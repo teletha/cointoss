@@ -47,7 +47,7 @@ public class TradingLog {
     public int expired;
 
     /** summary */
-    public int rejected;
+    public int unexecuted;
 
     /** summary */
     public LongSummary orderTime;
@@ -73,6 +73,7 @@ public class TradingLog {
         active = 0;
         completed = 0;
         canceled = 0;
+        unexecuted = 0;
         orderTime = new LongSummary();
         holdTime = new LongSummary();
         profit = new AmountSummary();
@@ -84,6 +85,10 @@ public class TradingLog {
                     canceled++;
                 }
                 continue;
+            }
+
+            if (entry.executed_size.isZero()) {
+                unexecuted++;
             }
 
             // calculate order time
@@ -155,12 +160,12 @@ public class TradingLog {
                         .append(" → ")
                         .append(totalExecutedSize.isZero() ? "" : totalPrice.divide(totalExecutedSize).asJPY(1))
                         .append("\t")
-                        .append(entry.description())
+                        .append(entry.description() == null ? "" : entry.description())
                         .toString());
             }
         }
 
-        int order = active + completed + canceled + expired + rejected;
+        int order = active + completed + canceled + expired + unexecuted;
 
         StringBuilder builder = new StringBuilder();
         builder.append("発注 ").append(orderTime);
@@ -176,7 +181,7 @@ public class TradingLog {
                 .append(" (勝率")
                 .append((profit.positive * 100 / Math.max(profit.size, 1)))
                 .append("% ")
-                .append(String.format("総%d 済%d 残%d 中止%d 失効%d 棄却%d)%n", order, completed, active, canceled, expired, rejected));
+                .append(String.format("総%d 済%d 残%d 中止%d 失効%d 未約定%d)%n", order, completed, active, canceled, expired, unexecuted));
         builder.append("開始 ").append(format(market.getExecutionInit(), market.getBaseInit(), market.getTargetInit())).append("\r\n");
         builder.append("終了 ")
                 .append(format(market.getExecutionLatest(), market.getBase(), market.getTarget()))

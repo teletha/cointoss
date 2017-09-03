@@ -415,6 +415,25 @@ public class Amount {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return value.hashCode();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Amount) {
+            return value.equals(((Amount) obj).value);
+        }
+        return false;
+    }
+
+    /**
      * <p>
      * Return the maximum amount.
      * </p>

@@ -510,6 +510,22 @@ public class Order implements Directional {
     }
 
     /**
+     * <p>
+     * Utility.
+     * </p>
+     * 
+     * @return
+     */
+    public final boolean isAllCompleted() {
+        for (Order exit : exits) {
+            if (exit.isCompleted() == false) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * Test whether this order can trade with the specified {@link Execution}.
      * 
      * @param e A target {@link Execution}.

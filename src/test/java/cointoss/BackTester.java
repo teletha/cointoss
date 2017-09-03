@@ -10,19 +10,11 @@
 package cointoss;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.IntStream;
 
-import cointoss.Amount;
-import cointoss.Execution;
-import cointoss.Market;
-import cointoss.MarketBuilder;
-import cointoss.Order;
-import cointoss.Side;
-import cointoss.Trade;
 import cointoss.Time.Lag;
-import cointoss.indicator.simple.ClosePriceIndicator;
-import cointoss.indicator.trackers.ExponentialMovingAverageIndicator;
-import cointoss.indicator.trackers.MACDIndicator;
 import cointoss.market.bitflyer.BitFlyerBTCFXBuilder;
 import kiss.I;
 import kiss.Signal;
@@ -34,7 +26,7 @@ import kiss.Ⅱ;
 public class BackTester {
 
     /** 試行回数 */
-    private int trial = 5;
+    private int trial = 1;
 
     /** 基軸通貨量 */
     private Amount base = Amount.ZERO;
@@ -167,28 +159,21 @@ public class BackTester {
      */
     private static class BackTestTrade extends Trade {
 
-        private final Amount size = new Amount("1");
+        private final Amount size = new Amount("0.01");
 
-        private final Amount profitLimit = new Amount("3");
+        private final Amount profitLimit = new Amount("500");
 
-        private final Amount lossLimit = new Amount("2.8");
+        private Set<Amount> prices = new HashSet();
 
-        private final long orderTimeLimit = 60 * 5;
+        private Amount priceInterval = Amount.of(300);
 
-        private final long holdTimeLimit = 60 * 60 * 24 * 1;
-
-        private MACDIndicator macd;
+        private int max = 100;
 
         /**
          * {@inheritDoc}
          */
         @Override
         public void initialize(Market market) {
-            ClosePriceIndicator closePrise = new ClosePriceIndicator(market.ticks);
-            ExponentialMovingAverageIndicator shortEMA = new ExponentialMovingAverageIndicator(closePrise, 9);
-            ExponentialMovingAverageIndicator longEMA = new ExponentialMovingAverageIndicator(closePrise, 26);
-            macd = new MACDIndicator(closePrise, 9, 26);
-            ExponentialMovingAverageIndicator emaMacd = new ExponentialMovingAverageIndicator(macd, 18);
         }
 
         /**
@@ -196,31 +181,46 @@ public class BackTester {
          */
         @Override
         public void onNoPosition(Market market, Execution exe) {
-            if (market.hasNoActiveOrder() && 60 < market.ticks.size()) {
-                Side side = Side.random();
-                Amount price = exe.price;
-                LocalDateTime orderTime = exe.after(orderTimeLimit);
-                LocalDateTime holdTime = exe.after(holdTimeLimit);
+            if (60 < market.ticks.size() && prices.size() < max) {
+                Amount range = range(exe.price);
 
-                Order.limit(side, size, price).entryTo(market).to(entry -> {
-                    if (entry.isAfter(orderTime)) {
-                        // cancel
-                        market.cancel(entry.o).to();
-                    } else if (entry.e.isMine()) {
-                        // executed
-                        Amount loss = price.ratio(entry.inverse(), lossLimit);
+                if (!prices.contains(range)) {
+                    prices.add(range);
 
-                        Order.limit(entry.inverse(), entry.e.size, price.ratio(entry, profitLimit)).with(entry).entryTo(market).to(exit -> {
+                    Side side = Side.BUY;
+                    Amount entryPrice = exe.price.minus(side, profitLimit.divide(2));
+                    Amount exitPrice = entryPrice.plus(side, profitLimit);
+                    LocalDateTime holdLimit = exe.exec_date.plusMinutes(10);
 
-                            if (exit.isAfter(holdTime)) {
-                                exit.clear("時間経過");
-                            } else if (exit.e.price.isLessThan(entry, loss)) {
-                                exit.clear("ロスカット");
+                    Order.limit(side, size, entryPrice).entryTo(market).to(entry -> {
+                        if (entry.e.isMine() && entry.o.isCompleted()) {
+                            Order.limit(side.inverse(), size, exitPrice).with(entry).entryTo(market).to(exit -> {
+                                if (exit.e.isMine() && entry.o.isAllCompleted()) {
+                                    prices.remove(range);
+                                }
+                            });
+                        } else {
+                            if (entry.o.executed_size.isZero() && entry.e.exec_date.isAfter(holdLimit)) {
+                                market.cancel(entry.o).to(o -> {
+                                    prices.remove(range);
+                                });
                             }
-                        });
-                    }
-                });
+                        }
+                    });
+                }
             }
+        }
+
+        /**
+         * <p>
+         * Calculate price range.
+         * </p>
+         * 
+         * @param price
+         * @return
+         */
+        private Amount range(Amount price) {
+            return price.divide(priceInterval).integral().multiply(priceInterval);
         }
     }
 }

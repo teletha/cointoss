@@ -16,6 +16,7 @@ import java.util.List;
 
 import cointoss.Execution;
 import cointoss.MarketBuilder;
+import cointoss.market.Span;
 import filer.Filer;
 import kiss.I;
 import kiss.Signal;
@@ -28,13 +29,25 @@ public class BitFlyerBTCFXBuilder implements MarketBuilder {
     /** date format for log */
     private static final DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyyMMdd");
 
+    /** Sample trend */
+    private static final Span SampleTrend = new Span(2017, 5, 24, 2017, 5, 27);
+
+    /** Sample of range trend */
+    private static final Span RangeTrend = new Span(2017, 5, 29, 2017, 7, 29);
+
+    /** Sample of up trend */
+    private static final Span UpTrend = new Span(2017, 7, 16, 2017, 8, 29);
+
+    /** Sample of down trend */
+    private static final Span DownTrend = new Span(2017, 6, 11, 2017, 7, 16);
+
     /**
      * {@inheritDoc}
      */
     @Override
     public Signal<Execution> initialize() {
-        LocalDate start = LocalDate.of(2017, 6, 24);
-        LocalDate end = LocalDate.of(2017, 6, 29);
+        LocalDate start = SampleTrend.start;
+        LocalDate end = SampleTrend.end;
 
         List<LocalDate> period = new ArrayList();
 

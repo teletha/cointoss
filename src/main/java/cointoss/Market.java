@@ -327,6 +327,7 @@ public class Market {
                     .plus(exe.price.multiply(executed))
                     .divide(order.executed_size.plus(executed));
         }
+
         order.outstanding_size = order.outstanding_size.minus(executed);
         order.executed_size = order.executed_size.plus(executed);
 
