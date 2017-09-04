@@ -13,10 +13,6 @@ import java.util.List;
 
 import org.junit.Test;
 
-import cointoss.Execution;
-import cointoss.Order;
-import cointoss.OrderState;
-import cointoss.Side;
 import cointoss.Order.Quantity;
 
 /**
@@ -205,6 +201,31 @@ public class MarketTest {
     }
 
     @Test
+    public void shortMarketWithTrigger() throws Exception {
+        TestableMarket market = new TestableMarket();
+
+        Order order = Order.marketShort(1).when(8);
+        market.requestSuccessfully(order);
+        market.execute(Side.BUY, 1, 9);
+        assert market.validateOrderState(1, 0, 0, 0, 0);
+        market.execute(Side.BUY, 1, 8);
+        assert market.validateOrderState(1, 0, 0, 0, 0);
+        market.execute(Side.BUY, 1, 7);
+        assert market.validateOrderState(0, 1, 0, 0, 0);
+        assert order.average_price.is(7);
+
+        order = Order.marketShort(1).when(8);
+        market.requestSuccessfully(order);
+        market.execute(Side.BUY, 1, 9);
+        assert market.validateOrderState(1, 1, 0, 0, 0);
+        market.execute(Side.BUY, 1, 8);
+        assert market.validateOrderState(1, 1, 0, 0, 0);
+        market.execute(Side.BUY, 1, 9);
+        assert market.validateOrderState(0, 2, 0, 0, 0);
+        assert order.average_price.is(9);
+    }
+
+    @Test
     public void longWithTrigger() throws Exception {
         TestableMarket market = new TestableMarket();
 
@@ -231,8 +252,31 @@ public class MarketTest {
         market.execute(Side.BUY, 1, 12);
         assert market.validateOrderState(0, 1, 0, 0, 0);
     }
-    // JRF20170818-000848-448049
-    // JRF20170818-001010-189927
+
+    @Test
+    public void longMarketWithTrigger() throws Exception {
+        TestableMarket market = new TestableMarket();
+
+        Order order = Order.marketLong(1).when(12);
+        market.requestSuccessfully(order);
+        market.execute(Side.BUY, 1, 11);
+        assert market.validateOrderState(1, 0, 0, 0, 0);
+        market.execute(Side.BUY, 1, 12);
+        assert market.validateOrderState(1, 0, 0, 0, 0);
+        market.execute(Side.BUY, 1, 13);
+        assert market.validateOrderState(0, 1, 0, 0, 0);
+        assert order.average_price.is(13);
+
+        order = Order.marketLong(1).when(12);
+        market.requestSuccessfully(order);
+        market.execute(Side.BUY, 1, 11);
+        assert market.validateOrderState(1, 1, 0, 0, 0);
+        market.execute(Side.BUY, 1, 12);
+        assert market.validateOrderState(1, 1, 0, 0, 0);
+        market.execute(Side.BUY, 1, 11);
+        assert market.validateOrderState(0, 2, 0, 0, 0);
+        assert order.average_price.is(11);
+    }
 
     @Test
     public void fillOrKillLong() throws Exception {
@@ -356,9 +400,6 @@ public class MarketTest {
         assert market.validateOrderState(0, 4, 0, 0, 0);
     }
 
-    // JRF20170818-000848-448049
-    // JRF20170818-001010-189927
-
     @Test
     public void marketLong() throws Exception {
         TestableMarket market = new TestableMarket();
@@ -393,6 +434,43 @@ public class MarketTest {
     }
 
     @Test
+    public void marketShort() throws Exception {
+        TestableMarket market = new TestableMarket();
+
+        Order order = Order.marketShort(1);
+        market.requestSuccessfully(order);
+        market.execute(Side.SELL, 1, 10);
+        assert order.average_price.is(10);
+        assert order.executed_size.is(1);
+
+        // divide
+        order = Order.marketShort(10);
+        market.requestSuccessfully(order);
+        market.execute(Side.BUY, 5, 10);
+        market.execute(Side.BUY, 5, 20);
+        assert order.average_price.is(15);
+        assert order.executed_size.is(10);
+
+        // divide overflow
+        order = Order.marketShort(10);
+        market.requestSuccessfully(order);
+        market.execute(Side.BUY, 5, 10);
+        market.execute(Side.BUY, 14, 20);
+        assert order.average_price.is(15);
+        assert order.executed_size.is(10);
+
+        // divide underflow
+        order = Order.marketShort(10);
+        market.requestSuccessfully(order);
+        market.execute(Side.BUY, 5, 10);
+        market.execute(Side.BUY, 3, 20);
+        assert order.average_price.is("13.75");
+        assert order.executed_size.is(8);
+        market.execute(Side.BUY, 2, 20);
+        assert order.average_price.is(15);
+    }
+
+    @Test
     public void cancel() throws Exception {
         TestableMarket market = new TestableMarket();
 
@@ -403,19 +481,5 @@ public class MarketTest {
         assert market.validateOrderState(0, 0, 1, 0, 0);
         market.execute(Side.BUY, 1, 12);
         assert market.validateOrderState(0, 0, 1, 0, 0);
-    }
-
-    @Test
-    public void entryOCO() throws Exception {
-        TestableMarket market = new TestableMarket();
-
-        Order buy = Order.limitLong(1, 5);
-        Order sell = Order.limitShort(1, 15);
-
-        market.entry(buy, sell).to();
-        assert market.validateOrderState(2, 0, 0, 0, 0);
-        market.execute(Side.BUY, 1, 15);
-        assert market.validateExecutionState(1);
-        assert market.validateOrderState(0, 1, 1, 0, 0);
     }
 }

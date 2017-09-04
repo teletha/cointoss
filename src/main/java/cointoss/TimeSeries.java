@@ -70,6 +70,13 @@ public class TimeSeries {
         return ticks.get(index);
     }
 
+    /**
+     * 
+     */
+    public Tick getCurrentTick() {
+        return ticks.get(ticks.size() - 1);
+    }
+
     /** CACHE */
     private MACDIndicator macd;
 

@@ -9,12 +9,12 @@
  */
 package cointoss;
 
-import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.stream.IntStream;
 
 import cointoss.Time.Lag;
+import cointoss.indicator.Indicator;
+import cointoss.indicator.simple.PriceIndicator;
+import cointoss.indicator.trackers.SimpleMovingAverageIndicator;
 import cointoss.market.bitflyer.BitFlyerBTCFXBuilder;
 import kiss.I;
 import kiss.Signal;
@@ -26,7 +26,7 @@ import kiss.Ⅱ;
 public class BackTester {
 
     /** 試行回数 */
-    private int trial = 1;
+    private int trial = 3;
 
     /** 基軸通貨量 */
     private Amount base = Amount.ZERO;
@@ -159,21 +159,39 @@ public class BackTester {
      */
     private static class BackTestTrade extends Trade {
 
-        private final Amount size = new Amount("0.01");
+        private final Amount size = new Amount("1");
 
-        private final Amount profitLimit = new Amount("500");
+        private final Amount lossLimit = new Amount("3000");
 
-        private Set<Amount> prices = new HashSet();
+        private final Amount interval = new Amount("100");
 
-        private Amount priceInterval = Amount.of(300);
+        private Indicator<Amount> longMV;
 
-        private int max = 100;
+        private Indicator<Amount> shortMV;
 
         /**
          * {@inheritDoc}
          */
         @Override
         public void initialize(Market market) {
+            Indicator<Amount> closer = new PriceIndicator(market.ticks, Tick::getMiddle);
+            shortMV = new SimpleMovingAverageIndicator(closer, 12);
+            longMV = new SimpleMovingAverageIndicator(closer, 60);
+        }
+
+        private void exit(OrderAndExecution entry, Amount size, Amount base, Amount limitLine, Market market, int count) {
+            Order.market(entry.inverse(), size).when(limitLine).with(entry).entryTo(market).to(exit -> {
+                Amount diff = exit.e.price.minus(shortMV.getLast());
+
+                if (exit.isBuy() ? diff.isLessThan(-2500) : diff.isGreaterThan(2500)) {
+                    market.cancel(exit.o);
+                    Order.market(exit.side(), exit.o.outstanding_size).with(entry).entryTo(market).to();
+                } else if (exit.e.price.isGreaterThan(entry, base.plus(entry, interval))) {
+                    market.cancel(exit.o);
+                    exit(entry, exit.o.outstanding_size, exit.e.price, exit.e.price
+                            .minus(entry, lossLimit.minus(Amount.of(50).multiply(count))), market, count + 1);
+                }
+            });
         }
 
         /**
@@ -181,46 +199,21 @@ public class BackTester {
          */
         @Override
         public void onNoPosition(Market market, Execution exe) {
-            if (60 < market.ticks.size() && prices.size() < max) {
-                Amount range = range(exe.price);
+            if (60 < market.ticks.size() && market.hasNoActiveOrder()) {
+                Amount diff = exe.price.minus(longMV.getLast());
 
-                if (!prices.contains(range)) {
-                    prices.add(range);
+                if (diff.abs().isGreaterThan(5200)) {
+                    Side side = diff.isNegative() ? Side.BUY : Side.SELL;
 
-                    Side side = Side.BUY;
-                    Amount entryPrice = exe.price.minus(side, profitLimit.divide(2));
-                    Amount exitPrice = entryPrice.plus(side, profitLimit);
-                    LocalDateTime holdLimit = exe.exec_date.plusMinutes(10);
-
-                    Order.limit(side, size, entryPrice).entryTo(market).to(entry -> {
-                        if (entry.e.isMine() && entry.o.isCompleted()) {
-                            Order.limit(side.inverse(), size, exitPrice).with(entry).entryTo(market).to(exit -> {
-                                if (exit.e.isMine() && entry.o.isAllCompleted()) {
-                                    prices.remove(range);
+                    Order.market(side, size) //
+                            .entryTo(market)
+                            .to(entry -> {
+                                if (entry.e.isMine()) {
+                                    exit(entry, entry.e.size, entry.e.price, entry.e.price.minus(entry, lossLimit), market, 1);
                                 }
                             });
-                        } else {
-                            if (entry.o.executed_size.isZero() && entry.e.exec_date.isAfter(holdLimit)) {
-                                market.cancel(entry.o).to(o -> {
-                                    prices.remove(range);
-                                });
-                            }
-                        }
-                    });
                 }
             }
-        }
-
-        /**
-         * <p>
-         * Calculate price range.
-         * </p>
-         * 
-         * @param price
-         * @return
-         */
-        private Amount range(Amount price) {
-            return price.divide(priceInterval).integral().multiply(priceInterval);
         }
     }
 }

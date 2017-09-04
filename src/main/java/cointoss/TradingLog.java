@@ -58,6 +58,12 @@ public class TradingLog {
     /** summary */
     public AmountSummary profit;
 
+    /** summary */
+    public AmountSummary loss;
+
+    /** summary */
+    public AmountSummary profitAndLoss;
+
     /**
      * @param market
      */
@@ -77,6 +83,8 @@ public class TradingLog {
         orderTime = new LongSummary();
         holdTime = new LongSummary();
         profit = new AmountSummary();
+        loss = new AmountSummary();
+        profitAndLoss = new AmountSummary();
 
         for (Order entry : orders) {
             // exclude exit order
@@ -134,7 +142,12 @@ public class TradingLog {
                 }
             }
             holdTime.add(Duration.between(start, finish).getSeconds());
-            profit.add(totalProfit);
+            profitAndLoss.add(totalProfit);
+            if (totalProfit.isPositive()) {
+                profit.add(totalProfit);
+            } else {
+                loss.add(totalProfit);
+            }
             if (0 < active) {
                 this.active++;
             } else {
@@ -143,25 +156,26 @@ public class TradingLog {
 
             // show bad orders
             if (totalProfit.isNegative()) {
-                System.out.println(new StringBuilder() //
-                        .append("注文 ")
-                        .append(durationHMS.format(start))
-                        .append("～")
-                        .append(start == finish ? "\t\t" : durationHMS.format(finish))
-                        .append("\t 損益")
-                        .append(totalProfit.asJPY(4))
-                        .append("\t")
-                        .append(totalExecutedSize)
-                        .append("/")
-                        .append(entry.executed_size)
-                        .append("@")
-                        .append(entry.side().mark())
-                        .append(entry.average_price.asJPY(1))
-                        .append(" → ")
-                        .append(totalExecutedSize.isZero() ? "" : totalPrice.divide(totalExecutedSize).asJPY(1))
-                        .append("\t")
-                        .append(entry.description() == null ? "" : entry.description())
-                        .toString());
+                // System.out.println(new StringBuilder() //
+                // .append("注文 ")
+                // .append(durationHMS.format(start))
+                // .append("～")
+                // .append(start == finish ? "\t\t" : durationHMS.format(finish))
+                // .append("\t 損益")
+                // .append(totalProfit.asJPY(4))
+                // .append("\t")
+                // .append(totalExecutedSize)
+                // .append("/")
+                // .append(entry.executed_size)
+                // .append("@")
+                // .append(entry.side().mark())
+                // .append(entry.average_price.asJPY(1))
+                // .append(" → ")
+                // .append(totalExecutedSize.isZero() ? "" :
+                // totalPrice.divide(totalExecutedSize).asJPY(1))
+                // .append("\t")
+                // .append(entry.description() == null ? "" : entry.description())
+                // .toString());
             }
         }
 
@@ -170,16 +184,18 @@ public class TradingLog {
         StringBuilder builder = new StringBuilder();
         builder.append("発注 ").append(orderTime);
         builder.append("保持 ").append(holdTime);
+        builder.append("損失 ").append(loss).append("\r\n");
+        builder.append("利益 ").append(profit).append("\r\n");
         builder.append("取引 最小")
-                .append(profit.min.asJPY(7))
+                .append(profitAndLoss.min.asJPY(7))
                 .append("\t最大")
-                .append(profit.max.asJPY(7))
+                .append(profitAndLoss.max.asJPY(7))
                 .append("\t平均")
-                .append(profit.mean().asJPY(7))
+                .append(profitAndLoss.mean().asJPY(7))
                 .append("\t合計")
-                .append(profit.total.asJPY(12))
+                .append(profitAndLoss.total.asJPY(12))
                 .append(" (勝率")
-                .append((profit.positive * 100 / Math.max(profit.size, 1)))
+                .append((profitAndLoss.positive * 100 / Math.max(profitAndLoss.size, 1)))
                 .append("% ")
                 .append(String.format("総%d 済%d 残%d 中止%d 失効%d 未約定%d)%n", order, completed, active, canceled, expired, unexecuted));
         builder.append("開始 ").append(format(market.getExecutionInit(), market.getBaseInit(), market.getTargetInit())).append("\r\n");
@@ -291,6 +307,9 @@ public class TradingLog {
     /**
      * @version 2017/08/30 20:45:02
      */
+    /**
+     * @version 2017/09/04 14:13:21
+     */
     private static class AmountSummary {
 
         /** MAX value. */
@@ -328,6 +347,22 @@ public class TradingLog {
             total = total.plus(value);
             size++;
             if (value.isPositive()) positive++;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String toString() {
+            return new StringBuilder().append("最小")
+                    .append(min.asJPY(7))
+                    .append("\t最大")
+                    .append(max.asJPY(7))
+                    .append("\t平均")
+                    .append(mean().asJPY(7))
+                    .append("\t合計")
+                    .append(total.asJPY(12))
+                    .toString();
         }
     }
 }

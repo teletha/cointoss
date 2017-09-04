@@ -121,6 +121,9 @@ public class Market {
      * @param acceptanceId
      */
     public final Signal<String> cancel(Order order) {
+        orders.remove(order);
+        order.child_order_state = OrderState.CANCELED;
+
         return backend.cancel(order.child_order_acceptance_id).effect(id -> {
             orders.remove(order);
             order.child_order_state = OrderState.CANCELED;

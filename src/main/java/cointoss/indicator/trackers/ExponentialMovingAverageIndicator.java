@@ -57,7 +57,7 @@ public class ExponentialMovingAverageIndicator extends AbstractIndicator<Amount>
             // If the timeframe is bigger than the indicator's value count
             return indicator.getValue(0);
         }
-        Amount previous = calculate(index - 1);
+        Amount previous = getValue(index - 1);
         return indicator.getValue(index).minus(previous).multiply(multiplier).plus(previous);
     }
 }

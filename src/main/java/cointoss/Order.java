@@ -341,6 +341,16 @@ public class Order implements Directional {
      * @param size
      * @return
      */
+    public static Order marketShort(int size) {
+        return marketShort(Amount.of(size));
+    }
+
+    /**
+     * 成り行き注文
+     * 
+     * @param size
+     * @return
+     */
     public static Order marketShort(Amount size) {
         return market(Side.SELL, size);
     }

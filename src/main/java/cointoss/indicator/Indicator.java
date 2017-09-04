@@ -38,6 +38,15 @@ public interface Indicator<T> extends Serializable {
     }
 
     /**
+     * Get the current tick.
+     * 
+     * @return
+     */
+    default T getLast() {
+        return getValue(getTimeSeries().size() - 2);
+    }
+
+    /**
      * @return the related time series
      */
     TimeSeries getTimeSeries();

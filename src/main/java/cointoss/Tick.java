@@ -107,6 +107,15 @@ public class Tick {
     }
 
     /**
+     * Calculate typical price.
+     * 
+     * @return
+     */
+    public Amount getMiddle() {
+        return opening.plus(closing).divide(2);
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override

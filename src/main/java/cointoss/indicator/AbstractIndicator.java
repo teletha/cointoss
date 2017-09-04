@@ -9,7 +9,7 @@
  */
 package cointoss.indicator;
 
-import org.eclipse.collections.api.map.primitive.IntObjectMap;
+import org.eclipse.collections.api.map.primitive.MutableIntObjectMap;
 import org.eclipse.collections.impl.factory.primitive.IntObjectMaps;
 
 import cointoss.TimeSeries;
@@ -23,7 +23,7 @@ public abstract class AbstractIndicator<T> implements Indicator<T> {
     /** INTERNAL ACCESS */
     protected final TimeSeries series;
 
-    private final IntObjectMap<T> cache = IntObjectMaps.mutable.empty();
+    private final MutableIntObjectMap<T> cache = IntObjectMaps.mutable.empty();
 
     /**
      * Constructor.
@@ -48,7 +48,7 @@ public abstract class AbstractIndicator<T> implements Indicator<T> {
      */
     @Override
     public T getValue(int index) {
-        return calculate(index);
+        return cache.getIfAbsentPut(index, () -> calculate(index));
     }
 
     /**

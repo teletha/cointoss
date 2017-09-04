@@ -30,7 +30,7 @@ public class BitFlyerBTCFXBuilder implements MarketBuilder {
     private static final DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyyMMdd");
 
     /** Sample trend */
-    private static final Span SampleTrend = new Span(2017, 5, 24, 2017, 5, 27);
+    private static final Span SampleTrend = new Span(2017, 5, 29, 2017, 6, 5);
 
     /** Sample of range trend */
     private static final Span RangeTrend = new Span(2017, 5, 29, 2017, 7, 29);
@@ -46,8 +46,9 @@ public class BitFlyerBTCFXBuilder implements MarketBuilder {
      */
     @Override
     public Signal<Execution> initialize() {
-        LocalDate start = SampleTrend.start;
-        LocalDate end = SampleTrend.end;
+        Span span = Span.random(2017, 5, 24, 2017, 8, 24, 5);
+        LocalDate start = span.start;
+        LocalDate end = span.end;
 
         List<LocalDate> period = new ArrayList();
 

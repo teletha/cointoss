@@ -45,7 +45,7 @@ public class Amount {
     public static final Amount MAX = new Amount(new BigDecimal(Long.MAX_VALUE));
 
     /** The actual value. */
-    private BigDecimal value;
+    protected BigDecimal value;
 
     /**
      * @param value
@@ -57,14 +57,14 @@ public class Amount {
     /**
      * @param value
      */
-    private Amount(BigDecimal value) {
+    protected Amount(BigDecimal value) {
         this.value = value.setScale(SCALE, RoundingMode.HALF_UP);
     }
 
     /**
      * @return
      */
-    public long longValue() {
+    public final long longValue() {
         return value.longValue();
     }
 
@@ -82,7 +82,7 @@ public class Amount {
      * 
      * @param size
      */
-    public Amount plus(int size) {
+    public final Amount plus(int size) {
         return plus(Amount.of(size));
     }
 
@@ -101,7 +101,7 @@ public class Amount {
      * @param direction A current side.
      * @param size A increase size.
      */
-    public Amount plus(Directional direction, int size) {
+    public final Amount plus(Directional direction, int size) {
         return plus(direction, Amount.of(size));
     }
 
@@ -111,7 +111,7 @@ public class Amount {
      * @param direction A current side.
      * @param size A increase size.
      */
-    public Amount plus(Directional direction, Amount size) {
+    public final Amount plus(Directional direction, Amount size) {
         return direction.isBuy() ? plus(size) : minus(size);
     }
 
@@ -120,7 +120,7 @@ public class Amount {
      * 
      * @param size
      */
-    public Amount minus(int size) {
+    public final Amount minus(int size) {
         return minus(Amount.of(size));
     }
 
@@ -139,7 +139,7 @@ public class Amount {
      * @param direction A current side.
      * @param size A decrease size.
      */
-    public Amount minus(Directional direction, int size) {
+    public final Amount minus(Directional direction, int size) {
         return minus(direction, Amount.of(size));
     }
 
@@ -149,7 +149,7 @@ public class Amount {
      * @param direction A current side.
      * @param size A decrease size.
      */
-    public Amount minus(Directional direction, Amount size) {
+    public final Amount minus(Directional direction, Amount size) {
         return direction.isSell() ? plus(size) : minus(size);
     }
 
@@ -159,7 +159,7 @@ public class Amount {
      * @param size
      * @return
      */
-    public Amount multiply(int size) {
+    public final Amount multiply(int size) {
         return multiply(Amount.of(size));
     }
 
@@ -179,7 +179,7 @@ public class Amount {
      * @param size
      * @return
      */
-    public Amount divide(int size) {
+    public final Amount divide(int size) {
         return divide(Amount.of(size));
     }
 
@@ -209,7 +209,7 @@ public class Amount {
      * @param size
      * @return
      */
-    public Amount ratio(Directional direction, Amount size) {
+    public final Amount ratio(Directional direction, Amount size) {
         return direction.isBuy() ? multiply(HUNDRED.plus(size).divide(HUNDRED)) : multiply(HUNDRED.minus(size).divide(HUNDRED));
     }
 
@@ -219,7 +219,7 @@ public class Amount {
      * @param amount
      * @return A result.
      */
-    public boolean isGreaterThan(int amount) {
+    public final boolean isGreaterThan(int amount) {
         return isGreaterThan(Amount.of(amount));
     }
 
@@ -229,15 +229,25 @@ public class Amount {
      * @param amount
      * @return A result.
      */
-    public boolean isGreaterThan(Amount amount) {
+    public final boolean isGreaterThan(Amount amount) {
         return value.compareTo(amount.value) > 0;
+    }
+
+    /**
+     * Compare {@link Amount}.
+     * 
+     * @param amount
+     * @return A result.
+     */
+    public final boolean isGreaterThan(Directional direction, Amount price) {
+        return direction.isBuy() ? isGreaterThan(price) : isLessThan(price);
     }
 
     /**
      * @param i
      * @return
      */
-    public boolean isEqualOrGreaterThan(int amount) {
+    public final boolean isEqualOrGreaterThan(int amount) {
         return isEqualOrGreaterThan(Amount.of(amount));
     }
 
@@ -247,7 +257,7 @@ public class Amount {
      * @param amount
      * @return A result.
      */
-    public boolean isEqualOrGreaterThan(Amount amount) {
+    public final boolean isEqualOrGreaterThan(Amount amount) {
         return value.compareTo(amount.value) >= 0;
     }
 
@@ -257,7 +267,7 @@ public class Amount {
      * @param amount
      * @return A result.
      */
-    public boolean isLessThan(int amount) {
+    public final boolean isLessThan(int amount) {
         return isLessThan(Amount.of(amount));
     }
 
@@ -267,7 +277,7 @@ public class Amount {
      * @param amount
      * @return A result.
      */
-    public boolean isLessThan(Amount amount) {
+    public final boolean isLessThan(Amount amount) {
         return value.compareTo(amount.value) < 0;
     }
 
@@ -277,7 +287,7 @@ public class Amount {
      * @param amount
      * @return A result.
      */
-    public boolean isLessThan(Directional direction, Amount price) {
+    public final boolean isLessThan(Directional direction, Amount price) {
         return direction.isBuy() ? isLessThan(price) : isGreaterThan(price);
     }
 
@@ -285,7 +295,7 @@ public class Amount {
      * @param amount
      * @return
      */
-    public boolean isEqualOrLessThan(int amount) {
+    public final boolean isEqualOrLessThan(int amount) {
         return isEqualOrLessThan(Amount.of(amount));
     }
 
@@ -295,7 +305,7 @@ public class Amount {
      * @param amount
      * @return A result.
      */
-    public boolean isEqualOrLessThan(Amount amount) {
+    public final boolean isEqualOrLessThan(Amount amount) {
         return value.compareTo(amount.value) <= 0;
     }
 
@@ -305,7 +315,7 @@ public class Amount {
      * @param amount
      * @return A result.
      */
-    public boolean isEqualTo(Amount amount) {
+    public final boolean isEqualTo(Amount amount) {
         return value.compareTo(amount.value) == 0;
     }
 
@@ -315,7 +325,7 @@ public class Amount {
      * @param amount
      * @return A result.
      */
-    public boolean isNotEqualTo(Amount amount) {
+    public final boolean isNotEqualTo(Amount amount) {
         return value.compareTo(amount.value) != 0;
     }
 
@@ -325,7 +335,7 @@ public class Amount {
      * @param amount
      * @return A result.
      */
-    public boolean is(int amount) {
+    public final boolean is(int amount) {
         return isEqualTo(Amount.of(amount));
     }
 
@@ -335,7 +345,7 @@ public class Amount {
      * @param amount
      * @return A result.
      */
-    public boolean is(String amount) {
+    public final boolean is(String amount) {
         return isEqualTo(new Amount(amount));
     }
 
@@ -345,28 +355,28 @@ public class Amount {
      * @param amount
      * @return A result.
      */
-    public boolean isNot(int amount) {
+    public final boolean isNot(int amount) {
         return isNotEqualTo(Amount.of(amount));
     }
 
     /**
      * @return
      */
-    public boolean isZero() {
+    public final boolean isZero() {
         return isEqualTo(ZERO);
     }
 
     /**
      * @return
      */
-    public boolean isPositive() {
+    public final boolean isPositive() {
         return isEqualOrGreaterThan(ZERO);
     }
 
     /**
      * @return
      */
-    public boolean isNegative() {
+    public final boolean isNegative() {
         return isLessThan(ZERO);
     }
 
@@ -375,7 +385,7 @@ public class Amount {
      * 
      * @return
      */
-    public String asJPY() {
+    public final String asJPY() {
         return asJPY(10);
     }
 
@@ -384,7 +394,7 @@ public class Amount {
      * 
      * @return
      */
-    public String asJPY(int size) {
+    public final String asJPY(int size) {
         return String.format("%," + size + ".0f円", value.doubleValue());
     }
 
@@ -393,7 +403,7 @@ public class Amount {
      * 
      * @return
      */
-    public String asBTC() {
+    public final String asBTC() {
         return String.format("B%3.4f", value.doubleValue());
     }
 
@@ -410,7 +420,7 @@ public class Amount {
      * {@inheritDoc}
      */
     @Override
-    public String toString() {
+    public final String toString() {
         return value.stripTrailingZeros().toPlainString();
     }
 
@@ -418,7 +428,7 @@ public class Amount {
      * {@inheritDoc}
      */
     @Override
-    public int hashCode() {
+    public final int hashCode() {
         return value.hashCode();
     }
 
@@ -426,7 +436,7 @@ public class Amount {
      * {@inheritDoc}
      */
     @Override
-    public boolean equals(Object obj) {
+    public final boolean equals(Object obj) {
         if (obj instanceof Amount) {
             return value.equals(((Amount) obj).value);
         }
