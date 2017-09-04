@@ -44,19 +44,13 @@ public class Span {
     }
 
     /**
-     * @param i
-     * @param j
-     * @param k
-     * @param l
-     * @param m
-     * @param n
-     * @param o
+     * @param start
+     * @param end
+     * @param size
      * @return
      */
-    public static Span random(int startYear, int startMonth, int startDay, int endYear, int endMonth, int endDay, int size) {
-        LocalDate start = LocalDate.of(startYear, startMonth, startDay);
-        LocalDate end = LocalDate.of(endYear, endMonth, endDay).minusDays(size);
-        long days = ChronoUnit.DAYS.between(start, end);
+    public static Span random(LocalDate start, LocalDate end, int size) {
+        long days = ChronoUnit.DAYS.between(start, end.minusDays(size));
         long offset = Generator.randomLong(0, days);
         return new Span(start.plusDays(offset), start.plusDays(offset + size));
     }

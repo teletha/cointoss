@@ -9,6 +9,7 @@
  */
 package cointoss.market.bitflyer;
 
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -41,12 +42,48 @@ public class BitFlyerBTCFXBuilder implements MarketBuilder {
     /** Sample of down trend */
     private static final Span DownTrend = new Span(2017, 6, 11, 2017, 7, 16);
 
+    /** The log folder. */
+    private static final Path root = Filer.locate(".log/bitflyer/" + BitFlyerType.FX_BTC_JPY.name());
+
+    /** The first day. */
+    private static final LocalDate first;
+
+    /** The last day. */
+    private static final LocalDate last;
+
+    static {
+        List<Path> files = Filer.walk(root, "execution*.log");
+        LocalDate start = null;
+        LocalDate end = null;
+
+        for (Path file : files) {
+            String name = file.getFileName().toString();
+            LocalDate date = LocalDate.parse(name.substring(9, 17), format);
+
+            if (start == null || end == null) {
+                start = date;
+                end = date;
+            } else {
+                if (start.isAfter(date)) {
+                    start = date;
+                }
+
+                if (end.isBefore(date)) {
+                    end = date;
+                }
+            }
+        }
+
+        first = start;
+        last = end;
+    }
+
     /**
      * {@inheritDoc}
      */
     @Override
     public Signal<Execution> initialize() {
-        Span span = Span.random(2017, 5, 24, 2017, 8, 24, 5);
+        Span span = Span.random(first, last, 5);
         LocalDate start = span.start;
         LocalDate end = span.end;
 

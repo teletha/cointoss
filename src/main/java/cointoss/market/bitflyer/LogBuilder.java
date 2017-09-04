@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import cointoss.Amount;
 import cointoss.Execution;
 import cointoss.Generator;
 import cointoss.Side;
@@ -211,6 +212,8 @@ public class LogBuilder {
     }
 
     public static void main(String[] args) {
+        I.load(Amount.Codec.class, false);
+
         new LogBuilder(BitFlyerType.FX_BTC_JPY).build();
     }
 }
