@@ -161,7 +161,7 @@ public class BackTester {
 
         private final Amount size = new Amount("1");
 
-        private final Amount lossLimit = new Amount("3000");
+        private final Amount lossLimit = new Amount("7000");
 
         private final Amount interval = new Amount("100");
 
@@ -183,7 +183,7 @@ public class BackTester {
             Order.market(entry.inverse(), size).when(limitLine).with(entry).entryTo(market).to(exit -> {
                 Amount diff = exit.e.price.minus(shortMV.getLast());
 
-                if (exit.isBuy() ? diff.isLessThan(-2500) : diff.isGreaterThan(2500)) {
+                if (exit.isBuy() ? diff.isLessThan(-1800) : diff.isGreaterThan(1800)) {
                     market.cancel(exit.o);
                     Order.market(exit.side(), exit.o.outstanding_size).with(entry).entryTo(market).to();
                 } else if (exit.e.price.isGreaterThan(entry, base.plus(entry, interval))) {
@@ -200,7 +200,7 @@ public class BackTester {
         @Override
         public void onNoPosition(Market market, Execution exe) {
             if (60 < market.ticks.size() && market.hasNoActiveOrder()) {
-                Amount diff = exe.price.minus(longMV.getLast());
+                Amount diff = market.ticks.getLastTick().closing.minus(longMV.getLast());
 
                 if (diff.abs().isGreaterThan(5200)) {
                     Side side = diff.isNegative() ? Side.BUY : Side.SELL;

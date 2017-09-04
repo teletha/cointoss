@@ -71,6 +71,13 @@ public class TimeSeries {
     }
 
     /**
+     * @return
+     */
+    public Tick getLastTick() {
+        return ticks.get(ticks.size() - 2);
+    }
+
+    /**
      * 
      */
     public Tick getCurrentTick() {
