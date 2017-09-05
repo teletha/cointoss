@@ -169,7 +169,7 @@ public class BackTester {
 
         private Market market;
 
-        private TimeSeries series;
+        private TimeSeries minute1;
 
         private final Decimal size = Decimal.valueOf("1");
 
@@ -203,12 +203,12 @@ public class BackTester {
         @Override
         public void initialize(Market market) {
             this.market = market;
-            this.series = market.series;
-            Indicator<Decimal> closer = new ClosePriceIndicator(market.series);
+            this.minute1 = market.minute1;
+            Indicator<Decimal> closer = new ClosePriceIndicator(market.minute1);
             shortMV = new SMAIndicator(closer, 12);
             longMV = new SMAIndicator(closer, 60);
 
-            close = new ClosePriceIndicator(market.series);
+            close = new ClosePriceIndicator(market.minute1);
             SMAIndicator sma = new SMAIndicator(close, 20);
             bm = new BollingerBandsMiddleIndicator(sma);
             bu = new BollingerBandsUpperIndicator(bm, sma);
@@ -235,13 +235,24 @@ public class BackTester {
             });
         }
 
+        private Trading trade;
+
         /**
          * {@inheritDoc}
          */
         @Override
         public void onNoPosition(Market market, Execution exe) {
-            if (market.hasNoActiveOrder() && market.remaining.is(0)) {
-                Order.market(Side.random(), size).entryTo(market).to(this::tryExit);
+            if (60 <= minute1.getTickCount()) {
+                if (trade == null) {
+                    trade = new BreakoutTrading(market);
+                }
+
+                if (trade.hasPosition() == false) {
+                    trade.tryEntry(exe);
+                } else {
+                    trade.tryExit(exe);
+                }
+
             }
         }
 
@@ -251,13 +262,197 @@ public class BackTester {
          * @param entry
          */
         private void tryExit(OrderAndExecution entry) {
-            Decimal closePrice = series.getLastTick().getClosePrice();
+            if (entry.o.isCompleted() == false) {
+                return;
+            }
+            Order.limit(entry.inverse(), entry.o.size(), entry.priceUp(2000)).with(entry).entryTo(market).to(exit -> {
+                if (exit.e.isMine()) {
+                }
+            });
+        }
+    }
 
-            if (entry.isBuy() ? entry.e.price.plus(300).isLessThan(closePrice) : entry.e.price.minus(300).isGreaterThan(closePrice)) {
-                // // 最終終値よりも安くなったら売る （上がり続けている場合のみ継続する）
-                // Order.market(entry.inverse(),
-                // entry.o.executed_size).with(entry).entryTo(market).to(exit -> {
-                // });
+    /**
+     * @version 2017/09/05 19:39:34
+     */
+    private abstract static class Trading {
+
+        /** The market. */
+        protected final Market market;
+
+        /** The current position. (null means no position) */
+        private Side position;
+
+        /** The current position size. */
+        private Decimal positionSize = Decimal.ZERO;
+
+        /** The current position average price. */
+        private Decimal positionPrice = Decimal.ZERO;
+
+        /** The number of requesting order. */
+        private int requestingOrders;
+
+        /** The entry order. */
+        private Order entry;
+
+        /**
+         * New Trade.
+         */
+        protected Trading(Market market) {
+            this.market = market;
+        }
+
+        /**
+         * Helper to check position state.
+         * 
+         * @return
+         */
+        protected final boolean hasPosition() {
+            return requestingOrders != 0 || position != null;
+        }
+
+        /**
+         * Calculate current profit or loss.
+         * 
+         * @return
+         */
+        protected final Decimal profit() {
+            return market.getLatestPrice().minus(positionPrice).multipliedBy(positionSize);
+        }
+
+        /**
+         * Request entry order.
+         * 
+         * @param side
+         * @param size
+         */
+        protected final void entryLimit(Side side, Decimal size, Decimal price) {
+            requestingOrders++;
+
+            Order.limit(side, size, price).entryTo(market).to(this::managePosition);
+        }
+
+        /**
+         * Request entry order.
+         * 
+         * @param side
+         * @param size
+         */
+        protected final void entryMarket(Side side, Decimal size) {
+            requestingOrders++;
+
+            Order.market(side, size).entryTo(market).to(this::managePosition);
+        }
+
+        /**
+         * Request entry order.
+         * 
+         * @param size
+         */
+        protected final void exitMarket(Decimal size) {
+            if (hasPosition()) {
+                requestingOrders++;
+
+                Order.market(position.inverse(), size).with(entry).entryTo(market).to(this::managePosition);
+            }
+        }
+
+        /**
+         * Manage position.
+         * 
+         * @param oae
+         */
+        private void managePosition(OrderAndExecution oae) {
+            Execution exe = oae.e;
+
+            if (exe.isMine()) {
+                Decimal size = positionSize;
+
+                // update position
+                if (position == null) {
+                    // new position
+                    position = oae.o.side();
+                    positionSize = exe.size;
+                    positionPrice = exe.price;
+                } else if (position == oae.o.side()) {
+                    // same position
+                    positionSize = positionSize.plus(exe.size);
+                    positionPrice = positionPrice.multipliedBy(size).plus(exe.price.multipliedBy(exe.size)).dividedBy(positionSize);
+                } else {
+                    // counter position
+                    positionSize = positionSize.minus(exe.size);
+
+                    if (positionSize.isZero()) {
+                        // clear position
+                        position = null;
+                        positionPrice = Decimal.ZERO;
+                    } else if (positionSize.isNegative()) {
+                        // inverse position
+                        position = position.inverse();
+                        positionPrice = exe.price;
+                    } else {
+                        // decrease position
+                        positionPrice = positionPrice.multipliedBy(size).minus(exe.price.multipliedBy(exe.size)).dividedBy(positionSize);
+                    }
+                }
+
+                if (oae.o.isCompleted()) {
+                    requestingOrders--;
+                }
+            }
+        }
+
+        /**
+         * Write your entry rule. This method is called whenever this trade has no position.
+         * 
+         * @param exe
+         */
+        public abstract void tryEntry(Execution exe);
+
+        /**
+         * Write your exit rule. This method is called whenever this trade has some position.
+         * 
+         * @param exe
+         */
+        public abstract void tryCancelEntry(Execution exe);
+
+        /**
+         * Write your exit rule. This method is called whenever this trade has some position.
+         * 
+         * @param exe
+         */
+        public abstract void tryExit(Execution exe);
+    }
+
+    /**
+     * @version 2017/09/05 20:19:04
+     */
+    private static class BreakoutTrading extends Trading {
+
+        /**
+         * @param market
+         * @param exe
+         */
+        private BreakoutTrading(Market market) {
+            super(market);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void tryEntry(Execution exe) {
+            entryMarket(Side.random(), Decimal.ONE);
+            System.out.println("entry");
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void tryExit(Execution exe) {
+            if (profit().isGreaterThan(1000)) {
+                // exitMarket(Decimal.ONE);
             }
         }
     }

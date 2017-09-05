@@ -102,9 +102,6 @@ public class Decimal implements Comparable<Decimal> {
      * @see BigDecimal#add(java.math.BigDecimal, java.math.MathContext)
      */
     public Decimal plus(Decimal augend) {
-        if ((this == NaN) || (augend == NaN)) {
-            return NaN;
-        }
         return new Decimal(delegate.add(augend.delegate, MATH_CONTEXT));
     }
 
@@ -117,9 +114,6 @@ public class Decimal implements Comparable<Decimal> {
      * @see BigDecimal#subtract(java.math.BigDecimal, java.math.MathContext)
      */
     public Decimal minus(Decimal subtrahend) {
-        if ((this == NaN) || (subtrahend == NaN)) {
-            return NaN;
-        }
         return new Decimal(delegate.subtract(subtrahend.delegate, MATH_CONTEXT));
     }
 
@@ -132,9 +126,6 @@ public class Decimal implements Comparable<Decimal> {
      * @see BigDecimal#multiply(java.math.BigDecimal, java.math.MathContext)
      */
     public Decimal multipliedBy(Decimal multiplicand) {
-        if ((this == NaN) || (multiplicand == NaN)) {
-            return NaN;
-        }
         return new Decimal(delegate.multiply(multiplicand.delegate, MATH_CONTEXT));
     }
 

@@ -11,6 +11,8 @@ package cointoss;
 
 import java.time.ZonedDateTime;
 
+import eu.verdelhan.ta4j.Decimal;
+
 /**
  * @version 2017/08/19 18:48:34
  */
@@ -68,5 +70,15 @@ public class OrderAndExecution implements Directional {
     @Override
     public String toString() {
         return o + "\t\t" + e;
+    }
+
+    /**
+     * Calculate the upforward order price.
+     * 
+     * @param size
+     * @return
+     */
+    public Decimal priceUp(int size) {
+        return o.average_price.plus(o, size);
     }
 }

@@ -16,8 +16,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 
 import eu.verdelhan.ta4j.Decimal;
-import eu.verdelhan.ta4j.Tick;
-import eu.verdelhan.ta4j.TimeSeries;
 import kiss.I;
 import kiss.Observer;
 import kiss.Signal;
@@ -33,8 +31,44 @@ public class Market {
     /** The trading logger. */
     public final TradingLog logger = new TradingLog(this);
 
-    /** The tick manager. */
-    public final TimeSeries series = new TimeSeries("minute");
+    /** CHART */
+    public final Chart hour256 = new Chart(Duration.ofHours(256), null);
+
+    /** CHART */
+    public final Chart hour128 = new Chart(Duration.ofHours(128), hour256);
+
+    /** CHART */
+    public final Chart hour64 = new Chart(Duration.ofHours(64), hour128);
+
+    /** CHART */
+    public final Chart hour32 = new Chart(Duration.ofHours(32), hour64);
+
+    /** CHART */
+    public final Chart hour16 = new Chart(Duration.ofHours(16), hour32);
+
+    /** CHART */
+    public final Chart hour8 = new Chart(Duration.ofHours(8), hour16);
+
+    /** CHART */
+    public final Chart hour4 = new Chart(Duration.ofHours(4), hour8);
+
+    /** CHART */
+    public final Chart hour2 = new Chart(Duration.ofHours(2), hour4);
+
+    /** CHART */
+    public final Chart hour1 = new Chart(Duration.ofHours(1), hour2);
+
+    /** CHART */
+    public final Chart minute30 = new Chart(Duration.ofMinutes(30), hour1);
+
+    /** CHART */
+    public final Chart minute15 = new Chart(Duration.ofMinutes(15), minute30);
+
+    /** CHART */
+    public final Chart minute5 = new Chart(Duration.ofMinutes(5), minute15);
+
+    /** CHART */
+    public final Chart minute1 = new Chart(Duration.ofMinutes(1), minute5);
 
     /** The initial execution. */
     private Execution init;
@@ -282,21 +316,6 @@ public class Market {
     /** The related order identifiers. */
     private final CopyOnWriteArrayList<Order> orders = new CopyOnWriteArrayList();
 
-    private LocalTick current = new LocalTick();
-
-    /**
-     * Record executions.
-     */
-    private void tick(Execution exe) {
-        if (exe.exec_date.isBefore(current.endTime)) {
-            current.mark(exe);
-        } else {
-            series.addTick(new Tick(Duration
-                    .ofMinutes(1), current.endTime, current.opening, current.highest, current.lowest, current.closing, current.volume));
-            current = new LocalTick(exe);
-        }
-    }
-
     /**
      * <p>
      * Trade something.
@@ -310,7 +329,7 @@ public class Market {
         }
         latest = exe;
 
-        tick(exe);
+        minute1.tick(exe);
 
         for (Order order : orders) {
             if (order.id().equals(exe.buy_child_order_acceptance_id) || order.id().equals(exe.sell_child_order_acceptance_id)) {
