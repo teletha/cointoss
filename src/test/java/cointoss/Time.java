@@ -43,16 +43,6 @@ public class Time {
     }
 
     /**
-     * Specify time
-     * 
-     * @param seconds
-     * @return
-     */
-    public static Rule after(int seconds) {
-        return Rule.when(at(seconds).to());
-    }
-
-    /**
      * Specify time.
      * 
      * @param seconds

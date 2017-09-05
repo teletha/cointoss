@@ -18,7 +18,7 @@ import eu.verdelhan.ta4j.Decimal;
 /**
  * @version 2017/08/22 14:24:30
  */
-public class LocalTick {
+class LocalTick {
 
     /** opening price */
     public Decimal opening;

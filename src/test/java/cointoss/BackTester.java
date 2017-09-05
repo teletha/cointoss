@@ -15,8 +15,15 @@ import cointoss.Time.Lag;
 import cointoss.market.bitflyer.BitFlyerBTCFXBuilder;
 import eu.verdelhan.ta4j.Decimal;
 import eu.verdelhan.ta4j.Indicator;
+import eu.verdelhan.ta4j.TimeSeries;
 import eu.verdelhan.ta4j.indicators.simple.ClosePriceIndicator;
+import eu.verdelhan.ta4j.indicators.trackers.RSIIndicator;
 import eu.verdelhan.ta4j.indicators.trackers.SMAIndicator;
+import eu.verdelhan.ta4j.indicators.trackers.bollinger.BollingerBandsLowerIndicator;
+import eu.verdelhan.ta4j.indicators.trackers.bollinger.BollingerBandsMiddleIndicator;
+import eu.verdelhan.ta4j.indicators.trackers.bollinger.BollingerBandsUpperIndicator;
+import eu.verdelhan.ta4j.trading.rules.CrossedDownIndicatorRule;
+import eu.verdelhan.ta4j.trading.rules.CrossedUpIndicatorRule;
 import kiss.I;
 import kiss.Signal;
 import kiss.Ⅱ;
@@ -27,7 +34,7 @@ import kiss.Ⅱ;
 public class BackTester {
 
     /** 試行回数 */
-    private int trial = 3;
+    private int trial = 1;
 
     /** 基軸通貨量 */
     private Decimal base = Decimal.ZERO;
@@ -151,18 +158,22 @@ public class BackTester {
      * @param args
      */
     public static void main(String[] args) {
-        BackTester tester = BackTester.initialize(BitFlyerBTCFXBuilder.class).balance(1000000, 0).strategy(BackTestTrade.class);
+        BackTester tester = BackTester.initialize(BitFlyerBTCFXBuilder.class).balance(1000000, 0).strategy(BreakoutStrategy.class);
         tester.execute();
     }
 
     /**
      * @version 2017/08/24 23:18:21
      */
-    private static class BackTestTrade extends Trade {
+    private static class BreakoutStrategy extends Trade {
+
+        private Market market;
+
+        private TimeSeries series;
 
         private final Decimal size = Decimal.valueOf("1");
 
-        private final Decimal lossLimit = Decimal.valueOf("7000");
+        private final Decimal lossLimit = Decimal.valueOf("3000");
 
         private final Decimal interval = Decimal.valueOf("100");
 
@@ -170,14 +181,43 @@ public class BackTester {
 
         private Indicator<Decimal> shortMV;
 
+        private BollingerBandsMiddleIndicator bm;
+
+        private BollingerBandsUpperIndicator bu;
+
+        private BollingerBandsLowerIndicator bl;
+
+        private ClosePriceIndicator close;
+
+        private CrossedUpIndicatorRule buyEntry;
+
+        private CrossedDownIndicatorRule sellEntry;
+
+        RSIIndicator shortRSI;
+
+        RSIIndicator longRSI;
+
         /**
          * {@inheritDoc}
          */
         @Override
         public void initialize(Market market) {
+            this.market = market;
+            this.series = market.series;
             Indicator<Decimal> closer = new ClosePriceIndicator(market.series);
             shortMV = new SMAIndicator(closer, 12);
             longMV = new SMAIndicator(closer, 60);
+
+            close = new ClosePriceIndicator(market.series);
+            SMAIndicator sma = new SMAIndicator(close, 20);
+            bm = new BollingerBandsMiddleIndicator(sma);
+            bu = new BollingerBandsUpperIndicator(bm, sma);
+            bl = new BollingerBandsLowerIndicator(bm, sma);
+            buyEntry = new CrossedUpIndicatorRule(close, bu);
+            sellEntry = new CrossedDownIndicatorRule(close, bl);
+
+            shortRSI = new RSIIndicator(closer, 13);
+            longRSI = new RSIIndicator(closer, 42);
         }
 
         private void exit(OrderAndExecution entry, Decimal size, Decimal base, Decimal limitLine, Market market, int count) {
@@ -200,20 +240,24 @@ public class BackTester {
          */
         @Override
         public void onNoPosition(Market market, Execution exe) {
-            if (market.hasNoActiveOrder()) {
-                Decimal diff = market.series.getLastTick().getClosePrice().minus(longMV.getValue(longMV.getTimeSeries().getEnd()));
+            if (market.hasNoActiveOrder() && market.remaining.is(0)) {
+                Order.market(Side.random(), size).entryTo(market).to(this::tryExit);
+            }
+        }
 
-                if (diff.abs().isGreaterThan(5200)) {
-                    Side side = diff.isNegative() ? Side.BUY : Side.SELL;
+        /**
+         * Try to order exit.
+         * 
+         * @param entry
+         */
+        private void tryExit(OrderAndExecution entry) {
+            Decimal closePrice = series.getLastTick().getClosePrice();
 
-                    Order.market(side, size) //
-                            .entryTo(market)
-                            .to(entry -> {
-                                if (entry.e.isMine()) {
-                                    exit(entry, entry.e.size, entry.e.price, entry.e.price.minus(entry, lossLimit), market, 1);
-                                }
-                            });
-                }
+            if (entry.isBuy() ? entry.e.price.plus(300).isLessThan(closePrice) : entry.e.price.minus(300).isGreaterThan(closePrice)) {
+                // // 最終終値よりも安くなったら売る （上がり続けている場合のみ継続する）
+                // Order.market(entry.inverse(),
+                // entry.o.executed_size).with(entry).entryTo(market).to(exit -> {
+                // });
             }
         }
     }

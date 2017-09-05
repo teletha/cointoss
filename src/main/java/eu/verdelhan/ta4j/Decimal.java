@@ -639,6 +639,16 @@ public class Decimal implements Comparable<Decimal> {
      * @param direction A current side.
      * @param size A increase size.
      */
+    public final Decimal plus(int size) {
+        return plus(new Decimal(size));
+    }
+
+    /**
+     * Increase amount by the specified {@link Directional}.
+     * 
+     * @param direction A current side.
+     * @param size A increase size.
+     */
     public final Decimal plus(Directional direction, int size) {
         return plus(direction, new Decimal(size));
     }
@@ -651,6 +661,16 @@ public class Decimal implements Comparable<Decimal> {
      */
     public final Decimal plus(Directional direction, Decimal size) {
         return direction.isBuy() ? plus(size) : minus(size);
+    }
+
+    /**
+     * Decrease amount by the specified {@link Directional}.
+     * 
+     * @param direction A current side.
+     * @param size A decrease size.
+     */
+    public final Decimal minus(int size) {
+        return minus(new Decimal(size));
     }
 
     /**
