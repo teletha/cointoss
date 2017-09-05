@@ -20,10 +20,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import cointoss.Amount;
 import cointoss.Execution;
 import cointoss.Generator;
 import cointoss.Side;
+import eu.verdelhan.ta4j.Decimal;
 import filer.Filer;
 import kiss.I;
 
@@ -174,7 +174,7 @@ public class LogBuilder {
             }
 
             // check price
-            if (e2.price.minus(e1.price).abs().isEqualOrLessThan(400)) {
+            if (e2.price.minus(e1.price).abs().isLessThanOrEqual(400)) {
                 continue;
             }
 
@@ -188,8 +188,8 @@ public class LogBuilder {
             Execution complement = new Execution();
             complement.id = (e1.id + e2.id) / 2;
             complement.side = Side.random();
-            complement.size = e1.size.plus(e2.size).divide(2);
-            complement.price = e1.price.plus(e2.price).divide(2).integral();
+            complement.size = e1.size.plus(e2.size).dividedBy(2);
+            complement.price = e1.price.plus(e2.price).dividedBy(2).integral();
             complement.exec_date = e1.exec_date.plusSeconds(duration / 2);
             complement.buy_child_order_acceptance_id = "Complement-" + format.format(e1.exec_date) + "-" + Generator
                     .randomInt(10000000, 99999999);
@@ -212,7 +212,7 @@ public class LogBuilder {
     }
 
     public static void main(String[] args) {
-        I.load(Amount.Codec.class, false);
+        I.load(Decimal.Codec.class, false);
 
         new LogBuilder(BitFlyerType.FX_BTC_JPY).build();
     }

@@ -9,9 +9,8 @@
  */
 package cointoss;
 
-import java.time.LocalDateTime;
-
-import cointoss.Generator;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 /**
  * @version 2017/08/16 22:07:12
@@ -19,7 +18,7 @@ import cointoss.Generator;
 public class Time {
 
     /** The base time */
-    static final LocalDateTime BASE = LocalDateTime.of(2017, 1, 1, 0, 0, 0);
+    static final ZonedDateTime BASE = ZonedDateTime.of(2017, 1, 1, 0, 0, 0, 0, ZoneId.systemDefault());
 
     /**
      * @version 2017/08/16 22:36:24
@@ -38,7 +37,7 @@ public class Time {
         /**
          * @return
          */
-        public LocalDateTime to() {
+        public ZonedDateTime to() {
             return BASE.plusSeconds(time);
         }
     }
@@ -123,7 +122,7 @@ public class Time {
          * {@inheritDoc}
          */
         @Override
-        public LocalDateTime to() {
+        public ZonedDateTime to() {
             return BASE.plusSeconds(Generator.randomInt(start, end));
         }
 

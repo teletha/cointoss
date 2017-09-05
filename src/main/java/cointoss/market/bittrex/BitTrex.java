@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import cointoss.Amount;
+import eu.verdelhan.ta4j.Decimal;
 import kiss.I;
 import kiss.Signal;
 
@@ -24,7 +24,7 @@ import kiss.Signal;
  */
 public class BitTrex {
 
-    private final Amount fee = new Amount("0.9975");
+    private final Decimal fee = Decimal.valueOf("0.9975");
 
     /**
      * Read ticker.
@@ -65,31 +65,31 @@ public class BitTrex {
             BitTrexOrderBook eth2coin = o.ⅱ;
             BitTrexOrderBook btc2eth = o.ⅲ;
 
-            Amount btc = Amount.ONE;
+            Decimal btc = Decimal.ONE;
 
             // exchange to coin
-            Amount coin = btc.divide(btc2coin.middleAsk()).multiply(fee);
+            Decimal coin = btc.dividedBy(btc2coin.middleAsk()).multipliedBy(fee);
 
             // exchange to eth
-            Amount eth = coin.multiply(eth2coin.middleBid()).multiply(fee);
+            Decimal eth = coin.multipliedBy(eth2coin.middleBid()).multipliedBy(fee);
 
             // exchange to btc
-            Amount result = eth.multiply(btc2eth.middleBid()).multiply(fee);
+            Decimal result = eth.multipliedBy(btc2eth.middleBid()).multipliedBy(fee);
 
             if (result.isGreaterThan(btc)) {
                 System.out.println("BTC-" + type + "-ETH-BTC \t" + result + "  ");
             }
 
-            btc = Amount.ONE;
+            btc = Decimal.ONE;
 
             // exchange to eth
-            eth = btc.divide(btc2eth.middleAsk()).multiply(fee);
+            eth = btc.dividedBy(btc2eth.middleAsk()).multipliedBy(fee);
 
             // exchange to coin
-            coin = eth.divide(eth2coin.middleAsk()).multiply(fee);
+            coin = eth.dividedBy(eth2coin.middleAsk()).multipliedBy(fee);
 
             // exchange to btc
-            result = coin.multiply(btc2coin.middleBid()).multiply(fee);
+            result = coin.multipliedBy(btc2coin.middleBid()).multipliedBy(fee);
 
             if (result.isGreaterThan(btc)) {
                 System.out.println("BTC-ETH-" + type + "-BTC \t" + result);
@@ -101,7 +101,7 @@ public class BitTrex {
      * 
      */
     public static void main(String[] args) throws InterruptedException, MalformedURLException {
-        I.load(Amount.Codec.class, false);
+        I.load(Decimal.Codec.class, false);
 
         BitTrex trex = new BitTrex();
 

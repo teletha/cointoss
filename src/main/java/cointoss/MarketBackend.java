@@ -9,6 +9,7 @@
  */
 package cointoss;
 
+import eu.verdelhan.ta4j.Decimal;
 import kiss.Signal;
 import kiss.Ⅱ;
 
@@ -97,5 +98,5 @@ public interface MarketBackend {
      * 
      * @return
      */
-    Signal<Ⅱ<Amount, Amount>> getCurrency();
+    Signal<Ⅱ<Decimal, Decimal>> getCurrency();
 }

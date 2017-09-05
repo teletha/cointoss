@@ -9,23 +9,15 @@
  */
 package cointoss;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import cointoss.Amount;
-import cointoss.Execution;
-import cointoss.Market;
-import cointoss.MarketBackend;
-import cointoss.MarketBuilder;
-import cointoss.Order;
-import cointoss.OrderState;
-import cointoss.OrderType;
-import cointoss.Position;
 import cointoss.Order.Quantity;
 import cointoss.Time.Lag;
+import eu.verdelhan.ta4j.Decimal;
 import kiss.I;
 import kiss.Signal;
 import kiss.Ⅱ;
@@ -54,7 +46,7 @@ class TestableMarketBackend implements MarketBackend {
     private final Lag lag;
 
     /** The current time. */
-    private LocalDateTime now = Time.BASE;
+    private ZonedDateTime now = Time.BASE;
 
     /**
     * 
@@ -86,8 +78,8 @@ class TestableMarketBackend implements MarketBackend {
             child.child_order_type = order.price().is(0) ? OrderType.MARKET : OrderType.LIMIT;
             child.average_price = order.price();
             child.outstanding_size = order.size();
-            child.cancel_size = Amount.ZERO;
-            child.executed_size = Amount.ZERO;
+            child.cancel_size = Decimal.ZERO;
+            child.executed_size = Decimal.ZERO;
 
             orderAll.add(child);
             orderActive.add(child);
@@ -156,8 +148,8 @@ class TestableMarketBackend implements MarketBackend {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Ⅱ<Amount, Amount>> getCurrency() {
-        return I.signal(I.pair(Amount.of(100), Amount.ZERO));
+    public Signal<Ⅱ<Decimal, Decimal>> getCurrency() {
+        return I.signal(I.pair(Decimal.of(100), Decimal.ZERO));
     }
 
     /**
@@ -183,11 +175,11 @@ class TestableMarketBackend implements MarketBackend {
             // check trigger price
             if (order.triggerPrice() != null && order.triggerArchived == false) {
                 if (order.isBuy()) {
-                    if (e.price.isEqualOrGreaterThan(order.triggerPrice())) {
+                    if (e.price.isGreaterThanOrEqual(order.triggerPrice())) {
                         order.triggerArchived = true;
                     }
                 } else {
-                    if (e.price.isEqualOrLessThan(order.triggerPrice())) {
+                    if (e.price.isLessThanOrEqual(order.triggerPrice())) {
                         order.triggerArchived = true;
                     }
                 }
@@ -203,7 +195,7 @@ class TestableMarketBackend implements MarketBackend {
 
             if (order.quantity() == Quantity.ImmediateOrCancel) {
                 if (order.isTradablePriceWith(e)) {
-                    Amount min = Amount.min(e.size, order.outstanding_size);
+                    Decimal min = Decimal.min(e.size, order.outstanding_size);
                     order.outstanding_size = min;
                 } else {
                     iterator.remove();
@@ -213,11 +205,11 @@ class TestableMarketBackend implements MarketBackend {
             }
 
             if (order.isTradablePriceWith(e)) {
-                Amount executedSize = Amount.min(e.size, order.outstanding_size);
+                Decimal executedSize = Decimal.min(e.size, order.outstanding_size);
                 if (order.child_order_type.isMarket() && executedSize.isNot(0)) {
-                    order.average_price = order.average_price.multiply(order.executed_size)
-                            .plus(e.price.multiply(executedSize))
-                            .divide(order.executed_size.plus(executedSize));
+                    order.average_price = order.average_price.multipliedBy(order.executed_size)
+                            .plus(e.price.multipliedBy(executedSize))
+                            .dividedBy(order.executed_size.plus(executedSize));
                 }
                 order.outstanding_size = order.outstanding_size.minus(executedSize);
                 order.executed_size = order.executed_size.plus(executedSize);

@@ -9,7 +9,7 @@
  */
 package cointoss;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 /**
  * @version 2017/08/19 18:48:34
@@ -41,7 +41,7 @@ public class OrderAndExecution implements Directional {
     public void clear(String message) {
         market.cancel(o).to(id -> {
             o.entry.description(message);
-    
+
             Order.market(o.side(), o.outstanding_size).with(o.entry).description(message).entryTo(market).to();
         });
     }
@@ -50,7 +50,7 @@ public class OrderAndExecution implements Directional {
      * @param time
      * @return
      */
-    public boolean isAfter(LocalDateTime time) {
+    public boolean isAfter(ZonedDateTime time) {
         return e.exec_date.isAfter(time);
     }
 

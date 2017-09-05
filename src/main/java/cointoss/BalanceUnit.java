@@ -9,6 +9,8 @@
  */
 package cointoss;
 
+import eu.verdelhan.ta4j.Decimal;
+
 /**
  * @version 2017/08/15 16:31:11
  */
@@ -18,8 +20,8 @@ public class BalanceUnit {
     public String currency_code;
 
     /** The total currency amount. */
-    public Amount amount;
+    public Decimal amount;
 
     /** The available currency amount. */
-    public Amount available;
+    public Decimal available;
 }

@@ -9,7 +9,6 @@
  */
 package cointoss.market.bitflyer;
 
-import cointoss.Amount;
 import cointoss.Execution;
 import cointoss.Market;
 import cointoss.MarketBackend;
@@ -17,6 +16,7 @@ import cointoss.MarketBuilder;
 import cointoss.Order;
 import cointoss.OrderState;
 import cointoss.Position;
+import eu.verdelhan.ta4j.Decimal;
 import kiss.Signal;
 import kiss.Ⅱ;
 
@@ -109,7 +109,7 @@ public class BitFlyerBTCFX implements MarketBackend {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Ⅱ<Amount, Amount>> getCurrency() {
+    public Signal<Ⅱ<Decimal, Decimal>> getCurrency() {
         // If this exception will be thrown, it is bug of this program. So we must rethrow the
         // wrapped error in here.
         throw new Error();

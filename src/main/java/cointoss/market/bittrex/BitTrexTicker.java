@@ -9,29 +9,29 @@
  */
 package cointoss.market.bittrex;
 
-import cointoss.Amount;
+import eu.verdelhan.ta4j.Decimal;
 
 /**
  * @version 2017/08/31 19:11:31
  */
 public class BitTrexTicker {
 
-    public Amount Bid;
+    public Decimal Bid;
 
-    public Amount Ask;
+    public Decimal Ask;
 
-    public Amount Last;
+    public Decimal Last;
 
-    public Amount middle() {
-        return Bid.plus(Ask).divide(2);
+    public Decimal middle() {
+        return Bid.plus(Ask).dividedBy(2);
     }
 
-    public Amount middleBid() {
-        return Bid.plus(Bid).plus(Ask).divide(3);
+    public Decimal middleBid() {
+        return Bid.plus(Bid).plus(Ask).dividedBy(3);
     }
 
-    public Amount middleAsk() {
-        return Bid.plus(Ask).plus(Ask).divide(3);
+    public Decimal middleAsk() {
+        return Bid.plus(Ask).plus(Ask).dividedBy(3);
     }
 
     /**

@@ -9,11 +9,15 @@
  */
 package cointoss;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 
+import eu.verdelhan.ta4j.Decimal;
+import eu.verdelhan.ta4j.Tick;
+import eu.verdelhan.ta4j.TimeSeries;
 import kiss.I;
 import kiss.Observer;
 import kiss.Signal;
@@ -30,7 +34,7 @@ public class Market {
     public final TradingLog logger = new TradingLog(this);
 
     /** The tick manager. */
-    public final TimeSeries ticks = new TimeSeries();
+    public final TimeSeries series = new TimeSeries("minute");
 
     /** The initial execution. */
     private Execution init;
@@ -39,16 +43,16 @@ public class Market {
     private Execution latest;
 
     /** 基軸通貨量 */
-    private Amount base;
+    private Decimal base;
 
     /** 基軸通貨初期量 */
-    private Amount baseInit;
+    private Decimal baseInit;
 
     /** 対象通貨量 */
-    private Amount target;
+    private Decimal target;
 
     /** 対象通貨初期量 */
-    private Amount targetInit;
+    private Decimal targetInit;
 
     /** The current trading. */
     private Trade trade = new NOP();
@@ -177,7 +181,7 @@ public class Market {
      * 
      * @return
      */
-    public Amount getBase() {
+    public Decimal getBase() {
         return base;
     }
 
@@ -186,7 +190,7 @@ public class Market {
      * 
      * @return
      */
-    public Amount getTarget() {
+    public Decimal getTarget() {
         return target;
     }
 
@@ -195,7 +199,7 @@ public class Market {
      * 
      * @return
      */
-    public Amount getBaseInit() {
+    public Decimal getBaseInit() {
         return baseInit;
     }
 
@@ -204,7 +208,7 @@ public class Market {
      * 
      * @return
      */
-    public Amount getTargetInit() {
+    public Decimal getTargetInit() {
         return targetInit;
     }
 
@@ -229,7 +233,7 @@ public class Market {
     /**
      * @return
      */
-    public Amount getLatestPrice() {
+    public Decimal getLatestPrice() {
         return latest.price;
     }
 
@@ -249,9 +253,9 @@ public class Market {
      * 
      * @return
      */
-    public Amount calculateProfit() {
-        Amount baseProfit = base.minus(baseInit);
-        Amount targetProfit = target.multiply(latest.price).minus(targetInit.multiply(init.price));
+    public Decimal calculateProfit() {
+        Decimal baseProfit = base.minus(baseInit);
+        Decimal targetProfit = target.multipliedBy(latest.price).minus(targetInit.multipliedBy(init.price));
         return baseProfit.plus(targetProfit);
     }
 
@@ -270,13 +274,28 @@ public class Market {
     public Side position;
 
     /** The remaining position price. */
-    public Amount price = Amount.ZERO;
+    public Decimal price = Decimal.ZERO;
 
     /** The remaining position size. */
-    public Amount remaining = Amount.ZERO;
+    public Decimal remaining = Decimal.ZERO;
 
     /** The related order identifiers. */
     private final CopyOnWriteArrayList<Order> orders = new CopyOnWriteArrayList();
+
+    private LocalTick current = new LocalTick();
+
+    /**
+     * Record executions.
+     */
+    private void tick(Execution exe) {
+        if (exe.exec_date.isBefore(current.endTime)) {
+            current.mark(exe);
+        } else {
+            series.addTick(new Tick(Duration
+                    .ofMinutes(1), current.endTime, current.opening, current.highest, current.lowest, current.closing, current.volume));
+            current = new LocalTick(exe);
+        }
+    }
 
     /**
      * <p>
@@ -291,7 +310,7 @@ public class Market {
         }
         latest = exe;
 
-        ticks.tick(exe);
+        tick(exe);
 
         for (Order order : orders) {
             if (order.id().equals(exe.buy_child_order_acceptance_id) || order.id().equals(exe.sell_child_order_acceptance_id)) {
@@ -316,19 +335,19 @@ public class Market {
     private void update(Order order, Execution exe) {
         // update assets
         if (order.side().isBuy()) {
-            base = base.minus(exe.size.multiply(exe.price));
+            base = base.minus(exe.size.multipliedBy(exe.price));
             target = target.plus(exe.size);
         } else {
-            base = base.plus(exe.size.multiply(exe.price));
+            base = base.plus(exe.size.multipliedBy(exe.price));
             target = target.minus(exe.size);
         }
 
         // for order state
-        Amount executed = Amount.min(order.outstanding_size, exe.size);
+        Decimal executed = Decimal.min(order.outstanding_size, exe.size);
         if (order.child_order_type.isMarket() && executed.isNot(0)) {
-            order.average_price = order.average_price.multiply(order.executed_size)
-                    .plus(exe.price.multiply(executed))
-                    .divide(order.executed_size.plus(executed));
+            order.average_price = order.average_price.multipliedBy(order.executed_size)
+                    .plus(exe.price.multipliedBy(executed))
+                    .dividedBy(order.executed_size.plus(executed));
         }
 
         order.outstanding_size = order.outstanding_size.minus(executed);
@@ -351,7 +370,7 @@ public class Market {
             price = exe.price;
         } else if (position.isSame(order.side())) {
             // same position
-            price = price.multiply(remaining).plus(exe.price.multiply(executed)).divide(remaining.plus(executed));
+            price = price.multipliedBy(remaining).plus(exe.price.multipliedBy(executed)).dividedBy(remaining.plus(executed));
             remaining = remaining.plus(executed);
         } else {
             // diff position
@@ -373,7 +392,7 @@ public class Market {
      */
     private void initializePosition() {
         position = null;
-        price = remaining = Amount.ZERO;
+        price = remaining = Decimal.ZERO;
     }
 
     /**

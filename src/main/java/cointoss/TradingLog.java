@@ -10,12 +10,14 @@
 package cointoss;
 
 import java.time.Duration;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.time.DurationFormatUtils;
+
+import eu.verdelhan.ta4j.Decimal;
 
 /**
  * @version 2017/08/27 18:19:06
@@ -100,16 +102,16 @@ public class TradingLog {
             }
 
             // calculate order time
-            LocalDateTime start = entry.child_order_date;
-            LocalDateTime finish = entry.executions.get(entry.executions.size() - 1).exec_date;
+            ZonedDateTime start = entry.child_order_date;
+            ZonedDateTime finish = entry.executions.get(entry.executions.size() - 1).exec_date;
             orderTime.add(Duration.between(start, finish).getSeconds());
 
             // calculate hold time and profit
             start = entry.executions.get(0).exec_date;
             finish = start;
-            Amount totalExecutedSize = Amount.ZERO;
-            Amount totalProfit = Amount.ZERO;
-            Amount totalPrice = Amount.ZERO;
+            Decimal totalExecutedSize = Decimal.ZERO;
+            Decimal totalProfit = Decimal.ZERO;
+            Decimal totalPrice = Decimal.ZERO;
             int active = 0;
 
             for (Order exit : entry.exits) {
@@ -118,20 +120,20 @@ public class TradingLog {
                     active++;
                     totalExecutedSize = totalExecutedSize.plus(exit.executed_size);
                     totalProfit = totalProfit.plus(calculateTradeProfit(entry, exit));
-                    totalPrice = totalPrice.plus(exit.average_price.multiply(exit.executed_size));
+                    totalPrice = totalPrice.plus(exit.average_price.multipliedBy(exit.executed_size));
                     break;
 
                 case COMPLETED:
                     finish = max(finish, exit.executions.get(exit.executions.size() - 1).exec_date);
                     totalExecutedSize = totalExecutedSize.plus(exit.executed_size);
                     totalProfit = totalProfit.plus(calculateTradeProfit(entry, exit));
-                    totalPrice = totalPrice.plus(exit.average_price.multiply(exit.executed_size));
+                    totalPrice = totalPrice.plus(exit.average_price.multipliedBy(exit.executed_size));
                     break;
 
                 case CANCELED:
                     totalExecutedSize = totalExecutedSize.plus(exit.executed_size);
                     totalProfit = totalProfit.plus(calculateTradeProfit(entry, exit));
-                    totalPrice = totalPrice.plus(exit.average_price.multiply(exit.executed_size));
+                    totalPrice = totalPrice.plus(exit.average_price.multipliedBy(exit.executed_size));
                     break;
 
                 case EXPIRED:
@@ -214,7 +216,7 @@ public class TradingLog {
      * @param other
      * @return
      */
-    private LocalDateTime max(LocalDateTime one, LocalDateTime other) {
+    private ZonedDateTime max(ZonedDateTime one, ZonedDateTime other) {
         return one.isBefore(other) ? other : one;
     }
 
@@ -223,11 +225,11 @@ public class TradingLog {
      * 
      * @return
      */
-    private Amount calculateTradeProfit(Order entry, Order exit) {
+    private Decimal calculateTradeProfit(Order entry, Order exit) {
         if (entry.isBuy()) {
-            return exit.isBuy() ? Amount.ZERO : exit.average_price.minus(entry.average_price).multiply(exit.executed_size);
+            return exit.isBuy() ? Decimal.ZERO : exit.average_price.minus(entry.average_price).multipliedBy(exit.executed_size);
         } else {
-            return exit.isBuy() ? entry.average_price.minus(exit.average_price).multiply(exit.executed_size) : Amount.ZERO;
+            return exit.isBuy() ? entry.average_price.minus(exit.average_price).multipliedBy(exit.executed_size) : Decimal.ZERO;
         }
     }
 
@@ -243,14 +245,14 @@ public class TradingLog {
     }
 
     /**
-     * Format {@link Amount}.
+     * Format {@link Decimal}.
      * 
      * @param base
      * @return
      */
-    private String format(Execution e, Amount base, Amount target) {
+    private String format(Execution e, Decimal base, Decimal target) {
         return durationHM.format(e.exec_date) + " " + base.asJPY() + "\t" + target.asBTC() + "(" + e.price
-                .asJPY(1) + ")\t総計" + base.plus(target.multiply(e.price)).asJPY();
+                .asJPY(1) + ")\t総計" + base.plus(target.multipliedBy(e.price)).asJPY();
     }
 
     /**
@@ -313,13 +315,13 @@ public class TradingLog {
     private static class AmountSummary {
 
         /** MAX value. */
-        private Amount min = Amount.MAX;
+        private Decimal min = Decimal.MAX;
 
         /** MIN value. */
-        private Amount max = Amount.ZERO;
+        private Decimal max = Decimal.ZERO;
 
         /** Total value. */
-        private Amount total = Amount.ZERO;
+        private Decimal total = Decimal.ZERO;
 
         /** Number of values. */
         private int size = 0;
@@ -332,8 +334,8 @@ public class TradingLog {
          * 
          * @return
          */
-        private Amount mean() {
-            return total.divide(Math.max(size, 1));
+        private Decimal mean() {
+            return total.dividedBy(Math.max(size, 1));
         }
 
         /**
@@ -341,9 +343,9 @@ public class TradingLog {
          * 
          * @param value
          */
-        private void add(Amount value) {
-            min = Amount.min(min, value);
-            max = Amount.max(max, value);
+        private void add(Decimal value) {
+            min = Decimal.min(min, value);
+            max = Decimal.max(max, value);
             total = total.plus(value);
             size++;
             if (value.isPositive()) positive++;

@@ -9,7 +9,7 @@
  */
 package cointoss;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -94,7 +94,7 @@ public interface Rule {
      * @param timeLimit
      * @return
      */
-    static Rule when(LocalDateTime timeLimit) {
+    static Rule when(ZonedDateTime timeLimit) {
         return (m, e) -> e.exec_date.isAfter(timeLimit);
     }
 }

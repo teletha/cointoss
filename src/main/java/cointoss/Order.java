@@ -9,7 +9,7 @@
  */
 package cointoss;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -18,6 +18,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import eu.verdelhan.ta4j.Decimal;
 import kiss.Observer;
 import kiss.Signal;
 
@@ -33,12 +34,12 @@ public class Order implements Directional {
     private Side side;
 
     /** The ordered size. */
-    private Amount size;
+    private Decimal size;
 
     /** The ordered price. */
-    private Amount price;
+    private Decimal price;
 
-    private Amount triggerPrice;
+    private Decimal triggerPrice;
 
     private Quantity quantity;
 
@@ -60,10 +61,10 @@ public class Order implements Directional {
      * @param price
      * @param size
      */
-    protected Order(Side position, Amount size, Amount price, Amount priceLimit, Quantity quantity) {
+    protected Order(Side position, Decimal size, Decimal price, Decimal priceLimit, Quantity quantity) {
         this.side = Objects.requireNonNull(position);
         this.size = Objects.requireNonNull(size);
-        this.price = price == null ? Amount.ZERO : price;
+        this.price = price == null ? Decimal.ZERO : price;
         this.child_order_type = price == null ? OrderType.MARKET : OrderType.LIMIT;
 
         when(priceLimit);
@@ -114,7 +115,7 @@ public class Order implements Directional {
      * 
      * @return The size property.
      */
-    public Amount size() {
+    public Decimal size() {
         return size;
     }
 
@@ -124,7 +125,7 @@ public class Order implements Directional {
      * @return The size property.
      */
     @SuppressWarnings("unused")
-    private Amount getSize() {
+    private Decimal getSize() {
         return size;
     }
 
@@ -134,7 +135,7 @@ public class Order implements Directional {
      * @param size The size value to set.
      */
     @SuppressWarnings("unused")
-    private void setSize(Amount size) {
+    private void setSize(Decimal size) {
         this.size = size;
     }
 
@@ -143,7 +144,7 @@ public class Order implements Directional {
      * 
      * @return The price property.
      */
-    public Amount price() {
+    public Decimal price() {
         return price;
     }
 
@@ -153,7 +154,7 @@ public class Order implements Directional {
      * @return The price property.
      */
     @SuppressWarnings("unused")
-    private Amount getPrice() {
+    private Decimal getPrice() {
         return price;
     }
 
@@ -163,7 +164,7 @@ public class Order implements Directional {
      * @param price The price value to set.
      */
     @SuppressWarnings("unused")
-    private void setPrice(Amount price) {
+    private void setPrice(Decimal price) {
         this.price = price;
     }
 
@@ -172,7 +173,7 @@ public class Order implements Directional {
      * 
      * @return The triggerPrice property.
      */
-    public Amount triggerPrice() {
+    public Decimal triggerPrice() {
         return triggerPrice;
     }
 
@@ -182,7 +183,7 @@ public class Order implements Directional {
      * @return The triggerPrice property.
      */
     @SuppressWarnings("unused")
-    private Amount getTriggerPrice() {
+    private Decimal getTriggerPrice() {
         return triggerPrice;
     }
 
@@ -192,7 +193,7 @@ public class Order implements Directional {
      * @param triggerPrice The triggerPrice value to set.
      */
     @SuppressWarnings("unused")
-    private void setTriggerPrice(Amount triggerPrice) {
+    private void setTriggerPrice(Decimal triggerPrice) {
         this.triggerPrice = triggerPrice;
     }
 
@@ -232,7 +233,7 @@ public class Order implements Directional {
      * @return
      */
     public Order when(int priceLimit) {
-        return when(Amount.of(priceLimit));
+        return when(Decimal.of(priceLimit));
     }
 
     /**
@@ -241,7 +242,7 @@ public class Order implements Directional {
      * @param triggerPrice
      * @return
      */
-    public Order when(Amount triggerPrice) {
+    public Order when(Decimal triggerPrice) {
         if (triggerPrice != null) {
             this.triggerPrice = triggerPrice;
         }
@@ -311,7 +312,7 @@ public class Order implements Directional {
      * @param size
      * @return
      */
-    public static Order market(Side position, Amount size) {
+    public static Order market(Side position, Decimal size) {
         return new Order(position, size, null, null, null);
     }
 
@@ -322,7 +323,7 @@ public class Order implements Directional {
      * @return
      */
     public static Order marketLong(int size) {
-        return marketLong(Amount.of(size));
+        return marketLong(Decimal.of(size));
     }
 
     /**
@@ -331,7 +332,7 @@ public class Order implements Directional {
      * @param size
      * @return
      */
-    public static Order marketLong(Amount size) {
+    public static Order marketLong(Decimal size) {
         return market(Side.BUY, size);
     }
 
@@ -342,7 +343,7 @@ public class Order implements Directional {
      * @return
      */
     public static Order marketShort(int size) {
-        return marketShort(Amount.of(size));
+        return marketShort(Decimal.of(size));
     }
 
     /**
@@ -351,7 +352,7 @@ public class Order implements Directional {
      * @param size
      * @return
      */
-    public static Order marketShort(Amount size) {
+    public static Order marketShort(Decimal size) {
         return market(Side.SELL, size);
     }
 
@@ -362,7 +363,7 @@ public class Order implements Directional {
      * @param size
      * @return
      */
-    public static Order limit(Side position, Amount size, Amount price) {
+    public static Order limit(Side position, Decimal size, Decimal price) {
         return new Order(position, size, price, null, null);
     }
 
@@ -372,7 +373,7 @@ public class Order implements Directional {
      * @param size
      * @return
      */
-    public static Order limitLong(Amount size, Amount price) {
+    public static Order limitLong(Decimal size, Decimal price) {
         return limit(Side.BUY, size, price);
     }
 
@@ -383,7 +384,7 @@ public class Order implements Directional {
      * @return
      */
     public static Order limitLong(String size, String price) {
-        return limitLong(new Amount(size), new Amount(price));
+        return limitLong(Decimal.valueOf(size), Decimal.valueOf(price));
     }
 
     /**
@@ -393,7 +394,7 @@ public class Order implements Directional {
      * @return
      */
     public static Order limitLong(int size, int price) {
-        return limitLong(Amount.of(size), Amount.of(price));
+        return limitLong(Decimal.of(size), Decimal.of(price));
     }
 
     /**
@@ -402,7 +403,7 @@ public class Order implements Directional {
      * @param size
      * @return
      */
-    public static Order limitShort(Amount size, Amount price) {
+    public static Order limitShort(Decimal size, Decimal price) {
         return limit(Side.SELL, size, price);
     }
 
@@ -413,7 +414,7 @@ public class Order implements Directional {
      * @return
      */
     public static Order limitShort(String size, String price) {
-        return limitShort(new Amount(size), new Amount(price));
+        return limitShort(Decimal.valueOf(size), Decimal.valueOf(price));
     }
 
     /**
@@ -423,7 +424,7 @@ public class Order implements Directional {
      * @return
      */
     public static Order limitShort(int size, int price) {
-        return limitShort(Amount.of(size), Amount.of(price));
+        return limitShort(Decimal.of(size), Decimal.of(price));
     }
 
     /**
@@ -460,25 +461,25 @@ public class Order implements Directional {
     public OrderState child_order_state;
 
     /** The order date */
-    public LocalDateTime child_order_date;
+    public ZonedDateTime child_order_date;
 
     /** The expire date */
-    public LocalDateTime expire_date;
+    public ZonedDateTime expire_date;
 
     /** The remaining size */
-    public Amount outstanding_size;
+    public Decimal outstanding_size;
 
     /** The executed size */
-    public Amount executed_size;
+    public Decimal executed_size;
 
     /** The canceled size */
-    public Amount cancel_size;
+    public Decimal cancel_size;
 
     /** The total commited size */
-    public Amount total_commission;
+    public Decimal total_commission;
 
     /** Order avarage price */
-    public Amount average_price;
+    public Decimal average_price;
 
     /** INTERNAL USAGE */
     public List<Execution> executions = new ArrayList(4);
@@ -557,9 +558,9 @@ public class Order implements Directional {
         }
 
         if (isBuy()) {
-            return average_price.isEqualOrGreaterThan(e.price);
+            return average_price.isGreaterThanOrEqual(e.price);
         } else {
-            return average_price.isEqualOrLessThan(e.price);
+            return average_price.isLessThanOrEqual(e.price);
         }
     }
 
@@ -570,7 +571,7 @@ public class Order implements Directional {
      * @return A result.
      */
     public final boolean isTradableSizeWith(Execution e) {
-        return size().isEqualOrLessThan(e.size);
+        return size().isLessThanOrEqual(e.size);
     }
 
     /**
@@ -581,7 +582,7 @@ public class Order implements Directional {
      * @param diff
      * @return
      */
-    public final Amount calculatePrice(Amount diff) {
+    public final Decimal calculatePrice(Decimal diff) {
         return isBuy() ? average_price.plus(diff) : average_price.minus(diff);
     }
 

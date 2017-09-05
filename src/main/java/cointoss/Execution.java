@@ -10,6 +10,10 @@
 package cointoss;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+
+import eu.verdelhan.ta4j.Decimal;
 
 /**
  * @version 2017/08/23 8:47:20
@@ -28,13 +32,13 @@ public class Execution {
     public Side side;
 
     /** price */
-    public Amount price;
+    public Decimal price;
 
     /** size */
-    public Amount size;
+    public Decimal size;
 
     /** date */
-    public LocalDateTime exec_date;
+    public ZonedDateTime exec_date;
 
     /** INTERNAL USAGE */
     Order associated;
@@ -51,10 +55,10 @@ public class Execution {
     public Execution(String line) {
         String[] values = line.split(" ");
         id = Long.parseLong(values[0]);
-        exec_date = LocalDateTime.parse(values[1]);
+        exec_date = LocalDateTime.parse(values[1]).atZone(ZoneId.systemDefault());
         side = Side.parse(values[2]);
-        price = new Amount(values[3]);
-        size = new Amount(values[4]);
+        price = Decimal.valueOf(values[3]);
+        size = Decimal.valueOf(values[4]);
 
         if (5 < values.length) {
             buy_child_order_acceptance_id = values[5];
@@ -75,7 +79,7 @@ public class Execution {
      * @param seconds
      * @return
      */
-    public LocalDateTime after(long seconds) {
+    public ZonedDateTime after(long seconds) {
         return exec_date.plusSeconds(seconds);
     }
 

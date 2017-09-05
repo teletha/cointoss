@@ -11,6 +11,8 @@ package cointoss;
 
 import java.time.LocalDateTime;
 
+import eu.verdelhan.ta4j.Decimal;
+
 /**
  * @version 2017/07/25 1:36:12
  */
@@ -20,18 +22,18 @@ public class Position {
     public Side side;
 
     /** 値段 */
-    public Amount price;
+    public Decimal price;
 
     /** サイズ */
-    public Amount size;
+    public Decimal size;
 
-    public Amount commission;
+    public Decimal commission;
 
     /** 累積スワップポイント */
-    public Amount swap_point_accumulate;
+    public Decimal swap_point_accumulate;
 
     /** 保証金 */
-    public Amount require_collateral;
+    public Decimal require_collateral;
 
     /** 成立日 */
     public LocalDateTime open_date;
@@ -40,5 +42,5 @@ public class Position {
     public int leverage;
 
     /** 確定損益合計 */
-    public Amount pnl;
+    public Decimal pnl;
 }

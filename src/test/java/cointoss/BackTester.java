@@ -12,10 +12,11 @@ package cointoss;
 import java.util.stream.IntStream;
 
 import cointoss.Time.Lag;
-import cointoss.indicator.Indicator;
-import cointoss.indicator.simple.PriceIndicator;
-import cointoss.indicator.trackers.SimpleMovingAverageIndicator;
 import cointoss.market.bitflyer.BitFlyerBTCFXBuilder;
+import eu.verdelhan.ta4j.Decimal;
+import eu.verdelhan.ta4j.Indicator;
+import eu.verdelhan.ta4j.indicators.simple.ClosePriceIndicator;
+import eu.verdelhan.ta4j.indicators.trackers.SMAIndicator;
 import kiss.I;
 import kiss.Signal;
 import kiss.Ⅱ;
@@ -29,10 +30,10 @@ public class BackTester {
     private int trial = 3;
 
     /** 基軸通貨量 */
-    private Amount base = Amount.ZERO;
+    private Decimal base = Decimal.ZERO;
 
     /** 対象通貨量 */
-    private Amount target = Amount.ZERO;
+    private Decimal target = Decimal.ZERO;
 
     /** テスト対象マーケット */
     private MarketBuilder builder;
@@ -83,7 +84,7 @@ public class BackTester {
      * @return
      */
     public BackTester balance(int base, int target) {
-        return balance(Amount.of(base), Amount.of(target));
+        return balance(Decimal.of(base), Decimal.of(target));
     }
 
     /**
@@ -93,8 +94,8 @@ public class BackTester {
      * @param target
      * @return
      */
-    public BackTester balance(Amount base, Amount target) {
-        if (base.isEqualOrGreaterThan(0) && target.isEqualOrLessThan(0)) {
+    public BackTester balance(Decimal base, Decimal target) {
+        if (base.isGreaterThanOrEqual(0) && target.isLessThanOrEqual(0)) {
             this.base = base;
             this.target = target;
         }
@@ -139,7 +140,7 @@ public class BackTester {
          * {@inheritDoc}
          */
         @Override
-        public Signal<Ⅱ<Amount, Amount>> getCurrency() {
+        public Signal<Ⅱ<Decimal, Decimal>> getCurrency() {
             return I.signal(I.pair(base, target));
         }
     }
@@ -159,29 +160,29 @@ public class BackTester {
      */
     private static class BackTestTrade extends Trade {
 
-        private final Amount size = new Amount("1");
+        private final Decimal size = Decimal.valueOf("1");
 
-        private final Amount lossLimit = new Amount("7000");
+        private final Decimal lossLimit = Decimal.valueOf("7000");
 
-        private final Amount interval = new Amount("100");
+        private final Decimal interval = Decimal.valueOf("100");
 
-        private Indicator<Amount> longMV;
+        private Indicator<Decimal> longMV;
 
-        private Indicator<Amount> shortMV;
+        private Indicator<Decimal> shortMV;
 
         /**
          * {@inheritDoc}
          */
         @Override
         public void initialize(Market market) {
-            Indicator<Amount> closer = new PriceIndicator(market.ticks, Tick::getMiddle);
-            shortMV = new SimpleMovingAverageIndicator(closer, 12);
-            longMV = new SimpleMovingAverageIndicator(closer, 60);
+            Indicator<Decimal> closer = new ClosePriceIndicator(market.series);
+            shortMV = new SMAIndicator(closer, 12);
+            longMV = new SMAIndicator(closer, 60);
         }
 
-        private void exit(OrderAndExecution entry, Amount size, Amount base, Amount limitLine, Market market, int count) {
+        private void exit(OrderAndExecution entry, Decimal size, Decimal base, Decimal limitLine, Market market, int count) {
             Order.market(entry.inverse(), size).when(limitLine).with(entry).entryTo(market).to(exit -> {
-                Amount diff = exit.e.price.minus(shortMV.getLast());
+                Decimal diff = exit.e.price.minus(shortMV.getValue(shortMV.getTimeSeries().getEnd()));
 
                 if (exit.isBuy() ? diff.isLessThan(-1800) : diff.isGreaterThan(1800)) {
                     market.cancel(exit.o);
@@ -189,7 +190,7 @@ public class BackTester {
                 } else if (exit.e.price.isGreaterThan(entry, base.plus(entry, interval))) {
                     market.cancel(exit.o);
                     exit(entry, exit.o.outstanding_size, exit.e.price, exit.e.price
-                            .minus(entry, lossLimit.minus(Amount.of(50).multiply(count))), market, count + 1);
+                            .minus(entry, lossLimit.minus(Decimal.of(50).multiply(count))), market, count + 1);
                 }
             });
         }
@@ -199,8 +200,8 @@ public class BackTester {
          */
         @Override
         public void onNoPosition(Market market, Execution exe) {
-            if (60 < market.ticks.size() && market.hasNoActiveOrder()) {
-                Amount diff = market.ticks.getLastTick().closing.minus(longMV.getLast());
+            if (market.hasNoActiveOrder()) {
+                Decimal diff = market.series.getLastTick().getClosePrice().minus(longMV.getValue(longMV.getTimeSeries().getEnd()));
 
                 if (diff.abs().isGreaterThan(5200)) {
                     Side side = diff.isNegative() ? Side.BUY : Side.SELL;
