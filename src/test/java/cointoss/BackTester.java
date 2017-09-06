@@ -275,7 +275,7 @@ public class BackTester {
     /**
      * @version 2017/09/05 19:39:34
      */
-    private abstract static class Trading {
+    public abstract static class Trading {
 
         /** The market. */
         protected final Market market;
@@ -283,14 +283,17 @@ public class BackTester {
         /** The current position. (null means no position) */
         private Side position;
 
+        /** The current requested entry size. */
+        private Decimal requestEntrySize = Decimal.ZERO;
+
+        /** The current requested exit size. */
+        private Decimal requestExitSize = Decimal.ZERO;
+
         /** The current position size. */
         private Decimal positionSize = Decimal.ZERO;
 
         /** The current position average price. */
         private Decimal positionPrice = Decimal.ZERO;
-
-        /** The number of requesting order. */
-        private int requestingOrders;
 
         /** The entry order. */
         private Order entry;
@@ -308,7 +311,34 @@ public class BackTester {
          * @return
          */
         protected final boolean hasPosition() {
-            return requestingOrders != 0 || position != null;
+            return !requestEntrySize.isZero() || !requestExitSize.isZero() || !positionSize.isZero();
+        }
+
+        /**
+         * Helper to check position state.
+         * 
+         * @return
+         */
+        protected final boolean hasNoPosition() {
+            return requestEntrySize.isZero() && requestExitSize.isZero() && positionSize.isZero();
+        }
+
+        /**
+         * Helper to check position state.
+         * 
+         * @return
+         */
+        protected final boolean hasEntry() {
+            return !positionSize.isZero();
+        }
+
+        /**
+         * Helper to check position state.
+         * 
+         * @return
+         */
+        protected final boolean hasExit() {
+            return !requestExitSize.isZero();
         }
 
         /**
@@ -327,9 +357,9 @@ public class BackTester {
          * @param size
          */
         protected final void entryLimit(Side side, Decimal size, Decimal price) {
-            requestingOrders++;
+            requestEntrySize = requestEntrySize.plus(size);
 
-            Order.limit(side, size, price).entryTo(market).to(this::managePosition);
+            Order.limit(side, size, price).entryTo(market).to(e -> managePosition(e, true));
         }
 
         /**
@@ -339,9 +369,9 @@ public class BackTester {
          * @param size
          */
         protected final void entryMarket(Side side, Decimal size) {
-            requestingOrders++;
+            requestEntrySize = requestEntrySize.plus(size);
 
-            Order.market(side, size).entryTo(market).to(this::managePosition);
+            Order.market(side, size).entryTo(market).to(e -> managePosition(e, true));
         }
 
         /**
@@ -351,9 +381,9 @@ public class BackTester {
          */
         protected final void exitMarket(Decimal size) {
             if (hasPosition()) {
-                requestingOrders++;
+                requestExitSize = requestExitSize.plus(size);
 
-                Order.market(position.inverse(), size).with(entry).entryTo(market).to(this::managePosition);
+                Order.market(position.inverse(), size).with(entry).entryTo(market).to(e -> managePosition(e, false));
             }
         }
 
@@ -362,7 +392,7 @@ public class BackTester {
          * 
          * @param oae
          */
-        private void managePosition(OrderAndExecution oae) {
+        private void managePosition(OrderAndExecution oae, boolean entry) {
             Execution exe = oae.e;
 
             if (exe.isMine()) {
@@ -395,10 +425,6 @@ public class BackTester {
                         positionPrice = positionPrice.multipliedBy(size).minus(exe.price.multipliedBy(exe.size)).dividedBy(positionSize);
                     }
                 }
-
-                if (oae.o.isCompleted()) {
-                    requestingOrders--;
-                }
             }
         }
 
@@ -414,14 +440,34 @@ public class BackTester {
          * 
          * @param exe
          */
-        public abstract void tryCancelEntry(Execution exe);
+        public abstract void tryExit(Execution exe);
 
         /**
-         * Write your exit rule. This method is called whenever this trade has some position.
+         * Write your trading rule. This method is called from instantiating to clearing position.
          * 
          * @param exe
          */
-        public abstract void tryExit(Execution exe);
+        private void timeline(Execution exe) {
+            // entry timing
+            boolean entry = !requestEntrySize.isZero();
+            boolean exit = !requestExitSize.isZero();
+            boolean position = !positionSize.isZero();
+
+            // entry and exit timing
+            if (!entry && !exit && !position) {
+                tryEntry(exe);
+            } else if (position && requestExitSize.isLessThan(positionSize)) {
+                tryExit(exe);
+            }
+
+            // observe exit order
+            if (hasExit()) {
+
+            }
+
+            // observe timeline
+            observe(exe);
+        }
     }
 
     /**
@@ -442,8 +488,9 @@ public class BackTester {
          */
         @Override
         public void tryEntry(Execution exe) {
-            entryMarket(Side.random(), Decimal.ONE);
-            System.out.println("entry");
+            if (hasNoPosition()) {
+                entryMarket(Side.random(), Decimal.ONE);
+            }
         }
 
         /**
@@ -454,6 +501,34 @@ public class BackTester {
             if (profit().isGreaterThan(1000)) {
                 // exitMarket(Decimal.ONE);
             }
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void timeline(Execution exe) {
+            // entry timing
+            if (hasNoPosition()) {
+
+            }
+
+            // observe entry order
+            if (hasUncompletedEntry()) {
+
+            }
+
+            // exit timing
+            if (hasPosition()) {
+
+            }
+
+            // observe exit order
+            if (hasExit()) {
+
+            }
+
+            // observe timeline
         }
     }
 }
