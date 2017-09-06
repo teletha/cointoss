@@ -12,11 +12,6 @@ package cointoss;
 
 import static cointoss.Time.*;
 
-import cointoss.Execution;
-import cointoss.Market;
-import cointoss.Order;
-import cointoss.OrderState;
-import cointoss.Side;
 import cointoss.Time.At;
 import eu.verdelhan.ta4j.Decimal;
 import kiss.Signal;
@@ -63,6 +58,17 @@ class TestableMarket extends Market {
      */
     TestableMarket execute(Side side, Decimal size, Decimal price) {
         return execute(side, size, price, at(0), "", "");
+    }
+
+    /**
+     * Emulate execution event.
+     * 
+     * @param side
+     * @param size
+     * @param price
+     */
+    TestableMarket execute(Side side, int size, int price, String buyId, String sellId) {
+        return execute(side, Decimal.valueOf(size), Decimal.valueOf(price), at(0), buyId, sellId);
     }
 
     /**

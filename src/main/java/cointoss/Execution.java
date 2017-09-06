@@ -37,6 +37,9 @@ public class Execution {
     /** size */
     public Decimal size;
 
+    /** size */
+    public Decimal cumulativeSize;
+
     /** date */
     public ZonedDateTime exec_date;
 

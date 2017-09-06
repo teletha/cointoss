@@ -9,6 +9,7 @@
  */
 package cointoss;
 
+import java.lang.reflect.Constructor;
 import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
@@ -70,6 +71,9 @@ public class Market {
     /** CHART */
     public final Chart minute1 = new Chart(Duration.ofMinutes(1), minute5);
 
+    /** The event listeners. */
+    private final CopyOnWriteArrayList<Observer<? super Execution>> executionListeners = new CopyOnWriteArrayList();
+
     /** The initial execution. */
     private Execution init;
 
@@ -89,14 +93,14 @@ public class Market {
     private Decimal targetInit;
 
     /** The current trading. */
-    private Trade trade = new NOP();
+    private Trading trade = create(NOP.class);
 
     /**
      * @param backend
      * @param builder
      * @param strategy
      */
-    protected Market(MarketBackend backend, MarketBuilder builder, Class<? extends Trade> trade) {
+    protected Market(MarketBackend backend, MarketBuilder builder, Class<? extends Trading> trade) {
         this.backend = Objects.requireNonNull(backend);
         with(trade);
 
@@ -110,15 +114,45 @@ public class Market {
     }
 
     /**
+     * Observe executions.
+     * 
+     * @param threshold
+     * @return
+     */
+    public final Signal<Execution> observeExecution() {
+        return new Signal<Execution>((observer, disposer) -> {
+            executionListeners.add(observer);
+            return disposer.add(() -> {
+                executionListeners.remove(observer);
+            });
+        });
+    }
+
+    /**
+     * Observe executions filtered by size.
+     * 
+     * @param threshold
+     * @return
+     */
+    public final Signal<Execution> observeExecutionBySize(int threshold) {
+        return observeExecution().scan(new Execution(), (prev, next) -> {
+            if (prev.buy_child_order_acceptance_id.equals(next.buy_child_order_acceptance_id)) {
+                Execution buffer = new Execution();
+
+            }
+            return next;
+        }).take(e -> e.size.isGreaterThanOrEqual(threshold));
+    }
+
+    /**
      * Set trading strategy.
      * 
      * @param tradeType
      * @return
      */
-    public final Market with(Class<? extends Trade> tradeType) {
+    public final Market with(Class<? extends Trading> tradeType) {
         if (tradeType != null) {
-            this.trade = I.make(tradeType);
-            this.trade.initialize(this);
+            this.trade = create(tradeType);
         }
         return this;
     }
@@ -339,10 +373,17 @@ public class Market {
             OrderAndExecution oae = new OrderAndExecution(order, exe, this);
 
             for (Observer<? super OrderAndExecution> listener : order.executionListeners) {
+                System.out.println(exe);
                 listener.accept(oae);
             }
         }
-        trade.onNoPosition(this, exe);
+
+        // observe executions
+        for (Observer<? super Execution> listener : executionListeners) {
+            listener.accept(exe);
+        }
+
+        trade.tick(exe);
     }
 
     /**
@@ -415,22 +456,52 @@ public class Market {
     }
 
     /**
+     * Create new {@link Trading} instance.
+     * 
+     * @param type
+     * @return
+     */
+    private Trading create(Class<? extends Trading> type) {
+        try {
+            Constructor<? extends Trading> constructor = type.getDeclaredConstructor(Market.class);
+            constructor.setAccessible(true);
+            return constructor.newInstance(this);
+        } catch (Exception e) {
+            throw I.quiet(e);
+        }
+    }
+
+    /**
      * @version 2017/08/24 20:13:13
      */
-    private static class NOP extends Trade {
+    private static class NOP extends Trading {
 
         /**
-         * {@inheritDoc}
+         * @param market
          */
-        @Override
-        public void initialize(Market market) {
+        private NOP(Market market) {
+            super(market);
         }
 
         /**
          * {@inheritDoc}
          */
         @Override
-        public void onNoPosition(Market market, Execution exe) {
+        public void tryEntry(Execution exe) {
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void tryExit(Execution exe) {
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void timeline(Execution exe) {
         }
     }
 

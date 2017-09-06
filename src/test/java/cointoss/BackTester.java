@@ -14,16 +14,6 @@ import java.util.stream.IntStream;
 import cointoss.Time.Lag;
 import cointoss.market.bitflyer.BitFlyerBTCFXBuilder;
 import eu.verdelhan.ta4j.Decimal;
-import eu.verdelhan.ta4j.Indicator;
-import eu.verdelhan.ta4j.TimeSeries;
-import eu.verdelhan.ta4j.indicators.simple.ClosePriceIndicator;
-import eu.verdelhan.ta4j.indicators.trackers.RSIIndicator;
-import eu.verdelhan.ta4j.indicators.trackers.SMAIndicator;
-import eu.verdelhan.ta4j.indicators.trackers.bollinger.BollingerBandsLowerIndicator;
-import eu.verdelhan.ta4j.indicators.trackers.bollinger.BollingerBandsMiddleIndicator;
-import eu.verdelhan.ta4j.indicators.trackers.bollinger.BollingerBandsUpperIndicator;
-import eu.verdelhan.ta4j.trading.rules.CrossedDownIndicatorRule;
-import eu.verdelhan.ta4j.trading.rules.CrossedUpIndicatorRule;
 import kiss.I;
 import kiss.Signal;
 import kiss.Ⅱ;
@@ -46,7 +36,7 @@ public class BackTester {
     private MarketBuilder builder;
 
     /** テスト戦略 */
-    private Class<? extends Trade> strategy;
+    private Class<? extends Trading> strategy;
 
     /** ラグ生成器 */
     private Lag lag = Time.lag(2, 15);
@@ -63,7 +53,7 @@ public class BackTester {
      * @param strategy
      * @return
      */
-    public BackTester strategy(Class<? extends Trade> strategy) {
+    public BackTester strategy(Class<? extends Trading> strategy) {
         if (strategy != null) {
             this.strategy = strategy;
         }
@@ -158,316 +148,8 @@ public class BackTester {
      * @param args
      */
     public static void main(String[] args) {
-        BackTester tester = BackTester.initialize(BitFlyerBTCFXBuilder.class).balance(1000000, 0).strategy(BreakoutStrategy.class);
+        BackTester tester = BackTester.initialize(BitFlyerBTCFXBuilder.class).balance(1000000, 0).strategy(BreakoutTrading.class);
         tester.execute();
-    }
-
-    /**
-     * @version 2017/08/24 23:18:21
-     */
-    private static class BreakoutStrategy extends Trade {
-
-        private Market market;
-
-        private TimeSeries minute1;
-
-        private final Decimal size = Decimal.valueOf("1");
-
-        private final Decimal lossLimit = Decimal.valueOf("3000");
-
-        private final Decimal interval = Decimal.valueOf("100");
-
-        private Indicator<Decimal> longMV;
-
-        private Indicator<Decimal> shortMV;
-
-        private BollingerBandsMiddleIndicator bm;
-
-        private BollingerBandsUpperIndicator bu;
-
-        private BollingerBandsLowerIndicator bl;
-
-        private ClosePriceIndicator close;
-
-        private CrossedUpIndicatorRule buyEntry;
-
-        private CrossedDownIndicatorRule sellEntry;
-
-        RSIIndicator shortRSI;
-
-        RSIIndicator longRSI;
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void initialize(Market market) {
-            this.market = market;
-            this.minute1 = market.minute1;
-            Indicator<Decimal> closer = new ClosePriceIndicator(market.minute1);
-            shortMV = new SMAIndicator(closer, 12);
-            longMV = new SMAIndicator(closer, 60);
-
-            close = new ClosePriceIndicator(market.minute1);
-            SMAIndicator sma = new SMAIndicator(close, 20);
-            bm = new BollingerBandsMiddleIndicator(sma);
-            bu = new BollingerBandsUpperIndicator(bm, sma);
-            bl = new BollingerBandsLowerIndicator(bm, sma);
-            buyEntry = new CrossedUpIndicatorRule(close, bu);
-            sellEntry = new CrossedDownIndicatorRule(close, bl);
-
-            shortRSI = new RSIIndicator(closer, 13);
-            longRSI = new RSIIndicator(closer, 42);
-        }
-
-        private void exit(OrderAndExecution entry, Decimal size, Decimal base, Decimal limitLine, Market market, int count) {
-            Order.market(entry.inverse(), size).when(limitLine).with(entry).entryTo(market).to(exit -> {
-                Decimal diff = exit.e.price.minus(shortMV.getValue(shortMV.getTimeSeries().getEnd()));
-
-                if (exit.isBuy() ? diff.isLessThan(-1800) : diff.isGreaterThan(1800)) {
-                    market.cancel(exit.o);
-                    Order.market(exit.side(), exit.o.outstanding_size).with(entry).entryTo(market).to();
-                } else if (exit.e.price.isGreaterThan(entry, base.plus(entry, interval))) {
-                    market.cancel(exit.o);
-                    exit(entry, exit.o.outstanding_size, exit.e.price, exit.e.price
-                            .minus(entry, lossLimit.minus(Decimal.of(50).multiply(count))), market, count + 1);
-                }
-            });
-        }
-
-        private Trading trade;
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void onNoPosition(Market market, Execution exe) {
-            if (60 <= minute1.getTickCount()) {
-                if (trade == null) {
-                    trade = new BreakoutTrading(market);
-                }
-
-                if (trade.hasPosition() == false) {
-                    trade.tryEntry(exe);
-                } else {
-                    trade.tryExit(exe);
-                }
-
-            }
-        }
-
-        /**
-         * Try to order exit.
-         * 
-         * @param entry
-         */
-        private void tryExit(OrderAndExecution entry) {
-            if (entry.o.isCompleted() == false) {
-                return;
-            }
-            Order.limit(entry.inverse(), entry.o.size(), entry.priceUp(2000)).with(entry).entryTo(market).to(exit -> {
-                if (exit.e.isMine()) {
-                }
-            });
-        }
-    }
-
-    /**
-     * @version 2017/09/05 19:39:34
-     */
-    public abstract static class Trading {
-
-        /** The market. */
-        protected final Market market;
-
-        /** The current position. (null means no position) */
-        private Side position;
-
-        /** The current requested entry size. */
-        private Decimal requestEntrySize = Decimal.ZERO;
-
-        /** The current requested exit size. */
-        private Decimal requestExitSize = Decimal.ZERO;
-
-        /** The current position size. */
-        private Decimal positionSize = Decimal.ZERO;
-
-        /** The current position average price. */
-        private Decimal positionPrice = Decimal.ZERO;
-
-        /** The entry order. */
-        private Order entry;
-
-        /**
-         * New Trade.
-         */
-        protected Trading(Market market) {
-            this.market = market;
-        }
-
-        /**
-         * Helper to check position state.
-         * 
-         * @return
-         */
-        protected final boolean hasPosition() {
-            return !requestEntrySize.isZero() || !requestExitSize.isZero() || !positionSize.isZero();
-        }
-
-        /**
-         * Helper to check position state.
-         * 
-         * @return
-         */
-        protected final boolean hasNoPosition() {
-            return requestEntrySize.isZero() && requestExitSize.isZero() && positionSize.isZero();
-        }
-
-        /**
-         * Helper to check position state.
-         * 
-         * @return
-         */
-        protected final boolean hasEntry() {
-            return !positionSize.isZero();
-        }
-
-        /**
-         * Helper to check position state.
-         * 
-         * @return
-         */
-        protected final boolean hasExit() {
-            return !requestExitSize.isZero();
-        }
-
-        /**
-         * Calculate current profit or loss.
-         * 
-         * @return
-         */
-        protected final Decimal profit() {
-            return market.getLatestPrice().minus(positionPrice).multipliedBy(positionSize);
-        }
-
-        /**
-         * Request entry order.
-         * 
-         * @param side
-         * @param size
-         */
-        protected final void entryLimit(Side side, Decimal size, Decimal price) {
-            requestEntrySize = requestEntrySize.plus(size);
-
-            Order.limit(side, size, price).entryTo(market).to(e -> managePosition(e, true));
-        }
-
-        /**
-         * Request entry order.
-         * 
-         * @param side
-         * @param size
-         */
-        protected final void entryMarket(Side side, Decimal size) {
-            requestEntrySize = requestEntrySize.plus(size);
-
-            Order.market(side, size).entryTo(market).to(e -> managePosition(e, true));
-        }
-
-        /**
-         * Request entry order.
-         * 
-         * @param size
-         */
-        protected final void exitMarket(Decimal size) {
-            if (hasPosition()) {
-                requestExitSize = requestExitSize.plus(size);
-
-                Order.market(position.inverse(), size).with(entry).entryTo(market).to(e -> managePosition(e, false));
-            }
-        }
-
-        /**
-         * Manage position.
-         * 
-         * @param oae
-         */
-        private void managePosition(OrderAndExecution oae, boolean entry) {
-            Execution exe = oae.e;
-
-            if (exe.isMine()) {
-                Decimal size = positionSize;
-
-                // update position
-                if (position == null) {
-                    // new position
-                    position = oae.o.side();
-                    positionSize = exe.size;
-                    positionPrice = exe.price;
-                } else if (position == oae.o.side()) {
-                    // same position
-                    positionSize = positionSize.plus(exe.size);
-                    positionPrice = positionPrice.multipliedBy(size).plus(exe.price.multipliedBy(exe.size)).dividedBy(positionSize);
-                } else {
-                    // counter position
-                    positionSize = positionSize.minus(exe.size);
-
-                    if (positionSize.isZero()) {
-                        // clear position
-                        position = null;
-                        positionPrice = Decimal.ZERO;
-                    } else if (positionSize.isNegative()) {
-                        // inverse position
-                        position = position.inverse();
-                        positionPrice = exe.price;
-                    } else {
-                        // decrease position
-                        positionPrice = positionPrice.multipliedBy(size).minus(exe.price.multipliedBy(exe.size)).dividedBy(positionSize);
-                    }
-                }
-            }
-        }
-
-        /**
-         * Write your entry rule. This method is called whenever this trade has no position.
-         * 
-         * @param exe
-         */
-        public abstract void tryEntry(Execution exe);
-
-        /**
-         * Write your exit rule. This method is called whenever this trade has some position.
-         * 
-         * @param exe
-         */
-        public abstract void tryExit(Execution exe);
-
-        /**
-         * Write your trading rule. This method is called from instantiating to clearing position.
-         * 
-         * @param exe
-         */
-        private void timeline(Execution exe) {
-            // entry timing
-            boolean entry = !requestEntrySize.isZero();
-            boolean exit = !requestExitSize.isZero();
-            boolean position = !positionSize.isZero();
-
-            // entry and exit timing
-            if (!entry && !exit && !position) {
-                tryEntry(exe);
-            } else if (position && requestExitSize.isLessThan(positionSize)) {
-                tryExit(exe);
-            }
-
-            // observe exit order
-            if (hasExit()) {
-
-            }
-
-            // observe timeline
-            observe(exe);
-        }
     }
 
     /**
@@ -481,6 +163,9 @@ public class BackTester {
          */
         private BreakoutTrading(Market market) {
             super(market);
+
+            // various events
+            market.observeExecutionBySize(30);
         }
 
         /**
@@ -489,7 +174,7 @@ public class BackTester {
         @Override
         public void tryEntry(Execution exe) {
             if (hasNoPosition()) {
-                entryMarket(Side.random(), Decimal.ONE);
+                // entryMarket(Side.random(), maxPositionSize);
             }
         }
 
@@ -508,27 +193,7 @@ public class BackTester {
          */
         @Override
         public void timeline(Execution exe) {
-            // entry timing
-            if (hasNoPosition()) {
 
-            }
-
-            // observe entry order
-            if (hasUncompletedEntry()) {
-
-            }
-
-            // exit timing
-            if (hasPosition()) {
-
-            }
-
-            // observe exit order
-            if (hasExit()) {
-
-            }
-
-            // observe timeline
         }
     }
 }

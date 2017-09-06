@@ -10,10 +10,12 @@
 package cointoss;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.Test;
 
 import cointoss.Order.Quantity;
+import eu.verdelhan.ta4j.Decimal;
 
 /**
  * @version 2017/08/15 15:07:15
@@ -481,5 +483,44 @@ public class MarketTest {
         assert market.validateOrderState(0, 0, 1, 0, 0);
         market.execute(Side.BUY, 1, 12);
         assert market.validateOrderState(0, 0, 1, 0, 0);
+    }
+
+    @Test
+    public void observeExecutionsBySize() throws Exception {
+        AtomicReference<Decimal> size = new AtomicReference<>();
+
+        TestableMarket market = new TestableMarket();
+        market.observeExecutionBySize(20).to(e -> {
+            size.set(e.size);
+        });
+
+        assert size.get() == null;
+        market.execute(Side.BUY, 1, 10);
+        assert size.get() == null;
+        market.execute(Side.BUY, 19, 10);
+        assert size.get() == null;
+        market.execute(Side.BUY, 20, 10);
+        assert size.get().is(20);
+        market.execute(Side.BUY, 21, 10);
+        assert size.get().is(21);
+    }
+
+    @Test
+    public void observeSequencialExecutionsByBuySize() throws Exception {
+        AtomicReference<Decimal> size = new AtomicReference<>();
+
+        TestableMarket market = new TestableMarket();
+        market.observeExecutionBySize(20).to(e -> {
+            size.set(e.size);
+        });
+
+        market.execute(Side.BUY, 5, 10, "Buy-1", "Sell-1");
+        assert size.get() == null;
+        market.execute(Side.BUY, 5, 10, "Buy-1", "Sell-2");
+        assert size.get() == null;
+        market.execute(Side.BUY, 5, 10, "Buy-1", "Sell-3");
+        assert size.get() == null;
+        market.execute(Side.BUY, 5, 10, "Buy-1", "Sell-4");
+        assert size.get().is(20);
     }
 }
