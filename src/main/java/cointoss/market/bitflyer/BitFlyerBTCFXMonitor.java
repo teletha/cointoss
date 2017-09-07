@@ -63,6 +63,17 @@ public class BitFlyerBTCFXMonitor {
          */
         public TradingMonitor(Market market) {
             super(market);
+
+            // market.observeExecutionBySize(1).to(exe -> {
+            // });
+
+            market.minute1.to(tick -> {
+                System.out.println(tick);
+            });
+
+            market.minute5.to(tick -> {
+                System.out.println(tick);
+            });
         }
 
         /**
@@ -84,7 +95,6 @@ public class BitFlyerBTCFXMonitor {
          */
         @Override
         public void timeline(Execution exe) {
-            System.out.println(exe);
         }
     }
 
@@ -127,7 +137,6 @@ public class BitFlyerBTCFXMonitor {
                     exe.buy_child_order_acceptance_id = node.get("buy_child_order_acceptance_id").asText();
                     exe.sell_child_order_acceptance_id = node.get("sell_child_order_acceptance_id").asText();
 
-                    System.out.println(exe);
                     market.tick(exe);
                 }
             }

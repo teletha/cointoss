@@ -9,9 +9,7 @@
  */
 package cointoss;
 
-import eu.verdelhan.ta4j.Decimal;
 import kiss.Signal;
-import kiss.Ⅱ;
 
 /**
  * @version 2017/07/24 23:39:15
@@ -98,5 +96,5 @@ public interface MarketBackend {
      * 
      * @return
      */
-    Signal<Ⅱ<Decimal, Decimal>> getCurrency();
+    Signal<BalanceUnit> getCurrency();
 }

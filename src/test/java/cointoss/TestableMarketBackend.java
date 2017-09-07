@@ -20,7 +20,6 @@ import cointoss.Time.Lag;
 import eu.verdelhan.ta4j.Decimal;
 import kiss.I;
 import kiss.Signal;
-import kiss.Ⅱ;
 
 /**
  * @version 2017/08/15 23:38:25
@@ -148,8 +147,16 @@ class TestableMarketBackend implements MarketBackend {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Ⅱ<Decimal, Decimal>> getCurrency() {
-        return I.signal(I.pair(Decimal.of(100), Decimal.ZERO));
+    public Signal<BalanceUnit> getCurrency() {
+        BalanceUnit base = new BalanceUnit();
+        base.currency_code = "JPY";
+        base.amount = base.available = Decimal.HUNDRED;
+
+        BalanceUnit target = new BalanceUnit();
+        target.currency_code = "BTC";
+        target.amount = target.available = Decimal.ZERO;
+
+        return I.signal(base, target);
     }
 
     /**

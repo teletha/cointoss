@@ -17,10 +17,13 @@ public class Project extends bee.api.Project {
         require("com.github.teletha", "filer", "0.5");
         require("com.github.teletha", "antibug", "0.3").atTest();
         require("org.apache.commons", "commons-lang3", "3.5");
+        require("commons-codec", "commons-codec", "1.10");
+        require("org.apache.httpcomponents", "httpclient", "4.5.3");
         // require("org.apache.logging.log4j", "log4j-core", "2.8.2");
         // require("org.apache.logging.log4j", "log4j-jul", "2.8.2");
         require("org.eclipse.collections", "eclipse-collections", "8.2.0");
         require("eu.verdelhan", "ta4j", "0.9-SNAPSHOT");
         require("com.pubnub", "pubnub", "4.6.5");
+
     }
 }

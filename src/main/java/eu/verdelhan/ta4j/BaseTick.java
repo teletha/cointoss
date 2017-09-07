@@ -24,7 +24,6 @@ package eu.verdelhan.ta4j;
 
 import java.io.Serializable;
 import java.time.Duration;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -35,7 +34,7 @@ import cointoss.Execution;
  * End tick of a time period.
  * <p>
  */
-public class Tick implements Serializable {
+public class BaseTick implements Tick, Serializable {
 
     private static final long serialVersionUID = 8038383777467488147L;
 
@@ -72,9 +71,9 @@ public class Tick implements Serializable {
     /**
      * Initialize.
      */
-    public Tick(Duration duration) {
+    public BaseTick(Duration duration) {
         this.openPrice = this.closePrice = Decimal.ZERO;
-        this.beginTime = LocalDateTime.MIN.atZone(ZoneId.systemDefault());
+        this.beginTime = ZonedDateTime.now();
         this.endTime = beginTime.plus(duration);
     }
 
@@ -83,7 +82,7 @@ public class Tick implements Serializable {
      * 
      * @param opening
      */
-    public Tick(Execution opening, Duration duration) {
+    public BaseTick(Execution opening, Duration duration) {
         this.openPrice = opening.price;
         this.beginTime = opening.exec_date.withNano(0).withSecond(0);
         this.endTime = beginTime.plus(duration);
@@ -96,7 +95,7 @@ public class Tick implements Serializable {
      * 
      * @param opening
      */
-    public Tick(Tick opening, Duration duration) {
+    public BaseTick(BaseTick opening, Duration duration) {
         this.openPrice = opening.openPrice;
         this.beginTime = opening.beginTime.withNano(0).withSecond(0);
         this.endTime = beginTime.plus(duration);
@@ -124,7 +123,7 @@ public class Tick implements Serializable {
      * 
      * @param exe
      */
-    public void mark(Tick exe) {
+    public void mark(BaseTick exe) {
         this.closePrice = exe.closePrice;
         this.maxPrice = Decimal.max(maxPrice, exe.maxPrice);
         this.minPrice = Decimal.min(minPrice, exe.minPrice);
@@ -164,7 +163,7 @@ public class Tick implements Serializable {
      * @param timePeriod the time period
      * @param endTime the end time of the tick period
      */
-    public Tick(Duration timePeriod, ZonedDateTime endTime) {
+    public BaseTick(Duration timePeriod, ZonedDateTime endTime) {
         checkTimeArguments(timePeriod, endTime);
         this.timePeriod = timePeriod;
         this.endTime = endTime;
@@ -181,7 +180,7 @@ public class Tick implements Serializable {
      * @param closePrice the close price of the tick period
      * @param volume the volume of the tick period
      */
-    public Tick(ZonedDateTime endTime, double openPrice, double highPrice, double lowPrice, double closePrice, double volume) {
+    public BaseTick(ZonedDateTime endTime, double openPrice, double highPrice, double lowPrice, double closePrice, double volume) {
         this(endTime, Decimal.valueOf(openPrice), Decimal.valueOf(highPrice), Decimal.valueOf(lowPrice), Decimal
                 .valueOf(closePrice), Decimal.valueOf(volume));
     }
@@ -196,7 +195,7 @@ public class Tick implements Serializable {
      * @param closePrice the close price of the tick period
      * @param volume the volume of the tick period
      */
-    public Tick(ZonedDateTime endTime, String openPrice, String highPrice, String lowPrice, String closePrice, String volume) {
+    public BaseTick(ZonedDateTime endTime, String openPrice, String highPrice, String lowPrice, String closePrice, String volume) {
         this(endTime, Decimal.valueOf(openPrice), Decimal.valueOf(highPrice), Decimal.valueOf(lowPrice), Decimal
                 .valueOf(closePrice), Decimal.valueOf(volume));
     }
@@ -211,7 +210,7 @@ public class Tick implements Serializable {
      * @param closePrice the close price of the tick period
      * @param volume the volume of the tick period
      */
-    public Tick(ZonedDateTime endTime, Decimal openPrice, Decimal highPrice, Decimal lowPrice, Decimal closePrice, Decimal volume) {
+    public BaseTick(ZonedDateTime endTime, Decimal openPrice, Decimal highPrice, Decimal lowPrice, Decimal closePrice, Decimal volume) {
         this(Duration.ofDays(1), endTime, openPrice, highPrice, lowPrice, closePrice, volume);
     }
 
@@ -226,7 +225,7 @@ public class Tick implements Serializable {
      * @param closePrice the close price of the tick period
      * @param volume the volume of the tick period
      */
-    public Tick(Duration timePeriod, ZonedDateTime endTime, Decimal openPrice, Decimal highPrice, Decimal lowPrice, Decimal closePrice, Decimal volume) {
+    public BaseTick(Duration timePeriod, ZonedDateTime endTime, Decimal openPrice, Decimal highPrice, Decimal lowPrice, Decimal closePrice, Decimal volume) {
         checkTimeArguments(timePeriod, endTime);
         this.timePeriod = timePeriod;
         this.endTime = endTime;
@@ -241,6 +240,7 @@ public class Tick implements Serializable {
     /**
      * @return the close price of the period
      */
+    @Override
     public Decimal getClosePrice() {
         return closePrice;
     }
@@ -248,6 +248,7 @@ public class Tick implements Serializable {
     /**
      * @return the open price of the period
      */
+    @Override
     public Decimal getOpenPrice() {
         return openPrice;
     }
@@ -255,6 +256,7 @@ public class Tick implements Serializable {
     /**
      * @return the number of trades in the period
      */
+    @Override
     public int getTrades() {
         return trades;
     }
@@ -262,6 +264,7 @@ public class Tick implements Serializable {
     /**
      * @return the max price of the period
      */
+    @Override
     public Decimal getMaxPrice() {
         return maxPrice;
     }
@@ -269,6 +272,7 @@ public class Tick implements Serializable {
     /**
      * @return the whole traded amount of the period
      */
+    @Override
     public Decimal getAmount() {
         return amount;
     }
@@ -276,6 +280,7 @@ public class Tick implements Serializable {
     /**
      * @return the whole traded volume in the period
      */
+    @Override
     public Decimal getVolume() {
         return volume;
     }
@@ -286,6 +291,7 @@ public class Tick implements Serializable {
      * @param tradeAmount the tradable amount
      * @param tradePrice the price
      */
+    @Override
     public void addTrade(double tradeAmount, double tradePrice) {
         addTrade(Decimal.valueOf(tradeAmount), Decimal.valueOf(tradePrice));
     }
@@ -296,6 +302,7 @@ public class Tick implements Serializable {
      * @param tradeAmount the tradable amount
      * @param tradePrice the price
      */
+    @Override
     public void addTrade(String tradeAmount, String tradePrice) {
         addTrade(Decimal.valueOf(tradeAmount), Decimal.valueOf(tradePrice));
     }
@@ -306,6 +313,7 @@ public class Tick implements Serializable {
      * @param tradeAmount the tradable amount
      * @param tradePrice the price
      */
+    @Override
     public void addTrade(Decimal tradeAmount, Decimal tradePrice) {
         if (openPrice == null) {
             openPrice = tradePrice;
@@ -330,6 +338,7 @@ public class Tick implements Serializable {
     /**
      * @return the min price of the period
      */
+    @Override
     public Decimal getMinPrice() {
         return minPrice;
     }
@@ -337,6 +346,7 @@ public class Tick implements Serializable {
     /**
      * @return the time period of the tick
      */
+    @Override
     public Duration getTimePeriod() {
         return timePeriod;
     }
@@ -344,6 +354,7 @@ public class Tick implements Serializable {
     /**
      * @return the begin timestamp of the tick period
      */
+    @Override
     public ZonedDateTime getBeginTime() {
         return beginTime;
     }
@@ -351,6 +362,7 @@ public class Tick implements Serializable {
     /**
      * @return the end timestamp of the tick period
      */
+    @Override
     public ZonedDateTime getEndTime() {
         return endTime;
     }
@@ -367,6 +379,7 @@ public class Tick implements Serializable {
      * @return true if the provided timestamp is between the begin time and the end time of the
      *         current period, false otherwise
      */
+    @Override
     public boolean inPeriod(ZonedDateTime timestamp) {
         return timestamp != null && !timestamp.isBefore(beginTime) && timestamp.isBefore(endTime);
     }
@@ -374,6 +387,7 @@ public class Tick implements Serializable {
     /**
      * @return true if this is a bearish tick, false otherwise
      */
+    @Override
     public boolean isBearish() {
         return (openPrice != null) && (closePrice != null) && closePrice.isLessThan(openPrice);
     }
@@ -381,6 +395,7 @@ public class Tick implements Serializable {
     /**
      * @return true if this is a bullish tick, false otherwise
      */
+    @Override
     public boolean isBullish() {
         return (openPrice != null) && (closePrice != null) && openPrice.isLessThan(closePrice);
     }
@@ -388,6 +403,7 @@ public class Tick implements Serializable {
     /**
      * @return a human-friendly string of the end timestamp
      */
+    @Override
     public String getDateName() {
         return endTime.format(DateTimeFormatter.ISO_DATE);
     }
@@ -395,6 +411,7 @@ public class Tick implements Serializable {
     /**
      * @return a even more human-friendly string of the end timestamp
      */
+    @Override
     public String getSimpleDateName() {
         return endTime.format(DateTimeFormatter.ISO_LOCAL_DATE);
     }

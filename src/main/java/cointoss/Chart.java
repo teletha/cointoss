@@ -10,20 +10,26 @@
 package cointoss;
 
 import java.time.Duration;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Consumer;
 
-import eu.verdelhan.ta4j.Tick;
+import eu.verdelhan.ta4j.BaseTick;
 import eu.verdelhan.ta4j.TimeSeries;
 
 /**
  * @version 2017/09/05 18:40:19
  */
+@SuppressWarnings("serial")
 public class Chart extends TimeSeries {
 
     private final Duration duration;
 
     private final Chart child;
 
-    private Tick current;
+    private BaseTick current;
+
+    private final List<Consumer<BaseTick>> listeners = new CopyOnWriteArrayList();
 
     /**
      * 
@@ -33,7 +39,7 @@ public class Chart extends TimeSeries {
 
         this.duration = duration;
         this.child = child;
-        this.current = new Tick(duration);
+        this.current = new BaseTick(duration);
     }
 
     /**
@@ -47,14 +53,18 @@ public class Chart extends TimeSeries {
             if (child != null) {
                 child.tick(current);
             }
-            current = new Tick(exe, duration);
+
+            for (Consumer<BaseTick> listener : listeners) {
+                listener.accept(current);
+            }
+            current = new BaseTick(exe, duration);
         }
     }
 
     /**
      * Record tick.
      */
-    private void tick(Tick tick) {
+    private void tick(BaseTick tick) {
         if (tick.endTime.isBefore(current.endTime)) {
             current.mark(tick);
         } else {
@@ -62,7 +72,21 @@ public class Chart extends TimeSeries {
             if (child != null) {
                 child.tick(current);
             }
-            current = new Tick(tick, duration);
+
+            for (Consumer<BaseTick> listener : listeners) {
+                listener.accept(current);
+            }
+
+            current = new BaseTick(tick, duration);
         }
+    }
+
+    /**
+     * Observe tick.
+     * 
+     * @param object
+     */
+    public void to(Consumer<BaseTick> listener) {
+        listeners.add(listener);
     }
 }

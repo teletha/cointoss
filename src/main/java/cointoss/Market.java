@@ -105,12 +105,12 @@ public class Market {
         with(trade);
 
         // initialize price, balance and executions
-        this.backend.getCurrency().to(amounts -> {
-            this.base = this.baseInit = amounts.ⅰ;
-            this.target = this.targetInit = amounts.ⅱ;
-        });
+        List<BalanceUnit> units = backend.getCurrency().toList();
+        this.base = this.baseInit = units.get(0).amount;
+        this.target = this.targetInit = units.get(1).amount;
 
         backend.initialize(this, builder);
+
     }
 
     /**

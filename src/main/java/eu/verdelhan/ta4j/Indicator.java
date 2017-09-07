@@ -37,6 +37,6 @@ public interface Indicator<T> extends Serializable {
      * @return
      */
     default T getEndValue() {
-        return getValue(getTimeSeries().getEnd());
+        return getValue(getTimeSeries().getEndIndex());
     }
 }

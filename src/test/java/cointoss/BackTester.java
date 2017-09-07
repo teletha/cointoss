@@ -16,7 +16,6 @@ import cointoss.market.bitflyer.BitFlyerBTCFXBuilder;
 import eu.verdelhan.ta4j.Decimal;
 import kiss.I;
 import kiss.Signal;
-import kiss.Ⅱ;
 
 /**
  * @version 2017/07/24 20:56:39
@@ -137,8 +136,16 @@ public class BackTester {
          * {@inheritDoc}
          */
         @Override
-        public Signal<Ⅱ<Decimal, Decimal>> getCurrency() {
-            return I.signal(I.pair(base, target));
+        public Signal<BalanceUnit> getCurrency() {
+            BalanceUnit base = new BalanceUnit();
+            base.currency_code = "JPY";
+            base.amount = base.available = BackTester.this.base;
+
+            BalanceUnit target = new BalanceUnit();
+            target.currency_code = "BTC";
+            target.amount = target.available = BackTester.this.target;
+
+            return I.signal(base, target);
         }
     }
 
