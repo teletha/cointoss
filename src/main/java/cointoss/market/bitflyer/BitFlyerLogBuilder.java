@@ -30,7 +30,7 @@ import kiss.I;
 /**
  * @version 2017/08/23 14:48:43
  */
-public class LogBuilder {
+public class BitFlyerLogBuilder {
 
     /** date format for log */
     private static final DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyyMMdd");
@@ -41,7 +41,7 @@ public class LogBuilder {
     /**
      * @param type
      */
-    private LogBuilder(BitFlyerType type) {
+    private BitFlyerLogBuilder(BitFlyerType type) {
         this.type = type;
     }
 
@@ -214,6 +214,6 @@ public class LogBuilder {
     public static void main(String[] args) {
         I.load(Decimal.Codec.class, false);
 
-        new LogBuilder(BitFlyerType.FX_BTC_JPY).build();
+        new BitFlyerLogBuilder(BitFlyerType.FX_BTC_JPY).build();
     }
 }

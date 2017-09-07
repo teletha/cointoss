@@ -165,7 +165,6 @@ public class BackTester {
             super(market);
 
             // various events
-            market.observeExecutionBySize(30);
         }
 
         /**

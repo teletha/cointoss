@@ -100,7 +100,7 @@ public class Market {
      * @param builder
      * @param strategy
      */
-    protected Market(MarketBackend backend, MarketBuilder builder, Class<? extends Trading> trade) {
+    public Market(MarketBackend backend, MarketBuilder builder, Class<? extends Trading> trade) {
         this.backend = Objects.requireNonNull(backend);
         with(trade);
 
@@ -135,13 +135,17 @@ public class Market {
      * @return
      */
     public final Signal<Execution> observeExecutionBySize(int threshold) {
-        return observeExecution().scan(new Execution(), (prev, next) -> {
-            if (prev.buy_child_order_acceptance_id.equals(next.buy_child_order_acceptance_id)) {
-                Execution buffer = new Execution();
+        AtomicReference<Decimal> accumlated = new AtomicReference<>(Decimal.ZERO);
 
+        return observeExecution().scan(new Execution(), (prev, next) -> {
+            if (prev.buy_child_order_acceptance_id.equals(next.buy_child_order_acceptance_id) || prev.sell_child_order_acceptance_id
+                    .equals(next.sell_child_order_acceptance_id)) {
+                accumlated.updateAndGet(v -> v.plus(next.size));
+            } else {
+                prev.cumulativeSize = accumlated.getAndSet(next.size);
             }
             return next;
-        }).take(e -> e.size.isGreaterThanOrEqual(threshold));
+        }).delay(1).take(e -> e.cumulativeSize != null && e.cumulativeSize.isGreaterThanOrEqual(threshold));
     }
 
     /**
@@ -357,7 +361,7 @@ public class Market {
      * 
      * @param exe
      */
-    final void trade(Execution exe) {
+    public final void tick(Execution exe) {
         if (init == null) {
             init = exe;
         }

@@ -120,7 +120,7 @@ class TestableMarket extends Market {
      * @param price
      */
     TestableMarket execute(Execution e) {
-        trade(((TestableMarketBackend) backend).emulate(e));
+        tick(((TestableMarketBackend) backend).emulate(e));
         return this;
     }
 

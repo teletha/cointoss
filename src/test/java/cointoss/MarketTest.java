@@ -486,23 +486,23 @@ public class MarketTest {
     }
 
     @Test
-    public void observeExecutionsBySize() throws Exception {
+    public void observeSequencialExecutionsBySellSize() throws Exception {
         AtomicReference<Decimal> size = new AtomicReference<>();
 
         TestableMarket market = new TestableMarket();
         market.observeExecutionBySize(20).to(e -> {
-            size.set(e.size);
+            size.set(e.cumulativeSize);
         });
 
+        market.execute(Side.BUY, 5, 10, "Buy-1", "Sell-1");
         assert size.get() == null;
-        market.execute(Side.BUY, 1, 10);
+        market.execute(Side.BUY, 5, 10, "Buy-2", "Sell-1");
         assert size.get() == null;
-        market.execute(Side.BUY, 19, 10);
+        market.execute(Side.BUY, 5, 10, "Buy-3", "Sell-1");
         assert size.get() == null;
-        market.execute(Side.BUY, 20, 10);
+        market.execute(Side.BUY, 5, 10, "Buy-4", "Sell-1");
+        market.execute(Side.BUY, 5, 10, "Buy-5", "Sell-2");
         assert size.get().is(20);
-        market.execute(Side.BUY, 21, 10);
-        assert size.get().is(21);
     }
 
     @Test
@@ -511,7 +511,7 @@ public class MarketTest {
 
         TestableMarket market = new TestableMarket();
         market.observeExecutionBySize(20).to(e -> {
-            size.set(e.size);
+            size.set(e.cumulativeSize);
         });
 
         market.execute(Side.BUY, 5, 10, "Buy-1", "Sell-1");
@@ -521,6 +521,7 @@ public class MarketTest {
         market.execute(Side.BUY, 5, 10, "Buy-1", "Sell-3");
         assert size.get() == null;
         market.execute(Side.BUY, 5, 10, "Buy-1", "Sell-4");
+        market.execute(Side.BUY, 5, 10, "Buy-2", "Sell-5");
         assert size.get().is(20);
     }
 }

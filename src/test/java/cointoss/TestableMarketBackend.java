@@ -61,7 +61,7 @@ class TestableMarketBackend implements MarketBackend {
     @Override
     public void initialize(Market market, MarketBuilder builder) {
         builder.initialize().to(e -> {
-            market.trade(emulate(e));
+            market.tick(emulate(e));
         });
     }
 
