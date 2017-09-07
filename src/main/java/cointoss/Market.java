@@ -377,7 +377,6 @@ public class Market {
             OrderAndExecution oae = new OrderAndExecution(order, exe, this);
 
             for (Observer<? super OrderAndExecution> listener : order.executionListeners) {
-                System.out.println(exe);
                 listener.accept(oae);
             }
         }
@@ -407,7 +406,7 @@ public class Market {
         }
 
         // for order state
-        Decimal executed = Decimal.min(order.outstanding_size, exe.size);
+        Decimal executed = order.outstanding_size.min(exe.size);
         if (order.child_order_type.isMarket() && executed.isNot(0)) {
             order.average_price = order.average_price.multipliedBy(order.executed_size)
                     .plus(exe.price.multipliedBy(executed))

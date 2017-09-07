@@ -465,44 +465,6 @@ public class Decimal implements Comparable<Decimal> {
     }
 
     /**
-     * <p>
-     * Return the maximum amount.
-     * </p>
-     * 
-     * @param amounts
-     * @return The maximum amount.
-     */
-    public static Decimal max(Decimal... amounts) {
-        Decimal max = amounts[0];
-
-        for (int i = 1; i < amounts.length; i++) {
-            if (amounts[i].isGreaterThan(max)) {
-                max = amounts[i];
-            }
-        }
-        return max;
-    }
-
-    /**
-     * <p>
-     * Return the minmum amount.
-     * </p>
-     * 
-     * @param amounts
-     * @return The minimum amount.
-     */
-    public static Decimal min(Decimal... amounts) {
-        Decimal min = amounts[0];
-
-        for (int i = 1; i < amounts.length; i++) {
-            if (amounts[i].isLessThan(min)) {
-                min = amounts[i];
-            }
-        }
-        return min;
-    }
-
-    /**
      * Divide amount.
      * 
      * @param size

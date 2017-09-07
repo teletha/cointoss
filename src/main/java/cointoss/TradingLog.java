@@ -344,8 +344,8 @@ public class TradingLog {
          * @param value
          */
         private void add(Decimal value) {
-            min = Decimal.min(min, value);
-            max = Decimal.max(max, value);
+            min = min.min(value);
+            max = max.max(value);
             total = total.plus(value);
             size++;
             if (value.isPositive()) positive++;

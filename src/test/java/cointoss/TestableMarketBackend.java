@@ -202,7 +202,7 @@ class TestableMarketBackend implements MarketBackend {
 
             if (order.quantity() == Quantity.ImmediateOrCancel) {
                 if (order.isTradablePriceWith(e)) {
-                    Decimal min = Decimal.min(e.size, order.outstanding_size);
+                    Decimal min = e.size.min(order.outstanding_size);
                     order.outstanding_size = min;
                 } else {
                     iterator.remove();
@@ -212,7 +212,7 @@ class TestableMarketBackend implements MarketBackend {
             }
 
             if (order.isTradablePriceWith(e)) {
-                Decimal executedSize = Decimal.min(e.size, order.outstanding_size);
+                Decimal executedSize = e.size.min(order.outstanding_size);
                 if (order.child_order_type.isMarket() && executedSize.isNot(0)) {
                     order.average_price = order.average_price.multipliedBy(order.executed_size)
                             .plus(e.price.multipliedBy(executedSize))
