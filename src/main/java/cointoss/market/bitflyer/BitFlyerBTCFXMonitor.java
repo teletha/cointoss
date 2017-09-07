@@ -39,7 +39,7 @@ public class BitFlyerBTCFXMonitor {
     private static final ZoneId zone = ZoneId.of("Asia/Tokyo");
 
     /** The target market */
-    private final Market market = new Market(new BitFlyerBTCFX(), null, TradingMonitor.class);
+    private final Market market = new Market(new BitFlyerBTCFX(), new BitFlyerBTCFXBuilder(), TradingMonitor.class);
 
     /**
      * 
@@ -64,14 +64,11 @@ public class BitFlyerBTCFXMonitor {
         public TradingMonitor(Market market) {
             super(market);
 
-            // market.observeExecutionBySize(1).to(exe -> {
-            // });
-
-            market.minute1.to(tick -> {
-                System.out.println(tick);
+            market.observeExecutionBySize(20).to(exe -> {
+                System.out.println("大口 " + exe.side.mark() + exe.cumulativeSize);
             });
 
-            market.minute5.to(tick -> {
+            market.minute1.to(tick -> {
                 System.out.println(tick);
             });
         }

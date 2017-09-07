@@ -15,6 +15,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +33,8 @@ import kiss.I;
  * @version 2017/08/23 14:48:43
  */
 public class BitFlyerLogBuilder {
+
+    private static final ZoneId zone = ZoneId.of("Asia/Tokyo");
 
     /** date format for log */
     private static final DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyyMMdd");
@@ -50,14 +54,19 @@ public class BitFlyerLogBuilder {
      * 
      * @param type
      */
-    public void build() {
+    public void build() throws Exception {
+        LocalDate today = LocalDate.now();
+        LocalDate limit = today.minusDays(7);
         List<Path> files = Filer.walk(Filer.locate(".log").resolve("bitflyer").resolve(type.name()), "execution2*.log");
 
         for (Path file : files) {
-            fix(file);
+            LocalDate modified = LocalDateTime.ofInstant(Files.getLastModifiedTime(file).toInstant(), zone).toLocalDate();
+
+            if (modified.isAfter(limit)) {
+                fix(file);
+            }
         }
 
-        LocalDate today = LocalDate.now();
         LocalDate latest = LocalDate.parse(files.get(files.size() - 1).getFileName().toString().substring(9, 17), format);
 
         while (latest.isBefore(today)) {
@@ -89,7 +98,7 @@ public class BitFlyerLogBuilder {
         final long initia = latest;
 
         try {
-            root: for (int i = 0; i < 5000; i++) {
+            root: for (int i = 0; i < 50000; i++) {
                 URL url = new URL("https://api.bitflyer.jp/v1/executions?product_code=" + type
                         .name() + "&count=500&before=" + (initia + i * 500));
                 Executions executions = I.json(url).to(Executions.class);
@@ -114,6 +123,7 @@ public class BitFlyerLogBuilder {
 
             if (initia == latest) {
                 // completed
+
             } else {
                 // write
                 Files.write(file(target), lines);
@@ -211,7 +221,7 @@ public class BitFlyerLogBuilder {
         }
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         I.load(Decimal.Codec.class, false);
 
         new BitFlyerLogBuilder(BitFlyerType.FX_BTC_JPY).build();

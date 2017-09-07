@@ -14,6 +14,8 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
 import eu.verdelhan.ta4j.Decimal;
+import kiss.Decoder;
+import kiss.Encoder;
 
 /**
  * @version 2017/08/23 8:47:20
@@ -91,8 +93,33 @@ public class Execution {
      */
     @Override
     public String toString() {
-        return id + " " + exec_date + " " + side
+        return id + " " + exec_date.toLocalDateTime() + " " + side
                 .mark() + " " + price + " " + size + " " + buy_child_order_acceptance_id + " " + sell_child_order_acceptance_id;
+    }
+
+    /**
+     * @version 2017/09/07 23:25:44
+     */
+    @SuppressWarnings("unused")
+    private static class Codec implements Decoder<ZonedDateTime>, Encoder<ZonedDateTime> {
+
+        private static final ZoneId zone = ZoneId.of("UTC");
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String encode(ZonedDateTime value) {
+            return value.toLocalDate().toString();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public ZonedDateTime decode(String value) {
+            return LocalDateTime.parse(value).atZone(zone);
+        }
     }
 
 }

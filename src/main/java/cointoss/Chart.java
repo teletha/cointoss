@@ -236,6 +236,29 @@ public class Chart extends TimeSeries {
             // wrapped error in here.
             throw new Error();
         }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String toString() {
+            StringBuilder builder = new StringBuilder();
+            builder.append(beginTime.toLocalDateTime())
+                    .append("～")
+                    .append(endTime.toLocalDateTime())
+                    .append(" Open")
+                    .append(openPrice)
+                    .append(" Close")
+                    .append(closePrice)
+                    .append(" Max")
+                    .append(maxPrice)
+                    .append(" Min")
+                    .append(minPrice)
+                    .append(" Volume")
+                    .append(volume);
+
+            return builder.toString();
+        }
     }
 
 }
