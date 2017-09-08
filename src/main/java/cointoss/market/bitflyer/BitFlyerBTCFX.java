@@ -42,7 +42,7 @@ public class BitFlyerBTCFX implements MarketBackend {
     private static final ZoneId zone = ZoneId.of("Asia/Tokyo");
 
     /** The api url. */
-    private static final String api = "https://api.bitflyer.jp";
+    public static final String api = "https://api.bitflyer.jp";
 
     /** The key. */
     private final String accessKey;

@@ -12,7 +12,7 @@ package cointoss;
 import java.util.stream.IntStream;
 
 import cointoss.Time.Lag;
-import cointoss.market.bitflyer.BitFlyerBTCFXBuilder;
+import cointoss.market.bitflyer.BitFlyerBuilder;
 import eu.verdelhan.ta4j.Decimal;
 import kiss.I;
 import kiss.Signal;
@@ -155,7 +155,7 @@ public class BackTester {
      * @param args
      */
     public static void main(String[] args) {
-        BackTester tester = BackTester.initialize(BitFlyerBTCFXBuilder.class).balance(1000000, 0).strategy(BreakoutTrading.class);
+        BackTester tester = BackTester.initialize(BitFlyerBuilder.class).balance(1000000, 0).strategy(BreakoutTrading.class);
         tester.execute();
     }
 

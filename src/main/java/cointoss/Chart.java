@@ -45,6 +45,7 @@ public class Chart extends TimeSeries {
 
         this.duration = duration;
         this.child = child;
+        setMaximumTickCount(60 * 60 * 24 * 3);
     }
 
     /**

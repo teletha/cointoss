@@ -9,6 +9,8 @@
  */
 package cointoss;
 
+import java.time.LocalDate;
+
 import kiss.Signal;
 
 /**
@@ -22,4 +24,38 @@ public interface MarketBuilder {
      * @return
      */
     Signal<Execution> initialize();
+
+    /**
+     * Read date from the specified date.
+     * 
+     * @param start
+     * @return
+     */
+    Signal<Execution> from(LocalDate start);
+
+    /**
+     * Read date from the specified start to end.
+     * 
+     * @param start
+     * @param end
+     * @return
+     */
+    default Signal<Execution> range(LocalDate start, LocalDate end) {
+        return from(start).takeUntil(e -> e.exec_date.toLocalDate().isAfter(end));
+    }
+
+    /**
+     * Get the starting day of cache.
+     * 
+     * @return
+     */
+    LocalDate getCacheStart();
+
+    /**
+     * Get the ending day of cache.
+     * 
+     * @return
+     */
+    LocalDate getCacheEnd();
+
 }

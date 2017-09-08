@@ -9,10 +9,12 @@
  */
 package cointoss.market.bitflyer;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Iterator;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.pubnub.api.PNConfiguration;
@@ -38,8 +40,21 @@ public class BitFlyerBTCFXMonitor {
 
     private static final ZoneId zone = ZoneId.of("Asia/Tokyo");
 
-    /** The target market */
-    private final Market market = new Market(new BitFlyerBTCFX(), new BitFlyerBTCFXBuilder(), TradingMonitor.class);
+    /** Target market */
+    private final Market market = new Market(new BitFlyerBTCFX(), new BitFlyerBuilder(), TradingMonitor.class);
+
+    /** Starting point. */
+    private long realtimeStartId;
+
+    /** Realtime execution queue. */
+    private ConcurrentLinkedDeque<Execution> realtimeBuffer = new ConcurrentLinkedDeque<>();
+
+    /**
+     * Process past executions.
+     */
+    private void processPast(LocalDate start) {
+
+    }
 
     /**
      * 
@@ -135,10 +150,13 @@ public class BitFlyerBTCFXMonitor {
                     exe.sell_child_order_acceptance_id = node.get("sell_child_order_acceptance_id").asText();
 
                     market.tick(exe);
+
+                    if (realtimeStartId == 0) {
+                        realtimeStartId = exe.id;
+                    }
                 }
             }
         }
-
     }
 
     /**
