@@ -25,7 +25,7 @@ import org.apache.http.util.EntityUtils;
 import cointoss.BalanceUnit;
 import cointoss.Execution;
 import cointoss.Market;
-import cointoss.MarketService;
+import cointoss.MarketBackend;
 import cointoss.Order;
 import cointoss.OrderState;
 import cointoss.Position;
@@ -34,9 +34,9 @@ import kiss.I;
 import kiss.Signal;
 
 /**
- * @version 2017/07/22 13:18:23
+ * @version 2017/09/08 18:49:31
  */
-class BitFlyerService implements MarketService {
+class BitFlyerBackend implements MarketBackend {
 
     /** The api url. */
     static final String api = "https://api.bitflyer.jp";
@@ -56,7 +56,7 @@ class BitFlyerService implements MarketService {
     /**
      * @param type
      */
-    BitFlyerService(BitFlyer type) {
+    BitFlyerBackend(BitFlyer type) {
         List<String> lines = Filer.read(".log/bitflyer/key.txt").toList();
 
         this.type = type;

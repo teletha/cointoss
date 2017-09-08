@@ -17,7 +17,7 @@ import eu.verdelhan.ta4j.Decimal;
 /**
  * @version 2017/09/05 19:39:34
  */
-public abstract class Trading {
+public abstract class TradingStrategy {
 
     /** The market. */
     protected final Market market;
@@ -49,7 +49,7 @@ public abstract class Trading {
     /**
      * New Trade.
      */
-    protected Trading(Market market) {
+    protected TradingStrategy(Market market) {
         this.market = market;
     }
 

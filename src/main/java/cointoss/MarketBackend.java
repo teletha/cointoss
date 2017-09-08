@@ -12,9 +12,9 @@ package cointoss;
 import kiss.Signal;
 
 /**
- * @version 2017/07/24 23:39:15
+ * @version 2017/09/08 18:51:05
  */
-public interface MarketService {
+public interface MarketBackend {
 
     /**
      * <p>

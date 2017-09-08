@@ -7,7 +7,7 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss;
+package cointoss.util;
 
 import org.apache.commons.lang3.RandomUtils;
 

@@ -10,7 +10,7 @@
 package cointoss.market.bitflyer;
 
 import cointoss.MarketLog;
-import cointoss.MarketService;
+import cointoss.MarketBackend;
 import cointoss.market.Span;
 
 /**
@@ -56,7 +56,7 @@ public enum BitFlyer {
      * 
      * @return
      */
-    public MarketService service() {
-        return new BitFlyerService(this);
+    public MarketBackend service() {
+        return new BitFlyerBackend(this);
     }
 }

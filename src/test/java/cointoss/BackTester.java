@@ -35,7 +35,7 @@ public class BackTester {
     private MarketLog marketLog;
 
     /** テスト戦略 */
-    private Class<? extends Trading> strategy;
+    private Class<? extends TradingStrategy> strategy;
 
     /** ラグ生成器 */
     private Lag lag = Time.lag(2, 15);
@@ -52,7 +52,7 @@ public class BackTester {
      * @param strategy
      * @return
      */
-    public BackTester strategy(Class<? extends Trading> strategy) {
+    public BackTester strategy(Class<? extends TradingStrategy> strategy) {
         if (strategy != null) {
             this.strategy = strategy;
         }
@@ -127,7 +127,7 @@ public class BackTester {
     /**
      * @version 2017/08/16 9:16:09
      */
-    private class BackTestBackend extends TestableMarketService {
+    private class BackTestBackend extends TestableMarketBackend {
 
         /**
          */
@@ -165,7 +165,7 @@ public class BackTester {
     /**
      * @version 2017/09/05 20:19:04
      */
-    private static class BreakoutTrading extends Trading {
+    private static class BreakoutTrading extends TradingStrategy {
 
         /**
          * @param market

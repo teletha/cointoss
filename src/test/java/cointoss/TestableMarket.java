@@ -28,14 +28,14 @@ class TestableMarket extends Market {
      * @param strategy
      */
     TestableMarket() {
-        super(new TestableMarketService(Time.lag(0)), Signal.EMPTY, null);
+        super(new TestableMarketBackend(Time.lag(0)), Signal.EMPTY, null);
     }
 
     /**
      * @param delay
      */
     TestableMarket(int delay) {
-        super(new TestableMarketService(Time.lag(delay)), Signal.EMPTY, null);
+        super(new TestableMarketBackend(Time.lag(delay)), Signal.EMPTY, null);
     }
 
     /**
@@ -120,7 +120,7 @@ class TestableMarket extends Market {
      * @param price
      */
     TestableMarket execute(Execution e) {
-        tick(((TestableMarketService) backend).emulate(e));
+        tick(((TestableMarketBackend) backend).emulate(e));
         return this;
     }
 

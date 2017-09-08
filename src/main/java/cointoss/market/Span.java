@@ -12,7 +12,7 @@ package cointoss.market;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 
-import cointoss.Generator;
+import cointoss.util.Generator;
 
 /**
  * @version 2017/09/03 22:04:28

@@ -230,7 +230,7 @@ class BitFlyerLog implements MarketLog {
         return new Signal<Execution>((observer, disposer) -> {
             while (disposer.isDisposed() == false) {
                 try {
-                    URL url = new URL(BitFlyerService.api + "/v1/executions?product_code=" + type + "&count=500&before=" + (latestId + 500));
+                    URL url = new URL(BitFlyerBackend.api + "/v1/executions?product_code=" + type + "&count=500&before=" + (latestId + 500));
                     Executions executions = I.json(url).to(Executions.class);
 
                     for (int i = executions.size() - 1; 0 <= i; i--) {
@@ -295,7 +295,7 @@ class BitFlyerLog implements MarketLog {
                             exe.side = Side.parse(node.get("side").asText());
                             exe.price = Decimal.valueOf(node.get("price").asText());
                             exe.size = Decimal.valueOf(node.get("size").asText());
-                            exe.exec_date = LocalDateTime.parse(node.get("exec_date").asText(), format).atZone(BitFlyerService.zone);
+                            exe.exec_date = LocalDateTime.parse(node.get("exec_date").asText(), format).atZone(BitFlyerBackend.zone);
                             exe.buy_child_order_acceptance_id = node.get("buy_child_order_acceptance_id").asText();
                             exe.sell_child_order_acceptance_id = node.get("sell_child_order_acceptance_id").asText();
 

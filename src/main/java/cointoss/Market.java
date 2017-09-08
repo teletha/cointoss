@@ -22,12 +22,12 @@ import kiss.Observer;
 import kiss.Signal;
 
 /**
- * @version 2017/08/16 9:22:14
+ * @version 2017/09/08 19:30:15
  */
 public class Market {
 
     /** The market handler. */
-    protected final MarketService backend;
+    protected final MarketBackend backend;
 
     /** The trading logger. */
     public final TradingLog logger = new TradingLog(this);
@@ -93,22 +93,22 @@ public class Market {
     private Decimal targetInit;
 
     /** The current trading. */
-    private Trading trade = create(NOP.class);
+    private TradingStrategy strategy;
 
     /**
      * @param backend
      * @param builder
      * @param strategy
      */
-    public Market(MarketService backend, Signal<Execution> log, Class<? extends Trading> trade) {
+    public Market(MarketBackend backend, Signal<Execution> log, Class<? extends TradingStrategy> strategy) {
         this.backend = Objects.requireNonNull(backend);
-        with(trade);
 
         // initialize price, balance and executions
         List<BalanceUnit> units = backend.getCurrency().toList();
         this.base = this.baseInit = units.get(0).amount;
         this.target = this.targetInit = units.get(1).amount;
 
+        useStrategy(strategy);
         backend.initialize(this, log);
     }
 
@@ -150,12 +150,12 @@ public class Market {
     /**
      * Set trading strategy.
      * 
-     * @param tradeType
+     * @param strategy
      * @return
      */
-    public final Market with(Class<? extends Trading> tradeType) {
-        if (tradeType != null) {
-            this.trade = create(tradeType);
+    public final Market useStrategy(Class<? extends TradingStrategy> strategy) {
+        if (strategy != null) {
+            this.strategy = create(Objects.requireNonNull(strategy));
         }
         return this;
     }
@@ -385,7 +385,7 @@ public class Market {
             listener.accept(exe);
         }
 
-        trade.tick(exe);
+        strategy.tick(exe);
     }
 
     /**
@@ -458,14 +458,14 @@ public class Market {
     }
 
     /**
-     * Create new {@link Trading} instance.
+     * Create new {@link TradingStrategy} instance.
      * 
      * @param type
      * @return
      */
-    private Trading create(Class<? extends Trading> type) {
+    private TradingStrategy create(Class<? extends TradingStrategy> type) {
         try {
-            Constructor<? extends Trading> constructor = type.getDeclaredConstructor(Market.class);
+            Constructor<? extends TradingStrategy> constructor = type.getDeclaredConstructor(Market.class);
             constructor.setAccessible(true);
             return constructor.newInstance(this);
         } catch (Exception e) {
@@ -476,7 +476,7 @@ public class Market {
     /**
      * @version 2017/08/24 20:13:13
      */
-    private static class NOP extends Trading {
+    private static class NOP extends TradingStrategy {
 
         /**
          * @param market

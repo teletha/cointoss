@@ -12,6 +12,8 @@ package cointoss;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
+import cointoss.util.Generator;
+
 /**
  * @version 2017/08/16 22:07:12
  */

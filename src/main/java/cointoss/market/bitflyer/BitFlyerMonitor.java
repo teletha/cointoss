@@ -11,14 +11,14 @@ package cointoss.market.bitflyer;
 
 import cointoss.Execution;
 import cointoss.Market;
-import cointoss.Trading;
+import cointoss.TradingStrategy;
 import eu.verdelhan.ta4j.Decimal;
 import kiss.I;
 
 /**
  * @version 2017/09/08 18:40:12
  */
-public class BitFlyerMonitor extends Trading {
+public class BitFlyerMonitor extends TradingStrategy {
 
     /**
      * @param market

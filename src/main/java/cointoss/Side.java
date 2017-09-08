@@ -11,6 +11,7 @@ package cointoss;
 
 import java.util.Objects;
 
+import cointoss.util.Generator;
 import kiss.Decoder;
 import kiss.Encoder;
 
