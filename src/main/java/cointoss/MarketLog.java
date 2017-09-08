@@ -17,7 +17,7 @@ import kiss.Signal;
 /**
  * @version 2017/09/08 18:20:48
  */
-public interface MarketLogBuilder {
+public interface MarketLog {
 
     /**
      * Read the initial execution data.

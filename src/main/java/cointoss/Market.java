@@ -27,7 +27,7 @@ import kiss.Signal;
 public class Market {
 
     /** The market handler. */
-    protected final MarketBackend backend;
+    protected final MarketService backend;
 
     /** The trading logger. */
     public final TradingLog logger = new TradingLog(this);
@@ -100,7 +100,7 @@ public class Market {
      * @param builder
      * @param strategy
      */
-    public Market(MarketBackend backend, Signal<Execution> log, Class<? extends Trading> trade) {
+    public Market(MarketService backend, Signal<Execution> log, Class<? extends Trading> trade) {
         this.backend = Objects.requireNonNull(backend);
         with(trade);
 

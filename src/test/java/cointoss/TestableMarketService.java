@@ -24,7 +24,7 @@ import kiss.Signal;
 /**
  * @version 2017/08/15 23:38:25
  */
-class TestableMarketBackend implements MarketBackend {
+class TestableMarketService implements MarketService {
 
     /** The managed id. */
     private int id = 0;
@@ -50,7 +50,7 @@ class TestableMarketBackend implements MarketBackend {
     /**
     * 
     */
-    TestableMarketBackend(Lag lag) {
+    TestableMarketService(Lag lag) {
         this.lag = lag;
     }
 

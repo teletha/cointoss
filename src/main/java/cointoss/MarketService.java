@@ -14,7 +14,7 @@ import kiss.Signal;
 /**
  * @version 2017/07/24 23:39:15
  */
-public interface MarketBackend {
+public interface MarketService {
 
     /**
      * <p>

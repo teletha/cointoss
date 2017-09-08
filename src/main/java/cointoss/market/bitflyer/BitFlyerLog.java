@@ -17,7 +17,6 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -33,7 +32,7 @@ import com.pubnub.api.models.consumer.pubsub.PNMessageResult;
 import com.pubnub.api.models.consumer.pubsub.PNPresenceEventResult;
 
 import cointoss.Execution;
-import cointoss.MarketLogBuilder;
+import cointoss.MarketLog;
 import cointoss.Side;
 import cointoss.market.Span;
 import eu.verdelhan.ta4j.Decimal;
@@ -42,12 +41,9 @@ import kiss.I;
 import kiss.Signal;
 
 /**
- * @version 2017/08/16 8:13:06
+ * @version 2017/09/08 18:42:36
  */
-public class BitFlyerLogBuilder implements MarketLogBuilder {
-
-    /** UTC */
-    private static final ZoneId zone = ZoneId.of("UTC");
+class BitFlyerLog implements MarketLog {
 
     /** file data format */
     private static final DateTimeFormatter fomatFile = DateTimeFormatter.ofPattern("yyyyMMdd");
@@ -82,7 +78,7 @@ public class BitFlyerLogBuilder implements MarketLogBuilder {
     /**
      * @param type
      */
-    public BitFlyerLogBuilder(BitFlyer type) {
+    BitFlyerLog(BitFlyer type) {
         this.type = type;
         this.root = Filer.locate(".log/bitflyer/" + type);
 
@@ -234,7 +230,7 @@ public class BitFlyerLogBuilder implements MarketLogBuilder {
         return new Signal<Execution>((observer, disposer) -> {
             while (disposer.isDisposed() == false) {
                 try {
-                    URL url = new URL(BitFlyerBTCFX.api + "/v1/executions?product_code=" + type + "&count=500&before=" + (latestId + 500));
+                    URL url = new URL(BitFlyerService.api + "/v1/executions?product_code=" + type + "&count=500&before=" + (latestId + 500));
                     Executions executions = I.json(url).to(Executions.class);
 
                     for (int i = executions.size() - 1; 0 <= i; i--) {
@@ -299,7 +295,7 @@ public class BitFlyerLogBuilder implements MarketLogBuilder {
                             exe.side = Side.parse(node.get("side").asText());
                             exe.price = Decimal.valueOf(node.get("price").asText());
                             exe.size = Decimal.valueOf(node.get("size").asText());
-                            exe.exec_date = LocalDateTime.parse(node.get("exec_date").asText(), format).atZone(zone);
+                            exe.exec_date = LocalDateTime.parse(node.get("exec_date").asText(), format).atZone(BitFlyerService.zone);
                             exe.buy_child_order_acceptance_id = node.get("buy_child_order_acceptance_id").asText();
                             exe.sell_child_order_acceptance_id = node.get("sell_child_order_acceptance_id").asText();
 

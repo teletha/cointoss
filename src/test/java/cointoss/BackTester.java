@@ -32,7 +32,7 @@ public class BackTester {
     private Decimal target = Decimal.ZERO;
 
     /** テスト対象マーケット */
-    private MarketLogBuilder marketLog;
+    private MarketLog marketLog;
 
     /** テスト戦略 */
     private Class<? extends Trading> strategy;
@@ -117,7 +117,7 @@ public class BackTester {
      * 
      * @return
      */
-    public static BackTester initialize(MarketLogBuilder marketLog) {
+    public static BackTester initialize(MarketLog marketLog) {
         BackTester tester = new BackTester();
         tester.marketLog = marketLog;
 
@@ -127,7 +127,7 @@ public class BackTester {
     /**
      * @version 2017/08/16 9:16:09
      */
-    private class BackTestBackend extends TestableMarketBackend {
+    private class BackTestBackend extends TestableMarketService {
 
         /**
          */

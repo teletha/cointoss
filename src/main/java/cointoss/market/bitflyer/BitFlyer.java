@@ -9,7 +9,8 @@
  */
 package cointoss.market.bitflyer;
 
-import cointoss.MarketLogBuilder;
+import cointoss.MarketLog;
+import cointoss.MarketService;
 import cointoss.market.Span;
 
 /**
@@ -42,11 +43,20 @@ public enum BitFlyer {
     }
 
     /**
-     * Create {@link MarketLogBuilder} for this market type.
+     * Create {@link MarketLog} for this market type.
      * 
      * @return
      */
-    public MarketLogBuilder log() {
-        return new BitFlyerLogBuilder(this);
+    public MarketLog log() {
+        return new BitFlyerLog(this);
+    }
+
+    /**
+     * Create {@link MerketService} for this market type.
+     * 
+     * @return
+     */
+    public MarketService service() {
+        return new BitFlyerService(this);
     }
 }

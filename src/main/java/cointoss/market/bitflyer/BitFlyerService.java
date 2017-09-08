@@ -25,7 +25,7 @@ import org.apache.http.util.EntityUtils;
 import cointoss.BalanceUnit;
 import cointoss.Execution;
 import cointoss.Market;
-import cointoss.MarketBackend;
+import cointoss.MarketService;
 import cointoss.Order;
 import cointoss.OrderState;
 import cointoss.Position;
@@ -36,12 +36,16 @@ import kiss.Signal;
 /**
  * @version 2017/07/22 13:18:23
  */
-public class BitFlyerBTCFX implements MarketBackend {
-
-    private static final ZoneId zone = ZoneId.of("Asia/Tokyo");
+class BitFlyerService implements MarketService {
 
     /** The api url. */
-    public static final String api = "https://api.bitflyer.jp";
+    static final String api = "https://api.bitflyer.jp";
+
+    /** UTC */
+    static final ZoneId zone = ZoneId.of("UTC");
+
+    /** The market type. */
+    private final BitFlyer type;
 
     /** The key. */
     private final String accessKey;
@@ -50,12 +54,14 @@ public class BitFlyerBTCFX implements MarketBackend {
     private final String accessToken;
 
     /**
-     * 
+     * @param type
      */
-    public BitFlyerBTCFX() {
+    BitFlyerService(BitFlyer type) {
         List<String> lines = Filer.read(".log/bitflyer/key.txt").toList();
-        accessKey = lines.get(0);
-        accessToken = lines.get(1);
+
+        this.type = type;
+        this.accessKey = lines.get(0);
+        this.accessToken = lines.get(1);
     }
 
     /**
