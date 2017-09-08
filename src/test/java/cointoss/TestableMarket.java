@@ -14,7 +14,6 @@ import static cointoss.Time.*;
 
 import cointoss.Time.At;
 import eu.verdelhan.ta4j.Decimal;
-import kiss.Signal;
 import kiss.Table;
 
 /**
@@ -28,14 +27,14 @@ class TestableMarket extends Market {
      * @param strategy
      */
     TestableMarket() {
-        super(new TestableMarketBackend(Time.lag(0)), () -> Signal.EMPTY, null);
+        super(new TestableMarketBackend(Time.lag(0)), new TestableMarketLogBuilder(), null);
     }
 
     /**
      * @param delay
      */
     TestableMarket(int delay) {
-        super(new TestableMarketBackend(Time.lag(delay)), () -> Signal.EMPTY, null);
+        super(new TestableMarketBackend(Time.lag(delay)), new TestableMarketLogBuilder(), null);
     }
 
     /**

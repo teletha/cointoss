@@ -9,10 +9,12 @@
  */
 package cointoss.market.bitflyer;
 
+import cointoss.MarketLogBuilder;
+
 /**
  * @version 2017/07/30 20:56:12
  */
-public enum BitFlyerType {
+public enum BitFlyer {
     BTC_JPY, FX_BTC_JPY, ETC_BTC, BCH_BTC;
 
     /**
@@ -24,5 +26,14 @@ public enum BitFlyerType {
      */
     public String fullName() {
         return "BitFlyer " + name();
+    }
+
+    /**
+     * Create {@link MarketLogBuilder} for this market type.
+     * 
+     * @return
+     */
+    public MarketLogBuilder log() {
+        return new BitFlyerLogBuilder(this);
     }
 }

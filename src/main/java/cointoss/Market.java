@@ -100,7 +100,7 @@ public class Market {
      * @param builder
      * @param strategy
      */
-    public Market(MarketBackend backend, MarketBuilder builder, Class<? extends Trading> trade) {
+    public Market(MarketBackend backend, MarketLogBuilder builder, Class<? extends Trading> trade) {
         this.backend = Objects.requireNonNull(backend);
         with(trade);
 

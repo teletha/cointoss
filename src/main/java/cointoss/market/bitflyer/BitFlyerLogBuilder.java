@@ -9,221 +9,339 @@
  */
 package cointoss.market.bitflyer;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.URL;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.pubnub.api.PNConfiguration;
+import com.pubnub.api.PubNub;
+import com.pubnub.api.callbacks.SubscribeCallback;
+import com.pubnub.api.models.consumer.PNStatus;
+import com.pubnub.api.models.consumer.pubsub.PNMessageResult;
+import com.pubnub.api.models.consumer.pubsub.PNPresenceEventResult;
 
 import cointoss.Execution;
-import cointoss.Generator;
+import cointoss.MarketLogBuilder;
 import cointoss.Side;
+import cointoss.market.Span;
 import eu.verdelhan.ta4j.Decimal;
 import filer.Filer;
 import kiss.I;
+import kiss.Signal;
 
 /**
- * @version 2017/08/23 14:48:43
+ * @version 2017/08/16 8:13:06
  */
-public class BitFlyerLogBuilder {
+public class BitFlyerLogBuilder extends MarketLogBuilder {
 
-    private static final ZoneId zone = ZoneId.of("Asia/Tokyo");
+    /** UTC */
+    private static final ZoneId zone = ZoneId.of("UTC");
 
-    /** date format for log */
-    private static final DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyyMMdd");
+    /** file data format */
+    private static final DateTimeFormatter fomatFile = DateTimeFormatter.ofPattern("yyyyMMdd");
 
-    /** The target type. */
-    private final BitFlyerType type;
+    /** realtime data format */
+    private static final DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.n'Z'");
+
+    /** Sample trend */
+    private static final Span SampleTrend = new Span(2017, 5, 29, 2017, 6, 5);
+
+    /** Sample of range trend */
+    private static final Span RangeTrend = new Span(2017, 5, 29, 2017, 7, 29);
+
+    /** Sample of up trend */
+    private static final Span UpTrend = new Span(2017, 7, 16, 2017, 8, 29);
+
+    /** Sample of down trend */
+    private static final Span DownTrend = new Span(2017, 6, 11, 2017, 7, 16);
+
+    /** The log folder. */
+    private static final Path root = Filer.locate(".log/bitflyer/" + BitFlyer.FX_BTC_JPY.name());
+
+    /** The current type. */
+    private final BitFlyer type;
+
+    /** The latest execution id. */
+    private long latestId;
+
+    /** The latest cached id. */
+    private long cacheId;
+
+    /** The latest realtime id. */
+    private long realtimeId;
+
+    /** The first day. */
+    private final LocalDate cacheFirst;
+
+    /** The last day. */
+    private LocalDate cacheLast;
+
+    /** The current processing cache file. */
+    private PrintWriter cache;
 
     /**
      * @param type
      */
-    private BitFlyerLogBuilder(BitFlyerType type) {
+    public BitFlyerLogBuilder(BitFlyer type) {
         this.type = type;
-    }
 
-    /**
-     * Build execution log for the specified market.
-     * 
-     * @param type
-     */
-    public void build() throws Exception {
-        LocalDate today = LocalDate.now();
-        LocalDate limit = today.minusDays(7);
-        List<Path> files = Filer.walk(Filer.locate(".log").resolve("bitflyer").resolve(type.name()), "execution2*.log");
+        List<Path> files = Filer.walk(root, "execution*.log");
+        LocalDate start = null;
+        LocalDate end = null;
 
         for (Path file : files) {
-            LocalDate modified = LocalDateTime.ofInstant(Files.getLastModifiedTime(file).toInstant(), zone).toLocalDate();
+            String name = file.getFileName().toString();
+            LocalDate date = LocalDate.parse(name.substring(9, 17), fomatFile);
 
-            if (modified.isAfter(limit)) {
-                fix(file);
-            }
-        }
-
-        LocalDate latest = LocalDate.parse(files.get(files.size() - 1).getFileName().toString().substring(9, 17), format);
-
-        while (latest.isBefore(today)) {
-            latest = latest.plusDays(1);
-
-            createLog(latest);
-        }
-    }
-
-    /**
-     * Create execution log file of the specified day.
-     * 
-     * @param target
-     */
-    private void createLog(LocalDate target) {
-        Path path = file(target);
-        long latest = -1;
-        List<String> lines;
-
-        if (Files.notExists(path)) {
-            // read from previous log file
-            lines = new ArrayList();
-            latest = readLastId(readLines(target.minusDays(1)));
-        } else {
-            lines = readLines(target);
-            latest = readLastId(lines);
-        }
-
-        final long initia = latest;
-
-        try {
-            root: for (int i = 0; i < 50000; i++) {
-                URL url = new URL("https://api.bitflyer.jp/v1/executions?product_code=" + type
-                        .name() + "&count=500&before=" + (initia + i * 500));
-                Executions executions = I.json(url).to(Executions.class);
-                System.out.println("Read " + latest + "   " + lines.size() + "   " + executions.get(executions.size() - 1).exec_date);
-
-                for (int j = executions.size() - 1; 0 <= j; j--) {
-                    Execution exe = executions.get(j);
-
-                    if (latest < exe.id) {
-                        if (exe.exec_date.toLocalDate().isEqual(target)) {
-                            // target day
-                            lines.add(exe.toString());
-                            latest = exe.id;
-                        } else {
-                            // next day
-                            break root;
-                        }
-                    }
-                }
-                Thread.sleep(700);
-            }
-
-            if (initia == latest) {
-                // completed
-
+            if (start == null || end == null) {
+                start = date;
+                end = date;
             } else {
-                // write
-                Files.write(file(target), lines);
+                if (start.isAfter(date)) {
+                    start = date;
+                }
 
-                // check
-                // createLog(target);
+                if (end.isBefore(date)) {
+                    end = date;
+                }
             }
-        } catch (Throwable e) {
-            e.printStackTrace();
-            throw I.quiet(e);
         }
+        this.cacheFirst = start;
+        this.cacheLast = end;
     }
 
     /**
-     * @param lines
-     * @return
+     * {@inheritDoc}
      */
-    private long readLastId(List<String> lines) {
-        return new Execution(lines.get(lines.size() - 1)).id;
-    }
+    @Override
+    public Signal<Execution> initialize() {
+        Span span = Span.random(cacheFirst, cacheLast, 5);
+        LocalDate start = span.start;
+        LocalDate end = span.end;
 
-    /**
-     * @param day
-     * @return
-     */
-    private List<String> readLines(LocalDate day) {
-        try {
-            return Files.readAllLines(file(day));
-        } catch (IOException e) {
-            throw I.quiet(e);
+        List<LocalDate> period = new ArrayList();
+
+        while (start.isBefore(end)) {
+            period.add(start);
+            start = start.plusDays(1);
         }
+
+        return I.signal(period)
+                .map(i -> Filer.locate(".log/bitflyer/" + BitFlyer.FX_BTC_JPY.name() + "/execution" + fomatFile.format(i) + ".log"))
+                .flatMap(Filer::read)
+                .map(Execution::new);
     }
 
     /**
-     * @param day
-     * @return
+     * {@inheritDoc}
      */
-    private Path file(LocalDate day) {
-        return Filer.locate(".log").resolve("bitflyer").resolve(type.name()).resolve("execution" + format.format(day) + ".log");
+    @Override
+    public Signal<Execution> from(LocalDate start) {
+        return new Signal<>((observer, disposer) -> {
+            // read from cache
+            LocalDate current = start.isBefore(cacheFirst) ? cacheFirst : start.isAfter(cacheLast) ? cacheLast : start;
+
+            while (disposer.isDisposed() == false && !current.isAfter(getCacheEnd())) {
+                disposer.add(localCache(current).effect(e -> latestId = cacheId = e.id).to(observer::accept));
+                current = current.plusDays(1);
+            }
+
+            AtomicBoolean completeREST = new AtomicBoolean();
+
+            // read from realtime API
+            if (disposer.isDisposed() == false) {
+                disposer.add(realtime().skipUntil(e -> completeREST.get()).effect(this::cache).to(observer::accept));
+            }
+
+            // read from REST API
+            if (disposer.isDisposed() == false) {
+                disposer.add(rest().effect(this::cache).effectOnComplete((o, d) -> completeREST.set(true)).to(observer::accept));
+            }
+
+            return disposer;
+        });
     }
 
     /**
-     * Fix incomplete log.
+     * {@inheritDoc}
+     */
+    @Override
+    public LocalDate getCacheStart() {
+        return cacheFirst;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public LocalDate getCacheEnd() {
+        return cacheLast;
+    }
+
+    /**
+     * Store cache data.
      * 
-     * @param file
+     * @param exe
      */
-    private void fix(Path file) {
-        List<Execution> lines = Filer.read(file).map(Execution::new).toList();
-        int initial = lines.size();
-
-        for (int i = 0; i < lines.size() - 1; i++) {
-            Execution e1 = lines.get(i);
-            Execution e2 = lines.get(i + 1);
-
-            // check id
-            if (e2.id - e1.id < 5) {
-                continue;
-            }
-
-            // check price
-            if (e2.price.minus(e1.price).abs().isLessThanOrEqual(400)) {
-                continue;
-            }
-
-            // check time
-            long duration = Duration.between(e1.exec_date, e2.exec_date).getSeconds();
-
-            if (duration < 30) {
-                continue;
-            }
-
-            Execution complement = new Execution();
-            complement.id = (e1.id + e2.id) / 2;
-            complement.side = Side.random();
-            complement.size = e1.size.plus(e2.size).dividedBy(2);
-            complement.price = e1.price.plus(e2.price).dividedBy(2).integral();
-            complement.exec_date = e1.exec_date.plusSeconds(duration / 2);
-            complement.buy_child_order_acceptance_id = "Complement-" + format.format(e1.exec_date) + "-" + Generator
-                    .randomInt(10000000, 99999999);
-            complement.sell_child_order_acceptance_id = "Complement-" + format.format(e1.exec_date) + "-" + Generator
-                    .randomInt(10000000, 99999999);
-
-            System.out.println("Insert complement execution. " + complement);
-
-            // insert complemented execution
-            lines.add(++i, complement);
-        }
-
-        if (initial != lines.size()) {
+    private void cache(Execution exe) {
+        if (cacheId < exe.id) {
             try {
-                Files.write(file, lines.stream().map(Execution::toString).collect(Collectors.toList()));
+                LocalDate date = exe.exec_date.toLocalDate();
+
+                if (cache == null || cacheLast.isBefore(date)) {
+                    I.quiet(cache);
+
+                    File file = localCacheFile(date).toFile();
+                    file.createNewFile();
+
+                    cache = new PrintWriter(new FileWriter(file, true));
+                    cacheLast = date;
+                }
+                cache.println(exe.toString());
+                cache.flush();
+                cacheId = exe.id;
             } catch (IOException e) {
                 throw I.quiet(e);
             }
         }
     }
 
-    public static void main(String[] args) throws Exception {
+    /**
+     * Read date from local cache.
+     * 
+     * @param date
+     * @return
+     */
+    private Signal<Execution> localCache(LocalDate date) {
+        return Filer.read(localCacheFile(date)).map(Execution::new);
+    }
+
+    /**
+     * Read date from local cache.
+     * 
+     * @param date
+     * @return
+     */
+    private Path localCacheFile(LocalDate date) {
+        return Filer.locate(".log/bitflyer/" + BitFlyer.FX_BTC_JPY.name() + "/execution" + fomatFile.format(date) + ".log");
+    }
+
+    /**
+     * Read data from REST API.
+     */
+    private Signal<Execution> rest() {
+        return new Signal<Execution>((observer, disposer) -> {
+            while (disposer.isDisposed() == false) {
+                try {
+                    URL url = new URL(BitFlyerBTCFX.api + "/v1/executions?product_code=" + type + "&count=500&before=" + (latestId + 500));
+                    Executions executions = I.json(url).to(Executions.class);
+
+                    for (int j = executions.size() - 1; 0 <= j; j--) {
+                        Execution exe = executions.get(j);
+
+                        if (latestId < exe.id) {
+                            observer.accept(exe);
+                            latestId = exe.id;
+                        }
+                    }
+                } catch (Exception e) {
+                    observer.error(e);
+                }
+
+                if (realtimeId != 0 && realtimeId <= latestId) {
+                    break;
+                }
+
+                try {
+                    Thread.sleep(333);
+                } catch (InterruptedException e) {
+                    observer.error(e);
+                }
+            }
+            System.out.println("追いついた！！！");
+            observer.complete();
+
+            return disposer;
+        });
+    }
+
+    /**
+     * Read data from realtime API.
+     * 
+     * @return
+     */
+    private Signal<Execution> realtime() {
+        return new Signal<>((observer, disposer) -> {
+            PNConfiguration config = new PNConfiguration();
+            config.setSubscribeKey("sub-c-52a9ab50-291b-11e5-baaa-0619f8945a4f");
+
+            PubNub pubNub = new PubNub(config);
+            pubNub.addListener(new SubscribeCallback() {
+
+                @Override
+                public void status(PubNub pubnub, PNStatus status) {
+                }
+
+                @Override
+                public void presence(PubNub pubnub, PNPresenceEventResult presence) {
+                }
+
+                @Override
+                public void message(PubNub pubnub, PNMessageResult message) {
+                    if (message.getChannel() != null) {
+                        Iterator<JsonNode> iterator = message.getMessage().iterator();
+
+                        while (iterator.hasNext()) {
+                            JsonNode node = iterator.next();
+
+                            Execution exe = new Execution();
+                            exe.id = node.get("id").asLong();
+                            exe.side = Side.parse(node.get("side").asText());
+                            exe.price = Decimal.valueOf(node.get("price").asText());
+                            exe.size = Decimal.valueOf(node.get("size").asText());
+                            exe.exec_date = LocalDateTime.parse(node.get("exec_date").asText(), format).atZone(zone);
+                            exe.buy_child_order_acceptance_id = node.get("buy_child_order_acceptance_id").asText();
+                            exe.sell_child_order_acceptance_id = node.get("sell_child_order_acceptance_id").asText();
+
+                            if (exe.id == 0) {
+                                exe.id = ++realtimeId;
+                            }
+
+                            observer.accept(exe);
+                            realtimeId = exe.id;
+                        }
+                    }
+                }
+            });
+            pubNub.subscribe().channels(I.list("lightning_executions_FX_BTC_JPY")).execute();
+
+            return disposer.add(() -> {
+                pubNub.unsubscribeAll();
+                pubNub.destroy();
+            });
+        });
+    }
+
+    /**
+     * @param args
+     */
+    public static void main(String[] args) {
         I.load(Decimal.Codec.class, false);
 
-        new BitFlyerLogBuilder(BitFlyerType.FX_BTC_JPY).build();
+        new BitFlyerLogBuilder(BitFlyer.FX_BTC_JPY).from(LocalDate.of(2017, 9, 8)).to(e -> {
+            System.out.println(e);
+        });
     }
 }

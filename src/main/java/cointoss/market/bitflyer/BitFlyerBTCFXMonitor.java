@@ -9,27 +9,12 @@
  */
 package cointoss.market.bitflyer;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.Iterator;
-import java.util.concurrent.ConcurrentLinkedDeque;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.pubnub.api.PNConfiguration;
-import com.pubnub.api.PubNub;
-import com.pubnub.api.callbacks.SubscribeCallback;
-import com.pubnub.api.models.consumer.PNStatus;
-import com.pubnub.api.models.consumer.pubsub.PNMessageResult;
-import com.pubnub.api.models.consumer.pubsub.PNPresenceEventResult;
 
 import cointoss.Execution;
 import cointoss.Market;
-import cointoss.Side;
 import cointoss.Trading;
-import eu.verdelhan.ta4j.Decimal;
-import kiss.I;
 
 /**
  * @version 2017/09/07 12:02:46
@@ -41,31 +26,12 @@ public class BitFlyerBTCFXMonitor {
     private static final ZoneId zone = ZoneId.of("Asia/Tokyo");
 
     /** Target market */
-    private final Market market = new Market(new BitFlyerBTCFX(), new BitFlyerBuilder(), TradingMonitor.class);
-
-    /** Starting point. */
-    private long realtimeStartId;
-
-    /** Realtime execution queue. */
-    private ConcurrentLinkedDeque<Execution> realtimeBuffer = new ConcurrentLinkedDeque<>();
-
-    /**
-     * Process past executions.
-     */
-    private void processPast(LocalDate start) {
-
-    }
+    private final Market market = new Market(new BitFlyerBTCFX(), new BitFlyerLogBuilder(BitFlyer.FX_BTC_JPY), TradingMonitor.class);
 
     /**
      * 
      */
     private void start() {
-        PNConfiguration config = new PNConfiguration();
-        config.setSubscribeKey("sub-c-52a9ab50-291b-11e5-baaa-0619f8945a4f");
-
-        PubNub pubNub = new PubNub(config);
-        pubNub.addListener(new ExecutionMonitor());
-        pubNub.subscribe().channels(I.list("lightning_executions_FX_BTC_JPY")).execute();
     }
 
     /**
@@ -107,55 +73,6 @@ public class BitFlyerBTCFXMonitor {
          */
         @Override
         public void timeline(Execution exe) {
-        }
-    }
-
-    /**
-     * @version 2017/09/07 12:33:49
-     */
-    private class ExecutionMonitor extends SubscribeCallback {
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void status(PubNub pubnub, PNStatus status) {
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void presence(PubNub pubnub, PNPresenceEventResult presence) {
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void message(PubNub pubnub, PNMessageResult message) {
-            if (message.getChannel() != null) {
-                Iterator<JsonNode> iterator = message.getMessage().iterator();
-
-                while (iterator.hasNext()) {
-                    JsonNode node = iterator.next();
-
-                    Execution exe = new Execution();
-                    exe.id = node.get("id").asLong();
-                    exe.side = Side.parse(node.get("side").asText());
-                    exe.price = Decimal.valueOf(node.get("price").asText());
-                    exe.size = Decimal.valueOf(node.get("size").asText());
-                    exe.exec_date = LocalDateTime.parse(node.get("exec_date").asText(), format).plusHours(9).atZone(zone);
-                    exe.buy_child_order_acceptance_id = node.get("buy_child_order_acceptance_id").asText();
-                    exe.sell_child_order_acceptance_id = node.get("sell_child_order_acceptance_id").asText();
-
-                    market.tick(exe);
-
-                    if (realtimeStartId == 0) {
-                        realtimeStartId = exe.id;
-                    }
-                }
-            }
         }
     }
 

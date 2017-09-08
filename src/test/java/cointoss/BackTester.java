@@ -12,7 +12,7 @@ package cointoss;
 import java.util.stream.IntStream;
 
 import cointoss.Time.Lag;
-import cointoss.market.bitflyer.BitFlyerBuilder;
+import cointoss.market.bitflyer.BitFlyer;
 import eu.verdelhan.ta4j.Decimal;
 import kiss.I;
 import kiss.Signal;
@@ -32,7 +32,7 @@ public class BackTester {
     private Decimal target = Decimal.ZERO;
 
     /** テスト対象マーケット */
-    private MarketBuilder builder;
+    private MarketLogBuilder marketLog;
 
     /** テスト戦略 */
     private Class<? extends Trading> strategy;
@@ -102,7 +102,7 @@ public class BackTester {
      * Execute back test.
      */
     public void execute() {
-        IntStream.range(0, trial).parallel().mapToObj(i -> new Market(new BackTestBackend(), builder, strategy)).forEach(market -> {
+        IntStream.range(0, trial).parallel().mapToObj(i -> new Market(new BackTestBackend(), marketLog, strategy)).forEach(market -> {
             market.logger.analyze();
         });
     }
@@ -114,9 +114,9 @@ public class BackTester {
      * 
      * @return
      */
-    public static BackTester initialize(Class<? extends MarketBuilder> market) {
+    public static BackTester initialize(MarketLogBuilder marketLog) {
         BackTester tester = new BackTester();
-        tester.builder = I.make(market);
+        tester.marketLog = marketLog;
 
         return tester;
     }
@@ -155,7 +155,7 @@ public class BackTester {
      * @param args
      */
     public static void main(String[] args) {
-        BackTester tester = BackTester.initialize(BitFlyerBuilder.class).balance(1000000, 0).strategy(BreakoutTrading.class);
+        BackTester tester = BackTester.initialize(BitFlyer.FX_BTC_JPY.log()).balance(1000000, 0).strategy(BreakoutTrading.class);
         tester.execute();
     }
 
