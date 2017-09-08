@@ -10,12 +10,25 @@
 package cointoss.market.bitflyer;
 
 import cointoss.MarketLogBuilder;
+import cointoss.market.Span;
 
 /**
- * @version 2017/07/30 20:56:12
+ * @version 2017/09/08 18:23:03
  */
 public enum BitFlyer {
     BTC_JPY, FX_BTC_JPY, ETC_BTC, BCH_BTC;
+
+    /** Sample trend */
+    public static final Span SampleTrend = new Span(2017, 5, 29, 2017, 6, 5);
+
+    /** Sample of range trend */
+    public static final Span RangeTrend = new Span(2017, 5, 29, 2017, 7, 29);
+
+    /** Sample of up trend */
+    public static final Span UpTrend = new Span(2017, 7, 16, 2017, 8, 29);
+
+    /** Sample of down trend */
+    public static final Span DownTrend = new Span(2017, 6, 11, 2017, 7, 16);
 
     /**
      * <p>

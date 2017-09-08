@@ -58,10 +58,8 @@ class TestableMarketBackend implements MarketBackend {
      * {@inheritDoc}
      */
     @Override
-    public void initialize(Market market, MarketLogBuilder builder) {
-        builder.initialize().to(e -> {
-            market.tick(emulate(e));
-        });
+    public void initialize(Market market, Signal<Execution> log) {
+        log.to(e -> market.tick(emulate(e)));
     }
 
     /**

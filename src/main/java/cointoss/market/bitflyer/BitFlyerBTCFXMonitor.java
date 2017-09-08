@@ -9,30 +9,16 @@
  */
 package cointoss.market.bitflyer;
 
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-
 import cointoss.Execution;
 import cointoss.Market;
 import cointoss.Trading;
+import eu.verdelhan.ta4j.Decimal;
+import kiss.I;
 
 /**
  * @version 2017/09/07 12:02:46
  */
 public class BitFlyerBTCFXMonitor {
-
-    private static final DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.n'Z'");
-
-    private static final ZoneId zone = ZoneId.of("Asia/Tokyo");
-
-    /** Target market */
-    private final Market market = new Market(new BitFlyerBTCFX(), new BitFlyerLogBuilder(BitFlyer.FX_BTC_JPY), TradingMonitor.class);
-
-    /**
-     * 
-     */
-    private void start() {
-    }
 
     /**
      * @version 2017/09/07 12:35:08
@@ -82,7 +68,8 @@ public class BitFlyerBTCFXMonitor {
      * @param args
      */
     public static void main(String[] args) {
-        BitFlyerBTCFXMonitor monitor = new BitFlyerBTCFXMonitor();
-        monitor.start();
+        I.load(Decimal.Codec.class, false);
+
+        Market market = new Market(new BitFlyerBTCFX(), BitFlyer.FX_BTC_JPY.log().fromToday(), TradingMonitor.class);
     }
 }

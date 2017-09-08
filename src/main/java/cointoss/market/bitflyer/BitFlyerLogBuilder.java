@@ -44,7 +44,7 @@ import kiss.Signal;
 /**
  * @version 2017/08/16 8:13:06
  */
-public class BitFlyerLogBuilder extends MarketLogBuilder {
+public class BitFlyerLogBuilder implements MarketLogBuilder {
 
     /** UTC */
     private static final ZoneId zone = ZoneId.of("UTC");
@@ -55,20 +55,8 @@ public class BitFlyerLogBuilder extends MarketLogBuilder {
     /** realtime data format */
     private static final DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.n'Z'");
 
-    /** Sample trend */
-    private static final Span SampleTrend = new Span(2017, 5, 29, 2017, 6, 5);
-
-    /** Sample of range trend */
-    private static final Span RangeTrend = new Span(2017, 5, 29, 2017, 7, 29);
-
-    /** Sample of up trend */
-    private static final Span UpTrend = new Span(2017, 7, 16, 2017, 8, 29);
-
-    /** Sample of down trend */
-    private static final Span DownTrend = new Span(2017, 6, 11, 2017, 7, 16);
-
     /** The log folder. */
-    private static final Path root = Filer.locate(".log/bitflyer/" + BitFlyer.FX_BTC_JPY.name());
+    private final Path root;
 
     /** The current type. */
     private final BitFlyer type;
@@ -96,6 +84,7 @@ public class BitFlyerLogBuilder extends MarketLogBuilder {
      */
     public BitFlyerLogBuilder(BitFlyer type) {
         this.type = type;
+        this.root = Filer.locate(".log/bitflyer/" + type);
 
         List<Path> files = Filer.walk(root, "execution*.log");
         LocalDate start = null;
@@ -235,7 +224,7 @@ public class BitFlyerLogBuilder extends MarketLogBuilder {
      * @return
      */
     private Path localCacheFile(LocalDate date) {
-        return Filer.locate(".log/bitflyer/" + BitFlyer.FX_BTC_JPY.name() + "/execution" + fomatFile.format(date) + ".log");
+        return root.resolve("execution" + fomatFile.format(date) + ".log");
     }
 
     /**
@@ -248,8 +237,8 @@ public class BitFlyerLogBuilder extends MarketLogBuilder {
                     URL url = new URL(BitFlyerBTCFX.api + "/v1/executions?product_code=" + type + "&count=500&before=" + (latestId + 500));
                     Executions executions = I.json(url).to(Executions.class);
 
-                    for (int j = executions.size() - 1; 0 <= j; j--) {
-                        Execution exe = executions.get(j);
+                    for (int i = executions.size() - 1; 0 <= i; i--) {
+                        Execution exe = executions.get(i);
 
                         if (latestId < exe.id) {
                             observer.accept(exe);
@@ -270,7 +259,6 @@ public class BitFlyerLogBuilder extends MarketLogBuilder {
                     observer.error(e);
                 }
             }
-            System.out.println("追いついた！！！");
             observer.complete();
 
             return disposer;
@@ -325,23 +313,12 @@ public class BitFlyerLogBuilder extends MarketLogBuilder {
                     }
                 }
             });
-            pubNub.subscribe().channels(I.list("lightning_executions_FX_BTC_JPY")).execute();
+            pubNub.subscribe().channels(I.list("lightning_executions_" + type)).execute();
 
             return disposer.add(() -> {
                 pubNub.unsubscribeAll();
                 pubNub.destroy();
             });
-        });
-    }
-
-    /**
-     * @param args
-     */
-    public static void main(String[] args) {
-        I.load(Decimal.Codec.class, false);
-
-        new BitFlyerLogBuilder(BitFlyer.FX_BTC_JPY).from(LocalDate.of(2017, 9, 8)).to(e -> {
-            System.out.println(e);
         });
     }
 }

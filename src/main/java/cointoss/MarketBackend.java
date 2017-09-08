@@ -23,7 +23,7 @@ public interface MarketBackend {
      * 
      * @param market
      */
-    void initialize(Market market, MarketLogBuilder builder);
+    void initialize(Market market, Signal<Execution> log);
 
     /**
      * <p>

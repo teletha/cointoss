@@ -26,7 +26,6 @@ import cointoss.BalanceUnit;
 import cointoss.Execution;
 import cointoss.Market;
 import cointoss.MarketBackend;
-import cointoss.MarketLogBuilder;
 import cointoss.Order;
 import cointoss.OrderState;
 import cointoss.Position;
@@ -63,7 +62,8 @@ public class BitFlyerBTCFX implements MarketBackend {
      * {@inheritDoc}
      */
     @Override
-    public void initialize(Market market, MarketLogBuilder builder) {
+    public void initialize(Market market, Signal<Execution> log) {
+        log.to(market::tick);
     }
 
     /**

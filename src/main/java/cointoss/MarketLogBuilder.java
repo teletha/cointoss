@@ -15,44 +15,16 @@ import cointoss.market.Span;
 import kiss.Signal;
 
 /**
- * @version 2017/08/16 8:11:25
+ * @version 2017/09/08 18:20:48
  */
-public abstract class MarketLogBuilder {
-
-    /** The start day. */
-    protected LocalDate start;
-
-    /** The end day. */
-    protected LocalDate end;
-
-    /**
-     * Set the start property of this {@link MarketLogBuilder}.
-     * 
-     * @param start The start value to set.
-     */
-    public final MarketLogBuilder start(LocalDate start) {
-        this.start = start;
-
-        return this;
-    }
-
-    /**
-     * Set the end property of this {@link MarketLogBuilder}.
-     * 
-     * @param end The end value to set.
-     */
-    public final MarketLogBuilder end(LocalDate end) {
-        this.end = end;
-
-        return this;
-    }
+public interface MarketLogBuilder {
 
     /**
      * Read the initial execution data.
      * 
      * @return
      */
-    public abstract Signal<Execution> initialize();
+    Signal<Execution> initialize();
 
     /**
      * Read date from the specified date.
@@ -60,7 +32,37 @@ public abstract class MarketLogBuilder {
      * @param start
      * @return
      */
-    public abstract Signal<Execution> from(LocalDate start);
+    Signal<Execution> from(LocalDate start);
+
+    /**
+     * Read date from the specified date.
+     * 
+     * @param start
+     * @return
+     */
+    default Signal<Execution> fromToday() {
+        return from(LocalDate.now());
+    }
+
+    /**
+     * Read date from the specified date.
+     * 
+     * @param start
+     * @return
+     */
+    default Signal<Execution> fromYestaday() {
+        return fromLast(1);
+    }
+
+    /**
+     * Read date from the specified date.
+     * 
+     * @param start
+     * @return
+     */
+    default Signal<Execution> fromLast(int days) {
+        return from(LocalDate.now().minusDays(days));
+    }
 
     /**
      * Read date from the specified start to end.
@@ -69,7 +71,7 @@ public abstract class MarketLogBuilder {
      * @param end
      * @return
      */
-    public final Signal<Execution> range(Span span) {
+    default Signal<Execution> range(Span span) {
         return range(span.start, span.end);
     }
 
@@ -80,7 +82,7 @@ public abstract class MarketLogBuilder {
      * @param end
      * @return
      */
-    public final Signal<Execution> range(LocalDate start, LocalDate end) {
+    default Signal<Execution> range(LocalDate start, LocalDate end) {
         return from(start).takeUntil(e -> e.exec_date.toLocalDate().isAfter(end));
     }
 
@@ -90,7 +92,7 @@ public abstract class MarketLogBuilder {
      * @param days
      * @return
      */
-    public final Signal<Execution> rangeRandom(int days) {
+    default Signal<Execution> rangeRandom(int days) {
         return range(Span.random(getCacheStart(), getCacheEnd(), days));
     }
 
@@ -99,13 +101,13 @@ public abstract class MarketLogBuilder {
      * 
      * @return
      */
-    public abstract LocalDate getCacheStart();
+    LocalDate getCacheStart();
 
     /**
      * Get the ending day of cache.
      * 
      * @return
      */
-    public abstract LocalDate getCacheEnd();
+    LocalDate getCacheEnd();
 
 }

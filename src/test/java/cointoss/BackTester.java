@@ -102,9 +102,12 @@ public class BackTester {
      * Execute back test.
      */
     public void execute() {
-        IntStream.range(0, trial).parallel().mapToObj(i -> new Market(new BackTestBackend(), marketLog, strategy)).forEach(market -> {
-            market.logger.analyze();
-        });
+        IntStream.range(0, trial)
+                .parallel()
+                .mapToObj(i -> new Market(new BackTestBackend(), marketLog.rangeRandom(5), strategy))
+                .forEach(market -> {
+                    market.logger.analyze();
+                });
     }
 
     /**
