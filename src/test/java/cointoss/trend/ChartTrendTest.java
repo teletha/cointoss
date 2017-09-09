@@ -20,6 +20,7 @@ import org.junit.Test;
 
 import cointoss.Chart;
 import cointoss.Execution;
+import cointoss.Trend;
 import cointoss.market.bitflyer.BitFlyer;
 import filer.Filer;
 
@@ -29,12 +30,30 @@ import filer.Filer;
 public class ChartTrendTest {
 
     @Test
-    public void upTrend() throws Exception {
+    public void downTrend() throws Exception {
         Chart chart = bitflyerFX("2017-09-02T11:00:00", "2017-09-05T12:59:59", Duration.ofHours(2));
+        assert chart.trend() == Trend.Down;
 
-        assert chart.isUpTrend() == false;
-        assert chart.isDownTrend() == true;
-        assert chart.isRange() == false;
+        chart = bitflyerFX("2017-08-20T07:00:00", "2017-08-22T08:59:59", Duration.ofHours(2));
+        assert chart.trend() == Trend.Down;
+    }
+
+    @Test
+    public void upTrend() throws Exception {
+        Chart chart = bitflyerFX("2017-09-05T13:00:00", "2017-09-07T00:59:59", Duration.ofHours(2));
+        assert chart.trend() == Trend.Up;
+
+        chart = bitflyerFX("2017-08-02T21:00:00", "2017-08-05T04:59:59", Duration.ofHours(2));
+        assert chart.trend() == Trend.Up;
+    }
+
+    @Test
+    public void range() throws Exception {
+        Chart chart = bitflyerFX("2017-08-25T07:00:00", "2017-08-28T06:59:59", Duration.ofHours(2));
+        assert chart.trend() == Trend.Range;
+
+        chart = bitflyerFX("2017-08-08T11:00:00", "2017-08-11T22:59:59", Duration.ofHours(2));
+        assert chart.trend() == Trend.Range;
     }
 
     /**

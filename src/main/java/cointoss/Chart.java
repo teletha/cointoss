@@ -22,6 +22,9 @@ import java.util.stream.IntStream;
 import eu.verdelhan.ta4j.BaseTimeSeries;
 import eu.verdelhan.ta4j.Decimal;
 import eu.verdelhan.ta4j.Tick;
+import eu.verdelhan.ta4j.indicators.AverageDirectionalMovementIndicator;
+import eu.verdelhan.ta4j.indicators.helpers.AverageDirectionalMovementDownIndicator;
+import eu.verdelhan.ta4j.indicators.helpers.AverageDirectionalMovementUpIndicator;
 import filer.Filer;
 import kiss.Decoder;
 import kiss.Encoder;
@@ -49,6 +52,15 @@ public class Chart extends BaseTimeSeries {
     /** The tick listeners. */
     private final List<Consumer<Tick>> listeners = new CopyOnWriteArrayList();
 
+    /** The trend monitor. */
+    private final AverageDirectionalMovementIndicator trend;
+
+    /** The trend monitor. */
+    private final AverageDirectionalMovementUpIndicator up;
+
+    /** The trend monitor. */
+    private final AverageDirectionalMovementDownIndicator down;
+
     /**
      * 
      */
@@ -58,6 +70,38 @@ public class Chart extends BaseTimeSeries {
         this.duration = duration;
         this.children = children;
         setMaximumTickCount(60 * 60 * 24 * 3);
+
+        this.trend = new AverageDirectionalMovementIndicator(this, 14);
+        this.up = new AverageDirectionalMovementUpIndicator(this, 14);
+        this.down = new AverageDirectionalMovementDownIndicator(this, 14);
+    }
+
+    /**
+     * Detect trend.
+     * 
+     * @return
+     */
+    public Trend trend() {
+        return trend(0);
+    }
+
+    /**
+     * Detect trend.
+     * 
+     * @return
+     */
+    public Trend trend(int backOffset) {
+        int index = getEndIndex() - backOffset;
+
+        if (trend.getValue(index).isLessThan(25)) {
+            return Trend.Range;
+        } else {
+            if (down.getValue(index).isLessThan(up.getValue(index))) {
+                return Trend.Up;
+            } else {
+                return Trend.Down;
+            }
+        }
     }
 
     /**
@@ -66,7 +110,7 @@ public class Chart extends BaseTimeSeries {
      * @return
      */
     public boolean isUpTrend() {
-        return false;
+        return trend() == Trend.Up;
     }
 
     /**
@@ -75,7 +119,7 @@ public class Chart extends BaseTimeSeries {
      * @return
      */
     public boolean isDownTrend() {
-        return false;
+        return trend() == Trend.Down;
     }
 
     /**
@@ -84,7 +128,7 @@ public class Chart extends BaseTimeSeries {
      * @return
      */
     public boolean isRange() {
-        return false;
+        return trend() == Trend.Range;
     }
 
     /**
@@ -152,7 +196,6 @@ public class Chart extends BaseTimeSeries {
      */
     public void readFrom(Path file) {
         Filer.read(file).map(line -> new MutableTick(line)).to(this::addTick);
-        System.out.println(getTickCount());
     }
 
     /**

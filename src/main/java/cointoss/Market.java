@@ -33,43 +33,38 @@ public class Market {
     public final TradingLog logger = new TradingLog(this);
 
     /** CHART */
-    public final Chart hour256 = new Chart(Duration.ofHours(256), null);
+    public final Chart day7 = new Chart(Duration.ofDays(7));
 
     /** CHART */
-    public final Chart hour128 = new Chart(Duration.ofHours(128), hour256);
+    public final Chart day3 = new Chart(Duration.ofDays(3));
 
     /** CHART */
-    public final Chart hour64 = new Chart(Duration.ofHours(64), hour128);
+    public final Chart day1 = new Chart(Duration.ofDays(1));
 
     /** CHART */
-    public final Chart hour32 = new Chart(Duration.ofHours(32), hour64);
+    public final Chart hour8 = new Chart(Duration.ofHours(8));
 
     /** CHART */
-    public final Chart hour16 = new Chart(Duration.ofHours(16), hour32);
+    public final Chart hour4 = new Chart(Duration.ofHours(4));
 
     /** CHART */
-    public final Chart hour8 = new Chart(Duration.ofHours(8), hour16);
+    public final Chart hour2 = new Chart(Duration.ofHours(2));
 
     /** CHART */
-    public final Chart hour4 = new Chart(Duration.ofHours(4), hour8);
+    public final Chart hour1 = new Chart(Duration.ofHours(1));
 
     /** CHART */
-    public final Chart hour2 = new Chart(Duration.ofHours(2), hour4);
+    public final Chart minute30 = new Chart(Duration.ofMinutes(30));
 
     /** CHART */
-    public final Chart hour1 = new Chart(Duration.ofHours(1), hour2);
+    public final Chart minute15 = new Chart(Duration.ofMinutes(15));
 
     /** CHART */
-    public final Chart minute30 = new Chart(Duration.ofMinutes(30), hour1);
+    public final Chart minute5 = new Chart(Duration.ofMinutes(5));
 
     /** CHART */
-    public final Chart minute15 = new Chart(Duration.ofMinutes(15), minute30);
-
-    /** CHART */
-    public final Chart minute5 = new Chart(Duration.ofMinutes(5), minute15);
-
-    /** CHART */
-    public final Chart minute1 = new Chart(Duration.ofMinutes(1), minute5);
+    public final Chart minute1 = new Chart(Duration
+            .ofMinutes(1), minute5, minute15, minute30, hour1, hour2, hour4, hour8, day1, day3, day7);
 
     /** The event listeners. */
     private final CopyOnWriteArrayList<Observer<? super Execution>> executionListeners = new CopyOnWriteArrayList();
