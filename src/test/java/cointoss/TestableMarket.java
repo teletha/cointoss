@@ -28,14 +28,14 @@ class TestableMarket extends Market {
      * @param strategy
      */
     TestableMarket() {
-        super(new TestableMarketBackend(Time.lag(0)), Signal.EMPTY, null);
+        super(new TestableMarketBackend(Time.lag(0)), Signal.EMPTY, TestableMarketTradingStrategy.class);
     }
 
     /**
      * @param delay
      */
     TestableMarket(int delay) {
-        super(new TestableMarketBackend(Time.lag(delay)), Signal.EMPTY, null);
+        super(new TestableMarketBackend(Time.lag(delay)), Signal.EMPTY, TestableMarketTradingStrategy.class);
     }
 
     /**

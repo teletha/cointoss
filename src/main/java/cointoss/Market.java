@@ -154,9 +154,8 @@ public class Market {
      * @return
      */
     public final Market useStrategy(Class<? extends TradingStrategy> strategy) {
-        if (strategy != null) {
-            this.strategy = create(Objects.requireNonNull(strategy));
-        }
+        this.strategy = create(Objects.requireNonNull(strategy));
+
         return this;
     }
 
