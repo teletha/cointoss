@@ -7,7 +7,7 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss;
+package cointoss.chart;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -19,6 +19,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 import java.util.stream.IntStream;
 
+import cointoss.Execution;
+import cointoss.Trend;
 import eu.verdelhan.ta4j.BaseTimeSeries;
 import eu.verdelhan.ta4j.Decimal;
 import eu.verdelhan.ta4j.Tick;
@@ -71,9 +73,9 @@ public class Chart extends BaseTimeSeries {
         this.children = children;
         setMaximumTickCount(60 * 60 * 24 * 3);
 
-        this.trend = new AverageDirectionalMovementIndicator(this, 14);
-        this.up = new AverageDirectionalMovementUpIndicator(this, 14);
-        this.down = new AverageDirectionalMovementDownIndicator(this, 14);
+        this.trend = new AverageDirectionalMovementIndicator(this, 12);
+        this.up = new AverageDirectionalMovementUpIndicator(this, 12);
+        this.down = new AverageDirectionalMovementDownIndicator(this, 12);
     }
 
     /**
@@ -92,7 +94,7 @@ public class Chart extends BaseTimeSeries {
      */
     public Trend trend(int backOffset) {
         int index = getEndIndex() - backOffset;
-
+        System.out.println(duration + "   " + trend.getValue(index));
         if (trend.getValue(index).isLessThan(25)) {
             return Trend.Range;
         } else {

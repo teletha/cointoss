@@ -16,6 +16,7 @@ import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 
+import cointoss.chart.Chart;
 import eu.verdelhan.ta4j.Decimal;
 import kiss.I;
 import kiss.Observer;
@@ -42,7 +43,10 @@ public class Market {
     public final Chart day1 = new Chart(Duration.ofDays(1));
 
     /** CHART */
-    public final Chart hour8 = new Chart(Duration.ofHours(8));
+    public final Chart hour12 = new Chart(Duration.ofHours(12));
+
+    /** CHART */
+    public final Chart hour6 = new Chart(Duration.ofHours(6));
 
     /** CHART */
     public final Chart hour4 = new Chart(Duration.ofHours(4));
@@ -64,7 +68,7 @@ public class Market {
 
     /** CHART */
     public final Chart minute1 = new Chart(Duration
-            .ofMinutes(1), minute5, minute15, minute30, hour1, hour2, hour4, hour8, day1, day3, day7);
+            .ofMinutes(1), minute5, minute15, minute30, hour1, hour2, hour4, hour6, hour12, day1, day3, day7);
 
     /** The event listeners. */
     private final CopyOnWriteArrayList<Observer<? super Execution>> executionListeners = new CopyOnWriteArrayList();

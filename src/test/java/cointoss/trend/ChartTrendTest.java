@@ -18,9 +18,9 @@ import java.time.format.DateTimeFormatter;
 
 import org.junit.Test;
 
-import cointoss.Chart;
 import cointoss.Execution;
 import cointoss.Trend;
+import cointoss.chart.Chart;
 import cointoss.market.bitflyer.BitFlyer;
 import filer.Filer;
 

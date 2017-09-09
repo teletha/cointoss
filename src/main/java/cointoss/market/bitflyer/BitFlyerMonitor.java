@@ -31,7 +31,9 @@ public class BitFlyerMonitor extends TradingStrategy {
         });
 
         market.minute1.to(tick -> {
-            System.out.println(tick);
+            System.out.println(tick.getBeginTime() + "  1min " + market.minute1.trend() + "   15min " + market.minute15
+                    .trend() + "    30min " + market.minute30
+                            .trend() + "   1hour " + market.hour1.trend() + "   2hour " + market.hour2.trend());
         });
     }
 
@@ -64,6 +66,6 @@ public class BitFlyerMonitor extends TradingStrategy {
     public static void main(String[] args) {
         I.load(Decimal.Codec.class, false);
 
-        Market market = new Market(BitFlyer.FX_BTC_JPY.service(), BitFlyer.FX_BTC_JPY.log().fromToday(), BitFlyerMonitor.class);
+        Market market = new Market(BitFlyer.FX_BTC_JPY.service(), BitFlyer.FX_BTC_JPY.log().fromLast(3), BitFlyerMonitor.class);
     }
 }

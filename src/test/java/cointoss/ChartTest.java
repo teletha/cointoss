@@ -14,6 +14,7 @@ import java.time.ZonedDateTime;
 
 import org.junit.Test;
 
+import cointoss.chart.Chart;
 import eu.verdelhan.ta4j.Decimal;
 import eu.verdelhan.ta4j.Tick;
 
