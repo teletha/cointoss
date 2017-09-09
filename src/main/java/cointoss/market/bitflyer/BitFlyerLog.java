@@ -21,6 +21,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -44,6 +46,9 @@ import kiss.Signal;
  * @version 2017/09/08 18:42:36
  */
 class BitFlyerLog implements MarketLog {
+
+    /** The writer thread. */
+    private static final ExecutorService writer = Executors.newSingleThreadExecutor();
 
     /** file data format */
     private static final DateTimeFormatter fomatFile = DateTimeFormatter.ofPattern("yyyyMMdd");
@@ -182,24 +187,26 @@ class BitFlyerLog implements MarketLog {
      */
     private void cache(Execution exe) {
         if (cacheId < exe.id) {
-            try {
-                LocalDate date = exe.exec_date.toLocalDate();
+            writer.submit(() -> {
+                try {
+                    LocalDate date = exe.exec_date.toLocalDate();
 
-                if (cache == null || cacheLast.isBefore(date)) {
-                    I.quiet(cache);
+                    if (cache == null || cacheLast.isBefore(date)) {
+                        I.quiet(cache);
 
-                    File file = localCacheFile(date).toFile();
-                    file.createNewFile();
+                        File file = localCacheFile(date).toFile();
+                        file.createNewFile();
 
-                    cache = new PrintWriter(new FileWriter(file, true));
-                    cacheLast = date;
+                        cache = new PrintWriter(new FileWriter(file, true));
+                        cacheLast = date;
+                    }
+                    cache.println(exe.toString());
+                    cache.flush();
+                    cacheId = exe.id;
+                } catch (IOException e) {
+                    throw I.quiet(e);
                 }
-                cache.println(exe.toString());
-                cache.flush();
-                cacheId = exe.id;
-            } catch (IOException e) {
-                throw I.quiet(e);
-            }
+            });
         }
     }
 
