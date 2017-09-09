@@ -9,15 +9,23 @@
  */
 package cointoss;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
+import java.util.stream.IntStream;
 
 import eu.verdelhan.ta4j.BaseTimeSeries;
 import eu.verdelhan.ta4j.Decimal;
 import eu.verdelhan.ta4j.Tick;
+import filer.Filer;
+import kiss.Decoder;
+import kiss.Encoder;
+import kiss.I;
 
 /**
  * @version 2017/09/07 22:12:13
@@ -25,11 +33,15 @@ import eu.verdelhan.ta4j.Tick;
 @SuppressWarnings("serial")
 public class Chart extends BaseTimeSeries {
 
+    static {
+        I.load(TickCodec.class, false);
+    }
+
     /** The chart duration. */
     private final Duration duration;
 
     /** The child delegator. */
-    private final Chart child;
+    private final Chart[] children;
 
     /** The current tick */
     private MutableTick current;
@@ -40,20 +52,48 @@ public class Chart extends BaseTimeSeries {
     /**
      * 
      */
-    Chart(Duration duration, Chart child) {
+    public Chart(Duration duration, Chart... children) {
         super(duration.toString());
 
         this.duration = duration;
-        this.child = child;
+        this.children = children;
         setMaximumTickCount(60 * 60 * 24 * 3);
+    }
+
+    /**
+     * Detect trend.
+     * 
+     * @return
+     */
+    public boolean isUpTrend() {
+        return false;
+    }
+
+    /**
+     * Detect trend.
+     * 
+     * @return
+     */
+    public boolean isDownTrend() {
+        return false;
+    }
+
+    /**
+     * Detect trend.
+     * 
+     * @return
+     */
+    public boolean isRange() {
+        return false;
     }
 
     /**
      * Record executions.
      */
-    void tick(Execution exe) {
+    public void tick(Execution exe) {
         if (current == null) {
-            current = new MutableTick(exe);
+            current = new MutableTick(exe, duration);
+            addTick(current);
         }
 
         if (!exe.exec_date.isBefore(current.endTime)) {
@@ -63,13 +103,16 @@ public class Chart extends BaseTimeSeries {
             }
 
             // update
-            current = new MutableTick(exe);
+            current = new MutableTick(exe, duration);
+            addTick(current);
         }
         current.tick(exe);
 
         // propagate
-        if (child != null) {
-            child.tick(exe);
+        if (children != null) {
+            for (Chart child : children) {
+                child.tick(exe);
+            }
         }
     }
 
@@ -83,9 +126,39 @@ public class Chart extends BaseTimeSeries {
     }
 
     /**
+     * <p>
+     * Write out the current tick log to the specified file
+     * </p>
+     * 
+     * @param file
+     */
+    public void writeTo(Path file) {
+        List<String> ticks = I.signal(IntStream.range(0, getTickCount())).map(this::getTick).map(tick -> tick.toString()).toList();
+
+        try {
+            Files.createDirectories(file.getParent());
+            Files.write(file, ticks);
+        } catch (IOException e) {
+            throw I.quiet(e);
+        }
+    }
+
+    /**
+     * <p>
+     * Read tick log from the specified file.
+     * </p>
+     * 
+     * @param file
+     */
+    public void readFrom(Path file) {
+        Filer.read(file).map(line -> new MutableTick(line)).to(this::addTick);
+        System.out.println(getTickCount());
+    }
+
+    /**
      * @version 2017/09/07 21:53:44
      */
-    private class MutableTick implements Tick {
+    private static class MutableTick implements Tick {
 
         /** Begin time of the tick */
         public final ZonedDateTime beginTime;
@@ -115,25 +188,38 @@ public class Chart extends BaseTimeSeries {
         protected int trades = 0;
 
         /**
-        * 
-        */
-        private MutableTick(Execution exe) {
-            beginTime = exe.exec_date.withSecond(0).withNano(0);
-            endTime = beginTime.plus(duration);
-            openPrice = exe.price;
+         * Decode.
+         * 
+         * @param value
+         */
+        private MutableTick(String value) {
+            String[] values = value.split(" ");
 
-            addTick(this);
+            beginTime = ZonedDateTime.parse(values[0]);
+            endTime = ZonedDateTime.parse(values[1]);
+            openPrice = Decimal.valueOf(values[2]);
+            closePrice = Decimal.valueOf(values[3]);
+            maxPrice = Decimal.valueOf(values[4]);
+            minPrice = Decimal.valueOf(values[5]);
+            volume = Decimal.valueOf(values[6]);
         }
 
         /**
         * 
         */
-        private MutableTick(MutableTick exe) {
+        private MutableTick(Execution exe, Duration duration) {
+            beginTime = exe.exec_date.withSecond(0).withNano(0);
+            endTime = beginTime.plus(duration);
+            openPrice = exe.price;
+        }
+
+        /**
+        * 
+        */
+        private MutableTick(MutableTick exe, Duration duration) {
             beginTime = exe.beginTime;
             endTime = beginTime.plus(duration);
             openPrice = exe.openPrice;
-
-            addTick(this);
         }
 
         /**
@@ -209,7 +295,7 @@ public class Chart extends BaseTimeSeries {
          */
         @Override
         public Duration getTimePeriod() {
-            return duration;
+            return Duration.between(beginTime, endTime);
         }
 
         /**
@@ -244,22 +330,43 @@ public class Chart extends BaseTimeSeries {
         @Override
         public String toString() {
             StringBuilder builder = new StringBuilder();
-            builder.append(beginTime.toLocalDateTime())
-                    .append("～")
-                    .append(endTime.toLocalDateTime())
-                    .append(" Open")
+            builder.append(beginTime)
+                    .append(" ")
+                    .append(endTime)
+                    .append(" ")
                     .append(openPrice)
-                    .append(" Close")
+                    .append(" ")
                     .append(closePrice)
-                    .append(" Max")
+                    .append(" ")
                     .append(maxPrice)
-                    .append(" Min")
+                    .append(" ")
                     .append(minPrice)
-                    .append(" Volume")
+                    .append(" ")
                     .append(volume);
 
             return builder.toString();
         }
     }
 
+    /**
+     * @version 2017/09/09 11:31:55
+     */
+    private static class TickCodec implements Encoder<Tick>, Decoder<Tick> {
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String encode(Tick value) {
+            return value.toString();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Tick decode(String value) {
+            return new MutableTick(value);
+        }
+    }
 }

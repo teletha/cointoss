@@ -22,6 +22,9 @@ import kiss.Encoder;
  */
 public class Execution {
 
+    /** The zone normalizer. */
+    public static final ZoneId UTC = ZoneId.of("UTC");
+
     public long id;
 
     /** Buyer id of this execution. */
@@ -60,7 +63,7 @@ public class Execution {
     public Execution(String line) {
         String[] values = line.split(" ");
         id = Long.parseLong(values[0]);
-        exec_date = LocalDateTime.parse(values[1]).atZone(ZoneId.systemDefault());
+        exec_date = LocalDateTime.parse(values[1]).atZone(UTC);
         side = Side.parse(values[2]);
         price = Decimal.valueOf(values[3]);
         size = Decimal.valueOf(values[4]);
@@ -74,8 +77,28 @@ public class Execution {
     /**
      * @return
      */
-    public boolean isMine() {
+    public final boolean isMine() {
         return associated != null;
+    }
+
+    /**
+     * Helper method to compare date and time.
+     * 
+     * @param time
+     * @return A result.
+     */
+    public final boolean isBefore(ZonedDateTime time) {
+        return exec_date.isBefore(time);
+    }
+
+    /**
+     * Helper method to compare date and time.
+     * 
+     * @param time
+     * @return A result.
+     */
+    public final boolean isAfter(ZonedDateTime time) {
+        return exec_date.isAfter(time);
     }
 
     /**

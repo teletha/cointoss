@@ -20,13 +20,6 @@ import kiss.Signal;
 public interface MarketLog {
 
     /**
-     * Read the initial execution data.
-     * 
-     * @return
-     */
-    Signal<Execution> initialize();
-
-    /**
      * Read date from the specified date.
      * 
      * @param start

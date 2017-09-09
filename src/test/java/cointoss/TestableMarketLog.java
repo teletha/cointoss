@@ -22,14 +22,6 @@ public class TestableMarketLog implements MarketLog {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Execution> initialize() {
-        return Signal.EMPTY;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public Signal<Execution> from(LocalDate start) {
         return Signal.EMPTY;
     }

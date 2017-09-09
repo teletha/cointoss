@@ -18,7 +18,6 @@ import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -36,7 +35,6 @@ import com.pubnub.api.models.consumer.pubsub.PNPresenceEventResult;
 import cointoss.Execution;
 import cointoss.MarketLog;
 import cointoss.Side;
-import cointoss.market.Span;
 import eu.verdelhan.ta4j.Decimal;
 import filer.Filer;
 import kiss.I;
@@ -110,28 +108,6 @@ class BitFlyerLog implements MarketLog {
         }
         this.cacheFirst = start;
         this.cacheLast = end;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Signal<Execution> initialize() {
-        Span span = Span.random(cacheFirst, cacheLast, 5);
-        LocalDate start = span.start;
-        LocalDate end = span.end;
-
-        List<LocalDate> period = new ArrayList();
-
-        while (start.isBefore(end)) {
-            period.add(start);
-            start = start.plusDays(1);
-        }
-
-        return I.signal(period)
-                .map(i -> Filer.locate(".log/bitflyer/" + BitFlyer.FX_BTC_JPY.name() + "/execution" + fomatFile.format(i) + ".log"))
-                .flatMap(Filer::read)
-                .map(Execution::new);
     }
 
     /**
