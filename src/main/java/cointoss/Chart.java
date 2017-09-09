@@ -15,15 +15,15 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
+import eu.verdelhan.ta4j.BaseTimeSeries;
 import eu.verdelhan.ta4j.Decimal;
 import eu.verdelhan.ta4j.Tick;
-import eu.verdelhan.ta4j.TimeSeries;
 
 /**
  * @version 2017/09/07 22:12:13
  */
 @SuppressWarnings("serial")
-public class Chart extends TimeSeries {
+public class Chart extends BaseTimeSeries {
 
     /** The chart duration. */
     private final Duration duration;
