@@ -61,7 +61,7 @@ public class ChartTrendTest {
 
         // search tick log
         DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyyMMddhhmmss");
-        Path file = Filer.locate("src/test/resources/trend").resolve(format.format(startTime) + "～" + format.format(endTime) + ".log");
+        Path file = Filer.locate("src/test/resources/trend").resolve(format.format(startTime) + "～" + format.format(endTime) + ".txt");
 
         Chart chart = new Chart(duration);
 
