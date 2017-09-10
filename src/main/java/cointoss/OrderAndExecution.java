@@ -18,7 +18,7 @@ import eu.verdelhan.ta4j.Decimal;
  */
 public class OrderAndExecution implements Directional {
 
-    public final Order o;
+    public final Order order;
 
     public final Execution e;
 
@@ -30,7 +30,7 @@ public class OrderAndExecution implements Directional {
      * @param exe
      */
     OrderAndExecution(Order order, Execution exe, Market market) {
-        this.o = order;
+        this.order = order;
         this.e = exe;
         this.market = market;
     }
@@ -41,10 +41,10 @@ public class OrderAndExecution implements Directional {
      * @param message
      */
     public void clear(String message) {
-        market.cancel(o).to(id -> {
-            o.entry.description(message);
+        market.cancel(order).to(id -> {
+            order.entry.description(message);
 
-            Order.market(o.side(), o.outstanding_size).with(o.entry).description(message).entryTo(market).to();
+            Order.market(order.side(), order.outstanding_size).with(order.entry).description(message).entryTo(market).to();
         });
     }
 
@@ -61,7 +61,7 @@ public class OrderAndExecution implements Directional {
      */
     @Override
     public Side side() {
-        return o.side();
+        return order.side();
     }
 
     /**
@@ -69,7 +69,7 @@ public class OrderAndExecution implements Directional {
      */
     @Override
     public String toString() {
-        return o + "\t\t" + e;
+        return order + "\t\t" + e;
     }
 
     /**
@@ -79,6 +79,6 @@ public class OrderAndExecution implements Directional {
      * @return
      */
     public Decimal priceUp(int size) {
-        return o.average_price.plus(o, size);
+        return order.average_price.plus(order, size);
     }
 }

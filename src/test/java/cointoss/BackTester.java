@@ -9,6 +9,9 @@
  */
 package cointoss;
 
+import static java.time.temporal.ChronoUnit.*;
+
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.IntStream;
 
 import cointoss.Time.Lag;
@@ -175,70 +178,6 @@ public class BackTester {
             super(market);
 
             // various events
-            market.minute1.to(tick -> {
-                if (market.hasNoActiveOrder()) {
-                    Trend trend1 = market.minute1.trend();
-                    Trend trend15 = market.minute15.trend();
-                    Trend trend30 = market.minute30.trend();
-
-                    if (trend1 == trend15 && trend1 == trend30) {
-                        if (trend1 != Trend.Range) {
-                            Order.market(trend1 == Trend.Up ? Side.BUY : Side.SELL, maxPositionSize).entryTo(market).to(entry -> {
-
-                                if (entry.e.isMine()) {
-                                    Decimal profitLimit = entry.o.average_price.plus(entry, 5000);
-                                    Decimal lossLimit = entry.o.average_price.minus(entry, 3000);
-
-                                    Order.limit(entry.inverse(), entry.e.size, profitLimit).with(entry).entryTo(market).to(exit -> {
-                                        if (exit.e.isMine()) {
-
-                                        } else {
-                                            if (exit.e.price.isLessThan(entry, lossLimit)) {
-                                                market.cancel(exit.o).to();
-                                                Order.market(exit.side(), exit.o.size()).with(entry).entryTo(market).to();
-                                            }
-                                        }
-                                    });
-                                }
-                            });
-                        }
-                    }
-                }
-            });
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void tryEntry(Execution exe) {
-            if (hasNoPosition()) {
-                // Trend trend1 = market.minute1.trend();
-                // Trend trend15 = market.minute15.trend();
-                // // Trend trend30 = market.minute30.trend();
-                // // Trend trend60 = market.hour1.trend();
-                //
-                // if (trend1 == trend15) {
-                // if (trend1 == Trend.Up) {
-                // Order.marketLong(maxPositionSize).entryTo(market).to(entry -> {
-                //
-                // if (entry.e.isMine()) {
-                // O
-                // }
-                // });
-                // }
-                // }
-            }
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void tryExit(Execution exe) {
-            // if (profit().isGreaterThan(1000)) {
-            // exitMarket(Decimal.ONE);
-            // }
         }
 
         /**
@@ -246,7 +185,22 @@ public class BackTester {
          */
         @Override
         public void timeline(Execution exe) {
+            if (hasNoPosition()) {
+                Side side = Side.random();
+                AtomicReference<Decimal> limit = new AtomicReference(exe.price.minus(side, 2000));
 
+                entryLimit(side, maxPositionSize, exe.price, entry -> {
+                    // change price line
+                    market.minute1.tick.to(tick -> {
+                        limit.set(tick.closePrice.minus(entry, 2000).min(limit.get()));
+                    });
+
+                    // loss cut
+                    timeline.takeUntil(closePosition).take(keep(5, SECONDS, e -> e.price.isLessThan(side, limit.get()))).take(1).to(e -> {
+                        exitMarket(entry.outstanding_size);
+                    });
+                });
+            }
         }
     }
 }

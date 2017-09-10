@@ -487,20 +487,6 @@ public class Market {
          * {@inheritDoc}
          */
         @Override
-        public void tryEntry(Execution exe) {
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void tryExit(Execution exe) {
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
         public void timeline(Execution exe) {
         }
     }
@@ -513,10 +499,10 @@ public class Market {
         AtomicReference<Order> ref = new AtomicReference();
 
         return profit.entryTo(this).merge(loss.entryTo(this)).take(o -> {
-            if (ref.compareAndSet(null, o.o)) {
-                cancel(o.o == profit ? loss : profit).to();
+            if (ref.compareAndSet(null, o.order)) {
+                cancel(o.order == profit ? loss : profit).to();
             }
-            return ref.get() == o.o;
+            return ref.get() == o.order;
         });
     }
 }

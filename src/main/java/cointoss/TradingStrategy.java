@@ -9,10 +9,18 @@
  */
 package cointoss;
 
+import java.time.ZonedDateTime;
+import java.time.temporal.TemporalUnit;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import eu.verdelhan.ta4j.Decimal;
+import kiss.Observer;
+import kiss.Signal;
 
 /**
  * @version 2017/09/05 19:39:34
@@ -21,6 +29,15 @@ public abstract class TradingStrategy {
 
     /** The market. */
     protected final Market market;
+
+    /** The execution signal. */
+    protected final Signal<Execution> timeline;
+
+    /** The signal of closing position. */
+    protected final Signal<Boolean> closePosition;
+
+    /** The signal observers. */
+    private final CopyOnWriteArrayList<Observer<Boolean>> closePositions = new CopyOnWriteArrayList();
 
     /** The user setting. */
     protected Decimal maxPositionSize = Decimal.ONE;
@@ -51,6 +68,8 @@ public abstract class TradingStrategy {
      */
     protected TradingStrategy(Market market) {
         this.market = market;
+        this.timeline = market.observeExecution();
+        this.closePosition = new Signal(closePositions);
     }
 
     /**
@@ -104,10 +123,10 @@ public abstract class TradingStrategy {
      * @param side
      * @param size
      */
-    protected final void entryLimit(Side side, Decimal size, Decimal price) {
+    protected final void entryLimit(Side side, Decimal size, Decimal price, Consumer<Order> process) {
         requestEntrySize = requestEntrySize.plus(size);
 
-        Order.limit(side, size, price).entryTo(market).to(e -> managePosition(e, true));
+        Order.limit(side, size, price).entryTo(market).effect(e -> managePosition(e, true));
     }
 
     /**
@@ -136,6 +155,53 @@ public abstract class TradingStrategy {
     }
 
     /**
+     * Close entry and position.
+     * 
+     * @param oae
+     */
+    protected final void close(OrderAndExecution oae) {
+        market.cancel(oae.order).to(id -> {
+
+        });
+    }
+
+    /**
+     * <p>
+     * Create rule which the specified condition is fulfilled during the specified duration.
+     * </p>
+     * 
+     * @param time
+     * @param unit
+     * @param condition
+     * @return
+     */
+    protected final Predicate<Execution> keep(int time, TemporalUnit unit, Predicate<Execution> condition) {
+        AtomicBoolean testing = new AtomicBoolean();
+        AtomicReference<ZonedDateTime> last = new AtomicReference(ZonedDateTime.now());
+
+        return e -> {
+            if (condition.test(e)) {
+                if (testing.get()) {
+                    if (e.exec_date.isAfter(last.get())) {
+                        testing.set(false);
+                        return true;
+                    }
+                } else {
+                    testing.set(true);
+                    last.set(e.exec_date.plus(time, unit));
+                }
+            } else {
+                if (testing.get()) {
+                    if (e.exec_date.isAfter(last.get())) {
+                        testing.set(false);
+                    }
+                }
+            }
+            return false;
+        };
+    }
+
+    /**
      * Manage position.
      * 
      * @param oae
@@ -144,15 +210,21 @@ public abstract class TradingStrategy {
         Execution exe = oae.e;
 
         if (exe.isMine()) {
+            if (entry) {
+                requestEntrySize = requestEntrySize.minus(exe.size);
+            } else {
+                requestExitSize = requestExitSize.minus(exe.size);
+            }
+
             Decimal size = positionSize;
 
             // update position
             if (position == null) {
                 // new position
-                position = oae.o.side();
+                position = oae.order.side();
                 positionSize = exe.size;
                 positionPrice = exe.price;
-            } else if (position == oae.o.side()) {
+            } else if (position == oae.order.side()) {
                 // same position
                 positionSize = positionSize.plus(exe.size);
                 positionPrice = positionPrice.multipliedBy(size).plus(exe.price.multipliedBy(exe.size)).dividedBy(positionSize);
@@ -177,20 +249,6 @@ public abstract class TradingStrategy {
     }
 
     /**
-     * Write your entry rule. This method is called whenever this trade has no position.
-     * 
-     * @param exe
-     */
-    public abstract void tryEntry(Execution exe);
-
-    /**
-     * Write your exit rule. This method is called whenever this trade has some position.
-     * 
-     * @param exe
-     */
-    public abstract void tryExit(Execution exe);
-
-    /**
      * This method is called from instantiating to clearing position.
      * 
      * @param exe
@@ -203,18 +261,6 @@ public abstract class TradingStrategy {
      * @param exe
      */
     void tick(Execution exe) {
-        boolean entry = !requestEntrySize.isZero();
-        boolean exit = !requestExitSize.isZero();
-        boolean position = !positionSize.isZero();
-
-        // entry and exit timing
-        if (!entry && !exit && !position) {
-            tryEntry(exe);
-        } else if (position && requestExitSize.isLessThan(positionSize)) {
-            tryExit(exe);
-        }
-
-        // observe timeline
         timeline(exe);
     }
 }

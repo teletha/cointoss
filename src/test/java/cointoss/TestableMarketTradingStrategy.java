@@ -25,20 +25,6 @@ class TestableMarketTradingStrategy extends TradingStrategy {
      * {@inheritDoc}
      */
     @Override
-    public void tryEntry(Execution exe) {
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void tryExit(Execution exe) {
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public void timeline(Execution exe) {
     }
 }

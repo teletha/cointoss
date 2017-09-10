@@ -256,7 +256,7 @@ public class Order implements Directional {
      * @return
      */
     public Order with(OrderAndExecution entry) {
-        return with(entry.o);
+        return with(entry.order);
     }
 
     /**
@@ -593,15 +593,6 @@ public class Order implements Directional {
     public String toString() {
         return side.mark() + size + "@" + average_price + " 残" + outstanding_size + " 済" + executed_size + " " + format
                 .format(child_order_date);
-    }
-
-    public final TradingState state = new TradingState();
-
-    /**
-     * @version 2017/09/05 16:59:40
-     */
-    public static class TradingState {
-
     }
 
 }

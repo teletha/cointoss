@@ -15,7 +15,6 @@ import java.nio.file.Path;
 import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.function.Consumer;
 import java.util.stream.IntStream;
 
 import cointoss.Execution;
@@ -25,6 +24,8 @@ import cointoss.util.RingBuffer;
 import eu.verdelhan.ta4j.Decimal;
 import filer.Filer;
 import kiss.I;
+import kiss.Observer;
+import kiss.Signal;
 
 /**
  * @version 2017/09/07 22:12:13
@@ -53,8 +54,10 @@ public class Chart {
     /** The tick manager. */
     public final RingBuffer<Tick> ticks = new RingBuffer(60 * 24);
 
-    /** The tick listeners. */
-    private final List<Consumer<Tick>> listeners = new CopyOnWriteArrayList();
+    public final Signal<Tick> tick;
+
+    /** The tick observers. */
+    private final CopyOnWriteArrayList<Observer<? super Tick>> listeners = new CopyOnWriteArrayList<>();
 
     /** The trend indicator. */
     private final Indicator trend;
@@ -66,6 +69,7 @@ public class Chart {
         this.duration = duration;
         this.children = children;
         this.trend = PriceIndicator.close(this).sma(12);
+        this.tick = new Signal(listeners);
     }
 
     /**
@@ -77,11 +81,12 @@ public class Chart {
         Decimal latest = trend.getLast(0);
         Decimal total = Decimal.ONE;
 
-        for (int i = 1; i < Math.min(30, ticks.size()); i++) {
+        for (int i = 1; i < Math.min(24, ticks.size()); i++) {
             Decimal ratio = latest.dividedBy(trend.getLast(i));
             total = total.multipliedBy(ratio);
         }
-        return total.isLessThan(Decimal.valueOf("0.7")) ? Trend.Down : total.isGreaterThan(Decimal.valueOf("1.3")) ? Trend.Up : Trend.Range;
+        return total.isLessThan(Decimal.valueOf("0.65")) ? Trend.Down
+                : total.isGreaterThan(Decimal.valueOf("1.35")) ? Trend.Up : Trend.Range;
     }
 
     /**
@@ -150,7 +155,7 @@ public class Chart {
 
         if (!exe.exec_date.isBefore(current.endTime)) {
             // notify
-            for (Consumer<Tick> listener : listeners) {
+            for (Observer<? super Tick> listener : listeners) {
                 listener.accept(current);
             }
 
@@ -166,15 +171,6 @@ public class Chart {
                 child.tick(exe);
             }
         }
-    }
-
-    /**
-     * Observe tick.
-     * 
-     * @param object
-     */
-    public void to(Consumer<Tick> listener) {
-        listeners.add(listener);
     }
 
     /**
@@ -204,5 +200,14 @@ public class Chart {
      */
     public void readFrom(Path file) {
         Filer.read(file).map(line -> new Tick(line)).to(ticks::add);
+    }
+
+    /**
+     * Observe tick.
+     * 
+     * @param object
+     */
+    public void to(Observer<? super Tick> listener) {
+        listeners.add(listener);
     }
 }
