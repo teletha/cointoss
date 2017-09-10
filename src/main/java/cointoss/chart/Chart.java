@@ -20,6 +20,7 @@ import java.util.stream.IntStream;
 
 import cointoss.Execution;
 import cointoss.Trend;
+import cointoss.util.RingBuffer;
 import filer.Filer;
 import kiss.I;
 
@@ -46,6 +47,9 @@ public class Chart {
 
     /** The current tick */
     private Tick current;
+
+    /** The tick manager. */
+    private final RingBuffer<Tick> ticks = new RingBuffer(60 * 24);
 
     /** The tick listeners. */
     private final List<Consumer<Tick>> listeners = new CopyOnWriteArrayList();
@@ -105,12 +109,40 @@ public class Chart {
     }
 
     /**
+     * <p>
+     * Return the current tick size.
+     * </p>
+     * 
+     * @return
+     */
+    public int getTickCount() {
+        return ticks.size();
+    }
+
+    /**
+     * Return the latest tick.
+     * 
+     * @return
+     */
+    public Tick getLastTick() {
+        return ticks.latest();
+    }
+
+    /**
+     * @param index
+     * @return
+     */
+    public Tick getTick(int index) {
+        return ticks.get(index);
+    }
+
+    /**
      * Record executions.
      */
     public void tick(Execution exe) {
         if (current == null) {
             current = new Tick(exe, duration);
-            addTick(current);
+            ticks.add(current);
         }
 
         if (!exe.exec_date.isBefore(current.endTime)) {
@@ -121,7 +153,7 @@ public class Chart {
 
             // update
             current = new Tick(exe, duration);
-            addTick(current);
+            ticks.add(current);
         }
         current.tick(exe);
 
@@ -150,11 +182,11 @@ public class Chart {
      * @param file
      */
     public void writeTo(Path file) {
-        List<String> ticks = I.signal(IntStream.range(0, getTickCount())).map(this::getTick).map(tick -> tick.toString()).toList();
+        List<String> list = I.signal(IntStream.range(ticks.start(), ticks.end())).map(this::getTick).map(tick -> tick.toString()).toList();
 
         try {
             Files.createDirectories(file.getParent());
-            Files.write(file, ticks);
+            Files.write(file, list);
         } catch (IOException e) {
             throw I.quiet(e);
         }
@@ -168,6 +200,6 @@ public class Chart {
      * @param file
      */
     public void readFrom(Path file) {
-        Filer.read(file).map(line -> new Tick(line)).to(this::addTick);
+        Filer.read(file).map(line -> new Tick(line)).to(ticks::add);
     }
 }

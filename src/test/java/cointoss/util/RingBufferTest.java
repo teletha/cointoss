@@ -45,8 +45,33 @@ public class RingBufferTest {
         buffer.add(4);
         assert buffer.latest(2) == 2;
         buffer.add(5);
-        assert buffer.latest(3) == 5;
+        assert buffer.latest(2) == 3;
+        assert buffer.latest(3) == null;
         buffer.add(6);
-        assert buffer.latest(3) == 6;
+        assert buffer.latest(2) == 4;
+        assert buffer.latest(3) == null;
+    }
+
+    @Test
+    public void set() throws Exception {
+        RingBuffer<Integer> buffer = new RingBuffer<>(5);
+        buffer.set(1, 1);
+        assert buffer.get(0) == null;
+        assert buffer.get(1) == 1;
+        buffer.set(3, 3);
+        assert buffer.get(2) == null;
+        assert buffer.get(3) == 3;
+        buffer.set(5, 5);
+        assert buffer.get(4) == null;
+        assert buffer.get(5) == 5;
+        buffer.set(7, 7);
+        assert buffer.get(0) == null;
+        assert buffer.get(1) == null;
+        assert buffer.get(2) == null;
+        assert buffer.get(3) == 3;
+        assert buffer.get(4) == null;
+        assert buffer.get(5) == 5;
+        assert buffer.get(6) == null;
+        assert buffer.get(7) == 7;
     }
 }

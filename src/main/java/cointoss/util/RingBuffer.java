@@ -11,24 +11,24 @@ package cointoss.util;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReferenceArray;
+import java.util.function.IntFunction;
 
 /**
- * @version 2017/09/10 9:10:16
+ * @version 2017/09/10 11:55:00
  */
 public class RingBuffer<T> {
 
-    /** The current position. */
-    private final AtomicInteger index = new AtomicInteger(-1);
+    /** The logical index. */
+    private final AtomicInteger logical = new AtomicInteger();
+
+    /** The physical index. */
+    private final AtomicInteger physical = new AtomicInteger();
 
     /** The item list. */
     private final AtomicReferenceArray<T> buffer;
 
     /** The max size. */
     private final int size;
-
-    private int first;
-
-    private int last;
 
     /**
      * @param size
@@ -44,17 +44,52 @@ public class RingBuffer<T> {
      * @param item
      */
     public void add(T item) {
-        buffer.set(index.updateAndGet(this::increment), item);
+        buffer.set(physical.intValue(), item);
+
+        // increment index
+        logical.incrementAndGet();
+        if (physical.incrementAndGet() == size) {
+            physical.set(0);
+        }
     }
 
     /**
-     * Increment index position.
+     * <p>
+     * Set new value.
+     * </p>
+     * 
+     * @param index
+     * @param value
+     */
+    public void set(int index, T value) {
+        for (int i = logical.intValue(); i < index; i++) {
+            add(null);
+        }
+        add(value);
+    }
+
+    /**
+     * Get the indexed value.
      * 
      * @param index
      * @return
      */
-    private int increment(int index) {
-        return index < size - 1 ? index + 1 : 0;
+    public T get(int index) {
+        return get(index, v -> null);
+    }
+
+    /**
+     * Get the indexed value.
+     * 
+     * @param index
+     * @return
+     */
+    public T get(int index, IntFunction<T> calculator) {
+        if (index < 0 || index < logical.intValue() - size || logical.intValue() <= index) {
+            return null;
+        } else {
+            return buffer.updateAndGet(index % size, v -> v != null ? v : calculator.apply(index));
+        }
     }
 
     /**
@@ -72,11 +107,44 @@ public class RingBuffer<T> {
      * @return
      */
     public T latest(int offset) {
-        int i = index.get() - offset % size;
+        return latest(offset, v -> null);
+    }
 
-        if (i < 0) {
-            i += size;
-        }
-        return buffer.get(i);
+    /**
+     * Return latest item.
+     * 
+     * @return
+     */
+    public T latest(int offset, IntFunction<T> calculator) {
+        return get(logical.intValue() - offset - 1, calculator);
+    }
+
+    /**
+     * Return the available start index.
+     * 
+     * @return
+     */
+    public int start() {
+        int start = logical.intValue() - size;
+
+        return start < 0 ? 0 : start;
+    }
+
+    /**
+     * Return the available end index.
+     * 
+     * @return
+     */
+    public int end() {
+        return logical.intValue();
+    }
+
+    /**
+     * Return buffer size.
+     * 
+     * @return
+     */
+    public int size() {
+        return logical.intValue();
     }
 }

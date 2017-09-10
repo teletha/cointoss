@@ -31,7 +31,7 @@ public class BitFlyerMonitor extends TradingStrategy {
         });
 
         market.minute1.to(tick -> {
-            System.out.println(tick.getBeginTime() + "  1min " + market.minute1.trend() + "   15min " + market.minute15
+            System.out.println(tick.beginTime + "  1min " + market.minute1.trend() + "   15min " + market.minute15
                     .trend() + "    30min " + market.minute30
                             .trend() + "   1hour " + market.hour1.trend() + "   2hour " + market.hour2.trend());
         });
