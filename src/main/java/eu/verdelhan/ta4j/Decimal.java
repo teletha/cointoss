@@ -657,6 +657,26 @@ public class Decimal implements Comparable<Decimal> {
     }
 
     /**
+     * Compare {@link Decimal3}.
+     * 
+     * @param amount
+     * @return A result.
+     */
+    public final boolean isLessThan(Directional direction, int price) {
+        return isLessThan(direction, Decimal.valueOf(price));
+    }
+
+    /**
+     * Compare {@link Decimal3}.
+     * 
+     * @param amount
+     * @return A result.
+     */
+    public final boolean isLessThan(Directional direction, Decimal price) {
+        return direction.isBuy() ? isLessThan(price) : isGreaterThan(price);
+    }
+
+    /**
      * @version 2017/07/26 9:08:16
      */
     public static class Codec implements Encoder<Decimal>, Decoder<Decimal> {

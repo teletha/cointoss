@@ -175,6 +175,36 @@ public class BackTester {
             super(market);
 
             // various events
+            market.minute1.to(tick -> {
+                if (market.hasNoActiveOrder()) {
+                    Trend trend1 = market.minute1.trend();
+                    Trend trend15 = market.minute15.trend();
+                    Trend trend30 = market.minute30.trend();
+
+                    if (trend1 == trend15 && trend1 == trend30) {
+                        if (trend1 != Trend.Range) {
+                            Order.market(trend1 == Trend.Up ? Side.BUY : Side.SELL, maxPositionSize).entryTo(market).to(entry -> {
+
+                                if (entry.e.isMine()) {
+                                    Decimal profitLimit = entry.o.average_price.plus(entry, 5000);
+                                    Decimal lossLimit = entry.o.average_price.minus(entry, 3000);
+
+                                    Order.limit(entry.inverse(), entry.e.size, profitLimit).with(entry).entryTo(market).to(exit -> {
+                                        if (exit.e.isMine()) {
+
+                                        } else {
+                                            if (exit.e.price.isLessThan(entry, lossLimit)) {
+                                                market.cancel(exit.o).to();
+                                                Order.market(exit.side(), exit.o.size()).with(entry).entryTo(market).to();
+                                            }
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                    }
+                }
+            });
         }
 
         /**
@@ -183,7 +213,21 @@ public class BackTester {
         @Override
         public void tryEntry(Execution exe) {
             if (hasNoPosition()) {
-                // entryMarket(Side.random(), maxPositionSize);
+                // Trend trend1 = market.minute1.trend();
+                // Trend trend15 = market.minute15.trend();
+                // // Trend trend30 = market.minute30.trend();
+                // // Trend trend60 = market.hour1.trend();
+                //
+                // if (trend1 == trend15) {
+                // if (trend1 == Trend.Up) {
+                // Order.marketLong(maxPositionSize).entryTo(market).to(entry -> {
+                //
+                // if (entry.e.isMine()) {
+                // O
+                // }
+                // });
+                // }
+                // }
             }
         }
 
@@ -192,9 +236,9 @@ public class BackTester {
          */
         @Override
         public void tryExit(Execution exe) {
-            if (profit().isGreaterThan(1000)) {
-                // exitMarket(Decimal.ONE);
-            }
+            // if (profit().isGreaterThan(1000)) {
+            // exitMarket(Decimal.ONE);
+            // }
         }
 
         /**

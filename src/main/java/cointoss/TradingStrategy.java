@@ -131,8 +131,7 @@ public abstract class TradingStrategy {
         if (hasPosition()) {
             requestExitSize = requestExitSize.plus(size);
 
-            // Order.market(position.inverse(), size).with(entry).entryTo(market).to(e ->
-            // managePosition(e, false));
+            Order.market(position.inverse(), size).entryTo(market).to(e -> managePosition(e, false));
         }
     }
 
