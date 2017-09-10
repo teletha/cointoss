@@ -9,20 +9,18 @@
  */
 package cointoss.chart;
 
-import eu.verdelhan.ta4j.Decimal;
-
 /**
  * @version 2017/09/10 14:15:09
  */
-public abstract class ComposableIndicator extends Indicator<Decimal> {
+public abstract class ComposableIndicator extends Indicator {
 
-    protected final Indicator<Decimal> indicator;
+    protected final Indicator indicator;
 
     /**
      * @param chart
      * @param indicator
      */
-    protected ComposableIndicator(Indicator<Decimal> indicator) {
+    protected ComposableIndicator(Indicator indicator) {
         super(indicator.chart);
 
         this.indicator = indicator;

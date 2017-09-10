@@ -95,7 +95,7 @@ public class RingBuffer<T> {
      * @return
      */
     public T get(int index, IntFunction<T> calculator) {
-        if (index < 0 || index < logical.intValue() - size || logical.intValue() <= index) {
+        if (index < 0 || index < logical.intValue() - size) {
             return null;
         } else {
             return buffer.updateAndGet(index % size, v -> v != null ? v : calculator.apply(index));
@@ -126,7 +126,6 @@ public class RingBuffer<T> {
      * @return
      */
     public T latest(int offset, IntFunction<T> calculator) {
-        System.out.println(logical.intValue() + "     " + offset + "   " + size);
         return get(logical.intValue() - offset - 1, calculator);
     }
 

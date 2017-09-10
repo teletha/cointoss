@@ -20,7 +20,9 @@ import java.util.stream.IntStream;
 
 import cointoss.Execution;
 import cointoss.Trend;
+import cointoss.chart.simple.PriceIndicator;
 import cointoss.util.RingBuffer;
+import eu.verdelhan.ta4j.Decimal;
 import filer.Filer;
 import kiss.I;
 
@@ -54,13 +56,16 @@ public class Chart {
     /** The tick listeners. */
     private final List<Consumer<Tick>> listeners = new CopyOnWriteArrayList();
 
+    /** The trend indicator. */
+    private final Indicator trend;
+
     /**
      * 
      */
     public Chart(Duration duration, Chart... children) {
-
         this.duration = duration;
         this.children = children;
+        this.trend = PriceIndicator.close(this).sma(12);
     }
 
     /**
@@ -69,16 +74,14 @@ public class Chart {
      * @return
      */
     public Trend trend() {
-        return trend(0);
-    }
+        Decimal latest = trend.getLast(0);
+        Decimal total = Decimal.ONE;
 
-    /**
-     * Detect trend.
-     * 
-     * @return
-     */
-    public Trend trend(int backOffset) {
-        return null;
+        for (int i = 1; i < Math.min(30, ticks.size()); i++) {
+            Decimal ratio = latest.dividedBy(trend.getLast(i));
+            total = total.multipliedBy(ratio);
+        }
+        return total.isLessThan(Decimal.valueOf("0.7")) ? Trend.Down : total.isGreaterThan(Decimal.valueOf("1.3")) ? Trend.Up : Trend.Range;
     }
 
     /**

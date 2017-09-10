@@ -19,7 +19,7 @@ import eu.verdelhan.ta4j.Decimal;
 /**
  * @version 2017/09/10 13:00:35
  */
-public class PriceIndicator extends Indicator<Decimal> {
+public class PriceIndicator extends Indicator {
 
     /** The price calculator. */
     private final Function<Tick, Decimal> calculator;
