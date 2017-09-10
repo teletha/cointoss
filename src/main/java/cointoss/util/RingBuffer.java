@@ -39,6 +39,16 @@ public class RingBuffer<T> {
     }
 
     /**
+     * @param size
+     */
+    public RingBuffer(RingBuffer buffer) {
+        this.size = buffer.size;
+        this.logical.set(buffer.logical.intValue());
+        this.physical.set(buffer.physical.intValue());
+        this.buffer = new AtomicReferenceArray<>(size);
+    }
+
+    /**
      * Add new item.
      * 
      * @param item
@@ -116,6 +126,7 @@ public class RingBuffer<T> {
      * @return
      */
     public T latest(int offset, IntFunction<T> calculator) {
+        System.out.println(logical.intValue() + "     " + offset + "   " + size);
         return get(logical.intValue() - offset - 1, calculator);
     }
 

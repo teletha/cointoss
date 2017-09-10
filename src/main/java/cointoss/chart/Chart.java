@@ -49,7 +49,7 @@ public class Chart {
     private Tick current;
 
     /** The tick manager. */
-    private final RingBuffer<Tick> ticks = new RingBuffer(60 * 24);
+    public final RingBuffer<Tick> ticks = new RingBuffer(60 * 24);
 
     /** The tick listeners. */
     private final List<Consumer<Tick>> listeners = new CopyOnWriteArrayList();

@@ -7,7 +7,7 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss.trend;
+package cointoss.chart;
 
 import java.nio.file.Files;
 import java.nio.file.Path;

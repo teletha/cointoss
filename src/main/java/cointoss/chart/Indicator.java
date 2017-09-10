@@ -17,7 +17,7 @@ import cointoss.util.RingBuffer;
 public abstract class Indicator<T> {
 
     /** The internal cache. */
-    private final RingBuffer<T> cache = new RingBuffer(60 * 24);
+    private final RingBuffer<T> cache;
 
     /** The target chart. */
     protected final Chart chart;
@@ -27,37 +27,30 @@ public abstract class Indicator<T> {
      */
     protected Indicator(Chart chart) {
         this.chart = chart;
+        this.cache = new RingBuffer(chart.ticks);
     }
 
     /**
-     * Return the latest value.
+     * Return the indexed value.
      * 
-     * @param offset
+     * @param index
      * @return
      */
-    public final T latest() {
-        return latest(0);
-    }
+    public final T get(int index) {
+        int end = chart.ticks.end() - 1;
 
-    /**
-     * Return the latest indexed value.
-     * 
-     * @param offset
-     * @return
-     */
-    public final T latest(int offset) {
-        if (offset == 0) {
-            return calculate(offset);
+        if (index == end) {
+            return calculate(end);
         } else {
-            return cache.latest(offset, this::calculate);
+            return cache.get(index, this::calculate);
         }
     }
 
     /**
-     * Calculate the latest indexed value.
+     * Calculate the indexed value.
      * 
-     * @param offset
+     * @param index
      * @return
      */
-    public abstract T calculate(int offset);
+    public abstract T calculate(int index);
 }

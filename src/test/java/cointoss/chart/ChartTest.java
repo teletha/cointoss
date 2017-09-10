@@ -7,13 +7,15 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss;
+package cointoss.chart;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
 
 import org.junit.Test;
 
+import cointoss.Execution;
+import cointoss.Side;
 import cointoss.chart.Chart;
 import cointoss.chart.Tick;
 import eu.verdelhan.ta4j.Decimal;
