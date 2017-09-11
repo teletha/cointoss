@@ -25,7 +25,7 @@ import kiss.Signal;
 /**
  * @version 2017/09/05 19:39:34
  */
-public abstract class TradingStrategy {
+public abstract class Trading {
 
     /** The market. */
     protected final Market market;
@@ -72,7 +72,7 @@ public abstract class TradingStrategy {
     /**
      * New Trade.
      */
-    protected TradingStrategy(Market market) {
+    protected Trading(Market market) {
         this.market = market;
     }
 
@@ -127,7 +127,7 @@ public abstract class TradingStrategy {
      * @param side
      * @param size
      */
-    protected final void entryLimit(Side side, Decimal size, Decimal price, Consumer<Order> process) {
+    protected final void entryLimit(Side side, Decimal size, Decimal price, Consumer<Entry> process) {
         // check side
         if (side == null) {
             return;
@@ -151,7 +151,7 @@ public abstract class TradingStrategy {
      * @param side
      * @param size
      */
-    protected final void entryMarket(Side side, Decimal size, Consumer<Order> process) {
+    protected final void entryMarket(Side side, Decimal size, Consumer<Entry> process) {
         // check side
         if (side == null) {
             return;
@@ -172,7 +172,7 @@ public abstract class TradingStrategy {
      * @param order
      * @param process
      */
-    private void entry(Order order, Consumer<Order> process) {
+    private void entry(Order order, Consumer<Entry> process) {
         // update trade state
         position = order.side();
         requestEntrySize = requestEntrySize.plus(order.size());
@@ -182,7 +182,7 @@ public abstract class TradingStrategy {
             entry = o;
 
             if (process != null) {
-                process.accept(o);
+                process.accept(new Entry(order));
             }
 
             o.notify(exe -> {
@@ -364,5 +364,43 @@ public abstract class TradingStrategy {
             }
             return false;
         };
+    }
+
+    /**
+     * @version 2017/09/11 16:57:47
+     */
+    public class Entry implements Directional {
+
+        /** The position side. */
+        private final Order order;
+
+        /**
+         * @param order
+         */
+        private Entry(Order order) {
+            this.order = order;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Side side() {
+            return order.side();
+        }
+
+        /**
+         * @return
+         */
+        public Decimal remaining() {
+            return order.outstanding_size;
+        }
+
+        /**
+         * @return
+         */
+        public Decimal executed() {
+            return order.executed_size;
+        }
     }
 }

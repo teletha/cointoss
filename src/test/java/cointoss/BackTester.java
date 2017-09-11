@@ -38,7 +38,7 @@ public class BackTester {
     private MarketLog marketLog;
 
     /** テスト戦略 */
-    private Class<? extends TradingStrategy> strategy;
+    private Class<? extends Trading> strategy;
 
     /** ラグ生成器 */
     private Lag lag = Time.lag(2, 15);
@@ -55,7 +55,7 @@ public class BackTester {
      * @param strategy
      * @return
      */
-    public BackTester strategy(Class<? extends TradingStrategy> strategy) {
+    public BackTester strategy(Class<? extends Trading> strategy) {
         if (strategy != null) {
             this.strategy = strategy;
         }
@@ -168,7 +168,7 @@ public class BackTester {
     /**
      * @version 2017/09/05 20:19:04
      */
-    private static class BreakoutTrading extends TradingStrategy {
+    private static class BreakoutTrading extends Trading {
 
         private Decimal underPrice;
 
@@ -183,15 +183,14 @@ public class BackTester {
             market.timeline.to(exe -> {
                 if (hasNoPosition()) {
                     entryLimit(Side.random(), maxPositionSize, exe.price, entry -> {
-                        System.out.println("Entry " + entry);
                         calculateUnderline(exe.price);
 
-                        // cancel timing
-                        market.timeline.takeUntil(completingEntry)
-                                .take(keep(5, MINUTES, entry::isNotCompleted))
-                                .take(1)
-                                .mapTo(entry)
-                                .to(market::cancel);
+                        // // cancel timing
+                        // market.timeline.takeUntil(completingEntry)
+                        // .take(keep(5, MINUTES, entry::isNotCompleted))
+                        // .take(1)
+                        // .mapTo(entry)
+                        // .to(market::cancel);
 
                         // rise under price line
                         market.minute1.tick.takeUntil(closingPosition) //
@@ -203,8 +202,7 @@ public class BackTester {
                                 .take(keep(5, SECONDS, e -> e.price.isLessThan(entry, underPrice)))
                                 .take(1)
                                 .to(e -> {
-                                    System.out.println("Exit " + entry + "  " + e);
-                                    exitMarket(entry.outstanding_size);
+                                    exitMarket(entry.executed());
                                 });
                     });
                 }
@@ -213,7 +211,12 @@ public class BackTester {
 
         private void calculateUnderline(Decimal consultation) {
             Decimal next = consultation.minus(position, 2000);
+            Decimal d = underPrice;
             underPrice = underPrice == null || next.isGreaterThan(position, underPrice) ? next : underPrice;
+
+            if (d != underPrice) {
+                System.out.println(d + " is up to " + underPrice);
+            }
         }
     }
 }

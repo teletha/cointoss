@@ -19,7 +19,7 @@ import kiss.Variable;
 /**
  * @version 2017/09/11 13:24:46
  */
-public class TradingStrategyTest extends TradingStrategyTestSupport {
+public class TradingTest extends TradingTestSupport {
 
     @Test
     public void entryLimit() throws Exception {
@@ -291,7 +291,6 @@ public class TradingStrategyTest extends TradingStrategyTestSupport {
         market.execute(1, 9, 10);
         market.execute(1, 9, 12);
         market.execute(1, 9, 15);
-        market.execute(1, 15, 18);
         assert state.isPresent();
     }
 }

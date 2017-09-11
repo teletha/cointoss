@@ -16,14 +16,14 @@ import eu.verdelhan.ta4j.Decimal;
 /**
  * @version 2017/09/11 13:34:54
  */
-public abstract class TradingStrategyTestSupport extends TradingStrategy {
+public abstract class TradingTestSupport extends Trading {
 
     protected TestableMarket market;
 
     /**
      * @param market
      */
-    public TradingStrategyTestSupport() {
+    public TradingTestSupport() {
         super(new TestableMarket());
 
         this.market = (TestableMarket) super.market;

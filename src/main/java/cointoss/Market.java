@@ -95,14 +95,14 @@ public class Market {
     private Decimal targetInit;
 
     /** The current trading. */
-    TradingStrategy strategy;
+    Trading strategy;
 
     /**
      * @param backend
      * @param builder
      * @param strategy
      */
-    public Market(MarketBackend backend, Signal<Execution> log, Class<? extends TradingStrategy> strategy) {
+    public Market(MarketBackend backend, Signal<Execution> log, Class<? extends Trading> strategy) {
         this.backend = Objects.requireNonNull(backend);
 
         // initialize price, balance and executions
@@ -140,7 +140,7 @@ public class Market {
      * @param strategy
      * @return
      */
-    public final Market useStrategy(Class<? extends TradingStrategy> strategy) {
+    public final Market useStrategy(Class<? extends Trading> strategy) {
         this.strategy = create(Objects.requireNonNull(strategy));
 
         return this;
@@ -440,14 +440,14 @@ public class Market {
     }
 
     /**
-     * Create new {@link TradingStrategy} instance.
+     * Create new {@link Trading} instance.
      * 
      * @param type
      * @return
      */
-    private TradingStrategy create(Class<? extends TradingStrategy> type) {
+    private Trading create(Class<? extends Trading> type) {
         try {
-            Constructor<? extends TradingStrategy> constructor = type.getDeclaredConstructor(Market.class);
+            Constructor<? extends Trading> constructor = type.getDeclaredConstructor(Market.class);
             constructor.setAccessible(true);
             return constructor.newInstance(this);
         } catch (Exception e) {

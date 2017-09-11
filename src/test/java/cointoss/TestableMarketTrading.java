@@ -12,12 +12,12 @@ package cointoss;
 /**
  * @version 2017/09/09 10:01:55
  */
-class TestableMarketTradingStrategy extends TradingStrategy {
+class TestableMarketTrading extends Trading {
 
     /**
      * @param market
      */
-    TestableMarketTradingStrategy(Market market) {
+    TestableMarketTrading(Market market) {
         super(market);
 
         market.strategy = this;
