@@ -537,6 +537,13 @@ public class Order implements Directional {
     }
 
     /**
+     * @return
+     */
+    public final boolean isNotCompleted() {
+        return isCompleted() == false;
+    }
+
+    /**
      * Test whether this order can trade with the specified {@link Execution}.
      * 
      * @param e A target {@link Execution}.

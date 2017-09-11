@@ -70,6 +70,9 @@ public class Market {
     public final Chart minute1 = new Chart(Duration
             .ofMinutes(1), minute5, minute15, minute30, hour1, hour2, hour4, hour6, hour12, day1, day3, day7);
 
+    /** The execution time line. */
+    public final Signal<Execution> timeline;
+
     /** The event listeners. */
     private final CopyOnWriteArrayList<Observer<? super Execution>> executionListeners = new CopyOnWriteArrayList();
 
@@ -101,6 +104,7 @@ public class Market {
      */
     public Market(MarketBackend backend, Signal<Execution> log, Class<? extends TradingStrategy> strategy) {
         this.backend = Objects.requireNonNull(backend);
+        this.timeline = new Signal(executionListeners);
 
         // initialize price, balance and executions
         List<BalanceUnit> units = backend.getCurrency().toList();
@@ -112,21 +116,6 @@ public class Market {
     }
 
     /**
-     * Observe executions.
-     * 
-     * @param threshold
-     * @return
-     */
-    public final Signal<Execution> observeExecution() {
-        return new Signal<Execution>((observer, disposer) -> {
-            executionListeners.add(observer);
-            return disposer.add(() -> {
-                executionListeners.remove(observer);
-            });
-        });
-    }
-
-    /**
      * Observe executions filtered by size.
      * 
      * @param threshold
@@ -135,7 +124,7 @@ public class Market {
     public final Signal<Execution> observeExecutionBySize(int threshold) {
         AtomicReference<Decimal> accumlated = new AtomicReference<>(Decimal.ZERO);
 
-        return observeExecution().scan(new Execution(), (prev, next) -> {
+        return timeline.scan(new Execution(), (prev, next) -> {
             if (prev.buy_child_order_acceptance_id.equals(next.buy_child_order_acceptance_id) || prev.sell_child_order_acceptance_id
                     .equals(next.sell_child_order_acceptance_id)) {
                 accumlated.updateAndGet(v -> v.plus(next.size));

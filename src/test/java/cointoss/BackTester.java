@@ -11,10 +11,10 @@ package cointoss;
 
 import static java.time.temporal.ChronoUnit.*;
 
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.IntStream;
 
 import cointoss.Time.Lag;
+import cointoss.chart.Tick;
 import cointoss.market.bitflyer.BitFlyer;
 import eu.verdelhan.ta4j.Decimal;
 import kiss.I;
@@ -170,6 +170,8 @@ public class BackTester {
      */
     private static class BreakoutTrading extends TradingStrategy {
 
+        private Decimal underPrice;
+
         /**
          * @param market
          * @param exe
@@ -186,21 +188,37 @@ public class BackTester {
         @Override
         public void timeline(Execution exe) {
             if (hasNoPosition()) {
-                Side side = Side.random();
-                AtomicReference<Decimal> limit = new AtomicReference(exe.price.minus(side, 2000));
+                entryLimit(Side.random(), maxPositionSize, exe.price, entry -> {
+                    System.out.println("Entry " + entry);
+                    calculateUnderline(exe.price);
 
-                entryLimit(side, maxPositionSize, exe.price, entry -> {
-                    // change price line
-                    market.minute1.tick.to(tick -> {
-                        limit.set(tick.closePrice.minus(entry, 2000).min(limit.get()));
-                    });
+                    // cancel timing
+                    market.timeline.takeUntil(completingEntry)
+                            .take(keep(5, MINUTES, entry::isNotCompleted))
+                            .take(1)
+                            .mapTo(entry)
+                            .to(market::cancel);
+
+                    // rise under price line
+                    market.minute1.tick.takeUntil(closingPosition) //
+                            .map(Tick::getClosePrice)
+                            .to(this::calculateUnderline);
 
                     // loss cut
-                    timeline.takeUntil(closePosition).take(keep(5, SECONDS, e -> e.price.isLessThan(side, limit.get()))).take(1).to(e -> {
-                        exitMarket(entry.outstanding_size);
-                    });
+                    market.timeline.takeUntil(closingPosition) //
+                            .take(keep(5, SECONDS, e -> e.price.isLessThan(entry, underPrice)))
+                            .take(1)
+                            .to(e -> {
+                                System.out.println("Exit " + entry + "  " + e);
+                                exitMarket(entry.outstanding_size);
+                            });
                 });
             }
+        }
+
+        private void calculateUnderline(Decimal consultation) {
+            Decimal next = consultation.minus(position, 2000);
+            underPrice = underPrice == null || next.isGreaterThan(position, underPrice) ? next : underPrice;
         }
     }
 }

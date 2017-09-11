@@ -95,6 +95,87 @@ public class Tick {
     }
 
     /**
+     * Get the beginTime property of this {@link Tick}.
+     * 
+     * @return The beginTime property.
+     */
+    public final ZonedDateTime getBeginTime() {
+        return beginTime;
+    }
+
+    /**
+     * Get the endTime property of this {@link Tick}.
+     * 
+     * @return The endTime property.
+     */
+    public final ZonedDateTime getEndTime() {
+        return endTime;
+    }
+
+    /**
+     * Get the openPrice property of this {@link Tick}.
+     * 
+     * @return The openPrice property.
+     */
+    public final Decimal getOpenPrice() {
+        return openPrice;
+    }
+
+    /**
+     * Get the closePrice property of this {@link Tick}.
+     * 
+     * @return The closePrice property.
+     */
+    public final Decimal getClosePrice() {
+        return closePrice;
+    }
+
+    /**
+     * Get the maxPrice property of this {@link Tick}.
+     * 
+     * @return The maxPrice property.
+     */
+    public final Decimal getMaxPrice() {
+        return maxPrice;
+    }
+
+    /**
+     * Get the minPrice property of this {@link Tick}.
+     * 
+     * @return The minPrice property.
+     */
+    public final Decimal getMinPrice() {
+        return minPrice;
+    }
+
+    /**
+     * Get the amount property of this {@link Tick}.
+     * 
+     * @return The amount property.
+     */
+    public final Decimal getAmount() {
+        return amount;
+    }
+
+    /**
+     * Get the volume property of this {@link Tick}.
+     * 
+     * @return The volume property.
+     */
+    public final Decimal getVolume() {
+        return volume;
+    }
+
+    /**
+     * Get the trades property of this {@link Tick}.
+     * 
+     * @return The trades property.
+     */
+    public final int getTrades() {
+        return trades;
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
