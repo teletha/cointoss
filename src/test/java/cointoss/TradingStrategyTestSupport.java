@@ -30,13 +30,6 @@ public abstract class TradingStrategyTestSupport extends TradingStrategy {
         this.market.strategy = this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void timeline(Execution exe) {
-    }
-
     @Before
     public void init() {
         position = null;

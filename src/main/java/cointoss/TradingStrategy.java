@@ -30,17 +30,23 @@ public abstract class TradingStrategy {
     /** The market. */
     protected final Market market;
 
-    /** The signal of closing position. */
-    protected final Signal<Boolean> closingPosition;
-
     /** The signal observers. */
     private final CopyOnWriteArrayList<Observer<Boolean>> closePositions = new CopyOnWriteArrayList();
 
-    /** The signal of closing position. */
-    protected final Signal<Boolean> completingEntry;
+    /** The trade related signal. */
+    protected final Signal<Boolean> closingPosition = new Signal(closePositions);
 
     /** The signal observers. */
     private final CopyOnWriteArrayList<Observer<Boolean>> completeEntries = new CopyOnWriteArrayList();
+
+    /** The trade related signal. */
+    protected final Signal<Boolean> completingEntry = new Signal(completeEntries);
+
+    /** The signal observers. */
+    private final CopyOnWriteArrayList<Observer<Boolean>> completeExits = new CopyOnWriteArrayList();
+
+    /** The trade related signal. */
+    protected final Signal<Boolean> completingExit = new Signal(completeExits);
 
     /** The user setting. */
     protected Decimal maxPositionSize = Decimal.ONE;
@@ -68,8 +74,6 @@ public abstract class TradingStrategy {
      */
     protected TradingStrategy(Market market) {
         this.market = market;
-        this.closingPosition = new Signal(closePositions);
-        this.completingEntry = new Signal(completeEntries);
     }
 
     /**
@@ -138,20 +142,7 @@ public abstract class TradingStrategy {
         if (price == null || price.isLessThanOrEqual(Decimal.ZERO)) {
             return;
         }
-
-        // update trade state
-        position = side;
-        requestEntrySize = requestEntrySize.plus(size);
-
-        // request order
-        market.request(Order.limit(side, size, price)).to(order -> {
-            entry = order;
-            if (process != null) process.accept(order);
-
-            order.notify(e -> {
-                managePosition(order, e, true);
-            });
-        });
+        entry(Order.limit(side, size, price), process);
     }
 
     /**
@@ -170,16 +161,38 @@ public abstract class TradingStrategy {
         if (size == null || size.isLessThanOrEqual(Decimal.ZERO)) {
             return;
         }
+        entry(Order.market(side, size), process);
+    }
 
-        position = side;
-        requestEntrySize = requestEntrySize.plus(size);
+    /**
+     * <p>
+     * Request entry order.
+     * </p>
+     * 
+     * @param order
+     * @param process
+     */
+    private void entry(Order order, Consumer<Order> process) {
+        // update trade state
+        position = order.side();
+        requestEntrySize = requestEntrySize.plus(order.size());
 
-        market.request(Order.market(side, size)).to(order -> {
-            entry = order;
-            if (process != null) process.accept(order);
+        // request order
+        market.request(order).to(o -> {
+            entry = o;
 
-            order.notify(e -> {
-                managePosition(order, e, true);
+            if (process != null) {
+                process.accept(o);
+            }
+
+            o.notify(exe -> {
+                managePosition(o, exe, true);
+
+                if (o.isCompleted()) {
+                    for (Observer<Boolean> observer : completeEntries) {
+                        observer.accept(true);
+                    }
+                }
             });
         });
     }
@@ -200,20 +213,7 @@ public abstract class TradingStrategy {
         if (price == null || price.isLessThanOrEqual(Decimal.ZERO)) {
             return;
         }
-
-        if (hasPosition()) {
-            requestExitSize = requestExitSize.plus(size);
-
-            market.request(Order.limit(position.inverse(), size, price).with(entry)).to(order -> {
-                if (process != null) {
-                    process.accept(order);
-                }
-
-                order.notify(e -> {
-                    managePosition(order, e, false);
-                });
-            });
-        }
+        exit(Order.limit(position.inverse(), size, price), process);
     }
 
     /**
@@ -226,15 +226,82 @@ public abstract class TradingStrategy {
         if (size == null || size.isLessThanOrEqual(Decimal.ZERO)) {
             return;
         }
+        exit(Order.market(position.inverse(), size), null);
+    }
 
+    /**
+     * Request exit order.
+     * 
+     * @param order A exit order.
+     */
+    private void exit(Order order, Consumer<Order> process) {
         if (hasPosition()) {
-            requestExitSize = requestExitSize.plus(size);
+            requestExitSize = requestExitSize.plus(order.size());
 
-            market.request(Order.market(position.inverse(), size).with(entry)).to(order -> {
-                order.notify(e -> {
-                    managePosition(order, e, false);
+            market.request(order.with(entry)).to(o -> {
+                if (process != null) {
+                    process.accept(o);
+                }
+
+                o.notify(exe -> {
+                    managePosition(o, exe, false);
+
+                    if (o.isCompleted()) {
+                        for (Observer<Boolean> observer : completeExits) {
+                            observer.accept(true);
+                        }
+                    }
                 });
             });
+        }
+    }
+
+    /**
+     * Manage position.
+     * 
+     * @param oae
+     */
+    private void managePosition(Order order, Execution exe, boolean entry) {
+        if (exe.isMine()) {
+            if (entry) {
+                requestEntrySize = requestEntrySize.minus(exe.size);
+            } else {
+                requestExitSize = requestExitSize.minus(exe.size);
+            }
+
+            Decimal size = positionSize;
+
+            // update position
+            if (position == null) {
+                // new position
+                position = order.side();
+                positionSize = exe.size;
+                positionPrice = exe.price;
+            } else if (position == order.side()) {
+                // same position
+                positionSize = positionSize.plus(exe.size);
+                positionPrice = positionPrice.multipliedBy(size).plus(exe.price.multipliedBy(exe.size)).dividedBy(positionSize);
+            } else {
+                // counter position
+                positionSize = positionSize.minus(exe.size);
+
+                if (positionSize.isZero()) {
+                    // clear position
+                    position = null;
+                    positionPrice = Decimal.ZERO;
+
+                    for (Observer<Boolean> observer : closePositions) {
+                        observer.accept(true);
+                    }
+                } else if (positionSize.isNegative()) {
+                    // inverse position
+                    position = position.inverse();
+                    positionPrice = exe.price;
+                } else {
+                    // decrease position
+                    positionPrice = positionPrice.multipliedBy(size).minus(exe.price.multipliedBy(exe.size)).dividedBy(positionSize);
+                }
+            }
         }
     }
 
@@ -298,56 +365,4 @@ public abstract class TradingStrategy {
             return false;
         };
     }
-
-    /**
-     * Manage position.
-     * 
-     * @param oae
-     */
-    private void managePosition(Order order, Execution exe, boolean entry) {
-        if (exe.isMine()) {
-            if (entry) {
-                requestEntrySize = requestEntrySize.minus(exe.size);
-            } else {
-                requestExitSize = requestExitSize.minus(exe.size);
-            }
-
-            Decimal size = positionSize;
-
-            // update position
-            if (position == null) {
-                // new position
-                position = order.side();
-                positionSize = exe.size;
-                positionPrice = exe.price;
-            } else if (position == order.side()) {
-                // same position
-                positionSize = positionSize.plus(exe.size);
-                positionPrice = positionPrice.multipliedBy(size).plus(exe.price.multipliedBy(exe.size)).dividedBy(positionSize);
-            } else {
-                // counter position
-                positionSize = positionSize.minus(exe.size);
-
-                if (positionSize.isZero()) {
-                    // clear position
-                    position = null;
-                    positionPrice = Decimal.ZERO;
-                } else if (positionSize.isNegative()) {
-                    // inverse position
-                    position = position.inverse();
-                    positionPrice = exe.price;
-                } else {
-                    // decrease position
-                    positionPrice = positionPrice.multipliedBy(size).minus(exe.price.multipliedBy(exe.size)).dividedBy(positionSize);
-                }
-            }
-        }
-    }
-
-    /**
-     * This method is called from instantiating to clearing position.
-     * 
-     * @param exe
-     */
-    public abstract void timeline(Execution exe);
 }

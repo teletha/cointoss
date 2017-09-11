@@ -23,7 +23,7 @@ import kiss.Observer;
 import kiss.Signal;
 
 /**
- * @version 2017/09/08 19:30:15
+ * @version 2017/09/11 15:33:40
  */
 public class Market {
 
@@ -70,11 +70,11 @@ public class Market {
     public final Chart minute1 = new Chart(Duration
             .ofMinutes(1), minute5, minute15, minute30, hour1, hour2, hour4, hour6, hour12, day1, day3, day7);
 
-    /** The execution time line. */
-    public final Signal<Execution> timeline;
+    /** The execution listeners. */
+    private final CopyOnWriteArrayList<Observer<? super Execution>> timelines = new CopyOnWriteArrayList();
 
-    /** The event listeners. */
-    private final CopyOnWriteArrayList<Observer<? super Execution>> executionListeners = new CopyOnWriteArrayList();
+    /** The execution time line. */
+    public final Signal<Execution> timeline = new Signal(timelines);
 
     /** The initial execution. */
     private Execution init;
@@ -104,7 +104,6 @@ public class Market {
      */
     public Market(MarketBackend backend, Signal<Execution> log, Class<? extends TradingStrategy> strategy) {
         this.backend = Objects.requireNonNull(backend);
-        this.timeline = new Signal(executionListeners);
 
         // initialize price, balance and executions
         List<BalanceUnit> units = backend.getCurrency().toList();
@@ -366,11 +365,9 @@ public class Market {
         }
 
         // observe executions
-        for (Observer<? super Execution> listener : executionListeners) {
+        for (Observer<? super Execution> listener : timelines) {
             listener.accept(exe);
         }
-
-        strategy.timeline(exe);
     }
 
     /**
@@ -455,26 +452,6 @@ public class Market {
             return constructor.newInstance(this);
         } catch (Exception e) {
             throw I.quiet(e);
-        }
-    }
-
-    /**
-     * @version 2017/08/24 20:13:13
-     */
-    private static class NOP extends TradingStrategy {
-
-        /**
-         * @param market
-         */
-        private NOP(Market market) {
-            super(market);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void timeline(Execution exe) {
         }
     }
 }

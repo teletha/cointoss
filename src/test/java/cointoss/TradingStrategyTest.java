@@ -12,6 +12,7 @@ package cointoss;
 import org.junit.Test;
 
 import eu.verdelhan.ta4j.Decimal;
+import kiss.Variable;
 
 /**
  * @version 2017/09/11 13:24:46
@@ -212,5 +213,57 @@ public class TradingStrategyTest extends TradingStrategyTestSupport {
         exitMarket(Decimal.valueOf(-1));
         assert requestExitSize.is(0);
         assert positionSize.is(1);
+    }
+
+    @Test
+    public void completingEntry() throws Exception {
+        Variable<Boolean> completed = completingEntry.to();
+        assert completed.isAbsent();
+
+        // entry
+        entryLimit(Side.BUY, Decimal.ONE, Decimal.TEN, null);
+        assert completed.isAbsent();
+
+        // execute
+        market.execute(1, 10);
+        assert completed.is(true);
+    }
+
+    @Test
+    public void completingExit() throws Exception {
+        Variable<Boolean> completed = completingExit.to();
+        assert completed.isAbsent();
+
+        // entry
+        entryLimit(Side.BUY, Decimal.ONE, Decimal.TEN, null);
+        market.execute(1, 10);
+        assert completed.isAbsent();
+
+        // exit
+        exitLimit(Decimal.ONE, Decimal.TEN, null);
+        assert completed.isAbsent();
+
+        // execute
+        market.execute(1, 10);
+        assert completed.is(true);
+    }
+
+    @Test
+    public void closingPosition() throws Exception {
+        Variable<Boolean> completed = closingPosition.to();
+        assert completed.isAbsent();
+
+        // entry
+        entryLimit(Side.BUY, Decimal.ONE, Decimal.TEN, null);
+        market.execute(1, 10);
+        assert completed.isAbsent();
+
+        // exit
+        exitLimit(Decimal.ONE, Decimal.TEN, null);
+        assert completed.isAbsent();
+
+        // execute
+        market.execute(1, 10);
+        assert completed.is(true);
     }
 }

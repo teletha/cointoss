@@ -9,7 +9,6 @@
  */
 package cointoss.market.bitflyer;
 
-import cointoss.Execution;
 import cointoss.Market;
 import cointoss.TradingStrategy;
 import eu.verdelhan.ta4j.Decimal;
@@ -35,13 +34,6 @@ public class BitFlyerMonitor extends TradingStrategy {
                     .trend() + "    30min " + market.minute30
                             .trend() + "   1hour " + market.hour1.trend() + "   2hour " + market.hour2.trend());
         });
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void timeline(Execution exe) {
     }
 
     /**

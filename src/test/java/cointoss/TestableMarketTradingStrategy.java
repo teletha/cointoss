@@ -22,11 +22,4 @@ class TestableMarketTradingStrategy extends TradingStrategy {
 
         market.strategy = this;
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void timeline(Execution exe) {
-    }
 }

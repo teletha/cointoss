@@ -180,40 +180,35 @@ public class BackTester {
             super(market);
 
             // various events
-        }
+            market.timeline.to(exe -> {
+                if (hasNoPosition()) {
+                    entryLimit(Side.random(), maxPositionSize, exe.price, entry -> {
+                        System.out.println("Entry " + entry);
+                        calculateUnderline(exe.price);
 
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void timeline(Execution exe) {
-            if (hasNoPosition()) {
-                entryLimit(Side.random(), maxPositionSize, exe.price, entry -> {
-                    System.out.println("Entry " + entry);
-                    calculateUnderline(exe.price);
+                        // cancel timing
+                        market.timeline.takeUntil(completingEntry)
+                                .take(keep(5, MINUTES, entry::isNotCompleted))
+                                .take(1)
+                                .mapTo(entry)
+                                .to(market::cancel);
 
-                    // cancel timing
-                    market.timeline.takeUntil(completingEntry)
-                            .take(keep(5, MINUTES, entry::isNotCompleted))
-                            .take(1)
-                            .mapTo(entry)
-                            .to(market::cancel);
+                        // rise under price line
+                        market.minute1.tick.takeUntil(closingPosition) //
+                                .map(Tick::getClosePrice)
+                                .to(this::calculateUnderline);
 
-                    // rise under price line
-                    market.minute1.tick.takeUntil(closingPosition) //
-                            .map(Tick::getClosePrice)
-                            .to(this::calculateUnderline);
-
-                    // loss cut
-                    market.timeline.takeUntil(closingPosition) //
-                            .take(keep(5, SECONDS, e -> e.price.isLessThan(entry, underPrice)))
-                            .take(1)
-                            .to(e -> {
-                                System.out.println("Exit " + entry + "  " + e);
-                                exitMarket(entry.outstanding_size);
-                            });
-                });
-            }
+                        // loss cut
+                        market.timeline.takeUntil(closingPosition) //
+                                .take(keep(5, SECONDS, e -> e.price.isLessThan(entry, underPrice)))
+                                .take(1)
+                                .to(e -> {
+                                    System.out.println("Exit " + entry + "  " + e);
+                                    exitMarket(entry.outstanding_size);
+                                });
+                    });
+                }
+            });
         }
 
         private void calculateUnderline(Decimal consultation) {
