@@ -353,7 +353,7 @@ public abstract class TradingStrategy {
                     }
                 } else {
                     testing.set(true);
-                    last.set(e.exec_date.plus(time, unit));
+                    last.set(e.exec_date.plus(time, unit).minusNanos(1));
                 }
             } else {
                 if (testing.get()) {

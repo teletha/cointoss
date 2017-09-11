@@ -9,6 +9,8 @@
  */
 package cointoss;
 
+import static java.time.temporal.ChronoUnit.*;
+
 import org.junit.Test;
 
 import eu.verdelhan.ta4j.Decimal;
@@ -265,5 +267,31 @@ public class TradingStrategyTest extends TradingStrategyTestSupport {
         // execute
         market.execute(1, 10);
         assert completed.is(true);
+    }
+
+    @Test
+    public void keep() throws Exception {
+        Variable<Execution> state = market.timeline.take(keep(5, SECONDS, e -> e.price.isLessThan(10))).to();
+        assert state.isAbsent();
+
+        // keep more than 10
+        market.execute(1, 15, 1);
+        market.execute(1, 15, 4);
+        market.execute(1, 15, 8);
+        assert state.isAbsent();
+
+        // keep less than 10 during 3 seconds
+        market.execute(1, 9, 10);
+        market.execute(1, 9, 12);
+        market.execute(1, 15, 13);
+        market.execute(1, 15, 18);
+        assert state.isAbsent();
+
+        // keep less than 10 during 5 seconds
+        market.execute(1, 9, 10);
+        market.execute(1, 9, 12);
+        market.execute(1, 9, 15);
+        market.execute(1, 15, 18);
+        assert state.isPresent();
     }
 }
