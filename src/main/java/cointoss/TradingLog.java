@@ -12,15 +12,15 @@ package cointoss;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.time.DurationFormatUtils;
 
+import cointoss.Trading.Entry;
 import eu.verdelhan.ta4j.Decimal;
 
 /**
- * @version 2017/08/27 18:19:06
+ * @version 2017/09/11 18:31:10
  */
 public class TradingLog {
 
@@ -30,158 +30,114 @@ public class TradingLog {
     /** The duration format. */
     private static final DateTimeFormatter durationHMS = DateTimeFormatter.ofPattern("MM/dd' 'HH:mm:ss");
 
-    /** All trading log. */
-    private final List<Order> orders = new ArrayList(2048);
-
-    /** The market. */
-    private final Market market;
+    /** summary */
+    public LongSummary orderTime = new LongSummary();
 
     /** summary */
-    public int active;
+    public LongSummary holdTime = new LongSummary();
 
     /** summary */
-    public int completed;
+    public AmountSummary profit = new AmountSummary();
 
     /** summary */
-    public int canceled;
+    public AmountSummary loss = new AmountSummary();
 
     /** summary */
-    public int expired;
-
-    /** summary */
-    public int unexecuted;
-
-    /** summary */
-    public LongSummary orderTime;
-
-    /** summary */
-    public LongSummary holdTime;
-
-    /** summary */
-    public AmountSummary profit;
-
-    /** summary */
-    public AmountSummary loss;
-
-    /** summary */
-    public AmountSummary profitAndLoss;
+    public AmountSummary profitAndLoss = new AmountSummary();
 
     /**
-     * @param market
+     * Analyze trading.
      */
-    TradingLog(Market market) {
-        this.market = market;
-    }
+    public TradingLog(Market market, List<Trading> tradings) {
+        int total = 0;
+        int active = 0;
+        int cancel = 0;
 
-    /**
-     * Analyze current trading.
-     */
-    public void analyze() {
-        // initialize
-        active = 0;
-        completed = 0;
-        canceled = 0;
-        unexecuted = 0;
-        orderTime = new LongSummary();
-        holdTime = new LongSummary();
-        profit = new AmountSummary();
-        loss = new AmountSummary();
-        profitAndLoss = new AmountSummary();
+        for (Trading trading : tradings) {
+            for (Entry entry : trading.entries) {
+                total++;
 
-        for (Order entry : orders) {
-            // exclude exit order
-            if (entry.exits.isEmpty()) {
-                if (entry.child_order_state == OrderState.CANCELED) {
-                    canceled++;
+                if (entry.entry.isCanceled()) {
+                    cancel++;
+                    continue;
                 }
-                continue;
-            }
 
-            if (entry.executed_size.isZero()) {
-                unexecuted++;
-            }
+                // calculate entry cost
+                Decimal entrySize = entry.entry.executed_size;
+                Decimal entryCost = entry.entry.average_price.multipliedBy(entrySize);
 
-            // calculate order time
-            ZonedDateTime start = entry.child_order_date;
-            ZonedDateTime finish = entry.executions.get(entry.executions.size() - 1).exec_date;
-            orderTime.add(Duration.between(start, finish).getSeconds());
+                // calculate order time
+                ZonedDateTime start = entry.entry.child_order_date;
+                ZonedDateTime finish = entry.entry.executions.get(entry.entry.executions.size() - 1).exec_date;
+                orderTime.add(Duration.between(start, finish).getSeconds());
 
-            // calculate hold time and profit
-            start = entry.executions.get(0).exec_date;
-            finish = start;
-            Decimal totalExecutedSize = Decimal.ZERO;
-            Decimal totalProfit = Decimal.ZERO;
-            Decimal totalPrice = Decimal.ZERO;
-            int active = 0;
+                // calculate hold time and profit
+                start = entry.entry.executions.get(0).exec_date;
+                finish = start;
+                Decimal exitSize = Decimal.ZERO;
+                Decimal exitCost = Decimal.ZERO;
+                boolean hasActiveExit = false;
 
-            for (Order exit : entry.exits) {
-                switch (exit.child_order_state) {
-                case ACTIVE:
+                for (Order exit : entry.exit) {
+                    exitSize = exitSize.plus(exit.executed_size);
+                    exitCost = exitCost.plus(exit.average_price.multipliedBy(exit.executed_size));
+
+                    if (exit.isAllCompleted()) {
+                        finish = max(finish, exit.executions.get(exit.executions.size() - 1).exec_date);
+                    } else {
+                        hasActiveExit = true;
+                        finish = market.getExecutionLatest().exec_date;
+                    }
+                }
+
+                if (entry.exit.isEmpty()) {
+                    exitCost = market.getLatestPrice();
+                }
+
+                if (entry.exit.isEmpty() || hasActiveExit) {
                     active++;
-                    totalExecutedSize = totalExecutedSize.plus(exit.executed_size);
-                    totalProfit = totalProfit.plus(calculateTradeProfit(entry, exit));
-                    totalPrice = totalPrice.plus(exit.average_price.multipliedBy(exit.executed_size));
-                    break;
-
-                case COMPLETED:
-                    finish = max(finish, exit.executions.get(exit.executions.size() - 1).exec_date);
-                    totalExecutedSize = totalExecutedSize.plus(exit.executed_size);
-                    totalProfit = totalProfit.plus(calculateTradeProfit(entry, exit));
-                    totalPrice = totalPrice.plus(exit.average_price.multipliedBy(exit.executed_size));
-                    break;
-
-                case CANCELED:
-                    totalExecutedSize = totalExecutedSize.plus(exit.executed_size);
-                    totalProfit = totalProfit.plus(calculateTradeProfit(entry, exit));
-                    totalPrice = totalPrice.plus(exit.average_price.multipliedBy(exit.executed_size));
-                    break;
-
-                case EXPIRED:
-                    break;
-
-                case REJECTED:
-                    break;
                 }
-            }
-            holdTime.add(Duration.between(start, finish).getSeconds());
-            profitAndLoss.add(totalProfit);
-            if (totalProfit.isPositive()) {
-                profit.add(totalProfit);
-            } else {
-                loss.add(totalProfit);
-            }
-            if (0 < active) {
-                this.active++;
-            } else {
-                this.completed++;
-            }
 
-            // show bad orders
-            if (totalProfit.isNegative()) {
-                // System.out.println(new StringBuilder() //
-                // .append("注文 ")
-                // .append(durationHMS.format(start))
-                // .append("～")
-                // .append(start == finish ? "\t\t" : durationHMS.format(finish))
-                // .append("\t 損益")
-                // .append(totalProfit.asJPY(4))
-                // .append("\t")
-                // .append(totalExecutedSize)
-                // .append("/")
-                // .append(entry.executed_size)
-                // .append("@")
-                // .append(entry.side().mark())
-                // .append(entry.average_price.asJPY(1))
-                // .append(" → ")
-                // .append(totalExecutedSize.isZero() ? "" :
-                // totalPrice.divide(totalExecutedSize).asJPY(1))
-                // .append("\t")
-                // .append(entry.description() == null ? "" : entry.description())
-                // .toString());
+                // calculate profit and loss
+                Decimal entryProfit;
+
+                if (entry.isBuy()) {
+                    entryProfit = exitCost.minus(entryCost);
+                } else {
+                    entryProfit = entryCost.minus(exitCost);
+                }
+
+                holdTime.add(Duration.between(start, finish).getSeconds());
+                profitAndLoss.add(entryProfit);
+
+                if (entryProfit.isPositive()) {
+                    profit.add(entryProfit);
+                } else {
+                    loss.add(entryProfit);
+                }
+
+                // show bad orders
+                System.out.println(new StringBuilder() //
+                        .append("注文 ")
+                        .append(durationHMS.format(start))
+                        .append("～")
+                        .append(start == finish ? "\t\t" : durationHMS.format(finish))
+                        .append("\t 損益")
+                        .append(entryProfit.asJPY(4))
+                        .append("\t")
+                        .append(exitSize)
+                        .append("/")
+                        .append(entrySize)
+                        .append("@")
+                        .append(entry.side().mark())
+                        .append(entry.entry.average_price.asJPY(1))
+                        .append(" → ")
+                        .append(exitSize.isZero() ? "" : exitCost.dividedBy(exitSize).asJPY(1))
+                        .append("\t")
+                        .append(entry.entry.description() == null ? "" : entry.entry.description())
+                        .toString());
             }
         }
-
-        int order = active + completed + canceled + expired + unexecuted;
 
         StringBuilder builder = new StringBuilder();
         builder.append("発注 ").append(orderTime);
@@ -199,7 +155,7 @@ public class TradingLog {
                 .append(" (勝率")
                 .append((profitAndLoss.positive * 100 / Math.max(profitAndLoss.size, 1)))
                 .append("% ")
-                .append(String.format("総%d 済%d 残%d 中止%d 失効%d 未約定%d)%n", order, completed, active, canceled, expired, unexecuted));
+                .append(String.format("総%d 済%d 残%d 中止%d)%n", total, total - active - cancel, active, cancel));
         builder.append("開始 ").append(format(market.getExecutionInit(), market.getBaseInit(), market.getTargetInit())).append("\r\n");
         builder.append("終了 ")
                 .append(format(market.getExecutionLatest(), market.getBase(), market.getTarget()))
@@ -231,17 +187,6 @@ public class TradingLog {
         } else {
             return exit.isBuy() ? entry.average_price.minus(exit.average_price).multipliedBy(exit.executed_size) : Decimal.ZERO;
         }
-    }
-
-    /**
-     * Logging {@link Order}.
-     * 
-     * @param order
-     */
-    public Order log(Order order) {
-        orders.add(order);
-
-        return order;
     }
 
     /**

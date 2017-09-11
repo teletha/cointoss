@@ -117,13 +117,13 @@ public class TradingTest extends TradingTestSupport {
     @Test
     public void exitLimit() throws Exception {
         // entry and execute
-        entryLimit(Side.BUY, Decimal.ONE, Decimal.TEN, null);
+        Entry entry = entryLimit(Side.BUY, Decimal.ONE, Decimal.TEN, null);
         market.execute(1, 10);
         assert requestEntrySize.is(0);
         assert positionSize.is(1);
 
         // try exit
-        exitLimit(Decimal.ONE, Decimal.TEN, null);
+        entry.exitLimit(Decimal.ONE, Decimal.TEN, null);
         assert requestEntrySize.is(0);
         assert requestExitSize.is(1);
         assert positionSize.is(1);
@@ -137,38 +137,38 @@ public class TradingTest extends TradingTestSupport {
     @Test
     public void exitLimitInvalidParameters() throws Exception {
         // entry and execute
-        entryLimit(Side.BUY, Decimal.ONE, Decimal.TEN, null);
+        Entry entry = entryLimit(Side.BUY, Decimal.ONE, Decimal.TEN, null);
         market.execute(1, 10);
         assert requestEntrySize.is(0);
         assert positionSize.is(1);
 
         // null size
-        exitLimit(null, Decimal.ONE, null);
+        entry.exitLimit(null, Decimal.ONE, null);
         assert requestExitSize.is(0);
         assert positionSize.is(1);
 
         // zero size
-        exitLimit(Decimal.ZERO, Decimal.ONE, null);
+        entry.exitLimit(Decimal.ZERO, Decimal.ONE, null);
         assert requestExitSize.is(0);
         assert positionSize.is(1);
 
         // negative size
-        exitLimit(Decimal.valueOf(-1), Decimal.ONE, null);
+        entry.exitLimit(Decimal.valueOf(-1), Decimal.ONE, null);
         assert requestExitSize.is(0);
         assert positionSize.is(1);
 
         // null price
-        exitLimit(Decimal.ONE, null, null);
+        entry.exitLimit(Decimal.ONE, null, null);
         assert requestExitSize.is(0);
         assert positionSize.is(1);
 
         // zero price
-        exitLimit(Decimal.ONE, Decimal.ZERO, null);
+        entry.exitLimit(Decimal.ONE, Decimal.ZERO, null);
         assert requestExitSize.is(0);
         assert positionSize.is(1);
 
         // negative price
-        exitLimit(Decimal.ONE, Decimal.valueOf(-1), null);
+        entry.exitLimit(Decimal.ONE, Decimal.valueOf(-1), null);
         assert requestExitSize.is(0);
         assert positionSize.is(1);
     }
@@ -176,13 +176,13 @@ public class TradingTest extends TradingTestSupport {
     @Test
     public void exitMarket() throws Exception {
         // entry and execute
-        entryLimit(Side.BUY, Decimal.ONE, Decimal.TEN, null);
+        Entry entry = entryLimit(Side.BUY, Decimal.ONE, Decimal.TEN, null);
         market.execute(1, 10);
         assert requestEntrySize.is(0);
         assert positionSize.is(1);
 
         // try exit
-        exitMarket(Decimal.ONE);
+        entry.exitMarket(Decimal.ONE);
         assert requestEntrySize.is(0);
         assert requestExitSize.is(1);
         assert positionSize.is(1);
@@ -196,23 +196,23 @@ public class TradingTest extends TradingTestSupport {
     @Test
     public void exitMarketInvalidPrameters() throws Exception {
         // entry and execute
-        entryLimit(Side.BUY, Decimal.ONE, Decimal.TEN, null);
+        Entry entry = entryLimit(Side.BUY, Decimal.ONE, Decimal.TEN, null);
         market.execute(1, 10);
         assert requestEntrySize.is(0);
         assert positionSize.is(1);
 
         // null size
-        exitMarket(null);
+        entry.exitMarket(null);
         assert requestExitSize.is(0);
         assert positionSize.is(1);
 
         // zero size
-        exitMarket(Decimal.ZERO);
+        entry.exitMarket(Decimal.ZERO);
         assert requestExitSize.is(0);
         assert positionSize.is(1);
 
         // negative size
-        exitMarket(Decimal.valueOf(-1));
+        entry.exitMarket(Decimal.valueOf(-1));
         assert requestExitSize.is(0);
         assert positionSize.is(1);
     }
@@ -237,12 +237,12 @@ public class TradingTest extends TradingTestSupport {
         assert completed.isAbsent();
 
         // entry
-        entryLimit(Side.BUY, Decimal.ONE, Decimal.TEN, null);
+        Entry entry = entryLimit(Side.BUY, Decimal.ONE, Decimal.TEN, null);
         market.execute(1, 10);
         assert completed.isAbsent();
 
         // exit
-        exitLimit(Decimal.ONE, Decimal.TEN, null);
+        entry.exitLimit(Decimal.ONE, Decimal.TEN, null);
         assert completed.isAbsent();
 
         // execute
@@ -256,12 +256,12 @@ public class TradingTest extends TradingTestSupport {
         assert completed.isAbsent();
 
         // entry
-        entryLimit(Side.BUY, Decimal.ONE, Decimal.TEN, null);
+        Entry entry = entryLimit(Side.BUY, Decimal.ONE, Decimal.TEN, null);
         market.execute(1, 10);
         assert completed.isAbsent();
 
         // exit
-        exitLimit(Decimal.ONE, Decimal.TEN, null);
+        entry.exitLimit(Decimal.ONE, Decimal.TEN, null);
         assert completed.isAbsent();
 
         // execute

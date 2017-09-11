@@ -20,6 +20,6 @@ class TestableMarketTrading extends Trading {
     TestableMarketTrading(Market market) {
         super(market);
 
-        market.strategy = this;
+        market.tradings.add(this);
     }
 }

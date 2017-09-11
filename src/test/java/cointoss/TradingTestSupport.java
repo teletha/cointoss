@@ -27,7 +27,7 @@ public abstract class TradingTestSupport extends Trading {
         super(new TestableMarket());
 
         this.market = (TestableMarket) super.market;
-        this.market.strategy = this;
+        this.market.tradings.add(this);
     }
 
     @Before

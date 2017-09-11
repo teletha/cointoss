@@ -11,6 +11,8 @@ package cointoss;
 
 import java.time.ZonedDateTime;
 import java.time.temporal.TemporalUnit;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
@@ -66,14 +68,15 @@ public abstract class Trading {
     /** The current position average price. */
     protected Decimal positionPrice = Decimal.ZERO;
 
-    /** The entry order. */
-    private Order entry;
+    /** All managed entries. */
+    protected final List<Entry> entries = new ArrayList<>();
 
     /**
      * New Trade.
      */
     protected Trading(Market market) {
         this.market = market;
+        this.market.tradings.add(this);
     }
 
     /**
@@ -127,22 +130,22 @@ public abstract class Trading {
      * @param side
      * @param size
      */
-    protected final void entryLimit(Side side, Decimal size, Decimal price, Consumer<Entry> process) {
+    protected final Entry entryLimit(Side side, Decimal size, Decimal price, Consumer<Entry> process) {
         // check side
         if (side == null) {
-            return;
+            return null;
         }
 
         // check size
         if (size == null || size.isLessThanOrEqual(Decimal.ZERO)) {
-            return;
+            return null;
         }
 
         // check price
         if (price == null || price.isLessThanOrEqual(Decimal.ZERO)) {
-            return;
+            return null;
         }
-        entry(Order.limit(side, size, price), process);
+        return entry(Order.limit(side, size, price), process);
     }
 
     /**
@@ -172,17 +175,19 @@ public abstract class Trading {
      * @param order
      * @param process
      */
-    private void entry(Order order, Consumer<Entry> process) {
+    private Entry entry(Order order, Consumer<Entry> process) {
         // update trade state
         position = order.side();
         requestEntrySize = requestEntrySize.plus(order.size());
 
+        // create new entry
+        Entry entry = new Entry(order);
+        entries.add(entry);
+
         // request order
         market.request(order).to(o -> {
-            entry = o;
-
             if (process != null) {
-                process.accept(new Entry(order));
+                process.accept(entry);
             }
 
             o.notify(exe -> {
@@ -195,65 +200,7 @@ public abstract class Trading {
                 }
             });
         });
-    }
-
-    /**
-     * Request exit order.
-     * 
-     * @param size A exit size.
-     * @param price A exit price.
-     */
-    protected final void exitLimit(Decimal size, Decimal price, Consumer<Order> process) {
-        // check size
-        if (size == null || size.isLessThanOrEqual(Decimal.ZERO)) {
-            return;
-        }
-
-        // check price
-        if (price == null || price.isLessThanOrEqual(Decimal.ZERO)) {
-            return;
-        }
-        exit(Order.limit(position.inverse(), size, price), process);
-    }
-
-    /**
-     * Request exit order.
-     * 
-     * @param size A exit size.
-     */
-    protected final void exitMarket(Decimal size) {
-        // check size
-        if (size == null || size.isLessThanOrEqual(Decimal.ZERO)) {
-            return;
-        }
-        exit(Order.market(position.inverse(), size), null);
-    }
-
-    /**
-     * Request exit order.
-     * 
-     * @param order A exit order.
-     */
-    private void exit(Order order, Consumer<Order> process) {
-        if (hasPosition()) {
-            requestExitSize = requestExitSize.plus(order.size());
-
-            market.request(order.with(entry)).to(o -> {
-                if (process != null) {
-                    process.accept(o);
-                }
-
-                o.notify(exe -> {
-                    managePosition(o, exe, false);
-
-                    if (o.isCompleted()) {
-                        for (Observer<Boolean> observer : completeExits) {
-                            observer.accept(true);
-                        }
-                    }
-                });
-            });
-        }
+        return entry;
     }
 
     /**
@@ -371,14 +318,19 @@ public abstract class Trading {
      */
     public class Entry implements Directional {
 
-        /** The position side. */
-        private final Order order;
+        /** The entry order. */
+        final Order entry;
+
+        /** The list exit orders. */
+        final List<Order> exit = new ArrayList<>();
 
         /**
-         * @param order
+         * Create {@link Entry} with {@link Order}.
+         * 
+         * @param entry A entry order.
          */
-        private Entry(Order order) {
-            this.order = order;
+        private Entry(Order entry) {
+            this.entry = entry;
         }
 
         /**
@@ -386,21 +338,95 @@ public abstract class Trading {
          */
         @Override
         public Side side() {
-            return order.side();
+            return entry.side();
         }
 
         /**
          * @return
          */
         public Decimal remaining() {
-            return order.outstanding_size;
+            return entry.outstanding_size;
         }
 
         /**
          * @return
          */
         public Decimal executed() {
-            return order.executed_size;
+            return entry.executed_size;
+        }
+
+        /**
+         * Request exit order.
+         * 
+         * @param size A exit size.
+         * @param price A exit price.
+         */
+        protected final void exitLimit(Decimal size, Decimal price, Consumer<Order> process) {
+            // check size
+            if (size == null || size.isLessThanOrEqual(Decimal.ZERO)) {
+                return;
+            }
+
+            // check price
+            if (price == null || price.isLessThanOrEqual(Decimal.ZERO)) {
+                return;
+            }
+            exit(Order.limit(position.inverse(), size, price), process);
+        }
+
+        /**
+         * Request exit order.
+         * 
+         * @param size A exit size.
+         */
+        protected final void exitMarket() {
+            // check size
+            exitMarket(executed());
+        }
+
+        /**
+         * Request exit order.
+         * 
+         * @param size A exit size.
+         */
+        protected final void exitMarket(Decimal size) {
+            // check size
+            if (size == null || size.isLessThanOrEqual(Decimal.ZERO)) {
+                return;
+            }
+            exit(Order.market(position.inverse(), size), null);
+        }
+
+        /**
+         * Request exit order.
+         * 
+         * @param order A exit order.
+         */
+        private void exit(Order order, Consumer<Order> process) {
+            System.out.println("call exit request " + hasPosition());
+            if (hasPosition()) {
+                System.out.println("call exit request");
+                requestExitSize = requestExitSize.plus(order.size());
+
+                market.request(order).to(o -> {
+                    exit.add(o);
+                    System.out.println("Exit " + order);
+
+                    if (process != null) {
+                        process.accept(o);
+                    }
+
+                    o.notify(exe -> {
+                        managePosition(o, exe, false);
+
+                        if (o.isCompleted()) {
+                            for (Observer<Boolean> observer : completeExits) {
+                                observer.accept(true);
+                            }
+                        }
+                    });
+                });
+            }
         }
     }
 }

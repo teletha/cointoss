@@ -109,7 +109,7 @@ public class BackTester {
                 .parallel()
                 .mapToObj(i -> new Market(new BackTestBackend(), marketLog.rangeRandom(5), strategy))
                 .forEach(market -> {
-                    market.logger.analyze();
+                    System.out.println(new TradingLog(market, market.tradings));;
                 });
     }
 
@@ -201,22 +201,16 @@ public class BackTester {
                         market.timeline.takeUntil(closingPosition) //
                                 .take(keep(5, SECONDS, e -> e.price.isLessThan(entry, underPrice)))
                                 .take(1)
-                                .to(e -> {
-                                    exitMarket(entry.executed());
-                                });
+                                .effect(e -> System.out.println("exit"))
+                                .to(entry::exitMarket);
                     });
                 }
             });
         }
 
         private void calculateUnderline(Decimal consultation) {
-            Decimal next = consultation.minus(position, 2000);
-            Decimal d = underPrice;
+            Decimal next = consultation.minus(position, 1000);
             underPrice = underPrice == null || next.isGreaterThan(position, underPrice) ? next : underPrice;
-
-            if (d != underPrice) {
-                System.out.println(d + " is up to " + underPrice);
-            }
         }
     }
 }

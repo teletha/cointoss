@@ -11,6 +11,7 @@ package cointoss;
 
 import java.lang.reflect.Constructor;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -23,15 +24,12 @@ import kiss.Observer;
 import kiss.Signal;
 
 /**
- * @version 2017/09/11 15:33:40
+ * @version 2017/09/11 18:26:15
  */
 public class Market {
 
     /** The market handler. */
     protected final MarketBackend backend;
-
-    /** The trading logger. */
-    public final TradingLog logger = new TradingLog(this);
 
     /** CHART */
     public final Chart day7 = new Chart(Duration.ofDays(7));
@@ -95,7 +93,7 @@ public class Market {
     private Decimal targetInit;
 
     /** The current trading. */
-    Trading strategy;
+    final List<Trading> tradings = new ArrayList<>();
 
     /**
      * @param backend
@@ -110,7 +108,7 @@ public class Market {
         this.base = this.baseInit = units.get(0).amount;
         this.target = this.targetInit = units.get(1).amount;
 
-        useStrategy(strategy);
+        create(Objects.requireNonNull(strategy));
         backend.initialize(this, log);
     }
 
@@ -132,18 +130,6 @@ public class Market {
             }
             return next;
         }).delay(1).take(e -> e.cumulativeSize != null && e.cumulativeSize.isGreaterThanOrEqual(threshold));
-    }
-
-    /**
-     * Set trading strategy.
-     * 
-     * @param strategy
-     * @return
-     */
-    public final Market useStrategy(Class<? extends Trading> strategy) {
-        this.strategy = create(Objects.requireNonNull(strategy));
-
-        return this;
     }
 
     /**
@@ -172,7 +158,7 @@ public class Market {
             // store
             orders.add(order);
 
-            return logger.log(order);
+            return order;
         });
     }
 
@@ -314,14 +300,6 @@ public class Market {
         Decimal baseProfit = base.minus(baseInit);
         Decimal targetProfit = target.multipliedBy(latest.price).minus(targetInit.multipliedBy(init.price));
         return baseProfit.plus(targetProfit);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String toString() {
-        return logger.toString();
     }
 
     // ===========================================================
