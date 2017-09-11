@@ -124,12 +124,18 @@ public abstract class TradingStrategy {
      * @param size
      */
     protected final void entryLimit(Side side, Decimal size, Decimal price, Consumer<Order> process) {
-        // ignore invalid parameters
-        if (side == null || size == null || price == null) {
+        // check side
+        if (side == null) {
             return;
         }
 
-        if (size.isLessThanOrEqual(Decimal.ZERO) || price.isLessThanOrEqual(Decimal.ZERO)) {
+        // check size
+        if (size == null || size.isLessThanOrEqual(Decimal.ZERO)) {
+            return;
+        }
+
+        // check price
+        if (price == null || price.isLessThanOrEqual(Decimal.ZERO)) {
             return;
         }
 
@@ -155,12 +161,13 @@ public abstract class TradingStrategy {
      * @param size
      */
     protected final void entryMarket(Side side, Decimal size, Consumer<Order> process) {
-        // ignore invalid parameters
-        if (side == null || size == null) {
+        // check side
+        if (side == null) {
             return;
         }
 
-        if (size.isLessThanOrEqual(Decimal.ZERO)) {
+        // check size
+        if (size == null || size.isLessThanOrEqual(Decimal.ZERO)) {
             return;
         }
 
@@ -178,11 +185,48 @@ public abstract class TradingStrategy {
     }
 
     /**
-     * Request entry order.
+     * Request exit order.
      * 
-     * @param size
+     * @param size A exit size.
+     * @param price A exit price.
+     */
+    protected final void exitLimit(Decimal size, Decimal price, Consumer<Order> process) {
+        // check size
+        if (size == null || size.isLessThanOrEqual(Decimal.ZERO)) {
+            return;
+        }
+
+        // check price
+        if (price == null || price.isLessThanOrEqual(Decimal.ZERO)) {
+            return;
+        }
+
+        if (hasPosition()) {
+            requestExitSize = requestExitSize.plus(size);
+
+            market.request(Order.limit(position.inverse(), size, price).with(entry)).to(order -> {
+                if (process != null) {
+                    process.accept(order);
+                }
+
+                order.notify(e -> {
+                    managePosition(order, e, false);
+                });
+            });
+        }
+    }
+
+    /**
+     * Request exit order.
+     * 
+     * @param size A exit size.
      */
     protected final void exitMarket(Decimal size) {
+        // check size
+        if (size == null || size.isLessThanOrEqual(Decimal.ZERO)) {
+            return;
+        }
+
         if (hasPosition()) {
             requestExitSize = requestExitSize.plus(size);
 
