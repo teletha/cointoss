@@ -124,19 +124,28 @@ public abstract class TradingStrategy {
      * @param size
      */
     protected final void entryLimit(Side side, Decimal size, Decimal price, Consumer<Order> process) {
-        if (position == null || position == side) {
-            position = side;
-            requestEntrySize = requestEntrySize.plus(size);
-
-            market.request(Order.limit(side, size, price)).to(o -> {
-                entry = o;
-                process.accept(o);
-
-                market.timeline.takeUntil(closingPosition).to(e -> {
-                    managePosition(o, e, true);
-                });
-            });
+        // ignore invalid parameters
+        if (side == null || size == null || price == null) {
+            return;
         }
+
+        if (size.isLessThanOrEqual(Decimal.ZERO) || price.isLessThanOrEqual(Decimal.ZERO)) {
+            return;
+        }
+
+        // update trade state
+        position = side;
+        requestEntrySize = requestEntrySize.plus(size);
+
+        // request order
+        market.request(Order.limit(side, size, price)).to(order -> {
+            entry = order;
+            if (process != null) process.accept(order);
+
+            order.notify(e -> {
+                managePosition(order, e, true);
+            });
+        });
     }
 
     /**
@@ -146,14 +155,24 @@ public abstract class TradingStrategy {
      * @param size
      */
     protected final void entryMarket(Side side, Decimal size, Consumer<Order> process) {
+        // ignore invalid parameters
+        if (side == null || size == null) {
+            return;
+        }
+
+        if (size.isLessThanOrEqual(Decimal.ZERO)) {
+            return;
+        }
+
+        position = side;
         requestEntrySize = requestEntrySize.plus(size);
 
-        market.request(Order.market(side, size)).to(o -> {
-            entry = o;
-            process.accept(o);
+        market.request(Order.market(side, size)).to(order -> {
+            entry = order;
+            if (process != null) process.accept(order);
 
-            market.timeline.takeUntil(closingPosition).to(e -> {
-                managePosition(o, e, true);
+            order.notify(e -> {
+                managePosition(order, e, true);
             });
         });
     }
@@ -167,9 +186,9 @@ public abstract class TradingStrategy {
         if (hasPosition()) {
             requestExitSize = requestExitSize.plus(size);
 
-            market.request(Order.market(position.inverse(), size).with(entry)).to(o -> {
-                market.timeline.takeUntil(closingPosition).to(e -> {
-                    managePosition(o, e, false);
+            market.request(Order.market(position.inverse(), size).with(entry)).to(order -> {
+                order.notify(e -> {
+                    managePosition(order, e, false);
                 });
             });
         }
@@ -180,10 +199,10 @@ public abstract class TradingStrategy {
      * 
      * @param oae
      */
-    protected final void close(OrderAndExecution oae) {
-        market.cancel(oae.order).to(id -> {
-
-        });
+    protected final void close() {
+        for (Observer<Boolean> observer : closePositions) {
+            observer.accept(true);
+        }
     }
 
     /**
@@ -287,13 +306,4 @@ public abstract class TradingStrategy {
      * @param exe
      */
     public abstract void timeline(Execution exe);
-
-    /**
-     * Write your trading rule. This method is called from instantiating to clearing position.
-     * 
-     * @param exe
-     */
-    void tick(Execution exe) {
-        timeline(exe);
-    }
 }

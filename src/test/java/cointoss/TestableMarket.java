@@ -12,6 +12,8 @@ package cointoss;
 
 import static cointoss.Time.*;
 
+import java.time.ZonedDateTime;
+
 import cointoss.Time.At;
 import eu.verdelhan.ta4j.Decimal;
 import kiss.Signal;
@@ -21,6 +23,9 @@ import kiss.Table;
  * @version 2017/07/24 23:50:33
  */
 class TestableMarket extends Market {
+
+    /** The starting time. */
+    private final ZonedDateTime base = ZonedDateTime.now().withSecond(0).withNano(0);
 
     /**
      * @param backend
@@ -36,6 +41,28 @@ class TestableMarket extends Market {
      */
     TestableMarket(int delay) {
         super(new TestableMarketBackend(Time.lag(delay)), Signal.EMPTY, TestableMarketTradingStrategy.class);
+    }
+
+    /**
+     * Emulate execution event.
+     * 
+     * @param time
+     * @param size
+     * @param price
+     */
+    TestableMarket execute(int size, int price) {
+        return execute(Side.random(), size, price);
+    }
+
+    /**
+     * Emulate execution event.
+     * 
+     * @param time
+     * @param size
+     * @param price
+     */
+    TestableMarket execute(int size, int price, int time) {
+        return execute(Side.random(), size, price, at(time));
     }
 
     /**

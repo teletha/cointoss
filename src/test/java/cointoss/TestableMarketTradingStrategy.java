@@ -19,6 +19,8 @@ class TestableMarketTradingStrategy extends TradingStrategy {
      */
     TestableMarketTradingStrategy(Market market) {
         super(market);
+
+        market.strategy = this;
     }
 
     /**

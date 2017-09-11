@@ -20,7 +20,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import eu.verdelhan.ta4j.Decimal;
 import kiss.Observer;
-import kiss.Signal;
 
 /**
  * @version 2017/08/24 23:09:32
@@ -255,16 +254,6 @@ public class Order implements Directional {
      * @param entry
      * @return
      */
-    public Order with(OrderAndExecution entry) {
-        return with(entry.order);
-    }
-
-    /**
-     * Associate with entry order.
-     * 
-     * @param entry
-     * @return
-     */
     public Order with(Order entry) {
         if (entry != null) {
             this.entry = entry;
@@ -435,20 +424,15 @@ public class Order implements Directional {
     }
 
     /**
-     * Entry to the specified {@link Market}.
+     * Notify execution event.
      * 
-     * @param market A target market to order.
+     * @param object
      */
-    public Signal<OrderAndExecution> entryTo(Market market) {
-        return new Signal<OrderAndExecution>((observer, disposer) -> {
-            market.request(this).to(o -> {
-                executionListeners.add(observer);
-            });
-
-            return disposer.add(() -> {
-                executionListeners.remove(observer);
-            });
-        });
+    public Order notify(Observer<? super Execution> observer) {
+        if (observer != null) {
+            executionListeners.add(observer);
+        }
+        return this;
     }
 
     /** The server ID */
@@ -485,7 +469,7 @@ public class Order implements Directional {
     public List<Execution> executions = new ArrayList(4);
 
     /** INTERNAL USAGE */
-    CopyOnWriteArrayList<Observer<? super OrderAndExecution>> executionListeners = new CopyOnWriteArrayList<>();
+    CopyOnWriteArrayList<Observer<? super Execution>> executionListeners = new CopyOnWriteArrayList<>();
 
     /**
      * <p>

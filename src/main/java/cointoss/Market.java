@@ -95,7 +95,7 @@ public class Market {
     private Decimal targetInit;
 
     /** The current trading. */
-    private TradingStrategy strategy;
+    TradingStrategy strategy;
 
     /**
      * @param backend
@@ -360,10 +360,8 @@ public class Market {
                 update(order, exe);
             }
 
-            OrderAndExecution oae = new OrderAndExecution(order, exe, this);
-
-            for (Observer<? super OrderAndExecution> listener : order.executionListeners) {
-                listener.accept(oae);
+            for (Observer<? super Execution> listener : order.executionListeners) {
+                listener.accept(exe);
             }
         }
 
@@ -372,7 +370,7 @@ public class Market {
             listener.accept(exe);
         }
 
-        strategy.tick(exe);
+        strategy.timeline(exe);
     }
 
     /**
@@ -478,20 +476,5 @@ public class Market {
         @Override
         public void timeline(Execution exe) {
         }
-    }
-
-    /**
-     * @param profit
-     * @param loss
-     */
-    public Signal<OrderAndExecution> entry(Order profit, Order loss) {
-        AtomicReference<Order> ref = new AtomicReference();
-
-        return profit.entryTo(this).merge(loss.entryTo(this)).take(o -> {
-            if (ref.compareAndSet(null, o.order)) {
-                cancel(o.order == profit ? loss : profit).to();
-            }
-            return ref.get() == o.order;
-        });
     }
 }
