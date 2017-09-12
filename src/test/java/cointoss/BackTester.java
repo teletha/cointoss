@@ -109,7 +109,7 @@ public class BackTester {
                 .parallel()
                 .mapToObj(i -> new Market(new BackTestBackend(), marketLog.rangeRandom(5), strategy))
                 .forEach(market -> {
-                    System.out.println(new TradingLog(market, market.tradings));;
+                    new TradingLog(market, market.tradings);
                 });
     }
 
@@ -170,6 +170,8 @@ public class BackTester {
      */
     private static class BreakoutTrading extends Trading {
 
+        private int update;
+
         private Decimal underPrice;
 
         /**
@@ -182,42 +184,41 @@ public class BackTester {
             // various events
             market.timeline.to(exe -> {
                 if (hasNoPosition()) {
-                    entryLimit(Side.random(), maxPositionSize, exe.price, entry -> {
-                        entry.log(entry.entry.average_price + "でエントリー " + entry.entry.executed_size);
-                        calculateUnderline(exe.price, entry);
+                    entryMarket(Side.random(), maxPositionSize, entry -> {
+                        update = 1;
+                        underPrice = exe.price.minus(entry, 2000);
 
-                        // // cancel timing
-                        // market.timeline.takeUntil(completingEntry)
-                        // .take(keep(5, MINUTES, entry::isNotCompleted))
-                        // .take(1)
-                        // .mapTo(entry)
-                        // .to(market::cancel);
+                        // cancel timing
+                        market.timeline.takeUntil(completingEntry)
+                                .take(keep(5, MINUTES, entry.order::isNotCompleted))
+                                .take(1)
+                                .mapTo(entry.order)
+                                .to(t -> {
+                                    System.out.println("cancel " + entry.order);
+                                    cancel(entry);
+                                });
 
                         // rise under price line
-                        market.minute1.tick.takeUntil(closingPosition) //
+                        market.second10.tick.takeUntil(closingPosition) //
                                 .map(Tick::getClosePrice)
-                                .to(e -> calculateUnderline(e, entry));
+                                .to(e -> {
+                                    Decimal next = e.minus(entry, Math.max(0, 2000 - update * 200));
+
+                                    if (next.isGreaterThan(entry, underPrice)) {
+                                        entry.log("最低価格を%sから%sに再設定 参考値%s", underPrice, next, e);
+                                        update++;
+                                        underPrice = next;
+                                    }
+                                });
 
                         // loss cut
                         market.timeline.takeUntil(closingPosition) //
-                                .take(keep(5, SECONDS, e -> e.price.isLessThan(entry, underPrice)))
+                                .take(keep(4, SECONDS, e -> e.price.isLessThan(entry, underPrice)))
                                 .take(1)
-                                .effect(e -> System.out.println("exit"))
                                 .to(entry::exitMarket);
                     });
                 }
             });
-        }
-
-        private void calculateUnderline(Decimal consultation, Entry entry) {
-            Decimal next = consultation.minus(entry, 2000);
-
-            if (underPrice == null) {
-                underPrice = next;
-            } else if (next.isGreaterThan(entry, underPrice)) {
-                entry.log("最低価格を%sから%sに再設定", underPrice, next);
-                underPrice = next;
-            }
         }
     }
 }

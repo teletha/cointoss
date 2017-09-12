@@ -86,7 +86,7 @@ public interface MarketLog {
      * @return
      */
     default Signal<Execution> rangeRandom(int days) {
-        return range(Span.random(getCacheStart(), getCacheEnd(), days));
+        return range(Span.random(getCacheStart(), getCacheEnd().minusDays(1), days));
     }
 
     /**

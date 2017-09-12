@@ -68,7 +68,7 @@ public class Tick {
     * 
     */
     Tick(Execution exe, Duration duration) {
-        beginTime = exe.exec_date.withSecond(0).withNano(0);
+        beginTime = exe.exec_date.withNano(0);
         endTime = beginTime.plus(duration);
         openPrice = exe.price;
     }

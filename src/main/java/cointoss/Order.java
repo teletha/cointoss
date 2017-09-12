@@ -11,11 +11,9 @@ package cointoss;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.Objects;
-import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import eu.verdelhan.ta4j.Decimal;
@@ -41,12 +39,6 @@ public class Order implements Directional {
     private Decimal triggerPrice;
 
     private Quantity quantity;
-
-    /** INTERNAL USAGE */
-    Order entry;
-
-    /** INTERNAL USAGE */
-    Set<Order> exits = new LinkedHashSet();
 
     /** The description. */
     private String description;
@@ -244,20 +236,6 @@ public class Order implements Directional {
     public Order when(Decimal triggerPrice) {
         if (triggerPrice != null) {
             this.triggerPrice = triggerPrice;
-        }
-        return this;
-    }
-
-    /**
-     * Associate with entry order.
-     * 
-     * @param entry
-     * @return
-     */
-    public Order with(Order entry) {
-        if (entry != null) {
-            this.entry = entry;
-            this.entry.exits.add(this);
         }
         return this;
     }
@@ -466,7 +444,7 @@ public class Order implements Directional {
     public Decimal average_price;
 
     /** INTERNAL USAGE */
-    public List<Execution> executions = new ArrayList(4);
+    public Deque<Execution> executions = new ArrayDeque<>();
 
     /** INTERNAL USAGE */
     CopyOnWriteArrayList<Observer<? super Execution>> executionListeners = new CopyOnWriteArrayList<>();
@@ -502,22 +480,6 @@ public class Order implements Directional {
      */
     public final boolean isCompleted() {
         return child_order_state == OrderState.COMPLETED;
-    }
-
-    /**
-     * <p>
-     * Utility.
-     * </p>
-     * 
-     * @return
-     */
-    public final boolean isAllCompleted() {
-        for (Order exit : exits) {
-            if (exit.isCompleted() == false) {
-                return false;
-            }
-        }
-        return true;
     }
 
     /**
@@ -563,18 +525,6 @@ public class Order implements Directional {
      */
     public final boolean isTradableSizeWith(Execution e) {
         return size().isLessThanOrEqual(e.size);
-    }
-
-    /**
-     * <p>
-     * Calculate new price with the specified diff.
-     * </p>
-     * 
-     * @param diff
-     * @return
-     */
-    public final Decimal calculatePrice(Decimal diff) {
-        return isBuy() ? average_price.plus(diff) : average_price.minus(diff);
     }
 
     /**

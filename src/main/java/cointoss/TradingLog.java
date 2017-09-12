@@ -51,70 +51,63 @@ public class TradingLog {
     public TradingLog(Market market, List<Trading> tradings) {
         int total = 0;
         int active = 0;
+        int complete = 0;
         int cancel = 0;
+        ZonedDateTime latestTime = market.getExecutionLatest().exec_date;
+        Decimal latestPrice = market.getLatestPrice();
 
         for (Trading trading : tradings) {
             for (Entry entry : trading.entries) {
                 total++;
 
-                if (entry.entry.isCanceled()) {
+                // entry
+                Decimal entryExecutedSize = entry.order.executed_size;
+                Decimal entryRemainingSize = entry.order.outstanding_size;
+                Decimal entryCost = entry.order.average_price.multipliedBy(entry.order.executed_size);
+                OrderState entryState = entry.order.child_order_state;
+
+                // exclude canceled entry
+                if (entry.order.isCanceled() && entryExecutedSize.isZero()) {
                     cancel++;
                     continue;
                 }
 
-                // calculate entry cost
-                Decimal entrySize = entry.entry.executed_size;
-                Decimal entryCost = entry.entry.average_price.multipliedBy(entrySize);
-
                 // calculate order time
-                ZonedDateTime start = entry.entry.child_order_date;
-                ZonedDateTime finish = entry.entry.executions.get(entry.entry.executions.size() - 1).exec_date;
+                ZonedDateTime start = entry.order.child_order_date;
+                ZonedDateTime finish = entry.order.executions.isEmpty() ? latestTime : entry.order.executions.getLast().exec_date;
                 orderTime.add(Duration.between(start, finish).getSeconds());
 
                 // calculate hold time and profit
-                start = entry.entry.executions.get(0).exec_date;
                 finish = start;
-                Decimal exitSize = Decimal.ZERO;
-                Decimal exitCost = Decimal.ZERO;
-                boolean hasActiveExit = false;
+                Decimal exitExecutedSize = Decimal.ZERO;
+                Decimal exitRemainingSize = Decimal.ZERO;
+                Decimal exitCost = entry.exit.isEmpty() ? entryExecutedSize.multipliedBy(latestPrice) : Decimal.ZERO;
 
                 for (Order exit : entry.exit) {
-                    exitSize = exitSize.plus(exit.executed_size);
+                    exitExecutedSize = exitExecutedSize.plus(exit.executed_size);
+                    exitRemainingSize = exitRemainingSize.plus(exit.outstanding_size);
                     exitCost = exitCost.plus(exit.average_price.multipliedBy(exit.executed_size));
+                    exitCost = exitCost.plus(market.getLatestPrice().multipliedBy(exit.outstanding_size));
 
-                    if (exit.isAllCompleted()) {
-                        finish = max(finish, exit.executions.get(exit.executions.size() - 1).exec_date);
+                    if (exit.isCompleted()) {
+                        finish = max(finish, exit.executions.getLast().exec_date);
                     } else {
-                        hasActiveExit = true;
                         finish = market.getExecutionLatest().exec_date;
                     }
                 }
 
-                if (entry.exit.isEmpty()) {
-                    exitCost = market.getLatestPrice();
-                }
-
-                if (entry.exit.isEmpty() || hasActiveExit) {
+                if (exitRemainingSize.isPositive() || entry.exit.isEmpty()) {
                     active++;
+                } else {
+                    complete++;
                 }
 
                 // calculate profit and loss
-                Decimal entryProfit;
-
-                if (entry.isBuy()) {
-                    entryProfit = exitCost.minus(entryCost);
-                } else {
-                    entryProfit = entryCost.minus(exitCost);
-                }
-
+                Decimal profitOrLoss = entry.isBuy() ? exitCost.minus(entryCost) : entryCost.minus(exitCost);
+                profitAndLoss.add(profitOrLoss);
+                if (profitOrLoss.isPositive()) profit.add(profitOrLoss);
+                if (profitOrLoss.isNegative()) loss.add(profitOrLoss);
                 holdTime.add(Duration.between(start, finish).getSeconds());
-                profitAndLoss.add(entryProfit);
-
-                if (entryProfit.isPositive()) {
-                    profit.add(entryProfit);
-                } else {
-                    loss.add(entryProfit);
-                }
 
                 // show bad orders
                 System.out.println(new StringBuilder() //
@@ -123,18 +116,18 @@ public class TradingLog {
                         .append("～")
                         .append(start == finish ? "\t\t" : durationHMS.format(finish))
                         .append("\t 損益")
-                        .append(entryProfit.asJPY(4))
+                        .append(profitOrLoss.asJPY(4))
                         .append("\t")
-                        .append(exitSize)
+                        .append(exitExecutedSize)
                         .append("/")
-                        .append(entrySize)
+                        .append(entryExecutedSize)
                         .append("@")
                         .append(entry.side().mark())
-                        .append(entry.entry.average_price.asJPY(1))
+                        .append(entry.order.average_price.asJPY(1))
                         .append(" → ")
-                        .append(exitSize.isZero() ? "" : exitCost.dividedBy(exitSize).asJPY(1))
+                        .append(exitExecutedSize.isZero() ? "" : exitCost.dividedBy(exitExecutedSize).asJPY(1))
                         .append("\t")
-                        .append(entry.entry.description() == null ? "" : entry.entry.description())
+                        .append(entry.order.description() == null ? "" : entry.order.description())
                         .toString());
 
                 for (String log : entry.logs) {
@@ -159,7 +152,7 @@ public class TradingLog {
                 .append(" (勝率")
                 .append((profitAndLoss.positive * 100 / Math.max(profitAndLoss.size, 1)))
                 .append("% ")
-                .append(String.format("総%d 済%d 残%d 中止%d)%n", total, total - active - cancel, active, cancel));
+                .append(String.format("総%d 済%d 残%d 中止%d)%n", total, complete, active, cancel));
         builder.append("開始 ").append(format(market.getExecutionInit(), market.getBaseInit(), market.getTargetInit())).append("\r\n");
         builder.append("終了 ")
                 .append(format(market.getExecutionLatest(), market.getBase(), market.getTarget()))

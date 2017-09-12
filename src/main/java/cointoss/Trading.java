@@ -51,7 +51,7 @@ public abstract class Trading {
     protected final Signal<Boolean> completingExit = new Signal(completeExits);
 
     /** The user setting. */
-    protected Decimal maxPositionSize = Decimal.ONE;
+    protected Decimal maxPositionSize = Decimal.valueOf(0.1);
 
     /** The current position. (null means no position) */
     protected Side position;
@@ -77,6 +77,14 @@ public abstract class Trading {
     protected Trading(Market market) {
         this.market = market;
         this.market.tradings.add(this);
+
+        closingPosition.to(() -> {
+            position = null;
+            requestEntrySize = Decimal.ZERO;
+            requestExitSize = Decimal.ZERO;
+            positionSize = Decimal.ZERO;
+            positionPrice = Decimal.ZERO;
+        });
     }
 
     /**
@@ -191,7 +199,7 @@ public abstract class Trading {
             o.notify(exe -> {
                 managePosition(o, exe, true);
 
-                if (process != null &&ednhtz first.getAndSet(false)) {
+                if (process != null && first.getAndSet(false)) {
                     process.accept(entry);
                 }
 
@@ -316,12 +324,25 @@ public abstract class Trading {
     }
 
     /**
+     * Cancel entry.
+     * 
+     * @param entry
+     */
+    protected final void cancel(Entry entry) {
+        if (entry != null && entry.order.isNotCompleted()) {
+            market.cancel(entry.order).to(id -> {
+                close();
+            });
+        }
+    }
+
+    /**
      * @version 2017/09/11 16:57:47
      */
     public class Entry implements Directional {
 
         /** The entry order. */
-        final Order entry;
+        final Order order;
 
         /** The list exit orders. */
         final List<Order> exit = new ArrayList<>();
@@ -335,7 +356,7 @@ public abstract class Trading {
          * @param entry A entry order.
          */
         private Entry(Order entry) {
-            this.entry = entry;
+            this.order = entry;
         }
 
         /**
@@ -343,21 +364,21 @@ public abstract class Trading {
          */
         @Override
         public Side side() {
-            return entry.side();
+            return order.side();
         }
 
         /**
          * @return
          */
         public Decimal remaining() {
-            return entry.outstanding_size;
+            return order.outstanding_size;
         }
 
         /**
          * @return
          */
         public Decimal executed() {
-            return entry.executed_size;
+            return order.executed_size;
         }
 
         /**
@@ -387,6 +408,10 @@ public abstract class Trading {
         protected final void exitMarket() {
             // check size
             exitMarket(executed());
+
+            if (!remaining().isZero()) {
+                market.cancel(order).to();
+            }
         }
 
         /**
@@ -408,14 +433,11 @@ public abstract class Trading {
          * @param order A exit order.
          */
         private void exit(Order order, Consumer<Order> process) {
-            System.out.println("call exit request " + hasPosition());
             if (hasPosition()) {
-                System.out.println("call exit request");
                 requestExitSize = requestExitSize.plus(order.size());
 
                 market.request(order).to(o -> {
                     exit.add(o);
-                    System.out.println("Exit " + order);
 
                     if (process != null) {
                         process.accept(o);

@@ -65,8 +65,17 @@ public class Market {
     public final Chart minute5 = new Chart(Duration.ofMinutes(5));
 
     /** CHART */
-    public final Chart minute1 = new Chart(Duration
-            .ofMinutes(1), minute5, minute15, minute30, hour1, hour2, hour4, hour6, hour12, day1, day3, day7);
+    public final Chart minute1 = new Chart(Duration.ofMinutes(1));
+
+    /** CHART */
+    public final Chart second30 = new Chart(Duration.ofSeconds(30));
+
+    /** CHART */
+    public final Chart second20 = new Chart(Duration.ofSeconds(20));
+
+    /** CHART */
+    public final Chart second10 = new Chart(Duration
+            .ofSeconds(10), second20, second30, minute1, minute5, minute15, minute30, hour1, hour2, hour4, hour6, hour12, day1, day3, day7);
 
     /** The execution listeners. */
     private final CopyOnWriteArrayList<Observer<? super Execution>> timelines = new CopyOnWriteArrayList();
@@ -330,7 +339,7 @@ public class Market {
         }
         latest = exe;
 
-        minute1.tick(exe);
+        second10.tick(exe);
 
         for (Order order : orders) {
             if (order.id().equals(exe.buy_child_order_acceptance_id) || order.id().equals(exe.sell_child_order_acceptance_id)) {
