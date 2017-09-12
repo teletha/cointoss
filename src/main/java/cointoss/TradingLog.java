@@ -136,6 +136,10 @@ public class TradingLog {
                         .append("\t")
                         .append(entry.entry.description() == null ? "" : entry.entry.description())
                         .toString());
+
+                for (String log : entry.logs) {
+                    System.out.println("   " + log);
+                }
             }
         }
 

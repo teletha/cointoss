@@ -183,7 +183,8 @@ public class BackTester {
             market.timeline.to(exe -> {
                 if (hasNoPosition()) {
                     entryLimit(Side.random(), maxPositionSize, exe.price, entry -> {
-                        calculateUnderline(exe.price);
+                        entry.log(entry.entry.average_price + "でエントリー " + entry.entry.executed_size);
+                        calculateUnderline(exe.price, entry);
 
                         // // cancel timing
                         // market.timeline.takeUntil(completingEntry)
@@ -195,7 +196,7 @@ public class BackTester {
                         // rise under price line
                         market.minute1.tick.takeUntil(closingPosition) //
                                 .map(Tick::getClosePrice)
-                                .to(this::calculateUnderline);
+                                .to(e -> calculateUnderline(e, entry));
 
                         // loss cut
                         market.timeline.takeUntil(closingPosition) //
@@ -208,9 +209,15 @@ public class BackTester {
             });
         }
 
-        private void calculateUnderline(Decimal consultation) {
-            Decimal next = consultation.minus(position, 1000);
-            underPrice = underPrice == null || next.isGreaterThan(position, underPrice) ? next : underPrice;
+        private void calculateUnderline(Decimal consultation, Entry entry) {
+            Decimal next = consultation.minus(entry, 2000);
+
+            if (underPrice == null) {
+                underPrice = next;
+            } else if (next.isGreaterThan(entry, underPrice)) {
+                entry.log("最低価格を%sから%sに再設定", underPrice, next);
+                underPrice = next;
+            }
         }
     }
 }

@@ -186,12 +186,14 @@ public abstract class Trading {
 
         // request order
         market.request(order).to(o -> {
-            if (process != null) {
-                process.accept(entry);
-            }
+            AtomicBoolean first = new AtomicBoolean(true);
 
             o.notify(exe -> {
                 managePosition(o, exe, true);
+
+                if (process != null &&ednhtz first.getAndSet(false)) {
+                    process.accept(entry);
+                }
 
                 if (o.isCompleted()) {
                     for (Observer<Boolean> observer : completeEntries) {
@@ -324,6 +326,9 @@ public abstract class Trading {
         /** The list exit orders. */
         final List<Order> exit = new ArrayList<>();
 
+        /** The detail log. */
+        final List<String> logs = new ArrayList();
+
         /**
          * Create {@link Entry} with {@link Order}.
          * 
@@ -427,6 +432,18 @@ public abstract class Trading {
                     });
                 });
             }
+        }
+
+        /**
+         * <p>
+         * Write detail log.
+         * </p>
+         * 
+         * @param message
+         * @param params
+         */
+        protected void log(String message, Object... params) {
+            logs.add(String.format(message, params));
         }
     }
 }

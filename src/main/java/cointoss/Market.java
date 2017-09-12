@@ -335,10 +335,10 @@ public class Market {
         for (Order order : orders) {
             if (order.id().equals(exe.buy_child_order_acceptance_id) || order.id().equals(exe.sell_child_order_acceptance_id)) {
                 update(order, exe);
-            }
 
-            for (Observer<? super Execution> listener : order.executionListeners) {
-                listener.accept(exe);
+                for (Observer<? super Execution> listener : order.executionListeners) {
+                    listener.accept(exe);
+                }
             }
         }
 
