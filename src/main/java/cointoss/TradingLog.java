@@ -75,6 +75,10 @@ public class TradingLog {
                 // calculate order time
                 ZonedDateTime start = entry.order.child_order_date;
                 ZonedDateTime finish = entry.order.executions.isEmpty() ? latestTime : entry.order.executions.getLast().exec_date;
+                if (start.isAfter(finish)) {
+                    System.out.println(entry.order);
+                    System.out.println(latestTime);
+                }
                 orderTime.add(Duration.between(start, finish).getSeconds());
 
                 // calculate hold time and profit
@@ -107,31 +111,33 @@ public class TradingLog {
                 profitAndLoss.add(profitOrLoss);
                 if (profitOrLoss.isPositive()) profit.add(profitOrLoss);
                 if (profitOrLoss.isNegative()) loss.add(profitOrLoss);
-                holdTime.add(Duration.between(start, finish).getSeconds());
+                if (start != finish) holdTime.add(Duration.between(start, finish).getSeconds());
 
                 // show bad orders
-                System.out.println(new StringBuilder() //
-                        .append("注文 ")
-                        .append(durationHMS.format(start))
-                        .append("～")
-                        .append(start == finish ? "\t\t" : durationHMS.format(finish))
-                        .append("\t 損益")
-                        .append(profitOrLoss.asJPY(4))
-                        .append("\t")
-                        .append(exitExecutedSize)
-                        .append("/")
-                        .append(entryExecutedSize)
-                        .append("@")
-                        .append(entry.side().mark())
-                        .append(entry.order.average_price.asJPY(1))
-                        .append(" → ")
-                        .append(exitExecutedSize.isZero() ? "" : exitCost.dividedBy(exitExecutedSize).asJPY(1))
-                        .append("\t")
-                        .append(entry.order.description() == null ? "" : entry.order.description())
-                        .toString());
+                if (profitOrLoss.isNegative()) {
+                    System.out.println(new StringBuilder() //
+                            .append("注文 ")
+                            .append(durationHMS.format(start))
+                            .append("～")
+                            .append(start == finish ? "\t\t" : durationHMS.format(finish))
+                            .append("\t 損益")
+                            .append(profitOrLoss.asJPY(4))
+                            .append("\t")
+                            .append(exitExecutedSize)
+                            .append("/")
+                            .append(entryExecutedSize)
+                            .append("@")
+                            .append(entry.side().mark())
+                            .append(entry.order.average_price.asJPY(1))
+                            .append(" → ")
+                            .append(exitExecutedSize.isZero() ? "" : exitCost.dividedBy(exitExecutedSize).asJPY(1))
+                            .append("\t")
+                            .append(entry.order.description() == null ? "" : entry.order.description())
+                            .toString());
 
-                for (String log : entry.logs) {
-                    System.out.println("   " + log);
+                    for (String log : entry.logs) {
+                        System.out.println("   " + log);
+                    }
                 }
             }
         }

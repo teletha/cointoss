@@ -13,7 +13,6 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.Objects;
-import java.util.function.UnaryOperator;
 
 import cointoss.Directional;
 import kiss.Decoder;
@@ -26,7 +25,7 @@ public class Decimal implements Comparable<Decimal> {
 
     private static final long serialVersionUID = 2225130444465033658L;
 
-    public static final MathContext MATH_CONTEXT = new MathContext(32, RoundingMode.HALF_UP);
+    public static final MathContext MATH_CONTEXT = new MathContext(16, RoundingMode.HALF_UP);
 
     /** Not-a-Number instance (infinite error) */
     public static final Decimal NaN = new Decimal();

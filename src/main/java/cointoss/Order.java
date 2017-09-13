@@ -10,7 +10,6 @@
 package cointoss;
 
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Objects;
@@ -23,9 +22,6 @@ import kiss.Observer;
  * @version 2017/08/24 23:09:32
  */
 public class Order implements Directional {
-
-    /** The date format. */
-    private static final DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'hh:mm:ss.SSS");
 
     /** The ordered position. */
     private Side side;
@@ -532,8 +528,7 @@ public class Order implements Directional {
      */
     @Override
     public String toString() {
-        return side.mark() + size + "@" + average_price + " 残" + outstanding_size + " 済" + executed_size + " " + format
-                .format(child_order_date);
+        return side.mark() + size + "@" + average_price + " 残" + outstanding_size + " 済" + executed_size + " " + child_order_date;
     }
 
 }
