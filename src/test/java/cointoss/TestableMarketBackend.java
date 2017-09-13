@@ -212,8 +212,9 @@ class TestableMarketBackend implements MarketBackend {
             if (order.isTradablePriceWith(e)) {
                 Decimal executedSize = e.size.min(order.outstanding_size);
                 if (order.child_order_type.isMarket() && executedSize.isNot(0)) {
+                    order.marketMinPrice = order.isBuy() ? order.marketMinPrice.max(e.price) : order.marketMinPrice.min(e.price);
                     order.average_price = order.average_price.multipliedBy(order.executed_size)
-                            .plus(e.price.multipliedBy(executedSize))
+                            .plus(order.marketMinPrice.multipliedBy(executedSize))
                             .dividedBy(order.executed_size.plus(executedSize));
                 }
                 order.outstanding_size = order.outstanding_size.minus(executedSize);
@@ -222,7 +223,7 @@ class TestableMarketBackend implements MarketBackend {
                 Execution exe = new Execution();
                 exe.side = order.side();
                 exe.size = executedSize;
-                exe.price = order.child_order_type.isMarket() ? e.price : order.average_price;
+                exe.price = order.child_order_type.isMarket() ? order.marketMinPrice : order.average_price;
                 exe.exec_date = e.exec_date;
                 exe.buy_child_order_acceptance_id = order.isBuy() ? order.child_order_acceptance_id : e.buy_child_order_acceptance_id;
                 exe.sell_child_order_acceptance_id = order.isSell() ? order.child_order_acceptance_id : e.sell_child_order_acceptance_id;
@@ -253,6 +254,9 @@ class TestableMarketBackend implements MarketBackend {
 
         /** The trigger state. */
         private boolean triggerArchived;
+
+        /** The minimum price for market order. */
+        private Decimal marketMinPrice = isBuy() ? Decimal.ZERO : Decimal.MAX;
 
         /**
          * @param o
