@@ -201,8 +201,9 @@ public class BackTester {
                         // rise under price line
                         market.second10.tick.takeUntil(closingPosition) //
                                 .map(Tick::getClosePrice)
+                                .takeAt(i -> i % 15 == 0)
                                 .to(e -> {
-                                    Decimal next = e.minus(entry, Math.max(0, 2000 - update * 200));
+                                    Decimal next = e.minus(entry, Math.max(0, 2000 - update * 100));
 
                                     if (next.isGreaterThan(entry, underPrice)) {
                                         entry.log("最低価格を%sから%sに再設定 参考値%s", underPrice, next, e);
@@ -213,7 +214,7 @@ public class BackTester {
 
                         // loss cut
                         market.timeline.takeUntil(closingPosition) //
-                                .take(keep(4, SECONDS, e -> e.price.isLessThan(entry, underPrice)))
+                                .take(keep(10, SECONDS, e -> e.price.isLessThan(entry, underPrice)))
                                 .take(1)
                                 .to(entry::exitMarket);
                     });

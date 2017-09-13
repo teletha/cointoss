@@ -75,11 +75,7 @@ public class TradingLog {
                 // calculate order time
                 ZonedDateTime start = entry.order.child_order_date;
                 ZonedDateTime finish = entry.order.executions.isEmpty() ? latestTime : entry.order.executions.getLast().exec_date;
-                if (start.isAfter(finish)) {
-                    System.out.println(entry.order);
-                    System.out.println(latestTime);
-                }
-                orderTime.add(Duration.between(start, finish).getSeconds());
+                if (start.isBefore(finish)) orderTime.add(Duration.between(start, finish).getSeconds());
 
                 // calculate hold time and profit
                 finish = start;

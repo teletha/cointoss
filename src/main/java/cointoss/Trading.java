@@ -51,7 +51,7 @@ public abstract class Trading {
     protected final Signal<Boolean> completingExit = new Signal(completeExits);
 
     /** The user setting. */
-    protected Decimal maxPositionSize = Decimal.valueOf(0.1);
+    protected Decimal maxPositionSize = Decimal.valueOf(0.01);
 
     /** The current position. (null means no position) */
     protected Side position;
