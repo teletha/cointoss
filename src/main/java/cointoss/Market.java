@@ -183,6 +183,10 @@ public class Market {
         return backend.cancel(order.child_order_acceptance_id).effect(id -> {
             orders.remove(order);
             order.child_order_state = OrderState.CANCELED;
+
+            for (Observer<? super Order> listener : order.cancelListeners) {
+                listener.accept(order);
+            }
         });
     }
 
@@ -345,7 +349,7 @@ public class Market {
             if (order.id().equals(exe.buy_child_order_acceptance_id) || order.id().equals(exe.sell_child_order_acceptance_id)) {
                 update(order, exe);
 
-                for (Observer<? super Execution> listener : order.executionListeners) {
+                for (Observer<? super Execution> listener : order.executeListeners) {
                     listener.accept(exe);
                 }
             }

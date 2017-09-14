@@ -202,7 +202,7 @@ public class TradingTest extends TradingTestSupport {
         assert positionSize.is(1);
 
         // null size
-        entry.exitMarket(null);
+        entry.exitMarket((Decimal) null);
         assert requestExitSize.is(0);
         assert positionSize.is(1);
 

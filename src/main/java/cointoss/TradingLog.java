@@ -85,13 +85,16 @@ public class TradingLog {
 
                 for (Order exit : entry.exit) {
                     exitExecutedSize = exitExecutedSize.plus(exit.executed_size);
-                    exitRemainingSize = exitRemainingSize.plus(exit.outstanding_size);
                     exitCost = exitCost.plus(exit.average_price.multipliedBy(exit.executed_size));
-                    exitCost = exitCost.plus(market.getLatestPrice().multipliedBy(exit.outstanding_size));
+
+                    if (!exit.isCanceled()) {
+                        exitRemainingSize = exitRemainingSize.plus(exit.outstanding_size);
+                        exitCost = exitCost.plus(market.getLatestPrice().multipliedBy(exit.outstanding_size));
+                    }
 
                     if (exit.isCompleted()) {
                         finish = max(finish, exit.executions.getLast().exec_date);
-                    } else {
+                    } else if (!exit.isCanceled()) {
                         finish = market.getExecutionLatest().exec_date;
                     }
                 }

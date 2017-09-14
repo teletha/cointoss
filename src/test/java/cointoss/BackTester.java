@@ -201,9 +201,9 @@ public class BackTester {
                         // rise under price line
                         market.second10.tick.takeUntil(closingPosition) //
                                 .map(Tick::getClosePrice)
-                                .takeAt(i -> i % 15 == 0)
+                                .takeAt(i -> i % 5 == 0)
                                 .to(e -> {
-                                    Decimal next = e.minus(entry, Math.max(0, 2000 - update * 100));
+                                    Decimal next = e.minus(entry, Math.max(0, 2000 - update * 200));
 
                                     if (next.isGreaterThan(entry, underPrice)) {
                                         entry.log("最低価格を%sから%sに再設定 参考値%s", underPrice, next, e);
@@ -216,7 +216,21 @@ public class BackTester {
                         market.timeline.takeUntil(closingPosition) //
                                 .take(keep(10, SECONDS, e -> e.price.isLessThan(entry, underPrice)))
                                 .take(1)
-                                .to(entry::exitMarket);
+                                .to(e -> {
+                                    entry.exitLimit(entry.executed(), underPrice, exit -> {
+                                        entry.log("10秒以上約定値が%s以下になったので指値で決済開始", underPrice);
+
+                                        market.timeline.takeUntil(completingEntry)
+                                                .take(keep(30, SECONDS, exit::isNotCompleted))
+                                                .take(1)
+                                                .to(x -> {
+                                                    market.cancel(exit).to(() -> {
+                                                        entry.log("30秒待っても処理されないので指値をキャンセルして成行決済 " + exit.outstanding_size);
+                                                        entry.exitMarket(exit.outstanding_size);
+                                                    });
+                                                });
+                                    });
+                                });
                     });
                 }
             });

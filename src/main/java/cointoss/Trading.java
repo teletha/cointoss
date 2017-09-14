@@ -51,7 +51,7 @@ public abstract class Trading {
     protected final Signal<Boolean> completingExit = new Signal(completeExits);
 
     /** The user setting. */
-    protected Decimal maxPositionSize = Decimal.valueOf(0.01);
+    protected Decimal maxPositionSize = Decimal.valueOf(1);
 
     /** The current position. (null means no position) */
     protected Side position;
@@ -181,9 +181,9 @@ public abstract class Trading {
      * </p>
      * 
      * @param order
-     * @param process
+     * @param initializer
      */
-    private Entry entry(Order order, Consumer<Entry> process) {
+    private Entry entry(Order order, Consumer<Entry> initializer) {
         // update trade state
         position = order.side();
         requestEntrySize = requestEntrySize.plus(order.size());
@@ -194,14 +194,10 @@ public abstract class Trading {
 
         // request order
         market.request(order).to(o -> {
-            AtomicBoolean first = new AtomicBoolean(true);
+            if (initializer != null) initializer.accept(entry);
 
-            o.notify(exe -> {
+            o.execute.to(exe -> {
                 managePosition(o, exe, true);
-
-                if (process != null && first.getAndSet(false)) {
-                    process.accept(entry);
-                }
 
                 if (o.isCompleted()) {
                     for (Observer<Boolean> observer : completeEntries) {
@@ -337,6 +333,19 @@ public abstract class Trading {
     }
 
     /**
+     * Cancel entry.
+     * 
+     * @param order
+     */
+    protected final void cancel(Order order) {
+        if (order != null && order.isNotCompleted()) {
+            market.cancel(order).to(id -> {
+
+            });
+        }
+    }
+
+    /**
      * @version 2017/09/11 16:57:47
      */
     public class Entry implements Directional {
@@ -406,8 +415,17 @@ public abstract class Trading {
          * @param size A exit size.
          */
         protected final void exitMarket() {
+            exitMarket((Consumer<Order>) null);
+        }
+
+        /**
+         * Request exit order.
+         * 
+         * @param size A exit size.
+         */
+        protected final void exitMarket(Consumer<Order> process) {
             // check size
-            exitMarket(executed());
+            exitMarket(executed(), process);
 
             if (!remaining().isZero()) {
                 market.cancel(order).to();
@@ -420,11 +438,20 @@ public abstract class Trading {
          * @param size A exit size.
          */
         protected final void exitMarket(Decimal size) {
+            exitMarket(size, null);
+        }
+
+        /**
+         * Request exit order.
+         * 
+         * @param size A exit size.
+         */
+        protected final void exitMarket(Decimal size, Consumer<Order> process) {
             // check size
             if (size == null || size.isLessThanOrEqual(Decimal.ZERO)) {
                 return;
             }
-            exit(Order.market(position.inverse(), size), null);
+            exit(Order.market(position.inverse(), size), process);
         }
 
         /**
@@ -432,24 +459,23 @@ public abstract class Trading {
          * 
          * @param order A exit order.
          */
-        private void exit(Order order, Consumer<Order> process) {
+        private void exit(Order order, Consumer<Order> initializer) {
             if (hasPosition()) {
                 requestExitSize = requestExitSize.plus(order.size());
+                order.cancel.to(() -> requestExitSize = requestExitSize.minus(order.outstanding_size));
 
                 market.request(order).to(o -> {
+                    if (initializer != null) initializer.accept(o);
                     exit.add(o);
 
-                    if (process != null) {
-                        process.accept(o);
-                    }
-
-                    o.notify(exe -> {
+                    o.execute.to(exe -> {
                         managePosition(o, exe, false);
 
                         if (o.isCompleted()) {
                             for (Observer<Boolean> observer : completeExits) {
                                 observer.accept(true);
                             }
+                            log("Exit " + o + "  " + positionSize + "  " + requestEntrySize + " " + requestExitSize);
                         }
                     });
                 });

@@ -17,6 +17,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import eu.verdelhan.ta4j.Decimal;
 import kiss.Observer;
+import kiss.Signal;
 
 /**
  * @version 2017/08/24 23:09:32
@@ -38,6 +39,18 @@ public class Order implements Directional {
 
     /** The description. */
     private String description;
+
+    /** The event listeners. */
+    final CopyOnWriteArrayList<Observer<? super Execution>> executeListeners = new CopyOnWriteArrayList<>();
+
+    /** The execution signal. */
+    public final Signal<Execution> execute = new Signal(executeListeners);
+
+    /** The event listeners. */
+    final CopyOnWriteArrayList<Observer<? super Order>> cancelListeners = new CopyOnWriteArrayList<>();
+
+    /** The execution signal. */
+    public final Signal<Order> cancel = new Signal(cancelListeners);
 
     /**
      * <p>
@@ -397,18 +410,6 @@ public class Order implements Directional {
         GoodTillCnaceled, ImmediateOrCancel, FillOrKill;
     }
 
-    /**
-     * Notify execution event.
-     * 
-     * @param object
-     */
-    public Order notify(Observer<? super Execution> observer) {
-        if (observer != null) {
-            executionListeners.add(observer);
-        }
-        return this;
-    }
-
     /** The server ID */
     public String child_order_acceptance_id;
 
@@ -441,9 +442,6 @@ public class Order implements Directional {
 
     /** INTERNAL USAGE */
     public Deque<Execution> executions = new ArrayDeque<>();
-
-    /** INTERNAL USAGE */
-    CopyOnWriteArrayList<Observer<? super Execution>> executionListeners = new CopyOnWriteArrayList<>();
 
     /**
      * <p>
