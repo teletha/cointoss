@@ -113,7 +113,7 @@ public class TradingLog {
                 if (start != finish) holdTime.add(Duration.between(start, finish).getSeconds());
 
                 // show bad orders
-                if (profitOrLoss.isNegative()) {
+                if (profitOrLoss.isNegative() || true) {
                     System.out.println(new StringBuilder() //
                             .append("注文 ")
                             .append(durationHMS.format(start))
