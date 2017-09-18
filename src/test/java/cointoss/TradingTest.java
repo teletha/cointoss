@@ -23,95 +23,76 @@ public class TradingTest extends TradingTestSupport {
 
     @Test
     public void entryLimit() throws Exception {
-        assert requestEntrySize.is(0);
-        assert positionSize.is(0);
+        assert hasPosition() == false;
 
         // try entry
-        entryLimit(Side.BUY, Decimal.ONE, Decimal.TEN, null);
-        assert requestEntrySize.is(1);
-        assert positionSize.is(0);
+        Entry entry = entryLimit(Side.BUY, Decimal.ONE, Decimal.TEN, null);
+        assert entry.remaining().is(0);
 
         // execute
         market.execute(1, 10);
-        assert requestEntrySize.is(0);
-        assert positionSize.is(1);
+        entry.remaining().is(1);
     }
 
     @Test
     public void entryLimitInvalidParameters() throws Exception {
         // null side
-        entryLimit(null, Decimal.ONE, Decimal.ONE, null);
-        assert requestEntrySize.is(0);
-        assert positionSize.is(0);
+        Entry entry = entryLimit(null, Decimal.ONE, Decimal.ONE, null);
+        assert entry == null;
 
         // null size
-        entryLimit(Side.BUY, null, Decimal.ONE, null);
-        assert requestEntrySize.is(0);
-        assert positionSize.is(0);
+        entry = entryLimit(Side.BUY, null, Decimal.ONE, null);
+        assert entry == null;
 
         // zero size
-        entryLimit(Side.BUY, Decimal.ZERO, Decimal.ONE, null);
-        assert requestEntrySize.is(0);
-        assert positionSize.is(0);
+        entry = entryLimit(Side.BUY, Decimal.ZERO, Decimal.ONE, null);
+        assert entry == null;
 
         // negative size
-        entryLimit(Side.BUY, Decimal.valueOf(-1), Decimal.ONE, null);
-        assert requestEntrySize.is(0);
-        assert positionSize.is(0);
+        entry = entryLimit(Side.BUY, Decimal.valueOf(-1), Decimal.ONE, null);
+        assert entry == null;
 
         // null price
-        entryLimit(Side.BUY, Decimal.ONE, null, null);
-        assert requestEntrySize.is(0);
-        assert positionSize.is(0);
+        entry = entryLimit(Side.BUY, Decimal.ONE, null, null);
+        assert entry == null;
 
         // zero price
-        entryLimit(Side.BUY, Decimal.ONE, Decimal.ZERO, null);
-        assert requestEntrySize.is(0);
-        assert positionSize.is(0);
+        entry = entryLimit(Side.BUY, Decimal.ONE, Decimal.ZERO, null);
+        assert entry == null;
 
         // negative price
-        entryLimit(Side.BUY, Decimal.ONE, Decimal.valueOf(-1), null);
-        assert requestEntrySize.is(0);
-        assert positionSize.is(0);
+        entry = entryLimit(Side.BUY, Decimal.ONE, Decimal.valueOf(-1), null);
+        assert entry == null;
     }
 
     @Test
     public void entryMarket() throws Exception {
-        assert requestEntrySize.is(0);
-        assert positionSize.is(0);
-
         // try entry
-        entryMarket(Side.BUY, Decimal.ONE, null);
-        assert requestEntrySize.is(1);
-        assert positionSize.is(0);
+        Entry entry = entryMarket(Side.BUY, Decimal.ONE, null);
+        assert entry.remaining().is(0);
 
         // execute
         market.execute(1, 10);
-        assert requestEntrySize.is(0);
-        assert positionSize.is(1);
+        assert entry.remaining().is(1);
     }
 
     @Test
     public void entryMarketInvalidParameters() throws Exception {
         // null side
-        entryMarket(null, Decimal.ONE, null);
-        assert requestEntrySize.is(0);
-        assert positionSize.is(0);
+        Entry entry = entryMarket(null, Decimal.ONE, null);
+        assert entry == null;
 
         // null size
-        entryMarket(Side.BUY, null, null);
-        assert requestEntrySize.is(0);
-        assert positionSize.is(0);
+        entry = entryMarket(Side.BUY, null, null);
+        assert entry == null;
 
         // zero size
-        entryMarket(Side.BUY, Decimal.ZERO, null);
-        assert requestEntrySize.is(0);
-        assert positionSize.is(0);
+        entry = entryMarket(Side.BUY, Decimal.ZERO, null);
+        assert entry == null;
 
         // negative size
-        entryMarket(Side.BUY, Decimal.valueOf(-1), null);
-        assert requestEntrySize.is(0);
-        assert positionSize.is(0);
+        entry = entryMarket(Side.BUY, Decimal.valueOf(-1), null);
+        assert entry == null;
     }
 
     @Test
@@ -119,19 +100,14 @@ public class TradingTest extends TradingTestSupport {
         // entry and execute
         Entry entry = entryLimit(Side.BUY, Decimal.ONE, Decimal.TEN, null);
         market.execute(1, 10);
-        assert requestEntrySize.is(0);
-        assert positionSize.is(1);
+        assert entry.remaining().is(1);
 
         // try exit
         entry.exitLimit(Decimal.ONE, Decimal.TEN, null);
-        assert requestEntrySize.is(0);
-        assert requestExitSize.is(1);
-        assert positionSize.is(1);
+        assert entry.remaining().is(1);
 
         market.execute(1, 10);
-        assert requestEntrySize.is(0);
-        assert requestExitSize.is(0);
-        assert positionSize.is(0);
+        assert entry.remaining().is(0);
     }
 
     @Test
@@ -139,38 +115,31 @@ public class TradingTest extends TradingTestSupport {
         // entry and execute
         Entry entry = entryLimit(Side.BUY, Decimal.ONE, Decimal.TEN, null);
         market.execute(1, 10);
-        assert requestEntrySize.is(0);
-        assert positionSize.is(1);
+        assert entry.remaining().is(1);
 
         // null size
         entry.exitLimit(null, Decimal.ONE, null);
-        assert requestExitSize.is(0);
-        assert positionSize.is(1);
+        assert entry.remaining().is(1);
 
         // zero size
         entry.exitLimit(Decimal.ZERO, Decimal.ONE, null);
-        assert requestExitSize.is(0);
-        assert positionSize.is(1);
+        assert entry.remaining().is(1);
 
         // negative size
         entry.exitLimit(Decimal.valueOf(-1), Decimal.ONE, null);
-        assert requestExitSize.is(0);
-        assert positionSize.is(1);
+        assert entry.remaining().is(1);
 
         // null price
         entry.exitLimit(Decimal.ONE, null, null);
-        assert requestExitSize.is(0);
-        assert positionSize.is(1);
+        assert entry.remaining().is(1);
 
         // zero price
         entry.exitLimit(Decimal.ONE, Decimal.ZERO, null);
-        assert requestExitSize.is(0);
-        assert positionSize.is(1);
+        assert entry.remaining().is(1);
 
         // negative price
         entry.exitLimit(Decimal.ONE, Decimal.valueOf(-1), null);
-        assert requestExitSize.is(0);
-        assert positionSize.is(1);
+        assert entry.remaining().is(1);
     }
 
     @Test
@@ -178,19 +147,14 @@ public class TradingTest extends TradingTestSupport {
         // entry and execute
         Entry entry = entryLimit(Side.BUY, Decimal.ONE, Decimal.TEN, null);
         market.execute(1, 10);
-        assert requestEntrySize.is(0);
-        assert positionSize.is(1);
+        assert entry.remaining().is(1);
 
         // try exit
         entry.exitMarket(Decimal.ONE);
-        assert requestEntrySize.is(0);
-        assert requestExitSize.is(1);
-        assert positionSize.is(1);
+        assert entry.remaining().is(1);
 
         market.execute(1, 10);
-        assert requestEntrySize.is(0);
-        assert requestExitSize.is(0);
-        assert positionSize.is(0);
+        assert entry.remaining().is(0);
     }
 
     @Test
@@ -198,23 +162,19 @@ public class TradingTest extends TradingTestSupport {
         // entry and execute
         Entry entry = entryLimit(Side.BUY, Decimal.ONE, Decimal.TEN, null);
         market.execute(1, 10);
-        assert requestEntrySize.is(0);
-        assert positionSize.is(1);
+        assert entry.remaining().is(1);
 
         // null size
         entry.exitMarket((Decimal) null);
-        assert requestExitSize.is(0);
-        assert positionSize.is(1);
+        assert entry.remaining().is(1);
 
         // zero size
         entry.exitMarket(Decimal.ZERO);
-        assert requestExitSize.is(0);
-        assert positionSize.is(1);
+        assert entry.remaining().is(1);
 
         // negative size
         entry.exitMarket(Decimal.valueOf(-1));
-        assert requestExitSize.is(0);
-        assert positionSize.is(1);
+        assert entry.remaining().is(1);
     }
 
     @Test

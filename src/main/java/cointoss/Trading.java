@@ -53,21 +53,6 @@ public abstract class Trading {
     /** The user setting. */
     protected Decimal maxPositionSize = Decimal.valueOf(1);
 
-    /** The current position. (null means no position) */
-    protected Side position;
-
-    /** The current requested entry size. */
-    protected Decimal requestEntrySize = Decimal.ZERO;
-
-    /** The current requested exit size. */
-    protected Decimal requestExitSize = Decimal.ZERO;
-
-    /** The current position size. */
-    protected Decimal positionSize = Decimal.ZERO;
-
-    /** The current position average price. */
-    protected Decimal positionPrice = Decimal.ZERO;
-
     /** All managed entries. */
     protected final List<Entry> entries = new ArrayList<>();
 
@@ -77,59 +62,15 @@ public abstract class Trading {
     protected Trading(Market market) {
         this.market = market;
         this.market.tradings.add(this);
-
-        closingPosition.to(() -> {
-            position = null;
-            requestEntrySize = Decimal.ZERO;
-            requestExitSize = Decimal.ZERO;
-            positionSize = Decimal.ZERO;
-            positionPrice = Decimal.ZERO;
-        });
     }
 
     /**
-     * Helper to check position state.
+     * Detect position.
      * 
      * @return
      */
     protected final boolean hasPosition() {
-        return !requestEntrySize.isZero() || !requestExitSize.isZero() || !positionSize.isZero();
-    }
-
-    /**
-     * Helper to check position state.
-     * 
-     * @return
-     */
-    protected final boolean hasNoPosition() {
-        return requestEntrySize.isZero() && requestExitSize.isZero() && positionSize.isZero();
-    }
-
-    /**
-     * Helper to check position state.
-     * 
-     * @return
-     */
-    protected final boolean hasEntry() {
-        return !positionSize.isZero();
-    }
-
-    /**
-     * Helper to check position state.
-     * 
-     * @return
-     */
-    protected final boolean hasExit() {
-        return !requestExitSize.isZero();
-    }
-
-    /**
-     * Calculate current profit or loss.
-     * 
-     * @return
-     */
-    protected final Decimal profit() {
-        return market.getLatestPrice().minus(positionPrice).multipliedBy(positionSize);
+        return entries.isEmpty() == false;
     }
 
     /**
@@ -153,7 +94,8 @@ public abstract class Trading {
         if (price == null || price.isLessThanOrEqual(Decimal.ZERO)) {
             return null;
         }
-        return entry(Order.limit(side, size, price), process);
+
+        return new Entry(Order.limit(side, size, price), process);
     }
 
     /**
@@ -162,100 +104,17 @@ public abstract class Trading {
      * @param side
      * @param size
      */
-    protected final void entryMarket(Side side, Decimal size, Consumer<Entry> process) {
+    protected final Entry entryMarket(Side side, Decimal size, Consumer<Entry> process) {
         // check side
         if (side == null) {
-            return;
+            return null;
         }
 
         // check size
         if (size == null || size.isLessThanOrEqual(Decimal.ZERO)) {
-            return;
+            return null;
         }
-        entry(Order.market(side, size), process);
-    }
-
-    /**
-     * <p>
-     * Request entry order.
-     * </p>
-     * 
-     * @param order
-     * @param initializer
-     */
-    private Entry entry(Order order, Consumer<Entry> initializer) {
-        // update trade state
-        position = order.side();
-        requestEntrySize = requestEntrySize.plus(order.size());
-
-        // create new entry
-        Entry entry = new Entry(order);
-        entries.add(entry);
-
-        // request order
-        market.request(order).to(o -> {
-            if (initializer != null) initializer.accept(entry);
-
-            o.execute.to(exe -> {
-                managePosition(o, exe, true);
-
-                if (o.isCompleted()) {
-                    for (Observer<Boolean> observer : completeEntries) {
-                        observer.accept(true);
-                    }
-                }
-            });
-        });
-        return entry;
-    }
-
-    /**
-     * Manage position.
-     * 
-     * @param oae
-     */
-    private void managePosition(Order order, Execution exe, boolean entry) {
-        if (exe.isMine()) {
-            if (entry) {
-                requestEntrySize = requestEntrySize.minus(exe.size);
-            } else {
-                requestExitSize = requestExitSize.minus(exe.size);
-            }
-
-            Decimal size = positionSize;
-
-            // update position
-            if (position == null) {
-                // new position
-                position = order.side();
-                positionSize = exe.size;
-                positionPrice = exe.price;
-            } else if (position == order.side()) {
-                // same position
-                positionSize = positionSize.plus(exe.size);
-                positionPrice = positionPrice.multipliedBy(size).plus(exe.price.multipliedBy(exe.size)).dividedBy(positionSize);
-            } else {
-                // counter position
-                positionSize = positionSize.minus(exe.size);
-
-                if (positionSize.isZero()) {
-                    // clear position
-                    position = null;
-                    positionPrice = Decimal.ZERO;
-
-                    for (Observer<Boolean> observer : closePositions) {
-                        observer.accept(true);
-                    }
-                } else if (positionSize.isNegative()) {
-                    // inverse position
-                    position = position.inverse();
-                    positionPrice = exe.price;
-                } else {
-                    // decrease position
-                    positionPrice = positionPrice.multipliedBy(size).minus(exe.price.multipliedBy(exe.size)).dividedBy(positionSize);
-                }
-            }
-        }
+        return new Entry(Order.market(side, size), process);
     }
 
     /**
@@ -346,7 +205,7 @@ public abstract class Trading {
     }
 
     /**
-     * @version 2017/09/11 16:57:47
+     * @version 2017/09/17 19:59:43
      */
     public class Entry implements Directional {
 
@@ -359,13 +218,55 @@ public abstract class Trading {
         /** The detail log. */
         final List<String> logs = new ArrayList();
 
+        /** The current position size. */
+        private Decimal remaining = Decimal.ZERO;
+
+        /** The remaining size of entry order. */
+        private Decimal entryRemaining;
+
+        /** The total size of entry order. */
+        private Decimal entrySize = Decimal.ZERO;
+
+        /** The total cost of entry order. */
+        private Decimal entryCost = Decimal.ZERO;
+
+        /** The remaining size of entry order. */
+        private Decimal exitRemaining = Decimal.ZERO;
+
+        /** The total size of exit order. */
+        private Decimal exitSize = Decimal.ZERO;
+
+        /** The total cost of exit order. */
+        private Decimal exitCost = Decimal.ZERO;
+
         /**
          * Create {@link Entry} with {@link Order}.
          * 
          * @param entry A entry order.
          */
-        private Entry(Order entry) {
+        private Entry(Order entry, Consumer<Entry> initializer) {
             this.order = entry;
+            this.entryRemaining = entry.size();
+
+            // create new entry
+            entries.add(this);
+
+            // request order
+            market.request(order).to(o -> {
+                o.execute.to(exe -> {
+                    remaining = remaining.plus(exe.size);
+                    entrySize = entrySize.plus(exe.size);
+                    entryRemaining = entryRemaining.minus(exe.size);
+                    entryCost = entryCost.plus(exe.price.multipliedBy(exe.size));
+
+                    if (o.isCompleted()) {
+                        for (Observer<Boolean> observer : completeEntries) {
+                            observer.accept(true);
+                        }
+                    }
+                });
+                if (initializer != null) initializer.accept(this);
+            });
         }
 
         /**
@@ -377,17 +278,94 @@ public abstract class Trading {
         }
 
         /**
+         * Calculate remaining size of position.
+         * 
          * @return
          */
-        public Decimal remaining() {
-            return order.outstanding_size;
+        public final Decimal remaining() {
+            return remaining;
         }
 
         /**
+         * Calculate profit or loss.
+         * 
          * @return
          */
-        public Decimal executed() {
-            return order.executed_size;
+        public final Decimal profit() {
+            Decimal up, down;
+
+            if (side().isBuy()) {
+                up = exitCost;
+                down = entryCost;
+            } else {
+                up = entryCost;
+                down = exitCost;
+            }
+            return up.plus(remaining.multipliedBy(market.getLatestPrice())).minus(down);
+        }
+
+        /**
+         * Calculate total executed entry size.
+         * 
+         * @return
+         */
+        public final Decimal entrySize() {
+            return entrySize;
+        }
+
+        /**
+         * Calculate average of entry price.
+         * 
+         * @return
+         */
+        public final Decimal entryPrice() {
+            return entrySize.isZero() ? Decimal.ZERO : entryCost.dividedBy(entrySize);
+        }
+
+        /**
+         * Calculate total executed exit size.
+         * 
+         * @return
+         */
+        public final Decimal exitSize() {
+            return exitSize;
+        }
+
+        /**
+         * Calculate average of exit price.
+         * 
+         * @return
+         */
+        public final Decimal exitPrice() {
+            return exitSize.isZero() ? Decimal.ZERO : exitCost.dividedBy(exitSize);
+        }
+
+        /**
+         * Cehck whether this position is not activated.
+         */
+        public final boolean isInitial() {
+            return order.size().isEqual(entryRemaining);
+        }
+
+        /**
+         * Cehck whether this position was activated but not completed.
+         */
+        public final boolean isActive() {
+            return remaining.isZero() == false;
+        }
+
+        /**
+         * Cehck whether this position was completed.
+         */
+        public final boolean isCompleted() {
+            return remaining.isZero() && entryRemaining.isZero();
+        }
+
+        /**
+         * Cehck whether this position was not activated, then it was canceled.
+         */
+        public final boolean isCanceled() {
+            return isInitial() && order.isCanceled();
         }
 
         /**
@@ -406,7 +384,7 @@ public abstract class Trading {
             if (price == null || price.isLessThanOrEqual(Decimal.ZERO)) {
                 return;
             }
-            exit(Order.limit(position.inverse(), size, price), process);
+            exit(Order.limit(order.inverse(), size, price), process);
         }
 
         /**
@@ -425,7 +403,7 @@ public abstract class Trading {
          */
         protected final void exitMarket(Consumer<Order> process) {
             // check size
-            exitMarket(executed(), process);
+            exitMarket(remaining(), process);
 
             if (!remaining().isZero()) {
                 market.cancel(order).to();
@@ -451,7 +429,7 @@ public abstract class Trading {
             if (size == null || size.isLessThanOrEqual(Decimal.ZERO)) {
                 return;
             }
-            exit(Order.market(position.inverse(), size), process);
+            exit(Order.market(order.inverse(), size), process);
         }
 
         /**
@@ -460,26 +438,31 @@ public abstract class Trading {
          * @param order A exit order.
          */
         private void exit(Order order, Consumer<Order> initializer) {
-            if (hasPosition()) {
-                requestExitSize = requestExitSize.plus(order.size());
-                order.cancel.to(() -> requestExitSize = requestExitSize.minus(order.outstanding_size));
+            exitRemaining = exitRemaining.plus(order.size());
 
-                market.request(order).to(o -> {
-                    if (initializer != null) initializer.accept(o);
-                    exit.add(o);
+            market.request(order).to(o -> {
+                exit.add(o);
 
-                    o.execute.to(exe -> {
-                        managePosition(o, exe, false);
+                o.execute.to(exe -> {
+                    remaining = remaining.minus(exe.size);
+                    exitSize = exitSize.plus(exe.size);
+                    exitRemaining = exitRemaining.minus(exe.size);
+                    exitCost = exitCost.plus(exe.price.multipliedBy(exe.size));
 
-                        if (o.isCompleted()) {
-                            for (Observer<Boolean> observer : completeExits) {
+                    if (o.isCompleted()) {
+                        for (Observer<Boolean> observer : completeExits) {
+                            observer.accept(true);
+                        }
+
+                        if (remaining.isZero()) {
+                            for (Observer<Boolean> observer : closePositions) {
                                 observer.accept(true);
                             }
-                            log("Exit " + o + "  " + positionSize + "  " + requestEntrySize + " " + requestExitSize);
                         }
-                    });
+                    }
                 });
-            }
+                if (initializer != null) initializer.accept(o);
+            });
         }
 
         /**

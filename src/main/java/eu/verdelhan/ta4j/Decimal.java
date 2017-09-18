@@ -677,6 +677,21 @@ public class Decimal implements Comparable<Decimal> {
     }
 
     /**
+     * Convert to {@link Decimal}.
+     * 
+     * @param values
+     * @return
+     */
+    public static Decimal[] of(double... values) {
+        Decimal[] decimals = new Decimal[values.length];
+
+        for (int i = 0; i < decimals.length; i++) {
+            decimals[i] = valueOf(values[i]);
+        }
+        return decimals;
+    }
+
+    /**
      * @version 2017/07/26 9:08:16
      */
     public static class Codec implements Encoder<Decimal>, Decoder<Decimal> {

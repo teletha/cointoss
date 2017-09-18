@@ -45,32 +45,37 @@ public class TradingLog {
     /** summary */
     public AmountSummary profitAndLoss = new AmountSummary();
 
+    /** A number of created positions. */
+    public int total = 0;
+
+    /** A number of active positions. */
+    public int active = 0;
+
+    /** A number of completed positions. */
+    public int complete = 0;
+
+    /** A number of canceled positions. */
+    public int cancel = 0;
+
     /**
      * Analyze trading.
      */
     public TradingLog(Market market, List<Trading> tradings) {
-        int total = 0;
-        int active = 0;
-        int complete = 0;
-        int cancel = 0;
         ZonedDateTime latestTime = market.getExecutionLatest().exec_date;
-        Decimal latestPrice = market.getLatestPrice();
 
         for (Trading trading : tradings) {
             for (Entry entry : trading.entries) {
-                total++;
-
-                // entry
-                Decimal entryExecutedSize = entry.order.executed_size;
-                Decimal entryRemainingSize = entry.order.outstanding_size;
-                Decimal entryCost = entry.order.average_price.multipliedBy(entry.order.executed_size);
-                OrderState entryState = entry.order.child_order_state;
-
-                // exclude canceled entry
-                if (entry.order.isCanceled() && entryExecutedSize.isZero()) {
-                    cancel++;
+                // skip not activated entry
+                if (entry.isInitial()) {
+                    if (entry.isCanceled()) {
+                        cancel++;
+                    }
                     continue;
                 }
+
+                total++;
+                if (entry.isActive()) active++;
+                if (entry.isCompleted()) complete++;
 
                 // calculate order time
                 ZonedDateTime start = entry.order.child_order_date;
@@ -79,19 +84,8 @@ public class TradingLog {
 
                 // calculate hold time and profit
                 finish = start;
-                Decimal exitExecutedSize = Decimal.ZERO;
-                Decimal exitRemainingSize = Decimal.ZERO;
-                Decimal exitCost = entry.exit.isEmpty() ? entryExecutedSize.multipliedBy(latestPrice) : Decimal.ZERO;
 
                 for (Order exit : entry.exit) {
-                    exitExecutedSize = exitExecutedSize.plus(exit.executed_size);
-                    exitCost = exitCost.plus(exit.average_price.multipliedBy(exit.executed_size));
-
-                    if (!exit.isCanceled()) {
-                        exitRemainingSize = exitRemainingSize.plus(exit.outstanding_size);
-                        exitCost = exitCost.plus(market.getLatestPrice().multipliedBy(exit.outstanding_size));
-                    }
-
                     if (exit.isCompleted()) {
                         finish = max(finish, exit.executions.getLast().exec_date);
                     } else if (!exit.isCanceled()) {
@@ -99,14 +93,8 @@ public class TradingLog {
                     }
                 }
 
-                if (exitRemainingSize.isPositive() || entry.exit.isEmpty()) {
-                    active++;
-                } else {
-                    complete++;
-                }
-
                 // calculate profit and loss
-                Decimal profitOrLoss = entry.isBuy() ? exitCost.minus(entryCost) : entryCost.minus(exitCost);
+                Decimal profitOrLoss = entry.profit();
                 profitAndLoss.add(profitOrLoss);
                 if (profitOrLoss.isPositive()) profit.add(profitOrLoss);
                 if (profitOrLoss.isNegative()) loss.add(profitOrLoss);
@@ -122,14 +110,14 @@ public class TradingLog {
                             .append("\t 損益")
                             .append(profitOrLoss.asJPY(4))
                             .append("\t")
-                            .append(exitExecutedSize)
+                            .append(entry.exitSize())
                             .append("/")
-                            .append(entryExecutedSize)
+                            .append(entry.entrySize())
                             .append("@")
                             .append(entry.side().mark())
                             .append(entry.order.average_price.asJPY(1))
                             .append(" → ")
-                            .append(exitExecutedSize.isZero() ? "" : exitCost.dividedBy(exitExecutedSize).asJPY(1))
+                            .append(entry.exitPrice().asJPY(1))
                             .append("\t")
                             .append(entry.order.description() == null ? "" : entry.order.description())
                             .toString());
@@ -176,19 +164,6 @@ public class TradingLog {
      */
     private ZonedDateTime max(ZonedDateTime one, ZonedDateTime other) {
         return one.isBefore(other) ? other : one;
-    }
-
-    /**
-     * Calculate profit and loss.
-     * 
-     * @return
-     */
-    private Decimal calculateTradeProfit(Order entry, Order exit) {
-        if (entry.isBuy()) {
-            return exit.isBuy() ? Decimal.ZERO : exit.average_price.minus(entry.average_price).multipliedBy(exit.executed_size);
-        } else {
-            return exit.isBuy() ? entry.average_price.minus(exit.average_price).multipliedBy(exit.executed_size) : Decimal.ZERO;
-        }
     }
 
     /**
@@ -259,19 +234,19 @@ public class TradingLog {
     /**
      * @version 2017/09/04 14:13:21
      */
-    private static class AmountSummary {
+    public static class AmountSummary {
 
         /** MAX value. */
-        private Decimal min = Decimal.MAX;
+        public Decimal min = Decimal.MAX;
 
         /** MIN value. */
-        private Decimal max = Decimal.ZERO;
+        public Decimal max = Decimal.ZERO;
 
         /** Total value. */
-        private Decimal total = Decimal.ZERO;
+        public Decimal total = Decimal.ZERO;
 
         /** Number of values. */
-        private int size = 0;
+        public int size = 0;
 
         /** Number of positive values. */
         private int positive = 0;
@@ -281,7 +256,7 @@ public class TradingLog {
          * 
          * @return
          */
-        private Decimal mean() {
+        public Decimal mean() {
             return total.dividedBy(Math.max(size, 1));
         }
 
