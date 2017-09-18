@@ -235,7 +235,7 @@ class BitFlyerLog implements MarketLog {
                 }
 
                 try {
-                    Thread.sleep(3333);
+                    Thread.sleep(333);
                 } catch (InterruptedException e) {
                     observer.error(e);
                 }
