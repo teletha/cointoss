@@ -10,8 +10,8 @@
 package cointoss.market.bitflyer;
 
 import cointoss.MarketLog;
+import cointoss.util.Span;
 import cointoss.MarketBackend;
-import cointoss.market.Span;
 
 /**
  * @version 2017/09/08 18:23:03

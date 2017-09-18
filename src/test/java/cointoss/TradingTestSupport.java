@@ -11,6 +11,7 @@ package cointoss;
 
 import org.junit.Before;
 
+import cointoss.analyze.TradingLog;
 import eu.verdelhan.ta4j.Decimal;
 import kiss.I;
 
@@ -110,7 +111,7 @@ public abstract class TradingTestSupport extends Trading {
     /**
      * @version 2017/09/18 9:07:21
      */
-    protected final class Exit {
+    public final class Exit {
 
         private final Entry entry;
 
@@ -128,7 +129,7 @@ public abstract class TradingTestSupport extends Trading {
          * @param exitPrice
          * @return
          */
-        protected final Exit exit(double exitSize, double exitPrice, double... executionSize) {
+        public final Exit exit(double exitSize, double exitPrice, double... executionSize) {
             return exit(Decimal.valueOf(exitSize), Decimal.valueOf(exitPrice), Decimal.of(executionSize));
         }
 
@@ -139,7 +140,7 @@ public abstract class TradingTestSupport extends Trading {
          * @param exitPrice
          * @return
          */
-        protected final Exit exit(Decimal exitSize, Decimal exitPrice, Decimal... executionSize) {
+        public final Exit exit(Decimal exitSize, Decimal exitPrice, Decimal... executionSize) {
             entry.exitLimit(exitSize, exitPrice, exit -> {
                 if (executionSize.length == 0) {
                     market.execute(entry.inverse(), exitSize, exitPrice);

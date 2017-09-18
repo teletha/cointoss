@@ -20,6 +20,7 @@ import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+import cointoss.util.Span;
 import eu.verdelhan.ta4j.Decimal;
 import kiss.Observer;
 import kiss.Signal;
@@ -54,7 +55,7 @@ public abstract class Trading {
     protected Decimal maxPositionSize = Decimal.valueOf(1);
 
     /** All managed entries. */
-    protected final List<Entry> entries = new ArrayList<>();
+    public final List<Entry> entries = new ArrayList<>();
 
     /**
      * New Trade.
@@ -295,13 +296,13 @@ public abstract class Trading {
             Decimal up, down;
 
             if (side().isBuy()) {
-                up = exitCost;
+                up = exitCost.plus(remaining.multipliedBy(market.getLatestPrice()));
                 down = entryCost;
             } else {
                 up = entryCost;
-                down = exitCost;
+                down = exitCost.plus(remaining.multipliedBy(market.getLatestPrice()));
             }
-            return up.plus(remaining.multipliedBy(market.getLatestPrice())).minus(down);
+            return up.minus(down);
         }
 
         /**
@@ -338,6 +339,55 @@ public abstract class Trading {
          */
         public final Decimal exitPrice() {
             return exitSize.isZero() ? Decimal.ZERO : exitCost.dividedBy(exitSize);
+        }
+
+        /**
+         * Calculate ordering time.
+         * 
+         * @return
+         */
+        public final Span orderTime() {
+            Execution last = order.executions.peekLast();
+            ZonedDateTime start = order.child_order_date;
+            ZonedDateTime finish = last == null ? market.getExecutionLatest().exec_date : last.exec_date;
+
+            if (start.isBefore(finish)) {
+                finish = market.getExecutionLatest().exec_date;
+            }
+            return new Span(start, finish);
+        }
+
+        /**
+         * Calculate holding time.
+         * 
+         * @return
+         */
+        public final Span holdTime() {
+            Execution first = order.executions.peekFirst();
+
+            if (first == null) {
+                return Span.ZERO;
+            }
+
+            ZonedDateTime start = first.exec_date;
+            ZonedDateTime finish = start;
+
+            if (isActive()) {
+                finish = market.getExecutionLatest().exec_date;
+            } else {
+                for (Order order : exit) {
+                    Execution last = order.executions.peekLast();
+
+                    if (last != null) {
+                        finish = last.exec_date;
+                    }
+                }
+            }
+
+            if (start.isBefore(finish)) {
+                finish = market.getExecutionLatest().exec_date;
+            }
+            return new Span(start, finish);
         }
 
         /**
@@ -475,6 +525,28 @@ public abstract class Trading {
          */
         protected void log(String message, Object... params) {
             logs.add(String.format(message, params));
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String toString() {
+            return new StringBuilder() //
+                    .append("注文 ")
+                    .append(holdTime())
+                    .append("\t 損益")
+                    .append(profit().asJPY(4))
+                    .append("\t")
+                    .append(exitSize())
+                    .append("/")
+                    .append(entrySize())
+                    .append("@")
+                    .append(side().mark())
+                    .append(entryPrice().asJPY(1))
+                    .append(" → ")
+                    .append(exitPrice().asJPY(1))
+                    .toString();
         }
     }
 }

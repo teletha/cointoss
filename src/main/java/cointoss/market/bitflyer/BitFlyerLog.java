@@ -17,6 +17,7 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Iterator;
 import java.util.List;
@@ -70,10 +71,10 @@ class BitFlyerLog implements MarketLog {
     private long realtimeId;
 
     /** The first day. */
-    private final LocalDate cacheFirst;
+    private final ZonedDateTime cacheFirst;
 
     /** The last day. */
-    private LocalDate cacheLast;
+    private ZonedDateTime cacheLast;
 
     /** The current processing cache file. */
     private PrintWriter cache;
@@ -86,12 +87,12 @@ class BitFlyerLog implements MarketLog {
         this.root = Filer.locate(".log/bitflyer/" + type);
 
         List<Path> files = Filer.walk(root, "execution*.log");
-        LocalDate start = null;
-        LocalDate end = null;
+        ZonedDateTime start = null;
+        ZonedDateTime end = null;
 
         for (Path file : files) {
             String name = file.getFileName().toString();
-            LocalDate date = LocalDate.parse(name.substring(9, 17), fomatFile);
+            ZonedDateTime date = LocalDate.parse(name.substring(9, 17), fomatFile).atTime(0, 0).atZone(Execution.UTC);
 
             if (start == null || end == null) {
                 start = date;
@@ -114,10 +115,11 @@ class BitFlyerLog implements MarketLog {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Execution> from(LocalDate start) {
+    public Signal<Execution> from(ZonedDateTime start) {
         return new Signal<>((observer, disposer) -> {
             // read from cache
-            LocalDate current = start.isBefore(cacheFirst) ? cacheFirst : start.isAfter(cacheLast) ? cacheLast : start;
+            ZonedDateTime current = start.isBefore(cacheFirst) ? cacheFirst : start.isAfter(cacheLast) ? cacheLast : start;
+            current = current.withHour(0).withMinute(0).withSecond(0).withNano(0);
 
             while (disposer.isDisposed() == false && !current.isAfter(getCacheEnd())) {
                 disposer.add(localCache(current).effect(e -> latestId = cacheId = e.id).to(observer::accept));
@@ -144,7 +146,7 @@ class BitFlyerLog implements MarketLog {
      * {@inheritDoc}
      */
     @Override
-    public LocalDate getCacheStart() {
+    public ZonedDateTime getCacheStart() {
         return cacheFirst;
     }
 
@@ -152,7 +154,7 @@ class BitFlyerLog implements MarketLog {
      * {@inheritDoc}
      */
     @Override
-    public LocalDate getCacheEnd() {
+    public ZonedDateTime getCacheEnd() {
         return cacheLast;
     }
 
@@ -165,7 +167,7 @@ class BitFlyerLog implements MarketLog {
         if (cacheId < exe.id) {
             writer.submit(() -> {
                 try {
-                    LocalDate date = exe.exec_date.toLocalDate();
+                    ZonedDateTime date = exe.exec_date;
 
                     if (cache == null || cacheLast.isBefore(date)) {
                         I.quiet(cache);
@@ -192,7 +194,7 @@ class BitFlyerLog implements MarketLog {
      * @param date
      * @return
      */
-    private Signal<Execution> localCache(LocalDate date) {
+    private Signal<Execution> localCache(ZonedDateTime date) {
         return Filer.read(localCacheFile(date)).map(Execution::new);
     }
 
@@ -202,7 +204,7 @@ class BitFlyerLog implements MarketLog {
      * @param date
      * @return
      */
-    private Path localCacheFile(LocalDate date) {
+    private Path localCacheFile(ZonedDateTime date) {
         return root.resolve("execution" + fomatFile.format(date) + ".log");
     }
 
@@ -233,7 +235,7 @@ class BitFlyerLog implements MarketLog {
                 }
 
                 try {
-                    Thread.sleep(333);
+                    Thread.sleep(3333);
                 } catch (InterruptedException e) {
                     observer.error(e);
                 }

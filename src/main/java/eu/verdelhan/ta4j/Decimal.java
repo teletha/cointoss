@@ -583,7 +583,16 @@ public class Decimal implements Comparable<Decimal> {
      * @return
      */
     public Decimal integral() {
-        return new Decimal(delegate.setScale(0, RoundingMode.HALF_UP));
+        return scale(0);
+    }
+
+    /**
+     * Change fractional portion.
+     * 
+     * @return
+     */
+    public Decimal scale(int size) {
+        return new Decimal(delegate.setScale(size, RoundingMode.HALF_UP));
     }
 
     /**

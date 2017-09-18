@@ -20,7 +20,6 @@ import org.junit.Test;
 
 import cointoss.Execution;
 import cointoss.Trend;
-import cointoss.chart.Chart;
 import cointoss.market.bitflyer.BitFlyer;
 import filer.Filer;
 
@@ -86,8 +85,8 @@ public class ChartTrendTest {
 
         if (Files.notExists(file)) {
             // crate new tick log from execution log
-            type.log()
-                    .range(startTime.toLocalDate(), endTime.toLocalDate())
+            type.log() //
+                    .range(startTime, endTime)
                     .skipWhile(e -> e.isBefore(startTime))
                     .takeWhile(e -> e.isBefore(endTime))
                     .to(chart::tick);

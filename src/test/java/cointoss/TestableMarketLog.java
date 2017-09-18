@@ -9,7 +9,7 @@
  */
 package cointoss;
 
-import java.time.LocalDate;
+import java.time.ZonedDateTime;
 
 import kiss.Signal;
 
@@ -22,7 +22,7 @@ public class TestableMarketLog implements MarketLog {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Execution> from(LocalDate start) {
+    public Signal<Execution> from(ZonedDateTime start) {
         return Signal.EMPTY;
     }
 
@@ -30,15 +30,15 @@ public class TestableMarketLog implements MarketLog {
      * {@inheritDoc}
      */
     @Override
-    public LocalDate getCacheStart() {
-        return LocalDate.MIN;
+    public ZonedDateTime getCacheStart() {
+        return ZonedDateTime.of(2017, 1, 1, 0, 0, 0, 0, Execution.UTC);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public LocalDate getCacheEnd() {
-        return LocalDate.MIN;
+    public ZonedDateTime getCacheEnd() {
+        return ZonedDateTime.of(2017, 1, 1, 0, 0, 0, 0, Execution.UTC);
     }
 }

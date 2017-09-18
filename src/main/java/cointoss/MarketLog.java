@@ -9,9 +9,9 @@
  */
 package cointoss;
 
-import java.time.LocalDate;
+import java.time.ZonedDateTime;
 
-import cointoss.market.Span;
+import cointoss.util.Span;
 import kiss.Signal;
 
 /**
@@ -25,7 +25,7 @@ public interface MarketLog {
      * @param start
      * @return
      */
-    Signal<Execution> from(LocalDate start);
+    Signal<Execution> from(ZonedDateTime start);
 
     /**
      * Read date from the specified date.
@@ -34,7 +34,7 @@ public interface MarketLog {
      * @return
      */
     default Signal<Execution> fromToday() {
-        return from(LocalDate.now());
+        return from(ZonedDateTime.now());
     }
 
     /**
@@ -54,7 +54,7 @@ public interface MarketLog {
      * @return
      */
     default Signal<Execution> fromLast(int days) {
-        return from(LocalDate.now().minusDays(days));
+        return from(ZonedDateTime.now().minusDays(days));
     }
 
     /**
@@ -75,8 +75,8 @@ public interface MarketLog {
      * @param end
      * @return
      */
-    default Signal<Execution> range(LocalDate start, LocalDate end) {
-        return from(start).takeUntil(e -> e.exec_date.toLocalDate().isAfter(end));
+    default Signal<Execution> range(ZonedDateTime start, ZonedDateTime end) {
+        return from(start).takeUntil(e -> e.exec_date.isAfter(end));
     }
 
     /**
@@ -94,13 +94,13 @@ public interface MarketLog {
      * 
      * @return
      */
-    LocalDate getCacheStart();
+    ZonedDateTime getCacheStart();
 
     /**
      * Get the ending day of cache.
      * 
      * @return
      */
-    LocalDate getCacheEnd();
+    ZonedDateTime getCacheEnd();
 
 }

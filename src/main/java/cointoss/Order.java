@@ -37,9 +37,6 @@ public class Order implements Directional {
 
     private Quantity quantity;
 
-    /** The description. */
-    private String description;
-
     /** The event listeners. */
     final CopyOnWriteArrayList<Observer<? super Execution>> executeListeners = new CopyOnWriteArrayList<>();
 
@@ -258,26 +255,6 @@ public class Order implements Directional {
     public Order type(Quantity quantity) {
         this.quantity = quantity == null ? Quantity.GoodTillCnaceled : quantity;
 
-        return this;
-    }
-
-    /**
-     * Read order description.
-     * 
-     * @return
-     */
-    public String description() {
-        return description;
-    }
-
-    /**
-     * Write order description.
-     * 
-     * @param description
-     * @return
-     */
-    public Order description(String description) {
-        this.description = description;
         return this;
     }
 

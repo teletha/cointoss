@@ -14,6 +14,7 @@ import static java.time.temporal.ChronoUnit.*;
 import java.util.stream.IntStream;
 
 import cointoss.Time.Lag;
+import cointoss.analyze.TradingLog;
 import cointoss.chart.Tick;
 import cointoss.market.bitflyer.BitFlyer;
 import eu.verdelhan.ta4j.Decimal;

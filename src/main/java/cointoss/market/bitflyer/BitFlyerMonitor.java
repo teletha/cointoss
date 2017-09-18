@@ -26,7 +26,7 @@ public class BitFlyerMonitor extends Trading {
         super(market);
 
         market.observeExecutionBySize(20).to(exe -> {
-            System.out.println("大口 " + exe.side.mark() + exe.cumulativeSize);
+            System.out.println("大口 " + exe.side.mark() + exe.cumulativeSize + " @" + exe.price);
         });
 
         market.minute1.to(tick -> {
