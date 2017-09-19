@@ -216,16 +216,19 @@ class BitFlyerLog implements MarketLog {
      */
     private Signal<Execution> rest() {
         return new Signal<Execution>((observer, disposer) -> {
+            int offset = 1;
+
             while (disposer.isDisposed() == false) {
                 try {
-                    URL url = new URL(BitFlyerBackend.api + "/v1/executions?product_code=" + type + "&count=500&before=" + (latestId + 500));
+                    URL url = new URL(BitFlyerBackend.api + "/v1/executions?product_code=" + type + "&count=500&before=" + (latestId + 500 * offset));
                     Executions executions = I.json(url).to(Executions.class);
 
                     // skip if there is no new execution
                     if (executions.get(0).id == latestId) {
-                        latestId += 500;
+                        offset++;
                         continue;
                     }
+                    offset = 1;
 
                     for (int i = executions.size() - 1; 0 <= i; i--) {
                         Execution exe = executions.get(i);
