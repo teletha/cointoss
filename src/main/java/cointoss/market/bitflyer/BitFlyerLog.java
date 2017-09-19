@@ -62,7 +62,7 @@ class BitFlyerLog implements MarketLog {
     private final BitFlyer type;
 
     /** The latest execution id. */
-    private long latestId;
+    private long latestId = 23164000;
 
     /** The latest cached id. */
     private long cacheId;
@@ -118,20 +118,23 @@ class BitFlyerLog implements MarketLog {
     public Signal<Execution> from(ZonedDateTime start) {
         return new Signal<>((observer, disposer) -> {
             // read from cache
-            ZonedDateTime current = start.isBefore(cacheFirst) ? cacheFirst : start.isAfter(cacheLast) ? cacheLast : start;
-            current = current.withHour(0).withMinute(0).withSecond(0).withNano(0);
+            if (cacheFirst != null) {
+                ZonedDateTime current = start.isBefore(cacheFirst) ? cacheFirst : start.isAfter(cacheLast) ? cacheLast : start;
+                current = current.withHour(0).withMinute(0).withSecond(0).withNano(0);
 
-            while (disposer.isDisposed() == false && !current.isAfter(getCacheEnd())) {
-                disposer.add(localCache(current).effect(e -> latestId = cacheId = e.id).to(observer::accept));
-                current = current.plusDays(1);
+                while (disposer.isDisposed() == false && !current.isAfter(getCacheEnd())) {
+                    disposer.add(localCache(current).effect(e -> latestId = cacheId = e.id).to(observer::accept));
+                    current = current.plusDays(1);
+                }
             }
 
             AtomicBoolean completeREST = new AtomicBoolean();
 
             // read from realtime API
-            if (disposer.isDisposed() == false) {
-                disposer.add(realtime().skipUntil(e -> completeREST.get()).effect(this::cache).to(observer::accept));
-            }
+            // if (disposer.isDisposed() == false) {
+            // disposer.add(realtime().skipUntil(e ->
+            // completeREST.get()).effect(this::cache).to(observer::accept));
+            // }
 
             // read from REST API
             if (disposer.isDisposed() == false) {
@@ -218,6 +221,12 @@ class BitFlyerLog implements MarketLog {
                     URL url = new URL(BitFlyerBackend.api + "/v1/executions?product_code=" + type + "&count=500&before=" + (latestId + 500));
                     Executions executions = I.json(url).to(Executions.class);
 
+                    // skip if there is no new execution
+                    if (executions.get(0).id == latestId) {
+                        latestId += 500;
+                        continue;
+                    }
+
                     for (int i = executions.size() - 1; 0 <= i; i--) {
                         Execution exe = executions.get(i);
 
@@ -235,7 +244,7 @@ class BitFlyerLog implements MarketLog {
                 }
 
                 try {
-                    Thread.sleep(333);
+                    Thread.sleep(111);
                 } catch (InterruptedException e) {
                     observer.error(e);
                 }

@@ -210,4 +210,13 @@ public class Chart {
     public void to(Observer<? super Tick> listener) {
         listeners.add(listener);
     }
+
+    /**
+     * Observe tick.
+     * 
+     * @return
+     */
+    public Signal<Tick> signal() {
+        return new Signal<>(listeners);
+    }
 }
