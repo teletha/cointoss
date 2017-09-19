@@ -263,4 +263,19 @@ public class TradingTest extends TradingTestSupport {
         exiter.exit(1, 10);
         assert hasPosition() == false;
     }
+
+    @Test
+    public void isWinAndLose() throws Exception {
+        entry(BUY, 1, 5).exit(1, 10);
+        assert latest().isWin() == true;
+        assert latest().isLose() == false;
+
+        entry(BUY, 1, 5).exit(1, 3);
+        assert latest().isWin() == false;
+        assert latest().isLose() == true;
+
+        entry(BUY, 1, 5).exit(1, 5);
+        assert latest().isWin() == false;
+        assert latest().isLose() == false;
+    }
 }

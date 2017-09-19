@@ -11,7 +11,9 @@ package cointoss;
 
 import java.time.ZonedDateTime;
 import java.time.temporal.TemporalUnit;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -55,7 +57,7 @@ public abstract class Trading {
     protected Decimal maxPositionSize = Decimal.valueOf(1);
 
     /** All managed entries. */
-    public final List<Entry> entries = new ArrayList<>();
+    public final Deque<Entry> entries = new ArrayDeque<>();
 
     /*** All active posiitons. */
     private final List<Entry> actives = new ArrayList();
@@ -75,6 +77,15 @@ public abstract class Trading {
      */
     protected final boolean hasPosition() {
         return actives.isEmpty() == false;
+    }
+
+    /**
+     * Return the latest completed or canceled entry.
+     * 
+     * @return
+     */
+    protected final Entry latest() {
+        return entries.peekLast();
     }
 
     /**
@@ -392,6 +403,20 @@ public abstract class Trading {
                 finish = market.getExecutionLatest().exec_date;
             }
             return new Span(start, finish);
+        }
+
+        /**
+         * Cehck whether this position has profit
+         */
+        public final boolean isWin() {
+            return profit().isPositive();
+        }
+
+        /**
+         * Cehck whether this position has loss
+         */
+        public final boolean isLose() {
+            return profit().isNegative();
         }
 
         /**

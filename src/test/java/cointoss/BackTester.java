@@ -185,9 +185,22 @@ public class BackTester {
             // various events
             market.timeline.to(exe -> {
                 if (hasPosition() == false) {
-                    entryMarket(Side.random(), maxPositionSize, entry -> {
+                    Entry latest = latest();
+                    Side side;
+
+                    if (latest == null) {
+                        side = Side.random();
+                    } else {
+                        if (market.minute5.isRange()) {
+                            side = latest.isWin() ? latest.inverse() : latest.side();
+                        } else {
+                            side = latest.isWin() ? latest.side() : latest.inverse();
+                        }
+                    }
+
+                    entryMarket(side, maxPositionSize, entry -> {
                         update = 1;
-                        underPrice = exe.price.minus(entry, 2000);
+                        underPrice = exe.price.minus(entry, 4000);
 
                         // cancel timing
                         market.timeline.takeUntil(completingEntry)
@@ -204,7 +217,7 @@ public class BackTester {
                                 .map(Tick::getClosePrice)
                                 .takeAt(i -> i % 5 == 0)
                                 .to(e -> {
-                                    Decimal next = e.minus(entry, Math.max(0, 2000 - update * 200));
+                                    Decimal next = e.minus(entry, Math.max(0, 4000 - update * 200));
 
                                     if (next.isGreaterThan(entry, underPrice)) {
                                         entry.log("最低価格を%sから%sに再設定 参考値%s", underPrice, next, e);
@@ -215,7 +228,7 @@ public class BackTester {
 
                         // loss cut
                         market.timeline.takeUntil(closingPosition) //
-                                .take(keep(10, SECONDS, e -> e.price.isLessThan(entry, underPrice)))
+                                .take(keep(5, SECONDS, e -> e.price.isLessThan(entry, underPrice)))
                                 .take(1)
                                 .to(e -> {
                                     entry.exitLimit(entry.entrySize(), underPrice, exit -> {
