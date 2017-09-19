@@ -57,6 +57,9 @@ public abstract class Trading {
     /** All managed entries. */
     public final List<Entry> entries = new ArrayList<>();
 
+    /*** All active posiitons. */
+    private final List<Entry> actives = new ArrayList();
+
     /**
      * New Trade.
      */
@@ -71,7 +74,7 @@ public abstract class Trading {
      * @return
      */
     protected final boolean hasPosition() {
-        return entries.isEmpty() == false;
+        return actives.isEmpty() == false;
     }
 
     /**
@@ -251,6 +254,7 @@ public abstract class Trading {
 
             // create new entry
             entries.add(this);
+            actives.add(this);
 
             // request order
             market.request(order).to(o -> {
@@ -505,6 +509,8 @@ public abstract class Trading {
                         }
 
                         if (remaining.isZero()) {
+                            actives.remove(this);
+
                             for (Observer<Boolean> observer : closePositions) {
                                 observer.accept(true);
                             }

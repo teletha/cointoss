@@ -129,10 +129,19 @@ public class TradingLog {
                 if (profitOrLoss.isNegative()) loss.add(profitOrLoss);
                 maxTotalProfitAndLoss = maxTotalProfitAndLoss.max(profitAndLoss.total);
                 drawDown = drawDown.max(maxTotalProfitAndLoss.minus(profitAndLoss.total));
-                drawDownRate = maxTotalProfitAndLoss.isZero() ? drawDownRate
-                        : drawDownRate.max(drawDown.dividedBy(maxTotalProfitAndLoss).multipliedBy(HUNDRED).scale(2));
+                drawDownRate = drawDownRate
+                        .max(drawDown.dividedBy(assetInitial().plus(maxTotalProfitAndLoss)).multipliedBy(HUNDRED).scale(1));
             }
         }
+    }
+
+    /**
+     * Calculate initial assets.
+     * 
+     * @return
+     */
+    public Decimal assetInitial() {
+        return startBaseCurrency.plus(startTargetCurrency.multipliedBy(startPrice));
     }
 
     /**
@@ -141,7 +150,7 @@ public class TradingLog {
      * @return
      */
     public Decimal asset() {
-        return startBaseCurrency.plus(startTargetCurrency.multipliedBy(startPrice)).plus(profitAndLoss.total);
+        return assetInitial().plus(profitAndLoss.total);
     }
 
     /**
@@ -197,7 +206,9 @@ public class TradingLog {
                 .append("% ")
                 .append(" PF")
                 .append(profitFactor())
-                .append(" ")
+                .append(" DD")
+                .append(drawDownRate)
+                .append("% ")
                 .append(String.format("総%d 済%d 残%d 中止%d)%n", total, complete, active, cancel));
         builder.append("開始 ").append(format(start, startPrice, startBaseCurrency, startTargetCurrency)).append("\r\n");
         builder.append("終了 ")

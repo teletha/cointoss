@@ -110,7 +110,7 @@ public class BackTester {
                 .parallel()
                 .mapToObj(i -> new Market(new BackTestBackend(), marketLog.rangeRandom(5), strategy))
                 .forEach(market -> {
-                    new TradingLog(market, market.tradings);
+                    System.out.println(new TradingLog(market, market.tradings));
                 });
     }
 
@@ -184,7 +184,7 @@ public class BackTester {
 
             // various events
             market.timeline.to(exe -> {
-                if (hasNoPosition()) {
+                if (hasPosition() == false) {
                     entryMarket(Side.random(), maxPositionSize, entry -> {
                         update = 1;
                         underPrice = exe.price.minus(entry, 2000);
@@ -218,7 +218,7 @@ public class BackTester {
                                 .take(keep(10, SECONDS, e -> e.price.isLessThan(entry, underPrice)))
                                 .take(1)
                                 .to(e -> {
-                                    entry.exitLimit(entry.executed(), underPrice, exit -> {
+                                    entry.exitLimit(entry.entrySize(), underPrice, exit -> {
                                         entry.log("10秒以上約定値が%s以下になったので指値で決済開始", underPrice);
 
                                         market.timeline.takeUntil(completingEntry)

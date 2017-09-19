@@ -9,6 +9,7 @@
  */
 package cointoss;
 
+import static cointoss.Side.*;
 import static java.time.temporal.ChronoUnit.*;
 
 import org.junit.Test;
@@ -252,5 +253,14 @@ public class TradingTest extends TradingTestSupport {
         market.execute(1, 9, 12);
         market.execute(1, 9, 15);
         assert state.isPresent();
+    }
+
+    @Test
+    public void testHasPosition() throws Exception {
+        assert hasPosition() == false;
+        Exit exiter = entry(BUY, 1, 10);
+        assert hasPosition() == true;
+        exiter.exit(1, 10);
+        assert hasPosition() == false;
     }
 }

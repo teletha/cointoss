@@ -181,7 +181,6 @@ public class TradingLogTest extends TradingTestSupport {
         assert log.profitAndLoss.max.is(10);
         assert log.profitAndLoss.min.is(-10);
         assert log.profitAndLoss.total.is(0);
-        System.out.println(log);
     }
 
     @Test
@@ -301,7 +300,7 @@ public class TradingLogTest extends TradingTestSupport {
 
         TradingLog log = createLog();
         assert log.drawDown.is(5);
-        assert log.drawDownRate.is(5);
+        assert log.drawDownRate.is("4.5");
     }
 
     @Test
@@ -316,6 +315,7 @@ public class TradingLogTest extends TradingTestSupport {
 
         TradingLog log = createLog();
         assert log.drawDown.is(40);
+        assert log.drawDownRate.is("27.6");
     }
 
     @Test
@@ -326,6 +326,7 @@ public class TradingLogTest extends TradingTestSupport {
 
         TradingLog log = createLog();
         assert log.drawDown.is(0);
+        assert log.drawDownRate.is("0");
     }
 
     @Test
@@ -334,14 +335,14 @@ public class TradingLogTest extends TradingTestSupport {
         entry(SELL, 1, 25).exit(1, 50); // lose -25
         entry(SELL, 1, 25).exit(1, 30); // lose -5
         entry(SELL, 1, 25).exit(1, 35); // lose -10
-    
+
         TradingLog log = createLog();
         assert log.drawDown.is(45);
+        assert log.drawDownRate.is("45");
     }
 
     @Test
     public void asset() throws Exception {
-        assert createLog().asset().is(100);
         entry(BUY, 1, 10).exit(1, 30); // win 20
         assert createLog().asset().is(120);
         entry(SELL, 1, 25).exit(1, 30); // lose -5
