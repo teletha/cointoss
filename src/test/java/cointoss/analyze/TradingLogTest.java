@@ -291,7 +291,7 @@ public class TradingLogTest extends TradingTestSupport {
     }
 
     @Test
-    public void drawDown() throws Exception {
+    public void drawDown1() throws Exception {
         // win
         entry(BUY, 1, 10).exit(1, 15);
         entry(BUY, 1, 10).exit(1, 15);
@@ -300,6 +300,61 @@ public class TradingLogTest extends TradingTestSupport {
         entry(SELL, 1, 25).exit(1, 30);
 
         TradingLog log = createLog();
-        assert log.drawDown().is(5);
+        assert log.drawDown.is(5);
+        assert log.drawDownRate.is(5);
+    }
+
+    @Test
+    public void drawDown2() throws Exception {
+        entry(BUY, 1, 10).exit(1, 30); // win 20
+        entry(SELL, 1, 25).exit(1, 30); // lose -5
+        entry(BUY, 1, 10).exit(1, 40); // win 30
+        entry(SELL, 1, 25).exit(1, 50); // lose -25
+        entry(SELL, 1, 25).exit(1, 30); // lose -5
+        entry(SELL, 1, 25).exit(1, 35); // lose -10
+        entry(BUY, 1, 10).exit(1, 40); // win 30
+
+        TradingLog log = createLog();
+        assert log.drawDown.is(40);
+    }
+
+    @Test
+    public void drawDown3() throws Exception {
+        entry(BUY, 1, 10).exit(1, 30); // win 20
+        entry(BUY, 1, 10).exit(1, 40); // win 30
+        entry(BUY, 1, 10).exit(1, 40); // win 30
+
+        TradingLog log = createLog();
+        assert log.drawDown.is(0);
+    }
+
+    @Test
+    public void drawDown4() throws Exception {
+        entry(SELL, 1, 25).exit(1, 30); // lose -5
+        entry(SELL, 1, 25).exit(1, 50); // lose -25
+        entry(SELL, 1, 25).exit(1, 30); // lose -5
+        entry(SELL, 1, 25).exit(1, 35); // lose -10
+    
+        TradingLog log = createLog();
+        assert log.drawDown.is(45);
+    }
+
+    @Test
+    public void asset() throws Exception {
+        assert createLog().asset().is(100);
+        entry(BUY, 1, 10).exit(1, 30); // win 20
+        assert createLog().asset().is(120);
+        entry(SELL, 1, 25).exit(1, 30); // lose -5
+        assert createLog().asset().is(115);
+        entry(BUY, 1, 10).exit(1, 40); // win 30
+        assert createLog().asset().is(145);
+        entry(SELL, 1, 25).exit(1, 50); // lose -25
+        assert createLog().asset().is(120);
+        entry(SELL, 1, 25).exit(1, 30); // lose -5
+        assert createLog().asset().is(115);
+        entry(SELL, 1, 25).exit(1, 35); // lose -10
+        assert createLog().asset().is(105);
+        entry(BUY, 1, 10).exit(1, 40); // win 30
+        assert createLog().asset().is(135);
     }
 }

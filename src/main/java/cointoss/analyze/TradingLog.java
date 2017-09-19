@@ -47,6 +47,9 @@ public class TradingLog {
     /** The max draw down. */
     public Decimal drawDown = Decimal.ZERO;
 
+    /** The max draw down. */
+    public Decimal drawDownRate = Decimal.ZERO;
+
     /** The max total profit and loss. */
     private Decimal maxTotalProfitAndLoss = Decimal.ZERO;
 
@@ -125,8 +128,20 @@ public class TradingLog {
                 if (profitOrLoss.isPositive()) profit.add(profitOrLoss);
                 if (profitOrLoss.isNegative()) loss.add(profitOrLoss);
                 maxTotalProfitAndLoss = maxTotalProfitAndLoss.max(profitAndLoss.total);
+                drawDown = drawDown.max(maxTotalProfitAndLoss.minus(profitAndLoss.total));
+                drawDownRate = maxTotalProfitAndLoss.isZero() ? drawDownRate
+                        : drawDownRate.max(drawDown.dividedBy(maxTotalProfitAndLoss).multipliedBy(HUNDRED).scale(2));
             }
         }
+    }
+
+    /**
+     * Calculate total assets.
+     * 
+     * @return
+     */
+    public Decimal asset() {
+        return startBaseCurrency.plus(startTargetCurrency.multipliedBy(startPrice)).plus(profitAndLoss.total);
     }
 
     /**
@@ -151,13 +166,6 @@ public class TradingLog {
      * Calculate profit factor.
      */
     public Decimal profitFactor() {
-        return profit.total.dividedBy(loss.total.isZero() ? Decimal.ONE : loss.total.abs()).scale(3);
-    }
-
-    /**
-     * Calculate max draw down.
-     */
-    public Decimal drawDown() {
         return profit.total.dividedBy(loss.total.isZero() ? Decimal.ONE : loss.total.abs()).scale(3);
     }
 
