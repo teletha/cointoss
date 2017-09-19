@@ -27,7 +27,7 @@ import kiss.Signal;
 public class BackTester {
 
     /** 試行回数 */
-    private int trial = 1;
+    private int trial = 5;
 
     /** 基軸通貨量 */
     private Decimal base = Decimal.ZERO;
@@ -108,7 +108,7 @@ public class BackTester {
     public void execute() {
         IntStream.range(0, trial)
                 .parallel()
-                .mapToObj(i -> new Market(new BackTestBackend(), marketLog.rangeRandom(5), strategy))
+                .mapToObj(i -> new Market(new BackTestBackend(), marketLog.rangeRandom(7 * 4), strategy))
                 .forEach(market -> {
                     System.out.println(new TradingLog(market, market.tradings));
                 });
@@ -162,8 +162,38 @@ public class BackTester {
      * @param args
      */
     public static void main(String[] args) {
-        BackTester tester = BackTester.initialize(BitFlyer.FX_BTC_JPY.log()).balance(1000000, 0).strategy(BreakoutTrading.class);
+        BackTester tester = BackTester.initialize(BitFlyer.FX_BTC_JPY.log()).balance(1000000, 0).strategy(BuyAndHold.class);
         tester.execute();
+    }
+
+    /**
+     * @version 2017/09/19 17:44:44
+     */
+    private static class BuyAndHold extends Trading {
+
+        private Decimal budget = Decimal.ZERO;
+
+        /**
+         * @param market
+         */
+        private BuyAndHold(Market market) {
+            super(market);
+
+            market.minute5.to(exe -> {
+                budget = budget.plus(Decimal.valueOf(10000 / (24 * 12)));
+
+                Tick tick = market.hour12.ticks.latest(0);
+
+                if (tick != null && exe.closePrice.isLessThan(tick.maxPrice.multipliedBy(Decimal.valueOf(0.9)))) {
+                    Decimal price = market.getExecutionLatest().price;
+                    Decimal size = budget.dividedBy(price).max(Decimal.valueOf(0.01));
+
+                    entryLimit(Side.BUY, size, price, entry -> {
+                        budget = Decimal.ZERO;
+                    });
+                }
+            });
+        }
     }
 
     /**

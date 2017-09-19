@@ -64,6 +64,17 @@ public interface MarketLog {
      * @param end
      * @return
      */
+    default Signal<Execution> rangeAll() {
+        return range(getCacheStart(), getCacheEnd());
+    }
+
+    /**
+     * Read date from the specified start to end.
+     * 
+     * @param start
+     * @param end
+     * @return
+     */
     default Signal<Execution> range(Span span) {
         return range(span.start, span.end);
     }

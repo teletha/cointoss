@@ -168,7 +168,8 @@ public class TradingLog {
      * Calculate winning rate.
      */
     public Decimal winningRate() {
-        return Decimal.valueOf(profit.size).dividedBy(Decimal.valueOf(profitAndLoss.size)).multipliedBy(HUNDRED).scale(1);
+        return profitAndLoss.size == 0 ? Decimal.ZERO
+                : Decimal.valueOf(profit.size).dividedBy(Decimal.valueOf(profitAndLoss.size)).multipliedBy(HUNDRED).scale(1);
     }
 
     /**
