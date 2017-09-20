@@ -16,8 +16,6 @@ import org.junit.Test;
 
 import cointoss.Execution;
 import cointoss.Side;
-import cointoss.chart.Chart;
-import cointoss.chart.Tick;
 import eu.verdelhan.ta4j.Decimal;
 
 /**
@@ -60,15 +58,17 @@ public class ChartTest {
         min1.tick(create(0, 1, 1));
         min1.tick(create(80, 2, 1));
         min1.tick(create(100, 3, 1));
+        min1.tick(create(120, 4, 1));
+        min1.tick(create(150, 5, 1));
 
-        assert min1.getTickCount() == 2;
+        assert min1.getTickCount() == 3;
         assert min2.getTickCount() == 1;
 
         Tick tick1 = min1.getLastTick();
-        assert tick1.openPrice.is(2);
-        assert tick1.closePrice.is(3);
-        assert tick1.maxPrice.is(3);
-        assert tick1.minPrice.is(2);
+        assert tick1.openPrice.is(4);
+        assert tick1.closePrice.is(5);
+        assert tick1.maxPrice.is(5);
+        assert tick1.minPrice.is(4);
         assert tick1.volume.is(2);
 
         Tick tick2 = min2.getLastTick();

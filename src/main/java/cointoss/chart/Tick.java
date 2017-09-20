@@ -9,7 +9,6 @@
  */
 package cointoss.chart;
 
-import java.time.Duration;
 import java.time.ZonedDateTime;
 
 import cointoss.Execution;
@@ -67,19 +66,10 @@ public class Tick {
     /**
     * 
     */
-    Tick(Execution exe, Duration duration) {
-        beginTime = exe.exec_date.withNano(0);
-        endTime = beginTime.plus(duration);
-        openPrice = exe.price;
-    }
-
-    /**
-    * 
-    */
-    Tick(Tick exe, Duration duration) {
-        beginTime = exe.beginTime;
-        endTime = beginTime.plus(duration);
-        openPrice = exe.openPrice;
+    Tick(ZonedDateTime start, ZonedDateTime end, Decimal open) {
+        this.beginTime = start;
+        this.endTime = end;
+        this.openPrice = open;
     }
 
     /**
@@ -92,6 +82,18 @@ public class Tick {
         maxPrice = maxPrice.max(exe.price);
         minPrice = minPrice.min(exe.price);
         volume = volume.plus(exe.size);
+    }
+
+    /**
+     * Assign date.
+     * 
+     * @param tick
+     */
+    void tick(Tick tick) {
+        closePrice = tick.closePrice;
+        maxPrice = maxPrice.max(tick.maxPrice);
+        minPrice = minPrice.min(tick.minPrice);
+        volume = volume.plus(tick.volume);
     }
 
     /**

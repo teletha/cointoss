@@ -29,7 +29,7 @@ public class BackTest {
         BackTester.with()
                 .baseCurrency(1000000)
                 .targetCurrency(0)
-                .log(() -> BitFlyer.BTC_JPY.log().rangeRandom(14))
+                .log(() -> BitFlyer.FX_BTC_JPY.log().rangeRandom(7))
                 .strategy(BuyAndHold.class)
                 .trial(5)
                 .run();
@@ -85,12 +85,12 @@ public class BackTest {
         private BuyAndHold(Market market) {
             super(market);
 
-            market.minute1.signal().takeAt(i -> i % 9 == 0).to(exe -> {
+            market.minute1.signal().takeAt(i -> i % 10 == 0).to(exe -> {
                 budget = budget.plus(Decimal.valueOf(10000 / (24 * 12)));
 
                 Tick tick = market.day1.ticks.latest(1);
 
-                if (tick != null && exe.closePrice.isLessThan(tick.closePrice.multipliedBy(Decimal.valueOf(0.95)))) {
+                if (tick != null && exe.closePrice.isLessThan(tick.closePrice.multipliedBy(Decimal.valueOf(0.9)))) {
                     Decimal price = market.getExecutionLatest().price;
                     Decimal size = budget.dividedBy(price).max(Decimal.valueOf(0.01));
 

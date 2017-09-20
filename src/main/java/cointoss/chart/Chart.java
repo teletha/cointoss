@@ -13,6 +13,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
+import java.time.Instant;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.IntStream;
@@ -33,20 +35,8 @@ import kiss.Signal;
 @SuppressWarnings("serial")
 public class Chart {
 
-    /** The max tick size. */
-    private final int size = 60 * 24;
-
     /** The chart duration. */
     private final Duration duration;
-
-    /** The child delegator. */
-    private final Chart[] children;
-
-    /** The start index. */
-    private int start = 0;
-
-    /** The end index. */
-    private int end = 0;
 
     /** The current tick */
     private Tick current;
@@ -54,10 +44,11 @@ public class Chart {
     /** The tick manager. */
     public final RingBuffer<Tick> ticks = new RingBuffer(60 * 24);
 
-    public final Signal<Tick> tick;
-
     /** The tick observers. */
     private final CopyOnWriteArrayList<Observer<? super Tick>> listeners = new CopyOnWriteArrayList<>();
+
+    /** The tick observers. */
+    public final Signal<Tick> tick = new Signal(listeners);
 
     /** The trend indicator. */
     private final Indicator trend;
@@ -67,9 +58,11 @@ public class Chart {
      */
     public Chart(Duration duration, Chart... children) {
         this.duration = duration;
-        this.children = children;
         this.trend = PriceIndicator.close(this).sma(12);
-        this.tick = new Signal(listeners);
+
+        for (Chart child : children) {
+            tick.to(child::tick);
+        }
     }
 
     /**
@@ -149,8 +142,7 @@ public class Chart {
      */
     public void tick(Execution exe) {
         if (current == null) {
-            current = new Tick(exe, duration);
-            ticks.add(current);
+            ticks.add(current = convert(exe));
         }
 
         if (!exe.exec_date.isBefore(current.endTime)) {
@@ -160,17 +152,44 @@ public class Chart {
             }
 
             // update
-            current = new Tick(exe, duration);
-            ticks.add(current);
+            ticks.add(current = convert(exe));
         }
         current.tick(exe);
+    }
 
-        // propagate
-        if (children != null) {
-            for (Chart child : children) {
-                child.tick(exe);
-            }
+    /**
+     * @param exe
+     * @return
+     */
+    private Tick convert(Execution exe) {
+        ZonedDateTime time = exe.exec_date.withNano(0);
+        long epochSecond = time.toEpochSecond();
+        epochSecond = epochSecond - (epochSecond % duration.getSeconds());
+        ZonedDateTime normalized = ZonedDateTime.ofInstant(Instant.ofEpochSecond(epochSecond), time.getZone());
+
+        return new Tick(normalized, normalized.plus(duration), exe.price);
+    }
+
+    /**
+     * Record executions.
+     */
+    private void tick(Tick tick) {
+        if (current == null) {
+            current = new Tick(tick.beginTime, tick.beginTime.plus(duration), tick.openPrice);
+            ticks.add(current);
         }
+
+        if (!tick.beginTime.isBefore(current.endTime)) {
+            // notify
+            for (Observer<? super Tick> listener : listeners) {
+                listener.accept(current);
+            }
+
+            // update
+            current = new Tick(tick.beginTime, tick.beginTime.plus(duration), tick.openPrice);
+            ticks.add(current);
+        }
+        current.tick(tick);
     }
 
     /**
