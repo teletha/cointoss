@@ -33,7 +33,7 @@ import kiss.Signal;
 public abstract class Trading {
 
     /** The market. */
-    protected final Market market;
+    protected Market market;
 
     /** The signal observers. */
     private final CopyOnWriteArrayList<Observer<Boolean>> closePositions = new CopyOnWriteArrayList();
@@ -63,12 +63,9 @@ public abstract class Trading {
     private final List<Entry> actives = new ArrayList();
 
     /**
-     * New Trade.
+     * Initialize this trading strategy.
      */
-    protected Trading(Market market) {
-        this.market = market;
-        this.market.tradings.add(this);
-    }
+    protected abstract void initialize();
 
     /**
      * Detect position.

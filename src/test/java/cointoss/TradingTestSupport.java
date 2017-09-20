@@ -28,10 +28,16 @@ public abstract class TradingTestSupport extends Trading {
      * @param market
      */
     public TradingTestSupport() {
-        super(new TestableMarket());
+        super.market = market = new TestableMarket();
+        super.market.tradings.add(this);
+    }
 
-        this.market = (TestableMarket) super.market;
-        this.market.tradings.add(this);
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected final void initialize() {
+        // do nothing
     }
 
     @Before

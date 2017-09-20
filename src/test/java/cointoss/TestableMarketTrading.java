@@ -15,11 +15,9 @@ package cointoss;
 class TestableMarketTrading extends Trading {
 
     /**
-     * @param market
+     * {@inheritDoc}
      */
-    TestableMarketTrading(Market market) {
-        super(market);
-
-        market.tradings.add(this);
+    @Override
+    protected void initialize() {
     }
 }

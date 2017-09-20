@@ -20,18 +20,17 @@ import kiss.I;
 public class BitFlyerMonitor extends Trading {
 
     /**
-     * @param market
+     * {@inheritDoc}
      */
-    public BitFlyerMonitor(Market market) {
-        super(market);
-
+    @Override
+    protected void initialize() {
         market.observeExecutionBySize(10).to(exe -> {
             System.out.println("大口 " + exe.exec_date.withNano(0).toLocalDateTime().plusHours(9) + "  " + exe.side
                     .mark() + exe.cumulativeSize + " @" + exe.price);
         });
 
         market.minute1.to(tick -> {
-            System.out.println(tick.beginTime + "  1min " + market.minute1.trend() + "   15min " + market.minute15
+            System.out.println(tick.start + "  1min " + market.minute1.trend() + "   15min " + market.minute15
                     .trend() + "    30min " + market.minute30
                             .trend() + "   1hour " + market.hour1.trend() + "   2hour " + market.hour2.trend());
         });
@@ -45,6 +44,6 @@ public class BitFlyerMonitor extends Trading {
     public static void main(String[] args) {
         I.load(Decimal.Codec.class, false);
 
-        Market market = new Market(BitFlyer.BTC_JPY.service(), BitFlyer.BTC_JPY.log().fromLast(3), BitFlyerMonitor.class);
+        Market market = new Market(BitFlyer.BTC_JPY.service(), BitFlyer.BTC_JPY.log().fromLast(3), new BitFlyerMonitor());
     }
 }

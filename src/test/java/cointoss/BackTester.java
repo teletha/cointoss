@@ -33,7 +33,7 @@ public class BackTester {
     private Decimal target = Decimal.ZERO;
 
     /** テスト戦略 */
-    private Class<? extends Trading> strategy;
+    private Trading strategy;
 
     /** The execution log. */
     private Supplier<Signal<Execution>> log;
@@ -53,7 +53,7 @@ public class BackTester {
      * @param strategy
      * @return
      */
-    public BackTester strategy(Class<? extends Trading> strategy) {
+    public BackTester strategy(Trading strategy) {
         if (strategy != null) {
             this.strategy = strategy;
         }

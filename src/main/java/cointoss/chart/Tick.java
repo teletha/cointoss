@@ -20,10 +20,10 @@ import eu.verdelhan.ta4j.Decimal;
 public class Tick {
 
     /** Begin time of the tick */
-    public final ZonedDateTime beginTime;
+    public final ZonedDateTime start;
 
     /** End time of the tick */
-    public final ZonedDateTime endTime;
+    public final ZonedDateTime end;
 
     /** Open price of the period */
     public final Decimal openPrice;
@@ -43,9 +43,6 @@ public class Tick {
     /** Volume of the period */
     public Decimal volume = Decimal.ZERO;
 
-    /** Trade count */
-    protected int trades = 0;
-
     /**
      * Decode.
      * 
@@ -54,8 +51,8 @@ public class Tick {
     Tick(String value) {
         String[] values = value.split(" ");
 
-        beginTime = ZonedDateTime.parse(values[0]);
-        endTime = ZonedDateTime.parse(values[1]);
+        start = ZonedDateTime.parse(values[0]);
+        end = ZonedDateTime.parse(values[1]);
         openPrice = Decimal.valueOf(values[2]);
         closePrice = Decimal.valueOf(values[3]);
         maxPrice = Decimal.valueOf(values[4]);
@@ -67,8 +64,8 @@ public class Tick {
     * 
     */
     Tick(ZonedDateTime start, ZonedDateTime end, Decimal open) {
-        this.beginTime = start;
-        this.endTime = end;
+        this.start = start;
+        this.end = end;
         this.openPrice = open;
     }
 
@@ -101,8 +98,8 @@ public class Tick {
      * 
      * @return The beginTime property.
      */
-    public final ZonedDateTime getBeginTime() {
-        return beginTime;
+    public final ZonedDateTime start() {
+        return start;
     }
 
     /**
@@ -110,8 +107,8 @@ public class Tick {
      * 
      * @return The endTime property.
      */
-    public final ZonedDateTime getEndTime() {
-        return endTime;
+    public final ZonedDateTime end() {
+        return end;
     }
 
     /**
@@ -169,23 +166,14 @@ public class Tick {
     }
 
     /**
-     * Get the trades property of this {@link Tick}.
-     * 
-     * @return The trades property.
-     */
-    public final int getTrades() {
-        return trades;
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append(beginTime)
+        builder.append(start)
                 .append(" ")
-                .append(endTime)
+                .append(end)
                 .append(" ")
                 .append(openPrice)
                 .append(" ")

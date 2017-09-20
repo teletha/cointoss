@@ -109,7 +109,7 @@ public class Market {
      * @param builder
      * @param strategy
      */
-    public Market(MarketBackend backend, Signal<Execution> log, Class<? extends Trading> strategy) {
+    public Market(MarketBackend backend, Signal<Execution> log, Trading strategy) {
         this.backend = Objects.requireNonNull(backend);
 
         // initialize price, balance and executions
@@ -117,7 +117,9 @@ public class Market {
         this.base = this.baseInit = units.get(0).amount;
         this.target = this.targetInit = units.get(1).amount;
 
-        create(Objects.requireNonNull(strategy));
+        tradings.add(strategy);
+        strategy.market = this;
+        strategy.initialize();
         backend.initialize(this, log);
     }
 

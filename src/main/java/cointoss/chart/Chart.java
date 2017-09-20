@@ -145,7 +145,7 @@ public class Chart {
             ticks.add(current = convert(exe));
         }
 
-        if (!exe.exec_date.isBefore(current.endTime)) {
+        if (!exe.exec_date.isBefore(current.end)) {
             // notify
             for (Observer<? super Tick> listener : listeners) {
                 listener.accept(current);
@@ -175,18 +175,18 @@ public class Chart {
      */
     private void tick(Tick tick) {
         if (current == null) {
-            current = new Tick(tick.beginTime, tick.beginTime.plus(duration), tick.openPrice);
+            current = new Tick(tick.start, tick.start.plus(duration), tick.openPrice);
             ticks.add(current);
         }
 
-        if (!tick.beginTime.isBefore(current.endTime)) {
+        if (!tick.start.isBefore(current.end)) {
             // notify
             for (Observer<? super Tick> listener : listeners) {
                 listener.accept(current);
             }
 
             // update
-            current = new Tick(tick.beginTime, tick.beginTime.plus(duration), tick.openPrice);
+            current = new Tick(tick.start, tick.start.plus(duration), tick.openPrice);
             ticks.add(current);
         }
         current.tick(tick);
