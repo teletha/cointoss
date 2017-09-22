@@ -131,10 +131,9 @@ class BitFlyerLog implements MarketLog {
             AtomicBoolean completeREST = new AtomicBoolean();
 
             // read from realtime API
-            // if (disposer.isDisposed() == false) {
-            // disposer.add(realtime().skipUntil(e ->
-            // completeREST.get()).effect(this::cache).to(observer::accept));
-            // }
+            if (disposer.isDisposed() == false) {
+                disposer.add(realtime().skipUntil(e -> completeREST.get()).effect(this::cache).to(observer::accept));
+            }
 
             // read from REST API
             if (disposer.isDisposed() == false) {

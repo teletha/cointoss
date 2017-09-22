@@ -33,7 +33,7 @@ public class BackTester {
     private Decimal target = Decimal.ZERO;
 
     /** テスト戦略 */
-    private Trading strategy;
+    private Supplier<Trading> strategy;
 
     /** The execution log. */
     private Supplier<Signal<Execution>> log;
@@ -53,7 +53,7 @@ public class BackTester {
      * @param strategy
      * @return
      */
-    public BackTester strategy(Trading strategy) {
+    public BackTester strategy(Supplier<Trading> strategy) {
         if (strategy != null) {
             this.strategy = strategy;
         }
@@ -142,7 +142,7 @@ public class BackTester {
      * Execute back test.
      */
     public void run() {
-        IntStream.range(0, trial).parallel().mapToObj(i -> new Market(new BackTestBackend(), log.get(), strategy)).forEach(market -> {
+        IntStream.range(0, trial).parallel().mapToObj(i -> new Market(new BackTestBackend(), log.get(), strategy.get())).forEach(market -> {
             System.out.println(new TradingLog(market, market.tradings));
         });
     }

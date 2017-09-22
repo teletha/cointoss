@@ -48,7 +48,7 @@ public class PriceIndicator extends Indicator {
      * @return
      */
     public static final PriceIndicator close(Chart chart) {
-        return new PriceIndicator(chart, tick -> tick.closePrice);
+        return new PriceIndicator(chart, Tick::getClosePrice);
     }
 
     /**
@@ -58,7 +58,7 @@ public class PriceIndicator extends Indicator {
      * @return
      */
     public static final PriceIndicator open(Chart chart) {
-        return new PriceIndicator(chart, tick -> tick.openPrice);
+        return new PriceIndicator(chart, Tick::getOpenPrice);
     }
 
     /**
@@ -68,7 +68,7 @@ public class PriceIndicator extends Indicator {
      * @return
      */
     public static final PriceIndicator max(Chart chart) {
-        return new PriceIndicator(chart, tick -> tick.maxPrice);
+        return new PriceIndicator(chart, Tick::getMaxPrice);
     }
 
     /**
@@ -78,6 +78,16 @@ public class PriceIndicator extends Indicator {
      * @return
      */
     public static final PriceIndicator min(Chart chart) {
-        return new PriceIndicator(chart, tick -> tick.minPrice);
+        return new PriceIndicator(chart, Tick::getMinPrice);
+    }
+
+    /**
+     * Helper to create price related indicator.
+     * 
+     * @param chart
+     * @return
+     */
+    public static final PriceIndicator weightMedian(Chart chart) {
+        return new PriceIndicator(chart, Tick::getWeightMedian);
     }
 }

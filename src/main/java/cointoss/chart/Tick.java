@@ -58,6 +58,7 @@ public class Tick {
         maxPrice = Decimal.valueOf(values[4]);
         minPrice = Decimal.valueOf(values[5]);
         volume = Decimal.valueOf(values[6]);
+        amount = Decimal.valueOf(values[7]);
     }
 
     /**
@@ -79,6 +80,7 @@ public class Tick {
         maxPrice = maxPrice.max(exe.price);
         minPrice = minPrice.min(exe.price);
         volume = volume.plus(exe.size);
+        amount = amount.plus(exe.price.multipliedBy(exe.size));
     }
 
     /**
@@ -91,6 +93,7 @@ public class Tick {
         maxPrice = maxPrice.max(tick.maxPrice);
         minPrice = minPrice.min(tick.minPrice);
         volume = volume.plus(tick.volume);
+        amount = amount.plus(tick.amount);
     }
 
     /**
@@ -166,6 +169,13 @@ public class Tick {
     }
 
     /**
+     * @return
+     */
+    public final Decimal getWeightMedian() {
+        return amount.dividedBy(volume);
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -183,7 +193,9 @@ public class Tick {
                 .append(" ")
                 .append(minPrice)
                 .append(" ")
-                .append(volume);
+                .append(volume)
+                .append(" ")
+                .append(amount);
 
         return builder.toString();
     }

@@ -396,9 +396,26 @@ public abstract class Trading {
                 }
             }
 
-            if (start.isBefore(finish)) {
-                finish = market.getExecutionLatest().exec_date;
+            // if (start.isBefore(finish)) {
+            // finish = market.getExecutionLatest().exec_date;
+            // }
+
+            if (finish.isBefore(start)) {
+                // If this exception will be thrown, it is bug of this program. So we must rethrow
+                // the wrapped error in here.
+                for (Execution e : order.executions) {
+                    System.out.println("Start Exe " + e);
+                }
+
+                for (Order o : exit) {
+                    for (Execution e : o.executions) {
+                        System.out.println("Exit Exe " + e);
+                    }
+                }
+
+                throw new Error(finish + "   " + start);
             }
+
             return new Span(start, finish);
         }
 

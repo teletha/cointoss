@@ -30,7 +30,7 @@ public class BackTest {
                 .baseCurrency(1000000)
                 .targetCurrency(0)
                 .log(() -> BitFlyer.FX_BTC_JPY.log().rangeRandom(7))
-                .strategy(new BuyAndHold())
+                .strategy(() -> new BuyAndHold())
                 .trial(5)
                 .run();
     }
@@ -80,6 +80,33 @@ public class BackTest {
      */
     private static class BuyAndHold extends Trading {
 
+        public String decreaseRatio = "0.95";
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected void initialize() {
+            market.minute1.signal().takeAt(i -> i % 10 == 0).to(tick -> {
+                Tick last1 = market.hour12.ticks.latest(0);
+                Tick last2 = market.hour12.ticks.latest(1);
+                Decimal max = last2 == null ? last1.getWeightMedian() : last1.getWeightMedian().max(last2.getWeightMedian());
+
+                if (tick.closePrice.isLessThan(max.multipliedBy(decreaseRatio))) {
+                    Decimal price = market.getExecutionLatest().price;
+                    Decimal size = Decimal.valueOf(0.01);
+
+                    entryLimit(Side.BUY, size, price, entry -> {
+                        entry.order.execute.to(e -> {
+                        });
+                    });
+                }
+            });
+        }
+    }
+
+    private static class SellAndHold extends Trading {
+
         private Decimal budget = Decimal.ZERO;
 
         /**
@@ -92,11 +119,11 @@ public class BackTest {
 
                 Tick tick = market.day1.ticks.latest(1);
 
-                if (tick != null && exe.closePrice.isLessThan(tick.closePrice.multipliedBy(Decimal.valueOf(0.9)))) {
+                if (tick != null && exe.closePrice.isGreaterThan(tick.minPrice.multipliedBy(Decimal.valueOf(1.07)))) {
                     Decimal price = market.getExecutionLatest().price;
                     Decimal size = budget.dividedBy(price).max(Decimal.valueOf(0.01));
 
-                    entryLimit(Side.BUY, size, price, entry -> {
+                    entryLimit(Side.SELL, size, price, entry -> {
                         budget = Decimal.ZERO;
                     });
                 }

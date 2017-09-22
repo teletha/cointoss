@@ -44,6 +44,6 @@ public class BitFlyerMonitor extends Trading {
     public static void main(String[] args) {
         I.load(Decimal.Codec.class, false);
 
-        Market market = new Market(BitFlyer.BTC_JPY.service(), BitFlyer.BTC_JPY.log().fromLast(3), new BitFlyerMonitor());
+        Market market = new Market(BitFlyer.FX_BTC_JPY.service(), BitFlyer.FX_BTC_JPY.log().fromLast(3), new BitFlyerMonitor());
     }
 }

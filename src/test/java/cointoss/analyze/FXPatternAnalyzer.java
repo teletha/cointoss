@@ -56,7 +56,7 @@ public class FXPatternAnalyzer extends Trading {
                 .baseCurrency(1000000)
                 .targetCurrency(0)
                 .log(BitFlyer.FX_BTC_JPY.log().rangeAll())
-                .strategy(analyzer)
+                .strategy(() -> analyzer)
                 .trial(1)
                 .run();
 

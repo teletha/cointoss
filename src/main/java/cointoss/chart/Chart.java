@@ -20,7 +20,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.IntStream;
 
 import cointoss.Execution;
-import cointoss.Trend;
 import cointoss.chart.simple.PriceIndicator;
 import cointoss.util.RingBuffer;
 import eu.verdelhan.ta4j.Decimal;
@@ -58,7 +57,7 @@ public class Chart {
      */
     public Chart(Duration duration, Chart... children) {
         this.duration = duration;
-        this.trend = PriceIndicator.close(this).sma(12);
+        this.trend = PriceIndicator.weightMedian(this).sma(30);
 
         for (Chart child : children) {
             tick.to(child::tick);

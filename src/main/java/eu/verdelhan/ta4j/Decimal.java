@@ -626,6 +626,14 @@ public class Decimal implements Comparable<Decimal> {
     }
 
     /**
+     * @param value
+     * @return
+     */
+    public Decimal multipliedBy(String value) {
+        return multipliedBy(Decimal.valueOf(value));
+    }
+
+    /**
      * Decrease amount by the specified {@link Directional}.
      * 
      * @param direction A current side.

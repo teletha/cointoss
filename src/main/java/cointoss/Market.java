@@ -133,8 +133,8 @@ public class Market {
         AtomicReference<Decimal> accumlated = new AtomicReference<>(Decimal.ZERO);
 
         return timeline.scan(new Execution(), (prev, next) -> {
-            if (prev.buy_child_order_acceptance_id.equals(next.buy_child_order_acceptance_id) || prev.sell_child_order_acceptance_id
-                    .equals(next.sell_child_order_acceptance_id)) {
+            if ((next.side.isBuy() && prev.buy_child_order_acceptance_id.equals(next.buy_child_order_acceptance_id)) || (next.side
+                    .isSell() && prev.sell_child_order_acceptance_id.equals(next.sell_child_order_acceptance_id))) {
                 accumlated.updateAndGet(v -> v.plus(next.size));
             } else {
                 prev.cumulativeSize = accumlated.getAndSet(next.size);
