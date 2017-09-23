@@ -87,6 +87,7 @@ public class BackTest {
          */
         @Override
         protected void initialize() {
+
             market.minute1.signal().takeAt(i -> i % 10 == 0).to(tick -> {
                 Tick last1 = market.hour12.ticks.latest(0);
                 Tick last2 = market.hour12.ticks.latest(1);

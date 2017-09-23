@@ -37,11 +37,14 @@ public class Tick {
     /** Min price of the period */
     public Decimal minPrice = Decimal.MAX;
 
+    /** Volume of the period */
+    public Decimal volume = Decimal.ZERO;
+
     /** Traded amount during the period */
     public Decimal amount = Decimal.ZERO;
 
-    /** Volume of the period */
-    public Decimal volume = Decimal.ZERO;
+    /** Traded amount during the period */
+    public Decimal amountSquare = Decimal.ZERO;
 
     /**
      * Decode.
