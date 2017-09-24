@@ -268,7 +268,7 @@ public class Num implements Comparable<Num> {
      * @see BigDecimal#remainder(java.math.BigDecimal, java.math.MathContext)
      */
     public final Num remainder(Num divisor) {
-        if (this == NaN || divisor == NaN || divisor.isZero()) {
+        if (this == NaN || divisor == null || divisor == NaN || divisor.isZero()) {
             return NaN;
         }
         return new Num(delegate.remainder(divisor.delegate, MATH_CONTEXT));
@@ -280,7 +280,7 @@ public class Num implements Comparable<Num> {
      * @return
      */
     public final Num scale(int size) {
-        return new Num(delegate.setScale(size, RoundingMode.HALF_UP));
+        return this == NaN ? NaN : new Num(delegate.setScale(size, RoundingMode.HALF_UP));
     }
 
     /**
@@ -493,6 +493,15 @@ public class Num implements Comparable<Num> {
     }
 
     /**
+     * Checks if the value is NOT zero.
+     * 
+     * @return true if the value is NOT zero, false otherwise
+     */
+    public final boolean isNotZero() {
+        return isZero() == false;
+    }
+
+    /**
      * Checks if the value is greater than zero.
      * 
      * @return true if the value is greater than zero, false otherwise
@@ -594,7 +603,7 @@ public class Num implements Comparable<Num> {
      * @return true is this is greater than or equal to the specified value, false otherwise
      */
     public final boolean isGreaterThanOrEqual(Num other) {
-        return this != NaN && other != NaN && compareTo(other) > -1;
+        return other != null && this != NaN && other != NaN && compareTo(other) > -1;
     }
 
     /**
@@ -654,7 +663,7 @@ public class Num implements Comparable<Num> {
      * @return true is this is less than or equal to the specified value, false otherwise
      */
     public final boolean isLessThanOrEqual(Num other) {
-        return this != NaN && other != NaN && compareTo(other) < 1;
+        return other != null && this != NaN && other != NaN && compareTo(other) < 1;
     }
 
     /**
