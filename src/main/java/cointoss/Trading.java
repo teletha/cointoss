@@ -22,8 +22,8 @@ import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+import cointoss.util.Num;
 import cointoss.util.Span;
-import eu.verdelhan.ta4j.Decimal;
 import kiss.Observer;
 import kiss.Signal;
 
@@ -54,7 +54,7 @@ public abstract class Trading {
     protected final Signal<Boolean> completingExit = new Signal(completeExits);
 
     /** The user setting. */
-    protected Decimal maxPositionSize = Decimal.valueOf(1);
+    protected Num maxPositionSize = Num.of(1);
 
     /** All managed entries. */
     public final Deque<Entry> entries = new ArrayDeque<>();
@@ -91,19 +91,19 @@ public abstract class Trading {
      * @param side
      * @param size
      */
-    protected final Entry entryLimit(Side side, Decimal size, Decimal price, Consumer<Entry> process) {
+    protected final Entry entryLimit(Side side, Num size, Num price, Consumer<Entry> process) {
         // check side
         if (side == null) {
             return null;
         }
 
         // check size
-        if (size == null || size.isLessThanOrEqual(Decimal.ZERO)) {
+        if (size == null || size.isLessThanOrEqual(Num.ZERO)) {
             return null;
         }
 
         // check price
-        if (price == null || price.isLessThanOrEqual(Decimal.ZERO)) {
+        if (price == null || price.isLessThanOrEqual(Num.ZERO)) {
             return null;
         }
 
@@ -116,14 +116,14 @@ public abstract class Trading {
      * @param side
      * @param size
      */
-    protected final Entry entryMarket(Side side, Decimal size, Consumer<Entry> process) {
+    protected final Entry entryMarket(Side side, Num size, Consumer<Entry> process) {
         // check side
         if (side == null) {
             return null;
         }
 
         // check size
-        if (size == null || size.isLessThanOrEqual(Decimal.ZERO)) {
+        if (size == null || size.isLessThanOrEqual(Num.ZERO)) {
             return null;
         }
         return new Entry(Order.market(side, size), process);
@@ -231,25 +231,25 @@ public abstract class Trading {
         final List<String> logs = new ArrayList();
 
         /** The current position size. */
-        private Decimal remaining = Decimal.ZERO;
+        private Num remaining = Num.ZERO;
 
         /** The remaining size of entry order. */
-        private Decimal entryRemaining;
+        private Num entryRemaining;
 
         /** The total size of entry order. */
-        private Decimal entrySize = Decimal.ZERO;
+        private Num entrySize = Num.ZERO;
 
         /** The total cost of entry order. */
-        private Decimal entryCost = Decimal.ZERO;
+        private Num entryCost = Num.ZERO;
 
         /** The remaining size of entry order. */
-        private Decimal exitRemaining = Decimal.ZERO;
+        private Num exitRemaining = Num.ZERO;
 
         /** The total size of exit order. */
-        private Decimal exitSize = Decimal.ZERO;
+        private Num exitSize = Num.ZERO;
 
         /** The total cost of exit order. */
-        private Decimal exitCost = Decimal.ZERO;
+        private Num exitCost = Num.ZERO;
 
         /**
          * Create {@link Entry} with {@link Order}.
@@ -270,7 +270,7 @@ public abstract class Trading {
                     remaining = remaining.plus(exe.size);
                     entrySize = entrySize.plus(exe.size);
                     entryRemaining = entryRemaining.minus(exe.size);
-                    entryCost = entryCost.plus(exe.price.multipliedBy(exe.size));
+                    entryCost = entryCost.plus(exe.price.multiply(exe.size));
 
                     if (o.isCompleted()) {
                         for (Observer<Boolean> observer : completeEntries) {
@@ -295,7 +295,7 @@ public abstract class Trading {
          * 
          * @return
          */
-        public final Decimal remaining() {
+        public final Num remaining() {
             return remaining;
         }
 
@@ -304,15 +304,15 @@ public abstract class Trading {
          * 
          * @return
          */
-        public final Decimal profit() {
-            Decimal up, down;
+        public final Num profit() {
+            Num up, down;
 
             if (side().isBuy()) {
-                up = exitCost.plus(remaining.multipliedBy(market.getLatestPrice()));
+                up = exitCost.plus(remaining.multiply(market.getLatestPrice()));
                 down = entryCost;
             } else {
                 up = entryCost;
-                down = exitCost.plus(remaining.multipliedBy(market.getLatestPrice()));
+                down = exitCost.plus(remaining.multiply(market.getLatestPrice()));
             }
             return up.minus(down);
         }
@@ -322,7 +322,7 @@ public abstract class Trading {
          * 
          * @return
          */
-        public final Decimal entrySize() {
+        public final Num entrySize() {
             return entrySize;
         }
 
@@ -331,8 +331,8 @@ public abstract class Trading {
          * 
          * @return
          */
-        public final Decimal entryPrice() {
-            return entrySize.isZero() ? Decimal.ZERO : entryCost.dividedBy(entrySize);
+        public final Num entryPrice() {
+            return entrySize.isZero() ? Num.ZERO : entryCost.divide(entrySize);
         }
 
         /**
@@ -340,7 +340,7 @@ public abstract class Trading {
          * 
          * @return
          */
-        public final Decimal exitSize() {
+        public final Num exitSize() {
             return exitSize;
         }
 
@@ -349,8 +349,8 @@ public abstract class Trading {
          * 
          * @return
          */
-        public final Decimal exitPrice() {
-            return exitSize.isZero() ? Decimal.ZERO : exitCost.dividedBy(exitSize);
+        public final Num exitPrice() {
+            return exitSize.isZero() ? Num.ZERO : exitCost.divide(exitSize);
         }
 
         /**
@@ -437,7 +437,7 @@ public abstract class Trading {
          * Cehck whether this position is not activated.
          */
         public final boolean isInitial() {
-            return order.size().isEqual(entryRemaining);
+            return order.size().is(entryRemaining);
         }
 
         /**
@@ -467,14 +467,14 @@ public abstract class Trading {
          * @param size A exit size.
          * @param price A exit price.
          */
-        protected final void exitLimit(Decimal size, Decimal price, Consumer<Order> process) {
+        protected final void exitLimit(Num size, Num price, Consumer<Order> process) {
             // check size
-            if (size == null || size.isLessThanOrEqual(Decimal.ZERO)) {
+            if (size == null || size.isLessThanOrEqual(Num.ZERO)) {
                 return;
             }
 
             // check price
-            if (price == null || price.isLessThanOrEqual(Decimal.ZERO)) {
+            if (price == null || price.isLessThanOrEqual(Num.ZERO)) {
                 return;
             }
             exit(Order.limit(order.inverse(), size, price), process);
@@ -508,7 +508,7 @@ public abstract class Trading {
          * 
          * @param size A exit size.
          */
-        protected final void exitMarket(Decimal size) {
+        protected final void exitMarket(Num size) {
             exitMarket(size, null);
         }
 
@@ -517,9 +517,9 @@ public abstract class Trading {
          * 
          * @param size A exit size.
          */
-        protected final void exitMarket(Decimal size, Consumer<Order> process) {
+        protected final void exitMarket(Num size, Consumer<Order> process) {
             // check size
-            if (size == null || size.isLessThanOrEqual(Decimal.ZERO)) {
+            if (size == null || size.isLessThanOrEqual(Num.ZERO)) {
                 return;
             }
             exit(Order.market(order.inverse(), size), process);
@@ -540,7 +540,7 @@ public abstract class Trading {
                     remaining = remaining.minus(exe.size);
                     exitSize = exitSize.plus(exe.size);
                     exitRemaining = exitRemaining.minus(exe.size);
-                    exitCost = exitCost.plus(exe.price.multipliedBy(exe.size));
+                    exitCost = exitCost.plus(exe.price.multiply(exe.size));
 
                     if (o.isCompleted()) {
                         for (Observer<Boolean> observer : completeExits) {

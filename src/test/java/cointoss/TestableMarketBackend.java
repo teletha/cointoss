@@ -17,7 +17,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import cointoss.Order.Quantity;
 import cointoss.Time.Lag;
-import eu.verdelhan.ta4j.Decimal;
+import cointoss.util.Num;
 import kiss.I;
 import kiss.Signal;
 
@@ -75,8 +75,8 @@ class TestableMarketBackend implements MarketBackend {
             child.child_order_type = order.price().is(0) ? OrderType.MARKET : OrderType.LIMIT;
             child.average_price = order.price();
             child.outstanding_size = order.size();
-            child.cancel_size = Decimal.ZERO;
-            child.executed_size = Decimal.ZERO;
+            child.cancel_size = Num.ZERO;
+            child.executed_size = Num.ZERO;
 
             orderAll.add(child);
             orderActive.add(child);
@@ -148,11 +148,11 @@ class TestableMarketBackend implements MarketBackend {
     public Signal<BalanceUnit> getCurrency() {
         BalanceUnit base = new BalanceUnit();
         base.currency_code = "JPY";
-        base.amount = base.available = Decimal.HUNDRED;
+        base.amount = base.available = Num.HUNDRED;
 
         BalanceUnit target = new BalanceUnit();
         target.currency_code = "BTC";
-        target.amount = target.available = Decimal.ZERO;
+        target.amount = target.available = Num.ZERO;
 
         return I.signal(base, target);
     }
@@ -200,7 +200,7 @@ class TestableMarketBackend implements MarketBackend {
 
             if (order.quantity() == Quantity.ImmediateOrCancel) {
                 if (order.isTradablePriceWith(e)) {
-                    Decimal min = e.size.min(order.outstanding_size);
+                    Num min = Num.min(e.size, order.outstanding_size);
                     order.outstanding_size = min;
                 } else {
                     iterator.remove();
@@ -210,12 +210,12 @@ class TestableMarketBackend implements MarketBackend {
             }
 
             if (order.isTradablePriceWith(e)) {
-                Decimal executedSize = e.size.min(order.outstanding_size);
+                Num executedSize = Num.min(e.size, order.outstanding_size);
                 if (order.child_order_type.isMarket() && executedSize.isNot(0)) {
-                    order.marketMinPrice = order.isBuy() ? order.marketMinPrice.max(e.price) : order.marketMinPrice.min(e.price);
-                    order.average_price = order.average_price.multipliedBy(order.executed_size)
-                            .plus(order.marketMinPrice.multipliedBy(executedSize))
-                            .dividedBy(order.executed_size.plus(executedSize));
+                    order.marketMinPrice = order.isBuy() ? Num.max(order.marketMinPrice, e.price) : Num.min(order.marketMinPrice, e.price);
+                    order.average_price = order.average_price.multiply(order.executed_size)
+                            .plus(order.marketMinPrice.multiply(executedSize))
+                            .divide(order.executed_size.plus(executedSize));
                 }
                 order.outstanding_size = order.outstanding_size.minus(executedSize);
                 order.executed_size = order.executed_size.plus(executedSize);
@@ -256,7 +256,7 @@ class TestableMarketBackend implements MarketBackend {
         private boolean triggerArchived;
 
         /** The minimum price for market order. */
-        private Decimal marketMinPrice = isBuy() ? Decimal.ZERO : Decimal.MAX;
+        private Num marketMinPrice = isBuy() ? Num.ZERO : Num.MAX;
 
         /**
          * @param o

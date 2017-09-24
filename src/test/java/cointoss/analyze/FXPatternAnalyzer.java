@@ -16,7 +16,7 @@ import java.util.TreeMap;
 import cointoss.BackTester;
 import cointoss.Trading;
 import cointoss.market.bitflyer.BitFlyer;
-import eu.verdelhan.ta4j.Decimal;
+import cointoss.util.Num;
 
 /**
  * @version 2017/09/20 2:36:26
@@ -32,14 +32,14 @@ public class FXPatternAnalyzer extends Trading {
     protected void initialize() {
         market.hour1.signal().to(tick -> {
             Statistics stat = statistics.computeIfAbsent(tick.start.toLocalTime().withMinute(0).withSecond(0).withNano(0), Statistics::new);
-            Decimal diff = tick.closePrice.dividedBy(tick.openPrice);
+            Num diff = tick.closePrice.divide(tick.openPrice);
 
             if (tick.openPrice.isLessThan(tick.closePrice)) {
                 stat.up = stat.up.plus(1);
-                stat.upRatio = stat.upRatio.multipliedBy(diff);
+                stat.upRatio = stat.upRatio.multiply(diff);
             } else {
                 stat.down = stat.down.plus(1);
-                stat.downRatio = stat.downRatio.multipliedBy(diff);
+                stat.downRatio = stat.downRatio.multiply(diff);
             }
         });
     }
@@ -70,13 +70,13 @@ public class FXPatternAnalyzer extends Trading {
      */
     private static class Statistics {
 
-        public Decimal down = Decimal.ZERO;
+        public Num down = Num.ZERO;
 
-        public Decimal downRatio = Decimal.ONE;
+        public Num downRatio = Num.ONE;
 
-        public Decimal up = Decimal.ZERO;
+        public Num up = Num.ZERO;
 
-        public Decimal upRatio = Decimal.ONE;
+        public Num upRatio = Num.ONE;
 
         private final LocalTime time;
 
@@ -102,7 +102,7 @@ public class FXPatternAnalyzer extends Trading {
                     .append(" ")
                     .append(downRatio)
                     .append("\t")
-                    .append(up.dividedBy(down).scale(2))
+                    .append(up.divide(down).scale(2))
                     .toString();
         }
     }

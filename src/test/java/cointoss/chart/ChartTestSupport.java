@@ -14,7 +14,7 @@ import java.time.ZonedDateTime;
 
 import cointoss.Execution;
 import cointoss.Side;
-import eu.verdelhan.ta4j.Decimal;
+import cointoss.util.Num;
 
 /**
  * @version 2017/09/10 13:06:03
@@ -47,8 +47,8 @@ abstract class ChartTestSupport {
      */
     private Execution execute(int time, int price, int size) {
         Execution e = new Execution();
-        e.price = Decimal.valueOf(price);
-        e.size = Decimal.valueOf(size);
+        e.price = Num.of(price);
+        e.size = Num.of(size);
         e.exec_date = base.plusSeconds(time);
         e.side = Side.BUY;
 

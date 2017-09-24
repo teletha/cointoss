@@ -9,7 +9,7 @@
  */
 package cointoss.analyze;
 
-import eu.verdelhan.ta4j.Decimal;
+import cointoss.util.Num;
 
 /**
  * @version 2017/08/30 20:45:02
@@ -20,13 +20,13 @@ import eu.verdelhan.ta4j.Decimal;
 public class AmountSummary {
 
     /** MAX value. */
-    public Decimal min = Decimal.ZERO;
+    public Num min = Num.ZERO;
 
     /** MIN value. */
-    public Decimal max = Decimal.ZERO;
+    public Num max = Num.ZERO;
 
     /** Total value. */
-    public Decimal total = Decimal.ZERO;
+    public Num total = Num.ZERO;
 
     /** Number of values. */
     public int size = 0;
@@ -39,8 +39,8 @@ public class AmountSummary {
      * 
      * @return
      */
-    public Decimal mean() {
-        return total.dividedBy(Math.max(size, 1));
+    public Num mean() {
+        return total.divide(Math.max(size, 1));
     }
 
     /**
@@ -48,9 +48,9 @@ public class AmountSummary {
      * 
      * @param value
      */
-    void add(Decimal value) {
-        min = min.isZero() ? value : min.min(value);
-        max = max.isZero() ? value : max.max(value);
+    void add(Num value) {
+        min = min.isZero() ? value : Num.min(min, value);
+        max = max.isZero() ? value : Num.max(max, value);
         total = total.plus(value);
         size++;
         if (value.isPositive()) positive++;

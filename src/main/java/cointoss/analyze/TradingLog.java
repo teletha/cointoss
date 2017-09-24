@@ -9,7 +9,7 @@
  */
 package cointoss.analyze;
 
-import static eu.verdelhan.ta4j.Decimal.*;
+import static cointoss.util.Num.*;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -19,7 +19,7 @@ import cointoss.Execution;
 import cointoss.Market;
 import cointoss.Trading;
 import cointoss.Trading.Entry;
-import eu.verdelhan.ta4j.Decimal;
+import cointoss.util.Num;
 
 /**
  * @version 2017/09/11 18:31:10
@@ -45,13 +45,13 @@ public class TradingLog {
     public AmountSummary profitAndLoss = new AmountSummary();
 
     /** The max draw down. */
-    public Decimal drawDown = Decimal.ZERO;
+    public Num drawDown = Num.ZERO;
 
     /** The max draw down. */
-    public Decimal drawDownRate = Decimal.ZERO;
+    public Num drawDownRate = Num.ZERO;
 
     /** The max total profit and loss. */
-    private Decimal maxTotalProfitAndLoss = Decimal.ZERO;
+    private Num maxTotalProfitAndLoss = Num.ZERO;
 
     /** A number of created positions. */
     public int total = 0;
@@ -69,25 +69,25 @@ public class TradingLog {
     public final ZonedDateTime start;
 
     /** The starting trading rate. */
-    public final Decimal startPrice;
+    public final Num startPrice;
 
     /** The starting base currency. */
-    public final Decimal startBaseCurrency;
+    public final Num startBaseCurrency;
 
     /** The starting target currency. */
-    public final Decimal startTargetCurrency;
+    public final Num startTargetCurrency;
 
     /** The finishing date. */
     public final ZonedDateTime finish;
 
     /** The finishing trading rate. */
-    public final Decimal finishPrice;
+    public final Num finishPrice;
 
     /** The finishing base currency. */
-    public final Decimal finishBaseCurrency;
+    public final Num finishBaseCurrency;
 
     /** The finishing target currency. */
-    public final Decimal finishTargetCurrency;
+    public final Num finishTargetCurrency;
 
     /**
      * Analyze trading.
@@ -123,14 +123,14 @@ public class TradingLog {
                 holdTime.add(entry.holdTime().time());
 
                 // calculate profit and loss
-                Decimal profitOrLoss = entry.profit();
+                Num profitOrLoss = entry.profit();
                 profitAndLoss.add(profitOrLoss);
                 if (profitOrLoss.isPositive()) profit.add(profitOrLoss);
                 if (profitOrLoss.isNegative()) loss.add(profitOrLoss);
-                maxTotalProfitAndLoss = maxTotalProfitAndLoss.max(profitAndLoss.total);
-                drawDown = drawDown.max(maxTotalProfitAndLoss.minus(profitAndLoss.total));
-                drawDownRate = drawDownRate
-                        .max(drawDown.dividedBy(assetInitial().plus(maxTotalProfitAndLoss)).multipliedBy(HUNDRED).scale(1));
+                maxTotalProfitAndLoss = Num.max(maxTotalProfitAndLoss, profitAndLoss.total);
+                drawDown = Num.max(drawDown, maxTotalProfitAndLoss.minus(profitAndLoss.total));
+                drawDownRate = Num
+                        .max(drawDownRate, drawDown.divide(assetInitial().plus(maxTotalProfitAndLoss)).multiply(HUNDRED).scale(1));
             }
         }
     }
@@ -140,8 +140,8 @@ public class TradingLog {
      * 
      * @return
      */
-    public Decimal assetInitial() {
-        return startBaseCurrency.plus(startTargetCurrency.multipliedBy(startPrice));
+    public Num assetInitial() {
+        return startBaseCurrency.plus(startTargetCurrency.multiply(startPrice));
     }
 
     /**
@@ -149,7 +149,7 @@ public class TradingLog {
      * 
      * @return
      */
-    public Decimal asset() {
+    public Num asset() {
         return assetInitial().plus(profitAndLoss.total);
     }
 
@@ -158,36 +158,35 @@ public class TradingLog {
      * 
      * @return
      */
-    public Decimal profit() {
-        Decimal baseProfit = finishBaseCurrency.minus(startBaseCurrency);
-        Decimal targetProfit = finishTargetCurrency.multipliedBy(finishPrice).minus(startTargetCurrency.multipliedBy(startPrice));
+    public Num profit() {
+        Num baseProfit = finishBaseCurrency.minus(startBaseCurrency);
+        Num targetProfit = finishTargetCurrency.multiply(finishPrice).minus(startTargetCurrency.multiply(startPrice));
         return baseProfit.plus(targetProfit);
     }
 
     /**
      * Calculate winning rate.
      */
-    public Decimal winningRate() {
-        return profitAndLoss.size == 0 ? Decimal.ZERO
-                : Decimal.valueOf(profit.size).dividedBy(Decimal.valueOf(profitAndLoss.size)).multipliedBy(HUNDRED).scale(1);
+    public Num winningRate() {
+        return profitAndLoss.size == 0 ? Num.ZERO : Num.of(profit.size).divide(Num.of(profitAndLoss.size)).multiply(HUNDRED).scale(1);
     }
 
     /**
      * Calculate profit factor.
      */
-    public Decimal profitFactor() {
-        return profit.total.dividedBy(loss.total.isZero() ? Decimal.ONE : loss.total.abs()).scale(3);
+    public Num profitFactor() {
+        return profit.total.divide(loss.total.isZero() ? Num.ONE : loss.total.abs()).scale(3);
     }
 
     /**
-     * Format {@link Decimal}.
+     * Format {@link Num}.
      * 
      * @param base
      * @return
      */
-    private String format(ZonedDateTime time, Decimal price, Decimal base, Decimal target) {
+    private String format(ZonedDateTime time, Num price, Num base, Num target) {
         return durationHM.format(time) + " " + base.asJPY() + "\t" + target.asBTC() + "(" + price
-                .asJPY(1) + ")\t総計" + base.plus(target.multipliedBy(price)).asJPY();
+                .asJPY(1) + ")\t総計" + base.plus(target.multiply(price)).asJPY();
     }
 
     /**

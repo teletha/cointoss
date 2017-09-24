@@ -12,7 +12,7 @@ package cointoss.chart;
 import java.time.ZonedDateTime;
 
 import cointoss.Execution;
-import eu.verdelhan.ta4j.Decimal;
+import cointoss.util.Num;
 
 /**
  * @version 2017/09/10 8:40:27
@@ -26,25 +26,25 @@ public class Tick {
     public final ZonedDateTime end;
 
     /** Open price of the period */
-    public final Decimal openPrice;
+    public final Num openPrice;
 
     /** Close price of the period */
-    public Decimal closePrice = null;
+    public Num closePrice = null;
 
     /** Max price of the period */
-    public Decimal maxPrice = Decimal.ZERO;
+    public Num maxPrice = Num.ZERO;
 
     /** Min price of the period */
-    public Decimal minPrice = Decimal.MAX;
+    public Num minPrice = Num.MAX;
 
     /** Volume of the period */
-    public Decimal volume = Decimal.ZERO;
+    public Num volume = Num.ZERO;
 
     /** Traded amount during the period */
-    public Decimal amount = Decimal.ZERO;
+    public Num amount = Num.ZERO;
 
     /** Traded amount during the period */
-    public Decimal amountSquare = Decimal.ZERO;
+    public Num amountSquare = Num.ZERO;
 
     /**
      * Decode.
@@ -56,18 +56,18 @@ public class Tick {
 
         start = ZonedDateTime.parse(values[0]);
         end = ZonedDateTime.parse(values[1]);
-        openPrice = Decimal.valueOf(values[2]);
-        closePrice = Decimal.valueOf(values[3]);
-        maxPrice = Decimal.valueOf(values[4]);
-        minPrice = Decimal.valueOf(values[5]);
-        volume = Decimal.valueOf(values[6]);
-        amount = Decimal.valueOf(values[7]);
+        openPrice = Num.of(values[2]);
+        closePrice = Num.of(values[3]);
+        maxPrice = Num.of(values[4]);
+        minPrice = Num.of(values[5]);
+        volume = Num.of(values[6]);
+        amount = Num.of(values[7]);
     }
 
     /**
     * 
     */
-    Tick(ZonedDateTime start, ZonedDateTime end, Decimal open) {
+    Tick(ZonedDateTime start, ZonedDateTime end, Num open) {
         this.start = start;
         this.end = end;
         this.openPrice = open;
@@ -80,10 +80,10 @@ public class Tick {
      */
     void tick(Execution exe) {
         closePrice = exe.price;
-        maxPrice = maxPrice.max(exe.price);
-        minPrice = minPrice.min(exe.price);
+        maxPrice = Num.max(maxPrice, exe.price);
+        minPrice = Num.min(minPrice, exe.price);
         volume = volume.plus(exe.size);
-        amount = amount.plus(exe.price.multipliedBy(exe.size));
+        amount = amount.plus(exe.price.multiply(exe.size));
     }
 
     /**
@@ -93,8 +93,8 @@ public class Tick {
      */
     void tick(Tick tick) {
         closePrice = tick.closePrice;
-        maxPrice = maxPrice.max(tick.maxPrice);
-        minPrice = minPrice.min(tick.minPrice);
+        maxPrice = Num.max(maxPrice, tick.maxPrice);
+        minPrice = Num.min(minPrice, tick.minPrice);
         volume = volume.plus(tick.volume);
         amount = amount.plus(tick.amount);
     }
@@ -122,7 +122,7 @@ public class Tick {
      * 
      * @return The openPrice property.
      */
-    public final Decimal getOpenPrice() {
+    public final Num getOpenPrice() {
         return openPrice;
     }
 
@@ -131,7 +131,7 @@ public class Tick {
      * 
      * @return The closePrice property.
      */
-    public final Decimal getClosePrice() {
+    public final Num getClosePrice() {
         return closePrice;
     }
 
@@ -140,7 +140,7 @@ public class Tick {
      * 
      * @return The maxPrice property.
      */
-    public final Decimal getMaxPrice() {
+    public final Num getMaxPrice() {
         return maxPrice;
     }
 
@@ -149,7 +149,7 @@ public class Tick {
      * 
      * @return The minPrice property.
      */
-    public final Decimal getMinPrice() {
+    public final Num getMinPrice() {
         return minPrice;
     }
 
@@ -158,7 +158,7 @@ public class Tick {
      * 
      * @return The amount property.
      */
-    public final Decimal getAmount() {
+    public final Num getAmount() {
         return amount;
     }
 
@@ -167,15 +167,15 @@ public class Tick {
      * 
      * @return The volume property.
      */
-    public final Decimal getVolume() {
+    public final Num getVolume() {
         return volume;
     }
 
     /**
      * @return
      */
-    public final Decimal getWeightMedian() {
-        return amount.dividedBy(volume);
+    public final Num getWeightMedian() {
+        return amount.divide(volume);
     }
 
     /**

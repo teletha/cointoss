@@ -13,7 +13,7 @@ import static java.time.temporal.ChronoUnit.*;
 
 import cointoss.chart.Tick;
 import cointoss.market.bitflyer.BitFlyer;
-import eu.verdelhan.ta4j.Decimal;
+import cointoss.util.Num;
 
 /**
  * @version 2017/09/19 23:45:54
@@ -91,11 +91,11 @@ public class BackTest {
             market.minute1.signal().takeAt(i -> i % 10 == 0).to(tick -> {
                 Tick last1 = market.hour12.ticks.latest(0);
                 Tick last2 = market.hour12.ticks.latest(1);
-                Decimal max = last2 == null ? last1.getWeightMedian() : last1.getWeightMedian().max(last2.getWeightMedian());
+                Num max = Num.max(last1.getWeightMedian(), last2.getWeightMedian());
 
-                if (tick.closePrice.isLessThan(max.multipliedBy(decreaseRatio))) {
-                    Decimal price = market.getExecutionLatest().price;
-                    Decimal size = Decimal.valueOf(0.01);
+                if (tick.closePrice.isLessThan(max.multiply(decreaseRatio))) {
+                    Num price = market.getExecutionLatest().price;
+                    Num size = Num.of(0.01);
 
                     entryLimit(Side.BUY, size, price, entry -> {
                         entry.order.execute.to(e -> {
@@ -108,7 +108,7 @@ public class BackTest {
 
     private static class SellAndHold extends Trading {
 
-        private Decimal budget = Decimal.ZERO;
+        private Num budget = Num.ZERO;
 
         /**
          * {@inheritDoc}
@@ -116,16 +116,16 @@ public class BackTest {
         @Override
         protected void initialize() {
             market.minute1.signal().takeAt(i -> i % 10 == 0).to(exe -> {
-                budget = budget.plus(Decimal.valueOf(10000 / (24 * 12)));
+                budget = budget.plus(Num.of(10000 / (24 * 12)));
 
                 Tick tick = market.day1.ticks.latest(1);
 
-                if (tick != null && exe.closePrice.isGreaterThan(tick.minPrice.multipliedBy(Decimal.valueOf(1.07)))) {
-                    Decimal price = market.getExecutionLatest().price;
-                    Decimal size = budget.dividedBy(price).max(Decimal.valueOf(0.01));
+                if (tick != null && exe.closePrice.isGreaterThan(tick.minPrice.multiply(Num.of(1.07)))) {
+                    Num price = market.getExecutionLatest().price;
+                    Num size = Num.of(0.01);
 
                     entryLimit(Side.SELL, size, price, entry -> {
-                        budget = Decimal.ZERO;
+                        budget = Num.ZERO;
                     });
                 }
             });
@@ -139,7 +139,7 @@ public class BackTest {
 
         private int update;
 
-        private Decimal underPrice;
+        private Num underPrice;
 
         /**
          * {@inheritDoc}
@@ -181,7 +181,7 @@ public class BackTest {
                                 .map(Tick::getClosePrice)
                                 .takeAt(i -> i % 5 == 0)
                                 .to(e -> {
-                                    Decimal next = e.minus(entry, Math.max(0, 4000 - update * 200));
+                                    Num next = e.minus(entry, Math.max(0, 4000 - update * 200));
 
                                     if (next.isGreaterThan(entry, underPrice)) {
                                         entry.log("最低価格を%sから%sに再設定 参考値%s", underPrice, next, e);

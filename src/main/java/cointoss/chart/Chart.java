@@ -21,8 +21,8 @@ import java.util.stream.IntStream;
 
 import cointoss.Execution;
 import cointoss.chart.simple.PriceIndicator;
+import cointoss.util.Num;
 import cointoss.util.RingBuffer;
-import eu.verdelhan.ta4j.Decimal;
 import filer.Filer;
 import kiss.I;
 import kiss.Observer;
@@ -70,15 +70,15 @@ public class Chart {
      * @return
      */
     public Trend trend() {
-        Decimal latest = trend.getLast(0);
-        Decimal total = Decimal.ONE;
+        Num latest = trend.getLast(0);
+        Num total = Num.ONE;
 
         for (int i = 1; i < Math.min(24, ticks.size()); i++) {
-            Decimal ratio = latest.dividedBy(trend.getLast(i));
-            total = total.multipliedBy(ratio);
+            Num ratio = latest.divide(trend.getLast(i));
+            total = total.multiply(ratio);
         }
-        return total.isLessThan(Decimal.valueOf("0.65")) ? Trend.Down
-                : total.isGreaterThan(Decimal.valueOf("1.35")) ? Trend.Up : Trend.Range;
+        return total.isLessThan(Num.of("0.65")) ? Trend.Down
+                : total.isGreaterThan(Num.of("1.35")) ? Trend.Up : Trend.Range;
     }
 
     /**

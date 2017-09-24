@@ -9,8 +9,8 @@
  */
 package cointoss.chart;
 
+import cointoss.util.Num;
 import cointoss.util.RingBuffer;
-import eu.verdelhan.ta4j.Decimal;
 
 /**
  * @version 2017/09/10 12:18:58
@@ -18,7 +18,7 @@ import eu.verdelhan.ta4j.Decimal;
 public abstract class Indicator {
 
     /** The internal cache. */
-    private final RingBuffer<Decimal> cache;
+    private final RingBuffer<Num> cache;
 
     /** The target chart. */
     protected final Chart chart;
@@ -37,7 +37,7 @@ public abstract class Indicator {
      * @param index
      * @return
      */
-    public final Decimal get(int index) {
+    public final Num get(int index) {
         int end = chart.ticks.end() - 1;
 
         if (index == end) {
@@ -50,7 +50,7 @@ public abstract class Indicator {
     /**
      * Return the index (from last) value.
      */
-    public final Decimal getLast(int lastIndex) {
+    public final Num getLast(int lastIndex) {
         return get(chart.ticks.end() - lastIndex - 1);
     }
 
@@ -60,7 +60,7 @@ public abstract class Indicator {
      * @param index
      * @return
      */
-    public abstract Decimal calculate(int index);
+    public abstract Num calculate(int index);
 
     /**
      * Compose Simple Moving Average indicator.
@@ -74,15 +74,15 @@ public abstract class Indicator {
              * {@inheritDoc}
              */
             @Override
-            public Decimal calculate(int index) {
-                Decimal sum = Decimal.ZERO;
+            public Num calculate(int index) {
+                Num sum = Num.ZERO;
 
                 for (int i = Math.max(0, index - timeFrame + 1); i <= index; i++) {
                     sum = sum.plus(indicator.get(i));
                 }
 
                 final int realTimeFrame = Math.min(timeFrame, index + 1);
-                return sum.dividedBy(Decimal.valueOf(realTimeFrame));
+                return sum.divide(Num.of(realTimeFrame));
             }
         };
     }
@@ -94,14 +94,14 @@ public abstract class Indicator {
      * @return
      */
     public Indicator ema(int timeFrame) {
-        Decimal multiplier = Decimal.TWO.dividedBy(Decimal.valueOf(timeFrame + 1));
+        Num multiplier = Num.TWO.divide(Num.of(timeFrame + 1));
 
         return new ComposableIndicator(this) {
             /**
              * {@inheritDoc}
              */
             @Override
-            public Decimal calculate(int index) {
+            public Num calculate(int index) {
                 if (index + 1 < timeFrame) {
                     // Starting point of the EMA
                     return sma(timeFrame).get(index);
@@ -110,8 +110,8 @@ public abstract class Indicator {
                     // If the timeframe is bigger than the indicator's value count
                     return indicator.get(0);
                 }
-                Decimal emaPrev = get(index - 1);
-                return indicator.get(index).minus(emaPrev).multipliedBy(multiplier).plus(emaPrev);
+                Num emaPrev = get(index - 1);
+                return indicator.get(index).minus(emaPrev).multiply(multiplier).plus(emaPrev);
             }
         };
     }

@@ -12,7 +12,7 @@ package cointoss.market.bittrex;
 import java.util.ArrayList;
 import java.util.List;
 
-import eu.verdelhan.ta4j.Decimal;
+import cointoss.util.Num;
 
 /**
  * @version 2017/09/01 11:32:57
@@ -31,12 +31,12 @@ public class BitTrexOrderBook {
         return sell.get(0);
     }
 
-    public Decimal middleBid() {
-        return bid().Rate.multiply(4).plus(ask().Rate).dividedBy(5);
+    public Num middleBid() {
+        return bid().Rate.multiply(4).plus(ask().Rate).divide(5);
     }
 
-    public Decimal middleAsk() {
-        return ask().Rate.multiply(4).plus(bid().Rate).dividedBy(5);
+    public Num middleAsk() {
+        return ask().Rate.multiply(4).plus(bid().Rate).divide(5);
     }
 
     /**
@@ -52,9 +52,9 @@ public class BitTrexOrderBook {
      */
     public static class Book {
 
-        public Decimal Quantity;
+        public Num Quantity;
 
-        public Decimal Rate;
+        public Num Rate;
 
         /**
          * {@inheritDoc}

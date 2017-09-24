@@ -18,7 +18,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 
 import cointoss.chart.Chart;
-import eu.verdelhan.ta4j.Decimal;
+import cointoss.util.Num;
 import kiss.I;
 import kiss.Observer;
 import kiss.Signal;
@@ -90,16 +90,16 @@ public class Market {
     private Execution latest;
 
     /** 基軸通貨量 */
-    private Decimal base;
+    private Num base;
 
     /** 基軸通貨初期量 */
-    private Decimal baseInit;
+    private Num baseInit;
 
     /** 対象通貨量 */
-    private Decimal target;
+    private Num target;
 
     /** 対象通貨初期量 */
-    private Decimal targetInit;
+    private Num targetInit;
 
     /** The current trading. */
     final List<Trading> tradings = new ArrayList<>();
@@ -130,7 +130,7 @@ public class Market {
      * @return
      */
     public final Signal<Execution> observeExecutionBySize(int threshold) {
-        AtomicReference<Decimal> accumlated = new AtomicReference<>(Decimal.ZERO);
+        AtomicReference<Num> accumlated = new AtomicReference<>(Num.ZERO);
 
         return timeline.scan(new Execution(), (prev, next) -> {
             if ((next.side.isBuy() && prev.buy_child_order_acceptance_id.equals(next.buy_child_order_acceptance_id)) || (next.side
@@ -239,7 +239,7 @@ public class Market {
      * 
      * @return
      */
-    public Decimal getBase() {
+    public Num getBase() {
         return base;
     }
 
@@ -248,7 +248,7 @@ public class Market {
      * 
      * @return
      */
-    public Decimal getTarget() {
+    public Num getTarget() {
         return target;
     }
 
@@ -257,7 +257,7 @@ public class Market {
      * 
      * @return
      */
-    public Decimal getBaseInit() {
+    public Num getBaseInit() {
         return baseInit;
     }
 
@@ -266,7 +266,7 @@ public class Market {
      * 
      * @return
      */
-    public Decimal getTargetInit() {
+    public Num getTargetInit() {
         return targetInit;
     }
 
@@ -291,7 +291,7 @@ public class Market {
     /**
      * @return
      */
-    public Decimal getLatestPrice() {
+    public Num getLatestPrice() {
         return latest.price;
     }
 
@@ -311,9 +311,9 @@ public class Market {
      * 
      * @return
      */
-    public Decimal calculateProfit() {
-        Decimal baseProfit = base.minus(baseInit);
-        Decimal targetProfit = target.multipliedBy(latest.price).minus(targetInit.multipliedBy(init.price));
+    public Num calculateProfit() {
+        Num baseProfit = base.minus(baseInit);
+        Num targetProfit = target.multiply(latest.price).minus(targetInit.multiply(init.price));
         return baseProfit.plus(targetProfit);
     }
 
@@ -324,10 +324,10 @@ public class Market {
     public Side position;
 
     /** The remaining position price. */
-    public Decimal price = Decimal.ZERO;
+    public Num price = Num.ZERO;
 
     /** The remaining position size. */
-    public Decimal remaining = Decimal.ZERO;
+    public Num remaining = Num.ZERO;
 
     /** The related order identifiers. */
     private final CopyOnWriteArrayList<Order> orders = new CopyOnWriteArrayList();
@@ -372,20 +372,20 @@ public class Market {
     private void update(Order order, Execution exe) {
         // update assets
         if (order.side().isBuy()) {
-            base = base.minus(exe.size.multipliedBy(exe.price));
+            base = base.minus(exe.size.multiply(exe.price));
             target = target.plus(exe.size);
         } else {
-            base = base.plus(exe.size.multipliedBy(exe.price));
+            base = base.plus(exe.size.multiply(exe.price));
             target = target.minus(exe.size);
         }
 
         // for order state
-        Decimal executed = order.outstanding_size.min(exe.size);
+        Num executed = Num.min(order.outstanding_size, exe.size);
 
         if (order.child_order_type.isMarket() && executed.isNot(0)) {
-            order.average_price = order.average_price.multipliedBy(order.executed_size)
-                    .plus(exe.price.multipliedBy(executed))
-                    .dividedBy(order.executed_size.plus(executed));
+            order.average_price = order.average_price.multiply(order.executed_size)
+                    .plus(exe.price.multiply(executed))
+                    .divide(order.executed_size.plus(executed));
         }
 
         order.outstanding_size = order.outstanding_size.minus(executed);
@@ -408,7 +408,7 @@ public class Market {
             price = exe.price;
         } else if (position.isSame(order.side())) {
             // same position
-            price = price.multipliedBy(remaining).plus(exe.price.multipliedBy(executed)).dividedBy(remaining.plus(executed));
+            price = price.multiply(remaining).plus(exe.price.multiply(executed)).divide(remaining.plus(executed));
             remaining = remaining.plus(executed);
         } else {
             // diff position
@@ -430,7 +430,7 @@ public class Market {
      */
     private void initializePosition() {
         position = null;
-        price = remaining = Decimal.ZERO;
+        price = remaining = Num.ZERO;
     }
 
     /**

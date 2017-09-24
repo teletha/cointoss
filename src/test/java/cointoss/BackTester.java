@@ -14,7 +14,7 @@ import java.util.stream.IntStream;
 
 import cointoss.Time.Lag;
 import cointoss.analyze.TradingLog;
-import eu.verdelhan.ta4j.Decimal;
+import cointoss.util.Num;
 import kiss.I;
 import kiss.Signal;
 
@@ -27,10 +27,10 @@ public class BackTester {
     private int trial = 7;
 
     /** 基軸通貨量 */
-    private Decimal base = Decimal.ZERO;
+    private Num base = Num.ZERO;
 
     /** 対象通貨量 */
-    private Decimal target = Decimal.ZERO;
+    private Num target = Num.ZERO;
 
     /** テスト戦略 */
     private Supplier<Trading> strategy;
@@ -99,7 +99,7 @@ public class BackTester {
      * @return
      */
     public BackTester baseCurrency(int base) {
-        return baseCurrency(Decimal.of(base));
+        return baseCurrency(Num.of(base));
     }
 
     /**
@@ -108,7 +108,7 @@ public class BackTester {
      * @param base
      * @return
      */
-    public BackTester baseCurrency(Decimal base) {
+    public BackTester baseCurrency(Num base) {
         if (base.isGreaterThanOrEqual(0)) {
             this.base = base;
         }
@@ -122,7 +122,7 @@ public class BackTester {
      * @return
      */
     public BackTester targetCurrency(int target) {
-        return targetCurrency(Decimal.of(target));
+        return targetCurrency(Num.of(target));
     }
 
     /**
@@ -131,7 +131,7 @@ public class BackTester {
      * @param target
      * @return
      */
-    public BackTester targetCurrency(Decimal target) {
+    public BackTester targetCurrency(Num target) {
         if (target.isGreaterThanOrEqual(0)) {
             this.target = target;
         }

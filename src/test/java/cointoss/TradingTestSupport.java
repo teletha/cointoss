@@ -12,7 +12,7 @@ package cointoss;
 import org.junit.Before;
 
 import cointoss.analyze.TradingLog;
-import eu.verdelhan.ta4j.Decimal;
+import cointoss.util.Num;
 import kiss.I;
 
 /**
@@ -57,7 +57,7 @@ public abstract class TradingTestSupport extends Trading {
      * @param exitPrice
      */
     protected final void entryAndExit(Side side, double entrySize, double entryPrice, double exitSize, double exitPrice) {
-        entryAndExit(side, Decimal.valueOf(entrySize), Decimal.valueOf(entryPrice), Decimal.valueOf(exitSize), Decimal.valueOf(exitPrice));
+        entryAndExit(side, Num.of(entrySize), Num.of(entryPrice), Num.of(exitSize), Num.of(exitPrice));
     }
 
     /**
@@ -69,7 +69,7 @@ public abstract class TradingTestSupport extends Trading {
      * @param exitSize
      * @param exitPrice
      */
-    protected final void entryAndExit(Side side, Decimal entrySize, Decimal entryPrice, Decimal exitSize, Decimal exitPrice) {
+    protected final void entryAndExit(Side side, Num entrySize, Num entryPrice, Num exitSize, Num exitPrice) {
         entryLimit(side, entrySize, entryPrice, entry -> {
             market.execute(side, entrySize, entryPrice);
 
@@ -88,7 +88,7 @@ public abstract class TradingTestSupport extends Trading {
      * @return
      */
     protected final Exit entry(Side side, double entrySize, double entryPrice) {
-        return entry(side, Decimal.valueOf(entrySize), Decimal.valueOf(entryPrice));
+        return entry(side, Num.of(entrySize), Num.of(entryPrice));
     }
 
     /**
@@ -99,7 +99,7 @@ public abstract class TradingTestSupport extends Trading {
      * @param entryPrice
      * @return
      */
-    protected final Exit entry(Side side, Decimal entrySize, Decimal entryPrice) {
+    protected final Exit entry(Side side, Num entrySize, Num entryPrice) {
         return new Exit(entryLimit(side, entrySize, entryPrice, entry -> {
             market.execute(side, entrySize, entryPrice);
         }));
@@ -136,7 +136,7 @@ public abstract class TradingTestSupport extends Trading {
          * @return
          */
         public final Exit exit(double exitSize, double exitPrice, double... executionSize) {
-            return exit(Decimal.valueOf(exitSize), Decimal.valueOf(exitPrice), Decimal.of(executionSize));
+            return exit(Num.of(exitSize), Num.of(exitPrice), Num.of(executionSize));
         }
 
         /**
@@ -146,12 +146,12 @@ public abstract class TradingTestSupport extends Trading {
          * @param exitPrice
          * @return
          */
-        public final Exit exit(Decimal exitSize, Decimal exitPrice, Decimal... executionSize) {
+        public final Exit exit(Num exitSize, Num exitPrice, Num... executionSize) {
             entry.exitLimit(exitSize, exitPrice, exit -> {
                 if (executionSize.length == 0) {
                     market.execute(entry.inverse(), exitSize, exitPrice);
                 } else {
-                    for (Decimal execution : executionSize) {
+                    for (Num execution : executionSize) {
                         market.execute(entry.inverse(), execution, exitPrice);
                     }
                 }

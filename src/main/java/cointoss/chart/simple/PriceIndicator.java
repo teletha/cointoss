@@ -14,7 +14,7 @@ import java.util.function.Function;
 import cointoss.chart.Chart;
 import cointoss.chart.Indicator;
 import cointoss.chart.Tick;
-import eu.verdelhan.ta4j.Decimal;
+import cointoss.util.Num;
 
 /**
  * @version 2017/09/10 13:00:35
@@ -22,12 +22,12 @@ import eu.verdelhan.ta4j.Decimal;
 public class PriceIndicator extends Indicator {
 
     /** The price calculator. */
-    private final Function<Tick, Decimal> calculator;
+    private final Function<Tick, Num> calculator;
 
     /**
      * @param chart
      */
-    public PriceIndicator(Chart chart, Function<Tick, Decimal> calculator) {
+    public PriceIndicator(Chart chart, Function<Tick, Num> calculator) {
         super(chart);
 
         this.calculator = calculator;
@@ -37,7 +37,7 @@ public class PriceIndicator extends Indicator {
      * {@inheritDoc}
      */
     @Override
-    public Decimal calculate(int index) {
+    public Num calculate(int index) {
         return calculator.apply(chart.ticks.get(index));
     }
 

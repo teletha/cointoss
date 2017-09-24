@@ -11,8 +11,6 @@ package cointoss.market.bitflyer;
 
 import cointoss.Market;
 import cointoss.Trading;
-import eu.verdelhan.ta4j.Decimal;
-import kiss.I;
 
 /**
  * @version 2017/09/08 18:40:12
@@ -42,8 +40,6 @@ public class BitFlyerMonitor extends Trading {
      * @param args
      */
     public static void main(String[] args) {
-        I.load(Decimal.Codec.class, false);
-
         Market market = new Market(BitFlyer.FX_BTC_JPY.service(), BitFlyer.FX_BTC_JPY.log().fromLast(3), new BitFlyerMonitor());
     }
 }

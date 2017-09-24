@@ -15,7 +15,7 @@ import static cointoss.Time.*;
 import java.time.ZonedDateTime;
 
 import cointoss.Time.At;
-import eu.verdelhan.ta4j.Decimal;
+import cointoss.util.Num;
 import kiss.Signal;
 import kiss.Table;
 
@@ -83,7 +83,7 @@ class TestableMarket extends Market {
      * @param size
      * @param price
      */
-    TestableMarket execute(Side side, Decimal size, Decimal price) {
+    TestableMarket execute(Side side, Num size, Num price) {
         return execute(side, size, price, at(0), "", "");
     }
 
@@ -95,7 +95,7 @@ class TestableMarket extends Market {
      * @param price
      */
     TestableMarket execute(Side side, int size, int price, String buyId, String sellId) {
-        return execute(side, Decimal.valueOf(size), Decimal.valueOf(price), at(0), buyId, sellId);
+        return execute(side, Num.of(size), Num.of(price), at(0), buyId, sellId);
     }
 
     /**
@@ -105,7 +105,7 @@ class TestableMarket extends Market {
      * @param size
      * @param price
      */
-    TestableMarket execute(Side side, Decimal size, Decimal price, String buyId, String sellId) {
+    TestableMarket execute(Side side, Num size, Num price, String buyId, String sellId) {
         return execute(side, size, price, at(0), buyId, sellId);
     }
 
@@ -117,7 +117,7 @@ class TestableMarket extends Market {
      * @param price
      */
     TestableMarket execute(Side side, int size, int price, At time) {
-        return execute(side, Decimal.of(size), Decimal.of(price), time, "", "");
+        return execute(side, Num.of(size), Num.of(price), time, "", "");
     }
 
     /**
@@ -127,7 +127,7 @@ class TestableMarket extends Market {
      * @param size
      * @param price
      */
-    TestableMarket execute(Side side, Decimal size, Decimal price, At time, String buyId, String sellId) {
+    TestableMarket execute(Side side, Num size, Num price, At time, String buyId, String sellId) {
         Execution e = new Execution();
         e.side = side;
         e.size = size;

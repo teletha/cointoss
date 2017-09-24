@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
-import eu.verdelhan.ta4j.Decimal;
+import cointoss.util.Num;
 import kiss.Decoder;
 import kiss.Encoder;
 
@@ -37,13 +37,13 @@ public class Execution {
     public Side side;
 
     /** price */
-    public Decimal price;
+    public Num price;
 
     /** size */
-    public Decimal size;
+    public Num size;
 
     /** size */
-    public Decimal cumulativeSize;
+    public Num cumulativeSize;
 
     /** date */
     public ZonedDateTime exec_date;
@@ -65,8 +65,8 @@ public class Execution {
         id = Long.parseLong(values[0]);
         exec_date = LocalDateTime.parse(values[1]).atZone(UTC);
         side = Side.parse(values[2]);
-        price = Decimal.valueOf(values[3]);
-        size = Decimal.valueOf(values[4]);
+        price = Num.of(values[3]);
+        size = Num.of(values[4]);
 
         if (5 < values.length) {
             buy_child_order_acceptance_id = values[5];
