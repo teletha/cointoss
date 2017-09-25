@@ -9,6 +9,7 @@
  */
 package cointoss.util;
 
+import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 import java.util.function.IntFunction;
@@ -16,7 +17,7 @@ import java.util.function.IntFunction;
 /**
  * @version 2017/09/10 11:55:00
  */
-public class RingBuffer<T> {
+public class RingBuffer<T> implements Iterable<T> {
 
     /** The logical index. */
     private final AtomicInteger logical = new AtomicInteger();
@@ -156,5 +157,32 @@ public class RingBuffer<T> {
      */
     public int size() {
         return logical.intValue();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Iterator<T> iterator() {
+        return new Iterator<T>() {
+
+            private int i = start();
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public boolean hasNext() {
+                return i < size();
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public T next() {
+                return get(i++);
+            }
+        };
     }
 }

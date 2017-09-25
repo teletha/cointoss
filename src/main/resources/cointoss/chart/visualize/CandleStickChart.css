@@ -1,0 +1,54 @@
+/* ====== CANDLE STICK CHART =========================================================== */
+.candlestick-tooltip-label {
+    -fx-font-size: 9pt;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+    -fx-padding: 2 5 2 0;
+}
+.candlestick-average-line {
+    -fx-stroke: #106ece;
+    -fx-stroke-width: 2px;
+}
+.candlestick-candle {
+    -fx-effect: dropshadow( two-pass-box , rgba(0,0,0,0.4) , 10, 0.0 , 2 , 4 );
+}
+.candlestick-line {
+    -fx-stroke: gray;
+    -fx-stroke-width: 2px;
+}
+.candlestick-bar {
+    -fx-padding: 5;
+    -candlestick-bar-fill: red;
+    -fx-background-color: linear-gradient(derive(-candlestick-bar-fill,-30%), derive(-candlestick-bar-fill,-40%)),
+        linear-gradient(derive(-candlestick-bar-fill,100%), derive(-candlestick-bar-fill, 10%)),
+        linear-gradient(derive(-candlestick-bar-fill,30%), derive(-candlestick-bar-fill,-10%));
+    -fx-background-insets: 0,1,2;
+}
+.candlestick-bar.close-above-open {
+    -candlestick-bar-fill: greenyellow;
+}
+.candlestick-bar.open-above-close {
+    -candlestick-bar-fill: lightpink;
+}
+ 
+.chart {
+    -fx-padding: 10px;
+    -fx-background-color: white;
+}
+  
+.chart-content {
+    -fx-padding: 10px;    
+}
+  
+.chart-title {
+    -fx-font-size: 18pt;    
+}
+  
+  
+.axis-label {
+    -fx-font-size: 14pt;
+}
+  
+.axis {
+    -fx-tick-label-font: 12pt system;
+}
