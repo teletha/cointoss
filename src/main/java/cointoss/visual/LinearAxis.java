@@ -30,7 +30,12 @@ import javafx.scene.text.Text;
  */
 public class LinearAxis extends Axis {
 
-    public LinearAxis() {
+    /**
+     * 
+     */
+    public LinearAxis(String name) {
+        nameProperty.set(name);
+
         formatProperty().addListener(o -> {
             unitIndex = -1;
         });
@@ -88,7 +93,7 @@ public class LinearAxis extends Axis {
         final double up = low + ll * a;
         if (up > max) {
             low = max - ll * a;
-            setLowerValue(low);
+            lowerValue(low);
         }
     }
 

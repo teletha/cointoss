@@ -44,13 +44,13 @@ public class LegendSkinBase extends TilePane implements Skin<Legend> {
             if (o != null) {
                 o.removeListener(listener);
                 for (final LineChartData d : o) {
-                    d.nameProperty().removeListener(lcdListener);
+                    d.nameProperty.removeListener(lcdListener);
                 }
             }
             if (n != null) {
                 n.addListener(listener);
                 for (final LineChartData d : n) {
-                    d.nameProperty().addListener(lcdListener);
+                    d.nameProperty.addListener(lcdListener);
                 }
             }
 
@@ -63,12 +63,12 @@ public class LegendSkinBase extends TilePane implements Skin<Legend> {
             while (c.next()) {
                 if (c.getRemovedSize() != 0) {
                     for (final LineChartData d : c.getRemoved()) {
-                        d.nameProperty().removeListener(lcdListener);
+                        d.nameProperty.removeListener(lcdListener);
                     }
                 }
                 if (c.getAddedSize() != 0) {
                     for (final LineChartData d : c.getAddedSubList()) {
-                        d.nameProperty().addListener(lcdListener);
+                        d.nameProperty.addListener(lcdListener);
                     }
                 }
             }
@@ -212,7 +212,7 @@ public class LegendSkinBase extends TilePane implements Skin<Legend> {
         if (l.getDataList() != null) {
             l.getDataList().removeListener(listener);
             for (final LineChartData d : l.getDataList()) {
-                d.nameProperty().removeListener(lcdListener);
+                d.nameProperty.removeListener(lcdListener);
             }
         }
     }

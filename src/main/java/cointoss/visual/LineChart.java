@@ -44,8 +44,22 @@ import javafx.scene.layout.Region;
  */
 public class LineChart extends Region {
 
+    /** The plotting date list. */
+    public final ObservableList<LineChartData> data;
+
+    public final ObjectProperty<Axis> xAxisProperty = new SimpleObjectProperty<>(this, "xAxis", null);
+
+    public final ObjectProperty<Axis> yAxisProperty = new SimpleObjectProperty<>(this, "yAxis", null);
+
     /** The actual graph drawer. */
     final GraphPlotArea graph = new GraphPlotArea();
+
+    private final InvalidationListener dataValidateListener = observable -> {
+        if (isDataValidate()) {
+            setDataValidate(false);
+            requestLayout();
+        }
+    };
 
     private boolean prelayout = false;
 
@@ -53,11 +67,32 @@ public class LineChart extends Region {
      * 
      */
     public LineChart() {
+        xAxisProperty.addListener(dataValidateListener);
+        xAxisProperty.addListener(axisListener);
+        yAxisProperty.addListener(dataValidateListener);
+        yAxisProperty.addListener(axisListener);
+
+        // create plotting data collection
+        data = FXCollections.observableArrayList();
+        data.addListener(dataValidateListener);
+        data.addListener((ListChangeListener<LineChartData>) c -> {
+            InvalidationListener listener = getLineChartDataListener();
+
+            while (c.next()) {
+                c.getRemoved().stream().map(LineChartData::validateProperty).forEach(p -> p.removeListener(listener));
+                c.getAddedSubList().stream().map(LineChartData::validateProperty).forEach(p -> p.addListener(listener));
+
+                if (isDataValidate()) {
+                    setDataValidate(false);
+                    setNeedsLayout(true);
+                }
+            }
+        });
+
         getStyleClass().setAll("chart");
-        graph.setAutoPlot(false);
-        graph.setLineChartDataList(getDataList());
-        graph.xAxisProperty().bind(xAxisProperty());
-        graph.yAxisProperty().bind(yAxisProperty());
+        graph.setLineChartDataList(data);
+        graph.xAxisProperty().bind(xAxisProperty);
+        graph.yAxisProperty().bind(yAxisProperty);
         graph.verticalMinorGridLinesVisibleProperty().bind(verticalMinorGridLinesVisibleProperty());
         graph.horizontalMinorGridLinesVisibleProperty().bind(horizontalMinorGridLinesVisibleProperty());
         graph.orientationProperty().bind(orientationProperty());
@@ -333,12 +368,12 @@ public class LineChart extends Region {
         if (xAxis == null) {
             return;
         }
-        if (datalist == null) {
+        if (data == null) {
             xAxis.setMaxValue(1);
             xAxis.setMinValue(0);
         } else {
             double min = Double.POSITIVE_INFINITY, max = Double.NEGATIVE_INFINITY;
-            for (final LineChartData d : datalist) {
+            for (final LineChartData d : data) {
                 if (d.size() == 0) {
                     continue;
                 }
@@ -382,12 +417,12 @@ public class LineChart extends Region {
         if (yAxis == null) {
             return;
         }
-        if (datalist == null) {
+        if (data == null) {
             yAxis.setMaxValue(1);
             yAxis.setMinValue(0);
         } else {
             double min = Double.POSITIVE_INFINITY, max = Double.NEGATIVE_INFINITY;
-            for (final LineChartData d : datalist) {
+            for (final LineChartData d : data) {
                 if (d.size() == 0) {
                     continue;
                 }
@@ -425,18 +460,6 @@ public class LineChart extends Region {
         }
     }
 
-    protected final InvalidationListener getDataValidateListener() {
-        if (dataValidateListener == null) {
-            dataValidateListener = observable -> {
-                if (isDataValidate()) {
-                    setDataValidate(false);
-                    requestLayout();
-                }
-            };
-        }
-        return dataValidateListener;
-    }
-
     protected final boolean isDataValidate() {
         return datavalidate;
     }
@@ -444,9 +467,6 @@ public class LineChart extends Region {
     protected final void setDataValidate(final boolean bool) {
         datavalidate = bool;
     }
-
-    /** 直接フィールドを利用せずに、 getValidateListener() を利用すること */
-    private InvalidationListener dataValidateListener = null;
 
     /** 状態の正当性を示すプロパティ */
     private boolean datavalidate = false;
@@ -465,34 +485,6 @@ public class LineChart extends Region {
         return lineChartDataListener;
     }
 
-    private ObservableList<LineChartData> datalist;
-
-    public final ObservableList<LineChartData> getDataList() {
-        if (datalist == null) {
-            datalist = FXCollections.observableArrayList();
-            datalist.addListener(getDataValidateListener());
-            datalist.addListener((ListChangeListener<LineChartData>) c -> {
-                final InvalidationListener l = getLineChartDataListener();
-
-                while (c.next()) {
-                    for (final LineChartData d1 : c.getRemoved()) {
-                        d1.validateProperty().removeListener(l);
-                    }
-
-                    for (final LineChartData d2 : c.getAddedSubList()) {
-                        d2.validateProperty().addListener(l);
-                    }
-
-                    if (isDataValidate()) {
-                        setDataValidate(false);
-                        setNeedsLayout(true);
-                    }
-                }
-            });
-        }
-        return datalist;
-    }
-
     /**
      * x軸方向に連続なデータか、y軸方向に連続なデータかを指定するプロパティ
      * 
@@ -509,8 +501,14 @@ public class LineChart extends Region {
         return orientationProperty == null ? Orientation.HORIZONTAL : orientationProperty.get();
     }
 
-    public final void setOrientation(final Orientation value) {
-        orientationProperty().set(value);
+    /**
+     * @param orientation
+     * @return
+     */
+    public final LineChart orientation(Orientation orientation) {
+        orientationProperty().set(orientation);
+
+        return this;
     }
 
     private ObjectProperty<Orientation> orientationProperty;
@@ -524,42 +522,31 @@ public class LineChart extends Region {
 
     private InvalidationListener layoutInvalidationListener = null;
 
-    /**
-     * x軸
-     * 
-     * @return
-     */
-    public final ObjectProperty<Axis> xAxisProperty() {
-        if (xAxisProperty == null) {
-            xAxisProperty = new SimpleObjectProperty<>(this, "xAxis", null);
-            xAxisProperty.addListener(getDataValidateListener());
-            xAxisProperty.addListener(axisListener);
-        }
-        return xAxisProperty;
-    }
-
     public final Axis getXAxis() {
         return xAxisProperty == null ? null : xAxisProperty.get();
     }
 
-    public final void setXAxis(final Axis value) {
-        xAxisProperty().set(value);
+    /**
+     * @param axis
+     * @return
+     */
+    public final LineChart xAxis(Axis axis) {
+        xAxisProperty.set(axis);
+
+        return this;
     }
 
-    private ObjectProperty<Axis> xAxisProperty;
-
     private ChangeListener<Axis> axisListener = (observable, oldValue, newValue) -> {
-        final InvalidationListener listener = getDataValidateListener();
         if (oldValue != null) {
             getChildren().remove(oldValue);
-            oldValue.lowerValueProperty().removeListener(listener);
-            oldValue.visibleAmountProperty().removeListener(listener);
+            oldValue.lowerValueProperty().removeListener(dataValidateListener);
+            oldValue.visibleAmountProperty().removeListener(dataValidateListener);
         }
 
         if (newValue != null) {
             getChildren().add(newValue);
-            newValue.lowerValueProperty().addListener(listener);
-            newValue.visibleAmountProperty().addListener(listener);
+            newValue.lowerValueProperty().addListener(dataValidateListener);
+            newValue.visibleAmountProperty().addListener(dataValidateListener);
         } else {
             // If this exception will be thrown, it is bug of this program. So we must rethrow the
             // wrapped error in here.
@@ -601,29 +588,19 @@ public class LineChart extends Region {
 
     private BooleanProperty autoRangeXProperty;
 
-    /**
-     * y軸
-     * 
-     * @return
-     */
-    public final ObjectProperty<Axis> yAxisProperty() {
-        if (yAxisProperty == null) {
-            yAxisProperty = new SimpleObjectProperty<>(this, "yAxis", null);
-            yAxisProperty.addListener(getDataValidateListener());
-            yAxisProperty.addListener(axisListener);
-        }
-        return yAxisProperty;
-    }
-
     public final Axis getYAxis() {
         return yAxisProperty == null ? null : yAxisProperty.get();
     }
 
-    public final void setYAxis(final Axis value) {
-        yAxisProperty().set(value);
-    }
+    /**
+     * @param axis
+     * @return
+     */
+    public final LineChart yAxis(Axis axis) {
+        yAxisProperty.set(axis);
 
-    private ObjectProperty<Axis> yAxisProperty;
+        return this;
+    }
 
     /**
      * y軸の範囲を自動的に設定するかどうか
@@ -663,8 +640,14 @@ public class LineChart extends Region {
         return rangeMarginXProperty == null ? 1.25 : rangeMarginXProperty.get();
     }
 
-    public final void setRangeMarginX(final double value) {
+    /**
+     * @param value
+     * @return
+     */
+    public final LineChart rangeMarginX(double value) {
         rangeMarginXProperty().set(value);
+
+        return this;
     }
 
     private DoubleProperty rangeMarginXProperty;
@@ -839,6 +822,28 @@ public class LineChart extends Region {
             titleLabel = l;
         }
         return titleLabel;
+    }
+
+    /**
+     * @param graphTracker
+     * @return
+     */
+    public final LineChart graphTracker(GraphTracker graphTracker) {
+        graphTracker.install(this);
+
+        return this;
+    }
+
+    /**
+     * @param closePrice
+     * @param maxPrice
+     * @param minPrice
+     * @return
+     */
+    public LineChart data(LineChartData... data) {
+        this.data.addAll(data);
+
+        return this;
     }
 
 }

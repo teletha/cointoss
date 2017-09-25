@@ -47,6 +47,9 @@ import javafx.scene.shape.Path;
 import javafx.scene.shape.PathElement;
 
 public abstract class Axis extends Region {
+
+    public final StringProperty nameProperty = new SimpleStringProperty(this, "name", null);
+
     /**
      * NAxisの状態の変化を受け取る必要がある親を定義するインターフェース
      * 
@@ -62,6 +65,8 @@ public abstract class Axis extends Region {
     }
 
     public Axis() {
+        nameProperty.addListener(getLayoutValidateListener());
+
         getStyleClass().add("axis");
         dataValidateListener = observable -> {
             if (widthProperty() == observable) {
@@ -167,29 +172,9 @@ public abstract class Axis extends Region {
 
     // -----------------layoutにしか関係ないデータ---------------------------
 
-    /**
-     * 軸の名前
-     * 
-     * @return
-     */
-    public final StringProperty nameProperty() {
-        if (nameProperty == null) {
-            nameProperty = new SimpleStringProperty(this, "name", null);
-            // nameはレイアウトにしか関わらない
-            nameProperty.addListener(getLayoutValidateListener());
-        }
-        return nameProperty;
-    }
-
     public final String getName() {
         return nameProperty == null ? null : nameProperty.get();
     }
-
-    public final void setName(final String value) {
-        nameProperty().set(value);
-    }
-
-    private StringProperty nameProperty;
 
     /**
      * major tickの線の長さ
@@ -374,9 +359,9 @@ public abstract class Axis extends Region {
                     if (b2) {
                         b2 = false;
                         if (p.getBean() == Axis.this) {
-                            a.setVisibleAmount(getVisibleAmount());
+                            a.visibleAmount(getVisibleAmount());
                         } else {
-                            setVisibleAmount(a.getVisibleAmount());
+                            visibleAmount(a.getVisibleAmount());
                         }
                         b2 = true;
                     }
@@ -386,9 +371,9 @@ public abstract class Axis extends Region {
                     if (b3) {
                         b3 = false;
                         if (p.getBean() == Axis.this) {
-                            a.setLowerValue(getLowerValue());
+                            a.lowerValue(getLowerValue());
                         } else {
-                            setLowerValue(a.getLowerValue());
+                            lowerValue(a.getLowerValue());
                         }
                         b3 = true;
                     }
@@ -555,8 +540,14 @@ public abstract class Axis extends Region {
         return lowerValueProperty == null ? Double.NaN : lowerValueProperty.get();
     }
 
-    public final void setLowerValue(final double value) {
+    /**
+     * @param value
+     * @return
+     */
+    public final Axis lowerValue(final double value) {
         lowerValueProperty().set(value);
+
+        return this;
     }
 
     private DoubleProperty lowerValueProperty;
@@ -595,8 +586,10 @@ public abstract class Axis extends Region {
         return visibleAmountProperty == null ? 1 : visibleAmountProperty.get();
     }
 
-    public final void setVisibleAmount(final double value) {
+    public final Axis visibleAmount(final double value) {
         visibleAmountProperty().set(value);
+
+        return this;
     }
 
     private DoubleProperty visibleAmountProperty;
@@ -663,12 +656,12 @@ public abstract class Axis extends Region {
                             final double position = scroll.getValue();
                             final double size = getScrollVisibleAmount();
                             if (position == -1 || size == 1) {
-                                setLowerValue(Double.NaN);
-                                setVisibleAmount(1);
+                                lowerValue(Double.NaN);
+                                visibleAmount(1);
                             } else {
                                 final double p = isHorizontal() ? position : 1 - position;
                                 final double d = calcLowValue(p, size);
-                                setLowerValue(d);
+                                lowerValue(d);
                             }
                         } else if (scroll != null) {
                             final double d = isHorizontal() ? getScrollBarValue() : 1 - getScrollBarValue();
@@ -913,7 +906,7 @@ public abstract class Axis extends Region {
             lineGroup.setAutoSizeChildren(false);
             nameLabel = new Label();
             nameLabel.getStyleClass().add("axis-label");
-            nameLabel.textProperty().bind(nameProperty());
+            nameLabel.textProperty().bind(nameProperty);
             labelGroup.setAutoSizeChildren(false);
             majorTickPath = new Path();
             minorTickPath = new Path();

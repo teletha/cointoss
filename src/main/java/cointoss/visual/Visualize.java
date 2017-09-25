@@ -43,65 +43,53 @@ public class Visualize extends Application {
      */
     @Override
     public void start(final Stage stage) throws Exception {
-        Chart cc = chart(BitFlyer.FX_BTC_JPY, "2017-09-05T13:00:00", "2017-09-07T00:59:59", Duration.ofMinutes(1));
+        Chart serise = chart(BitFlyer.FX_BTC_JPY, "2017-09-05T13:00:00", "2017-09-07T00:59:59", Duration.ofMinutes(1));
 
         Num max = Num.MIN;
         Num min = Num.MAX;
 
-        for (Tick tick : cc.ticks) {
+        for (Tick tick : serise.ticks) {
             max = Num.max(max, tick.maxPrice);
             min = Num.min(min, tick.minPrice);
         }
-        int size = cc.ticks.size();
+        int size = serise.ticks.size();
 
-        final LinearAxis axis = new LinearAxis();
-        final LinearAxis yaxis = new LinearAxis();
-        axis.setName("ももも");
-        axis.setLowerValue(0);
-        axis.setVisibleAmount(0.1);
-        yaxis.setName("ままま");
+        Axis axis = new LinearAxis("日時").lowerValue(0).visibleAmount(0.1);
+        Axis yaxis = new LinearAxis("JPY");
 
-        final AxisZoomHandler zoom = new AxisZoomHandler();
+        AxisZoomHandler zoom = new AxisZoomHandler();
         zoom.install(axis);
         zoom.install(yaxis);
 
-        final LineChart c = new LineChart();
-        c.setXAxis(axis);
-        c.setYAxis(yaxis);
-
-        LineChartData close = new LineChartData(size);
-        close.setName("Close");
-
-        LineChartData maxPrice = new LineChartData(size);
-        maxPrice.setName("Max");
-
-        LineChartData minPrice = new LineChartData(size);
-        minPrice.setName("Min");
+        LineChartData closePrice = new LineChartData(size).name("Close");
+        LineChartData maxPrice = new LineChartData(size).name("Max");
+        LineChartData minPrice = new LineChartData(size).name("Min");
 
         for (int i = 0; i < size; i++) {
-            close.addData(i, cc.ticks.get(i).closePrice.toDouble());
-            maxPrice.addData(i, cc.ticks.get(i).maxPrice.toDouble());
-            minPrice.addData(i, cc.ticks.get(i).minPrice.toDouble());
+            closePrice.addData(i, serise.ticks.get(i).closePrice.toDouble());
+            maxPrice.addData(i, serise.ticks.get(i).maxPrice.toDouble());
+            minPrice.addData(i, serise.ticks.get(i).minPrice.toDouble());
         }
 
-        c.getDataList().addAll(close, maxPrice, minPrice);
+        LineChart line = new LineChart()//
+                .xAxis(axis)
+                .yAxis(yaxis)
+                .orientation(Orientation.HORIZONTAL)
+                .rangeMarginX(1)
+                .graphTracker(new GraphTracker())
+                .data(closePrice, maxPrice, minPrice);
 
-        c.setOrientation(Orientation.HORIZONTAL);
-        c.setRangeMarginX(1);
+        Legend legend = new Legend();
+        legend.setDataList(line.data);
 
-        final GraphTracker traker = new GraphTracker();
-        traker.install(c);
-
-        final Legend legend = new Legend();
-        legend.setDataList(c.getDataList());
-
-        final BorderPane p = new BorderPane();
+        BorderPane p = new BorderPane();
         p.setTop(legend);
         p.setPrefWidth(800);
         p.setPrefHeight(500);
-        p.setCenter(c);
+        p.setCenter(line);
         p.setStyle("-fx-padding:50");
-        final Scene s = new Scene(p);
+
+        Scene s = new Scene(p);
         stage.setScene(s);
         stage.show();
     }

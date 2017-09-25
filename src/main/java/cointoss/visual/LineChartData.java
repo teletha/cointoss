@@ -23,18 +23,7 @@ import javafx.beans.property.StringProperty;
  */
 public class LineChartData {
 
-    /**
-     * @version 2017/09/26 1:03:37
-     */
-    public static interface ForEach {
-        /**
-         * @param x xの値
-         * @param y yの値
-         * @param index 現在のx,yのインデックス
-         * @return 次の処理も行う場合はtrue、処理を中断したい場合はfalse
-         */
-        public boolean each(double x, double y, int index);
-    }
+    public final StringProperty nameProperty = new SimpleStringProperty(this, "name", "");
 
     private static final double[] EMPTY_ARRAY = {};
 
@@ -46,22 +35,18 @@ public class LineChartData {
 
     private int length = 0;
 
+    /**
+     * 
+     */
     public LineChartData() {
     }
 
-    public LineChartData(final int capacity) {
+    /**
+     * @param capacity
+     */
+    public LineChartData(int capacity) {
         x = new double[capacity];
         y = new double[capacity];
-    }
-
-    public void foreach(final ForEach foreach) {
-        final int l = length;
-        final double[] x = this.x, y = this.y;
-        for (int i = 0; i < l; i++) {
-            if (!foreach.each(x[i], y[i], i)) {
-                break;
-            }
-        }
     }
 
     public void clear() {
@@ -716,32 +701,20 @@ public class LineChartData {
         return new double[] {min, max};
     }
 
-    /**
-     * 名前。Legendで利用する。
-     * 
-     * @return
-     */
-    public StringProperty nameProperty() {
-        if (nameProperty == null) {
-            nameProperty = new SimpleStringProperty(this, "name", "");
-        }
-        return nameProperty;
-    }
-
     public String getName() {
         return nameProperty == null ? "" : nameProperty.get();
     }
 
-    public void setName(final String value) {
-        nameProperty().set(value);
-    }
+    /**
+     * Set plot name.
+     * 
+     * @param name
+     */
+    public LineChartData name(String name) {
+        nameProperty.set(name);
 
-    public boolean hasName() {
-        final String n = getName();
-        return n != null && !n.isEmpty();
+        return this;
     }
-
-    private StringProperty nameProperty;
 
     /**
      * データが正当かどうか。 get～や、clearなどを呼び出すとtrueになります。
