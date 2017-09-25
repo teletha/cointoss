@@ -7,10 +7,12 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss.visual;
+package cointoss.visual.shape;
 
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.scene.Node;
+
+import cointoss.visual.Axis;
 
 /**
  * @version 2017/09/26 1:05:59

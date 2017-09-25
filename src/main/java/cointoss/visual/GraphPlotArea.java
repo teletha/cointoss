@@ -36,6 +36,9 @@ import javafx.scene.shape.PathElement;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.StrokeLineJoin;
 
+import cointoss.visual.shape.GraphLine;
+import cointoss.visual.shape.GraphShape;
+
 /**
  * グラフを実際に描画するエリアです
  */

@@ -22,6 +22,10 @@ import javafx.event.EventType;
 import javafx.geometry.Orientation;
 import javafx.scene.input.MouseEvent;
 
+import cointoss.visual.shape.GraphCircle;
+import cointoss.visual.shape.GraphLine;
+import cointoss.visual.shape.GraphPointShape;
+
 /**
  * GraphTrackingActionHandleを用いた実装例的な
  * 

@@ -7,7 +7,7 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss.visual;
+package cointoss.visual.shape;
 
 import javafx.scene.shape.Circle;
 

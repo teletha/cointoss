@@ -7,7 +7,7 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss.visual;
+package cointoss.visual.shape;
 
 import static java.lang.Math.*;
 
@@ -20,6 +20,8 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.geometry.Orientation;
 import javafx.scene.shape.Rectangle;
+
+import cointoss.visual.Axis;
 
 /**
  * @version 2017/09/26 1:04:42

@@ -38,6 +38,8 @@ import javafx.geometry.Side;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Region;
 
+import cointoss.visual.shape.GraphShape;
+
 /**
  * GraphPlotAreaとLineChartAxisだけのグラフです。<br>
  * データとしてはタイトル情報も保持していますが、タイトルを表示する機能はありません
