@@ -178,12 +178,12 @@ public class GraphPlotArea extends Region {
             setGraphShapeValidate(true);
             return;
         }
-        final double w = getWidth(), h = getHeight();
         drawGraphShapes();
+
         if (!isPlotValidate()) {
             drawBackGroundLine();
-            plotLineChartDatas(w, h);
-            plotCandleChartDatas(w, h);
+            plotLineChartDatas();
+            plotCandleChartDatas();
             setPlotValidate(true);
         }
     }
@@ -477,11 +477,8 @@ public class GraphPlotArea extends Region {
 
     /**
      * Draw line chart.
-     * 
-     * @param width
-     * @param height
      */
-    protected void plotLineChartDatas(double width, double height) {
+    protected void plotLineChartDatas() {
         ObservableList<Node> paths = lines.getChildren();
         List<LineChartData> datas = lineChartData;
 
@@ -517,7 +514,7 @@ public class GraphPlotArea extends Region {
                 if (!className.get(defaultColorIndex).equals(data.defaultColor)) {
                     className.set(defaultColorIndex, data.defaultColor);
                 }
-                plotLineChartData(data, path, width, height);
+                plotLineChartData(data, path);
             }
         }
     }
@@ -528,7 +525,7 @@ public class GraphPlotArea extends Region {
      * @param width
      * @param height
      */
-    protected void plotCandleChartDatas(double width, double height) {
+    protected void plotCandleChartDatas() {
         ObservableList<Node> nodes = candles.getChildren();
         List<Tick> datas = candleChartData;
 
@@ -564,7 +561,7 @@ public class GraphPlotArea extends Region {
                     candle = new Candle("series" + i, "data" + i);
                     nodes.add(candle);
                 }
-                plotCandleChartData(data.start.toInstant().toEpochMilli(), data, candle, width, height);
+                plotCandleChartData(data.start.toInstant().toEpochMilli(), data, candle);
             }
             getYAxis().lowerValue(min.multiply("0.995").toDouble());
         }
@@ -579,10 +576,8 @@ public class GraphPlotArea extends Region {
      * 
      * @param data
      * @param path
-     * @param width
-     * @param height
      */
-    protected void plotLineChartData(LineChartData data, Path path, double width, double height) {
+    protected void plotLineChartData(LineChartData data, Path path) {
         if (data.size() == 0) {
             path.setVisible(false);
             return;
@@ -612,55 +607,23 @@ public class GraphPlotArea extends Region {
         }
         start = Math.max(0, start - 2);
 
-        plotLineChartData(data, path, width, height, start, end);
+        plotLineChartData(data, path.getElements(), start, end);
     }
 
     /**
      * Draw chart data.
      * 
      * @param data
-     * @param candle
-     * @param width
-     * @param height
-     */
-    protected void plotCandleChartData(long index, Tick data, Candle candle, double width, double height) {
-        double x = getXAxis().getDisplayPosition(index);
-        double open = getYAxis().getDisplayPosition(data.openPrice.toDouble());
-        double close = getYAxis().getDisplayPosition(data.closePrice.toDouble());
-        double high = getYAxis().getDisplayPosition(data.maxPrice.toDouble());
-        double low = getYAxis().getDisplayPosition(data.minPrice.toDouble());
-
-        // calculate candle width
-        double candleWidth = 5;
-
-        // update candle
-        candle.update(close - open, high - open, low - open, candleWidth);
-        // candle.updateTooltip(item.getYValue().doubleValue(), extra.getClose(), extra.getHigh(),
-        // extra.getLow());
-
-        // position the candle
-        candle.setLayoutX(x);
-        candle.setLayoutY(open);
-    }
-
-    /**
-     * Draw chart data.
-     * 
-     * @param data
-     * @param path
-     * @param width
-     * @param height
+     * @param elements
      * @param start
      * @param end
      */
-    private void plotLineChartData(LineChartData data, Path path, double width, double height, int start, int end) {
-        ObservableList<PathElement> elements = path.getElements();
+    private void plotLineChartData(LineChartData data, ObservableList<PathElement> elements, int start, int end) {
         int elementSize = elements.size();
         Axis xaxis = getXAxis();
         Axis yaxis = getYAxis();
-        Orientation orientation = getOrientation();
 
-        if (orientation == Orientation.HORIZONTAL) {// x軸方向昇順
+        if (getOrientation() == Orientation.HORIZONTAL) {// x軸方向昇順
             boolean moveTo = true;
             double beforeX = 0, beforeY = 0;
             int elementIndex = 0;
@@ -782,6 +745,34 @@ public class GraphPlotArea extends Region {
             }
         }
 
+    }
+
+    /**
+     * Draw chart data.
+     * 
+     * @param data
+     * @param candle
+     * @param width
+     * @param height
+     */
+    protected void plotCandleChartData(long index, Tick data, Candle candle) {
+        double x = getXAxis().getDisplayPosition(index);
+        double open = getYAxis().getDisplayPosition(data.openPrice.toDouble());
+        double close = getYAxis().getDisplayPosition(data.closePrice.toDouble());
+        double high = getYAxis().getDisplayPosition(data.maxPrice.toDouble());
+        double low = getYAxis().getDisplayPosition(data.minPrice.toDouble());
+
+        // calculate candle width
+        double candleWidth = 5;
+
+        // update candle
+        candle.update(close - open, high - open, low - open, candleWidth);
+        // candle.updateTooltip(item.getYValue().doubleValue(), extra.getClose(), extra.getHigh(),
+        // extra.getLow());
+
+        // position the candle
+        candle.setLayoutX(x);
+        candle.setLayoutY(open);
     }
 
     // ----------------------------------------------------------------

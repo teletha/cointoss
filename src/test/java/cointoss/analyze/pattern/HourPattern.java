@@ -7,7 +7,7 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss.analyze;
+package cointoss.analyze.pattern;
 
 import java.time.LocalTime;
 import java.util.Map;
@@ -21,7 +21,7 @@ import cointoss.util.Num;
 /**
  * @version 2017/09/20 2:36:26
  */
-public class FXPatternAnalyzer extends Trading {
+public class HourPattern extends Trading {
 
     private Map<LocalTime, Statistics> statistics = new TreeMap();
 
@@ -50,7 +50,7 @@ public class FXPatternAnalyzer extends Trading {
      * @param args
      */
     public static void main(String[] args) {
-        FXPatternAnalyzer analyzer = new FXPatternAnalyzer();
+        HourPattern analyzer = new HourPattern();
 
         BackTester.with()
                 .baseCurrency(1000000)
