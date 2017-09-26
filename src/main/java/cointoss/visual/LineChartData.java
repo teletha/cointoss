@@ -16,6 +16,8 @@ import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
+import cointoss.chart.Tick;
+
 /**
  * @version 2017/09/26 1:03:28
  */
@@ -29,7 +31,7 @@ public class LineChartData {
 
     private double[] x = {};
 
-    private double[] y = {};
+    private Tick[] y = {};
 
     private int length = 0;
 
@@ -38,16 +40,16 @@ public class LineChartData {
      */
     public LineChartData(int capacity) {
         x = new double[capacity];
-        y = new double[capacity];
+        y = new Tick[capacity];
     }
 
-    public void addData(final double x, final double y) {
+    public void addData(final double x, final Tick y) {
         final int t = length;
         length++;
         if (this.x.length < length) {
             final int size = this.x.length + 16;
             final double[] newx = new double[size];
-            final double[] newy = new double[size];
+            final Tick[] newy = new Tick[size];
             System.arraycopy(this.x, 0, newx, 0, t);
             System.arraycopy(this.y, 0, newy, 0, t);
             this.x = newx;
@@ -77,7 +79,7 @@ public class LineChartData {
             throw new ArrayIndexOutOfBoundsException(index);
         }
         setValidate(true);
-        return y[index];
+        return y[index].getWeightMedian().toDouble();
     }
 
     /**
@@ -162,6 +164,46 @@ public class LineChartData {
     }
 
     /**
+     * ※aが昇順に整列されているときに限る。 vを越えない最大のaの場所を探索する
+     * 
+     * @param a
+     * @param size
+     * @param v
+     * @return
+     */
+    private static int findMaxIndex(final Tick[] a, final int size, final double v) {
+        if (size < 2) {
+            return 0;
+        }
+        if (size == 2) {
+            return 0;
+        }
+
+        int l = 1, r = size - 2, m = (l + r) >> 1;
+
+        while (r - l > 1) {
+            final double d = a[m].getWeightMedian().toDouble();
+            if (d == v) {
+                return m;
+            }
+            if (d < v) {
+                l = m;
+            } else {
+                r = m;
+            }
+            m = (l + r) >> 1;
+        }
+
+        if (a[l].getWeightMedian().toDouble() > v) {
+            return l - 1;
+        }
+        if (a[r].getWeightMedian().toDouble() <= v) {
+            return r;
+        }
+        return l;
+    }
+
+    /**
      * ※aが昇順に整列されているときに限る。 vより小さくならない最小のaの場所を探索する
      * 
      * @param a
@@ -197,6 +239,44 @@ public class LineChartData {
             return l;
         }
         if (a[r] < v) {
+            return r + 1;
+        }
+        return r;
+    }
+
+    /**
+     * ※aが昇順に整列されているときに限る。 vより小さくならない最小のaの場所を探索する
+     * 
+     * @param a
+     * @param size
+     * @param v
+     * @return
+     */
+    private static int findMinIndex(final Tick[] a, final int size, final double v) {
+        if (size < 2) {
+            return 0;
+        }
+        if (size == 2) {
+            return 1;
+        }
+        int l = 1, r = size - 2, m = (l + r) >> 1;
+
+        while (r - l > 1) {
+            final double d = a[m].getWeightMedian().toDouble();
+            if (d == v) {
+                return m;
+            }
+            if (d < v) {
+                l = m;
+            } else {
+                r = m;
+            }
+            m = (l + r) >> 1;
+        }
+        if (a[l].getWeightMedian().toDouble() >= v) {
+            return l;
+        }
+        if (a[r].getWeightMedian().toDouble() < v) {
             return r + 1;
         }
         return r;
