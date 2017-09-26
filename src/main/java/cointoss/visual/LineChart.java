@@ -39,6 +39,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.Region;
 
 import cointoss.chart.Tick;
+import cointoss.util.Num;
 import cointoss.visual.shape.GraphShape;
 
 /**
@@ -372,99 +373,58 @@ public class LineChart extends Region {
         return v != v || max >= v ? max : v;
     }
 
+    /**
+     * Set x-axis range.
+     */
     private void setXAxisRange() {
         final Axis xAxis = getXAxis();
-        if (xAxis == null) {
-            return;
+        double min = Double.POSITIVE_INFINITY, max = Double.NEGATIVE_INFINITY;
+        for (final LineChartData data : lines) {
+            if (data.size() == 0) {
+                continue;
+            }
+            if (getOrientation() == Orientation.HORIZONTAL) {
+                final double i = data.getX(0);
+                final double a = data.getX(data.size() - 1);
+                min = min(min, i);
+                max = max(max, a);
+            } else {
+                final double[] minmax = data.getMinMaxX(0, data.size(), true);
+                min = min(min, minmax[0]);
+                max = max(max, minmax[1]);
+            }
         }
-        if (lines == null) {
-            xAxis.setMaxValue(1);
-            xAxis.setMinValue(0);
-        } else {
-            double min = Double.POSITIVE_INFINITY, max = Double.NEGATIVE_INFINITY;
-            for (final LineChartData d : lines) {
-                if (d.size() == 0) {
-                    continue;
-                }
-                if (getOrientation() == Orientation.HORIZONTAL) {
-                    final double i = d.getX(0);
-                    final double a = d.getX(d.size() - 1);
-                    min = min(min, i);
-                    max = max(max, a);
-                } else {
-                    final double[] minmax = d.getMinMaxX(0, d.size(), true);
-                    min = min(min, minmax[0]);
-                    max = max(max, minmax[1]);
-                }
-            }
-            if (Double.isInfinite(min)) {
-                min = 0;
-            }
-            if (Double.isInfinite(max)) {
-                max = min + 1;
-            }
-            final double l = max == min ? 1 : max - min;
-            final double ll = l * getRangeMarginX();
-            double u = min + ll;
-            double b = max - ll;
-            if (max == 0 || signum(u) * signum(max) < 0) {
-                u = 0;
-            }
-            if (min == 0 || signum(b) * signum(min) < 0) {
-                b = 0;
-            }
-            xAxis.setMaxValue(u);
-            xAxis.setMinValue(b);
-        }
+
+        System.out.println(max + "  " + min);
+        final double l = max == min ? 1 : max - min;
+        final double ll = l * 1.01;
+        double u = min + ll;
+        double b = max - ll;
+
+        System.out.println("SET " + u + "  " + b + "  " + ll);
+        xAxis.setMaxValue(u);
+        xAxis.setMinValue(b);
+        // xAxis.setMaxValue(candles.get(candles.size() - 1).start.toEpochSecond());
+        // xAxis.setMinValue(candles.get(0).start.toEpochSecond());
     }
 
+    /**
+     * Set y-axis range.
+     */
     private void setYAxisRange() {
-        Axis yAxis = getYAxis();
-        if (yAxis == null) {
-            return;
-        }
-        if (lines == null) {
-            yAxis.setMaxValue(1);
-            yAxis.setMinValue(0);
-        } else {
-            double min = Double.POSITIVE_INFINITY, max = Double.NEGATIVE_INFINITY;
+        Num maximum = Num.MIN;
+        Num minimum = Num.MAX;
 
-            for (LineChartData line : lines) {
-                if (line.size() == 0) {
-                    continue;
-                }
-                if (getOrientation() == Orientation.VERTICAL) {
-                    final double i = line.getY(0);
-                    final double a = line.getY(line.size() - 1);
-                    min = min(min, i);
-                    max = max(max, a);
-                } else {
-                    final double[] minmax = line.getMinMaxY(0, line.size() - 1, true);
-                    min = min(min, minmax[0]);
-                    max = max(max, minmax[1]);
-                }
-            }
-            if (Double.isInfinite(min)) {
-                min = 0;
-                max = 1;
-            }
-            if (Double.isInfinite(max)) {
-                max = min + 1;
-            }
-
-            final double l = max == min ? 1 : max - min;
-            final double ll = l * getRangeMarginY();
-            double u = min + ll;
-            double b = max - ll;
-            if (max == 0 || signum(u) * signum(max) < 0) {
-                u = 0;
-            }
-            if (min == 0 || signum(b) * signum(min) < 0) {
-                b = 0;
-            }
-            yAxis.setMaxValue(u);
-            yAxis.setMinValue(b);
+        for (Tick tick : candles) {
+            maximum = Num.max(maximum, tick.maxPrice);
+            minimum = Num.min(minimum, tick.minPrice);
         }
+
+        maximum = maximum.plus(200);
+        minimum = minimum.minus(200);
+
+        getYAxis().setMaxValue(maximum.toDouble());
+        getYAxis().setMinValue(minimum.toDouble());
     }
 
     protected final boolean isDataValidate() {
@@ -585,34 +545,6 @@ public class LineChart extends Region {
 
         return this;
     }
-
-    /**
-     * 自動的に設定する範囲に対して持たせる余裕
-     * 
-     * @return
-     */
-    public final DoubleProperty rangeMarginXProperty() {
-        if (rangeMarginXProperty == null) {
-            rangeMarginXProperty = new SimpleDoubleProperty(this, "rangeMarginX", 1.25);
-        }
-        return rangeMarginXProperty;
-    }
-
-    public final double getRangeMarginX() {
-        return rangeMarginXProperty == null ? 1.25 : rangeMarginXProperty.get();
-    }
-
-    /**
-     * @param value
-     * @return
-     */
-    public final LineChart rangeMarginX(double value) {
-        rangeMarginXProperty().set(value);
-
-        return this;
-    }
-
-    private DoubleProperty rangeMarginXProperty;
 
     /**
      * 自動的に設定する範囲に対して持たせる余裕

@@ -77,7 +77,6 @@ public class Visualize extends Application {
                 .xAxis(axis)
                 .yAxis(yaxis)
                 .orientation(Orientation.HORIZONTAL)
-                .rangeMarginX(1.01)
                 .rangeMarginY(1.06)
                 .graphTracker(new GraphTracker())
                 .lineData(weightMedian)
