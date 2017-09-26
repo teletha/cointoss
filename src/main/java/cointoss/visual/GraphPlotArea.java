@@ -35,6 +35,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.StrokeLineJoin;
 
 import cointoss.chart.Tick;
+import cointoss.util.Num;
 import cointoss.visual.shape.Candle;
 import cointoss.visual.shape.GraphLine;
 import cointoss.visual.shape.GraphShape;
@@ -542,8 +543,17 @@ public class GraphPlotArea extends Region {
                 sizePath = sizeData;
             }
 
+            Num min = Num.MAX;
+            Axis xAxis = getXAxis();
+            int start = (int) xAxis.getLowerValue();
+            int end = (int) xAxis.getUpperValue();
+
             for (int i = 0; i < sizeData; i++) {
                 Tick data = datas.get(i);
+
+                if (start <= i && i <= end) {
+                    min = Num.min(min, data.minPrice);
+                }
 
                 Candle candle;
 
@@ -555,6 +565,7 @@ public class GraphPlotArea extends Region {
                 }
                 plotCandleChartData(i, data, candle, width, height);
             }
+            getYAxis().lowerValue(min.multiply("0.995").toDouble());
         }
     }
 
