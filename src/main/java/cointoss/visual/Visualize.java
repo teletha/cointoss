@@ -77,10 +77,11 @@ public class Visualize extends Application {
                 .orientation(Orientation.HORIZONTAL)
                 .rangeMarginX(1)
                 .graphTracker(new GraphTracker())
-                .data(closePrice, maxPrice, minPrice);
+                .lineData(closePrice, maxPrice, minPrice)
+                .candleDate(serise.ticks);
 
         Legend legend = new Legend();
-        legend.setDataList(line.data);
+        legend.setDataList(line.lines);
 
         BorderPane p = new BorderPane();
         p.setTop(legend);

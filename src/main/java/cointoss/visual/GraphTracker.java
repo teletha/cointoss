@@ -356,7 +356,7 @@ public class GraphTracker {
                 g.getForeGroundShapes().addAll(points);
             }
 
-            for (final LineChartData d : g.getDataList()) {
+            for (final LineChartData d : g.getLineDataList()) {
                 d.validateProperty().addListener(invalidatelistener);
             }
 
@@ -372,7 +372,7 @@ public class GraphTracker {
                 if (points != null && points.size() != 0) {
                     g.getForeGroundShapes().removeAll(points);
                 }
-                for (final LineChartData d : g.getDataList()) {
+                for (final LineChartData d : g.getLineDataList()) {
                     d.validateProperty().removeListener(invalidatelistener);
                 }
 

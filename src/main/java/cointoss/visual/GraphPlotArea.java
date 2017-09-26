@@ -9,8 +9,6 @@
  */
 package cointoss.visual;
 
-import static java.lang.Math.*;
-
 import java.util.BitSet;
 import java.util.List;
 
@@ -36,6 +34,7 @@ import javafx.scene.shape.PathElement;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.StrokeLineJoin;
 
+import cointoss.chart.Tick;
 import cointoss.visual.shape.GraphLine;
 import cointoss.visual.shape.GraphShape;
 
@@ -57,7 +56,11 @@ public class GraphPlotArea extends Region {
 
     private final Group background = new LocalGroup();
 
-    private final Group plotArea = new LocalGroup();
+    /** The line chart manager */
+    private final Group lines = new LocalGroup();
+
+    /** The candle chart manager */
+    private final Group candles = new LocalGroup();
 
     private final Group foreground = new LocalGroup();
 
@@ -76,6 +79,39 @@ public class GraphPlotArea extends Region {
     private final Path verticalRowFill = new Path();
 
     private final Path horizontalRowFill = new Path();
+
+    /** The line chart color manager. */
+    private final BitSet lineColorManager = new BitSet(8);
+
+    /** The line chart data list. */
+    private ObservableList<Tick> candleChartData;
+
+    /** The line chart data list. */
+    private ObservableList<LineChartData> lineChartData;
+
+    /** The line chart data observer. */
+    private final InvalidationListener lineDataObserver = o -> {
+        ReadOnlyBooleanProperty b = (ReadOnlyBooleanProperty) o;
+        if (!b.get() && isPlotValidate()) {
+            setPlotValidate(false);
+            setNeedsLayout(true);
+        }
+    };
+
+    /** The line chart data list observer. */
+    private final ListChangeListener<LineChartData> lineDataListObserver = change -> {
+        change.next();
+        for (LineChartData d : change.getRemoved()) {
+            lineColorManager.clear(d.defaultColorIndex);
+            d.validateProperty().removeListener(lineDataObserver);
+        }
+        for (LineChartData d : change.getAddedSubList()) {
+            d.defaultColorIndex = lineColorManager.nextClearBit(0);
+            lineColorManager.set(d.defaultColorIndex, true);
+            d.defaultColor = "default-color" + (d.defaultColorIndex % 8);
+            d.validateProperty().addListener(lineDataObserver);
+        }
+    };
 
     /**
      * 
@@ -97,7 +133,7 @@ public class GraphPlotArea extends Region {
         verticalMinorGridLines.getStyleClass().setAll("chart-vertical-grid-lines", "chart-vertical-minor-grid-lines");
         horizontalMinorGridLines.getStyleClass().setAll("chart-horizontal-grid-lines", "chart-horizontal-minor-grid-lines");
         getChildren()
-                .addAll(verticalRowFill, horizontalRowFill, verticalMinorGridLines, horizontalMinorGridLines, verticalGridLines, horizontalGridLines, background, userBackround, plotArea, foreground, userForeground);
+                .addAll(verticalRowFill, horizontalRowFill, verticalMinorGridLines, horizontalMinorGridLines, verticalGridLines, horizontalGridLines, background, userBackround, lines, candles, foreground, userForeground);
     }
 
     /**
@@ -433,9 +469,15 @@ public class GraphPlotArea extends Region {
         }
     }
 
-    protected void plotLineChartDatas(final double width, final double height) {
-        ObservableList<Node> paths = plotArea.getChildren();
-        List<LineChartData> datas = linechartData;
+    /**
+     * Draw line chart.
+     * 
+     * @param width
+     * @param height
+     */
+    protected void plotLineChartDatas(double width, double height) {
+        ObservableList<Node> paths = lines.getChildren();
+        List<LineChartData> datas = lineChartData;
 
         if (datas == null) {
             paths.clear();
@@ -486,7 +528,6 @@ public class GraphPlotArea extends Region {
      * @param height
      */
     protected void plotLineChartData(LineChartData data, Path path, double width, double height) {
-        final ObservableList<PathElement> elements = path.getElements();
         if (data.size() == 0) {
             path.setVisible(false);
             return;
@@ -498,425 +539,164 @@ public class GraphPlotArea extends Region {
             plotline.clearMemory();
         }
 
-        final Orientation orientation = getOrientation();
+        Orientation orientation = getOrientation();
         int start, end;
         if (orientation == Orientation.HORIZONTAL) {// x軸方向昇順
-            final Axis axis = getXAxis();
-            final double low = axis.getLowerValue();
-            final double up = axis.getUpperValue();
+            Axis axis = getXAxis();
+            double low = axis.getLowerValue();
+            double up = axis.getUpperValue();
             start = data.searchXIndex(low, false);
             end = data.searchXIndex(up, true);
 
         } else {
-
-            final Axis axis = getYAxis();
-            final double low = axis.getLowerValue();
-            final double up = axis.getUpperValue();
+            Axis axis = getYAxis();
+            double low = axis.getLowerValue();
+            double up = axis.getUpperValue();
             start = data.searchYIndex(low, false);
             end = data.searchYIndex(up, true);
         }
-        start = max(0, start - 2);
+        start = Math.max(0, start - 2);
 
-        if (end - start < 2000) {
-            plotLineChartData_min(data, path, width, height, start, end);
-        } else {
-            plotline.setOrientationX(getOrientation() == Orientation.HORIZONTAL);
-            plotline.init();
-            plotLineChartData_large(data, path, width, height, start, end);
-            plotline.toElements(elements);
-        }
-
+        plotLineChartData(data, path, width, height, start, end);
     }
 
-    private void plotLineChartData_min(final LineChartData data, final Path path, final double width, final double height, final int start, final int end) {
-        final ObservableList<PathElement> elements = path.getElements();
-        final int esize = elements.size();
-        final Axis xaxis = getXAxis();
-        final Axis yaxis = getYAxis();
-        final Orientation orientation = getOrientation();
+    /**
+     * Draw chart data.
+     * 
+     * @param data
+     * @param path
+     * @param width
+     * @param height
+     * @param start
+     * @param end
+     */
+    private void plotLineChartData(LineChartData data, Path path, double width, double height, int start, int end) {
+        ObservableList<PathElement> elements = path.getElements();
+        int elementSize = elements.size();
+        Axis xaxis = getXAxis();
+        Axis yaxis = getYAxis();
+        Orientation orientation = getOrientation();
 
         if (orientation == Orientation.HORIZONTAL) {// x軸方向昇順
             boolean moveTo = true;
-            boolean fromInfinit = false;
-            boolean positivInf = false;
+            double beforeX = 0, beforeY = 0;
+            int elementIndex = 0;
+            for (int i = start; i <= end; i++) {
+                double x = data.getX(i);
+                double y = data.getY(i);
+
+                // 座標変換
+                x = xaxis.getDisplayPosition(x);
+                y = yaxis.getDisplayPosition(y);
+
+                if (moveTo) {// 線が途切れている場合
+                    if (elementIndex < elementSize) {
+                        PathElement pathElement = elements.get(elementIndex);
+                        if (pathElement.getClass() == MoveTo.class) {// 再利用
+                            MoveTo m = ((MoveTo) pathElement);
+                            m.setX(x);
+                            m.setY(y);
+                        } else {
+                            MoveTo m = new MoveTo(x, y);
+                            elements.set(elementIndex, m);// 置換
+                        }
+                        elementIndex++;
+                    } else {
+                        MoveTo m = new MoveTo(x, y);
+                        elements.add(m);
+                    }
+                    moveTo = false;
+                    beforeX = x;
+                    beforeY = y;
+                } else {// 線が続いている場合
+                    double l = Math.hypot(x - beforeX, y - beforeY);
+                    // 距離が小さすぎる場合は無視
+                    if (l < DISTANCE_THRESHOLD) {
+                        continue;
+                    }
+                    if (elementIndex < elementSize) {
+                        final PathElement pathElement = elements.get(elementIndex);
+                        if (pathElement.getClass() == LineTo.class) {
+                            LineTo m = ((LineTo) pathElement);
+                            m.setX(x);
+                            m.setY(y);
+                        } else {
+                            LineTo m = new LineTo(x, y);
+                            elements.set(elementIndex, m);
+                        }
+                        elementIndex++;
+                    } else {
+                        LineTo m = new LineTo(x, y);
+                        elements.add(m);
+                    }
+                    beforeX = x;
+                    beforeY = y;
+                }
+            } // end for
+
+            if (elementIndex < elementSize) {
+                elements.remove(elementIndex, elementSize);
+            }
+        } else {
+            boolean moveTo = true;
             double beforeX = 0, beforeY = 0;
             int elei = 0;
             for (int i = start; i <= end; i++) {
                 double x = data.getX(i);
                 double y = data.getY(i);
 
-                // NaNの場合は線を途切れさせる
-                if (y != y) {
-                    moveTo = true;
-                    fromInfinit = false;
-                    continue;
-                }
-                // 無限の場合は垂直な線を引く
-                if (Double.isInfinite(y)) {
-                    // 線が途切れていたり、その前も無限の場合は何もしない
-                    positivInf = y > 0;
-                    if (!moveTo && !fromInfinit) {
-                        beforeY = positivInf ? 0 : height;
-                        if (elei < esize) {
-                            final PathElement pathElement = elements.get(elei);
-                            if (pathElement.getClass() == LineTo.class) {
-                                final LineTo m = ((LineTo) pathElement);
-                                m.setX(beforeX);
-                                m.setY(beforeY);
-                            } else {
-                                final LineTo m = new LineTo(beforeX, beforeY);
-                                elements.set(elei, m);
-                            }
-                            elei++;
-                        } else {
-                            final LineTo m = new LineTo(beforeX, beforeY);
-                            elements.add(m);
-                        }
-                    }
-                    // 無限フラグを立てる
-                    fromInfinit = true;
-                    moveTo = false;
-                    // 次の処理へ
-                    continue;
-                }
-                // 実数の処理
-
                 // 座標変換
                 x = xaxis.getDisplayPosition(x);
                 y = yaxis.getDisplayPosition(y);
 
-                // 前回が無限の時は垂直線を書く
-                if (fromInfinit) {
-                    beforeX = x;
-                    beforeY = positivInf ? 0 : height;
-                    if (elei < esize) {
-                        final PathElement pathElement = elements.get(elei);
-                        if (pathElement.getClass() == MoveTo.class) {// 再利用
-                            final MoveTo m = ((MoveTo) pathElement);
-                            m.setX(x);
-                            m.setY(beforeY);
-                        } else {
-                            final MoveTo m = new MoveTo(x, beforeY);
-                            elements.set(elei, m);// 置換
-                        }
-                        elei++;
-                    } else {
-                        final MoveTo m = new MoveTo(x, beforeY);
-                        elements.add(m);
-                    }
-                    moveTo = false;// moveToは不要になる
-                }
-
-                fromInfinit = false;
-
                 if (moveTo) {// 線が途切れている場合
-                    if (elei < esize) {
-                        final PathElement pathElement = elements.get(elei);
+                    if (elei < elementSize) {
+                        PathElement pathElement = elements.get(elei);
                         if (pathElement.getClass() == MoveTo.class) {// 再利用
-                            final MoveTo m = ((MoveTo) pathElement);
+                            MoveTo m = ((MoveTo) pathElement);
                             m.setX(x);
                             m.setY(y);
                         } else {
-                            final MoveTo m = new MoveTo(x, y);
+                            MoveTo m = new MoveTo(x, y);
                             elements.set(elei, m);// 置換
                         }
                         elei++;
                     } else {
-                        final MoveTo m = new MoveTo(x, y);
+                        MoveTo m = new MoveTo(x, y);
                         elements.add(m);
                     }
                     moveTo = false;
-                    beforeX = x;
                     beforeY = y;
+                    beforeX = x;
                 } else {// 線が続いている場合
-                    final double l = hypot(x - beforeX, y - beforeY);
+                    double l = Math.hypot(x - beforeX, y - beforeY);
                     // 距離が小さすぎる場合は無視
                     if (l < DISTANCE_THRESHOLD) {
                         continue;
                     }
-                    if (elei < esize) {
-                        final PathElement pathElement = elements.get(elei);
+                    if (elei < elementSize) {
+                        PathElement pathElement = elements.get(elei);
                         if (pathElement.getClass() == LineTo.class) {
-                            final LineTo m = ((LineTo) pathElement);
+                            LineTo m = ((LineTo) pathElement);
                             m.setX(x);
                             m.setY(y);
                         } else {
-                            final LineTo m = new LineTo(x, y);
+                            LineTo m = new LineTo(x, y);
                             elements.set(elei, m);
                         }
                         elei++;
                     } else {
-                        final LineTo m = new LineTo(x, y);
+                        LineTo m = new LineTo(x, y);
                         elements.add(m);
                     }
-                    beforeX = x;
                     beforeY = y;
+                    beforeX = x;
                 }
             } // end for
 
-            if (elei < esize) {
-                elements.remove(elei, esize);
+            if (elei < elementSize) {
+                elements.remove(elei, elementSize);
             }
-        } else {
-
-            boolean moveTo = true;
-            boolean fromInfinit = false;
-            boolean positivInf = false;
-            double beforeX = 0, beforeY = 0;
-            int elei = 0;
-            for (int i = start; i <= end; i++) {
-                double x = data.getX(i);
-                double y = data.getY(i);
-
-                // NaNの場合は線を途切れさせる
-                if (x != x) {
-                    moveTo = true;
-                    fromInfinit = false;
-                    continue;
-                }
-                // 無限の場合は垂直な線を引く
-                if (Double.isInfinite(x)) {
-                    // 線が途切れていたり、その前も無限の場合は何もしない
-                    positivInf = x > 0;
-                    if (!moveTo && !fromInfinit) {
-                        beforeX = positivInf ? width : 0;
-                        if (elei < esize) {
-                            final PathElement pathElement = elements.get(elei);
-                            if (pathElement.getClass() == LineTo.class) {
-                                final LineTo m = ((LineTo) pathElement);
-                                m.setX(beforeX);
-                                m.setY(beforeY);
-                            } else {
-                                final LineTo m = new LineTo(beforeX, beforeY);
-                                elements.set(elei, m);
-                            }
-                            elei++;
-                        } else {
-                            final LineTo m = new LineTo(beforeX, beforeY);
-                            elements.add(m);
-                        }
-                    }
-                    // 無限フラグを立てる
-                    fromInfinit = true;
-                    moveTo = false;
-                    // 次の処理へ
-                    continue;
-                }
-                // 実数の処理
-
-                // 座標変換
-                x = xaxis.getDisplayPosition(x);
-                y = yaxis.getDisplayPosition(y);
-
-                // 前回が無限の時は水平線を書く
-                if (fromInfinit) {
-                    beforeY = y;
-                    beforeX = positivInf ? width : 0;
-                    if (elei < esize) {
-                        final PathElement pathElement = elements.get(elei);
-                        if (pathElement.getClass() == MoveTo.class) {// 再利用
-                            final MoveTo m = ((MoveTo) pathElement);
-                            m.setX(beforeX);
-                            m.setY(y);
-                        } else {
-                            final MoveTo m = new MoveTo(beforeX, y);
-                            elements.set(elei, m);// 置換
-                        }
-                        elei++;
-                    } else {
-                        final MoveTo m = new MoveTo(beforeX, y);
-                        elements.add(m);
-                    }
-                    moveTo = false;// moveToは不要になる
-                }
-
-                fromInfinit = false;
-
-                if (moveTo) {// 線が途切れている場合
-                    if (elei < esize) {
-                        final PathElement pathElement = elements.get(elei);
-                        if (pathElement.getClass() == MoveTo.class) {// 再利用
-                            final MoveTo m = ((MoveTo) pathElement);
-                            m.setX(x);
-                            m.setY(y);
-                        } else {
-                            final MoveTo m = new MoveTo(x, y);
-                            elements.set(elei, m);// 置換
-                        }
-                        elei++;
-                    } else {
-                        final MoveTo m = new MoveTo(x, y);
-                        elements.add(m);
-                    }
-                    moveTo = false;
-                    beforeY = y;
-                    beforeX = x;
-                } else {// 線が続いている場合
-                    final double l = hypot(x - beforeX, y - beforeY);
-                    // 距離が小さすぎる場合は無視
-                    if (l < DISTANCE_THRESHOLD) {
-                        continue;
-                    }
-                    if (elei < esize) {
-                        final PathElement pathElement = elements.get(elei);
-                        if (pathElement.getClass() == LineTo.class) {
-                            final LineTo m = ((LineTo) pathElement);
-                            m.setX(x);
-                            m.setY(y);
-                        } else {
-                            final LineTo m = new LineTo(x, y);
-                            elements.set(elei, m);
-                        }
-                        elei++;
-                    } else {
-                        final LineTo m = new LineTo(x, y);
-                        elements.add(m);
-                    }
-                    beforeY = y;
-                    beforeX = x;
-                }
-            } // end for
-
-            if (elei < esize) {
-                elements.remove(elei, esize);
-            }
-
-        }
-
-    }
-
-    private void plotLineChartData_large(final LineChartData data, final Path path, final double width, final double height, final int start, final int end) {
-        // final ObservableList<PathElement> elements = path.getElements();
-        // final int esize = elements.size();
-        final Axis xaxis = getXAxis();
-        final Axis yaxis = getYAxis();
-        final Orientation orientation = getOrientation();
-
-        final PlotLine line = plotline;
-
-        if (orientation == Orientation.HORIZONTAL) {// x軸方向昇順
-            boolean moveTo = true;
-            boolean fromInfinit = false;
-            boolean positivInf = false;
-            double beforeX = 0, beforeY = 0;
-            for (int i = start; i <= end; i++) {
-                double x = data.getX(i);
-                double y = data.getY(i);
-
-                // NaNの場合は線を途切れさせる
-                if (y != y) {
-                    moveTo = true;
-                    fromInfinit = false;
-                    continue;
-                }
-                // 無限の場合は垂直な線を引く
-                if (Double.isInfinite(y)) {
-                    // 線が途切れていたり、その前も無限の場合は何もしない
-                    positivInf = y > 0;
-                    if (!moveTo && !fromInfinit) {
-                        beforeY = positivInf ? 0 : height;
-                        line.add(1, beforeX, beforeY);
-                    }
-                    // 無限フラグを立てる
-                    fromInfinit = true;
-                    moveTo = false;
-                    // 次の処理へ
-                    continue;
-                }
-                // 実数の処理
-
-                // 座標変換
-                x = xaxis.getDisplayPosition(x);
-                y = yaxis.getDisplayPosition(y);
-
-                // 前回が無限の時は垂直線を書く
-                if (fromInfinit) {
-                    beforeX = x;
-                    beforeY = positivInf ? 0 : height;
-                    line.add(0, x, beforeY);
-                    moveTo = false;// moveToは不要になる
-                }
-
-                fromInfinit = false;
-
-                if (moveTo) {// 線が途切れている場合
-                    line.add(0, x, y);
-                    moveTo = false;
-                    beforeX = x;
-                    beforeY = y;
-                } else {// 線が続いている場合
-                    final double l = hypot(x - beforeX, y - beforeY);
-                    // 距離が小さすぎる場合は無視
-                    if (l < DISTANCE_THRESHOLD) {
-                        continue;
-                    }
-                    line.add(1, x, y);
-                    beforeX = x;
-                    beforeY = y;
-                }
-            } // end for
-        } else {
-
-            boolean moveTo = true;
-            boolean fromInfinit = false;
-            boolean positivInf = false;
-            double beforeX = 0, beforeY = 0;
-            for (int i = start; i <= end; i++) {
-                double x = data.getX(i);
-                double y = data.getY(i);
-
-                // NaNの場合は線を途切れさせる
-                if (x != x) {
-                    moveTo = true;
-                    fromInfinit = false;
-                    continue;
-                }
-                // 無限の場合は垂直な線を引く
-                if (Double.isInfinite(x)) {
-                    // 線が途切れていたり、その前も無限の場合は何もしない
-                    positivInf = x > 0;
-                    if (!moveTo && !fromInfinit) {
-                        beforeX = positivInf ? width : 0;
-                        line.add(0, beforeX, beforeY);
-                    }
-                    // 無限フラグを立てる
-                    fromInfinit = true;
-                    moveTo = false;
-                    // 次の処理へ
-                    continue;
-                }
-                // 実数の処理
-
-                // 座標変換
-                x = xaxis.getDisplayPosition(x);
-                y = yaxis.getDisplayPosition(y);
-
-                // 前回が無限の時は垂直線を書く
-                if (fromInfinit) {
-                    beforeY = y;
-                    beforeX = positivInf ? width : 0;
-                    line.add(0, beforeX, y);
-                    moveTo = false;// moveToは不要になる
-                }
-
-                fromInfinit = false;
-
-                if (moveTo) {// 線が途切れている場合
-                    line.add(0, x, y);
-                    moveTo = false;
-                    beforeY = y;
-                    beforeX = x;
-                } else {// 線が続いている場合
-                    final double l = hypot(x - beforeX, y - beforeY);
-                    // 距離が小さすぎる場合は無視
-                    if (l < DISTANCE_THRESHOLD) {
-                        continue;
-                    }
-                    line.add(1, x, y);
-                    beforeY = y;
-                    beforeX = x;
-                }
-            } // end for
         }
 
     }
@@ -1213,66 +993,70 @@ public class GraphPlotArea extends Region {
         return foreGroundShapes;
     }
 
-    private ObservableList<LineChartData> linechartData;
-
-    private ListChangeListener<LineChartData> dataListListener;
-
-    private InvalidationListener dataListener;
-
-    private BitSet colorIndex = new BitSet(8);
-
-    protected final InvalidationListener getDataListener() {
-        if (dataListener == null) {
-            dataListener = o -> {
-                final ReadOnlyBooleanProperty b = (ReadOnlyBooleanProperty) o;
-                if (!b.get() && isPlotValidate()) {
-                    setPlotValidate(false);
-                    setNeedsLayout(true);
-                }
-            };
+    /**
+     * Set data list for line chart.
+     * 
+     * @param datalist
+     */
+    public final void setLineChartDataList(ObservableList<LineChartData> datalist) {
+        // clear old list configuration
+        if (lineChartData != null) {
+            lineChartData.removeListener(lineDataListObserver);
+            for (LineChartData data : lineChartData) {
+                data.validateProperty().removeListener(lineDataObserver);
+            }
+            lineColorManager.clear();
         }
-        return dataListener;
+
+        // add new list configuration
+        if (datalist != null) {
+            datalist.addListener(lineDataListObserver);
+            for (LineChartData data : datalist) {
+                data.defaultColorIndex = lineColorManager.nextClearBit(0);
+                lineColorManager.set(data.defaultColorIndex, true);
+                data.defaultColor = "default-color" + (data.defaultColorIndex % 8);
+                data.validateProperty().addListener(lineDataObserver);
+            }
+        }
+
+        // update
+        lineChartData = datalist;
+
+        if (isPlotValidate()) {
+            setPlotValidate(false);
+            setNeedsLayout(true);
+        }
     }
 
-    public final void setLineChartDataList(final ObservableList<LineChartData> datalist) {
-        if (dataListListener == null) {
-            dataListListener = (c) -> {
-                c.next();
-                final InvalidationListener dataListener = getDataListener();
-                for (final LineChartData d : c.getRemoved()) {
-                    colorIndex.clear(d.defaultColorIndex);
-                    d.validateProperty().removeListener(dataListener);
-                }
-                for (final LineChartData d : c.getAddedSubList()) {
-                    d.defaultColorIndex = colorIndex.nextClearBit(0);
-                    colorIndex.set(d.defaultColorIndex, true);
-                    d.defaultColor = "default-color" + (d.defaultColorIndex % 8);
-                    d.validateProperty().addListener(dataListener);
-                }
-            };
+    /**
+     * Set data list for line chart.
+     * 
+     * @param datalist
+     */
+    public final void setCandleChartDataList(ObservableList<Tick> datalist) {
+        // clear old list configuration
+        if (candleChartData != null) {
+            // lineChartData.removeListener(lineDataListObserver);
+            // for (LineChartData data : lineChartData) {
+            // data.validateProperty().removeListener(lineDataObserver);
+            // }
+            // lineColorManager.clear();
         }
 
-        final ObservableList<LineChartData> old = linechartData;
-        final InvalidationListener dataListener = getDataListener();
-        if (old != null) {
-            old.removeListener(dataListListener);
-            for (final LineChartData d : old) {
-                d.validateProperty().removeListener(dataListener);
-            }
-            colorIndex.clear();
-        }
-
+        // add new list configuration
         if (datalist != null) {
-            datalist.addListener(dataListListener);
-            for (final LineChartData d : datalist) {
-                d.defaultColorIndex = colorIndex.nextClearBit(0);
-                colorIndex.set(d.defaultColorIndex, true);
-                d.defaultColor = "default-color" + (d.defaultColorIndex % 8);
-                d.validateProperty().addListener(dataListener);
-            }
+            // datalist.addListener(lineDataListObserver);
+            // for (LineChartData data : datalist) {
+            // data.defaultColorIndex = lineColorManager.nextClearBit(0);
+            // lineColorManager.set(data.defaultColorIndex, true);
+            // data.defaultColor = "default-color" + (data.defaultColorIndex % 8);
+            // data.validateProperty().addListener(lineDataObserver);
+            // }
         }
 
-        linechartData = datalist;
+        // update
+        candleChartData = datalist;
+
         if (isPlotValidate()) {
             setPlotValidate(false);
             setNeedsLayout(true);
@@ -1372,8 +1156,22 @@ public class GraphPlotArea extends Region {
         }
     }
 
-    public final ObservableList<LineChartData> getDataList() {
-        return linechartData;
+    /**
+     * Get data for line chart.
+     * 
+     * @return
+     */
+    public final ObservableList<LineChartData> getLineDataList() {
+        return lineChartData;
+    }
+
+    /**
+     * Get data for candle chart.
+     * 
+     * @return
+     */
+    public final ObservableList<Tick> getCandleDataList() {
+        return candleChartData;
     }
 
     /**

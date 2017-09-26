@@ -38,6 +38,7 @@ import javafx.geometry.Side;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Region;
 
+import cointoss.chart.Tick;
 import cointoss.visual.shape.GraphShape;
 
 /**
@@ -46,8 +47,11 @@ import cointoss.visual.shape.GraphShape;
  */
 public class LineChart extends Region {
 
-    /** The plotting date list. */
-    public final ObservableList<LineChartData> data;
+    /** The list of plottable line date. */
+    public final ObservableList<LineChartData> lines;
+
+    /** The list of plottable cnadle date. */
+    public final ObservableList<Tick> candles;
 
     public final ObjectProperty<Axis> xAxisProperty = new SimpleObjectProperty<>(this, "xAxis", null);
 
@@ -75,9 +79,9 @@ public class LineChart extends Region {
         yAxisProperty.addListener(axisListener);
 
         // create plotting data collection
-        data = FXCollections.observableArrayList();
-        data.addListener(dataValidateListener);
-        data.addListener((ListChangeListener<LineChartData>) c -> {
+        lines = FXCollections.observableArrayList();
+        lines.addListener(dataValidateListener);
+        lines.addListener((ListChangeListener<LineChartData>) c -> {
             InvalidationListener listener = getLineChartDataListener();
 
             while (c.next()) {
@@ -91,8 +95,12 @@ public class LineChart extends Region {
             }
         });
 
+        candles = FXCollections.observableArrayList();
+        candles.addListener(dataValidateListener);
+
         getStyleClass().setAll("chart");
-        graph.setLineChartDataList(data);
+        graph.setLineChartDataList(lines);
+        graph.setCandleChartDataList(candles);
         graph.xAxisProperty().bind(xAxisProperty);
         graph.yAxisProperty().bind(yAxisProperty);
         graph.verticalMinorGridLinesVisibleProperty().bind(verticalMinorGridLinesVisibleProperty());
@@ -370,12 +378,12 @@ public class LineChart extends Region {
         if (xAxis == null) {
             return;
         }
-        if (data == null) {
+        if (lines == null) {
             xAxis.setMaxValue(1);
             xAxis.setMinValue(0);
         } else {
             double min = Double.POSITIVE_INFINITY, max = Double.NEGATIVE_INFINITY;
-            for (final LineChartData d : data) {
+            for (final LineChartData d : lines) {
                 if (d.size() == 0) {
                     continue;
                 }
@@ -419,12 +427,12 @@ public class LineChart extends Region {
         if (yAxis == null) {
             return;
         }
-        if (data == null) {
+        if (lines == null) {
             yAxis.setMaxValue(1);
             yAxis.setMinValue(0);
         } else {
             double min = Double.POSITIVE_INFINITY, max = Double.NEGATIVE_INFINITY;
-            for (final LineChartData d : data) {
+            for (final LineChartData d : lines) {
                 if (d.size() == 0) {
                     continue;
                 }
@@ -837,15 +845,25 @@ public class LineChart extends Region {
     }
 
     /**
+     * @param data
+     * @return
+     */
+    public LineChart lineData(LineChartData... data) {
+        this.lines.addAll(data);
+
+        return this;
+    }
+
+    /**
      * @param closePrice
      * @param maxPrice
      * @param minPrice
      * @return
      */
-    public LineChart data(LineChartData... data) {
-        this.data.addAll(data);
-
+    public LineChart candleDate(Iterable<Tick> data) {
+        for (Tick tick : data) {
+            this.candles.add(tick);
+        }
         return this;
     }
-
 }
