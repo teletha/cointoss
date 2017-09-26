@@ -365,10 +365,6 @@ public class LineChart extends Region {
 
     }
 
-    private static double min(final double min, final double v) {
-        return v != v || min <= v ? min : v;
-    }
-
     private static double max(final double max, final double v) {
         return v != v || max >= v ? max : v;
     }
@@ -377,35 +373,8 @@ public class LineChart extends Region {
      * Set x-axis range.
      */
     private void setXAxisRange() {
-        final Axis xAxis = getXAxis();
-        double min = Double.POSITIVE_INFINITY, max = Double.NEGATIVE_INFINITY;
-        for (final LineChartData data : lines) {
-            if (data.size() == 0) {
-                continue;
-            }
-            if (getOrientation() == Orientation.HORIZONTAL) {
-                final double i = data.getX(0);
-                final double a = data.getX(data.size() - 1);
-                min = min(min, i);
-                max = max(max, a);
-            } else {
-                final double[] minmax = data.getMinMaxX(0, data.size(), true);
-                min = min(min, minmax[0]);
-                max = max(max, minmax[1]);
-            }
-        }
-
-        // System.out.println(max + " " + min);
-        final double l = max == min ? 1 : max - min;
-        final double ll = l * 1.01;
-        double u = min + ll;
-        double b = max - ll;
-
-        // System.out.println("SET " + u + " " + b + " " + ll);
-        xAxis.setMaxValue(u);
-        xAxis.setMinValue(b);
-        // xAxis.setMaxValue(candles.get(candles.size() - 1).start.toEpochSecond());
-        // xAxis.setMinValue(candles.get(0).start.toEpochSecond());
+        getXAxis().setMaxValue(candles.get(candles.size() - 1).start.toInstant().toEpochMilli());
+        getXAxis().setMinValue(candles.get(0).start.toInstant().toEpochMilli());
     }
 
     /**

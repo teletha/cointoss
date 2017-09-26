@@ -23,13 +23,13 @@ public class LineChartData {
 
     public final StringProperty nameProperty = new SimpleStringProperty(this, "name", "");
 
-    private static final double[] EMPTY_ARRAY = {};
-
     int defaultColorIndex;
 
     String defaultColor;
 
-    private double[] x = EMPTY_ARRAY, y = EMPTY_ARRAY;
+    private double[] x = {};
+
+    private double[] y = {};
 
     private int length = 0;
 
