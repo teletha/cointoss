@@ -35,6 +35,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.StrokeLineJoin;
 
 import cointoss.chart.Tick;
+import cointoss.visual.shape.Candle;
 import cointoss.visual.shape.GraphLine;
 import cointoss.visual.shape.GraphShape;
 
@@ -133,7 +134,7 @@ public class GraphPlotArea extends Region {
         verticalMinorGridLines.getStyleClass().setAll("chart-vertical-grid-lines", "chart-vertical-minor-grid-lines");
         horizontalMinorGridLines.getStyleClass().setAll("chart-horizontal-grid-lines", "chart-horizontal-minor-grid-lines");
         getChildren()
-                .addAll(verticalRowFill, horizontalRowFill, verticalMinorGridLines, horizontalMinorGridLines, verticalGridLines, horizontalGridLines, background, userBackround, lines, candles, foreground, userForeground);
+                .addAll(verticalRowFill, horizontalRowFill, verticalMinorGridLines, horizontalMinorGridLines, verticalGridLines, horizontalGridLines, background, userBackround, candles, lines, foreground, userForeground);
     }
 
     /**
@@ -178,6 +179,7 @@ public class GraphPlotArea extends Region {
         if (!isPlotValidate()) {
             drawBackGroundLine();
             plotLineChartDatas(w, h);
+            plotCandleChartDatas(w, h);
             setPlotValidate(true);
         }
     }
@@ -501,6 +503,7 @@ public class GraphPlotArea extends Region {
                 } else {
                     path = new Path();
                     path.setStrokeLineJoin(StrokeLineJoin.BEVEL);
+                    path.setStrokeWidth(0.6);
                     path.getStyleClass().setAll("chart-series-line", "series" + i, data.defaultColor);
                     paths.add(path);
                 }
@@ -511,6 +514,43 @@ public class GraphPlotArea extends Region {
                     className.set(defaultColorIndex, data.defaultColor);
                 }
                 plotLineChartData(data, path, width, height);
+            }
+        }
+    }
+
+    /**
+     * Draw line chart.
+     * 
+     * @param width
+     * @param height
+     */
+    protected void plotCandleChartDatas(double width, double height) {
+        ObservableList<Node> nodes = candles.getChildren();
+        List<Tick> datas = candleChartData;
+
+        if (datas == null) {
+            nodes.clear();
+        } else {
+            int sizeData = datas.size();
+            int sizePath = nodes.size();
+
+            if (sizeData < sizePath) {
+                nodes.remove(sizeData, sizePath);
+                sizePath = sizeData;
+            }
+
+            for (int i = 0; i < sizeData; i++) {
+                Tick data = datas.get(i);
+
+                Candle candle;
+
+                if (i < sizePath) {
+                    candle = (Candle) nodes.get(i);
+                } else {
+                    candle = new Candle("series" + i, "data" + i);
+                    nodes.add(candle);
+                }
+                plotCandleChartData(i, data, candle, width, height);
             }
         }
     }
@@ -558,6 +598,34 @@ public class GraphPlotArea extends Region {
         start = Math.max(0, start - 2);
 
         plotLineChartData(data, path, width, height, start, end);
+    }
+
+    /**
+     * Draw chart data.
+     * 
+     * @param data
+     * @param candle
+     * @param width
+     * @param height
+     */
+    protected void plotCandleChartData(int index, Tick data, Candle candle, double width, double height) {
+        double x = getXAxis().getDisplayPosition(index);
+        double open = getYAxis().getDisplayPosition(data.openPrice.toDouble());
+        double close = getYAxis().getDisplayPosition(data.closePrice.toDouble());
+        double high = getYAxis().getDisplayPosition(data.maxPrice.toDouble());
+        double low = getYAxis().getDisplayPosition(data.minPrice.toDouble());
+
+        // calculate candle width
+        double candleWidth = 5;
+
+        // update candle
+        candle.update(close - open, high - open, low - open, candleWidth);
+        // candle.updateTooltip(item.getYValue().doubleValue(), extra.getClose(), extra.getHigh(),
+        // extra.getLow());
+
+        // position the candle
+        candle.setLayoutX(x);
+        candle.setLayoutY(open);
     }
 
     /**

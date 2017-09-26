@@ -43,7 +43,7 @@ public class Visualize extends Application {
      */
     @Override
     public void start(final Stage stage) throws Exception {
-        Chart serise = chart(BitFlyer.FX_BTC_JPY, "2017-09-05T13:00:00", "2017-09-07T00:59:59", Duration.ofMinutes(1));
+        Chart serise = chart(BitFlyer.FX_BTC_JPY, "2017-09-05T13:00:00", "2017-09-05T23:59:59", Duration.ofMinutes(1));
 
         Num max = Num.MIN;
         Num min = Num.MAX;
@@ -52,23 +52,22 @@ public class Visualize extends Application {
             max = Num.max(max, tick.maxPrice);
             min = Num.min(min, tick.minPrice);
         }
-        int size = serise.ticks.size();
+        Num diff = max.minus(min);
 
-        Axis axis = new LinearAxis("日時").lowerValue(0).visibleAmount(0.1);
-        Axis yaxis = new LinearAxis("JPY");
+        LinearAxis axis = new LinearAxis("日時");
+        axis.visibleAmount(100D / serise.ticks.size());
+
+        LinearAxis yaxis = new LinearAxis("JPY");
+        yaxis.visibleAmount(Num.of(24000).divide(diff).toDouble());
 
         AxisZoomHandler zoom = new AxisZoomHandler();
         zoom.install(axis);
         zoom.install(yaxis);
 
-        LineChartData closePrice = new LineChartData(size).name("Close");
-        LineChartData maxPrice = new LineChartData(size).name("Max");
-        LineChartData minPrice = new LineChartData(size).name("Min");
+        LineChartData weightMedian = new LineChartData(serise.ticks.size()).name("Weight Median");
 
-        for (int i = 0; i < size; i++) {
-            closePrice.addData(i, serise.ticks.get(i).closePrice.toDouble());
-            maxPrice.addData(i, serise.ticks.get(i).maxPrice.toDouble());
-            minPrice.addData(i, serise.ticks.get(i).minPrice.toDouble());
+        for (int i = 0; i < serise.ticks.size(); i++) {
+            weightMedian.addData(i, serise.ticks.get(i).getWeightMedian().toDouble());
         }
 
         LineChart line = new LineChart()//
@@ -76,8 +75,9 @@ public class Visualize extends Application {
                 .yAxis(yaxis)
                 .orientation(Orientation.HORIZONTAL)
                 .rangeMarginX(1)
+                .rangeMarginY(1.06)
                 .graphTracker(new GraphTracker())
-                .lineData(closePrice, maxPrice, minPrice)
+                .lineData(weightMedian)
                 .candleDate(serise.ticks);
 
         Legend legend = new Legend();

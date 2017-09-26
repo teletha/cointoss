@@ -30,7 +30,7 @@ public class Candle extends Group {
 
     private final Tooltip tooltip = new Tooltip();
 
-    Candle(String seriesStyleClass, String dataStyleClass) {
+    public Candle(String seriesStyleClass, String dataStyleClass) {
         setAutoSizeChildren(false);
         getChildren().addAll(highLowLine, bar);
         this.seriesStyleClass = seriesStyleClass;

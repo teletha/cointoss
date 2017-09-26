@@ -73,6 +73,8 @@ public class LineChart extends Region {
      * 
      */
     public LineChart() {
+        getStylesheets().add(getClass().getResource("CandleStickChart.css").toExternalForm());
+
         xAxisProperty.addListener(dataValidateListener);
         xAxisProperty.addListener(axisListener);
         yAxisProperty.addListener(dataValidateListener);
@@ -678,8 +680,10 @@ public class LineChart extends Region {
         return rangeMarginYProperty == null ? 1.25 : rangeMarginYProperty.get();
     }
 
-    public final void setRangeMarginY(final double value) {
+    public final LineChart rangeMarginY(final double value) {
         rangeMarginYProperty().set(value);
+
+        return this;
     }
 
     private DoubleProperty rangeMarginYProperty;
