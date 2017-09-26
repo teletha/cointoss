@@ -11,6 +11,7 @@ package cointoss.visual;
 
 import static java.lang.Math.*;
 
+import java.util.Objects;
 import java.util.function.ToDoubleFunction;
 
 import javafx.beans.property.ReadOnlyBooleanProperty;
@@ -18,7 +19,9 @@ import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
+import cointoss.chart.Chart;
 import cointoss.chart.Tick;
+import cointoss.util.RingBuffer;
 
 /**
  * @version 2017/09/26 1:03:28
@@ -31,50 +34,35 @@ public class LineChartData {
 
     String defaultColor;
 
-    private Tick[] ticks = {};
-
-    private int length = 0;
+    private Chart chart;
 
     /**
      * @param capacity
      */
-    public LineChartData(int capacity) {
-        ticks = new Tick[capacity];
-    }
-
-    public void addData(final double x, final Tick y) {
-        final int t = length;
-        length++;
-        if (this.ticks.length < length) {
-            final int size = this.ticks.length + 16;
-            final Tick[] newy = new Tick[size];
-            System.arraycopy(this.ticks, 0, newy, 0, t);
-            this.ticks = newy;
-        }
-
-        this.ticks[t] = y;
+    public LineChartData(Chart chart) {
+        this.chart = Objects.requireNonNull(chart);
         setValidate(false);
     }
 
     public int size() {
         setValidate(true);
-        return length;
+        return chart.ticks.size();
     }
 
     public double getX(final int index) throws ArrayIndexOutOfBoundsException {
-        if (index < 0 || index >= length) {
+        if (index < 0 || index >= chart.ticks.size()) {
             throw new ArrayIndexOutOfBoundsException(index);
         }
         setValidate(true);
-        return ticks[index].start.toInstant().toEpochMilli();
+        return chart.getTick(index).start.toInstant().toEpochMilli();
     }
 
     public double getY(final int index) throws ArrayIndexOutOfBoundsException {
-        if (index < 0 || index >= length) {
+        if (index < 0 || index >= chart.ticks.size()) {
             throw new ArrayIndexOutOfBoundsException(index);
         }
         setValidate(true);
-        return ticks[index].getWeightMedian().toDouble();
+        return chart.getTick(index).getWeightMedian().toDouble();
     }
 
     /**
@@ -90,9 +78,9 @@ public class LineChartData {
     public int searchXIndex(final double value, final boolean minMode) {
         setValidate(true);
         if (minMode) {
-            return findMinIndex(ticks, length, value, i -> i.start.toInstant().toEpochMilli());
+            return findMinIndex(chart.ticks, chart.ticks.size(), value, i -> i.start.toInstant().toEpochMilli());
         } else {
-            return findMaxIndex(ticks, length, value, i -> i.start.toInstant().toEpochMilli());
+            return findMaxIndex(chart.ticks, chart.ticks.size(), value, i -> i.start.toInstant().toEpochMilli());
         }
     }
 
@@ -109,9 +97,9 @@ public class LineChartData {
     public int searchYIndex(final double value, final boolean minMode) {
         setValidate(true);
         if (minMode) {
-            return findMinIndex(ticks, length, value, t -> t.getWeightMedian().toDouble());
+            return findMinIndex(chart.ticks, chart.ticks.size(), value, t -> t.getWeightMedian().toDouble());
         } else {
-            return findMaxIndex(ticks, length, value, t -> t.getWeightMedian().toDouble());
+            return findMaxIndex(chart.ticks, chart.ticks.size(), value, t -> t.getWeightMedian().toDouble());
         }
     }
 
@@ -123,7 +111,7 @@ public class LineChartData {
      * @param v
      * @return
      */
-    private static int findMaxIndex(final Tick[] a, final int size, final double v, ToDoubleFunction<Tick> converter) {
+    private static int findMaxIndex(final RingBuffer<Tick> a, final int size, final double v, ToDoubleFunction<Tick> converter) {
         if (size < 2) {
             return 0;
         }
@@ -134,7 +122,7 @@ public class LineChartData {
         int l = 1, r = size - 2, m = (l + r) >> 1;
 
         while (r - l > 1) {
-            final double d = converter.applyAsDouble(a[m]);
+            final double d = converter.applyAsDouble(a.get(m));
             if (d == v) {
                 return m;
             }
@@ -146,10 +134,10 @@ public class LineChartData {
             m = (l + r) >> 1;
         }
 
-        if (converter.applyAsDouble(a[l]) > v) {
+        if (converter.applyAsDouble(a.get(l)) > v) {
             return l - 1;
         }
-        if (converter.applyAsDouble(a[r]) <= v) {
+        if (converter.applyAsDouble(a.get(r)) <= v) {
             return r;
         }
         return l;
@@ -163,7 +151,7 @@ public class LineChartData {
      * @param v
      * @return
      */
-    private static int findMinIndex(final Tick[] a, final int size, final double v, ToDoubleFunction<Tick> converter) {
+    private static int findMinIndex(final RingBuffer<Tick> a, final int size, final double v, ToDoubleFunction<Tick> converter) {
         if (size < 2) {
             return 0;
         }
@@ -173,7 +161,7 @@ public class LineChartData {
         int l = 1, r = size - 2, m = (l + r) >> 1;
 
         while (r - l > 1) {
-            final double d = converter.applyAsDouble(a[m]);
+            final double d = converter.applyAsDouble(a.get(m));
             if (d == v) {
                 return m;
             }
@@ -184,10 +172,10 @@ public class LineChartData {
             }
             m = (l + r) >> 1;
         }
-        if (converter.applyAsDouble(a[l]) >= v) {
+        if (converter.applyAsDouble(a.get(l)) >= v) {
             return l;
         }
-        if (converter.applyAsDouble(a[r]) < v) {
+        if (converter.applyAsDouble(a.get(r)) < v) {
             return r + 1;
         }
         return r;
@@ -210,16 +198,16 @@ public class LineChartData {
         if (startIndex < 0) {
             startIndex = 0;
         }
-        if (endIndex >= length) {
-            endIndex = length - 1;
+        if (endIndex >= chart.ticks.size()) {
+            endIndex = chart.ticks.size() - 1;
         }
         setValidate(true);
-        return findMinMaxValue(ticks, startIndex, endIndex, ignoreInfinit, t -> t.start.toInstant().toEpochMilli());
+        return findMinMaxValue(chart.ticks, startIndex, endIndex, ignoreInfinit, t -> t.start.toInstant().toEpochMilli());
     }
 
-    private static double[] findMinMaxValue(final Tick[] a, int l, final int r, final boolean ignoreInfinit, ToDoubleFunction<Tick> converter) {
-        double min = converter.applyAsDouble(a[l]);
-        double max = converter.applyAsDouble(a[l]);
+    private static double[] findMinMaxValue(final RingBuffer<Tick> a, int l, final int r, final boolean ignoreInfinit, ToDoubleFunction<Tick> converter) {
+        double min = converter.applyAsDouble(a.get(l));
+        double max = converter.applyAsDouble(a.get(l));
 
         if (l == r) {
             if (ignoreInfinit && Double.isInfinite(min)) {
@@ -230,14 +218,14 @@ public class LineChartData {
         }
 
         while (min != min || (ignoreInfinit && Double.isInfinite(min))) {
-            min = max = converter.applyAsDouble(a[l++]);
+            min = max = converter.applyAsDouble(a.get(l++));
             if (l > r) {
                 return new double[] {Double.NaN, Double.NaN};
             }
         }
 
         for (; l <= r; l++) {
-            final double dd = converter.applyAsDouble(a[l]);
+            final double dd = converter.applyAsDouble(a.get(l));
             if (dd != dd) {
                 continue;
             }

@@ -67,11 +67,7 @@ public class Visualize extends Application {
         zoom.install(axis);
         zoom.install(yaxis);
 
-        LineChartData weightMedian = new LineChartData(serise.ticks.size()).name("Weight Median");
-
-        for (int i = 0; i < serise.ticks.size(); i++) {
-            weightMedian.addData(serise.ticks.get(i).start.toInstant().toEpochMilli(), serise.ticks.get(i));
-        }
+        LineChartData weightMedian = new LineChartData(serise).name("Weight Median");
 
         LineChart line = new LineChart()//
                 .xAxis(axis)
