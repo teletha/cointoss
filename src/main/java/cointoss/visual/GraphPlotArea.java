@@ -434,39 +434,41 @@ public class GraphPlotArea extends Region {
     }
 
     protected void plotLineChartDatas(final double width, final double height) {
-        final Group g = plotArea;
-        final ObservableList<Node> paths = g.getChildren();
-        final List<LineChartData> datas = linechartData;
+        ObservableList<Node> paths = plotArea.getChildren();
+        List<LineChartData> datas = linechartData;
+
         if (datas == null) {
             paths.clear();
         } else {
-            final int size = datas.size();
-            int psize = paths.size();
-            if (size < psize) {
-                paths.remove(size, psize);
-                psize = size;
+            int sizeData = datas.size();
+            int sizePath = paths.size();
+
+            if (sizeData < sizePath) {
+                paths.remove(sizeData, sizePath);
+                sizePath = sizeData;
             }
 
-            for (int i = 0; i < size; i++) {
-                final int defaultColorIndex = 2;
-                final LineChartData d = datas.get(i);
-                Path p;
-                if (i < psize) {
-                    p = (Path) paths.get(i);
+            for (int i = 0; i < sizeData; i++) {
+                int defaultColorIndex = 2;
+                LineChartData data = datas.get(i);
+
+                Path path;
+
+                if (i < sizePath) {
+                    path = (Path) paths.get(i);
                 } else {
-                    p = new Path();
-                    p.setStrokeLineJoin(StrokeLineJoin.BEVEL);
-                    // 順序とかあるのかね？
-                    p.getStyleClass().setAll("chart-series-line", "series" + i, d.defaultColor);
-                    paths.add(p);
-                }
-                final ObservableList<String> sc = p.getStyleClass();
-
-                if (!sc.get(defaultColorIndex).equals(d.defaultColor)) {
-                    sc.set(defaultColorIndex, d.defaultColor);
+                    path = new Path();
+                    path.setStrokeLineJoin(StrokeLineJoin.BEVEL);
+                    path.getStyleClass().setAll("chart-series-line", "series" + i, data.defaultColor);
+                    paths.add(path);
                 }
 
-                plotLineChartData(d, p, width, height);
+                ObservableList<String> className = path.getStyleClass();
+
+                if (!className.get(defaultColorIndex).equals(data.defaultColor)) {
+                    className.set(defaultColorIndex, data.defaultColor);
+                }
+                plotLineChartData(data, path, width, height);
             }
         }
     }
@@ -475,7 +477,15 @@ public class GraphPlotArea extends Region {
 
     private PlotLine plotline = new PlotLine();
 
-    protected void plotLineChartData(final LineChartData data, final Path path, final double width, final double height) {
+    /**
+     * Draw chart data.
+     * 
+     * @param data
+     * @param path
+     * @param width
+     * @param height
+     */
+    protected void plotLineChartData(LineChartData data, Path path, double width, double height) {
         final ObservableList<PathElement> elements = path.getElements();
         if (data.size() == 0) {
             path.setVisible(false);

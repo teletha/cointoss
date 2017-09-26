@@ -13,7 +13,6 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
-import javafx.collections.ObservableList;
 import javafx.scene.Node;
 
 import cointoss.visual.Axis;
@@ -24,28 +23,21 @@ import cointoss.visual.Axis;
 public abstract class GraphPointShape extends AbstractGraphShape {
 
     /**
-     * @return
-     */
-    public ObservableList<String> getStyleClass() {
-        return getNode().getStyleClass();
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
-    public void setNodeProperty(final Axis xaxis, final Axis yaxis, final double w, final double h) {
+    public void setNodeProperty(Axis xaxis, Axis yaxis, double w, double h) {
         setValidate(true);
-        final double x = xaxis.getDisplayPosition(getX());
-        final double y = yaxis.getDisplayPosition(getY());
-        final Node c = getNode();
+        double x = xaxis.getDisplayPosition(getX());
+        double y = yaxis.getDisplayPosition(getY());
+        Node node = getNode();
         if (!isVisible() || x != x || Double.isInfinite(x) || Double.isInfinite(y) || y != y) {
-            c.setVisible(false);
+            node.setVisible(false);
             return;
         }
-        c.setLayoutX(x);
-        c.setLayoutY(y);
-        c.setVisible(true);
+        node.setLayoutX(x);
+        node.setLayoutY(y);
+        node.setVisible(true);
     }
 
     /**

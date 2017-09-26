@@ -22,7 +22,7 @@ import javafx.event.EventType;
 import javafx.geometry.Orientation;
 import javafx.scene.input.MouseEvent;
 
-import cointoss.visual.shape.GraphCircle;
+import cointoss.visual.shape.GraphCandle;
 import cointoss.visual.shape.GraphLine;
 import cointoss.visual.shape.GraphPointShape;
 
@@ -102,7 +102,7 @@ public class GraphTracker {
         final GraphPointShapeFactory factory = getFactory();
         GraphPointShape ret;
         if (factory == null) {
-            ret = new GraphCircle();
+            ret = new GraphCandle();
         } else {
             ret = factory.create();
         }

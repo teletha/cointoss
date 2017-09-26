@@ -12,11 +12,21 @@ package cointoss.visual.shape;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyBooleanWrapper;
+import javafx.collections.ObservableList;
 
 /**
  * @version 2017/09/26 1:06:29
  */
 public abstract class AbstractGraphShape implements GraphShape {
+
+    /**
+     * Get styler.
+     * 
+     * @return
+     */
+    public final ObservableList<String> getStyleClass() {
+        return getNode().getStyleClass();
+    }
 
     /**
      * {@inheritDoc}

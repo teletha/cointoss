@@ -17,7 +17,6 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.collections.ObservableList;
 import javafx.geometry.Orientation;
 import javafx.scene.shape.Rectangle;
 
@@ -36,10 +35,6 @@ public class GraphRange extends AbstractGraphShape {
             rect = new Rectangle();
         }
         return rect;
-    }
-
-    public ObservableList<String> getStyleClass() {
-        return getNode().getStyleClass();
     }
 
     /**

@@ -15,7 +15,6 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.collections.ObservableList;
 import javafx.geometry.Orientation;
 import javafx.scene.shape.Line;
 
@@ -27,8 +26,12 @@ import cointoss.visual.Axis;
  * @author nodamushi
  */
 public class GraphLine extends AbstractGraphShape {
+
     private Line line;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Line getNode() {
         if (line == null) {
@@ -37,49 +40,48 @@ public class GraphLine extends AbstractGraphShape {
         return line;
     }
 
-    public ObservableList<String> getStyleClass() {
-        return getNode().getStyleClass();
-    }
-
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public void setNodeProperty(final Axis xaxis, final Axis yaxis, final double w, final double h) {
+    public void setNodeProperty(Axis xaxis, Axis yaxis, double w, double h) {
         setValidate(true);
-        final double v = getValue();
-        final Line l = getNode();
-        final Orientation orientation = getOrientation();
-        final boolean isX = orientation == Orientation.VERTICAL;
-        final Axis axis = isX ? xaxis : yaxis;
+        double v = getValue();
+        Line line = getNode();
+        Orientation orientation = getOrientation();
+        boolean isX = orientation == Orientation.VERTICAL;
+        Axis axis = isX ? xaxis : yaxis;
         if (Double.isInfinite(v) || v != v || !isVisible()) {
-            l.setVisible(false);
+            line.setVisible(false);
             return;
         }
         if (!isX) {
             // 横方向
-            final double y = axis.getDisplayPosition(v);
+            double y = axis.getDisplayPosition(v);
             if (Double.isInfinite(y) || y != y || y < 0 || y > h) {
-                l.setVisible(false);
+                line.setVisible(false);
                 return;
             }
-            l.setStartX(0);
-            l.setEndX(w);
-            l.setStartY(0);
-            l.setEndY(0);
-            l.setLayoutX(0);
-            l.setLayoutY(y);
+            line.setStartX(0);
+            line.setEndX(w);
+            line.setStartY(0);
+            line.setEndY(0);
+            line.setLayoutX(0);
+            line.setLayoutY(y);
         } else {
-            final double x = axis.getDisplayPosition(v);
+            double x = axis.getDisplayPosition(v);
             if (Double.isInfinite(x) || x != x || x < 0 || x > w) {
-                l.setVisible(false);
+                line.setVisible(false);
                 return;
             }
-            l.setStartY(0);
-            l.setEndY(h);
-            l.setStartX(0);
-            l.setEndX(0);
-            l.setLayoutX(x);
-            l.setLayoutY(0);
+            line.setStartY(0);
+            line.setEndY(h);
+            line.setStartX(0);
+            line.setEndX(0);
+            line.setLayoutX(x);
+            line.setLayoutY(0);
         }
-        l.setVisible(true);
+        line.setVisible(true);
 
     }
 
@@ -96,10 +98,20 @@ public class GraphLine extends AbstractGraphShape {
         return valueProperty;
     }
 
+    /**
+     * Get Value.
+     * 
+     * @return
+     */
     public final double getValue() {
         return valueProperty == null ? 0 : valueProperty.get();
     }
 
+    /**
+     * Set value.
+     * 
+     * @param value
+     */
     public final void setValue(final double value) {
         valueProperty().set(value);
     }
