@@ -373,9 +373,6 @@ public class LineChart extends Region {
     }
 
     private void setXAxisRange() {
-        if (!isAutoRangeX()) {
-            return;
-        }
         final Axis xAxis = getXAxis();
         if (xAxis == null) {
             return;
@@ -422,10 +419,7 @@ public class LineChart extends Region {
     }
 
     private void setYAxisRange() {
-        if (!isAutoRangeY()) {
-            return;
-        }
-        final Axis yAxis = getYAxis();
+        Axis yAxis = getYAxis();
         if (yAxis == null) {
             return;
         }
@@ -434,17 +428,18 @@ public class LineChart extends Region {
             yAxis.setMinValue(0);
         } else {
             double min = Double.POSITIVE_INFINITY, max = Double.NEGATIVE_INFINITY;
-            for (final LineChartData d : lines) {
-                if (d.size() == 0) {
+
+            for (LineChartData line : lines) {
+                if (line.size() == 0) {
                     continue;
                 }
                 if (getOrientation() == Orientation.VERTICAL) {
-                    final double i = d.getY(0);
-                    final double a = d.getY(d.size() - 1);
+                    final double i = line.getY(0);
+                    final double a = line.getY(line.size() - 1);
                     min = min(min, i);
                     max = max(max, a);
                 } else {
-                    final double[] minmax = d.getMinMaxY(0, d.size() - 1, true);
+                    final double[] minmax = line.getMinMaxY(0, line.size() - 1, true);
                     min = min(min, minmax[0]);
                     max = max(max, minmax[1]);
                 }
@@ -578,28 +573,6 @@ public class LineChart extends Region {
         }
     };
 
-    /**
-     * x軸の範囲を自動的に設定するかどうか
-     * 
-     * @return
-     */
-    public final BooleanProperty autoRangeXProperty() {
-        if (autoRangeXProperty == null) {
-            autoRangeXProperty = new SimpleBooleanProperty(this, "autoRangeX", true);
-        }
-        return autoRangeXProperty;
-    }
-
-    public final boolean isAutoRangeX() {
-        return autoRangeXProperty == null ? true : autoRangeXProperty.get();
-    }
-
-    public final void setAutoRangeX(final boolean value) {
-        autoRangeXProperty().set(value);
-    }
-
-    private BooleanProperty autoRangeXProperty;
-
     public final Axis getYAxis() {
         return yAxisProperty == null ? null : yAxisProperty.get();
     }
@@ -613,28 +586,6 @@ public class LineChart extends Region {
 
         return this;
     }
-
-    /**
-     * y軸の範囲を自動的に設定するかどうか
-     * 
-     * @return
-     */
-    public final BooleanProperty autoRangeYProperty() {
-        if (autoRangeYProperty == null) {
-            autoRangeYProperty = new SimpleBooleanProperty(this, "autoRangeY", true);
-        }
-        return autoRangeYProperty;
-    }
-
-    public final boolean isAutoRangeY() {
-        return autoRangeYProperty == null ? true : autoRangeYProperty.get();
-    }
-
-    public final void setAutoRangeY(final boolean value) {
-        autoRangeYProperty().set(value);
-    }
-
-    private BooleanProperty autoRangeYProperty;
 
     /**
      * 自動的に設定する範囲に対して持たせる余裕

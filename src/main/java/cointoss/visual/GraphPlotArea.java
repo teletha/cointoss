@@ -165,6 +165,9 @@ public class GraphPlotArea extends Region {
         }
     }
 
+    /**
+     * Draw plot data.
+     */
     public void plotData() {
         final Axis xaxis = getXAxis();
         final Axis yaxis = getYAxis();
@@ -905,7 +908,7 @@ public class GraphPlotArea extends Region {
 
     private BooleanProperty alternativeRowFillVisibleProperty;
 
-    private ChangeListener<Axis> axisListener = (observable, oldValue, newValue) -> {
+    private final ChangeListener<Axis> axisListener = (observable, oldValue, newValue) -> {
         if (oldValue != null) {
             oldValue.lowerValueProperty().removeListener(plotValidateListener);
             oldValue.visibleAmountProperty().removeListener(plotValidateListener);

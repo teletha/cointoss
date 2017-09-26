@@ -20,6 +20,9 @@ import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.input.ScrollEvent;
 
+/**
+ * @version 2017/09/26 13:01:21
+ */
 public class AxisZoomHandler implements EventHandler<ScrollEvent> {
 
     /**
@@ -120,8 +123,11 @@ public class AxisZoomHandler implements EventHandler<ScrollEvent> {
         return (Axis) o;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public void handle(final ScrollEvent event) {
+    public void handle(ScrollEvent event) {
         if (isDisable()) {
             return;
         }
