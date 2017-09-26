@@ -395,13 +395,13 @@ public class LineChart extends Region {
             }
         }
 
-        System.out.println(max + "  " + min);
+        // System.out.println(max + " " + min);
         final double l = max == min ? 1 : max - min;
         final double ll = l * 1.01;
         double u = min + ll;
         double b = max - ll;
 
-        System.out.println("SET " + u + "  " + b + "  " + ll);
+        // System.out.println("SET " + u + " " + b + " " + ll);
         xAxis.setMaxValue(u);
         xAxis.setMinValue(b);
         // xAxis.setMaxValue(candles.get(candles.size() - 1).start.toEpochSecond());
@@ -412,19 +412,19 @@ public class LineChart extends Region {
      * Set y-axis range.
      */
     private void setYAxisRange() {
-        Num maximum = Num.MIN;
-        Num minimum = Num.MAX;
+        Num max = Num.MIN;
+        Num min = Num.MAX;
 
         for (Tick tick : candles) {
-            maximum = Num.max(maximum, tick.maxPrice);
-            minimum = Num.min(minimum, tick.minPrice);
+            max = Num.max(max, tick.maxPrice);
+            min = Num.min(min, tick.minPrice);
         }
 
-        maximum = maximum.plus(200);
-        minimum = minimum.minus(200);
+        max = max.plus(200);
+        min = min.minus(200);
 
-        getYAxis().setMaxValue(maximum.toDouble());
-        getYAxis().setMinValue(minimum.toDouble());
+        getYAxis().setMaxValue(max.toDouble());
+        getYAxis().setMinValue(min.toDouble());
     }
 
     protected final boolean isDataValidate() {

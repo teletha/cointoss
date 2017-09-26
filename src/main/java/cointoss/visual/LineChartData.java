@@ -259,6 +259,10 @@ public class LineChartData {
         return new double[] {min, max};
     }
 
+    public String getName() {
+        return nameProperty == null ? "" : nameProperty.get();
+    }
+
     /**
      * Set plot name.
      * 

@@ -545,13 +545,14 @@ public class GraphPlotArea extends Region {
 
             Num min = Num.MAX;
             Axis xAxis = getXAxis();
-            int start = (int) xAxis.getLowerValue();
-            int end = (int) xAxis.getUpperValue();
+            long start = (long) xAxis.getLowerValue();
+            long end = (long) xAxis.getUpperValue();
 
             for (int i = 0; i < sizeData; i++) {
                 Tick data = datas.get(i);
+                long time = data.start.toInstant().toEpochMilli();
 
-                if (start <= i && i <= end) {
+                if (start <= time && time <= end) {
                     min = Num.min(min, data.minPrice);
                 }
 
@@ -563,7 +564,7 @@ public class GraphPlotArea extends Region {
                     candle = new Candle("series" + i, "data" + i);
                     nodes.add(candle);
                 }
-                plotCandleChartData(i, data, candle, width, height);
+                plotCandleChartData(data.start.toInstant().toEpochMilli(), data, candle, width, height);
             }
             getYAxis().lowerValue(min.multiply("0.995").toDouble());
         }
@@ -622,7 +623,7 @@ public class GraphPlotArea extends Region {
      * @param width
      * @param height
      */
-    protected void plotCandleChartData(int index, Tick data, Candle candle, double width, double height) {
+    protected void plotCandleChartData(long index, Tick data, Candle candle, double width, double height) {
         double x = getXAxis().getDisplayPosition(index);
         double open = getYAxis().getDisplayPosition(data.openPrice.toDouble());
         double close = getYAxis().getDisplayPosition(data.closePrice.toDouble());

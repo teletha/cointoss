@@ -70,7 +70,7 @@ public class Visualize extends Application {
         LineChartData weightMedian = new LineChartData(serise.ticks.size()).name("Weight Median");
 
         for (int i = 0; i < serise.ticks.size(); i++) {
-            weightMedian.addData(i, serise.ticks.get(i).getWeightMedian().toDouble());
+            weightMedian.addData(serise.ticks.get(i).start.toInstant().toEpochMilli(), serise.ticks.get(i).getWeightMedian().toDouble());
         }
 
         LineChart line = new LineChart()//
