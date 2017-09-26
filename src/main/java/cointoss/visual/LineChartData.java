@@ -181,63 +181,6 @@ public class LineChartData {
         return r;
     }
 
-    /**
-     * startIndex ～endIndexの範囲（両端含む）の中で最小、最大のxを探します
-     * 
-     * @param startIndex
-     * @param endIndex endIndexも検索に含みます
-     * @param ignoreInfinit 無限を無視するかどうか
-     * @return {最小値,最大値}の配列
-     */
-    public double[] getMinMaxX(int startIndex, int endIndex, final boolean ignoreInfinit) {
-        if (startIndex > endIndex) {
-            final int t = startIndex;
-            startIndex = endIndex;
-            endIndex = t;
-        }
-        if (startIndex < 0) {
-            startIndex = 0;
-        }
-        if (endIndex >= chart.ticks.size()) {
-            endIndex = chart.ticks.size() - 1;
-        }
-        setValidate(true);
-        return findMinMaxValue(chart.ticks, startIndex, endIndex, ignoreInfinit, t -> t.start.toInstant().toEpochMilli());
-    }
-
-    private static double[] findMinMaxValue(final RingBuffer<Tick> a, int l, final int r, final boolean ignoreInfinit, ToDoubleFunction<Tick> converter) {
-        double min = converter.applyAsDouble(a.get(l));
-        double max = converter.applyAsDouble(a.get(l));
-
-        if (l == r) {
-            if (ignoreInfinit && Double.isInfinite(min)) {
-                return new double[] {Double.NaN, Double.NaN};
-            } else {
-                return new double[] {min, max};
-            }
-        }
-
-        while (min != min || (ignoreInfinit && Double.isInfinite(min))) {
-            min = max = converter.applyAsDouble(a.get(l++));
-            if (l > r) {
-                return new double[] {Double.NaN, Double.NaN};
-            }
-        }
-
-        for (; l <= r; l++) {
-            final double dd = converter.applyAsDouble(a.get(l));
-            if (dd != dd) {
-                continue;
-            }
-            if (ignoreInfinit && Double.isInfinite(dd)) {
-                continue;
-            }
-            min = min(min, dd);
-            max = max(max, dd);
-        }
-        return new double[] {min, max};
-    }
-
     public String getName() {
         return nameProperty == null ? "" : nameProperty.get();
     }
