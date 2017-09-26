@@ -13,32 +13,32 @@ import static java.lang.Math.*;
 import static java.lang.Math.min;
 import static java.util.Collections.*;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.ObservableList;
-import javafx.scene.Node;
 import javafx.scene.text.Text;
+
+import org.eclipse.collections.api.block.function.primitive.DoubleToObjectFunction;
 
 /**
  * @version 2017/09/26 1:03:05
  */
 public class LinearAxis extends Axis {
 
+    private final DoubleToObjectFunction<String> labelFormatter;
+
     /**
      * 
      */
-    public LinearAxis(String name) {
+    public LinearAxis(String name, DoubleToObjectFunction<String> labelFormatter) {
+        this.labelFormatter = Objects.requireNonNull(labelFormatter);
         nameProperty.set(name);
-
-        formatProperty().addListener(o -> {
-            unitIndex = -1;
-        });
     }
 
     private double lowVal = 0;
@@ -136,15 +136,7 @@ public class LinearAxis extends Axis {
         }
 
         // 適当な単位を見つける
-        LabelFormat format = getLabelFormat();
-        if (format == null) {
-            format = new DefaultUnitLabelFormat();
-            setLabelFormat(format);
-        }
-        ConstantDArray units = format.getArray();
-        if (units == null) {
-            units = TICK_UNIT_DEFAULTS_ARRAY;
-        }
+        ConstantDArray units = TICK_UNIT_DEFAULTS_ARRAY;
         final int unitsLength = units.length();
 
         final int mtn = getPrefferedMajorTickNumber();
@@ -195,8 +187,6 @@ public class LinearAxis extends Axis {
         }
         final double usize = units.get(uindex);
 
-        format.setUnitIndex(uindex);
-
         final double l = up - low;
         boolean fill = ((int) floor(low / usize) & 1) != 0;
         final double basel = floor(low / usize) * usize;
@@ -233,21 +223,22 @@ public class LinearAxis extends Axis {
             labels.clear();
         }
 
-        final ArrayList<AxisLabel> notUse = new ArrayList<>(labels);
-        final ArrayList<AxisLabel> labelList = new ArrayList<>(k + 1);
+        ArrayList<AxisLabel> notUse = new ArrayList<>(labels);
+        ArrayList<AxisLabel> labelList = new ArrayList<>(k + 1);
+
         for (int i = 0; i <= k + 1; i++) {
-            final double value = basel + usize * i;
+            double value = basel + usize * i;
             fill = !fill;
             if (value > up) {
                 break;// i==k
             }
-            final double majorpos = m * (value - low);
+            double majorpos = m * (value - low);
             if (value >= low) {
                 majours.add(floor(isH ? majorpos : height - majorpos));
                 majoursFill.add(fill);
                 boolean find = false;
                 for (int t = 0, lsize = notUse.size(); t < lsize; t++) {
-                    final AxisLabel a = notUse.get(t);
+                    AxisLabel a = notUse.get(t);
                     if (a.match(value)) {
                         labelList.add(a);
                         notUse.remove(t);
@@ -256,16 +247,15 @@ public class LinearAxis extends Axis {
                     }
                 }
                 if (!find) {
-                    final AxisLabel a = new AxisLabel();
+                    AxisLabel a = new AxisLabel();
                     a.setID(value);
-                    final Node node = format.format(value);
-                    a.setNode(node);
+                    a.setNode(new Text(labelFormatter.apply(value)));
                     labelList.add(a);
                 }
             }
             if (visibleMinor) {
                 for (int count = 1; count < mcount; count++) {
-                    final double minorpos = majorpos + count * minorLength;
+                    double minorpos = majorpos + count * minorLength;
                     if (minorpos < 0) {
                         continue;
                     }
@@ -280,7 +270,8 @@ public class LinearAxis extends Axis {
         // これで大丈夫か？
         labels.removeAll(notUse);
         for (int i = 0, e = labelList.size(); i < e; i++) {
-            final AxisLabel axisLabel = labelList.get(i);
+            AxisLabel axisLabel = labelList.get(i);
+
             if (!labels.contains(axisLabel)) {
                 labels.add(i, axisLabel);
             }
@@ -405,53 +396,6 @@ public class LinearAxis extends Axis {
     private DoubleProperty minorUnitMinLengthProperty;
 
     /**
-     * 単純なフォーマッタ
-     * 
-     * @author nodemushi
-     */
-    public static class DefaultUnitLabelFormat implements LabelFormat {
-
-        private DecimalFormat formatter;
-
-        private int index = -1;
-
-        @Override
-        public void setUnitIndex(final int index) {
-            if (this.index != index) {
-                formatter = getFormatter(index);
-                this.index = index;
-            }
-        }
-
-        @Override
-        public Node format(final double value) {
-            final String str = formatter.format(value);
-            return new Text(str);
-        }
-
-        @Override
-        public ConstantDArray getArray() {
-            return TICK_UNIT_DEFAULTS_ARRAY;
-        }
-    }
-
-    /**
-     * 角度を表すフォーマッタ
-     * 
-     * @author nodamushi
-     */
-    public static class DegreeUnitLabelFormat extends DefaultUnitLabelFormat {
-        @Override
-        public ConstantDArray getArray() {
-            return TICK_UNIT_DEG_ARRAY;
-        };
-    }
-
-    // ------------------------------------------------------------
-
-    // javafx.scene.chart.NumberAxisのコードから引用
-
-    /**
      * We use these for auto ranging to pick a user friendly tick unit. We handle tick units in the
      * range of 1e-10 to 1e+12
      */
@@ -462,47 +406,5 @@ public class LinearAxis extends Axis {
             2.5E7d, 5.0E7d, 1.0E8d, 2.5E8d, 5.0E8d, 1.0E9d, 2.5E9d, 5.0E9d, 1.0E10d, 2.5E10d, 5.0E10d, 1.0E11d, 2.5E11d, 5.0E11d, 1.0E12d,
             2.5E12d, 5.0E12d};
 
-    private static final double[] TICK_UNIT_DEG = {1.0E-10d, 2.5E-10d, 5.0E-10d, 1.0E-9d, 2.5E-9d, 5.0E-9d, 1.0E-8d, 2.5E-8d, 5.0E-8d,
-            1.0E-7d, 2.5E-7d, 5.0E-7d, 1.0E-6d, 2.5E-6d, 5.0E-6d, 1.0E-5d, 2.5E-5d, 5.0E-5d, 1.0E-4d, 2.5E-4d, 5.0E-4d, 0.0010d, 0.0025d,
-            0.0050d, 0.01d, 0.025d, 0.05d, 0.1d, 0.25d, 0.5d, 1.0d, 2.5d, 5.0d, 10.0d, 15d, 30.0d, 45.0d, 90.0d, 180d, 360d, 500.0d,
-            1000.0d, 2500.0d, 5000.0d, 10000.0d, 25000.0d, 50000.0d, 100000.0d, 250000.0d, 500000.0d, 1000000.0d, 2500000.0d, 5000000.0d,
-            1.0E7d, 2.5E7d, 5.0E7d, 1.0E8d, 2.5E8d, 5.0E8d, 1.0E9d, 2.5E9d, 5.0E9d, 1.0E10d, 2.5E10d, 5.0E10d, 1.0E11d, 2.5E11d, 5.0E11d,
-            1.0E12d, 2.5E12d, 5.0E12d};
-
     protected static final ConstantDArray TICK_UNIT_DEFAULTS_ARRAY = new ConstantDArray(false, TICK_UNIT_DEFAULTS);
-
-    private static final ConstantDArray TICK_UNIT_DEG_ARRAY = new ConstantDArray(false, TICK_UNIT_DEG);
-
-    /** These are matching decimal formatter strings */
-    private static final String[] TICK_UNIT_FORMATTER_DEFAULTS = {"0.0000000000", "0.00000000000", "0.0000000000", "0.000000000",
-            "0.0000000000", "0.000000000", "0.00000000", "0.000000000", "0.00000000", "0.0000000", "0.00000000", "0.0000000", "0.000000",
-            "0.0000000", "0.000000", "0.00000", "0.000000", "0.00000", "0.0000", "0.00000", "0.0000", "0.000", "0.0000", "0.000", "0.00",
-            "0.000", "0.00", "0.0", "0.00", "0.0", "0", "0.0", "0", "#,##0"};
-
-    private static final DecimalFormat[] TICK_UNIT_FORMATTER_DEFAULTS_FORMAT = new DecimalFormat[TICK_UNIT_FORMATTER_DEFAULTS.length];
-
-    private static final DecimalFormat DECIMALFORMAT = new DecimalFormat();
-
-    private static DecimalFormat getFormatter(final int rangeIndex) {
-        if (rangeIndex < 0) {
-            return DECIMALFORMAT;
-        } else if (rangeIndex >= TICK_UNIT_FORMATTER_DEFAULTS.length) {
-            DecimalFormat d = TICK_UNIT_FORMATTER_DEFAULTS_FORMAT[TICK_UNIT_FORMATTER_DEFAULTS.length - 1];
-            if (d == null) {
-                d = new DecimalFormat(TICK_UNIT_FORMATTER_DEFAULTS[TICK_UNIT_FORMATTER_DEFAULTS.length - 1]);
-                TICK_UNIT_FORMATTER_DEFAULTS_FORMAT[TICK_UNIT_FORMATTER_DEFAULTS.length - 1] = d;
-            }
-            return d;
-        } else {
-            DecimalFormat d = TICK_UNIT_FORMATTER_DEFAULTS_FORMAT[rangeIndex];
-            if (d == null) {
-                d = new DecimalFormat(TICK_UNIT_FORMATTER_DEFAULTS[rangeIndex]);
-                TICK_UNIT_FORMATTER_DEFAULTS_FORMAT[rangeIndex] = d;
-            }
-            return d;
-        }
-    }
-
-    // -------------------------引用終わり------------------------------
-
 }

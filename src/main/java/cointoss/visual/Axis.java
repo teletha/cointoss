@@ -1289,29 +1289,6 @@ public abstract class Axis extends Region {
     private InvalidationListener layoutValidateListener = null;
 
     /**
-     * 数値をラベルに変換するformat
-     * 
-     * @return
-     */
-    public final ObjectProperty<LabelFormat> formatProperty() {
-        if (formatterProperty == null) {
-            formatterProperty = new SimpleObjectProperty<>(this, "formatter", null);
-            formatterProperty.addListener(getLayoutValidateListener());
-        }
-        return formatterProperty;
-    }
-
-    public final LabelFormat getLabelFormat() {
-        return formatterProperty == null ? null : formatterProperty.get();
-    }
-
-    public final void setLabelFormat(final LabelFormat value) {
-        formatProperty().set(value);
-    }
-
-    private ObjectProperty<LabelFormat> formatterProperty;
-
-    /**
      * コンストラクタに渡された配列のクローンを保持する。<br/>
      * なお、配列の要素は昇順にソートされる。
      * 
@@ -1359,38 +1336,4 @@ public abstract class Axis extends Region {
             }
         }
     }
-
-    /**
-     * 数値からラベル文字列に変換するインターフェース
-     */
-    public static interface LabelFormat {
-        /**
-         * valueを表示するノードを生成する
-         * 
-         * @param value 表示する値
-         * @return
-         */
-        public Node format(double value);
-
-        /**
-         * 主にLinearAxisから利用する。<br/>
-         * getArrayで得られる配列のindex番目の要素を利用することを通知する。<br/>
-         * 必ず、formatより先に呼ばれる。
-         * 
-         * @param index
-         */
-        default public void setUnitIndex(final int index) {
-        }
-
-        /**
-         * 主にLinearAxisから利用する。<br/>
-         * この配列の値を用いて表示するメモリの幅を決定する。<br/>
-         * 
-         * @return
-         */
-        default public ConstantDArray getArray() {
-            return null;
-        };
-    }
-
 }

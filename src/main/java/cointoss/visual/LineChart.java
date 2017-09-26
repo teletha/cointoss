@@ -560,7 +560,6 @@ public class LineChart extends Region {
             throw new Error();
         }
         if (xAxisProperty == observable) {
-
             newValue.setOrientation(Orientation.HORIZONTAL);
             if (newValue.getSide().isVertical()) {
                 newValue.setSide(Side.BOTTOM);
