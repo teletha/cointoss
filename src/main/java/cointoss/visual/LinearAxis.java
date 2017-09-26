@@ -136,9 +136,6 @@ public class LinearAxis extends Axis {
         }
 
         // 適当な単位を見つける
-        ConstantDArray units = TICK_UNIT_DEFAULTS_ARRAY;
-        final int unitsLength = units.length();
-
         final int mtn = getPrefferedMajorTickNumber();
         final double minu = getMinUnitLength();
         double pUnitLength = len / mtn;
@@ -149,17 +146,17 @@ public class LinearAxis extends Axis {
         int uindex = unitIndex;// 前回の探索結果の再利用
         boolean useBefore = true;
         if (lastPUnitSize != pUnitSize) {
-            if (pUnitSize <= units.get(0)) {
+            if (pUnitSize <= TickUnits[0]) {
                 uindex = 0;
-            } else if (pUnitSize >= units.get(unitsLength - 1)) {
-                uindex = unitsLength - 1;
+            } else if (pUnitSize >= TickUnits[TickUnits.length - 1]) {
+                uindex = TickUnits.length - 1;
             } else {
                 BLOCK: {
-                    int l = 1, r = unitsLength - 2;
+                    int l = 1, r = TickUnits.length - 2;
                     int m = (l + r >> 1);
 
                     while (r - l > 1) {
-                        final double d = units.get(m);
+                        final double d = TickUnits[m];
                         if (d == pUnitSize) {
                             uindex = m;
                             break BLOCK;
@@ -172,9 +169,9 @@ public class LinearAxis extends Axis {
                         m = (l + r >> 1);
                     }
 
-                    if (units.get(r) < pUnitSize) {
+                    if (TickUnits[r] < pUnitSize) {
                         uindex = r + 1;
-                    } else if (units.get(l) > pUnitSize) {
+                    } else if (TickUnits[l] > pUnitSize) {
                         uindex = l;
                     } else {
                         uindex = r;
@@ -185,7 +182,7 @@ public class LinearAxis extends Axis {
             useBefore = uindex == unitIndex;
             unitIndex = uindex;
         }
-        final double usize = units.get(uindex);
+        final double usize = TickUnits[uindex];
 
         final double l = up - low;
         boolean fill = ((int) floor(low / usize) & 1) != 0;
@@ -399,12 +396,10 @@ public class LinearAxis extends Axis {
      * We use these for auto ranging to pick a user friendly tick unit. We handle tick units in the
      * range of 1e-10 to 1e+12
      */
-    private static final double[] TICK_UNIT_DEFAULTS = {1.0E-10d, 2.5E-10d, 5.0E-10d, 1.0E-9d, 2.5E-9d, 5.0E-9d, 1.0E-8d, 2.5E-8d, 5.0E-8d,
-            1.0E-7d, 2.5E-7d, 5.0E-7d, 1.0E-6d, 2.5E-6d, 5.0E-6d, 1.0E-5d, 2.5E-5d, 5.0E-5d, 1.0E-4d, 2.5E-4d, 5.0E-4d, 0.0010d, 0.0025d,
-            0.0050d, 0.01d, 0.025d, 0.05d, 0.1d, 0.25d, 0.5d, 1.0d, 2.5d, 5.0d, 10.0d, 25.0d, 50.0d, 100.0d, 250.0d, 500.0d, 1000.0d,
-            2500.0d, 5000.0d, 10000.0d, 25000.0d, 50000.0d, 100000.0d, 250000.0d, 500000.0d, 1000000.0d, 2500000.0d, 5000000.0d, 1.0E7d,
-            2.5E7d, 5.0E7d, 1.0E8d, 2.5E8d, 5.0E8d, 1.0E9d, 2.5E9d, 5.0E9d, 1.0E10d, 2.5E10d, 5.0E10d, 1.0E11d, 2.5E11d, 5.0E11d, 1.0E12d,
-            2.5E12d, 5.0E12d};
-
-    protected static final ConstantDArray TICK_UNIT_DEFAULTS_ARRAY = new ConstantDArray(false, TICK_UNIT_DEFAULTS);
+    private static final double[] TickUnits = {1.0E-10d, 2.5E-10d, 5.0E-10d, 1.0E-9d, 2.5E-9d, 5.0E-9d, 1.0E-8d, 2.5E-8d, 5.0E-8d, 1.0E-7d,
+            2.5E-7d, 5.0E-7d, 1.0E-6d, 2.5E-6d, 5.0E-6d, 1.0E-5d, 2.5E-5d, 5.0E-5d, 1.0E-4d, 2.5E-4d, 5.0E-4d, 0.0010d, 0.0025d, 0.0050d,
+            0.01d, 0.025d, 0.05d, 0.1d, 0.25d, 0.5d, 1.0d, 2.5d, 5.0d, 10.0d, 25.0d, 50.0d, 100.0d, 250.0d, 500.0d, 1000.0d, 2500.0d,
+            5000.0d, 10000.0d, 25000.0d, 50000.0d, 100000.0d, 250000.0d, 500000.0d, 1000000.0d, 2500000.0d, 5000000.0d, 1.0E7d, 2.5E7d,
+            5.0E7d, 1.0E8d, 2.5E8d, 5.0E8d, 1.0E9d, 2.5E9d, 5.0E9d, 1.0E10d, 2.5E10d, 5.0E10d, 1.0E11d, 2.5E11d, 5.0E11d, 1.0E12d, 2.5E12d,
+            5.0E12d};
 }

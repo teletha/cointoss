@@ -55,9 +55,9 @@ public class Visualize extends Application {
         }
         Num diff = max.minus(min);
 
-        LinearAxis axis = new LinearAxis("日時", v -> Instant.ofEpochMilli((long) v)
-                .atZone(Execution.UTC)
-                .format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+        LinearAxis axis = new LinearAxis("日時", v -> {
+            return Instant.ofEpochMilli((long) v).atZone(Execution.UTC).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+        });
         axis.visibleAmount(100D / serise.ticks.size());
 
         LinearAxis yaxis = new LinearAxis("JPY", v -> Num.of(v).asJPY());

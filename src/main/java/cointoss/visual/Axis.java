@@ -11,7 +11,6 @@ package cointoss.visual;
 
 import static java.lang.Math.*;
 
-import java.util.Arrays;
 import java.util.List;
 
 import javafx.beans.InvalidationListener;
@@ -1287,53 +1286,4 @@ public abstract class Axis extends Region {
 
     /** 直接フィールドを利用せずに、 getValidateListener() を利用すること */
     private InvalidationListener layoutValidateListener = null;
-
-    /**
-     * コンストラクタに渡された配列のクローンを保持する。<br/>
-     * なお、配列の要素は昇順にソートされる。
-     * 
-     * @author nodamushi
-     */
-    public static final class ConstantDArray {
-        private final double[] array;
-
-        /**
-         * パッケージ用コンストラクタ。
-         * 
-         * @param clone 配列のクローンを作成し、ソートするかどうか。 昇順、要素の変更をしないことを約束した上で、メモリが無駄な場合はfalseにする。
-         * @param array 保持する配列。
-         */
-        ConstantDArray(final boolean clone, final double[] array) {
-            this.array = clone ? array.clone() : array;
-            if (clone) {
-                Arrays.sort(this.array);
-            }
-        }
-
-        public ConstantDArray(final double[] array) {
-            this(true, array);
-        }
-
-        /** 配列要素を取り出す */
-        public double get(final int index) throws ArrayIndexOutOfBoundsException {
-            return array[index];
-        }
-
-        /** 配列長を返す */
-        public int length() {
-            return array.length;
-        }
-
-        /** クローン配列を返す */
-        public double[] getArray() {
-            return array.clone();
-        }
-
-        /** 配列に値をコピーする */
-        public void copy(final double[] arr) {
-            if (arr != null) {
-                System.arraycopy(array, 0, arr, 0, min(array.length, arr.length));
-            }
-        }
-    }
 }
