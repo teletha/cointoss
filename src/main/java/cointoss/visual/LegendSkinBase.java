@@ -162,7 +162,7 @@ public class LegendSkinBase extends TilePane implements Skin<Legend> {
             icon.getStyleClass().addAll("series" + index, "chart-legend-item-symbol", "chart-line-symbol");
             l.setGraphic(icon);
         }
-        l.setText(data.getName());
+        l.setText(data.nameProperty.get());
         final Node icon = l.getGraphic();
         final ObservableList<String> sc = icon.getStyleClass();
         final String series = "series" + index;
