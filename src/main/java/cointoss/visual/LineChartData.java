@@ -11,6 +11,8 @@ package cointoss.visual;
 
 import static java.lang.Math.*;
 
+import java.util.function.ToDoubleFunction;
+
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.beans.property.SimpleStringProperty;
@@ -29,9 +31,7 @@ public class LineChartData {
 
     String defaultColor;
 
-    private double[] x = {};
-
-    private Tick[] y = {};
+    private Tick[] ticks = {};
 
     private int length = 0;
 
@@ -39,25 +39,20 @@ public class LineChartData {
      * @param capacity
      */
     public LineChartData(int capacity) {
-        x = new double[capacity];
-        y = new Tick[capacity];
+        ticks = new Tick[capacity];
     }
 
     public void addData(final double x, final Tick y) {
         final int t = length;
         length++;
-        if (this.x.length < length) {
-            final int size = this.x.length + 16;
-            final double[] newx = new double[size];
+        if (this.ticks.length < length) {
+            final int size = this.ticks.length + 16;
             final Tick[] newy = new Tick[size];
-            System.arraycopy(this.x, 0, newx, 0, t);
-            System.arraycopy(this.y, 0, newy, 0, t);
-            this.x = newx;
-            this.y = newy;
+            System.arraycopy(this.ticks, 0, newy, 0, t);
+            this.ticks = newy;
         }
 
-        this.x[t] = x;
-        this.y[t] = y;
+        this.ticks[t] = y;
         setValidate(false);
     }
 
@@ -71,7 +66,7 @@ public class LineChartData {
             throw new ArrayIndexOutOfBoundsException(index);
         }
         setValidate(true);
-        return x[index];
+        return ticks[index].start.toInstant().toEpochMilli();
     }
 
     public double getY(final int index) throws ArrayIndexOutOfBoundsException {
@@ -79,7 +74,7 @@ public class LineChartData {
             throw new ArrayIndexOutOfBoundsException(index);
         }
         setValidate(true);
-        return y[index].getWeightMedian().toDouble();
+        return ticks[index].getWeightMedian().toDouble();
     }
 
     /**
@@ -95,9 +90,9 @@ public class LineChartData {
     public int searchXIndex(final double value, final boolean minMode) {
         setValidate(true);
         if (minMode) {
-            return findMinIndex(x, length, value);
+            return findMinIndex(ticks, length, value, i -> i.start.toInstant().toEpochMilli());
         } else {
-            return findMaxIndex(x, length, value);
+            return findMaxIndex(ticks, length, value, i -> i.start.toInstant().toEpochMilli());
         }
     }
 
@@ -114,9 +109,9 @@ public class LineChartData {
     public int searchYIndex(final double value, final boolean minMode) {
         setValidate(true);
         if (minMode) {
-            return findMinIndex(y, length, value);
+            return findMinIndex(ticks, length, value, t -> t.getWeightMedian().toDouble());
         } else {
-            return findMaxIndex(y, length, value);
+            return findMaxIndex(ticks, length, value, t -> t.getWeightMedian().toDouble());
         }
     }
 
@@ -128,50 +123,7 @@ public class LineChartData {
      * @param v
      * @return
      */
-    private static int findMaxIndex(final double[] a, final int size, final double v) {
-        if (size < 2 || a[0] >= v) {
-            return 0;
-        }
-        if (a[size - 1] <= v) {
-            return size - 1;
-        }
-        if (size == 2) {
-            return 0;
-        }
-
-        int l = 1, r = size - 2, m = (l + r) >> 1;
-
-        while (r - l > 1) {
-            final double d = a[m];
-            if (d == v) {
-                return m;
-            }
-            if (d < v) {
-                l = m;
-            } else {
-                r = m;
-            }
-            m = (l + r) >> 1;
-        }
-
-        if (a[l] > v) {
-            return l - 1;
-        }
-        if (a[r] <= v) {
-            return r;
-        }
-        return l;
-    }
-
-    /**
-     * ※aが昇順に整列されているときに限る。 vを越えない最大のaの場所を探索する
-     * 
-     * @param a
-     * @param size
-     * @param v
-     * @return
-     */
-    private static int findMaxIndex(final Tick[] a, final int size, final double v) {
+    private static int findMaxIndex(final Tick[] a, final int size, final double v, ToDoubleFunction<Tick> converter) {
         if (size < 2) {
             return 0;
         }
@@ -182,7 +134,7 @@ public class LineChartData {
         int l = 1, r = size - 2, m = (l + r) >> 1;
 
         while (r - l > 1) {
-            final double d = a[m].getWeightMedian().toDouble();
+            final double d = converter.applyAsDouble(a[m]);
             if (d == v) {
                 return m;
             }
@@ -194,10 +146,10 @@ public class LineChartData {
             m = (l + r) >> 1;
         }
 
-        if (a[l].getWeightMedian().toDouble() > v) {
+        if (converter.applyAsDouble(a[l]) > v) {
             return l - 1;
         }
-        if (a[r].getWeightMedian().toDouble() <= v) {
+        if (converter.applyAsDouble(a[r]) <= v) {
             return r;
         }
         return l;
@@ -211,48 +163,7 @@ public class LineChartData {
      * @param v
      * @return
      */
-    private static int findMinIndex(final double[] a, final int size, final double v) {
-        if (size < 2 || a[0] >= v) {
-            return 0;
-        }
-        if (a[size - 1] <= v) {
-            return size - 1;
-        }
-        if (size == 2) {
-            return 1;
-        }
-        int l = 1, r = size - 2, m = (l + r) >> 1;
-
-        while (r - l > 1) {
-            final double d = a[m];
-            if (d == v) {
-                return m;
-            }
-            if (d < v) {
-                l = m;
-            } else {
-                r = m;
-            }
-            m = (l + r) >> 1;
-        }
-        if (a[l] >= v) {
-            return l;
-        }
-        if (a[r] < v) {
-            return r + 1;
-        }
-        return r;
-    }
-
-    /**
-     * ※aが昇順に整列されているときに限る。 vより小さくならない最小のaの場所を探索する
-     * 
-     * @param a
-     * @param size
-     * @param v
-     * @return
-     */
-    private static int findMinIndex(final Tick[] a, final int size, final double v) {
+    private static int findMinIndex(final Tick[] a, final int size, final double v, ToDoubleFunction<Tick> converter) {
         if (size < 2) {
             return 0;
         }
@@ -262,7 +173,7 @@ public class LineChartData {
         int l = 1, r = size - 2, m = (l + r) >> 1;
 
         while (r - l > 1) {
-            final double d = a[m].getWeightMedian().toDouble();
+            final double d = converter.applyAsDouble(a[m]);
             if (d == v) {
                 return m;
             }
@@ -273,10 +184,10 @@ public class LineChartData {
             }
             m = (l + r) >> 1;
         }
-        if (a[l].getWeightMedian().toDouble() >= v) {
+        if (converter.applyAsDouble(a[l]) >= v) {
             return l;
         }
-        if (a[r].getWeightMedian().toDouble() < v) {
+        if (converter.applyAsDouble(a[r]) < v) {
             return r + 1;
         }
         return r;
@@ -303,12 +214,12 @@ public class LineChartData {
             endIndex = length - 1;
         }
         setValidate(true);
-        return findMinMaxValue(x, startIndex, endIndex, ignoreInfinit);
+        return findMinMaxValue(ticks, startIndex, endIndex, ignoreInfinit, t -> t.start.toInstant().toEpochMilli());
     }
 
-    private static double[] findMinMaxValue(final double[] a, int l, final int r, final boolean ignoreInfinit) {
-        double min = a[l];
-        double max = a[l];
+    private static double[] findMinMaxValue(final Tick[] a, int l, final int r, final boolean ignoreInfinit, ToDoubleFunction<Tick> converter) {
+        double min = converter.applyAsDouble(a[l]);
+        double max = converter.applyAsDouble(a[l]);
 
         if (l == r) {
             if (ignoreInfinit && Double.isInfinite(min)) {
@@ -319,14 +230,14 @@ public class LineChartData {
         }
 
         while (min != min || (ignoreInfinit && Double.isInfinite(min))) {
-            min = max = a[l++];
+            min = max = converter.applyAsDouble(a[l++]);
             if (l > r) {
                 return new double[] {Double.NaN, Double.NaN};
             }
         }
 
         for (; l <= r; l++) {
-            final double dd = a[l];
+            final double dd = converter.applyAsDouble(a[l]);
             if (dd != dd) {
                 continue;
             }
