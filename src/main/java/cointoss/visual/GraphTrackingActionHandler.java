@@ -61,17 +61,17 @@ public abstract class GraphTrackingActionHandler extends GraphEventHandler<Mouse
      * @return
      */
     private final boolean _handle(final MouseEvent e, final GraphPlotArea a, final double v, final double[] arr, final Orientation o) {
-        final ObservableList<LineChartData> dataList = a.getLineDataList();
+        final ObservableList<CandleChartData> dataList = a.getLineDataList();
         final int dsize = arr.length;
         if (a.getOrientation() != o) {
             return false;
         }
         if (a.getOrientation() == Orientation.HORIZONTAL) {
-            if (a.getXAxis() == null) {
+            if (a.axisX.get() == null) {
                 return false;
             }
             for (int i = 0; i < dsize; i++) {
-                final LineChartData d = dataList.get(i);
+                final CandleChartData d = dataList.get(i);
                 final int ds = d.size();
                 if (ds == 0) {
                     arr[i] = Double.NaN;
@@ -94,12 +94,12 @@ public abstract class GraphTrackingActionHandler extends GraphEventHandler<Mouse
                 arr[i] = (1 - k) * d.getY(lowindex) + k * d.getY(lowindex + 1);
             }
         } else {
-            if (a.getYAxis() == null) {
+            if (a.axisY.get() == null) {
                 return false;
             }
 
             for (int i = 0; i < dsize; i++) {
-                final LineChartData d = dataList.get(i);
+                final CandleChartData d = dataList.get(i);
                 final int ds = d.size();
                 if (ds == 0) {
                     arr[i] = Double.NaN;
@@ -131,22 +131,22 @@ public abstract class GraphTrackingActionHandler extends GraphEventHandler<Mouse
             return;
         }
         final GraphPlotArea a = (GraphPlotArea) e.getSource();
-        final ObservableList<LineChartData> dataList = a.getLineDataList();
+        final ObservableList<CandleChartData> dataList = a.getLineDataList();
         final int dsize = dataList == null ? 0 : dataList.size();
         final double[] arr = getARR(dsize);
 
         final double v;
         final Orientation o = a.getOrientation();
         if (o == Orientation.HORIZONTAL) {
-            if (a.getXAxis() == null) {
+            if (a.axisX == null) {
                 return;
             }
-            v = a.getXAxis().getValueForPosition(e.getX());
+            v = a.axisX.get().getValueForPosition(e.getX());
         } else {
-            if (a.getYAxis() == null) {
+            if (a.axisY.get() == null) {
                 return;
             }
-            v = a.getYAxis().getValueForPosition(e.getY());
+            v = a.axisY.get().getValueForPosition(e.getY());
         }
 
         _handle(e, a, v, arr, o);
@@ -168,7 +168,7 @@ public abstract class GraphTrackingActionHandler extends GraphEventHandler<Mouse
     private void bindHandle(final MouseEvent e, final double v, final Orientation o) {
         final GraphPlotArea a = getTargetPlotArea();
         if (a != null && o == a.getOrientation()) {
-            final ObservableList<LineChartData> dataList = a.getLineDataList();
+            final ObservableList<CandleChartData> dataList = a.getLineDataList();
             final int dsize = dataList == null ? 0 : dataList.size();
             final double[] arr = getARR(dsize);
             if (!_handle(e, a, v, arr, o)) {

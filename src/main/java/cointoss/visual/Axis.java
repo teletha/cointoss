@@ -152,6 +152,9 @@ public abstract class Axis extends Region {
     /** The visual length of major tick. */
     public final DoubleProperty majorTickLength = new SimpleDoubleProperty(this, "MajorTickLength", 8);
 
+    /** The visibility of major tick. */
+    public final BooleanProperty majorTickVisibility = new SimpleBooleanProperty(this, "MajorTickVisibility", true);
+
     /** The visual length of minor tick. */
     public final DoubleProperty minorTickLength = new SimpleDoubleProperty(this, "MinorTickLength", 4);
 

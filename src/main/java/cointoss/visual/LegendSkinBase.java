@@ -25,7 +25,7 @@ import javafx.scene.layout.TilePane;
 public class LegendSkinBase extends TilePane implements Skin<Legend> {
     private Legend legend;
 
-    protected String getDefaultColorStyleClass(final LineChartData data) {
+    protected String getDefaultColorStyleClass(final CandleChartData data) {
         return data.defaultColor;
     }
 
@@ -38,18 +38,18 @@ public class LegendSkinBase extends TilePane implements Skin<Legend> {
         }
     };
 
-    private ChangeListener<ObservableList<LineChartData>> changelistener = new ChangeListener<ObservableList<LineChartData>>() {
+    private ChangeListener<ObservableList<CandleChartData>> changelistener = new ChangeListener<ObservableList<CandleChartData>>() {
         @Override
-        public void changed(final ObservableValue<? extends ObservableList<LineChartData>> a, final ObservableList<LineChartData> o, final ObservableList<LineChartData> n) {
+        public void changed(final ObservableValue<? extends ObservableList<CandleChartData>> a, final ObservableList<CandleChartData> o, final ObservableList<CandleChartData> n) {
             if (o != null) {
                 o.removeListener(listener);
-                for (final LineChartData d : o) {
+                for (final CandleChartData d : o) {
                     d.nameProperty.removeListener(lcdListener);
                 }
             }
             if (n != null) {
                 n.addListener(listener);
-                for (final LineChartData d : n) {
+                for (final CandleChartData d : n) {
                     d.nameProperty.addListener(lcdListener);
                 }
             }
@@ -57,17 +57,17 @@ public class LegendSkinBase extends TilePane implements Skin<Legend> {
         }
     };
 
-    private ListChangeListener<LineChartData> listener = new ListChangeListener<LineChartData>() {
+    private ListChangeListener<CandleChartData> listener = new ListChangeListener<CandleChartData>() {
         @Override
-        public void onChanged(final Change<? extends LineChartData> c) {
+        public void onChanged(final Change<? extends CandleChartData> c) {
             while (c.next()) {
                 if (c.getRemovedSize() != 0) {
-                    for (final LineChartData d : c.getRemoved()) {
+                    for (final CandleChartData d : c.getRemoved()) {
                         d.nameProperty.removeListener(lcdListener);
                     }
                 }
                 if (c.getAddedSize() != 0) {
-                    for (final LineChartData d : c.getAddedSubList()) {
+                    for (final CandleChartData d : c.getAddedSubList()) {
                         d.nameProperty.addListener(lcdListener);
                     }
                 }
@@ -94,7 +94,7 @@ public class LegendSkinBase extends TilePane implements Skin<Legend> {
 
     @Override
     protected double computePrefHeight(final double forWidth) {
-        final ObservableList<LineChartData> list = legend.getDataList();
+        final ObservableList<CandleChartData> list = legend.getDataList();
         if (list == null || list.size() == 0) {
             return 0;
         }
@@ -103,7 +103,7 @@ public class LegendSkinBase extends TilePane implements Skin<Legend> {
 
     @Override
     protected double computePrefWidth(final double forHeight) {
-        final ObservableList<LineChartData> list = legend.getDataList();
+        final ObservableList<CandleChartData> list = legend.getDataList();
         if (list == null || list.size() == 0) {
             return 0;
         }
@@ -114,7 +114,7 @@ public class LegendSkinBase extends TilePane implements Skin<Legend> {
      * @param datas Legend.getDataList() nullable
      * @param children getChildren()
      */
-    protected void makeChildren(final ObservableList<LineChartData> datas, final ObservableList<Node> children) {
+    protected void makeChildren(final ObservableList<CandleChartData> datas, final ObservableList<Node> children) {
         if (datas == null) {
             children.clear();
             return;
@@ -123,7 +123,7 @@ public class LegendSkinBase extends TilePane implements Skin<Legend> {
         final int childsize = children.size();
         int index = 0;
         int i = 0;
-        for (final LineChartData d : datas) {
+        for (final CandleChartData d : datas) {
             Label l = null;
             for (; index < childsize; index++) {
                 final Node n = children.get(index);
@@ -150,7 +150,7 @@ public class LegendSkinBase extends TilePane implements Skin<Legend> {
      * @param l if l is null,create new Label instance.
      * @return
      */
-    protected Label setProperty(final LineChartData data, Label l, final int index) {
+    protected Label setProperty(final CandleChartData data, Label l, final int index) {
         if (l == null) {
             l = new Label();
             l.getStyleClass().add("chart-legend-item");
@@ -211,7 +211,7 @@ public class LegendSkinBase extends TilePane implements Skin<Legend> {
         l.dataListProperty().removeListener(changelistener);
         if (l.getDataList() != null) {
             l.getDataList().removeListener(listener);
-            for (final LineChartData d : l.getDataList()) {
+            for (final CandleChartData d : l.getDataList()) {
                 d.nameProperty.removeListener(lcdListener);
             }
         }

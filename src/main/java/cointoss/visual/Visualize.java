@@ -21,7 +21,6 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 import javafx.application.Application;
-import javafx.geometry.Orientation;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
@@ -58,22 +57,22 @@ public class Visualize extends Application {
         }
         Num diff = max.minus(min);
 
-        LineChartData weightMedian = new LineChartData(serise).name("Weight Median");
+        CandleChartData weightMedian = new CandleChartData(serise).name("Weight Median");
 
-        LineChart line = new LineChart()//
+        CandleChart line = new CandleChart()//
+                .graph(plot -> {
+                })
                 .axisX(axis -> {
                     axis.nameLabel.setText("日時");
                     axis.tickLabelFormatter.set(v -> Instant.ofEpochMilli((long) v).atZone(UTC).format(ISO_LOCAL_DATE_TIME));
                     axis.visibleRange.set(100D / serise.ticks.size());
                 })
-                .axisY(yaxis -> {
-                    yaxis.nameLabel.setText("JPY");
-                    yaxis.tickLabelFormatter.set(v -> Num.of(v).asJPY());
-                    yaxis.visibleRange.set(Num.of(24000).divide(diff).toDouble());
-                    yaxis.scrollBarVisibility.set(false);
+                .axisY(axis -> {
+                    axis.nameLabel.setText("JPY");
+                    axis.tickLabelFormatter.set(v -> Num.of(v).asJPY());
+                    axis.visibleRange.set(Num.of(24000).divide(diff).toDouble());
+                    axis.scrollBarVisibility.set(false);
                 })
-                .orientation(Orientation.HORIZONTAL)
-                .rangeMarginY(1.06)
                 .graphTracker(new GraphTracker())
                 .lineData(weightMedian)
                 .candleDate(serise.ticks);

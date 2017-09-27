@@ -40,15 +40,15 @@ public class VGraphs extends Region {
 
     public VGraphs() {
         getStyleClass().setAll("chart");
-        graphs.addListener(new ListChangeListener<LineChart>() {
+        graphs.addListener(new ListChangeListener<CandleChart>() {
             @Override
-            public void onChanged(final Change<? extends LineChart> c) {
+            public void onChanged(final Change<? extends CandleChart> c) {
                 while (c.next()) {
-                    final List<? extends LineChart> removed = c.getRemoved();
+                    final List<? extends CandleChart> removed = c.getRemoved();
                     final ObservableList<Node> ch = getChildren();
                     if (!removed.isEmpty()) {
                         ch.removeAll(removed);
-                        for (final LineChart g : removed) {
+                        for (final CandleChart g : removed) {
                             final Label l = g.getTitleLabel();
                             l.visibleProperty().unbind();
                             final int i = ch.indexOf(l);
@@ -58,9 +58,9 @@ public class VGraphs extends Region {
                         }
                     }
                     if (c.getAddedSize() != 0) {
-                        final List<? extends LineChart> sub = c.getAddedSubList();
+                        final List<? extends CandleChart> sub = c.getAddedSubList();
                         ch.addAll(sub);
-                        for (final LineChart g : sub) {
+                        for (final CandleChart g : sub) {
                             final Label l = g.getTitleLabel();
                             if (l.visibleProperty().isBound()) {
                                 l.visibleProperty().unbind();
@@ -87,7 +87,7 @@ public class VGraphs extends Region {
 
     @Override
     protected void layoutChildren() {
-        final List<LineChart> list = graphs;
+        final List<CandleChart> list = graphs;
         final Insets insets = getInsets();
         double x0 = 0, x1 = getWidth(), y0 = 0, y1 = getHeight();
         if (insets != null) {
@@ -108,7 +108,7 @@ public class VGraphs extends Region {
             titles = Side.TOP;
         }
         if (titlev && titles.isHorizontal()) {
-            for (final LineChart g : list) {
+            for (final CandleChart g : list) {
                 final Label l = g.getTitleLabel();
                 if (l.isVisible()) {
                     hh -= l.prefHeight(-1);
@@ -118,7 +118,7 @@ public class VGraphs extends Region {
 
         if (titlev && titles.isVertical()) {
             double maxv = 0;
-            for (final LineChart g : list) {
+            for (final CandleChart g : list) {
                 final Label l = g.getTitleLabel();
                 if (l.isVisible()) {
                     maxv = max(maxv, l.prefWidth(-1));
@@ -139,7 +139,7 @@ public class VGraphs extends Region {
 
         double maxx0 = 0;
         double minx1 = Double.POSITIVE_INFINITY;
-        for (final LineChart g : list) {
+        for (final CandleChart g : list) {
             final Label l = g.getTitleLabel();
             if (l.isVisible()) {
                 final double w = l.prefWidth(-1);
@@ -173,7 +173,7 @@ public class VGraphs extends Region {
             y += space;
         }
 
-        for (final LineChart g : list) {
+        for (final CandleChart g : list) {
             final Rectangle2D r = g.getPlotAreaBounds(), r2 = new Rectangle2D(maxx0, r.getMinY(), minx1 - maxx0, r.getHeight());
             g.setPlotAreaPrefferedBounds(r2);
             g.layout();
@@ -181,9 +181,9 @@ public class VGraphs extends Region {
 
     }
 
-    private ObservableList<LineChart> graphs = FXCollections.observableArrayList();
+    private ObservableList<CandleChart> graphs = FXCollections.observableArrayList();
 
-    public ObservableList<LineChart> getGraphs() {
+    public ObservableList<CandleChart> getGraphs() {
         return graphs;
     }
 

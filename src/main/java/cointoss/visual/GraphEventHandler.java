@@ -20,17 +20,17 @@ import javafx.event.EventHandler;
  */
 public abstract class GraphEventHandler<T extends Event> implements EventHandler<T> {
 
-    protected final static GraphPlotArea getPlotArea(final LineChart l) {
+    protected final static GraphPlotArea getPlotArea(final CandleChart l) {
         return l.graph;
     }
 
-    public final void install(final LineChart g) {
+    public final void install(final CandleChart g) {
         install(g.graph);
     }
 
     public abstract void install(GraphPlotArea g);
 
-    public final void uninstall(final LineChart g) {
+    public final void uninstall(final CandleChart g) {
         uninstall(g.graph);
     }
 

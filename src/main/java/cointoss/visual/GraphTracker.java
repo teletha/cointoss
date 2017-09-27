@@ -37,7 +37,7 @@ public class GraphTracker {
     public GraphTracker() {
     }
 
-    public GraphTracker(final LineChart graph) {
+    public GraphTracker(final CandleChart graph) {
         install(graph);
     }
 
@@ -75,7 +75,7 @@ public class GraphTracker {
      * 
      * @param graph nullの場合は何もしない
      */
-    public void install(final LineChart graph) {
+    public void install(final CandleChart graph) {
         if (graph == null) {
             return;
         }
@@ -356,7 +356,7 @@ public class GraphTracker {
                 g.getForeGroundShapes().addAll(points);
             }
 
-            for (final LineChartData d : g.getLineDataList()) {
+            for (final CandleChartData d : g.getLineDataList()) {
                 d.validateProperty().addListener(invalidatelistener);
             }
 
@@ -372,7 +372,7 @@ public class GraphTracker {
                 if (points != null && points.size() != 0) {
                     g.getForeGroundShapes().removeAll(points);
                 }
-                for (final LineChartData d : g.getLineDataList()) {
+                for (final CandleChartData d : g.getLineDataList()) {
                     d.validateProperty().removeListener(invalidatelistener);
                 }
 

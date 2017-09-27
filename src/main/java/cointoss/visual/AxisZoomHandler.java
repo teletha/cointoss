@@ -160,7 +160,7 @@ public class AxisZoomHandler implements EventHandler<ScrollEvent> {
      * 
      * @param g
      */
-    public final void install(final LineChart g) {
+    public final void install(final CandleChart g) {
         install(g.graph);
     }
 

@@ -72,10 +72,10 @@ public class Legend extends Control {
     /**
      * @return
      */
-    public final ObjectProperty<ObservableList<LineChartData>> dataListProperty() {
+    public final ObjectProperty<ObservableList<CandleChartData>> dataListProperty() {
         if (dataListProperty == null) {
             dataListProperty = new SimpleObjectProperty<>(this, "dataList", null);
-            dataListProperty.addListener(new ChangeListener<ObservableList<LineChartData>>() {
+            dataListProperty.addListener(new ChangeListener<ObservableList<CandleChartData>>() {
                 InvalidationListener lis = new InvalidationListener() {
                     @Override
                     public void invalidated(final Observable arg0) {
@@ -84,7 +84,7 @@ public class Legend extends Control {
                 };
 
                 @Override
-                public void changed(final ObservableValue<? extends ObservableList<LineChartData>> c, final ObservableList<LineChartData> old, final ObservableList<LineChartData> newv) {
+                public void changed(final ObservableValue<? extends ObservableList<CandleChartData>> c, final ObservableList<CandleChartData> old, final ObservableList<CandleChartData> newv) {
                     if (old != null) {
                         old.removeListener(lis);
                     }
@@ -98,14 +98,14 @@ public class Legend extends Control {
         return dataListProperty;
     }
 
-    public final ObservableList<LineChartData> getDataList() {
+    public final ObservableList<CandleChartData> getDataList() {
         return dataListProperty == null ? null : dataListProperty.get();
     }
 
-    public final void setDataList(final ObservableList<LineChartData> value) {
+    public final void setDataList(final ObservableList<CandleChartData> value) {
         dataListProperty().set(value);
     }
 
-    private ObjectProperty<ObservableList<LineChartData>> dataListProperty;
+    private ObjectProperty<ObservableList<CandleChartData>> dataListProperty;
 
 }

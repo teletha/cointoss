@@ -14,9 +14,11 @@ import java.util.List;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
@@ -48,12 +50,47 @@ import cointoss.visual.shape.GraphShape;
  */
 public class GraphPlotArea extends Region {
 
+    /** The visibility of horizontal grid line. */
+    public final BooleanProperty horizontalGridLineVisibility = new SimpleBooleanProperty(this, "horizontalGridLinesVisible", true);
+
+    /** The visibility of vertical grid line. */
+    public final BooleanProperty verticalGridLineVisibility = new SimpleBooleanProperty(this, "verticalGridLineVisibility", true);
+
+    /** The horizontal margin of plot area. */
+    public final DoubleProperty horizontalMargin = new SimpleDoubleProperty(this, "horizontalGridLinesVisible", 1);
+
+    /** The vertical margin of plot area. */
+    public final DoubleProperty verticalMargin = new SimpleDoubleProperty(this, "verticalGridLineVisibility", 1);
+
+    /** The horizontal axis. */
+    final ObjectProperty<Axis> axisX = new SimpleObjectProperty<>(this, "axisX", null);
+
+    /** The vertical axis. */
+    final ObjectProperty<Axis> axisY = new SimpleObjectProperty<>(this, "axisY", null);
+
     /** The validator. */
-    protected final InvalidationListener plotValidateListener = observable -> {
+    private final InvalidationListener plotValidateListener = observable -> {
         if (isPlotValidate()) {
             setPlotValidate(false);
             setGraphShapeValidate(false);
             setNeedsLayout(true);
+        }
+    };
+
+    /** The validator. */
+    private final ChangeListener<Axis> axisListener = (observable, oldValue, newValue) -> {
+        if (oldValue != null) {
+            oldValue.visualMinValue.removeListener(plotValidateListener);
+            oldValue.visibleRange.removeListener(plotValidateListener);
+        }
+
+        if (newValue != null) {
+            newValue.visualMinValue.addListener(plotValidateListener);
+            newValue.visibleRange.addListener(plotValidateListener);
+        }
+        if (isPlotValidate()) {
+            setPlotValidate(false);
+            requestLayout();
         }
     };
 
@@ -92,7 +129,7 @@ public class GraphPlotArea extends Region {
     private ObservableList<Tick> candleChartData;
 
     /** The line chart data list. */
-    private ObservableList<LineChartData> lineChartData;
+    private ObservableList<CandleChartData> lineChartData;
 
     /** The line chart data observer. */
     private final InvalidationListener lineDataObserver = o -> {
@@ -104,13 +141,13 @@ public class GraphPlotArea extends Region {
     };
 
     /** The line chart data list observer. */
-    private final ListChangeListener<LineChartData> lineDataListObserver = change -> {
+    private final ListChangeListener<CandleChartData> lineDataListObserver = change -> {
         change.next();
-        for (LineChartData d : change.getRemoved()) {
+        for (CandleChartData d : change.getRemoved()) {
             lineColorManager.clear(d.defaultColorIndex);
             d.validateProperty().removeListener(lineDataObserver);
         }
-        for (LineChartData d : change.getAddedSubList()) {
+        for (CandleChartData d : change.getAddedSubList()) {
             d.defaultColorIndex = lineColorManager.nextClearBit(0);
             lineColorManager.set(d.defaultColorIndex, true);
             d.defaultColor = "default-color" + (d.defaultColorIndex % 8);
@@ -123,6 +160,7 @@ public class GraphPlotArea extends Region {
      */
     public GraphPlotArea() {
         getStyleClass().setAll("chart-plot-background");
+        axisX.addListener(axisListener);
         widthProperty().addListener(plotValidateListener);
         heightProperty().addListener(plotValidateListener);
         clip.widthProperty().bind(widthProperty());
@@ -173,8 +211,8 @@ public class GraphPlotArea extends Region {
      * Draw plot data.
      */
     public void plotData() {
-        final Axis xaxis = getXAxis();
-        final Axis yaxis = getYAxis();
+        final Axis xaxis = axisX.get();
+        final Axis yaxis = axisY.get();
 
         if (xaxis == null || yaxis == null) {
             setPlotValidate(true);
@@ -195,8 +233,8 @@ public class GraphPlotArea extends Region {
         if (isPlotValidate() && isGraphShapeValidate()) {
             return;
         }
-        final Axis xaxis = getXAxis();
-        final Axis yaxis = getYAxis();
+        final Axis xaxis = axisX.get();
+        final Axis yaxis = axisY.get();
 
         if (xaxis == null || yaxis == null) {
             setGraphShapeValidate(true);
@@ -224,8 +262,8 @@ public class GraphPlotArea extends Region {
     }
 
     public void drawBackGroundLine() {
-        final Axis xaxis = getXAxis();
-        final Axis yaxis = getYAxis();
+        final Axis xaxis = axisX.get();
+        final Axis yaxis = axisY.get();
 
         if (xaxis == null || yaxis == null) {
             setPlotValidate(true);
@@ -244,7 +282,7 @@ public class GraphPlotArea extends Region {
             int lelesize = lele.size();
             final int felesize = fele.size();
             final boolean fill = isAlternativeColumnFillVisible();
-            final boolean line = isVerticalGridLinesVisible();
+            final boolean line = verticalGridLineVisibility.get();
             verticalGridLines.setVisible(line);
             verticalRowFill.setVisible(fill);
             final int e = vTicks.size();
@@ -337,7 +375,7 @@ public class GraphPlotArea extends Region {
             int lelesize = lele.size();
             final int felesize = fele.size();
             final boolean fill = isAlternativeRowFillVisible();
-            final boolean line = isHorizontalGridLinesVisible();
+            final boolean line = horizontalGridLineVisibility.get();
             horizontalGridLines.setVisible(line);
             horizontalRowFill.setVisible(fill);
             final int e = hTicks.size();
@@ -419,7 +457,7 @@ public class GraphPlotArea extends Region {
             }
         } // end H
 
-        if (isVerticalMinorGridLinesVisible()) {
+        if (yaxis.minorTickVisibility.get()) {
             final Axis axis = xaxis;
             DoubleList minorTicks = axis.majors;
 
@@ -448,7 +486,7 @@ public class GraphPlotArea extends Region {
             }
         }
 
-        if (isHorizontalMinorGridLinesVisible()) {
+        if (xaxis.minorTickVisibility.get()) {
             final Axis axis = yaxis;
             DoubleList minorTicks = axis.minors;
 
@@ -483,7 +521,7 @@ public class GraphPlotArea extends Region {
      */
     protected void plotLineChartDatas() {
         ObservableList<Node> paths = lines.getChildren();
-        List<LineChartData> datas = lineChartData;
+        List<CandleChartData> datas = lineChartData;
 
         if (datas == null) {
             paths.clear();
@@ -498,7 +536,7 @@ public class GraphPlotArea extends Region {
 
             for (int i = 0; i < sizeData; i++) {
                 int defaultColorIndex = 2;
-                LineChartData data = datas.get(i);
+                CandleChartData data = datas.get(i);
 
                 Path path;
 
@@ -544,7 +582,7 @@ public class GraphPlotArea extends Region {
             }
 
             Num min = Num.MAX;
-            Axis xAxis = getXAxis();
+            Axis xAxis = axisX.get();
             long start = (long) xAxis.visualMinValue.get();
             long end = (long) xAxis.visualMaxValue.get();
 
@@ -566,7 +604,7 @@ public class GraphPlotArea extends Region {
                 }
                 plotCandleChartData(data.start.toInstant().toEpochMilli(), data, candle);
             }
-            getYAxis().visualMinValue.set(min.multiply("0.995").toDouble());
+            axisY.get().visualMinValue.set(min.multiply("0.995").toDouble());
         }
     }
 
@@ -580,7 +618,7 @@ public class GraphPlotArea extends Region {
      * @param data
      * @param path
      */
-    protected void plotLineChartData(LineChartData data, Path path) {
+    protected void plotLineChartData(CandleChartData data, Path path) {
         if (data.size() == 0) {
             path.setVisible(false);
             return;
@@ -595,14 +633,14 @@ public class GraphPlotArea extends Region {
         Orientation orientation = getOrientation();
         int start, end;
         if (orientation == Orientation.HORIZONTAL) {// x軸方向昇順
-            Axis axis = getXAxis();
+            Axis axis = axisX.get();
             double low = axis.visualMinValue.get();
             double up = axis.visualMaxValue.get();
             start = data.searchXIndex(low, false);
             end = data.searchXIndex(up, true);
 
         } else {
-            Axis axis = getYAxis();
+            Axis axis = axisY.get();
             double low = axis.visualMinValue.get();
             double up = axis.visualMaxValue.get();
             start = data.searchYIndex(low, false);
@@ -621,10 +659,10 @@ public class GraphPlotArea extends Region {
      * @param start
      * @param end
      */
-    private void plotLineChartData(LineChartData data, ObservableList<PathElement> elements, int start, int end) {
+    private void plotLineChartData(CandleChartData data, ObservableList<PathElement> elements, int start, int end) {
         int elementSize = elements.size();
-        Axis xaxis = getXAxis();
-        Axis yaxis = getYAxis();
+        Axis xaxis = axisX.get();
+        Axis yaxis = axisY.get();
 
         if (getOrientation() == Orientation.HORIZONTAL) {// x軸方向昇順
             boolean moveTo = true;
@@ -759,11 +797,11 @@ public class GraphPlotArea extends Region {
      * @param height
      */
     protected void plotCandleChartData(long index, Tick data, Candle candle) {
-        double x = getXAxis().getPositionForValue(index);
-        double open = getYAxis().getPositionForValue(data.openPrice.toDouble());
-        double close = getYAxis().getPositionForValue(data.closePrice.toDouble());
-        double high = getYAxis().getPositionForValue(data.maxPrice.toDouble());
-        double low = getYAxis().getPositionForValue(data.minPrice.toDouble());
+        double x = axisX.get().getPositionForValue(index);
+        double open = axisY.get().getPositionForValue(data.openPrice.toDouble());
+        double close = axisY.get().getPositionForValue(data.closePrice.toDouble());
+        double high = axisY.get().getPositionForValue(data.maxPrice.toDouble());
+        double low = axisY.get().getPositionForValue(data.minPrice.toDouble());
 
         // calculate candle width
         double candleWidth = 5;
@@ -777,98 +815,6 @@ public class GraphPlotArea extends Region {
         candle.setLayoutX(x);
         candle.setLayoutY(open);
     }
-
-    // ----------------------------------------------------------------
-
-    /**
-     * 横方向のグリッド線を表示するかどうかのプロパティ
-     * 
-     * @return
-     */
-    public final BooleanProperty horizontalGridLinesVisibleProperty() {
-        if (horizontalGridLinesVisibleProperty == null) {
-            horizontalGridLinesVisibleProperty = new SimpleBooleanProperty(this, "horizontalGridLinesVisible", true);
-        }
-        return horizontalGridLinesVisibleProperty;
-    }
-
-    public final boolean isHorizontalGridLinesVisible() {
-        return horizontalGridLinesVisibleProperty == null ? true : horizontalGridLinesVisibleProperty.get();
-    }
-
-    public final void setHorizontalGridLinesVisible(final boolean value) {
-        horizontalGridLinesVisibleProperty().set(value);
-    }
-
-    private BooleanProperty horizontalGridLinesVisibleProperty;
-
-    /**
-     * 縦方向のグリッド線を表示するかどうかのプロパティ
-     * 
-     * @return
-     */
-    public final BooleanProperty verticalGridLinesVisibleProperty() {
-        if (verticalGridLinesVisibleProperty == null) {
-            verticalGridLinesVisibleProperty = new SimpleBooleanProperty(this, "verticalGridLinesVisible", true);
-        }
-        return verticalGridLinesVisibleProperty;
-    }
-
-    public final boolean isVerticalGridLinesVisible() {
-        return verticalGridLinesVisibleProperty == null ? true : verticalGridLinesVisibleProperty.get();
-    }
-
-    public final void setVerticalGridLinesVisible(final boolean value) {
-        verticalGridLinesVisibleProperty().set(value);
-    }
-
-    private BooleanProperty verticalGridLinesVisibleProperty;
-
-    /**
-     * 横方向minor tickの線の可視性
-     * 
-     * @return
-     */
-    public final BooleanProperty horizontalMinorGridLinesVisibleProperty() {
-        if (horizontalMinorGridLinesVisibleProperty == null) {
-            horizontalMinorGridLinesVisibleProperty = new SimpleBooleanProperty(this, "horizontalMinorGridLinesVisible", false);
-            horizontalMinorGridLines.visibleProperty().bind(horizontalMinorGridLinesVisibleProperty);
-        }
-        return horizontalMinorGridLinesVisibleProperty;
-    }
-
-    public final boolean isHorizontalMinorGridLinesVisible() {
-        return horizontalMinorGridLinesVisibleProperty == null ? false : horizontalMinorGridLinesVisibleProperty.get();
-    }
-
-    public final void setHorizontalMinorGridLinesVisible(final boolean value) {
-        horizontalMinorGridLinesVisibleProperty().set(value);
-    }
-
-    private BooleanProperty horizontalMinorGridLinesVisibleProperty;
-
-    /**
-     * 縦方向minor tickの線の可視性
-     * 
-     * @return
-     */
-    public final BooleanProperty verticalMinorGridLinesVisibleProperty() {
-        if (verticalMinorGridLinesVisibleProperty == null) {
-            verticalMinorGridLinesVisibleProperty = new SimpleBooleanProperty(this, "verticalMinorGridLinesVisible", false);
-            verticalMinorGridLines.visibleProperty().bind(verticalMinorGridLinesVisibleProperty);
-        }
-        return verticalMinorGridLinesVisibleProperty;
-    }
-
-    public final boolean isVerticalMinorGridLinesVisible() {
-        return verticalMinorGridLinesVisibleProperty == null ? false : verticalMinorGridLinesVisibleProperty.get();
-    }
-
-    public final void setVerticalMinorGridLinesVisible(final boolean value) {
-        verticalMinorGridLinesVisibleProperty().set(value);
-    }
-
-    private BooleanProperty verticalMinorGridLinesVisibleProperty;
 
     /**
      * 縦方向に交互に背景を塗りつぶすかどうか
@@ -913,68 +859,6 @@ public class GraphPlotArea extends Region {
     }
 
     private BooleanProperty alternativeRowFillVisibleProperty;
-
-    private final ChangeListener<Axis> axisListener = (observable, oldValue, newValue) -> {
-        if (oldValue != null) {
-            oldValue.visualMinValue.removeListener(plotValidateListener);
-            oldValue.visibleRange.removeListener(plotValidateListener);
-        }
-
-        if (newValue != null) {
-            newValue.visualMinValue.addListener(plotValidateListener);
-            newValue.visibleRange.addListener(plotValidateListener);
-        }
-        if (isPlotValidate()) {
-            setPlotValidate(false);
-            requestLayout();
-        }
-    };
-
-    /**
-     * x-axis
-     * 
-     * @return
-     */
-    public final ObjectProperty<Axis> xAxisProperty() {
-        if (xAxisProperty == null) {
-            xAxisProperty = new SimpleObjectProperty<>(this, "xAxis", null);
-            xAxisProperty.addListener(axisListener);
-        }
-        return xAxisProperty;
-    }
-
-    public final Axis getXAxis() {
-        return xAxisProperty == null ? null : xAxisProperty.get();
-    }
-
-    public final void setXAxis(final Axis value) {
-        xAxisProperty().set(value);
-    }
-
-    private ObjectProperty<Axis> xAxisProperty;
-
-    /**
-     * y-axis
-     * 
-     * @return
-     */
-    public final ObjectProperty<Axis> yAxisProperty() {
-        if (yAxisProperty == null) {
-            yAxisProperty = new SimpleObjectProperty<>(this, "yAxis", null);
-            yAxisProperty.addListener(axisListener);
-        }
-        return yAxisProperty;
-    }
-
-    public Axis getYAxis() {
-        return yAxisProperty == null ? null : yAxisProperty.get();
-    }
-
-    public final void setYAxis(final Axis value) {
-        yAxisProperty().set(value);
-    }
-
-    private ObjectProperty<Axis> yAxisProperty;
 
     private boolean graphshapeValidate = true;
 
@@ -1075,11 +959,11 @@ public class GraphPlotArea extends Region {
      * 
      * @param datalist
      */
-    public final void setLineChartDataList(ObservableList<LineChartData> datalist) {
+    public final void setLineChartDataList(ObservableList<CandleChartData> datalist) {
         // clear old list configuration
         if (lineChartData != null) {
             lineChartData.removeListener(lineDataListObserver);
-            for (LineChartData data : lineChartData) {
+            for (CandleChartData data : lineChartData) {
                 data.validateProperty().removeListener(lineDataObserver);
             }
             lineColorManager.clear();
@@ -1088,7 +972,7 @@ public class GraphPlotArea extends Region {
         // add new list configuration
         if (datalist != null) {
             datalist.addListener(lineDataListObserver);
-            for (LineChartData data : datalist) {
+            for (CandleChartData data : datalist) {
                 data.defaultColorIndex = lineColorManager.nextClearBit(0);
                 lineColorManager.set(data.defaultColorIndex, true);
                 data.defaultColor = "default-color" + (data.defaultColorIndex % 8);
@@ -1238,7 +1122,7 @@ public class GraphPlotArea extends Region {
      * 
      * @return
      */
-    public final ObservableList<LineChartData> getLineDataList() {
+    public final ObservableList<CandleChartData> getLineDataList() {
         return lineChartData;
     }
 

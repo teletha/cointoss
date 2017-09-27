@@ -26,7 +26,7 @@ import cointoss.util.RingBuffer;
 /**
  * @version 2017/09/26 1:03:28
  */
-public class LineChartData {
+public class CandleChartData {
 
     public final StringProperty nameProperty = new SimpleStringProperty(this, "name", "");
 
@@ -39,7 +39,7 @@ public class LineChartData {
     /**
      * @param capacity
      */
-    public LineChartData(Chart chart) {
+    public CandleChartData(Chart chart) {
         this.chart = Objects.requireNonNull(chart);
         setValidate(false);
     }
@@ -190,7 +190,7 @@ public class LineChartData {
      * 
      * @param name
      */
-    public LineChartData name(String name) {
+    public CandleChartData name(String name) {
         nameProperty.set(name);
 
         return this;
