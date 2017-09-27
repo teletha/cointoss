@@ -62,6 +62,7 @@ public class Visualize extends Application {
 
         LinearAxis yaxis = new LinearAxis("JPY", v -> Num.of(v).asJPY());
         yaxis.visibleRange.set(Num.of(24000).divide(diff).toDouble());
+        yaxis.scrollBarVisibility.set(false);
 
         AxisZoomHandler zoom = new AxisZoomHandler();
         zoom.install(axis);

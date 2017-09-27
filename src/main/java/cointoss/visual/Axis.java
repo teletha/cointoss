@@ -145,7 +145,7 @@ public abstract class Axis extends Region {
         }
     };
 
-    public final BooleanProperty scrollBarVisible = new SimpleBooleanProperty(this, "scrollBarVisible", true);
+    public final BooleanProperty scrollBarVisibility = new SimpleBooleanProperty(this, "scrollBarVisible", true);
 
     /** スクロールバーのvisibleAmountを0～1で表現する。 */
     public final ReadOnlyDoubleWrapper scrollBarSize = new ReadOnlyDoubleWrapper(this, "scrollBarSize", 1);
@@ -160,7 +160,7 @@ public abstract class Axis extends Region {
     public final DoubleProperty minorTickLength = new SimpleDoubleProperty(this, "MinorTickLength", 8);
 
     /** The visibility of minor tick. */
-    public final BooleanProperty minorTickVisibility = new SimpleBooleanProperty(this, "MinorTickVisibility", true);
+    public final BooleanProperty minorTickVisibility = new SimpleBooleanProperty(this, "MinorTickVisibility", false);
 
     /** The visual distance between tick and label. */
     public final DoubleProperty tickLabelDistance = new SimpleDoubleProperty(this, "tickLabelGap", 10);
@@ -253,6 +253,75 @@ public abstract class Axis extends Region {
     protected abstract void computeAxisProperties(double width, double height);
 
     /**
+     * Detect orientation of this axis.
+     * 
+     * @return
+     */
+    public final boolean isHorizontal() {
+        return orientation.get() == Orientation.HORIZONTAL;
+    }
+
+    /**
+     * Detect orientation of this axis.
+     * 
+     * @return
+     */
+    public final boolean isVertical() {
+        return orientation.get() == Orientation.VERTICAL;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void requestLayout() {
+        Parent parent = getParent();
+
+        if (parent != null) {
+            parent.requestLayout();
+        }
+        super.requestLayout();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected double computePrefWidth(double height) {
+        if (isHorizontal()) {
+            return 150d;
+        } else {
+            // force to re-layout
+            layoutChildren(lastLayoutWidth, height);
+
+            double tick = max(majorTickLength.get(), minorTickLength.get());
+            double scrollBar = scroll.isVisible() ? scroll.getWidth() : 0;
+            double labels = max(labelGroup.prefWidth(height), 10);
+            double label = nameLabel.isVisible() ? nameLabel.getHeight() + 5 : 0;
+            return tick + scrollBar + labels + label;
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected double computePrefHeight(double width) {
+        if (isVertical()) {
+            return 150d;
+        } else {
+            // force to re-layout
+            layoutChildren(width, lastLayoutHeight);
+
+            double tick = max(majorTickLength.get(), minorTickLength.get());
+            double scrollBar = scroll.isVisible() ? scroll.getHeight() : 0;
+            double labels = max(labelGroup.prefHeight(width), 10);
+            double label = nameLabel.isVisible() ? nameLabel.getHeight() + 5 : 0;
+            return tick + scrollBar + labels + label;
+        }
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -264,226 +333,9 @@ public abstract class Axis extends Region {
     }
 
     /**
-     * Force to layout.
-     * 
-     * @param width
-     * @param height
-     */
-    protected final void layoutChildren(double width, double height) {
-        if (whileLayout.compareAndSet(false, true)) {
-            try {
-                if (!dataValidate || getAxisLength(width, height) != getAxisLength(lastLayoutWidth, lastLayoutHeight)) {
-                    computeAxisProperties(width, height);
-                    layoutValidate = false;
-                    dataValidate = true;
-                }
-
-                if (!layoutValidate || width != lastLayoutWidth || height != lastLayoutHeight) {
-                    layoutAxis(width, height);
-                    layoutValidate = true;
-                }
-                lastLayoutWidth = width;
-                lastLayoutHeight = height;
-            } finally {
-                whileLayout.compareAndSet(true, false);
-            }
-        }
-    }
-
-    /**
-     * 軸方向のサイズを返す
-     * 
-     * @param width
-     * @param height
-     * @return
-     */
-    protected final double getAxisLength(final double width, final double height) {
-        return isHorizontal() ? width : height;
-    }
-
-    public final boolean isHorizontal() {
-        return orientation.get() == Orientation.HORIZONTAL;
-    }
-
-    public final boolean isVertical() {
-        return orientation.get() == Orientation.VERTICAL;
-    }
-
-    /**
-     * lowerValueを実際に利用可能な数値に変換して返す
-     * 
-     * @param up 最大値
-     * @return
-     */
-    protected final double computeLowerValue(double up) {
-        double d = visualMinValue.get();
-        final double m = logicalMinValue.get();
-        if (up != up) {
-            up = logicalMaxValue.get();
-        }
-        if (d != d) {
-            d = m;
-        }
-        if (d > up) {
-            d = up;
-        }
-        if (d < m) {
-            return m;
-        } else {
-            return d;
-        }
-    }
-
-    /**
-     * スクロールバーが変更されたときに呼び出されるメソッド。 表示の最小値を計算する。
-     * 
-     * @param value scrollBarValueに相当する値
-     * @param amount scrollVisibleAmountに相当する値
-     * @return
-     */
-    protected double calcLowValue(double value, double amount) {
-        double max = logicalMaxValue.get();
-        double min = logicalMinValue.get();
-        double diff = max - min;
-        double bar = diff * amount;
-        return min + (diff - bar) * value;
-    }
-
-    // ----------------------------------------------------------------------
-    // layout
-    // ----------------------------------------------------------------------
-
-    protected static class AxisLabel {
-        private Node node;// 複雑な形状のラベルを許可するために単にNode
-
-        private boolean managed = false;
-
-        private boolean beforeVisible = true;
-
-        public Node getNode() {
-            return node;
-        }
-
-        public void setNode(final Node node) {
-            this.node = node;
-        }
-
-        private boolean isManaged() {
-            return managed;
-        }
-
-        private void setManaged(final boolean b) {
-            managed = true;
-        }
-
-        private boolean isBeforeVisible() {
-            return beforeVisible;
-        }
-
-        private void setBeforeVisible(final boolean b) {
-            beforeVisible = b;
-        }
-
-        private double id;
-
-        /** 文字列等の比較以外で同値性を確認するための数値を設定する */
-        public void setID(final double id) {
-            this.id = id;
-        }
-
-        /** 文字列等の比較以外で同値性を確認するための数値を得る */
-        public double getID() {
-            return id;
-        }
-
-        /** 設定されているIDと等しいか調べる */
-        public boolean match(final double id) {
-            return this.id == id;
-        }
-    }
-
-    private Group lineGroup, labelGroup = new Group();
-
-    private Path majorTickPath, minorTickPath;
-
-    private Line baseLine;
-
-    private ScrollBar scroll;
-
-    private Label nameLabel;
-
-    private ObservableList<AxisLabel> labels;
-
-    protected final ObservableList<AxisLabel> getLabels() {
-        if (labels == null) {
-            labels = FXCollections.observableArrayList();
-            labels.addListener((ListChangeListener<AxisLabel>) c -> {
-                final ObservableList<Node> list = labelGroup.getChildren();
-                while (c.next()) {
-                    for (final AxisLabel a1 : c.getRemoved()) {
-                        list.remove(a1.getNode());
-                        a1.setManaged(false);
-                        a1.getNode().rotateProperty().unbind();
-                    }
-                    for (final AxisLabel a2 : c.getAddedSubList()) {
-                        list.add(a2.getNode());
-                        a2.getNode().setVisible(false);
-                        a2.getNode().rotateProperty().bind(tickLabelRotate);
-                    }
-                }
-            });
-        }
-        return labels;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected double computePrefWidth(final double height) {
-        if (isHorizontal()) {
-            return 150d;
-        } else {
-            final double w1 = linesPrefSize();
-            layoutChildren(lastLayoutWidth, height);
-            final double w2 = scroll.isVisible() ? scroll.getWidth() : 0;
-
-            final double w3 = max(labelGroup.prefWidth(height), 10);
-            double w4 = 0;
-            if (nameLabel.isVisible()) {
-                w4 = nameLabel.getHeight() + 5;
-            }
-
-            return w1 + w2 + w3 + w4;
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected double computePrefHeight(final double width) {
-        if (isVertical()) {
-            return 150d;
-        } else {
-            final double h1 = linesPrefSize();
-
-            layoutChildren(width, lastLayoutHeight);
-            final double h2 = scroll.isVisible() ? scroll.getHeight() : 0;
-            final double h3 = max(labelGroup.prefHeight(width), 10);
-            double h4 = 0;
-            if (nameLabel.isVisible()) {
-                h4 = nameLabel.getHeight() + 5;
-            }
-
-            return h1 + h2 + h3 + h4;
-        }
-    }
-
-    /**
      * layoutChildrenから呼び出されます。 このAxisのレイアウトを実際に行うメソッドです。
      */
-    protected void layoutAxis(final double width, final double height) {
+    private void layoutAxis(final double width, final double height) {
         if (lineGroup == null) {
             lineGroup = new Group();
             lineGroup.setAutoSizeChildren(false);
@@ -497,8 +349,8 @@ public abstract class Axis extends Region {
 
             scroll = new ScrollBar();
             scroll.orientationProperty().bind(orientation);
-            scroll.visibleProperty().bind(Bindings.createBooleanBinding(() -> scrollBarVisible
-                    .get() && scrollBarValue.get() != -1 && scrollBarSize.get() != 1, scrollBarValue, scrollBarVisible, scrollBarSize));
+            scroll.visibleProperty().bind(Bindings.createBooleanBinding(() -> scrollBarVisibility
+                    .get() && scrollBarValue.get() != -1 && scrollBarSize.get() != 1, scrollBarValue, scrollBarVisibility, scrollBarSize));
             scroll.visibleProperty().addListener(layoutValidator);
             scroll.valueProperty().addListener(scrollValueValidator);
             scroll.setMin(0);
@@ -715,10 +567,6 @@ public abstract class Axis extends Region {
 
     }
 
-    private double linesPrefSize() {
-        return max(majorTickLength.get(), minorTickLength.get());
-    }
-
     private void layoutLines(final double width, final double height) {
 
         final boolean ish = isHorizontal();
@@ -808,15 +656,168 @@ public abstract class Axis extends Region {
     }
 
     /**
-     * {@inheritDoc}
+     * Force to layout child nodes.
+     * 
+     * @param width
+     * @param height
      */
-    @Override
-    public void requestLayout() {
-        final Parent p = getParent();
-        if (p != null) {
-            p.requestLayout();
+    protected final void layoutChildren(double width, double height) {
+        if (whileLayout.compareAndSet(false, true)) {
+            try {
+                if (!dataValidate || getAxisLength(width, height) != getAxisLength(lastLayoutWidth, lastLayoutHeight)) {
+                    computeAxisProperties(width, height);
+                    layoutValidate = false;
+                    dataValidate = true;
+                }
+
+                if (!layoutValidate || width != lastLayoutWidth || height != lastLayoutHeight) {
+                    layoutAxis(width, height);
+                    layoutValidate = true;
+                }
+                lastLayoutWidth = width;
+                lastLayoutHeight = height;
+            } finally {
+                whileLayout.compareAndSet(true, false);
+            }
         }
-        super.requestLayout();
+    }
+
+    /**
+     * 軸方向のサイズを返す
+     * 
+     * @param width
+     * @param height
+     * @return
+     */
+    protected final double getAxisLength(final double width, final double height) {
+        return isHorizontal() ? width : height;
+    }
+
+    /**
+     * lowerValueを実際に利用可能な数値に変換して返す
+     * 
+     * @param up 最大値
+     * @return
+     */
+    protected final double computeLowerValue(double up) {
+        double d = visualMinValue.get();
+        final double m = logicalMinValue.get();
+        if (up != up) {
+            up = logicalMaxValue.get();
+        }
+        if (d != d) {
+            d = m;
+        }
+        if (d > up) {
+            d = up;
+        }
+        if (d < m) {
+            return m;
+        } else {
+            return d;
+        }
+    }
+
+    /**
+     * スクロールバーが変更されたときに呼び出されるメソッド。 表示の最小値を計算する。
+     * 
+     * @param value scrollBarValueに相当する値
+     * @param amount scrollVisibleAmountに相当する値
+     * @return
+     */
+    private double calcLowValue(double value, double amount) {
+        double max = logicalMaxValue.get();
+        double min = logicalMinValue.get();
+        double diff = max - min;
+        double bar = diff * amount;
+        return min + (diff - bar) * value;
+    }
+
+    /**
+     * @version 2017/09/27 14:22:45
+     */
+    protected static class AxisLabel {
+
+        private Node node;
+
+        private boolean managed = false;
+
+        private boolean beforeVisible = true;
+
+        public Node getNode() {
+            return node;
+        }
+
+        public void setNode(final Node node) {
+            this.node = node;
+        }
+
+        private boolean isManaged() {
+            return managed;
+        }
+
+        private void setManaged(final boolean b) {
+            managed = true;
+        }
+
+        private boolean isBeforeVisible() {
+            return beforeVisible;
+        }
+
+        private void setBeforeVisible(final boolean b) {
+            beforeVisible = b;
+        }
+
+        private double id;
+
+        /** 文字列等の比較以外で同値性を確認するための数値を設定する */
+        public void setID(final double id) {
+            this.id = id;
+        }
+
+        /** 文字列等の比較以外で同値性を確認するための数値を得る */
+        public double getID() {
+            return id;
+        }
+
+        /** 設定されているIDと等しいか調べる */
+        public boolean match(final double id) {
+            return this.id == id;
+        }
+    }
+
+    private Group lineGroup, labelGroup = new Group();
+
+    private Path majorTickPath, minorTickPath;
+
+    private Line baseLine;
+
+    private ScrollBar scroll;
+
+    private Label nameLabel;
+
+    private ObservableList<AxisLabel> labels;
+
+    protected final ObservableList<AxisLabel> getLabels() {
+        if (labels == null) {
+            labels = FXCollections.observableArrayList();
+            labels.addListener((ListChangeListener<AxisLabel>) c -> {
+                final ObservableList<Node> list = labelGroup.getChildren();
+                while (c.next()) {
+                    for (final AxisLabel a1 : c.getRemoved()) {
+                        list.remove(a1.getNode());
+                        a1.setManaged(false);
+                        a1.getNode().rotateProperty().unbind();
+                    }
+                    for (final AxisLabel a2 : c.getAddedSubList()) {
+                        list.add(a2.getNode());
+                        a2.getNode().setVisible(false);
+                        a2.getNode().rotateProperty().bind(tickLabelRotate);
+                    }
+                }
+            });
+        }
+        return labels;
     }
 
 }
