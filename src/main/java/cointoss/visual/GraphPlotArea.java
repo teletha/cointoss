@@ -60,6 +60,12 @@ public class GraphPlotArea extends Region {
     /** The vertical margin of plot area. */
     public final DoubleProperty verticalMargin = new SimpleDoubleProperty(this, "verticalGridLineVisibility", 1);
 
+    /** The background color setting. */
+    public final BooleanProperty alternativeRowFillVisible = new SimpleBooleanProperty(this, "alternativeRowFillVisible", true);
+
+    /** The background color setting. */
+    public final BooleanProperty alternativeColumnFillVisible = new SimpleBooleanProperty(this, "alternativeColumnFillVisible", true);
+
     /** The horizontal axis. */
     final ObjectProperty<Axis> axisX = new SimpleObjectProperty<>(this, "axisX", null);
 
@@ -73,7 +79,7 @@ public class GraphPlotArea extends Region {
     private final InvalidationListener plotValidateListener = observable -> {
         if (plotValidate) {
             plotValidate = false;
-            setGraphShapeValidate(false);
+            graphshapeValidate = false;
             setNeedsLayout(true);
         }
     };
@@ -192,7 +198,7 @@ public class GraphPlotArea extends Region {
         if (!plotValidate) {
             plotData();
         }
-        if (!isGraphShapeValidate()) {
+        if (!graphshapeValidate) {
             drawGraphShapes();
         }
     }
@@ -206,7 +212,7 @@ public class GraphPlotArea extends Region {
 
         if (xaxis == null || yaxis == null) {
             plotValidate = true;
-            setGraphShapeValidate(true);
+            graphshapeValidate = true;
             return;
         }
         drawGraphShapes();
@@ -220,14 +226,14 @@ public class GraphPlotArea extends Region {
     }
 
     public void drawGraphShapes() {
-        if (plotValidate && isGraphShapeValidate()) {
+        if (plotValidate && graphshapeValidate) {
             return;
         }
         final Axis xaxis = axisX.get();
         final Axis yaxis = axisY.get();
 
         if (xaxis == null || yaxis == null) {
-            setGraphShapeValidate(true);
+            graphshapeValidate = true;
             return;
         }
 
@@ -248,7 +254,7 @@ public class GraphPlotArea extends Region {
                 gl.setNodeProperty(xaxis, yaxis, w, h);
             }
         }
-        setGraphShapeValidate(true);
+        graphshapeValidate = true;
     }
 
     public void drawBackGroundLine() {
@@ -271,7 +277,7 @@ public class GraphPlotArea extends Region {
             final ObservableList<PathElement> fele = verticalRowFill.getElements();
             int lelesize = lele.size();
             final int felesize = fele.size();
-            final boolean fill = isAlternativeColumnFillVisible();
+            final boolean fill = alternativeColumnFillVisible.get();
             final boolean line = verticalGridLineVisibility.get();
             verticalGridLines.setVisible(line);
             verticalRowFill.setVisible(fill);
@@ -364,7 +370,7 @@ public class GraphPlotArea extends Region {
             final ObservableList<PathElement> fele = horizontalRowFill.getElements();
             int lelesize = lele.size();
             final int felesize = fele.size();
-            final boolean fill = isAlternativeRowFillVisible();
+            final boolean fill = alternativeRowFillVisible.get();
             final boolean line = horizontalGridLineVisibility.get();
             horizontalGridLines.setVisible(line);
             horizontalRowFill.setVisible(fill);
@@ -734,76 +740,17 @@ public class GraphPlotArea extends Region {
         candle.setLayoutY(open);
     }
 
-    /**
-     * 縦方向に交互に背景を塗りつぶすかどうか
-     * 
-     * @return
-     */
-    public final BooleanProperty alternativeColumnFillVisibleProperty() {
-        if (alternativeColumnFillVisibleProperty == null) {
-            alternativeColumnFillVisibleProperty = new SimpleBooleanProperty(this, "alternativeColumnFillVisible", true);
+    boolean graphshapeValidate = true;
+
+    private InvalidationListener graphShapeValidateListener = o -> {
+        final ReadOnlyBooleanProperty p = (ReadOnlyBooleanProperty) o;
+        final boolean b = p.get();
+        if (!b && graphshapeValidate) {
+            graphshapeValidate = false;
+            setNeedsLayout(true);
+
         }
-        return alternativeColumnFillVisibleProperty;
-    }
-
-    public final boolean isAlternativeColumnFillVisible() {
-        return alternativeColumnFillVisibleProperty == null ? true : alternativeColumnFillVisibleProperty.get();
-    }
-
-    public final void setAlternativeColumnFillVisible(final boolean value) {
-        alternativeColumnFillVisibleProperty().set(value);
-    }
-
-    private BooleanProperty alternativeColumnFillVisibleProperty;
-
-    /**
-     * 横方向に交互に背景を塗りつぶす
-     * 
-     * @return
-     */
-    public final BooleanProperty alternativeRowFillVisibleProperty() {
-        if (alternativeRowFillVisibleProperty == null) {
-            alternativeRowFillVisibleProperty = new SimpleBooleanProperty(this, "alternativeRowFillVisible", true);
-        }
-        return alternativeRowFillVisibleProperty;
-    }
-
-    public final boolean isAlternativeRowFillVisible() {
-        return alternativeRowFillVisibleProperty == null ? true : alternativeRowFillVisibleProperty.get();
-    }
-
-    public final void setAlternativeRowFillVisible(final boolean value) {
-        alternativeRowFillVisibleProperty().set(value);
-    }
-
-    private BooleanProperty alternativeRowFillVisibleProperty;
-
-    private boolean graphshapeValidate = true;
-
-    protected final void setGraphShapeValidate(final boolean b) {
-        graphshapeValidate = b;
-    }
-
-    public final boolean isGraphShapeValidate() {
-        return graphshapeValidate;
-    }
-
-    private InvalidationListener getGraphShapeValidateListener() {
-        if (graphShapeValidateListener == null) {
-            graphShapeValidateListener = o -> {
-                final ReadOnlyBooleanProperty p = (ReadOnlyBooleanProperty) o;
-                final boolean b = p.get();
-                if (!b && isGraphShapeValidate()) {
-                    setGraphShapeValidate(false);
-                    setNeedsLayout(true);
-
-                }
-            };
-        }
-        return graphShapeValidateListener;
-    }
-
-    private InvalidationListener graphShapeValidateListener;
+    };
 
     private ObservableList<GraphShape> backGroundShapes, foreGroundShapes;
 
@@ -814,23 +761,22 @@ public class GraphPlotArea extends Region {
                 c.next();
                 final Group g = background;
                 final ObservableList<Node> ch = g.getChildren();
-                final InvalidationListener listener = getGraphShapeValidateListener();
                 for (final GraphShape gl : c.getRemoved()) {
                     final Node node = gl.getNode();
                     if (node != null) {
                         ch.remove(node);
                     }
-                    gl.validateProperty().removeListener(listener);
+                    gl.validateProperty().removeListener(graphShapeValidateListener);
                 }
                 for (final GraphShape gl : c.getAddedSubList()) {
                     final Node node = gl.getNode();
                     if (node != null) {
                         ch.add(gl.getNode());
                     }
-                    gl.validateProperty().addListener(listener);
+                    gl.validateProperty().addListener(graphShapeValidateListener);
                 }
                 if (plotValidate) {
-                    setGraphShapeValidate(false);
+                    graphshapeValidate = false;
                     plotValidate = false;
                     setNeedsLayout(true);
                 }
@@ -847,23 +793,22 @@ public class GraphPlotArea extends Region {
                 c.next();
                 final Group g = foreground;
                 final ObservableList<Node> ch = g.getChildren();
-                final InvalidationListener listener = getGraphShapeValidateListener();
                 for (final GraphShape gl : c.getRemoved()) {
                     final Node node = gl.getNode();
                     if (node != null) {
                         ch.remove(node);
                     }
-                    gl.validateProperty().removeListener(listener);
+                    gl.validateProperty().removeListener(graphShapeValidateListener);
                 }
                 for (final GraphShape gl : c.getAddedSubList()) {
                     final Node node = gl.getNode();
                     if (node != null) {
                         ch.add(gl.getNode());
                     }
-                    gl.validateProperty().addListener(listener);
+                    gl.validateProperty().addListener(graphShapeValidateListener);
                 }
                 if (plotValidate) {
-                    setGraphShapeValidate(false);
+                    graphshapeValidate = false;
                     requestLayout();
                 }
             };

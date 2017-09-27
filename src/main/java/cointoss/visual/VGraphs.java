@@ -159,10 +159,10 @@ public class VGraphs extends Region {
                     break;
                 }
             }
-            g.setPlotAreaPrefferedBounds(null);
+            g.plotAreaPrefferedBounds.set(null);;
             g.preLayout(x0, floor(y), width, hh);
-            maxx0 = max(maxx0, g.getPlotAreaBounds().getMinX());
-            minx1 = min(minx1, g.getPlotAreaBounds().getMaxX());
+            maxx0 = max(maxx0, g.plotAreaBounds.get().getMinX());
+            minx1 = min(minx1, g.plotAreaBounds.get().getMaxX());
             y += hh;
             if (l.isVisible() && titles == Side.BOTTOM) {
                 final double w = l.prefWidth(-1);
@@ -174,8 +174,8 @@ public class VGraphs extends Region {
         }
 
         for (final CandleChart g : list) {
-            final Rectangle2D r = g.getPlotAreaBounds(), r2 = new Rectangle2D(maxx0, r.getMinY(), minx1 - maxx0, r.getHeight());
-            g.setPlotAreaPrefferedBounds(r2);
+            final Rectangle2D r = g.plotAreaBounds.get(), r2 = new Rectangle2D(maxx0, r.getMinY(), minx1 - maxx0, r.getHeight());
+            g.plotAreaPrefferedBounds.set(r2);
             g.layout();
         }
 

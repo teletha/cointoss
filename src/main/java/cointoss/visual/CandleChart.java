@@ -15,8 +15,6 @@ import java.util.function.Consumer;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.ReadOnlyBooleanProperty;
-import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -58,6 +56,17 @@ public class CandleChart extends Region {
     /** The actual graph drawer. */
     public final GraphPlotArea graph = new GraphPlotArea();
 
+    /** The change observer. */
+    private final InvalidationListener layoutInvalidationObserver = observable -> requestLayout();
+
+    /**
+     * GraphPlotAreaの最適な大きさと位置。 この値が指定されたときは、このノードの大きさにかかわらず、この値が利用される。
+     */
+    public final ObjectProperty<Rectangle2D> plotAreaPrefferedBounds = new SimpleObjectProperty<>(this, "plotAreaPrefferedBounds", null);
+
+    /** A current position and size of plot area. */
+    public final ReadOnlyObjectWrapper<Rectangle2D> plotAreaBounds = new ReadOnlyObjectWrapper<>(this, "plotAreaBounds", null);
+
     private final InvalidationListener dataValidateListener = observable -> {
         if (isDataValidate()) {
             setDataValidate(false);
@@ -79,6 +88,7 @@ public class CandleChart extends Region {
         axisX.visibleRange.addListener(dataValidateListener);
         axisY.visualMinValue.addListener(dataValidateListener);
         axisY.visibleRange.addListener(dataValidateListener);
+        plotAreaPrefferedBounds.addListener(layoutInvalidationObserver);
 
         // create plotting data collection
         lines = FXCollections.observableArrayList();
@@ -165,6 +175,9 @@ public class CandleChart extends Region {
         prelayout = false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected final void layoutChildren() {
         final double w = getWidth();
@@ -173,7 +186,6 @@ public class CandleChart extends Region {
             return;
         }
         layoutChildren(w, h);
-        setLayoutedSize(new Point2D(w, h));
     }
 
     protected void layoutChildren(double width, double height) {
@@ -192,6 +204,9 @@ public class CandleChart extends Region {
         setYAxisRange();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected double computePrefHeight(final double width) {
         return 150;
@@ -235,7 +250,7 @@ public class CandleChart extends Region {
     }
 
     protected void layoutChart(final double w, final double h, final double x0, final double y0) {
-        final Rectangle2D bounds = getPlotAreaPrefferedBounds();
+        final Rectangle2D bounds = plotAreaPrefferedBounds.get();
         if (bounds == null) {
             layoutChartArea(w, h, x0, y0);
         } else {
@@ -245,7 +260,7 @@ public class CandleChart extends Region {
             if (!prelayout) {
                 graph.resizeRelocate(bounds.getMinX(), bounds.getMinY(), ww, hh);
             }
-            setPlotAreaBounds(bounds);
+            plotAreaBounds.set(bounds);
             final Axis xAxis = axisX;
             final Axis yAxis = axisY;
             if (xAxis != null) {
@@ -272,7 +287,7 @@ public class CandleChart extends Region {
                     setDataValidate(true);
                 }
             }
-            if (!prelayout && !graph.isGraphShapeValidate()) {
+            if (!prelayout && !graph.graphshapeValidate) {
                 graph.drawGraphShapes();
             }
         }
@@ -375,12 +390,12 @@ public class CandleChart extends Region {
                     graph.plotData();
                     setDataValidate(true);
                 }
-                if (!graph.isGraphShapeValidate()) {
+                if (!graph.graphshapeValidate) {
                     graph.drawGraphShapes();
                 }
             }
 
-            setPlotAreaBounds(new Rectangle2D(x + x0, y + y0, graphWidth, graphHeight));
+            plotAreaBounds.set(new Rectangle2D(x + x0, y + y0, graphWidth, graphHeight));
         }
 
     }
@@ -426,98 +441,6 @@ public class CandleChart extends Region {
 
     /** 状態の正当性を示すプロパティ */
     private boolean datavalidate = false;
-
-    private InvalidationListener lineChartDataListener;
-
-    protected final InvalidationListener getLineChartDataListener() {
-        if (lineChartDataListener == null) {
-            lineChartDataListener = o -> {
-                if (!((ReadOnlyBooleanProperty) o).get() && isDataValidate()) {
-                    setDataValidate(false);
-                    requestLayout();
-                }
-            };
-        }
-        return lineChartDataListener;
-    }
-
-    protected final InvalidationListener getLayoutInvalidationListener() {
-        if (layoutInvalidationListener == null) {
-            layoutInvalidationListener = observable -> requestLayout();
-        }
-        return layoutInvalidationListener;
-    }
-
-    private InvalidationListener layoutInvalidationListener = null;
-
-    /**
-     * GraphPlotAreaの最適な大きさと位置。 この値が指定されたときは、このノードの大きさにかかわらず、この値が利用される。
-     * 
-     * @return
-     */
-    public final ObjectProperty<Rectangle2D> plotAreaPrefferedBoundsProperty() {
-        if (plotAreaPrefferedBoundsProperty == null) {
-            plotAreaPrefferedBoundsProperty = new SimpleObjectProperty<>(this, "plotAreaPrefferedBounds", null);
-            plotAreaPrefferedBoundsProperty.addListener(getLayoutInvalidationListener());
-        }
-        return plotAreaPrefferedBoundsProperty;
-    }
-
-    public final Rectangle2D getPlotAreaPrefferedBounds() {
-        return plotAreaPrefferedBoundsProperty == null ? null : plotAreaPrefferedBoundsProperty.get();
-    }
-
-    public final void setPlotAreaPrefferedBounds(final Rectangle2D value) {
-        plotAreaPrefferedBoundsProperty().set(value);
-    }
-
-    private ObjectProperty<Rectangle2D> plotAreaPrefferedBoundsProperty;
-
-    /**
-     * レイアウト結果のGraphPlotAreaの大きさと位置
-     * 
-     * @return
-     */
-    public final ReadOnlyObjectProperty<Rectangle2D> plotAreaBoundsProperty() {
-        return plotAreaBoundsWrapper().getReadOnlyProperty();
-    }
-
-    public final Rectangle2D getPlotAreaBounds() {
-        return plotAreaBoundsWrapper.get();
-    }
-
-    protected final void setPlotAreaBounds(final Rectangle2D value) {
-        plotAreaBoundsWrapper().set(value);
-    }
-
-    protected final ReadOnlyObjectWrapper<Rectangle2D> plotAreaBoundsWrapper() {
-        return plotAreaBoundsWrapper;
-    }
-
-    private final ReadOnlyObjectWrapper<Rectangle2D> plotAreaBoundsWrapper = new ReadOnlyObjectWrapper<>(this, "plotAreaBounds", null);
-
-    /**
-     * layoutChildrenが最後に実行されたときのこのノードの大きさ。 xが幅を表し、yが高さを表す。
-     * 
-     * @return
-     */
-    public final ReadOnlyObjectProperty<Point2D> layoutedSizeProperty() {
-        return layoutedSizeWrapper().getReadOnlyProperty();
-    }
-
-    public final Point2D getLayoutedSize() {
-        return layoutedSizeWrapper.get();
-    }
-
-    protected final void setLayoutedSize(final Point2D value) {
-        layoutedSizeWrapper().set(value);
-    }
-
-    protected ReadOnlyObjectWrapper<Point2D> layoutedSizeWrapper() {
-        return layoutedSizeWrapper;
-    }
-
-    private final ReadOnlyObjectWrapper<Point2D> layoutedSizeWrapper = new ReadOnlyObjectWrapper<>(this, "layoutedSize", new Point2D(0, 0));
 
     /**
      * グラフのタイトル。<br>
