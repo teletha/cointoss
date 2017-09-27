@@ -31,7 +31,7 @@ public class LinearAxis extends Axis {
      */
     public LinearAxis(String name, DoubleToObjectFunction<String> labelFormatter) {
         this.labelFormatter = Objects.requireNonNull(labelFormatter);
-        nameProperty.set(name);
+        this.name.set(name);
     }
 
     private double lowVal = 0;
@@ -58,22 +58,22 @@ public class LinearAxis extends Axis {
 
     @Override
     public void adjustLowerValue() {
-        final double max = getMaxValue();
+        final double max = logicalMaxValue.get();
         final double a = getVisibleAmount();
-        final double min = getMinValue();
+        final double min = logicalMinValue.get();
         final double ll = max - min;
         double low = computeLowerValue(max);
         final double up = low + ll * a;
         if (up > max) {
             low = max - ll * a;
-            lowerValue(low);
+            visualMinValue.set(low);
         }
     }
 
     private double computeUpperValue(final double low) {
-        final double max = getMaxValue();
+        final double max = logicalMaxValue.get();
         final double a = getVisibleAmount();
-        final double min = getMinValue();
+        final double min = logicalMinValue.get();
         final double ll = max - min;
         return min(low + ll * a, max);
     }
@@ -84,7 +84,7 @@ public class LinearAxis extends Axis {
         minors.clear();
         majorsFill.clear();
 
-        final double low = computeLowerValue(getMaxValue());
+        final double low = computeLowerValue(logicalMaxValue.get());
         final double up = computeUpperValue(low);
         final double len = getAxisLength(width, height);
         if (low == up || low != low || up != up || len <= 0) {
@@ -93,10 +93,10 @@ public class LinearAxis extends Axis {
         }
 
         lowVal = low;
-        setUpperValue(up);
+        visualMaxValue.set(up);
         {// scroll bar
-            final double max = getMaxValue();
-            final double min = getMinValue();
+            final double max = logicalMaxValue.get();
+            final double min = logicalMinValue.get();
             if (low == min && max == up) {
                 scrollBarValue.set(-1);
                 scrollBarSize.set(1);
@@ -172,7 +172,7 @@ public class LinearAxis extends Axis {
 
         double minorLength;
         int mcount = 10; // getPrefferedMinorCount();
-        if (!isMinorTickVisible() || mcount <= 1) {
+        if (!minorTickVisibility.get() || mcount <= 1) {
             minorLength = -1;
         } else {
             minorLength = majorLength / mcount;
@@ -252,7 +252,7 @@ public class LinearAxis extends Axis {
         lastPUnitSize = Double.NaN;
         unitIndex = -1;
         lowVal = 0;
-        setUpperValue(1);
+        visualMaxValue.set(1);
         final double len = getAxisLength(width, height);
         m = len;
         majors.add(0d);

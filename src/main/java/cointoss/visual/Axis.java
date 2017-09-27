@@ -49,7 +49,56 @@ import org.eclipse.collections.impl.factory.primitive.DoubleLists;
 
 public abstract class Axis extends Region {
 
-    private final InvalidationListener scrollValueListener = new InvalidationListener() {
+    private double lastLayoutWidth = -1, lastLayoutHeight = -1;
+
+    public final StringProperty name = new SimpleStringProperty(this, "name", null);
+
+    /** The visual placement direction. */
+    public final ObjectProperty<Orientation> orientation = new SimpleObjectProperty<Orientation>(this, "orientation", Orientation.HORIZONTAL) {
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void set(final Orientation newValue) {
+            if (newValue == null) {
+                return;
+            }
+            super.set(newValue);
+        }
+    };
+
+    /** The visual placement position. */
+    public final ObjectProperty<Side> side = new SimpleObjectProperty<>(this, "side", orientation.get() != Orientation.VERTICAL
+            ? Side.BOTTOM
+            : Side.LEFT);
+
+    /** レイアウトを構成すべき情報に対して付加すべきリスナ */
+    private final InvalidationListener layoutValidator = observable -> {
+        if (isLayoutValidate()) {
+            setLayoutValidate(false);
+            requestLayout();
+        }
+    };
+
+    /** Axisの構成情報を書き換えるべきデータに対して付加するリスナ */
+    private final InvalidationListener dataValidateListener = observable -> {
+        if (widthProperty() == observable) {
+            if (orientation.get() != Orientation.HORIZONTAL || getWidth() == lastLayoutWidth) {
+                return;
+            }
+        }
+        if (heightProperty() == observable) {
+            if (orientation.get() != Orientation.VERTICAL || getHeight() == lastLayoutHeight) {
+                return;
+            }
+        }
+        if (isDataValidate()) {
+            setDataValidate(false);
+            requestLayout();
+        }
+    };
+
+    private final InvalidationListener scrollValueValidator = new InvalidationListener() {
 
         private boolean doflag = true;
 
@@ -63,12 +112,12 @@ public abstract class Axis extends Region {
                     final double position = scroll.getValue();
                     final double size = scrollBarSize.get();
                     if (position == -1 || size == 1) {
-                        lowerValue(Double.NaN);
+                        visualMinValue.set(Double.NaN);
                         visibleAmount(1);
                     } else {
                         final double p = isHorizontal() ? position : 1 - position;
                         final double d = calcLowValue(p, size);
-                        lowerValue(d);
+                        visualMinValue.set(d);
                     }
                 } else if (scroll != null) {
                     final double d = isHorizontal() ? scrollBarValue.get() : 1 - scrollBarValue.get();
@@ -83,8 +132,6 @@ public abstract class Axis extends Region {
         }
     };
 
-    public final StringProperty nameProperty = new SimpleStringProperty(this, "name", null);
-
     public final BooleanProperty scrollBarVisible = new SimpleBooleanProperty(this, "scrollBarVisible", true);
 
     /** スクロールバーのvisibleAmountを0～1で表現する。 */
@@ -93,10 +140,32 @@ public abstract class Axis extends Region {
     /** スクロールバーの表示位置のプロパティ。縦方向の場合、1からこの値を引いた値を利用する。 -1の時、非表示となる。 bindする際にはbindBidirectionalを用いること */
     public final DoubleProperty scrollBarValue = new SimpleDoubleProperty(this, "scrollBarPosition", -1);
 
-    {
-        scrollBarSize.addListener(scrollValueListener);
-        scrollBarValue.addListener(scrollValueListener);
-    }
+    /** The visual length of major tick. */
+    public final DoubleProperty majorTickLength = new SimpleDoubleProperty(this, "MajorTickLength", 12);
+
+    /** The visual length of minor tick. */
+    public final DoubleProperty minorTickLength = new SimpleDoubleProperty(this, "MinorTickLength", 8);
+
+    /** The visibility of minor tick. */
+    public final BooleanProperty minorTickVisibility = new SimpleBooleanProperty(this, "MinorTickVisibility", true);
+
+    /** The visual distance between tick and label. */
+    public final DoubleProperty tickLabelDistance = new SimpleDoubleProperty(this, "tickLabelGap", 10);
+
+    /** The rotation angle of label. */
+    public final DoubleProperty tickLabelRotate = new SimpleDoubleProperty(this, "tickLabelRotate", 0);
+
+    /** The logical maximum value. */
+    public final DoubleProperty logicalMaxValue = new SimpleDoubleProperty(this, "logicalMaxValue", 1);
+
+    /** The logical minimum value. */
+    public final DoubleProperty logicalMinValue = new SimpleDoubleProperty(this, "logicalMinValue", 0);
+
+    /** The visual maximum value. */
+    public final ReadOnlyDoubleWrapper visualMaxValue = new ReadOnlyDoubleWrapper(this, "visualMaxValue", 1);
+
+    /** The visual minimum value. */
+    public final DoubleProperty visualMinValue = new SimpleDoubleProperty(this, "visualMinValue", Double.NaN);
 
     protected final MutableDoubleList majors = DoubleLists.mutable.empty();
 
@@ -105,27 +174,22 @@ public abstract class Axis extends Region {
     protected final MutableDoubleList minors = DoubleLists.mutable.empty();
 
     public Axis() {
-        nameProperty.addListener(getLayoutValidateListener());
+        name.addListener(layoutValidator);
 
         getStyleClass().add("axis");
-        dataValidateListener = observable -> {
-            if (widthProperty() == observable) {
-                if (getOrientation() != Orientation.HORIZONTAL || getWidth() == lastLayoutWidth) {
-                    return;
-                }
-            }
-            if (heightProperty() == observable) {
-                if (getOrientation() != Orientation.VERTICAL || getHeight() == lastLayoutHeight) {
-                    return;
-                }
-            }
-            if (isDataValidate()) {
-                setDataValidate(false);
-                requestLayout();
-            }
-        };
         widthProperty().addListener(dataValidateListener);
         heightProperty().addListener(dataValidateListener);
+        orientation.addListener(dataValidateListener);
+        logicalMaxValue.addListener(dataValidateListener);
+        logicalMinValue.addListener(dataValidateListener);
+        visualMinValue.addListener(dataValidateListener);
+        scrollBarSize.addListener(scrollValueValidator);
+        scrollBarValue.addListener(scrollValueValidator);
+        majorTickLength.addListener(layoutValidator);
+        minorTickLength.addListener(layoutValidator);
+        minorTickVisibility.addListener(layoutValidator);
+        tickLabelDistance.addListener(layoutValidator);
+        tickLabelRotate.addListener(layoutValidator);
     }
 
     @Override
@@ -161,8 +225,6 @@ public abstract class Axis extends Region {
     }
 
     private boolean nowLayout = false;
-
-    private double lastLayoutWidth = -1, lastLayoutHeight = -1;
 
     /**
      * 軸方向のサイズを返す
@@ -206,123 +268,8 @@ public abstract class Axis extends Region {
     // -----------------layoutにしか関係ないデータ---------------------------
 
     public final String getName() {
-        return nameProperty == null ? null : nameProperty.get();
+        return name == null ? null : name.get();
     }
-
-    /**
-     * major tickの線の長さ
-     * 
-     * @return
-     */
-    public final DoubleProperty majorTickLengthProperty() {
-        if (majorTickLengthProperty == null) {
-            majorTickLengthProperty = new SimpleDoubleProperty(this, "majorTickLength", 12);
-            majorTickLengthProperty.addListener(getLayoutValidateListener());
-        }
-        return majorTickLengthProperty;
-    }
-
-    public final double getMajorTickLength() {
-        return majorTickLengthProperty == null ? 12 : majorTickLengthProperty.get();
-    }
-
-    public final void setmMjorTickLength(final double value) {
-        majorTickLengthProperty().set(value);
-    }
-
-    private DoubleProperty majorTickLengthProperty;
-
-    /**
-     * minor tickの線の長さ
-     * 
-     * @return
-     */
-    public final DoubleProperty minorTickLengthProperty() {
-        if (minorTickLengthProperty == null) {
-            minorTickLengthProperty = new SimpleDoubleProperty(this, "minorTickLength", 8);
-            minorTickLengthProperty.addListener(getLayoutValidateListener());
-        }
-        return minorTickLengthProperty;
-    }
-
-    public final double getMinorTickLength() {
-        return minorTickLengthProperty == null ? 8 : minorTickLengthProperty.get();
-    }
-
-    public final void setMinorTickLength(final double value) {
-        minorTickLengthProperty().set(value);
-    }
-
-    private DoubleProperty minorTickLengthProperty;
-
-    /**
-     * minor tickの可視性。デフォルトはtrue
-     * 
-     * @return
-     */
-    public final BooleanProperty minorTickVisibleProperty() {
-        if (minorTickVisibleProperty == null) {
-            minorTickVisibleProperty = new SimpleBooleanProperty(this, "minorTickVisible", true);
-            minorTickVisibleProperty.addListener(getLayoutValidateListener());
-        }
-        return minorTickVisibleProperty;
-    }
-
-    public final boolean isMinorTickVisible() {
-        return minorTickVisibleProperty == null ? true : minorTickVisibleProperty.get();
-    }
-
-    public final void setMinorTickVisible(final boolean value) {
-        minorTickVisibleProperty().set(value);
-    }
-
-    private BooleanProperty minorTickVisibleProperty;
-
-    /**
-     * tickと数値ラベルの間の空間。 CSS化したい
-     * 
-     * @return
-     */
-    public final DoubleProperty tickLabelGapProperty() {
-        if (tickLabelGapProperty == null) {
-            tickLabelGapProperty = new SimpleDoubleProperty(this, "tickLabelGap", 10);
-            tickLabelGapProperty.addListener(getLayoutValidateListener());
-        }
-        return tickLabelGapProperty;
-    }
-
-    public final double getTickLabelGap() {
-        return tickLabelGapProperty == null ? 10 : tickLabelGapProperty.get();
-    }
-
-    public final void setTickLabelGap(final double value) {
-        tickLabelGapProperty().set(value);
-    }
-
-    private DoubleProperty tickLabelGapProperty;
-
-    /**
-     * 数値ラベルの回転角度。 CSS化したい
-     * 
-     * @return
-     */
-    public final DoubleProperty tickLabelRotateProperty() {
-        if (tickLabelRotateProperty == null) {
-            tickLabelRotateProperty = new SimpleDoubleProperty(this, "tickLabelRotate", 0);
-            tickLabelRotateProperty.addListener(getLayoutValidateListener());
-        }
-        return tickLabelRotateProperty;
-    }
-
-    public final double getTickLabelRotate() {
-        return tickLabelRotateProperty == null ? 0 : tickLabelRotateProperty.get();
-    }
-
-    public final void setTickLabelRotate(final double value) {
-        tickLabelRotateProperty().set(value);
-    }
-
-    private DoubleProperty tickLabelRotateProperty;
 
     private static void unbind(final Property<?> p) {
         if (p.isBound()) {
@@ -382,9 +329,9 @@ public abstract class Axis extends Region {
                     if (b3) {
                         b3 = false;
                         if (p.getBean() == Axis.this) {
-                            a.lowerValue(getLowerValue());
+                            a.visualMinValue.set(visualMinValue.get());
                         } else {
-                            lowerValue(a.getLowerValue());
+                            visualMinValue.set(a.visualMinValue.get());
                         }
                         b3 = true;
                     }
@@ -396,8 +343,8 @@ public abstract class Axis extends Region {
         // a.scrollBarVisibleProperty().addListener(listener);
         visibleAmountProperty().addListener(listener);
         a.visibleAmountProperty().addListener(listener);
-        lowerValueProperty().addListener(listener);
-        a.lowerValueProperty().addListener(listener);
+        visualMinValue.addListener(listener);
+        a.visualMinValue.addListener(listener);
         scrollbarBindListener = listener;
         a.scrollbarBindListener = listener;
         scrollbarBindTarget = a;
@@ -407,7 +354,7 @@ public abstract class Axis extends Region {
     public void unbindBidicalScrollPropertyies() {
         // unbind(scrollBarVisibleProperty());
         unbind(visibleAmountProperty());
-        unbind(lowerValueProperty());
+        unbind(visualMinValue);
         if (scrollbarBindListener != null) {
             _unbindScrollProp();
             if (scrollbarBindTarget != null) {
@@ -421,147 +368,18 @@ public abstract class Axis extends Region {
     private void _unbindScrollProp() {
         // scrollBarVisibleProperty().removeListener(scrollbarBindListener);
         visibleAmountProperty().removeListener(scrollbarBindListener);
-        lowerValueProperty().removeListener(scrollbarBindListener);
+        visualMinValue.removeListener(scrollbarBindListener);
         scrollbarBindListener = null;
     }
 
     // -----------------layoutにしか関係ないデータここまで--------------------
-
-    /**
-     * 方向の情報
-     * 
-     * @return
-     */
-    public final ObjectProperty<Orientation> orientationProperty() {
-        if (orientationProperty == null) {
-            orientationProperty = new SimpleObjectProperty<Orientation>(this, "orientation", Orientation.HORIZONTAL) {
-                @Override
-                public void set(final Orientation newValue) {
-                    if (newValue == null) {
-                        return;
-                    }
-                    super.set(newValue);
-                }
-            };
-            orientationProperty.addListener(getDataValidateListener());
-        }
-        return orientationProperty;
-    }
-
-    public final Orientation getOrientation() {
-        return orientationProperty == null ? Orientation.HORIZONTAL : orientationProperty.get();
-    }
-
-    public final void setOrientation(final Orientation value) {
-        orientationProperty().set(value);
-    }
-
     public final boolean isHorizontal() {
-        return getOrientation() == Orientation.HORIZONTAL;
+        return orientation.get() == Orientation.HORIZONTAL;
     }
 
     public final boolean isVertical() {
-        return getOrientation() == Orientation.VERTICAL;
+        return orientation.get() == Orientation.VERTICAL;
     }
-
-    private ObjectProperty<Orientation> orientationProperty;
-
-    /**
-     * Side
-     * 
-     * @return
-     */
-    public final ObjectProperty<Side> sideProperty() {
-        if (sideProperty == null) {
-            sideProperty = new SimpleObjectProperty<>(this, "side", getOrientation() != Orientation.VERTICAL ? Side.BOTTOM : Side.LEFT);
-        }
-        return sideProperty;
-    }
-
-    public final Side getSide() {
-        return sideProperty == null ? getOrientation() != Orientation.VERTICAL ? Side.BOTTOM : Side.LEFT : sideProperty.get();
-    }
-
-    public final void setSide(final Side value) {
-        sideProperty().set(value);
-    }
-
-    private ObjectProperty<Side> sideProperty;
-
-    /**
-     * データの最大値（表示されているとは限らない）
-     * 
-     * @return
-     */
-    public final DoubleProperty maxValueProperty() {
-        if (maxValueProperty == null) {
-            maxValueProperty = new SimpleDoubleProperty(this, "maxValue", 1);
-            maxValueProperty.addListener(getDataValidateListener());
-        }
-        return maxValueProperty;
-    }
-
-    public final double getMaxValue() {
-        return maxValueProperty == null ? 1 : maxValueProperty.get();
-    }
-
-    public final void setMaxValue(final double value) {
-        maxValueProperty().set(value);
-    }
-
-    private DoubleProperty maxValueProperty;
-
-    /**
-     * データの最小値の値（表示されているとは限らない）
-     * 
-     * @return
-     */
-    public final DoubleProperty minValueProperty() {
-        if (minValueProperty == null) {
-            minValueProperty = new SimpleDoubleProperty(this, "minValue", 0);
-            minValueProperty.addListener(getDataValidateListener());
-        }
-        return minValueProperty;
-    }
-
-    public final double getMinValue() {
-        return minValueProperty == null ? 0 : minValueProperty.get();
-    }
-
-    public final void setMinValue(final double value) {
-        minValueProperty().set(value);
-    }
-
-    private DoubleProperty minValueProperty;
-
-    /**
-     * 実際に表示されている範囲の最小値。 NaNの時はminValueに同じ
-     * 
-     * @return
-     */
-    public final DoubleProperty lowerValueProperty() {
-        if (lowerValueProperty == null) {
-            lowerValueProperty = new SimpleDoubleProperty(this, "lowerValue", Double.NaN);
-            lowerValueProperty.addListener(getDataValidateListener());
-        }
-        return lowerValueProperty;
-    }
-
-    public final double getLowerValue() {
-        return lowerValueProperty == null ? Double.NaN : lowerValueProperty.get();
-    }
-
-    /**
-     * @param value
-     * @return
-     */
-    public final Axis lowerValue(final double value) {
-        lowerValueProperty().set(value);
-
-        return this;
-    }
-
-    private DoubleProperty lowerValueProperty;
 
     /**
      * visibleAmountで設定する範囲が全て見えるような「最大の」最小値を設定する。<br>
@@ -588,7 +406,7 @@ public abstract class Axis extends Region {
                     super.set(newValue);
                 }
             };
-            visibleAmountProperty.addListener(getDataValidateListener());
+            visibleAmountProperty.addListener(dataValidateListener);
         }
         return visibleAmountProperty;
     }
@@ -605,16 +423,6 @@ public abstract class Axis extends Region {
 
     private DoubleProperty visibleAmountProperty;
 
-    public final double getUpperValue() {
-        return upperValueWrapper.get();
-    }
-
-    protected final void setUpperValue(final double value) {
-        upperValueWrapper.set(value);
-    }
-
-    private ReadOnlyDoubleWrapper upperValueWrapper = new ReadOnlyDoubleWrapper(this, "upperValue", 1);
-
     /**
      * lowerValueを実際に利用可能な数値に変換して返す
      * 
@@ -622,10 +430,10 @@ public abstract class Axis extends Region {
      * @return
      */
     protected final double computeLowerValue(double up) {
-        double d = getLowerValue();
-        final double m = getMinValue();
+        double d = visualMinValue.get();
+        final double m = logicalMinValue.get();
         if (up != up) {
-            up = getMaxValue();
+            up = logicalMaxValue.get();
         }
         if (d != d) {
             d = m;
@@ -648,21 +456,12 @@ public abstract class Axis extends Region {
      * @return
      */
     protected double calcLowValue(final double value, final double amount) {
-        final double max = getMaxValue();
-        final double min = getMinValue();
+        final double max = logicalMaxValue.get();
+        final double min = logicalMinValue.get();
         final double l = max - min;
         final double bar = l * amount;
         final double low = (l - bar) * value + min;
         return low;
-    }
-
-    /**
-     * Axisの構成情報を書き換えるべきデータに対して付加するリスナ
-     * 
-     * @return
-     */
-    protected final InvalidationListener getDataValidateListener() {
-        return dataValidateListener;
     }
 
     protected final boolean isDataValidate() {
@@ -675,8 +474,6 @@ public abstract class Axis extends Region {
 
     /** 状態の正当性を示すプロパティ */
     private boolean dataValidate = false;
-
-    protected final InvalidationListener dataValidateListener;
 
     // ----------------------------------------------------------------------
     // layout
@@ -748,9 +545,7 @@ public abstract class Axis extends Region {
             labels = FXCollections.observableArrayList();
             labels.addListener((ListChangeListener<AxisLabel>) c -> {
                 final ObservableList<Node> list = labelGroup.getChildren();
-                final DoubleProperty rp = tickLabelRotateProperty();
                 while (c.next()) {
-
                     for (final AxisLabel a1 : c.getRemoved()) {
                         list.remove(a1.getNode());
                         a1.setManaged(false);
@@ -759,7 +554,7 @@ public abstract class Axis extends Region {
                     for (final AxisLabel a2 : c.getAddedSubList()) {
                         list.add(a2.getNode());
                         a2.getNode().setVisible(false);
-                        a2.getNode().rotateProperty().bind(rp);
+                        a2.getNode().rotateProperty().bind(tickLabelRotate);
                     }
                 }
             });
@@ -814,23 +609,23 @@ public abstract class Axis extends Region {
             lineGroup.setAutoSizeChildren(false);
             nameLabel = new Label();
             nameLabel.getStyleClass().add("axis-label");
-            nameLabel.textProperty().bind(nameProperty);
+            nameLabel.textProperty().bind(name);
             labelGroup.setAutoSizeChildren(false);
             majorTickPath = new Path();
             minorTickPath = new Path();
             baseLine = new Line();
 
             scroll = new ScrollBar();
-            scroll.orientationProperty().bind(orientationProperty());
+            scroll.orientationProperty().bind(orientation);
             scroll.visibleProperty().bind(Bindings.createBooleanBinding(() -> scrollBarVisible
                     .get() && scrollBarValue.get() != -1 && scrollBarSize.get() != 1, scrollBarValue, scrollBarVisible, scrollBarSize));
-            scroll.visibleProperty().addListener(getLayoutValidateListener());
-            scroll.valueProperty().addListener(scrollValueListener);
+            scroll.visibleProperty().addListener(layoutValidator);
+            scroll.valueProperty().addListener(scrollValueValidator);
             scroll.setMin(0);
             scroll.setMax(1);
             scroll.visibleAmountProperty().bind(scrollBarSize);
             if (scrollBarValue.get() != -1 && scrollBarSize.get() != 1) {
-                scroll.setValue(getOrientation() != Orientation.VERTICAL ? scrollBarValue.get() : 1 - scrollBarValue.get());
+                scroll.setValue(orientation.get() != Orientation.VERTICAL ? scrollBarValue.get() : 1 - scrollBarValue.get());
             }
             majorTickPath.getStyleClass().setAll("axis-tick-mark");
             minorTickPath.getStyleClass().setAll("axis-minor-tick-mark");
@@ -854,7 +649,7 @@ public abstract class Axis extends Region {
         final double l = getAxisLength(width, height);
         final boolean isH = isHorizontal();
         int firstIndex = -1;// 重なりを検出する基準位置
-        Side s = getSide();
+        Side s = side.get();
         if (isH) {
             if (s.isVertical()) {
                 s = Side.BOTTOM;
@@ -950,7 +745,7 @@ public abstract class Axis extends Region {
         nameLabel.setVisible(n != null && !n.isEmpty());
         if (ish) {
             nameLabel.setRotate(0);
-            if (getSide() != Side.TOP) {// BOTTOM
+            if (side.get() != Side.TOP) {// BOTTOM
                 double y = 0;
                 if (scroll.isVisible()) {
                     y = scroll.prefHeight(-1);
@@ -958,7 +753,7 @@ public abstract class Axis extends Region {
                 }
                 lineGroup.setLayoutX(0);
                 lineGroup.setLayoutY(floor(y));
-                y += lineGroup.prefHeight(-1) + getTickLabelGap();
+                y += lineGroup.prefHeight(-1) + tickLabelDistance.get();
                 labelGroup.setLayoutX(0);
                 labelGroup.setLayoutY(floor(y));
                 if (nameLabel.isVisible()) {
@@ -977,7 +772,7 @@ public abstract class Axis extends Region {
                 }
                 lineGroup.setLayoutX(0);
                 lineGroup.setLayoutY(floor(y));
-                y -= lineGroup.prefHeight(-1) + getTickLabelGap();
+                y -= lineGroup.prefHeight(-1) + tickLabelDistance.get();
                 labelGroup.setLayoutX(0);
                 labelGroup.setLayoutY(floor(y));
                 if (nameLabel.isVisible()) {
@@ -989,7 +784,7 @@ public abstract class Axis extends Region {
                 }
             }
         } else {
-            if (getSide() != Side.RIGHT) {// LEFT
+            if (side.get() != Side.RIGHT) {// LEFT
                 nameLabel.setRotate(-90);
                 double x = width;
                 if (scroll.isVisible()) {
@@ -1000,7 +795,7 @@ public abstract class Axis extends Region {
 
                 lineGroup.setLayoutX(floor(x));
                 lineGroup.setLayoutY(0);
-                x -= getTickLabelGap() + lineGroup.prefWidth(-1);
+                x -= tickLabelDistance.get() + lineGroup.prefWidth(-1);
                 labelGroup.setLayoutX(floor(x));
                 labelGroup.setLayoutY(0);
                 if (nameLabel.isVisible()) {
@@ -1023,7 +818,7 @@ public abstract class Axis extends Region {
 
                 lineGroup.setLayoutX(floor(x));
                 lineGroup.setLayoutY(0);
-                x = getTickLabelGap() + lineGroup.prefWidth(-1);
+                x = tickLabelDistance.get() + lineGroup.prefWidth(-1);
                 labelGroup.setLayoutX(floor(x));
                 labelGroup.setLayoutY(0);
                 if (nameLabel.isVisible()) {
@@ -1041,7 +836,7 @@ public abstract class Axis extends Region {
     }
 
     private double linesPrefSize() {
-        return max(getMajorTickLength(), getMinorTickLength());
+        return max(majorTickLength.get(), minorTickLength.get());
     }
 
     private void layoutLines(final double width, final double height) {
@@ -1051,10 +846,10 @@ public abstract class Axis extends Region {
         baseLine.setEndX(ish ? l : 0);
         baseLine.setEndY(ish ? 0 : l);
 
-        final double al = getMajorTickLength();
-        final double il = getMinorTickLength();
-        final boolean isIV = il > 0 && isMinorTickVisible();
-        final Side s = getSide();
+        final double al = majorTickLength.get();
+        final double il = minorTickLength.get();
+        final boolean isIV = il > 0 && minorTickVisibility.get();
+        final Side s = side.get();
         final int k = ish ? s != Side.TOP ? 1 : -1 : s != Side.RIGHT ? -1 : 1;
 
         if (isIV) {
@@ -1133,22 +928,8 @@ public abstract class Axis extends Region {
     }
 
     /**
-     * レイアウトを構成すべき情報に対して付加すべきリスナ
-     * 
-     * @return
+     * {@inheritDoc}
      */
-    protected final InvalidationListener getLayoutValidateListener() {
-        if (layoutValidateListener == null) {
-            layoutValidateListener = observable -> {
-                if (isLayoutValidate()) {
-                    setLayoutValidate(false);
-                    requestLayout();
-                }
-            };
-        }
-        return layoutValidateListener;
-    }
-
     @Override
     public void requestLayout() {
         final Parent p = getParent();
@@ -1169,6 +950,4 @@ public abstract class Axis extends Region {
     /** 状態の正当性を示すプロパティ */
     private boolean layoutValidate = false;
 
-    /** 直接フィールドを利用せずに、 getValidateListener() を利用すること */
-    private InvalidationListener layoutValidateListener = null;
 }

@@ -231,7 +231,7 @@ public class LineChart extends Region {
             if (xAxis != null) {
                 final double xh = xAxis.prefHeight(ww);
                 xAxis.resize(ww, xh);
-                if (isBottom(xAxis.getSide())) {
+                if (isBottom(xAxis.side.get())) {
                     xAxis.relocate(bounds.getMinX(), bounds.getMaxY());
                 } else {
                     xAxis.relocate(bounds.getMinX(), bounds.getMinY() - xh);
@@ -240,7 +240,7 @@ public class LineChart extends Region {
             if (yAxis != null) {
                 final double yw = yAxis.prefWidth(hh);
                 yAxis.resize(yw, hh);
-                if (isLeft(yAxis.getSide())) {
+                if (isLeft(yAxis.side.get())) {
                     yAxis.relocate(bounds.getMinX() - yw, bounds.getMinY());
                 } else {
                     yAxis.relocate(bounds.getMaxX(), bounds.getMinY());
@@ -264,15 +264,15 @@ public class LineChart extends Region {
         } else {
             graph.setVisible(true);
             final Axis xAxis = getXAxis();
-            xAxis.setOrientation(Orientation.HORIZONTAL);
-            if (xAxis.getSide().isVertical()) {
-                xAxis.setSide(Side.BOTTOM);
+            xAxis.orientation.set(Orientation.HORIZONTAL);
+            if (xAxis.side.get().isVertical()) {
+                xAxis.side.set(Side.BOTTOM);
             }
 
             final Axis yAxis = getYAxis();
-            yAxis.setOrientation(Orientation.VERTICAL);
-            if (yAxis.getSide().isHorizontal()) {
-                yAxis.setSide(Side.LEFT);
+            yAxis.orientation.set(Orientation.VERTICAL);
+            if (yAxis.side.get().isHorizontal()) {
+                yAxis.side.set(Side.LEFT);
             }
             double graphWidth, graphHeight;
             double xAxisHeight, yAxisWidth;
@@ -326,8 +326,8 @@ public class LineChart extends Region {
             yAxis.resize(yAxisWidth, graphHeight);
             xAxis.layout();
             yAxis.layout();
-            final boolean isLeft = yAxis.getSide() != Side.RIGHT;
-            final boolean isBottom = xAxis.getSide() != Side.TOP;
+            final boolean isLeft = yAxis.side.get() != Side.RIGHT;
+            final boolean isBottom = xAxis.side.get() != Side.TOP;
             final double x = yAxis.isVisible() && isLeft ? yAxisWidth : 0, y = !xAxis.isVisible() || isBottom ? 0 : xAxisHeight;
             if (xAxis.isVisible()) {
                 if (isBottom) {
@@ -373,8 +373,8 @@ public class LineChart extends Region {
      * Set x-axis range.
      */
     private void setXAxisRange() {
-        getXAxis().setMaxValue(candles.get(candles.size() - 1).start.toInstant().toEpochMilli());
-        getXAxis().setMinValue(candles.get(0).start.toInstant().toEpochMilli());
+        getXAxis().logicalMaxValue.set(candles.get(candles.size() - 1).start.toInstant().toEpochMilli());
+        getXAxis().logicalMinValue.set(candles.get(0).start.toInstant().toEpochMilli());
     }
 
     /**
@@ -392,8 +392,8 @@ public class LineChart extends Region {
         max = max.plus(200);
         min = min.minus(200);
 
-        getYAxis().setMaxValue(max.toDouble());
-        getYAxis().setMinValue(min.toDouble());
+        getYAxis().logicalMaxValue.set(max.toDouble());
+        getYAxis().logicalMinValue.set(min.toDouble());
     }
 
     protected final boolean isDataValidate() {
@@ -475,13 +475,13 @@ public class LineChart extends Region {
     private ChangeListener<Axis> axisListener = (observable, oldValue, newValue) -> {
         if (oldValue != null) {
             getChildren().remove(oldValue);
-            oldValue.lowerValueProperty().removeListener(dataValidateListener);
+            oldValue.visualMinValue.removeListener(dataValidateListener);
             oldValue.visibleAmountProperty().removeListener(dataValidateListener);
         }
 
         if (newValue != null) {
             getChildren().add(newValue);
-            newValue.lowerValueProperty().addListener(dataValidateListener);
+            newValue.visualMinValue.addListener(dataValidateListener);
             newValue.visibleAmountProperty().addListener(dataValidateListener);
         } else {
             // If this exception will be thrown, it is bug of this program. So we must rethrow the
@@ -489,14 +489,14 @@ public class LineChart extends Region {
             throw new Error();
         }
         if (xAxisProperty == observable) {
-            newValue.setOrientation(Orientation.HORIZONTAL);
-            if (newValue.getSide().isVertical()) {
-                newValue.setSide(Side.BOTTOM);
+            newValue.orientation.set(Orientation.HORIZONTAL);
+            if (newValue.side.get().isVertical()) {
+                newValue.side.set(Side.BOTTOM);
             }
         } else {
-            newValue.setOrientation(Orientation.VERTICAL);
-            if (newValue.getSide().isHorizontal()) {
-                newValue.setSide(Side.LEFT);
+            newValue.orientation.set(Orientation.VERTICAL);
+            if (newValue.side.get().isHorizontal()) {
+                newValue.side.set(Side.LEFT);
             }
         }
     };

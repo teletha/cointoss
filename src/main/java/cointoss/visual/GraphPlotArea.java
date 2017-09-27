@@ -545,8 +545,8 @@ public class GraphPlotArea extends Region {
 
             Num min = Num.MAX;
             Axis xAxis = getXAxis();
-            long start = (long) xAxis.getLowerValue();
-            long end = (long) xAxis.getUpperValue();
+            long start = (long) xAxis.visualMinValue.get();
+            long end = (long) xAxis.visualMaxValue.get();
 
             for (int i = 0; i < sizeData; i++) {
                 Tick data = datas.get(i);
@@ -566,7 +566,7 @@ public class GraphPlotArea extends Region {
                 }
                 plotCandleChartData(data.start.toInstant().toEpochMilli(), data, candle);
             }
-            getYAxis().lowerValue(min.multiply("0.995").toDouble());
+            getYAxis().visualMinValue.set(min.multiply("0.995").toDouble());
         }
     }
 
@@ -596,15 +596,15 @@ public class GraphPlotArea extends Region {
         int start, end;
         if (orientation == Orientation.HORIZONTAL) {// x軸方向昇順
             Axis axis = getXAxis();
-            double low = axis.getLowerValue();
-            double up = axis.getUpperValue();
+            double low = axis.visualMinValue.get();
+            double up = axis.visualMaxValue.get();
             start = data.searchXIndex(low, false);
             end = data.searchXIndex(up, true);
 
         } else {
             Axis axis = getYAxis();
-            double low = axis.getLowerValue();
-            double up = axis.getUpperValue();
+            double low = axis.visualMinValue.get();
+            double up = axis.visualMaxValue.get();
             start = data.searchYIndex(low, false);
             end = data.searchYIndex(up, true);
         }
@@ -916,12 +916,12 @@ public class GraphPlotArea extends Region {
 
     private final ChangeListener<Axis> axisListener = (observable, oldValue, newValue) -> {
         if (oldValue != null) {
-            oldValue.lowerValueProperty().removeListener(plotValidateListener);
+            oldValue.visualMinValue.removeListener(plotValidateListener);
             oldValue.visibleAmountProperty().removeListener(plotValidateListener);
         }
 
         if (newValue != null) {
-            newValue.lowerValueProperty().addListener(plotValidateListener);
+            newValue.visualMinValue.addListener(plotValidateListener);
             newValue.visibleAmountProperty().addListener(plotValidateListener);
         }
         if (isPlotValidate()) {
