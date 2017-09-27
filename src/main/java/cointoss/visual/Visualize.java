@@ -69,10 +69,6 @@ public class Visualize extends Application {
         yaxis.visibleRange.set(Num.of(24000).divide(diff).toDouble());
         yaxis.scrollBarVisibility.set(false);
 
-        AxisZoomHandler zoom = new AxisZoomHandler();
-        zoom.install(axis);
-        zoom.install(yaxis);
-
         LineChartData weightMedian = new LineChartData(serise).name("Weight Median");
 
         LineChart line = new LineChart()//

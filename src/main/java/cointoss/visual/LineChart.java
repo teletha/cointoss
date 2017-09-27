@@ -72,6 +72,8 @@ public class LineChart extends Region {
 
     private boolean prelayout = false;
 
+    private final AxisZoomHandler zoom = new AxisZoomHandler();
+
     /**
      * 
      */
@@ -491,12 +493,14 @@ public class LineChart extends Region {
             getChildren().remove(oldValue);
             oldValue.visualMinValue.removeListener(dataValidateListener);
             oldValue.visibleRange.removeListener(dataValidateListener);
+            zoom.uninstall(oldValue);
         }
 
         if (newValue != null) {
             getChildren().add(newValue);
             newValue.visualMinValue.addListener(dataValidateListener);
             newValue.visibleRange.addListener(dataValidateListener);
+            zoom.install(newValue);
         } else {
             // If this exception will be thrown, it is bug of this program. So we must rethrow the
             // wrapped error in here.
