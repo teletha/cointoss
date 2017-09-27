@@ -12,8 +12,9 @@ package cointoss.visual;
 import static java.lang.Math.*;
 
 import java.util.ArrayList;
-import java.util.Objects;
 
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.scene.text.Text;
 
@@ -24,15 +25,7 @@ import org.eclipse.collections.api.block.function.primitive.DoubleToObjectFuncti
  */
 public class LinearAxis extends Axis {
 
-    private final DoubleToObjectFunction<String> labelFormatter;
-
-    /**
-     * 
-     */
-    public LinearAxis(String name, DoubleToObjectFunction<String> labelFormatter) {
-        this.labelFormatter = Objects.requireNonNull(labelFormatter);
-        this.nameLabel.setText(name);
-    }
+    public final ObjectProperty<DoubleToObjectFunction<String>> tickLabelFormatter = new SimpleObjectProperty<>(this, "tickLabelFormatter", String::valueOf);
 
     private double lowVal = 0;
 
@@ -219,7 +212,7 @@ public class LinearAxis extends Axis {
                 if (!find) {
                     AxisLabel a = new AxisLabel();
                     a.setID(value);
-                    a.setNode(new Text(labelFormatter.apply(value)));
+                    a.setNode(new Text(tickLabelFormatter.get().apply(value)));
                     labelList.add(a);
                 }
             }

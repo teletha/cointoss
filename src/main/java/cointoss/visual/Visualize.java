@@ -9,6 +9,9 @@
  */
 package cointoss.visual;
 
+import static cointoss.Execution.*;
+import static java.time.format.DateTimeFormatter.*;
+
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
@@ -55,12 +58,14 @@ public class Visualize extends Application {
         }
         Num diff = max.minus(min);
 
-        LinearAxis axis = new LinearAxis("日時", v -> {
-            return Instant.ofEpochMilli((long) v).atZone(Execution.UTC).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-        });
+        LinearAxis axis = new LinearAxis();
+        axis.nameLabel.setText("日時");
+        axis.tickLabelFormatter.set(v -> Instant.ofEpochMilli((long) v).atZone(UTC).format(ISO_LOCAL_DATE_TIME));
         axis.visibleRange.set(100D / serise.ticks.size());
 
-        LinearAxis yaxis = new LinearAxis("JPY", v -> Num.of(v).asJPY());
+        LinearAxis yaxis = new LinearAxis();
+        yaxis.nameLabel.setText("JPY");
+        yaxis.tickLabelFormatter.set(v -> Num.of(v).asJPY());
         yaxis.visibleRange.set(Num.of(24000).divide(diff).toDouble());
         yaxis.scrollBarVisibility.set(false);
 
