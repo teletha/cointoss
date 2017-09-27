@@ -133,27 +133,16 @@ public class GraphPlotArea extends Region {
     /** The line chart data list. */
     private ObservableList<CandleChartData> lineChartData;
 
-    /** The line chart data observer. */
-    private final InvalidationListener lineDataObserver = o -> {
-        ReadOnlyBooleanProperty b = (ReadOnlyBooleanProperty) o;
-        if (!b.get() && plotValidate) {
-            plotValidate = false;
-            setNeedsLayout(true);
-        }
-    };
-
     /** The line chart data list observer. */
     private final ListChangeListener<CandleChartData> lineDataListObserver = change -> {
         change.next();
         for (CandleChartData d : change.getRemoved()) {
             lineColorManager.clear(d.defaultColorIndex);
-            d.validateProperty().removeListener(lineDataObserver);
         }
         for (CandleChartData d : change.getAddedSubList()) {
             d.defaultColorIndex = lineColorManager.nextClearBit(0);
             lineColorManager.set(d.defaultColorIndex, true);
             d.defaultColor = "default-color" + (d.defaultColorIndex % 8);
-            d.validateProperty().addListener(lineDataObserver);
         }
     };
 
@@ -965,9 +954,6 @@ public class GraphPlotArea extends Region {
         // clear old list configuration
         if (lineChartData != null) {
             lineChartData.removeListener(lineDataListObserver);
-            for (CandleChartData data : lineChartData) {
-                data.validateProperty().removeListener(lineDataObserver);
-            }
             lineColorManager.clear();
         }
 
@@ -978,7 +964,6 @@ public class GraphPlotArea extends Region {
                 data.defaultColorIndex = lineColorManager.nextClearBit(0);
                 lineColorManager.set(data.defaultColorIndex, true);
                 data.defaultColor = "default-color" + (data.defaultColorIndex % 8);
-                data.validateProperty().addListener(lineDataObserver);
             }
         }
 

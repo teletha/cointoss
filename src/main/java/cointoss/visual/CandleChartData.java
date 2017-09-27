@@ -12,8 +12,6 @@ package cointoss.visual;
 import java.util.Objects;
 import java.util.function.ToDoubleFunction;
 
-import javafx.beans.property.ReadOnlyBooleanProperty;
-import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
@@ -26,7 +24,7 @@ import cointoss.util.RingBuffer;
  */
 public class CandleChartData {
 
-    public final StringProperty nameProperty = new SimpleStringProperty(this, "name", "");
+    public final StringProperty name = new SimpleStringProperty(this, "name", "");
 
     int defaultColorIndex;
 
@@ -39,11 +37,9 @@ public class CandleChartData {
      */
     public CandleChartData(Chart chart) {
         this.chart = Objects.requireNonNull(chart);
-        setValidate(false);
     }
 
     public int size() {
-        setValidate(true);
         return chart.ticks.size();
     }
 
@@ -51,7 +47,6 @@ public class CandleChartData {
         if (index < 0 || index >= chart.ticks.size()) {
             throw new ArrayIndexOutOfBoundsException(index);
         }
-        setValidate(true);
         return chart.getTick(index).start.toInstant().toEpochMilli();
     }
 
@@ -59,7 +54,6 @@ public class CandleChartData {
         if (index < 0 || index >= chart.ticks.size()) {
             throw new ArrayIndexOutOfBoundsException(index);
         }
-        setValidate(true);
         return chart.getTick(index).getWeightMedian().toDouble();
     }
 
@@ -74,7 +68,6 @@ public class CandleChartData {
      * @return
      */
     public int searchXIndex(final double value, final boolean minMode) {
-        setValidate(true);
         if (minMode) {
             return findMinIndex(chart.ticks, chart.ticks.size(), value, i -> i.start.toInstant().toEpochMilli());
         } else {
@@ -93,7 +86,6 @@ public class CandleChartData {
      * @return
      */
     public int searchYIndex(final double value, final boolean minMode) {
-        setValidate(true);
         if (minMode) {
             return findMinIndex(chart.ticks, chart.ticks.size(), value, t -> t.getWeightMedian().toDouble());
         } else {
@@ -178,42 +170,4 @@ public class CandleChartData {
         }
         return r;
     }
-
-    public String getName() {
-        return nameProperty == null ? "" : nameProperty.get();
-    }
-
-    /**
-     * Set plot name.
-     * 
-     * @param name
-     */
-    public CandleChartData name(String name) {
-        nameProperty.set(name);
-
-        return this;
-    }
-
-    /**
-     * データが正当かどうか。 get～や、clearなどを呼び出すとtrueになります。
-     * 
-     * @return
-     */
-    public ReadOnlyBooleanProperty validateProperty() {
-        return validateWrapper().getReadOnlyProperty();
-    }
-
-    protected void setValidate(final boolean value) {
-        validateWrapper().set(value);
-    }
-
-    protected ReadOnlyBooleanWrapper validateWrapper() {
-        if (validateWrapper == null) {
-            validateWrapper = new ReadOnlyBooleanWrapper(this, "validate", false);
-        }
-        return validateWrapper;
-    }
-
-    private ReadOnlyBooleanWrapper validateWrapper;
-
 }

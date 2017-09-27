@@ -355,11 +355,6 @@ public class GraphTracker {
             if (points != null) {
                 g.getForeGroundShapes().addAll(points);
             }
-
-            for (final CandleChartData d : g.getLineDataList()) {
-                d.validateProperty().addListener(invalidatelistener);
-            }
-
         }
 
         @Override
@@ -371,9 +366,6 @@ public class GraphTracker {
                 }
                 if (points != null && points.size() != 0) {
                     g.getForeGroundShapes().removeAll(points);
-                }
-                for (final CandleChartData d : g.getLineDataList()) {
-                    d.validateProperty().removeListener(invalidatelistener);
                 }
 
                 dispose();

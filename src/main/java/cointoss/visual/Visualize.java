@@ -57,7 +57,8 @@ public class Visualize extends Application {
         }
         Num diff = max.minus(min);
 
-        CandleChartData weightMedian = new CandleChartData(serise).name("Weight Median");
+        CandleChartData weightMedian = new CandleChartData(serise);
+        weightMedian.name.set("Weight Median");
 
         CandleChart line = new CandleChart()//
                 .graph(plot -> {

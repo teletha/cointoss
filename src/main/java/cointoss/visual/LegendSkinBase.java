@@ -44,13 +44,13 @@ public class LegendSkinBase extends TilePane implements Skin<Legend> {
             if (o != null) {
                 o.removeListener(listener);
                 for (final CandleChartData d : o) {
-                    d.nameProperty.removeListener(lcdListener);
+                    d.name.removeListener(lcdListener);
                 }
             }
             if (n != null) {
                 n.addListener(listener);
                 for (final CandleChartData d : n) {
-                    d.nameProperty.addListener(lcdListener);
+                    d.name.addListener(lcdListener);
                 }
             }
 
@@ -63,12 +63,12 @@ public class LegendSkinBase extends TilePane implements Skin<Legend> {
             while (c.next()) {
                 if (c.getRemovedSize() != 0) {
                     for (final CandleChartData d : c.getRemoved()) {
-                        d.nameProperty.removeListener(lcdListener);
+                        d.name.removeListener(lcdListener);
                     }
                 }
                 if (c.getAddedSize() != 0) {
                     for (final CandleChartData d : c.getAddedSubList()) {
-                        d.nameProperty.addListener(lcdListener);
+                        d.name.addListener(lcdListener);
                     }
                 }
             }
@@ -162,7 +162,7 @@ public class LegendSkinBase extends TilePane implements Skin<Legend> {
             icon.getStyleClass().addAll("series" + index, "chart-legend-item-symbol", "chart-line-symbol");
             l.setGraphic(icon);
         }
-        l.setText(data.nameProperty.get());
+        l.setText(data.name.get());
         final Node icon = l.getGraphic();
         final ObservableList<String> sc = icon.getStyleClass();
         final String series = "series" + index;
@@ -212,7 +212,7 @@ public class LegendSkinBase extends TilePane implements Skin<Legend> {
         if (l.getDataList() != null) {
             l.getDataList().removeListener(listener);
             for (final CandleChartData d : l.getDataList()) {
-                d.nameProperty.removeListener(lcdListener);
+                d.name.removeListener(lcdListener);
             }
         }
     }

@@ -22,7 +22,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.event.EventHandler;
@@ -84,19 +83,6 @@ public class CandleChart extends Region {
         // create plotting data collection
         lines = FXCollections.observableArrayList();
         lines.addListener(dataValidateListener);
-        lines.addListener((ListChangeListener<CandleChartData>) c -> {
-            InvalidationListener listener = getLineChartDataListener();
-
-            while (c.next()) {
-                c.getRemoved().stream().map(CandleChartData::validateProperty).forEach(p -> p.removeListener(listener));
-                c.getAddedSubList().stream().map(CandleChartData::validateProperty).forEach(p -> p.addListener(listener));
-
-                if (isDataValidate()) {
-                    setDataValidate(false);
-                    setNeedsLayout(true);
-                }
-            }
-        });
 
         candles = FXCollections.observableArrayList();
         candles.addListener(dataValidateListener);
