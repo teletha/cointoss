@@ -42,11 +42,10 @@ import org.eclipse.collections.api.list.primitive.DoubleList;
 import cointoss.chart.Tick;
 import cointoss.util.Num;
 import cointoss.visual.shape.Candle;
-import cointoss.visual.shape.GraphLine;
 import cointoss.visual.shape.GraphShape;
 
 /**
- * グラフを実際に描画するエリアです
+ * @version 2017/09/27 21:49:33
  */
 public class GraphPlotArea extends Region {
 
@@ -68,10 +67,13 @@ public class GraphPlotArea extends Region {
     /** The vertical axis. */
     final ObjectProperty<Axis> axisY = new SimpleObjectProperty<>(this, "axisY", null);
 
+    /** The validity flag of plotting. */
+    private boolean plotValidate = false;
+
     /** The validator. */
     private final InvalidationListener plotValidateListener = observable -> {
-        if (isPlotValidate()) {
-            setPlotValidate(false);
+        if (plotValidate) {
+            plotValidate = false;
             setGraphShapeValidate(false);
             setNeedsLayout(true);
         }
@@ -88,8 +90,8 @@ public class GraphPlotArea extends Region {
             newValue.visualMinValue.addListener(plotValidateListener);
             newValue.visibleRange.addListener(plotValidateListener);
         }
-        if (isPlotValidate()) {
-            setPlotValidate(false);
+        if (plotValidate) {
+            plotValidate = false;
             requestLayout();
         }
     };
@@ -134,8 +136,8 @@ public class GraphPlotArea extends Region {
     /** The line chart data observer. */
     private final InvalidationListener lineDataObserver = o -> {
         ReadOnlyBooleanProperty b = (ReadOnlyBooleanProperty) o;
-        if (!b.get() && isPlotValidate()) {
-            setPlotValidate(false);
+        if (!b.get() && plotValidate) {
+            plotValidate = false;
             setNeedsLayout(true);
         }
     };
@@ -199,7 +201,7 @@ public class GraphPlotArea extends Region {
 
     @Override
     protected void layoutChildren() {
-        if (isAutoPlot() && !isPlotValidate()) {
+        if (!plotValidate) {
             plotData();
         }
         if (!isGraphShapeValidate()) {
@@ -215,22 +217,22 @@ public class GraphPlotArea extends Region {
         final Axis yaxis = axisY.get();
 
         if (xaxis == null || yaxis == null) {
-            setPlotValidate(true);
+            plotValidate = true;
             setGraphShapeValidate(true);
             return;
         }
         drawGraphShapes();
 
-        if (!isPlotValidate()) {
+        if (!plotValidate) {
             drawBackGroundLine();
             plotLineChartDatas();
             plotCandleChartDatas();
-            setPlotValidate(true);
+            plotValidate = true;
         }
     }
 
     public void drawGraphShapes() {
-        if (isPlotValidate() && isGraphShapeValidate()) {
+        if (plotValidate && isGraphShapeValidate()) {
             return;
         }
         final Axis xaxis = axisX.get();
@@ -266,7 +268,7 @@ public class GraphPlotArea extends Region {
         final Axis yaxis = axisY.get();
 
         if (xaxis == null || yaxis == null) {
-            setPlotValidate(true);
+            plotValidate = true;
             return;
         }
 
@@ -911,9 +913,9 @@ public class GraphPlotArea extends Region {
                     }
                     gl.validateProperty().addListener(listener);
                 }
-                if (isPlotValidate()) {
+                if (plotValidate) {
                     setGraphShapeValidate(false);
-                    setPlotValidate(false);
+                    plotValidate = false;
                     setNeedsLayout(true);
                 }
             };
@@ -944,7 +946,7 @@ public class GraphPlotArea extends Region {
                     }
                     gl.validateProperty().addListener(listener);
                 }
-                if (isPlotValidate()) {
+                if (plotValidate) {
                     setGraphShapeValidate(false);
                     requestLayout();
                 }
@@ -983,8 +985,8 @@ public class GraphPlotArea extends Region {
         // update
         lineChartData = datalist;
 
-        if (isPlotValidate()) {
-            setPlotValidate(false);
+        if (plotValidate) {
+            plotValidate = false;
             setNeedsLayout(true);
         }
     }
@@ -1018,44 +1020,11 @@ public class GraphPlotArea extends Region {
         // update
         candleChartData = datalist;
 
-        if (isPlotValidate()) {
-            setPlotValidate(false);
+        if (plotValidate) {
+            plotValidate = false;
             setNeedsLayout(true);
         }
     }
-
-    /**
-     * layoutChildrenを実行時に自動的にグラフエリアの描画も行うかどうか。 falseにした場合は必要なときに自分でplotDataを呼び出す必要がある。 デフォルトはtrue
-     * 
-     * @return
-     */
-    public final BooleanProperty autoPlotProperty() {
-        if (autoPlotProperty == null) {
-            autoPlotProperty = new SimpleBooleanProperty(this, "autoPlot", true);
-        }
-        return autoPlotProperty;
-    }
-
-    public final boolean isAutoPlot() {
-        return autoPlotProperty == null ? true : autoPlotProperty.get();
-    }
-
-    public final void setAutoPlot(final boolean value) {
-        autoPlotProperty().set(value);
-    }
-
-    private BooleanProperty autoPlotProperty;
-
-    protected final boolean isPlotValidate() {
-        return plotValidate;
-    }
-
-    protected final void setPlotValidate(final boolean bool) {
-        plotValidate = bool;
-    }
-
-    /** 状態の正当性を示すプロパティ */
-    private boolean plotValidate = false;
 
     /**
      * x軸方向に連続なデータか、y軸方向に連続なデータかを指定するプロパティ
@@ -1078,44 +1047,6 @@ public class GraphPlotArea extends Region {
     }
 
     private ObjectProperty<Orientation> orientationProperty;
-
-    private GraphLine verticalZeroLine, horizontalZeroLine;
-
-    public final GraphLine getVerticalZeroLine() {
-        if (verticalZeroLine == null) {
-            verticalZeroLine = new GraphLine();
-            verticalZeroLine.setOrientation(Orientation.VERTICAL);
-            verticalZeroLine.getStyleClass().setAll("chart-vertical-zero-line");
-        }
-        return verticalZeroLine;
-    }
-
-    public final GraphLine getHorizontalZeroLine() {
-        if (horizontalZeroLine == null) {
-            horizontalZeroLine = new GraphLine();
-            horizontalZeroLine.setOrientation(Orientation.HORIZONTAL);
-            horizontalZeroLine.getStyleClass().setAll("chart-horizontal-zero-line");
-        }
-        return horizontalZeroLine;
-    }
-
-    public void showVerticalZeroLine() {
-        final ObservableList<GraphShape> backGroundLine = getBackGroundShapes();
-        final GraphLine l = getVerticalZeroLine();
-        l.setVisible(true);
-        if (!backGroundLine.contains(l)) {
-            backGroundLine.add(l);
-        }
-    }
-
-    public void showHorizontalZeroLine() {
-        final ObservableList<GraphShape> backGroundLine = getBackGroundShapes();
-        final GraphLine l = getHorizontalZeroLine();
-        l.setVisible(true);
-        if (!backGroundLine.contains(l)) {
-            backGroundLine.add(l);
-        }
-    }
 
     /**
      * Get data for line chart.

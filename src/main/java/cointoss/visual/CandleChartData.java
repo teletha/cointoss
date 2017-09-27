@@ -9,8 +9,6 @@
  */
 package cointoss.visual;
 
-import static java.lang.Math.*;
-
 import java.util.Objects;
 import java.util.function.ToDoubleFunction;
 
@@ -24,7 +22,7 @@ import cointoss.chart.Tick;
 import cointoss.util.RingBuffer;
 
 /**
- * @version 2017/09/26 1:03:28
+ * @version 2017/09/27 21:41:30
  */
 public class CandleChartData {
 

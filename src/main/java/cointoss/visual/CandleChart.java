@@ -107,8 +107,6 @@ public class CandleChart extends Region {
         graph.axisX.set(axisX);
         graph.axisY.set(axisY);
         graph.orientationProperty().bind(orientationProperty());
-        graph.showHorizontalZeroLine();
-        graph.showVerticalZeroLine();
         getChildren().addAll(graph, axisX, axisY);
     }
 
