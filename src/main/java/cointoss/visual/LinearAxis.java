@@ -98,13 +98,13 @@ public class LinearAxis extends Axis {
             final double max = getMaxValue();
             final double min = getMinValue();
             if (low == min && max == up) {
-                setScrollBarValue(-1);
-                setScrollVisibleAmount(1);
+                scrollBarValue.set(-1);
+                scrollBarSize.set(1);
             } else {
                 final double ll = max - min;
                 final double l = up - low;
-                setScrollBarValue((low - min) / (ll - l));
-                setScrollVisibleAmount(l / ll);
+                scrollBarValue.set((low - min) / (ll - l));
+                scrollBarSize.set(l / ll);
             }
         }
 

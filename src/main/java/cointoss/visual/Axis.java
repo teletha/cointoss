@@ -18,7 +18,6 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.Property;
-import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.property.ReadOnlyDoubleWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -50,9 +49,54 @@ import org.eclipse.collections.impl.factory.primitive.DoubleLists;
 
 public abstract class Axis extends Region {
 
+    private final InvalidationListener scrollValueListener = new InvalidationListener() {
+
+        private boolean doflag = true;
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void invalidated(final Observable observable) {
+            if (!nowLayout) {
+                if (scroll != null && observable == scroll.valueProperty()) {
+                    final double position = scroll.getValue();
+                    final double size = scrollBarSize.get();
+                    if (position == -1 || size == 1) {
+                        lowerValue(Double.NaN);
+                        visibleAmount(1);
+                    } else {
+                        final double p = isHorizontal() ? position : 1 - position;
+                        final double d = calcLowValue(p, size);
+                        lowerValue(d);
+                    }
+                } else if (scroll != null) {
+                    final double d = isHorizontal() ? scrollBarValue.get() : 1 - scrollBarValue.get();
+                    scroll.setValue(d);
+                }
+            } else if (doflag && scroll != null && observable != scroll.valueProperty()) {
+                doflag = false;
+                final double d = isHorizontal() ? scrollBarValue.get() : 1 - scrollBarValue.get();
+                scroll.setValue(d);
+                doflag = true;
+            }
+        }
+    };
+
     public final StringProperty nameProperty = new SimpleStringProperty(this, "name", null);
 
     public final BooleanProperty scrollBarVisible = new SimpleBooleanProperty(this, "scrollBarVisible", true);
+
+    /** スクロールバーのvisibleAmountを0～1で表現する。 */
+    public final ReadOnlyDoubleWrapper scrollBarSize = new ReadOnlyDoubleWrapper(this, "scrollBarSize", 1);
+
+    /** スクロールバーの表示位置のプロパティ。縦方向の場合、1からこの値を引いた値を利用する。 -1の時、非表示となる。 bindする際にはbindBidirectionalを用いること */
+    public final DoubleProperty scrollBarValue = new SimpleDoubleProperty(this, "scrollBarPosition", -1);
+
+    {
+        scrollBarSize.addListener(scrollValueListener);
+        scrollBarValue.addListener(scrollValueListener);
+    }
 
     protected final MutableDoubleList majors = DoubleLists.mutable.empty();
 
@@ -596,43 +640,6 @@ public abstract class Axis extends Region {
         }
     }
 
-    private InvalidationListener scrollValueListener;
-
-    private InvalidationListener getScrollValueListener() {
-        if (scrollValueListener == null) {
-            scrollValueListener = new InvalidationListener() {
-                private boolean doflag = true;
-
-                @Override
-                public void invalidated(final Observable observable) {
-                    if (!nowLayout) {
-                        if (scroll != null && observable == scroll.valueProperty()) {
-                            final double position = scroll.getValue();
-                            final double size = getScrollVisibleAmount();
-                            if (position == -1 || size == 1) {
-                                lowerValue(Double.NaN);
-                                visibleAmount(1);
-                            } else {
-                                final double p = isHorizontal() ? position : 1 - position;
-                                final double d = calcLowValue(p, size);
-                                lowerValue(d);
-                            }
-                        } else if (scroll != null) {
-                            final double d = isHorizontal() ? getScrollBarValue() : 1 - getScrollBarValue();
-                            scroll.setValue(d);
-                        }
-                    } else if (doflag && scroll != null && observable != scroll.valueProperty()) {
-                        doflag = false;
-                        final double d = isHorizontal() ? getScrollBarValue() : 1 - getScrollBarValue();
-                        scroll.setValue(d);
-                        doflag = true;
-                    }
-                }
-            };
-        }
-        return scrollValueListener;
-    }
-
     /**
      * スクロールバーが変更されたときに呼び出されるメソッド。 表示の最小値を計算する。
      * 
@@ -648,59 +655,6 @@ public abstract class Axis extends Region {
         final double low = (l - bar) * value + min;
         return low;
     }
-
-    /**
-     * スクロールバーの表示位置のプロパティ。縦方向の場合、1からこの値を引いた値を利用する。 -1の時、非表示となる。 bindする際にはbindBidirectionalを用いること
-     * 
-     * @return
-     */
-    protected final DoubleProperty scrollBarValueProperty() {
-        if (scrollBarValueProperty == null) {
-            scrollBarValueProperty = new SimpleDoubleProperty(this, "scrollBarPosition", -1);
-            scrollBarValueProperty.addListener(getScrollValueListener());
-        }
-        return scrollBarValueProperty;
-    }
-
-    public final double getScrollBarValue() {
-        if (scrollBarValueProperty == null) {
-            return -1;
-        }
-        return scrollBarValueProperty.get();
-    }
-
-    protected final void setScrollBarValue(final double value) {
-        scrollBarValueProperty().set(value);
-    }
-
-    private DoubleProperty scrollBarValueProperty;
-
-    /**
-     * スクロールバーのvisibleAmountを0～1で表現する。 この値は
-     * 
-     * @return
-     */
-    public final ReadOnlyDoubleProperty scrollVisibleAmountProperty() {
-        return scrollVisibleAmountWrapper().getReadOnlyProperty();
-    }
-
-    public final double getScrollVisibleAmount() {
-        return scrollBarSizeWrapper == null ? 1 : scrollBarSizeWrapper.get();
-    }
-
-    protected final void setScrollVisibleAmount(final double value) {
-        scrollVisibleAmountWrapper().set(value);
-    }
-
-    protected final ReadOnlyDoubleWrapper scrollVisibleAmountWrapper() {
-        if (scrollBarSizeWrapper == null) {
-            scrollBarSizeWrapper = new ReadOnlyDoubleWrapper(this, "scrollBarSize", 1);
-            scrollBarSizeWrapper.addListener(getScrollValueListener());
-        }
-        return scrollBarSizeWrapper;
-    }
-
-    private ReadOnlyDoubleWrapper scrollBarSizeWrapper;
 
     /**
      * Axisの構成情報を書き換えるべきデータに対して付加するリスナ
@@ -869,14 +823,14 @@ public abstract class Axis extends Region {
             scroll = new ScrollBar();
             scroll.orientationProperty().bind(orientationProperty());
             scroll.visibleProperty().bind(Bindings.createBooleanBinding(() -> scrollBarVisible
-                    .get() && getScrollBarValue() != -1 && getScrollVisibleAmount() != 1, scrollBarValueProperty(), scrollBarVisible, scrollVisibleAmountWrapper()));
+                    .get() && scrollBarValue.get() != -1 && scrollBarSize.get() != 1, scrollBarValue, scrollBarVisible, scrollBarSize));
             scroll.visibleProperty().addListener(getLayoutValidateListener());
-            scroll.valueProperty().addListener(getScrollValueListener());
+            scroll.valueProperty().addListener(scrollValueListener);
             scroll.setMin(0);
             scroll.setMax(1);
-            scroll.visibleAmountProperty().bind(scrollVisibleAmountProperty());
-            if (getScrollBarValue() != -1 && getScrollVisibleAmount() != 1) {
-                scroll.setValue(getOrientation() != Orientation.VERTICAL ? getScrollBarValue() : 1 - getScrollBarValue());
+            scroll.visibleAmountProperty().bind(scrollBarSize);
+            if (scrollBarValue.get() != -1 && scrollBarSize.get() != 1) {
+                scroll.setValue(getOrientation() != Orientation.VERTICAL ? scrollBarValue.get() : 1 - scrollBarValue.get());
             }
             majorTickPath.getStyleClass().setAll("axis-tick-mark");
             minorTickPath.getStyleClass().setAll("axis-minor-tick-mark");
