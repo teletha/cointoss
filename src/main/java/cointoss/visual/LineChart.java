@@ -476,13 +476,13 @@ public class LineChart extends Region {
         if (oldValue != null) {
             getChildren().remove(oldValue);
             oldValue.visualMinValue.removeListener(dataValidateListener);
-            oldValue.visibleAmountProperty().removeListener(dataValidateListener);
+            oldValue.visibleRange.removeListener(dataValidateListener);
         }
 
         if (newValue != null) {
             getChildren().add(newValue);
             newValue.visualMinValue.addListener(dataValidateListener);
-            newValue.visibleAmountProperty().addListener(dataValidateListener);
+            newValue.visibleRange.addListener(dataValidateListener);
         } else {
             // If this exception will be thrown, it is bug of this program. So we must rethrow the
             // wrapped error in here.

@@ -145,10 +145,10 @@ public class AxisZoomHandler implements EventHandler<ScrollEvent> {
             event.consume();
             return;
         }
-        final double amount = a.getVisibleAmount();
+        final double amount = a.visibleRange.get();
         final double inva = min(1 / amount + d, getMaxZoom());
         final double newamount = max(min(1 / inva, 1), 0);
-        a.visibleAmount(newamount);
+        a.visibleRange.set(newamount);
         if (amount < newamount) {
             a.adjustLowerValue();
         }

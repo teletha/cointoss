@@ -17,7 +17,6 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.Property;
 import javafx.beans.property.ReadOnlyDoubleWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -113,7 +112,7 @@ public abstract class Axis extends Region {
                     final double size = scrollBarSize.get();
                     if (position == -1 || size == 1) {
                         visualMinValue.set(Double.NaN);
-                        visibleAmount(1);
+                        visibleRange.set(1);
                     } else {
                         final double p = isHorizontal() ? position : 1 - position;
                         final double d = calcLowValue(p, size);
@@ -167,6 +166,22 @@ public abstract class Axis extends Region {
     /** The visual minimum value. */
     public final DoubleProperty visualMinValue = new SimpleDoubleProperty(this, "visualMinValue", Double.NaN);
 
+    /** The visible range (between 0 and 1) of scrollable area. "1" will hide scroll bar. */
+    public final DoubleProperty visibleRange = new SimpleDoubleProperty(this, "visibleAmount", 1) {
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void set(double newValue) {
+            if (newValue > 1) {
+                newValue = 1;
+            } else if (newValue <= 0) {
+                return;
+            }
+            super.set(newValue);
+        }
+    };
+
     protected final MutableDoubleList majors = DoubleLists.mutable.empty();
 
     protected final MutableBooleanList majorsFill = BooleanLists.mutable.empty();
@@ -183,6 +198,7 @@ public abstract class Axis extends Region {
         logicalMaxValue.addListener(dataValidateListener);
         logicalMinValue.addListener(dataValidateListener);
         visualMinValue.addListener(dataValidateListener);
+        visibleRange.addListener(dataValidateListener);
         scrollBarSize.addListener(scrollValueValidator);
         scrollBarValue.addListener(scrollValueValidator);
         majorTickLength.addListener(layoutValidator);
@@ -192,6 +208,27 @@ public abstract class Axis extends Region {
         tickLabelRotate.addListener(layoutValidator);
     }
 
+    public abstract double getDisplayPosition(double v);
+
+    public abstract double getValueForDisplay(double position);
+
+    /**
+     * visibleAmountで設定する範囲が全て見えるような「最大の」最小値を設定する。<br>
+     * visibleAmountが全て見えている場合には処理を行わない。
+     */
+    public abstract void adjustLowerValue();
+
+    /**
+     * Axisの描画に必要なプロパティを計算するメソッド width,heightのどちらかは-1である場合がある。
+     * 
+     * @param width 描画横幅
+     * @param height 描画高さ
+     */
+    protected abstract void computeAxisProperties(double width, double height);
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected final void layoutChildren() {
         if ((isHorizontal() && getWidth() == -1) || (isVertical() && getHeight() == -1)) {
@@ -246,133 +283,10 @@ public abstract class Axis extends Region {
         return isHorizontal() ? width : height;
     }
 
-    public abstract double getDisplayPosition(double v);
-
-    public abstract double getValueForDisplay(double position);
-
     public double getZeroPosition() {
         return getDisplayPosition(0);
     }
 
-    // ----------------------------------------------------------------------
-    // data
-    // ----------------------------------------------------------------------
-    /**
-     * Axisの描画に必要なプロパティを計算するメソッド width,heightのどちらかは-1である場合がある。
-     * 
-     * @param width 描画横幅
-     * @param height 描画高さ
-     */
-    protected abstract void computeAxisProperties(double width, double height);
-
-    // -----------------layoutにしか関係ないデータ---------------------------
-
-    public final String getName() {
-        return name == null ? null : name.get();
-    }
-
-    private static void unbind(final Property<?> p) {
-        if (p.isBound()) {
-            p.unbind();
-        }
-    }
-
-    private InvalidationListener scrollbarBindListener = null;
-
-    private Axis scrollbarBindTarget = null;
-
-    /**
-     * スクロールバーに関連するプロパティをbindします。<br>
-     * その際、プロパティのbindメソッドは利用しません。
-     * 
-     * @param a bind対象。nullの場合はunbindだけする。
-     */
-    public void bindBidicalScrollProperties(final Axis a) {
-        if (a == null) {
-            return;
-        }
-        unbindBidicalScrollPropertyies();
-        a.unbindBidicalScrollPropertyies();
-        final InvalidationListener listener = new InvalidationListener() {
-            private boolean
-            // b1=true,
-            b2 = true, b3 = true;
-
-            @Override
-            public void invalidated(final Observable observable) {
-                final Property<?> p = (Property<?>) observable;
-                switch (p.getName()) {
-                // case "scrollBarVisible":
-                // if(b1){
-                // b1 = false;
-                // if(p.getBean() == Axis.this){
-                // a.setScrollBarVisible(isScrollBarVisible());
-                // }else{
-                // setScrollBarVisible(a.isScrollBarVisible());
-                // }
-                // b1 = true;
-                // }
-                // break;
-                case "visibleAmount":
-                    if (b2) {
-                        b2 = false;
-                        if (p.getBean() == Axis.this) {
-                            a.visibleAmount(getVisibleAmount());
-                        } else {
-                            visibleAmount(a.getVisibleAmount());
-                        }
-                        b2 = true;
-                    }
-
-                    break;
-                case "lowerValue":
-                    if (b3) {
-                        b3 = false;
-                        if (p.getBean() == Axis.this) {
-                            a.visualMinValue.set(visualMinValue.get());
-                        } else {
-                            visualMinValue.set(a.visualMinValue.get());
-                        }
-                        b3 = true;
-                    }
-                    break;
-                }
-            }
-        };
-        // scrollBarVisibleProperty().addListener(listener);
-        // a.scrollBarVisibleProperty().addListener(listener);
-        visibleAmountProperty().addListener(listener);
-        a.visibleAmountProperty().addListener(listener);
-        visualMinValue.addListener(listener);
-        a.visualMinValue.addListener(listener);
-        scrollbarBindListener = listener;
-        a.scrollbarBindListener = listener;
-        scrollbarBindTarget = a;
-        a.scrollbarBindTarget = this;
-    }
-
-    public void unbindBidicalScrollPropertyies() {
-        // unbind(scrollBarVisibleProperty());
-        unbind(visibleAmountProperty());
-        unbind(visualMinValue);
-        if (scrollbarBindListener != null) {
-            _unbindScrollProp();
-            if (scrollbarBindTarget != null) {
-                scrollbarBindTarget._unbindScrollProp();
-                scrollbarBindTarget.scrollbarBindTarget = null;
-            }
-            scrollbarBindTarget = null;
-        }
-    }
-
-    private void _unbindScrollProp() {
-        // scrollBarVisibleProperty().removeListener(scrollbarBindListener);
-        visibleAmountProperty().removeListener(scrollbarBindListener);
-        visualMinValue.removeListener(scrollbarBindListener);
-        scrollbarBindListener = null;
-    }
-
-    // -----------------layoutにしか関係ないデータここまで--------------------
     public final boolean isHorizontal() {
         return orientation.get() == Orientation.HORIZONTAL;
     }
@@ -380,48 +294,6 @@ public abstract class Axis extends Region {
     public final boolean isVertical() {
         return orientation.get() == Orientation.VERTICAL;
     }
-
-    /**
-     * visibleAmountで設定する範囲が全て見えるような「最大の」最小値を設定する。<br>
-     * visibleAmountが全て見えている場合には処理を行わない。
-     */
-    public abstract void adjustLowerValue();
-
-    /**
-     * 表示範囲を0より大、1以下で指定する。 1の時、全ての範囲が表示され、スクロールバーは非表示になる
-     * 必ずしも、ここで設定した値とscrollVisibleAmountが一致するとは限らない。
-     * 
-     * @return
-     */
-    public final DoubleProperty visibleAmountProperty() {
-        if (visibleAmountProperty == null) {
-            visibleAmountProperty = new SimpleDoubleProperty(this, "visibleAmount", 1) {
-                @Override
-                public void set(double newValue) {
-                    if (newValue > 1) {
-                        newValue = 1;
-                    } else if (newValue <= 0) {
-                        return;
-                    }
-                    super.set(newValue);
-                }
-            };
-            visibleAmountProperty.addListener(dataValidateListener);
-        }
-        return visibleAmountProperty;
-    }
-
-    public final double getVisibleAmount() {
-        return visibleAmountProperty == null ? 1 : visibleAmountProperty.get();
-    }
-
-    public final Axis visibleAmount(final double value) {
-        visibleAmountProperty().set(value);
-
-        return this;
-    }
-
-    private DoubleProperty visibleAmountProperty;
 
     /**
      * lowerValueを実際に利用可能な数値に変換して返す
@@ -741,7 +613,7 @@ public abstract class Axis extends Region {
 
     private void layoutGroups(final double width, final double height) {
         final boolean ish = isHorizontal();
-        final String n = getName();
+        final String n = name.get();
         nameLabel.setVisible(n != null && !n.isEmpty());
         if (ish) {
             nameLabel.setRotate(0);

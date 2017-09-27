@@ -58,10 +58,10 @@ public class Visualize extends Application {
         LinearAxis axis = new LinearAxis("日時", v -> {
             return Instant.ofEpochMilli((long) v).atZone(Execution.UTC).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
         });
-        axis.visibleAmount(100D / serise.ticks.size());
+        axis.visibleRange.set(100D / serise.ticks.size());
 
         LinearAxis yaxis = new LinearAxis("JPY", v -> Num.of(v).asJPY());
-        yaxis.visibleAmount(Num.of(24000).divide(diff).toDouble());
+        yaxis.visibleRange.set(Num.of(24000).divide(diff).toDouble());
 
         AxisZoomHandler zoom = new AxisZoomHandler();
         zoom.install(axis);

@@ -59,7 +59,7 @@ public class LinearAxis extends Axis {
     @Override
     public void adjustLowerValue() {
         final double max = logicalMaxValue.get();
-        final double a = getVisibleAmount();
+        final double a = visibleRange.get();
         final double min = logicalMinValue.get();
         final double ll = max - min;
         double low = computeLowerValue(max);
@@ -72,7 +72,7 @@ public class LinearAxis extends Axis {
 
     private double computeUpperValue(final double low) {
         final double max = logicalMaxValue.get();
-        final double a = getVisibleAmount();
+        final double a = visibleRange.get();
         final double min = logicalMinValue.get();
         final double ll = max - min;
         return min(low + ll * a, max);
