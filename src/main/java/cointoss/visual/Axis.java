@@ -593,25 +593,12 @@ public abstract class Axis extends Region {
 
     private DoubleProperty visibleAmountProperty;
 
-    /**
-     * 実際に表示されている最大値
-     * 
-     * @return
-     */
-    public final ReadOnlyDoubleProperty upperValueProperty() {
-        return upperValueWrapper.getReadOnlyProperty();
-    }
-
     public final double getUpperValue() {
         return upperValueWrapper.get();
     }
 
     protected final void setUpperValue(final double value) {
         upperValueWrapper.set(value);
-    }
-
-    protected final ReadOnlyDoubleWrapper upperValueWrapper() {
-        return upperValueWrapper;
     }
 
     private ReadOnlyDoubleWrapper upperValueWrapper = new ReadOnlyDoubleWrapper(this, "upperValue", 1);

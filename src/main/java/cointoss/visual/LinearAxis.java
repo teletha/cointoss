@@ -17,17 +17,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.ObservableList;
 import javafx.scene.text.Text;
 
 import org.eclipse.collections.api.block.function.primitive.DoubleToObjectFunction;
 
 /**
- * @version 2017/09/26 1:03:05
+ * @version 2017/09/27 9:11:27
  */
 public class LinearAxis extends Axis {
 
@@ -136,8 +132,8 @@ public class LinearAxis extends Axis {
         }
 
         // 適当な単位を見つける
-        final int mtn = getPrefferedMajorTickNumber();
-        final double minu = getMinUnitLength();
+        final int mtn = 10; // getPrefferedMajorTickNumber();
+        final double minu = 20;// getMinUnitLength();
         double pUnitLength = len / mtn;
         if (minu > 0 && pUnitLength < minu) {
             pUnitLength = minu;
@@ -198,12 +194,12 @@ public class LinearAxis extends Axis {
         this.m = m;
 
         double minorLength;
-        int mcount = getPrefferedMinorCount();
+        int mcount = 10; // getPrefferedMinorCount();
         if (!isMinorTickVisible() || mcount <= 1) {
             minorLength = -1;
         } else {
             minorLength = majorLength / mcount;
-            final double mins = getMinorUnitMinLength();
+            final double mins = 4; // minor unit min length
             if (mins > 0 && mins >= majorLength) {
                 minorLength = -1;
             } else if (mins > 0 && minorLength < mins) {
@@ -301,96 +297,6 @@ public class LinearAxis extends Axis {
     // ----------------------------------------------------------------------
     // data
     // ----------------------------------------------------------------------
-
-    /**
-     * major tickが画面に表示される理想個数
-     * 
-     * @return
-     */
-    public IntegerProperty prefferedMajorTickNumberProperty() {
-        if (prefferedMajorTickNumberProperty == null) {
-            prefferedMajorTickNumberProperty = new SimpleIntegerProperty(this, "prefferedMajorTickNumber", 10);
-            prefferedMajorTickNumberProperty.addListener(getDataValidateListener());
-        }
-        return prefferedMajorTickNumberProperty;
-    }
-
-    public int getPrefferedMajorTickNumber() {
-        return prefferedMajorTickNumberProperty == null ? 10 : prefferedMajorTickNumberProperty.get();
-    }
-
-    public void setPrefferedMajorTickNumber(final int value) {
-        prefferedMajorTickNumberProperty().set(value);
-    }
-
-    private IntegerProperty prefferedMajorTickNumberProperty;
-
-    /**
-     * major tick間の画面距離（ピクセルの事）の最小値の理想。
-     * 
-     * @return
-     */
-    public DoubleProperty minUnitLengthProperty() {
-        if (minUnitLengthProperty == null) {
-            minUnitLengthProperty = new SimpleDoubleProperty(this, "minUnitLength", 20);
-            minUnitLengthProperty.addListener(getDataValidateListener());
-        }
-        return minUnitLengthProperty;
-    }
-
-    public double getMinUnitLength() {
-        return minUnitLengthProperty == null ? 20 : minUnitLengthProperty.get();
-    }
-
-    public void setMinUnitLength(final double value) {
-        minUnitLengthProperty().set(value);
-    }
-
-    private DoubleProperty minUnitLengthProperty;
-
-    /**
-     * major tick間を何分割するか。表示されるMinor tickはこの数より1少ない。 これより大きくなることはない。
-     * 
-     * @return
-     */
-    public IntegerProperty prefferedMinorCountProperty() {
-        if (prefferedMinorCountProperty == null) {
-            prefferedMinorCountProperty = new SimpleIntegerProperty(this, "prefferedMinorCount", 10);
-        }
-        return prefferedMinorCountProperty;
-    }
-
-    public int getPrefferedMinorCount() {
-        return prefferedMinorCountProperty == null ? 10 : prefferedMinorCountProperty.get();
-    }
-
-    public void setPrefferedMinorCount(final int value) {
-        prefferedMinorCountProperty().set(value);
-    }
-
-    private IntegerProperty prefferedMinorCountProperty;
-
-    /**
-     * minor tick間の最小画面距離
-     * 
-     * @return
-     */
-    public DoubleProperty minorUnitMinLengthProperty() {
-        if (minorUnitMinLengthProperty == null) {
-            minorUnitMinLengthProperty = new SimpleDoubleProperty(this, "minorUnitMinLength", 4);
-        }
-        return minorUnitMinLengthProperty;
-    }
-
-    public double getMinorUnitMinLength() {
-        return minorUnitMinLengthProperty == null ? 4 : minorUnitMinLengthProperty.get();
-    }
-
-    public void setMinorUnitMinLength(final double value) {
-        minorUnitMinLengthProperty().set(value);
-    }
-
-    private DoubleProperty minorUnitMinLengthProperty;
 
     /**
      * We use these for auto ranging to pick a user friendly tick unit. We handle tick units in the
