@@ -10,11 +10,8 @@
 package cointoss.visual;
 
 import static java.lang.Math.*;
-import static java.lang.Math.min;
-import static java.util.Collections.*;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 import javafx.collections.ObservableList;
@@ -59,26 +56,6 @@ public class LinearAxis extends Axis {
 
     private double lastPUnitSize = Double.NaN;
 
-    private List<Double> majours = new ArrayList<>(10), majoursU = unmodifiableList(majours), minors = new ArrayList<>(100),
-            minorsU = unmodifiableList(minors);
-
-    private List<Boolean> majoursFill = new ArrayList<>(10), majoursFillU = unmodifiableList(majoursFill);
-
-    @Override
-    public List<Double> getMajorTicks() {
-        return majoursU;
-    }
-
-    @Override
-    public List<Double> getMinorTicks() {
-        return minorsU;
-    }
-
-    @Override
-    public List<Boolean> getMajorTicksFill() {
-        return majoursFillU;
-    }
-
     @Override
     public void adjustLowerValue() {
         final double max = getMaxValue();
@@ -103,9 +80,9 @@ public class LinearAxis extends Axis {
 
     @Override
     protected void computeAxisProperties(final double width, final double height) {
-        majours.clear();
+        majors.clear();
         minors.clear();
-        majoursFill.clear();
+        majorsFill.clear();
 
         final double low = computeLowerValue(getMaxValue());
         final double up = computeUpperValue(low);
@@ -227,8 +204,8 @@ public class LinearAxis extends Axis {
             }
             double majorpos = m * (value - low);
             if (value >= low) {
-                majours.add(floor(isH ? majorpos : height - majorpos));
-                majoursFill.add(fill);
+                majors.add(floor(isH ? majorpos : height - majorpos));
+                majorsFill.add(fill);
                 boolean find = false;
                 for (int t = 0, lsize = notUse.size(); t < lsize; t++) {
                     AxisLabel a = notUse.get(t);
@@ -278,10 +255,10 @@ public class LinearAxis extends Axis {
         setUpperValue(1);
         final double len = getAxisLength(width, height);
         m = len;
-        majours.add(0d);
-        majours.add(getAxisLength(width, height));
-        majoursFill.add(true);
-        majoursFill.add(false);
+        majors.add(0d);
+        majors.add(getAxisLength(width, height));
+        majorsFill.add(true);
+        majorsFill.add(false);
         final ObservableList<AxisLabel> labels = getLabels();
         labels.clear();
         AxisLabel l = new AxisLabel();

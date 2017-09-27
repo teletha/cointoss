@@ -11,8 +11,6 @@ package cointoss.visual;
 
 import static java.lang.Math.*;
 
-import java.util.List;
-
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
@@ -45,9 +43,20 @@ import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.PathElement;
 
+import org.eclipse.collections.api.list.primitive.MutableBooleanList;
+import org.eclipse.collections.api.list.primitive.MutableDoubleList;
+import org.eclipse.collections.impl.factory.primitive.BooleanLists;
+import org.eclipse.collections.impl.factory.primitive.DoubleLists;
+
 public abstract class Axis extends Region {
 
     public final StringProperty nameProperty = new SimpleStringProperty(this, "name", null);
+
+    protected final MutableDoubleList majors = DoubleLists.mutable.empty();
+
+    protected final MutableBooleanList majorsFill = BooleanLists.mutable.empty();
+
+    protected final MutableDoubleList minors = DoubleLists.mutable.empty();
 
     /**
      * NAxisの状態の変化を受け取る必要がある親を定義するインターフェース
@@ -928,7 +937,6 @@ public abstract class Axis extends Region {
             return;
         }
         final ObservableList<AxisLabel> labels = this.labels;
-        final List<Double> majorTicks = getMajorTicks();
         final double lastL = getAxisLength(lastLayoutWidth, lastLayoutHeight);
         final double l = getAxisLength(width, height);
         final boolean isH = isHorizontal();
@@ -944,9 +952,9 @@ public abstract class Axis extends Region {
             }
         }
 
-        for (int i = 0, e = majorTicks.size(); i < e; i++) {
+        for (int i = 0, e = majors.size(); i < e; i++) {
             final AxisLabel a = labels.get(i);
-            final double d = majorTicks.get(i);
+            final double d = majors.get(i);
             if (firstIndex == -1 && a.isManaged() && a.isBeforeVisible()) {
                 firstIndex = i;
             }
@@ -1137,16 +1145,15 @@ public abstract class Axis extends Region {
         final int k = ish ? s != Side.TOP ? 1 : -1 : s != Side.RIGHT ? -1 : 1;
 
         if (isIV) {
-            final List<Double> list = getMinorTicks();
             final ObservableList<PathElement> elements = minorTickPath.getElements();
-            if (elements.size() > list.size() * 2) {
-                elements.remove(list.size() * 2, elements.size());
+            if (elements.size() > minors.size() * 2) {
+                elements.remove(minors.size() * 2, elements.size());
             }
 
             final int eles = elements.size();
-            final int ls = list.size();
+            final int ls = minors.size();
             for (int i = 0; i < ls; i++) {
-                final double d = list.get(i);
+                final double d = minors.get(i);
                 MoveTo mt;
                 LineTo lt;
                 if (i * 2 < eles) {
@@ -1176,16 +1183,15 @@ public abstract class Axis extends Region {
             minorTickPath.setVisible(false);
         }
 
-        final List<Double> list = getMajorTicks();
         final ObservableList<PathElement> elements = majorTickPath.getElements();
-        if (elements.size() > list.size() * 2) {
-            elements.remove(list.size() * 2, elements.size());
+        if (elements.size() > majors.size() * 2) {
+            elements.remove(majors.size() * 2, elements.size());
         }
 
         final int eles = elements.size();
-        final int ls = list.size();
+        final int ls = majors.size();
         for (int i = 0; i < ls; i++) {
-            final double d = list.get(i);
+            final double d = majors.get(i);
             MoveTo mt;
             LineTo lt;
             if (i * 2 < eles) {
@@ -1212,27 +1218,6 @@ public abstract class Axis extends Region {
             lt.setY(y2);
         }
     }
-
-    /**
-     * major tickを表示する座標を返します
-     * 
-     * @return unmodifiable list
-     */
-    public abstract List<Double> getMajorTicks();
-
-    /**
-     * minor tickを表示する座標を返します
-     * 
-     * @return unmodifiable list
-     */
-    public abstract List<Double> getMinorTicks();
-
-    /**
-     * major tickから次のmajor tickまでの間をFillするかどうか。 getMajorTicksのsizeと同じ長さのリストであること。
-     * 
-     * @return
-     */
-    public abstract List<Boolean> getMajorTicksFill();
 
     /**
      * レイアウトを構成すべき情報に対して付加すべきリスナ

@@ -34,6 +34,9 @@ import javafx.scene.shape.PathElement;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.StrokeLineJoin;
 
+import org.eclipse.collections.api.list.primitive.BooleanList;
+import org.eclipse.collections.api.list.primitive.DoubleList;
+
 import cointoss.chart.Tick;
 import cointoss.util.Num;
 import cointoss.visual.shape.Candle;
@@ -234,8 +237,8 @@ public class GraphPlotArea extends Region {
 
         V: {
             final Axis axis = xaxis;
-            final List<Double> vTicks = axis.getMajorTicks();
-            final List<Boolean> vFill = axis.getMajorTicksFill();
+            DoubleList vTicks = axis.majors;
+            BooleanList vFill = axis.majorsFill;
             final ObservableList<PathElement> lele = verticalGridLines.getElements();
             final ObservableList<PathElement> fele = verticalRowFill.getElements();
             int lelesize = lele.size();
@@ -327,8 +330,8 @@ public class GraphPlotArea extends Region {
 
         H: {
             final Axis axis = yaxis;
-            final List<Double> hTicks = axis.getMajorTicks();
-            final List<Boolean> hFill = axis.getMajorTicksFill();
+            DoubleList hTicks = axis.majors;
+            BooleanList hFill = axis.majorsFill;
             final ObservableList<PathElement> lele = horizontalGridLines.getElements();
             final ObservableList<PathElement> fele = horizontalRowFill.getElements();
             int lelesize = lele.size();
@@ -418,7 +421,7 @@ public class GraphPlotArea extends Region {
 
         if (isVerticalMinorGridLinesVisible()) {
             final Axis axis = xaxis;
-            final List<Double> minorTicks = axis.getMinorTicks();
+            DoubleList minorTicks = axis.majors;
 
             final ObservableList<PathElement> ele = verticalMinorGridLines.getElements();
             final int elesize = ele.size();
@@ -447,7 +450,7 @@ public class GraphPlotArea extends Region {
 
         if (isHorizontalMinorGridLinesVisible()) {
             final Axis axis = yaxis;
-            final List<Double> minorTicks = axis.getMinorTicks();
+            DoubleList minorTicks = axis.minors;
 
             final ObservableList<PathElement> ele = horizontalMinorGridLines.getElements();
             final int elesize = ele.size();
