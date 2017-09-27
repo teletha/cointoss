@@ -11,6 +11,8 @@ package cointoss.visual;
 
 import static java.lang.Math.*;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
@@ -46,7 +48,19 @@ import org.eclipse.collections.api.list.primitive.MutableDoubleList;
 import org.eclipse.collections.impl.factory.primitive.BooleanLists;
 import org.eclipse.collections.impl.factory.primitive.DoubleLists;
 
+/**
+ * @version 2017/09/27 13:44:10
+ */
 public abstract class Axis extends Region {
+
+    /** The layouting flag. */
+    private final AtomicBoolean whileLayout = new AtomicBoolean();
+
+    /** 状態の正当性を示すプロパティ */
+    private boolean layoutValidate = false;
+
+    /** 状態の正当性を示すプロパティ */
+    private boolean dataValidate = false;
 
     private double lastLayoutWidth = -1, lastLayoutHeight = -1;
 
@@ -73,8 +87,8 @@ public abstract class Axis extends Region {
 
     /** レイアウトを構成すべき情報に対して付加すべきリスナ */
     private final InvalidationListener layoutValidator = observable -> {
-        if (isLayoutValidate()) {
-            setLayoutValidate(false);
+        if (layoutValidate) {
+            layoutValidate = false;
             requestLayout();
         }
     };
@@ -91,8 +105,8 @@ public abstract class Axis extends Region {
                 return;
             }
         }
-        if (isDataValidate()) {
-            setDataValidate(false);
+        if (dataValidate) {
+            dataValidate = false;
             requestLayout();
         }
     };
@@ -106,7 +120,7 @@ public abstract class Axis extends Region {
          */
         @Override
         public void invalidated(final Observable observable) {
-            if (!nowLayout) {
+            if (whileLayout.get() == false) {
                 if (scroll != null && observable == scroll.valueProperty()) {
                     final double position = scroll.getValue();
                     final double size = scrollBarSize.get();
@@ -208,9 +222,21 @@ public abstract class Axis extends Region {
         tickLabelRotate.addListener(layoutValidator);
     }
 
-    public abstract double getDisplayPosition(double v);
+    /**
+     * Compute the visual position for the specified value.
+     * 
+     * @param value
+     * @return
+     */
+    public abstract double getPositionForValue(double value);
 
-    public abstract double getValueForDisplay(double position);
+    /**
+     * Compute the value for the specified visual position.
+     * 
+     * @param position
+     * @return
+     */
+    public abstract double getValueForPosition(double position);
 
     /**
      * visibleAmountで設定する範囲が全て見えるような「最大の」最小値を設定する。<br>
@@ -237,39 +263,31 @@ public abstract class Axis extends Region {
         layoutChildren(getWidth(), getHeight());
     }
 
-    protected final void layoutChildren(final double width, final double height) {
-        if (nowLayout) {
-            return;
-        }
-        nowLayout = true;
-        try {
-            final boolean b = !isDataValidate() || getAxisLength(width, height) != getAxisLength(lastLayoutWidth, lastLayoutHeight);
-            if (b) {
-                computeAxisProperties(width, height);
-                setLayoutValidate(false);
-                setDataValidate(true);
-            }
-
-            if (!isLayoutValidate() || width != lastLayoutWidth || height != lastLayoutHeight) {
-                layoutAxis(width, height);
-                setLayoutValidate(true);
-            }
-            lastLayoutWidth = width;
-            lastLayoutHeight = height;
-        } finally {
-            nowLayout = false;
-        }
-    }
-
-    private boolean nowLayout = false;
-
     /**
-     * 軸方向のサイズを返す
+     * Force to layout.
      * 
-     * @return
+     * @param width
+     * @param height
      */
-    protected final double getAxisLength() {
-        return getAxisLength(getWidth(), getHeight());
+    protected final void layoutChildren(double width, double height) {
+        if (whileLayout.compareAndSet(false, true)) {
+            try {
+                if (!dataValidate || getAxisLength(width, height) != getAxisLength(lastLayoutWidth, lastLayoutHeight)) {
+                    computeAxisProperties(width, height);
+                    layoutValidate = false;
+                    dataValidate = true;
+                }
+
+                if (!layoutValidate || width != lastLayoutWidth || height != lastLayoutHeight) {
+                    layoutAxis(width, height);
+                    layoutValidate = true;
+                }
+                lastLayoutWidth = width;
+                lastLayoutHeight = height;
+            } finally {
+                whileLayout.compareAndSet(true, false);
+            }
+        }
     }
 
     /**
@@ -281,10 +299,6 @@ public abstract class Axis extends Region {
      */
     protected final double getAxisLength(final double width, final double height) {
         return isHorizontal() ? width : height;
-    }
-
-    public double getZeroPosition() {
-        return getDisplayPosition(0);
     }
 
     public final boolean isHorizontal() {
@@ -327,25 +341,13 @@ public abstract class Axis extends Region {
      * @param amount scrollVisibleAmountに相当する値
      * @return
      */
-    protected double calcLowValue(final double value, final double amount) {
-        final double max = logicalMaxValue.get();
-        final double min = logicalMinValue.get();
-        final double l = max - min;
-        final double bar = l * amount;
-        final double low = (l - bar) * value + min;
-        return low;
+    protected double calcLowValue(double value, double amount) {
+        double max = logicalMaxValue.get();
+        double min = logicalMinValue.get();
+        double diff = max - min;
+        double bar = diff * amount;
+        return min + (diff - bar) * value;
     }
-
-    protected final boolean isDataValidate() {
-        return dataValidate;
-    }
-
-    protected final void setDataValidate(final boolean bool) {
-        dataValidate = bool;
-    }
-
-    /** 状態の正当性を示すプロパティ */
-    private boolean dataValidate = false;
 
     // ----------------------------------------------------------------------
     // layout
@@ -434,6 +436,9 @@ public abstract class Axis extends Region {
         return labels;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected double computePrefWidth(final double height) {
         if (isHorizontal()) {
@@ -453,6 +458,9 @@ public abstract class Axis extends Region {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected double computePrefHeight(final double width) {
         if (isVertical()) {
@@ -810,16 +818,5 @@ public abstract class Axis extends Region {
         }
         super.requestLayout();
     }
-
-    protected final boolean isLayoutValidate() {
-        return layoutValidate;
-    }
-
-    protected final void setLayoutValidate(final boolean bool) {
-        layoutValidate = bool;
-    }
-
-    /** 状態の正当性を示すプロパティ */
-    private boolean layoutValidate = false;
 
 }

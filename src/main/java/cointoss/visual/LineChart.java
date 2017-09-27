@@ -132,8 +132,8 @@ public class LineChart extends Region {
         }
         final Point2D p = graph.parentToLocal(x, y);
 
-        final double vx = xAxis.getValueForDisplay(p.getX());
-        final double vy = yAxis.getValueForDisplay(p.getY());
+        final double vx = xAxis.getValueForPosition(p.getX());
+        final double vy = yAxis.getValueForPosition(p.getY());
 
         return new Point2D(vx, vy);
     }

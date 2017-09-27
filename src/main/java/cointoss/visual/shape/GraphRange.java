@@ -137,7 +137,7 @@ public class GraphRange extends AbstractGraphShape {
         final Orientation orientation = getOrientation();
         final boolean isX = orientation == Orientation.VERTICAL;
         final Axis axis = isX ? xaxis : yaxis;
-        double d1 = axis.getDisplayPosition(v1);
+        double d1 = axis.getPositionForValue(v1);
 
         if (Double.isInfinite(d1)) {
             if (d1 < 0) {
@@ -147,7 +147,7 @@ public class GraphRange extends AbstractGraphShape {
             }
         }
 
-        double d2 = axis.getDisplayPosition(v2);
+        double d2 = axis.getPositionForValue(v2);
         if (Double.isInfinite(d2)) {
             if (d2 < 0) {
                 d2 = 0;

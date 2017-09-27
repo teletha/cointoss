@@ -28,8 +28,8 @@ public abstract class GraphPointShape extends AbstractGraphShape {
     @Override
     public void setNodeProperty(Axis xaxis, Axis yaxis, double w, double h) {
         setValidate(true);
-        double x = xaxis.getDisplayPosition(getX());
-        double y = yaxis.getDisplayPosition(getY());
+        double x = xaxis.getPositionForValue(getX());
+        double y = yaxis.getPositionForValue(getY());
         Node node = getNode();
         if (!isVisible() || x != x || Double.isInfinite(x) || Double.isInfinite(y) || y != y) {
             node.setVisible(false);

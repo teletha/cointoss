@@ -141,12 +141,12 @@ public abstract class GraphTrackingActionHandler extends GraphEventHandler<Mouse
             if (a.getXAxis() == null) {
                 return;
             }
-            v = a.getXAxis().getValueForDisplay(e.getX());
+            v = a.getXAxis().getValueForPosition(e.getX());
         } else {
             if (a.getYAxis() == null) {
                 return;
             }
-            v = a.getYAxis().getValueForDisplay(e.getY());
+            v = a.getYAxis().getValueForPosition(e.getY());
         }
 
         _handle(e, a, v, arr, o);

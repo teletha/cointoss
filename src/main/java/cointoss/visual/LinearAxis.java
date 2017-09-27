@@ -39,13 +39,13 @@ public class LinearAxis extends Axis {
     private double m;
 
     @Override
-    public double getDisplayPosition(final double v) {
+    public double getPositionForValue(final double v) {
         final double d = m * (v - lowVal);
         return isHorizontal() ? d : getHeight() - d;
     }
 
     @Override
-    public double getValueForDisplay(double position) {
+    public double getValueForPosition(double position) {
         if (!isHorizontal()) {
             position = getHeight() - position;
         }

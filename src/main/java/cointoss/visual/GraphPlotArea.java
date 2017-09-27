@@ -635,8 +635,8 @@ public class GraphPlotArea extends Region {
                 double y = data.getY(i);
 
                 // 座標変換
-                x = xaxis.getDisplayPosition(x);
-                y = yaxis.getDisplayPosition(y);
+                x = xaxis.getPositionForValue(x);
+                y = yaxis.getPositionForValue(y);
 
                 if (moveTo) {// 線が途切れている場合
                     if (elementIndex < elementSize) {
@@ -695,8 +695,8 @@ public class GraphPlotArea extends Region {
                 double y = data.getY(i);
 
                 // 座標変換
-                x = xaxis.getDisplayPosition(x);
-                y = yaxis.getDisplayPosition(y);
+                x = xaxis.getPositionForValue(x);
+                y = yaxis.getPositionForValue(y);
 
                 if (moveTo) {// 線が途切れている場合
                     if (elei < elementSize) {
@@ -759,11 +759,11 @@ public class GraphPlotArea extends Region {
      * @param height
      */
     protected void plotCandleChartData(long index, Tick data, Candle candle) {
-        double x = getXAxis().getDisplayPosition(index);
-        double open = getYAxis().getDisplayPosition(data.openPrice.toDouble());
-        double close = getYAxis().getDisplayPosition(data.closePrice.toDouble());
-        double high = getYAxis().getDisplayPosition(data.maxPrice.toDouble());
-        double low = getYAxis().getDisplayPosition(data.minPrice.toDouble());
+        double x = getXAxis().getPositionForValue(index);
+        double open = getYAxis().getPositionForValue(data.openPrice.toDouble());
+        double close = getYAxis().getPositionForValue(data.closePrice.toDouble());
+        double high = getYAxis().getPositionForValue(data.maxPrice.toDouble());
+        double low = getYAxis().getPositionForValue(data.minPrice.toDouble());
 
         // calculate candle width
         double candleWidth = 5;

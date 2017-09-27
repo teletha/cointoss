@@ -57,7 +57,7 @@ public class GraphLine extends AbstractGraphShape {
         }
         if (!isX) {
             // 横方向
-            double y = axis.getDisplayPosition(v);
+            double y = axis.getPositionForValue(v);
             if (Double.isInfinite(y) || y != y || y < 0 || y > h) {
                 line.setVisible(false);
                 return;
@@ -69,7 +69,7 @@ public class GraphLine extends AbstractGraphShape {
             line.setLayoutX(0);
             line.setLayoutY(y);
         } else {
-            double x = axis.getDisplayPosition(v);
+            double x = axis.getPositionForValue(v);
             if (Double.isInfinite(x) || x != x || x < 0 || x > w) {
                 line.setVisible(false);
                 return;
