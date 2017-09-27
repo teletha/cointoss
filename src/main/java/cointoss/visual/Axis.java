@@ -52,25 +52,13 @@ public abstract class Axis extends Region {
 
     public final StringProperty nameProperty = new SimpleStringProperty(this, "name", null);
 
+    public final BooleanProperty scrollBarVisible = new SimpleBooleanProperty(this, "scrollBarVisible", true);
+
     protected final MutableDoubleList majors = DoubleLists.mutable.empty();
 
     protected final MutableBooleanList majorsFill = BooleanLists.mutable.empty();
 
     protected final MutableDoubleList minors = DoubleLists.mutable.empty();
-
-    /**
-     * NAxisの状態の変化を受け取る必要がある親を定義するインターフェース
-     * 
-     * @author nodamushi
-     */
-    public static interface AxisParent {
-        /**
-         * Axisの状態が変化し、グラフの描画が不正確になった通知を受け取るメソッド。
-         * 
-         * @param axis 変化したNAxis
-         */
-        public void graphInvalidate(Axis axis);
-    }
 
     public Axis() {
         nameProperty.addListener(getLayoutValidateListener());
@@ -123,13 +111,6 @@ public abstract class Axis extends Region {
             }
             lastLayoutWidth = width;
             lastLayoutHeight = height;
-
-            if (b) {
-                final Parent parent = getParent();
-                if (parent instanceof AxisParent) {
-                    ((AxisParent) parent).graphInvalidate(this);
-                }
-            }
         } finally {
             nowLayout = false;
         }
@@ -298,28 +279,6 @@ public abstract class Axis extends Region {
     }
 
     private DoubleProperty tickLabelRotateProperty;
-
-    /**
-     * スクロールバーを表示するかどうか
-     * 
-     * @return
-     */
-    public final BooleanProperty scrollBarVisibleProperty() {
-        if (scrollBarVisibleProperty == null) {
-            scrollBarVisibleProperty = new SimpleBooleanProperty(this, "scrollBarVisible", true);
-        }
-        return scrollBarVisibleProperty;
-    }
-
-    public final boolean isScrollBarVisible() {
-        return scrollBarVisibleProperty == null ? true : scrollBarVisibleProperty.get();
-    }
-
-    public final void setScrollBarVisible(final boolean value) {
-        scrollBarVisibleProperty().set(value);
-    }
-
-    private BooleanProperty scrollBarVisibleProperty;
 
     private static void unbind(final Property<?> p) {
         if (p.isBound()) {
@@ -909,8 +868,8 @@ public abstract class Axis extends Region {
 
             scroll = new ScrollBar();
             scroll.orientationProperty().bind(orientationProperty());
-            scroll.visibleProperty().bind(Bindings
-                    .createBooleanBinding(() -> isScrollBarVisible() && getScrollBarValue() != -1 && getScrollVisibleAmount() != 1, scrollBarValueProperty(), scrollBarVisibleProperty(), scrollVisibleAmountWrapper()));
+            scroll.visibleProperty().bind(Bindings.createBooleanBinding(() -> scrollBarVisible
+                    .get() && getScrollBarValue() != -1 && getScrollVisibleAmount() != 1, scrollBarValueProperty(), scrollBarVisible, scrollVisibleAmountWrapper()));
             scroll.visibleProperty().addListener(getLayoutValidateListener());
             scroll.valueProperty().addListener(getScrollValueListener());
             scroll.setMin(0);
