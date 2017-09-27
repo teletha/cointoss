@@ -31,7 +31,7 @@ public class LinearAxis extends Axis {
      */
     public LinearAxis(String name, DoubleToObjectFunction<String> labelFormatter) {
         this.labelFormatter = Objects.requireNonNull(labelFormatter);
-        this.name.set(name);
+        this.nameLabel.setText(name);
     }
 
     private double lowVal = 0;
@@ -58,14 +58,14 @@ public class LinearAxis extends Axis {
 
     @Override
     public void adjustLowerValue() {
-        final double max = logicalMaxValue.get();
-        final double a = visibleRange.get();
-        final double min = logicalMinValue.get();
-        final double ll = max - min;
+        double max = logicalMaxValue.get();
+        double min = logicalMinValue.get();
+        double diff = max - min;
+        double range = visibleRange.get();
         double low = computeLowerValue(max);
-        final double up = low + ll * a;
+        double up = low + diff * range;
         if (up > max) {
-            low = max - ll * a;
+            low = max - diff * range;
             visualMinValue.set(low);
         }
     }

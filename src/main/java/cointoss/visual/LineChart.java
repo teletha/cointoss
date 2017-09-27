@@ -11,6 +11,8 @@ package cointoss.visual;
 
 import static java.lang.Math.*;
 
+import java.util.function.Consumer;
+
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
@@ -468,6 +470,18 @@ public class LineChart extends Region {
      */
     public final LineChart xAxis(Axis axis) {
         xAxisProperty.set(axis);
+
+        return this;
+    }
+
+    /**
+     * Configure x-axis.
+     * 
+     * @param axis
+     * @return
+     */
+    public final LineChart axisX(Consumer<Axis> axis) {
+        axis.accept(xAxisProperty.get());
 
         return this;
     }

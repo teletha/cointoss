@@ -23,8 +23,6 @@ import javafx.beans.property.ReadOnlyDoubleWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -63,8 +61,6 @@ public abstract class Axis extends Region {
     private boolean dataValidate = false;
 
     private double lastLayoutWidth = -1, lastLayoutHeight = -1;
-
-    public final StringProperty name = new SimpleStringProperty(this, "name", null);
 
     /** The visual placement direction. */
     public final ObjectProperty<Orientation> orientation = new SimpleObjectProperty<Orientation>(this, "orientation", Orientation.HORIZONTAL) {
@@ -154,10 +150,10 @@ public abstract class Axis extends Region {
     public final DoubleProperty scrollBarValue = new SimpleDoubleProperty(this, "scrollBarPosition", -1);
 
     /** The visual length of major tick. */
-    public final DoubleProperty majorTickLength = new SimpleDoubleProperty(this, "MajorTickLength", 12);
+    public final DoubleProperty majorTickLength = new SimpleDoubleProperty(this, "MajorTickLength", 8);
 
     /** The visual length of minor tick. */
-    public final DoubleProperty minorTickLength = new SimpleDoubleProperty(this, "MinorTickLength", 8);
+    public final DoubleProperty minorTickLength = new SimpleDoubleProperty(this, "MinorTickLength", 4);
 
     /** The visibility of minor tick. */
     public final BooleanProperty minorTickVisibility = new SimpleBooleanProperty(this, "MinorTickVisibility", false);
@@ -202,10 +198,36 @@ public abstract class Axis extends Region {
 
     protected final MutableDoubleList minors = DoubleLists.mutable.empty();
 
-    public Axis() {
-        name.addListener(layoutValidator);
+    /** UI widget. */
+    private final Group lines = new Group();
 
+    /** UI widget. */
+    private final Group tickLabels = new Group();
+
+    /** UI widget. */
+    private final Path majorTickPath = new Path();
+
+    /** UI widget. */
+    private final Path minorTickPath = new Path();
+
+    /** UI widget. */
+    private final Line baseLine = new Line();
+
+    /** UI widget. */
+    private final ScrollBar scroll = new ScrollBar();
+
+    /** UI for name label of axis. */
+    public final Label nameLabel = new Label();
+
+    /**
+     * 
+     */
+    public Axis() {
         getStyleClass().add("axis");
+
+        // ====================================================
+        // Initialize Property
+        // ====================================================
         widthProperty().addListener(dataValidateListener);
         heightProperty().addListener(dataValidateListener);
         orientation.addListener(dataValidateListener);
@@ -220,6 +242,34 @@ public abstract class Axis extends Region {
         minorTickVisibility.addListener(layoutValidator);
         tickLabelDistance.addListener(layoutValidator);
         tickLabelRotate.addListener(layoutValidator);
+
+        // ====================================================
+        // Initialize UI widget
+        // ====================================================
+
+        nameLabel.getStyleClass().add("axis-label");
+        majorTickPath.getStyleClass().setAll("axis-tick-mark");
+        minorTickPath.getStyleClass().setAll("axis-minor-tick-mark");
+        baseLine.getStyleClass().setAll("axis-line");
+
+        lines.setAutoSizeChildren(false);
+        lines.getChildren().addAll(majorTickPath, minorTickPath, baseLine);
+
+        tickLabels.setAutoSizeChildren(false);
+
+        scroll.orientationProperty().bind(orientation);
+        scroll.visibleProperty().bind(Bindings.createBooleanBinding(() -> scrollBarVisibility
+                .get() && scrollBarValue.get() != -1 && scrollBarSize.get() != 1, scrollBarValue, scrollBarVisibility, scrollBarSize));
+        scroll.visibleProperty().addListener(layoutValidator);
+        scroll.valueProperty().addListener(scrollValueValidator);
+        scroll.setMin(0);
+        scroll.setMax(1);
+        scroll.visibleAmountProperty().bind(scrollBarSize);
+
+        if (scrollBarValue.get() != -1 && scrollBarSize.get() != 1) {
+            scroll.setValue(orientation.get() != Orientation.VERTICAL ? scrollBarValue.get() : 1 - scrollBarValue.get());
+        }
+        getChildren().addAll(lines, tickLabels, scroll, nameLabel);
     }
 
     /**
@@ -296,7 +346,7 @@ public abstract class Axis extends Region {
 
             double tick = max(majorTickLength.get(), minorTickLength.get());
             double scrollBar = scroll.isVisible() ? scroll.getWidth() : 0;
-            double labels = max(labelGroup.prefWidth(height), 10);
+            double labels = max(tickLabels.prefWidth(height), 10);
             double label = nameLabel.isVisible() ? nameLabel.getHeight() + 5 : 0;
             return tick + scrollBar + labels + label;
         }
@@ -315,7 +365,7 @@ public abstract class Axis extends Region {
 
             double tick = max(majorTickLength.get(), minorTickLength.get());
             double scrollBar = scroll.isVisible() ? scroll.getHeight() : 0;
-            double labels = max(labelGroup.prefHeight(width), 10);
+            double labels = max(tickLabels.prefHeight(width), 10);
             double label = nameLabel.isVisible() ? nameLabel.getHeight() + 5 : 0;
             return tick + scrollBar + labels + label;
         }
@@ -333,40 +383,12 @@ public abstract class Axis extends Region {
     }
 
     /**
-     * layoutChildrenから呼び出されます。 このAxisのレイアウトを実際に行うメソッドです。
+     * Layout actually.
+     * 
+     * @param width
+     * @param height
      */
-    private void layoutAxis(final double width, final double height) {
-        if (lineGroup == null) {
-            lineGroup = new Group();
-            lineGroup.setAutoSizeChildren(false);
-            nameLabel = new Label();
-            nameLabel.getStyleClass().add("axis-label");
-            nameLabel.textProperty().bind(name);
-            labelGroup.setAutoSizeChildren(false);
-            majorTickPath = new Path();
-            minorTickPath = new Path();
-            baseLine = new Line();
-
-            scroll = new ScrollBar();
-            scroll.orientationProperty().bind(orientation);
-            scroll.visibleProperty().bind(Bindings.createBooleanBinding(() -> scrollBarVisibility
-                    .get() && scrollBarValue.get() != -1 && scrollBarSize.get() != 1, scrollBarValue, scrollBarVisibility, scrollBarSize));
-            scroll.visibleProperty().addListener(layoutValidator);
-            scroll.valueProperty().addListener(scrollValueValidator);
-            scroll.setMin(0);
-            scroll.setMax(1);
-            scroll.visibleAmountProperty().bind(scrollBarSize);
-            if (scrollBarValue.get() != -1 && scrollBarSize.get() != 1) {
-                scroll.setValue(orientation.get() != Orientation.VERTICAL ? scrollBarValue.get() : 1 - scrollBarValue.get());
-            }
-            majorTickPath.getStyleClass().setAll("axis-tick-mark");
-            minorTickPath.getStyleClass().setAll("axis-minor-tick-mark");
-            baseLine.getStyleClass().setAll("axis-line");
-            lineGroup.getChildren().addAll(majorTickPath, minorTickPath, baseLine);
-
-            getChildren().addAll(lineGroup, labelGroup, scroll, nameLabel);
-        }
-
+    private void layoutAxis(double width, double height) {
         layoutLines(width, height);
         layoutLabels(width, height);
         layoutGroups(width, height);
@@ -472,9 +494,9 @@ public abstract class Axis extends Region {
     }
 
     private void layoutGroups(final double width, final double height) {
-        final boolean ish = isHorizontal();
-        final String n = name.get();
-        nameLabel.setVisible(n != null && !n.isEmpty());
+        boolean ish = isHorizontal();
+        String name = nameLabel.getText();
+        nameLabel.setVisible(name != null && !name.isEmpty());
         if (ish) {
             nameLabel.setRotate(0);
             if (side.get() != Side.TOP) {// BOTTOM
@@ -483,13 +505,13 @@ public abstract class Axis extends Region {
                     y = scroll.prefHeight(-1);
                     scroll.resizeRelocate(0, 0, width, y);
                 }
-                lineGroup.setLayoutX(0);
-                lineGroup.setLayoutY(floor(y));
-                y += lineGroup.prefHeight(-1) + tickLabelDistance.get();
-                labelGroup.setLayoutX(0);
-                labelGroup.setLayoutY(floor(y));
+                lines.setLayoutX(0);
+                lines.setLayoutY(floor(y));
+                y += lines.prefHeight(-1) + tickLabelDistance.get();
+                tickLabels.setLayoutX(0);
+                tickLabels.setLayoutY(floor(y));
                 if (nameLabel.isVisible()) {
-                    y += max(labelGroup.prefHeight(-1) + 5, 15);
+                    y += max(tickLabels.prefHeight(-1) + 5, 15);
                     final double w = min(nameLabel.prefWidth(-1), width);
                     final double h = nameLabel.prefHeight(w);
                     nameLabel.resize(w, h);
@@ -502,13 +524,13 @@ public abstract class Axis extends Region {
                     y -= h;
                     scroll.resizeRelocate(0, floor(y), width, h);
                 }
-                lineGroup.setLayoutX(0);
-                lineGroup.setLayoutY(floor(y));
-                y -= lineGroup.prefHeight(-1) + tickLabelDistance.get();
-                labelGroup.setLayoutX(0);
-                labelGroup.setLayoutY(floor(y));
+                lines.setLayoutX(0);
+                lines.setLayoutY(floor(y));
+                y -= lines.prefHeight(-1) + tickLabelDistance.get();
+                tickLabels.setLayoutX(0);
+                tickLabels.setLayoutY(floor(y));
                 if (nameLabel.isVisible()) {
-                    y -= max(labelGroup.prefHeight(-1) + 5, 15);
+                    y -= max(tickLabels.prefHeight(-1) + 5, 15);
                     final double w = min(nameLabel.prefWidth(-1), width);
                     final double h = nameLabel.prefHeight(w);
                     nameLabel.resize(w, h);
@@ -525,17 +547,17 @@ public abstract class Axis extends Region {
                     scroll.resizeRelocate(floor(x), 0, w, height);
                 }
 
-                lineGroup.setLayoutX(floor(x));
-                lineGroup.setLayoutY(0);
-                x -= tickLabelDistance.get() + lineGroup.prefWidth(-1);
-                labelGroup.setLayoutX(floor(x));
-                labelGroup.setLayoutY(0);
+                lines.setLayoutX(floor(x));
+                lines.setLayoutY(0);
+                x -= tickLabelDistance.get() + lines.prefWidth(-1);
+                tickLabels.setLayoutX(floor(x));
+                tickLabels.setLayoutY(0);
                 if (nameLabel.isVisible()) {
                     final double w = min(nameLabel.prefWidth(-1), height);
                     final double h = nameLabel.prefHeight(w);
                     nameLabel.resize(w, h);
                     final Bounds b = nameLabel.getBoundsInParent();
-                    x -= labelGroup.prefWidth(-1) + 5 + b.getWidth();
+                    x -= tickLabels.prefWidth(-1) + 5 + b.getWidth();
                     nameLabel.relocate(floor(x - b.getMinX() + nameLabel
                             .getLayoutX()), floor((height - b.getHeight()) * 0.5 - b.getMinY() + nameLabel.getLayoutY()));
                 }
@@ -548,17 +570,17 @@ public abstract class Axis extends Region {
                     scroll.resizeRelocate(0, 0, w, height);
                 }
 
-                lineGroup.setLayoutX(floor(x));
-                lineGroup.setLayoutY(0);
-                x = tickLabelDistance.get() + lineGroup.prefWidth(-1);
-                labelGroup.setLayoutX(floor(x));
-                labelGroup.setLayoutY(0);
+                lines.setLayoutX(floor(x));
+                lines.setLayoutY(0);
+                x = tickLabelDistance.get() + lines.prefWidth(-1);
+                tickLabels.setLayoutX(floor(x));
+                tickLabels.setLayoutY(0);
                 if (nameLabel.isVisible()) {
                     final double w = min(nameLabel.prefWidth(-1), height);
                     final double h = nameLabel.prefHeight(w);
                     nameLabel.resize(w, h);
                     final Bounds b = nameLabel.getBoundsInParent();
-                    x += max(labelGroup.prefWidth(-1) + 5, 15);
+                    x += max(tickLabels.prefWidth(-1) + 5, 15);
                     nameLabel.relocate(floor(x - b.getMinX() + nameLabel
                             .getLayoutX()), floor((height - b.getHeight()) * 0.5 - b.getMinY() + nameLabel.getLayoutY()));
                 }
@@ -700,21 +722,21 @@ public abstract class Axis extends Region {
      * @return
      */
     protected final double computeLowerValue(double up) {
-        double d = visualMinValue.get();
-        final double m = logicalMinValue.get();
+        double visibleMin = visualMinValue.get();
+        double logicalMin = logicalMinValue.get();
         if (up != up) {
             up = logicalMaxValue.get();
         }
-        if (d != d) {
-            d = m;
+        if (visibleMin != visibleMin) {
+            visibleMin = logicalMin;
         }
-        if (d > up) {
-            d = up;
+        if (visibleMin > up) {
+            visibleMin = up;
         }
-        if (d < m) {
-            return m;
+        if (visibleMin < logicalMin) {
+            return logicalMin;
         } else {
-            return d;
+            return visibleMin;
         }
     }
 
@@ -731,6 +753,30 @@ public abstract class Axis extends Region {
         double diff = max - min;
         double bar = diff * amount;
         return min + (diff - bar) * value;
+    }
+
+    private ObservableList<AxisLabel> labels;
+
+    protected final ObservableList<AxisLabel> getLabels() {
+        if (labels == null) {
+            labels = FXCollections.observableArrayList();
+            labels.addListener((ListChangeListener<AxisLabel>) c -> {
+                final ObservableList<Node> list = tickLabels.getChildren();
+                while (c.next()) {
+                    for (final AxisLabel a1 : c.getRemoved()) {
+                        list.remove(a1.getNode());
+                        a1.setManaged(false);
+                        a1.getNode().rotateProperty().unbind();
+                    }
+                    for (final AxisLabel a2 : c.getAddedSubList()) {
+                        list.add(a2.getNode());
+                        a2.getNode().setVisible(false);
+                        a2.getNode().rotateProperty().bind(tickLabelRotate);
+                    }
+                }
+            });
+        }
+        return labels;
     }
 
     /**
@@ -784,40 +830,6 @@ public abstract class Axis extends Region {
         public boolean match(final double id) {
             return this.id == id;
         }
-    }
-
-    private Group lineGroup, labelGroup = new Group();
-
-    private Path majorTickPath, minorTickPath;
-
-    private Line baseLine;
-
-    private ScrollBar scroll;
-
-    private Label nameLabel;
-
-    private ObservableList<AxisLabel> labels;
-
-    protected final ObservableList<AxisLabel> getLabels() {
-        if (labels == null) {
-            labels = FXCollections.observableArrayList();
-            labels.addListener((ListChangeListener<AxisLabel>) c -> {
-                final ObservableList<Node> list = labelGroup.getChildren();
-                while (c.next()) {
-                    for (final AxisLabel a1 : c.getRemoved()) {
-                        list.remove(a1.getNode());
-                        a1.setManaged(false);
-                        a1.getNode().rotateProperty().unbind();
-                    }
-                    for (final AxisLabel a2 : c.getAddedSubList()) {
-                        list.add(a2.getNode());
-                        a2.getNode().setVisible(false);
-                        a2.getNode().rotateProperty().bind(tickLabelRotate);
-                    }
-                }
-            });
-        }
-        return labels;
     }
 
 }
