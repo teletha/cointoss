@@ -58,22 +58,20 @@ public class Visualize extends Application {
         }
         Num diff = max.minus(min);
 
-        LinearAxis axis = new LinearAxis();
-        axis.nameLabel.setText("日時");
-        axis.tickLabelFormatter.set(v -> Instant.ofEpochMilli((long) v).atZone(UTC).format(ISO_LOCAL_DATE_TIME));
-        axis.visibleRange.set(100D / serise.ticks.size());
-
-        LinearAxis yaxis = new LinearAxis();
-        yaxis.nameLabel.setText("JPY");
-        yaxis.tickLabelFormatter.set(v -> Num.of(v).asJPY());
-        yaxis.visibleRange.set(Num.of(24000).divide(diff).toDouble());
-        yaxis.scrollBarVisibility.set(false);
-
         LineChartData weightMedian = new LineChartData(serise).name("Weight Median");
 
         LineChart line = new LineChart()//
-                .xAxis(axis)
-                .yAxis(yaxis)
+                .axisX(axis -> {
+                    axis.nameLabel.setText("日時");
+                    axis.tickLabelFormatter.set(v -> Instant.ofEpochMilli((long) v).atZone(UTC).format(ISO_LOCAL_DATE_TIME));
+                    axis.visibleRange.set(100D / serise.ticks.size());
+                })
+                .axisY(yaxis -> {
+                    yaxis.nameLabel.setText("JPY");
+                    yaxis.tickLabelFormatter.set(v -> Num.of(v).asJPY());
+                    yaxis.visibleRange.set(Num.of(24000).divide(diff).toDouble());
+                    yaxis.scrollBarVisibility.set(false);
+                })
                 .orientation(Orientation.HORIZONTAL)
                 .rangeMarginY(1.06)
                 .graphTracker(new GraphTracker())

@@ -45,8 +45,7 @@ import cointoss.util.Num;
 import cointoss.visual.shape.GraphShape;
 
 /**
- * GraphPlotAreaとLineChartAxisだけのグラフです。<br>
- * データとしてはタイトル情報も保持していますが、タイトルを表示する機能はありません
+ * @version 2017/09/27 18:13:28
  */
 public class LineChart extends Region {
 
@@ -56,9 +55,11 @@ public class LineChart extends Region {
     /** The list of plottable cnadle date. */
     public final ObservableList<Tick> candles;
 
-    public final ObjectProperty<Axis> xAxisProperty = new SimpleObjectProperty<>(this, "xAxis", null);
+    /** The x-axis UI. */
+    public final ObjectProperty<LinearAxis> axisX = new SimpleObjectProperty<>(this, "xAxis", null);
 
-    public final ObjectProperty<Axis> yAxisProperty = new SimpleObjectProperty<>(this, "yAxis", null);
+    /** The y-axis UI. */
+    public final ObjectProperty<LinearAxis> axisY = new SimpleObjectProperty<>(this, "yAxis", null);
 
     /** The actual graph drawer. */
     final GraphPlotArea graph = new GraphPlotArea();
@@ -74,16 +75,48 @@ public class LineChart extends Region {
 
     private final AxisZoomHandler zoom = new AxisZoomHandler();
 
+    /** The axis observer. */
+    private final ChangeListener<Axis> axisObserver = (observable, oldAxis, newAxis) -> {
+        if (oldAxis != null) {
+            getChildren().remove(oldAxis);
+            oldAxis.visualMinValue.removeListener(dataValidateListener);
+            oldAxis.visibleRange.removeListener(dataValidateListener);
+            zoom.uninstall(oldAxis);
+        }
+
+        if (newAxis != null) {
+            getChildren().add(newAxis);
+            newAxis.visualMinValue.addListener(dataValidateListener);
+            newAxis.visibleRange.addListener(dataValidateListener);
+            zoom.install(newAxis);
+        } else {
+            // If this exception will be thrown, it is bug of this program. So we must rethrow the
+            // wrapped error in here.
+            throw new Error();
+        }
+        if (axisX == observable) {
+            newAxis.orientation.set(Orientation.HORIZONTAL);
+            if (newAxis.side.get().isVertical()) {
+                newAxis.side.set(Side.BOTTOM);
+            }
+        } else {
+            newAxis.orientation.set(Orientation.VERTICAL);
+            if (newAxis.side.get().isHorizontal()) {
+                newAxis.side.set(Side.LEFT);
+            }
+        }
+    };
+
     /**
      * 
      */
     public LineChart() {
         getStylesheets().add(getClass().getResource("CandleStickChart.css").toExternalForm());
 
-        xAxisProperty.addListener(dataValidateListener);
-        xAxisProperty.addListener(axisListener);
-        yAxisProperty.addListener(dataValidateListener);
-        yAxisProperty.addListener(axisListener);
+        axisX.addListener(dataValidateListener);
+        axisX.addListener(axisObserver);
+        axisY.addListener(dataValidateListener);
+        axisY.addListener(axisObserver);
 
         // create plotting data collection
         lines = FXCollections.observableArrayList();
@@ -108,8 +141,8 @@ public class LineChart extends Region {
         getStyleClass().setAll("chart");
         graph.setLineChartDataList(lines);
         graph.setCandleChartDataList(candles);
-        graph.xAxisProperty().bind(xAxisProperty);
-        graph.yAxisProperty().bind(yAxisProperty);
+        graph.xAxisProperty().bind(axisX);
+        graph.yAxisProperty().bind(axisY);
         graph.verticalMinorGridLinesVisibleProperty().bind(verticalMinorGridLinesVisibleProperty());
         graph.horizontalMinorGridLinesVisibleProperty().bind(horizontalMinorGridLinesVisibleProperty());
         graph.orientationProperty().bind(orientationProperty());
@@ -129,8 +162,8 @@ public class LineChart extends Region {
 
     public Point2D getValueOfLocalLocation(final double x, final double y) {
 
-        final Axis xAxis = getXAxis();
-        final Axis yAxis = getYAxis();
+        final Axis xAxis = axisX.get();
+        final Axis yAxis = axisY.get();
         if (xAxis == null || yAxis == null) {
             return null;
         }
@@ -230,8 +263,8 @@ public class LineChart extends Region {
                 graph.resizeRelocate(bounds.getMinX(), bounds.getMinY(), ww, hh);
             }
             setPlotAreaBounds(bounds);
-            final Axis xAxis = getXAxis();
-            final Axis yAxis = getYAxis();
+            final Axis xAxis = axisX.get();
+            final Axis yAxis = axisY.get();
             if (xAxis != null) {
                 final double xh = xAxis.prefHeight(ww);
                 xAxis.resize(ww, xh);
@@ -263,17 +296,17 @@ public class LineChart extends Region {
     }
 
     protected void layoutChartArea(final double w, final double h, final double x0, final double y0) {
-        if (getXAxis() == null || getYAxis() == null) {
+        if (axisX.get() == null || axisY.get() == null) {
             graph.setVisible(false);
         } else {
             graph.setVisible(true);
-            final Axis xAxis = getXAxis();
+            final Axis xAxis = axisX.get();
             xAxis.orientation.set(Orientation.HORIZONTAL);
             if (xAxis.side.get().isVertical()) {
                 xAxis.side.set(Side.BOTTOM);
             }
 
-            final Axis yAxis = getYAxis();
+            final Axis yAxis = axisY.get();
             yAxis.orientation.set(Orientation.VERTICAL);
             if (yAxis.side.get().isHorizontal()) {
                 yAxis.side.set(Side.LEFT);
@@ -377,8 +410,8 @@ public class LineChart extends Region {
      * Set x-axis range.
      */
     private void setXAxisRange() {
-        getXAxis().logicalMaxValue.set(candles.get(candles.size() - 1).start.toInstant().toEpochMilli());
-        getXAxis().logicalMinValue.set(candles.get(0).start.toInstant().toEpochMilli());
+        axisX.get().logicalMaxValue.set(candles.get(candles.size() - 1).start.toInstant().toEpochMilli());
+        axisX.get().logicalMinValue.set(candles.get(0).start.toInstant().toEpochMilli());
     }
 
     /**
@@ -396,8 +429,8 @@ public class LineChart extends Region {
         max = max.plus(200);
         min = min.minus(200);
 
-        getYAxis().logicalMaxValue.set(max.toDouble());
-        getYAxis().logicalMinValue.set(min.toDouble());
+        axisY.get().logicalMaxValue.set(max.toDouble());
+        axisY.get().logicalMinValue.set(min.toDouble());
     }
 
     protected final boolean isDataValidate() {
@@ -462,73 +495,32 @@ public class LineChart extends Region {
 
     private InvalidationListener layoutInvalidationListener = null;
 
-    public final Axis getXAxis() {
-        return xAxisProperty == null ? null : xAxisProperty.get();
-    }
-
-    /**
-     * @param axis
-     * @return
-     */
-    public final LineChart xAxis(Axis axis) {
-        xAxisProperty.set(axis);
-
-        return this;
-    }
-
     /**
      * Configure x-axis.
      * 
      * @param axis
      * @return
      */
-    public final LineChart axisX(Consumer<Axis> axis) {
-        axis.accept(xAxisProperty.get());
+    public final LineChart axisX(Consumer<LinearAxis> axis) {
+        if (axisX.get() == null) {
+            axisX.set(new LinearAxis());
+        }
+        axis.accept(axisX.get());
 
         return this;
     }
 
-    private ChangeListener<Axis> axisListener = (observable, oldValue, newValue) -> {
-        if (oldValue != null) {
-            getChildren().remove(oldValue);
-            oldValue.visualMinValue.removeListener(dataValidateListener);
-            oldValue.visibleRange.removeListener(dataValidateListener);
-            zoom.uninstall(oldValue);
-        }
-
-        if (newValue != null) {
-            getChildren().add(newValue);
-            newValue.visualMinValue.addListener(dataValidateListener);
-            newValue.visibleRange.addListener(dataValidateListener);
-            zoom.install(newValue);
-        } else {
-            // If this exception will be thrown, it is bug of this program. So we must rethrow the
-            // wrapped error in here.
-            throw new Error();
-        }
-        if (xAxisProperty == observable) {
-            newValue.orientation.set(Orientation.HORIZONTAL);
-            if (newValue.side.get().isVertical()) {
-                newValue.side.set(Side.BOTTOM);
-            }
-        } else {
-            newValue.orientation.set(Orientation.VERTICAL);
-            if (newValue.side.get().isHorizontal()) {
-                newValue.side.set(Side.LEFT);
-            }
-        }
-    };
-
-    public final Axis getYAxis() {
-        return yAxisProperty == null ? null : yAxisProperty.get();
-    }
-
     /**
+     * Configure y-axis.
+     * 
      * @param axis
      * @return
      */
-    public final LineChart yAxis(Axis axis) {
-        yAxisProperty.set(axis);
+    public final LineChart axisY(Consumer<LinearAxis> axis) {
+        if (axisY.get() == null) {
+            axisY.set(new LinearAxis());
+        }
+        axis.accept(axisY.get());
 
         return this;
     }
