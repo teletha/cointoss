@@ -79,8 +79,8 @@ public class LinearAxis extends Axis {
 
         final double low = computeLowerValue(logicalMaxValue.get());
         final double up = computeUpperValue(low);
-        final double len = getAxisLength(width, height);
-        if (low == up || low != low || up != up || len <= 0) {
+        final double axisLength = getAxisLength(width, height);
+        if (low == up || low != low || up != up || axisLength <= 0) {
             noData(width, height);
             return;
         }
@@ -102,19 +102,17 @@ public class LinearAxis extends Axis {
         }
 
         // 適当な単位を見つける
-        final int mtn = 10; // getPrefferedMajorTickNumber();
-        final double minu = 20;// getMinUnitLength();
-        double pUnitLength = len / mtn;
-        if (minu > 0 && pUnitLength < minu) {
-            pUnitLength = minu;
-        }
-        final double pUnitSize = (up - low) / (len / pUnitLength);
+        int majorTickNumber = 10; // getPrefferedMajorTickNumber();
+        double minimumMajorTickDistance = 20;// getMinUnitLength();
+        double majorTickDistance = Math.max(axisLength / majorTickNumber, minimumMajorTickDistance);
+
+        double valueDistancePerMajorTick = (up - low) / (axisLength / majorTickDistance);
         int uindex = unitIndex;// 前回の探索結果の再利用
         boolean useBefore = true;
-        if (lastPUnitSize != pUnitSize) {
-            if (pUnitSize <= TickUnits[0]) {
+        if (lastPUnitSize != valueDistancePerMajorTick) {
+            if (valueDistancePerMajorTick <= TickUnits[0]) {
                 uindex = 0;
-            } else if (pUnitSize >= TickUnits[TickUnits.length - 1]) {
+            } else if (valueDistancePerMajorTick >= TickUnits[TickUnits.length - 1]) {
                 uindex = TickUnits.length - 1;
             } else {
                 BLOCK: {
@@ -123,11 +121,11 @@ public class LinearAxis extends Axis {
 
                     while (r - l > 1) {
                         final double d = TickUnits[m];
-                        if (d == pUnitSize) {
+                        if (d == valueDistancePerMajorTick) {
                             uindex = m;
                             break BLOCK;
                         }
-                        if (d < pUnitSize) {
+                        if (d < valueDistancePerMajorTick) {
                             l = m;
                         } else {
                             r = m;
@@ -135,16 +133,16 @@ public class LinearAxis extends Axis {
                         m = (l + r >> 1);
                     }
 
-                    if (TickUnits[r] < pUnitSize) {
+                    if (TickUnits[r] < valueDistancePerMajorTick) {
                         uindex = r + 1;
-                    } else if (TickUnits[l] > pUnitSize) {
+                    } else if (TickUnits[l] > valueDistancePerMajorTick) {
                         uindex = l;
                     } else {
                         uindex = r;
                     }
                 }
             }
-            lastPUnitSize = pUnitSize;
+            lastPUnitSize = valueDistancePerMajorTick;
             useBefore = uindex == unitIndex;
             unitIndex = uindex;
         }
@@ -153,7 +151,7 @@ public class LinearAxis extends Axis {
         final double l = up - low;
         boolean fill = ((int) floor(low / usize) & 1) != 0;
         final double basel = floor(low / usize) * usize;
-        final double m = len / l;
+        final double m = axisLength / l;
 
         final double majorLength = m * usize;
         final int k = (int) (ceil((up - basel) / usize));
@@ -222,7 +220,7 @@ public class LinearAxis extends Axis {
                     if (minorpos < 0) {
                         continue;
                     }
-                    if (minorpos >= len) {
+                    if (minorpos >= axisLength) {
                         break;
                     }
                     minors.add(floor(isH ? minorpos : height - minorpos));
