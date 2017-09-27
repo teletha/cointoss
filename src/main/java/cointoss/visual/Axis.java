@@ -152,14 +152,8 @@ public abstract class Axis extends Region {
     /** The visual length of major tick. */
     public final DoubleProperty majorTickLength = new SimpleDoubleProperty(this, "MajorTickLength", 8);
 
-    /** The visibility of major tick. */
-    public final BooleanProperty majorTickVisibility = new SimpleBooleanProperty(this, "MajorTickVisibility", true);
-
     /** The visual length of minor tick. */
     public final DoubleProperty minorTickLength = new SimpleDoubleProperty(this, "MinorTickLength", 4);
-
-    /** The visibility of minor tick. */
-    public final BooleanProperty minorTickVisibility = new SimpleBooleanProperty(this, "MinorTickVisibility", false);
 
     /** The visual distance between tick and label. */
     public final DoubleProperty tickLabelDistance = new SimpleDoubleProperty(this, "tickLabelGap", 10);
@@ -242,7 +236,6 @@ public abstract class Axis extends Region {
         scrollBarValue.addListener(scrollValueValidator);
         majorTickLength.addListener(layoutValidator);
         minorTickLength.addListener(layoutValidator);
-        minorTickVisibility.addListener(layoutValidator);
         tickLabelDistance.addListener(layoutValidator);
         tickLabelRotate.addListener(layoutValidator);
 
@@ -601,11 +594,12 @@ public abstract class Axis extends Region {
 
         final double al = majorTickLength.get();
         final double il = minorTickLength.get();
-        final boolean isIV = il > 0 && minorTickVisibility.get();
+        final boolean isIV = il > 0;
         final Side s = side.get();
         final int k = ish ? s != Side.TOP ? 1 : -1 : s != Side.RIGHT ? -1 : 1;
 
         if (isIV) {
+            minorTickPath.setVisible(true);
             final ObservableList<PathElement> elements = minorTickPath.getElements();
             if (elements.size() > minors.size() * 2) {
                 elements.remove(minors.size() * 2, elements.size());
@@ -613,6 +607,7 @@ public abstract class Axis extends Region {
 
             final int eles = elements.size();
             final int ls = minors.size();
+
             for (int i = 0; i < ls; i++) {
                 final double d = minors.get(i);
                 MoveTo mt;

@@ -49,7 +49,11 @@ final class PlotLine {
 
     private double beforelast = NaN;
 
-    private double beforeminv = NaN, beforemaxv = NaN, beforeendv = NaN;
+    private double beforeminv = NaN;
+
+    private double beforemaxv = NaN;
+
+    private double beforeendv = NaN;
 
     private int count = 0;
 

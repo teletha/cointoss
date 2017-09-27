@@ -214,18 +214,6 @@ public class GraphTracker {
 
     private class H extends GraphTrackingActionHandler {
 
-        private MouseEvent event;
-
-        public void storeEvent(final MouseEvent event) {
-            this.event = event;
-        }
-
-        public void rehandle() {
-            if (event != null) {
-                handle(event);
-            }
-        }
-
         private GraphPlotArea area;
 
         private GraphLine line;
@@ -259,7 +247,6 @@ public class GraphTracker {
         protected boolean handle(final MouseEvent e, final GraphPlotArea a, final double v, final double[] values) {
             final EventType<? extends MouseEvent> type = e.getEventType();
             if (type == MouseEvent.MOUSE_RELEASED || v != v) {
-                storeEvent(null);
                 hidden();
                 if (line != null) {
                     line.setVisible(false);
@@ -271,7 +258,6 @@ public class GraphTracker {
                 }
                 return true;
             }
-            storeEvent(e);
             final GraphPlotArea area = this.area;
 
             // type == drag or pressed

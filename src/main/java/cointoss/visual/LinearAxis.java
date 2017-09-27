@@ -165,7 +165,7 @@ public class LinearAxis extends Axis {
 
         double minorLength;
         int mcount = 10; // getPrefferedMinorCount();
-        if (!minorTickVisibility.get() || mcount <= 1) {
+        if (minorTickLength.get() <= 0 || mcount <= 1) {
             minorLength = -1;
         } else {
             minorLength = majorLength / mcount;

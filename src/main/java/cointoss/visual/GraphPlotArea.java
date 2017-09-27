@@ -447,7 +447,7 @@ public class GraphPlotArea extends Region {
             }
         } // end H
 
-        if (yaxis.minorTickVisibility.get()) {
+        if (0 < yaxis.minorTickLength.get()) {
             final Axis axis = xaxis;
             DoubleList minorTicks = axis.majors;
 
@@ -476,7 +476,7 @@ public class GraphPlotArea extends Region {
             }
         }
 
-        if (xaxis.minorTickVisibility.get()) {
+        if (0 < xaxis.minorTickLength.get()) {
             final Axis axis = yaxis;
             DoubleList minorTicks = axis.minors;
 
@@ -620,12 +620,11 @@ public class GraphPlotArea extends Region {
             plotline.clearMemory();
         }
 
-        int start, end;
         Axis axis = axisX.get();
         double low = axis.visualMinValue.get();
         double up = axis.visualMaxValue.get();
-        start = data.searchXIndex(low, false);
-        end = data.searchXIndex(up, true);
+        int start = data.searchXIndex(low, false);
+        int end = data.searchXIndex(up, true);
 
         start = Math.max(0, start - 2);
 
