@@ -76,24 +76,6 @@ public class CandleChartData {
     }
 
     /**
-     * <b>このデータがyでソートされているときに限り</b>valueが出てくるインデックスを検索します。
-     * minModeにより、valueを越えない最大インデックスか、valueより大きな最小インデックスを探すかを変えられます。<br>
-     * このデータがソートされていないときの挙動は保証しません
-     * 
-     * @param value
-     * @param minMode trueの時、value「より小さくならない最小の」インデックスを検索する。<br>
-     *            falseの時、value「を越えない最大の」インデックスを検索する
-     * @return
-     */
-    public int searchYIndex(final double value, final boolean minMode) {
-        if (minMode) {
-            return findMinIndex(chart.ticks, chart.ticks.size(), value, t -> t.getWeightMedian().toDouble());
-        } else {
-            return findMaxIndex(chart.ticks, chart.ticks.size(), value, t -> t.getWeightMedian().toDouble());
-        }
-    }
-
-    /**
      * ※aが昇順に整列されているときに限る。 vを越えない最大のaの場所を探索する
      * 
      * @param a

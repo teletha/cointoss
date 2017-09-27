@@ -12,9 +12,7 @@ package cointoss.visual;
 import java.util.ArrayList;
 import java.util.List;
 
-import javafx.beans.InvalidationListener;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -147,9 +145,8 @@ public class GraphTracker {
          * @param area 対象のGraphPlotArea
          * @param value oがHORIZONTALのとき、xを意味する。そうでないときはy
          * @param values oがHORIZONTALのとき、yを意味する。そうでないときはx
-         * @param o
          */
-        public void show(GraphPlotArea area, double value, double[] values, Orientation o);
+        public void show(GraphPlotArea area, double value, double[] values);
 
         /**
          * 点の情報を非表示にする
@@ -197,7 +194,7 @@ public class GraphTracker {
     private void show(final double v, final double[] vv) {
         final PointsDataView view = getView();
         if (view != null) {
-            view.show(h.area, v, vv, h.area.getOrientation());
+            view.show(h.area, v, vv);
         }
     }
 
@@ -297,48 +294,24 @@ public class GraphTracker {
 
             line.setValue(v);
             line.setVisible(true);
-            if (area.getOrientation() == Orientation.HORIZONTAL) {
-                // v = x,values = y
-                line.setOrientation(Orientation.VERTICAL);
-                for (int i = 0, ee = values.length; i < ee; i++) {
-                    final double vv = values[i];
-                    final GraphPointShape s = points.get(i);
-                    if (vv != vv || Double.isInfinite(vv)) {
-                        s.setVisible(false);
-                    } else {
-                        s.setVisible(true);
-                        s.setX(v);
-                        s.setY(vv);
-                    }
+            // v = x,values = y
+            line.setOrientation(Orientation.VERTICAL);
+            for (int i = 0, ee = values.length; i < ee; i++) {
+                final double vv = values[i];
+                final GraphPointShape s = points.get(i);
+                if (vv != vv || Double.isInfinite(vv)) {
+                    s.setVisible(false);
+                } else {
+                    s.setVisible(true);
+                    s.setX(v);
+                    s.setY(vv);
+                }
 
-                }
-            } else {
-                line.setOrientation(Orientation.HORIZONTAL);
-                for (int i = 0, ee = values.length; i < ee; i++) {
-                    final double vv = values[i];
-                    final GraphPointShape s = points.get(i);
-                    if (vv != vv || Double.isInfinite(vv)) {
-                        s.setVisible(false);
-                    } else {
-                        s.setVisible(true);
-                        s.setY(v);
-                        s.setX(vv);
-                    }
-                }
             }
 
             show(v, values);
             return true;
         }
-
-        InvalidationListener invalidatelistener = o -> {
-            final ReadOnlyBooleanProperty b = (ReadOnlyBooleanProperty) o;
-            if (!b.get()) {
-                // TODO requestLayoutと違って無駄な計算が多すぎる
-                // 呼び出しタイミングをコントロールできないかな？
-                rehandle();
-            }
-        };
 
         @Override
         public void install(final GraphPlotArea g) {

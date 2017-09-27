@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javafx.collections.ObservableList;
-import javafx.geometry.Orientation;
 import javafx.scene.input.MouseEvent;
 
 /**
@@ -60,71 +59,41 @@ public abstract class GraphTrackingActionHandler extends GraphEventHandler<Mouse
      * @param arr
      * @return
      */
-    private final boolean _handle(final MouseEvent e, final GraphPlotArea a, final double v, final double[] arr, final Orientation o) {
+    private final boolean _handle(final MouseEvent e, final GraphPlotArea a, final double v, final double[] arr) {
         final ObservableList<CandleChartData> dataList = a.getLineDataList();
         final int dsize = arr.length;
-        if (a.getOrientation() != o) {
+        if (a.axisX.get() == null) {
             return false;
         }
-        if (a.getOrientation() == Orientation.HORIZONTAL) {
-            if (a.axisX.get() == null) {
-                return false;
-            }
-            for (int i = 0; i < dsize; i++) {
-                final CandleChartData d = dataList.get(i);
-                final int ds = d.size();
-                if (ds == 0) {
-                    arr[i] = Double.NaN;
-                    continue;
-                }
-
-                final int lowindex = d.searchXIndex(v, false);
-                final double lowv = d.getX(lowindex);
-
-                if (lowv == v) {
-                    arr[i] = d.getY(lowindex);
-                    continue;
-                } else if (lowv > v || ds <= lowindex + 1) {
-                    arr[i] = Double.NaN;
-                    continue;
-                }
-
-                final double upv = d.getX(lowindex + 1);
-                final double k = (v - lowv) / (upv - lowv);
-                arr[i] = (1 - k) * d.getY(lowindex) + k * d.getY(lowindex + 1);
-            }
-        } else {
-            if (a.axisY.get() == null) {
-                return false;
+        for (int i = 0; i < dsize; i++) {
+            final CandleChartData d = dataList.get(i);
+            final int ds = d.size();
+            if (ds == 0) {
+                arr[i] = Double.NaN;
+                continue;
             }
 
-            for (int i = 0; i < dsize; i++) {
-                final CandleChartData d = dataList.get(i);
-                final int ds = d.size();
-                if (ds == 0) {
-                    arr[i] = Double.NaN;
-                    continue;
-                }
+            final int lowindex = d.searchXIndex(v, false);
+            final double lowv = d.getX(lowindex);
 
-                final int lowindex = d.searchYIndex(v, false);
-                final double lowv = d.getY(lowindex);
-
-                if (lowv == v) {
-                    arr[i] = d.getX(lowindex);
-                    continue;
-                } else if (lowv > v || ds <= lowindex + 1) {
-                    arr[i] = Double.NaN;
-                    continue;
-                }
-
-                final double upv = d.getY(lowindex + 1);
-                final double k = (v - lowv) / (upv - lowv);
-                arr[i] = (1 - k) * d.getX(lowindex) + k * d.getX(lowindex + 1);
+            if (lowv == v) {
+                arr[i] = d.getY(lowindex);
+                continue;
+            } else if (lowv > v || ds <= lowindex + 1) {
+                arr[i] = Double.NaN;
+                continue;
             }
+
+            final double upv = d.getX(lowindex + 1);
+            final double k = (v - lowv) / (upv - lowv);
+            arr[i] = (1 - k) * d.getY(lowindex) + k * d.getY(lowindex + 1);
         }
         return true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public final void handle(final MouseEvent e) {
         if (!(e.getSource() instanceof GraphPlotArea) || !filter(e)) {
@@ -136,25 +105,17 @@ public abstract class GraphTrackingActionHandler extends GraphEventHandler<Mouse
         final double[] arr = getARR(dsize);
 
         final double v;
-        final Orientation o = a.getOrientation();
-        if (o == Orientation.HORIZONTAL) {
-            if (a.axisX == null) {
-                return;
-            }
-            v = a.axisX.get().getValueForPosition(e.getX());
-        } else {
-            if (a.axisY.get() == null) {
-                return;
-            }
-            v = a.axisY.get().getValueForPosition(e.getY());
+        if (a.axisX == null) {
+            return;
         }
+        v = a.axisX.get().getValueForPosition(e.getX());
 
-        _handle(e, a, v, arr, o);
+        _handle(e, a, v, arr);
         final boolean b = handle(e, a, v, arr);
         if (binds != null) {
             for (final A aa : binds) {
                 if (aa.call) {
-                    aa.a.bindHandle(e, v, o);
+                    aa.a.bindHandle(e, v);
                 }
             }
         }
@@ -165,13 +126,13 @@ public abstract class GraphTrackingActionHandler extends GraphEventHandler<Mouse
 
     }
 
-    private void bindHandle(final MouseEvent e, final double v, final Orientation o) {
+    private void bindHandle(final MouseEvent e, final double v) {
         final GraphPlotArea a = getTargetPlotArea();
-        if (a != null && o == a.getOrientation()) {
+        if (a != null) {
             final ObservableList<CandleChartData> dataList = a.getLineDataList();
             final int dsize = dataList == null ? 0 : dataList.size();
             final double[] arr = getARR(dsize);
-            if (!_handle(e, a, v, arr, o)) {
+            if (!_handle(e, a, v, arr)) {
                 return;
             }
             handle(e, a, v, arr);

@@ -24,7 +24,6 @@ import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.geometry.Orientation;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.layout.Region;
@@ -621,22 +620,13 @@ public class GraphPlotArea extends Region {
             plotline.clearMemory();
         }
 
-        Orientation orientation = getOrientation();
         int start, end;
-        if (orientation == Orientation.HORIZONTAL) {// x軸方向昇順
-            Axis axis = axisX.get();
-            double low = axis.visualMinValue.get();
-            double up = axis.visualMaxValue.get();
-            start = data.searchXIndex(low, false);
-            end = data.searchXIndex(up, true);
+        Axis axis = axisX.get();
+        double low = axis.visualMinValue.get();
+        double up = axis.visualMaxValue.get();
+        start = data.searchXIndex(low, false);
+        end = data.searchXIndex(up, true);
 
-        } else {
-            Axis axis = axisY.get();
-            double low = axis.visualMinValue.get();
-            double up = axis.visualMaxValue.get();
-            start = data.searchYIndex(low, false);
-            end = data.searchYIndex(up, true);
-        }
         start = Math.max(0, start - 2);
 
         plotLineChartData(data, path.getElements(), start, end);
@@ -655,126 +645,64 @@ public class GraphPlotArea extends Region {
         Axis xaxis = axisX.get();
         Axis yaxis = axisY.get();
 
-        if (getOrientation() == Orientation.HORIZONTAL) {// x軸方向昇順
-            boolean moveTo = true;
-            double beforeX = 0, beforeY = 0;
-            int elementIndex = 0;
-            for (int i = start; i <= end; i++) {
-                double x = data.getX(i);
-                double y = data.getY(i);
+        boolean moveTo = true;
+        double beforeX = 0, beforeY = 0;
+        int elementIndex = 0;
+        for (int i = start; i <= end; i++) {
+            double x = data.getX(i);
+            double y = data.getY(i);
 
-                // 座標変換
-                x = xaxis.getPositionForValue(x);
-                y = yaxis.getPositionForValue(y);
+            // 座標変換
+            x = xaxis.getPositionForValue(x);
+            y = yaxis.getPositionForValue(y);
 
-                if (moveTo) {// 線が途切れている場合
-                    if (elementIndex < elementSize) {
-                        PathElement pathElement = elements.get(elementIndex);
-                        if (pathElement.getClass() == MoveTo.class) {// 再利用
-                            MoveTo m = ((MoveTo) pathElement);
-                            m.setX(x);
-                            m.setY(y);
-                        } else {
-                            MoveTo m = new MoveTo(x, y);
-                            elements.set(elementIndex, m);// 置換
-                        }
-                        elementIndex++;
+            if (moveTo) {// 線が途切れている場合
+                if (elementIndex < elementSize) {
+                    PathElement pathElement = elements.get(elementIndex);
+                    if (pathElement.getClass() == MoveTo.class) {// 再利用
+                        MoveTo m = ((MoveTo) pathElement);
+                        m.setX(x);
+                        m.setY(y);
                     } else {
                         MoveTo m = new MoveTo(x, y);
-                        elements.add(m);
+                        elements.set(elementIndex, m);// 置換
                     }
-                    moveTo = false;
-                    beforeX = x;
-                    beforeY = y;
-                } else {// 線が続いている場合
-                    double l = Math.hypot(x - beforeX, y - beforeY);
-                    // 距離が小さすぎる場合は無視
-                    if (l < DISTANCE_THRESHOLD) {
-                        continue;
-                    }
-                    if (elementIndex < elementSize) {
-                        final PathElement pathElement = elements.get(elementIndex);
-                        if (pathElement.getClass() == LineTo.class) {
-                            LineTo m = ((LineTo) pathElement);
-                            m.setX(x);
-                            m.setY(y);
-                        } else {
-                            LineTo m = new LineTo(x, y);
-                            elements.set(elementIndex, m);
-                        }
-                        elementIndex++;
+                    elementIndex++;
+                } else {
+                    MoveTo m = new MoveTo(x, y);
+                    elements.add(m);
+                }
+                moveTo = false;
+                beforeX = x;
+                beforeY = y;
+            } else {// 線が続いている場合
+                double l = Math.hypot(x - beforeX, y - beforeY);
+                // 距離が小さすぎる場合は無視
+                if (l < DISTANCE_THRESHOLD) {
+                    continue;
+                }
+                if (elementIndex < elementSize) {
+                    final PathElement pathElement = elements.get(elementIndex);
+                    if (pathElement.getClass() == LineTo.class) {
+                        LineTo m = ((LineTo) pathElement);
+                        m.setX(x);
+                        m.setY(y);
                     } else {
                         LineTo m = new LineTo(x, y);
-                        elements.add(m);
+                        elements.set(elementIndex, m);
                     }
-                    beforeX = x;
-                    beforeY = y;
+                    elementIndex++;
+                } else {
+                    LineTo m = new LineTo(x, y);
+                    elements.add(m);
                 }
-            } // end for
-
-            if (elementIndex < elementSize) {
-                elements.remove(elementIndex, elementSize);
+                beforeX = x;
+                beforeY = y;
             }
-        } else {
-            boolean moveTo = true;
-            double beforeX = 0, beforeY = 0;
-            int elei = 0;
-            for (int i = start; i <= end; i++) {
-                double x = data.getX(i);
-                double y = data.getY(i);
+        } // end for
 
-                // 座標変換
-                x = xaxis.getPositionForValue(x);
-                y = yaxis.getPositionForValue(y);
-
-                if (moveTo) {// 線が途切れている場合
-                    if (elei < elementSize) {
-                        PathElement pathElement = elements.get(elei);
-                        if (pathElement.getClass() == MoveTo.class) {// 再利用
-                            MoveTo m = ((MoveTo) pathElement);
-                            m.setX(x);
-                            m.setY(y);
-                        } else {
-                            MoveTo m = new MoveTo(x, y);
-                            elements.set(elei, m);// 置換
-                        }
-                        elei++;
-                    } else {
-                        MoveTo m = new MoveTo(x, y);
-                        elements.add(m);
-                    }
-                    moveTo = false;
-                    beforeY = y;
-                    beforeX = x;
-                } else {// 線が続いている場合
-                    double l = Math.hypot(x - beforeX, y - beforeY);
-                    // 距離が小さすぎる場合は無視
-                    if (l < DISTANCE_THRESHOLD) {
-                        continue;
-                    }
-                    if (elei < elementSize) {
-                        PathElement pathElement = elements.get(elei);
-                        if (pathElement.getClass() == LineTo.class) {
-                            LineTo m = ((LineTo) pathElement);
-                            m.setX(x);
-                            m.setY(y);
-                        } else {
-                            LineTo m = new LineTo(x, y);
-                            elements.set(elei, m);
-                        }
-                        elei++;
-                    } else {
-                        LineTo m = new LineTo(x, y);
-                        elements.add(m);
-                    }
-                    beforeY = y;
-                    beforeX = x;
-                }
-            } // end for
-
-            if (elei < elementSize) {
-                elements.remove(elei, elementSize);
-            }
+        if (elementIndex < elementSize) {
+            elements.remove(elementIndex, elementSize);
         }
 
     }
@@ -1010,28 +938,6 @@ public class GraphPlotArea extends Region {
             setNeedsLayout(true);
         }
     }
-
-    /**
-     * x軸方向に連続なデータか、y軸方向に連続なデータかを指定するプロパティ
-     * 
-     * @return
-     */
-    public final ObjectProperty<Orientation> orientationProperty() {
-        if (orientationProperty == null) {
-            orientationProperty = new SimpleObjectProperty<>(this, "orientation", Orientation.HORIZONTAL);
-        }
-        return orientationProperty;
-    }
-
-    public final Orientation getOrientation() {
-        return orientationProperty == null ? Orientation.HORIZONTAL : orientationProperty.get();
-    }
-
-    public final void setOrientation(final Orientation value) {
-        orientationProperty().set(value);
-    }
-
-    private ObjectProperty<Orientation> orientationProperty;
 
     /**
      * Get data for line chart.

@@ -92,7 +92,6 @@ public class CandleChart extends Region {
         graph.setCandleChartDataList(candles);
         graph.axisX.set(axisX);
         graph.axisY.set(axisY);
-        graph.orientationProperty().bind(orientationProperty());
         getChildren().addAll(graph, axisX, axisY);
     }
 
@@ -441,34 +440,6 @@ public class CandleChart extends Region {
         }
         return lineChartDataListener;
     }
-
-    /**
-     * x軸方向に連続なデータか、y軸方向に連続なデータかを指定するプロパティ
-     * 
-     * @return
-     */
-    public final ObjectProperty<Orientation> orientationProperty() {
-        if (orientationProperty == null) {
-            orientationProperty = new SimpleObjectProperty<>(this, "orientation", Orientation.HORIZONTAL);
-        }
-        return orientationProperty;
-    }
-
-    public final Orientation getOrientation() {
-        return orientationProperty == null ? Orientation.HORIZONTAL : orientationProperty.get();
-    }
-
-    /**
-     * @param orientation
-     * @return
-     */
-    public final CandleChart orientation(Orientation orientation) {
-        orientationProperty().set(orientation);
-
-        return this;
-    }
-
-    private ObjectProperty<Orientation> orientationProperty;
 
     protected final InvalidationListener getLayoutInvalidationListener() {
         if (layoutInvalidationListener == null) {
