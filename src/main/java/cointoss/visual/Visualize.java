@@ -10,7 +10,6 @@
 package cointoss.visual;
 
 import static cointoss.Execution.*;
-import static java.time.format.DateTimeFormatter.*;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -37,6 +36,8 @@ import filer.Filer;
  */
 public class Visualize extends Application {
 
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+
     public static void main(final String[] args) {
         launch(args);
     }
@@ -46,7 +47,7 @@ public class Visualize extends Application {
      */
     @Override
     public void start(final Stage stage) throws Exception {
-        Chart serise = chart(BitFlyer.FX_BTC_JPY, "2017-09-05T13:00:00", "2017-09-05T23:59:59", Duration.ofMinutes(1));
+        Chart serise = chart(BitFlyer.FX_BTC_JPY, "2017-09-05T00:00:00", "2017-09-06T23:59:59", Duration.ofMinutes(1));
 
         Num max = Num.MIN;
         Num min = Num.MAX;
@@ -64,9 +65,12 @@ public class Visualize extends Application {
                 .graph(plot -> {
                 })
                 .axisX(axis -> {
+                    long minute = 60000;
                     axis.nameLabel.setText("日時");
-                    axis.tickLabelFormatter.set(v -> Instant.ofEpochMilli((long) v).atZone(UTC).format(ISO_LOCAL_DATE_TIME));
+                    axis.tickLabelFormatter.set(v -> Instant.ofEpochMilli((long) v).atZone(UTC).format(formatter));
                     axis.visibleRange.set(100D / serise.ticks.size());
+                    axis.units.set(new double[] {minute, 10 * minute, 30 * minute, 60 * minute, 2 * 60 * minute, 4 * 60 * minute,
+                            6 * 60 * minute, 12 * 60 * minute, 24 * 60 * minute});
                 })
                 .axisY(axis -> {
                     axis.nameLabel.setText("JPY");

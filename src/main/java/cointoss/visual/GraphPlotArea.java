@@ -27,7 +27,6 @@ import javafx.collections.ObservableList;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.layout.Region;
-import javafx.scene.shape.ClosePath;
 import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
@@ -314,48 +313,6 @@ public class GraphPlotArea extends Region {
                     lt.setX(d);
                     lt.setY(h);
                 }
-                if (fill) {
-                    final boolean f = vFill.get(i);
-                    MoveTo m;
-                    LineTo l1, l2, l3;
-
-                    if (f || i == 0) {
-                        if (findex < felesize) {
-                            m = (MoveTo) fele.get(findex);
-                            l1 = (LineTo) fele.get(findex + 1);
-                            l2 = (LineTo) fele.get(findex + 2);
-                            l3 = (LineTo) fele.get(findex + 3);
-                            findex += 5;
-                        } else {
-                            m = new MoveTo();
-                            l1 = new LineTo();
-                            l2 = new LineTo();
-                            l3 = new LineTo();
-                            fele.addAll(m, l1, l2, l3, new ClosePath());
-                        }
-                    } else {
-                        continue;
-                    }
-                    double x0, x1;
-                    if (!f) {
-                        x0 = 0;
-                        x1 = d;
-                    } else if (i == e - 1) {
-                        x0 = d;
-                        x1 = w;
-                    } else {
-                        x0 = d;
-                        x1 = vTicks.get(i + 1);
-                    }
-                    m.setX(x0);
-                    m.setY(0);
-                    l1.setX(x0);
-                    l1.setY(h);
-                    l2.setX(x1);
-                    l2.setY(h);
-                    l3.setX(x1);
-                    l3.setY(0);
-                } // end fill
             } // end for
             if (findex < felesize) {
                 fele.remove(findex, felesize);
@@ -406,47 +363,6 @@ public class GraphPlotArea extends Region {
                     lt.setX(w);
                     lt.setY(d);
                 }
-                if (fill) {
-                    final boolean f = hFill.get(i);
-                    MoveTo m;
-                    LineTo l1, l2, l3;
-                    if (f || i == 0) {
-                        if (findex < felesize) {
-                            m = (MoveTo) fele.get(findex);
-                            l1 = (LineTo) fele.get(findex + 1);
-                            l2 = (LineTo) fele.get(findex + 2);
-                            l3 = (LineTo) fele.get(findex + 3);
-                            findex += 5;
-                        } else {
-                            m = new MoveTo();
-                            l1 = new LineTo();
-                            l2 = new LineTo();
-                            l3 = new LineTo();
-                            fele.addAll(m, l1, l2, l3, new ClosePath());
-                        }
-                    } else {
-                        continue;
-                    }
-                    double y0, y1;
-                    if (!f) {
-                        y0 = h;
-                        y1 = d;
-                    } else if (i == e - 1) {
-                        y0 = d;
-                        y1 = 0;
-                    } else {
-                        y0 = d;
-                        y1 = hTicks.get(i + 1);
-                    }
-                    m.setX(0);
-                    m.setY(y0);
-                    l1.setX(w);
-                    l1.setY(y0);
-                    l2.setX(w);
-                    l2.setY(y1);
-                    l3.setX(0);
-                    l3.setY(y1);
-                } // end fill
             } // end for
             if (findex < felesize) {
                 fele.remove(findex, felesize);
