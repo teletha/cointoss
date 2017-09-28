@@ -47,7 +47,13 @@ public class Visualize extends Application {
      */
     @Override
     public void start(final Stage stage) throws Exception {
-        Chart serise = chart(BitFlyer.FX_BTC_JPY, "2017-09-05T00:00:00", "2017-09-06T23:59:59", Duration.ofMinutes(1));
+        // Chart serise = chart(BitFlyer.FX_BTC_JPY, "2017-09-05T00:00:00", "2017-09-06T23:59:59",
+        // Duration.ofMinutes(1));
+        Chart serise = chart(BitFlyer.FX_BTC_JPY, Duration.ofMinutes(1));
+
+        serise.tick.to(t -> {
+            System.out.println(t);
+        });
 
         Num max = Num.MIN;
         Num min = Num.MAX;
@@ -121,6 +127,17 @@ public class Visualize extends Application {
         } else {
             chart.readFrom(file);
         }
+        return chart;
+    }
+
+    private Chart chart(BitFlyer type, Duration duration) {
+        // search tick log
+        Chart chart = new Chart(duration);
+
+        type.log() //
+                .fromLast(1)
+                .to(chart::tick);
+
         return chart;
     }
 }

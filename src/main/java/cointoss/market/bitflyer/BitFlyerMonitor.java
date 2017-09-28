@@ -22,7 +22,7 @@ public class BitFlyerMonitor extends Trading {
      */
     @Override
     protected void initialize() {
-        market.observeExecutionBySize(10).to(exe -> {
+        market.observeExecutionBySize(11).to(exe -> {
             System.out.println("大口 " + exe.exec_date.withNano(0).toLocalDateTime().plusHours(9) + "  " + exe.side
                     .mark() + exe.cumulativeSize + " @" + exe.price);
         });
