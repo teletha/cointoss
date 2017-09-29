@@ -9,8 +9,6 @@
  */
 package cointoss;
 
-import static java.time.temporal.ChronoUnit.*;
-
 import cointoss.chart.Tick;
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.util.Num;
@@ -30,7 +28,7 @@ public class BackTest {
                 .baseCurrency(1000000)
                 .targetCurrency(0)
                 .log(() -> BitFlyer.FX_BTC_JPY.log().rangeRandom(7))
-                .strategy(() -> new BuyAndHold())
+                .strategy(() -> new BreakoutTrading())
                 .trial(5)
                 .run();
     }
@@ -137,78 +135,28 @@ public class BackTest {
      */
     private static class BreakoutTrading extends Trading {
 
-        private int update;
+        Num profitPrice;
 
-        private Num underPrice;
+        Num lossPrice;
 
         /**
          * {@inheritDoc}
          */
         @Override
         protected void initialize() {
-            // various events
-            market.timeline.to(exe -> {
+            market.second10.to(exe -> {
                 if (hasPosition() == false) {
-                    Entry latest = latest();
-                    Side side;
-
-                    if (latest == null) {
-                        side = Side.random();
-                    } else {
-                        if (market.minute5.isRange()) {
-                            side = latest.isWin() ? latest.inverse() : latest.side();
-                        } else {
-                            side = latest.isWin() ? latest.side() : latest.inverse();
-                        }
-                    }
+                    Side side = Side.random();
 
                     entryMarket(side, maxPositionSize, entry -> {
-                        update = 1;
-                        underPrice = exe.price.minus(entry, 4000);
+                        profitPrice = entry.entryPrice().plus(entry, 5000);
+                        lossPrice = entry.entryPrice().minus(entry, 2000);
 
-                        // cancel timing
-                        market.timeline.takeUntil(completingEntry)
-                                .take(keep(5, MINUTES, entry.order::isNotCompleted))
-                                .take(1)
-                                .mapTo(entry.order)
-                                .to(t -> {
-                                    System.out.println("cancel " + entry.order);
-                                    cancel(entry);
-                                });
-
-                        // rise under price line
-                        market.second10.tick.takeUntil(closingPosition) //
-                                .map(Tick::getClosePrice)
-                                .takeAt(i -> i % 5 == 0)
-                                .to(e -> {
-                                    Num next = e.minus(entry, Math.max(0, 4000 - update * 200));
-
-                                    if (next.isGreaterThan(entry, underPrice)) {
-                                        entry.log("最低価格を%sから%sに再設定 参考値%s", underPrice, next, e);
-                                        update++;
-                                        underPrice = next;
-                                    }
-                                });
-
-                        // loss cut
-                        market.timeline.takeUntil(closingPosition) //
-                                .take(keep(5, SECONDS, e -> e.price.isLessThan(entry, underPrice)))
-                                .take(1)
-                                .to(e -> {
-                                    entry.exitLimit(entry.entrySize(), underPrice, exit -> {
-                                        entry.log("10秒以上約定値が%s以下になったので指値で決済開始", underPrice);
-
-                                        market.timeline.takeUntil(completingEntry)
-                                                .take(keep(30, SECONDS, exit::isNotCompleted))
-                                                .take(1)
-                                                .to(x -> {
-                                                    market.cancel(exit).to(() -> {
-                                                        entry.log("30秒待っても処理されないので指値をキャンセルして成行決済 " + exit.outstanding_size);
-                                                        entry.exitMarket(exit.outstanding_size);
-                                                    });
-                                                });
-                                    });
-                                });
+                        market.second10.tick.takeUntil(closingPosition).to(e -> {
+                            if (e.closePrice.isGreaterThan(entry, profitPrice)) {
+                                entry.exitMarket(entry.entrySize());
+                            }
+                        });
                     });
                 }
             });
