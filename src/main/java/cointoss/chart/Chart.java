@@ -77,8 +77,7 @@ public class Chart {
             Num ratio = latest.divide(trend.getLast(i));
             total = total.multiply(ratio);
         }
-        return total.isLessThan(Num.of("0.65")) ? Trend.Down
-                : total.isGreaterThan(Num.of("1.35")) ? Trend.Up : Trend.Range;
+        return total.isLessThan(Num.of("0.65")) ? Trend.Down : total.isGreaterThan(Num.of("1.35")) ? Trend.Up : Trend.Range;
     }
 
     /**

@@ -66,6 +66,13 @@ class TestableMarketBackend implements MarketBackend {
      * {@inheritDoc}
      */
     @Override
+    public void vandalize() {
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Signal<String> request(Order order) {
         return I.signal(order).map(o -> {
             BackendOrder child = new BackendOrder(order);

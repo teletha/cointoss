@@ -9,7 +9,6 @@
  */
 package cointoss;
 
-import java.lang.reflect.Constructor;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,14 +18,14 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import cointoss.chart.Chart;
 import cointoss.util.Num;
-import kiss.I;
+import kiss.Disposable;
 import kiss.Observer;
 import kiss.Signal;
 
 /**
  * @version 2017/09/11 18:26:15
  */
-public class Market {
+public class Market implements Disposable {
 
     /** The market handler. */
     protected final MarketBackend backend;
@@ -121,6 +120,14 @@ public class Market {
         strategy.market = this;
         strategy.initialize();
         backend.initialize(this, log);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void vandalize() {
+        backend.dispose();
     }
 
     /**
@@ -431,21 +438,5 @@ public class Market {
     private void initializePosition() {
         position = null;
         price = remaining = Num.ZERO;
-    }
-
-    /**
-     * Create new {@link Trading} instance.
-     * 
-     * @param type
-     * @return
-     */
-    private Trading create(Class<? extends Trading> type) {
-        try {
-            Constructor<? extends Trading> constructor = type.getDeclaredConstructor(Market.class);
-            constructor.setAccessible(true);
-            return constructor.newInstance(this);
-        } catch (Exception e) {
-            throw I.quiet(e);
-        }
     }
 }

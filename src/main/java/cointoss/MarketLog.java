@@ -10,6 +10,7 @@
 package cointoss;
 
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 
 import cointoss.util.Span;
 import kiss.Signal;
@@ -54,7 +55,18 @@ public interface MarketLog {
      * @return
      */
     default Signal<Execution> fromLast(int days) {
-        return from(ZonedDateTime.now().minusDays(days));
+        return fromLast(days, ChronoUnit.DAYS);
+    }
+
+    /**
+     * Read date from the specified date.
+     * 
+     * @param time A duration.
+     * @param unit A duration unit.
+     * @return
+     */
+    default Signal<Execution> fromLast(int time, ChronoUnit unit) {
+        return from(ZonedDateTime.now().minus(time, unit));
     }
 
     /**

@@ -9,12 +9,13 @@
  */
 package cointoss;
 
+import kiss.Disposable;
 import kiss.Signal;
 
 /**
  * @version 2017/09/08 18:51:05
  */
-public interface MarketBackend {
+public interface MarketBackend extends Disposable {
 
     /**
      * <p>

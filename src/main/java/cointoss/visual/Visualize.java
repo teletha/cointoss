@@ -10,6 +10,7 @@
 package cointoss.visual;
 
 import static cointoss.Execution.*;
+import static java.time.temporal.ChronoUnit.*;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -18,6 +19,8 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -25,6 +28,8 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
 import cointoss.Execution;
+import cointoss.Market;
+import cointoss.Trading;
 import cointoss.chart.Chart;
 import cointoss.chart.Tick;
 import cointoss.market.bitflyer.BitFlyer;
@@ -38,6 +43,16 @@ public class Visualize extends Application {
 
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
 
+    /** The system thread. */
+    private static ExecutorService system = Executors.newFixedThreadPool(1);
+
+    private Market market;
+
+    /**
+     * Launch application.
+     * 
+     * @param args
+     */
     public static void main(final String[] args) {
         launch(args);
     }
@@ -46,14 +61,33 @@ public class Visualize extends Application {
      * {@inheritDoc}
      */
     @Override
-    public void start(final Stage stage) throws Exception {
-        // Chart serise = chart(BitFlyer.FX_BTC_JPY, "2017-09-05T00:00:00", "2017-09-06T23:59:59",
-        // Duration.ofMinutes(1));
-        Chart serise = chart(BitFlyer.FX_BTC_JPY, Duration.ofMinutes(1));
+    public void init() throws Exception {
+        system.submit(() -> {
+            market = new Market(BitFlyer.FX_BTC_JPY.service(), BitFlyer.FX_BTC_JPY.log().fromLast(180, MINUTES), new Trading() {
 
-        serise.tick.to(t -> {
-            System.out.println(t);
+                /**
+                 * 
+                 */
+                @Override
+                protected void initialize() {
+                    market.minute1.to(t -> {
+                        System.out.println(t);
+                    });
+                }
+            });
         });
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void start(final Stage stage) throws Exception {
+        while (market == null) {
+            Thread.sleep(100);
+        }
+
+        Chart serise = market.minute1;
 
         Num max = Num.MIN;
         Num min = Num.MAX;
@@ -101,6 +135,11 @@ public class Visualize extends Application {
         Scene s = new Scene(p);
         stage.setScene(s);
         stage.show();
+        stage.setOnCloseRequest(e -> {
+            market.dispose();
+            system.shutdownNow();
+            System.out.println("HSHOUT");
+        });
     }
 
     private Chart chart(BitFlyer type, String start, String end, Duration duration) {

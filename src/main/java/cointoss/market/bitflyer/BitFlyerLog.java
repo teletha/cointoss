@@ -42,12 +42,17 @@ import kiss.I;
 import kiss.Signal;
 
 /**
- * @version 2017/09/08 18:42:36
+ * @version 2017/10/01 8:41:58
  */
 class BitFlyerLog implements MarketLog {
 
     /** The writer thread. */
-    private static final ExecutorService writer = Executors.newSingleThreadExecutor();
+    private static final ExecutorService writer = Executors.newSingleThreadExecutor(run -> {
+        Thread thread = new Thread(run);
+        thread.setName("Log Writer");
+        thread.setDaemon(true);
+        return thread;
+    });
 
     /** file data format */
     private static final DateTimeFormatter fomatFile = DateTimeFormatter.ofPattern("yyyyMMdd");
@@ -92,7 +97,7 @@ class BitFlyerLog implements MarketLog {
 
         for (Path file : files) {
             String name = file.getFileName().toString();
-            ZonedDateTime date = LocalDate.parse(name.substring(9, 17), fomatFile).atTime(0, 0).atZone(Execution.UTC);
+            ZonedDateTime date = LocalDate.parse(name.substring(9, 17), fomatFile).atTime(0, 0, 0, 0).atZone(Execution.UTC);
 
             if (start == null || end == null) {
                 start = date;
@@ -123,7 +128,9 @@ class BitFlyerLog implements MarketLog {
                 current = current.withHour(0).withMinute(0).withSecond(0).withNano(0);
 
                 while (disposer.isDisposed() == false && !current.isAfter(getCacheEnd())) {
-                    disposer.add(localCache(current).effect(e -> latestId = cacheId = e.id).to(observer::accept));
+                    disposer.add(localCache(current).effect(e -> latestId = cacheId = e.id)
+                            .take(e -> e.exec_date.isAfter(start))
+                            .to(observer::accept));
                     current = current.plusDays(1);
                 }
             }
@@ -270,14 +277,26 @@ class BitFlyerLog implements MarketLog {
             PubNub pubNub = new PubNub(config);
             pubNub.addListener(new SubscribeCallback() {
 
+                /**
+                 * @param pubnub
+                 * @param status
+                 */
                 @Override
                 public void status(PubNub pubnub, PNStatus status) {
                 }
 
+                /**
+                 * @param pubnub
+                 * @param presence
+                 */
                 @Override
                 public void presence(PubNub pubnub, PNPresenceEventResult presence) {
                 }
 
+                /**
+                 * @param pubnub
+                 * @param message
+                 */
                 @Override
                 public void message(PubNub pubnub, PNMessageResult message) {
                     if (message.getChannel() != null) {

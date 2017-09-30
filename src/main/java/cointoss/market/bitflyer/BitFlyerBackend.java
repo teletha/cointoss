@@ -30,6 +30,7 @@ import cointoss.Order;
 import cointoss.OrderState;
 import cointoss.Position;
 import filer.Filer;
+import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
 
@@ -53,6 +54,8 @@ class BitFlyerBackend implements MarketBackend {
     /** The token. */
     private final String accessToken;
 
+    private Disposable disposer = Disposable.empty();
+
     /**
      * @param type
      */
@@ -69,7 +72,15 @@ class BitFlyerBackend implements MarketBackend {
      */
     @Override
     public void initialize(Market market, Signal<Execution> log) {
-        log.to(market::tick);
+        disposer.add(log.to(market::tick));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void vandalize() {
+        disposer.dispose();
     }
 
     /**
