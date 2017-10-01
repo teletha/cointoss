@@ -11,6 +11,7 @@ package cointoss.visual;
 
 import static java.lang.Math.*;
 
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 import javafx.beans.InvalidationListener;
@@ -32,6 +33,7 @@ import javafx.geometry.Side;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Region;
 
+import cointoss.chart.Chart;
 import cointoss.chart.Tick;
 import cointoss.util.Num;
 import cointoss.visual.shape.GraphShape;
@@ -56,6 +58,9 @@ public class CandleChart extends Region {
     /** The actual graph drawer. */
     public final GraphPlotArea graph = new GraphPlotArea();
 
+    /** The validity of data. */
+    private AtomicBoolean dataIsValid = new AtomicBoolean();
+
     /** The change observer. */
     private final InvalidationListener layoutInvalidationObserver = observable -> requestLayout();
 
@@ -68,8 +73,7 @@ public class CandleChart extends Region {
     public final ReadOnlyObjectWrapper<Rectangle2D> plotAreaBounds = new ReadOnlyObjectWrapper<>(this, "plotAreaBounds", null);
 
     private final InvalidationListener dataValidateListener = observable -> {
-        if (isDataValidate()) {
-            setDataValidate(false);
+        if (dataIsValid.compareAndSet(true, false)) {
             requestLayout();
         }
     };
@@ -189,7 +193,7 @@ public class CandleChart extends Region {
     }
 
     protected void layoutChildren(double width, double height) {
-        if (!isDataValidate()) {
+        if (dataIsValid.get() == false) {
             dealWithData();
         }
         final Insets in = getInsets();
@@ -250,7 +254,7 @@ public class CandleChart extends Region {
     }
 
     protected void layoutChart(final double w, final double h, final double x0, final double y0) {
-        final Rectangle2D bounds = plotAreaPrefferedBounds.get();
+        Rectangle2D bounds = plotAreaPrefferedBounds.get();
         if (bounds == null) {
             layoutChartArea(w, h, x0, y0);
         } else {
@@ -281,10 +285,11 @@ public class CandleChart extends Region {
                     yAxis.relocate(bounds.getMaxX(), bounds.getMinY());
                 }
             }
-            if (resized || !isDataValidate()) {
+
+            if (resized || dataIsValid.get() == false) {
                 if (!prelayout) {
                     graph.plotData();
-                    setDataValidate(true);
+                    dataIsValid.set(true);
                 }
             }
             if (!prelayout && !graph.graphshapeValidate) {
@@ -382,13 +387,14 @@ public class CandleChart extends Region {
             final double oldgW = graph.getWidth();
             final double oldgH = graph.getHeight();
             final boolean resize = oldgW != graphWidth || oldgH != graphHeight;
+
             if (!prelayout) {
                 if (resize) {
                     graph.resize(graphWidth, graphHeight);
                 }
-                if (resize || !isDataValidate()) {
+                if (resize || dataIsValid.get() == false) {
                     graph.plotData();
-                    setDataValidate(true);
+                    dataIsValid.set(true);
                 }
                 if (!graph.graphshapeValidate) {
                     graph.drawGraphShapes();
@@ -430,17 +436,6 @@ public class CandleChart extends Region {
         axisY.logicalMaxValue.set(max.toDouble());
         axisY.logicalMinValue.set(min.toDouble());
     }
-
-    protected final boolean isDataValidate() {
-        return datavalidate;
-    }
-
-    protected final void setDataValidate(final boolean bool) {
-        datavalidate = bool;
-    }
-
-    /** 状態の正当性を示すプロパティ */
-    private boolean datavalidate = false;
 
     /**
      * グラフのタイトル。<br>
@@ -503,10 +498,14 @@ public class CandleChart extends Region {
      * @param minPrice
      * @return
      */
-    public CandleChart candleDate(Iterable<Tick> data) {
-        for (Tick tick : data) {
+    public CandleChart candleDate(Chart data) {
+        for (Tick tick : data.ticks) {
             this.candles.add(tick);
         }
+
+        data.to(tick -> {
+            this.candles.add(tick);
+        });
         return this;
     }
 }

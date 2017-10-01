@@ -214,6 +214,7 @@ public class GraphPlotArea extends Region {
             graphshapeValidate = true;
             return;
         }
+
         drawGraphShapes();
 
         if (!plotValidate) {
@@ -764,6 +765,13 @@ public class GraphPlotArea extends Region {
         }
     }
 
+    private final InvalidationListener dataChangeObserver = observalbe -> {
+        if (plotValidate) {
+            plotValidate = false;
+            setNeedsLayout(true);
+        }
+    };
+
     /**
      * Set data list for line chart.
      * 
@@ -772,22 +780,12 @@ public class GraphPlotArea extends Region {
     public final void setCandleChartDataList(ObservableList<Tick> datalist) {
         // clear old list configuration
         if (candleChartData != null) {
-            // lineChartData.removeListener(lineDataListObserver);
-            // for (LineChartData data : lineChartData) {
-            // data.validateProperty().removeListener(lineDataObserver);
-            // }
-            // lineColorManager.clear();
+            candleChartData.removeListener(dataChangeObserver);
         }
 
         // add new list configuration
         if (datalist != null) {
-            // datalist.addListener(lineDataListObserver);
-            // for (LineChartData data : datalist) {
-            // data.defaultColorIndex = lineColorManager.nextClearBit(0);
-            // lineColorManager.set(data.defaultColorIndex, true);
-            // data.defaultColor = "default-color" + (data.defaultColorIndex % 8);
-            // data.validateProperty().addListener(lineDataObserver);
-            // }
+            datalist.addListener(dataChangeObserver);
         }
 
         // update
