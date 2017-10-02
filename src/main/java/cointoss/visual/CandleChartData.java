@@ -94,6 +94,7 @@ public class CandleChartData {
         int l = 1, r = size - 2, m = (l + r) >> 1;
 
         while (r - l > 1) {
+            System.out.println(m + "  " + a.start() + "  " + a.end() + " " + a.size());
             final double d = converter.applyAsDouble(a.get(m));
             if (d == v) {
                 return m;

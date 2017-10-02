@@ -59,7 +59,7 @@ public class Visualize extends Application {
     @Override
     public void init() throws Exception {
         system.submit(() -> {
-            market = new Market(BitFlyer.FX_BTC_JPY.service(), BitFlyer.FX_BTC_JPY.log().fromLast(30, MINUTES), new Trading() {
+            market = new Market(BitFlyer.FX_BTC_JPY.service(), BitFlyer.FX_BTC_JPY.log().fromLast(2, DAYS), new Trading() {
 
                 /**
                  * 
@@ -87,7 +87,7 @@ public class Visualize extends Application {
             Thread.sleep(100);
         }
 
-        Chart serise = market.second10;
+        Chart serise = market.minute1;
 
         Num max = Num.MIN;
         Num min = Num.MAX;
