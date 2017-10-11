@@ -18,7 +18,7 @@ public class RingBufferTest {
 
     @Test
     public void latest() throws Exception {
-        RingBuffer<Integer> buffer = new RingBuffer<>(3);
+        RingBuffer<Integer> buffer = new RingBuffer<>(3, "");
         buffer.add(1);
         assert buffer.latest() == 1;
         buffer.add(2);
@@ -35,7 +35,7 @@ public class RingBufferTest {
 
     @Test
     public void latestOffset() throws Exception {
-        RingBuffer<Integer> buffer = new RingBuffer<>(3);
+        RingBuffer<Integer> buffer = new RingBuffer<>(3, "");
         buffer.add(1);
         assert buffer.latest(1) == null;
         buffer.add(2);
@@ -54,7 +54,7 @@ public class RingBufferTest {
 
     @Test
     public void set() throws Exception {
-        RingBuffer<Integer> buffer = new RingBuffer<>(5);
+        RingBuffer<Integer> buffer = new RingBuffer<>(5, "");
         buffer.set(1, 1);
         assert buffer.get(0) == null;
         assert buffer.get(1) == 1;

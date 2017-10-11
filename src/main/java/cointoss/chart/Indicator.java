@@ -28,7 +28,7 @@ public abstract class Indicator {
      */
     protected Indicator(Chart chart) {
         this.chart = chart;
-        this.cache = new RingBuffer(chart.ticks);
+        this.cache = new RingBuffer(chart.ticks, chart + "-" + toString());
     }
 
     /**

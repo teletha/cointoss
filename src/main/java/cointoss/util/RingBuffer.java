@@ -19,6 +19,9 @@ import java.util.function.IntFunction;
  */
 public class RingBuffer<T> implements Iterable<T> {
 
+    /** The name */
+    private final String name;
+
     /** The logical index. */
     private final AtomicInteger logical = new AtomicInteger();
 
@@ -34,7 +37,8 @@ public class RingBuffer<T> implements Iterable<T> {
     /**
      * @param size
      */
-    public RingBuffer(int size) {
+    public RingBuffer(int size, String name) {
+        this.name = name;
         this.size = size;
         this.buffer = new AtomicReferenceArray<>(size);
     }
@@ -42,7 +46,8 @@ public class RingBuffer<T> implements Iterable<T> {
     /**
      * @param size
      */
-    public RingBuffer(RingBuffer buffer) {
+    public RingBuffer(RingBuffer buffer, String name) {
+        this.name = name;
         this.size = buffer.size;
         this.logical.set(buffer.logical.intValue());
         this.physical.set(buffer.physical.intValue());

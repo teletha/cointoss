@@ -41,7 +41,7 @@ public class Chart {
     private Tick current;
 
     /** The tick manager. */
-    public final RingBuffer<Tick> ticks = new RingBuffer(60 * 24);
+    public final RingBuffer<Tick> ticks;
 
     /** The tick observers. */
     private final CopyOnWriteArrayList<Observer<? super Tick>> listeners = new CopyOnWriteArrayList<>();
@@ -57,6 +57,7 @@ public class Chart {
      */
     public Chart(Duration duration, Chart... children) {
         this.duration = duration;
+        this.ticks = new RingBuffer(60 * 24, "chart - " + duration);
         this.trend = PriceIndicator.weightMedian(this).sma(30);
 
         for (Chart child : children) {
