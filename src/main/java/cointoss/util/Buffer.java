@@ -9,6 +9,8 @@
  */
 package cointoss.util;
 
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReferenceArray;
@@ -17,7 +19,7 @@ import java.util.function.IntFunction;
 /**
  * @version 2017/09/10 11:55:00
  */
-public class RingBuffer<T> implements Iterable<T> {
+public class Buffer<T> implements Iterable<T> {
 
     /** The name */
     private final String name;
@@ -35,29 +37,34 @@ public class RingBuffer<T> implements Iterable<T> {
     private final AtomicInteger physicalEnd = new AtomicInteger();
 
     /** The item list. */
-    private final AtomicReferenceArray<T> buffer;
+    private final ArrayList<T> buffer;
 
     /** The max size. */
-    private final int size;
+    private final int max;
+
+    /** The max size. */
+    private final int block;
 
     /**
-     * @param size
+     * @param max
      */
-    public RingBuffer(int size, String name) {
+    public Buffer(int max, int block, String name) {
         this.name = name;
-        this.size = size;
-        this.buffer = new AtomicReferenceArray<>(size);
+        this.max = max;
+        this.block = block;
+        this.buffer = new ArrayList<>(max);
     }
 
     /**
-     * @param size
+     * @param max
      */
-    public RingBuffer(RingBuffer buffer, String name) {
+    public Buffer(Buffer buffer, String name) {
         this.name = name;
-        this.size = buffer.size;
+        this.max = buffer.max;
+        this.block = buffer.block;
         this.logicalEnd.set(buffer.logicalEnd.intValue());
         this.physicalEnd.set(buffer.physicalEnd.intValue());
-        this.buffer = new AtomicReferenceArray<>(size);
+        this.buffer = new ArrayList<>(max);
     }
 
     /**
@@ -70,7 +77,7 @@ public class RingBuffer<T> implements Iterable<T> {
 
         // increment index
         logicalEnd.incrementAndGet();
-        if (physicalEnd.incrementAndGet() == size) {
+        if (physicalEnd.incrementAndGet() == max) {
             physicalEnd.set(0);
         }
     }
@@ -107,10 +114,10 @@ public class RingBuffer<T> implements Iterable<T> {
      * @return
      */
     public T get(int index, IntFunction<T> calculator) {
-        if (index < 0 || index < logicalEnd.intValue() - size) {
+        if (index < 0 || index < logicalEnd.intValue() - max) {
             return null;
         } else {
-            return buffer.updateAndGet(index % size, v -> v != null ? v : calculator.apply(index));
+            return buffer.updateAndGet(index % max, v -> v != null ? v : calculator.apply(index));
         }
     }
 
@@ -147,7 +154,7 @@ public class RingBuffer<T> implements Iterable<T> {
      * @return
      */
     public int start() {
-        int start = logicalEnd.intValue() - size;
+        int start = logicalEnd.intValue() - max;
 
         return start < 0 ? 0 : start;
     }
@@ -195,5 +202,32 @@ public class RingBuffer<T> implements Iterable<T> {
                 return get(i++);
             }
         };
+    }
+
+    /**
+     * @version 2017/10/11 22:52:17
+     */
+    private class Block implements Serializable {
+
+        private final long logicalStart;
+
+        private final long logicalEnd;
+
+        private final int size;
+
+        private final AtomicReferenceArray<T> items;
+
+        /**
+         * @param logicalStart
+         * @param logicalEnd
+         * @param size
+         */
+        private Block(long logicalStart, long logicalEnd, int size) {
+            this.logicalStart = logicalStart;
+            this.logicalEnd = logicalEnd;
+            this.size = size;
+            this.items = new AtomicReferenceArray(size);
+        }
+
     }
 }
