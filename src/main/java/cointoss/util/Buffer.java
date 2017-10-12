@@ -10,8 +10,7 @@
 package cointoss.util;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 import java.util.function.IntFunction;
@@ -19,7 +18,7 @@ import java.util.function.IntFunction;
 /**
  * @version 2017/09/10 11:55:00
  */
-public class Buffer<T> implements Iterable<T> {
+public class Buffer<T> {
 
     /** The name */
     private final String name;
@@ -28,43 +27,36 @@ public class Buffer<T> implements Iterable<T> {
     private final AtomicInteger logicalStart = new AtomicInteger();
 
     /** The logical index. */
-    private final AtomicInteger logicalEnd = new AtomicInteger();
+    private final AtomicInteger logicalEnd = new AtomicInteger(-1);
 
     /** The physical index. */
     private final AtomicInteger physicalStart = new AtomicInteger();
 
     /** The physical index. */
-    private final AtomicInteger physicalEnd = new AtomicInteger();
+    private final AtomicInteger physicalEnd = new AtomicInteger(-1);
 
-    /** The item list. */
-    private final ArrayList<T> buffer;
+    /** The block size. */
+    private final int size;
 
-    /** The max size. */
-    private final int max;
+    /** The block length. */
+    private final int length;
 
-    /** The max size. */
-    private final int block;
+    /** The block list. */
+    private final LinkedList<Block> blocks = new LinkedList<>();
 
-    /**
-     * @param max
-     */
-    public Buffer(int max, int block, String name) {
-        this.name = name;
-        this.max = max;
-        this.block = block;
-        this.buffer = new ArrayList<>(max);
-    }
+    /** The last block. (this block is always on memory) */
+    private Block last;
 
     /**
-     * @param max
+     * @param size
+     * @param length
+     * @param name
      */
-    public Buffer(Buffer buffer, String name) {
+    public Buffer(int size, int length, String name) {
         this.name = name;
-        this.max = buffer.max;
-        this.block = buffer.block;
-        this.logicalEnd.set(buffer.logicalEnd.intValue());
-        this.physicalEnd.set(buffer.physicalEnd.intValue());
-        this.buffer = new ArrayList<>(max);
+        this.size = size;
+        this.length = length;
+        this.last = new Block(0, length);
     }
 
     /**
@@ -72,80 +64,68 @@ public class Buffer<T> implements Iterable<T> {
      * 
      * @param item
      */
-    public void add(T item) {
-        buffer.set(physicalEnd.intValue(), item);
+    public void append(T item) {
+        // increment logical end index
+        int end = logicalEnd.incrementAndGet();
 
-        // increment index
-        logicalEnd.incrementAndGet();
-        if (physicalEnd.incrementAndGet() == max) {
-            physicalEnd.set(0);
-        }
-    }
-
-    /**
-     * <p>
-     * Set new value.
-     * </p>
-     * 
-     * @param index
-     * @param value
-     */
-    public void set(int index, T value) {
-        for (int i = logicalEnd.intValue(); i < index; i++) {
-            add(null);
-        }
-        add(value);
-    }
-
-    /**
-     * Get the indexed value.
-     * 
-     * @param index
-     * @return
-     */
-    public T get(int index) {
-        return get(index, v -> null);
-    }
-
-    /**
-     * Get the indexed value.
-     * 
-     * @param index
-     * @return
-     */
-    public T get(int index, IntFunction<T> calculator) {
-        if (index < 0 || index < logicalEnd.intValue() - max) {
-            return null;
+        if (end <= last.logicalEnd) {
+            // current block
+            last.append(item);
         } else {
-            return buffer.updateAndGet(index % max, v -> v != null ? v : calculator.apply(index));
+            // store current block
+            blocks.add(last);
+
+            // next block
+            last = new Block(end, length);
+            last.append(item);
         }
     }
 
     /**
-     * Return latest item.
+     * Add items to tail.
      * 
-     * @return
+     * @param items
      */
-    public T latest() {
-        return latest(0);
+    public final void append(T... items) {
+        for (T item : items) {
+            append(item);
+        }
     }
 
     /**
-     * Return latest item.
+     * Return tail item.
      * 
      * @return
      */
-    public T latest(int offset) {
-        return latest(offset, v -> null);
+    public final T end() {
+        return end(0);
     }
 
     /**
-     * Return latest item.
+     * Return tail item.
      * 
      * @return
      */
-    public T latest(int offset, IntFunction<T> calculator) {
-        return get(logicalEnd.intValue() - offset - 1, calculator);
+    public final T end(int offset) {
+        return end(offset, v -> null);
+    }
+
+    /**
+     * Return tail item.
+     * 
+     * @return
+     */
+    public T end(int offset, IntFunction<T> calculator) {
+        // compute block index
+        if (offset < last.physicalEnd) {
+            // last block
+            return last.end(offset, calculator);
+        } else {
+            // stored block
+            // If this exception will be thrown, it is bug of this program. So we must rethrow the
+            // wrapped error in here.
+            throw new Error();
+        }
     }
 
     /**
@@ -153,10 +133,8 @@ public class Buffer<T> implements Iterable<T> {
      * 
      * @return
      */
-    public int start() {
-        int start = logicalEnd.intValue() - max;
-
-        return start < 0 ? 0 : start;
+    public final int startIndex() {
+        return logicalStart.get();
     }
 
     /**
@@ -164,44 +142,26 @@ public class Buffer<T> implements Iterable<T> {
      * 
      * @return
      */
-    public int end() {
-        return logicalEnd.intValue();
+    public final int endIndex() {
+        return logicalEnd.get();
     }
 
     /**
-     * Return buffer size.
+     * Return the available start index.
      * 
      * @return
      */
-    public int size() {
-        return logicalEnd.intValue();
+    public final int firstIndex() {
+        return physicalStart.get();
     }
 
     /**
-     * {@inheritDoc}
+     * Return the available end index.
+     * 
+     * @return
      */
-    @Override
-    public Iterator<T> iterator() {
-        return new Iterator<T>() {
-
-            private int i = start();
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            public boolean hasNext() {
-                return i < size();
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            public T next() {
-                return get(i++);
-            }
-        };
+    public final int lastIndex() {
+        return physicalEnd.get();
     }
 
     /**
@@ -209,25 +169,39 @@ public class Buffer<T> implements Iterable<T> {
      */
     private class Block implements Serializable {
 
-        private final long logicalStart;
+        private final int logicalStart;
 
-        private final long logicalEnd;
+        private final int logicalEnd;
 
-        private final int size;
+        private int physicalEnd;
+
+        private final int length;
 
         private final AtomicReferenceArray<T> items;
 
         /**
          * @param logicalStart
          * @param logicalEnd
-         * @param size
+         * @param length
          */
-        private Block(long logicalStart, long logicalEnd, int size) {
+        private Block(int logicalStart, int length) {
             this.logicalStart = logicalStart;
-            this.logicalEnd = logicalEnd;
-            this.size = size;
-            this.items = new AtomicReferenceArray(size);
+            this.logicalEnd = logicalStart + length - 1;
+            this.physicalEnd = 0;
+            this.length = length;
+            this.items = new AtomicReferenceArray(length);
         }
 
+        private boolean isFull() {
+            return physicalEnd == length - 1;
+        }
+
+        private void append(T item) {
+            items.set(physicalEnd++, item);
+        }
+
+        private T end(int offset, IntFunction<T> calculator) {
+            return items.get(physicalEnd - offset - 1);
+        }
     }
 }
