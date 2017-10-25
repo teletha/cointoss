@@ -59,7 +59,7 @@ public class Visualize extends Application {
     @Override
     public void init() throws Exception {
         system.submit(() -> {
-            market = new Market(BitFlyer.FX_BTC_JPY.service(), BitFlyer.FX_BTC_JPY.log().fromLast(2, DAYS), new Trading() {
+            market = new Market(BitFlyer.FX_BTC_JPY.service(), BitFlyer.FX_BTC_JPY.log().fromLast(24, HOURS), new Trading() {
 
                 /**
                  * 
@@ -115,7 +115,7 @@ public class Visualize extends Application {
                 .axisY(axis -> {
                     axis.nameLabel.setText("JPY");
                     axis.tickLabelFormatter.set(v -> Num.of(v).asJPY());
-                    axis.visibleRange.set(Num.of(24000).divide(diff).toDouble());
+                    axis.visibleRange.set(Num.of(50000).divide(diff).toDouble());
                     axis.scrollBarVisibility.set(false);
                 })
                 .graphTracker(new GraphTracker())

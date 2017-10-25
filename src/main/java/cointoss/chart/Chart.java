@@ -57,7 +57,7 @@ public class Chart {
      */
     public Chart(Duration duration, Chart... children) {
         this.duration = duration;
-        this.ticks = new RingBuffer(60 * 24, "chart - " + duration);
+        this.ticks = new RingBuffer(5 * 60 * 24, "chart - " + duration);
         this.trend = PriceIndicator.weightMedian(this).sma(30);
 
         for (Chart child : children) {
