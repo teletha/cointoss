@@ -59,7 +59,7 @@ public class Visualize extends Application {
     @Override
     public void init() throws Exception {
         system.submit(() -> {
-            market = new Market(BitFlyer.FX_BTC_JPY.service(), BitFlyer.FX_BTC_JPY.log().fromLast(24, HOURS), new Trading() {
+            market = new Market(BitFlyer.FX_BTC_JPY.service(), BitFlyer.FX_BTC_JPY.log().fromLast(10, HOURS), new Trading() {
 
                 /**
                  * 

@@ -523,8 +523,6 @@ public class GraphPlotArea extends Region {
 
     private final double DISTANCE_THRESHOLD = 0.5;
 
-    private PlotLine plotline = new PlotLine();
-
     /**
      * Draw chart data.
      * 
@@ -532,17 +530,6 @@ public class GraphPlotArea extends Region {
      * @param path
      */
     protected void plotLineChartData(CandleChartData data, Path path) {
-        if (data.size() == 0) {
-            path.setVisible(false);
-            return;
-        } else {
-            path.setVisible(true);
-        }
-
-        if (data.size() < 2000) {
-            plotline.clearMemory();
-        }
-
         Axis axis = axisX.get();
         double low = axis.visualMinValue.get();
         double up = axis.visualMaxValue.get();
