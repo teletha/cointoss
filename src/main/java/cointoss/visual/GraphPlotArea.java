@@ -531,10 +531,10 @@ public class GraphPlotArea extends Region {
      */
     protected void plotLineChartData(CandleChartData data, Path path) {
         Axis axis = axisX.get();
-        double low = axis.visualMinValue.get();
-        double up = axis.visualMaxValue.get();
-        int start = data.searchXIndex(low, false);
-        int end = data.searchXIndex(up, true);
+        double min = axis.visualMinValue.get();
+        double max = axis.visualMaxValue.get();
+        int start = data.searchXIndex(min, false);
+        int end = data.searchXIndex(max, true);
 
         start = Math.max(0, start - 2);
 

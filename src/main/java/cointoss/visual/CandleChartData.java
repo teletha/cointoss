@@ -76,44 +76,37 @@ public class CandleChartData {
     }
 
     /**
-     * ※aが昇順に整列されているときに限る。 vを越えない最大のaの場所を探索する
+     * ※aが昇順に整列されているときに限る。 valueを越えない最大のaの場所を探索する
      * 
      * @param a
      * @param size
-     * @param v
+     * @param value
      * @return
      */
-    private static int findMaxIndex(final RingBuffer<Tick> a, final int size, final double v, ToDoubleFunction<Tick> converter) {
-        if (size < 2) {
-            return 0;
-        }
-        if (size == 2) {
-            return 0;
-        }
+    private static int findMaxIndex(RingBuffer<Tick> a, int size, double value, ToDoubleFunction<Tick> converter) {
+        int start = 1, end = size - 2, middle = (start + end) >> 1;
 
-        int l = 1, r = size - 2, m = (l + r) >> 1;
-
-        while (r - l > 1) {
-            System.out.println(m + "  " + a.start() + "  " + a.end() + " " + a.size());
-            final double d = converter.applyAsDouble(a.get(m));
-            if (d == v) {
-                return m;
+        while (end - start > 1) {
+            System.out.println(middle + "  " + a.start() + "  " + a.end() + " " + a.size());
+            final double d = converter.applyAsDouble(a.get(middle));
+            if (d == value) {
+                return middle;
             }
-            if (d < v) {
-                l = m;
+            if (d < value) {
+                start = middle;
             } else {
-                r = m;
+                end = middle;
             }
-            m = (l + r) >> 1;
+            middle = (start + end) >> 1;
         }
 
-        if (converter.applyAsDouble(a.get(l)) > v) {
-            return l - 1;
+        if (converter.applyAsDouble(a.get(start)) > value) {
+            return start - 1;
         }
-        if (converter.applyAsDouble(a.get(r)) <= v) {
-            return r;
+        if (converter.applyAsDouble(a.get(end)) <= value) {
+            return end;
         }
-        return l;
+        return start;
     }
 
     /**

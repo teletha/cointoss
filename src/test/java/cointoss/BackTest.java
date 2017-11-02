@@ -27,9 +27,9 @@ public class BackTest {
         BackTester.with()
                 .baseCurrency(1000000)
                 .targetCurrency(0)
-                .log(() -> BitFlyer.FX_BTC_JPY.log().rangeRandom(7))
+                .log(() -> BitFlyer.FX_BTC_JPY.log().rangeRandom(2))
                 .strategy(() -> new BreakoutTrading())
-                .trial(5)
+                .trial(3)
                 .run();
     }
 
@@ -144,22 +144,7 @@ public class BackTest {
          */
         @Override
         protected void initialize() {
-            market.second10.to(exe -> {
-                if (hasPosition() == false) {
-                    Side side = Side.random();
 
-                    entryMarket(side, maxPositionSize, entry -> {
-                        profitPrice = entry.entryPrice().plus(entry, 5000);
-                        lossPrice = entry.entryPrice().minus(entry, 2000);
-
-                        market.second10.tick.takeUntil(closingPosition).to(e -> {
-                            if (e.closePrice.isGreaterThan(entry, profitPrice)) {
-                                entry.exitMarket(entry.entrySize());
-                            }
-                        });
-                    });
-                }
-            });
         }
     }
 }
