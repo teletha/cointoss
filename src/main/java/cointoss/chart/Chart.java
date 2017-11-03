@@ -141,7 +141,7 @@ public class Chart {
      */
     public void tick(Execution exe) {
         if (current == null) {
-            ticks.add(current = convert(exe));
+            ticks.add(current = convert(exe, exe.price));
         }
 
         if (!exe.exec_date.isBefore(current.end)) {
@@ -151,7 +151,7 @@ public class Chart {
             }
 
             // update
-            ticks.add(current = convert(exe));
+            ticks.add(current = convert(exe, current.closePrice));
         }
         current.tick(exe);
     }
@@ -160,13 +160,13 @@ public class Chart {
      * @param exe
      * @return
      */
-    private Tick convert(Execution exe) {
+    private Tick convert(Execution exe, Num previousPrice) {
         ZonedDateTime time = exe.exec_date.withNano(0);
         long epochSecond = time.toEpochSecond();
         epochSecond = epochSecond - (epochSecond % duration.getSeconds());
         ZonedDateTime normalized = ZonedDateTime.ofInstant(Instant.ofEpochSecond(epochSecond), time.getZone());
 
-        return new Tick(normalized, normalized.plus(duration), exe.price);
+        return new Tick(normalized, normalized.plus(duration), previousPrice);
     }
 
     /**

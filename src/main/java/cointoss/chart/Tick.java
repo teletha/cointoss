@@ -46,6 +46,18 @@ public class Tick {
     /** Traded amount during the period */
     public Num amountSquare = Num.ZERO;
 
+    /** Volume of the period */
+    public Num longVolume = Num.ZERO;
+
+    /** Volume of the period */
+    public Num longPriceIncrese = Num.ZERO;
+
+    /** Volume of the period */
+    public Num shortVolume = Num.ZERO;
+
+    /** Volume of the period */
+    public Num shortPriceDecrease = Num.ZERO;
+
     /**
      * Decode.
      * 
@@ -79,11 +91,20 @@ public class Tick {
      * @param exe
      */
     void tick(Execution exe) {
+        Num latest = closePrice == null ? openPrice : closePrice;
         closePrice = exe.price;
         maxPrice = Num.max(maxPrice, exe.price);
         minPrice = Num.min(minPrice, exe.price);
         volume = volume.plus(exe.size);
         amount = amount.plus(exe.price.multiply(exe.size));
+
+        if (exe.side.isBuy()) {
+            longVolume = longVolume.plus(exe.size);
+            longPriceIncrese = longPriceIncrese.plus(exe.price.minus(latest));
+        } else {
+            shortVolume = shortVolume.plus(exe.size);
+            shortPriceDecrease = shortPriceDecrease.plus(latest.minus(exe.price));
+        }
     }
 
     /**
@@ -97,6 +118,10 @@ public class Tick {
         minPrice = Num.min(minPrice, tick.minPrice);
         volume = volume.plus(tick.volume);
         amount = amount.plus(tick.amount);
+        longVolume = longVolume.plus(tick.longVolume);
+        longPriceIncrese = longPriceIncrese.plus(tick.longPriceIncrese);
+        shortVolume = shortVolume.plus(tick.shortVolume);
+        shortPriceDecrease = shortPriceDecrease.plus(tick.shortPriceDecrease);
     }
 
     /**
@@ -176,6 +201,15 @@ public class Tick {
      */
     public final Num getWeightMedian() {
         return amount.divide(volume);
+    }
+
+    /**
+     * @return
+     */
+    public final Num priceVolatility() {
+        Num up = longVolume.isZero() ? Num.ZERO : longPriceIncrese.divide(longVolume);
+        Num down = shortVolume.isZero() ? Num.ZERO : shortPriceDecrease.divide(shortVolume);
+        return up.minus(down);
     }
 
     /**

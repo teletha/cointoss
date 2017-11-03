@@ -9,8 +9,12 @@
  */
 package cointoss.market.bitflyer;
 
+import java.util.concurrent.atomic.AtomicReference;
+
 import cointoss.Market;
 import cointoss.Trading;
+import cointoss.chart.Tick;
+import cointoss.util.Num;
 
 /**
  * @version 2017/09/08 18:40:12
@@ -22,15 +26,52 @@ public class BitFlyerMonitor extends Trading {
      */
     @Override
     protected void initialize() {
-        market.observeExecutionBySize(7).to(exe -> {
-            System.out.println("大口 " + exe.exec_date.withNano(0).toLocalDateTime().plusHours(9) + "  " + exe.side
-                    .mark() + exe.cumulativeSize + " @" + exe.price);
-        });
+        // market.observeExecutionBySize(20).to(exe -> {
+        // System.out.println("大口 " + exe.exec_date.withNano(0).toLocalDateTime().plusHours(9) + " "
+        // + exe.side
+        // .mark() + exe.cumulativeSize + " @" + exe.price);
+        // });
 
-        market.minute1.to(tick -> {
-            System.out.println(tick.start + "  1min " + market.minute1.trend() + "   15min " + market.minute15
-                    .trend() + "    30min " + market.minute30
-                            .trend() + "   1hour " + market.hour1.trend() + "   2hour " + market.hour2.trend());
+        AtomicReference<Tick> latest = new AtomicReference();
+
+        market.second5.to(tick -> {
+            Tick prev1 = latest.getAndSet(tick);
+
+            if (prev1 == null) {
+                return;
+            }
+
+            Num priceDiff = tick.closePrice.minus(prev1.closePrice);
+            Num volumeDiff = tick.longVolume.minus(tick.shortVolume).scale(1);
+            Num volatilityDiff = tick.longPriceIncrese.minus(tick.shortPriceDecrease);
+            Num longVolumeRatio = tick.longVolume.divide(prev1.longVolume).scale(1);
+            Num shortVolumeRatio = tick.shortVolume.divide(prev1.shortVolume).scale(1);
+
+            StringBuilder builder = new StringBuilder();
+            builder.append(tick.closePrice).append("(P").append(priceDiff).append(" V").append(volumeDiff).append(")\t");
+            builder.append("L")
+                    .append(tick.longVolume.scale(1))
+                    .append("(")
+                    .append(longVolumeRatio)
+                    .append(")")
+                    .append(" S")
+                    .append(tick.shortVolume.scale(1))
+                    .append("(")
+                    .append(shortVolumeRatio)
+                    .append(")")
+                    .append("\t");
+            builder.append("Volatility").append(volatilityDiff).append("(").append(tick.priceVolatility().scale(1)).append(")\t");
+
+            // まず下げている最中か上げている最中かを判断できないといけない
+
+            if (priceDiff.isNegative() && volumeDiff.isPositive()) {
+                builder.append("転換気配");
+            }
+
+            if (priceDiff.isPositive() && volumeDiff.isNegative()) {
+                builder.append("転換気配");
+            }
+            System.out.println(builder);
         });
     }
 

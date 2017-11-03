@@ -19,7 +19,7 @@ import cointoss.Side;
 import cointoss.util.Num;
 
 /**
- * @version 2017/09/10 12:35:05
+ * @version 2017/11/03 20:48:54
  */
 public class ChartTest {
 
@@ -28,44 +28,53 @@ public class ChartTest {
     @Test
     public void chart() throws Exception {
         Chart chart = new Chart(Duration.ofMinutes(1));
-        chart.tick(create(0, 1, 1));
-        chart.tick(create(50, 2, 1));
-        chart.tick(create(70, 3, 1));
-        chart.tick(create(90, 4, 1));
+        chart.tick(createBuy(0, 1, 1));
+        chart.tick(createBuy(50, 2, 1));
+        chart.tick(createBuy(70, 3, 1));
+        chart.tick(createBuy(90, 5, 1));
 
         assert chart.getTickCount() == 2;
         Tick tick = chart.getLastTick();
-        assert tick.openPrice.is(3);
-        assert tick.closePrice.is(4);
-        assert tick.maxPrice.is(4);
+        assert tick.openPrice.is(2);
+        assert tick.closePrice.is(5);
+        assert tick.maxPrice.is(5);
         assert tick.minPrice.is(3);
         assert tick.volume.is(2);
+        assert tick.longVolume.is(2);
+        assert tick.longPriceIncrese.is(3);
+        assert tick.priceVolatility().is(1.5);
 
-        chart.tick(create(120, 5, 1));
+        chart.tick(createBuy(120, 7, 1));
+        chart.tick(createSell(130, 4, 1));
         assert chart.getTickCount() == 3;
         tick = chart.getLastTick();
         assert tick.openPrice.is(5);
-        assert tick.closePrice.is(5);
-        assert tick.maxPrice.is(5);
-        assert tick.minPrice.is(5);
-        assert tick.volume.is(1);
+        assert tick.closePrice.is(4);
+        assert tick.maxPrice.is(7);
+        assert tick.minPrice.is(4);
+        assert tick.volume.is(2);
+        assert tick.longVolume.is(1);
+        assert tick.longPriceIncrese.is(2);
+        assert tick.shortVolume.is(1);
+        assert tick.shortPriceDecrease.is(3);
+        assert tick.priceVolatility().is(-1);
     }
 
     @Test
     public void subchart() throws Exception {
         Chart min2 = new Chart(Duration.ofMinutes(2));
         Chart min1 = new Chart(Duration.ofMinutes(1), min2);
-        min1.tick(create(0, 1, 1));
-        min1.tick(create(80, 2, 1));
-        min1.tick(create(100, 3, 1));
-        min1.tick(create(120, 4, 1));
-        min1.tick(create(150, 5, 1));
+        min1.tick(createBuy(0, 1, 1));
+        min1.tick(createBuy(80, 2, 1));
+        min1.tick(createBuy(100, 3, 1));
+        min1.tick(createBuy(120, 4, 1));
+        min1.tick(createBuy(150, 5, 1));
 
         assert min1.getTickCount() == 3;
         assert min2.getTickCount() == 1;
 
         Tick tick1 = min1.getLastTick();
-        assert tick1.openPrice.is(4);
+        assert tick1.openPrice.is(3);
         assert tick1.closePrice.is(5);
         assert tick1.maxPrice.is(5);
         assert tick1.minPrice.is(4);
@@ -87,12 +96,30 @@ public class ChartTest {
      * @param size
      * @return
      */
-    private Execution create(int time, int price, int size) {
+    private Execution createBuy(int time, int price, int size) {
         Execution e = new Execution();
         e.price = Num.of(price);
         e.size = Num.of(size);
         e.exec_date = base.plusSeconds(time);
         e.side = Side.BUY;
+
+        return e;
+    }
+
+    /**
+     * Create executon.
+     * 
+     * @param time
+     * @param price
+     * @param size
+     * @return
+     */
+    private Execution createSell(int time, int price, int size) {
+        Execution e = new Execution();
+        e.price = Num.of(price);
+        e.size = Num.of(size);
+        e.exec_date = base.plusSeconds(time);
+        e.side = Side.SELL;
 
         return e;
     }

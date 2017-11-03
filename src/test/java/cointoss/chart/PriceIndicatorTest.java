@@ -33,10 +33,10 @@ public class PriceIndicatorTest extends ChartTestSupport {
     public void open() throws Exception {
         Chart chart = createChart1sec(1, 2, 3, 4, 5);
         PriceIndicator indicator = PriceIndicator.open(chart);
-        assert indicator.get(4).is(5);
-        assert indicator.get(3).is(4);
-        assert indicator.get(2).is(3);
-        assert indicator.get(1).is(2);
+        assert indicator.get(4).is(4);
+        assert indicator.get(3).is(3);
+        assert indicator.get(2).is(2);
+        assert indicator.get(1).is(1);
         assert indicator.get(0).is(1);
     }
 
