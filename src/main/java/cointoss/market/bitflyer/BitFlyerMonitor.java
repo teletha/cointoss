@@ -74,16 +74,16 @@ public class BitFlyerMonitor extends Trading {
             if (priceDiff.isZero()) {
                 builder.append("均衡");
             } else if (priceDiff.isNegative()) {
-                if (power.isPositive()) {
-                    builder.append("下げ止まり");
+                if (volumeDiff.isPositive()) {
+                    builder.append("上げ止まり");
                 } else {
                     builder.append("下げ");
                 }
             } else {
-                if (power.isPositive()) {
+                if (volumeDiff.isPositive()) {
                     builder.append("上げ");
                 } else {
-                    builder.append("上げ止まり");
+                    builder.append("下げ止まり");
                 }
             }
             System.out.println(builder);
