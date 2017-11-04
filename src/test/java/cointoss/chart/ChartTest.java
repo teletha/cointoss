@@ -42,22 +42,22 @@ public class ChartTest {
         assert tick.volume.is(2);
         assert tick.longVolume.is(2);
         assert tick.longPriceIncrese.is(3);
-        assert tick.priceVolatility().is(1.5);
+        assert tick.priceVolatility().isNaN();
 
         chart.tick(createBuy(120, 7, 1));
-        chart.tick(createSell(130, 4, 1));
+        chart.tick(createSell(130, 3, 1));
         assert chart.getTickCount() == 3;
         tick = chart.getLastTick();
         assert tick.openPrice.is(5);
-        assert tick.closePrice.is(4);
+        assert tick.closePrice.is(3);
         assert tick.maxPrice.is(7);
-        assert tick.minPrice.is(4);
+        assert tick.minPrice.is(3);
         assert tick.volume.is(2);
         assert tick.longVolume.is(1);
         assert tick.longPriceIncrese.is(2);
         assert tick.shortVolume.is(1);
-        assert tick.shortPriceDecrease.is(3);
-        assert tick.priceVolatility().is(-1);
+        assert tick.shortPriceDecrease.is(4);
+        assert tick.priceVolatility().is(0.5);
     }
 
     @Test

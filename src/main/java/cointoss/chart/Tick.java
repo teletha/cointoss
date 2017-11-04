@@ -209,7 +209,15 @@ public class Tick {
     public final Num priceVolatility() {
         Num up = longVolume.isZero() ? Num.ZERO : longPriceIncrese.divide(longVolume);
         Num down = shortVolume.isZero() ? Num.ZERO : shortPriceDecrease.divide(shortVolume);
-        return up.minus(down);
+        return up.divide(down).scale(2);
+    }
+
+    public final Num upRatio() {
+        return longVolume.isZero() ? Num.ZERO : longPriceIncrese.multiply(longVolume);
+    }
+
+    public final Num downRatio() {
+        return shortVolume.isZero() ? Num.ZERO : shortPriceDecrease.multiply(shortVolume);
     }
 
     /**

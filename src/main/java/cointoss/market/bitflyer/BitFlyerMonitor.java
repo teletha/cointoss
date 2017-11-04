@@ -43,33 +43,48 @@ public class BitFlyerMonitor extends Trading {
 
             Num priceDiff = tick.closePrice.minus(prev1.closePrice);
             Num volumeDiff = tick.longVolume.minus(tick.shortVolume).scale(1);
-            Num volatilityDiff = tick.longPriceIncrese.minus(tick.shortPriceDecrease);
+            Num longVolumeDiff = tick.longVolume.minus(prev1.longVolume).scale(1);
             Num longVolumeRatio = tick.longVolume.divide(prev1.longVolume).scale(1);
+            Num shortVolumeDiff = tick.shortVolume.minus(prev1.shortVolume).scale(1);
             Num shortVolumeRatio = tick.shortVolume.divide(prev1.shortVolume).scale(1);
+
+            Num power = tick.upRatio().minus(tick.downRatio()).scale(3);
 
             StringBuilder builder = new StringBuilder();
             builder.append(tick.closePrice).append("(P").append(priceDiff).append(" V").append(volumeDiff).append(")\t");
             builder.append("L")
-                    .append(tick.longVolume.scale(1))
                     .append("(")
                     .append(longVolumeRatio)
+                    .append(" ")
+                    .append(longVolumeDiff)
+                    .append(" ")
+                    .append(tick.upRatio().scale(1))
                     .append(")")
                     .append(" S")
-                    .append(tick.shortVolume.scale(1))
                     .append("(")
                     .append(shortVolumeRatio)
+                    .append(" ")
+                    .append(shortVolumeDiff)
+                    .append(" ")
+                    .append(tick.downRatio().scale(1))
                     .append(")")
                     .append("\t");
-            builder.append("Volatility").append(volatilityDiff).append("(").append(tick.priceVolatility().scale(1)).append(")\t");
+            builder.append("Volatility").append("(").append(power).append(" ").append(priceDiff.divide(power).scale(5)).append(")\t");
 
-            // まず下げている最中か上げている最中かを判断できないといけない
-
-            if (priceDiff.isNegative() && volumeDiff.isPositive()) {
-                builder.append("転換気配");
-            }
-
-            if (priceDiff.isPositive() && volumeDiff.isNegative()) {
-                builder.append("転換気配");
+            if (priceDiff.isZero()) {
+                builder.append("均衡");
+            } else if (priceDiff.isNegative()) {
+                if (power.isPositive()) {
+                    builder.append("下げ止まり");
+                } else {
+                    builder.append("下げ");
+                }
+            } else {
+                if (power.isPositive()) {
+                    builder.append("上げ");
+                } else {
+                    builder.append("上げ止まり");
+                }
             }
             System.out.println(builder);
         });
