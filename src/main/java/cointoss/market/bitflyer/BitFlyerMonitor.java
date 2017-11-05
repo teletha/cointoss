@@ -71,6 +71,9 @@ public class BitFlyerMonitor extends Trading {
                     .append("\t");
             builder.append("Volatility").append("(").append(power).append(" ").append(priceDiff.divide(power).scale(5)).append(")\t");
 
+            Tick minute = market.minute5.ticks.latest();
+            builder.append("MINUTE L").append(minute.longVolume.scale(1)).append(" S").append(minute.shortVolume.scale(1)).append("\t");
+
             if (priceDiff.isZero()) {
                 builder.append("均衡");
             } else if (priceDiff.isNegative()) {
