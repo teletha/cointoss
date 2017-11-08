@@ -65,7 +65,7 @@ public class RingBuffer<T> implements Iterable<T> {
      * 
      * @param item
      */
-    public void add(T item) {
+    public T add(T item) {
         buffer.set(physicalEnd.intValue(), item);
 
         // increment index
