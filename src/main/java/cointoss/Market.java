@@ -81,7 +81,7 @@ public class Market implements Disposable {
     public final Chart second5 = new Chart(Duration
             .ofSeconds(5), second10, second20, second30, minute1, minute5, minute15, minute30, hour1, hour2, hour4, hour6, hour12, day1, day3, day7);
 
-    public final ExecutionFlow flow = new ExecutionFlow(80, 500);
+    public final ExecutionFlow flow = new ExecutionFlow(80);
 
     /** The execution listeners. */
     private final CopyOnWriteArrayList<Observer<? super Execution>> timelines = new CopyOnWriteArrayList();

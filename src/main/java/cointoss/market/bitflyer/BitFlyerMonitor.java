@@ -11,6 +11,7 @@ package cointoss.market.bitflyer;
 
 import java.time.ZonedDateTime;
 
+import cointoss.Execution;
 import cointoss.Market;
 import cointoss.Trading;
 
@@ -93,16 +94,9 @@ public class BitFlyerMonitor extends Trading {
         // System.out.println(builder);
         // });
 
-        market.timeline.take(e -> {
-            if (e.isAfter(last)) {
-                last = e.exec_date.withNano(0).plusSeconds(1);
-                return true;
-            } else {
-                return false;
-            }
-        }).mapTo(market.flow).to(flow -> {
-
-            System.out.println(flow.volume + " (" + flow.id + ") " + flow.history.latest(1).volume + "(" + flow.history.latest(1).id + ")");
+        market.flow.to(flow -> {
+            System.out.println(flow.history.latest().volume + " (" + flow.history.latest().id + ") " + flow.history
+                    .latest(1).volume + "(" + flow.history.latest(1).id + ")");
         });
         // market.executions(500, (prev, flow) -> {
         // Num longDiff = flow.longVolume.minus(prev.longVolume);
@@ -125,7 +119,7 @@ public class BitFlyerMonitor extends Trading {
         // });
     }
 
-    ZonedDateTime last = ZonedDateTime.now().minusDays(1).withSecond(0).withNano(0);
+    private ZonedDateTime last = ZonedDateTime.of(1971, 1, 1, 0, 0, 0, 0, Execution.UTC);
 
     /**
      * Entry point.

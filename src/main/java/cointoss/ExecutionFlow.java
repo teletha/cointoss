@@ -44,18 +44,15 @@ public class ExecutionFlow {
 
     private ZonedDateTime next = ZonedDateTime.of(1971, 1, 1, 0, 0, 0, 0, Execution.UTC);
 
-    private final long interval;
-
     public final RingBuffer<ExecutionFlow> history = new RingBuffer(60, "HISTORY");
 
     public int id;
 
     /**
-     * @param i
+     * @param size
      */
-    public ExecutionFlow(int size, int mills) {
+    public ExecutionFlow(int size) {
         this.buffer = new RingBuffer(size, "TREND" + size);
-        this.interval = mills * 1000000;
     }
 
     /**
@@ -64,9 +61,10 @@ public class ExecutionFlow {
      * @param exe
      */
     public void record(Execution exe) {
-        if (exe.isAfter(next)) {
-            history.add(copy());
+        if (!exe.isBefore(next)) {
             next = exe.exec_date.withNano(0).plusSeconds(1);
+
+            history.add(copy());
         }
 
         size++;
@@ -117,7 +115,7 @@ public class ExecutionFlow {
     }
 
     private ExecutionFlow copy() {
-        ExecutionFlow copy = new ExecutionFlow(0, 0);
+        ExecutionFlow copy = new ExecutionFlow(0);
         copy.id = id++;
         copy.size = size;
         copy.price = price;

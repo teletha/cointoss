@@ -24,7 +24,7 @@ public class ExecutionFlowTest {
 
     @Test
     public void price() throws Exception {
-        ExecutionFlow flow = new ExecutionFlow(3, 0);
+        ExecutionFlow flow = new ExecutionFlow(3);
         assert flow.price.is(0);
 
         flow.record(createBuy(0, 1, 1));
@@ -39,7 +39,7 @@ public class ExecutionFlowTest {
 
     @Test
     public void longValues() throws Exception {
-        ExecutionFlow flow = new ExecutionFlow(3, 0);
+        ExecutionFlow flow = new ExecutionFlow(3);
         flow.record(createBuy(0, 1, 1));
         assert flow.longVolume.is(1);
         assert flow.longPriceIncrese.is(1);
@@ -59,7 +59,7 @@ public class ExecutionFlowTest {
 
     @Test
     public void shortValues() throws Exception {
-        ExecutionFlow flow = new ExecutionFlow(3, 0);
+        ExecutionFlow flow = new ExecutionFlow(3);
         flow.record(createSell(0, -1, 1));
         assert flow.shortVolume.is(1);
         assert flow.shortPriceDecrease.is(1);
@@ -75,6 +75,19 @@ public class ExecutionFlowTest {
         flow.record(createSell(0, -6, 1));
         assert flow.shortVolume.is(4);
         assert flow.shortPriceDecrease.is(7);
+    }
+
+    @Test
+    public void history() throws Exception {
+        ExecutionFlow flow = new ExecutionFlow(3);
+        flow.record(createBuy(0, 1, 1));
+        assert flow.history.latest().price.is(0);
+
+        flow.record(createBuy(1, 2, 1));
+        assert flow.history.latest().price.is(1);
+
+        flow.record(createBuy(2, 3, 1));
+        assert flow.history.latest().price.is(2);
     }
 
     /**
