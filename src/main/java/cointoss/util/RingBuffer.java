@@ -66,6 +66,7 @@ public class RingBuffer<T> implements Iterable<T> {
      * @param item
      */
     public T add(T item) {
+        T removed = buffer.getAndSet(physicalEnd.intValue(), item);
         buffer.set(physicalEnd.intValue(), item);
 
         // increment index
@@ -73,6 +74,7 @@ public class RingBuffer<T> implements Iterable<T> {
         if (physicalEnd.incrementAndGet() == size) {
             physicalEnd.set(0);
         }
+        return removed;
     }
 
     /**

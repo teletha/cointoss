@@ -17,6 +17,18 @@ import org.junit.Test;
 public class RingBufferTest {
 
     @Test
+    public void append() throws Exception {
+        RingBuffer<Integer> buffer = new RingBuffer<>(3, "");
+        assert buffer.add(1) == null;
+        assert buffer.add(2) == null;
+        assert buffer.add(3) == null;
+        assert buffer.add(4) == 1;
+        assert buffer.add(5) == 2;
+        assert buffer.add(6) == 3;
+        assert buffer.add(7) == 4;
+    }
+
+    @Test
     public void latest() throws Exception {
         RingBuffer<Integer> buffer = new RingBuffer<>(3, "");
         buffer.add(1);

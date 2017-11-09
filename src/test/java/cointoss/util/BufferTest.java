@@ -17,6 +17,12 @@ import org.junit.Test;
 public class BufferTest {
 
     @Test
+    public void appendSingle() throws Exception {
+        Buffer<Integer> buffer = new Buffer<>(2, 2, "");
+        buffer.append(1);
+    }
+
+    @Test
     public void append() throws Exception {
         Buffer<Integer> buffer = new Buffer<>(2, 2, "");
         buffer.append(0, 1, 2, 3);

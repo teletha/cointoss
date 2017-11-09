@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicReference;
 
 import cointoss.chart.Chart;
@@ -79,7 +81,7 @@ public class Market implements Disposable {
     public final Chart second5 = new Chart(Duration
             .ofSeconds(5), second10, second20, second30, minute1, minute5, minute15, minute30, hour1, hour2, hour4, hour6, hour12, day1, day3, day7);
 
-    public final WhatNew whatNew = new WhatNew(100);
+    public final ExecutionFlow flow = new ExecutionFlow(80, 500);
 
     /** The execution listeners. */
     private final CopyOnWriteArrayList<Observer<? super Execution>> timelines = new CopyOnWriteArrayList();
@@ -357,6 +359,7 @@ public class Market implements Disposable {
         }
         latest = exe;
 
+        flow.record(exe);
         second5.tick(exe);
 
         for (Order order : orders) {
@@ -374,6 +377,10 @@ public class Market implements Disposable {
             listener.accept(exe);
         }
     }
+
+    private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+
+    private final AtomicReference<ExecutionFlow> previous = new AtomicReference();
 
     /**
      * Update local managed {@link Order}.

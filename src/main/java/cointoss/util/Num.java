@@ -763,6 +763,12 @@ public class Num implements Comparable<Num> {
         return direction.isBuy() ? isLessThan(price) : isGreaterThan(price);
     }
 
+    public final String format(int scale) {
+        Num num = scale(scale);
+
+        return isPositiveOrZero() ? "+" + num : num.toString();
+    }
+
     /**
      * Convert to {@link Num}.
      * 

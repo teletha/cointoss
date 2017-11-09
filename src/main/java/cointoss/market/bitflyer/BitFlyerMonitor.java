@@ -9,12 +9,10 @@
  */
 package cointoss.market.bitflyer;
 
-import java.util.concurrent.atomic.AtomicReference;
+import java.time.ZonedDateTime;
 
 import cointoss.Market;
 import cointoss.Trading;
-import cointoss.chart.Tick;
-import cointoss.util.Num;
 
 /**
  * @version 2017/09/08 18:40:12
@@ -32,66 +30,102 @@ public class BitFlyerMonitor extends Trading {
         // .mark() + exe.cumulativeSize + " @" + exe.price);
         // });
 
-        AtomicReference<Tick> latest = new AtomicReference();
+        // AtomicReference<Tick> latest = new AtomicReference();
+        //
+        // market.second5.to(tick -> {
+        // Tick prev1 = latest.getAndSet(tick);
+        //
+        // if (prev1 == null) {
+        // return;
+        // }
+        //
+        // Num priceDiff = tick.closePrice.minus(prev1.closePrice);
+        // Num volumeDiff = tick.longVolume.minus(tick.shortVolume).scale(1);
+        // Num longVolumeDiff = tick.longVolume.minus(prev1.longVolume).scale(1);
+        // Num longVolumeRatio = tick.longVolume.divide(prev1.longVolume).scale(1);
+        // Num shortVolumeDiff = tick.shortVolume.minus(prev1.shortVolume).scale(1);
+        // Num shortVolumeRatio = tick.shortVolume.divide(prev1.shortVolume).scale(1);
+        //
+        // Num power = tick.upRatio().minus(tick.downRatio()).scale(3);
+        //
+        // StringBuilder builder = new StringBuilder();
+        // builder.append(tick.closePrice).append("(P").append(priceDiff).append("
+        // V").append(volumeDiff).append(")\t");
+        // builder.append("L")
+        // .append("(")
+        // .append(longVolumeRatio)
+        // .append(" ")
+        // .append(longVolumeDiff)
+        // .append(" ")
+        // .append(tick.upRatio().scale(1))
+        // .append(")")
+        // .append(" S")
+        // .append("(")
+        // .append(shortVolumeRatio)
+        // .append(" ")
+        // .append(shortVolumeDiff)
+        // .append(" ")
+        // .append(tick.downRatio().scale(1))
+        // .append(")")
+        // .append("\t");
+        // builder.append("Volatility").append("(").append(power).append("
+        // ").append(priceDiff.divide(power).scale(5)).append(")\t");
+        //
+        // Tick minute = market.minute5.ticks.latest();
+        // builder.append("MINUTE L").append(minute.longVolume.scale(1)).append("
+        // S").append(minute.shortVolume.scale(1)).append("\t");
+        //
+        // if (priceDiff.isZero()) {
+        // builder.append("均衡");
+        // } else if (priceDiff.isNegative()) {
+        // if (volumeDiff.isPositive()) {
+        // builder.append("上げ止まり");
+        // } else {
+        // builder.append("下げ");
+        // }
+        // } else {
+        // if (volumeDiff.isPositive()) {
+        // builder.append("上げ");
+        // } else {
+        // builder.append("下げ止まり");
+        // }
+        // }
+        // System.out.println(builder);
+        // });
 
-        market.second5.to(tick -> {
-            Tick prev1 = latest.getAndSet(tick);
-
-            if (prev1 == null) {
-                return;
-            }
-
-            Num priceDiff = tick.closePrice.minus(prev1.closePrice);
-            Num volumeDiff = tick.longVolume.minus(tick.shortVolume).scale(1);
-            Num longVolumeDiff = tick.longVolume.minus(prev1.longVolume).scale(1);
-            Num longVolumeRatio = tick.longVolume.divide(prev1.longVolume).scale(1);
-            Num shortVolumeDiff = tick.shortVolume.minus(prev1.shortVolume).scale(1);
-            Num shortVolumeRatio = tick.shortVolume.divide(prev1.shortVolume).scale(1);
-
-            Num power = tick.upRatio().minus(tick.downRatio()).scale(3);
-
-            StringBuilder builder = new StringBuilder();
-            builder.append(tick.closePrice).append("(P").append(priceDiff).append(" V").append(volumeDiff).append(")\t");
-            builder.append("L")
-                    .append("(")
-                    .append(longVolumeRatio)
-                    .append(" ")
-                    .append(longVolumeDiff)
-                    .append(" ")
-                    .append(tick.upRatio().scale(1))
-                    .append(")")
-                    .append(" S")
-                    .append("(")
-                    .append(shortVolumeRatio)
-                    .append(" ")
-                    .append(shortVolumeDiff)
-                    .append(" ")
-                    .append(tick.downRatio().scale(1))
-                    .append(")")
-                    .append("\t");
-            builder.append("Volatility").append("(").append(power).append(" ").append(priceDiff.divide(power).scale(5)).append(")\t");
-
-            Tick minute = market.minute5.ticks.latest();
-            builder.append("MINUTE L").append(minute.longVolume.scale(1)).append(" S").append(minute.shortVolume.scale(1)).append("\t");
-
-            if (priceDiff.isZero()) {
-                builder.append("均衡");
-            } else if (priceDiff.isNegative()) {
-                if (volumeDiff.isPositive()) {
-                    builder.append("上げ止まり");
-                } else {
-                    builder.append("下げ");
-                }
+        market.timeline.take(e -> {
+            if (e.isAfter(last)) {
+                last = e.exec_date.withNano(0).plusSeconds(1);
+                return true;
             } else {
-                if (volumeDiff.isPositive()) {
-                    builder.append("上げ");
-                } else {
-                    builder.append("下げ止まり");
-                }
+                return false;
             }
-            System.out.println(builder);
+        }).mapTo(market.flow).to(flow -> {
+
+            System.out.println(flow.volume + " (" + flow.id + ") " + flow.history.latest(1).volume + "(" + flow.history.latest(1).id + ")");
         });
+        // market.executions(500, (prev, flow) -> {
+        // Num longDiff = flow.longVolume.minus(prev.longVolume);
+        // Num shortDiff = flow.shortVolume.minus(prev.shortVolume);
+        //
+        // Num longPriceDiff = flow.longPriceIncrese.minus(prev.longPriceIncrese);
+        // Num shortPriceDiff = flow.shortPriceDecrease.minus(prev.shortPriceDecrease);
+        //
+        // StringBuilder builder = new StringBuilder();
+        // builder.append(flow.price).append(" ");
+        // builder.append(flow.volume().format(2)).append(" \t");
+        // builder.append(longDiff.minus(shortDiff).format(2)).append("\t");
+        // builder.append(longPriceDiff.minus(shortPriceDiff).format(0)).append("\t");
+        // builder.append(flow.longVolume.scale(2)).append("(").append(longDiff.format(2)).append(")\t
+        // ");
+        // builder.append(flow.shortVolume.scale(2)).append("(").append(shortDiff.format(2)).append(")\t");
+        // builder.append(flow.power().format(0)).append(" ");
+        //
+        // System.out.println(builder);
+        // });
     }
+
+    ZonedDateTime last = ZonedDateTime.now().minusDays(1).withSecond(0).withNano(0);
 
     /**
      * Entry point.
