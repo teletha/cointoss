@@ -229,7 +229,7 @@ class TestableMarketBackend implements MarketBackend {
 
                 Execution exe = new Execution();
                 exe.side = order.side();
-                exe.size = executedSize;
+                exe.size = exe.cumulativeSize = executedSize;
                 exe.price = order.child_order_type.isMarket() ? order.marketMinPrice : order.average_price;
                 exe.exec_date = e.exec_date;
                 exe.buy_child_order_acceptance_id = order.isBuy() ? order.child_order_acceptance_id : e.buy_child_order_acceptance_id;
@@ -244,7 +244,7 @@ class TestableMarketBackend implements MarketBackend {
 
                 // replace execution info
                 e.side = exe.side;
-                e.size = exe.size;
+                e.size = e.cumulativeSize = exe.size;
                 e.price = exe.price;
                 e.buy_child_order_acceptance_id = exe.buy_child_order_acceptance_id;
                 e.sell_child_order_acceptance_id = exe.sell_child_order_acceptance_id;

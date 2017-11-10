@@ -100,8 +100,8 @@ public class BitFlyerMonitor extends Trading {
         // .latest(1).volume + "(" + flow.history.latest(1).id + ")");
         // });
 
-        market.timeline.take(e -> e.size.isGreaterThan(10)).to(e -> {
-            System.out.println(e);
+        market.timeline.take(e -> e.cumulativeSize.isGreaterThan(5)).to(e -> {
+            System.out.println(e + "   " + e.cumulativeSize);
         });
         // market.executions(500, (prev, flow) -> {
         // Num longDiff = flow.longVolume.minus(prev.longVolume);

@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.pubnub.api.PNConfiguration;
@@ -124,6 +125,8 @@ class BitFlyerLog implements MarketLog {
      */
     @Override
     public Signal<Execution> from(ZonedDateTime start) {
+        AtomicReference<Execution> switcher = new AtomicReference<>(SEED);
+
         return new Signal<Execution>((observer, disposer) -> {
             // read from cache
             if (cacheFirst != null) {
@@ -151,24 +154,21 @@ class BitFlyerLog implements MarketLog {
             }
 
             return disposer;
-        }).scan(SEED, (prev, next) -> {
-            if (next.side.isBuy()) {
-                if (prev.buy_child_order_acceptance_id.equals(next.buy_child_order_acceptance_id)) {
-                    // same long taker
-                    System.out.println(next.size);
-                    next.size = prev.size.plus(next.size);
-                    return null;
-                }
-            } else {
-                if (prev.sell_child_order_acceptance_id.equals(next.sell_child_order_acceptance_id)) {
-                    // same short taker
-                    System.out.println(next.size);
-                    next.size = prev.size.plus(next.size);
-                    return null;
-                }
+        }).map(e -> {
+            Execution previous = switcher.getAndSet(e);
+
+            if (e.side.isBuy() && previous.buy_child_order_acceptance_id.equals(e.buy_child_order_acceptance_id)) {
+                // same long taker
+                e.cumulativeSize = previous.cumulativeSize.plus(e.size);
+                return null;
+            } else if (e.side.isSell() && previous.sell_child_order_acceptance_id.equals(e.sell_child_order_acceptance_id)) {
+                // same short taker
+                e.cumulativeSize = previous.cumulativeSize.plus(e.size);
+                return null;
             }
-            return prev;
+            return previous;
         }).skip(e -> e == null || e == SEED);
+
     }
 
     /**
@@ -329,7 +329,7 @@ class BitFlyerLog implements MarketLog {
                             exe.id = node.get("id").asLong();
                             exe.side = Side.parse(node.get("side").asText());
                             exe.price = Num.of(node.get("price").asText());
-                            exe.size = Num.of(node.get("size").asText());
+                            exe.size = exe.cumulativeSize = Num.of(node.get("size").asText());
                             exe.exec_date = LocalDateTime.parse(node.get("exec_date").asText(), format).atZone(BitFlyerBackend.zone);
                             exe.buy_child_order_acceptance_id = node.get("buy_child_order_acceptance_id").asText();
                             exe.sell_child_order_acceptance_id = node.get("sell_child_order_acceptance_id").asText();

@@ -43,7 +43,7 @@ public class Execution {
     public Num size;
 
     /** size */
-    public Num cumulativeSize;
+    public Num cumulativeSize = Num.ZERO;
 
     /** date */
     public ZonedDateTime exec_date;
@@ -72,7 +72,7 @@ public class Execution {
         exec_date = LocalDateTime.parse(values[1]).atZone(UTC);
         side = Side.parse(values[2]);
         price = Num.of(values[3]);
-        size = Num.of(values[4]);
+        size = cumulativeSize = Num.of(values[4]);
 
         if (5 < values.length) {
             buy_child_order_acceptance_id = values[5];
