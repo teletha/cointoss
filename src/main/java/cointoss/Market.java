@@ -86,6 +86,8 @@ public class Market implements Disposable {
     /** The execution listeners. */
     private final CopyOnWriteArrayList<Observer<? super Execution>> timelines = new CopyOnWriteArrayList();
 
+    private final AtomicReference<Num> accumurated = new AtomicReference();
+
     /** The execution time line. */
     public final Signal<Execution> timeline = new Signal(timelines);
 
@@ -357,6 +359,7 @@ public class Market implements Disposable {
         if (init == null) {
             init = exe;
         }
+
         latest = exe;
 
         flow.record(exe);

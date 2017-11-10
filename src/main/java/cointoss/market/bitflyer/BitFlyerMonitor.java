@@ -94,9 +94,14 @@ public class BitFlyerMonitor extends Trading {
         // System.out.println(builder);
         // });
 
-        market.flow.to(flow -> {
-            System.out.println(flow.history.latest().volume + " (" + flow.history.latest().id + ") " + flow.history
-                    .latest(1).volume + "(" + flow.history.latest(1).id + ")");
+        // market.flow.to(flow -> {
+        // System.out.println(flow.history.latest().volume + " (" + flow.history.latest().id + ") "
+        // + flow.history
+        // .latest(1).volume + "(" + flow.history.latest(1).id + ")");
+        // });
+
+        market.timeline.take(e -> e.size.isGreaterThan(10)).to(e -> {
+            System.out.println(e);
         });
         // market.executions(500, (prev, flow) -> {
         // Num longDiff = flow.longVolume.minus(prev.longVolume);

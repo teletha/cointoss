@@ -46,6 +46,9 @@ import kiss.Signal;
  */
 class BitFlyerLog implements MarketLog {
 
+    /** The seed execution. */
+    private static final Execution SEED = new Execution();
+
     /** The writer thread. */
     private static final ExecutorService writer = Executors.newSingleThreadExecutor(run -> {
         Thread thread = new Thread(run);
@@ -121,7 +124,7 @@ class BitFlyerLog implements MarketLog {
      */
     @Override
     public Signal<Execution> from(ZonedDateTime start) {
-        return new Signal<>((observer, disposer) -> {
+        return new Signal<Execution>((observer, disposer) -> {
             // read from cache
             if (cacheFirst != null) {
                 ZonedDateTime current = start.isBefore(cacheFirst) ? cacheFirst : start.isAfter(cacheLast) ? cacheLast : start;
@@ -148,7 +151,24 @@ class BitFlyerLog implements MarketLog {
             }
 
             return disposer;
-        });
+        }).scan(SEED, (prev, next) -> {
+            if (next.side.isBuy()) {
+                if (prev.buy_child_order_acceptance_id.equals(next.buy_child_order_acceptance_id)) {
+                    // same long taker
+                    System.out.println(next.size);
+                    next.size = prev.size.plus(next.size);
+                    return null;
+                }
+            } else {
+                if (prev.sell_child_order_acceptance_id.equals(next.sell_child_order_acceptance_id)) {
+                    // same short taker
+                    System.out.println(next.size);
+                    next.size = prev.size.plus(next.size);
+                    return null;
+                }
+            }
+            return prev;
+        }).skip(e -> e == null || e == SEED);
     }
 
     /**
