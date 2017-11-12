@@ -9,9 +9,11 @@
  */
 package cointoss.market.bitflyer;
 
-import java.time.ZonedDateTime;
+import static java.util.concurrent.TimeUnit.*;
 
-import cointoss.Execution;
+import java.time.LocalDateTime;
+
+import cointoss.ExecutionFlow;
 import cointoss.Market;
 import cointoss.Trading;
 
@@ -100,31 +102,25 @@ public class BitFlyerMonitor extends Trading {
         // .latest(1).volume + "(" + flow.history.latest(1).id + ")");
         // });
 
-        market.timeline.take(e -> e.cumulativeSize.isGreaterThan(5)).to(e -> {
-            System.out.println(e + "   " + e.cumulativeSize);
-        });
-        // market.executions(500, (prev, flow) -> {
-        // Num longDiff = flow.longVolume.minus(prev.longVolume);
-        // Num shortDiff = flow.shortVolume.minus(prev.shortVolume);
-        //
-        // Num longPriceDiff = flow.longPriceIncrese.minus(prev.longPriceIncrese);
-        // Num shortPriceDiff = flow.shortPriceDecrease.minus(prev.shortPriceDecrease);
-        //
-        // StringBuilder builder = new StringBuilder();
-        // builder.append(flow.price).append(" ");
-        // builder.append(flow.volume().format(2)).append(" \t");
-        // builder.append(longDiff.minus(shortDiff).format(2)).append("\t");
-        // builder.append(longPriceDiff.minus(shortPriceDiff).format(0)).append("\t");
-        // builder.append(flow.longVolume.scale(2)).append("(").append(longDiff.format(2)).append(")\t
-        // ");
-        // builder.append(flow.shortVolume.scale(2)).append("(").append(shortDiff.format(2)).append(")\t");
-        // builder.append(flow.power().format(0)).append(" ");
-        //
-        // System.out.println(builder);
-        // });
-    }
+        market.timeline.throttle(500, MILLISECONDS).to(e -> {
+            ExecutionFlow flow = market.flow;
 
-    private ZonedDateTime last = ZonedDateTime.of(1971, 1, 1, 0, 0, 0, 0, Execution.UTC);
+            StringBuilder builder = new StringBuilder();
+            builder.append(LocalDateTime.now().withNano(0)).append(" ");
+            builder.append(flow.price).append(" ");
+            builder.append(flow.volume().format(2)).append("   ");
+            builder.append(market.flow75.volume().format(2)).append("   ");
+            builder.append(market.flow100.volume().format(2)).append("   ");
+            builder.append(market.flow200.volume().format(2)).append("   ");
+            builder.append(market.flow300.volume().format(2)).append("   ");
+
+            // 値段が上がりづらい要因
+            // ・買いが少ない long volumeの量が小さい
+            // ・売り方が厚い longPriceIncrease / longVolumeが小さい
+
+            System.out.println(builder);
+        });
+    }
 
     /**
      * Entry point.

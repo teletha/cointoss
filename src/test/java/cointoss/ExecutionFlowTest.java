@@ -42,19 +42,15 @@ public class ExecutionFlowTest {
         ExecutionFlow flow = new ExecutionFlow(3);
         flow.record(createBuy(0, 1, 1));
         assert flow.longVolume.is(1);
-        assert flow.longPriceIncrese.is(1);
 
         flow.record(createBuy(0, 2, 1));
         assert flow.longVolume.is(2);
-        assert flow.longPriceIncrese.is(2);
 
         flow.record(createBuy(0, 4, 2));
         assert flow.longVolume.is(4);
-        assert flow.longPriceIncrese.is(6);
 
         flow.record(createBuy(0, 6, 1));
         assert flow.longVolume.is(4);
-        assert flow.longPriceIncrese.is(7);
     }
 
     @Test
@@ -62,19 +58,15 @@ public class ExecutionFlowTest {
         ExecutionFlow flow = new ExecutionFlow(3);
         flow.record(createSell(0, -1, 1));
         assert flow.shortVolume.is(1);
-        assert flow.shortPriceDecrease.is(1);
 
         flow.record(createSell(0, -2, 1));
         assert flow.shortVolume.is(2);
-        assert flow.shortPriceDecrease.is(2);
 
         flow.record(createSell(0, -4, 2));
         assert flow.shortVolume.is(4);
-        assert flow.shortPriceDecrease.is(6);
 
         flow.record(createSell(0, -6, 1));
         assert flow.shortVolume.is(4);
-        assert flow.shortPriceDecrease.is(7);
     }
 
     @Test

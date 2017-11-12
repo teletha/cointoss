@@ -51,12 +51,6 @@ public class Execution {
     /** INTERNAL USAGE */
     Order associated;
 
-    /** INTERNAL USAGE */
-    Num longPriceIncrese = Num.ZERO;
-
-    /** INTERNAL USAGE */
-    Num shortPriceDecrease = Num.ZERO;
-
     /**
      * 
      */

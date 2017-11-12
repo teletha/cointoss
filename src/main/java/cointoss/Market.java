@@ -81,12 +81,18 @@ public class Market implements Disposable {
     public final Chart second5 = new Chart(Duration
             .ofSeconds(5), second10, second20, second30, minute1, minute5, minute15, minute30, hour1, hour2, hour4, hour6, hour12, day1, day3, day7);
 
-    public final ExecutionFlow flow = new ExecutionFlow(80);
+    public final ExecutionFlow flow = new ExecutionFlow(50);
+
+    public final ExecutionFlow flow75 = new ExecutionFlow(75);
+
+    public final ExecutionFlow flow100 = new ExecutionFlow(100);
+
+    public final ExecutionFlow flow200 = new ExecutionFlow(200);
+
+    public final ExecutionFlow flow300 = new ExecutionFlow(300);
 
     /** The execution listeners. */
     private final CopyOnWriteArrayList<Observer<? super Execution>> timelines = new CopyOnWriteArrayList();
-
-    private final AtomicReference<Num> accumurated = new AtomicReference();
 
     /** The execution time line. */
     public final Signal<Execution> timeline = new Signal(timelines);
@@ -363,6 +369,10 @@ public class Market implements Disposable {
         latest = exe;
 
         flow.record(exe);
+        flow75.record(exe);
+        flow100.record(exe);
+        flow200.record(exe);
+        flow300.record(exe);
         second5.tick(exe);
 
         for (Order order : orders) {
