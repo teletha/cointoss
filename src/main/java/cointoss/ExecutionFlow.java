@@ -21,11 +21,8 @@ public class ExecutionFlow {
 
     public int size = 0;
 
-    /** The latest price. */
-    public Num price = Num.ZERO;
-
-    /** The latest side. */
-    public Side side = Side.BUY;
+    /** The latest execution. */
+    public Execution latest = new Execution();
 
     /** The volume. */
     public Num volume = Num.ZERO;
@@ -90,9 +87,7 @@ public class ExecutionFlow {
                 shortVolume = shortVolume.minus(removed.size);
             }
         }
-
-        price = exe.price;
-        side = exe.side;
+        latest = exe;
     }
 
     /**
@@ -108,7 +103,7 @@ public class ExecutionFlow {
         ExecutionFlow copy = new ExecutionFlow(0);
         copy.id = id++;
         copy.size = size;
-        copy.price = price;
+        copy.latest = latest;
         copy.volume = volume;
         copy.longVolume = longVolume;
         copy.shortVolume = shortVolume;

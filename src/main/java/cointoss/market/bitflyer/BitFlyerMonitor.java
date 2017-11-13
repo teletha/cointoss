@@ -107,7 +107,7 @@ public class BitFlyerMonitor extends Trading {
 
             StringBuilder builder = new StringBuilder();
             builder.append(LocalDateTime.now().withNano(0)).append(" ");
-            builder.append(flow.price).append(" ");
+            builder.append(flow.latest.price).append(" ");
             builder.append(flow.volume().format(2)).append("   ");
             builder.append(market.flow75.volume().format(2)).append("   ");
             builder.append(market.flow100.volume().format(2)).append("   ");

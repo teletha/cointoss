@@ -18,6 +18,9 @@ import org.apache.commons.codec.digest.HmacUtils;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
@@ -88,9 +91,25 @@ class BitFlyerBackend implements MarketBackend {
      */
     @Override
     public Signal<String> request(Order order) {
-        // If this exception will be thrown, it is bug of this program. So we must rethrow the
-        // wrapped error in here.
-        throw new Error();
+        // {
+        // "product_code": "BTC_JPY",
+        // "child_order_type": "LIMIT",
+        // "side": "BUY",
+        // "price": 30000,
+        // "size": 0.1,
+        // "minute_to_expire": 10000,
+        // "time_in_force": "GTC"
+        // }
+        ChildOrderRequest request = new ChildOrderRequest();
+        request.child_order_type = order.isLimit() ? "LIMIT" : "MARKET";
+        request.minute_to_expire = 60 * 24;
+        request.price = order.price().toInt();
+        request.product_code = type.name();
+        request.side = order.side().name();
+        request.size = order.size().toDouble();
+        request.time_in_force = "GTC";
+
+        return call("POST", "/v1/me/sendchildorder", request, "child_order_acceptance_id", String.class);
     }
 
     /**
@@ -165,15 +184,40 @@ class BitFlyerBackend implements MarketBackend {
     /**
      * Call private API.
      */
+    private <M> Signal<M> call(String method, String path, Object body, String selector, Class<M> type) {
+        StringBuilder builder = new StringBuilder();
+        I.write(body, builder);
+
+        return call(method, path, builder.toString(), selector, type);
+    }
+
+    /**
+     * Call private API.
+     */
     private <M> Signal<M> call(String method, String path, String body, String selector, Class<M> type) {
         return new Signal<>((observer, disposer) -> {
             String timestamp = String.valueOf(ZonedDateTime.now(zone).toEpochSecond());
             String sign = HmacUtils.hmacSha256Hex(accessToken, timestamp + method + path + body);
 
-            HttpGet request = new HttpGet(api + path);
-            request.addHeader("ACCESS-KEY", accessKey);
-            request.addHeader("ACCESS-TIMESTAMP", timestamp);
-            request.addHeader("ACCESS-SIGN", sign);
+            HttpUriRequest request = null;
+
+            if (method.equals("GET")) {
+                request = new HttpGet(api + path);
+                request.addHeader("ACCESS-KEY", accessKey);
+                request.addHeader("ACCESS-TIMESTAMP", timestamp);
+                request.addHeader("ACCESS-SIGN", sign);
+            } else if (method.equals("POST")) {
+                request = new HttpPost(api + path);
+                request.addHeader("ACCESS-KEY", accessKey);
+                request.addHeader("ACCESS-TIMESTAMP", timestamp);
+                request.addHeader("ACCESS-SIGN", sign);
+                request.addHeader("Content-Type", "application/json");
+                ((HttpPost) request).setEntity(new StringEntity(body, StandardCharsets.UTF_8));
+            } else {
+                // If this exception will be thrown, it is bug of this program. So we must rethrow
+                // the wrapped error in here.
+                throw new Error();
+            }
 
             try (CloseableHttpClient client = HttpClientBuilder.create().disableCookieManagement().build(); //
                     CloseableHttpResponse response = client.execute(request)) {
@@ -188,7 +232,29 @@ class BitFlyerBackend implements MarketBackend {
             } catch (Exception e) {
                 observer.error(e);
             }
+
             return disposer;
         });
+    }
+
+    /**
+     * @version 2017/11/13 13:09:00
+     */
+    @SuppressWarnings("unused")
+    private static class ChildOrderRequest {
+
+        public String product_code;
+
+        public String child_order_type;
+
+        public String side;
+
+        public int price;
+
+        public double size;
+
+        public int minute_to_expire;
+
+        public String time_in_force;
     }
 }

@@ -326,6 +326,16 @@ public class Order implements Directional {
      * @param size
      * @return
      */
+    public static Order limitLong(double size, double price) {
+        return limit(Side.BUY, Num.of(size), Num.of(price));
+    }
+
+    /**
+     * 指値注文
+     * 
+     * @param size
+     * @return
+     */
     public static Order limitLong(Num size, Num price) {
         return limit(Side.BUY, size, price);
     }
@@ -419,6 +429,15 @@ public class Order implements Directional {
 
     /** INTERNAL USAGE */
     public Deque<Execution> executions = new ArrayDeque<>();
+
+    /**
+     * Detect order type.
+     * 
+     * @return
+     */
+    public final boolean isLimit() {
+        return price != null;
+    }
 
     /**
      * <p>

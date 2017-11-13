@@ -352,6 +352,16 @@ public class Num implements Comparable<Num> {
     }
 
     /**
+     * Converts this {@code Decimal} to a {@code int}.
+     * 
+     * @return this {@code Decimal} converted to a {@code int}
+     * @see BigDecimal#intValueExact();
+     */
+    public final int toInt() {
+        return delegate.intValueExact();
+    }
+
+    /**
      * @param other
      * @return
      */

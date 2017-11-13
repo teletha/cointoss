@@ -25,16 +25,16 @@ public class ExecutionFlowTest {
     @Test
     public void price() throws Exception {
         ExecutionFlow flow = new ExecutionFlow(3);
-        assert flow.price.is(0);
+        assert flow.latest.price.is(0);
 
         flow.record(createBuy(0, 1, 1));
-        assert flow.price.is(1);
+        assert flow.latest.price.is(1);
 
         flow.record(createBuy(0, 10, 1));
-        assert flow.price.is(10);
+        assert flow.latest.price.is(10);
 
         flow.record(createSell(0, 5, 1));
-        assert flow.price.is(5);
+        assert flow.latest.price.is(5);
     }
 
     @Test
@@ -73,13 +73,13 @@ public class ExecutionFlowTest {
     public void history() throws Exception {
         ExecutionFlow flow = new ExecutionFlow(3);
         flow.record(createBuy(0, 1, 1));
-        assert flow.history.latest().price.is(0);
+        assert flow.history.latest().latest.price.is(0);
 
         flow.record(createBuy(1, 2, 1));
-        assert flow.history.latest().price.is(1);
+        assert flow.history.latest().latest.price.is(1);
 
         flow.record(createBuy(2, 3, 1));
-        assert flow.history.latest().price.is(2);
+        assert flow.history.latest().latest.price.is(2);
     }
 
     /**
