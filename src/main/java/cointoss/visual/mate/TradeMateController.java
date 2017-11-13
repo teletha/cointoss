@@ -1,0 +1,34 @@
+/*
+ * Copyright (C) 2017 Nameless Production Committee
+ *
+ * Licensed under the MIT License (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *          http://opensource.org/licenses/mit-license.php
+ */
+package cointoss.visual.mate;
+
+import javafx.application.Platform;
+import javafx.fxml.FXML;
+import javafx.scene.control.ListView;
+
+import cointoss.Execution;
+
+/**
+ * @version 2017/11/13 18:47:42
+ */
+
+public class TradeMateController {
+
+    @FXML
+    public ListView<Execution> executionList;
+
+    /**
+     * Terminate this application.
+     */
+    @FXML
+    void activeMenuQuit() {
+        Platform.exit();
+    }
+}

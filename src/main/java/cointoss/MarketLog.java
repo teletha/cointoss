@@ -125,5 +125,4 @@ public interface MarketLog {
      * @return
      */
     ZonedDateTime getCacheEnd();
-
 }

@@ -165,6 +165,16 @@ class TestableMarketBackend implements MarketBackend {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Signal<Board> getBoard() {
+        // If this exception will be thrown, it is bug of this program. So we must rethrow the
+        // wrapped error in here.
+        throw new Error();
+    }
+
+    /**
      * Emulate {@link Execution}.
      * 
      * @param e

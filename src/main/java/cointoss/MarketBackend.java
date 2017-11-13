@@ -98,4 +98,13 @@ public interface MarketBackend extends Disposable {
      * @return
      */
     Signal<BalanceUnit> getCurrency();
+
+    /**
+     * <p>
+     * Get amount of the base and target currency.
+     * </p>
+     * 
+     * @return
+     */
+    Signal<Board> getBoard();
 }

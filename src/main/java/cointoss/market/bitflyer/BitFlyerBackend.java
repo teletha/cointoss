@@ -25,16 +25,28 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.pubnub.api.PNConfiguration;
+import com.pubnub.api.PubNub;
+import com.pubnub.api.callbacks.SubscribeCallback;
+import com.pubnub.api.models.consumer.PNStatus;
+import com.pubnub.api.models.consumer.pubsub.PNMessageResult;
+import com.pubnub.api.models.consumer.pubsub.PNPresenceEventResult;
+
 import cointoss.BalanceUnit;
+import cointoss.Board;
+import cointoss.Board.Unit;
 import cointoss.Execution;
 import cointoss.Market;
 import cointoss.MarketBackend;
 import cointoss.Order;
 import cointoss.OrderState;
 import cointoss.Position;
+import cointoss.util.Num;
 import filer.Filer;
 import kiss.Disposable;
 import kiss.I;
+import kiss.JSON;
 import kiss.Signal;
 
 /**
@@ -182,6 +194,14 @@ class BitFlyerBackend implements MarketBackend {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Signal<Board> getBoard() {
+        return realtimeBoard();
+    }
+
+    /**
      * Call private API.
      */
     private <M> Signal<M> call(String method, String path, Object body, String selector, Class<M> type) {
@@ -225,7 +245,13 @@ class BitFlyerBackend implements MarketBackend {
                 int status = response.getStatusLine().getStatusCode();
 
                 if (status == HttpStatus.SC_OK) {
-                    I.json(EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8)).find(selector, type).to(observer::accept);
+                    JSON json = I.json(EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8));
+
+                    if (selector == null || selector.isEmpty()) {
+                        observer.accept(json.to(type));
+                    } else {
+                        json.find(selector, type).to(observer::accept);
+                    }
                 } else {
                     observer.error(new Error("HTTP Status " + status));
                 }
@@ -234,6 +260,79 @@ class BitFlyerBackend implements MarketBackend {
             }
 
             return disposer;
+        });
+    }
+
+    /**
+     * Realtime board info.
+     * 
+     * @return
+     */
+    private Signal<Board> realtimeBoard() {
+        return new Signal<Board>((observer, disposer) -> {
+            PNConfiguration config = new PNConfiguration();
+            config.setSubscribeKey("sub-c-52a9ab50-291b-11e5-baaa-0619f8945a4f");
+
+            PubNub pubNub = new PubNub(config);
+            pubNub.addListener(new SubscribeCallback() {
+
+                /**
+                 * @param pubnub
+                 * @param status
+                 */
+                @Override
+                public void status(PubNub pubnub, PNStatus status) {
+                }
+
+                /**
+                 * @param pubnub
+                 * @param presence
+                 */
+                @Override
+                public void presence(PubNub pubnub, PNPresenceEventResult presence) {
+                }
+
+                /**
+                 * @param pubnub
+                 * @param message
+                 */
+                @Override
+                public void message(PubNub pubnub, PNMessageResult message) {
+                    if (message.getChannel() != null) {
+                        JsonNode node = message.getMessage();
+
+                        Board board = new Board();
+                        board.mid_price = Num.of(node.get("mid_price").asLong());
+
+                        JsonNode asks = node.get("asks");
+
+                        for (int i = 0; i < asks.size(); i++) {
+                            JsonNode ask = asks.get(i);
+                            Unit unit = new Unit();
+                            unit.price = Num.of(ask.get("price").asDouble());
+                            unit.size = Num.of(ask.get("size").asDouble());
+                            board.asks.add(unit);
+                        }
+
+                        JsonNode bids = node.get("bids");
+
+                        for (int i = 0; i < bids.size(); i++) {
+                            JsonNode bid = bids.get(i);
+                            Unit unit = new Unit();
+                            unit.price = Num.of(bid.get("price").asDouble());
+                            unit.size = Num.of(bid.get("size").asDouble());
+                            board.bids.add(unit);
+                        }
+                        observer.accept(board);
+                    }
+                }
+            });
+            pubNub.subscribe().channels(I.list("lightning_board_" + type)).execute();
+
+            return disposer.add(() -> {
+                pubNub.unsubscribeAll();
+                pubNub.destroy();
+            });
         });
     }
 

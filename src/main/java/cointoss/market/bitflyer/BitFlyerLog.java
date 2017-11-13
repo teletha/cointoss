@@ -50,6 +50,10 @@ class BitFlyerLog implements MarketLog {
     /** The seed execution. */
     private static final Execution SEED = new Execution();
 
+    static {
+        SEED.side = Side.BUY;
+    }
+
     /** The writer thread. */
     private static final ExecutorService writer = Executors.newSingleThreadExecutor(run -> {
         Thread thread = new Thread(run);
@@ -341,6 +345,7 @@ class BitFlyerLog implements MarketLog {
                             observer.accept(exe);
                             realtimeId = exe.id;
                         }
+                        observer.accept(SEED);
                     }
                 }
             });
