@@ -280,7 +280,36 @@ public class Num implements Comparable<Num> {
      * @return
      */
     public final Num scale(int size) {
-        return this == NaN ? NaN : new Num(delegate.setScale(size, RoundingMode.HALF_UP));
+        return scale(size, RoundingMode.HALF_UP);
+    }
+
+    /**
+     * Change fractional portion.
+     * 
+     * @return
+     */
+    public final Num scale(int size, RoundingMode mode) {
+        return this == NaN ? NaN : new Num(delegate.setScale(size, mode));
+    }
+
+    /**
+     * Ceil up the specified digit.
+     * 
+     * @param size
+     * @return
+     */
+    public final Num scaleDown(int size) {
+        return scale(size, RoundingMode.DOWN);
+    }
+
+    /**
+     * Ceil up the specified digit.
+     * 
+     * @param size
+     * @return
+     */
+    public final Num scaleUp(int size) {
+        return scale(size, RoundingMode.UP);
     }
 
     /**

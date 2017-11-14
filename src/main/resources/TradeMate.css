@@ -69,7 +69,3 @@
 .SELL {
 	-fx-text-fill: #f7694d;
 }
-
-.list-cell {
-  -fx-alignment: center;
-}

@@ -102,6 +102,17 @@ public class NumTest {
     }
 
     @Test
+    public void scaleDown() throws Exception {
+        assert Num.of(1).scaleDown(0).is(1);
+        assert Num.of(12).scaleDown(0).is(12);
+        assert Num.of(123).scaleDown(0).is(123);
+
+        assert Num.of(1).scaleDown(1).is(1);
+        assert Num.of(12).scaleDown(-1).is(10);
+        assert Num.of(123).scaleDown(-1).is(120);
+    }
+
+    @Test
     public void pow() throws Exception {
         assert Num.of(2).pow(0).is(1);
         assert Num.of(2).pow(1).is(2);

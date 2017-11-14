@@ -258,6 +258,7 @@ class BitFlyerBackend implements MarketBackend {
             } catch (Exception e) {
                 observer.error(e);
             }
+            observer.complete();
 
             return disposer;
         });

@@ -42,6 +42,28 @@ public class Board {
 
         public Num size;
 
+        public Num price() {
+            return price;
+        }
+
+        public Num size() {
+            return size;
+        }
+
+        /**
+         * Create price scaled unit.
+         * 
+         * @param scale
+         * @return
+         */
+        public Unit scale(int scale) {
+            Unit unit = new Unit();
+            unit.price = price.scaleDown(scale);
+            unit.size = size;
+
+            return unit;
+        }
+
         /**
          * {@inheritDoc}
          */

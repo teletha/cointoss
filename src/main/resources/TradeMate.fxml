@@ -59,7 +59,7 @@
         </Menu>
       </menus>
       </MenuBar>
-    <SplitPane dividerPositions="0.2, 0.58, 0.77" focusTraversable="true" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS">
+    <SplitPane dividerPositions="0.1, 0.39, 0.58, 0.77" focusTraversable="true" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS">
       <items>
         <AnchorPane>
           <children>
@@ -132,6 +132,28 @@
                      <padding>
                         <Insets left="10.0" />
                      </padding></ListView>
+               </children>
+            </VBox>
+            <VBox alignment="CENTER">
+               <children>
+                  <ListView id="short10List" focusTraversable="false" VBox.vgrow="ALWAYS">
+                     <padding>
+                        <Insets left="10.0" />
+                     </padding>
+                     <cursor>
+                        <Cursor fx:constant="DEFAULT" />
+                     </cursor>
+                  </ListView>
+                  <HBox alignment="CENTER">
+                     <children>
+                        <TextField />
+                     </children>
+                  </HBox>
+                  <ListView id="long10List" focusTraversable="false" VBox.vgrow="ALWAYS">
+                     <padding>
+                        <Insets left="10.0" />
+                     </padding>
+                  </ListView>
                </children>
             </VBox>
             <ListView id="executionList" focusTraversable="false">
