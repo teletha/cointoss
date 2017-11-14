@@ -26,5 +26,6 @@ public class Project extends bee.api.Project {
         require("com.pubnub", "pubnub", "4.6.5");
         require("org.knowm.xchart", "xchart", "3.5.1-SNAPSHOT");
         require("org.magicwerk", "brownies-collections", "0.9.13");
+        require("org.controlsfx", "controlsfx", "8.40.14");
     }
 }

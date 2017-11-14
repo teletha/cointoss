@@ -9,12 +9,11 @@
  */
 package cointoss.visual.mate;
 
-import static java.time.temporal.ChronoUnit.*;
-
 import java.time.format.DateTimeFormatter;
 
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 
@@ -26,8 +25,14 @@ import cointoss.market.bitflyer.BitFlyer;
  */
 public class ExecutionView extends View {
 
+    /** The curretn theme. */
+    private static final Theme theme = Theme.now();
+
     /** The execution list. */
     private @FXML ListView<Execution> executionList;
+
+    /** The execution list. */
+    private @FXML Label priceLatest;
 
     /**
      * {@inheritDoc}
@@ -39,7 +44,9 @@ public class ExecutionView extends View {
 
         // load execution log
         inWorker(() -> {
-            return BitFlyer.FX_BTC_JPY.log().fromLast(10, MINUTES).on(UIThread).to(e -> {
+            return BitFlyer.FX_BTC_JPY.log().fromToday().on(UIThread).to(e -> {
+                priceLatest.setText(e.price.toString());
+
                 ObservableList<Execution> items = executionList.getItems();
 
                 items.add(0, e);
@@ -71,10 +78,7 @@ public class ExecutionView extends View {
                 setGraphic(null);
             } else {
                 setText(formatter.format(e.exec_date.plusHours(9)) + "  " + e.price + "円  " + e.size.scale(6));
-
-                ObservableList<String> classes = getStyleClass();
-                classes.clear();
-                classes.add(e.side.name());
+                setTextFill(e.side.isBuy() ? theme.buy() : theme.sell());
             }
         }
     }

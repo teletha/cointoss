@@ -309,20 +309,14 @@ class BitFlyerBackend implements MarketBackend {
 
                         for (int i = 0; i < asks.size(); i++) {
                             JsonNode ask = asks.get(i);
-                            Unit unit = new Unit();
-                            unit.price = Num.of(ask.get("price").asDouble());
-                            unit.size = Num.of(ask.get("size").asDouble());
-                            board.asks.add(unit);
+                            board.asks.add(new Unit(Num.of(ask.get("price").asDouble()), Num.of(ask.get("size").asDouble())));
                         }
 
                         JsonNode bids = node.get("bids");
 
                         for (int i = 0; i < bids.size(); i++) {
                             JsonNode bid = bids.get(i);
-                            Unit unit = new Unit();
-                            unit.price = Num.of(bid.get("price").asDouble());
-                            unit.size = Num.of(bid.get("size").asDouble());
-                            board.bids.add(unit);
+                            board.bids.add(new Unit(Num.of(bid.get("price").asDouble()), Num.of(bid.get("size").asDouble())));
                         }
                         observer.accept(board);
                     }

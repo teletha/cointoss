@@ -9,6 +9,7 @@
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.SeparatorMenuItem?>
+<?import javafx.scene.control.Spinner?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -59,7 +60,7 @@
         </Menu>
       </menus>
       </MenuBar>
-    <SplitPane dividerPositions="0.1, 0.39, 0.58, 0.77" focusTraversable="true" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS">
+    <SplitPane dividerPositions="0.2, 0.59, 0.82" focusTraversable="false" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS">
       <items>
         <AnchorPane>
           <children>
@@ -75,10 +76,15 @@
         </AnchorPane>
             <VBox>
                <children>
-                  <HBox alignment="CENTER" VBox.vgrow="NEVER">
+                  <HBox alignment="CENTER_LEFT" VBox.vgrow="NEVER">
                      <children>
                   <Label alignment="CENTER" prefHeight="27.0" prefWidth="60.0" style="&#10;" text="数量" textAlignment="CENTER" wrapText="false" />
-                        <TextField />
+                        <TextField id="orderSize" maxWidth="120.0">
+                           <HBox.margin>
+                              <Insets right="20.0" />
+                           </HBox.margin>
+                        </TextField>
+                        <Spinner id="orderSizeAmount" editable="true" maxWidth="70.0" />
                      </children>
                      <VBox.margin>
                         <Insets top="5.0" />
@@ -87,10 +93,15 @@
                         <Insets right="10.0" />
                      </padding>
                   </HBox>
-                  <HBox alignment="CENTER">
+                  <HBox alignment="CENTER_LEFT">
                      <children>
                         <Label alignment="CENTER" prefHeight="27.0" prefWidth="60.0" style="&#10;" text="価格" textAlignment="CENTER" wrapText="false" />
-                        <TextField />
+                        <TextField id="orderPrice" maxWidth="120.0">
+                           <HBox.margin>
+                              <Insets right="20.0" />
+                           </HBox.margin>
+                        </TextField>
+                        <Spinner id="orderPriceAmount" editable="true" maxWidth="70.0" />
                      </children>
                      <VBox.margin>
                         <Insets top="5.0" />
@@ -98,70 +109,84 @@
                      <padding>
                         <Insets right="10.0" />
                      </padding>
+                  </HBox>
+                  <HBox alignment="CENTER_LEFT">
+                     <children>
+                        <Label alignment="CENTER" prefHeight="27.0" prefWidth="60.0" style="&#10;" text="分散数" textAlignment="CENTER" wrapText="false" />
+                        <Spinner id="orderDivideSize" maxWidth="120.0" />
+                     </children>
+                     <padding>
+                        <Insets right="10.0" />
+                     </padding>
+                     <VBox.margin>
+                        <Insets top="5.0" />
+                     </VBox.margin>
+                  </HBox>
+                  <HBox alignment="CENTER_LEFT" disable="true">
+                     <children>
+                        <Label alignment="CENTER" prefHeight="27.0" prefWidth="60.0" style="&#10;" text="価格間隔" textAlignment="CENTER" wrapText="false" />
+                        <TextField id="orderPriceInterval" maxWidth="120.0" />
+                     </children>
+                     <padding>
+                        <Insets right="10.0" />
+                     </padding>
+                     <VBox.margin>
+                        <Insets top="5.0" />
+                     </VBox.margin>
                   </HBox>
                   <HBox alignment="CENTER" spacing="10.0">
                      <children>
-                        <Button mnemonicParsing="false" prefWidth="50.0" text="売り" textFill="#9f9f9f">
+                        <Button id="orderSell" mnemonicParsing="false" prefWidth="50.0" text="売り" textFill="#9f9f9f">
                            <HBox.margin>
                               <Insets />
                            </HBox.margin>
                         </Button>
-                        <Button mnemonicParsing="false" prefWidth="50.0" text="買い" textFill="#9f9f9f" />
+                        <Button id="orderBuy" mnemonicParsing="false" prefWidth="50.0" text="買い" textFill="#9f9f9f" />
                      </children>
                      <VBox.margin>
-                        <Insets bottom="5.0" top="5.0" />
+                        <Insets top="5.0" />
                      </VBox.margin>
                   </HBox>
                </children>
+               <padding>
+                  <Insets left="20.0" right="20.0" />
+               </padding>
             </VBox>
-            <VBox alignment="CENTER">
+            <VBox alignment="CENTER" maxWidth="220.0" minWidth="220.0">
                <children>
                   <ListView id="shortList" focusTraversable="false" VBox.vgrow="ALWAYS">
-                     <padding>
-                        <Insets left="10.0" />
-                     </padding>
+                     <VBox.margin>
+                        <Insets />
+                     </VBox.margin>
                      <cursor>
                         <Cursor fx:constant="DEFAULT" />
                      </cursor></ListView>
                   <HBox alignment="CENTER">
                      <children>
-                        <TextField />
+                        <Spinner id="priceRange" maxWidth="60.0" minWidth="60.0" prefWidth="60.0" />
+                        <Label id="priceLatest" focusTraversable="false" prefWidth="80.0" textOverrun="CLIP" />
+                        <Label id="priceSpread" alignment="CENTER_RIGHT" focusTraversable="false" prefWidth="90.0" textAlignment="RIGHT" textOverrun="CLIP">
+                           <padding>
+                              <Insets right="20.0" />
+                           </padding>
+                        </Label>
                      </children>
                   </HBox>
                   <ListView id="longList" focusTraversable="false" VBox.vgrow="ALWAYS">
-                     <padding>
-                        <Insets left="10.0" />
-                     </padding></ListView>
-               </children>
-            </VBox>
-            <VBox alignment="CENTER">
-               <children>
-                  <ListView id="short10List" focusTraversable="false" VBox.vgrow="ALWAYS">
-                     <padding>
-                        <Insets left="10.0" />
-                     </padding>
                      <cursor>
                         <Cursor fx:constant="DEFAULT" />
-                     </cursor>
-                  </ListView>
-                  <HBox alignment="CENTER">
-                     <children>
-                        <TextField />
-                     </children>
-                  </HBox>
-                  <ListView id="long10List" focusTraversable="false" VBox.vgrow="ALWAYS">
-                     <padding>
-                        <Insets left="10.0" />
-                     </padding>
-                  </ListView>
+                     </cursor></ListView>
                </children>
+               <cursor>
+                  <Cursor fx:constant="DEFAULT" />
+               </cursor>
             </VBox>
             <ListView id="executionList" focusTraversable="false">
                <padding>
                   <Insets bottom="2.0" left="5.0" top="2.0" />
                </padding>
                <cursor>
-                  <Cursor fx:constant="CLOSED_HAND" />
+                  <Cursor fx:constant="DEFAULT" />
                </cursor>
             </ListView>
       </items>

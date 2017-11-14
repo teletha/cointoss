@@ -18,9 +18,20 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.scene.control.SpinnerValueFactory;
+import javafx.scene.control.SpinnerValueFactory.ListSpinnerValueFactory;
+import javafx.util.StringConverter;
 
+import org.controlsfx.validation.Validator;
+
+import cointoss.util.Num;
 import kiss.Disposable;
 import kiss.Extensible;
+import kiss.Signal;
 
 /**
  * @version 2017/11/13 20:39:23
@@ -73,5 +84,103 @@ public abstract class View implements Extensible {
         pool.submit(() -> {
             terminators.add(process.get());
         });
+    }
+
+    /**
+     * Observe the specified value.
+     * 
+     * @param value
+     * @return
+     */
+    protected final <T> Signal<T> observe(ObservableValue<T> value) {
+        return new Signal<>((observer, disposer) -> {
+            ChangeListener<T> listener = (e, o, n) -> {
+                observer.accept(n);
+            };
+            value.addListener(listener);
+
+            return disposer.add(() -> {
+                value.removeListener(listener);
+            });
+        });
+    }
+
+    /**
+     * Helper to create {@link SpinnerValueFactory}.
+     * 
+     * @param values
+     * @return
+     */
+    protected final <T> SpinnerValueFactory<T> spinnerV(T... values) {
+        ListSpinnerValueFactory factory = new ListSpinnerValueFactory(values(values));
+        factory.setWrapAround(false);
+
+        return factory;
+    }
+
+    /**
+     * Helper to create {@link SpinnerValueFactory}.
+     * 
+     * @param values
+     * @return
+     */
+    protected final <T> SpinnerValueFactory<List<T>> spinner(int size, T... values) {
+        ObservableList<List<T>> lists = FXCollections.observableArrayList();
+
+        for (int i = 0; i < values.length;) {
+            List<T> list = new ArrayList();
+
+            for (int j = 0; j < size; j++) {
+                list.add(values[i++]);
+            }
+            lists.add(list);
+        }
+
+        ListSpinnerValueFactory<List<T>> factory = new ListSpinnerValueFactory<>(lists);
+        factory.setConverter(new StringConverter<List<T>>() {
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public String toString(List<T> object) {
+                return object.get(0).toString();
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public List<T> fromString(String string) {
+                return null;
+            }
+        });
+        return factory;
+    }
+
+    /**
+     * Helper to create {@link ObservableList}.
+     * 
+     * @param values
+     * @return
+     */
+    protected final <T> ObservableList<T> values(T... values) {
+        return FXCollections.observableArrayList(values);
+    }
+
+    /**
+     * Validation helper.
+     * 
+     * @return
+     */
+    public static <T> Validator<String> requirePositiveNumber() {
+        return Validator.<String> createPredicateValidator(v -> {
+            try {
+                Num number = Num.of(v);
+                return number.isPositive();
+            } catch (NumberFormatException e) {
+                return false;
+            }
+        }, "Require the positive number.");
     }
 }

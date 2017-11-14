@@ -18,8 +18,11 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.Spinner;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+
+import org.controlsfx.tools.ValueExtractor;
 
 import filer.Filer;
 import kiss.Disposable;
@@ -32,6 +35,8 @@ public class TradeMate extends Application {
 
     static {
         I.load(View.class, false);
+
+        ValueExtractor.addObservableValueExtractor(c -> c instanceof Spinner, c -> ((Spinner) c).valueProperty());
     }
 
     /** The root controller. */
@@ -67,6 +72,8 @@ public class TradeMate extends Application {
                     } else {
                         field.setAccessible(true);
                         field.set(view, node);
+
+                        enhanceNode(node);
                     }
                 }
             }
@@ -82,6 +89,22 @@ public class TradeMate extends Application {
                 list.add(system.getResource("TradeMate.css").toExternalForm());
             }
         });
+    }
+
+    /**
+     * Enhance Node.
+     */
+    private void enhanceNode(Node node) {
+        if (node instanceof Spinner) {
+            Spinner spinner = (Spinner) node;
+            spinner.setOnScroll(e -> {
+                if (e.getDeltaY() > 0) {
+                    spinner.increment();
+                } else if (e.getDeltaY() < 0) {
+                    spinner.decrement();
+                }
+            });
+        }
     }
 
     /**

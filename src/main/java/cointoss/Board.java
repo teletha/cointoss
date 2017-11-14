@@ -42,6 +42,15 @@ public class Board {
 
         public Num size;
 
+        /**
+         * @param price
+         * @param size
+         */
+        public Unit(Num price, Num size) {
+            this.price = price;
+            this.size = size;
+        }
+
         public Num price() {
             return price;
         }
@@ -51,17 +60,23 @@ public class Board {
         }
 
         /**
+         * Create new Unit.
+         * 
+         * @param size
+         * @return
+         */
+        public Unit size(Num size) {
+            return new Unit(price, size);
+        }
+
+        /**
          * Create price scaled unit.
          * 
          * @param scale
          * @return
          */
         public Unit scale(int scale) {
-            Unit unit = new Unit();
-            unit.price = price.scaleDown(scale);
-            unit.size = size;
-
-            return unit;
+            return new Unit(price.scaleDown(scale), size);
         }
 
         /**
