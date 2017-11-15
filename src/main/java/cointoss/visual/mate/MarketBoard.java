@@ -28,6 +28,7 @@ import cointoss.Side;
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.util.Num;
 import viewtify.View;
+import viewtify.Viewtify;
 
 /**
  * @version 2017/11/14 19:16:13
@@ -95,8 +96,8 @@ public class MarketBoard extends View {
         });
 
         // read data from backend service
-        inWorker(() -> {
-            return BitFlyer.FX_BTC_JPY.service().getBoard().on(UIThread).to(board -> {
+        Viewtify.inWorker(() -> {
+            return BitFlyer.FX_BTC_JPY.service().getBoard().on(Viewtify.UIThread).to(board -> {
                 for (Unit unit : board.asks) {
                     short1.add(unit);
                 }

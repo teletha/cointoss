@@ -21,6 +21,7 @@ import javafx.scene.control.ListView;
 import cointoss.Execution;
 import cointoss.market.bitflyer.BitFlyer;
 import viewtify.View;
+import viewtify.Viewtify;
 
 /**
  * @version 2017/11/13 20:36:45
@@ -45,8 +46,8 @@ public class ExecutionView extends View {
         executionList.setCellFactory(v -> new Cell());
 
         // load execution log
-        inWorker(() -> {
-            return BitFlyer.FX_BTC_JPY.log().fromToday().throttle(100, TimeUnit.MILLISECONDS).on(UIThread).to(e -> {
+        Viewtify.inWorker(() -> {
+            return BitFlyer.FX_BTC_JPY.log().fromToday().throttle(100, TimeUnit.MILLISECONDS).on(Viewtify.UIThread).to(e -> {
                 priceLatest.setText(e.price.toString());
 
                 ObservableList<Execution> items = executionList.getItems();

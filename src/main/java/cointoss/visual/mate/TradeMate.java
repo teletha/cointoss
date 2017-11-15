@@ -10,6 +10,7 @@
 package cointoss.visual.mate;
 
 import java.nio.file.StandardWatchEventKinds;
+import java.util.concurrent.TimeUnit;
 
 import javafx.application.Application;
 import javafx.collections.ObservableList;
@@ -18,13 +19,21 @@ import javafx.scene.Scene;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import cointoss.Execution;
+import cointoss.market.bitflyer.BitFlyer;
+import cointoss.util.Num;
 import filer.Filer;
+import kiss.I;
 import viewtify.Viewtify;
 
 /**
  * @version 2017/11/13 16:58:58
  */
 public class TradeMate extends Application {
+
+    static {
+        I.load(Num.Codec.class, false);
+    }
 
     /** The root controller. */
     private static TradeMateController controller;
@@ -53,6 +62,21 @@ public class TradeMate extends Application {
                 list.clear();
                 list.add(system.getResource("TradeMate.css").toExternalForm());
             }
+        });
+
+        // load execution log
+        Viewtify.inWorker(() -> {
+            return BitFlyer.FX_BTC_JPY.log().fromToday().throttle(100, TimeUnit.MILLISECONDS).on(Viewtify.UIThread).to(e -> {
+                priceLatest.setText(e.price.toString());
+
+                ObservableList<Execution> items = executionList.getItems();
+
+                items.add(0, e);
+
+                if (100 < items.size()) {
+                    items.remove(items.size() - 1);
+                }
+            });
         });
     }
 
