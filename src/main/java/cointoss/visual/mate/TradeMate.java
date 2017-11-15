@@ -9,35 +9,22 @@
  */
 package cointoss.visual.mate;
 
-import java.lang.reflect.Field;
 import java.nio.file.StandardWatchEventKinds;
 
 import javafx.application.Application;
 import javafx.collections.ObservableList;
-import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Spinner;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import org.controlsfx.tools.ValueExtractor;
-
 import filer.Filer;
-import kiss.Disposable;
-import kiss.I;
+import viewtify.Viewtify;
 
 /**
  * @version 2017/11/13 16:58:58
  */
 public class TradeMate extends Application {
-
-    static {
-        I.load(View.class, false);
-
-        ValueExtractor.addObservableValueExtractor(c -> c instanceof Spinner, c -> ((Spinner) c).valueProperty());
-    }
 
     /** The root controller. */
     private static TradeMateController controller;
@@ -58,29 +45,7 @@ public class TradeMate extends Application {
         stage.show();
 
         // setup views
-        for (View view : I.find(View.class)) {
-            // inject FXML
-            for (Field field : view.getClass().getDeclaredFields()) {
-                if (field.isAnnotationPresent(FXML.class)) {
-                    String id = "#" + field.getName();
-                    Node node = scene.lookup(id);
-
-                    if (node == null) {
-                        // If this exception will be thrown, it is bug of this program. So we must
-                        // rethrow the wrapped error in here.
-                        throw new Error("Node [" + id + "] is not found.");
-                    } else {
-                        field.setAccessible(true);
-                        field.set(view, node);
-
-                        enhanceNode(node);
-                    }
-                }
-            }
-
-            // initialize view
-            view.initialize();
-        }
+        Viewtify.initialize(scene);
 
         Filer.observe(Filer.locate("src/main/resources/TradeMate.css")).to(e -> {
             if (e.kind() == StandardWatchEventKinds.ENTRY_MODIFY) {
@@ -92,29 +57,11 @@ public class TradeMate extends Application {
     }
 
     /**
-     * Enhance Node.
-     */
-    private void enhanceNode(Node node) {
-        if (node instanceof Spinner) {
-            Spinner spinner = (Spinner) node;
-            spinner.setOnScroll(e -> {
-                if (e.getDeltaY() > 0) {
-                    spinner.increment();
-                } else if (e.getDeltaY() < 0) {
-                    spinner.decrement();
-                }
-            });
-        }
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
     public void stop() throws Exception {
-        for (Disposable disposable : View.terminators) {
-            disposable.dispose();
-        }
+        Viewtify.terminate();
     }
 
     /**

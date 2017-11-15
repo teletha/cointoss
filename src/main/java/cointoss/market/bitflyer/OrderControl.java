@@ -9,62 +9,73 @@
  */
 package cointoss.market.bitflyer;
 
-import javafx.event.EventHandler;
+import java.util.function.Predicate;
+
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
-import javafx.scene.control.TextField;
 import javafx.scene.input.ScrollEvent;
 
-import org.controlsfx.validation.ValidationSupport;
-
 import cointoss.util.Num;
-import cointoss.visual.mate.View;
+import kiss.WiseBiConsumer;
+import viewtify.User;
+import viewtify.View;
+import viewtify.ui.UIButton;
+import viewtify.ui.UIText;
 
 /**
  * @version 2017/11/14 23:47:09
  */
 public class OrderControl extends View {
 
-    private @FXML TextField orderSize;
+    private Predicate<UIText> positiveNumber = ui -> {
+        try {
+            return Num.of(ui.text()).isPositive();
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    };
+
+    private Predicate<UIText> negativeNumber = ui -> {
+        try {
+            return Num.of(ui.text()).isNegative();
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    };
+
+    private @FXML UIText orderSize;
 
     private @FXML Spinner<Num> orderSizeAmount;
 
-    private @FXML TextField orderPrice;
+    private @FXML UIText orderPrice;
 
     private @FXML Spinner<Num> orderPriceAmount;
 
     private @FXML Spinner<Integer> orderDivideSize;
 
-    private @FXML TextField orderPriceInterval;
+    private @FXML UIText orderPriceInterval;
 
-    private @FXML Button orderBuy;
+    private @FXML UIButton orderBuy;
 
-    private @FXML Button orderSell;
+    private @FXML UIButton orderSell;
 
     /**
      * {@inheritDoc}
      */
     @Override
     protected void initialize() {
-        orderSize.setText("0");
-        orderSize.setOnScroll(changeByWheel(orderSize, orderSizeAmount));
+        orderSize.text("0").when(User.Scroll, changeBy(orderSizeAmount)).require(positiveNumber);
         orderSizeAmount.setValueFactory(spinnerV(Num.of("0.01"), Num.of("0.1"), Num.ONE));
 
-        orderPrice.setText("0");
-        orderPrice.setOnScroll(changeByWheel(orderPrice, orderPriceAmount));
+        orderPrice.text("0").when(User.Scroll, changeBy(orderPriceAmount)).require(positiveNumber);
         orderPriceAmount.setValueFactory(spinnerV(Num.ONE, Num.HUNDRED, Num.THOUSAND));
 
         orderDivideSize.setValueFactory(spinnerV(1, 2, 4, 5, 8, 10));
-        orderPriceInterval.getParent().disableProperty().bind(orderDivideSize.valueProperty().isEqualTo(1));
+        orderPriceInterval.parent().disableWhen(orderDivideSize.valueProperty().isEqualTo(1));
 
         // validate order condition
-        ValidationSupport support = new ValidationSupport();
-        support.registerValidator(orderSize, false, requirePositiveNumber());
-        support.registerValidator(orderPrice, false, requirePositiveNumber());
-
-        orderBuy.getParent().disableProperty().bind(support.invalidProperty());
+        orderBuy.parent().disableWhen(orderSize.isInvalid().or(orderPrice.isInvalid()));
     }
 
     /**
@@ -74,9 +85,18 @@ public class OrderControl extends View {
      * @param amount
      * @return
      */
-    private EventHandler<? super ScrollEvent> changeByWheel(TextField source, Spinner amount) {
-        return e -> {
-            System.out.println(source + "  " + amount);
+    private WiseBiConsumer<ScrollEvent, UIText> changeBy(Spinner<Num> spinner) {
+        return (e, ui) -> {
+            Num current = Num.of(ui.text());
+            double deltaY = e.getDeltaY();
+
+            if (deltaY > 0) {
+                // increment
+                ui.text(current.plus(spinner.getValue()));
+            } else if (deltaY < 0) {
+                // decrement
+                ui.text(current.minus(spinner.getValue()));
+            }
         };
     }
 

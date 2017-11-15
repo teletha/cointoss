@@ -84,7 +84,7 @@
                               <Insets right="20.0" />
                            </HBox.margin>
                         </TextField>
-                        <Spinner id="orderSizeAmount" editable="true" maxWidth="70.0" />
+                        <Spinner id="orderSizeAmount" focusTraversable="false" maxWidth="70.0" />
                      </children>
                      <VBox.margin>
                         <Insets top="5.0" />
@@ -101,7 +101,7 @@
                               <Insets right="20.0" />
                            </HBox.margin>
                         </TextField>
-                        <Spinner id="orderPriceAmount" editable="true" maxWidth="70.0" />
+                        <Spinner id="orderPriceAmount" focusTraversable="false" maxWidth="70.0" />
                      </children>
                      <VBox.margin>
                         <Insets top="5.0" />
@@ -122,7 +122,7 @@
                         <Insets top="5.0" />
                      </VBox.margin>
                   </HBox>
-                  <HBox alignment="CENTER_LEFT" disable="true">
+                  <HBox alignment="CENTER_LEFT">
                      <children>
                         <Label alignment="CENTER" prefHeight="27.0" prefWidth="60.0" style="&#10;" text="価格間隔" textAlignment="CENTER" wrapText="false" />
                         <TextField id="orderPriceInterval" maxWidth="120.0" />

@@ -10,6 +10,7 @@
 package cointoss.visual.mate;
 
 import java.time.format.DateTimeFormatter;
+import java.util.concurrent.TimeUnit;
 
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -19,6 +20,7 @@ import javafx.scene.control.ListView;
 
 import cointoss.Execution;
 import cointoss.market.bitflyer.BitFlyer;
+import viewtify.View;
 
 /**
  * @version 2017/11/13 20:36:45
@@ -44,7 +46,7 @@ public class ExecutionView extends View {
 
         // load execution log
         inWorker(() -> {
-            return BitFlyer.FX_BTC_JPY.log().fromToday().on(UIThread).to(e -> {
+            return BitFlyer.FX_BTC_JPY.log().fromToday().throttle(100, TimeUnit.MILLISECONDS).on(UIThread).to(e -> {
                 priceLatest.setText(e.price.toString());
 
                 ObservableList<Execution> items = executionList.getItems();

@@ -27,6 +27,7 @@ import cointoss.Board.Unit;
 import cointoss.Side;
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.util.Num;
+import viewtify.View;
 
 /**
  * @version 2017/11/14 19:16:13

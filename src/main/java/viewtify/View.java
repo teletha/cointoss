@@ -7,7 +7,7 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss.visual.mate;
+package viewtify;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,9 +26,6 @@ import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.SpinnerValueFactory.ListSpinnerValueFactory;
 import javafx.util.StringConverter;
 
-import org.controlsfx.validation.Validator;
-
-import cointoss.util.Num;
 import kiss.Disposable;
 import kiss.Extensible;
 import kiss.Signal;
@@ -114,6 +111,7 @@ public abstract class View implements Extensible {
     protected final <T> SpinnerValueFactory<T> spinnerV(T... values) {
         ListSpinnerValueFactory factory = new ListSpinnerValueFactory(values(values));
         factory.setWrapAround(false);
+        factory.setValue(values[0]);
 
         return factory;
     }
@@ -166,21 +164,5 @@ public abstract class View implements Extensible {
      */
     protected final <T> ObservableList<T> values(T... values) {
         return FXCollections.observableArrayList(values);
-    }
-
-    /**
-     * Validation helper.
-     * 
-     * @return
-     */
-    public static <T> Validator<String> requirePositiveNumber() {
-        return Validator.<String> createPredicateValidator(v -> {
-            try {
-                Num number = Num.of(v);
-                return number.isPositive();
-            } catch (NumberFormatException e) {
-                return false;
-            }
-        }, "Require the positive number.");
     }
 }
