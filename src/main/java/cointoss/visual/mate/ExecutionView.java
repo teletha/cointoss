@@ -10,7 +10,7 @@
 package cointoss.visual.mate;
 
 import java.time.format.DateTimeFormatter;
-import java.util.concurrent.TimeUnit;
+import java.util.stream.IntStream;
 
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -22,6 +22,7 @@ import cointoss.Execution;
 import cointoss.market.bitflyer.BitFlyer;
 import viewtify.View;
 import viewtify.Viewtify;
+import viewtify.ui.UISpinner;
 
 /**
  * @version 2017/11/13 20:36:45
@@ -35,7 +36,13 @@ public class ExecutionView extends View {
     private @FXML ListView<Execution> executionList;
 
     /** The execution list. */
+    private @FXML ListView executionCumulativeList;
+
+    /** The execution list. */
     private @FXML Label priceLatest;
+
+    /** UI for interval configuration. */
+    private @FXML UISpinner<Integer> takerSize;
 
     /**
      * {@inheritDoc}
@@ -44,10 +51,12 @@ public class ExecutionView extends View {
     public void initialize() {
         // configure UI
         executionList.setCellFactory(v -> new Cell());
+        executionCumulativeList.setCellFactory(v -> new Cell());
+        takerSize.values(IntStream.range(1, 51).boxed()).initial(10);
 
         // load execution log
         Viewtify.inWorker(() -> {
-            return BitFlyer.FX_BTC_JPY.log().fromToday().throttle(100, TimeUnit.MILLISECONDS).on(Viewtify.UIThread).to(e -> {
+            return BitFlyer.FX_BTC_JPY.log().fromToday().on(Viewtify.UIThread).to(e -> {
                 priceLatest.setText(e.price.toString());
 
                 ObservableList<Execution> items = executionList.getItems();
@@ -56,6 +65,16 @@ public class ExecutionView extends View {
 
                 if (100 < items.size()) {
                     items.remove(items.size() - 1);
+                }
+
+                if (e.cumulativeSize.isGreaterThanOrEqual(takerSize.ui.getValue())) {
+                    ObservableList<Execution> bigs = executionCumulativeList.getItems();
+
+                    bigs.add(0, e);
+
+                    if (100 < bigs.size()) {
+                        bigs.remove(bigs.size() - 1);
+                    }
                 }
             });
         });
@@ -80,7 +99,7 @@ public class ExecutionView extends View {
                 setText(null);
                 setGraphic(null);
             } else {
-                setText(formatter.format(e.exec_date.plusHours(9)) + "  " + e.price + "円  " + e.size.scale(6));
+                setText(formatter.format(e.exec_date.plusHours(9)) + "  " + e.price + "円  " + e.cumulativeSize.scale(6));
                 setTextFill(e.side.isBuy() ? theme.buy() : theme.sell());
             }
         }

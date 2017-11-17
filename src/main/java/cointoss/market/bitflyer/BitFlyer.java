@@ -9,12 +9,12 @@
  */
 package cointoss.market.bitflyer;
 
+import cointoss.MarketBackend;
 import cointoss.MarketLog;
 import cointoss.util.Span;
-import cointoss.MarketBackend;
 
 /**
- * @version 2017/09/08 18:23:03
+ * @version 2017/11/16 10:30:15
  */
 public enum BitFlyer {
     BTC_JPY, FX_BTC_JPY, ETC_BTC, BCH_BTC;
@@ -30,6 +30,12 @@ public enum BitFlyer {
 
     /** Sample of down trend */
     public static final Span DownTrend = new Span(2017, 6, 11, 2017, 7, 16);
+
+    /** cache */
+    private final MarketLog marketLog = new BitFlyerLog(this);
+
+    /** cache */
+    private final MarketBackend marketBackend = new BitFlyerBackend(this);
 
     /**
      * <p>
@@ -48,7 +54,7 @@ public enum BitFlyer {
      * @return
      */
     public MarketLog log() {
-        return new BitFlyerLog(this);
+        return marketLog;
     }
 
     /**
@@ -57,6 +63,6 @@ public enum BitFlyer {
      * @return
      */
     public MarketBackend service() {
-        return new BitFlyerBackend(this);
+        return marketBackend;
     }
 }

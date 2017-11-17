@@ -10,7 +10,6 @@
 package cointoss.visual.mate;
 
 import java.nio.file.StandardWatchEventKinds;
-import java.util.concurrent.TimeUnit;
 
 import javafx.application.Application;
 import javafx.collections.ObservableList;
@@ -19,8 +18,6 @@ import javafx.scene.Scene;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import cointoss.Execution;
-import cointoss.market.bitflyer.BitFlyer;
 import cointoss.util.Num;
 import filer.Filer;
 import kiss.I;
@@ -56,27 +53,12 @@ public class TradeMate extends Application {
         // setup views
         Viewtify.initialize(scene);
 
-        Filer.observe(Filer.locate("src/main/resources/TradeMate.css")).to(e -> {
+        Filer.observe(Filer.locate("src/main/resources/TradeMate.css")).on(Viewtify.UIThread).to(e -> {
             if (e.kind() == StandardWatchEventKinds.ENTRY_MODIFY) {
                 ObservableList<String> list = scene.getStylesheets();
                 list.clear();
                 list.add(system.getResource("TradeMate.css").toExternalForm());
             }
-        });
-
-        // load execution log
-        Viewtify.inWorker(() -> {
-            return BitFlyer.FX_BTC_JPY.log().fromToday().throttle(100, TimeUnit.MILLISECONDS).on(Viewtify.UIThread).to(e -> {
-                priceLatest.setText(e.price.toString());
-
-                ObservableList<Execution> items = executionList.getItems();
-
-                items.add(0, e);
-
-                if (100 < items.size()) {
-                    items.remove(items.size() - 1);
-                }
-            });
         });
     }
 

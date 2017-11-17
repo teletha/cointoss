@@ -11,18 +11,12 @@ package cointoss.visual.mate;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.scene.control.ListView;
-
-import cointoss.Execution;
 
 /**
  * @version 2017/11/13 18:47:42
  */
 
 public class TradeMateController {
-
-    @FXML
-    public ListView<Execution> executionList;
 
     /**
      * Terminate this application.

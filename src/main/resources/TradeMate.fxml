@@ -12,14 +12,13 @@
 <?import javafx.scene.control.Spinner?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.paint.Color?>
 <?import javafx.scene.text.Font?>
 
-<VBox prefHeight="600.0" prefWidth="900.0" stylesheets="@TradeMate.css" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cointoss.visual.mate.TradeMateController">
+<VBox prefHeight="700.0" prefWidth="1200.0" stylesheets="@TradeMate.css" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cointoss.visual.mate.TradeMateController">
   <children>
       <MenuBar VBox.vgrow="NEVER">
       <menus>
@@ -60,20 +59,9 @@
         </Menu>
       </menus>
       </MenuBar>
-    <SplitPane dividerPositions="0.2, 0.59, 0.82" focusTraversable="false" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS">
+    <SplitPane dividerPositions="0.2, 0.59, 0.5" focusTraversable="false" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS">
       <items>
-        <AnchorPane>
-          <children>
-            <Label alignment="CENTER" layoutX="14.0" layoutY="14.0" prefWidth="-1.0" style="&#10;" text="Master" textAlignment="CENTER" wrapText="false">
-              <font>
-                <Font size="18.0" fx:id="x1" />
-              </font>
-              <textFill>
-                <Color blue="0.624" green="0.624" red="0.624" fx:id="x2" />
-              </textFill>
-            </Label>
-          </children>
-        </AnchorPane>
+            <ListView focusTraversable="false" />
             <VBox>
                <children>
                   <HBox alignment="CENTER_LEFT" VBox.vgrow="NEVER">
@@ -134,18 +122,49 @@
                         <Insets top="5.0" />
                      </VBox.margin>
                   </HBox>
-                  <HBox alignment="CENTER" spacing="10.0">
+                  <HBox alignment="CENTER_LEFT">
                      <children>
-                        <Button id="orderSell" mnemonicParsing="false" prefWidth="50.0" text="売り" textFill="#9f9f9f">
-                           <HBox.margin>
-                              <Insets />
-                           </HBox.margin>
-                        </Button>
-                        <Button id="orderBuy" mnemonicParsing="false" prefWidth="50.0" text="買い" textFill="#9f9f9f" />
+                        <Label alignment="CENTER" prefHeight="40.0" prefWidth="60.0" style="&#10;" text="指値" textAlignment="CENTER" wrapText="false" />
+                        <HBox alignment="CENTER_LEFT" prefWidth="200.0">
+                           <children>
+                              <Button id="orderLimitSell" mnemonicParsing="false" prefHeight="35.0" prefWidth="60.0" text="売り" textAlignment="CENTER" textFill="#9f9f9f">
+                                 <HBox.margin>
+                                    <Insets />
+                                 </HBox.margin>
+                              </Button>
+                              <Button id="orderLimitBuy" alignment="CENTER" mnemonicParsing="false" prefHeight="35.0" prefWidth="60.0" text="買い" textAlignment="CENTER" textFill="#9f9f9f">
+                                 <HBox.margin>
+                                    <Insets />
+                                 </HBox.margin>
+                              </Button>
+                           </children>
+                        </HBox>
                      </children>
-                     <VBox.margin>
-                        <Insets top="5.0" />
-                     </VBox.margin>
+                     <padding>
+                        <Insets right="10.0" />
+                     </padding>
+                  </HBox>
+                  <HBox alignment="CENTER_LEFT">
+                     <children>
+                        <Label alignment="CENTER" prefHeight="40.0" prefWidth="60.0" style="&#10;" text="成行" textAlignment="CENTER" wrapText="false" />
+                        <HBox alignment="CENTER_LEFT" prefWidth="200.0">
+                           <children>
+                              <Button id="orderMarketSell" mnemonicParsing="false" prefHeight="35.0" prefWidth="60.0" text="売り" textAlignment="CENTER" textFill="#9f9f9f">
+                                 <HBox.margin>
+                                    <Insets />
+                                 </HBox.margin>
+                              </Button>
+                              <Button id="orderMarketBuy" alignment="CENTER" mnemonicParsing="false" prefHeight="35.0" prefWidth="60.0" text="買い" textAlignment="CENTER" textFill="#9f9f9f">
+                                 <HBox.margin>
+                                    <Insets />
+                                 </HBox.margin>
+                              </Button>
+                           </children>
+                        </HBox>
+                     </children>
+                     <padding>
+                        <Insets right="10.0" />
+                     </padding>
                   </HBox>
                </children>
                <padding>
@@ -163,7 +182,7 @@
                      </cursor></ListView>
                   <HBox alignment="CENTER">
                      <children>
-                        <Spinner id="priceRange" maxWidth="60.0" minWidth="60.0" prefWidth="60.0" />
+                        <Spinner id="priceRange" maxWidth="70.0" minWidth="70.0" prefWidth="70.0" />
                         <Label id="priceLatest" focusTraversable="false" prefWidth="80.0" textOverrun="CLIP" />
                         <Label id="priceSpread" alignment="CENTER_RIGHT" focusTraversable="false" prefWidth="90.0" textAlignment="RIGHT" textOverrun="CLIP">
                            <padding>
@@ -181,14 +200,37 @@
                   <Cursor fx:constant="DEFAULT" />
                </cursor>
             </VBox>
-            <ListView id="executionList" focusTraversable="false">
-               <padding>
-                  <Insets bottom="2.0" left="5.0" top="2.0" />
-               </padding>
+            <VBox alignment="CENTER" maxWidth="220.0" minWidth="220.0">
+               <children>
+                  <ListView id="executionList" focusTraversable="false" VBox.vgrow="ALWAYS">
+                     <VBox.margin>
+                        <Insets />
+                     </VBox.margin>
+                     <cursor>
+                        <Cursor fx:constant="DEFAULT" />
+                     </cursor>
+                  </ListView>
+                  <HBox alignment="CENTER">
+                     <children>
+                        <Spinner id="takerSize" maxWidth="70.0" minWidth="70.0" prefWidth="70.0" />
+                        <Label focusTraversable="false" prefWidth="80.0" textOverrun="CLIP" />
+                        <Label alignment="CENTER_RIGHT" focusTraversable="false" prefWidth="90.0" textAlignment="RIGHT" textOverrun="CLIP">
+                           <padding>
+                              <Insets right="20.0" />
+                           </padding>
+                        </Label>
+                     </children>
+                  </HBox>
+                  <ListView id="executionCumulativeList" focusTraversable="false" VBox.vgrow="ALWAYS">
+                     <cursor>
+                        <Cursor fx:constant="DEFAULT" />
+                     </cursor>
+                  </ListView>
+               </children>
                <cursor>
                   <Cursor fx:constant="DEFAULT" />
                </cursor>
-            </ListView>
+            </VBox>
       </items>
     </SplitPane>
     <HBox id="HBox" alignment="CENTER_LEFT" spacing="5.0" VBox.vgrow="NEVER">

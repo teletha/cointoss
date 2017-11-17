@@ -7,7 +7,9 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss.market.bitflyer;
+package cointoss.visual.mate;
+
+import static java.util.concurrent.TimeUnit.*;
 
 import java.util.function.Predicate;
 
@@ -16,6 +18,10 @@ import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.input.ScrollEvent;
 
+import cointoss.MarketBackend;
+import cointoss.Order;
+import cointoss.Side;
+import cointoss.market.bitflyer.BitFlyer;
 import cointoss.util.Num;
 import kiss.WiseBiConsumer;
 import viewtify.User;
@@ -44,6 +50,9 @@ public class OrderControl extends View {
         }
     };
 
+    /** The backend service. */
+    private final MarketBackend service = BitFlyer.FX_BTC_JPY.service();
+
     private @FXML UIText orderSize;
 
     private @FXML Spinner<Num> orderSizeAmount;
@@ -56,9 +65,9 @@ public class OrderControl extends View {
 
     private @FXML UIText orderPriceInterval;
 
-    private @FXML UIButton orderBuy;
+    private @FXML UIButton orderLimitBuy;
 
-    private @FXML UIButton orderSell;
+    private @FXML UIButton orderLimitSell;
 
     /**
      * {@inheritDoc}
@@ -75,7 +84,10 @@ public class OrderControl extends View {
         orderPriceInterval.parent().disableWhen(orderDivideSize.valueProperty().isEqualTo(1));
 
         // validate order condition
-        orderBuy.parent().disableWhen(orderSize.isInvalid().or(orderPrice.isInvalid()));
+        orderLimitBuy.parent().disableWhen(orderSize.isInvalid().or(orderPrice.isInvalid()));
+
+        orderLimitBuy.when(User.Click).throttle(1000, MILLISECONDS).mapTo(Side.BUY).to(this::requestOrder);
+        orderLimitSell.when(User.Click).throttle(1000, MILLISECONDS).mapTo(Side.SELL).to(this::requestOrder);
     }
 
     /**
@@ -98,6 +110,28 @@ public class OrderControl extends View {
                 ui.text(current.minus(spinner.getValue()));
             }
         };
+    }
+
+    /**
+     * Request order by API.
+     * 
+     * @param side
+     * @return
+     */
+    private void requestOrder(Side side) {
+        Num size = orderSize.valueOr(Num.ZERO);
+        Num price = orderPrice.valueOr(Num.ZERO);
+        Integer divideSize = orderDivideSize.getValue();
+        Num priceInterval = orderPriceInterval.valueOr(Num.ZERO).multiply(side.isBuy() ? -1 : 1);
+
+        System.out.println("OK " + side + "  " + size + "  " + price + "  " + divideSize + "  " + priceInterval);
+
+        for (int i = 0; i < divideSize; i++) {
+            service.request(Order.limit(side, size, price)).to(id -> {
+                System.out.println("SUCCESS " + id);
+            });
+            price = price.plus(priceInterval);
+        }
     }
 
     /**

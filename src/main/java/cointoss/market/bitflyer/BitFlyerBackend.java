@@ -71,6 +71,9 @@ class BitFlyerBackend implements MarketBackend {
 
     private Disposable disposer = Disposable.empty();
 
+    /** The shared source. */
+    private Signal<Board> board = realtimeBoard();
+
     /**
      * @param type
      */
@@ -198,7 +201,7 @@ class BitFlyerBackend implements MarketBackend {
      */
     @Override
     public Signal<Board> getBoard() {
-        return realtimeBoard();
+        return board;
     }
 
     /**

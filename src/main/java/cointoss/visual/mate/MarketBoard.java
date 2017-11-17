@@ -362,7 +362,7 @@ public class MarketBoard extends View {
                 } else if (unit.price.is(price)) {
                     Num remaining = unit.size.plus(size);
 
-                    if (remaining.isZero()) {
+                    if (remaining.scale(5).isZero()) {
                         list.remove(i);
                     } else {
                         list.set(i, unit.size(remaining));
@@ -391,7 +391,7 @@ public class MarketBoard extends View {
                 } else if (unit.price.is(price)) {
                     Num remaining = unit.size.plus(size);
 
-                    if (remaining.isZero()) {
+                    if (remaining.scale(5).isZero()) {
                         list.remove(i);
                     } else {
                         list.set(i, unit.size(remaining));

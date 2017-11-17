@@ -92,87 +92,96 @@ class BitFlyerLog implements MarketLog {
     /** The current processing cache file. */
     private PrintWriter cache;
 
+    /** The shared source. */
+    private Signal<Execution> source;
+
     /**
      * @param type
      */
     BitFlyerLog(BitFlyer type) {
-        this.type = type;
-        this.root = Filer.locate(".log/bitflyer/" + type);
+        try {
+            this.type = type;
+            this.root = Filer.locate(".log/bitflyer/" + type);
 
-        List<Path> files = Filer.walk(root, "execution*.log");
-        ZonedDateTime start = null;
-        ZonedDateTime end = null;
+            List<Path> files = Filer.walk(root, "execution*.log");
+            ZonedDateTime start = null;
+            ZonedDateTime end = null;
 
-        for (Path file : files) {
-            String name = file.getFileName().toString();
-            ZonedDateTime date = LocalDate.parse(name.substring(9, 17), fomatFile).atTime(0, 0, 0, 0).atZone(Execution.UTC);
+            for (Path file : files) {
+                String name = file.getFileName().toString();
+                ZonedDateTime date = LocalDate.parse(name.substring(9, 17), fomatFile).atTime(0, 0, 0, 0).atZone(Execution.UTC);
 
-            if (start == null || end == null) {
-                start = date;
-                end = date;
-            } else {
-                if (start.isAfter(date)) {
+                if (start == null || end == null) {
                     start = date;
-                }
-
-                if (end.isBefore(date)) {
                     end = date;
+                } else {
+                    if (start.isAfter(date)) {
+                        start = date;
+                    }
+
+                    if (end.isBefore(date)) {
+                        end = date;
+                    }
                 }
             }
+            this.cacheFirst = start;
+            this.cacheLast = end;
+        } catch (Exception e) {
+            throw I.quiet(e);
         }
-        this.cacheFirst = start;
-        this.cacheLast = end;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Signal<Execution> from(ZonedDateTime start) {
-        AtomicReference<Execution> switcher = new AtomicReference<>(SEED);
+    public synchronized Signal<Execution> from(ZonedDateTime start) {
+        if (source == null) {
+            AtomicReference<Execution> switcher = new AtomicReference<>(SEED);
 
-        return new Signal<Execution>((observer, disposer) -> {
-            // read from cache
-            if (cacheFirst != null) {
-                ZonedDateTime current = start.isBefore(cacheFirst) ? cacheFirst : start.isAfter(cacheLast) ? cacheLast : start;
-                current = current.withHour(0).withMinute(0).withSecond(0).withNano(0);
+            source = new Signal<Execution>((observer, disposer) -> {
+                // read from cache
+                if (cacheFirst != null) {
+                    ZonedDateTime current = start.isBefore(cacheFirst) ? cacheFirst : start.isAfter(cacheLast) ? cacheLast : start;
+                    current = current.withHour(0).withMinute(0).withSecond(0).withNano(0);
 
-                while (disposer.isDisposed() == false && !current.isAfter(getCacheEnd())) {
-                    disposer.add(localCache(current).effect(e -> latestId = cacheId = e.id)
-                            .take(e -> e.exec_date.isAfter(start))
-                            .to(observer::accept));
-                    current = current.plusDays(1);
+                    while (disposer.isDisposed() == false && !current.isAfter(getCacheEnd())) {
+                        disposer.add(localCache(current).effect(e -> latestId = cacheId = e.id)
+                                .take(e -> e.exec_date.isAfter(start))
+                                .to(observer::accept));
+                        current = current.plusDays(1);
+                    }
                 }
-            }
 
-            AtomicBoolean completeREST = new AtomicBoolean();
+                AtomicBoolean completeREST = new AtomicBoolean();
 
-            // read from realtime API
-            if (disposer.isDisposed() == false) {
-                disposer.add(realtime().skipUntil(e -> completeREST.get()).effect(this::cache).to(observer::accept));
-            }
+                // read from realtime API
+                if (disposer.isDisposed() == false) {
+                    disposer.add(realtime().skipUntil(e -> completeREST.get()).effect(this::cache).to(observer::accept));
+                }
 
-            // read from REST API
-            if (disposer.isDisposed() == false) {
-                disposer.add(rest().effect(this::cache).effectOnComplete((o, d) -> completeREST.set(true)).to(observer::accept));
-            }
+                // read from REST API
+                if (disposer.isDisposed() == false) {
+                    disposer.add(rest().effect(this::cache).effectOnComplete((o, d) -> completeREST.set(true)).to(observer::accept));
+                }
 
-            return disposer;
-        }).map(e -> {
-            Execution previous = switcher.getAndSet(e);
+                return disposer;
+            }).map(e -> {
+                Execution previous = switcher.getAndSet(e);
 
-            if (e.side.isBuy() && previous.buy_child_order_acceptance_id.equals(e.buy_child_order_acceptance_id)) {
-                // same long taker
-                e.cumulativeSize = previous.cumulativeSize.plus(e.size);
-                return null;
-            } else if (e.side.isSell() && previous.sell_child_order_acceptance_id.equals(e.sell_child_order_acceptance_id)) {
-                // same short taker
-                e.cumulativeSize = previous.cumulativeSize.plus(e.size);
-                return null;
-            }
-            return previous;
-        }).skip(e -> e == null || e == SEED);
-
+                if (e.side.isBuy() && previous.buy_child_order_acceptance_id.equals(e.buy_child_order_acceptance_id)) {
+                    // same long taker
+                    e.cumulativeSize = previous.cumulativeSize.plus(e.size);
+                    return null;
+                } else if (e.side.isSell() && previous.sell_child_order_acceptance_id.equals(e.sell_child_order_acceptance_id)) {
+                    // same short taker
+                    e.cumulativeSize = previous.cumulativeSize.plus(e.size);
+                    return null;
+                }
+                return previous;
+            }).skip(e -> e == null || e == SEED).share();
+        }
+        return source;
     }
 
     /**
@@ -198,6 +207,8 @@ class BitFlyerLog implements MarketLog {
      */
     private void cache(Execution exe) {
         if (cacheId < exe.id) {
+            cacheId = exe.id;
+
             writer.submit(() -> {
                 try {
                     ZonedDateTime date = exe.exec_date;
@@ -213,7 +224,6 @@ class BitFlyerLog implements MarketLog {
                     }
                     cache.println(exe.toString());
                     cache.flush();
-                    cacheId = exe.id;
                 } catch (IOException e) {
                     throw I.quiet(e);
                 }
