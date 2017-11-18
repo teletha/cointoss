@@ -122,7 +122,19 @@ class BitFlyerBackend implements MarketBackend {
         request.product_code = type.name();
         request.side = order.side().name();
         request.size = order.size().toDouble();
-        request.time_in_force = "GTC";
+        switch (order.quantity()) {
+        case GoodTillCanceled:
+            request.time_in_force = "GTC";
+            break;
+
+        case ImmediateOrCancel:
+            request.time_in_force = "IOC";
+            break;
+
+        case FillOrKill:
+            request.time_in_force = "FOK";
+            break;
+        }
 
         return call("POST", "/v1/me/sendchildorder", request, "child_order_acceptance_id", String.class);
     }

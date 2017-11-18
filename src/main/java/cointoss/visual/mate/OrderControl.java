@@ -20,13 +20,16 @@ import javafx.scene.input.ScrollEvent;
 
 import cointoss.MarketBackend;
 import cointoss.Order;
+import cointoss.Order.Quantity;
 import cointoss.Side;
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.util.Num;
 import kiss.WiseBiConsumer;
 import viewtify.User;
 import viewtify.View;
+import viewtify.Viewtify;
 import viewtify.ui.UIButton;
+import viewtify.ui.UIComboBox;
 import viewtify.ui.UISpinner;
 import viewtify.ui.UIText;
 
@@ -70,6 +73,8 @@ public class OrderControl extends View {
 
     private @FXML UIButton orderLimitShort;
 
+    private @FXML UIComboBox<Quantity> orderQuantity;
+
     /**
      * {@inheritDoc}
      */
@@ -89,6 +94,8 @@ public class OrderControl extends View {
 
         orderLimitLong.when(User.Click).throttle(1000, MILLISECONDS).mapTo(Side.BUY).to(this::requestOrder);
         orderLimitShort.when(User.Click).throttle(1000, MILLISECONDS).mapTo(Side.SELL).to(this::requestOrder);
+
+        orderQuantity.values(Quantity.values()).initial(Quantity.GoodTillCanceled);
     }
 
     /**
@@ -120,19 +127,20 @@ public class OrderControl extends View {
      * @return
      */
     private void requestOrder(Side side) {
-        Num size = orderSize.valueOr(Num.ZERO);
-        Num price = orderPrice.valueOr(Num.ZERO);
-        Integer divideSize = orderDivideSize.value();
-        Num priceInterval = orderPriceInterval.valueOr(Num.ZERO).multiply(side.isBuy() ? -1 : 1);
+        Viewtify.inWorker(() -> {
+            Num size = orderSize.valueOr(Num.ZERO);
+            Num price = orderPrice.valueOr(Num.ZERO);
+            Integer divideSize = orderDivideSize.value();
+            Num priceInterval = orderPriceInterval.valueOr(Num.ZERO).multiply(side.isBuy() ? -1 : 1);
+            Quantity quantity = orderQuantity.value();
 
-        System.out.println("OK " + side + "  " + size + "  " + price + "  " + divideSize + "  " + priceInterval);
-
-        for (int i = 0; i < divideSize; i++) {
-            service.request(Order.limit(side, size, price)).to(id -> {
-                System.out.println("SUCCESS " + id);
-            });
-            price = price.plus(priceInterval);
-        }
+            for (int i = 0; i < divideSize; i++) {
+                service.request(Order.limit(side, size, price).type(quantity)).to(id -> {
+                    System.out.println("SUCCESS " + id);
+                });
+                price = price.plus(priceInterval);
+            }
+        });
     }
 
     /**

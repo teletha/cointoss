@@ -253,7 +253,7 @@ public class Order implements Directional {
      * @return
      */
     public Order type(Quantity quantity) {
-        this.quantity = quantity == null ? Quantity.GoodTillCnaceled : quantity;
+        this.quantity = quantity == null ? Quantity.GoodTillCanceled : quantity;
 
         return this;
     }
@@ -394,7 +394,7 @@ public class Order implements Directional {
      * @version 2017/07/22 18:02:37
      */
     public static enum Quantity {
-        GoodTillCnaceled, ImmediateOrCancel, FillOrKill;
+        GoodTillCanceled, ImmediateOrCancel, FillOrKill;
     }
 
     /** The server ID */
