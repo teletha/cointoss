@@ -22,7 +22,6 @@ public class Project extends bee.api.Project {
         // require("org.apache.logging.log4j", "log4j-core", "2.8.2");
         // require("org.apache.logging.log4j", "log4j-jul", "2.8.2");
         require("org.eclipse.collections", "eclipse-collections", "8.2.0");
-        require("eu.verdelhan", "ta4j", "0.9-SNAPSHOT");
         require("com.pubnub", "pubnub", "4.6.5");
         require("org.knowm.xchart", "xchart", "3.5.1-SNAPSHOT");
         require("org.magicwerk", "brownies-collections", "0.9.13");

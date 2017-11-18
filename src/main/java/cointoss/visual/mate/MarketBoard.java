@@ -17,18 +17,18 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
-import javafx.scene.control.Spinner;
 import javafx.scene.control.TextField;
 
 import org.magicwerk.brownies.collections.GapList;
 
 import cointoss.Board.Unit;
-import cointoss.Side;
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.util.Num;
+import kiss.I;
 import viewtify.View;
 import viewtify.Viewtify;
+import viewtify.ui.UIListView;
+import viewtify.ui.UISpinner;
 
 /**
  * @version 2017/11/14 19:16:13
@@ -48,7 +48,7 @@ public class MarketBoard extends View {
     private SortableUnitList long1 = new SortableUnitList(true, long10, long100, long1000);
 
     /** UI for long maker. */
-    private @FXML ListView<Unit> longList;
+    private @FXML UIListView<Unit> longList;
 
     /** Model for maker. */
     private final SortableGroupList short1000 = new SortableGroupList(false, -3);
@@ -63,10 +63,10 @@ public class MarketBoard extends View {
     private final SortableUnitList short1 = new SortableUnitList(false, short10, short100, short1000);
 
     /** UI for maker. */
-    private @FXML ListView<Unit> shortList;
+    private @FXML UIListView<Unit> shortList;
 
     /** UI for interval configuration. */
-    private @FXML Spinner<List<SortableUnitList>> priceRange;
+    private @FXML UISpinner<List<SortableUnitList>> priceRange;
 
     /** UI for interval configuration. */
     private @FXML Label priceLatest;
@@ -82,18 +82,14 @@ public class MarketBoard extends View {
      */
     @Override
     protected void initialize() {
-        longList.setItems(long1.list);
-        longList.setCellFactory(e -> new Cell(Side.BUY));
-        shortList.setItems(short1.list);
-        shortList.setCellFactory(e -> new Cell(Side.SELL));
-        shortList.scrollTo(short1.list.size() - 1);
-        priceRange.setValueFactory(spinner(2, long1, short1, long10, short10, long100, short100, long1000, short1000));
-
-        // whne price range is changed
-        observe(priceRange.valueProperty()).to(e -> {
-            longList.setItems(e.get(0).list);
-            shortList.setItems(e.get(1).list);
-        });
+        longList.values(long1.list).cell(CellView.class);
+        shortList.values(short1.list).cell(CellView.class).scrollTo(short1.list.size() - 1);
+        priceRange.values(I.signal(long1, short1, long10, short10, long100, short100, long1000, short1000).buffer(2).toList())
+                .text(e -> e.get(0).toString())
+                .observe(e -> {
+                    longList.values(e.get(0).list);
+                    shortList.values(e.get(1).list);
+                });
 
         // read data from backend service
         Viewtify.inWorker(() -> {
@@ -119,16 +115,12 @@ public class MarketBoard extends View {
     /**
      * @version 2017/11/13 21:35:32
      */
-    private class Cell extends ListCell<Unit> {
-
-        private Side side;
+    private class CellView extends ListCell<Unit> {
 
         /**
          * @param side
          */
-        private Cell(Side side) {
-            this.side = side;
-
+        private CellView() {
             setOnMouseClicked(e -> orderPrice.setText(getItem().price.toString()));
         }
 
