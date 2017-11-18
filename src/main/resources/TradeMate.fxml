@@ -127,12 +127,12 @@
                         <Label alignment="CENTER" prefHeight="40.0" prefWidth="60.0" style="&#10;" text="指値" textAlignment="CENTER" wrapText="false" />
                         <HBox alignment="CENTER_LEFT" prefWidth="200.0">
                            <children>
-                              <Button id="orderLimitSell" mnemonicParsing="false" prefHeight="35.0" prefWidth="60.0" text="売り" textAlignment="CENTER" textFill="#9f9f9f">
+                              <Button id="orderLimitShort" mnemonicParsing="false" prefHeight="35.0" prefWidth="60.0" text="売り" textAlignment="CENTER" textFill="#9f9f9f">
                                  <HBox.margin>
                                     <Insets />
                                  </HBox.margin>
                               </Button>
-                              <Button id="orderLimitBuy" alignment="CENTER" mnemonicParsing="false" prefHeight="35.0" prefWidth="60.0" text="買い" textAlignment="CENTER" textFill="#9f9f9f">
+                              <Button id="orderLimitLong" alignment="CENTER" mnemonicParsing="false" prefHeight="35.0" prefWidth="60.0" text="買い" textAlignment="CENTER" textFill="#9f9f9f">
                                  <HBox.margin>
                                     <Insets />
                                  </HBox.margin>
@@ -149,12 +149,12 @@
                         <Label alignment="CENTER" prefHeight="40.0" prefWidth="60.0" style="&#10;" text="成行" textAlignment="CENTER" wrapText="false" />
                         <HBox alignment="CENTER_LEFT" prefWidth="200.0">
                            <children>
-                              <Button id="orderMarketSell" mnemonicParsing="false" prefHeight="35.0" prefWidth="60.0" text="売り" textAlignment="CENTER" textFill="#9f9f9f">
+                              <Button id="orderMarketShort" mnemonicParsing="false" prefHeight="35.0" prefWidth="60.0" text="売り" textAlignment="CENTER" textFill="#9f9f9f">
                                  <HBox.margin>
                                     <Insets />
                                  </HBox.margin>
                               </Button>
-                              <Button id="orderMarketBuy" alignment="CENTER" mnemonicParsing="false" prefHeight="35.0" prefWidth="60.0" text="買い" textAlignment="CENTER" textFill="#9f9f9f">
+                              <Button id="orderMarketLong" alignment="CENTER" mnemonicParsing="false" prefHeight="35.0" prefWidth="60.0" text="買い" textAlignment="CENTER" textFill="#9f9f9f">
                                  <HBox.margin>
                                     <Insets />
                                  </HBox.margin>

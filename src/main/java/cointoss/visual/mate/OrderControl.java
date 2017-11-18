@@ -27,6 +27,7 @@ import kiss.WiseBiConsumer;
 import viewtify.User;
 import viewtify.View;
 import viewtify.ui.UIButton;
+import viewtify.ui.UISpinner;
 import viewtify.ui.UIText;
 
 /**
@@ -55,39 +56,39 @@ public class OrderControl extends View {
 
     private @FXML UIText orderSize;
 
-    private @FXML Spinner<Num> orderSizeAmount;
+    private @FXML UISpinner<Num> orderSizeAmount;
 
     private @FXML UIText orderPrice;
 
-    private @FXML Spinner<Num> orderPriceAmount;
+    private @FXML UISpinner<Num> orderPriceAmount;
 
-    private @FXML Spinner<Integer> orderDivideSize;
+    private @FXML UISpinner<Integer> orderDivideSize;
 
     private @FXML UIText orderPriceInterval;
 
-    private @FXML UIButton orderLimitBuy;
+    private @FXML UIButton orderLimitLong;
 
-    private @FXML UIButton orderLimitSell;
+    private @FXML UIButton orderLimitShort;
 
     /**
      * {@inheritDoc}
      */
     @Override
     protected void initialize() {
-        orderSize.text("0").when(User.Scroll, changeBy(orderSizeAmount)).require(positiveNumber);
-        orderSizeAmount.setValueFactory(spinnerV(Num.of("0.01"), Num.of("0.1"), Num.ONE));
+        orderSize.text("0").when(User.Scroll, changeBy(orderSizeAmount.ui)).require(positiveNumber);
+        orderSizeAmount.values(Num.of("0.01"), Num.of("0.1"), Num.ONE).initial(Num.ONE);
 
-        orderPrice.text("0").when(User.Scroll, changeBy(orderPriceAmount)).require(positiveNumber);
-        orderPriceAmount.setValueFactory(spinnerV(Num.ONE, Num.HUNDRED, Num.THOUSAND));
+        orderPrice.text("0").when(User.Scroll, changeBy(orderPriceAmount.ui)).require(positiveNumber);
+        orderPriceAmount.values(Num.ONE, Num.HUNDRED, Num.THOUSAND).initial(Num.ONE);
 
-        orderDivideSize.setValueFactory(spinnerV(1, 2, 4, 5, 8, 10));
-        orderPriceInterval.parent().disableWhen(orderDivideSize.valueProperty().isEqualTo(1));
+        orderDivideSize.values(1, 2, 4, 5, 8, 10).initial(1);
+        orderPriceInterval.parent().disableWhen(orderDivideSize.ui.valueProperty().isEqualTo(1));
 
         // validate order condition
-        orderLimitBuy.parent().disableWhen(orderSize.isInvalid().or(orderPrice.isInvalid()));
+        orderLimitLong.parent().disableWhen(orderSize.isInvalid().or(orderPrice.isInvalid()));
 
-        orderLimitBuy.when(User.Click).throttle(1000, MILLISECONDS).mapTo(Side.BUY).to(this::requestOrder);
-        orderLimitSell.when(User.Click).throttle(1000, MILLISECONDS).mapTo(Side.SELL).to(this::requestOrder);
+        orderLimitLong.when(User.Click).throttle(1000, MILLISECONDS).mapTo(Side.BUY).to(this::requestOrder);
+        orderLimitShort.when(User.Click).throttle(1000, MILLISECONDS).mapTo(Side.SELL).to(this::requestOrder);
     }
 
     /**
@@ -121,7 +122,7 @@ public class OrderControl extends View {
     private void requestOrder(Side side) {
         Num size = orderSize.valueOr(Num.ZERO);
         Num price = orderPrice.valueOr(Num.ZERO);
-        Integer divideSize = orderDivideSize.getValue();
+        Integer divideSize = orderDivideSize.value();
         Num priceInterval = orderPriceInterval.valueOr(Num.ZERO).multiply(side.isBuy() ? -1 : 1);
 
         System.out.println("OK " + side + "  " + size + "  " + price + "  " + divideSize + "  " + priceInterval);

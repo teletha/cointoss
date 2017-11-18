@@ -75,3 +75,12 @@
 #priceLatest {
 	-fx-label-padding: 0 0 0 8px;
 }
+
+#orderLimitShort, #orderMarketShort {
+	-fx-text-fill: rgba(247, 105, 77, 1);
+}
+
+
+#orderLimitLong, #orderMarketLong {
+	-fx-text-fill: rgb(251, 189, 42);
+}
