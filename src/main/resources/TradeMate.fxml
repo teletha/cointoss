@@ -12,6 +12,8 @@
 <?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.control.Spinner?>
 <?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
@@ -19,7 +21,7 @@
 <?import javafx.scene.paint.Color?>
 <?import javafx.scene.text.Font?>
 
-<VBox prefHeight="700.0" prefWidth="1200.0" stylesheets="@TradeMate.css" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cointoss.visual.mate.TradeMateController">
+<VBox prefHeight="830.0" prefWidth="1200.0" stylesheets="@TradeMate.css" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cointoss.visual.mate.TradeMateController">
   <children>
       <MenuBar VBox.vgrow="NEVER">
       <menus>
@@ -235,6 +237,18 @@
             </VBox>
       </items>
     </SplitPane>
+      <HBox maxHeight="200.0" minHeight="200.0" prefHeight="200.0">
+         <children>
+            <TableView id="requestedOrders">
+              <columns>
+                  <TableColumn editable="false" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" resizable="false" text="日付" />
+                <TableColumn editable="false" maxWidth="70.0" minWidth="70.0" prefWidth="70.0" resizable="false" text="売買" />
+                <TableColumn editable="false" maxWidth="70.0" minWidth="70.0" prefWidth="70.0" resizable="false" text="数量" />
+                  <TableColumn editable="false" maxWidth="100.0" minWidth="100.0" prefWidth="100.0" resizable="false" text="価格" />
+              </columns>
+            </TableView>
+         </children>
+      </HBox>
     <HBox id="HBox" alignment="CENTER_LEFT" spacing="5.0" VBox.vgrow="NEVER">
       <children>
         <Label maxHeight="1.7976931348623157E308" maxWidth="-1.0" text="Left status" HBox.hgrow="ALWAYS">

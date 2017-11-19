@@ -84,3 +84,7 @@
 #orderLimitLong, #orderMarketLong {
 	-fx-text-fill: rgb(251, 189, 42);
 }
+
+#requestedOrders .table-column {
+  -fx-alignment: CENTER;
+}

@@ -60,7 +60,6 @@ public class ExecutionView extends View {
                 priceLatest.setText(e.price.toString());
 
                 ObservableList<Execution> items = executionList.getItems();
-
                 items.add(0, e);
 
                 if (100 < items.size()) {

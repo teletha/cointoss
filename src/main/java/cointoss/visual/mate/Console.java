@@ -7,7 +7,7 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss.market.bitflyer;
+package cointoss.visual.mate;
 
 import static java.util.concurrent.TimeUnit.*;
 
@@ -23,6 +23,7 @@ import javafx.fxml.FXML;
 import cointoss.ExecutionFlow;
 import cointoss.Market;
 import cointoss.Trading;
+import cointoss.market.bitflyer.BitFlyer;
 import viewtify.View;
 import viewtify.Viewtify;
 import viewtify.ui.UIListView;

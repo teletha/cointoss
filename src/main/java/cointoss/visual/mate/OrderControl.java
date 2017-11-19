@@ -13,9 +13,15 @@ import static java.util.concurrent.TimeUnit.*;
 
 import java.util.function.Predicate;
 
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TreeTableCell;
 import javafx.scene.input.ScrollEvent;
 
 import cointoss.MarketBackend;
@@ -75,6 +81,8 @@ public class OrderControl extends View {
 
     private @FXML UIComboBox<Quantity> orderQuantity;
 
+    private @FXML TableView<Order> requestedOrders;
+
     /**
      * {@inheritDoc}
      */
@@ -96,6 +104,18 @@ public class OrderControl extends View {
         orderLimitShort.when(User.Click).throttle(1000, MILLISECONDS).mapTo(Side.SELL).to(this::requestOrder);
 
         orderQuantity.values(Quantity.values()).initial(Quantity.GoodTillCanceled);
+
+        ObservableList<TableColumn<Order, ?>> columns = requestedOrders.getColumns();
+        columns.get(1).setCellValueFactory(e -> new SimpleObjectProperty(e.getValue().side()));
+        columns.get(2).setCellValueFactory(e -> new SimpleObjectProperty(e.getValue().size()));
+        columns.get(3).setCellValueFactory(e -> new SimpleObjectProperty(e.getValue().price()));
+
+        ObservableList<Order> items = FXCollections
+                .observableArrayList(Order.limitLong(1, 20), Order.limitLong(1, 30), Order.limitLong(1, 40));
+        requestedOrders.setItems(items);
+
+        // requestedOrdersDate.setCellValueFactory(e -> e.);
+        // requestedOrdersDate.setCellFactory(e -> new TableCell());
     }
 
     /**
@@ -180,6 +200,23 @@ public class OrderControl extends View {
 
             setValue(value);
         }
+    }
 
+    /**
+     * @version 2017/11/19 15:40:13
+     */
+    private class TableCell extends TreeTableCell<Order, String> {
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected void updateItem(String item, boolean empty) {
+            super.updateItem(item, empty);
+
+            if (item != null && !empty) {
+                System.out.println(item);
+            }
+        }
     }
 }

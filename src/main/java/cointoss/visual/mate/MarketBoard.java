@@ -82,8 +82,9 @@ public class MarketBoard extends View {
      */
     @Override
     protected void initialize() {
-        longList.values(long1.list).cell(CellView.class);
-        shortList.values(short1.list).cell(CellView.class).scrollTo(short1.list.size() - 1);
+        System.out.println(orderPrice);
+        longList.values(long1.list).cell(e -> new CellView());
+        shortList.values(short1.list).cell(e -> new CellView()).scrollTo(short1.list.size() - 1);
         priceRange.values(I.signal(long1, short1, long10, short10, long100, short100, long1000, short1000).buffer(2).toList())
                 .text(e -> e.get(0).toString())
                 .observe(e -> {
@@ -121,7 +122,10 @@ public class MarketBoard extends View {
          * @param side
          */
         private CellView() {
-            setOnMouseClicked(e -> orderPrice.setText(getItem().price.toString()));
+            setOnMouseClicked(e -> {
+                System.out.println(orderPrice + "  " + priceLatest);
+                orderPrice.setText(getItem().price.toString());
+            });
         }
 
         /**
