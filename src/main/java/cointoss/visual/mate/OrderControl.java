@@ -17,11 +17,12 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.control.Cell;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.TreeTableCell;
 import javafx.scene.input.ScrollEvent;
 
 import cointoss.MarketBackend;
@@ -83,19 +84,23 @@ public class OrderControl extends View {
 
     private @FXML TableView<Order> requestedOrders;
 
+    private @FXML TableColumn<Order, String> requestedOrdersSide;
+
+    private final ObservableList<Order> orders = FXCollections.observableArrayList();
+
     /**
      * {@inheritDoc}
      */
     @Override
     protected void initialize() {
-        orderSize.text("0").when(User.Scroll, changeBy(orderSizeAmount.ui)).require(positiveNumber);
+        orderSize.initial("0").when(User.Scroll, changeBy(orderSizeAmount.ui)).require(positiveNumber);
         orderSizeAmount.values(Num.of("0.01"), Num.of("0.1"), Num.ONE).initial(Num.ONE);
 
-        orderPrice.text("0").when(User.Scroll, changeBy(orderPriceAmount.ui)).require(positiveNumber);
+        orderPrice.initial("0").when(User.Scroll, changeBy(orderPriceAmount.ui)).require(positiveNumber);
         orderPriceAmount.values(Num.ONE, Num.HUNDRED, Num.THOUSAND).initial(Num.ONE);
 
         orderDivideSize.values(1, 2, 4, 5, 8, 10).initial(1);
-        orderPriceInterval.parent().disableWhen(orderDivideSize.ui.valueProperty().isEqualTo(1));
+        orderPriceInterval.initial("0").parent().disableWhen(orderDivideSize.ui.valueProperty().isEqualTo(1));
 
         // validate order condition
         orderLimitLong.parent().disableWhen(orderSize.isInvalid().or(orderPrice.isInvalid()));
@@ -110,9 +115,8 @@ public class OrderControl extends View {
         columns.get(2).setCellValueFactory(e -> new SimpleObjectProperty(e.getValue().size()));
         columns.get(3).setCellValueFactory(e -> new SimpleObjectProperty(e.getValue().price()));
 
-        ObservableList<Order> items = FXCollections
-                .observableArrayList(Order.limitLong(1, 20), Order.limitLong(1, 30), Order.limitLong(1, 40));
-        requestedOrders.setItems(items);
+        requestedOrders.setCellFactory(c -> new Cell());
+        requestedOrders.setItems(orders);
 
         // requestedOrdersDate.setCellValueFactory(e -> e.);
         // requestedOrdersDate.setCellFactory(e -> new TableCell());
@@ -155,9 +159,19 @@ public class OrderControl extends View {
             Quantity quantity = orderQuantity.value();
 
             for (int i = 0; i < divideSize; i++) {
-                service.request(Order.limit(side, size, price).type(quantity)).to(id -> {
-                    System.out.println("SUCCESS " + id);
-                });
+                Order order = Order.limit(side, size, price).type(quantity);
+
+                if (order.isLimit()) {
+                    Viewtify.inUI(() -> {
+                        orders.add(order);
+                    });
+
+                    service.request(order).on(Viewtify.UIThread).to(id -> {
+                        System.out.println(id);
+                    }, e -> {
+                        e.printStackTrace();
+                    });
+                }
                 price = price.plus(priceInterval);
             }
         });
@@ -205,7 +219,7 @@ public class OrderControl extends View {
     /**
      * @version 2017/11/19 15:40:13
      */
-    private class TableCell extends TreeTableCell<Order, String> {
+    private class Cell extends TableCell<Order, String> {
 
         /**
          * {@inheritDoc}

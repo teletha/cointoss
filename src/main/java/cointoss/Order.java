@@ -15,6 +15,9 @@ import java.util.Deque;
 import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import javafx.beans.property.Property;
+import javafx.beans.property.SimpleObjectProperty;
+
 import cointoss.util.Num;
 import kiss.Observer;
 import kiss.Signal;
@@ -524,5 +527,4 @@ public class Order implements Directional {
     public String toString() {
         return side.mark() + size + "@" + average_price + " 残" + outstanding_size + " 済" + executed_size + " " + child_order_date;
     }
-
 }
