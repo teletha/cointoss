@@ -12,6 +12,7 @@ package cointoss.visual.mate;
 import static java.util.concurrent.TimeUnit.*;
 
 import java.util.function.Predicate;
+import java.util.stream.IntStream;
 
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
@@ -83,6 +84,8 @@ public class OrderControl extends View {
 
     private @FXML TableView<Order> requestedOrders;
 
+    private @FXML TableColumn<Order, String> requestedOrdersSide;
+
     private final ObservableList<Order> orders = FXCollections.observableArrayList();
 
     /**
@@ -96,7 +99,7 @@ public class OrderControl extends View {
         orderPrice.initial("0").when(User.Scroll, changeBy(orderPriceAmount.ui)).require(positiveNumber);
         orderPriceAmount.values(Num.ONE, Num.HUNDRED, Num.THOUSAND).initial(Num.ONE);
 
-        orderDivideSize.values(1, 2, 4, 5, 8, 10).initial(1);
+        orderDivideSize.values(IntStream.range(1, 21).boxed()).initial(1);
         orderPriceInterval.initial("0").parent().disableWhen(orderDivideSize.ui.valueProperty().isEqualTo(1));
 
         // validate order condition
@@ -158,12 +161,8 @@ public class OrderControl extends View {
                 Order order = Order.limit(side, size, price).type(quantity);
 
                 if (order.isLimit()) {
-                    Viewtify.inUI(() -> {
+                    service.request(order).to(id -> {
                         orders.add(order);
-                    });
-
-                    service.request(order).on(Viewtify.UIThread).to(id -> {
-                        System.out.println(id);
                     }, e -> {
                         e.printStackTrace();
                     });
@@ -215,13 +214,13 @@ public class OrderControl extends View {
     /**
      * @version 2017/11/19 15:40:13
      */
-    private class Cell extends TableCell<Order, String> {
+    private class Cell extends TableCell<Order, Object> {
 
         /**
          * {@inheritDoc}
          */
         @Override
-        protected void updateItem(String item, boolean empty) {
+        protected void updateItem(Object item, boolean empty) {
             super.updateItem(item, empty);
 
             if (item != null && !empty) {

@@ -14,7 +14,6 @@ import java.util.stream.IntStream;
 
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 
@@ -38,9 +37,6 @@ public class ExecutionView extends View {
     /** The execution list. */
     private @FXML ListView executionCumulativeList;
 
-    /** The execution list. */
-    private @FXML Label priceLatest;
-
     /** UI for interval configuration. */
     private @FXML UISpinner<Integer> takerSize;
 
@@ -57,8 +53,6 @@ public class ExecutionView extends View {
         // load execution log
         Viewtify.inWorker(() -> {
             return BitFlyer.FX_BTC_JPY.log().fromToday().on(Viewtify.UIThread).to(e -> {
-                priceLatest.setText(e.price.toString());
-
                 ObservableList<Execution> items = executionList.getItems();
                 items.add(0, e);
 

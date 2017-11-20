@@ -82,7 +82,6 @@ public class MarketBoard extends View {
      */
     @Override
     protected void initialize() {
-        System.out.println(orderPrice);
         longList.values(long1.list).cell(e -> new CellView());
         shortList.values(short1.list).cell(e -> new CellView()).scrollTo(short1.list.size() - 1);
         priceRange.values(I.signal(long1, short1, long10, short10, long100, short100, long1000, short1000).buffer(2).toList())
@@ -111,6 +110,12 @@ public class MarketBoard extends View {
                 }
             });
         });
+
+        Viewtify.inWorker(() -> {
+            return BitFlyer.FX_BTC_JPY.log().fromToday().on(Viewtify.UIThread).to(e -> {
+                priceLatest.setText(e.price.toString());
+            });
+        });
     }
 
     /**
@@ -123,7 +128,6 @@ public class MarketBoard extends View {
          */
         private CellView() {
             setOnMouseClicked(e -> {
-                System.out.println(orderPrice + "  " + priceLatest);
                 orderPrice.setText(getItem().price.toString());
             });
         }

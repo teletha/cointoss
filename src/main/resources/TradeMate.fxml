@@ -242,7 +242,7 @@
             <TableView id="requestedOrders">
               <columns>
                   <TableColumn editable="false" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" resizable="false" text="日付" />
-                <TableColumn editable="false" maxWidth="70.0" minWidth="70.0" prefWidth="70.0" resizable="false" text="売買" />
+                <TableColumn id="requestedOrdersSide" editable="false" maxWidth="70.0" minWidth="70.0" prefWidth="70.0" resizable="false" text="売買" />
                 <TableColumn editable="false" maxWidth="70.0" minWidth="70.0" prefWidth="70.0" resizable="false" text="数量" />
                   <TableColumn editable="false" maxWidth="100.0" minWidth="100.0" prefWidth="100.0" resizable="false" text="価格" />
               </columns>

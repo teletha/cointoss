@@ -79,7 +79,7 @@ public class Console extends View {
                 Viewtify.inUI(() -> {
                     messages.add(0, builder.toString());
 
-                    if (100 < messages.size()) {
+                    if (2000 < messages.size()) {
                         messages.remove(messages.size() - 1);
                     }
                 });
