@@ -17,7 +17,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.Cell;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.TableCell;
@@ -84,8 +83,6 @@ public class OrderControl extends View {
 
     private @FXML TableView<Order> requestedOrders;
 
-    private @FXML TableColumn<Order, String> requestedOrdersSide;
-
     private final ObservableList<Order> orders = FXCollections.observableArrayList();
 
     /**
@@ -115,7 +112,6 @@ public class OrderControl extends View {
         columns.get(2).setCellValueFactory(e -> new SimpleObjectProperty(e.getValue().size()));
         columns.get(3).setCellValueFactory(e -> new SimpleObjectProperty(e.getValue().price()));
 
-        requestedOrders.setCellFactory(c -> new Cell());
         requestedOrders.setItems(orders);
 
         // requestedOrdersDate.setCellValueFactory(e -> e.);
