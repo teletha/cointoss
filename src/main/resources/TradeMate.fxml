@@ -116,7 +116,11 @@
                   <HBox alignment="CENTER_LEFT">
                      <children>
                         <Label alignment="CENTER" prefHeight="27.0" prefWidth="60.0" style="&#10;" text="価格間隔" textAlignment="CENTER" wrapText="false" />
-                        <TextField id="orderPriceInterval" maxWidth="120.0" />
+                        <TextField id="orderPriceInterval" maxWidth="120.0">
+                           <HBox.margin>
+                              <Insets right="20.0" />
+                           </HBox.margin></TextField>
+                        <Spinner id="orderPriceIntervalAmount" focusTraversable="false" maxWidth="70.0" />
                      </children>
                      <padding>
                         <Insets right="10.0" />

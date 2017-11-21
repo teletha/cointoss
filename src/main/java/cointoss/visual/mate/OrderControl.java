@@ -76,6 +76,8 @@ public class OrderControl extends View {
 
     private @FXML UIText orderPriceInterval;
 
+    private @FXML UISpinner<Num> orderPriceIntervalAmount;
+
     private @FXML UIButton orderLimitLong;
 
     private @FXML UIButton orderLimitShort;
@@ -84,7 +86,7 @@ public class OrderControl extends View {
 
     private @FXML TableView<Order> requestedOrders;
 
-    private @FXML TableColumn<Order, String> requestedOrdersSide;
+    // private @FXML TableColumn<Order, String> requestedOrdersSide;
 
     private final ObservableList<Order> orders = FXCollections.observableArrayList();
 
@@ -99,8 +101,13 @@ public class OrderControl extends View {
         orderPrice.initial("0").when(User.Scroll, changeBy(orderPriceAmount.ui)).require(positiveNumber);
         orderPriceAmount.values(Num.ONE, Num.HUNDRED, Num.THOUSAND).initial(Num.ONE);
 
-        orderDivideSize.values(IntStream.range(1, 21).boxed()).initial(1);
-        orderPriceInterval.initial("0").parent().disableWhen(orderDivideSize.ui.valueProperty().isEqualTo(1));
+        orderDivideSize.values(IntStream.range(1, 31).boxed()).initial(1);
+        orderPriceInterval.initial("0")
+                .when(User.Scroll, changeBy(orderPriceIntervalAmount.ui))
+                .require(positiveNumber)
+                .parent()
+                .disableWhen(orderDivideSize.ui.valueProperty().isEqualTo(1));
+        orderPriceIntervalAmount.values(Num.TEN, Num.HUNDRED, Num.THOUSAND).initial(Num.TEN);
 
         // validate order condition
         orderLimitLong.parent().disableWhen(orderSize.isInvalid().or(orderPrice.isInvalid()));
@@ -162,6 +169,7 @@ public class OrderControl extends View {
 
                 if (order.isLimit()) {
                     service.request(order).to(id -> {
+                        System.out.println(id);
                         orders.add(order);
                     }, e -> {
                         e.printStackTrace();
