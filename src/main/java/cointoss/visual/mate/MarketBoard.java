@@ -9,6 +9,8 @@
  */
 package cointoss.visual.mate;
 
+import static java.util.concurrent.TimeUnit.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +24,7 @@ import javafx.scene.control.TextField;
 import org.magicwerk.brownies.collections.GapList;
 
 import cointoss.Board.Unit;
+import cointoss.Execution;
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.util.Num;
 import kiss.I;
@@ -112,8 +115,11 @@ public class MarketBoard extends View {
         });
 
         Viewtify.inWorker(() -> {
-            return BitFlyer.FX_BTC_JPY.log().fromToday().on(Viewtify.UIThread).to(e -> {
+            return BitFlyer.FX_BTC_JPY.log().fromToday().on(Viewtify.UIThread).effect(e -> {
                 priceLatest.setText(e.price.toString());
+            }).throttle(1, MINUTES).to(e -> {
+                // fix error board
+                long1.fix(e);
             });
         });
     }
@@ -171,6 +177,21 @@ public class MarketBoard extends View {
             this.fromHead = fromHead;
             this.groups = groups;
             this.list = FXCollections.observableList(GapList.create(empty()));
+        }
+
+        /**
+         * Fix error board.
+         * 
+         * @param e
+         */
+        void fix(Execution e) {
+            if (fromHead) {
+                for (int i = 0; i < list.size(); i++) {
+                    Unit unit = list.get(i);
+                }
+            } else {
+
+            }
         }
 
         /**
