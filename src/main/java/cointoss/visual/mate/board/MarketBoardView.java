@@ -7,7 +7,7 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss.visual.mate;
+package cointoss.visual.mate.board;
 
 import static java.util.concurrent.TimeUnit.*;
 
@@ -36,7 +36,7 @@ import viewtify.ui.UISpinner;
 /**
  * @version 2017/11/14 19:16:13
  */
-public class MarketBoard extends View {
+public class MarketBoardView extends View {
 
     /** Model for maker. */
     private final SortableGroupList long1000 = new SortableGroupList(true, -3);
