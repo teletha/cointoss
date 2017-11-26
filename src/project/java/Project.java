@@ -26,5 +26,6 @@ public class Project extends bee.api.Project {
         require("org.knowm.xchart", "xchart", "3.5.1-SNAPSHOT");
         require("org.magicwerk", "brownies-collections", "0.9.13");
         require("org.controlsfx", "controlsfx", "8.40.14");
+        require("org.fxmisc.easybind", "easybind", "1.0.3");
     }
 }

@@ -15,6 +15,8 @@ import java.util.LinkedList;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import javafx.beans.property.SimpleObjectProperty;
+
 import cointoss.Order.Quantity;
 import cointoss.Time.Lag;
 import cointoss.util.Num;
@@ -78,10 +80,10 @@ class TestableMarketBackend implements MarketBackend {
             BackendOrder child = new BackendOrder(order);
             child.child_order_acceptance_id = "LOCAL-ACCEPTANCE-" + id++;
             child.child_order_state = OrderState.ACTIVE;
-            child.child_order_date = now.plusNanos(lag.generate());
-            child.child_order_type = order.price().is(0) ? OrderType.MARKET : OrderType.LIMIT;
-            child.average_price = order.price();
-            child.outstanding_size = order.size();
+            child.child_order_date = new SimpleObjectProperty(now.plusNanos(lag.generate()));
+            child.child_order_type = order.price.v.is(0) ? OrderType.MARKET : OrderType.LIMIT;
+            child.average_price.set(order.price.v);
+            child.outstanding_size.set(order.size.v);
             child.cancel_size = Num.ZERO;
             child.executed_size = Num.ZERO;
 
@@ -190,7 +192,7 @@ class TestableMarketBackend implements MarketBackend {
             BackendOrder order = iterator.next();
 
             // time base filter
-            if (e.exec_date.isBefore(order.child_order_date)) {
+            if (e.exec_date.isBefore(order.child_order_date.get())) {
                 continue;
             }
 
@@ -217,8 +219,8 @@ class TestableMarketBackend implements MarketBackend {
 
             if (order.quantity() == Quantity.ImmediateOrCancel) {
                 if (order.isTradablePriceWith(e)) {
-                    Num min = Num.min(e.size, order.outstanding_size);
-                    order.outstanding_size = min;
+                    Num min = Num.min(e.size, order.outstanding_size.get());
+                    order.outstanding_size.set(min);
                 } else {
                     iterator.remove();
                     orderAll.remove(order);
@@ -227,27 +229,28 @@ class TestableMarketBackend implements MarketBackend {
             }
 
             if (order.isTradablePriceWith(e)) {
-                Num executedSize = Num.min(e.size, order.outstanding_size);
+                Num executedSize = Num.min(e.size, order.outstanding_size.get());
                 if (order.child_order_type.isMarket() && executedSize.isNot(0)) {
                     order.marketMinPrice = order.isBuy() ? Num.max(order.marketMinPrice, e.price) : Num.min(order.marketMinPrice, e.price);
-                    order.average_price = order.average_price.multiply(order.executed_size)
+                    order.average_price.set(order.average_price.get()
+                            .multiply(order.executed_size)
                             .plus(order.marketMinPrice.multiply(executedSize))
-                            .divide(order.executed_size.plus(executedSize));
+                            .divide(order.executed_size.plus(executedSize)));;
                 }
-                order.outstanding_size = order.outstanding_size.minus(executedSize);
+                order.outstanding_size.set(order.outstanding_size.get().minus(executedSize));
                 order.executed_size = order.executed_size.plus(executedSize);
 
                 Execution exe = new Execution();
                 exe.side = order.side();
                 exe.size = exe.cumulativeSize = executedSize;
-                exe.price = order.child_order_type.isMarket() ? order.marketMinPrice : order.average_price;
+                exe.price = order.child_order_type.isMarket() ? order.marketMinPrice : order.average_price.get();
                 exe.exec_date = e.exec_date;
                 exe.buy_child_order_acceptance_id = order.isBuy() ? order.child_order_acceptance_id : e.buy_child_order_acceptance_id;
                 exe.sell_child_order_acceptance_id = order.isSell() ? order.child_order_acceptance_id : e.sell_child_order_acceptance_id;
 
                 executeds.add(exe);
 
-                if (order.outstanding_size.is(0)) {
+                if (order.outstanding_size.get().is(0)) {
                     order.child_order_state = OrderState.COMPLETED;
                     iterator.remove();
                 }
@@ -279,7 +282,7 @@ class TestableMarketBackend implements MarketBackend {
          * @param o
          */
         private BackendOrder(Order o) {
-            super(o.side(), o.size(), o.price(), o.triggerPrice(), o.quantity());
+            super(o.side(), o.size.v, o.price.v, o.triggerPrice(), o.quantity());
         }
     }
 }

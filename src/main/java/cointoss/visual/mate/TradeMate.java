@@ -9,74 +9,27 @@
  */
 package cointoss.visual.mate;
 
-import java.nio.file.StandardWatchEventKinds;
-
-import javafx.application.Application;
-import javafx.collections.ObservableList;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
-import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
+import java.net.URL;
 
 import cointoss.util.Num;
-import filer.Filer;
 import kiss.I;
 import viewtify.Viewtify;
 
 /**
  * @version 2017/11/13 16:58:58
  */
-public class TradeMate extends Application {
+public class TradeMate extends Viewtify {
 
     static {
         I.load(Num.Codec.class, false);
     }
 
-    /** The root controller. */
-    private static TradeMateController controller;
-
     /**
      * {@inheritDoc}
      */
     @Override
-    public void start(Stage stage) throws Exception {
-        ClassLoader system = ClassLoader.getSystemClassLoader();
-        FXMLLoader loader = new FXMLLoader(system.getResource("TradeMate.fxml"));
-        VBox root = loader.load();
-        controller = loader.getController();
-
-        Scene scene = new Scene(root);
-        stage.setScene(scene);
-        stage.setTitle(getClass().getSimpleName());
-        stage.show();
-
-        // setup views
-        Viewtify.initialize(scene);
-
-        Filer.observe(Filer.locate("src/main/resources/TradeMate.css")).on(Viewtify.UIThread).to(e -> {
-            if (e.kind() == StandardWatchEventKinds.ENTRY_MODIFY) {
-                ObservableList<String> list = scene.getStylesheets();
-                list.clear();
-                list.add(system.getResource("TradeMate.css").toExternalForm());
-            }
-        });
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void stop() throws Exception {
-        Viewtify.terminate();
-    }
-
-    /**
-     * Access to controller.
-     * 
-     * @return
-     */
-    public static TradeMateController cotroller() {
-        return controller;
+    protected URL fxml() {
+        return ClassLoader.getSystemClassLoader().getResource("TradeMate.fxml");
     }
 
     /**

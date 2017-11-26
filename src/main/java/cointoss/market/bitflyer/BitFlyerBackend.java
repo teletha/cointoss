@@ -118,10 +118,10 @@ class BitFlyerBackend implements MarketBackend {
         ChildOrderRequest request = new ChildOrderRequest();
         request.child_order_type = order.isLimit() ? "LIMIT" : "MARKET";
         request.minute_to_expire = 60 * 24;
-        request.price = order.price().toInt();
+        request.price = order.price.v.toInt();
         request.product_code = type.name();
         request.side = order.side().name();
-        request.size = order.size().toDouble();
+        request.size = order.size.v.toDouble();
         switch (order.quantity()) {
         case GoodTillCanceled:
             request.time_in_force = "GTC";

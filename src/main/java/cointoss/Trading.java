@@ -258,7 +258,7 @@ public abstract class Trading {
          */
         private Entry(Order entry, Consumer<Entry> initializer) {
             this.order = entry;
-            this.entryRemaining = entry.size();
+            this.entryRemaining = entry.size.v;
 
             // create new entry
             entries.add(this);
@@ -360,7 +360,7 @@ public abstract class Trading {
          */
         public final Span orderTime() {
             Execution last = order.executions.peekLast();
-            ZonedDateTime start = order.child_order_date;
+            ZonedDateTime start = order.child_order_date.get();
             ZonedDateTime finish = last == null ? market.getExecutionLatest().exec_date : last.exec_date;
 
             if (start.isBefore(finish)) {
@@ -437,7 +437,7 @@ public abstract class Trading {
          * Cehck whether this position is not activated.
          */
         public final boolean isInitial() {
-            return order.size().is(entryRemaining);
+            return order.size.v.is(entryRemaining);
         }
 
         /**
@@ -531,7 +531,7 @@ public abstract class Trading {
          * @param order A exit order.
          */
         private void exit(Order order, Consumer<Order> initializer) {
-            exitRemaining = exitRemaining.plus(order.size());
+            exitRemaining = exitRemaining.plus(order.size.v);
 
             market.request(order).to(o -> {
                 exit.add(o);

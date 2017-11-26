@@ -7,23 +7,26 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss.visual.mate;
+package cointoss.visual.mate.order;
 
 import static java.util.concurrent.TimeUnit.*;
 
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
 
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeTableColumn;
+import javafx.scene.control.TreeTableColumn.CellDataFeatures;
+import javafx.scene.control.TreeTableView;
 import javafx.scene.input.ScrollEvent;
+import javafx.util.Callback;
 
 import cointoss.MarketBackend;
 import cointoss.Order;
@@ -31,6 +34,7 @@ import cointoss.Order.Quantity;
 import cointoss.Side;
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.util.Num;
+import kiss.I;
 import kiss.WiseBiConsumer;
 import viewtify.User;
 import viewtify.View;
@@ -48,7 +52,9 @@ public class OrderControl extends View {
     private Predicate<UIText> positiveNumber = ui -> {
         try {
             return Num.of(ui.text()).isPositive();
-        } catch (NumberFormatException e) {
+        } catch (
+
+        NumberFormatException e) {
             return false;
         }
     };
@@ -56,13 +62,18 @@ public class OrderControl extends View {
     private Predicate<UIText> negativeNumber = ui -> {
         try {
             return Num.of(ui.text()).isNegative();
-        } catch (NumberFormatException e) {
+        } catch (
+
+        NumberFormatException e) {
             return false;
         }
     };
 
     /** The backend service. */
     private final MarketBackend service = BitFlyer.FX_BTC_JPY.service();
+
+    /** The backend service. */
+    private final OrderManager manager = I.make(OrderManager.class);
 
     private @FXML UIText orderSize;
 
@@ -84,11 +95,18 @@ public class OrderControl extends View {
 
     private @FXML UIComboBox<Quantity> orderQuantity;
 
-    private @FXML TableView<Order> requestedOrders;
+    private @FXML TreeTableView<Object> requestedOrders;
 
-    // private @FXML TableColumn<Order, String> requestedOrdersSide;
+    private @FXML TreeTableColumn<Object, Object> requestedOrdersDate;
 
-    private final ObservableList<Order> orders = FXCollections.observableArrayList();
+    private @FXML TreeTableColumn<Object, Object> requestedOrdersSide;
+
+    private @FXML TreeTableColumn<Object, Object> requestedOrdersAmount;
+
+    private @FXML TreeTableColumn<Object, Object> requestedOrdersPrice;
+
+    /** The root item. */
+    private final TreeItem<Object> root = new TreeItem();
 
     /**
      * {@inheritDoc}
@@ -117,12 +135,22 @@ public class OrderControl extends View {
 
         orderQuantity.values(Quantity.values()).initial(Quantity.GoodTillCanceled);
 
-        ObservableList<TableColumn<Order, ?>> columns = requestedOrders.getColumns();
-        columns.get(1).setCellValueFactory(e -> new SimpleObjectProperty(e.getValue().side()));
-        columns.get(2).setCellValueFactory(e -> new SimpleObjectProperty(e.getValue().size()));
-        columns.get(3).setCellValueFactory(e -> new SimpleObjectProperty(e.getValue().price()));
+        // columns.get(1).setCellValueFactory(e -> new
+        // SimpleObjectProperty(e.getValue().getValue().side()));
+        // columns.get(2).setCellValueFactory(e -> new
+        // SimpleObjectProperty(e.getValue().getValue().size()));
+        // columns.get(3).setCellValueFactory(e -> new
+        // SimpleObjectProperty(e.getValue().getValue().price()));
 
-        requestedOrders.setItems(orders);
+        requestedOrders.setRoot(root);
+        requestedOrders.setShowRoot(false);
+        requestedOrdersDate.setCellValueFactory(new OrderCellValueFactory(s -> new SimpleStringProperty(""), o -> o.child_order_date));
+        requestedOrdersSide.setCellValueFactory(new OrderCellValueFactory(OrderSet::side, Order::sideProperty));
+        requestedOrdersAmount.setCellValueFactory(new OrderCellValueFactory(OrderSet::amount, Order::size));
+        requestedOrdersPrice.setCellValueFactory(new OrderCellValueFactory(OrderSet::averagePrice, Order::price));
+
+        // columns.get(1).setCellValueFactory(c -> new
+        // SimpleObjectProperty(c.getValue().getValue().side()));
 
         // requestedOrdersDate.setCellValueFactory(e -> e.);
         // requestedOrdersDate.setCellFactory(e -> new TableCell());
@@ -158,25 +186,45 @@ public class OrderControl extends View {
      */
     private void requestOrder(Side side) {
         Viewtify.inWorker(() -> {
+            // ========================================
+            // Create Model
+            // ========================================
+            OrderSet set = new OrderSet();
+
             Num size = orderSize.valueOr(Num.ZERO);
             Num price = orderPrice.valueOr(Num.ZERO);
-            Integer divideSize = orderDivideSize.value();
+            int divideSize = orderDivideSize.value();
             Num priceInterval = orderPriceInterval.valueOr(Num.ZERO).multiply(side.isBuy() ? -1 : 1);
             Quantity quantity = orderQuantity.value();
 
             for (int i = 0; i < divideSize; i++) {
                 Order order = Order.limit(side, size, price).type(quantity);
 
-                if (order.isLimit()) {
-                    service.request(order).to(id -> {
-                        System.out.println(id);
-                        orders.add(order);
-                    }, e -> {
-                        e.printStackTrace();
-                    });
-                }
+                set.sub.add(order);
+                service.request(order).to(id -> {
+                    System.out.println(id);
+                });
+
                 price = price.plus(priceInterval);
             }
+
+            // ========================================
+            // Create View Model
+            // ========================================
+            TreeItem item;
+
+            if (divideSize == 1) {
+                item = new TreeItem(set.sub.get(0));
+            } else {
+                item = new TreeItem(set);
+                item.setExpanded(true);
+
+                // create sub orders for UI
+                for (int i = 0; i < divideSize; i++) {
+                    item.getChildren().add(new TreeItem(set.sub.get(i)));
+                }
+            }
+            root.getChildren().add(item);
         });
     }
 
@@ -233,6 +281,42 @@ public class OrderControl extends View {
 
             if (item != null && !empty) {
                 System.out.println(item);
+            }
+        }
+    }
+
+    /**
+     * @version 2017/11/26 12:45:18
+     */
+    private static class OrderCellValueFactory
+            implements Callback<TreeTableColumn.CellDataFeatures<Object, Object>, ObservableValue<Object>> {
+
+        /** The value converter. */
+        private final Function<OrderSet, ObservableValue> forSet;
+
+        /** The value converter. */
+        private final Function<Order, ObservableValue> forOrder;
+
+        /**
+         * @param forSet
+         * @param forOrder
+         */
+        private OrderCellValueFactory(Function<OrderSet, ObservableValue> forSet, Function<Order, ObservableValue> forOrder) {
+            this.forSet = forSet;
+            this.forOrder = forOrder;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public ObservableValue<Object> call(CellDataFeatures<Object, Object> features) {
+            Object value = features.getValue().getValue();
+
+            if (value instanceof OrderSet) {
+                return forSet.apply((OrderSet) value);
+            } else {
+                return forOrder.apply((Order) value);
             }
         }
     }

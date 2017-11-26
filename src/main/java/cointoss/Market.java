@@ -177,7 +177,7 @@ public class Market implements Disposable {
     public final Signal<Order> request(Order order) {
         return backend.request(order).flatMap(backend::getOrderBy).map(o -> {
             // copy backend property
-            order.average_price = o.average_price;
+            order.average_price.set(o.average_price);
             order.cancel_size = o.cancel_size;
             order.child_order_acceptance_id = o.child_order_acceptance_id;
             order.child_order_date = o.child_order_date;
@@ -185,7 +185,7 @@ public class Market implements Disposable {
             order.child_order_type = o.child_order_type;
             order.executed_size = o.executed_size;
             order.expire_date = o.expire_date;
-            order.outstanding_size = o.outstanding_size;
+            order.outstanding_size.set(o.outstanding_size);
             order.total_commission = o.total_commission;
 
             // store
@@ -412,18 +412,18 @@ public class Market implements Disposable {
         }
 
         // for order state
-        Num executed = Num.min(order.outstanding_size, exe.size);
+        Num executed = Num.min(order.outstanding_size.v, exe.size);
 
         if (order.child_order_type.isMarket() && executed.isNot(0)) {
-            order.average_price = order.average_price.multiply(order.executed_size)
+            order.average_price.set(order.average_price.v.multiply(order.executed_size)
                     .plus(exe.price.multiply(executed))
-                    .divide(order.executed_size.plus(executed));
+                    .divide(order.executed_size.plus(executed)));
         }
 
-        order.outstanding_size = order.outstanding_size.minus(executed);
+        order.outstanding_size.set(order.outstanding_size.v.minus(executed));
         order.executed_size = order.executed_size.plus(executed);
 
-        if (order.outstanding_size.is(0)) {
+        if (order.outstanding_size.v.is(0)) {
             order.child_order_state = OrderState.COMPLETED;
             orders.remove(order); // complete order
         }

@@ -15,12 +15,14 @@ import java.util.Deque;
 import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import javafx.beans.property.Property;
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.value.ObservableValue;
 
 import cointoss.util.Num;
 import kiss.Observer;
 import kiss.Signal;
+import kiss.Variable;
+import viewtify.Viewtify;
 
 /**
  * @version 2017/08/24 23:09:32
@@ -28,13 +30,13 @@ import kiss.Signal;
 public class Order implements Directional {
 
     /** The ordered position. */
-    private Side side;
+    public final Variable<Side> side;
 
     /** The ordered size. */
-    private Num size;
+    public final Variable<Num> size;
 
     /** The ordered price. */
-    private Num price;
+    public final Variable<Num> price;
 
     private Num triggerPrice;
 
@@ -62,10 +64,11 @@ public class Order implements Directional {
      * @param size
      */
     protected Order(Side position, Num size, Num price, Num priceLimit, Quantity quantity) {
-        this.side = Objects.requireNonNull(position);
-        this.size = Objects.requireNonNull(size);
-        this.price = price == null ? Num.ZERO : price;
+        this.side = Variable.of(Objects.requireNonNull(position));
+        this.size = Variable.of(Objects.requireNonNull(size));
+        this.price = Variable.of(price == null ? Num.ZERO : price);
         this.child_order_type = price == null ? OrderType.MARKET : OrderType.LIMIT;
+        this.outstanding_size = Variable.of(size);
 
         when(priceLimit);
         type(quantity);
@@ -87,27 +90,14 @@ public class Order implements Directional {
      */
     @Override
     public Side side() {
-        return side;
+        return side.get();
     }
 
     /**
-     * Get the side property of this {@link Order}.
-     * 
-     * @return The side property.
+     * @return
      */
-    @SuppressWarnings("unused")
-    private Side getSide() {
-        return side;
-    }
-
-    /**
-     * Set the side property of this {@link Order}.
-     * 
-     * @param side The side value to set.
-     */
-    @SuppressWarnings("unused")
-    private void setSide(Side side) {
-        this.side = side;
+    public ObservableValue<Side> sideProperty() {
+        return Viewtify.wrap(side);
     }
 
     /**
@@ -115,28 +105,8 @@ public class Order implements Directional {
      * 
      * @return The size property.
      */
-    public Num size() {
-        return size;
-    }
-
-    /**
-     * Get the size property of this {@link Order}.
-     * 
-     * @return The size property.
-     */
-    @SuppressWarnings("unused")
-    private Num getSize() {
-        return size;
-    }
-
-    /**
-     * Set the size property of this {@link Order}.
-     * 
-     * @param size The size value to set.
-     */
-    @SuppressWarnings("unused")
-    private void setSize(Num size) {
-        this.size = size;
+    public ObservableValue<Num> size() {
+        return Viewtify.wrap(size);
     }
 
     /**
@@ -144,28 +114,8 @@ public class Order implements Directional {
      * 
      * @return The price property.
      */
-    public Num price() {
-        return price;
-    }
-
-    /**
-     * Get the price property of this {@link Order}.
-     * 
-     * @return The price property.
-     */
-    @SuppressWarnings("unused")
-    private Num getPrice() {
-        return price;
-    }
-
-    /**
-     * Set the price property of this {@link Order}.
-     * 
-     * @param price The price value to set.
-     */
-    @SuppressWarnings("unused")
-    private void setPrice(Num price) {
-        this.price = price;
+    public ObservableValue<Num> price() {
+        return Viewtify.wrap(price);
     }
 
     /**
@@ -320,7 +270,10 @@ public class Order implements Directional {
      * @return
      */
     public static Order limit(Side position, Num size, Num price) {
-        return new Order(position, size, price, null, null);
+        Order order = new Order(position, size, price, null, null);
+        order.average_price.set(price);
+
+        return order;
     }
 
     /**
@@ -410,13 +363,13 @@ public class Order implements Directional {
     public OrderState child_order_state;
 
     /** The order date */
-    public ZonedDateTime child_order_date;
+    public ReadOnlyObjectProperty<ZonedDateTime> child_order_date;
 
     /** The expire date */
     public ZonedDateTime expire_date;
 
     /** The remaining size */
-    public Num outstanding_size;
+    public final Variable<Num> outstanding_size;
 
     /** The executed size */
     public Num executed_size;
@@ -428,7 +381,7 @@ public class Order implements Directional {
     public Num total_commission;
 
     /** Order avarage price */
-    public Num average_price;
+    public final Variable<Num> average_price = Variable.of(Num.ZERO);
 
     /** INTERNAL USAGE */
     public Deque<Execution> executions = new ArrayDeque<>();
@@ -504,9 +457,9 @@ public class Order implements Directional {
         }
 
         if (isBuy()) {
-            return average_price.isGreaterThanOrEqual(e.price);
+            return average_price.get().isGreaterThanOrEqual(e.price);
         } else {
-            return average_price.isLessThanOrEqual(e.price);
+            return average_price.get().isLessThanOrEqual(e.price);
         }
     }
 
@@ -517,7 +470,7 @@ public class Order implements Directional {
      * @return A result.
      */
     public final boolean isTradableSizeWith(Execution e) {
-        return size().isLessThanOrEqual(e.size);
+        return size.v.isLessThanOrEqual(e.size);
     }
 
     /**
@@ -525,6 +478,6 @@ public class Order implements Directional {
      */
     @Override
     public String toString() {
-        return side.mark() + size + "@" + average_price + " 残" + outstanding_size + " 済" + executed_size + " " + child_order_date;
+        return side().mark() + size + "@" + average_price + " 残" + outstanding_size + " 済" + executed_size + " " + child_order_date;
     }
 }

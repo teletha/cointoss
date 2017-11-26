@@ -12,9 +12,9 @@
 <?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.control.Spinner?>
 <?import javafx.scene.control.SplitPane?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TreeTableColumn?>
+<?import javafx.scene.control.TreeTableView?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
@@ -243,14 +243,14 @@
     </SplitPane>
       <HBox maxHeight="200.0" minHeight="200.0" prefHeight="200.0">
          <children>
-            <TableView id="requestedOrders">
+            <TreeTableView id="requestedOrders">
               <columns>
-                  <TableColumn editable="false" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" resizable="false" text="日付" />
-                <TableColumn id="requestedOrdersSide" editable="false" maxWidth="70.0" minWidth="70.0" prefWidth="70.0" resizable="false" text="売買" />
-                <TableColumn editable="false" maxWidth="70.0" minWidth="70.0" prefWidth="70.0" resizable="false" text="数量" />
-                  <TableColumn editable="false" maxWidth="100.0" minWidth="100.0" prefWidth="100.0" resizable="false" text="価格" />
+                <TreeTableColumn id="requestedOrdersDate" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" text="日付" />
+                <TreeTableColumn id="requestedOrdersSide" maxWidth="70.0" minWidth="70.0" prefWidth="70.0" text="売買" />
+                  <TreeTableColumn id="requestedOrdersAmount" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" text="数量" />
+                  <TreeTableColumn id="requestedOrdersPrice" prefWidth="75.0" text="価格" />
               </columns>
-            </TableView>
+            </TreeTableView>
          </children>
       </HBox>
     <HBox id="HBox" alignment="CENTER_LEFT" spacing="5.0" VBox.vgrow="NEVER">
