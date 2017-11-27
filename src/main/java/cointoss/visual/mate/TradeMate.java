@@ -21,6 +21,28 @@ import viewtify.Viewtify;
 public class TradeMate extends Viewtify {
 
     static {
+        System.setProperty("java.util.logging.manager", "org.apache.logging.log4j.jul.LogManager");
+
+        // Path log = Filer.locate(".log/TradeMate");
+        // String pattern = log.resolve("system%i.log").toString();
+        //
+        // LoggerContext context = (LoggerContext) LogManager.getContext();
+        // RollingRandomAccessFileAppender appender = RollingRandomAccessFileAppender.newBuilder()
+        // .withName("TradeMate")
+        // .withFileName("system.log")
+        // .withFilePattern(pattern)
+        // .withImmediateFlush(true)
+        // .withStrategy(DefaultRolloverStrategy.createStrategy("1000000", null, null, "-1", null,
+        // true, context.getConfiguration()))
+        // .withLayout(PatternLayout.newBuilder().withPattern("%msg%n").build())
+        // .withPolicy(SizeBasedTriggeringPolicy.createPolicy("64 M"))
+        // .build();
+        // appender.start();
+        //
+        // logger = context.getLogger(id);
+        // logger.addAppender(appender);
+        // logger.setAdditive(false);
+
         I.load(Num.Codec.class, false);
     }
 

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="error">
+
+    <!-- Properties -->
+    <Properties>
+        <Property name="pattern">%d{yyy-MM-dd HH:mm:ss.SSS}   %msg%n</Property>
+    </Properties>
+
+    <!-- Console Appender -->
+    <Appenders>
+        <Console name="CONSOLE_APPENDER" target="SYSTEM_OUT">
+            <PatternLayout pattern="${pattern}" />
+        </Console>
+
+        <!-- Rolling File Appender -->
+        <RollingFile name="FILE_APPERNDER"
+            fileName=".log/TradeMate/log.txt"
+            filePattern=".jackpot/log%d{yyyyMMdd}.txt">
+            <PatternLayout pattern="${pattern}" />
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+            </Policies>
+            <DefaultRolloverStrategy max="9" />
+        </RollingFile>
+    </Appenders>
+
+    <Loggers>
+        <Root level="info">
+            <AppenderRef ref="CONSOLE_APPENDER" />
+            <AppenderRef ref="FILE_APPERNDER" />
+        </Root>
+    </Loggers>
+</Configuration>
