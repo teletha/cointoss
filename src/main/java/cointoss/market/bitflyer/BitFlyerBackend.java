@@ -144,9 +144,11 @@ class BitFlyerBackend implements MarketBackend {
      */
     @Override
     public Signal<String> cancel(String childOrderId) {
-        // If this exception will be thrown, it is bug of this program. So we must rethrow the
-        // wrapped error in here.
-        throw new Error();
+        ChildCancelRequest request = new ChildCancelRequest();
+        request.child_order_acceptance_id = childOrderId;
+        request.product_code = type.name();
+
+        return call("POST", "/v1/me/cancelchildorder", request, null, null).mapTo(childOrderId);
     }
 
     /**
@@ -260,12 +262,16 @@ class BitFlyerBackend implements MarketBackend {
                 int status = response.getStatusLine().getStatusCode();
 
                 if (status == HttpStatus.SC_OK) {
-                    JSON json = I.json(EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8));
-
-                    if (selector == null || selector.isEmpty()) {
-                        observer.accept(json.to(type));
+                    if (type == null) {
+                        observer.accept(null);
                     } else {
-                        json.find(selector, type).to(observer::accept);
+                        JSON json = I.json(EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8));
+
+                        if (selector == null || selector.isEmpty()) {
+                            observer.accept(json.to(type));
+                        } else {
+                            json.find(selector, type).to(observer::accept);
+                        }
                     }
                 } else {
                     observer.error(new Error("HTTP Status " + status));
@@ -365,5 +371,16 @@ class BitFlyerBackend implements MarketBackend {
         public int minute_to_expire;
 
         public String time_in_force;
+    }
+
+    /**
+     * @version 2017/11/13 13:09:00
+     */
+    @SuppressWarnings("unused")
+    private static class ChildCancelRequest {
+
+        public String product_code;
+
+        public String child_order_acceptance_id;
     }
 }

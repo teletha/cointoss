@@ -11,22 +11,12 @@ package cointoss.visual.mate.order;
 
 import static java.util.concurrent.TimeUnit.*;
 
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
 
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.scene.control.Spinner;
-import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeTableCell;
-import javafx.scene.control.TreeTableColumn;
-import javafx.scene.control.TreeTableColumn.CellDataFeatures;
-import javafx.scene.control.TreeTableRow;
-import javafx.scene.control.TreeTableView;
 import javafx.scene.input.ScrollEvent;
-import javafx.util.Callback;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -39,20 +29,18 @@ import cointoss.Side;
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.util.Num;
 import cointoss.visual.mate.console.Console;
-import kiss.Disposable;
 import kiss.I;
 import kiss.WiseBiConsumer;
 import viewtify.User;
 import viewtify.View;
 import viewtify.Viewtify;
-import viewtify.ui.UI;
 import viewtify.ui.UIButton;
 import viewtify.ui.UIComboBox;
 import viewtify.ui.UISpinner;
 import viewtify.ui.UIText;
 
 /**
- * @version 2017/11/14 23:47:09
+ * @version 2017/11/27 23:21:48
  */
 public class OrderMaker extends View {
 
@@ -116,25 +104,10 @@ public class OrderMaker extends View {
     private @FXML UIComboBox<Quantity> orderQuantity;
 
     /** UI */
-    private @FXML TreeTableView<Object> requestedOrders;
-
-    /** UI */
-    private @FXML TreeTableColumn<Object, Object> requestedOrdersDate;
-
-    /** UI */
-    private @FXML TreeTableColumn<Object, Object> requestedOrdersSide;
-
-    /** UI */
-    private @FXML TreeTableColumn<Object, Object> requestedOrdersAmount;
-
-    /** UI */
-    private @FXML TreeTableColumn<Object, Object> requestedOrdersPrice;
+    private @FXML OrderCatalog orderCatalog;
 
     /** UI */
     private @FXML Console console;
-
-    /** The root item. */
-    private final TreeItem<Object> root = new TreeItem();
 
     /**
      * {@inheritDoc}
@@ -162,16 +135,6 @@ public class OrderMaker extends View {
         orderLimitShort.when(User.Click).throttle(1000, MILLISECONDS).mapTo(Side.SELL).to(this::requestOrder);
 
         orderQuantity.values(Quantity.values()).initial(Quantity.GoodTillCanceled);
-
-        requestedOrders.setRoot(root);
-        requestedOrders.setShowRoot(false);
-        requestedOrders.setRowFactory(table -> new OrderStateRow());
-        requestedOrdersDate.setCellValueFactory(new OrderStateValueCell(s -> new SimpleStringProperty(""), o -> o.child_order_date));
-        requestedOrdersSide.setCellValueFactory(new OrderStateValueCell(OrderSet::side, Order::sideProperty));
-        requestedOrdersSide.setCellFactory(table -> new OrderStateCell());
-        requestedOrdersAmount.setCellValueFactory(new OrderStateValueCell(OrderSet::amount, Order::size));
-        requestedOrdersPrice.setCellValueFactory(new OrderStateValueCell(OrderSet::averagePrice, Order::price));
-
     }
 
     /**
@@ -227,20 +190,7 @@ public class OrderMaker extends View {
             // ========================================
             // Create View Model
             // ========================================
-            TreeItem item;
-
-            if (divideSize == 1) {
-                item = new TreeItem(set.sub.get(0));
-            } else {
-                item = new TreeItem(set);
-                item.setExpanded(true);
-
-                // create sub orders for UI
-                for (int i = 0; i < divideSize; i++) {
-                    item.getChildren().add(new TreeItem(set.sub.get(i)));
-                }
-            }
-            root.getChildren().add(item);
+            orderCatalog.add(set);
 
             // ========================================
             // Request to Server
@@ -257,92 +207,4 @@ public class OrderMaker extends View {
         });
     }
 
-    /**
-     * @version 2017/11/27 14:59:36
-     */
-    private static class OrderStateRow extends TreeTableRow<Object> {
-
-        /** The enhanced ui. */
-        private final UI ui = Viewtify.wrap(this);
-
-        /** The bind manager. */
-        private Disposable bind = Disposable.empty();
-
-        /**
-         * 
-         */
-        private OrderStateRow() {
-            itemProperty().addListener((s, o, n) -> {
-                if (o instanceof Order) {
-                    bind.dispose();
-                    ui.unstyle(Side.class);
-                }
-
-                if (n instanceof Order) {
-                    bind = ((Order) n).child_order_state.observeNow().to(ui::style);
-                }
-            });
-        }
-    }
-
-    /**
-     * @version 2017/11/26 12:45:18
-     */
-    private static class OrderStateValueCell
-            implements Callback<TreeTableColumn.CellDataFeatures<Object, Object>, ObservableValue<Object>> {
-
-        /** The value converter. */
-        private final Function<OrderSet, ObservableValue> forSet;
-
-        /** The value converter. */
-        private final Function<Order, ObservableValue> forOrder;
-
-        /**
-         * @param forSet
-         * @param forOrder
-         */
-        private OrderStateValueCell(Function<OrderSet, ObservableValue> forSet, Function<Order, ObservableValue> forOrder) {
-            this.forSet = forSet;
-            this.forOrder = forOrder;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public ObservableValue<Object> call(CellDataFeatures<Object, Object> features) {
-            Object value = features.getValue().getValue();
-
-            if (value instanceof OrderSet) {
-                return forSet.apply((OrderSet) value);
-            } else {
-                return forOrder.apply((Order) value);
-            }
-        }
-    }
-
-    /**
-     * @version 2017/11/27 17:12:43
-     */
-    private static class OrderStateCell extends TreeTableCell<Object, Object> {
-
-        /** The enhanced ui. */
-        private final UI ui = Viewtify.wrap(this);
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        protected void updateItem(Object item, boolean empty) {
-            super.updateItem(item, empty);
-
-            if (item != null && !empty) {
-                setText(item.toString());
-
-                if (item instanceof Side) {
-                    ui.style((Side) item);
-                }
-            }
-        }
-    }
 }
