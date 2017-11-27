@@ -19,11 +19,10 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.scene.control.Spinner;
-import javafx.scene.control.SpinnerValueFactory;
-import javafx.scene.control.TableCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableColumn.CellDataFeatures;
+import javafx.scene.control.TreeTableRow;
 import javafx.scene.control.TreeTableView;
 import javafx.scene.input.ScrollEvent;
 import javafx.util.Callback;
@@ -34,10 +33,12 @@ import org.apache.logging.log4j.Logger;
 import cointoss.MarketBackend;
 import cointoss.Order;
 import cointoss.Order.Quantity;
+import cointoss.OrderState;
 import cointoss.Side;
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.util.Num;
 import cointoss.visual.mate.console.Console;
+import kiss.Disposable;
 import kiss.I;
 import kiss.WiseBiConsumer;
 import viewtify.User;
@@ -82,36 +83,52 @@ public class OrderMaker extends View {
     /** The backend service. */
     private final OrderManager manager = I.make(OrderManager.class);
 
+    /** UI */
     private @FXML UIText orderSize;
 
+    /** UI */
     private @FXML UISpinner<Num> orderSizeAmount;
 
+    /** UI */
     private @FXML UIText orderPrice;
 
+    /** UI */
     private @FXML UISpinner<Num> orderPriceAmount;
 
+    /** UI */
     private @FXML UISpinner<Integer> orderDivideSize;
 
+    /** UI */
     private @FXML UIText orderPriceInterval;
 
+    /** UI */
     private @FXML UISpinner<Num> orderPriceIntervalAmount;
 
+    /** UI */
     private @FXML UIButton orderLimitLong;
 
+    /** UI */
     private @FXML UIButton orderLimitShort;
 
+    /** UI */
     private @FXML UIComboBox<Quantity> orderQuantity;
 
+    /** UI */
     private @FXML TreeTableView<Object> requestedOrders;
 
+    /** UI */
     private @FXML TreeTableColumn<Object, Object> requestedOrdersDate;
 
+    /** UI */
     private @FXML TreeTableColumn<Object, Object> requestedOrdersSide;
 
+    /** UI */
     private @FXML TreeTableColumn<Object, Object> requestedOrdersAmount;
 
+    /** UI */
     private @FXML TreeTableColumn<Object, Object> requestedOrdersPrice;
 
+    /** UI */
     private @FXML Console console;
 
     /** The root item. */
@@ -144,25 +161,14 @@ public class OrderMaker extends View {
 
         orderQuantity.values(Quantity.values()).initial(Quantity.GoodTillCanceled);
 
-        // columns.get(1).setCellValueFactory(e -> new
-        // SimpleObjectProperty(e.getValue().getValue().side()));
-        // columns.get(2).setCellValueFactory(e -> new
-        // SimpleObjectProperty(e.getValue().getValue().size()));
-        // columns.get(3).setCellValueFactory(e -> new
-        // SimpleObjectProperty(e.getValue().getValue().price()));
-
         requestedOrders.setRoot(root);
         requestedOrders.setShowRoot(false);
-        requestedOrdersDate.setCellValueFactory(new OrderCellValueFactory(s -> new SimpleStringProperty(""), o -> o.child_order_date));
-        requestedOrdersSide.setCellValueFactory(new OrderCellValueFactory(OrderSet::side, Order::sideProperty));
-        requestedOrdersAmount.setCellValueFactory(new OrderCellValueFactory(OrderSet::amount, Order::size));
-        requestedOrdersPrice.setCellValueFactory(new OrderCellValueFactory(OrderSet::averagePrice, Order::price));
+        requestedOrders.setRowFactory(table -> new OrderStateRow());
+        requestedOrdersDate.setCellValueFactory(new OrderStateValueCell(s -> new SimpleStringProperty(""), o -> o.child_order_date));
+        requestedOrdersSide.setCellValueFactory(new OrderStateValueCell(OrderSet::side, Order::sideProperty));
+        requestedOrdersAmount.setCellValueFactory(new OrderStateValueCell(OrderSet::amount, Order::size));
+        requestedOrdersPrice.setCellValueFactory(new OrderStateValueCell(OrderSet::averagePrice, Order::price));
 
-        // columns.get(1).setCellValueFactory(c -> new
-        // SimpleObjectProperty(c.getValue().getValue().side()));
-
-        // requestedOrdersDate.setCellValueFactory(e -> e.);
-        // requestedOrdersDate.setCellFactory(e -> new TableCell());
     }
 
     /**
@@ -208,6 +214,7 @@ public class OrderMaker extends View {
 
             for (int i = 0; i < divideSize; i++) {
                 Order order = Order.limit(side, size, price).type(quantity);
+                order.child_order_state.set(OrderState.REQUESTING);
 
                 set.sub.add(order);
 
@@ -237,74 +244,44 @@ public class OrderMaker extends View {
             // ========================================
             for (Order order : set.sub) {
                 logger.info("Request order [{}]", order);
+
                 service.request(order).to(id -> {
-                    System.out.println(id);
+                    order.child_order_acceptance_id = id;
+                    order.child_order_state.set(OrderState.ACTIVE);
+                    logger.info("Accept order [{}]", order);
                 });
             }
         });
     }
 
     /**
-     * @version 2017/11/15 0:58:48
+     * @version 2017/11/27 14:59:36
      */
-    private static class PriceValueFactory extends SpinnerValueFactory<Num> {
+    private static class OrderStateRow extends TreeTableRow<Object> {
 
-        /** The amount of step. */
-        private final Num amount;
-
-        /**
-         * @param amount
-         */
-        private PriceValueFactory(String amount) {
-            this.amount = Num.of(amount);
-            setValue(Num.ZERO);
-        }
+        /** The bind manager. */
+        private Disposable bind = Disposable.empty();
 
         /**
-         * {@inheritDoc}
+         * 
          */
-        @Override
-        public void decrement(int steps) {
-            Num value = getValue().minus(amount.multiply(steps));
-            value = Num.max(value, Num.ZERO);
+        private OrderStateRow() {
+            itemProperty().addListener((s, o, n) -> {
+                if (o instanceof Order) {
+                    bind.dispose();
+                }
 
-            setValue(value);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void increment(int steps) {
-            Num value = getValue().plus(amount.multiply(steps));
-            value = Num.min(value, Num.MAX);
-
-            setValue(value);
-        }
-    }
-
-    /**
-     * @version 2017/11/19 15:40:13
-     */
-    private class Cell extends TableCell<Order, Object> {
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        protected void updateItem(Object item, boolean empty) {
-            super.updateItem(item, empty);
-
-            if (item != null && !empty) {
-                System.out.println(item);
-            }
+                if (n instanceof Order) {
+                    bind = ((Order) n).child_order_state.observeNow().to(state -> Viewtify.style(this, state));
+                }
+            });
         }
     }
 
     /**
      * @version 2017/11/26 12:45:18
      */
-    private static class OrderCellValueFactory
+    private static class OrderStateValueCell
             implements Callback<TreeTableColumn.CellDataFeatures<Object, Object>, ObservableValue<Object>> {
 
         /** The value converter. */
@@ -317,7 +294,7 @@ public class OrderMaker extends View {
          * @param forSet
          * @param forOrder
          */
-        private OrderCellValueFactory(Function<OrderSet, ObservableValue> forSet, Function<Order, ObservableValue> forOrder) {
+        private OrderStateValueCell(Function<OrderSet, ObservableValue> forSet, Function<Order, ObservableValue> forOrder) {
             this.forSet = forSet;
             this.forOrder = forOrder;
         }

@@ -13,5 +13,5 @@ package cointoss;
  * @version 2017/07/24 14:20:21
  */
 public enum OrderState {
-    ACTIVE, COMPLETED, CANCELED, EXPIRED, REJECTED;
+    INIT, REQUESTING, ACTIVE, COMPLETED, CANCELED, EXPIRED, REJECTED;
 }

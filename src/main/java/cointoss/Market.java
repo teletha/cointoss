@@ -202,11 +202,11 @@ public class Market implements Disposable {
      */
     public final Signal<String> cancel(Order order) {
         orders.remove(order);
-        order.child_order_state = OrderState.CANCELED;
+        order.child_order_state.set(OrderState.CANCELED);
 
         return backend.cancel(order.child_order_acceptance_id).effect(id -> {
             orders.remove(order);
-            order.child_order_state = OrderState.CANCELED;
+            order.child_order_state.set(OrderState.CANCELED);
 
             for (Observer<? super Order> listener : order.cancelListeners) {
                 listener.accept(order);
@@ -222,7 +222,7 @@ public class Market implements Disposable {
      * @return
      */
     public final Signal<Order> getOrdersBy(OrderState state) {
-        return backend.getOrders().take(o -> o.child_order_state == state);
+        return backend.getOrders().take(o -> o.child_order_state.is(state));
     }
 
     /**
@@ -424,7 +424,7 @@ public class Market implements Disposable {
         order.executed_size = order.executed_size.plus(executed);
 
         if (order.outstanding_size.v.is(0)) {
-            order.child_order_state = OrderState.COMPLETED;
+            order.child_order_state.set(OrderState.COMPLETED);
             orders.remove(order); // complete order
         }
 

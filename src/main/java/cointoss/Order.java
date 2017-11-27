@@ -360,7 +360,7 @@ public class Order implements Directional {
     public OrderType child_order_type;
 
     /** Order state */
-    public OrderState child_order_state;
+    public Variable<OrderState> child_order_state = Variable.of(OrderState.INIT);
 
     /** The order date */
     public ReadOnlyObjectProperty<ZonedDateTime> child_order_date;
@@ -403,7 +403,7 @@ public class Order implements Directional {
      * @return
      */
     public final boolean isExpired() {
-        return child_order_state == OrderState.EXPIRED;
+        return child_order_state.is(OrderState.EXPIRED);
     }
 
     /**
@@ -414,7 +414,7 @@ public class Order implements Directional {
      * @return
      */
     public boolean isCanceled() {
-        return child_order_state == OrderState.CANCELED;
+        return child_order_state.is(OrderState.CANCELED);
     }
 
     /**
@@ -425,7 +425,7 @@ public class Order implements Directional {
      * @return
      */
     public final boolean isCompleted() {
-        return child_order_state == OrderState.COMPLETED;
+        return child_order_state.is(OrderState.COMPLETED);
     }
 
     /**

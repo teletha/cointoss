@@ -199,7 +199,7 @@ class TestableMarket extends Market {
      * @return
      */
     boolean validateOrderState(int active, int completed, int canceled, int expired, int rejected) {
-        Table<OrderState, Order> state = backend.getOrders().toTable(o -> o.child_order_state);
+        Table<OrderState, Order> state = backend.getOrders().toTable(o -> o.child_order_state.v);
 
         assert state.get(OrderState.ACTIVE).size() == active;
         assert state.get(OrderState.COMPLETED).size() == completed;

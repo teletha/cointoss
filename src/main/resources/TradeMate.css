@@ -88,3 +88,7 @@
 #requestedOrders .table-column {
   -fx-alignment: CENTER;
 }
+
+.tree-table-row-cell.REQUESTING .cell {
+  -fx-text-fill: rgb(60, 60, 60);
+}
