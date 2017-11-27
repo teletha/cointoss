@@ -7,7 +7,7 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss.visual.mate;
+package cointoss.visual.mate.console;
 
 import static java.util.concurrent.TimeUnit.*;
 
@@ -33,9 +33,12 @@ import viewtify.ui.UIListView;
  */
 public class Console extends View {
 
+    /** The maximum line size. */
+    private static final int MAX = 3000;
+
     private @FXML UIListView<String> console;
 
-    private final ObservableList<String> messages = FXCollections.observableList(new LinkedList());
+    final ObservableList<String> messages = FXCollections.observableList(new LinkedList());
 
     /**
      * {@inheritDoc}
@@ -46,6 +49,21 @@ public class Console extends View {
 
         Viewtify.inWorker(() -> {
             return new Market(BitFlyer.FX_BTC_JPY.service(), BitFlyer.FX_BTC_JPY.log().fromLast(10, ChronoUnit.SECONDS), new Trader());
+        });
+    }
+
+    /**
+     * Write message to console.
+     * 
+     * @param message
+     */
+    public void write(String message) {
+        Viewtify.inUI(() -> {
+            messages.add(0, message);
+
+            if (MAX < messages.size()) {
+                messages.remove(messages.size() - 1);
+            }
         });
     }
 
@@ -76,13 +94,7 @@ public class Console extends View {
                 // 値段が上がりづらい要因
                 // ・買いが少ない long volumeの量が小さい
                 // ・売り方が厚い longPriceIncrease / longVolumeが小さい
-                Viewtify.inUI(() -> {
-                    messages.add(0, builder.toString());
-
-                    if (2000 < messages.size()) {
-                        messages.remove(messages.size() - 1);
-                    }
-                });
+                write(builder.toString());
             });
         }
     }

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration status="error">
+<Configuration status="error" packages="cointoss.visual.mate.console">
 
     <!-- Properties -->
     <Properties>
@@ -8,13 +8,13 @@
 
     <!-- Console Appender -->
     <Appenders>
-        <Console name="CONSOLE_APPENDER" target="SYSTEM_OUT">
+        <Console name="SYSTEM" target="SYSTEM_OUT">
             <PatternLayout pattern="${pattern}" />
         </Console>
 
         <!-- Rolling File Appender -->
-        <RollingFile name="FILE_APPERNDER"
-            fileName=".log/TradeMate/log.txt"
+        <RollingFile name="FILE"
+            fileName=".log/TradeMate/trade.log"
             filePattern=".jackpot/log%d{yyyyMMdd}.txt">
             <PatternLayout pattern="${pattern}" />
             <Policies>
@@ -22,12 +22,17 @@
             </Policies>
             <DefaultRolloverStrategy max="9" />
         </RollingFile>
+        
+        <UI name="UI">
+            <PatternLayout pattern="${pattern}" />
+        </UI>
     </Appenders>
 
     <Loggers>
         <Root level="info">
-            <AppenderRef ref="CONSOLE_APPENDER" />
-            <AppenderRef ref="FILE_APPERNDER" />
+            <AppenderRef ref="SYSTEM" />
+            <AppenderRef ref="FILE" />
+            <AppenderRef ref="UI" />
         </Root>
     </Loggers>
 </Configuration>

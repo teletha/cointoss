@@ -37,7 +37,7 @@ import cointoss.Order.Quantity;
 import cointoss.Side;
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.util.Num;
-import cointoss.visual.mate.Console;
+import cointoss.visual.mate.console.Console;
 import kiss.I;
 import kiss.WiseBiConsumer;
 import viewtify.User;
