@@ -28,12 +28,16 @@ import javafx.scene.control.TreeTableView;
 import javafx.scene.input.ScrollEvent;
 import javafx.util.Callback;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import cointoss.MarketBackend;
 import cointoss.Order;
 import cointoss.Order.Quantity;
 import cointoss.Side;
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.util.Num;
+import cointoss.visual.mate.Console;
 import kiss.I;
 import kiss.WiseBiConsumer;
 import viewtify.User;
@@ -47,7 +51,10 @@ import viewtify.ui.UIText;
 /**
  * @version 2017/11/14 23:47:09
  */
-public class OrderControl extends View {
+public class OrderMaker extends View {
+
+    /** LOGGING */
+    private static final Logger logger = LogManager.getLogger();
 
     private Predicate<UIText> positiveNumber = ui -> {
         try {
@@ -104,6 +111,8 @@ public class OrderControl extends View {
     private @FXML TreeTableColumn<Object, Object> requestedOrdersAmount;
 
     private @FXML TreeTableColumn<Object, Object> requestedOrdersPrice;
+
+    private @FXML Console console;
 
     /** The root item. */
     private final TreeItem<Object> root = new TreeItem();
@@ -201,9 +210,6 @@ public class OrderControl extends View {
                 Order order = Order.limit(side, size, price).type(quantity);
 
                 set.sub.add(order);
-                service.request(order).to(id -> {
-                    System.out.println(id);
-                });
 
                 price = price.plus(priceInterval);
             }
@@ -225,6 +231,16 @@ public class OrderControl extends View {
                 }
             }
             root.getChildren().add(item);
+
+            // ========================================
+            // Request to Server
+            // ========================================
+            for (Order order : set.sub) {
+                logger.info("Request order [{}]", order);
+                service.request(order).to(id -> {
+                    System.out.println(id);
+                });
+            }
         });
     }
 

@@ -65,7 +65,7 @@ public class ExecutionView extends View {
 
                     bigs.add(0, e);
 
-                    if (100 < bigs.size()) {
+                    if (1000 < bigs.size()) {
                         bigs.remove(bigs.size() - 1);
                     }
                 }
