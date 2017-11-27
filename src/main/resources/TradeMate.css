@@ -58,15 +58,23 @@
 /* ==========================================================================
 
 ===========================================================================*/
-#shortList .list-cell {
+.BUY {
+	-fx-text-fill: rgb(251, 189, 42);
+}
+
+.SELL {
 	-fx-text-fill: rgba(247, 105, 77, 1);
+}
+
+#shortList .list-cell {
+	-fx-text-fill: inherit;
   -fx-label-padding: 0 0 0 70px;
   -fx-background-color: rgba(247, 105, 77, 0.2);
   -fx-background-insets: 0 300px 0 0;
 }
 
 #longList .list-cell {
-	-fx-text-fill: rgb(251, 189, 42);
+	-fx-text-fill: inherit;
   -fx-label-padding: 0 0 0 70px;
   -fx-background-color: rgba(251, 189, 42, 0.2);
   -fx-background-insets: 0 300px 0 0;
@@ -74,15 +82,6 @@
 
 #priceLatest {
 	-fx-label-padding: 0 0 0 8px;
-}
-
-#orderLimitShort, #orderMarketShort {
-	-fx-text-fill: rgba(247, 105, 77, 1);
-}
-
-
-#orderLimitLong, #orderMarketLong {
-	-fx-text-fill: rgb(251, 189, 42);
 }
 
 #requestedOrders .table-column {

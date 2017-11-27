@@ -21,15 +21,13 @@ import cointoss.Execution;
 import cointoss.market.bitflyer.BitFlyer;
 import viewtify.View;
 import viewtify.Viewtify;
+import viewtify.ui.UI;
 import viewtify.ui.UISpinner;
 
 /**
  * @version 2017/11/13 20:36:45
  */
 public class ExecutionView extends View {
-
-    /** The curretn theme. */
-    private static final Theme theme = Theme.now();
 
     /** The execution list. */
     private @FXML ListView<Execution> executionList;
@@ -81,6 +79,9 @@ public class ExecutionView extends View {
         /** The time format. */
         private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
 
+        /** The enhanced ui. */
+        private final UI ui = Viewtify.wrap(this);
+
         /**
          * {@inheritDoc}
          */
@@ -93,7 +94,7 @@ public class ExecutionView extends View {
                 setGraphic(null);
             } else {
                 setText(formatter.format(e.exec_date.plusHours(9)) + "  " + e.price + "円  " + e.cumulativeSize.scale(6));
-                setTextFill(e.side.isBuy() ? theme.buy() : theme.sell());
+                ui.style(e.side);
             }
         }
     }

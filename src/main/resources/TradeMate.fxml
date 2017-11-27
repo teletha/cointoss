@@ -134,12 +134,12 @@
                         <Label alignment="CENTER" prefHeight="40.0" prefWidth="60.0" style="&#10;" text="指値" textAlignment="CENTER" wrapText="false" />
                         <HBox alignment="CENTER_LEFT" prefWidth="140.0">
                            <children>
-                              <Button id="orderLimitShort" mnemonicParsing="false" prefHeight="35.0" prefWidth="60.0" text="売り" textAlignment="CENTER" textFill="#9f9f9f">
+                              <Button id="orderLimitShort" mnemonicParsing="false" prefHeight="35.0" prefWidth="60.0" styleClass="SELL" text="売り" textAlignment="CENTER" textFill="#9f9f9f">
                                  <HBox.margin>
                                     <Insets />
                                  </HBox.margin>
                               </Button>
-                              <Button id="orderLimitLong" alignment="CENTER" mnemonicParsing="false" prefHeight="35.0" prefWidth="60.0" text="買い" textAlignment="CENTER" textFill="#9f9f9f">
+                              <Button id="orderLimitLong" alignment="CENTER" mnemonicParsing="false" prefHeight="35.0" prefWidth="60.0" styleClass="BUY" text="買い" textAlignment="CENTER" textFill="#9f9f9f">
                                  <HBox.margin>
                                     <Insets />
                                  </HBox.margin>
@@ -157,12 +157,12 @@
                         <Label alignment="CENTER" prefHeight="40.0" prefWidth="60.0" style="&#10;" text="成行" textAlignment="CENTER" wrapText="false" />
                         <HBox alignment="CENTER_LEFT" prefWidth="200.0">
                            <children>
-                              <Button id="orderMarketShort" mnemonicParsing="false" prefHeight="35.0" prefWidth="60.0" text="売り" textAlignment="CENTER" textFill="#9f9f9f">
+                              <Button id="orderMarketShort" mnemonicParsing="false" prefHeight="35.0" prefWidth="60.0" styleClass="SELL" text="売り" textAlignment="CENTER" textFill="#9f9f9f">
                                  <HBox.margin>
                                     <Insets />
                                  </HBox.margin>
                               </Button>
-                              <Button id="orderMarketLong" alignment="CENTER" mnemonicParsing="false" prefHeight="35.0" prefWidth="60.0" text="買い" textAlignment="CENTER" textFill="#9f9f9f">
+                              <Button id="orderMarketLong" alignment="CENTER" mnemonicParsing="false" prefHeight="35.0" prefWidth="60.0" styleClass="BUY" text="買い" textAlignment="CENTER" textFill="#9f9f9f">
                                  <HBox.margin>
                                     <Insets />
                                  </HBox.margin>
@@ -181,7 +181,7 @@
             </VBox>
             <VBox alignment="CENTER" maxWidth="220.0" minWidth="220.0">
                <children>
-                  <ListView id="shortList" focusTraversable="false" VBox.vgrow="ALWAYS">
+                  <ListView id="shortList" focusTraversable="false" styleClass="SELL" VBox.vgrow="ALWAYS">
                      <VBox.margin>
                         <Insets />
                      </VBox.margin>
@@ -199,7 +199,7 @@
                         </Label>
                      </children>
                   </HBox>
-                  <ListView id="longList" focusTraversable="false" VBox.vgrow="ALWAYS">
+                  <ListView id="longList" focusTraversable="false" styleClass="BUY" VBox.vgrow="ALWAYS">
                      <cursor>
                         <Cursor fx:constant="DEFAULT" />
                      </cursor></ListView>

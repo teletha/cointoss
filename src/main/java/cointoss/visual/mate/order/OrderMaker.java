@@ -20,6 +20,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeTableCell;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableColumn.CellDataFeatures;
 import javafx.scene.control.TreeTableRow;
@@ -44,6 +45,7 @@ import kiss.WiseBiConsumer;
 import viewtify.User;
 import viewtify.View;
 import viewtify.Viewtify;
+import viewtify.ui.UI;
 import viewtify.ui.UIButton;
 import viewtify.ui.UIComboBox;
 import viewtify.ui.UISpinner;
@@ -166,6 +168,7 @@ public class OrderMaker extends View {
         requestedOrders.setRowFactory(table -> new OrderStateRow());
         requestedOrdersDate.setCellValueFactory(new OrderStateValueCell(s -> new SimpleStringProperty(""), o -> o.child_order_date));
         requestedOrdersSide.setCellValueFactory(new OrderStateValueCell(OrderSet::side, Order::sideProperty));
+        requestedOrdersSide.setCellFactory(table -> new OrderStateCell());
         requestedOrdersAmount.setCellValueFactory(new OrderStateValueCell(OrderSet::amount, Order::size));
         requestedOrdersPrice.setCellValueFactory(new OrderStateValueCell(OrderSet::averagePrice, Order::price));
 
@@ -259,6 +262,9 @@ public class OrderMaker extends View {
      */
     private static class OrderStateRow extends TreeTableRow<Object> {
 
+        /** The enhanced ui. */
+        private final UI ui = Viewtify.wrap(this);
+
         /** The bind manager. */
         private Disposable bind = Disposable.empty();
 
@@ -269,10 +275,11 @@ public class OrderMaker extends View {
             itemProperty().addListener((s, o, n) -> {
                 if (o instanceof Order) {
                     bind.dispose();
+                    ui.unstyle(Side.class);
                 }
 
                 if (n instanceof Order) {
-                    bind = ((Order) n).child_order_state.observeNow().to(state -> Viewtify.style(this, state));
+                    bind = ((Order) n).child_order_state.observeNow().to(ui::style);
                 }
             });
         }
@@ -310,6 +317,31 @@ public class OrderMaker extends View {
                 return forSet.apply((OrderSet) value);
             } else {
                 return forOrder.apply((Order) value);
+            }
+        }
+    }
+
+    /**
+     * @version 2017/11/27 17:12:43
+     */
+    private static class OrderStateCell extends TreeTableCell<Object, Object> {
+
+        /** The enhanced ui. */
+        private final UI ui = Viewtify.wrap(this);
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected void updateItem(Object item, boolean empty) {
+            super.updateItem(item, empty);
+
+            if (item != null && !empty) {
+                setText(item.toString());
+
+                if (item instanceof Side) {
+                    ui.style((Side) item);
+                }
             }
         }
     }
