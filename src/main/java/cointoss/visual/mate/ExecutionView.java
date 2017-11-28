@@ -38,6 +38,16 @@ public class ExecutionView extends View {
     /** UI for interval configuration. */
     private @FXML UISpinner<Integer> takerSize;
 
+    /** Application. */
+    private final TradeMate mate;
+
+    /**
+     * @param mate
+     */
+    private ExecutionView(TradeMate mate) {
+        this.mate = mate;
+    }
+
     /**
      * {@inheritDoc}
      */

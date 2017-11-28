@@ -9,27 +9,40 @@
  */
 package cointoss.visual.mate;
 
-import java.net.URL;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
-import cointoss.util.Num;
-import kiss.I;
+import cointoss.Market;
+import cointoss.market.bitflyer.BitFlyer;
 import viewtify.Viewtify;
+import viewtify.Viewty;
 
 /**
  * @version 2017/11/13 16:58:58
  */
 public class TradeMate extends Viewtify {
 
-    static {
-        I.load(Num.Codec.class, false);
+    /** Cache for markets. */
+    private final Map<Object, Market> markets = new ConcurrentHashMap();
+
+    /**
+     * Select the trading market.
+     * 
+     * @param bitFlyer
+     * @return
+     */
+    public final Market tradeAt(BitFlyer bitFlyer) {
+        return markets.computeIfAbsent(bitFlyer, key -> {
+            return new Market(bitFlyer.service(), bitFlyer.log().fromToday());
+        });
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected URL fxml() {
-        return ClassLoader.getSystemClassLoader().getResource("TradeMate.fxml");
+    protected Class<? extends Viewty> view() {
+        return MainView.class;
     }
 
     /**
@@ -38,6 +51,6 @@ public class TradeMate extends Viewtify {
      * @param args
      */
     public static void main(String[] args) {
-        launch(TradeMate.class);
+        activate(TradeMate.class);
     }
 }
