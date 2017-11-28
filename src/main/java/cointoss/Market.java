@@ -12,7 +12,6 @@ package cointoss;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -119,21 +118,44 @@ public class Market implements Disposable {
     final List<Trading> tradings = new ArrayList<>();
 
     /**
-     * @param backend
-     * @param builder
-     * @param strategy
+     * Market without {@link Trading}.
+     * 
+     * @param backend A market backend.
+     * @param log A market execution log.
      */
-    public Market(MarketBackend backend, Signal<Execution> log, Trading strategy) {
-        this.backend = Objects.requireNonNull(backend);
+    public Market(MarketBackend backend, Signal<Execution> log) {
+        this(backend, log, null);
+    }
+
+    /**
+     * Market with {@link Trading}.
+     * 
+     * @param backend A market backend.
+     * @param log A market execution log.
+     * @param trading A trading strategy.
+     */
+    public Market(MarketBackend backend, Signal<Execution> log, Trading trading) {
+        if (backend == null) {
+            throw new Error("Market is not found.");
+        }
+
+        if (log == null) {
+            throw new Error("Market log is not found.");
+        }
+
+        if (trading == null) {
+            trading = new NOP();
+        }
+
+        this.backend = backend;
 
         // initialize price, balance and executions
-        List<BalanceUnit> units = backend.getCurrency().toList();
-        this.base = this.baseInit = units.get(0).amount;
-        this.target = this.targetInit = units.get(1).amount;
+        this.base = backend.getBaseCurrency().to().v;
+        this.target = backend.getTargetCurrency().to().v;
 
-        tradings.add(strategy);
-        strategy.market = this;
-        strategy.initialize();
+        tradings.add(trading);
+        trading.market = this;
+        trading.initialize();
         backend.initialize(this, log);
     }
 
@@ -463,5 +485,19 @@ public class Market implements Disposable {
     private void initializePosition() {
         position = null;
         price = remaining = Num.ZERO;
+    }
+
+    /**
+     * @version 2017/11/28 9:22:17
+     */
+    private static class NOP extends Trading {
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected void initialize() {
+            // do nothing
+        }
     }
 }

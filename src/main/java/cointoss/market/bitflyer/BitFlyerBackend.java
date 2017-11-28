@@ -205,9 +205,18 @@ class BitFlyerBackend implements MarketBackend {
      * {@inheritDoc}
      */
     @Override
-    public Signal<BalanceUnit> getCurrency() {
-        return call("GET", "/v1/me/getbalance", "", "*", BalanceUnit.class)
-                .take(unit -> unit.currency_code.equals("JPY") || unit.currency_code.equals("BTC"));
+    public Signal<Num> getBaseCurrency() {
+        return call("GET", "/v1/me/getbalance", "", "*", CurrencyState.class).take(unit -> unit.currency_code.equals("JPY"))
+                .map(c -> c.available);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Signal<Num> getTargetCurrency() {
+        return call("GET", "/v1/me/getbalance", "", "*", CurrencyState.class).take(unit -> unit.currency_code.equals("BTC"))
+                .map(c -> c.available);
     }
 
     /**
@@ -382,5 +391,20 @@ class BitFlyerBackend implements MarketBackend {
         public String product_code;
 
         public String child_order_acceptance_id;
+    }
+
+    /**
+     * @version 2017/11/28 9:28:38
+     */
+    private static class CurrencyState {
+
+        /** The currency code. */
+        public String currency_code;
+
+        /** The total currency amount. */
+        public Num amount;
+
+        /** The available currency amount. */
+        public Num available;
     }
 }

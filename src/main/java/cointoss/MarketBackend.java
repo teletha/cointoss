@@ -9,6 +9,7 @@
  */
 package cointoss;
 
+import cointoss.util.Num;
 import kiss.Disposable;
 import kiss.Signal;
 
@@ -105,12 +106,21 @@ public interface MarketBackend extends Disposable {
 
     /**
      * <p>
-     * Get amount of the base and target currency.
+     * Get amount of the base currency.
      * </p>
      * 
      * @return
      */
-    Signal<BalanceUnit> getCurrency();
+    Signal<Num> getBaseCurrency();
+
+    /**
+     * <p>
+     * Get amount of the target currency.
+     * </p>
+     * 
+     * @return
+     */
+    Signal<Num> getTargetCurrency();
 
     /**
      * <p>

@@ -154,16 +154,16 @@ class TestableMarketBackend implements MarketBackend {
      * {@inheritDoc}
      */
     @Override
-    public Signal<BalanceUnit> getCurrency() {
-        BalanceUnit base = new BalanceUnit();
-        base.currency_code = "JPY";
-        base.amount = base.available = Num.HUNDRED;
+    public Signal<Num> getBaseCurrency() {
+        return I.signal(Num.HUNDRED);
+    }
 
-        BalanceUnit target = new BalanceUnit();
-        target.currency_code = "BTC";
-        target.amount = target.available = Num.ZERO;
-
-        return I.signal(base, target);
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Signal<Num> getTargetCurrency() {
+        return I.signal(Num.ZERO);
     }
 
     /**

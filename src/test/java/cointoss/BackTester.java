@@ -173,16 +173,16 @@ public class BackTester {
          * {@inheritDoc}
          */
         @Override
-        public Signal<BalanceUnit> getCurrency() {
-            BalanceUnit base = new BalanceUnit();
-            base.currency_code = "JPY";
-            base.amount = base.available = BackTester.this.base;
+        public Signal<Num> getBaseCurrency() {
+            return I.signal(BackTester.this.base);
+        }
 
-            BalanceUnit target = new BalanceUnit();
-            target.currency_code = "BTC";
-            target.amount = target.available = BackTester.this.target;
-
-            return I.signal(base, target);
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Signal<Num> getTargetCurrency() {
+            return I.signal(BackTester.this.target);
         }
     }
 }

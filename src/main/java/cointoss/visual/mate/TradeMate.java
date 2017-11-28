@@ -38,6 +38,6 @@ public class TradeMate extends Viewtify {
      * @param args
      */
     public static void main(String[] args) {
-        launch(args);
+        launch(TradeMate.class);
     }
 }
