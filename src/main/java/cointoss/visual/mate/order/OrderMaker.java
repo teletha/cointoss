@@ -32,8 +32,8 @@ import cointoss.visual.mate.console.Console;
 import kiss.I;
 import kiss.WiseBiConsumer;
 import viewtify.User;
+import viewtify.View;
 import viewtify.Viewtify;
-import viewtify.Viewty;
 import viewtify.ui.UIButton;
 import viewtify.ui.UIComboBox;
 import viewtify.ui.UISpinner;
@@ -42,7 +42,7 @@ import viewtify.ui.UIText;
 /**
  * @version 2017/11/27 23:21:48
  */
-public class OrderMaker extends Viewty {
+public class OrderMaker extends View {
 
     /** LOGGING */
     private static final Logger logger = LogManager.getLogger();
@@ -110,9 +110,10 @@ public class OrderMaker extends Viewty {
     private @FXML Console console;
 
     /**
-     * 
+     * {@inheritDoc}
      */
-    private OrderMaker() {
+    @Override
+    protected void initialize() {
         orderSize.initial("0").when(User.Scroll, changeBy(orderSizeAmount.ui)).require(positiveNumber);
         orderSizeAmount.values(Num.of("0.01"), Num.of("0.1"), Num.ONE).initial(Num.ONE);
 

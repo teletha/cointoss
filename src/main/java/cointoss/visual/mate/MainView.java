@@ -12,20 +12,21 @@ package cointoss.visual.mate;
 import javafx.fxml.FXML;
 
 import cointoss.market.bitflyer.BitFlyer;
-import viewtify.Viewty;
+import viewtify.View;
 import viewtify.ui.UITabPane;
 
 /**
  * @version 2017/11/29 8:18:42
  */
-public class MainView extends Viewty {
+public class MainView extends View {
 
     private @FXML UITabPane main;
 
     /**
-     * 
+     * {@inheritDoc}
      */
-    private MainView() {
+    @Override
+    protected void initialize() {
         main.load(BitFlyer.FX_BTC_JPY.fullName(), () -> new TradingView(BitFlyer.FX_BTC_JPY)).initial(0);
     }
 }

@@ -19,15 +19,15 @@ import javafx.scene.control.ListView;
 
 import cointoss.Execution;
 import cointoss.market.bitflyer.BitFlyer;
+import viewtify.View;
 import viewtify.Viewtify;
-import viewtify.Viewty;
 import viewtify.ui.UI;
 import viewtify.ui.UISpinner;
 
 /**
  * @version 2017/11/13 20:36:45
  */
-public class ExecutionView extends Viewty {
+public class ExecutionView extends View {
 
     /** The execution list. */
     private @FXML ListView<Execution> executionList;
@@ -38,15 +38,11 @@ public class ExecutionView extends Viewty {
     /** UI for interval configuration. */
     private @FXML UISpinner<Integer> takerSize;
 
-    /** Application. */
-    private final TradeMate mate;
-
     /**
-     * @param mate
+     * {@inheritDoc}
      */
-    private ExecutionView(TradeMate mate) {
-        this.mate = mate;
-
+    @Override
+    protected void initialize() {
         // configure UI
         executionList.setCellFactory(v -> new Cell());
         executionCumulativeList.setCellFactory(v -> new Cell());

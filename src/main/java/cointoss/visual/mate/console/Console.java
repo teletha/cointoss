@@ -24,14 +24,14 @@ import cointoss.ExecutionFlow;
 import cointoss.Market;
 import cointoss.Trading;
 import cointoss.market.bitflyer.BitFlyer;
+import viewtify.View;
 import viewtify.Viewtify;
-import viewtify.Viewty;
 import viewtify.ui.UIListView;
 
 /**
  * @version 2017/11/19 6:48:15
  */
-public class Console extends Viewty {
+public class Console extends View {
 
     /** The maximum line size. */
     private static final int MAX = 3000;
@@ -41,9 +41,11 @@ public class Console extends Viewty {
     final ObservableList<String> messages = FXCollections.observableList(new LinkedList());
 
     /**
-     * 
+     * {@inheritDoc}
      */
-    private Console() {
+    @Override
+    protected void initialize() {
+        System.out.println("init console");
         console.values(messages);
 
         Viewtify.inWorker(() -> {

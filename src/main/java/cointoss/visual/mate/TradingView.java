@@ -9,22 +9,51 @@
  */
 package cointoss.visual.mate;
 
+import javafx.fxml.FXML;
+
 import cointoss.market.bitflyer.BitFlyer;
-import viewtify.Viewty;
+import cointoss.visual.mate.board.MarketBoardView;
+import cointoss.visual.mate.console.Console;
+import cointoss.visual.mate.order.OrderCatalog;
+import cointoss.visual.mate.order.OrderMaker;
+import viewtify.View;
 
 /**
  * @version 2017/11/29 10:50:06
  */
-public class TradingView extends Viewty {
+public class TradingView extends View {
 
-    // private @FXML ExecutionView executionView;
+    private final BitFlyer market;
+
+    private @FXML ExecutionView executionView;
+
+    private @FXML Console console;
+
+    private @FXML MarketBoardView board;
+
+    private @FXML OrderMaker maker;
+
+    private @FXML OrderCatalog catalog;
 
     /**
      * 
      */
     public TradingView(BitFlyer market) {
-        System.out.println(market);
+        this.market = market;
+    }
 
-        System.out.println(root().lookup(".SELL"));
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void initialize() {
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String id() {
+        return TradingView.class.getSimpleName() + "-" + market.fullName();
     }
 }

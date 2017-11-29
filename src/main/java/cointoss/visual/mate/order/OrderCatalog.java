@@ -32,8 +32,8 @@ import cointoss.Side;
 import cointoss.market.bitflyer.BitFlyer;
 import kiss.Disposable;
 import kiss.I;
+import viewtify.View;
 import viewtify.Viewtify;
-import viewtify.Viewty;
 import viewtify.ui.UI;
 import viewtify.ui.UIContextMenu;
 import viewtify.ui.UIMenuItem;
@@ -41,7 +41,7 @@ import viewtify.ui.UIMenuItem;
 /**
  * @version 2017/11/26 14:05:31
  */
-class OrderCatalog extends Viewty {
+public class OrderCatalog extends View {
 
     /** LOGGING */
     private static final Logger logger = LogManager.getLogger();
@@ -70,9 +70,10 @@ class OrderCatalog extends Viewty {
     private final TreeItem<Object> root = new TreeItem();
 
     /**
-     * 
+     * {@inheritDoc}
      */
-    private OrderCatalog() {
+    @Override
+    protected void initialize() {
         requestedOrders.setRoot(root);
         requestedOrders.setShowRoot(false);
         requestedOrders.setRowFactory(table -> new OrderStateRow());
