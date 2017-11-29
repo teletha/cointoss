@@ -32,8 +32,8 @@ import cointoss.Side;
 import cointoss.market.bitflyer.BitFlyer;
 import kiss.Disposable;
 import kiss.I;
-import viewtify.View;
 import viewtify.Viewtify;
+import viewtify.Viewty;
 import viewtify.ui.UI;
 import viewtify.ui.UIContextMenu;
 import viewtify.ui.UIMenuItem;
@@ -41,7 +41,7 @@ import viewtify.ui.UIMenuItem;
 /**
  * @version 2017/11/26 14:05:31
  */
-class OrderCatalog extends View {
+class OrderCatalog extends Viewty {
 
     /** LOGGING */
     private static final Logger logger = LogManager.getLogger();
@@ -70,10 +70,9 @@ class OrderCatalog extends View {
     private final TreeItem<Object> root = new TreeItem();
 
     /**
-     * {@inheritDoc}
+     * 
      */
-    @Override
-    protected void initialize() {
+    private OrderCatalog() {
         requestedOrders.setRoot(root);
         requestedOrders.setShowRoot(false);
         requestedOrders.setRowFactory(table -> new OrderStateRow());
@@ -119,7 +118,7 @@ class OrderCatalog extends View {
     private class OrderStateRow extends TreeTableRow<Object> {
 
         /** The enhanced ui. */
-        private final UI ui = Viewtify.wrap(this);
+        private final UI ui = Viewtify.wrap(this, OrderCatalog.this);
 
         /** The bind manager. */
         private Disposable bind = Disposable.empty();
@@ -211,10 +210,10 @@ class OrderCatalog extends View {
     /**
      * @version 2017/11/27 17:12:43
      */
-    private static class OrderStateCell extends TreeTableCell<Object, Object> {
+    private class OrderStateCell extends TreeTableCell<Object, Object> {
 
         /** The enhanced ui. */
-        private final UI ui = Viewtify.wrap(this);
+        private final UI ui = Viewtify.wrap(this, OrderCatalog.this);
 
         /**
          * {@inheritDoc}

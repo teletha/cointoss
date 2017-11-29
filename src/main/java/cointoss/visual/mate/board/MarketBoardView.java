@@ -28,15 +28,15 @@ import cointoss.Execution;
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.util.Num;
 import kiss.I;
-import viewtify.View;
 import viewtify.Viewtify;
+import viewtify.Viewty;
 import viewtify.ui.UIListView;
 import viewtify.ui.UISpinner;
 
 /**
  * @version 2017/11/14 19:16:13
  */
-public class MarketBoardView extends View {
+public class MarketBoardView extends Viewty {
 
     /** Model for maker. */
     private final SortableGroupList long1000 = new SortableGroupList(true, -3);
@@ -81,10 +81,9 @@ public class MarketBoardView extends View {
     private @FXML TextField orderPrice;
 
     /**
-     * {@inheritDoc}
+     * 
      */
-    @Override
-    protected void initialize() {
+    private MarketBoardView() {
         longList.values(long1.list).cell(e -> new CellView());
         shortList.values(short1.list).cell(e -> new CellView()).scrollTo(short1.list.size() - 1);
         priceRange.values(I.signal(long1, short1, long10, short10, long100, short100, long1000, short1000).buffer(2).toList())

@@ -14,13 +14,13 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import cointoss.Market;
 import cointoss.market.bitflyer.BitFlyer;
+import viewtify.ActivationPolicy;
 import viewtify.Viewtify;
-import viewtify.Viewty;
 
 /**
  * @version 2017/11/13 16:58:58
  */
-public class TradeMate extends Viewtify {
+public class TradeMate {
 
     /** Cache for markets. */
     private final Map<Object, Market> markets = new ConcurrentHashMap();
@@ -38,19 +38,11 @@ public class TradeMate extends Viewtify {
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected Class<? extends Viewty> view() {
-        return MainView.class;
-    }
-
-    /**
      * Entry point.
      * 
      * @param args
      */
     public static void main(String[] args) {
-        activate(TradeMate.class);
+        Viewtify.activate(MainView.class, ActivationPolicy.Latest);
     }
 }

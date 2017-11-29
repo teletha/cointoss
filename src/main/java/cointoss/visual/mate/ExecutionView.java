@@ -19,15 +19,15 @@ import javafx.scene.control.ListView;
 
 import cointoss.Execution;
 import cointoss.market.bitflyer.BitFlyer;
-import viewtify.View;
 import viewtify.Viewtify;
+import viewtify.Viewty;
 import viewtify.ui.UI;
 import viewtify.ui.UISpinner;
 
 /**
  * @version 2017/11/13 20:36:45
  */
-public class ExecutionView extends View {
+public class ExecutionView extends Viewty {
 
     /** The execution list. */
     private @FXML ListView<Execution> executionList;
@@ -46,13 +46,7 @@ public class ExecutionView extends View {
      */
     private ExecutionView(TradeMate mate) {
         this.mate = mate;
-    }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void initialize() {
         // configure UI
         executionList.setCellFactory(v -> new Cell());
         executionCumulativeList.setCellFactory(v -> new Cell());
@@ -81,16 +75,16 @@ public class ExecutionView extends View {
         });
     }
 
+    /** The time format. */
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+
     /**
      * @version 2017/11/13 21:35:32
      */
-    private static class Cell extends ListCell<Execution> {
-
-        /** The time format. */
-        private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+    private class Cell extends ListCell<Execution> {
 
         /** The enhanced ui. */
-        private final UI ui = Viewtify.wrap(this);
+        private final UI ui = Viewtify.wrap(this, ExecutionView.this);
 
         /**
          * {@inheritDoc}
