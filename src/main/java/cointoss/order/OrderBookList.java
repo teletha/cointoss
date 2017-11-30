@@ -92,7 +92,7 @@ public class OrderBookList {
      * 
      * @param hint A price hint.
      */
-    void fix(Num hint) {
+    public void fix(Num hint) {
         if (side == Side.BUY) {
             Iterator<OrderUnit> iterator = x1.iterator();
 
@@ -116,6 +116,24 @@ public class OrderBookList {
                 }
             }
         }
+    }
+
+    /**
+     * Retrieve minimum unit.
+     * 
+     * @return
+     */
+    public OrderUnit min() {
+        return x1.get(x1.size() - 1);
+    }
+
+    /**
+     * Retrieve maximum unit.
+     * 
+     * @return
+     */
+    public OrderUnit max() {
+        return x1.get(0);
     }
 
     /**

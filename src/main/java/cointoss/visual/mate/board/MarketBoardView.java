@@ -11,20 +11,16 @@ package cointoss.visual.mate.board;
 
 import static java.util.concurrent.TimeUnit.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.TextField;
 
-import org.magicwerk.brownies.collections.GapList;
-
-import cointoss.Execution;
 import cointoss.market.bitflyer.BitFlyer;
+import cointoss.order.OrderBook;
 import cointoss.order.OrderUnit;
 import cointoss.util.Num;
 import kiss.I;
@@ -39,37 +35,16 @@ import viewtify.ui.UISpinner;
 public class MarketBoardView extends View {
 
     /** Model for maker. */
-    private final SortableGroupList long1000 = new SortableGroupList(true, -3);
-
-    /** Model for maker. */
-    private final SortableGroupList long100 = new SortableGroupList(true, -2);
-
-    /** Model for maker. */
-    private final SortableGroupList long10 = new SortableGroupList(true, -1);
-
-    /** Model for maker. */
-    private SortableUnitList long1 = new SortableUnitList(true, long10, long100, long1000);
+    private final OrderBook book = new OrderBook();
 
     /** UI for long maker. */
     private @FXML UIListView<OrderUnit> longList;
-
-    /** Model for maker. */
-    private final SortableGroupList short1000 = new SortableGroupList(false, -3);
-
-    /** Model for maker. */
-    private final SortableGroupList short100 = new SortableGroupList(false, -2);
-
-    /** Model for maker. */
-    private final SortableGroupList short10 = new SortableGroupList(false, -1);
-
-    /** Model for maker. */
-    private final SortableUnitList short1 = new SortableUnitList(false, short10, short100, short1000);
 
     /** UI for maker. */
     private @FXML UIListView<OrderUnit> shortList;
 
     /** UI for interval configuration. */
-    private @FXML UISpinner<List<SortableUnitList>> priceRange;
+    private @FXML UISpinner<List<ObservableList<OrderUnit>>> priceRange;
 
     /** UI for interval configuration. */
     private @FXML Label priceLatest;
@@ -85,28 +60,29 @@ public class MarketBoardView extends View {
      */
     @Override
     protected void initialize() {
-        longList.values(long1.list).cell(e -> new CellView());
-        shortList.values(short1.list).cell(e -> new CellView()).scrollTo(short1.list.size() - 1);
-        priceRange.values(I.signal(long1, short1, long10, short10, long100, short100, long1000, short1000).buffer(2).toList())
-                .text(e -> e.get(0).toString())
-                .observe(e -> {
-                    longList.values(e.get(0).list);
-                    shortList.values(e.get(1).list);
+        longList.values(book.longs.x1).cell(e -> new CellView());
+        shortList.values(book.shorts.x1).cell(e -> new CellView()).scrollTo(book.shorts.x1.size() - 1);
+        priceRange.values(I
+                .signal(book.longs.x1, book.shorts.x1, book.longs.x10, book.shorts.x10, book.longs.x100, book.shorts.x100, book.longs.x1000, book.shorts.x1000)
+                .buffer(2)
+                .toList()).text(e -> e.get(0).toString()).observe(e -> {
+                    longList.values(e.get(0));
+                    shortList.values(e.get(1));
                 });
 
         // read data from backend service
         Viewtify.inWorker(() -> {
             return BitFlyer.FX_BTC_JPY.service().getBoard().on(Viewtify.UIThread).to(board -> {
                 for (OrderUnit unit : board.asks) {
-                    short1.add(unit);
+                    book.shorts.update(unit);
                 }
 
                 for (OrderUnit unit : board.bids) {
-                    long1.add(unit);
+                    book.longs.update(unit);
                 }
 
-                OrderUnit bestAsk = short1.list.get(short1.list.size() - 1);
-                OrderUnit bestBid = long1.list.get(0);
+                OrderUnit bestAsk = book.shorts.min();
+                OrderUnit bestBid = book.longs.max();
 
                 if (bestAsk != null && bestBid != null) {
                     priceSpread.setText(bestAsk.price.minus(bestBid.price).toString());
@@ -119,7 +95,9 @@ public class MarketBoardView extends View {
                 priceLatest.setText(e.price.toString());
             }).throttle(1, MINUTES).to(e -> {
                 // fix error board
-                long1.fix(e);
+                book.shorts.fix(e.price);
+                book.longs.fix(e.price);
+                System.out.println("Fix erro board");
             });
         });
     }
@@ -155,296 +133,5 @@ public class MarketBoardView extends View {
                 setStyle("-fx-background-insets: 0 " + Num.of(210).minus(normalize.multiply(Num.TWO)) + "px 0 0;");
             }
         }
-    }
-
-    /**
-     * @version 2017/11/14 15:53:29
-     */
-    static class SortableUnitList {
-
-        /** The direction. */
-        boolean fromHead;
-
-        final ObservableList<OrderUnit> list;
-
-        /** The group list. */
-        private final SortableGroupList[] groups;
-
-        /**
-         * @param fromHead
-         */
-        SortableUnitList(boolean fromHead, SortableGroupList... groups) {
-            this.fromHead = fromHead;
-            this.groups = groups;
-            this.list = FXCollections.observableList(GapList.create(empty()));
-        }
-
-        /**
-         * Fix error board.
-         * 
-         * @param e
-         */
-        void fix(Execution e) {
-            if (fromHead) {
-                for (int i = 0; i < list.size(); i++) {
-                    OrderUnit unit = list.get(i);
-                }
-            } else {
-
-            }
-        }
-
-        /**
-         * For test.
-         */
-        SortableUnitList(boolean fromHead, boolean empty) {
-            this.fromHead = fromHead;
-            this.groups = new SortableGroupList[0];
-            this.list = FXCollections.observableArrayList();
-        }
-
-        /**
-         * Update {@link OrderUnit}.
-         * 
-         * @param add
-         */
-        void add(OrderUnit add) {
-            if (fromHead) {
-                head(add);
-            } else {
-                tail(add);
-            }
-        }
-
-        /**
-         * Update {@link OrderUnit}.
-         * 
-         * @param add
-         */
-        private void head(OrderUnit add) {
-            for (int i = 0; i < list.size(); i++) {
-                OrderUnit unit = list.get(i);
-
-                if (unit == null) {
-                    if (add.size.isNotZero()) {
-                        list.set(i, add);
-                        update(add.price, add.size);
-                    }
-                    return;
-                } else if (unit.price.is(add.price)) {
-                    OrderUnit old;
-
-                    if (add.size.isZero()) {
-                        old = list.remove(i);
-                    } else {
-                        old = list.set(i, add);
-                    }
-                    update(add.price, add.size.minus(old.size));
-                    return;
-                } else if (unit.price.isLessThan(add.price)) {
-                    if (add.size.isNotZero()) {
-                        list.add(i, add);
-                        update(add.price, add.size);
-                    }
-                    return;
-                }
-            }
-
-            if (add.size.isNotZero()) {
-                list.add(add);
-                update(add.price, add.size);
-            }
-        }
-
-        /**
-         * Update {@link OrderUnit}.
-         * 
-         * @param add
-         */
-        private void tail(OrderUnit add) {
-            for (int i = list.size() - 1; 0 <= i; i--) {
-                OrderUnit unit = list.get(i);
-
-                if (unit == null) {
-                    if (add.size.isNotZero()) {
-                        list.set(i, add);
-                        update(add.price, add.size);
-                    }
-                    return;
-                } else if (unit.price.is(add.price)) {
-                    OrderUnit old;
-
-                    if (add.size.isZero()) {
-                        old = list.remove(i);
-                    } else {
-                        old = list.set(i, add);
-                    }
-                    update(add.price, add.size.minus(old.size));
-                    return;
-                } else if (unit.price.isGreaterThan(add.price)) {
-                    if (add.size.isNotZero()) {
-                        list.add(i + 1, add);
-                        update(add.price, add.size);
-                    }
-                    return;
-                }
-            }
-
-            if (add.size.isNotZero()) {
-                list.add(0, add);
-                update(add.price, add.size);
-            }
-        }
-
-        /**
-         * Update group list.
-         * 
-         * @param size
-         */
-        private void update(Num price, Num size) {
-            for (SortableGroupList group : groups) {
-                group.add(price, size);
-            }
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public String toString() {
-            return "1";
-        }
-    }
-
-    /**
-     * @version 2017/11/14 15:53:29
-     */
-    static class SortableGroupList extends SortableUnitList {
-
-        /** The scale. */
-        private final int scale;
-
-        /**
-         * @param fromHead
-         * @param scale
-         */
-        SortableGroupList(boolean fromHead, int scale) {
-            super(fromHead);
-            this.scale = scale;
-        }
-
-        /**
-         * @param fromHead
-         * @param scale
-         */
-        SortableGroupList(boolean fromHead, int scale, boolean empty) {
-            super(fromHead, empty);
-            this.scale = scale;
-        }
-
-        /**
-         * Update price and size.
-         * 
-         * @param price
-         * @param size
-         */
-        void add(Num price, Num size) {
-            price = price.scaleDown(scale);
-
-            if (fromHead) {
-                head(price, size);
-            } else {
-                tail(price, size);
-            }
-        }
-
-        /**
-         * For test.
-         * 
-         * @param price
-         * @param size
-         */
-        void add(int price, int size) {
-            add(Num.of(price), Num.of(size));
-        }
-
-        /**
-         * Update {@link OrderUnit}.
-         * 
-         * @param add
-         */
-        private void head(Num price, Num size) {
-            for (int i = 0; i < list.size(); i++) {
-                OrderUnit unit = list.get(i);
-
-                if (unit == null) {
-                    list.set(i, new OrderUnit(price, size));
-                    return;
-                } else if (unit.price.is(price)) {
-                    Num remaining = unit.size.plus(size);
-
-                    if (remaining.scale(5).isZero()) {
-                        list.remove(i);
-                    } else {
-                        list.set(i, unit.size(remaining));
-                    }
-                    return;
-                } else if (unit.price.isLessThan(price)) {
-                    list.add(i, new OrderUnit(price, size));
-                    return;
-                }
-            }
-            list.add(new OrderUnit(price, size));
-        }
-
-        /**
-         * Update {@link OrderUnit}.
-         * 
-         * @param add
-         */
-        private void tail(Num price, Num size) {
-            for (int i = list.size() - 1; 0 <= i; i--) {
-                OrderUnit unit = list.get(i);
-
-                if (unit == null) {
-                    list.set(i, new OrderUnit(price, size));
-                    return;
-                } else if (unit.price.is(price)) {
-                    Num remaining = unit.size.plus(size);
-
-                    if (remaining.scale(5).isZero()) {
-                        list.remove(i);
-                    } else {
-                        list.set(i, unit.size(remaining));
-                    }
-                    return;
-                } else if (unit.price.isGreaterThan(price)) {
-                    list.add(i + 1, new OrderUnit(price, size));
-                    return;
-                }
-            }
-            list.add(0, new OrderUnit(price, size));
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public String toString() {
-            return Num.TEN.pow(scale * -1).toString();
-        }
-    }
-
-    /**
-     * Create empry list.
-     * 
-     * @return
-     */
-    private static List<OrderUnit> empty() {
-        List<OrderUnit> list = new ArrayList();
-        for (int i = 0; i < 30; i++) {
-            list.add(null);
-        }
-        return list;
     }
 }
