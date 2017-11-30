@@ -10,6 +10,8 @@
 package cointoss.visual.mate.console;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.logging.log4j.core.Appender;
 import org.apache.logging.log4j.core.Filter;
@@ -22,16 +24,14 @@ import org.apache.logging.log4j.core.config.plugins.PluginElement;
 import org.apache.logging.log4j.core.config.plugins.PluginFactory;
 import org.apache.logging.log4j.core.layout.PatternLayout;
 
-import kiss.I;
-
 /**
  * @version 2017/11/27 13:00:47
  */
 @Plugin(name = "UI", category = "Core", elementType = "appender", printObject = true)
 class ConsoleAppender extends AbstractAppender {
 
-    /** The console ui. */
-    private final Console console = I.make(Console.class);
+    /** The cosole mapping. */
+    static final Map<String, Console> consoles = new HashMap();
 
     /**
      * Log appender for console UI.
@@ -66,6 +66,10 @@ class ConsoleAppender extends AbstractAppender {
      */
     @Override
     public void append(LogEvent event) {
-        console.write(event.getMessage().getFormattedMessage());
+        Console console = consoles.get(event.getLoggerName());
+
+        if (console != null) {
+            console.write(event.getMessage().getFormattedMessage());
+        }
     }
 }

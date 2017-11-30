@@ -23,13 +23,11 @@ import javafx.scene.control.TreeTableRow;
 import javafx.scene.control.TreeTableView;
 import javafx.util.Callback;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import cointoss.MarketBackend;
 import cointoss.Order;
 import cointoss.Side;
 import cointoss.market.bitflyer.BitFlyer;
+import cointoss.visual.mate.TradingView;
 import kiss.Disposable;
 import kiss.I;
 import viewtify.View;
@@ -42,9 +40,6 @@ import viewtify.ui.UIMenuItem;
  * @version 2017/11/26 14:05:31
  */
 public class OrderCatalog extends View {
-
-    /** LOGGING */
-    private static final Logger logger = LogManager.getLogger();
 
     private final OrderManager manager = I.make(OrderManager.class);
 
@@ -65,6 +60,9 @@ public class OrderCatalog extends View {
 
     /** UI */
     private @FXML TreeTableColumn<Object, Object> requestedOrdersPrice;
+
+    /** UI */
+    private @FXML TradingView view;
 
     /** The root item. */
     private final TreeItem<Object> root = new TreeItem();
@@ -127,13 +125,13 @@ public class OrderCatalog extends View {
         /** Context Menu */
         private final UIMenuItem cancel = UI.menuItem().label("Cancel").whenUserClick(e -> {
             Object item = getItem();
-            System.out.println(getTreeItem().isLeaf());
+
             if (item instanceof Order) {
                 service.cancel((Order) item).to(order -> {
                     TreeItem<Object> tree = getTreeItem();
                     tree.getParent().getChildren().remove(tree);
 
-                    logger.info("{} is canceled.", order);
+                    view.console.write("{} is canceled.", order);
                 });
             }
         });

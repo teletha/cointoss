@@ -23,17 +23,17 @@ import viewtify.View;
  */
 public class TradingView extends View {
 
-    private final BitFlyer market;
+    public final BitFlyer market;
 
-    private @FXML ExecutionView executionView;
+    public @FXML ExecutionView executionView;
 
-    private @FXML Console console;
+    public @FXML Console console;
 
-    private @FXML MarketBoardView board;
+    public @FXML MarketBoardView board;
 
-    private @FXML OrderMaker maker;
+    public @FXML OrderMaker maker;
 
-    private @FXML OrderCatalog catalog;
+    public @FXML OrderCatalog catalog;
 
     /**
      * 
@@ -53,7 +53,7 @@ public class TradingView extends View {
      * {@inheritDoc}
      */
     @Override
-    public String id() {
-        return TradingView.class.getSimpleName() + "-" + market.fullName();
+    protected String name() {
+        return TradingView.class.getSimpleName() + View.IDSeparator + market.fullName();
     }
 }

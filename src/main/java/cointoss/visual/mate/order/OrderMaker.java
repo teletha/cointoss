@@ -18,9 +18,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Spinner;
 import javafx.scene.input.ScrollEvent;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import cointoss.MarketBackend;
 import cointoss.Order;
 import cointoss.Order.Quantity;
@@ -28,7 +25,7 @@ import cointoss.OrderState;
 import cointoss.Side;
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.util.Num;
-import cointoss.visual.mate.console.Console;
+import cointoss.visual.mate.TradingView;
 import kiss.I;
 import kiss.WiseBiConsumer;
 import viewtify.User;
@@ -43,9 +40,6 @@ import viewtify.ui.UIText;
  * @version 2017/11/27 23:21:48
  */
 public class OrderMaker extends View {
-
-    /** LOGGING */
-    private static final Logger logger = LogManager.getLogger();
 
     private Predicate<UIText> positiveNumber = ui -> {
         try {
@@ -104,10 +98,7 @@ public class OrderMaker extends View {
     private @FXML UIComboBox<Quantity> orderQuantity;
 
     /** UI */
-    private @FXML OrderCatalog orderCatalog;
-
-    /** UI */
-    private @FXML Console console;
+    private @FXML TradingView view;
 
     /**
      * {@inheritDoc}
@@ -190,18 +181,19 @@ public class OrderMaker extends View {
             // ========================================
             // Create View Model
             // ========================================
-            orderCatalog.add(set);
+            view.catalog.add(set);
 
             // ========================================
             // Request to Server
             // ========================================
             for (Order order : set.sub) {
-                logger.info("Request order [{}]", order);
+                view.console.write("Request order [{}]", order);
 
                 service.request(order).to(id -> {
                     order.child_order_acceptance_id = id;
                     order.child_order_state.set(OrderState.ACTIVE);
-                    logger.info("Accept order [{}]", order);
+
+                    view.console.write("Accept order [{}]", order);
                 });
             }
         });

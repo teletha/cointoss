@@ -20,10 +20,14 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import cointoss.ExecutionFlow;
 import cointoss.Market;
 import cointoss.Trading;
 import cointoss.market.bitflyer.BitFlyer;
+import cointoss.visual.mate.TradingView;
 import viewtify.View;
 import viewtify.Viewtify;
 import viewtify.ui.UIListView;
@@ -36,6 +40,11 @@ public class Console extends View {
     /** The maximum line size. */
     private static final int MAX = 3000;
 
+    /** The background logger. */
+    private Logger logger;
+
+    private @FXML TradingView view;
+
     private @FXML UIListView<String> console;
 
     final ObservableList<String> messages = FXCollections.observableList(new LinkedList());
@@ -45,7 +54,11 @@ public class Console extends View {
      */
     @Override
     protected void initialize() {
-        System.out.println("init console");
+        // create logger
+        String name = view.market.fullName();
+        logger = LogManager.getLogger(name);
+        ConsoleAppender.consoles.put(name, this);
+
         console.values(messages);
 
         Viewtify.inWorker(() -> {
@@ -58,7 +71,7 @@ public class Console extends View {
      * 
      * @param message
      */
-    public void write(String message) {
+    void write(String message) {
         Viewtify.inUI(() -> {
             messages.add(0, message);
 
@@ -66,6 +79,15 @@ public class Console extends View {
                 messages.remove(messages.size() - 1);
             }
         });
+    }
+
+    /**
+     * Write message to console.
+     * 
+     * @param message
+     */
+    public void write(String message, Object... params) {
+        logger.info(message, params);
     }
 
     /**
