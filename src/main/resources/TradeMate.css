@@ -73,6 +73,10 @@
     -fx-faint-focus-color: transparent;
 }
 
+.tab:selected {
+		-fx-font-weight: bold;
+}
+
 
 
 /* ==========================================================================

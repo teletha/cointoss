@@ -34,14 +34,14 @@ import com.pubnub.api.models.consumer.pubsub.PNMessageResult;
 import com.pubnub.api.models.consumer.pubsub.PNPresenceEventResult;
 
 import cointoss.BalanceUnit;
-import cointoss.Board;
-import cointoss.Board.Unit;
 import cointoss.Execution;
 import cointoss.Market;
 import cointoss.MarketBackend;
 import cointoss.Order;
 import cointoss.OrderState;
 import cointoss.Position;
+import cointoss.order.OrderBookChange;
+import cointoss.order.OrderUnit;
 import cointoss.util.Num;
 import filer.Filer;
 import kiss.Disposable;
@@ -72,7 +72,7 @@ class BitFlyerBackend implements MarketBackend {
     private Disposable disposer = Disposable.empty();
 
     /** The shared source. */
-    private Signal<Board> board = realtimeBoard();
+    private Signal<OrderBookChange> board = realtimeBoard();
 
     /**
      * @param type
@@ -223,7 +223,7 @@ class BitFlyerBackend implements MarketBackend {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Board> getBoard() {
+    public Signal<OrderBookChange> getBoard() {
         return board;
     }
 
@@ -299,8 +299,8 @@ class BitFlyerBackend implements MarketBackend {
      * 
      * @return
      */
-    private Signal<Board> realtimeBoard() {
-        return new Signal<Board>((observer, disposer) -> {
+    private Signal<OrderBookChange> realtimeBoard() {
+        return new Signal<OrderBookChange>((observer, disposer) -> {
             PNConfiguration config = new PNConfiguration();
             config.setSubscribeKey("sub-c-52a9ab50-291b-11e5-baaa-0619f8945a4f");
 
@@ -332,21 +332,21 @@ class BitFlyerBackend implements MarketBackend {
                     if (message.getChannel() != null) {
                         JsonNode node = message.getMessage();
 
-                        Board board = new Board();
+                        OrderBookChange board = new OrderBookChange();
                         board.mid_price = Num.of(node.get("mid_price").asLong());
 
                         JsonNode asks = node.get("asks");
 
                         for (int i = 0; i < asks.size(); i++) {
                             JsonNode ask = asks.get(i);
-                            board.asks.add(new Unit(Num.of(ask.get("price").asDouble()), Num.of(ask.get("size").asDouble())));
+                            board.asks.add(new OrderUnit(Num.of(ask.get("price").asDouble()), Num.of(ask.get("size").asDouble())));
                         }
 
                         JsonNode bids = node.get("bids");
 
                         for (int i = 0; i < bids.size(); i++) {
                             JsonNode bid = bids.get(i);
-                            board.bids.add(new Unit(Num.of(bid.get("price").asDouble()), Num.of(bid.get("size").asDouble())));
+                            board.bids.add(new OrderUnit(Num.of(bid.get("price").asDouble()), Num.of(bid.get("size").asDouble())));
                         }
                         observer.accept(board);
                     }

@@ -9,6 +9,7 @@
  */
 package cointoss;
 
+import cointoss.order.OrderBookChange;
 import cointoss.util.Num;
 import kiss.Disposable;
 import kiss.Signal;
@@ -129,5 +130,5 @@ public interface MarketBackend extends Disposable {
      * 
      * @return
      */
-    Signal<Board> getBoard();
+    Signal<OrderBookChange> getBoard();
 }

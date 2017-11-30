@@ -19,6 +19,7 @@ import javafx.beans.property.SimpleObjectProperty;
 
 import cointoss.Order.Quantity;
 import cointoss.Time.Lag;
+import cointoss.order.OrderBookChange;
 import cointoss.util.Num;
 import kiss.I;
 import kiss.Signal;
@@ -170,7 +171,7 @@ class TestableMarketBackend implements MarketBackend {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Board> getBoard() {
+    public Signal<OrderBookChange> getBoard() {
         // If this exception will be thrown, it is bug of this program. So we must rethrow the
         // wrapped error in here.
         throw new Error();

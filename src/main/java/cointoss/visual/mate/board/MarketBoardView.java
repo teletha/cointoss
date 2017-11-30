@@ -23,9 +23,9 @@ import javafx.scene.control.TextField;
 
 import org.magicwerk.brownies.collections.GapList;
 
-import cointoss.Board.Unit;
 import cointoss.Execution;
 import cointoss.market.bitflyer.BitFlyer;
+import cointoss.order.OrderUnit;
 import cointoss.util.Num;
 import kiss.I;
 import viewtify.View;
@@ -51,7 +51,7 @@ public class MarketBoardView extends View {
     private SortableUnitList long1 = new SortableUnitList(true, long10, long100, long1000);
 
     /** UI for long maker. */
-    private @FXML UIListView<Unit> longList;
+    private @FXML UIListView<OrderUnit> longList;
 
     /** Model for maker. */
     private final SortableGroupList short1000 = new SortableGroupList(false, -3);
@@ -66,7 +66,7 @@ public class MarketBoardView extends View {
     private final SortableUnitList short1 = new SortableUnitList(false, short10, short100, short1000);
 
     /** UI for maker. */
-    private @FXML UIListView<Unit> shortList;
+    private @FXML UIListView<OrderUnit> shortList;
 
     /** UI for interval configuration. */
     private @FXML UISpinner<List<SortableUnitList>> priceRange;
@@ -97,16 +97,16 @@ public class MarketBoardView extends View {
         // read data from backend service
         Viewtify.inWorker(() -> {
             return BitFlyer.FX_BTC_JPY.service().getBoard().on(Viewtify.UIThread).to(board -> {
-                for (Unit unit : board.asks) {
+                for (OrderUnit unit : board.asks) {
                     short1.add(unit);
                 }
 
-                for (Unit unit : board.bids) {
+                for (OrderUnit unit : board.bids) {
                     long1.add(unit);
                 }
 
-                Unit bestAsk = short1.list.get(short1.list.size() - 1);
-                Unit bestBid = long1.list.get(0);
+                OrderUnit bestAsk = short1.list.get(short1.list.size() - 1);
+                OrderUnit bestBid = long1.list.get(0);
 
                 if (bestAsk != null && bestBid != null) {
                     priceSpread.setText(bestAsk.price.minus(bestBid.price).toString());
@@ -127,7 +127,7 @@ public class MarketBoardView extends View {
     /**
      * @version 2017/11/13 21:35:32
      */
-    private class CellView extends ListCell<Unit> {
+    private class CellView extends ListCell<OrderUnit> {
 
         /**
          * @param side
@@ -142,7 +142,7 @@ public class MarketBoardView extends View {
          * {@inheritDoc}
          */
         @Override
-        protected void updateItem(Unit e, boolean empty) {
+        protected void updateItem(OrderUnit e, boolean empty) {
             super.updateItem(e, empty);
 
             if (empty || e == null) {
@@ -165,7 +165,7 @@ public class MarketBoardView extends View {
         /** The direction. */
         boolean fromHead;
 
-        final ObservableList<Unit> list;
+        final ObservableList<OrderUnit> list;
 
         /** The group list. */
         private final SortableGroupList[] groups;
@@ -187,7 +187,7 @@ public class MarketBoardView extends View {
         void fix(Execution e) {
             if (fromHead) {
                 for (int i = 0; i < list.size(); i++) {
-                    Unit unit = list.get(i);
+                    OrderUnit unit = list.get(i);
                 }
             } else {
 
@@ -204,11 +204,11 @@ public class MarketBoardView extends View {
         }
 
         /**
-         * Update {@link Unit}.
+         * Update {@link OrderUnit}.
          * 
          * @param add
          */
-        void add(Unit add) {
+        void add(OrderUnit add) {
             if (fromHead) {
                 head(add);
             } else {
@@ -217,13 +217,13 @@ public class MarketBoardView extends View {
         }
 
         /**
-         * Update {@link Unit}.
+         * Update {@link OrderUnit}.
          * 
          * @param add
          */
-        private void head(Unit add) {
+        private void head(OrderUnit add) {
             for (int i = 0; i < list.size(); i++) {
-                Unit unit = list.get(i);
+                OrderUnit unit = list.get(i);
 
                 if (unit == null) {
                     if (add.size.isNotZero()) {
@@ -232,7 +232,7 @@ public class MarketBoardView extends View {
                     }
                     return;
                 } else if (unit.price.is(add.price)) {
-                    Unit old;
+                    OrderUnit old;
 
                     if (add.size.isZero()) {
                         old = list.remove(i);
@@ -257,13 +257,13 @@ public class MarketBoardView extends View {
         }
 
         /**
-         * Update {@link Unit}.
+         * Update {@link OrderUnit}.
          * 
          * @param add
          */
-        private void tail(Unit add) {
+        private void tail(OrderUnit add) {
             for (int i = list.size() - 1; 0 <= i; i--) {
-                Unit unit = list.get(i);
+                OrderUnit unit = list.get(i);
 
                 if (unit == null) {
                     if (add.size.isNotZero()) {
@@ -272,7 +272,7 @@ public class MarketBoardView extends View {
                     }
                     return;
                 } else if (unit.price.is(add.price)) {
-                    Unit old;
+                    OrderUnit old;
 
                     if (add.size.isZero()) {
                         old = list.remove(i);
@@ -369,16 +369,16 @@ public class MarketBoardView extends View {
         }
 
         /**
-         * Update {@link Unit}.
+         * Update {@link OrderUnit}.
          * 
          * @param add
          */
         private void head(Num price, Num size) {
             for (int i = 0; i < list.size(); i++) {
-                Unit unit = list.get(i);
+                OrderUnit unit = list.get(i);
 
                 if (unit == null) {
-                    list.set(i, new Unit(price, size));
+                    list.set(i, new OrderUnit(price, size));
                     return;
                 } else if (unit.price.is(price)) {
                     Num remaining = unit.size.plus(size);
@@ -390,24 +390,24 @@ public class MarketBoardView extends View {
                     }
                     return;
                 } else if (unit.price.isLessThan(price)) {
-                    list.add(i, new Unit(price, size));
+                    list.add(i, new OrderUnit(price, size));
                     return;
                 }
             }
-            list.add(new Unit(price, size));
+            list.add(new OrderUnit(price, size));
         }
 
         /**
-         * Update {@link Unit}.
+         * Update {@link OrderUnit}.
          * 
          * @param add
          */
         private void tail(Num price, Num size) {
             for (int i = list.size() - 1; 0 <= i; i--) {
-                Unit unit = list.get(i);
+                OrderUnit unit = list.get(i);
 
                 if (unit == null) {
-                    list.set(i, new Unit(price, size));
+                    list.set(i, new OrderUnit(price, size));
                     return;
                 } else if (unit.price.is(price)) {
                     Num remaining = unit.size.plus(size);
@@ -419,11 +419,11 @@ public class MarketBoardView extends View {
                     }
                     return;
                 } else if (unit.price.isGreaterThan(price)) {
-                    list.add(i + 1, new Unit(price, size));
+                    list.add(i + 1, new OrderUnit(price, size));
                     return;
                 }
             }
-            list.add(0, new Unit(price, size));
+            list.add(0, new OrderUnit(price, size));
         }
 
         /**
@@ -440,8 +440,8 @@ public class MarketBoardView extends View {
      * 
      * @return
      */
-    private static List<Unit> empty() {
-        List<Unit> list = new ArrayList();
+    private static List<OrderUnit> empty() {
+        List<OrderUnit> list = new ArrayList();
         for (int i = 0; i < 30; i++) {
             list.add(null);
         }
