@@ -101,6 +101,10 @@ public class OrderBookList {
 
                 if (unit.price.isGreaterThan(hint)) {
                     iterator.remove();
+
+                    for (Grouped grouped : group) {
+                        grouped.update(unit.price, unit.size.negate());
+                    }
                 } else {
                     break;
                 }
@@ -111,6 +115,10 @@ public class OrderBookList {
 
                 if (unit.price.isLessThan(hint)) {
                     x1.remove(i);
+
+                    for (Grouped grouped : group) {
+                        grouped.update(unit.price, unit.size.negate());
+                    }
                 } else {
                     break;
                 }

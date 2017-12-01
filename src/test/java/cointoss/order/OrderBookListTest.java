@@ -84,6 +84,57 @@ public class OrderBookListTest {
     }
 
     @Test
+    public void buyFix() throws Exception {
+        OrderBookList list = new OrderBookList(Side.BUY, true);
+        list.update(unit(1007, 1));
+        list.update(unit(1006, 1));
+        list.update(unit(1005, 1));
+        list.update(unit(1004, 1));
+        list.update(unit(1003, 1));
+        list.update(unit(1000, 1));
+        assert list.x1.size() == 6;
+
+        // fix error
+        list.fix(Num.of(1006));
+        assertList(list.x1, 0, 1006, 1);
+        assert list.x1.size() == 5;
+
+        // fix error : multiple
+        list.fix(Num.of(1004));
+        assertList(list.x1, 0, 1004, 1);
+        assert list.x1.size() == 3;
+
+        // fix error : not exits
+        list.fix(Num.of(1002));
+        assertList(list.x1, 0, 1000, 1);
+        assert list.x1.size() == 1;
+    }
+
+    @Test
+    public void sellFix() throws Exception {
+        OrderBookList list = new OrderBookList(Side.SELL, true);
+        list.update(unit(1007, 1));
+        list.update(unit(1004, 1));
+        list.update(unit(1003, 1));
+        list.update(unit(1002, 1));
+        list.update(unit(1001, 1));
+        list.update(unit(1000, 1));
+        assert list.x1.size() == 6;
+
+        // fix error
+        list.fix(Num.of(1001));
+        assert list.x1.size() == 5;
+
+        // fix error : multiple
+        list.fix(Num.of(1003));
+        assert list.x1.size() == 3;
+
+        // fix error : not exits
+        list.fix(Num.of(1005));
+        assert list.x1.size() == 1;
+    }
+
+    @Test
     public void buyGroup() throws Exception {
         OrderBookList list = new OrderBookList(Side.BUY, true);
         list.update(unit(1000, 1));
@@ -132,43 +183,79 @@ public class OrderBookListTest {
     }
 
     @Test
-    public void buyFix() throws Exception {
+    public void buyGroupFix() throws Exception {
         OrderBookList list = new OrderBookList(Side.BUY, true);
-        list.update(unit(1003, 1));
-        list.update(unit(1002, 1));
+        list.update(unit(1061, 1));
+        list.update(unit(1060, 1));
+        list.update(unit(1051, 1));
+        list.update(unit(1050, 1));
+        list.update(unit(1041, 1));
+        list.update(unit(1040, 1));
+        list.update(unit(1035, 1));
+        list.update(unit(1034, 1));
+        list.update(unit(1025, 1));
+        list.update(unit(1024, 1));
         list.update(unit(1001, 1));
         list.update(unit(1000, 1));
-        assert list.x1.size() == 4;
+        assert list.x10.size() == 6;
 
         // fix error
-        list.fix(Num.of(1002));
-        assertList(list.x1, 0, 1002, 1);
-        assert list.x1.size() == 3;
+        list.fix(Num.of(1051));
+        assert list.x10.size() == 5;
 
-        // fix error
-        list.fix(Num.of(1000));
-        assertList(list.x1, 0, 1000, 1);
-        assert list.x1.size() == 1;
+        // fix error : remaining
+        list.fix(Num.of(1050));
+        assert list.x10.size() == 5;
+
+        // fix error : multiple
+        list.fix(Num.of(1038));
+        assert list.x10.size() == 3;
+
+        // fix error : overlap
+        list.fix(Num.of(1030));
+        assert list.x10.size() == 2;
+
+        // fix error : not exist
+        list.fix(Num.of(1010));
+        assert list.x10.size() == 1;
     }
 
     @Test
-    public void sellFix() throws Exception {
+    public void sellGroupFix() throws Exception {
         OrderBookList list = new OrderBookList(Side.SELL, true);
-        list.update(unit(1003, 1));
-        list.update(unit(1002, 1));
+        list.update(unit(1061, 1));
+        list.update(unit(1060, 1));
+        list.update(unit(1043, 1));
+        list.update(unit(1044, 1));
+        list.update(unit(1035, 1));
+        list.update(unit(1034, 1));
+        list.update(unit(1021, 1));
+        list.update(unit(1020, 1));
+        list.update(unit(1011, 1));
+        list.update(unit(1010, 1));
         list.update(unit(1001, 1));
         list.update(unit(1000, 1));
-        assert list.x1.size() == 4;
+        assert list.x10.size() == 6;
 
         // fix error
-        list.fix(Num.of(1001));
-        assertList(list.x1, 2, 1001, 1);
-        assert list.x1.size() == 3;
+        list.fix(Num.of(1010));
+        assert list.x10.size() == 5;
 
-        // fix error
-        list.fix(Num.of(1003));
-        assertList(list.x1, 0, 1003, 1);
-        assert list.x1.size() == 1;
+        // fix error : remaining
+        list.fix(Num.of(1011));
+        assert list.x10.size() == 5;
+
+        // fix error : multiple
+        list.fix(Num.of(1031));
+        assert list.x10.size() == 3;
+
+        // fix error : overlap
+        list.fix(Num.of(1038));
+        assert list.x10.size() == 2;
+
+        // fix error : not exist
+        list.fix(Num.of(1050));
+        assert list.x10.size() == 1;
     }
 
     /**

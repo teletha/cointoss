@@ -368,6 +368,16 @@ public class Num implements Comparable<Num> {
     }
 
     /**
+     * Returns a {@code Num} whose value is {@code (-this)}, and whose scale is
+     * {@code this.scale()}.
+     *
+     * @return {@code -this}.
+     */
+    public Num negate() {
+        return new Num(delegate.negate());
+    }
+
+    /**
      * Converts this {@code Decimal} to a {@code double}.
      * 
      * @return this {@code Decimal} converted to a {@code double}
