@@ -142,13 +142,20 @@
                   </ListView>
                   <HBox alignment="CENTER">
                      <children>
-                        <Spinner id="priceRange" maxWidth="70.0" minWidth="70.0" prefWidth="70.0" />
-                        <Label id="priceLatest" focusTraversable="false" prefWidth="80.0" textOverrun="CLIP" />
-                        <Label id="priceSpread" alignment="CENTER_RIGHT" focusTraversable="false" prefWidth="90.0" textAlignment="RIGHT" textOverrun="CLIP">
+                        <Spinner id="priceRange" maxWidth="72.0" minWidth="72.0" prefWidth="72.0" />
+                        <Label id="priceLatest" focusTraversable="false" maxWidth="60.0" prefWidth="60.0" textOverrun="CLIP">
+                           <HBox.margin>
+                              <Insets left="-2.0" />
+                           </HBox.margin></Label>
+                        <Label id="priceSpread" focusTraversable="false" maxWidth="50.0" minWidth="50.0" prefWidth="50.0" textOverrun="CLIP">
+                           <HBox.margin>
+                              <Insets />
+                           </HBox.margin>
                            <padding>
-                              <Insets right="20.0" />
+                              <Insets left="4.0" />
                            </padding>
                         </Label>
+                        <Spinner id="hideSize" maxWidth="45.0" minWidth="45.0" prefWidth="45.0" />
                      </children>
                   </HBox>
                   <ListView id="longList" focusTraversable="false" styleClass="BUY" VBox.vgrow="ALWAYS">
@@ -170,9 +177,6 @@
                      <VBox.margin>
                         <Insets />
                      </VBox.margin>
-                     <cursor>
-                        <Cursor fx:constant="DEFAULT" />
-                     </cursor>
                   </ListView>
                   <HBox alignment="CENTER">
                      <children>

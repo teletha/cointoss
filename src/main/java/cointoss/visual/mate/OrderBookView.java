@@ -7,13 +7,10 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss.visual.mate.board;
+package cointoss.visual.mate;
 
 import static java.util.concurrent.TimeUnit.*;
 
-import java.util.List;
-
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
@@ -23,7 +20,6 @@ import cointoss.market.bitflyer.BitFlyer;
 import cointoss.order.OrderBook;
 import cointoss.order.OrderUnit;
 import cointoss.util.Num;
-import kiss.I;
 import viewtify.View;
 import viewtify.Viewtify;
 import viewtify.ui.UIListView;
@@ -32,9 +28,9 @@ import viewtify.ui.UISpinner;
 /**
  * @version 2017/11/14 19:16:13
  */
-public class MarketBoardView extends View {
+public class OrderBookView extends View {
 
-    /** Model for maker. */
+    /** Order Book. */
     private final OrderBook book = new OrderBook();
 
     /** UI for long maker. */
@@ -44,7 +40,7 @@ public class MarketBoardView extends View {
     private @FXML UIListView<OrderUnit> shortList;
 
     /** UI for interval configuration. */
-    private @FXML UISpinner<List<ObservableList<OrderUnit>>> priceRange;
+    private @FXML UISpinner<Integer> priceRange;
 
     /** UI for interval configuration. */
     private @FXML Label priceLatest;
@@ -55,6 +51,9 @@ public class MarketBoardView extends View {
     /** UI for order. */
     private @FXML TextField orderPrice;
 
+    /** UI for interval configuration. */
+    private @FXML UISpinner<Num> hideSize;
+
     /**
      * {@inheritDoc}
      */
@@ -62,13 +61,36 @@ public class MarketBoardView extends View {
     protected void initialize() {
         longList.values(book.longs.x1).cell(e -> new CellView());
         shortList.values(book.shorts.x1).cell(e -> new CellView()).scrollTo(book.shorts.x1.size() - 1);
-        priceRange.values(I
-                .signal(book.longs.x1, book.shorts.x1, book.longs.x10, book.shorts.x10, book.longs.x100, book.shorts.x100, book.longs.x1000, book.shorts.x1000)
-                .buffer(2)
-                .toList()).text(e -> e.get(0).toString()).observe(e -> {
-                    longList.values(e.get(0));
-                    shortList.values(e.get(1));
-                });
+        hideSize.values(Num.ZERO, Num.ONE, Num.TWO, Num.of(5)).initial(Num.ZERO).observe(e -> longList.ui.refresh());
+
+        priceRange.values(1, 10, 100, 1000, 10000).initial(1).observeNow(e -> {
+            switch (e) {
+            case 1:
+                longList.values(book.longs.x1);
+                shortList.values(book.shorts.x1);
+                break;
+
+            case 10:
+                longList.values(book.longs.x10);
+                shortList.values(book.shorts.x10);
+                break;
+
+            case 100:
+                longList.values(book.longs.x100);
+                shortList.values(book.shorts.x100);
+                break;
+
+            case 1000:
+                longList.values(book.longs.x1000);
+                shortList.values(book.shorts.x1000);
+                break;
+
+            case 10000:
+                longList.values(book.longs.x10000);
+                shortList.values(book.shorts.x10000);
+                break;
+            }
+        });
 
         // read data from backend service
         Viewtify.inWorker(() -> {
@@ -93,11 +115,10 @@ public class MarketBoardView extends View {
         Viewtify.inWorker(() -> {
             return BitFlyer.FX_BTC_JPY.log().fromToday().on(Viewtify.UIThread).effect(e -> {
                 priceLatest.setText(e.price.toString());
-            }).throttle(1, MINUTES).to(e -> {
+            }).throttle(3, SECONDS).to(e -> {
                 // fix error board
                 book.shorts.fix(e.price);
                 book.longs.fix(e.price);
-                System.out.println("Fix erro board");
             });
         });
     }
@@ -128,9 +149,13 @@ public class MarketBoardView extends View {
                 setGraphic(null);
                 setStyle("-fx-background-insets: 0 300px 0 0;");
             } else {
-                Num normalize = e.size.scale(5);
+                Num normalize = e.size.scale(3);
                 setText(e.price() + "  " + normalize);
-                setStyle("-fx-background-insets: 0 " + Num.of(210).minus(normalize.multiply(Num.TWO)) + "px 0 0;");
+
+                StringBuilder style = new StringBuilder();
+                style.append("-fx-background-insets: 0 " + Num.of(210).minus(normalize.multiply(Num.TWO)) + "px 0 0;");
+                style.append("-fx-font-size: " + (normalize.isLessThan(hideSize.value()) ? "0.1px;" : "100%;"));
+                setStyle(style.toString());
             }
         }
     }

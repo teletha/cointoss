@@ -12,7 +12,6 @@ package cointoss.visual.mate;
 import javafx.fxml.FXML;
 
 import cointoss.market.bitflyer.BitFlyer;
-import cointoss.visual.mate.board.MarketBoardView;
 import cointoss.visual.mate.console.Console;
 import cointoss.visual.mate.order.OrderCatalog;
 import cointoss.visual.mate.order.OrderMaker;
@@ -29,7 +28,7 @@ public class TradingView extends View {
 
     public @FXML Console console;
 
-    public @FXML MarketBoardView board;
+    public @FXML OrderBookView board;
 
     public @FXML OrderMaker maker;
 

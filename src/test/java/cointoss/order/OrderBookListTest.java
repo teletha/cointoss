@@ -258,6 +258,20 @@ public class OrderBookListTest {
         assert list.x10.size() == 1;
     }
 
+    @Test
+    public void buyBestPrice() throws Exception {
+        OrderBookList list = new OrderBookList(Side.SELL, true);
+        list.update(unit(1093, 1));
+        list.update(unit(1077, 1));
+        list.update(unit(1051, 2));
+        list.update(unit(1035, 4));
+        list.update(unit(1024, 1));
+        list.update(unit(1013, 1));
+        list.update(unit(1001, 7));
+        list.update(unit(1000, 30)); // total 47
+        assert list.computeBestPrice(Num.of(1000), Num.of(1999)).is(1002);
+    }
+
     /**
      * Helper method to assert.
      * 

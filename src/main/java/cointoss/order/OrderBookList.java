@@ -41,7 +41,10 @@ public class OrderBookList {
     /** The base list. */
     public final ObservableList<OrderUnit> x1000;
 
-    private Grouped[] group = new Grouped[3];
+    /** The base list. */
+    public final ObservableList<OrderUnit> x10000;
+
+    private Grouped[] group = new Grouped[4];
 
     /**
      * @param side
@@ -52,10 +55,12 @@ public class OrderBookList {
         this.x10 = FXCollections.observableList(GapList.create(empty()));
         this.x100 = FXCollections.observableList(GapList.create(empty()));
         this.x1000 = FXCollections.observableList(GapList.create(empty()));
+        this.x10000 = FXCollections.observableList(GapList.create(empty()));
 
         group[0] = new Grouped(side, -1, x10);
         group[1] = new Grouped(side, -2, x100);
         group[2] = new Grouped(side, -3, x1000);
+        group[3] = new Grouped(side, -4, x10000);
     }
 
     /**
@@ -67,10 +72,12 @@ public class OrderBookList {
         this.x10 = FXCollections.observableArrayList();
         this.x100 = FXCollections.observableArrayList();
         this.x1000 = FXCollections.observableArrayList();
+        this.x10000 = FXCollections.observableArrayList();
 
         group[0] = new Grouped(side, -1, x10);
         group[1] = new Grouped(side, -2, x100);
         group[2] = new Grouped(side, -3, x1000);
+        group[3] = new Grouped(side, -4, x10000);
     }
 
     /**
@@ -99,7 +106,7 @@ public class OrderBookList {
             while (iterator.hasNext()) {
                 OrderUnit unit = iterator.next();
 
-                if (unit.price.isGreaterThan(hint)) {
+                if (unit != null && unit.price.isGreaterThan(hint)) {
                     iterator.remove();
 
                     for (Grouped grouped : group) {
@@ -113,7 +120,7 @@ public class OrderBookList {
             for (int i = x1.size() - 1; 0 <= 0; i--) {
                 OrderUnit unit = x1.get(i);
 
-                if (unit.price.isLessThan(hint)) {
+                if (unit != null && unit.price.isLessThan(hint)) {
                     x1.remove(i);
 
                     for (Grouped grouped : group) {
@@ -142,6 +149,28 @@ public class OrderBookList {
      */
     public OrderUnit max() {
         return x1.get(0);
+    }
+
+    /**
+     * <pre>
+     * ■板の価格をクリックしたときの仕様
+     * 板の価格を１回クリックするとその価格が入力される
+     * 板の価格を２回クリックするとその価格グループで大きい板手前の有利な価格が入力される。
+     * 例)
+     * ２００円でグルーピングしてるときそのグループ内で0.9～3枚目の手前
+     * １０００円でグルーピングしてるときそのグループ内で3～10枚目の手前
+     * 3～10枚と変動基準は売り板買い板の仲値からの距離で変動する。
+     * １グループ目3枚目の手前、１０グループ目以降１０枚になる。
+     * </pre>
+     * 
+     * @return
+     */
+    public Num computeBestPrice(Num min, Num max) {
+        if (side == Side.BUY) {
+            // calculate sum
+
+        }
+        return null;
     }
 
     /**
