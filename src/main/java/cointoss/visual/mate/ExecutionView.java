@@ -18,16 +18,15 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 
 import cointoss.Execution;
-import cointoss.market.bitflyer.BitFlyer;
 import viewtify.View;
 import viewtify.Viewtify;
 import viewtify.ui.UI;
 import viewtify.ui.UISpinner;
 
 /**
- * @version 2017/11/13 20:36:45
+ * @version 2017/12/01 16:58:49
  */
-public class ExecutionView extends View {
+public class ExecutionView extends View<TradingView> {
 
     /** The execution list. */
     private @FXML ListView<Execution> executionList;
@@ -50,7 +49,7 @@ public class ExecutionView extends View {
 
         // load execution log
         Viewtify.inWorker(() -> {
-            return BitFlyer.FX_BTC_JPY.log().fromToday().on(Viewtify.UIThread).to(e -> {
+            return parent.market.timeline.on(Viewtify.UIThread).to(e -> {
                 ObservableList<Execution> items = executionList.getItems();
                 items.add(0, e);
 

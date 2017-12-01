@@ -11,18 +11,19 @@ package cointoss.visual.mate;
 
 import javafx.fxml.FXML;
 
+import cointoss.Market;
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.visual.mate.console.Console;
+import cointoss.visual.mate.order.OrderBuilder;
 import cointoss.visual.mate.order.OrderCatalog;
-import cointoss.visual.mate.order.OrderMaker;
 import viewtify.View;
 
 /**
  * @version 2017/11/29 10:50:06
  */
-public class TradingView extends View {
+public class TradingView extends View<MainView> {
 
-    public final BitFlyer market;
+    public final BitFlyer provider;
 
     public @FXML ExecutionView executionView;
 
@@ -30,15 +31,17 @@ public class TradingView extends View {
 
     public @FXML OrderBookView board;
 
-    public @FXML OrderMaker maker;
+    public @FXML OrderBuilder builder;
 
     public @FXML OrderCatalog catalog;
+
+    public Market market;
 
     /**
      * 
      */
-    public TradingView(BitFlyer market) {
-        this.market = market;
+    public TradingView(BitFlyer provider) {
+        this.provider = provider;
     }
 
     /**
@@ -46,6 +49,7 @@ public class TradingView extends View {
      */
     @Override
     protected void initialize() {
+        this.market = new Market(provider.service(), provider.log().fromToday());
     }
 
     /**
@@ -53,6 +57,6 @@ public class TradingView extends View {
      */
     @Override
     protected String name() {
-        return TradingView.class.getSimpleName() + View.IDSeparator + market.fullName();
+        return TradingView.class.getSimpleName() + View.IDSeparator + provider.fullName();
     }
 }

@@ -30,7 +30,7 @@ import viewtify.ui.UISpinner;
 /**
  * @version 2017/11/14 19:16:13
  */
-public class OrderBookView extends View {
+public class OrderBookView extends View<TradingView> {
 
     /** Order Book. */
     private final OrderBook book = new OrderBook();
@@ -91,7 +91,7 @@ public class OrderBookView extends View {
         });
 
         Viewtify.inWorker(() -> {
-            return BitFlyer.FX_BTC_JPY.log().fromToday().on(Viewtify.UIThread).effect(e -> {
+            return parent.market.timeline.on(Viewtify.UIThread).effect(e -> {
                 priceLatest.setText(e.price.toString());
             }).throttle(3, SECONDS).to(e -> {
                 // fix error board

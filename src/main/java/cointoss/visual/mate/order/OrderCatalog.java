@@ -39,7 +39,7 @@ import viewtify.ui.UIMenuItem;
 /**
  * @version 2017/11/26 14:05:31
  */
-public class OrderCatalog extends View {
+public class OrderCatalog extends View<TradingView> {
 
     private final OrderManager manager = I.make(OrderManager.class);
 
@@ -60,9 +60,6 @@ public class OrderCatalog extends View {
 
     /** UI */
     private @FXML TreeTableColumn<Object, Object> requestedOrdersPrice;
-
-    /** UI */
-    private @FXML TradingView view;
 
     /** The root item. */
     private final TreeItem<Object> root = new TreeItem();
@@ -131,7 +128,7 @@ public class OrderCatalog extends View {
                     TreeItem<Object> tree = getTreeItem();
                     tree.getParent().getChildren().remove(tree);
 
-                    view.console.write("{} is canceled.", order);
+                    parent.console.write("{} is canceled.", order);
                 });
             }
         });

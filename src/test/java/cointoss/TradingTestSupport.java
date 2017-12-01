@@ -25,7 +25,7 @@ public abstract class TradingTestSupport extends Trading {
     protected TradingLog log;
 
     /**
-     * @param market
+     * @param provider
      */
     public TradingTestSupport() {
         super.market = market = new TestableMarket();

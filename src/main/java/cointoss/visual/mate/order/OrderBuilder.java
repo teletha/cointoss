@@ -39,7 +39,7 @@ import viewtify.ui.UIText;
 /**
  * @version 2017/11/27 23:21:48
  */
-public class OrderMaker extends View {
+public class OrderBuilder extends View {
 
     private Predicate<UIText> positiveNumber = ui -> {
         try {
@@ -61,7 +61,6 @@ public class OrderMaker extends View {
         }
     };
 
-    /** The backend service. */
     private final MarketBackend service = BitFlyer.FX_BTC_JPY.service();
 
     /** The backend service. */
