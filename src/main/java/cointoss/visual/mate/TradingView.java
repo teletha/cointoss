@@ -35,10 +35,11 @@ public class TradingView extends View<MainView> {
 
     public @FXML OrderCatalog catalog;
 
-    public Market market;
+    /** Market cache. */
+    private Market market;
 
     /**
-     * 
+     *
      */
     public TradingView(BitFlyer provider) {
         this.provider = provider;
@@ -49,7 +50,6 @@ public class TradingView extends View<MainView> {
      */
     @Override
     protected void initialize() {
-        this.market = new Market(provider.service(), provider.log().fromToday());
     }
 
     /**
@@ -58,5 +58,17 @@ public class TradingView extends View<MainView> {
     @Override
     protected String name() {
         return TradingView.class.getSimpleName() + View.IDSeparator + provider.fullName();
+    }
+
+    /**
+     * Retrieve the associated market.
+     * 
+     * @return
+     */
+    public final synchronized Market market() {
+        if (market == null) {
+            market = new Market(provider.service(), provider.log().fromToday());
+        }
+        return market;
     }
 }

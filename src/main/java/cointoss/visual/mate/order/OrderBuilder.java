@@ -18,12 +18,10 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Spinner;
 import javafx.scene.input.ScrollEvent;
 
-import cointoss.MarketBackend;
 import cointoss.Order;
 import cointoss.Order.Quantity;
 import cointoss.OrderState;
 import cointoss.Side;
-import cointoss.market.bitflyer.BitFlyer;
 import cointoss.util.Num;
 import cointoss.visual.mate.TradingView;
 import kiss.I;
@@ -39,7 +37,7 @@ import viewtify.ui.UIText;
 /**
  * @version 2017/11/27 23:21:48
  */
-public class OrderBuilder extends View {
+public class OrderBuilder extends View<TradingView> {
 
     private Predicate<UIText> positiveNumber = ui -> {
         try {
@@ -60,8 +58,6 @@ public class OrderBuilder extends View {
             return false;
         }
     };
-
-    private final MarketBackend service = BitFlyer.FX_BTC_JPY.service();
 
     /** The backend service. */
     private final OrderManager manager = I.make(OrderManager.class);
@@ -188,7 +184,7 @@ public class OrderBuilder extends View {
             for (Order order : set.sub) {
                 view.console.write("Request order [{}]", order);
 
-                service.request(order).to(id -> {
+                parent.market().cancel(order).to(id -> {
                     order.child_order_acceptance_id = id;
                     order.child_order_state.set(OrderState.ACTIVE);
 

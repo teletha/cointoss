@@ -91,7 +91,7 @@ public class OrderBookView extends View<TradingView> {
         });
 
         Viewtify.inWorker(() -> {
-            return parent.market.timeline.on(Viewtify.UIThread).effect(e -> {
+            return parent.market().timeline.on(Viewtify.UIThread).effect(e -> {
                 priceLatest.setText(e.price.toString());
             }).throttle(3, SECONDS).to(e -> {
                 // fix error board

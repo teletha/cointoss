@@ -49,7 +49,7 @@ public class ExecutionView extends View<TradingView> {
 
         // load execution log
         Viewtify.inWorker(() -> {
-            return parent.market.timeline.on(Viewtify.UIThread).to(e -> {
+            return parent.market().timeline.on(Viewtify.UIThread).to(e -> {
                 ObservableList<Execution> items = executionList.getItems();
                 items.add(0, e);
 

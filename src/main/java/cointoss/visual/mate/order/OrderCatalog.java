@@ -23,10 +23,8 @@ import javafx.scene.control.TreeTableRow;
 import javafx.scene.control.TreeTableView;
 import javafx.util.Callback;
 
-import cointoss.MarketBackend;
 import cointoss.Order;
 import cointoss.Side;
-import cointoss.market.bitflyer.BitFlyer;
 import cointoss.visual.mate.TradingView;
 import kiss.Disposable;
 import kiss.I;
@@ -42,9 +40,6 @@ import viewtify.ui.UIMenuItem;
 public class OrderCatalog extends View<TradingView> {
 
     private final OrderManager manager = I.make(OrderManager.class);
-
-    /** The backend service. */
-    private final MarketBackend service = BitFlyer.FX_BTC_JPY.service();
 
     /** UI */
     private @FXML TreeTableView<Object> requestedOrders;
@@ -124,7 +119,7 @@ public class OrderCatalog extends View<TradingView> {
             Object item = getItem();
 
             if (item instanceof Order) {
-                service.cancel((Order) item).to(order -> {
+                parent.market().cancel((Order) item).to(order -> {
                     TreeItem<Object> tree = getTreeItem();
                     tree.getParent().getChildren().remove(tree);
 

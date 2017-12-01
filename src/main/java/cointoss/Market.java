@@ -18,6 +18,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicReference;
 
 import cointoss.chart.Chart;
+import cointoss.order.OrderBookChange;
 import cointoss.util.Num;
 import kiss.Disposable;
 import kiss.Observer;
@@ -96,6 +97,9 @@ public class Market implements Disposable {
     /** The execution time line. */
     public final Signal<Execution> timeline = new Signal(timelines);
 
+    /** The execution time line. */
+    public final Signal<OrderBookChange> orderTimeline;
+
     /** The initial execution. */
     private Execution init;
 
@@ -148,6 +152,7 @@ public class Market implements Disposable {
         }
 
         this.backend = backend;
+        this.orderTimeline = backend.getBoard();
 
         // initialize price, balance and executions
         this.base = backend.getBaseCurrency().to().v;

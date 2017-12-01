@@ -14,8 +14,6 @@ import java.util.LinkedList;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import cointoss.MarketBackend;
-import cointoss.market.bitflyer.BitFlyer;
 import kiss.Manageable;
 import kiss.Singleton;
 
@@ -24,9 +22,6 @@ import kiss.Singleton;
  */
 @Manageable(lifestyle = Singleton.class)
 class OrderManager {
-
-    /** The backend service. */
-    private final MarketBackend service = BitFlyer.FX_BTC_JPY.service();
 
     /** The order set management. */
     private final ObservableList<OrderSet> managed = FXCollections.observableList(new LinkedList());
