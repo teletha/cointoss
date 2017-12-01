@@ -83,11 +83,11 @@ public class OrderBookView extends View {
                     book.longs.update(unit);
                 }
 
-                OrderUnit bestAsk = book.shorts.min();
-                OrderUnit bestBid = book.longs.max();
+                OrderUnit bestShort = book.shorts.min();
+                OrderUnit bestLong = book.longs.max();
 
-                if (bestAsk != null && bestBid != null) {
-                    priceSpread.setText(bestAsk.price.minus(bestBid.price).toString());
+                if (bestShort != null && bestLong != null) {
+                    priceSpread.setText(bestShort.price.minus(bestLong.price).toString());
                 }
             });
         });

@@ -28,6 +28,9 @@ import viewtify.ui.UISpinner;
  */
 public class ExecutionView extends View {
 
+    /** The time format. */
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+
     /** The execution list. */
     private @FXML ListView<Execution> executionList;
 
@@ -72,9 +75,6 @@ public class ExecutionView extends View {
             });
         });
     }
-
-    /** The time format. */
-    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
 
     /**
      * @version 2017/11/13 21:35:32

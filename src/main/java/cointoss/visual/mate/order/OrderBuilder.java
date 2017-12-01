@@ -19,12 +19,12 @@ import javafx.scene.control.Spinner;
 import javafx.scene.input.ScrollEvent;
 
 import cointoss.Order;
+import cointoss.OrderSet;
 import cointoss.Order.Quantity;
 import cointoss.OrderState;
 import cointoss.Side;
 import cointoss.util.Num;
 import cointoss.visual.mate.TradingView;
-import kiss.I;
 import kiss.WiseBiConsumer;
 import viewtify.User;
 import viewtify.View;
@@ -58,9 +58,6 @@ public class OrderBuilder extends View {
             return false;
         }
     };
-
-    /** The backend service. */
-    private final OrderManager manager = I.make(OrderManager.class);
 
     /** UI */
     private @FXML UIText orderSize;
@@ -152,46 +149,46 @@ public class OrderBuilder extends View {
      * @return
      */
     private void requestOrder(Side side) {
-        Viewtify.inWorker(() -> {
-            // ========================================
-            // Create Model
-            // ========================================
-            OrderSet set = new OrderSet();
+        // ========================================
+        // Create Model
+        // ========================================
+        OrderSet set = new OrderSet();
 
-            Num size = orderSize.valueOr(Num.ZERO);
-            Num price = orderPrice.valueOr(Num.ZERO);
-            int divideSize = orderDivideSize.value();
-            Num priceInterval = orderPriceInterval.valueOr(Num.ZERO).multiply(side.isBuy() ? -1 : 1);
-            Quantity quantity = orderQuantity.value();
+        Num size = orderSize.valueOr(Num.ZERO);
+        Num price = orderPrice.valueOr(Num.ZERO);
+        int divideSize = orderDivideSize.value();
+        Num priceInterval = orderPriceInterval.valueOr(Num.ZERO).multiply(side.isBuy() ? -1 : 1);
+        Quantity quantity = orderQuantity.value();
 
-            for (int i = 0; i < divideSize; i++) {
-                Order order = Order.limit(side, size, price).type(quantity);
-                order.child_order_state.set(OrderState.REQUESTING);
+        for (int i = 0; i < divideSize; i++) {
+            Order order = Order.limit(side, size, price).type(quantity);
+            order.child_order_state.set(OrderState.REQUESTING);
+            order.cancel.to(set.sub::remove);
 
-                set.sub.add(order);
+            set.sub.add(order);
 
-                price = price.plus(priceInterval);
-            }
+            price = price.plus(priceInterval);
+        }
 
-            // ========================================
-            // Create View Model
-            // ========================================
-            view.catalog.add(set);
+        // ========================================
+        // Create View Model
+        // ========================================
+        view.catalog.add(set);
 
-            // ========================================
-            // Request to Server
-            // ========================================
-            for (Order order : set.sub) {
-                view.console.write("Request order [{}]", order);
+        // ========================================
+        // Request to Server
+        // ========================================
+        for (Order order : set.sub) {
+            view.console.write("Request order [{}]", order);
 
-                view.market().cancel(order).to(id -> {
-                    order.child_order_acceptance_id = id;
-                    order.child_order_state.set(OrderState.ACTIVE);
-
-                    view.console.write("Accept order [{}]", order);
+            Viewtify.inWorker(() -> {
+                view.market().request(order).to(o -> {
+                    view.console.write("Accept order [{}]", o);
                 });
-            }
-        });
+            });
+
+            System.out.println("REQEST");
+        }
     }
 
 }

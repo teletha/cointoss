@@ -33,7 +33,6 @@ import com.pubnub.api.models.consumer.PNStatus;
 import com.pubnub.api.models.consumer.pubsub.PNMessageResult;
 import com.pubnub.api.models.consumer.pubsub.PNPresenceEventResult;
 
-import cointoss.BalanceUnit;
 import cointoss.Execution;
 import cointoss.Market;
 import cointoss.MarketBackend;
@@ -156,9 +155,7 @@ class BitFlyerBackend implements MarketBackend {
      */
     @Override
     public Signal<Order> getOrderBy(String id) {
-        // If this exception will be thrown, it is bug of this program. So we must rethrow the
-        // wrapped error in here.
-        throw new Error();
+        return call("GET", "/v1/me/getchildorders?product_code=" + type.name() + "&child_order_acceptance_id=" + id, "", "*", Order.class);
     }
 
     /**
@@ -269,12 +266,13 @@ class BitFlyerBackend implements MarketBackend {
                     CloseableHttpResponse response = client.execute(request)) {
 
                 int status = response.getStatusLine().getStatusCode();
+                String value = EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8);
 
                 if (status == HttpStatus.SC_OK) {
                     if (type == null) {
                         observer.accept(null);
                     } else {
-                        JSON json = I.json(EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8));
+                        JSON json = I.json(value);
 
                         if (selector == null || selector.isEmpty()) {
                             observer.accept(json.to(type));
@@ -283,9 +281,9 @@ class BitFlyerBackend implements MarketBackend {
                         }
                     }
                 } else {
-                    observer.error(new Error("HTTP Status " + status));
+                    observer.error(new Error("HTTP Status " + status + " " + value));
                 }
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 observer.error(e);
             }
             observer.complete();

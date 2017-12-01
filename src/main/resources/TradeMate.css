@@ -55,6 +55,9 @@
     -fx-background-color: -fx-mark-highlight-color, rgb(255, 255, 255);
 }
 
+/* ==========================================================================
+  Tab
+===========================================================================*/
 .tab-pane:top *.tab-header-area {
     -fx-background-insets: 0, 0 0 1 0;
     -fx-padding: 0em 0em 0.0em 0em;
@@ -77,9 +80,20 @@
 		-fx-font-weight: bold;
 }
 
+/* ==========================================================================
+  Table
+===========================================================================*/
+.table-column {
+  -fx-alignment: CENTER;
+}
+
+.tree-table-row-cell{
+    -fx-indent: 0;
+}
+
 
 /* ==========================================================================
-
+ Trade Mate
 ===========================================================================*/
 .BUY {
 	-fx-text-fill: rgb(251, 189, 42);
@@ -107,8 +121,8 @@
 	-fx-label-padding: 0 0 0 8px;
 }
 
-#requestedOrders .table-column {
-  -fx-alignment: CENTER;
+#requestedOrdersDate {
+  -fx-alignment: CENTER_LEFT;
 }
 
 .tree-table-row-cell.REQUESTING .cell {

@@ -202,10 +202,10 @@
          <children>
             <TreeTableView id="requestedOrders">
                <columns>
-                  <TreeTableColumn id="requestedOrdersDate" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" text="日付" />
-                  <TreeTableColumn id="requestedOrdersSide" maxWidth="70.0" minWidth="70.0" prefWidth="70.0" text="売買" />
-                  <TreeTableColumn id="requestedOrdersAmount" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" text="数量" />
-                  <TreeTableColumn id="requestedOrdersPrice" prefWidth="75.0" text="価格" />
+                  <TreeTableColumn id="requestedOrdersDate" editable="false" maxWidth="130.0" minWidth="130.0" prefWidth="130.0" resizable="false" text="日付" />
+                  <TreeTableColumn id="requestedOrdersSide" maxWidth="70.0" minWidth="70.0" prefWidth="70.0" resizable="false" text="売買" />
+                  <TreeTableColumn id="requestedOrdersAmount" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" resizable="false" text="数量" />
+                  <TreeTableColumn id="requestedOrdersPrice" prefWidth="75.0" resizable="false" text="価格" />
                </columns>
             </TreeTableView>
          </children>

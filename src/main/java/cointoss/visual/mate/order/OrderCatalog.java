@@ -9,11 +9,11 @@
  */
 package cointoss.visual.mate.order;
 
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAccessor;
 import java.util.function.Function;
 
-import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.ListChangeListener;
 import javafx.fxml.FXML;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableCell;
@@ -24,10 +24,10 @@ import javafx.scene.control.TreeTableView;
 import javafx.util.Callback;
 
 import cointoss.Order;
+import cointoss.OrderSet;
 import cointoss.Side;
 import cointoss.visual.mate.TradingView;
 import kiss.Disposable;
-import kiss.I;
 import viewtify.View;
 import viewtify.Viewtify;
 import viewtify.ui.UI;
@@ -38,8 +38,6 @@ import viewtify.ui.UIMenuItem;
  * @version 2017/11/26 14:05:31
  */
 public class OrderCatalog extends View {
-
-    private final OrderManager manager = I.make(OrderManager.class);
 
     /** UI */
     private @FXML TreeTableView<Object> requestedOrders;
@@ -70,7 +68,8 @@ public class OrderCatalog extends View {
         requestedOrders.setRoot(root);
         requestedOrders.setShowRoot(false);
         requestedOrders.setRowFactory(table -> new OrderStateRow());
-        requestedOrdersDate.setCellValueFactory(new OrderStateValueCell(s -> new SimpleStringProperty(""), o -> o.child_order_date));
+        requestedOrdersDate.setCellValueFactory(new OrderStateValueCell(OrderSet::date, Order::childOrderDate));
+        requestedOrdersDate.setCellFactory(t -> new DateCell());
         requestedOrdersSide.setCellValueFactory(new OrderStateValueCell(OrderSet::side, Order::sideProperty));
         requestedOrdersSide.setCellFactory(table -> new OrderStateCell());
         requestedOrdersAmount.setCellValueFactory(new OrderStateValueCell(OrderSet::amount, Order::size));
@@ -81,26 +80,20 @@ public class OrderCatalog extends View {
      * @param set
      */
     public void add(OrderSet set) {
-        TreeItem item;
+        TreeItem item = new TreeItem(set);
+        item.setExpanded(set.sub.size() != 1);
 
-        if (set.sub.size() == 1) {
-            Order order = set.sub.get(0);
-            item = new TreeItem(order);
+        // create sub orders for UI
+        for (Order order : set.sub) {
+            TreeItem sub = new TreeItem(order);
+            item.getChildren().add(sub);
 
-            order.cancel.to(e -> {
-                System.out.println("canceled " + e);
-            });
-        } else {
-            item = new TreeItem(set);
-            item.setExpanded(true);
+            order.cancel.to(o -> {
+                item.getChildren().remove(sub);
 
-            // create sub orders for UI
-            for (Order order : set.sub) {
-                item.getChildren().add(new TreeItem(order));
-            }
-
-            set.sub.addListener((ListChangeListener) c -> {
-
+                if (item.getChildren().isEmpty()) {
+                    root.getChildren().remove(item);
+                }
             });
         }
         root.getChildren().add(item);
@@ -123,9 +116,6 @@ public class OrderCatalog extends View {
 
             if (item instanceof Order) {
                 view.market().cancel((Order) item).to(order -> {
-                    TreeItem<Object> tree = getTreeItem();
-                    tree.getParent().getChildren().remove(tree);
-
                     view.console.write("{} is canceled.", order);
                 });
             }
@@ -218,11 +208,35 @@ public class OrderCatalog extends View {
 
             if (empty) {
                 setText(null);
-            } else if (item != null && !empty) {
+            } else {
                 setText(item.toString());
 
                 if (item instanceof Side) {
                     ui.style((Side) item);
+                }
+            }
+        }
+    }
+
+    /**
+     * @version 2017/12/01 23:30:30
+     */
+    private static class DateCell extends TreeTableCell<Object, Object> {
+
+        private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd HH:mm:ss");
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected void updateItem(Object item, boolean empty) {
+            super.updateItem(item, empty);
+
+            if (empty) {
+                setText(null);
+            } else {
+                if (item instanceof TemporalAccessor) {
+                    setText(formatter.format((TemporalAccessor) item));
                 }
             }
         }

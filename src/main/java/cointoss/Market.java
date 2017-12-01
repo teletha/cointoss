@@ -10,6 +10,7 @@
 package cointoss;
 
 import java.time.Duration;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -210,18 +211,12 @@ public class Market implements Disposable {
      * @param size
      */
     public final Signal<Order> request(Order order) {
-        return backend.request(order).flatMap(backend::getOrderBy).map(o -> {
-            // copy backend property
-            order.average_price.set(o.average_price);
-            order.cancel_size = o.cancel_size;
-            order.child_order_acceptance_id = o.child_order_acceptance_id;
-            order.child_order_date = o.child_order_date;
-            order.child_order_state = o.child_order_state;
-            order.child_order_type = o.child_order_type;
-            order.executed_size = o.executed_size;
-            order.expire_date = o.expire_date;
-            order.outstanding_size.set(o.outstanding_size);
-            order.total_commission = o.total_commission;
+        return backend.request(order).map(id -> {
+            order.child_order_acceptance_id = id;
+            order.child_order_state.set(OrderState.ACTIVE);
+            order.child_order_date.set(ZonedDateTime.now());
+            order.average_price.set(order.price);
+            order.outstanding_size.set(order.size);
 
             // store
             orders.add(order);

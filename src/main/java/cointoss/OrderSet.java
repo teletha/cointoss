@@ -7,8 +7,9 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss.visual.mate.order;
+package cointoss;
 
+import java.time.ZonedDateTime;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -16,17 +17,16 @@ import javafx.beans.binding.ObjectBinding;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import cointoss.Order;
-import cointoss.Side;
 import cointoss.util.Num;
 import viewtify.Viewtify;
+import viewtify.bind.MonadicBinding;
 
 /**
  * @version 2017/11/26 13:44:57
  */
-class OrderSet {
+public class OrderSet {
 
-    final ObservableList<Order> sub = FXCollections.observableArrayList();
+    public final ObservableList<Order> sub = FXCollections.observableArrayList();
 
     /** Total amount calculation. */
     final ObjectBinding<Num> amount = Viewtify.bind(sub)
@@ -43,6 +43,8 @@ class OrderSet {
 
     /** Average price calculation. */
     final ObjectBinding<Set<Side>> side = Viewtify.bind(sub).map(e -> e.side()).collect(Collectors.toSet());
+
+    final MonadicBinding<ZonedDateTime> date = Viewtify.bind(sub).item(0).flatVariable(o -> o.child_order_date);
 
     /**
      * Get the amount property of this {@link OrderSet}.
@@ -78,5 +80,14 @@ class OrderSet {
      */
     public ObjectBinding<Set<Side>> side() {
         return side;
+    }
+
+    /**
+     * Get the date property of this {@link OrderSet}.
+     * 
+     * @return The side property.
+     */
+    public MonadicBinding<ZonedDateTime> date() {
+        return date;
     }
 }

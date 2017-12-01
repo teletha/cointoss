@@ -15,7 +15,6 @@ import java.util.Deque;
 import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.value.ObservableValue;
 
 import cointoss.util.Num;
@@ -53,6 +52,10 @@ public class Order implements Directional {
 
     /** The execution signal. */
     public final Signal<Order> cancel = new Signal(cancelListeners);
+
+    private Order() {
+        this(Side.BUY, Num.ZERO, Num.ZERO, Num.ZERO, Quantity.GoodTillCanceled);
+    }
 
     /**
      * <p>
@@ -116,6 +119,15 @@ public class Order implements Directional {
      */
     public ObservableValue<Num> price() {
         return Viewtify.wrap(price);
+    }
+
+    /**
+     * Get the price property of this {@link Order}.
+     * 
+     * @return The price property.
+     */
+    public ObservableValue<ZonedDateTime> childOrderDate() {
+        return Viewtify.wrap(child_order_date);
     }
 
     /**
@@ -363,7 +375,7 @@ public class Order implements Directional {
     public Variable<OrderState> child_order_state = Variable.of(OrderState.INIT);
 
     /** The order date */
-    public ReadOnlyObjectProperty<ZonedDateTime> child_order_date;
+    public Variable<ZonedDateTime> child_order_date = Variable.of(ZonedDateTime.now());
 
     /** The expire date */
     public ZonedDateTime expire_date;

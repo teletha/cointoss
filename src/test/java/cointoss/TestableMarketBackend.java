@@ -15,8 +15,6 @@ import java.util.LinkedList;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import javafx.beans.property.SimpleObjectProperty;
-
 import cointoss.Order.Quantity;
 import cointoss.Time.Lag;
 import cointoss.order.OrderBookChange;
@@ -81,7 +79,7 @@ class TestableMarketBackend implements MarketBackend {
             BackendOrder child = new BackendOrder(order);
             child.child_order_acceptance_id = "LOCAL-ACCEPTANCE-" + id++;
             child.child_order_state.set(OrderState.ACTIVE);
-            child.child_order_date = new SimpleObjectProperty(now.plusNanos(lag.generate()));
+            child.child_order_date.set(now.plusNanos(lag.generate()));
             child.child_order_type = order.price.v.is(0) ? OrderType.MARKET : OrderType.LIMIT;
             child.average_price.set(order.price.v);
             child.outstanding_size.set(order.size.v);
