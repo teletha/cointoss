@@ -22,7 +22,7 @@ import viewtify.Viewtify;
 /**
  * @version 2017/11/29 10:50:06
  */
-public class TradingView extends View<MainView> {
+public class TradingView extends View {
 
     public final BitFlyer provider;
 

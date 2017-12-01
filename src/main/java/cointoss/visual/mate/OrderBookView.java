@@ -29,7 +29,7 @@ import viewtify.ui.UISpinner;
 /**
  * @version 2017/11/14 19:16:13
  */
-public class OrderBookView extends View<TradingView> {
+public class OrderBookView extends View {
 
     /** Order Book. */
     private final OrderBook book = new OrderBook();
@@ -55,6 +55,9 @@ public class OrderBookView extends View<TradingView> {
     /** UI for interval configuration. */
     private @FXML UISpinner<Num> hideSize;
 
+    /** Parent View */
+    private @FXML TradingView view;
+
     /**
      * {@inheritDoc}
      */
@@ -71,7 +74,7 @@ public class OrderBookView extends View<TradingView> {
 
         // read data from backend service
         Viewtify.inWorker(() -> {
-            return parent.market().orderTimeline.on(Viewtify.UIThread).to(board -> {
+            return view.market().orderTimeline.on(Viewtify.UIThread).to(board -> {
                 for (OrderUnit unit : board.asks) {
                     book.shorts.update(unit);
                 }
@@ -90,7 +93,7 @@ public class OrderBookView extends View<TradingView> {
         });
 
         Viewtify.inWorker(() -> {
-            return parent.market().timeline.on(Viewtify.UIThread).effect(e -> {
+            return view.market().timeline.on(Viewtify.UIThread).effect(e -> {
                 priceLatest.setText(e.price.toString());
             }).throttle(3, SECONDS).to(e -> {
                 // fix error board

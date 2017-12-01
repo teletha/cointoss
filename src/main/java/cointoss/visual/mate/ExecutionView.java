@@ -26,7 +26,7 @@ import viewtify.ui.UISpinner;
 /**
  * @version 2017/12/01 16:58:49
  */
-public class ExecutionView extends View<TradingView> {
+public class ExecutionView extends View {
 
     /** The execution list. */
     private @FXML ListView<Execution> executionList;
@@ -36,6 +36,9 @@ public class ExecutionView extends View<TradingView> {
 
     /** UI for interval configuration. */
     private @FXML UISpinner<Integer> takerSize;
+
+    /** Parent View */
+    private @FXML TradingView view;
 
     /**
      * {@inheritDoc}
@@ -49,7 +52,7 @@ public class ExecutionView extends View<TradingView> {
 
         // load execution log
         Viewtify.inWorker(() -> {
-            return parent.market().timeline.on(Viewtify.UIThread).to(e -> {
+            return view.market().timeline.on(Viewtify.UIThread).to(e -> {
                 ObservableList<Execution> items = executionList.getItems();
                 items.add(0, e);
 

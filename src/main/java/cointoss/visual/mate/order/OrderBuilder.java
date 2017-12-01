@@ -37,7 +37,7 @@ import viewtify.ui.UIText;
 /**
  * @version 2017/11/27 23:21:48
  */
-public class OrderBuilder extends View<TradingView> {
+public class OrderBuilder extends View {
 
     private Predicate<UIText> positiveNumber = ui -> {
         try {
@@ -184,7 +184,7 @@ public class OrderBuilder extends View<TradingView> {
             for (Order order : set.sub) {
                 view.console.write("Request order [{}]", order);
 
-                parent.market().cancel(order).to(id -> {
+                view.market().cancel(order).to(id -> {
                     order.child_order_acceptance_id = id;
                     order.child_order_state.set(OrderState.ACTIVE);
 

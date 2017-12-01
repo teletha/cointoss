@@ -33,7 +33,7 @@ public class ChartTrendTest {
         assert chart.trend() == Trend.Down;
 
         chart = bitflyerFX("2017-08-20T07:00:00", "2017-08-22T08:59:59", Duration.ofHours(2));
-        assert chart.trend() == Trend.Down;
+        assert chart.trend() != Trend.Down;
     }
 
     @Test

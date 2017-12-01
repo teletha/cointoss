@@ -32,7 +32,7 @@ import viewtify.ui.UIListView;
 /**
  * @version 2017/11/19 6:48:15
  */
-public class Console extends View<TradingView> {
+public class Console extends View {
 
     /** The maximum line size. */
     private static final int MAX = 3000;
@@ -59,7 +59,7 @@ public class Console extends View<TradingView> {
         console.values(messages);
 
         Viewtify.inWorker(() -> {
-            parent.market().add(new Trader());
+            view.market().add(new Trader());
         });
     }
 
