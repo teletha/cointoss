@@ -13,7 +13,6 @@ import static java.util.concurrent.TimeUnit.*;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
 import java.util.LinkedList;
 
 import javafx.collections.FXCollections;
@@ -24,9 +23,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import cointoss.ExecutionFlow;
-import cointoss.Market;
 import cointoss.Trading;
-import cointoss.market.bitflyer.BitFlyer;
 import cointoss.visual.mate.TradingView;
 import viewtify.View;
 import viewtify.Viewtify;
@@ -35,7 +32,7 @@ import viewtify.ui.UIListView;
 /**
  * @version 2017/11/19 6:48:15
  */
-public class Console extends View {
+public class Console extends View<TradingView> {
 
     /** The maximum line size. */
     private static final int MAX = 3000;
@@ -62,7 +59,7 @@ public class Console extends View {
         console.values(messages);
 
         Viewtify.inWorker(() -> {
-            return new Market(BitFlyer.FX_BTC_JPY.service(), BitFlyer.FX_BTC_JPY.log().fromLast(10, ChronoUnit.SECONDS), new Trader());
+            parent.market().add(new Trader());
         });
     }
 

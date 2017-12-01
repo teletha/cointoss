@@ -17,6 +17,7 @@ import cointoss.visual.mate.console.Console;
 import cointoss.visual.mate.order.OrderBuilder;
 import cointoss.visual.mate.order.OrderCatalog;
 import viewtify.View;
+import viewtify.Viewtify;
 
 /**
  * @version 2017/11/29 10:50:06
@@ -67,7 +68,7 @@ public class TradingView extends View<MainView> {
      */
     public final synchronized Market market() {
         if (market == null) {
-            market = new Market(provider.service(), provider.log().fromToday());
+            Viewtify.Terminator.add(market = new Market(provider.service(), provider.log().fromToday()));
         }
         return market;
     }

@@ -25,6 +25,9 @@ public class ExecutionFlowTest {
     @Test
     public void price() throws Exception {
         ExecutionFlow flow = new ExecutionFlow(3);
+        System.out.println(flow);
+        System.out.println(flow.latest == null);
+        System.out.println(flow.latest.price == null);
         assert flow.latest.price.is(0);
 
         flow.record(createBuy(0, 1, 1));

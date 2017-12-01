@@ -51,6 +51,9 @@ public class ExecutionFlow {
      */
     public ExecutionFlow(int size) {
         this.buffer = new RingBuffer(size, "TREND" + size);
+
+        // initialize empty object
+        latest.price = Num.ZERO;
     }
 
     /**

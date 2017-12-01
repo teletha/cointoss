@@ -147,21 +147,29 @@ public class Market implements Disposable {
             throw new Error("Market log is not found.");
         }
 
-        if (trading == null) {
-            trading = new NOP();
-        }
-
         this.backend = backend;
         this.orderTimeline = backend.getBoard();
 
         // initialize price, balance and executions
-        this.base = backend.getBaseCurrency().to().v;
-        this.target = backend.getTargetCurrency().to().v;
+        this.base = this.baseInit = backend.getBaseCurrency().to().v;
+        this.target = this.targetInit = backend.getTargetCurrency().to().v;
 
-        tradings.add(trading);
-        trading.market = this;
-        trading.initialize();
+        add(trading);
         backend.initialize(this, log);
+    }
+
+    /**
+     * Add market trader to this market.
+     * 
+     * @param trading
+     */
+    public void add(Trading trading) {
+        if (trading != null) {
+            trading.market = this;
+            trading.initialize();
+
+            tradings.add(trading);
+        }
     }
 
     /**
@@ -490,19 +498,5 @@ public class Market implements Disposable {
     private void initializePosition() {
         position = null;
         price = remaining = Num.ZERO;
-    }
-
-    /**
-     * @version 2017/11/28 9:22:17
-     */
-    private static class NOP extends Trading {
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        protected void initialize() {
-            // do nothing
-        }
     }
 }

@@ -172,9 +172,7 @@ class TestableMarketBackend implements MarketBackend {
      */
     @Override
     public Signal<OrderBookChange> getBoard() {
-        // If this exception will be thrown, it is bug of this program. So we must rethrow the
-        // wrapped error in here.
-        throw new Error();
+        return I.signal();
     }
 
     /**

@@ -18,13 +18,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
 import cointoss.Market;
-import cointoss.Trading;
 import cointoss.chart.Chart;
 import cointoss.chart.Tick;
 import cointoss.market.bitflyer.BitFlyer;
@@ -59,22 +57,7 @@ public class Visualize extends Application {
     @Override
     public void init() throws Exception {
         system.submit(() -> {
-            market = new Market(BitFlyer.FX_BTC_JPY.service(), BitFlyer.FX_BTC_JPY.log().fromLast(10, HOURS), new Trading() {
-
-                /**
-                 * 
-                 */
-                @Override
-                protected void initialize() {
-                    market.minute1.to(t -> {
-                        if (candleChart != null) {
-                            Platform.runLater(() -> {
-                                candleChart.requestLayout();
-                            });
-                        }
-                    });
-                }
-            });
+            market = new Market(BitFlyer.FX_BTC_JPY.service(), BitFlyer.FX_BTC_JPY.log().fromLast(10, HOURS));
         });
     }
 

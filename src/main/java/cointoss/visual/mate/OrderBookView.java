@@ -16,7 +16,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.TextField;
 
-import cointoss.market.bitflyer.BitFlyer;
 import cointoss.order.OrderBook;
 import cointoss.order.OrderBookList;
 import cointoss.order.OrderBookList.Ratio;
@@ -72,7 +71,7 @@ public class OrderBookView extends View<TradingView> {
 
         // read data from backend service
         Viewtify.inWorker(() -> {
-            return BitFlyer.FX_BTC_JPY.service().getBoard().on(Viewtify.UIThread).to(board -> {
+            return parent.market().orderTimeline.on(Viewtify.UIThread).to(board -> {
                 for (OrderUnit unit : board.asks) {
                     book.shorts.update(unit);
                 }
