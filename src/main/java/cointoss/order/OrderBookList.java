@@ -81,17 +81,91 @@ public class OrderBookList {
     }
 
     /**
-     * Update orders.
+     * Retrieve minimum unit.
      * 
-     * @param price A order price.
-     * @param size A order size.
+     * @return
      */
-    public void update(OrderUnit unit) {
-        if (side == Side.BUY) {
-            head(unit);
-        } else {
-            tail(unit);
+    public OrderUnit min() {
+        return x1.get(x1.size() - 1);
+    }
+
+    /**
+     * Retrieve maximum unit.
+     * 
+     * @return
+     */
+    public OrderUnit max() {
+        return x1.get(0);
+    }
+
+    /**
+     * Select list by ratio.
+     * 
+     * @param ratio
+     * @return
+     */
+    public ObservableList<OrderUnit> selectByRatio(Ratio ratio) {
+        switch (ratio) {
+        case x1:
+            return x1;
+
+        case x10:
+            return x10;
+
+        case x100:
+            return x100;
+
+        case x1000:
+            return x1000;
+
+        default:
+            return x10000;
         }
+    }
+
+    /**
+     * <pre>
+     * ■板の価格をクリックしたときの仕様
+     * 板の価格を１回クリックするとその価格が入力される
+     * 板の価格を２回クリックするとその価格グループで大きい板手前の有利な価格が入力される。
+     * 例)
+     * ２００円でグルーピングしてるときそのグループ内で0.9～3枚目の手前
+     * １０００円でグルーピングしてるときそのグループ内で3～10枚目の手前
+     * 3～10枚と変動基準は売り板買い板の仲値からの距離で変動する。
+     * １グループ目3枚目の手前、１０グループ目以降１０枚になる。
+     * </pre>
+     * 
+     * @return
+     */
+    public Num computeBestPrice(Num start, Num threshold, Num diff) {
+        if (side == Side.BUY) {
+            Num total = Num.ZERO;
+
+            for (OrderUnit unit : x1) {
+                if (unit.price.isLessThan(start)) {
+                    total = total.plus(unit.size);
+
+                    if (total.isGreaterThanOrEqual(threshold)) {
+                        return unit.price.plus(diff);
+                    }
+                }
+            }
+        } else {
+            Num total = Num.ZERO;
+
+            for (int i = x1.size() - 1; 0 <= i; i--) {
+                OrderUnit unit = x1.get(i);
+
+                if (unit.price.isGreaterThanOrEqual(start)) {
+                    total = total.plus(unit.size);
+
+                    if (total.isGreaterThanOrEqual(threshold)) {
+                        return unit.price.minus(diff);
+                    }
+                }
+            }
+        }
+        return null;
     }
 
     /**
@@ -134,43 +208,17 @@ public class OrderBookList {
     }
 
     /**
-     * Retrieve minimum unit.
+     * Update orders.
      * 
-     * @return
+     * @param price A order price.
+     * @param size A order size.
      */
-    public OrderUnit min() {
-        return x1.get(x1.size() - 1);
-    }
-
-    /**
-     * Retrieve maximum unit.
-     * 
-     * @return
-     */
-    public OrderUnit max() {
-        return x1.get(0);
-    }
-
-    /**
-     * <pre>
-     * ■板の価格をクリックしたときの仕様
-     * 板の価格を１回クリックするとその価格が入力される
-     * 板の価格を２回クリックするとその価格グループで大きい板手前の有利な価格が入力される。
-     * 例)
-     * ２００円でグルーピングしてるときそのグループ内で0.9～3枚目の手前
-     * １０００円でグルーピングしてるときそのグループ内で3～10枚目の手前
-     * 3～10枚と変動基準は売り板買い板の仲値からの距離で変動する。
-     * １グループ目3枚目の手前、１０グループ目以降１０枚になる。
-     * </pre>
-     * 
-     * @return
-     */
-    public Num computeBestPrice(Num min, Num max) {
+    public void update(OrderUnit unit) {
         if (side == Side.BUY) {
-            // calculate sum
-
+            head(unit);
+        } else {
+            tail(unit);
         }
-        return null;
     }
 
     /**
@@ -276,6 +324,30 @@ public class OrderBookList {
             list.add(null);
         }
         return list;
+    }
+
+    /**
+     * @version 2017/12/01 13:04:56
+     */
+    public static enum Ratio {
+        x1(1), x10(10), x100(100), x1000(1000), x10000(10000);
+
+        public final int ratio;
+
+        /**
+         * @param ratio
+         */
+        private Ratio(int ratio) {
+            this.ratio = ratio;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String toString() {
+            return String.valueOf(ratio);
+        }
     }
 
     /**

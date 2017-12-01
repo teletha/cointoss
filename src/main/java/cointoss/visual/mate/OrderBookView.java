@@ -18,6 +18,8 @@ import javafx.scene.control.TextField;
 
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.order.OrderBook;
+import cointoss.order.OrderBookList;
+import cointoss.order.OrderBookList.Ratio;
 import cointoss.order.OrderUnit;
 import cointoss.util.Num;
 import viewtify.View;
@@ -40,7 +42,7 @@ public class OrderBookView extends View {
     private @FXML UIListView<OrderUnit> shortList;
 
     /** UI for interval configuration. */
-    private @FXML UISpinner<Integer> priceRange;
+    private @FXML UISpinner<OrderBookList.Ratio> priceRange;
 
     /** UI for interval configuration. */
     private @FXML Label priceLatest;
@@ -61,35 +63,11 @@ public class OrderBookView extends View {
     protected void initialize() {
         longList.values(book.longs.x1).cell(e -> new CellView());
         shortList.values(book.shorts.x1).cell(e -> new CellView()).scrollTo(book.shorts.x1.size() - 1);
-        hideSize.values(Num.ZERO, Num.ONE, Num.TWO, Num.of(5)).initial(Num.ZERO).observe(e -> longList.ui.refresh());
+        hideSize.values(Num.range(0, 9)).initial(Num.ZERO).observe(e -> longList.ui.refresh());
 
-        priceRange.values(1, 10, 100, 1000, 10000).initial(1).observeNow(e -> {
-            switch (e) {
-            case 1:
-                longList.values(book.longs.x1);
-                shortList.values(book.shorts.x1);
-                break;
-
-            case 10:
-                longList.values(book.longs.x10);
-                shortList.values(book.shorts.x10);
-                break;
-
-            case 100:
-                longList.values(book.longs.x100);
-                shortList.values(book.shorts.x100);
-                break;
-
-            case 1000:
-                longList.values(book.longs.x1000);
-                shortList.values(book.shorts.x1000);
-                break;
-
-            case 10000:
-                longList.values(book.longs.x10000);
-                shortList.values(book.shorts.x10000);
-                break;
-            }
+        priceRange.values(Ratio.class).initial(Ratio.x1).observeNow(ratio -> {
+            longList.values(book.longs.selectByRatio(ratio));
+            shortList.values(book.shorts.selectByRatio(ratio));
         });
 
         // read data from backend service
@@ -133,7 +111,16 @@ public class OrderBookView extends View {
          */
         private CellView() {
             setOnMouseClicked(e -> {
-                orderPrice.setText(getItem().price.toString());
+                if (getListView() == longList.ui) {
+                    Num min = getItem().price;
+                    Num max = min.plus(priceRange.value().ratio);
+                    Num best = book.longs.computeBestPrice(max, Num.of(3), Num.ONE);
+                    orderPrice.setText(best.toString());
+                } else {
+                    Num min = getItem().price;
+                    Num best = book.shorts.computeBestPrice(min, Num.of(3), Num.ONE);
+                    orderPrice.setText(best.toString());
+                }
             });
         }
 

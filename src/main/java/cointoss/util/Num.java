@@ -13,11 +13,13 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.Objects;
+import java.util.stream.IntStream;
 
 import cointoss.Directional;
 import kiss.Decoder;
 import kiss.Encoder;
 import kiss.I;
+import kiss.Signal;
 
 /**
  * @version 2017/09/24 13:06:14
@@ -983,6 +985,15 @@ public class Num implements Comparable<Num> {
             }
         }
         return min == null ? NaN : min;
+    }
+
+    /**
+     * @param start
+     * @param end
+     * @return
+     */
+    public static Signal<Num> range(int start, int end) {
+        return I.signal(IntStream.rangeClosed(start, end).mapToObj(Num::of)::iterator);
     }
 
     /**

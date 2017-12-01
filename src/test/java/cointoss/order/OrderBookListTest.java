@@ -260,16 +260,38 @@ public class OrderBookListTest {
 
     @Test
     public void buyBestPrice() throws Exception {
-        OrderBookList list = new OrderBookList(Side.SELL, true);
-        list.update(unit(1093, 1));
-        list.update(unit(1077, 1));
-        list.update(unit(1051, 2));
-        list.update(unit(1035, 4));
-        list.update(unit(1024, 1));
-        list.update(unit(1013, 1));
-        list.update(unit(1001, 7));
+        Num min = Num.of(1099);
+
+        OrderBookList list = new OrderBookList(Side.BUY, true);
+        list.update(unit(1093, 1)); // total 1
+        list.update(unit(1077, 1)); // total 2
+        list.update(unit(1051, 2)); // total 4
+        list.update(unit(1035, 4)); // total 8
+        list.update(unit(1024, 1)); // total 9
+        list.update(unit(1013, 1)); // total 10
+        list.update(unit(1001, 7)); // total 17
         list.update(unit(1000, 30)); // total 47
-        assert list.computeBestPrice(Num.of(1000), Num.of(1999)).is(1002);
+        assert list.computeBestPrice(min, Num.of(10), Num.ONE).is(1014);
+        assert list.computeBestPrice(min, Num.of(30), Num.ONE).is(1001);
+        assert list.computeBestPrice(min, Num.of(4), Num.ONE).is(1052);
+    }
+
+    @Test
+    public void sellBestPrice() throws Exception {
+        Num min = Num.of(1000);
+
+        OrderBookList list = new OrderBookList(Side.SELL, true);
+        list.update(unit(1093, 30)); // total 47
+        list.update(unit(1077, 7)); // total 17
+        list.update(unit(1051, 1)); // total 10
+        list.update(unit(1035, 1)); // total 9
+        list.update(unit(1024, 4)); // total 8
+        list.update(unit(1013, 2)); // total 4
+        list.update(unit(1001, 1)); // total 2
+        list.update(unit(1000, 1)); // total 1
+        assert list.computeBestPrice(min, Num.of(10), Num.ONE).is(1050);
+        assert list.computeBestPrice(min, Num.of(30), Num.ONE).is(1092);
+        assert list.computeBestPrice(min, Num.of(4), Num.ONE).is(1012);
     }
 
     /**
