@@ -258,7 +258,7 @@ public abstract class Trading {
          */
         private Entry(Order entry, Consumer<Entry> initializer) {
             this.order = entry;
-            this.entryRemaining = entry.size.v;
+            this.entryRemaining = entry.size;
 
             // create new entry
             entries.add(this);
@@ -437,7 +437,7 @@ public abstract class Trading {
          * Cehck whether this position is not activated.
          */
         public final boolean isInitial() {
-            return order.size.v.is(entryRemaining);
+            return order.size.is(entryRemaining);
         }
 
         /**
@@ -531,7 +531,7 @@ public abstract class Trading {
          * @param order A exit order.
          */
         private void exit(Order order, Consumer<Order> initializer) {
-            exitRemaining = exitRemaining.plus(order.size.v);
+            exitRemaining = exitRemaining.plus(order.size);
 
             market.request(order).to(o -> {
                 exit.add(o);

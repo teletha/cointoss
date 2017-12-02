@@ -31,12 +31,12 @@ public class OrderSet {
     /** Total amount calculation. */
     final ObjectBinding<Num> amount = Viewtify.bind(sub)
             .observeVariable(o -> o.outstanding_size)
-            .reduce(Num.ZERO, (total, o) -> total.plus(o.size.v));
+            .reduce(Num.ZERO, (total, o) -> total.plus(o.size));
 
     /** Total price calculation. */
     final ObjectBinding<Num> totalPrice = Viewtify.bind(sub)
             .observeVariable(o -> o.outstanding_size)
-            .reduce(Num.ZERO, (total, o) -> total.plus(o.price.v.multiply(o.size.v)));
+            .reduce(Num.ZERO, (total, o) -> total.plus(o.price.multiply(o.size)));
 
     /** Average price calculation. */
     final ObjectBinding<Num> averagePrice = Viewtify.bind(totalPrice, amount, (total, amount) -> total.divide(amount).scale(0));

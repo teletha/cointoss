@@ -80,9 +80,9 @@ class TestableMarketBackend implements MarketBackend {
             child.child_order_acceptance_id = "LOCAL-ACCEPTANCE-" + id++;
             child.child_order_state.set(OrderState.ACTIVE);
             child.child_order_date.set(now.plusNanos(lag.generate()));
-            child.child_order_type = order.price.v.is(0) ? OrderType.MARKET : OrderType.LIMIT;
-            child.average_price.set(order.price.v);
-            child.outstanding_size.set(order.size.v);
+            child.child_order_type = order.price.is(0) ? OrderType.MARKET : OrderType.LIMIT;
+            child.average_price.set(order.price);
+            child.outstanding_size.set(order.size);
             child.cancel_size = Num.ZERO;
             child.executed_size = Num.ZERO;
 
@@ -279,7 +279,7 @@ class TestableMarketBackend implements MarketBackend {
          * @param o
          */
         private BackendOrder(Order o) {
-            super(o.side(), o.size.v, o.price.v, o.triggerPrice(), o.quantity());
+            super(o.side(), o.size, o.price, o.triggerPrice(), o.quantity());
         }
     }
 }

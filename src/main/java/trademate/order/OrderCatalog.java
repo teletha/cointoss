@@ -13,6 +13,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
 import java.util.function.Function;
 
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.scene.control.TreeItem;
@@ -71,10 +72,10 @@ public class OrderCatalog extends View {
         requestedOrders.setRowFactory(table -> new OrderStateRow());
         requestedOrdersDate.setCellValueFactory(new OrderStateValueCell(OrderSet::date, Order::childOrderDate));
         requestedOrdersDate.setCellFactory(t -> new DateCell());
-        requestedOrdersSide.setCellValueFactory(new OrderStateValueCell(OrderSet::side, Order::sideProperty));
+        requestedOrdersSide.setCellValueFactory(new OrderStateValueCell(OrderSet::side, o -> new SimpleObjectProperty(o.side)));
         requestedOrdersSide.setCellFactory(table -> new OrderStateCell());
-        requestedOrdersAmount.setCellValueFactory(new OrderStateValueCell(OrderSet::amount, Order::size));
-        requestedOrdersPrice.setCellValueFactory(new OrderStateValueCell(OrderSet::averagePrice, Order::price));
+        requestedOrdersAmount.setCellValueFactory(new OrderStateValueCell(OrderSet::amount, o -> new SimpleObjectProperty(o.size)));
+        requestedOrdersPrice.setCellValueFactory(new OrderStateValueCell(OrderSet::averagePrice, o -> new SimpleObjectProperty(o.price)));
     }
 
     /**

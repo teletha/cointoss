@@ -14,8 +14,6 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicReference;
 
 import cointoss.chart.Chart;
@@ -420,10 +418,6 @@ public class Market implements Disposable {
             listener.accept(exe);
         }
     }
-
-    private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-
-    private final AtomicReference<ExecutionFlow> previous = new AtomicReference();
 
     /**
      * Update local managed {@link Order}.

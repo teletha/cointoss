@@ -29,13 +29,13 @@ import viewtify.Viewtify;
 public class Order implements Directional {
 
     /** The ordered position. */
-    public final Variable<Side> side;
+    public final Side side;
 
     /** The ordered size. */
-    public final Variable<Num> size;
+    public final Num size;
 
     /** The ordered price. */
-    public final Variable<Num> price;
+    public final Num price;
 
     private Num triggerPrice;
 
@@ -67,14 +67,22 @@ public class Order implements Directional {
      * @param size
      */
     protected Order(Side position, Num size, Num price, Num priceLimit, Quantity quantity) {
-        this.side = Variable.of(Objects.requireNonNull(position));
-        this.size = Variable.of(Objects.requireNonNull(size));
-        this.price = Variable.of(price == null ? Num.ZERO : price);
+        this.side = Objects.requireNonNull(position);
+        this.size = Objects.requireNonNull(size);
+        this.price = price == null ? Num.ZERO : price;
         this.child_order_type = price == null ? OrderType.MARKET : OrderType.LIMIT;
         this.outstanding_size = Variable.of(size);
 
         when(priceLimit);
         type(quantity);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Side side() {
+        return side;
     }
 
     /**
@@ -84,41 +92,6 @@ public class Order implements Directional {
      */
     public String id() {
         return child_order_acceptance_id;
-    }
-
-    /**
-     * Get the side property of this {@link Order}.
-     * 
-     * @return The side property.
-     */
-    @Override
-    public Side side() {
-        return side.get();
-    }
-
-    /**
-     * @return
-     */
-    public ObservableValue<Side> sideProperty() {
-        return Viewtify.wrap(side);
-    }
-
-    /**
-     * Get the size property of this {@link Order}.
-     * 
-     * @return The size property.
-     */
-    public ObservableValue<Num> size() {
-        return Viewtify.wrap(size);
-    }
-
-    /**
-     * Get the price property of this {@link Order}.
-     * 
-     * @return The price property.
-     */
-    public ObservableValue<Num> price() {
-        return Viewtify.wrap(price);
     }
 
     /**
@@ -482,7 +455,7 @@ public class Order implements Directional {
      * @return A result.
      */
     public final boolean isTradableSizeWith(Execution e) {
-        return size.v.isLessThanOrEqual(e.size);
+        return size.isLessThanOrEqual(e.size);
     }
 
     /**

@@ -11,7 +11,7 @@
 <?import javafx.scene.paint.Color?>
 <?import javafx.scene.text.Font?>
 
-<VBox prefHeight="830.0" prefWidth="1200.0" stylesheets="@TradeMate.css" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cointoss.visual.mate.TradeMateController">
+<VBox prefHeight="830.0" prefWidth="1200.0" stylesheets="@TradeMate.css" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1">
   <children>
       <TabPane id="main" prefHeight="800.0" tabClosingPolicy="UNAVAILABLE">
          <tabs>
