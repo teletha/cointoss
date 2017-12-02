@@ -11,9 +11,13 @@ package cointoss;
 
 import java.time.ZonedDateTime;
 
+import javafx.beans.binding.Binding;
+import javafx.beans.binding.Bindings;
 import javafx.beans.binding.ObjectBinding;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+
+import org.fxmisc.easybind.EasyBind;
 
 import cointoss.util.Num;
 import viewtify.Viewtify;
@@ -27,17 +31,16 @@ public class OrderSet {
     public final ObservableList<Order> sub = FXCollections.observableArrayList();
 
     /** Total amount calculation. */
-    final ObjectBinding<Num> amount = Viewtify.bind(sub)
-            .observeVariable(o -> o.outstanding_size)
-            .reduce(Num.ZERO, (total, o) -> total.plus(o.size));
+    final ObjectBinding<Num> amount = Bindings
+            .createObjectBinding(() -> sub.stream().reduce(Num.ZERO, (o, n) -> o.plus(n.size), Num::plus), sub);
 
     /** Total price calculation. */
-    final ObjectBinding<Num> totalPrice = Viewtify.bind(sub)
-            .observeVariable(o -> o.outstanding_size)
-            .reduce(Num.ZERO, (total, o) -> total.plus(o.price.multiply(o.size)));
+    final ObjectBinding<Num> totalPrice = Bindings
+            .createObjectBinding(() -> sub.stream().reduce(Num.ZERO, (o, n) -> o.plus(n.price.multiply(n.size)), (p, q) -> p.plus(q)), sub);
 
     /** Average price calculation. */
-    final ObjectBinding<Num> averagePrice = Viewtify.bind(totalPrice, amount, (total, amount) -> total.divide(amount).scale(0));
+    final org.fxmisc.easybind.monadic.MonadicBinding<Num> averagePrice = EasyBind
+            .combine(totalPrice, amount, (total, amount) -> total.divide(amount).scale(0));
 
     /** Average price calculation. */
     final MonadicBinding<Side> side = Viewtify.bind(sub).item(0).map(o -> o.side);
@@ -50,6 +53,7 @@ public class OrderSet {
      * @return The amount property.
      */
     public ObjectBinding<Num> amount() {
+        Binding<Num> bind = Viewtify.bind(sub, signal -> signal.scan(Num.ZERO, (o, n) -> o.plus(n.size)).take);
         return amount;
     }
 
@@ -67,7 +71,7 @@ public class OrderSet {
      * 
      * @return The averagePrice property.
      */
-    public ObjectBinding<Num> averagePrice() {
+    public org.fxmisc.easybind.monadic.MonadicBinding<Num> averagePrice() {
         return averagePrice;
     }
 

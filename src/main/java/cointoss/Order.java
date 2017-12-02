@@ -15,13 +15,10 @@ import java.util.Deque;
 import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import javafx.beans.value.ObservableValue;
-
 import cointoss.util.Num;
 import kiss.Observer;
 import kiss.Signal;
 import kiss.Variable;
-import viewtify.Viewtify;
 
 /**
  * @version 2017/08/24 23:09:32
@@ -91,15 +88,6 @@ public class Order implements Directional {
      */
     public String id() {
         return child_order_acceptance_id;
-    }
-
-    /**
-     * Get the price property of this {@link Order}.
-     * 
-     * @return The price property.
-     */
-    public ObservableValue<ZonedDateTime> childOrderDate() {
-        return Viewtify.wrap(child_order_date);
     }
 
     /**

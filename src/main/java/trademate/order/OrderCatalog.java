@@ -9,20 +9,13 @@
  */
 package trademate.order;
 
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.TemporalAccessor;
-import java.util.function.Function;
 
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeTableCell;
-import javafx.scene.control.TreeTableColumn;
-import javafx.scene.control.TreeTableColumn.CellDataFeatures;
 import javafx.scene.control.TreeTableRow;
 import javafx.scene.control.TreeTableView;
-import javafx.util.Callback;
 
 import cointoss.Order;
 import cointoss.Order.State;
@@ -30,8 +23,6 @@ import cointoss.OrderSet;
 import cointoss.Side;
 import cointoss.util.Num;
 import kiss.Disposable;
-import kiss.Manageable;
-import kiss.Singleton;
 import trademate.TradingView;
 import viewtify.View;
 import viewtify.Viewtify;
@@ -45,20 +36,23 @@ import viewtify.ui.UITreeTableColumn;
  */
 public class OrderCatalog extends View {
 
+    /** The date formatter. */
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd HH:mm:ss");
+
     /** UI */
     private @FXML TreeTableView<Object> requestedOrders;
 
     /** UI */
-    private @FXML TreeTableColumn<Object, Object> requestedOrdersDate;
+    private @FXML UITreeTableColumn<Object, ZonedDateTime> requestedOrdersDate;
 
     /** UI */
-    private @FXML TreeTableColumn<Object, Side> requestedOrdersSide;
+    private @FXML UITreeTableColumn<Object, Side> requestedOrdersSide;
 
     /** UI */
     private @FXML UITreeTableColumn<Object, Num> requestedOrdersAmount;
 
     /** UI */
-    private @FXML TreeTableColumn<Object, Num> requestedOrdersPrice;
+    private @FXML UITreeTableColumn<Object, Num> requestedOrdersPrice;
 
     /** Parent View */
     private @FXML TradingView view;
@@ -74,12 +68,14 @@ public class OrderCatalog extends View {
         requestedOrders.setRoot(root);
         requestedOrders.setShowRoot(false);
         requestedOrders.setRowFactory(table -> new OrderStateRow());
-        requestedOrdersDate.setCellValueFactory(new OrderStateValueCell(OrderSet::date, Order::childOrderDate));
-        requestedOrdersDate.setCellFactory(t -> new DateCell());
-        requestedOrdersSide.setCellValueFactory(new SideColumn());
-        requestedOrdersSide.setCellFactory(table -> new OrderStateCell());
-        requestedOrdersAmount.provider(OrderSet.class, OrderSet::amount).providerValue(Order.class, o -> o.size);
-        requestedOrdersPrice.setCellValueFactory(new PriceColumn());
+        requestedOrdersDate.provideProperty(OrderSet.class, OrderSet::date)
+                .provideVariable(Order.class, o -> o.child_order_date)
+                .render((ui, item) -> ui.text(formatter.format(item)));
+        requestedOrdersSide.provideProperty(OrderSet.class, OrderSet::side)
+                .provideValue(Order.class, Order::side)
+                .render((ui, item) -> ui.text(item).style(item));
+        requestedOrdersAmount.provideProperty(OrderSet.class, OrderSet::amount).provideValue(Order.class, o -> o.size);
+        requestedOrdersPrice.provideProperty(OrderSet.class, OrderSet::averagePrice).provideValue(Order.class, o -> o.price);
     }
 
     /**
@@ -185,149 +181,6 @@ public class OrderCatalog extends View {
                 setContextMenu(null);
             } else {
                 setContextMenu(context.ui);
-            }
-        }
-    }
-
-    /**
-     * @version 2017/11/26 12:45:18
-     */
-    private static class OrderStateValueCell
-            implements Callback<TreeTableColumn.CellDataFeatures<Object, Object>, ObservableValue<Object>> {
-
-        /** The value converter. */
-        private final Function<OrderSet, ObservableValue> forSet;
-
-        /** The value converter. */
-        private final Function<Order, ObservableValue> forOrder;
-
-        /**
-         * @param forSet
-         * @param forOrder
-         */
-        private OrderStateValueCell(Function<OrderSet, ObservableValue> forSet, Function<Order, ObservableValue> forOrder) {
-            this.forSet = forSet;
-            this.forOrder = forOrder;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public ObservableValue<Object> call(CellDataFeatures<Object, Object> features) {
-            Object value = features.getValue().getValue();
-
-            if (value instanceof OrderSet) {
-                return forSet.apply((OrderSet) value);
-            } else {
-                return forOrder.apply((Order) value);
-            }
-        }
-    }
-
-    /**
-     * @version 2017/11/27 17:12:43
-     */
-    private class OrderStateCell extends TreeTableCell<Object, Side> {
-
-        /** The enhanced ui. */
-        private final UI ui = Viewtify.wrap(this, OrderCatalog.this);
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        protected void updateItem(Side item, boolean empty) {
-            super.updateItem(item, empty);
-
-            if (empty) {
-                setText(null);
-            } else {
-                setText(item.toString());
-                ui.style(item);
-            }
-        }
-    }
-
-    /**
-     * @version 2017/12/01 23:30:30
-     */
-    private static class DateCell extends TreeTableCell<Object, Object> {
-
-        private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd HH:mm:ss");
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        protected void updateItem(Object item, boolean empty) {
-            super.updateItem(item, empty);
-
-            if (empty) {
-                setText(null);
-            } else {
-                if (item instanceof TemporalAccessor) {
-                    setText(formatter.format((TemporalAccessor) item));
-                }
-            }
-        }
-    }
-
-    /**
-     * @version 2017/12/02 15:35:16
-     */
-    private static class SideColumn implements Callback<TreeTableColumn.CellDataFeatures<Object, Side>, ObservableValue<Side>> {
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public ObservableValue<Side> call(CellDataFeatures<Object, Side> param) {
-            Object value = param.getValue().getValue();
-
-            if (value instanceof OrderSet) {
-                return ((OrderSet) value).side();
-            } else {
-                return new SimpleObjectProperty(((Order) value).side);
-            }
-        }
-    }
-
-    /**
-     * @version 2017/12/02 15:35:16
-     */
-    @Manageable(lifestyle = Singleton.class)
-    private static class AmountColumn implements Function<Object, ObservableValue<Num>> {
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public ObservableValue<Num> apply(Object value) {
-            if (value instanceof OrderSet) {
-                return ((OrderSet) value).amount();
-            } else {
-                return new SimpleObjectProperty(((Order) value).size);
-            }
-        }
-    }
-
-    /**
-     * @version 2017/12/02 15:35:16
-     */
-    private static class PriceColumn implements Callback<TreeTableColumn.CellDataFeatures<Object, Num>, ObservableValue<Num>> {
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public ObservableValue<Num> call(CellDataFeatures<Object, Num> param) {
-            Object value = param.getValue().getValue();
-
-            if (value instanceof OrderSet) {
-                return ((OrderSet) value).averagePrice();
-            } else {
-                return new SimpleObjectProperty(((Order) value).price);
             }
         }
     }
