@@ -158,7 +158,7 @@ class TestableMarket extends Market {
      */
     void requestAndExecution(Order order) {
         request(order).to(id -> {
-            execute(order.side(), order.size, order.price, order.side().isBuy() ? id.child_order_acceptance_id
+            execute(order.side, order.size, order.price, order.side.isBuy() ? id.child_order_acceptance_id
                     : "", order.side().isSell() ? id.child_order_acceptance_id : "");
         });
     }

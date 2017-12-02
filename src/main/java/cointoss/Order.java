@@ -357,7 +357,7 @@ public class Order implements Directional {
     public final Variable<Num> outstanding_size;
 
     /** The executed size */
-    public Num executed_size;
+    public Num executed_size = Num.ZERO;
 
     /** The canceled size */
     public Num cancel_size;

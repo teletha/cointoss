@@ -9,6 +9,7 @@
  */
 package cointoss;
 
+import java.io.PrintStream;
 import java.time.ZonedDateTime;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -244,7 +245,7 @@ class TestableMarketBackend implements MarketBackend {
                 exe.exec_date = e.exec_date;
                 exe.buy_child_order_acceptance_id = order.isBuy() ? order.child_order_acceptance_id : e.buy_child_order_acceptance_id;
                 exe.sell_child_order_acceptance_id = order.isSell() ? order.child_order_acceptance_id : e.sell_child_order_acceptance_id;
-
+                PrintStream out = System.out;
                 executeds.add(exe);
 
                 if (order.outstanding_size.get().is(0)) {
