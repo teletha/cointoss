@@ -31,6 +31,9 @@ public class OrderBook {
      * @return
      */
     public Num computeBestPrice(Side side, Num price, Num threshold, Num diff) {
+        if (threshold.isZero()) {
+            return price;
+        }
         return side.isBuy() ? longs.computeBestPrice(price, threshold, diff) : shorts.computeBestPrice(price, threshold, diff);
     }
 }

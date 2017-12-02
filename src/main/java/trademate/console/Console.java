@@ -7,7 +7,7 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss.visual.mate.console;
+package trademate.console;
 
 import static java.util.concurrent.TimeUnit.*;
 
@@ -24,7 +24,7 @@ import org.apache.logging.log4j.Logger;
 
 import cointoss.ExecutionFlow;
 import cointoss.Trading;
-import cointoss.visual.mate.TradingView;
+import trademate.TradingView;
 import viewtify.View;
 import viewtify.Viewtify;
 import viewtify.ui.UIListView;

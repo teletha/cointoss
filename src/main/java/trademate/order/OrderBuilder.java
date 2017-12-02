@@ -7,7 +7,7 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss.visual.mate.order;
+package trademate.order;
 
 import static java.util.concurrent.TimeUnit.*;
 
@@ -24,13 +24,12 @@ import cointoss.OrderSet;
 import cointoss.OrderState;
 import cointoss.Side;
 import cointoss.util.Num;
-import cointoss.visual.mate.TradingView;
 import kiss.WiseBiConsumer;
+import trademate.TradingView;
 import viewtify.User;
 import viewtify.View;
 import viewtify.Viewtify;
 import viewtify.ui.UIButton;
-import viewtify.ui.UICheckBox;
 import viewtify.ui.UIComboBox;
 import viewtify.ui.UISpinner;
 import viewtify.ui.UIText;
@@ -76,7 +75,7 @@ public class OrderBuilder extends View {
     private @FXML UISpinner<Integer> orderDivideSize;
 
     /** UI */
-    private @FXML UICheckBox orderPriceOptimization;
+    private @FXML UISpinner<Num> optimizeThreshold;
 
     /** UI */
     private @FXML UIText orderPriceInterval;
@@ -108,7 +107,7 @@ public class OrderBuilder extends View {
         orderPriceAmount.values(Num.ONE, Num.HUNDRED, Num.THOUSAND).initial(Num.ONE);
 
         orderDivideSize.values(IntStream.range(1, 31).boxed()).initial(1);
-        orderPriceOptimization.initial(true);
+        optimizeThreshold.values(Num.range(0, 20)).initial(Num.ZERO);
         orderPriceInterval.initial("0")
                 .when(User.Scroll, changeBy(orderPriceIntervalAmount.ui))
                 .require(positiveNumber)
@@ -166,7 +165,7 @@ public class OrderBuilder extends View {
         Quantity quantity = orderQuantity.value();
 
         for (int i = 0; i < divideSize; i++) {
-            Num optimized = view.board.book.computeBestPrice(side, price, Num.of(3), Num.of(2));
+            Num optimized = view.board.book.computeBestPrice(side, price, optimizeThreshold.value(), Num.of(2));
 
             Order order = Order.limit(side, size, optimized).type(quantity);
             order.child_order_state.set(OrderState.REQUESTING);
@@ -174,7 +173,7 @@ public class OrderBuilder extends View {
 
             set.sub.add(order);
 
-            price = price.plus(priceInterval);
+            price = optimized.plus(priceInterval);
         }
 
         // ========================================
@@ -193,8 +192,6 @@ public class OrderBuilder extends View {
                     view.console.write("Accept order [{}]", o);
                 });
             });
-
-            System.out.println("REQEST");
         }
     }
 

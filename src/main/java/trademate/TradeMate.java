@@ -7,7 +7,7 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss.visual.mate;
+package trademate;
 
 import viewtify.ActivationPolicy;
 import viewtify.Viewtify;

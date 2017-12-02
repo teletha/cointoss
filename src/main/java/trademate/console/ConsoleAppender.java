@@ -7,7 +7,7 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss.visual.mate.console;
+package trademate.console;
 
 import java.io.Serializable;
 import java.util.HashMap;

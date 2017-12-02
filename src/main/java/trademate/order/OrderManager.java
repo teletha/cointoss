@@ -7,7 +7,7 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss.visual.mate.order;
+package trademate.order;
 
 import java.util.LinkedList;
 

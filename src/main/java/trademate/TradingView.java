@@ -7,15 +7,15 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss.visual.mate;
+package trademate;
 
 import javafx.fxml.FXML;
 
 import cointoss.Market;
 import cointoss.market.bitflyer.BitFlyer;
-import cointoss.visual.mate.console.Console;
-import cointoss.visual.mate.order.OrderBuilder;
-import cointoss.visual.mate.order.OrderCatalog;
+import trademate.console.Console;
+import trademate.order.OrderBuilder;
+import trademate.order.OrderCatalog;
 import viewtify.View;
 import viewtify.Viewtify;
 

@@ -7,7 +7,7 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss.visual.mate;
+package trademate;
 
 import static java.util.concurrent.TimeUnit.*;
 

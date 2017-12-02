@@ -7,7 +7,7 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss.visual.mate.order;
+package trademate.order;
 
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
@@ -27,8 +27,8 @@ import cointoss.Order;
 import cointoss.OrderSet;
 import cointoss.OrderState;
 import cointoss.Side;
-import cointoss.visual.mate.TradingView;
 import kiss.Disposable;
+import trademate.TradingView;
 import viewtify.View;
 import viewtify.Viewtify;
 import viewtify.ui.UI;
