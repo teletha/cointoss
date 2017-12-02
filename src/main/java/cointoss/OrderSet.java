@@ -10,8 +10,6 @@
 package cointoss;
 
 import java.time.ZonedDateTime;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import javafx.beans.binding.ObjectBinding;
 import javafx.collections.FXCollections;
@@ -42,7 +40,7 @@ public class OrderSet {
     final ObjectBinding<Num> averagePrice = Viewtify.bind(totalPrice, amount, (total, amount) -> total.divide(amount).scale(0));
 
     /** Average price calculation. */
-    final ObjectBinding<Set<Side>> side = Viewtify.bind(sub).map(e -> e.side()).collect(Collectors.toSet());
+    final MonadicBinding<Side> side = Viewtify.bind(sub).item(0).map(o -> o.side);
 
     final MonadicBinding<ZonedDateTime> date = Viewtify.bind(sub).item(0).flatVariable(o -> o.child_order_date);
 
@@ -78,7 +76,7 @@ public class OrderSet {
      * 
      * @return The side property.
      */
-    public ObjectBinding<Set<Side>> side() {
+    public MonadicBinding<Side> side() {
         return side;
     }
 

@@ -28,13 +28,17 @@ import cointoss.Order;
 import cointoss.Order.State;
 import cointoss.OrderSet;
 import cointoss.Side;
+import cointoss.util.Num;
 import kiss.Disposable;
+import kiss.Manageable;
+import kiss.Singleton;
 import trademate.TradingView;
 import viewtify.View;
 import viewtify.Viewtify;
 import viewtify.ui.UI;
 import viewtify.ui.UIContextMenu;
 import viewtify.ui.UIMenuItem;
+import viewtify.ui.UITreeTableColumn;
 
 /**
  * @version 2017/11/26 14:05:31
@@ -48,13 +52,13 @@ public class OrderCatalog extends View {
     private @FXML TreeTableColumn<Object, Object> requestedOrdersDate;
 
     /** UI */
-    private @FXML TreeTableColumn<Object, Object> requestedOrdersSide;
+    private @FXML TreeTableColumn<Object, Side> requestedOrdersSide;
 
     /** UI */
-    private @FXML TreeTableColumn<Object, Object> requestedOrdersAmount;
+    private @FXML UITreeTableColumn<Object, Num> requestedOrdersAmount;
 
     /** UI */
-    private @FXML TreeTableColumn<Object, Object> requestedOrdersPrice;
+    private @FXML TreeTableColumn<Object, Num> requestedOrdersPrice;
 
     /** Parent View */
     private @FXML TradingView view;
@@ -72,10 +76,10 @@ public class OrderCatalog extends View {
         requestedOrders.setRowFactory(table -> new OrderStateRow());
         requestedOrdersDate.setCellValueFactory(new OrderStateValueCell(OrderSet::date, Order::childOrderDate));
         requestedOrdersDate.setCellFactory(t -> new DateCell());
-        requestedOrdersSide.setCellValueFactory(new OrderStateValueCell(OrderSet::side, o -> new SimpleObjectProperty(o.side)));
+        requestedOrdersSide.setCellValueFactory(new SideColumn());
         requestedOrdersSide.setCellFactory(table -> new OrderStateCell());
-        requestedOrdersAmount.setCellValueFactory(new OrderStateValueCell(OrderSet::amount, o -> new SimpleObjectProperty(o.size)));
-        requestedOrdersPrice.setCellValueFactory(new OrderStateValueCell(OrderSet::averagePrice, o -> new SimpleObjectProperty(o.price)));
+        requestedOrdersAmount.provider(OrderSet.class, OrderSet::amount).providerValue(Order.class, o -> o.size);
+        requestedOrdersPrice.setCellValueFactory(new PriceColumn());
     }
 
     /**
@@ -88,7 +92,7 @@ public class OrderCatalog extends View {
             Order order = set.sub.get(0);
             item = new TreeItem(order);
 
-            order.cancel.to(o -> {
+            order.cancel.on(Viewtify.UIThread).to(o -> {
                 root.getChildren().remove(item);
             });
         } else {
@@ -100,7 +104,7 @@ public class OrderCatalog extends View {
                 TreeItem subItem = new TreeItem(order);
                 item.getChildren().add(subItem);
 
-                order.cancel.to(o -> {
+                order.cancel.on(Viewtify.UIThread).to(o -> {
                     item.getChildren().remove(subItem);
 
                     if (item.getChildren().isEmpty()) {
@@ -224,7 +228,7 @@ public class OrderCatalog extends View {
     /**
      * @version 2017/11/27 17:12:43
      */
-    private class OrderStateCell extends TreeTableCell<Object, Object> {
+    private class OrderStateCell extends TreeTableCell<Object, Side> {
 
         /** The enhanced ui. */
         private final UI ui = Viewtify.wrap(this, OrderCatalog.this);
@@ -233,17 +237,14 @@ public class OrderCatalog extends View {
          * {@inheritDoc}
          */
         @Override
-        protected void updateItem(Object item, boolean empty) {
+        protected void updateItem(Side item, boolean empty) {
             super.updateItem(item, empty);
 
             if (empty) {
                 setText(null);
             } else {
                 setText(item.toString());
-
-                if (item instanceof Side) {
-                    ui.style((Side) item);
-                }
+                ui.style(item);
             }
         }
     }
@@ -268,6 +269,65 @@ public class OrderCatalog extends View {
                 if (item instanceof TemporalAccessor) {
                     setText(formatter.format((TemporalAccessor) item));
                 }
+            }
+        }
+    }
+
+    /**
+     * @version 2017/12/02 15:35:16
+     */
+    private static class SideColumn implements Callback<TreeTableColumn.CellDataFeatures<Object, Side>, ObservableValue<Side>> {
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public ObservableValue<Side> call(CellDataFeatures<Object, Side> param) {
+            Object value = param.getValue().getValue();
+
+            if (value instanceof OrderSet) {
+                return ((OrderSet) value).side();
+            } else {
+                return new SimpleObjectProperty(((Order) value).side);
+            }
+        }
+    }
+
+    /**
+     * @version 2017/12/02 15:35:16
+     */
+    @Manageable(lifestyle = Singleton.class)
+    private static class AmountColumn implements Function<Object, ObservableValue<Num>> {
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public ObservableValue<Num> apply(Object value) {
+            if (value instanceof OrderSet) {
+                return ((OrderSet) value).amount();
+            } else {
+                return new SimpleObjectProperty(((Order) value).size);
+            }
+        }
+    }
+
+    /**
+     * @version 2017/12/02 15:35:16
+     */
+    private static class PriceColumn implements Callback<TreeTableColumn.CellDataFeatures<Object, Num>, ObservableValue<Num>> {
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public ObservableValue<Num> call(CellDataFeatures<Object, Num> param) {
+            Object value = param.getValue().getValue();
+
+            if (value instanceof OrderSet) {
+                return ((OrderSet) value).averagePrice();
+            } else {
+                return new SimpleObjectProperty(((Order) value).price);
             }
         }
     }

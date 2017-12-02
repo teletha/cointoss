@@ -56,10 +56,6 @@ public class Order implements Directional {
     /** The execution signal. */
     public final Signal<Order> cancel = new Signal(cancelListeners);
 
-    private Order() {
-        this(Side.BUY, Num.ZERO, Num.ZERO, Num.ZERO, Quantity.GoodTillCanceled);
-    }
-
     /**
      * <p>
      * Hide constructor.

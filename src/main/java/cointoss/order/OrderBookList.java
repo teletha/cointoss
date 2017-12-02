@@ -189,7 +189,7 @@ public class OrderBookList {
                 }
             }
         } else {
-            for (int i = x1.size() - 1; 0 <= 0; i--) {
+            for (int i = x1.size() - 1; 0 <= i; i--) {
                 OrderUnit unit = x1.get(i);
 
                 if (unit != null && unit.price.isLessThan(hint)) {
