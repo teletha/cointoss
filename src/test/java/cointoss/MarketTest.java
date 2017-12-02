@@ -14,6 +14,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.Test;
 
+import cointoss.Order.State;
 import cointoss.Order.Quantity;
 import cointoss.util.Num;
 
@@ -83,7 +84,7 @@ public class MarketTest {
 
         List<Order> orders = market.listOrders();
         assert orders.size() == 1;
-        assert orders.get(0).child_order_state.is(OrderState.COMPLETED);
+        assert orders.get(0).state.is(State.COMPLETED);
 
         List<Execution> executions = market.listExecutions();
         assert executions.size() == 2;

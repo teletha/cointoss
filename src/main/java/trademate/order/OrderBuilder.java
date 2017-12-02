@@ -19,9 +19,9 @@ import javafx.scene.control.Spinner;
 import javafx.scene.input.ScrollEvent;
 
 import cointoss.Order;
+import cointoss.Order.State;
 import cointoss.Order.Quantity;
 import cointoss.OrderSet;
-import cointoss.OrderState;
 import cointoss.Side;
 import cointoss.util.Num;
 import kiss.WiseBiConsumer;
@@ -168,7 +168,7 @@ public class OrderBuilder extends View {
             Num optimized = view.board.book.computeBestPrice(side, price, optimizeThreshold.value(), Num.of(2));
 
             Order order = Order.limit(side, size, optimized).type(quantity);
-            order.child_order_state.set(OrderState.REQUESTING);
+            order.state.set(State.REQUESTING);
             order.cancel.to(set.sub::remove);
 
             set.sub.add(order);

@@ -14,6 +14,7 @@ import static cointoss.Time.*;
 
 import java.time.ZonedDateTime;
 
+import cointoss.Order.State;
 import cointoss.Time.At;
 import cointoss.util.Num;
 import kiss.Signal;
@@ -199,13 +200,13 @@ class TestableMarket extends Market {
      * @return
      */
     boolean validateOrderState(int active, int completed, int canceled, int expired, int rejected) {
-        Table<OrderState, Order> state = backend.getOrders().toTable(o -> o.child_order_state.v);
+        Table<State, Order> state = backend.getOrders().toTable(o -> o.state.v);
 
-        assert state.get(OrderState.ACTIVE).size() == active;
-        assert state.get(OrderState.COMPLETED).size() == completed;
-        assert state.get(OrderState.CANCELED).size() == canceled;
-        assert state.get(OrderState.EXPIRED).size() == expired;
-        assert state.get(OrderState.REJECTED).size() == rejected;
+        assert state.get(State.ACTIVE).size() == active;
+        assert state.get(State.COMPLETED).size() == completed;
+        assert state.get(State.CANCELED).size() == canceled;
+        assert state.get(State.EXPIRED).size() == expired;
+        assert state.get(State.REJECTED).size() == rejected;
 
         return true;
     }

@@ -9,6 +9,7 @@
  */
 package cointoss;
 
+import cointoss.Order.State;
 import cointoss.order.OrderBookChange;
 import cointoss.util.Num;
 import kiss.Disposable;
@@ -56,7 +57,7 @@ public interface MarketBackend extends Disposable {
      */
     default Signal<Order> cancel(Order order) {
         return cancel(order.child_order_acceptance_id).mapTo(order).effect(o -> {
-            o.child_order_state.set(OrderState.CANCELED);
+            o.state.set(State.CANCELED);
         });
     }
 
@@ -85,7 +86,7 @@ public interface MarketBackend extends Disposable {
      * 
      * @return
      */
-    Signal<Order> getOrdersBy(OrderState state);
+    Signal<Order> getOrdersBy(State state);
 
     /**
      * <p>

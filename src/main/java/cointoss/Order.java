@@ -37,6 +37,9 @@ public class Order implements Directional {
     /** The ordered price. */
     public final Num price;
 
+    /** The order state */
+    public final Variable<State> state = Variable.of(State.INIT);
+
     private Num triggerPrice;
 
     private Quantity quantity;
@@ -344,9 +347,6 @@ public class Order implements Directional {
     /** Order type */
     public OrderType child_order_type;
 
-    /** Order state */
-    public Variable<OrderState> child_order_state = Variable.of(OrderState.INIT);
-
     /** The order date */
     public Variable<ZonedDateTime> child_order_date = Variable.of(ZonedDateTime.now());
 
@@ -388,7 +388,7 @@ public class Order implements Directional {
      * @return
      */
     public final boolean isExpired() {
-        return child_order_state.is(OrderState.EXPIRED);
+        return state.is(State.EXPIRED);
     }
 
     /**
@@ -399,7 +399,7 @@ public class Order implements Directional {
      * @return
      */
     public boolean isCanceled() {
-        return child_order_state.is(OrderState.CANCELED);
+        return state.is(State.CANCELED);
     }
 
     /**
@@ -410,7 +410,7 @@ public class Order implements Directional {
      * @return
      */
     public final boolean isCompleted() {
-        return child_order_state.is(OrderState.COMPLETED);
+        return state.is(State.COMPLETED);
     }
 
     /**
@@ -464,5 +464,12 @@ public class Order implements Directional {
     @Override
     public String toString() {
         return side().mark() + size + "@" + average_price + " 残" + outstanding_size + " 済" + executed_size + " " + child_order_date;
+    }
+
+    /**
+     * @version 2017/12/02 14:54:40
+     */
+    public enum State {
+        INIT, REQUESTING, ACTIVE, COMPLETED, CANCELED, EXPIRED, REJECTED;
     }
 }

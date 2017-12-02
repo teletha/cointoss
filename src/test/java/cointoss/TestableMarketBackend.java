@@ -16,6 +16,7 @@ import java.util.LinkedList;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import cointoss.Order.State;
 import cointoss.Order.Quantity;
 import cointoss.Time.Lag;
 import cointoss.order.OrderBookChange;
@@ -79,7 +80,7 @@ class TestableMarketBackend implements MarketBackend {
         return I.signal(order).map(o -> {
             BackendOrder child = new BackendOrder(order);
             child.child_order_acceptance_id = "LOCAL-ACCEPTANCE-" + id++;
-            child.child_order_state.set(OrderState.ACTIVE);
+            child.state.set(State.ACTIVE);
             child.child_order_date.set(now.plusNanos(lag.generate()));
             child.child_order_type = order.price.is(0) ? OrderType.MARKET : OrderType.LIMIT;
             child.average_price.set(order.price);
@@ -102,7 +103,7 @@ class TestableMarketBackend implements MarketBackend {
         return new Signal<>((observer, disposer) -> {
             orderActive.removeIf(o -> o.child_order_acceptance_id.equals(childOrderId));
             I.signal(orderAll).take(o -> o.child_order_acceptance_id.equals(childOrderId)).take(1).to(o -> {
-                o.child_order_state.set(OrderState.CANCELED);
+                o.state.set(State.CANCELED);
                 observer.accept(childOrderId);
                 observer.complete();
             });
@@ -130,8 +131,8 @@ class TestableMarketBackend implements MarketBackend {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Order> getOrdersBy(OrderState state) {
-        return I.signal(orderAll).take(o -> o.child_order_state.is(state)).as(Order.class);
+    public Signal<Order> getOrdersBy(State state) {
+        return I.signal(orderAll).take(o -> o.state.is(state)).as(Order.class);
     }
 
     /**
@@ -249,7 +250,7 @@ class TestableMarketBackend implements MarketBackend {
                 executeds.add(exe);
 
                 if (order.outstanding_size.get().is(0)) {
-                    order.child_order_state.set(OrderState.COMPLETED);
+                    order.state.set(State.COMPLETED);
                     iterator.remove();
                 }
 

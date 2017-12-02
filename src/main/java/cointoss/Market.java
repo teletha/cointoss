@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 
+import cointoss.Order.State;
 import cointoss.chart.Chart;
 import cointoss.order.OrderBookChange;
 import cointoss.util.Num;
@@ -211,7 +212,7 @@ public class Market implements Disposable {
     public final Signal<Order> request(Order order) {
         return backend.request(order).map(id -> {
             order.child_order_acceptance_id = id;
-            order.child_order_state.set(OrderState.ACTIVE);
+            order.state.set(State.ACTIVE);
             order.child_order_date.set(ZonedDateTime.now());
             order.average_price.set(order.price);
             order.outstanding_size.set(order.size);
@@ -230,11 +231,11 @@ public class Market implements Disposable {
      */
     public final Signal<String> cancel(Order order) {
         orders.remove(order);
-        order.child_order_state.set(OrderState.CANCELED);
+        order.state.set(State.CANCELED);
 
         return backend.cancel(order.child_order_acceptance_id).effect(id -> {
             orders.remove(order);
-            order.child_order_state.set(OrderState.CANCELED);
+            order.state.set(State.CANCELED);
 
             for (Observer<? super Order> listener : order.cancelListeners) {
                 listener.accept(order);
@@ -249,8 +250,8 @@ public class Market implements Disposable {
      * 
      * @return
      */
-    public final Signal<Order> getOrdersBy(OrderState state) {
-        return backend.getOrders().take(o -> o.child_order_state.is(state));
+    public final Signal<Order> getOrdersBy(State state) {
+        return backend.getOrders().take(o -> o.state.is(state));
     }
 
     /**
@@ -448,7 +449,7 @@ public class Market implements Disposable {
         order.executed_size = order.executed_size.plus(executed);
 
         if (order.outstanding_size.v.is(0)) {
-            order.child_order_state.set(OrderState.COMPLETED);
+            order.state.set(State.COMPLETED);
             orders.remove(order); // complete order
         }
 

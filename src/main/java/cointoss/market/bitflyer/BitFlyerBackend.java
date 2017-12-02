@@ -37,7 +37,7 @@ import cointoss.Execution;
 import cointoss.Market;
 import cointoss.MarketBackend;
 import cointoss.Order;
-import cointoss.OrderState;
+import cointoss.Order.State;
 import cointoss.Position;
 import cointoss.order.OrderBookChange;
 import cointoss.order.OrderUnit;
@@ -172,7 +172,7 @@ class BitFlyerBackend implements MarketBackend {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Order> getOrdersBy(OrderState state) {
+    public Signal<Order> getOrdersBy(State state) {
         // If this exception will be thrown, it is bug of this program. So we must rethrow the
         // wrapped error in here.
         throw new Error();

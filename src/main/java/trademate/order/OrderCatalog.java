@@ -25,8 +25,8 @@ import javafx.scene.control.TreeTableView;
 import javafx.util.Callback;
 
 import cointoss.Order;
+import cointoss.Order.State;
 import cointoss.OrderSet;
-import cointoss.OrderState;
 import cointoss.Side;
 import kiss.Disposable;
 import trademate.TradingView;
@@ -118,7 +118,7 @@ public class OrderCatalog extends View {
      * @param order
      */
     private void cancel(Order order) {
-        order.child_order_state.set(OrderState.REQUESTING);
+        order.state.set(State.REQUESTING);
 
         Viewtify.inWorker(() -> {
             view.market().cancel(order).to(o -> {
@@ -165,7 +165,7 @@ public class OrderCatalog extends View {
                 }
 
                 if (n instanceof Order) {
-                    bind = ((Order) n).child_order_state.observeNow().to(ui::style);
+                    bind = ((Order) n).state.observeNow().to(ui::style);
                 }
             });
         }
