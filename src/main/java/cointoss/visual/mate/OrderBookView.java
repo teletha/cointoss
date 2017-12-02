@@ -32,7 +32,7 @@ import viewtify.ui.UISpinner;
 public class OrderBookView extends View {
 
     /** Order Book. */
-    private final OrderBook book = new OrderBook();
+    public final OrderBook book = new OrderBook();
 
     /** UI for long maker. */
     private @FXML UIListView<OrderUnit> longList;

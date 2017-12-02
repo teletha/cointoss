@@ -130,5 +130,5 @@ public interface MarketBackend extends Disposable {
      * 
      * @return
      */
-    Signal<OrderBookChange> getBoard();
+    Signal<OrderBookChange> getOrderBook();
 }

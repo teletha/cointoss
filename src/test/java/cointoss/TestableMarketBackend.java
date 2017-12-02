@@ -169,7 +169,7 @@ class TestableMarketBackend implements MarketBackend {
      * {@inheritDoc}
      */
     @Override
-    public Signal<OrderBookChange> getBoard() {
+    public Signal<OrderBookChange> getOrderBook() {
         return I.signal();
     }
 

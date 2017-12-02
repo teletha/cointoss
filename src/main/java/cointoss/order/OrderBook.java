@@ -10,6 +10,7 @@
 package cointoss.order;
 
 import cointoss.Side;
+import cointoss.util.Num;
 
 /**
  * @version 2017/12/01 1:10:57
@@ -21,4 +22,15 @@ public class OrderBook {
 
     /** BID */
     public final OrderBookList longs = new OrderBookList(Side.BUY);
+
+    /**
+     * @param side
+     * @param price
+     * @param threshold
+     * @param diff
+     * @return
+     */
+    public Num computeBestPrice(Side side, Num price, Num threshold, Num diff) {
+        return side.isBuy() ? longs.computeBestPrice(price, threshold, diff) : shorts.computeBestPrice(price, threshold, diff);
+    }
 }

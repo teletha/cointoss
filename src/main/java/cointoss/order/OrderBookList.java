@@ -9,9 +9,7 @@
  */
 package cointoss.order;
 
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -51,11 +49,11 @@ public class OrderBookList {
      */
     public OrderBookList(Side side) {
         this.side = side;
-        this.x1 = FXCollections.observableList(GapList.create(empty()));
-        this.x10 = FXCollections.observableList(GapList.create(empty()));
-        this.x100 = FXCollections.observableList(GapList.create(empty()));
-        this.x1000 = FXCollections.observableList(GapList.create(empty()));
-        this.x10000 = FXCollections.observableList(GapList.create(empty()));
+        this.x1 = FXCollections.observableList(GapList.create());
+        this.x10 = FXCollections.observableList(GapList.create());
+        this.x100 = FXCollections.observableList(GapList.create());
+        this.x1000 = FXCollections.observableList(GapList.create());
+        this.x10000 = FXCollections.observableList(GapList.create());
 
         group[0] = new Grouped(side, -1, x10);
         group[1] = new Grouped(side, -2, x100);
@@ -310,20 +308,6 @@ public class OrderBookList {
         for (Grouped grouped : group) {
             grouped.update(price, size);
         }
-    }
-
-    /**
-     * Create empry list.
-     * 
-     * @return
-     */
-    private static List<OrderUnit> empty() {
-        List<OrderUnit> list = new ArrayList();
-
-        for (int i = 0; i < 30; i++) {
-            list.add(null);
-        }
-        return list;
     }
 
     /**

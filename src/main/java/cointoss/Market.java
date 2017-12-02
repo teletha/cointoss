@@ -149,7 +149,7 @@ public class Market implements Disposable {
         }
 
         this.backend = backend;
-        this.orderTimeline = backend.getBoard();
+        this.orderTimeline = backend.getOrderBook();
 
         // initialize price, balance and executions
         this.base = this.baseInit = backend.getBaseCurrency().to().v;

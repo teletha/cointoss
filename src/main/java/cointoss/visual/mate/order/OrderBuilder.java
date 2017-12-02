@@ -19,8 +19,8 @@ import javafx.scene.control.Spinner;
 import javafx.scene.input.ScrollEvent;
 
 import cointoss.Order;
-import cointoss.OrderSet;
 import cointoss.Order.Quantity;
+import cointoss.OrderSet;
 import cointoss.OrderState;
 import cointoss.Side;
 import cointoss.util.Num;
@@ -30,6 +30,7 @@ import viewtify.User;
 import viewtify.View;
 import viewtify.Viewtify;
 import viewtify.ui.UIButton;
+import viewtify.ui.UICheckBox;
 import viewtify.ui.UIComboBox;
 import viewtify.ui.UISpinner;
 import viewtify.ui.UIText;
@@ -75,6 +76,9 @@ public class OrderBuilder extends View {
     private @FXML UISpinner<Integer> orderDivideSize;
 
     /** UI */
+    private @FXML UICheckBox orderPriceOptimization;
+
+    /** UI */
     private @FXML UIText orderPriceInterval;
 
     /** UI */
@@ -104,6 +108,7 @@ public class OrderBuilder extends View {
         orderPriceAmount.values(Num.ONE, Num.HUNDRED, Num.THOUSAND).initial(Num.ONE);
 
         orderDivideSize.values(IntStream.range(1, 31).boxed()).initial(1);
+        orderPriceOptimization.initial(true);
         orderPriceInterval.initial("0")
                 .when(User.Scroll, changeBy(orderPriceIntervalAmount.ui))
                 .require(positiveNumber)
@@ -161,7 +166,9 @@ public class OrderBuilder extends View {
         Quantity quantity = orderQuantity.value();
 
         for (int i = 0; i < divideSize; i++) {
-            Order order = Order.limit(side, size, price).type(quantity);
+            Num optimized = view.board.book.computeBestPrice(side, price, Num.of(3), Num.of(2));
+
+            Order order = Order.limit(side, size, optimized).type(quantity);
             order.child_order_state.set(OrderState.REQUESTING);
             order.cancel.to(set.sub::remove);
 

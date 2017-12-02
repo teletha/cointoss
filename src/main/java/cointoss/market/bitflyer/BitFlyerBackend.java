@@ -49,7 +49,7 @@ import kiss.JSON;
 import kiss.Signal;
 
 /**
- * @version 2017/09/08 18:49:31
+ * @version 2017/12/02 11:49:35
  */
 class BitFlyerBackend implements MarketBackend {
 
@@ -71,7 +71,7 @@ class BitFlyerBackend implements MarketBackend {
     private Disposable disposer = Disposable.empty();
 
     /** The shared source. */
-    private Signal<OrderBookChange> board = realtimeBoard();
+    private Signal<OrderBookChange> board = realtimeOrderBook();
 
     /**
      * @param type
@@ -220,8 +220,84 @@ class BitFlyerBackend implements MarketBackend {
      * {@inheritDoc}
      */
     @Override
-    public Signal<OrderBookChange> getBoard() {
-        return board;
+    public Signal<OrderBookChange> getOrderBook() {
+        return snapshotOrderBook().merge(board);
+    }
+
+    /**
+     * Snapshot order book info.
+     * 
+     * @return
+     */
+    private Signal<OrderBookChange> snapshotOrderBook() {
+        return call("GET", "/v1/board?product_code=" + type, "", "", OrderBookChange.class);
+    }
+
+    /**
+     * Realtime order book info.
+     * 
+     * @return
+     */
+    private Signal<OrderBookChange> realtimeOrderBook() {
+        return new Signal<OrderBookChange>((observer, disposer) -> {
+            PNConfiguration config = new PNConfiguration();
+            config.setSubscribeKey("sub-c-52a9ab50-291b-11e5-baaa-0619f8945a4f");
+
+            PubNub pubNub = new PubNub(config);
+            pubNub.addListener(new SubscribeCallback() {
+
+                /**
+                 * @param pubnub
+                 * @param status
+                 */
+                @Override
+                public void status(PubNub pubnub, PNStatus status) {
+                }
+
+                /**
+                 * @param pubnub
+                 * @param presence
+                 */
+                @Override
+                public void presence(PubNub pubnub, PNPresenceEventResult presence) {
+                }
+
+                /**
+                 * @param pubnub
+                 * @param message
+                 */
+                @Override
+                public void message(PubNub pubnub, PNMessageResult message) {
+                    if (message.getChannel() != null) {
+                        JsonNode node = message.getMessage();
+
+                        OrderBookChange board = new OrderBookChange();
+                        board.mid_price = Num.of(node.get("mid_price").asLong());
+
+                        JsonNode asks = node.get("asks");
+
+                        for (int i = 0; i < asks.size(); i++) {
+                            JsonNode ask = asks.get(i);
+                            board.asks.add(new OrderUnit(Num.of(ask.get("price").asDouble()), Num.of(ask.get("size").asDouble())));
+                        }
+
+                        JsonNode bids = node.get("bids");
+
+                        for (int i = 0; i < bids.size(); i++) {
+                            JsonNode bid = bids.get(i);
+                            board.bids.add(new OrderUnit(Num.of(bid.get("price").asDouble()), Num.of(bid.get("size").asDouble())));
+                        }
+                        observer.accept(board);
+                    }
+                }
+            });
+            pubNub.subscribe().channels(I.list("lightning_board_" + type)).execute();
+
+            return disposer.add(() -> {
+                pubNub.unsubscribeAll();
+                pubNub.destroy();
+            });
+        });
     }
 
     /**
@@ -289,73 +365,6 @@ class BitFlyerBackend implements MarketBackend {
             observer.complete();
 
             return disposer;
-        });
-    }
-
-    /**
-     * Realtime board info.
-     * 
-     * @return
-     */
-    private Signal<OrderBookChange> realtimeBoard() {
-        return new Signal<OrderBookChange>((observer, disposer) -> {
-            PNConfiguration config = new PNConfiguration();
-            config.setSubscribeKey("sub-c-52a9ab50-291b-11e5-baaa-0619f8945a4f");
-
-            PubNub pubNub = new PubNub(config);
-            pubNub.addListener(new SubscribeCallback() {
-
-                /**
-                 * @param pubnub
-                 * @param status
-                 */
-                @Override
-                public void status(PubNub pubnub, PNStatus status) {
-                }
-
-                /**
-                 * @param pubnub
-                 * @param presence
-                 */
-                @Override
-                public void presence(PubNub pubnub, PNPresenceEventResult presence) {
-                }
-
-                /**
-                 * @param pubnub
-                 * @param message
-                 */
-                @Override
-                public void message(PubNub pubnub, PNMessageResult message) {
-                    if (message.getChannel() != null) {
-                        JsonNode node = message.getMessage();
-
-                        OrderBookChange board = new OrderBookChange();
-                        board.mid_price = Num.of(node.get("mid_price").asLong());
-
-                        JsonNode asks = node.get("asks");
-
-                        for (int i = 0; i < asks.size(); i++) {
-                            JsonNode ask = asks.get(i);
-                            board.asks.add(new OrderUnit(Num.of(ask.get("price").asDouble()), Num.of(ask.get("size").asDouble())));
-                        }
-
-                        JsonNode bids = node.get("bids");
-
-                        for (int i = 0; i < bids.size(); i++) {
-                            JsonNode bid = bids.get(i);
-                            board.bids.add(new OrderUnit(Num.of(bid.get("price").asDouble()), Num.of(bid.get("size").asDouble())));
-                        }
-                        observer.accept(board);
-                    }
-                }
-            });
-            pubNub.subscribe().channels(I.list("lightning_board_" + type)).execute();
-
-            return disposer.add(() -> {
-                pubNub.unsubscribeAll();
-                pubNub.destroy();
-            });
         });
     }
 

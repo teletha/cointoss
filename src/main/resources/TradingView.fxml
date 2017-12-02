@@ -3,6 +3,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.Cursor?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
@@ -58,7 +59,11 @@
                   <HBox alignment="CENTER_LEFT">
                      <children>
                         <Label alignment="CENTER" prefHeight="27.0" prefWidth="60.0" style="&#10;" text="分散数" textAlignment="CENTER" wrapText="false" />
-                        <Spinner id="orderDivideSize" maxWidth="120.0" />
+                        <Spinner id="orderDivideSize" maxWidth="120.0">
+                           <HBox.margin>
+                              <Insets right="20.0" />
+                           </HBox.margin></Spinner>
+                        <CheckBox id="orderPriceOptimization" mnemonicParsing="false" prefWidth="70.0" text="最適化" />
                      </children>
                      <padding>
                         <Insets right="10.0" />
@@ -200,12 +205,12 @@
       </SplitPane>
       <HBox maxHeight="200.0" minHeight="200.0" prefHeight="200.0">
          <children>
-            <TreeTableView id="requestedOrders">
+            <TreeTableView id="requestedOrders" focusTraversable="false" maxWidth="405.0" minWidth="405.0" prefWidth="405.0" showRoot="false">
                <columns>
-                  <TreeTableColumn id="requestedOrdersDate" editable="false" maxWidth="130.0" minWidth="130.0" prefWidth="130.0" resizable="false" text="日付" />
-                  <TreeTableColumn id="requestedOrdersSide" maxWidth="70.0" minWidth="70.0" prefWidth="70.0" resizable="false" text="売買" />
-                  <TreeTableColumn id="requestedOrdersAmount" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" resizable="false" text="数量" />
-                  <TreeTableColumn id="requestedOrdersPrice" prefWidth="75.0" resizable="false" text="価格" />
+                  <TreeTableColumn id="requestedOrdersDate" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" text="日付" />
+                  <TreeTableColumn id="requestedOrdersSide" maxWidth="70.0" minWidth="70.0" prefWidth="70.0" text="売買" />
+                  <TreeTableColumn id="requestedOrdersAmount" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" text="数量" />
+                  <TreeTableColumn id="requestedOrdersPrice" maxWidth="80.0" minWidth="80.0" text="価格" />
                </columns>
             </TreeTableView>
          </children>

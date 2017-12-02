@@ -25,6 +25,7 @@ import javafx.util.Callback;
 
 import cointoss.Order;
 import cointoss.OrderSet;
+import cointoss.OrderState;
 import cointoss.Side;
 import cointoss.visual.mate.TradingView;
 import kiss.Disposable;
@@ -80,23 +81,49 @@ public class OrderCatalog extends View {
      * @param set
      */
     public void add(OrderSet set) {
-        TreeItem item = new TreeItem(set);
-        item.setExpanded(set.sub.size() != 1);
+        TreeItem item;
 
-        // create sub orders for UI
-        for (Order order : set.sub) {
-            TreeItem sub = new TreeItem(order);
-            item.getChildren().add(sub);
+        if (set.sub.size() == 1) {
+            Order order = set.sub.get(0);
+            item = new TreeItem(order);
 
             order.cancel.to(o -> {
-                item.getChildren().remove(sub);
-
-                if (item.getChildren().isEmpty()) {
-                    root.getChildren().remove(item);
-                }
+                root.getChildren().remove(item);
             });
+        } else {
+            item = new TreeItem(set);
+            item.setExpanded(true);
+
+            // create sub orders for UI
+            for (Order order : set.sub) {
+                TreeItem subItem = new TreeItem(order);
+                item.getChildren().add(subItem);
+
+                order.cancel.to(o -> {
+                    item.getChildren().remove(subItem);
+
+                    if (item.getChildren().isEmpty()) {
+                        root.getChildren().remove(item);
+                    }
+                });
+            }
         }
         root.getChildren().add(item);
+    }
+
+    /**
+     * Cancel the specified {@link Order}.
+     * 
+     * @param order
+     */
+    private void cancel(Order order) {
+        order.child_order_state.set(OrderState.REQUESTING);
+
+        Viewtify.inWorker(() -> {
+            view.market().cancel(order).to(o -> {
+                view.console.write("{} is canceled.", order);
+            });
+        });
     }
 
     /**
@@ -115,9 +142,11 @@ public class OrderCatalog extends View {
             Object item = getItem();
 
             if (item instanceof Order) {
-                view.market().cancel((Order) item).to(order -> {
-                    view.console.write("{} is canceled.", order);
-                });
+                cancel((Order) item);
+            } else if (item instanceof OrderSet) {
+                for (Order sub : ((OrderSet) item).sub) {
+                    cancel(sub);
+                }
             }
         });
 
