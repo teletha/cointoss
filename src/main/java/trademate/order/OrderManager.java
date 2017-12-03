@@ -14,7 +14,6 @@ import java.util.LinkedList;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import cointoss.OrderSet;
 import kiss.Manageable;
 import kiss.Singleton;
 

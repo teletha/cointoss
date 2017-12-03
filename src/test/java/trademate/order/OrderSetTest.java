@@ -7,9 +7,12 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss;
+package trademate.order;
 
 import org.junit.Test;
+
+import cointoss.Order;
+import trademate.order.OrderSet;
 
 /**
  * @version 2017/12/02 1:37:21

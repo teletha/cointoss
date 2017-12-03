@@ -19,9 +19,8 @@ import javafx.scene.control.Spinner;
 import javafx.scene.input.ScrollEvent;
 
 import cointoss.Order;
-import cointoss.Order.State;
 import cointoss.Order.Quantity;
-import cointoss.OrderSet;
+import cointoss.Order.State;
 import cointoss.Side;
 import cointoss.util.Num;
 import kiss.WiseBiConsumer;

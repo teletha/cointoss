@@ -19,7 +19,6 @@ import javafx.scene.control.TreeTableView;
 
 import cointoss.Order;
 import cointoss.Order.State;
-import cointoss.OrderSet;
 import cointoss.Side;
 import cointoss.util.Num;
 import kiss.Disposable;
