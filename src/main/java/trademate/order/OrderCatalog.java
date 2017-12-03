@@ -67,14 +67,14 @@ public class OrderCatalog extends View {
         requestedOrders.setRoot(root);
         requestedOrders.setShowRoot(false);
         requestedOrders.setRowFactory(table -> new OrderStateRow());
-        requestedOrdersDate.provideProperty(OrderSet.class, OrderSet::date)
+        requestedOrdersDate.provideProperty(OrderSet.class, o -> o.date)
                 .provideVariable(Order.class, o -> o.child_order_date)
                 .render((ui, item) -> ui.text(formatter.format(item)));
-        requestedOrdersSide.provideProperty(OrderSet.class, OrderSet::side)
+        requestedOrdersSide.provideProperty(OrderSet.class, o -> o.side)
                 .provideValue(Order.class, Order::side)
                 .render((ui, item) -> ui.text(item).style(item));
-        requestedOrdersAmount.provideProperty(OrderSet.class, OrderSet::amount).provideValue(Order.class, o -> o.size);
-        requestedOrdersPrice.provideProperty(OrderSet.class, OrderSet::averagePrice).provideValue(Order.class, o -> o.price);
+        requestedOrdersAmount.provideProperty(OrderSet.class, o -> o.amount).provideValue(Order.class, o -> o.size);
+        requestedOrdersPrice.provideProperty(OrderSet.class, o -> o.averagePrice).provideValue(Order.class, o -> o.price);
     }
 
     /**

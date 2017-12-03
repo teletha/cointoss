@@ -12,7 +12,6 @@ package trademate.order;
 import org.junit.Test;
 
 import cointoss.Order;
-import trademate.order.OrderSet;
 
 /**
  * @version 2017/12/02 1:37:21
@@ -28,13 +27,13 @@ public class OrderSetTest {
         set.sub.add(o1);
         set.sub.add(o2);
 
-        assert set.amount().get().is(2);
+        assert set.amount.get().is(2);
         assert set.averagePrice.get().is(150);
 
         // emulate cancel
         set.sub.remove(0);
 
-        assert set.amount().get().is(1);
+        assert set.amount.get().is(1);
         assert set.averagePrice.get().is(200);
     }
 }
