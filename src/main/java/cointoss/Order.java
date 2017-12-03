@@ -47,12 +47,6 @@ public class Order implements Directional {
     /** The execution signal. */
     public final Signal<Execution> execute = new Signal(executeListeners);
 
-    /** The event listeners. */
-    final CopyOnWriteArrayList<Observer<? super Order>> cancelListeners = new CopyOnWriteArrayList<>();
-
-    /** The execution signal. */
-    public final Signal<Order> cancel = new Signal(cancelListeners);
-
     /**
      * <p>
      * Hide constructor.

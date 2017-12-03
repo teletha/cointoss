@@ -25,7 +25,7 @@ import viewtify.calculation.Calculatable;
  */
 public class OrderSet {
 
-    public final ObservableList<Order> sub = FXCollections.observableArrayList();
+    public final ObservableList<Order> sub = FXCollections.synchronizedObservableList(FXCollections.observableArrayList());
 
     /** Total amount. */
     public final Calculatable<Num> amount = Viewtify.calculate(sub).reduce(Num.ZERO, (p, q) -> p.plus(q.size));

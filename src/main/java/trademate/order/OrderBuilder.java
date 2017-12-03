@@ -9,6 +9,7 @@
  */
 package trademate.order;
 
+import static cointoss.Order.State.*;
 import static java.util.concurrent.TimeUnit.*;
 
 import java.util.function.Predicate;
@@ -152,11 +153,11 @@ public class OrderBuilder extends View {
      * @return
      */
     private void requestOrder(Side side) {
+        OrderSet set = new OrderSet();
+
         // ========================================
         // Create Model
         // ========================================
-        OrderSet set = new OrderSet();
-
         Num size = orderSize.valueOr(Num.ZERO);
         Num price = orderPrice.valueOr(Num.ZERO);
         int divideSize = orderDivideSize.value();
@@ -168,7 +169,7 @@ public class OrderBuilder extends View {
 
             Order order = Order.limit(side, size, optimized).type(quantity);
             order.state.set(State.REQUESTING);
-            order.cancel.to(set.sub::remove);
+            order.state.observe().take(CANCELED, COMPLETED).take(1).to(() -> set.sub.remove(order));
 
             set.sub.add(order);
 

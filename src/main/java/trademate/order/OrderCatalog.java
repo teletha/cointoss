@@ -9,6 +9,8 @@
  */
 package trademate.order;
 
+import static cointoss.Order.State.*;
+
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -18,7 +20,6 @@ import javafx.scene.control.TreeTableRow;
 import javafx.scene.control.TreeTableView;
 
 import cointoss.Order;
-import cointoss.Order.State;
 import cointoss.Side;
 import cointoss.util.Num;
 import kiss.Disposable;
@@ -87,9 +88,7 @@ public class OrderCatalog extends View {
             Order order = set.sub.get(0);
             item = new TreeItem(order);
 
-            order.cancel.on(Viewtify.UIThread).to(o -> {
-                root.getChildren().remove(item);
-            });
+            order.state.observe().take(CANCELED).take(1).to(() -> root.getChildren().remove(item));
         } else {
             item = new TreeItem(set);
             item.setExpanded(true);
@@ -99,7 +98,7 @@ public class OrderCatalog extends View {
                 TreeItem subItem = new TreeItem(order);
                 item.getChildren().add(subItem);
 
-                order.cancel.on(Viewtify.UIThread).to(o -> {
+                order.state.observe().take(CANCELED).take(1).to(() -> {
                     item.getChildren().remove(subItem);
 
                     if (item.getChildren().isEmpty()) {
@@ -117,8 +116,6 @@ public class OrderCatalog extends View {
      * @param order
      */
     private void cancel(Order order) {
-        order.state.set(State.REQUESTING);
-
         Viewtify.inWorker(() -> {
             view.market().cancel(order).to(o -> {
                 view.console.write("{} is canceled.", order);
@@ -138,7 +135,7 @@ public class OrderCatalog extends View {
         private Disposable bind = Disposable.empty();
 
         /** Context Menu */
-        private final UIMenuItem cancel = UI.menuItem().label("Cancel").whenUserClick(e -> {
+        private final UIMenuItem cancel = UI.menuItem().label("Cancel").disableWhen().whenUserClick(e -> {
             Object item = getItem();
 
             if (item instanceof Order) {
