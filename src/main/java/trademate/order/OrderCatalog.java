@@ -10,11 +10,14 @@
 package trademate.order;
 
 import static cointoss.Order.State.*;
+import static javafx.scene.control.SelectionMode.*;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableRow;
 
 import cointoss.Order;
@@ -27,7 +30,6 @@ import viewtify.Viewtify;
 import viewtify.calculation.Calculatable;
 import viewtify.ui.UI;
 import viewtify.ui.UIContextMenu;
-import viewtify.ui.UIMenuItem;
 import viewtify.ui.UITreeItem;
 import viewtify.ui.UITreeTableColumn;
 import viewtify.ui.UITreeTableView;
@@ -63,7 +65,11 @@ public class OrderCatalog extends View {
      */
     @Override
     protected void initialize() {
-        orderCatalog.showRoot(false).render(table -> new CatalogRow());
+        orderCatalog.selectionMode(MULTIPLE).render(table -> new CatalogRow()).context($ -> {
+            $.menu("Cancel")
+                    .disableWhen(orderState.isNot(ACTIVE))
+                    .whenUserClick(e -> cancel(getTreeTableView().getSelectionModel().getSelectedItems()));
+        });
         requestedOrdersDate.provideProperty(OrderSet.class, o -> o.date)
                 .provideVariable(Order.class, o -> o.child_order_date)
                 .render((ui, item) -> ui.text(formatter.format(item)));
@@ -75,6 +81,8 @@ public class OrderCatalog extends View {
     }
 
     /**
+     * Add {@link OrderSet}.
+     * 
      * @param set
      */
     public void add(OrderSet set) {
@@ -90,16 +98,28 @@ public class OrderCatalog extends View {
     }
 
     /**
-     * Cancel the specified {@link Order}.
+     * Cancel the specified {@link Order} or {@link OrderSet}.
      * 
      * @param order
      */
-    private void cancel(Order order) {
-        Viewtify.inWorker(() -> {
-            view.market().cancel(order).to(o -> {
-                view.console.write("{} is canceled.", order);
+    private void cancel(Object order) {
+        if (order instanceof Order) {
+            Viewtify.inWorker(() -> {
+                view.market().cancel((Order) order).to(o -> {
+                    view.console.write("{} is canceled.", order);
+                });
             });
-        });
+        } else if (order instanceof OrderSet) {
+            for (Order sub : ((OrderSet) order).sub) {
+                cancel(sub);
+            }
+        } else if (order instanceof ObservableList) {
+            for (Object item : (ObservableList) order) {
+                cancel(item);
+            }
+        } else if (order instanceof TreeItem) {
+            cancel(((TreeItem) order).getValue());
+        }
     }
 
     /**
@@ -107,46 +127,25 @@ public class OrderCatalog extends View {
      */
     private class CatalogRow extends TreeTableRow<Object> {
 
+        private final Calculatable<State> orderState = Viewtify.calculate(itemProperty()).as(Order.class).calculateVariable(o -> o.state);
+
         /** The enhanced ui. */
         private final UI ui = Viewtify.wrap(this, OrderCatalog.this);
 
-        private final Calculatable<State> orderState = Viewtify.calculate(itemProperty()).as(Order.class).calculateVariable(o -> o.state);
-
         /** Context Menu */
-        private final UIMenuItem cancel = UI.menuItem().label("Cancel").disableWhen(orderState.isNot(ACTIVE)).whenUserClick(e -> {
-            Object item = getItem();
-
-            if (item instanceof Order) {
-                cancel((Order) item);
-            } else if (item instanceof OrderSet) {
-                for (Order sub : ((OrderSet) item).sub) {
-                    cancel(sub);
-                }
-            }
+        private final UIContextMenu context = UI.contextMenu($ -> {
+            $.menu("Cancel")
+                    .disableWhen(orderState.isNot(ACTIVE))
+                    .whenUserClick(e -> cancel(getTreeTableView().getSelectionModel().getSelectedItems()));
         });
-
-        /** Context Menu */
-        private final UIContextMenu context = UI.contextMenu().item(cancel);
 
         /**
          * 
          */
         private CatalogRow() {
             ui.style(orderState);
-        }
 
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        protected void updateItem(Object item, boolean empty) {
-            super.updateItem(item, empty);
-
-            if (empty) {
-                setContextMenu(null);
-            } else {
-                setContextMenu(context.ui);
-            }
+            contextMenuProperty().bind(Viewtify.calculate(itemProperty()).map(v -> context.ui));
         }
     }
 }

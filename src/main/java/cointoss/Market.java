@@ -223,6 +223,8 @@ public class Market implements Disposable {
             orders.add(order);
 
             return order;
+        }).effectOnError(e -> {
+            order.state.set(State.CANCELED);
         });
     }
 
@@ -233,12 +235,14 @@ public class Market implements Disposable {
      */
     public final Signal<String> cancel(Order order) {
         if (order.state.is(ACTIVE)) {
-            order.state.set(REQUESTING);
+            State previous = order.state.set(REQUESTING);
             orders.remove(order);
 
             return backend.cancel(order.child_order_acceptance_id).effect(id -> {
                 orders.remove(order);
                 order.state.set(CANCELED);
+            }).effectOnError(e -> {
+                order.state.set(previous);
             });
         } else {
             return Signal.EMPTY;
