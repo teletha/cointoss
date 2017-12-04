@@ -179,7 +179,7 @@
       </SplitPane>
       <HBox minHeight="250.0">
          <children>
-            <TreeTableView id="requestedOrders" focusTraversable="false" maxWidth="405.0" minWidth="405.0" prefWidth="405.0" showRoot="false">
+            <TreeTableView id="orderCatalog" focusTraversable="false" maxWidth="405.0" minWidth="405.0" prefWidth="405.0" showRoot="false">
                <columns>
                   <TreeTableColumn id="requestedOrdersDate" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" text="日付" />
                   <TreeTableColumn id="requestedOrdersSide" maxWidth="70.0" minWidth="70.0" prefWidth="70.0" text="売買" />

@@ -15,14 +15,12 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableRow;
 
 import cointoss.Order;
 import cointoss.Order.State;
 import cointoss.Side;
 import cointoss.util.Num;
-import kiss.Disposable;
 import trademate.TradingView;
 import viewtify.View;
 import viewtify.Viewtify;
@@ -30,6 +28,7 @@ import viewtify.calculation.Calculatable;
 import viewtify.ui.UI;
 import viewtify.ui.UIContextMenu;
 import viewtify.ui.UIMenuItem;
+import viewtify.ui.UITreeItem;
 import viewtify.ui.UITreeTableColumn;
 import viewtify.ui.UITreeTableView;
 
@@ -42,7 +41,7 @@ public class OrderCatalog extends View {
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd HH:mm:ss");
 
     /** UI */
-    private @FXML UITreeTableView<Object> requestedOrders;
+    private @FXML UITreeTableView<Object> orderCatalog;
 
     /** UI */
     private @FXML UITreeTableColumn<Object, ZonedDateTime> requestedOrdersDate;
@@ -59,19 +58,12 @@ public class OrderCatalog extends View {
     /** Parent View */
     private @FXML TradingView view;
 
-    /** The root item. */
-    private final TreeItem<Object> root = new TreeItem();
-
     /**
      * {@inheritDoc}
      */
     @Override
     protected void initialize() {
-        requestedOrders.root(root).showRoot(false);
-        requestedOrders.ui.setRowFactory(table -> {
-            System.out.println("create row factory");
-            return new OrderStateRow();
-        });
+        orderCatalog.showRoot(false).render(table -> new CatalogRow());
         requestedOrdersDate.provideProperty(OrderSet.class, o -> o.date)
                 .provideVariable(Order.class, o -> o.child_order_date)
                 .render((ui, item) -> ui.text(formatter.format(item)));
@@ -86,32 +78,15 @@ public class OrderCatalog extends View {
      * @param set
      */
     public void add(OrderSet set) {
-        TreeItem item;
-
         if (set.sub.size() == 1) {
-            Order order = set.sub.get(0);
-            item = new TreeItem(order);
-
-            order.state.observe().take(CANCELED).take(1).to(() -> root.getChildren().remove(item));
+            orderCatalog.createItem(set.sub.get(0)).removeWhen(o -> o.state.observe().take(CANCELED));
         } else {
-            item = new TreeItem(set);
-            item.setExpanded(true);
+            UITreeItem item = orderCatalog.createItem(set).expand(true).removeWhenEmpty();
 
-            // create sub orders for UI
-            for (Order order : set.sub) {
-                TreeItem subItem = new TreeItem(order);
-                item.getChildren().add(subItem);
-
-                order.state.observe().take(CANCELED).take(1).to(() -> {
-                    item.getChildren().remove(subItem);
-
-                    if (item.getChildren().isEmpty()) {
-                        root.getChildren().remove(item);
-                    }
-                });
+            for (Order sub : set.sub) {
+                item.createItem(sub).removeWhen(sub.state.observe().take(CANCELED));
             }
         }
-        root.getChildren().add(item);
     }
 
     /**
@@ -128,23 +103,17 @@ public class OrderCatalog extends View {
     }
 
     /**
-     * @version 2017/11/27 14:59:36
+     * @version 2017/12/04 14:32:07
      */
-    private class OrderStateRow extends TreeTableRow<Object> {
+    private class CatalogRow extends TreeTableRow<Object> {
 
         /** The enhanced ui. */
         private final UI ui = Viewtify.wrap(this, OrderCatalog.this);
 
-        /** The bind manager. */
-        private Disposable bind = Disposable.empty();
-
-        private Calculatable<Boolean> orderIsInvalid = Viewtify.calculate(itemProperty())
-                .as(Order.class)
-                .calculateVariable(o -> o.state)
-                .isNot(State.ACTIVE);
+        private final Calculatable<State> orderState = Viewtify.calculate(itemProperty()).as(Order.class).calculateVariable(o -> o.state);
 
         /** Context Menu */
-        private final UIMenuItem cancel = UI.menuItem().label("Cancel").disableWhen(orderIsInvalid).whenUserClick(e -> {
+        private final UIMenuItem cancel = UI.menuItem().label("Cancel").disableWhen(orderState.isNot(ACTIVE)).whenUserClick(e -> {
             Object item = getItem();
 
             if (item instanceof Order) {
@@ -162,17 +131,8 @@ public class OrderCatalog extends View {
         /**
          * 
          */
-        private OrderStateRow() {
-            itemProperty().addListener((s, o, n) -> {
-                if (o instanceof Order) {
-                    bind.dispose();
-                    ui.unstyle(Side.class);
-                }
-
-                if (n instanceof Order) {
-                    bind = ((Order) n).state.observeNow().to(ui::style);
-                }
-            });
+        private CatalogRow() {
+            ui.style(orderState);
         }
 
         /**

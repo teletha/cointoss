@@ -9,13 +9,28 @@
  */
 package trademate;
 
+import javafx.fxml.FXML;
+
+import cointoss.market.bitflyer.BitFlyer;
 import viewtify.ActivationPolicy;
+import viewtify.View;
 import viewtify.Viewtify;
+import viewtify.ui.UITabPane;
 
 /**
- * @version 2017/11/13 16:58:58
+ * @version 2017/12/04 13:07:34
  */
-public class TradeMate {
+public class TradeMate extends View {
+
+    private @FXML UITabPane main;
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void initialize() {
+        main.load(BitFlyer.FX_BTC_JPY.fullName(), () -> new TradingView(BitFlyer.FX_BTC_JPY)).initial(0);
+    }
 
     /**
      * Entry point.
@@ -23,6 +38,6 @@ public class TradeMate {
      * @param args
      */
     public static void main(String[] args) {
-        Viewtify.activate(MainView.class, ActivationPolicy.Latest);
+        Viewtify.activate(TradeMate.class, ActivationPolicy.Latest);
     }
 }
