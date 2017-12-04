@@ -17,7 +17,6 @@ import java.time.format.DateTimeFormatter;
 import javafx.fxml.FXML;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableRow;
-import javafx.scene.control.TreeTableView;
 
 import cointoss.Order;
 import cointoss.Order.State;
@@ -32,6 +31,7 @@ import viewtify.ui.UI;
 import viewtify.ui.UIContextMenu;
 import viewtify.ui.UIMenuItem;
 import viewtify.ui.UITreeTableColumn;
+import viewtify.ui.UITreeTableView;
 
 /**
  * @version 2017/11/26 14:05:31
@@ -42,7 +42,7 @@ public class OrderCatalog extends View {
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd HH:mm:ss");
 
     /** UI */
-    private @FXML TreeTableView<Object> requestedOrders;
+    private @FXML UITreeTableView<Object> requestedOrders;
 
     /** UI */
     private @FXML UITreeTableColumn<Object, ZonedDateTime> requestedOrdersDate;
@@ -67,9 +67,11 @@ public class OrderCatalog extends View {
      */
     @Override
     protected void initialize() {
-        requestedOrders.setRoot(root);
-        requestedOrders.setShowRoot(false);
-        requestedOrders.setRowFactory(table -> new OrderStateRow());
+        requestedOrders.root(root).showRoot(false);
+        requestedOrders.ui.setRowFactory(table -> {
+            System.out.println("create row factory");
+            return new OrderStateRow();
+        });
         requestedOrdersDate.provideProperty(OrderSet.class, o -> o.date)
                 .provideVariable(Order.class, o -> o.child_order_date)
                 .render((ui, item) -> ui.text(formatter.format(item)));

@@ -11,17 +11,6 @@
         <Console name="SYSTEM" target="SYSTEM_OUT">
             <PatternLayout pattern="${pattern}" />
         </Console>
-
-        <!-- Rolling File Appender -->
-        <RollingFile name="FILE"
-            fileName=".log/TradeMate/trade.log"
-            filePattern=".jackpot/log%d{yyyyMMdd}.txt">
-            <PatternLayout pattern="${pattern}" />
-            <Policies>
-                <TimeBasedTriggeringPolicy />
-            </Policies>
-            <DefaultRolloverStrategy max="9" />
-        </RollingFile>
         
         <UI name="UI">
             <PatternLayout pattern="${pattern}" />
@@ -31,7 +20,6 @@
     <Loggers>
         <Root level="info">
             <AppenderRef ref="SYSTEM" />
-            <AppenderRef ref="FILE" />
             <AppenderRef ref="UI" />
         </Root>
     </Loggers>
