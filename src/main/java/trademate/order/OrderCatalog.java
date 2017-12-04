@@ -20,12 +20,14 @@ import javafx.scene.control.TreeTableRow;
 import javafx.scene.control.TreeTableView;
 
 import cointoss.Order;
+import cointoss.Order.State;
 import cointoss.Side;
 import cointoss.util.Num;
 import kiss.Disposable;
 import trademate.TradingView;
 import viewtify.View;
 import viewtify.Viewtify;
+import viewtify.calculation.Calculatable;
 import viewtify.ui.UI;
 import viewtify.ui.UIContextMenu;
 import viewtify.ui.UIMenuItem;
@@ -134,8 +136,13 @@ public class OrderCatalog extends View {
         /** The bind manager. */
         private Disposable bind = Disposable.empty();
 
+        private Calculatable<Boolean> orderIsInvalid = Viewtify.calculate(itemProperty())
+                .as(Order.class)
+                .calculateVariable(o -> o.state)
+                .isNot(State.ACTIVE);
+
         /** Context Menu */
-        private final UIMenuItem cancel = UI.menuItem().label("Cancel").disableWhen().whenUserClick(e -> {
+        private final UIMenuItem cancel = UI.menuItem().label("Cancel").disableWhen(orderIsInvalid).whenUserClick(e -> {
             Object item = getItem();
 
             if (item instanceof Order) {
