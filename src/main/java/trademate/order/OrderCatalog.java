@@ -28,8 +28,8 @@ import trademate.TradingView;
 import viewtify.View;
 import viewtify.Viewtify;
 import viewtify.calculation.Calculatable;
+import viewtify.calculation.CalculatableList;
 import viewtify.ui.UI;
-import viewtify.ui.UIContextMenu;
 import viewtify.ui.UITreeItem;
 import viewtify.ui.UITreeTableColumn;
 import viewtify.ui.UITreeTableView;
@@ -65,11 +65,15 @@ public class OrderCatalog extends View {
      */
     @Override
     protected void initialize() {
-        orderCatalog.selectionMode(MULTIPLE).render(table -> new CatalogRow()).context($ -> {
-            $.menu("Cancel")
-                    .disableWhen(orderState.isNot(ACTIVE))
-                    .whenUserClick(e -> cancel(getTreeTableView().getSelectionModel().getSelectedItems()));
+        orderCatalog.selectionMode(MULTIPLE).render(table -> new CatalogRow());
+
+        orderCatalog.context($ -> {
+            CalculatableList<Object> selected = orderCatalog.getSelected();
+            CalculatableList<State> state = selected.as(Order.class).flatVariable(o -> o.state);
+
+            $.menu("Cancel").disableWhen(state.isNot(ACTIVE)).whenUserClick(e -> cancel(selected.asList()));
         });
+
         requestedOrdersDate.provideProperty(OrderSet.class, o -> o.date)
                 .provideVariable(Order.class, o -> o.child_order_date)
                 .render((ui, item) -> ui.text(formatter.format(item)));
@@ -91,8 +95,8 @@ public class OrderCatalog extends View {
         } else {
             UITreeItem item = orderCatalog.createItem(set).expand(true).removeWhenEmpty();
 
-            for (Order sub : set.sub) {
-                item.createItem(sub).removeWhen(sub.state.observe().take(CANCELED));
+            for (Order order : set.sub) {
+                item.createItem(order).removeWhen(order.state.observe().take(CANCELED));
             }
         }
     }
@@ -132,12 +136,11 @@ public class OrderCatalog extends View {
         /** The enhanced ui. */
         private final UI ui = Viewtify.wrap(this, OrderCatalog.this);
 
-        /** Context Menu */
-        private final UIContextMenu context = UI.contextMenu($ -> {
-            $.menu("Cancel")
-                    .disableWhen(orderState.isNot(ACTIVE))
-                    .whenUserClick(e -> cancel(getTreeTableView().getSelectionModel().getSelectedItems()));
-        });
+        // /** Context Menu */
+        // private final UIContextMenu context = UI.contextMenu($ -> {
+        // $.menu("Cancel").disableWhen(orderState.isNot(ACTIVE)).whenUserClick(e ->
+        // cancel(getItem()));
+        // });
 
         /**
          * 
@@ -145,7 +148,7 @@ public class OrderCatalog extends View {
         private CatalogRow() {
             ui.style(orderState);
 
-            contextMenuProperty().bind(Viewtify.calculate(itemProperty()).map(v -> context.ui));
+            // contextMenuProperty().bind(Viewtify.calculate(itemProperty()).map(v -> context.ui));
         }
     }
 }
