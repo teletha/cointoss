@@ -71,7 +71,7 @@ public class OrderCatalog extends View {
             CalculatableList<Object> selected = orderCatalog.getSelected();
             CalculatableList<State> state = selected.as(Order.class).flatVariable(o -> o.state);
 
-            $.menu("Cancel").disableWhen(state.isNot(ACTIVE)).whenUserClick(e -> cancel(selected.asList()));
+            $.menu("Cancel").disableWhen(state.isNot(ACTIVE)).whenUserClick(e -> cancel(selected));
         });
 
         requestedOrdersDate.provideProperty(OrderSet.class, o -> o.date)
