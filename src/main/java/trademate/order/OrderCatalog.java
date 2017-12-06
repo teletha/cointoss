@@ -25,10 +25,10 @@ import cointoss.Order.State;
 import cointoss.Side;
 import cointoss.util.Num;
 import trademate.TradingView;
+import viewtify.Calculation;
+import viewtify.CalculationList;
 import viewtify.View;
 import viewtify.Viewtify;
-import viewtify.calculation.Calculatable;
-import viewtify.calculation.CalculatableList;
 import viewtify.ui.UI;
 import viewtify.ui.UITreeItem;
 import viewtify.ui.UITreeTableColumn;
@@ -68,8 +68,8 @@ public class OrderCatalog extends View {
         orderCatalog.selectionMode(MULTIPLE).render(table -> new CatalogRow());
 
         orderCatalog.context($ -> {
-            CalculatableList<Object> selected = orderCatalog.getSelected();
-            CalculatableList<State> state = selected.as(Order.class).flatVariable(o -> o.state);
+            CalculationList<Object> selected = orderCatalog.getSelected();
+            CalculationList<State> state = selected.as(Order.class).flatVariable(o -> o.state);
 
             $.menu("Cancel").disableWhen(state.isNot(ACTIVE)).whenUserClick(e -> cancel(selected));
         });
@@ -131,7 +131,7 @@ public class OrderCatalog extends View {
      */
     private class CatalogRow extends TreeTableRow<Object> {
 
-        private final Calculatable<State> orderState = Viewtify.calculate(itemProperty()).as(Order.class).calculateVariable(o -> o.state);
+        private final Calculation<State> orderState = Viewtify.calculate(itemProperty()).as(Order.class).calculateVariable(o -> o.state);
 
         /** The enhanced ui. */
         private final UI ui = Viewtify.wrap(this, OrderCatalog.this);

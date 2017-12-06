@@ -17,8 +17,8 @@ import javafx.collections.ObservableList;
 import cointoss.Order;
 import cointoss.Side;
 import cointoss.util.Num;
+import viewtify.Calculation;
 import viewtify.Viewtify;
-import viewtify.calculation.Calculatable;
 
 /**
  * @version 2017/12/04 22:02:23
@@ -28,18 +28,17 @@ public class OrderSet {
     public final ObservableList<Order> sub = FXCollections.synchronizedObservableList(FXCollections.observableArrayList());
 
     /** Total amount. */
-    public final Calculatable<Num> amount = Viewtify.calculate(sub).reduce(Num.ZERO, (p, q) -> p.plus(q.size));
+    public final Calculation<Num> amount = Viewtify.calculate(sub).reduce(Num.ZERO, (p, q) -> p.plus(q.size));
 
     /** Total price. */
-    public final Calculatable<Num> totalPrice = Viewtify.calculate(sub)
-            .reduce(Num.ZERO, (p, q) -> p.plus(q.price.multiply(q.size)));
+    public final Calculation<Num> totalPrice = Viewtify.calculate(sub).reduce(Num.ZERO, (p, q) -> p.plus(q.price.multiply(q.size)));
 
     /** Average price. */
-    public final Calculatable<Num> averagePrice = Viewtify.calculate(totalPrice, amount, (total, amount) -> total.divide(amount).scale(0));
+    public final Calculation<Num> averagePrice = Viewtify.calculate(totalPrice, amount, (total, amount) -> total.divide(amount).scale(0));
 
     /** Side */
-    public final Calculatable<Side> side = Viewtify.calculate(sub).item(0).map(o -> o.side);
+    public final Calculation<Side> side = Viewtify.calculate(sub).item(0).map(o -> o.side);
 
     /** The latest date */
-    public final Calculatable<ZonedDateTime> date = Viewtify.calculate(sub).item(0).calculateVariable(o -> o.child_order_date);
+    public final Calculation<ZonedDateTime> date = Viewtify.calculate(sub).item(0).calculateVariable(o -> o.child_order_date);
 }

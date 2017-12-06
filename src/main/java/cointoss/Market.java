@@ -16,7 +16,6 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import cointoss.Order.State;
@@ -239,7 +238,7 @@ public class Market implements Disposable {
             State previous = order.state.set(REQUESTING);
             orders.remove(order);
 
-            return backend.cancel(order.child_order_acceptance_id).delay(5, TimeUnit.SECONDS).effect(id -> {
+            return backend.cancel(order.child_order_acceptance_id).effect(id -> {
                 orders.remove(order);
                 order.state.set(CANCELED);
             }).effectOnError(e -> {
