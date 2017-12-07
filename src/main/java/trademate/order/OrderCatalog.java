@@ -69,7 +69,14 @@ public class OrderCatalog extends View {
 
         orderCatalog.context($ -> {
             CalculationList<Object> selected = orderCatalog.getSelected();
-            CalculationList<State> state = selected.as(Order.class).flatVariable(o -> o.state);
+            CalculationList<State> state = selected.flatVariable(o -> {
+                System.out.println("Flat " + o);
+                if (o instanceof Order) {
+                    return ((Order) o).state;
+                } else {
+                    return null;
+                }
+            });
 
             $.menu("Cancel").disableWhen(state.isNot(ACTIVE)).whenUserClick(e -> cancel(selected));
         });
