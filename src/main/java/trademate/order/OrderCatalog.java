@@ -15,10 +15,14 @@ import static javafx.scene.control.SelectionMode.*;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
+import javafx.beans.binding.Binding;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableRow;
+
+import org.fxmisc.easybind.EasyBind;
 
 import cointoss.Order;
 import cointoss.Order.State;
@@ -26,7 +30,6 @@ import cointoss.Side;
 import cointoss.util.Num;
 import trademate.TradingView;
 import viewtify.Calculation;
-import viewtify.CalculationList;
 import viewtify.View;
 import viewtify.Viewtify;
 import viewtify.ui.UI;
@@ -68,17 +71,27 @@ public class OrderCatalog extends View {
         orderCatalog.selectionMode(MULTIPLE).render(table -> new CatalogRow());
 
         orderCatalog.context($ -> {
-            CalculationList<Object> selected = orderCatalog.getSelected();
-            CalculationList<State> state = selected.flatVariable(o -> {
-                System.out.println("Flat " + o);
-                if (o instanceof Order) {
-                    return ((Order) o).state;
-                } else {
-                    return null;
-                }
-            });
+            ObservableList<Order> selected = EasyBind
+                    .map(orderCatalog.ui.getSelectionModel().getSelectedItems(), v -> (Order) v.getValue());
 
-            $.menu("Cancel").disableWhen(state.isNot(ACTIVE)).whenUserClick(e -> cancel(selected));
+            ObservableList<ObservableValue<State>> state = EasyBind.map(selected, v -> Viewtify.calculate(v.state));
+
+            Binding<Boolean> result = EasyBind.combine(state, s -> s.noneMatch(v -> v == State.ACTIVE));
+            //
+            // CalculationList<Object> selected = orderCatalog.getSelected();
+            // CalculationList<State> state = selected.flatVariable(o -> {
+            //
+            // if (o instanceof Order) {
+            // return ((Order) o).state;
+            // } else {
+            // return null;
+            // }
+            // });
+
+            $.menu("Cancel").disableWhen(result).whenUserClick(e -> {
+                cancel(selected);
+                System.out.println(result.getValue());
+            });
         });
 
         requestedOrdersDate.provideProperty(OrderSet.class, o -> o.date)

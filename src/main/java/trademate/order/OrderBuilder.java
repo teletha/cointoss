@@ -104,7 +104,7 @@ public class OrderBuilder extends View {
         orderSizeAmount.values(Num.of("0.01"), Num.of("0.1"), Num.ONE).initial(Num.ONE);
 
         orderPrice.initial("0").when(User.Scroll, changeBy(orderPriceAmount.ui)).require(positiveNumber);
-        orderPriceAmount.values(Num.ONE, Num.HUNDRED, Num.THOUSAND).initial(Num.ONE);
+        orderPriceAmount.values(Num.ONE, Num.HUNDRED, Num.THOUSAND, Num.of(10000)).initial(Num.ONE);
 
         orderDivideSize.values(IntStream.range(1, 31).boxed()).initial(1);
         optimizeThreshold.values(Num.range(0, 20)).initial(Num.ZERO);
