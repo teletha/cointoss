@@ -16,6 +16,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 import javafx.beans.binding.Binding;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -71,10 +72,21 @@ public class OrderCatalog extends View {
         orderCatalog.selectionMode(MULTIPLE).render(table -> new CatalogRow());
 
         orderCatalog.context($ -> {
-            ObservableList<Order> selected = EasyBind
-                    .map(orderCatalog.ui.getSelectionModel().getSelectedItems(), v -> (Order) v.getValue());
+            ObservableList<Order> selected = EasyBind.map(orderCatalog.ui.getSelectionModel().getSelectedItems(), v -> {
+                Object value = v.getValue();
+                if (value instanceof Order) {
+                    return (Order) value;
+                } else {
+                    return null;
+                }
+            });
 
-            ObservableList<ObservableValue<State>> state = EasyBind.map(selected, v -> Viewtify.calculate(v.state));
+            ObservableList<ObservableValue<State>> state = EasyBind.map(selected, v -> {
+                if (v == null) {
+                    return new SimpleObjectProperty(State.ACTIVE);
+                }
+                return Viewtify.calculate(v.state);
+            });
 
             Binding<Boolean> result = EasyBind.combine(state, s -> s.noneMatch(v -> v == State.ACTIVE));
             //
