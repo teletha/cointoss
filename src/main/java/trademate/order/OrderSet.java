@@ -15,6 +15,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import cointoss.Order;
+import cointoss.Order.State;
 import cointoss.Side;
 import cointoss.util.Num;
 import viewtify.Calculation;
@@ -28,7 +29,9 @@ public class OrderSet {
     public final ObservableList<Order> sub = FXCollections.synchronizedObservableList(FXCollections.observableArrayList());
 
     /** Total amount. */
-    public final Calculation<Num> amount = Viewtify.calculate(sub).reduce(Num.ZERO, (p, q) -> p.plus(q.size));
+    public final Calculation<Num> amount = Viewtify.calculate(sub)
+            .take(o -> o.state.is(State.ACTIVE))
+            .reduce(Num.ZERO, (p, q) -> p.plus(q.size));
 
     /** Total price. */
     public final Calculation<Num> totalPrice = Viewtify.calculate(sub).reduce(Num.ZERO, (p, q) -> p.plus(q.price.multiply(q.size)));
@@ -40,5 +43,5 @@ public class OrderSet {
     public final Calculation<Side> side = Viewtify.calculate(sub).item(0).map(o -> o.side);
 
     /** The latest date */
-    public final Calculation<ZonedDateTime> date = Viewtify.calculate(sub).item(0).calculateVariable(o -> o.child_order_date);
+    public final Calculation<ZonedDateTime> date = Viewtify.calculate(sub).item(0).flatVariable(o -> o.child_order_date);
 }

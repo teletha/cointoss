@@ -16,21 +16,18 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 import javafx.beans.binding.Binding;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableRow;
-
-import org.fxmisc.easybind.EasyBind;
 
 import cointoss.Order;
 import cointoss.Order.State;
 import cointoss.Side;
 import cointoss.util.Num;
+import kiss.Variable;
 import trademate.TradingView;
 import viewtify.Calculation;
+import viewtify.CalculationList;
 import viewtify.View;
 import viewtify.Viewtify;
 import viewtify.ui.UI;
@@ -72,38 +69,18 @@ public class OrderCatalog extends View {
         orderCatalog.selectionMode(MULTIPLE).render(table -> new CatalogRow());
 
         orderCatalog.context($ -> {
-            ObservableList<Order> selected = EasyBind.map(orderCatalog.ui.getSelectionModel().getSelectedItems(), v -> {
-                Object value = v.getValue();
-                if (value instanceof Order) {
-                    return (Order) value;
+            CalculationList<Object> selected = orderCatalog.getSelected();
+            CalculationList<State> state = selected.flatVariable(o -> {
+                if (o instanceof Order) {
+                    return ((Order) o).state;
                 } else {
-                    return null;
+                    return Variable.of(State.ACTIVE);
                 }
             });
 
-            ObservableList<ObservableValue<State>> state = EasyBind.map(selected, v -> {
-                if (v == null) {
-                    return new SimpleObjectProperty(State.ACTIVE);
-                }
-                return Viewtify.calculate(v.state);
-            });
+            Calculation<Boolean> not = state.isNot(State.ACTIVE);
 
-            Binding<Boolean> result = EasyBind.combine(state, s -> s.noneMatch(v -> v == State.ACTIVE));
-            //
-            // CalculationList<Object> selected = orderCatalog.getSelected();
-            // CalculationList<State> state = selected.flatVariable(o -> {
-            //
-            // if (o instanceof Order) {
-            // return ((Order) o).state;
-            // } else {
-            // return null;
-            // }
-            // });
-
-            $.menu("Cancel").disableWhen(result).whenUserClick(e -> {
-                cancel(selected);
-                System.out.println(result.getValue());
-            });
+            $.menu("Cancel").disableWhen(not).whenUserClick(e -> cancel(selected));
         });
 
         requestedOrdersDate.provideProperty(OrderSet.class, o -> o.date)
@@ -153,8 +130,8 @@ public class OrderCatalog extends View {
             for (Object item : (ObservableList) order) {
                 cancel(item);
             }
-        } else if (order instanceof TreeItem) {
-            cancel(((TreeItem) order).getValue());
+        } else if (order instanceof Binding) {
+            cancel(((Binding) order).getValue());
         }
     }
 
@@ -163,7 +140,13 @@ public class OrderCatalog extends View {
      */
     private class CatalogRow extends TreeTableRow<Object> {
 
-        private final Calculation<State> orderState = Viewtify.calculate(itemProperty()).as(Order.class).calculateVariable(o -> o.state);
+        private final Calculation<State> orderState = Viewtify.calculate(itemProperty()).flatVariable(o -> {
+            if (o instanceof Order) {
+                return ((Order) o).state;
+            } else {
+                return Variable.of(State.ACTIVE);
+            }
+        });
 
         /** The enhanced ui. */
         private final UI ui = Viewtify.wrap(this, OrderCatalog.this);
