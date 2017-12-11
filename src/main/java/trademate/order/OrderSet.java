@@ -34,7 +34,9 @@ public class OrderSet {
             .reduce(Num.ZERO, (p, q) -> p.plus(q.size));
 
     /** Total price. */
-    public final Calculation<Num> totalPrice = Viewtify.calculate(sub).reduce(Num.ZERO, (p, q) -> p.plus(q.price.multiply(q.size)));
+    public final Calculation<Num> totalPrice = Viewtify.calculate(sub)
+            .take(o -> o.state.is(State.ACTIVE))
+            .reduce(Num.ZERO, (p, q) -> p.plus(q.price.multiply(q.size)));
 
     /** Average price. */
     public final Calculation<Num> averagePrice = Viewtify.calculate(totalPrice, amount, (total, amount) -> total.divide(amount).scale(0));
