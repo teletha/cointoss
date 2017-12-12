@@ -14,8 +14,8 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.Test;
 
-import cointoss.Order.State;
 import cointoss.Order.Quantity;
+import cointoss.Order.State;
 import cointoss.util.Num;
 
 /**
@@ -521,7 +521,7 @@ public class MarketTest {
         AtomicReference<Num> size = new AtomicReference<>();
 
         TestableMarket market = new TestableMarket();
-        market.observeExecutionBySize(20).to(e -> {
+        market.timelineByTaker.to(e -> {
             size.set(e.cumulativeSize);
         });
 
@@ -541,7 +541,7 @@ public class MarketTest {
         AtomicReference<Num> size = new AtomicReference<>();
 
         TestableMarket market = new TestableMarket();
-        market.observeExecutionBySize(20).to(e -> {
+        market.timelineByTaker.to(e -> {
             size.set(e.cumulativeSize);
         });
 

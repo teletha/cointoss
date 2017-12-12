@@ -62,7 +62,12 @@ public class ExecutionView extends View {
                 if (100 < items.size()) {
                     items.remove(items.size() - 1);
                 }
+            });
+        });
 
+        // load big taker log
+        Viewtify.inWorker(() -> {
+            return view.market().timelineByTaker.on(Viewtify.UIThread).to(e -> {
                 if (e.cumulativeSize.isGreaterThanOrEqual(takerSize.ui.getValue())) {
                     ObservableList<Execution> bigs = executionCumulativeList.getItems();
 

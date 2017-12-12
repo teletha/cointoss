@@ -131,7 +131,7 @@ class TestableMarket extends Market {
     TestableMarket execute(Side side, Num size, Num price, At time, String buyId, String sellId) {
         Execution e = new Execution();
         e.side = side;
-        e.size = size;
+        e.size = e.cumulativeSize = size;
         e.price = price;
         e.exec_date = time.to();
         e.buy_child_order_acceptance_id = buyId;

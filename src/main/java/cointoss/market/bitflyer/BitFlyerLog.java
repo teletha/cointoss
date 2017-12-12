@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.pubnub.api.PNConfiguration;
@@ -46,13 +45,6 @@ import kiss.Signal;
  * @version 2017/10/01 8:41:58
  */
 class BitFlyerLog implements MarketLog {
-
-    /** The seed execution. */
-    private static final Execution SEED = new Execution();
-
-    static {
-        SEED.side = Side.BUY;
-    }
 
     /** The writer thread. */
     private static final ExecutorService writer = Executors.newSingleThreadExecutor(run -> {
@@ -137,8 +129,6 @@ class BitFlyerLog implements MarketLog {
     @Override
     public synchronized Signal<Execution> from(ZonedDateTime start) {
         if (source == null) {
-            AtomicReference<Execution> switcher = new AtomicReference<>(SEED);
-
             source = new Signal<Execution>((observer, disposer) -> {
                 // read from cache
                 if (cacheFirst != null) {
@@ -166,20 +156,7 @@ class BitFlyerLog implements MarketLog {
                 }
 
                 return disposer;
-            }).map(e -> {
-                Execution previous = switcher.getAndSet(e);
-
-                if (e.side.isBuy() && previous.buy_child_order_acceptance_id.equals(e.buy_child_order_acceptance_id)) {
-                    // same long taker
-                    e.cumulativeSize = previous.cumulativeSize.plus(e.size);
-                    return null;
-                } else if (e.side.isSell() && previous.sell_child_order_acceptance_id.equals(e.sell_child_order_acceptance_id)) {
-                    // same short taker
-                    e.cumulativeSize = previous.cumulativeSize.plus(e.size);
-                    return null;
-                }
-                return previous;
-            }).skip(e -> e == null || e == SEED).share();
+            }).share();
         }
         return source;
     }
@@ -355,7 +332,6 @@ class BitFlyerLog implements MarketLog {
                             observer.accept(exe);
                             realtimeId = exe.id;
                         }
-                        observer.accept(SEED);
                     }
                 }
             });

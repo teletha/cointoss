@@ -81,7 +81,7 @@ public class OrderCatalog extends View {
         requestedOrdersSide.provideProperty(OrderSet.class, o -> o.side)
                 .provideValue(Order.class, Order::side)
                 .render((ui, item) -> ui.text(item).style(item));
-        requestedOrdersAmount.provideProperty(OrderSet.class, o -> o.amount).provideValue(Order.class, o -> o.size);
+        requestedOrdersAmount.provideProperty(OrderSet.class, o -> o.amount).provideVariable(Order.class, o -> o.outstanding_size);
         requestedOrdersPrice.provideProperty(OrderSet.class, o -> o.averagePrice).provideValue(Order.class, o -> o.price);
     }
 

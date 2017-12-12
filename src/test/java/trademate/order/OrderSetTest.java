@@ -12,6 +12,7 @@ package trademate.order;
 import org.junit.Test;
 
 import cointoss.Order;
+import cointoss.Order.State;
 
 /**
  * @version 2017/12/02 1:37:21
@@ -21,7 +22,9 @@ public class OrderSetTest {
     @Test
     public void set() throws Exception {
         Order o1 = Order.limitLong(1, 100);
+        o1.state.set(State.ACTIVE);
         Order o2 = Order.limitLong(1, 200);
+        o2.state.set(State.ACTIVE);
 
         OrderSet set = new OrderSet();
         set.sub.add(o1);

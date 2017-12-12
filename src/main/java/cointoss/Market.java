@@ -31,6 +31,15 @@ import kiss.Signal;
  */
 public class Market implements Disposable {
 
+    /** The initial execution. */
+    private static final Execution SEED = new Execution();
+
+    static {
+        SEED.side = Side.BUY;
+    }
+
+    private final AtomicReference<Execution> switcher = new AtomicReference<>(SEED);
+
     /** The market handler. */
     protected final MarketBackend backend;
 
@@ -98,6 +107,22 @@ public class Market implements Disposable {
 
     /** The execution time line. */
     public final Signal<Execution> timeline = new Signal(timelines);
+
+    /** The execution time line by taker. */
+    public final Signal<Execution> timelineByTaker = timeline.map(e -> {
+        Execution previous = switcher.getAndSet(e);
+
+        if (e.side.isBuy() && previous.buy_child_order_acceptance_id.equals(e.buy_child_order_acceptance_id)) {
+            // same long taker
+            e.cumulativeSize = previous.cumulativeSize.plus(e.size);
+            return null;
+        } else if (e.side.isSell() && previous.sell_child_order_acceptance_id.equals(e.sell_child_order_acceptance_id)) {
+            // same short taker
+            e.cumulativeSize = previous.cumulativeSize.plus(e.size);
+            return null;
+        }
+        return previous;
+    }).skip(e -> e == null || e == SEED);
 
     /** The execution time line. */
     public final Signal<OrderBookChange> orderTimeline;
@@ -180,26 +205,6 @@ public class Market implements Disposable {
     @Override
     public void vandalize() {
         backend.dispose();
-    }
-
-    /**
-     * Observe executions filtered by size.
-     * 
-     * @param threshold
-     * @return
-     */
-    public final Signal<Execution> observeExecutionBySize(int threshold) {
-        AtomicReference<Num> accumlated = new AtomicReference<>(Num.ZERO);
-
-        return timeline.scan(new Execution(), (prev, next) -> {
-            if ((next.side.isBuy() && prev.buy_child_order_acceptance_id.equals(next.buy_child_order_acceptance_id)) || (next.side
-                    .isSell() && prev.sell_child_order_acceptance_id.equals(next.sell_child_order_acceptance_id))) {
-                accumlated.updateAndGet(v -> v.plus(next.size));
-            } else {
-                prev.cumulativeSize = accumlated.getAndSet(next.size);
-            }
-            return next;
-        }).delay(1).take(e -> e.cumulativeSize != null && e.cumulativeSize.isGreaterThanOrEqual(threshold));
     }
 
     /**
