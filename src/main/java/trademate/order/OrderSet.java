@@ -18,8 +18,8 @@ import cointoss.Order;
 import cointoss.Order.State;
 import cointoss.Side;
 import cointoss.util.Num;
-import viewtify.Calculation;
 import viewtify.Viewtify;
+import viewtify.bind.Calculation;
 
 /**
  * @version 2017/12/04 22:02:23
@@ -30,13 +30,15 @@ public class OrderSet {
 
     /** Total amount. */
     public final Calculation<Num> amount = Viewtify.calculate(sub)
-            .take(o -> o.state.is(State.ACTIVE))
-            .reduce(Num.ZERO, (p, q) -> p.plus(q.size));
+            .observe(o -> o.state)
+            .map(o -> o.state.is(State.ACTIVE) ? o.size : Num.ZERO)
+            .reduce(Num.ZERO, Num::plus);
 
     /** Total price. */
     public final Calculation<Num> totalPrice = Viewtify.calculate(sub)
-            .take(o -> o.state.is(State.ACTIVE))
-            .reduce(Num.ZERO, (p, q) -> p.plus(q.price.multiply(q.size)));
+            .observe(o -> o.state)
+            .map(o -> o.state.is(State.ACTIVE) ? o.size.multiply(o.price) : Num.ZERO)
+            .reduce(Num.ZERO, Num::plus);
 
     /** Average price. */
     public final Calculation<Num> averagePrice = Viewtify.calculate(totalPrice, amount, (total, amount) -> total.divide(amount).scale(0));
