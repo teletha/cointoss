@@ -15,7 +15,6 @@ import static javafx.scene.control.SelectionMode.*;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
-import javafx.beans.binding.Binding;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.TreeTableRow;
@@ -29,7 +28,6 @@ import trademate.TradingView;
 import viewtify.View;
 import viewtify.Viewtify;
 import viewtify.bind.Calculation;
-import viewtify.bind.CalculationList;
 import viewtify.ui.UI;
 import viewtify.ui.UITreeItem;
 import viewtify.ui.UITreeTableColumn;
@@ -66,21 +64,10 @@ public class OrderCatalog extends View {
      */
     @Override
     protected void initialize() {
-        orderCatalog.selectionMode(MULTIPLE).render(table -> new CatalogRow());
-
-        orderCatalog.context($ -> {
-            CalculationList<Object> selected = orderCatalog.getSelected();
-            CalculationList<State> state = selected.flatVariable(o -> {
-                if (o instanceof Order) {
-                    return ((Order) o).state;
-                } else {
-                    return Variable.of(State.ACTIVE);
-                }
-            });
-
-            Calculation<Boolean> not = state.isNot(State.ACTIVE);
-
-            $.menu("Cancel").disableWhen(not).whenUserClick(e -> cancel(selected));
+        orderCatalog.selectionMode(MULTIPLE).render(table -> new CatalogRow()).context($ -> {
+            $.menu("Cancel")
+                    .disableWhen(orderCatalog.getSelected().flatVariable(this::state).isNot(ACTIVE))
+                    .whenUserClick(e -> cancel(orderCatalog.getSelected().getValue()));
         });
 
         requestedOrdersDate.provideProperty(OrderSet.class, o -> o.date)
@@ -91,6 +78,16 @@ public class OrderCatalog extends View {
                 .render((ui, item) -> ui.text(item).style(item));
         requestedOrdersAmount.provideProperty(OrderSet.class, o -> o.amount).provideValue(Order.class, o -> o.size);
         requestedOrdersPrice.provideProperty(OrderSet.class, o -> o.averagePrice).provideValue(Order.class, o -> o.price);
+    }
+
+    /**
+     * Compute order state.
+     * 
+     * @param item
+     * @return
+     */
+    private Variable<State> state(Object item) {
+        return item instanceof Order ? ((Order) item).state : Variable.of(ACTIVE);
     }
 
     /**
@@ -111,28 +108,42 @@ public class OrderCatalog extends View {
     }
 
     /**
-     * Cancel the specified {@link Order} or {@link OrderSet}.
+     * Cancel {@link OrderSet} or {@link Order}.
      * 
      * @param order
      */
-    private void cancel(Object order) {
-        if (order instanceof Order) {
-            Viewtify.inWorker(() -> {
-                view.market().cancel((Order) order).to(o -> {
-                    view.console.write("{} is canceled.", order);
-                });
-            });
-        } else if (order instanceof OrderSet) {
-            for (Order sub : ((OrderSet) order).sub) {
-                cancel(sub);
+    private void cancel(ObservableList orders) {
+        for (Object sub : orders) {
+            if (sub instanceof Order) {
+                cancel((Order) sub);
+            } else {
+                cancel((OrderSet) sub);
             }
-        } else if (order instanceof ObservableList) {
-            for (Object item : (ObservableList) order) {
-                cancel(item);
-            }
-        } else if (order instanceof Binding) {
-            cancel(((Binding) order).getValue());
         }
+    }
+
+    /**
+     * Cancel {@link OrderSet}.
+     * 
+     * @param order
+     */
+    private void cancel(OrderSet order) {
+        for (Order sub : order.sub) {
+            cancel(sub);
+        }
+    }
+
+    /**
+     * Cancel {@link Order}.
+     * 
+     * @param order
+     */
+    private void cancel(Order order) {
+        Viewtify.inWorker(() -> {
+            view.market().cancel(order).to(o -> {
+                view.console.write("{} is canceled.", order);
+            });
+        });
     }
 
     /**
