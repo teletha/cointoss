@@ -10,12 +10,11 @@
 package trademate.order;
 
 import static cointoss.Order.State.*;
-import static javafx.scene.control.SelectionMode.*;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.function.Consumer;
 
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.TreeTableRow;
 
@@ -29,6 +28,7 @@ import viewtify.View;
 import viewtify.Viewtify;
 import viewtify.bind.Calculation;
 import viewtify.ui.UI;
+import viewtify.ui.UISpinner;
 import viewtify.ui.UITreeItem;
 import viewtify.ui.UITreeTableColumn;
 import viewtify.ui.UITreeTableView;
@@ -56,6 +56,9 @@ public class OrderCatalog extends View {
     /** UI */
     private @FXML UITreeTableColumn<Object, Num> requestedOrdersPrice;
 
+    /** UI */
+    private @FXML UISpinner<Num> optimizeThreshold;
+
     /** Parent View */
     private @FXML TradingView view;
 
@@ -64,10 +67,12 @@ public class OrderCatalog extends View {
      */
     @Override
     protected void initialize() {
-        orderCatalog.selectionMode(MULTIPLE).render(table -> new CatalogRow()).context($ -> {
-            $.menu("Cancel")
-                    .disableWhen(orderCatalog.getSelected().flatVariable(this::state).isNot(ACTIVE))
-                    .whenUserClick(e -> cancel(orderCatalog.getSelected().getValue()));
+        orderCatalog.selectMultipleRows().render(table -> new CatalogRow()).context($ -> {
+            Calculation<Boolean> ordersArePassive = orderCatalog.getSelected().flatVariable(this::state).isNot(ACTIVE);
+
+            $.menu("Cancel").disableWhen(ordersArePassive).whenUserClick(e -> act(this::cancel));
+            $.menu("Get Close").disableWhen(ordersArePassive).whenUserClick(e -> act(this::reorderClosely));
+            $.menu("Get Away").disableWhen(ordersArePassive).whenUserClick(e -> act(this::reorderAway));
         });
 
         requestedOrdersDate.provideProperty(OrderSet.class, o -> o.date)
@@ -112,24 +117,15 @@ public class OrderCatalog extends View {
      * 
      * @param order
      */
-    private void cancel(ObservableList orders) {
-        for (Object sub : orders) {
-            if (sub instanceof Order) {
-                cancel((Order) sub);
+    private void act(Consumer<Order> forOrder) {
+        for (Object order : orderCatalog.getSelected().getValue()) {
+            if (order instanceof Order) {
+                forOrder.accept((Order) order);
             } else {
-                cancel((OrderSet) sub);
+                for (Order child : ((OrderSet) order).sub) {
+                    forOrder.accept(child);
+                }
             }
-        }
-    }
-
-    /**
-     * Cancel {@link OrderSet}.
-     * 
-     * @param order
-     */
-    private void cancel(OrderSet order) {
-        for (Order sub : order.sub) {
-            cancel(sub);
         }
     }
 
@@ -139,6 +135,38 @@ public class OrderCatalog extends View {
      * @param order
      */
     private void cancel(Order order) {
+        Viewtify.inWorker(() -> {
+            view.market().cancel(order).to(o -> {
+                view.console.write("{} is canceled.", order);
+            });
+        });
+    }
+
+    /**
+     * Reorder {@link Order}.
+     * 
+     * @param order
+     */
+    private void reorderClosely(Order order) {
+        Viewtify.inWorker(() -> {
+            Num price = view.board.book.computeBestPrice(order.side, order.price, optimizeThreshold.value(), Num.of(2));
+
+            view.market().cancel(order).to(o -> {
+                view.console.write("{} is canceled.", o);
+
+                view.market().request(Order.limit(order.side, order.size, price)).to(re -> {
+                    view.console.write("{} is reorder.", re);
+                });
+            });
+        });
+    }
+
+    /**
+     * Reorder {@link Order}.
+     * 
+     * @param order
+     */
+    private void reorderAway(Order order) {
         Viewtify.inWorker(() -> {
             view.market().cancel(order).to(o -> {
                 view.console.write("{} is canceled.", order);
