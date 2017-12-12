@@ -102,12 +102,12 @@ public class OrderCatalog extends View {
      */
     public void add(OrderSet set) {
         if (set.sub.size() == 1) {
-            orderCatalog.createItem(set.sub.get(0)).removeWhen(o -> o.state.observe().take(CANCELED));
+            orderCatalog.createItem(set.sub.get(0)).removeWhen(o -> o.state.observe().take(CANCELED, COMPLETED));
         } else {
             UITreeItem item = orderCatalog.createItem(set).expand(true).removeWhenEmpty();
 
             for (Order order : set.sub) {
-                item.createItem(order).removeWhen(order.state.observe().take(CANCELED));
+                item.createItem(order).removeWhen(order.state.observe().take(CANCELED, COMPLETED));
             }
         }
     }
