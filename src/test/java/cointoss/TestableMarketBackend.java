@@ -16,11 +16,12 @@ import java.util.LinkedList;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import cointoss.Order.State;
 import cointoss.Order.Quantity;
+import cointoss.Order.State;
 import cointoss.Time.Lag;
 import cointoss.order.OrderBookChange;
 import cointoss.util.Num;
+import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
 
@@ -28,6 +29,9 @@ import kiss.Signal;
  * @version 2017/09/08 19:09:35
  */
 class TestableMarketBackend implements MarketBackend {
+
+    /** The terminator. */
+    private final Disposable diposer = Disposable.empty();
 
     /** The managed id. */
     private int id = 0;
@@ -62,7 +66,7 @@ class TestableMarketBackend implements MarketBackend {
      */
     @Override
     public void initialize(Market market, Signal<Execution> log) {
-        log.to(e -> market.tick(emulate(e)));
+        diposer.add(log.to(e -> market.tick(emulate(e))));
     }
 
     /**
@@ -70,6 +74,7 @@ class TestableMarketBackend implements MarketBackend {
      */
     @Override
     public void vandalize() {
+        diposer.dispose();
     }
 
     /**
@@ -172,7 +177,7 @@ class TestableMarketBackend implements MarketBackend {
      */
     @Override
     public Signal<OrderBookChange> getOrderBook() {
-        return I.signal();
+        return Signal.NEVER;
     }
 
     /**

@@ -13,7 +13,6 @@ import java.util.function.Supplier;
 import java.util.stream.IntStream;
 
 import cointoss.Time.Lag;
-import cointoss.analyze.TradingLog;
 import cointoss.util.Num;
 import kiss.I;
 import kiss.Signal;
@@ -142,8 +141,13 @@ public class BackTester {
      * Execute back test.
      */
     public void run() {
-        IntStream.range(0, trial).parallel().mapToObj(i -> new Market(new BackTestBackend(), log.get(), strategy.get())).forEach(market -> {
-            System.out.println(new TradingLog(market, market.tradings));
+        IntStream.range(0, trial).parallel().forEach(index -> {
+            System.out.println("start");
+            Market market = new Market(new BackTestBackend(), log.get());
+            System.out.println("ok");
+            market.dispose();
+
+            System.out.println("dis");
         });
     }
 
@@ -174,7 +178,7 @@ public class BackTester {
          */
         @Override
         public Signal<Num> getBaseCurrency() {
-            return I.signal(BackTester.this.base);
+            return I.signal(base);
         }
 
         /**
@@ -182,7 +186,7 @@ public class BackTester {
          */
         @Override
         public Signal<Num> getTargetCurrency() {
-            return I.signal(BackTester.this.target);
+            return I.signal(target);
         }
     }
 }

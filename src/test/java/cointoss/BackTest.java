@@ -27,9 +27,9 @@ public class BackTest {
         BackTester.with()
                 .baseCurrency(1000000)
                 .targetCurrency(0)
-                .log(() -> BitFlyer.FX_BTC_JPY.log().rangeRandom(2))
-                .strategy(() -> new BreakoutTrading())
-                .trial(3)
+                .log(() -> BitFlyer.FX_BTC_JPY.log().rangeRandom(1))
+                .strategy(() -> new BuyAndHold())
+                .trial(1)
                 .run();
     }
 
@@ -85,21 +85,8 @@ public class BackTest {
          */
         @Override
         protected void initialize() {
-
             market.minute1.signal().takeAt(i -> i % 10 == 0).to(tick -> {
-                Tick last1 = market.hour12.ticks.latest(0);
-                Tick last2 = market.hour12.ticks.latest(1);
-                Num max = Num.max(last1.getWeightMedian(), last2.getWeightMedian());
-
-                if (tick.closePrice.isLessThan(max.multiply(decreaseRatio))) {
-                    Num price = market.getExecutionLatest().price;
-                    Num size = Num.of(0.01);
-
-                    entryLimit(Side.BUY, size, price, entry -> {
-                        entry.order.execute.to(e -> {
-                        });
-                    });
-                }
+                System.out.println(tick);
             });
         }
     }

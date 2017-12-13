@@ -414,7 +414,6 @@ public class Market implements Disposable {
         if (init == null) {
             init = exe;
         }
-
         latest = exe;
 
         flow.record(exe);
