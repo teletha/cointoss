@@ -7,7 +7,7 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package trademate;
+package trademate.order;
 
 import static java.util.concurrent.TimeUnit.*;
 
@@ -21,13 +21,14 @@ import cointoss.order.OrderBookList;
 import cointoss.order.OrderBookList.Ratio;
 import cointoss.order.OrderUnit;
 import cointoss.util.Num;
+import trademate.TradingView;
 import viewtify.View;
 import viewtify.Viewtify;
 import viewtify.ui.UIListView;
 import viewtify.ui.UISpinner;
 
 /**
- * @version 2017/11/14 19:16:13
+ * @version 2017/12/13 11:19:28
  */
 public class OrderBookView extends View {
 
@@ -95,7 +96,7 @@ public class OrderBookView extends View {
         Viewtify.inWorker(() -> {
             return view.market().timeline.on(Viewtify.UIThread).effect(e -> {
                 priceLatest.setText(e.price.toString());
-            }).throttle(3, SECONDS).to(e -> {
+            }).throttle(2, SECONDS).to(e -> {
                 // fix error board
                 book.shorts.fix(e.price);
                 book.longs.fix(e.price);

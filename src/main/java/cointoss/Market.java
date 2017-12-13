@@ -127,6 +127,12 @@ public class Market implements Disposable {
     /** The execution time line. */
     public final Signal<OrderBookChange> orderTimeline;
 
+    /** The holder. */
+    private final Holder<Order> holderForYourOrder = new Holder();
+
+    /** The event stream. */
+    public final Signal<Order> yourOrder = new Signal(holderForYourOrder);
+
     /** The initial execution. */
     private Execution init;
 
@@ -226,6 +232,9 @@ public class Market implements Disposable {
 
             // store
             orders.add(order);
+
+            // event
+            holderForYourOrder.omit(order);
 
             return order;
         }).effectOnError(e -> {
@@ -499,5 +508,24 @@ public class Market implements Disposable {
     private void initializePosition() {
         position = null;
         price = remaining = Num.ZERO;
+    }
+
+    /**
+     * Listener support.
+     * 
+     * @version 2017/12/13 9:18:41
+     */
+    private static final class Holder<E> extends CopyOnWriteArrayList<Observer<? super E>> {
+
+        /**
+         * Omit your event.
+         * 
+         * @param event
+         */
+        private void omit(E event) {
+            for (Observer<? super E> observer : this) {
+                observer.accept(event);
+            }
+        }
     }
 }

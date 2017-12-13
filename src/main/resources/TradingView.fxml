@@ -181,10 +181,19 @@
          <children>
             <TreeTableView id="orderCatalog" focusTraversable="false" maxWidth="405.0" minWidth="405.0" prefWidth="405.0" showRoot="false">
                <columns>
-                  <TreeTableColumn id="requestedOrdersDate" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" text="日付" />
+                  <TreeTableColumn id="requestedOrdersDate" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" text="注文" />
                   <TreeTableColumn id="requestedOrdersSide" maxWidth="70.0" minWidth="70.0" prefWidth="70.0" text="売買" />
                   <TreeTableColumn id="requestedOrdersAmount" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" text="数量" />
                   <TreeTableColumn id="requestedOrdersPrice" maxWidth="80.0" minWidth="80.0" text="価格" />
+               </columns>
+            </TreeTableView>
+            <TreeTableView id="openPositionCatalog" focusTraversable="false" maxWidth="485.0" minWidth="485.0" prefWidth="485.0" showRoot="false">
+               <columns>
+                  <TreeTableColumn id="openPositionDate" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" text="建玉" />
+                  <TreeTableColumn id="openPositionSide" maxWidth="70.0" minWidth="70.0" prefWidth="70.0" text="売買" />
+                  <TreeTableColumn id="openPositionAmount" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" text="数量" />
+                  <TreeTableColumn id="openPositionPrice" maxWidth="80.0" minWidth="80.0" text="価格" />
+                  <TreeTableColumn id="openPositionProfitAndLoss" maxWidth="80.0" minWidth="80.0" text="損益" />
                </columns>
             </TreeTableView>
          </children>

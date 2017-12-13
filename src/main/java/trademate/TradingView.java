@@ -14,6 +14,7 @@ import javafx.fxml.FXML;
 import cointoss.Market;
 import cointoss.market.bitflyer.BitFlyer;
 import trademate.console.Console;
+import trademate.order.OrderBookView;
 import trademate.order.OrderBuilder;
 import trademate.order.OrderCatalog;
 import viewtify.View;

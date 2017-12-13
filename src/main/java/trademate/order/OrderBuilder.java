@@ -163,6 +163,7 @@ public class OrderBuilder extends View {
         int divideSize = orderDivideSize.value();
         Num priceInterval = orderPriceInterval.valueOr(Num.ZERO).multiply(side.isBuy() ? -1 : 1);
         Quantity quantity = orderQuantity.value();
+        long group = System.nanoTime();
 
         for (int i = 0; i < divideSize; i++) {
             Num optimized = view.board.book.computeBestPrice(side, price, optimizeThreshold.value(), Num.of(2));
@@ -170,6 +171,7 @@ public class OrderBuilder extends View {
             Order order = Order.limit(side, size, optimized).type(quantity);
             order.state.set(State.REQUESTING);
             order.state.observe().take(CANCELED, COMPLETED).take(1).to(() -> set.sub.remove(order));
+            order.group = group;
 
             set.sub.add(order);
 

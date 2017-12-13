@@ -20,6 +20,8 @@ public class OrderUnit {
 
     public Num size;
 
+    public Num yourSize = Num.ZERO;
+
     /**
      * @param price
      * @param size

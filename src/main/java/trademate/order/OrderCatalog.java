@@ -83,6 +83,11 @@ public class OrderCatalog extends View {
                 .render((ui, item) -> ui.text(item).style(item));
         requestedOrdersAmount.provideProperty(OrderSet.class, o -> o.amount).provideVariable(Order.class, o -> o.outstanding_size);
         requestedOrdersPrice.provideProperty(OrderSet.class, o -> o.averagePrice).provideValue(Order.class, o -> o.price);
+
+        // observe external orders
+        view.market().yourOrder.skip(o -> o.group != -1).to(order -> {
+            orderCatalog.createItem(order).removeWhen(order.state.observe().take(CANCELED, COMPLETED));
+        });
     }
 
     /**

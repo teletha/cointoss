@@ -37,6 +37,9 @@ public class Order implements Directional {
     /** The order state */
     public final Variable<State> state = Variable.of(State.INIT);
 
+    /** The group id. */
+    public long group = -1;
+
     private Num triggerPrice;
 
     private Quantity quantity;

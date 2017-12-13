@@ -12,6 +12,7 @@ package cointoss.util;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.util.Objects;
 import java.util.stream.IntStream;
 
@@ -818,6 +819,14 @@ public class Num implements Comparable<Num> {
         Num num = scale(scale);
 
         return isPositiveOrZero() ? "+" + num : num.toString();
+    }
+
+    /**
+     * @param format
+     * @return
+     */
+    public String format(DecimalFormat format) {
+        return format.format(delegate);
     }
 
     /**
