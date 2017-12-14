@@ -1,23 +1,95 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
 <VBox prefHeight="830.0" prefWidth="1200.0" stylesheets="@TradeMate.css" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1">
   <children>
       <TabPane id="main" prefHeight="800.0" tabClosingPolicy="UNAVAILABLE">
          <tabs>
-            <Tab text="Untitled Tab">
-              <content>
-                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-              </content>
+            <Tab text="Setting">
+               <content>
+                  <VBox prefHeight="200.0" prefWidth="100.0">
+                     <children>
+                        <HBox alignment="CENTER_LEFT" prefHeight="30.0" prefWidth="200.0">
+                           <children>
+                              <Label prefWidth="100.0" text="Up Trend" />
+                              <CheckBox mnemonicParsing="false" text="Notification">
+                                 <HBox.margin>
+                                    <Insets right="20.0" />
+                                 </HBox.margin>
+                              </CheckBox>
+                              <CheckBox mnemonicParsing="false" text="Sound">
+                                 <HBox.margin>
+                                    <Insets right="20.0" />
+                                 </HBox.margin>
+                              </CheckBox>
+                              <TextField />
+                           </children>
+                        </HBox>
+                        <HBox alignment="CENTER_LEFT" prefHeight="30.0" prefWidth="200.0">
+                           <children>
+                              <Label prefWidth="100.0" text="Down Trend" />
+                              <CheckBox mnemonicParsing="false" text="Notification">
+                                 <HBox.margin>
+                                    <Insets right="20.0" />
+                                 </HBox.margin>
+                              </CheckBox>
+                              <CheckBox mnemonicParsing="false" text="Sound">
+                                 <HBox.margin>
+                                    <Insets right="20.0" />
+                                 </HBox.margin>
+                              </CheckBox>
+                              <TextField />
+                           </children>
+                        </HBox>
+                        <HBox alignment="CENTER_LEFT" prefHeight="30.0" prefWidth="200.0">
+                           <children>
+                              <Label prefWidth="100.0" text="Execution" />
+                              <CheckBox mnemonicParsing="false" text="Notification">
+                                 <HBox.margin>
+                                    <Insets right="20.0" />
+                                 </HBox.margin>
+                              </CheckBox>
+                              <CheckBox mnemonicParsing="false" text="Sound">
+                                 <HBox.margin>
+                                    <Insets right="20.0" />
+                                 </HBox.margin>
+                              </CheckBox>
+                              <TextField />
+                           </children>
+                        </HBox>
+                     </children>
+                     <padding>
+                        <Insets left="20.0" />
+                     </padding>
+                  </VBox>
+               </content>
             </Tab>
             <Tab text="Untitled Tab">
-              <content>
-                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-              </content>
+               <content>
+                  <TabPane prefHeight="200.0" prefWidth="200.0" side="LEFT" styleClass="vertical" tabClosingPolicy="UNAVAILABLE">
+                    <tabs>
+                      <Tab text="Untitled Tab 1">
+                        <content>
+                          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                        </content>
+                      </Tab>
+                      <Tab text="Untitled Tab 2">
+                        <content>
+                          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                        </content>
+                      </Tab>
+                    </tabs>
+                  </TabPane>
+               </content>
             </Tab>
          </tabs>
       </TabPane>

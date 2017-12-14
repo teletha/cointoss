@@ -76,6 +76,19 @@
     -fx-faint-focus-color: transparent;
 }
 
+.vertical *.tab-label {
+    -fx-rotate: 90;
+}
+
+.vertical {
+		-fx-tab-max-height: 120px;
+		-fx-tab-min-height: 120px;
+		-fx-tab-max-width: 70px;
+		-fx-tab-min-width: 70px;
+		-fx-padding: 0;
+}
+
+
 /* ==========================================================================
   Table
 ===========================================================================*/
