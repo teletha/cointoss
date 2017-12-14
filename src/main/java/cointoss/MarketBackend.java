@@ -132,4 +132,18 @@ public interface MarketBackend extends Disposable {
      * @return
      */
     Signal<OrderBookChange> getOrderBook();
+
+    /**
+     * Get the service status.
+     * 
+     * @return
+     */
+    Signal<Health> getHealth();
+
+    /**
+     * @version 2017/12/14 16:20:52
+     */
+    enum Health {
+        Normal, Busy, VeryBusy, SuperBusy, NoOrder, Stop;
+    }
 }

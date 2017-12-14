@@ -142,12 +142,8 @@ public class BackTester {
      */
     public void run() {
         IntStream.range(0, trial).parallel().forEach(index -> {
-            System.out.println("start");
             Market market = new Market(new BackTestBackend(), log.get());
-            System.out.println("ok");
             market.dispose();
-
-            System.out.println("dis");
         });
     }
 

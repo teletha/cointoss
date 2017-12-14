@@ -13,6 +13,9 @@ import java.nio.charset.StandardCharsets;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.codec.digest.HmacUtils;
 import org.apache.http.HttpStatus;
@@ -53,6 +56,14 @@ import kiss.Signal;
  */
 class BitFlyerBackend implements MarketBackend {
 
+    /** The server checking thread. */
+    private static final ScheduledExecutorService checker = Executors.newSingleThreadScheduledExecutor(run -> {
+        Thread thread = new Thread(run);
+        thread.setName("Server Checker");
+        thread.setDaemon(true);
+        return thread;
+    });
+
     /** The api url. */
     static final String api = "https://api.bitflyer.jp";
 
@@ -60,7 +71,7 @@ class BitFlyerBackend implements MarketBackend {
     static final ZoneId zone = ZoneId.of("UTC");
 
     /** The market type. */
-    private final BitFlyer type;
+    private BitFlyer type;
 
     /** The key. */
     private final String accessKey;
@@ -223,6 +234,22 @@ class BitFlyerBackend implements MarketBackend {
     public Signal<OrderBookChange> getOrderBook() {
         return snapshotOrderBook().merge(board);
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Signal<Health> getHealth() {
+        return health;
+    }
+
+    private final Signal<Health> health = new Signal<Health>((observer, disposer) -> {
+        checker.scheduleAtFixedRate(() -> {
+            call("GET", "/v1/gethealth?product_code=" + type, "", "", ServerHealth.class).map(health -> Health.valueOf(health.status))
+                    .to(observer::accept);
+        }, 0, 30, TimeUnit.SECONDS);
+        return disposer.add(checker::shutdown);
+    }).share();
 
     /**
      * Snapshot order book info.
@@ -413,5 +440,14 @@ class BitFlyerBackend implements MarketBackend {
 
         /** The available currency amount. */
         public Num available;
+    }
+
+    /**
+     * @version 2017/12/14 16:24:28
+     */
+    private static class ServerHealth {
+
+        /** The server status. */
+        public String status;
     }
 }

@@ -140,7 +140,6 @@ class BitFlyerLog implements MarketLog {
                                 .take(e -> e.exec_date.isAfter(start))
                                 .to(observer::accept));
                         current = current.plusDays(1);
-                        System.out.println(current);
                     }
                 }
 
