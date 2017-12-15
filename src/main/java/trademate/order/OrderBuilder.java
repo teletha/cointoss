@@ -192,7 +192,7 @@ public class OrderBuilder extends View {
 
             Viewtify.inWorker(() -> {
                 view.market().request(order).to(o -> {
-                    view.console.notify(NotificationType.OrderAccepted, "Accept order [{}]", o);
+                    view.console.info("Accept order [{}]", o);
                 }, e -> {
                     view.console.notify(NotificationType.OrderFailed, "Reject order [{}]", order, e);
                 });
