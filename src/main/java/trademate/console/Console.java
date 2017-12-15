@@ -18,12 +18,16 @@ import java.util.LinkedList;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.controlsfx.control.Notifications;
 
 import cointoss.ExecutionFlow;
 import cointoss.Trading;
+import trademate.NotificationType;
+import trademate.SettingView;
 import trademate.TradingView;
 import viewtify.View;
 import viewtify.Viewtify;
@@ -39,6 +43,8 @@ public class Console extends View {
 
     /** The background logger. */
     private Logger logger;
+
+    private @FXML SettingView setting;
 
     private @FXML TradingView view;
 
@@ -83,8 +89,23 @@ public class Console extends View {
      * 
      * @param message
      */
-    public void write(String message, Object... params) {
+    public void info(String message, Object... params) {
         logger.info(message, params);
+    }
+
+    /**
+     * @param e
+     * @param message
+     * @param params
+     */
+    public void notify(NotificationType type, String message, Object... params) {
+        logger.error(message, params);
+
+        if (setting.shouldNotify(type)) {
+            Viewtify.inUI(() -> {
+                Notifications.create().title(type.name()).text(String.format(message, params)).darkStyle().position(Pos.TOP_RIGHT).show();
+            });
+        }
     }
 
     /**

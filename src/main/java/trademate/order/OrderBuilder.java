@@ -25,6 +25,7 @@ import cointoss.Order.State;
 import cointoss.Side;
 import cointoss.util.Num;
 import kiss.WiseBiConsumer;
+import trademate.NotificationType;
 import trademate.TradingView;
 import viewtify.User;
 import viewtify.View;
@@ -187,11 +188,13 @@ public class OrderBuilder extends View {
         // Request to Server
         // ========================================
         for (Order order : set.sub) {
-            view.console.write("Request order [{}]", order);
+            view.console.info("Request order [{}]", order);
 
             Viewtify.inWorker(() -> {
                 view.market().request(order).to(o -> {
-                    view.console.write("Accept order [{}]", o);
+                    view.console.notify(NotificationType.OrderAccepted, "Accept order [{}]", o);
+                }, e -> {
+                    view.console.notify(NotificationType.OrderFailed, "Reject order [{}]", order, e);
                 });
             });
         }

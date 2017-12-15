@@ -52,6 +52,9 @@ public class TradingView extends View {
      */
     @Override
     protected void initialize() {
+        market().yourExecution.to(o -> {
+
+        });
     }
 
     /**

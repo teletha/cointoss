@@ -21,6 +21,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import cointoss.Order.State;
 import cointoss.chart.Chart;
 import cointoss.order.OrderBookChange;
+import cointoss.util.Listeners;
 import cointoss.util.Num;
 import kiss.Disposable;
 import kiss.Observer;
@@ -128,10 +129,16 @@ public class Market implements Disposable {
     public final Signal<OrderBookChange> orderTimeline;
 
     /** The holder. */
-    private final Holder<Order> holderForYourOrder = new Holder();
+    private final Listeners<Order> holderForYourOrder = new Listeners();
 
     /** The event stream. */
     public final Signal<Order> yourOrder = new Signal(holderForYourOrder);
+
+    /** The holder. */
+    private final Listeners<Order> holderForYourExecution = new Listeners();
+
+    /** The event stream. */
+    public final Signal<Order> yourExecution = new Signal(holderForYourExecution);
 
     /** The initial execution. */
     private Execution init;
@@ -430,6 +437,7 @@ public class Market implements Disposable {
                 for (Observer<? super Execution> listener : order.executeListeners) {
                     listener.accept(exe);
                 }
+                holderForYourExecution.omit(order);
             }
         }
 
@@ -507,24 +515,5 @@ public class Market implements Disposable {
     private void initializePosition() {
         position = null;
         price = remaining = Num.ZERO;
-    }
-
-    /**
-     * Listener support.
-     * 
-     * @version 2017/12/13 9:18:41
-     */
-    private static final class Holder<E> extends CopyOnWriteArrayList<Observer<? super E>> {
-
-        /**
-         * Omit your event.
-         * 
-         * @param event
-         */
-        private void omit(E event) {
-            for (Observer<? super E> observer : this) {
-                observer.accept(event);
-            }
-        }
     }
 }
