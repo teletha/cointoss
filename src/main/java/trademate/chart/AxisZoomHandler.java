@@ -7,7 +7,7 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss.visual;
+package trademate.chart;
 
 import static java.lang.Math.*;
 

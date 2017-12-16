@@ -7,7 +7,7 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss.visual;
+package trademate.chart;
 
 import static cointoss.Execution.*;
 import static java.time.temporal.ChronoUnit.*;
@@ -101,15 +101,10 @@ public class Visualize extends Application {
                     axis.visibleRange.set(Num.of(50000).divide(diff).toDouble());
                     axis.scrollBarVisibility.set(false);
                 })
-                .graphTracker(new GraphTracker())
                 .lineData(weightMedian)
                 .candleDate(serise);
 
-        Legend legend = new Legend();
-        legend.setDataList(candleChart.lines);
-
         BorderPane p = new BorderPane();
-        p.setTop(legend);
         p.setPrefWidth(800);
         p.setPrefHeight(500);
         p.setCenter(candleChart);

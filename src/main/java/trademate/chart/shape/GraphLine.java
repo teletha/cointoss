@@ -7,7 +7,7 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss.visual.shape;
+package trademate.chart.shape;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
@@ -18,7 +18,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Orientation;
 import javafx.scene.shape.Line;
 
-import cointoss.visual.Axis;
+import trademate.chart.Axis;
 
 /**
  * グラフ上に表示する線

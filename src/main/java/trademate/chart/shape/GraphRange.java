@@ -7,7 +7,7 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss.visual.shape;
+package trademate.chart.shape;
 
 import static java.lang.Math.*;
 
@@ -20,7 +20,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Orientation;
 import javafx.scene.shape.Rectangle;
 
-import cointoss.visual.Axis;
+import trademate.chart.Axis;
 
 /**
  * @version 2017/09/26 1:04:42

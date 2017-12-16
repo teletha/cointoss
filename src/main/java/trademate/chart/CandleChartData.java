@@ -7,7 +7,7 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss.visual;
+package trademate.chart;
 
 import java.util.Objects;
 import java.util.function.ToDoubleFunction;

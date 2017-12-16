@@ -7,7 +7,7 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss.visual;
+package trademate.chart;
 
 import java.util.BitSet;
 import java.util.List;
@@ -39,8 +39,8 @@ import org.eclipse.collections.api.list.primitive.DoubleList;
 
 import cointoss.chart.Tick;
 import cointoss.util.Num;
-import cointoss.visual.shape.Candle;
-import cointoss.visual.shape.GraphShape;
+import trademate.chart.shape.Candle;
+import trademate.chart.shape.GraphShape;
 
 /**
  * @version 2017/09/27 21:49:33

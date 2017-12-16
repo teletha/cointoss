@@ -7,7 +7,7 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss.visual;
+package trademate.chart;
 
 import static java.lang.Math.*;
 
@@ -36,7 +36,7 @@ import javafx.scene.layout.Region;
 import cointoss.chart.Chart;
 import cointoss.chart.Tick;
 import cointoss.util.Num;
-import cointoss.visual.shape.GraphShape;
+import trademate.chart.shape.GraphShape;
 
 /**
  * @version 2017/09/27 18:13:28
@@ -470,16 +470,6 @@ public class CandleChart extends Region {
             titleLabel = l;
         }
         return titleLabel;
-    }
-
-    /**
-     * @param graphTracker
-     * @return
-     */
-    public final CandleChart graphTracker(GraphTracker graphTracker) {
-        graphTracker.install(this);
-
-        return this;
     }
 
     /**

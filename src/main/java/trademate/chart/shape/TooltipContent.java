@@ -7,7 +7,7 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss.visual.shape;
+package trademate.chart.shape;
 
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
