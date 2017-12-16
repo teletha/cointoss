@@ -9,10 +9,8 @@
  */
 package trademate.chart;
 
-import static cointoss.Execution.*;
 import static java.time.temporal.ChronoUnit.*;
 
-import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -24,14 +22,12 @@ import javafx.stage.Stage;
 
 import cointoss.Market;
 import cointoss.chart.Chart;
-import cointoss.chart.Tick;
 import cointoss.market.bitflyer.BitFlyer;
-import cointoss.util.Num;
 
 /**
  * @version 2017/09/25 21:39:19
  */
-public class Visualize extends Application {
+public class ChartDemo extends Application {
 
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
 
@@ -72,36 +68,34 @@ public class Visualize extends Application {
 
         Chart serise = market.minute1;
 
-        Num max = Num.MIN;
-        Num min = Num.MAX;
-
-        for (Tick tick : serise.ticks) {
-            max = Num.max(max, tick.maxPrice);
-            min = Num.min(min, tick.minPrice);
-        }
-        Num diff = max.minus(min);
-
-        CandleChartData weightMedian = new CandleChartData(serise);
-        weightMedian.name.set("Weight Median");
+        // Num max = Num.MIN;
+        // Num min = Num.MAX;
+        //
+        // for (Tick tick : serise.ticks) {
+        // max = Num.max(max, tick.maxPrice);
+        // min = Num.min(min, tick.minPrice);
+        // }
+        // Num diff = max.minus(min);
 
         candleChart = new CandleChart()//
                 .graph(plot -> {
                 })
-                .axisX(axis -> {
-                    long minute = 60000;
-                    axis.nameLabel.setText("日時");
-                    axis.tickLabelFormatter.set(v -> Instant.ofEpochMilli((long) v).plus(9, HOURS).atZone(UTC).format(formatter));
-                    axis.visibleRange.set(100D / serise.ticks.size());
-                    axis.units.set(new double[] {minute, 10 * minute, 30 * minute, 60 * minute, 2 * 60 * minute, 4 * 60 * minute,
-                            6 * 60 * minute, 12 * 60 * minute, 24 * 60 * minute});
-                })
-                .axisY(axis -> {
-                    axis.nameLabel.setText("JPY");
-                    axis.tickLabelFormatter.set(v -> Num.of(v).asJPY());
-                    axis.visibleRange.set(Num.of(50000).divide(diff).toDouble());
-                    axis.scrollBarVisibility.set(false);
-                })
-                .lineData(weightMedian)
+                // .axisX(axis -> {
+                // long minute = 60000;
+                // axis.nameLabel.setText("日時");
+                // axis.tickLabelFormatter.set(v -> Instant.ofEpochMilli((long) v).plus(9,
+                // HOURS).atZone(UTC).format(formatter));
+                // axis.visibleRange.set(100D / serise.ticks.size());
+                // axis.units.set(new double[] {minute, 10 * minute, 30 * minute, 60 * minute, 2 *
+                // 60 * minute, 4 * 60 * minute,
+                // 6 * 60 * minute, 12 * 60 * minute, 24 * 60 * minute});
+                // })
+                // .axisY(axis -> {
+                // axis.nameLabel.setText("JPY");
+                // axis.tickLabelFormatter.set(v -> Num.of(v).asJPY());
+                // axis.visibleRange.set(Num.of(50000).divide(diff).toDouble());
+                // axis.scrollBarVisibility.set(false);
+                // })
                 .candleDate(serise);
 
         BorderPane p = new BorderPane();

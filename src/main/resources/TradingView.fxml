@@ -12,13 +12,14 @@
 <?import javafx.scene.control.TreeTableColumn?>
 <?import javafx.scene.control.TreeTableView?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 
 <VBox stylesheets="@TradeMate.css" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <SplitPane dividerPositions="0.37, 0.6156, 0.8091" focusTraversable="false" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS">
+      <SplitPane dividerPositions="0.37, 0.6156, 0.5" focusTraversable="false" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS">
          <items>
-            <ListView id="console" focusTraversable="false" minWidth="400.0" />
+            <Pane id="chart" />
             <VBox maxWidth="280.0" minWidth="280.0">
                <children>
                   <HBox alignment="CENTER_LEFT" VBox.vgrow="NEVER">
@@ -196,6 +197,7 @@
                   <TreeTableColumn id="openPositionProfitAndLoss" maxWidth="80.0" minWidth="80.0" text="損益" />
                </columns>
             </TreeTableView>
+            <ListView id="console" focusTraversable="false" minWidth="400.0" />
          </children>
       </HBox>
    </children>

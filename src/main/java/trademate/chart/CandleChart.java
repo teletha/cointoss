@@ -84,7 +84,7 @@ public class CandleChart extends Region {
      * 
      */
     public CandleChart() {
-        getStylesheets().add(getClass().getResource("CandleStickChart.css").toExternalForm());
+        getStylesheets().add(ClassLoader.getSystemResource("CandleStickChart.css").toExternalForm());
 
         zoom.install(axisX);
         zoom.install(axisY);
@@ -206,19 +206,6 @@ public class CandleChart extends Region {
     protected void dealWithData() {
         setXAxisRange();
         setYAxisRange();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected double computePrefHeight(final double width) {
-        return 150;
-    }
-
-    @Override
-    protected double computePrefWidth(final double height) {
-        return 150;
     }
 
     public final <T extends Event> void addEventHandlerToGraphArea(final EventType<T> eventType, final EventHandler<? super T> eventHandler) {

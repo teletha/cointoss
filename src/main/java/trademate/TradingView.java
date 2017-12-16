@@ -9,10 +9,19 @@
  */
 package trademate;
 
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
+
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.scene.layout.Pane;
 
 import cointoss.Market;
+import cointoss.chart.Tick;
 import cointoss.market.bitflyer.BitFlyer;
+import trademate.chart2.BarData;
+import trademate.chart2.CandleStickChart;
 import trademate.console.Console;
 import trademate.order.OrderBookView;
 import trademate.order.OrderBuilder;
@@ -25,6 +34,8 @@ import viewtify.Viewtify;
  */
 public class TradingView extends View {
 
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+
     public final BitFlyer provider;
 
     public @FXML ExecutionView executionView;
@@ -36,6 +47,8 @@ public class TradingView extends View {
     public @FXML OrderBuilder builder;
 
     public @FXML OrderCatalog catalog;
+
+    public @FXML Pane chart;
 
     /** Market cache. */
     private Market market;
@@ -55,6 +68,16 @@ public class TradingView extends View {
         market().yourExecution.to(o -> {
 
         });
+
+        List<BarData> list = FXCollections.observableArrayList();
+
+        for (Tick tick : market().minute1.ticks) {
+            list.add(new BarData(tick.start, tick.openPrice, tick.maxPrice, tick.minPrice, tick.closePrice, tick.volume));
+        }
+
+        CandleStickChart candle = new CandleStickChart("OK", list);
+
+        chart.getChildren().add(candle);
     }
 
     /**
@@ -72,7 +95,7 @@ public class TradingView extends View {
      */
     public final synchronized Market market() {
         if (market == null) {
-            Viewtify.Terminator.add(market = new Market(provider.service(), provider.log().fromToday()));
+            Viewtify.Terminator.add(market = new Market(provider.service(), provider.log().fromLast(60, ChronoUnit.MINUTES)));
         }
         return market;
     }
