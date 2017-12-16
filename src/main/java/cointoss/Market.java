@@ -104,10 +104,10 @@ public class Market implements Disposable {
     public final ExecutionFlow flow300 = new ExecutionFlow(300);
 
     /** The execution listeners. */
-    private final CopyOnWriteArrayList<Observer<? super Execution>> timelines = new CopyOnWriteArrayList();
+    private final Listeners<Execution> holderForTimeline = new Listeners();
 
     /** The execution time line. */
-    public final Signal<Execution> timeline = new Signal(timelines);
+    public final Signal<Execution> timeline = new Signal(holderForTimeline);
 
     /** The execution time line by taker. */
     public final Signal<Execution> timelineByTaker = timeline.map(e -> {
@@ -442,9 +442,7 @@ public class Market implements Disposable {
         }
 
         // observe executions
-        for (Observer<? super Execution> listener : timelines) {
-            listener.accept(exe);
-        }
+        holderForTimeline.omit(exe);
     }
 
     /**
