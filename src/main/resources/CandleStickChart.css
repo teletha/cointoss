@@ -32,11 +32,17 @@
 }
  
 .chart {
-    -fx-pref-width: -1;
-    -fx-pref-height: -1;
+    -fx-pref-width: 100%;
+    -fx-pref-height: 100%;
+    -fx-min-width: 100%;
+    -fx-min-height: 100%;
 }
   
 .chart-content {
+    -fx-pref-width: 100%;
+    -fx-pref-height: 100%;
+    -fx-min-width: 100%;
+    -fx-min-height: 100%;
 }
   
 .chart-title {
