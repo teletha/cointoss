@@ -32,11 +32,11 @@
 }
  
 .chart {
-    -fx-padding: 10px;
+    -fx-pref-width: -1;
+    -fx-pref-height: -1;
 }
   
 .chart-content {
-    -fx-padding: 10px;    
 }
   
 .chart-title {

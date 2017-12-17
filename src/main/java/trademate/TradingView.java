@@ -11,17 +11,12 @@ package trademate;
 
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
 
-import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.layout.Pane;
 
 import cointoss.Market;
-import cointoss.chart.Tick;
 import cointoss.market.bitflyer.BitFlyer;
-import trademate.chart2.BarData;
-import trademate.chart2.CandleStickChart;
 import trademate.console.Console;
 import trademate.order.OrderBookView;
 import trademate.order.OrderBuilder;
@@ -69,15 +64,7 @@ public class TradingView extends View {
 
         });
 
-        List<BarData> list = FXCollections.observableArrayList();
-
-        for (Tick tick : market().minute1.ticks) {
-            list.add(new BarData(tick.start, tick.openPrice, tick.maxPrice, tick.minPrice, tick.closePrice, tick.volume));
-        }
-
-        CandleStickChart candle = new CandleStickChart("OK", list);
-
-        chart.getChildren().add(candle);
+        // chart.getChildren().add(new CandleChart().candleDate(market.minute1));
     }
 
     /**
