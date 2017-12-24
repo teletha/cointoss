@@ -12,6 +12,7 @@ package trademate.order;
 import static cointoss.Order.State.*;
 import static java.util.concurrent.TimeUnit.*;
 
+import java.math.RoundingMode;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
 
@@ -76,6 +77,9 @@ public class OrderBuilder extends View {
     private @FXML UISpinner<Integer> orderDivideSize;
 
     /** UI */
+    private @FXML UISpinner<Integer> orderDivideIntervalAmount;
+
+    /** UI */
     private @FXML UISpinner<Num> optimizeThreshold;
 
     /** UI */
@@ -108,6 +112,9 @@ public class OrderBuilder extends View {
         orderPriceAmount.values(Num.ONE, Num.HUNDRED, Num.THOUSAND, Num.of(10000)).initial(Num.ONE);
 
         orderDivideSize.values(IntStream.range(1, 31).boxed()).initial(1);
+        orderDivideIntervalAmount.values(IntStream.range(0, 5).boxed())
+                .initial(0)
+                .disableWhen(orderDivideSize.ui.valueProperty().isEqualTo(1));
         optimizeThreshold.values(Num.range(0, 20)).initial(Num.ZERO);
         orderPriceInterval.initial("0")
                 .when(User.Scroll, changeBy(orderPriceIntervalAmount.ui))
@@ -162,21 +169,24 @@ public class OrderBuilder extends View {
         Num size = orderSize.valueOr(Num.ZERO);
         Num price = orderPrice.valueOr(Num.ZERO);
         int divideSize = orderDivideSize.value();
+        int increaseInterval = orderDivideIntervalAmount.value();
         Num priceInterval = orderPriceInterval.valueOr(Num.ZERO).multiply(side.isBuy() ? -1 : 1);
         Quantity quantity = orderQuantity.value();
         long group = System.nanoTime();
 
         for (int i = 0; i < divideSize; i++) {
-            Num optimized = view.board.book.computeBestPrice(side, price, optimizeThreshold.value(), Num.of(2));
+            Num optimizedSize = increaseInterval == 0 ? Num.ZERO
+                    : Num.of(i).divide(increaseInterval).scale(0, RoundingMode.FLOOR).multiply(orderSizeAmount.value());
+            Num optimizedPrice = view.board.book.computeBestPrice(side, price, optimizeThreshold.value(), Num.of(2));
 
-            Order order = Order.limit(side, size, optimized).type(quantity);
+            Order order = Order.limit(side, size.plus(optimizedSize), optimizedPrice).type(quantity);
             order.state.set(State.REQUESTING);
             order.state.observe().take(CANCELED, COMPLETED).take(1).to(() -> set.sub.remove(order));
             order.group = group;
 
             set.sub.add(order);
 
-            price = optimized.plus(priceInterval);
+            price = optimizedPrice.plus(priceInterval);
         }
 
         // ========================================

@@ -10,6 +10,7 @@
 package cointoss;
 
 import static cointoss.Order.State.*;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
@@ -230,7 +231,7 @@ public class Market implements Disposable {
      * @param size
      */
     public final Signal<Order> request(Order order) {
-        return backend.request(order).map(id -> {
+        return backend.request(order).effectOnError(System.out::println).retryWhen(fail -> fail.take(3).delay(5, SECONDS)).map(id -> {
             order.child_order_acceptance_id = id;
             order.state.set(State.ACTIVE);
             order.child_order_date.set(ZonedDateTime.now());
