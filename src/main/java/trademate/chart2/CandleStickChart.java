@@ -103,7 +103,7 @@ public class CandleStickChart extends XYChart<String, Number> {
         for (BarData bar : sublist) {
             String label = "";
             label = sdf.format(bar.getDateTime());
-            series.getData().add(new XYChart.Data<>(label, bar.getOpen(), bar));
+            series.getData().createOrderItem(new XYChart.Data<>(label, bar.getOpen(), bar));
         }
 
         dataSeries = FXCollections.observableArrayList(series);
@@ -352,8 +352,8 @@ public class CandleStickChart extends XYChart<String, Number> {
                     if (yData != null) {
                         BarData extras = (BarData) data.getExtraValue();
                         if (extras != null) {
-                            yData.add(extras.getHigh());
-                            yData.add(extras.getLow());
+                            yData.createOrderItem(extras.getHigh());
+                            yData.createOrderItem(extras.getLow());
                         } else {
                             yData.add(data.getYValue());
                         }

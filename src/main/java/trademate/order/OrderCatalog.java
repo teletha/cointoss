@@ -34,7 +34,7 @@ import viewtify.ui.UITreeTableColumn;
 import viewtify.ui.UITreeTableView;
 
 /**
- * @version 2017/11/26 14:05:31
+ * @version 2017/12/25 12:25:16
  */
 public class OrderCatalog extends View {
 
@@ -85,9 +85,7 @@ public class OrderCatalog extends View {
         requestedOrdersPrice.provideProperty(OrderSet.class, o -> o.averagePrice).provideValue(Order.class, o -> o.price);
 
         // observe external orders
-        view.market().yourOrder.skip(o -> o.group != -1).to(order -> {
-            orderCatalog.createItem(order).removeWhen(order.state.observe().take(CANCELED, COMPLETED));
-        });
+        view.market().yourOrder.skip(o -> o.group != -1).to(order -> createOrderItem(orderCatalog.root, order));
     }
 
     /**
@@ -101,20 +99,27 @@ public class OrderCatalog extends View {
     }
 
     /**
-     * Add {@link OrderSet}.
+     * Create tree item for {@link OrderSet}.
      * 
      * @param set
      */
-    public void add(OrderSet set) {
+    public void createOrderItem(OrderSet set) {
         if (set.sub.size() == 1) {
-            orderCatalog.createItem(set.sub.get(0)).removeWhen(o -> o.state.observe().take(CANCELED, COMPLETED));
+            createOrderItem(orderCatalog.root, set.sub.get(0));
         } else {
-            UITreeItem item = orderCatalog.createItem(set).expand(true).removeWhenEmpty();
+            UITreeItem item = orderCatalog.root.createItem(set).expand(true).removeWhenEmpty();
 
             for (Order order : set.sub) {
-                item.createItem(order).removeWhen(order.state.observe().take(CANCELED, COMPLETED));
+                createOrderItem(item, order);
             }
         }
+    }
+
+    /**
+     * Create tree item for {@link Order}.
+     */
+    private void createOrderItem(UITreeItem item, Order order) {
+        item.createItem(order).removeWhen(order.state.observe().take(CANCELED, COMPLETED));
     }
 
     /**

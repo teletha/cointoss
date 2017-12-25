@@ -21,6 +21,7 @@ import trademate.console.Console;
 import trademate.order.OrderBookView;
 import trademate.order.OrderBuilder;
 import trademate.order.OrderCatalog;
+import trademate.order.PositionCatalog;
 import viewtify.View;
 import viewtify.Viewtify;
 
@@ -41,7 +42,9 @@ public class TradingView extends View {
 
     public @FXML OrderBuilder builder;
 
-    public @FXML OrderCatalog catalog;
+    public @FXML OrderCatalog orders;
+
+    public @FXML PositionCatalog positions;
 
     public @FXML Pane chart;
 
