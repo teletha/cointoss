@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 
+import cointoss.MarketBackend.Health;
 import cointoss.Order.State;
 import cointoss.chart.Chart;
 import cointoss.order.OrderBookChange;
@@ -141,6 +142,9 @@ public class Market implements Disposable {
     /** The event stream. */
     public final Signal<Order> yourExecution = new Signal(holderForYourExecution);
 
+    /** The market health. */
+    public final Signal<Health> health;
+
     /** The initial execution. */
     private Execution init;
 
@@ -190,6 +194,7 @@ public class Market implements Disposable {
 
         this.backend = backend;
         this.orderTimeline = backend.getOrderBook();
+        this.health = backend.getHealth();
 
         // initialize price, balance and executions
         this.base = this.baseInit = backend.getBaseCurrency().to().v;

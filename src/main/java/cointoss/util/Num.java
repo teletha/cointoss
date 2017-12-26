@@ -1008,7 +1008,7 @@ public class Num implements Comparable<Num> {
     /**
      * @version 2017/07/26 9:08:16
      */
-    public static class Codec implements Encoder<Num>, Decoder<Num> {
+    private static class Codec implements Encoder<Num>, Decoder<Num> {
 
         /**
          * {@inheritDoc}

@@ -34,3 +34,9 @@
 .tree-table-row-cell.REQUESTING .cell {
   -fx-text-fill: rgb(80, 80, 80);
 }
+
+
+.market-tab {
+  -fx-background-image: url("04.jpg");
+  -fx-background-size: cover ;
+}

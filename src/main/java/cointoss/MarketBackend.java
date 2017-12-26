@@ -12,7 +12,10 @@ package cointoss;
 import cointoss.Order.State;
 import cointoss.order.OrderBookChange;
 import cointoss.util.Num;
+import kiss.Decoder;
 import kiss.Disposable;
+import kiss.Encoder;
+import kiss.I;
 import kiss.Signal;
 
 /**
@@ -145,5 +148,52 @@ public interface MarketBackend extends Disposable {
      */
     enum Health {
         Normal, Busy, VeryBusy, SuperBusy, NoOrder, Stop;
+
+        static {
+            I.load(Codec.class, false);
+        }
+
+        /**
+         * @version 2017/12/26 12:59:08
+         */
+        private static class Codec implements Decoder<MarketBackend.Health>, Encoder<MarketBackend.Health> {
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public String encode(MarketBackend.Health value) {
+                return value.name();
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public MarketBackend.Health decode(String value) {
+                switch (value.toLowerCase().replaceAll("\\s", "")) {
+                case "normal":
+                    return MarketBackend.Health.Normal;
+
+                case "busy":
+                    return MarketBackend.Health.Busy;
+
+                case "verybusy":
+                    return MarketBackend.Health.VeryBusy;
+
+                case "superbusy":
+                    return MarketBackend.Health.SuperBusy;
+
+                case "noorder":
+                    return MarketBackend.Health.NoOrder;
+
+                case "stop":
+                    return MarketBackend.Health.Stop;
+                }
+                // If this exception will be thrown, it is bug of this program. So we must rethrow
+                // the wrapped error in here.
+                throw new Error();
+            }
+        }
     }
 }

@@ -67,6 +67,9 @@ public class TradingView extends View {
 
         });
 
+        market().health.to(v -> {
+            System.out.println(v);
+        });
         // chart.getChildren().add(new CandleChart().candleDate(market.minute1));
     }
 
