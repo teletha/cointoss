@@ -12,6 +12,7 @@ package trademate.order;
 import static cointoss.Order.State.*;
 import static java.util.concurrent.TimeUnit.*;
 
+import java.io.File;
 import java.math.RoundingMode;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
@@ -19,6 +20,8 @@ import java.util.stream.IntStream;
 import javafx.fxml.FXML;
 import javafx.scene.control.Spinner;
 import javafx.scene.input.ScrollEvent;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 
 import cointoss.Order;
 import cointoss.Order.Quantity;
@@ -129,8 +132,27 @@ public class OrderBuilder extends View {
         orderLimitLong.when(User.Click).throttle(1000, MILLISECONDS).mapTo(Side.BUY).to(this::requestOrder);
         orderLimitShort.when(User.Click).throttle(1000, MILLISECONDS).mapTo(Side.SELL).to(this::requestOrder);
 
-        orderQuantity.values(Quantity.values()).initial(Quantity.GoodTillCanceled);
+        orderQuantity.values(Quantity.values()).initial(Quantity.GoodTillCanceled).observe(v -> {
+            System.out.println(v);
+
+            String musicFile = "Error.wav"; // For example
+            new Thread() {
+                @Override
+                public void run() {
+                    try {
+                        player = new MediaPlayer(new Media(new File(musicFile).toURI().toString()));
+                        player.play();
+                        System.out.println("PLAY");
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }.start();
+            System.out.println(v);
+        });
     }
+
+    private volatile MediaPlayer player;
 
     /**
      * Support wheel change.

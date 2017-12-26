@@ -246,7 +246,7 @@ class BitFlyerBackend implements MarketBackend {
     private final Signal<Health> health = new Signal<Health>((observer, disposer) -> {
         checker.scheduleAtFixedRate(() -> {
             call("GET", "/v1/gethealth?product_code=" + type, "", "", ServerHealth.class).map(health -> health.status).to(observer::accept);
-        }, 0, 1, TimeUnit.SECONDS);
+        }, 0, 5, TimeUnit.SECONDS);
         return disposer.add(checker::shutdown);
     }).share();
 
