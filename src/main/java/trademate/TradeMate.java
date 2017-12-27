@@ -28,7 +28,9 @@ public class TradeMate extends View {
      */
     @Override
     protected void initialize() {
-        main.load("Setting", SettingView.class).load(BitFlyer.FX_BTC_JPY.fullName(), () -> new TradingView(BitFlyer.FX_BTC_JPY)).initial(0);
+        main.load("Setting", SettingView.class)
+                .load(BitFlyer.FX_BTC_JPY.fullName(), tab -> new TradingView(BitFlyer.FX_BTC_JPY, tab))
+                .initial(0);
     }
 
     /**

@@ -24,6 +24,13 @@ import kiss.Signal;
 public interface MarketBackend extends Disposable {
 
     /**
+     * Backend name.
+     * 
+     * @return
+     */
+    String name();
+
+    /**
      * <p>
      * Initialize and activate market backend.
      * </p>
@@ -147,10 +154,20 @@ public interface MarketBackend extends Disposable {
      * @version 2017/12/14 16:20:52
      */
     enum Health {
-        Normal, Busy, VeryBusy, SuperBusy, NoOrder, Stop;
+        Normal("🌕"), Busy("🌔"), VeryBusy("🌓"), SuperBusy("🌒"), NoOrder("🌑"), Stop("☠");
 
         static {
             I.load(Codec.class, false);
+        }
+
+        /** The human-readable status. */
+        public final String mark;
+
+        /**
+         * @param mark
+         */
+        private Health(String mark) {
+            this.mark = mark;
         }
 
         /**

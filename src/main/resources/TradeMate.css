@@ -37,6 +37,7 @@
 
 
 .market-tab {
+  -fx-font-family: Emoji;
   -fx-background-image: url("04.jpg");
   -fx-background-size: cover ;
 }

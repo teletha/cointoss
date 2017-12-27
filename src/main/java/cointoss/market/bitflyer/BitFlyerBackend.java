@@ -100,6 +100,14 @@ class BitFlyerBackend implements MarketBackend {
      * {@inheritDoc}
      */
     @Override
+    public String name() {
+        return type.fullName();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void initialize(Market market, Signal<Execution> log) {
         disposer.add(log.to(market::tick));
     }

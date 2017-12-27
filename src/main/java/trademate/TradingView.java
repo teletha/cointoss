@@ -24,6 +24,7 @@ import trademate.order.PositionCatalog;
 import viewtify.UI;
 import viewtify.View;
 import viewtify.Viewtify;
+import viewtify.ui.UITab;
 
 /**
  * @version 2017/11/29 10:50:06
@@ -33,6 +34,8 @@ public class TradingView extends View {
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
 
     public final BitFlyer provider;
+
+    private final UITab tab;
 
     public @UI ExecutionView executionView;
 
@@ -52,10 +55,11 @@ public class TradingView extends View {
     private Market market;
 
     /**
-     *
+     * @param tab
      */
-    public TradingView(BitFlyer provider) {
+    public TradingView(BitFlyer provider, UITab tab) {
         this.provider = provider;
+        this.tab = tab;
     }
 
     /**
@@ -67,7 +71,8 @@ public class TradingView extends View {
 
         });
 
-        market().health.to(v -> {
+        market().health.on(Viewtify.UIThread).to(v -> {
+            tab.text(market().name() + " " + v.mark);
             System.out.println(v);
         });
         // chart.getChildren().add(new CandleChart().candleDate(market.minute1));

@@ -205,6 +205,15 @@ public class Market implements Disposable {
     }
 
     /**
+     * Market name.
+     * 
+     * @return
+     */
+    public String name() {
+        return backend.name();
+    }
+
+    /**
      * Add market trader to this market.
      * 
      * @param trading

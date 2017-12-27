@@ -65,6 +65,14 @@ class TestableMarketBackend implements MarketBackend {
      * {@inheritDoc}
      */
     @Override
+    public String name() {
+        return "TestableMarket";
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void initialize(Market market, Signal<Execution> log) {
         diposer.add(log.to(e -> market.tick(emulate(e))));
     }
