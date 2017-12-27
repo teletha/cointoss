@@ -154,7 +154,7 @@ public interface MarketBackend extends Disposable {
      * @version 2017/12/14 16:20:52
      */
     enum Health {
-        Normal("🌕"), Busy("🌔"), VeryBusy("🌓"), SuperBusy("🌒"), NoOrder("🌑"), Stop("☠");
+        Normal("🌑"), Busy("🌘"), VeryBusy("🌗"), SuperBusy("🌖"), NoOrder("🌕"), Stop("💀");
 
         static {
             I.load(Codec.class, false);

@@ -12,15 +12,13 @@ package trademate.order;
 import static cointoss.Order.State.*;
 import static java.util.concurrent.TimeUnit.*;
 
-import java.io.File;
 import java.math.RoundingMode;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
 
 import javafx.scene.control.Spinner;
 import javafx.scene.input.ScrollEvent;
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
+import javafx.scene.media.AudioClip;
 
 import cointoss.Order;
 import cointoss.Order.Quantity;
@@ -135,24 +133,16 @@ public class OrderBuilder extends View {
         orderQuantity.values(Quantity.values()).initial(Quantity.GoodTillCanceled).observe(v -> {
             System.out.println(v);
 
-            String musicFile = "Error.wav"; // For example
-            new Thread() {
-                @Override
-                public void run() {
-                    try {
-                        player = new MediaPlayer(new Media(new File(musicFile).toURI().toString()));
-                        player.play();
-                        System.out.println("PLAY");
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            }.start();
+            try {
+                AudioClip audioClip = new AudioClip(ClassLoader.getSystemResource("sound/Start.m4a").toExternalForm());
+                audioClip.play();
+                System.out.println("PLAY");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             System.out.println(v);
         });
     }
-
-    private volatile MediaPlayer player;
 
     /**
      * Support wheel change.

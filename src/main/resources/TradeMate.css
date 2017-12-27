@@ -1,6 +1,11 @@
 /* ==========================================================================
  Trade Mate
 ===========================================================================*/
+@font-face {
+  font-family: "cryptocoins";
+  src: url('cryptocoins.ttf') format('truetype');
+}
+
 .BUY {
 	-fx-text-fill: rgb(251, 189, 42);
 }
@@ -36,8 +41,19 @@
 }
 
 
-.market-tab {
-  -fx-font-family: Emoji;
-  -fx-background-image: url("04.jpg");
-  -fx-background-size: cover ;
+.Busy .tab-label {
+	-fx-text-fill: #0B8D7E;
 }
+
+.VeryBusy .tab-label {
+	-fx-text-fill: #B3DB9A;
+}
+
+.SuperBusy .tab-label {
+	-fx-text-fill: #F1C65A;
+}
+
+.NoOrder .tab-label, .Stop .tab-label {
+	-fx-text-fill: #DB5928;
+}
+
