@@ -17,7 +17,6 @@ import java.math.RoundingMode;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
 
-import javafx.fxml.FXML;
 import javafx.scene.control.Spinner;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.media.Media;
@@ -31,6 +30,7 @@ import cointoss.util.Num;
 import kiss.WiseBiConsumer;
 import trademate.NotificationType;
 import trademate.TradingView;
+import viewtify.UI;
 import viewtify.User;
 import viewtify.View;
 import viewtify.Viewtify;
@@ -65,43 +65,43 @@ public class OrderBuilder extends View {
     };
 
     /** UI */
-    private @FXML UIText orderSize;
+    private @UI UIText orderSize;
 
     /** UI */
-    private @FXML UISpinner<Num> orderSizeAmount;
+    private @UI UISpinner<Num> orderSizeAmount;
 
     /** UI */
-    private @FXML UIText orderPrice;
+    private @UI UIText orderPrice;
 
     /** UI */
-    private @FXML UISpinner<Num> orderPriceAmount;
+    private @UI UISpinner<Num> orderPriceAmount;
 
     /** UI */
-    private @FXML UISpinner<Integer> orderDivideSize;
+    private @UI UISpinner<Integer> orderDivideSize;
 
     /** UI */
-    private @FXML UISpinner<Integer> orderDivideIntervalAmount;
+    private @UI UISpinner<Integer> orderDivideIntervalAmount;
 
     /** UI */
-    private @FXML UISpinner<Num> optimizeThreshold;
+    private @UI UISpinner<Num> optimizeThreshold;
 
     /** UI */
-    private @FXML UIText orderPriceInterval;
+    private @UI UIText orderPriceInterval;
 
     /** UI */
-    private @FXML UISpinner<Num> orderPriceIntervalAmount;
+    private @UI UISpinner<Num> orderPriceIntervalAmount;
 
     /** UI */
-    private @FXML UIButton orderLimitLong;
+    private @UI UIButton orderLimitLong;
 
     /** UI */
-    private @FXML UIButton orderLimitShort;
+    private @UI UIButton orderLimitShort;
 
     /** UI */
-    private @FXML UIComboBox<Quantity> orderQuantity;
+    private @UI UIComboBox<Quantity> orderQuantity;
 
     /** UI */
-    private @FXML TradingView view;
+    private @UI TradingView view;
 
     /**
      * {@inheritDoc}

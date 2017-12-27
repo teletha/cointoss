@@ -9,13 +9,14 @@
  */
 package cointoss.market.bitflyer;
 
+import static java.util.concurrent.TimeUnit.*;
+
 import java.nio.charset.StandardCharsets;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.codec.digest.HmacUtils;
 import org.apache.http.HttpStatus;
@@ -243,12 +244,11 @@ class BitFlyerBackend implements MarketBackend {
         return health;
     }
 
-    private final Signal<Health> health = new Signal<Health>((observer, disposer) -> {
-        checker.scheduleAtFixedRate(() -> {
-            call("GET", "/v1/gethealth?product_code=" + type, "", "", ServerHealth.class).map(health -> health.status).to(observer::accept);
-        }, 0, 5, TimeUnit.SECONDS);
-        return disposer.add(checker::shutdown);
-    }).share();
+    private final Signal<Health> health = I.signal(0, 5, SECONDS)
+            .flatMap(v -> call("GET", "/v1/gethealth?product_code=" + type, "", "", ServerHealth.class))
+            .map(health -> health.status)
+            .share()
+            .diff();
 
     /**
      * Snapshot order book info.

@@ -9,10 +9,9 @@
  */
 package trademate;
 
-import javafx.fxml.FXML;
-
 import cointoss.market.bitflyer.BitFlyer;
 import viewtify.ActivationPolicy;
+import viewtify.UI;
 import viewtify.View;
 import viewtify.Viewtify;
 import viewtify.ui.UITabPane;
@@ -22,7 +21,7 @@ import viewtify.ui.UITabPane;
  */
 public class TradeMate extends View {
 
-    private @FXML UITabPane main;
+    private @UI UITabPane main;
 
     /**
      * {@inheritDoc}

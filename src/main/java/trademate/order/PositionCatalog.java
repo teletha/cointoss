@@ -14,12 +14,11 @@ import static cointoss.Order.State.*;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
-import javafx.fxml.FXML;
-
 import cointoss.Order;
 import cointoss.Side;
 import cointoss.util.Num;
 import trademate.TradingView;
+import viewtify.UI;
 import viewtify.View;
 import viewtify.ui.UITreeItem;
 import viewtify.ui.UITreeTableColumn;
@@ -34,22 +33,22 @@ public class PositionCatalog extends View {
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd HH:mm:ss");
 
     /** UI */
-    private @FXML UITreeTableView<Order> openPositionCatalog;
+    private @UI UITreeTableView<Order> openPositionCatalog;
 
     /** UI */
-    private @FXML UITreeTableColumn<Object, ZonedDateTime> openPositionDate;
+    private @UI UITreeTableColumn<Object, ZonedDateTime> openPositionDate;
 
     /** UI */
-    private @FXML UITreeTableColumn<Object, Side> openPositionSide;
+    private @UI UITreeTableColumn<Object, Side> openPositionSide;
 
     /** UI */
-    private @FXML UITreeTableColumn<Object, Num> openPositionAmount;
+    private @UI UITreeTableColumn<Object, Num> openPositionAmount;
 
     /** UI */
-    private @FXML UITreeTableColumn<Object, Num> openPositionPrice;
+    private @UI UITreeTableColumn<Object, Num> openPositionPrice;
 
     /** Parent View */
-    private @FXML TradingView view;
+    private @UI TradingView view;
 
     /**
      * {@inheritDoc}

@@ -12,7 +12,6 @@ package trademate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 
-import javafx.fxml.FXML;
 import javafx.scene.layout.Pane;
 
 import cointoss.Market;
@@ -22,6 +21,7 @@ import trademate.order.OrderBookView;
 import trademate.order.OrderBuilder;
 import trademate.order.OrderCatalog;
 import trademate.order.PositionCatalog;
+import viewtify.UI;
 import viewtify.View;
 import viewtify.Viewtify;
 
@@ -34,19 +34,19 @@ public class TradingView extends View {
 
     public final BitFlyer provider;
 
-    public @FXML ExecutionView executionView;
+    public @UI ExecutionView executionView;
 
-    public @FXML Console console;
+    public @UI Console console;
 
-    public @FXML OrderBookView board;
+    public @UI OrderBookView board;
 
-    public @FXML OrderBuilder builder;
+    public @UI OrderBuilder builder;
 
-    public @FXML OrderCatalog orders;
+    public @UI OrderCatalog orders;
 
-    public @FXML PositionCatalog positions;
+    public @UI PositionCatalog positions;
 
-    public @FXML Pane chart;
+    public @UI Pane chart;
 
     /** Market cache. */
     private Market market;

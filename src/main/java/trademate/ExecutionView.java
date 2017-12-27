@@ -13,15 +13,15 @@ import java.time.format.DateTimeFormatter;
 import java.util.stream.IntStream;
 
 import javafx.collections.ObservableList;
-import javafx.fxml.FXML;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 
 import cointoss.Execution;
+import viewtify.UI;
 import viewtify.View;
 import viewtify.Viewtify;
-import viewtify.ui.UI;
 import viewtify.ui.UISpinner;
+import viewtify.ui.UserInterface;
 
 /**
  * @version 2017/12/01 16:58:49
@@ -32,16 +32,16 @@ public class ExecutionView extends View {
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
 
     /** The execution list. */
-    private @FXML ListView<Execution> executionList;
+    private @UI ListView<Execution> executionList;
 
     /** The execution list. */
-    private @FXML ListView executionCumulativeList;
+    private @UI ListView executionCumulativeList;
 
     /** UI for interval configuration. */
-    private @FXML UISpinner<Integer> takerSize;
+    private @UI UISpinner<Integer> takerSize;
 
     /** Parent View */
-    private @FXML TradingView view;
+    private @UI TradingView view;
 
     /**
      * {@inheritDoc}
@@ -87,7 +87,7 @@ public class ExecutionView extends View {
     private class Cell extends ListCell<Execution> {
 
         /** The enhanced ui. */
-        private final UI ui = Viewtify.wrap(this, ExecutionView.this);
+        private final UserInterface ui = Viewtify.wrap(this, ExecutionView.this);
 
         /**
          * {@inheritDoc}

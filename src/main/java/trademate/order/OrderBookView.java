@@ -11,7 +11,6 @@ package trademate.order;
 
 import static java.util.concurrent.TimeUnit.*;
 
-import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.TextField;
@@ -22,6 +21,7 @@ import cointoss.order.OrderBookList.Ratio;
 import cointoss.order.OrderUnit;
 import cointoss.util.Num;
 import trademate.TradingView;
+import viewtify.UI;
 import viewtify.View;
 import viewtify.Viewtify;
 import viewtify.ui.UIListView;
@@ -36,28 +36,28 @@ public class OrderBookView extends View {
     public final OrderBook book = new OrderBook();
 
     /** UI for long maker. */
-    private @FXML UIListView<OrderUnit> longList;
+    private @UI UIListView<OrderUnit> longList;
 
     /** UI for maker. */
-    private @FXML UIListView<OrderUnit> shortList;
+    private @UI UIListView<OrderUnit> shortList;
 
     /** UI for interval configuration. */
-    private @FXML UISpinner<OrderBookList.Ratio> priceRange;
+    private @UI UISpinner<OrderBookList.Ratio> priceRange;
 
     /** UI for interval configuration. */
-    private @FXML Label priceLatest;
+    private @UI Label priceLatest;
 
     /** UI for interval configuration. */
-    private @FXML Label priceSpread;
+    private @UI Label priceSpread;
 
     /** UI for order. */
-    private @FXML TextField orderPrice;
+    private @UI TextField orderPrice;
 
     /** UI for interval configuration. */
-    private @FXML UISpinner<Num> hideSize;
+    private @UI UISpinner<Num> hideSize;
 
     /** Parent View */
-    private @FXML TradingView view;
+    private @UI TradingView view;
 
     /**
      * {@inheritDoc}

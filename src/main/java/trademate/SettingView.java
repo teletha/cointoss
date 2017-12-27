@@ -9,10 +9,9 @@
  */
 package trademate;
 
-import javafx.fxml.FXML;
-
 import kiss.Manageable;
 import kiss.Singleton;
+import viewtify.UI;
 import viewtify.View;
 import viewtify.ui.UICheckBox;
 import viewtify.ui.UIText;
@@ -23,13 +22,13 @@ import viewtify.ui.UIText;
 @Manageable(lifestyle = Singleton.class)
 public class SettingView extends View {
 
-    private @FXML Notification longTrend;
+    private @UI Notification longTrend;
 
-    private @FXML Notification shortTrend;
+    private @UI Notification shortTrend;
 
-    private @FXML Notification execution;
+    private @UI Notification execution;
 
-    private @FXML Notification orderFailed;
+    private @UI Notification orderFailed;
 
     /**
      * {@inheritDoc}
@@ -65,11 +64,11 @@ public class SettingView extends View {
      */
     private static class Notification extends View {
 
-        private @FXML UICheckBox notification;
+        private @UI UICheckBox notification;
 
-        private @FXML UICheckBox sound;
+        private @UI UICheckBox sound;
 
-        private @FXML UIText soundFile;
+        private @UI UIText soundFile;
 
         /**
          * {@inheritDoc}

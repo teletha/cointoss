@@ -17,7 +17,6 @@ import java.util.LinkedList;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 
 import org.apache.logging.log4j.LogManager;
@@ -29,6 +28,7 @@ import cointoss.Trading;
 import trademate.NotificationType;
 import trademate.SettingView;
 import trademate.TradingView;
+import viewtify.UI;
 import viewtify.View;
 import viewtify.Viewtify;
 import viewtify.ui.UIListView;
@@ -44,11 +44,11 @@ public class Console extends View {
     /** The background logger. */
     private Logger logger;
 
-    private @FXML SettingView setting;
+    private @UI SettingView setting;
 
-    private @FXML TradingView view;
+    private @UI TradingView view;
 
-    private @FXML UIListView<String> console;
+    private @UI UIListView<String> console;
 
     final ObservableList<String> messages = FXCollections.observableList(new LinkedList());
 

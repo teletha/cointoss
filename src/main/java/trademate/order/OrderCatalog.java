@@ -15,7 +15,6 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.function.Consumer;
 
-import javafx.fxml.FXML;
 import javafx.scene.control.TreeTableRow;
 
 import cointoss.Order;
@@ -24,14 +23,15 @@ import cointoss.Side;
 import cointoss.util.Num;
 import kiss.Variable;
 import trademate.TradingView;
+import viewtify.UI;
 import viewtify.View;
 import viewtify.Viewtify;
 import viewtify.bind.Calculation;
-import viewtify.ui.UI;
 import viewtify.ui.UISpinner;
 import viewtify.ui.UITreeItem;
 import viewtify.ui.UITreeTableColumn;
 import viewtify.ui.UITreeTableView;
+import viewtify.ui.UserInterface;
 
 /**
  * @version 2017/12/25 12:25:16
@@ -42,25 +42,25 @@ public class OrderCatalog extends View {
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd HH:mm:ss");
 
     /** UI */
-    private @FXML UITreeTableView<Object> orderCatalog;
+    private @UI UITreeTableView<Object> orderCatalog;
 
     /** UI */
-    private @FXML UITreeTableColumn<Object, ZonedDateTime> requestedOrdersDate;
+    private @UI UITreeTableColumn<Object, ZonedDateTime> requestedOrdersDate;
 
     /** UI */
-    private @FXML UITreeTableColumn<Object, Side> requestedOrdersSide;
+    private @UI UITreeTableColumn<Object, Side> requestedOrdersSide;
 
     /** UI */
-    private @FXML UITreeTableColumn<Object, Num> requestedOrdersAmount;
+    private @UI UITreeTableColumn<Object, Num> requestedOrdersAmount;
 
     /** UI */
-    private @FXML UITreeTableColumn<Object, Num> requestedOrdersPrice;
+    private @UI UITreeTableColumn<Object, Num> requestedOrdersPrice;
 
     /** UI */
-    private @FXML UISpinner<Num> optimizeThreshold;
+    private @UI UISpinner<Num> optimizeThreshold;
 
     /** Parent View */
-    private @FXML TradingView view;
+    private @UI TradingView view;
 
     /**
      * {@inheritDoc}
@@ -198,7 +198,7 @@ public class OrderCatalog extends View {
         });
 
         /** The enhanced ui. */
-        private final UI ui = Viewtify.wrap(this, OrderCatalog.this);
+        private final UserInterface ui = Viewtify.wrap(this, OrderCatalog.this);
 
         // /** Context Menu */
         // private final UIContextMenu context = UI.contextMenu($ -> {
