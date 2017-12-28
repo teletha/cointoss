@@ -25,8 +25,10 @@ import cointoss.Order.Quantity;
 import cointoss.Order.State;
 import cointoss.Side;
 import cointoss.util.Num;
+import kiss.I;
 import kiss.WiseBiConsumer;
 import trademate.NotificationType;
+import trademate.Notificator;
 import trademate.TradingView;
 import viewtify.UI;
 import viewtify.User;
@@ -101,6 +103,8 @@ public class OrderBuilder extends View {
     /** UI */
     private @UI TradingView view;
 
+    private Notificator notificator = I.make(Notificator.class);
+
     /**
      * {@inheritDoc}
      */
@@ -134,6 +138,7 @@ public class OrderBuilder extends View {
             System.out.println(v);
 
             try {
+                notificator.orderFailed.notify("OKOKOK");
                 AudioClip audioClip = new AudioClip(ClassLoader.getSystemResource("sound/Start.m4a").toExternalForm());
                 audioClip.play();
                 System.out.println("PLAY");

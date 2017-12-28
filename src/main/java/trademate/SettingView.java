@@ -9,8 +9,10 @@
  */
 package trademate;
 
+import kiss.I;
 import kiss.Manageable;
 import kiss.Singleton;
+import trademate.Notificator.Kind;
 import viewtify.UI;
 import viewtify.View;
 import viewtify.ui.UICheckBox;
@@ -21,6 +23,8 @@ import viewtify.ui.UIText;
  */
 @Manageable(lifestyle = Singleton.class)
 public class SettingView extends View {
+
+    private Notificator notificator = I.make(Notificator.class);
 
     private @UI Notification longTrend;
 
@@ -35,6 +39,10 @@ public class SettingView extends View {
      */
     @Override
     protected void initialize() {
+        longTrend.kind = notificator.longTrend;
+        shortTrend.kind = notificator.shortTrend;
+        execution.kind = notificator.execution;
+        orderFailed.kind = notificator.orderFailed;
     }
 
     /**
@@ -62,7 +70,9 @@ public class SettingView extends View {
     /**
      * @version 2017/12/15 9:37:47
      */
-    private static class Notification extends View {
+    private class Notification extends View {
+
+        private Kind kind;
 
         private @UI UICheckBox notification;
 
@@ -75,7 +85,7 @@ public class SettingView extends View {
          */
         @Override
         protected void initialize() {
-            notification.initial(true);
+            notification.model(kind.notification);
             sound.initial(false);
             soundFile.disableWhen(sound.isNotSelected());
         }
