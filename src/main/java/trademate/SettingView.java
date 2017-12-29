@@ -9,14 +9,22 @@
  */
 package trademate;
 
+import java.io.File;
+
+import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
+
 import kiss.I;
 import kiss.Manageable;
 import kiss.Singleton;
-import trademate.Notificator.Kind;
+import trademate.Notificator.Type;
 import viewtify.UI;
+import viewtify.User;
 import viewtify.View;
+import viewtify.Viewtify;
 import viewtify.ui.UICheckBox;
-import viewtify.ui.UIText;
+import viewtify.ui.UIComboBox;
+import viewtify.ui.UIFileDialog;
 
 /**
  * @version 2017/12/15 9:30:13
@@ -26,68 +34,49 @@ public class SettingView extends View {
 
     private Notificator notificator = I.make(Notificator.class);
 
-    private @UI Notification longTrend;
+    private @UI NotificationSetting longTrend;
 
-    private @UI Notification shortTrend;
+    private @UI NotificationSetting shortTrend;
 
-    private @UI Notification execution;
+    private @UI NotificationSetting execution;
 
-    private @UI Notification orderFailed;
+    private @UI NotificationSetting orderFailed;
 
     /**
      * {@inheritDoc}
      */
     @Override
     protected void initialize() {
-        longTrend.kind = notificator.longTrend;
-        shortTrend.kind = notificator.shortTrend;
-        execution.kind = notificator.execution;
-        orderFailed.kind = notificator.orderFailed;
-    }
-
-    /**
-     * @param type
-     * @return
-     */
-    public boolean shouldNotify(NotificationType type) {
-        return by(type).notification.isSelected().get();
-    }
-
-    private Notification by(NotificationType type) {
-        switch (type) {
-        case OrderAccepted:
-            return longTrend;
-
-        case OrderFailed:
-            return orderFailed;
-        }
-
-        // If this exception will be thrown, it is bug of this program. So we must rethrow the
-        // wrapped error in here.
-        throw new Error();
+        longTrend.type = notificator.longTrend;
+        shortTrend.type = notificator.shortTrend;
+        execution.type = notificator.execution;
+        orderFailed.type = notificator.orderFailed;
     }
 
     /**
      * @version 2017/12/15 9:37:47
      */
-    private class Notification extends View {
+    private class NotificationSetting extends View {
 
-        private Kind kind;
+        private Type type;
 
         private @UI UICheckBox notification;
 
-        private @UI UICheckBox sound;
-
-        private @UI UIText soundFile;
+        private @UI UIComboBox<String> sound;
 
         /**
          * {@inheritDoc}
          */
         @Override
         protected void initialize() {
-            notification.model(kind.notification);
-            sound.initial(false);
-            soundFile.disableWhen(sound.isNotSelected());
+            notification.model(type.notification);
+            sound.values("Select File", "None", "System").initial("None").when(User.Action, e -> {
+                if (sound.index() == 0) {
+                    UIFileDialog.title("Select sound file.").filter("Sound Files", "*.aac", "*.mp3").select().to(path -> {
+                        System.out.println(path);
+                    });
+                }
+            });
         }
     }
 }

@@ -14,53 +14,49 @@ import javafx.util.Duration;
 
 import org.controlsfx.control.Notifications;
 
-import kiss.I;
 import kiss.Variable;
 import viewtify.Preference;
+import viewtify.Viewtify;
 
 /**
  * @version 2017/12/28 9:36:20
  */
 public class Notificator extends Preference<Notificator> {
 
-    public final Kind longTrend = new Kind(3);
+    public final Type longTrend = new Type(3);
 
-    public final Kind shortTrend = new Kind(3);
+    public final Type shortTrend = new Type(3);
 
-    public final Kind execution = new Kind(3);
+    public final Type execution = new Type(3);
 
-    public final Kind orderFailed = new Kind(3);
+    public final Type orderFailed = new Type(3);
 
     /**
      * 
      */
     private Notificator() {
-        restore();
-    }
-
-    public static void main(String[] args) throws Exception {
-        Notificator make = I.make(Notificator.class);
-        make.autoSave();
-        System.out.println("start");
-        make.execution.notification.set(false);
-        Thread.sleep(5000);
+        restore().autoSave();
+        System.out.println(longTrend.notification.get());
     }
 
     /**
      * @version 2017/12/28 9:37:39
      */
-    public static class Kind {
+    public static class Type {
 
         /** The duration of displaying notification. */
         public final Variable<Integer> showTime;
 
         /** Showing notification pane. */
-        public final Variable<Boolean> notification = Variable.of(true);
+        public final Variable<Boolean> notification = Variable.of(false);
+
+        /** Showing notification pane. */
+        public final Variable<Boolean> sound = Variable.of(true);
 
         /**
          * @param i
          */
-        public Kind(int showTime) {
+        public Type(int showTime) {
             this.showTime = Variable.of(showTime);
         }
 
@@ -71,14 +67,16 @@ public class Notificator extends Preference<Notificator> {
          */
         public void notify(String message) {
             if (notification.is(true)) {
-                Notifications.create()
-                        .darkStyle()
-                        .hideCloseButton()
-                        .position(Pos.TOP_RIGHT)
-                        .hideAfter(Duration.seconds(showTime.get()))
-                        .title("OK")
-                        .text(message)
-                        .show();
+                Viewtify.inUI(() -> {
+                    Notifications.create()
+                            .darkStyle()
+                            .hideCloseButton()
+                            .position(Pos.TOP_RIGHT)
+                            .hideAfter(Duration.seconds(showTime.get()))
+                            .title("OK")
+                            .text(message)
+                            .show();
+                });
             }
         }
     }

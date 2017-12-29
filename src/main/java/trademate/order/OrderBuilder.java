@@ -27,7 +27,6 @@ import cointoss.Side;
 import cointoss.util.Num;
 import kiss.I;
 import kiss.WiseBiConsumer;
-import trademate.NotificationType;
 import trademate.Notificator;
 import trademate.TradingView;
 import viewtify.UI;
@@ -135,8 +134,6 @@ public class OrderBuilder extends View {
         orderLimitShort.when(User.Click).throttle(1000, MILLISECONDS).mapTo(Side.SELL).to(this::requestOrder);
 
         orderQuantity.values(Quantity.values()).initial(Quantity.GoodTillCanceled).observe(v -> {
-            System.out.println(v);
-
             try {
                 notificator.orderFailed.notify("OKOKOK");
                 AudioClip audioClip = new AudioClip(ClassLoader.getSystemResource("sound/Start.m4a").toExternalForm());
@@ -145,7 +142,6 @@ public class OrderBuilder extends View {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            System.out.println(v);
         });
     }
 
@@ -222,7 +218,8 @@ public class OrderBuilder extends View {
                 view.market().request(order).to(o -> {
                     view.console.info("Accept order [{}]", o);
                 }, e -> {
-                    view.console.notify(NotificationType.OrderFailed, "Reject order [{}]", order, e);
+                    view.console.info("Reject order [{}]", order, e);
+                    notificator.orderFailed.notify("Reject order " + order);
                 });
             });
         }
