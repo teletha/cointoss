@@ -9,11 +9,6 @@
  */
 package trademate;
 
-import java.io.File;
-
-import javafx.stage.FileChooser;
-import javafx.stage.FileChooser.ExtensionFilter;
-
 import kiss.I;
 import kiss.Manageable;
 import kiss.Singleton;
@@ -21,7 +16,6 @@ import trademate.Notificator.Type;
 import viewtify.UI;
 import viewtify.User;
 import viewtify.View;
-import viewtify.Viewtify;
 import viewtify.ui.UICheckBox;
 import viewtify.ui.UIComboBox;
 import viewtify.ui.UIFileDialog;
