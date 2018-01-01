@@ -33,6 +33,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.pubnub.api.PNConfiguration;
 import com.pubnub.api.PubNub;
 import com.pubnub.api.callbacks.SubscribeCallback;
+import com.pubnub.api.enums.PNStatusCategory;
 import com.pubnub.api.models.consumer.PNStatus;
 import com.pubnub.api.models.consumer.pubsub.PNMessageResult;
 import com.pubnub.api.models.consumer.pubsub.PNPresenceEventResult;
@@ -286,6 +287,9 @@ class BitFlyerBackend implements MarketBackend {
                  */
                 @Override
                 public void status(PubNub pubnub, PNStatus status) {
+                    if (status.getCategory() == PNStatusCategory.PNBadRequestCategory) {
+                    }
+                    System.out.println(status);
                 }
 
                 /**

@@ -9,13 +9,13 @@
  */
 package trademate;
 
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 
 import javafx.scene.layout.Pane;
 
 import cointoss.Market;
 import cointoss.market.bitflyer.BitFlyer;
+import kiss.I;
 import trademate.console.Console;
 import trademate.order.OrderBookView;
 import trademate.order.OrderBuilder;
@@ -31,11 +31,11 @@ import viewtify.ui.UITab;
  */
 public class TradingView extends View {
 
-    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
-
     public final BitFlyer provider;
 
     private final UITab tab;
+
+    private final Notificator notificator = I.make(Notificator.class);
 
     public @UI ExecutionView executionView;
 
@@ -68,7 +68,7 @@ public class TradingView extends View {
     @Override
     protected void initialize() {
         market().yourExecution.to(o -> {
-
+            notificator.execution.notify("Executed " + o);
         });
 
         market().health.on(Viewtify.UIThread).to(v -> {

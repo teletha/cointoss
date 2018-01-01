@@ -18,7 +18,6 @@ import viewtify.User;
 import viewtify.View;
 import viewtify.ui.UICheckBox;
 import viewtify.ui.UIComboBox;
-import viewtify.ui.UIFileDialog;
 
 /**
  * @version 2017/12/15 9:30:13
@@ -56,7 +55,7 @@ public class SettingView extends View {
 
         private @UI UICheckBox notification;
 
-        private @UI UIComboBox<String> sound;
+        private @UI UIComboBox<Sound> sound;
 
         /**
          * {@inheritDoc}
@@ -64,12 +63,8 @@ public class SettingView extends View {
         @Override
         protected void initialize() {
             notification.model(type.notification);
-            sound.values("Select File", "None", "System").initial("None").when(User.Action, e -> {
-                if (sound.index() == 0) {
-                    UIFileDialog.title("Select sound file.").filter("Sound Files", "*.aac", "*.mp3").select().to(path -> {
-                        System.out.println(path);
-                    });
-                }
+            sound.values(Sound.values()).model(type.sound).when(User.Action, e -> {
+                sound.value().play();
             });
         }
     }

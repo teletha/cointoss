@@ -36,7 +36,6 @@ public class Notificator extends Preference<Notificator> {
      */
     private Notificator() {
         restore().autoSave();
-        System.out.println(longTrend.notification.get());
     }
 
     /**
@@ -51,7 +50,7 @@ public class Notificator extends Preference<Notificator> {
         public final Variable<Boolean> notification = Variable.of(false);
 
         /** Showing notification pane. */
-        public final Variable<Boolean> sound = Variable.of(true);
+        public final Variable<Sound> sound = Variable.of(Sound.なし);
 
         /**
          * @param i
@@ -78,6 +77,7 @@ public class Notificator extends Preference<Notificator> {
                             .show();
                 });
             }
+            sound.get().play();
         }
     }
 }

@@ -294,6 +294,7 @@ class BitFlyerLog implements MarketLog {
                  */
                 @Override
                 public void status(PubNub pubnub, PNStatus status) {
+                    System.out.println(status);
                 }
 
                 /**
