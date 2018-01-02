@@ -73,3 +73,8 @@
 .tick-label {
 	-fx-fill: -fx-mid-text-color;
 }
+
+.chart-vertical-grid-lines, .chart-horizontal-grid-lines {
+	-fx-stroke: rgb(40, 40, 40);
+	-fx-stroke-width: 1;
+}
