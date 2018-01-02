@@ -20,7 +20,6 @@ import javafx.scene.layout.StackPane;
 
 import cointoss.Market;
 import cointoss.market.bitflyer.BitFlyer;
-import trademate.chart3.LayeredChart;
 import viewtify.View;
 import viewtify.Viewtify;
 

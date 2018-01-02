@@ -3,31 +3,27 @@
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.VBox?>
 
-<VBox prefHeight="830.0" prefWidth="1200.0" stylesheets="@TradeMate.css" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1">
-  <children>
-      <TabPane id="main" prefHeight="800.0" tabClosingPolicy="UNAVAILABLE">
-         <tabs>
-            <Tab text="Untitled Tab">
-               <content>
-                  <TabPane prefHeight="200.0" prefWidth="200.0" side="LEFT" styleClass="vertical" tabClosingPolicy="UNAVAILABLE">
-                    <tabs>
-                      <Tab text="Untitled Tab 1">
-                        <content>
-                          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-                        </content>
-                      </Tab>
-                      <Tab text="Untitled Tab 2">
-                        <content>
-                          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-                        </content>
-                      </Tab>
-                    </tabs>
-                  </TabPane>
-               </content>
-            </Tab>
-         </tabs>
-      </TabPane>
-  </children>
-</VBox>
+
+<TabPane id="main" stylesheets="@TradeMate.css" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1">
+   <tabs>
+      <Tab text="Untitled Tab">
+         <content>
+            <TabPane prefHeight="200.0" prefWidth="200.0" side="LEFT" styleClass="vertical" tabClosingPolicy="UNAVAILABLE">
+              <tabs>
+                <Tab text="Untitled Tab 1">
+                  <content>
+                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                  </content>
+                </Tab>
+                <Tab text="Untitled Tab 2">
+                  <content>
+                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                  </content>
+                </Tab>
+              </tabs>
+            </TabPane>
+         </content>
+      </Tab>
+   </tabs>
+</TabPane>

@@ -11,16 +11,44 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.TreeTableColumn?>
 <?import javafx.scene.control.TreeTableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox stylesheets="@TradeMate.css" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1">
-   <children>
-      <SplitPane dividerPositions="0.37, 0.6156, 0.5" focusTraversable="false" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS">
+
+<BorderPane maxHeight="1.7976931348623157E308" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1">
+   <bottom>
+      <HBox maxHeight="300.0" minHeight="300.0" prefHeight="300.0" BorderPane.alignment="BOTTOM_LEFT">
+         <children>
+            <TreeTableView id="orderCatalog" focusTraversable="false" maxWidth="405.0" minWidth="405.0" prefWidth="405.0" showRoot="false">
+               <columns>
+                  <TreeTableColumn id="requestedOrdersDate" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" text="注文" />
+                  <TreeTableColumn id="requestedOrdersSide" maxWidth="70.0" minWidth="70.0" prefWidth="70.0" text="売買" />
+                  <TreeTableColumn id="requestedOrdersAmount" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" text="数量" />
+                  <TreeTableColumn id="requestedOrdersPrice" maxWidth="80.0" minWidth="80.0" text="価格" />
+               </columns>
+            </TreeTableView>
+            <TreeTableView id="openPositionCatalog" focusTraversable="false" maxWidth="485.0" minWidth="485.0" prefWidth="485.0" showRoot="false">
+               <columns>
+                  <TreeTableColumn id="openPositionDate" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" text="建玉" />
+                  <TreeTableColumn id="openPositionSide" maxWidth="70.0" minWidth="70.0" prefWidth="70.0" text="売買" />
+                  <TreeTableColumn id="openPositionAmount" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" text="数量" />
+                  <TreeTableColumn id="openPositionPrice" maxWidth="80.0" minWidth="80.0" text="価格" />
+                  <TreeTableColumn id="openPositionProfitAndLoss" maxWidth="80.0" minWidth="80.0" text="損益" />
+               </columns>
+            </TreeTableView>
+            <ListView id="console" focusTraversable="false" minWidth="400.0" />
+         </children>
+      </HBox>
+   </bottom>
+   <center>
+      <AnchorPane id="chart" />
+   </center>
+   <right>
+      <SplitPane id="TradingSplitPane" dividerPositions="0.5, 0.5" focusTraversable="false" prefHeight="-1.0" prefWidth="-1.0">
          <items>
-            <Pane id="chart" />
-            <VBox maxWidth="280.0" minWidth="280.0">
+            <VBox maxWidth="-Infinity" minWidth="-Infinity" prefWidth="280.0" SplitPane.resizableWithParent="false">
                <children>
                   <HBox alignment="CENTER_LEFT" VBox.vgrow="NEVER">
                      <children>
@@ -56,7 +84,8 @@
                         <Spinner id="orderDivideSize" maxWidth="100.0">
                            <HBox.margin>
                               <Insets right="20.0" />
-                           </HBox.margin></Spinner>
+                           </HBox.margin>
+                        </Spinner>
                         <Spinner id="orderDivideIntervalAmount" focusTraversable="false" maxWidth="70.0" />
                      </children>
                      <VBox.margin>
@@ -83,7 +112,8 @@
                         <Spinner id="optimizeThreshold" focusTraversable="false" maxWidth="100.0">
                            <HBox.margin>
                               <Insets right="20.0" />
-                           </HBox.margin></Spinner>
+                           </HBox.margin>
+                        </Spinner>
                      </children>
                      <VBox.margin>
                         <Insets top="5.0" />
@@ -114,7 +144,7 @@
                   <Insets left="10.0" right="10.0" />
                </padding>
             </VBox>
-            <VBox alignment="CENTER" maxWidth="220.0" minWidth="220.0">
+            <VBox alignment="CENTER" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="220.0" SplitPane.resizableWithParent="false">
                <children>
                   <ListView id="shortList" focusTraversable="false" styleClass="SELL" VBox.vgrow="ALWAYS">
                      <VBox.margin>
@@ -130,7 +160,8 @@
                         <Label id="priceLatest" focusTraversable="false" maxWidth="60.0" prefWidth="60.0" textOverrun="CLIP">
                            <HBox.margin>
                               <Insets left="-2.0" />
-                           </HBox.margin></Label>
+                           </HBox.margin>
+                        </Label>
                         <Label id="priceSpread" focusTraversable="false" maxWidth="50.0" minWidth="50.0" prefWidth="50.0" textOverrun="CLIP">
                            <HBox.margin>
                               <Insets />
@@ -152,7 +183,7 @@
                   <Cursor fx:constant="DEFAULT" />
                </cursor>
             </VBox>
-            <VBox alignment="CENTER" maxWidth="220.0" minWidth="220.0">
+            <VBox alignment="CENTER" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="190.0" SplitPane.resizableWithParent="false">
                <cursor>
                   <Cursor fx:constant="DEFAULT" />
                </cursor>
@@ -182,27 +213,5 @@
             </VBox>
          </items>
       </SplitPane>
-      <HBox minHeight="250.0">
-         <children>
-            <TreeTableView id="orderCatalog" focusTraversable="false" maxWidth="405.0" minWidth="405.0" prefWidth="405.0" showRoot="false">
-               <columns>
-                  <TreeTableColumn id="requestedOrdersDate" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" text="注文" />
-                  <TreeTableColumn id="requestedOrdersSide" maxWidth="70.0" minWidth="70.0" prefWidth="70.0" text="売買" />
-                  <TreeTableColumn id="requestedOrdersAmount" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" text="数量" />
-                  <TreeTableColumn id="requestedOrdersPrice" maxWidth="80.0" minWidth="80.0" text="価格" />
-               </columns>
-            </TreeTableView>
-            <TreeTableView id="openPositionCatalog" focusTraversable="false" maxWidth="485.0" minWidth="485.0" prefWidth="485.0" showRoot="false">
-               <columns>
-                  <TreeTableColumn id="openPositionDate" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" text="建玉" />
-                  <TreeTableColumn id="openPositionSide" maxWidth="70.0" minWidth="70.0" prefWidth="70.0" text="売買" />
-                  <TreeTableColumn id="openPositionAmount" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" text="数量" />
-                  <TreeTableColumn id="openPositionPrice" maxWidth="80.0" minWidth="80.0" text="価格" />
-                  <TreeTableColumn id="openPositionProfitAndLoss" maxWidth="80.0" minWidth="80.0" text="損益" />
-               </columns>
-            </TreeTableView>
-            <ListView id="console" focusTraversable="false" minWidth="400.0" />
-         </children>
-      </HBox>
-   </children>
-</VBox>
+   </right>
+</BorderPane>

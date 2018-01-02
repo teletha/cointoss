@@ -31,6 +31,7 @@ import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
 import javafx.geometry.Side;
 import javafx.scene.control.Label;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Region;
 
 import cointoss.chart.Chart;
@@ -83,8 +84,13 @@ public class CandleChart extends Region {
     /**
      * 
      */
-    public CandleChart() {
-        getStylesheets().add(ClassLoader.getSystemResource("CandleStickChart.css").toExternalForm());
+    public CandleChart(AnchorPane parent) {
+        parent.getChildren().add(this);
+
+        AnchorPane.setTopAnchor(this, 0d);
+        AnchorPane.setBottomAnchor(this, 0d);
+        AnchorPane.setRightAnchor(this, 0d);
+        AnchorPane.setLeftAnchor(this, 0d);
 
         zoom.install(axisX);
         zoom.install(axisY);
