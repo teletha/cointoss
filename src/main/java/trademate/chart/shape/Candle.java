@@ -68,9 +68,7 @@ public class Candle extends Group {
 
     private void updateStyleClasses() {
         getStyleClass().setAll("candlestick-candle", seriesStyleClass, dataStyleClass);
-        highLowLine.getStyleClass()
-                .setAll("candlestick-line", seriesStyleClass, dataStyleClass, openAboveClose ? "open-above-close" : "close-above-open");
-        bar.getStyleClass()
-                .setAll("candlestick-bar", seriesStyleClass, dataStyleClass, openAboveClose ? "open-above-close" : "close-above-open");
+        highLowLine.getStyleClass().setAll("candlestick-line", seriesStyleClass, dataStyleClass, openAboveClose ? "SELL" : "BUY");
+        bar.getStyleClass().setAll("candlestick-bar", seriesStyleClass, dataStyleClass, openAboveClose ? "SELL" : "BUY");
     }
 }

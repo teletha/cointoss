@@ -189,7 +189,9 @@ public class LinearAxis extends Axis {
                 if (!find) {
                     AxisLabel a = new AxisLabel();
                     a.setID(value);
-                    a.setNode(new Text(tickLabelFormatter.get().apply(value)));
+                    Text text = new Text(tickLabelFormatter.get().apply(value));
+                    text.getStyleClass().add("tick-label");
+                    a.setNode(text);
                     labelList.add(a);
                 }
             }

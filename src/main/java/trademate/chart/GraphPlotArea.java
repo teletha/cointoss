@@ -632,7 +632,7 @@ public class GraphPlotArea extends Region {
         double low = axisY.get().getPositionForValue(data.minPrice.toDouble());
 
         // calculate candle width
-        double candleWidth = 5;
+        double candleWidth = 4;
 
         // update candle
         candle.update(close - open, high - open, low - open, candleWidth);

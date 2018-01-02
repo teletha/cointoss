@@ -18,8 +18,6 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.Event;
@@ -30,7 +28,6 @@ import javafx.geometry.Orientation;
 import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
 import javafx.geometry.Side;
-import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Region;
 
@@ -87,10 +84,10 @@ public class CandleChart extends Region {
     public CandleChart(AnchorPane parent) {
         parent.getChildren().add(this);
 
-        AnchorPane.setTopAnchor(this, 0d);
-        AnchorPane.setBottomAnchor(this, 0d);
-        AnchorPane.setRightAnchor(this, 0d);
-        AnchorPane.setLeftAnchor(this, 0d);
+        AnchorPane.setTopAnchor(this, 10d);
+        AnchorPane.setBottomAnchor(this, 15d);
+        AnchorPane.setRightAnchor(this, 10d);
+        AnchorPane.setLeftAnchor(this, 10d);
 
         zoom.install(axisX);
         zoom.install(axisY);
@@ -428,41 +425,6 @@ public class CandleChart extends Region {
 
         axisY.logicalMaxValue.set(max.toDouble());
         axisY.logicalMinValue.set(min.toDouble());
-    }
-
-    /**
-     * グラフのタイトル。<br>
-     * 単なるデータであり、表示はされない
-     * 
-     * @return
-     */
-    public final StringProperty titleProperty() {
-        if (titleProperty == null) {
-            titleProperty = new SimpleStringProperty(this, "title", null);
-        }
-        return titleProperty;
-    }
-
-    public final String getTitle() {
-        return titleProperty == null ? null : titleProperty.get();
-    }
-
-    public final void setTitle(final String value) {
-        titleProperty().set(value);
-    }
-
-    private StringProperty titleProperty;
-
-    private Label titleLabel;
-
-    public Label getTitleLabel() {
-        if (titleLabel == null) {
-            final Label l = new Label();
-            l.getStyleClass().add("chart-title");
-            l.textProperty().bind(titleProperty());
-            titleLabel = l;
-        }
-        return titleLabel;
     }
 
     /**

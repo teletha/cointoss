@@ -32,7 +32,6 @@ import javafx.geometry.Side;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Parent;
-import javafx.scene.control.Label;
 import javafx.scene.control.ScrollBar;
 import javafx.scene.layout.Region;
 import javafx.scene.shape.Line;
@@ -213,15 +212,10 @@ public abstract class Axis extends Region {
     /** UI widget. */
     private final ScrollBar scroll = new ScrollBar();
 
-    /** UI for name label of axis. */
-    public final Label nameLabel = new Label();
-
     /**
      * 
      */
     public Axis() {
-        getStyleClass().add("axis");
-
         // ====================================================
         // Initialize Property
         // ====================================================
@@ -243,7 +237,6 @@ public abstract class Axis extends Region {
         // Initialize UI widget
         // ====================================================
 
-        nameLabel.getStyleClass().add("axis-label");
         majorTickPath.getStyleClass().setAll("axis-tick-mark");
         minorTickPath.getStyleClass().setAll("axis-minor-tick-mark");
         baseLine.getStyleClass().setAll("axis-line");
@@ -265,7 +258,7 @@ public abstract class Axis extends Region {
         if (scrollBarValue.get() != -1 && scrollBarSize.get() != 1) {
             scroll.setValue(orientation.get() != Orientation.VERTICAL ? scrollBarValue.get() : 1 - scrollBarValue.get());
         }
-        getChildren().addAll(lines, tickLabels, scroll, nameLabel);
+        getChildren().addAll(lines, tickLabels, scroll);
     }
 
     /**
@@ -343,8 +336,7 @@ public abstract class Axis extends Region {
             double tick = max(majorTickLength.get(), minorTickLength.get());
             double scrollBar = scroll.isVisible() ? scroll.getWidth() : 0;
             double labels = max(tickLabels.prefWidth(height), 10);
-            double label = nameLabel.isVisible() ? nameLabel.getHeight() + 5 : 0;
-            return tick + scrollBar + labels + label;
+            return tick + scrollBar + labels;
         }
     }
 
@@ -362,8 +354,7 @@ public abstract class Axis extends Region {
             double tick = max(majorTickLength.get(), minorTickLength.get());
             double scrollBar = scroll.isVisible() ? scroll.getHeight() : 0;
             double labels = max(tickLabels.prefHeight(width), 10);
-            double label = nameLabel.isVisible() ? nameLabel.getHeight() + 5 : 0;
-            return tick + scrollBar + labels + label;
+            return tick + scrollBar + labels;
         }
     }
 
@@ -491,10 +482,7 @@ public abstract class Axis extends Region {
 
     private void layoutGroups(final double width, final double height) {
         boolean ish = isHorizontal();
-        String name = nameLabel.getText();
-        nameLabel.setVisible(name != null && !name.isEmpty());
         if (ish) {
-            nameLabel.setRotate(0);
             if (side.get() != Side.TOP) {// BOTTOM
                 double y = 0;
                 if (scroll.isVisible()) {
@@ -506,13 +494,6 @@ public abstract class Axis extends Region {
                 y += lines.prefHeight(-1) + tickLabelDistance.get();
                 tickLabels.setLayoutX(0);
                 tickLabels.setLayoutY(floor(y));
-                if (nameLabel.isVisible()) {
-                    y += max(tickLabels.prefHeight(-1) + 5, 15);
-                    final double w = min(nameLabel.prefWidth(-1), width);
-                    final double h = nameLabel.prefHeight(w);
-                    nameLabel.resize(w, h);
-                    nameLabel.relocate(floor((width - nameLabel.getWidth()) * 0.5), floor(y));
-                }
             } else {
                 double y = height;
                 if (scroll.isVisible()) {
@@ -525,17 +506,9 @@ public abstract class Axis extends Region {
                 y -= lines.prefHeight(-1) + tickLabelDistance.get();
                 tickLabels.setLayoutX(0);
                 tickLabels.setLayoutY(floor(y));
-                if (nameLabel.isVisible()) {
-                    y -= max(tickLabels.prefHeight(-1) + 5, 15);
-                    final double w = min(nameLabel.prefWidth(-1), width);
-                    final double h = nameLabel.prefHeight(w);
-                    nameLabel.resize(w, h);
-                    nameLabel.relocate(floor((width - nameLabel.getWidth()) * 0.5), floor(y));
-                }
             }
         } else {
             if (side.get() != Side.RIGHT) {// LEFT
-                nameLabel.setRotate(-90);
                 double x = width;
                 if (scroll.isVisible()) {
                     final double w = scroll.prefWidth(-1);
@@ -548,17 +521,7 @@ public abstract class Axis extends Region {
                 x -= tickLabelDistance.get() + lines.prefWidth(-1);
                 tickLabels.setLayoutX(floor(x));
                 tickLabels.setLayoutY(0);
-                if (nameLabel.isVisible()) {
-                    final double w = min(nameLabel.prefWidth(-1), height);
-                    final double h = nameLabel.prefHeight(w);
-                    nameLabel.resize(w, h);
-                    final Bounds b = nameLabel.getBoundsInParent();
-                    x -= tickLabels.prefWidth(-1) + 5 + b.getWidth();
-                    nameLabel.relocate(floor(x - b.getMinX() + nameLabel
-                            .getLayoutX()), floor((height - b.getHeight()) * 0.5 - b.getMinY() + nameLabel.getLayoutY()));
-                }
             } else {
-                nameLabel.setRotate(90);
                 double x = 0;
                 if (scroll.isVisible()) {
                     final double w = scroll.prefWidth(-1);
@@ -571,15 +534,6 @@ public abstract class Axis extends Region {
                 x = tickLabelDistance.get() + lines.prefWidth(-1);
                 tickLabels.setLayoutX(floor(x));
                 tickLabels.setLayoutY(0);
-                if (nameLabel.isVisible()) {
-                    final double w = min(nameLabel.prefWidth(-1), height);
-                    final double h = nameLabel.prefHeight(w);
-                    nameLabel.resize(w, h);
-                    final Bounds b = nameLabel.getBoundsInParent();
-                    x += max(tickLabels.prefWidth(-1) + 5, 15);
-                    nameLabel.relocate(floor(x - b.getMinX() + nameLabel
-                            .getLayoutX()), floor((height - b.getHeight()) * 0.5 - b.getMinY() + nameLabel.getLayoutY()));
-                }
             }
         }
 

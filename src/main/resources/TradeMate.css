@@ -2,11 +2,13 @@
  Trade Mate
 ===========================================================================*/
 .BUY {
+	-side: rgb(32, 151, 77);
 	-fx-text-fill: rgb(251, 189, 42);
 }
 
 .SELL {
-	-fx-text-fill: rgba(247, 105, 77, 1);
+	-side: rgb(247, 105, 77);
+	-fx-text-fill: -side
 }
 
 #shortList .list-cell {
@@ -49,41 +51,25 @@
     -fx-text-fill: white;
     -fx-padding: 2 5 2 0;
 }
+
 .candlestick-average-line {
     -fx-stroke: #106ece;
     -fx-stroke-width: 2px;
 }
-.candlestick-candle {
-    -fx-effect: dropshadow( two-pass-box , rgba(0,0,0,0.4) , 10, 0.0 , 2 , 4 );
-}
+
 .candlestick-line {
-    -fx-stroke: white;
-    -fx-stroke-width: 2px;
+    -fx-stroke: -side;
+    -fx-stroke-width: 1px;
 }
+
 .candlestick-bar {
-    -fx-padding: 5;
-    -candlestick-bar-fill: red;
-    -fx-background-color: linear-gradient(derive(-candlestick-bar-fill,-30%), derive(-candlestick-bar-fill,-40%)),
-        linear-gradient(derive(-candlestick-bar-fill,100%), derive(-candlestick-bar-fill, 10%)),
-        linear-gradient(derive(-candlestick-bar-fill,30%), derive(-candlestick-bar-fill,-10%));
-    -fx-background-insets: 0,1,2;
+	-fx-padding: 5;
+	-fx-background-color: linear-gradient(derive(-side,-10%), derive(-side,-20%)),
+        								linear-gradient(derive(-side,60%), derive(-side, 10%)),
+        								linear-gradient(derive(-side,30%), derive(-side,-10%));
+  -fx-background-insets: 0,1,2;
 }
-.candlestick-bar.close-above-open {
-    -candlestick-bar-fill: greenyellow;
-}
-.candlestick-bar.open-above-close {
-    -candlestick-bar-fill: lightpink;
-}
-  
-  
-.chart-title {
-    -fx-font-size: 18pt;    
-}
-  
-  
-.axis-label {
-}
-  
-.axis {
-    -fx-tick-label-font: 12pt system;
+
+.tick-label {
+	-fx-fill: -fx-mid-text-color;
 }

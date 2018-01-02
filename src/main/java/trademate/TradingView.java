@@ -38,7 +38,7 @@ import viewtify.ui.UITab;
  */
 public class TradingView extends View {
 
-    private static final DateTimeFormatter formatter = DateTimeFormatter.BASIC_ISO_DATE;
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
 
     public final BitFlyer provider;
 
@@ -98,15 +98,13 @@ public class TradingView extends View {
         CandleChart candleChart = new CandleChart(chart).graph(plot -> {
         }).axisX(axis -> {
             long minute = 60000;
-            axis.nameLabel.setText("日時");
             axis.tickLabelFormatter
                     .set(v -> Instant.ofEpochMilli((long) v).plus(9, ChronoUnit.HOURS).atZone(Execution.UTC).format(formatter));
             axis.visibleRange.set(100D / serise.ticks.size());
             axis.units.set(new double[] {minute, 10 * minute, 30 * minute, 60 * minute, 2 * 60 * minute, 4 * 60 * minute, 6 * 60 * minute,
                     12 * 60 * minute, 24 * 60 * minute});
         }).axisY(axis -> {
-            axis.nameLabel.setText("JPY");
-            axis.tickLabelFormatter.set(v -> Num.of(v).asJPY());
+            axis.tickLabelFormatter.set(v -> Num.of(v).toString());
             axis.visibleRange.set(Num.of(50000).divide(diff).toDouble());
             axis.scrollBarVisibility.set(false);
         }).candleDate(serise);

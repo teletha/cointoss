@@ -183,7 +183,7 @@
                   <Cursor fx:constant="DEFAULT" />
                </cursor>
             </VBox>
-            <VBox alignment="CENTER" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="190.0" SplitPane.resizableWithParent="false">
+            <VBox alignment="CENTER" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="210.0" SplitPane.resizableWithParent="false">
                <cursor>
                   <Cursor fx:constant="DEFAULT" />
                </cursor>
