@@ -13,6 +13,7 @@ import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 
+import javafx.geometry.Side;
 import javafx.scene.layout.AnchorPane;
 
 import cointoss.Execution;
@@ -106,6 +107,7 @@ public class TradingView extends View {
             axis.units.set(new double[] {minute, 10 * minute, 30 * minute, 60 * minute, 2 * 60 * minute, 4 * 60 * minute, 6 * 60 * minute,
                     12 * 60 * minute, 24 * 60 * minute});
         }).axisY(axis -> {
+            axis.side.set(Side.RIGHT);
             axis.tickLabelFormatter.set(v -> Num.of(v).toString());
             axis.visibleRange.set(Num.of(50000).divide(diff).toDouble());
             axis.scrollBarVisibility.set(false);

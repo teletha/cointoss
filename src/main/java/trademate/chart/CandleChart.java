@@ -86,8 +86,8 @@ public class CandleChart extends Region {
 
         AnchorPane.setTopAnchor(this, 10d);
         AnchorPane.setBottomAnchor(this, 15d);
-        AnchorPane.setRightAnchor(this, 10d);
-        AnchorPane.setLeftAnchor(this, 10d);
+        AnchorPane.setRightAnchor(this, 15d);
+        AnchorPane.setLeftAnchor(this, 0d);
 
         zoom.install(axisX);
         zoom.install(axisY);
