@@ -157,9 +157,6 @@ public abstract class Axis extends Region {
     /** The visual distance between tick and label. */
     public final DoubleProperty tickLabelDistance = new SimpleDoubleProperty(this, "tickLabelGap", 10);
 
-    /** The rotation angle of label. */
-    public final DoubleProperty tickLabelRotate = new SimpleDoubleProperty(this, "tickLabelRotate", 0);
-
     /** The logical maximum value. */
     public final DoubleProperty logicalMaxValue = new SimpleDoubleProperty(this, "logicalMaxValue", 1);
 
@@ -231,7 +228,6 @@ public abstract class Axis extends Region {
         majorTickLength.addListener(layoutValidator);
         minorTickLength.addListener(layoutValidator);
         tickLabelDistance.addListener(layoutValidator);
-        tickLabelRotate.addListener(layoutValidator);
 
         // ====================================================
         // Initialize UI widget
@@ -723,7 +719,6 @@ public abstract class Axis extends Region {
                     for (final AxisLabel a2 : c.getAddedSubList()) {
                         list.add(a2.getNode());
                         a2.getNode().setVisible(false);
-                        a2.getNode().rotateProperty().bind(tickLabelRotate);
                     }
                 }
             });

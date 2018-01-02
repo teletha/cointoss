@@ -37,11 +37,6 @@
   -fx-text-fill: rgb(80, 80, 80);
 }
 
-
-#chart {
-}
-
-
 /* ==========================================================================
  Chart Area
 ===========================================================================*/
@@ -74,7 +69,20 @@
 	-fx-fill: -fx-mid-text-color;
 }
 
-.chart-vertical-grid-lines, .chart-horizontal-grid-lines {
+.chart-vertical-grid-line,
+.chart-vertical-minor-grid-line,
+.chart-horizontal-grid-line,
+.chart-horizontal-minor-grid-line {
+	-fx-stroke-width: 0.5;
 	-fx-stroke: rgb(40, 40, 40);
-	-fx-stroke-width: 1;
+}
+
+.axis-tick-mark, .axis-minor-tick-mark {
+	-fx-stroke-width: 0.5;
+	-fx-stroke: rgb(40, 40, 40);
+}
+
+.axis-line {
+	-fx-stroke-width: 0.5;
+	-fx-stroke: rgb(40, 40, 40);
 }

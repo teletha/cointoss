@@ -51,6 +51,12 @@ public class GraphPlotArea extends Region {
     /** The visibility of vertical grid line. */
     public final BooleanProperty verticalGridLineVisibility = new SimpleBooleanProperty(this, "verticalGridLineVisibility", true);
 
+    /** The visibility of horizontal grid line. */
+    public final BooleanProperty horizontalMinorGridLineVisibility = new SimpleBooleanProperty(this, "horizontalMinorGridLinesVisible", false);
+
+    /** The visibility of vertical grid line. */
+    public final BooleanProperty verticalMinorGridLineVisibility = new SimpleBooleanProperty(this, "verticalMinorGridLineVisibility", false);
+
     /** The background color setting. */
     public final BooleanProperty alternativeRowFillVisible = new SimpleBooleanProperty(this, "alternativeRowFillVisible", true);
 
@@ -154,14 +160,12 @@ public class GraphPlotArea extends Region {
         clip.heightProperty().bind(heightProperty());
         setClip(clip);
 
-        verticalMinorGridLines.setVisible(false);
-        horizontalMinorGridLines.setVisible(false);
         verticalRowFill.getStyleClass().setAll("chart-alternative-column-fill");
         horizontalRowFill.getStyleClass().setAll("chart-alternative-row-fill");
-        verticalGridLines.getStyleClass().setAll("chart-vertical-grid-lines");
-        horizontalGridLines.getStyleClass().setAll("chart-horizontal-grid-lines");
-        verticalMinorGridLines.getStyleClass().setAll("chart-vertical-grid-lines", "chart-vertical-minor-grid-lines");
-        horizontalMinorGridLines.getStyleClass().setAll("chart-horizontal-grid-lines", "chart-horizontal-minor-grid-lines");
+        verticalGridLines.getStyleClass().setAll("chart-vertical-grid-line");
+        verticalMinorGridLines.getStyleClass().setAll("chart-vertical-grid-line", "chart-vertical-minor-grid-line");
+        horizontalGridLines.getStyleClass().setAll("chart-horizontal-grid-line");
+        horizontalMinorGridLines.getStyleClass().setAll("chart-horizontal-grid-lines", "chart-horizontal-minor-grid-line");
         getChildren()
                 .addAll(verticalRowFill, horizontalRowFill, verticalMinorGridLines, horizontalMinorGridLines, verticalGridLines, horizontalGridLines, background, userBackround, candles, lines, foreground, userForeground);
     }
@@ -367,6 +371,8 @@ public class GraphPlotArea extends Region {
             DoubleList minorTicks = axis.majors;
 
             final ObservableList<PathElement> ele = verticalMinorGridLines.getElements();
+            final boolean line = verticalMinorGridLineVisibility.get();
+            verticalMinorGridLines.setVisible(line);
             final int elesize = ele.size();
             final int e = minorTicks.size();
             if (elesize > e * 2) {
@@ -396,6 +402,8 @@ public class GraphPlotArea extends Region {
             DoubleList minorTicks = axis.minors;
 
             final ObservableList<PathElement> ele = horizontalMinorGridLines.getElements();
+            final boolean line = horizontalMinorGridLineVisibility.get();
+            horizontalMinorGridLines.setVisible(line);
             final int elesize = ele.size();
             final int e = minorTicks.size();
             if (elesize > e * 2) {
