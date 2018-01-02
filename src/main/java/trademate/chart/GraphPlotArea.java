@@ -14,11 +14,9 @@ import java.util.List;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
@@ -52,12 +50,6 @@ public class GraphPlotArea extends Region {
 
     /** The visibility of vertical grid line. */
     public final BooleanProperty verticalGridLineVisibility = new SimpleBooleanProperty(this, "verticalGridLineVisibility", true);
-
-    /** The horizontal margin of plot area. */
-    public final DoubleProperty horizontalMargin = new SimpleDoubleProperty(this, "horizontalGridLinesVisible", 1);
-
-    /** The vertical margin of plot area. */
-    public final DoubleProperty verticalMargin = new SimpleDoubleProperty(this, "verticalGridLineVisibility", 1);
 
     /** The background color setting. */
     public final BooleanProperty alternativeRowFillVisible = new SimpleBooleanProperty(this, "alternativeRowFillVisible", true);
@@ -632,7 +624,7 @@ public class GraphPlotArea extends Region {
         double low = axisY.get().getPositionForValue(data.minPrice.toDouble());
 
         // calculate candle width
-        double candleWidth = 4;
+        double candleWidth = 3;
 
         // update candle
         candle.update(close - open, high - open, low - open, candleWidth);
