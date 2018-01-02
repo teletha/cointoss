@@ -74,7 +74,6 @@ public class TradingView extends View {
         market().health.on(Viewtify.UIThread).to(v -> {
             tab.text(market().name() + "  " + v.mark);
         });
-        // chart.getChildren().add(new CandleChart().candleDate(market.minute1));
     }
 
     /**
