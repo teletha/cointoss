@@ -505,17 +505,23 @@ public class GraphPlotArea extends Region {
 
                 if (start <= time && time <= end) {
                     min = Num.min(min, data.minPrice);
-                }
 
-                Candle candle;
+                    Candle candle;
 
-                if (i < sizePath) {
-                    candle = (Candle) nodes.get(i);
+                    if (i < sizePath) {
+                        candle = (Candle) nodes.get(i);
+                    } else {
+                        candle = new Candle("series" + i, "data" + i);
+                        nodes.add(candle);
+                    }
+                    plotCandleChartData(data.start.toInstant().toEpochMilli(), data, candle);
                 } else {
-                    candle = new Candle("series" + i, "data" + i);
-                    nodes.add(candle);
+                    if (i < sizePath) {
+                        Candle candle = (Candle) nodes.get(i);
+                        candle.setLayoutX(-10);
+                        candle.setLayoutY(-10);
+                    }
                 }
-                plotCandleChartData(data.start.toInstant().toEpochMilli(), data, candle);
             }
             axisY.get().visualMinValue.set(min.multiply("0.995").toDouble());
         }

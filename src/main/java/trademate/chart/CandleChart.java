@@ -404,7 +404,7 @@ public class CandleChart extends Region {
      * Set x-axis range.
      */
     private void setXAxisRange() {
-        axisX.logicalMaxValue.set(candles.get(candles.size() - 1).start.toInstant().toEpochMilli());
+        axisX.logicalMaxValue.set(candles.get(candles.size() - 1).start.toInstant().toEpochMilli() + 3 * 60 * 1000);
         axisX.logicalMinValue.set(candles.get(0).start.toInstant().toEpochMilli());
     }
 
@@ -420,8 +420,8 @@ public class CandleChart extends Region {
             min = Num.min(min, tick.minPrice);
         }
 
-        max = max.plus(200);
-        min = min.minus(200);
+        max = max.plus(5000);
+        min = min.minus(5000);
 
         axisY.logicalMaxValue.set(max.toDouble());
         axisY.logicalMinValue.set(min.toDouble());
