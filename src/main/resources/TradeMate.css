@@ -65,10 +65,6 @@
   -fx-background-insets: 0,1,2;
 }
 
-.tick-label {
-	-fx-fill: -fx-mid-text-color;
-}
-
 .chart-vertical-grid-line,
 .chart-vertical-minor-grid-line,
 .chart-horizontal-grid-line,
@@ -85,4 +81,8 @@
 .axis-line {
 	-fx-stroke-width: 0.5;
 	-fx-stroke: rgb(40, 40, 40);
+}
+
+.tick-label {
+	-fx-fill: -fx-mid-text-color;
 }
