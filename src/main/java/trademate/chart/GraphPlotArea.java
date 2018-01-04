@@ -39,6 +39,7 @@ import cointoss.chart.Tick;
 import cointoss.util.Num;
 import trademate.chart.shape.Candle;
 import trademate.chart.shape.GraphShape;
+import viewtify.ui.UILine;
 
 /**
  * @version 2017/09/27 21:49:33
@@ -129,6 +130,12 @@ public class GraphPlotArea extends Region {
     /** The line chart color manager. */
     private final BitSet lineColorManager = new BitSet(8);
 
+    /** The mouse tracking ui. */
+    private final UILine mouseTrackV = new UILine().style("mouse-track-line").startX(-10).startY(0).endX(-10).endY(heightProperty());
+
+    /** The mouse tracking ui. */
+    private final UILine mouseTrackH = new UILine().style("mouse-track-line").startX(0).startY(-10).endX(widthProperty()).endY(-10);
+
     /** The line chart data list. */
     private ObservableList<Tick> candleChartData;
 
@@ -160,6 +167,17 @@ public class GraphPlotArea extends Region {
         clip.heightProperty().bind(heightProperty());
         setClip(clip);
 
+        setOnMouseMoved(e -> {
+            double x = e.getX();
+            double y = e.getY();
+            mouseTrackV.startX(x).endX(x);
+            mouseTrackH.startY(y).endY(y);
+        });
+        setOnMouseExited(e -> {
+            mouseTrackV.startX(-10).endX(-10);
+            mouseTrackH.startY(-10).endY(-10);
+        });
+
         verticalRowFill.getStyleClass().setAll("chart-alternative-column-fill");
         horizontalRowFill.getStyleClass().setAll("chart-alternative-row-fill");
         verticalGridLines.getStyleClass().setAll("chart-vertical-grid-line");
@@ -167,7 +185,7 @@ public class GraphPlotArea extends Region {
         horizontalGridLines.getStyleClass().setAll("chart-horizontal-grid-line");
         horizontalMinorGridLines.getStyleClass().setAll("chart-horizontal-grid-lines", "chart-horizontal-minor-grid-line");
         getChildren()
-                .addAll(verticalRowFill, horizontalRowFill, verticalMinorGridLines, horizontalMinorGridLines, verticalGridLines, horizontalGridLines, background, userBackround, candles, lines, foreground, userForeground);
+                .addAll(verticalRowFill, horizontalRowFill, verticalMinorGridLines, horizontalMinorGridLines, verticalGridLines, horizontalGridLines, mouseTrackV.ui, mouseTrackH.ui, background, userBackround, candles, lines, foreground, userForeground);
     }
 
     /**

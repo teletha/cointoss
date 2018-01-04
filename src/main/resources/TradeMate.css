@@ -86,3 +86,8 @@
 .tick-label {
 	-fx-fill: -fx-mid-text-color;
 }
+
+.mouse-track-line {
+	-fx-stroke-width: 0.5;
+	-fx-stroke: rgb(50, 50, 50);
+}
