@@ -33,6 +33,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.pubnub.api.PNConfiguration;
 import com.pubnub.api.PubNub;
 import com.pubnub.api.callbacks.SubscribeCallback;
+import com.pubnub.api.enums.PNReconnectionPolicy;
 import com.pubnub.api.enums.PNStatusCategory;
 import com.pubnub.api.models.consumer.PNStatus;
 import com.pubnub.api.models.consumer.pubsub.PNMessageResult;
@@ -276,6 +277,12 @@ class BitFlyerBackend implements MarketBackend {
     private Signal<OrderBookChange> realtimeOrderBook() {
         return new Signal<OrderBookChange>((observer, disposer) -> {
             PNConfiguration config = new PNConfiguration();
+            config.setSecure(false);
+            config.setReconnectionPolicy(PNReconnectionPolicy.LINEAR);
+            config.setNonSubscribeRequestTimeout(5);
+            config.setPresenceTimeout(5);
+            config.setSubscribeTimeout(5);
+            config.setStartSubscriberThread(true);
             config.setSubscribeKey("sub-c-52a9ab50-291b-11e5-baaa-0619f8945a4f");
 
             PubNub pubNub = new PubNub(config);
@@ -287,9 +294,14 @@ class BitFlyerBackend implements MarketBackend {
                  */
                 @Override
                 public void status(PubNub pubnub, PNStatus status) {
-                    if (status.getCategory() == PNStatusCategory.PNBadRequestCategory) {
-                    }
                     System.out.println(status);
+                    if (status.getCategory() == PNStatusCategory.PNUnexpectedDisconnectCategory) {
+                        // internet got lost, do some magic and call reconnect when ready
+                        pubnub.reconnect();
+                    } else if (status.getCategory() == PNStatusCategory.PNTimeoutCategory) {
+                        // do some magic and call reconnect when ready
+                        pubnub.reconnect();
+                    }
                 }
 
                 /**

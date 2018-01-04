@@ -287,11 +287,11 @@ class BitFlyerLog implements MarketLog {
             PNConfiguration config = new PNConfiguration();
             config.setSecure(false);
             config.setReconnectionPolicy(PNReconnectionPolicy.LINEAR);
-            config.setSubscribeKey("sub-c-52a9ab50-291b-11e5-baaa-0619f8945a4f");
             config.setNonSubscribeRequestTimeout(5);
             config.setPresenceTimeout(5);
             config.setSubscribeTimeout(5);
             config.setStartSubscriberThread(true);
+            config.setSubscribeKey("sub-c-52a9ab50-291b-11e5-baaa-0619f8945a4f");
 
             PubNub pubNub = new PubNub(config);
             pubNub.addListener(new SubscribeCallback() {
