@@ -9,9 +9,13 @@
  */
 package trademate;
 
+import javafx.stage.Stage;
+import javafx.stage.Window;
+
 import cointoss.market.bitflyer.BitFlyer;
 import viewtify.ActivationPolicy;
 import viewtify.UI;
+import viewtify.User;
 import viewtify.View;
 import viewtify.Viewtify;
 import viewtify.ui.UITabPane;
@@ -30,7 +34,22 @@ public class TradeMate extends View {
     protected void initialize() {
         main.load("Setting", SettingView.class)
                 .load(BitFlyer.FX_BTC_JPY.fullName(), tab -> new TradingView(BitFlyer.FX_BTC_JPY, tab))
-                .initial(0);
+                .initial(0)
+                .when(User.Click, e -> {
+                    if (e.getClickCount() == 2) {
+                        Window window = root().getScene().getWindow();
+
+                        if (window instanceof Stage) {
+                            Stage stage = (Stage) window;
+
+                            if (stage.isMaximized()) {
+                                stage.setMaximized(false);
+                            } else {
+                                stage.setMaximized(true);
+                            }
+                        }
+                    }
+                });
     }
 
     /**

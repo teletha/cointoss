@@ -32,10 +32,10 @@ public class Candle extends Group {
 
     public Candle(String seriesStyleClass, String dataStyleClass) {
         setAutoSizeChildren(false);
+        updateStyleClasses();
         getChildren().addAll(highLowLine, bar);
         this.seriesStyleClass = seriesStyleClass;
         this.dataStyleClass = dataStyleClass;
-        updateStyleClasses();
         tooltip.setGraphic(new TooltipContent());
         Tooltip.install(bar, tooltip);
     }

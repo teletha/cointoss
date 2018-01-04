@@ -450,6 +450,10 @@ public class CandleChart extends Region {
 
         data.to(tick -> {
             this.candles.add(tick);
+
+            if (0.99 <= axisX.scroll.getValue()) {
+                axisX.scroll.setValue(1);
+            }
         });
         return this;
     }
