@@ -19,10 +19,12 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyDoubleWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -39,7 +41,9 @@ import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.PathElement;
+import javafx.scene.text.Text;
 
+import org.eclipse.collections.api.block.function.primitive.DoubleToObjectFunction;
 import org.eclipse.collections.api.list.primitive.MutableDoubleList;
 import org.eclipse.collections.impl.factory.primitive.DoubleLists;
 
@@ -63,6 +67,8 @@ public abstract class Axis extends Region {
 
     /** The visual placement position. */
     public final Side side;
+
+    public final ObjectProperty<DoubleToObjectFunction<String>> tickLabelFormatter = new SimpleObjectProperty<>(this, "tickLabelFormatter", String::valueOf);
 
     /** レイアウトを構成すべき情報に対して付加すべきリスナ */
     private final InvalidationListener layoutValidator = observable -> {
@@ -184,9 +190,7 @@ public abstract class Axis extends Region {
     private final UILine indicatorPath = new UILine().style(ChartClass.AxisTick).visible(false).startX(0).startY(0);
 
     /** UI widget. */
-    private final UILine indicatorLabel = new UILine().style(ChartClass.AxisTick).visible(false).startX(0).startY(0);
-
-    protected double indicatorPosition = 0;
+    private final Text indicatorLabel = new Text();
 
     /** UI widget. */
     private final Line baseLine = new Line();
@@ -207,6 +211,8 @@ public abstract class Axis extends Region {
         } else {
             indicatorPath.endX(tickLength).endY(0);
         }
+        indicatorLabel.getStyleClass().add(ChartClass.AxisTickLabel.name());
+        tickLabels.getChildren().add(indicatorLabel);
 
         // ====================================================
         // Initialize Property
@@ -373,44 +379,40 @@ public abstract class Axis extends Region {
         final ObservableList<AxisLabel> labels = this.labels;
         final double lastL = getAxisLength(lastLayoutWidth, lastLayoutHeight);
         final double l = getAxisLength(width, height);
-        final boolean isH = isHorizontal();
         int firstIndex = -1;// 重なりを検出する基準位置
 
         for (int i = 0, e = ticks.size(); i < e; i++) {
-            final AxisLabel axisLabel = labels.get(i);
-            final double d = ticks.get(i);
+            AxisLabel axisLabel = labels.get(i);
+            double d = ticks.get(i);
+
             if (firstIndex == -1 && axisLabel.managed && axisLabel.beforeVisible) {
                 firstIndex = i;
             }
+
             axisLabel.managed = true;
+
             // 位置を合わせる
-            final Node n = axisLabel.node;
-            n.setLayoutX(0);
-            n.setLayoutY(0);
-            final Bounds bounds = n.getBoundsInParent();
-            if (isH) {
+            Node node = axisLabel.node;
+            node.setLayoutX(0);
+            node.setLayoutY(0);
+
+            Bounds bounds = node.getBoundsInParent();
+
+            if (isHorizontal()) {
                 final double cx = (bounds.getMinX() + bounds.getMaxX()) * 0.5;
-                n.setLayoutX(d - cx);
+                node.setLayoutX(d - cx);
                 if (side == Side.BOTTOM) {
-                    // 上を合わす
-                    final double bottom = bounds.getMinY();
-                    n.setLayoutY(-bottom);
+                    node.setLayoutY(tickLabelDistance);
                 } else {
-                    // 下を合わす
-                    final double top = bounds.getMaxY();
-                    n.setLayoutY(-top);
+                    node.setLayoutY(-tickLabelDistance);
                 }
             } else {
                 final double cy = (bounds.getMinY() + bounds.getMaxY()) * 0.5;
-                n.setLayoutY(d - cy);
+                node.setLayoutY(d - cy);
                 if (side == Side.LEFT) {
-                    // 右端を合わす
-                    final double right = bounds.getMaxX();
-                    n.setLayoutX(-right);
+                    node.setLayoutX(-tickLabelDistance);
                 } else {
-                    // 左端を合わす
-                    final double left = bounds.getMinX();
-                    n.setLayoutX(-left);
+                    node.setLayoutX(tickLabelDistance);
                 }
             }
         }
@@ -662,7 +664,6 @@ public abstract class Axis extends Region {
                     for (final AxisLabel a1 : c.getRemoved()) {
                         list.remove(a1.node);
                         a1.managed = false;
-                        a1.node.rotateProperty().unbind();
                     }
                     for (final AxisLabel a2 : c.getAddedSubList()) {
                         list.add(a2.node);
@@ -680,13 +681,22 @@ public abstract class Axis extends Region {
     public void indicateAt(double position) {
         if (position < 0) {
             indicatorPath.visible(false);
+            indicatorLabel.setVisible(false);
         } else {
             indicatorPath.visible(true);
+            indicatorLabel.setVisible(true);
+            indicatorLabel.setText(tickLabelFormatter.get().apply(Math.floor(getValueForPosition(position))));
+
+            Bounds bounds = indicatorLabel.getBoundsInParent();
 
             if (isHorizontal()) {
                 indicatorPath.startX(position).endX(position);
+                indicatorLabel.setLayoutX(position - bounds.getWidth() / 2);
+                indicatorLabel.setLayoutY(tickLabelDistance);
             } else {
                 indicatorPath.startY(position).endY(position);
+                indicatorLabel.setLayoutY(position + bounds.getHeight() / 4);
+                indicatorLabel.setLayoutX(tickLabelDistance);
             }
         }
     }

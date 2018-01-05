@@ -19,8 +19,6 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Side;
 import javafx.scene.text.Text;
 
-import org.eclipse.collections.api.block.function.primitive.DoubleToObjectFunction;
-
 /**
  * @version 2017/09/27 9:11:27
  */
@@ -36,8 +34,6 @@ public class LinearAxis extends Axis {
             2500.0d, 5000.0d, 10000.0d, 25000.0d, 50000.0d, 100000.0d, 250000.0d, 500000.0d, 1000000.0d, 2500000.0d, 5000000.0d, 1.0E7d,
             2.5E7d, 5.0E7d, 1.0E8d, 2.5E8d, 5.0E8d, 1.0E9d, 2.5E9d, 5.0E9d, 1.0E10d, 2.5E10d, 5.0E10d, 1.0E11d, 2.5E11d, 5.0E11d, 1.0E12d,
             2.5E12d, 5.0E12d};
-
-    public final ObjectProperty<DoubleToObjectFunction<String>> tickLabelFormatter = new SimpleObjectProperty<>(this, "tickLabelFormatter", String::valueOf);
 
     private double lowVal = 0;
 
