@@ -73,17 +73,17 @@
 	-fx-stroke: rgb(40, 40, 40);
 }
 
-.axis-tick-mark {
+.AxisLine {
 	-fx-stroke-width: 0.5;
 	-fx-stroke: rgb(40, 40, 40);
 }
 
-.axis-line {
+.AxisTick {
 	-fx-stroke-width: 0.5;
 	-fx-stroke: rgb(40, 40, 40);
 }
 
-.tick-label {
+.AxisTickLabel {
 	-fx-fill: -fx-mid-text-color;
 }
 

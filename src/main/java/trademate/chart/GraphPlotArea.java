@@ -166,7 +166,7 @@ public class GraphPlotArea extends Region {
         clip.heightProperty().bind(heightProperty());
         setClip(clip);
 
-        setupMouseTrackEffect();
+        provideMouseTracker();
 
         verticalRowFill.getStyleClass().setAll("chart-alternative-column-fill");
         horizontalRowFill.getStyleClass().setAll("chart-alternative-row-fill");
@@ -179,9 +179,9 @@ public class GraphPlotArea extends Region {
     }
 
     /**
-     * Setup.
+     * Provide mouse tracker.
      */
-    private void setupMouseTrackEffect() {
+    private void provideMouseTracker() {
         // track on move
         setOnMouseMoved(e -> {
             double x = e.getX();
@@ -197,6 +197,9 @@ public class GraphPlotArea extends Region {
         setOnMouseExited(e -> {
             mouseTrackV.startX(-10).endX(-10);
             mouseTrackH.startY(-10).endY(-10);
+
+            axisX.get().indicateAt(-10);
+            axisY.get().indicateAt(-10);
         });
 
     }

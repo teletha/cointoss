@@ -34,7 +34,6 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.ScrollBar;
 import javafx.scene.layout.Region;
-import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
@@ -181,7 +180,13 @@ public abstract class Axis extends Region {
     /** UI widget. */
     private final Group tickLabels = new Group();
 
-    private final UILine indicatorPath = new UILine().stroke(Color.RED).strokeWidth(2).startX(10).startY(0).endX(10).endY(10);
+    /** UI widget. */
+    private final UILine indicatorPath = new UILine().style(ChartClass.AxisTick).visible(false).startX(0).startY(0);
+
+    /** UI widget. */
+    private final UILine indicatorLabel = new UILine().style(ChartClass.AxisTick).visible(false).startX(0).startY(0);
+
+    protected double indicatorPosition = 0;
 
     /** UI widget. */
     private final Line baseLine = new Line();
@@ -196,6 +201,12 @@ public abstract class Axis extends Region {
         this.tickLength = tickLength;
         this.tickLabelDistance = tickLabelDistance;
         this.side = side;
+
+        if (isHorizontal()) {
+            indicatorPath.endX(0).endY(tickLength);
+        } else {
+            indicatorPath.endX(tickLength).endY(0);
+        }
 
         // ====================================================
         // Initialize Property
@@ -214,8 +225,8 @@ public abstract class Axis extends Region {
         // Initialize UI widget
         // ====================================================
 
-        tickPath.getStyleClass().setAll("axis-tick-mark");
-        baseLine.getStyleClass().setAll("axis-line");
+        tickPath.getStyleClass().setAll(ChartClass.AxisTick.name());
+        baseLine.getStyleClass().setAll(ChartClass.AxisLine.name());
 
         lines.setAutoSizeChildren(false);
         lines.getChildren().addAll(tickPath, indicatorPath.ui, baseLine);
@@ -366,14 +377,14 @@ public abstract class Axis extends Region {
         int firstIndex = -1;// 重なりを検出する基準位置
 
         for (int i = 0, e = ticks.size(); i < e; i++) {
-            final AxisLabel a = labels.get(i);
+            final AxisLabel axisLabel = labels.get(i);
             final double d = ticks.get(i);
-            if (firstIndex == -1 && a.managed && a.beforeVisible) {
+            if (firstIndex == -1 && axisLabel.managed && axisLabel.beforeVisible) {
                 firstIndex = i;
             }
-            a.managed = true;
+            axisLabel.managed = true;
             // 位置を合わせる
-            final Node n = a.node;
+            final Node n = axisLabel.node;
             n.setLayoutX(0);
             n.setLayoutY(0);
             final Bounds bounds = n.getBoundsInParent();
@@ -667,10 +678,16 @@ public abstract class Axis extends Region {
      * @param position
      */
     public void indicateAt(double position) {
-        if (isHorizontal()) {
-            indicatorPath.startX(position).endX(position);
+        if (position < 0) {
+            indicatorPath.visible(false);
         } else {
-            indicatorPath.startY(position).endY(position);
+            indicatorPath.visible(true);
+
+            if (isHorizontal()) {
+                indicatorPath.startX(position).endX(position);
+            } else {
+                indicatorPath.startY(position).endY(position);
+            }
         }
     }
 
