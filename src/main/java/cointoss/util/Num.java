@@ -581,6 +581,28 @@ public class Num implements Comparable<Num> {
     }
 
     /**
+     * Checks value range.
+     * 
+     * @param value
+     * @param errorRange
+     * @return
+     */
+    public final boolean isNear(Num price, double errorRange) {
+        return isNear(price, of(errorRange));
+    }
+
+    /**
+     * Checks value range.
+     * 
+     * @param value
+     * @param errorRange
+     * @return
+     */
+    public final boolean isNear(Num price, Num errorRange) {
+        return minus(price).abs().isLessThanOrEqual(errorRange.abs());
+    }
+
+    /**
      * Checks if the value is less than zero.
      * 
      * @return true if the value is less than zero, false otherwise

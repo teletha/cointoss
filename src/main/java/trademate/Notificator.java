@@ -31,7 +31,7 @@ public class Notificator extends Preference<Notificator> {
 
     public final Type orderFailed = new Type(3);
 
-    public final Type priceSignal = new Type(3);
+    public final Type priceSignal = new Type(15);
 
     /**
      * 

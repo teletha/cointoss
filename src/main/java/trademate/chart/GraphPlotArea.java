@@ -11,6 +11,7 @@ package trademate.chart;
 
 import java.util.BitSet;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.BooleanProperty;
@@ -33,12 +34,15 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.StrokeLineJoin;
 
 import org.eclipse.collections.api.list.primitive.DoubleList;
+import org.eclipse.collections.api.list.primitive.MutableDoubleList;
+import org.eclipse.collections.impl.factory.primitive.DoubleLists;
 
-import cointoss.Market;
 import cointoss.chart.Tick;
 import cointoss.util.Num;
+import kiss.Disposable;
 import kiss.I;
 import trademate.Notificator;
+import trademate.TradingView;
 import trademate.chart.shape.Candle;
 import trademate.chart.shape.GraphShape;
 import viewtify.ui.UILine;
@@ -61,7 +65,7 @@ public class GraphPlotArea extends Region {
     final ObjectProperty<Axis> axisY = new SimpleObjectProperty<>(this, "axisY", null);
 
     /** The current market. */
-    private final Market market;
+    private final TradingView trade;
 
     /** The notificator. */
     private final Notificator notificator = I.make(Notificator.class);
@@ -70,13 +74,7 @@ public class GraphPlotArea extends Region {
     private boolean plotValidate = false;
 
     /** The validator. */
-    private final InvalidationListener plotValidateListener = observable -> {
-        if (plotValidate) {
-            plotValidate = false;
-            graphshapeValidate = false;
-            setNeedsLayout(true);
-        }
-    };
+    private final InvalidationListener plotValidateListener = observable -> invalidate();
 
     /** The validator. */
     private final ChangeListener<Axis> axisListener = (observable, oldValue, newValue) -> {
@@ -124,8 +122,8 @@ public class GraphPlotArea extends Region {
     /** The mouse tracking ui. */
     private final UILine mouseTrackH = new UILine().style(ChartClass.MouseTrackLine).startX(0).startY(-10).endX(widthProperty()).endY(-10);
 
-    /** The price signal ui. */
-    private final UILine priceSignal = new UILine().style(ChartClass.PriceSignalLine).startX(0).startY(-10).endX(widthProperty()).endY(-10);
+    /** The price signal line. */
+    private final HorizontalMark priceSignal = new HorizontalMark(ChartClass.PriceSignalLine);
 
     /** The line chart data list. */
     private ObservableList<Tick> candleChartData;
@@ -149,8 +147,8 @@ public class GraphPlotArea extends Region {
     /**
      * 
      */
-    public GraphPlotArea(Market market) {
-        this.market = market;
+    public GraphPlotArea(TradingView trade) {
+        this.trade = trade;
 
         getStyleClass().setAll("chart-plot-background");
         axisX.addListener(axisListener);
@@ -166,7 +164,18 @@ public class GraphPlotArea extends Region {
         verticalGridLines.getStyleClass().setAll("chart-vertical-grid-line");
         horizontalGridLines.getStyleClass().setAll("chart-horizontal-grid-line");
         getChildren()
-                .addAll(verticalGridLines, horizontalGridLines, priceSignal.ui, mouseTrackV.ui, mouseTrackH.ui, background, userBackround, candles, lines, foreground, userForeground);
+                .addAll(verticalGridLines, horizontalGridLines, priceSignal.path, mouseTrackV.ui, mouseTrackH.ui, background, userBackround, candles, lines, foreground, userForeground);
+    }
+
+    /**
+     * Make this graph invalidate.
+     */
+    private void invalidate() {
+        if (plotValidate) {
+            plotValidate = false;
+            graphshapeValidate = false;
+            setNeedsLayout(true);
+        }
     }
 
     /**
@@ -199,15 +208,28 @@ public class GraphPlotArea extends Region {
      */
     private void providePriceSignal() {
         setOnContextMenuRequested(e -> {
-            System.out.println("Add signal");
-            double y = e.getY();
-            Num price = Num.of(Math.floor(axisY.get().getValueForPosition(y)));
+            invalidate();
 
-            priceSignal.startY(y).endY(y);
+            Num price = Num.of(Math.floor(axisY.get().getValueForPosition(e.getY())));
 
-            // market.signalByPrice(price).to(exe -> {
-            // notificator.priceSignal.notify("Rearch to " + price);
-            // });
+            // check price range to add or remove
+            for (Mark mark : priceSignal.marks) {
+                if (mark.price.isNear(price, 500)) {
+                    priceSignal.remove(mark);
+                    return;
+                }
+            }
+
+            // create new mark
+            Mark mark = new Mark(price);
+            priceSignal.marks.add(mark);
+
+            mark.disposer = trade.market().signalByPrice(price).to(exe -> {
+                notificator.priceSignal.notify("Rearch to " + price);
+                priceSignal.marks.remove(mark);
+
+                invalidate();
+            });
         });
     }
 
@@ -378,6 +400,9 @@ public class GraphPlotArea extends Region {
                 lt.setY(d);
             }
         }
+
+        // horizontal marks
+        priceSignal.draw(width);
     }
 
     /**
@@ -779,4 +804,111 @@ public class GraphPlotArea extends Region {
         }
     }
 
+    /**
+     * @version 2018/01/05 21:28:11
+     */
+    private class HorizontalMark {
+
+        /** The user interface. */
+        private final Path path = new Path();
+
+        /** The model. */
+        private final List<Mark> marks = new CopyOnWriteArrayList();
+
+        /**
+         * 
+         */
+        private HorizontalMark(ChartClass clazz) {
+            path.getStyleClass().add(clazz.name());
+        }
+
+        /**
+         * Dispose mark.
+         * 
+         * @param mark
+         */
+        private void remove(Mark mark) {
+            marks.remove(mark);
+            mark.dispose();
+        }
+
+        private void draw(double width) {
+            MutableDoubleList list = DoubleLists.mutable.empty();
+
+            for (Mark line : marks) {
+                list.add(Math.floor(axisY.get().getPositionForValue(line.price.toDouble())));
+            }
+            draw(list, true, width);
+        }
+
+        /**
+         * Draw lines.
+         * 
+         * @param values
+         * @param visible
+         * @param width
+         */
+        private void draw(DoubleList values, boolean visible, double width) {
+            ObservableList<PathElement> paths = path.getElements();
+            int pathSize = paths.size();
+            int valueSize = values.size();
+
+            if (!visible) {
+                paths.clear();
+                return;
+            } else if (pathSize > valueSize * 2) {
+                paths.remove(valueSize * 2, pathSize);
+                pathSize = valueSize * 2;
+            }
+
+            for (int i = 0; i < valueSize; i++) {
+                MoveTo move;
+                LineTo line;
+
+                if (i * 2 < pathSize) {
+                    move = (MoveTo) paths.get(i * 2);
+                    line = (LineTo) paths.get(i * 2 + 1);
+                } else {
+                    move = new MoveTo();
+                    line = new LineTo();
+                    paths.addAll(move, line);
+                }
+
+                double value = values.get(i);
+                move.setX(0);
+                move.setY(value);
+                line.setX(width);
+                line.setY(value);
+            }
+        }
+    }
+
+    /**
+     * @version 2018/01/05 21:12:36
+     */
+    private static class Mark implements Disposable {
+
+        /** The marked price. */
+        private final Num price;
+
+        /** The disposer */
+        private Disposable disposer;
+
+        /**
+         * @param price
+         */
+        private Mark(Num price) {
+            this.price = price;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void vandalize() {
+            if (disposer != null) {
+                disposer.dispose();
+            }
+        }
+    }
 }

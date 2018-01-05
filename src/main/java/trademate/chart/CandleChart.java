@@ -30,19 +30,16 @@ import javafx.geometry.Side;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Region;
 
-import cointoss.Market;
 import cointoss.chart.Chart;
 import cointoss.chart.Tick;
 import cointoss.util.Num;
+import trademate.TradingView;
 import trademate.chart.shape.GraphShape;
 
 /**
  * @version 2017/09/27 18:13:28
  */
 public class CandleChart extends Region {
-
-    /** The current market. */
-    public final Market market;
 
     /** The list of plottable line date. */
     public final ObservableList<CandleChartData> lines;
@@ -84,9 +81,8 @@ public class CandleChart extends Region {
     /**
      * 
      */
-    public CandleChart(AnchorPane parent, Market market) {
-        this.market = market;
-        this.graph = new GraphPlotArea(market);
+    public CandleChart(AnchorPane parent, TradingView trade) {
+        this.graph = new GraphPlotArea(trade);
 
         parent.getChildren().add(this);
 
