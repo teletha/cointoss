@@ -284,7 +284,7 @@ public class GraphPlotArea extends Region {
 
         V: {
             final Axis axis = xaxis;
-            DoubleList vTicks = axis.majors;
+            DoubleList vTicks = axis.ticks;
             final ObservableList<PathElement> lele = verticalGridLines.getElements();
             final ObservableList<PathElement> fele = verticalRowFill.getElements();
             int lelesize = lele.size();
@@ -334,7 +334,7 @@ public class GraphPlotArea extends Region {
 
         H: {
             final Axis axis = yaxis;
-            DoubleList hTicks = axis.majors;
+            DoubleList hTicks = axis.ticks;
             final ObservableList<PathElement> lele = horizontalGridLines.getElements();
             final ObservableList<PathElement> fele = horizontalRowFill.getElements();
             int lelesize = lele.size();

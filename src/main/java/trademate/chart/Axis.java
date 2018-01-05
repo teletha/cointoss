@@ -40,9 +40,7 @@ import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.PathElement;
 
-import org.eclipse.collections.api.list.primitive.MutableBooleanList;
 import org.eclipse.collections.api.list.primitive.MutableDoubleList;
-import org.eclipse.collections.impl.factory.primitive.BooleanLists;
 import org.eclipse.collections.impl.factory.primitive.DoubleLists;
 
 /**
@@ -149,7 +147,7 @@ public abstract class Axis extends Region {
     public final DoubleProperty scrollBarValue = new SimpleDoubleProperty(this, "scrollBarPosition", -1);
 
     /** The visual length of major tick. */
-    public final DoubleProperty majorTickLength = new SimpleDoubleProperty(this, "MajorTickLength", 8);
+    public final DoubleProperty tickLength = new SimpleDoubleProperty(this, "MajorTickLength", 8);
 
     /** The visual distance between tick and label. */
     public final DoubleProperty tickLabelDistance = new SimpleDoubleProperty(this, "tickLabelGap", 10);
@@ -182,9 +180,7 @@ public abstract class Axis extends Region {
         }
     };
 
-    protected final MutableDoubleList majors = DoubleLists.mutable.empty();
-
-    protected final MutableBooleanList majorsFill = BooleanLists.mutable.empty();
+    protected final MutableDoubleList ticks = DoubleLists.mutable.empty();
 
     /** UI widget. */
     private final Group lines = new Group();
@@ -193,7 +189,7 @@ public abstract class Axis extends Region {
     private final Group tickLabels = new Group();
 
     /** UI widget. */
-    private final Path majorTickPath = new Path();
+    private final Path tickPath = new Path();
 
     /** UI widget. */
     private final Line baseLine = new Line();
@@ -217,18 +213,18 @@ public abstract class Axis extends Region {
         visibleRange.addListener(dataValidateListener);
         scrollBarSize.addListener(scrollValueValidator);
         scrollBarValue.addListener(scrollValueValidator);
-        majorTickLength.addListener(layoutValidator);
+        tickLength.addListener(layoutValidator);
         tickLabelDistance.addListener(layoutValidator);
 
         // ====================================================
         // Initialize UI widget
         // ====================================================
 
-        majorTickPath.getStyleClass().setAll("axis-tick-mark");
+        tickPath.getStyleClass().setAll("axis-tick-mark");
         baseLine.getStyleClass().setAll("axis-line");
 
         lines.setAutoSizeChildren(false);
-        lines.getChildren().addAll(majorTickPath, baseLine);
+        lines.getChildren().addAll(tickPath, baseLine);
 
         tickLabels.setAutoSizeChildren(false);
 
@@ -319,7 +315,7 @@ public abstract class Axis extends Region {
             // force to re-layout
             layoutChildren(lastLayoutWidth, height);
 
-            double tick = majorTickLength.get();
+            double tick = tickLength.get();
             double scrollBar = scroll.isVisible() ? scroll.getWidth() : 0;
             double labels = max(tickLabels.prefWidth(height), 10);
             return tick + scrollBar + labels;
@@ -337,7 +333,7 @@ public abstract class Axis extends Region {
             // force to re-layout
             layoutChildren(width, lastLayoutHeight);
 
-            double tick = majorTickLength.get();
+            double tick = tickLength.get();
             double scrollBar = scroll.isVisible() ? scroll.getHeight() : 0;
             double labels = max(tickLabels.prefHeight(width), 10);
             return tick + scrollBar + labels;
@@ -387,9 +383,9 @@ public abstract class Axis extends Region {
             }
         }
 
-        for (int i = 0, e = majors.size(); i < e; i++) {
+        for (int i = 0, e = ticks.size(); i < e; i++) {
             final AxisLabel a = labels.get(i);
-            final double d = majors.get(i);
+            final double d = ticks.get(i);
             if (firstIndex == -1 && a.isManaged() && a.isBeforeVisible()) {
                 firstIndex = i;
             }
@@ -532,19 +528,19 @@ public abstract class Axis extends Region {
         baseLine.setEndX(ish ? l : 0);
         baseLine.setEndY(ish ? 0 : l);
 
-        final double al = majorTickLength.get();
+        final double al = tickLength.get();
         final Side s = side.get();
         final int k = ish ? s != Side.TOP ? 1 : -1 : s != Side.RIGHT ? -1 : 1;
 
-        final ObservableList<PathElement> elements = majorTickPath.getElements();
-        if (elements.size() > majors.size() * 2) {
-            elements.remove(majors.size() * 2, elements.size());
+        final ObservableList<PathElement> elements = tickPath.getElements();
+        if (elements.size() > ticks.size() * 2) {
+            elements.remove(ticks.size() * 2, elements.size());
         }
 
         final int eles = elements.size();
-        final int ls = majors.size();
+        final int ls = ticks.size();
         for (int i = 0; i < ls; i++) {
-            final double d = majors.get(i);
+            final double d = ticks.get(i);
             MoveTo mt;
             LineTo lt;
             if (i * 2 < eles) {

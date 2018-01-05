@@ -103,8 +103,7 @@ public class LinearAxis extends Axis {
      */
     @Override
     protected void computeAxisProperties(double width, double height) {
-        majors.clear();
-        majorsFill.clear();
+        ticks.clear();
 
         final double lowValue = computeLowerValue(logicalMaxValue.get());
         final double upValue = computeUpperValue(lowValue);
@@ -170,7 +169,7 @@ public class LinearAxis extends Axis {
             }
             double majorpos = uiRatio * (value - lowValue);
             if (value >= lowValue) {
-                majors.add(floor(isH ? majorpos : height - majorpos));
+                ticks.add(floor(isH ? majorpos : height - majorpos));
                 boolean find = false;
                 for (int t = 0, lsize = unused.size(); t < lsize; t++) {
                     AxisLabel a = unused.get(t);
@@ -209,10 +208,8 @@ public class LinearAxis extends Axis {
         visualMaxValue.set(1);
         final double len = getAxisLength(width, height);
         uiRatio = len;
-        majors.add(0d);
-        majors.add(getAxisLength(width, height));
-        majorsFill.add(true);
-        majorsFill.add(false);
+        ticks.add(0d);
+        ticks.add(getAxisLength(width, height));
         final ObservableList<AxisLabel> labels = getLabels();
         labels.clear();
         AxisLabel l = new AxisLabel();
