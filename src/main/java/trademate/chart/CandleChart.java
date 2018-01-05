@@ -48,10 +48,10 @@ public class CandleChart extends Region {
     public final ObservableList<Tick> candles;
 
     /** The x-axis UI. */
-    public final LinearAxis axisX = new LinearAxis(8);
+    public final LinearAxis axisX = new LinearAxis(5, 6);
 
     /** The y-axis UI. */
-    public final LinearAxis axisY = new LinearAxis(8);
+    public final LinearAxis axisY = new LinearAxis(5, 6);
 
     /** The actual graph drawer. */
     public final GraphPlotArea graph = new GraphPlotArea();

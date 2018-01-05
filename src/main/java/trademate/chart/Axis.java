@@ -150,7 +150,7 @@ public abstract class Axis extends Region {
     public final int tickLength;
 
     /** The visual distance between tick and label. */
-    public final DoubleProperty tickLabelDistance = new SimpleDoubleProperty(this, "tickLabelGap", 10);
+    public final int tickLabelDistance;
 
     /** The logical maximum value. */
     public final DoubleProperty logicalMaxValue = new SimpleDoubleProperty(this, "logicalMaxValue", 1);
@@ -200,8 +200,9 @@ public abstract class Axis extends Region {
     /**
      * 
      */
-    public Axis(int tickLength) {
+    public Axis(int tickLength, int tickLabelDistance) {
         this.tickLength = tickLength;
+        this.tickLabelDistance = tickLabelDistance;
 
         // ====================================================
         // Initialize Property
@@ -215,7 +216,6 @@ public abstract class Axis extends Region {
         visibleRange.addListener(dataValidateListener);
         scrollBarSize.addListener(scrollValueValidator);
         scrollBarValue.addListener(scrollValueValidator);
-        tickLabelDistance.addListener(layoutValidator);
 
         // ====================================================
         // Initialize UI widget
@@ -472,7 +472,7 @@ public abstract class Axis extends Region {
                 }
                 lines.setLayoutX(0);
                 lines.setLayoutY(floor(y));
-                y += lines.prefHeight(-1) + tickLabelDistance.get();
+                y += lines.prefHeight(-1) + tickLabelDistance;
                 tickLabels.setLayoutX(0);
                 tickLabels.setLayoutY(floor(y));
             } else {
@@ -484,7 +484,7 @@ public abstract class Axis extends Region {
                 }
                 lines.setLayoutX(0);
                 lines.setLayoutY(floor(y));
-                y -= lines.prefHeight(-1) + tickLabelDistance.get();
+                y -= lines.prefHeight(-1) + tickLabelDistance;
                 tickLabels.setLayoutX(0);
                 tickLabels.setLayoutY(floor(y));
             }
@@ -499,7 +499,7 @@ public abstract class Axis extends Region {
 
                 lines.setLayoutX(floor(x));
                 lines.setLayoutY(0);
-                x -= tickLabelDistance.get() + lines.prefWidth(-1);
+                x -= tickLabelDistance + lines.prefWidth(-1);
                 tickLabels.setLayoutX(floor(x));
                 tickLabels.setLayoutY(0);
             } else {
@@ -512,7 +512,7 @@ public abstract class Axis extends Region {
 
                 lines.setLayoutX(floor(x));
                 lines.setLayoutY(0);
-                x = tickLabelDistance.get() + lines.prefWidth(-1);
+                x = tickLabelDistance + lines.prefWidth(-1);
                 tickLabels.setLayoutX(floor(x));
                 tickLabels.setLayoutY(0);
             }

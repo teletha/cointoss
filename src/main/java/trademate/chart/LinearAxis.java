@@ -43,9 +43,10 @@ public class LinearAxis extends Axis {
 
     /**
      * @param tickLength
+     * @param tickLabelDistance
      */
-    public LinearAxis(int tickLength) {
-        super(tickLength);
+    public LinearAxis(int tickLength, int tickLabelDistance) {
+        super(tickLength, tickLabelDistance);
     }
 
     /**
