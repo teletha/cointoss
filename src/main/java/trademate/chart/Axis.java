@@ -372,24 +372,16 @@ public abstract class Axis extends Region {
         layoutGroups(width, height);
     }
 
-    private void layoutLabels(final double width, final double height) {
-        if (labels == null) {
-            return;
-        }
-        final ObservableList<AxisLabel> labels = this.labels;
-        final double lastL = getAxisLength(lastLayoutWidth, lastLayoutHeight);
-        final double l = getAxisLength(width, height);
-        int firstIndex = -1;// 重なりを検出する基準位置
-
+    /**
+     * Layout labels.
+     * 
+     * @param width
+     * @param height
+     */
+    private void layoutLabels(double width, double height) {
         for (int i = 0, e = ticks.size(); i < e; i++) {
             AxisLabel axisLabel = labels.get(i);
             double d = ticks.get(i);
-
-            if (firstIndex == -1 && axisLabel.managed && axisLabel.beforeVisible) {
-                firstIndex = i;
-            }
-
-            axisLabel.managed = true;
 
             // 位置を合わせる
             Node node = axisLabel.node;
@@ -417,42 +409,14 @@ public abstract class Axis extends Region {
             }
         }
 
-        // 大きさが変わったときは前回の履歴を参照しない。
-        if (lastL != l) {
-            firstIndex = -1;
-        }
-
         // 重なるラベルを不可視にする
+        Bounds indicatorBounds = indicatorLabel.getBoundsInParent();
 
-        for (int k = 0; k < 2; k++) {
-            // TODO 本当に重なっている領域で判定するようにしたい
-            Bounds base = null;
-            if (firstIndex != -1) {
-                base = labels.get(firstIndex).node.getBoundsInParent();
-            }
-            final int end = k == 0 ? -1 : labels.size();
-            int i = k == 0 ? firstIndex - 1 : firstIndex + 1;
-            final int add = k == 0 ? -1 : 1;
-            if (i < 0) {
-                i = -1;
-            }
+        for (
 
-            for (; i != end; i += add) {
-                final AxisLabel a = labels.get(i);
-                final Bounds bounds = a.node.getBoundsInParent();
-                if (base == null) {
-                    a.node.setVisible(true);
-                    a.beforeVisible = true;
-                    base = bounds;
-                } else {
-                    final boolean visible = !base.intersects(bounds);
-                    a.beforeVisible = visible;
-                    a.node.setVisible(visible);
-                    if (visible) {
-                        base = bounds;
-                    }
-                }
-            }
+                int i = 0; i != labels.size(); i++) {
+            AxisLabel axisLabel = labels.get(i);
+            axisLabel.node.setVisible(!indicatorBounds.intersects(axisLabel.node.getBoundsInParent()));
         }
     }
 
@@ -663,7 +627,6 @@ public abstract class Axis extends Region {
                 while (c.next()) {
                     for (final AxisLabel a1 : c.getRemoved()) {
                         list.remove(a1.node);
-                        a1.managed = false;
                     }
                     for (final AxisLabel a2 : c.getAddedSubList()) {
                         list.add(a2.node);
@@ -679,6 +642,8 @@ public abstract class Axis extends Region {
      * @param position
      */
     public void indicateAt(double position) {
+        dateIsValid = false;
+
         if (position < 0) {
             indicatorPath.visible(false);
             indicatorLabel.setVisible(false);
@@ -710,10 +675,6 @@ public abstract class Axis extends Region {
         protected final double id;
 
         protected final Node node;
-
-        private boolean managed = false;
-
-        private boolean beforeVisible = true;
 
         /**
          * @param id

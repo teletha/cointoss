@@ -95,7 +95,7 @@ public class TradingView extends View {
         }
         Num diff = max.minus(min);
 
-        CandleChart candleChart = new CandleChart(chart).graph(plot -> {
+        CandleChart candleChart = new CandleChart(chart, market()).graph(plot -> {
         }).axisX(axis -> {
             long minute = 60000;
             axis.tickLabelFormatter

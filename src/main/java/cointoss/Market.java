@@ -409,6 +409,20 @@ public class Market implements Disposable {
         return baseProfit.plus(targetProfit);
     }
 
+    /**
+     * Create new price signal.
+     * 
+     * @param price
+     * @return
+     */
+    public Signal<Execution> signalByPrice(Num price) {
+        if (getLatestPrice().isLessThan(price)) {
+            return timeline.take(e -> e.price.isGreaterThanOrEqual(price)).take(1);
+        } else {
+            return timeline.take(e -> e.price.isLessThanOrEqual(price)).take(1);
+        }
+    }
+
     // ===========================================================
     // Position Management
     // ===========================================================

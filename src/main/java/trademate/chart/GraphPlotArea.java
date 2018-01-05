@@ -34,14 +34,17 @@ import javafx.scene.shape.StrokeLineJoin;
 
 import org.eclipse.collections.api.list.primitive.DoubleList;
 
+import cointoss.Market;
 import cointoss.chart.Tick;
 import cointoss.util.Num;
+import kiss.I;
+import trademate.Notificator;
 import trademate.chart.shape.Candle;
 import trademate.chart.shape.GraphShape;
 import viewtify.ui.UILine;
 
 /**
- * @version 2017/09/27 21:49:33
+ * @version 2018/01/05 20:35:03
  */
 public class GraphPlotArea extends Region {
 
@@ -51,23 +54,17 @@ public class GraphPlotArea extends Region {
     /** The visibility of vertical grid line. */
     public final BooleanProperty verticalGridLineVisibility = new SimpleBooleanProperty(this, "verticalGridLineVisibility", true);
 
-    /** The visibility of horizontal grid line. */
-    public final BooleanProperty horizontalMinorGridLineVisibility = new SimpleBooleanProperty(this, "horizontalMinorGridLinesVisible", false);
-
-    /** The visibility of vertical grid line. */
-    public final BooleanProperty verticalMinorGridLineVisibility = new SimpleBooleanProperty(this, "verticalMinorGridLineVisibility", false);
-
-    /** The background color setting. */
-    public final BooleanProperty alternativeRowFillVisible = new SimpleBooleanProperty(this, "alternativeRowFillVisible", true);
-
-    /** The background color setting. */
-    public final BooleanProperty alternativeColumnFillVisible = new SimpleBooleanProperty(this, "alternativeColumnFillVisible", true);
-
     /** The horizontal axis. */
     final ObjectProperty<Axis> axisX = new SimpleObjectProperty<>(this, "axisX", null);
 
     /** The vertical axis. */
     final ObjectProperty<Axis> axisY = new SimpleObjectProperty<>(this, "axisY", null);
+
+    /** The current market. */
+    private final Market market;
+
+    /** The notificator. */
+    private final Notificator notificator = I.make(Notificator.class);
 
     /** The validity flag of plotting. */
     private boolean plotValidate = false;
@@ -118,22 +115,17 @@ public class GraphPlotArea extends Region {
 
     private final Path horizontalGridLines = new Path();
 
-    private final Path verticalMinorGridLines = new Path();
-
-    private final Path horizontalMinorGridLines = new Path();
-
-    private final Path verticalRowFill = new Path();
-
-    private final Path horizontalRowFill = new Path();
-
     /** The line chart color manager. */
     private final BitSet lineColorManager = new BitSet(8);
 
     /** The mouse tracking ui. */
-    private final UILine mouseTrackV = new UILine().style("mouse-track-line").startX(-10).startY(0).endX(-10).endY(heightProperty());
+    private final UILine mouseTrackV = new UILine().style(ChartClass.MouseTrackLine).startX(-10).startY(0).endX(-10).endY(heightProperty());
 
     /** The mouse tracking ui. */
-    private final UILine mouseTrackH = new UILine().style("mouse-track-line").startX(0).startY(-10).endX(widthProperty()).endY(-10);
+    private final UILine mouseTrackH = new UILine().style(ChartClass.MouseTrackLine).startX(0).startY(-10).endX(widthProperty()).endY(-10);
+
+    /** The price signal ui. */
+    private final UILine priceSignal = new UILine().style(ChartClass.PriceSignalLine).startX(0).startY(-10).endX(widthProperty()).endY(-10);
 
     /** The line chart data list. */
     private ObservableList<Tick> candleChartData;
@@ -157,7 +149,9 @@ public class GraphPlotArea extends Region {
     /**
      * 
      */
-    public GraphPlotArea() {
+    public GraphPlotArea(Market market) {
+        this.market = market;
+
         getStyleClass().setAll("chart-plot-background");
         axisX.addListener(axisListener);
         widthProperty().addListener(plotValidateListener);
@@ -167,15 +161,12 @@ public class GraphPlotArea extends Region {
         setClip(clip);
 
         provideMouseTracker();
+        providePriceSignal();
 
-        verticalRowFill.getStyleClass().setAll("chart-alternative-column-fill");
-        horizontalRowFill.getStyleClass().setAll("chart-alternative-row-fill");
         verticalGridLines.getStyleClass().setAll("chart-vertical-grid-line");
-        verticalMinorGridLines.getStyleClass().setAll("chart-vertical-grid-line", "chart-vertical-minor-grid-line");
         horizontalGridLines.getStyleClass().setAll("chart-horizontal-grid-line");
-        horizontalMinorGridLines.getStyleClass().setAll("chart-horizontal-grid-lines", "chart-horizontal-minor-grid-line");
         getChildren()
-                .addAll(verticalRowFill, horizontalRowFill, verticalMinorGridLines, horizontalMinorGridLines, verticalGridLines, horizontalGridLines, mouseTrackV.ui, mouseTrackH.ui, background, userBackround, candles, lines, foreground, userForeground);
+                .addAll(verticalGridLines, horizontalGridLines, priceSignal.ui, mouseTrackV.ui, mouseTrackH.ui, background, userBackround, candles, lines, foreground, userForeground);
     }
 
     /**
@@ -201,7 +192,23 @@ public class GraphPlotArea extends Region {
             axisX.get().indicateAt(-10);
             axisY.get().indicateAt(-10);
         });
+    }
 
+    /**
+     * Provide price signal.
+     */
+    private void providePriceSignal() {
+        setOnContextMenuRequested(e -> {
+            System.out.println("Add signal");
+            double y = e.getY();
+            Num price = Num.of(Math.floor(axisY.get().getValueForPosition(y)));
+
+            priceSignal.startY(y).endY(y);
+
+            // market.signalByPrice(price).to(exe -> {
+            // notificator.priceSignal.notify("Rearch to " + price);
+            // });
+        });
     }
 
     /**
@@ -287,29 +294,22 @@ public class GraphPlotArea extends Region {
         graphshapeValidate = true;
     }
 
+    /**
+     * Draw background lines.
+     */
     public void drawBackGroundLine() {
-        final Axis xaxis = axisX.get();
-        final Axis yaxis = axisY.get();
+        Axis axisX = this.axisX.get();
+        Axis axisY = this.axisY.get();
+        double width = getWidth();
+        double height = getHeight();
 
-        if (xaxis == null || yaxis == null) {
-            plotValidate = true;
-            return;
-        }
-
-        final double w = getWidth(), h = getHeight();
-        // 背景の線を描画
-
-        V: {
-            final Axis axis = xaxis;
-            DoubleList vTicks = axis.ticks;
+        verrical: {
+            DoubleList vTicks = axisX.ticks;
             final ObservableList<PathElement> lele = verticalGridLines.getElements();
-            final ObservableList<PathElement> fele = verticalRowFill.getElements();
             int lelesize = lele.size();
-            final int felesize = fele.size();
-            final boolean fill = alternativeColumnFillVisible.get();
             final boolean line = verticalGridLineVisibility.get();
             verticalGridLines.setVisible(line);
-            verticalRowFill.setVisible(fill);
+
             final int e = vTicks.size();
             if (!line) {
                 lele.clear();
@@ -317,14 +317,11 @@ public class GraphPlotArea extends Region {
                 lele.remove(e * 2, lelesize);
                 lelesize = e * 2;
             }
-            if (!fill) {
-                fele.clear();
-            }
-            int findex = 0;
 
-            if (!line && !fill) {
-                break V;
+            if (!line) {
+                break verrical;
             }
+
             for (int i = 0; i < e; i++) {
                 final double d = vTicks.get(i);
                 if (line) {
@@ -341,25 +338,18 @@ public class GraphPlotArea extends Region {
                     mt.setX(d);
                     mt.setY(0);
                     lt.setX(d);
-                    lt.setY(h);
+                    lt.setY(height);
                 }
-            } // end for
-            if (findex < felesize) {
-                fele.remove(findex, felesize);
             }
-        } // end V
+        }
 
-        H: {
-            final Axis axis = yaxis;
-            DoubleList hTicks = axis.ticks;
+        horizontal: {
+            DoubleList hTicks = axisY.ticks;
             final ObservableList<PathElement> lele = horizontalGridLines.getElements();
-            final ObservableList<PathElement> fele = horizontalRowFill.getElements();
             int lelesize = lele.size();
-            final int felesize = fele.size();
-            final boolean fill = alternativeRowFillVisible.get();
             final boolean line = horizontalGridLineVisibility.get();
             horizontalGridLines.setVisible(line);
-            horizontalRowFill.setVisible(fill);
+
             final int e = hTicks.size();
             if (!line) {
                 lele.clear();
@@ -367,12 +357,9 @@ public class GraphPlotArea extends Region {
                 lele.remove(e * 2, lelesize);
                 lelesize = e * 2;
             }
-            if (!fill) {
-                fele.clear();
-            }
-            int findex = 0;
-            if (!line && !fill) {
-                break H;
+
+            if (!line) {
+                break horizontal;
             }
             for (int i = 0; i < e; i++) {
                 final double d = hTicks.get(i);
@@ -389,14 +376,11 @@ public class GraphPlotArea extends Region {
                     }
                     mt.setX(0);
                     mt.setY(d);
-                    lt.setX(w);
+                    lt.setX(width);
                     lt.setY(d);
                 }
-            } // end for
-            if (findex < felesize) {
-                fele.remove(findex, felesize);
             }
-        } // end H
+        }
     }
 
     /**

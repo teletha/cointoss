@@ -35,6 +35,8 @@ public class SettingView extends View {
 
     private @UI NotificationSetting orderFailed;
 
+    private @UI NotificationSetting priceSignal;
+
     /**
      * {@inheritDoc}
      */
@@ -44,6 +46,7 @@ public class SettingView extends View {
         shortTrend.type = notificator.shortTrend;
         execution.type = notificator.execution;
         orderFailed.type = notificator.orderFailed;
+        priceSignal.type = notificator.priceSignal;
     }
 
     /**

@@ -87,7 +87,12 @@
 	-fx-fill: -fx-mid-text-color;
 }
 
-.mouse-track-line {
+.MouseTrackLine {
 	-fx-stroke-width: 0.5;
 	-fx-stroke: rgb(50, 50, 50);
+}
+
+.PriceSignalLine {
+	-fx-stroke-width: 0.5;
+	-fx-stroke: rgb(93, 50, 50);
 }
