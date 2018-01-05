@@ -186,10 +186,10 @@ public abstract class Axis extends Region {
     private final Group lines = new Group();
 
     /** UI widget. */
-    private final Group tickLabels = new Group();
+    private final Path tickPath = new Path();
 
     /** UI widget. */
-    private final Path tickPath = new Path();
+    private final Group tickLabels = new Group();
 
     /** UI widget. */
     private final Line baseLine = new Line();
@@ -390,7 +390,7 @@ public abstract class Axis extends Region {
             }
             a.setManaged(true);
             // 位置を合わせる
-            final Node n = a.getNode();
+            final Node n = a.node;
             n.setLayoutX(0);
             n.setLayoutY(0);
             final Bounds bounds = n.getBoundsInParent();
@@ -432,7 +432,7 @@ public abstract class Axis extends Region {
             // TODO 本当に重なっている領域で判定するようにしたい
             Bounds base = null;
             if (firstIndex != -1) {
-                base = labels.get(firstIndex).getNode().getBoundsInParent();
+                base = labels.get(firstIndex).node.getBoundsInParent();
             }
             final int end = k == 0 ? -1 : labels.size();
             int i = k == 0 ? firstIndex - 1 : firstIndex + 1;
@@ -443,16 +443,15 @@ public abstract class Axis extends Region {
 
             for (; i != end; i += add) {
                 final AxisLabel a = labels.get(i);
-                final Node n = a.getNode();
-                final Bounds bounds = n.getBoundsInParent();
+                final Bounds bounds = a.node.getBoundsInParent();
                 if (base == null) {
-                    n.setVisible(true);
+                    a.node.setVisible(true);
                     a.setBeforeVisible(true);
                     base = bounds;
                 } else {
                     final boolean visible = !base.intersects(bounds);
                     a.setBeforeVisible(visible);
-                    n.setVisible(visible);
+                    a.node.setVisible(visible);
                     if (visible) {
                         base = bounds;
                     }
@@ -653,13 +652,13 @@ public abstract class Axis extends Region {
                 final ObservableList<Node> list = tickLabels.getChildren();
                 while (c.next()) {
                     for (final AxisLabel a1 : c.getRemoved()) {
-                        list.remove(a1.getNode());
+                        list.remove(a1.node);
                         a1.setManaged(false);
-                        a1.getNode().rotateProperty().unbind();
+                        a1.node.rotateProperty().unbind();
                     }
                     for (final AxisLabel a2 : c.getAddedSubList()) {
-                        list.add(a2.getNode());
-                        a2.getNode().setVisible(false);
+                        list.add(a2.node);
+                        a2.node.setVisible(false);
                     }
                 }
             });
@@ -672,25 +671,17 @@ public abstract class Axis extends Region {
      */
     protected static class AxisLabel {
 
-        private Node node;
+        protected Node node;
 
         private boolean managed = false;
 
         private boolean beforeVisible = true;
 
-        public Node getNode() {
-            return node;
-        }
-
-        public void setNode(final Node node) {
-            this.node = node;
-        }
-
         private boolean isManaged() {
             return managed;
         }
 
-        private void setManaged(final boolean b) {
+        private void setManaged(boolean b) {
             managed = true;
         }
 
@@ -698,14 +689,14 @@ public abstract class Axis extends Region {
             return beforeVisible;
         }
 
-        private void setBeforeVisible(final boolean b) {
+        private void setBeforeVisible(boolean b) {
             beforeVisible = b;
         }
 
         private double id;
 
         /** 文字列等の比較以外で同値性を確認するための数値を設定する */
-        public void setID(final double id) {
+        public void setID(double id) {
             this.id = id;
         }
 
@@ -715,7 +706,7 @@ public abstract class Axis extends Region {
         }
 
         /** 設定されているIDと等しいか調べる */
-        public boolean match(final double id) {
+        public boolean match(double id) {
             return this.id == id;
         }
     }

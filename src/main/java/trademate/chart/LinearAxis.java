@@ -117,7 +117,6 @@ public class LinearAxis extends Axis {
         final double upValue = computeUpperValue(lowValue);
         final double uiFullLength = getAxisLength(width, height);
         if (lowValue == upValue || lowValue != lowValue || upValue != upValue || uiFullLength <= 0) {
-            noData(width, height);
             return;
         }
 
@@ -155,9 +154,9 @@ public class LinearAxis extends Axis {
         int actualVisibleMajorTickCount = (int) (ceil((upValue - visibleStartUnitBasedValue) / nextUnitSize));
 
         if (actualVisibleMajorTickCount <= 0 || 2000 < actualVisibleMajorTickCount) {
-            noData(width, height);
             return;
         }
+
         this.uiRatio = uiRatio;
 
         boolean isH = isHorizontal();
@@ -193,7 +192,7 @@ public class LinearAxis extends Axis {
                     a.setID(value);
                     Text text = new Text(tickLabelFormatter.get().apply(value));
                     text.getStyleClass().add("tick-label");
-                    a.setNode(text);
+                    a.node = text;
                     labelList.add(a);
                 }
             }
@@ -208,25 +207,5 @@ public class LinearAxis extends Axis {
                 labels.add(i, axisLabel);
             }
         }
-    }
-
-    protected void noData(final double width, final double height) {
-        unitIndex = -1;
-        lowVal = 0;
-        visualMaxValue.set(1);
-        final double len = getAxisLength(width, height);
-        uiRatio = len;
-        ticks.add(0d);
-        ticks.add(getAxisLength(width, height));
-        final ObservableList<AxisLabel> labels = getLabels();
-        labels.clear();
-        AxisLabel l = new AxisLabel();
-        l.setID(Double.NaN);
-        l.setNode(new Text("1"));
-        labels.add(l);
-        l = new AxisLabel();
-        l.setID(Double.NaN);
-        l.setNode(new Text("0"));
-        labels.add(l);
     }
 }
