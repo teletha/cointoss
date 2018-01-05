@@ -297,88 +297,85 @@ public class GraphPlotArea extends Region {
     /**
      * Draw background lines.
      */
-    public void drawBackGroundLine() {
+    private void drawBackGroundLine() {
         Axis axisX = this.axisX.get();
         Axis axisY = this.axisY.get();
         double width = getWidth();
         double height = getHeight();
 
-        verrical: {
-            DoubleList vTicks = axisX.ticks;
-            final ObservableList<PathElement> lele = verticalGridLines.getElements();
-            int lelesize = lele.size();
-            final boolean line = verticalGridLineVisibility.get();
-            verticalGridLines.setVisible(line);
+        // vertical lines
+        vertical: {
+            DoubleList ticks = axisX.ticks;
+            boolean visible = verticalGridLineVisibility.get();
+            ObservableList<PathElement> paths = verticalGridLines.getElements();
+            int pathSize = paths.size();
+            int tickSize = ticks.size();
 
-            final int e = vTicks.size();
-            if (!line) {
-                lele.clear();
-            } else if (lelesize > e * 2) {
-                lele.remove(e * 2, lelesize);
-                lelesize = e * 2;
+            // update visibility
+            verticalGridLines.setVisible(visible);
+
+            if (!visible) {
+                paths.clear();
+                break vertical;
+            } else if (pathSize > tickSize * 2) {
+                paths.remove(tickSize * 2, pathSize);
+                pathSize = tickSize * 2;
             }
 
-            if (!line) {
-                break verrical;
-            }
-
-            for (int i = 0; i < e; i++) {
-                final double d = vTicks.get(i);
-                if (line) {
-                    MoveTo mt;
-                    LineTo lt;
-                    if (i * 2 < lelesize) {
-                        mt = (MoveTo) lele.get(i * 2);
-                        lt = (LineTo) lele.get(i * 2 + 1);
-                    } else {
-                        mt = new MoveTo();
-                        lt = new LineTo();
-                        lele.addAll(mt, lt);
-                    }
-                    mt.setX(d);
-                    mt.setY(0);
-                    lt.setX(d);
-                    lt.setY(height);
+            for (int i = 0; i < tickSize; i++) {
+                double d = ticks.get(i);
+                MoveTo mt;
+                LineTo lt;
+                if (i * 2 < pathSize) {
+                    mt = (MoveTo) paths.get(i * 2);
+                    lt = (LineTo) paths.get(i * 2 + 1);
+                } else {
+                    mt = new MoveTo();
+                    lt = new LineTo();
+                    paths.addAll(mt, lt);
                 }
+                mt.setX(d);
+                mt.setY(0);
+                lt.setX(d);
+                lt.setY(height);
             }
         }
 
+        // horizontal lines
         horizontal: {
-            DoubleList hTicks = axisY.ticks;
-            final ObservableList<PathElement> lele = horizontalGridLines.getElements();
-            int lelesize = lele.size();
-            final boolean line = horizontalGridLineVisibility.get();
-            horizontalGridLines.setVisible(line);
+            DoubleList ticks = axisY.ticks;
+            boolean visible = horizontalGridLineVisibility.get();
+            ObservableList<PathElement> paths = horizontalGridLines.getElements();
+            int pathSize = paths.size();
+            int tickSize = ticks.size();
 
-            final int e = hTicks.size();
-            if (!line) {
-                lele.clear();
-            } else if (lelesize > e * 2) {
-                lele.remove(e * 2, lelesize);
-                lelesize = e * 2;
-            }
+            // update visibility
+            horizontalGridLines.setVisible(visible);
 
-            if (!line) {
+            if (!visible) {
+                paths.clear();
                 break horizontal;
+            } else if (pathSize > tickSize * 2) {
+                paths.remove(tickSize * 2, pathSize);
+                pathSize = tickSize * 2;
             }
-            for (int i = 0; i < e; i++) {
-                final double d = hTicks.get(i);
-                if (line) {
-                    MoveTo mt;
-                    LineTo lt;
-                    if (i * 2 < lelesize) {
-                        mt = (MoveTo) lele.get(i * 2);
-                        lt = (LineTo) lele.get(i * 2 + 1);
-                    } else {
-                        mt = new MoveTo();
-                        lt = new LineTo();
-                        lele.addAll(mt, lt);
-                    }
-                    mt.setX(0);
-                    mt.setY(d);
-                    lt.setX(width);
-                    lt.setY(d);
+
+            for (int i = 0; i < tickSize; i++) {
+                double d = ticks.get(i);
+                MoveTo mt;
+                LineTo lt;
+                if (i * 2 < pathSize) {
+                    mt = (MoveTo) paths.get(i * 2);
+                    lt = (LineTo) paths.get(i * 2 + 1);
+                } else {
+                    mt = new MoveTo();
+                    lt = new LineTo();
+                    paths.addAll(mt, lt);
                 }
+                mt.setX(0);
+                mt.setY(d);
+                lt.setX(width);
+                lt.setY(d);
             }
         }
     }
