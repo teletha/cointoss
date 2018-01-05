@@ -180,7 +180,7 @@ public class LinearAxis extends Axis {
                 boolean find = false;
                 for (int t = 0, lsize = unused.size(); t < lsize; t++) {
                     AxisLabel a = unused.get(t);
-                    if (a.match(value)) {
+                    if (a.id == value) {
                         labelList.add(a);
                         unused.remove(t);
                         find = true;
@@ -189,7 +189,7 @@ public class LinearAxis extends Axis {
                 }
                 if (!find) {
                     AxisLabel a = new AxisLabel();
-                    a.setID(value);
+                    a.id = value;
                     Text text = new Text(tickLabelFormatter.get().apply(value));
                     text.getStyleClass().add("tick-label");
                     a.node = text;

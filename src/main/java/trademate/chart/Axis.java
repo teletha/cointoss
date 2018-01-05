@@ -385,10 +385,10 @@ public abstract class Axis extends Region {
         for (int i = 0, e = ticks.size(); i < e; i++) {
             final AxisLabel a = labels.get(i);
             final double d = ticks.get(i);
-            if (firstIndex == -1 && a.isManaged() && a.isBeforeVisible()) {
+            if (firstIndex == -1 && a.managed && a.beforeVisible) {
                 firstIndex = i;
             }
-            a.setManaged(true);
+            a.managed = true;
             // 位置を合わせる
             final Node n = a.node;
             n.setLayoutX(0);
@@ -446,11 +446,11 @@ public abstract class Axis extends Region {
                 final Bounds bounds = a.node.getBoundsInParent();
                 if (base == null) {
                     a.node.setVisible(true);
-                    a.setBeforeVisible(true);
+                    a.beforeVisible = true;
                     base = bounds;
                 } else {
                     final boolean visible = !base.intersects(bounds);
-                    a.setBeforeVisible(visible);
+                    a.beforeVisible = visible;
                     a.node.setVisible(visible);
                     if (visible) {
                         base = bounds;
@@ -653,7 +653,7 @@ public abstract class Axis extends Region {
                 while (c.next()) {
                     for (final AxisLabel a1 : c.getRemoved()) {
                         list.remove(a1.node);
-                        a1.setManaged(false);
+                        a1.managed = false;
                         a1.node.rotateProperty().unbind();
                     }
                     for (final AxisLabel a2 : c.getAddedSubList()) {
@@ -671,44 +671,13 @@ public abstract class Axis extends Region {
      */
     protected static class AxisLabel {
 
+        /** 文字列等の比較以外で同値性を確認するための数値を得る */
+        protected double id;
+
         protected Node node;
 
         private boolean managed = false;
 
         private boolean beforeVisible = true;
-
-        private boolean isManaged() {
-            return managed;
-        }
-
-        private void setManaged(boolean b) {
-            managed = true;
-        }
-
-        private boolean isBeforeVisible() {
-            return beforeVisible;
-        }
-
-        private void setBeforeVisible(boolean b) {
-            beforeVisible = b;
-        }
-
-        private double id;
-
-        /** 文字列等の比較以外で同値性を確認するための数値を設定する */
-        public void setID(double id) {
-            this.id = id;
-        }
-
-        /** 文字列等の比較以外で同値性を確認するための数値を得る */
-        public double getID() {
-            return id;
-        }
-
-        /** 設定されているIDと等しいか調べる */
-        public boolean match(double id) {
-            return this.id == id;
-        }
     }
-
 }
