@@ -42,6 +42,13 @@ public class LinearAxis extends Axis {
     public final ObjectProperty<double[]> units = new SimpleObjectProperty(this, "units", TickUnit);
 
     /**
+     * @param tickLength
+     */
+    public LinearAxis(int tickLength) {
+        super(tickLength);
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override

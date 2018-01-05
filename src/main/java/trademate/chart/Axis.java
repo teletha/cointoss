@@ -146,8 +146,8 @@ public abstract class Axis extends Region {
     /** スクロールバーの表示位置のプロパティ。縦方向の場合、1からこの値を引いた値を利用する。 -1の時、非表示となる。 bindする際にはbindBidirectionalを用いること */
     public final DoubleProperty scrollBarValue = new SimpleDoubleProperty(this, "scrollBarPosition", -1);
 
-    /** The visual length of major tick. */
-    public final DoubleProperty tickLength = new SimpleDoubleProperty(this, "MajorTickLength", 8);
+    /** The visual length of tick. */
+    public final int tickLength;
 
     /** The visual distance between tick and label. */
     public final DoubleProperty tickLabelDistance = new SimpleDoubleProperty(this, "tickLabelGap", 10);
@@ -200,7 +200,9 @@ public abstract class Axis extends Region {
     /**
      * 
      */
-    public Axis() {
+    public Axis(int tickLength) {
+        this.tickLength = tickLength;
+
         // ====================================================
         // Initialize Property
         // ====================================================
@@ -213,7 +215,6 @@ public abstract class Axis extends Region {
         visibleRange.addListener(dataValidateListener);
         scrollBarSize.addListener(scrollValueValidator);
         scrollBarValue.addListener(scrollValueValidator);
-        tickLength.addListener(layoutValidator);
         tickLabelDistance.addListener(layoutValidator);
 
         // ====================================================
@@ -315,10 +316,9 @@ public abstract class Axis extends Region {
             // force to re-layout
             layoutChildren(lastLayoutWidth, height);
 
-            double tick = tickLength.get();
             double scrollBar = scroll.isVisible() ? scroll.getWidth() : 0;
             double labels = max(tickLabels.prefWidth(height), 10);
-            return tick + scrollBar + labels;
+            return tickLength + scrollBar + labels;
         }
     }
 
@@ -333,10 +333,9 @@ public abstract class Axis extends Region {
             // force to re-layout
             layoutChildren(width, lastLayoutHeight);
 
-            double tick = tickLength.get();
             double scrollBar = scroll.isVisible() ? scroll.getHeight() : 0;
             double labels = max(tickLabels.prefHeight(width), 10);
-            return tick + scrollBar + labels;
+            return tickLength + scrollBar + labels;
         }
     }
 
@@ -528,7 +527,6 @@ public abstract class Axis extends Region {
         baseLine.setEndX(ish ? l : 0);
         baseLine.setEndY(ish ? 0 : l);
 
-        final double al = tickLength.get();
         final Side s = side.get();
         final int k = ish ? s != Side.TOP ? 1 : -1 : s != Side.RIGHT ? -1 : 1;
 
@@ -555,10 +553,10 @@ public abstract class Axis extends Region {
             if (ish) {
                 x1 = x2 = d;
                 y1 = 0;
-                y2 = al * k;
+                y2 = tickLength * k;
             } else {
                 x1 = 0;
-                x2 = al * k;
+                x2 = tickLength * k;
                 y1 = y2 = d;
             }
             mt.setX(x1);
