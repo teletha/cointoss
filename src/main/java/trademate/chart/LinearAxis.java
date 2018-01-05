@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
+import javafx.geometry.Side;
 import javafx.scene.text.Text;
 
 import org.eclipse.collections.api.block.function.primitive.DoubleToObjectFunction;
@@ -50,9 +51,10 @@ public class LinearAxis extends Axis {
     /**
      * @param tickLength
      * @param tickLabelDistance
+     * @param side
      */
-    public LinearAxis(int tickLength, int tickLabelDistance) {
-        super(tickLength, tickLabelDistance);
+    public LinearAxis(int tickLength, int tickLabelDistance, Side side) {
+        super(tickLength, tickLabelDistance, side);
     }
 
     /**

@@ -166,16 +166,7 @@ public class GraphPlotArea extends Region {
         clip.heightProperty().bind(heightProperty());
         setClip(clip);
 
-        setOnMouseMoved(e -> {
-            double x = e.getX();
-            double y = e.getY();
-            mouseTrackV.startX(x).endX(x);
-            mouseTrackH.startY(y).endY(y);
-        });
-        setOnMouseExited(e -> {
-            mouseTrackV.startX(-10).endX(-10);
-            mouseTrackH.startY(-10).endY(-10);
-        });
+        setupMouseTrackEffect();
 
         verticalRowFill.getStyleClass().setAll("chart-alternative-column-fill");
         horizontalRowFill.getStyleClass().setAll("chart-alternative-row-fill");
@@ -185,6 +176,29 @@ public class GraphPlotArea extends Region {
         horizontalMinorGridLines.getStyleClass().setAll("chart-horizontal-grid-lines", "chart-horizontal-minor-grid-line");
         getChildren()
                 .addAll(verticalRowFill, horizontalRowFill, verticalMinorGridLines, horizontalMinorGridLines, verticalGridLines, horizontalGridLines, mouseTrackV.ui, mouseTrackH.ui, background, userBackround, candles, lines, foreground, userForeground);
+    }
+
+    /**
+     * Setup.
+     */
+    private void setupMouseTrackEffect() {
+        // track on move
+        setOnMouseMoved(e -> {
+            double x = e.getX();
+            double y = e.getY();
+            mouseTrackV.startX(x).endX(x);
+            mouseTrackH.startY(y).endY(y);
+
+            axisX.get().indicateAt(x);
+            axisY.get().indicateAt(y);
+        });
+
+        // remove on exit
+        setOnMouseExited(e -> {
+            mouseTrackV.startX(-10).endX(-10);
+            mouseTrackH.startY(-10).endY(-10);
+        });
+
     }
 
     /**

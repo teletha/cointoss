@@ -24,7 +24,6 @@ import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
 import javafx.geometry.Insets;
-import javafx.geometry.Orientation;
 import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
 import javafx.geometry.Side;
@@ -48,10 +47,10 @@ public class CandleChart extends Region {
     public final ObservableList<Tick> candles;
 
     /** The x-axis UI. */
-    public final LinearAxis axisX = new LinearAxis(5, 6);
+    public final LinearAxis axisX = new LinearAxis(5, 6, Side.BOTTOM);
 
     /** The y-axis UI. */
-    public final LinearAxis axisY = new LinearAxis(5, 6);
+    public final LinearAxis axisY = new LinearAxis(5, 6, Side.RIGHT);
 
     /** The actual graph drawer. */
     public final GraphPlotArea graph = new GraphPlotArea();
@@ -260,7 +259,7 @@ public class CandleChart extends Region {
             if (xAxis != null) {
                 final double xh = xAxis.prefHeight(ww);
                 xAxis.resize(ww, xh);
-                if (isBottom(xAxis.side.get())) {
+                if (isBottom(xAxis.side)) {
                     xAxis.relocate(bounds.getMinX(), bounds.getMaxY());
                 } else {
                     xAxis.relocate(bounds.getMinX(), bounds.getMinY() - xh);
@@ -269,7 +268,7 @@ public class CandleChart extends Region {
             if (yAxis != null) {
                 final double yw = yAxis.prefWidth(hh);
                 yAxis.resize(yw, hh);
-                if (isLeft(yAxis.side.get())) {
+                if (isLeft(yAxis.side)) {
                     yAxis.relocate(bounds.getMinX() - yw, bounds.getMinY());
                 } else {
                     yAxis.relocate(bounds.getMaxX(), bounds.getMinY());
@@ -294,16 +293,7 @@ public class CandleChart extends Region {
         } else {
             graph.setVisible(true);
             final Axis xAxis = axisX;
-            xAxis.orientation.set(Orientation.HORIZONTAL);
-            if (xAxis.side.get().isVertical()) {
-                xAxis.side.set(Side.BOTTOM);
-            }
-
             final Axis yAxis = axisY;
-            yAxis.orientation.set(Orientation.VERTICAL);
-            if (yAxis.side.get().isHorizontal()) {
-                yAxis.side.set(Side.LEFT);
-            }
             double graphWidth, graphHeight;
             double xAxisHeight, yAxisWidth;
             if (xAxis.isVisible() && yAxis.isVisible()) {
@@ -356,8 +346,8 @@ public class CandleChart extends Region {
             yAxis.resize(yAxisWidth, graphHeight);
             xAxis.layout();
             yAxis.layout();
-            final boolean isLeft = yAxis.side.get() != Side.RIGHT;
-            final boolean isBottom = xAxis.side.get() != Side.TOP;
+            final boolean isLeft = yAxis.side != Side.RIGHT;
+            final boolean isBottom = xAxis.side != Side.TOP;
             final double x = yAxis.isVisible() && isLeft ? yAxisWidth : 0, y = !xAxis.isVisible() || isBottom ? 0 : xAxisHeight;
             if (xAxis.isVisible()) {
                 if (isBottom) {

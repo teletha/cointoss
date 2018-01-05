@@ -19,12 +19,10 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyDoubleWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -36,6 +34,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.ScrollBar;
 import javafx.scene.layout.Region;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
@@ -44,6 +43,8 @@ import javafx.scene.shape.PathElement;
 
 import org.eclipse.collections.api.list.primitive.MutableDoubleList;
 import org.eclipse.collections.impl.factory.primitive.DoubleLists;
+
+import viewtify.ui.UILine;
 
 /**
  * @version 2017/09/27 13:44:10
@@ -61,24 +62,8 @@ public abstract class Axis extends Region {
 
     private double lastLayoutWidth = -1, lastLayoutHeight = -1;
 
-    /** The visual placement direction. */
-    public final ObjectProperty<Orientation> orientation = new SimpleObjectProperty<Orientation>(this, "orientation", Orientation.HORIZONTAL) {
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void set(final Orientation newValue) {
-            if (newValue == null) {
-                return;
-            }
-            super.set(newValue);
-        }
-    };
-
     /** The visual placement position. */
-    public final ObjectProperty<Side> side = new SimpleObjectProperty<>(this, "side", orientation.get() != Orientation.VERTICAL
-            ? Side.BOTTOM
-            : Side.LEFT);
+    public final Side side;
 
     /** レイアウトを構成すべき情報に対して付加すべきリスナ */
     private final InvalidationListener layoutValidator = observable -> {
@@ -91,12 +76,12 @@ public abstract class Axis extends Region {
     /** Axisの構成情報を書き換えるべきデータに対して付加するリスナ */
     private final InvalidationListener dataValidateListener = observable -> {
         if (widthProperty() == observable) {
-            if (orientation.get() != Orientation.HORIZONTAL || getWidth() == lastLayoutWidth) {
+            if (isVertical() || getWidth() == lastLayoutWidth) {
                 return;
             }
         }
         if (heightProperty() == observable) {
-            if (orientation.get() != Orientation.VERTICAL || getHeight() == lastLayoutHeight) {
+            if (isHorizontal() || getHeight() == lastLayoutHeight) {
                 return;
             }
         }
@@ -196,6 +181,8 @@ public abstract class Axis extends Region {
     /** UI widget. */
     private final Group tickLabels = new Group();
 
+    private final UILine indicatorPath = new UILine().stroke(Color.RED).strokeWidth(2).startX(10).startY(0).endX(10).endY(10);
+
     /** UI widget. */
     private final Line baseLine = new Line();
 
@@ -205,16 +192,16 @@ public abstract class Axis extends Region {
     /**
      * 
      */
-    public Axis(int tickLength, int tickLabelDistance) {
+    public Axis(int tickLength, int tickLabelDistance, Side side) {
         this.tickLength = tickLength;
         this.tickLabelDistance = tickLabelDistance;
+        this.side = side;
 
         // ====================================================
         // Initialize Property
         // ====================================================
         widthProperty().addListener(dataValidateListener);
         heightProperty().addListener(dataValidateListener);
-        orientation.addListener(dataValidateListener);
         tickNumber.addListener(dataValidateListener);
         logicalMaxValue.addListener(dataValidateListener);
         logicalMinValue.addListener(dataValidateListener);
@@ -231,11 +218,11 @@ public abstract class Axis extends Region {
         baseLine.getStyleClass().setAll("axis-line");
 
         lines.setAutoSizeChildren(false);
-        lines.getChildren().addAll(tickPath, baseLine);
+        lines.getChildren().addAll(tickPath, indicatorPath.ui, baseLine);
 
         tickLabels.setAutoSizeChildren(false);
 
-        scroll.orientationProperty().bind(orientation);
+        scroll.setOrientation(isHorizontal() ? Orientation.HORIZONTAL : Orientation.VERTICAL);
         scroll.visibleProperty().bind(Bindings.createBooleanBinding(() -> scrollBarVisibility
                 .get() && scrollBarValue.get() != -1 && scrollBarSize.get() != 1, scrollBarValue, scrollBarVisibility, scrollBarSize));
         scroll.visibleProperty().addListener(layoutValidator);
@@ -245,7 +232,7 @@ public abstract class Axis extends Region {
         scroll.visibleAmountProperty().bind(scrollBarSize);
 
         if (scrollBarValue.get() != -1 && scrollBarSize.get() != 1) {
-            scroll.setValue(orientation.get() != Orientation.VERTICAL ? scrollBarValue.get() : 1 - scrollBarValue.get());
+            scroll.setValue(isHorizontal() ? scrollBarValue.get() : 1 - scrollBarValue.get());
         }
         getChildren().addAll(lines, tickLabels, scroll);
     }
@@ -286,7 +273,7 @@ public abstract class Axis extends Region {
      * @return
      */
     public final boolean isHorizontal() {
-        return orientation.get() == Orientation.HORIZONTAL;
+        return side.isHorizontal();
     }
 
     /**
@@ -295,7 +282,7 @@ public abstract class Axis extends Region {
      * @return
      */
     public final boolean isVertical() {
-        return orientation.get() == Orientation.VERTICAL;
+        return side.isVertical();
     }
 
     /**
@@ -377,16 +364,6 @@ public abstract class Axis extends Region {
         final double l = getAxisLength(width, height);
         final boolean isH = isHorizontal();
         int firstIndex = -1;// 重なりを検出する基準位置
-        Side s = side.get();
-        if (isH) {
-            if (s.isVertical()) {
-                s = Side.BOTTOM;
-            }
-        } else {
-            if (s.isHorizontal()) {
-                s = Side.LEFT;
-            }
-        }
 
         for (int i = 0, e = ticks.size(); i < e; i++) {
             final AxisLabel a = labels.get(i);
@@ -403,7 +380,7 @@ public abstract class Axis extends Region {
             if (isH) {
                 final double cx = (bounds.getMinX() + bounds.getMaxX()) * 0.5;
                 n.setLayoutX(d - cx);
-                if (s == Side.BOTTOM) {
+                if (side == Side.BOTTOM) {
                     // 上を合わす
                     final double bottom = bounds.getMinY();
                     n.setLayoutY(-bottom);
@@ -415,7 +392,7 @@ public abstract class Axis extends Region {
             } else {
                 final double cy = (bounds.getMinY() + bounds.getMaxY()) * 0.5;
                 n.setLayoutY(d - cy);
-                if (s == Side.LEFT) {
+                if (side == Side.LEFT) {
                     // 右端を合わす
                     final double right = bounds.getMaxX();
                     n.setLayoutX(-right);
@@ -466,20 +443,30 @@ public abstract class Axis extends Region {
         }
     }
 
-    private void layoutGroups(final double width, final double height) {
-        boolean ish = isHorizontal();
-        if (ish) {
-            if (side.get() != Side.TOP) {// BOTTOM
-                double y = 0;
+    /**
+     * Layout.
+     * 
+     * @param width
+     * @param height
+     */
+    private void layoutGroups(double width, double height) {
+        if (isHorizontal()) {
+            if (side == Side.BOTTOM) {
+                double distanceFromTop = 0;
+
+                // scroll bar
                 if (scroll.isVisible()) {
-                    y = scroll.prefHeight(-1);
-                    scroll.resizeRelocate(0, 0, width, y);
+                    distanceFromTop = scroll.prefHeight(-1);
+                    scroll.resizeRelocate(0, 0, width, distanceFromTop);
                 }
+
+                // lines
                 lines.setLayoutX(0);
-                lines.setLayoutY(floor(y));
-                y += lines.prefHeight(-1) + tickLabelDistance;
+                lines.setLayoutY(floor(distanceFromTop));
+
+                // labels
                 tickLabels.setLayoutX(0);
-                tickLabels.setLayoutY(floor(y));
+                tickLabels.setLayoutY(floor(distanceFromTop + lines.prefHeight(-1) + tickLabelDistance));
             } else {
                 double y = height;
                 if (scroll.isVisible()) {
@@ -494,7 +481,7 @@ public abstract class Axis extends Region {
                 tickLabels.setLayoutY(floor(y));
             }
         } else {
-            if (side.get() != Side.RIGHT) {// LEFT
+            if (side == Side.LEFT) {
                 double x = width;
                 if (scroll.isVisible()) {
                     final double w = scroll.prefWidth(-1);
@@ -525,15 +512,19 @@ public abstract class Axis extends Region {
 
     }
 
-    private void layoutLines(final double width, final double height) {
+    /**
+     * Layout lines.
+     * 
+     * @param width
+     * @param height
+     */
+    private void layoutLines(double width, double height) {
+        boolean horizontal = isHorizontal();
+        double axisLength = getAxisLength(width, height);
+        baseLine.setEndX(horizontal ? axisLength : 0);
+        baseLine.setEndY(horizontal ? 0 : axisLength);
 
-        final boolean ish = isHorizontal();
-        final double l = getAxisLength(width, height);
-        baseLine.setEndX(ish ? l : 0);
-        baseLine.setEndY(ish ? 0 : l);
-
-        final Side s = side.get();
-        final int k = ish ? s != Side.TOP ? 1 : -1 : s != Side.RIGHT ? -1 : 1;
+        final int k = horizontal ? side != Side.TOP ? 1 : -1 : side != Side.RIGHT ? -1 : 1;
 
         final ObservableList<PathElement> elements = tickPath.getElements();
         if (elements.size() > ticks.size() * 2) {
@@ -555,7 +546,7 @@ public abstract class Axis extends Region {
                 elements.addAll(mt, lt);
             }
             double x1, x2, y1, y2;
-            if (ish) {
+            if (horizontal) {
                 x1 = x2 = d;
                 y1 = 0;
                 y2 = tickLength * k;
@@ -670,6 +661,17 @@ public abstract class Axis extends Region {
             });
         }
         return labels;
+    }
+
+    /**
+     * @param position
+     */
+    public void indicateAt(double position) {
+        if (isHorizontal()) {
+            indicatorPath.startX(position).endX(position);
+        } else {
+            indicatorPath.startY(position).endY(position);
+        }
     }
 
     /**
