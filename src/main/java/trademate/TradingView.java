@@ -101,11 +101,10 @@ public class TradingView extends View {
             long minute = 60000;
             axis.tickLabelFormatter
                     .set(v -> Instant.ofEpochMilli((long) v).plus(9, ChronoUnit.HOURS).atZone(Execution.UTC).format(formatter));
-            axis.visibleRange.set(150D / serise.ticks.size());
             axis.visualMinValue.set(System.currentTimeMillis() - 10 * 60 * 1000);
             axis.visualMaxValue.set(System.currentTimeMillis() + 10 * 60 * 1000);
-            axis.units.set(new double[] {minute, 10 * minute, 30 * minute, 60 * minute, 2 * 60 * minute, 4 * 60 * minute, 6 * 60 * minute,
-                    12 * 60 * minute, 24 * 60 * minute});
+            axis.units.set(new double[] {minute, 5 * minute, 10 * minute, 30 * minute, 60 * minute, 2 * 60 * minute, 4 * 60 * minute,
+                    6 * 60 * minute, 12 * 60 * minute, 24 * 60 * minute});
         }).axisY(axis -> {
             axis.side.set(Side.RIGHT);
             axis.tickLabelFormatter.set(v -> Num.of(v).toString());

@@ -113,45 +113,41 @@ public class LinearAxis extends Axis {
     protected void computeAxisProperties(double width, double height) {
         ticks.clear();
 
-        final double lowValue = computeLowerValue(logicalMaxValue.get());
-        final double upValue = computeUpperValue(lowValue);
-        final double uiFullLength = getAxisLength(width, height);
-        if (lowValue == upValue || lowValue != lowValue || upValue != upValue || uiFullLength <= 0) {
+        final double low = computeLowerValue(logicalMaxValue.get());
+        final double up = computeUpperValue(low);
+        final double axisLength = getAxisLength(width, height);
+        if (low == up || Double.isNaN(low) || Double.isNaN(up) || axisLength <= 0) {
             return;
         }
 
-        lowVal = lowValue;
-        visualMaxValue.set(upValue);
-        {// scroll bar
-            final double max = logicalMaxValue.get();
-            final double min = logicalMinValue.get();
-            if (lowValue == min && max == upValue) {
-                scrollBarValue.set(-1);
-                scrollBarSize.set(1);
-            } else {
-                final double ll = max - min;
-                final double l = upValue - lowValue;
-                scrollBarValue.set((lowValue - min) / (ll - l));
-                scrollBarSize.set(l / ll);
-            }
+        lowVal = low;
+        visualMaxValue.set(up);
+
+        // layout scroll bar
+        double max = logicalMaxValue.get();
+        double min = logicalMinValue.get();
+
+        if (low == min && up == max) {
+            scrollBarValue.set(-1);
+            scrollBarSize.set(1);
+        } else {
+            double logicalDiff = max - min;
+            double visualDiff = up - low;
+            scrollBarValue.set((low - min) / (logicalDiff - visualDiff));
+            scrollBarSize.set(visualDiff / logicalDiff);
         }
 
         // search sutable unit
-        int majorTickCount = 10; // getPrefferedMajorTickNumber();
-        double minimumMajorTickVisualInterval = 20;// getMinUnitLength();
-        double majorTickVisualInterval = Math.max(uiFullLength / majorTickCount, minimumMajorTickVisualInterval);
-
-        double visibleValueDistance = upValue - lowValue;
-        double majorTickValueInterval = visibleValueDistance / (uiFullLength / majorTickVisualInterval);
-        int nextUnitIndex = findNearestUnitIndex(majorTickValueInterval);
+        double visibleValueDistance = up - low;
+        int nextUnitIndex = findNearestUnitIndex(visibleValueDistance / tickNumber.get());
         boolean usePrevious = nextUnitIndex == unitIndex;
 
         double nextUnitSize = units.get()[nextUnitIndex];
 
-        double visibleStartUnitBasedValue = floor(lowValue / nextUnitSize) * nextUnitSize;
-        double uiRatio = uiFullLength / visibleValueDistance;
+        double visibleStartUnitBasedValue = floor(low / nextUnitSize) * nextUnitSize;
+        double uiRatio = axisLength / visibleValueDistance;
 
-        int actualVisibleMajorTickCount = (int) (ceil((upValue - visibleStartUnitBasedValue) / nextUnitSize));
+        int actualVisibleMajorTickCount = (int) (ceil((up - visibleStartUnitBasedValue) / nextUnitSize));
 
         if (actualVisibleMajorTickCount <= 0 || 2000 < actualVisibleMajorTickCount) {
             return;
@@ -171,11 +167,11 @@ public class LinearAxis extends Axis {
 
         for (int i = 0; i <= actualVisibleMajorTickCount + 1; i++) {
             double value = visibleStartUnitBasedValue + nextUnitSize * i;
-            if (value > upValue) {
+            if (value > up) {
                 break;// i==k
             }
-            double majorpos = uiRatio * (value - lowValue);
-            if (value >= lowValue) {
+            double majorpos = uiRatio * (value - low);
+            if (value >= low) {
                 ticks.add(floor(isH ? majorpos : height - majorpos));
                 boolean find = false;
                 for (int t = 0, lsize = unused.size(); t < lsize; t++) {

@@ -18,10 +18,12 @@ import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyDoubleWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -146,6 +148,9 @@ public abstract class Axis extends Region {
     /** スクロールバーの表示位置のプロパティ。縦方向の場合、1からこの値を引いた値を利用する。 -1の時、非表示となる。 bindする際にはbindBidirectionalを用いること */
     public final DoubleProperty scrollBarValue = new SimpleDoubleProperty(this, "scrollBarPosition", -1);
 
+    /** The preferred visible number of ticks. */
+    public final IntegerProperty tickNumber = new SimpleIntegerProperty(10);
+
     /** The visual length of tick. */
     public final int tickLength;
 
@@ -210,6 +215,7 @@ public abstract class Axis extends Region {
         widthProperty().addListener(dataValidateListener);
         heightProperty().addListener(dataValidateListener);
         orientation.addListener(dataValidateListener);
+        tickNumber.addListener(dataValidateListener);
         logicalMaxValue.addListener(dataValidateListener);
         logicalMinValue.addListener(dataValidateListener);
         visualMinValue.addListener(dataValidateListener);
