@@ -57,7 +57,7 @@ public abstract class Axis extends Region {
     private boolean layoutValidate = false;
 
     /** 状態の正当性を示すプロパティ */
-    private boolean dataValidate = false;
+    private boolean dateIsValid = false;
 
     private double lastLayoutWidth = -1, lastLayoutHeight = -1;
 
@@ -100,8 +100,8 @@ public abstract class Axis extends Region {
                 return;
             }
         }
-        if (dataValidate) {
-            dataValidate = false;
+        if (dateIsValid) {
+            dateIsValid = false;
             requestLayout();
         }
     };
@@ -151,9 +151,6 @@ public abstract class Axis extends Region {
     /** The visual length of major tick. */
     public final DoubleProperty majorTickLength = new SimpleDoubleProperty(this, "MajorTickLength", 8);
 
-    /** The visual length of minor tick. */
-    public final DoubleProperty minorTickLength = new SimpleDoubleProperty(this, "MinorTickLength", 4);
-
     /** The visual distance between tick and label. */
     public final DoubleProperty tickLabelDistance = new SimpleDoubleProperty(this, "tickLabelGap", 10);
 
@@ -189,8 +186,6 @@ public abstract class Axis extends Region {
 
     protected final MutableBooleanList majorsFill = BooleanLists.mutable.empty();
 
-    protected final MutableDoubleList minors = DoubleLists.mutable.empty();
-
     /** UI widget. */
     private final Group lines = new Group();
 
@@ -199,9 +194,6 @@ public abstract class Axis extends Region {
 
     /** UI widget. */
     private final Path majorTickPath = new Path();
-
-    /** UI widget. */
-    private final Path minorTickPath = new Path();
 
     /** UI widget. */
     private final Line baseLine = new Line();
@@ -226,7 +218,6 @@ public abstract class Axis extends Region {
         scrollBarSize.addListener(scrollValueValidator);
         scrollBarValue.addListener(scrollValueValidator);
         majorTickLength.addListener(layoutValidator);
-        minorTickLength.addListener(layoutValidator);
         tickLabelDistance.addListener(layoutValidator);
 
         // ====================================================
@@ -234,11 +225,10 @@ public abstract class Axis extends Region {
         // ====================================================
 
         majorTickPath.getStyleClass().setAll("axis-tick-mark");
-        minorTickPath.getStyleClass().setAll("axis-minor-tick-mark");
         baseLine.getStyleClass().setAll("axis-line");
 
         lines.setAutoSizeChildren(false);
-        lines.getChildren().addAll(majorTickPath, minorTickPath, baseLine);
+        lines.getChildren().addAll(majorTickPath, baseLine);
 
         tickLabels.setAutoSizeChildren(false);
 
@@ -329,7 +319,7 @@ public abstract class Axis extends Region {
             // force to re-layout
             layoutChildren(lastLayoutWidth, height);
 
-            double tick = max(majorTickLength.get(), minorTickLength.get());
+            double tick = majorTickLength.get();
             double scrollBar = scroll.isVisible() ? scroll.getWidth() : 0;
             double labels = max(tickLabels.prefWidth(height), 10);
             return tick + scrollBar + labels;
@@ -347,7 +337,7 @@ public abstract class Axis extends Region {
             // force to re-layout
             layoutChildren(width, lastLayoutHeight);
 
-            double tick = max(majorTickLength.get(), minorTickLength.get());
+            double tick = majorTickLength.get();
             double scrollBar = scroll.isVisible() ? scroll.getHeight() : 0;
             double labels = max(tickLabels.prefHeight(width), 10);
             return tick + scrollBar + labels;
@@ -543,51 +533,8 @@ public abstract class Axis extends Region {
         baseLine.setEndY(ish ? 0 : l);
 
         final double al = majorTickLength.get();
-        final double il = minorTickLength.get();
-        final boolean isIV = il > 0;
         final Side s = side.get();
         final int k = ish ? s != Side.TOP ? 1 : -1 : s != Side.RIGHT ? -1 : 1;
-
-        if (isIV) {
-            minorTickPath.setVisible(true);
-            final ObservableList<PathElement> elements = minorTickPath.getElements();
-            if (elements.size() > minors.size() * 2) {
-                elements.remove(minors.size() * 2, elements.size());
-            }
-
-            final int eles = elements.size();
-            final int ls = minors.size();
-
-            for (int i = 0; i < ls; i++) {
-                final double d = minors.get(i);
-                MoveTo mt;
-                LineTo lt;
-                if (i * 2 < eles) {
-                    mt = (MoveTo) elements.get(i * 2);
-                    lt = (LineTo) elements.get(i * 2 + 1);
-                } else {
-                    mt = new MoveTo();
-                    lt = new LineTo();
-                    elements.addAll(mt, lt);
-                }
-                double x1, x2, y1, y2;
-                if (ish) {
-                    x1 = x2 = d;
-                    y1 = 0;
-                    y2 = il * k;
-                } else {
-                    x1 = 0;
-                    x2 = il * k;
-                    y1 = y2 = d;
-                }
-                mt.setX(x1);
-                mt.setY(y1);
-                lt.setX(x2);
-                lt.setY(y2);
-            }
-        } else {
-            minorTickPath.setVisible(false);
-        }
 
         final ObservableList<PathElement> elements = majorTickPath.getElements();
         if (elements.size() > majors.size() * 2) {
@@ -634,10 +581,10 @@ public abstract class Axis extends Region {
     protected final void layoutChildren(double width, double height) {
         if (whileLayout.compareAndSet(false, true)) {
             try {
-                if (!dataValidate || getAxisLength(width, height) != getAxisLength(lastLayoutWidth, lastLayoutHeight)) {
+                if (!dateIsValid || getAxisLength(width, height) != getAxisLength(lastLayoutWidth, lastLayoutHeight)) {
                     computeAxisProperties(width, height);
                     layoutValidate = false;
-                    dataValidate = true;
+                    dateIsValid = true;
                 }
 
                 if (!layoutValidate || width != lastLayoutWidth || height != lastLayoutHeight) {

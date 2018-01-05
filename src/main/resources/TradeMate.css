@@ -73,7 +73,7 @@
 	-fx-stroke: rgb(40, 40, 40);
 }
 
-.axis-tick-mark, .axis-minor-tick-mark {
+.axis-tick-mark {
 	-fx-stroke-width: 0.5;
 	-fx-stroke: rgb(40, 40, 40);
 }

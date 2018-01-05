@@ -104,7 +104,6 @@ public class LinearAxis extends Axis {
     @Override
     protected void computeAxisProperties(double width, double height) {
         majors.clear();
-        minors.clear();
         majorsFill.clear();
 
         final double lowValue = computeLowerValue(logicalMaxValue.get());
@@ -146,7 +145,6 @@ public class LinearAxis extends Axis {
         double visibleStartUnitBasedValue = floor(lowValue / nextUnitSize) * nextUnitSize;
         double uiRatio = uiFullLength / visibleValueDistance;
 
-        double uiLengthPerMajorTick = uiRatio * nextUnitSize;
         int actualVisibleMajorTickCount = (int) (ceil((upValue - visibleStartUnitBasedValue) / nextUnitSize));
 
         if (actualVisibleMajorTickCount <= 0 || 2000 < actualVisibleMajorTickCount) {
@@ -154,9 +152,6 @@ public class LinearAxis extends Axis {
             return;
         }
         this.uiRatio = uiRatio;
-
-        int minorTickCount = 10; // getPrefferedMinorCount();
-        double uiLengthPerMinorTick = minorTickLength.get() <= 0 ? 0 : uiLengthPerMajorTick / minorTickCount;
 
         boolean isH = isHorizontal();
 
@@ -193,18 +188,6 @@ public class LinearAxis extends Axis {
                     text.getStyleClass().add("tick-label");
                     a.setNode(text);
                     labelList.add(a);
-                }
-            }
-            if (0 < uiLengthPerMinorTick) {
-                for (int count = 1; count < minorTickCount; count++) {
-                    double minorpos = majorpos + count * uiLengthPerMinorTick;
-                    if (minorpos < 0) {
-                        continue;
-                    }
-                    if (minorpos >= uiFullLength) {
-                        break;
-                    }
-                    minors.add(floor(isH ? minorpos : height - minorpos));
                 }
             }
         } // end for

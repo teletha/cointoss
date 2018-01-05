@@ -32,7 +32,6 @@ import javafx.scene.shape.PathElement;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.StrokeLineJoin;
 
-import org.eclipse.collections.api.list.primitive.BooleanList;
 import org.eclipse.collections.api.list.primitive.DoubleList;
 
 import cointoss.chart.Tick;
@@ -286,7 +285,6 @@ public class GraphPlotArea extends Region {
         V: {
             final Axis axis = xaxis;
             DoubleList vTicks = axis.majors;
-            BooleanList vFill = axis.majorsFill;
             final ObservableList<PathElement> lele = verticalGridLines.getElements();
             final ObservableList<PathElement> fele = verticalRowFill.getElements();
             int lelesize = lele.size();
@@ -337,7 +335,6 @@ public class GraphPlotArea extends Region {
         H: {
             final Axis axis = yaxis;
             DoubleList hTicks = axis.majors;
-            BooleanList hFill = axis.majorsFill;
             final ObservableList<PathElement> lele = horizontalGridLines.getElements();
             final ObservableList<PathElement> fele = horizontalRowFill.getElements();
             int lelesize = lele.size();
@@ -383,68 +380,6 @@ public class GraphPlotArea extends Region {
                 fele.remove(findex, felesize);
             }
         } // end H
-
-        if (0 < yaxis.minorTickLength.get()) {
-            final Axis axis = xaxis;
-            DoubleList minorTicks = axis.majors;
-
-            final ObservableList<PathElement> ele = verticalMinorGridLines.getElements();
-            final boolean line = verticalMinorGridLineVisibility.get();
-            verticalMinorGridLines.setVisible(line);
-            final int elesize = ele.size();
-            final int e = minorTicks.size();
-            if (elesize > e * 2) {
-                ele.remove(e * 2, elesize);
-            }
-            for (int i = 0; i < e; i++) {
-                final double d = minorTicks.get(i);
-                MoveTo mt;
-                LineTo lt;
-                if (i * 2 < elesize) {
-                    mt = (MoveTo) ele.get(i * 2);
-                    lt = (LineTo) ele.get(i * 2 + 1);
-                } else {
-                    mt = new MoveTo();
-                    lt = new LineTo();
-                    ele.addAll(mt, lt);
-                }
-                mt.setX(d);
-                mt.setY(0);
-                lt.setX(d);
-                lt.setY(h);
-            }
-        }
-
-        if (0 < xaxis.minorTickLength.get()) {
-            final Axis axis = yaxis;
-            DoubleList minorTicks = axis.minors;
-
-            final ObservableList<PathElement> ele = horizontalMinorGridLines.getElements();
-            final boolean line = horizontalMinorGridLineVisibility.get();
-            horizontalMinorGridLines.setVisible(line);
-            final int elesize = ele.size();
-            final int e = minorTicks.size();
-            if (elesize > e * 2) {
-                ele.remove(e * 2, elesize);
-            }
-            for (int i = 0; i < e; i++) {
-                final double d = minorTicks.get(i);
-                MoveTo mt;
-                LineTo lt;
-                if (i * 2 < elesize) {
-                    mt = (MoveTo) ele.get(i * 2);
-                    lt = (LineTo) ele.get(i * 2 + 1);
-                } else {
-                    mt = new MoveTo();
-                    lt = new LineTo();
-                    ele.addAll(mt, lt);
-                }
-                mt.setX(0);
-                mt.setY(d);
-                lt.setX(w);
-                lt.setY(d);
-            }
-        }
     }
 
     /**
