@@ -157,9 +157,8 @@ public class LinearAxis extends Axis {
 
         this.uiRatio = uiRatio;
 
-        boolean isH = isHorizontal();
-
         ObservableList<AxisLabel> labels = getLabels();
+
         if (currentUnitIndex != nextUnitIndex) {
             labels.clear();
             currentUnitIndex = nextUnitIndex;
@@ -173,29 +172,29 @@ public class LinearAxis extends Axis {
             if (value > up) {
                 break;// i==k
             }
-            double majorpos = uiRatio * (value - low);
+
+            double tickPosition = uiRatio * (value - low);
+
             if (value >= low) {
-                ticks.add(floor(isH ? majorpos : height - majorpos));
+                ticks.add(floor(isHorizontal() ? tickPosition : height - tickPosition));
                 boolean find = false;
                 for (int t = 0, lsize = unused.size(); t < lsize; t++) {
-                    AxisLabel a = unused.get(t);
-                    if (a.id == value) {
-                        labelList.add(a);
+                    AxisLabel axisLabel = unused.get(t);
+
+                    if (axisLabel.id == value) {
+                        labelList.add(axisLabel);
                         unused.remove(t);
                         find = true;
                         break;
                     }
                 }
                 if (!find) {
-                    AxisLabel a = new AxisLabel();
-                    a.id = value;
                     Text text = new Text(tickLabelFormatter.get().apply(value));
                     text.getStyleClass().add("tick-label");
-                    a.node = text;
-                    labelList.add(a);
+                    labelList.add(new AxisLabel(value, text));
                 }
             }
-        } // end for
+        }
 
         // これで大丈夫か？
         labels.removeAll(unused);

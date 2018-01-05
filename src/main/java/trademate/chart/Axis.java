@@ -678,12 +678,21 @@ public abstract class Axis extends Region {
     protected static class AxisLabel {
 
         /** 文字列等の比較以外で同値性を確認するための数値を得る */
-        protected double id;
+        protected final double id;
 
-        protected Node node;
+        protected final Node node;
 
         private boolean managed = false;
 
         private boolean beforeVisible = true;
+
+        /**
+         * @param id
+         * @param node
+         */
+        protected AxisLabel(double id, Node node) {
+            this.id = id;
+            this.node = node;
+        }
     }
 }
