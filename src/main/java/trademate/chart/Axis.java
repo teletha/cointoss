@@ -81,14 +81,6 @@ public class Axis extends Region {
 
     public final ObjectProperty<DoubleToObjectFunction<String>> tickLabelFormatter = new SimpleObjectProperty<>(this, "tickLabelFormatter", String::valueOf);
 
-    /** レイアウトを構成すべき情報に対して付加すべきリスナ */
-    private final InvalidationListener layoutValidator = observable -> {
-        if (layoutValidate) {
-            layoutValidate = false;
-            requestLayout();
-        }
-    };
-
     /** Axisの構成情報を書き換えるべきデータに対して付加するリスナ */
     private final InvalidationListener dataValidateListener = observable -> {
         if (widthProperty() == observable) {
@@ -178,8 +170,6 @@ public class Axis extends Region {
     /** UI widget. */
     public final ScrollBar scroll = new ScrollBar();
 
-    private double lowVal = 0;
-
     /** The current. (axisLength / visibleValueDistance) */
     private double uiRatio;
 
@@ -246,7 +236,7 @@ public class Axis extends Region {
      * @return A corresponding visual position.
      */
     public final double getPositionForValue(double value) {
-        double position = uiRatio * (value - lowVal);
+        double position = uiRatio * (value - computeVisibleMinValue());
         return isHorizontal() ? position : getHeight() - position;
     }
 
@@ -260,7 +250,7 @@ public class Axis extends Region {
         if (!isHorizontal()) {
             position = getHeight() - position;
         }
-        return position / uiRatio + lowVal;
+        return position / uiRatio + computeVisibleMinValue();
     }
 
     /**
@@ -275,11 +265,6 @@ public class Axis extends Region {
         double low = computeVisibleMinValue();
         double up = computeVisibleMaxValue();
         double axisLength = getAxisLength(width, height);
-        if (low == up || Double.isNaN(low) || Double.isNaN(up) || axisLength <= 0) {
-            return;
-        }
-
-        lowVal = low;
 
         // layout scroll bar
         double max = logicalMaxValue.get();
