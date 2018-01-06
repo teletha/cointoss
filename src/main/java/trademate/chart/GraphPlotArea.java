@@ -490,7 +490,7 @@ public class GraphPlotArea extends Region {
             Num min = Num.MAX;
             Axis xAxis = axisX.get();
             long start = (long) xAxis.visualMinValue.get();
-            long end = (long) xAxis.visualMaxValue.get();
+            long end = (long) xAxis.computeVisibleMaxValue();
 
             for (int i = 0; i < sizeData; i++) {
                 Tick data = datas.get(i);
@@ -531,7 +531,7 @@ public class GraphPlotArea extends Region {
     protected void plotLineChartData(CandleChartData data, Path path) {
         Axis axis = axisX.get();
         double min = axis.visualMinValue.get();
-        double max = axis.visualMaxValue.get();
+        double max = axis.computeVisibleMaxValue();
         int start = data.searchXIndex(min, false);
         int end = data.searchXIndex(max, true);
 

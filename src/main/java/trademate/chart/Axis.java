@@ -17,7 +17,6 @@ import javafx.beans.Observable;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.ReadOnlyDoubleWrapper;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -157,9 +156,6 @@ public class Axis extends Region {
     /** The logical minimum value. */
     public final DoubleProperty logicalMinValue = new SimpleDoubleProperty(this, "logicalMinValue", 0);
 
-    /** The visual maximum value. */
-    public final ReadOnlyDoubleWrapper visualMaxValue = new ReadOnlyDoubleWrapper(this, "visualMaxValue", 1);
-
     /** The visual minimum value. */
     public final DoubleProperty visualMinValue = new SimpleDoubleProperty(this, "visualMinValue", 0);
 
@@ -284,15 +280,14 @@ public class Axis extends Region {
     private void computeAxisProperties(double width, double height) {
         ticks.clear();
 
-        double low = computeLowerValue();
-        double up = computeUpperValue();
+        double low = computeVisibleMinValue();
+        double up = computeVisibleMaxValue();
         double axisLength = getAxisLength(width, height);
         if (low == up || Double.isNaN(low) || Double.isNaN(up) || axisLength <= 0) {
             return;
         }
 
         lowVal = low;
-        visualMaxValue.set(up);
 
         // layout scroll bar
         double max = logicalMaxValue.get();
@@ -375,23 +370,23 @@ public class Axis extends Region {
     }
 
     /**
-     * Compute actual upper value.
+     * Compute visible max value.
      * 
      * @return
      */
-    protected final double computeUpperValue() {
+    public final double computeVisibleMaxValue() {
         double max = logicalMaxValue.get();
         double min = logicalMinValue.get();
         double amount = scroll.getVisibleAmount();
-        return Math.min(computeLowerValue() + (max - min) * amount, max);
+        return Math.min(computeVisibleMinValue() + (max - min) * amount, max);
     }
 
     /**
-     * Compute actual lower value.
+     * Compute visible max value.
      * 
      * @return
      */
-    protected final double computeLowerValue() {
+    public final double computeVisibleMinValue() {
         double visibleMin = visualMinValue.get();
         double logicalMin = logicalMinValue.get();
         return Math.max(visibleMin, logicalMin);
@@ -784,7 +779,7 @@ public class Axis extends Region {
         double min = logicalMinValue.get();
         double diff = max - min;
         double range = scroll.getVisibleAmount();
-        double low = computeLowerValue();
+        double low = computeVisibleMinValue();
         double up = low + diff * range;
         if (up > max) {
             low = max - diff * range;
