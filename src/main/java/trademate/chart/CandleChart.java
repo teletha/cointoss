@@ -403,16 +403,22 @@ public class CandleChart extends Region {
         Num max = Num.MIN;
         Num min = Num.MAX;
 
-        for (Tick tick : candles) {
-            max = Num.max(max, tick.maxPrice);
-            min = Num.min(min, tick.minPrice);
+        long start = (long) axisX.computeVisibleMinValue();
+        long end = (long) axisX.computeVisibleMaxValue();
+
+        for (int i = 0; i < candles.size(); i++) {
+            Tick data = candles.get(i);
+            long time = data.start.toInstant().toEpochMilli();
+
+            if (start <= time && time <= end) {
+                max = Num.max(max, data.maxPrice);
+                min = Num.min(min, data.minPrice);
+            }
         }
 
-        max = max.plus(5000);
-        min = min.minus(5000);
-
-        axisY.logicalMaxValue.set(max.toDouble());
-        axisY.logicalMinValue.set(min.toDouble());
+        Num margin = max.minus(min).multiply(Num.of(0.5));
+        axisY.logicalMaxValue.set(max.plus(margin).toDouble());
+        axisY.logicalMinValue.set(min.minus(margin).toDouble());
     }
 
     /**
