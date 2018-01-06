@@ -48,10 +48,10 @@ public class CandleChart extends Region {
     public final ObservableList<Tick> candles;
 
     /** The x-axis UI. */
-    public final LinearAxis axisX = new LinearAxis(5, 8, Side.BOTTOM);
+    public final Axis axisX = new Axis(5, 8, Side.BOTTOM);
 
     /** The y-axis UI. */
-    public final LinearAxis axisY = new LinearAxis(5, 4, Side.RIGHT);
+    public final Axis axisY = new Axis(5, 4, Side.RIGHT);
 
     /** The actual graph drawer. */
     public final GraphPlotArea graph;
@@ -123,7 +123,7 @@ public class CandleChart extends Region {
      * @param axis
      * @return Chainable API.
      */
-    public final CandleChart axisX(Consumer<LinearAxis> axis) {
+    public final CandleChart axisX(Consumer<Axis> axis) {
         axis.accept(this.axisX);
 
         return this;
@@ -135,7 +135,7 @@ public class CandleChart extends Region {
      * @param axis
      * @return Chainable API.
      */
-    public final CandleChart axisY(Consumer<LinearAxis> axis) {
+    public final CandleChart axisY(Consumer<Axis> axis) {
         axis.accept(this.axisY);
 
         return this;

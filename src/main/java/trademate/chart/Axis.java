@@ -11,6 +11,7 @@ package trademate.chart;
 
 import static java.lang.Math.*;
 
+import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javafx.beans.InvalidationListener;
@@ -52,7 +53,18 @@ import viewtify.ui.UILine;
 /**
  * @version 2017/09/27 13:44:10
  */
-public abstract class Axis extends Region {
+public class Axis extends Region {
+
+    /**
+     * We use these for auto ranging to pick a user friendly tick unit. We handle tick units in the
+     * range of 1e-10 to 1e+12
+     */
+    private static final double[] DefaultTickUnit = {1.0E-10d, 2.5E-10d, 5.0E-10d, 1.0E-9d, 2.5E-9d, 5.0E-9d, 1.0E-8d, 2.5E-8d, 5.0E-8d,
+            1.0E-7d, 2.5E-7d, 5.0E-7d, 1.0E-6d, 2.5E-6d, 5.0E-6d, 1.0E-5d, 2.5E-5d, 5.0E-5d, 1.0E-4d, 2.5E-4d, 5.0E-4d, 0.0010d, 0.0025d,
+            0.0050d, 0.01d, 0.025d, 0.05d, 0.1d, 0.25d, 0.5d, 1.0d, 2.5d, 5.0d, 10.0d, 25.0d, 50.0d, 100.0d, 250.0d, 500.0d, 1000.0d,
+            2500.0d, 5000.0d, 10000.0d, 25000.0d, 50000.0d, 100000.0d, 250000.0d, 500000.0d, 1000000.0d, 2500000.0d, 5000000.0d, 1.0E7d,
+            2.5E7d, 5.0E7d, 1.0E8d, 2.5E8d, 5.0E8d, 1.0E9d, 2.5E9d, 5.0E9d, 1.0E10d, 2.5E10d, 5.0E10d, 1.0E11d, 2.5E11d, 5.0E11d, 1.0E12d,
+            2.5E12d, 5.0E12d};
 
     /** The layouting flag. */
     private final AtomicBoolean whileLayout = new AtomicBoolean();
@@ -175,6 +187,9 @@ public abstract class Axis extends Region {
         }
     };
 
+    /** The tick unit. */
+    public final ObjectProperty<double[]> units = new SimpleObjectProperty(DefaultTickUnit);
+
     protected final MutableDoubleList ticks = DoubleLists.mutable.empty();
 
     /** UI widget. */
@@ -197,6 +212,13 @@ public abstract class Axis extends Region {
 
     /** UI widget. */
     protected final ScrollBar scroll = new ScrollBar();
+
+    private double lowVal = 0;
+
+    private double uiRatio;
+
+    /** The current unit index. */
+    private int currentUnitIndex = -1;
 
     /**
      * 
@@ -260,7 +282,10 @@ public abstract class Axis extends Region {
      * @param value
      * @return
      */
-    public abstract double getPositionForValue(double value);
+    public double getPositionForValue(final double v) {
+        final double d = uiRatio * (v - lowVal);
+        return isHorizontal() ? d : getHeight() - d;
+    }
 
     /**
      * Compute the value for the specified visual position.
@@ -268,13 +293,29 @@ public abstract class Axis extends Region {
      * @param position
      * @return
      */
-    public abstract double getValueForPosition(double position);
+    public double getValueForPosition(double position) {
+        if (!isHorizontal()) {
+            position = getHeight() - position;
+        }
+        return position / uiRatio + lowVal;
+    }
 
     /**
      * visibleAmountで設定する範囲が全て見えるような「最大の」最小値を設定する。<br>
      * visibleAmountが全て見えている場合には処理を行わない。
      */
-    public abstract void adjustLowerValue();
+    public void adjustLowerValue() {
+        double max = logicalMaxValue.get();
+        double min = logicalMinValue.get();
+        double diff = max - min;
+        double range = visibleRange.get();
+        double low = computeLowerValue(max);
+        double up = low + diff * range;
+        if (up > max) {
+            low = max - diff * range;
+            visualMinValue.set(low);
+        }
+    }
 
     /**
      * Axisの描画に必要なプロパティを計算するメソッド width,heightのどちらかは-1である場合がある。
@@ -282,7 +323,116 @@ public abstract class Axis extends Region {
      * @param width 描画横幅
      * @param height 描画高さ
      */
-    protected abstract void computeAxisProperties(double width, double height);
+    protected void computeAxisProperties(double width, double height) {
+        ticks.clear();
+
+        final double low = computeLowerValue(logicalMaxValue.get());
+        final double up = computeUpperValue(low);
+        final double axisLength = getAxisLength(width, height);
+        if (low == up || Double.isNaN(low) || Double.isNaN(up) || axisLength <= 0) {
+            return;
+        }
+
+        lowVal = low;
+        visualMaxValue.set(up);
+
+        // layout scroll bar
+        double max = logicalMaxValue.get();
+        double min = logicalMinValue.get();
+
+        if (low == min && up == max) {
+            scrollBarValue.set(-1);
+            scrollBarSize.set(1);
+        } else {
+            double logicalDiff = max - min;
+            double visualDiff = up - low;
+            scrollBarValue.set((low - min) / (logicalDiff - visualDiff));
+            scrollBarSize.set(visualDiff / logicalDiff);
+        }
+
+        // search sutable unit
+        double visibleValueDistance = up - low;
+        int nextUnitIndex = findNearestUnitIndex(visibleValueDistance / tickNumber.get());
+
+        double nextUnitSize = units.get()[nextUnitIndex];
+        double visibleStartUnitBasedValue = floor(low / nextUnitSize) * nextUnitSize;
+        double uiRatio = axisLength / visibleValueDistance;
+
+        int actualVisibleMajorTickCount = (int) (ceil((up - visibleStartUnitBasedValue) / nextUnitSize));
+
+        if (actualVisibleMajorTickCount <= 0 || 2000 < actualVisibleMajorTickCount) {
+            return;
+        }
+
+        this.uiRatio = uiRatio;
+
+        ObservableList<AxisLabel> labels = getLabels();
+
+        if (currentUnitIndex != nextUnitIndex) {
+            labels.clear();
+            currentUnitIndex = nextUnitIndex;
+        }
+
+        ArrayList<AxisLabel> unused = new ArrayList<>(labels);
+        ArrayList<AxisLabel> labelList = new ArrayList<>(actualVisibleMajorTickCount + 1);
+
+        for (int i = 0; i <= actualVisibleMajorTickCount + 1; i++) {
+            double value = visibleStartUnitBasedValue + nextUnitSize * i;
+            if (value > up) {
+                break;// i==k
+            }
+
+            double tickPosition = uiRatio * (value - low);
+
+            if (value >= low) {
+                ticks.add(floor(isHorizontal() ? tickPosition : height - tickPosition));
+                boolean find = false;
+                for (int t = 0, lsize = unused.size(); t < lsize; t++) {
+                    AxisLabel axisLabel = unused.get(t);
+
+                    if (axisLabel.id == value) {
+                        labelList.add(axisLabel);
+                        unused.remove(t);
+                        find = true;
+                        break;
+                    }
+                }
+                if (!find) {
+                    Text text = new Text(tickLabelFormatter.get().apply(value));
+                    text.getStyleClass().add(ChartClass.AxisTickLabel.name());
+                    labelList.add(new AxisLabel(value, text));
+                }
+            }
+        }
+
+        // これで大丈夫か？
+        labels.removeAll(unused);
+        for (int i = 0, e = labelList.size(); i < e; i++) {
+            AxisLabel axisLabel = labelList.get(i);
+
+            if (!labels.contains(axisLabel)) {
+                labels.add(i, axisLabel);
+            }
+        }
+    }
+
+    private double computeUpperValue(final double low) {
+        final double max = logicalMaxValue.get();
+        final double a = visibleRange.get();
+        final double min = logicalMinValue.get();
+        final double ll = max - min;
+        return min(low + ll * a, max);
+    }
+
+    private int findNearestUnitIndex(double majorTickValueInterval) {
+        // serach from unit list
+        for (int i = 0; i < units.get().length; i++) {
+            if (majorTickValueInterval < units.get()[i]) {
+                return i;
+            }
+        }
+        return units.get().length - 1;
+    }
 
     /**
      * Detect orientation of this axis.
@@ -370,6 +520,56 @@ public abstract class Axis extends Region {
         layoutLines(width, height);
         layoutLabels(width, height);
         layoutGroups(width, height);
+    }
+
+    /**
+     * Layout lines.
+     * 
+     * @param width
+     * @param height
+     */
+    private void layoutLines(double width, double height) {
+        boolean horizontal = isHorizontal();
+        double axisLength = getAxisLength(width, height);
+        baseLine.setEndX(horizontal ? axisLength : 0);
+        baseLine.setEndY(horizontal ? 0 : axisLength);
+
+        final int k = horizontal ? side != Side.TOP ? 1 : -1 : side != Side.RIGHT ? -1 : 1;
+
+        final ObservableList<PathElement> elements = tickPath.getElements();
+        if (elements.size() > ticks.size() * 2) {
+            elements.remove(ticks.size() * 2, elements.size());
+        }
+
+        final int eles = elements.size();
+        final int ls = ticks.size();
+        for (int i = 0; i < ls; i++) {
+            final double d = ticks.get(i);
+            MoveTo mt;
+            LineTo lt;
+            if (i * 2 < eles) {
+                mt = (MoveTo) elements.get(i * 2);
+                lt = (LineTo) elements.get(i * 2 + 1);
+            } else {
+                mt = new MoveTo();
+                lt = new LineTo();
+                elements.addAll(mt, lt);
+            }
+            double x1, x2, y1, y2;
+            if (horizontal) {
+                x1 = x2 = d;
+                y1 = 0;
+                y2 = tickLength * k;
+            } else {
+                x1 = 0;
+                x2 = tickLength * k;
+                y1 = y2 = d;
+            }
+            mt.setX(x1);
+            mt.setY(y1);
+            lt.setX(x2);
+            lt.setY(y2);
+        }
     }
 
     /**
@@ -487,56 +687,6 @@ public abstract class Axis extends Region {
             }
         }
 
-    }
-
-    /**
-     * Layout lines.
-     * 
-     * @param width
-     * @param height
-     */
-    private void layoutLines(double width, double height) {
-        boolean horizontal = isHorizontal();
-        double axisLength = getAxisLength(width, height);
-        baseLine.setEndX(horizontal ? axisLength : 0);
-        baseLine.setEndY(horizontal ? 0 : axisLength);
-
-        final int k = horizontal ? side != Side.TOP ? 1 : -1 : side != Side.RIGHT ? -1 : 1;
-
-        final ObservableList<PathElement> elements = tickPath.getElements();
-        if (elements.size() > ticks.size() * 2) {
-            elements.remove(ticks.size() * 2, elements.size());
-        }
-
-        final int eles = elements.size();
-        final int ls = ticks.size();
-        for (int i = 0; i < ls; i++) {
-            final double d = ticks.get(i);
-            MoveTo mt;
-            LineTo lt;
-            if (i * 2 < eles) {
-                mt = (MoveTo) elements.get(i * 2);
-                lt = (LineTo) elements.get(i * 2 + 1);
-            } else {
-                mt = new MoveTo();
-                lt = new LineTo();
-                elements.addAll(mt, lt);
-            }
-            double x1, x2, y1, y2;
-            if (horizontal) {
-                x1 = x2 = d;
-                y1 = 0;
-                y2 = tickLength * k;
-            } else {
-                x1 = 0;
-                x2 = tickLength * k;
-                y1 = y2 = d;
-            }
-            mt.setX(x1);
-            mt.setY(y1);
-            lt.setX(x2);
-            lt.setY(y2);
-        }
     }
 
     /**
