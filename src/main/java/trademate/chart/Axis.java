@@ -706,6 +706,8 @@ public class Axis extends Region {
         if (position < 0) {
             indicatorPath.visible(false);
             indicatorLabel.setVisible(false);
+            indicatorLabel.setLayoutX(-100);
+            indicatorLabel.setLayoutY(-100);
         } else {
             indicatorPath.visible(true);
             indicatorLabel.setVisible(true);
