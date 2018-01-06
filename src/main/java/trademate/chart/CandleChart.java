@@ -91,9 +91,9 @@ public class CandleChart extends Region {
         AnchorPane.setRightAnchor(this, 15d);
         AnchorPane.setLeftAnchor(this, 0d);
 
-        axisX.visualMinValue.addListener(dataValidateListener);
+        axisX.scroll.valueProperty().addListener(dataValidateListener);
         axisX.scroll.visibleAmountProperty().addListener(dataValidateListener);
-        axisY.visualMinValue.addListener(dataValidateListener);
+        axisY.scroll.valueProperty().addListener(dataValidateListener);
         axisY.scroll.visibleAmountProperty().addListener(dataValidateListener);
         plotAreaPrefferedBounds.addListener(layoutInvalidationObserver);
 

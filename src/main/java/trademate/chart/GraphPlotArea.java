@@ -80,12 +80,12 @@ public class GraphPlotArea extends Region {
     /** The validator. */
     private final ChangeListener<Axis> axisListener = (observable, oldValue, newValue) -> {
         if (oldValue != null) {
-            oldValue.visualMinValue.removeListener(plotValidateListener);
+            oldValue.scroll.valueProperty().removeListener(plotValidateListener);
             oldValue.scroll.visibleAmountProperty().removeListener(plotValidateListener);
         }
 
         if (newValue != null) {
-            newValue.visualMinValue.addListener(plotValidateListener);
+            newValue.scroll.valueProperty().addListener(plotValidateListener);
             newValue.scroll.visibleAmountProperty().addListener(plotValidateListener);
         }
         if (plotValidate) {
@@ -489,7 +489,7 @@ public class GraphPlotArea extends Region {
 
             Num min = Num.MAX;
             Axis xAxis = axisX.get();
-            long start = (long) xAxis.visualMinValue.get();
+            long start = (long) xAxis.computeVisibleMinValue();
             long end = (long) xAxis.computeVisibleMaxValue();
 
             for (int i = 0; i < sizeData; i++) {
@@ -516,7 +516,6 @@ public class GraphPlotArea extends Region {
                     }
                 }
             }
-            axisY.get().visualMinValue.set(min.multiply("0.995").toDouble());
         }
     }
 
@@ -530,7 +529,7 @@ public class GraphPlotArea extends Region {
      */
     protected void plotLineChartData(CandleChartData data, Path path) {
         Axis axis = axisX.get();
-        double min = axis.visualMinValue.get();
+        double min = axis.computeVisibleMinValue();
         double max = axis.computeVisibleMaxValue();
         int start = data.searchXIndex(min, false);
         int end = data.searchXIndex(max, true);

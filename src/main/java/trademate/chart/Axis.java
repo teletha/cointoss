@@ -124,9 +124,7 @@ public class Axis extends Region {
                         visualMinValue.set(0);
                         scroll.setVisibleAmount(1);
                     } else {
-                        final double p = isHorizontal() ? position : 1 - position;
-                        final double d = calcLowValue(p, size);
-                        visualMinValue.set(d);
+                        visualMinValue.set(computeVisibleMinValue());
                     }
                 } else if (scroll != null) {
                     final double d = isHorizontal() ? scroll.getValue() : 1 - scroll.getValue();
@@ -387,9 +385,12 @@ public class Axis extends Region {
      * @return
      */
     public final double computeVisibleMinValue() {
-        double visibleMin = visualMinValue.get();
-        double logicalMin = logicalMinValue.get();
-        return Math.max(visibleMin, logicalMin);
+        double position = isHorizontal() ? scroll.getValue() : 1 - scroll.getValue();
+        double max = logicalMaxValue.get();
+        double min = logicalMinValue.get();
+        double logicalDiff = max - min;
+        double bar = logicalDiff * scroll.getVisibleAmount();
+        return Math.max(min, min + (logicalDiff - bar) * position);
     }
 
     private int findNearestUnitIndex(double majorTickValueInterval) {
@@ -693,21 +694,6 @@ public class Axis extends Region {
         return isHorizontal() ? width : height;
     }
 
-    /**
-     * スクロールバーが変更されたときに呼び出されるメソッド。 表示の最小値を計算する。
-     * 
-     * @param value scrollBarValueに相当する値
-     * @param amount scrollVisibleAmountに相当する値
-     * @return
-     */
-    private double calcLowValue(double value, double amount) {
-        double max = logicalMaxValue.get();
-        double min = logicalMinValue.get();
-        double diff = max - min;
-        double bar = diff * amount;
-        return min + (diff - bar) * value;
-    }
-
     private ObservableList<AxisLabel> labels;
 
     protected final ObservableList<AxisLabel> getLabels() {
@@ -763,28 +749,6 @@ public class Axis extends Region {
         Num next = Num.within(Num.ONE.divide(ZoomSize), current.plus(change), Num.ONE);
 
         scroll.setVisibleAmount(next.toDouble());
-
-        if (current.isLessThan(next)) {
-            adjustLowerValue();
-        }
-        event.consume();
-    }
-
-    /**
-     * visibleAmountで設定する範囲が全て見えるような「最大の」最小値を設定する。<br>
-     * visibleAmountが全て見えている場合には処理を行わない。
-     */
-    public void adjustLowerValue() {
-        double max = logicalMaxValue.get();
-        double min = logicalMinValue.get();
-        double diff = max - min;
-        double range = scroll.getVisibleAmount();
-        double low = computeVisibleMinValue();
-        double up = low + diff * range;
-        if (up > max) {
-            low = max - diff * range;
-            visualMinValue.set(low);
-        }
     }
 
     /**
