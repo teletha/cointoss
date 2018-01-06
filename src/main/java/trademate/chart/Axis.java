@@ -187,7 +187,7 @@ public class Axis extends Region {
     private final Line baseLine = new Line();
 
     /** UI widget. */
-    protected final ScrollBar scroll = new ScrollBar();
+    public final ScrollBar scroll = new ScrollBar();
 
     private double lowVal = 0;
 
