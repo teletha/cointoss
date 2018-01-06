@@ -16,5 +16,5 @@ import viewtify.CSSName;
  */
 public enum ChartClass implements CSSName {
 
-    AxisLine, AxisTick, AxisTickLabel, MouseTrackLine, PriceSignalLine;
+    AxisLine, AxisTick, AxisTickLabel, MouseTrackLine, PriceSignalLine, OrderLine;
 }

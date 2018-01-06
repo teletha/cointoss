@@ -37,6 +37,7 @@ import org.eclipse.collections.api.list.primitive.DoubleList;
 import org.eclipse.collections.api.list.primitive.MutableDoubleList;
 import org.eclipse.collections.impl.factory.primitive.DoubleLists;
 
+import cointoss.Order.State;
 import cointoss.chart.Tick;
 import cointoss.util.Num;
 import kiss.Disposable;
@@ -125,6 +126,9 @@ public class GraphPlotArea extends Region {
     /** The price signal line. */
     private final HorizontalMark priceSignal = new HorizontalMark(ChartClass.PriceSignalLine);
 
+    /** The price signal line. */
+    private final HorizontalMark orders = new HorizontalMark(ChartClass.OrderLine);
+
     /** The line chart data list. */
     private ObservableList<Tick> candleChartData;
 
@@ -160,11 +164,12 @@ public class GraphPlotArea extends Region {
 
         provideMouseTracker();
         providePriceSignal();
+        provideOrderSupport();
 
         verticalGridLines.getStyleClass().setAll("chart-vertical-grid-line");
         horizontalGridLines.getStyleClass().setAll("chart-horizontal-grid-line");
         getChildren()
-                .addAll(verticalGridLines, horizontalGridLines, priceSignal.path, mouseTrackV.ui, mouseTrackH.ui, background, userBackround, candles, lines, foreground, userForeground);
+                .addAll(verticalGridLines, horizontalGridLines, priceSignal.path, orders.path, mouseTrackV.ui, mouseTrackH.ui, background, userBackround, candles, lines, foreground, userForeground);
     }
 
     /**
@@ -208,8 +213,6 @@ public class GraphPlotArea extends Region {
      */
     private void providePriceSignal() {
         setOnContextMenuRequested(e -> {
-            invalidate();
-
             Num price = Num.of(Math.floor(axisY.get().getValueForPosition(e.getY())));
 
             // check price range to add or remove
@@ -222,13 +225,26 @@ public class GraphPlotArea extends Region {
 
             // create new mark
             Mark mark = new Mark(price);
-            priceSignal.marks.add(mark);
+            priceSignal.add(mark);
 
             mark.disposer = trade.market().signalByPrice(price).to(exe -> {
                 notificator.priceSignal.notify("Rearch to " + price);
-                priceSignal.marks.remove(mark);
+                priceSignal.remove(mark);
+            });
+        });
+    }
 
-                invalidate();
+    /**
+     * Provide order support.
+     */
+    private void provideOrderSupport() {
+        trade.market().yourOrder.to(o -> {
+            Mark mark = new Mark(o.price);
+
+            orders.add(mark);
+
+            o.state.observe().take(State.CANCELED, State.COMPLETED).take(1).to(() -> {
+                orders.remove(mark);
             });
         });
     }
@@ -403,6 +419,7 @@ public class GraphPlotArea extends Region {
 
         // horizontal marks
         priceSignal.draw(width);
+        orders.draw(width);
     }
 
     /**
@@ -816,10 +833,20 @@ public class GraphPlotArea extends Region {
         private final List<Mark> marks = new CopyOnWriteArrayList();
 
         /**
-         * 
+         *  
          */
         private HorizontalMark(ChartClass clazz) {
             path.getStyleClass().add(clazz.name());
+        }
+
+        /**
+         * Add mark.
+         * 
+         * @param mark
+         */
+        private void add(Mark mark) {
+            marks.add(mark);
+            invalidate();
         }
 
         /**
@@ -830,6 +857,7 @@ public class GraphPlotArea extends Region {
         private void remove(Mark mark) {
             marks.remove(mark);
             mark.dispose();
+            invalidate();
         }
 
         private void draw(double width) {

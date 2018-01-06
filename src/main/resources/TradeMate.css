@@ -96,3 +96,9 @@
 	-fx-stroke-width: 0.5;
 	-fx-stroke: rgb(180, 100, 100);
 }
+
+.OrderLine {
+	-fx-stroke-width: 0.5;
+	-fx-stroke: rgb(180, 100, 100);
+	-fx-stroke-dash-array: 2 4;
+}
