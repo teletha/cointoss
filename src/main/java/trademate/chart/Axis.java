@@ -122,7 +122,7 @@ public class Axis extends Region {
                     final double position = scroll.getValue();
                     final double size = scroll.getVisibleAmount();
                     if (position == -1 || size == 1) {
-                        visualMinValue.set(Double.NaN);
+                        visualMinValue.set(0);
                         scroll.setVisibleAmount(1);
                     } else {
                         final double p = isHorizontal() ? position : 1 - position;
@@ -161,7 +161,7 @@ public class Axis extends Region {
     public final ReadOnlyDoubleWrapper visualMaxValue = new ReadOnlyDoubleWrapper(this, "visualMaxValue", 1);
 
     /** The visual minimum value. */
-    public final DoubleProperty visualMinValue = new SimpleDoubleProperty(this, "visualMinValue", Double.NaN);
+    public final DoubleProperty visualMinValue = new SimpleDoubleProperty(this, "visualMinValue", 0);
 
     /** The tick unit. */
     public final ObjectProperty<double[]> units = new SimpleObjectProperty(DefaultTickUnit);
@@ -284,8 +284,8 @@ public class Axis extends Region {
     private void computeAxisProperties(double width, double height) {
         ticks.clear();
 
-        double low = computeLowerValue(logicalMaxValue.get());
-        double up = computeUpperValue(low);
+        double low = computeLowerValue();
+        double up = computeUpperValue();
         double axisLength = getAxisLength(width, height);
         if (low == up || Double.isNaN(low) || Double.isNaN(up) || axisLength <= 0) {
             return;
@@ -374,12 +374,27 @@ public class Axis extends Region {
         }
     }
 
-    private double computeUpperValue(final double low) {
-        final double max = logicalMaxValue.get();
-        final double a = scroll.getVisibleAmount();
-        final double min = logicalMinValue.get();
-        final double ll = max - min;
-        return Math.min(low + ll * a, max);
+    /**
+     * Compute actual upper value.
+     * 
+     * @return
+     */
+    protected final double computeUpperValue() {
+        double max = logicalMaxValue.get();
+        double min = logicalMinValue.get();
+        double amount = scroll.getVisibleAmount();
+        return Math.min(computeLowerValue() + (max - min) * amount, max);
+    }
+
+    /**
+     * Compute actual lower value.
+     * 
+     * @return
+     */
+    protected final double computeLowerValue() {
+        double visibleMin = visualMinValue.get();
+        double logicalMin = logicalMinValue.get();
+        return Math.max(visibleMin, logicalMin);
     }
 
     private int findNearestUnitIndex(double majorTickValueInterval) {
@@ -684,31 +699,6 @@ public class Axis extends Region {
     }
 
     /**
-     * lowerValueを実際に利用可能な数値に変換して返す
-     * 
-     * @param up 最大値
-     * @return
-     */
-    protected final double computeLowerValue(double up) {
-        double visibleMin = visualMinValue.get();
-        double logicalMin = logicalMinValue.get();
-        if (up != up) {
-            up = logicalMaxValue.get();
-        }
-        if (visibleMin != visibleMin) {
-            visibleMin = logicalMin;
-        }
-        if (visibleMin > up) {
-            visibleMin = up;
-        }
-        if (visibleMin < logicalMin) {
-            return logicalMin;
-        } else {
-            return visibleMin;
-        }
-    }
-
-    /**
      * スクロールバーが変更されたときに呼び出されるメソッド。 表示の最小値を計算する。
      * 
      * @param value scrollBarValueに相当する値
@@ -794,7 +784,7 @@ public class Axis extends Region {
         double min = logicalMinValue.get();
         double diff = max - min;
         double range = scroll.getVisibleAmount();
-        double low = computeLowerValue(max);
+        double low = computeLowerValue();
         double up = low + diff * range;
         if (up > max) {
             low = max - diff * range;
