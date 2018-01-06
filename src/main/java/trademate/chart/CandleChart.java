@@ -91,8 +91,6 @@ public class CandleChart extends Region {
         AnchorPane.setRightAnchor(this, 15d);
         AnchorPane.setLeftAnchor(this, 0d);
 
-        zoom.install(axisX);
-        zoom.install(axisY);
         axisX.visualMinValue.addListener(dataValidateListener);
         axisX.visibleRange.addListener(dataValidateListener);
         axisY.visualMinValue.addListener(dataValidateListener);
@@ -113,9 +111,6 @@ public class CandleChart extends Region {
         graph.axisY.set(axisY);
         getChildren().addAll(graph, axisX, axisY);
     }
-
-    /** Zoon functionality. */
-    private final AxisZoomHandler zoom = new AxisZoomHandler();
 
     /**
      * Configure x-axis.

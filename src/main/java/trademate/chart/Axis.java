@@ -36,6 +36,7 @@ import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.ScrollBar;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.Region;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.LineTo;
@@ -215,6 +216,7 @@ public class Axis extends Region {
 
     private double lowVal = 0;
 
+    /** The current. (axisLength / visibleValueDistance) */
     private double uiRatio;
 
     /** The current unit index. */
@@ -274,17 +276,19 @@ public class Axis extends Region {
             scroll.setValue(isHorizontal() ? scrollBarValue.get() : 1 - scrollBarValue.get());
         }
         getChildren().addAll(lines, tickLabels, scroll);
+
+        addEventHandler(ScrollEvent.SCROLL, this::zoom);
     }
 
     /**
      * Compute the visual position for the specified value.
      * 
-     * @param value
-     * @return
+     * @param value A value to search position.
+     * @return A corresponding visual position.
      */
-    public double getPositionForValue(final double v) {
-        final double d = uiRatio * (v - lowVal);
-        return isHorizontal() ? d : getHeight() - d;
+    public final double getPositionForValue(double value) {
+        double position = uiRatio * (value - lowVal);
+        return isHorizontal() ? position : getHeight() - position;
     }
 
     /**
@@ -293,7 +297,7 @@ public class Axis extends Region {
      * @param position
      * @return
      */
-    public double getValueForPosition(double position) {
+    public final double getValueForPosition(double position) {
         if (!isHorizontal()) {
             position = getHeight() - position;
         }
@@ -318,17 +322,17 @@ public class Axis extends Region {
     }
 
     /**
-     * Axisの描画に必要なプロパティを計算するメソッド width,heightのどちらかは-1である場合がある。
+     * Compute axis properties to layout items.
      * 
-     * @param width 描画横幅
-     * @param height 描画高さ
+     * @param width A current visual width, may be -1.
+     * @param height A curretn visual height, may be -1.
      */
-    protected void computeAxisProperties(double width, double height) {
+    private void computeAxisProperties(double width, double height) {
         ticks.clear();
 
-        final double low = computeLowerValue(logicalMaxValue.get());
-        final double up = computeUpperValue(low);
-        final double axisLength = getAxisLength(width, height);
+        double low = computeLowerValue(logicalMaxValue.get());
+        double up = computeUpperValue(low);
+        double axisLength = getAxisLength(width, height);
         if (low == up || Double.isNaN(low) || Double.isNaN(up) || axisLength <= 0) {
             return;
         }
@@ -814,6 +818,24 @@ public class Axis extends Region {
                 indicatorLabel.setLayoutX(tickLabelDistance);
             }
         }
+    }
+
+    private void zoom(ScrollEvent event) {
+        Axis axis = (Axis) event.getSource();
+
+        final double d = event.getDeltaY() * 0.01;
+        if (d == 0d) {
+            event.consume();
+            return;
+        }
+        final double amount = axis.visibleRange.get();
+        final double inva = min(1 / amount + d, 20);
+        final double newamount = max(min(1 / inva, 1), 0);
+        axis.visibleRange.set(newamount);
+        if (amount < newamount) {
+            axis.adjustLowerValue();
+        }
+        event.consume();
     }
 
     /**
