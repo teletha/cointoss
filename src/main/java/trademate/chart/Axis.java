@@ -121,10 +121,8 @@ public class Axis extends Region {
                     final double position = scroll.getValue();
                     final double size = scroll.getVisibleAmount();
                     if (position == -1 || size == 1) {
-                        visualMinValue.set(0);
                         scroll.setVisibleAmount(1);
                     } else {
-                        visualMinValue.set(computeVisibleMinValue());
                     }
                 } else if (scroll != null) {
                     final double d = isHorizontal() ? scroll.getValue() : 1 - scroll.getValue();
@@ -153,9 +151,6 @@ public class Axis extends Region {
 
     /** The logical minimum value. */
     public final DoubleProperty logicalMinValue = new SimpleDoubleProperty(this, "logicalMinValue", 0);
-
-    /** The visual minimum value. */
-    public final DoubleProperty visualMinValue = new SimpleDoubleProperty(this, "visualMinValue", 0);
 
     /** The tick unit. */
     public final ObjectProperty<double[]> units = new SimpleObjectProperty(DefaultTickUnit);
@@ -215,7 +210,6 @@ public class Axis extends Region {
         tickNumber.addListener(dataValidateListener);
         logicalMaxValue.addListener(dataValidateListener);
         logicalMinValue.addListener(dataValidateListener);
-        visualMinValue.addListener(dataValidateListener);
         scroll.visibleAmountProperty().addListener(dataValidateListener);
         scroll.valueProperty().addListener(scrollValueValidator);
 
