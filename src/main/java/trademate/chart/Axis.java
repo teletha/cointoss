@@ -115,6 +115,8 @@ public class Axis extends Region {
                     if (position == -1 || size == 1) {
                         scroll.setVisibleAmount(1);
                     } else {
+                        dateIsValid = false;
+                        requestLayout();
                     }
                 } else if (scroll != null) {
                     final double d = isHorizontal() ? scroll.getValue() : 1 - scroll.getValue();
@@ -276,7 +278,8 @@ public class Axis extends Region {
         } else {
             double logicalDiff = max - min;
             double visualDiff = up - low;
-            scroll.setValue((low - min) / (logicalDiff - visualDiff));
+            double value = (low - min) / (logicalDiff - visualDiff);
+            scroll.setValue(isHorizontal() ? value : 1 - value);
             scroll.setVisibleAmount(visualDiff / logicalDiff);
         }
 

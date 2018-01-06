@@ -93,6 +93,8 @@ public class TradingView extends View {
             axis.units.set(new double[] {minute, 5 * minute, 10 * minute, 30 * minute, 60 * minute, 2 * 60 * minute, 4 * 60 * minute,
                     6 * 60 * minute, 12 * 60 * minute, 24 * 60 * minute});
         }).axisY(axis -> {
+            axis.scroll.setValue(1);
+            axis.scroll.setVisibleAmount(0.3);
             axis.tickLabelFormatter.set(v -> Num.of(v).toString());
         }).candleDate(market().second5);
     }

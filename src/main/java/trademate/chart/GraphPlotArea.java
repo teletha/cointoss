@@ -156,6 +156,7 @@ public class GraphPlotArea extends Region {
 
         getStyleClass().setAll("chart-plot-background");
         axisX.addListener(axisListener);
+        axisY.addListener(axisListener);
         widthProperty().addListener(plotValidateListener);
         heightProperty().addListener(plotValidateListener);
         clip.widthProperty().bind(widthProperty());
