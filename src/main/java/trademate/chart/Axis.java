@@ -9,20 +9,15 @@
  */
 package trademate.chart;
 
-import static java.lang.Math.*;
-
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
-import javafx.beans.binding.Bindings;
-import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyDoubleWrapper;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -49,12 +44,16 @@ import org.eclipse.collections.api.block.function.primitive.DoubleToObjectFuncti
 import org.eclipse.collections.api.list.primitive.MutableDoubleList;
 import org.eclipse.collections.impl.factory.primitive.DoubleLists;
 
+import cointoss.util.Num;
 import viewtify.ui.UILine;
 
 /**
  * @version 2017/09/27 13:44:10
  */
 public class Axis extends Region {
+
+    /** The default zoom size. */
+    private static final int ZoomSize = 20;
 
     /**
      * We use these for auto ranging to pick a user friendly tick unit. We handle tick units in the
@@ -121,35 +120,27 @@ public class Axis extends Region {
             if (whileLayout.get() == false) {
                 if (scroll != null && observable == scroll.valueProperty()) {
                     final double position = scroll.getValue();
-                    final double size = scrollBarSize.get();
+                    final double size = scroll.getVisibleAmount();
                     if (position == -1 || size == 1) {
                         visualMinValue.set(Double.NaN);
-                        visibleRange.set(1);
+                        scroll.setVisibleAmount(1);
                     } else {
                         final double p = isHorizontal() ? position : 1 - position;
                         final double d = calcLowValue(p, size);
                         visualMinValue.set(d);
                     }
                 } else if (scroll != null) {
-                    final double d = isHorizontal() ? scrollBarValue.get() : 1 - scrollBarValue.get();
+                    final double d = isHorizontal() ? scroll.getValue() : 1 - scroll.getValue();
                     scroll.setValue(d);
                 }
             } else if (doflag && scroll != null && observable != scroll.valueProperty()) {
                 doflag = false;
-                final double d = isHorizontal() ? scrollBarValue.get() : 1 - scrollBarValue.get();
+                final double d = isHorizontal() ? scroll.getValue() : 1 - scroll.getValue();
                 scroll.setValue(d);
                 doflag = true;
             }
         }
     };
-
-    public final BooleanProperty scrollBarVisibility = new SimpleBooleanProperty(this, "scrollBarVisible", true);
-
-    /** スクロールバーのvisibleAmountを0～1で表現する。 */
-    public final ReadOnlyDoubleWrapper scrollBarSize = new ReadOnlyDoubleWrapper(this, "scrollBarSize", 1);
-
-    /** スクロールバーの表示位置のプロパティ。縦方向の場合、1からこの値を引いた値を利用する。 -1の時、非表示となる。 bindする際にはbindBidirectionalを用いること */
-    public final DoubleProperty scrollBarValue = new SimpleDoubleProperty(this, "scrollBarPosition", -1);
 
     /** The preferred visible number of ticks. */
     public final IntegerProperty tickNumber = new SimpleIntegerProperty(10);
@@ -171,22 +162,6 @@ public class Axis extends Region {
 
     /** The visual minimum value. */
     public final DoubleProperty visualMinValue = new SimpleDoubleProperty(this, "visualMinValue", Double.NaN);
-
-    /** The visible range (between 0 and 1) of scrollable area. "1" will hide scroll bar. */
-    public final DoubleProperty visibleRange = new SimpleDoubleProperty(this, "visibleAmount", 1) {
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void set(double newValue) {
-            if (newValue > 1) {
-                newValue = 1;
-            } else if (newValue <= 0) {
-                return;
-            }
-            super.set(newValue);
-        }
-    };
 
     /** The tick unit. */
     public final ObjectProperty<double[]> units = new SimpleObjectProperty(DefaultTickUnit);
@@ -247,9 +222,8 @@ public class Axis extends Region {
         logicalMaxValue.addListener(dataValidateListener);
         logicalMinValue.addListener(dataValidateListener);
         visualMinValue.addListener(dataValidateListener);
-        visibleRange.addListener(dataValidateListener);
-        scrollBarSize.addListener(scrollValueValidator);
-        scrollBarValue.addListener(scrollValueValidator);
+        scroll.visibleAmountProperty().addListener(dataValidateListener);
+        scroll.valueProperty().addListener(scrollValueValidator);
 
         // ====================================================
         // Initialize UI widget
@@ -264,17 +238,14 @@ public class Axis extends Region {
         tickLabels.setAutoSizeChildren(false);
 
         scroll.setOrientation(isHorizontal() ? Orientation.HORIZONTAL : Orientation.VERTICAL);
-        scroll.visibleProperty().bind(Bindings.createBooleanBinding(() -> scrollBarVisibility
-                .get() && scrollBarValue.get() != -1 && scrollBarSize.get() != 1, scrollBarValue, scrollBarVisibility, scrollBarSize));
-        scroll.visibleProperty().addListener(layoutValidator);
         scroll.valueProperty().addListener(scrollValueValidator);
         scroll.setMin(0);
         scroll.setMax(1);
-        scroll.visibleAmountProperty().bind(scrollBarSize);
+        scroll.setVisibleAmount(1);
 
-        if (scrollBarValue.get() != -1 && scrollBarSize.get() != 1) {
-            scroll.setValue(isHorizontal() ? scrollBarValue.get() : 1 - scrollBarValue.get());
-        }
+        // if (scrollBarValue.get() != -1 && scrollBarSize.get() != 1) {
+        // scroll.setValue(isHorizontal() ? scrollBarValue.get() : 1 - scrollBarValue.get());
+        // }
         getChildren().addAll(lines, tickLabels, scroll);
 
         addEventHandler(ScrollEvent.SCROLL, this::zoom);
@@ -305,23 +276,6 @@ public class Axis extends Region {
     }
 
     /**
-     * visibleAmountで設定する範囲が全て見えるような「最大の」最小値を設定する。<br>
-     * visibleAmountが全て見えている場合には処理を行わない。
-     */
-    public void adjustLowerValue() {
-        double max = logicalMaxValue.get();
-        double min = logicalMinValue.get();
-        double diff = max - min;
-        double range = visibleRange.get();
-        double low = computeLowerValue(max);
-        double up = low + diff * range;
-        if (up > max) {
-            low = max - diff * range;
-            visualMinValue.set(low);
-        }
-    }
-
-    /**
      * Compute axis properties to layout items.
      * 
      * @param width A current visual width, may be -1.
@@ -345,13 +299,13 @@ public class Axis extends Region {
         double min = logicalMinValue.get();
 
         if (low == min && up == max) {
-            scrollBarValue.set(-1);
-            scrollBarSize.set(1);
+            scroll.setValue(-1);
+            scroll.setVisibleAmount(1);
         } else {
             double logicalDiff = max - min;
             double visualDiff = up - low;
-            scrollBarValue.set((low - min) / (logicalDiff - visualDiff));
-            scrollBarSize.set(visualDiff / logicalDiff);
+            scroll.setValue((low - min) / (logicalDiff - visualDiff));
+            scroll.setVisibleAmount(visualDiff / logicalDiff);
         }
 
         // search sutable unit
@@ -359,10 +313,10 @@ public class Axis extends Region {
         int nextUnitIndex = findNearestUnitIndex(visibleValueDistance / tickNumber.get());
 
         double nextUnitSize = units.get()[nextUnitIndex];
-        double visibleStartUnitBasedValue = floor(low / nextUnitSize) * nextUnitSize;
+        double visibleStartUnitBasedValue = Math.floor(low / nextUnitSize) * nextUnitSize;
         double uiRatio = axisLength / visibleValueDistance;
 
-        int actualVisibleMajorTickCount = (int) (ceil((up - visibleStartUnitBasedValue) / nextUnitSize));
+        int actualVisibleMajorTickCount = (int) (Math.ceil((up - visibleStartUnitBasedValue) / nextUnitSize));
 
         if (actualVisibleMajorTickCount <= 0 || 2000 < actualVisibleMajorTickCount) {
             return;
@@ -389,7 +343,7 @@ public class Axis extends Region {
             double tickPosition = uiRatio * (value - low);
 
             if (value >= low) {
-                ticks.add(floor(isHorizontal() ? tickPosition : height - tickPosition));
+                ticks.add(Math.floor(isHorizontal() ? tickPosition : height - tickPosition));
                 boolean find = false;
                 for (int t = 0, lsize = unused.size(); t < lsize; t++) {
                     AxisLabel axisLabel = unused.get(t);
@@ -422,10 +376,10 @@ public class Axis extends Region {
 
     private double computeUpperValue(final double low) {
         final double max = logicalMaxValue.get();
-        final double a = visibleRange.get();
+        final double a = scroll.getVisibleAmount();
         final double min = logicalMinValue.get();
         final double ll = max - min;
-        return min(low + ll * a, max);
+        return Math.min(low + ll * a, max);
     }
 
     private int findNearestUnitIndex(double majorTickValueInterval) {
@@ -481,7 +435,7 @@ public class Axis extends Region {
             layoutChildren(lastLayoutWidth, height);
 
             double scrollBar = scroll.isVisible() ? scroll.getWidth() : 0;
-            double labels = max(tickLabels.prefWidth(height), 10);
+            double labels = Math.max(tickLabels.prefWidth(height), 10);
             return tickLength + scrollBar + labels;
         }
     }
@@ -498,7 +452,7 @@ public class Axis extends Region {
             layoutChildren(width, lastLayoutHeight);
 
             double scrollBar = scroll.isVisible() ? scroll.getHeight() : 0;
-            double labels = max(tickLabels.prefHeight(width), 10);
+            double labels = Math.max(tickLabels.prefHeight(width), 10);
             return tickLength + scrollBar + labels;
         }
     }
@@ -616,9 +570,7 @@ public class Axis extends Region {
         // 重なるラベルを不可視にする
         Bounds indicatorBounds = indicatorLabel.getBoundsInParent();
 
-        for (
-
-                int i = 0; i != labels.size(); i++) {
+        for (int i = 0; i != labels.size(); i++) {
             AxisLabel axisLabel = labels.get(i);
             axisLabel.node.setVisible(!indicatorBounds.intersects(axisLabel.node.getBoundsInParent()));
         }
@@ -643,23 +595,23 @@ public class Axis extends Region {
 
                 // lines
                 lines.setLayoutX(0);
-                lines.setLayoutY(floor(distanceFromTop));
+                lines.setLayoutY(Math.floor(distanceFromTop));
 
                 // labels
                 tickLabels.setLayoutX(0);
-                tickLabels.setLayoutY(floor(distanceFromTop + lines.prefHeight(-1) + tickLabelDistance));
+                tickLabels.setLayoutY(Math.floor(distanceFromTop + lines.prefHeight(-1) + tickLabelDistance));
             } else {
                 double y = height;
                 if (scroll.isVisible()) {
                     final double h = scroll.prefHeight(-1);
                     y -= h;
-                    scroll.resizeRelocate(0, floor(y), width, h);
+                    scroll.resizeRelocate(0, Math.floor(y), width, h);
                 }
                 lines.setLayoutX(0);
-                lines.setLayoutY(floor(y));
+                lines.setLayoutY(Math.floor(y));
                 y -= lines.prefHeight(-1) + tickLabelDistance;
                 tickLabels.setLayoutX(0);
-                tickLabels.setLayoutY(floor(y));
+                tickLabels.setLayoutY(Math.floor(y));
             }
         } else {
             if (side == Side.LEFT) {
@@ -667,13 +619,13 @@ public class Axis extends Region {
                 if (scroll.isVisible()) {
                     final double w = scroll.prefWidth(-1);
                     x = x - w;
-                    scroll.resizeRelocate(floor(x), 0, w, height);
+                    scroll.resizeRelocate(Math.floor(x), 0, w, height);
                 }
 
-                lines.setLayoutX(floor(x));
+                lines.setLayoutX(Math.floor(x));
                 lines.setLayoutY(0);
                 x -= tickLabelDistance + lines.prefWidth(-1);
-                tickLabels.setLayoutX(floor(x));
+                tickLabels.setLayoutX(Math.floor(x));
                 tickLabels.setLayoutY(0);
             } else {
                 double x = 0;
@@ -683,10 +635,10 @@ public class Axis extends Region {
                     scroll.resizeRelocate(0, 0, w, height);
                 }
 
-                lines.setLayoutX(floor(x));
+                lines.setLayoutX(Math.floor(x));
                 lines.setLayoutY(0);
                 x = tickLabelDistance + lines.prefWidth(-1);
-                tickLabels.setLayoutX(floor(x));
+                tickLabels.setLayoutX(Math.floor(x));
                 tickLabels.setLayoutY(0);
             }
         }
@@ -821,21 +773,33 @@ public class Axis extends Region {
     }
 
     private void zoom(ScrollEvent event) {
-        Axis axis = (Axis) event.getSource();
+        Num change = Num.of(event.getDeltaY() / event.getMultiplierY() / ZoomSize);
+        Num current = Num.of(scroll.getVisibleAmount());
+        Num next = Num.within(Num.ONE.divide(ZoomSize), current.plus(change), Num.ONE);
 
-        final double d = event.getDeltaY() * 0.01;
-        if (d == 0d) {
-            event.consume();
-            return;
-        }
-        final double amount = axis.visibleRange.get();
-        final double inva = min(1 / amount + d, 20);
-        final double newamount = max(min(1 / inva, 1), 0);
-        axis.visibleRange.set(newamount);
-        if (amount < newamount) {
-            axis.adjustLowerValue();
+        scroll.setVisibleAmount(next.toDouble());
+
+        if (current.isLessThan(next)) {
+            adjustLowerValue();
         }
         event.consume();
+    }
+
+    /**
+     * visibleAmountで設定する範囲が全て見えるような「最大の」最小値を設定する。<br>
+     * visibleAmountが全て見えている場合には処理を行わない。
+     */
+    public void adjustLowerValue() {
+        double max = logicalMaxValue.get();
+        double min = logicalMinValue.get();
+        double diff = max - min;
+        double range = scroll.getVisibleAmount();
+        double low = computeLowerValue(max);
+        double up = low + diff * range;
+        if (up > max) {
+            low = max - diff * range;
+            visualMinValue.set(low);
+        }
     }
 
     /**

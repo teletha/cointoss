@@ -14,7 +14,7 @@ import static cointoss.util.Num.*;
 import org.junit.Test;
 
 /**
- * @version 2017/09/24 12:22:52
+ * @version 2018/01/06 21:04:40
  */
 public class NumTest {
 
@@ -38,6 +38,13 @@ public class NumTest {
         assert Num.min((Num[]) null).isNaN();
         assert Num.min(ONE, null, TWO).is(1);
         assert Num.min(null, null, null).isNaN();
+    }
+
+    @Test
+    public void within() throws Exception {
+        assert Num.within(ONE, TWO, TEN).is(TWO);
+        assert Num.within(ONE, THOUSAND, TEN).is(TEN);
+        assert Num.within(ONE, ZERO, TEN).is(ONE);
     }
 
     @Test

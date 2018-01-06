@@ -1019,6 +1019,18 @@ public class Num implements Comparable<Num> {
     }
 
     /**
+     * Check the value range.
+     * 
+     * @param min A minimum value.
+     * @param value A target value to check.
+     * @param max A maximum value.
+     * @return A target value in range.
+     */
+    public static Num within(Num min, Num value, Num max) {
+        return min(max, max(min, value));
+    }
+
+    /**
      * @param start
      * @param end
      * @return

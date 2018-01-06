@@ -81,12 +81,12 @@ public class GraphPlotArea extends Region {
     private final ChangeListener<Axis> axisListener = (observable, oldValue, newValue) -> {
         if (oldValue != null) {
             oldValue.visualMinValue.removeListener(plotValidateListener);
-            oldValue.visibleRange.removeListener(plotValidateListener);
+            oldValue.scroll.visibleAmountProperty().removeListener(plotValidateListener);
         }
 
         if (newValue != null) {
             newValue.visualMinValue.addListener(plotValidateListener);
-            newValue.visibleRange.addListener(plotValidateListener);
+            newValue.scroll.visibleAmountProperty().addListener(plotValidateListener);
         }
         if (plotValidate) {
             plotValidate = false;

@@ -17,8 +17,6 @@ import javafx.scene.layout.AnchorPane;
 
 import cointoss.Execution;
 import cointoss.Market;
-import cointoss.chart.Chart;
-import cointoss.chart.Tick;
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.util.Num;
 import kiss.I;
@@ -84,32 +82,18 @@ public class TradingView extends View {
             tab.text(market().name() + "  " + v.mark);
         });
 
-        Chart serise = market().second5;
-
-        Num max = Num.MIN;
-        Num min = Num.MAX;
-
-        for (Tick tick : serise.ticks) {
-            max = Num.max(max, tick.maxPrice);
-            min = Num.min(min, tick.minPrice);
-        }
-        Num diff = max.minus(min);
-
         CandleChart candleChart = new CandleChart(chart, this).graph(plot -> {
         }).axisX(axis -> {
             long minute = 60000;
             axis.tickLabelFormatter
                     .set(v -> Instant.ofEpochMilli((long) v).plus(9, ChronoUnit.HOURS).atZone(Execution.UTC).format(formatter));
-            axis.visibleRange.set(150D / serise.ticks.size());
             axis.visualMinValue.set(System.currentTimeMillis() - 10 * 60 * 1000);
             axis.visualMaxValue.set(System.currentTimeMillis() + 10 * 60 * 1000);
             axis.units.set(new double[] {minute, 5 * minute, 10 * minute, 30 * minute, 60 * minute, 2 * 60 * minute, 4 * 60 * minute,
                     6 * 60 * minute, 12 * 60 * minute, 24 * 60 * minute});
         }).axisY(axis -> {
             axis.tickLabelFormatter.set(v -> Num.of(v).toString());
-            axis.visibleRange.set(Num.of(50000).divide(diff).toDouble());
-            axis.scrollBarVisibility.set(false);
-        }).candleDate(serise);
+        }).candleDate(market().second5);
     }
 
     /**
