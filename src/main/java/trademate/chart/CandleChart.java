@@ -82,7 +82,7 @@ public class CandleChart extends Region {
      * 
      */
     public CandleChart(AnchorPane parent, TradingView trade) {
-        this.graph = new GraphPlotArea(trade, axisX, axisY);
+        this.graph = new GraphPlotArea(trade);
 
         parent.getChildren().add(this);
 
@@ -107,6 +107,8 @@ public class CandleChart extends Region {
         getStyleClass().setAll("chart");
         graph.setLineChartDataList(lines);
         graph.setCandleChartDataList(candles);
+        graph.axisX.set(axisX);
+        graph.axisY.set(axisY);
         getChildren().addAll(graph, axisX, axisY);
     }
 
