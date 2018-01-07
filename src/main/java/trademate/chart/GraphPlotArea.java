@@ -15,10 +15,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -44,6 +42,7 @@ import kiss.Disposable;
 import kiss.I;
 import trademate.Notificator;
 import trademate.TradingView;
+import trademate.chart.Axis.TickLable;
 import trademate.chart.shape.Candle;
 import trademate.chart.shape.GraphShape;
 import viewtify.ui.UILine;
@@ -59,11 +58,10 @@ public class GraphPlotArea extends Region {
     /** The visibility of vertical grid line. */
     public final BooleanProperty verticalGridLineVisibility = new SimpleBooleanProperty(this, "verticalGridLineVisibility", true);
 
-    /** The horizontal axis. */
-    final ObjectProperty<Axis> axisX = new SimpleObjectProperty<>(this, "axisX", null);
+    final Axis axisX;
 
     /** The vertical axis. */
-    final ObjectProperty<Axis> axisY = new SimpleObjectProperty<>(this, "axisY", null);
+    final Axis axisY;
 
     /** The current market. */
     private final TradingView trade;
@@ -151,12 +149,17 @@ public class GraphPlotArea extends Region {
     /**
      * 
      */
-    public GraphPlotArea(TradingView trade) {
+    public GraphPlotArea(TradingView trade, Axis axisX, Axis axisY) {
         this.trade = trade;
+        this.axisX = axisX;
+        this.axisY = axisY;
+
+        axisX.scroll.valueProperty().addListener(plotValidateListener);
+        axisX.scroll.visibleAmountProperty().addListener(plotValidateListener);
+        axisY.scroll.valueProperty().addListener(plotValidateListener);
+        axisY.scroll.visibleAmountProperty().addListener(plotValidateListener);
 
         getStyleClass().setAll("chart-plot-background");
-        axisX.addListener(axisListener);
-        axisY.addListener(axisListener);
         widthProperty().addListener(plotValidateListener);
         heightProperty().addListener(plotValidateListener);
         clip.widthProperty().bind(widthProperty());
@@ -188,24 +191,31 @@ public class GraphPlotArea extends Region {
      * Provide mouse tracker.
      */
     private void provideMouseTracker() {
+        TickLable labelX = axisX.createLabel();
+        TickLable labelY = axisY.createLabel();
+
         // track on move
         setOnMouseMoved(e -> {
             double x = e.getX();
             double y = e.getY();
-            mouseTrackV.startX(x).endX(x);
-            mouseTrackH.startY(y).endY(y);
+            // mouseTrackV.startX(x).endX(x);
+            // mouseTrackH.startY(y).endY(y);
 
-            axisX.get().indicateAt(x);
-            axisY.get().indicateAt(y);
+            labelX.value.set(axisX.getValueForPosition(x));
+            labelY.value.set(axisY.getValueForPosition(y));
+
+            invalidate();
         });
 
         // remove on exit
         setOnMouseExited(e -> {
-            mouseTrackV.startX(-10).endX(-10);
-            mouseTrackH.startY(-10).endY(-10);
+            // mouseTrackV.startX(-10).endX(-10);
+            // mouseTrackH.startY(-10).endY(-10);
 
-            axisX.get().indicateAt(-10);
-            axisY.get().indicateAt(-10);
+            labelX.value.set(-1);
+            labelY.value.set(-1);
+
+            invalidate();
         });
     }
 
@@ -214,7 +224,7 @@ public class GraphPlotArea extends Region {
      */
     private void providePriceSignal() {
         setOnContextMenuRequested(e -> {
-            Num price = Num.of(Math.floor(axisY.get().getValueForPosition(e.getY())));
+            Num price = Num.of(Math.floor(axisY.getValueForPosition(e.getY())));
 
             // check price range to add or remove
             for (Mark mark : priceSignal.marks) {
@@ -282,8 +292,8 @@ public class GraphPlotArea extends Region {
      * Draw plot data.
      */
     public void plotData() {
-        final Axis xaxis = axisX.get();
-        final Axis yaxis = axisY.get();
+        final Axis xaxis = axisX;
+        final Axis yaxis = axisY;
 
         if (xaxis == null || yaxis == null) {
             plotValidate = true;
@@ -305,8 +315,8 @@ public class GraphPlotArea extends Region {
         if (plotValidate && graphshapeValidate) {
             return;
         }
-        final Axis xaxis = axisX.get();
-        final Axis yaxis = axisY.get();
+        final Axis xaxis = axisX;
+        final Axis yaxis = axisY;
 
         if (xaxis == null || yaxis == null) {
             graphshapeValidate = true;
@@ -337,8 +347,8 @@ public class GraphPlotArea extends Region {
      * Draw background lines.
      */
     private void drawBackGroundLine() {
-        Axis axisX = this.axisX.get();
-        Axis axisY = this.axisY.get();
+        Axis axisX = this.axisX;
+        Axis axisY = this.axisY;
         double width = getWidth();
         double height = getHeight();
 
@@ -347,7 +357,7 @@ public class GraphPlotArea extends Region {
             boolean visible = verticalGridLineVisibility.get();
             ObservableList<PathElement> paths = verticalGridLines.getElements();
             int pathSize = paths.size();
-            int tickSize = axisX.labels.size();
+            int tickSize = axisX.tickSize();
 
             // update visibility
             verticalGridLines.setVisible(visible);
@@ -361,7 +371,7 @@ public class GraphPlotArea extends Region {
             }
 
             for (int i = 0; i < tickSize; i++) {
-                double d = axisX.labels.get(i).position;
+                double d = axisX.labelAt(i).position();
                 MoveTo mt;
                 LineTo lt;
                 if (i * 2 < pathSize) {
@@ -384,7 +394,7 @@ public class GraphPlotArea extends Region {
             boolean visible = horizontalGridLineVisibility.get();
             ObservableList<PathElement> paths = horizontalGridLines.getElements();
             int pathSize = paths.size();
-            int tickSize = axisY.labels.size();
+            int tickSize = axisY.tickSize();
 
             // update visibility
             horizontalGridLines.setVisible(visible);
@@ -398,7 +408,7 @@ public class GraphPlotArea extends Region {
             }
 
             for (int i = 0; i < tickSize; i++) {
-                double d = axisY.labels.get(i).position;
+                double d = axisY.labelAt(i).position();
                 MoveTo mt;
                 LineTo lt;
                 if (i * 2 < pathSize) {
@@ -487,7 +497,7 @@ public class GraphPlotArea extends Region {
             }
 
             Num min = Num.MAX;
-            Axis xAxis = axisX.get();
+            Axis xAxis = axisX;
             long start = (long) xAxis.computeVisibleMinValue();
             long end = (long) xAxis.computeVisibleMaxValue();
 
@@ -527,7 +537,7 @@ public class GraphPlotArea extends Region {
      * @param path
      */
     protected void plotLineChartData(CandleChartData data, Path path) {
-        Axis axis = axisX.get();
+        Axis axis = axisX;
         double min = axis.computeVisibleMinValue();
         double max = axis.computeVisibleMaxValue();
         int start = data.searchXIndex(min, false);
@@ -548,8 +558,8 @@ public class GraphPlotArea extends Region {
      */
     private void plotLineChartData(CandleChartData data, ObservableList<PathElement> elements, int start, int end) {
         int elementSize = elements.size();
-        Axis xaxis = axisX.get();
-        Axis yaxis = axisY.get();
+        Axis xaxis = axisX;
+        Axis yaxis = axisY;
 
         boolean moveTo = true;
         double beforeX = 0, beforeY = 0;
@@ -622,11 +632,11 @@ public class GraphPlotArea extends Region {
      * @param height
      */
     protected void plotCandleChartData(long index, Tick data, Candle candle) {
-        double x = axisX.get().getPositionForValue(index);
-        double open = axisY.get().getPositionForValue(data.openPrice.toDouble());
-        double close = axisY.get().getPositionForValue(data.closePrice.toDouble());
-        double high = axisY.get().getPositionForValue(data.maxPrice.toDouble());
-        double low = axisY.get().getPositionForValue(data.minPrice.toDouble());
+        double x = axisX.getPositionForValue(index);
+        double open = axisY.getPositionForValue(data.openPrice.toDouble());
+        double close = axisY.getPositionForValue(data.closePrice.toDouble());
+        double high = axisY.getPositionForValue(data.maxPrice.toDouble());
+        double low = axisY.getPositionForValue(data.minPrice.toDouble());
 
         // calculate candle width
         double candleWidth = 3;
@@ -862,7 +872,7 @@ public class GraphPlotArea extends Region {
             MutableDoubleList list = DoubleLists.mutable.empty();
 
             for (Mark line : marks) {
-                list.add(Math.floor(axisY.get().getPositionForValue(line.price.toDouble())));
+                list.add(Math.floor(axisY.getPositionForValue(line.price.toDouble())));
             }
             draw(list, true, width);
         }
