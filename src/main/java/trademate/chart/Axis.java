@@ -309,11 +309,7 @@ public class Axis extends Region {
             double tickValue = visibleTickBaseValue + nextUnitSize * i;
 
             if (low <= tickValue && tickValue <= up) {
-                double tickPosition = uiRatio * (tickValue - low);
-                double position = Math.floor(isHorizontal() ? tickPosition : height - tickPosition);
-
-                label.text(tickValue);
-                label.position = position;
+                label.set(tickValue);
             } else {
                 labels.remove(i);
             }
@@ -676,6 +672,11 @@ public class Axis extends Region {
         }
     }
 
+    public void indicateByValue(double value) {
+        dateIsValid = false;
+
+    }
+
     private void zoom(ScrollEvent event) {
         Num change = Num.of(event.getDeltaY() / event.getMultiplierY() / ZoomSize);
         Num current = Num.of(scroll.getVisibleAmount());
@@ -703,7 +704,8 @@ public class Axis extends Region {
          * 
          * @param value
          */
-        private void text(double value) {
+        private void set(double value) {
+            position = getPositionForValue(value);
             setText(tickLabelFormatter.get().apply(value));
         }
     }
