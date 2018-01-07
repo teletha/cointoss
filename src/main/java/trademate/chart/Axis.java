@@ -267,7 +267,7 @@ public class Axis extends Region {
         double low = computeVisibleMinValue();
         double up = computeVisibleMaxValue();
         double visualDiff = up - low;
-        double axisLength = getAxisLength(width, height);
+        this.uiRatio = getAxisLength(width, height) / visualDiff;
 
         // layout scroll bar
         double max = logicalMaxValue.get();
@@ -286,10 +286,8 @@ public class Axis extends Region {
         // search sutable unit
         int nextUnitIndex = findNearestUnitIndex(visualDiff / tickNumber.get());
         double nextUnitSize = units.get()[nextUnitIndex];
-        double start = Math.floor(low / nextUnitSize) * nextUnitSize;
-
-        int visibleTickCount = (int) (Math.ceil((up - low) / nextUnitSize));
-        this.uiRatio = axisLength / visualDiff;
+        int visibleTickCount = (int) (Math.ceil(visualDiff / nextUnitSize));
+        double visibleTickBaseValue = Math.floor(low / nextUnitSize) * nextUnitSize;
 
         ObservableList<AxisLabel> labels = getLabels();
 
@@ -302,21 +300,17 @@ public class Axis extends Region {
         ArrayList<AxisLabel> labelList = new ArrayList<>(visibleTickCount + 1);
 
         for (int i = 0; i <= visibleTickCount + 1; i++) {
-            double value = start + nextUnitSize * i;
+            double tickValue = visibleTickBaseValue + nextUnitSize * i;
 
-            if (value > up) {
-                break;// i==k
-            }
+            if (low <= tickValue && tickValue <= up) {
+                double tickPosition = uiRatio * (tickValue - low);
 
-            double tickPosition = uiRatio * (value - low);
-
-            if (low <= value) {
                 ticks.add(Math.floor(isHorizontal() ? tickPosition : height - tickPosition));
                 boolean find = false;
                 for (int t = 0, lsize = unused.size(); t < lsize; t++) {
                     AxisLabel axisLabel = unused.get(t);
 
-                    if (axisLabel.id == value) {
+                    if (axisLabel.id == tickValue) {
                         labelList.add(axisLabel);
                         unused.remove(t);
                         find = true;
@@ -324,9 +318,9 @@ public class Axis extends Region {
                     }
                 }
                 if (!find) {
-                    Text text = new Text(tickLabelFormatter.get().apply(value));
+                    Text text = new Text(tickLabelFormatter.get().apply(tickValue));
                     text.getStyleClass().add(ChartClass.AxisTickLabel.name());
-                    labelList.add(new AxisLabel(value, text));
+                    labelList.add(new AxisLabel(tickValue, text));
                 }
             }
         }
