@@ -279,7 +279,7 @@ public class Axis extends Region {
         // search sutable unit
         int nextUnitIndex = findNearestUnitIndex(visualDiff / tickNumber.get());
         double nextUnitSize = units.get()[nextUnitIndex];
-        int visibleTickCount = (int) (Math.ceil(visualDiff / nextUnitSize));
+        int visibleTickCount = (int) (Math.ceil(visualDiff / nextUnitSize)) + 1;
         double visibleTickBaseValue = Math.floor(low / nextUnitSize) * nextUnitSize;
 
         ObservableList<AxisLabel> labels = getLabels();
@@ -297,16 +297,18 @@ public class Axis extends Region {
             labels.remove(visibleTickCount, labels.size());
         }
 
-        for (int i = 0; i < visibleTickCount; i++) {
+        for (int i = visibleTickCount - 1; 0 < i; i--) {
+            AxisLabel label = labels.get(i);
             double tickValue = visibleTickBaseValue + nextUnitSize * i;
 
             if (low <= tickValue && tickValue <= up) {
                 double tickPosition = uiRatio * (tickValue - low);
                 double position = Math.floor(isHorizontal() ? tickPosition : height - tickPosition);
 
-                AxisLabel label = labels.get(i);
                 label.set(tickValue);
                 label.value = position;
+            } else {
+                labels.remove(i);
             }
         }
     }
@@ -493,31 +495,30 @@ public class Axis extends Region {
      */
     private void layoutLabels(double width, double height) {
         for (int i = 0, e = labels.size(); i < e; i++) {
-            AxisLabel axisLabel = labels.get(i);
-            double value = axisLabel.value;
+            AxisLabel label = labels.get(i);
+            double value = label.value;
 
             // 位置を合わせる
-            Node node = axisLabel.text;
-            node.setLayoutX(0);
-            node.setLayoutY(0);
+            label.setLayoutX(0);
+            label.setLayoutY(0);
 
-            Bounds bounds = node.getBoundsInParent();
+            Bounds bounds = label.getBoundsInParent();
 
             if (isHorizontal()) {
                 final double cx = (bounds.getMinX() + bounds.getMaxX()) * 0.5;
-                node.setLayoutX(value - cx);
+                label.setLayoutX(value - cx);
                 if (side == Side.BOTTOM) {
-                    node.setLayoutY(tickLabelDistance);
+                    label.setLayoutY(tickLabelDistance);
                 } else {
-                    node.setLayoutY(-tickLabelDistance);
+                    label.setLayoutY(-tickLabelDistance);
                 }
             } else {
                 final double cy = (bounds.getMinY() + bounds.getMaxY()) * 0.5;
-                node.setLayoutY(value - cy);
+                label.setLayoutY(value - cy);
                 if (side == Side.LEFT) {
-                    node.setLayoutX(-tickLabelDistance);
+                    label.setLayoutX(-tickLabelDistance);
                 } else {
-                    node.setLayoutX(tickLabelDistance);
+                    label.setLayoutX(tickLabelDistance);
                 }
             }
         }
@@ -527,7 +528,7 @@ public class Axis extends Region {
 
         for (int i = 0; i != labels.size(); i++) {
             AxisLabel axisLabel = labels.get(i);
-            axisLabel.text.setVisible(!indicatorBounds.intersects(axisLabel.text.getBoundsInParent()));
+            axisLabel.setVisible(!indicatorBounds.intersects(axisLabel.getBoundsInParent()));
         }
     }
 
@@ -647,11 +648,11 @@ public class Axis extends Region {
                 final ObservableList<Node> list = tickLabels.getChildren();
                 while (c.next()) {
                     for (final AxisLabel a1 : c.getRemoved()) {
-                        list.remove(a1.text);
+                        list.remove(a1);
                     }
                     for (final AxisLabel a2 : c.getAddedSubList()) {
-                        list.add(a2.text);
-                        a2.text.setVisible(false);
+                        list.add(a2);
+                        a2.setVisible(false);
                     }
                 }
             });
@@ -700,26 +701,24 @@ public class Axis extends Region {
     /**
      * @version 2017/09/27 14:22:45
      */
-    protected class AxisLabel {
+    protected class AxisLabel extends Text {
 
         /** 文字列等の比較以外で同値性を確認するための数値を得る */
         private double id;
 
         protected double value;
 
-        protected final Text text = new Text();
-
         /**
          * @param id
          * @param text
          */
         protected AxisLabel() {
-            text.getStyleClass().add(ChartClass.AxisTickLabel.name());
+            getStyleClass().add(ChartClass.AxisTickLabel.name());
         }
 
         private void set(double value) {
             this.id = value;
-            text.setText(tickLabelFormatter.get().apply(value));
+            setText(tickLabelFormatter.get().apply(value));
         }
     }
 }
