@@ -583,7 +583,7 @@ public class Num implements Comparable<Num> {
     /**
      * Checks value range.
      * 
-     * @param value
+     * @param position
      * @param errorRange
      * @return
      */
@@ -594,7 +594,7 @@ public class Num implements Comparable<Num> {
     /**
      * Checks value range.
      * 
-     * @param value
+     * @param position
      * @param errorRange
      * @return
      */

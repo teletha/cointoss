@@ -44,7 +44,6 @@ import kiss.Disposable;
 import kiss.I;
 import trademate.Notificator;
 import trademate.TradingView;
-import trademate.chart.Axis.AxisLabel;
 import trademate.chart.shape.Candle;
 import trademate.chart.shape.GraphShape;
 import viewtify.ui.UILine;
@@ -345,11 +344,10 @@ public class GraphPlotArea extends Region {
 
         // vertical lines
         vertical: {
-            ObservableList<AxisLabel> ticks = axisX.getLabels();
             boolean visible = verticalGridLineVisibility.get();
             ObservableList<PathElement> paths = verticalGridLines.getElements();
             int pathSize = paths.size();
-            int tickSize = ticks.size();
+            int tickSize = axisX.labels.size();
 
             // update visibility
             verticalGridLines.setVisible(visible);
@@ -363,7 +361,7 @@ public class GraphPlotArea extends Region {
             }
 
             for (int i = 0; i < tickSize; i++) {
-                double d = ticks.get(i).value;
+                double d = axisX.labels.get(i).position;
                 MoveTo mt;
                 LineTo lt;
                 if (i * 2 < pathSize) {
@@ -383,11 +381,10 @@ public class GraphPlotArea extends Region {
 
         // horizontal lines
         horizontal: {
-            ObservableList<AxisLabel> ticks = axisY.getLabels();
             boolean visible = horizontalGridLineVisibility.get();
             ObservableList<PathElement> paths = horizontalGridLines.getElements();
             int pathSize = paths.size();
-            int tickSize = ticks.size();
+            int tickSize = axisY.labels.size();
 
             // update visibility
             horizontalGridLines.setVisible(visible);
@@ -401,7 +398,7 @@ public class GraphPlotArea extends Region {
             }
 
             for (int i = 0; i < tickSize; i++) {
-                double d = ticks.get(i).value;
+                double d = axisY.labels.get(i).position;
                 MoveTo mt;
                 LineTo lt;
                 if (i * 2 < pathSize) {

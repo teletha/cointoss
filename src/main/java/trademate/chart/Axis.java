@@ -26,7 +26,6 @@ import javafx.geometry.Bounds;
 import javafx.geometry.Orientation;
 import javafx.geometry.Side;
 import javafx.scene.Group;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.ScrollBar;
 import javafx.scene.input.ScrollEvent;
@@ -44,7 +43,7 @@ import cointoss.util.Num;
 import viewtify.ui.UILine;
 
 /**
- * @version 2017/09/27 13:44:10
+ * @version 2018/01/07 13:47:17
  */
 public class Axis extends Region {
 
@@ -146,6 +145,9 @@ public class Axis extends Region {
     /** The tick unit. */
     public final ObjectProperty<double[]> units = new SimpleObjectProperty(DefaultTickUnit);
 
+    /** The label manager. */
+    public final ObservableList<AxisLabel> labels = FXCollections.observableArrayList();
+
     /** UI widget. */
     private final Group lines = new Group();
 
@@ -180,6 +182,13 @@ public class Axis extends Region {
         this.tickLength = tickLength;
         this.tickLabelDistance = tickLabelDistance;
         this.side = side;
+
+        labels.addListener((ListChangeListener<AxisLabel>) change -> {
+            while (change.next()) {
+                change.getRemoved().forEach(tickLabels.getChildren()::remove);
+                change.getAddedSubList().forEach(tickLabels.getChildren()::add);
+            }
+        });
 
         if (isHorizontal()) {
             indicatorPath.endX(0).endY(tickLength);
@@ -279,25 +288,23 @@ public class Axis extends Region {
         // search sutable unit
         int nextUnitIndex = findNearestUnitIndex(visualDiff / tickNumber.get());
         double nextUnitSize = units.get()[nextUnitIndex];
-        int visibleTickCount = (int) (Math.ceil(visualDiff / nextUnitSize)) + 1;
+        int visibleTickSize = (int) (Math.ceil(visualDiff / nextUnitSize)) + 1;
         double visibleTickBaseValue = Math.floor(low / nextUnitSize) * nextUnitSize;
-
-        ObservableList<AxisLabel> labels = getLabels();
 
         if (currentUnitIndex != nextUnitIndex) {
             labels.clear();
             currentUnitIndex = nextUnitIndex;
         }
 
-        if (labels.size() < visibleTickCount) {
-            for (int i = visibleTickCount - labels.size(); 0 < i; i--) {
+        if (labels.size() < visibleTickSize) {
+            for (int i = visibleTickSize - labels.size(); 0 < i; i--) {
                 labels.add(new AxisLabel());
             }
-        } else if (visibleTickCount < labels.size()) {
-            labels.remove(visibleTickCount, labels.size());
+        } else if (visibleTickSize < labels.size()) {
+            labels.remove(visibleTickSize, labels.size());
         }
 
-        for (int i = visibleTickCount - 1; 0 < i; i--) {
+        for (int i = visibleTickSize - 1; 0 < i; i--) {
             AxisLabel label = labels.get(i);
             double tickValue = visibleTickBaseValue + nextUnitSize * i;
 
@@ -305,8 +312,8 @@ public class Axis extends Region {
                 double tickPosition = uiRatio * (tickValue - low);
                 double position = Math.floor(isHorizontal() ? tickPosition : height - tickPosition);
 
-                label.set(tickValue);
-                label.value = position;
+                label.text(tickValue);
+                label.position = position;
             } else {
                 labels.remove(i);
             }
@@ -459,7 +466,7 @@ public class Axis extends Region {
         final int eles = elements.size();
         final int ls = labels.size();
         for (int i = 0; i < ls; i++) {
-            final double d = labels.get(i).value;
+            final double d = labels.get(i).position;
             MoveTo mt;
             LineTo lt;
             if (i * 2 < eles) {
@@ -496,7 +503,7 @@ public class Axis extends Region {
     private void layoutLabels(double width, double height) {
         for (int i = 0, e = labels.size(); i < e; i++) {
             AxisLabel label = labels.get(i);
-            double value = label.value;
+            double value = label.position;
 
             // 位置を合わせる
             label.setLayoutX(0);
@@ -639,27 +646,6 @@ public class Axis extends Region {
         return isHorizontal() ? width : height;
     }
 
-    private ObservableList<AxisLabel> labels;
-
-    protected final ObservableList<AxisLabel> getLabels() {
-        if (labels == null) {
-            labels = FXCollections.observableArrayList();
-            labels.addListener((ListChangeListener<AxisLabel>) c -> {
-                final ObservableList<Node> list = tickLabels.getChildren();
-                while (c.next()) {
-                    for (final AxisLabel a1 : c.getRemoved()) {
-                        list.remove(a1);
-                    }
-                    for (final AxisLabel a2 : c.getAddedSubList()) {
-                        list.add(a2);
-                        a2.setVisible(false);
-                    }
-                }
-            });
-        }
-        return labels;
-    }
-
     /**
      * @param position
      */
@@ -699,25 +685,25 @@ public class Axis extends Region {
     }
 
     /**
-     * @version 2017/09/27 14:22:45
+     * @version 2018/01/07 13:47:12
      */
     protected class AxisLabel extends Text {
 
-        /** 文字列等の比較以外で同値性を確認するための数値を得る */
-        private double id;
-
-        protected double value;
+        protected double position;
 
         /**
-         * @param id
-         * @param text
+         * 
          */
         protected AxisLabel() {
             getStyleClass().add(ChartClass.AxisTickLabel.name());
         }
 
-        private void set(double value) {
-            this.id = value;
+        /**
+         * Set label text.
+         * 
+         * @param value
+         */
+        private void text(double value) {
             setText(tickLabelFormatter.get().apply(value));
         }
     }
