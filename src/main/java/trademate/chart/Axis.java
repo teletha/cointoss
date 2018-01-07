@@ -286,7 +286,9 @@ public class Axis extends Region {
         // search sutable unit
         int nextUnitIndex = findNearestUnitIndex(visualDiff / tickNumber.get());
         double nextUnitSize = units.get()[nextUnitIndex];
-        int visibleTickCount = (int) (Math.ceil(visualDiff / nextUnitSize));
+        double start = Math.floor(low / nextUnitSize) * nextUnitSize;
+
+        int visibleTickCount = (int) (Math.ceil((up - low) / nextUnitSize));
         this.uiRatio = axisLength / visualDiff;
 
         ObservableList<AxisLabel> labels = getLabels();
@@ -300,14 +302,15 @@ public class Axis extends Region {
         ArrayList<AxisLabel> labelList = new ArrayList<>(visibleTickCount + 1);
 
         for (int i = 0; i <= visibleTickCount + 1; i++) {
-            double value = low + nextUnitSize * i;
+            double value = start + nextUnitSize * i;
+
             if (value > up) {
                 break;// i==k
             }
 
             double tickPosition = uiRatio * (value - low);
 
-            if (value >= low) {
+            if (low <= value) {
                 ticks.add(Math.floor(isHorizontal() ? tickPosition : height - tickPosition));
                 boolean find = false;
                 for (int t = 0, lsize = unused.size(); t < lsize; t++) {
