@@ -94,7 +94,7 @@ public class TradingView extends View {
                     6 * 60 * minute, 12 * 60 * minute, 24 * 60 * minute});
         }).axisY(axis -> {
             axis.scroll.setVisible(false);
-            axis.tickLabelFormatter.set(v -> Num.of(v).toString());
+            axis.tickLabelFormatter.set(v -> Num.of(v).scale(0).toString());
         }).candleDate(market().second5);
     }
 

@@ -266,6 +266,7 @@ public class Axis extends Region {
 
         double low = computeVisibleMinValue();
         double up = computeVisibleMaxValue();
+        double visualDiff = up - low;
         double axisLength = getAxisLength(width, height);
 
         // layout scroll bar
@@ -273,31 +274,20 @@ public class Axis extends Region {
         double min = logicalMinValue.get();
 
         if (low == min && up == max) {
-            scroll.setValue(-1);
+            scroll.setValue(0);
             scroll.setVisibleAmount(1);
         } else {
             double logicalDiff = max - min;
-            double visualDiff = up - low;
             double value = (low - min) / (logicalDiff - visualDiff);
             scroll.setValue(isHorizontal() ? value : 1 - value);
             scroll.setVisibleAmount(visualDiff / logicalDiff);
         }
 
         // search sutable unit
-        double visibleValueDistance = up - low;
-        int nextUnitIndex = findNearestUnitIndex(visibleValueDistance / tickNumber.get());
-
+        int nextUnitIndex = findNearestUnitIndex(visualDiff / tickNumber.get());
         double nextUnitSize = units.get()[nextUnitIndex];
-        double visibleStartUnitBasedValue = Math.floor(low / nextUnitSize) * nextUnitSize;
-        double uiRatio = axisLength / visibleValueDistance;
-
-        int actualVisibleMajorTickCount = (int) (Math.ceil((up - visibleStartUnitBasedValue) / nextUnitSize));
-
-        if (actualVisibleMajorTickCount <= 0 || 2000 < actualVisibleMajorTickCount) {
-            return;
-        }
-
-        this.uiRatio = uiRatio;
+        int visibleTickCount = (int) (Math.ceil(visualDiff / nextUnitSize));
+        this.uiRatio = axisLength / visualDiff;
 
         ObservableList<AxisLabel> labels = getLabels();
 
@@ -307,10 +297,10 @@ public class Axis extends Region {
         }
 
         ArrayList<AxisLabel> unused = new ArrayList<>(labels);
-        ArrayList<AxisLabel> labelList = new ArrayList<>(actualVisibleMajorTickCount + 1);
+        ArrayList<AxisLabel> labelList = new ArrayList<>(visibleTickCount + 1);
 
-        for (int i = 0; i <= actualVisibleMajorTickCount + 1; i++) {
-            double value = visibleStartUnitBasedValue + nextUnitSize * i;
+        for (int i = 0; i <= visibleTickCount + 1; i++) {
+            double value = low + nextUnitSize * i;
             if (value > up) {
                 break;// i==k
             }
