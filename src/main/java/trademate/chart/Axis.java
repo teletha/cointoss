@@ -9,7 +9,6 @@
  */
 package trademate.chart;
 
-import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javafx.beans.InvalidationListener;
@@ -40,8 +39,6 @@ import javafx.scene.shape.PathElement;
 import javafx.scene.text.Text;
 
 import org.eclipse.collections.api.block.function.primitive.DoubleToObjectFunction;
-import org.eclipse.collections.api.list.primitive.MutableDoubleList;
-import org.eclipse.collections.impl.factory.primitive.DoubleLists;
 
 import cointoss.util.Num;
 import viewtify.ui.UILine;
@@ -148,8 +145,6 @@ public class Axis extends Region {
 
     /** The tick unit. */
     public final ObjectProperty<double[]> units = new SimpleObjectProperty(DefaultTickUnit);
-
-    protected final MutableDoubleList ticks = DoubleLists.mutable.empty();
 
     /** UI widget. */
     private final Group lines = new Group();
@@ -262,8 +257,6 @@ public class Axis extends Region {
      * @param height A curretn visual height, may be -1.
      */
     private void computeAxisProperties(double width, double height) {
-        ticks.clear();
-
         double low = computeVisibleMinValue();
         double up = computeVisibleMaxValue();
         double visualDiff = up - low;
@@ -296,42 +289,24 @@ public class Axis extends Region {
             currentUnitIndex = nextUnitIndex;
         }
 
-        ArrayList<AxisLabel> unused = new ArrayList<>(labels);
-        ArrayList<AxisLabel> labelList = new ArrayList<>(visibleTickCount + 1);
+        if (labels.size() < visibleTickCount) {
+            for (int i = visibleTickCount - labels.size(); 0 < i; i--) {
+                labels.add(new AxisLabel());
+            }
+        } else if (visibleTickCount < labels.size()) {
+            labels.remove(visibleTickCount, labels.size());
+        }
 
-        for (int i = 0; i <= visibleTickCount + 1; i++) {
+        for (int i = 0; i < visibleTickCount; i++) {
             double tickValue = visibleTickBaseValue + nextUnitSize * i;
 
             if (low <= tickValue && tickValue <= up) {
                 double tickPosition = uiRatio * (tickValue - low);
+                double position = Math.floor(isHorizontal() ? tickPosition : height - tickPosition);
 
-                ticks.add(Math.floor(isHorizontal() ? tickPosition : height - tickPosition));
-                boolean find = false;
-                for (int t = 0, lsize = unused.size(); t < lsize; t++) {
-                    AxisLabel axisLabel = unused.get(t);
-
-                    if (axisLabel.id == tickValue) {
-                        labelList.add(axisLabel);
-                        unused.remove(t);
-                        find = true;
-                        break;
-                    }
-                }
-                if (!find) {
-                    Text text = new Text(tickLabelFormatter.get().apply(tickValue));
-                    text.getStyleClass().add(ChartClass.AxisTickLabel.name());
-                    labelList.add(new AxisLabel(tickValue, text));
-                }
-            }
-        }
-
-        // これで大丈夫か？
-        labels.removeAll(unused);
-        for (int i = 0, e = labelList.size(); i < e; i++) {
-            AxisLabel axisLabel = labelList.get(i);
-
-            if (!labels.contains(axisLabel)) {
-                labels.add(i, axisLabel);
+                AxisLabel label = labels.get(i);
+                label.set(tickValue);
+                label.value = position;
             }
         }
     }
@@ -475,14 +450,14 @@ public class Axis extends Region {
         final int k = horizontal ? side != Side.TOP ? 1 : -1 : side != Side.RIGHT ? -1 : 1;
 
         final ObservableList<PathElement> elements = tickPath.getElements();
-        if (elements.size() > ticks.size() * 2) {
-            elements.remove(ticks.size() * 2, elements.size());
+        if (elements.size() > labels.size() * 2) {
+            elements.remove(labels.size() * 2, elements.size());
         }
 
         final int eles = elements.size();
-        final int ls = ticks.size();
+        final int ls = labels.size();
         for (int i = 0; i < ls; i++) {
-            final double d = ticks.get(i);
+            final double d = labels.get(i).value;
             MoveTo mt;
             LineTo lt;
             if (i * 2 < eles) {
@@ -517,12 +492,12 @@ public class Axis extends Region {
      * @param height
      */
     private void layoutLabels(double width, double height) {
-        for (int i = 0, e = ticks.size(); i < e; i++) {
+        for (int i = 0, e = labels.size(); i < e; i++) {
             AxisLabel axisLabel = labels.get(i);
-            double d = ticks.get(i);
+            double value = axisLabel.value;
 
             // 位置を合わせる
-            Node node = axisLabel.node;
+            Node node = axisLabel.text;
             node.setLayoutX(0);
             node.setLayoutY(0);
 
@@ -530,7 +505,7 @@ public class Axis extends Region {
 
             if (isHorizontal()) {
                 final double cx = (bounds.getMinX() + bounds.getMaxX()) * 0.5;
-                node.setLayoutX(d - cx);
+                node.setLayoutX(value - cx);
                 if (side == Side.BOTTOM) {
                     node.setLayoutY(tickLabelDistance);
                 } else {
@@ -538,7 +513,7 @@ public class Axis extends Region {
                 }
             } else {
                 final double cy = (bounds.getMinY() + bounds.getMaxY()) * 0.5;
-                node.setLayoutY(d - cy);
+                node.setLayoutY(value - cy);
                 if (side == Side.LEFT) {
                     node.setLayoutX(-tickLabelDistance);
                 } else {
@@ -552,7 +527,7 @@ public class Axis extends Region {
 
         for (int i = 0; i != labels.size(); i++) {
             AxisLabel axisLabel = labels.get(i);
-            axisLabel.node.setVisible(!indicatorBounds.intersects(axisLabel.node.getBoundsInParent()));
+            axisLabel.text.setVisible(!indicatorBounds.intersects(axisLabel.text.getBoundsInParent()));
         }
     }
 
@@ -672,11 +647,11 @@ public class Axis extends Region {
                 final ObservableList<Node> list = tickLabels.getChildren();
                 while (c.next()) {
                     for (final AxisLabel a1 : c.getRemoved()) {
-                        list.remove(a1.node);
+                        list.remove(a1.text);
                     }
                     for (final AxisLabel a2 : c.getAddedSubList()) {
-                        list.add(a2.node);
-                        a2.node.setVisible(false);
+                        list.add(a2.text);
+                        a2.text.setVisible(false);
                     }
                 }
             });
@@ -725,20 +700,26 @@ public class Axis extends Region {
     /**
      * @version 2017/09/27 14:22:45
      */
-    protected static class AxisLabel {
+    protected class AxisLabel {
 
         /** 文字列等の比較以外で同値性を確認するための数値を得る */
-        protected final double id;
+        private double id;
 
-        protected final Node node;
+        protected double value;
+
+        protected final Text text = new Text();
 
         /**
          * @param id
-         * @param node
+         * @param text
          */
-        protected AxisLabel(double id, Node node) {
-            this.id = id;
-            this.node = node;
+        protected AxisLabel() {
+            text.getStyleClass().add(ChartClass.AxisTickLabel.name());
+        }
+
+        private void set(double value) {
+            this.id = value;
+            text.setText(tickLabelFormatter.get().apply(value));
         }
     }
 }
