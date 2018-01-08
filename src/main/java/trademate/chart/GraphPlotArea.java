@@ -9,10 +9,9 @@
  */
 package trademate.chart;
 
+import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.function.IntToDoubleFunction;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.ReadOnlyBooleanProperty;
@@ -39,6 +38,7 @@ import trademate.TradingView;
 import trademate.chart.Axis.TickLable;
 import trademate.chart.shape.Candle;
 import trademate.chart.shape.GraphShape;
+import viewtify.Viewtify;
 
 /**
  * @version 2018/01/05 20:35:03
@@ -98,7 +98,7 @@ public class GraphPlotArea extends Region {
     private final Path verticalGridLines = new Path();
 
     /** Chart UI */
-    private final HorizontalMark horizontalGridLines = new HorizontalMark(ChartClass.GridLine);
+    private final HorizontalMark horizontalGridLines;
 
     /** Chart UI */
     private final HorizontalMark horizontalMouseTrack = new HorizontalMark(ChartClass.MouseTrack);
@@ -138,6 +138,7 @@ public class GraphPlotArea extends Region {
         this.trade = trade;
         this.axisX = axisX;
         this.axisY = axisY;
+        this.horizontalGridLines = new HorizontalMark(ChartClass.GridLine, axisY.forGrid);
 
         axisX.scroll.valueProperty().addListener(plotValidateListener);
         axisX.scroll.visibleAmountProperty().addListener(plotValidateListener);
@@ -210,10 +211,7 @@ public class GraphPlotArea extends Region {
                 }
             }
 
-            // create new mark
-            TickLable label = axisY.createLabel(ChartClass.PriceSignal);
-            label.value.set(price.toDouble());
-            priceSignal.add(label);
+            TickLable label = priceSignal.createLabel(price);
 
             label.add(trade.market().signalByPrice(price).to(exe -> {
                 notificator.priceSignal.notify("Rearch to " + price);
@@ -226,14 +224,10 @@ public class GraphPlotArea extends Region {
      * Provide order support.
      */
     private void provideOrderSupport() {
-        trade.market().yourOrder.to(o -> {
+        trade.market().yourOrder.on(Viewtify.UIThread).to(o -> {
+            TickLable label = orders.createLabel(o.price);
 
-            TickLable label = axisY.createLabel(ChartClass.OrderSupport);
-            label.value.set(o.price.toDouble());
-
-            orders.add(label);
-
-            o.state.observe().take(State.CANCELED, State.COMPLETED).take(1).to(() -> {
+            o.state.observe().take(State.CANCELED, State.COMPLETED).take(1).on(Viewtify.UIThread).to(() -> {
                 orders.remove(label);
             });
         });
@@ -327,45 +321,41 @@ public class GraphPlotArea extends Region {
      */
     private void drawBackGroundLine() {
         Axis axisX = this.axisX;
-        Axis axisY = this.axisY;
-        double width = getWidth();
         double height = getHeight();
 
         // vertical lines
-        vertical: {
-            ObservableList<PathElement> paths = verticalGridLines.getElements();
-            int pathSize = paths.size();
-            int tickSize = axisX.tickSize();
+        ObservableList<PathElement> paths = verticalGridLines.getElements();
+        int pathSize = paths.size();
+        int tickSize = axisX.tickSize();
 
-            if (pathSize > tickSize * 2) {
-                paths.remove(tickSize * 2, pathSize);
-                pathSize = tickSize * 2;
-            }
+        if (pathSize > tickSize * 2) {
+            paths.remove(tickSize * 2, pathSize);
+            pathSize = tickSize * 2;
+        }
 
-            for (int i = 0; i < tickSize; i++) {
-                double d = axisX.labelAt(i).position();
-                MoveTo mt;
-                LineTo lt;
-                if (i * 2 < pathSize) {
-                    mt = (MoveTo) paths.get(i * 2);
-                    lt = (LineTo) paths.get(i * 2 + 1);
-                } else {
-                    mt = new MoveTo();
-                    lt = new LineTo();
-                    paths.addAll(mt, lt);
-                }
-                mt.setX(d);
-                mt.setY(0);
-                lt.setX(d);
-                lt.setY(height);
+        for (int i = 0; i < tickSize; i++) {
+            double d = axisX.labelAt(i).position();
+            MoveTo mt;
+            LineTo lt;
+            if (i * 2 < pathSize) {
+                mt = (MoveTo) paths.get(i * 2);
+                lt = (LineTo) paths.get(i * 2 + 1);
+            } else {
+                mt = new MoveTo();
+                lt = new LineTo();
+                paths.addAll(mt, lt);
             }
+            mt.setX(d);
+            mt.setY(0);
+            lt.setX(d);
+            lt.setY(height);
         }
 
         // horizontal lines
-        horizontalGridLines.draw(axisY.forGrid.size(), index -> axisY.forGrid.get(index).position(), width);
-        horizontalMouseTrack.draw(width);
-        priceSignal.draw(width);
-        orders.draw(width);
+        horizontalGridLines.draw();
+        horizontalMouseTrack.draw();
+        priceSignal.draw();
+        orders.draw();
     }
 
     /**
@@ -778,48 +768,47 @@ public class GraphPlotArea extends Region {
         private final Path path = new Path();
 
         /** The model. */
-        private final List<TickLable> labels = new CopyOnWriteArrayList();
+        private final List<TickLable> labels;
 
         /**
          * @param className
          */
         private HorizontalMark(ChartClass className) {
+            this(className, new ArrayList());
+        }
+
+        /**
+         * @param className
+         * @param labels
+         */
+        private HorizontalMark(ChartClass className, List<TickLable> labels) {
             this.className = className;
+            this.labels = labels;
             this.path.getStyleClass().addAll(className.name(), ChartClass.Line.name());
         }
 
+        /**
+         * Create new mark.
+         * 
+         * @return
+         */
         private TickLable createLabel() {
+            return createLabel(null);
+        }
+
+        /**
+         * Create new mark.
+         * 
+         * @return
+         */
+        private TickLable createLabel(Num price) {
             TickLable label = axisY.createLabel(className);
-            add(label);
+            if (price != null) label.value.set(price.toDouble());
+            labels.add(label);
+
+            invalidate();
 
             return label;
-        }
-
-        private void addMark(Num value) {
-            addMark(value.toDouble());
-        }
-
-        /**
-         * Add mark at the specified value.
-         * 
-         * @param value
-         */
-        private void addMark(double value) {
-            TickLable label = axisY.createLabel(className);
-            label.value.set(value);
-
-            labels.add(label);
-            invalidate();
-        }
-
-        /**
-         * Add mark.
-         * 
-         * @param mark
-         */
-        private void add(TickLable mark) {
-            labels.add(mark);
-            invalidate();
         }
 
         /**
@@ -833,20 +822,17 @@ public class GraphPlotArea extends Region {
             invalidate();
         }
 
-        private void draw(double width) {
-            draw(labels.size(), index -> Math.floor(labels.get(index).position()), width);
-        }
-
-        private void draw(int size, IntToDoubleFunction positionAdviser, double width) {
+        private void draw() {
             ObservableList<PathElement> paths = path.getElements();
             int pathSize = paths.size();
+            int labelSize = labels.size();
 
-            if (pathSize > size * 2) {
-                paths.remove(size * 2, pathSize);
-                pathSize = size * 2;
+            if (pathSize > labelSize * 2) {
+                paths.remove(labelSize * 2, pathSize);
+                pathSize = labelSize * 2;
             }
 
-            for (int i = 0; i < size; i++) {
+            for (int i = 0; i < labelSize; i++) {
                 MoveTo move;
                 LineTo line;
 
@@ -859,10 +845,10 @@ public class GraphPlotArea extends Region {
                     paths.addAll(move, line);
                 }
 
-                double value = positionAdviser.applyAsDouble(i);
+                double value = labels.get(i).position();
                 move.setX(0);
                 move.setY(value);
-                line.setX(width);
+                line.setX(getWidth());
                 line.setY(value);
             }
         }
