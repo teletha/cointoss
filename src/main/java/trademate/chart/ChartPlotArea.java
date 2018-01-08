@@ -51,7 +51,7 @@ public class ChartPlotArea extends Region {
     private final Notificator notificator = I.make(Notificator.class);
 
     /** The validity flag of plotting. */
-    private boolean plotValidate = false;
+    private boolean plotIsValid = false;
 
     /** The validator. */
     private final InvalidationListener plotValidateListener = observable -> invalidate();
@@ -123,8 +123,8 @@ public class ChartPlotArea extends Region {
      * Make this graph invalidate.
      */
     private void invalidate() {
-        if (plotValidate) {
-            plotValidate = false;
+        if (plotIsValid) {
+            plotIsValid = false;
             setNeedsLayout(true);
         }
     }
@@ -195,7 +195,7 @@ public class ChartPlotArea extends Region {
      */
     @Override
     protected void layoutChildren() {
-        if (!plotValidate) {
+        if (!plotIsValid) {
             plotData();
         }
     }
@@ -204,15 +204,7 @@ public class ChartPlotArea extends Region {
      * Draw plot data.
      */
     public void plotData() {
-        final Axis xaxis = axisX;
-        final Axis yaxis = axisY;
-
-        if (xaxis == null || yaxis == null) {
-            plotValidate = true;
-            return;
-        }
-
-        if (!plotValidate) {
+        if (!plotIsValid) {
             // draw back lines
             backGridVertical.draw();
             backGridHorizontal.draw();
@@ -223,7 +215,7 @@ public class ChartPlotArea extends Region {
 
             plotLineChartDatas();
             plotCandleChartDatas();
-            plotValidate = true;
+            plotIsValid = true;
         }
     }
 
@@ -277,19 +269,19 @@ public class ChartPlotArea extends Region {
      * @param width
      * @param height
      */
-    protected void plotCandleChartDatas() {
+    private void plotCandleChartDatas() {
         ObservableList<Node> nodes = candles.getChildren();
         List<Tick> datas = candleChartData;
 
         if (datas == null) {
             nodes.clear();
         } else {
-            int sizeData = datas.size();
-            int sizePath = nodes.size();
+            int dataSize = datas.size();
+            int nodeSize = nodes.size();
 
-            if (sizeData < sizePath) {
-                nodes.remove(sizeData, sizePath);
-                sizePath = sizeData;
+            if (dataSize < nodeSize) {
+                nodes.remove(dataSize, nodeSize);
+                nodeSize = dataSize;
             }
 
             Num min = Num.MAX;
@@ -297,24 +289,24 @@ public class ChartPlotArea extends Region {
             long start = (long) xAxis.computeVisibleMinValue();
             long end = (long) xAxis.computeVisibleMaxValue();
 
-            for (int i = 0; i < sizeData; i++) {
-                Tick data = datas.get(i);
-                long time = data.start.toInstant().toEpochMilli();
+            for (int i = 0; i < dataSize; i++) {
+                Tick tick = datas.get(i);
+                long time = tick.start.toInstant().toEpochMilli();
 
                 if (start <= time && time <= end) {
-                    min = Num.min(min, data.minPrice);
+                    min = Num.min(min, tick.minPrice);
 
                     Candle candle;
 
-                    if (i < sizePath) {
+                    if (i < nodeSize) {
                         candle = (Candle) nodes.get(i);
                     } else {
-                        candle = new Candle("series" + i, "data" + i);
+                        candle = new Candle();
                         nodes.add(candle);
                     }
-                    plotCandleChartData(data.start.toInstant().toEpochMilli(), data, candle);
+                    plotCandleChartData(tick.start.toInstant().toEpochMilli(), tick, candle);
                 } else {
-                    if (i < sizePath) {
+                    if (i < nodeSize) {
                         Candle candle = (Candle) nodes.get(i);
                         candle.setLayoutX(-10);
                         candle.setLayoutY(-10);
@@ -322,6 +314,29 @@ public class ChartPlotArea extends Region {
                 }
             }
         }
+    }
+
+    /**
+     * Draw chart data.
+     * 
+     * @param tick
+     * @param candle
+     * @param width
+     * @param height
+     */
+    private void plotCandleChartData(long index, Tick tick, Candle candle) {
+        double x = axisX.getPositionForValue(index);
+        double open = axisY.getPositionForValue(tick.openPrice.toDouble());
+        double close = axisY.getPositionForValue(tick.closePrice.toDouble());
+        double high = axisY.getPositionForValue(tick.maxPrice.toDouble());
+        double low = axisY.getPositionForValue(tick.minPrice.toDouble());
+
+        // update candle
+        candle.update(close - open, high - open, low - open);
+
+        // position the candle
+        candle.setLayoutX(x);
+        candle.setLayoutY(open);
     }
 
     private final double DISTANCE_THRESHOLD = 0.5;
@@ -420,34 +435,6 @@ public class ChartPlotArea extends Region {
     }
 
     /**
-     * Draw chart data.
-     * 
-     * @param data
-     * @param candle
-     * @param width
-     * @param height
-     */
-    protected void plotCandleChartData(long index, Tick data, Candle candle) {
-        double x = axisX.getPositionForValue(index);
-        double open = axisY.getPositionForValue(data.openPrice.toDouble());
-        double close = axisY.getPositionForValue(data.closePrice.toDouble());
-        double high = axisY.getPositionForValue(data.maxPrice.toDouble());
-        double low = axisY.getPositionForValue(data.minPrice.toDouble());
-
-        // calculate candle width
-        double candleWidth = 3;
-
-        // update candle
-        candle.update(close - open, high - open, low - open, candleWidth);
-        // candle.updateTooltip(item.getYValue().doubleValue(), extra.getClose(), extra.getHigh(),
-        // extra.getLow());
-
-        // position the candle
-        candle.setLayoutX(x);
-        candle.setLayoutY(open);
-    }
-
-    /**
      * Set data list for line chart.
      * 
      * @param datalist
@@ -456,15 +443,15 @@ public class ChartPlotArea extends Region {
         // update
         lineChartData = datalist;
 
-        if (plotValidate) {
-            plotValidate = false;
+        if (plotIsValid) {
+            plotIsValid = false;
             setNeedsLayout(true);
         }
     }
 
     private final InvalidationListener dataChangeObserver = observalbe -> {
-        if (plotValidate) {
-            plotValidate = false;
+        if (plotIsValid) {
+            plotIsValid = false;
             setNeedsLayout(true);
         }
     };
@@ -488,8 +475,8 @@ public class ChartPlotArea extends Region {
         // update
         candleChartData = datalist;
 
-        if (plotValidate) {
-            plotValidate = false;
+        if (plotIsValid) {
+            plotIsValid = false;
             setNeedsLayout(true);
         }
     }

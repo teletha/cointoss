@@ -14,61 +14,79 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Region;
 import javafx.scene.shape.Line;
 
+import cointoss.Side;
+import trademate.chart.ChartClass;
+
 /**
- * @version 2017/09/25 17:31:39
+ * @version 2018/01/09 1:22:09
  */
 public class Candle extends Group {
-    private final Line highLowLine = new Line();
 
+    /** The candle width. */
+    private static final int width = 3;
+
+    /** The line part. */
+    private final Line line = new Line();
+
+    /** The bar part. */
     private final Region bar = new Region();
 
-    private String seriesStyleClass;
-
-    private String dataStyleClass;
-
-    private boolean openAboveClose = true;
+    /** The direction */
+    private Side side = Side.BUY;
 
     private final Tooltip tooltip = new Tooltip();
 
-    public Candle(String seriesStyleClass, String dataStyleClass) {
+    /**
+     * 
+     */
+    public Candle() {
+        updateStyle();
         setAutoSizeChildren(false);
-        updateStyleClasses();
-        getChildren().addAll(highLowLine, bar);
-        this.seriesStyleClass = seriesStyleClass;
-        this.dataStyleClass = dataStyleClass;
+        getChildren().addAll(line, bar);
+
         tooltip.setGraphic(new TooltipContent());
         Tooltip.install(bar, tooltip);
     }
 
-    public void setSeriesAndDataStyleClasses(String seriesStyleClass, String dataStyleClass) {
-        this.seriesStyleClass = seriesStyleClass;
-        this.dataStyleClass = dataStyleClass;
-        updateStyleClasses();
-    }
+    /**
+     * Update value.
+     * 
+     * @param closeOffset
+     * @param highOffset
+     * @param lowOffset
+     */
+    public void update(double closeOffset, double highOffset, double lowOffset) {
+        this.side = closeOffset > 0 ? Side.SELL : Side.BUY;
 
-    public void update(double closeOffset, double highOffset, double lowOffset, double candleWidth) {
-        openAboveClose = closeOffset > 0;
-        updateStyleClasses();
-        highLowLine.setStartY(highOffset);
-        highLowLine.setEndY(lowOffset);
-        if (candleWidth == -1) {
-            candleWidth = bar.prefWidth(-1);
-        }
-        if (openAboveClose) {
-            bar.resizeRelocate(-candleWidth / 2, 0, candleWidth, closeOffset);
+        line.setStartY(highOffset);
+        line.setEndY(lowOffset);
+
+        if (side.isSell()) {
+            bar.resizeRelocate(-width / 2, 0, width, closeOffset);
         } else {
-            bar.resizeRelocate(-candleWidth / 2, closeOffset, candleWidth, closeOffset * -1);
+            bar.resizeRelocate(-width / 2, closeOffset, width, closeOffset * -1);
         }
+        updateStyle();
     }
 
+    /**
+     * Update tooltip.
+     * 
+     * @param open
+     * @param close
+     * @param high
+     * @param low
+     */
     public void updateTooltip(double open, double close, double high, double low) {
         TooltipContent tooltipContent = (TooltipContent) tooltip.getGraphic();
         tooltipContent.update(open, close, high, low);
     }
 
-    private void updateStyleClasses() {
-        getStyleClass().setAll("candlestick-candle", seriesStyleClass, dataStyleClass);
-        highLowLine.getStyleClass().setAll("candlestick-line", seriesStyleClass, dataStyleClass, openAboveClose ? "SELL" : "BUY");
-        bar.getStyleClass().setAll("candlestick-bar", seriesStyleClass, dataStyleClass, openAboveClose ? "SELL" : "BUY");
+    /**
+     * Update style.
+     */
+    private void updateStyle() {
+        line.getStyleClass().setAll(ChartClass.CandleLine.name(), side.name());
+        bar.getStyleClass().setAll(ChartClass.CandleBar.name(), side.name());
     }
 }
