@@ -10,14 +10,9 @@
 package trademate.chart;
 
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.List;
 
 import javafx.beans.InvalidationListener;
-import javafx.beans.property.ReadOnlyBooleanProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -37,11 +32,10 @@ import trademate.Notificator;
 import trademate.TradingView;
 import trademate.chart.Axis.TickLable;
 import trademate.chart.shape.Candle;
-import trademate.chart.shape.GraphShape;
 import viewtify.Viewtify;
 
 /**
- * @version 2018/01/05 20:35:03
+ * @version 2018/01/09 0:28:48
  */
 public class GraphPlotArea extends Region {
 
@@ -62,23 +56,6 @@ public class GraphPlotArea extends Region {
     /** The validator. */
     private final InvalidationListener plotValidateListener = observable -> invalidate();
 
-    /** The validator. */
-    private final ChangeListener<Axis> axisListener = (observable, oldValue, newValue) -> {
-        if (oldValue != null) {
-            oldValue.scroll.valueProperty().removeListener(plotValidateListener);
-            oldValue.scroll.visibleAmountProperty().removeListener(plotValidateListener);
-        }
-
-        if (newValue != null) {
-            newValue.scroll.valueProperty().addListener(plotValidateListener);
-            newValue.scroll.visibleAmountProperty().addListener(plotValidateListener);
-        }
-        if (plotValidate) {
-            plotValidate = false;
-            requestLayout();
-        }
-    };
-
     private final Rectangle clip = new Rectangle();
 
     private final Group background = new LocalGroup();
@@ -89,47 +66,29 @@ public class GraphPlotArea extends Region {
     /** The candle chart manager */
     private final Group candles = new LocalGroup();
 
-    private final Group foreground = new LocalGroup();
-
-    private final Group userBackround = new LocalGroup();
-
-    private final Group userForeground = new LocalGroup();
-
-    private final Path verticalGridLines = new Path();
+    /** Chart UI */
+    private final LineMark backGridVertical;
 
     /** Chart UI */
-    private final HorizontalMark horizontalGridLines;
+    private final LineMark backGridHorizontal;
 
     /** Chart UI */
-    private final HorizontalMark horizontalMouseTrack = new HorizontalMark(ChartClass.MouseTrack);
+    private final LineMark mouseTrackVertical;
 
     /** Chart UI */
-    private final HorizontalMark priceSignal = new HorizontalMark(ChartClass.PriceSignal);
+    private final LineMark mouseTrackHorizontal;
 
     /** Chart UI */
-    private final HorizontalMark orders = new HorizontalMark(ChartClass.OrderSupport);
+    private final LineMark priceSignal;
 
-    /** The line chart color manager. */
-    private final BitSet lineColorManager = new BitSet(8);
+    /** Chart UI */
+    private final LineMark orders;
 
     /** The line chart data list. */
     private ObservableList<Tick> candleChartData;
 
     /** The line chart data list. */
     private ObservableList<CandleChartData> lineChartData;
-
-    /** The line chart data list observer. */
-    private final ListChangeListener<CandleChartData> lineDataListObserver = change -> {
-        change.next();
-        for (CandleChartData d : change.getRemoved()) {
-            lineColorManager.clear(d.defaultColorIndex);
-        }
-        for (CandleChartData d : change.getAddedSubList()) {
-            d.defaultColorIndex = lineColorManager.nextClearBit(0);
-            lineColorManager.set(d.defaultColorIndex, true);
-            d.defaultColor = "default-color" + (d.defaultColorIndex % 8);
-        }
-    };
 
     /**
      * 
@@ -138,7 +97,12 @@ public class GraphPlotArea extends Region {
         this.trade = trade;
         this.axisX = axisX;
         this.axisY = axisY;
-        this.horizontalGridLines = new HorizontalMark(ChartClass.GridLine, axisY.forGrid);
+        this.backGridVertical = new LineMark(ChartClass.GridLine, axisX.forGrid, axisX);
+        this.backGridHorizontal = new LineMark(ChartClass.GridLine, axisY.forGrid, axisY);
+        this.mouseTrackVertical = new LineMark(ChartClass.MouseTrack, axisX);
+        this.mouseTrackHorizontal = new LineMark(ChartClass.MouseTrack, axisY);
+        this.priceSignal = new LineMark(ChartClass.PriceSignal, axisY);
+        this.orders = new LineMark(ChartClass.OrderSupport, axisY);
 
         axisX.scroll.valueProperty().addListener(plotValidateListener);
         axisX.scroll.visibleAmountProperty().addListener(plotValidateListener);
@@ -156,9 +120,8 @@ public class GraphPlotArea extends Region {
         providePriceSignal();
         provideOrderSupport();
 
-        verticalGridLines.getStyleClass().setAll("chart-vertical-grid-line");
         getChildren()
-                .addAll(verticalGridLines, horizontalGridLines.path, priceSignal.path, orders.path, horizontalMouseTrack.path, background, userBackround, candles, lines, foreground, userForeground);
+                .addAll(backGridVertical, backGridHorizontal, priceSignal, orders, mouseTrackHorizontal, mouseTrackVertical, background, candles, lines);
     }
 
     /**
@@ -167,7 +130,6 @@ public class GraphPlotArea extends Region {
     private void invalidate() {
         if (plotValidate) {
             plotValidate = false;
-            graphshapeValidate = false;
             setNeedsLayout(true);
         }
     }
@@ -176,8 +138,8 @@ public class GraphPlotArea extends Region {
      * Provide mouse tracker.
      */
     private void provideMouseTracker() {
-        TickLable labelX = axisX.createLabel(ChartClass.MouseTrack);
-        TickLable labelY = horizontalMouseTrack.createLabel();
+        TickLable labelX = mouseTrackVertical.createLabel();
+        TickLable labelY = mouseTrackHorizontal.createLabel();
 
         // track on move
         setOnMouseMoved(e -> {
@@ -234,30 +196,12 @@ public class GraphPlotArea extends Region {
     }
 
     /**
-     * ユーザが任意に使える背景領域
-     * 
-     * @return
+     * {@inheritDoc}
      */
-    public final ObservableList<Node> getBackgroundChildren() {
-        return userBackround.getChildren();
-    }
-
-    /**
-     * ユーザが任意に使える前景領域
-     * 
-     * @return
-     */
-    public final ObservableList<Node> getForegroundChildren() {
-        return userForeground.getChildren();
-    }
-
     @Override
     protected void layoutChildren() {
         if (!plotValidate) {
             plotData();
-        }
-        if (!graphshapeValidate) {
-            drawGraphShapes();
         }
     }
 
@@ -270,92 +214,22 @@ public class GraphPlotArea extends Region {
 
         if (xaxis == null || yaxis == null) {
             plotValidate = true;
-            graphshapeValidate = true;
             return;
         }
 
-        drawGraphShapes();
-
         if (!plotValidate) {
-            drawBackGroundLine();
+            // draw back lines
+            backGridVertical.draw();
+            backGridHorizontal.draw();
+            mouseTrackVertical.draw();
+            mouseTrackHorizontal.draw();
+            priceSignal.draw();
+            orders.draw();
+
             plotLineChartDatas();
             plotCandleChartDatas();
             plotValidate = true;
         }
-    }
-
-    public void drawGraphShapes() {
-        if (plotValidate && graphshapeValidate) {
-            return;
-        }
-        final Axis xaxis = axisX;
-        final Axis yaxis = axisY;
-
-        if (xaxis == null || yaxis == null) {
-            graphshapeValidate = true;
-            return;
-        }
-
-        final double w = getWidth(), h = getHeight();
-        if (w != xaxis.getWidth() || h != yaxis.getHeight()) {
-            return;
-        }
-        List<GraphShape> lines = backGroundShapes;
-        if (lines != null) {
-
-            for (final GraphShape gl : lines) {
-                gl.setNodeProperty(xaxis, yaxis, w, h);
-            }
-        }
-        lines = foreGroundShapes;
-        if (lines != null) {
-            for (final GraphShape gl : lines) {
-                gl.setNodeProperty(xaxis, yaxis, w, h);
-            }
-        }
-        graphshapeValidate = true;
-    }
-
-    /**
-     * Draw background lines.
-     */
-    private void drawBackGroundLine() {
-        Axis axisX = this.axisX;
-        double height = getHeight();
-
-        // vertical lines
-        ObservableList<PathElement> paths = verticalGridLines.getElements();
-        int pathSize = paths.size();
-        int tickSize = axisX.tickSize();
-
-        if (pathSize > tickSize * 2) {
-            paths.remove(tickSize * 2, pathSize);
-            pathSize = tickSize * 2;
-        }
-
-        for (int i = 0; i < tickSize; i++) {
-            double d = axisX.labelAt(i).position();
-            MoveTo mt;
-            LineTo lt;
-            if (i * 2 < pathSize) {
-                mt = (MoveTo) paths.get(i * 2);
-                lt = (LineTo) paths.get(i * 2 + 1);
-            } else {
-                mt = new MoveTo();
-                lt = new LineTo();
-                paths.addAll(mt, lt);
-            }
-            mt.setX(d);
-            mt.setY(0);
-            lt.setX(d);
-            lt.setY(height);
-        }
-
-        // horizontal lines
-        horizontalGridLines.draw();
-        horizontalMouseTrack.draw();
-        priceSignal.draw();
-        orders.draw();
     }
 
     /**
@@ -578,105 +452,12 @@ public class GraphPlotArea extends Region {
         candle.setLayoutY(open);
     }
 
-    boolean graphshapeValidate = true;
-
-    private InvalidationListener graphShapeValidateListener = o -> {
-        final ReadOnlyBooleanProperty p = (ReadOnlyBooleanProperty) o;
-        final boolean b = p.get();
-        if (!b && graphshapeValidate) {
-            graphshapeValidate = false;
-            setNeedsLayout(true);
-
-        }
-    };
-
-    private ObservableList<GraphShape> backGroundShapes, foreGroundShapes;
-
-    public final ObservableList<GraphShape> getBackGroundShapes() {
-        if (backGroundShapes == null) {
-            backGroundShapes = FXCollections.observableArrayList();
-            final ListChangeListener<GraphShape> l = (c) -> {
-                c.next();
-                final Group g = background;
-                final ObservableList<Node> ch = g.getChildren();
-                for (final GraphShape gl : c.getRemoved()) {
-                    final Node node = gl.getNode();
-                    if (node != null) {
-                        ch.remove(node);
-                    }
-                    gl.validateProperty().removeListener(graphShapeValidateListener);
-                }
-                for (final GraphShape gl : c.getAddedSubList()) {
-                    final Node node = gl.getNode();
-                    if (node != null) {
-                        ch.add(gl.getNode());
-                    }
-                    gl.validateProperty().addListener(graphShapeValidateListener);
-                }
-                if (plotValidate) {
-                    graphshapeValidate = false;
-                    plotValidate = false;
-                    setNeedsLayout(true);
-                }
-            };
-            backGroundShapes.addListener(l);
-        }
-        return backGroundShapes;
-    }
-
-    public final ObservableList<GraphShape> getForeGroundShapes() {
-        if (foreGroundShapes == null) {
-            foreGroundShapes = FXCollections.observableArrayList();
-            final ListChangeListener<GraphShape> l = c -> {
-                c.next();
-                final Group g = foreground;
-                final ObservableList<Node> ch = g.getChildren();
-                for (final GraphShape gl : c.getRemoved()) {
-                    final Node node = gl.getNode();
-                    if (node != null) {
-                        ch.remove(node);
-                    }
-                    gl.validateProperty().removeListener(graphShapeValidateListener);
-                }
-                for (final GraphShape gl : c.getAddedSubList()) {
-                    final Node node = gl.getNode();
-                    if (node != null) {
-                        ch.add(gl.getNode());
-                    }
-                    gl.validateProperty().addListener(graphShapeValidateListener);
-                }
-                if (plotValidate) {
-                    graphshapeValidate = false;
-                    requestLayout();
-                }
-            };
-            foreGroundShapes.addListener(l);
-        }
-        return foreGroundShapes;
-    }
-
     /**
      * Set data list for line chart.
      * 
      * @param datalist
      */
     public final void setLineChartDataList(ObservableList<CandleChartData> datalist) {
-        // clear old list configuration
-        if (lineChartData != null) {
-            lineChartData.removeListener(lineDataListObserver);
-            lineColorManager.clear();
-        }
-
-        // add new list configuration
-        if (datalist != null) {
-            datalist.addListener(lineDataListObserver);
-            for (CandleChartData data : datalist) {
-                data.defaultColorIndex = lineColorManager.nextClearBit(0);
-                lineColorManager.set(data.defaultColorIndex, true);
-                data.defaultColor = "default-color" + (data.defaultColorIndex % 8);
-            }
-        }
-
         // update
         lineChartData = datalist;
 
@@ -757,34 +538,36 @@ public class GraphPlotArea extends Region {
     }
 
     /**
-     * @version 2018/01/05 21:28:11
+     * @version 2018/01/09 0:19:26
      */
-    private class HorizontalMark {
+    private class LineMark extends Path {
 
         /** The class name. */
         private final ChartClass className;
 
-        /** The user interface. */
-        private final Path path = new Path();
-
         /** The model. */
         private final List<TickLable> labels;
+
+        /** The associated axis. */
+        private final Axis axis;
 
         /**
          * @param className
          */
-        private HorizontalMark(ChartClass className) {
-            this(className, new ArrayList());
+        private LineMark(ChartClass className, Axis axis) {
+            this(className, new ArrayList(), axis);
         }
 
         /**
          * @param className
          * @param labels
          */
-        private HorizontalMark(ChartClass className, List<TickLable> labels) {
+        private LineMark(ChartClass className, List<TickLable> labels, Axis axis) {
             this.className = className;
             this.labels = labels;
-            this.path.getStyleClass().addAll(className.name(), ChartClass.Line.name());
+            this.axis = axis;
+
+            getStyleClass().addAll(className.name(), ChartClass.Line.name());
         }
 
         /**
@@ -802,7 +585,7 @@ public class GraphPlotArea extends Region {
          * @return
          */
         private TickLable createLabel(Num price) {
-            TickLable label = axisY.createLabel(className);
+            TickLable label = axis.createLabel(className);
             if (price != null) label.value.set(price.toDouble());
             labels.add(label);
 
@@ -822,8 +605,11 @@ public class GraphPlotArea extends Region {
             invalidate();
         }
 
+        /**
+         * Draw mark.
+         */
         private void draw() {
-            ObservableList<PathElement> paths = path.getElements();
+            ObservableList<PathElement> paths = getElements();
             int pathSize = paths.size();
             int labelSize = labels.size();
 
@@ -846,10 +632,18 @@ public class GraphPlotArea extends Region {
                 }
 
                 double value = labels.get(i).position();
-                move.setX(0);
-                move.setY(value);
-                line.setX(getWidth());
-                line.setY(value);
+
+                if (axis.isHorizontal()) {
+                    move.setX(value);
+                    move.setY(0);
+                    line.setX(value);
+                    line.setY(getHeight());
+                } else {
+                    move.setX(0);
+                    move.setY(value);
+                    line.setX(getWidth());
+                    line.setY(value);
+                }
             }
         }
     }

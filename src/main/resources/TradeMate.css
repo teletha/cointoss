@@ -87,11 +87,11 @@
 }
 
 .MouseTrack.Label {
-	-fx-fill: -fx-mid-text-color;
+	-fx-fill: -fx-light-text-color;
 }
 .MouseTrack.Line {
 	-fx-stroke-width: 0.5;
-	-fx-stroke: rgb(50, 50, 50);
+	-fx-stroke: rgb(80, 80, 80);
 }
 
 .PriceSignal.Label {

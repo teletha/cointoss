@@ -34,7 +34,6 @@ import cointoss.chart.Chart;
 import cointoss.chart.Tick;
 import cointoss.util.Num;
 import trademate.TradingView;
-import trademate.chart.shape.GraphShape;
 
 /**
  * @version 2017/09/27 18:13:28
@@ -221,14 +220,6 @@ public class CandleChart extends Region {
         graph.removeEventFilter(eventType, eventFilter);
     }
 
-    public final ObservableList<GraphShape> getForeGroundShapes() {
-        return graph.getForeGroundShapes();
-    }
-
-    public final ObservableList<GraphShape> getBackGroundShapes() {
-        return graph.getBackGroundShapes();
-    }
-
     private static boolean isLeft(final Side s) {
         return s != Side.RIGHT;
     }
@@ -275,9 +266,6 @@ public class CandleChart extends Region {
                     graph.plotData();
                     dataIsValid.set(true);
                 }
-            }
-            if (!prelayout && !graph.graphshapeValidate) {
-                graph.drawGraphShapes();
             }
         }
     }
@@ -371,11 +359,7 @@ public class CandleChart extends Region {
                     graph.plotData();
                     dataIsValid.set(true);
                 }
-                if (!graph.graphshapeValidate) {
-                    graph.drawGraphShapes();
-                }
             }
-
             plotAreaBounds.set(new Rectangle2D(x + x0, y + y0, graphWidth, graphHeight));
         }
 

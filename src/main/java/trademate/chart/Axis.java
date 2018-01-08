@@ -296,7 +296,7 @@ public class Axis extends Region {
         double low = computeVisibleMinValue();
         double up = computeVisibleMaxValue();
         double visualDiff = up - low;
-        this.uiRatio = computeAxisLength(width, height) / visualDiff;
+        this.uiRatio = computeAxisLength() / visualDiff;
 
         // layout scroll bar
         double max = logicalMaxValue.get();
@@ -326,12 +326,10 @@ public class Axis extends Region {
     /**
      * 軸方向のサイズを返す
      * 
-     * @param width
-     * @param height
      * @return
      */
-    private final double computeAxisLength(double width, double height) {
-        return isHorizontal() ? width : height;
+    public final double computeAxisLength() {
+        return isHorizontal() ? getWidth() : getHeight();
     }
 
     private int findNearestUnitIndex(double majorTickValueInterval) {
@@ -364,7 +362,7 @@ public class Axis extends Region {
     protected final void layoutChildren(double width, double height) {
         if (whileLayout.compareAndSet(false, true)) {
             try {
-                if (!dateIsValid || computeAxisLength(width, height) != computeAxisLength(lastLayoutWidth, lastLayoutHeight)) {
+                if (!dateIsValid) {
                     computeAxisProperties(width, height);
                     layoutValidate = false;
                     dateIsValid = true;
@@ -402,7 +400,7 @@ public class Axis extends Region {
      */
     private void layoutLines(double width, double height) {
         boolean horizontal = isHorizontal();
-        double axisLength = computeAxisLength(width, height);
+        double axisLength = computeAxisLength();
         baseLine.setEndX(horizontal ? axisLength : 0);
         baseLine.setEndY(horizontal ? 0 : axisLength);
 
