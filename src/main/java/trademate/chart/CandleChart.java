@@ -36,7 +36,7 @@ import cointoss.util.Num;
 import trademate.TradingView;
 
 /**
- * @version 2017/09/27 18:13:28
+ * @version 2018/01/09 0:38:15
  */
 public class CandleChart extends Region {
 

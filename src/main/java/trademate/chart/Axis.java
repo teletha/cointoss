@@ -174,7 +174,7 @@ public class Axis extends Region {
         this.side = side;
 
         for (int i = 0; i < tickNumber; i++) {
-            forGrid.add(new TickLable(ChartClass.AxisTickLabel));
+            forGrid.add(new TickLable(ChartClass.BackGrid));
         }
 
         Viewtify.clip(tickPath, this);
@@ -193,9 +193,8 @@ public class Axis extends Region {
         // ====================================================
         // Initialize UI widget
         // ====================================================
-
-        tickPath.getStyleClass().setAll(ChartClass.AxisTick.name());
-        baseLine.getStyleClass().setAll(ChartClass.AxisLine.name());
+        tickPath.getStyleClass().setAll(ChartClass.BackGrid.name(), ChartClass.Line.name());
+        baseLine.getStyleClass().setAll(ChartClass.BackGrid.name(), ChartClass.Line.name());
 
         lines.getChildren().addAll(tickPath, baseLine);
 

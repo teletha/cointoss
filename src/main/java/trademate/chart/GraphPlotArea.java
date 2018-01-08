@@ -79,10 +79,10 @@ public class GraphPlotArea extends Region {
     private final LineMark mouseTrackHorizontal;
 
     /** Chart UI */
-    private final LineMark priceSignal;
+    private final LineMark notifyPrice;
 
     /** Chart UI */
-    private final LineMark orders;
+    private final LineMark orderPrice;
 
     /** The line chart data list. */
     private ObservableList<Tick> candleChartData;
@@ -97,12 +97,12 @@ public class GraphPlotArea extends Region {
         this.trade = trade;
         this.axisX = axisX;
         this.axisY = axisY;
-        this.backGridVertical = new LineMark(ChartClass.GridLine, axisX.forGrid, axisX);
-        this.backGridHorizontal = new LineMark(ChartClass.GridLine, axisY.forGrid, axisY);
+        this.backGridVertical = new LineMark(ChartClass.BackGrid, axisX.forGrid, axisX);
+        this.backGridHorizontal = new LineMark(ChartClass.BackGrid, axisY.forGrid, axisY);
         this.mouseTrackVertical = new LineMark(ChartClass.MouseTrack, axisX);
         this.mouseTrackHorizontal = new LineMark(ChartClass.MouseTrack, axisY);
-        this.priceSignal = new LineMark(ChartClass.PriceSignal, axisY);
-        this.orders = new LineMark(ChartClass.OrderSupport, axisY);
+        this.notifyPrice = new LineMark(ChartClass.PriceSignal, axisY);
+        this.orderPrice = new LineMark(ChartClass.OrderSupport, axisY);
 
         axisX.scroll.valueProperty().addListener(plotValidateListener);
         axisX.scroll.visibleAmountProperty().addListener(plotValidateListener);
@@ -121,7 +121,7 @@ public class GraphPlotArea extends Region {
         provideOrderSupport();
 
         getChildren()
-                .addAll(backGridVertical, backGridHorizontal, priceSignal, orders, mouseTrackHorizontal, mouseTrackVertical, background, candles, lines);
+                .addAll(backGridVertical, backGridHorizontal, notifyPrice, orderPrice, mouseTrackHorizontal, mouseTrackVertical, background, candles, lines);
     }
 
     /**
@@ -166,18 +166,18 @@ public class GraphPlotArea extends Region {
             Num price = Num.of(Math.floor(axisY.getValueForPosition(e.getY())));
 
             // check price range to add or remove
-            for (TickLable mark : priceSignal.labels) {
+            for (TickLable mark : notifyPrice.labels) {
                 if (Num.of(mark.value.get()).isNear(price, 500)) {
-                    priceSignal.remove(mark);
+                    notifyPrice.remove(mark);
                     return;
                 }
             }
 
-            TickLable label = priceSignal.createLabel(price);
+            TickLable label = notifyPrice.createLabel(price);
 
             label.add(trade.market().signalByPrice(price).to(exe -> {
                 notificator.priceSignal.notify("Rearch to " + price);
-                priceSignal.remove(label);
+                notifyPrice.remove(label);
             }));
         });
     }
@@ -187,10 +187,10 @@ public class GraphPlotArea extends Region {
      */
     private void provideOrderSupport() {
         trade.market().yourOrder.on(Viewtify.UIThread).to(o -> {
-            TickLable label = orders.createLabel(o.price);
+            TickLable label = orderPrice.createLabel(o.price);
 
             o.state.observe().take(State.CANCELED, State.COMPLETED).take(1).on(Viewtify.UIThread).to(() -> {
-                orders.remove(label);
+                orderPrice.remove(label);
             });
         });
     }
@@ -223,8 +223,8 @@ public class GraphPlotArea extends Region {
             backGridHorizontal.draw();
             mouseTrackVertical.draw();
             mouseTrackHorizontal.draw();
-            priceSignal.draw();
-            orders.draw();
+            notifyPrice.draw();
+            orderPrice.draw();
 
             plotLineChartDatas();
             plotCandleChartDatas();

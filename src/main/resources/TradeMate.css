@@ -65,25 +65,12 @@
   -fx-background-insets: 0,1,2;
 }
 
-.chart-vertical-grid-line,
-.chart-vertical-minor-grid-line,
-.GridLine {
-	-fx-stroke-width: 0.5;
-	-fx-stroke: rgb(40, 40, 40);
-}
-
-.AxisLine {
-	-fx-stroke-width: 0.5;
-	-fx-stroke: rgb(40, 40, 40);
-}
-
-.AxisTick {
-	-fx-stroke-width: 0.5;
-	-fx-stroke: rgb(40, 40, 40);
-}
-
-.AxisTickLabel {
+.BackGrid.Label {
 	-fx-fill: -fx-mid-text-color;
+}
+.BackGrid.Line {
+	-fx-stroke-width: 0.5;
+	-fx-stroke: rgb(40, 40, 40);
 }
 
 .MouseTrack.Label {
