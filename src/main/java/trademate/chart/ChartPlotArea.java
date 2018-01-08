@@ -273,44 +273,41 @@ public class ChartPlotArea extends Region {
         ObservableList<Node> nodes = candles.getChildren();
         List<Tick> datas = candleChartData;
 
-        if (datas == null) {
-            nodes.clear();
-        } else {
-            int dataSize = datas.size();
-            int nodeSize = nodes.size();
+        int dataSize = datas.size();
+        int nodeSize = nodes.size();
 
-            if (dataSize < nodeSize) {
-                nodes.remove(dataSize, nodeSize);
-                nodeSize = dataSize;
-            }
+        if (dataSize < nodeSize) {
+            nodes.remove(dataSize, nodeSize);
+            nodeSize = dataSize;
+        }
 
-            Num min = Num.MAX;
-            Axis xAxis = axisX;
-            long start = (long) xAxis.computeVisibleMinValue();
-            long end = (long) xAxis.computeVisibleMaxValue();
+        Num min = Num.MAX;
+        Axis xAxis = axisX;
+        long start = (long) xAxis.computeVisibleMinValue();
+        long end = (long) xAxis.computeVisibleMaxValue();
 
-            for (int i = 0; i < dataSize; i++) {
-                Tick tick = datas.get(i);
-                long time = tick.start.toInstant().toEpochMilli();
+        for (int i = 0; i < dataSize; i++) {
+            Tick tick = datas.get(i);
+            long time = tick.start.toInstant().toEpochMilli();
 
-                if (start <= time && time <= end) {
-                    min = Num.min(min, tick.minPrice);
+            if (start <= time && time <= end) {
+                min = Num.min(min, tick.minPrice);
 
-                    Candle candle;
+                Candle candle;
 
-                    if (i < nodeSize) {
-                        candle = (Candle) nodes.get(i);
-                    } else {
-                        candle = new Candle();
-                        nodes.add(candle);
-                    }
-                    plotCandleChartData(tick.start.toInstant().toEpochMilli(), tick, candle);
+                if (i < nodes.size()) {
+                    candle = (Candle) nodes.get(i);
                 } else {
-                    if (i < nodeSize) {
-                        Candle candle = (Candle) nodes.get(i);
-                        candle.setLayoutX(-10);
-                        candle.setLayoutY(-10);
-                    }
+                    candle = new Candle();
+                    nodes.add(0, candle);
+                    System.out.println("add  " + nodes.size() + "  " + dataSize + "  " + i);
+                }
+                plotCandleChartData(tick.start.toInstant().toEpochMilli(), tick, candle);
+            } else {
+                if (i < nodes.size()) {
+                    Candle candle = (Candle) nodes.get(i);
+                    candle.setLayoutX(-10);
+                    candle.setLayoutY(-10);
                 }
             }
         }
