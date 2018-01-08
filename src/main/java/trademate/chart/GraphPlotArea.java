@@ -22,7 +22,6 @@ import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.PathElement;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.StrokeLineJoin;
 
 import cointoss.Order.State;
@@ -57,10 +56,6 @@ public class GraphPlotArea extends Region {
     /** The validator. */
     private final InvalidationListener plotValidateListener = observable -> invalidate();
 
-    private final Rectangle clip = new Rectangle();
-
-    private final Group background = new LocalGroup();
-
     /** The line chart manager */
     private final Group lines = new LocalGroup();
 
@@ -92,7 +87,9 @@ public class GraphPlotArea extends Region {
     private ObservableList<CandleChartData> lineChartData;
 
     /**
-     * 
+     * @param trade
+     * @param axisX
+     * @param axisY
      */
     public GraphPlotArea(TradingView trade, Axis axisX, Axis axisY) {
         this.trade = trade;
@@ -105,24 +102,21 @@ public class GraphPlotArea extends Region {
         this.notifyPrice = new LineMark(ChartClass.PriceSignal, axisY);
         this.orderPrice = new LineMark(ChartClass.OrderSupport, axisY);
 
+        widthProperty().addListener(plotValidateListener);
+        heightProperty().addListener(plotValidateListener);
         axisX.scroll.valueProperty().addListener(plotValidateListener);
         axisX.scroll.visibleAmountProperty().addListener(plotValidateListener);
         axisY.scroll.valueProperty().addListener(plotValidateListener);
         axisY.scroll.visibleAmountProperty().addListener(plotValidateListener);
 
-        getStyleClass().setAll("chart-plot-background");
-        widthProperty().addListener(plotValidateListener);
-        heightProperty().addListener(plotValidateListener);
-        clip.widthProperty().bind(widthProperty());
-        clip.heightProperty().bind(heightProperty());
-        setClip(clip);
+        Viewtify.clip(this);
 
         visualizeMouseTrack();
         visualizeNotifyPrice();
         visualizeOrderPrice();
 
         getChildren()
-                .addAll(backGridVertical, backGridHorizontal, notifyPrice, orderPrice, mouseTrackHorizontal, mouseTrackVertical, background, candles, lines);
+                .addAll(backGridVertical, backGridHorizontal, notifyPrice, orderPrice, mouseTrackHorizontal, mouseTrackVertical, candles, lines);
     }
 
     /**
