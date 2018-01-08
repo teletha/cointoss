@@ -39,6 +39,7 @@ import javafx.scene.text.Text;
 import org.eclipse.collections.api.block.function.primitive.DoubleToObjectFunction;
 
 import cointoss.util.Num;
+import kiss.Disposable;
 import viewtify.Viewtify;
 import viewtify.ui.UILine;
 
@@ -649,10 +650,22 @@ public class Axis extends Region {
     /**
      * @version 2018/01/08 2:53:23
      */
-    public class TickLable extends Text {
+    public class TickLable extends Text implements Disposable {
 
         /** The associated value. */
         public final DoubleProperty value = new SimpleDoubleProperty();
+
+        private final InvalidationListener layout = change -> {
+            Viewtify.inUI(() -> {
+                ObservableList<Node> children = tickLabels.getChildren();
+
+                if (value.get() < 0) {
+                    children.remove(this);
+                } else if (!children.contains(this)) {
+                    children.add(this);
+                }
+            });
+        };
 
         /**
          * 
@@ -662,15 +675,7 @@ public class Axis extends Region {
             textProperty().bind(Viewtify.calculate(value, () -> tickLabelFormatter.get().apply(value.get())));
 
             value.addListener(dataValidateListener);
-            value.addListener(change -> {
-                ObservableList<Node> children = tickLabels.getChildren();
-
-                if (value.get() < 0) {
-                    children.remove(this);
-                } else if (!children.contains(this)) {
-                    children.add(this);
-                }
-            });
+            value.addListener(layout);
         }
 
         /**
@@ -680,6 +685,17 @@ public class Axis extends Region {
          */
         public double position() {
             return getPositionForValue(value.get());
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void vandalize() {
+            tickLabels.getChildren().remove(this);
+            textProperty().unbind();
+            value.removeListener(dataValidateListener);
+            value.removeListener(layout);
         }
     }
 }

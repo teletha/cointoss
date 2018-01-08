@@ -208,21 +208,22 @@ public class GraphPlotArea extends Region {
             Num price = Num.of(Math.floor(axisY.getValueForPosition(e.getY())));
 
             // check price range to add or remove
-            for (Mark mark : priceSignal.marks) {
-                if (mark.price.isNear(price, 500)) {
+            for (TickLable mark : priceSignal.marks) {
+                if (Num.of(mark.value.get()).isNear(price, 500)) {
                     priceSignal.remove(mark);
                     return;
                 }
             }
 
             // create new mark
-            Mark mark = new Mark(price);
-            priceSignal.add(mark);
+            TickLable label = axisY.createLabel();
+            label.value.set(price.toDouble());
+            priceSignal.add(label);
 
-            mark.disposer = trade.market().signalByPrice(price).to(exe -> {
+            label.add(trade.market().signalByPrice(price).to(exe -> {
                 notificator.priceSignal.notify("Rearch to " + price);
-                priceSignal.remove(mark);
-            });
+                priceSignal.remove(label);
+            }));
         });
     }
 
@@ -231,12 +232,14 @@ public class GraphPlotArea extends Region {
      */
     private void provideOrderSupport() {
         trade.market().yourOrder.to(o -> {
-            Mark mark = new Mark(o.price);
 
-            orders.add(mark);
+            TickLable label = axisY.createLabel();
+            label.value.set(o.price.toDouble());
+
+            orders.add(label);
 
             o.state.observe().take(State.CANCELED, State.COMPLETED).take(1).to(() -> {
-                orders.remove(mark);
+                orders.remove(label);
             });
         });
     }
@@ -786,7 +789,7 @@ public class GraphPlotArea extends Region {
         private final Path path = new Path();
 
         /** The model. */
-        private final List<Mark> marks = new CopyOnWriteArrayList();
+        private final List<TickLable> marks = new CopyOnWriteArrayList();
 
         /**
          *  
@@ -794,13 +797,30 @@ public class GraphPlotArea extends Region {
         private HorizontalMark(ChartClass clazz) {
             path.getStyleClass().add(clazz.name());
         }
+        
+        private void addMark(Num value) {
+            addMark(value.toDouble());
+        }
+        
+        /**
+         * Add mark at the specified value.
+         * 
+         * @param value
+         */
+        private void addMark(double value) {
+            TickLable label = axisY.createLabel();
+            label.value.set(value);
+            
+            marks.add(label);
+            invalidate();
+        }
 
         /**
          * Add mark.
          * 
          * @param mark
          */
-        private void add(Mark mark) {
+        private void add(TickLable mark) {
             marks.add(mark);
             invalidate();
         }
@@ -810,14 +830,14 @@ public class GraphPlotArea extends Region {
          * 
          * @param mark
          */
-        private void remove(Mark mark) {
+        private void remove(TickLable mark) {
             marks.remove(mark);
             mark.dispose();
             invalidate();
         }
 
         private void draw(double width) {
-            draw(marks.size(), index -> Math.floor(axisY.getPositionForValue(marks.get(index).price.toDouble())), true, width);
+            draw(marks.size(), index -> Math.floor(marks.get(index).position()), true, width);
         }
 
         private void draw(int size, IntToDoubleFunction positionAdviser, boolean visible, double width) {
@@ -850,35 +870,6 @@ public class GraphPlotArea extends Region {
                 move.setY(value);
                 line.setX(width);
                 line.setY(value);
-            }
-        }
-    }
-
-    /**
-     * @version 2018/01/05 21:12:36
-     */
-    private static class Mark implements Disposable {
-
-        /** The marked price. */
-        private final Num price;
-
-        /** The disposer */
-        private Disposable disposer;
-
-        /**
-         * @param price
-         */
-        private Mark(Num price) {
-            this.price = price;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void vandalize() {
-            if (disposer != null) {
-                disposer.dispose();
             }
         }
     }
