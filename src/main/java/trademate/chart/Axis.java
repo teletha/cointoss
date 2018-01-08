@@ -24,7 +24,6 @@ import javafx.geometry.Bounds;
 import javafx.geometry.Orientation;
 import javafx.geometry.Side;
 import javafx.scene.Group;
-import javafx.scene.Node;
 import javafx.scene.control.ScrollBar;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.Region;
@@ -40,10 +39,9 @@ import org.eclipse.collections.api.block.function.primitive.DoubleToObjectFuncti
 import cointoss.util.Num;
 import kiss.Disposable;
 import viewtify.Viewtify;
-import viewtify.ui.UILine;
 
 /**
- * @version 2018/01/07 13:47:17
+ * @version 2018/01/08 22:59:17
  */
 public class Axis extends Region {
 
@@ -61,8 +59,51 @@ public class Axis extends Region {
             2.5E7d, 5.0E7d, 1.0E8d, 2.5E8d, 5.0E8d, 1.0E9d, 2.5E9d, 5.0E9d, 1.0E10d, 2.5E10d, 5.0E10d, 1.0E11d, 2.5E11d, 5.0E11d, 1.0E12d,
             2.5E12d, 5.0E12d};
 
+    /** The visual placement position. */
+    public final Side side;
+
+    public final ObjectProperty<DoubleToObjectFunction<String>> tickLabelFormatter = new SimpleObjectProperty<>(this, "tickLabelFormatter", String::valueOf);
+
+    /** The preferred visible number of ticks. */
+    public final int tickNumber = 10;
+
+    /** The visual length of tick. */
+    public final int tickLength;
+
+    /** The visual distance between tick and label. */
+    public final int tickLabelDistance;
+
+    /** The logical maximum value. */
+    public final DoubleProperty logicalMaxValue = new SimpleDoubleProperty(this, "logicalMaxValue", 1);
+
+    /** The logical minimum value. */
+    public final DoubleProperty logicalMinValue = new SimpleDoubleProperty(this, "logicalMinValue", 0);
+
+    /** The tick unit. */
+    public final ObjectProperty<double[]> units = new SimpleObjectProperty(DefaultTickUnit);
+
+    public final List<TickLable> forGrid = new ArrayList();
+
+    /** UI widget. */
+    public final ScrollBar scroll = new ScrollBar();
+
+    /** UI widget. */
+    private final Group lines = new Group();
+
+    /** UI widget. */
+    private final Path tickPath = new Path();
+
+    /** UI widget. */
+    private final Group tickLabels = new Group();
+
+    /** UI widget. */
+    private final Line baseLine = new Line();
+
     /** The layouting flag. */
     private final AtomicBoolean whileLayout = new AtomicBoolean();
+
+    /** The current. (axisLength / visibleValueDistance) */
+    private double uiRatio;
 
     /** 状態の正当性を示すプロパティ */
     private boolean layoutValidate = false;
@@ -70,12 +111,9 @@ public class Axis extends Region {
     /** 状態の正当性を示すプロパティ */
     private boolean dateIsValid = false;
 
-    private double lastLayoutWidth = -1, lastLayoutHeight = -1;
+    private double lastLayoutWidth = -1;
 
-    /** The visual placement position. */
-    public final Side side;
-
-    public final ObjectProperty<DoubleToObjectFunction<String>> tickLabelFormatter = new SimpleObjectProperty<>(this, "tickLabelFormatter", String::valueOf);
+    private double lastLayoutHeight = -1;
 
     /** Axisの構成情報を書き換えるべきデータに対して付加するリスナ */
     private final InvalidationListener dataValidateListener = observable -> {
@@ -127,50 +165,6 @@ public class Axis extends Region {
         }
     };
 
-    /** The preferred visible number of ticks. */
-    public final int tickNumber = 10;
-
-    /** The visual length of tick. */
-    public final int tickLength;
-
-    /** The visual distance between tick and label. */
-    public final int tickLabelDistance;
-
-    /** The logical maximum value. */
-    public final DoubleProperty logicalMaxValue = new SimpleDoubleProperty(this, "logicalMaxValue", 1);
-
-    /** The logical minimum value. */
-    public final DoubleProperty logicalMinValue = new SimpleDoubleProperty(this, "logicalMinValue", 0);
-
-    /** The tick unit. */
-    public final ObjectProperty<double[]> units = new SimpleObjectProperty(DefaultTickUnit);
-
-    public final List<TickLable> forGrid = new ArrayList();
-
-    /** UI widget. */
-    private final Group lines = new Group();
-
-    /** UI widget. */
-    private final Path tickPath = new Path();
-
-    /** UI widget. */
-    private final Group tickLabels = new Group();
-
-    /** UI widget. */
-    private final UILine indicatorPath = new UILine().style(ChartClass.AxisTick).visible(false).startX(0).startY(0);
-
-    /** UI widget. */
-    private final Line baseLine = new Line();
-
-    /** UI widget. */
-    public final ScrollBar scroll = new ScrollBar();
-
-    /** The current. (axisLength / visibleValueDistance) */
-    private double uiRatio;
-
-    /** The current unit index. */
-    private int currentUnitIndex = -1;
-
     /**
      * 
      */
@@ -178,12 +172,6 @@ public class Axis extends Region {
         this.tickLength = tickLength;
         this.tickLabelDistance = tickLabelDistance;
         this.side = side;
-
-        if (isHorizontal()) {
-            indicatorPath.endX(0).endY(tickLength);
-        } else {
-            indicatorPath.endX(tickLength).endY(0);
-        }
 
         for (int i = 0; i < tickNumber; i++) {
             forGrid.add(new TickLable(ChartClass.AxisTickLabel));
@@ -209,7 +197,7 @@ public class Axis extends Region {
         tickPath.getStyleClass().setAll(ChartClass.AxisTick.name());
         baseLine.getStyleClass().setAll(ChartClass.AxisLine.name());
 
-        lines.getChildren().addAll(tickPath, indicatorPath.ui, baseLine);
+        lines.getChildren().addAll(tickPath, baseLine);
 
         scroll.setOrientation(isHorizontal() ? Orientation.HORIZONTAL : Orientation.VERTICAL);
         scroll.valueProperty().addListener(scrollValueValidator);
@@ -220,6 +208,24 @@ public class Axis extends Region {
         getChildren().addAll(lines, tickLabels, scroll);
 
         addEventHandler(ScrollEvent.SCROLL, this::zoom);
+    }
+
+    /**
+     * Detect orientation of this axis.
+     * 
+     * @return
+     */
+    public final boolean isHorizontal() {
+        return side.isHorizontal();
+    }
+
+    /**
+     * Detect orientation of this axis.
+     * 
+     * @return
+     */
+    public final boolean isVertical() {
+        return side.isVertical();
     }
 
     public int tickSize() {
@@ -248,57 +254,10 @@ public class Axis extends Region {
      * @return
      */
     public final double getValueForPosition(double position) {
-        if (!isHorizontal()) {
+        if (isVertical()) {
             position = getHeight() - position;
         }
         return position / uiRatio + computeVisibleMinValue();
-    }
-
-    /**
-     * Compute axis properties to layout items.
-     * 
-     * @param width A current visual width, may be -1.
-     * @param height A curretn visual height, may be -1.
-     */
-    private void computeAxisProperties(double width, double height) {
-        double low = computeVisibleMinValue();
-        double up = computeVisibleMaxValue();
-        double visualDiff = up - low;
-        this.uiRatio = getAxisLength(width, height) / visualDiff;
-
-        // layout scroll bar
-        double max = logicalMaxValue.get();
-        double min = logicalMinValue.get();
-
-        if (low == min && up == max) {
-            scroll.setValue(0);
-            scroll.setVisibleAmount(1);
-        } else {
-            double logicalDiff = max - min;
-            double value = (low - min) / (logicalDiff - visualDiff);
-            scroll.setValue(isHorizontal() ? value : 1 - value);
-            scroll.setVisibleAmount(visualDiff / logicalDiff);
-        }
-
-        // search sutable unit
-        int nextUnitIndex = findNearestUnitIndex(visualDiff / tickNumber);
-        double nextUnitSize = units.get()[nextUnitIndex];
-        double visibleTickBaseValue = Math.floor(low / nextUnitSize) * nextUnitSize;
-
-        if (currentUnitIndex != nextUnitIndex) {
-            currentUnitIndex = nextUnitIndex;
-        }
-
-        for (int i = 0; i < tickNumber; i++) {
-            TickLable label = forGrid.get(i);
-            double tickValue = visibleTickBaseValue + nextUnitSize * (i + 1);
-
-            if (low <= tickValue && tickValue <= up) {
-                label.value.set(tickValue);
-            } else {
-                label.value.set(tickValue);
-            }
-        }
     }
 
     /**
@@ -327,6 +286,54 @@ public class Axis extends Region {
         return Math.max(min, min + (logicalDiff - bar) * position);
     }
 
+    /**
+     * Compute axis properties to layout items.
+     * 
+     * @param width A current visual width, may be -1.
+     * @param height A curretn visual height, may be -1.
+     */
+    private void computeAxisProperties(double width, double height) {
+        double low = computeVisibleMinValue();
+        double up = computeVisibleMaxValue();
+        double visualDiff = up - low;
+        this.uiRatio = computeAxisLength(width, height) / visualDiff;
+
+        // layout scroll bar
+        double max = logicalMaxValue.get();
+        double min = logicalMinValue.get();
+
+        if (low == min && up == max) {
+            scroll.setValue(0);
+            scroll.setVisibleAmount(1);
+        } else {
+            double logicalDiff = max - min;
+            double value = (low - min) / (logicalDiff - visualDiff);
+            scroll.setValue(isHorizontal() ? value : 1 - value);
+            scroll.setVisibleAmount(visualDiff / logicalDiff);
+        }
+
+        // search sutable unit
+        int nextUnitIndex = findNearestUnitIndex(visualDiff / tickNumber);
+        double nextUnitSize = units.get()[nextUnitIndex];
+        double visibleTickBaseValue = Math.floor(low / nextUnitSize) * nextUnitSize;
+
+        // reset value for grid lines
+        for (int i = 0; i < forGrid.size(); i++) {
+            forGrid.get(i).value.set(visibleTickBaseValue + nextUnitSize * (i + 1));
+        }
+    }
+
+    /**
+     * 軸方向のサイズを返す
+     * 
+     * @param width
+     * @param height
+     * @return
+     */
+    private final double computeAxisLength(double width, double height) {
+        return isHorizontal() ? width : height;
+    }
+
     private int findNearestUnitIndex(double majorTickValueInterval) {
         // serach from unit list
         for (int i = 0; i < units.get().length; i++) {
@@ -338,24 +345,6 @@ public class Axis extends Region {
     }
 
     /**
-     * Detect orientation of this axis.
-     * 
-     * @return
-     */
-    public final boolean isHorizontal() {
-        return side.isHorizontal();
-    }
-
-    /**
-     * Detect orientation of this axis.
-     * 
-     * @return
-     */
-    public final boolean isVertical() {
-        return side.isVertical();
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
@@ -364,6 +353,33 @@ public class Axis extends Region {
             return;
         }
         layoutChildren(getWidth(), getHeight());
+    }
+
+    /**
+     * Force to layout child nodes.
+     * 
+     * @param width
+     * @param height
+     */
+    protected final void layoutChildren(double width, double height) {
+        if (whileLayout.compareAndSet(false, true)) {
+            try {
+                if (!dateIsValid || computeAxisLength(width, height) != computeAxisLength(lastLayoutWidth, lastLayoutHeight)) {
+                    computeAxisProperties(width, height);
+                    layoutValidate = false;
+                    dateIsValid = true;
+                }
+
+                if (!layoutValidate || width != lastLayoutWidth || height != lastLayoutHeight) {
+                    layoutAxis(width, height);
+                    layoutValidate = true;
+                }
+                lastLayoutWidth = width;
+                lastLayoutHeight = height;
+            } finally {
+                whileLayout.compareAndSet(true, false);
+            }
+        }
     }
 
     /**
@@ -386,7 +402,7 @@ public class Axis extends Region {
      */
     private void layoutLines(double width, double height) {
         boolean horizontal = isHorizontal();
-        double axisLength = getAxisLength(width, height);
+        double axisLength = computeAxisLength(width, height);
         baseLine.setEndX(horizontal ? axisLength : 0);
         baseLine.setEndY(horizontal ? 0 : axisLength);
 
@@ -542,44 +558,6 @@ public class Axis extends Region {
     }
 
     /**
-     * Force to layout child nodes.
-     * 
-     * @param width
-     * @param height
-     */
-    protected final void layoutChildren(double width, double height) {
-        if (whileLayout.compareAndSet(false, true)) {
-            try {
-                if (!dateIsValid || getAxisLength(width, height) != getAxisLength(lastLayoutWidth, lastLayoutHeight)) {
-                    computeAxisProperties(width, height);
-                    layoutValidate = false;
-                    dateIsValid = true;
-                }
-
-                if (!layoutValidate || width != lastLayoutWidth || height != lastLayoutHeight) {
-                    layoutAxis(width, height);
-                    layoutValidate = true;
-                }
-                lastLayoutWidth = width;
-                lastLayoutHeight = height;
-            } finally {
-                whileLayout.compareAndSet(true, false);
-            }
-        }
-    }
-
-    /**
-     * 軸方向のサイズを返す
-     * 
-     * @param width
-     * @param height
-     * @return
-     */
-    protected final double getAxisLength(final double width, final double height) {
-        return isHorizontal() ? width : height;
-    }
-
-    /**
      * Create new label.
      * 
      * @return
@@ -604,27 +582,15 @@ public class Axis extends Region {
         /** The associated value. */
         public final DoubleProperty value = new SimpleDoubleProperty();
 
-        private final InvalidationListener layout = change -> {
-            Viewtify.inUI(() -> {
-                ObservableList<Node> children = tickLabels.getChildren();
-
-                if (value.get() < 0) {
-                    children.remove(this);
-                } else if (!children.contains(this)) {
-                    children.add(this);
-                }
-            });
-        };
-
         /**
          * 
          */
         private TickLable(ChartClass className) {
+            tickLabels.getChildren().add(this);
             getStyleClass().addAll(className.name(), ChartClass.Label.name());
             textProperty().bind(Viewtify.calculate(value, () -> tickLabelFormatter.get().apply(value.get())));
 
             value.addListener(dataValidateListener);
-            value.addListener(layout);
         }
 
         /**
@@ -645,7 +611,6 @@ public class Axis extends Region {
                 tickLabels.getChildren().remove(this);
                 textProperty().unbind();
                 value.removeListener(dataValidateListener);
-                value.removeListener(layout);
             });
         }
     }

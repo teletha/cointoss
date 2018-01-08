@@ -15,9 +15,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.IntToDoubleFunction;
 
 import javafx.beans.InvalidationListener;
-import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -46,12 +44,6 @@ import trademate.chart.shape.GraphShape;
  * @version 2018/01/05 20:35:03
  */
 public class GraphPlotArea extends Region {
-
-    /** The visibility of horizontal grid line. */
-    public final BooleanProperty horizontalGridLineVisibility = new SimpleBooleanProperty(this, "horizontalGridLinesVisible", true);
-
-    /** The visibility of vertical grid line. */
-    public final BooleanProperty verticalGridLineVisibility = new SimpleBooleanProperty(this, "verticalGridLineVisibility", true);
 
     final Axis axisX;
 
@@ -105,16 +97,20 @@ public class GraphPlotArea extends Region {
 
     private final Path verticalGridLines = new Path();
 
+    /** Chart UI */
     private final HorizontalMark horizontalGridLines = new HorizontalMark(ChartClass.GridLine);
+
+    /** Chart UI */
+    private final HorizontalMark horizontalMouseTrack = new HorizontalMark(ChartClass.MouseTrack);
+
+    /** Chart UI */
+    private final HorizontalMark priceSignal = new HorizontalMark(ChartClass.PriceSignal);
+
+    /** Chart UI */
+    private final HorizontalMark orders = new HorizontalMark(ChartClass.OrderSupport);
 
     /** The line chart color manager. */
     private final BitSet lineColorManager = new BitSet(8);
-
-    /** The price signal line. */
-    private final HorizontalMark priceSignal = new HorizontalMark(ChartClass.PriceSignal);
-
-    /** The price signal line. */
-    private final HorizontalMark orders = new HorizontalMark(ChartClass.OrderSupport);
 
     /** The line chart data list. */
     private ObservableList<Tick> candleChartData;
@@ -161,7 +157,7 @@ public class GraphPlotArea extends Region {
 
         verticalGridLines.getStyleClass().setAll("chart-vertical-grid-line");
         getChildren()
-                .addAll(verticalGridLines, horizontalGridLines.path, priceSignal.path, orders.path, background, userBackround, candles, lines, foreground, userForeground);
+                .addAll(verticalGridLines, horizontalGridLines.path, priceSignal.path, orders.path, horizontalMouseTrack.path, background, userBackround, candles, lines, foreground, userForeground);
     }
 
     /**
@@ -180,7 +176,7 @@ public class GraphPlotArea extends Region {
      */
     private void provideMouseTracker() {
         TickLable labelX = axisX.createLabel(ChartClass.MouseTrack);
-        TickLable labelY = axisY.createLabel(ChartClass.MouseTrack);
+        TickLable labelY = horizontalMouseTrack.createLabel();
 
         // track on move
         setOnMouseMoved(e -> {
@@ -337,18 +333,11 @@ public class GraphPlotArea extends Region {
 
         // vertical lines
         vertical: {
-            boolean visible = verticalGridLineVisibility.get();
             ObservableList<PathElement> paths = verticalGridLines.getElements();
             int pathSize = paths.size();
             int tickSize = axisX.tickSize();
 
-            // update visibility
-            verticalGridLines.setVisible(visible);
-
-            if (!visible) {
-                paths.clear();
-                break vertical;
-            } else if (pathSize > tickSize * 2) {
+            if (pathSize > tickSize * 2) {
                 paths.remove(tickSize * 2, pathSize);
                 pathSize = tickSize * 2;
             }
@@ -373,10 +362,8 @@ public class GraphPlotArea extends Region {
         }
 
         // horizontal lines
-        horizontalGridLines
-                .draw(axisY.forGrid.size(), index -> axisY.forGrid.get(index).position(), horizontalGridLineVisibility.get(), width);
-
-        // horizontal marks
+        horizontalGridLines.draw(axisY.forGrid.size(), index -> axisY.forGrid.get(index).position(), width);
+        horizontalMouseTrack.draw(width);
         priceSignal.draw(width);
         orders.draw(width);
     }
@@ -801,6 +788,13 @@ public class GraphPlotArea extends Region {
             this.path.getStyleClass().addAll(className.name(), ChartClass.Line.name());
         }
 
+        private TickLable createLabel() {
+            TickLable label = axisY.createLabel(className);
+            add(label);
+
+            return label;
+        }
+
         private void addMark(Num value) {
             addMark(value.toDouble());
         }
@@ -840,17 +834,14 @@ public class GraphPlotArea extends Region {
         }
 
         private void draw(double width) {
-            draw(labels.size(), index -> Math.floor(labels.get(index).position()), true, width);
+            draw(labels.size(), index -> Math.floor(labels.get(index).position()), width);
         }
 
-        private void draw(int size, IntToDoubleFunction positionAdviser, boolean visible, double width) {
+        private void draw(int size, IntToDoubleFunction positionAdviser, double width) {
             ObservableList<PathElement> paths = path.getElements();
             int pathSize = paths.size();
 
-            if (!visible) {
-                paths.clear();
-                return;
-            } else if (pathSize > size * 2) {
+            if (pathSize > size * 2) {
                 paths.remove(size * 2, pathSize);
                 pathSize = size * 2;
             }
