@@ -25,7 +25,6 @@ import javafx.geometry.Orientation;
 import javafx.geometry.Side;
 import javafx.scene.Group;
 import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.control.ScrollBar;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.Region;
@@ -187,7 +186,7 @@ public class Axis extends Region {
         }
 
         for (int i = 0; i < tickNumber; i++) {
-            forGrid.add(new TickLable());
+            forGrid.add(new TickLable(ChartClass.AxisTickLabel));
         }
 
         // ====================================================
@@ -207,10 +206,7 @@ public class Axis extends Region {
         tickPath.getStyleClass().setAll(ChartClass.AxisTick.name());
         baseLine.getStyleClass().setAll(ChartClass.AxisLine.name());
 
-        lines.setAutoSizeChildren(false);
         lines.getChildren().addAll(tickPath, indicatorPath.ui, baseLine);
-
-        tickLabels.setAutoSizeChildren(false);
 
         scroll.setOrientation(isHorizontal() ? Orientation.HORIZONTAL : Orientation.VERTICAL);
         scroll.valueProperty().addListener(scrollValueValidator);
@@ -363,53 +359,6 @@ public class Axis extends Region {
      * {@inheritDoc}
      */
     @Override
-    public void requestLayout() {
-        Parent parent = getParent();
-
-        if (parent != null) {
-            parent.requestLayout();
-        }
-        super.requestLayout();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected double computePrefWidth(double height) {
-        if (isHorizontal()) {
-            return 150d;
-        } else {
-            // force to re-layout
-            layoutChildren(lastLayoutWidth, height);
-
-            double scrollBar = scroll.isVisible() ? scroll.getWidth() : 0;
-            double labels = Math.max(tickLabels.prefWidth(height), 10);
-            return tickLength + scrollBar + labels;
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected double computePrefHeight(double width) {
-        if (isVertical()) {
-            return 150d;
-        } else {
-            // force to re-layout
-            layoutChildren(width, lastLayoutHeight);
-
-            double scrollBar = scroll.isVisible() ? scroll.getHeight() : 0;
-            double labels = Math.max(tickLabels.prefHeight(width), 10);
-            return tickLength + scrollBar + labels;
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     protected final void layoutChildren() {
         if ((isHorizontal() && getWidth() == -1) || (isVertical() && getHeight() == -1)) {
             return;
@@ -488,11 +437,10 @@ public class Axis extends Region {
     private void layoutLabels(double width, double height) {
         for (int i = 0, e = tickSize(); i < e; i++) {
             TickLable label = labelAt(i);
-
-            // 位置を合わせる
             label.setLayoutX(0);
             label.setLayoutY(0);
 
+            double position = label.position();
             Bounds bounds = label.getBoundsInParent();
 
             if (isHorizontal()) {
@@ -505,7 +453,8 @@ public class Axis extends Region {
                 }
             } else {
                 double cy = (bounds.getMinY() + bounds.getMaxY()) * 0.5;
-                label.setLayoutY(label.position() - cy);
+                label.setLayoutY(position - cy);
+
                 if (side == Side.LEFT) {
                     label.setLayoutX(-tickLabelDistance);
                 } else {
@@ -635,8 +584,8 @@ public class Axis extends Region {
      * 
      * @return
      */
-    public TickLable createLabel() {
-        return new TickLable();
+    public TickLable createLabel(ChartClass className) {
+        return new TickLable(className);
     }
 
     private void zoom(ScrollEvent event) {
@@ -670,8 +619,8 @@ public class Axis extends Region {
         /**
          * 
          */
-        private TickLable() {
-            getStyleClass().add(ChartClass.AxisTickLabel.name());
+        private TickLable(ChartClass className) {
+            getStyleClass().addAll(className.name(), ChartClass.Label.name());
             textProperty().bind(Viewtify.calculate(value, () -> tickLabelFormatter.get().apply(value.get())));
 
             value.addListener(dataValidateListener);
@@ -692,10 +641,12 @@ public class Axis extends Region {
          */
         @Override
         public void vandalize() {
-            tickLabels.getChildren().remove(this);
-            textProperty().unbind();
-            value.removeListener(dataValidateListener);
-            value.removeListener(layout);
+            Viewtify.inUI(() -> {
+                tickLabels.getChildren().remove(this);
+                textProperty().unbind();
+                value.removeListener(dataValidateListener);
+                value.removeListener(layout);
+            });
         }
     }
 }

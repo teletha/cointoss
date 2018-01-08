@@ -35,7 +35,6 @@ import javafx.scene.shape.StrokeLineJoin;
 import cointoss.Order.State;
 import cointoss.chart.Tick;
 import cointoss.util.Num;
-import kiss.Disposable;
 import kiss.I;
 import trademate.Notificator;
 import trademate.TradingView;
@@ -112,10 +111,10 @@ public class GraphPlotArea extends Region {
     private final BitSet lineColorManager = new BitSet(8);
 
     /** The price signal line. */
-    private final HorizontalMark priceSignal = new HorizontalMark(ChartClass.PriceSignalLine);
+    private final HorizontalMark priceSignal = new HorizontalMark(ChartClass.PriceSignal);
 
     /** The price signal line. */
-    private final HorizontalMark orders = new HorizontalMark(ChartClass.OrderLine);
+    private final HorizontalMark orders = new HorizontalMark(ChartClass.OrderSupport);
 
     /** The line chart data list. */
     private ObservableList<Tick> candleChartData;
@@ -180,8 +179,8 @@ public class GraphPlotArea extends Region {
      * Provide mouse tracker.
      */
     private void provideMouseTracker() {
-        TickLable labelX = axisX.createLabel();
-        TickLable labelY = axisY.createLabel();
+        TickLable labelX = axisX.createLabel(ChartClass.MouseTrack);
+        TickLable labelY = axisY.createLabel(ChartClass.MouseTrack);
 
         // track on move
         setOnMouseMoved(e -> {
@@ -208,7 +207,7 @@ public class GraphPlotArea extends Region {
             Num price = Num.of(Math.floor(axisY.getValueForPosition(e.getY())));
 
             // check price range to add or remove
-            for (TickLable mark : priceSignal.marks) {
+            for (TickLable mark : priceSignal.labels) {
                 if (Num.of(mark.value.get()).isNear(price, 500)) {
                     priceSignal.remove(mark);
                     return;
@@ -216,7 +215,7 @@ public class GraphPlotArea extends Region {
             }
 
             // create new mark
-            TickLable label = axisY.createLabel();
+            TickLable label = axisY.createLabel(ChartClass.PriceSignal);
             label.value.set(price.toDouble());
             priceSignal.add(label);
 
@@ -233,7 +232,7 @@ public class GraphPlotArea extends Region {
     private void provideOrderSupport() {
         trade.market().yourOrder.to(o -> {
 
-            TickLable label = axisY.createLabel();
+            TickLable label = axisY.createLabel(ChartClass.OrderSupport);
             label.value.set(o.price.toDouble());
 
             orders.add(label);
@@ -785,33 +784,37 @@ public class GraphPlotArea extends Region {
      */
     private class HorizontalMark {
 
+        /** The class name. */
+        private final ChartClass className;
+
         /** The user interface. */
         private final Path path = new Path();
 
         /** The model. */
-        private final List<TickLable> marks = new CopyOnWriteArrayList();
+        private final List<TickLable> labels = new CopyOnWriteArrayList();
 
         /**
-         *  
+         * @param className
          */
-        private HorizontalMark(ChartClass clazz) {
-            path.getStyleClass().add(clazz.name());
+        private HorizontalMark(ChartClass className) {
+            this.className = className;
+            this.path.getStyleClass().addAll(className.name(), ChartClass.Line.name());
         }
-        
+
         private void addMark(Num value) {
             addMark(value.toDouble());
         }
-        
+
         /**
          * Add mark at the specified value.
          * 
          * @param value
          */
         private void addMark(double value) {
-            TickLable label = axisY.createLabel();
+            TickLable label = axisY.createLabel(className);
             label.value.set(value);
-            
-            marks.add(label);
+
+            labels.add(label);
             invalidate();
         }
 
@@ -821,7 +824,7 @@ public class GraphPlotArea extends Region {
          * @param mark
          */
         private void add(TickLable mark) {
-            marks.add(mark);
+            labels.add(mark);
             invalidate();
         }
 
@@ -831,13 +834,13 @@ public class GraphPlotArea extends Region {
          * @param mark
          */
         private void remove(TickLable mark) {
-            marks.remove(mark);
+            labels.remove(mark);
             mark.dispose();
             invalidate();
         }
 
         private void draw(double width) {
-            draw(marks.size(), index -> Math.floor(marks.get(index).position()), true, width);
+            draw(labels.size(), index -> Math.floor(labels.get(index).position()), true, width);
         }
 
         private void draw(int size, IntToDoubleFunction positionAdviser, boolean visible, double width) {

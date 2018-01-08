@@ -86,17 +86,26 @@
 	-fx-fill: -fx-mid-text-color;
 }
 
-.MouseTrackLine {
+.MouseTrack.Label {
+	-fx-fill: -fx-mid-text-color;
+}
+.MouseTrack.Line {
 	-fx-stroke-width: 0.5;
 	-fx-stroke: rgb(50, 50, 50);
 }
 
-.PriceSignalLine {
+.PriceSignal.Label {
+	-fx-fill: rgb(180, 100, 100);
+}
+.PriceSignal.Line {
 	-fx-stroke-width: 0.5;
 	-fx-stroke: rgb(180, 100, 100);
 }
 
-.OrderLine {
+.OrderSupport.Label {
+	-fx-fill: rgb(180, 100, 100);
+}
+.OrderSupport.Line {
 	-fx-stroke-width: 0.5;
 	-fx-stroke: rgb(180, 100, 100);
 	-fx-stroke-dash-array: 2 4;
