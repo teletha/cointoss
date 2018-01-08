@@ -37,7 +37,7 @@ import viewtify.Viewtify;
 /**
  * @version 2018/01/09 0:28:48
  */
-public class GraphPlotArea extends Region {
+public class ChartPlotArea extends Region {
 
     final Axis axisX;
 
@@ -91,7 +91,7 @@ public class GraphPlotArea extends Region {
      * @param axisX
      * @param axisY
      */
-    public GraphPlotArea(TradingView trade, Axis axisX, Axis axisY) {
+    public ChartPlotArea(TradingView trade, Axis axisX, Axis axisY) {
         this.trade = trade;
         this.axisX = axisX;
         this.axisY = axisY;

@@ -53,7 +53,7 @@ public class CandleChart extends Region {
     public final Axis axisY = new Axis(5, 4, Side.RIGHT);
 
     /** The actual graph drawer. */
-    public final GraphPlotArea graph;
+    public final ChartPlotArea graph;
 
     /** The validity of data. */
     private AtomicBoolean dataIsValid = new AtomicBoolean();
@@ -81,7 +81,7 @@ public class CandleChart extends Region {
      * 
      */
     public CandleChart(AnchorPane parent, TradingView trade) {
-        this.graph = new GraphPlotArea(trade, axisX, axisY);
+        this.graph = new ChartPlotArea(trade, axisX, axisY);
 
         parent.getChildren().add(this);
 
@@ -138,7 +138,7 @@ public class CandleChart extends Region {
      * @param graph
      * @return Chainable API.
      */
-    public final CandleChart graph(Consumer<GraphPlotArea> graph) {
+    public final CandleChart graph(Consumer<ChartPlotArea> graph) {
         graph.accept(this.graph);
 
         return this;
