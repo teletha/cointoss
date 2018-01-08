@@ -145,7 +145,7 @@ public class Axis extends Region {
     /** The tick unit. */
     public final ObjectProperty<double[]> units = new SimpleObjectProperty(DefaultTickUnit);
 
-    private final List<TickLable> forGrid = new ArrayList();
+    public final List<TickLable> forGrid = new ArrayList();
 
     /** UI widget. */
     private final Group lines = new Group();

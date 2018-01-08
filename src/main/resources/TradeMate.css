@@ -67,8 +67,7 @@
 
 .chart-vertical-grid-line,
 .chart-vertical-minor-grid-line,
-.chart-horizontal-grid-line,
-.chart-horizontal-minor-grid-line {
+.GridLine {
 	-fx-stroke-width: 0.5;
 	-fx-stroke: rgb(40, 40, 40);
 }

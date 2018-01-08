@@ -12,6 +12,7 @@ package trademate.chart;
 import java.util.BitSet;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.IntToDoubleFunction;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.BooleanProperty;
@@ -31,10 +32,6 @@ import javafx.scene.shape.PathElement;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.StrokeLineJoin;
 
-import org.eclipse.collections.api.list.primitive.DoubleList;
-import org.eclipse.collections.api.list.primitive.MutableDoubleList;
-import org.eclipse.collections.impl.factory.primitive.DoubleLists;
-
 import cointoss.Order.State;
 import cointoss.chart.Tick;
 import cointoss.util.Num;
@@ -45,7 +42,6 @@ import trademate.TradingView;
 import trademate.chart.Axis.TickLable;
 import trademate.chart.shape.Candle;
 import trademate.chart.shape.GraphShape;
-import viewtify.ui.UILine;
 
 /**
  * @version 2018/01/05 20:35:03
@@ -110,16 +106,10 @@ public class GraphPlotArea extends Region {
 
     private final Path verticalGridLines = new Path();
 
-    private final Path horizontalGridLines = new Path();
+    private final HorizontalMark horizontalGridLines = new HorizontalMark(ChartClass.GridLine);
 
     /** The line chart color manager. */
     private final BitSet lineColorManager = new BitSet(8);
-
-    /** The mouse tracking ui. */
-    private final UILine mouseTrackV = new UILine().style(ChartClass.MouseTrackLine).startX(-10).startY(0).endX(-10).endY(heightProperty());
-
-    /** The mouse tracking ui. */
-    private final UILine mouseTrackH = new UILine().style(ChartClass.MouseTrackLine).startX(0).startY(-10).endX(widthProperty()).endY(-10);
 
     /** The price signal line. */
     private final HorizontalMark priceSignal = new HorizontalMark(ChartClass.PriceSignalLine);
@@ -171,9 +161,8 @@ public class GraphPlotArea extends Region {
         provideOrderSupport();
 
         verticalGridLines.getStyleClass().setAll("chart-vertical-grid-line");
-        horizontalGridLines.getStyleClass().setAll("chart-horizontal-grid-line");
         getChildren()
-                .addAll(verticalGridLines, horizontalGridLines, priceSignal.path, orders.path, mouseTrackV.ui, mouseTrackH.ui, background, userBackround, candles, lines, foreground, userForeground);
+                .addAll(verticalGridLines, horizontalGridLines.path, priceSignal.path, orders.path, background, userBackround, candles, lines, foreground, userForeground);
     }
 
     /**
@@ -196,10 +185,8 @@ public class GraphPlotArea extends Region {
 
         // track on move
         setOnMouseMoved(e -> {
-            double x = e.getX();
-            double y = e.getY();
-            labelX.value.set(axisX.getValueForPosition(x));
-            labelY.value.set(axisY.getValueForPosition(y));
+            labelX.value.set(axisX.getValueForPosition(e.getX()));
+            labelY.value.set(axisY.getValueForPosition(e.getY()));
 
             invalidate();
         });
@@ -384,41 +371,8 @@ public class GraphPlotArea extends Region {
         }
 
         // horizontal lines
-        horizontal: {
-            boolean visible = horizontalGridLineVisibility.get();
-            ObservableList<PathElement> paths = horizontalGridLines.getElements();
-            int pathSize = paths.size();
-            int tickSize = axisY.tickSize();
-
-            // update visibility
-            horizontalGridLines.setVisible(visible);
-
-            if (!visible) {
-                paths.clear();
-                break horizontal;
-            } else if (pathSize > tickSize * 2) {
-                paths.remove(tickSize * 2, pathSize);
-                pathSize = tickSize * 2;
-            }
-
-            for (int i = 0; i < tickSize; i++) {
-                double d = axisY.labelAt(i).position();
-                MoveTo mt;
-                LineTo lt;
-                if (i * 2 < pathSize) {
-                    mt = (MoveTo) paths.get(i * 2);
-                    lt = (LineTo) paths.get(i * 2 + 1);
-                } else {
-                    mt = new MoveTo();
-                    lt = new LineTo();
-                    paths.addAll(mt, lt);
-                }
-                mt.setX(0);
-                mt.setY(d);
-                lt.setX(width);
-                lt.setY(d);
-            }
-        }
+        horizontalGridLines
+                .draw(axisY.forGrid.size(), index -> axisY.forGrid.get(index).position(), horizontalGridLineVisibility.get(), width);
 
         // horizontal marks
         priceSignal.draw(width);
@@ -863,35 +817,22 @@ public class GraphPlotArea extends Region {
         }
 
         private void draw(double width) {
-            MutableDoubleList list = DoubleLists.mutable.empty();
-
-            for (Mark line : marks) {
-                list.add(Math.floor(axisY.getPositionForValue(line.price.toDouble())));
-            }
-            draw(list, true, width);
+            draw(marks.size(), index -> Math.floor(axisY.getPositionForValue(marks.get(index).price.toDouble())), true, width);
         }
 
-        /**
-         * Draw lines.
-         * 
-         * @param values
-         * @param visible
-         * @param width
-         */
-        private void draw(DoubleList values, boolean visible, double width) {
+        private void draw(int size, IntToDoubleFunction positionAdviser, boolean visible, double width) {
             ObservableList<PathElement> paths = path.getElements();
             int pathSize = paths.size();
-            int valueSize = values.size();
 
             if (!visible) {
                 paths.clear();
                 return;
-            } else if (pathSize > valueSize * 2) {
-                paths.remove(valueSize * 2, pathSize);
-                pathSize = valueSize * 2;
+            } else if (pathSize > size * 2) {
+                paths.remove(size * 2, pathSize);
+                pathSize = size * 2;
             }
 
-            for (int i = 0; i < valueSize; i++) {
+            for (int i = 0; i < size; i++) {
                 MoveTo move;
                 LineTo line;
 
@@ -904,7 +845,7 @@ public class GraphPlotArea extends Region {
                     paths.addAll(move, line);
                 }
 
-                double value = values.get(i);
+                double value = positionAdviser.applyAsDouble(i);
                 move.setX(0);
                 move.setY(value);
                 line.setX(width);
