@@ -16,6 +16,7 @@ import javafx.beans.InvalidationListener;
 import javafx.collections.ObservableList;
 import javafx.scene.Group;
 import javafx.scene.Node;
+import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.layout.Region;
 import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
@@ -116,9 +117,9 @@ public class GraphPlotArea extends Region {
         clip.heightProperty().bind(heightProperty());
         setClip(clip);
 
-        provideMouseTracker();
-        providePriceSignal();
-        provideOrderSupport();
+        visualizeMouseTrack();
+        visualizeNotifyPrice();
+        visualizeOrderPrice();
 
         getChildren()
                 .addAll(backGridVertical, backGridHorizontal, notifyPrice, orderPrice, mouseTrackHorizontal, mouseTrackVertical, background, candles, lines);
@@ -135,9 +136,9 @@ public class GraphPlotArea extends Region {
     }
 
     /**
-     * Provide mouse tracker.
+     * Visualize mouse tracker in chart.
      */
-    private void provideMouseTracker() {
+    private void visualizeMouseTrack() {
         TickLable labelX = mouseTrackVertical.createLabel();
         TickLable labelY = mouseTrackHorizontal.createLabel();
 
@@ -159,10 +160,10 @@ public class GraphPlotArea extends Region {
     }
 
     /**
-     * Provide price signal.
+     * Visualize notifiable price in chart.
      */
-    private void providePriceSignal() {
-        setOnContextMenuRequested(e -> {
+    private void visualizeNotifyPrice() {
+        addEventHandler(ContextMenuEvent.CONTEXT_MENU_REQUESTED, e -> {
             Num price = Num.of(Math.floor(axisY.getValueForPosition(e.getY())));
 
             // check price range to add or remove
@@ -175,7 +176,7 @@ public class GraphPlotArea extends Region {
 
             TickLable label = notifyPrice.createLabel(price);
 
-            label.add(trade.market().signalByPrice(price).to(exe -> {
+            label.add(trade.market().signalByPrice(price).on(Viewtify.UIThread).to(exe -> {
                 notificator.priceSignal.notify("Rearch to " + price);
                 notifyPrice.remove(label);
             }));
@@ -183,9 +184,9 @@ public class GraphPlotArea extends Region {
     }
 
     /**
-     * Provide order support.
+     * Visualize order price in chart.
      */
-    private void provideOrderSupport() {
+    private void visualizeOrderPrice() {
         trade.market().yourOrder.on(Viewtify.UIThread).to(o -> {
             TickLable label = orderPrice.createLabel(o.price);
 
