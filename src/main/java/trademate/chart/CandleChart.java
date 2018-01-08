@@ -104,7 +104,6 @@ public class CandleChart extends Region {
         candles = FXCollections.observableArrayList();
         candles.addListener(dataValidateListener);
 
-        getStyleClass().setAll("chart");
         graph.setLineChartDataList(lines);
         graph.setCandleChartDataList(candles);
         getChildren().addAll(graph, axisX, axisY);

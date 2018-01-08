@@ -189,6 +189,9 @@ public class Axis extends Region {
             forGrid.add(new TickLable(ChartClass.AxisTickLabel));
         }
 
+        Viewtify.clip(tickPath, this);
+        Viewtify.clip(tickLabels, this);
+
         // ====================================================
         // Initialize Property
         // ====================================================
@@ -214,9 +217,6 @@ public class Axis extends Region {
         scroll.setMax(1);
         scroll.setVisibleAmount(1);
 
-        // if (scrollBarValue.get() != -1 && scrollBarSize.get() != 1) {
-        // scroll.setValue(isHorizontal() ? scrollBarValue.get() : 1 - scrollBarValue.get());
-        // }
         getChildren().addAll(lines, tickLabels, scroll);
 
         addEventHandler(ScrollEvent.SCROLL, this::zoom);
@@ -296,7 +296,7 @@ public class Axis extends Region {
             if (low <= tickValue && tickValue <= up) {
                 label.value.set(tickValue);
             } else {
-                label.value.set(-1);
+                label.value.set(tickValue);
             }
         }
     }
