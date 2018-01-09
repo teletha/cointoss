@@ -24,6 +24,8 @@ import javafx.scene.shape.Path;
 import javafx.scene.shape.PathElement;
 import javafx.scene.shape.StrokeLineJoin;
 
+import org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap;
+
 import cointoss.Order.State;
 import cointoss.chart.Tick;
 import cointoss.util.Num;
@@ -60,7 +62,10 @@ public class ChartPlotArea extends Region {
     private final Group lines = new LocalGroup();
 
     /** The candle chart manager */
-    private final Group candles = new LocalGroup();
+    private final IntObjectHashMap<Candle> candles = new IntObjectHashMap<>();
+
+    /** Chart UI */
+    private final Group candleGraph = new LocalGroup();
 
     /** Chart UI */
     private final LineMark backGridVertical;
@@ -116,7 +121,7 @@ public class ChartPlotArea extends Region {
         visualizeOrderPrice();
 
         getChildren()
-                .addAll(backGridVertical, backGridHorizontal, notifyPrice, orderPrice, mouseTrackHorizontal, mouseTrackVertical, candles, lines);
+                .addAll(backGridVertical, backGridHorizontal, notifyPrice, orderPrice, mouseTrackHorizontal, mouseTrackVertical, candleGraph, lines);
     }
 
     /**
@@ -270,42 +275,26 @@ public class ChartPlotArea extends Region {
      * @param height
      */
     private void plotCandleChartDatas() {
-        ObservableList<Node> nodes = candles.getChildren();
-        List<Tick> datas = candleChartData;
-
-        int dataSize = datas.size();
-        int nodeSize = nodes.size();
-
-        if (dataSize < nodeSize) {
-            nodes.remove(dataSize, nodeSize);
-            nodeSize = dataSize;
-        }
-
-        Num min = Num.MAX;
-        Axis xAxis = axisX;
-        long start = (long) xAxis.computeVisibleMinValue();
-        long end = (long) xAxis.computeVisibleMaxValue();
+        int dataSize = candleChartData.size();
+        long start = (long) axisX.computeVisibleMinValue();
+        long end = (long) axisX.computeVisibleMaxValue();
 
         for (int i = 0; i < dataSize; i++) {
-            Tick tick = datas.get(i);
+            Tick tick = candleChartData.get(i);
+            Candle candle = candles.get(i);
             long time = tick.start.toInstant().toEpochMilli();
 
             if (start <= time && time <= end) {
-                min = Num.min(min, tick.minPrice);
-
-                Candle candle;
-
-                if (i < nodes.size()) {
-                    candle = (Candle) nodes.get(i);
-                } else {
+                // in visible range
+                if (candle == null) {
                     candle = new Candle();
-                    nodes.add(0, candle);
-                    System.out.println("add  " + nodes.size() + "  " + dataSize + "  " + i);
+                    candleGraph.getChildren().add(candle);
+                    candles.put(i, candle);
                 }
                 plotCandleChartData(tick.start.toInstant().toEpochMilli(), tick, candle);
             } else {
-                if (i < nodes.size()) {
-                    Candle candle = (Candle) nodes.get(i);
+                // out of visible range
+                if (candle != null) {
                     candle.setLayoutX(-10);
                     candle.setLayoutY(-10);
                 }
