@@ -21,7 +21,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
-import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
 import javafx.geometry.Side;
 import javafx.scene.layout.AnchorPane;
@@ -33,12 +32,9 @@ import cointoss.util.Num;
 import trademate.TradingView;
 
 /**
- * @version 2018/01/09 0:38:15
+ * @version 2018/01/09 22:15:56
  */
 public class CandleChart extends Region {
-
-    /** The list of plottable line date. */
-    public final ObservableList<CandleChartData> lines;
 
     /** The target chart. */
     public final ObjectProperty<Chart> chart = new SimpleObjectProperty();
@@ -88,14 +84,9 @@ public class CandleChart extends Region {
         axisY.scroll.valueProperty().addListener(dataValidateListener);
         axisY.scroll.visibleAmountProperty().addListener(dataValidateListener);
 
-        // create plotting data collection
-        lines = FXCollections.observableArrayList();
-        lines.addListener(dataValidateListener);
-
         candles = FXCollections.observableArrayList();
         candles.addListener(dataValidateListener);
 
-        graph.setLineChartDataList(lines);
         graph.setCandleChartDataList(candles);
         getChildren().addAll(graph, axisX, axisY);
     }
@@ -134,30 +125,6 @@ public class CandleChart extends Region {
         graph.accept(this.graph);
 
         return this;
-    }
-
-    /**
-     * @param x グラフの中での座標（グラフの値ではない）
-     * @param y グラフの中での座標（グラフの値ではない）
-     * @return
-     */
-    public Point2D getLocationOfGraph(final double x, final double y) {
-        return graph.localToParent(x, y);
-    }
-
-    public Point2D getValueOfLocalLocation(final double x, final double y) {
-
-        final Axis xAxis = axisX;
-        final Axis yAxis = axisY;
-        if (xAxis == null || yAxis == null) {
-            return null;
-        }
-        final Point2D p = graph.parentToLocal(x, y);
-
-        final double vx = xAxis.getValueForPosition(p.getX());
-        final double vy = yAxis.getValueForPosition(p.getY());
-
-        return new Point2D(vx, vy);
     }
 
     /**
@@ -306,16 +273,6 @@ public class CandleChart extends Region {
         Num margin = max.minus(min).multiply(Num.of(0.5));
         axisY.logicalMaxValue.set(max.plus(margin).toDouble());
         axisY.logicalMinValue.set(min.minus(margin).toDouble());
-    }
-
-    /**
-     * @param data
-     * @return
-     */
-    public CandleChart lineData(CandleChartData... data) {
-        this.lines.addAll(data);
-
-        return this;
     }
 
     /**
