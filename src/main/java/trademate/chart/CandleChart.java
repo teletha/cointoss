@@ -58,14 +58,6 @@ public class CandleChart extends Region {
     /** The validity of data. */
     private AtomicBoolean dataIsValid = new AtomicBoolean();
 
-    /** The change observer. */
-    private final InvalidationListener layoutInvalidationObserver = observable -> requestLayout();
-
-    /**
-     * GraphPlotAreaの最適な大きさと位置。 この値が指定されたときは、このノードの大きさにかかわらず、この値が利用される。
-     */
-    public final ObjectProperty<Rectangle2D> plotAreaPrefferedBounds = new SimpleObjectProperty<>(this, "plotAreaPrefferedBounds", null);
-
     /** A current position and size of plot area. */
     public final ReadOnlyObjectWrapper<Rectangle2D> plotAreaBounds = new ReadOnlyObjectWrapper<>(this, "plotAreaBounds", null);
 
@@ -95,7 +87,6 @@ public class CandleChart extends Region {
         axisX.scroll.visibleAmountProperty().addListener(dataValidateListener);
         axisY.scroll.valueProperty().addListener(dataValidateListener);
         axisY.scroll.visibleAmountProperty().addListener(dataValidateListener);
-        plotAreaPrefferedBounds.addListener(layoutInvalidationObserver);
 
         // create plotting data collection
         lines = FXCollections.observableArrayList();
@@ -189,144 +180,95 @@ public class CandleChart extends Region {
         width -= insets.getLeft() + insets.getRight();
         height -= insets.getTop() + insets.getBottom();
 
-        layoutChart(width, height, insets.getLeft(), insets.getTop());
+        layoutChartArea(width, height, insets.getLeft(), insets.getTop());
     }
 
-    protected void layoutChart(final double w, final double h, final double x0, final double y0) {
-        Rectangle2D bounds = plotAreaPrefferedBounds.get();
-        if (bounds == null) {
-            layoutChartArea(w, h, x0, y0);
-        } else {
-            final double ww = bounds.getWidth();
-            final double hh = bounds.getHeight();
-            final boolean resized = ww != graph.getWidth() || hh != graph.getHeight();
-            if (!prelayout) {
-                graph.resizeRelocate(bounds.getMinX(), bounds.getMinY(), ww, hh);
-            }
-            plotAreaBounds.set(bounds);
-            final Axis xAxis = axisX;
-            final Axis yAxis = axisY;
-            if (xAxis != null) {
-                final double xh = xAxis.prefHeight(ww);
-                xAxis.resize(ww, xh);
-                if (xAxis.side == Side.BOTTOM) {
-                    xAxis.relocate(bounds.getMinX(), bounds.getMaxY());
-                } else {
-                    xAxis.relocate(bounds.getMinX(), bounds.getMinY() - xh);
-                }
-            }
-            if (yAxis != null) {
-                final double yw = yAxis.prefWidth(hh);
-                yAxis.resize(yw, hh);
-                if (yAxis.side == Side.LEFT) {
-                    yAxis.relocate(bounds.getMinX() - yw, bounds.getMinY());
-                } else {
-                    yAxis.relocate(bounds.getMaxX(), bounds.getMinY());
-                }
-            }
+    private void layoutChartArea(double width, double height, double x0, double y0) {
+        double graphWidth, graphHeight;
+        double xAxisHeight, yAxisWidth;
 
-            if (resized || dataIsValid.get() == false) {
-                if (!prelayout) {
-                    graph.layoutChildren();
-                    dataIsValid.set(true);
+        if (axisX.isVisible() && axisY.isVisible()) {
+            double gap = 10;
+            int loop = 0;
+            double xH = 0, yW = 0;
+            while (gap > 5) {
+                double xaxisH = axisX.prefHeight(width);
+                double yaxisW = axisY.prefWidth(height - xaxisH);
+                final double xaxisH2 = axisX.prefHeight(width - yaxisW);
+                gap = abs(xaxisH2 - xaxisH);
+                xaxisH = xaxisH2;
+                if (gap > 5) {
+                    final double yaxisW2 = axisY.prefWidth(height - xaxisH);
+                    gap = abs(yaxisW - yaxisW2);
+                    yaxisW = yaxisW2;
+                }
+                xH = xaxisH;
+                yW = yaxisW;
+                loop++;
+                if (loop == 5) {
+                    break;
                 }
             }
-        }
-    }
-
-    protected void layoutChartArea(final double w, final double h, final double x0, final double y0) {
-        if (axisX == null || axisY == null) {
-            graph.setVisible(false);
+            graphWidth = width - yW;
+            graphHeight = height - xH;
+            xAxisHeight = xH;
+            yAxisWidth = yW;
         } else {
-            graph.setVisible(true);
-            final Axis xAxis = axisX;
-            final Axis yAxis = axisY;
-            double graphWidth, graphHeight;
-            double xAxisHeight, yAxisWidth;
-            if (xAxis.isVisible() && yAxis.isVisible()) {
-                double gap = 10;
-                int loop = 0;
-                double xH = 0, yW = 0;
-                while (gap > 5) {
-                    double xaxisH = xAxis.prefHeight(w);
-                    double yaxisW = yAxis.prefWidth(h - xaxisH);
-                    final double xaxisH2 = xAxis.prefHeight(w - yaxisW);
-                    gap = abs(xaxisH2 - xaxisH);
-                    xaxisH = xaxisH2;
-                    if (gap > 5) {
-                        final double yaxisW2 = yAxis.prefWidth(h - xaxisH);
-                        gap = abs(yaxisW - yaxisW2);
-                        yaxisW = yaxisW2;
-                    }
-                    xH = xaxisH;
-                    yW = yaxisW;
-                    loop++;
-                    if (loop == 5) {
-                        break;
-                    }
-                }
-                graphWidth = w - yW;
-                graphHeight = h - xH;
-                xAxisHeight = xH;
-                yAxisWidth = yW;
+            if (axisX.isVisible()) {
+                xAxisHeight = axisX.prefHeight(width);
+                graphHeight = height - xAxisHeight;
+                graphWidth = width;
+                yAxisWidth = axisY.prefWidth(graphHeight);
+            } else if (axisY.isVisible()) {
+                yAxisWidth = axisY.prefWidth(height);
+                graphWidth = width - yAxisWidth;
+                graphHeight = height;
+                xAxisHeight = axisX.prefHeight(graphWidth);
             } else {
-                if (xAxis.isVisible()) {
-                    xAxisHeight = xAxis.prefHeight(w);
-                    graphHeight = h - xAxisHeight;
-                    graphWidth = w;
-                    yAxisWidth = yAxis.prefWidth(graphHeight);
-                } else if (yAxis.isVisible()) {
-                    yAxisWidth = yAxis.prefWidth(h);
-                    graphWidth = w - yAxisWidth;
-                    graphHeight = h;
-                    xAxisHeight = xAxis.prefHeight(graphWidth);
-                } else {
-                    xAxisHeight = xAxis.prefHeight(w);
-                    yAxisWidth = yAxis.prefWidth(h);
-                    graphWidth = w;
-                    graphHeight = h;
-                }
+                xAxisHeight = axisX.prefHeight(width);
+                yAxisWidth = axisY.prefWidth(height);
+                graphWidth = width;
+                graphHeight = height;
             }
-            graphHeight = max(0, graphHeight);
-            graphWidth = max(0, graphWidth);
-            xAxis.resize(graphWidth, xAxisHeight);
-            yAxis.resize(yAxisWidth, graphHeight);
-            xAxis.layout();
-            yAxis.layout();
-            final boolean isLeft = yAxis.side != Side.RIGHT;
-            final boolean isBottom = xAxis.side != Side.TOP;
-            final double x = yAxis.isVisible() && isLeft ? yAxisWidth : 0, y = !xAxis.isVisible() || isBottom ? 0 : xAxisHeight;
-            if (xAxis.isVisible()) {
-                if (isBottom) {
-                    xAxis.relocate(x + x0, graphHeight + y0);
-                } else {
-                    xAxis.relocate(x + x0, y0);
-                }
-            }
-            if (yAxis.isVisible()) {
-                if (isLeft) {
-                    yAxis.relocate(x0, y + y0);
-                } else {
-                    yAxis.relocate(graphWidth + x0, y + y0);
-                }
-            }
-            graph.relocate(x + x0, y + y0);
-            final double oldgW = graph.getWidth();
-            final double oldgH = graph.getHeight();
-            final boolean resize = oldgW != graphWidth || oldgH != graphHeight;
-
-            if (!prelayout) {
-                if (resize) {
-                    graph.resize(graphWidth, graphHeight);
-                }
-                if (resize || dataIsValid.get() == false) {
-                    graph.layoutChildren();
-                    dataIsValid.set(true);
-                }
-            }
-            plotAreaBounds.set(new Rectangle2D(x + x0, y + y0, graphWidth, graphHeight));
         }
+        graphHeight = max(0, graphHeight);
+        graphWidth = max(0, graphWidth);
+        axisX.resize(graphWidth, xAxisHeight);
+        axisY.resize(yAxisWidth, graphHeight);
+        axisX.layout();
+        axisY.layout();
+        final boolean isLeft = axisY.side != Side.RIGHT;
+        final boolean isBottom = axisX.side != Side.TOP;
+        final double x = axisY.isVisible() && isLeft ? yAxisWidth : 0, y = !axisX.isVisible() || isBottom ? 0 : xAxisHeight;
+        if (axisX.isVisible()) {
+            if (isBottom) {
+                axisX.relocate(x + x0, graphHeight + y0);
+            } else {
+                axisX.relocate(x + x0, y0);
+            }
+        }
+        if (axisY.isVisible()) {
+            if (isLeft) {
+                axisY.relocate(x0, y + y0);
+            } else {
+                axisY.relocate(graphWidth + x0, y + y0);
+            }
+        }
+        graph.relocate(x + x0, y + y0);
+        final double oldgW = graph.getWidth();
+        final double oldgH = graph.getHeight();
+        final boolean resize = oldgW != graphWidth || oldgH != graphHeight;
 
+        if (!prelayout) {
+            if (resize) {
+                graph.resize(graphWidth, graphHeight);
+            }
+            if (resize || dataIsValid.get() == false) {
+                graph.layoutChildren();
+                dataIsValid.set(true);
+            }
+        }
+        plotAreaBounds.set(new Rectangle2D(x + x0, y + y0, graphWidth, graphHeight));
     }
 
     private static double max(double max, double v) {
