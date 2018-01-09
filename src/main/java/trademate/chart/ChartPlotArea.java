@@ -210,15 +210,6 @@ public class ChartPlotArea extends Region {
     @Override
     protected void layoutChildren() {
         if (!plotIsValid) {
-            plotData();
-        }
-    }
-
-    /**
-     * Draw plot data.
-     */
-    public void plotData() {
-        if (!plotIsValid) {
             // draw back lines
             backGridVertical.draw();
             backGridHorizontal.draw();
@@ -229,69 +220,22 @@ public class ChartPlotArea extends Region {
             orderSellPrice.draw();
 
             plotLineChartDatas();
-            plotCandleChartDatas();
+            drawCandleChart();
             plotIsValid = true;
         }
     }
 
     /**
-     * Draw line chart.
+     * Draw candle chart.
      */
-    protected void plotLineChartDatas() {
-        ObservableList<Node> paths = lines.getChildren();
-        List<CandleChartData> datas = lineChartData;
-
-        if (datas == null) {
-            paths.clear();
-        } else {
-            int sizeData = datas.size();
-            int sizePath = paths.size();
-
-            if (sizeData < sizePath) {
-                paths.remove(sizeData, sizePath);
-                sizePath = sizeData;
-            }
-
-            for (int i = 0; i < sizeData; i++) {
-                int defaultColorIndex = 2;
-                CandleChartData data = datas.get(i);
-
-                Path path;
-
-                if (i < sizePath) {
-                    path = (Path) paths.get(i);
-                } else {
-                    path = new Path();
-                    path.setStrokeLineJoin(StrokeLineJoin.BEVEL);
-                    path.setStrokeWidth(0.6);
-                    path.getStyleClass().setAll("chart-series-line", "series" + i, data.defaultColor);
-                    paths.add(path);
-                }
-
-                ObservableList<String> className = path.getStyleClass();
-
-                if (!className.get(defaultColorIndex).equals(data.defaultColor)) {
-                    className.set(defaultColorIndex, data.defaultColor);
-                }
-                plotLineChartData(data, path);
-            }
-        }
-    }
-
-    /**
-     * Draw line chart.
-     * 
-     * @param width
-     * @param height
-     */
-    private void plotCandleChartDatas() {
+    private void drawCandleChart() {
         int dataSize = candleChartData.size();
         long start = (long) axisX.computeVisibleMinValue();
         long end = (long) axisX.computeVisibleMaxValue();
 
         for (int i = 0; i < dataSize; i++) {
-            Tick tick = candleChartData.get(i);
             Candle candle = candles.get(i);
+            Tick tick = candleChartData.get(i);
             long time = tick.start.toInstant().toEpochMilli();
 
             if (start <= time && time <= end) {
@@ -301,7 +245,16 @@ public class ChartPlotArea extends Region {
                     candleGraph.getChildren().add(candle);
                     candles.put(i, candle);
                 }
-                plotCandleChartData(tick.start.toInstant().toEpochMilli(), tick, candle);
+
+                // update candle layout
+                double x = axisX.getPositionForValue(i);
+                double open = axisY.getPositionForValue(tick.openPrice.toDouble());
+                double close = axisY.getPositionForValue(tick.closePrice.toDouble());
+                double high = axisY.getPositionForValue(tick.maxPrice.toDouble());
+                double low = axisY.getPositionForValue(tick.minPrice.toDouble());
+                candle.update(close - open, high - open, low - open);
+                candle.setLayoutX(x);
+                candle.setLayoutY(open);
             } else {
                 // out of visible range
                 if (candle != null) {
@@ -312,30 +265,51 @@ public class ChartPlotArea extends Region {
         }
     }
 
-    /**
-     * Draw chart data.
-     * 
-     * @param tick
-     * @param candle
-     * @param width
-     * @param height
-     */
-    private void plotCandleChartData(long index, Tick tick, Candle candle) {
-        double x = axisX.getPositionForValue(index);
-        double open = axisY.getPositionForValue(tick.openPrice.toDouble());
-        double close = axisY.getPositionForValue(tick.closePrice.toDouble());
-        double high = axisY.getPositionForValue(tick.maxPrice.toDouble());
-        double low = axisY.getPositionForValue(tick.minPrice.toDouble());
-
-        // update candle
-        candle.update(close - open, high - open, low - open);
-
-        // position the candle
-        candle.setLayoutX(x);
-        candle.setLayoutY(open);
-    }
-
     private final double DISTANCE_THRESHOLD = 0.5;
+
+    /**
+     * Draw line chart.
+     */
+    protected void plotLineChartDatas() {
+        ObservableList<Node> paths = lines.getChildren();
+        List<CandleChartData> datas = lineChartData;
+    
+        if (datas == null) {
+            paths.clear();
+        } else {
+            int sizeData = datas.size();
+            int sizePath = paths.size();
+    
+            if (sizeData < sizePath) {
+                paths.remove(sizeData, sizePath);
+                sizePath = sizeData;
+            }
+    
+            for (int i = 0; i < sizeData; i++) {
+                int defaultColorIndex = 2;
+                CandleChartData data = datas.get(i);
+    
+                Path path;
+    
+                if (i < sizePath) {
+                    path = (Path) paths.get(i);
+                } else {
+                    path = new Path();
+                    path.setStrokeLineJoin(StrokeLineJoin.BEVEL);
+                    path.setStrokeWidth(0.6);
+                    path.getStyleClass().setAll("chart-series-line", "series" + i, data.defaultColor);
+                    paths.add(path);
+                }
+    
+                ObservableList<String> className = path.getStyleClass();
+    
+                if (!className.get(defaultColorIndex).equals(data.defaultColor)) {
+                    className.set(defaultColorIndex, data.defaultColor);
+                }
+                plotLineChartData(data, path);
+            }
+        }
+    }
 
     /**
      * Draw chart data.

@@ -263,7 +263,7 @@ public class CandleChart extends Region {
 
             if (resized || dataIsValid.get() == false) {
                 if (!prelayout) {
-                    graph.plotData();
+                    graph.layoutChildren();
                     dataIsValid.set(true);
                 }
             }
@@ -356,7 +356,7 @@ public class CandleChart extends Region {
                     graph.resize(graphWidth, graphHeight);
                 }
                 if (resize || dataIsValid.get() == false) {
-                    graph.plotData();
+                    graph.layoutChildren();
                     dataIsValid.set(true);
                 }
             }
