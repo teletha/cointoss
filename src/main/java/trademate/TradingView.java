@@ -96,7 +96,7 @@ public class TradingView extends View {
         }).candleDate(market().second5);
 
         chartSpan.values(0, 1, 2, 3, 4).initial(0).text(i -> charts[i].toString()).observe(i -> {
-            candleChart.candleDate(null);
+            candleChart.candleDate(charts[i]);
         });
 
         market().yourExecution.to(o -> {

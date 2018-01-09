@@ -27,6 +27,7 @@ import javafx.scene.layout.Region;
 import cointoss.chart.Chart;
 import cointoss.chart.Tick;
 import cointoss.util.Num;
+import kiss.Disposable;
 import trademate.TradingView;
 
 /**
@@ -265,6 +266,8 @@ public class CandleChart extends Region {
         axisY.logicalMinValue.set(min.minus(margin).toDouble());
     }
 
+    private Disposable disposable;
+
     /**
      * @param closePrice
      * @param maxPrice
@@ -272,19 +275,18 @@ public class CandleChart extends Region {
      * @return
      */
     public CandleChart candleDate(Chart data) {
-        if (data == null) {
-            graph.setCandleChartDataList(FXCollections.emptyObservableList());
-            return this;
-        }
-
         dataIsValid.set(false);
         this.candles.clear();
+
+        if (disposable != null) {
+            disposable.dispose();
+        }
 
         for (Tick tick : data.ticks) {
             this.candles.add(tick);
         }
 
-        data.to(tick -> {
+        disposable = data.add.to(tick -> {
             this.candles.add(tick);
 
             if (0.99 <= axisX.scroll.getValue()) {

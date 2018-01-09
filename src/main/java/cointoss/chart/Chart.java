@@ -18,11 +18,11 @@ import java.time.LocalTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.IntStream;
 
 import cointoss.Execution;
 import cointoss.chart.simple.PriceIndicator;
+import cointoss.util.Listeners;
 import cointoss.util.Num;
 import cointoss.util.RingBuffer;
 import filer.Filer;
@@ -46,7 +46,9 @@ public class Chart {
     public final RingBuffer<Tick> ticks;
 
     /** The tick observers. */
-    private final CopyOnWriteArrayList<Observer<? super Tick>> listeners = new CopyOnWriteArrayList<>();
+    private final Listeners<Tick> listeners = new Listeners();
+
+    public final Signal<Tick> add = new Signal(listeners);
 
     /** The tick observers. */
     public final Signal<Tick> tick = new Signal(listeners);
@@ -147,10 +149,7 @@ public class Chart {
         }
 
         if (!exe.exec_date.isBefore(current.end)) {
-            // notify
-            for (Observer<? super Tick> listener : listeners) {
-                listener.accept(current);
-            }
+            listeners.omit(current);
 
             // update
             ticks.add(current = convert(exe, current.closePrice));
@@ -220,15 +219,6 @@ public class Chart {
      */
     public void readFrom(Path file) {
         Filer.read(file).map(line -> new Tick(line)).to(ticks::add);
-    }
-
-    /**
-     * Observe tick.
-     * 
-     * @param object
-     */
-    public void to(Observer<? super Tick> listener) {
-        listeners.add(listener);
     }
 
     /**

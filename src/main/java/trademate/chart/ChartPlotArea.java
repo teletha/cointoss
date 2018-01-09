@@ -237,6 +237,7 @@ public class ChartPlotArea extends Region {
         int difference = dataSize - candleSize;
 
         if (0 < difference) {
+            // ensure size with null
             candles.addAll(Arrays.asList((Candle[]) Array.newInstance(Candle.class, difference)));
         } else if (difference < 0) {
             Iterator<Candle> remover = candles.subList(candleSize + difference, candleSize).iterator();

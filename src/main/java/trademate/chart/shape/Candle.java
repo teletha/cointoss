@@ -23,7 +23,7 @@ import trademate.chart.ChartClass;
 public class Candle extends Group {
 
     /** The candle width. */
-    private static final int width = 3;
+    private static final int width = 4;
 
     /** The line part. */
     private final Line line = new Line();
