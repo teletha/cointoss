@@ -43,6 +43,9 @@ public class CandleChart extends Region {
     /** The list of plottable line date. */
     public final ObservableList<CandleChartData> lines;
 
+    /** The target chart. */
+    public final ObjectProperty<Chart> chart = new SimpleObjectProperty();
+
     /** The list of plottable cnadle date. */
     public final ObservableList<Tick> candles;
 
@@ -90,6 +93,7 @@ public class CandleChart extends Region {
         AnchorPane.setRightAnchor(this, 15d);
         AnchorPane.setLeftAnchor(this, 0d);
 
+        chart.addListener(dataValidateListener);
         axisX.scroll.valueProperty().addListener(dataValidateListener);
         axisX.scroll.visibleAmountProperty().addListener(dataValidateListener);
         axisY.scroll.valueProperty().addListener(dataValidateListener);
@@ -419,6 +423,9 @@ public class CandleChart extends Region {
      * @return
      */
     public CandleChart candleDate(Chart data) {
+        dataIsValid.set(false);
+        this.candles.clear();
+
         for (Tick tick : data.ticks) {
             this.candles.add(tick);
         }

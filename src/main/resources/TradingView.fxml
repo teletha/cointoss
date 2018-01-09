@@ -16,7 +16,6 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-
 <BorderPane maxHeight="1.7976931348623157E308" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1">
    <bottom>
       <HBox maxHeight="300.0" minHeight="300.0" prefHeight="300.0" BorderPane.alignment="BOTTOM_LEFT">
@@ -43,7 +42,16 @@
       </HBox>
    </bottom>
    <center>
-      <AnchorPane id="chart" />
+      <VBox>
+         <children>
+            <HBox>
+               <children>
+                  <ComboBox id="chartSpan" prefWidth="150.0" />
+               </children>
+            </HBox>
+            <AnchorPane id="chart" />
+         </children>
+      </VBox>
    </center>
    <right>
       <SplitPane id="TradingSplitPane" dividerPositions="0.5, 0.5" focusTraversable="false" prefHeight="-1.0" prefWidth="-1.0">

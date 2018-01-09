@@ -17,6 +17,7 @@ import javafx.scene.layout.AnchorPane;
 
 import cointoss.Execution;
 import cointoss.Market;
+import cointoss.chart.Chart;
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.util.Num;
 import kiss.I;
@@ -29,6 +30,7 @@ import trademate.order.PositionCatalog;
 import viewtify.UI;
 import viewtify.View;
 import viewtify.Viewtify;
+import viewtify.ui.UIComboBox;
 import viewtify.ui.UITab;
 
 /**
@@ -58,6 +60,8 @@ public class TradingView extends View {
 
     public @UI AnchorPane chart;
 
+    public @UI UIComboBox<Integer> chartSpan;
+
     /** Market cache. */
     private Market market;
 
@@ -74,13 +78,7 @@ public class TradingView extends View {
      */
     @Override
     protected void initialize() {
-        market().yourExecution.to(o -> {
-            notificator.execution.notify("Executed " + o);
-        });
-
-        market().health.on(Viewtify.UIThread).to(v -> {
-            tab.text(market().name() + "  " + v.mark);
-        });
+        Chart[] charts = {market().second5, market().second10, market().second20, market().minute1, market().minute30};
 
         CandleChart candleChart = new CandleChart(chart, this).graph(plot -> {
         }).axisX(axis -> {
@@ -96,6 +94,19 @@ public class TradingView extends View {
             axis.scroll.setVisible(false);
             axis.tickLabelFormatter.set(v -> Num.of(v).scale(0).toString());
         }).candleDate(market().second5);
+
+        chartSpan.values(0, 1, 2, 3, 4).initial(0).text(i -> charts[i].toString()).observe(i -> {
+            candleChart.candleDate(charts[i]);
+        });
+
+        market().yourExecution.to(o -> {
+            notificator.execution.notify("Executed " + o);
+        });
+
+        market().health.on(Viewtify.UIThread).to(v -> {
+            tab.text(market().name() + "  " + v.mark);
+        });
+
     }
 
     /**
