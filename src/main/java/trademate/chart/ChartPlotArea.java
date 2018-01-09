@@ -121,6 +121,8 @@ public class ChartPlotArea extends Region {
         axisY.scroll.visibleAmountProperty().addListener(plotValidateListener);
 
         Viewtify.clip(this);
+        Viewtify.clip(backGridVertical);
+        Viewtify.clip(backGridHorizontal);
 
         visualizeMouseTrack();
         visualizeNotifyPrice();
