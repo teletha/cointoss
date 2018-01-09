@@ -247,7 +247,7 @@ public class ChartPlotArea extends Region {
                 }
 
                 // update candle layout
-                double x = axisX.getPositionForValue(i);
+                double x = axisX.getPositionForValue(time);
                 double open = axisY.getPositionForValue(tick.openPrice.toDouble());
                 double close = axisY.getPositionForValue(tick.closePrice.toDouble());
                 double high = axisY.getPositionForValue(tick.maxPrice.toDouble());
@@ -273,24 +273,24 @@ public class ChartPlotArea extends Region {
     protected void plotLineChartDatas() {
         ObservableList<Node> paths = lines.getChildren();
         List<CandleChartData> datas = lineChartData;
-    
+
         if (datas == null) {
             paths.clear();
         } else {
             int sizeData = datas.size();
             int sizePath = paths.size();
-    
+
             if (sizeData < sizePath) {
                 paths.remove(sizeData, sizePath);
                 sizePath = sizeData;
             }
-    
+
             for (int i = 0; i < sizeData; i++) {
                 int defaultColorIndex = 2;
                 CandleChartData data = datas.get(i);
-    
+
                 Path path;
-    
+
                 if (i < sizePath) {
                     path = (Path) paths.get(i);
                 } else {
@@ -300,9 +300,9 @@ public class ChartPlotArea extends Region {
                     path.getStyleClass().setAll("chart-series-line", "series" + i, data.defaultColor);
                     paths.add(path);
                 }
-    
+
                 ObservableList<String> className = path.getStyleClass();
-    
+
                 if (!className.get(defaultColorIndex).equals(data.defaultColor)) {
                     className.set(defaultColorIndex, data.defaultColor);
                 }
