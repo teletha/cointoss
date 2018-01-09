@@ -60,7 +60,7 @@ public class PositionCatalog extends View {
                 .render((ui, item) -> ui.text(formatter.format(item)));
         openPositionSide.provideProperty(OrderSet.class, o -> o.side)
                 .provideValue(Order.class, Order::side)
-                .render((ui, item) -> ui.text(item).style(item));
+                .render((ui, item) -> ui.text(item).styleOnly(item));
         openPositionAmount.provideProperty(OrderSet.class, o -> o.amount).provideVariable(Order.class, o -> o.outstanding_size);
         openPositionPrice.provideProperty(OrderSet.class, o -> o.averagePrice).provideValue(Order.class, o -> o.price);
     }

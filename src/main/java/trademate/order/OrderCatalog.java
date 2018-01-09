@@ -80,7 +80,7 @@ public class OrderCatalog extends View {
                 .render((ui, item) -> ui.text(formatter.format(item)));
         requestedOrdersSide.provideProperty(OrderSet.class, o -> o.side)
                 .provideValue(Order.class, Order::side)
-                .render((ui, item) -> ui.text(item).style(item));
+                .render((ui, item) -> ui.text(item).styleOnly(item));
         requestedOrdersAmount.provideProperty(OrderSet.class, o -> o.amount).provideVariable(Order.class, o -> o.outstanding_size);
         requestedOrdersPrice.provideProperty(OrderSet.class, o -> o.averagePrice).provideValue(Order.class, o -> o.price);
 
@@ -210,7 +210,7 @@ public class OrderCatalog extends View {
          * 
          */
         private CatalogRow() {
-            ui.style(orderState);
+            ui.styleOnly(orderState);
 
             // contextMenuProperty().bind(Viewtify.calculate(itemProperty()).map(v -> context.ui));
         }

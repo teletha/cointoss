@@ -90,10 +90,10 @@
 }
 
 .OrderSupport.Label {
-	-fx-fill: rgb(180, 100, 100);
+	-fx-fill: -side;
 }
 .OrderSupport.Line {
 	-fx-stroke-width: 0.5;
-	-fx-stroke: rgb(180, 100, 100);
+	-fx-stroke: -side;
 	-fx-stroke-dash-array: 2 4;
 }

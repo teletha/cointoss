@@ -101,7 +101,7 @@ public class ExecutionView extends View {
                 setGraphic(null);
             } else {
                 setText(formatter.format(e.exec_date.plusHours(9)) + "  " + e.price + "円  " + e.cumulativeSize.scale(6));
-                ui.style(e.side);
+                ui.styleOnly(e.side);
             }
         }
     }

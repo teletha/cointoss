@@ -27,6 +27,7 @@ import javafx.scene.shape.StrokeLineJoin;
 import org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap;
 
 import cointoss.Order.State;
+import cointoss.Side;
 import cointoss.chart.Tick;
 import cointoss.util.Num;
 import kiss.I;
@@ -35,6 +36,7 @@ import trademate.TradingView;
 import trademate.chart.Axis.TickLable;
 import trademate.chart.shape.Candle;
 import viewtify.Viewtify;
+import viewtify.ui.helper.StyleHelper;
 
 /**
  * @version 2018/01/09 0:28:48
@@ -83,7 +85,10 @@ public class ChartPlotArea extends Region {
     private final LineMark notifyPrice;
 
     /** Chart UI */
-    private final LineMark orderPrice;
+    private final LineMark orderBuyPrice;
+
+    /** Chart UI */
+    private final LineMark orderSellPrice;
 
     /** The line chart data list. */
     private ObservableList<Tick> candleChartData;
@@ -100,12 +105,13 @@ public class ChartPlotArea extends Region {
         this.trade = trade;
         this.axisX = axisX;
         this.axisY = axisY;
-        this.backGridVertical = new LineMark(ChartClass.BackGrid, axisX.forGrid, axisX);
-        this.backGridHorizontal = new LineMark(ChartClass.BackGrid, axisY.forGrid, axisY);
-        this.mouseTrackVertical = new LineMark(ChartClass.MouseTrack, axisX);
-        this.mouseTrackHorizontal = new LineMark(ChartClass.MouseTrack, axisY);
-        this.notifyPrice = new LineMark(ChartClass.PriceSignal, axisY);
-        this.orderPrice = new LineMark(ChartClass.OrderSupport, axisY);
+        this.backGridVertical = new LineMark(axisX.forGrid, axisX, ChartClass.BackGrid);
+        this.backGridHorizontal = new LineMark(axisY.forGrid, axisY, ChartClass.BackGrid);
+        this.mouseTrackVertical = new LineMark(axisX, ChartClass.MouseTrack);
+        this.mouseTrackHorizontal = new LineMark(axisY, ChartClass.MouseTrack);
+        this.notifyPrice = new LineMark(axisY, ChartClass.PriceSignal);
+        this.orderBuyPrice = new LineMark(axisY, ChartClass.OrderSupport, Side.BUY);
+        this.orderSellPrice = new LineMark(axisY, ChartClass.OrderSupport, Side.SELL);
 
         widthProperty().addListener(plotValidateListener);
         heightProperty().addListener(plotValidateListener);
@@ -121,7 +127,7 @@ public class ChartPlotArea extends Region {
         visualizeOrderPrice();
 
         getChildren()
-                .addAll(backGridVertical, backGridHorizontal, notifyPrice, orderPrice, mouseTrackHorizontal, mouseTrackVertical, candleGraph, lines);
+                .addAll(backGridVertical, backGridHorizontal, notifyPrice, orderBuyPrice, orderSellPrice, mouseTrackHorizontal, mouseTrackVertical, candleGraph, lines);
     }
 
     /**
@@ -187,10 +193,11 @@ public class ChartPlotArea extends Region {
      */
     private void visualizeOrderPrice() {
         trade.market().yourOrder.on(Viewtify.UIThread).to(o -> {
-            TickLable label = orderPrice.createLabel(o.price);
+            LineMark mark = o.isBuy() ? orderBuyPrice : orderSellPrice;
+            TickLable label = mark.createLabel(o.price);
 
             o.state.observe().take(State.CANCELED, State.COMPLETED).take(1).on(Viewtify.UIThread).to(() -> {
-                orderPrice.remove(label);
+                mark.remove(label);
             });
         });
     }
@@ -216,7 +223,8 @@ public class ChartPlotArea extends Region {
             mouseTrackVertical.draw();
             mouseTrackHorizontal.draw();
             notifyPrice.draw();
-            orderPrice.draw();
+            orderBuyPrice.draw();
+            orderSellPrice.draw();
 
             plotLineChartDatas();
             plotCandleChartDatas();
@@ -511,7 +519,7 @@ public class ChartPlotArea extends Region {
     private class LineMark extends Path {
 
         /** The class name. */
-        private final ChartClass className;
+        private final Enum[] classNames;
 
         /** The model. */
         private final List<TickLable> labels;
@@ -520,22 +528,22 @@ public class ChartPlotArea extends Region {
         private final Axis axis;
 
         /**
-         * @param className
+         * @param classNames
          */
-        private LineMark(ChartClass className, Axis axis) {
-            this(className, new ArrayList(), axis);
+        private LineMark(Axis axis, Enum... classNames) {
+            this(new ArrayList(), axis, classNames);
         }
 
         /**
          * @param className
          * @param labels
          */
-        private LineMark(ChartClass className, List<TickLable> labels, Axis axis) {
-            this.className = className;
+        private LineMark(List<TickLable> labels, Axis axis, Enum... classNames) {
+            this.classNames = classNames;
             this.labels = labels;
             this.axis = axis;
 
-            getStyleClass().addAll(className.name(), ChartClass.Line.name());
+            StyleHelper.of(this).style(ChartClass.Line).style(classNames);
         }
 
         /**
@@ -553,7 +561,7 @@ public class ChartPlotArea extends Region {
          * @return
          */
         private TickLable createLabel(Num price) {
-            TickLable label = axis.createLabel(className);
+            TickLable label = axis.createLabel(classNames);
             if (price != null) label.value.set(price.toDouble());
             labels.add(label);
 

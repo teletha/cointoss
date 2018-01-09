@@ -39,6 +39,7 @@ import org.eclipse.collections.api.block.function.primitive.DoubleToObjectFuncti
 import cointoss.util.Num;
 import kiss.Disposable;
 import viewtify.Viewtify;
+import viewtify.ui.helper.StyleHelper;
 
 /**
  * @version 2018/01/08 22:59:17
@@ -559,8 +560,8 @@ public class Axis extends Region {
      * 
      * @return
      */
-    public TickLable createLabel(ChartClass className) {
-        return new TickLable(className);
+    public TickLable createLabel(Enum... classNames) {
+        return new TickLable(classNames);
     }
 
     private void zoom(ScrollEvent event) {
@@ -582,12 +583,12 @@ public class Axis extends Region {
         /**
          * 
          */
-        private TickLable(ChartClass className) {
+        private TickLable(Enum... classNames) {
             tickLabels.getChildren().add(this);
-            getStyleClass().addAll(className.name(), ChartClass.Label.name());
             textProperty().bind(Viewtify.calculate(value, () -> tickLabelFormatter.get().apply(value.get())));
-
             value.addListener(dataValidateListener);
+
+            StyleHelper.of(this).style(ChartClass.Label).style(classNames);
         }
 
         /**
