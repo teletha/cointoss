@@ -9,7 +9,10 @@
  */
 package trademate.chart;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import javafx.beans.InvalidationListener;
@@ -23,8 +26,6 @@ import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.PathElement;
 import javafx.scene.shape.StrokeLineJoin;
-
-import org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap;
 
 import cointoss.Order.State;
 import cointoss.Side;
@@ -64,7 +65,7 @@ public class ChartPlotArea extends Region {
     private final Group lines = new LocalGroup();
 
     /** The candle chart manager */
-    private final IntObjectHashMap<Candle> candles = new IntObjectHashMap<>();
+    private final ArrayList<Candle> candles = new ArrayList<>();
 
     /** Chart UI */
     private final Group candleGraph = new LocalGroup();
@@ -229,7 +230,25 @@ public class ChartPlotArea extends Region {
      * Draw candle chart.
      */
     private void drawCandleChart() {
+        int candleSize = candles.size();
         int dataSize = candleChartData.size();
+
+        // size matching
+        int difference = dataSize - candleSize;
+
+        if (0 < difference) {
+            candles.addAll(Arrays.asList((Candle[]) Array.newInstance(Candle.class, difference)));
+        } else if (difference < 0) {
+            Iterator<Candle> remover = candles.subList(candleSize + difference, candleSize).iterator();
+
+            while (remover.hasNext()) {
+                Candle candle = remover.next();
+                candleGraph.getChildren().remove(candle);
+                remover.remove();
+            }
+        }
+
+        // draw chart
         long start = (long) axisX.computeVisibleMinValue();
         long end = (long) axisX.computeVisibleMaxValue();
 
@@ -243,7 +262,7 @@ public class ChartPlotArea extends Region {
                 if (candle == null) {
                     candle = new Candle();
                     candleGraph.getChildren().add(candle);
-                    candles.put(i, candle);
+                    candles.set(i, candle);
                 }
 
                 // update candle layout
@@ -449,24 +468,6 @@ public class ChartPlotArea extends Region {
             plotIsValid = false;
             setNeedsLayout(true);
         }
-    }
-
-    /**
-     * Get data for line chart.
-     * 
-     * @return
-     */
-    public final ObservableList<CandleChartData> getLineDataList() {
-        return lineChartData;
-    }
-
-    /**
-     * Get data for candle chart.
-     * 
-     * @return
-     */
-    public final ObservableList<Tick> getCandleDataList() {
-        return candleChartData;
     }
 
     /**

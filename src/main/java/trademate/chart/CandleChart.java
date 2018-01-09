@@ -80,7 +80,6 @@ public class CandleChart extends Region {
         candles = FXCollections.observableArrayList();
         candles.addListener(dataValidateListener);
 
-        graph.setCandleChartDataList(candles);
         getChildren().addAll(graph, axisX, axisY);
     }
 
@@ -273,6 +272,11 @@ public class CandleChart extends Region {
      * @return
      */
     public CandleChart candleDate(Chart data) {
+        if (data == null) {
+            graph.setCandleChartDataList(FXCollections.emptyObservableList());
+            return this;
+        }
+
         dataIsValid.set(false);
         this.candles.clear();
 
@@ -287,6 +291,9 @@ public class CandleChart extends Region {
                 axisX.scroll.setValue(1);
             }
         });
+
+        graph.setCandleChartDataList(candles);
+
         return this;
     }
 }
