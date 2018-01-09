@@ -66,7 +66,7 @@ public interface MarketLog {
      * @return
      */
     default Signal<Execution> fromLast(int time, ChronoUnit unit) {
-        return from(ZonedDateTime.now().minus(time, unit));
+        return from(ZonedDateTime.now(Execution.UTC).minus(time, unit));
     }
 
     /**
