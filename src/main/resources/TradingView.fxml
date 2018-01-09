@@ -46,7 +46,7 @@
          <children>
             <HBox>
                <children>
-                  <ComboBox id="chartSpan" prefWidth="150.0" />
+                  <ComboBox id="chartSpan" prefWidth="100.0" />
                </children>
             </HBox>
             <AnchorPane id="chart" />

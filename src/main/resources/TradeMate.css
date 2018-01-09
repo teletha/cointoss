@@ -93,7 +93,7 @@
 	-fx-fill: -side;
 }
 .OrderSupport.Line {
-	-fx-stroke-width: 1;
+	-fx-stroke-width: 0.6;
 	-fx-stroke: -side;
 	-fx-stroke-dash-array: 2 4;
 }

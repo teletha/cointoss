@@ -20,9 +20,6 @@ import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.Event;
-import javafx.event.EventHandler;
-import javafx.event.EventType;
 import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
@@ -172,64 +169,27 @@ public class CandleChart extends Region {
         return new Point2D(vx, vy);
     }
 
-    public void preLayout(final double x, final double y, final double width, final double height) {
-        prelayout = true;
-        resizeRelocate(x, y, width, height);
-        layout();
-        prelayout = false;
-    }
-
     /**
      * {@inheritDoc}
      */
     @Override
     protected final void layoutChildren() {
-        final double w = getWidth();
-        final double h = getHeight();
-        if (w == -1 || h == -1) {
+        double width = getWidth();
+        double height = getHeight();
+        if (width == -1 || height == -1) {
             return;
         }
-        layoutChildren(w, h);
-    }
 
-    protected void layoutChildren(double width, double height) {
         if (dataIsValid.get() == false) {
-            dealWithData();
+            setXAxisRange();
+            setYAxisRange();
         }
-        final Insets in = getInsets();
-        width -= in.getLeft() + in.getRight();
-        height -= in.getTop() + in.getBottom();
-        layoutChart(width, height, in.getLeft(), in.getTop());
 
-    }
+        Insets insets = getInsets();
+        width -= insets.getLeft() + insets.getRight();
+        height -= insets.getTop() + insets.getBottom();
 
-    protected void dealWithData() {
-        setXAxisRange();
-        setYAxisRange();
-    }
-
-    public final <T extends Event> void addEventHandlerToGraphArea(final EventType<T> eventType, final EventHandler<? super T> eventHandler) {
-        graph.addEventHandler(eventType, eventHandler);
-    }
-
-    public final <T extends Event> void addEventFilterToGraphArea(final EventType<T> eventType, final EventHandler<? super T> eventFilter) {
-        graph.addEventFilter(eventType, eventFilter);
-    }
-
-    public final <T extends Event> void removeEventHandlerFromGraphArea(final EventType<T> eventType, final EventHandler<? super T> eventHandler) {
-        graph.removeEventHandler(eventType, eventHandler);
-    }
-
-    public final <T extends Event> void removeEventFilterFromGraphArea(final EventType<T> eventType, final EventHandler<? super T> eventFilter) {
-        graph.removeEventFilter(eventType, eventFilter);
-    }
-
-    private static boolean isLeft(final Side s) {
-        return s != Side.RIGHT;
-    }
-
-    private static boolean isBottom(final Side s) {
-        return s != Side.TOP;
+        layoutChart(width, height, insets.getLeft(), insets.getTop());
     }
 
     protected void layoutChart(final double w, final double h, final double x0, final double y0) {
@@ -249,7 +209,7 @@ public class CandleChart extends Region {
             if (xAxis != null) {
                 final double xh = xAxis.prefHeight(ww);
                 xAxis.resize(ww, xh);
-                if (isBottom(xAxis.side)) {
+                if (xAxis.side == Side.BOTTOM) {
                     xAxis.relocate(bounds.getMinX(), bounds.getMaxY());
                 } else {
                     xAxis.relocate(bounds.getMinX(), bounds.getMinY() - xh);
@@ -258,7 +218,7 @@ public class CandleChart extends Region {
             if (yAxis != null) {
                 final double yw = yAxis.prefWidth(hh);
                 yAxis.resize(yw, hh);
-                if (isLeft(yAxis.side)) {
+                if (yAxis.side == Side.LEFT) {
                     yAxis.relocate(bounds.getMinX() - yw, bounds.getMinY());
                 } else {
                     yAxis.relocate(bounds.getMaxX(), bounds.getMinY());
@@ -369,7 +329,7 @@ public class CandleChart extends Region {
 
     }
 
-    private static double max(final double max, final double v) {
+    private static double max(double max, double v) {
         return v != v || max >= v ? max : v;
     }
 
