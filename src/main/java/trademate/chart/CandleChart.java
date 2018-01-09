@@ -16,12 +16,10 @@ import java.util.function.Consumer;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
-import javafx.geometry.Rectangle2D;
 import javafx.geometry.Side;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Region;
@@ -54,16 +52,11 @@ public class CandleChart extends Region {
     /** The validity of data. */
     private AtomicBoolean dataIsValid = new AtomicBoolean();
 
-    /** A current position and size of plot area. */
-    public final ReadOnlyObjectWrapper<Rectangle2D> plotAreaBounds = new ReadOnlyObjectWrapper<>(this, "plotAreaBounds", null);
-
     private final InvalidationListener dataValidateListener = observable -> {
         if (dataIsValid.compareAndSet(true, false)) {
             requestLayout();
         }
     };
-
-    private boolean prelayout = false;
 
     /**
      * 
@@ -222,20 +215,18 @@ public class CandleChart extends Region {
             }
         }
         graph.relocate(x + x0, y + y0);
+
         final double oldgW = graph.getWidth();
         final double oldgH = graph.getHeight();
         final boolean resize = oldgW != graphWidth || oldgH != graphHeight;
 
-        if (!prelayout) {
-            if (resize) {
-                graph.resize(graphWidth, graphHeight);
-            }
-            if (resize || dataIsValid.get() == false) {
-                graph.layoutChildren();
-                dataIsValid.set(true);
-            }
+        if (resize) {
+            graph.resize(graphWidth, graphHeight);
         }
-        plotAreaBounds.set(new Rectangle2D(x + x0, y + y0, graphWidth, graphHeight));
+        if (resize || dataIsValid.get() == false) {
+            graph.layoutChildren();
+            dataIsValid.set(true);
+        }
     }
 
     private static double max(double max, double v) {
