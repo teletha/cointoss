@@ -102,7 +102,7 @@ public class Console extends View {
          */
         @Override
         protected void initialize() {
-            market.timeline.throttle(500, MILLISECONDS).to(e -> {
+            market.timeline.throttle(1000, MILLISECONDS).to(e -> {
                 ExecutionFlow flow = market.flow;
 
                 StringBuilder builder = new StringBuilder();
@@ -113,6 +113,7 @@ public class Console extends View {
                 builder.append(market.flow100.volume().format(2)).append("   ");
                 builder.append(market.flow200.volume().format(2)).append("   ");
                 builder.append(market.flow300.volume().format(2)).append("   ");
+                builder.append(market.flow100.priceVolatility()).append("   ");
 
                 // 値段が上がりづらい要因
                 // ・買いが少ない long volumeの量が小さい

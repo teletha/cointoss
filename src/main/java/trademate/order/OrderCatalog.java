@@ -147,7 +147,6 @@ public class OrderCatalog extends View {
     private void cancel(Order order) {
         Viewtify.inWorker(() -> {
             view.market().cancel(order).to(o -> {
-                view.console.info("{} is canceled.", order);
             });
         });
     }

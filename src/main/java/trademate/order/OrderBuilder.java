@@ -212,13 +212,9 @@ public class OrderBuilder extends View {
         // Request to Server
         // ========================================
         for (Order order : set.sub) {
-            view.console.info("Request order [{}]", order);
-
             Viewtify.inWorker(() -> {
                 view.market().request(order).to(o -> {
-                    view.console.info("Accept order [{}]", o);
                 }, e -> {
-                    view.console.info("Reject order [{}]", order, e);
                     notificator.orderFailed.notify("Reject order " + order);
                 });
             });

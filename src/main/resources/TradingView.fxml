@@ -37,7 +37,7 @@
                   <TreeTableColumn id="openPositionProfitAndLoss" maxWidth="80.0" minWidth="80.0" text="損益" />
                </columns>
             </TreeTableView>
-            <ListView id="console" focusTraversable="false" minWidth="400.0" />
+            <ListView id="console" focusTraversable="false" minWidth="600.0" />
          </children>
       </HBox>
    </bottom>

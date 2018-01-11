@@ -207,9 +207,9 @@ public class Tick {
      * @return
      */
     public final Num priceVolatility() {
-        Num up = longVolume.isZero() ? Num.ZERO : longPriceIncrese.divide(longVolume);
-        Num down = shortVolume.isZero() ? Num.ZERO : shortPriceDecrease.divide(shortVolume);
-        return up.divide(down).scale(2);
+        Num upPotencial = longVolume.isZero() ? Num.ZERO : longPriceIncrese.divide(longVolume);
+        Num downPotencial = shortVolume.isZero() ? Num.ZERO : shortPriceDecrease.divide(shortVolume);
+        return upPotencial.divide(downPotencial).scale(2);
     }
 
     public final Num upRatio() {

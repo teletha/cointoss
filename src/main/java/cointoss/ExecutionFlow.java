@@ -31,11 +31,13 @@ public class ExecutionFlow {
     public Num longVolume = Num.ZERO;
 
     /** Volume of the period */
+    public Num longPriceIncrese = Num.ZERO;
+
+    /** Volume of the period */
     public Num shortVolume = Num.ZERO;
 
-    public int longDown = 0;
-
-    public int shortUp = 0;
+    /** Volume of the period */
+    public Num shortPriceDecrease = Num.ZERO;
 
     /** The execution buffer. */
     private final RingBuffer<Execution> buffer;
@@ -76,18 +78,22 @@ public class ExecutionFlow {
 
         if (exe.side.isBuy()) {
             longVolume = longVolume.plus(exe.size);
-
+            longPriceIncrese = longPriceIncrese.plus(exe.price.minus(latest.price));
         } else {
             shortVolume = shortVolume.plus(exe.size);
+            shortPriceDecrease = shortPriceDecrease.plus(latest.price.minus(exe.price));
         }
 
         if (removed != null) {
+            Execution next = buffer.get(0);
             volume = volume.minus(removed.size);
 
             if (removed.side.isBuy()) {
                 longVolume = longVolume.minus(removed.size);
+                if (next != null) longPriceIncrese = longPriceIncrese.minus(next.price.minus(removed.price));
             } else {
                 shortVolume = shortVolume.minus(removed.size);
+                if (next != null) shortPriceDecrease = shortPriceDecrease.minus(removed.price.minus(next.price));
             }
         }
         latest = exe;
@@ -102,6 +108,17 @@ public class ExecutionFlow {
         return longVolume.minus(shortVolume);
     }
 
+    /**
+     * @return
+     */
+    public final Num priceVolatility() {
+        Num upPotencial = longVolume.isZero() ? Num.ZERO : longPriceIncrese.divide(longVolume);
+        Num downPotencial = shortVolume.isZero() ? Num.ZERO : shortPriceDecrease.divide(shortVolume);
+        Num volatility = upPotencial.divide(downPotencial).scale(2);
+
+        return volatility.isGreaterThanOrEqual(Num.ONE) ? volatility.minus(1) : Num.ONE.divide(volatility).negate();
+    }
+
     private ExecutionFlow copy() {
         ExecutionFlow copy = new ExecutionFlow(0);
         copy.id = id++;
@@ -109,7 +126,9 @@ public class ExecutionFlow {
         copy.latest = latest;
         copy.volume = volume;
         copy.longVolume = longVolume;
+        copy.longPriceIncrese = longPriceIncrese;
         copy.shortVolume = shortVolume;
+        copy.shortPriceDecrease = shortPriceDecrease;
 
         return copy;
     }
