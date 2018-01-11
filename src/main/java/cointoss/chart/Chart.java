@@ -35,7 +35,7 @@ public class Chart {
     private Tick current;
 
     /** The tick manager. */
-    public final BigList<Tick> ticks;
+    public final BigList<Tick> ticks = new BigList();
 
     /** The tick observers. */
     private final Listeners<Tick> listeners = new Listeners();
@@ -50,7 +50,6 @@ public class Chart {
      */
     public Chart(Duration duration, Chart... children) {
         this.duration = duration;
-        this.ticks = new BigList();
 
         for (Chart child : children) {
             tick.to(child::tick);
@@ -69,29 +68,38 @@ public class Chart {
     }
 
     /**
+     * Return the first tick.
+     * 
+     * @return
+     */
+    public final Tick getFirstTick() {
+        return ticks.getFirst();
+    }
+
+    /**
      * Return the latest tick.
      * 
      * @return
      */
-    public Tick getLastTick() {
+    public final Tick getLastTick() {
         return ticks.getLast();
     }
 
     /**
+     * @param fromFirst
+     * @return
+     */
+    public final Tick getTick(int fromFirst) {
+        return ticks.get(fromFirst);
+    }
+
+    /**
      * Return the latest tick.
      * 
      * @return
      */
-    public Tick getLatestTick(int fromLast) {
+    public final Tick getLatestTick(int fromLast) {
         return ticks.get(ticks.size() - 1 - fromLast);
-    }
-
-    /**
-     * @param index
-     * @return
-     */
-    public Tick getTick(int index) {
-        return ticks.get(index);
     }
 
     /**

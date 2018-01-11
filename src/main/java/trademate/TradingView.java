@@ -124,7 +124,7 @@ public class TradingView extends View {
      */
     public final synchronized Market market() {
         if (market == null) {
-            Viewtify.Terminator.add(market = new Market(provider.service(), provider.log().fromLast(120, ChronoUnit.MINUTES)));
+            Viewtify.Terminator.add(market = new Market(provider.service(), provider.log().fromLast(360, ChronoUnit.MINUTES)));
         }
         return market;
     }
