@@ -103,7 +103,7 @@ public class BackTest {
             market.minute1.signal().takeAt(i -> i % 10 == 0).to(exe -> {
                 budget = budget.plus(Num.of(10000 / (24 * 12)));
 
-                Tick tick = market.day1.ticks.latest(1);
+                Tick tick = market.day1.getLatestTick(1);
 
                 if (tick != null && exe.closePrice.isGreaterThan(tick.minPrice.multiply(Num.of(1.07)))) {
                     Num price = market.getExecutionLatest().price;

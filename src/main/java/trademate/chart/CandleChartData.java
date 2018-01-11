@@ -15,9 +15,10 @@ import java.util.function.ToDoubleFunction;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
+import org.magicwerk.brownies.collections.BigList;
+
 import cointoss.chart.Chart;
 import cointoss.chart.Tick;
-import cointoss.util.RingBuffer;
 
 /**
  * @version 2017/09/27 21:41:30
@@ -83,11 +84,10 @@ public class CandleChartData {
      * @param value
      * @return
      */
-    private static int findMaxIndex(RingBuffer<Tick> a, int size, double value, ToDoubleFunction<Tick> converter) {
+    private static int findMaxIndex(BigList<Tick> a, int size, double value, ToDoubleFunction<Tick> converter) {
         int start = 1, end = size - 2, middle = (start + end) >> 1;
 
         while (end - start > 1) {
-            System.out.println(middle + "  " + a.start() + "  " + a.end() + " " + a.size());
             final double d = converter.applyAsDouble(a.get(middle));
             if (d == value) {
                 return middle;
@@ -117,7 +117,7 @@ public class CandleChartData {
      * @param v
      * @return
      */
-    private static int findMinIndex(final RingBuffer<Tick> a, final int size, final double v, ToDoubleFunction<Tick> converter) {
+    private static int findMinIndex(BigList<Tick> a, int size, double v, ToDoubleFunction<Tick> converter) {
         if (size < 2) {
             return 0;
         }

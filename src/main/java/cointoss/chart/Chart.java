@@ -9,31 +9,23 @@
  */
 package cointoss.chart;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.stream.IntStream;
+
+import org.magicwerk.brownies.collections.BigList;
 
 import cointoss.Execution;
-import cointoss.chart.simple.PriceIndicator;
 import cointoss.util.Listeners;
 import cointoss.util.Num;
-import cointoss.util.RingBuffer;
-import filer.Filer;
-import kiss.I;
 import kiss.Observer;
 import kiss.Signal;
 
 /**
  * @version 2017/09/07 22:12:13
  */
-@SuppressWarnings("serial")
 public class Chart {
 
     /** The chart duration. */
@@ -43,7 +35,7 @@ public class Chart {
     private Tick current;
 
     /** The tick manager. */
-    public final RingBuffer<Tick> ticks;
+    public final BigList<Tick> ticks;
 
     /** The tick observers. */
     private final Listeners<Tick> listeners = new Listeners();
@@ -53,63 +45,16 @@ public class Chart {
     /** The tick observers. */
     public final Signal<Tick> tick = new Signal(listeners);
 
-    /** The trend indicator. */
-    private final Indicator trend;
-
     /**
      * 
      */
     public Chart(Duration duration, Chart... children) {
         this.duration = duration;
-        this.ticks = new RingBuffer(5 * 60 * 24, "chart - " + duration);
-        this.trend = PriceIndicator.weightMedian(this).sma(30);
+        this.ticks = new BigList();
 
         for (Chart child : children) {
             tick.to(child::tick);
         }
-    }
-
-    /**
-     * Detect trend.
-     * 
-     * @return
-     */
-    public Trend trend() {
-        Num latest = trend.getLast(0);
-        Num total = Num.ONE;
-
-        for (int i = 1; i < Math.min(24, ticks.size()); i++) {
-            Num ratio = latest.divide(trend.getLast(i));
-            total = total.multiply(ratio);
-        }
-        return total.isLessThan(Num.of("0.65")) ? Trend.Down : total.isGreaterThan(Num.of("1.35")) ? Trend.Up : Trend.Range;
-    }
-
-    /**
-     * Detect trend.
-     * 
-     * @return
-     */
-    public boolean isUpTrend() {
-        return trend() == Trend.Up;
-    }
-
-    /**
-     * Detect trend.
-     * 
-     * @return
-     */
-    public boolean isDownTrend() {
-        return trend() == Trend.Down;
-    }
-
-    /**
-     * Detect trend.
-     * 
-     * @return
-     */
-    public boolean isRange() {
-        return trend() == Trend.Range;
     }
 
     /**
@@ -129,7 +74,16 @@ public class Chart {
      * @return
      */
     public Tick getLastTick() {
-        return ticks.latest();
+        return ticks.getLast();
+    }
+
+    /**
+     * Return the latest tick.
+     * 
+     * @return
+     */
+    public Tick getLatestTick(int fromLast) {
+        return ticks.get(ticks.size() - 1 - fromLast);
     }
 
     /**
@@ -190,35 +144,6 @@ public class Chart {
             ticks.add(current);
         }
         current.tick(tick);
-    }
-
-    /**
-     * <p>
-     * Write out the current tick log to the specified file
-     * </p>
-     * 
-     * @param file
-     */
-    public void writeTo(Path file) {
-        List<String> list = I.signal(IntStream.range(ticks.start(), ticks.end())).map(this::getTick).map(tick -> tick.toString()).toList();
-
-        try {
-            Files.createDirectories(file.getParent());
-            Files.write(file, list);
-        } catch (IOException e) {
-            throw I.quiet(e);
-        }
-    }
-
-    /**
-     * <p>
-     * Read tick log from the specified file.
-     * </p>
-     * 
-     * @param file
-     */
-    public void readFrom(Path file) {
-        Filer.read(file).map(line -> new Tick(line)).to(ticks::add);
     }
 
     /**

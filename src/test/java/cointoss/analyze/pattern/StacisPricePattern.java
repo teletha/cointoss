@@ -64,7 +64,7 @@ public class StacisPricePattern extends Trading {
             List<Num> min = new ArrayList();
 
             for (int i = 0; i <= time; i++) {
-                Tick latest = market.minute1.ticks.latest(i);
+                Tick latest = market.minute1.getLatestTick(i);
 
                 max.add(Num.max(latest.openPrice, latest.closePrice));
                 min.add(Num.min(latest.openPrice, latest.closePrice));
