@@ -111,8 +111,6 @@ public class ChartPlotArea extends Region {
         axisY.scroll.visibleAmountProperty().addListener(this::shoudLayoutCandle);
 
         Viewtify.clip(this);
-        Viewtify.clip(backGridVertical);
-        Viewtify.clip(backGridHorizontal);
 
         visualizeMouseTrack();
         visualizeNotifyPrice();
@@ -354,6 +352,7 @@ public class ChartPlotArea extends Region {
             this.labels = labels;
             this.axis = axis;
 
+            Viewtify.clip(this);
             StyleHelper.of(this).style(ChartClass.Line).style(classNames);
         }
 
