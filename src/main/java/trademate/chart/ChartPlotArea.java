@@ -163,16 +163,19 @@ public class ChartPlotArea extends Region {
      */
     private void visualizeNotifyPrice() {
         addEventHandler(ContextMenuEvent.CONTEXT_MENU_REQUESTED, e -> {
-            Num price = Num.of(Math.floor(axisY.getValueForPosition(e.getY())));
+            double clickedPosition = e.getY();
 
             // check price range to add or remove
             for (TickLable mark : notifyPrice.labels) {
-                if (Num.of(mark.value.get()).isNear(price, 500)) {
+                double markedPosition = axisY.getPositionForValue(mark.value.get());
+
+                if (Math.abs(markedPosition - clickedPosition) < 5) {
                     notifyPrice.remove(mark);
                     return;
                 }
             }
 
+            Num price = Num.of(Math.floor(axisY.getValueForPosition(clickedPosition)));
             TickLable label = notifyPrice.createLabel(price);
 
             label.add(trade.market().signalByPrice(price).on(Viewtify.UIThread).to(exe -> {
