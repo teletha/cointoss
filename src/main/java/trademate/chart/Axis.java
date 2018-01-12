@@ -47,7 +47,7 @@ import viewtify.ui.helper.StyleHelper;
 public class Axis extends Region {
 
     /** The default zoom size. */
-    private static final int ZoomSize = 20;
+    private static final int ZoomSize = 50;
 
     /**
      * We use these for auto ranging to pick a user friendly tick unit. We handle tick units in the

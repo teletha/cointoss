@@ -23,6 +23,7 @@ import org.apache.logging.log4j.Logger;
 
 import cointoss.ExecutionFlow;
 import cointoss.Trading;
+import cointoss.util.Num;
 import trademate.SettingView;
 import trademate.TradingView;
 import viewtify.UI;
@@ -113,7 +114,15 @@ public class Console extends View {
                 builder.append(market.flow100.volume().format(2)).append("   ");
                 builder.append(market.flow200.volume().format(2)).append("   ");
                 builder.append(market.flow300.volume().format(2)).append("   ");
-                builder.append(market.flow100.priceVolatility()).append("   ");
+
+                Num upPotential = market.flow.estimateUpPotential();
+                Num downPotential = market.flow.estimateDownPotential();
+                builder.append(upPotential)
+                        .append("   ")
+                        .append(downPotential)
+                        .append("   ")
+                        .append(upPotential.abs().minus(downPotential).divide(100000).scale(4))
+                        .append("   ");
 
                 // 値段が上がりづらい要因
                 // ・買いが少ない long volumeの量が小さい

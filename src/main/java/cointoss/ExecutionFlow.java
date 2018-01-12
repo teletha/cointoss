@@ -108,15 +108,12 @@ public class ExecutionFlow {
         return longVolume.minus(shortVolume);
     }
 
-    /**
-     * @return
-     */
-    public final Num priceVolatility() {
-        Num upPotencial = longVolume.isZero() ? Num.ZERO : longPriceIncrese.divide(longVolume);
-        Num downPotencial = shortVolume.isZero() ? Num.ZERO : shortPriceDecrease.divide(shortVolume);
-        Num volatility = upPotencial.divide(downPotencial).scale(2);
+    public Num estimateUpPotential() {
+        return longVolume.isZero() ? Num.ZERO : longPriceIncrese.divide(longVolume).scale(3);
+    }
 
-        return volatility.isGreaterThanOrEqual(Num.ONE) ? volatility.minus(1) : Num.ONE.divide(volatility).negate();
+    public Num estimateDownPotential() {
+        return shortVolume.isZero() ? Num.ZERO : shortPriceDecrease.divide(shortVolume).scale(3);
     }
 
     private ExecutionFlow copy() {
