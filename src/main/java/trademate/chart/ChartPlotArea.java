@@ -110,8 +110,6 @@ public class ChartPlotArea extends Region {
         axisY.scroll.valueProperty().addListener(this::shoudLayoutCandle);
         axisY.scroll.visibleAmountProperty().addListener(this::shoudLayoutCandle);
 
-        Viewtify.clip(this);
-
         visualizeMouseTrack();
         visualizeNotifyPrice();
         visualizeOrderPrice();
