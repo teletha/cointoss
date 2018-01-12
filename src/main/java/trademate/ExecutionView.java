@@ -13,10 +13,12 @@ import java.time.format.DateTimeFormatter;
 import java.util.stream.IntStream;
 
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 
 import cointoss.Execution;
+import cointoss.util.Num;
 import viewtify.UI;
 import viewtify.View;
 import viewtify.Viewtify;
@@ -48,10 +50,16 @@ public class ExecutionView extends View {
      */
     @Override
     protected void initialize() {
+        ObservableList<Execution> commulatives = executionCumulativeList.getItems();
+        FilteredList<Execution> filtered = new FilteredList<>(commulatives);
+
         // configure UI
         executionList.setCellFactory(v -> new Cell());
+        executionCumulativeList.setItems(filtered);
         executionCumulativeList.setCellFactory(v -> new Cell());
-        takerSize.values(IntStream.range(1, 51).boxed()).initial(10);
+        takerSize.values(IntStream.range(1, 51).boxed())
+                .initial(10)
+                .observe(size -> filtered.setPredicate(e -> e.cumulativeSize.isGreaterThanOrEqual(size)));
 
         // load execution log
         Viewtify.inWorker(() -> {
@@ -68,13 +76,11 @@ public class ExecutionView extends View {
         // load big taker log
         Viewtify.inWorker(() -> {
             return view.market().timelineByTaker.on(Viewtify.UIThread).to(e -> {
-                if (e.cumulativeSize.isGreaterThanOrEqual(takerSize.ui.getValue())) {
-                    ObservableList<Execution> bigs = executionCumulativeList.getItems();
+                if (e.cumulativeSize.isGreaterThanOrEqual(Num.ONE)) {
+                    commulatives.add(0, e);
 
-                    bigs.add(0, e);
-
-                    if (1000 < bigs.size()) {
-                        bigs.remove(bigs.size() - 1);
+                    if (2000 < commulatives.size()) {
+                        commulatives.remove(commulatives.size() - 1);
                     }
                 }
             });
