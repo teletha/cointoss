@@ -12,21 +12,19 @@ package trademate;
 import java.time.format.DateTimeFormatter;
 import java.util.stream.IntStream;
 
-import javafx.collections.ObservableList;
-import javafx.collections.transformation.FilteredList;
 import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
 
 import cointoss.Execution;
 import cointoss.util.Num;
 import viewtify.UI;
 import viewtify.View;
 import viewtify.Viewtify;
+import viewtify.ui.UIListView;
 import viewtify.ui.UISpinner;
 import viewtify.ui.UserInterface;
 
 /**
- * @version 2017/12/01 16:58:49
+ * @version 2018/01/12 21:29:04
  */
 public class ExecutionView extends View {
 
@@ -34,10 +32,10 @@ public class ExecutionView extends View {
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
 
     /** The execution list. */
-    private @UI ListView<Execution> executionList;
+    private @UI UIListView<Execution> executionList;
 
     /** The execution list. */
-    private @UI ListView executionCumulativeList;
+    private @UI UIListView<Execution> executionCumulativeList;
 
     /** UI for interval configuration. */
     private @UI UISpinner<Integer> takerSize;
@@ -50,25 +48,19 @@ public class ExecutionView extends View {
      */
     @Override
     protected void initialize() {
-        ObservableList<Execution> commulatives = executionCumulativeList.getItems();
-        FilteredList<Execution> filtered = new FilteredList<>(commulatives);
-
         // configure UI
-        executionList.setCellFactory(v -> new Cell());
-        executionCumulativeList.setItems(filtered);
-        executionCumulativeList.setCellFactory(v -> new Cell());
-        takerSize.values(IntStream.range(1, 51).boxed())
-                .initial(10)
-                .observe(size -> filtered.setPredicate(e -> e.cumulativeSize.isGreaterThanOrEqual(size)));
+        executionList.cell(v -> new Cell());
+        executionCumulativeList.cell(v -> new Cell())
+                .filter(takerSize.property(), (e, size) -> e.cumulativeSize.isGreaterThanOrEqual(size));
+        takerSize.values(IntStream.range(1, 51).boxed()).initial(10);
 
         // load execution log
         Viewtify.inWorker(() -> {
             return view.market().timeline.on(Viewtify.UIThread).to(e -> {
-                ObservableList<Execution> items = executionList.getItems();
-                items.add(0, e);
+                executionList.add(0, e);
 
-                if (100 < items.size()) {
-                    items.remove(items.size() - 1);
+                if (100 < executionList.size()) {
+                    executionList.removeLast();
                 }
             });
         });
@@ -77,10 +69,10 @@ public class ExecutionView extends View {
         Viewtify.inWorker(() -> {
             return view.market().timelineByTaker.on(Viewtify.UIThread).to(e -> {
                 if (e.cumulativeSize.isGreaterThanOrEqual(Num.ONE)) {
-                    commulatives.add(0, e);
+                    executionCumulativeList.add(0, e);
 
-                    if (2000 < commulatives.size()) {
-                        commulatives.remove(commulatives.size() - 1);
+                    if (2000 < executionCumulativeList.size()) {
+                        executionCumulativeList.removeLast();
                     }
                 }
             });
