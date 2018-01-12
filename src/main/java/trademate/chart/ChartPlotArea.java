@@ -438,13 +438,6 @@ public class ChartPlotArea extends Region {
          * This mark should draw on the next rendering phase.
          */
         private void shouldLayout() {
-            shouldLayout(null);
-        }
-
-        /**
-         * This mark should draw on the next rendering phase.
-         */
-        private void shouldLayout(Observable source) {
             shouldLayout = true;
             setNeedsLayout(true);
         }
