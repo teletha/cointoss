@@ -219,13 +219,12 @@ public class ChartPlotArea extends Region {
      */
     private void drawCandleChart() {
         if (shoudLayoutCandle) {
-
             int candleSize = candles.size();
             int dataSize = candleChartData.size();
 
             // size matching
             int difference = dataSize - candleSize;
-            System.out.println("draw " + difference);
+
             if (0 < difference) {
                 // ensure size with null
                 candles.addAll(Arrays.asList((Candle[]) Array.newInstance(Candle.class, difference)));
