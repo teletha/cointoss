@@ -116,7 +116,7 @@ public class OrderBuilder extends View {
         orderPriceAmount.values(Num.ONE, Num.HUNDRED, Num.THOUSAND, Num.of(10000)).initial(Num.ONE);
 
         orderDivideSize.values(IntStream.range(1, 31).boxed()).initial(1);
-        orderDivideIntervalAmount.values(IntStream.range(0, 5).boxed())
+        orderDivideIntervalAmount.values(IntStream.range(0, 10).boxed())
                 .initial(0)
                 .disableWhen(orderDivideSize.ui.valueProperty().isEqualTo(1));
         optimizeThreshold.values(Num.range(0, 20)).initial(Num.ZERO);

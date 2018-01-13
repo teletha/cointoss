@@ -65,6 +65,13 @@
   -fx-background-insets: 0,1,2;
 }
 
+.CandleTopText {
+	-fx-fill: white;
+	-fx-font-size: 9px;
+	-fx-translate-x: -9px;
+	-fx-translate-y: -10px;
+}
+
 .BackGrid.Label {
 	-fx-fill: -fx-mid-text-color;
 }

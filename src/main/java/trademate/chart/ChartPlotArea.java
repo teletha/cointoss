@@ -80,6 +80,9 @@ public class ChartPlotArea extends Region {
     /** Chart UI */
     private final LineMark orderSellPrice;
 
+    /** Chart UI */
+    private final TopMark mouseTrackMark;
+
     /** Flag whether candle chart shoud layout on the next rendering phase or not. */
     private boolean shoudLayoutCandle = true;
 
@@ -102,6 +105,9 @@ public class ChartPlotArea extends Region {
         this.notifyPrice = new LineMark(axisY, ChartClass.PriceSignal);
         this.orderBuyPrice = new LineMark(axisY, ChartClass.OrderSupport, Side.BUY);
         this.orderSellPrice = new LineMark(axisY, ChartClass.OrderSupport, Side.SELL);
+        this.mouseTrackMark = new TopMark();
+
+        Viewtify.clip(this);
 
         widthProperty().addListener(this::shoudLayoutCandle);
         heightProperty().addListener(this::shoudLayoutCandle);
@@ -260,14 +266,14 @@ public class ChartPlotArea extends Region {
                     double close = axisY.getPositionForValue(tick.closePrice.toDouble());
                     double high = axisY.getPositionForValue(tick.maxPrice.toDouble());
                     double low = axisY.getPositionForValue(tick.minPrice.toDouble());
-                    candle.update(close - open, high - open, low - open);
+                    candle.update(close - open, high - open, low - open, null);
                     candle.setLayoutX(x);
                     candle.setLayoutY(open);
                 } else {
                     // out of visible range
                     if (candle != null) {
-                        candle.setLayoutX(-10);
-                        candle.setLayoutY(-10);
+                        candle.setLayoutX(-50);
+                        candle.setLayoutY(-50);
                     }
                 }
             }
@@ -315,6 +321,13 @@ public class ChartPlotArea extends Region {
         @Override
         public void requestLayout() {
         }
+    }
+
+    /**
+     * @version 2018/01/12 21:54:07
+     */
+    private class TopMark extends Path {
+
     }
 
     /**

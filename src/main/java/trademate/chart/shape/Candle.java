@@ -13,12 +13,14 @@ import javafx.scene.Group;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Region;
 import javafx.scene.shape.Line;
+import javafx.scene.shape.Path;
+import javafx.scene.text.Text;
 
 import cointoss.Side;
 import trademate.chart.ChartClass;
 
 /**
- * @version 2018/01/09 1:22:09
+ * @version 2018/01/12 21:50:12
  */
 public class Candle extends Group {
 
@@ -30,6 +32,12 @@ public class Candle extends Group {
 
     /** The bar part. */
     private final Region bar = new Region();
+
+    /** The top mark. */
+    private Text textTop;
+
+    /** The bottom mark. */
+    private Path bottom;
 
     /** The direction */
     private Side side = Side.BUY;
@@ -55,7 +63,7 @@ public class Candle extends Group {
      * @param highOffset
      * @param lowOffset
      */
-    public void update(double closeOffset, double highOffset, double lowOffset) {
+    public void update(double closeOffset, double highOffset, double lowOffset, String top) {
         this.side = closeOffset > 0 ? Side.SELL : Side.BUY;
 
         line.setStartY(highOffset);
@@ -67,6 +75,23 @@ public class Candle extends Group {
             bar.resizeRelocate(-width / 2, closeOffset, width, closeOffset * -1);
         }
         updateStyle();
+
+        // top text
+        if (top == null) {
+            if (textTop != null) {
+                textTop.setVisible(false);
+            }
+        } else {
+            if (textTop == null) {
+                textTop = new Text();
+                textTop.getStyleClass().add(ChartClass.CandleTopText.name());
+                getChildren().add(textTop);
+            }
+            textTop.setVisible(true);
+            textTop.setText(top);
+            textTop.setLayoutX(0);
+            textTop.setLayoutY(highOffset - 10);
+        }
     }
 
     /**
@@ -88,5 +113,14 @@ public class Candle extends Group {
     private void updateStyle() {
         line.getStyleClass().setAll(ChartClass.CandleLine.name(), side.name());
         bar.getStyleClass().setAll(ChartClass.CandleBar.name(), side.name());
+    }
+
+    /**
+     * Draw top text.
+     * 
+     * @param text
+     */
+    private void drawTopText(String text) {
+
     }
 }
