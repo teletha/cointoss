@@ -10,9 +10,7 @@
 package trademate.chart;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.function.Consumer;
 
 import javafx.beans.Observable;
 import javafx.collections.ObservableList;
@@ -54,11 +52,8 @@ public class ChartPlotArea extends Region {
     /** The notificator. */
     private final Notificator notificator = I.make(Notificator.class);
 
-    /** The candle chart manager */
-    private final ArrayList<Candle> candles = new ArrayList<>();
-
     /** Chart UI */
-    private final Group candleGraph = new LocalGroup();
+    private final Group candles = new LocalGroup();
 
     /** Chart UI */
     private final LineMark backGridVertical;
@@ -82,7 +77,7 @@ public class ChartPlotArea extends Region {
     private final LineMark orderSellPrice;
 
     /** Chart UI */
-    private final LineChart volumeLine;
+    private final LineChart volumeChart;
 
     /** Flag whether candle chart shoud layout on the next rendering phase or not. */
     private boolean shoudLayoutCandle = true;
@@ -106,7 +101,7 @@ public class ChartPlotArea extends Region {
         this.notifyPrice = new LineMark(axisY, ChartClass.PriceSignal);
         this.orderBuyPrice = new LineMark(axisY, ChartClass.OrderSupport, Side.BUY);
         this.orderSellPrice = new LineMark(axisY, ChartClass.OrderSupport, Side.SELL);
-        this.volumeLine = new LineChart();
+        this.volumeChart = new LineChart();
 
         Viewtify.clip(this);
 
@@ -122,7 +117,7 @@ public class ChartPlotArea extends Region {
         visualizeOrderPrice();
 
         getChildren()
-                .addAll(backGridVertical, backGridHorizontal, notifyPrice, orderBuyPrice, orderSellPrice, mouseTrackHorizontal, mouseTrackVertical, candleGraph, volumeLine);
+                .addAll(backGridVertical, backGridHorizontal, notifyPrice, orderBuyPrice, orderSellPrice, mouseTrackHorizontal, mouseTrackVertical, candles, volumeChart);
     }
 
     /**
@@ -220,81 +215,56 @@ public class ChartPlotArea extends Region {
         drawCandleChart();
     }
 
-    private <N extends Node> void ensureSize(List<N> items, int dataSize, Consumer<N> remover) {
-        // size matching
-        int itemSize = items.size();
-        int difference = dataSize - itemSize;
-
-        if (0 < difference) {
-            // ensure size with null
-            for (int i = 0; i < difference; i++) {
-                items.add(null);
-            }
-        } else if (difference < 0) {
-            Iterator<N> iterator = items.subList(itemSize + difference, itemSize).iterator();
-
-            while (iterator.hasNext()) {
-                N node = iterator.next();
-                remover.accept(node);
-                iterator.remove();
-            }
-        }
-    }
-
     /**
      * Draw candle chart.
      */
     private void drawCandleChart() {
         if (shoudLayoutCandle) {
+            ObservableList<Node> candles = this.candles.getChildren();
             int candleSize = candles.size();
             int dataSize = candleChartData.size();
 
-            long start = (long) axisX.computeVisibleMinValue();
-            long end = (long) axisX.computeVisibleMaxValue();
-            List<Tick> viewable = new ArrayList();
+            // size matching
+            int difference = dataSize - candleSize;
 
-            for (int i = 0; i < dataSize; i++) {
-                Tick tick = candleChartData.get(i);
-                long time = tick.start.toInstant().toEpochMilli();
-
-                if (time < start) {
-                    continue;
-                }
-
-                if (time < end) {
-                    viewable.add(tick);
-                } else {
-                    break;
+            if (0 < difference) {
+                // ensure size with null
+                for (int i = 0; i < difference; i++) {
+                    candles.add(new Candle());
                 }
             }
-            System.out.println(viewable.size());
-
-            ensureSize(candles, viewable.size(), candle -> candleGraph.getChildren().remove(candle));
 
             // draw chart
+            long start = (long) axisX.computeVisibleMinValue();
+            long end = (long) axisX.computeVisibleMaxValue();
 
-            for (int i = 0; i < viewable.size(); i++) {
-                Tick tick = viewable.get(i);
+            for (int i = 0; i < candleSize; i++) {
+                Candle candle = (Candle) candles.get(i);
 
-                Candle candle = candles.get(i);
+                if (i < dataSize) {
+                    Tick tick = candleChartData.get(i);
+                    long time = tick.start.toInstant().toEpochMilli();
 
-                if (candle == null) {
-                    candle = new Candle();
-                    candleGraph.getChildren().add(candle);
-                    candles.set(i, candle);
+                    if (start <= time && time <= end) {
+                        // in visible range
+                        double x = axisX.getPositionForValue(time);
+                        double open = axisY.getPositionForValue(tick.openPrice.toDouble());
+                        double close = axisY.getPositionForValue(tick.closePrice.toDouble());
+                        double high = axisY.getPositionForValue(tick.maxPrice.toDouble());
+                        double low = axisY.getPositionForValue(tick.minPrice.toDouble());
+                        candle.update(close - open, high - open, low - open, null);
+                        candle.setLayoutX(x);
+                        candle.setLayoutY(open);
+                    } else {
+                        // out of visible range
+                        candle.setLayoutX(-50);
+                        candle.setLayoutY(-50);
+                    }
+                } else {
+                    // unused
+                    candle.setLayoutX(-50);
+                    candle.setLayoutY(-50);
                 }
-
-                // update candle layout
-                double x = axisX.getPositionForValue(tick.start.toInstant().toEpochMilli());
-                double open = axisY.getPositionForValue(tick.openPrice.toDouble());
-                double close = axisY.getPositionForValue(tick.closePrice.toDouble());
-                double high = axisY.getPositionForValue(tick.maxPrice.toDouble());
-                double low = axisY.getPositionForValue(tick.minPrice.toDouble());
-                candle.update(close - open, high - open, low - open, null);
-                candle.setLayoutX(x);
-                candle.setLayoutY(open);
-
-                volumeLine.draw(tick, x);
             }
             shoudLayoutCandle = false;
         }
@@ -362,6 +332,13 @@ public class ChartPlotArea extends Region {
 
             // draw chart
         }
+    }
+
+    /**
+     * @version 2018/01/12 21:54:07
+     */
+    private class TopMark extends Path {
+
     }
 
     /**

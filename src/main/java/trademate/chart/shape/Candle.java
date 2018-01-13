@@ -54,7 +54,6 @@ public class Candle extends Group {
 
         tooltip.setGraphic(new TooltipContent());
         Tooltip.install(bar, tooltip);
-        updateStyle();
     }
 
     /**
