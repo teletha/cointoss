@@ -63,14 +63,14 @@ public class CandleChart extends Region {
         AnchorPane.setRightAnchor(this, 15d);
         AnchorPane.setLeftAnchor(this, 0d);
 
-        widthProperty().addListener(this::shoudLayout);
-        heightProperty().addListener(this::shoudLayout);
-        chart.addListener(this::shoudLayout);
-        candles.addListener(this::shoudLayout);
-        axisX.scroll.valueProperty().addListener(this::shoudLayout);
-        axisX.scroll.visibleAmountProperty().addListener(this::shoudLayout);
-        axisY.scroll.valueProperty().addListener(this::shoudLayout);
-        axisY.scroll.visibleAmountProperty().addListener(this::shoudLayout);
+        widthProperty().addListener(this::shouldLayout);
+        heightProperty().addListener(this::shouldLayout);
+        chart.addListener(this::shouldLayout);
+        candles.addListener(this::shouldLayout);
+        axisX.scroll.valueProperty().addListener(this::shouldLayout);
+        axisX.scroll.visibleAmountProperty().addListener(this::shouldLayout);
+        axisY.scroll.valueProperty().addListener(this::shouldLayout);
+        axisY.scroll.visibleAmountProperty().addListener(this::shouldLayout);
 
         getChildren().addAll(main, axisX, axisY);
     }
@@ -78,7 +78,7 @@ public class CandleChart extends Region {
     /**
      * This chart should draw on the next rendering phase.
      */
-    private void shoudLayout(Observable source) {
+    private void shouldLayout(Observable source) {
         if (shouldLayout == false) {
             shouldLayout = true;
             setNeedsLayout(true);
