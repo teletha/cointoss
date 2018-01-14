@@ -244,7 +244,7 @@ public class Axis extends Region {
     public final double computeVisibleMaxValue() {
         double max = logicalMaxValue.get();
         double min = logicalMinValue.get();
-        double amount = scrollVisibleAmount.doubleValue();
+        double amount = scrollVisibleAmount.get();
         return Math.min(computeVisibleMinValue() + (max - min) * amount, max);
     }
 
@@ -280,12 +280,10 @@ public class Axis extends Region {
 
         if (low == min && up == max) {
             scrollValue.set(0);
-            scrollVisibleAmount.set(1);
         } else {
             double logicalDiff = max - min;
             double value = (low - min) / (logicalDiff - visualDiff);
             scrollValue.set(isHorizontal() ? value : 1 - value);
-            scrollVisibleAmount.set(visualDiff / logicalDiff);
         }
 
         // search sutable unit
