@@ -67,10 +67,10 @@ public class CandleChart extends Region {
         heightProperty().addListener(this::shouldLayout);
         chart.addListener(this::shouldLayout);
         candles.addListener(this::shouldLayout);
-        axisX.scroll.valueProperty().addListener(this::shouldLayout);
-        axisX.scroll.visibleAmountProperty().addListener(this::shouldLayout);
-        axisY.scroll.valueProperty().addListener(this::shouldLayout);
-        axisY.scroll.visibleAmountProperty().addListener(this::shouldLayout);
+        axisX.scrollValue.addListener(this::shouldLayout);
+        axisX.scrollVisibleAmount.addListener(this::shouldLayout);
+        axisY.scrollValue.addListener(this::shouldLayout);
+        axisY.scrollVisibleAmount.addListener(this::shouldLayout);
 
         getChildren().addAll(main, axisX, axisY);
     }
@@ -93,7 +93,7 @@ public class CandleChart extends Region {
         if (shouldLayout) {
             setAxisXRange();
             setAxisYRange();
-    
+
             Insets insets = getInsets();
             double x = insets.getLeft();
             double y = insets.getTop();
@@ -103,17 +103,17 @@ public class CandleChart extends Region {
             double axisYWidth = axisY.prefWidth(height);
             double mainHeight = Math.max(0, height - axisXHeight);
             double mainWidth = Math.max(0, width - axisYWidth);
-    
+
             // layout axis
             axisX.resizeRelocate(x, y + mainHeight, mainWidth, axisXHeight);
             axisY.resizeRelocate(x + mainWidth, y, axisYWidth, mainHeight);
             axisX.layout();
             axisY.layout();
-    
+
             // layout chart
             main.resizeRelocate(x, y, mainWidth, mainHeight);
             main.layoutChildren();
-    
+
             shouldLayout = false;
         }
     }
@@ -132,20 +132,20 @@ public class CandleChart extends Region {
     private void setAxisYRange() {
         Num max = Num.MIN;
         Num min = Num.MAX;
-    
+
         long start = (long) axisX.computeVisibleMinValue();
         long end = (long) axisX.computeVisibleMaxValue();
-    
+
         for (int i = 0; i < candles.size(); i++) {
             Tick data = candles.get(i);
             long time = data.start.toInstant().toEpochMilli();
-    
+
             if (start <= time && time <= end) {
                 max = Num.max(max, data.maxPrice);
                 min = Num.min(min, data.minPrice);
             }
         }
-    
+
         Num margin = max.minus(min).multiply(Num.of(0.5));
         axisY.logicalMaxValue.set(max.plus(margin).toDouble());
         axisY.logicalMinValue.set(min.minus(margin).toDouble());
@@ -210,8 +210,8 @@ public class CandleChart extends Region {
         disposable = data.add.to(tick -> {
             this.candles.add(tick);
 
-            if (0.99 <= axisX.scroll.getValue()) {
-                axisX.scroll.setValue(1);
+            if (0.99 <= axisX.scrollValue.get()) {
+                axisX.scrollValue.set(1);
             }
         });
 

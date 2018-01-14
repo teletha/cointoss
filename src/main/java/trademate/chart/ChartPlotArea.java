@@ -107,11 +107,12 @@ public class ChartPlotArea extends Region {
 
         widthProperty().addListener(this::shoudLayoutCandle);
         heightProperty().addListener(this::shoudLayoutCandle);
-        axisX.scroll.valueProperty().addListener(this::shoudLayoutCandle);
-        axisX.scroll.visibleAmountProperty().addListener(this::shoudLayoutCandle);
-        axisY.scroll.valueProperty().addListener(this::shoudLayoutCandle);
-        axisY.scroll.visibleAmountProperty().addListener(this::shoudLayoutCandle);
+        axisX.scrollValue.addListener(this::shoudLayoutCandle);
+        axisX.scrollVisibleAmount.addListener(this::shoudLayoutCandle);
+        axisY.scrollValue.addListener(this::shoudLayoutCandle);
+        axisY.scrollVisibleAmount.addListener(this::shoudLayoutCandle);
 
+        mouseMove();
         visualizeMouseTrack();
         visualizeNotifyPrice();
         visualizeOrderPrice();
@@ -128,6 +129,18 @@ public class ChartPlotArea extends Region {
             shoudLayoutCandle = true;
             setNeedsLayout(true);
         }
+    }
+
+    private void mouseMove() {
+        setOnScroll(e -> {
+            double value = axisX.scrollValue.get();
+
+            if (e.getDeltaY() < 0) {
+                axisX.scrollValue.set(value + 0.1);
+            } else {
+                axisX.scrollValue.set(value - 0.1);
+            }
+        });
     }
 
     /**
