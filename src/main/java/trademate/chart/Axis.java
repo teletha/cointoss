@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -42,7 +41,7 @@ import viewtify.Viewtify;
 import viewtify.ui.helper.StyleHelper;
 
 /**
- * @version 2018/01/08 22:59:17
+ * @version 2018/01/14 9:47:28
  */
 public class Axis extends Region {
 
@@ -85,7 +84,6 @@ public class Axis extends Region {
 
     public final List<TickLable> forGrid = new ArrayList();
 
-    /** UI widget. */
     public final ScrollBar scroll = new ScrollBar();
 
     /** UI widget. */
@@ -134,38 +132,6 @@ public class Axis extends Region {
         }
     };
 
-    private final InvalidationListener scrollValueValidator = new InvalidationListener() {
-
-        private boolean doflag = true;
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void invalidated(final Observable observable) {
-            if (whileLayout.get() == false) {
-                if (scroll != null && observable == scroll.valueProperty()) {
-                    final double position = scroll.getValue();
-                    final double size = scroll.getVisibleAmount();
-                    if (position == -1 || size == 1) {
-                        scroll.setVisibleAmount(1);
-                    } else {
-                        dateIsValid = false;
-                        requestLayout();
-                    }
-                } else if (scroll != null) {
-                    final double d = isHorizontal() ? scroll.getValue() : 1 - scroll.getValue();
-                    scroll.setValue(d);
-                }
-            } else if (doflag && scroll != null && observable != scroll.valueProperty()) {
-                doflag = false;
-                final double d = isHorizontal() ? scroll.getValue() : 1 - scroll.getValue();
-                scroll.setValue(d);
-                doflag = true;
-            }
-        }
-    };
-
     /**
      * 
      */
@@ -189,7 +155,7 @@ public class Axis extends Region {
         logicalMaxValue.addListener(dataValidateListener);
         logicalMinValue.addListener(dataValidateListener);
         scroll.visibleAmountProperty().addListener(dataValidateListener);
-        scroll.valueProperty().addListener(scrollValueValidator);
+        scroll.valueProperty().addListener(dataValidateListener);
 
         // ====================================================
         // Initialize UI widget
@@ -200,7 +166,6 @@ public class Axis extends Region {
         lines.getChildren().addAll(tickPath, baseLine);
 
         scroll.setOrientation(isHorizontal() ? Orientation.HORIZONTAL : Orientation.VERTICAL);
-        scroll.valueProperty().addListener(scrollValueValidator);
         scroll.setMin(0);
         scroll.setMax(1);
         scroll.setVisibleAmount(1);
@@ -494,65 +459,31 @@ public class Axis extends Region {
      */
     private void layoutGroups(double width, double height) {
         if (isHorizontal()) {
-            if (side == Side.BOTTOM) {
-                double distanceFromTop = 0;
+            double distanceFromTop = 0;
 
-                // scroll bar
-                if (scroll.isVisible()) {
-                    distanceFromTop = scroll.prefHeight(-1);
-                    scroll.resizeRelocate(0, 0, width, distanceFromTop);
-                }
-
-                // lines
-                lines.setLayoutX(0);
-                lines.setLayoutY(Math.floor(distanceFromTop));
-
-                // labels
-                tickLabels.setLayoutX(0);
-                tickLabels.setLayoutY(Math.floor(distanceFromTop + lines.prefHeight(-1) + tickLabelDistance));
-            } else {
-                double y = height;
-                if (scroll.isVisible()) {
-                    final double h = scroll.prefHeight(-1);
-                    y -= h;
-                    scroll.resizeRelocate(0, Math.floor(y), width, h);
-                }
-                lines.setLayoutX(0);
-                lines.setLayoutY(Math.floor(y));
-                y -= lines.prefHeight(-1) + tickLabelDistance;
-                tickLabels.setLayoutX(0);
-                tickLabels.setLayoutY(Math.floor(y));
+            // scroll bar
+            if (scroll.isVisible()) {
+                distanceFromTop = scroll.prefHeight(-1);
+                scroll.resizeRelocate(0, 0, width, distanceFromTop);
             }
+
+            // lines
+            lines.setLayoutX(0);
+            lines.setLayoutY(Math.floor(distanceFromTop));
+
+            // labels
+            tickLabels.setLayoutX(0);
+            tickLabels.setLayoutY(Math.floor(distanceFromTop + lines.prefHeight(-1) + tickLabelDistance));
+
         } else {
-            if (side == Side.LEFT) {
-                double x = width;
-                if (scroll.isVisible()) {
-                    final double w = scroll.prefWidth(-1);
-                    x = x - w;
-                    scroll.resizeRelocate(Math.floor(x), 0, w, height);
-                }
+            // lines
+            lines.setLayoutX(0);
+            lines.setLayoutY(0);
 
-                lines.setLayoutX(Math.floor(x));
-                lines.setLayoutY(0);
-                x -= tickLabelDistance + lines.prefWidth(-1);
-                tickLabels.setLayoutX(Math.floor(x));
-                tickLabels.setLayoutY(0);
-            } else {
-                double x = 0;
-                if (scroll.isVisible()) {
-                    final double w = scroll.prefWidth(-1);
-                    x = w;
-                    scroll.resizeRelocate(0, 0, w, height);
-                }
-
-                lines.setLayoutX(Math.floor(x));
-                lines.setLayoutY(0);
-                x = tickLabelDistance + lines.prefWidth(-1);
-                tickLabels.setLayoutX(Math.floor(x));
-                tickLabels.setLayoutY(0);
-            }
+            // labels
+            tickLabels.setLayoutX(Math.floor(tickLabelDistance + lines.prefWidth(-1)));
+            tickLabels.setLayoutY(0);
         }
-
     }
 
     /**
