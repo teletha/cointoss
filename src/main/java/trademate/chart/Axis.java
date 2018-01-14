@@ -15,8 +15,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.geometry.Bounds;
@@ -81,6 +83,8 @@ public class Axis extends Region {
     public final ObjectProperty<double[]> units = new SimpleObjectProperty(DefaultTickUnit);
 
     public final List<TickLable> forGrid = new ArrayList();
+
+    public final IntegerProperty visibleTickNumber = new SimpleIntegerProperty(300);
 
     public final DoubleProperty scrollVisibleAmount = new SimpleDoubleProperty(1);
 

@@ -84,7 +84,7 @@ public class TradingView extends View {
 
         CandleChart candleChart = new CandleChart(chart, this).graph(plot -> {
         }).axisX(axis -> {
-            axis.scrollVisibleAmount.set(0.1);
+            axis.scrollVisibleAmount.set(1);
             axis.scrollValue.set(1);
 
             long minute = 60000;
