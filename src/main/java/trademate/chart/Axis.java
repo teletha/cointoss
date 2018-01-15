@@ -172,7 +172,14 @@ public class Axis extends Region {
 
         getChildren().addAll(lines, tickLabels, scroll);
 
-        addEventHandler(ScrollEvent.SCROLL, this::zoom);
+        // zoom function
+        addEventHandler(ScrollEvent.SCROLL, e -> {
+            Num change = Num.of(e.getDeltaY() / e.getMultiplierY() / ZoomSize);
+            Num current = Num.of(scroll.getVisibleAmount());
+            Num next = Num.within(Num.ONE.divide(ZoomSize), current.plus(change), Num.ONE);
+
+            scroll.setVisibleAmount(next.toDouble());
+        });
     }
 
     /**
@@ -277,7 +284,7 @@ public class Axis extends Region {
             scroll.setVisibleAmount(visualDiff / logicalDiff);
         }
 
-        // search sutable unit
+        // search nearest unit index
         int nextUnitIndex = findNearestUnitIndex(visualDiff / tickNumber);
         double nextUnitSize = units.get()[nextUnitIndex];
         double visibleTickBaseValue = Math.floor(low / nextUnitSize) * nextUnitSize;
@@ -289,18 +296,15 @@ public class Axis extends Region {
     }
 
     /**
-     * 軸方向のサイズを返す
+     * Find nearest unit index from the unit list.
      * 
+     * @param tickInterval
      * @return
      */
-    public final double computeAxisLength() {
-        return isHorizontal() ? getWidth() : getHeight();
-    }
-
-    private int findNearestUnitIndex(double majorTickValueInterval) {
+    private int findNearestUnitIndex(double tickInterval) {
         // serach from unit list
         for (int i = 0; i < units.get().length; i++) {
-            if (majorTickValueInterval < units.get()[i]) {
+            if (tickInterval < units.get()[i]) {
                 return i;
             }
         }
@@ -308,23 +312,22 @@ public class Axis extends Region {
     }
 
     /**
+     * Compute axis visual length.
+     * 
+     * @return
+     */
+    private double computeAxisLength() {
+        return isHorizontal() ? getWidth() : getHeight();
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
     protected final void layoutChildren() {
-        if ((isHorizontal() && getWidth() == -1) || (isVertical() && getHeight() == -1)) {
-            return;
-        }
-        layoutChildren(getWidth(), getHeight());
-    }
+        double width = getWidth();
+        double height = getHeight();
 
-    /**
-     * Force to layout child nodes.
-     * 
-     * @param width
-     * @param height
-     */
-    protected final void layoutChildren(double width, double height) {
         if (whileLayout.compareAndSet(false, true)) {
             try {
                 if (!dateIsValid) {
@@ -493,14 +496,6 @@ public class Axis extends Region {
      */
     public TickLable createLabel(Enum... classNames) {
         return new TickLable(classNames);
-    }
-
-    private void zoom(ScrollEvent event) {
-        Num change = Num.of(event.getDeltaY() / event.getMultiplierY() / ZoomSize);
-        Num current = Num.of(scroll.getVisibleAmount());
-        Num next = Num.within(Num.ONE.divide(ZoomSize), current.plus(change), Num.ONE);
-
-        scroll.setVisibleAmount(next.toDouble());
     }
 
     /**
