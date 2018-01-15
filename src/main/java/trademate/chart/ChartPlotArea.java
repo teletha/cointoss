@@ -11,6 +11,7 @@ package trademate.chart;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.ToDoubleFunction;
 
 import javafx.collections.ObservableList;
 import javafx.scene.Group;
@@ -77,7 +78,7 @@ public class ChartPlotArea extends Region {
     private final LineMark orderSellPrice;
 
     /** Chart UI */
-    private final LineChart volumeChart;
+    private final LineChart bottomChart = new LineChart();
 
     /** Flag whether candle chart shoud layout on the next rendering phase or not. */
     private final LayoutAssistant layoutCandle = new LayoutAssistant(this);
@@ -101,7 +102,9 @@ public class ChartPlotArea extends Region {
         this.notifyPrice = new LineMark(axisY, ChartClass.PriceSignal);
         this.orderBuyPrice = new LineMark(axisY, ChartClass.OrderSupport, Side.BUY);
         this.orderSellPrice = new LineMark(axisY, ChartClass.OrderSupport, Side.SELL);
-        this.volumeChart = new LineChart();
+
+        this.bottomChart.create(tick -> tick.longVolume.toDouble(), ChartClass.ChartVolume, Side.BUY);
+        this.bottomChart.create(tick -> tick.shortVolume.toDouble(), ChartClass.ChartVolume, Side.SELL);
 
         Viewtify.clip(this);
 
@@ -114,7 +117,7 @@ public class ChartPlotArea extends Region {
         visualizeOrderPrice();
 
         getChildren()
-                .addAll(backGridVertical, backGridHorizontal, notifyPrice, orderBuyPrice, orderSellPrice, mouseTrackHorizontal, mouseTrackVertical, candles, volumeChart);
+                .addAll(backGridVertical, backGridHorizontal, notifyPrice, orderBuyPrice, orderSellPrice, mouseTrackHorizontal, mouseTrackVertical, candles);
     }
 
     /**
@@ -211,20 +214,21 @@ public class ChartPlotArea extends Region {
             int candleSize = candles.size();
             int dataSize = candleChartData.size();
 
-            // size matching
+            // ensure size
             int difference = dataSize - candleSize;
 
             if (0 < difference) {
-                // ensure size with null
                 for (int i = 0; i < difference; i++) {
                     candles.add(new Candle());
                 }
             }
 
-            // draw chart
+            // estimate visible range
             long start = (long) axisX.computeVisibleMinValue();
             long end = (long) axisX.computeVisibleMaxValue();
+            int visible = 0;
 
+            // draw chart
             for (int i = 0; i < candleSize; i++) {
                 Candle candle = (Candle) candles.get(i);
 
@@ -242,6 +246,8 @@ public class ChartPlotArea extends Region {
                         candle.update(close - open, high - open, low - open, null);
                         candle.setLayoutX(x);
                         candle.setLayoutY(open);
+
+                        bottomChart.draw(tick, visible++, x);
                     } else {
                         // out of visible range
                         candle.setLayoutX(-50);
@@ -253,6 +259,7 @@ public class ChartPlotArea extends Region {
                     candle.setLayoutY(-50);
                 }
             }
+            bottomChart.clear(visible);
         });
     }
 
@@ -301,22 +308,72 @@ public class ChartPlotArea extends Region {
     /**
      * @version 2018/01/12 21:54:07
      */
-    private class LineChart extends Polyline {
+    private class LineChart {
+
+        /** The poly line. */
+        private final List<Polyline> lines = new ArrayList();
+
+        /** The value converter. */
+        private final List<ToDoubleFunction<Tick>> converters = new ArrayList();
 
         /**
          * 
          */
         private LineChart() {
-            getPoints().addAll(10d, 10d, 20d, 20d, 30d, 20d, 40d, 30d, 50d, 50d, 60d, 70d);
+        }
+
+        /**
+         * Create new line chart.
+         * 
+         * @param className
+         * @param converter
+         */
+        private void create(ToDoubleFunction<Tick> converter, Enum... classNames) {
+            Polyline polyline = new Polyline();
+            getChildren().add(polyline);
+            StyleHelper.of(polyline).style(classNames);
+
+            lines.add(polyline);
+            converters.add(converter);
         }
 
         /**
          * Draw chart line.
          */
-        private void draw(Tick tick, double x) {
-            ObservableList<Double> points = getPoints();
+        private void draw(Tick tick, int index, double x) {
+            double height = getHeight();
 
-            // draw chart
+            for (int i = 0; i < lines.size(); i++) {
+                Polyline line = lines.get(i);
+                ToDoubleFunction<Tick> converter = converters.get(i);
+
+                double y = height - converter.applyAsDouble(tick);
+
+                ObservableList<Double> points = line.getPoints();
+                int size = points.size();
+                int position = index * 2;
+
+                if (position < size) {
+                    points.set(index * 2, x);
+                    points.set(index * 2 + 1, y);
+                } else {
+                    points.add(x);
+                    points.add(y);
+                }
+            }
+        }
+
+        /**
+         * Clear chart line.
+         */
+        private void clear(int index) {
+            for (int i = 0; i < lines.size(); i++) {
+                ObservableList<Double> points = lines.get(i).getPoints();
+
+                if (index * 2 < points.size()) {
+                    points.remove(index * 2, points.size());
+                }
+            }
         }
     }
 
@@ -341,6 +398,7 @@ public class ChartPlotArea extends Region {
         /** The associated axis. */
         private final Axis axis;
 
+        /** The layout manager. */
         private final LayoutAssistant layoutLine = layoutCandle.sub();
 
         /**

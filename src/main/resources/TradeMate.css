@@ -104,3 +104,7 @@
 	-fx-stroke: -side;
 	-fx-stroke-dash-array: 2 4;
 }
+
+.ChartVolume {
+	-fx-stroke: -side;
+}
