@@ -247,7 +247,7 @@ public class ChartPlotArea extends Region {
                         candle.setLayoutX(x);
                         candle.setLayoutY(open);
 
-                        bottomChart.draw(tick, visible++, x);
+                        bottomChart.calculate(tick, visible++, x);
                     } else {
                         // out of visible range
                         candle.setLayoutX(-50);
@@ -259,7 +259,7 @@ public class ChartPlotArea extends Region {
                     candle.setLayoutY(-50);
                 }
             }
-            bottomChart.clear(visible);
+            bottomChart.draw(visible);
         });
     }
 
@@ -306,15 +306,12 @@ public class ChartPlotArea extends Region {
     }
 
     /**
-     * @version 2018/01/12 21:54:07
+     * @version 2018/01/15 20:52:31
      */
     private class LineChart {
 
         /** The poly line. */
-        private final List<Polyline> lines = new ArrayList();
-
-        /** The value converter. */
-        private final List<ToDoubleFunction<Tick>> converters = new ArrayList();
+        private final List<Line> lines = new ArrayList();
 
         /**
          * 
@@ -329,50 +326,88 @@ public class ChartPlotArea extends Region {
          * @param converter
          */
         private void create(ToDoubleFunction<Tick> converter, Enum... classNames) {
-            Polyline polyline = new Polyline();
-            getChildren().add(polyline);
-            StyleHelper.of(polyline).style(classNames);
-
-            lines.add(polyline);
-            converters.add(converter);
+            lines.add(new Line(converter, classNames));
         }
 
         /**
-         * Draw chart line.
+         * Calculate each value
          */
-        private void draw(Tick tick, int index, double x) {
-            double height = getHeight();
-
-            for (int i = 0; i < lines.size(); i++) {
-                Polyline line = lines.get(i);
-                ToDoubleFunction<Tick> converter = converters.get(i);
-
-                double y = height - converter.applyAsDouble(tick);
-
-                ObservableList<Double> points = line.getPoints();
-                int size = points.size();
-                int position = index * 2;
-
-                if (position < size) {
-                    points.set(index * 2, x);
-                    points.set(index * 2 + 1, y);
-                } else {
-                    points.add(x);
-                    points.add(y);
-                }
+        private void calculate(Tick tick, int index, double x) {
+            for (Line line : lines) {
+                line.calculate(tick, x);
             }
         }
 
         /**
-         * Clear chart line.
+         * Finish drawing chart line.
          */
-        private void clear(int index) {
-            for (int i = 0; i < lines.size(); i++) {
-                ObservableList<Double> points = lines.get(i).getPoints();
+        private void draw(int index) {
+            double height = getHeight();
 
-                if (index * 2 < points.size()) {
-                    points.remove(index * 2, points.size());
+            for (Line line : lines) {
+                // draw
+                double scale = line.scale();
+
+                for (int i = 1; i < line.values.size(); i += 2) {
+                    line.values.set(i, height - line.values.get(i) * scale);
                 }
+                line.getPoints().setAll(line.values);
+
+                // clear
+                line.values.clear();
+                line.valueMax = 0;
+            }
+        }
+
+        /**
+         * @version 2018/01/15 20:38:38
+         */
+        private class Line extends Polyline {
+
+            /** The maximum height. */
+            private final double heightMax = 40;
+
+            /** The value converter. */
+            private final ToDoubleFunction<Tick> converter;
+
+            /** The values. */
+            private final List<Double> values = new ArrayList();
+
+            /** The max value. */
+            private double valueMax = 0;
+
+            /**
+             * @param converter
+             * @param valueMax
+             */
+            private Line(ToDoubleFunction<Tick> converter, Enum... classNames) {
+                this.converter = converter;
+
+                getChildren().add(this);
+                StyleHelper.of(this).style(classNames);
+            }
+
+            /**
+             * Calculate value.
+             * 
+             * @param tick
+             * @return
+             */
+            private void calculate(Tick tick, double x) {
+                double calculated = converter.applyAsDouble(tick);
+
+                valueMax = Math.max(valueMax, calculated);
+                values.add(x);
+                values.add(calculated);
+            }
+
+            /**
+             * Calculate scale.
+             * 
+             * @return
+             */
+            private double scale() {
+                return heightMax < valueMax ? heightMax / valueMax : 1;
             }
         }
     }
