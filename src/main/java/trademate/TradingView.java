@@ -79,8 +79,8 @@ public class TradingView extends View {
      */
     @Override
     protected void initialize() {
-        Chart[] charts = {market().second5, market().second10, market().second20, market().minute1, market().minute5, market().minute15,
-                market().minute30};
+        Chart[] charts = {market().second5, market().second10, market().second20, market().second30, market().minute1, market().minute5,
+                market().minute15, market().minute30};
 
         CandleChart candleChart = new CandleChart(chart, this).graph(plot -> {
         }).axisX(axis -> {
@@ -97,7 +97,7 @@ public class TradingView extends View {
             axis.tickLabelFormatter.set(v -> Num.of(v).scale(0).toString());
         }).candleDate(market().second5);
 
-        chartSpan.values(0, 1, 2, 3, 4, 5, 6)
+        chartSpan.values(0, 1, 2, 3, 4, 5, 6, 7)
                 .initial(0)
                 .text(i -> charts[i].toString())
                 .observe(i -> candleChart.candleDate(charts[i]))

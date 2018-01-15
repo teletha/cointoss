@@ -10,6 +10,7 @@
 package trademate.chart;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.function.ToDoubleFunction;
 
@@ -54,7 +55,7 @@ public class ChartPlotArea extends Region {
     private final Notificator notificator = I.make(Notificator.class);
 
     /** Chart UI */
-    private final Group candles = new LocalGroup();
+    private final Group candles = new Group();
 
     /** Chart UI */
     private final LineMark backGridVertical;
@@ -78,7 +79,7 @@ public class ChartPlotArea extends Region {
     private final LineMark orderSellPrice;
 
     /** Chart UI */
-    private final LineChart bottomChart = new LineChart();
+    private final LineChart chartBottom = new LineChart();
 
     /** Flag whether candle chart shoud layout on the next rendering phase or not. */
     private final LayoutAssistant layoutCandle = new LayoutAssistant(this);
@@ -103,8 +104,9 @@ public class ChartPlotArea extends Region {
         this.orderBuyPrice = new LineMark(axisY, ChartClass.OrderSupport, Side.BUY);
         this.orderSellPrice = new LineMark(axisY, ChartClass.OrderSupport, Side.SELL);
 
-        this.bottomChart.create(tick -> tick.longVolume.toDouble(), ChartClass.ChartVolume, Side.BUY);
-        this.bottomChart.create(tick -> tick.shortVolume.toDouble(), ChartClass.ChartVolume, Side.SELL);
+        this.chartBottom.create(tick -> tick.longVolume.toDouble() * 2, ChartClass.ChartVolume, Side.BUY);
+        this.chartBottom.create(tick -> tick.shortVolume.toDouble() * 2, ChartClass.ChartVolume, Side.SELL);
+        this.chartBottom.create(tick -> tick.volume.toDouble() * 2, ChartClass.ChartTotalVolume);
 
         Viewtify.clip(this);
 
@@ -117,7 +119,7 @@ public class ChartPlotArea extends Region {
         visualizeOrderPrice();
 
         getChildren()
-                .addAll(backGridVertical, backGridHorizontal, notifyPrice, orderBuyPrice, orderSellPrice, mouseTrackHorizontal, mouseTrackVertical, candles);
+                .addAll(backGridVertical, backGridHorizontal, notifyPrice, orderBuyPrice, orderSellPrice, mouseTrackHorizontal, mouseTrackVertical, candles, chartBottom);
     }
 
     /**
@@ -247,7 +249,7 @@ public class ChartPlotArea extends Region {
                         candle.setLayoutX(x);
                         candle.setLayoutY(open);
 
-                        bottomChart.calculate(tick, visible++, x);
+                        chartBottom.calculate(tick, visible++, x);
                     } else {
                         // out of visible range
                         candle.setLayoutX(-50);
@@ -259,7 +261,7 @@ public class ChartPlotArea extends Region {
                     candle.setLayoutY(-50);
                 }
             }
-            bottomChart.draw(visible);
+            chartBottom.draw(visible);
         });
     }
 
@@ -286,29 +288,9 @@ public class ChartPlotArea extends Region {
     }
 
     /**
-     * @version 2017/09/26 1:20:10
-     */
-    private final class LocalGroup extends Group {
-
-        /**
-         * 
-         */
-        private LocalGroup() {
-            setAutoSizeChildren(false);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void requestLayout() {
-        }
-    }
-
-    /**
      * @version 2018/01/15 20:52:31
      */
-    private class LineChart {
+    private class LineChart extends Group {
 
         /** The poly line. */
         private final List<Line> lines = new ArrayList();
@@ -343,11 +325,10 @@ public class ChartPlotArea extends Region {
          */
         private void draw(int index) {
             double height = getHeight();
+            double scale = lines.stream().map(Line::scale).min(Comparator.naturalOrder()).get();
 
             for (Line line : lines) {
                 // draw
-                double scale = line.scale();
-
                 for (int i = 1; i < line.values.size(); i += 2) {
                     line.values.set(i, height - line.values.get(i) * scale);
                 }

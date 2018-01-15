@@ -49,8 +49,8 @@ public class ExecutionView extends View {
     @Override
     protected void initialize() {
         // configure UI
-        executionList.cell(v -> new Cell());
-        executionCumulativeList.cell(v -> new Cell())
+        executionList.cell(v -> new Cell(false));
+        executionCumulativeList.cell(v -> new Cell(true))
                 .filter(takerSize.property(), (e, size) -> e.cumulativeSize.isGreaterThanOrEqual(size));
         takerSize.values(IntStream.range(1, 51).boxed()).initial(10);
 
@@ -84,8 +84,18 @@ public class ExecutionView extends View {
      */
     private class Cell extends ListCell<Execution> {
 
+        /** The format. */
+        private final boolean comulative;
+
         /** The enhanced ui. */
         private final UserInterface ui = Viewtify.wrap(this, ExecutionView.this);
+
+        /**
+         * @param comulative
+         */
+        private Cell(boolean comulative) {
+            this.comulative = comulative;
+        }
 
         /**
          * {@inheritDoc}
@@ -98,7 +108,8 @@ public class ExecutionView extends View {
                 setText(null);
                 setGraphic(null);
             } else {
-                setText(formatter.format(e.exec_date.plusHours(9)) + "  " + e.price + "円  " + e.cumulativeSize.scale(6));
+                setText(formatter.format(e.exec_date.plusHours(9)) + "  " + e.price + "円  " + (comulative ? e.cumulativeSize : e.size)
+                        .scale(6));
                 ui.styleOnly(e.side);
             }
         }

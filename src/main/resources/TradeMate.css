@@ -108,3 +108,8 @@
 .ChartVolume {
 	-fx-stroke: -side;
 }
+
+.ChartTotalVolume {
+	-fx-stroke: rgb(140, 140, 140);
+	-fx-opacity: 0;
+}
