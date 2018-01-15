@@ -15,15 +15,15 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.geometry.Bounds;
+import javafx.geometry.Orientation;
 import javafx.geometry.Side;
 import javafx.scene.Group;
+import javafx.scene.control.ScrollBar;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.Region;
 import javafx.scene.shape.Line;
@@ -84,27 +84,7 @@ public class Axis extends Region {
 
     public final List<TickLable> forGrid = new ArrayList();
 
-    public final IntegerProperty visibleTickNumber = new SimpleIntegerProperty(300);
-
-    public final DoubleProperty scrollVisibleAmount = new SimpleDoubleProperty(1);
-
-    public final DoubleProperty scrollValue = new SimpleDoubleProperty() {
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void set(double newValue) {
-            if (newValue < 0) {
-                newValue = 0;
-            }
-
-            if (1 < newValue) {
-                newValue = 1;
-            }
-            super.set(newValue);
-        }
-    };
+    public final ScrollBar scroll = new ScrollBar();
 
     /** UI widget. */
     private final Group lines = new Group();
@@ -174,8 +154,8 @@ public class Axis extends Region {
         heightProperty().addListener(dataValidateListener);
         logicalMaxValue.addListener(dataValidateListener);
         logicalMinValue.addListener(dataValidateListener);
-        scrollVisibleAmount.addListener(dataValidateListener);
-        scrollValue.addListener(dataValidateListener);
+        scroll.visibleAmountProperty().addListener(dataValidateListener);
+        scroll.valueProperty().addListener(dataValidateListener);
 
         // ====================================================
         // Initialize UI widget
@@ -185,7 +165,12 @@ public class Axis extends Region {
 
         lines.getChildren().addAll(tickPath, baseLine);
 
-        getChildren().addAll(lines, tickLabels);
+        scroll.setOrientation(isHorizontal() ? Orientation.HORIZONTAL : Orientation.VERTICAL);
+        scroll.setMin(0);
+        scroll.setMax(1);
+        scroll.setVisibleAmount(1);
+
+        getChildren().addAll(lines, tickLabels, scroll);
 
         addEventHandler(ScrollEvent.SCROLL, this::zoom);
     }
@@ -248,7 +233,7 @@ public class Axis extends Region {
     public final double computeVisibleMaxValue() {
         double max = logicalMaxValue.get();
         double min = logicalMinValue.get();
-        double amount = scrollVisibleAmount.get();
+        double amount = scroll.getVisibleAmount();
         return Math.min(computeVisibleMinValue() + (max - min) * amount, max);
     }
 
@@ -258,11 +243,11 @@ public class Axis extends Region {
      * @return
      */
     public final double computeVisibleMinValue() {
-        double position = isHorizontal() ? scrollValue.get() : 1 - scrollValue.get();
+        double position = isHorizontal() ? scroll.getValue() : 1 - scroll.getValue();
         double max = logicalMaxValue.get();
         double min = logicalMinValue.get();
         double logicalDiff = max - min;
-        double bar = logicalDiff * scrollVisibleAmount.get();
+        double bar = logicalDiff * scroll.getVisibleAmount();
         return Math.max(min, min + (logicalDiff - bar) * position);
     }
 
@@ -283,11 +268,13 @@ public class Axis extends Region {
         double min = logicalMinValue.get();
 
         if (low == min && up == max) {
-            scrollValue.set(0);
+            scroll.setValue(0);
+            scroll.setVisibleAmount(1);
         } else {
             double logicalDiff = max - min;
             double value = (low - min) / (logicalDiff - visualDiff);
-            scrollValue.set(isHorizontal() ? value : 1 - value);
+            scroll.setValue(isHorizontal() ? value : 1 - value);
+            scroll.setVisibleAmount(visualDiff / logicalDiff);
         }
 
         // search sutable unit
@@ -474,6 +461,12 @@ public class Axis extends Region {
         if (isHorizontal()) {
             double distanceFromTop = 0;
 
+            // scroll bar
+            if (scroll.isVisible()) {
+                distanceFromTop = scroll.prefHeight(-1);
+                scroll.resizeRelocate(0, 0, width, distanceFromTop);
+            }
+
             // lines
             lines.setLayoutX(0);
             lines.setLayoutY(Math.floor(distanceFromTop));
@@ -504,10 +497,10 @@ public class Axis extends Region {
 
     private void zoom(ScrollEvent event) {
         Num change = Num.of(event.getDeltaY() / event.getMultiplierY() / ZoomSize);
-        Num current = Num.of(scrollVisibleAmount.get());
+        Num current = Num.of(scroll.getVisibleAmount());
         Num next = Num.within(Num.ONE.divide(ZoomSize), current.plus(change), Num.ONE);
 
-        scrollVisibleAmount.set(next.toDouble());
+        scroll.setVisibleAmount(next.toDouble());
     }
 
     /**
