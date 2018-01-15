@@ -11,9 +11,7 @@ package trademate.chart;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 
-import javafx.beans.InvalidationListener;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -38,6 +36,7 @@ import org.eclipse.collections.api.block.function.primitive.DoubleToObjectFuncti
 import cointoss.util.Num;
 import kiss.Disposable;
 import viewtify.Viewtify;
+import viewtify.ui.helper.LayoutAssistant;
 import viewtify.ui.helper.StyleHelper;
 
 /**
@@ -98,39 +97,14 @@ public class Axis extends Region {
     /** UI widget. */
     private final Line baseLine = new Line();
 
-    /** The layouting flag. */
-    private final AtomicBoolean whileLayout = new AtomicBoolean();
-
     /** The current. (axisLength / visibleValueDistance) */
     private double uiRatio;
 
-    /** 状態の正当性を示すプロパティ */
-    private boolean layoutValidate = false;
-
-    /** 状態の正当性を示すプロパティ */
-    private boolean dateIsValid = false;
-
-    private double lastLayoutWidth = -1;
-
-    private double lastLayoutHeight = -1;
-
-    /** Axisの構成情報を書き換えるべきデータに対して付加するリスナ */
-    private final InvalidationListener dataValidateListener = observable -> {
-        if (widthProperty() == observable) {
-            if (isVertical() || getWidth() == lastLayoutWidth) {
-                return;
-            }
-        }
-        if (heightProperty() == observable) {
-            if (isHorizontal() || getHeight() == lastLayoutHeight) {
-                return;
-            }
-        }
-        if (dateIsValid) {
-            dateIsValid = false;
-            requestLayout();
-        }
-    };
+    /** Flag whether axis shoud layout on the next rendering phase or not. */
+    private LayoutAssistant layoutAxis = new LayoutAssistant(this) //
+            .layoutBy(widthProperty(), heightProperty())
+            .layoutBy(logicalMaxValue, logicalMinValue)
+            .layoutBy(scroll.visibleAmountProperty(), scroll.valueProperty());
 
     /**
      * 
@@ -146,16 +120,6 @@ public class Axis extends Region {
 
         Viewtify.clip(tickPath, this);
         Viewtify.clip(tickLabels, this);
-
-        // ====================================================
-        // Initialize Property
-        // ====================================================
-        widthProperty().addListener(dataValidateListener);
-        heightProperty().addListener(dataValidateListener);
-        logicalMaxValue.addListener(dataValidateListener);
-        logicalMinValue.addListener(dataValidateListener);
-        scroll.visibleAmountProperty().addListener(dataValidateListener);
-        scroll.valueProperty().addListener(dataValidateListener);
 
         // ====================================================
         // Initialize UI widget
@@ -328,36 +292,12 @@ public class Axis extends Region {
         double width = getWidth();
         double height = getHeight();
 
-        if (whileLayout.compareAndSet(false, true)) {
-            try {
-                if (!dateIsValid) {
-                    computeAxisProperties(width, height);
-                    layoutValidate = false;
-                    dateIsValid = true;
-                }
-
-                if (!layoutValidate || width != lastLayoutWidth || height != lastLayoutHeight) {
-                    layoutAxis(width, height);
-                    layoutValidate = true;
-                }
-                lastLayoutWidth = width;
-                lastLayoutHeight = height;
-            } finally {
-                whileLayout.compareAndSet(true, false);
-            }
-        }
-    }
-
-    /**
-     * Layout actually.
-     * 
-     * @param width
-     * @param height
-     */
-    private void layoutAxis(double width, double height) {
-        layoutLines(width, height);
-        layoutLabels(width, height);
-        layoutGroups(width, height);
+        layoutAxis.layout(() -> {
+            computeAxisProperties(width, height);
+            layoutLines(width, height);
+            layoutLabels(width, height);
+            layoutGroups(width, height);
+        });
     }
 
     /**
@@ -512,7 +452,7 @@ public class Axis extends Region {
         private TickLable(Enum... classNames) {
             tickLabels.getChildren().add(this);
             textProperty().bind(Viewtify.calculate(value, () -> tickLabelFormatter.get().apply(value.get())));
-            value.addListener(dataValidateListener);
+            value.addListener(layoutAxis);
 
             StyleHelper.of(this).style(ChartClass.Label).style(classNames);
         }
@@ -534,7 +474,7 @@ public class Axis extends Region {
             Viewtify.inUI(() -> {
                 tickLabels.getChildren().remove(this);
                 textProperty().unbind();
-                value.removeListener(dataValidateListener);
+                value.removeListener(layoutAxis);
             });
         }
     }

@@ -12,7 +12,6 @@ package trademate.chart;
 import java.util.ArrayList;
 import java.util.List;
 
-import javafx.beans.Observable;
 import javafx.collections.ObservableList;
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -34,6 +33,7 @@ import trademate.TradingView;
 import trademate.chart.Axis.TickLable;
 import trademate.chart.shape.Candle;
 import viewtify.Viewtify;
+import viewtify.ui.helper.LayoutAssistant;
 import viewtify.ui.helper.StyleHelper;
 
 /**
@@ -80,7 +80,7 @@ public class ChartPlotArea extends Region {
     private final LineChart volumeChart;
 
     /** Flag whether candle chart shoud layout on the next rendering phase or not. */
-    private boolean shoudLayoutCandle = true;
+    private final LayoutAssistant layoutCandle = new LayoutAssistant(this);
 
     /** The line chart data list. */
     private ObservableList<Tick> candleChartData;
@@ -105,12 +105,9 @@ public class ChartPlotArea extends Region {
 
         Viewtify.clip(this);
 
-        widthProperty().addListener(this::shoudLayoutCandle);
-        heightProperty().addListener(this::shoudLayoutCandle);
-        axisX.scroll.valueProperty().addListener(this::shoudLayoutCandle);
-        axisX.scroll.visibleAmountProperty().addListener(this::shoudLayoutCandle);
-        axisY.scroll.valueProperty().addListener(this::shoudLayoutCandle);
-        axisY.scroll.visibleAmountProperty().addListener(this::shoudLayoutCandle);
+        layoutCandle.layoutBy(widthProperty(), heightProperty())
+                .layoutBy(axisX.scroll.valueProperty(), axisX.scroll.visibleAmountProperty())
+                .layoutBy(axisY.scroll.valueProperty(), axisY.scroll.visibleAmountProperty());
 
         visualizeMouseTrack();
         visualizeNotifyPrice();
@@ -118,16 +115,6 @@ public class ChartPlotArea extends Region {
 
         getChildren()
                 .addAll(backGridVertical, backGridHorizontal, notifyPrice, orderBuyPrice, orderSellPrice, mouseTrackHorizontal, mouseTrackVertical, candles, volumeChart);
-    }
-
-    /**
-     * This chart should draw on the next rendering phase.
-     */
-    private void shoudLayoutCandle(Observable source) {
-        if (shoudLayoutCandle == false) {
-            shoudLayoutCandle = true;
-            setNeedsLayout(true);
-        }
     }
 
     /**
@@ -142,8 +129,8 @@ public class ChartPlotArea extends Region {
             labelX.value.set(axisX.getValueForPosition(e.getX()));
             labelY.value.set(axisY.getValueForPosition(e.getY()));
 
-            mouseTrackVertical.shouldLayout();
-            mouseTrackHorizontal.shouldLayout();
+            mouseTrackVertical.layoutLine.requestLayout();
+            mouseTrackHorizontal.layoutLine.requestLayout();
         });
 
         // remove on exit
@@ -151,8 +138,8 @@ public class ChartPlotArea extends Region {
             labelX.value.set(-1);
             labelY.value.set(-1);
 
-            mouseTrackVertical.shouldLayout();
-            mouseTrackHorizontal.shouldLayout();
+            mouseTrackVertical.layoutLine.requestLayout();
+            mouseTrackHorizontal.layoutLine.requestLayout();
         });
     }
 
@@ -219,7 +206,7 @@ public class ChartPlotArea extends Region {
      * Draw candle chart.
      */
     private void drawCandleChart() {
-        if (shoudLayoutCandle) {
+        layoutCandle.layout(() -> {
             ObservableList<Node> candles = this.candles.getChildren();
             int candleSize = candles.size();
             int dataSize = candleChartData.size();
@@ -266,8 +253,7 @@ public class ChartPlotArea extends Region {
                     candle.setLayoutY(-50);
                 }
             }
-            shoudLayoutCandle = false;
-        }
+        });
     }
 
     /**
@@ -278,18 +264,18 @@ public class ChartPlotArea extends Region {
     public final void setCandleChartDataList(ObservableList<Tick> datalist) {
         // clear old list configuration
         if (candleChartData != null) {
-            candleChartData.removeListener(this::shoudLayoutCandle);
+            candleChartData.removeListener(layoutCandle);
         }
 
         // add new list configuration
         if (datalist != null) {
-            datalist.addListener(this::shoudLayoutCandle);
+            datalist.addListener(layoutCandle);
         }
 
         // update
         candleChartData = datalist;
 
-        shoudLayoutCandle(null);
+        layoutCandle.requestLayout();
     }
 
     /**
@@ -355,8 +341,7 @@ public class ChartPlotArea extends Region {
         /** The associated axis. */
         private final Axis axis;
 
-        /** Flag whether this mark should draw on the next rendering phase. */
-        private boolean shouldLayout = true;
+        private final LayoutAssistant layoutLine = layoutCandle.sub();
 
         /**
          * @param classNames
@@ -397,7 +382,7 @@ public class ChartPlotArea extends Region {
             if (price != null) label.value.set(price.toDouble());
             labels.add(label);
 
-            shouldLayout();
+            layoutLine.requestLayout();
 
             return label;
         }
@@ -410,14 +395,14 @@ public class ChartPlotArea extends Region {
         private void remove(TickLable mark) {
             labels.remove(mark);
             mark.dispose();
-            shouldLayout();
+            layoutLine.requestLayout();
         }
 
         /**
          * Draw mark.
          */
         private void draw() {
-            if (shouldLayout || shoudLayoutCandle) {
+            layoutLine.layout(() -> {
                 ObservableList<PathElement> paths = getElements();
                 int pathSize = paths.size();
                 int labelSize = labels.size();
@@ -454,16 +439,7 @@ public class ChartPlotArea extends Region {
                         line.setY(value);
                     }
                 }
-                shouldLayout = false;
-            }
-        }
-
-        /**
-         * This mark should draw on the next rendering phase.
-         */
-        private void shouldLayout() {
-            shouldLayout = true;
-            setNeedsLayout(true);
+            });
         }
     }
 }

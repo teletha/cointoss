@@ -11,7 +11,6 @@ package trademate.chart;
 
 import java.util.function.Consumer;
 
-import javafx.beans.Observable;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
@@ -26,6 +25,7 @@ import cointoss.chart.Tick;
 import cointoss.util.Num;
 import kiss.Disposable;
 import trademate.TradingView;
+import viewtify.ui.helper.LayoutAssistant;
 
 /**
  * @version 2018/01/09 22:15:56
@@ -47,8 +47,12 @@ public class CandleChart extends Region {
     /** The list of plottable cnadle date. */
     private final ObservableList<Tick> candles = FXCollections.observableArrayList();
 
-    /** The validity of data. */
-    private boolean shouldLayout = true;
+    /** The layout manager. */
+    private final LayoutAssistant layoutChart = new LayoutAssistant(this)//
+            .layoutBy(widthProperty(), heightProperty())
+            .layoutBy(chart, candles)
+            .layoutBy(axisX.scroll.valueProperty(), axisX.scroll.visibleAmountProperty())
+            .layoutBy(axisY.scroll.valueProperty(), axisY.scroll.visibleAmountProperty());
 
     /**
      * 
@@ -63,26 +67,7 @@ public class CandleChart extends Region {
         AnchorPane.setRightAnchor(this, 15d);
         AnchorPane.setLeftAnchor(this, 0d);
 
-        widthProperty().addListener(this::shouldLayout);
-        heightProperty().addListener(this::shouldLayout);
-        chart.addListener(this::shouldLayout);
-        candles.addListener(this::shouldLayout);
-        axisX.scroll.valueProperty().addListener(this::shouldLayout);
-        axisX.scroll.visibleAmountProperty().addListener(this::shouldLayout);
-        axisY.scroll.valueProperty().addListener(this::shouldLayout);
-        axisY.scroll.visibleAmountProperty().addListener(this::shouldLayout);
-
         getChildren().addAll(main, axisX, axisY);
-    }
-
-    /**
-     * This chart should draw on the next rendering phase.
-     */
-    private void shouldLayout(Observable source) {
-        if (shouldLayout == false) {
-            shouldLayout = true;
-            setNeedsLayout(true);
-        }
     }
 
     /**
@@ -90,10 +75,10 @@ public class CandleChart extends Region {
      */
     @Override
     protected final void layoutChildren() {
-        if (shouldLayout) {
+        layoutChart.layout(() -> {
             setAxisXRange();
             setAxisYRange();
-    
+
             Insets insets = getInsets();
             double x = insets.getLeft();
             double y = insets.getTop();
@@ -103,19 +88,17 @@ public class CandleChart extends Region {
             double axisYWidth = axisY.prefWidth(height);
             double mainHeight = Math.max(0, height - axisXHeight);
             double mainWidth = Math.max(0, width - axisYWidth);
-    
+
             // layout axis
             axisX.resizeRelocate(x, y + mainHeight, mainWidth, axisXHeight);
             axisY.resizeRelocate(x + mainWidth, y, axisYWidth, mainHeight);
             axisX.layout();
             axisY.layout();
-    
+
             // layout chart
             main.resizeRelocate(x, y, mainWidth, mainHeight);
             main.layoutChildren();
-    
-            shouldLayout = false;
-        }
+        });
     }
 
     /**
@@ -132,20 +115,20 @@ public class CandleChart extends Region {
     private void setAxisYRange() {
         Num max = Num.MIN;
         Num min = Num.MAX;
-    
+
         long start = (long) axisX.computeVisibleMinValue();
         long end = (long) axisX.computeVisibleMaxValue();
-    
+
         for (int i = 0; i < candles.size(); i++) {
             Tick data = candles.get(i);
             long time = data.start.toInstant().toEpochMilli();
-    
+
             if (start <= time && time <= end) {
                 max = Num.max(max, data.maxPrice);
                 min = Num.min(min, data.minPrice);
             }
         }
-    
+
         Num margin = max.minus(min).multiply(Num.of(0.5));
         axisY.logicalMaxValue.set(max.plus(margin).toDouble());
         axisY.logicalMinValue.set(min.minus(margin).toDouble());
@@ -196,7 +179,6 @@ public class CandleChart extends Region {
      * @return
      */
     public CandleChart candleDate(Chart data) {
-        shouldLayout = true;
         this.candles.clear();
 
         if (disposable != null) {
@@ -216,6 +198,8 @@ public class CandleChart extends Region {
         });
 
         main.setCandleChartDataList(candles);
+
+        layoutChart.requestLayout();
 
         return this;
     }
