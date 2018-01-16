@@ -9,18 +9,15 @@
  */
 package trademate.order;
 
-import static cointoss.Order.State.*;
-
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
-import cointoss.Order;
+import cointoss.Position;
 import cointoss.Side;
 import cointoss.util.Num;
 import trademate.TradingView;
 import viewtify.UI;
 import viewtify.View;
-import viewtify.ui.UITreeItem;
 import viewtify.ui.UITreeTableColumn;
 import viewtify.ui.UITreeTableView;
 
@@ -33,19 +30,19 @@ public class PositionCatalog extends View {
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd HH:mm:ss");
 
     /** UI */
-    private @UI UITreeTableView<Order> openPositionCatalog;
+    private @UI UITreeTableView<Position> openPositionCatalog;
 
     /** UI */
-    private @UI UITreeTableColumn<Object, ZonedDateTime> openPositionDate;
+    private @UI UITreeTableColumn<Position, ZonedDateTime> openPositionDate;
 
     /** UI */
-    private @UI UITreeTableColumn<Object, Side> openPositionSide;
+    private @UI UITreeTableColumn<Position, Side> openPositionSide;
 
     /** UI */
-    private @UI UITreeTableColumn<Object, Num> openPositionAmount;
+    private @UI UITreeTableColumn<Position, Num> openPositionAmount;
 
     /** UI */
-    private @UI UITreeTableColumn<Object, Num> openPositionPrice;
+    private @UI UITreeTableColumn<Position, Num> openPositionPrice;
 
     /** Parent View */
     private @UI TradingView view;
@@ -55,37 +52,38 @@ public class PositionCatalog extends View {
      */
     @Override
     protected void initialize() {
-        openPositionDate.provideProperty(OrderSet.class, o -> o.date)
-                .provideVariable(Order.class, o -> o.child_order_date)
-                .render((ui, item) -> ui.text(formatter.format(item)));
-        openPositionSide.provideProperty(OrderSet.class, o -> o.side)
-                .provideValue(Order.class, Order::side)
-                .render((ui, item) -> ui.text(item).styleOnly(item));
-        openPositionAmount.provideProperty(OrderSet.class, o -> o.amount).provideVariable(Order.class, o -> o.outstanding_size);
-        openPositionPrice.provideProperty(OrderSet.class, o -> o.averagePrice).provideValue(Order.class, o -> o.price);
-    }
+        openPositionDate.model(o -> o.open_date).render((ui, item) -> ui.text(formatter.format(item)));
+        openPositionSide.model(o -> o.side).render((ui, item) -> ui.text(item).styleOnly(item));
+        openPositionAmount.modelByVar(o -> o.size);
+        openPositionPrice.model(o -> o.price);
 
-    /**
-     * Create tree item for executed {@link OrderSet}.
-     * 
-     * @param set
-     */
-    public void createPositionItem(OrderSet set) {
-        if (set.sub.size() == 1) {
-            createPositionItem(openPositionCatalog.root, set.sub.get(0));
-        } else {
-            UITreeItem item = openPositionCatalog.root.createItem(set).expand(true).removeWhenEmpty();
+        view.market().yourExecution.to(p -> {
+            for (Position position : openPositionCatalog.root.values()) {
+                if (position.side == p.side) {
+                    if (position.price.is(p.price)) {
+                        position.size.set(p.size.v.plus(position.size));
+                        return;
+                    }
+                } else {
+                    Num diff = p.size.get().minus(position.size);
 
-            for (Order order : set.sub) {
-                createPositionItem(item, order);
+                    if (diff.isPositive()) {
+                        p.size.set(diff);
+                        position.size.set(Num.ZERO);
+                    } else if (diff.isZero()) {
+                        p.size.set(diff);
+                        position.size.set(Num.ZERO);
+                        break;
+                    } else {
+                        position.size.set(position.size.get().minus(p.size));
+                        return;
+                    }
+                }
             }
-        }
-    }
 
-    /**
-     * Create tree item for executed {@link Order}.
-     */
-    private void createPositionItem(UITreeItem item, Order order) {
-        item.createItem(order).removeWhen(order.state.observe().take(CANCELED, COMPLETED));
+            if (p.size.v.isPositive()) {
+                openPositionCatalog.root.createItem(p).removeWhen(p.size.observe().take(Num::isZero));
+            }
+        });
     }
 }

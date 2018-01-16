@@ -9,9 +9,10 @@
  */
 package cointoss;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 import cointoss.util.Num;
+import kiss.Variable;
 
 /**
  * @version 2017/07/25 1:36:12
@@ -25,7 +26,7 @@ public class Position {
     public Num price;
 
     /** サイズ */
-    public Num size;
+    public Variable<Num> size = Variable.of(Num.ZERO);
 
     public Num commission;
 
@@ -36,7 +37,7 @@ public class Position {
     public Num require_collateral;
 
     /** 成立日 */
-    public LocalDateTime open_date;
+    public ZonedDateTime open_date;
 
     /** レバレッジ */
     public int leverage;

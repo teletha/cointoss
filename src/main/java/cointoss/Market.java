@@ -136,10 +136,10 @@ public class Market implements Disposable {
     public final Signal<Order> yourOrder = new Signal(holderForYourOrder);
 
     /** The holder. */
-    private final Listeners<Order> holderForYourExecution = new Listeners();
+    private final Listeners<Position> holderForYourExecution = new Listeners();
 
     /** The event stream. */
-    public final Signal<Order> yourExecution = new Signal(holderForYourExecution);
+    public final Signal<Position> yourExecution = new Signal(holderForYourExecution);
 
     /** The market health. */
     public final Signal<Health> health;
@@ -465,7 +465,13 @@ public class Market implements Disposable {
                 for (Observer<? super Execution> listener : order.executeListeners) {
                     listener.accept(exe);
                 }
-                holderForYourExecution.omit(order);
+
+                Position position = new Position();
+                position.side = order.side;
+                position.price = exe.price;
+                position.size.set(exe.size);
+                position.open_date = exe.exec_date;
+                holderForYourExecution.omit(position);
             }
         }
 
@@ -493,13 +499,13 @@ public class Market implements Disposable {
         Num executed = Num.min(order.outstanding_size.v, exe.size);
 
         if (order.child_order_type.isMarket() && executed.isNot(0)) {
-            order.average_price.set(order.average_price.v.multiply(order.executed_size)
+            order.average_price.set(order.average_price.v.multiply(order.executed_size.get())
                     .plus(exe.price.multiply(executed))
-                    .divide(order.executed_size.plus(executed)));
+                    .divide(order.executed_size.get().plus(executed)));
         }
 
         order.outstanding_size.set(order.outstanding_size.v.minus(executed));
-        order.executed_size = order.executed_size.plus(executed);
+        order.executed_size.set(order.executed_size.get().plus(executed));
 
         if (order.outstanding_size.v.is(0)) {
             order.state.set(State.COMPLETED);

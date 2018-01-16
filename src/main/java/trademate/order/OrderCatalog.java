@@ -75,14 +75,14 @@ public class OrderCatalog extends View {
             $.menu("Get Away").disableWhen(ordersArePassive).whenUserClick(e -> act(this::reorderAway));
         });
 
-        requestedOrdersDate.provideProperty(OrderSet.class, o -> o.date)
-                .provideVariable(Order.class, o -> o.child_order_date)
+        requestedOrdersDate.modelByProperty(OrderSet.class, o -> o.date)
+                .modelByVar(Order.class, o -> o.child_order_date)
                 .render((ui, item) -> ui.text(formatter.format(item)));
-        requestedOrdersSide.provideProperty(OrderSet.class, o -> o.side)
-                .provideValue(Order.class, Order::side)
+        requestedOrdersSide.modelByProperty(OrderSet.class, o -> o.side)
+                .model(Order.class, Order::side)
                 .render((ui, item) -> ui.text(item).styleOnly(item));
-        requestedOrdersAmount.provideProperty(OrderSet.class, o -> o.amount).provideVariable(Order.class, o -> o.outstanding_size);
-        requestedOrdersPrice.provideProperty(OrderSet.class, o -> o.averagePrice).provideValue(Order.class, o -> o.price);
+        requestedOrdersAmount.modelByProperty(OrderSet.class, o -> o.amount).modelByVar(Order.class, o -> o.outstanding_size);
+        requestedOrdersPrice.modelByProperty(OrderSet.class, o -> o.averagePrice).model(Order.class, o -> o.price);
 
         // observe external orders
         view.market().yourOrder.skip(o -> o.group != -1).to(order -> createOrderItem(orderCatalog.root, order));

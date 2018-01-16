@@ -206,7 +206,6 @@ public class OrderBuilder extends View {
         // Create View Model
         // ========================================
         view.orders.createOrderItem(set);
-        view.positions.createPositionItem(set);
 
         // ========================================
         // Request to Server

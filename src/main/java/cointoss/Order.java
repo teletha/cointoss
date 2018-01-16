@@ -65,6 +65,7 @@ public class Order implements Directional {
         this.price = price == null ? Num.ZERO : price;
         this.child_order_type = price == null ? OrderType.MARKET : OrderType.LIMIT;
         this.outstanding_size = Variable.of(size);
+        this.executed_size = Variable.of(Num.ZERO);
 
         when(priceLimit);
         type(quantity);
@@ -338,7 +339,7 @@ public class Order implements Directional {
     public final Variable<Num> outstanding_size;
 
     /** The executed size */
-    public Num executed_size = Num.ZERO;
+    public final Variable<Num> executed_size;
 
     /** The canceled size */
     public Num cancel_size;

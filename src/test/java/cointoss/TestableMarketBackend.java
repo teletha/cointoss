@@ -9,7 +9,6 @@
  */
 package cointoss;
 
-import java.io.PrintStream;
 import java.time.ZonedDateTime;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -99,7 +98,7 @@ class TestableMarketBackend implements MarketBackend {
             child.average_price.set(order.price);
             child.outstanding_size.set(order.size);
             child.cancel_size = Num.ZERO;
-            child.executed_size = Num.ZERO;
+            child.executed_size.set(Num.ZERO);
 
             orderAll.add(child);
             orderActive.add(child);
@@ -253,12 +252,12 @@ class TestableMarketBackend implements MarketBackend {
                 if (order.child_order_type.isMarket() && executedSize.isNot(0)) {
                     order.marketMinPrice = order.isBuy() ? Num.max(order.marketMinPrice, e.price) : Num.min(order.marketMinPrice, e.price);
                     order.average_price.set(order.average_price.get()
-                            .multiply(order.executed_size)
+                            .multiply(order.executed_size.get())
                             .plus(order.marketMinPrice.multiply(executedSize))
-                            .divide(order.executed_size.plus(executedSize)));;
+                            .divide(order.executed_size.get().plus(executedSize)));;
                 }
                 order.outstanding_size.set(order.outstanding_size.get().minus(executedSize));
-                order.executed_size = order.executed_size.plus(executedSize);
+                order.executed_size.set(order.executed_size.get().plus(executedSize));
 
                 Execution exe = new Execution();
                 exe.side = order.side();
@@ -267,7 +266,6 @@ class TestableMarketBackend implements MarketBackend {
                 exe.exec_date = e.exec_date;
                 exe.buy_child_order_acceptance_id = order.isBuy() ? order.child_order_acceptance_id : e.buy_child_order_acceptance_id;
                 exe.sell_child_order_acceptance_id = order.isSell() ? order.child_order_acceptance_id : e.sell_child_order_acceptance_id;
-                PrintStream out = System.out;
                 executeds.add(exe);
 
                 if (order.outstanding_size.get().is(0)) {
