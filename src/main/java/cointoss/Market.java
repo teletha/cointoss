@@ -29,6 +29,7 @@ import cointoss.util.Num;
 import kiss.Disposable;
 import kiss.Observer;
 import kiss.Signal;
+import kiss.Variable;
 
 /**
  * @version 2017/09/11 18:26:15
@@ -147,7 +148,7 @@ public class Market implements Disposable {
     public final Signal<Position> yourExecution = new Signal(holderForYourExecution);
 
     /** The market health. */
-    public final Signal<Health> health;
+    public final Variable<Health> health = Variable.empty();
 
     /** The initial execution. */
     private Execution init;
@@ -197,7 +198,6 @@ public class Market implements Disposable {
         }
 
         this.backend = backend;
-        this.health = backend.getHealth();
 
         // initialize price, balance and executions
         this.base = this.baseInit = backend.getBaseCurrency().to().v;
@@ -215,6 +215,9 @@ public class Market implements Disposable {
             for (OrderUnit unit : board.bids) {
                 orderBook.longs.update(unit);
             }
+        }));
+        backend.add(backend.getHealth().to(health -> {
+            this.health.set(health);
         }));
     }
 
