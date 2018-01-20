@@ -158,7 +158,7 @@ public class OrderCatalog extends View {
      */
     private void reorderClosely(Order order) {
         Viewtify.inWorker(() -> {
-            Num price = view.board.book.computeBestPrice(order.side, order.price, optimizeThreshold.value(), Num.of(2));
+            Num price = view.market().orderBook.computeBestPrice(order.side, order.price, optimizeThreshold.value(), Num.of(2));
 
             view.market().cancel(order).to(o -> {
                 view.console.info("{} is canceled.", o);

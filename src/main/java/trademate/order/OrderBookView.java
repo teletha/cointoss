@@ -32,9 +32,6 @@ import viewtify.ui.UISpinner;
  */
 public class OrderBookView extends View {
 
-    /** Order Book. */
-    public final OrderBook book = new OrderBook();
-
     /** UI for long maker. */
     private @UI UIListView<OrderUnit> longList;
 
@@ -59,11 +56,16 @@ public class OrderBookView extends View {
     /** Parent View */
     private @UI TradingView view;
 
+    /** Order Book. */
+    private OrderBook book;
+
     /**
      * {@inheritDoc}
      */
     @Override
     protected void initialize() {
+        book = view.market().orderBook;
+
         longList.values(book.longs.x1).cell(e -> new CellView());
         shortList.values(book.shorts.x1).cell(e -> new CellView()).scrollTo(book.shorts.x1.size() - 1);
         hideSize.values(Num.range(0, 9)).initial(Num.ZERO).observe(e -> longList.ui.refresh());
@@ -76,14 +78,6 @@ public class OrderBookView extends View {
         // read data from backend service
         Viewtify.inWorker(() -> {
             return view.market().orderTimeline.on(Viewtify.UIThread).to(board -> {
-                for (OrderUnit unit : board.asks) {
-                    book.shorts.update(unit);
-                }
-
-                for (OrderUnit unit : board.bids) {
-                    book.longs.update(unit);
-                }
-
                 OrderUnit bestShort = book.shorts.min();
                 OrderUnit bestLong = book.longs.max();
 
@@ -132,21 +126,23 @@ public class OrderBookView extends View {
          */
         @Override
         protected void updateItem(OrderUnit e, boolean empty) {
-            super.updateItem(e, empty);
+            Viewtify.inUI(() -> {
+                super.updateItem(e, empty);
 
-            if (empty || e == null) {
-                setText(null);
-                setGraphic(null);
-                setStyle("-fx-background-insets: 0 300px 0 0;");
-            } else {
-                Num normalize = e.size.scale(3);
-                setText(e.price() + "  " + normalize);
+                if (empty || e == null) {
+                    setText(null);
+                    setGraphic(null);
+                    setStyle("-fx-background-insets: 0 300px 0 0;");
+                } else {
+                    Num normalize = e.size.scale(3);
+                    setText(e.price() + "  " + normalize);
 
-                StringBuilder style = new StringBuilder();
-                style.append("-fx-background-insets: 0 " + Num.of(210).minus(normalize.multiply(Num.TWO)) + "px 0 0;");
-                style.append("-fx-font-size: " + (normalize.isLessThan(hideSize.value()) ? "0.1px;" : "100%;"));
-                setStyle(style.toString());
-            }
+                    StringBuilder style = new StringBuilder();
+                    style.append("-fx-background-insets: 0 " + Num.of(210).minus(normalize.multiply(Num.TWO)) + "px 0 0;");
+                    style.append("-fx-font-size: " + (normalize.isLessThan(hideSize.value()) ? "0.1px;" : "100%;"));
+                    setStyle(style.toString());
+                }
+            });
         }
     }
 }

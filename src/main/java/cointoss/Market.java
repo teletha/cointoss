@@ -21,7 +21,9 @@ import java.util.concurrent.atomic.AtomicReference;
 import cointoss.MarketBackend.Health;
 import cointoss.Order.State;
 import cointoss.chart.Chart;
+import cointoss.order.OrderBook;
 import cointoss.order.OrderBookChange;
+import cointoss.order.OrderUnit;
 import cointoss.util.Listeners;
 import cointoss.util.Num;
 import kiss.Disposable;
@@ -129,6 +131,9 @@ public class Market implements Disposable {
     /** The execution time line. */
     public final Signal<OrderBookChange> orderTimeline;
 
+    /** Order Book. */
+    public final OrderBook orderBook = new OrderBook();
+
     /** The holder. */
     private final Listeners<Order> holderForYourOrder = new Listeners();
 
@@ -192,7 +197,6 @@ public class Market implements Disposable {
         }
 
         this.backend = backend;
-        this.orderTimeline = backend.getOrderBook();
         this.health = backend.getHealth();
 
         // initialize price, balance and executions
@@ -201,6 +205,17 @@ public class Market implements Disposable {
 
         add(trading);
         backend.initialize(this, log);
+
+        orderTimeline = backend.getOrderBook();
+        backend.add(orderTimeline.to(board -> {
+            for (OrderUnit unit : board.asks) {
+                orderBook.shorts.update(unit);
+            }
+
+            for (OrderUnit unit : board.bids) {
+                orderBook.longs.update(unit);
+            }
+        }));
     }
 
     /**
@@ -223,6 +238,19 @@ public class Market implements Disposable {
             trading.initialize();
 
             tradings.add(trading);
+        }
+    }
+
+    /**
+     * Remove market trader to this market.
+     * 
+     * @param trading
+     */
+    public void remove(Trading trading) {
+        if (trading != null) {
+            tradings.remove(trading);
+            trading.dispose();
+            trading.market = null;
         }
     }
 

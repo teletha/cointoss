@@ -29,11 +29,13 @@ import kiss.I;
 import kiss.WiseBiConsumer;
 import trademate.Notificator;
 import trademate.TradingView;
+import trademate.bot.Spreader;
 import viewtify.UI;
 import viewtify.User;
 import viewtify.View;
 import viewtify.Viewtify;
 import viewtify.ui.UIButton;
+import viewtify.ui.UICheckBox;
 import viewtify.ui.UIComboBox;
 import viewtify.ui.UISpinner;
 import viewtify.ui.UIText;
@@ -102,6 +104,9 @@ public class OrderBuilder extends View {
     /** UI */
     private @UI TradingView view;
 
+    /** UI */
+    private @UI UICheckBox bot;
+
     private Notificator notificator = I.make(Notificator.class);
 
     /**
@@ -141,6 +146,16 @@ public class OrderBuilder extends View {
                 System.out.println("PLAY");
             } catch (Exception e) {
                 e.printStackTrace();
+            }
+        });
+
+        Spreader spreader = new Spreader();
+
+        bot.observe(use -> {
+            if (use) {
+                view.market().add(spreader);
+            } else {
+                view.market().remove(spreader);
             }
         });
     }
@@ -190,7 +205,7 @@ public class OrderBuilder extends View {
         for (int i = 0; i < divideSize; i++) {
             Num optimizedSize = increaseInterval == 0 ? Num.ZERO
                     : Num.of(i).divide(increaseInterval).scale(0, RoundingMode.FLOOR).multiply(orderSizeAmount.value());
-            Num optimizedPrice = view.board.book.computeBestPrice(side, price, optimizeThreshold.value(), Num.of(2));
+            Num optimizedPrice = view.market().orderBook.computeBestPrice(side, price, optimizeThreshold.value(), Num.of(2));
 
             Order order = Order.limit(side, size.plus(optimizedSize), optimizedPrice).type(quantity);
             order.state.set(State.REQUESTING);

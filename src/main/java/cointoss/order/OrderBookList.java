@@ -84,7 +84,11 @@ public class OrderBookList {
      * @return
      */
     public OrderUnit min() {
-        return x1.get(x1.size() - 1);
+        if (x1.isEmpty()) {
+            return null;
+        } else {
+            return x1.get(x1.size() - 1);
+        }
     }
 
     /**
@@ -93,7 +97,11 @@ public class OrderBookList {
      * @return
      */
     public OrderUnit max() {
-        return x1.get(0);
+        if (x1.isEmpty()) {
+            return null;
+        } else {
+            return x1.get(0);
+        }
     }
 
     /**

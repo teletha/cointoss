@@ -24,13 +24,14 @@ import java.util.function.Predicate;
 
 import cointoss.util.Num;
 import cointoss.util.Span;
+import kiss.Disposable;
 import kiss.Observer;
 import kiss.Signal;
 
 /**
  * @version 2017/09/05 19:39:34
  */
-public abstract class Trading {
+public abstract class Trading implements Disposable {
 
     /** The market. */
     protected Market market;
@@ -66,6 +67,14 @@ public abstract class Trading {
      * Initialize this trading strategy.
      */
     protected abstract void initialize();
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void vandalize() {
+        // do nothing
+    }
 
     /**
      * Detect position.

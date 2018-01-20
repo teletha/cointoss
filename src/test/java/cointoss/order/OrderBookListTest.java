@@ -9,7 +9,7 @@
  */
 package cointoss.order;
 
-import javafx.collections.ObservableList;
+import java.util.List;
 
 import org.junit.Test;
 
@@ -302,7 +302,7 @@ public class OrderBookListTest {
      * @param size
      * @param price
      */
-    private void assertList(ObservableList<OrderUnit> list, int index, int price, int size) {
+    private void assertList(List<OrderUnit> list, int index, int price, int size) {
         OrderUnit unit = list.get(index);
         assert unit.size.is(size);
         assert unit.price.is(price);
