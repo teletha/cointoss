@@ -105,6 +105,15 @@ public class OrderBookList {
     }
 
     /**
+     * Retrieve best unit.
+     * 
+     * @return
+     */
+    public OrderUnit best() {
+        return side.isBuy() ? max() : min();
+    }
+
+    /**
      * Select list by ratio.
      * 
      * @param ratio
@@ -127,6 +136,10 @@ public class OrderBookList {
         default:
             return x10000;
         }
+    }
+
+    public Num computeBestPrice(Num threshold, Num diff) {
+        return computeBestPrice(best().price, threshold, diff);
     }
 
     /**

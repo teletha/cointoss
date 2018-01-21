@@ -24,6 +24,25 @@ public class OrderBook {
     public final OrderBookList longs = new OrderBookList(Side.BUY);
 
     /**
+     * Retrieve the {@link OrderBookList} for {@link Side}.
+     * 
+     * @param side
+     * @return
+     */
+    public OrderBookList bookFor(Side side) {
+        return side.isBuy() ? longs : shorts;
+    }
+
+    /**
+     * Compute the current spread.
+     * 
+     * @return
+     */
+    public Num spread() {
+        return shorts.best().price.minus(longs.best().price);
+    }
+
+    /**
      * @param side
      * @param price
      * @param threshold

@@ -113,7 +113,7 @@ public class TradingView extends View {
             notificator.execution.notify("Executed " + o);
         });
 
-        market().health.on(Viewtify.UIThread).to(v -> {
+        market().health.observe().on(Viewtify.UIThread).to(v -> {
             tab.text(market().name() + "  " + v.mark);
         });
 

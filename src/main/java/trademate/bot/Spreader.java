@@ -10,10 +10,10 @@
 package trademate.bot;
 
 import cointoss.MarketBackend.Health;
-import cointoss.order.OrderBookList;
 import cointoss.Order;
 import cointoss.Side;
 import cointoss.Trading;
+import cointoss.order.OrderBookList;
 import cointoss.util.Num;
 
 /**
@@ -28,29 +28,34 @@ public class Spreader extends Trading {
      */
     @Override
     protected void initialize() {
-        add(market.timeline.to(e -> {
-            System.out.println(e);
-        }));
-
         market.timeline.to(e -> {
             if (whileTrading == false && market.health.is(Health.Normal)) {
                 Num volume = market.flow.volume();
+                Num spread = market.orderBook.spread();
 
-                if (volume.abs().isGreaterThanOrEqual(3)) {
+                if (volume.abs().isGreaterThanOrEqual(3) && spread.isGreaterThanOrEqual(200)) {
                     whileTrading = true;
 
                     Side entrySide = volume.isPositive() ? Side.BUY : Side.SELL;
                     Side exitSide = entrySide.inverse();
                     Num entrySize = Num.of(0.001);
-                    
-                    OrderBookList entryBook =  entrySide.isBuy() ? market.orderBook.longs : market.orderBook.shorts;
-                    OrderBookList exitBoot = exitSide.isBuy() ? market.orderBook.longs : market.orderBook.shorts;
-                    
-                    Num entryPrice = entryBook.computeBestPrice()
 
-                    market.request(Order.limit(entrySide, entrySize, entryPrice)).to(entry -> {
+                    OrderBookList entryBook = market.orderBook.bookFor(entrySide);
+                    OrderBookList exitBook = market.orderBook.bookFor(exitSide);
+
+                    entryLimit(entrySide, entrySize, entryBook.computeBestPrice(Num.ZERO, Num.TWO), entry -> {
+                        // entry.
+                    });
+
+                    market.request(Order.limit(entrySide, entrySize, entryBook.computeBestPrice(Num.ZERO, Num.TWO))).to(entry -> {
                         entry.execute.to(entryExe -> {
-                            market.request(Order.limit(exitSide, entryExe.size, ma))
+                            market.request(Order.limit(exitSide, entryExe.size, exitBook.computeBestPrice(Num.ZERO, Num.TWO))).to(exit -> {
+                                exit.execute.to(exitExe -> {
+                                    // if (entry.isCompleted() && exit.i) {
+                                    //
+                                    // }
+                                });
+                            });
                         });
                     });
                 }

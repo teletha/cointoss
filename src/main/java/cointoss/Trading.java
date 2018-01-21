@@ -15,17 +15,16 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+import cointoss.util.Listeners;
 import cointoss.util.Num;
 import cointoss.util.Span;
 import kiss.Disposable;
-import kiss.Observer;
 import kiss.Signal;
 
 /**
@@ -37,19 +36,19 @@ public abstract class Trading implements Disposable {
     protected Market market;
 
     /** The signal observers. */
-    private final CopyOnWriteArrayList<Observer<Boolean>> closePositions = new CopyOnWriteArrayList();
+    private final Listeners<Boolean> closePositions = new Listeners();
 
     /** The trade related signal. */
     protected final Signal<Boolean> closingPosition = new Signal(closePositions);
 
     /** The signal observers. */
-    private final CopyOnWriteArrayList<Observer<Boolean>> completeEntries = new CopyOnWriteArrayList();
+    private final Listeners<Boolean> completeEntries = new Listeners();
 
     /** The trade related signal. */
     protected final Signal<Boolean> completingEntry = new Signal(completeEntries);
 
     /** The signal observers. */
-    private final CopyOnWriteArrayList<Observer<Boolean>> completeExits = new CopyOnWriteArrayList();
+    private final Listeners<Boolean> completeExits = new Listeners();
 
     /** The trade related signal. */
     protected final Signal<Boolean> completingExit = new Signal(completeExits);
@@ -144,9 +143,7 @@ public abstract class Trading implements Disposable {
      * @param oae
      */
     protected final void close() {
-        for (Observer<Boolean> observer : closePositions) {
-            observer.accept(true);
-        }
+        closePositions.omit(true);
     }
 
     /**
@@ -240,13 +237,13 @@ public abstract class Trading implements Disposable {
         final List<String> logs = new ArrayList();
 
         /** The current position size. */
-        private Num remaining = Num.ZERO;
+        private Num positionSize = Num.ZERO;
 
         /** The remaining size of entry order. */
         private Num entryRemaining;
 
         /** The total size of entry order. */
-        private Num entrySize = Num.ZERO;
+        private Num entryTotalSize = Num.ZERO;
 
         /** The total cost of entry order. */
         private Num entryCost = Num.ZERO;
@@ -255,7 +252,7 @@ public abstract class Trading implements Disposable {
         private Num exitRemaining = Num.ZERO;
 
         /** The total size of exit order. */
-        private Num exitSize = Num.ZERO;
+        private Num exitTotalSize = Num.ZERO;
 
         /** The total cost of exit order. */
         private Num exitCost = Num.ZERO;
@@ -276,15 +273,13 @@ public abstract class Trading implements Disposable {
             // request order
             market.request(order).to(o -> {
                 o.execute.to(exe -> {
-                    remaining = remaining.plus(exe.size);
-                    entrySize = entrySize.plus(exe.size);
+                    positionSize = positionSize.plus(exe.size);
+                    entryTotalSize = entryTotalSize.plus(exe.size);
                     entryRemaining = entryRemaining.minus(exe.size);
                     entryCost = entryCost.plus(exe.price.multiply(exe.size));
 
                     if (o.isCompleted()) {
-                        for (Observer<Boolean> observer : completeEntries) {
-                            observer.accept(true);
-                        }
+                        completeEntries.omit(true);
                     }
                 });
                 if (initializer != null) initializer.accept(this);
@@ -305,7 +300,7 @@ public abstract class Trading implements Disposable {
          * @return
          */
         public final Num remaining() {
-            return remaining;
+            return positionSize;
         }
 
         /**
@@ -317,11 +312,11 @@ public abstract class Trading implements Disposable {
             Num up, down;
 
             if (side().isBuy()) {
-                up = exitCost.plus(remaining.multiply(market.getLatestPrice()));
+                up = exitCost.plus(positionSize.multiply(market.getLatestPrice()));
                 down = entryCost;
             } else {
                 up = entryCost;
-                down = exitCost.plus(remaining.multiply(market.getLatestPrice()));
+                down = exitCost.plus(positionSize.multiply(market.getLatestPrice()));
             }
             return up.minus(down);
         }
@@ -332,7 +327,7 @@ public abstract class Trading implements Disposable {
          * @return
          */
         public final Num entrySize() {
-            return entrySize;
+            return entryTotalSize;
         }
 
         /**
@@ -341,7 +336,7 @@ public abstract class Trading implements Disposable {
          * @return
          */
         public final Num entryPrice() {
-            return entrySize.isZero() ? Num.ZERO : entryCost.divide(entrySize);
+            return entryTotalSize.isZero() ? Num.ZERO : entryCost.divide(entryTotalSize);
         }
 
         /**
@@ -350,7 +345,7 @@ public abstract class Trading implements Disposable {
          * @return
          */
         public final Num exitSize() {
-            return exitSize;
+            return exitTotalSize;
         }
 
         /**
@@ -359,7 +354,7 @@ public abstract class Trading implements Disposable {
          * @return
          */
         public final Num exitPrice() {
-            return exitSize.isZero() ? Num.ZERO : exitCost.divide(exitSize);
+            return exitTotalSize.isZero() ? Num.ZERO : exitCost.divide(exitTotalSize);
         }
 
         /**
@@ -453,14 +448,14 @@ public abstract class Trading implements Disposable {
          * Cehck whether this position was activated but not completed.
          */
         public final boolean isActive() {
-            return remaining.isZero() == false;
+            return positionSize.isZero() == false;
         }
 
         /**
          * Cehck whether this position was completed.
          */
         public final boolean isCompleted() {
-            return remaining.isZero() && entryRemaining.isZero();
+            return positionSize.isZero() && entryRemaining.isZero();
         }
 
         /**
@@ -546,22 +541,17 @@ public abstract class Trading implements Disposable {
                 exit.add(o);
 
                 o.execute.to(exe -> {
-                    remaining = remaining.minus(exe.size);
-                    exitSize = exitSize.plus(exe.size);
+                    positionSize = positionSize.minus(exe.size);
+                    exitTotalSize = exitTotalSize.plus(exe.size);
                     exitRemaining = exitRemaining.minus(exe.size);
                     exitCost = exitCost.plus(exe.price.multiply(exe.size));
 
                     if (o.isCompleted()) {
-                        for (Observer<Boolean> observer : completeExits) {
-                            observer.accept(true);
-                        }
+                        completeExits.omit(true);
 
-                        if (remaining.isZero()) {
+                        if (positionSize.isZero()) {
                             actives.remove(this);
-
-                            for (Observer<Boolean> observer : closePositions) {
-                                observer.accept(true);
-                            }
+                            closePositions.omit(true);
                         }
                     }
                 });
