@@ -12,7 +12,7 @@ package cointoss;
 /**
  * @version 2017/09/09 10:01:55
  */
-class TestableMarketTrading extends Trading {
+class TestableMarketTrading extends Trader {
 
     /**
      * {@inheritDoc}

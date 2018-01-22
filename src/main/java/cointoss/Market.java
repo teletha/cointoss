@@ -13,7 +13,6 @@ import static cointoss.Order.State.*;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicReference;
@@ -168,11 +167,11 @@ public class Market implements Disposable {
     /** 対象通貨初期量 */
     private Num targetInit;
 
-    /** The current trading. */
-    final List<Trading> tradings = new ArrayList<>();
+    /** The list of traders. */
+    final List<Trader> traders = new CopyOnWriteArrayList<>();
 
     /**
-     * Market without {@link Trading}.
+     * Market without {@link Trader}.
      * 
      * @param backend A market backend.
      * @param log A market execution log.
@@ -182,13 +181,13 @@ public class Market implements Disposable {
     }
 
     /**
-     * Market with {@link Trading}.
+     * Market with {@link Trader}.
      * 
      * @param backend A market backend.
      * @param log A market execution log.
      * @param trading A trading strategy.
      */
-    public Market(MarketBackend backend, Signal<Execution> log, Trading trading) {
+    public Market(MarketBackend backend, Signal<Execution> log, Trader trading) {
         if (backend == null) {
             throw new Error("Market is not found.");
         }
@@ -235,12 +234,12 @@ public class Market implements Disposable {
      * 
      * @param trading
      */
-    public void add(Trading trading) {
+    public void add(Trader trading) {
         if (trading != null) {
             trading.market = this;
             trading.initialize();
 
-            tradings.add(trading);
+            traders.add(trading);
         }
     }
 
@@ -249,9 +248,9 @@ public class Market implements Disposable {
      * 
      * @param trading
      */
-    public void remove(Trading trading) {
+    public void remove(Trader trading) {
         if (trading != null) {
-            tradings.remove(trading);
+            traders.remove(trading);
             trading.dispose();
             trading.market = null;
         }

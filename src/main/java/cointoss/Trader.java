@@ -30,7 +30,7 @@ import kiss.Signal;
 /**
  * @version 2017/09/05 19:39:34
  */
-public abstract class Trading implements Disposable {
+public abstract class Trader implements Disposable {
 
     /** The market. */
     protected Market market;

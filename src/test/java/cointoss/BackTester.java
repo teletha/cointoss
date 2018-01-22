@@ -32,7 +32,7 @@ public class BackTester {
     private Num target = Num.ZERO;
 
     /** テスト戦略 */
-    private Supplier<Trading> strategy;
+    private Supplier<Trader> strategy;
 
     /** The execution log. */
     private Supplier<Signal<Execution>> log;
@@ -52,7 +52,7 @@ public class BackTester {
      * @param strategy
      * @return
      */
-    public BackTester strategy(Supplier<Trading> strategy) {
+    public BackTester strategy(Supplier<Trader> strategy) {
         if (strategy != null) {
             this.strategy = strategy;
         }

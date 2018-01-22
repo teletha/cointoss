@@ -78,7 +78,7 @@ public class BackTest {
     終了 06/01 00:00    582,301円  B1.7011(265,000円)   総計 1,033,099円 (損益 33,099円)
     </pre>
      */
-    private static class BuyAndHold extends Trading {
+    private static class BuyAndHold extends Trader {
 
         public String decreaseRatio = "0.95";
 
@@ -93,7 +93,7 @@ public class BackTest {
         }
     }
 
-    private static class SellAndHold extends Trading {
+    private static class SellAndHold extends Trader {
 
         private Num budget = Num.ZERO;
 
@@ -122,7 +122,7 @@ public class BackTest {
     /**
      * @version 2017/09/05 20:19:04
      */
-    private static class BreakoutTrading extends Trading {
+    private static class BreakoutTrading extends Trader {
 
         private int update;
 

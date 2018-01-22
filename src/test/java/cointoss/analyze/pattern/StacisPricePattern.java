@@ -17,7 +17,7 @@ import java.util.List;
 
 import cointoss.BackTester;
 import cointoss.Side;
-import cointoss.Trading;
+import cointoss.Trader;
 import cointoss.chart.Tick;
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.util.Num;
@@ -25,7 +25,7 @@ import cointoss.util.Num;
 /**
  * @version 2017/09/20 2:36:26
  */
-public class StacisPricePattern extends Trading {
+public class StacisPricePattern extends Trader {
 
     private List<Statistics> statictics = new LinkedList();
 

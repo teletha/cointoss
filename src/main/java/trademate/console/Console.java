@@ -22,7 +22,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import cointoss.ExecutionFlow;
-import cointoss.Trading;
+import cointoss.Trader;
 import cointoss.util.Num;
 import trademate.SettingView;
 import trademate.TradingView;
@@ -63,7 +63,7 @@ public class Console extends View {
         console.values(messages);
 
         Viewtify.inWorker(() -> {
-            view.market().add(new Trader());
+            view.market().add(new Dumper());
         });
     }
 
@@ -94,7 +94,7 @@ public class Console extends View {
     /**
      * @version 2017/11/19 6:52:53
      */
-    private class Trader extends Trading {
+    private class Dumper extends Trader {
 
         private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
 

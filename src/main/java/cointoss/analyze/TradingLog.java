@@ -17,8 +17,8 @@ import java.util.List;
 
 import cointoss.Execution;
 import cointoss.Market;
-import cointoss.Trading;
-import cointoss.Trading.Entry;
+import cointoss.Trader;
+import cointoss.Trader.Entry;
 import cointoss.util.Num;
 
 /**
@@ -92,7 +92,7 @@ public class TradingLog {
     /**
      * Analyze trading.
      */
-    public TradingLog(Market market, List<Trading> tradings) {
+    public TradingLog(Market market, List<Trader> tradings) {
         Execution init = market.getExecutionInit();
         Execution last = market.getExecutionLatest();
         this.start = init.exec_date;
@@ -104,7 +104,7 @@ public class TradingLog {
         this.finishBaseCurrency = market.getBase();
         this.finishTargetCurrency = market.getTarget();
 
-        for (Trading trading : tradings) {
+        for (Trader trading : tradings) {
             for (Entry entry : trading.entries) {
                 // skip not activated entry
                 if (entry.isInitial()) {

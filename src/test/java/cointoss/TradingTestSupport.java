@@ -18,7 +18,7 @@ import kiss.I;
 /**
  * @version 2017/09/11 13:34:54
  */
-public abstract class TradingTestSupport extends Trading {
+public abstract class TradingTestSupport extends Trader {
 
     protected TestableMarket market;
 
@@ -29,7 +29,7 @@ public abstract class TradingTestSupport extends Trading {
      */
     public TradingTestSupport() {
         super.market = market = new TestableMarket();
-        super.market.tradings.add(this);
+        super.market.traders.add(this);
     }
 
     /**

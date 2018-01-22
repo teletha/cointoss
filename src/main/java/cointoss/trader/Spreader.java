@@ -7,19 +7,19 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package trademate.bot;
+package cointoss.trader;
 
 import cointoss.MarketBackend.Health;
 import cointoss.Order;
 import cointoss.Side;
-import cointoss.Trading;
+import cointoss.Trader;
 import cointoss.order.OrderBookList;
 import cointoss.util.Num;
 
 /**
  * @version 2018/01/20 22:37:53
  */
-public class Spreader extends Trading {
+public class Spreader extends Trader {
 
     private boolean whileTrading = false;
 

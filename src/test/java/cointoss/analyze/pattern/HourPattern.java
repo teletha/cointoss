@@ -14,14 +14,14 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import cointoss.BackTester;
-import cointoss.Trading;
+import cointoss.Trader;
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.util.Num;
 
 /**
  * @version 2017/09/20 2:36:26
  */
-public class HourPattern extends Trading {
+public class HourPattern extends Trader {
 
     private Map<LocalTime, Statistics> statistics = new TreeMap();
 
