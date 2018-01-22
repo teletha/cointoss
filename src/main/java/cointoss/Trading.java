@@ -471,7 +471,7 @@ public abstract class Trading implements Disposable {
          * @param size A exit size.
          * @param price A exit price.
          */
-        protected final void exitLimit(Num size, Num price, Consumer<Order> process) {
+        public final void exitLimit(Num size, Num price, Consumer<Order> process) {
             // check size
             if (size == null || size.isLessThanOrEqual(Num.ZERO)) {
                 return;
@@ -489,7 +489,7 @@ public abstract class Trading implements Disposable {
          * 
          * @param size A exit size.
          */
-        protected final void exitMarket() {
+        public final void exitMarket() {
             exitMarket((Consumer<Order>) null);
         }
 
@@ -498,7 +498,7 @@ public abstract class Trading implements Disposable {
          * 
          * @param size A exit size.
          */
-        protected final void exitMarket(Consumer<Order> process) {
+        public final void exitMarket(Consumer<Order> process) {
             // check size
             exitMarket(remaining(), process);
 
@@ -512,7 +512,7 @@ public abstract class Trading implements Disposable {
          * 
          * @param size A exit size.
          */
-        protected final void exitMarket(Num size) {
+        public final void exitMarket(Num size) {
             exitMarket(size, null);
         }
 
@@ -521,7 +521,7 @@ public abstract class Trading implements Disposable {
          * 
          * @param size A exit size.
          */
-        protected final void exitMarket(Num size, Consumer<Order> process) {
+        public final void exitMarket(Num size, Consumer<Order> process) {
             // check size
             if (size == null || size.isLessThanOrEqual(Num.ZERO)) {
                 return;

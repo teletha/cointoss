@@ -43,10 +43,6 @@ public class Spreader extends Trading {
                     OrderBookList entryBook = market.orderBook.bookFor(entrySide);
                     OrderBookList exitBook = market.orderBook.bookFor(exitSide);
 
-                    entryLimit(entrySide, entrySize, entryBook.computeBestPrice(Num.ZERO, Num.TWO), entry -> {
-                        // entry.
-                    });
-
                     market.request(Order.limit(entrySide, entrySize, entryBook.computeBestPrice(Num.ZERO, Num.TWO))).to(entry -> {
                         entry.execute.to(entryExe -> {
                             market.request(Order.limit(exitSide, entryExe.size, exitBook.computeBestPrice(Num.ZERO, Num.TWO))).to(exit -> {
