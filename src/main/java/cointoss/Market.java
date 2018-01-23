@@ -15,6 +15,7 @@ import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import cointoss.MarketBackend.Health;
@@ -31,7 +32,7 @@ import kiss.Signal;
 import kiss.Variable;
 
 /**
- * @version 2017/09/11 18:26:15
+ * @version 2018/01/23 14:36:32
  */
 public class Market implements Disposable {
 
@@ -149,6 +150,9 @@ public class Market implements Disposable {
     /** The market health. */
     public final Variable<Health> health = Variable.empty();
 
+    /** The latest price. */
+    public final Variable<Num> latestPrice = Variable.of(Num.ZERO);
+
     /** The initial execution. */
     private Execution init;
 
@@ -217,6 +221,11 @@ public class Market implements Disposable {
         }));
         backend.add(backend.getHealth().to(health -> {
             this.health.set(health);
+        }));
+        backend.add(timeline.throttle(2, TimeUnit.SECONDS).to(e -> {
+            // fix error board
+            orderBook.shorts.fix(e.price);
+            orderBook.longs.fix(e.price);
         }));
     }
 
@@ -411,13 +420,6 @@ public class Market implements Disposable {
     }
 
     /**
-     * @return
-     */
-    public Num getLatestPrice() {
-        return latest.price;
-    }
-
-    /**
      * <p>
      * Check market state.
      * </p>
@@ -446,7 +448,7 @@ public class Market implements Disposable {
      * @return
      */
     public Signal<Execution> signalByPrice(Num price) {
-        if (getLatestPrice().isLessThan(price)) {
+        if (latest.price.isLessThan(price)) {
             return timeline.take(e -> e.price.isGreaterThanOrEqual(price)).take(1);
         } else {
             return timeline.take(e -> e.price.isLessThanOrEqual(price)).take(1);
@@ -480,6 +482,7 @@ public class Market implements Disposable {
             init = exe;
         }
         latest = exe;
+        latestPrice.set(exe.price);
 
         flow.record(exe);
         flow75.record(exe);

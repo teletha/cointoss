@@ -9,8 +9,6 @@
  */
 package trademate.order;
 
-import static java.util.concurrent.TimeUnit.*;
-
 import javafx.scene.control.ListCell;
 import javafx.scene.control.TextField;
 
@@ -75,18 +73,8 @@ public class OrderBookView extends View {
             shortList.values(book.shorts.selectByRatio(ratio));
         });
 
-        // read data from backend service
+        view.market().latestPrice.observe().on(Viewtify.UIThread).to(price -> priceLatest.text(price));
         view.market().orderBook.spread.observe().on(Viewtify.UIThread).to(price -> priceSpread.text(price));
-
-        Viewtify.inWorker(() -> {
-            return view.market().timeline.on(Viewtify.UIThread).effect(e -> {
-                priceLatest.text(e.price);
-            }).throttle(2, SECONDS).to(e -> {
-                // fix error board
-                book.shorts.fix(e.price);
-                book.longs.fix(e.price);
-            });
-        });
     }
 
     /**

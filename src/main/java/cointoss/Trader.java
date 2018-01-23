@@ -312,11 +312,11 @@ public abstract class Trader implements Disposable {
             Num up, down;
 
             if (side().isBuy()) {
-                up = exitCost.plus(positionSize.multiply(market.getLatestPrice()));
+                up = exitCost.plus(positionSize.multiply(market.latestPrice.v));
                 down = entryCost;
             } else {
                 up = entryCost;
-                down = exitCost.plus(positionSize.multiply(market.getLatestPrice()));
+                down = exitCost.plus(positionSize.multiply(market.latestPrice.v));
             }
             return up.minus(down);
         }
