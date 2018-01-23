@@ -325,17 +325,6 @@ public class Market implements Disposable {
 
     /**
      * <p>
-     * Check remaining orders.
-     * </p>
-     * 
-     * @return
-     */
-    public final Signal<Order> getOrdersBy(State state) {
-        return backend.getOrders().take(o -> o.state.is(state));
-    }
-
-    /**
-     * <p>
      * Check orders.
      * </p>
      * 
