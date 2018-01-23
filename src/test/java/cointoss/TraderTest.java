@@ -20,7 +20,7 @@ import kiss.Variable;
 /**
  * @version 2017/09/11 13:24:46
  */
-public class TradingTest extends TradingTestSupport {
+public class TraderTest extends TraderTestSupport {
 
     @Test
     public void entryLimit() throws Exception {

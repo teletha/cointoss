@@ -18,6 +18,7 @@ import org.magicwerk.brownies.collections.GapList;
 
 import cointoss.Side;
 import cointoss.util.Num;
+import kiss.Variable;
 
 /**
  * @version 2017/12/01 1:12:33
@@ -41,6 +42,9 @@ public class OrderBookList {
 
     /** The base list. */
     public final ObservableList<OrderUnit> x10000;
+
+    /** The best order. */
+    public final Variable<OrderUnit> best = Variable.empty();
 
     private Grouped[] group = new Grouped[4];
 
@@ -105,15 +109,6 @@ public class OrderBookList {
     }
 
     /**
-     * Retrieve best unit.
-     * 
-     * @return
-     */
-    public OrderUnit best() {
-        return side.isBuy() ? max() : min();
-    }
-
-    /**
      * Select list by ratio.
      * 
      * @param ratio
@@ -139,7 +134,7 @@ public class OrderBookList {
     }
 
     public Num computeBestPrice(Num threshold, Num diff) {
-        return computeBestPrice(best().price, threshold, diff);
+        return computeBestPrice(best.v.price, threshold, diff);
     }
 
     /**
@@ -235,8 +230,10 @@ public class OrderBookList {
     public void update(OrderUnit unit) {
         if (side == Side.BUY) {
             head(unit);
+            best.set(x1.get(0));
         } else {
             tail(unit);
+            best.set(x1.get(x1.size() - 1));
         }
     }
 

@@ -13,12 +13,12 @@ import static cointoss.Side.*;
 
 import org.junit.Test;
 
-import cointoss.TradingTestSupport;
+import cointoss.TraderTestSupport;
 
 /**
  * @version 2017/09/18 9:19:37
  */
-public class TradingLogTest extends TradingTestSupport {
+public class TradingLogTest extends TraderTestSupport {
 
     @Test
     public void complete() throws Exception {

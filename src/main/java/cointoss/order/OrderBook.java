@@ -11,9 +11,10 @@ package cointoss.order;
 
 import cointoss.Side;
 import cointoss.util.Num;
+import kiss.Variable;
 
 /**
- * @version 2017/12/01 1:10:57
+ * @version 2018/01/23 14:12:16
  */
 public class OrderBook {
 
@@ -22,6 +23,16 @@ public class OrderBook {
 
     /** BID */
     public final OrderBookList longs = new OrderBookList(Side.BUY);
+
+    /** The current spread. */
+    public final Variable<Num> spread = Variable.of(Num.ZERO);
+
+    /**
+     * 
+     */
+    public OrderBook() {
+        shorts.best.observe().combineLatest(longs.best.observe()).to(v -> spread.set(v.ⅰ.price.minus(v.ⅱ.price)));
+    }
 
     /**
      * Retrieve the {@link OrderBookList} for {@link Side}.
@@ -39,7 +50,7 @@ public class OrderBook {
      * @return
      */
     public Num spread() {
-        return shorts.best().price.minus(longs.best().price);
+        return shorts.best.v.price.minus(longs.best.v.price);
     }
 
     /**

@@ -11,7 +11,6 @@ package trademate.order;
 
 import static java.util.concurrent.TimeUnit.*;
 
-import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.TextField;
 
@@ -24,11 +23,12 @@ import trademate.TradingView;
 import viewtify.UI;
 import viewtify.View;
 import viewtify.Viewtify;
+import viewtify.ui.UILabel;
 import viewtify.ui.UIListView;
 import viewtify.ui.UISpinner;
 
 /**
- * @version 2017/12/13 11:19:28
+ * @version 2018/01/23 14:13:06
  */
 public class OrderBookView extends View {
 
@@ -42,10 +42,10 @@ public class OrderBookView extends View {
     private @UI UISpinner<OrderBookList.Ratio> priceRange;
 
     /** UI for interval configuration. */
-    private @UI Label priceLatest;
+    private @UI UILabel priceLatest;
 
     /** UI for interval configuration. */
-    private @UI Label priceSpread;
+    private @UI UILabel priceSpread;
 
     /** UI for order. */
     private @UI TextField orderPrice;
@@ -76,20 +76,11 @@ public class OrderBookView extends View {
         });
 
         // read data from backend service
-        Viewtify.inWorker(() -> {
-            return view.market().orderTimeline.on(Viewtify.UIThread).to(board -> {
-                OrderUnit bestShort = book.shorts.min();
-                OrderUnit bestLong = book.longs.max();
-
-                if (bestShort != null && bestLong != null) {
-                    priceSpread.setText(bestShort.price.minus(bestLong.price).toString());
-                }
-            });
-        });
+        view.market().orderBook.spread.observe().on(Viewtify.UIThread).to(price -> priceSpread.text(price));
 
         Viewtify.inWorker(() -> {
             return view.market().timeline.on(Viewtify.UIThread).effect(e -> {
-                priceLatest.setText(e.price.toString());
+                priceLatest.text(e.price);
             }).throttle(2, SECONDS).to(e -> {
                 // fix error board
                 book.shorts.fix(e.price);
