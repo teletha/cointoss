@@ -455,18 +455,6 @@ public class Market implements Disposable {
         }
     }
 
-    // ===========================================================
-    // Position Management
-    // ===========================================================
-    /** The side */
-    public Side position;
-
-    /** The remaining position price. */
-    public Num price = Num.ZERO;
-
-    /** The remaining position size. */
-    public Num remaining = Num.ZERO;
-
     /** The related order identifiers. */
     private final CopyOnWriteArrayList<Order> orders = new CopyOnWriteArrayList();
 
@@ -548,37 +536,5 @@ public class Market implements Disposable {
         // pairing order and execution
         exe.associated = order;
         order.executions.add(exe);
-
-        // for trade state
-        if (position == null) {
-            // first
-            position = order.side();
-            remaining = executed;
-            price = exe.price;
-        } else if (position.isSame(order.side())) {
-            // same position
-            price = price.multiply(remaining).plus(exe.price.multiply(executed)).divide(remaining.plus(executed));
-            remaining = remaining.plus(executed);
-        } else {
-            // diff position
-            remaining = remaining.minus(executed);
-            if (remaining.isGreaterThan(0)) {
-
-            } else if (remaining.isLessThan(0)) {
-                position = order.side();
-                remaining = remaining.abs();
-                price = exe.price;
-            } else {
-                initializePosition();
-            }
-        }
-    }
-
-    /**
-     * Initialize position.
-     */
-    private void initializePosition() {
-        position = null;
-        price = remaining = Num.ZERO;
     }
 }
