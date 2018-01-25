@@ -23,7 +23,6 @@ import cointoss.Order.State;
 import cointoss.chart.Chart;
 import cointoss.order.OrderBook;
 import cointoss.order.OrderBookChange;
-import cointoss.order.OrderUnit;
 import cointoss.util.Listeners;
 import cointoss.util.Num;
 import kiss.Disposable;
@@ -211,13 +210,8 @@ public class Market implements Disposable {
 
         orderTimeline = backend.getOrderBook();
         backend.add(orderTimeline.to(board -> {
-            for (OrderUnit unit : board.asks) {
-                orderBook.shorts.update(unit);
-            }
-
-            for (OrderUnit unit : board.bids) {
-                orderBook.longs.update(unit);
-            }
+            orderBook.shorts.update(board.asks);
+            orderBook.longs.update(board.bids);
         }));
         backend.add(backend.getHealth().to(health -> {
             this.health.set(health);

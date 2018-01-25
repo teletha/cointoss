@@ -12,23 +12,41 @@ package cointoss.order;
 import cointoss.util.Num;
 
 /**
+ * Immutable.
+ * 
  * @version 2017/11/13 22:53:25
  */
 public class OrderUnit {
 
+    /** IMMUTABLE */
     public Num price;
 
+    /** IMMUTABLE */
     public Num size;
 
-    public Num yourSize = Num.ZERO;
+    /** IMMUTABLE */
+    public Num total;
+
+    private OrderUnit() {
+
+    }
 
     /**
      * @param price
      * @param size
      */
     public OrderUnit(Num price, Num size) {
+        this(price, size, Num.ZERO);
+    }
+
+    /**
+     * @param price
+     * @param size
+     */
+    private OrderUnit(Num price, Num size, Num total) {
         this.price = price;
         this.size = size;
+        this.total = total;
     }
 
     public Num price() {
@@ -50,13 +68,11 @@ public class OrderUnit {
     }
 
     /**
-     * Create price scaled unit.
-     * 
-     * @param scale
+     * @param total2
      * @return
      */
-    public OrderUnit scale(int scale) {
-        return new OrderUnit(price.scaleDown(scale), size);
+    public OrderUnit total(Num total) {
+        return new OrderUnit(price, size, total);
     }
 
     /**

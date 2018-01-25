@@ -9,7 +9,7 @@
  */
 package cointoss.order;
 
-import java.util.Iterator;
+import java.util.List;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -189,13 +189,11 @@ public class OrderBookList {
      */
     public void fix(Num hint) {
         if (side == Side.BUY) {
-            Iterator<OrderUnit> iterator = x1.iterator();
-
-            while (iterator.hasNext()) {
-                OrderUnit unit = iterator.next();
+            for (int i = 0; i < x1.size();) {
+                OrderUnit unit = x1.get(i);
 
                 if (unit != null && unit.price.isGreaterThan(hint)) {
-                    iterator.remove();
+                    x1.remove(i);
 
                     for (Grouped grouped : group) {
                         grouped.update(unit.price, unit.size.negate());
@@ -219,21 +217,57 @@ public class OrderBookList {
                 }
             }
         }
+        calculateTotal();
     }
 
     /**
      * Update orders.
      * 
-     * @param price A order price.
-     * @param size A order size.
+     * @param asks
      */
-    public void update(OrderUnit unit) {
+    public void update(List<OrderUnit> units) {
         if (side == Side.BUY) {
-            head(unit);
-            best.set(x1.get(0));
+            for (OrderUnit unit : units) {
+                head(unit);
+            }
+
+            if (x1.isEmpty() == false) {
+                best.set(x1.get(0));
+            }
         } else {
-            tail(unit);
-            best.set(x1.get(x1.size() - 1));
+            for (OrderUnit unit : units) {
+                tail(unit);
+            }
+
+            if (x1.isEmpty() == false) {
+                best.set(x1.get(x1.size() - 1));
+            }
+        }
+        calculateTotal();
+    }
+
+    private void calculateTotal() {
+        calculateTotal(x1);
+        calculateTotal(x10);
+        calculateTotal(x100);
+        calculateTotal(x1000);
+    }
+
+    private void calculateTotal(ObservableList<OrderUnit> units) {
+        Num total = Num.ZERO;
+
+        if (side == Side.BUY) {
+            for (int i = 0; i < units.size(); i++) {
+                OrderUnit unit = units.get(i);
+                total = total.plus(unit.size);
+                units.set(i, unit.total(total));
+            }
+        } else {
+            for (int i = units.size() - 1; 0 <= i; i--) {
+                OrderUnit unit = units.get(i);
+                total = total.plus(unit.size);
+                units.set(i, unit.total(total));
+            }
         }
     }
 

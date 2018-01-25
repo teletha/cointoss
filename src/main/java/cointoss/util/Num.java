@@ -473,6 +473,9 @@ public class Num implements Comparable<Num> {
         if (this == NaN || other == NaN || other == null) {
             return 0;
         }
+        if (delegate == null) {
+            System.out.println("OUT " + (this == NaN));
+        }
         return delegate.compareTo(other.delegate);
     }
 
