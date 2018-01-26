@@ -247,10 +247,10 @@ public class OrderBookList {
     }
 
     private void calculateTotal() {
-        calculateTotal(x1);
-        calculateTotal(x10);
-        calculateTotal(x100);
-        calculateTotal(x1000);
+        // calculateTotal(x1);
+        // calculateTotal(x10);
+        // calculateTotal(x100);
+        // calculateTotal(x1000);
     }
 
     private void calculateTotal(ObservableList<OrderUnit> units) {
