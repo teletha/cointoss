@@ -12,13 +12,18 @@ package cointoss.market.bitflyer;
 import static java.util.concurrent.TimeUnit.*;
 
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
 import org.apache.commons.codec.digest.HmacUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -58,6 +63,8 @@ import kiss.Signal;
  * @version 2017/12/02 11:49:35
  */
 class BitFlyerBackend implements MarketBackend {
+
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss");
 
     /** The server checking thread. */
     private static final ScheduledExecutorService checker = Executors.newSingleThreadScheduledExecutor(run -> {
@@ -136,8 +143,9 @@ class BitFlyerBackend implements MarketBackend {
         // "minute_to_expire": 10000,
         // "time_in_force": "GTC"
         // }
-        ChildOrderRequest request = new ChildOrderRequest();
-        request.child_order_type = order.isLimit() ? "LIMIT" : "MARKET";
+        ChildOrderRequestWebAPI request = new ChildOrderRequestWebAPI();
+        request.order_ref_id = "JRF" + LocalDateTime.now().format(formatter) + "-" + RandomStringUtils.randomNumeric(6);
+        request.ord_type = order.isLimit() ? "LIMIT" : "MARKET";
         request.minute_to_expire = 60 * 24;
         request.price = order.price.toInt();
         request.product_code = type.name();
@@ -156,9 +164,49 @@ class BitFlyerBackend implements MarketBackend {
             request.time_in_force = "FOK";
             break;
         }
-
-        return call("POST", "/v1/me/sendchildorder", request, "child_order_acceptance_id", String.class);
+        // RESPONSE
+        // {"status":0,"error_message":null,"data":{"order_ref_id":"JRF20180128-234437-373993"}}
+        return call("POST", "https://lightning.bitflyer.jp/api/trade/sendorder", request, "data/order_ref_id", String.class);
     }
+
+    // /**
+    // * {@inheritDoc}
+    // */
+    // @Override
+    // public Signal<String> request(Order order) {
+    // // {
+    // // "product_code": "BTC_JPY",
+    // // "child_order_type": "LIMIT",
+    // // "side": "BUY",
+    // // "price": 30000,
+    // // "size": 0.1,
+    // // "minute_to_expire": 10000,
+    // // "time_in_force": "GTC"
+    // // }
+    // ChildOrderRequest request = new ChildOrderRequest();
+    // request.child_order_type = order.isLimit() ? "LIMIT" : "MARKET";
+    // request.minute_to_expire = 60 * 24;
+    // request.price = order.price.toInt();
+    // request.product_code = type.name();
+    // request.side = order.side().name();
+    // request.size = order.size.toDouble();
+    // switch (order.quantity()) {
+    // case GoodTillCanceled:
+    // request.time_in_force = "GTC";
+    // break;
+    //
+    // case ImmediateOrCancel:
+    // request.time_in_force = "IOC";
+    // break;
+    //
+    // case FillOrKill:
+    // request.time_in_force = "FOK";
+    // break;
+    // }
+    //
+    // return call("POST", "/v1/me/sendchildorder", request, "child_order_acceptance_id",
+    // String.class);
+    // }
 
     /**
      * {@inheritDoc}
@@ -376,7 +424,7 @@ class BitFlyerBackend implements MarketBackend {
                 request.addHeader("ACCESS-TIMESTAMP", timestamp);
                 request.addHeader("ACCESS-SIGN", sign);
             } else if (method.equals("POST")) {
-                request = new HttpPost(api + path);
+                request = new HttpPost(path.startsWith("https://") ? path : api + path);
                 request.addHeader("ACCESS-KEY", accessKey);
                 request.addHeader("ACCESS-TIMESTAMP", timestamp);
                 request.addHeader("ACCESS-SIGN", sign);
@@ -437,6 +485,44 @@ class BitFlyerBackend implements MarketBackend {
         public int minute_to_expire;
 
         public String time_in_force;
+    }
+
+    /**
+     * @version 2018/01/29 1:23:05
+     */
+    private static class ChildOrderRequestWebAPI {
+
+        public String product_code;
+
+        public String order_ref_id;
+
+        public String ord_type;
+
+        public String side;
+
+        public int price;
+
+        public double size;
+
+        public int minute_to_expire;
+
+        public String time_in_force;
+
+        public String lang;
+
+        public String account_id;
+    }
+
+    /**
+     * @version 2018/01/29 1:28:03
+     */
+    private static class ChildOrderResponseWebAPI {
+
+        public int status;
+
+        public String error_message;
+
+        public Map<String, String> data = new HashMap();
     }
 
     /**

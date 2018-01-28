@@ -67,9 +67,7 @@ public class OrderBookView extends View {
         hideSize.values(0, Num.range(0, 9)).observe(e -> longList.ui.refresh());
 
         longList.cell(e -> new CellView()).filter(hideSize, (unit, size) -> unit.size.isGreaterThanOrEqual(size));
-        shortList.cell(e -> new CellView())
-                .filter(hideSize, (unit, size) -> unit.size.isGreaterThanOrEqual(size))
-                .scrollTo(book.shorts.selectBy(Range.x1).size() - 1);
+        shortList.cell(e -> new CellView()).filter(hideSize, (unit, size) -> unit.size.isGreaterThanOrEqual(size)).scrollToBottom();
 
         priceRange.values(0, Range.class).observeNow(range -> {
             longList.values(book.longs.selectBy(range));
