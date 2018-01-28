@@ -11,13 +11,12 @@ package cointoss.order;
 
 import java.util.List;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-
 import org.magicwerk.brownies.collections.GapList;
 
 import cointoss.Side;
+import cointoss.util.Listeners;
 import cointoss.util.Num;
+import kiss.Signal;
 import kiss.Variable;
 
 /**
@@ -25,26 +24,32 @@ import kiss.Variable;
  */
 public class OrderBookList {
 
+    /** The best order. */
+    public final Variable<OrderUnit> best = Variable.empty();
+
+    /** The modified event listeners. */
+    private final Listeners<Boolean> modify = new Listeners();
+
+    /** The modified event stream. */
+    public final Signal<Boolean> modified = new Signal(modify);
+
     /** The search direction. */
     private final Side side;
 
     /** The base list. */
-    public final ObservableList<OrderUnit> x1;
+    final GapList<OrderUnit> x1;
 
     /** The base list. */
-    public final ObservableList<OrderUnit> x10;
+    final GapList<OrderUnit> x10;
 
     /** The base list. */
-    public final ObservableList<OrderUnit> x100;
+    final GapList<OrderUnit> x100;
 
     /** The base list. */
-    public final ObservableList<OrderUnit> x1000;
+    final GapList<OrderUnit> x1000;
 
     /** The base list. */
-    public final ObservableList<OrderUnit> x10000;
-
-    /** The best order. */
-    public final Variable<OrderUnit> best = Variable.empty();
+    final GapList<OrderUnit> x10000;
 
     private Grouped[] group = new Grouped[4];
 
@@ -53,28 +58,11 @@ public class OrderBookList {
      */
     public OrderBookList(Side side) {
         this.side = side;
-        this.x1 = FXCollections.observableList(GapList.create());
-        this.x10 = FXCollections.observableList(GapList.create());
-        this.x100 = FXCollections.observableList(GapList.create());
-        this.x1000 = FXCollections.observableList(GapList.create());
-        this.x10000 = FXCollections.observableList(GapList.create());
-
-        group[0] = new Grouped(side, -1, x10);
-        group[1] = new Grouped(side, -2, x100);
-        group[2] = new Grouped(side, -3, x1000);
-        group[3] = new Grouped(side, -4, x10000);
-    }
-
-    /**
-     * For test.
-     */
-    OrderBookList(Side side, boolean empty) {
-        this.side = side;
-        this.x1 = FXCollections.observableArrayList();
-        this.x10 = FXCollections.observableArrayList();
-        this.x100 = FXCollections.observableArrayList();
-        this.x1000 = FXCollections.observableArrayList();
-        this.x10000 = FXCollections.observableArrayList();
+        this.x1 = GapList.create();
+        this.x10 = GapList.create();
+        this.x100 = GapList.create();
+        this.x1000 = GapList.create();
+        this.x10000 = GapList.create();
 
         group[0] = new Grouped(side, -1, x10);
         group[1] = new Grouped(side, -2, x100);
@@ -114,7 +102,7 @@ public class OrderBookList {
      * @param ratio
      * @return
      */
-    public ObservableList<OrderUnit> selectByRatio(Ratio ratio) {
+    public GapList<OrderUnit> selectBy(Range ratio) {
         switch (ratio) {
         case x1:
             return x1;
@@ -152,9 +140,9 @@ public class OrderBookList {
      * @return
      */
     public Num computeBestPrice(Num start, Num threshold, Num diff) {
-        if (side == Side.BUY) {
-            Num total = Num.ZERO;
+        Num total = Num.ZERO;
 
+        if (side == Side.BUY) {
             for (OrderUnit unit : x1) {
                 if (unit.price.isLessThan(start)) {
                     total = total.plus(unit.size);
@@ -165,8 +153,6 @@ public class OrderBookList {
                 }
             }
         } else {
-            Num total = Num.ZERO;
-
             for (int i = x1.size() - 1; 0 <= i; i--) {
                 OrderUnit unit = x1.get(i);
 
@@ -217,6 +203,8 @@ public class OrderBookList {
                 }
             }
         }
+
+        modify.omit(true);
         calculateTotal();
     }
 
@@ -243,6 +231,8 @@ public class OrderBookList {
                 best.set(x1.get(x1.size() - 1));
             }
         }
+
+        modify.omit(true);
         calculateTotal();
     }
 
@@ -253,23 +243,23 @@ public class OrderBookList {
         // calculateTotal(x1000);
     }
 
-    private void calculateTotal(ObservableList<OrderUnit> units) {
-        Num total = Num.ZERO;
-
-        if (side == Side.BUY) {
-            for (int i = 0; i < units.size(); i++) {
-                OrderUnit unit = units.get(i);
-                total = total.plus(unit.size);
-                units.set(i, unit.total(total));
-            }
-        } else {
-            for (int i = units.size() - 1; 0 <= i; i--) {
-                OrderUnit unit = units.get(i);
-                total = total.plus(unit.size);
-                units.set(i, unit.total(total));
-            }
-        }
-    }
+    // private void calculateTotal(ObservableList<OrderUnit> units) {
+    // Num total = Num.ZERO;
+    //
+    // if (side == Side.BUY) {
+    // for (int i = 0; i < units.size(); i++) {
+    // OrderUnit unit = units.get(i);
+    // total = total.plus(unit.size);
+    // units.set(i, unit.total(total));
+    // }
+    // } else {
+    // for (int i = units.size() - 1; 0 <= i; i--) {
+    // OrderUnit unit = units.get(i);
+    // total = total.plus(unit.size);
+    // units.set(i, unit.total(total));
+    // }
+    // }
+    // }
 
     /**
      * Update {@link OrderUnit}.
@@ -365,7 +355,7 @@ public class OrderBookList {
     /**
      * @version 2017/12/01 13:04:56
      */
-    public static enum Ratio {
+    public static enum Range {
         x1(1), x10(10), x100(100), x1000(1000), x10000(10000);
 
         public final int ratio;
@@ -373,7 +363,7 @@ public class OrderBookList {
         /**
          * @param ratio
          */
-        private Ratio(int ratio) {
+        private Range(int ratio) {
             this.ratio = ratio;
         }
 
@@ -398,13 +388,13 @@ public class OrderBookList {
         private final int scale;
 
         /** The base list. */
-        public final ObservableList<OrderUnit> list;
+        public final GapList<OrderUnit> list;
 
         /**
          * @param side
          * @param scale
          */
-        private Grouped(Side side, int scale, ObservableList<OrderUnit> list) {
+        private Grouped(Side side, int scale, GapList<OrderUnit> list) {
             this.side = side;
             this.scale = scale;
             this.list = list;

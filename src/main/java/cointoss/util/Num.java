@@ -874,8 +874,9 @@ public class Num implements Comparable<Num> {
     /**
      * Compare {@link Num}.
      * 
-     * @param amount
-     * @return A result.
+     * @param direction
+     * @param other
+     * @return
      */
     public final boolean isGreaterThan(Directional direction, Num price) {
         return direction.isBuy() ? isGreaterThan(price) : isLessThan(price);
@@ -884,21 +885,45 @@ public class Num implements Comparable<Num> {
     /**
      * Compare {@link Num}.
      * 
-     * @param amount
-     * @return A result.
+     * @param direction
+     * @param other
+     * @return
      */
-    public final boolean isLessThan(Directional direction, int price) {
-        return isLessThan(direction, Num.of(price));
+    public final boolean isGreaterThanOrEqual(Directional direction, Num other) {
+        return direction.isBuy() ? isGreaterThanOrEqual(other) : isLessThanOrEqual(other);
     }
 
     /**
      * Compare {@link Num}.
      * 
-     * @param amount
-     * @return A result.
+     * @param direction
+     * @param other
+     * @return
      */
-    public final boolean isLessThan(Directional direction, Num price) {
-        return direction.isBuy() ? isLessThan(price) : isGreaterThan(price);
+    public final boolean isLessThan(Directional direction, int other) {
+        return isLessThan(direction, Num.of(other));
+    }
+
+    /**
+     * Compare {@link Num}.
+     * 
+     * @param direction
+     * @param other
+     * @return
+     */
+    public final boolean isLessThan(Directional direction, Num other) {
+        return direction.isBuy() ? isLessThan(other) : isGreaterThan(other);
+    }
+
+    /**
+     * Compare {@link Num}.
+     * 
+     * @param direction
+     * @param other
+     * @return
+     */
+    public final boolean isLessThanOrEqual(Directional direction, Num other) {
+        return direction.isBuy() ? isLessThanOrEqual(other) : isGreaterThanOrEqual(other);
     }
 
     public final String format(int scale) {

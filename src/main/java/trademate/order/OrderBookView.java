@@ -14,7 +14,7 @@ import javafx.scene.control.TextField;
 
 import cointoss.order.OrderBook;
 import cointoss.order.OrderBookList;
-import cointoss.order.OrderBookList.Ratio;
+import cointoss.order.OrderBookList.Range;
 import cointoss.order.OrderUnit;
 import cointoss.util.Num;
 import trademate.TradingView;
@@ -37,7 +37,7 @@ public class OrderBookView extends View {
     private @UI UIListView<OrderUnit> shortList;
 
     /** UI for interval configuration. */
-    private @UI UISpinner<OrderBookList.Ratio> priceRange;
+    private @UI UISpinner<OrderBookList.Range> priceRange;
 
     /** UI for interval configuration. */
     private @UI UILabel priceLatest;
@@ -64,13 +64,13 @@ public class OrderBookView extends View {
     protected void initialize() {
         book = view.market().orderBook;
 
-        longList.values(book.longs.x1).cell(e -> new CellView());
-        shortList.values(book.shorts.x1).cell(e -> new CellView()).scrollTo(book.shorts.x1.size() - 1);
+        longList.cell(e -> new CellView());
+        shortList.cell(e -> new CellView()).scrollTo(book.shorts.selectBy(Range.x1).size() - 1);
         hideSize.values(Num.range(0, 9)).initial(Num.ZERO).observe(e -> longList.ui.refresh());
 
-        priceRange.values(Ratio.class).initial(Ratio.x1).observeNow(ratio -> {
-            longList.values(book.longs.selectByRatio(ratio));
-            shortList.values(book.shorts.selectByRatio(ratio));
+        priceRange.values(Range.class).initial(Range.x1).observeNow(range -> {
+            longList.values(book.longs.selectBy(range), book.longs.modified);
+            shortList.values(book.shorts.selectBy(range), book.shorts.modified);
         });
 
         view.market().latestPrice.observe().on(Viewtify.UIThread).to(price -> priceLatest.text(price));

@@ -16,7 +16,7 @@ import cointoss.util.Num;
  * 
  * @version 2017/11/13 22:53:25
  */
-public class OrderUnit {
+public class OrderUnit implements Comparable<OrderUnit> {
 
     /** IMMUTABLE */
     public Num price;
@@ -24,11 +24,7 @@ public class OrderUnit {
     /** IMMUTABLE */
     public Num size;
 
-    /** IMMUTABLE */
-    public Num total;
-
     private OrderUnit() {
-
     }
 
     /**
@@ -36,17 +32,8 @@ public class OrderUnit {
      * @param size
      */
     public OrderUnit(Num price, Num size) {
-        this(price, size, Num.ZERO);
-    }
-
-    /**
-     * @param price
-     * @param size
-     */
-    private OrderUnit(Num price, Num size, Num total) {
         this.price = price;
         this.size = size;
-        this.total = total;
     }
 
     public Num price() {
@@ -68,18 +55,18 @@ public class OrderUnit {
     }
 
     /**
-     * @param total2
-     * @return
+     * {@inheritDoc}
      */
-    public OrderUnit total(Num total) {
-        return new OrderUnit(price, size, total);
+    @Override
+    public String toString() {
+        return price + "  " + size.format(4);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public String toString() {
-        return price + "  " + size.format(4);
+    public int compareTo(OrderUnit o) {
+        return price.compareTo(o.price);
     }
 }
