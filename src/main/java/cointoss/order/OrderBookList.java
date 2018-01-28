@@ -11,6 +11,9 @@ package cointoss.order;
 
 import java.util.List;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+
 import org.magicwerk.brownies.collections.GapList;
 
 import cointoss.Side;
@@ -37,19 +40,19 @@ public class OrderBookList {
     private final Side side;
 
     /** The base list. */
-    final GapList<OrderUnit> x1;
+    final ObservableList<OrderUnit> x1;
 
     /** The base list. */
-    final GapList<OrderUnit> x10;
+    final ObservableList<OrderUnit> x10;
 
     /** The base list. */
-    final GapList<OrderUnit> x100;
+    final ObservableList<OrderUnit> x100;
 
     /** The base list. */
-    final GapList<OrderUnit> x1000;
+    final ObservableList<OrderUnit> x1000;
 
     /** The base list. */
-    final GapList<OrderUnit> x10000;
+    final ObservableList<OrderUnit> x10000;
 
     private Grouped[] group = new Grouped[4];
 
@@ -58,11 +61,11 @@ public class OrderBookList {
      */
     public OrderBookList(Side side) {
         this.side = side;
-        this.x1 = GapList.create();
-        this.x10 = GapList.create();
-        this.x100 = GapList.create();
-        this.x1000 = GapList.create();
-        this.x10000 = GapList.create();
+        this.x1 = FXCollections.observableList(GapList.create());
+        this.x10 = FXCollections.observableList(GapList.create());
+        this.x100 = FXCollections.observableList(GapList.create());
+        this.x1000 = FXCollections.observableList(GapList.create());
+        this.x10000 = FXCollections.observableList(GapList.create());
 
         group[0] = new Grouped(side, -1, x10);
         group[1] = new Grouped(side, -2, x100);
@@ -102,7 +105,7 @@ public class OrderBookList {
      * @param ratio
      * @return
      */
-    public GapList<OrderUnit> selectBy(Range ratio) {
+    public ObservableList<OrderUnit> selectBy(Range ratio) {
         switch (ratio) {
         case x1:
             return x1;
@@ -388,13 +391,13 @@ public class OrderBookList {
         private final int scale;
 
         /** The base list. */
-        public final GapList<OrderUnit> list;
+        public final ObservableList<OrderUnit> list;
 
         /**
          * @param side
          * @param scale
          */
-        private Grouped(Side side, int scale, GapList<OrderUnit> list) {
+        private Grouped(Side side, int scale, ObservableList<OrderUnit> list) {
             this.side = side;
             this.scale = scale;
             this.list = list;

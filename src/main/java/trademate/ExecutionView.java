@@ -49,10 +49,9 @@ public class ExecutionView extends View {
     @Override
     protected void initialize() {
         // configure UI
-        executionList.cell(v -> new Cell(false));
-        executionCumulativeList.cell(v -> new Cell(true))
-                .filter(takerSize.property(), (e, size) -> e.cumulativeSize.isGreaterThanOrEqual(size));
         takerSize.values(IntStream.range(1, 51).boxed()).initial(10);
+        executionList.cell(v -> new Cell(false));
+        executionCumulativeList.cell(v -> new Cell(true)).filter(takerSize, (e, size) -> e.cumulativeSize.isGreaterThanOrEqual(size));
 
         // load execution log
         Viewtify.inWorker(() -> {

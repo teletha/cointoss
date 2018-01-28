@@ -97,8 +97,7 @@ public class TradingView extends View {
             axis.tickLabelFormatter.set(v -> Num.of(v).scale(0).toString());
         }).candleDate(market().second5);
 
-        chartSpan.values(0, 1, 2, 3, 4, 5, 6, 7)
-                .initial(0)
+        chartSpan.values(0, new Integer[] {0, 1, 2, 3, 4, 5, 6, 7})
                 .text(i -> charts[i].toString())
                 .observe(i -> candleChart.candleDate(charts[i]))
                 .when(User.Scroll, e -> {

@@ -23,8 +23,8 @@ import javafx.scene.media.AudioClip;
 import cointoss.Order;
 import cointoss.Order.Quantity;
 import cointoss.Order.State;
-import cointoss.trader.Spreader;
 import cointoss.Side;
+import cointoss.trader.Spreader;
 import cointoss.util.Num;
 import kiss.I;
 import kiss.WiseBiConsumer;
@@ -115,22 +115,20 @@ public class OrderBuilder extends View {
     @Override
     protected void initialize() {
         orderSize.initial("0").when(User.Scroll, changeBy(orderSizeAmount.ui)).require(positiveNumber);
-        orderSizeAmount.values(Num.of("0.01"), Num.of("0.1"), Num.ONE).initial(Num.ONE);
+        orderSizeAmount.values(2, Num.of("0.01"), Num.of("0.1"), Num.ONE);
 
         orderPrice.initial("0").when(User.Scroll, changeBy(orderPriceAmount.ui)).require(positiveNumber);
-        orderPriceAmount.values(Num.ONE, Num.HUNDRED, Num.THOUSAND, Num.of(10000)).initial(Num.ONE);
+        orderPriceAmount.values(0, Num.ONE, Num.HUNDRED, Num.THOUSAND, Num.of(10000));
 
-        orderDivideSize.values(IntStream.range(1, 31).boxed()).initial(1);
-        orderDivideIntervalAmount.values(IntStream.range(0, 10).boxed())
-                .initial(0)
-                .disableWhen(orderDivideSize.ui.valueProperty().isEqualTo(1));
-        optimizeThreshold.values(Num.range(0, 20)).initial(Num.ZERO);
+        orderDivideSize.values(0, IntStream.range(1, 31).boxed());
+        orderDivideIntervalAmount.values(0, IntStream.range(0, 10).boxed()).disableWhen(orderDivideSize.ui.valueProperty().isEqualTo(1));
+        optimizeThreshold.values(0, Num.range(0, 20));
         orderPriceInterval.initial("0")
                 .when(User.Scroll, changeBy(orderPriceIntervalAmount.ui))
                 .require(positiveNumber)
                 .parent()
                 .disableWhen(orderDivideSize.ui.valueProperty().isEqualTo(1));
-        orderPriceIntervalAmount.values(Num.TEN, Num.HUNDRED, Num.THOUSAND).initial(Num.TEN);
+        orderPriceIntervalAmount.values(0, Num.TEN, Num.HUNDRED, Num.THOUSAND);
 
         // validate order condition
         orderLimitLong.parent().disableWhen(orderSize.isInvalid().or(orderPrice.isInvalid()));

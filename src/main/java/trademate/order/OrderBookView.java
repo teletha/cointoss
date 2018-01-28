@@ -64,13 +64,16 @@ public class OrderBookView extends View {
     protected void initialize() {
         book = view.market().orderBook;
 
-        longList.cell(e -> new CellView());
-        shortList.cell(e -> new CellView()).scrollTo(book.shorts.selectBy(Range.x1).size() - 1);
-        hideSize.values(Num.range(0, 9)).initial(Num.ZERO).observe(e -> longList.ui.refresh());
+        hideSize.values(0, Num.range(0, 9)).observe(e -> longList.ui.refresh());
 
-        priceRange.values(Range.class).initial(Range.x1).observeNow(range -> {
-            longList.values(book.longs.selectBy(range), book.longs.modified);
-            shortList.values(book.shorts.selectBy(range), book.shorts.modified);
+        longList.cell(e -> new CellView()).filter(hideSize, (unit, size) -> unit.size.isGreaterThanOrEqual(size));
+        shortList.cell(e -> new CellView())
+                .filter(hideSize, (unit, size) -> unit.size.isGreaterThanOrEqual(size))
+                .scrollTo(book.shorts.selectBy(Range.x1).size() - 1);
+
+        priceRange.values(0, Range.class).observeNow(range -> {
+            longList.values(book.longs.selectBy(range));
+            shortList.values(book.shorts.selectBy(range));
         });
 
         view.market().latestPrice.observe().on(Viewtify.UIThread).to(price -> priceLatest.text(price));
@@ -118,7 +121,6 @@ public class OrderBookView extends View {
 
                     StringBuilder style = new StringBuilder();
                     style.append("-fx-background-insets: 0 " + Num.of(210).minus(normalize.multiply(Num.TWO)) + "px 0 0;");
-                    style.append("-fx-font-size: " + (normalize.isLessThan(hideSize.value()) ? "0.1px;" : "100%;"));
                     setStyle(style.toString());
                 }
             });
