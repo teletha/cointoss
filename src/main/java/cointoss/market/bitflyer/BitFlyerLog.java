@@ -9,10 +9,10 @@
  */
 package cointoss.market.bitflyer;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -85,7 +85,7 @@ class BitFlyerLog extends MarketLog {
     private ZonedDateTime cacheLast;
 
     /** The current processing cache file. */
-    private PrintWriter cache;
+    private BufferedWriter cache;
 
     /**
      * @param type
@@ -201,10 +201,10 @@ class BitFlyerLog extends MarketLog {
                         File file = localCacheFile(date).toFile();
                         file.createNewFile();
 
-                        cache = new PrintWriter(new FileWriter(file, true));
+                        cache = new BufferedWriter(new FileWriter(file, true));
                         cacheLast = date.withHour(23).withMinute(59).withSecond(59).withNano(999999999);
                     }
-                    cache.println(exe.toString());
+                    cache.write(exe.toString() + "\r\n");
                     cache.flush();
                 } catch (IOException e) {
                     throw I.quiet(e);
