@@ -99,7 +99,7 @@ public interface MarketLog {
      * @return
      */
     default Signal<Execution> range(ZonedDateTime start, ZonedDateTime end) {
-        return from(start).takeUntil(e -> e.exec_date.isAfter(end));
+        return from(start).takeWhile(e -> e.exec_date.isBefore(end));
     }
 
     /**
