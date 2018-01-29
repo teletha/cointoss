@@ -30,9 +30,7 @@ public class TickerTest {
 
     private ZonedDateTime minite1 = start.plus(1, ChronoUnit.MINUTES);
 
-    private ZonedDateTime minite3 = start.plus(3, ChronoUnit.MINUTES);
-
-    private ZonedDateTime minite30 = start.plus(30, ChronoUnit.MINUTES);
+    private ZonedDateTime hour12 = start.plus(12, ChronoUnit.HOURS);
 
     @Before
     public void setup() {
@@ -55,5 +53,11 @@ public class TickerTest {
     public void second30() throws Exception {
         List<Tick> ticks = ticker.read(start, minite1, TickSpan.Second30, true).diff().toList();
         assert ticks.size() == 2;
+    }
+
+    @Test
+    public void hour() throws Exception {
+        List<Tick> ticks = ticker.read(start, hour12, TickSpan.Minute10, true).diff().toList();
+        assert ticks.size() == 72;
     }
 }
