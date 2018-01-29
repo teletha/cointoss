@@ -18,7 +18,7 @@ import kiss.Signal;
 /**
  * @version 2017/09/08 17:51:59
  */
-public class TestableMarketLog implements MarketLog {
+public class TestableMarketLog extends MarketLog {
 
     /**
      * {@inheritDoc}

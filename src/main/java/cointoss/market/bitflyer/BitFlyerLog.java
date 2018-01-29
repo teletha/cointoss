@@ -47,7 +47,7 @@ import kiss.Signal;
 /**
  * @version 2017/10/01 8:41:58
  */
-class BitFlyerLog implements MarketLog {
+class BitFlyerLog extends MarketLog {
 
     /** The writer thread. */
     private static final ExecutorService writer = Executors.newSingleThreadExecutor(run -> {

@@ -21,7 +21,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import cointoss.MarketBackend.Health;
 import cointoss.Order.State;
 import cointoss.chart.Chart;
-import cointoss.chart.Ticker;
 import cointoss.order.OrderBook;
 import cointoss.order.OrderBookChange;
 import cointoss.util.Listeners;
@@ -47,9 +46,6 @@ public class Market implements Disposable {
 
     /** The market handler. */
     protected final MarketBackend backend;
-
-    /** The tick manager. */
-    public final Ticker ticker;
 
     /** CHART */
     public final Chart day7 = new Chart(Duration.ofDays(7));
@@ -204,7 +200,6 @@ public class Market implements Disposable {
         }
 
         this.backend = provider.service();
-        this.ticker = new Ticker(provider.log());
 
         // initialize price, balance and executions
         this.base = this.baseInit = backend.getBaseCurrency().to().v;

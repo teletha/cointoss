@@ -63,7 +63,7 @@ public class Tick {
      * 
      * @param value
      */
-    Tick(String value) {
+    public Tick(String value) {
         String[] values = value.split(" ");
 
         start = ZonedDateTime.parse(values[0]);
@@ -79,7 +79,7 @@ public class Tick {
     /**
     * 
     */
-    Tick(ZonedDateTime start, ZonedDateTime end, Num open) {
+    public Tick(ZonedDateTime start, ZonedDateTime end, Num open) {
         this.start = start;
         this.end = end;
         this.openPrice = open;
@@ -90,7 +90,7 @@ public class Tick {
      * 
      * @param exe
      */
-    void update(Execution exe) {
+    public void update(Execution exe) {
         Num latest = closePrice == null ? openPrice : closePrice;
         closePrice = exe.price;
         maxPrice = Num.max(maxPrice, exe.price);
