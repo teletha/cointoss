@@ -87,9 +87,6 @@ class BitFlyerLog implements MarketLog {
     /** The current processing cache file. */
     private PrintWriter cache;
 
-    /** The shared source. */
-    private Signal<Execution> source;
-
     /**
      * @param type
      */
@@ -139,37 +136,34 @@ class BitFlyerLog implements MarketLog {
      */
     @Override
     public synchronized Signal<Execution> from(ZonedDateTime start) {
-        if (source == null) {
-            source = new Signal<Execution>((observer, disposer) -> {
-                // read from cache
-                if (cacheFirst != null) {
-                    ZonedDateTime current = start.isBefore(cacheFirst) ? cacheFirst : start.isAfter(cacheLast) ? cacheLast : start;
-                    current = current.withHour(0).withMinute(0).withSecond(0).withNano(0);
+        return new Signal<Execution>((observer, disposer) -> {
+            // read from cache
+            if (cacheFirst != null) {
+                ZonedDateTime current = start.isBefore(cacheFirst) ? cacheFirst : start.isAfter(cacheLast) ? cacheLast : start;
+                current = current.withHour(0).withMinute(0).withSecond(0).withNano(0);
 
-                    while (disposer.isDisposed() == false && !current.isAfter(getCacheEnd())) {
-                        disposer.add(localCache(current).effect(e -> latestId = cacheId = e.id)
-                                .take(e -> e.exec_date.isAfter(start))
-                                .to(observer::accept));
-                        current = current.plusDays(1);
-                    }
+                while (disposer.isDisposed() == false && !current.isAfter(getCacheEnd())) {
+                    disposer.add(localCache(current).effect(e -> latestId = cacheId = e.id)
+                            .take(e -> e.exec_date.isAfter(start))
+                            .to(observer::accept));
+                    current = current.plusDays(1);
                 }
+            }
 
-                AtomicBoolean completeREST = new AtomicBoolean();
+            AtomicBoolean completeREST = new AtomicBoolean();
 
-                // read from realtime API
-                if (disposer.isDisposed() == false) {
-                    disposer.add(realtime().skipUntil(e -> completeREST.get()).effect(this::cache).to(observer::accept));
-                }
+            // read from realtime API
+            if (disposer.isDisposed() == false) {
+                disposer.add(realtime().skipUntil(e -> completeREST.get()).effect(this::cache).to(observer::accept));
+            }
 
-                // read from REST API
-                if (disposer.isDisposed() == false) {
-                    disposer.add(rest().effect(this::cache).effectOnComplete((o, d) -> completeREST.set(true)).to(observer::accept));
-                }
+            // read from REST API
+            if (disposer.isDisposed() == false) {
+                disposer.add(rest().effect(this::cache).effectOnComplete((o, d) -> completeREST.set(true)).to(observer::accept));
+            }
 
-                return disposer;
-            }).share();
-        }
-        return source;
+            return disposer;
+        });
     }
 
     /**

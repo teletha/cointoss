@@ -9,11 +9,20 @@
  */
 package cointoss.chart;
 
+import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Map;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
+
+import org.eclipse.collections.impl.map.mutable.ConcurrentHashMap;
 
 import cointoss.MarketLog;
 import kiss.I;
@@ -26,19 +35,17 @@ public class Ticker {
 
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
+    private static final Map<TickSpan, CacheWriter> writers = new ConcurrentHashMap();
+
     /** The actual log reader. */
     private final MarketLog log;
-
-    /** The cache directory. */
-    private final Path cache;
 
     /**
      * @param log
      * @param cache
      */
-    public Ticker(MarketLog log, Path cache) {
+    public Ticker(MarketLog log) {
         this.log = log;
-        this.cache = log.cacheRoot();
     }
 
     /**
@@ -54,26 +61,31 @@ public class Ticker {
         AtomicReference<Tick> latest = new AtomicReference();
 
         Signal<Tick> signal = new Signal<>((observer, disposer) -> {
-            ZonedDateTime current = start.withHour(0).withMinute(0).withSecond(0).withNano(0);
+            ZonedDateTime day = start;
+            ZonedDateTime[] current = new ZonedDateTime[] {start.withHour(0).withMinute(0).withSecond(0).withNano(0)};
 
             // read from cache
-            while (current.isBefore(end)) {
-                Path file = file(current, span);
+            while (day.isBefore(end)) {
+                Path file = file(current[0], span);
 
                 if (Files.exists(file)) {
                     try {
-                        I.signal(Files.lines(file)).map(Tick::new).to(observer);
+                        I.signal(Files.lines(file))
+                                .map(Tick::new)
+                                .effect(tick -> current[0] = tick.end)
+                                .take(tick -> tick.start.isBefore(end))
+                                .to(observer);
                     } catch (Exception e) {
-                        throw I.quiet(e);
+                        break;
                     }
-                    current = current.plusDays(1);
+                    day = day.plusDays(1);
                 } else {
                     break;
                 }
             }
 
             // read from execution flow
-            return disposer.add(log.range(current, end).map(e -> {
+            return disposer.add(log.range(current[0], end).map(e -> {
                 Tick tick = latest.get();
 
                 if (tick == null || !e.exec_date.isBefore(tick.end)) {
@@ -85,13 +97,9 @@ public class Ticker {
                 }
                 tick.update(e);
                 return tick;
-            }).effect(tick -> writeCache(tick, span)).to(observer));
+            }).effect(tick -> writers.computeIfAbsent(span, CacheWriter::new).write(tick)).to(observer));
         });
         return every ? signal : signal.diff().delay(1);
-    }
-
-    private void writeCache(Tick tick, TickSpan span) {
-        System.out.println(tick);
     }
 
     /**
@@ -102,6 +110,57 @@ public class Ticker {
      * @return
      */
     private Path file(ZonedDateTime time, TickSpan span) {
-        return cache.resolve(span.name()).resolve(formatter.format(time).concat(".log"));
+        return log.cacheRoot().resolve(span.name()).resolve(formatter.format(time).concat(".log"));
+    }
+
+    /**
+     * @version 2018/01/29 16:57:46
+     */
+    private class CacheWriter {
+
+        private final TickSpan span;
+
+        private final Executor writer = Executors.newSingleThreadExecutor();
+
+        private Tick latest;
+
+        /**
+         * @param span
+         */
+        private CacheWriter(TickSpan span) {
+            this.span = span;
+        }
+
+        /**
+         * Write tick to cache.
+         * 
+         * @param tick
+         */
+        private void write(Tick tick) {
+            if (tick != latest) {
+                // write latest tick
+                writer.execute(() -> {
+                    try {
+                        Path path = file(tick.start, span);
+
+                        if (Files.notExists(path)) {
+                            Files.createDirectories(path.getParent());
+                        }
+
+                        RandomAccessFile store = new RandomAccessFile(path.toFile(), "rw");
+                        FileChannel channel = store.getChannel();
+                        channel.position(channel.size());
+                        channel.write(ByteBuffer.wrap((tick + "\r\n").getBytes(StandardCharsets.UTF_8)));
+                        channel.close();
+                        store.close();
+                    } catch (Exception e) {
+                        throw I.quiet(e);
+                    }
+                });
+
+                // next
+                latest = tick;
+            }
+        }
     }
 }

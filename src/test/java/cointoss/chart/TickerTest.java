@@ -9,7 +9,6 @@
  */
 package cointoss.chart;
 
-import java.nio.file.Path;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -18,11 +17,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import cointoss.Execution;
-import cointoss.chart.Ticker;
-import cointoss.chart.Tick;
-import cointoss.chart.TickSpan;
 import cointoss.market.bitflyer.BitFlyer;
-import filer.Filer;
 
 /**
  * @version 2018/01/29 10:01:00
@@ -33,19 +28,32 @@ public class TickerTest {
 
     private ZonedDateTime start = ZonedDateTime.of(2018, 1, 1, 0, 0, 0, 0, Execution.UTC);
 
-    private ZonedDateTime minite1 = start.plus(1, ChronoUnit.MINUTES).plus(4, ChronoUnit.SECONDS);
+    private ZonedDateTime minite1 = start.plus(1, ChronoUnit.MINUTES);
 
-    private ZonedDateTime minite3 = start.plus(3, ChronoUnit.MINUTES).plus(4, ChronoUnit.SECONDS);
+    private ZonedDateTime minite3 = start.plus(3, ChronoUnit.MINUTES);
+
+    private ZonedDateTime minite30 = start.plus(30, ChronoUnit.MINUTES);
 
     @Before
     public void setup() {
-        Path cache = Filer.locateTemporary();
-        ticker = new Ticker(BitFlyer.FX_BTC_JPY.log(), cache);
+        ticker = new Ticker(BitFlyer.FX_BTC_JPY.log());
     }
 
     @Test
-    public void readTick() throws Exception {
-        List<Tick> ticks = ticker.read(start, minite1, TickSpan.Second5, false).toList();
+    public void second5() throws Exception {
+        List<Tick> ticks = ticker.read(start, minite1, TickSpan.Second5, true).diff().toList();
         assert ticks.size() == 12;
+    }
+
+    @Test
+    public void second10() throws Exception {
+        List<Tick> ticks = ticker.read(start, minite1, TickSpan.Second10, true).diff().toList();
+        assert ticks.size() == 6;
+    }
+
+    @Test
+    public void second30() throws Exception {
+        List<Tick> ticks = ticker.read(start, minite1, TickSpan.Second30, true).diff().toList();
+        assert ticks.size() == 2;
     }
 }
