@@ -21,6 +21,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import cointoss.MarketBackend.Health;
 import cointoss.Order.State;
 import cointoss.chart.Chart;
+import cointoss.chart.Ticker;
 import cointoss.order.OrderBook;
 import cointoss.order.OrderBookChange;
 import cointoss.util.Listeners;
@@ -46,6 +47,9 @@ public class Market implements Disposable {
 
     /** The market handler. */
     protected final MarketBackend backend;
+
+    /** The tick manager. */
+    public final Ticker ticker;
 
     /** CHART */
     public final Chart day7 = new Chart(Duration.ofDays(7));
@@ -176,22 +180,22 @@ public class Market implements Disposable {
     /**
      * Market without {@link Trader}.
      * 
-     * @param backend A market backend.
+     * @param provider A market provider.
      * @param log A market execution log.
      */
-    public Market(MarketBackend backend, Signal<Execution> log) {
-        this(backend, log, null);
+    public Market(MarketProvider provider, Signal<Execution> log) {
+        this(provider, log, null);
     }
 
     /**
      * Market with {@link Trader}.
      * 
-     * @param backend A market backend.
+     * @param provider A market backend.
      * @param log A market execution log.
      * @param trading A trading strategy.
      */
-    public Market(MarketBackend backend, Signal<Execution> log, Trader trading) {
-        if (backend == null) {
+    public Market(MarketProvider provider, Signal<Execution> log, Trader trading) {
+        if (provider == null) {
             throw new Error("Market is not found.");
         }
 
@@ -199,7 +203,8 @@ public class Market implements Disposable {
             throw new Error("Market log is not found.");
         }
 
-        this.backend = backend;
+        this.backend = provider.service();
+        this.ticker = new Ticker(provider.log());
 
         // initialize price, balance and executions
         this.base = this.baseInit = backend.getBaseCurrency().to().v;

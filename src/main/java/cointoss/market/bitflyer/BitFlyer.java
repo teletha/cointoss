@@ -11,12 +11,13 @@ package cointoss.market.bitflyer;
 
 import cointoss.MarketBackend;
 import cointoss.MarketLog;
+import cointoss.MarketProvider;
 import cointoss.util.Span;
 
 /**
- * @version 2017/11/16 10:30:15
+ * @version 2018/01/29 21:00:37
  */
-public enum BitFlyer {
+public enum BitFlyer implements MarketProvider {
     BTC_JPY, FX_BTC_JPY, ETC_BTC, BCH_BTC;
 
     /** Sample trend */
@@ -49,19 +50,17 @@ public enum BitFlyer {
     }
 
     /**
-     * Create {@link MarketLog} for this market type.
-     * 
-     * @return
+     * {@inheritDoc}
      */
+    @Override
     public MarketLog log() {
         return marketLog;
     }
 
     /**
-     * Create {@link MerketService} for this market type.
-     * 
-     * @return
+     * {@inheritDoc}
      */
+    @Override
     public MarketBackend service() {
         return marketBackend;
     }

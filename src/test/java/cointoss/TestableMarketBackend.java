@@ -18,6 +18,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import cointoss.Order.Quantity;
 import cointoss.Order.State;
 import cointoss.Time.Lag;
+import cointoss.market.bitflyer.BitFlyer;
 import cointoss.order.OrderBookChange;
 import cointoss.util.Num;
 import kiss.Disposable;
@@ -27,7 +28,7 @@ import kiss.Signal;
 /**
  * @version 2017/09/08 19:09:35
  */
-class TestableMarketBackend implements MarketBackend {
+class TestableMarketBackend implements MarketBackend, MarketProvider {
 
     /** The terminator. */
     private final Disposable diposer = Disposable.empty();
@@ -58,6 +59,22 @@ class TestableMarketBackend implements MarketBackend {
     */
     TestableMarketBackend(Lag lag) {
         this.lag = lag;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public MarketBackend service() {
+        return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public MarketLog log() {
+        return BitFlyer.FX_BTC_JPY.log();
     }
 
     /**
