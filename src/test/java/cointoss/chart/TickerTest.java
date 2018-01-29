@@ -7,7 +7,7 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss;
+package cointoss.chart;
 
 import java.nio.file.Path;
 import java.time.ZonedDateTime;
@@ -17,7 +17,9 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-import cointoss.chart.ETick;
+import cointoss.Execution;
+import cointoss.chart.Ticker;
+import cointoss.chart.Tick;
 import cointoss.chart.TickSpan;
 import cointoss.market.bitflyer.BitFlyer;
 import filer.Filer;
@@ -25,9 +27,9 @@ import filer.Filer;
 /**
  * @version 2018/01/29 10:01:00
  */
-public class MarketTickerTest {
+public class TickerTest {
 
-    private MarketTicker ticker;
+    private Ticker ticker;
 
     private ZonedDateTime start = ZonedDateTime.of(2018, 1, 1, 0, 0, 0, 0, Execution.UTC);
 
@@ -38,12 +40,12 @@ public class MarketTickerTest {
     @Before
     public void setup() {
         Path cache = Filer.locateTemporary();
-        ticker = new MarketTicker(BitFlyer.FX_BTC_JPY.log(), cache);
+        ticker = new Ticker(BitFlyer.FX_BTC_JPY.log(), cache);
     }
 
     @Test
     public void readTick() throws Exception {
-        List<ETick> ticks = ticker.read(start, minite1, TickSpan.Second5, false).toList();
+        List<Tick> ticks = ticker.read(start, minite1, TickSpan.Second5, false).toList();
         assert ticks.size() == 12;
     }
 }

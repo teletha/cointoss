@@ -9,6 +9,7 @@
  */
 package cointoss;
 
+import java.nio.file.Path;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 
@@ -19,6 +20,13 @@ import kiss.Signal;
  * @version 2017/09/08 18:20:48
  */
 public interface MarketLog {
+
+    /**
+     * Locate cache directory.
+     * 
+     * @return
+     */
+    Path cacheRoot();
 
     /**
      * Read date from the specified date.

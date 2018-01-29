@@ -116,7 +116,7 @@ public class Chart {
             // update
             ticks.add(current = convert(exe, current.closePrice));
         }
-        current.tick(exe);
+        current.update(exe);
     }
 
     /**
@@ -151,7 +151,7 @@ public class Chart {
             current = new Tick(tick.start, tick.start.plus(duration), tick.openPrice);
             ticks.add(current);
         }
-        current.tick(tick);
+        current.update(tick);
     }
 
     /**

@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URL;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
@@ -95,7 +96,7 @@ class BitFlyerLog implements MarketLog {
     BitFlyerLog(BitFlyer type) {
         try {
             this.type = type;
-            this.root = Filer.locate(".log/bitflyer/" + type);
+            this.root = cacheRoot();
 
             List<Path> files = Filer.walk(root, "execution*.log");
             ZonedDateTime start = null;
@@ -123,6 +124,14 @@ class BitFlyerLog implements MarketLog {
         } catch (Exception e) {
             throw I.quiet(e);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Path cacheRoot() {
+        return Paths.get(".log/bitflyer/" + type);
     }
 
     /**

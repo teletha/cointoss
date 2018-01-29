@@ -15,7 +15,7 @@ import cointoss.Execution;
 import cointoss.util.Num;
 
 /**
- * @version 2017/09/10 8:40:27
+ * @version 2018/01/29 13:37:15
  */
 public class Tick {
 
@@ -90,7 +90,7 @@ public class Tick {
      * 
      * @param exe
      */
-    void tick(Execution exe) {
+    void update(Execution exe) {
         Num latest = closePrice == null ? openPrice : closePrice;
         closePrice = exe.price;
         maxPrice = Num.max(maxPrice, exe.price);
@@ -112,7 +112,7 @@ public class Tick {
      * 
      * @param tick
      */
-    void tick(Tick tick) {
+    void update(Tick tick) {
         closePrice = tick.closePrice;
         maxPrice = Num.max(maxPrice, tick.maxPrice);
         minPrice = Num.min(minPrice, tick.minPrice);

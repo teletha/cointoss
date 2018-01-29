@@ -9,14 +9,24 @@
  */
 package cointoss;
 
+import java.nio.file.Path;
 import java.time.ZonedDateTime;
 
+import filer.Filer;
 import kiss.Signal;
 
 /**
  * @version 2017/09/08 17:51:59
  */
 public class TestableMarketLog implements MarketLog {
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Path cacheRoot() {
+        return Filer.locateTemporary();
+    }
 
     /**
      * {@inheritDoc}
