@@ -17,7 +17,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-import cointoss.chart.Tick;
+import cointoss.chart.ETick;
 import cointoss.chart.TickSpan;
 import cointoss.market.bitflyer.BitFlyer;
 import filer.Filer;
@@ -31,9 +31,9 @@ public class MarketTickerTest {
 
     private ZonedDateTime start = ZonedDateTime.of(2018, 1, 1, 0, 0, 0, 0, Execution.UTC);
 
-    private ZonedDateTime minite1 = start.plus(1, ChronoUnit.MINUTES);
+    private ZonedDateTime minite1 = start.plus(1, ChronoUnit.MINUTES).plus(4, ChronoUnit.SECONDS);
 
-    private ZonedDateTime minite3 = start.plus(3, ChronoUnit.MINUTES);
+    private ZonedDateTime minite3 = start.plus(3, ChronoUnit.MINUTES).plus(4, ChronoUnit.SECONDS);
 
     @Before
     public void setup() {
@@ -42,8 +42,8 @@ public class MarketTickerTest {
     }
 
     @Test
-    public void test() throws Exception {
-        List<Tick> ticks = ticker.read(TickSpan.Second10, start, minite3).toList();
+    public void readTick() throws Exception {
+        List<ETick> ticks = ticker.read(start, minite1, TickSpan.Second5, false).toList();
         assert ticks.size() == 12;
     }
 }

@@ -14,7 +14,6 @@ import java.time.ZonedDateTime;
 import java.util.concurrent.atomic.AtomicReference;
 
 import cointoss.chart.ETick;
-import cointoss.chart.Tick;
 import cointoss.chart.TickSpan;
 import kiss.Signal;
 
@@ -41,28 +40,29 @@ public class MarketTicker {
     /**
      * Read tick data.
      * 
-     * @param span
      * @param start
      * @param end
+     * @param span
+     * @param every
      * @return
      */
-    public Signal<Tick> read(TickSpan span, ZonedDateTime start, ZonedDateTime end) {
+    public Signal<ETick> read(ZonedDateTime start, ZonedDateTime end, TickSpan span, boolean every) {
         AtomicReference<ETick> latest = new AtomicReference();
 
-        return new Signal<>((observer, disposer) -> {
-            log.range(start, end).to(e -> {
-                ETick tick = latest.get();
+        Signal<ETick> signal = log.range(start, end).map(e -> {
+            ETick tick = latest.get();
 
-                if (tick == null) {
-                    ZonedDateTime startTime = span.calculateStartTime(e.exec_date);
-                    ZonedDateTime endTime = span.calculateEndTime(e.exec_date);
+            if (tick == null || !e.exec_date.isBefore(tick.end)) {
+                // add
+                ZonedDateTime startTime = span.calculateStartTime(e.exec_date);
+                ZonedDateTime endTime = span.calculateEndTime(e.exec_date);
 
-                    tick = new ETick(startTime, endTime);
-                }
-
-            });
-
-            return disposer;
+                tick = new ETick(startTime, endTime, e.price);
+                latest.set(tick);
+            }
+            tick.update(e);
+            return tick;
         });
+        return every ? signal : signal.diff().delay(1);
     }
 }
