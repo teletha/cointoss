@@ -9,11 +9,12 @@
  */
 package cointoss.market.bitflyer;
 
-import java.io.File;
-import java.io.FileWriter;
+import static java.nio.file.StandardOpenOption.*;
+
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.net.URL;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
@@ -85,7 +86,7 @@ class BitFlyerLog extends MarketLog {
     private ZonedDateTime cacheLast;
 
     /** The current processing cache file. */
-    private PrintWriter cache;
+    private FileChannel channel;
 
     /**
      * @param type
@@ -195,17 +196,13 @@ class BitFlyerLog extends MarketLog {
                 try {
                     ZonedDateTime date = exe.exec_date;
 
-                    if (cache == null || cacheLast.isBefore(date)) {
-                        I.quiet(cache);
+                    if (channel == null || cacheLast.isBefore(date)) {
+                        I.quiet(channel);
 
-                        File file = localCacheFile(date).toFile();
-                        file.createNewFile();
-
-                        cache = new PrintWriter(new FileWriter(file, true));
-                        cacheLast = date;
+                        channel = FileChannel.open(localCacheFile(date), WRITE, APPEND, CREATE, SYNC);
+                        cacheLast = date.withHour(23).withMinute(59).withSecond(59).withNano(999999999);
                     }
-                    cache.println(exe.toString());
-                    cache.flush();
+                    channel.write(ByteBuffer.wrap((exe + "\r\n").getBytes()));
                 } catch (IOException e) {
                     throw I.quiet(e);
                 }
