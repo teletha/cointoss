@@ -9,6 +9,7 @@
  */
 package trademate.chart;
 
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -29,14 +30,13 @@ import javafx.scene.shape.Polyline;
 import cointoss.Side;
 import cointoss.order.Order.State;
 import cointoss.ticker.Tick;
+import cointoss.util.Chrono;
 import cointoss.util.Num;
 import kiss.I;
 import trademate.Notificator;
 import trademate.chart.Axis.TickLable;
 import trademate.chart.shape.Candle;
-import viewtify.UI;
 import viewtify.Viewtify;
-import viewtify.ui.UILabel;
 import viewtify.ui.helper.LayoutAssistant;
 import viewtify.ui.helper.StyleHelper;
 
@@ -90,9 +90,6 @@ public class ChartPlotArea extends Region {
     /** Flag whether candle chart shoud layout on the next rendering phase or not. */
     public final LayoutAssistant layoutCandle = new LayoutAssistant(this);
 
-    /** Chart UI */
-    private @UI UILabel pointedDate;
-
     /**
      * @param chart
      * @param axisX
@@ -139,15 +136,15 @@ public class ChartPlotArea extends Region {
 
         // track on move
         setOnMouseMoved(e -> {
-            labelX.value.set(axisX.getValueForPosition(e.getX()));
+            double x = axisX.getValueForPosition(e.getX());
+            labelX.value.set(x);
             labelY.value.set(axisY.getValueForPosition(e.getY()));
 
             mouseTrackVertical.layoutLine.requestLayout();
             mouseTrackHorizontal.layoutLine.requestLayout();
 
             // upper info
-            String applied = axisX.tickLabelFormatter.get().apply(axisX.getValueForPosition(e.getX()));
-
+            chart.trade.pointedDate.text(Chrono.system(x).format(Chrono.DateTime));
         });
 
         // remove on exit
@@ -157,6 +154,9 @@ public class ChartPlotArea extends Region {
 
             mouseTrackVertical.layoutLine.requestLayout();
             mouseTrackHorizontal.layoutLine.requestLayout();
+
+            // upper info
+            chart.trade.pointedDate.text("");
         });
     }
 
@@ -180,7 +180,7 @@ public class ChartPlotArea extends Region {
             Num price = Num.of(Math.floor(axisY.getValueForPosition(clickedPosition)));
             TickLable label = notifyPrice.createLabel(price);
 
-            label.add(chart.market.signalByPrice(price).on(Viewtify.UIThread).to(exe -> {
+            label.add(chart.trade.market().signalByPrice(price).on(Viewtify.UIThread).to(exe -> {
                 notificator.priceSignal.notify("Rearch to " + price);
                 notifyPrice.remove(label);
             }));
@@ -191,7 +191,7 @@ public class ChartPlotArea extends Region {
      * Visualize order price in chart.
      */
     private void visualizeOrderPrice() {
-        chart.market.yourOrder.on(Viewtify.UIThread).to(o -> {
+        chart.trade.market().yourOrder.on(Viewtify.UIThread).to(o -> {
             LineMark mark = o.isBuy() ? orderBuyPrice : orderSellPrice;
             TickLable label = mark.createLabel(o.price);
 
@@ -205,7 +205,7 @@ public class ChartPlotArea extends Region {
      * Visualize latest price in chart.
      */
     private void visualizeLatestPrice() {
-        chart.market.timeline.map(e -> e.price).diff().on(Viewtify.UIThread).to(price -> {
+        chart.trade.market().timeline.map(e -> e.price).diff().on(Viewtify.UIThread).to(price -> {
             latestPrice.removeAll();
             latestPrice.createLabel(price);
         });

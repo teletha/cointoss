@@ -12,6 +12,7 @@ package cointoss;
 import java.nio.file.Path;
 import java.time.ZonedDateTime;
 
+import cointoss.util.Chrono;
 import filer.Filer;
 import kiss.Signal;
 
@@ -41,7 +42,7 @@ public class TestableMarketLog extends MarketLog {
      */
     @Override
     public ZonedDateTime getCacheStart() {
-        return ZonedDateTime.of(2017, 1, 1, 0, 0, 0, 0, Execution.UTC);
+        return ZonedDateTime.of(2017, 1, 1, 0, 0, 0, 0, Chrono.UTC);
     }
 
     /**
@@ -49,6 +50,6 @@ public class TestableMarketLog extends MarketLog {
      */
     @Override
     public ZonedDateTime getCacheEnd() {
-        return ZonedDateTime.of(2017, 1, 1, 0, 0, 0, 0, Execution.UTC);
+        return ZonedDateTime.of(2017, 1, 1, 0, 0, 0, 0, Chrono.UTC);
     }
 }

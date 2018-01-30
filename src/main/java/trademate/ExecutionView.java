@@ -9,12 +9,12 @@
  */
 package trademate;
 
-import java.time.format.DateTimeFormatter;
 import java.util.stream.IntStream;
 
 import javafx.scene.control.ListCell;
 
 import cointoss.Execution;
+import cointoss.util.Chrono;
 import cointoss.util.Num;
 import viewtify.UI;
 import viewtify.View;
@@ -27,9 +27,6 @@ import viewtify.ui.UserInterface;
  * @version 2018/01/12 21:29:04
  */
 public class ExecutionView extends View {
-
-    /** The time format. */
-    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
 
     /** The execution list. */
     private @UI UIListView<Execution> executionList;
@@ -107,7 +104,7 @@ public class ExecutionView extends View {
                 setText(null);
                 setGraphic(null);
             } else {
-                setText(formatter.format(e.exec_date.plusHours(9)) + "  " + e.price + "円  " + (comulative ? e.cumulativeSize : e.size)
+                setText(Chrono.system(e.exec_date).format(Chrono.Time) + "  " + e.price + "円  " + (comulative ? e.cumulativeSize : e.size)
                         .scale(6));
                 ui.styleOnly(e.side);
             }

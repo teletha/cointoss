@@ -12,7 +12,6 @@ package trademate.console;
 import static java.util.concurrent.TimeUnit.*;
 
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.LinkedList;
 
 import javafx.collections.FXCollections;
@@ -23,6 +22,7 @@ import org.apache.logging.log4j.Logger;
 
 import cointoss.Trader;
 import cointoss.ticker.ExecutionFlow;
+import cointoss.util.Chrono;
 import cointoss.util.Num;
 import trademate.SettingView;
 import trademate.TradingView;
@@ -96,8 +96,6 @@ public class Console extends View {
      */
     private class Dumper extends Trader {
 
-        private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
-
         /**
          * {@inheritDoc}
          */
@@ -107,7 +105,7 @@ public class Console extends View {
                 ExecutionFlow flow = market.flow;
 
                 StringBuilder builder = new StringBuilder();
-                builder.append(formatter.format(LocalTime.now())).append(" ");
+                builder.append(LocalTime.now().format(Chrono.Time)).append(" ");
                 builder.append(flow.latest.price).append(" ");
                 builder.append(flow.volume().format(2)).append("   ");
                 builder.append(market.flow75.volume().format(2)).append("   ");

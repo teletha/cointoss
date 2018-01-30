@@ -40,6 +40,7 @@ import cointoss.Execution;
 import cointoss.MarketLog;
 import cointoss.Side;
 import cointoss.util.Num;
+import cointoss.util.Chrono;
 import filer.Filer;
 import kiss.I;
 import kiss.Signal;
@@ -101,7 +102,7 @@ class BitFlyerLog extends MarketLog {
 
             for (Path file : files) {
                 String name = file.getFileName().toString();
-                ZonedDateTime date = LocalDate.parse(name.substring(9, 17), fomatFile).atTime(0, 0, 0, 0).atZone(Execution.UTC);
+                ZonedDateTime date = LocalDate.parse(name.substring(9, 17), fomatFile).atTime(0, 0, 0, 0).atZone(Chrono.UTC);
 
                 if (start == null || end == null) {
                     start = date;

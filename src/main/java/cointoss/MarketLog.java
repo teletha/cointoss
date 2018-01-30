@@ -14,6 +14,7 @@ import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 
 import cointoss.util.Span;
+import cointoss.util.Chrono;
 import kiss.Signal;
 
 /**
@@ -88,7 +89,7 @@ public abstract class MarketLog {
      * @return
      */
     public final Signal<Execution> fromLast(int time, ChronoUnit unit) {
-        return from(ZonedDateTime.now(Execution.UTC).minus(time, unit));
+        return from(ZonedDateTime.now(Chrono.UTC).minus(time, unit));
     }
 
     /**

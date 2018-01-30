@@ -16,16 +16,16 @@ import javafx.geometry.Side;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Region;
 
-import cointoss.Market;
 import cointoss.ticker.Tick;
 import cointoss.ticker.TickSpan;
 import cointoss.ticker.Ticker;
 import cointoss.util.Num;
 import kiss.Disposable;
+import trademate.TradingView;
 import viewtify.ui.helper.LayoutAssistant;
 
 /**
- * @version 2018/01/09 22:15:56
+ * @version 2018/01/30 19:46:15
  */
 public class CandleChart extends Region {
 
@@ -39,7 +39,7 @@ public class CandleChart extends Region {
     public final ChartPlotArea main;
 
     /** The current market. */
-    public final Market market;
+    public final TradingView trade;
 
     /** The list of plottable cnadle date. */
     Ticker ticker;
@@ -56,8 +56,8 @@ public class CandleChart extends Region {
     /**
      * 
      */
-    public CandleChart(AnchorPane parent, Market market) {
-        this.market = market;
+    public CandleChart(AnchorPane parent, TradingView trade) {
+        this.trade = trade;
         this.main = new ChartPlotArea(this, axisX, axisY);
 
         parent.getChildren().add(this);
@@ -177,7 +177,7 @@ public class CandleChart extends Region {
      * @return
      */
     public final CandleChart use(TickSpan span) {
-        this.ticker = market.tickerBy(span);
+        this.ticker = trade.market().tickerBy(span);
 
         tickerUsage.dispose();
         tickerUsage = ticker.update.startWith((Tick) null).to(tick -> {

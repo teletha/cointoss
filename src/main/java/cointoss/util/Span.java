@@ -13,8 +13,6 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 
-import cointoss.Execution;
-
 /**
  * @version 2017/09/03 22:04:28
  */
@@ -37,8 +35,8 @@ public class Span {
      * @param end
      */
     public Span(int startYear, int startMonth, int startDay, int endYear, int endMonth, int endDay) {
-        this.start = ZonedDateTime.of(startYear, startMonth, startDay, 0, 0, 0, 0, Execution.UTC);
-        this.end = ZonedDateTime.of(endYear, endMonth, endDay, 0, 0, 0, 0, Execution.UTC);
+        this.start = ZonedDateTime.of(startYear, startMonth, startDay, 0, 0, 0, 0, Chrono.UTC);
+        this.end = ZonedDateTime.of(endYear, endMonth, endDay, 0, 0, 0, 0, Chrono.UTC);
     }
 
     /**

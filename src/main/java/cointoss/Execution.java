@@ -23,9 +23,6 @@ import kiss.Encoder;
  */
 public class Execution {
 
-    /** The zone normalizer. */
-    public static final ZoneId UTC = ZoneId.of("UTC");
-
     public long id;
 
     /** Buyer id of this execution. */
@@ -64,7 +61,7 @@ public class Execution {
     public Execution(String line) {
         String[] values = line.split(" ");
         id = Long.parseLong(values[0]);
-        exec_date = LocalDateTime.parse(values[1]).atZone(UTC);
+        exec_date = LocalDateTime.parse(values[1]).atZone(cointoss.util.Chrono.UTC);
         side = Side.parse(values[2]);
         price = Num.of(values[3]);
         size = cumulativeSize = Num.of(values[4]);

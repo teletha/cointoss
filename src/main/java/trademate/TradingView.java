@@ -9,16 +9,14 @@
  */
 package trademate;
 
-import java.time.Instant;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 
 import javafx.scene.layout.AnchorPane;
 
-import cointoss.Execution;
 import cointoss.Market;
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.ticker.TickSpan;
+import cointoss.util.Chrono;
 import cointoss.util.Num;
 import kiss.I;
 import trademate.chart.CandleChart;
@@ -32,14 +30,13 @@ import viewtify.User;
 import viewtify.View;
 import viewtify.Viewtify;
 import viewtify.ui.UIComboBox;
+import viewtify.ui.UILabel;
 import viewtify.ui.UITab;
 
 /**
  * @version 2017/11/29 10:50:06
  */
 public class TradingView extends View {
-
-    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
 
     public final BitFlyer provider;
 
@@ -61,7 +58,11 @@ public class TradingView extends View {
 
     public @UI AnchorPane chart;
 
+    /** Chart UI */
     public @UI UIComboBox<TickSpan> chartSpan;
+
+    /** Chart UI */
+    public @UI UILabel pointedDate;
 
     /** Market cache. */
     private Market market;
@@ -79,14 +80,13 @@ public class TradingView extends View {
      */
     @Override
     protected void initialize() {
-        CandleChart candleChart = new CandleChart(chart, market()).graph(plot -> {
+        CandleChart candleChart = new CandleChart(chart, this).graph(plot -> {
         }).axisX(axis -> {
             axis.scroll.setVisibleAmount(0.1);
             axis.scroll.setValue(1);
 
             long minute = 60000;
-            axis.tickLabelFormatter
-                    .set(v -> Instant.ofEpochMilli((long) v).plus(9, ChronoUnit.HOURS).atZone(Execution.UTC).format(formatter));
+            axis.tickLabelFormatter.set(time -> Chrono.system(time).format(Chrono.TimeWithoutSec));
             axis.units.set(new double[] {minute, 5 * minute, 10 * minute, 30 * minute, 60 * minute, 2 * 60 * minute, 4 * 60 * minute,
                     6 * 60 * minute, 12 * 60 * minute, 24 * 60 * minute});
         }).axisY(axis -> {
