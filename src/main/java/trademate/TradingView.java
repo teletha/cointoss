@@ -79,7 +79,7 @@ public class TradingView extends View {
      */
     @Override
     protected void initialize() {
-        CandleChart candleChart = new CandleChart(chart, this).graph(plot -> {
+        CandleChart candleChart = new CandleChart(chart, market()).graph(plot -> {
         }).axisX(axis -> {
             axis.scroll.setVisibleAmount(0.1);
             axis.scroll.setValue(1);
@@ -92,9 +92,9 @@ public class TradingView extends View {
         }).axisY(axis -> {
             axis.scroll.setVisible(false);
             axis.tickLabelFormatter.set(v -> Num.of(v).scale(0).toString());
-        }).candleDate(market().tickerBy(TickSpan.Second5));
+        }).use(TickSpan.Second5);
 
-        chartSpan.values(0, TickSpan.class).observe(span -> candleChart.candleDate(market().tickerBy(span))).when(User.Scroll, e -> {
+        chartSpan.values(0, TickSpan.class).observe(candleChart::use).when(User.Scroll, e -> {
             if (e.getDeltaY() < 0) {
                 chartSpan.ui.getSelectionModel().selectNext();
             } else {

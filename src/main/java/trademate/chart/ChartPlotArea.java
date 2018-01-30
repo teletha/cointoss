@@ -32,7 +32,6 @@ import cointoss.ticker.Tick;
 import cointoss.util.Num;
 import kiss.I;
 import trademate.Notificator;
-import trademate.TradingView;
 import trademate.chart.Axis.TickLable;
 import trademate.chart.shape.Candle;
 import viewtify.Viewtify;
@@ -52,9 +51,6 @@ public class ChartPlotArea extends Region {
 
     /** The vertical axis. */
     final Axis axisY;
-
-    /** The current market. */
-    private final TradingView trade;
 
     /** The notificator. */
     private final Notificator notificator = I.make(Notificator.class);
@@ -94,13 +90,11 @@ public class ChartPlotArea extends Region {
 
     /**
      * @param chart
-     * @param trade
      * @param axisX
      * @param axisY
      */
-    public ChartPlotArea(CandleChart chart, TradingView trade, Axis axisX, Axis axisY) {
+    public ChartPlotArea(CandleChart chart, Axis axisX, Axis axisY) {
         this.chart = chart;
-        this.trade = trade;
         this.axisX = axisX;
         this.axisY = axisY;
         this.backGridVertical = new LineMark(axisX.forGrid, axisX, ChartClass.BackGrid);
@@ -177,7 +171,7 @@ public class ChartPlotArea extends Region {
             Num price = Num.of(Math.floor(axisY.getValueForPosition(clickedPosition)));
             TickLable label = notifyPrice.createLabel(price);
 
-            label.add(trade.market().signalByPrice(price).on(Viewtify.UIThread).to(exe -> {
+            label.add(chart.market.signalByPrice(price).on(Viewtify.UIThread).to(exe -> {
                 notificator.priceSignal.notify("Rearch to " + price);
                 notifyPrice.remove(label);
             }));
@@ -188,7 +182,7 @@ public class ChartPlotArea extends Region {
      * Visualize order price in chart.
      */
     private void visualizeOrderPrice() {
-        trade.market().yourOrder.on(Viewtify.UIThread).to(o -> {
+        chart.market.yourOrder.on(Viewtify.UIThread).to(o -> {
             LineMark mark = o.isBuy() ? orderBuyPrice : orderSellPrice;
             TickLable label = mark.createLabel(o.price);
 
@@ -202,7 +196,7 @@ public class ChartPlotArea extends Region {
      * Visualize latest price in chart.
      */
     private void visualizeLatestPrice() {
-        trade.market().timeline.map(e -> e.price).diff().on(Viewtify.UIThread).to(price -> {
+        chart.market.timeline.map(e -> e.price).diff().on(Viewtify.UIThread).to(price -> {
             latestPrice.removeAll();
             latestPrice.createLabel(price);
         });

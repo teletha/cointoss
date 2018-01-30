@@ -16,11 +16,12 @@ import javafx.geometry.Side;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Region;
 
+import cointoss.Market;
 import cointoss.ticker.Tick;
+import cointoss.ticker.TickSpan;
 import cointoss.ticker.Ticker;
 import cointoss.util.Num;
 import kiss.Disposable;
-import trademate.TradingView;
 import viewtify.ui.helper.LayoutAssistant;
 
 /**
@@ -37,6 +38,9 @@ public class CandleChart extends Region {
     /** The actual graph drawer. */
     public final ChartPlotArea main;
 
+    /** The current market. */
+    public final Market market;
+
     /** The list of plottable cnadle date. */
     Ticker ticker;
 
@@ -46,11 +50,15 @@ public class CandleChart extends Region {
             .layoutBy(axisX.scroll.valueProperty(), axisX.scroll.visibleAmountProperty())
             .layoutBy(axisY.scroll.valueProperty(), axisY.scroll.visibleAmountProperty());
 
+    /** The use flag. */
+    private Disposable tickerUsage = Disposable.empty();
+
     /**
      * 
      */
-    public CandleChart(AnchorPane parent, TradingView trade) {
-        this.main = new ChartPlotArea(this, trade, axisX, axisY);
+    public CandleChart(AnchorPane parent, Market market) {
+        this.market = market;
+        this.main = new ChartPlotArea(this, axisX, axisY);
 
         parent.getChildren().add(this);
 
@@ -162,32 +170,23 @@ public class CandleChart extends Region {
         return this;
     }
 
-    private Disposable disposable;
-
     /**
+     * Specify ticker.
+     * 
      * @param ticker
      * @return
      */
-    public CandleChart candleDate(Ticker ticker) {
-        // clear old ticks
-        this.ticker = ticker;
+    public final CandleChart use(TickSpan span) {
+        this.ticker = market.tickerBy(span);
 
-        if (disposable != null) {
-            disposable.dispose();
-        }
-
-        disposable = ticker.update.to(tick -> {
-            layoutChart.requestLayout();
+        tickerUsage.dispose();
+        tickerUsage = ticker.update.startWith((Tick) null).to(tick -> {
             main.layoutCandle.requestLayout();
 
             if (0.99 <= axisX.scroll.getValue()) {
                 axisX.scroll.setValue(1);
             }
         });
-
-        layoutChart.requestLayout();
-        main.layoutCandle.requestLayout();
-
         return this;
     }
 }
