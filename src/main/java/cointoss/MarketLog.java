@@ -9,7 +9,7 @@
  */
 package cointoss;
 
-import static cointoss.chart.TickSpan.*;
+import static cointoss.ticker.TickSpan.*;
 
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
@@ -28,8 +28,8 @@ import java.util.function.Function;
 
 import org.eclipse.collections.impl.map.mutable.ConcurrentHashMap;
 
-import cointoss.chart.Tick;
-import cointoss.chart.TickSpan;
+import cointoss.ticker.Tick;
+import cointoss.ticker.TickSpan;
 import cointoss.util.Span;
 import kiss.I;
 import kiss.Signal;

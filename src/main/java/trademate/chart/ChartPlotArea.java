@@ -26,8 +26,8 @@ import javafx.scene.shape.PathElement;
 import javafx.scene.shape.Polyline;
 
 import cointoss.Order.State;
+import cointoss.ticker.Tick;
 import cointoss.Side;
-import cointoss.chart.Tick;
 import cointoss.util.Num;
 import kiss.I;
 import trademate.Notificator;

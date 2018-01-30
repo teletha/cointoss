@@ -7,7 +7,7 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss.chart;
+package cointoss.ticker;
 
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
@@ -19,6 +19,8 @@ import org.junit.Test;
 import cointoss.Execution;
 import cointoss.MarketLog;
 import cointoss.market.bitflyer.BitFlyer;
+import cointoss.ticker.Tick;
+import cointoss.ticker.TickSpan;
 
 /**
  * @version 2018/01/29 10:01:00

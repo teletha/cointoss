@@ -7,7 +7,7 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss.chart;
+package cointoss.ticker;
 
 import static java.time.temporal.ChronoField.*;
 

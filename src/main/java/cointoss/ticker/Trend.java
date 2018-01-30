@@ -7,7 +7,7 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss.chart;
+package cointoss.ticker;
 
 /**
  * @version 2017/09/09 22:38:20

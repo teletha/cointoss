@@ -17,8 +17,8 @@ import javafx.scene.layout.AnchorPane;
 
 import cointoss.Execution;
 import cointoss.Market;
-import cointoss.chart.TickSpan;
 import cointoss.market.bitflyer.BitFlyer;
+import cointoss.ticker.TickSpan;
 import cointoss.util.Num;
 import kiss.I;
 import trademate.chart.CandleChart;

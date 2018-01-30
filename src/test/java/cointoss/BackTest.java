@@ -11,9 +11,9 @@ package cointoss;
 
 import java.time.temporal.ChronoUnit;
 
-import cointoss.chart.Tick;
-import cointoss.chart.TickSpan;
 import cointoss.market.bitflyer.BitFlyer;
+import cointoss.ticker.Tick;
+import cointoss.ticker.TickSpan;
 import cointoss.util.Num;
 
 /**

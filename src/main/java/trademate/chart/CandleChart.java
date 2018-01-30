@@ -18,8 +18,8 @@ import javafx.geometry.Side;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Region;
 
-import cointoss.chart.Tick;
-import cointoss.chart.Ticker;
+import cointoss.ticker.Tick;
+import cointoss.ticker.Ticker;
 import cointoss.util.Num;
 import kiss.Disposable;
 import trademate.TradingView;
