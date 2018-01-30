@@ -13,12 +13,10 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.ToDoubleFunction;
 
 import javafx.collections.ObservableList;
 import javafx.scene.Group;
-import javafx.scene.Node;
 import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.layout.Region;
 import javafx.scene.shape.LineTo;
@@ -26,6 +24,8 @@ import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.PathElement;
 import javafx.scene.shape.Polyline;
+
+import org.eclipse.collections.impl.map.mutable.primitive.LongObjectHashMap;
 
 import cointoss.Side;
 import cointoss.order.Order.State;
@@ -59,7 +59,7 @@ public class ChartPlotArea extends Region {
     private final Notificator notificator = I.make(Notificator.class);
 
     /** Chart UI */
-    private final Group candles = new Group();
+    private final Candles candles = new Candles();
 
     /** Chart UI */
     private final LineMark backGridVertical;
@@ -238,7 +238,7 @@ public class ChartPlotArea extends Region {
     }
 
     private Variable<Tick> findBy(double x) {
-        return chart.ticker.find(tick -> x <= tick.start.toInstant().toEpochMilli());
+        return chart.ticker.find(tick -> x <= tick.start.toEpochSecond());
     }
 
     /**
@@ -246,30 +246,15 @@ public class ChartPlotArea extends Region {
      */
     private void drawCandleChart() {
         layoutCandle.layout(() -> {
-            ObservableList<Node> candles = this.candles.getChildren();
-            int candleSize = candles.size();
-            int dataSize = chart.ticker.size();
-
-            // ensure size
-            int difference = dataSize - candleSize;
-
-            if (0 < difference) {
-                for (int i = 0; i < difference; i++) {
-                    candles.add(new Candle());
-                }
-            }
-
             // estimate visible range
             long start = (long) axisX.computeVisibleMinValue();
             long end = (long) axisX.computeVisibleMaxValue();
 
             // draw chart
-            AtomicInteger visible = new AtomicInteger();
-            AtomicInteger index = new AtomicInteger();
+            candles.initialize();
 
             chart.ticker.each(tick -> {
-                Candle candle = (Candle) candles.get(index.getAndIncrement());
-                long time = tick.start.toInstant().toEpochMilli();
+                long time = tick.start.toEpochSecond();
 
                 if (start <= time && time <= end) {
                     // in visible range
@@ -278,35 +263,42 @@ public class ChartPlotArea extends Region {
                     double close = axisY.getPositionForValue(tick.closePrice.toDouble());
                     double high = axisY.getPositionForValue(tick.highPrice.toDouble());
                     double low = axisY.getPositionForValue(tick.lowPrice.toDouble());
+
+                    Candle candle = candles.next(time);
                     candle.update(close - open, high - open, low - open, null);
                     candle.setLayoutX(x);
                     candle.setLayoutY(open);
+                    candle.setVisible(true);
 
-                    chartBottom.calculate(tick, visible.getAndIncrement(), x);
-                } else {
-                    // out of visible range
-                    candle.setLayoutX(-50);
-                    candle.setLayoutY(-50);
+                    chartBottom.calculate(tick, x);
                 }
             });
-
-            // hide unused candle shapes
-            for (int i = index.get(); i < candleSize; i++) {
-                Candle candle = (Candle) candles.get(i);
-                candle.setLayoutX(-50);
-                candle.setLayoutY(-50);
-            }
-            System.out.println("visible:" + visible
-                    .get() + "  width:" + getWidth() + "  tickwidth: 4   idealMaxVisible:" + ((int) (getWidth() / 4)));
-            chartBottom.draw(visible.get());
+            chartBottom.draw();
         });
     }
 
     /**
+     * Candle shape manager.
+     * 
      * @version 2018/01/30 23:10:36
      */
-    private class CandleManager {
+    private static class Candles extends Group {
 
+        private LongObjectHashMap<Candle> map = LongObjectHashMap.newMap();
+
+        private void initialize() {
+            map.forEachValue(candle -> candle.setVisible(false));
+        }
+
+        private Candle next(long time) {
+            Candle candle = map.getIfAbsentPut(time, () -> {
+                Candle c = new Candle();
+                getChildren().add(c);
+                return c;
+            });
+
+            return candle;
+        }
     }
 
     /**
@@ -336,7 +328,7 @@ public class ChartPlotArea extends Region {
         /**
          * Calculate each value
          */
-        private void calculate(Tick tick, int index, double x) {
+        private void calculate(Tick tick, double x) {
             for (Line line : lines) {
                 line.calculate(tick, x);
             }
@@ -345,7 +337,7 @@ public class ChartPlotArea extends Region {
         /**
          * Finish drawing chart line.
          */
-        private void draw(int index) {
+        private void draw() {
             double height = getHeight();
             double scale = lines.stream().map(Line::scale).min(Comparator.naturalOrder()).get();
 

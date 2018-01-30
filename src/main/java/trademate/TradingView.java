@@ -91,8 +91,8 @@ public class TradingView extends View {
             axis.scroll.setVisibleAmount(0.1);
             axis.scroll.setValue(1);
 
-            long minute = 60000;
-            axis.tickLabelFormatter.set(time -> Chrono.system(time).format(Chrono.TimeWithoutSec));
+            long minute = 60;
+            axis.tickLabelFormatter.set(time -> Chrono.systemBySeconds(time).format(Chrono.TimeWithoutSec));
             axis.units.set(new double[] {minute, 5 * minute, 10 * minute, 30 * minute, 60 * minute, 2 * 60 * minute, 4 * 60 * minute,
                     6 * 60 * minute, 12 * 60 * minute, 24 * 60 * minute});
         }).axisY(axis -> {

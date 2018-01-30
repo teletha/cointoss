@@ -106,8 +106,8 @@ public class CandleChart extends Region {
      * Set x-axis range.
      */
     private void setAxisXRange() {
-        axisX.logicalMinValue.set(ticker.first().start.toInstant().toEpochMilli());
-        axisX.logicalMaxValue.set(ticker.last().start.toInstant().toEpochMilli() + 3 * 60 * 1000);
+        axisX.logicalMinValue.set(ticker.first().start.toEpochSecond());
+        axisX.logicalMaxValue.set(ticker.last().start.toEpochSecond() + 3 * 60);
     }
 
     /**
@@ -121,7 +121,7 @@ public class CandleChart extends Region {
         long end = (long) axisX.computeVisibleMaxValue();
 
         ticker.each(data -> {
-            long time = data.start.toInstant().toEpochMilli();
+            long time = data.start.toEpochSecond();
 
             if (start <= time && time <= end) {
                 max.set(Num.max(max.v, data.highPrice));

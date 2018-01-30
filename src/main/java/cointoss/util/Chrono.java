@@ -60,7 +60,7 @@ public class Chrono {
      * @param mills
      * @return
      */
-    public static ZonedDateTime system(long mills) {
+    public static ZonedDateTime systemByMills(long mills) {
         return utc(mills).withZoneSameInstant(ZoneId.systemDefault());
     }
 
@@ -70,8 +70,28 @@ public class Chrono {
      * @param mills
      * @return
      */
-    public static ZonedDateTime system(double mills) {
-        return system((long) mills);
+    public static ZonedDateTime systemByMills(double mills) {
+        return systemByMills((long) mills);
+    }
+
+    /**
+     * System default {@link ZonedDateTime} from epoc seconds.
+     * 
+     * @param seconds
+     * @return
+     */
+    public static ZonedDateTime systemBySeconds(long seconds) {
+        return systemByMills(seconds * 1000);
+    }
+
+    /**
+     * System default {@link ZonedDateTime} from epoc seconds.
+     * 
+     * @param seconds
+     * @return
+     */
+    public static ZonedDateTime systemBySeconds(double seconds) {
+        return systemBySeconds((long) seconds);
     }
 
     /**
