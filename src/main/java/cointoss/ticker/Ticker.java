@@ -12,11 +12,13 @@ package cointoss.ticker;
 import java.time.ZonedDateTime;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import org.magicwerk.brownies.collections.BigList;
 
 import cointoss.util.Listeners;
 import kiss.Signal;
+import kiss.Variable;
 
 /**
  * @version 2018/01/29 9:41:02
@@ -103,16 +105,6 @@ public class Ticker {
     }
 
     /**
-     * Get the indexed tick.
-     * 
-     * @param index
-     * @return
-     */
-    public final Tick get(int index) {
-        return ticks.get(index);
-    }
-
-    /**
      * List up all ticks.
      * 
      * @param consumer
@@ -124,6 +116,26 @@ public class Ticker {
             for (Tick tick : ticks) {
                 consumer.accept(tick);
             }
+        } finally {
+            lock.readLock().unlock();
+        }
+    }
+
+    /**
+     * Find the first tick which matches the specified condition.
+     * 
+     * @param condition
+     */
+    public Variable<Tick> find(Predicate<Tick> condition) {
+        lock.readLock().lock();
+
+        try {
+            for (Tick tick : ticks) {
+                if (condition.test(tick)) {
+                    return Variable.of(tick);
+                }
+            }
+            return Variable.empty();
         } finally {
             lock.readLock().unlock();
         }

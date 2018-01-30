@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.ToDoubleFunction;
 
 import javafx.collections.ObservableList;
@@ -32,6 +33,7 @@ import cointoss.ticker.Tick;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
 import kiss.I;
+import kiss.Variable;
 import trademate.Notificator;
 import trademate.chart.Axis.TickLable;
 import trademate.chart.shape.Candle;
@@ -143,13 +145,11 @@ public class ChartPlotArea extends Region {
             mouseTrackHorizontal.layoutLine.requestLayout();
 
             // upper info
-            Tick tick = findBy(x);
-
-            if (tick != null) {
+            findBy(x).isPresent(tick -> {
                 chart.trade.selectDate.text(Chrono.system(tick.start).format(Chrono.DateTime));
                 chart.trade.selectHigh.text("H " + tick.highPrice.scale(0));
                 chart.trade.selectLow.text("L " + tick.lowPrice.scale(0));
-            }
+            });
         });
 
         // remove on exit
@@ -237,15 +237,8 @@ public class ChartPlotArea extends Region {
         drawCandleChart();
     }
 
-    private Tick findBy(double x) {
-        for (int i = 0; i < chart.ticker.size(); i++) {
-            Tick tick = chart.ticker.get(i);
-
-            if (x <= tick.start.toInstant().toEpochMilli()) {
-                return tick;
-            }
-        }
-        return null;
+    private Variable<Tick> findBy(double x) {
+        return chart.ticker.find(tick -> x <= tick.start.toInstant().toEpochMilli());
     }
 
     /**
@@ -269,41 +262,51 @@ public class ChartPlotArea extends Region {
             // estimate visible range
             long start = (long) axisX.computeVisibleMinValue();
             long end = (long) axisX.computeVisibleMaxValue();
-            int visible = 0;
 
             // draw chart
-            for (int i = 0; i < candleSize; i++) {
-                Candle candle = (Candle) candles.get(i);
+            AtomicInteger visible = new AtomicInteger();
+            AtomicInteger index = new AtomicInteger();
 
-                if (i < dataSize) {
-                    Tick tick = chart.ticker.get(i);
-                    long time = tick.start.toInstant().toEpochMilli();
+            chart.ticker.each(tick -> {
+                Candle candle = (Candle) candles.get(index.getAndIncrement());
+                long time = tick.start.toInstant().toEpochMilli();
 
-                    if (start <= time && time <= end) {
-                        // in visible range
-                        double x = axisX.getPositionForValue(time);
-                        double open = axisY.getPositionForValue(tick.openPrice.toDouble());
-                        double close = axisY.getPositionForValue(tick.closePrice.toDouble());
-                        double high = axisY.getPositionForValue(tick.highPrice.toDouble());
-                        double low = axisY.getPositionForValue(tick.lowPrice.toDouble());
-                        candle.update(close - open, high - open, low - open, null);
-                        candle.setLayoutX(x);
-                        candle.setLayoutY(open);
+                if (start <= time && time <= end) {
+                    // in visible range
+                    double x = axisX.getPositionForValue(time);
+                    double open = axisY.getPositionForValue(tick.openPrice.toDouble());
+                    double close = axisY.getPositionForValue(tick.closePrice.toDouble());
+                    double high = axisY.getPositionForValue(tick.highPrice.toDouble());
+                    double low = axisY.getPositionForValue(tick.lowPrice.toDouble());
+                    candle.update(close - open, high - open, low - open, null);
+                    candle.setLayoutX(x);
+                    candle.setLayoutY(open);
 
-                        chartBottom.calculate(tick, visible++, x);
-                    } else {
-                        // out of visible range
-                        candle.setLayoutX(-50);
-                        candle.setLayoutY(-50);
-                    }
+                    chartBottom.calculate(tick, visible.getAndIncrement(), x);
                 } else {
-                    // unused
+                    // out of visible range
                     candle.setLayoutX(-50);
                     candle.setLayoutY(-50);
                 }
+            });
+
+            // hide unused candle shapes
+            for (int i = index.get(); i < candleSize; i++) {
+                Candle candle = (Candle) candles.get(i);
+                candle.setLayoutX(-50);
+                candle.setLayoutY(-50);
             }
-            chartBottom.draw(visible);
+            System.out.println("visible:" + visible
+                    .get() + "  width:" + getWidth() + "  tickwidth: 4   idealMaxVisible:" + ((int) (getWidth() / 4)));
+            chartBottom.draw(visible.get());
         });
+    }
+
+    /**
+     * @version 2018/01/30 23:10:36
+     */
+    private class CandleManager {
+
     }
 
     /**

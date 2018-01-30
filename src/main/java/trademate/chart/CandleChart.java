@@ -21,6 +21,7 @@ import cointoss.ticker.TickSpan;
 import cointoss.ticker.Ticker;
 import cointoss.util.Num;
 import kiss.Disposable;
+import kiss.Variable;
 import trademate.TradingView;
 import viewtify.ui.helper.LayoutAssistant;
 
@@ -113,25 +114,24 @@ public class CandleChart extends Region {
      * Set y-axis range.
      */
     private void setAxisYRange() {
-        Num max = Num.MIN;
-        Num min = Num.MAX;
+        Variable<Num> max = Variable.of(Num.MIN);
+        Variable<Num> min = Variable.of(Num.MAX);
 
         long start = (long) axisX.computeVisibleMinValue();
         long end = (long) axisX.computeVisibleMaxValue();
 
-        for (int i = 0; i < ticker.size(); i++) {
-            Tick data = ticker.get(i);
+        ticker.each(data -> {
             long time = data.start.toInstant().toEpochMilli();
 
             if (start <= time && time <= end) {
-                max = Num.max(max, data.highPrice);
-                min = Num.min(min, data.lowPrice);
+                max.set(Num.max(max.v, data.highPrice));
+                min.set(Num.min(min.v, data.lowPrice));
             }
-        }
+        });
 
-        Num margin = max.minus(min).multiply(Num.of(0.5));
-        axisY.logicalMaxValue.set(max.plus(margin).toDouble());
-        axisY.logicalMinValue.set(min.minus(margin).toDouble());
+        Num margin = max.v.minus(min).multiply(Num.of(0.5));
+        axisY.logicalMaxValue.set(max.v.plus(margin).toDouble());
+        axisY.logicalMinValue.set(min.v.minus(margin).toDouble());
     }
 
     /**
