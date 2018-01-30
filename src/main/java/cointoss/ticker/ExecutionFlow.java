@@ -7,10 +7,9 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss;
+package cointoss.ticker;
 
-import java.time.ZonedDateTime;
-
+import cointoss.Execution;
 import cointoss.util.Num;
 import cointoss.util.RingBuffer;
 
@@ -18,8 +17,6 @@ import cointoss.util.RingBuffer;
  * @version 2017/11/09 11:19:47
  */
 public class ExecutionFlow {
-
-    public int size = 0;
 
     /** The latest execution. */
     public Execution latest = new Execution();
@@ -42,12 +39,6 @@ public class ExecutionFlow {
     /** The execution buffer. */
     private final RingBuffer<Execution> buffer;
 
-    private ZonedDateTime next = ZonedDateTime.of(1971, 1, 1, 0, 0, 0, 0, Execution.UTC);
-
-    public final RingBuffer<ExecutionFlow> history = new RingBuffer(60, "HISTORY");
-
-    public int id;
-
     /**
      * @param size
      */
@@ -64,14 +55,6 @@ public class ExecutionFlow {
      * @param exe
      */
     public void record(Execution exe) {
-        if (!exe.isBefore(next)) {
-            next = exe.exec_date.withNano(0).plusSeconds(1);
-
-            history.add(copy());
-        }
-
-        size++;
-
         Execution removed = buffer.add(exe);
 
         volume = volume.plus(exe.size);
@@ -114,19 +97,5 @@ public class ExecutionFlow {
 
     public Num estimateDownPotential() {
         return shortVolume.isZero() ? Num.ZERO : shortPriceDecrease.divide(shortVolume).scale(3);
-    }
-
-    private ExecutionFlow copy() {
-        ExecutionFlow copy = new ExecutionFlow(0);
-        copy.id = id++;
-        copy.size = size;
-        copy.latest = latest;
-        copy.volume = volume;
-        copy.longVolume = longVolume;
-        copy.longPriceIncrese = longPriceIncrese;
-        copy.shortVolume = shortVolume;
-        copy.shortPriceDecrease = shortPriceDecrease;
-
-        return copy;
     }
 }

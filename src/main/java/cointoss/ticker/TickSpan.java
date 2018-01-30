@@ -89,16 +89,16 @@ public enum TickSpan {
     Hour12(12, HOUR_OF_DAY),
 
     /** SPAN */
-    Day1(1, DAY_OF_YEAR),
+    Day1(1, EPOCH_DAY),
 
     /** SPAN */
-    Day2(2, DAY_OF_YEAR),
+    Day2(2, EPOCH_DAY),
 
     /** SPAN */
-    Day3(3, DAY_OF_YEAR),
+    Day3(3, EPOCH_DAY),
 
     /** SPAN */
-    Day7(7, DAY_OF_YEAR);
+    Day7(7, EPOCH_DAY);
 
     /** The duration. */
     public final Duration duration;
@@ -117,7 +117,7 @@ public enum TickSpan {
      * @param unit
      */
     private TickSpan(long amount, ChronoField unit) {
-        List<ChronoField> units = I.list(DAY_OF_YEAR, HOUR_OF_DAY, MINUTE_OF_HOUR, SECOND_OF_MINUTE, MILLI_OF_SECOND);
+        List<ChronoField> units = I.list(HOUR_OF_DAY, MINUTE_OF_HOUR, SECOND_OF_MINUTE, MILLI_OF_SECOND);
 
         this.amount = amount;
         this.unit = unit;
@@ -135,7 +135,7 @@ public enum TickSpan {
             for (ChronoField erase : eraser) {
                 temporal = temporal.with(erase, 0);
             }
-            return temporal.with(unit, (temporal.get(unit) / amount) * amount);
+            return temporal.with(unit, temporal.getLong(unit) - (temporal.getLong(unit) % amount));
         });
     }
 

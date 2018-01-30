@@ -13,6 +13,7 @@ import java.time.ZonedDateTime;
 
 import org.junit.Test;
 
+import cointoss.ticker.ExecutionFlow;
 import cointoss.util.Num;
 
 /**
@@ -67,19 +68,6 @@ public class ExecutionFlowTest {
 
         flow.record(createSell(0, -6, 1));
         assert flow.shortVolume.is(4);
-    }
-
-    @Test
-    public void history() throws Exception {
-        ExecutionFlow flow = new ExecutionFlow(3);
-        flow.record(createBuy(0, 1, 1));
-        assert flow.history.latest().latest.price.is(0);
-
-        flow.record(createBuy(1, 2, 1));
-        assert flow.history.latest().latest.price.is(1);
-
-        flow.record(createBuy(2, 3, 1));
-        assert flow.history.latest().latest.price.is(2);
     }
 
     /**

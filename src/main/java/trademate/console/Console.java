@@ -21,8 +21,8 @@ import javafx.collections.ObservableList;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import cointoss.ExecutionFlow;
 import cointoss.Trader;
+import cointoss.ticker.ExecutionFlow;
 import cointoss.util.Num;
 import trademate.SettingView;
 import trademate.TradingView;
