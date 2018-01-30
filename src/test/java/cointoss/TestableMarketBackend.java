@@ -15,11 +15,13 @@ import java.util.LinkedList;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import cointoss.Order.Quantity;
-import cointoss.Order.State;
 import cointoss.Time.Lag;
 import cointoss.market.bitflyer.BitFlyer;
+import cointoss.order.Order;
 import cointoss.order.OrderBookChange;
+import cointoss.order.OrderType;
+import cointoss.order.Order.Quantity;
+import cointoss.order.Order.State;
 import cointoss.util.Num;
 import kiss.Disposable;
 import kiss.I;

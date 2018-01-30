@@ -14,9 +14,9 @@ import java.time.ZonedDateTime;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import cointoss.Order;
-import cointoss.Order.State;
 import cointoss.Side;
+import cointoss.order.Order;
+import cointoss.order.Order.State;
 import cointoss.util.Num;
 import viewtify.Viewtify;
 import viewtify.bind.Calculation;

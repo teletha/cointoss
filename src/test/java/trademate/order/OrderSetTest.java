@@ -11,8 +11,8 @@ package trademate.order;
 
 import org.junit.Test;
 
-import cointoss.Order;
-import cointoss.Order.State;
+import cointoss.order.Order;
+import cointoss.order.Order.State;
 
 /**
  * @version 2017/12/02 1:37:21

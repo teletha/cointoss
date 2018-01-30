@@ -11,8 +11,8 @@ package cointoss;
 
 import org.junit.Test;
 
-import cointoss.Order;
 import cointoss.Side;
+import cointoss.order.Order;
 
 /**
  * @version 2017/07/26 15:22:24

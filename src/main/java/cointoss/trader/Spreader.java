@@ -10,9 +10,9 @@
 package cointoss.trader;
 
 import cointoss.MarketBackend.Health;
-import cointoss.Order;
 import cointoss.Side;
 import cointoss.Trader;
+import cointoss.order.Order;
 import cointoss.order.OrderBookList;
 import cointoss.util.Num;
 

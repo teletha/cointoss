@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
+import cointoss.order.Order;
 import cointoss.util.Num;
 import kiss.Decoder;
 import kiss.Encoder;

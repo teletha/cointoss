@@ -7,7 +7,7 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss;
+package cointoss.order;
 
 /**
  * @version 2017/07/24 14:17:46

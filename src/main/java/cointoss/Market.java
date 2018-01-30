@@ -9,7 +9,7 @@
  */
 package cointoss;
 
-import static cointoss.Order.State.*;
+import static cointoss.order.Order.State.*;
 
 import java.time.ZonedDateTime;
 import java.util.EnumMap;
@@ -19,7 +19,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import cointoss.MarketBackend.Health;
-import cointoss.Order.State;
+import cointoss.order.Order;
+import cointoss.order.Order.State;
 import cointoss.order.OrderBook;
 import cointoss.order.OrderBookChange;
 import cointoss.ticker.ExecutionFlow;
@@ -29,7 +30,6 @@ import cointoss.ticker.Ticker;
 import cointoss.util.Listeners;
 import cointoss.util.Num;
 import kiss.Disposable;
-import kiss.Observer;
 import kiss.Signal;
 import kiss.Variable;
 
@@ -438,9 +438,7 @@ public class Market implements Disposable {
             if (order.id().equals(exe.buy_child_order_acceptance_id) || order.id().equals(exe.sell_child_order_acceptance_id)) {
                 update(order, exe);
 
-                for (Observer<? super Execution> listener : order.executeListeners) {
-                    listener.accept(exe);
-                }
+                order.listeners.omit(exe);
 
                 Position position = new Position();
                 position.side = order.side;

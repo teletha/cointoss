@@ -9,7 +9,7 @@
  */
 package trademate.order;
 
-import static cointoss.Order.State.*;
+import static cointoss.order.Order.State.*;
 import static java.util.concurrent.TimeUnit.*;
 
 import java.math.RoundingMode;
@@ -20,10 +20,10 @@ import javafx.scene.control.Spinner;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.media.AudioClip;
 
-import cointoss.Order;
-import cointoss.Order.Quantity;
-import cointoss.Order.State;
 import cointoss.Side;
+import cointoss.order.Order;
+import cointoss.order.Order.Quantity;
+import cointoss.order.Order.State;
 import cointoss.trader.Spreader;
 import cointoss.util.Num;
 import kiss.I;

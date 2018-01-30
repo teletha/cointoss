@@ -14,8 +14,9 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.Test;
 
-import cointoss.Order.Quantity;
-import cointoss.Order.State;
+import cointoss.order.Order;
+import cointoss.order.Order.Quantity;
+import cointoss.order.Order.State;
 import cointoss.util.Num;
 
 /**

@@ -14,8 +14,9 @@ import static cointoss.Time.*;
 
 import java.time.ZonedDateTime;
 
-import cointoss.Order.State;
 import cointoss.Time.At;
+import cointoss.order.Order;
+import cointoss.order.Order.State;
 import cointoss.util.Num;
 import kiss.Signal;
 import kiss.Table;

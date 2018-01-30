@@ -7,16 +7,18 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss;
+package cointoss.order;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Objects;
-import java.util.concurrent.CopyOnWriteArrayList;
 
+import cointoss.Directional;
+import cointoss.Execution;
+import cointoss.Side;
+import cointoss.util.Listeners;
 import cointoss.util.Num;
-import kiss.Observer;
 import kiss.Signal;
 import kiss.Variable;
 
@@ -45,10 +47,10 @@ public class Order implements Directional {
     private Quantity quantity;
 
     /** The event listeners. */
-    final CopyOnWriteArrayList<Observer<? super Execution>> executeListeners = new CopyOnWriteArrayList<>();
+    public final Listeners<Execution> listeners = new Listeners();
 
     /** The execution signal. */
-    public final Signal<Execution> execute = new Signal(executeListeners);
+    public final Signal<Execution> execute = new Signal(listeners);
 
     /**
      * <p>
