@@ -9,8 +9,6 @@
  */
 package cointoss;
 
-import static cointoss.ticker.TickSpan.*;
-
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
@@ -23,8 +21,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Function;
 
 import org.eclipse.collections.impl.map.mutable.ConcurrentHashMap;
 
@@ -158,28 +154,6 @@ public abstract class MarketLog {
      */
     public final Signal<Execution> rangeRandom(int days) {
         return range(Span.random(getCacheStart(), getCacheEnd().minusDays(1), days));
-    }
-
-    private void smaple() {
-        fromToday().map(Tick.by(Minute1));
-    }
-
-    public final Function<Execution, Tick> ticklize(TickSpan span) {
-        AtomicReference<Tick> latest = new AtomicReference();
-
-        return e -> {
-            Tick tick = latest.get();
-
-            if (tick == null || !e.exec_date.isBefore(tick.end)) {
-                ZonedDateTime startTime = span.calculateStartTime(e.exec_date);
-                ZonedDateTime endTime = span.calculateEndTime(e.exec_date);
-
-                tick = new Tick(startTime, endTime, e.price);
-                latest.set(tick);
-            }
-            tick.update(e);
-            return tick;
-        };
     }
 
     /**
