@@ -9,7 +9,6 @@
  */
 package trademate.chart;
 
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -144,7 +143,13 @@ public class ChartPlotArea extends Region {
             mouseTrackHorizontal.layoutLine.requestLayout();
 
             // upper info
-            chart.trade.pointedDate.text(Chrono.system(x).format(Chrono.DateTime));
+            Tick tick = findBy(x);
+
+            if (tick != null) {
+                chart.trade.selectDate.text(Chrono.system(tick.start).format(Chrono.DateTime));
+                chart.trade.selectHigh.text("H " + tick.highPrice.scale(0));
+                chart.trade.selectLow.text("L " + tick.lowPrice.scale(0));
+            }
         });
 
         // remove on exit
@@ -156,7 +161,9 @@ public class ChartPlotArea extends Region {
             mouseTrackHorizontal.layoutLine.requestLayout();
 
             // upper info
-            chart.trade.pointedDate.text("");
+            chart.trade.selectDate.text("");
+            chart.trade.selectHigh.text("");
+            chart.trade.selectLow.text("");
         });
     }
 
@@ -230,6 +237,17 @@ public class ChartPlotArea extends Region {
         drawCandleChart();
     }
 
+    private Tick findBy(double x) {
+        for (int i = 0; i < chart.ticker.size(); i++) {
+            Tick tick = chart.ticker.get(i);
+
+            if (x <= tick.start.toInstant().toEpochMilli()) {
+                return tick;
+            }
+        }
+        return null;
+    }
+
     /**
      * Draw candle chart.
      */
@@ -266,8 +284,8 @@ public class ChartPlotArea extends Region {
                         double x = axisX.getPositionForValue(time);
                         double open = axisY.getPositionForValue(tick.openPrice.toDouble());
                         double close = axisY.getPositionForValue(tick.closePrice.toDouble());
-                        double high = axisY.getPositionForValue(tick.maxPrice.toDouble());
-                        double low = axisY.getPositionForValue(tick.minPrice.toDouble());
+                        double high = axisY.getPositionForValue(tick.highPrice.toDouble());
+                        double low = axisY.getPositionForValue(tick.lowPrice.toDouble());
                         candle.update(close - open, high - open, low - open, null);
                         candle.setLayoutX(x);
                         candle.setLayoutY(open);

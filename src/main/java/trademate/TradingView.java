@@ -62,7 +62,13 @@ public class TradingView extends View {
     public @UI UIComboBox<TickSpan> chartSpan;
 
     /** Chart UI */
-    public @UI UILabel pointedDate;
+    public @UI UILabel selectDate;
+
+    /** Chart UI */
+    public @UI UILabel selectHigh;
+
+    /** Chart UI */
+    public @UI UILabel selectLow;
 
     /** Market cache. */
     private Market market;

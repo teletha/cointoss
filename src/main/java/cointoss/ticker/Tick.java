@@ -34,10 +34,10 @@ public class Tick {
     public Num closePrice = null;
 
     /** Max price of the period */
-    public Num maxPrice = Num.ZERO;
+    public Num highPrice = Num.ZERO;
 
     /** Min price of the period */
-    public Num minPrice = Num.MAX;
+    public Num lowPrice = Num.MAX;
 
     /** Volume of the period */
     public Num volume = Num.ZERO;
@@ -72,8 +72,8 @@ public class Tick {
         end = ZonedDateTime.parse(values[1]);
         openPrice = Num.of(values[2]);
         closePrice = Num.of(values[3]);
-        maxPrice = Num.of(values[4]);
-        minPrice = Num.of(values[5]);
+        highPrice = Num.of(values[4]);
+        lowPrice = Num.of(values[5]);
         volume = Num.of(values[6]);
         amount = Num.of(values[7]);
     }
@@ -95,8 +95,8 @@ public class Tick {
     public void update(Execution exe) {
         Num latest = closePrice == null ? openPrice : closePrice;
         closePrice = exe.price;
-        maxPrice = Num.max(maxPrice, exe.price);
-        minPrice = Num.min(minPrice, exe.price);
+        highPrice = Num.max(highPrice, exe.price);
+        lowPrice = Num.min(lowPrice, exe.price);
         volume = volume.plus(exe.size);
         amount = amount.plus(exe.price.multiply(exe.size));
 
@@ -116,8 +116,8 @@ public class Tick {
      */
     void update(Tick tick) {
         closePrice = tick.closePrice;
-        maxPrice = Num.max(maxPrice, tick.maxPrice);
-        minPrice = Num.min(minPrice, tick.minPrice);
+        highPrice = Num.max(highPrice, tick.highPrice);
+        lowPrice = Num.min(lowPrice, tick.lowPrice);
         volume = volume.plus(tick.volume);
         amount = amount.plus(tick.amount);
         longVolume = longVolume.plus(tick.longVolume);
@@ -168,7 +168,7 @@ public class Tick {
      * @return The maxPrice property.
      */
     public final Num getMaxPrice() {
-        return maxPrice;
+        return highPrice;
     }
 
     /**
@@ -177,7 +177,7 @@ public class Tick {
      * @return The minPrice property.
      */
     public final Num getMinPrice() {
-        return minPrice;
+        return lowPrice;
     }
 
     /**
@@ -236,9 +236,9 @@ public class Tick {
                 .append(" ")
                 .append(closePrice)
                 .append(" ")
-                .append(maxPrice)
+                .append(highPrice)
                 .append(" ")
-                .append(minPrice)
+                .append(lowPrice)
                 .append(" ")
                 .append(volume)
                 .append(" ")

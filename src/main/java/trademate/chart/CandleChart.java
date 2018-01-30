@@ -124,8 +124,8 @@ public class CandleChart extends Region {
             long time = data.start.toInstant().toEpochMilli();
 
             if (start <= time && time <= end) {
-                max = Num.max(max, data.maxPrice);
-                min = Num.min(min, data.minPrice);
+                max = Num.max(max, data.highPrice);
+                min = Num.min(min, data.lowPrice);
             }
         }
 
