@@ -25,7 +25,7 @@ import javafx.scene.shape.Path;
 import javafx.scene.shape.PathElement;
 import javafx.scene.shape.Polyline;
 
-import org.eclipse.collections.impl.map.mutable.primitive.LongObjectHashMap;
+import org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap;
 
 import cointoss.Side;
 import cointoss.order.Order.State;
@@ -264,7 +264,7 @@ public class ChartPlotArea extends Region {
                     double high = axisY.getPositionForValue(tick.highPrice.toDouble());
                     double low = axisY.getPositionForValue(tick.lowPrice.toDouble());
 
-                    Candle candle = candles.next(time);
+                    Candle candle = candles.next(time - start);
                     candle.update(close - open, high - open, low - open, null);
                     candle.setLayoutX(x);
                     candle.setLayoutY(open);
@@ -284,14 +284,15 @@ public class ChartPlotArea extends Region {
      */
     private static class Candles extends Group {
 
-        private LongObjectHashMap<Candle> map = LongObjectHashMap.newMap();
+        private IntObjectHashMap<Candle> map = IntObjectHashMap.newMap();
 
         private void initialize() {
             map.forEachValue(candle -> candle.setVisible(false));
         }
 
-        private Candle next(long time) {
-            Candle candle = map.getIfAbsentPut(time, () -> {
+        private Candle next(double time) {
+            Candle candle = map.getIfAbsentPut((int) time, () -> {
+                System.out.println(((int) time));
                 Candle c = new Candle();
                 getChildren().add(c);
                 return c;
