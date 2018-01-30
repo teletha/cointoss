@@ -48,6 +48,11 @@
             <HBox>
                <children>
                   <ComboBox id="chartSpan" prefWidth="100.0" />
+                  <Label id="pointedDate" alignment="CENTER" maxHeight="1.7976931348623157E308" prefWidth="60.0" HBox.hgrow="ALWAYS">
+                     <HBox.margin>
+                        <Insets left="10.0" />
+                     </HBox.margin>
+                  </Label>
                </children>
             </HBox>
             <AnchorPane id="chart" />

@@ -34,7 +34,9 @@ import kiss.I;
 import trademate.Notificator;
 import trademate.chart.Axis.TickLable;
 import trademate.chart.shape.Candle;
+import viewtify.UI;
 import viewtify.Viewtify;
+import viewtify.ui.UILabel;
 import viewtify.ui.helper.LayoutAssistant;
 import viewtify.ui.helper.StyleHelper;
 
@@ -88,6 +90,9 @@ public class ChartPlotArea extends Region {
     /** Flag whether candle chart shoud layout on the next rendering phase or not. */
     public final LayoutAssistant layoutCandle = new LayoutAssistant(this);
 
+    /** Chart UI */
+    private @UI UILabel pointedDate;
+
     /**
      * @param chart
      * @param axisX
@@ -139,6 +144,10 @@ public class ChartPlotArea extends Region {
 
             mouseTrackVertical.layoutLine.requestLayout();
             mouseTrackHorizontal.layoutLine.requestLayout();
+
+            // upper info
+            String applied = axisX.tickLabelFormatter.get().apply(axisX.getValueForPosition(e.getX()));
+
         });
 
         // remove on exit

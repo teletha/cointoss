@@ -173,7 +173,7 @@ public class CandleChart extends Region {
     /**
      * Specify ticker.
      * 
-     * @param ticker
+     * @param span
      * @return
      */
     public final CandleChart use(TickSpan span) {
@@ -181,6 +181,7 @@ public class CandleChart extends Region {
 
         tickerUsage.dispose();
         tickerUsage = ticker.update.startWith((Tick) null).to(tick -> {
+            layoutChart.requestLayout();
             main.layoutCandle.requestLayout();
 
             if (0.99 <= axisX.scroll.getValue()) {
