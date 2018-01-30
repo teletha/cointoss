@@ -11,8 +11,6 @@ package trademate.chart;
 
 import java.util.function.Consumer;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Side;
 import javafx.scene.layout.AnchorPane;
@@ -40,12 +38,11 @@ public class CandleChart extends Region {
     public final ChartPlotArea main;
 
     /** The list of plottable cnadle date. */
-    final ObservableList<Tick> candles = FXCollections.observableArrayList();
+    Ticker ticker;
 
     /** The layout manager. */
     private final LayoutAssistant layoutChart = new LayoutAssistant(this)//
             .layoutBy(widthProperty(), heightProperty())
-            .layoutBy(candles)
             .layoutBy(axisX.scroll.valueProperty(), axisX.scroll.visibleAmountProperty())
             .layoutBy(axisY.scroll.valueProperty(), axisY.scroll.visibleAmountProperty());
 
@@ -100,10 +97,8 @@ public class CandleChart extends Region {
      * Set x-axis range.
      */
     private void setAxisXRange() {
-        if (candles.isEmpty() == false) {
-            axisX.logicalMaxValue.set(candles.get(candles.size() - 1).start.toInstant().toEpochMilli() + 3 * 60 * 1000);
-            axisX.logicalMinValue.set(candles.get(0).start.toInstant().toEpochMilli());
-        }
+        axisX.logicalMinValue.set(ticker.first().start.toInstant().toEpochMilli());
+        axisX.logicalMaxValue.set(ticker.last().start.toInstant().toEpochMilli() + 3 * 60 * 1000);
     }
 
     /**
@@ -116,8 +111,8 @@ public class CandleChart extends Region {
         long start = (long) axisX.computeVisibleMinValue();
         long end = (long) axisX.computeVisibleMaxValue();
 
-        for (int i = 0; i < candles.size(); i++) {
-            Tick data = candles.get(i);
+        for (int i = 0; i < ticker.size(); i++) {
+            Tick data = ticker.get(i);
             long time = data.start.toInstant().toEpochMilli();
 
             if (start <= time && time <= end) {
@@ -175,18 +170,14 @@ public class CandleChart extends Region {
      */
     public CandleChart candleDate(Ticker ticker) {
         // clear old ticks
-        this.candles.clear();
+        this.ticker = ticker;
 
         if (disposable != null) {
             disposable.dispose();
         }
 
-        ticker.each(tick -> {
-            this.candles.add(tick);
-        });
-
         disposable = ticker.add.to(tick -> {
-            this.candles.add(tick);
+            layoutChart.requestLayout();
             main.layoutCandle.requestLayout();
 
             if (0.99 <= axisX.scroll.getValue()) {
@@ -194,6 +185,7 @@ public class CandleChart extends Region {
             }
         });
 
+        layoutChart.requestLayout();
         main.layoutCandle.requestLayout();
 
         return this;

@@ -79,12 +79,31 @@ public class Ticker {
     }
 
     /**
-     * Get latest tick.
+     * Get first tick.
      * 
      * @return
      */
-    public final Tick latest() {
+    public final Tick first() {
+        return ticks.getFirst();
+    }
+
+    /**
+     * Get last tick.
+     * 
+     * @return
+     */
+    public final Tick last() {
         return ticks.getLast();
+    }
+
+    /**
+     * Get the indexed tick.
+     * 
+     * @param index
+     * @return
+     */
+    public final Tick get(int index) {
+        return ticks.get(index);
     }
 
     /**

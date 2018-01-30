@@ -217,7 +217,7 @@ public class ChartPlotArea extends Region {
         layoutCandle.layout(() -> {
             ObservableList<Node> candles = this.candles.getChildren();
             int candleSize = candles.size();
-            int dataSize = chart.candles.size();
+            int dataSize = chart.ticker.size();
 
             // ensure size
             int difference = dataSize - candleSize;
@@ -238,7 +238,7 @@ public class ChartPlotArea extends Region {
                 Candle candle = (Candle) candles.get(i);
 
                 if (i < dataSize) {
-                    Tick tick = chart.candles.get(i);
+                    Tick tick = chart.ticker.get(i);
                     long time = tick.start.toInstant().toEpochMilli();
 
                     if (start <= time && time <= end) {
