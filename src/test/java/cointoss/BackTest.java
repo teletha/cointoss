@@ -12,6 +12,7 @@ package cointoss;
 import java.time.temporal.ChronoUnit;
 
 import cointoss.chart.Tick;
+import cointoss.chart.TickSpan;
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.util.Num;
 
@@ -76,7 +77,7 @@ public class BackTest {
                                 });
 
                         // rise under price line
-                        market.second10.tick.takeUntil(closingPosition) //
+                        market.tickerBy(TickSpan.Second10).add.takeUntil(closingPosition) //
                                 .map(Tick::getClosePrice)
                                 .takeAt(i -> i % 5 == 0)
                                 .to(e -> {

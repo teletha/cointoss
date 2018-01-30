@@ -11,8 +11,8 @@ package cointoss;
 
 import static cointoss.Order.State.*;
 
-import java.time.Duration;
 import java.time.ZonedDateTime;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
@@ -20,7 +20,9 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import cointoss.MarketBackend.Health;
 import cointoss.Order.State;
-import cointoss.chart.Chart;
+import cointoss.chart.Tick;
+import cointoss.chart.TickSpan;
+import cointoss.chart.Ticker;
 import cointoss.order.OrderBook;
 import cointoss.order.OrderBookChange;
 import cointoss.util.Listeners;
@@ -46,55 +48,6 @@ public class Market implements Disposable {
 
     /** The market handler. */
     protected final MarketBackend backend;
-
-    /** CHART */
-    public final Chart day7 = new Chart(Duration.ofDays(7));
-
-    /** CHART */
-    public final Chart day3 = new Chart(Duration.ofDays(3));
-
-    /** CHART */
-    public final Chart day1 = new Chart(Duration.ofDays(1));
-
-    /** CHART */
-    public final Chart hour12 = new Chart(Duration.ofHours(12));
-
-    /** CHART */
-    public final Chart hour6 = new Chart(Duration.ofHours(6));
-
-    /** CHART */
-    public final Chart hour4 = new Chart(Duration.ofHours(4));
-
-    /** CHART */
-    public final Chart hour2 = new Chart(Duration.ofHours(2));
-
-    /** CHART */
-    public final Chart hour1 = new Chart(Duration.ofHours(1));
-
-    /** CHART */
-    public final Chart minute30 = new Chart(Duration.ofMinutes(30));
-
-    /** CHART */
-    public final Chart minute15 = new Chart(Duration.ofMinutes(15));
-
-    /** CHART */
-    public final Chart minute5 = new Chart(Duration.ofMinutes(5));
-
-    /** CHART */
-    public final Chart minute1 = new Chart(Duration.ofMinutes(1));
-
-    /** CHART */
-    public final Chart second30 = new Chart(Duration.ofSeconds(30));
-
-    /** CHART */
-    public final Chart second20 = new Chart(Duration.ofSeconds(20));
-
-    /** CHART */
-    public final Chart second10 = new Chart(Duration.ofSeconds(10));
-
-    /** CHART */
-    public final Chart second5 = new Chart(Duration
-            .ofSeconds(5), second10, second20, second30, minute1, minute5, minute15, minute30, hour1, hour2, hour4, hour6, hour12, day1, day3, day7);
 
     public final ExecutionFlow flow = new ExecutionFlow(100);
 
@@ -173,6 +126,9 @@ public class Market implements Disposable {
     /** The list of traders. */
     final List<Trader> traders = new CopyOnWriteArrayList<>();
 
+    /** The ticker manager. */
+    private final EnumMap<TickSpan, Ticker> tickers = new EnumMap(TickSpan.class);
+
     /**
      * Market without {@link Trader}.
      * 
@@ -199,6 +155,11 @@ public class Market implements Disposable {
             throw new Error("Market log is not found.");
         }
 
+        // build tickers for each span
+        for (TickSpan span : TickSpan.values()) {
+            tickers.put(span, new Ticker(timeline.map(Tick.by(span))));
+        }
+
         this.backend = provider.service();
 
         // initialize price, balance and executions
@@ -206,6 +167,7 @@ public class Market implements Disposable {
         this.target = this.targetInit = backend.getTargetCurrency().to().v;
 
         add(trading);
+
         backend.initialize(this, log);
 
         orderTimeline = backend.getOrderBook();
@@ -230,6 +192,16 @@ public class Market implements Disposable {
      */
     public String name() {
         return backend.name();
+    }
+
+    /**
+     * Get {@link Ticker} by span.
+     * 
+     * @param span
+     * @return
+     */
+    public final Ticker tickerBy(TickSpan span) {
+        return tickers.get(span);
     }
 
     /**
@@ -460,7 +432,6 @@ public class Market implements Disposable {
         flow100.record(exe);
         flow200.record(exe);
         flow300.record(exe);
-        second5.tick(exe);
 
         for (Order order : orders) {
             if (order.id().equals(exe.buy_child_order_acceptance_id) || order.id().equals(exe.sell_child_order_acceptance_id)) {

@@ -9,6 +9,8 @@
  */
 package cointoss;
 
+import static cointoss.chart.TickSpan.*;
+
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
@@ -22,6 +24,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
 
 import org.eclipse.collections.impl.map.mutable.ConcurrentHashMap;
 
@@ -157,6 +160,28 @@ public abstract class MarketLog {
         return range(Span.random(getCacheStart(), getCacheEnd().minusDays(1), days));
     }
 
+    private void smaple() {
+        fromToday().map(Tick.by(Minute1));
+    }
+
+    public final Function<Execution, Tick> ticklize(TickSpan span) {
+        AtomicReference<Tick> latest = new AtomicReference();
+
+        return e -> {
+            Tick tick = latest.get();
+
+            if (tick == null || !e.exec_date.isBefore(tick.end)) {
+                ZonedDateTime startTime = span.calculateStartTime(e.exec_date);
+                ZonedDateTime endTime = span.calculateEndTime(e.exec_date);
+
+                tick = new Tick(startTime, endTime, e.price);
+                latest.set(tick);
+            }
+            tick.update(e);
+            return tick;
+        };
+    }
+
     /**
      * Read tick data.
      * 
@@ -167,8 +192,6 @@ public abstract class MarketLog {
      * @return
      */
     public Signal<Tick> read(ZonedDateTime start, ZonedDateTime end, TickSpan span, boolean every) {
-        AtomicReference<Tick> latest = new AtomicReference();
-
         Signal<Tick> signal = new Signal<>((observer, disposer) -> {
             ZonedDateTime day = start;
             ZonedDateTime[] current = new ZonedDateTime[] {start.withHour(0).withMinute(0).withSecond(0).withNano(0)};
@@ -194,19 +217,9 @@ public abstract class MarketLog {
             }
 
             // read from execution flow
-            return disposer.add(range(current[0], end).map(e -> {
-                Tick tick = latest.get();
-
-                if (tick == null || !e.exec_date.isBefore(tick.end)) {
-                    ZonedDateTime startTime = span.calculateStartTime(e.exec_date);
-                    ZonedDateTime endTime = span.calculateEndTime(e.exec_date);
-
-                    tick = new Tick(startTime, endTime, e.price);
-                    latest.set(tick);
-                }
-                tick.update(e);
-                return tick;
-            }).effect(tick -> writers.computeIfAbsent(span, CacheWriter::new).write(tick)).to(observer));
+            return disposer.add(range(current[0], end).map(Tick.by(span))
+                    .effect(tick -> writers.computeIfAbsent(span, CacheWriter::new).write(tick))
+                    .to(observer));
         });
         return every ? signal : signal.diff().delay(1);
     }

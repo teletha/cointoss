@@ -11,8 +11,6 @@ package trademate.chart;
 
 import java.util.function.Consumer;
 
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -20,8 +18,8 @@ import javafx.geometry.Side;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Region;
 
-import cointoss.chart.Chart;
 import cointoss.chart.Tick;
+import cointoss.chart.Ticker;
 import cointoss.util.Num;
 import kiss.Disposable;
 import trademate.TradingView;
@@ -31,9 +29,6 @@ import viewtify.ui.helper.LayoutAssistant;
  * @version 2018/01/09 22:15:56
  */
 public class CandleChart extends Region {
-
-    /** The target chart. */
-    public final ObjectProperty<Chart> chart = new SimpleObjectProperty();
 
     /** The x-axis UI. */
     public final Axis axisX = new Axis(5, 8, Side.BOTTOM);
@@ -50,7 +45,7 @@ public class CandleChart extends Region {
     /** The layout manager. */
     private final LayoutAssistant layoutChart = new LayoutAssistant(this)//
             .layoutBy(widthProperty(), heightProperty())
-            .layoutBy(chart, candles)
+            .layoutBy(candles)
             .layoutBy(axisX.scroll.valueProperty(), axisX.scroll.visibleAmountProperty())
             .layoutBy(axisY.scroll.valueProperty(), axisY.scroll.visibleAmountProperty());
 
@@ -105,8 +100,10 @@ public class CandleChart extends Region {
      * Set x-axis range.
      */
     private void setAxisXRange() {
-        axisX.logicalMaxValue.set(candles.get(candles.size() - 1).start.toInstant().toEpochMilli() + 3 * 60 * 1000);
-        axisX.logicalMinValue.set(candles.get(0).start.toInstant().toEpochMilli());
+        if (candles.isEmpty() == false) {
+            axisX.logicalMaxValue.set(candles.get(candles.size() - 1).start.toInstant().toEpochMilli() + 3 * 60 * 1000);
+            axisX.logicalMinValue.set(candles.get(0).start.toInstant().toEpochMilli());
+        }
     }
 
     /**
@@ -178,18 +175,18 @@ public class CandleChart extends Region {
      * @param minPrice
      * @return
      */
-    public CandleChart candleDate(Chart data) {
+    public CandleChart candleDate(Ticker data) {
         this.candles.clear();
 
         if (disposable != null) {
             disposable.dispose();
         }
 
-        for (Tick tick : data.ticks) {
+        data.each(tick -> {
             this.candles.add(tick);
-        }
+        });
 
-        disposable = data.tick.to(tick -> {
+        disposable = data.add.to(tick -> {
             this.candles.add(tick);
 
             if (0.99 <= axisX.scroll.getValue()) {

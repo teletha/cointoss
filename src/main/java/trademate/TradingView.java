@@ -17,7 +17,7 @@ import javafx.scene.layout.AnchorPane;
 
 import cointoss.Execution;
 import cointoss.Market;
-import cointoss.chart.Chart;
+import cointoss.chart.TickSpan;
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.util.Num;
 import kiss.I;
@@ -61,7 +61,7 @@ public class TradingView extends View {
 
     public @UI AnchorPane chart;
 
-    public @UI UIComboBox<Integer> chartSpan;
+    public @UI UIComboBox<TickSpan> chartSpan;
 
     /** Market cache. */
     private Market market;
@@ -79,9 +79,6 @@ public class TradingView extends View {
      */
     @Override
     protected void initialize() {
-        Chart[] charts = {market().second5, market().second10, market().second20, market().second30, market().minute1, market().minute5,
-                market().minute15, market().minute30};
-
         CandleChart candleChart = new CandleChart(chart, this).graph(plot -> {
         }).axisX(axis -> {
             axis.scroll.setVisibleAmount(0.1);
@@ -95,18 +92,15 @@ public class TradingView extends View {
         }).axisY(axis -> {
             axis.scroll.setVisible(false);
             axis.tickLabelFormatter.set(v -> Num.of(v).scale(0).toString());
-        }).candleDate(market().second5);
+        }).candleDate(market().tickerBy(TickSpan.Second5));
 
-        chartSpan.values(0, new Integer[] {0, 1, 2, 3, 4, 5, 6, 7})
-                .text(i -> charts[i].toString())
-                .observe(i -> candleChart.candleDate(charts[i]))
-                .when(User.Scroll, e -> {
-                    if (e.getDeltaY() < 0) {
-                        chartSpan.ui.getSelectionModel().selectNext();
-                    } else {
-                        chartSpan.ui.getSelectionModel().selectPrevious();
-                    }
-                });
+        chartSpan.values(0, TickSpan.class).observe(span -> candleChart.candleDate(market().tickerBy(span))).when(User.Scroll, e -> {
+            if (e.getDeltaY() < 0) {
+                chartSpan.ui.getSelectionModel().selectNext();
+            } else {
+                chartSpan.ui.getSelectionModel().selectPrevious();
+            }
+        });
 
         market().yourExecution.to(o -> {
             notificator.execution.notify("Executed " + o);

@@ -10,6 +10,8 @@
 package cointoss.chart;
 
 import java.time.ZonedDateTime;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
 
 import cointoss.Execution;
 import cointoss.util.Num;
@@ -243,5 +245,29 @@ public class Tick {
                 .append(amount);
 
         return builder.toString();
+    }
+
+    /**
+     * Create {@link Tick} from {@link Execution}.
+     * 
+     * @param span
+     * @return
+     */
+    public static Function<Execution, Tick> by(TickSpan span) {
+        AtomicReference<Tick> latest = new AtomicReference();
+
+        return e -> {
+            Tick tick = latest.get();
+
+            if (tick == null || !e.exec_date.isBefore(tick.end)) {
+                ZonedDateTime start = span.calculateStartTime(e.exec_date);
+                ZonedDateTime end = span.calculateEndTime(e.exec_date);
+
+                tick = new Tick(start, end, e.price);
+                latest.set(tick);
+            }
+            tick.update(e);
+            return tick;
+        };
     }
 }

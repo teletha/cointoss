@@ -38,12 +38,13 @@ public class Ticker {
     /**
      * 
      */
-    public Ticker(Signal<Tick> ticks) {
-        ticks.diff().delay(1).to(tick -> {
+    public Ticker(Signal<Tick> signal) {
+        signal.diff().delay(1).to(tick -> {
             lock.writeLock().lock();
 
             try {
-                this.ticks.add(tick);
+                ticks.add(tick);
+                listeners.omit(tick);
             } finally {
                 lock.writeLock().unlock();
             }
