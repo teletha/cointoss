@@ -9,23 +9,13 @@
  */
 package cointoss.chart;
 
-import java.io.RandomAccessFile;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Map;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.function.Consumer;
 
-import org.eclipse.collections.impl.map.mutable.ConcurrentHashMap;
+import org.magicwerk.brownies.collections.BigList;
 
-import cointoss.MarketLog;
-import kiss.I;
+import cointoss.util.Listeners;
 import kiss.Signal;
 
 /**
@@ -33,134 +23,83 @@ import kiss.Signal;
  */
 public class Ticker {
 
-    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    /** The event listeners. */
+    private final Listeners<Tick> listeners = new Listeners();
 
-    private static final Map<TickSpan, CacheWriter> writers = new ConcurrentHashMap();
+    /** The event about adding new tick. */
+    public final Signal<Tick> add = new Signal(listeners);
 
-    /** The actual log reader. */
-    private final MarketLog log;
+    /** The tick manager. */
+    private final BigList<Tick> ticks = new BigList();
 
-    /**
-     * @param log
-     * @param cache
-     */
-    public Ticker(MarketLog log) {
-        this.log = log;
-    }
+    /** The lock system. */
+    private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
     /**
-     * Read tick data.
      * 
-     * @param start
-     * @param end
-     * @param span
-     * @param every
-     * @return
      */
-    public Signal<Tick> read(ZonedDateTime start, ZonedDateTime end, TickSpan span, boolean every) {
-        AtomicReference<Tick> latest = new AtomicReference();
+    public Ticker(Signal<Tick> ticks) {
+        ticks.diff().delay(1).to(tick -> {
+            lock.writeLock().lock();
 
-        Signal<Tick> signal = new Signal<>((observer, disposer) -> {
-            ZonedDateTime day = start;
-            ZonedDateTime[] current = new ZonedDateTime[] {start.withHour(0).withMinute(0).withSecond(0).withNano(0)};
-
-            // read from cache
-            while (day.isBefore(end)) {
-                Path file = file(current[0], span);
-
-                if (Files.exists(file)) {
-                    try {
-                        I.signal(Files.lines(file))
-                                .map(Tick::new)
-                                .effect(tick -> current[0] = tick.end)
-                                .take(tick -> tick.start.isBefore(end))
-                                .to(observer);
-                    } catch (Exception e) {
-                        break;
-                    }
-                    day = day.plusDays(1);
-                } else {
-                    break;
-                }
+            try {
+                this.ticks.add(tick);
+            } finally {
+                lock.writeLock().unlock();
             }
-
-            // read from execution flow
-            return disposer.add(log.range(current[0], end).map(e -> {
-                Tick tick = latest.get();
-
-                if (tick == null || !e.exec_date.isBefore(tick.end)) {
-                    ZonedDateTime startTime = span.calculateStartTime(e.exec_date);
-                    ZonedDateTime endTime = span.calculateEndTime(e.exec_date);
-
-                    tick = new Tick(startTime, endTime, e.price);
-                    latest.set(tick);
-                }
-                tick.update(e);
-                return tick;
-            }).effect(tick -> writers.computeIfAbsent(span, CacheWriter::new).write(tick)).to(observer));
         });
-        return every ? signal : signal.diff().delay(1);
     }
 
     /**
-     * Locate cache file.
+     * Calculate start time.
      * 
-     * @param time
-     * @param span
      * @return
      */
-    private Path file(ZonedDateTime time, TickSpan span) {
-        return log.cacheRoot().resolve(span.name()).resolve(formatter.format(time).concat(".log"));
+    public final ZonedDateTime startTime() {
+        return ticks.isEmpty() ? ZonedDateTime.now() : ticks.getFirst().start;
     }
 
     /**
-     * @version 2018/01/29 16:57:46
+     * Calculate end time.
+     * 
+     * @return
      */
-    private class CacheWriter {
+    public final ZonedDateTime endTime() {
+        return ticks.isEmpty() ? ZonedDateTime.now() : ticks.getLast().end;
+    }
 
-        private final TickSpan span;
+    /**
+     * Calculate tick size.
+     * 
+     * @return
+     */
+    public final int size() {
+        return ticks.size();
+    }
 
-        private final Executor writer = Executors.newSingleThreadExecutor();
+    /**
+     * Get latest tick.
+     * 
+     * @return
+     */
+    public final Tick latest() {
+        return ticks.getLast();
+    }
 
-        private Tick latest;
+    /**
+     * List up all ticks.
+     * 
+     * @param consumer
+     */
+    public final void each(Consumer<Tick> consumer) {
+        lock.readLock().lock();
 
-        /**
-         * @param span
-         */
-        private CacheWriter(TickSpan span) {
-            this.span = span;
-        }
-
-        /**
-         * Write tick to cache.
-         * 
-         * @param tick
-         */
-        private void write(Tick tick) {
-            if (tick != latest) {
-                // write latest tick
-                writer.execute(() -> {
-                    try {
-                        Path path = file(tick.start, span);
-
-                        if (Files.notExists(path)) {
-                            Files.createDirectories(path.getParent());
-                        }
-
-                        RandomAccessFile store = new RandomAccessFile(path.toFile(), "rw");
-                        FileChannel channel = store.getChannel();
-                        channel.position(channel.size());
-                        channel.write(ByteBuffer.wrap((tick + "\r\n").getBytes(StandardCharsets.UTF_8)));
-                        channel.close();
-                        store.close();
-                    } catch (Exception e) {
-                        throw I.quiet(e);
-                    }
-                });
-
-                // next
-                latest = tick;
+        try {
+            for (Tick tick : ticks) {
+                consumer.accept(tick);
             }
+        } finally {
+            lock.readLock().unlock();
         }
     }
 }

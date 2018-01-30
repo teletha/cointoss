@@ -40,8 +40,6 @@ public class Chart {
     /** The tick observers. */
     private final Listeners<Tick> listeners = new Listeners();
 
-    public final Signal<Tick> add = new Signal(listeners);
-
     /** The tick observers. */
     public final Signal<Tick> tick = new Signal(listeners);
 
@@ -54,52 +52,6 @@ public class Chart {
         for (Chart child : children) {
             tick.to(child::tick);
         }
-    }
-
-    /**
-     * <p>
-     * Return the current tick size.
-     * </p>
-     * 
-     * @return
-     */
-    public int getTickCount() {
-        return ticks.size();
-    }
-
-    /**
-     * Return the first tick.
-     * 
-     * @return
-     */
-    public final Tick getFirstTick() {
-        return ticks.getFirst();
-    }
-
-    /**
-     * Return the latest tick.
-     * 
-     * @return
-     */
-    public final Tick getLastTick() {
-        return ticks.getLast();
-    }
-
-    /**
-     * @param fromFirst
-     * @return
-     */
-    public final Tick getTick(int fromFirst) {
-        return ticks.get(fromFirst);
-    }
-
-    /**
-     * Return the latest tick.
-     * 
-     * @return
-     */
-    public final Tick getLatestTick(int fromLast) {
-        return ticks.get(ticks.size() - 1 - fromLast);
     }
 
     /**
@@ -152,15 +104,6 @@ public class Chart {
             ticks.add(current);
         }
         current.update(tick);
-    }
-
-    /**
-     * Observe tick.
-     * 
-     * @return
-     */
-    public Signal<Tick> signal() {
-        return new Signal<>(listeners);
     }
 
     /**

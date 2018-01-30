@@ -17,6 +17,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import cointoss.Execution;
+import cointoss.MarketLog;
 import cointoss.market.bitflyer.BitFlyer;
 
 /**
@@ -24,7 +25,7 @@ import cointoss.market.bitflyer.BitFlyer;
  */
 public class TickerTest {
 
-    private Ticker ticker;
+    private MarketLog ticker;
 
     private ZonedDateTime start = ZonedDateTime.of(2018, 1, 1, 0, 0, 0, 0, Execution.UTC);
 
@@ -34,7 +35,7 @@ public class TickerTest {
 
     @Before
     public void setup() {
-        ticker = new Ticker(BitFlyer.FX_BTC_JPY.log());
+        ticker = BitFlyer.FX_BTC_JPY.log();
     }
 
     @Test

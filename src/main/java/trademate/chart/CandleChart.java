@@ -189,7 +189,7 @@ public class CandleChart extends Region {
             this.candles.add(tick);
         }
 
-        disposable = data.add.to(tick -> {
+        disposable = data.tick.to(tick -> {
             this.candles.add(tick);
 
             if (0.99 <= axisX.scroll.getValue()) {
