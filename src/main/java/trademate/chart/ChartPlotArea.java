@@ -25,6 +25,7 @@ import javafx.scene.shape.Path;
 import javafx.scene.shape.PathElement;
 import javafx.scene.shape.Polyline;
 
+import org.eclipse.collections.impl.map.mutable.UnifiedMap;
 import org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap;
 
 import cointoss.Side;
@@ -264,7 +265,7 @@ public class ChartPlotArea extends Region {
                     double high = axisY.getPositionForValue(tick.highPrice.toDouble());
                     double low = axisY.getPositionForValue(tick.lowPrice.toDouble());
 
-                    Candle candle = candles.next(time - start);
+                    Candle candle = candles.next((int) x, tick);
                     candle.update(close - open, high - open, low - open, null);
                     candle.setLayoutX(x);
                     candle.setLayoutY(open);
@@ -273,6 +274,7 @@ public class ChartPlotArea extends Region {
                     chartBottom.calculate(tick, x);
                 }
             });
+            candles.clearUp();
             chartBottom.draw();
         });
     }
@@ -284,21 +286,39 @@ public class ChartPlotArea extends Region {
      */
     private static class Candles extends Group {
 
-        private IntObjectHashMap<Candle> map = IntObjectHashMap.newMap();
+        private IntObjectHashMap<Candle> positions = IntObjectHashMap.newMap();
+
+        private UnifiedMap<Tick, Candle> previous = UnifiedMap.newMap();
+
+        private UnifiedMap<Tick, Candle> current = UnifiedMap.newMap();
 
         private void initialize() {
-            map.forEachValue(candle -> candle.setVisible(false));
         }
 
-        private Candle next(double time) {
-            Candle candle = map.getIfAbsentPut((int) time, () -> {
-                System.out.println(((int) time));
+        private Candle next(int position, Tick tick) {
+            Candle previousCandle = previous.remove(tick);
+
+            if (previousCandle != null) {
+                current.put(tick, previousCandle);
+                return previousCandle;
+            }
+
+            Candle positionCandle = positions.getIfAbsentPut(position, () -> {
                 Candle c = new Candle();
                 getChildren().add(c);
                 return c;
             });
 
-            return candle;
+            current.put(tick, positionCandle);
+            return positionCandle;
+        }
+
+        private void clearUp() {
+            previous.forEachValue(candle -> {
+                candle.setVisible(false);
+            });
+            previous = current;
+            current = UnifiedMap.newMap();
         }
     }
 
