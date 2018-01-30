@@ -96,6 +96,14 @@
 	-fx-stroke: rgb(180, 100, 100);
 }
 
+.PriceLatest.Label {
+	-fx-fill: rgb(140, 140, 50);
+}
+.PriceLatest.Line {
+	-fx-stroke-width: 0.4;
+	-fx-stroke: rgb(140, 140, 50);
+}
+
 .OrderSupport.Label {
 	-fx-fill: -side;
 }

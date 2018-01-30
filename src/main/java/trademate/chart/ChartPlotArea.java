@@ -12,6 +12,7 @@ package trademate.chart;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.ToDoubleFunction;
 
 import javafx.collections.ObservableList;
@@ -77,6 +78,9 @@ public class ChartPlotArea extends Region {
     private final LineMark notifyPrice;
 
     /** Chart UI */
+    private final LineMark latestPrice;
+
+    /** Chart UI */
     private final LineMark orderBuyPrice;
 
     /** Chart UI */
@@ -104,6 +108,7 @@ public class ChartPlotArea extends Region {
         this.mouseTrackVertical = new LineMark(axisX, ChartClass.MouseTrack);
         this.mouseTrackHorizontal = new LineMark(axisY, ChartClass.MouseTrack);
         this.notifyPrice = new LineMark(axisY, ChartClass.PriceSignal);
+        this.latestPrice = new LineMark(axisY, ChartClass.PriceLatest);
         this.orderBuyPrice = new LineMark(axisY, ChartClass.OrderSupport, Side.BUY);
         this.orderSellPrice = new LineMark(axisY, ChartClass.OrderSupport, Side.SELL);
 
@@ -120,9 +125,10 @@ public class ChartPlotArea extends Region {
         visualizeMouseTrack();
         visualizeNotifyPrice();
         visualizeOrderPrice();
+        visualizeLatestPrice();
 
         getChildren()
-                .addAll(backGridVertical, backGridHorizontal, notifyPrice, orderBuyPrice, orderSellPrice, mouseTrackHorizontal, mouseTrackVertical, candles, chartBottom);
+                .addAll(backGridVertical, backGridHorizontal, notifyPrice, orderBuyPrice, orderSellPrice, latestPrice, mouseTrackHorizontal, mouseTrackVertical, candles, chartBottom);
     }
 
     /**
@@ -193,6 +199,16 @@ public class ChartPlotArea extends Region {
     }
 
     /**
+     * Visualize latest price in chart.
+     */
+    private void visualizeLatestPrice() {
+        trade.market().timeline.map(e -> e.price).diff().on(Viewtify.UIThread).to(price -> {
+            latestPrice.removeAll();
+            latestPrice.createLabel(price);
+        });
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -203,6 +219,7 @@ public class ChartPlotArea extends Region {
         mouseTrackVertical.draw();
         mouseTrackHorizontal.draw();
         notifyPrice.draw();
+        latestPrice.draw();
         orderBuyPrice.draw();
         orderSellPrice.draw();
 
@@ -402,7 +419,7 @@ public class ChartPlotArea extends Region {
          * @param classNames
          */
         private LineMark(Axis axis, Enum... classNames) {
-            this(new ArrayList(), axis, classNames);
+            this(new CopyOnWriteArrayList(), axis, classNames);
         }
 
         /**
@@ -451,6 +468,13 @@ public class ChartPlotArea extends Region {
             labels.remove(mark);
             mark.dispose();
             layoutLine.requestLayout();
+        }
+
+        /**
+         * Dsipose all mark.
+         */
+        private void removeAll() {
+            labels.forEach(this::remove);
         }
 
         /**
