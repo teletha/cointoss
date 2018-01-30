@@ -144,7 +144,7 @@ public abstract class Trader implements Disposable {
      * @param oae
      */
     protected final void close() {
-        closePositions.omit(true);
+        closePositions.accept(true);
     }
 
     /**
@@ -280,7 +280,7 @@ public abstract class Trader implements Disposable {
                     entryCost = entryCost.plus(exe.price.multiply(exe.size));
 
                     if (o.isCompleted()) {
-                        completeEntries.omit(true);
+                        completeEntries.accept(true);
                     }
                 });
                 if (initializer != null) initializer.accept(this);
@@ -548,11 +548,11 @@ public abstract class Trader implements Disposable {
                     exitCost = exitCost.plus(exe.price.multiply(exe.size));
 
                     if (o.isCompleted()) {
-                        completeExits.omit(true);
+                        completeExits.accept(true);
 
                         if (positionSize.isZero()) {
                             actives.remove(this);
-                            closePositions.omit(true);
+                            closePositions.accept(true);
                         }
                     }
                 });

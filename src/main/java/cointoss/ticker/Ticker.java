@@ -24,10 +24,16 @@ import kiss.Signal;
 public class Ticker {
 
     /** The event listeners. */
-    private final Listeners<Tick> listeners = new Listeners();
+    private final Listeners<Tick> additions = new Listeners();
 
     /** The event about adding new tick. */
-    public final Signal<Tick> add = new Signal(listeners);
+    public final Signal<Tick> add = new Signal(additions);
+
+    /** The event listeners. */
+    private final Listeners<Tick> updaters = new Listeners();
+
+    /** The event about update tick. */
+    public final Signal<Tick> update = new Signal(updaters);
 
     /** The tick manager. */
     private final BigList<Tick> ticks = new BigList();
@@ -39,12 +45,12 @@ public class Ticker {
      * 
      */
     public Ticker(Signal<Tick> signal) {
-        signal.diff().delay(1).to(tick -> {
+        signal.effect(updaters).diff().to(tick -> {
             lock.writeLock().lock();
 
             try {
                 ticks.add(tick);
-                listeners.omit(tick);
+                additions.accept(tick);
             } finally {
                 lock.writeLock().unlock();
             }

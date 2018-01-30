@@ -9,35 +9,17 @@
  */
 package cointoss;
 
-import java.io.RandomAccessFile;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
-import org.eclipse.collections.impl.map.mutable.ConcurrentHashMap;
-
-import cointoss.ticker.Tick;
-import cointoss.ticker.TickSpan;
 import cointoss.util.Span;
-import kiss.I;
 import kiss.Signal;
 
 /**
  * @version 2017/09/08 18:20:48
  */
 public abstract class MarketLog {
-
-    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
-    private static final Map<TickSpan, CacheWriter> writers = new ConcurrentHashMap();
 
     /**
      * Get the starting day of cache.
@@ -154,115 +136,5 @@ public abstract class MarketLog {
      */
     public final Signal<Execution> rangeRandom(int days) {
         return range(Span.random(getCacheStart(), getCacheEnd().minusDays(1), days));
-    }
-
-    /**
-     * Read tick data.
-     * 
-     * @param start
-     * @param end
-     * @param span
-     * @param every
-     * @return
-     */
-    public Signal<Tick> read(ZonedDateTime start, ZonedDateTime end, TickSpan span, boolean every) {
-        Signal<Tick> signal = new Signal<>((observer, disposer) -> {
-            ZonedDateTime day = start;
-            ZonedDateTime[] current = new ZonedDateTime[] {start.withHour(0).withMinute(0).withSecond(0).withNano(0)};
-
-            // read from cache
-            while (day.isBefore(end)) {
-                Path file = file(current[0], span);
-
-                if (Files.exists(file)) {
-                    try {
-                        I.signal(Files.lines(file))
-                                .map(Tick::new)
-                                .effect(tick -> current[0] = tick.end)
-                                .take(tick -> tick.start.isBefore(end))
-                                .to(observer);
-                    } catch (Exception e) {
-                        break;
-                    }
-                    day = day.plusDays(1);
-                } else {
-                    break;
-                }
-            }
-
-            // read from execution flow
-            return disposer.add(range(current[0], end).map(Tick.by(span))
-                    .effect(tick -> writers.computeIfAbsent(span, CacheWriter::new).write(tick))
-                    .to(observer));
-        });
-        return every ? signal : signal.diff().delay(1);
-    }
-
-    /**
-     * Locate cache file.
-     * 
-     * @param time
-     * @param span
-     * @return
-     */
-    private Path file(ZonedDateTime time, TickSpan span) {
-        return cacheRoot().resolve(span.name()).resolve(formatter.format(time).concat(".log"));
-    }
-
-    /**
-     * @version 2018/01/29 16:57:46
-     */
-    private class CacheWriter {
-
-        private final TickSpan span;
-
-        /** The writer thread. */
-        private final ExecutorService writer = Executors.newSingleThreadExecutor(run -> {
-            Thread thread = new Thread(run);
-            thread.setName("Log Writer");
-            thread.setDaemon(true);
-            return thread;
-        });
-
-        private Tick latest;
-
-        /**
-         * @param span
-         */
-        private CacheWriter(TickSpan span) {
-            this.span = span;
-        }
-
-        /**
-         * Write tick to cache.
-         * 
-         * @param tick
-         */
-        private void write(Tick tick) {
-            if (tick != latest) {
-                // write latest tick
-                writer.execute(() -> {
-                    try {
-                        Path path = file(tick.start, span);
-
-                        if (Files.notExists(path)) {
-                            Files.createDirectories(path.getParent());
-                        }
-
-                        RandomAccessFile store = new RandomAccessFile(path.toFile(), "rw");
-                        FileChannel channel = store.getChannel();
-                        channel.position(channel.size());
-                        channel.write(ByteBuffer.wrap((tick + "\r\n").getBytes(StandardCharsets.UTF_8)));
-                        channel.close();
-                        store.close();
-                    } catch (Exception e) {
-                        throw I.quiet(e);
-                    }
-                });
-
-                // next
-                latest = tick;
-            }
-        }
     }
 }

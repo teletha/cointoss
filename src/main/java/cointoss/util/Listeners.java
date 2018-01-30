@@ -10,25 +10,28 @@
 package cointoss.util;
 
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Consumer;
 
 import kiss.Observer;
 
 /**
  * Listener support.
  * 
- * @version 2017/12/13 9:18:41
+ * @version 2018/01/30 15:40:58
  */
 @SuppressWarnings("serial")
-public final class Listeners<E> extends CopyOnWriteArrayList<Observer<? super E>> {
+public final class Listeners<E> extends CopyOnWriteArrayList<Observer<? super E>> implements Consumer<E> {
 
     /**
      * Omit your event.
      * 
      * @param event
      */
-    public void omit(E event) {
+    @Override
+    public void accept(E event) {
         for (Observer<? super E> observer : this) {
             observer.accept(event);
         }
     }
+
 }

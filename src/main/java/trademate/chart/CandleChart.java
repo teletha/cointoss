@@ -176,7 +176,7 @@ public class CandleChart extends Region {
             disposable.dispose();
         }
 
-        disposable = ticker.add.to(tick -> {
+        disposable = ticker.update.to(tick -> {
             layoutChart.requestLayout();
             main.layoutCandle.requestLayout();
 

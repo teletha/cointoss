@@ -207,7 +207,7 @@ public class OrderBookList {
             }
         }
 
-        modify.omit(true);
+        modify.accept(true);
         calculateTotal();
     }
 
@@ -235,7 +235,7 @@ public class OrderBookList {
             }
         }
 
-        modify.omit(true);
+        modify.accept(true);
         calculateTotal();
     }
 

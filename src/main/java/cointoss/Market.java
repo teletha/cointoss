@@ -261,7 +261,7 @@ public class Market implements Disposable {
             orders.add(order);
 
             // event
-            holderForYourOrder.omit(order);
+            holderForYourOrder.accept(order);
 
             return order;
         }).effectOnError(e -> {
@@ -438,19 +438,19 @@ public class Market implements Disposable {
             if (order.id().equals(exe.buy_child_order_acceptance_id) || order.id().equals(exe.sell_child_order_acceptance_id)) {
                 update(order, exe);
 
-                order.listeners.omit(exe);
+                order.listeners.accept(exe);
 
                 Position position = new Position();
                 position.side = order.side;
                 position.price = exe.price;
                 position.size.set(exe.size);
                 position.open_date = exe.exec_date;
-                holderForYourExecution.omit(position);
+                holderForYourExecution.accept(position);
             }
         }
 
         // observe executions
-        holderForTimeline.omit(exe);
+        holderForTimeline.accept(exe);
     }
 
     /**
