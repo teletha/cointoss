@@ -40,7 +40,7 @@ public class CandleChart extends Region {
     public final ChartPlotArea main;
 
     /** The list of plottable cnadle date. */
-    private final ObservableList<Tick> candles = FXCollections.observableArrayList();
+    final ObservableList<Tick> candles = FXCollections.observableArrayList();
 
     /** The layout manager. */
     private final LayoutAssistant layoutChart = new LayoutAssistant(this)//
@@ -53,7 +53,7 @@ public class CandleChart extends Region {
      * 
      */
     public CandleChart(AnchorPane parent, TradingView trade) {
-        this.main = new ChartPlotArea(trade, axisX, axisY);
+        this.main = new ChartPlotArea(this, trade, axisX, axisY);
 
         parent.getChildren().add(this);
 
@@ -170,33 +170,31 @@ public class CandleChart extends Region {
     private Disposable disposable;
 
     /**
-     * @param closePrice
-     * @param maxPrice
-     * @param minPrice
+     * @param ticker
      * @return
      */
-    public CandleChart candleDate(Ticker data) {
+    public CandleChart candleDate(Ticker ticker) {
+        // clear old ticks
         this.candles.clear();
 
         if (disposable != null) {
             disposable.dispose();
         }
 
-        data.each(tick -> {
+        ticker.each(tick -> {
             this.candles.add(tick);
         });
 
-        disposable = data.add.to(tick -> {
+        disposable = ticker.add.to(tick -> {
             this.candles.add(tick);
+            main.layoutCandle.requestLayout();
 
             if (0.99 <= axisX.scroll.getValue()) {
                 axisX.scroll.setValue(1);
             }
         });
 
-        main.setCandleChartDataList(candles);
-
-        layoutChart.requestLayout();
+        main.layoutCandle.requestLayout();
 
         return this;
     }

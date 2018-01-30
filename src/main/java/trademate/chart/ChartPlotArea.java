@@ -25,9 +25,9 @@ import javafx.scene.shape.Path;
 import javafx.scene.shape.PathElement;
 import javafx.scene.shape.Polyline;
 
-import cointoss.ticker.Tick;
 import cointoss.Side;
 import cointoss.order.Order.State;
+import cointoss.ticker.Tick;
 import cointoss.util.Num;
 import kiss.I;
 import trademate.Notificator;
@@ -43,6 +43,10 @@ import viewtify.ui.helper.StyleHelper;
  */
 public class ChartPlotArea extends Region {
 
+    /** The chart node. */
+    private final CandleChart chart;
+
+    /** The horizontal axis. */
     final Axis axisX;
 
     /** The vertical axis. */
@@ -82,17 +86,16 @@ public class ChartPlotArea extends Region {
     private final LineChart chartBottom = new LineChart();
 
     /** Flag whether candle chart shoud layout on the next rendering phase or not. */
-    private final LayoutAssistant layoutCandle = new LayoutAssistant(this);
-
-    /** The line chart data list. */
-    private ObservableList<Tick> candleChartData;
+    public final LayoutAssistant layoutCandle = new LayoutAssistant(this);
 
     /**
+     * @param chart
      * @param trade
      * @param axisX
      * @param axisY
      */
-    public ChartPlotArea(TradingView trade, Axis axisX, Axis axisY) {
+    public ChartPlotArea(CandleChart chart, TradingView trade, Axis axisX, Axis axisY) {
+        this.chart = chart;
         this.trade = trade;
         this.axisX = axisX;
         this.axisY = axisY;
@@ -214,7 +217,7 @@ public class ChartPlotArea extends Region {
         layoutCandle.layout(() -> {
             ObservableList<Node> candles = this.candles.getChildren();
             int candleSize = candles.size();
-            int dataSize = candleChartData.size();
+            int dataSize = chart.candles.size();
 
             // ensure size
             int difference = dataSize - candleSize;
@@ -235,7 +238,7 @@ public class ChartPlotArea extends Region {
                 Candle candle = (Candle) candles.get(i);
 
                 if (i < dataSize) {
-                    Tick tick = candleChartData.get(i);
+                    Tick tick = chart.candles.get(i);
                     long time = tick.start.toInstant().toEpochMilli();
 
                     if (start <= time && time <= end) {
@@ -263,28 +266,6 @@ public class ChartPlotArea extends Region {
             }
             chartBottom.draw(visible);
         });
-    }
-
-    /**
-     * Set data list for line chart.
-     * 
-     * @param datalist
-     */
-    public final void setCandleChartDataList(ObservableList<Tick> datalist) {
-        // clear old list configuration
-        if (candleChartData != null) {
-            candleChartData.removeListener(layoutCandle);
-        }
-
-        // add new list configuration
-        if (datalist != null) {
-            datalist.addListener(layoutCandle);
-        }
-
-        // update
-        candleChartData = datalist;
-
-        layoutCandle.requestLayout();
     }
 
     /**
