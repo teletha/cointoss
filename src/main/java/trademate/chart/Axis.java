@@ -21,6 +21,7 @@ import javafx.geometry.Bounds;
 import javafx.geometry.Orientation;
 import javafx.geometry.Side;
 import javafx.scene.Group;
+import javafx.scene.control.Label;
 import javafx.scene.control.ScrollBar;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.Region;
@@ -29,7 +30,6 @@ import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.PathElement;
-import javafx.scene.text.Text;
 
 import org.eclipse.collections.api.block.function.primitive.DoubleToObjectFunction;
 
@@ -384,14 +384,6 @@ public class Axis extends Region {
                 }
             }
         }
-
-        // 重なるラベルを不可視にする
-        // Bounds indicatorBounds = indicatorLabel.getBoundsInParent();
-        //
-        // for (int i = 0; i != tickSize(); i++) {
-        // TickLable axisLabel = labelAt(i);
-        // axisLabel.setVisible(!indicatorBounds.intersects(axisLabel.getBoundsInParent()));
-        // }
     }
 
     /**
@@ -441,7 +433,7 @@ public class Axis extends Region {
     /**
      * @version 2018/01/08 2:53:23
      */
-    public class TickLable extends Text implements Disposable {
+    public class TickLable extends Label implements Disposable {
 
         /** The associated value. */
         public final DoubleProperty value = new SimpleDoubleProperty();

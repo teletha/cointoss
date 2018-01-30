@@ -122,10 +122,10 @@ public class ChartPlotArea extends Region {
                 .layoutBy(axisX.scroll.valueProperty(), axisX.scroll.visibleAmountProperty())
                 .layoutBy(axisY.scroll.valueProperty(), axisY.scroll.visibleAmountProperty());
 
-        visualizeMouseTrack();
         visualizeNotifyPrice();
         visualizeOrderPrice();
         visualizeLatestPrice();
+        visualizeMouseTrack();
 
         getChildren()
                 .addAll(backGridVertical, backGridHorizontal, notifyPrice, orderBuyPrice, orderSellPrice, latestPrice, mouseTrackHorizontal, mouseTrackVertical, candles, chartBottom);

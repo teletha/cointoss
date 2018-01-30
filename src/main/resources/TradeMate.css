@@ -72,8 +72,14 @@
 	-fx-translate-y: -10px;
 }
 
+.Label {
+  -fx-font-size: 11px;
+	-fx-background-color: -fx-background;
+	-fx-opacity: 0.8;
+}
+
 .BackGrid.Label {
-	-fx-fill: -fx-mid-text-color;
+	-fx-text-fill: -fx-mid-text-color;
 }
 .BackGrid.Line {
 	-fx-stroke-width: 0.5;
@@ -81,7 +87,7 @@
 }
 
 .MouseTrack.Label {
-	-fx-fill: -fx-light-text-color;
+	-fx-text-fill: -fx-light-text-color;
 }
 .MouseTrack.Line {
 	-fx-stroke-width: 0.5;
@@ -89,7 +95,7 @@
 }
 
 .PriceSignal.Label {
-	-fx-fill: rgb(180, 100, 100);
+	-fx-text-fill: rgb(180, 100, 100);
 }
 .PriceSignal.Line {
 	-fx-stroke-width: 0.5;
@@ -97,18 +103,18 @@
 }
 
 .PriceLatest.Label {
-	-fx-fill: rgb(140, 140, 50);
+	-fx-text-fill: rgb(140, 100, 40);
 }
 .PriceLatest.Line {
-	-fx-stroke-width: 0.4;
-	-fx-stroke: rgb(140, 140, 50);
+	-fx-stroke-width: 0.5;
+	-fx-stroke: rgb(140, 100, 40);
 }
 
 .OrderSupport.Label {
-	-fx-fill: -side;
+	-fx-text-fill: -side;
 }
 .OrderSupport.Line {
-	-fx-stroke-width: 0.6;
+	-fx-stroke-width: 0.5;
 	-fx-stroke: -side;
 	-fx-stroke-dash-array: 2 4;
 }
