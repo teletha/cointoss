@@ -17,6 +17,7 @@ import java.util.function.ToDoubleFunction;
 
 import javafx.collections.ObservableList;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.layout.Region;
 import javafx.scene.shape.LineTo;
@@ -25,8 +26,7 @@ import javafx.scene.shape.Path;
 import javafx.scene.shape.PathElement;
 import javafx.scene.shape.Polyline;
 
-import org.eclipse.collections.impl.map.mutable.UnifiedMap;
-import org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap;
+import org.eclipse.collections.impl.map.mutable.primitive.LongObjectHashMap;
 
 import cointoss.Side;
 import cointoss.order.Order.State;
@@ -252,8 +252,6 @@ public class ChartPlotArea extends Region {
             long end = (long) axisX.computeVisibleMaxValue();
 
             // draw chart
-            candles.initialize();
-
             chart.ticker.each(tick -> {
                 long time = tick.start.toEpochSecond();
 
@@ -265,17 +263,16 @@ public class ChartPlotArea extends Region {
                     double high = axisY.getPositionForValue(tick.highPrice.toDouble());
                     double low = axisY.getPositionForValue(tick.lowPrice.toDouble());
 
-                    Candle candle = candles.next((int) x, tick);
+                    Candle candle = candles.at(time);
                     candle.update(close - open, high - open, low - open, null);
                     candle.setLayoutX(x);
                     candle.setLayoutY(open);
-                    candle.setVisible(true);
 
                     chartBottom.calculate(tick, x);
                 }
             });
-            candles.clearUp();
             chartBottom.draw();
+            candles.clear();
         });
     }
 
@@ -286,39 +283,43 @@ public class ChartPlotArea extends Region {
      */
     private static class Candles extends Group {
 
-        private IntObjectHashMap<Candle> positions = IntObjectHashMap.newMap();
+        /** The child nodes. */
+        private final ObservableList<Node> children = getChildren();
 
-        private UnifiedMap<Tick, Candle> previous = UnifiedMap.newMap();
+        /** The managed candles by tick's epoc seconds. */
+        private final LongObjectHashMap<Candle> candles = LongObjectHashMap.newMap();
 
-        private UnifiedMap<Tick, Candle> current = UnifiedMap.newMap();
+        /** The curretn visible candles. */
+        private final LongObjectHashMap<Candle> used = LongObjectHashMap.newMap();
 
-        private void initialize() {
-        }
-
-        private Candle next(int position, Tick tick) {
-            Candle previousCandle = previous.remove(tick);
-
-            if (previousCandle != null) {
-                current.put(tick, previousCandle);
-                return previousCandle;
+        private void clear() {
+            // hide
+            for (Candle candle : candles) {
+                candle.setLayoutX(-40);
             }
 
-            Candle positionCandle = positions.getIfAbsentPut(position, () -> {
-                Candle c = new Candle();
-                getChildren().add(c);
-                return c;
-            });
-
-            current.put(tick, positionCandle);
-            return positionCandle;
+            // reset
+            candles.putAll(used);
+            used.clear();
         }
 
-        private void clearUp() {
-            previous.forEachValue(candle -> {
-                candle.setVisible(false);
-            });
-            previous = current;
-            current = UnifiedMap.newMap();
+        /**
+         * Retrieve the candle by tick's epoc seconds.
+         * 
+         * @param seconds
+         * @return
+         */
+        private Candle at(long seconds) {
+            Candle candle = candles.remove(seconds);
+
+            if (candle == null) {
+                candle = new Candle();
+                children.add(candle);
+            }
+
+            used.put(seconds, candle);
+
+            return candle;
         }
     }
 
