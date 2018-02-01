@@ -442,9 +442,9 @@ public class Num implements Comparable<Num> {
     }
 
     /**
-     * Converts this {@code Decimal} to a {@code double}.
+     * Converts this {@code Num} to a {@code double}.
      * 
-     * @return this {@code Decimal} converted to a {@code double}
+     * @return this {@code Num} converted to a {@code double}
      * @see BigDecimal#doubleValue()
      */
     public final double toDouble() {
@@ -455,13 +455,23 @@ public class Num implements Comparable<Num> {
     }
 
     /**
-     * Converts this {@code Decimal} to a {@code int}.
+     * Converts this {@code Num} to a {@code int}.
      * 
-     * @return this {@code Decimal} converted to a {@code int}
+     * @return this {@code Num} converted to a {@code int}
      * @see BigDecimal#intValueExact();
      */
     public final int toInt() {
         return delegate.intValueExact();
+    }
+
+    /**
+     * Converts this {@code Num} to a {@code long}.
+     * 
+     * @return this {@code Num} converted to a {@code long}
+     * @see BigDecimal#intValueExact();
+     */
+    public final long toLong() {
+        return delegate.longValue();
     }
 
     /**

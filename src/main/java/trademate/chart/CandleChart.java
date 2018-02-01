@@ -117,8 +117,8 @@ public class CandleChart extends Region {
         Variable<Num> max = Variable.of(Num.MIN);
         Variable<Num> min = Variable.of(Num.MAX);
 
-        long start = (long) axisX.computeVisibleMinValue();
-        long end = (long) axisX.computeVisibleMaxValue();
+        long start = axisX.computeVisibleMinValue();
+        long end = axisX.computeVisibleMaxValue();
 
         ticker.each(data -> {
             long time = data.start.toEpochSecond();
@@ -130,8 +130,8 @@ public class CandleChart extends Region {
         });
 
         Num margin = max.v.minus(min).multiply(Num.of(0.5));
-        axisY.logicalMaxValue.set(max.v.plus(margin).toDouble());
-        axisY.logicalMinValue.set(min.v.minus(margin).toDouble());
+        axisY.logicalMaxValue.set(max.v.plus(margin).toLong());
+        axisY.logicalMinValue.set(min.v.minus(margin).toLong());
     }
 
     /**

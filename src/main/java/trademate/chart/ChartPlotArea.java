@@ -248,8 +248,8 @@ public class ChartPlotArea extends Region {
     private void drawCandleChart() {
         layoutCandle.layout(() -> {
             // estimate visible range
-            long start = (long) axisX.computeVisibleMinValue();
-            long end = (long) axisX.computeVisibleMaxValue();
+            long start = axisX.computeVisibleMinValue();
+            long end = axisX.computeVisibleMaxValue();
 
             // draw chart
             chart.ticker.each(tick -> {

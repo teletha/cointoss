@@ -13,8 +13,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.LongProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.geometry.Bounds;
@@ -73,10 +75,10 @@ public class Axis extends Region {
     public final int tickLabelDistance;
 
     /** The logical maximum value. */
-    public final DoubleProperty logicalMaxValue = new SimpleDoubleProperty(this, "logicalMaxValue", 1);
+    public final LongProperty logicalMaxValue = new SimpleLongProperty(this, "logicalMaxValue", 1000000);
 
     /** The logical minimum value. */
-    public final DoubleProperty logicalMinValue = new SimpleDoubleProperty(this, "logicalMinValue", 0);
+    public final LongProperty logicalMinValue = new SimpleLongProperty(this, "logicalMinValue", 0);
 
     /** The tick unit. */
     public final ObjectProperty<double[]> units = new SimpleObjectProperty(DefaultTickUnit);
@@ -178,9 +180,9 @@ public class Axis extends Region {
      * @param value A value to search position.
      * @return A corresponding visual position.
      */
-    public final double getPositionForValue(double value) {
+    public final long getPositionForValue(double value) {
         double position = uiRatio * (value - computeVisibleMinValue());
-        return isHorizontal() ? position : getHeight() - position;
+        return isHorizontal() ? (long) position : (long) (getHeight() - position);
     }
 
     /**
@@ -201,11 +203,11 @@ public class Axis extends Region {
      * 
      * @return
      */
-    public final double computeVisibleMaxValue() {
-        double max = logicalMaxValue.get();
-        double min = logicalMinValue.get();
+    public final long computeVisibleMaxValue() {
+        long max = logicalMaxValue.get();
+        long min = logicalMinValue.get();
         double amount = scroll.getVisibleAmount();
-        return Math.min(computeVisibleMinValue() + (max - min) * amount, max);
+        return Math.min(computeVisibleMinValue() + (long) ((max - min) * amount), max);
     }
 
     /**
@@ -213,13 +215,13 @@ public class Axis extends Region {
      * 
      * @return
      */
-    public final double computeVisibleMinValue() {
+    public final long computeVisibleMinValue() {
         double position = isHorizontal() ? scroll.getValue() : 1 - scroll.getValue();
-        double max = logicalMaxValue.get();
-        double min = logicalMinValue.get();
-        double logicalDiff = max - min;
+        long max = logicalMaxValue.get();
+        long min = logicalMinValue.get();
+        long logicalDiff = max - min;
         double bar = logicalDiff * scroll.getVisibleAmount();
-        return Math.max(min, min + (logicalDiff - bar) * position);
+        return Math.max(min, min + (long) ((logicalDiff - bar) * position));
     }
 
     /**
