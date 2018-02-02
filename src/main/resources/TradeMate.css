@@ -53,16 +53,12 @@
 }
 
 .CandleLine {
-    -fx-stroke: -side;
-    -fx-stroke-width: 1px;
+  -fx-stroke: -side;
+  -fx-stroke-width: 1px;
 }
 
 .CandleBar {
-	-fx-padding: 5;
-	-fx-background-color: linear-gradient(derive(-side,-10%), derive(-side,-20%)),
-        								linear-gradient(derive(-side,60%), derive(-side, 10%)),
-        								linear-gradient(derive(-side,30%), derive(-side,-10%));
-  -fx-background-insets: 0,1,2;
+	-fx-fill: -side;
 }
 
 .CandleTopText {

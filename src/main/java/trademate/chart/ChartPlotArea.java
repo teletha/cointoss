@@ -20,11 +20,13 @@ import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.layout.Region;
+import javafx.scene.shape.Line;
 import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.PathElement;
 import javafx.scene.shape.Polyline;
+import javafx.scene.shape.Rectangle;
 
 import org.eclipse.collections.impl.map.mutable.primitive.LongObjectHashMap;
 
@@ -36,7 +38,6 @@ import cointoss.util.Num;
 import kiss.I;
 import trademate.Notificator;
 import trademate.chart.Axis.TickLable;
-import trademate.chart.shape.Candle;
 import viewtify.Viewtify;
 import viewtify.ui.helper.LayoutAssistant;
 import viewtify.ui.helper.StyleHelper;
@@ -261,8 +262,8 @@ public class ChartPlotArea extends Region {
                     double high = axisY.getPositionForValue(tick.highPrice.toDouble());
                     double low = axisY.getPositionForValue(tick.lowPrice.toDouble());
 
-                    Candle candle = candles.at((time - start) / span);
-                    candle.update(close - open, high - open, low - open, null);
+                    Candles.Candle candle = candles.at((time - start) / span);
+                    candle.update(close - open, high - open, low - open);
                     candle.setLayoutX(x);
                     candle.setLayoutY(open);
 
@@ -319,6 +320,61 @@ public class ChartPlotArea extends Region {
             used.put(seconds, candle);
 
             return candle;
+        }
+
+        /**
+         * @version 2018/02/03 0:05:26
+         */
+        private static class Candle extends Group {
+
+            /** The candle width. */
+            private static final int width = 4;
+
+            /** The line part. */
+            private final Line line = new Line();
+
+            /** The bar part. */
+            private final Rectangle bar = new Rectangle();
+
+            /** The style class. */
+            private final ObservableList<String> styles = getStyleClass();
+
+            /**
+             * 
+             */
+            private Candle() {
+                bar.setWidth(width);
+                bar.setLayoutX(-width / 2);
+                StyleHelper.of(bar).style(ChartClass.CandleBar);
+                StyleHelper.of(line).style(ChartClass.CandleLine);
+
+                setAutoSizeChildren(false);
+                getChildren().addAll(line, bar);
+                styles.add(Side.BUY.name());
+            }
+
+            /**
+             * Update value.
+             * 
+             * @param closeOffset
+             * @param highOffset
+             * @param lowOffset
+             */
+            private void update(double closeOffset, double highOffset, double lowOffset) {
+                Side side = closeOffset > 0 ? Side.SELL : Side.BUY;
+
+                line.setStartY(highOffset);
+                line.setEndY(lowOffset);
+
+                if (side.isSell()) {
+                    bar.setHeight(closeOffset);
+                    bar.setLayoutY(0);
+                } else {
+                    bar.setHeight(-closeOffset);
+                    bar.setLayoutY(closeOffset);
+                }
+                styles.set(0, side.name());
+            }
         }
     }
 
