@@ -254,18 +254,20 @@ public class ChartPlotArea extends Region {
                 long time = tick.start.toEpochSecond();
 
                 // in visible range
-                double x = axisX.getPositionForValue(time);
-                double open = axisY.getPositionForValue(tick.openPrice.toDouble());
-                double close = axisY.getPositionForValue(tick.closePrice.toDouble());
-                double high = axisY.getPositionForValue(tick.highPrice.toDouble());
-                double low = axisY.getPositionForValue(tick.lowPrice.toDouble());
+                if (start <= time && time <= end) {
+                    double x = axisX.getPositionForValue(time);
+                    double open = axisY.getPositionForValue(tick.openPrice.toDouble());
+                    double close = axisY.getPositionForValue(tick.closePrice.toDouble());
+                    double high = axisY.getPositionForValue(tick.highPrice.toDouble());
+                    double low = axisY.getPositionForValue(tick.lowPrice.toDouble());
 
-                Candle candle = candles.at((time - start) / span);
-                candle.update(close - open, high - open, low - open, null);
-                candle.setLayoutX(x);
-                candle.setLayoutY(open);
+                    Candle candle = candles.at((time - start) / span);
+                    candle.update(close - open, high - open, low - open, null);
+                    candle.setLayoutX(x);
+                    candle.setLayoutY(open);
 
-                chartBottom.calculate(tick, x);
+                    chartBottom.calculate(tick, x);
+                }
             });
             chartBottom.draw();
             candles.clear();
@@ -291,7 +293,8 @@ public class ChartPlotArea extends Region {
         private void clear() {
             // hide
             for (Candle candle : candles) {
-                candle.setLayoutX(-40);
+                candle.setLayoutX(-50);
+                candle.setLayoutY(-50);
             }
 
             // reset

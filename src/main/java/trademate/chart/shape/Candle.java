@@ -10,17 +10,14 @@
 package trademate.chart.shape;
 
 import javafx.scene.Group;
-import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Region;
 import javafx.scene.shape.Line;
-import javafx.scene.shape.Path;
-import javafx.scene.text.Text;
 
 import cointoss.Side;
 import trademate.chart.ChartClass;
 
 /**
- * @version 2018/01/12 21:50:12
+ * @version 2018/02/02 17:40:38
  */
 public class Candle extends Group {
 
@@ -33,16 +30,8 @@ public class Candle extends Group {
     /** The bar part. */
     private final Region bar = new Region();
 
-    /** The top mark. */
-    private Text textTop;
-
-    /** The bottom mark. */
-    private Path bottom;
-
     /** The direction */
     private Side side = Side.BUY;
-
-    private final Tooltip tooltip = new Tooltip();
 
     /**
      * 
@@ -51,9 +40,6 @@ public class Candle extends Group {
         updateStyle();
         setAutoSizeChildren(false);
         getChildren().addAll(line, bar);
-
-        tooltip.setGraphic(new TooltipContent());
-        Tooltip.install(bar, tooltip);
     }
 
     /**
@@ -75,36 +61,6 @@ public class Candle extends Group {
             bar.resizeRelocate(-width / 2, closeOffset, width, closeOffset * -1);
         }
         updateStyle();
-
-        // top text
-        if (top == null) {
-            if (textTop != null) {
-                textTop.setVisible(false);
-            }
-        } else {
-            if (textTop == null) {
-                textTop = new Text();
-                textTop.getStyleClass().add(ChartClass.CandleTopText.name());
-                getChildren().add(textTop);
-            }
-            textTop.setVisible(true);
-            textTop.setText(top);
-            textTop.setLayoutX(0);
-            textTop.setLayoutY(highOffset - 10);
-        }
-    }
-
-    /**
-     * Update tooltip.
-     * 
-     * @param open
-     * @param close
-     * @param high
-     * @param low
-     */
-    public void updateTooltip(double open, double close, double high, double low) {
-        TooltipContent tooltipContent = (TooltipContent) tooltip.getGraphic();
-        tooltipContent.update(open, close, high, low);
     }
 
     /**
@@ -113,14 +69,5 @@ public class Candle extends Group {
     private void updateStyle() {
         line.getStyleClass().setAll(ChartClass.CandleLine.name(), side.name());
         bar.getStyleClass().setAll(ChartClass.CandleBar.name(), side.name());
-    }
-
-    /**
-     * Draw top text.
-     * 
-     * @param text
-     */
-    private void drawTopText(String text) {
-
     }
 }

@@ -31,7 +31,7 @@ import viewtify.ui.helper.LayoutAssistant;
 public class CandleChart extends Region {
 
     /** The x-axis UI. */
-    public final Axis axisX = new Axis(5, 8, Side.BOTTOM);
+    public final Axis axisX = new Axis(5, 4, Side.BOTTOM);
 
     /** The y-axis UI. */
     public final Axis axisY = new Axis(5, 4, Side.RIGHT);
