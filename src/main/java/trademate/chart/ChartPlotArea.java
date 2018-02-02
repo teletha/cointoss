@@ -34,7 +34,6 @@ import cointoss.ticker.Tick;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
 import kiss.I;
-import kiss.Variable;
 import trademate.Notificator;
 import trademate.chart.Axis.TickLable;
 import trademate.chart.shape.Candle;
@@ -146,7 +145,7 @@ public class ChartPlotArea extends Region {
             mouseTrackHorizontal.layoutLine.requestLayout();
 
             // upper info
-            findBy(x).isPresent(tick -> {
+            chart.ticker.findByEpochSecond((long) x).isPresent(tick -> {
                 chart.trade.selectDate.text(Chrono.system(tick.start).format(Chrono.DateTime));
                 chart.trade.selectHigh.text("H " + tick.highPrice.scale(0));
                 chart.trade.selectLow.text("L " + tick.lowPrice.scale(0));
@@ -238,38 +237,35 @@ public class ChartPlotArea extends Region {
         drawCandleChart();
     }
 
-    private Variable<Tick> findBy(double x) {
-        return chart.ticker.find(tick -> x <= tick.start.toEpochSecond());
-    }
-
     /**
      * Draw candle chart.
      */
     private void drawCandleChart() {
         layoutCandle.layout(() -> {
             // estimate visible range
-            long start = axisX.computeVisibleMinValue();
-            long end = axisX.computeVisibleMaxValue();
+            long start = (long) axisX.computeVisibleMinValue();
+            long end = (long) axisX.computeVisibleMaxValue();
+            long span = chart.ticker.span.duration.getSeconds();
+            int visibleSize = (int) ((end - start) / span);
+            int visigleStartIndex = (int) ((start - chart.ticker.first().start.toEpochSecond()) / span);
 
             // draw chart
-            chart.ticker.each(tick -> {
+            chart.ticker.each(visigleStartIndex, visibleSize, tick -> {
                 long time = tick.start.toEpochSecond();
 
-                if (start <= time && time <= end) {
-                    // in visible range
-                    double x = axisX.getPositionForValue(time);
-                    double open = axisY.getPositionForValue(tick.openPrice.toDouble());
-                    double close = axisY.getPositionForValue(tick.closePrice.toDouble());
-                    double high = axisY.getPositionForValue(tick.highPrice.toDouble());
-                    double low = axisY.getPositionForValue(tick.lowPrice.toDouble());
+                // in visible range
+                double x = axisX.getPositionForValue(time);
+                double open = axisY.getPositionForValue(tick.openPrice.toDouble());
+                double close = axisY.getPositionForValue(tick.closePrice.toDouble());
+                double high = axisY.getPositionForValue(tick.highPrice.toDouble());
+                double low = axisY.getPositionForValue(tick.lowPrice.toDouble());
 
-                    Candle candle = candles.at(time);
-                    candle.update(close - open, high - open, low - open, null);
-                    candle.setLayoutX(x);
-                    candle.setLayoutY(open);
+                Candle candle = candles.at((time - start) / span);
+                candle.update(close - open, high - open, low - open, null);
+                candle.setLayoutX(x);
+                candle.setLayoutY(open);
 
-                    chartBottom.calculate(tick, x);
-                }
+                chartBottom.calculate(tick, x);
             });
             chartBottom.draw();
             candles.clear();

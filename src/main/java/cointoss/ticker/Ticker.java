@@ -12,18 +12,21 @@ package cointoss.ticker;
 import java.time.ZonedDateTime;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
 
 import org.magicwerk.brownies.collections.BigList;
 
+import cointoss.Execution;
 import cointoss.util.Listeners;
 import kiss.Signal;
 import kiss.Variable;
 
 /**
- * @version 2018/01/29 9:41:02
+ * @version 2018/02/02 17:14:53
  */
 public class Ticker {
+
+    /** The target span. */
+    public final TickSpan span;
 
     /** The event listeners. */
     private final Listeners<Tick> additions = new Listeners();
@@ -46,11 +49,29 @@ public class Ticker {
     /**
      * 
      */
-    public Ticker(Signal<Tick> signal) {
-        signal.effect(updaters).diff().to(tick -> {
+    public Ticker(TickSpan span, Signal<Execution> signal) {
+        this.span = span;
+
+        signal.map(Tick.by(span)).effect(updaters).diff().to(tick -> {
             lock.writeLock().lock();
 
             try {
+                // handle unobservable ticks (i.e. server error, maintenance)
+                Tick last = last();
+
+                if (last != null) {
+                    ZonedDateTime nextStart = last.start.plus(span.duration);
+
+                    while (nextStart.isBefore(tick.start)) {
+                        // some ticks were skipped by unknown error, so we will complement
+                        last = new Tick(nextStart, nextStart.plus(span.duration), last.openPrice);
+                        last.closePrice = last.highPrice = last.lowPrice = last.openPrice;
+                        ticks.add(last);
+
+                        nextStart = last.end;
+                    }
+                }
+
                 ticks.add(tick);
                 additions.accept(tick);
             } finally {
@@ -65,7 +86,7 @@ public class Ticker {
      * @return
      */
     public final ZonedDateTime startTime() {
-        return ticks.isEmpty() ? ZonedDateTime.now() : ticks.getFirst().start;
+        return ticks.isEmpty() ? ZonedDateTime.now() : ticks.peekFirst().start;
     }
 
     /**
@@ -74,7 +95,7 @@ public class Ticker {
      * @return
      */
     public final ZonedDateTime endTime() {
-        return ticks.isEmpty() ? ZonedDateTime.now() : ticks.getLast().end;
+        return ticks.isEmpty() ? ZonedDateTime.now() : ticks.peekLast().end;
     }
 
     /**
@@ -92,7 +113,7 @@ public class Ticker {
      * @return
      */
     public final Tick first() {
-        return ticks.getFirst();
+        return ticks.peekFirst();
     }
 
     /**
@@ -101,7 +122,7 @@ public class Ticker {
      * @return
      */
     public final Tick last() {
-        return ticks.getLast();
+        return ticks.peekLast();
     }
 
     /**
@@ -122,20 +143,36 @@ public class Ticker {
     }
 
     /**
-     * Find the first tick which matches the specified condition.
+     * List up all ticks.
      * 
-     * @param condition
+     * @param consumer
      */
-    public Variable<Tick> find(Predicate<Tick> condition) {
+    public final void each(int start, int size, Consumer<Tick> consumer) {
+        lock.readLock().lock();
+
+        size = Math.min(start + size, ticks.size());
+
+        try {
+            for (int i = start; i < size; i++) {
+                consumer.accept(ticks.get(i));
+            }
+        } finally {
+            lock.readLock().unlock();
+        }
+    }
+
+    /**
+     * Find by epoch second.
+     * 
+     * @param epochSeconds
+     * @return
+     */
+    public final Variable<Tick> findByEpochSecond(long epochSeconds) {
         lock.readLock().lock();
 
         try {
-            for (Tick tick : ticks) {
-                if (condition.test(tick)) {
-                    return Variable.of(tick);
-                }
-            }
-            return Variable.empty();
+            int index = (int) ((epochSeconds - first().start.toEpochSecond()) / span.duration.getSeconds());
+            return index < size() ? Variable.of(ticks.get(index)) : Variable.empty();
         } finally {
             lock.readLock().unlock();
         }

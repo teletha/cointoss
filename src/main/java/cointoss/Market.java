@@ -24,7 +24,6 @@ import cointoss.order.Order.State;
 import cointoss.order.OrderBook;
 import cointoss.order.OrderBookChange;
 import cointoss.ticker.ExecutionFlow;
-import cointoss.ticker.Tick;
 import cointoss.ticker.TickSpan;
 import cointoss.ticker.Ticker;
 import cointoss.util.Listeners;
@@ -158,7 +157,7 @@ public class Market implements Disposable {
 
         // build tickers for each span
         for (TickSpan span : TickSpan.values()) {
-            tickers.put(span, new Ticker(timeline.map(Tick.by(span))));
+            tickers.put(span, new Ticker(span, timeline));
         }
 
         this.backend = provider.service();
