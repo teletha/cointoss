@@ -100,7 +100,7 @@ public class TradingView extends View {
             axis.tickLabelFormatter.set(v -> Num.of(v).scale(0).toString());
         }).use(TickSpan.Second5);
 
-        chartSpan.values(0, TickSpan.class).observe(candleChart::use).when(User.Scroll, e -> {
+        chartSpan.values(0, TickSpan.class).observeNow(candleChart::use).when(User.Scroll, e -> {
             if (e.getDeltaY() < 0) {
                 chartSpan.ui.getSelectionModel().selectNext();
             } else {
@@ -133,7 +133,7 @@ public class TradingView extends View {
      */
     public final synchronized Market market() {
         if (market == null) {
-            Viewtify.Terminator.add(market = new Market(provider, provider.log().fromLast(14, ChronoUnit.HOURS).share()));
+            Viewtify.Terminator.add(market = new Market(provider, provider.log().fromLast(2, ChronoUnit.HOURS).share()));
         }
         return market;
     }
