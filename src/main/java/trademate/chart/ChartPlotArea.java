@@ -46,10 +46,13 @@ import viewtify.ui.helper.StyleHelper;
 public class ChartPlotArea extends Region {
 
     /** @FIXME Read from css file. */
-    private static final Color BUY = Color.rgb(32, 151, 77);
+    private static final Color Buy = Color.rgb(32, 151, 77);
 
     /** @FIXME Read from css file. */
-    private static final Color SELL = Color.rgb(247, 105, 77);
+    private static final Color Sell = Color.rgb(247, 105, 77);
+
+    /** The candle width. */
+    private static final int BarWidth = 3;
 
     /** The chart node. */
     private final CandleChart chart;
@@ -98,9 +101,6 @@ public class ChartPlotArea extends Region {
 
     /** Flag whether candle chart shoud layout on the next rendering phase or not. */
     public final LayoutAssistant layoutCandle = new LayoutAssistant(this);
-
-    /** The candle width. */
-    private final int width = 3;
 
     /**
      * @param chart
@@ -266,26 +266,21 @@ public class ChartPlotArea extends Region {
             int visibleSize = (int) ((end - start) / span);
             int visigleStartIndex = (int) ((start - chart.ticker.first().start.toEpochSecond()) / span);
 
-            // draw chart
+            // draw chart in visible range
             chart.ticker.each(visigleStartIndex, visibleSize, tick -> {
-                long time = tick.start.toEpochSecond();
+                double x = axisX.getPositionForValue(tick.start.toEpochSecond());
+                double open = axisY.getPositionForValue(tick.openPrice.toDouble());
+                double close = axisY.getPositionForValue(tick.closePrice.toDouble());
+                double high = axisY.getPositionForValue(tick.highPrice.toDouble());
+                double low = axisY.getPositionForValue(tick.lowPrice.toDouble());
 
-                // in visible range
-                if (start <= time && time <= end) {
-                    double x = axisX.getPositionForValue(time);
-                    double open = axisY.getPositionForValue(tick.openPrice.toDouble());
-                    double close = axisY.getPositionForValue(tick.closePrice.toDouble());
-                    double high = axisY.getPositionForValue(tick.highPrice.toDouble());
-                    double low = axisY.getPositionForValue(tick.lowPrice.toDouble());
+                gc.setStroke(open < close ? Sell : Buy);
+                gc.setLineWidth(1);
+                gc.strokeLine(x, high, x, low);
+                gc.setLineWidth(BarWidth);
+                gc.strokeLine(x, open, x, close);
 
-                    gc.setStroke(open < close ? SELL : BUY);
-                    gc.setLineWidth(1);
-                    gc.strokeLine(x, high, x, low);
-                    gc.setLineWidth(width);
-                    gc.strokeLine(x, open, x, close);
-
-                    chartBottom.calculate(tick, x);
-                }
+                chartBottom.calculate(tick, x);
             });
             chartBottom.draw();
         });
