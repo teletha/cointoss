@@ -10,6 +10,7 @@
 package cointoss.order;
 
 import java.util.List;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -38,6 +39,9 @@ public class OrderBookList {
 
     /** The search direction. */
     private final Side side;
+
+    /** The lock system. */
+    private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
     /** The base list. */
     final ObservableList<OrderUnit> x1;
@@ -79,10 +83,16 @@ public class OrderBookList {
      * @return
      */
     public OrderUnit min() {
-        if (x1.isEmpty()) {
-            return null;
-        } else {
-            return x1.get(x1.size() - 1);
+        lock.readLock().lock();
+
+        try {
+            if (x1.isEmpty()) {
+                return null;
+            } else {
+                return x1.get(x1.size() - 1);
+            }
+        } finally {
+            lock.readLock().unlock();
         }
     }
 
@@ -92,10 +102,16 @@ public class OrderBookList {
      * @return
      */
     public OrderUnit max() {
-        if (x1.isEmpty()) {
-            return null;
-        } else {
-            return x1.get(0);
+        lock.readLock().lock();
+
+        try {
+            if (x1.isEmpty()) {
+                return null;
+            } else {
+                return x1.get(0);
+            }
+        } finally {
+            lock.readLock().unlock();
         }
     }
 
@@ -143,32 +159,37 @@ public class OrderBookList {
      * @return
      */
     public Num computeBestPrice(Num start, Num threshold, Num diff) {
-        Num total = Num.ZERO;
+        lock.readLock().lock();
 
-        if (side == Side.BUY) {
-            for (OrderUnit unit : x1) {
-                if (unit.price.isLessThan(start)) {
-                    total = total.plus(unit.size);
+        try {
+            Num total = Num.ZERO;
+            if (side == Side.BUY) {
+                for (OrderUnit unit : x1) {
+                    if (unit.price.isLessThan(start)) {
+                        total = total.plus(unit.size);
 
-                    if (total.isGreaterThanOrEqual(threshold)) {
-                        return unit.price.plus(diff);
+                        if (total.isGreaterThanOrEqual(threshold)) {
+                            return unit.price.plus(diff);
+                        }
+                    }
+                }
+            } else {
+                for (int i = x1.size() - 1; 0 <= i; i--) {
+                    OrderUnit unit = x1.get(i);
+
+                    if (unit.price.isGreaterThanOrEqual(start)) {
+                        total = total.plus(unit.size);
+
+                        if (total.isGreaterThanOrEqual(threshold)) {
+                            return unit.price.minus(diff);
+                        }
                     }
                 }
             }
-        } else {
-            for (int i = x1.size() - 1; 0 <= i; i--) {
-                OrderUnit unit = x1.get(i);
-
-                if (unit.price.isGreaterThanOrEqual(start)) {
-                    total = total.plus(unit.size);
-
-                    if (total.isGreaterThanOrEqual(threshold)) {
-                        return unit.price.minus(diff);
-                    }
-                }
-            }
+            return null;
+        } finally {
+            lock.readLock().unlock();
         }
-        return null;
     }
 
     /**
@@ -177,38 +198,42 @@ public class OrderBookList {
      * @param hint A price hint.
      */
     public void fix(Num hint) {
-        if (side == Side.BUY) {
-            for (int i = 0; i < x1.size();) {
-                OrderUnit unit = x1.get(i);
+        lock.writeLock().lock();
 
-                if (unit != null && unit.price.isGreaterThan(hint)) {
-                    x1.remove(i);
+        try {
+            if (side == Side.BUY) {
+                for (int i = 0; i < x1.size();) {
+                    OrderUnit unit = x1.get(i);
 
-                    for (Grouped grouped : group) {
-                        grouped.update(unit.price, unit.size.negate());
+                    if (unit != null && unit.price.isGreaterThan(hint)) {
+                        x1.remove(i);
+
+                        for (Grouped grouped : group) {
+                            grouped.update(unit.price, unit.size.negate());
+                        }
+                    } else {
+                        break;
                     }
-                } else {
-                    break;
+                }
+            } else {
+                for (int i = x1.size() - 1; 0 <= i; i--) {
+                    OrderUnit unit = x1.get(i);
+
+                    if (unit != null && unit.price.isLessThan(hint)) {
+                        x1.remove(i);
+
+                        for (Grouped grouped : group) {
+                            grouped.update(unit.price, unit.size.negate());
+                        }
+                    } else {
+                        break;
+                    }
                 }
             }
-        } else {
-            for (int i = x1.size() - 1; 0 <= i; i--) {
-                OrderUnit unit = x1.get(i);
-
-                if (unit != null && unit.price.isLessThan(hint)) {
-                    x1.remove(i);
-
-                    for (Grouped grouped : group) {
-                        grouped.update(unit.price, unit.size.negate());
-                    }
-                } else {
-                    break;
-                }
-            }
+            modify.accept(true);
+        } finally {
+            lock.writeLock().unlock();
         }
-
-        modify.accept(true);
-        calculateTotal();
     }
 
     /**
@@ -217,33 +242,31 @@ public class OrderBookList {
      * @param asks
      */
     public void update(List<OrderUnit> units) {
-        if (side == Side.BUY) {
-            for (OrderUnit unit : units) {
-                head(unit);
+        lock.writeLock().lock();
+
+        try {
+            if (side == Side.BUY) {
+                for (OrderUnit unit : units) {
+                    head(unit);
+                }
+
+                if (x1.isEmpty() == false) {
+                    best.set(x1.get(0));
+                }
+            } else {
+                for (OrderUnit unit : units) {
+                    tail(unit);
+                }
+
+                if (x1.isEmpty() == false) {
+                    best.set(x1.get(x1.size() - 1));
+                }
             }
 
-            if (x1.isEmpty() == false) {
-                best.set(x1.get(0));
-            }
-        } else {
-            for (OrderUnit unit : units) {
-                tail(unit);
-            }
-
-            if (x1.isEmpty() == false) {
-                best.set(x1.get(x1.size() - 1));
-            }
+            modify.accept(true);
+        } finally {
+            lock.writeLock().unlock();
         }
-
-        modify.accept(true);
-        calculateTotal();
-    }
-
-    private void calculateTotal() {
-        // calculateTotal(x1);
-        // calculateTotal(x10);
-        // calculateTotal(x100);
-        // calculateTotal(x1000);
     }
 
     // private void calculateTotal(ObservableList<OrderUnit> units) {
