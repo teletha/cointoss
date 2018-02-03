@@ -17,21 +17,16 @@ import java.util.function.ToDoubleFunction;
 
 import javafx.collections.ObservableList;
 import javafx.scene.Group;
-import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Line;
 import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.PathElement;
 import javafx.scene.shape.Polyline;
-import javafx.scene.shape.Rectangle;
-
-import org.eclipse.collections.impl.map.mutable.primitive.LongObjectHashMap;
 
 import cointoss.Side;
 import cointoss.order.Order.State;
@@ -46,9 +41,15 @@ import viewtify.ui.helper.LayoutAssistant;
 import viewtify.ui.helper.StyleHelper;
 
 /**
- * @version 2018/01/12 16:40:07
+ * @version 2018/02/03 17:10:38
  */
 public class ChartPlotArea extends Region {
+
+    /** @FIXME Read from css file. */
+    private static final Color BUY = Color.rgb(32, 151, 77);
+
+    /** @FIXME Read from css file. */
+    private static final Color SELL = Color.rgb(247, 105, 77);
 
     /** The chart node. */
     private final CandleChart chart;
@@ -61,9 +62,6 @@ public class ChartPlotArea extends Region {
 
     /** The notificator. */
     private final Notificator notificator = I.make(Notificator.class);
-
-    /** Chart UI */
-    private final Candles candles = new Candles();
 
     /** Chart UI */
     private final LineMark backGridVertical;
@@ -92,12 +90,17 @@ public class ChartPlotArea extends Region {
     /** Chart UI */
     private final LineChart chartBottom = new LineChart();
 
-    private final Canvas canvas = new CAN();
+    /** Chart UI */
+    private final Canvas canvas = new Canvas();
 
+    /** Chart UI */
     private final GraphicsContext gc = canvas.getGraphicsContext2D();
 
     /** Flag whether candle chart shoud layout on the next rendering phase or not. */
     public final LayoutAssistant layoutCandle = new LayoutAssistant(this);
+
+    /** The candle width. */
+    private final int width = 3;
 
     /**
      * @param chart
@@ -116,6 +119,8 @@ public class ChartPlotArea extends Region {
         this.latestPrice = new LineMark(axisY, ChartClass.PriceLatest);
         this.orderBuyPrice = new LineMark(axisY, ChartClass.OrderSupport, Side.BUY);
         this.orderSellPrice = new LineMark(axisY, ChartClass.OrderSupport, Side.SELL);
+        this.canvas.widthProperty().bind(widthProperty());
+        this.canvas.heightProperty().bind(heightProperty());
 
         this.chartBottom.create(tick -> tick.longVolume.toDouble() * 2, ChartClass.ChartVolume, Side.BUY);
         this.chartBottom.create(tick -> tick.shortVolume.toDouble() * 2, ChartClass.ChartVolume, Side.SELL);
@@ -135,46 +140,7 @@ public class ChartPlotArea extends Region {
         canvas.isResizable();
 
         getChildren()
-                .addAll(backGridVertical, backGridHorizontal, notifyPrice, orderBuyPrice, orderSellPrice, latestPrice, mouseTrackHorizontal, mouseTrackVertical, candles, chartBottom, canvas);
-    }
-
-    private Color BUY = Color.rgb(32, 151, 77);
-
-    private Color SELL = Color.rgb(247, 105, 77);
-
-    private class CAN extends Canvas {
-
-        /**
-         * 
-         */
-        public CAN() {
-            widthProperty().bind(ChartPlotArea.this.widthProperty());
-            heightProperty().bind(ChartPlotArea.this.heightProperty());
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public boolean isResizable() {
-            return true;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public double prefWidth(double height) {
-            return getWidth();
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public double prefHeight(double width) {
-            return getHeight();
-        }
+                .addAll(backGridVertical, backGridHorizontal, notifyPrice, orderBuyPrice, orderSellPrice, latestPrice, canvas, mouseTrackHorizontal, mouseTrackVertical, chartBottom);
     }
 
     /**
@@ -312,127 +278,17 @@ public class ChartPlotArea extends Region {
                     double high = axisY.getPositionForValue(tick.highPrice.toDouble());
                     double low = axisY.getPositionForValue(tick.lowPrice.toDouble());
 
-                    // Candles.Candle candle = candles.at((time - start) / span);
-                    // candle.update(close - open, high - open, low - open);
-                    // candle.setLayoutX(x);
-                    // candle.setLayoutY(open);
-
-                    boolean sell = open < close;
-                    Color color = sell ? SELL : BUY;
-                    gc.setStroke(color);
-                    gc.setFill(color);
+                    gc.setStroke(open < close ? SELL : BUY);
+                    gc.setLineWidth(1);
                     gc.strokeLine(x, high, x, low);
-                    gc.fillRect(x - 2, sell ? open : close, 4, sell ? close - open : open - close);
+                    gc.setLineWidth(width);
+                    gc.strokeLine(x, open, x, close);
 
                     chartBottom.calculate(tick, x);
                 }
             });
             chartBottom.draw();
-            candles.clear();
         });
-    }
-
-    /**
-     * Candle shape manager.
-     * 
-     * @version 2018/01/30 23:10:36
-     */
-    private static class Candles extends Group {
-
-        /** The child nodes. */
-        private final ObservableList<Node> children = getChildren();
-
-        /** The managed candles by tick's epoc seconds. */
-        private final LongObjectHashMap<Candle> candles = LongObjectHashMap.newMap();
-
-        /** The curretn visible candles. */
-        private final LongObjectHashMap<Candle> used = LongObjectHashMap.newMap();
-
-        private void clear() {
-            // hide
-            for (Candle candle : candles) {
-                candle.setLayoutX(-50);
-                candle.setLayoutY(-50);
-            }
-
-            // reset
-            candles.putAll(used);
-            used.clear();
-        }
-
-        /**
-         * Retrieve the candle by tick's epoc seconds.
-         * 
-         * @param seconds
-         * @return
-         */
-        private Candle at(long seconds) {
-            Candle candle = candles.remove(seconds);
-
-            if (candle == null) {
-                candle = new Candle();
-                children.add(candle);
-            }
-
-            used.put(seconds, candle);
-
-            return candle;
-        }
-
-        /**
-         * @version 2018/02/03 0:05:26
-         */
-        private static class Candle extends Group {
-
-            /** The candle width. */
-            private static final int width = 4;
-
-            /** The line part. */
-            private final Line line = new Line();
-
-            /** The bar part. */
-            private final Rectangle bar = new Rectangle();
-
-            /** The style class. */
-            private final ObservableList<String> styles = getStyleClass();
-
-            /**
-             * 
-             */
-            private Candle() {
-                bar.setWidth(width);
-                bar.setLayoutX(-width / 2);
-                StyleHelper.of(bar).style(ChartClass.CandleBar);
-                StyleHelper.of(line).style(ChartClass.CandleLine);
-
-                setAutoSizeChildren(false);
-                getChildren().addAll(line, bar);
-                styles.add(Side.BUY.name());
-            }
-
-            /**
-             * Update value.
-             * 
-             * @param closeOffset
-             * @param highOffset
-             * @param lowOffset
-             */
-            private void update(double closeOffset, double highOffset, double lowOffset) {
-                Side side = closeOffset > 0 ? Side.SELL : Side.BUY;
-
-                // line.setStartY(highOffset);
-                // line.setEndY(lowOffset);
-
-                if (side.isSell()) {
-                    bar.setHeight(closeOffset);
-                    bar.setLayoutY(0);
-                } else {
-                    bar.setHeight(-closeOffset);
-                    bar.setLayoutY(closeOffset);
-                }
-                styles.set(0, side.name());
-            }
-        }
     }
 
     /**
