@@ -18,8 +18,11 @@ import java.util.function.ToDoubleFunction;
 import javafx.collections.ObservableList;
 import javafx.scene.Group;
 import javafx.scene.Node;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.layout.Region;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
@@ -89,6 +92,10 @@ public class ChartPlotArea extends Region {
     /** Chart UI */
     private final LineChart chartBottom = new LineChart();
 
+    private final Canvas canvas = new CAN();
+
+    private final GraphicsContext gc = canvas.getGraphicsContext2D();
+
     /** Flag whether candle chart shoud layout on the next rendering phase or not. */
     public final LayoutAssistant layoutCandle = new LayoutAssistant(this);
 
@@ -125,8 +132,49 @@ public class ChartPlotArea extends Region {
         visualizeLatestPrice();
         visualizeMouseTrack();
 
+        canvas.isResizable();
+
         getChildren()
-                .addAll(backGridVertical, backGridHorizontal, notifyPrice, orderBuyPrice, orderSellPrice, latestPrice, mouseTrackHorizontal, mouseTrackVertical, candles, chartBottom);
+                .addAll(backGridVertical, backGridHorizontal, notifyPrice, orderBuyPrice, orderSellPrice, latestPrice, mouseTrackHorizontal, mouseTrackVertical, candles, chartBottom, canvas);
+    }
+
+    private Color BUY = Color.rgb(32, 151, 77);
+
+    private Color SELL = Color.rgb(247, 105, 77);
+
+    private class CAN extends Canvas {
+
+        /**
+         * 
+         */
+        public CAN() {
+            widthProperty().bind(ChartPlotArea.this.widthProperty());
+            heightProperty().bind(ChartPlotArea.this.heightProperty());
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean isResizable() {
+            return true;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public double prefWidth(double height) {
+            return getWidth();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public double prefHeight(double width) {
+            return getHeight();
+        }
     }
 
     /**
@@ -243,6 +291,8 @@ public class ChartPlotArea extends Region {
      */
     private void drawCandleChart() {
         layoutCandle.layout(() -> {
+            gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+
             // estimate visible range
             long start = (long) axisX.computeVisibleMinValue();
             long end = (long) axisX.computeVisibleMaxValue();
@@ -262,10 +312,17 @@ public class ChartPlotArea extends Region {
                     double high = axisY.getPositionForValue(tick.highPrice.toDouble());
                     double low = axisY.getPositionForValue(tick.lowPrice.toDouble());
 
-                    Candles.Candle candle = candles.at((time - start) / span);
-                    candle.update(close - open, high - open, low - open);
-                    candle.setLayoutX(x);
-                    candle.setLayoutY(open);
+                    // Candles.Candle candle = candles.at((time - start) / span);
+                    // candle.update(close - open, high - open, low - open);
+                    // candle.setLayoutX(x);
+                    // candle.setLayoutY(open);
+
+                    boolean sell = open < close;
+                    Color color = sell ? SELL : BUY;
+                    gc.setStroke(color);
+                    gc.setFill(color);
+                    gc.strokeLine(x, high, x, low);
+                    gc.fillRect(x - 2, sell ? open : close, 4, sell ? close - open : open - close);
 
                     chartBottom.calculate(tick, x);
                 }
@@ -363,8 +420,8 @@ public class ChartPlotArea extends Region {
             private void update(double closeOffset, double highOffset, double lowOffset) {
                 Side side = closeOffset > 0 ? Side.SELL : Side.BUY;
 
-                line.setStartY(highOffset);
-                line.setEndY(lowOffset);
+                // line.setStartY(highOffset);
+                // line.setEndY(lowOffset);
 
                 if (side.isSell()) {
                     bar.setHeight(closeOffset);
