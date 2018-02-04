@@ -121,8 +121,8 @@ public class ChartPlotArea extends Region {
         this.canvas.widthProperty().bind(widthProperty());
         this.canvas.heightProperty().bind(heightProperty());
 
-        this.chartBottom.create(tick -> tick.longVolume.toDouble() * 2, ChartClass.ChartVolume, Side.BUY);
-        this.chartBottom.create(tick -> tick.shortVolume.toDouble() * 2, ChartClass.ChartVolume, Side.SELL);
+        this.chartBottom.create(tick -> tick.longVolume.toDouble() * 2, Buy);
+        this.chartBottom.create(tick -> tick.shortVolume.toDouble() * 2, Sell);
 
         Viewtify.clip(this);
 
@@ -263,6 +263,7 @@ public class ChartPlotArea extends Region {
             long span = chart.ticker.span.duration.getSeconds();
             int visibleSize = (int) ((end - start) / span);
             int visibleStartIndex = (int) ((start - chart.ticker.first().start.toEpochSecond()) / span);
+            chartBottom.ensureSize(visibleSize);
 
             // draw chart in visible range
             chart.ticker.each(visibleStartIndex, visibleSize, tick -> {
@@ -292,6 +293,12 @@ public class ChartPlotArea extends Region {
         /** The poly line. */
         private final List<Line> lines = new ArrayList();
 
+        /** The current x-position. */
+        private int index = 0;
+
+        /** The x-point of values. */
+        private double[] valueX = new double[0];
+
         /**
          * 
          */
@@ -301,11 +308,26 @@ public class ChartPlotArea extends Region {
         /**
          * Create new line chart.
          * 
-         * @param className
          * @param converter
+         * @param color
          */
-        private void create(ToDoubleFunction<Tick> converter, Enum... classNames) {
-            lines.add(new Line(converter, classNames));
+        private void create(ToDoubleFunction<Tick> converter, Color color) {
+            lines.add(new Line(converter, color));
+        }
+
+        /**
+         * Ensure value size.
+         * 
+         * @param size
+         */
+        private void ensureSize(int size) {
+            if (valueX.length < size) {
+                valueX = new double[size];
+
+                for (Line line : lines) {
+                    line.valueY = new double[size];
+                }
+            }
         }
 
         /**
@@ -318,6 +340,7 @@ public class ChartPlotArea extends Region {
             for (Line line : lines) {
                 line.calculate(x, tick);
             }
+            valueX[index++] = x;
         }
 
         /**
@@ -327,19 +350,20 @@ public class ChartPlotArea extends Region {
             double height = getHeight();
             double scale = lines.stream().map(Line::scale).min(Comparator.naturalOrder()).get();
 
-            gc.setLineWidth(1);
-
             for (Line line : lines) {
                 // draw
-                for (int i = 0; i < line.y.length; i++) {
-                    line.y[i] = height - line.y[i] * scale;
+                for (int i = 0; i < line.valueY.length; i++) {
+                    line.valueY[i] = height - line.valueY[i] * scale;
                 }
-                gc.strokePolyline(line.x, line.y, line.index);
+
+                gc.setLineWidth(1);
+                gc.setStroke(line.color);
+                gc.strokePolyline(valueX, line.valueY, index);
 
                 // clear
-                line.index = 0;
                 line.valueMax = 0;
             }
+            index = 0;
         }
 
         /**
@@ -353,23 +377,22 @@ public class ChartPlotArea extends Region {
             /** The value converter. */
             private final ToDoubleFunction<Tick> converter;
 
-            private int index = 0;
-
-            /** The x-point of values. */
-            private double[] x = new double[8000];
+            /** The color of line. */
+            private final Color color;
 
             /** The y-point of values. */
-            private double[] y = new double[8000];
+            private double[] valueY;
 
             /** The max value. */
             private double valueMax = 0;
 
             /**
              * @param converter
-             * @param valueMax
+             * @param color
              */
-            private Line(ToDoubleFunction<Tick> converter, Enum... classNames) {
+            private Line(ToDoubleFunction<Tick> converter, Color color) {
                 this.converter = converter;
+                this.color = color;
             }
 
             /**
@@ -382,8 +405,7 @@ public class ChartPlotArea extends Region {
                 double calculated = converter.applyAsDouble(tick);
 
                 valueMax = Math.max(valueMax, calculated);
-                this.x[index] = x;
-                this.y[index++] = calculated;
+                this.valueY[index] = calculated;
             }
 
             /**
