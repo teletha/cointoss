@@ -93,10 +93,10 @@ public class ChartPlotArea extends Region {
     private final LineChart chartBottom = new LineChart();
 
     /** Chart UI */
-    private final Canvas canvas = new Canvas();
+    private final Canvas candles = new Canvas();
 
     /** Chart UI */
-    private final GraphicsContext gc = canvas.getGraphicsContext2D();
+    private final Canvas candleLatest = new Canvas();
 
     /** Flag whether candle chart shoud layout on the next rendering phase or not. */
     public final LayoutAssistant layoutCandle = new LayoutAssistant(this);
@@ -118,8 +118,10 @@ public class ChartPlotArea extends Region {
         this.latestPrice = new LineMark(axisY, ChartClass.PriceLatest);
         this.orderBuyPrice = new LineMark(axisY, ChartClass.OrderSupport, Side.BUY);
         this.orderSellPrice = new LineMark(axisY, ChartClass.OrderSupport, Side.SELL);
-        this.canvas.widthProperty().bind(widthProperty());
-        this.canvas.heightProperty().bind(heightProperty());
+        this.candles.widthProperty().bind(widthProperty());
+        this.candles.heightProperty().bind(heightProperty());
+        this.candleLatest.widthProperty().bind(widthProperty());
+        this.candleLatest.heightProperty().bind(heightProperty());
 
         this.chartBottom.create(tick -> tick.longVolume.toDouble() * 2, Buy);
         this.chartBottom.create(tick -> tick.shortVolume.toDouble() * 2, Sell);
@@ -135,10 +137,10 @@ public class ChartPlotArea extends Region {
         visualizeLatestPrice();
         visualizeMouseTrack();
 
-        canvas.isResizable();
+        candles.isResizable();
 
         getChildren()
-                .addAll(backGridVertical, backGridHorizontal, notifyPrice, orderBuyPrice, orderSellPrice, latestPrice, canvas, mouseTrackHorizontal, mouseTrackVertical, chartBottom);
+                .addAll(backGridVertical, backGridHorizontal, notifyPrice, orderBuyPrice, orderSellPrice, latestPrice, candles, candleLatest, mouseTrackHorizontal, mouseTrackVertical, chartBottom);
     }
 
     /**
@@ -250,22 +252,46 @@ public class ChartPlotArea extends Region {
         drawCandleChart();
     }
 
+    private long latestStart;
+
+    private long latestEnd;
+
     /**
      * Draw candle chart.
      */
     private void drawCandleChart() {
         layoutCandle.layout(() -> {
-            gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-
             // estimate visible range
             long start = (long) axisX.computeVisibleMinValue();
             long end = (long) axisX.computeVisibleMaxValue();
             long span = chart.ticker.span.duration.getSeconds();
             int visibleSize = (int) ((end - start) / span);
             int visibleStartIndex = (int) ((start - chart.ticker.first().start.toEpochSecond()) / span);
-            chartBottom.ensureSize(visibleSize);
+
+            GraphicsContext gc;
+
+            if (start == latestStart && end == latestEnd) {
+                // Update last tick only.
+                long last = chart.ticker.last().start.toEpochSecond();
+
+                if (last <= end) {
+                    // The last tick is visible.
+                    gc = candleLatest.getGraphicsContext2D();
+                    gc.clearRect(0, 0, candleLatest.getWidth(), candleLatest.getHeight());
+                    visibleStartIndex = chart.ticker.size() - 1;
+                } else {
+                    // The last tick is NOT visible.
+                    // Don't redraw candles.
+                    return;
+                }
+            } else {
+                // Redraw all candles.
+                gc = candles.getGraphicsContext2D();
+                gc.clearRect(0, 0, candles.getWidth(), candles.getHeight());
+            }
 
             // draw chart in visible range
+            chartBottom.ensureSize(visibleSize);
             chart.ticker.each(visibleStartIndex, visibleSize, tick -> {
                 double x = axisX.getPositionForValue(tick.start.toEpochSecond());
                 double open = axisY.getPositionForValue(tick.openPrice.toDouble());
@@ -282,7 +308,29 @@ public class ChartPlotArea extends Region {
                 chartBottom.calculate(x, tick);
             });
             chartBottom.draw();
+
+            latestStart = start;
+            latestEnd = end;
         });
+    }
+
+    private void drawCandleLatest() {
+        GraphicsContext gc = candleLatest.getGraphicsContext2D();
+        gc.clearRect(0, 0, candleLatest.getWidth(), candleLatest.getHeight());
+
+        Tick tick = chart.ticker.last();
+
+        double x = axisX.getPositionForValue(tick.start.toEpochSecond());
+        double open = axisY.getPositionForValue(tick.openPrice.toDouble());
+        double close = axisY.getPositionForValue(tick.closePrice.toDouble());
+        double high = axisY.getPositionForValue(tick.highPrice.toDouble());
+        double low = axisY.getPositionForValue(tick.lowPrice.toDouble());
+
+        gc.setStroke(open < close ? Sell : Buy);
+        gc.setLineWidth(1);
+        gc.strokeLine(x, high, x, low);
+        gc.setLineWidth(BarWidth);
+        gc.strokeLine(x, open, x, close);
     }
 
     /**
@@ -349,6 +397,7 @@ public class ChartPlotArea extends Region {
         private void draw() {
             double height = getHeight();
             double scale = lines.stream().map(Line::scale).min(Comparator.naturalOrder()).get();
+            GraphicsContext gc = candles.getGraphicsContext2D();
 
             for (Line line : lines) {
                 // draw
