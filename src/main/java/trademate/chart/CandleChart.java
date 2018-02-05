@@ -180,7 +180,7 @@ public class CandleChart extends Region {
         this.ticker = trade.market().tickerBy(span);
 
         tickerUsage.dispose();
-        tickerUsage = ticker.update.startWith((Tick) null).to(tick -> {
+        tickerUsage = ticker.add.startWith((Tick) null).to(tick -> {
             layoutChart.requestLayout();
             main.layoutCandle.requestLayout();
 
@@ -188,6 +188,9 @@ public class CandleChart extends Region {
                 axisX.scroll.setValue(1);
             }
         });
+        tickerUsage.add(ticker.update.to(tick -> {
+            main.layoutCandleLatest.requestLayout();
+        }));
         return this;
     }
 }

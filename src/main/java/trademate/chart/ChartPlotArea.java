@@ -9,7 +9,6 @@
  */
 package trademate.chart;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -101,6 +100,9 @@ public class ChartPlotArea extends Region {
     /** Flag whether candle chart shoud layout on the next rendering phase or not. */
     public final LayoutAssistant layoutCandle = new LayoutAssistant(this);
 
+    /** Flag whether candle chart shoud layout on the next rendering phase or not. */
+    public final LayoutAssistant layoutCandleLatest = new LayoutAssistant(this);
+
     /**
      * @param chart
      * @param axisX
@@ -129,6 +131,9 @@ public class ChartPlotArea extends Region {
         Viewtify.clip(this);
 
         layoutCandle.layoutBy(widthProperty(), heightProperty())
+                .layoutBy(axisX.scroll.valueProperty(), axisX.scroll.visibleAmountProperty())
+                .layoutBy(axisY.scroll.valueProperty(), axisY.scroll.visibleAmountProperty());
+        layoutCandleLatest.layoutBy(widthProperty(), heightProperty())
                 .layoutBy(axisX.scroll.valueProperty(), axisX.scroll.visibleAmountProperty())
                 .layoutBy(axisY.scroll.valueProperty(), axisY.scroll.visibleAmountProperty());
 
@@ -248,50 +253,27 @@ public class ChartPlotArea extends Region {
         orderBuyPrice.draw();
         orderSellPrice.draw();
 
-        // plotLineChartDatas();
-        drawCandleChart();
+        drawCandle();
     }
-
-    private long latestStart;
-
-    private long latestEnd;
 
     /**
      * Draw candle chart.
      */
-    private void drawCandleChart() {
+    private void drawCandle() {
         layoutCandle.layout(() -> {
             // estimate visible range
             long start = (long) axisX.computeVisibleMinValue();
-            long end = (long) axisX.computeVisibleMaxValue();
+            long end = Math.min((long) axisX.computeVisibleMaxValue(), chart.ticker.last().start.toEpochSecond());
             long span = chart.ticker.span.duration.getSeconds();
-            int visibleSize = (int) ((end - start) / span);
+            int visibleSize = (int) ((end - start) / span) + 1;
             int visibleStartIndex = (int) ((start - chart.ticker.first().start.toEpochSecond()) / span);
 
-            GraphicsContext gc;
-
-            if (start == latestStart && end == latestEnd) {
-                // Update last tick only.
-                long last = chart.ticker.last().start.toEpochSecond();
-
-                if (last <= end) {
-                    // The last tick is visible.
-                    gc = candleLatest.getGraphicsContext2D();
-                    gc.clearRect(0, 0, candleLatest.getWidth(), candleLatest.getHeight());
-                    visibleStartIndex = chart.ticker.size() - 1;
-                } else {
-                    // The last tick is NOT visible.
-                    // Don't redraw candles.
-                    return;
-                }
-            } else {
-                // Redraw all candles.
-                gc = candles.getGraphicsContext2D();
-                gc.clearRect(0, 0, candles.getWidth(), candles.getHeight());
-            }
+            // Redraw all candles.
+            GraphicsContext gc = candles.getGraphicsContext2D();
+            gc.clearRect(0, 0, candles.getWidth(), candles.getHeight());
 
             // draw chart in visible range
-            chartBottom.ensureSize(visibleSize);
+            chartBottom.initialize(visibleSize);
             chart.ticker.each(visibleStartIndex, visibleSize, tick -> {
                 double x = axisX.getPositionForValue(tick.start.toEpochSecond());
                 double open = axisY.getPositionForValue(tick.openPrice.toDouble());
@@ -308,29 +290,26 @@ public class ChartPlotArea extends Region {
                 chartBottom.calculate(x, tick);
             });
             chartBottom.draw();
-
-            latestStart = start;
-            latestEnd = end;
         });
-    }
 
-    private void drawCandleLatest() {
-        GraphicsContext gc = candleLatest.getGraphicsContext2D();
-        gc.clearRect(0, 0, candleLatest.getWidth(), candleLatest.getHeight());
+        layoutCandleLatest.layout(() -> {
+            GraphicsContext gc = candleLatest.getGraphicsContext2D();
+            gc.clearRect(0, 0, candleLatest.getWidth(), candleLatest.getHeight());
 
-        Tick tick = chart.ticker.last();
+            Tick tick = chart.ticker.last();
 
-        double x = axisX.getPositionForValue(tick.start.toEpochSecond());
-        double open = axisY.getPositionForValue(tick.openPrice.toDouble());
-        double close = axisY.getPositionForValue(tick.closePrice.toDouble());
-        double high = axisY.getPositionForValue(tick.highPrice.toDouble());
-        double low = axisY.getPositionForValue(tick.lowPrice.toDouble());
+            double x = axisX.getPositionForValue(tick.start.toEpochSecond());
+            double open = axisY.getPositionForValue(tick.openPrice.toDouble());
+            double close = axisY.getPositionForValue(tick.closePrice.toDouble());
+            double high = axisY.getPositionForValue(tick.highPrice.toDouble());
+            double low = axisY.getPositionForValue(tick.lowPrice.toDouble());
 
-        gc.setStroke(open < close ? Sell : Buy);
-        gc.setLineWidth(1);
-        gc.strokeLine(x, high, x, low);
-        gc.setLineWidth(BarWidth);
-        gc.strokeLine(x, open, x, close);
+            gc.setStroke(open < close ? Sell : Buy);
+            gc.setLineWidth(1);
+            gc.strokeLine(x, high, x, low);
+            gc.setLineWidth(BarWidth);
+            gc.strokeLine(x, open, x, close);
+        });
     }
 
     /**
@@ -339,7 +318,7 @@ public class ChartPlotArea extends Region {
     private class LineChart extends Group {
 
         /** The poly line. */
-        private final List<Line> lines = new ArrayList();
+        private final List<Line> lines = new CopyOnWriteArrayList();
 
         /** The current x-position. */
         private int index = 0;
@@ -364,16 +343,23 @@ public class ChartPlotArea extends Region {
         }
 
         /**
-         * Ensure value size.
+         * Initialize.
          * 
          * @param size
          */
-        private void ensureSize(int size) {
+        private void initialize(int size) {
+            index = 0;
+
+            for (Line line : lines) {
+                line.valueMax = 0;
+            }
+
+            // ensure size
             if (valueX.length < size) {
-                valueX = new double[size];
+                valueX = new double[size * 2];
 
                 for (Line line : lines) {
-                    line.valueY = new double[size];
+                    line.valueY = new double[size * 2];
                 }
             }
         }
@@ -400,7 +386,6 @@ public class ChartPlotArea extends Region {
             GraphicsContext gc = candles.getGraphicsContext2D();
 
             for (Line line : lines) {
-                // draw
                 for (int i = 0; i < line.valueY.length; i++) {
                     line.valueY[i] = height - line.valueY[i] * scale;
                 }
@@ -408,11 +393,7 @@ public class ChartPlotArea extends Region {
                 gc.setLineWidth(1);
                 gc.setStroke(line.color);
                 gc.strokePolyline(valueX, line.valueY, index);
-
-                // clear
-                line.valueMax = 0;
             }
-            index = 0;
         }
 
         /**
