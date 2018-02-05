@@ -104,14 +104,10 @@ public class OrderCatalog extends View {
      * @param set
      */
     public void createOrderItem(OrderSet set) {
-        if (set.sub.size() == 1) {
-            createOrderItem(orderCatalog.root, set.sub.get(0));
-        } else {
-            UITreeItem item = orderCatalog.root.createItem(set).expand(true).removeWhenEmpty();
+        UITreeItem item = orderCatalog.root.createItem(set).expand(set.sub.size() != 1).removeWhenEmpty();
 
-            for (Order order : set.sub) {
-                createOrderItem(item, order);
-            }
+        for (Order order : set.sub) {
+            createOrderItem(item, order);
         }
     }
 

@@ -9,6 +9,8 @@
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.Spinner?>
 <?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.TreeTableColumn?>
 <?import javafx.scene.control.TreeTableView?>
@@ -30,15 +32,15 @@
                   <TreeTableColumn id="requestedOrdersPrice" maxWidth="80.0" minWidth="80.0" text="価格" />
                </columns>
             </TreeTableView>
-            <TreeTableView id="openPositionCatalog" focusTraversable="false" maxWidth="485.0" minWidth="485.0" prefWidth="485.0" showRoot="false">
+            <TableView id="positions" focusTraversable="false" maxWidth="525.0" minWidth="525.0" prefWidth="525.0">
                <columns>
-                  <TreeTableColumn id="openPositionDate" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" text="建玉" />
-                  <TreeTableColumn id="openPositionSide" maxWidth="70.0" minWidth="70.0" prefWidth="70.0" text="売買" />
-                  <TreeTableColumn id="openPositionAmount" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" text="数量" />
-                  <TreeTableColumn id="openPositionPrice" maxWidth="80.0" minWidth="80.0" text="価格" />
-                  <TreeTableColumn id="openPositionProfitAndLoss" maxWidth="80.0" minWidth="80.0" text="損益" />
+                  <TableColumn id="openPositionDate" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" text="建玉" />
+                  <TableColumn id="openPositionSide" maxWidth="70.0" minWidth="70.0" prefWidth="70.0" text="売買" />
+                  <TableColumn id="openPositionAmount" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" text="数量" />
+                  <TableColumn id="openPositionPrice" maxWidth="100.0" minWidth="100.0" prefWidth="100.0" text="価格" />
+                  <TableColumn id="openPositionProfitAndLoss" maxWidth="100.0" minWidth="100.0" prefWidth="100.0" text="損益" />
                </columns>
-            </TreeTableView>
+            </TableView>
             <ListView id="console" focusTraversable="false" minWidth="600.0" />
          </children>
       </HBox>

@@ -40,18 +40,6 @@
 /* ==========================================================================
  Chart Area
 ===========================================================================*/
-.candlestick-tooltip-label {
-    -fx-font-size: 9pt;
-    -fx-font-weight: bold;
-    -fx-text-fill: white;
-    -fx-padding: 2 5 2 0;
-}
-
-.candlestick-average-line {
-    -fx-stroke: #106ece;
-    -fx-stroke-width: 2px;
-}
-
 .CandleLine {
   -fx-stroke: -side;
   -fx-stroke-width: 1px;
@@ -117,9 +105,4 @@
 
 .ChartVolume {
 	-fx-stroke: -side;
-}
-
-.ChartTotalVolume {
-	-fx-stroke: rgb(140, 140, 140);
-	-fx-opacity: 0;
 }

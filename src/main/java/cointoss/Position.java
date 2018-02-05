@@ -17,7 +17,7 @@ import kiss.Variable;
 /**
  * @version 2017/07/25 1:36:12
  */
-public class Position {
+public class Position implements Directional {
 
     /** 建玉 */
     public Side side;
@@ -43,5 +43,13 @@ public class Position {
     public int leverage;
 
     /** 確定損益合計 */
-    public Num pnl;
+    public Variable<Num> pnl = Variable.of(Num.ZERO);
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Side side() {
+        return side;
+    }
 }
