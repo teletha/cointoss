@@ -41,7 +41,7 @@
                   <TableColumn id="openPositionProfitAndLoss" maxWidth="100.0" minWidth="100.0" prefWidth="100.0" text="損益" />
                </columns>
             </TableView>
-            <ListView id="console" focusTraversable="false" minWidth="600.0" />
+            <ListView id="console" focusTraversable="false" prefWidth="700.0" />
          </children>
       </HBox>
    </bottom>
