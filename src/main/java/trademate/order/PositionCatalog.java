@@ -62,15 +62,15 @@ public class PositionCatalog extends View {
         Calculation<Num> totalPrice = Viewtify.calculate(positions.values).reduce(Num.ZERO, (t, p) -> t.plus(p.price.multiply(p.size)));
         Calculation<Num> averagePrice = Viewtify.calculate(totalPrice, totalAmount, (total, amount) -> total.divide(amount).scale(0));
         Calculation<Num> totalPnL = Viewtify.calculate(positions.values)
-                .flatVariable(p -> p.pnl)
+                .flatVariable(p -> p.profit)
                 .reduce(Num.ZERO, Num::plus)
                 .map(v -> v.scale(0));
 
-        openPositionDate.model(o -> o.open_date).render((ui, item) -> ui.text(formatter.format(item)));
+        openPositionDate.model(o -> o.date).render((ui, item) -> ui.text(formatter.format(item)));
         openPositionSide.model(o -> o.side).render((ui, item) -> ui.text(item).styleOnly(item));
         openPositionAmount.modelByVar(o -> o.size).header(Viewtify.calculate("数量 ").concat(totalAmount).trim());
         openPositionPrice.model(o -> o.price).header(Viewtify.calculate("価格 ").concat(averagePrice).trim());
-        openPositionProfitAndLoss.modelByVar(o -> o.pnl).header(Viewtify.calculate("損益 ").concat(totalPnL).trim());
+        openPositionProfitAndLoss.modelByVar(o -> o.profit).header(Viewtify.calculate("損益 ").concat(totalPnL).trim());
         positions.context($ -> {
             $.menu("撤退").whenUserClick(e -> {
 
@@ -79,14 +79,14 @@ public class PositionCatalog extends View {
 
         Position pp = new Position();
         pp.side = Side.BUY;
-        pp.open_date = ZonedDateTime.now();
-        pp.price = Num.of(600000);
+        pp.date = ZonedDateTime.now();
+        pp.price = Num.of(700000);
         pp.size = Variable.of(Num.TEN);
 
         Position minus = new Position();
         minus.side = Side.BUY;
-        minus.open_date = ZonedDateTime.now();
-        minus.price = Num.of(900000);
+        minus.date = ZonedDateTime.now();
+        minus.price = Num.of(800000);
         minus.size = Variable.of(Num.ONE);
 
         view.market().yourExecution.startWith(pp, minus).to(p -> {
@@ -122,9 +122,9 @@ public class PositionCatalog extends View {
         view.market().latestPrice.observe().to(e -> {
             for (Position position : positions.values) {
                 if (position.isBuy()) {
-                    position.pnl.set(e.minus(position.price).multiply(position.size));
+                    position.profit.set(e.minus(position.price).multiply(position.size));
                 } else {
-                    position.pnl.set(position.price.minus(e).multiply(position.size));
+                    position.profit.set(position.price.minus(e).multiply(position.size));
                 }
             }
         });

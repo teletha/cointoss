@@ -1099,6 +1099,17 @@ public class Num implements Comparable<Num> {
     /**
      * Detect min value.
      * 
+     * @param one
+     * @param other
+     * @return
+     */
+    public static Num min(Variable<Num> one, Num other) {
+        return min(one.v, other);
+    }
+
+    /**
+     * Detect min value.
+     * 
      * @param decimals
      * @return
      */

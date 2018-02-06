@@ -15,35 +15,24 @@ import cointoss.util.Num;
 import kiss.Variable;
 
 /**
- * @version 2017/07/25 1:36:12
+ * @version 2018/02/06 22:37:41
  */
 public class Position implements Directional {
 
-    /** 建玉 */
+    /** The position side. */
     public Side side;
 
-    /** 値段 */
+    /** The position price. */
     public Num price;
 
-    /** サイズ */
+    /** The position size. */
     public Variable<Num> size = Variable.of(Num.ZERO);
 
-    public Num commission;
+    /** The opened date. */
+    public ZonedDateTime date;
 
-    /** 累積スワップポイント */
-    public Num swap_point_accumulate;
-
-    /** 保証金 */
-    public Num require_collateral;
-
-    /** 成立日 */
-    public ZonedDateTime open_date;
-
-    /** レバレッジ */
-    public int leverage;
-
-    /** 確定損益合計 */
-    public Variable<Num> pnl = Variable.of(Num.ZERO);
+    /** The current profit and loss. */
+    public Variable<Num> profit = Variable.of(Num.ZERO);
 
     /**
      * {@inheritDoc}

@@ -129,6 +129,9 @@ public class Market implements Disposable {
     /** The ticker manager. */
     private final EnumMap<TickSpan, Ticker> tickers = new EnumMap(TickSpan.class);
 
+    /** The position manager. */
+    private final List<Position> positions = new CopyOnWriteArrayList();
+
     /**
      * Market without {@link Trader}.
      * 
@@ -443,7 +446,7 @@ public class Market implements Disposable {
                 position.side = order.side;
                 position.price = exe.price;
                 position.size.set(exe.size);
-                position.open_date = exe.exec_date;
+                position.date = exe.exec_date;
                 holderForYourExecution.accept(position);
             }
         }
@@ -469,12 +472,12 @@ public class Market implements Disposable {
         }
 
         // for order state
-        Num executed = Num.min(order.outstanding_size.v, exe.size);
+        Num executed = Num.min(order.outstanding_size, exe.size);
 
         if (order.child_order_type.isMarket() && executed.isNot(0)) {
-            order.average_price.set(order.average_price.v.multiply(order.executed_size.get())
+            order.average_price.set(order.average_price.v.multiply(order.executed_size)
                     .plus(exe.price.multiply(executed))
-                    .divide(order.executed_size.get().plus(executed)));
+                    .divide(executed.plus(order.executed_size)));
         }
 
         order.outstanding_size.set(order.outstanding_size.v.minus(executed));
