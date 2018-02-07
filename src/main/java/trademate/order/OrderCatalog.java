@@ -105,9 +105,8 @@ public class OrderCatalog extends View {
      */
     public void createOrderItem(OrderSet set) {
         UITreeItem item = orderCatalog.root.createItem(set).expand(set.sub.size() != 1).removeWhenEmpty();
-        System.out.println(set);
+
         for (Order order : set.sub) {
-            System.out.println(order);
             createOrderItem(item, order);
         }
     }

@@ -72,7 +72,7 @@ public class PositionCatalog extends View {
         openPositionSide.model(o -> o.side).render((ui, item) -> ui.text(item).styleOnly(item));
         openPositionAmount.modelByVar(o -> o.size).header(Viewtify.calculate("数量 ").concat(totalAmount).trim());
         openPositionPrice.model(o -> o.price).header(Viewtify.calculate("価格 ").concat(averagePrice).trim());
-        openPositionProfitAndLoss.modelByVar(o -> o.profit.map(v -> v.scale(0))).header(Viewtify.calculate("損益 ").concat(totalProfit).trim());
+        openPositionProfitAndLoss.modelByVar(o -> o.profit).header(Viewtify.calculate("損益 ").concat(totalProfit).trim());
         positions.selectMultipleRows().context($ -> {
             $.menu("撤退").whenUserClick(() -> positions.selection().forEach(this::retreat));
         });
@@ -122,9 +122,9 @@ public class PositionCatalog extends View {
         view.market().latest.observe().to(e -> {
             for (Position position : positions.values) {
                 if (position.isBuy()) {
-                    position.profit.set(e.price.minus(position.price).multiply(position.size));
+                    position.profit.set(e.price.minus(position.price).multiply(position.size).scale(0));
                 } else {
-                    position.profit.set(position.price.minus(e.price).multiply(position.size));
+                    position.profit.set(position.price.minus(e.price).multiply(position.size).scale(0));
                 }
             }
         });
