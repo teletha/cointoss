@@ -52,9 +52,11 @@ class PubNubSignal {
                     System.out.println(status);
                     if (status.getCategory() == PNStatusCategory.PNUnexpectedDisconnectCategory) {
                         // internet got lost, do some magic and call reconnect when ready
+                        pubnub.disconnect();
                         pubnub.reconnect();
                     } else if (status.getCategory() == PNStatusCategory.PNTimeoutCategory) {
                         // do some magic and call reconnect when ready
+                        pubnub.disconnect();
                         pubnub.reconnect();
                     }
                 }
