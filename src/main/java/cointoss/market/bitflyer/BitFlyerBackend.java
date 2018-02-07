@@ -11,14 +11,23 @@ package cointoss.market.bitflyer;
 
 import static java.util.concurrent.TimeUnit.*;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.codec.digest.HmacUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -73,6 +82,12 @@ class BitFlyerBackend implements MarketBackend {
     /** The token. */
     private final String password;
 
+    /** The token. */
+    private final String id;
+
+    /** The current session id. */
+    private String session;
+
     private Disposable disposer = Disposable.empty();
 
     /**
@@ -86,6 +101,7 @@ class BitFlyerBackend implements MarketBackend {
         this.accessToken = lines.get(1);
         this.name = lines.get(2);
         this.password = lines.get(3);
+        this.id = lines.get(4);
     }
 
     /**
@@ -353,7 +369,7 @@ class BitFlyerBackend implements MarketBackend {
                 request.addHeader("ACCESS-KEY", accessKey);
                 request.addHeader("ACCESS-TIMESTAMP", timestamp);
                 request.addHeader("ACCESS-SIGN", sign);
-            } else if (method.equals("POST")) {
+            } else if (method.equals("POST") && !path.startsWith("http")) {
                 request = new HttpPost(path.startsWith("https://") ? path : api + path);
                 request.addHeader("ACCESS-KEY", accessKey);
                 request.addHeader("ACCESS-TIMESTAMP", timestamp);
@@ -361,9 +377,11 @@ class BitFlyerBackend implements MarketBackend {
                 request.addHeader("Content-Type", "application/json");
                 ((HttpPost) request).setEntity(new StringEntity(body, StandardCharsets.UTF_8));
             } else {
-                // If this exception will be thrown, it is bug of this program. So we must rethrow
-                // the wrapped error in here.
-                throw new Error();
+                request = new HttpPost(path);
+                request.addHeader("Content-Type", "application/json");
+                request.addHeader("Cookie", "api_session=" + session());
+                request.addHeader("X-Requested-With", "XMLHttpRequest");
+                ((HttpPost) request).setEntity(new StringEntity(body, StandardCharsets.UTF_8));
             }
 
             try (CloseableHttpClient client = HttpClientBuilder.create().disableCookieManagement().build(); //
@@ -394,6 +412,83 @@ class BitFlyerBackend implements MarketBackend {
 
             return disposer;
         });
+    }
+
+    private static class Cache {
+
+        /** The actual file. */
+        private final Path file;
+
+        /**
+         * @param path
+         */
+        public Cache(String path) {
+            this.file = Paths.get(path);
+        }
+
+        /**
+         * @return
+         */
+        public List<String> read() {
+
+        }
+    }
+
+    /**
+     * Retrieve session id.
+     * 
+     * @return
+     */
+    private synchronized String session() {
+        if (session == null) {
+            try {
+                Path file = Filer.locate(".log/bitflyer/cookie.txt");
+                Cache cache = new Cache(".log/bitflyer/cookie.txt");
+
+                if (Files.notExists(file) || Files.getLastModifiedTime(file)
+                        .toInstant()
+                        .plus(1, ChronoUnit.DAYS)
+                        .isBefore(LocalDateTime.now().toInstant(ZoneOffset.UTC))) {
+                    Instant last = Files.getLastModifiedTime(file).toInstant().plus(1, ChronoUnit.DAYS);
+
+                    if (last.isBefore(LocalDateTime.now().toInstant(ZoneOffset.UTC))) {
+                        // login by browser
+                        Browser browser = new Browser().configProfile(Filer.locate(".log/bitflyer/chrome"));
+                        browser.load("https://lightning.bitflyer.jp/trade/btcfx")
+                                .input("#LoginId", name)
+                                .input("#Password", password)
+                                .click("#login_btn")
+                                .storeCookie(file);
+                        session = browser.cookie("api_session");
+                        browser.dispose();
+
+                        // write cache
+                        Files.write(file, I.list(session));
+                    }
+                }
+
+                if (last.isBefore(LocalDateTime.now().toInstant(ZoneOffset.UTC))) {
+                    // login by browser
+                    Browser browser = new Browser().configProfile(Filer.locate(".log/bitflyer/chrome"));
+                    browser.load("https://lightning.bitflyer.jp/trade/btcfx")
+                            .input("#LoginId", name)
+                            .input("#Password", password)
+                            .click("#login_btn")
+                            .storeCookie(file);
+                    session = browser.cookie("api_session");
+                    browser.dispose();
+
+                    // write cache
+                    Files.write(file, I.list(session));
+                } else {
+                    // read cache
+                    session = Files.readAllLines(file).get(0);
+                }
+            } catch (IOException e) {
+                throw I.quiet(e);
+            }
+        }
+        return session;
     }
 
     /**
@@ -499,25 +594,20 @@ class BitFlyerBackend implements MarketBackend {
     }
 
     private void browser() {
-        Headless headless = new Headless();
-        headless.login();
-    }
+        ChildOrderRequestWebAPI body = new ChildOrderRequestWebAPI();
+        body.account_id = id;
+        body.lang = "ja";
+        body.minute_to_expire = 43200;
+        body.ord_type = "LIMIT";
+        body.order_ref_id = "KUMAKUAM" + RandomStringUtils.randomAlphabetic(15);
+        body.price = 700000;
+        body.product_code = "FX_BTC_JPY";
+        body.side = "BUY";
+        body.size = 0.001;
+        body.time_in_force = "GTC";
 
-    /**
-     * @version 2018/02/07 22:10:47
-     */
-    private class Headless {
-
-        /**
-         * Try to login.
-         */
-        private void login() {
-            Browser browser = new Browser().configProfile(Filer.locate(".log/bitflyer/chrome"));
-            
-            browser.load("https://lightning.bitflyer.jp/trade/btcfx")
-                    .input("#LoginId", name)
-                    .input("#Password", password)
-                    .click("#login_btn");
-        }
+        call("POST", "https://lightning.bitflyer.jp/api/trade/sendorder", body, "", ChildOrderResponseWebAPI.class).to(e -> {
+            System.out.println(e);
+        });
     }
 }
