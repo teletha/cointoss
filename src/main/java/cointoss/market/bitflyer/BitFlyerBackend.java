@@ -45,6 +45,7 @@ import kiss.Disposable;
 import kiss.I;
 import kiss.JSON;
 import kiss.Signal;
+import marionette.Browser;
 
 /**
  * @version 2018/02/07 9:22:14
@@ -66,6 +67,12 @@ class BitFlyerBackend implements MarketBackend {
     /** The token. */
     private final String accessToken;
 
+    /** The key. */
+    private final String name;
+
+    /** The token. */
+    private final String password;
+
     private Disposable disposer = Disposable.empty();
 
     /**
@@ -77,6 +84,8 @@ class BitFlyerBackend implements MarketBackend {
         this.type = type;
         this.accessKey = lines.get(0);
         this.accessToken = lines.get(1);
+        this.name = lines.get(2);
+        this.password = lines.get(3);
     }
 
     /**
@@ -482,5 +491,33 @@ class BitFlyerBackend implements MarketBackend {
 
         /** The server status. */
         public Health status;
+    }
+
+    public static void main(String[] args) {
+        BitFlyerBackend service = new BitFlyerBackend(BitFlyer.FX_BTC_JPY);
+        service.browser();
+    }
+
+    private void browser() {
+        Headless headless = new Headless();
+        headless.login();
+    }
+
+    /**
+     * @version 2018/02/07 22:10:47
+     */
+    private class Headless {
+
+        /**
+         * Try to login.
+         */
+        private void login() {
+            Browser browser = new Browser().configProfile(Filer.locate(".log/bitflyer/chrome"));
+            
+            browser.load("https://lightning.bitflyer.jp/trade/btcfx")
+                    .input("#LoginId", name)
+                    .input("#Password", password)
+                    .click("#login_btn");
+        }
     }
 }

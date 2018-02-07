@@ -15,6 +15,7 @@ public class Project extends bee.api.Project {
         repository("https://oss.sonatype.org/content/repositories/snapshots");
         require("com.github.teletha", "sinobu", "1.0");
         require("com.github.teletha", "filer", "0.5");
+        require("com.github.teletha", "marionette", "0.1");
         require("com.github.teletha", "antibug", "0.3").atTest();
         require("org.apache.commons", "commons-lang3", "3.5");
         require("commons-codec", "commons-codec", "1.10");
