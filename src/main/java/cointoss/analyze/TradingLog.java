@@ -93,8 +93,8 @@ public class TradingLog {
      * Analyze trading.
      */
     public TradingLog(Market market, List<Trader> tradings) {
-        Execution init = market.getExecutionInit();
-        Execution last = market.getExecutionLatest();
+        Execution init = market.init.v;
+        Execution last = market.latest.v;
         this.start = init.exec_date;
         this.startPrice = init.price;
         this.startBaseCurrency = market.getBaseInit();

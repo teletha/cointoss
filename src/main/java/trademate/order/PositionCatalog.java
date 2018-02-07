@@ -119,12 +119,12 @@ public class PositionCatalog extends View {
             }
         });
 
-        view.market().latestPrice.observe().to(e -> {
+        view.market().latest.observe().to(e -> {
             for (Position position : positions.values) {
                 if (position.isBuy()) {
-                    position.profit.set(e.minus(position.price).multiply(position.size));
+                    position.profit.set(e.price.minus(position.price).multiply(position.size));
                 } else {
-                    position.profit.set(position.price.minus(e).multiply(position.size));
+                    position.profit.set(position.price.minus(e.price).multiply(position.size));
                 }
             }
         });

@@ -102,14 +102,11 @@ public class Market implements Disposable {
     /** The market health. */
     public final Variable<Health> health = Variable.empty();
 
-    /** The latest price. */
-    public final Variable<Num> latestPrice = Variable.of(Num.ZERO);
-
     /** The initial execution. */
-    private Execution init;
+    public final Variable<Execution> init = Variable.empty();
 
     /** The latest execution. */
-    private Execution latest;
+    public final Variable<Execution> latest = Variable.of(new Execution());
 
     /** 基軸通貨量 */
     private Num base;
@@ -360,24 +357,6 @@ public class Market implements Disposable {
     }
 
     /**
-     * Return the current amount of base currency.
-     * 
-     * @return
-     */
-    public Execution getExecutionInit() {
-        return init;
-    }
-
-    /**
-     * Return the current amount of target currency.
-     * 
-     * @return
-     */
-    public Execution getExecutionLatest() {
-        return latest;
-    }
-
-    /**
      * <p>
      * Check market state.
      * </p>
@@ -395,7 +374,7 @@ public class Market implements Disposable {
      */
     public Num calculateProfit() {
         Num baseProfit = base.minus(baseInit);
-        Num targetProfit = target.multiply(latest.price).minus(targetInit.multiply(init.price));
+        Num targetProfit = target.multiply(latest.v.price).minus(targetInit.multiply(init.v.price));
         return baseProfit.plus(targetProfit);
     }
 
@@ -406,7 +385,7 @@ public class Market implements Disposable {
      * @return
      */
     public Signal<Execution> signalByPrice(Num price) {
-        if (latest.price.isLessThan(price)) {
+        if (latest.v.price.isLessThan(price)) {
             return timeline.take(e -> e.price.isGreaterThanOrEqual(price)).take(1);
         } else {
             return timeline.take(e -> e.price.isLessThanOrEqual(price)).take(1);
@@ -424,11 +403,8 @@ public class Market implements Disposable {
      * @param exe
      */
     public final void tick(Execution exe) {
-        if (init == null) {
-            init = exe;
-        }
-        latest = exe;
-        latestPrice.set(exe.price);
+        if (init.isAbsent()) init.let(exe);
+        latest.set(exe);
 
         flow.record(exe);
         flow75.record(exe);
