@@ -14,12 +14,9 @@ import static java.util.concurrent.TimeUnit.*;
 import java.nio.charset.StandardCharsets;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 
 import org.apache.commons.codec.digest.HmacUtils;
 import org.apache.http.HttpStatus;
@@ -33,14 +30,6 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.pubnub.api.PNConfiguration;
-import com.pubnub.api.PubNub;
-import com.pubnub.api.callbacks.SubscribeCallback;
-import com.pubnub.api.enums.PNReconnectionPolicy;
-import com.pubnub.api.enums.PNStatusCategory;
-import com.pubnub.api.models.consumer.PNStatus;
-import com.pubnub.api.models.consumer.pubsub.PNMessageResult;
-import com.pubnub.api.models.consumer.pubsub.PNPresenceEventResult;
 
 import cointoss.Execution;
 import cointoss.Market;
@@ -58,19 +47,9 @@ import kiss.JSON;
 import kiss.Signal;
 
 /**
- * @version 2017/12/02 11:49:35
+ * @version 2018/02/07 9:22:14
  */
 class BitFlyerBackend implements MarketBackend {
-
-    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss");
-
-    /** The server checking thread. */
-    private static final ScheduledExecutorService checker = Executors.newSingleThreadScheduledExecutor(run -> {
-        Thread thread = new Thread(run);
-        thread.setName("Server Checker");
-        thread.setDaemon(true);
-        return thread;
-    });
 
     /** The api url. */
     static final String api = "https://api.bitflyer.jp";
@@ -88,9 +67,6 @@ class BitFlyerBackend implements MarketBackend {
     private final String accessToken;
 
     private Disposable disposer = Disposable.empty();
-
-    /** The shared source. */
-    private Signal<OrderBookChange> board = realtimeOrderBook();
 
     /**
      * @param type
@@ -290,7 +266,7 @@ class BitFlyerBackend implements MarketBackend {
      */
     @Override
     public Signal<OrderBookChange> getOrderBook() {
-        return snapshotOrderBook().merge(board);
+        return snapshotOrderBook().merge(realtimeOrderBook());
     }
 
     /**
@@ -322,78 +298,24 @@ class BitFlyerBackend implements MarketBackend {
      * @return
      */
     private Signal<OrderBookChange> realtimeOrderBook() {
-        return new Signal<OrderBookChange>((observer, disposer) -> {
-            PNConfiguration config = new PNConfiguration();
-            config.setSecure(false);
-            config.setReconnectionPolicy(PNReconnectionPolicy.LINEAR);
-            config.setNonSubscribeRequestTimeout(5);
-            config.setPresenceTimeout(5);
-            config.setSubscribeTimeout(5);
-            config.setStartSubscriberThread(true);
-            config.setSubscribeKey("sub-c-52a9ab50-291b-11e5-baaa-0619f8945a4f");
+        return PubNubSignal.observe("lightning_board_" + type, "sub-c-52a9ab50-291b-11e5-baaa-0619f8945a4f", (root, observer) -> {
+            OrderBookChange board = new OrderBookChange();
+            board.mid_price = Num.of(root.get("mid_price").asLong());
 
-            PubNub pubNub = new PubNub(config);
-            pubNub.addListener(new SubscribeCallback() {
+            JsonNode asks = root.get("asks");
 
-                /**
-                 * @param pubnub
-                 * @param status
-                 */
-                @Override
-                public void status(PubNub pubnub, PNStatus status) {
-                    System.out.println(status);
-                    if (status.getCategory() == PNStatusCategory.PNUnexpectedDisconnectCategory) {
-                        // internet got lost, do some magic and call reconnect when ready
-                        pubnub.reconnect();
-                    } else if (status.getCategory() == PNStatusCategory.PNTimeoutCategory) {
-                        // do some magic and call reconnect when ready
-                        pubnub.reconnect();
-                    }
-                }
+            for (int i = 0; i < asks.size(); i++) {
+                JsonNode ask = asks.get(i);
+                board.asks.add(new OrderUnit(Num.of(ask.get("price").asText()), Num.of(ask.get("size").asText())));
+            }
 
-                /**
-                 * @param pubnub
-                 * @param presence
-                 */
-                @Override
-                public void presence(PubNub pubnub, PNPresenceEventResult presence) {
-                }
+            JsonNode bids = root.get("bids");
 
-                /**
-                 * @param pubnub
-                 * @param message
-                 */
-                @Override
-                public void message(PubNub pubnub, PNMessageResult message) {
-                    if (message.getChannel() != null) {
-                        JsonNode node = message.getMessage();
-
-                        OrderBookChange board = new OrderBookChange();
-                        board.mid_price = Num.of(node.get("mid_price").asLong());
-
-                        JsonNode asks = node.get("asks");
-
-                        for (int i = 0; i < asks.size(); i++) {
-                            JsonNode ask = asks.get(i);
-                            board.asks.add(new OrderUnit(Num.of(ask.get("price").asText()), Num.of(ask.get("size").asText())));
-                        }
-
-                        JsonNode bids = node.get("bids");
-
-                        for (int i = 0; i < bids.size(); i++) {
-                            JsonNode bid = bids.get(i);
-                            board.bids.add(new OrderUnit(Num.of(bid.get("price").asText()), Num.of(bid.get("size").asText())));
-                        }
-                        observer.accept(board);
-                    }
-                }
-            });
-            pubNub.subscribe().channels(I.list("lightning_board_" + type)).execute();
-
-            return disposer.add(() -> {
-                pubNub.unsubscribeAll();
-                pubNub.destroy();
-            });
+            for (int i = 0; i < bids.size(); i++) {
+                JsonNode bid = bids.get(i);
+                board.bids.add(new OrderUnit(Num.of(bid.get("price").asText()), Num.of(bid.get("size").asText())));
+            }
+            observer.accept(board);
         });
     }
 
@@ -489,6 +411,7 @@ class BitFlyerBackend implements MarketBackend {
     /**
      * @version 2018/01/29 1:23:05
      */
+    @SuppressWarnings("unused")
     private static class ChildOrderRequestWebAPI {
 
         public String product_code;
@@ -515,6 +438,7 @@ class BitFlyerBackend implements MarketBackend {
     /**
      * @version 2018/01/29 1:28:03
      */
+    @SuppressWarnings("unused")
     private static class ChildOrderResponseWebAPI {
 
         public int status;
@@ -538,6 +462,7 @@ class BitFlyerBackend implements MarketBackend {
     /**
      * @version 2017/11/28 9:28:38
      */
+    @SuppressWarnings("unused")
     private static class CurrencyState {
 
         /** The currency code. */

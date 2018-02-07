@@ -475,15 +475,15 @@ public class Market implements Disposable {
         Num executed = Num.min(order.outstanding_size, exe.size);
 
         if (order.child_order_type.isMarket() && executed.isNot(0)) {
-            order.average_price.set(order.average_price.v.multiply(order.executed_size)
+            order.average_price.set(v -> v.multiply(order.executed_size)
                     .plus(exe.price.multiply(executed))
                     .divide(executed.plus(order.executed_size)));
         }
 
-        order.outstanding_size.set(order.outstanding_size.v.minus(executed));
-        order.executed_size.set(order.executed_size.get().plus(executed));
+        order.executed_size.set(v -> v.plus(executed));
+        order.outstanding_size.set(v -> v.minus(executed));
 
-        if (order.outstanding_size.v.is(0)) {
+        if (order.outstanding_size.is(Num.ZERO)) {
             order.state.set(State.COMPLETED);
             orders.remove(order); // complete order
         }

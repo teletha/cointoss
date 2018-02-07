@@ -27,20 +27,12 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.pubnub.api.PNConfiguration;
-import com.pubnub.api.PubNub;
-import com.pubnub.api.callbacks.SubscribeCallback;
-import com.pubnub.api.enums.PNReconnectionPolicy;
-import com.pubnub.api.enums.PNStatusCategory;
-import com.pubnub.api.models.consumer.PNStatus;
-import com.pubnub.api.models.consumer.pubsub.PNMessageResult;
-import com.pubnub.api.models.consumer.pubsub.PNPresenceEventResult;
 
 import cointoss.Execution;
 import cointoss.MarketLog;
 import cointoss.Side;
-import cointoss.util.Num;
 import cointoss.util.Chrono;
+import cointoss.util.Num;
 import filer.Filer;
 import kiss.I;
 import kiss.Signal;
@@ -287,81 +279,28 @@ class BitFlyerLog extends MarketLog {
      * @return
      */
     private Signal<Execution> realtime() {
-        return new Signal<>((observer, disposer) -> {
-            PNConfiguration config = new PNConfiguration();
-            config.setSecure(false);
-            config.setReconnectionPolicy(PNReconnectionPolicy.LINEAR);
-            config.setNonSubscribeRequestTimeout(5);
-            config.setPresenceTimeout(5);
-            config.setSubscribeTimeout(5);
-            config.setStartSubscriberThread(true);
-            config.setSubscribeKey("sub-c-52a9ab50-291b-11e5-baaa-0619f8945a4f");
+        return PubNubSignal.observe("lightning_executions_" + type, "sub-c-52a9ab50-291b-11e5-baaa-0619f8945a4f", (root, observer) -> {
+            Iterator<JsonNode> iterator = root.iterator();
 
-            PubNub pubNub = new PubNub(config);
-            pubNub.addListener(new SubscribeCallback() {
+            while (iterator.hasNext()) {
+                JsonNode node = iterator.next();
 
-                /**
-                 * @param pubnub
-                 * @param status
-                 */
-                @Override
-                public void status(PubNub pubnub, PNStatus status) {
-                    System.out.println(status);
-                    if (status.getCategory() == PNStatusCategory.PNUnexpectedDisconnectCategory) {
-                        // internet got lost, do some magic and call reconnect when ready
-                        pubnub.reconnect();
-                    } else if (status.getCategory() == PNStatusCategory.PNTimeoutCategory) {
-                        // do some magic and call reconnect when ready
-                        pubnub.reconnect();
-                    }
+                Execution exe = new Execution();
+                exe.id = node.get("id").asLong();
+                exe.side = Side.parse(node.get("side").asText());
+                exe.price = Num.of(node.get("price").asText());
+                exe.size = exe.cumulativeSize = Num.of(node.get("size").asText());
+                exe.exec_date = LocalDateTime.parse(node.get("exec_date").asText(), format).atZone(BitFlyerBackend.zone);
+                exe.buy_child_order_acceptance_id = node.get("buy_child_order_acceptance_id").asText();
+                exe.sell_child_order_acceptance_id = node.get("sell_child_order_acceptance_id").asText();
+
+                if (exe.id == 0) {
+                    exe.id = ++realtimeId;
                 }
 
-                /**
-                 * @param pubnub
-                 * @param presence
-                 */
-                @Override
-                public void presence(PubNub pubnub, PNPresenceEventResult presence) {
-                    System.out.println(presence);
-                }
-
-                /**
-                 * @param pubnub
-                 * @param message
-                 */
-                @Override
-                public void message(PubNub pubnub, PNMessageResult message) {
-                    if (message.getChannel() != null) {
-                        Iterator<JsonNode> iterator = message.getMessage().iterator();
-
-                        while (iterator.hasNext()) {
-                            JsonNode node = iterator.next();
-
-                            Execution exe = new Execution();
-                            exe.id = node.get("id").asLong();
-                            exe.side = Side.parse(node.get("side").asText());
-                            exe.price = Num.of(node.get("price").asText());
-                            exe.size = exe.cumulativeSize = Num.of(node.get("size").asText());
-                            exe.exec_date = LocalDateTime.parse(node.get("exec_date").asText(), format).atZone(BitFlyerBackend.zone);
-                            exe.buy_child_order_acceptance_id = node.get("buy_child_order_acceptance_id").asText();
-                            exe.sell_child_order_acceptance_id = node.get("sell_child_order_acceptance_id").asText();
-
-                            if (exe.id == 0) {
-                                exe.id = ++realtimeId;
-                            }
-
-                            observer.accept(exe);
-                            realtimeId = exe.id;
-                        }
-                    }
-                }
-            });
-            pubNub.subscribe().channels(I.list("lightning_executions_" + type)).execute();
-
-            return disposer.add(() -> {
-                pubNub.unsubscribeAll();
-                pubNub.destroy();
-            });
+                observer.accept(exe);
+                realtimeId = exe.id;
+            }
         });
     }
 }
