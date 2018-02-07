@@ -14,6 +14,8 @@ import java.time.format.DateTimeFormatter;
 
 import cointoss.Position;
 import cointoss.Side;
+import cointoss.order.Order;
+import cointoss.order.OrderBookList;
 import cointoss.util.Num;
 import kiss.Variable;
 import trademate.TradingView;
@@ -61,7 +63,7 @@ public class PositionCatalog extends View {
         Calculation<Num> totalAmount = Viewtify.calculate(positions.values).map(p -> p.size).reduce(Num.ZERO, Num::plus);
         Calculation<Num> totalPrice = Viewtify.calculate(positions.values).reduce(Num.ZERO, (t, p) -> t.plus(p.price.multiply(p.size)));
         Calculation<Num> averagePrice = Viewtify.calculate(totalPrice, totalAmount, (total, amount) -> total.divide(amount).scale(0));
-        Calculation<Num> totalPnL = Viewtify.calculate(positions.values)
+        Calculation<Num> totalProfit = Viewtify.calculate(positions.values)
                 .flatVariable(p -> p.profit)
                 .reduce(Num.ZERO, Num::plus)
                 .map(v -> v.scale(0));
@@ -70,11 +72,9 @@ public class PositionCatalog extends View {
         openPositionSide.model(o -> o.side).render((ui, item) -> ui.text(item).styleOnly(item));
         openPositionAmount.modelByVar(o -> o.size).header(Viewtify.calculate("数量 ").concat(totalAmount).trim());
         openPositionPrice.model(o -> o.price).header(Viewtify.calculate("価格 ").concat(averagePrice).trim());
-        openPositionProfitAndLoss.modelByVar(o -> o.profit).header(Viewtify.calculate("損益 ").concat(totalPnL).trim());
-        positions.context($ -> {
-            $.menu("撤退").whenUserClick(e -> {
-
-            });
+        openPositionProfitAndLoss.modelByVar(o -> o.profit.map(v -> v.scale(0))).header(Viewtify.calculate("損益 ").concat(totalProfit).trim());
+        positions.selectMultipleRows().context($ -> {
+            $.menu("撤退").whenUserClick(() -> positions.selection().forEach(this::retreat));
         });
 
         Position pp = new Position();
@@ -89,7 +89,7 @@ public class PositionCatalog extends View {
         minus.price = Num.of(800000);
         minus.size = Variable.of(Num.ONE);
 
-        view.market().yourExecution.startWith(pp, minus).to(p -> {
+        view.market().yourExecution.startWith().to(p -> {
             for (Position position : positions.values) {
                 if (position.side == p.side) {
                     if (position.price.is(p.price)) {
@@ -128,5 +128,17 @@ public class PositionCatalog extends View {
                 }
             }
         });
+    }
+
+    /**
+     * Request exit order.
+     * 
+     * @param position
+     */
+    private void retreat(Position position) {
+        OrderBookList book = view.market().orderBook.bookFor(position.inverse());
+        Num price = book.computeBestPrice(Num.ZERO, Num.TWO);
+
+        view.order(Order.limit(position.inverse(), position.size.v, price));
     }
 }

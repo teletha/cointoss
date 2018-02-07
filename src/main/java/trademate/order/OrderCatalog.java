@@ -68,7 +68,7 @@ public class OrderCatalog extends View {
     @Override
     protected void initialize() {
         orderCatalog.selectMultipleRows().render(table -> new CatalogRow()).context($ -> {
-            Calculation<Boolean> ordersArePassive = orderCatalog.getSelected().flatVariable(this::state).isNot(ACTIVE);
+            Calculation<Boolean> ordersArePassive = orderCatalog.selection().flatVariable(this::state).isNot(ACTIVE);
 
             $.menu("Cancel").disableWhen(ordersArePassive).whenUserClick(e -> act(this::cancel));
             $.menu("Get Close").disableWhen(ordersArePassive).whenUserClick(e -> act(this::reorderClosely));
@@ -105,8 +105,9 @@ public class OrderCatalog extends View {
      */
     public void createOrderItem(OrderSet set) {
         UITreeItem item = orderCatalog.root.createItem(set).expand(set.sub.size() != 1).removeWhenEmpty();
-
+        System.out.println(set);
         for (Order order : set.sub) {
+            System.out.println(order);
             createOrderItem(item, order);
         }
     }
@@ -124,7 +125,7 @@ public class OrderCatalog extends View {
      * @param order
      */
     private void act(Consumer<Order> forOrder) {
-        for (Object order : orderCatalog.getSelected().getValue()) {
+        for (Object order : orderCatalog.selection()) {
             if (order instanceof Order) {
                 forOrder.accept((Order) order);
             } else {

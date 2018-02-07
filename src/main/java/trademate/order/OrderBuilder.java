@@ -33,7 +33,6 @@ import trademate.TradingView;
 import viewtify.UI;
 import viewtify.User;
 import viewtify.View;
-import viewtify.Viewtify;
 import viewtify.ui.UIButton;
 import viewtify.ui.UICheckBox;
 import viewtify.ui.UIComboBox;
@@ -41,7 +40,7 @@ import viewtify.ui.UISpinner;
 import viewtify.ui.UIText;
 
 /**
- * @version 2017/11/27 23:21:48
+ * @version 2018/02/07 17:11:55
  */
 public class OrderBuilder extends View {
 
@@ -115,7 +114,7 @@ public class OrderBuilder extends View {
     @Override
     protected void initialize() {
         orderSize.initial("0").when(User.Scroll, changeBy(orderSizeAmount.ui)).require(positiveNumber);
-        orderSizeAmount.values(2, Num.of("0.01"), Num.of("0.1"), Num.ONE);
+        orderSizeAmount.values(3, Num.of("0.001"), Num.of("0.01"), Num.of("0.1"), Num.ONE);
 
         orderPrice.initial("0").when(User.Scroll, changeBy(orderPriceAmount.ui)).require(positiveNumber);
         orderPriceAmount.values(0, Num.ONE, Num.HUNDRED, Num.THOUSAND, Num.of(10000));
@@ -214,23 +213,6 @@ public class OrderBuilder extends View {
 
             price = optimizedPrice.plus(priceInterval);
         }
-
-        // ========================================
-        // Create View Model
-        // ========================================
-        view.orders.createOrderItem(set);
-
-        // ========================================
-        // Request to Server
-        // ========================================
-        for (Order order : set.sub) {
-            Viewtify.inWorker(() -> {
-                view.market().request(order).to(o -> {
-                }, e -> {
-                    notificator.orderFailed.notify("Reject order " + order);
-                });
-            });
-        }
+        view.order(set);
     }
-
 }

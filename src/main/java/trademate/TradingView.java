@@ -15,6 +15,7 @@ import javafx.scene.layout.AnchorPane;
 
 import cointoss.Market;
 import cointoss.market.bitflyer.BitFlyer;
+import cointoss.order.Order;
 import cointoss.ticker.TickSpan;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
@@ -24,6 +25,7 @@ import trademate.console.Console;
 import trademate.order.OrderBookView;
 import trademate.order.OrderBuilder;
 import trademate.order.OrderCatalog;
+import trademate.order.OrderSet;
 import trademate.order.PositionCatalog;
 import viewtify.UI;
 import viewtify.User;
@@ -34,7 +36,7 @@ import viewtify.ui.UILabel;
 import viewtify.ui.UITab;
 
 /**
- * @version 2017/11/29 10:50:06
+ * @version 2018/02/07 17:12:03
  */
 public class TradingView extends View {
 
@@ -133,8 +135,46 @@ public class TradingView extends View {
      */
     public final synchronized Market market() {
         if (market == null) {
-            Viewtify.Terminator.add(market = new Market(provider, provider.log().fromLast(10, ChronoUnit.HOURS).share()));
+            Viewtify.Terminator.add(market = new Market(provider, provider.log().fromLast(2, ChronoUnit.HOURS).share()));
         }
         return market;
+    }
+
+    /**
+     * Reqest order to the market.
+     * 
+     * @param order
+     */
+    public final void order(Order order) {
+        OrderSet set = new OrderSet();
+        set.sub.add(order);
+        order.group = System.nanoTime();
+
+        order(set);
+    }
+
+    /**
+     * Reqest order to the market.
+     * 
+     * @param set
+     */
+    public final void order(OrderSet set) {
+        // ========================================
+        // Create View Model
+        // ========================================
+        orders.createOrderItem(set);
+
+        // ========================================
+        // Request to Server
+        // ========================================
+        for (Order order : set.sub) {
+            Viewtify.inWorker(() -> {
+                market().request(order).to(o -> {
+                    // ok
+                }, e -> {
+                    notificator.orderFailed.notify("Reject order " + order);
+                });
+            });
+        }
     }
 }
