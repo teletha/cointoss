@@ -322,7 +322,16 @@ public class Order implements Directional {
      * @version 2017/07/22 18:02:37
      */
     public static enum Quantity {
-        GoodTillCanceled, ImmediateOrCancel, FillOrKill;
+        GoodTillCanceled("GTC"), ImmediateOrCancel("IOC"), FillOrKill("FOK");
+
+        public final String abbreviation;
+
+        /**
+         * @param abbreviation
+         */
+        private Quantity(String abbreviation) {
+            this.abbreviation = abbreviation;
+        }
     }
 
     /** The server ID */

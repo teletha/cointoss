@@ -15,6 +15,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +42,7 @@ import cointoss.order.Order;
 import cointoss.order.Order.State;
 import cointoss.order.OrderBookChange;
 import cointoss.order.OrderUnit;
+import cointoss.util.Chrono;
 import cointoss.util.Num;
 import filer.Filer;
 import kiss.Disposable;
@@ -50,9 +52,14 @@ import kiss.Signal;
 import marionette.Browser;
 
 /**
- * @version 2018/02/07 9:22:14
+ * @version 2018/02/08 12:25:47
  */
 class BitFlyerBackend implements MarketBackend {
+
+    private static final DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss-");
+
+    /** The current session id. */
+    private static String session;
 
     /** The api url. */
     static final String api = "https://api.bitflyer.jp";
@@ -76,10 +83,7 @@ class BitFlyerBackend implements MarketBackend {
     private final String password;
 
     /** The token. */
-    private final String id;
-
-    /** The current session id. */
-    private String session;
+    private final String accountId;
 
     private Disposable disposer = Disposable.empty();
 
@@ -87,13 +91,14 @@ class BitFlyerBackend implements MarketBackend {
      * @param type
      */
     BitFlyerBackend(BitFlyer type) {
-        List<String> lines = Filer.read(".log/bitflyer/key.txt").toList();
         this.type = type;
+
+        List<String> lines = Filer.read(".log/bitflyer/key.txt").toList();
         this.accessKey = lines.get(0);
         this.accessToken = lines.get(1);
         this.name = lines.get(2);
         this.password = lines.get(3);
-        this.id = lines.get(4);
+        this.accountId = lines.get(4);
     }
 
     /**
@@ -109,6 +114,7 @@ class BitFlyerBackend implements MarketBackend {
      */
     @Override
     public void initialize(Market market, Signal<Execution> log) {
+        session = session();
         disposer.add(log.to(market::tick));
     }
 
@@ -120,84 +126,37 @@ class BitFlyerBackend implements MarketBackend {
         disposer.dispose();
     }
 
-    // /**
-    // * {@inheritDoc}
-    // */
-    // @Override
-    // public Signal<String> request(Order order) {
-    // // {
-    // // "product_code": "BTC_JPY",
-    // // "child_order_type": "LIMIT",
-    // // "side": "BUY",
-    // // "price": 30000,
-    // // "size": 0.1,
-    // // "minute_to_expire": 10000,
-    // // "time_in_force": "GTC"
-    // // }
-    // ChildOrderRequestWebAPI request = new ChildOrderRequestWebAPI();
-    // request.order_ref_id = "JRF" + LocalDateTime.now().format(formatter) + "-" +
-    // RandomStringUtils.randomNumeric(6);
-    // request.ord_type = order.isLimit() ? "LIMIT" : "MARKET";
-    // request.minute_to_expire = 60 * 24;
-    // request.price = order.price.toInt();
-    // request.product_code = type.name();
-    // request.side = order.side().name();
-    // request.size = order.size.toDouble();
-    // switch (order.quantity()) {
-    // case GoodTillCanceled:
-    // request.time_in_force = "GTC";
-    // break;
-    //
-    // case ImmediateOrCancel:
-    // request.time_in_force = "IOC";
-    // break;
-    //
-    // case FillOrKill:
-    // request.time_in_force = "FOK";
-    // break;
-    // }
-    // // RESPONSE
-    // // {"status":0,"error_message":null,"data":{"order_ref_id":"JRF20180128-234437-373993"}}
-    // return call("POST", "https://lightning.bitflyer.jp/api/trade/sendorder", request,
-    // "data/order_ref_id", String.class);
-    // }
-
     /**
      * {@inheritDoc}
      */
     @Override
     public Signal<String> request(Order order) {
-        // {
-        // "product_code": "BTC_JPY",
-        // "child_order_type": "LIMIT",
-        // "side": "BUY",
-        // "price": 30000,
-        // "size": 0.1,
-        // "minute_to_expire": 10000,
-        // "time_in_force": "GTC"
-        // }
-        ChildOrderRequest request = new ChildOrderRequest();
-        request.child_order_type = order.isLimit() ? "LIMIT" : "MARKET";
-        request.minute_to_expire = 60 * 24;
-        request.price = order.price.toInt();
-        request.product_code = type.name();
-        request.side = order.side().name();
-        request.size = order.size.toDouble();
-        switch (order.quantity()) {
-        case GoodTillCanceled:
-            request.time_in_force = "GTC";
-            break;
+        if (session == null) {
+            ChildOrderRequest request = new ChildOrderRequest();
+            request.child_order_type = order.isLimit() ? "LIMIT" : "MARKET";
+            request.minute_to_expire = 60 * 24;
+            request.price = order.price.toInt();
+            request.product_code = type.name();
+            request.side = order.side().name();
+            request.size = order.size.toDouble();
+            request.time_in_force = order.quantity().abbreviation;
 
-        case ImmediateOrCancel:
-            request.time_in_force = "IOC";
-            break;
+            return call("POST", "/v1/me/sendchildorder", request, "child_order_acceptance_id", String.class);
+        } else {
+            ChildOrderRequestWebAPI request = new ChildOrderRequestWebAPI();
+            request.account_id = accountId;
+            request.lang = "ja";
+            request.minute_to_expire = 60 * 24;
+            request.ord_type = order.isLimit() ? "LIMIT" : "MARKET";
+            request.order_ref_id = "JRF" + Chrono.utc(System.currentTimeMillis()).format(format) + RandomStringUtils.randomNumeric(6);
+            request.price = order.price.toInt();
+            request.product_code = type.name();
+            request.side = order.side().name();
+            request.size = order.size.toDouble();
+            request.time_in_force = order.quantity().abbreviation;
 
-        case FillOrKill:
-            request.time_in_force = "FOK";
-            break;
+            return call("POST", "https://lightning.bitflyer.jp/api/trade/sendorder", request, "data.order_ref_id", String.class);
         }
-
-        return call("POST", "/v1/me/sendchildorder", request, "child_order_acceptance_id", String.class);
     }
 
     /**
@@ -383,6 +342,7 @@ class BitFlyerBackend implements MarketBackend {
                 String value = EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8);
 
                 if (status == HttpStatus.SC_OK) {
+                    System.out.println(value);
                     if (type == null) {
                         observer.accept(null);
                     } else {
@@ -511,13 +471,15 @@ class BitFlyerBackend implements MarketBackend {
     }
 
     /**
-     * @version 2017/11/13 13:09:00
+     * @version 2018/02/08 14:15:51
      */
     @SuppressWarnings("unused")
     private static class ChildCancelRequest {
 
+        /** For REST API. */
         public String product_code;
 
+        /** For REST API. */
         public String child_order_acceptance_id;
     }
 
@@ -544,30 +506,5 @@ class BitFlyerBackend implements MarketBackend {
 
         /** The server status. */
         public Health status;
-    }
-
-    public static void main(String[] args) {
-        BitFlyerBackend service = new BitFlyerBackend(BitFlyer.FX_BTC_JPY);
-        service.browser();
-    }
-
-    private void browser() {
-        ChildOrderRequestWebAPI body = new ChildOrderRequestWebAPI();
-        body.account_id = id;
-        body.lang = "ja";
-        body.minute_to_expire = 43200;
-        body.ord_type = "LIMIT";
-        body.order_ref_id = "KUMAKUAM" + RandomStringUtils.randomAlphabetic(15);
-        body.price = 700000;
-        body.product_code = "FX_BTC_JPY";
-        body.side = "BUY";
-        body.size = 0.001;
-        body.time_in_force = "GTC";
-
-        call("POST", "https://lightning.bitflyer.jp/api/trade/sendorder", body, "", ChildOrderResponseWebAPI.class).to(e -> {
-            System.out.println(e);
-        }, e -> {
-            e.printStackTrace();
-        });
     }
 }
