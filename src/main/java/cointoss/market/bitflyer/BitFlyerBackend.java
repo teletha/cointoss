@@ -155,7 +155,8 @@ class BitFlyerBackend implements MarketBackend {
             request.size = order.size.toDouble();
             request.time_in_force = order.quantity().abbreviation;
 
-            return call("POST", "https://lightning.bitflyer.jp/api/trade/sendorder", request, "data.order_ref_id", String.class);
+            return call("POST", "https://lightning.bitflyer.jp/api/trade/sendorder", request, "", WebResponse.class)
+                    .map(e -> e.data.order_ref_id);
         }
     }
 
@@ -506,5 +507,30 @@ class BitFlyerBackend implements MarketBackend {
 
         /** The server status. */
         public Health status;
+    }
+
+    /**
+     * @version 2018/01/29 1:28:03
+     */
+    @SuppressWarnings("unused")
+    private static class WebResponse {
+
+        /** Generic parameter */
+        public int status;
+
+        /** Generic parameter */
+        public String error_message;
+
+        /** Generic parameter */
+        public Data data;
+    }
+
+    /**
+     * @version 2018/02/09 3:55:13
+     */
+    private static class Data {
+
+        /** For oreder request. */
+        public String order_ref_id;
     }
 }
