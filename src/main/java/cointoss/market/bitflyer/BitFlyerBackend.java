@@ -11,17 +11,10 @@ package cointoss.market.bitflyer;
 
 import static java.util.concurrent.TimeUnit.*;
 
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -95,7 +88,6 @@ class BitFlyerBackend implements MarketBackend {
      */
     BitFlyerBackend(BitFlyer type) {
         List<String> lines = Filer.read(".log/bitflyer/key.txt").toList();
-
         this.type = type;
         this.accessKey = lines.get(0);
         this.accessToken = lines.get(1);
@@ -414,26 +406,6 @@ class BitFlyerBackend implements MarketBackend {
         });
     }
 
-    private static class Cache {
-
-        /** The actual file. */
-        private final Path file;
-
-        /**
-         * @param path
-         */
-        public Cache(String path) {
-            this.file = Paths.get(path);
-        }
-
-        /**
-         * @return
-         */
-        public List<String> read() {
-
-        }
-    }
-
     /**
      * Retrieve session id.
      * 
@@ -441,51 +413,29 @@ class BitFlyerBackend implements MarketBackend {
      */
     private synchronized String session() {
         if (session == null) {
-            try {
-                Path file = Filer.locate(".log/bitflyer/cookie.txt");
-                Cache cache = new Cache(".log/bitflyer/cookie.txt");
+            Path cache = Filer.locate(".log/bitflyer/session.txt");
+            long expire = Filer.getLastModified(cache) + 60 * 60 * 24 * 1000;
 
-                if (Files.notExists(file) || Files.getLastModifiedTime(file)
-                        .toInstant()
-                        .plus(1, ChronoUnit.DAYS)
-                        .isBefore(LocalDateTime.now().toInstant(ZoneOffset.UTC))) {
-                    Instant last = Files.getLastModifiedTime(file).toInstant().plus(1, ChronoUnit.DAYS);
+            if (expire < System.currentTimeMillis()) {
+                // login by browser
+                Browser browser = new Browser().configProfile(Filer.locate(".log/bitflyer/chrome"));
+                browser.load("https://lightning.bitflyer.jp/trade/btcfx")
+                        .input("#LoginId", name)
+                        .input("#Password", password)
+                        .click("#login_btn");
 
-                    if (last.isBefore(LocalDateTime.now().toInstant(ZoneOffset.UTC))) {
-                        // login by browser
-                        Browser browser = new Browser().configProfile(Filer.locate(".log/bitflyer/chrome"));
-                        browser.load("https://lightning.bitflyer.jp/trade/btcfx")
-                                .input("#LoginId", name)
-                                .input("#Password", password)
-                                .click("#login_btn")
-                                .storeCookie(file);
-                        session = browser.cookie("api_session");
-                        browser.dispose();
-
-                        // write cache
-                        Files.write(file, I.list(session));
-                    }
+                if (browser.uri().equals("https://lightning.bitflyer.jp/Home/TwoFactorAuth")) {
+                    browser.click("form > label").inputByHuman("#ConfirmationCode").click("form > button");
                 }
 
-                if (last.isBefore(LocalDateTime.now().toInstant(ZoneOffset.UTC))) {
-                    // login by browser
-                    Browser browser = new Browser().configProfile(Filer.locate(".log/bitflyer/chrome"));
-                    browser.load("https://lightning.bitflyer.jp/trade/btcfx")
-                            .input("#LoginId", name)
-                            .input("#Password", password)
-                            .click("#login_btn")
-                            .storeCookie(file);
-                    session = browser.cookie("api_session");
-                    browser.dispose();
+                session = browser.cookie("api_session");
+                browser.dispose();
 
-                    // write cache
-                    Files.write(file, I.list(session));
-                } else {
-                    // read cache
-                    session = Files.readAllLines(file).get(0);
-                }
-            } catch (IOException e) {
-                throw I.quiet(e);
+                // write cache
+                Filer.write(cache, I.list(session));
+            } else {
+                // read cache
+                session = Filer.read(cache).to().v;
             }
         }
         return session;
@@ -550,6 +500,14 @@ class BitFlyerBackend implements MarketBackend {
         public String error_message;
 
         public Map<String, String> data = new HashMap();
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String toString() {
+            return "ChildOrderResponseWebAPI [status=" + status + ", error_message=" + error_message + ", data=" + data + "]";
+        }
     }
 
     /**
@@ -608,6 +566,8 @@ class BitFlyerBackend implements MarketBackend {
 
         call("POST", "https://lightning.bitflyer.jp/api/trade/sendorder", body, "", ChildOrderResponseWebAPI.class).to(e -> {
             System.out.println(e);
+        }, e -> {
+            e.printStackTrace();
         });
     }
 }
