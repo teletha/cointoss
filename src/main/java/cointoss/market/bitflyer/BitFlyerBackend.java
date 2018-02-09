@@ -156,7 +156,7 @@ class BitFlyerBackend implements MarketBackend {
             request.time_in_force = order.quantity().abbreviation;
 
             return call("POST", "https://lightning.bitflyer.jp/api/trade/sendorder", request, "", WebResponse.class)
-                    .map(e -> e.data.order_ref_id);
+                    .map(e -> e.data.get("order_ref_id"));
         }
     }
 
@@ -185,9 +185,11 @@ class BitFlyerBackend implements MarketBackend {
      */
     @Override
     public Signal<Order> getOrders() {
-        // If this exception will be thrown, it is bug of this program. So we must rethrow the
-        // wrapped error in here.
-        throw new Error();
+        return call("POST", "https://lightning.bitflyer.jp/api/trade/getMyActiveParentOrders", new WebRequest(), "", WebResponse.class)
+                .map(e -> {
+                    System.out.println(e);
+                    return (Order) null;
+                });
     }
 
     /**
@@ -510,7 +512,23 @@ class BitFlyerBackend implements MarketBackend {
     }
 
     /**
-     * @version 2018/01/29 1:28:03
+     * @version 2018/02/09 11:42:27
+     */
+    @SuppressWarnings("unused")
+    private class WebRequest {
+
+        /** Generic parameter */
+        public String account_id = accountId;
+
+        /** Generic parameter */
+        public String product_code = type.name();
+
+        /** Generic parameter */
+        public String lang = "ja";
+    }
+
+    /**
+     * @version 2018/02/09 11:42:24
      */
     @SuppressWarnings("unused")
     private static class WebResponse {
@@ -522,15 +540,14 @@ class BitFlyerBackend implements MarketBackend {
         public String error_message;
 
         /** Generic parameter */
-        public Data data;
-    }
+        public Map<String, String> data = new HashMap();
 
-    /**
-     * @version 2018/02/09 3:55:13
-     */
-    private static class Data {
-
-        /** For oreder request. */
-        public String order_ref_id;
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String toString() {
+            return "WebResponse [status=" + status + ", error_message=" + error_message + ", data=" + data + "]";
+        }
     }
 }

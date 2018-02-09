@@ -183,6 +183,12 @@ public class Market implements Disposable {
             orderBook.shorts.fix(e.price);
             orderBook.longs.fix(e.price);
         }));
+
+        yourOrder.debounce(5000, TimeUnit.MILLISECONDS).to(e -> {
+            backend.getOrders().to(o -> {
+                System.out.println(o);
+            });
+        });
     }
 
     /**
