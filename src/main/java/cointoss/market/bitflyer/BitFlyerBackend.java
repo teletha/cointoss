@@ -154,6 +154,7 @@ class BitFlyerBackend implements MarketBackend {
             request.side = order.side().name();
             request.size = order.size.toDouble();
             request.time_in_force = order.quantity().abbreviation;
+            request.minute_to_expire = 0.1;
 
             return call("POST", "https://lightning.bitflyer.jp/api/trade/sendorder", request, "", WebResponse.class)
                     .map(e -> e.data.get("order_ref_id"));
@@ -443,7 +444,7 @@ class BitFlyerBackend implements MarketBackend {
 
         public double size;
 
-        public int minute_to_expire;
+        public double minute_to_expire;
 
         public String time_in_force;
 

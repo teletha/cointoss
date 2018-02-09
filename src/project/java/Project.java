@@ -26,5 +26,6 @@ public class Project extends bee.api.Project {
         require("com.pubnub", "pubnub", "4.6.5");
         require("org.magicwerk", "brownies-collections", "0.9.13");
         require("org.controlsfx", "controlsfx", "8.40.14");
+        require("com.github.signalr4j", "signalr4j", "2.0.2");
     }
 }

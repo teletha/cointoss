@@ -30,7 +30,7 @@ public class Websocket {
         // https://lightning.bitflyer.jp/signalr/ping?account_id=ID&token=TOKEN&products=FX_BTC_JPY,heartbeat&_=1518066411185
 
         OkHttpClient client = new OkHttpClient();
-        Request request = new Request.Builder().url("ws://echo.websocket.org").build();
+        Request request = new Request.Builder().url("wss").build();
         EchoWebSocketListener listener = new EchoWebSocketListener();
         WebSocket ws = client.newWebSocket(request, listener);
 
@@ -42,10 +42,7 @@ public class Websocket {
 
         @Override
         public void onOpen(WebSocket webSocket, Response response) {
-            webSocket.send("Hello, it's SSaurel !");
-            webSocket.send("What's up ?");
-            webSocket.send(ByteString.decodeHex("deadbeef"));
-            webSocket.close(NORMAL_CLOSURE_STATUS, "Goodbye !");
+            System.out.println("OPEN");
         }
 
         @Override
