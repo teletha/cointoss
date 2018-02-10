@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.apache.commons.logging.Log;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.drafts.Draft_6455;
 import org.java_websocket.handshake.ServerHandshake;
@@ -57,6 +56,35 @@ public class WebSocketHubConnection implements HubConnection {
     private String connectionId = null;
 
     private String authHeader = null;
+
+    public static void main(String[] args) throws InterruptedException {
+        WebSocketHubConnection connection = new WebSocketHubConnection("https://lightning.bitflyer.jp/signalr/connect", "");
+        connection.addListener(new HubConnectionListener() {
+
+            @Override
+            public void onMessage(HubMessage message) {
+                System.out.println(message);
+            }
+
+            @Override
+            public void onError(Exception exception) {
+                exception.printStackTrace();
+            }
+
+            @Override
+            public void onDisconnected() {
+                System.out.println("Disconnect");
+            }
+
+            @Override
+            public void onConnected() {
+                System.out.println("Connect");
+            }
+        });
+        connection.connect();
+
+        Thread.sleep(10000);
+    }
 
     public WebSocketHubConnection(String hubUrl, String authHeader) {
         try {
@@ -96,6 +124,7 @@ public class WebSocketHubConnection implements HubConnection {
             throw new RuntimeException("URL must start with http or https");
 
         try {
+            System.out.println(hubUrl);
             HttpURLConnection connection = (HttpURLConnection) new URL(hubUrl).openConnection();
             if (authHeader != null && !authHeader.isEmpty()) {
                 connection.addRequestProperty("Authorization", authHeader);
@@ -132,20 +161,16 @@ public class WebSocketHubConnection implements HubConnection {
     }
 
     private void connectClient() {
-        URI create = 
-        Uri.Builder uriBuilder = parsedUri.buildUpon();
-        uriBuilder.appendQueryParameter("id", connectionId);
-        uriBuilder.scheme(parsedUri.getScheme().replace("http", "ws"));
-        Uri uri = uriBuilder.build();
-        Map<String, String> headers = new HashMap<>();
-        if (authHeader != null && !authHeader.isEmpty()) {
-            headers.put("Authorization", authHeader);
-        }
         try {
+            URI uri = new URI(parsedUri.toString().replace("http", "ws") + "?id=" + connectionId);
+            Map<String, String> headers = new HashMap<>();
+            if (authHeader != null && !authHeader.isEmpty()) {
+                headers.put("Authorization", authHeader);
+            }
+
             client = new WebSocketClient(new URI(uri.toString()), new Draft_6455(), headers, 15000) {
                 @Override
                 public void onOpen(ServerHandshake handshakeData) {
-                    Log.i(TAG, "Opened");
                     for (HubConnectionListener listener : listeners) {
                         listener.onConnected();
                     }
@@ -154,7 +179,6 @@ public class WebSocketHubConnection implements HubConnection {
 
                 @Override
                 public void onMessage(String message) {
-                    Log.i(TAG, message);
                     SignalRMessage element = gson.fromJson(message.replace(SPECIAL_SYMBOL, ""), SignalRMessage.class);
                     if (element.getType() == 1) {
                         HubMessage hubMessage = new HubMessage(element.getInvocationId(), element.getTarget(), element.getArguments());
@@ -173,7 +197,6 @@ public class WebSocketHubConnection implements HubConnection {
 
                 @Override
                 public void onClose(int code, String reason, boolean remote) {
-                    Log.i(TAG, String.format("Closed. Code: %s, Reason: %s, Remote: %s", code, reason, remote));
                     for (HubConnectionListener listener : listeners) {
                         listener.onDisconnected();
                     }
@@ -182,7 +205,6 @@ public class WebSocketHubConnection implements HubConnection {
 
                 @Override
                 public void onError(Exception ex) {
-                    Log.i(TAG, "Error " + ex.getMessage());
                     error(ex);
                 }
             };
@@ -190,7 +212,6 @@ public class WebSocketHubConnection implements HubConnection {
             error(e);
         }
 
-        Log.i(TAG, "Connecting...");
         client.connect();
     }
 
