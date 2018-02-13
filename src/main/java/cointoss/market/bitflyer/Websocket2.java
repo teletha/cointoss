@@ -26,14 +26,14 @@ public class Websocket2 {
 
             @Override
             public void log(String message, LogLevel level) {
-                // System.out.println(message);
+                System.out.println(message);
             }
         };
 
-        String uri = "https://lightning.bitflyer.jp/signalr";
+        String uri = "https://lightning.bitflyer.jp";
 
         // Connect to the server
-        HubConnection conn = new HubConnection(uri, "", false, logger);
+        HubConnection conn = new HubConnection(uri, "", true, logger);
 
         // Subscribe to the error event
         conn.error(e -> {
@@ -48,10 +48,6 @@ public class Websocket2 {
         // Subscribe to the closed event
         conn.closed(() -> {
             System.out.println("Close");
-        });
-
-        conn.stateChanged((o, n) -> {
-            System.out.println(o + "  to  " + n);
         });
 
         // Subscribe to the received event
