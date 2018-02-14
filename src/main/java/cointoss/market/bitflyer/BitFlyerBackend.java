@@ -38,6 +38,7 @@ import cointoss.Execution;
 import cointoss.Market;
 import cointoss.MarketBackend;
 import cointoss.Position;
+import cointoss.Side;
 import cointoss.order.Order;
 import cointoss.order.Order.State;
 import cointoss.order.OrderBookChange;
@@ -186,11 +187,9 @@ class BitFlyerBackend implements MarketBackend {
      */
     @Override
     public Signal<Order> getOrders() {
-        return call("POST", "https://lightning.bitflyer.jp/api/trade/getMyActiveParentOrders", new WebRequest(), "", WebResponse.class)
-                .map(e -> {
-                    System.out.println(e);
-                    return (Order) null;
-                });
+        return call("GET", "/v1/me/getchildorders?child_order_state=ACTIVE&product_code=" + type.name(), "", "*", ChildOrderResponse.class)
+                .map(ChildOrderResponse::toOrder);
+
     }
 
     /**
@@ -346,13 +345,13 @@ class BitFlyerBackend implements MarketBackend {
                 String value = EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8);
 
                 if (status == HttpStatus.SC_OK) {
-                    System.out.println(value);
                     if (type == null) {
                         observer.accept(null);
                     } else {
                         JSON json = I.json(value);
 
                         if (selector == null || selector.isEmpty()) {
+                            System.out.println(value);
                             observer.accept(json.to(type));
                         } else {
                             json.find(selector, type).to(observer::accept);
@@ -367,6 +366,15 @@ class BitFlyerBackend implements MarketBackend {
             observer.complete();
 
             return disposer;
+        });
+    }
+
+    public static void main(String[] args) {
+        I.load(Side.Codec.class, false);
+
+        BitFlyerBackend service = new BitFlyerBackend(BitFlyer.FX_BTC_JPY);
+        service.getOrders().to(o -> {
+            System.out.println("From WebAPI " + o);
         });
     }
 
@@ -424,6 +432,26 @@ class BitFlyerBackend implements MarketBackend {
         public int minute_to_expire;
 
         public String time_in_force;
+    }
+
+    /**
+     * @version 2018/02/14 13:36:32
+     */
+    private static class ChildOrderResponse {
+
+        public Side side;
+
+        public String id;
+
+        public String child_order_acceptance_id;
+
+        public Num size;
+
+        public Num price;
+
+        public Order toOrder() {
+            return Order.limit(side, size, price);
+        }
     }
 
     /**
