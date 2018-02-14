@@ -13,6 +13,7 @@ import static java.util.concurrent.TimeUnit.*;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -191,7 +192,16 @@ class BitFlyerBackend implements MarketBackend {
                 .effectOnError(e -> e.printStackTrace())
                 .map(ChildOrderResponse::toOrder)
                 .effectOnError(e -> e.printStackTrace());
+    }
 
+    public static void main(String[] args) throws InterruptedException {
+        I.load(Side.Codec.class, false);
+        BitFlyerBackend back = new BitFlyerBackend(BitFlyer.FX_BTC_JPY);
+
+        I.signal(0, 1, SECONDS).flatMap(v -> back.getOrders()).to(v -> {
+            System.out.println(v);
+        });
+        Thread.sleep(5000);
     }
 
     /**
@@ -441,8 +451,22 @@ class BitFlyerBackend implements MarketBackend {
 
         public Num price;
 
+        public Num average_price;
+
+        public Num outstanding_size;
+
+        public Num executed_size;
+
+        public String child_order_date;
+
         public Order toOrder() {
-            return Order.limit(side, size, price);
+            Order o = Order.limit(side, size, price);
+            o.average_price.set(average_price);
+            o.outstanding_size.set(outstanding_size);
+            o.executed_size.set(executed_size);
+            o.child_order_date.set(LocalDateTime.parse(child_order_date, Chrono.DateTimeWithT).atZone(Chrono.UTC));
+
+            return o;
         }
     }
 

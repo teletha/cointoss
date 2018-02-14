@@ -131,7 +131,7 @@ public class Market implements Disposable {
     private final List<Position> positions = new CopyOnWriteArrayList();
 
     /** The order manager. */
-    private final OrderManager orders = new OrderManager();
+    private final OrderManager orders;
 
     /**
      * Market without {@link Trader}.
@@ -165,6 +165,7 @@ public class Market implements Disposable {
         }
 
         this.backend = provider.service();
+        this.orders = new OrderManager();
 
         // initialize price, balance and executions
         this.base = this.baseInit = backend.getBaseCurrency().to().v;
