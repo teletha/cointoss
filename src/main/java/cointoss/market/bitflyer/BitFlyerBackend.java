@@ -188,7 +188,9 @@ class BitFlyerBackend implements MarketBackend {
     @Override
     public Signal<Order> getOrders() {
         return call("GET", "/v1/me/getchildorders?child_order_state=ACTIVE&product_code=" + type.name(), "", "*", ChildOrderResponse.class)
-                .map(ChildOrderResponse::toOrder);
+                .effectOnError(e -> e.printStackTrace())
+                .map(ChildOrderResponse::toOrder)
+                .effectOnError(e -> e.printStackTrace());
 
     }
 
@@ -351,7 +353,6 @@ class BitFlyerBackend implements MarketBackend {
                         JSON json = I.json(value);
 
                         if (selector == null || selector.isEmpty()) {
-                            System.out.println(value);
                             observer.accept(json.to(type));
                         } else {
                             json.find(selector, type).to(observer::accept);
@@ -366,15 +367,6 @@ class BitFlyerBackend implements MarketBackend {
             observer.complete();
 
             return disposer;
-        });
-    }
-
-    public static void main(String[] args) {
-        I.load(Side.Codec.class, false);
-
-        BitFlyerBackend service = new BitFlyerBackend(BitFlyer.FX_BTC_JPY);
-        service.getOrders().to(o -> {
-            System.out.println("From WebAPI " + o);
         });
     }
 

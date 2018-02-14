@@ -29,6 +29,7 @@ import cointoss.ticker.Ticker;
 import cointoss.util.Listeners;
 import cointoss.util.Num;
 import kiss.Disposable;
+import kiss.I;
 import kiss.Signal;
 import kiss.Variable;
 
@@ -129,6 +130,9 @@ public class Market implements Disposable {
     /** The position manager. */
     private final List<Position> positions = new CopyOnWriteArrayList();
 
+    /** The order manager. */
+    private final OrderManager orders = new OrderManager();
+
     /**
      * Market without {@link Trader}.
      * 
@@ -183,12 +187,6 @@ public class Market implements Disposable {
             orderBook.shorts.fix(e.price);
             orderBook.longs.fix(e.price);
         }));
-
-        yourOrder.debounce(5000, TimeUnit.MILLISECONDS).to(e -> {
-            backend.getOrders().to(o -> {
-                System.out.println(o);
-            });
-        });
     }
 
     /**
@@ -255,9 +253,9 @@ public class Market implements Disposable {
      * @param size
      */
     public final Signal<Order> request(Order order) {
-        return backend.request(order).effectOnError(System.out::println).map(id -> {
+        return backend.request(order).map(id -> {
             order.child_order_acceptance_id = id;
-            order.state.set(State.ACTIVE);
+            order.state.set(State.REQUESTING);
             order.child_order_date.set(ZonedDateTime.now());
             order.average_price.set(order.price);
             order.outstanding_size.set(order.size);
@@ -267,7 +265,6 @@ public class Market implements Disposable {
 
             // event
             holderForYourOrder.accept(order);
-
             return order;
         }).effectOnError(e -> {
             order.state.set(State.CANCELED);
@@ -282,7 +279,6 @@ public class Market implements Disposable {
     public final Signal<String> cancel(Order order) {
         if (order.state.is(ACTIVE)) {
             State previous = order.state.set(REQUESTING);
-            orders.remove(order);
 
             return backend.cancel(order.child_order_acceptance_id).effect(id -> {
                 orders.remove(order);
@@ -398,9 +394,6 @@ public class Market implements Disposable {
         }
     }
 
-    /** The related order identifiers. */
-    private final CopyOnWriteArrayList<Order> orders = new CopyOnWriteArrayList();
-
     /**
      * <p>
      * Trade something.
@@ -418,7 +411,7 @@ public class Market implements Disposable {
         flow200.record(exe);
         flow300.record(exe);
 
-        for (Order order : orders) {
+        for (Order order : orders.actives) {
             if (order.id().equals(exe.buy_child_order_acceptance_id) || order.id().equals(exe.sell_child_order_acceptance_id)) {
                 update(order, exe);
 
@@ -473,5 +466,84 @@ public class Market implements Disposable {
         // pairing order and execution
         exe.associated = order;
         order.executions.add(exe);
+    }
+
+    /**
+     * @version 2018/02/14 15:55:43
+     */
+    private class OrderManager {
+
+        /** The active orders. */
+        private final List<Order> actives = new CopyOnWriteArrayList();
+
+        /**
+         * 
+         */
+        private OrderManager() {
+            I.signal(0, 1, TimeUnit.SECONDS).flatMap(v -> backend.getOrders()).to(this::update);
+        }
+
+        /**
+         * Add new order.
+         * 
+         * @param order
+         */
+        private void add(Order order) {
+            actives.add(order);
+        }
+
+        /**
+         * Remove the specified order.
+         * 
+         * @param order
+         */
+        private void remove(Order order) {
+            actives.remove(order);
+        }
+
+        /**
+         * Check size.
+         */
+        private boolean isEmpty() {
+            return actives.isEmpty();
+        }
+
+        /**
+         * Update managed orders.
+         * 
+         * @param updaters
+         */
+        private void update(Order updater) {
+            System.out.println(updater);
+            // for (Order updater : updaters) {
+            // Order active = findBy(updater.child_order_acceptance_id);
+            //
+            // if (active == null) {
+            // // add order
+            // add(active = updater);
+            // } else {
+            // if (active.state.is(State.REQUESTING)) {
+            // // update order id
+            // active.id = updater.id;
+            // active.state.set(updater.state);
+            // }
+            // }
+            // }
+        }
+
+        /**
+         * Find by accept id.
+         * 
+         * @param acceptId
+         * @return
+         */
+        private Order findBy(String acceptId) {
+            for (Order order : actives) {
+                if (order.child_order_acceptance_id.equals(acceptId)) {
+                    return order;
+                }
+            }
+            return null;
+        }
     }
 }

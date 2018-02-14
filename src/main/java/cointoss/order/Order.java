@@ -39,6 +39,9 @@ public class Order implements Directional {
     /** The order state */
     public final Variable<State> state = Variable.of(State.INIT);
 
+    /** The order id. */
+    public String id;
+
     /** The group id. */
     public long group = -1;
 
