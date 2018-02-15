@@ -121,8 +121,8 @@ public class PositionCatalog extends View {
             }
 
             if (p.size.v.isPositive()) {
-                positions.values.add(p);
-                p.size.observe().take(Num::isZero).to(() -> positions.values.remove(p));
+                Viewtify.inUI(() -> positions.values.add(p));
+                p.size.observe().take(Num::isZero).on(Viewtify.UIThread).to(() -> positions.values.remove(p));
             }
         });
 
