@@ -481,7 +481,7 @@ public class Market implements Disposable {
          * 
          */
         private OrderManager() {
-            I.signal(0, 1, TimeUnit.SECONDS).flatMap(v -> backend.getOrders()).to(this::update);
+            I.signal(0, 1, TimeUnit.SECONDS).map(v -> listOrders()).to(this::update);
         }
 
         /**
@@ -514,22 +514,24 @@ public class Market implements Disposable {
          * 
          * @param updaters
          */
-        private void update(Order updater) {
-            System.out.println(updater);
-            // for (Order updater : updaters) {
-            // Order active = findBy(updater.child_order_acceptance_id);
-            //
-            // if (active == null) {
-            // // add order
-            // add(active = updater);
-            // } else {
-            // if (active.state.is(State.REQUESTING)) {
-            // // update order id
-            // active.id = updater.id;
-            // active.state.set(updater.state);
-            // }
-            // }
-            // }
+        private void update(List<Order> updaters) {
+            System.out.println(updaters);
+            for (Order updater : updaters) {
+                Order active = findBy(updater.child_order_acceptance_id);
+
+                if (active == null) {
+                    // add order
+                    add(active = updater);
+                    System.out.println("add " + updater);
+                } else {
+                    if (active.state.is(State.REQUESTING)) {
+                        // update order id
+                        active.id = updater.id;
+                        active.state.set(updater.state);
+                        System.out.println("update " + active + "  " + updater.id + "  " + updater.state);
+                    }
+                }
+            }
         }
 
         /**

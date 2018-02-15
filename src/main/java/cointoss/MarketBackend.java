@@ -10,8 +10,8 @@
 package cointoss;
 
 import cointoss.order.Order;
-import cointoss.order.OrderBookChange;
 import cointoss.order.Order.State;
+import cointoss.order.OrderBookChange;
 import cointoss.util.Num;
 import kiss.Decoder;
 import kiss.Disposable;

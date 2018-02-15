@@ -172,7 +172,7 @@ public class TradingView extends View {
                 market().request(order).to(o -> {
                     // ok
                 }, e -> {
-                    notificator.orderFailed.notify("Reject order " + order);
+                    notificator.orderFailed.notify("Reject : " + e.getMessage() + "\r\n" + order);
                 });
             });
         }

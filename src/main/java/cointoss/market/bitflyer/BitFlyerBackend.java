@@ -12,7 +12,6 @@ package cointoss.market.bitflyer;
 import static java.util.concurrent.TimeUnit.*;
 
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -59,9 +58,6 @@ import marionette.Browser;
 class BitFlyerBackend implements MarketBackend {
 
     private static final DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss-");
-
-    /** The current session id. */
-    private static String session;
 
     /** The api url. */
     static final String api = "https://api.bitflyer.jp";
@@ -116,7 +112,6 @@ class BitFlyerBackend implements MarketBackend {
      */
     @Override
     public void initialize(Market market, Signal<Execution> log) {
-        session = session();
         disposer.add(log.to(market::tick));
     }
 
@@ -133,7 +128,7 @@ class BitFlyerBackend implements MarketBackend {
      */
     @Override
     public Signal<String> request(Order order) {
-        if (session == null) {
+        if (maintainer.session() == null) {
             ChildOrderRequest request = new ChildOrderRequest();
             request.child_order_type = order.isLimit() ? "LIMIT" : "MARKET";
             request.minute_to_expire = 60 * 24;
@@ -150,7 +145,7 @@ class BitFlyerBackend implements MarketBackend {
             request.lang = "ja";
             request.minute_to_expire = 60 * 24;
             request.ord_type = order.isLimit() ? "LIMIT" : "MARKET";
-            request.order_ref_id = "JRF" + Chrono.utc(System.currentTimeMillis()).format(format) + RandomStringUtils.randomNumeric(6);
+            request.order_ref_id = "JRF" + Chrono.utcNow().format(format) + RandomStringUtils.randomNumeric(6);
             request.price = order.price.toInt();
             request.product_code = type.name();
             request.side = order.side().name();
@@ -189,19 +184,7 @@ class BitFlyerBackend implements MarketBackend {
     @Override
     public Signal<Order> getOrders() {
         return call("GET", "/v1/me/getchildorders?child_order_state=ACTIVE&product_code=" + type.name(), "", "*", ChildOrderResponse.class)
-                .effectOnError(e -> e.printStackTrace())
-                .map(ChildOrderResponse::toOrder)
-                .effectOnError(e -> e.printStackTrace());
-    }
-
-    public static void main(String[] args) throws InterruptedException {
-        I.load(Side.Codec.class, false);
-        BitFlyerBackend back = new BitFlyerBackend(BitFlyer.FX_BTC_JPY);
-
-        I.signal(0, 1, SECONDS).flatMap(v -> back.getOrders()).to(v -> {
-            System.out.println(v);
-        });
-        Thread.sleep(5000);
+                .map(ChildOrderResponse::toOrder);
     }
 
     /**
@@ -345,7 +328,7 @@ class BitFlyerBackend implements MarketBackend {
             } else {
                 request = new HttpPost(path);
                 request.addHeader("Content-Type", "application/json");
-                request.addHeader("Cookie", "api_session=" + session());
+                request.addHeader("Cookie", "api_session=" + maintainer.session());
                 request.addHeader("X-Requested-With", "XMLHttpRequest");
                 ((HttpPost) request).setEntity(new StringEntity(body, StandardCharsets.UTF_8));
             }
@@ -363,9 +346,19 @@ class BitFlyerBackend implements MarketBackend {
                         JSON json = I.json(value);
 
                         if (selector == null || selector.isEmpty()) {
-                            observer.accept(json.to(type));
+                            M m = json.to(type);
+
+                            if (m instanceof WebResponse) {
+                                WebResponse res = (WebResponse) m;
+
+                                if (res.error_message != null && !res.error_message.isEmpty()) {
+                                    throw new Error(res.error_message);
+                                }
+                            } else {
+                                observer.accept(m);
+                            }
                         } else {
-                            json.find(selector, type).to(observer::accept);
+                            json.find(selector, type).to(observer);
                         }
                     }
                 } else {
@@ -380,39 +373,58 @@ class BitFlyerBackend implements MarketBackend {
         });
     }
 
+    private SessionMaintainer maintainer = new SessionMaintainer();
+
     /**
-     * Retrieve session id.
-     * 
-     * @return
+     * @version 2018/02/15 9:27:14
      */
-    private synchronized String session() {
-        if (session == null) {
-            Path cache = Filer.locate(".log/bitflyer/session.txt");
-            long expire = Filer.getLastModified(cache) + 60 * 60 * 24 * 1000;
+    private class SessionMaintainer implements Disposable {
 
-            if (expire < System.currentTimeMillis()) {
-                // login by browser
-                Browser browser = new Browser().configProfile(Filer.locate(".log/bitflyer/chrome"));
-                browser.load("https://lightning.bitflyer.jp/trade/btcfx")
-                        .input("#LoginId", name)
-                        .input("#Password", password)
-                        .click("#login_btn");
+        /** The session id. */
+        private String session;
 
-                if (browser.uri().equals("https://lightning.bitflyer.jp/Home/TwoFactorAuth")) {
-                    browser.click("form > label").inputByHuman("#ConfirmationCode").click("form > button");
-                }
-
-                session = browser.cookie("api_session");
-                browser.dispose();
-
-                // write cache
-                Filer.write(cache, I.list(session));
-            } else {
-                // read cache
-                session = Filer.read(cache).to().v;
+        /**
+         * Retrieve the session id.
+         * 
+         * @return
+         */
+        private String session() {
+            if (session == null) {
+                // I.schedule(this::connect);
             }
+            return session;
         }
-        return session;
+
+        /**
+         * Connect to server and get session id.
+         */
+        private void connect() {
+            Browser browser = new Browser().configProfile(".log/bitflyer/chrome");
+            browser.load("https://lightning.bitflyer.jp/trade/btcfx")
+                    .input("#LoginId", name)
+                    .input("#Password", password)
+                    .click("#login_btn");
+
+            if (browser.uri().equals("https://lightning.bitflyer.jp/Home/TwoFactorAuth")) {
+                browser.click("form > label").inputByHuman("#ConfirmationCode").click("form > button");
+            }
+
+            session = browser.cookie("api_session");
+            browser.dispose();
+        }
+
+        /**
+         * Maintain the session.
+         */
+        private void maintain() {
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void vandalize() {
+        }
     }
 
     /**
@@ -459,12 +471,17 @@ class BitFlyerBackend implements MarketBackend {
 
         public String child_order_date;
 
+        public State child_order_state;
+
         public Order toOrder() {
             Order o = Order.limit(side, size, price);
+            o.id = id;
+            o.child_order_acceptance_id = child_order_acceptance_id;
             o.average_price.set(average_price);
             o.outstanding_size.set(outstanding_size);
             o.executed_size.set(executed_size);
             o.child_order_date.set(LocalDateTime.parse(child_order_date, Chrono.DateTimeWithT).atZone(Chrono.UTC));
+            o.state.set(child_order_state);
 
             return o;
         }

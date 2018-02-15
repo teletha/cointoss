@@ -11,6 +11,10 @@ package trademate.order;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.function.Consumer;
+
+import javafx.collections.ObservableList;
 
 import cointoss.Position;
 import cointoss.Side;
@@ -55,6 +59,8 @@ public class PositionCatalog extends View {
     /** Parent View */
     private @UI TradingView view;
 
+    private PositionManager manager;
+
     /**
      * {@inheritDoc}
      */
@@ -68,6 +74,7 @@ public class PositionCatalog extends View {
                 .reduce(Num.ZERO, Num::plus)
                 .map(v -> v.scale(0));
 
+        manager = new PositionManager(positions.values);
         openPositionDate.model(o -> o.date).render((ui, item) -> ui.text(formatter.format(item)));
         openPositionSide.model(o -> o.side).render((ui, item) -> ui.text(item).styleOnly(item));
         openPositionAmount.modelByVar(o -> o.size).header(Viewtify.calculate("数量 ").concat(totalAmount).trim());
@@ -140,5 +147,69 @@ public class PositionCatalog extends View {
         Num price = book.computeBestPrice(Num.ZERO, Num.TWO);
 
         view.order(Order.limit(position.inverse(), position.size.v, price));
+    }
+
+    /**
+     * @version 2018/02/15 16:16:52
+     */
+    private static class PositionManager {
+
+        /** The manager. */
+        private final ObservableList<Position> positions;
+
+        /** The lock system. */
+        private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+
+        /**
+         * @param positions
+         */
+        private PositionManager(ObservableList<Position> positions) {
+            this.positions = positions;
+        }
+
+        /**
+         * Add new position.
+         * 
+         * @param position
+         */
+        private void add(Position position) {
+            lock.writeLock().lock();
+
+            try {
+                positions.add(position);
+            } finally {
+                lock.writeLock().unlock();
+            }
+        }
+
+        /**
+         * Add new position.
+         * 
+         * @param position
+         */
+        private void remove(Position position) {
+            lock.writeLock().lock();
+
+            try {
+                positions.remove(position);
+            } finally {
+                lock.writeLock().unlock();
+            }
+        }
+
+        /**
+         * Add new position.
+         * 
+         * @param position
+         */
+        private void each(Consumer<Position> process) {
+            lock.readLock().lock();
+
+            try {
+                positions.forEach(process);
+            } finally {
+                lock.readLock().unlock();
+            }
+        }
     }
 }

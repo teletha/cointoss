@@ -15,7 +15,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 /**
- * @version 2018/01/30 20:02:12
+ * @version 2018/02/15 14:56:42
  */
 public class Chrono {
 
@@ -38,6 +38,15 @@ public class Chrono {
     public static final DateTimeFormatter TimeWithoutSec = DateTimeFormatter.ofPattern("HH:mm");
 
     /**
+     * UTC {@link ZonedDateTime} from current time.
+     * 
+     * @return
+     */
+    public static ZonedDateTime utcNow() {
+        return utc(System.currentTimeMillis());
+    }
+
+    /**
      * UTC {@link ZonedDateTime} from epoc mills.
      * 
      * @param mills
@@ -55,6 +64,16 @@ public class Chrono {
      */
     public static ZonedDateTime utc(double mills) {
         return utc((long) mills);
+    }
+
+    /**
+     * System default {@link ZonedDateTime} from current time
+     * 
+     * @param mills
+     * @return
+     */
+    public static ZonedDateTime systemNow() {
+        return systemByMills(System.currentTimeMillis());
     }
 
     /**

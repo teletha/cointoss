@@ -74,7 +74,6 @@ public class Notificator extends Preference<Notificator> {
                             .hideCloseButton()
                             .position(Pos.TOP_RIGHT)
                             .hideAfter(Duration.seconds(showTime.get()))
-                            .title("OK")
                             .text(message)
                             .show();
                 });
