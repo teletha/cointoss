@@ -13,8 +13,10 @@ import static cointoss.util.Num.*;
 
 import org.junit.Test;
 
+import cointoss.Side;
+
 /**
- * @version 2018/01/06 21:04:40
+ * @version 2018/02/17 9:35:49
  */
 public class NumTest {
 
@@ -61,6 +63,12 @@ public class NumTest {
         assert ONE.minus(-1).is(2);
         assert ONE.minus("5.5").is(-4.5);
         assert ONE.minus((Num) null).isNaN();
+    }
+
+    @Test
+    public void minusDirectional() throws Exception {
+        assert HUNDRED.minus(Side.BUY, 20).is(80);
+        assert HUNDRED.minus(Side.SELL, 20).is(120);
     }
 
     @Test
@@ -156,6 +164,14 @@ public class NumTest {
         assert ONE.isLessThanOrEqual("3");
         assert ONE.isLessThanOrEqual(TEN);
         assert ONE.isLessThanOrEqual((Num) null) == false;
+    }
+
+    @Test
+    public void isLessThanDirectional() throws Exception {
+        assert HUNDRED.isLessThan(Side.BUY, 120) == true;
+        assert HUNDRED.isLessThan(Side.BUY, 80) == false;
+        assert HUNDRED.isLessThan(Side.SELL, 120) == false;
+        assert HUNDRED.isLessThan(Side.SELL, 80) == true;
     }
 
     @Test
