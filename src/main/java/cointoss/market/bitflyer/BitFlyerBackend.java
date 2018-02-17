@@ -151,7 +151,6 @@ class BitFlyerBackend implements MarketBackend {
             request.side = order.side().name();
             request.size = order.size.toDouble();
             request.time_in_force = order.quantity().abbreviation;
-            request.minute_to_expire = 0.1;
 
             return call("POST", "https://lightning.bitflyer.jp/api/trade/sendorder", request, "", WebResponse.class)
                     .map(e -> e.data.get("order_ref_id"));
@@ -354,9 +353,8 @@ class BitFlyerBackend implements MarketBackend {
                                 if (res.error_message != null && !res.error_message.isEmpty()) {
                                     throw new Error(res.error_message);
                                 }
-                            } else {
-                                observer.accept(m);
                             }
+                            observer.accept(m);
                         } else {
                             json.find(selector, type).to(observer);
                         }
@@ -400,7 +398,7 @@ class BitFlyerBackend implements MarketBackend {
          */
         private void connect() {
             Browser browser = new Browser().configProfile(".log/bitflyer/chrome");
-            browser.load("https://lightning.bitflyer.jp/trade/btcfx")
+            browser.load("https://lightning.bitflyer.jp") //
                     .input("#LoginId", name)
                     .input("#Password", password)
                     .click("#login_btn");
@@ -410,7 +408,6 @@ class BitFlyerBackend implements MarketBackend {
             }
 
             session = browser.cookie("api_session");
-            browser.dispose();
         }
 
         /**

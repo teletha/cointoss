@@ -519,7 +519,12 @@ public class Num implements Comparable<Num> {
         if (!(obj instanceof Num)) {
             return false;
         }
-        final Num other = (Num) obj;
+
+        if (obj == NaN) {
+            return this == NaN;
+        }
+
+        Num other = (Num) obj;
         if (this.delegate != other.delegate && (this.delegate == null || (this.delegate.compareTo(other.delegate) != 0))) {
             return false;
         }
