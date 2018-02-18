@@ -381,6 +381,8 @@ class BitFlyerBackend implements MarketBackend {
         /** The session id. */
         private String session;
 
+        private boolean started = false;
+
         /**
          * Retrieve the session id.
          * 
@@ -396,18 +398,22 @@ class BitFlyerBackend implements MarketBackend {
         /**
          * Connect to server and get session id.
          */
-        private void connect() {
-            Browser browser = new Browser().configProfile(".log/bitflyer/chrome");
-            browser.load("https://lightning.bitflyer.jp") //
-                    .input("#LoginId", name)
-                    .input("#Password", password)
-                    .click("#login_btn");
+        private synchronized void connect() {
+            if (started == false) {
+                started = true;
 
-            if (browser.uri().equals("https://lightning.bitflyer.jp/Home/TwoFactorAuth")) {
-                browser.click("form > label").inputByHuman("#ConfirmationCode").click("form > button");
+                Browser browser = new Browser().configProfile(".log/bitflyer/chrome");
+                browser.load("https://lightning.bitflyer.jp") //
+                        .input("#LoginId", name)
+                        .input("#Password", password)
+                        .click("#login_btn");
+
+                if (browser.uri().equals("https://lightning.bitflyer.jp/Home/TwoFactorAuth")) {
+                    browser.click("form > label").inputByHuman("#ConfirmationCode").click("form > button");
+                }
+
+                session = browser.cookie("api_session");
             }
-
-            session = browser.cookie("api_session");
         }
 
         /**
