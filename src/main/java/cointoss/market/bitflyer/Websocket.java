@@ -45,7 +45,7 @@ public class Websocket {
         String uri = "https://lightning.bitflyer.jp";
 
         // Connect to the server
-        HubConnection conn = new HubConnection(uri, "account_id=" + id + "&token=" + token + "&products=FX_BTC_JPY,heartbeat", true, logger);
+        HubConnection conn = new HubConnection(uri, "account_id=" + id + "&token=" + token + "&products=FX_BTC_JPY,heartbeat", logger);
 
         // Subscribe to the error event
         conn.error(e -> {
