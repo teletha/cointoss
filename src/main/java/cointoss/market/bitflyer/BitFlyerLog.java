@@ -25,13 +25,12 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 
 import cointoss.Execution;
 import cointoss.MarketLog;
 import cointoss.Side;
+import cointoss.network.PubNubs;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
 import filer.Filer;
@@ -280,28 +279,24 @@ class BitFlyerLog extends MarketLog {
      * @return
      */
     private Signal<Execution> realtime() {
-        return PubNubSignal.observe("lightning_executions_" + type, "sub-c-52a9ab50-291b-11e5-baaa-0619f8945a4f", (root, observer) -> {
-            JsonArray array = root.getAsJsonArray();
+        return PubNubs.observe("lightning_executions_" + type, "sub-c-52a9ab50-291b-11e5-baaa-0619f8945a4f")
+                .flatIterable(JsonElement::getAsJsonArray)
+                .map(JsonElement::getAsJsonObject)
+                .map(e -> {
+                    Execution exe = new Execution();
+                    exe.id = e.get("id").getAsLong();
+                    exe.side = Side.parse(e.get("side").getAsString());
+                    exe.price = Num.of(e.get("price").getAsString());
+                    exe.size = exe.cumulativeSize = Num.of(e.get("size").getAsString());
+                    exe.exec_date = LocalDateTime.parse(e.get("exec_date").getAsString(), format).atZone(BitFlyerBackend.zone);
+                    exe.buy_child_order_acceptance_id = e.get("buy_child_order_acceptance_id").getAsString();
+                    exe.sell_child_order_acceptance_id = e.get("sell_child_order_acceptance_id").getAsString();
 
-            for (JsonElement e : array) {
-                JsonObject node = e.getAsJsonObject();
-
-                Execution exe = new Execution();
-                exe.id = node.get("id").getAsLong();
-                exe.side = Side.parse(node.get("side").getAsString());
-                exe.price = Num.of(node.get("price").getAsString());
-                exe.size = exe.cumulativeSize = Num.of(node.get("size").getAsString());
-                exe.exec_date = LocalDateTime.parse(node.get("exec_date").getAsString(), format).atZone(BitFlyerBackend.zone);
-                exe.buy_child_order_acceptance_id = node.get("buy_child_order_acceptance_id").getAsString();
-                exe.sell_child_order_acceptance_id = node.get("sell_child_order_acceptance_id").getAsString();
-
-                if (exe.id == 0) {
-                    exe.id = ++realtimeId;
-                }
-
-                observer.accept(exe);
-                realtimeId = exe.id;
-            }
-        });
+                    if (exe.id == 0) {
+                        exe.id = ++realtimeId;
+                    }
+                    realtimeId = exe.id;
+                    return exe;
+                });
     }
 }

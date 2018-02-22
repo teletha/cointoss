@@ -7,7 +7,7 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss.market.bitflyer;
+package cointoss.network;
 
 import com.google.gson.JsonElement;
 import com.pubnub.api.PNConfiguration;
@@ -20,19 +20,21 @@ import com.pubnub.api.models.consumer.pubsub.PNMessageResult;
 import com.pubnub.api.models.consumer.pubsub.PNPresenceEventResult;
 
 import kiss.I;
-import kiss.Observer;
 import kiss.Signal;
-import kiss.WiseBiConsumer;
 
 /**
  * @version 2018/02/07 8:56:54
  */
-class PubNubSignal {
+public class PubNubs {
 
-    static <T> Signal<T> observe(String channelName, String subscribeKey, WiseBiConsumer<JsonElement, Observer<? super T>> process) {
+    public static Signal<JsonElement> observe(String channelName, String subscribeKey) {
+        if (true) {
+            return Signal.EMPTY;
+        }
+
         return new Signal<>((observer, disposer) -> {
             PNConfiguration config = new PNConfiguration();
-            config.setSecure(false);
+            config.setSecure(true);
             config.setReconnectionPolicy(PNReconnectionPolicy.EXPONENTIAL);
             config.setNonSubscribeRequestTimeout(5);
             config.setPresenceTimeout(5);
@@ -77,7 +79,7 @@ class PubNubSignal {
                 @Override
                 public void message(PubNub pubnub, PNMessageResult message) {
                     if (message.getChannel() != null) {
-                        process.accept(message.getMessage(), observer);
+                        observer.accept(message.getMessage());
                     }
                 }
             });

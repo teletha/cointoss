@@ -33,6 +33,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import cointoss.Execution;
@@ -40,6 +41,7 @@ import cointoss.Market;
 import cointoss.MarketBackend;
 import cointoss.Position;
 import cointoss.Side;
+import cointoss.network.PubNubs;
 import cointoss.order.Order;
 import cointoss.order.Order.State;
 import cointoss.order.OrderBookChange;
@@ -272,26 +274,27 @@ class BitFlyerBackend implements MarketBackend {
      * @return
      */
     private Signal<OrderBookChange> realtimeOrderBook() {
-        return PubNubSignal.observe("lightning_board_" + type, "sub-c-52a9ab50-291b-11e5-baaa-0619f8945a4f", (root, observer) -> {
-            JsonObject object = root.getAsJsonObject();
-            OrderBookChange board = new OrderBookChange();
-            board.mid_price = Num.of(object.get("mid_price").getAsLong());
+        return PubNubs.observe("lightning_board_" + type, "sub-c-52a9ab50-291b-11e5-baaa-0619f8945a4f")
+                .map(JsonElement::getAsJsonObject)
+                .map(e -> {
+                    OrderBookChange board = new OrderBookChange();
+                    board.mid_price = Num.of(e.get("mid_price").getAsLong());
 
-            JsonArray asks = object.get("asks").getAsJsonArray();
+                    JsonArray asks = e.get("asks").getAsJsonArray();
 
-            for (int i = 0; i < asks.size(); i++) {
-                JsonObject ask = asks.get(i).getAsJsonObject();
-                board.asks.add(new OrderUnit(Num.of(ask.get("price").getAsString()), Num.of(ask.get("size").getAsString())));
-            }
+                    for (int i = 0; i < asks.size(); i++) {
+                        JsonObject ask = asks.get(i).getAsJsonObject();
+                        board.asks.add(new OrderUnit(Num.of(ask.get("price").getAsString()), Num.of(ask.get("size").getAsString())));
+                    }
 
-            JsonArray bids = object.get("bids").getAsJsonArray();
+                    JsonArray bids = e.get("bids").getAsJsonArray();
 
-            for (int i = 0; i < bids.size(); i++) {
-                JsonObject bid = bids.get(i).getAsJsonObject();
-                board.bids.add(new OrderUnit(Num.of(bid.get("price").getAsString()), Num.of(bid.get("size").getAsString())));
-            }
-            observer.accept(board);
-        });
+                    for (int i = 0; i < bids.size(); i++) {
+                        JsonObject bid = bids.get(i).getAsJsonObject();
+                        board.bids.add(new OrderUnit(Num.of(bid.get("price").getAsString()), Num.of(bid.get("size").getAsString())));
+                    }
+                    return board;
+                });
     }
 
     /**
