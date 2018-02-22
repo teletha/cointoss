@@ -28,10 +28,6 @@ import kiss.Signal;
 public class PubNubs {
 
     public static Signal<JsonElement> observe(String channelName, String subscribeKey) {
-        if (true) {
-            return Signal.EMPTY;
-        }
-
         return new Signal<>((observer, disposer) -> {
             PNConfiguration config = new PNConfiguration();
             config.setSecure(true);
