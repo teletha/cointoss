@@ -9,7 +9,7 @@
  */
 package cointoss.market.bitflyer;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import com.google.gson.JsonElement;
 import com.pubnub.api.PNConfiguration;
 import com.pubnub.api.PubNub;
 import com.pubnub.api.callbacks.SubscribeCallback;
@@ -29,7 +29,7 @@ import kiss.WiseBiConsumer;
  */
 class PubNubSignal {
 
-    static <T> Signal<T> observe(String channelName, String subscribeKey, WiseBiConsumer<JsonNode, Observer<? super T>> process) {
+    static <T> Signal<T> observe(String channelName, String subscribeKey, WiseBiConsumer<JsonElement, Observer<? super T>> process) {
         return new Signal<>((observer, disposer) -> {
             PNConfiguration config = new PNConfiguration();
             config.setSecure(false);

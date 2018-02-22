@@ -32,7 +32,8 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 import cointoss.Execution;
 import cointoss.Market;
@@ -272,21 +273,22 @@ class BitFlyerBackend implements MarketBackend {
      */
     private Signal<OrderBookChange> realtimeOrderBook() {
         return PubNubSignal.observe("lightning_board_" + type, "sub-c-52a9ab50-291b-11e5-baaa-0619f8945a4f", (root, observer) -> {
+            JsonObject object = root.getAsJsonObject();
             OrderBookChange board = new OrderBookChange();
-            board.mid_price = Num.of(root.get("mid_price").asLong());
+            board.mid_price = Num.of(object.get("mid_price").getAsLong());
 
-            JsonNode asks = root.get("asks");
+            JsonArray asks = object.get("asks").getAsJsonArray();
 
             for (int i = 0; i < asks.size(); i++) {
-                JsonNode ask = asks.get(i);
-                board.asks.add(new OrderUnit(Num.of(ask.get("price").asText()), Num.of(ask.get("size").asText())));
+                JsonObject ask = asks.get(i).getAsJsonObject();
+                board.asks.add(new OrderUnit(Num.of(ask.get("price").getAsString()), Num.of(ask.get("size").getAsString())));
             }
 
-            JsonNode bids = root.get("bids");
+            JsonArray bids = object.get("bids").getAsJsonArray();
 
             for (int i = 0; i < bids.size(); i++) {
-                JsonNode bid = bids.get(i);
-                board.bids.add(new OrderUnit(Num.of(bid.get("price").asText()), Num.of(bid.get("size").asText())));
+                JsonObject bid = bids.get(i).getAsJsonObject();
+                board.bids.add(new OrderUnit(Num.of(bid.get("price").getAsString()), Num.of(bid.get("size").getAsString())));
             }
             observer.accept(board);
         });

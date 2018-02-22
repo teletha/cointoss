@@ -20,13 +20,14 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 import cointoss.Execution;
 import cointoss.MarketLog;
@@ -280,19 +281,19 @@ class BitFlyerLog extends MarketLog {
      */
     private Signal<Execution> realtime() {
         return PubNubSignal.observe("lightning_executions_" + type, "sub-c-52a9ab50-291b-11e5-baaa-0619f8945a4f", (root, observer) -> {
-            Iterator<JsonNode> iterator = root.iterator();
+            JsonArray array = root.getAsJsonArray();
 
-            while (iterator.hasNext()) {
-                JsonNode node = iterator.next();
+            for (JsonElement e : array) {
+                JsonObject node = e.getAsJsonObject();
 
                 Execution exe = new Execution();
-                exe.id = node.get("id").asLong();
-                exe.side = Side.parse(node.get("side").asText());
-                exe.price = Num.of(node.get("price").asText());
-                exe.size = exe.cumulativeSize = Num.of(node.get("size").asText());
-                exe.exec_date = LocalDateTime.parse(node.get("exec_date").asText(), format).atZone(BitFlyerBackend.zone);
-                exe.buy_child_order_acceptance_id = node.get("buy_child_order_acceptance_id").asText();
-                exe.sell_child_order_acceptance_id = node.get("sell_child_order_acceptance_id").asText();
+                exe.id = node.get("id").getAsLong();
+                exe.side = Side.parse(node.get("side").getAsString());
+                exe.price = Num.of(node.get("price").getAsString());
+                exe.size = exe.cumulativeSize = Num.of(node.get("size").getAsString());
+                exe.exec_date = LocalDateTime.parse(node.get("exec_date").getAsString(), format).atZone(BitFlyerBackend.zone);
+                exe.buy_child_order_acceptance_id = node.get("buy_child_order_acceptance_id").getAsString();
+                exe.sell_child_order_acceptance_id = node.get("sell_child_order_acceptance_id").getAsString();
 
                 if (exe.id == 0) {
                     exe.id = ++realtimeId;

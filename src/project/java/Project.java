@@ -24,7 +24,7 @@ public class Project extends bee.api.Project {
         require("org.apache.logging.log4j", "log4j-core", "2.10.0");
         require("org.apache.logging.log4j", "log4j-jul", "2.10.0");
         require("org.eclipse.collections", "eclipse-collections", "8.2.0");
-        require("com.pubnub", "pubnub", "4.6.5");
+        require("com.pubnub", "pubnub-gson", "4.18.0");
         require("org.magicwerk", "brownies-collections", "0.9.13");
         require("org.controlsfx", "controlsfx", "8.40.14");
         require("com.github.signalr4j", "signalr4j", "2.0.2");
