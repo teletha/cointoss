@@ -52,25 +52,12 @@ public interface MarketBackend extends Disposable {
 
     /**
      * <p>
-     * Request order canceling by id.
-     * </p>
-     * 
-     * @param childOrderId
-     */
-    Signal<String> cancel(String childOrderId);
-
-    /**
-     * <p>
-     * Request order canceling by order.
+     * Request order canceling.
      * </p>
      * 
      * @param order
      */
-    default Signal<Order> cancel(Order order) {
-        return cancel(order.child_order_acceptance_id).mapTo(order).effect(o -> {
-            o.state.set(State.CANCELED);
-        });
-    }
+    Signal<Order> cancel(Order order);
 
     /**
      * <p>

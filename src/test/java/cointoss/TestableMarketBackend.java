@@ -18,10 +18,10 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import cointoss.Time.Lag;
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.order.Order;
-import cointoss.order.OrderBookChange;
-import cointoss.order.OrderType;
 import cointoss.order.Order.Quantity;
 import cointoss.order.Order.State;
+import cointoss.order.OrderBookChange;
+import cointoss.order.OrderType;
 import cointoss.util.Num;
 import kiss.Disposable;
 import kiss.I;
@@ -130,12 +130,12 @@ class TestableMarketBackend implements MarketBackend, MarketProvider {
      * {@inheritDoc}
      */
     @Override
-    public Signal<String> cancel(String childOrderId) {
+    public Signal<Order> cancel(Order order) {
         return new Signal<>((observer, disposer) -> {
-            orderActive.removeIf(o -> o.child_order_acceptance_id.equals(childOrderId));
-            I.signal(orderAll).take(o -> o.child_order_acceptance_id.equals(childOrderId)).take(1).to(o -> {
+            orderActive.removeIf(o -> o.child_order_acceptance_id.equals(order.child_order_acceptance_id));
+            I.signal(orderAll).take(o -> o.child_order_acceptance_id.equals(order.child_order_acceptance_id)).take(1).to(o -> {
                 o.state.set(State.CANCELED);
-                observer.accept(childOrderId);
+                observer.accept(order);
                 observer.complete();
             });
             return disposer;

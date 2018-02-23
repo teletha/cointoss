@@ -277,11 +277,11 @@ public class Market implements Disposable {
      * 
      * @param acceptanceId
      */
-    public final Signal<String> cancel(Order order) {
+    public final Signal<Order> cancel(Order order) {
         if (order.state.is(ACTIVE)) {
             State previous = order.state.set(REQUESTING);
 
-            return backend.cancel(order.child_order_acceptance_id).effect(id -> {
+            return backend.cancel(order).effect(o -> {
                 orders.remove(order);
                 order.state.set(CANCELED);
             }).effectOnError(e -> {
