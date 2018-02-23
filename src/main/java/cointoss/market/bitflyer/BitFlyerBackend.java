@@ -165,23 +165,15 @@ class BitFlyerBackend implements MarketBackend {
      */
     @Override
     public Signal<Order> cancel(Order order) {
-        CancelOrder cancel = new CancelOrder();
-        cancel.account_id = accountId;
-        cancel.child_order_acceptance_id = order.child_order_acceptance_id;
-        cancel.order_id = order.id;
-        cancel.parent_order_id = "";
+        CancelRequest cancel = new CancelRequest();
         cancel.product_code = type.name();
-        System.out.println(cancel);
+        cancel.account_id = accountId;
+        cancel.order_id = order.id;
+        cancel.child_order_acceptance_id = order.child_order_acceptance_id;
 
-        call("POST", "https://lightning.bitflyer.jp/api/trade/cancelorder", cancel, null, WebResponse.class).to(v -> {
-            System.out.println("RESPONSE " + v);
-        });
+        String uri = cancel.order_id == null ? "/v1/me/cancelchildorder" : "https://lightning.bitflyer.jp/api/trade/cancelorder";
 
-        ChildCancelRequest request = new ChildCancelRequest();
-        request.child_order_acceptance_id = order.child_order_acceptance_id;
-        request.product_code = type.name();
-
-        return call("POST", "/v1/me/cancelchildorder", request, null, null).mapTo(order);
+        return call("POST", uri, cancel, null, WebResponse.class).mapTo(order);
     }
 
     /**
@@ -475,7 +467,7 @@ class BitFlyerBackend implements MarketBackend {
 
         public Side side;
 
-        public String id;
+        public String child_order_id;
 
         public String child_order_acceptance_id;
 
@@ -495,7 +487,7 @@ class BitFlyerBackend implements MarketBackend {
 
         public Order toOrder() {
             Order o = Order.limit(side, size, price);
-            o.id = id;
+            o.id = child_order_id;
             o.child_order_acceptance_id = child_order_acceptance_id;
             o.average_price.set(average_price);
             o.outstanding_size.set(outstanding_size);
@@ -556,23 +548,10 @@ class BitFlyerBackend implements MarketBackend {
     }
 
     /**
-     * @version 2018/02/08 14:15:51
+     * @version 2018/02/23 16:41:56
      */
     @SuppressWarnings("unused")
-    private static class ChildCancelRequest {
-
-        /** For REST API. */
-        public String product_code;
-
-        /** For REST API. */
-        public String child_order_acceptance_id;
-    }
-
-    /**
-     * @version 2018/02/08 14:15:51
-     */
-    @SuppressWarnings("unused")
-    private static class CancelOrder {
+    private static class CancelRequest {
 
         /** For REST API. */
         public String product_code;
@@ -580,21 +559,14 @@ class BitFlyerBackend implements MarketBackend {
         /** For REST API. */
         public String child_order_acceptance_id;
 
+        /** For internal API. */
         public String lang = "ja";
 
+        /** For internal API. */
         public String account_id;
 
+        /** For internal API. */
         public String order_id;
-
-        public String parent_order_id;
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public String toString() {
-            return "CancelOrder [product_code=" + product_code + ", child_order_acceptance_id=" + child_order_acceptance_id + ", lang=" + lang + ", account_id=" + account_id + ", order_id=" + order_id + ", parent_order_id=" + parent_order_id + "]";
-        }
     }
 
     /**
