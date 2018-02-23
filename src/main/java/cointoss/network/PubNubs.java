@@ -65,7 +65,7 @@ public class PubNubs {
                  */
                 @Override
                 public void presence(PubNub pubnub, PNPresenceEventResult presence) {
-                    System.out.println(presence);
+                    System.out.println("PRESENCE : " + presence);
                 }
 
                 /**
@@ -83,7 +83,7 @@ public class PubNubs {
 
             return disposer.add(() -> {
                 pubNub.unsubscribeAll();
-                pubNub.destroy();
+                pubNub.forceDestroy();
             });
         });
     }

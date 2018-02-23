@@ -516,6 +516,7 @@ public class Market implements Disposable {
          */
         private void update(List<Order> updaters) {
             System.out.println(updaters);
+
             for (Order updater : updaters) {
                 Order active = findBy(updater.child_order_acceptance_id);
 
