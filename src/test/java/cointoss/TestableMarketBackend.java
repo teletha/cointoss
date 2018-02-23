@@ -121,7 +121,6 @@ class TestableMarketBackend implements MarketBackend, MarketProvider {
 
             orderAll.add(child);
             orderActive.add(child);
-
             return child.child_order_acceptance_id;
         });
     }

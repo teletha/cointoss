@@ -256,10 +256,10 @@ public class Market implements Disposable {
     public final Signal<Order> request(Order order) {
         return backend.request(order).map(id -> {
             order.child_order_acceptance_id = id;
-            order.state.set(State.REQUESTING);
             order.child_order_date.set(ZonedDateTime.now());
             order.average_price.set(order.price);
             order.outstanding_size.set(order.size);
+            order.state.set(REQUESTING);
 
             // store
             orders.add(order);
@@ -278,7 +278,7 @@ public class Market implements Disposable {
      * @param acceptanceId
      */
     public final Signal<Order> cancel(Order order) {
-        if (order.state.is(ACTIVE)) {
+        if (order.state.is(ACTIVE) || order.state.is(REQUESTING)) {
             State previous = order.state.set(REQUESTING);
 
             return backend.cancel(order).effect(o -> {
