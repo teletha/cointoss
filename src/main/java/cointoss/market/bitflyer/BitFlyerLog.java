@@ -30,8 +30,8 @@ import com.google.gson.JsonElement;
 import cointoss.Execution;
 import cointoss.MarketLog;
 import cointoss.Side;
-import cointoss.network.PubNubs;
 import cointoss.util.Chrono;
+import cointoss.util.Network;
 import cointoss.util.Num;
 import filer.Filer;
 import kiss.I;
@@ -279,7 +279,7 @@ class BitFlyerLog extends MarketLog {
      * @return
      */
     private Signal<Execution> realtime() {
-        return PubNubs.observe("lightning_executions_" + type, "sub-c-52a9ab50-291b-11e5-baaa-0619f8945a4f")
+        return Network.pubnub("lightning_executions_" + type, "sub-c-52a9ab50-291b-11e5-baaa-0619f8945a4f")
                 .flatIterable(JsonElement::getAsJsonArray)
                 .map(JsonElement::getAsJsonObject)
                 .map(e -> {

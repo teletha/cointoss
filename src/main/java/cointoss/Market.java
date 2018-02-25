@@ -29,7 +29,6 @@ import cointoss.ticker.Ticker;
 import cointoss.util.Listeners;
 import cointoss.util.Num;
 import kiss.Disposable;
-import kiss.I;
 import kiss.Signal;
 import kiss.Variable;
 
@@ -131,7 +130,7 @@ public class Market implements Disposable {
     private final List<Position> positions = new CopyOnWriteArrayList();
 
     /** The order manager. */
-    private final OrderManager orders;
+    private final List<Order> orders = new CopyOnWriteArrayList();
 
     /**
      * Market without {@link Trader}.
@@ -165,7 +164,6 @@ public class Market implements Disposable {
         }
 
         this.backend = provider.service();
-        this.orders = new OrderManager();
 
         // initialize price, balance and executions
         this.base = this.baseInit = backend.getBaseCurrency().to().v;
@@ -412,7 +410,7 @@ public class Market implements Disposable {
         flow200.record(exe);
         flow300.record(exe);
 
-        for (Order order : orders.actives) {
+        for (Order order : orders) {
             if (order.id().equals(exe.buy_child_order_acceptance_id) || order.id().equals(exe.sell_child_order_acceptance_id)) {
                 update(order, exe);
 
@@ -467,87 +465,5 @@ public class Market implements Disposable {
         // pairing order and execution
         exe.associated = order;
         order.executions.add(exe);
-    }
-
-    /**
-     * @version 2018/02/14 15:55:43
-     */
-    private class OrderManager {
-
-        /** The active orders. */
-        private final List<Order> actives = new CopyOnWriteArrayList();
-
-        /**
-         * 
-         */
-        private OrderManager() {
-            I.signal(0, 1, TimeUnit.SECONDS).map(v -> listOrders()).to(this::update);
-        }
-
-        /**
-         * Add new order.
-         * 
-         * @param order
-         */
-        private void add(Order order) {
-            actives.add(order);
-        }
-
-        /**
-         * Remove the specified order.
-         * 
-         * @param order
-         */
-        private void remove(Order order) {
-            actives.remove(order);
-        }
-
-        /**
-         * Check size.
-         */
-        private boolean isEmpty() {
-            return actives.isEmpty();
-        }
-
-        /**
-         * Update managed orders.
-         * 
-         * @param updaters
-         */
-        private void update(List<Order> updaters) {
-            System.out.println(updaters);
-
-            for (Order updater : updaters) {
-                Order active = findBy(updater.child_order_acceptance_id);
-
-                if (active == null) {
-                    // add order
-                    add(active = updater);
-                    System.out.println("add " + updater);
-                } else {
-                    if (active.state.is(State.REQUESTING)) {
-                        // update order id
-                        active.id = updater.id;
-                        active.state.set(updater.state);
-                        System.out.println("update " + active + "  " + updater.id + "  " + updater.state);
-                    }
-                }
-            }
-        }
-
-        /**
-         * Find by accept id.
-         * 
-         * @param acceptId
-         * @return
-         */
-        private Order findBy(String acceptId) {
-            for (Order order : actives) {
-                if (order.child_order_acceptance_id.equals(acceptId)) {
-                    return order;
-                }
-            }
-            return null;
-        }
     }
 }

@@ -41,12 +41,12 @@ import cointoss.Market;
 import cointoss.MarketBackend;
 import cointoss.Position;
 import cointoss.Side;
-import cointoss.network.PubNubs;
 import cointoss.order.Order;
 import cointoss.order.Order.State;
 import cointoss.order.OrderBookChange;
 import cointoss.order.OrderUnit;
 import cointoss.util.Chrono;
+import cointoss.util.Network;
 import cointoss.util.Num;
 import filer.Filer;
 import kiss.Disposable;
@@ -86,7 +86,12 @@ class BitFlyerBackend implements MarketBackend {
     /** The token. */
     private final String accountId;
 
+    /** The token. */
+    private final String webAccessToken;
+
     private Disposable disposer = Disposable.empty();
+
+    private Signal<JsonObject> orderUpdater;
 
     /**
      * @param type
@@ -100,6 +105,7 @@ class BitFlyerBackend implements MarketBackend {
         this.name = lines.get(2);
         this.password = lines.get(3);
         this.accountId = lines.get(4);
+        this.webAccessToken = lines.get(5);
     }
 
     /**
@@ -116,6 +122,15 @@ class BitFlyerBackend implements MarketBackend {
     @Override
     public void initialize(Market market, Signal<Execution> log) {
         disposer.add(log.to(market::tick));
+
+        orderUpdater = Network
+                .signalr("https://lightning.bitflyer.jp/signalr", "account_id=" + accountId + "&token=" + webAccessToken + "&products=FX_BTC_JPY,heartbeat", "BFEXHub")
+                .map(JsonElement::getAsJsonObject)
+                .take(o -> o.get("M").getAsString().equals("ReceiveOrderUpdates"))
+                .flatIterable(o -> o.get("A").getAsJsonArray())
+                .flatIterable(JsonElement::getAsJsonArray)
+                .map(o -> o.getAsJsonObject().get("order").getAsJsonObject())
+                .share();
     }
 
     /**
@@ -131,6 +146,8 @@ class BitFlyerBackend implements MarketBackend {
      */
     @Override
     public Signal<String> request(Order order) {
+        Signal<String> result;
+
         if (maintainer.session() == null) {
             ChildOrderRequest request = new ChildOrderRequest();
             request.child_order_type = order.isLimit() ? "LIMIT" : "MARKET";
@@ -141,7 +158,7 @@ class BitFlyerBackend implements MarketBackend {
             request.size = order.size.toDouble();
             request.time_in_force = order.quantity().abbreviation;
 
-            return call("POST", "/v1/me/sendchildorder", request, "child_order_acceptance_id", String.class);
+            result = call("POST", "/v1/me/sendchildorder", request, "child_order_acceptance_id", String.class);
         } else {
             ChildOrderRequestWebAPI request = new ChildOrderRequestWebAPI();
             request.account_id = accountId;
@@ -155,9 +172,19 @@ class BitFlyerBackend implements MarketBackend {
             request.size = order.size.toDouble();
             request.time_in_force = order.quantity().abbreviation;
 
-            return call("POST", "https://lightning.bitflyer.jp/api/trade/sendorder", request, "", WebResponse.class)
+            result = call("POST", "https://lightning.bitflyer.jp/api/trade/sendorder", request, "", WebResponse.class)
                     .map(e -> e.data.get("order_ref_id"));
         }
+
+        return result.effect(id -> {
+            orderUpdater.take(e -> e.get("order_ref_id").getAsString().equals(id))
+                    .take(1)
+                    .map(e -> e.get("order_id").getAsString())
+                    .to(internalId -> {
+                        order.id = internalId;
+                        order.state.set(State.ACTIVE);
+                    });
+        });
     }
 
     /**
@@ -278,7 +305,7 @@ class BitFlyerBackend implements MarketBackend {
      * @return
      */
     private Signal<OrderBookChange> realtimeOrderBook() {
-        return PubNubs.observe("lightning_board_" + type, "sub-c-52a9ab50-291b-11e5-baaa-0619f8945a4f")
+        return Network.pubnub("lightning_board_" + type, "sub-c-52a9ab50-291b-11e5-baaa-0619f8945a4f")
                 .map(JsonElement::getAsJsonObject)
                 .map(e -> {
                     OrderBookChange board = new OrderBookChange();

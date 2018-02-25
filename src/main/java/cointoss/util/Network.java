@@ -7,7 +7,7 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss.network;
+package cointoss.util;
 
 import com.google.gson.JsonElement;
 import com.pubnub.api.PNConfiguration;
@@ -21,13 +21,49 @@ import com.pubnub.api.models.consumer.pubsub.PNPresenceEventResult;
 
 import kiss.I;
 import kiss.Signal;
+import signalj.Logger;
+import signalj.hubs.HubConnection;
 
 /**
  * @version 2018/02/07 8:56:54
  */
-public class PubNubs {
+public class Network {
 
-    public static Signal<JsonElement> observe(String channelName, String subscribeKey) {
+    /** The no-operation logger. */
+    private static final Logger NOP = (message, level) -> {
+    };
+
+    /**
+     * Create SignalR connection.
+     * 
+     * @param uri
+     * @param query
+     * @return
+     */
+    public static Signal<JsonElement> signalr(String uri, String query, String hubName) {
+        return new Signal<>((observer, disposer) -> {
+            // Connect to the server
+            HubConnection connection = new HubConnection(uri, query, NOP);
+            connection.createHubProxy(hubName);
+            connection.received(observer::accept);
+            connection.start();
+            System.out.println("START");
+
+            return disposer.add(() -> {
+                connection.disconnect();
+                System.out.println("STOP");
+            });
+        });
+    }
+
+    /**
+     * Create pubnub connection.
+     * 
+     * @param channelName
+     * @param subscribeKey
+     * @return
+     */
+    public static Signal<JsonElement> pubnub(String channelName, String subscribeKey) {
         return new Signal<>((observer, disposer) -> {
             PNConfiguration config = new PNConfiguration();
             config.setSecure(true);
