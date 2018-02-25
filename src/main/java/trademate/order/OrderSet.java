@@ -22,7 +22,7 @@ import viewtify.Viewtify;
 import viewtify.bind.Calculation;
 
 /**
- * @version 2017/12/13 10:04:34
+ * @version 2018/02/25 17:50:47
  */
 public class OrderSet {
 
@@ -31,13 +31,13 @@ public class OrderSet {
     /** Total amount. */
     public final Calculation<Num> amount = Viewtify.calculate(sub)
             .observe(o -> o.state)
-            .map(o -> o.state.is(State.ACTIVE) ? o.size : Num.ZERO)
+            .map(o -> o.state.is(State.ACTIVE) || o.state.is(State.REQUESTING) ? o.size : Num.ZERO)
             .reduce(Num.ZERO, Num::plus);
 
     /** Total price. */
     public final Calculation<Num> totalPrice = Viewtify.calculate(sub)
             .observe(o -> o.state)
-            .map(o -> o.state.is(State.ACTIVE) ? o.size.multiply(o.price) : Num.ZERO)
+            .map(o -> o.state.is(State.ACTIVE) || o.state.is(State.REQUESTING) ? o.size.multiply(o.price) : Num.ZERO)
             .reduce(Num.ZERO, Num::plus);
 
     /** Average price. */

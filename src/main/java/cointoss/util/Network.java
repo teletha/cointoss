@@ -42,16 +42,16 @@ public class Network {
      */
     public static Signal<JsonElement> signalr(String uri, String query, String hubName) {
         return new Signal<>((observer, disposer) -> {
+            System.out.println("START");
             // Connect to the server
             HubConnection connection = new HubConnection(uri, query, NOP);
             connection.createHubProxy(hubName);
             connection.received(observer::accept);
             connection.start();
-            System.out.println("START");
 
             return disposer.add(() -> {
-                connection.disconnect();
                 System.out.println("STOP");
+                connection.disconnect();
             });
         });
     }

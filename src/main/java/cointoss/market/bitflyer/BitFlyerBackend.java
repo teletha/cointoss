@@ -46,6 +46,7 @@ import cointoss.order.Order.State;
 import cointoss.order.OrderBookChange;
 import cointoss.order.OrderUnit;
 import cointoss.util.Chrono;
+import cointoss.util.Listeners;
 import cointoss.util.Network;
 import cointoss.util.Num;
 import filer.Filer;
@@ -91,7 +92,11 @@ class BitFlyerBackend implements MarketBackend {
 
     private Disposable disposer = Disposable.empty();
 
-    private Signal<JsonObject> orderUpdater;
+    /** The order updater. */
+    private final Listeners<JsonObject> orderUpdaters = new Listeners();
+
+    /** The order updater. */
+    private final Signal<JsonObject> orderUpdater = new Signal<>(orderUpdaters);
 
     /**
      * @param type
@@ -122,15 +127,14 @@ class BitFlyerBackend implements MarketBackend {
     @Override
     public void initialize(Market market, Signal<Execution> log) {
         disposer.add(log.to(market::tick));
-
-        orderUpdater = Network
+        disposer.add(Network
                 .signalr("https://lightning.bitflyer.jp/signalr", "account_id=" + accountId + "&token=" + webAccessToken + "&products=FX_BTC_JPY,heartbeat", "BFEXHub")
                 .map(JsonElement::getAsJsonObject)
                 .take(o -> o.get("M").getAsString().equals("ReceiveOrderUpdates"))
                 .flatIterable(o -> o.get("A").getAsJsonArray())
                 .flatIterable(JsonElement::getAsJsonArray)
                 .map(o -> o.getAsJsonObject().get("order").getAsJsonObject())
-                .share();
+                .to(orderUpdaters::accept));
     }
 
     /**
@@ -198,9 +202,11 @@ class BitFlyerBackend implements MarketBackend {
         cancel.order_id = order.id;
         cancel.child_order_acceptance_id = order.child_order_acceptance_id;
 
-        String uri = cancel.order_id == null ? "/v1/me/cancelchildorder" : "https://lightning.bitflyer.jp/api/trade/cancelorder";
-
-        return call("POST", uri, cancel, null, WebResponse.class).mapTo(order);
+        if (maintainer.session() == null || cancel.order_id == null) {
+            return call("POST", "/v1/me/cancelchildorder", cancel, null, null).mapTo(order);
+        } else {
+            return call("POST", "https://lightning.bitflyer.jp/api/trade/cancelorder", cancel, null, WebResponse.class).mapTo(order);
+        }
     }
 
     /**
@@ -426,7 +432,7 @@ class BitFlyerBackend implements MarketBackend {
          */
         private String session() {
             if (session == null) {
-                I.schedule(this::connect);
+                // I.schedule(this::connect);
             }
             return session;
         }
