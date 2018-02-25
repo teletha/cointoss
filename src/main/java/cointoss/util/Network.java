@@ -25,7 +25,7 @@ import signalj.Logger;
 import signalj.hubs.HubConnection;
 
 /**
- * @version 2018/02/07 8:56:54
+ * @version 2018/02/25 18:36:37
  */
 public class Network {
 
@@ -42,7 +42,6 @@ public class Network {
      */
     public static Signal<JsonElement> signalr(String uri, String query, String hubName) {
         return new Signal<>((observer, disposer) -> {
-            System.out.println("START");
             // Connect to the server
             HubConnection connection = new HubConnection(uri, query, NOP);
             connection.createHubProxy(hubName);
@@ -50,7 +49,6 @@ public class Network {
             connection.start();
 
             return disposer.add(() -> {
-                System.out.println("STOP");
                 connection.disconnect();
             });
         });

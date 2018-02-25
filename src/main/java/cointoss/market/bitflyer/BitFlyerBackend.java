@@ -20,6 +20,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javafx.scene.control.TextInputDialog;
+
 import org.apache.commons.codec.digest.HmacUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.http.HttpStatus;
@@ -55,6 +57,7 @@ import kiss.I;
 import kiss.JSON;
 import kiss.Signal;
 import marionette.Browser;
+import viewtify.Viewtify;
 
 /**
  * @version 2018/02/08 12:25:47
@@ -133,7 +136,8 @@ class BitFlyerBackend implements MarketBackend {
                 .take(o -> o.get("M").getAsString().equals("ReceiveOrderUpdates"))
                 .flatIterable(o -> o.get("A").getAsJsonArray())
                 .flatIterable(JsonElement::getAsJsonArray)
-                .map(o -> o.getAsJsonObject().get("order").getAsJsonObject())
+                .map(o -> o.getAsJsonObject().getAsJsonObject("order"))
+                .effect(System.out::println)
                 .to(orderUpdaters::accept));
     }
 
@@ -151,6 +155,7 @@ class BitFlyerBackend implements MarketBackend {
     @Override
     public Signal<String> request(Order order) {
         Signal<String> result;
+        String id = "JRF" + Chrono.utcNow().format(format) + RandomStringUtils.randomNumeric(6);
 
         if (maintainer.session() == null) {
             ChildOrderRequest request = new ChildOrderRequest();
@@ -163,32 +168,42 @@ class BitFlyerBackend implements MarketBackend {
             request.time_in_force = order.quantity().abbreviation;
 
             result = call("POST", "/v1/me/sendchildorder", request, "child_order_acceptance_id", String.class);
+            return result.effect(acceptId -> {
+                orderUpdater.take(e -> e.get("order_ref_id").getAsString().equals(acceptId))
+                        .take(1)
+                        .map(e -> e.get("order_id").getAsString())
+                        .to(internalId -> {
+                            order.internlId = internalId;
+                            order.state.set(State.ACTIVE);
+                        });
+            });
         } else {
+            orderUpdater.take(e -> e.get("order_ref_id").getAsString().equals(id)).effect(e -> {
+                System.out.println("ORDER 1" + order.id);
+            }).take(1).effect(e -> {
+                System.out.println("ORDER 2" + order.id);
+            }).map(e -> e.get("order_id").getAsString()).effect(e -> {
+                System.out.println("ORDER 3" + order.id);
+            }).to(internalId -> {
+                order.internlId = internalId;
+                order.state.set(State.ACTIVE);
+            });
+
             ChildOrderRequestWebAPI request = new ChildOrderRequestWebAPI();
             request.account_id = accountId;
             request.lang = "ja";
             request.minute_to_expire = 60 * 24;
             request.ord_type = order.isLimit() ? "LIMIT" : "MARKET";
-            request.order_ref_id = "JRF" + Chrono.utcNow().format(format) + RandomStringUtils.randomNumeric(6);
+            request.order_ref_id = id;
             request.price = order.price.toInt();
             request.product_code = type.name();
             request.side = order.side().name();
             request.size = order.size.toDouble();
             request.time_in_force = order.quantity().abbreviation;
 
-            result = call("POST", "https://lightning.bitflyer.jp/api/trade/sendorder", request, "", WebResponse.class)
+            return call("POST", "https://lightning.bitflyer.jp/api/trade/sendorder", request, "", WebResponse.class)
                     .map(e -> e.data.get("order_ref_id"));
         }
-
-        return result.effect(id -> {
-            orderUpdater.take(e -> e.get("order_ref_id").getAsString().equals(id))
-                    .take(1)
-                    .map(e -> e.get("order_id").getAsString())
-                    .to(internalId -> {
-                        order.id = internalId;
-                        order.state.set(State.ACTIVE);
-                    });
-        });
     }
 
     /**
@@ -196,11 +211,18 @@ class BitFlyerBackend implements MarketBackend {
      */
     @Override
     public Signal<Order> cancel(Order order) {
+        // order state management
+        orderUpdater
+                .take(e -> e.get("order_ref_id").getAsString().equals(order.id) && e.get("order_state").getAsString().equals("CANCELED"))
+                .take(1)
+                .to(e -> order.state.set(State.CANCELED));
+
+        // request order canceling
         CancelRequest cancel = new CancelRequest();
         cancel.product_code = type.name();
         cancel.account_id = accountId;
-        cancel.order_id = order.id;
-        cancel.child_order_acceptance_id = order.child_order_acceptance_id;
+        cancel.order_id = order.internlId;
+        cancel.child_order_acceptance_id = order.id;
 
         if (maintainer.session() == null || cancel.order_id == null) {
             return call("POST", "/v1/me/cancelchildorder", cancel, null, null).mapTo(order);
@@ -432,7 +454,7 @@ class BitFlyerBackend implements MarketBackend {
          */
         private String session() {
             if (session == null) {
-                // I.schedule(this::connect);
+                I.schedule(this::connect);
             }
             return session;
         }
@@ -444,17 +466,32 @@ class BitFlyerBackend implements MarketBackend {
             if (started == false) {
                 started = true;
 
-                Browser browser = new Browser().configProfile(".log/bitflyer/chrome");
+                Browser browser = new Browser().configHeadless(false).configProfile(".log/bitflyer/chrome");
                 browser.load("https://lightning.bitflyer.jp") //
                         .input("#LoginId", name)
                         .input("#Password", password)
                         .click("#login_btn");
 
                 if (browser.uri().equals("https://lightning.bitflyer.jp/Home/TwoFactorAuth")) {
-                    browser.click("form > label").inputByHuman("#ConfirmationCode").click("form > button");
+                    Viewtify.inUI(() -> {
+                        String code = new TextInputDialog().showAndWait()
+                                .orElseThrow(() -> new IllegalArgumentException("二段階認証の確認コードが間違っています"))
+                                .trim();
+
+                        Viewtify.inWorker(() -> {
+                            browser.click("form > label").input("#ConfirmationCode", code).click("form > button");
+                            session = browser.cookie("api_session");
+                            System.out.println("SESSION OK");
+                            browser.reload();
+                            browser.dispose();
+                        });
+                    });
+                } else {
+                    session = browser.cookie("api_session");
+                    System.out.println("SESSION OK2");
+                    browser.dispose();
                 }
 
-                session = browser.cookie("api_session");
             }
         }
 
@@ -520,8 +557,8 @@ class BitFlyerBackend implements MarketBackend {
 
         public Order toOrder() {
             Order o = Order.limit(side, size, price);
-            o.id = child_order_id;
-            o.child_order_acceptance_id = child_order_acceptance_id;
+            o.internlId = child_order_id;
+            o.id = child_order_acceptance_id;
             o.average_price.set(average_price);
             o.outstanding_size.set(outstanding_size);
             o.executed_size.set(executed_size);

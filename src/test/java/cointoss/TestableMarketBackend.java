@@ -110,7 +110,7 @@ class TestableMarketBackend implements MarketBackend, MarketProvider {
     public Signal<String> request(Order order) {
         return I.signal(order).map(o -> {
             BackendOrder child = new BackendOrder(order);
-            child.child_order_acceptance_id = "LOCAL-ACCEPTANCE-" + id++;
+            child.id = "LOCAL-ACCEPTANCE-" + id++;
             child.state.set(State.ACTIVE);
             child.child_order_date.set(now.plusNanos(lag.generate()));
             child.child_order_type = order.price.is(0) ? OrderType.MARKET : OrderType.LIMIT;
@@ -121,7 +121,7 @@ class TestableMarketBackend implements MarketBackend, MarketProvider {
 
             orderAll.add(child);
             orderActive.add(child);
-            return child.child_order_acceptance_id;
+            return child.id;
         });
     }
 
@@ -131,8 +131,9 @@ class TestableMarketBackend implements MarketBackend, MarketProvider {
     @Override
     public Signal<Order> cancel(Order order) {
         return new Signal<>((observer, disposer) -> {
-            orderActive.removeIf(o -> o.child_order_acceptance_id.equals(order.child_order_acceptance_id));
-            I.signal(orderAll).take(o -> o.child_order_acceptance_id.equals(order.child_order_acceptance_id)).take(1).to(o -> {
+            orderActive.removeIf(o -> o.id.equals(order.id));
+            I.signal(orderAll).take(o -> o.id.equals(order.id)).take(1).to(o -> {
+                order.state.set(State.CANCELED);
                 o.state.set(State.CANCELED);
                 observer.accept(order);
                 observer.complete();
@@ -146,7 +147,7 @@ class TestableMarketBackend implements MarketBackend, MarketProvider {
      */
     @Override
     public Signal<Order> getOrderBy(String id) {
-        return I.signal(orderAll).take(o -> o.child_order_acceptance_id.equals(id)).take(1).as(Order.class);
+        return I.signal(orderAll).take(o -> o.id.equals(id)).take(1).as(Order.class);
     }
 
     /**
@@ -282,8 +283,8 @@ class TestableMarketBackend implements MarketBackend, MarketProvider {
                 exe.size = exe.cumulativeSize = executedSize;
                 exe.price = order.child_order_type.isMarket() ? order.marketMinPrice : order.average_price.get();
                 exe.exec_date = e.exec_date;
-                exe.buy_child_order_acceptance_id = order.isBuy() ? order.child_order_acceptance_id : e.buy_child_order_acceptance_id;
-                exe.sell_child_order_acceptance_id = order.isSell() ? order.child_order_acceptance_id : e.sell_child_order_acceptance_id;
+                exe.buy_child_order_acceptance_id = order.isBuy() ? order.id : e.buy_child_order_acceptance_id;
+                exe.sell_child_order_acceptance_id = order.isSell() ? order.id : e.sell_child_order_acceptance_id;
                 executeds.add(exe);
 
                 if (order.outstanding_size.get().is(0)) {

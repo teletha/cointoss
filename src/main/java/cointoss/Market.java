@@ -33,7 +33,7 @@ import kiss.Signal;
 import kiss.Variable;
 
 /**
- * @version 2018/01/23 14:36:32
+ * @version 2018/02/25 18:36:30
  */
 public class Market implements Disposable {
 
@@ -253,11 +253,11 @@ public class Market implements Disposable {
      */
     public final Signal<Order> request(Order order) {
         return backend.request(order).map(id -> {
-            order.child_order_acceptance_id = id;
+            order.id = id;
             order.child_order_date.set(ZonedDateTime.now());
             order.average_price.set(order.price);
             order.outstanding_size.set(order.size);
-            order.state.set(REQUESTING);
+            order.state.setIf(v -> v == INIT, REQUESTING);
 
             // store
             orders.add(order);
@@ -279,12 +279,7 @@ public class Market implements Disposable {
         if (order.state.is(ACTIVE) || order.state.is(REQUESTING)) {
             State previous = order.state.set(REQUESTING);
 
-            return backend.cancel(order).effect(o -> {
-                orders.remove(order);
-                order.state.set(CANCELED);
-            }).effectOnError(e -> {
-                order.state.set(previous);
-            });
+            return backend.cancel(order).effect(orders::remove).effectOnError(e -> order.state.set(previous));
         } else {
             return Signal.EMPTY;
         }

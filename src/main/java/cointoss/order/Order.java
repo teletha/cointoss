@@ -40,7 +40,7 @@ public class Order implements Directional {
     public final Variable<State> state = Variable.of(State.INIT);
 
     /** The order id. */
-    public String id;
+    public String internlId;
 
     /** The group id. */
     public long group = -1;
@@ -85,12 +85,12 @@ public class Order implements Directional {
     }
 
     /**
-     * Aliase for {@link #child_order_acceptance_id}.
+     * Aliase for {@link #id}.
      * 
      * @return
      */
     public String id() {
-        return child_order_acceptance_id;
+        return id;
     }
 
     /**
@@ -338,7 +338,7 @@ public class Order implements Directional {
     }
 
     /** The server ID */
-    public String child_order_acceptance_id;
+    public String id;
 
     /** Order type */
     public OrderType child_order_type;
