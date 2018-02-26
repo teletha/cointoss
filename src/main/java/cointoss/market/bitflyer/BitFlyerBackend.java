@@ -48,7 +48,6 @@ import cointoss.order.Order.State;
 import cointoss.order.OrderBookChange;
 import cointoss.order.OrderUnit;
 import cointoss.util.Chrono;
-import cointoss.util.Listeners;
 import cointoss.util.Network;
 import cointoss.util.Num;
 import filer.Filer;
@@ -90,16 +89,7 @@ class BitFlyerBackend implements MarketBackend {
     /** The token. */
     private final String accountId;
 
-    /** The token. */
-    private final String webAccessToken;
-
     private Disposable disposer = Disposable.empty();
-
-    /** The order updater. */
-    private final Listeners<JsonObject> orderUpdaters = new Listeners();
-
-    /** The order updater. */
-    private final Signal<JsonObject> orderUpdater = new Signal<>(orderUpdaters);
 
     /**
      * @param type
@@ -113,7 +103,6 @@ class BitFlyerBackend implements MarketBackend {
         this.name = lines.get(2);
         this.password = lines.get(3);
         this.accountId = lines.get(4);
-        this.webAccessToken = lines.get(5);
     }
 
     /**
@@ -130,15 +119,6 @@ class BitFlyerBackend implements MarketBackend {
     @Override
     public void initialize(Market market, Signal<Execution> log) {
         disposer.add(log.to(market::tick));
-        disposer.add(Network
-                .signalr("https://lightning.bitflyer.jp/signalr", "account_id=" + accountId + "&token=" + webAccessToken + "&products=FX_BTC_JPY,heartbeat", "BFEXHub")
-                .map(JsonElement::getAsJsonObject)
-                .take(o -> o.get("M").getAsString().equals("ReceiveOrderUpdates"))
-                .flatIterable(o -> o.get("A").getAsJsonArray())
-                .flatIterable(JsonElement::getAsJsonArray)
-                .map(o -> o.getAsJsonObject().getAsJsonObject("order"))
-                .effect(System.out::println)
-                .to(orderUpdaters::accept));
     }
 
     /**
@@ -154,7 +134,6 @@ class BitFlyerBackend implements MarketBackend {
      */
     @Override
     public Signal<String> request(Order order) {
-        Signal<String> result;
         String id = "JRF" + Chrono.utcNow().format(format) + RandomStringUtils.randomNumeric(6);
 
         if (maintainer.session() == null) {
@@ -167,28 +146,8 @@ class BitFlyerBackend implements MarketBackend {
             request.size = order.size.toDouble();
             request.time_in_force = order.quantity().abbreviation;
 
-            result = call("POST", "/v1/me/sendchildorder", request, "child_order_acceptance_id", String.class);
-            return result.effect(acceptId -> {
-                orderUpdater.take(e -> e.get("order_ref_id").getAsString().equals(acceptId))
-                        .take(1)
-                        .map(e -> e.get("order_id").getAsString())
-                        .to(internalId -> {
-                            order.internlId = internalId;
-                            order.state.set(State.ACTIVE);
-                        });
-            });
+            return call("POST", "/v1/me/sendchildorder", request, "child_order_acceptance_id", String.class);
         } else {
-            orderUpdater.take(e -> e.get("order_ref_id").getAsString().equals(id)).effect(e -> {
-                System.out.println("ORDER 1" + order.id);
-            }).take(1).effect(e -> {
-                System.out.println("ORDER 2" + order.id);
-            }).map(e -> e.get("order_id").getAsString()).effect(e -> {
-                System.out.println("ORDER 3" + order.id);
-            }).to(internalId -> {
-                order.internlId = internalId;
-                order.state.set(State.ACTIVE);
-            });
-
             ChildOrderRequestWebAPI request = new ChildOrderRequestWebAPI();
             request.account_id = accountId;
             request.lang = "ja";
@@ -212,10 +171,6 @@ class BitFlyerBackend implements MarketBackend {
     @Override
     public Signal<Order> cancel(Order order) {
         // order state management
-        orderUpdater
-                .take(e -> e.get("order_ref_id").getAsString().equals(order.id) && e.get("order_state").getAsString().equals("CANCELED"))
-                .take(1)
-                .to(e -> order.state.set(State.CANCELED));
 
         // request order canceling
         CancelRequest cancel = new CancelRequest();

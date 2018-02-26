@@ -21,38 +21,11 @@ import com.pubnub.api.models.consumer.pubsub.PNPresenceEventResult;
 
 import kiss.I;
 import kiss.Signal;
-import signalj.Logger;
-import signalj.hubs.HubConnection;
 
 /**
  * @version 2018/02/25 18:36:37
  */
 public class Network {
-
-    /** The no-operation logger. */
-    private static final Logger NOP = (message, level) -> {
-    };
-
-    /**
-     * Create SignalR connection.
-     * 
-     * @param uri
-     * @param query
-     * @return
-     */
-    public static Signal<JsonElement> signalr(String uri, String query, String hubName) {
-        return new Signal<>((observer, disposer) -> {
-            // Connect to the server
-            HubConnection connection = new HubConnection(uri, query, NOP);
-            connection.createHubProxy(hubName);
-            connection.received(observer::accept);
-            connection.start();
-
-            return disposer.add(() -> {
-                connection.disconnect();
-            });
-        });
-    }
 
     /**
      * Create pubnub connection.
