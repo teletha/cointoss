@@ -10,7 +10,6 @@
 package cointoss;
 
 import static cointoss.order.Order.State.*;
-import static java.util.concurrent.TimeUnit.*;
 
 import java.time.ZonedDateTime;
 import java.util.EnumMap;
@@ -30,6 +29,7 @@ import cointoss.ticker.Ticker;
 import cointoss.util.Listeners;
 import cointoss.util.Num;
 import kiss.Disposable;
+import kiss.I;
 import kiss.Signal;
 import kiss.Variable;
 
@@ -253,18 +253,14 @@ public class Market implements Disposable {
      * @param size
      */
     public final Signal<Order> request(Order order) {
+        order.state.set(REQUESTING);
+
         return backend.request(order).map(id -> {
             order.id = id;
-            order.child_order_date.set(ZonedDateTime.now());
-            order.average_price.set(order.price);
-            order.outstanding_size.set(order.size);
-            order.state.setIf(v -> v == INIT, REQUESTING);
-
-            backend.orders().flatIterable(v -> v).take(o -> o.id.equals(order.id)).take(1).timeout(5, MINUTES).to(o -> {
-                order.state.set(ACTIVE);
-            }, e -> {
-                order.state.set(CANCELED);
-            });
+            order.created.set(ZonedDateTime.now());
+            order.averagePrice.set(order.price);
+            order.remainingSize.set(order.size);
+            order.state.set(ACTIVE);
 
             // store
             orders.add(order);
@@ -288,7 +284,7 @@ public class Market implements Disposable {
 
             return backend.cancel(order).effect(orders::remove).effectOnError(e -> order.state.set(previous));
         } else {
-            return Signal.EMPTY;
+            return I.signal(order);
         }
     }
 
@@ -448,18 +444,18 @@ public class Market implements Disposable {
         }
 
         // for order state
-        Num executed = Num.min(order.outstanding_size, exe.size);
+        Num executed = Num.min(order.remainingSize, exe.size);
 
         if (order.child_order_type.isMarket() && executed.isNot(0)) {
-            order.average_price.set(v -> v.multiply(order.executed_size)
+            order.averagePrice.set(v -> v.multiply(order.executed_size)
                     .plus(exe.price.multiply(executed))
                     .divide(executed.plus(order.executed_size)));
         }
 
         order.executed_size.set(v -> v.plus(executed));
-        order.outstanding_size.set(v -> v.minus(executed));
+        order.remainingSize.set(v -> v.minus(executed));
 
-        if (order.outstanding_size.is(Num.ZERO)) {
+        if (order.remainingSize.is(Num.ZERO)) {
             order.state.set(State.COMPLETED);
             orders.remove(order); // complete order
         }

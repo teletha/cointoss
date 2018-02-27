@@ -76,12 +76,12 @@ public class OrderCatalog extends View {
         });
 
         requestedOrdersDate.modelByProperty(OrderSet.class, o -> o.date)
-                .modelByVar(Order.class, o -> o.child_order_date)
+                .modelByVar(Order.class, o -> o.created)
                 .render((ui, item) -> ui.text(formatter.format(item)));
         requestedOrdersSide.modelByProperty(OrderSet.class, o -> o.side)
                 .model(Order.class, Order::side)
                 .render((ui, item) -> ui.text(item).styleOnly(item));
-        requestedOrdersAmount.modelByProperty(OrderSet.class, o -> o.amount).modelByVar(Order.class, o -> o.outstanding_size);
+        requestedOrdersAmount.modelByProperty(OrderSet.class, o -> o.amount).modelByVar(Order.class, o -> o.remainingSize);
         requestedOrdersPrice.modelByProperty(OrderSet.class, o -> o.averagePrice).model(Order.class, o -> o.price);
 
         // observe external orders

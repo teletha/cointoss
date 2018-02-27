@@ -365,7 +365,7 @@ public abstract class Trader implements Disposable {
          */
         public final Span orderTime() {
             Execution last = order.executions.peekLast();
-            ZonedDateTime start = order.child_order_date.get();
+            ZonedDateTime start = order.created.get();
             ZonedDateTime finish = last == null ? market.latest.v.exec_date : last.exec_date;
 
             if (start.isBefore(finish)) {

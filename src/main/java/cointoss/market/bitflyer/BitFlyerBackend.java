@@ -18,6 +18,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Future;
 
 import javafx.scene.control.TextInputDialog;
 
@@ -57,7 +58,7 @@ import viewtify.Viewtify;
 /**
  * @version 2018/02/27 10:20:56
  */
-class BitFlyerBackend implements MarketBackend {
+class BitFlyerBackend extends MarketBackend {
 
     private static final MediaType mime = MediaType.parse("application/json; charset=utf-8");
 
@@ -89,6 +90,9 @@ class BitFlyerBackend implements MarketBackend {
 
     private Disposable disposer = Disposable.empty();
 
+    /** The real time order. */
+    private final Signal<List<Order>> orders;
+
     /**
      * @param type
      */
@@ -101,6 +105,17 @@ class BitFlyerBackend implements MarketBackend {
         this.name = lines.get(2);
         this.password = lines.get(3);
         this.accountId = lines.get(4);
+        this.orders = new Signal<List<Order>>((observer, disposer) -> {
+            System.out.println("START");
+            Future<?> future = I.schedule(() -> {
+                System.out.println("Get Orders");
+                observer.accept(getOrders().toList());
+            }, 1, SECONDS);
+            return disposer.add(() -> {
+                System.out.println("STOP");
+                future.cancel(true);
+            });
+        }).share();
     }
 
     /**
@@ -169,6 +184,16 @@ class BitFlyerBackend implements MarketBackend {
     @Override
     public Signal<Order> cancel(Order order) {
         // order state management
+        Signal<List<Order>> notExist = orders.take(orders -> {
+            for (Order o : orders) {
+                if (o.id.equals(order.id)) {
+                    System.out.println("EXIST");
+                    return false;
+                }
+            }
+            System.out.println("NOT EXIST");
+            return true;
+        });
 
         // request order canceling
         CancelRequest cancel = new CancelRequest();
@@ -178,7 +203,7 @@ class BitFlyerBackend implements MarketBackend {
         cancel.child_order_acceptance_id = order.id;
 
         if (maintainer.session() == null || cancel.order_id == null) {
-            return call("POST", "/v1/me/cancelchildorder", cancel, null, null).mapTo(order);
+            return call("POST", "/v1/me/cancelchildorder", cancel, null, null).combine(notExist).take(1).mapTo(order);
         } else {
             return call("POST", "https://lightning.bitflyer.jp/api/trade/cancelorder", cancel, null, WebResponse.class).mapTo(order);
         }
@@ -522,10 +547,10 @@ class BitFlyerBackend implements MarketBackend {
             Order o = Order.limit(side, size, price);
             o.internlId = child_order_id;
             o.id = child_order_acceptance_id;
-            o.average_price.set(average_price);
-            o.outstanding_size.set(outstanding_size);
+            o.averagePrice.set(average_price);
+            o.remainingSize.set(outstanding_size);
             o.executed_size.set(executed_size);
-            o.child_order_date.set(LocalDateTime.parse(child_order_date, Chrono.DateTimeWithT).atZone(Chrono.UTC));
+            o.created.set(LocalDateTime.parse(child_order_date, Chrono.DateTimeWithT).atZone(Chrono.UTC));
             o.state.set(child_order_state);
 
             return o;

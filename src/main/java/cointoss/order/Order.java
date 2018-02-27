@@ -69,7 +69,7 @@ public class Order implements Directional {
         this.size = Objects.requireNonNull(size);
         this.price = price == null ? Num.ZERO : price;
         this.child_order_type = price == null ? OrderType.MARKET : OrderType.LIMIT;
-        this.outstanding_size = Variable.of(size);
+        this.remainingSize = Variable.of(size);
         this.executed_size = Variable.of(Num.ZERO);
 
         when(priceLimit);
@@ -246,7 +246,7 @@ public class Order implements Directional {
      */
     public static Order limit(Side position, Num size, Num price) {
         Order order = new Order(position, size, price, null, null);
-        order.average_price.set(price);
+        order.averagePrice.set(price);
 
         return order;
     }
@@ -344,13 +344,13 @@ public class Order implements Directional {
     public OrderType child_order_type;
 
     /** The order date */
-    public Variable<ZonedDateTime> child_order_date = Variable.of(ZonedDateTime.now());
+    public Variable<ZonedDateTime> created = Variable.of(ZonedDateTime.now());
 
     /** The expire date */
     public ZonedDateTime expire_date;
 
     /** The remaining size */
-    public final Variable<Num> outstanding_size;
+    public final Variable<Num> remainingSize;
 
     /** The executed size */
     public final Variable<Num> executed_size;
@@ -362,7 +362,7 @@ public class Order implements Directional {
     public Num total_commission;
 
     /** Order avarage price */
-    public final Variable<Num> average_price = Variable.of(Num.ZERO);
+    public final Variable<Num> averagePrice = Variable.of(Num.ZERO);
 
     /** INTERNAL USAGE */
     public Deque<Execution> executions = new ArrayDeque<>();
@@ -438,9 +438,9 @@ public class Order implements Directional {
         }
 
         if (isBuy()) {
-            return average_price.get().isGreaterThanOrEqual(e.price);
+            return averagePrice.get().isGreaterThanOrEqual(e.price);
         } else {
-            return average_price.get().isLessThanOrEqual(e.price);
+            return averagePrice.get().isLessThanOrEqual(e.price);
         }
     }
 
@@ -459,7 +459,7 @@ public class Order implements Directional {
      */
     @Override
     public String toString() {
-        return side().mark() + size + "@" + average_price + " 残" + outstanding_size + " 済" + executed_size + " " + child_order_date;
+        return side().mark() + size + "@" + averagePrice + " 残" + remainingSize + " 済" + executed_size + " " + created;
     }
 
     /**

@@ -24,14 +24,14 @@ import kiss.Signal;
 /**
  * @version 2017/09/08 18:51:05
  */
-public interface MarketBackend extends Disposable {
+public abstract class MarketBackend implements Disposable {
 
     /**
      * Backend name.
      * 
      * @return
      */
-    String name();
+    public abstract String name();
 
     /**
      * <p>
@@ -40,7 +40,7 @@ public interface MarketBackend extends Disposable {
      * 
      * @param market
      */
-    void initialize(Market market, Signal<Execution> log);
+    public abstract void initialize(Market market, Signal<Execution> log);
 
     /**
      * <p>
@@ -50,7 +50,7 @@ public interface MarketBackend extends Disposable {
      * @param order
      * @return
      */
-    Signal<String> request(Order order);
+    public abstract Signal<String> request(Order order);
 
     /**
      * <p>
@@ -59,7 +59,7 @@ public interface MarketBackend extends Disposable {
      * 
      * @param order
      */
-    Signal<Order> cancel(Order order);
+    public abstract Signal<Order> cancel(Order order);
 
     /**
      * <p>
@@ -68,14 +68,14 @@ public interface MarketBackend extends Disposable {
      * 
      * @return
      */
-    Signal<Order> getOrderBy(String id);
+    public abstract Signal<Order> getOrderBy(String id);
 
     /**
      * Retrieve all active orders constantly.
      * 
      * @return
      */
-    Signal<List<Order>> orders();
+    public abstract Signal<List<Order>> orders();
 
     /**
      * <p>
@@ -84,7 +84,7 @@ public interface MarketBackend extends Disposable {
      * 
      * @return
      */
-    Signal<Order> getOrders();
+    public abstract Signal<Order> getOrders();
 
     /**
      * <p>
@@ -93,7 +93,7 @@ public interface MarketBackend extends Disposable {
      * 
      * @return
      */
-    Signal<Order> getOrdersBy(State state);
+    public abstract Signal<Order> getOrdersBy(State state);
 
     /**
      * <p>
@@ -102,7 +102,7 @@ public interface MarketBackend extends Disposable {
      * 
      * @return
      */
-    Signal<Position> getPositions();
+    public abstract Signal<Position> getPositions();
 
     /**
      * <p>
@@ -111,7 +111,7 @@ public interface MarketBackend extends Disposable {
      * 
      * @return
      */
-    Signal<Execution> getExecutions();
+    public abstract Signal<Execution> getExecutions();
 
     /**
      * <p>
@@ -120,7 +120,7 @@ public interface MarketBackend extends Disposable {
      * 
      * @return
      */
-    Signal<Num> getBaseCurrency();
+    public abstract Signal<Num> getBaseCurrency();
 
     /**
      * <p>
@@ -129,7 +129,7 @@ public interface MarketBackend extends Disposable {
      * 
      * @return
      */
-    Signal<Num> getTargetCurrency();
+    public abstract Signal<Num> getTargetCurrency();
 
     /**
      * <p>
@@ -138,19 +138,19 @@ public interface MarketBackend extends Disposable {
      * 
      * @return
      */
-    Signal<OrderBookChange> getOrderBook();
+    public abstract Signal<OrderBookChange> getOrderBook();
 
     /**
      * Get the service status.
      * 
      * @return
      */
-    Signal<Health> getHealth();
+    public abstract Signal<Health> getHealth();
 
     /**
      * @version 2017/12/14 16:20:52
      */
-    enum Health {
+    public enum Health {
         Normal("🌑"), Busy("🌘"), VeryBusy("🌗"), SuperBusy("🌖"), NoOrder("🌕"), Stop("💀");
 
         static {

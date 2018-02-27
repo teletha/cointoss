@@ -31,7 +31,7 @@ import kiss.Signal;
 /**
  * @version 2017/09/08 19:09:35
  */
-class TestableMarketBackend implements MarketBackend, MarketProvider {
+class TestableMarketBackend extends MarketBackend implements MarketProvider {
 
     /** The terminator. */
     private final Disposable diposer = Disposable.empty();
@@ -113,10 +113,10 @@ class TestableMarketBackend implements MarketBackend, MarketProvider {
             BackendOrder child = new BackendOrder(order);
             child.id = "LOCAL-ACCEPTANCE-" + id++;
             child.state.set(State.ACTIVE);
-            child.child_order_date.set(now.plusNanos(lag.generate()));
+            child.created.set(now.plusNanos(lag.generate()));
             child.child_order_type = order.price.is(0) ? OrderType.MARKET : OrderType.LIMIT;
-            child.average_price.set(order.price);
-            child.outstanding_size.set(order.size);
+            child.averagePrice.set(order.price);
+            child.remainingSize.set(order.size);
             child.cancel_size = Num.ZERO;
             child.executed_size.set(Num.ZERO);
 
@@ -239,7 +239,7 @@ class TestableMarketBackend implements MarketBackend, MarketProvider {
             BackendOrder order = iterator.next();
 
             // time base filter
-            if (e.exec_date.isBefore(order.child_order_date.get())) {
+            if (e.exec_date.isBefore(order.created.get())) {
                 continue;
             }
 
@@ -266,8 +266,8 @@ class TestableMarketBackend implements MarketBackend, MarketProvider {
 
             if (order.quantity() == Quantity.ImmediateOrCancel) {
                 if (order.isTradablePriceWith(e)) {
-                    Num min = Num.min(e.size, order.outstanding_size.get());
-                    order.outstanding_size.set(min);
+                    Num min = Num.min(e.size, order.remainingSize.get());
+                    order.remainingSize.set(min);
                 } else {
                     iterator.remove();
                     orderAll.remove(order);
@@ -276,27 +276,27 @@ class TestableMarketBackend implements MarketBackend, MarketProvider {
             }
 
             if (order.isTradablePriceWith(e)) {
-                Num executedSize = Num.min(e.size, order.outstanding_size.get());
+                Num executedSize = Num.min(e.size, order.remainingSize.get());
                 if (order.child_order_type.isMarket() && executedSize.isNot(0)) {
                     order.marketMinPrice = order.isBuy() ? Num.max(order.marketMinPrice, e.price) : Num.min(order.marketMinPrice, e.price);
-                    order.average_price.set(order.average_price.get()
+                    order.averagePrice.set(order.averagePrice.get()
                             .multiply(order.executed_size.get())
                             .plus(order.marketMinPrice.multiply(executedSize))
                             .divide(order.executed_size.get().plus(executedSize)));;
                 }
-                order.outstanding_size.set(order.outstanding_size.get().minus(executedSize));
+                order.remainingSize.set(order.remainingSize.get().minus(executedSize));
                 order.executed_size.set(order.executed_size.get().plus(executedSize));
 
                 Execution exe = new Execution();
                 exe.side = order.side();
                 exe.size = exe.cumulativeSize = executedSize;
-                exe.price = order.child_order_type.isMarket() ? order.marketMinPrice : order.average_price.get();
+                exe.price = order.child_order_type.isMarket() ? order.marketMinPrice : order.averagePrice.get();
                 exe.exec_date = e.exec_date;
                 exe.buy_child_order_acceptance_id = order.isBuy() ? order.id : e.buy_child_order_acceptance_id;
                 exe.sell_child_order_acceptance_id = order.isSell() ? order.id : e.sell_child_order_acceptance_id;
                 executeds.add(exe);
 
-                if (order.outstanding_size.get().is(0)) {
+                if (order.remainingSize.get().is(0)) {
                     order.state.set(State.COMPLETED);
                     iterator.remove();
                 }

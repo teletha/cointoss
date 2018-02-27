@@ -47,5 +47,5 @@ public class OrderSet {
     public final Calculation<Side> side = Viewtify.calculate(sub).item(0).map(o -> o.side);
 
     /** The latest date */
-    public final Calculation<ZonedDateTime> date = Viewtify.calculate(sub).item(0).flatVariable(o -> o.child_order_date);
+    public final Calculation<ZonedDateTime> date = Viewtify.calculate(sub).item(0).flatVariable(o -> o.created);
 }
