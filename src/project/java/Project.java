@@ -14,6 +14,7 @@ public class Project extends bee.api.Project {
 
         repository("https://oss.sonatype.org/content/repositories/snapshots");
         require("com.github.teletha", "sinobu", "1.0");
+        require("com.github.teletha", "viewtify", "1.0");
         require("com.github.teletha", "filer", "0.5");
         require("com.github.teletha", "marionette", "0.1");
         require("com.github.teletha", "antibug", "0.3").atTest();
@@ -25,6 +26,5 @@ public class Project extends bee.api.Project {
         require("org.eclipse.collections", "eclipse-collections", "8.2.0");
         require("com.pubnub", "pubnub-gson", "4.18.0");
         require("org.magicwerk", "brownies-collections", "0.9.13");
-        require("org.controlsfx", "controlsfx", "8.40.14");
     }
 }
