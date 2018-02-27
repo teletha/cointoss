@@ -196,6 +196,14 @@ class BitFlyerBackend implements MarketBackend {
      * {@inheritDoc}
      */
     @Override
+    public Signal<List<Order>> orders() {
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Signal<Order> getOrders() {
         return call("GET", "/v1/me/getchildorders?child_order_state=ACTIVE&product_code=" + type.name(), "", "*", ChildOrderResponse.class)
                 .map(ChildOrderResponse::toOrder);

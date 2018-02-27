@@ -10,6 +10,7 @@
 package cointoss;
 
 import static cointoss.order.Order.State.*;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.time.ZonedDateTime;
 import java.util.EnumMap;
@@ -258,6 +259,12 @@ public class Market implements Disposable {
             order.average_price.set(order.price);
             order.outstanding_size.set(order.size);
             order.state.setIf(v -> v == INIT, REQUESTING);
+
+            backend.orders().flatIterable(v -> v).take(o -> o.id.equals(order.id)).take(1).timeout(5, MINUTES).to(o -> {
+                order.state.set(ACTIVE);
+            }, e -> {
+                order.state.set(CANCELED);
+            });
 
             // store
             orders.add(order);

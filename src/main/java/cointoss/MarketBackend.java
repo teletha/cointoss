@@ -9,6 +9,8 @@
  */
 package cointoss;
 
+import java.util.List;
+
 import cointoss.order.Order;
 import cointoss.order.Order.State;
 import cointoss.order.OrderBookChange;
@@ -67,6 +69,13 @@ public interface MarketBackend extends Disposable {
      * @return
      */
     Signal<Order> getOrderBy(String id);
+
+    /**
+     * Retrieve all active orders constantly.
+     * 
+     * @return
+     */
+    Signal<List<Order>> orders();
 
     /**
      * <p>
