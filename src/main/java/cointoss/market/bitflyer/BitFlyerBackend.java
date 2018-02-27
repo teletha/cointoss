@@ -11,7 +11,6 @@ package cointoss.market.bitflyer;
 
 import static java.util.concurrent.TimeUnit.*;
 
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -22,17 +21,9 @@ import java.util.Map;
 
 import javafx.scene.control.TextInputDialog;
 
+import org.apache.commons.codec.digest.HmacAlgorithms;
 import org.apache.commons.codec.digest.HmacUtils;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.util.EntityUtils;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -56,12 +47,19 @@ import kiss.I;
 import kiss.JSON;
 import kiss.Signal;
 import marionette.Browser;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 import viewtify.Viewtify;
 
 /**
- * @version 2018/02/08 12:25:47
+ * @version 2018/02/27 10:20:56
  */
 class BitFlyerBackend implements MarketBackend {
+
+    private static final MediaType mime = MediaType.parse("application/json; charset=utf-8");
 
     private static final DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss-");
 
@@ -327,37 +325,39 @@ class BitFlyerBackend implements MarketBackend {
     private <M> Signal<M> call(String method, String path, String body, String selector, Class<M> type) {
         return new Signal<>((observer, disposer) -> {
             String timestamp = String.valueOf(ZonedDateTime.now(zone).toEpochSecond());
-            String sign = HmacUtils.hmacSha256Hex(accessToken, timestamp + method + path + body);
+            String sign = new HmacUtils(HmacAlgorithms.HMAC_SHA_256, accessToken).hmacHex(timestamp + method + path + body);
 
-            HttpUriRequest request = null;
+            Request request;
 
             if (method.equals("GET")) {
-                request = new HttpGet(api + path);
-                request.addHeader("ACCESS-KEY", accessKey);
-                request.addHeader("ACCESS-TIMESTAMP", timestamp);
-                request.addHeader("ACCESS-SIGN", sign);
+                request = new Request.Builder().url(api + path)
+                        .addHeader("ACCESS-KEY", accessKey)
+                        .addHeader("ACCESS-TIMESTAMP", timestamp)
+                        .addHeader("ACCESS-SIGN", sign)
+                        .build();
             } else if (method.equals("POST") && !path.startsWith("http")) {
-                request = new HttpPost(path.startsWith("https://") ? path : api + path);
-                request.addHeader("ACCESS-KEY", accessKey);
-                request.addHeader("ACCESS-TIMESTAMP", timestamp);
-                request.addHeader("ACCESS-SIGN", sign);
-                request.addHeader("Content-Type", "application/json");
-                ((HttpPost) request).setEntity(new StringEntity(body, StandardCharsets.UTF_8));
+                request = new Request.Builder().url(api + path)
+                        .addHeader("ACCESS-KEY", accessKey)
+                        .addHeader("ACCESS-TIMESTAMP", timestamp)
+                        .addHeader("ACCESS-SIGN", sign)
+                        .addHeader("Content-Type", "application/json")
+                        .post(RequestBody.create(mime, body))
+                        .build();
             } else {
-                request = new HttpPost(path);
-                request.addHeader("Content-Type", "application/json");
-                request.addHeader("Cookie", "api_session=" + maintainer.session());
-                request.addHeader("X-Requested-With", "XMLHttpRequest");
-                ((HttpPost) request).setEntity(new StringEntity(body, StandardCharsets.UTF_8));
+                request = new Request.Builder().url(api + path)
+                        .addHeader("Content-Type", "application/json")
+                        .addHeader("Cookie", "api_session=" + maintainer.session())
+                        .addHeader("ACCESS-SIGN", sign)
+                        .addHeader("X-Requested-With", "XMLHttpRequest")
+                        .post(RequestBody.create(mime, body))
+                        .build();
             }
 
-            try (CloseableHttpClient client = HttpClientBuilder.create().disableCookieManagement().build(); //
-                    CloseableHttpResponse response = client.execute(request)) {
+            try (Response response = new OkHttpClient().newCall(request).execute()) {
+                int code = response.code();
+                String value = response.body().string();
 
-                int status = response.getStatusLine().getStatusCode();
-                String value = EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8);
-
-                if (status == HttpStatus.SC_OK) {
+                if (code == 200) {
                     if (type == null) {
                         observer.accept(null);
                     } else {
@@ -379,7 +379,7 @@ class BitFlyerBackend implements MarketBackend {
                         }
                     }
                 } else {
-                    observer.error(new Error("HTTP Status " + status + " " + value));
+                    observer.error(new Error("HTTP Status " + code + " " + value));
                 }
             } catch (Throwable e) {
                 observer.error(e);
@@ -409,7 +409,7 @@ class BitFlyerBackend implements MarketBackend {
          */
         private String session() {
             if (session == null) {
-                I.schedule(this::connect);
+                // I.schedule(this::connect);
             }
             return session;
         }

@@ -12,7 +12,6 @@ public class Project extends bee.api.Project {
     {
         product("cointoss", "CoinToss", "1.0");
 
-        repository("https://oss.sonatype.org/content/repositories/snapshots");
         require("com.github.teletha", "sinobu", "1.0");
         require("com.github.teletha", "viewtify", "1.0");
         require("com.github.teletha", "filer", "0.5");
@@ -20,7 +19,6 @@ public class Project extends bee.api.Project {
         require("com.github.teletha", "antibug", "0.3").atTest();
         require("org.apache.commons", "commons-lang3", "3.7");
         require("commons-codec", "commons-codec", "1.11");
-        require("org.apache.httpcomponents", "httpclient", "4.5.5");
         require("org.apache.logging.log4j", "log4j-core", "2.10.0");
         require("org.apache.logging.log4j", "log4j-jul", "2.10.0");
         require("org.eclipse.collections", "eclipse-collections", "9.1.0");
