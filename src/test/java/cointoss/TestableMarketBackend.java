@@ -30,7 +30,7 @@ import kiss.Signal;
 /**
  * @version 2017/09/08 19:09:35
  */
-class TestableMarketBackend extends MarketBackend implements MarketProvider {
+class TestableMarketBackend implements MarketBackend, MarketProvider {
 
     /** The terminator. */
     private final Disposable diposer = Disposable.empty();

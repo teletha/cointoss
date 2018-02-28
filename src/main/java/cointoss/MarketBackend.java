@@ -21,14 +21,14 @@ import kiss.Signal;
 /**
  * @version 2017/09/08 18:51:05
  */
-public abstract class MarketBackend implements Disposable {
+public interface MarketBackend extends Disposable {
 
     /**
      * Backend name.
      * 
      * @return
      */
-    public abstract String name();
+    String name();
 
     /**
      * <p>
@@ -37,7 +37,7 @@ public abstract class MarketBackend implements Disposable {
      * 
      * @param market
      */
-    public abstract void initialize(Market market, Signal<Execution> log);
+    void initialize(Market market, Signal<Execution> log);
 
     /**
      * <p>
@@ -47,7 +47,7 @@ public abstract class MarketBackend implements Disposable {
      * @param order A order to request.
      * @return A requested order.
      */
-    public abstract Signal<String> request(Order order);
+    Signal<String> request(Order order);
 
     /**
      * <p>
@@ -56,7 +56,7 @@ public abstract class MarketBackend implements Disposable {
      * 
      * @param order A order to cancel.
      */
-    public abstract Signal<Order> cancel(Order order);
+    Signal<Order> cancel(Order order);
 
     /**
      * <p>
@@ -65,7 +65,7 @@ public abstract class MarketBackend implements Disposable {
      * 
      * @return
      */
-    public abstract Signal<Order> orders();
+    Signal<Order> orders();
 
     /**
      * <p>
@@ -74,7 +74,7 @@ public abstract class MarketBackend implements Disposable {
      * 
      * @return
      */
-    public abstract Signal<Position> getPositions();
+    Signal<Position> getPositions();
 
     /**
      * <p>
@@ -83,7 +83,7 @@ public abstract class MarketBackend implements Disposable {
      * 
      * @return
      */
-    public abstract Signal<Execution> getExecutions();
+    Signal<Execution> getExecutions();
 
     /**
      * <p>
@@ -92,7 +92,7 @@ public abstract class MarketBackend implements Disposable {
      * 
      * @return
      */
-    public abstract Signal<Num> getBaseCurrency();
+    Signal<Num> getBaseCurrency();
 
     /**
      * <p>
@@ -101,7 +101,7 @@ public abstract class MarketBackend implements Disposable {
      * 
      * @return
      */
-    public abstract Signal<Num> getTargetCurrency();
+    Signal<Num> getTargetCurrency();
 
     /**
      * <p>
@@ -110,19 +110,19 @@ public abstract class MarketBackend implements Disposable {
      * 
      * @return
      */
-    public abstract Signal<OrderBookChange> getOrderBook();
+    Signal<OrderBookChange> getOrderBook();
 
     /**
      * Get the service status.
      * 
      * @return
      */
-    public abstract Signal<Health> getHealth();
+    Signal<Health> getHealth();
 
     /**
      * @version 2017/12/14 16:20:52
      */
-    public enum Health {
+    enum Health {
         Normal("🌑"), Busy("🌘"), VeryBusy("🌗"), SuperBusy("🌖"), NoOrder("🌕"), Stop("💀");
 
         static {

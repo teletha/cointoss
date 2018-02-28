@@ -58,7 +58,7 @@ import viewtify.Viewtify;
 /**
  * @version 2018/02/27 10:20:56
  */
-class BitFlyerBackend extends MarketBackend {
+class BitFlyerBackend implements MarketBackend {
 
     private static final MediaType mime = MediaType.parse("application/json; charset=utf-8");
 
