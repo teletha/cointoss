@@ -193,7 +193,7 @@ class TestableMarketBackend implements MarketBackend, MarketProvider {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Health> getHealth() {
+    public Signal<Health> health() {
         return I.signal(Health.Normal);
     }
 

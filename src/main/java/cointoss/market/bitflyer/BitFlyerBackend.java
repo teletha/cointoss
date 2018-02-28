@@ -18,7 +18,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Future;
 
 import javafx.scene.control.TextInputDialog;
 
@@ -90,8 +89,11 @@ class BitFlyerBackend implements MarketBackend {
 
     private Disposable disposer = Disposable.empty();
 
-    /** The real time order. */
+    /** The shared order list. */
     private final Signal<List<Order>> orders;
+
+    /** The shared server health. */
+    private final Signal<Health> health;
 
     /**
      * @param type
@@ -105,14 +107,13 @@ class BitFlyerBackend implements MarketBackend {
         this.name = lines.get(2);
         this.password = lines.get(3);
         this.accountId = lines.get(4);
-        this.orders = new Signal<List<Order>>((observer, disposer) -> {
-            Future<?> future = I.schedule(() -> {
-                observer.accept(orders().toList());
-            }, 1, SECONDS);
-            return disposer.add(() -> {
-                future.cancel(true);
-            });
-        }).share();
+
+        this.orders = I.signal(0, 1, SECONDS).map(v -> orders().toList()).share();
+        this.health = I.signal(0, 5, SECONDS)
+                .flatMap(v -> call("GET", "/v1/gethealth?product_code=" + type, "", "status", String.class))
+                .map(this::parseHealth)
+                .share()
+                .diff();
     }
 
     /**
@@ -137,6 +138,14 @@ class BitFlyerBackend implements MarketBackend {
     @Override
     public void vandalize() {
         disposer.dispose();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Signal<Health> health() {
+        return health;
     }
 
     /**
@@ -250,20 +259,6 @@ class BitFlyerBackend implements MarketBackend {
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Signal<Health> getHealth() {
-        return health;
-    }
-
-    private final Signal<Health> health = I.signal(0, 5, SECONDS)
-            .flatMap(v -> call("GET", "/v1/gethealth?product_code=" + type, "", "", ServerHealth.class))
-            .map(health -> health.status)
-            .share()
-            .diff();
-
-    /**
      * Snapshot order book info.
      * 
      * @return
@@ -299,6 +294,37 @@ class BitFlyerBackend implements MarketBackend {
                     }
                     return board;
                 });
+    }
+
+    /**
+     * Parse health status.
+     * 
+     * @param value
+     * @return
+     */
+    private Health parseHealth(String value) {
+        switch (value.toLowerCase().replaceAll("\\s", "")) {
+        case "normal":
+            return MarketBackend.Health.Normal;
+
+        case "busy":
+            return MarketBackend.Health.Busy;
+
+        case "verybusy":
+            return MarketBackend.Health.VeryBusy;
+
+        case "superbusy":
+            return MarketBackend.Health.SuperBusy;
+
+        case "noorder":
+            return MarketBackend.Health.NoOrder;
+
+        case "stop":
+            return MarketBackend.Health.Stop;
+        }
+        // If this exception will be thrown, it is bug of this program. So we must rethrow
+        // the wrapped error in here.
+        throw new Error();
     }
 
     /**
@@ -541,27 +567,6 @@ class BitFlyerBackend implements MarketBackend {
         public String lang;
 
         public String account_id;
-    }
-
-    /**
-     * @version 2018/01/29 1:28:03
-     */
-    @SuppressWarnings("unused")
-    private static class ChildOrderResponseWebAPI {
-
-        public int status;
-
-        public String error_message;
-
-        public Map<String, String> data = new HashMap();
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public String toString() {
-            return "ChildOrderResponseWebAPI [status=" + status + ", error_message=" + error_message + ", data=" + data + "]";
-        }
     }
 
     /**

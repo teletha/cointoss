@@ -179,7 +179,7 @@ public class Market implements Disposable {
             orderBook.shorts.update(board.asks);
             orderBook.longs.update(board.bids);
         }));
-        backend.add(backend.getHealth().to(health -> {
+        backend.add(backend.health().to(health -> {
             this.health.set(health);
         }));
         backend.add(timeline.throttle(2, TimeUnit.SECONDS).to(e -> {
