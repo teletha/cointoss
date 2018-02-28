@@ -244,13 +244,10 @@ public class Market implements Disposable {
     }
 
     /**
-     * <p>
-     * Request order.
-     * </p>
+     * Request order actually.
      * 
-     * @param position
-     * @param init
-     * @param size
+     * @param order A order to request.
+     * @return A requested order.
      */
     public final Signal<Order> request(Order order) {
         order.state.set(REQUESTING);
@@ -262,7 +259,6 @@ public class Market implements Disposable {
             order.remainingSize.set(order.size);
             order.state.set(ACTIVE);
 
-            // store
             orders.add(order);
 
             // event
@@ -276,7 +272,8 @@ public class Market implements Disposable {
     /**
      * Request order canceling.
      * 
-     * @param acceptanceId
+     * @param order A order to cancel.
+     * @return A canceled order.
      */
     public final Signal<Order> cancel(Order order) {
         if (order.state.is(ACTIVE) || order.state.is(REQUESTING)) {
@@ -284,7 +281,7 @@ public class Market implements Disposable {
 
             return backend.cancel(order).effect(o -> {
                 orders.remove(o);
-                o.state.set(State.CANCELED);
+                o.state.set(CANCELED);
             }).effectOnError(e -> {
                 order.state.set(previous);
             });
@@ -294,13 +291,11 @@ public class Market implements Disposable {
     }
 
     /**
-     * <p>
-     * Check orders.
-     * </p>
+     * List up all orders.
      * 
      * @return
      */
-    public final List<Order> listOrders() {
+    public final List<Order> orders() {
         return backend.orders().toList();
     }
 

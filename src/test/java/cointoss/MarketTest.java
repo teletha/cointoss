@@ -28,12 +28,12 @@ public class MarketTest {
     public void requestOrder() throws Exception {
         TestableMarket market = new TestableMarket();
 
-        assert market.listOrders().isEmpty();
+        assert market.orders().isEmpty();
         Order order = Order.limitLong(1, 10);
         market.requestSuccessfully(order);
         assert order.isBuy();
         assert order.executed_size.get().is(0);
-        assert market.listOrders().size() == 1;
+        assert market.orders().size() == 1;
     }
 
     @Test
@@ -83,7 +83,7 @@ public class MarketTest {
             assert order.executed_size.get().is(10);
         });
 
-        List<Order> orders = market.listOrders();
+        List<Order> orders = market.orders();
         assert orders.size() == 1;
         assert orders.get(0).state.is(State.COMPLETED);
 
@@ -365,7 +365,7 @@ public class MarketTest {
         market.requestSuccessfully(Order.limitLong(10, 10).type(Quantity.ImmediateOrCancel));
         market.execute(Side.BUY, 4, 10);
         assert market.validateOrderState(0, 4, 0, 0, 0);
-        assert market.listOrders().get(3).executed_size.get().is(4);
+        assert market.orders().get(3).executed_size.get().is(4);
 
         // less price will be failed
         market.requestSuccessfully(Order.limitLong(1, 10).type(Quantity.ImmediateOrCancel));
@@ -396,7 +396,7 @@ public class MarketTest {
         market.requestSuccessfully(Order.limitShort(10, 10).type(Quantity.ImmediateOrCancel));
         market.execute(Side.SELL, 4, 10);
         assert market.validateOrderState(0, 4, 0, 0, 0);
-        assert market.listOrders().get(3).executed_size.get().is(4);
+        assert market.orders().get(3).executed_size.get().is(4);
 
         // less price will be failed
         market.requestSuccessfully(Order.limitShort(1, 10).type(Quantity.ImmediateOrCancel));
@@ -410,45 +410,45 @@ public class MarketTest {
 
         market.requestSuccessfully(Order.marketLong(1));
         market.execute(Side.SELL, 1, 10);
-        assert market.listOrders().get(0).averagePrice.get().is(10);
-        assert market.listOrders().get(0).executed_size.get().is(1);
+        assert market.orders().get(0).averagePrice.get().is(10);
+        assert market.orders().get(0).executed_size.get().is(1);
 
         // divide
         market.requestSuccessfully(Order.marketLong(10));
         market.execute(Side.BUY, 5, 10);
         market.execute(Side.BUY, 5, 20);
-        assert market.listOrders().get(1).averagePrice.get().is(15);
-        assert market.listOrders().get(1).executed_size.get().is(10);
+        assert market.orders().get(1).averagePrice.get().is(15);
+        assert market.orders().get(1).executed_size.get().is(10);
 
         // divide overflow
         market.requestSuccessfully(Order.marketLong(10));
         market.execute(Side.BUY, 5, 10);
         market.execute(Side.BUY, 14, 20);
-        assert market.listOrders().get(2).averagePrice.get().is(15);
-        assert market.listOrders().get(2).executed_size.get().is(10);
+        assert market.orders().get(2).averagePrice.get().is(15);
+        assert market.orders().get(2).executed_size.get().is(10);
 
         // divide underflow
         market.requestSuccessfully(Order.marketLong(10));
         market.execute(Side.BUY, 5, 10);
         market.execute(Side.BUY, 3, 20);
-        assert market.listOrders().get(3).averagePrice.get().is("13.75");
-        assert market.listOrders().get(3).executed_size.get().is(8);
+        assert market.orders().get(3).averagePrice.get().is("13.75");
+        assert market.orders().get(3).executed_size.get().is(8);
         market.execute(Side.BUY, 2, 20);
-        assert market.listOrders().get(3).averagePrice.get().is("15");
+        assert market.orders().get(3).averagePrice.get().is("15");
 
         // down price
         market.requestSuccessfully(Order.marketLong(10));
         market.execute(Side.BUY, 5, 10);
         market.execute(Side.BUY, 5, 5);
-        assert market.listOrders().get(4).averagePrice.get().is("10");
-        assert market.listOrders().get(4).executed_size.get().is(10);
+        assert market.orders().get(4).averagePrice.get().is("10");
+        assert market.orders().get(4).executed_size.get().is(10);
 
         // up price
         market.requestSuccessfully(Order.marketLong(10));
         market.execute(Side.BUY, 5, 10);
         market.execute(Side.BUY, 5, 20);
-        assert market.listOrders().get(5).averagePrice.get().is("15");
-        assert market.listOrders().get(5).executed_size.get().is(10);
+        assert market.orders().get(5).averagePrice.get().is("15");
+        assert market.orders().get(5).executed_size.get().is(10);
     }
 
     @Test
