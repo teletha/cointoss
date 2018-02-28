@@ -301,7 +301,7 @@ public class Market implements Disposable {
      * @return
      */
     public final List<Order> listOrders() {
-        return backend.getOrders().toList();
+        return backend.orders().toList();
     }
 
     /**

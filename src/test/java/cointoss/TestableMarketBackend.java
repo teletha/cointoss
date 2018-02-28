@@ -12,7 +12,6 @@ package cointoss;
 import java.time.ZonedDateTime;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -146,32 +145,8 @@ class TestableMarketBackend extends MarketBackend implements MarketProvider {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Order> getOrderBy(String id) {
-        return I.signal(orderAll).take(o -> o.id.equals(id)).take(1).as(Order.class);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Signal<List<Order>> orders() {
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Signal<Order> getOrders() {
-        return I.signal(orderAll).map(o -> o);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Signal<Order> getOrdersBy(State state) {
-        return I.signal(orderAll).take(o -> o.state.is(state)).as(Order.class);
+    public Signal<Order> orders() {
+        return I.signal(orderAll).as(Order.class);
     }
 
     /**

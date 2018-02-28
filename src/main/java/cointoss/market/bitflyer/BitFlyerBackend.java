@@ -107,7 +107,7 @@ class BitFlyerBackend extends MarketBackend {
         this.accountId = lines.get(4);
         this.orders = new Signal<List<Order>>((observer, disposer) -> {
             Future<?> future = I.schedule(() -> {
-                observer.accept(getOrders().toList());
+                observer.accept(orders().toList());
             }, 1, SECONDS);
             return disposer.add(() -> {
                 future.cancel(true);
@@ -189,7 +189,7 @@ class BitFlyerBackend extends MarketBackend {
         Signal requestCancel = maintainer.session() == null || cancel.order_id == null
                 ? call("POST", "/v1/me/cancelchildorder", cancel, null, null)
                 : call("POST", "https://lightning.bitflyer.jp/api/trade/cancelorder", cancel, null, WebResponse.class);
-        Signal<List<Order>> isCanceled = orders.take(orders -> orders.contains(order));
+        Signal<List<Order>> isCanceled = orders.take(orders -> !orders.contains(order));
 
         return requestCancel.combine(isCanceled).take(1).mapTo(order);
     }
@@ -198,35 +198,9 @@ class BitFlyerBackend extends MarketBackend {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Order> getOrderBy(String id) {
-        return call("GET", "/v1/me/getchildorders?product_code=" + type.name() + "&child_order_acceptance_id=" + id, "", "*", Order.class);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Signal<List<Order>> orders() {
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Signal<Order> getOrders() {
+    public Signal<Order> orders() {
         return call("GET", "/v1/me/getchildorders?child_order_state=ACTIVE&product_code=" + type.name(), "", "*", ChildOrderResponse.class)
                 .map(ChildOrderResponse::toOrder);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Signal<Order> getOrdersBy(State state) {
-        // If this exception will be thrown, it is bug of this program. So we must rethrow the
-        // wrapped error in here.
-        throw new Error();
     }
 
     /**

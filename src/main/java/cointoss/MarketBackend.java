@@ -9,10 +9,7 @@
  */
 package cointoss;
 
-import java.util.List;
-
 import cointoss.order.Order;
-import cointoss.order.Order.State;
 import cointoss.order.OrderBookChange;
 import cointoss.util.Num;
 import kiss.Decoder;
@@ -47,8 +44,8 @@ public abstract class MarketBackend implements Disposable {
      * Request order actually.
      * </p>
      * 
-     * @param order
-     * @return
+     * @param order A order to request.
+     * @return A requested order.
      */
     public abstract Signal<String> request(Order order);
 
@@ -57,43 +54,18 @@ public abstract class MarketBackend implements Disposable {
      * Request order canceling.
      * </p>
      * 
-     * @param order
+     * @param order A order to cancel.
      */
     public abstract Signal<Order> cancel(Order order);
 
     /**
      * <p>
-     * Request order by id.
+     * Request all orders.
      * </p>
      * 
      * @return
      */
-    public abstract Signal<Order> getOrderBy(String id);
-
-    /**
-     * Retrieve all active orders constantly.
-     * 
-     * @return
-     */
-    public abstract Signal<List<Order>> orders();
-
-    /**
-     * <p>
-     * Check all orders.
-     * </p>
-     * 
-     * @return
-     */
-    public abstract Signal<Order> getOrders();
-
-    /**
-     * <p>
-     * Check all orders.
-     * </p>
-     * 
-     * @return
-     */
-    public abstract Signal<Order> getOrdersBy(State state);
+    public abstract Signal<Order> orders();
 
     /**
      * <p>
