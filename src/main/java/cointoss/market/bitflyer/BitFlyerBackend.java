@@ -106,13 +106,10 @@ class BitFlyerBackend extends MarketBackend {
         this.password = lines.get(3);
         this.accountId = lines.get(4);
         this.orders = new Signal<List<Order>>((observer, disposer) -> {
-            System.out.println("START");
             Future<?> future = I.schedule(() -> {
-                System.out.println("Get Orders");
                 observer.accept(getOrders().toList());
             }, 1, SECONDS);
             return disposer.add(() -> {
-                System.out.println("STOP");
                 future.cancel(true);
             });
         }).share();
@@ -183,30 +180,18 @@ class BitFlyerBackend extends MarketBackend {
      */
     @Override
     public Signal<Order> cancel(Order order) {
-        // order state management
-        Signal<List<Order>> notExist = orders.take(orders -> {
-            for (Order o : orders) {
-                if (o.id.equals(order.id)) {
-                    System.out.println("EXIST");
-                    return false;
-                }
-            }
-            System.out.println("NOT EXIST");
-            return true;
-        });
-
-        // request order canceling
         CancelRequest cancel = new CancelRequest();
         cancel.product_code = type.name();
         cancel.account_id = accountId;
         cancel.order_id = order.internlId;
         cancel.child_order_acceptance_id = order.id;
 
-        if (maintainer.session() == null || cancel.order_id == null) {
-            return call("POST", "/v1/me/cancelchildorder", cancel, null, null).combine(notExist).take(1).mapTo(order);
-        } else {
-            return call("POST", "https://lightning.bitflyer.jp/api/trade/cancelorder", cancel, null, WebResponse.class).mapTo(order);
-        }
+        Signal requestCancel = maintainer.session() == null || cancel.order_id == null
+                ? call("POST", "/v1/me/cancelchildorder", cancel, null, null)
+                : call("POST", "https://lightning.bitflyer.jp/api/trade/cancelorder", cancel, null, WebResponse.class);
+        Signal<List<Order>> isCanceled = orders.take(orders -> orders.contains(order));
+
+        return requestCancel.combine(isCanceled).take(1).mapTo(order);
     }
 
     /**

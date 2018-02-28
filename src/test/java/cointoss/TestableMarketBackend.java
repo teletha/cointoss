@@ -134,7 +134,6 @@ class TestableMarketBackend extends MarketBackend implements MarketProvider {
         return new Signal<>((observer, disposer) -> {
             orderActive.removeIf(o -> o.id.equals(order.id));
             I.signal(orderAll).take(o -> o.id.equals(order.id)).take(1).to(o -> {
-                order.state.set(State.CANCELED);
                 o.state.set(State.CANCELED);
                 observer.accept(order);
                 observer.complete();

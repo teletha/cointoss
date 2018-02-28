@@ -282,7 +282,12 @@ public class Market implements Disposable {
         if (order.state.is(ACTIVE) || order.state.is(REQUESTING)) {
             State previous = order.state.set(REQUESTING);
 
-            return backend.cancel(order).effect(orders::remove).effectOnError(e -> order.state.set(previous));
+            return backend.cancel(order).effect(o -> {
+                orders.remove(o);
+                o.state.set(State.CANCELED);
+            }).effectOnError(e -> {
+                order.state.set(previous);
+            });
         } else {
             return I.signal(order);
         }

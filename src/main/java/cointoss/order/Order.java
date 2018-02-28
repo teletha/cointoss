@@ -458,6 +458,22 @@ public class Order implements Directional {
      * {@inheritDoc}
      */
     @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof Order ? Objects.equals(id, ((Order) obj).id) : false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public String toString() {
         return side().mark() + size + "@" + averagePrice + " 残" + remainingSize + " 済" + executed_size + " " + created;
     }
