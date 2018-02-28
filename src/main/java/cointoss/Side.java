@@ -121,7 +121,7 @@ public enum Side implements Directional {
      * @version 2017/08/23 0:08:13
      */
     @SuppressWarnings("unused")
-    public static class Codec implements Encoder<Side>, Decoder<Side> {
+    private static class Codec implements Encoder<Side>, Decoder<Side> {
 
         /**
          * {@inheritDoc}
