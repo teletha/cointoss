@@ -293,30 +293,51 @@ public class Market implements Disposable {
     /**
      * List up all orders.
      * 
-     * @return
+     * @return A list of all orders.
      */
     public final List<Order> orders() {
         return backend.orders().toList();
     }
 
     /**
-     * <p>
-     * Check executions.
-     * </p>
+     * List up all executions.
+     * 
+     * @return A list of all executions.
      */
-    public final List<Execution> listExecutions() {
+    public final List<Execution> executions() {
         return backend.getExecutions().toList();
     }
 
     /**
-     * <p>
-     * Check market state.
-     * </p>
+     * Check order status.
      * 
      * @return
      */
-    public final boolean isEmpty() {
-        return orders.isEmpty();
+    public final boolean hasActiveOrder() {
+        return orders.isEmpty() == false;
+    }
+
+    /**
+     * Check order status.
+     * 
+     * @return
+     */
+    public final boolean hasNoActiveOrder() {
+        return orders.isEmpty() == true;
+    }
+
+    /**
+     * Create new price signal.
+     * 
+     * @param price
+     * @return
+     */
+    public final Signal<Execution> signalByPrice(Num price) {
+        if (latest.v.price.isLessThan(price)) {
+            return timeline.take(e -> e.price.isGreaterThanOrEqual(price)).take(1);
+        } else {
+            return timeline.take(e -> e.price.isLessThanOrEqual(price)).take(1);
+        }
     }
 
     /**
@@ -356,17 +377,6 @@ public class Market implements Disposable {
     }
 
     /**
-     * <p>
-     * Check market state.
-     * </p>
-     * 
-     * @return
-     */
-    public boolean hasNoActiveOrder() {
-        return orders.isEmpty();
-    }
-
-    /**
      * Calculate profit and loss.
      * 
      * @return
@@ -375,20 +385,6 @@ public class Market implements Disposable {
         Num baseProfit = base.minus(baseInit);
         Num targetProfit = target.multiply(latest.v.price).minus(targetInit.multiply(init.v.price));
         return baseProfit.plus(targetProfit);
-    }
-
-    /**
-     * Create new price signal.
-     * 
-     * @param price
-     * @return
-     */
-    public Signal<Execution> signalByPrice(Num price) {
-        if (latest.v.price.isLessThan(price)) {
-            return timeline.take(e -> e.price.isGreaterThanOrEqual(price)).take(1);
-        } else {
-            return timeline.take(e -> e.price.isLessThanOrEqual(price)).take(1);
-        }
     }
 
     /**

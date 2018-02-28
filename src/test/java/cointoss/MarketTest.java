@@ -87,7 +87,7 @@ public class MarketTest {
         assert orders.size() == 1;
         assert orders.get(0).state.is(State.COMPLETED);
 
-        List<Execution> executions = market.listExecutions();
+        List<Execution> executions = market.executions();
         assert executions.size() == 2;
         assert executions.get(0).size.is(7);
         assert executions.get(1).size.is(3);
