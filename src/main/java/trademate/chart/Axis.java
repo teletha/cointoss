@@ -11,6 +11,7 @@ package trademate.chart;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.DoubleFunction;
 
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
@@ -30,8 +31,6 @@ import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.PathElement;
-
-import org.eclipse.collections.api.block.function.primitive.DoubleToObjectFunction;
 
 import cointoss.util.Num;
 import kiss.Disposable;
@@ -61,7 +60,7 @@ public class Axis extends Region {
     /** The visual placement position. */
     public final Side side;
 
-    public final ObjectProperty<DoubleToObjectFunction<String>> tickLabelFormatter = new SimpleObjectProperty<>(this, "tickLabelFormatter", String::valueOf);
+    public final ObjectProperty<DoubleFunction<String>> tickLabelFormatter = new SimpleObjectProperty<>(this, "tickLabelFormatter", String::valueOf);
 
     /** The preferred visible number of ticks. */
     public final int tickNumber = 10;
