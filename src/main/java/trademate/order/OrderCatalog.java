@@ -157,10 +157,10 @@ public class OrderCatalog extends View {
             Num price = view.market().orderBook.computeBestPrice(order.side, order.price, optimizeThreshold.value(), Num.of(2));
 
             view.market().cancel(order).to(o -> {
-                view.console.info("{} is canceled.", o);
+                view.console.write("{} is canceled.", o);
 
                 view.market().request(Order.limit(order.side, order.size, price)).to(re -> {
-                    view.console.info("{} is reorder.", re);
+                    view.console.write("{} is reorder.", re);
                 });
             });
         });
@@ -174,7 +174,7 @@ public class OrderCatalog extends View {
     private void reorderAway(Order order) {
         Viewtify.inWorker(() -> {
             view.market().cancel(order).to(o -> {
-                view.console.info("{} is canceled.", order);
+                view.console.write("{} is canceled.", order);
             });
         });
     }

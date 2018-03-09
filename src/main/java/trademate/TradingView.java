@@ -21,7 +21,6 @@ import cointoss.util.Chrono;
 import cointoss.util.Num;
 import kiss.I;
 import trademate.chart.CandleChart;
-import trademate.console.Console;
 import trademate.order.OrderBookView;
 import trademate.order.OrderBuilder;
 import trademate.order.OrderCatalog;
@@ -48,7 +47,7 @@ public class TradingView extends View {
 
     public @UI ExecutionView executionView;
 
-    public @UI Console console;
+    public @UI ConsoleView console;
 
     public @UI OrderBookView board;
 
