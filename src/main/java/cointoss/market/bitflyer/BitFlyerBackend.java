@@ -18,6 +18,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javafx.scene.control.TextInputDialog;
 
@@ -58,6 +60,10 @@ import viewtify.Viewtify;
  * @version 2018/02/27 10:20:56
  */
 class BitFlyerBackend implements MarketBackend {
+
+    static {
+        Logger.getLogger(OkHttpClient.class.getName()).setLevel(Level.FINE);
+    }
 
     private static final MediaType mime = MediaType.parse("application/json; charset=utf-8");
 
