@@ -18,7 +18,6 @@ import java.util.stream.IntStream;
 
 import javafx.scene.control.Spinner;
 import javafx.scene.input.ScrollEvent;
-import javafx.scene.media.AudioClip;
 
 import cointoss.Side;
 import cointoss.order.Order;
@@ -134,18 +133,7 @@ public class OrderBuilder extends View {
 
         orderLimitLong.when(User.Click).throttle(1000, MILLISECONDS).mapTo(Side.BUY).to(this::requestOrder);
         orderLimitShort.when(User.Click).throttle(1000, MILLISECONDS).mapTo(Side.SELL).to(this::requestOrder);
-
-        orderQuantity.values(Quantity.values()).initial(Quantity.GoodTillCanceled).observe(v -> {
-            try {
-                notificator.orderFailed.notify("OKOKOK");
-                AudioClip audioClip = new AudioClip(ClassLoader.getSystemResource("sound/Start.m4a").toExternalForm());
-                audioClip.play();
-                System.out.println("PLAY");
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-
+        orderQuantity.values(Quantity.values()).initial(Quantity.GoodTillCanceled);
         Spreader spreader = new Spreader();
 
         bot.observe(use -> {
@@ -192,6 +180,7 @@ public class OrderBuilder extends View {
         // Create Model
         // ========================================
         Num size = orderSize.valueOr(Num.ZERO);
+        Num initSize = size;
         Num price = orderPrice.valueOr(Num.ZERO);
         int divideSize = orderDivideSize.value();
         int increaseInterval = orderDivideIntervalAmount.value();
@@ -201,7 +190,7 @@ public class OrderBuilder extends View {
 
         for (int i = 0; i < divideSize; i++) {
             Num optimizedSize = increaseInterval == 0 ? Num.ZERO
-                    : Num.of(i).divide(increaseInterval).scale(0, RoundingMode.FLOOR).multiply(orderSizeAmount.value());
+                    : Num.of(i).divide(increaseInterval).scale(0, RoundingMode.FLOOR).multiply(initSize.divide(2));
             Num optimizedPrice = view.market().orderBook.computeBestPrice(side, price, optimizeThreshold.value(), Num.of(2));
 
             Order order = Order.limit(side, size.plus(optimizedSize), optimizedPrice).type(quantity);
