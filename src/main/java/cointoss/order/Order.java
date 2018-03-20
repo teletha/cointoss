@@ -12,6 +12,8 @@ package cointoss.order;
 import java.time.ZonedDateTime;
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 import cointoss.Directional;
@@ -39,8 +41,8 @@ public class Order implements Directional {
     /** The order state */
     public final Variable<State> state = Variable.of(State.INIT);
 
-    /** The order id. */
-    public String internlId;
+    /** The order attribute. */
+    public final Map<String, Object> attributes = new HashMap();
 
     /** The group id. */
     public long group = -1;

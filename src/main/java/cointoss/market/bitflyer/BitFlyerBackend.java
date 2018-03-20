@@ -18,6 +18,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -65,6 +66,9 @@ class BitFlyerBackend implements MarketBackend {
         Logger.getLogger(OkHttpClient.class.getName()).setLevel(Level.FINE);
     }
 
+    /** The key for internal id. */
+    private static final String InternalID = BitFlyerBackend.class.getName() + "#ID";
+
     private static final MediaType mime = MediaType.parse("application/json; charset=utf-8");
 
     private static final DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss-");
@@ -96,7 +100,7 @@ class BitFlyerBackend implements MarketBackend {
     private Disposable disposer = Disposable.empty();
 
     /** The shared order list. */
-    private final Signal<List<Order>> orders;
+    private final Signal<List<Order>> intervalOrderCheck;
 
     /** The shared server health. */
     private final Signal<Health> health;
@@ -114,7 +118,7 @@ class BitFlyerBackend implements MarketBackend {
         this.password = lines.get(3);
         this.accountId = lines.get(4);
 
-        this.orders = I.signal(0, 1, SECONDS).map(v -> orders().toList()).share();
+        this.intervalOrderCheck = I.signal(0, 1, SECONDS).map(v -> orders().toList()).share();
         this.health = I.signal(0, 5, SECONDS)
                 .flatMap(v -> call("GET", "/v1/gethealth?product_code=" + type, "", "status", String.class))
                 .map(this::parseHealth)
@@ -159,6 +163,7 @@ class BitFlyerBackend implements MarketBackend {
      */
     @Override
     public Signal<String> request(Order order) {
+        Signal<String> call;
         String id = "JRF" + Chrono.utcNow().format(format) + RandomStringUtils.randomNumeric(6);
 
         if (maintainer.session() == null) {
@@ -171,7 +176,7 @@ class BitFlyerBackend implements MarketBackend {
             request.size = order.size.toDouble();
             request.time_in_force = order.quantity().abbreviation;
 
-            return call("POST", "/v1/me/sendchildorder", request, "child_order_acceptance_id", String.class);
+            call = call("POST", "/v1/me/sendchildorder", request, "child_order_acceptance_id", String.class);
         } else {
             ChildOrderRequestWebAPI request = new ChildOrderRequestWebAPI();
             request.account_id = accountId;
@@ -185,9 +190,24 @@ class BitFlyerBackend implements MarketBackend {
             request.size = order.size.toDouble();
             request.time_in_force = order.quantity().abbreviation;
 
-            return call("POST", "https://lightning.bitflyer.jp/api/trade/sendorder", request, "", WebResponse.class)
+            call = call("POST", "https://lightning.bitflyer.jp/api/trade/sendorder", request, "", WebResponse.class)
                     .map(e -> e.data.get("order_ref_id"));
         }
+
+        return call.effect(v -> {
+            System.out.println("start check");
+            I.signal(0, 5, SECONDS).map(a -> orders().toList()).effect(a -> {
+                System.out.println("Retrive intenal id for " + order.id);
+            }).map((Function<List<Order>, Order>) orders -> {
+                return orders.get(orders.indexOf(order));
+            }).effectOnError(e -> {
+                System.out.println(e);
+            }).retry(10).take(1).effect(a -> {
+                System.out.println("Retrive intenal id for " + order.id + " " + a.attributes.get(InternalID));
+            }).to(o -> order.attributes.putAll(o.attributes), e -> {
+                System.out.println("EDND " + e);
+            });
+        });
     }
 
     /**
@@ -198,13 +218,13 @@ class BitFlyerBackend implements MarketBackend {
         CancelRequest cancel = new CancelRequest();
         cancel.product_code = type.name();
         cancel.account_id = accountId;
-        cancel.order_id = order.internlId;
+        cancel.order_id = (String) order.attributes.get(InternalID);
         cancel.child_order_acceptance_id = order.id;
 
         Signal requestCancel = maintainer.session() == null || cancel.order_id == null
                 ? call("POST", "/v1/me/cancelchildorder", cancel, null, null)
                 : call("POST", "https://lightning.bitflyer.jp/api/trade/cancelorder", cancel, null, WebResponse.class);
-        Signal<List<Order>> isCanceled = orders.take(orders -> !orders.contains(order));
+        Signal<List<Order>> isCanceled = intervalOrderCheck.take(orders -> !orders.contains(order));
 
         return requestCancel.combine(isCanceled).take(1).mapTo(order);
     }
@@ -433,7 +453,7 @@ class BitFlyerBackend implements MarketBackend {
          */
         private String session() {
             if (session == null) {
-                I.schedule(this::connect);
+                // I.schedule(this::connect);
             }
             return session;
         }
@@ -534,13 +554,13 @@ class BitFlyerBackend implements MarketBackend {
 
         public Order toOrder() {
             Order o = Order.limit(side, size, price);
-            o.internlId = child_order_id;
             o.id = child_order_acceptance_id;
             o.averagePrice.set(average_price);
             o.remainingSize.set(outstanding_size);
             o.executed_size.set(executed_size);
             o.created.set(LocalDateTime.parse(child_order_date, Chrono.DateTimeWithT).atZone(Chrono.UTC));
             o.state.set(child_order_state);
+            o.attributes.put(InternalID, child_order_id);
 
             return o;
         }
