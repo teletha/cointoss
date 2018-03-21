@@ -152,7 +152,7 @@ class BitFlyerLog extends MarketLog {
 
             // read from REST API
             if (disposer.isDisposed() == false) {
-                disposer.add(rest().effect(this::cache).effectOnComplete((o, d) -> completeREST.set(true)).to(observer::accept));
+                disposer.add(rest().effect(this::cache).effectOnComplete(() -> completeREST.set(true)).to(observer::accept));
             }
 
             return disposer;

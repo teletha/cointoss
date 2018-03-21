@@ -453,7 +453,7 @@ class BitFlyerBackend implements MarketBackend {
          */
         private String session() {
             if (session == null) {
-                // I.schedule(this::connect);
+                I.schedule(this::connect);
             }
             return session;
         }
