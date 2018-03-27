@@ -18,7 +18,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -180,9 +179,8 @@ class BitFlyerBackend implements MarketBackend {
         } else {
             ChildOrderRequestWebAPI request = new ChildOrderRequestWebAPI();
             request.account_id = accountId;
-            request.lang = "ja";
-            request.minute_to_expire = 60 * 24;
             request.ord_type = order.isLimit() ? "LIMIT" : "MARKET";
+            request.minute_to_expire = 60 * 24;
             request.order_ref_id = id;
             request.price = order.price.toInt();
             request.product_code = type.name();
@@ -195,18 +193,10 @@ class BitFlyerBackend implements MarketBackend {
         }
 
         return call.effect(v -> {
-            System.out.println("start check");
-            I.signal(0, 5, SECONDS).map(a -> orders().toList()).effect(a -> {
-                System.out.println("Retrive intenal id for " + order.id);
-            }).map((Function<List<Order>, Order>) orders -> {
-                return orders.get(orders.indexOf(order));
-            }).effectOnError(e -> {
-                System.out.println(e);
-            }).retry(10).take(1).effect(a -> {
-                System.out.println("Retrive intenal id for " + order.id + " " + a.attributes.get(InternalID));
-            }).to(o -> order.attributes.putAll(o.attributes), e -> {
-                System.out.println("EDND " + e);
-            });
+            intervalOrderCheck.map(orders -> orders.get(orders.indexOf(order)))
+                    .skipError()
+                    .take(1)
+                    .to(o -> order.attributes.putAll(o.attributes));
         });
     }
 
@@ -588,7 +578,7 @@ class BitFlyerBackend implements MarketBackend {
 
         public String time_in_force;
 
-        public String lang;
+        public String lang = "ja";
 
         public String account_id;
     }
