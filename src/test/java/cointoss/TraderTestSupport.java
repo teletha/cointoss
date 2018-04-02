@@ -9,14 +9,14 @@
  */
 package cointoss;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 
 import cointoss.analyze.TradingLog;
 import cointoss.util.Num;
 import kiss.I;
 
 /**
- * @version 2017/09/11 13:34:54
+ * @version 2018/04/02 16:49:10
  */
 public abstract class TraderTestSupport extends Trader {
 
@@ -40,7 +40,7 @@ public abstract class TraderTestSupport extends Trader {
         // do nothing
     }
 
-    @Before
+    @BeforeEach
     public void init() {
         close();
 

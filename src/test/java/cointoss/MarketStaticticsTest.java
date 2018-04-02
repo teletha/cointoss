@@ -9,18 +9,17 @@
  */
 package cointoss;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import cointoss.Side;
 import cointoss.order.Order;
 
 /**
- * @version 2017/07/26 15:22:24
+ * @version 2018/04/02 16:47:46
  */
-public class MarketStaticticsTest {
+class MarketStaticticsTest {
 
     @Test
-    public void market() throws Exception {
+    void market() {
         TestableMarket market = new TestableMarket();
         market.requestAndExecution(Order.limitLong(1, 10));
 
@@ -35,7 +34,7 @@ public class MarketStaticticsTest {
     }
 
     @Test
-    public void longOnly() throws Exception {
+    void longOnly() {
         TestableMarket market = new TestableMarket();
         market.requestSuccessfully(Order.limitLong(1, 10));
         market.execute(Side.BUY, 1, 9);
@@ -46,7 +45,7 @@ public class MarketStaticticsTest {
     }
 
     @Test
-    public void longMultiple() throws Exception {
+    void longMultiple() {
         TestableMarket market = new TestableMarket();
         market.requestAndExecution(Order.limitLong(1, 10));
         market.requestAndExecution(Order.limitLong(1, 20));
@@ -57,7 +56,7 @@ public class MarketStaticticsTest {
     }
 
     @Test
-    public void longDown() throws Exception {
+    void longDown() {
         TestableMarket market = new TestableMarket();
         market.requestAndExecution(Order.limitLong(1, 10));
         market.requestAndExecution(Order.limitLong(1, 20));
@@ -69,7 +68,7 @@ public class MarketStaticticsTest {
     }
 
     @Test
-    public void shortMultiple() throws Exception {
+    void shortMultiple() {
         TestableMarket market = new TestableMarket();
         market.requestAndExecution(Order.limitShort(1, 10));
         market.requestAndExecution(Order.limitShort(1, 20));
@@ -80,7 +79,7 @@ public class MarketStaticticsTest {
     }
 
     @Test
-    public void shortLong() throws Exception {
+    void shortLong() {
         TestableMarket market = new TestableMarket();
         market.requestAndExecution(Order.limitShort(1, 10));
         market.requestAndExecution(Order.limitLong(1, 20));
@@ -91,7 +90,7 @@ public class MarketStaticticsTest {
     }
 
     @Test
-    public void longShort() throws Exception {
+    void longShort() {
         TestableMarket market = new TestableMarket();
         market.requestAndExecution(Order.limitLong(1, 10));
         market.requestAndExecution(Order.limitShort(1, 20));

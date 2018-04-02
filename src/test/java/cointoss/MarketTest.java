@@ -12,7 +12,7 @@ package cointoss;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import cointoss.order.Order;
 import cointoss.order.Order.Quantity;
@@ -20,12 +20,12 @@ import cointoss.order.Order.State;
 import cointoss.util.Num;
 
 /**
- * @version 2017/08/15 15:07:15
+ * @version 2018/04/02 16:48:08
  */
-public class MarketTest {
+class MarketTest {
 
     @Test
-    public void requestOrder() throws Exception {
+    void requestOrder() {
         TestableMarket market = new TestableMarket();
 
         assert market.orders().isEmpty();
@@ -37,7 +37,7 @@ public class MarketTest {
     }
 
     @Test
-    public void execute() throws Exception {
+    void execute() {
         TestableMarket market = new TestableMarket();
         market.request(Order.limitLong(1, 10)).to(order -> {
             assert order.remainingSize.get().is(1);
@@ -50,7 +50,7 @@ public class MarketTest {
     }
 
     @Test
-    public void executeDivided() throws Exception {
+    void executeDivided() {
         TestableMarket market = new TestableMarket();
         market.request(Order.limitLong(10, 10)).to(order -> {
             assert order.remainingSize.get().is(10);
@@ -68,7 +68,7 @@ public class MarketTest {
     }
 
     @Test
-    public void executeOverflow() throws Exception {
+    void executeOverflow() {
         TestableMarket market = new TestableMarket();
         market.request(Order.limitLong(10, 10)).to(order -> {
             assert order.remainingSize.get().is(10);
@@ -94,7 +94,7 @@ public class MarketTest {
     }
 
     @Test
-    public void executeExtra() throws Exception {
+    void executeExtra() {
         TestableMarket market = new TestableMarket();
         market.request(Order.limitLong(10, 10)).to(order -> {
             assert order.remainingSize.get().is(10);
@@ -114,7 +114,7 @@ public class MarketTest {
     }
 
     @Test
-    public void executeLongWithUpperPrice() throws Exception {
+    void executeLongWithUpperPrice() {
         TestableMarket market = new TestableMarket();
         market.request(Order.limitLong(10, 10)).to(order -> {
             market.execute(Side.BUY, 5, 12);
@@ -126,7 +126,7 @@ public class MarketTest {
     }
 
     @Test
-    public void executeLongWithLowerPrice() throws Exception {
+    void executeLongWithLowerPrice() {
         TestableMarket market = new TestableMarket();
         market.request(Order.limitLong(10, 10)).to(order -> {
             market.execute(Side.BUY, 5, 8);
@@ -138,7 +138,7 @@ public class MarketTest {
     }
 
     @Test
-    public void executeShortWithUpperPrice() throws Exception {
+    void executeShortWithUpperPrice() {
         TestableMarket market = new TestableMarket();
         market.request(Order.limitShort(10, 10)).to(order -> {
             market.execute(Side.BUY, 5, 12);
@@ -150,7 +150,7 @@ public class MarketTest {
     }
 
     @Test
-    public void executeShortWithLowerPrice() throws Exception {
+    void executeShortWithLowerPrice() {
         TestableMarket market = new TestableMarket();
         market.request(Order.limitShort(10, 10)).to(order -> {
             market.execute(Side.BUY, 5, 8);
@@ -162,7 +162,7 @@ public class MarketTest {
     }
 
     @Test
-    public void lag() throws Exception {
+    void lag() {
         TestableMarket market = new TestableMarket(5);
 
         market.requestSuccessfully(Order.limitLong(10, 10));
@@ -177,7 +177,7 @@ public class MarketTest {
     }
 
     @Test
-    public void shortWithTrigger() throws Exception {
+    void shortWithTrigger() {
         TestableMarket market = new TestableMarket();
 
         market.requestSuccessfully(Order.limitShort(1, 7).when(8));
@@ -190,7 +190,7 @@ public class MarketTest {
     }
 
     @Test
-    public void shortWithTriggerSamePrice() throws Exception {
+    void shortWithTriggerSamePrice() {
         TestableMarket market = new TestableMarket();
 
         market.requestSuccessfully(Order.limitShort(1, 8).when(8));
@@ -205,7 +205,7 @@ public class MarketTest {
     }
 
     @Test
-    public void shortMarketWithTrigger() throws Exception {
+    void shortMarketWithTrigger() {
         TestableMarket market = new TestableMarket();
 
         Order order = Order.marketShort(1).when(8);
@@ -230,7 +230,7 @@ public class MarketTest {
     }
 
     @Test
-    public void longWithTrigger() throws Exception {
+    void longWithTrigger() {
         TestableMarket market = new TestableMarket();
 
         market.requestSuccessfully(Order.limitLong(1, 13).when(12));
@@ -243,7 +243,7 @@ public class MarketTest {
     }
 
     @Test
-    public void longWithTriggerSamePrice() throws Exception {
+    void longWithTriggerSamePrice() {
         TestableMarket market = new TestableMarket();
 
         market.requestSuccessfully(Order.limitLong(1, 12).when(12));
@@ -258,7 +258,7 @@ public class MarketTest {
     }
 
     @Test
-    public void longMarketWithTrigger() throws Exception {
+    void longMarketWithTrigger() {
         TestableMarket market = new TestableMarket();
 
         Order order = Order.marketLong(1).when(12);
@@ -283,7 +283,7 @@ public class MarketTest {
     }
 
     @Test
-    public void fillOrKillLong() throws Exception {
+    void fillOrKillLong() {
         TestableMarket market = new TestableMarket();
 
         // success
@@ -313,7 +313,7 @@ public class MarketTest {
     }
 
     @Test
-    public void fillOrKillShort() throws Exception {
+    void fillOrKillShort() {
         TestableMarket market = new TestableMarket();
 
         // success
@@ -343,7 +343,7 @@ public class MarketTest {
     }
 
     @Test
-    public void immediateOrCancelLong() throws Exception {
+    void immediateOrCancelLong() {
         TestableMarket market = new TestableMarket();
 
         // success
@@ -374,7 +374,7 @@ public class MarketTest {
     }
 
     @Test
-    public void immediateOrCancelShort() throws Exception {
+    void immediateOrCancelShort() {
         TestableMarket market = new TestableMarket();
 
         // success
@@ -405,7 +405,7 @@ public class MarketTest {
     }
 
     @Test
-    public void marketLong() throws Exception {
+    void marketLong() {
         TestableMarket market = new TestableMarket();
 
         market.requestSuccessfully(Order.marketLong(1));
@@ -452,7 +452,7 @@ public class MarketTest {
     }
 
     @Test
-    public void marketShort() throws Exception {
+    void marketShort() {
         TestableMarket market = new TestableMarket();
 
         Order order = Order.marketShort(1);
@@ -505,7 +505,7 @@ public class MarketTest {
     }
 
     @Test
-    public void cancel() throws Exception {
+    void cancel() {
         TestableMarket market = new TestableMarket();
 
         Order order = market.requestSuccessfully(Order.limitShort(1, 12));
@@ -518,7 +518,7 @@ public class MarketTest {
     }
 
     @Test
-    public void observeSequencialExecutionsBySellSize() throws Exception {
+    void observeSequencialExecutionsBySellSize() {
         AtomicReference<Num> size = new AtomicReference<>();
 
         TestableMarket market = new TestableMarket();
@@ -538,7 +538,7 @@ public class MarketTest {
     }
 
     @Test
-    public void observeSequencialExecutionsByBuySize() throws Exception {
+    void observeSequencialExecutionsByBuySize() {
         AtomicReference<Num> size = new AtomicReference<>();
 
         TestableMarket market = new TestableMarket();

@@ -12,18 +12,18 @@ package cointoss;
 import static cointoss.Side.*;
 import static java.time.temporal.ChronoUnit.*;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import cointoss.util.Num;
 import kiss.Variable;
 
 /**
- * @version 2017/09/11 13:24:46
+ * @version 2018/04/02 16:48:42
  */
-public class TraderTest extends TraderTestSupport {
+class TraderTest extends TraderTestSupport {
 
     @Test
-    public void entryLimit() throws Exception {
+    void entryLimit() {
         assert hasPosition() == false;
 
         // try entry
@@ -36,7 +36,7 @@ public class TraderTest extends TraderTestSupport {
     }
 
     @Test
-    public void entryLimitInvalidParameters() throws Exception {
+    void entryLimitInvalidParameters() {
         // null side
         Entry entry = entryLimit(null, Num.ONE, Num.ONE, null);
         assert entry == null;
@@ -67,7 +67,7 @@ public class TraderTest extends TraderTestSupport {
     }
 
     @Test
-    public void entryMarket() throws Exception {
+    void entryMarket() {
         // try entry
         Entry entry = entryMarket(Side.BUY, Num.ONE, null);
         assert entry.remaining().is(0);
@@ -78,7 +78,7 @@ public class TraderTest extends TraderTestSupport {
     }
 
     @Test
-    public void entryMarketInvalidParameters() throws Exception {
+    void entryMarketInvalidParameters() {
         // null side
         Entry entry = entryMarket(null, Num.ONE, null);
         assert entry == null;
@@ -97,7 +97,7 @@ public class TraderTest extends TraderTestSupport {
     }
 
     @Test
-    public void exitLimit() throws Exception {
+    void exitLimit() {
         // entry and execute
         Entry entry = entryLimit(Side.BUY, Num.ONE, Num.TEN, null);
         market.execute(1, 10);
@@ -112,7 +112,7 @@ public class TraderTest extends TraderTestSupport {
     }
 
     @Test
-    public void exitLimitInvalidParameters() throws Exception {
+    void exitLimitInvalidParameters() {
         // entry and execute
         Entry entry = entryLimit(Side.BUY, Num.ONE, Num.TEN, null);
         market.execute(1, 10);
@@ -144,7 +144,7 @@ public class TraderTest extends TraderTestSupport {
     }
 
     @Test
-    public void exitMarket() throws Exception {
+    void exitMarket() {
         // entry and execute
         Entry entry = entryLimit(Side.BUY, Num.ONE, Num.TEN, null);
         market.execute(1, 10);
@@ -159,7 +159,7 @@ public class TraderTest extends TraderTestSupport {
     }
 
     @Test
-    public void exitMarketInvalidPrameters() throws Exception {
+    void exitMarketInvalidPrameters() {
         // entry and execute
         Entry entry = entryLimit(Side.BUY, Num.ONE, Num.TEN, null);
         market.execute(1, 10);
@@ -179,7 +179,7 @@ public class TraderTest extends TraderTestSupport {
     }
 
     @Test
-    public void completingEntry() throws Exception {
+    void completingEntry() {
         Variable<Boolean> completed = completingEntry.to();
         assert completed.isAbsent();
 
@@ -193,7 +193,7 @@ public class TraderTest extends TraderTestSupport {
     }
 
     @Test
-    public void completingExit() throws Exception {
+    void completingExit() {
         Variable<Boolean> completed = completingExit.to();
         assert completed.isAbsent();
 
@@ -212,7 +212,7 @@ public class TraderTest extends TraderTestSupport {
     }
 
     @Test
-    public void closingPosition() throws Exception {
+    void closingPosition() {
         Variable<Boolean> completed = closingPosition.to();
         assert completed.isAbsent();
 
@@ -231,7 +231,7 @@ public class TraderTest extends TraderTestSupport {
     }
 
     @Test
-    public void keep() throws Exception {
+    void keep() {
         Variable<Execution> state = market.timeline.take(keep(5, SECONDS, e -> e.price.isLessThan(10))).to();
         assert state.isAbsent();
 
@@ -256,7 +256,7 @@ public class TraderTest extends TraderTestSupport {
     }
 
     @Test
-    public void testHasPosition() throws Exception {
+    void testHasPosition() {
         assert hasPosition() == false;
         Exit exiter = entry(BUY, 1, 10);
         assert hasPosition() == true;
@@ -265,7 +265,7 @@ public class TraderTest extends TraderTestSupport {
     }
 
     @Test
-    public void isWinAndLose() throws Exception {
+    void isWinAndLose() {
         entry(BUY, 1, 5).exit(1, 10);
         assert latest().isWin() == true;
         assert latest().isLose() == false;

@@ -9,18 +9,18 @@
  */
 package trademate.order;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import cointoss.order.Order;
 import cointoss.order.Order.State;
 
 /**
- * @version 2017/12/02 1:37:21
+ * @version 2018/04/02 16:49:22
  */
-public class OrderSetTest {
+class OrderSetTest {
 
     @Test
-    public void set() throws Exception {
+    void set() {
         Order o1 = Order.limitLong(1, 100);
         o1.state.set(State.ACTIVE);
         Order o2 = Order.limitLong(1, 200);

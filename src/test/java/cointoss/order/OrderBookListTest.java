@@ -12,15 +12,15 @@ package cointoss.order;
 import java.util.Collections;
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import cointoss.Side;
 import cointoss.util.Num;
 
 /**
- * @version 2018/01/24 23:56:15
+ * @version 2018/04/02 16:46:26
  */
-public class OrderBookListTest {
+class OrderBookListTest {
 
     @Test
     public void buy() throws Exception {

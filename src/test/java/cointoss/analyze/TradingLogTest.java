@@ -11,17 +11,17 @@ package cointoss.analyze;
 
 import static cointoss.Side.*;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import cointoss.TraderTestSupport;
 
 /**
- * @version 2017/09/18 9:19:37
+ * @version 2018/04/02 16:44:56
  */
 public class TradingLogTest extends TraderTestSupport {
 
     @Test
-    public void complete() throws Exception {
+    void complete() {
         entry(BUY, 1, 10).exit(1, 15);
 
         TradingLog log = createLog();
@@ -32,7 +32,7 @@ public class TradingLogTest extends TraderTestSupport {
     }
 
     @Test
-    public void completeProfit() throws Exception {
+    void completeProfit() {
         entry(BUY, 1, 10).exit(1, 15);
 
         TradingLog log = createLog();
@@ -44,7 +44,7 @@ public class TradingLogTest extends TraderTestSupport {
     }
 
     @Test
-    public void completeLoss() throws Exception {
+    void completeLoss() {
         entry(SELL, 1, 10).exit(1, 15);
 
         TradingLog log = createLog();
@@ -56,7 +56,7 @@ public class TradingLogTest extends TraderTestSupport {
     }
 
     @Test
-    public void completeProfitMultiExitOrders() throws Exception {
+    void completeProfitMultiExitOrders() {
         entry(BUY, 1, 10).exit(0.5, 15).exit(0.5, 20);
 
         TradingLog log = createLog();
@@ -68,7 +68,7 @@ public class TradingLogTest extends TraderTestSupport {
     }
 
     @Test
-    public void completeProfitMultiExitExecutions() throws Exception {
+    void completeProfitMultiExitExecutions() {
         entry(BUY, 1, 10).exit(1, 15, 0.5, 0.5);
 
         TradingLog log = createLog();
@@ -80,7 +80,7 @@ public class TradingLogTest extends TraderTestSupport {
     }
 
     @Test
-    public void active() throws Exception {
+    void active() {
         entry(BUY, 1, 10).exit(0.5, 15);
 
         TradingLog log = createLog();
@@ -91,7 +91,7 @@ public class TradingLogTest extends TraderTestSupport {
     }
 
     @Test
-    public void activeProfit() throws Exception {
+    void activeProfit() {
         entry(BUY, 1, 10).exit(0.5, 15);
 
         TradingLog log = createLog();
@@ -103,7 +103,7 @@ public class TradingLogTest extends TraderTestSupport {
     }
 
     @Test
-    public void activeLoss() throws Exception {
+    void activeLoss() {
         entry(SELL, 1, 10).exit(0.5, 15);
 
         TradingLog log = createLog();
@@ -115,7 +115,7 @@ public class TradingLogTest extends TraderTestSupport {
     }
 
     @Test
-    public void activeProfitMultipleExitOrders() throws Exception {
+    void activeProfitMultipleExitOrders() {
         entry(BUY, 1, 10).exit(0.5, 15).exit(0.2, 20);
 
         TradingLog log = createLog();
@@ -127,7 +127,7 @@ public class TradingLogTest extends TraderTestSupport {
     }
 
     @Test
-    public void activeProfitMultiExitExecutions() throws Exception {
+    void activeProfitMultiExitExecutions() {
         entry(BUY, 1, 10).exit(1, 20, 0.2, 0.3);
 
         TradingLog log = createLog();
@@ -139,7 +139,7 @@ public class TradingLogTest extends TraderTestSupport {
     }
 
     @Test
-    public void entries() throws Exception {
+    void entries() {
         entry(BUY, 1, 10).exit(1, 15);
         entry(BUY, 1, 15).exit(1, 25, 0.5);
 
@@ -156,7 +156,7 @@ public class TradingLogTest extends TraderTestSupport {
     }
 
     @Test
-    public void profitAndLoss() throws Exception {
+    void profitAndLoss() {
         entry(BUY, 1, 10).exit(1, 15);
         entry(BUY, 1, 15).exit(1, 25);
 
@@ -184,7 +184,7 @@ public class TradingLogTest extends TraderTestSupport {
     }
 
     @Test
-    public void winningRate1() throws Exception {
+    void winningRate1() {
         // win
         entry(BUY, 1, 10).exit(1, 15);
         entry(BUY, 1, 15).exit(1, 25);
@@ -198,7 +198,7 @@ public class TradingLogTest extends TraderTestSupport {
     }
 
     @Test
-    public void winningRate2() throws Exception {
+    void winningRate2() {
         // win
         entry(BUY, 1, 10).exit(1, 15);
         entry(BUY, 1, 15).exit(1, 25);
@@ -211,7 +211,7 @@ public class TradingLogTest extends TraderTestSupport {
     }
 
     @Test
-    public void winningRateNoWin() throws Exception {
+    void winningRateNoWin() {
         // lose
         entry(SELL, 1, 25).exit(1, 30);
         entry(SELL, 1, 25).exit(1, 30);
@@ -221,7 +221,7 @@ public class TradingLogTest extends TraderTestSupport {
     }
 
     @Test
-    public void winningRateNoLose() throws Exception {
+    void winningRateNoLose() {
         // win
         entry(BUY, 1, 25).exit(1, 30);
         entry(BUY, 1, 25).exit(1, 30);
@@ -231,7 +231,7 @@ public class TradingLogTest extends TraderTestSupport {
     }
 
     @Test
-    public void profitFactorSame() throws Exception {
+    void profitFactorSame() {
         // win
         entry(BUY, 1, 10).exit(1, 15);
         entry(BUY, 1, 15).exit(1, 25);
@@ -245,7 +245,7 @@ public class TradingLogTest extends TraderTestSupport {
     }
 
     @Test
-    public void profitFactorUp() throws Exception {
+    void profitFactorUp() {
         // win
         entry(BUY, 1, 10).exit(1, 15);
         entry(BUY, 1, 15).exit(1, 25);
@@ -258,7 +258,7 @@ public class TradingLogTest extends TraderTestSupport {
     }
 
     @Test
-    public void profitFactorDown() throws Exception {
+    void profitFactorDown() {
         // win
         entry(BUY, 1, 10).exit(1, 20);
 
@@ -271,7 +271,7 @@ public class TradingLogTest extends TraderTestSupport {
     }
 
     @Test
-    public void profitFactorNoLose() throws Exception {
+    void profitFactorNoLose() {
         // win
         entry(BUY, 1, 10).exit(1, 20);
 
@@ -280,7 +280,7 @@ public class TradingLogTest extends TraderTestSupport {
     }
 
     @Test
-    public void profitFactorNoWin() throws Exception {
+    void profitFactorNoWin() {
         // lose
         entry(SELL, 1, 25).exit(1, 30);
         entry(SELL, 1, 30).exit(1, 40);
@@ -290,7 +290,7 @@ public class TradingLogTest extends TraderTestSupport {
     }
 
     @Test
-    public void drawDown1() throws Exception {
+    void drawDown1() {
         // win
         entry(BUY, 1, 10).exit(1, 15);
         entry(BUY, 1, 10).exit(1, 15);
@@ -304,7 +304,7 @@ public class TradingLogTest extends TraderTestSupport {
     }
 
     @Test
-    public void drawDown2() throws Exception {
+    void drawDown2() {
         entry(BUY, 1, 10).exit(1, 30); // win 20
         entry(SELL, 1, 25).exit(1, 30); // lose -5
         entry(BUY, 1, 10).exit(1, 40); // win 30
@@ -319,7 +319,7 @@ public class TradingLogTest extends TraderTestSupport {
     }
 
     @Test
-    public void drawDown3() throws Exception {
+    void drawDown3() {
         entry(BUY, 1, 10).exit(1, 30); // win 20
         entry(BUY, 1, 10).exit(1, 40); // win 30
         entry(BUY, 1, 10).exit(1, 40); // win 30
@@ -330,7 +330,7 @@ public class TradingLogTest extends TraderTestSupport {
     }
 
     @Test
-    public void drawDown4() throws Exception {
+    void drawDown4() {
         entry(SELL, 1, 25).exit(1, 30); // lose -5
         entry(SELL, 1, 25).exit(1, 50); // lose -25
         entry(SELL, 1, 25).exit(1, 30); // lose -5
@@ -342,7 +342,7 @@ public class TradingLogTest extends TraderTestSupport {
     }
 
     @Test
-    public void asset() throws Exception {
+    void asset() {
         entry(BUY, 1, 10).exit(1, 30); // win 20
         assert createLog().asset().is(120);
         entry(SELL, 1, 25).exit(1, 30); // lose -5

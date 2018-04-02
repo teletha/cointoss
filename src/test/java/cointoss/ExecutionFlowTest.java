@@ -11,20 +11,20 @@ package cointoss;
 
 import java.time.ZonedDateTime;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import cointoss.ticker.ExecutionFlow;
 import cointoss.util.Num;
 
 /**
- * @version 2017/11/09 11:34:34
+ * @version 2018/04/02 16:47:20
  */
-public class ExecutionFlowTest {
+class ExecutionFlowTest {
 
     private ZonedDateTime base = ZonedDateTime.now().withSecond(0).withNano(0);
 
     @Test
-    public void price() throws Exception {
+    void price() {
         ExecutionFlow flow = new ExecutionFlow(3);
         assert flow.latest.price.is(0);
 
@@ -39,7 +39,7 @@ public class ExecutionFlowTest {
     }
 
     @Test
-    public void longValues() throws Exception {
+    void longValues() {
         ExecutionFlow flow = new ExecutionFlow(3);
         flow.record(createBuy(0, 1, 1));
         assert flow.longVolume.is(1);
@@ -55,7 +55,7 @@ public class ExecutionFlowTest {
     }
 
     @Test
-    public void shortValues() throws Exception {
+    void shortValues() {
         ExecutionFlow flow = new ExecutionFlow(3);
         flow.record(createSell(0, -1, 1));
         assert flow.shortVolume.is(1);

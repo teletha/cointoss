@@ -9,15 +9,15 @@
  */
 package cointoss.util;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
- * @version 2017/09/10 9:27:14
+ * @version 2018/04/02 16:46:58
  */
-public class RingBufferTest {
+class RingBufferTest {
 
     @Test
-    public void append() throws Exception {
+    void append() {
         RingBuffer<Integer> buffer = new RingBuffer<>(3, "");
         assert buffer.add(1) == null;
         assert buffer.add(2) == null;
@@ -29,7 +29,7 @@ public class RingBufferTest {
     }
 
     @Test
-    public void latest() throws Exception {
+    void latest() {
         RingBuffer<Integer> buffer = new RingBuffer<>(3, "");
         buffer.add(1);
         assert buffer.latest() == 1;
@@ -46,7 +46,7 @@ public class RingBufferTest {
     }
 
     @Test
-    public void latestOffset() throws Exception {
+    void latestOffset() {
         RingBuffer<Integer> buffer = new RingBuffer<>(3, "");
         buffer.add(1);
         assert buffer.latest(1) == null;
@@ -65,7 +65,7 @@ public class RingBufferTest {
     }
 
     @Test
-    public void set() throws Exception {
+    void set() {
         RingBuffer<Integer> buffer = new RingBuffer<>(5, "");
         buffer.set(1, 1);
         assert buffer.get(0) == null;

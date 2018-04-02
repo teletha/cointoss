@@ -16,7 +16,7 @@ public class Project extends bee.api.Project {
         require("com.github.teletha", "viewtify", "1.0");
         require("com.github.teletha", "filer", "0.5");
         require("com.github.teletha", "marionette", "0.1");
-        require("com.github.teletha", "antibug", "0.3").atTest();
+        require("com.github.teletha", "antibug", "0.6").atTest();
         require("org.apache.commons", "commons-lang3", "3.7");
         require("commons-codec", "commons-codec", "1.11");
         require("org.apache.logging.log4j", "log4j-core", "2.10.0");
