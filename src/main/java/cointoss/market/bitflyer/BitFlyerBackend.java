@@ -104,6 +104,9 @@ class BitFlyerBackend implements MarketBackend {
     /** The shared server health. */
     private final Signal<Health> health;
 
+    /** The singleton. */
+    private final OkHttpClient client = new OkHttpClient();
+
     /**
      * @param type
      */
@@ -147,6 +150,8 @@ class BitFlyerBackend implements MarketBackend {
     @Override
     public void vandalize() {
         disposer.dispose();
+        client.dispatcher().executorService().shutdown();
+        client.connectionPool().evictAll();
     }
 
     /**
@@ -387,7 +392,7 @@ class BitFlyerBackend implements MarketBackend {
                         .build();
             }
 
-            try (Response response = new OkHttpClient().newCall(request).execute()) {
+            try (Response response = client.newCall(request).execute()) {
                 int code = response.code();
                 String value = response.body().string();
 
@@ -411,6 +416,7 @@ class BitFlyerBackend implements MarketBackend {
                         } else {
                             json.find(selector, type).to(observer);
                         }
+                        observer.complete();
                     }
                 } else {
                     observer.error(new Error("HTTP Status " + code + " " + value));
@@ -418,8 +424,6 @@ class BitFlyerBackend implements MarketBackend {
             } catch (Throwable e) {
                 observer.error(e);
             }
-            observer.complete();
-
             return disposer;
         });
     }

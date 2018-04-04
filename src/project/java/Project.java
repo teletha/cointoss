@@ -22,7 +22,7 @@ public class Project extends bee.api.Project {
         require("org.apache.logging.log4j", "log4j-core", "2.10.0");
         require("org.apache.logging.log4j", "log4j-jul", "2.10.0");
         require("org.slf4j", "slf4j-simple", "1.7.22");
-        require("com.pubnub", "pubnub-gson", "4.18.0");
+        require("com.pubnub", "pubnub-gson", "4.19.0");
         require("org.magicwerk", "brownies-collections", "0.9.13");
     }
 }
