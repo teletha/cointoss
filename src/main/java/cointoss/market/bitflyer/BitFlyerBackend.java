@@ -385,7 +385,7 @@ class BitFlyerBackend implements MarketBackend {
             } else {
                 request = new Request.Builder().url(path)
                         .addHeader("Content-Type", "application/json")
-                        .addHeader("Cookie", "api_session=" + maintainer.session())
+                        .addHeader("Cookie", "api_session=" + maintainer.session() + "; api_session_v2=" + maintainer.session2)
                         .addHeader("ACCESS-SIGN", sign)
                         .addHeader("X-Requested-With", "XMLHttpRequest")
                         .post(RequestBody.create(mime, body))
@@ -438,6 +438,8 @@ class BitFlyerBackend implements MarketBackend {
         /** The session id. */
         private String session;
 
+        private String session2;
+
         private boolean started = false;
 
         /**
@@ -480,7 +482,9 @@ class BitFlyerBackend implements MarketBackend {
                     });
                 } else {
                     session = browser.cookie("api_session");
-                    browser.dispose();
+                    session2 = browser.cookie("api_session_v2");
+                    System.out.println(session);
+                    System.out.println(session2);
                 }
 
             }

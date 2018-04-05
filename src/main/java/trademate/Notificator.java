@@ -84,6 +84,7 @@ public class Notificator extends Preference<Notificator> {
                             .position(Pos.TOP_RIGHT)
                             .hideAfter(Duration.seconds(showTime.get()))
                             .text(message)
+                            .owner(Viewtify.root().root())
                             .show();
                 });
             }
