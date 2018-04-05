@@ -254,7 +254,7 @@ class BitFlyerLog extends MarketLog {
                         }
                     }
                 } catch (Exception e) {
-                    observer.error(e);
+                    // ignore to retry
                 }
 
                 if (realtimeId != 0 && realtimeId <= latestId) {

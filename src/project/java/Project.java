@@ -24,5 +24,6 @@ public class Project extends bee.api.Project {
         require("org.slf4j", "slf4j-simple", "1.7.22");
         require("com.pubnub", "pubnub-gson", "4.19.0");
         require("org.magicwerk", "brownies-collections", "0.9.13");
+        require("org.elasticsearch.client", "elasticsearch-rest-high-level-client", "6.2.3");
     }
 }
