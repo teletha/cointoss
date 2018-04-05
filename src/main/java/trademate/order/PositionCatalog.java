@@ -14,6 +14,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Consumer;
 
+import javafx.beans.InvalidationListener;
 import javafx.collections.ObservableList;
 
 import cointoss.Position;
@@ -21,6 +22,7 @@ import cointoss.Side;
 import cointoss.order.Order;
 import cointoss.order.OrderBookList;
 import cointoss.util.Num;
+import kiss.Signal;
 import kiss.Variable;
 import trademate.TradingView;
 import viewtify.UI;
@@ -61,6 +63,20 @@ public class PositionCatalog extends View {
 
     private PositionManager manager;
 
+    private static <V> Signal<ObservableList<V>> signal(ObservableList<V> list) {
+        return new Signal<>((observer, disposer) -> {
+            InvalidationListener listener = e -> {
+                observer.accept(list);
+            };
+
+            list.addListener(listener);
+
+            return disposer.add(() -> {
+                list.removeListener(listener);
+            });
+        });
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -69,10 +85,10 @@ public class PositionCatalog extends View {
         Calculation<Num> totalAmount = Viewtify.calculate(positions.values).map(p -> p.size).reduce(Num.ZERO, Num::plus);
         Calculation<Num> totalPrice = Viewtify.calculate(positions.values).reduce(Num.ZERO, (t, p) -> t.plus(p.price.multiply(p.size)));
         Calculation<Num> averagePrice = Viewtify.calculate(totalPrice, totalAmount, (total, amount) -> total.divide(amount).scale(0));
-        Calculation<Num> totalProfit = Viewtify.calculate(positions.values)
-                .flatVariable(p -> p.profit)
-                .reduce(Num.ZERO, Num::plus)
-                .map(v -> v.scale(0));
+        Calculation<Num> totalProfit = Viewtify.calculate(positions.values).flatVariable(p -> {
+            System.out.println(p.profit);
+            return p.profit;
+        }).reduce(Num.ZERO, Num::plus);
 
         manager = new PositionManager(positions.values);
         openPositionDate.model(o -> o.date).render((ui, item) -> ui.text(formatter.format(item)));
@@ -96,7 +112,10 @@ public class PositionCatalog extends View {
         minus.price = Num.of(800000);
         minus.size = Variable.of(Num.ONE);
 
-        view.market().yourExecution.startWith().to(p -> {
+        Calculation<Num> a = Viewtify.calculate(pp.profit);
+        Calculation<Num> b = Viewtify.calculate(minus.profit);
+
+        view.market().yourExecution.startWith(pp, minus).on(Viewtify.UIThread).to(p -> {
             for (Position position : positions.values) {
                 if (position.side == p.side) {
                     if (position.price.is(p.price)) {
@@ -126,7 +145,7 @@ public class PositionCatalog extends View {
             }
         });
 
-        view.market().latest.observe().to(e -> {
+        view.market().latest.observe().on(Viewtify.UIThread).to(e -> {
             for (Position position : positions.values) {
                 if (position.isBuy()) {
                     position.profit.set(e.price.minus(position.price).multiply(position.size).scale(0));

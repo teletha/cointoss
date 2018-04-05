@@ -107,6 +107,9 @@ class BitFlyerBackend implements MarketBackend {
     /** The singleton. */
     private final OkHttpClient client = new OkHttpClient();
 
+    /** The session key. */
+    private final String sessionKey = "api_session_v2";
+
     /**
      * @param type
      */
@@ -385,8 +388,7 @@ class BitFlyerBackend implements MarketBackend {
             } else {
                 request = new Request.Builder().url(path)
                         .addHeader("Content-Type", "application/json")
-                        .addHeader("Cookie", "api_session=" + maintainer.session() + "; api_session_v2=" + maintainer.session2)
-                        .addHeader("ACCESS-SIGN", sign)
+                        .addHeader("Cookie", sessionKey + "=" + maintainer.session)
                         .addHeader("X-Requested-With", "XMLHttpRequest")
                         .post(RequestBody.create(mime, body))
                         .build();
@@ -438,7 +440,7 @@ class BitFlyerBackend implements MarketBackend {
         /** The session id. */
         private String session;
 
-        private String session2;
+        private String cookies;
 
         private boolean started = false;
 
@@ -475,18 +477,16 @@ class BitFlyerBackend implements MarketBackend {
 
                         Viewtify.inWorker(() -> {
                             browser.click("form > label").input("#ConfirmationCode", code).click("form > button");
-                            session = browser.cookie("api_session");
+                            session = browser.cookie(sessionKey);
                             browser.reload();
                             browser.dispose();
                         });
                     });
                 } else {
-                    session = browser.cookie("api_session");
-                    session2 = browser.cookie("api_session_v2");
-                    System.out.println(session);
-                    System.out.println(session2);
+                    session = browser.cookie(sessionKey);
+                    browser.reload();
+                    browser.dispose();
                 }
-
             }
         }
 
