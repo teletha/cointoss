@@ -25,5 +25,6 @@ public class Project extends bee.api.Project {
         require("com.pubnub", "pubnub-gson", "4.19.0");
         require("org.magicwerk", "brownies-collections", "0.9.13");
         require("org.elasticsearch.client", "elasticsearch-rest-high-level-client", "6.2.3");
+        require("org.influxdb", "influxdb-java", "2.9");
     }
 }
