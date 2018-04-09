@@ -20,7 +20,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -88,11 +87,10 @@ class BitFlyerLog extends MarketLog {
             this.type = type;
             this.root = cacheRoot();
 
-            List<Path> files = Filer.walk(root, "execution*.log");
             ZonedDateTime start = null;
             ZonedDateTime end = null;
 
-            for (Path file : files) {
+            for (Path file : Filer.walk(root, "execution*.log").toList()) {
                 String name = file.getFileName().toString();
                 ZonedDateTime date = LocalDate.parse(name.substring(9, 17), fomatFile).atTime(0, 0, 0, 0).atZone(Chrono.UTC);
 
