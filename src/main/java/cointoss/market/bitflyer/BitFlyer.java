@@ -15,7 +15,7 @@ import cointoss.MarketProvider;
 import cointoss.util.Span;
 
 /**
- * @version 2018/01/29 21:00:37
+ * @version 2018/04/10 14:18:05
  */
 public enum BitFlyer implements MarketProvider {
     BTC_JPY, FX_BTC_JPY, ETC_BTC, BCH_BTC;
@@ -39,14 +39,22 @@ public enum BitFlyer implements MarketProvider {
     private final MarketBackend marketBackend = new BitFlyerBackend(this);
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String orgnizationName() {
+        return getClass().getSimpleName();
+    }
+
+    /**
      * <p>
      * Compute full name.
      * </p>
      * 
      * @return
      */
-    public String fullName() {
-        return "BitFlyer " + name();
+    public String marketName() {
+        return orgnizationName() + " " + name();
     }
 
     /**

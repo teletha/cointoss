@@ -136,7 +136,7 @@ class BitFlyerBackend implements MarketBackend {
      */
     @Override
     public String name() {
-        return type.fullName();
+        return type.marketName();
     }
 
     /**

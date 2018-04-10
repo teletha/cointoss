@@ -131,15 +131,7 @@ public class Ticker {
      * @param consumer
      */
     public final void each(Consumer<Tick> consumer) {
-        lock.readLock().lock();
-
-        try {
-            for (Tick tick : ticks) {
-                consumer.accept(tick);
-            }
-        } finally {
-            lock.readLock().unlock();
-        }
+        each(0, size(), consumer);
     }
 
     /**

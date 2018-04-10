@@ -9,10 +9,9 @@
  */
 package trademate.console;
 
-import static java.util.concurrent.TimeUnit.*;
-
 import java.time.LocalTime;
 import java.util.LinkedList;
+import java.util.concurrent.TimeUnit;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -56,7 +55,7 @@ public class Console extends View {
     @Override
     protected void initialize() {
         // create logger
-        String name = view.provider.fullName();
+        String name = view.provider.marketName();
         logger = LogManager.getLogger(name);
         ConsoleAppender.consoles.put(name, this);
 
@@ -101,7 +100,7 @@ public class Console extends View {
          */
         @Override
         protected void initialize() {
-            market.timeline.throttle(1000, MILLISECONDS).to(e -> {
+            market.timeline.throttle(1000, TimeUnit.MILLISECONDS).to(e -> {
                 ExecutionFlow flow = market.flow;
 
                 StringBuilder builder = new StringBuilder();

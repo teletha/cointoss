@@ -27,4 +27,13 @@ public interface MarketProvider {
      * @return
      */
     MarketLog log();
+
+    /**
+     * Compute orgnization name.
+     * 
+     * @return
+     */
+    default String orgnizationName() {
+        return getClass().getSimpleName();
+    }
 }
