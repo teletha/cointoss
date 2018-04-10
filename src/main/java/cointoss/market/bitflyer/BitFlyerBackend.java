@@ -440,8 +440,6 @@ class BitFlyerBackend implements MarketBackend {
         /** The session id. */
         private String session;
 
-        private String cookies;
-
         private boolean started = false;
 
         /**
@@ -463,29 +461,34 @@ class BitFlyerBackend implements MarketBackend {
             if (started == false) {
                 started = true;
 
-                Browser browser = new Browser().configHeadless(false).configProfile(".log/bitflyer/chrome");
-                browser.load("https://lightning.bitflyer.jp") //
-                        .input("#LoginId", name)
-                        .input("#Password", password)
-                        .click("#login_btn");
+                try {
+                    Browser browser = new Browser().configHeadless(false).configProfile(".log/bitflyer/chrome");
+                    browser.load("https://lightning.bitflyer.jp") //
+                            .input("#LoginId", name)
+                            .input("#Password", password)
+                            .click("#login_btn");
 
-                if (browser.uri().equals("https://lightning.bitflyer.jp/Home/TwoFactorAuth")) {
-                    Viewtify.inUI(() -> {
-                        String code = new TextInputDialog().showAndWait()
-                                .orElseThrow(() -> new IllegalArgumentException("二段階認証の確認コードが間違っています"))
-                                .trim();
+                    if (browser.uri().equals("https://lightning.bitflyer.jp/Home/TwoFactorAuth")) {
+                        Viewtify.inUI(() -> {
+                            String code = new TextInputDialog().showAndWait()
+                                    .orElseThrow(() -> new IllegalArgumentException("二段階認証の確認コードが間違っています"))
+                                    .trim();
 
-                        Viewtify.inWorker(() -> {
-                            browser.click("form > label").input("#ConfirmationCode", code).click("form > button");
-                            session = browser.cookie(sessionKey);
-                            browser.reload();
-                            browser.dispose();
+                            Viewtify.inWorker(() -> {
+                                browser.click("form > label").input("#ConfirmationCode", code).click("form > button");
+                                session = browser.cookie(sessionKey);
+                                browser.reload();
+                                browser.dispose();
+                            });
                         });
-                    });
-                } else {
-                    session = browser.cookie(sessionKey);
-                    browser.reload();
-                    browser.dispose();
+                    } else {
+                        session = browser.cookie(sessionKey);
+                        browser.reload();
+                        browser.dispose();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    throw I.quiet(e);
                 }
             }
         }

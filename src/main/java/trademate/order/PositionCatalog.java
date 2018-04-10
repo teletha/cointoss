@@ -17,6 +17,7 @@ import java.util.function.Consumer;
 import javafx.collections.ObservableList;
 
 import cointoss.Position;
+import cointoss.PositionManager;
 import cointoss.Side;
 import cointoss.order.Order;
 import cointoss.order.OrderBookList;
@@ -93,7 +94,7 @@ public class PositionCatalog extends View {
         minus.price = Num.of(800000);
         minus.size = Variable.of(Num.ONE);
 
-        view.market().yourExecution.startWith(pp, minus).on(Viewtify.UIThread).to(p -> {
+        view.market().yourExecution.startWith().on(Viewtify.UIThread).to(p -> {
             for (Position position : positions.values) {
                 if (position.side == p.side) {
                     if (position.price.is(p.price)) {

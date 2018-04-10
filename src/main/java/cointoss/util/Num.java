@@ -461,7 +461,7 @@ public class Num implements Comparable<Num> {
      * @see BigDecimal#intValueExact();
      */
     public final int toInt() {
-        return delegate.intValueExact();
+        return delegate.intValue();
     }
 
     /**

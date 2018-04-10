@@ -32,6 +32,7 @@ import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
 import kiss.Variable;
+import viewtify.Viewtify;
 
 /**
  * @version 2018/02/25 18:36:30
@@ -175,7 +176,7 @@ public class Market implements Disposable {
         backend.initialize(this, log);
 
         orderTimeline = backend.getOrderBook();
-        backend.add(orderTimeline.to(board -> {
+        backend.add(orderTimeline.on(Viewtify.UIThread).to(board -> {
             orderBook.shorts.update(board.asks);
             orderBook.longs.update(board.bids);
         }));

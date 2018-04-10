@@ -14,21 +14,19 @@
 
 .SELL {
 	-side: rgb(247, 105, 77);
-	-fx-text-fill: -side
+	-fx-text-fill: -side;
 }
 
 #shortList .list-cell {
 	-fx-text-fill: inherit;
   -fx-label-padding: 0 0 0 70px;
   -fx-background-color: rgba(247, 105, 77, 0.2);
-  -fx-background-insets: 0 300px 0 0;
 }
 
 #longList .list-cell {
 	-fx-text-fill: inherit;
   -fx-label-padding: 0 0 0 70px;
   -fx-background-color: rgba(251, 189, 42, 0.2);
-  -fx-background-insets: 0 300px 0 0;
 }
 
 #priceLatest {

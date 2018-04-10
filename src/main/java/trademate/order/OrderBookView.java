@@ -83,6 +83,8 @@ public class OrderBookView extends View {
      */
     private class CellView extends ListCell<OrderUnit> {
 
+        private Num base = Num.of(210);
+
         /**
          * @param side
          */
@@ -110,16 +112,11 @@ public class OrderBookView extends View {
                 super.updateItem(e, empty);
 
                 if (empty || e == null) {
-                    setText(null);
-                    setGraphic(null);
-                    setStyle("-fx-background-insets: 0 300px 0 0;");
                 } else {
                     Num normalize = e.size.scale(3);
-                    setText(e.price() + "  " + normalize);
-
-                    StringBuilder style = new StringBuilder();
-                    style.append("-fx-background-insets: 0 " + Num.of(210).minus(normalize.multiply(Num.TWO)) + "px 0 0;");
-                    setStyle(style.toString());
+                    setText(e.price() + " " + normalize);
+                    // setStyle("-fx-background-insets: 0 " +
+                    // base.minus(normalize.multiply(Num.TWO)) + "px 0 0;");
                 }
             });
         }
