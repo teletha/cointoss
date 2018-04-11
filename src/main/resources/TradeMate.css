@@ -20,7 +20,7 @@
 #shortList .list-cell,
 #longList .list-cell {
 	-fx-text-fill: inherit;
-	-fx-label-padding: 0 0 0 30px;
+	-fx-label-padding: 0 0 0 66px;
 }
 
 #shortList .scroll-bar:horizontal *,

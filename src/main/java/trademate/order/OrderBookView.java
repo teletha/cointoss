@@ -127,7 +127,7 @@ public class OrderBookView extends View {
 
                     double width = Math.min(200, normalize.toDouble());
                     back.setWidth(width);
-                    back.setTranslateX(width - 30);
+                    back.setTranslateX(width - 66);
                     setTranslateX(-width);
 
                     // using inline style makes memory leak
