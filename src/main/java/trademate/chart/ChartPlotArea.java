@@ -152,8 +152,8 @@ public class ChartPlotArea extends Region {
      * Visualize mouse tracker in chart.
      */
     private void visualizeMouseTrack() {
-        TickLable labelX = mouseTrackVertical.createLabel();
-        TickLable labelY = mouseTrackHorizontal.createLabel();
+        TickLable labelX = mouseTrackVertical.createLabel("MouseX");
+        TickLable labelY = mouseTrackHorizontal.createLabel("MouseY");
 
         // track on move
         setOnMouseMoved(e -> {
@@ -205,7 +205,7 @@ public class ChartPlotArea extends Region {
             }
 
             Num price = Num.of(Math.floor(axisY.getValueForPosition(clickedPosition)));
-            TickLable label = notifyPrice.createLabel(price);
+            TickLable label = notifyPrice.createLabel("NotifyPrice", price);
 
             label.add(chart.trade.market().signalByPrice(price).on(Viewtify.UIThread).to(exe -> {
                 notificator.priceSignal.notify("Rearch to " + price);
@@ -220,7 +220,7 @@ public class ChartPlotArea extends Region {
     private void visualizeOrderPrice() {
         chart.trade.market().yourOrder.on(Viewtify.UIThread).to(o -> {
             LineMark mark = o.isBuy() ? orderBuyPrice : orderSellPrice;
-            TickLable label = mark.createLabel(o.price);
+            TickLable label = mark.createLabel("OrderPrice", o.price);
 
             o.state.observe().take(State.CANCELED, State.COMPLETED).take(1).on(Viewtify.UIThread).to(() -> {
                 mark.remove(label);
@@ -232,9 +232,11 @@ public class ChartPlotArea extends Region {
      * Visualize latest price in chart.
      */
     private void visualizeLatestPrice() {
+        TickLable latest = latestPrice.createLabel("LatestPrice");
+
         chart.trade.market().timeline.map(e -> e.price).diff().on(Viewtify.UIThread).to(price -> {
-            latestPrice.removeAll();
-            latestPrice.createLabel(price);
+            latest.value.set(price.toDouble());
+            latestPrice.layoutLine.requestLayout();
         });
     }
 
@@ -498,8 +500,8 @@ public class ChartPlotArea extends Region {
          * 
          * @return
          */
-        private TickLable createLabel() {
-            return createLabel(null);
+        private TickLable createLabel(String title) {
+            return createLabel(title, null);
         }
 
         /**
@@ -507,8 +509,8 @@ public class ChartPlotArea extends Region {
          * 
          * @return
          */
-        private TickLable createLabel(Num price) {
-            TickLable label = axis.createLabel(classNames);
+        private TickLable createLabel(String title, Num price) {
+            TickLable label = axis.createLabel(title, classNames);
             if (price != null) label.value.set(price.toDouble());
             labels.add(label);
 
@@ -526,6 +528,7 @@ public class ChartPlotArea extends Region {
             labels.remove(mark);
             mark.dispose();
             layoutLine.requestLayout();
+            System.out.println("Remove " + mark.labelTitle + "  " + labels.size());
         }
 
         /**

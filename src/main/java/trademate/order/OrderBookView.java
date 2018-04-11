@@ -11,6 +11,8 @@ package trademate.order;
 
 import javafx.scene.control.ListCell;
 import javafx.scene.control.TextField;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 
 import cointoss.order.OrderBook;
 import cointoss.order.OrderBookList;
@@ -66,8 +68,11 @@ public class OrderBookView extends View {
 
         hideSize.values(0, Num.range(0, 9)).observe(e -> longList.ui.refresh());
 
-        longList.cell(e -> new CellView()).filter(hideSize, (unit, size) -> unit.size.isGreaterThanOrEqual(size));
-        shortList.cell(e -> new CellView()).filter(hideSize, (unit, size) -> unit.size.isGreaterThanOrEqual(size)).scrollToBottom();
+        longList.cell(e -> new CellView(Color.rgb(251, 189, 42, 0.2)))
+                .filter(hideSize, (unit, size) -> unit.size.isGreaterThanOrEqual(size));
+        shortList.cell(e -> new CellView(Color.rgb(247, 105, 77, 0.2)))
+                .filter(hideSize, (unit, size) -> unit.size.isGreaterThanOrEqual(size))
+                .scrollToBottom();
 
         priceRange.values(0, Range.class).observeNow(range -> {
             longList.values(book.longs.selectBy(range));
@@ -79,16 +84,16 @@ public class OrderBookView extends View {
     }
 
     /**
-     * @version 2017/11/13 21:35:32
+     * @version 2018/04/11 12:12:09
      */
     private class CellView extends ListCell<OrderUnit> {
 
-        private Num base = Num.of(210);
+        private final Rectangle back = new Rectangle(0, 16);
 
         /**
          * @param side
          */
-        private CellView() {
+        private CellView(Color color) {
             setOnMouseClicked(e -> {
                 if (getListView() == longList.ui) {
                     Num min = getItem().price;
@@ -101,6 +106,9 @@ public class OrderBookView extends View {
                     orderPrice.setText(best.toString());
                 }
             });
+
+            back.setFill(color);
+            setGraphic(back);
         }
 
         /**
@@ -112,9 +120,17 @@ public class OrderBookView extends View {
                 super.updateItem(e, empty);
 
                 if (empty || e == null) {
+                    setText(null);
                 } else {
                     Num normalize = e.size.scale(3);
                     setText(e.price() + " " + normalize);
+
+                    double width = Math.min(200, normalize.toDouble());
+                    back.setWidth(width);
+                    back.setTranslateX(width - 30);
+                    setTranslateX(-width);
+
+                    // using inline style makes memory leak
                     // setStyle("-fx-background-insets: 0 " +
                     // base.minus(normalize.multiply(Num.TWO)) + "px 0 0;");
                 }

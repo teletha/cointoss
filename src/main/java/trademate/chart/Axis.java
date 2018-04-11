@@ -114,7 +114,7 @@ public class Axis extends Region {
         this.side = side;
 
         for (int i = 0; i < tickNumber; i++) {
-            forGrid.add(new TickLable(ChartClass.BackGrid));
+            forGrid.add(new TickLable("For Grid", ChartClass.BackGrid));
         }
 
         Viewtify.clip(tickPath, this);
@@ -425,8 +425,8 @@ public class Axis extends Region {
      * 
      * @return
      */
-    public TickLable createLabel(Enum... classNames) {
-        return new TickLable(classNames);
+    public TickLable createLabel(String title, Enum... classNames) {
+        return new TickLable(title, classNames);
     }
 
     /**
@@ -437,10 +437,13 @@ public class Axis extends Region {
         /** The associated value. */
         public final DoubleProperty value = new SimpleDoubleProperty();
 
+        String labelTitle;
+
         /**
          * 
          */
-        private TickLable(Enum... classNames) {
+        private TickLable(String title, Enum... classNames) {
+            this.labelTitle = title;
             tickLabels.getChildren().add(this);
             textProperty().bind(Viewtify.calculate(value, () -> tickLabelFormatter.get().apply(value.get())));
             value.addListener(layoutAxis);

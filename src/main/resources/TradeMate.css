@@ -17,16 +17,15 @@
 	-fx-text-fill: -side;
 }
 
-#shortList .list-cell {
-	-fx-text-fill: inherit;
-  -fx-label-padding: 0 0 0 70px;
-  -fx-background-color: rgba(247, 105, 77, 0.2);
-}
-
+#shortList .list-cell,
 #longList .list-cell {
 	-fx-text-fill: inherit;
-  -fx-label-padding: 0 0 0 70px;
-  -fx-background-color: rgba(251, 189, 42, 0.2);
+	-fx-label-padding: 0 0 0 30px;
+}
+
+#shortList .scroll-bar:horizontal *,
+#longList .scroll-bar:horizontal * {
+    -fx-padding: 0;
 }
 
 #priceLatest {
