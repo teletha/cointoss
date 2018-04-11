@@ -39,7 +39,7 @@ import viewtify.ui.helper.LayoutAssistant;
 import viewtify.ui.helper.StyleHelper;
 
 /**
- * @version 2018/02/03 17:10:38
+ * @version 2018/04/11 17:26:19
  */
 public class ChartPlotArea extends Region {
 
@@ -152,8 +152,8 @@ public class ChartPlotArea extends Region {
      * Visualize mouse tracker in chart.
      */
     private void visualizeMouseTrack() {
-        TickLable labelX = mouseTrackVertical.createLabel("MouseX");
-        TickLable labelY = mouseTrackHorizontal.createLabel("MouseY");
+        TickLable labelX = mouseTrackVertical.createLabel();
+        TickLable labelY = mouseTrackHorizontal.createLabel();
 
         // track on move
         setOnMouseMoved(e -> {
@@ -205,7 +205,7 @@ public class ChartPlotArea extends Region {
             }
 
             Num price = Num.of(Math.floor(axisY.getValueForPosition(clickedPosition)));
-            TickLable label = notifyPrice.createLabel("NotifyPrice", price);
+            TickLable label = notifyPrice.createLabel(price);
 
             label.add(chart.trade.market().signalByPrice(price).on(Viewtify.UIThread).to(exe -> {
                 notificator.priceSignal.notify("Rearch to " + price);
@@ -220,7 +220,7 @@ public class ChartPlotArea extends Region {
     private void visualizeOrderPrice() {
         chart.trade.market().yourOrder.on(Viewtify.UIThread).to(o -> {
             LineMark mark = o.isBuy() ? orderBuyPrice : orderSellPrice;
-            TickLable label = mark.createLabel("OrderPrice", o.price);
+            TickLable label = mark.createLabel(o.price);
 
             o.state.observe().take(State.CANCELED, State.COMPLETED).take(1).on(Viewtify.UIThread).to(() -> {
                 mark.remove(label);
@@ -232,7 +232,7 @@ public class ChartPlotArea extends Region {
      * Visualize latest price in chart.
      */
     private void visualizeLatestPrice() {
-        TickLable latest = latestPrice.createLabel("LatestPrice");
+        TickLable latest = latestPrice.createLabel();
 
         chart.trade.market().timeline.map(e -> e.price).diff().on(Viewtify.UIThread).to(price -> {
             latest.value.set(price.toDouble());
@@ -500,8 +500,8 @@ public class ChartPlotArea extends Region {
          * 
          * @return
          */
-        private TickLable createLabel(String title) {
-            return createLabel(title, null);
+        private TickLable createLabel() {
+            return createLabel(null);
         }
 
         /**
@@ -509,8 +509,8 @@ public class ChartPlotArea extends Region {
          * 
          * @return
          */
-        private TickLable createLabel(String title, Num price) {
-            TickLable label = axis.createLabel(title, classNames);
+        private TickLable createLabel(Num price) {
+            TickLable label = axis.createLabel(classNames);
             if (price != null) label.value.set(price.toDouble());
             labels.add(label);
 
@@ -528,14 +528,6 @@ public class ChartPlotArea extends Region {
             labels.remove(mark);
             mark.dispose();
             layoutLine.requestLayout();
-            System.out.println("Remove " + mark.labelTitle + "  " + labels.size());
-        }
-
-        /**
-         * Dsipose all mark.
-         */
-        private void removeAll() {
-            labels.forEach(this::remove);
         }
 
         /**

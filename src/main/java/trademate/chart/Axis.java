@@ -34,6 +34,7 @@ import javafx.scene.shape.PathElement;
 
 import cointoss.util.Num;
 import kiss.Disposable;
+import trademate.chart.Axis.TickLable;
 import viewtify.Viewtify;
 import viewtify.ui.helper.LayoutAssistant;
 import viewtify.ui.helper.StyleHelper;
@@ -114,7 +115,7 @@ public class Axis extends Region {
         this.side = side;
 
         for (int i = 0; i < tickNumber; i++) {
-            forGrid.add(new TickLable("For Grid", ChartClass.BackGrid));
+            forGrid.add(new TickLable(ChartClass.BackGrid));
         }
 
         Viewtify.clip(tickPath, this);
@@ -425,8 +426,8 @@ public class Axis extends Region {
      * 
      * @return
      */
-    public TickLable createLabel(String title, Enum... classNames) {
-        return new TickLable(title, classNames);
+    public TickLable createLabel(Enum... classNames) {
+        return new TickLable(classNames);
     }
 
     /**
@@ -437,13 +438,10 @@ public class Axis extends Region {
         /** The associated value. */
         public final DoubleProperty value = new SimpleDoubleProperty();
 
-        String labelTitle;
-
         /**
          * 
          */
-        private TickLable(String title, Enum... classNames) {
-            this.labelTitle = title;
+        private TickLable(Enum... classNames) {
             tickLabels.getChildren().add(this);
             textProperty().bind(Viewtify.calculate(value, () -> tickLabelFormatter.get().apply(value.get())));
             value.addListener(layoutAxis);
