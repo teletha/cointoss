@@ -17,7 +17,6 @@ import java.util.function.Consumer;
 import javafx.collections.ObservableList;
 
 import cointoss.Position;
-import cointoss.PositionManager;
 import cointoss.Side;
 import cointoss.order.Order;
 import cointoss.order.OrderBookList;
@@ -82,17 +81,17 @@ public class PositionCatalog extends View {
             $.menu("撤退").whenUserClick(() -> positions.selection().forEach(this::retreat));
         });
 
-        Position pp = new Position();
-        pp.side = Side.BUY;
-        pp.date = ZonedDateTime.now();
-        pp.price = Num.of(700000);
-        pp.size = Variable.of(Num.TEN);
+        Position positive1 = new Position();
+        positive1.side = Side.BUY;
+        positive1.date = ZonedDateTime.now();
+        positive1.price = Num.of(700000);
+        positive1.size = Variable.of(Num.ONE);
 
-        Position minus = new Position();
-        minus.side = Side.BUY;
-        minus.date = ZonedDateTime.now();
-        minus.price = Num.of(800000);
-        minus.size = Variable.of(Num.ONE);
+        Position positive2 = new Position();
+        positive2.side = Side.BUY;
+        positive2.date = ZonedDateTime.now();
+        positive2.price = Num.of(700001);
+        positive2.size = Variable.of(Num.ONE);
 
         view.market().yourExecution.startWith().on(Viewtify.UIThread).to(p -> {
             for (Position position : positions.values) {
@@ -103,7 +102,6 @@ public class PositionCatalog extends View {
                     }
                 } else {
                     Num diff = p.size.get().minus(position.size);
-
                     if (diff.isPositive()) {
                         p.size.set(diff);
                         position.size.set(Num.ZERO);
