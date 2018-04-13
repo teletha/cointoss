@@ -10,6 +10,7 @@
 package cointoss;
 
 import static cointoss.order.Order.State.*;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.time.ZonedDateTime;
 import java.util.EnumMap;
@@ -253,7 +254,7 @@ public class Market implements Disposable {
     public final Signal<Order> request(Order order) {
         order.state.set(REQUESTING);
 
-        return backend.request(order).map(id -> {
+        return backend.request(order).retryWhen(fail -> fail.take(10).delay(100, MILLISECONDS)).map(id -> {
             order.id = id;
             order.created.set(ZonedDateTime.now());
             order.averagePrice.set(order.price);
