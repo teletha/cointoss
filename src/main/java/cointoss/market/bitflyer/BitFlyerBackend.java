@@ -183,7 +183,7 @@ class BitFlyerBackend implements MarketBackend {
             request.size = order.size.toDouble();
             request.time_in_force = order.quantity().abbreviation;
 
-            call = call("POST", "/v1/me/sendchildorderss", request, "child_order_acceptance_id", String.class);
+            call = call("POST", "/v1/me/sendchildorder", request, "child_order_acceptance_id", String.class);
         } else {
             ChildOrderRequestWebAPI request = new ChildOrderRequestWebAPI();
             request.account_id = accountId;
