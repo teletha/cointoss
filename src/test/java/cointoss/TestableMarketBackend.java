@@ -20,7 +20,7 @@ import cointoss.market.bitflyer.BitFlyer;
 import cointoss.order.Order;
 import cointoss.order.Order.Quantity;
 import cointoss.order.Order.State;
-import cointoss.order.OrderBookChange;
+import cointoss.order.OrderBookListChange;
 import cointoss.order.OrderType;
 import cointoss.util.Num;
 import kiss.Disposable;
@@ -185,7 +185,7 @@ class TestableMarketBackend implements MarketBackend, MarketProvider {
      * {@inheritDoc}
      */
     @Override
-    public Signal<OrderBookChange> getOrderBook() {
+    public Signal<OrderBookListChange> getOrderBook() {
         return Signal.NEVER;
     }
 

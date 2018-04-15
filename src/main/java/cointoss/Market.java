@@ -23,7 +23,7 @@ import cointoss.MarketBackend.Health;
 import cointoss.order.Order;
 import cointoss.order.Order.State;
 import cointoss.order.OrderBook;
-import cointoss.order.OrderBookChange;
+import cointoss.order.OrderBookListChange;
 import cointoss.ticker.ExecutionFlow;
 import cointoss.ticker.TickSpan;
 import cointoss.ticker.Ticker;
@@ -85,7 +85,7 @@ public class Market implements Disposable {
     }).skip(e -> e == null || e == SEED);
 
     /** The execution time line. */
-    public final Signal<OrderBookChange> orderTimeline;
+    public final Signal<OrderBookListChange> orderTimeline;
 
     /** Order Book. */
     public final OrderBook orderBook = new OrderBook();

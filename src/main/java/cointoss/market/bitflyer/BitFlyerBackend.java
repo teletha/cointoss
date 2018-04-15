@@ -38,7 +38,7 @@ import cointoss.Position;
 import cointoss.Side;
 import cointoss.order.Order;
 import cointoss.order.Order.State;
-import cointoss.order.OrderBookChange;
+import cointoss.order.OrderBookListChange;
 import cointoss.order.OrderUnit;
 import cointoss.util.Chrono;
 import cointoss.util.Network;
@@ -278,7 +278,7 @@ class BitFlyerBackend implements MarketBackend {
      * {@inheritDoc}
      */
     @Override
-    public Signal<OrderBookChange> getOrderBook() {
+    public Signal<OrderBookListChange> getOrderBook() {
         return snapshotOrderBook().merge(realtimeOrderBook());
     }
 
@@ -287,8 +287,8 @@ class BitFlyerBackend implements MarketBackend {
      * 
      * @return
      */
-    private Signal<OrderBookChange> snapshotOrderBook() {
-        return call("GET", "/v1/board?product_code=" + type, "", "", OrderBookChange.class);
+    private Signal<OrderBookListChange> snapshotOrderBook() {
+        return call("GET", "/v1/board?product_code=" + type, "", "", OrderBookListChange.class);
     }
 
     /**
@@ -296,27 +296,25 @@ class BitFlyerBackend implements MarketBackend {
      * 
      * @return
      */
-    private Signal<OrderBookChange> realtimeOrderBook() {
+    private Signal<OrderBookListChange> realtimeOrderBook() {
         return Network.pubnub("lightning_board_" + type, "sub-c-52a9ab50-291b-11e5-baaa-0619f8945a4f")
                 .map(JsonElement::getAsJsonObject)
                 .map(e -> {
-                    OrderBookChange board = new OrderBookChange();
-                    board.mid_price = Num.of(e.get("mid_price").getAsLong());
-
+                    OrderBookListChange change = new OrderBookListChange();
                     JsonArray asks = e.get("asks").getAsJsonArray();
 
                     for (int i = 0; i < asks.size(); i++) {
                         JsonObject ask = asks.get(i).getAsJsonObject();
-                        board.asks.add(new OrderUnit(Num.of(ask.get("price").getAsString()), Num.of(ask.get("size").getAsString())));
+                        change.asks.add(new OrderUnit(Num.of(ask.get("price").getAsString()), Num.of(ask.get("size").getAsString())));
                     }
 
                     JsonArray bids = e.get("bids").getAsJsonArray();
 
                     for (int i = 0; i < bids.size(); i++) {
                         JsonObject bid = bids.get(i).getAsJsonObject();
-                        board.bids.add(new OrderUnit(Num.of(bid.get("price").getAsString()), Num.of(bid.get("size").getAsString())));
+                        change.bids.add(new OrderUnit(Num.of(bid.get("price").getAsString()), Num.of(bid.get("size").getAsString())));
                     }
-                    return board;
+                    return change;
                 });
     }
 
