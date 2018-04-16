@@ -10,7 +10,6 @@
 package cointoss.order;
 
 import java.util.List;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -39,9 +38,6 @@ public class OrderBookList {
 
     /** The search direction. */
     private final Side side;
-
-    /** The lock system. */
-    private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
     /** The base list. */
     final ObservableList<OrderUnit> x1;
@@ -82,17 +78,11 @@ public class OrderBookList {
      * 
      * @return
      */
-    public OrderUnit min() {
-        lock.readLock().lock();
-
-        try {
-            if (x1.isEmpty()) {
-                return null;
-            } else {
-                return x1.get(x1.size() - 1);
-            }
-        } finally {
-            lock.readLock().unlock();
+    public synchronized OrderUnit min() {
+        if (x1.isEmpty()) {
+            return null;
+        } else {
+            return x1.get(x1.size() - 1);
         }
     }
 
@@ -101,17 +91,11 @@ public class OrderBookList {
      * 
      * @return
      */
-    public OrderUnit max() {
-        lock.readLock().lock();
-
-        try {
-            if (x1.isEmpty()) {
-                return null;
-            } else {
-                return x1.get(0);
-            }
-        } finally {
-            lock.readLock().unlock();
+    public synchronized OrderUnit max() {
+        if (x1.isEmpty()) {
+            return null;
+        } else {
+            return x1.get(0);
         }
     }
 
@@ -140,7 +124,7 @@ public class OrderBookList {
         }
     }
 
-    public Num computeBestPrice(Num threshold, Num diff) {
+    public synchronized Num computeBestPrice(Num threshold, Num diff) {
         return computeBestPrice(best.v.price, threshold, diff);
     }
 
@@ -158,38 +142,32 @@ public class OrderBookList {
      * 
      * @return
      */
-    public Num computeBestPrice(Num start, Num threshold, Num diff) {
-        lock.readLock().lock();
+    public synchronized Num computeBestPrice(Num start, Num threshold, Num diff) {
+        Num total = Num.ZERO;
+        if (side == Side.BUY) {
+            for (OrderUnit unit : x1) {
+                if (unit.price.isLessThan(start)) {
+                    total = total.plus(unit.size);
 
-        try {
-            Num total = Num.ZERO;
-            if (side == Side.BUY) {
-                for (OrderUnit unit : x1) {
-                    if (unit.price.isLessThan(start)) {
-                        total = total.plus(unit.size);
-
-                        if (total.isGreaterThanOrEqual(threshold)) {
-                            return unit.price.plus(diff);
-                        }
-                    }
-                }
-            } else {
-                for (int i = x1.size() - 1; 0 <= i; i--) {
-                    OrderUnit unit = x1.get(i);
-
-                    if (unit.price.isGreaterThanOrEqual(start)) {
-                        total = total.plus(unit.size);
-
-                        if (total.isGreaterThanOrEqual(threshold)) {
-                            return unit.price.minus(diff);
-                        }
+                    if (total.isGreaterThanOrEqual(threshold)) {
+                        return unit.price.plus(diff);
                     }
                 }
             }
-            return null;
-        } finally {
-            lock.readLock().unlock();
+        } else {
+            for (int i = x1.size() - 1; 0 <= i; i--) {
+                OrderUnit unit = x1.get(i);
+
+                if (unit.price.isGreaterThanOrEqual(start)) {
+                    total = total.plus(unit.size);
+
+                    if (total.isGreaterThanOrEqual(threshold)) {
+                        return unit.price.minus(diff);
+                    }
+                }
+            }
         }
+        return null;
     }
 
     /**
@@ -197,43 +175,37 @@ public class OrderBookList {
      * 
      * @param hint A price hint.
      */
-    public void fix(Num hint) {
-        lock.writeLock().lock();
+    public synchronized void fix(Num hint) {
+        if (side == Side.BUY) {
+            for (int i = 0; i < x1.size();) {
+                OrderUnit unit = x1.get(i);
 
-        try {
-            if (side == Side.BUY) {
-                for (int i = 0; i < x1.size();) {
-                    OrderUnit unit = x1.get(i);
+                if (unit != null && unit.price.isGreaterThan(hint)) {
+                    x1.remove(i);
 
-                    if (unit != null && unit.price.isGreaterThan(hint)) {
-                        x1.remove(i);
-
-                        for (Grouped grouped : group) {
-                            grouped.update(unit.price, unit.size.negate());
-                        }
-                    } else {
-                        break;
+                    for (Grouped grouped : group) {
+                        grouped.update(unit.price, unit.size.negate());
                     }
-                }
-            } else {
-                for (int i = x1.size() - 1; 0 <= i; i--) {
-                    OrderUnit unit = x1.get(i);
-
-                    if (unit != null && unit.price.isLessThan(hint)) {
-                        x1.remove(i);
-
-                        for (Grouped grouped : group) {
-                            grouped.update(unit.price, unit.size.negate());
-                        }
-                    } else {
-                        break;
-                    }
+                } else {
+                    break;
                 }
             }
-            modify.accept(true);
-        } finally {
-            lock.writeLock().unlock();
+        } else {
+            for (int i = x1.size() - 1; 0 <= i; i--) {
+                OrderUnit unit = x1.get(i);
+
+                if (unit != null && unit.price.isLessThan(hint)) {
+                    x1.remove(i);
+
+                    for (Grouped grouped : group) {
+                        grouped.update(unit.price, unit.size.negate());
+                    }
+                } else {
+                    break;
+                }
+            }
         }
+        modify.accept(true);
     }
 
     /**
@@ -241,32 +213,26 @@ public class OrderBookList {
      * 
      * @param asks
      */
-    public void update(List<OrderUnit> units) {
-        lock.writeLock().lock();
-
-        try {
-            if (side == Side.BUY) {
-                for (OrderUnit unit : units) {
-                    head(unit);
-                }
-
-                if (x1.isEmpty() == false) {
-                    best.set(x1.get(0));
-                }
-            } else {
-                for (OrderUnit unit : units) {
-                    tail(unit);
-                }
-
-                if (x1.isEmpty() == false) {
-                    best.set(x1.get(x1.size() - 1));
-                }
+    public synchronized void update(List<OrderUnit> units) {
+        if (side == Side.BUY) {
+            for (OrderUnit unit : units) {
+                head(unit);
             }
 
-            modify.accept(true);
-        } finally {
-            lock.writeLock().unlock();
+            if (x1.isEmpty() == false) {
+                best.set(x1.get(0));
+            }
+        } else {
+            for (OrderUnit unit : units) {
+                tail(unit);
+            }
+
+            if (x1.isEmpty() == false) {
+                best.set(x1.get(x1.size() - 1));
+            }
         }
+
+        modify.accept(true);
     }
 
     // private void calculateTotal(ObservableList<OrderUnit> units) {
