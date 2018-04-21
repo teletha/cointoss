@@ -12,6 +12,7 @@ package cointoss;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.zip.CRC32;
 
 import cointoss.order.Order;
 import cointoss.util.Num;
@@ -59,7 +60,13 @@ public class Execution {
      * @param line
      */
     public Execution(String line) {
-        String[] values = line.split(" ");
+        this(line.split(" "));
+    }
+
+    /**
+     * @param line
+     */
+    public Execution(String[] values) {
         id = Long.parseLong(values[0]);
         exec_date = LocalDateTime.parse(values[1]).atZone(cointoss.util.Chrono.UTC);
         side = Side.parse(values[2]);
@@ -97,6 +104,34 @@ public class Execution {
      */
     public final boolean isAfter(ZonedDateTime time) {
         return exec_date.isAfter(time);
+    }
+
+    /**
+     * Compute buyer id.
+     * 
+     * @return
+     */
+    public final long buyer() {
+        return id(buy_child_order_acceptance_id);
+    }
+
+    /**
+     * Compute seller id.
+     * 
+     * @return
+     */
+    public final long seller() {
+        return id(sell_child_order_acceptance_id);
+    }
+
+    private long id(String value) {
+        if (value.startsWith("JRF20")) {
+            return Long.parseLong(value.substring(11).replaceAll("-", ""));
+        } else {
+            CRC32 crc = new CRC32();
+            crc.update(value.getBytes());
+            return crc.getValue();
+        }
     }
 
     /**

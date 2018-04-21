@@ -9,22 +9,18 @@
  */
 package cointoss.log;
 
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.channels.FileChannel;
-import java.nio.charset.CharsetDecoder;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+
+import com.univocity.parsers.csv.CsvParser;
+import com.univocity.parsers.csv.CsvParserSettings;
+import com.univocity.parsers.csv.CsvWriter;
+import com.univocity.parsers.csv.CsvWriterSettings;
 
 import cointoss.Execution;
-import cointoss.Side;
 import cointoss.util.Num;
 import filer.Filer;
-import kiss.I;
 import kiss.Signal;
 
 /**
@@ -32,105 +28,129 @@ import kiss.Signal;
  */
 public class Log {
 
-    /** The buffer size (kb). */
-    private static final int size = 16;
-
     /**
-     * Read {@link Execution} log extremely fast.
+     * Read {@link Execution} log.
      * 
      * @param file
      * @return
      */
-    private Signal<Execution> read(Path file) {
+    public Signal<Execution> read(Path file) {
         return new Signal<>((observer, disposer) -> {
-            CharsetDecoder decoder = StandardCharsets.ISO_8859_1.newDecoder();
-            ByteBuffer bytes = ByteBuffer.allocate(1024 * size);
-            CharBuffer chars = CharBuffer.allocate(1024 * (size + 1));
-            char[] array = chars.array();
+            CsvParserSettings settings = new CsvParserSettings();
+            settings.getFormat().setDelimiter(' ');
 
-            try (FileChannel channel = (FileChannel) Files.newByteChannel(file)) {
-                Execution execution = new Execution();
+            CsvParser parser = new CsvParser(settings);
+            parser.beginParsing(file.toFile());
 
-                root: while (channel.read(bytes) != -1) {
-                    int count = 0;
-
-                    bytes.flip();
-                    decoder.decode(bytes, chars, true);
-                    chars.flip();
-                    int last = 0;
-
-                    for (int i = 0, end = chars.limit(); i < end; i++) {
-                        char c = chars.get();
-
-                        if (c == ' ' || c == '\r') {
-                            String value = new String(array, last, i - last);
-                            last = i + 1;
-
-                            switch (count++) {
-                            case 0:
-                                execution.id = Long.parseLong(value);
-                                break;
-
-                            case 1:
-                                execution.exec_date = LocalDateTime.parse(value).atZone(cointoss.util.Chrono.UTC);
-                                break;
-
-                            case 2:
-                                execution.side = Side.parse(value);
-                                break;
-
-                            case 3:
-                                execution.price = Num.of(value);
-                                break;
-
-                            case 4:
-                                execution.size = execution.cumulativeSize = Num.of(value);
-                                break;
-
-                            case 5:
-                                execution.buy_child_order_acceptance_id = value;
-                                break;
-
-                            case 6:
-                                execution.sell_child_order_acceptance_id = value;
-                                observer.accept(execution);
-
-                                // skip next '\n'
-                                i++;
-                                last++;
-                                chars.get();
-
-                                if (chars.remaining() < 124) {
-                                    chars.compact();
-                                    bytes.clear();
-                                    continue root;
-                                }
-                                count = 0;
-                                execution = new Execution();
-                            }
-                        }
-                    }
-                    bytes.clear();
-                }
-            } catch (IOException e) {
-                throw I.quiet(e);
+            String[] row;
+            while ((row = parser.parseNext()) != null) {
+                observer.accept(new Execution(row));
             }
+
+            parser.stopParsing();
             return disposer;
         });
     }
 
-    private Signal<Execution> read2(Path file) {
-        return Filer.read(file).map(Execution::new);
+    public void compact(Path file) {
+        CsvParserSettings settings = new CsvParserSettings();
+        settings.getFormat().setDelimiter(' ');
+
+        CsvParser parser = new CsvParser(settings);
+        parser.beginParsing(file.toFile());
+
+        Path output = file.resolveSibling(file.getFileName().toString().replace(".log", ".clog"));
+        CsvWriterSettings writerConfig = new CsvWriterSettings();
+        writerConfig.getFormat().setDelimiter(' ');
+        CsvWriter writer = new CsvWriter(output.toFile(), writerConfig);
+
+        Execution previous = null;
+        String[] row = null;
+        while ((row = parser.parseNext()) != null) {
+            if (previous == null) {
+                writer.writeRow(row);
+            } else {
+                Execution exe = new Execution(row);
+
+                String id = encode(exe.id, previous.id, 1);
+                String time = encode(exe.exec_date, previous.exec_date);
+                String side = encode(exe.side.mark(), previous.side.mark());
+                String price = encode(exe.price, previous.price);
+                String size = exe.size.equals(previous.size) ? "" : exe.size.multiply(Num.HUNDRED).toString();
+                String buyer = encode(exe.buyer(), previous.buyer(), 0);
+                String seller = encode(exe.seller(), previous.seller(), 0);
+
+                writer.writeRow(id + " " + time + " " + side + " " + price + " " + size + " " + buyer + " " + seller);
+            }
+            previous = new Execution(row);
+        }
+
+        parser.stopParsing();
+    }
+
+    /**
+     * Erase duplicated value.
+     * 
+     * @param current
+     * @param previous
+     * @param defaults
+     * @return
+     */
+    private static String encode(Num current, Num previous) {
+        if (current.equals(previous)) {
+            return "";
+        } else {
+            return current.minus(previous).toString();
+        }
+    }
+
+    /**
+     * Erase duplicated value.
+     * 
+     * @param current
+     * @param previous
+     * @param defaults
+     * @return
+     */
+    private static String encode(long current, long previous, long defaults) {
+        long diff = current - previous;
+
+        if (diff == defaults) {
+            return "";
+        } else {
+            return String.valueOf(diff);
+        }
+    }
+
+    /**
+     * Erase duplicated value.
+     * 
+     * @param current
+     * @param previous
+     * @param defaults
+     * @return
+     */
+    private static String encode(ZonedDateTime current, ZonedDateTime previous) {
+        return encode(current.toInstant().toEpochMilli(), previous.toInstant().toEpochMilli(), 0);
+    }
+
+    /**
+     * Erase duplicated sequence.
+     * 
+     * @param current
+     * @param previous
+     * @return
+     */
+    private static String encode(String current, String previous) {
+        return current.equals(previous) ? "" : current;
     }
 
     public static void main(String[] args) {
-        Log log = new Log();
-        Path file = Paths.get("F:\\Development\\CoinToss\\.log\\bitflyer\\FX_BTC_JPY\\execution20180404.log");
-
-        long start = System.currentTimeMillis();
-        log.read(file).to(v -> {
+        Path path = Paths.get("F:\\Development\\CoinToss\\.log\\bitflyer\\FX_BTC_JPY");
+        Filer.walk(path, "execution20180404.log").to(file -> {
+            Log log = new Log();
+            log.compact(file);
         });
-        long end = System.currentTimeMillis();
-        System.out.println(end - start);
     }
+
 }

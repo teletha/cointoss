@@ -24,5 +24,7 @@ public class Project extends bee.api.Project {
         require("org.slf4j", "slf4j-simple", "1.7.22");
         require("com.pubnub", "pubnub-gson", "4.19.0");
         require("org.magicwerk", "brownies-collections", "0.9.13");
+        require("com.univocity", "univocity-parsers", "2.6.3");
+        require("com.github.luben", "zstd-jni", "1.3.4-4");
     }
 }
