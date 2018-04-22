@@ -29,6 +29,13 @@ public interface MarketProvider {
     MarketLog log();
 
     /**
+     * Compute market name.
+     * 
+     * @return
+     */
+    String name();
+
+    /**
      * Compute orgnization name.
      * 
      * @return

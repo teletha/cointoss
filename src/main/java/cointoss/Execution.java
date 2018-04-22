@@ -126,7 +126,7 @@ public class Execution {
 
     private long id(String value) {
         if (value.startsWith("JRF20")) {
-            return Long.parseLong(value.substring(11).replaceAll("-", ""));
+            return Long.parseLong(value.substring(11).replaceAll("\\D", ""));
         } else {
             CRC32 crc = new CRC32();
             crc.update(value.getBytes());

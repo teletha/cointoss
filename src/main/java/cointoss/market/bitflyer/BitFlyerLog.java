@@ -20,6 +20,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -43,7 +44,7 @@ class BitFlyerLog extends MarketLog {
 
     /** The writer thread. */
     private static final ExecutorService writer = Executors.newSingleThreadExecutor(run -> {
-        Thread thread = new Thread(run);
+        final Thread thread = new Thread(run);
         thread.setName("Log Writer");
         thread.setDaemon(true);
         return thread;
@@ -82,7 +83,7 @@ class BitFlyerLog extends MarketLog {
     /**
      * @param type
      */
-    BitFlyerLog(BitFlyer type) {
+    BitFlyerLog(final BitFlyer type) {
         try {
             this.type = type;
             this.root = cacheRoot();
@@ -90,9 +91,9 @@ class BitFlyerLog extends MarketLog {
             ZonedDateTime start = null;
             ZonedDateTime end = null;
 
-            for (Path file : Filer.walk(root, "execution*.log").toList()) {
-                String name = file.getFileName().toString();
-                ZonedDateTime date = LocalDate.parse(name.substring(9, 17), fomatFile).atTime(0, 0, 0, 0).atZone(Chrono.UTC);
+            for (final Path file : Filer.walk(root, "execution*.log").toList()) {
+                final String name = file.getFileName().toString();
+                final ZonedDateTime date = LocalDate.parse(name.substring(9, 17), fomatFile).atTime(0, 0, 0, 0).atZone(Chrono.UTC);
 
                 if (start == null || end == null) {
                     start = date;
@@ -109,7 +110,7 @@ class BitFlyerLog extends MarketLog {
             }
             this.cacheFirst = start;
             this.cacheLast = end;
-        } catch (Exception e) {
+        } catch (final Exception e) {
             throw I.quiet(e);
         }
     }
@@ -126,7 +127,7 @@ class BitFlyerLog extends MarketLog {
      * {@inheritDoc}
      */
     @Override
-    public synchronized Signal<Execution> from(ZonedDateTime start) {
+    public synchronized Signal<Execution> from(final ZonedDateTime start) {
         return new Signal<Execution>((observer, disposer) -> {
             // read from cache
             if (cacheFirst != null) {
@@ -141,7 +142,7 @@ class BitFlyerLog extends MarketLog {
                 }
             }
 
-            AtomicBoolean completeREST = new AtomicBoolean();
+            final AtomicBoolean completeREST = new AtomicBoolean();
 
             // read from realtime API
             if (disposer.isDisposed() == false) {
@@ -178,18 +179,18 @@ class BitFlyerLog extends MarketLog {
      * 
      * @param exe
      */
-    private void cache(Execution exe) {
+    private void cache(final Execution exe) {
         if (cacheId < exe.id) {
             cacheId = exe.id;
 
             writer.submit(() -> {
                 try {
-                    ZonedDateTime date = exe.exec_date;
+                    final ZonedDateTime date = exe.exec_date;
 
                     if (cache == null || cacheLast.isBefore(date)) {
                         I.quiet(cache);
 
-                        File file = localCacheFile(date).toFile();
+                        final File file = localCacheFile(date).toFile();
                         file.createNewFile();
 
                         cache = new BufferedWriter(new FileWriter(file, true));
@@ -197,7 +198,7 @@ class BitFlyerLog extends MarketLog {
                     }
                     cache.write(exe.toString() + "\r\n");
                     cache.flush();
-                } catch (IOException e) {
+                } catch (final IOException e) {
                     throw I.quiet(e);
                 }
             });
@@ -210,7 +211,7 @@ class BitFlyerLog extends MarketLog {
      * @param date
      * @return
      */
-    private Signal<Execution> localCache(ZonedDateTime date) {
+    private Signal<Execution> localCache(final ZonedDateTime date) {
         return Filer.read(localCacheFile(date)).map(Execution::new);
     }
 
@@ -220,7 +221,7 @@ class BitFlyerLog extends MarketLog {
      * @param date
      * @return
      */
-    private Path localCacheFile(ZonedDateTime date) {
+    private Path localCacheFile(final ZonedDateTime date) {
         return root.resolve("execution" + fomatFile.format(date) + ".log");
     }
 
@@ -233,8 +234,8 @@ class BitFlyerLog extends MarketLog {
 
             while (disposer.isDisposed() == false) {
                 try {
-                    URL url = new URL(BitFlyerBackend.api + "/v1/executions?product_code=" + type + "&count=500&before=" + (latestId + 500 * offset));
-                    Executions executions = I.json(url).to(Executions.class);
+                    final URL url = new URL(BitFlyerBackend.api + "/v1/executions?product_code=" + type + "&count=500&before=" + (latestId + 500 * offset));
+                    final Executions executions = I.json(url).to(Executions.class);
 
                     // skip if there is no new execution
                     if (executions.get(0).id == latestId) {
@@ -244,14 +245,14 @@ class BitFlyerLog extends MarketLog {
                     offset = 1;
 
                     for (int i = executions.size() - 1; 0 <= i; i--) {
-                        Execution exe = executions.get(i);
+                        final Execution exe = executions.get(i);
 
                         if (latestId < exe.id) {
                             observer.accept(exe);
                             latestId = exe.id;
                         }
                     }
-                } catch (Exception e) {
+                } catch (final Exception e) {
                     // ignore to retry
                 }
 
@@ -261,7 +262,7 @@ class BitFlyerLog extends MarketLog {
 
                 try {
                     Thread.sleep(222);
-                } catch (InterruptedException e) {
+                } catch (final InterruptedException e) {
                     observer.error(e);
                 }
             }
@@ -296,5 +297,132 @@ class BitFlyerLog extends MarketLog {
                     realtimeId = exe.id;
                     return exe;
                 });
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Execution decode(String[] values, Execution previous) {
+
+        if (previous == null) {
+            return new Execution(values);
+        } else {
+            Execution current = new Execution();
+            current.id = previous.id + decode(values[0], 1);
+            current.exec_date = previous.exec_date.plus(decode(values[1], 0), ChronoUnit.MILLIS);
+            current.side = decode(values[2], previous.side);
+            current.price = decode(values[3], previous.price);
+            current.size = decodeSize(values[4], previous.size);
+            current.buy_child_order_acceptance_id = String.valueOf(decode(values[5], previous.buyer()));
+            current.sell_child_order_acceptance_id = String.valueOf(decode(values[6], previous.seller()));
+
+            return current;
+        }
+    }
+
+    private static long decode(String value, long defaults) {
+        if (value == null) {
+            return defaults;
+        }
+        return Long.parseLong(value);
+    }
+
+    private static Side decode(String value, Side defaults) {
+        if (value == null) {
+            return defaults;
+        }
+        return Side.parse(value);
+    }
+
+    private static Num decode(String value, Num defaults) {
+        if (value == null) {
+            return defaults;
+        }
+        return Num.of(value).plus(defaults);
+    }
+
+    private static Num decodeSize(String value, Num defaults) {
+        if (value == null) {
+            return defaults;
+        }
+        return Num.of(value).divide(Num.HUNDRED);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected String[] encode(Execution execution, Execution previous) {
+        if (previous == null) {
+            return execution.toString().split(" ");
+        } else {
+            String id = encode(execution.id, previous.id, 1);
+            String time = encode(execution.exec_date, previous.exec_date);
+            String side = encode(execution.side.mark(), previous.side.mark());
+            String price = encode(execution.price, previous.price);
+            String size = execution.size.equals(previous.size) ? "" : execution.size.multiply(Num.HUNDRED).toString();
+            String buyer = encode(execution.buyer(), previous.buyer(), 0);
+            String seller = encode(execution.seller(), previous.seller(), 0);
+
+            return new String[] {id, time, side, price, size, buyer, seller};
+        }
+    }
+
+    /**
+     * Erase duplicated value.
+     * 
+     * @param current
+     * @param previous
+     * @param defaults
+     * @return
+     */
+    private static String encode(Num current, Num previous) {
+        if (current.equals(previous)) {
+            return "";
+        } else {
+            return current.minus(previous).toString();
+        }
+    }
+
+    /**
+     * Erase duplicated value.
+     * 
+     * @param current
+     * @param previous
+     * @param defaults
+     * @return
+     */
+    private static String encode(long current, long previous, long defaults) {
+        long diff = current - previous;
+
+        if (diff == defaults) {
+            return "";
+        } else {
+            return String.valueOf(diff);
+        }
+    }
+
+    /**
+     * Erase duplicated value.
+     * 
+     * @param current
+     * @param previous
+     * @param defaults
+     * @return
+     */
+    private static String encode(ZonedDateTime current, ZonedDateTime previous) {
+        return encode(current.toInstant().toEpochMilli(), previous.toInstant().toEpochMilli(), 0);
+    }
+
+    /**
+     * Erase duplicated sequence.
+     * 
+     * @param current
+     * @param previous
+     * @return
+     */
+    private static String encode(String current, String previous) {
+        return current.equals(previous) ? "" : current;
     }
 }

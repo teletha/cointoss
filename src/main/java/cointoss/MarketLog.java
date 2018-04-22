@@ -9,12 +9,19 @@
  */
 package cointoss;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 
-import cointoss.util.Span;
+import com.univocity.parsers.csv.CsvParser;
+import com.univocity.parsers.csv.CsvParserSettings;
+import com.univocity.parsers.csv.CsvWriter;
+import com.univocity.parsers.csv.CsvWriterSettings;
+
 import cointoss.util.Chrono;
+import cointoss.util.Span;
+import kiss.I;
 import kiss.Signal;
 
 /**
@@ -138,4 +145,97 @@ public abstract class MarketLog {
     public final Signal<Execution> rangeRandom(int days) {
         return range(Span.random(getCacheStart(), getCacheEnd().minusDays(1), days));
     }
+
+    /**
+     * Read {@link Execution} log.
+     * 
+     * @param file
+     * @return
+     */
+    public final Signal<Execution> read(Path file) {
+        return new Signal<>((observer, disposer) -> {
+            Path compact = computeCompactLogFile(file);
+            boolean hasCompact = Files.exists(compact);
+
+            CsvParserSettings settings = new CsvParserSettings();
+            settings.getFormat().setDelimiter(' ');
+
+            CsvParser parser = new CsvParser(settings);
+            parser.beginParsing((hasCompact ? compact : file).toFile());
+
+            String[] row;
+            Execution previous = null;
+
+            while ((row = parser.parseNext()) != null) {
+                observer.accept(previous = decode(row, hasCompact ? previous : null));
+            }
+
+            parser.stopParsing();
+            return disposer;
+        });
+    }
+
+    /**
+     * Compact log.
+     * 
+     * @param file
+     */
+    public final void compact(Path file) {
+        try {
+            Path output = computeCompactLogFile(file);
+
+            if (Files.exists(output)) {
+                return;
+            }
+
+            CsvParserSettings settings = new CsvParserSettings();
+            settings.getFormat().setDelimiter(' ');
+
+            CsvParser parser = new CsvParser(settings);
+            parser.beginParsing(file.toFile());
+
+            CsvWriterSettings writerConfig = new CsvWriterSettings();
+            writerConfig.getFormat().setDelimiter(' ');
+
+            CsvWriter writer = new CsvWriter(output.toFile(), writerConfig);
+
+            Execution previous = null;
+            String[] row = null;
+            while ((row = parser.parseNext()) != null) {
+                Execution current = new Execution(row);
+                writer.writeRow(encode(current, previous));
+                previous = current;
+            }
+            writer.close();
+            parser.stopParsing();
+        } catch (Exception e) {
+            throw I.quiet(e);
+        }
+    }
+
+    /**
+     * Compute compact log file.
+     * 
+     * @param file A log file.
+     * @return
+     */
+    private Path computeCompactLogFile(Path file) {
+        return file.resolveSibling(file.getFileName().toString().replace(".log", ".clog"));
+    }
+
+    /**
+     * Build execution from log.
+     * 
+     * @param values
+     * @return
+     */
+    protected abstract Execution decode(String[] values, Execution previous);
+
+    /**
+     * Build log from execution.
+     * 
+     * @param execution
+     * @return
+     */
+    protected abstract String[] encode(Execution execution, Execution previous);
 }
