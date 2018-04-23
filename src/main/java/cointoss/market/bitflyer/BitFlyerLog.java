@@ -254,6 +254,7 @@ class BitFlyerLog extends MarketLog {
                     exe.side = Side.parse(e.get("side").getAsString());
                     exe.price = Num.of(e.get("price").getAsString());
                     exe.size = exe.cumulativeSize = Num.of(e.get("size").getAsString());
+                    System.out.println(e.get("exec_date").getAsString());
                     exe.exec_date = LocalDateTime.parse(e.get("exec_date").getAsString(), format).atZone(BitFlyerBackend.zone);
                     exe.buy_child_order_acceptance_id = e.get("buy_child_order_acceptance_id").getAsString();
                     exe.sell_child_order_acceptance_id = e.get("sell_child_order_acceptance_id").getAsString();
