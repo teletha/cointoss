@@ -15,6 +15,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
@@ -85,9 +86,9 @@ class BitFlyerLog extends MarketLog {
             ZonedDateTime start = null;
             ZonedDateTime end = null;
 
-            for (final Path file : Filer.walk(root, "execution*.log").toList()) {
-                final String name = file.getFileName().toString();
-                final ZonedDateTime date = LocalDate.parse(name.substring(9, 17), fomatFile).atTime(0, 0, 0, 0).atZone(Chrono.UTC);
+            for (Path file : Filer.walk(root, "execution*.log").toList()) {
+                String name = file.getFileName().toString();
+                ZonedDateTime date = LocalDate.parse(name.substring(9, 17), fomatFile).atTime(0, 0, 0, 0).atZone(Chrono.UTC);
 
                 if (start == null || end == null) {
                     start = date;
@@ -288,28 +289,28 @@ class BitFlyerLog extends MarketLog {
     }
 
     private static long decode(String value, long defaults) {
-        if (value == null) {
+        if (value == null || value.isEmpty()) {
             return defaults;
         }
         return Long.parseLong(value);
     }
 
     private static Side decode(String value, Side defaults) {
-        if (value == null) {
+        if (value == null || value.isEmpty()) {
             return defaults;
         }
         return Side.parse(value);
     }
 
     private static Num decode(String value, Num defaults) {
-        if (value == null) {
+        if (value == null || value.isEmpty()) {
             return defaults;
         }
         return Num.of(value).plus(defaults);
     }
 
     private static Num decodeSize(String value, Num defaults) {
-        if (value == null) {
+        if (value == null || value.isEmpty()) {
             return defaults;
         }
         return Num.of(value).divide(Num.HUNDRED);
@@ -378,7 +379,13 @@ class BitFlyerLog extends MarketLog {
      * @return
      */
     private static String encode(ZonedDateTime current, ZonedDateTime previous) {
-        return encode(current.toInstant().toEpochMilli(), previous.toInstant().toEpochMilli(), 0);
+        Duration between = Duration.between(previous, current);
+
+        if (between.isZero()) {
+            return "";
+        } else {
+            return String.valueOf(between.toMillis());
+        }
     }
 
     /**

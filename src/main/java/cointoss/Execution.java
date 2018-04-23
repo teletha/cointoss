@@ -47,6 +47,12 @@ public class Execution {
     /** date */
     public ZonedDateTime exec_date;
 
+    /** The buyer id. (may be 0) */
+    public long buyer;
+
+    /** The seller id. (may be 0) */
+    public long seller;
+
     /** INTERNAL USAGE */
     Order associated;
 
@@ -151,6 +157,47 @@ public class Execution {
     public String toString() {
         return id + " " + exec_date.toLocalDateTime() + " " + side
                 .mark() + " " + price + " " + size + " " + buy_child_order_acceptance_id + " " + sell_child_order_acceptance_id;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Execution == false) {
+            return false;
+        }
+
+        Execution other = (Execution) obj;
+
+        if (id != other.id) {
+            return false;
+        }
+
+        if (side != other.side) {
+            return false;
+        }
+
+        if (price.isNot(other.price)) {
+            return false;
+        }
+
+        if (size.isNot(other.size)) {
+            return false;
+        }
+
+        if (exec_date.isEqual(other.exec_date) == false) {
+            return false;
+        }
+
+        if (buyer() != other.buyer()) {
+            return false;
+        }
+
+        // if (seller() != other.seller()) {
+        // return false;
+        // }
+        return true;
     }
 
     /**
