@@ -15,7 +15,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
@@ -56,9 +55,6 @@ class BitFlyerLog extends MarketLog {
     /** realtime data format */
     private static final DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.n'Z'");
 
-    /** The log folder. */
-    private final Path root;
-
     /** The current type. */
     private final BitFlyer type;
 
@@ -83,10 +79,11 @@ class BitFlyerLog extends MarketLog {
     /**
      * @param type
      */
-    BitFlyerLog(final BitFlyer type) {
+    BitFlyerLog(BitFlyer type) {
+        super(type);
+
         try {
             this.type = type;
-            this.root = cacheRoot();
 
             ZonedDateTime start = null;
             ZonedDateTime end = null;
@@ -113,14 +110,6 @@ class BitFlyerLog extends MarketLog {
         } catch (final Exception e) {
             throw I.quiet(e);
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Path cacheRoot() {
-        return Paths.get(".log/bitflyer/" + type);
     }
 
     /**

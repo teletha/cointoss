@@ -11,9 +11,15 @@ package trademate;
 
 import java.util.concurrent.TimeUnit;
 
+import javafx.geometry.Pos;
+import javafx.util.Duration;
+
+import org.controlsfx.control.Notifications;
+
 import kiss.Variable;
 import viewtify.Preference;
 import viewtify.Switch;
+import viewtify.Viewtify;
 
 /**
  * @version 2017/12/28 9:36:20
@@ -71,18 +77,18 @@ public class Notificator extends Preference<Notificator> {
          */
         public void notify(String message) {
             if (notification.is(true)) {
-                // Viewtify.inUI(() -> {
-                // Notifications.create()
-                // .darkStyle()
-                // .hideCloseButton()
-                // .position(Pos.TOP_RIGHT)
-                // .hideAfter(Duration.seconds(showTime.get()))
-                // .text(message)
-                // .owner(Viewtify.root().root())
-                // .show();
-                // });
+                Viewtify.inUI(() -> {
+                    Notifications.create()
+                            .darkStyle()
+                            .hideCloseButton()
+                            .position(Pos.TOP_RIGHT)
+                            .hideAfter(Duration.seconds(showTime.get()))
+                            .text(message)
+                            .owner(Viewtify.root().root())
+                            .show();
+                });
             }
-            // sound.get().play();
+            sound.get().play();
         }
     }
 }

@@ -11,6 +11,7 @@ package cointoss;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 
@@ -29,6 +30,18 @@ import kiss.Signal;
  */
 public abstract class MarketLog {
 
+    /** The root directory of logs. */
+    protected final Path root;
+
+    /**
+     * Create log manager.
+     * 
+     * @param provider
+     */
+    protected MarketLog(MarketProvider provider) {
+        this.root = Paths.get(".log").resolve(provider.orgnizationName()).resolve(provider.name());
+    }
+
     /**
      * Get the starting day of cache.
      * 
@@ -42,13 +55,6 @@ public abstract class MarketLog {
      * @return
      */
     public abstract ZonedDateTime getCacheEnd();
-
-    /**
-     * Locate cache directory.
-     * 
-     * @return
-     */
-    public abstract Path cacheRoot();
 
     /**
      * Read date from the specified date.
