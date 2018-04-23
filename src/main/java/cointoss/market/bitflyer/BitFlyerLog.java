@@ -55,9 +55,6 @@ class BitFlyerLog extends MarketLog {
     /** realtime data format */
     private static final DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.n'Z'");
 
-    /** The current type. */
-    private final BitFlyer type;
-
     /** The latest execution id. */
     private long latestId = 23164000;
 
@@ -77,14 +74,14 @@ class BitFlyerLog extends MarketLog {
     private BufferedWriter cache;
 
     /**
-     * @param type
+     * Bitflyer log manager.
+     * 
+     * @param provider
      */
-    BitFlyerLog(BitFlyer type) {
-        super(type);
+    BitFlyerLog(BitFlyer provider) {
+        super(provider);
 
         try {
-            this.type = type;
-
             ZonedDateTime start = null;
             ZonedDateTime end = null;
 
@@ -124,7 +121,7 @@ class BitFlyerLog extends MarketLog {
                 current = current.withHour(0).withMinute(0).withSecond(0).withNano(0);
 
                 while (disposer.isDisposed() == false && !current.isAfter(getCacheEnd())) {
-                    disposer.add(localCache(current).effect(e -> latestId = cacheId = e.id)
+                    disposer.add(read(current).effect(e -> latestId = cacheId = e.id)
                             .take(e -> e.exec_date.isAfter(start))
                             .to(observer::accept));
                     current = current.plusDays(1);
@@ -195,26 +192,6 @@ class BitFlyerLog extends MarketLog {
     }
 
     /**
-     * Read date from local cache.
-     * 
-     * @param date
-     * @return
-     */
-    private Signal<Execution> localCache(final ZonedDateTime date) {
-        return Filer.read(localCacheFile(date)).map(Execution::new);
-    }
-
-    /**
-     * Read date from local cache.
-     * 
-     * @param date
-     * @return
-     */
-    private Path localCacheFile(final ZonedDateTime date) {
-        return root.resolve("execution" + fomatFile.format(date) + ".log");
-    }
-
-    /**
      * Read data from REST API.
      */
     private Signal<Execution> rest() {
@@ -223,7 +200,7 @@ class BitFlyerLog extends MarketLog {
 
             while (disposer.isDisposed() == false) {
                 try {
-                    final URL url = new URL(BitFlyerBackend.api + "/v1/executions?product_code=" + type + "&count=500&before=" + (latestId + 500 * offset));
+                    final URL url = new URL(BitFlyerBackend.api + "/v1/executions?product_code=" + provider + "&count=500&before=" + (latestId + 500 * offset));
                     final Executions executions = I.json(url).to(Executions.class);
 
                     // skip if there is no new execution
@@ -267,7 +244,7 @@ class BitFlyerLog extends MarketLog {
      * @return
      */
     private Signal<Execution> realtime() {
-        return Network.pubnub("lightning_executions_" + type, "sub-c-52a9ab50-291b-11e5-baaa-0619f8945a4f")
+        return Network.pubnub("lightning_executions_" + provider, "sub-c-52a9ab50-291b-11e5-baaa-0619f8945a4f")
                 .flatIterable(JsonElement::getAsJsonArray)
                 .map(JsonElement::getAsJsonObject)
                 .map(e -> {

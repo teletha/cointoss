@@ -12,8 +12,11 @@ package cointoss;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.Objects;
 
 import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
@@ -30,6 +33,12 @@ import kiss.Signal;
  */
 public abstract class MarketLog {
 
+    /** The file data format */
+    private static final DateTimeFormatter fileName = DateTimeFormatter.ofPattern("yyyyMMdd");
+
+    /** The market provider. */
+    protected final MarketProvider provider;
+
     /** The root directory of logs. */
     protected final Path root;
 
@@ -39,6 +48,7 @@ public abstract class MarketLog {
      * @param provider
      */
     protected MarketLog(MarketProvider provider) {
+        this.provider = Objects.requireNonNull(provider);
         this.root = Paths.get(".log").resolve(provider.orgnizationName()).resolve(provider.name());
     }
 
@@ -153,6 +163,16 @@ public abstract class MarketLog {
     }
 
     /**
+     * Read {@link Execution} log of the specified {@link LocalDate}.
+     * 
+     * @param date
+     * @return
+     */
+    public final Signal<Execution> read(ZonedDateTime date) {
+        return read(localCacheFile(date));
+    }
+
+    /**
      * Read {@link Execution} log.
      * 
      * @param file
@@ -179,6 +199,16 @@ public abstract class MarketLog {
             parser.stopParsing();
             return disposer;
         });
+    }
+
+    /**
+     * Read date from local cache.
+     * 
+     * @param date
+     * @return
+     */
+    protected final Path localCacheFile(ZonedDateTime date) {
+        return root.resolve("execution" + fileName.format(date) + ".log");
     }
 
     /**
