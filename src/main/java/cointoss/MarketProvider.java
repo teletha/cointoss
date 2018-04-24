@@ -10,7 +10,7 @@
 package cointoss;
 
 /**
- * @version 2018/01/29 20:59:07
+ * @version 2018/04/25 4:06:43
  */
 public interface MarketProvider {
 
@@ -36,11 +36,11 @@ public interface MarketProvider {
     String name();
 
     /**
-     * Compute orgnization name.
+     * Compute exchange name.
      * 
      * @return
      */
-    default String orgnizationName() {
+    default String exchangeName() {
         return getClass().getSimpleName();
     }
 
@@ -49,7 +49,7 @@ public interface MarketProvider {
      * 
      * @return
      */
-    default String marketName() {
-        return orgnizationName() + " " + name();
+    default String fullName() {
+        return exchangeName() + " " + name();
     }
 }

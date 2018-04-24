@@ -14,7 +14,7 @@ import cointoss.MarketLog;
 import cointoss.MarketProvider;
 
 /**
- * @version 2018/04/10 14:18:05
+ * @version 2018/04/25 4:04:43
  */
 public enum BitFlyer implements MarketProvider {
     BTC_JPY, FX_BTC_JPY, ETC_BTC, BCH_BTC;
@@ -24,14 +24,6 @@ public enum BitFlyer implements MarketProvider {
 
     /** cache */
     private final MarketBackend marketBackend = new BitFlyerBackend(this);
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String orgnizationName() {
-        return getClass().getSimpleName();
-    }
 
     /**
      * {@inheritDoc}

@@ -120,7 +120,7 @@ public class TradingView extends View {
      */
     @Override
     protected String name() {
-        return TradingView.class.getSimpleName() + View.IDSeparator + provider.marketName();
+        return TradingView.class.getSimpleName() + View.IDSeparator + provider.fullName();
     }
 
     /**

@@ -84,7 +84,7 @@ public class MarketLog {
      */
     public MarketLog(MarketProvider provider) {
         this.provider = Objects.requireNonNull(provider);
-        this.root = Paths.get(".log").resolve(provider.orgnizationName()).resolve(provider.name());
+        this.root = Paths.get(".log").resolve(provider.exchangeName()).resolve(provider.name());
 
         try {
             ZonedDateTime start = null;
