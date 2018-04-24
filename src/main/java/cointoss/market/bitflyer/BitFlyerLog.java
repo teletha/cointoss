@@ -14,9 +14,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
-import java.nio.file.Path;
 import java.time.Duration;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -30,10 +28,8 @@ import com.google.gson.JsonElement;
 import cointoss.Execution;
 import cointoss.MarketLog;
 import cointoss.Side;
-import cointoss.util.Chrono;
 import cointoss.util.Network;
 import cointoss.util.Num;
-import filer.Filer;
 import kiss.I;
 import kiss.Signal;
 
@@ -50,9 +46,6 @@ class BitFlyerLog extends MarketLog {
         return thread;
     });
 
-    /** file data format */
-    private static final DateTimeFormatter fomatFile = DateTimeFormatter.ofPattern("yyyyMMdd");
-
     /** realtime data format */
     private static final DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
 
@@ -65,12 +58,6 @@ class BitFlyerLog extends MarketLog {
     /** The latest realtime id. */
     private long realtimeId;
 
-    /** The first day. */
-    private final ZonedDateTime cacheFirst;
-
-    /** The last day. */
-    private ZonedDateTime cacheLast;
-
     /** The current processing cache file. */
     private BufferedWriter cache;
 
@@ -81,33 +68,6 @@ class BitFlyerLog extends MarketLog {
      */
     BitFlyerLog(BitFlyer provider) {
         super(provider);
-
-        try {
-            ZonedDateTime start = null;
-            ZonedDateTime end = null;
-
-            for (Path file : Filer.walk(root, "execution*.log").toList()) {
-                String name = file.getFileName().toString();
-                ZonedDateTime date = LocalDate.parse(name.substring(9, 17), fomatFile).atTime(0, 0, 0, 0).atZone(Chrono.UTC);
-
-                if (start == null || end == null) {
-                    start = date;
-                    end = date;
-                } else {
-                    if (start.isAfter(date)) {
-                        start = date;
-                    }
-
-                    if (end.isBefore(date)) {
-                        end = date;
-                    }
-                }
-            }
-            this.cacheFirst = start;
-            this.cacheLast = end;
-        } catch (final Exception e) {
-            throw I.quiet(e);
-        }
     }
 
     /**
@@ -143,22 +103,6 @@ class BitFlyerLog extends MarketLog {
 
             return disposer;
         });
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ZonedDateTime getCacheStart() {
-        return cacheFirst;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ZonedDateTime getCacheEnd() {
-        return cacheLast;
     }
 
     /**
@@ -244,6 +188,7 @@ class BitFlyerLog extends MarketLog {
      * 
      * @return
      */
+    @Override
     public Signal<Execution> realtime() {
         return Network.pubnub("lightning_executions_" + provider, "sub-c-52a9ab50-291b-11e5-baaa-0619f8945a4f")
                 .flatIterable(JsonElement::getAsJsonArray)

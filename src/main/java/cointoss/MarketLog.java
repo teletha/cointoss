@@ -25,6 +25,7 @@ import com.univocity.parsers.csv.CsvWriterSettings;
 
 import cointoss.util.Chrono;
 import cointoss.util.Span;
+import filer.Filer;
 import kiss.I;
 import kiss.Signal;
 
@@ -42,6 +43,12 @@ public abstract class MarketLog {
     /** The root directory of logs. */
     protected final Path root;
 
+    /** The first day. */
+    protected ZonedDateTime cacheFirst;
+
+    /** The last day. */
+    protected ZonedDateTime cacheLast;
+
     /**
      * Create log manager.
      * 
@@ -50,6 +57,33 @@ public abstract class MarketLog {
     protected MarketLog(MarketProvider provider) {
         this.provider = Objects.requireNonNull(provider);
         this.root = Paths.get(".log").resolve(provider.orgnizationName()).resolve(provider.name());
+
+        try {
+            ZonedDateTime start = null;
+            ZonedDateTime end = null;
+
+            for (Path file : Filer.walk(root, "execution*.log").toList()) {
+                String name = file.getFileName().toString();
+                ZonedDateTime date = LocalDate.parse(name.substring(9, 17), fileName).atTime(0, 0, 0, 0).atZone(Chrono.UTC);
+
+                if (start == null || end == null) {
+                    start = date;
+                    end = date;
+                } else {
+                    if (start.isAfter(date)) {
+                        start = date;
+                    }
+
+                    if (end.isBefore(date)) {
+                        end = date;
+                    }
+                }
+            }
+            this.cacheFirst = start;
+            this.cacheLast = end;
+        } catch (Exception e) {
+            throw I.quiet(e);
+        }
     }
 
     /**
@@ -57,14 +91,18 @@ public abstract class MarketLog {
      * 
      * @return
      */
-    public abstract ZonedDateTime getCacheStart();
+    public final ZonedDateTime getCacheStart() {
+        return cacheFirst;
+    }
 
     /**
      * Get the ending day of cache.
      * 
      * @return
      */
-    public abstract ZonedDateTime getCacheEnd();
+    public final ZonedDateTime getCacheEnd() {
+        return cacheLast;
+    }
 
     /**
      * Read date from the specified date.

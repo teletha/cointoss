@@ -59,7 +59,7 @@ import viewtify.Viewtify;
 /**
  * @version 2018/02/27 10:20:56
  */
-class BitFlyerBackend implements MarketBackend {
+class BitFlyerBackend extends MarketBackend {
 
     static {
         Logger.getLogger(OkHttpClient.class.getName()).setLevel(Level.FINE);
