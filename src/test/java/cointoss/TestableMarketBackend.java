@@ -91,7 +91,7 @@ class TestableMarketBackend extends MarketBackend implements MarketProvider {
      * {@inheritDoc}
      */
     @Override
-    public void initialize(Market market, Signal<Execution> log) {
+    protected void initialize(Market market, Signal<Execution> log) {
         diposer.add(log.to(e -> market.tick(emulate(e))));
     }
 

@@ -27,7 +27,7 @@ public abstract class MarketBackend implements Disposable {
      * 
      * @param market
      */
-    public abstract void initialize(Market market, Signal<Execution> log);
+    protected abstract void initialize(Market market, Signal<Execution> log);
 
     /**
      * Get the server health (status).

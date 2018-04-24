@@ -134,7 +134,7 @@ class BitFlyerBackend extends MarketBackend {
      * {@inheritDoc}
      */
     @Override
-    public void initialize(Market market, Signal<Execution> log) {
+    protected void initialize(Market market, Signal<Execution> log) {
         disposer.add(log.to(market::tick));
     }
 
