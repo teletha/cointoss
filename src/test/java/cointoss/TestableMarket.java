@@ -160,8 +160,7 @@ class TestableMarket extends Market {
      */
     void requestAndExecution(Order order) {
         request(order).to(id -> {
-            execute(order.side, order.size, order.price, order.side.isBuy() ? id.id
-                    : "", order.side().isSell() ? id.id : "");
+            execute(order.side, order.size, order.price, order.side.isBuy() ? id.id : "", order.side().isSell() ? id.id : "");
         });
     }
 
@@ -219,7 +218,7 @@ class TestableMarket extends Market {
      * @return
      */
     boolean validateExecutionState(int executed) {
-        assert backend.getExecutions().toList().size() == executed;
+        assert backend.executions().toList().size() == executed;
 
         return true;
     }

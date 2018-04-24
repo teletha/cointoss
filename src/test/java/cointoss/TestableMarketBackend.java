@@ -146,9 +146,7 @@ class TestableMarketBackend extends MarketBackend implements MarketProvider {
      */
     @Override
     public Signal<Execution> executions() {
-        // If this exception will be thrown, it is bug of this program. So we must rethrow the
-        // wrapped error in here.
-        throw new Error();
+        return I.signal(executeds);
     }
 
     /**
@@ -175,14 +173,6 @@ class TestableMarketBackend extends MarketBackend implements MarketProvider {
     @Override
     public Signal<Position> getPositions() {
         return I.signal(positions);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Signal<Execution> getExecutions() {
-        return I.signal(executeds);
     }
 
     /**

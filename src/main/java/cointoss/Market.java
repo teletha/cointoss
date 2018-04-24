@@ -293,15 +293,6 @@ public class Market implements Disposable {
     }
 
     /**
-     * List up all executions.
-     * 
-     * @return A list of all executions.
-     */
-    public final List<Execution> executions() {
-        return backend.getExecutions().toList();
-    }
-
-    /**
      * Check order status.
      * 
      * @return

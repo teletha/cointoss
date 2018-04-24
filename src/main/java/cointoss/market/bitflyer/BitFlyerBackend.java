@@ -272,16 +272,6 @@ class BitFlyerBackend extends MarketBackend {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Execution> getExecutions() {
-        // If this exception will be thrown, it is bug of this program. So we must rethrow the
-        // wrapped error in here.
-        throw new Error();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public Signal<Num> getBaseCurrency() {
         return call("GET", "/v1/me/getbalance", "", "*", CurrencyState.class).take(unit -> unit.currency_code.equals("JPY"))
                 .map(c -> c.available);

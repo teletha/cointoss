@@ -90,15 +90,6 @@ public abstract class MarketBackend implements Disposable {
 
     /**
      * <p>
-     * Check all executions.
-     * </p>
-     * 
-     * @return
-     */
-    public abstract Signal<Execution> getExecutions();
-
-    /**
-     * <p>
      * Get amount of the base currency.
      * </p>
      * 
