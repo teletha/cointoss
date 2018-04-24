@@ -19,7 +19,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
-import cointoss.MarketBackend.Health;
 import cointoss.order.Order;
 import cointoss.order.Order.State;
 import cointoss.order.OrderBook;
@@ -103,7 +102,7 @@ public class Market implements Disposable {
     public final Signal<Position> yourExecution = new Signal(holderForYourExecution);
 
     /** The market health. */
-    public final Variable<Health> health = Variable.empty();
+    public final Variable<MarketHealth> health = Variable.empty();
 
     /** The initial execution. */
     public final Variable<Execution> init = Variable.empty();

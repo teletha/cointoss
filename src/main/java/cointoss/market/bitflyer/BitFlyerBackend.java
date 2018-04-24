@@ -32,6 +32,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import cointoss.Execution;
+import cointoss.MarketHealth;
 import cointoss.Market;
 import cointoss.MarketBackend;
 import cointoss.Position;
@@ -101,7 +102,7 @@ class BitFlyerBackend extends MarketBackend {
     private final Signal<List<Order>> intervalOrderCheck;
 
     /** The shared server health. */
-    private final Signal<Health> health;
+    private final Signal<MarketHealth> health;
 
     /** The singleton. */
     private final OkHttpClient client = new OkHttpClient();
@@ -152,7 +153,7 @@ class BitFlyerBackend extends MarketBackend {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Health> health() {
+    public Signal<MarketHealth> health() {
         return health;
     }
 
@@ -469,25 +470,25 @@ class BitFlyerBackend extends MarketBackend {
      * @param value
      * @return
      */
-    private Health parseHealth(String value) {
+    private MarketHealth parseHealth(String value) {
         switch (value.toLowerCase().replaceAll("\\s", "")) {
         case "normal":
-            return MarketBackend.Health.Normal;
+            return MarketHealth.Normal;
 
         case "busy":
-            return MarketBackend.Health.Busy;
+            return MarketHealth.Busy;
 
         case "verybusy":
-            return MarketBackend.Health.VeryBusy;
+            return MarketHealth.VeryBusy;
 
         case "superbusy":
-            return MarketBackend.Health.SuperBusy;
+            return MarketHealth.SuperBusy;
 
         case "noorder":
-            return MarketBackend.Health.NoOrder;
+            return MarketHealth.NoOrder;
 
         case "stop":
-            return MarketBackend.Health.Stop;
+            return MarketHealth.Stop;
         }
         // If this exception will be thrown, it is bug of this program. So we must rethrow
         // the wrapped error in here.
@@ -781,7 +782,7 @@ class BitFlyerBackend extends MarketBackend {
     private static class ServerHealth {
 
         /** The server status. */
-        public Health status;
+        public MarketHealth status;
     }
 
     /**

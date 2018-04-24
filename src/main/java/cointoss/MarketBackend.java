@@ -34,7 +34,7 @@ public abstract class MarketBackend implements Disposable {
      * 
      * @return
      */
-    public abstract Signal<Health> health();
+    public abstract Signal<MarketHealth> health();
 
     /**
      * <p>
@@ -130,21 +130,4 @@ public abstract class MarketBackend implements Disposable {
      * @return
      */
     protected abstract String[] encode(Execution execution, Execution previous);
-
-    /**
-     * @version 2018/02/28 16:28:41
-     */
-    public static enum Health {
-        Normal("🌑"), Busy("🌘"), VeryBusy("🌗"), SuperBusy("🌖"), NoOrder("🌕"), Stop("💀");
-
-        /** The human-readable status. */
-        public final String mark;
-
-        /**
-         * @param mark
-         */
-        private Health(String mark) {
-            this.mark = mark;
-        }
-    }
 }
