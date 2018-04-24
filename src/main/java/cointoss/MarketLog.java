@@ -9,6 +9,10 @@
  */
 package cointoss;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -16,7 +20,11 @@ import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
@@ -34,6 +42,14 @@ import kiss.Signal;
  */
 public abstract class MarketLog {
 
+    /** The writer thread. */
+    private static final ExecutorService writer = Executors.newSingleThreadExecutor(run -> {
+        final Thread thread = new Thread(run);
+        thread.setName("Log Writer");
+        thread.setDaemon(true);
+        return thread;
+    });
+
     /** The file data format */
     private static final DateTimeFormatter fileName = DateTimeFormatter.ofPattern("yyyyMMdd");
 
@@ -48,6 +64,18 @@ public abstract class MarketLog {
 
     /** The last day. */
     protected ZonedDateTime cacheLast;
+
+    /** The latest execution id. */
+    private long latestId = 23164000;
+
+    /** The latest cached id. */
+    private long cacheId;
+
+    /** The latest realtime id. */
+    protected long realtimeId;
+
+    /** The current processing cache file. */
+    private BufferedWriter cache;
 
     /**
      * Create log manager.
@@ -110,7 +138,118 @@ public abstract class MarketLog {
      * @param start
      * @return
      */
-    public abstract Signal<Execution> from(ZonedDateTime start);
+    public final synchronized Signal<Execution> from(final ZonedDateTime start) {
+        return new Signal<Execution>((observer, disposer) -> {
+            // read from cache
+            if (cacheFirst != null) {
+                ZonedDateTime current = start.isBefore(cacheFirst) ? cacheFirst : start.isAfter(cacheLast) ? cacheLast : start;
+                current = current.withHour(0).withMinute(0).withSecond(0).withNano(0);
+
+                while (disposer.isDisposed() == false && !current.isAfter(getCacheEnd())) {
+                    disposer.add(read(current).effect(e -> latestId = cacheId = e.id)
+                            .take(e -> e.exec_date.isAfter(start))
+                            .to(observer::accept));
+                    current = current.plusDays(1);
+                }
+            }
+
+            final AtomicBoolean completeREST = new AtomicBoolean();
+
+            // read from realtime API
+            if (disposer.isDisposed() == false) {
+                disposer.add(realtime().skipUntil(e -> completeREST.get()).effect(this::cache).to(observer::accept));
+            }
+
+            // read from REST API
+            if (disposer.isDisposed() == false) {
+                disposer.add(rest().effect(this::cache).effectOnComplete(() -> completeREST.set(true)).to(observer::accept));
+            }
+
+            return disposer;
+        });
+    }
+
+    /**
+     * Store cache data.
+     * 
+     * @param exe
+     */
+    private void cache(final Execution exe) {
+        if (cacheId < exe.id) {
+            cacheId = exe.id;
+
+            writer.submit(() -> {
+                try {
+                    final ZonedDateTime date = exe.exec_date;
+
+                    if (cache == null || cacheLast.isBefore(date)) {
+                        I.quiet(cache);
+
+                        final File file = localCacheFile(date).toFile();
+                        file.createNewFile();
+
+                        cache = new BufferedWriter(new FileWriter(file, true));
+                        cacheLast = date.withHour(23).withMinute(59).withSecond(59).withNano(999999999);
+                    }
+                    cache.write(exe.toString() + "\r\n");
+                    cache.flush();
+                } catch (final IOException e) {
+                    throw I.quiet(e);
+                }
+            });
+        }
+    }
+
+    /**
+     * Read data in realtime.
+     * 
+     * @return
+     */
+    /**
+     * Read data from REST API.
+     */
+    private Signal<Execution> rest() {
+        return new Signal<Execution>((observer, disposer) -> {
+            int offset = 0;
+
+            while (disposer.isDisposed() == false) {
+                try {
+                    List<Execution> executions = provider.service().executions(latestId + 499 * offset).toList();
+
+                    // skip if there is no new execution
+                    if (executions.get(0).id == latestId) {
+                        offset++;
+                        continue;
+                    }
+                    offset = 0;
+
+                    for (int i = executions.size() - 1; 0 <= i; i--) {
+                        final Execution exe = executions.get(i);
+
+                        if (latestId < exe.id) {
+                            observer.accept(exe);
+                            latestId = exe.id;
+                        }
+                    }
+                } catch (Exception e) {
+                    // ignore to retry
+                }
+
+                if (realtimeId != 0 && realtimeId <= latestId) {
+                    break;
+                }
+
+                try {
+                    Thread.sleep(222);
+                } catch (final InterruptedException e) {
+                    observer.error(e);
+                }
+            }
+            observer.complete();
+
+            return disposer;
+        });
+    }
 
     /**
      * Read data in realtime.

@@ -231,6 +231,14 @@ class BitFlyerBackend extends MarketBackend {
      * {@inheritDoc}
      */
     @Override
+    public Signal<Execution> executions(long id) {
+        return call("GET", "/v1/executions?product_code=" + type.name() + "&count=499&before=" + (id + 499), "", "*", Execution.class);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Signal<Order> orders() {
         return call("GET", "/v1/me/getchildorders?child_order_state=ACTIVE&product_code=" + type.name(), "", "*", ChildOrderResponse.class)
                 .map(ChildOrderResponse::toOrder);

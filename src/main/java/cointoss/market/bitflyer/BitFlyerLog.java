@@ -10,9 +10,6 @@
 package cointoss.market.bitflyer;
 
 import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.net.URL;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -21,7 +18,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.google.gson.JsonElement;
 
@@ -38,28 +34,8 @@ import kiss.Signal;
  */
 class BitFlyerLog extends MarketLog {
 
-    /** The writer thread. */
-    private static final ExecutorService writer = Executors.newSingleThreadExecutor(run -> {
-        final Thread thread = new Thread(run);
-        thread.setName("Log Writer");
-        thread.setDaemon(true);
-        return thread;
-    });
-
     /** realtime data format */
     private static final DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
-
-    /** The latest execution id. */
-    private long latestId = 23164000;
-
-    /** The latest cached id. */
-    private long cacheId;
-
-    /** The latest realtime id. */
-    private long realtimeId;
-
-    /** The current processing cache file. */
-    private BufferedWriter cache;
 
     /**
      * Bitflyer log manager.
@@ -68,119 +44,6 @@ class BitFlyerLog extends MarketLog {
      */
     BitFlyerLog(BitFlyer provider) {
         super(provider);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public synchronized Signal<Execution> from(final ZonedDateTime start) {
-        return new Signal<Execution>((observer, disposer) -> {
-            // read from cache
-            if (cacheFirst != null) {
-                ZonedDateTime current = start.isBefore(cacheFirst) ? cacheFirst : start.isAfter(cacheLast) ? cacheLast : start;
-                current = current.withHour(0).withMinute(0).withSecond(0).withNano(0);
-
-                while (disposer.isDisposed() == false && !current.isAfter(getCacheEnd())) {
-                    disposer.add(read(current).effect(e -> latestId = cacheId = e.id)
-                            .take(e -> e.exec_date.isAfter(start))
-                            .to(observer::accept));
-                    current = current.plusDays(1);
-                }
-            }
-
-            final AtomicBoolean completeREST = new AtomicBoolean();
-
-            // read from realtime API
-            if (disposer.isDisposed() == false) {
-                disposer.add(realtime().skipUntil(e -> completeREST.get()).effect(this::cache).to(observer::accept));
-            }
-
-            // read from REST API
-            if (disposer.isDisposed() == false) {
-                disposer.add(rest().effect(this::cache).effectOnComplete(() -> completeREST.set(true)).to(observer::accept));
-            }
-
-            return disposer;
-        });
-    }
-
-    /**
-     * Store cache data.
-     * 
-     * @param exe
-     */
-    private void cache(final Execution exe) {
-        if (cacheId < exe.id) {
-            cacheId = exe.id;
-
-            writer.submit(() -> {
-                try {
-                    final ZonedDateTime date = exe.exec_date;
-
-                    if (cache == null || cacheLast.isBefore(date)) {
-                        I.quiet(cache);
-
-                        final File file = localCacheFile(date).toFile();
-                        file.createNewFile();
-
-                        cache = new BufferedWriter(new FileWriter(file, true));
-                        cacheLast = date.withHour(23).withMinute(59).withSecond(59).withNano(999999999);
-                    }
-                    cache.write(exe.toString() + "\r\n");
-                    cache.flush();
-                } catch (final IOException e) {
-                    throw I.quiet(e);
-                }
-            });
-        }
-    }
-
-    /**
-     * Read data from REST API.
-     */
-    private Signal<Execution> rest() {
-        return new Signal<Execution>((observer, disposer) -> {
-            int offset = 1;
-
-            while (disposer.isDisposed() == false) {
-                try {
-                    final URL url = new URL(BitFlyerBackend.api + "/v1/executions?product_code=" + provider + "&count=500&before=" + (latestId + 500 * offset));
-                    final Executions executions = I.json(url).to(Executions.class);
-
-                    // skip if there is no new execution
-                    if (executions.get(0).id == latestId) {
-                        offset++;
-                        continue;
-                    }
-                    offset = 1;
-
-                    for (int i = executions.size() - 1; 0 <= i; i--) {
-                        final Execution exe = executions.get(i);
-
-                        if (latestId < exe.id) {
-                            observer.accept(exe);
-                            latestId = exe.id;
-                        }
-                    }
-                } catch (final Exception e) {
-                    // ignore to retry
-                }
-
-                if (realtimeId != 0 && realtimeId <= latestId) {
-                    break;
-                }
-
-                try {
-                    Thread.sleep(222);
-                } catch (final InterruptedException e) {
-                    observer.error(e);
-                }
-            }
-            observer.complete();
-
-            return disposer;
-        });
     }
 
     /**

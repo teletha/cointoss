@@ -63,6 +63,14 @@ public abstract class MarketBackend implements Disposable {
     public abstract Signal<Order> cancel(Order order);
 
     /**
+     * Acquire the execution log after the specified ID as much as possible.
+     * 
+     * @param id
+     * @return
+     */
+    public abstract Signal<Execution> executions(long id);
+
+    /**
      * <p>
      * Request all orders.
      * </p>

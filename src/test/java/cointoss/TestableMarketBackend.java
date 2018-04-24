@@ -145,6 +145,16 @@ class TestableMarketBackend extends MarketBackend implements MarketProvider {
      * {@inheritDoc}
      */
     @Override
+    public Signal<Execution> executions(long id) {
+        // If this exception will be thrown, it is bug of this program. So we must rethrow the
+        // wrapped error in here.
+        throw new Error();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Signal<Order> orders() {
         return I.signal(orderAll).as(Order.class);
     }
