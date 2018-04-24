@@ -33,7 +33,7 @@ public enum BitFlyer implements MarketProvider {
     public static final Span DownTrend = new Span(2017, 6, 11, 2017, 7, 16);
 
     /** cache */
-    private final MarketLog marketLog = new BitFlyerLog(this);
+    private final MarketLog marketLog = new MarketLog(this);
 
     /** cache */
     private final MarketBackend marketBackend = new BitFlyerBackend(this);

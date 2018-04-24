@@ -16,7 +16,7 @@ import kiss.Disposable;
 import kiss.Signal;
 
 /**
- * @version 2018/02/28 16:28:45
+ * @version 2018/04/25 2:37:12
  */
 public abstract class MarketBackend implements Disposable {
 
@@ -61,6 +61,13 @@ public abstract class MarketBackend implements Disposable {
      * @param order A order to cancel.
      */
     public abstract Signal<Order> cancel(Order order);
+
+    /**
+     * Acquire the execution log in realtime.
+     * 
+     * @return
+     */
+    public abstract Signal<Execution> executions();
 
     /**
      * Acquire the execution log after the specified ID as much as possible.
@@ -123,6 +130,22 @@ public abstract class MarketBackend implements Disposable {
      * @return
      */
     public abstract Signal<OrderBookListChange> getOrderBook();
+
+    /**
+     * Build execution from log.
+     * 
+     * @param values
+     * @return
+     */
+    protected abstract Execution decode(String[] values, Execution previous);
+
+    /**
+     * Build log from execution.
+     * 
+     * @param execution
+     * @return
+     */
+    protected abstract String[] encode(Execution execution, Execution previous);
 
     /**
      * @version 2018/02/28 16:28:41

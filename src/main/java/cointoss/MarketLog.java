@@ -38,9 +38,9 @@ import kiss.I;
 import kiss.Signal;
 
 /**
- * @version 2017/09/08 18:20:48
+ * @version 2018/04/25 2:37:27
  */
-public abstract class MarketLog {
+public class MarketLog {
 
     /** The writer thread. */
     private static final ExecutorService writer = Executors.newSingleThreadExecutor(run -> {
@@ -82,7 +82,7 @@ public abstract class MarketLog {
      * 
      * @param provider
      */
-    protected MarketLog(MarketProvider provider) {
+    public MarketLog(MarketProvider provider) {
         this.provider = Objects.requireNonNull(provider);
         this.root = Paths.get(".log").resolve(provider.orgnizationName()).resolve(provider.name());
 
@@ -157,7 +157,12 @@ public abstract class MarketLog {
 
             // read from realtime API
             if (disposer.isDisposed() == false) {
-                disposer.add(realtime().skipUntil(e -> completeREST.get()).effect(this::cache).to(observer::accept));
+                disposer.add(provider.service().executions().effect(e -> {
+                    if (e.id == 0) {
+                        e.id = ++realtimeId;
+                    }
+                    realtimeId = e.id;
+                }).skipUntil(e -> completeREST.get()).effect(this::cache).to(observer::accept));
             }
 
             // read from REST API
@@ -250,13 +255,6 @@ public abstract class MarketLog {
             return disposer;
         });
     }
-
-    /**
-     * Read data in realtime.
-     * 
-     * @return
-     */
-    public abstract Signal<Execution> realtime();
 
     /**
      * Read date from the specified date.
@@ -377,7 +375,7 @@ public abstract class MarketLog {
             Execution previous = null;
 
             while ((row = parser.parseNext()) != null) {
-                observer.accept(previous = decode(row, hasCompact ? previous : null));
+                observer.accept(previous = provider.service().decode(row, hasCompact ? previous : null));
             }
 
             parser.stopParsing();
@@ -423,7 +421,7 @@ public abstract class MarketLog {
             String[] row = null;
             while ((row = parser.parseNext()) != null) {
                 Execution current = new Execution(row);
-                writer.writeRow(encode(current, previous));
+                writer.writeRow(provider.service().encode(current, previous));
                 previous = current;
             }
             writer.close();
@@ -442,20 +440,4 @@ public abstract class MarketLog {
     private Path computeCompactLogFile(Path file) {
         return file.resolveSibling(file.getFileName().toString().replace(".log", ".clog"));
     }
-
-    /**
-     * Build execution from log.
-     * 
-     * @param values
-     * @return
-     */
-    protected abstract Execution decode(String[] values, Execution previous);
-
-    /**
-     * Build log from execution.
-     * 
-     * @param execution
-     * @return
-     */
-    protected abstract String[] encode(Execution execution, Execution previous);
 }

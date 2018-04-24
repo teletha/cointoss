@@ -1,3 +1,4 @@
+package cointoss;
 /*
  * Copyright (C) 2018 Nameless Production Committee
  *
@@ -7,28 +8,27 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss.market.bitflyer;
 
 import static cointoss.MarketTestSupport.*;
 
 import org.junit.jupiter.api.Test;
 
-import cointoss.Execution;
+import cointoss.market.bitflyer.BitFlyer;
 
 /**
  * @version 2018/04/23 23:31:21
  */
 public class BitFlyerLogTest {
 
-    BitFlyerLog log = new BitFlyerLog(BitFlyer.FX_BTC_JPY);
+    MarketBackend service = BitFlyer.FX_BTC_JPY.service();
 
     @Test
     void compact() {
         Execution first = buy(10, 1);
         Execution second = buy(11, 2);
 
-        String[] encoded = log.encode(second, first);
-        Execution decoded = log.decode(encoded, first);
+        String[] encoded = service.encode(second, first);
+        Execution decoded = service.decode(encoded, first);
         System.out.println(first.buyer() + "  " + second.buyer() + "   " + decoded.buyer());
 
         assert decoded.equals(second);
