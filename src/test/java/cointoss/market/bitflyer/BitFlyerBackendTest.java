@@ -1,4 +1,4 @@
-package cointoss;
+package cointoss.market.bitflyer;
 /*
  * Copyright (C) 2018 Nameless Production Committee
  *
@@ -13,14 +13,14 @@ import static cointoss.MarketTestSupport.*;
 
 import org.junit.jupiter.api.Test;
 
-import cointoss.market.bitflyer.BitFlyer;
+import cointoss.Execution;
 
 /**
  * @version 2018/04/23 23:31:21
  */
-public class BitFlyerLogTest {
+public class BitFlyerBackendTest {
 
-    MarketBackend service = BitFlyer.FX_BTC_JPY.service();
+    BitFlyerBackend service = new BitFlyerBackend(BitFlyer.FX_BTC_JPY);
 
     @Test
     void compact() {
