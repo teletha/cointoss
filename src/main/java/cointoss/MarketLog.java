@@ -38,7 +38,7 @@ import kiss.I;
 import kiss.Signal;
 
 /**
- * @version 2018/04/25 2:37:27
+ * @version 2018/04/25 4:13:13
  */
 public class MarketLog {
 
@@ -54,16 +54,16 @@ public class MarketLog {
     private static final DateTimeFormatter fileName = DateTimeFormatter.ofPattern("yyyyMMdd");
 
     /** The market provider. */
-    protected final MarketProvider provider;
+    private final MarketProvider provider;
 
     /** The root directory of logs. */
-    protected final Path root;
+    private final Path root;
 
     /** The first day. */
-    protected ZonedDateTime cacheFirst;
+    private ZonedDateTime cacheFirst;
 
     /** The last day. */
-    protected ZonedDateTime cacheLast;
+    private ZonedDateTime cacheLast;
 
     /** The latest execution id. */
     private long latestId = 23164000;
@@ -72,7 +72,7 @@ public class MarketLog {
     private long cacheId;
 
     /** The latest realtime id. */
-    protected long realtimeId;
+    private long realtimeId;
 
     /** The current processing cache file. */
     private BufferedWriter cache;
@@ -115,24 +115,6 @@ public class MarketLog {
     }
 
     /**
-     * Get the starting day of cache.
-     * 
-     * @return
-     */
-    public final ZonedDateTime getCacheStart() {
-        return cacheFirst;
-    }
-
-    /**
-     * Get the ending day of cache.
-     * 
-     * @return
-     */
-    public final ZonedDateTime getCacheEnd() {
-        return cacheLast;
-    }
-
-    /**
      * Read date from the specified date.
      * 
      * @param start
@@ -145,7 +127,7 @@ public class MarketLog {
                 ZonedDateTime current = start.isBefore(cacheFirst) ? cacheFirst : start.isAfter(cacheLast) ? cacheLast : start;
                 current = current.withHour(0).withMinute(0).withSecond(0).withNano(0);
 
-                while (disposer.isDisposed() == false && !current.isAfter(getCacheEnd())) {
+                while (disposer.isDisposed() == false && !current.isAfter(cacheLast)) {
                     disposer.add(read(current).effect(e -> latestId = cacheId = e.id)
                             .take(e -> e.exec_date.isAfter(start))
                             .to(observer::accept));
@@ -305,7 +287,7 @@ public class MarketLog {
      * @return
      */
     public final Signal<Execution> rangeAll() {
-        return range(getCacheStart(), getCacheEnd());
+        return range(cacheFirst, cacheLast);
     }
 
     /**
@@ -341,7 +323,7 @@ public class MarketLog {
      * @return
      */
     public final Signal<Execution> rangeRandom(int days) {
-        return range(Span.random(getCacheStart(), getCacheEnd().minusDays(1), days));
+        return range(Span.random(cacheFirst, cacheLast.minusDays(1), days));
     }
 
     /**
@@ -389,7 +371,7 @@ public class MarketLog {
      * @param date
      * @return
      */
-    protected final Path localCacheFile(ZonedDateTime date) {
+    private final Path localCacheFile(ZonedDateTime date) {
         return root.resolve("execution" + fileName.format(date) + ".log");
     }
 
