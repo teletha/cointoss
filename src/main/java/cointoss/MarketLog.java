@@ -75,6 +75,13 @@ public abstract class MarketLog {
     public abstract Signal<Execution> from(ZonedDateTime start);
 
     /**
+     * Read data in realtime.
+     * 
+     * @return
+     */
+    public abstract Signal<Execution> realtime();
+
+    /**
      * Read date from the specified date.
      * 
      * @param start

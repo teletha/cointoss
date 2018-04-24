@@ -54,7 +54,7 @@ class BitFlyerLog extends MarketLog {
     private static final DateTimeFormatter fomatFile = DateTimeFormatter.ofPattern("yyyyMMdd");
 
     /** realtime data format */
-    private static final DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.n'Z'");
+    private static final DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
 
     /** The latest execution id. */
     private long latestId = 23164000;
@@ -244,7 +244,7 @@ class BitFlyerLog extends MarketLog {
      * 
      * @return
      */
-    private Signal<Execution> realtime() {
+    public Signal<Execution> realtime() {
         return Network.pubnub("lightning_executions_" + provider, "sub-c-52a9ab50-291b-11e5-baaa-0619f8945a4f")
                 .flatIterable(JsonElement::getAsJsonArray)
                 .map(JsonElement::getAsJsonObject)
@@ -254,8 +254,8 @@ class BitFlyerLog extends MarketLog {
                     exe.side = Side.parse(e.get("side").getAsString());
                     exe.price = Num.of(e.get("price").getAsString());
                     exe.size = exe.cumulativeSize = Num.of(e.get("size").getAsString());
-                    System.out.println(e.get("exec_date").getAsString());
-                    exe.exec_date = LocalDateTime.parse(e.get("exec_date").getAsString(), format).atZone(BitFlyerBackend.zone);
+                    exe.exec_date = LocalDateTime.parse(e.get("exec_date").getAsString().substring(0, 23), format)
+                            .atZone(BitFlyerBackend.zone);
                     exe.buy_child_order_acceptance_id = e.get("buy_child_order_acceptance_id").getAsString();
                     exe.sell_child_order_acceptance_id = e.get("sell_child_order_acceptance_id").getAsString();
 

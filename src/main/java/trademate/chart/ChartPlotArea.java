@@ -413,7 +413,7 @@ public class ChartPlotArea extends Region {
             private final Color color;
 
             /** The y-point of values. */
-            private double[] valueY;
+            private double[] valueY = new double[0];
 
             /** The max value. */
             private double valueMax = 0;
