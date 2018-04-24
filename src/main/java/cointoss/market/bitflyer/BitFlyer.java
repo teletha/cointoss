@@ -34,17 +34,6 @@ public enum BitFlyer implements MarketProvider {
     }
 
     /**
-     * <p>
-     * Compute full name.
-     * </p>
-     * 
-     * @return
-     */
-    public String marketName() {
-        return orgnizationName() + " " + name();
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override

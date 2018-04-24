@@ -43,4 +43,13 @@ public interface MarketProvider {
     default String orgnizationName() {
         return getClass().getSimpleName();
     }
+
+    /**
+     * Full market name.
+     * 
+     * @return
+     */
+    default String marketName() {
+        return orgnizationName() + " " + name();
+    }
 }

@@ -192,15 +192,6 @@ public class Market implements Disposable {
     }
 
     /**
-     * Market name.
-     * 
-     * @return
-     */
-    public String name() {
-        return backend.name();
-    }
-
-    /**
      * Get {@link Ticker} by span.
      * 
      * @param span

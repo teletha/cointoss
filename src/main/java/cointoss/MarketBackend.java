@@ -21,13 +21,6 @@ import kiss.Signal;
 public abstract class MarketBackend implements Disposable {
 
     /**
-     * Backend name.
-     * 
-     * @return
-     */
-    public abstract String name();
-
-    /**
      * <p>
      * Initialize and activate market backend.
      * </p>
