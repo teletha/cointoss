@@ -20,8 +20,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javafx.scene.control.TextInputDialog;
 
@@ -62,10 +60,6 @@ import viewtify.Viewtify;
  * @version 2018/04/25 2:37:00
  */
 class BitFlyerBackend extends MarketBackend {
-
-    static {
-        Logger.getLogger(OkHttpClient.class.getName()).setLevel(Level.FINE);
-    }
 
     /** The key for internal id. */
     private static final String InternalID = BitFlyerBackend.class.getName() + "#ID";
