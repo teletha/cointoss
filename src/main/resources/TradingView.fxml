@@ -175,6 +175,25 @@
                         <ComboBox id="orderQuantity" maxWidth="70.0" minWidth="70.0" prefWidth="70.0" />
                      </children>
                   </HBox>
+                  <HBox alignment="CENTER_LEFT">
+                     <children>
+                        <Label alignment="CENTER" prefHeight="40.0" prefWidth="60.0" style="&#10;" text="決済" textAlignment="CENTER" wrapText="false" />
+                        <HBox alignment="CENTER_LEFT" prefWidth="120.0">
+                           <children>
+                              <Button id="orderRetreat" mnemonicParsing="false" prefHeight="30.0" prefWidth="51.0" text="撤退" textAlignment="CENTER" textFill="#9f9f9f">
+                                 <HBox.margin>
+                                    <Insets />
+                                 </HBox.margin>
+                              </Button>
+                              <Button id="orderReverse" alignment="CENTER" mnemonicParsing="false" prefHeight="30.0" prefWidth="51.0" text="ドテン" textAlignment="CENTER" textFill="#9f9f9f">
+                                 <HBox.margin>
+                                    <Insets />
+                                 </HBox.margin>
+                              </Button>
+                           </children>
+                        </HBox>
+                     </children>
+                  </HBox>
                   <VBox>
                      <children>
                         <CheckBox id="bot" mnemonicParsing="false" text="Bot" />

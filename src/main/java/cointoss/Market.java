@@ -51,6 +51,9 @@ public class Market implements Disposable {
     /** The market handler. */
     protected final MarketBackend backend;
 
+    /** The position manager. */
+    public final PositionManager positions = new PositionManager();
+
     public final ExecutionFlow flow = new ExecutionFlow(100);
 
     public final ExecutionFlow flow75 = new ExecutionFlow(200);
@@ -127,9 +130,6 @@ public class Market implements Disposable {
 
     /** The ticker manager. */
     private final EnumMap<TickSpan, Ticker> tickers = new EnumMap(TickSpan.class);
-
-    /** The position manager. */
-    private final List<Position> positions = new CopyOnWriteArrayList();
 
     /** The order manager. */
     private final List<Order> orders = new CopyOnWriteArrayList();

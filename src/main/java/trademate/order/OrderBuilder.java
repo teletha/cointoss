@@ -97,6 +97,12 @@ public class OrderBuilder extends View {
     private @UI UIButton orderLimitShort;
 
     /** UI */
+    private @UI UIButton orderRetreat;
+
+    /** UI */
+    private @UI UIButton orderReverse;
+
+    /** UI */
     private @UI UIComboBox<Quantity> orderQuantity;
 
     /** UI */
@@ -134,6 +140,10 @@ public class OrderBuilder extends View {
         orderLimitLong.when(User.Click).throttle(1000, MILLISECONDS).mapTo(Side.BUY).to(this::requestOrder);
         orderLimitShort.when(User.Click).throttle(1000, MILLISECONDS).mapTo(Side.SELL).to(this::requestOrder);
         orderQuantity.values(Quantity.values()).initial(Quantity.GoodTillCanceled);
+
+        orderRetreat.when(User.Click).throttle(1000, MILLISECONDS).to(this::retreat);
+        orderReverse.when(User.Click).throttle(1000, MILLISECONDS).to(this::reverse);
+
         Spreader spreader = new Spreader();
 
         bot.observe(use -> {
@@ -203,5 +213,19 @@ public class OrderBuilder extends View {
             price = optimizedPrice.plus(priceInterval);
         }
         view.order(set);
+    }
+
+    /**
+     * Request retreat order.
+     */
+    private void retreat() {
+
+    }
+
+    /**
+     * Request reverse order.
+     */
+    private void reverse() {
+
     }
 }
