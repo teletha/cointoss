@@ -90,4 +90,34 @@ public class MarketTestSupport {
 
         return exe;
     }
+
+    /**
+     * Create {@link Position}.
+     * 
+     * @param side
+     * @param price
+     * @param size
+     * @return
+     */
+    public static Position position(Side side, double price, double size) {
+        return position(side, Num.of(price), Num.of(size));
+    }
+
+    /**
+     * Create {@link Position}.
+     * 
+     * @param side
+     * @param price
+     * @param size
+     * @return
+     */
+    public static Position position(Side side, Num price, Num size) {
+        Position position = new Position();
+        position.date = ZonedDateTime.now().truncatedTo(ChronoUnit.MILLIS);
+        position.side = Objects.requireNonNull(side);
+        position.price = Objects.requireNonNull(price);
+        position.size.set(Objects.requireNonNull(size));
+
+        return position;
+    }
 }

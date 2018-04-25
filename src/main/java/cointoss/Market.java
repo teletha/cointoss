@@ -399,6 +399,7 @@ public class Market implements Disposable {
                 position.size.set(exe.size);
                 position.date = exe.exec_date;
                 holderForYourExecution.accept(position);
+                // positions.add(position);
             }
         }
 

@@ -13,6 +13,8 @@ import static cointoss.MarketTestSupport.*;
 
 import org.junit.jupiter.api.Test;
 
+import cointoss.util.Num;
+
 /**
  * @version 2018/04/25 16:24:55
  */
@@ -24,7 +26,7 @@ public class PositionManagerTest {
         assert positions.hasPosition() == false;
         assert positions.hasNoPosition() == true;
 
-        positions.add(Side.BUY, buy(10, 1));
+        positions.add(position(Side.BUY, 10, 1));
         assert positions.hasPosition() == true;
         assert positions.hasNoPosition() == false;
     }
@@ -35,7 +37,7 @@ public class PositionManagerTest {
         assert positions.isLong() == false;
         assert positions.isShort() == false;
 
-        positions.add(Side.BUY, buy(10, 1));
+        positions.add(position(Side.BUY, 10, 1));
         assert positions.isLong() == true;
         assert positions.isShort() == false;
     }
@@ -46,8 +48,69 @@ public class PositionManagerTest {
         assert positions.isLong() == false;
         assert positions.isShort() == false;
 
-        positions.add(Side.SELL, buy(10, 1));
+        positions.add(position(Side.SELL, 10, 1));
         assert positions.isLong() == false;
         assert positions.isShort() == true;
+    }
+
+    @Test
+    void size() {
+        PositionManager positions = new PositionManager();
+        assert positions.size.is(Num.ZERO);
+
+        // long
+        positions.add(position(Side.BUY, 10, 1));
+        assert positions.size.is(Num.ONE);
+
+        // same price long
+        positions.add(position(Side.BUY, 10, 1));
+        assert positions.size.is(Num.TWO);
+
+        // different price long
+        positions.add(position(Side.BUY, 20, 1));
+        assert positions.size.is(Num.THREE);
+
+        // short
+        positions.add(position(Side.SELL, 10, 2));
+        assert positions.size.is(Num.ONE);
+
+        // turn over
+        positions.add(position(Side.SELL, 20, 2));
+        assert positions.size.is(Num.ONE);
+    }
+
+    @Test
+    void price() {
+        PositionManager positions = new PositionManager();
+        assert positions.price.is(Num.ZERO);
+
+        // long
+        positions.add(position(Side.BUY, 10, 1));
+        assert positions.price.is(Num.TEN);
+
+        // same price long
+        positions.add(position(Side.BUY, 10, 1));
+        assert positions.price.is(Num.TEN);
+
+        // different price long
+        positions.add(position(Side.BUY, 20, 2));
+        assert positions.price.is(Num.of(15));
+
+        // short
+        positions.add(position(Side.SELL, 10, 2));
+        assert positions.price.is(Num.of(20));
+
+        // turn over
+        positions.add(position(Side.SELL, 20, 2));
+        assert positions.price.is(Num.ZERO);
+    }
+
+    @Test
+    void zero() {
+        PositionManager positions = new PositionManager();
+        positions.add(position(Side.BUY, 10, 1));
+        positions.add(position(Side.SELL, 12, 1));
+
+        assert positions.hasNoPosition();
     }
 }
