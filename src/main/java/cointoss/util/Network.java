@@ -9,89 +9,89 @@
  */
 package cointoss.util;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.google.gson.JsonElement;
-import com.pubnub.api.PNConfiguration;
-import com.pubnub.api.PubNub;
-import com.pubnub.api.callbacks.SubscribeCallback;
-import com.pubnub.api.enums.PNReconnectionPolicy;
-import com.pubnub.api.enums.PNStatusCategory;
-import com.pubnub.api.models.consumer.PNStatus;
-import com.pubnub.api.models.consumer.pubsub.PNMessageResult;
-import com.pubnub.api.models.consumer.pubsub.PNPresenceEventResult;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import kiss.I;
 import kiss.Signal;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.WebSocket;
+import okhttp3.WebSocketListener;
 
 /**
- * @version 2018/02/25 18:36:37
+ * @version 2018/04/26 23:31:42
  */
 public class Network {
 
+    /** The singleton. */
+    private static final OkHttpClient client = new OkHttpClient();
+
     /**
-     * Create pubnub connection.
+     * Connect by websocket.
      * 
+     * @param uri
      * @param channelName
-     * @param subscribeKey
      * @return
      */
-    public static Signal<JsonElement> pubnub(String channelName, String subscribeKey) {
+    public static Signal<JsonElement> websocket(String uri, String channelName) {
         return new Signal<>((observer, disposer) -> {
-            PNConfiguration config = new PNConfiguration();
-            config.setSecure(true);
-            config.setReconnectionPolicy(PNReconnectionPolicy.EXPONENTIAL);
-            config.setNonSubscribeRequestTimeout(5);
-            config.setPresenceTimeout(5);
-            config.setSubscribeTimeout(15);
-            config.setStartSubscriberThread(true);
-            config.setSubscribeKey(subscribeKey);
+            JsonParser parser = new JsonParser();
+            Request request = new Request.Builder().url(uri).build();
 
-            PubNub pubNub = new PubNub(config);
-            pubNub.addListener(new SubscribeCallback() {
+            WebSocket websocket = client.newWebSocket(request, new WebSocketListener() {
 
                 /**
-                 * @param pubnub
-                 * @param status
+                 * {@inheritDoc}
                  */
                 @Override
-                public void status(PubNub pubnub, PNStatus status) {
-                    System.out.println(status);
-                    if (status.getCategory() == PNStatusCategory.PNUnexpectedDisconnectCategory) {
-                        // internet got lost, do some magic and call reconnect when ready
-                        pubnub.disconnect();
-                        pubnub.reconnect();
-                    } else if (status.getCategory() == PNStatusCategory.PNTimeoutCategory) {
-                        // do some magic and call reconnect when ready
-                        pubnub.disconnect();
-                        pubnub.reconnect();
-                    }
+                public void onOpen(WebSocket socket, Response response) {
+                    JsonRPC invoke = new JsonRPC();
+                    invoke.method = "subscribe";
+                    invoke.params.put("channel", channelName);
+
+                    socket.send(I.write(invoke));
                 }
 
                 /**
-                 * @param pubnub
-                 * @param presence
+                 * {@inheritDoc}
                  */
                 @Override
-                public void presence(PubNub pubnub, PNPresenceEventResult presence) {
-                    System.out.println("PRESENCE : " + presence);
-                }
+                public void onMessage(WebSocket socket, String text) {
+                    JsonObject e = parser.parse(text).getAsJsonObject();
+                    JsonObject params = e.getAsJsonObject("params");
 
-                /**
-                 * @param pubnub
-                 * @param message
-                 */
-                @Override
-                public void message(PubNub pubnub, PNMessageResult message) {
-                    if (message.getChannel() != null) {
-                        observer.accept(message.getMessage());
+                    if (params != null) {
+                        observer.accept(params.get("message"));
                     }
                 }
             });
-            pubNub.subscribe().channels(I.list(channelName)).execute();
 
             return disposer.add(() -> {
-                pubNub.unsubscribeAll();
-                pubNub.forceDestroy();
+                websocket.cancel();
+                client.dispatcher().executorService().shutdown();
+                client.connectionPool().evictAll();
             });
         });
+    }
+
+    /**
+     * @version 2018/04/26 21:09:09
+     */
+    @SuppressWarnings("unused")
+    private static class JsonRPC {
+
+        public long id;
+
+        public String jsonrpc = "2.0";
+
+        public String method;
+
+        public Map<String, String> params = new HashMap();
     }
 }

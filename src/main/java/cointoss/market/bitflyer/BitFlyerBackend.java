@@ -224,7 +224,7 @@ class BitFlyerBackend extends MarketBackend {
      */
     @Override
     public Signal<Execution> executions() {
-        return Network.pubnub("lightning_executions_" + type, "sub-c-52a9ab50-291b-11e5-baaa-0619f8945a4f")
+        return Network.websocket("wss://ws.lightstream.bitflyer.com/json-rpc", "lightning_executions_FX_BTC_JPY")
                 .flatIterable(JsonElement::getAsJsonArray)
                 .map(JsonElement::getAsJsonObject)
                 .map(e -> {
@@ -333,7 +333,7 @@ class BitFlyerBackend extends MarketBackend {
      * @return
      */
     private Signal<OrderBookListChange> realtimeOrderBook() {
-        return Network.pubnub("lightning_board_" + type, "sub-c-52a9ab50-291b-11e5-baaa-0619f8945a4f")
+        return Network.websocket("wss://ws.lightstream.bitflyer.com/json-rpc", "lightning_board_" + type)
                 .map(JsonElement::getAsJsonObject)
                 .map(e -> {
                     OrderBookListChange change = new OrderBookListChange();
