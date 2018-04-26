@@ -19,6 +19,8 @@ import java.util.stream.IntStream;
 import javafx.scene.control.Spinner;
 import javafx.scene.input.ScrollEvent;
 
+import cointoss.MarketTestSupport;
+import cointoss.Position;
 import cointoss.Side;
 import cointoss.order.Order;
 import cointoss.order.Order.Quantity;
@@ -219,13 +221,18 @@ public class OrderBuilder extends View {
      * Request retreat order.
      */
     private void retreat() {
+        Position pos = MarketTestSupport.position(Side.BUY, 900000, 1);
 
+        view.market().positions.add(pos);
     }
 
     /**
      * Request reverse order.
      */
     private void reverse() {
+        Position pos = MarketTestSupport.position(Side.SELL, 900000, 1);
+
+        view.market().positions.add(pos);
 
     }
 }

@@ -32,9 +32,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import cointoss.Execution;
-import cointoss.MarketHealth;
 import cointoss.Market;
 import cointoss.MarketBackend;
+import cointoss.MarketHealth;
 import cointoss.Position;
 import cointoss.Side;
 import cointoss.order.Order;
@@ -233,13 +233,36 @@ class BitFlyerBackend extends MarketBackend {
                     exe.side = Side.parse(e.get("side").getAsString());
                     exe.price = Num.of(e.get("price").getAsString());
                     exe.size = exe.cumulativeSize = Num.of(e.get("size").getAsString());
-                    exe.exec_date = LocalDateTime.parse(e.get("exec_date").getAsString().substring(0, 23), RealTimeExecutionFormat)
+                    exe.exec_date = LocalDateTime.parse(normalize(e.get("exec_date").getAsString()), RealTimeExecutionFormat)
                             .atZone(BitFlyerBackend.zone);
                     exe.buy_child_order_acceptance_id = e.get("buy_child_order_acceptance_id").getAsString();
                     exe.sell_child_order_acceptance_id = e.get("sell_child_order_acceptance_id").getAsString();
 
                     return exe;
                 });
+    }
+
+    /**
+     * Normalize time format.
+     * 
+     * @param time
+     * @return
+     */
+    static String normalize(String time) {
+        int size = time.length();
+
+        // remove tail Z
+        time = time.substring(0, size - 1);
+
+        // padding 0
+        if (size < 24) {
+            StringBuilder builder = new StringBuilder();
+            for (int i = 0; i < 24 - size; i++) {
+                builder.append("0");
+            }
+            time = time + builder;
+        }
+        return time.substring(0, 23);
     }
 
     /**

@@ -51,9 +51,6 @@ public class Market implements Disposable {
     /** The market handler. */
     protected final MarketBackend backend;
 
-    /** The position manager. */
-    public final PositionManager positions = new PositionManager();
-
     public final ExecutionFlow flow = new ExecutionFlow(100);
 
     public final ExecutionFlow flow75 = new ExecutionFlow(200);
@@ -112,6 +109,9 @@ public class Market implements Disposable {
 
     /** The latest execution. */
     public final Variable<Execution> latest = Variable.of(new Execution());
+
+    /** The position manager. */
+    public final PositionManager positions = new PositionManager(latest);
 
     /** 基軸通貨量 */
     private Num base;

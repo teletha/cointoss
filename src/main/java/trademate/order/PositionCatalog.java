@@ -79,15 +79,12 @@ public class PositionCatalog extends View {
         manager.add(positive1);
         manager.add(positive2);
 
-        Calculation<Num> totalAmount = Viewtify.calculate(positions.values).flatVariable(p -> p.size).reduce(Num.ZERO, Num::plus);
-        Calculation<Num> totalPrice = Viewtify.calculate(positions.values).reduce(Num.ZERO, (t, p) -> t.plus(p.price.multiply(p.size)));
-        Calculation<Num> averagePrice = Viewtify.calculate(totalPrice, totalAmount, (total, amount) -> total.divide(amount).scale(0));
         Calculation<Num> totalProfit = Viewtify.calculate(positions.values).flatVariable(p -> p.profit).reduce(Num.ZERO, Num::plus);
 
         openPositionDate.model(o -> o.date).render((ui, item) -> ui.text(formatter.format(item)));
         openPositionSide.model(o -> o.side).render((ui, item) -> ui.text(item).styleOnly(item));
         openPositionAmount.modelByVar(o -> o.size).header(Viewtify.calculate("数量 ").concat(manager.size).trim());
-        openPositionPrice.model(o -> o.price).header(Viewtify.calculate("価格 ").concat(averagePrice).trim());
+        openPositionPrice.model(o -> o.price).header(Viewtify.calculate("価格 ").concat(manager.price).trim());
         openPositionProfitAndLoss.modelByVar(o -> o.profit).header(Viewtify.calculate("損益 ").concat(totalProfit).trim());
         positions.selectMultipleRows().context($ -> {
             $.menu("撤退").whenUserClick(() -> positions.selection().forEach(this::retreat));

@@ -14,6 +14,7 @@ import static cointoss.MarketTestSupport.*;
 import org.junit.jupiter.api.Test;
 
 import cointoss.util.Num;
+import kiss.Variable;
 
 /**
  * @version 2018/04/25 16:24:55
@@ -22,7 +23,7 @@ public class PositionManagerTest {
 
     @Test
     void hasPosition() {
-        PositionManager positions = new PositionManager();
+        PositionManager positions = new PositionManager(null);
         assert positions.hasPosition() == false;
         assert positions.hasNoPosition() == true;
 
@@ -33,7 +34,7 @@ public class PositionManagerTest {
 
     @Test
     void isLong() {
-        PositionManager positions = new PositionManager();
+        PositionManager positions = new PositionManager(null);
         assert positions.isLong() == false;
         assert positions.isShort() == false;
 
@@ -44,7 +45,7 @@ public class PositionManagerTest {
 
     @Test
     void isShort() {
-        PositionManager positions = new PositionManager();
+        PositionManager positions = new PositionManager(null);
         assert positions.isLong() == false;
         assert positions.isShort() == false;
 
@@ -55,7 +56,7 @@ public class PositionManagerTest {
 
     @Test
     void size() {
-        PositionManager positions = new PositionManager();
+        PositionManager positions = new PositionManager(null);
         assert positions.size.is(Num.ZERO);
 
         // long
@@ -81,7 +82,7 @@ public class PositionManagerTest {
 
     @Test
     void price() {
-        PositionManager positions = new PositionManager();
+        PositionManager positions = new PositionManager(null);
         assert positions.price.is(Num.ZERO);
 
         // long
@@ -106,8 +107,35 @@ public class PositionManagerTest {
     }
 
     @Test
+    void profit() {
+        Variable<Execution> latest = Variable.of(buy(20, 1));
+        PositionManager positions = new PositionManager(latest);
+        assert positions.profit.is(Num.ZERO);
+
+        // long
+        positions.add(position(Side.BUY, 10, 1));
+        assert positions.profit.is(Num.of(10));
+
+        // same price long
+        positions.add(position(Side.BUY, 10, 1));
+        assert positions.profit.is(Num.of(20));
+
+        // different price long
+        positions.add(position(Side.BUY, 20, 2));
+        assert positions.profit.is(Num.of(15));
+
+        // short
+        positions.add(position(Side.SELL, 10, 2));
+        assert positions.profit.is(Num.of(20));
+
+        // turn over
+        positions.add(position(Side.SELL, 20, 2));
+        assert positions.profit.is(Num.ZERO);
+    }
+
+    @Test
     void zero() {
-        PositionManager positions = new PositionManager();
+        PositionManager positions = new PositionManager(null);
         positions.add(position(Side.BUY, 10, 1));
         positions.add(position(Side.SELL, 12, 1));
 

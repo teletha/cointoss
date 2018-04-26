@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test;
 import cointoss.Execution;
 
 /**
- * @version 2018/04/23 23:31:21
+ * @version 2018/04/26 10:38:43
  */
 public class BitFlyerBackendTest {
 
@@ -32,5 +32,11 @@ public class BitFlyerBackendTest {
         System.out.println(first.buyer() + "  " + second.buyer() + "   " + decoded.buyer());
 
         assert decoded.equals(second);
+    }
+
+    @Test
+    void normalize() {
+        assert BitFlyerBackend.normalize("2018-04-26T00:32:26.1234567Z").equals("2018-04-26T00:32:26.123");
+        assert BitFlyerBackend.normalize("2018-04-26T00:32:26.19Z").equals("2018-04-26T00:32:26.190");
     }
 }

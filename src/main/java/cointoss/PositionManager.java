@@ -47,6 +47,21 @@ public final class PositionManager {
     /** The average price. */
     public final Variable<Num> price = Variable.of(Num.ZERO);
 
+    /** The total profit and loss. */
+    public final Variable<Num> profit = Variable.of(Num.ZERO);
+
+    /** The latest market price. */
+    private final Variable<Num> latestPrice;
+
+    /**
+     * Manage {@link Position}.
+     * 
+     * @param latest A latest market {@link Execution} holder.
+     */
+    public PositionManager(Variable<Execution> latest) {
+        latestPrice = latest == null ? Variable.of(Num.ZERO) : latest.observe().map(e -> e.price).diff().to();
+    }
+
     /**
      * Check the position state.
      * 
@@ -146,5 +161,19 @@ public final class PositionManager {
 
         this.size.set(size);
         this.price.set(size.isZero() ? Num.ZERO : price.divide(size));
+        recalculateProfit(latestPrice.v);
+    }
+
+    private void recalculateProfit(Num price) {
+        Num total = Num.ZERO;
+
+        for (Position position : positions) {
+            Num profit = position.isBuy() ? price.minus(position.price) : position.price.minus(price);
+            profit = profit.multiply(position.size).scale(0);
+
+            position.profit.set(profit);
+            total = total.plus(profit);
+        }
+        this.profit.set(total);
     }
 }
