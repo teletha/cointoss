@@ -108,10 +108,13 @@ public class Market implements Disposable {
     public final Variable<Execution> init = Variable.empty();
 
     /** The latest execution. */
-    public final Variable<Execution> latest = Variable.of(new Execution());
+    public final Variable<Execution> latest = Variable.of(Execution.NONE);
+
+    /** The latest price. */
+    public final Variable<Num> price = latest.observeNow().map(e -> e.price).diff().to();
 
     /** The position manager. */
-    public final PositionManager positions = new PositionManager(latest);
+    public final PositionManager positions = new PositionManager(price);
 
     /** 基軸通貨量 */
     private Num base;

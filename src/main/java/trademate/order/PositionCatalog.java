@@ -23,12 +23,11 @@ import trademate.TradingView;
 import viewtify.UI;
 import viewtify.View;
 import viewtify.Viewtify;
-import viewtify.bind.Calculation;
 import viewtify.ui.UITableColumn;
 import viewtify.ui.UITableView;
 
 /**
- * @version 2018/04/25 17:18:29
+ * @version 2018/04/26 14:54:03
  */
 public class PositionCatalog extends View {
 
@@ -79,54 +78,13 @@ public class PositionCatalog extends View {
         manager.add(positive1);
         manager.add(positive2);
 
-        Calculation<Num> totalProfit = Viewtify.calculate(positions.values).flatVariable(p -> p.profit).reduce(Num.ZERO, Num::plus);
-
         openPositionDate.model(o -> o.date).render((ui, item) -> ui.text(formatter.format(item)));
         openPositionSide.model(o -> o.side).render((ui, item) -> ui.text(item).styleOnly(item));
         openPositionAmount.modelByVar(o -> o.size).header(Viewtify.calculate("数量 ").concat(manager.size).trim());
         openPositionPrice.model(o -> o.price).header(Viewtify.calculate("価格 ").concat(manager.price).trim());
-        openPositionProfitAndLoss.modelByVar(o -> o.profit).header(Viewtify.calculate("損益 ").concat(totalProfit).trim());
+        openPositionProfitAndLoss.modelByVar(o -> o.profit).header(Viewtify.calculate("損益 ").concat(manager.profit).trim());
         positions.selectMultipleRows().context($ -> {
             $.menu("撤退").whenUserClick(() -> positions.selection().forEach(this::retreat));
-        });
-
-        // view.market().yourExecution.startWith().on(Viewtify.UIThread).to(p -> {
-        // for (Position position : positions.values) {
-        // if (position.side == p.side) {
-        // if (position.price.is(p.price)) {
-        // position.size.set(p.size.v.plus(position.size));
-        // return;
-        // }
-        // } else {
-        // Num diff = p.size.get().minus(position.size);
-        // if (diff.isPositive()) {
-        // p.size.set(diff);
-        // position.size.set(Num.ZERO);
-        // } else if (diff.isZero()) {
-        // p.size.set(diff);
-        // position.size.set(Num.ZERO);
-        // break;
-        // } else {
-        // position.size.set(position.size.get().minus(p.size));
-        // return;
-        // }
-        // }
-        // }
-        //
-        // if (p.size.v.isPositive()) {
-        // positions.values.add(p);
-        // p.size.observe().take(Num::isZero).to(() -> positions.values.remove(p));
-        // }
-        // });
-
-        view.market().latest.observe().on(Viewtify.UIThread).to(e -> {
-            for (Position position : manager.items) {
-                if (position.isBuy()) {
-                    position.profit.set(e.price.minus(position.price).multiply(position.size).scale(0));
-                } else {
-                    position.profit.set(position.price.minus(e.price).multiply(position.size).scale(0));
-                }
-            }
         });
     }
 

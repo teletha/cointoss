@@ -19,7 +19,7 @@ import kiss.Variable;
 import viewtify.Switch;
 
 /**
- * @version 2018/04/25 16:59:46
+ * @version 2018/04/26 18:11:34
  */
 public final class PositionManager {
 
@@ -51,15 +51,16 @@ public final class PositionManager {
     public final Variable<Num> profit = Variable.of(Num.ZERO);
 
     /** The latest market price. */
-    private final Variable<Num> latestPrice;
+    private final Variable<Num> latest;
 
     /**
      * Manage {@link Position}.
      * 
      * @param latest A latest market {@link Execution} holder.
      */
-    public PositionManager(Variable<Execution> latest) {
-        latestPrice = latest == null ? Variable.of(Num.ZERO) : latest.observe().map(e -> e.price).diff().to();
+    public PositionManager(Variable<Num> latest) {
+        this.latest = latest == null ? Variable.of(Num.ZERO) : latest;
+        this.latest.observe().to(this::calculateProfit);
     }
 
     /**
@@ -111,7 +112,7 @@ public final class PositionManager {
                     // check same price position
                     if (position.price.is(add.price)) {
                         position.size.set(add.size.v::plus);
-                        recalculate();
+                        calculate();
                         return;
                     }
                 } else {
@@ -129,11 +130,11 @@ public final class PositionManager {
 
                         positions.remove(position);
                         remove.emit(position);
-                        recalculate();
+                        calculate();
                         return;
                     } else {
                         position.size.set(v -> v.minus(add.size));
-                        recalculate();
+                        calculate();
                         return;
                     }
                 }
@@ -142,7 +143,7 @@ public final class PositionManager {
             if (add.size.v.isPositive()) {
                 positions.add(add);
                 addition.emit(add);
-                recalculate();
+                calculate();
             }
         }
     }
@@ -150,7 +151,7 @@ public final class PositionManager {
     /**
      * Calculate some variables.
      */
-    private void recalculate() {
+    private void calculate() {
         Num size = Num.ZERO;
         Num price = Num.ZERO;
 
@@ -161,10 +162,13 @@ public final class PositionManager {
 
         this.size.set(size);
         this.price.set(size.isZero() ? Num.ZERO : price.divide(size));
-        recalculateProfit(latestPrice.v);
+        calculateProfit(latest.v);
     }
 
-    private void recalculateProfit(Num price) {
+    /**
+     * Calculate profit variable.
+     */
+    private void calculateProfit(Num price) {
         Num total = Num.ZERO;
 
         for (Position position : positions) {

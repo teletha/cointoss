@@ -108,7 +108,7 @@ public class PositionManagerTest {
 
     @Test
     void profit() {
-        Variable<Execution> latest = Variable.of(buy(20, 1));
+        Variable<Num> latest = Variable.of(Num.of(20));
         PositionManager positions = new PositionManager(latest);
         assert positions.profit.is(Num.ZERO);
 
@@ -122,11 +122,11 @@ public class PositionManagerTest {
 
         // different price long
         positions.add(position(Side.BUY, 20, 2));
-        assert positions.profit.is(Num.of(15));
+        assert positions.profit.is(Num.of(20));
 
         // short
         positions.add(position(Side.SELL, 10, 2));
-        assert positions.profit.is(Num.of(20));
+        assert positions.profit.is(Num.ZERO);
 
         // turn over
         positions.add(position(Side.SELL, 20, 2));

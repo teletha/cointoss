@@ -20,9 +20,20 @@ import kiss.Decoder;
 import kiss.Encoder;
 
 /**
- * @version 2017/08/23 8:47:20
+ * @version 2018/04/26 14:49:40
  */
 public class Execution {
+
+    /** The empty object. */
+    public static final Execution NONE = new Execution();
+
+    static {
+        NONE.id = 0;
+        NONE.exec_date = ZonedDateTime.now();
+        NONE.side = Side.BUY;
+        NONE.price = Num.ZERO;
+        NONE.size = Num.ZERO;
+    }
 
     public long id;
 
@@ -72,7 +83,7 @@ public class Execution {
     /**
      * @param line
      */
-    public Execution(String[] values) {
+    public Execution(String... values) {
         id = Long.parseLong(values[0]);
         exec_date = LocalDateTime.parse(values[1]).atZone(cointoss.util.Chrono.UTC);
         side = Side.parse(values[2]);
