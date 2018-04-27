@@ -78,11 +78,13 @@ public class PositionCatalog extends View {
         manager.add(positive1);
         manager.add(positive2);
 
+        Variable<String> map = manager.profit.observeNow().map(e -> e.asJPY()).to();
+
         openPositionDate.model(o -> o.date).render((ui, item) -> ui.text(formatter.format(item)));
         openPositionSide.model(o -> o.side).render((ui, item) -> ui.text(item).styleOnly(item));
-        openPositionAmount.modelByVar(o -> o.size).header(Viewtify.calculate("数量 ").concat(manager.size).trim());
-        openPositionPrice.model(o -> o.price).header(Viewtify.calculate("価格 ").concat(manager.price).trim());
-        openPositionProfitAndLoss.modelByVar(o -> o.profit).header(Viewtify.calculate("損益 ").concat(manager.profit).trim());
+        openPositionAmount.modelByVar(o -> o.size).header(Viewtify.calculate("数量 ").concat(manager.profit));
+        openPositionPrice.model(o -> o.price).header(Viewtify.calculate("価格 ").concat(manager.profit).trim());
+        openPositionProfitAndLoss.modelByVar(o -> o.profit).header(Viewtify.calculate(map));
         positions.selectMultipleRows().context($ -> {
             $.menu("撤退").whenUserClick(() -> positions.selection().forEach(this::retreat));
         });
