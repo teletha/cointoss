@@ -20,6 +20,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import javafx.scene.control.TextInputDialog;
 
@@ -105,7 +106,7 @@ class BitFlyerBackend extends MarketBackend {
     private final Signal<MarketHealth> health;
 
     /** The singleton. */
-    private final OkHttpClient client = new OkHttpClient();
+    private final OkHttpClient client = new OkHttpClient.Builder().connectTimeout(30, SECONDS).build();
 
     /** The session key. */
     private final String sessionKey = "api_session_v2";
@@ -591,7 +592,7 @@ class BitFlyerBackend extends MarketBackend {
                     observer.error(new Error("HTTP Status " + code + " " + value));
                 }
             } catch (Throwable e) {
-                observer.error(e);
+                observer.error(new Error("[" + path + "] throws some error.", e));
             }
             return disposer;
         });
