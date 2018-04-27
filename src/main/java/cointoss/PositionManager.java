@@ -105,7 +105,7 @@ public final class PositionManager {
      * @param side A position side.
      * @param exe A target execution.
      */
-    public void add(Position add) {
+    void add(Position add) {
         if (add != null) {
             for (Position position : positions) {
                 if (position.side == add.side) {

@@ -18,7 +18,6 @@ import cointoss.Side;
 import cointoss.order.Order;
 import cointoss.order.OrderBookList;
 import cointoss.util.Num;
-import kiss.Variable;
 import trademate.TradingView;
 import viewtify.UI;
 import viewtify.View;
@@ -60,31 +59,15 @@ public class PositionCatalog extends View {
      */
     @Override
     protected void initialize() {
-        Position positive1 = new Position();
-        positive1.side = Side.BUY;
-        positive1.date = ZonedDateTime.now();
-        positive1.price = Num.of(700000);
-        positive1.size = Variable.of(Num.ONE);
-
-        Position positive2 = new Position();
-        positive2.side = Side.BUY;
-        positive2.date = ZonedDateTime.now();
-        positive2.price = Num.of(700001);
-        positive2.size = Variable.of(Num.ONE);
         PositionManager manager = view.market().positions;
-
-        positions.ui.setItems(Viewtify.observe(manager.items, manager.added, manager.removed));
-
-        manager.add(positive1);
-        manager.add(positive2);
-
-        Variable<String> map = manager.profit.observeNow().map(e -> e.asJPY()).to();
 
         openPositionDate.model(o -> o.date).render((ui, item) -> ui.text(formatter.format(item)));
         openPositionSide.model(o -> o.side).render((ui, item) -> ui.text(item).styleOnly(item));
-        openPositionAmount.modelByVar(o -> o.size).header(Viewtify.calculate("数量 ").concat(manager.profit));
-        openPositionPrice.model(o -> o.price).header(Viewtify.calculate("価格 ").concat(manager.profit).trim());
-        openPositionProfitAndLoss.modelByVar(o -> o.profit).header(Viewtify.calculate(map));
+        openPositionAmount.modelByVar(o -> o.size).header("数量 ", manager.size);
+        openPositionPrice.model(o -> o.price).header("価格 ", manager.price);
+        openPositionProfitAndLoss.modelByVar(o -> o.profit).header("損益 ", manager.profit);
+
+        positions.ui.setItems(Viewtify.observe(manager.items, manager.added, manager.removed));
         positions.selectMultipleRows().context($ -> {
             $.menu("撤退").whenUserClick(() -> positions.selection().forEach(this::retreat));
         });
