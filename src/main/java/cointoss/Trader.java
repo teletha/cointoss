@@ -22,11 +22,11 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import cointoss.order.Order;
-import cointoss.util.Listeners;
 import cointoss.util.Num;
 import cointoss.util.Span;
 import kiss.Disposable;
 import kiss.Signal;
+import kiss.Signaler;
 
 /**
  * @version 2017/09/05 19:39:34
@@ -37,19 +37,19 @@ public abstract class Trader implements Disposable {
     protected Market market;
 
     /** The signal observers. */
-    private final Listeners<Boolean> closePositions = new Listeners();
+    private final Signaler<Boolean> closePositions = new Signaler();
 
     /** The trade related signal. */
     protected final Signal<Boolean> closingPosition = new Signal(closePositions);
 
     /** The signal observers. */
-    private final Listeners<Boolean> completeEntries = new Listeners();
+    private final Signaler<Boolean> completeEntries = new Signaler();
 
     /** The trade related signal. */
     protected final Signal<Boolean> completingEntry = new Signal(completeEntries);
 
     /** The signal observers. */
-    private final Listeners<Boolean> completeExits = new Listeners();
+    private final Signaler<Boolean> completeExits = new Signaler();
 
     /** The trade related signal. */
     protected final Signal<Boolean> completingExit = new Signal(completeExits);

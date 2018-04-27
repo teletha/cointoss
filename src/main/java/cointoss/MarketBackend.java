@@ -16,7 +16,7 @@ import kiss.Disposable;
 import kiss.Signal;
 
 /**
- * @version 2018/04/25 2:37:12
+ * @version 2018/04/28 1:17:19
  */
 public abstract class MarketBackend implements Disposable {
 
@@ -30,11 +30,11 @@ public abstract class MarketBackend implements Disposable {
     protected abstract void initialize(Market market, Signal<Execution> log);
 
     /**
-     * Get the server health (status).
+     * Estimate the curernt order delay (second).
      * 
      * @return
      */
-    public abstract Signal<MarketHealth> health();
+    public abstract Signal<Integer> delay();
 
     /**
      * <p>

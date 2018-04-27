@@ -17,9 +17,9 @@ import javafx.collections.ObservableList;
 import org.magicwerk.brownies.collections.GapList;
 
 import cointoss.Side;
-import cointoss.util.Listeners;
 import cointoss.util.Num;
 import kiss.Signal;
+import kiss.Signaler;
 import kiss.Variable;
 
 /**
@@ -31,7 +31,7 @@ public class OrderBookList {
     public final Variable<OrderUnit> best = Variable.empty();
 
     /** The modified event listeners. */
-    private final Listeners<Boolean> modify = new Listeners();
+    private final Signaler<Boolean> modify = new Signaler();
 
     /** The modified event stream. */
     public final Signal<Boolean> modified = new Signal(modify);

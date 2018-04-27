@@ -15,8 +15,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import cointoss.util.Num;
 import kiss.Signal;
+import kiss.Signaler;
 import kiss.Variable;
-import viewtify.Switch;
 
 /**
  * @version 2018/04/26 18:11:34
@@ -30,16 +30,16 @@ public final class PositionManager {
     public final List<Position> items = Collections.unmodifiableList(positions);
 
     /** position remove event. */
-    private final Switch<Position> remove = new Switch();
+    private final Signaler<Position> remove = new Signaler();
 
     /** position remove event. */
-    public final Signal<Position> removed = remove.expose;
+    public final Signal<Position> removed = new Signal(remove);
 
     /** position add event. */
-    private final Switch<Position> addition = new Switch();
+    private final Signaler<Position> addition = new Signaler();
 
     /** position add event. */
-    public final Signal<Position> added = addition.expose;
+    public final Signal<Position> added = new Signal(addition);
 
     /** The total size. */
     public final Variable<Num> size = Variable.of(Num.ZERO);
@@ -123,13 +123,13 @@ public final class PositionManager {
                         position.size.set(Num.ZERO);
 
                         positions.remove(position);
-                        remove.emit(position);
+                        remove.accept(position);
                     } else if (remaining.isZero()) {
                         add.size.set(remaining);
                         position.size.set(Num.ZERO);
 
                         positions.remove(position);
-                        remove.emit(position);
+                        remove.accept(position);
                         calculate();
                         return;
                     } else {
@@ -142,7 +142,7 @@ public final class PositionManager {
 
             if (add.size.v.isPositive()) {
                 positions.add(add);
-                addition.emit(add);
+                addition.accept(add);
                 calculate();
             }
         }

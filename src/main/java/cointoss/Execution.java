@@ -58,6 +58,9 @@ public class Execution {
     /** date */
     public ZonedDateTime exec_date;
 
+    /** The rough estimated delay time. (unit : second) */
+    public long delay;
+
     /** The buyer id. (may be 0) */
     public long buyer;
 

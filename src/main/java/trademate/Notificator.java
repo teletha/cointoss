@@ -9,8 +9,6 @@
  */
 package trademate;
 
-import java.util.concurrent.TimeUnit;
-
 import javafx.geometry.Pos;
 import javafx.util.Duration;
 
@@ -18,7 +16,6 @@ import org.controlsfx.control.Notifications;
 
 import kiss.Variable;
 import viewtify.Preference;
-import viewtify.Switch;
 import viewtify.Viewtify;
 
 /**
@@ -57,17 +54,11 @@ public class Notificator extends Preference<Notificator> {
         /** Showing notification pane. */
         public final Variable<Sound> sound = Variable.of(Sound.なし);
 
-        /** The actual signal. */
-        private final Switch<String> signal = new Switch();
-
         /**
          * @param i
          */
         public Type(int showTime) {
             this.showTime = Variable.of(showTime);
-            this.signal.expose.buffer(1000, TimeUnit.MILLISECONDS).to(messages -> {
-
-            });
         }
 
         /**

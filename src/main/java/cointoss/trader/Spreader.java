@@ -9,7 +9,6 @@
  */
 package cointoss.trader;
 
-import cointoss.MarketHealth;
 import cointoss.Side;
 import cointoss.Trader;
 import cointoss.order.Order;
@@ -29,7 +28,7 @@ public class Spreader extends Trader {
     @Override
     protected void initialize() {
         market.timeline.to(e -> {
-            if (whileTrading == false && market.health.is(MarketHealth.Normal)) {
+            if (whileTrading == false) {
                 Num volume = market.flow.volume();
                 Num spread = market.orderBook.spread();
 

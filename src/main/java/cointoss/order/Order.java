@@ -19,9 +19,9 @@ import java.util.Objects;
 import cointoss.Directional;
 import cointoss.Execution;
 import cointoss.Side;
-import cointoss.util.Listeners;
 import cointoss.util.Num;
 import kiss.Signal;
+import kiss.Signaler;
 import kiss.Variable;
 
 /**
@@ -52,7 +52,7 @@ public class Order implements Directional {
     private Quantity quantity;
 
     /** The event listeners. */
-    public final Listeners<Execution> listeners = new Listeners();
+    public final Signaler<Execution> listeners = new Signaler();
 
     /** The execution signal. */
     public final Signal<Execution> execute = new Signal(listeners);

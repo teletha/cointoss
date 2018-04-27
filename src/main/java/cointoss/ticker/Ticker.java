@@ -16,8 +16,8 @@ import java.util.function.Consumer;
 import org.magicwerk.brownies.collections.BigList;
 
 import cointoss.Execution;
-import cointoss.util.Listeners;
 import kiss.Signal;
+import kiss.Signaler;
 import kiss.Variable;
 
 /**
@@ -29,13 +29,13 @@ public class Ticker {
     public final TickSpan span;
 
     /** The event listeners. */
-    private final Listeners<Tick> additions = new Listeners();
+    private final Signaler<Tick> additions = new Signaler();
 
     /** The event about adding new tick. */
     public final Signal<Tick> add = new Signal(additions);
 
     /** The event listeners. */
-    private final Listeners<Tick> updaters = new Listeners();
+    private final Signaler<Tick> updaters = new Signaler();
 
     /** The event about update tick. */
     public final Signal<Tick> update = new Signal(updaters);

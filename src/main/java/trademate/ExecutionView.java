@@ -105,7 +105,7 @@ public class ExecutionView extends View {
                 setGraphic(null);
             } else {
                 setText(Chrono.system(e.exec_date).format(Chrono.Time) + "  " + e.price + "円  " + (comulative ? e.cumulativeSize : e.size)
-                        .scale(6));
+                        .scale(6) + "  " + e.delay);
                 ui.styleOnly(e.side);
             }
         }

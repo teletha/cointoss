@@ -14,13 +14,14 @@ import static java.util.concurrent.TimeUnit.*;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import javafx.scene.control.TextInputDialog;
 
@@ -35,7 +36,6 @@ import com.google.gson.JsonObject;
 import cointoss.Execution;
 import cointoss.Market;
 import cointoss.MarketBackend;
-import cointoss.MarketHealth;
 import cointoss.Position;
 import cointoss.Side;
 import cointoss.order.Order;
@@ -102,9 +102,6 @@ class BitFlyerBackend extends MarketBackend {
     /** The shared order list. */
     private final Signal<List<Order>> intervalOrderCheck;
 
-    /** The shared server health. */
-    private final Signal<MarketHealth> health;
-
     /** The singleton. */
     private final OkHttpClient client = new OkHttpClient.Builder().connectTimeout(30, SECONDS).build();
 
@@ -123,13 +120,7 @@ class BitFlyerBackend extends MarketBackend {
         this.name = lines.get(2);
         this.password = lines.get(3);
         this.accountId = lines.get(4);
-
         this.intervalOrderCheck = I.signal(0, 1, SECONDS).map(v -> orders().toList()).share();
-        this.health = I.signal(0, 5, SECONDS)
-                .flatMap(v -> call("GET", "/v1/gethealth?product_code=" + type, "", "status", String.class))
-                .map(this::parseHealth)
-                .share()
-                .diff();
     }
 
     /**
@@ -148,14 +139,6 @@ class BitFlyerBackend extends MarketBackend {
         disposer.dispose();
         client.dispatcher().executorService().shutdown();
         client.connectionPool().evictAll();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Signal<MarketHealth> health() {
-        return health;
     }
 
     /**
@@ -224,6 +207,14 @@ class BitFlyerBackend extends MarketBackend {
      * {@inheritDoc}
      */
     @Override
+    public Signal<Integer> delay() {
+        return Signal.NEVER;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Signal<Execution> executions() {
         return Network.websocket("wss://ws.lightstream.bitflyer.com/json-rpc", "lightning_executions_FX_BTC_JPY")
                 .flatIterable(JsonElement::getAsJsonArray)
@@ -238,6 +229,7 @@ class BitFlyerBackend extends MarketBackend {
                             .atZone(BitFlyerBackend.zone);
                     exe.buy_child_order_acceptance_id = e.get("buy_child_order_acceptance_id").getAsString();
                     exe.sell_child_order_acceptance_id = e.get("sell_child_order_acceptance_id").getAsString();
+                    exe.delay = estimateDelay(exe);
 
                     return exe;
                 });
@@ -264,6 +256,55 @@ class BitFlyerBackend extends MarketBackend {
             time = time + builder;
         }
         return time.substring(0, 23);
+    }
+
+    private static final DateTimeFormatter TEST = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss");
+
+    private static final ZoneOffset JST = ZoneOffset.ofHours(9);
+
+    /**
+     * <p>
+     * Analyze Taker's order ID and obtain approximate order time (Since there is a bot which
+     * specifies non-standard id format, ignore it in that case).
+     * </p>
+     * <ol>
+     * <li>Execution Date : UTC</li>
+     * <li>Server Order ID Date : UTC (i.e. stop-limit or IFD order)</li>
+     * <li>User Order ID Date : JST+9:00</li>
+     * </ol>
+     *
+     * @param exe
+     * @return
+     */
+    static long estimateDelay(Execution exe) {
+        String taker = exe.side.isBuy() ? exe.buy_child_order_acceptance_id : exe.sell_child_order_acceptance_id;
+
+        try {
+            // order format is like the following [JRF20180427-123407-869661]
+            // exclude illegal format
+            if (taker.length() != 25 || !taker.startsWith("JRF")) {
+                return 0;
+            }
+
+            // remove tail random numbers
+            taker = taker.substring(3, 18);
+
+            // parse as datetime
+            long orderTime = LocalDateTime.parse(taker, TEST).toEpochSecond(JST);
+            long executedTime = exe.exec_date.toEpochSecond() + 1;
+            long diff = executedTime - orderTime;
+
+            // estimate server order (over 9*60*60)
+            if (32000 < diff) {
+                return -2;
+            } else if (diff < 0) {
+                return -1; // some local client time is not stable, so ignore it
+            } else {
+                return diff;
+            }
+        } catch (DateTimeParseException e) {
+            return 0;
+        }
     }
 
     /**
@@ -486,37 +527,6 @@ class BitFlyerBackend extends MarketBackend {
      */
     private static String encode(String current, String previous) {
         return current.equals(previous) ? "" : current;
-    }
-
-    /**
-     * Parse health status.
-     * 
-     * @param value
-     * @return
-     */
-    private MarketHealth parseHealth(String value) {
-        switch (value.toLowerCase().replaceAll("\\s", "")) {
-        case "normal":
-            return MarketHealth.Normal;
-
-        case "busy":
-            return MarketHealth.Busy;
-
-        case "verybusy":
-            return MarketHealth.VeryBusy;
-
-        case "superbusy":
-            return MarketHealth.SuperBusy;
-
-        case "noorder":
-            return MarketHealth.NoOrder;
-
-        case "stop":
-            return MarketHealth.Stop;
-        }
-        // If this exception will be thrown, it is bug of this program. So we must rethrow
-        // the wrapped error in here.
-        throw new Error();
     }
 
     /**
@@ -798,15 +808,6 @@ class BitFlyerBackend extends MarketBackend {
 
         /** The available currency amount. */
         public Num available;
-    }
-
-    /**
-     * @version 2017/12/14 16:24:28
-     */
-    private static class ServerHealth {
-
-        /** The server status. */
-        public MarketHealth status;
     }
 
     /**

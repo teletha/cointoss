@@ -26,11 +26,11 @@ import cointoss.order.OrderBookListChange;
 import cointoss.ticker.ExecutionFlow;
 import cointoss.ticker.TickSpan;
 import cointoss.ticker.Ticker;
-import cointoss.util.Listeners;
 import cointoss.util.Num;
 import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
+import kiss.Signaler;
 import kiss.Variable;
 import viewtify.Viewtify;
 
@@ -62,7 +62,7 @@ public class Market implements Disposable {
     public final ExecutionFlow flow300 = new ExecutionFlow(1600);
 
     /** The execution listeners. */
-    private final Listeners<Execution> holderForTimeline = new Listeners();
+    private final Signaler<Execution> holderForTimeline = new Signaler();
 
     /** The execution time line. */
     public final Signal<Execution> timeline = new Signal(holderForTimeline);
@@ -90,19 +90,16 @@ public class Market implements Disposable {
     public final OrderBook orderBook = new OrderBook();
 
     /** The holder. */
-    private final Listeners<Order> holderForYourOrder = new Listeners();
+    private final Signaler<Order> holderForYourOrder = new Signaler();
 
     /** The event stream. */
     public final Signal<Order> yourOrder = new Signal(holderForYourOrder);
 
     /** The holder. */
-    private final Listeners<Position> holderForYourExecution = new Listeners();
+    private final Signaler<Position> holderForYourExecution = new Signaler();
 
     /** The event stream. */
     public final Signal<Position> yourExecution = new Signal(holderForYourExecution);
-
-    /** The market health. */
-    public final Variable<MarketHealth> health = Variable.empty();
 
     /** The initial execution. */
     public final Variable<Execution> init = Variable.empty();
@@ -182,9 +179,6 @@ public class Market implements Disposable {
         backend.add(orderTimeline.on(Viewtify.UIThread).to(board -> {
             orderBook.shorts.update(board.asks);
             orderBook.longs.update(board.bids);
-        }));
-        backend.add(backend.health().to(health -> {
-            this.health.set(health);
         }));
         backend.add(timeline.throttle(2, TimeUnit.SECONDS).to(e -> {
             // fix error board
@@ -271,7 +265,7 @@ public class Market implements Disposable {
      * @return A canceled order.
      */
     public final Signal<Order> cancel(Order order) {
-        if (order.state.is(ACTIVE) || order.state.is(REQUESTING)) {
+        if (order.state.is(ACTIVE) || order.state.is(State.REQUESTING)) {
             State previous = order.state.set(REQUESTING);
 
             return backend.cancel(order).effect(o -> {

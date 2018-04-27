@@ -13,7 +13,8 @@ import java.util.concurrent.TimeUnit;
 
 import javafx.scene.media.AudioClip;
 
-import viewtify.Switch;
+import kiss.Signal;
+import kiss.Signaler;
 import viewtify.Viewtify;
 
 /**
@@ -23,16 +24,18 @@ public enum Sound {
 
     なし, 追加, 注目, クリア, 来た, 完了, 削除, 下, エラー, 失敗, ゴール, 行くよ, スタート, 成功, 何か不安定みたい, 上, がーん, ばばーん, じゃじゃーん, 始めるよ, ブレークポイント, やったー, うわーん;
 
-    private final Switch<Object> on = new Switch();
+    private final Signaler<String> ons = new Signaler<>();
+
+    private final Signal<String> on = new Signal<>(ons);
 
     /**
      * 
      */
     private Sound() {
-        on.expose.throttle(1000, TimeUnit.MILLISECONDS)
-                .on(Viewtify.UIThread)
-                .map(v -> new AudioClip(ClassLoader.getSystemResource("sound/" + name() + ".m4a").toExternalForm()))
-                .to(AudioClip::play);
+        AudioClip audioClip2 = new AudioClip("");
+        AudioClip audioClip = new AudioClip(ClassLoader.getSystemResource("sound/" + name() + ".m4a").toExternalForm());
+
+        on.throttle(1000, TimeUnit.MILLISECONDS).on(Viewtify.UIThread).map(v -> "").to(AudioClip::play);
     }
 
     /**
@@ -40,7 +43,7 @@ public enum Sound {
      */
     public void play() {
         if (this != なし) {
-            on.emit("PLAY");
+            ons.accept("PLAY");
         }
     }
 }
