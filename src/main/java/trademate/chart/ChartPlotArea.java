@@ -127,6 +127,7 @@ public class ChartPlotArea extends Region {
 
         this.chartBottom.create(tick -> tick.longVolume.toDouble() * 2, Buy);
         this.chartBottom.create(tick -> tick.shortVolume.toDouble() * 2, Sell);
+        this.chartBottom.create(tick -> tick.delay.toDouble() * 3, Color.AQUA);
 
         Viewtify.clip(this);
 

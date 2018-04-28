@@ -61,7 +61,7 @@ import viewtify.Viewtify;
 /**
  * @version 2018/04/25 2:37:00
  */
-class BitFlyerBackend extends MarketBackend {
+public class BitFlyerBackend extends MarketBackend {
 
     /** The key for internal id. */
     private static final String InternalID = BitFlyerBackend.class.getName() + "#ID";
@@ -220,7 +220,7 @@ class BitFlyerBackend extends MarketBackend {
                 .flatIterable(JsonElement::getAsJsonArray)
                 .map(JsonElement::getAsJsonObject)
                 .map(e -> {
-                    Execution exe = new Execution();
+                    BitFlyerExecution exe = new BitFlyerExecution();
                     exe.id = e.get("id").getAsLong();
                     exe.side = Side.parse(e.get("side").getAsString());
                     exe.price = Num.of(e.get("price").getAsString());
@@ -276,14 +276,14 @@ class BitFlyerBackend extends MarketBackend {
      * @param exe
      * @return
      */
-    static long estimateDelay(Execution exe) {
+    public static long estimateDelay(Execution exe) {
         String taker = exe.side.isBuy() ? exe.buy_child_order_acceptance_id : exe.sell_child_order_acceptance_id;
 
         try {
             // order format is like the following [JRF20180427-123407-869661]
             // exclude illegal format
-            if (taker.length() != 25 || !taker.startsWith("JRF")) {
-                return 0;
+            if (taker == null || taker.length() != 25 || !taker.startsWith("JRF")) {
+                return Execution.DelayUnknown;
             }
 
             // remove tail random numbers
@@ -296,14 +296,15 @@ class BitFlyerBackend extends MarketBackend {
 
             // estimate server order (over 9*60*60)
             if (32000 < diff) {
-                return -2;
+                return Execution.DelayServerOrder;
             } else if (diff < 0) {
-                return -1; // some local client time is not stable, so ignore it
+                // some local client time is not stable, so ignore it
+                return Execution.DelayInestimable;
             } else {
                 return diff;
             }
         } catch (DateTimeParseException e) {
-            return 0;
+            return Execution.DelayUnknown;
         }
     }
 
@@ -312,7 +313,8 @@ class BitFlyerBackend extends MarketBackend {
      */
     @Override
     public Signal<Execution> executions(long id) {
-        return call("GET", "/v1/executions?product_code=" + type.name() + "&count=499&before=" + (id + 499), "", "*", Execution.class);
+        return call("GET", "/v1/executions?product_code=" + type
+                .name() + "&count=499&before=" + (id + 499), "", "*", BitFlyerExecution.class).as(Execution.class);
     }
 
     /**
@@ -848,5 +850,12 @@ class BitFlyerBackend extends MarketBackend {
         public String toString() {
             return "WebResponse [status=" + status + ", error_message=" + error_message + ", data=" + data + "]";
         }
+    }
+
+    /**
+     * @version 2018/04/28 11:52:26
+     */
+    private static class BitFlyerExecution extends Execution {
+
     }
 }

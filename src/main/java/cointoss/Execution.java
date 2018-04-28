@@ -20,9 +20,30 @@ import kiss.Decoder;
 import kiss.Encoder;
 
 /**
- * @version 2018/04/26 14:49:40
+ * @version 2018/04/28 11:35:38
  */
 public class Execution {
+
+    /** The order delay type. (DEFAULT) */
+    public static final int DelayUnknown = 0;
+
+    /** The order delay type. */
+    public static final int DelayInestimable = -1;
+
+    /** The order delay type. */
+    public static final int DelayServerOrder = -2;
+
+    /** The consecutive type. (DEFAULT) */
+    public static final int ConsecutiveUnknown = 0;
+
+    /** The consecutive type. */
+    public static final int ConsecutiveDifference = 1;
+
+    /** The consecutive type. */
+    public static final int ConsecutiveSameBuyer = 2;
+
+    /** The consecutive type. */
+    public static final int ConsecutiveSameSeller = 3;
 
     /** The empty object. */
     public static final Execution NONE = new Execution();
@@ -58,14 +79,14 @@ public class Execution {
     /** date */
     public ZonedDateTime exec_date;
 
-    /** The rough estimated delay time. (unit : second) */
+    /**
+     * Optional Attribute : The rough estimated delay time (unit : second). The negative value means
+     * special info.
+     */
     public long delay;
 
-    /** The buyer id. (may be 0) */
-    public long buyer;
-
-    /** The seller id. (may be 0) */
-    public long seller;
+    /** Optional Attribute : The consecutive type. */
+    public int consecutive;
 
     /** INTERNAL USAGE */
     Order associated;

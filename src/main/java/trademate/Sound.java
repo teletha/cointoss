@@ -32,10 +32,10 @@ public enum Sound {
      * 
      */
     private Sound() {
-        AudioClip audioClip2 = new AudioClip("");
-        AudioClip audioClip = new AudioClip(ClassLoader.getSystemResource("sound/" + name() + ".m4a").toExternalForm());
-
-        on.throttle(1000, TimeUnit.MILLISECONDS).on(Viewtify.UIThread).map(v -> "").to(AudioClip::play);
+        on.throttle(1000, TimeUnit.MILLISECONDS)
+                .on(Viewtify.UIThread)
+                .map(v -> new AudioClip(ClassLoader.getSystemResource("sound/" + name() + ".m4a").toExternalForm()))
+                .to(AudioClip::play);
     }
 
     /**

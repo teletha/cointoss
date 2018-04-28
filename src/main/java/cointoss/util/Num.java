@@ -103,6 +103,18 @@ public class Num implements Comparable<Num> {
      * @return {@code this + augend}, rounded as necessary
      * @see BigDecimal#add(java.math.BigDecimal, java.math.MathContext)
      */
+    public final Num plus(long augend) {
+        return plus(of(augend));
+    }
+
+    /**
+     * Returns a {@code Decimal} whose value is {@code (this + augend)}, with rounding according to
+     * the context settings.
+     * 
+     * @param augend value to be added to this {@code Decimal}.
+     * @return {@code this + augend}, rounded as necessary
+     * @see BigDecimal#add(java.math.BigDecimal, java.math.MathContext)
+     */
     public final Num plus(String augend) {
         return plus(of(augend));
     }
@@ -143,6 +155,18 @@ public class Num implements Comparable<Num> {
      * @see BigDecimal#subtract(java.math.BigDecimal, java.math.MathContext)
      */
     public final Num minus(int subtrahend) {
+        return minus(of(subtrahend));
+    }
+
+    /**
+     * Returns a {@code Decimal} whose value is {@code (this - augend)}, with rounding according to
+     * the context settings.
+     * 
+     * @param subtrahend value to be subtracted from this {@code Decimal}.
+     * @return {@code this - subtrahend}, rounded as necessary
+     * @see BigDecimal#subtract(java.math.BigDecimal, java.math.MathContext)
+     */
+    public final Num minus(long subtrahend) {
         return minus(of(subtrahend));
     }
 
@@ -205,6 +229,18 @@ public class Num implements Comparable<Num> {
      * @return {@code this * multiplicand}, rounded as necessary
      * @see BigDecimal#multiply(java.math.BigDecimal, java.math.MathContext)
      */
+    public final Num multiply(long multiplicand) {
+        return multiply(of(multiplicand));
+    }
+
+    /**
+     * Returns a {@code Decimal} whose value is {@code this * multiplicand}, with rounding according
+     * to the context settings.
+     * 
+     * @param multiplicand value to be multiplied by this {@code Decimal}.
+     * @return {@code this * multiplicand}, rounded as necessary
+     * @see BigDecimal#multiply(java.math.BigDecimal, java.math.MathContext)
+     */
     public final Num multiply(String multiplicand) {
         return multiply(of(multiplicand));
     }
@@ -245,6 +281,18 @@ public class Num implements Comparable<Num> {
      * @see BigDecimal#divide(java.math.BigDecimal, java.math.MathContext)
      */
     public final Num divide(int divisor) {
+        return divide(of(divisor));
+    }
+
+    /**
+     * Returns a {@code Decimal} whose value is {@code (this / divisor)}, with rounding according to
+     * the context settings.
+     * 
+     * @param divisor value by which this {@code Decimal} is to be divided.
+     * @return {@code this / divisor}, rounded as necessary
+     * @see BigDecimal#divide(java.math.BigDecimal, java.math.MathContext)
+     */
+    public final Num divide(long divisor) {
         return divide(of(divisor));
     }
 
