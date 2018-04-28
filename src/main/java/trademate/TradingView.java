@@ -109,10 +109,6 @@ public class TradingView extends View {
                 chartSpan.ui.getSelectionModel().selectPrevious();
             }
         });
-
-        market().yourExecution.to(o -> {
-            notificator.execution.notify("Executed " + o);
-        });
     }
 
     /**

@@ -80,13 +80,11 @@ public abstract class MarketBackend implements Disposable {
     public abstract Signal<Order> orders();
 
     /**
-     * <p>
-     * Check all positions.
-     * </p>
+     * Acquire the your position log in realtime.
      * 
      * @return
      */
-    public abstract Signal<Position> getPositions();
+    public abstract Signal<Position> positions();
 
     /**
      * <p>

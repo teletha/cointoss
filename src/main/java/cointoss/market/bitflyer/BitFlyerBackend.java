@@ -330,7 +330,7 @@ public class BitFlyerBackend extends MarketBackend {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Position> getPositions() {
+    public Signal<Position> positions() {
         // If this exception will be thrown, it is bug of this program. So we must rethrow the
         // wrapped error in here.
         throw new Error();
@@ -461,10 +461,12 @@ public class BitFlyerBackend extends MarketBackend {
             String side = encode(execution.side.mark(), previous.side.mark());
             String price = encode(execution.price, previous.price);
             String size = execution.size.equals(previous.size) ? "" : execution.size.multiply(Num.HUNDRED).toString();
-            String buyer = encode(execution.buyer(), previous.buyer(), 0);
-            String seller = encode(execution.seller(), previous.seller(), 0);
+            String consecutive = "1";
+            String delay = String.valueOf(estimateDelay(execution));
+            // String buyer = encode(execution.buyer(), previous.buyer(), 0);
+            // String seller = encode(execution.seller(), previous.seller(), 0);
 
-            return new String[] {id, time, side, price, size, buyer, seller};
+            return new String[] {id, time, side, price, size, consecutive + delay};
         }
     }
 

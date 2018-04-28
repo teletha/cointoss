@@ -95,12 +95,6 @@ public class Market implements Disposable {
     /** The event stream. */
     public final Signal<Order> yourOrder = new Signal(holderForYourOrder);
 
-    /** The holder. */
-    private final Signaler<Position> holderForYourExecution = new Signaler();
-
-    /** The event stream. */
-    public final Signal<Position> yourExecution = new Signal(holderForYourExecution);
-
     /** The initial execution. */
     public final Variable<Execution> init = Variable.empty();
 
@@ -395,8 +389,7 @@ public class Market implements Disposable {
                 position.price = exe.price;
                 position.size.set(exe.size);
                 position.date = exe.exec_date;
-                holderForYourExecution.accept(position);
-                // positions.add(position);
+                positions.add(position);
             }
         }
 

@@ -171,7 +171,7 @@ class TestableMarketBackend extends MarketBackend implements MarketProvider {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Position> getPositions() {
+    public Signal<Position> positions() {
         return I.signal(positions);
     }
 

@@ -31,6 +31,7 @@ import com.univocity.parsers.csv.CsvParserSettings;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
 
+import cointoss.market.bitflyer.BitFlyer;
 import cointoss.market.bitflyer.BitFlyerBackend;
 import cointoss.util.Chrono;
 import cointoss.util.Span;
@@ -421,6 +422,17 @@ public class MarketLog {
      * @return
      */
     private Path computeCompactLogFile(Path file) {
-        return file.resolveSibling(file.getFileName().toString().replace(".log", ".clog"));
+        return file.resolveSibling(file.getFileName().toString().replace(".log", ".alog"));
+    }
+
+    /**
+     * @param args
+     */
+    public static void main(String[] args) {
+        MarketLog log = new MarketLog(BitFlyer.FX_BTC_JPY);
+
+        Filer.walk(log.root, "*20180414.log").to(file -> {
+            log.compact(file);
+        });
     }
 }
