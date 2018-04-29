@@ -89,6 +89,9 @@ public class BitFlyerService extends MarketService {
     /** The market type. */
     private BitFlyer type;
 
+    /** Flag for test. */
+    private final boolean forTest;
+
     /** The key. */
     private final String accessKey;
 
@@ -118,8 +121,9 @@ public class BitFlyerService extends MarketService {
     /**
      * @param type
      */
-    BitFlyerService(BitFlyer type) {
+    BitFlyerService(BitFlyer type, boolean forTest) {
         this.type = type;
+        this.forTest = forTest;
 
         List<String> lines = Filer.read(".log/bitflyer/key.txt").toList();
         this.accessKey = lines.get(0);
@@ -148,7 +152,7 @@ public class BitFlyerService extends MarketService {
         Signal<String> call;
         String id = "JRF" + Chrono.utcNow().format(format) + RandomStringUtils.randomNumeric(6);
 
-        if (maintainer.session() == null) {
+        if (forTest || maintainer.session() == null) {
             ChildOrderRequest request = new ChildOrderRequest();
             request.child_order_type = order.isLimit() ? "LIMIT" : "MARKET";
             request.minute_to_expire = 60 * 24;
@@ -198,7 +202,7 @@ public class BitFlyerService extends MarketService {
         cancel.order_id = (String) order.attributes.get(InternalID);
         cancel.child_order_acceptance_id = order.id;
 
-        Signal requestCancel = maintainer.session() == null || cancel.order_id == null
+        Signal requestCancel = forTest || maintainer.session() == null || cancel.order_id == null
                 ? call("POST", "/v1/me/cancelchildorder", cancel, null, null)
                 : call("POST", "https://lightning.bitflyer.jp/api/trade/cancelorder", cancel, null, WebResponse.class);
         Signal<List<Order>> isCanceled = intervalOrderCheck.take(orders -> !orders.contains(order));
@@ -221,7 +225,7 @@ public class BitFlyerService extends MarketService {
      */
     @Override
     public Signal<Execution> executions() {
-        return Network.websocket("wss://ws.lightstream.bitflyer.com/json-rpc", "lightning_executions_FX_BTC_JPY")
+        return websocket("wss://ws.lightstream.bitflyer.com/json-rpc", "lightning_executions_FX_BTC_JPY")
                 .flatIterable(JsonElement::getAsJsonArray)
                 .map(JsonElement::getAsJsonObject)
                 .map(e -> {
@@ -569,7 +573,7 @@ public class BitFlyerService extends MarketService {
     /**
      * Call private API.
      */
-    private <M> Signal<M> call(String method, String path, String body, String selector, Class<M> type) {
+    protected <M> Signal<M> call(String method, String path, String body, String selector, Class<M> type) {
         return new Signal<>((observer, disposer) -> {
             String timestamp = String.valueOf(ZonedDateTime.now(zone).toEpochSecond());
             String sign = new HmacUtils(HmacAlgorithms.HMAC_SHA_256, accessToken).hmacHex(timestamp + method + path + body);
@@ -635,7 +639,18 @@ public class BitFlyerService extends MarketService {
         });
     }
 
-    private SessionMaintainer maintainer = new SessionMaintainer();
+    /**
+     * Read data from websocket.
+     * 
+     * @param uri
+     * @param channel
+     * @return
+     */
+    protected Signal<JsonElement> websocket(String uri, String channel) {
+        return Network.websocket(uri, channel);
+    }
+
+    protected SessionMaintainer maintainer = new SessionMaintainer();
 
     /**
      * @version 2018/02/15 9:27:14

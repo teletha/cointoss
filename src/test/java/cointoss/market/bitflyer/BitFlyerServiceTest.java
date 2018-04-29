@@ -12,18 +12,22 @@ package cointoss.market.bitflyer;
 import static cointoss.MarketTestSupport.*;
 
 import java.time.ZonedDateTime;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
 import cointoss.Execution;
+import cointoss.Position;
+import cointoss.Side;
+import cointoss.order.Order;
 import cointoss.util.Chrono;
 
 /**
  * @version 2018/04/26 10:38:43
  */
-public class BitFlyerBackendTest {
+public class BitFlyerServiceTest {
 
-    BitFlyerService service = new BitFlyerService(BitFlyer.FX_BTC_JPY);
+    MockBitFlyerService service = new MockBitFlyerService();
 
     @Test
     void compact() {
@@ -59,5 +63,26 @@ public class BitFlyerBackendTest {
         // server order id
         exe.sell_child_order_acceptance_id = "JRF20180427-090006-597220";
         assert BitFlyerService.estimateDelay(exe) == -2;
+    }
+
+    @Test
+    void createPositionWhenOrderIsExecuted() {
+        List<Execution> executions = service.executions().toList();
+        List<Position> positions = service.positions().toList();
+        assert executions.isEmpty();
+        assert positions.isEmpty();
+
+        service.nextRequest("ServerAcceptanceID");
+        assert service.request(Order.limitLong(1, 10)).to().is("ServerAcceptanceID");
+
+        // irrelevant execution
+        service.nextExecution(execution(Side.BUY, 10, 1), "DisrelatedBuyer", "DisrelatedSeller");
+        assert executions.size() == 1;
+        assert positions.isEmpty();
+
+        // my execution
+        service.nextExecution(execution(Side.BUY, 10, 1), "ServerAcceptanceID", "DisrelatedSeller");
+        assert executions.size() == 2;
+        assert positions.size() == 1;
     }
 }

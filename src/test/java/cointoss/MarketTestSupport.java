@@ -19,7 +19,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import cointoss.util.Num;
 
 /**
- * @version 2018/04/23 23:34:34
+ * @version 2018/04/29 21:47:23
  */
 public class MarketTestSupport {
 
@@ -68,6 +68,18 @@ public class MarketTestSupport {
      */
     public static Execution sell(Num price, Num size) {
         return execution(Side.SELL, price, size);
+    }
+
+    /**
+     * Create {@link Execution}.
+     * 
+     * @param side
+     * @param price
+     * @param size
+     * @return
+     */
+    public static Execution execution(Side side, double price, double size) {
+        return execution(side, Num.of(price), Num.of(size));
     }
 
     /**
