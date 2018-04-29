@@ -24,7 +24,6 @@ import java.util.function.Function;
 import cointoss.order.Order;
 import cointoss.order.Order.State;
 import cointoss.order.OrderBook;
-import cointoss.order.OrderBookListChange;
 import cointoss.order.OrderManager;
 import cointoss.ticker.ExecutionFlow;
 import cointoss.ticker.TickSpan;
@@ -88,17 +87,11 @@ public class Market implements Disposable {
         return previous;
     }).skip(e -> e == null || e == SEED);
 
-    /** The execution time line. */
-    public final Signal<OrderBookListChange> orderTimeline;
-
-    /** Order Book. */
-    public final OrderBook orderBook = new OrderBook();
-
     /** The holder. */
-    private final Signaling<Order> holderForYourOrder = new Signaling();
+    private final Signaling<Order> yourOrders = new Signaling();
 
     /** The event stream. */
-    public final Signal<Order> yourOrder = holderForYourOrder.expose;
+    public final Signal<Order> yourOrder = yourOrders.expose;
 
     /** The initial execution. */
     public final Variable<Execution> init = Variable.empty();
@@ -108,6 +101,9 @@ public class Market implements Disposable {
 
     /** The latest price. */
     public final Variable<Num> price = latest.observeNow().map(e -> e.price).diff().to();
+
+    /** The order book. */
+    public final OrderBook orderBook = new OrderBook();
 
     /** The order manager. */
     public final OrderManager orders = new OrderManager();
@@ -144,7 +140,6 @@ public class Market implements Disposable {
     public Market(MarketProvider provider) {
         this.provider = Objects.requireNonNull(provider, "Market is not found.");
         this.service = provider.service();
-        this.orderTimeline = service.orderBook();
 
         // build tickers for each span
         for (TickSpan span : TickSpan.values()) {
@@ -162,7 +157,7 @@ public class Market implements Disposable {
         });
 
         // orderbook management
-        service.add(orderTimeline.to(board -> {
+        service.add(service.orderBook().to(board -> {
             orderBook.shorts.update(board.asks);
             orderBook.longs.update(board.bids);
         }));
@@ -249,7 +244,7 @@ public class Market implements Disposable {
             orderItems.add(order);
 
             // event
-            holderForYourOrder.accept(order);
+            yourOrders.accept(order);
             return order;
         }).effectOnError(e -> {
             order.state.set(State.CANCELED);
