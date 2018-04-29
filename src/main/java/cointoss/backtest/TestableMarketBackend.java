@@ -16,7 +16,6 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import cointoss.Execution;
-import cointoss.Market;
 import cointoss.MarketBackend;
 import cointoss.MarketLog;
 import cointoss.MarketProvider;
@@ -92,14 +91,6 @@ class TestableMarketBackend extends MarketBackend implements MarketProvider {
     @Override
     public String name() {
         return "TestableMarket";
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void initialize(Market market, Signal<Execution> log) {
-        diposer.add(log.to(e -> market.tick(emulate(e))));
     }
 
     /**

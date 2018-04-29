@@ -35,7 +35,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import cointoss.Execution;
-import cointoss.Market;
 import cointoss.MarketBackend;
 import cointoss.Position;
 import cointoss.Side;
@@ -61,7 +60,7 @@ import okhttp3.Response;
 import viewtify.Viewtify;
 
 /**
- * @version 2018/04/25 2:37:00
+ * @version 2018/04/29 17:28:17
  */
 public class BitFlyerBackend extends MarketBackend {
 
@@ -129,14 +128,6 @@ public class BitFlyerBackend extends MarketBackend {
         this.password = lines.get(3);
         this.accountId = lines.get(4);
         this.intervalOrderCheck = I.signal(0, 1, TimeUnit.SECONDS).map(v -> orders().toList()).share();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void initialize(Market market, Signal<Execution> log) {
-        disposer.add(log.to(market::tick));
     }
 
     /**

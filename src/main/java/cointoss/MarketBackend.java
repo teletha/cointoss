@@ -16,18 +16,9 @@ import kiss.Disposable;
 import kiss.Signal;
 
 /**
- * @version 2018/04/28 1:17:19
+ * @version 2018/04/29 17:28:36
  */
 public abstract class MarketBackend implements Disposable {
-
-    /**
-     * <p>
-     * Initialize and activate market backend.
-     * </p>
-     * 
-     * @param market
-     */
-    protected abstract void initialize(Market market, Signal<Execution> log);
 
     /**
      * Estimate the curernt order delay (second).

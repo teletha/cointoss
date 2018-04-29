@@ -37,7 +37,7 @@ import kiss.Variable;
 import viewtify.Viewtify;
 
 /**
- * @version 2018/02/25 18:36:30
+ * @version 2018/04/29 17:28:31
  */
 public class Market implements Disposable {
 
@@ -137,9 +137,9 @@ public class Market implements Disposable {
     private final List<Order> orderItems = new CopyOnWriteArrayList();
 
     /**
-     * Market with {@link Trader}.
+     * Build {@link Market} with the specified {@link MarketProvider}.
      * 
-     * @param provider A market backend.
+     * @param provider A market provider.
      */
     public Market(MarketProvider provider) {
         if (provider == null) {
