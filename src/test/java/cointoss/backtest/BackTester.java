@@ -15,8 +15,6 @@ import java.util.stream.IntStream;
 import cointoss.Execution;
 import cointoss.Market;
 import cointoss.Trader;
-import cointoss.backtest.TestableMarketBackend;
-import cointoss.backtest.Time.Lag;
 import cointoss.util.Num;
 import kiss.I;
 import kiss.Signal;
@@ -42,7 +40,7 @@ public class BackTester {
     private Supplier<Signal<Execution>> log;
 
     /** ラグ生成器 */
-    private Lag lag = Time.lag(2, 15);
+    private Time lag = Time.lag(2, 15);
 
     /**
      * Hide

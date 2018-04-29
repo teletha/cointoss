@@ -17,7 +17,6 @@ import java.time.ZonedDateTime;
 import cointoss.Execution;
 import cointoss.Market;
 import cointoss.Side;
-import cointoss.backtest.Time.At;
 import cointoss.order.Order;
 import cointoss.order.Order.State;
 import cointoss.util.Num;
@@ -38,14 +37,14 @@ class TestableMarket extends Market {
      * @param strategy
      */
     TestableMarket() {
-        super(new TestableMarketBackend(Time.lag(0)), Signal.EMPTY);
+        super(new TestableMarketBackend(Time.at(0)), Signal.EMPTY);
     }
 
     /**
      * @param delay
      */
     TestableMarket(int delay) {
-        super(new TestableMarketBackend(Time.lag(delay)), Signal.EMPTY);
+        super(new TestableMarketBackend(Time.at(delay)), Signal.EMPTY);
     }
 
     /**
@@ -121,8 +120,8 @@ class TestableMarket extends Market {
      * @param size
      * @param price
      */
-    TestableMarket execute(Side side, int size, int price, At time) {
-        return execute(side, Num.of(size), Num.of(price), time, "", "");
+    TestableMarket execute(Side side, int size, int price, Time lag) {
+        return execute(side, Num.of(size), Num.of(price), lag, "", "");
     }
 
     /**
@@ -132,12 +131,12 @@ class TestableMarket extends Market {
      * @param size
      * @param price
      */
-    TestableMarket execute(Side side, Num size, Num price, At time, String buyId, String sellId) {
+    TestableMarket execute(Side side, Num size, Num price, Time lag, String buyId, String sellId) {
         Execution e = new Execution();
         e.side = side;
         e.size = e.cumulativeSize = size;
         e.price = price;
-        e.exec_date = time.to();
+        e.exec_date = lag.to();
         e.buy_child_order_acceptance_id = buyId;
         e.sell_child_order_acceptance_id = sellId;
 
@@ -187,7 +186,7 @@ class TestableMarket extends Market {
      * 
      * @param order
      */
-    void requestSuccessfully(Order order, Time.Lag lag) {
+    void requestSuccessfully(Order order, Time lag) {
         request(order).to();
 
     }

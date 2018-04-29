@@ -21,8 +21,6 @@ import cointoss.MarketBackend;
 import cointoss.MarketLog;
 import cointoss.MarketProvider;
 import cointoss.Position;
-import cointoss.backtest.Time.Lag;
-import cointoss.market.bitflyer.BitFlyer;
 import cointoss.order.Order;
 import cointoss.order.Order.Quantity;
 import cointoss.order.Order.State;
@@ -58,7 +56,7 @@ class TestableMarketBackend extends MarketBackend implements MarketProvider {
     private final LinkedList<Execution> executeds = new LinkedList();
 
     /** The lag generator. */
-    private final Lag lag;
+    private final Time lag;
 
     /** The current time. */
     private ZonedDateTime now = Time.BASE;
@@ -66,7 +64,7 @@ class TestableMarketBackend extends MarketBackend implements MarketProvider {
     /**
     * 
     */
-    TestableMarketBackend(Lag lag) {
+    TestableMarketBackend(Time lag) {
         this.lag = lag;
     }
 
@@ -83,7 +81,9 @@ class TestableMarketBackend extends MarketBackend implements MarketProvider {
      */
     @Override
     public MarketLog log() {
-        return BitFlyer.FX_BTC_JPY.log();
+        // If this exception will be thrown, it is bug of this program. So we must rethrow the
+        // wrapped error in here.
+        throw new Error();
     }
 
     /**
@@ -100,6 +100,14 @@ class TestableMarketBackend extends MarketBackend implements MarketProvider {
     @Override
     protected void initialize(Market market, Signal<Execution> log) {
         diposer.add(log.to(e -> market.tick(emulate(e))));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Signal<Integer> delay() {
+        return I.signal(0);
     }
 
     /**
@@ -204,14 +212,6 @@ class TestableMarketBackend extends MarketBackend implements MarketProvider {
     @Override
     public Signal<OrderBookListChange> getOrderBook() {
         return Signal.NEVER;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Signal<Integer> delay() {
-        return I.signal(0);
     }
 
     /**
