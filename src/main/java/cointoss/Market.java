@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
 
 import cointoss.order.Order;
 import cointoss.order.Order.State;
@@ -48,6 +49,9 @@ public class Market implements Disposable {
     }
 
     private final AtomicReference<Execution> switcher = new AtomicReference<>(SEED);
+
+    /** The market provider. */
+    protected final MarketProvider provider;
 
     /** The market handler. */
     protected final MarketBackend backend;
@@ -136,15 +140,10 @@ public class Market implements Disposable {
      * Market with {@link Trader}.
      * 
      * @param provider A market backend.
-     * @param log A market execution log.
      */
-    public Market(MarketProvider provider, Signal<Execution> log) {
+    public Market(MarketProvider provider) {
         if (provider == null) {
             throw new Error("Market is not found.");
-        }
-
-        if (log == null) {
-            throw new Error("Market log is not found.");
         }
 
         // build tickers for each span
@@ -152,13 +151,12 @@ public class Market implements Disposable {
             tickers.put(span, new Ticker(span, timeline));
         }
 
+        this.provider = provider;
         this.backend = provider.service();
 
         // initialize price, balance and executions
         this.base = this.baseInit = backend.getBaseCurrency().to().v;
         this.target = this.targetInit = backend.getTargetCurrency().to().v;
-
-        backend.initialize(this, log);
 
         orderTimeline = backend.getOrderBook();
         backend.add(orderTimeline.on(Viewtify.UIThread).to(board -> {
@@ -170,6 +168,12 @@ public class Market implements Disposable {
             orderBook.shorts.fix(e.price);
             orderBook.longs.fix(e.price);
         }));
+    }
+
+    public Market log(Function<MarketLog, Signal<Execution>> log) {
+        backend.add(log.apply(provider.log()).to(this::tick));
+
+        return this;
     }
 
     /**

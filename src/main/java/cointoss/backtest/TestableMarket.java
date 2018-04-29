@@ -18,7 +18,6 @@ import cointoss.Side;
 import cointoss.order.Order;
 import cointoss.order.Order.State;
 import cointoss.util.Num;
-import kiss.Signal;
 import kiss.Table;
 
 /**
@@ -32,14 +31,14 @@ class TestableMarket extends Market {
      * @param strategy
      */
     TestableMarket() {
-        super(new TestableMarketBackend(Time.at(0)), Signal.EMPTY);
+        super(new TestableMarketBackend(Time.at(0)));
     }
 
     /**
      * @param delay
      */
     TestableMarket(int delay) {
-        super(new TestableMarketBackend(Time.at(delay)), Signal.EMPTY);
+        super(new TestableMarketBackend(Time.at(delay)));
     }
 
     /**

@@ -10,12 +10,13 @@
 package cointoss.backtest;
 
 import java.util.Objects;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.IntStream;
-
-import com.google.common.base.Supplier;
 
 import cointoss.Execution;
 import cointoss.Market;
+import cointoss.MarketLog;
 import cointoss.Trader;
 import cointoss.util.Num;
 import kiss.I;
@@ -27,7 +28,7 @@ import kiss.Signal;
 public class BackTest {
 
     /** The target execution log. */
-    private Signal<Execution> log;
+    private Function<MarketLog, Signal<Execution>> log;
 
     /** The base currency. */
     private Num base = Num.ZERO;
@@ -45,7 +46,7 @@ public class BackTest {
      * @param rangeRandom
      * @return
      */
-    public BackTest log(Signal<Execution> log) {
+    public BackTest log(Function<MarketLog, Signal<Execution>> log) {
         this.log = Objects.requireNonNull(log);
         return this;
     }
@@ -100,7 +101,9 @@ public class BackTest {
      */
     public void run() {
         IntStream.range(0, trial).parallel().forEach(index -> {
-            Market market = new Market(new BackTestBackend(), log);
+            Market market = new Market(new BackTestBackend());
+            market.add(strategy.get());
+            market.log(log);
             market.dispose();
         });
     }

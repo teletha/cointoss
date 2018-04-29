@@ -11,8 +11,6 @@ package cointoss;
 
 import java.time.temporal.ChronoUnit;
 
-import cointoss.backtest.BackTester;
-import cointoss.market.bitflyer.BitFlyer;
 import cointoss.ticker.Tick;
 import cointoss.ticker.TickSpan;
 import cointoss.util.Num;
@@ -21,21 +19,6 @@ import cointoss.util.Num;
  * @version 2017/09/19 23:45:54
  */
 public class BackTest {
-
-    /**
-     * Run back test.
-     * 
-     * @param args
-     */
-    public static void main(String[] args) {
-        BackTester.with()
-                .baseCurrency(1000000)
-                .targetCurrency(0)
-                .log(() -> BitFlyer.FX_BTC_JPY.log().rangeRandom(1))
-                .strategy(() -> new BreakoutTrading())
-                .trial(1)
-                .run();
-    }
 
     /**
      * @version 2017/09/05 20:19:04
