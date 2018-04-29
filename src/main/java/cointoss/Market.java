@@ -133,23 +133,12 @@ public class Market implements Disposable {
     private final List<Order> orderItems = new CopyOnWriteArrayList();
 
     /**
-     * Market without {@link Trader}.
-     * 
-     * @param provider A market provider.
-     * @param log A market execution log.
-     */
-    public Market(MarketProvider provider, Signal<Execution> log) {
-        this(provider, log, null);
-    }
-
-    /**
      * Market with {@link Trader}.
      * 
      * @param provider A market backend.
      * @param log A market execution log.
-     * @param trading A trading strategy.
      */
-    public Market(MarketProvider provider, Signal<Execution> log, Trader trading) {
+    public Market(MarketProvider provider, Signal<Execution> log) {
         if (provider == null) {
             throw new Error("Market is not found.");
         }
@@ -168,8 +157,6 @@ public class Market implements Disposable {
         // initialize price, balance and executions
         this.base = this.baseInit = backend.getBaseCurrency().to().v;
         this.target = this.targetInit = backend.getTargetCurrency().to().v;
-
-        add(trading);
 
         backend.initialize(this, log);
 
