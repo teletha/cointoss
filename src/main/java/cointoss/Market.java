@@ -163,28 +163,6 @@ public class Market implements Disposable {
     }
 
     /**
-     * Read {@link Execution} log.
-     * 
-     * @param log
-     * @return
-     */
-    public final Market readLog(Function<MarketLog, Signal<Execution>> log) {
-        service.add(log.apply(provider.log()).to(this::tick));
-
-        return this;
-    }
-
-    /**
-     * Get {@link Ticker} by span.
-     * 
-     * @param span
-     * @return
-     */
-    public final Ticker tickerBy(TickSpan span) {
-        return tickers.get(span);
-    }
-
-    /**
      * Add market trader to this market.
      * 
      * @param trader A trader to add.
@@ -287,6 +265,28 @@ public class Market implements Disposable {
     }
 
     /**
+     * Get {@link Ticker} by span.
+     * 
+     * @param span
+     * @return
+     */
+    public final Ticker tickerBy(TickSpan span) {
+        return tickers.get(span);
+    }
+
+    /**
+     * Read {@link Execution} log.
+     * 
+     * @param log
+     * @return
+     */
+    public final Market readLog(Function<MarketLog, Signal<Execution>> log) {
+        service.add(log.apply(provider.log()).to(this::tick));
+    
+        return this;
+    }
+
+    /**
      * Calculate profit and loss.
      * 
      * @return
@@ -299,38 +299,38 @@ public class Market implements Disposable {
 
     /**
      * <p>
-     * Trade something.
+     * Process each {@link Execution}.
      * </p>
      * 
-     * @param exe
+     * @param e
      */
-    public final void tick(Execution exe) {
-        if (init.isAbsent()) init.let(exe);
-        latest.set(exe);
+    protected void tick(Execution e) {
+        if (init.isAbsent()) init.let(e);
+        latest.set(e);
 
-        flow.record(exe);
-        flow75.record(exe);
-        flow100.record(exe);
-        flow200.record(exe);
-        flow300.record(exe);
+        flow.record(e);
+        flow75.record(e);
+        flow100.record(e);
+        flow200.record(e);
+        flow300.record(e);
 
         for (Order order : orderItems) {
-            if (order.id().equals(exe.buy_child_order_acceptance_id) || order.id().equals(exe.sell_child_order_acceptance_id)) {
-                update(order, exe);
+            if (order.id().equals(e.buy_child_order_acceptance_id) || order.id().equals(e.sell_child_order_acceptance_id)) {
+                update(order, e);
 
-                order.listeners.accept(exe);
+                order.listeners.accept(e);
 
                 Position position = new Position();
                 position.side = order.side;
-                position.price = exe.price;
-                position.size.set(exe.size);
-                position.date = exe.exec_date;
+                position.price = e.price;
+                position.size.set(e.size);
+                position.date = e.exec_date;
                 positions.add(position);
             }
         }
 
         // observe executions
-        timelineObservers.accept(exe);
+        timelineObservers.accept(e);
     }
 
     /**
