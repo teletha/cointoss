@@ -163,12 +163,12 @@ class TestableMarket extends Market {
 
     /**
      * <p>
-     * Helper method to emit {@link Order}.
+     * Helper method to request {@link Order}.
      * </p>
      * 
      * @param order
      */
-    Order requestSuccessfully(Order order) {
+    Order requestTo(Order order) {
         request(order).to();
 
         return order;

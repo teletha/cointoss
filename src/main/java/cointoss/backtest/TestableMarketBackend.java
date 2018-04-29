@@ -130,7 +130,7 @@ class TestableMarketBackend extends MarketBackend implements MarketProvider {
             child.created.set(now.plusNanos(lag.generate()));
             child.child_order_type = order.price.is(0) ? OrderType.MARKET : OrderType.LIMIT;
             child.averagePrice.set(order.price);
-            child.remainingSize.set(order.size);
+            child.remaining.set(order.size);
             child.cancel_size = Num.ZERO;
             child.executed_size.set(Num.ZERO);
 
@@ -277,8 +277,8 @@ class TestableMarketBackend extends MarketBackend implements MarketProvider {
 
             if (order.quantity() == Quantity.ImmediateOrCancel) {
                 if (order.isTradablePriceWith(e)) {
-                    Num min = Num.min(e.size, order.remainingSize.get());
-                    order.remainingSize.set(min);
+                    Num min = Num.min(e.size, order.remaining.get());
+                    order.remaining.set(min);
                 } else {
                     iterator.remove();
                     orderAll.remove(order);
@@ -287,14 +287,14 @@ class TestableMarketBackend extends MarketBackend implements MarketProvider {
             }
 
             if (order.isTradablePriceWith(e)) {
-                Num executedSize = Num.min(e.size, order.remainingSize.get());
+                Num executedSize = Num.min(e.size, order.remaining.get());
                 if (order.child_order_type.isMarket() && executedSize.isNot(0)) {
                     order.marketMinPrice = order.isBuy() ? Num.max(order.marketMinPrice, e.price) : Num.min(order.marketMinPrice, e.price);
                     order.averagePrice.set(v -> v.multiply(order.executed_size)
                             .plus(order.marketMinPrice.multiply(executedSize))
                             .divide(executedSize.plus(order.executed_size)));
                 }
-                order.remainingSize.set(v -> v.minus(executedSize));
+                order.remaining.set(v -> v.minus(executedSize));
                 order.executed_size.set(v -> v.plus(executedSize));
 
                 Execution exe = new Execution();
@@ -306,7 +306,7 @@ class TestableMarketBackend extends MarketBackend implements MarketProvider {
                 exe.sell_child_order_acceptance_id = order.isSell() ? order.id : e.sell_child_order_acceptance_id;
                 executeds.add(exe);
 
-                if (order.remainingSize.get().is(0)) {
+                if (order.remaining.get().is(0)) {
                     order.state.set(State.COMPLETED);
                     iterator.remove();
                 }

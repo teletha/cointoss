@@ -771,7 +771,7 @@ public class BitFlyerBackend extends MarketBackend {
             Order o = Order.limit(side, size, price);
             o.id = child_order_acceptance_id;
             o.averagePrice.set(average_price);
-            o.remainingSize.set(outstanding_size);
+            o.remaining.set(outstanding_size);
             o.executed_size.set(executed_size);
             o.created.set(LocalDateTime.parse(child_order_date, Chrono.DateTimeWithT).atZone(Chrono.UTC));
             o.state.set(child_order_state);

@@ -71,7 +71,7 @@ public class Order implements Directional {
         this.size = Objects.requireNonNull(size);
         this.price = price == null ? Num.ZERO : price;
         this.child_order_type = price == null ? OrderType.MARKET : OrderType.LIMIT;
-        this.remainingSize = Variable.of(size);
+        this.remaining = Variable.of(size);
         this.executed_size = Variable.of(Num.ZERO);
 
         when(priceLimit);
@@ -352,7 +352,7 @@ public class Order implements Directional {
     public ZonedDateTime expire_date;
 
     /** The remaining size */
-    public final Variable<Num> remainingSize;
+    public final Variable<Num> remaining;
 
     /** The executed size */
     public final Variable<Num> executed_size;
@@ -477,7 +477,7 @@ public class Order implements Directional {
      */
     @Override
     public String toString() {
-        return side().mark() + size + "@" + averagePrice + " 残" + remainingSize + " 済" + executed_size + " " + created;
+        return side().mark() + size + "@" + averagePrice + " 残" + remaining + " 済" + executed_size + " " + created;
     }
 
     /**

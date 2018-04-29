@@ -38,7 +38,7 @@ class MarketStaticticsTest {
     @Test
     void longOnly() {
         TestableMarket market = new TestableMarket();
-        market.requestSuccessfully(Order.limitLong(1, 10));
+        market.requestTo(Order.limitLong(1, 10));
         market.execute(Side.BUY, 1, 9);
 
         assert market.getBase().is(90);

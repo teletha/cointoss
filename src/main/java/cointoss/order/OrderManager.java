@@ -68,7 +68,7 @@ public class OrderManager {
      */
     private void update(Order order, Execution exe) {
         // for order state
-        Num executed = Num.min(order.remainingSize, exe.size);
+        Num executed = Num.min(order.remaining, exe.size);
 
         if (order.child_order_type.isMarket() && executed.isNot(0)) {
             order.averagePrice.set(v -> v.multiply(order.executed_size)
@@ -77,9 +77,9 @@ public class OrderManager {
         }
 
         order.executed_size.set(v -> v.plus(executed));
-        order.remainingSize.set(v -> v.minus(executed));
+        order.remaining.set(v -> v.minus(executed));
 
-        if (order.remainingSize.is(Num.ZERO)) {
+        if (order.remaining.is(Num.ZERO)) {
             order.state.set(State.COMPLETED);
             orders.remove(order); // complete order
         }
