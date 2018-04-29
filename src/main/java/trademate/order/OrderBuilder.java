@@ -148,9 +148,9 @@ public class OrderBuilder extends View {
 
         bot.observe(use -> {
             if (use) {
-                view.market().add(spreader);
+                view.market().addTrader(spreader);
             } else {
-                view.market().remove(spreader);
+                view.market().removeTrader(spreader);
             }
         });
     }

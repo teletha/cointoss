@@ -62,7 +62,7 @@ public class Console extends View {
         console.values(messages);
 
         Viewtify.inWorker(() -> {
-            view.market().add(new Dumper());
+            view.market().addTrader(new Dumper());
         });
     }
 

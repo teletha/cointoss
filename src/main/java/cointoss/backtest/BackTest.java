@@ -100,7 +100,7 @@ public class BackTest {
     public void run() {
         IntStream.range(0, trial).parallel().forEach(index -> {
             Market market = new Market(new BackTestService());
-            market.add(strategy.get());
+            market.addTrader(strategy.get());
             market.readLog(v -> log.get());
             market.dispose();
         });

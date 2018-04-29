@@ -14,7 +14,6 @@ import org.junit.jupiter.api.BeforeEach;
 import cointoss.Side;
 import cointoss.Trader;
 import cointoss.analyze.TradingLog;
-import cointoss.backtest.TestableMarket;
 import cointoss.util.Num;
 import kiss.I;
 
@@ -32,7 +31,7 @@ public abstract class TraderTestSupport extends Trader {
      */
     public TraderTestSupport() {
         super.market = market = new TestableMarket();
-        super.market.add(this);
+        super.market.addTrader(this);
     }
 
     /**

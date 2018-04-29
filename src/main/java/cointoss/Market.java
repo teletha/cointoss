@@ -65,11 +65,11 @@ public class Market implements Disposable {
 
     public final ExecutionFlow flow300 = new ExecutionFlow(1600);
 
-    /** The execution listeners. */
-    private final Signaling<Execution> holderForTimeline = new Signaling();
+    /** The execution observers. */
+    private final Signaling<Execution> timelineObservers = new Signaling();
 
     /** The execution time line. */
-    public final Signal<Execution> timeline = holderForTimeline.expose;
+    public final Signal<Execution> timeline = timelineObservers.expose;
 
     /** The execution time line by taker. */
     public final Signal<Execution> timelineByTaker = timeline.map(e -> {
@@ -117,8 +117,8 @@ public class Market implements Disposable {
     /** The initial amount of target currency. */
     public final Variable<Num> targetInit = Variable.empty();
 
-    /** The list of traders. */
-    final List<Trader> traders = new CopyOnWriteArrayList<>();
+    /** The tarader manager. */
+    private final List<Trader> traders = new CopyOnWriteArrayList<>();
 
     /** The ticker manager. */
     private final EnumMap<TickSpan, Ticker> tickers = new EnumMap(TickSpan.class);
@@ -168,7 +168,7 @@ public class Market implements Disposable {
      * @param log
      * @return
      */
-    public Market readLog(Function<MarketLog, Signal<Execution>> log) {
+    public final Market readLog(Function<MarketLog, Signal<Execution>> log) {
         service.add(log.apply(provider.log()).to(this::tick));
 
         return this;
@@ -187,27 +187,26 @@ public class Market implements Disposable {
     /**
      * Add market trader to this market.
      * 
-     * @param trading
+     * @param trader A trader to add.
      */
-    public void add(Trader trading) {
-        if (trading != null) {
-            trading.market = this;
-            trading.initialize();
-
-            traders.add(trading);
+    public final void addTrader(Trader trader) {
+        if (trader != null) {
+            traders.add(trader);
+            trader.market = this;
+            trader.initialize();
         }
     }
 
     /**
      * Remove market trader to this market.
      * 
-     * @param trading
+     * @param trader A trader to remove.
      */
-    public void remove(Trader trading) {
-        if (trading != null) {
-            traders.remove(trading);
-            trading.dispose();
-            trading.market = null;
+    public final void removeTrader(Trader trader) {
+        if (trader != null) {
+            traders.remove(trader);
+            trader.dispose();
+            trader.market = null;
         }
     }
 
@@ -331,7 +330,7 @@ public class Market implements Disposable {
         }
 
         // observe executions
-        holderForTimeline.accept(exe);
+        timelineObservers.accept(exe);
     }
 
     /**
