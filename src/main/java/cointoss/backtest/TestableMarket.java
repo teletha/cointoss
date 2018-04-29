@@ -26,7 +26,7 @@ import kiss.Table;
 class TestableMarket extends Market {
 
     /**
-     * @param backend
+     * @param service
      * @param builder
      * @param strategy
      */
@@ -145,7 +145,7 @@ class TestableMarket extends Market {
      * @param price
      */
     TestableMarket execute(Execution e) {
-        tick(((TestableMarketService) backend).emulate(e));
+        tick(((TestableMarketService) service).emulate(e));
         return this;
     }
 
@@ -184,7 +184,7 @@ class TestableMarket extends Market {
      * @return
      */
     boolean validateOrderState(int active, int completed, int canceled, int expired, int rejected) {
-        Table<State, Order> state = backend.orders().toTable(o -> o.state.v);
+        Table<State, Order> state = service.orders().toTable(o -> o.state.v);
 
         assert state.get(State.ACTIVE).size() == active;
         assert state.get(State.COMPLETED).size() == completed;
@@ -202,7 +202,7 @@ class TestableMarket extends Market {
      * @return
      */
     boolean validateExecutionState(int executed) {
-        assert backend.executions().toList().size() == executed;
+        assert service.executions().toList().size() == executed;
 
         return true;
     }

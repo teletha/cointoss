@@ -16,9 +16,9 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import cointoss.Execution;
-import cointoss.MarketService;
 import cointoss.MarketLog;
 import cointoss.MarketProvider;
+import cointoss.MarketService;
 import cointoss.Position;
 import cointoss.order.Order;
 import cointoss.order.Order.Quantity;
@@ -80,9 +80,7 @@ class TestableMarketService extends MarketService implements MarketProvider {
      */
     @Override
     public MarketLog log() {
-        // If this exception will be thrown, it is bug of this program. So we must rethrow the
-        // wrapped error in here.
-        throw new Error();
+        return new MarketLog(this);
     }
 
     /**
@@ -201,7 +199,7 @@ class TestableMarketService extends MarketService implements MarketProvider {
      * {@inheritDoc}
      */
     @Override
-    public Signal<OrderBookListChange> getOrderBook() {
+    public Signal<OrderBookListChange> orderBook() {
         return Signal.NEVER;
     }
 

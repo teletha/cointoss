@@ -381,7 +381,7 @@ public class BitFlyerService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<OrderBookListChange> getOrderBook() {
+    public Signal<OrderBookListChange> orderBook() {
         return snapshotOrderBook().merge(realtimeOrderBook());
     }
 

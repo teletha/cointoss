@@ -241,7 +241,39 @@ public class MarketLog {
     }
 
     /**
-     * Read date from the specified date.
+     * Read log at the specified date.
+     * 
+     * @param year
+     * @param month
+     * @param day
+     * @return
+     */
+    public final Signal<Execution> at(int year, int month, int day) {
+        return at(LocalDate.of(year, month, day));
+    }
+
+    /**
+     * Read log at the specified date.
+     * 
+     * @param date
+     * @return
+     */
+    public final Signal<Execution> at(LocalDate date) {
+        return at(date.atTime(0, 0).atZone(Chrono.UTC));
+    }
+
+    /**
+     * Read log at the specified date.
+     * 
+     * @param date
+     * @return
+     */
+    public final Signal<Execution> at(ZonedDateTime date) {
+        return range(date, date.plusDays(1));
+    }
+
+    /**
+     * Read log from the specified date.
      * 
      * @param start
      * @return
@@ -251,7 +283,7 @@ public class MarketLog {
     }
 
     /**
-     * Read date from the specified date.
+     * Read log from the specified date.
      * 
      * @param start
      * @return
@@ -261,7 +293,7 @@ public class MarketLog {
     }
 
     /**
-     * Read date from the specified date.
+     * Read log from the specified date.
      * 
      * @param start
      * @return
@@ -271,7 +303,7 @@ public class MarketLog {
     }
 
     /**
-     * Read date from the specified date.
+     * Read log from the specified date.
      * 
      * @param time A duration.
      * @param unit A duration unit.
@@ -282,7 +314,7 @@ public class MarketLog {
     }
 
     /**
-     * Read date from the specified start to end.
+     * Read log from the specified start to end.
      * 
      * @param start
      * @param end
@@ -293,7 +325,7 @@ public class MarketLog {
     }
 
     /**
-     * Read date from the specified start to end.
+     * Read log from the specified start to end.
      * 
      * @param start
      * @param end
@@ -304,7 +336,7 @@ public class MarketLog {
     }
 
     /**
-     * Read date from the specified start to end.
+     * Read log from the specified start to end.
      * 
      * @param start
      * @param end
@@ -319,7 +351,7 @@ public class MarketLog {
     }
 
     /**
-     * Read date from the specified start to end.
+     * Read log from the specified start to end.
      * 
      * @param days
      * @return
@@ -368,7 +400,7 @@ public class MarketLog {
     }
 
     /**
-     * Read date from local cache.
+     * Read log from local cache.
      * 
      * @param date
      * @return

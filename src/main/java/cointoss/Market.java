@@ -15,6 +15,7 @@ import static java.util.concurrent.TimeUnit.*;
 import java.time.ZonedDateTime;
 import java.util.EnumMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
@@ -34,10 +35,9 @@ import kiss.I;
 import kiss.Signal;
 import kiss.Signaling;
 import kiss.Variable;
-import viewtify.Viewtify;
 
 /**
- * @version 2018/04/29 17:28:31
+ * @version 2018/04/29 20:17:06
  */
 public class Market implements Disposable {
 
@@ -54,7 +54,7 @@ public class Market implements Disposable {
     protected final MarketProvider provider;
 
     /** The market handler. */
-    protected final MarketService backend;
+    protected final MarketService service;
 
     public final ExecutionFlow flow = new ExecutionFlow(100);
 
@@ -115,17 +115,17 @@ public class Market implements Disposable {
     /** The position manager. */
     public final PositionManager positions = new PositionManager(price);
 
-    /** 基軸通貨量 */
-    private Num base;
+    /** The amount of base currency. */
+    public final Variable<Num> base = Variable.empty();
 
-    /** 基軸通貨初期量 */
-    private Num baseInit;
+    /** The initial amount of base currency. */
+    public final Variable<Num> baseInit = Variable.empty();
 
-    /** 対象通貨量 */
-    private Num target;
+    /** The amount of target currency. */
+    public final Variable<Num> target = Variable.empty();
 
-    /** 対象通貨初期量 */
-    private Num targetInit;
+    /** The initial amount of target currency. */
+    public final Variable<Num> targetInit = Variable.empty();
 
     /** The list of traders. */
     final List<Trader> traders = new CopyOnWriteArrayList<>();
@@ -142,36 +142,45 @@ public class Market implements Disposable {
      * @param provider A market provider.
      */
     public Market(MarketProvider provider) {
-        if (provider == null) {
-            throw new Error("Market is not found.");
-        }
+        this.provider = Objects.requireNonNull(provider, "Market is not found.");
+        this.service = provider.service();
+        this.orderTimeline = service.orderBook();
 
         // build tickers for each span
         for (TickSpan span : TickSpan.values()) {
             tickers.put(span, new Ticker(span, timeline));
         }
 
-        this.provider = provider;
-        this.backend = provider.service();
+        // initialize currency data
+        service.baseCurrency().to(v -> {
+            this.base.set(v);
+            this.baseInit.let(v);
+        });
+        service.targetCurrency().to(v -> {
+            this.target.set(v);
+            this.targetInit.let(v);
+        });
 
-        // initialize price, balance and executions
-        this.base = this.baseInit = backend.baseCurrency().to().v;
-        this.target = this.targetInit = backend.targetCurrency().to().v;
-
-        orderTimeline = backend.getOrderBook();
-        backend.add(orderTimeline.on(Viewtify.UIThread).to(board -> {
+        // orderbook management
+        service.add(orderTimeline.to(board -> {
             orderBook.shorts.update(board.asks);
             orderBook.longs.update(board.bids);
         }));
-        backend.add(timeline.throttle(2, TimeUnit.SECONDS).to(e -> {
+        service.add(timeline.throttle(2, TimeUnit.SECONDS).to(e -> {
             // fix error board
             orderBook.shorts.fix(e.price);
             orderBook.longs.fix(e.price);
         }));
     }
 
-    public Market read(Function<MarketLog, Signal<Execution>> log) {
-        backend.add(log.apply(provider.log()).to(this::tick));
+    /**
+     * Read {@link Execution} log.
+     * 
+     * @param log
+     * @return
+     */
+    public Market readLog(Function<MarketLog, Signal<Execution>> log) {
+        service.add(log.apply(provider.log()).to(this::tick));
 
         return this;
     }
@@ -218,7 +227,7 @@ public class Market implements Disposable {
      */
     @Override
     public void vandalize() {
-        backend.dispose();
+        service.dispose();
     }
 
     /**
@@ -230,7 +239,7 @@ public class Market implements Disposable {
     public final Signal<Order> request(Order order) {
         order.state.set(REQUESTING);
 
-        return backend.request(order).retryWhen(fail -> fail.take(40).delay(100, MILLISECONDS)).map(id -> {
+        return service.request(order).retryWhen(fail -> fail.take(40).delay(100, MILLISECONDS)).map(id -> {
             order.id = id;
             order.created.set(ZonedDateTime.now());
             order.averagePrice.set(order.price);
@@ -257,7 +266,7 @@ public class Market implements Disposable {
         if (order.state.is(ACTIVE) || order.state.is(State.REQUESTING)) {
             State previous = order.state.set(REQUESTING);
 
-            return backend.cancel(order).effect(o -> {
+            return service.cancel(order).effect(o -> {
                 orderItems.remove(o);
                 o.state.set(CANCELED);
             }).effectOnError(e -> {
@@ -274,7 +283,7 @@ public class Market implements Disposable {
      * @return A list of all orders.
      */
     public final List<Order> orders() {
-        return backend.orders().toList();
+        return service.orders().toList();
     }
 
     /**
@@ -292,49 +301,13 @@ public class Market implements Disposable {
     }
 
     /**
-     * Return the current amount of base currency.
-     * 
-     * @return
-     */
-    public Num getBase() {
-        return base;
-    }
-
-    /**
-     * Return the current amount of target currency.
-     * 
-     * @return
-     */
-    public Num getTarget() {
-        return target;
-    }
-
-    /**
-     * Return the current amount of base currency.
-     * 
-     * @return
-     */
-    public Num getBaseInit() {
-        return baseInit;
-    }
-
-    /**
-     * Return the current amount of target currency.
-     * 
-     * @return
-     */
-    public Num getTargetInit() {
-        return targetInit;
-    }
-
-    /**
      * Calculate profit and loss.
      * 
      * @return
      */
     public Num calculateProfit() {
-        Num baseProfit = base.minus(baseInit);
-        Num targetProfit = target.multiply(latest.v.price).minus(targetInit.multiply(init.v.price));
+        Num baseProfit = base.v.minus(baseInit);
+        Num targetProfit = target.v.multiply(latest.v.price).minus(targetInit.v.multiply(init.v.price));
         return baseProfit.plus(targetProfit);
     }
 
@@ -383,11 +356,11 @@ public class Market implements Disposable {
     private void update(Order order, Execution exe) {
         // update assets
         if (order.side().isBuy()) {
-            base = base.minus(exe.size.multiply(exe.price));
-            target = target.plus(exe.size);
+            base.set(v -> v.minus(exe.size.multiply(exe.price)));
+            target.set(v -> v.plus(exe.size));
         } else {
-            base = base.plus(exe.size.multiply(exe.price));
-            target = target.minus(exe.size);
+            base.set(v -> v.plus(exe.size.multiply(exe.price)));
+            target.set(v -> v.minus(exe.size));
         }
 
         // for order state

@@ -14,6 +14,7 @@ import org.junit.jupiter.api.BeforeEach;
 import cointoss.Side;
 import cointoss.Trader;
 import cointoss.analyze.TradingLog;
+import cointoss.backtest.TestableMarket;
 import cointoss.util.Num;
 import kiss.I;
 

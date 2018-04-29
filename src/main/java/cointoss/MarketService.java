@@ -102,7 +102,7 @@ public abstract class MarketService implements Disposable {
      * 
      * @return
      */
-    public abstract Signal<OrderBookListChange> getOrderBook();
+    public abstract Signal<OrderBookListChange> orderBook();
 
     /**
      * Build execution from log.
