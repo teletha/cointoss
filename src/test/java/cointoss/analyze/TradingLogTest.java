@@ -13,7 +13,7 @@ import static cointoss.Side.*;
 
 import org.junit.jupiter.api.Test;
 
-import cointoss.TraderTestSupport;
+import cointoss.backtest.TraderTestSupport;
 
 /**
  * @version 2018/04/02 16:44:56

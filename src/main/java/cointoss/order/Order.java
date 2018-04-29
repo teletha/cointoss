@@ -21,7 +21,7 @@ import cointoss.Execution;
 import cointoss.Side;
 import cointoss.util.Num;
 import kiss.Signal;
-import kiss.Signaler;
+import kiss.Signaling;
 import kiss.Variable;
 
 /**
@@ -52,10 +52,10 @@ public class Order implements Directional {
     private Quantity quantity;
 
     /** The event listeners. */
-    public final Signaler<Execution> listeners = new Signaler();
+    public final Signaling<Execution> listeners = new Signaling();
 
     /** The execution signal. */
-    public final Signal<Execution> execute = new Signal(listeners);
+    public final Signal<Execution> execute = listeners.expose;
 
     /**
      * <p>

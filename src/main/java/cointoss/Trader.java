@@ -26,7 +26,7 @@ import cointoss.util.Num;
 import cointoss.util.Span;
 import kiss.Disposable;
 import kiss.Signal;
-import kiss.Signaler;
+import kiss.Signaling;
 
 /**
  * @version 2017/09/05 19:39:34
@@ -37,22 +37,22 @@ public abstract class Trader implements Disposable {
     protected Market market;
 
     /** The signal observers. */
-    private final Signaler<Boolean> closePositions = new Signaler();
+    private final Signaling<Boolean> closePositions = new Signaling();
 
     /** The trade related signal. */
-    protected final Signal<Boolean> closingPosition = new Signal(closePositions);
+    protected final Signal<Boolean> closingPosition = closePositions.expose;
 
     /** The signal observers. */
-    private final Signaler<Boolean> completeEntries = new Signaler();
+    private final Signaling<Boolean> completeEntries = new Signaling();
 
     /** The trade related signal. */
-    protected final Signal<Boolean> completingEntry = new Signal(completeEntries);
+    protected final Signal<Boolean> completingEntry = completeEntries.expose;
 
     /** The signal observers. */
-    private final Signaler<Boolean> completeExits = new Signaler();
+    private final Signaling<Boolean> completeExits = new Signaling();
 
     /** The trade related signal. */
-    protected final Signal<Boolean> completingExit = new Signal(completeExits);
+    protected final Signal<Boolean> completingExit = completeExits.expose;
 
     /** The user setting. */
     protected Num maxPositionSize = Num.of(1);

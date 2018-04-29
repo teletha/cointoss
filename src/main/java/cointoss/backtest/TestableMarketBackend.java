@@ -7,7 +7,7 @@
  *
  *          https://opensource.org/licenses/MIT
  */
-package cointoss;
+package cointoss.backtest;
 
 import java.time.ZonedDateTime;
 import java.util.Iterator;
@@ -15,7 +15,13 @@ import java.util.LinkedList;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import cointoss.Time.Lag;
+import cointoss.Execution;
+import cointoss.Market;
+import cointoss.MarketBackend;
+import cointoss.MarketLog;
+import cointoss.MarketProvider;
+import cointoss.Position;
+import cointoss.backtest.Time.Lag;
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.order.Order;
 import cointoss.order.Order.Quantity;
@@ -26,6 +32,7 @@ import cointoss.util.Num;
 import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
+import kiss.Signaling;
 
 /**
  * @version 2017/09/08 19:09:35
@@ -45,7 +52,7 @@ class TestableMarketBackend extends MarketBackend implements MarketProvider {
     private final ConcurrentLinkedQueue<BackendOrder> orderAll = new ConcurrentLinkedQueue<>();
 
     /** The order manager. */
-    private final ConcurrentLinkedDeque<Position> positions = new ConcurrentLinkedDeque<>();
+    private final Signaling<Position> positions = new Signaling();
 
     /** The execution manager. */
     private final LinkedList<Execution> executeds = new LinkedList();
@@ -172,7 +179,7 @@ class TestableMarketBackend extends MarketBackend implements MarketProvider {
      */
     @Override
     public Signal<Position> positions() {
-        return I.signal(positions);
+        return positions.expose;
     }
 
     /**
@@ -283,13 +290,12 @@ class TestableMarketBackend extends MarketBackend implements MarketProvider {
                 Num executedSize = Num.min(e.size, order.remainingSize.get());
                 if (order.child_order_type.isMarket() && executedSize.isNot(0)) {
                     order.marketMinPrice = order.isBuy() ? Num.max(order.marketMinPrice, e.price) : Num.min(order.marketMinPrice, e.price);
-                    order.averagePrice.set(order.averagePrice.get()
-                            .multiply(order.executed_size.get())
+                    order.averagePrice.set(v -> v.multiply(order.executed_size)
                             .plus(order.marketMinPrice.multiply(executedSize))
-                            .divide(order.executed_size.get().plus(executedSize)));;
+                            .divide(executedSize.plus(order.executed_size)));
                 }
-                order.remainingSize.set(order.remainingSize.get().minus(executedSize));
-                order.executed_size.set(order.executed_size.get().plus(executedSize));
+                order.remainingSize.set(v -> v.minus(executedSize));
+                order.executed_size.set(v -> v.plus(executedSize));
 
                 Execution exe = new Execution();
                 exe.side = order.side();

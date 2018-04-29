@@ -19,7 +19,7 @@ import org.magicwerk.brownies.collections.GapList;
 import cointoss.Side;
 import cointoss.util.Num;
 import kiss.Signal;
-import kiss.Signaler;
+import kiss.Signaling;
 import kiss.Variable;
 
 /**
@@ -31,10 +31,10 @@ public class OrderBookList {
     public final Variable<OrderUnit> best = Variable.empty();
 
     /** The modified event listeners. */
-    private final Signaler<Boolean> modify = new Signaler();
+    private final Signaling<Boolean> modify = new Signaling();
 
     /** The modified event stream. */
-    public final Signal<Boolean> modified = new Signal(modify);
+    public final Signal<Boolean> modified = modify.expose;
 
     /** The search direction. */
     private final Side side;

@@ -14,7 +14,6 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.zip.CRC32;
 
-import cointoss.order.Order;
 import cointoss.util.Num;
 import kiss.Decoder;
 import kiss.Encoder;
@@ -88,9 +87,6 @@ public class Execution {
     /** Optional Attribute : The consecutive type. */
     public int consecutive;
 
-    /** INTERNAL USAGE */
-    Order associated;
-
     /**
      * 
      */
@@ -118,13 +114,6 @@ public class Execution {
             buy_child_order_acceptance_id = values[5];
             sell_child_order_acceptance_id = values[6];
         }
-    }
-
-    /**
-     * @return
-     */
-    public final boolean isMine() {
-        return associated != null;
     }
 
     /**

@@ -23,6 +23,7 @@ import cointoss.order.Order;
 import cointoss.order.Order.State;
 import cointoss.order.OrderBook;
 import cointoss.order.OrderBookListChange;
+import cointoss.order.OrderManager;
 import cointoss.ticker.ExecutionFlow;
 import cointoss.ticker.TickSpan;
 import cointoss.ticker.Ticker;
@@ -30,7 +31,7 @@ import cointoss.util.Num;
 import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
-import kiss.Signaler;
+import kiss.Signaling;
 import kiss.Variable;
 import viewtify.Viewtify;
 
@@ -62,10 +63,10 @@ public class Market implements Disposable {
     public final ExecutionFlow flow300 = new ExecutionFlow(1600);
 
     /** The execution listeners. */
-    private final Signaler<Execution> holderForTimeline = new Signaler();
+    private final Signaling<Execution> holderForTimeline = new Signaling();
 
     /** The execution time line. */
-    public final Signal<Execution> timeline = new Signal(holderForTimeline);
+    public final Signal<Execution> timeline = holderForTimeline.expose;
 
     /** The execution time line by taker. */
     public final Signal<Execution> timelineByTaker = timeline.map(e -> {
@@ -90,10 +91,10 @@ public class Market implements Disposable {
     public final OrderBook orderBook = new OrderBook();
 
     /** The holder. */
-    private final Signaler<Order> holderForYourOrder = new Signaler();
+    private final Signaling<Order> holderForYourOrder = new Signaling();
 
     /** The event stream. */
-    public final Signal<Order> yourOrder = new Signal(holderForYourOrder);
+    public final Signal<Order> yourOrder = holderForYourOrder.expose;
 
     /** The initial execution. */
     public final Variable<Execution> init = Variable.empty();
@@ -103,6 +104,9 @@ public class Market implements Disposable {
 
     /** The latest price. */
     public final Variable<Num> price = latest.observeNow().map(e -> e.price).diff().to();
+
+    /** The order manager. */
+    public final OrderManager orders = new OrderManager();
 
     /** The position manager. */
     public final PositionManager positions = new PositionManager(price);
@@ -126,7 +130,7 @@ public class Market implements Disposable {
     private final EnumMap<TickSpan, Ticker> tickers = new EnumMap(TickSpan.class);
 
     /** The order manager. */
-    private final List<Order> orders = new CopyOnWriteArrayList();
+    private final List<Order> orderItems = new CopyOnWriteArrayList();
 
     /**
      * Market without {@link Trader}.
@@ -242,7 +246,7 @@ public class Market implements Disposable {
             order.remainingSize.set(order.size);
             order.state.set(ACTIVE);
 
-            orders.add(order);
+            orderItems.add(order);
 
             // event
             holderForYourOrder.accept(order);
@@ -263,7 +267,7 @@ public class Market implements Disposable {
             State previous = order.state.set(REQUESTING);
 
             return backend.cancel(order).effect(o -> {
-                orders.remove(o);
+                orderItems.remove(o);
                 o.state.set(CANCELED);
             }).effectOnError(e -> {
                 order.state.set(previous);
@@ -280,24 +284,6 @@ public class Market implements Disposable {
      */
     public final List<Order> orders() {
         return backend.orders().toList();
-    }
-
-    /**
-     * Check order status.
-     * 
-     * @return
-     */
-    public final boolean hasActiveOrder() {
-        return orders.isEmpty() == false;
-    }
-
-    /**
-     * Check order status.
-     * 
-     * @return
-     */
-    public final boolean hasNoActiveOrder() {
-        return orders.isEmpty() == true;
     }
 
     /**
@@ -378,7 +364,7 @@ public class Market implements Disposable {
         flow200.record(exe);
         flow300.record(exe);
 
-        for (Order order : orders) {
+        for (Order order : orderItems) {
             if (order.id().equals(exe.buy_child_order_acceptance_id) || order.id().equals(exe.sell_child_order_acceptance_id)) {
                 update(order, exe);
 
@@ -427,11 +413,10 @@ public class Market implements Disposable {
 
         if (order.remainingSize.is(Num.ZERO)) {
             order.state.set(State.COMPLETED);
-            orders.remove(order); // complete order
+            orderItems.remove(order); // complete order
         }
 
         // pairing order and execution
-        exe.associated = order;
         order.executions.add(exe);
     }
 }

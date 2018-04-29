@@ -83,9 +83,6 @@ public class OrderCatalog extends View {
                 .render((ui, item) -> ui.text(item).styleOnly(item));
         requestedOrdersAmount.modelByProperty(OrderSet.class, o -> o.amount).modelByVar(Order.class, o -> o.remainingSize);
         requestedOrdersPrice.modelByProperty(OrderSet.class, o -> o.averagePrice).model(Order.class, o -> o.price);
-
-        // observe external orders
-        view.market().yourOrder.skip(o -> o.group != -1).to(order -> createOrderItem(orderCatalog.root, order));
     }
 
     /**

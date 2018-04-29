@@ -15,7 +15,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import cointoss.util.Num;
 import kiss.Signal;
-import kiss.Signaler;
+import kiss.Signaling;
 import kiss.Variable;
 
 /**
@@ -30,16 +30,16 @@ public final class PositionManager {
     public final List<Position> items = Collections.unmodifiableList(positions);
 
     /** position remove event. */
-    private final Signaler<Position> remove = new Signaler();
+    private final Signaling<Position> remove = new Signaling();
 
     /** position remove event. */
-    public final Signal<Position> removed = new Signal(remove);
+    public final Signal<Position> removed = remove.expose;
 
     /** position add event. */
-    private final Signaler<Position> addition = new Signaler();
+    private final Signaling<Position> addition = new Signaling();
 
     /** position add event. */
-    public final Signal<Position> added = new Signal(addition);
+    public final Signal<Position> added = addition.expose;
 
     /** The total size. */
     public final Variable<Num> size = Variable.of(Num.ZERO);
@@ -66,7 +66,7 @@ public final class PositionManager {
     /**
      * Check the position state.
      * 
-     * @return
+     * @return A result.
      */
     public boolean hasPosition() {
         return positions.isEmpty() == false;
@@ -75,7 +75,7 @@ public final class PositionManager {
     /**
      * Check the position state.
      * 
-     * @return
+     * @return A result.
      */
     public boolean hasNoPosition() {
         return positions.isEmpty() == true;

@@ -17,7 +17,7 @@ import org.magicwerk.brownies.collections.BigList;
 
 import cointoss.Execution;
 import kiss.Signal;
-import kiss.Signaler;
+import kiss.Signaling;
 import kiss.Variable;
 
 /**
@@ -29,16 +29,16 @@ public class Ticker {
     public final TickSpan span;
 
     /** The event listeners. */
-    private final Signaler<Tick> additions = new Signaler();
+    private final Signaling<Tick> additions = new Signaling();
 
     /** The event about adding new tick. */
-    public final Signal<Tick> add = new Signal(additions);
+    public final Signal<Tick> add = additions.expose;
 
     /** The event listeners. */
-    private final Signaler<Tick> updaters = new Signaler();
+    private final Signaling<Tick> updaters = new Signaling();
 
     /** The event about update tick. */
-    public final Signal<Tick> update = new Signal(updaters);
+    public final Signal<Tick> update = updaters.expose;
 
     /** The tick manager. */
     private final BigList<Tick> ticks = new BigList();

@@ -15,7 +15,7 @@ import cointoss.util.Num;
 import kiss.Variable;
 
 /**
- * @version 2018/02/06 22:37:41
+ * @version 2018/04/29 13:37:42
  */
 public class Position implements Directional {
 
@@ -33,6 +33,9 @@ public class Position implements Directional {
 
     /** The current profit and loss. */
     public Variable<Num> profit = Variable.of(Num.ZERO);
+
+    /** Optional : The associated execution id. */
+    public String id;
 
     /**
      * {@inheritDoc}

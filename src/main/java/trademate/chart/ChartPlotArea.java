@@ -219,7 +219,7 @@ public class ChartPlotArea extends Region {
      * Visualize order price in chart.
      */
     private void visualizeOrderPrice() {
-        chart.trade.market().yourOrder.on(Viewtify.UIThread).to(o -> {
+        chart.trade.market().orders.added.on(Viewtify.UIThread).to(o -> {
             LineMark mark = o.isBuy() ? orderBuyPrice : orderSellPrice;
             TickLable label = mark.createLabel(o.price);
 

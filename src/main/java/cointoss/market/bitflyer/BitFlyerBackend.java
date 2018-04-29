@@ -9,8 +9,6 @@
  */
 package cointoss.market.bitflyer;
 
-import static java.util.concurrent.TimeUnit.*;
-
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -22,6 +20,9 @@ import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 import javafx.scene.control.TextInputDialog;
 
@@ -50,6 +51,7 @@ import kiss.Disposable;
 import kiss.I;
 import kiss.JSON;
 import kiss.Signal;
+import kiss.Signaling;
 import marionette.Browser;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -79,6 +81,12 @@ public class BitFlyerBackend extends MarketBackend {
     /** UTC */
     static final ZoneId zone = ZoneId.of("UTC");
 
+    /** The order management. */
+    private final Set<String> orders = ConcurrentHashMap.newKeySet();
+
+    /** The position event. */
+    private final Signaling<Position> positions = new Signaling();
+
     /** The market type. */
     private BitFlyer type;
 
@@ -103,7 +111,7 @@ public class BitFlyerBackend extends MarketBackend {
     private final Signal<List<Order>> intervalOrderCheck;
 
     /** The singleton. */
-    private final OkHttpClient client = new OkHttpClient.Builder().connectTimeout(30, SECONDS).build();
+    private final OkHttpClient client = new OkHttpClient.Builder().connectTimeout(30, TimeUnit.SECONDS).build();
 
     /** The session key. */
     private final String sessionKey = "api_session_v2";
@@ -120,7 +128,7 @@ public class BitFlyerBackend extends MarketBackend {
         this.name = lines.get(2);
         this.password = lines.get(3);
         this.accountId = lines.get(4);
-        this.intervalOrderCheck = I.signal(0, 1, SECONDS).map(v -> orders().toList()).share();
+        this.intervalOrderCheck = I.signal(0, 1, TimeUnit.SECONDS).map(v -> orders().toList()).share();
     }
 
     /**
@@ -177,6 +185,10 @@ public class BitFlyerBackend extends MarketBackend {
         }
 
         return call.effect(v -> {
+            // register order id
+            orders.add(v);
+
+            // check order state
             intervalOrderCheck.map(orders -> orders.get(orders.indexOf(order)))
                     .skipError()
                     .take(1)
@@ -200,7 +212,9 @@ public class BitFlyerBackend extends MarketBackend {
                 : call("POST", "https://lightning.bitflyer.jp/api/trade/cancelorder", cancel, null, WebResponse.class);
         Signal<List<Order>> isCanceled = intervalOrderCheck.take(orders -> !orders.contains(order));
 
-        return requestCancel.combine(isCanceled).take(1).mapTo(order);
+        return requestCancel.combine(isCanceled).take(1).mapTo(order).effect(o -> {
+            orders.remove(order.id);
+        });
     }
 
     /**
@@ -227,9 +241,29 @@ public class BitFlyerBackend extends MarketBackend {
                     exe.size = exe.cumulativeSize = Num.of(e.get("size").getAsString());
                     exe.exec_date = LocalDateTime.parse(normalize(e.get("exec_date").getAsString()), RealTimeExecutionFormat)
                             .atZone(BitFlyerBackend.zone);
-                    exe.buy_child_order_acceptance_id = e.get("buy_child_order_acceptance_id").getAsString();
-                    exe.sell_child_order_acceptance_id = e.get("sell_child_order_acceptance_id").getAsString();
+                    String buyer = exe.buy_child_order_acceptance_id = e.get("buy_child_order_acceptance_id").getAsString();
+                    String seller = exe.sell_child_order_acceptance_id = e.get("sell_child_order_acceptance_id").getAsString();
                     exe.delay = estimateDelay(exe);
+
+                    if (orders.contains(buyer)) {
+                        Position position = new Position();
+                        position.side = Side.BUY;
+                        position.date = exe.exec_date;
+                        position.price = exe.price;
+                        position.size.set(exe.size);
+                        position.id = buyer;
+
+                        positions.accept(position);
+                    } else if (orders.contains(seller)) {
+                        Position position = new Position();
+                        position.side = Side.SELL;
+                        position.date = exe.exec_date;
+                        position.price = exe.price;
+                        position.size.set(exe.size);
+                        position.id = seller;
+
+                        positions.accept(position);
+                    }
 
                     return exe;
                 });
@@ -331,9 +365,7 @@ public class BitFlyerBackend extends MarketBackend {
      */
     @Override
     public Signal<Position> positions() {
-        // If this exception will be thrown, it is bug of this program. So we must rethrow the
-        // wrapped error in here.
-        throw new Error();
+        return positions.expose;
     }
 
     /**
