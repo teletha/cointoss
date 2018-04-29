@@ -21,15 +21,14 @@ import cointoss.order.Order.State;
 import cointoss.util.Num;
 
 /**
- * @version 2018/04/02 16:48:08
+ * @version 2018/04/29 16:12:46
  */
-class MarketTest {
+class TestableMarketTest {
+
+    TestableMarket market = new TestableMarket();
 
     @Test
     void requestOrder() {
-        TestableMarket market = new TestableMarket();
-
-        assert market.orders().isEmpty();
         Order order = Order.limitLong(1, 10);
         market.requestSuccessfully(order);
         assert order.isBuy();
@@ -39,7 +38,6 @@ class MarketTest {
 
     @Test
     void execute() {
-        TestableMarket market = new TestableMarket();
         market.request(Order.limitLong(1, 10)).to(order -> {
             assert order.remainingSize.get().is(1);
             assert order.executed_size.get().is(0);
@@ -52,7 +50,6 @@ class MarketTest {
 
     @Test
     void executeDivided() {
-        TestableMarket market = new TestableMarket();
         market.request(Order.limitLong(10, 10)).to(order -> {
             assert order.remainingSize.get().is(10);
             assert order.executed_size.get().is(0);
@@ -70,7 +67,6 @@ class MarketTest {
 
     @Test
     void executeOverflow() {
-        TestableMarket market = new TestableMarket();
         market.request(Order.limitLong(10, 10)).to(order -> {
             assert order.remainingSize.get().is(10);
             assert order.executed_size.get().is(0);
@@ -96,7 +92,6 @@ class MarketTest {
 
     @Test
     void executeExtra() {
-        TestableMarket market = new TestableMarket();
         market.request(Order.limitLong(10, 10)).to(order -> {
             assert order.remainingSize.get().is(10);
             assert order.executed_size.get().is(0);
@@ -116,7 +111,6 @@ class MarketTest {
 
     @Test
     void executeLongWithUpperPrice() {
-        TestableMarket market = new TestableMarket();
         market.request(Order.limitLong(10, 10)).to(order -> {
             market.execute(Side.BUY, 5, 12);
             market.execute(Side.SELL, 5, 13);
@@ -128,7 +122,6 @@ class MarketTest {
 
     @Test
     void executeLongWithLowerPrice() {
-        TestableMarket market = new TestableMarket();
         market.request(Order.limitLong(10, 10)).to(order -> {
             market.execute(Side.BUY, 5, 8);
             market.execute(Side.SELL, 5, 7);
@@ -140,7 +133,6 @@ class MarketTest {
 
     @Test
     void executeShortWithUpperPrice() {
-        TestableMarket market = new TestableMarket();
         market.request(Order.limitShort(10, 10)).to(order -> {
             market.execute(Side.BUY, 5, 12);
             market.execute(Side.SELL, 5, 13);
@@ -152,7 +144,6 @@ class MarketTest {
 
     @Test
     void executeShortWithLowerPrice() {
-        TestableMarket market = new TestableMarket();
         market.request(Order.limitShort(10, 10)).to(order -> {
             market.execute(Side.BUY, 5, 8);
             market.execute(Side.SELL, 5, 7);
@@ -179,8 +170,6 @@ class MarketTest {
 
     @Test
     void shortWithTrigger() {
-        TestableMarket market = new TestableMarket();
-
         market.requestSuccessfully(Order.limitShort(1, 7).when(8));
         market.execute(Side.BUY, 1, 9);
         assert market.validateOrderState(1, 0, 0, 0, 0);
@@ -192,8 +181,6 @@ class MarketTest {
 
     @Test
     void shortWithTriggerSamePrice() {
-        TestableMarket market = new TestableMarket();
-
         market.requestSuccessfully(Order.limitShort(1, 8).when(8));
         market.execute(Side.BUY, 1, 9);
         assert market.validateOrderState(1, 0, 0, 0, 0);
@@ -207,8 +194,6 @@ class MarketTest {
 
     @Test
     void shortMarketWithTrigger() {
-        TestableMarket market = new TestableMarket();
-
         Order order = Order.marketShort(1).when(8);
         market.requestSuccessfully(order);
         market.execute(Side.BUY, 1, 9);
@@ -232,8 +217,6 @@ class MarketTest {
 
     @Test
     void longWithTrigger() {
-        TestableMarket market = new TestableMarket();
-
         market.requestSuccessfully(Order.limitLong(1, 13).when(12));
         market.execute(Side.BUY, 1, 11);
         assert market.validateOrderState(1, 0, 0, 0, 0);
@@ -245,8 +228,6 @@ class MarketTest {
 
     @Test
     void longWithTriggerSamePrice() {
-        TestableMarket market = new TestableMarket();
-
         market.requestSuccessfully(Order.limitLong(1, 12).when(12));
         market.execute(Side.BUY, 1, 11);
         assert market.validateOrderState(1, 0, 0, 0, 0);
@@ -260,8 +241,6 @@ class MarketTest {
 
     @Test
     void longMarketWithTrigger() {
-        TestableMarket market = new TestableMarket();
-
         Order order = Order.marketLong(1).when(12);
         market.requestSuccessfully(order);
         market.execute(Side.BUY, 1, 11);
@@ -285,8 +264,6 @@ class MarketTest {
 
     @Test
     void fillOrKillLong() {
-        TestableMarket market = new TestableMarket();
-
         // success
         market.requestSuccessfully(Order.limitLong(10, 10).type(Quantity.FillOrKill));
         market.execute(Side.BUY, 10, 10);
@@ -315,8 +292,6 @@ class MarketTest {
 
     @Test
     void fillOrKillShort() {
-        TestableMarket market = new TestableMarket();
-
         // success
         market.requestSuccessfully(Order.limitShort(1, 10).type(Quantity.FillOrKill));
         market.execute(Side.SELL, 1, 10);
@@ -345,8 +320,6 @@ class MarketTest {
 
     @Test
     void immediateOrCancelLong() {
-        TestableMarket market = new TestableMarket();
-
         // success
         market.requestSuccessfully(Order.limitLong(1, 10).type(Quantity.ImmediateOrCancel));
         market.execute(Side.BUY, 1, 10);
@@ -376,8 +349,6 @@ class MarketTest {
 
     @Test
     void immediateOrCancelShort() {
-        TestableMarket market = new TestableMarket();
-
         // success
         market.requestSuccessfully(Order.limitShort(1, 10).type(Quantity.ImmediateOrCancel));
         market.execute(Side.SELL, 1, 10);
@@ -407,8 +378,6 @@ class MarketTest {
 
     @Test
     void marketLong() {
-        TestableMarket market = new TestableMarket();
-
         market.requestSuccessfully(Order.marketLong(1));
         market.execute(Side.SELL, 1, 10);
         assert market.orders().get(0).averagePrice.get().is(10);
@@ -454,8 +423,6 @@ class MarketTest {
 
     @Test
     void marketShort() {
-        TestableMarket market = new TestableMarket();
-
         Order order = Order.marketShort(1);
         market.requestSuccessfully(order);
         market.execute(Side.SELL, 1, 10);
@@ -507,8 +474,6 @@ class MarketTest {
 
     @Test
     void cancel() {
-        TestableMarket market = new TestableMarket();
-
         Order order = market.requestSuccessfully(Order.limitShort(1, 12));
         market.execute(Side.BUY, 1, 11);
         assert market.validateOrderState(1, 0, 0, 0, 0);
@@ -522,7 +487,6 @@ class MarketTest {
     void observeSequencialExecutionsBySellSize() {
         AtomicReference<Num> size = new AtomicReference<>();
 
-        TestableMarket market = new TestableMarket();
         market.timelineByTaker.to(e -> {
             size.set(e.cumulativeSize);
         });
@@ -542,7 +506,6 @@ class MarketTest {
     void observeSequencialExecutionsByBuySize() {
         AtomicReference<Num> size = new AtomicReference<>();
 
-        TestableMarket market = new TestableMarket();
         market.timelineByTaker.to(e -> {
             size.set(e.cumulativeSize);
         });

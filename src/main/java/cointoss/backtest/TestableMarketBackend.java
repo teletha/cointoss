@@ -33,7 +33,7 @@ import kiss.Signal;
 import kiss.Signaling;
 
 /**
- * @version 2017/09/08 19:09:35
+ * @version 2018/04/29 16:11:11
  */
 class TestableMarketBackend extends MarketBackend implements MarketProvider {
 

@@ -12,8 +12,6 @@ package cointoss.backtest;
 
 import static cointoss.backtest.Time.*;
 
-import java.time.ZonedDateTime;
-
 import cointoss.Execution;
 import cointoss.Market;
 import cointoss.Side;
@@ -24,12 +22,9 @@ import kiss.Signal;
 import kiss.Table;
 
 /**
- * @version 2017/07/24 23:50:33
+ * @version 2018/04/29 16:07:28
  */
 class TestableMarket extends Market {
-
-    /** The starting time. */
-    private final ZonedDateTime base = ZonedDateTime.now().withSecond(0).withNano(0);
 
     /**
      * @param backend
@@ -177,18 +172,6 @@ class TestableMarket extends Market {
         request(order).to();
 
         return order;
-    }
-
-    /**
-     * <p>
-     * Helper method to emit {@link Order}.
-     * </p>
-     * 
-     * @param order
-     */
-    void requestSuccessfully(Order order, Time lag) {
-        request(order).to();
-
     }
 
     /**
