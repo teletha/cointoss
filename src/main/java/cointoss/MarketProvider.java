@@ -10,12 +10,12 @@
 package cointoss;
 
 /**
- * @version 2018/04/25 4:06:43
+ * @version 2018/04/29 17:46:48
  */
 public interface MarketProvider {
 
     /**
-     * Provide market backend.
+     * Provide market backend service.
      * 
      * @return
      */
@@ -51,5 +51,23 @@ public interface MarketProvider {
      */
     default String fullName() {
         return exchangeName() + " " + name();
+    }
+
+    /**
+     * Compute base {@link Currency}.
+     * 
+     * @return
+     */
+    default Currency base() {
+        return Currency.getInstance(name().substring(name().indexOf("_") + 1));
+    }
+
+    /**
+     * Compute target {@link Currency}.
+     * 
+     * @return
+     */
+    default Currency target() {
+        return Currency.getInstance(name().substring(0, name().indexOf("_")));
     }
 }

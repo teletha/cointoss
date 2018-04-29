@@ -363,7 +363,7 @@ public class BitFlyerService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Num> getBaseCurrency() {
+    public Signal<Num> baseCurrency() {
         return call("GET", "/v1/me/getbalance", "", "*", CurrencyState.class).take(unit -> unit.currency_code.equals("JPY"))
                 .map(c -> c.available);
     }
@@ -372,7 +372,7 @@ public class BitFlyerService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Num> getTargetCurrency() {
+    public Signal<Num> targetCurrency() {
         return call("GET", "/v1/me/getbalance", "", "*", CurrencyState.class).take(unit -> unit.currency_code.equals("BTC"))
                 .map(c -> c.available);
     }

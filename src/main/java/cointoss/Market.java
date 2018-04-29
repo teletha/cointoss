@@ -155,8 +155,8 @@ public class Market implements Disposable {
         this.backend = provider.service();
 
         // initialize price, balance and executions
-        this.base = this.baseInit = backend.getBaseCurrency().to().v;
-        this.target = this.targetInit = backend.getTargetCurrency().to().v;
+        this.base = this.baseInit = backend.baseCurrency().to().v;
+        this.target = this.targetInit = backend.targetCurrency().to().v;
 
         orderTimeline = backend.getOrderBook();
         backend.add(orderTimeline.on(Viewtify.UIThread).to(board -> {

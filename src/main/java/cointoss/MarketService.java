@@ -84,7 +84,7 @@ public abstract class MarketService implements Disposable {
      * 
      * @return
      */
-    public abstract Signal<Num> getBaseCurrency();
+    public abstract Signal<Num> baseCurrency();
 
     /**
      * <p>
@@ -93,7 +93,7 @@ public abstract class MarketService implements Disposable {
      * 
      * @return
      */
-    public abstract Signal<Num> getTargetCurrency();
+    public abstract Signal<Num> targetCurrency();
 
     /**
      * <p>

@@ -24,7 +24,7 @@ import kiss.Signal;
 import kiss.Variable;
 
 /**
- * @version 2017/09/24 13:06:14
+ * @version 2018/04/29 18:03:37
  */
 public class Num implements Comparable<Num> {
 
@@ -115,6 +115,18 @@ public class Num implements Comparable<Num> {
      * @return {@code this + augend}, rounded as necessary
      * @see BigDecimal#add(java.math.BigDecimal, java.math.MathContext)
      */
+    public final Num plus(double augend) {
+        return plus(of(augend));
+    }
+
+    /**
+     * Returns a {@code Decimal} whose value is {@code (this + augend)}, with rounding according to
+     * the context settings.
+     * 
+     * @param augend value to be added to this {@code Decimal}.
+     * @return {@code this + augend}, rounded as necessary
+     * @see BigDecimal#add(java.math.BigDecimal, java.math.MathContext)
+     */
     public final Num plus(String augend) {
         return plus(of(augend));
     }
@@ -167,6 +179,18 @@ public class Num implements Comparable<Num> {
      * @see BigDecimal#subtract(java.math.BigDecimal, java.math.MathContext)
      */
     public final Num minus(long subtrahend) {
+        return minus(of(subtrahend));
+    }
+
+    /**
+     * Returns a {@code Decimal} whose value is {@code (this - augend)}, with rounding according to
+     * the context settings.
+     * 
+     * @param subtrahend value to be subtracted from this {@code Decimal}.
+     * @return {@code this - subtrahend}, rounded as necessary
+     * @see BigDecimal#subtract(java.math.BigDecimal, java.math.MathContext)
+     */
+    public final Num minus(double subtrahend) {
         return minus(of(subtrahend));
     }
 
@@ -241,6 +265,18 @@ public class Num implements Comparable<Num> {
      * @return {@code this * multiplicand}, rounded as necessary
      * @see BigDecimal#multiply(java.math.BigDecimal, java.math.MathContext)
      */
+    public final Num multiply(double multiplicand) {
+        return multiply(of(multiplicand));
+    }
+
+    /**
+     * Returns a {@code Decimal} whose value is {@code this * multiplicand}, with rounding according
+     * to the context settings.
+     * 
+     * @param multiplicand value to be multiplied by this {@code Decimal}.
+     * @return {@code this * multiplicand}, rounded as necessary
+     * @see BigDecimal#multiply(java.math.BigDecimal, java.math.MathContext)
+     */
     public final Num multiply(String multiplicand) {
         return multiply(of(multiplicand));
     }
@@ -304,6 +340,18 @@ public class Num implements Comparable<Num> {
      * @return {@code this / divisor}, rounded as necessary
      * @see BigDecimal#divide(java.math.BigDecimal, java.math.MathContext)
      */
+    public final Num divide(double divisor) {
+        return divide(of(divisor));
+    }
+
+    /**
+     * Returns a {@code Decimal} whose value is {@code (this / divisor)}, with rounding according to
+     * the context settings.
+     * 
+     * @param divisor value by which this {@code Decimal} is to be divided.
+     * @return {@code this / divisor}, rounded as necessary
+     * @see BigDecimal#divide(java.math.BigDecimal, java.math.MathContext)
+     */
     public final Num divide(String divisor) {
         return divide(of(divisor));
     }
@@ -344,6 +392,30 @@ public class Num implements Comparable<Num> {
      * @see BigDecimal#remainder(java.math.BigDecimal, java.math.MathContext)
      */
     public final Num remainder(int divisor) {
+        return remainder(of(divisor));
+    }
+
+    /**
+     * Returns a {@code Decimal} whose value is {@code (this % divisor)}, with rounding according to
+     * the context settings.
+     * 
+     * @param divisor value by which this {@code Decimal} is to be divided.
+     * @return {@code this % divisor}, rounded as necessary.
+     * @see BigDecimal#remainder(java.math.BigDecimal, java.math.MathContext)
+     */
+    public final Num remainder(long divisor) {
+        return remainder(of(divisor));
+    }
+
+    /**
+     * Returns a {@code Decimal} whose value is {@code (this % divisor)}, with rounding according to
+     * the context settings.
+     * 
+     * @param divisor value by which this {@code Decimal} is to be divided.
+     * @return {@code this % divisor}, rounded as necessary.
+     * @see BigDecimal#remainder(java.math.BigDecimal, java.math.MathContext)
+     */
+    public final Num remainder(double divisor) {
         return remainder(of(divisor));
     }
 
@@ -595,6 +667,16 @@ public class Num implements Comparable<Num> {
      * @param other
      * @return A result.
      */
+    public final boolean is(long other) {
+        return is(of(other));
+    }
+
+    /**
+     * Compare {@link Num}.
+     * 
+     * @param other
+     * @return A result.
+     */
     public final boolean is(double other) {
         return is(of(other));
     }
@@ -607,6 +689,16 @@ public class Num implements Comparable<Num> {
      */
     public final boolean is(String other) {
         return is(of(other));
+    }
+
+    /**
+     * Compare {@link Num}.
+     * 
+     * @param other
+     * @return A result.
+     */
+    public final boolean is(Variable<Num> other) {
+        return is(other.get());
     }
 
     /**
@@ -638,6 +730,16 @@ public class Num implements Comparable<Num> {
      * @param other the other value, not null
      * @return true is this is greater than the specified value, false otherwise
      */
+    public final boolean isNot(long other) {
+        return !is(other);
+    }
+
+    /**
+     * Compare {@link Num}.
+     * 
+     * @param other the other value, not null
+     * @return true is this is greater than the specified value, false otherwise
+     */
     public final boolean isNot(double other) {
         return !is(other);
     }
@@ -649,6 +751,16 @@ public class Num implements Comparable<Num> {
      * @return true is this is greater than the specified value, false otherwise
      */
     public final boolean isNot(String other) {
+        return !is(other);
+    }
+
+    /**
+     * Checks if this value is equal to another.
+     * 
+     * @param other the other value, not null
+     * @return true is this is greater than the specified value, false otherwise
+     */
+    public final boolean isNot(Variable<Num> other) {
         return !is(other);
     }
 
@@ -763,8 +875,38 @@ public class Num implements Comparable<Num> {
      * @param other the other value, not null
      * @return true is this is greater than the specified value, false otherwise
      */
+    public final boolean isGreaterThan(long other) {
+        return isGreaterThan(of(other));
+    }
+
+    /**
+     * Checks if this value is greater than another.
+     * 
+     * @param other the other value, not null
+     * @return true is this is greater than the specified value, false otherwise
+     */
+    public final boolean isGreaterThan(double other) {
+        return isGreaterThan(of(other));
+    }
+
+    /**
+     * Checks if this value is greater than another.
+     * 
+     * @param other the other value, not null
+     * @return true is this is greater than the specified value, false otherwise
+     */
     public final boolean isGreaterThan(String other) {
         return isGreaterThan(of(other));
+    }
+
+    /**
+     * Checks if this value is greater than another.
+     * 
+     * @param other the other value, not null
+     * @return true is this is greater than the specified value, false otherwise
+     */
+    public final boolean isGreaterThan(Variable<Num> other) {
+        return isGreaterThan(other.get());
     }
 
     /**
@@ -793,8 +935,38 @@ public class Num implements Comparable<Num> {
      * @param other the other value, not null
      * @return true is this is greater than or equal to the specified value, false otherwise
      */
+    public final boolean isGreaterThanOrEqual(long other) {
+        return isGreaterThanOrEqual(of(other));
+    }
+
+    /**
+     * Checks if this value is greater than or equal to another.
+     * 
+     * @param other the other value, not null
+     * @return true is this is greater than or equal to the specified value, false otherwise
+     */
+    public final boolean isGreaterThanOrEqual(double other) {
+        return isGreaterThanOrEqual(of(other));
+    }
+
+    /**
+     * Checks if this value is greater than or equal to another.
+     * 
+     * @param other the other value, not null
+     * @return true is this is greater than or equal to the specified value, false otherwise
+     */
     public final boolean isGreaterThanOrEqual(String other) {
         return isGreaterThanOrEqual(of(other));
+    }
+
+    /**
+     * Checks if this value is greater than or equal to another.
+     * 
+     * @param other the other value, not null
+     * @return true is this is greater than or equal to the specified value, false otherwise
+     */
+    public final boolean isGreaterThanOrEqual(Variable<Num> other) {
+        return isGreaterThanOrEqual(other.get());
     }
 
     /**
@@ -823,8 +995,38 @@ public class Num implements Comparable<Num> {
      * @param other the other value, not null
      * @return true is this is less than the specified value, false otherwise
      */
+    public final boolean isLessThan(long other) {
+        return isLessThan(of(other));
+    }
+
+    /**
+     * Checks if this value is less than another.
+     * 
+     * @param other the other value, not null
+     * @return true is this is less than the specified value, false otherwise
+     */
+    public final boolean isLessThan(double other) {
+        return isLessThan(of(other));
+    }
+
+    /**
+     * Checks if this value is less than another.
+     * 
+     * @param other the other value, not null
+     * @return true is this is less than the specified value, false otherwise
+     */
     public final boolean isLessThan(String other) {
         return isLessThan(of(other));
+    }
+
+    /**
+     * Checks if this value is less than another.
+     * 
+     * @param other the other value, not null
+     * @return true is this is less than the specified value, false otherwise
+     */
+    public final boolean isLessThan(Variable<Num> other) {
+        return isLessThan(other.get());
     }
 
     /**
@@ -853,8 +1055,38 @@ public class Num implements Comparable<Num> {
      * @param other the other value, not null
      * @return true is this is less than or equal to the specified value, false otherwise
      */
+    public final boolean isLessThanOrEqual(long other) {
+        return isLessThanOrEqual(of(other));
+    }
+
+    /**
+     * Checks if this value is less than or equal to another.
+     * 
+     * @param other the other value, not null
+     * @return true is this is less than or equal to the specified value, false otherwise
+     */
+    public final boolean isLessThanOrEqual(double other) {
+        return isLessThanOrEqual(of(other));
+    }
+
+    /**
+     * Checks if this value is less than or equal to another.
+     * 
+     * @param other the other value, not null
+     * @return true is this is less than or equal to the specified value, false otherwise
+     */
     public final boolean isLessThanOrEqual(String other) {
         return isLessThanOrEqual(of(other));
+    }
+
+    /**
+     * Checks if this value is less than or equal to another.
+     * 
+     * @param other the other value, not null
+     * @return true is this is less than or equal to the specified value, false otherwise
+     */
+    public final boolean isLessThanOrEqual(Variable<Num> other) {
+        return isLessThanOrEqual(other.get());
     }
 
     /**

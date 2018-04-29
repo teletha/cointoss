@@ -123,7 +123,7 @@ public class BackTest {
          * {@inheritDoc}
          */
         @Override
-        public Signal<Num> getBaseCurrency() {
+        public Signal<Num> baseCurrency() {
             return I.signal(base);
         }
 
@@ -131,7 +131,7 @@ public class BackTest {
          * {@inheritDoc}
          */
         @Override
-        public Signal<Num> getTargetCurrency() {
+        public Signal<Num> targetCurrency() {
             return I.signal(target);
         }
     }
