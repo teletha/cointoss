@@ -19,7 +19,7 @@ public interface MarketProvider {
      * 
      * @return
      */
-    MarketBackend service();
+    MarketService service();
 
     /**
      * Provide market log.

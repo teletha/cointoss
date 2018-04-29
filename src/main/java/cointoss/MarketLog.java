@@ -32,7 +32,7 @@ import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
 
 import cointoss.market.bitflyer.BitFlyer;
-import cointoss.market.bitflyer.BitFlyerBackend;
+import cointoss.market.bitflyer.BitFlyerService;
 import cointoss.util.Chrono;
 import cointoss.util.Span;
 import filer.Filer;
@@ -131,7 +131,7 @@ public class MarketLog {
 
                 while (disposer.isDisposed() == false && !current.isAfter(cacheLast)) {
                     disposer.add(read(current).effect(e -> latestId = cacheId = e.id).take(e -> e.exec_date.isAfter(start)).effect(e -> {
-                        e.delay = BitFlyerBackend.estimateDelay(e);
+                        e.delay = BitFlyerService.estimateDelay(e);
                     }).to(observer::accept));
                     current = current.plusDays(1);
                 }

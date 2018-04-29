@@ -9,7 +9,7 @@
  */
 package cointoss.market.bitflyer;
 
-import cointoss.MarketBackend;
+import cointoss.MarketService;
 import cointoss.MarketLog;
 import cointoss.MarketProvider;
 
@@ -23,7 +23,7 @@ public enum BitFlyer implements MarketProvider {
     private final MarketLog marketLog = new MarketLog(this);
 
     /** cache */
-    private final MarketBackend marketBackend = new BitFlyerBackend(this);
+    private final MarketService marketBackend = new BitFlyerService(this);
 
     /**
      * {@inheritDoc}
@@ -37,7 +37,7 @@ public enum BitFlyer implements MarketProvider {
      * {@inheritDoc}
      */
     @Override
-    public MarketBackend service() {
+    public MarketService service() {
         return marketBackend;
     }
 }

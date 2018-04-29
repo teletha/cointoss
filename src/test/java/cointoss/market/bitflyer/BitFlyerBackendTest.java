@@ -23,7 +23,7 @@ import cointoss.util.Chrono;
  */
 public class BitFlyerBackendTest {
 
-    BitFlyerBackend service = new BitFlyerBackend(BitFlyer.FX_BTC_JPY);
+    BitFlyerService service = new BitFlyerService(BitFlyer.FX_BTC_JPY);
 
     @Test
     void compact() {
@@ -39,8 +39,8 @@ public class BitFlyerBackendTest {
 
     @Test
     void normalize() {
-        assert BitFlyerBackend.normalize("2018-04-26T00:32:26.1234567Z").equals("2018-04-26T00:32:26.123");
-        assert BitFlyerBackend.normalize("2018-04-26T00:32:26.19Z").equals("2018-04-26T00:32:26.190");
+        assert BitFlyerService.normalize("2018-04-26T00:32:26.1234567Z").equals("2018-04-26T00:32:26.123");
+        assert BitFlyerService.normalize("2018-04-26T00:32:26.19Z").equals("2018-04-26T00:32:26.190");
     }
 
     @Test
@@ -50,14 +50,14 @@ public class BitFlyerBackendTest {
 
         // user order id
         exe.sell_child_order_acceptance_id = "JRF20180427-180006-597220";
-        assert BitFlyerBackend.estimateDelay(exe) == 1;
+        assert BitFlyerService.estimateDelay(exe) == 1;
 
         // illegal id
         exe.sell_child_order_acceptance_id = "ABCDEFGHIJKLMN";
-        assert BitFlyerBackend.estimateDelay(exe) == 0;
+        assert BitFlyerService.estimateDelay(exe) == 0;
 
         // server order id
         exe.sell_child_order_acceptance_id = "JRF20180427-090006-597220";
-        assert BitFlyerBackend.estimateDelay(exe) == -2;
+        assert BitFlyerService.estimateDelay(exe) == -2;
     }
 }

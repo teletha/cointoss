@@ -101,9 +101,9 @@ public class BackTest {
      */
     public void run() {
         IntStream.range(0, trial).parallel().forEach(index -> {
-            Market market = new Market(new BackTestBackend());
+            Market market = new Market(new BackTestService());
             market.add(strategy.get());
-            market.log(log);
+            market.read(log);
             market.dispose();
         });
     }
@@ -111,11 +111,11 @@ public class BackTest {
     /**
      * @version 2018/04/29 14:59:08
      */
-    private class BackTestBackend extends TestableMarketBackend {
+    private class BackTestService extends TestableMarketService {
 
         /**
          */
-        private BackTestBackend() {
+        private BackTestService() {
             super(Time.lag(0, 10));
         }
 

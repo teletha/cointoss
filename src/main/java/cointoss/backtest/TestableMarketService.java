@@ -16,7 +16,7 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import cointoss.Execution;
-import cointoss.MarketBackend;
+import cointoss.MarketService;
 import cointoss.MarketLog;
 import cointoss.MarketProvider;
 import cointoss.Position;
@@ -34,7 +34,7 @@ import kiss.Signaling;
 /**
  * @version 2018/04/29 16:11:11
  */
-class TestableMarketBackend extends MarketBackend implements MarketProvider {
+class TestableMarketService extends MarketService implements MarketProvider {
 
     /** The terminator. */
     private final Disposable diposer = Disposable.empty();
@@ -63,7 +63,7 @@ class TestableMarketBackend extends MarketBackend implements MarketProvider {
     /**
     * 
     */
-    TestableMarketBackend(Time lag) {
+    TestableMarketService(Time lag) {
         this.lag = lag;
     }
 
@@ -71,7 +71,7 @@ class TestableMarketBackend extends MarketBackend implements MarketProvider {
      * {@inheritDoc}
      */
     @Override
-    public MarketBackend service() {
+    public MarketService service() {
         return this;
     }
 

@@ -35,7 +35,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import cointoss.Execution;
-import cointoss.MarketBackend;
+import cointoss.MarketService;
 import cointoss.Position;
 import cointoss.Side;
 import cointoss.order.Order;
@@ -62,10 +62,10 @@ import viewtify.Viewtify;
 /**
  * @version 2018/04/29 17:28:17
  */
-public class BitFlyerBackend extends MarketBackend {
+public class BitFlyerService extends MarketService {
 
     /** The key for internal id. */
-    private static final String InternalID = BitFlyerBackend.class.getName() + "#ID";
+    private static final String InternalID = BitFlyerService.class.getName() + "#ID";
 
     private static final MediaType mime = MediaType.parse("application/json; charset=utf-8");
 
@@ -118,7 +118,7 @@ public class BitFlyerBackend extends MarketBackend {
     /**
      * @param type
      */
-    BitFlyerBackend(BitFlyer type) {
+    BitFlyerService(BitFlyer type) {
         this.type = type;
 
         List<String> lines = Filer.read(".log/bitflyer/key.txt").toList();
@@ -231,7 +231,7 @@ public class BitFlyerBackend extends MarketBackend {
                     exe.price = Num.of(e.get("price").getAsString());
                     exe.size = exe.cumulativeSize = Num.of(e.get("size").getAsString());
                     exe.exec_date = LocalDateTime.parse(normalize(e.get("exec_date").getAsString()), RealTimeExecutionFormat)
-                            .atZone(BitFlyerBackend.zone);
+                            .atZone(BitFlyerService.zone);
                     String buyer = exe.buy_child_order_acceptance_id = e.get("buy_child_order_acceptance_id").getAsString();
                     String seller = exe.sell_child_order_acceptance_id = e.get("sell_child_order_acceptance_id").getAsString();
                     exe.delay = estimateDelay(exe);

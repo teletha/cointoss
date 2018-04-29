@@ -18,7 +18,7 @@ import kiss.Signal;
 /**
  * @version 2018/04/29 17:28:36
  */
-public abstract class MarketBackend implements Disposable {
+public abstract class MarketService implements Disposable {
 
     /**
      * Estimate the curernt order delay (second).

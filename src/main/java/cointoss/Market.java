@@ -54,7 +54,7 @@ public class Market implements Disposable {
     protected final MarketProvider provider;
 
     /** The market handler. */
-    protected final MarketBackend backend;
+    protected final MarketService backend;
 
     public final ExecutionFlow flow = new ExecutionFlow(100);
 
@@ -170,7 +170,7 @@ public class Market implements Disposable {
         }));
     }
 
-    public Market log(Function<MarketLog, Signal<Execution>> log) {
+    public Market read(Function<MarketLog, Signal<Execution>> log) {
         backend.add(log.apply(provider.log()).to(this::tick));
 
         return this;
