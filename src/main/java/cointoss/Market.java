@@ -87,12 +87,6 @@ public class Market implements Disposable {
         return previous;
     }).skip(e -> e == null || e == SEED);
 
-    /** The holder. */
-    private final Signaling<Order> yourOrders = new Signaling();
-
-    /** The event stream. */
-    public final Signal<Order> yourOrder = yourOrders.expose;
-
     /** The initial execution. */
     public final Variable<Execution> init = Variable.empty();
 
@@ -243,8 +237,6 @@ public class Market implements Disposable {
 
             orderItems.add(order);
 
-            // event
-            yourOrders.accept(order);
             return order;
         }).effectOnError(e -> {
             order.state.set(State.CANCELED);
