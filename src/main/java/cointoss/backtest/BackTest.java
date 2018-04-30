@@ -41,12 +41,19 @@ public class BackTest {
     private int trial = 1;
 
     /**
+     * Hide
+     */
+    private BackTest() {
+    }
+
+    /**
      * @param rangeRandom
      * @return
      */
-    public BackTest log(Supplier<Signal<Execution>> log) {
-        this.log = Objects.requireNonNull(log);
-        return this;
+    public static BackTest log(Supplier<Signal<Execution>> log) {
+        BackTest test = new BackTest();
+        test.log = Objects.requireNonNull(log);
+        return test;
     }
 
     /**

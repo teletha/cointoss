@@ -79,8 +79,9 @@ public class BitFlyerServiceTest {
         assert positions.size() == 0;
 
         // my execution
-        service.executionWillResponse(execution(Side.BUY, 10, 1), "ServerAcceptanceID", "DisrelatedSeller");
+        service.executionWillResponse(execution(Side.SELL, 10, 1), "ServerAcceptanceID", "DisrelatedSeller");
         assert executions.size() == 2;
         assert positions.size() == 1;
+        assert positions.get(0).isBuy();
     }
 }

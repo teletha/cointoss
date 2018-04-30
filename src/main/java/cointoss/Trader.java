@@ -77,12 +77,21 @@ public abstract class Trader implements Disposable {
     }
 
     /**
-     * Detect position.
+     * Detect position state.
      * 
      * @return
      */
     protected final boolean hasPosition() {
         return actives.isEmpty() == false;
+    }
+
+    /**
+     * Detect position state.
+     * 
+     * @return
+     */
+    protected final boolean hasNotPosition() {
+        return actives.isEmpty() == true;
     }
 
     /**
@@ -229,7 +238,7 @@ public abstract class Trader implements Disposable {
     public class Entry implements Directional {
 
         /** The entry order. */
-        final Order order;
+        public final Order order;
 
         /** The list exit orders. */
         final List<Order> exit = new ArrayList<>();
@@ -261,7 +270,8 @@ public abstract class Trader implements Disposable {
         /**
          * Create {@link Entry} with {@link Order}.
          * 
-         * @param entry A entry order.
+         * @param entry
+         *            A entry order.
          */
         private Entry(Order entry, Consumer<Entry> initializer) {
             this.order = entry;
@@ -469,8 +479,10 @@ public abstract class Trader implements Disposable {
         /**
          * Request exit order.
          * 
-         * @param size A exit size.
-         * @param price A exit price.
+         * @param size
+         *            A exit size.
+         * @param price
+         *            A exit price.
          */
         public final void exitLimit(Num size, Num price, Consumer<Order> process) {
             // check size
@@ -488,7 +500,8 @@ public abstract class Trader implements Disposable {
         /**
          * Request exit order.
          * 
-         * @param size A exit size.
+         * @param size
+         *            A exit size.
          */
         public final void exitMarket() {
             exitMarket((Consumer<Order>) null);
@@ -497,7 +510,8 @@ public abstract class Trader implements Disposable {
         /**
          * Request exit order.
          * 
-         * @param size A exit size.
+         * @param size
+         *            A exit size.
          */
         public final void exitMarket(Consumer<Order> process) {
             // check size
@@ -511,7 +525,8 @@ public abstract class Trader implements Disposable {
         /**
          * Request exit order.
          * 
-         * @param size A exit size.
+         * @param size
+         *            A exit size.
          */
         public final void exitMarket(Num size) {
             exitMarket(size, null);
@@ -520,7 +535,8 @@ public abstract class Trader implements Disposable {
         /**
          * Request exit order.
          * 
-         * @param size A exit size.
+         * @param size
+         *            A exit size.
          */
         public final void exitMarket(Num size, Consumer<Order> process) {
             // check size
@@ -533,7 +549,8 @@ public abstract class Trader implements Disposable {
         /**
          * Request exit order.
          * 
-         * @param order A exit order.
+         * @param order
+         *            A exit order.
          */
         private void exit(Order order, Consumer<Order> initializer) {
             exitRemaining = exitRemaining.plus(order.size);
@@ -568,7 +585,7 @@ public abstract class Trader implements Disposable {
          * @param message
          * @param params
          */
-        protected void log(String message, Object... params) {
+        public void log(String message, Object... params) {
             logs.add(String.format(message, params));
         }
 
