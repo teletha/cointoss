@@ -9,57 +9,29 @@
  */
 package cointoss.market.bitflyer;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import cointoss.Execution;
-import kiss.Signal;
-import kiss.Signaling;
+import cointoss.util.MockNetwork;
 
 /**
  * @version 2018/04/29 21:19:34
  */
 class MockBitFlyerService extends BitFlyerService {
 
-    private final Map<String, Object> responses = new HashMap();
-
-    private final Signaling<JsonElement> websocket = new Signaling();
+    /** The mockable network. */
+    private final MockNetwork mockNetwork;
 
     /**
      * 
      */
     MockBitFlyerService() {
         super(BitFlyer.FX_BTC_JPY, true);
-    }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected <M> Signal<M> call(String method, String path, String body, String selector, Class<M> type) {
-        Object response = responses.remove(path);
-
-        if (response == null) {
-            throw new AssertionError("[" + path + "] requires valid response.");
-        } else {
-            return new Signal<M>((observer, disposer) -> {
-                observer.accept((M) response);
-                return disposer;
-            });
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected Signal<JsonElement> websocket(String uri, String channel) {
-        return websocket.expose;
+        network = mockNetwork = new MockNetwork();
     }
 
     /**
@@ -68,8 +40,7 @@ class MockBitFlyerService extends BitFlyerService {
      * @param orderId
      */
     protected void nextRequest(String orderId) {
-        Objects.requireNonNull(orderId);
-        responses.put("/v1/me/sendchildorder", orderId);
+        mockNetwork.request("/v1/me/sendchildorder").willResponse(orderId);
     }
 
     /**
@@ -96,6 +67,6 @@ class MockBitFlyerService extends BitFlyerService {
         JsonArray root = new JsonArray();
         root.add(o);
 
-        websocket.accept(root);
+        mockNetwork.connect("wss://ws.lightstream.bitflyer.com/json-rpc").willPublish(root);
     }
 }

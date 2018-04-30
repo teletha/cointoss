@@ -48,7 +48,6 @@ import cointoss.util.Num;
 import filer.Filer;
 import kiss.Disposable;
 import kiss.I;
-import kiss.JSON;
 import kiss.Signal;
 import kiss.Signaling;
 import marionette.Browser;
@@ -56,7 +55,6 @@ import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
-import okhttp3.Response;
 import viewtify.Viewtify;
 
 /**
@@ -225,7 +223,7 @@ public class BitFlyerService extends MarketService {
      */
     @Override
     public Signal<Execution> executions() {
-        return websocket("wss://ws.lightstream.bitflyer.com/json-rpc", "lightning_executions_FX_BTC_JPY")
+        return network.jsonRPC("wss://ws.lightstream.bitflyer.com/json-rpc", "lightning_executions_" + type)
                 .flatIterable(JsonElement::getAsJsonArray)
                 .map(JsonElement::getAsJsonObject)
                 .map(e -> {
@@ -574,80 +572,34 @@ public class BitFlyerService extends MarketService {
      * Call private API.
      */
     protected <M> Signal<M> call(String method, String path, String body, String selector, Class<M> type) {
-        return new Signal<>((observer, disposer) -> {
-            String timestamp = String.valueOf(ZonedDateTime.now(zone).toEpochSecond());
-            String sign = new HmacUtils(HmacAlgorithms.HMAC_SHA_256, accessToken).hmacHex(timestamp + method + path + body);
+        String timestamp = String.valueOf(ZonedDateTime.now(zone).toEpochSecond());
+        String sign = new HmacUtils(HmacAlgorithms.HMAC_SHA_256, accessToken).hmacHex(timestamp + method + path + body);
 
-            Request request;
+        Request request;
 
-            if (method.equals("GET")) {
-                request = new Request.Builder().url(api + path)
-                        .addHeader("ACCESS-KEY", accessKey)
-                        .addHeader("ACCESS-TIMESTAMP", timestamp)
-                        .addHeader("ACCESS-SIGN", sign)
-                        .build();
-            } else if (method.equals("POST") && !path.startsWith("http")) {
-                request = new Request.Builder().url(api + path)
-                        .addHeader("ACCESS-KEY", accessKey)
-                        .addHeader("ACCESS-TIMESTAMP", timestamp)
-                        .addHeader("ACCESS-SIGN", sign)
-                        .addHeader("Content-Type", "application/json")
-                        .post(RequestBody.create(mime, body))
-                        .build();
-            } else {
-                request = new Request.Builder().url(path)
-                        .addHeader("Content-Type", "application/json")
-                        .addHeader("Cookie", sessionKey + "=" + maintainer.session)
-                        .addHeader("X-Requested-With", "XMLHttpRequest")
-                        .post(RequestBody.create(mime, body))
-                        .build();
-            }
-
-            try (Response response = client.newCall(request).execute()) {
-                int code = response.code();
-                String value = response.body().string();
-
-                if (code == 200) {
-                    if (type == null) {
-                        observer.accept(null);
-                    } else {
-                        JSON json = I.json(value);
-
-                        if (selector == null || selector.isEmpty()) {
-                            M m = json.to(type);
-
-                            if (m instanceof WebResponse) {
-                                WebResponse res = (WebResponse) m;
-
-                                if (res.error_message != null && !res.error_message.isEmpty()) {
-                                    throw new Error(res.error_message);
-                                }
-                            }
-                            observer.accept(m);
-                        } else {
-                            json.find(selector, type).to(observer);
-                        }
-                        observer.complete();
-                    }
-                } else {
-                    observer.error(new Error("HTTP Status " + code + " " + value));
-                }
-            } catch (Throwable e) {
-                observer.error(new Error("[" + path + "] throws some error.", e));
-            }
-            return disposer;
-        });
-    }
-
-    /**
-     * Read data from websocket.
-     * 
-     * @param uri
-     * @param channel
-     * @return
-     */
-    protected Signal<JsonElement> websocket(String uri, String channel) {
-        return Network.websocket(uri, channel);
+        if (method.equals("GET")) {
+            request = new Request.Builder().url(api + path)
+                    .addHeader("ACCESS-KEY", accessKey)
+                    .addHeader("ACCESS-TIMESTAMP", timestamp)
+                    .addHeader("ACCESS-SIGN", sign)
+                    .build();
+        } else if (method.equals("POST") && !path.startsWith("http")) {
+            request = new Request.Builder().url(api + path)
+                    .addHeader("ACCESS-KEY", accessKey)
+                    .addHeader("ACCESS-TIMESTAMP", timestamp)
+                    .addHeader("ACCESS-SIGN", sign)
+                    .addHeader("Content-Type", "application/json")
+                    .post(RequestBody.create(mime, body))
+                    .build();
+        } else {
+            request = new Request.Builder().url(path)
+                    .addHeader("Content-Type", "application/json")
+                    .addHeader("Cookie", sessionKey + "=" + maintainer.session)
+                    .addHeader("X-Requested-With", "XMLHttpRequest")
+                    .post(RequestBody.create(mime, body))
+                    .build();
+        }
+        return network.rest(request, selector, type);
     }
 
     protected SessionMaintainer maintainer = new SessionMaintainer();

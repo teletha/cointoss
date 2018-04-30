@@ -66,11 +66,14 @@ public class BitFlyerServiceTest {
     }
 
     @Test
+    void manageOrder() {
+        service.nextRequest("FirstOrder");
+    }
+
+    @Test
     void createPositionWhenOrderIsExecuted() {
         List<Execution> executions = service.executions().toList();
         List<Position> positions = service.positions().toList();
-        assert executions.isEmpty();
-        assert positions.isEmpty();
 
         service.nextRequest("ServerAcceptanceID");
         assert service.request(Order.limitLong(1, 10)).to().is("ServerAcceptanceID");

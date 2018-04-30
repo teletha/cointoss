@@ -11,6 +11,7 @@ package cointoss;
 
 import cointoss.order.Order;
 import cointoss.order.OrderBookListChange;
+import cointoss.util.NetworkService;
 import cointoss.util.Num;
 import kiss.Disposable;
 import kiss.Signal;
@@ -19,6 +20,9 @@ import kiss.Signal;
  * @version 2018/04/29 17:28:36
  */
 public abstract class MarketService implements Disposable {
+
+    /** The network accessor. */
+    protected NetworkService network = new NetworkService();
 
     /**
      * Estimate the curernt order delay (second).
