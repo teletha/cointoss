@@ -11,7 +11,6 @@ package cointoss.market.bitflyer;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -51,13 +50,12 @@ import kiss.Signal;
 import kiss.Signaling;
 import marionette.Browser;
 import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import viewtify.Viewtify;
 
 /**
- * @version 2018/04/29 17:28:17
+ * @version 2018/04/30 17:38:26
  */
 public class BitFlyerService extends MarketService {
 
@@ -74,9 +72,6 @@ public class BitFlyerService extends MarketService {
     /** The api url. */
     static final String api = "https://api.bitflyer.jp";
 
-    /** UTC */
-    static final ZoneId zone = ZoneId.of("UTC");
-
     /** The order management. */
     private final Set<String> orders = ConcurrentHashMap.newKeySet();
 
@@ -84,7 +79,7 @@ public class BitFlyerService extends MarketService {
     private final Signaling<Position> positions = new Signaling();
 
     /** The market type. */
-    private BitFlyer type;
+    private final BitFlyer type;
 
     /** Flag for test. */
     private final boolean forTest;
@@ -108,9 +103,6 @@ public class BitFlyerService extends MarketService {
 
     /** The shared order list. */
     private final Signal<List<Order>> intervalOrderCheck;
-
-    /** The singleton. */
-    private final OkHttpClient client = new OkHttpClient.Builder().connectTimeout(30, TimeUnit.SECONDS).build();
 
     /** The session key. */
     private final String sessionKey = "api_session_v2";
@@ -137,8 +129,6 @@ public class BitFlyerService extends MarketService {
     @Override
     public void vandalize() {
         disposer.dispose();
-        client.dispatcher().executorService().shutdown();
-        client.connectionPool().evictAll();
     }
 
     /**
@@ -232,7 +222,7 @@ public class BitFlyerService extends MarketService {
                     exe.price = Num.of(e.get("price").getAsString());
                     exe.size = exe.cumulativeSize = Num.of(e.get("size").getAsString());
                     exe.exec_date = LocalDateTime.parse(normalize(e.get("exec_date").getAsString()), RealTimeExecutionFormat)
-                            .atZone(BitFlyerService.zone);
+                            .atZone(Chrono.UTC);
                     String buyer = exe.buy_child_order_acceptance_id = e.get("buy_child_order_acceptance_id").getAsString();
                     String seller = exe.sell_child_order_acceptance_id = e.get("sell_child_order_acceptance_id").getAsString();
                     exe.delay = estimateDelay(exe);
@@ -571,7 +561,7 @@ public class BitFlyerService extends MarketService {
      * Call private API.
      */
     protected <M> Signal<M> call(String method, String path, String body, String selector, Class<M> type) {
-        String timestamp = String.valueOf(ZonedDateTime.now(zone).toEpochSecond());
+        String timestamp = String.valueOf(Chrono.utcNow().toEpochSecond());
         String sign = new HmacUtils(HmacAlgorithms.HMAC_SHA_256, accessToken).hmacHex(timestamp + method + path + body);
 
         Request request;
