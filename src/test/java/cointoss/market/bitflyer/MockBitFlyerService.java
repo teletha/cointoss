@@ -39,8 +39,8 @@ class MockBitFlyerService extends BitFlyerService {
      * 
      * @param orderId
      */
-    protected void nextRequest(String orderId) {
-        mockNetwork.request("/v1/me/sendchildorder").willResponse(orderId);
+    protected void requestWillResponse(String... orderIds) {
+        mockNetwork.request("/v1/me/sendchildorder").willResponse((Object[]) orderIds);
     }
 
     /**
@@ -50,7 +50,7 @@ class MockBitFlyerService extends BitFlyerService {
      * @param buyerId
      * @param sellerId
      */
-    protected void nextExecution(Execution exe, String buyerId, String sellerId) {
+    protected void executionWillResponse(Execution exe, String buyerId, String sellerId) {
         Objects.requireNonNull(exe);
         Objects.requireNonNull(buyerId);
         Objects.requireNonNull(sellerId);
@@ -67,6 +67,6 @@ class MockBitFlyerService extends BitFlyerService {
         JsonArray root = new JsonArray();
         root.add(o);
 
-        mockNetwork.connect("wss://ws.lightstream.bitflyer.com/json-rpc").willPublish(root);
+        mockNetwork.connect("wss://ws.lightstream.bitflyer.com/json-rpc").willResponse(root);
     }
 }

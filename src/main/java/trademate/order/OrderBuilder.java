@@ -9,7 +9,6 @@
  */
 package trademate.order;
 
-import static cointoss.order.Order.State.*;
 import static java.util.concurrent.TimeUnit.*;
 
 import java.math.RoundingMode;
@@ -205,7 +204,7 @@ public class OrderBuilder extends View {
 
             Order order = Order.limit(side, size.plus(optimizedSize), optimizedPrice).type(quantity);
             order.state.set(State.REQUESTING);
-            order.state.observe().take(CANCELED, COMPLETED).take(1).to(() -> set.sub.remove(order));
+            order.isDisposed().to(() -> set.sub.remove(order));
             order.group = group;
 
             set.sub.add(order);

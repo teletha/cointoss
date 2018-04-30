@@ -169,6 +169,7 @@ public class BitFlyerService extends MarketService {
         return call.effect(v -> {
             // register order id
             orders.add(v);
+            order.isDisposed().to(() -> orders.remove(v));
 
             // check order state
             intervalOrderCheck.map(orders -> orders.get(orders.indexOf(order)))
@@ -194,9 +195,7 @@ public class BitFlyerService extends MarketService {
                 : call("POST", "https://lightning.bitflyer.jp/api/trade/cancelorder", cancel, null, WebResponse.class);
         Signal<List<Order>> isCanceled = intervalOrderCheck.take(orders -> !orders.contains(order));
 
-        return requestCancel.combine(isCanceled).take(1).mapTo(order).effect(o -> {
-            orders.remove(order.id);
-        });
+        return requestCancel.combine(isCanceled).take(1).mapTo(order);
     }
 
     /**

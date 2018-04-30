@@ -92,8 +92,12 @@ public class MockNetwork extends Network {
          * 
          * @param value
          */
-        public void willResponse(String value) {
-            response.add(Objects.requireNonNull(value));
+        public void willResponse(Object... values) {
+            Objects.requireNonNull(values);
+
+            for (Object value : values) {
+                response.add(value);
+            }
         }
 
         /**
@@ -118,7 +122,7 @@ public class MockNetwork extends Network {
          * 
          * @param value
          */
-        public void willPublish(JsonElement data) {
+        public void willResponse(JsonElement data) {
             signaling.accept(data);
         }
     }

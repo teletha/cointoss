@@ -189,6 +189,15 @@ public class Order implements Directional {
     }
 
     /**
+     * Observe this order's disposing.
+     * 
+     * @return
+     */
+    public Signal<Order> isDisposed() {
+        return state.observe().take(State.CANCELED, State.COMPLETED).take(1).mapTo(this);
+    }
+
+    /**
      * 成り行き注文
      * 
      * @param position

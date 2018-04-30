@@ -66,25 +66,20 @@ public class BitFlyerServiceTest {
     }
 
     @Test
-    void manageOrder() {
-        service.nextRequest("FirstOrder");
-    }
-
-    @Test
     void createPositionWhenOrderIsExecuted() {
         List<Execution> executions = service.executions().toList();
         List<Position> positions = service.positions().toList();
 
-        service.nextRequest("ServerAcceptanceID");
+        service.requestWillResponse("ServerAcceptanceID");
         assert service.request(Order.limitLong(1, 10)).to().is("ServerAcceptanceID");
 
         // irrelevant execution
-        service.nextExecution(execution(Side.BUY, 10, 1), "DisrelatedBuyer", "DisrelatedSeller");
+        service.executionWillResponse(execution(Side.BUY, 10, 1), "DisrelatedBuyer", "DisrelatedSeller");
         assert executions.size() == 1;
-        assert positions.isEmpty();
+        assert positions.size() == 0;
 
         // my execution
-        service.nextExecution(execution(Side.BUY, 10, 1), "ServerAcceptanceID", "DisrelatedSeller");
+        service.executionWillResponse(execution(Side.BUY, 10, 1), "ServerAcceptanceID", "DisrelatedSeller");
         assert executions.size() == 2;
         assert positions.size() == 1;
     }
