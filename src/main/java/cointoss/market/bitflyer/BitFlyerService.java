@@ -43,7 +43,6 @@ import cointoss.order.Order.State;
 import cointoss.order.OrderBookListChange;
 import cointoss.order.OrderUnit;
 import cointoss.util.Chrono;
-import cointoss.util.Network;
 import cointoss.util.Num;
 import filer.Filer;
 import kiss.Disposable;
@@ -402,7 +401,7 @@ public class BitFlyerService extends MarketService {
      * @return
      */
     private Signal<OrderBookListChange> realtimeOrderBook() {
-        return Network.websocket("wss://ws.lightstream.bitflyer.com/json-rpc", "lightning_board_" + type)
+        return network.jsonRPC("wss://ws.lightstream.bitflyer.com/json-rpc", "lightning_board_" + type)
                 .map(JsonElement::getAsJsonObject)
                 .map(e -> {
                     OrderBookListChange change = new OrderBookListChange();

@@ -24,7 +24,7 @@ import okhttp3.Request;
 /**
  * @version 2018/04/30 10:38:28
  */
-public class MockNetwork extends NetworkService {
+public class MockNetwork extends Network {
 
     /** The mocked response manager. */
     private final Map<String, MockResponse> responses = new HashMap();
@@ -56,13 +56,7 @@ public class MockNetwork extends NetworkService {
      */
     @Override
     public final Signal<JsonElement> jsonRPC(String uri, String channelName) {
-        MockSocket mock = websockets.get(uri);
-
-        if (mock == null) {
-            throw new AssertionError("JsonRPC [" + uri + "] is not mocked.");
-        } else {
-            return mock.signaling.expose;
-        }
+        return websockets.computeIfAbsent(uri, key -> new MockSocket()).signaling.expose;
     }
 
     /**
@@ -82,7 +76,7 @@ public class MockNetwork extends NetworkService {
      * @return
      */
     public MockSocket connect(String uri) {
-        return websockets.computeIfAbsent(uri, keu -> new MockSocket());
+        return websockets.computeIfAbsent(uri, key -> new MockSocket());
     }
 
     /**
@@ -117,9 +111,6 @@ public class MockNetwork extends NetworkService {
      */
     public static class MockSocket {
 
-        /** The dummy responses. */
-        private final Queue response = new LinkedList();
-
         private final Signaling<JsonElement> signaling = new Signaling();
 
         /**
@@ -128,8 +119,7 @@ public class MockNetwork extends NetworkService {
          * @param value
          */
         public void willPublish(JsonElement data) {
-            response.add(data);
+            signaling.accept(data);
         }
-
     }
 }

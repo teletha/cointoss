@@ -32,7 +32,8 @@ public class AAA {
 
         String uri = "https://lightning.bitflyer.jp";
 
-        Network.signalr(uri, "account_id=" + id + "&token=" + token + "&products=FX_BTC_JPY,heartbeat", "BFEXHub", "ReceiveOrderUpdates")
+        new Network()
+                .signalr(uri, "account_id=" + id + "&token=" + token + "&products=FX_BTC_JPY,heartbeat", "BFEXHub", "ReceiveOrderUpdates")
                 .to(e -> {
                     JsonObject root = e.getAsJsonArray().get(0).getAsJsonObject();
                     JsonObject order = root.getAsJsonObject("order");

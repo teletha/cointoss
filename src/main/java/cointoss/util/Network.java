@@ -1,11 +1,11 @@
 /*
- * Copyright (C) 2018 CoinToss Development Team
+ * Copyright (C) 2018 Nameless Production Committee
  *
  * Licensed under the MIT License (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *          https://opensource.org/licenses/MIT
+ *          http://opensource.org/licenses/mit-license.php
  */
 package cointoss.util;
 
@@ -21,6 +21,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import kiss.I;
+import kiss.JSON;
 import kiss.Signal;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -29,12 +30,44 @@ import okhttp3.WebSocket;
 import okhttp3.WebSocketListener;
 
 /**
- * @version 2018/04/26 23:31:42
+ * @version 2018/04/30 0:14:00
  */
 public class Network {
 
     /** The singleton. */
     private static final OkHttpClient client = new OkHttpClient();
+
+    /**
+     * Call private API.
+     */
+    public <M> Signal<M> rest(Request request, String selector, Class<M> type) {
+        return new Signal<>((observer, disposer) -> {
+            try (Response response = client.newCall(request).execute()) {
+                int code = response.code();
+                String value = response.body().string();
+
+                if (code == 200) {
+                    if (type == null) {
+                        observer.accept(null);
+                    } else {
+                        JSON json = I.json(value);
+
+                        if (selector == null || selector.isEmpty()) {
+                            observer.accept(json.to(type));
+                        } else {
+                            json.find(selector, type).to(observer);
+                        }
+                        observer.complete();
+                    }
+                } else {
+                    observer.error(new Error("HTTP Status " + code + " " + value));
+                }
+            } catch (Throwable e) {
+                observer.error(new Error("[" + request.url() + "] throws some error.", e));
+            }
+            return disposer;
+        });
+    }
 
     /**
      * Connect by websocket.
@@ -43,7 +76,7 @@ public class Network {
      * @param channelName
      * @return
      */
-    public static Signal<JsonElement> websocket(String uri, String channelName) {
+    public Signal<JsonElement> jsonRPC(String uri, String channelName) {
         return new Signal<>((observer, disposer) -> {
             JsonParser parser = new JsonParser();
             Request request = new Request.Builder().url(uri).build();
@@ -107,7 +140,7 @@ public class Network {
      * @param channel
      * @return
      */
-    public static Signal<JsonElement> signalr(String uri, String query, String channel, String event) {
+    public Signal<JsonElement> signalr(String uri, String query, String channel, String event) {
         return new Signal<>((observer, disposer) -> {
             // Connect to the server
             HubConnection connection = new HubConnection(uri, query, true, new NullLogger());
