@@ -12,14 +12,13 @@ package cointoss;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.zip.CRC32;
 
 import cointoss.util.Num;
 import kiss.Decoder;
 import kiss.Encoder;
 
 /**
- * @version 2018/04/28 11:35:38
+ * @version 2018/05/01 16:47:20
  */
 public class Execution {
 
@@ -126,16 +125,6 @@ public class Execution {
      */
     public final boolean isAfter(ZonedDateTime time) {
         return exec_date.isAfter(time);
-    }
-
-    private long id(String value) {
-        if (value.startsWith("JRF20") && 11 < value.length()) {
-            return Long.parseLong(value.substring(11).replaceAll("\\D", ""));
-        } else {
-            CRC32 crc = new CRC32();
-            crc.update(value.getBytes());
-            return crc.getValue();
-        }
     }
 
     /**

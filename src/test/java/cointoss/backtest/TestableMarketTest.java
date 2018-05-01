@@ -16,7 +16,6 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.jupiter.api.Test;
 
-import antibug.powerassert.PowerAssertOff;
 import cointoss.MarketTestSupport;
 import cointoss.Side;
 import cointoss.order.Order;
@@ -487,7 +486,6 @@ class TestableMarketTest {
     }
 
     @Test
-    @PowerAssertOff
     void observeSequencialExecutionsBySellSize() {
         AtomicReference<Num> size = new AtomicReference<>();
 

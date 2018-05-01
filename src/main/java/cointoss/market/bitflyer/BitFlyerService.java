@@ -36,6 +36,7 @@ import com.google.gson.JsonObject;
 import cointoss.Execution;
 import cointoss.MarketService;
 import cointoss.Side;
+import cointoss.market.bitflyer.BitFlyerService.BitFlyerExecution;
 import cointoss.order.Order;
 import cointoss.order.Order.State;
 import cointoss.order.OrderBookListChange;
@@ -839,5 +840,9 @@ public class BitFlyerService extends MarketService {
 
         /** Seller id of this execution. */
         public String sell_child_order_acceptance_id = "";
+
+        public String toString() {
+            return super.toString() + " " + buy_child_order_acceptance_id + " " + sell_child_order_acceptance_id;
+        };
     }
 }
