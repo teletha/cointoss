@@ -16,6 +16,8 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.jupiter.api.Test;
 
+import antibug.powerassert.PowerAssertOff;
+import cointoss.MarketTestSupport;
 import cointoss.Side;
 import cointoss.order.Order;
 import cointoss.order.Order.Quantity;
@@ -485,6 +487,7 @@ class TestableMarketTest {
     }
 
     @Test
+    @PowerAssertOff
     void observeSequencialExecutionsBySellSize() {
         AtomicReference<Num> size = new AtomicReference<>();
 
@@ -492,14 +495,8 @@ class TestableMarketTest {
             size.set(e.cumulativeSize);
         });
 
-        market.execute(Side.SELL, 5, 10, "Buy-1", "Sell-1");
-        assert size.get() == null;
-        market.execute(Side.SELL, 5, 10, "Buy-2", "Sell-1");
-        assert size.get() == null;
-        market.execute(Side.SELL, 5, 10, "Buy-3", "Sell-1");
-        assert size.get() == null;
-        market.execute(Side.SELL, 5, 10, "Buy-4", "Sell-1");
-        market.execute(Side.SELL, 5, 10, "Buy-5", "Sell-2");
+        MarketTestSupport.executionSerially(4, Side.SELL, 10, 5).forEach(market::execute);
+        market.execute(Side.SELL, 5, 10);
         assert size.get().is(20);
     }
 
@@ -511,14 +508,8 @@ class TestableMarketTest {
             size.set(e.cumulativeSize);
         });
 
-        market.execute(Side.BUY, 5, 10, "Buy-1", "Sell-1");
-        assert size.get() == null;
-        market.execute(Side.BUY, 5, 10, "Buy-1", "Sell-2");
-        assert size.get() == null;
-        market.execute(Side.BUY, 5, 10, "Buy-1", "Sell-3");
-        assert size.get() == null;
-        market.execute(Side.BUY, 5, 10, "Buy-1", "Sell-4");
-        market.execute(Side.BUY, 5, 10, "Buy-2", "Sell-5");
+        MarketTestSupport.executionSerially(4, Side.BUY, 10, 5).forEach(market::execute);
+        market.execute(Side.BUY, 5, 10);
         assert size.get().is(20);
     }
 }

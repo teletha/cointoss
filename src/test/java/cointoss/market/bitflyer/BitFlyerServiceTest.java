@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Test;
 
 import cointoss.Execution;
 import cointoss.Side;
+import cointoss.market.bitflyer.BitFlyerService.BitFlyerExecution;
 import cointoss.order.Order;
 import cointoss.util.Chrono;
 
@@ -35,7 +36,6 @@ public class BitFlyerServiceTest {
 
         String[] encoded = service.encode(second, first);
         Execution decoded = service.decode(encoded, first);
-        System.out.println(first.buyer() + "  " + second.buyer() + "   " + decoded.buyer());
 
         assert decoded.equals(second);
     }
@@ -48,7 +48,8 @@ public class BitFlyerServiceTest {
 
     @Test
     void estimateDelay() {
-        Execution exe = sell(10, 1);
+        BitFlyerExecution exe = new BitFlyerExecution();
+        exe.side = Side.SELL;
         exe.exec_date = ZonedDateTime.of(2018, 4, 27, 9, 0, 6, 500000000, Chrono.UTC);
 
         // user order id

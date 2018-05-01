@@ -82,29 +82,7 @@ class TestableMarket extends Market {
      * @param price
      */
     TestableMarket execute(Side side, Num size, Num price) {
-        return execute(side, size, price, at(0), "", "");
-    }
-
-    /**
-     * Emulate execution event.
-     * 
-     * @param side
-     * @param size
-     * @param price
-     */
-    TestableMarket execute(Side side, int size, int price, String buyId, String sellId) {
-        return execute(side, Num.of(size), Num.of(price), at(0), buyId, sellId);
-    }
-
-    /**
-     * Emulate execution event.
-     * 
-     * @param side
-     * @param size
-     * @param price
-     */
-    TestableMarket execute(Side side, Num size, Num price, String buyId, String sellId) {
-        return execute(side, size, price, at(0), buyId, sellId);
+        return execute(side, size, price, at(0));
     }
 
     /**
@@ -115,7 +93,7 @@ class TestableMarket extends Market {
      * @param price
      */
     TestableMarket execute(Side side, int size, int price, Time lag) {
-        return execute(side, Num.of(size), Num.of(price), lag, "", "");
+        return execute(side, Num.of(size), Num.of(price), lag);
     }
 
     /**
@@ -125,14 +103,12 @@ class TestableMarket extends Market {
      * @param size
      * @param price
      */
-    TestableMarket execute(Side side, Num size, Num price, Time lag, String buyId, String sellId) {
+    TestableMarket execute(Side side, Num size, Num price, Time lag) {
         Execution e = new Execution();
         e.side = side;
         e.size = e.cumulativeSize = size;
         e.price = price;
         e.exec_date = lag.to();
-        e.buy_child_order_acceptance_id = buyId;
-        e.sell_child_order_acceptance_id = sellId;
 
         return execute(e);
     }
@@ -156,7 +132,7 @@ class TestableMarket extends Market {
      */
     void requestAndExecution(Order order) {
         request(order).to(id -> {
-            execute(order.side, order.size, order.price, order.side.isBuy() ? id.id : "", order.side().isSell() ? id.id : "");
+            execute(order.side, order.size, order.price);
         });
     }
 

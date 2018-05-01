@@ -57,12 +57,6 @@ public class Execution {
 
     public long id;
 
-    /** Buyer id of this execution. */
-    public String buy_child_order_acceptance_id = "";
-
-    /** Seller id of this execution. */
-    public String sell_child_order_acceptance_id = "";
-
     /** The side */
     public Side side;
 
@@ -87,6 +81,9 @@ public class Execution {
     /** Optional Attribute : The consecutive type. */
     public int consecutive;
 
+    /** Optional : The associated execution id. */
+    public String yourOrder;
+
     /**
      * 
      */
@@ -109,11 +106,6 @@ public class Execution {
         side = Side.parse(values[2]);
         price = Num.of(values[3]);
         size = cumulativeSize = Num.of(values[4]);
-
-        if (5 < values.length) {
-            buy_child_order_acceptance_id = values[5];
-            sell_child_order_acceptance_id = values[6];
-        }
     }
 
     /**
@@ -134,24 +126,6 @@ public class Execution {
      */
     public final boolean isAfter(ZonedDateTime time) {
         return exec_date.isAfter(time);
-    }
-
-    /**
-     * Compute buyer id.
-     * 
-     * @return
-     */
-    public final long buyer() {
-        return id(buy_child_order_acceptance_id);
-    }
-
-    /**
-     * Compute seller id.
-     * 
-     * @return
-     */
-    public final long seller() {
-        return id(sell_child_order_acceptance_id);
     }
 
     private long id(String value) {
@@ -179,8 +153,7 @@ public class Execution {
      */
     @Override
     public String toString() {
-        return id + " " + exec_date.toLocalDateTime() + " " + side
-                .mark() + " " + price + " " + size + " " + buy_child_order_acceptance_id + " " + sell_child_order_acceptance_id;
+        return id + " " + exec_date.toLocalDateTime() + " " + side.mark() + " " + price + " " + size;
     }
 
     /**
@@ -213,14 +186,6 @@ public class Execution {
         if (exec_date.isEqual(other.exec_date) == false) {
             return false;
         }
-
-        if (buyer() != other.buyer()) {
-            return false;
-        }
-
-        // if (seller() != other.seller()) {
-        // return false;
-        // }
         return true;
     }
 

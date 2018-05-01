@@ -75,12 +75,8 @@ public class Market implements Disposable {
     public final Signal<Execution> timelineByTaker = timeline.map(e -> {
         Execution previous = switcher.getAndSet(e);
 
-        if (e.side.isBuy() && previous.buy_child_order_acceptance_id.equals(e.buy_child_order_acceptance_id)) {
-            // same long taker
-            e.cumulativeSize = previous.cumulativeSize.plus(e.size);
-            return null;
-        } else if (e.side.isSell() && previous.sell_child_order_acceptance_id.equals(e.sell_child_order_acceptance_id)) {
-            // same short taker
+        if (e.consecutive == Execution.ConsecutiveSameBuyer || e.consecutive == Execution.ConsecutiveSameSeller) {
+            // same taker
             e.cumulativeSize = previous.cumulativeSize.plus(e.size);
             return null;
         }
@@ -161,8 +157,21 @@ public class Market implements Disposable {
             orderBook.longs.fix(e.price);
         }));
 
-        service.add(service.positions().to(p -> {
-            System.out.println(p);
+        service.add(service.positions().to(e -> {
+            for (Order order : orderItems) {
+                if (order.id().equals(e.yourOrder)) {
+                    update(order, e);
+
+                    order.listeners.accept(e);
+
+                    // Position position = new Position();
+                    // position.side = order.side;
+                    // position.price = e.price;
+                    // position.size.set(e.size);
+                    // position.date = e.exec_date;
+                    // positions.add(position);
+                }
+            }
         }));
     }
 
@@ -317,21 +326,6 @@ public class Market implements Disposable {
         flow100.record(e);
         flow200.record(e);
         flow300.record(e);
-
-        for (Order order : orderItems) {
-            if (order.id().equals(e.buy_child_order_acceptance_id) || order.id().equals(e.sell_child_order_acceptance_id)) {
-                update(order, e);
-
-                order.listeners.accept(e);
-
-                // Position position = new Position();
-                // position.side = order.side;
-                // position.price = e.price;
-                // position.size.set(e.size);
-                // position.date = e.exec_date;
-                // positions.add(position);
-            }
-        }
 
         // observe executions
         timelineObservers.accept(e);

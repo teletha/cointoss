@@ -290,8 +290,7 @@ class TestableMarketService extends MarketService implements MarketProvider {
                 exe.size = exe.cumulativeSize = executedSize;
                 exe.price = order.child_order_type.isMarket() ? order.marketMinPrice : order.averagePrice.get();
                 exe.exec_date = e.exec_date;
-                exe.buy_child_order_acceptance_id = order.isBuy() ? order.id : e.buy_child_order_acceptance_id;
-                exe.sell_child_order_acceptance_id = order.isSell() ? order.id : e.sell_child_order_acceptance_id;
+                exe.yourOrder = order.id;
                 executeds.add(exe);
 
                 if (order.remaining.get().is(0)) {
@@ -304,8 +303,6 @@ class TestableMarketService extends MarketService implements MarketProvider {
                 e.side = exe.side;
                 e.size = e.cumulativeSize = exe.size;
                 e.price = exe.price;
-                e.buy_child_order_acceptance_id = exe.buy_child_order_acceptance_id;
-                e.sell_child_order_acceptance_id = exe.sell_child_order_acceptance_id;
                 break;
             }
         }

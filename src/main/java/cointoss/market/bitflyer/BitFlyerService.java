@@ -231,6 +231,7 @@ public class BitFlyerService extends MarketService {
                         position.exec_date = exe.exec_date;
                         position.price = exe.price;
                         position.size = exe.size;
+                        position.yourOrder = buyer;
 
                         positions.accept(position);
                     } else if (orders.contains(seller)) {
@@ -239,6 +240,7 @@ public class BitFlyerService extends MarketService {
                         position.exec_date = exe.exec_date;
                         position.price = exe.price;
                         position.size = exe.size;
+                        position.yourOrder = seller;
 
                         positions.accept(position);
                     }
@@ -288,7 +290,7 @@ public class BitFlyerService extends MarketService {
      * @param exe
      * @return
      */
-    public static long estimateDelay(Execution exe) {
+    public static long estimateDelay(BitFlyerExecution exe) {
         String taker = exe.side.isBuy() ? exe.buy_child_order_acceptance_id : exe.sell_child_order_acceptance_id;
 
         try {
@@ -423,8 +425,6 @@ public class BitFlyerService extends MarketService {
             current.side = decode(values[2], previous.side);
             current.price = decode(values[3], previous.price);
             current.size = decodeSize(values[4], previous.size);
-            current.buy_child_order_acceptance_id = String.valueOf(decode(values[5], previous.buyer()));
-            current.sell_child_order_acceptance_id = String.valueOf(decode(values[6], previous.seller()));
 
             return current;
         }
@@ -472,11 +472,11 @@ public class BitFlyerService extends MarketService {
             String price = encode(execution.price, previous.price);
             String size = execution.size.equals(previous.size) ? "" : execution.size.multiply(Num.HUNDRED).toString();
             String consecutive = "1";
-            String delay = String.valueOf(estimateDelay(execution));
+            // String delay = String.valueOf(estimateDelay(execution));
             // String buyer = encode(execution.buyer(), previous.buyer(), 0);
             // String seller = encode(execution.seller(), previous.seller(), 0);
 
-            return new String[] {id, time, side, price, size, consecutive + delay};
+            return new String[] {id, time, side, price, size, consecutive};
         }
     }
 
@@ -832,7 +832,12 @@ public class BitFlyerService extends MarketService {
     /**
      * @version 2018/04/28 11:52:26
      */
-    private static class BitFlyerExecution extends Execution {
+    static class BitFlyerExecution extends Execution {
 
+        /** Buyer id of this execution. */
+        public String buy_child_order_acceptance_id = "";
+
+        /** Seller id of this execution. */
+        public String sell_child_order_acceptance_id = "";
     }
 }

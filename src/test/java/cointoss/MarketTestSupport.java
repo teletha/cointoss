@@ -11,10 +11,10 @@ package cointoss;
 
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
-
-import org.apache.commons.lang3.RandomStringUtils;
 
 import cointoss.util.Num;
 
@@ -95,12 +95,28 @@ public class MarketTestSupport {
         exe.id = executionId.getAndIncrement();
         exe.side = Objects.requireNonNull(side);
         exe.price = Objects.requireNonNull(price);
-        exe.size = Objects.requireNonNull(size);
+        exe.size = exe.cumulativeSize = Objects.requireNonNull(size);
         exe.exec_date = ZonedDateTime.now().truncatedTo(ChronoUnit.MILLIS);
-        exe.buy_child_order_acceptance_id = RandomStringUtils.randomAlphabetic(10);
-        exe.sell_child_order_acceptance_id = RandomStringUtils.randomAlphabetic(10);
 
         return exe;
+    }
+
+    /**
+     * Create {@link Execution}.
+     * 
+     * @param price
+     * @param size
+     * @return
+     */
+    public static List<Execution> executionSerially(int count, Side side, double price, double size) {
+        List<Execution> list = new ArrayList();
+
+        for (int i = 0; i < count; i++) {
+            Execution e = execution(side, price, size);
+            if (i != 0) e.consecutive = side.isBuy() ? Execution.ConsecutiveSameBuyer : Execution.ConsecutiveSameSeller;
+            list.add(e);
+        }
+        return list;
     }
 
     /**
