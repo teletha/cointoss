@@ -32,16 +32,13 @@ public class Execution {
     public static final int DelayServerOrder = -2;
 
     /** The consecutive type. (DEFAULT) */
-    public static final int ConsecutiveUnknown = 0;
+    public static final int ConsecutiveDifference = 0;
 
     /** The consecutive type. */
-    public static final int ConsecutiveDifference = 1;
+    public static final int ConsecutiveSameBuyer = 1;
 
     /** The consecutive type. */
-    public static final int ConsecutiveSameBuyer = 2;
-
-    /** The consecutive type. */
-    public static final int ConsecutiveSameSeller = 3;
+    public static final int ConsecutiveSameSeller = 2;
 
     /** The empty object. */
     public static final Execution NONE = new Execution();
@@ -75,7 +72,7 @@ public class Execution {
      * Optional Attribute : The rough estimated delay time (unit : second). The negative value means
      * special info.
      */
-    public long delay;
+    public int delay;
 
     /** Optional Attribute : The consecutive type. */
     public int consecutive;
@@ -138,11 +135,35 @@ public class Execution {
     }
 
     /**
+     * Set the rough estimated delay time (unit : second). The negative value means special info.
+     * 
+     * @param delay
+     * @return This {@link Execution}.
+     */
+    public final Execution delay(int delay) {
+        this.delay = delay;
+
+        return this;
+    }
+
+    /**
+     * Set the consecutive type.
+     * 
+     * @param consecutivesamebuyer2
+     * @return This {@link Execution}.
+     */
+    public final Execution consecutive(int type) {
+        this.consecutive = type;
+
+        return this;
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
     public String toString() {
-        return id + " " + exec_date.toLocalDateTime() + " " + side.mark() + " " + price + " " + size;
+        return id + " " + exec_date.toLocalDateTime() + " " + side.mark() + " " + price + " " + size + " " + delay + " " + consecutive;
     }
 
     /**
@@ -173,6 +194,14 @@ public class Execution {
         }
 
         if (exec_date.isEqual(other.exec_date) == false) {
+            return false;
+        }
+
+        if (delay != other.delay) {
+            return false;
+        }
+
+        if (consecutive != other.consecutive) {
             return false;
         }
         return true;

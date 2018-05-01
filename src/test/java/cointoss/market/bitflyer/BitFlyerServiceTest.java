@@ -30,13 +30,52 @@ public class BitFlyerServiceTest {
     MockBitFlyerService service = new MockBitFlyerService();
 
     @Test
-    void compact() {
-        Execution first = buy(10, 1);
-        Execution second = buy(11, 2);
+    void compactSameDelay() {
+        Execution first = buy(10, 1).delay(5);
+        Execution second = buy(10, 1).delay(5);
 
         String[] encoded = service.encode(second, first);
         Execution decoded = service.decode(encoded, first);
+        assert decoded.equals(second);
+    }
 
+    @Test
+    void compactGreaterDelay() {
+        Execution first = buy(10, 1).delay(5);
+        Execution second = buy(10, 1).delay(7);
+
+        String[] encoded = service.encode(second, first);
+        Execution decoded = service.decode(encoded, first);
+        assert decoded.equals(second);
+    }
+
+    @Test
+    void compactLesserDelay() {
+        Execution first = buy(10, 1).delay(5);
+        Execution second = buy(10, 1).delay(3);
+
+        String[] encoded = service.encode(second, first);
+        Execution decoded = service.decode(encoded, first);
+        assert decoded.equals(second);
+    }
+
+    @Test
+    void compactSameConsecutiveType() {
+        Execution first = buy(10, 1).consecutive(Execution.ConsecutiveSameBuyer);
+        Execution second = buy(10, 1).consecutive(Execution.ConsecutiveSameBuyer);
+
+        String[] encoded = service.encode(second, first);
+        Execution decoded = service.decode(encoded, first);
+        assert decoded.equals(second);
+    }
+
+    @Test
+    void compactDiffConsecutiveType() {
+        Execution first = buy(10, 1).consecutive(Execution.ConsecutiveSameBuyer);
+        Execution second = buy(10, 1).consecutive(Execution.ConsecutiveDifference);
+
+        String[] encoded = service.encode(second, first);
+        Execution decoded = service.decode(encoded, first);
         assert decoded.equals(second);
     }
 

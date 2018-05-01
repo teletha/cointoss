@@ -32,6 +32,7 @@ import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
 
 import cointoss.market.bitflyer.BitFlyer;
+import cointoss.market.bitflyer.BitFlyerService.BitFlyerExecution;
 import cointoss.util.Chrono;
 import cointoss.util.Span;
 import filer.Filer;
@@ -304,8 +305,10 @@ public class MarketLog {
     /**
      * Read log from the specified date.
      * 
-     * @param time A duration.
-     * @param unit A duration unit.
+     * @param time
+     *            A duration.
+     * @param unit
+     *            A duration unit.
      * @return
      */
     public final Signal<Execution> fromLast(int time, ChronoUnit unit) {
@@ -432,10 +435,10 @@ public class MarketLog {
 
             CsvWriter writer = new CsvWriter(output.toFile(), writerConfig);
 
-            Execution previous = null;
+            BitFlyerExecution previous = null;
             String[] row = null;
             while ((row = parser.parseNext()) != null) {
-                Execution current = new Execution(row);
+                BitFlyerExecution current = BitFlyerExecution.parse(row, previous);
                 writer.writeRow(provider.service().encode(current, previous));
                 previous = current;
             }
@@ -449,11 +452,12 @@ public class MarketLog {
     /**
      * Compute compact log file.
      * 
-     * @param file A log file.
+     * @param file
+     *            A log file.
      * @return
      */
     private Path computeCompactLogFile(Path file) {
-        return file.resolveSibling(file.getFileName().toString().replace(".log", ".alog"));
+        return file.resolveSibling(file.getFileName().toString().replace(".log", ".clog"));
     }
 
     /**
@@ -462,7 +466,7 @@ public class MarketLog {
     public static void main(String[] args) {
         MarketLog log = new MarketLog(BitFlyer.FX_BTC_JPY);
 
-        Filer.walk(log.root, "*20180414.log").to(file -> {
+        Filer.walk(log.root, "*.log").to(file -> {
             log.compact(file);
         });
     }

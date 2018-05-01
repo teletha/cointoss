@@ -16,6 +16,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,7 +37,6 @@ import com.google.gson.JsonObject;
 import cointoss.Execution;
 import cointoss.MarketService;
 import cointoss.Side;
-import cointoss.market.bitflyer.BitFlyerService.BitFlyerExecution;
 import cointoss.order.Order;
 import cointoss.order.Order.State;
 import cointoss.order.OrderBookListChange;
@@ -291,7 +291,7 @@ public class BitFlyerService extends MarketService {
      * @param exe
      * @return
      */
-    public static long estimateDelay(BitFlyerExecution exe) {
+    public static int estimateDelay(BitFlyerExecution exe) {
         String taker = exe.side.isBuy() ? exe.buy_child_order_acceptance_id : exe.sell_child_order_acceptance_id;
 
         try {
@@ -307,7 +307,7 @@ public class BitFlyerService extends MarketService {
             // parse as datetime
             long orderTime = LocalDateTime.parse(taker, TEST).toEpochSecond(JST);
             long executedTime = exe.exec_date.toEpochSecond() + 1;
-            long diff = executedTime - orderTime;
+            int diff = (int) (executedTime - orderTime);
 
             // estimate server order (over 9*60*60)
             if (32000 < diff) {
@@ -416,7 +416,7 @@ public class BitFlyerService extends MarketService {
      */
     @Override
     protected Execution decode(String[] values, Execution previous) {
-
+        System.out.println(Arrays.toString(values));
         if (previous == null) {
             return new Execution(values);
         } else {
@@ -426,6 +426,8 @@ public class BitFlyerService extends MarketService {
             current.side = decode(values[2], previous.side);
             current.price = decode(values[3], previous.price);
             current.size = decodeSize(values[4], previous.size);
+            current.consecutive = Integer.parseInt(values[5].substring(0, 1));
+            current.delay = previous.delay + decode(values[5].substring(1), 0);
 
             return current;
         }
@@ -436,6 +438,13 @@ public class BitFlyerService extends MarketService {
             return defaults;
         }
         return Long.parseLong(value);
+    }
+
+    private static int decode(String value, int defaults) {
+        if (value == null || value.isEmpty()) {
+            return defaults;
+        }
+        return Integer.parseInt(value);
     }
 
     private static Side decode(String value, Side defaults) {
@@ -472,12 +481,10 @@ public class BitFlyerService extends MarketService {
             String side = encode(execution.side.mark(), previous.side.mark());
             String price = encode(execution.price, previous.price);
             String size = execution.size.equals(previous.size) ? "" : execution.size.multiply(Num.HUNDRED).toString();
-            String consecutive = "1";
-            // String delay = String.valueOf(estimateDelay(execution));
-            // String buyer = encode(execution.buyer(), previous.buyer(), 0);
-            // String seller = encode(execution.seller(), previous.seller(), 0);
+            String consecutive = String.valueOf(execution.consecutive);
+            String delay = encode(execution.delay, previous.delay, 0);
 
-            return new String[] {id, time, side, price, size, consecutive};
+            return new String[] {id, time, side, price, size, consecutive + delay};
         }
     }
 
@@ -833,7 +840,7 @@ public class BitFlyerService extends MarketService {
     /**
      * @version 2018/04/28 11:52:26
      */
-    static class BitFlyerExecution extends Execution {
+    public static class BitFlyerExecution extends Execution {
 
         /** Buyer id of this execution. */
         public String buy_child_order_acceptance_id = "";
@@ -841,8 +848,25 @@ public class BitFlyerService extends MarketService {
         /** Seller id of this execution. */
         public String sell_child_order_acceptance_id = "";
 
-        public String toString() {
-            return super.toString() + " " + buy_child_order_acceptance_id + " " + sell_child_order_acceptance_id;
-        };
+        public static BitFlyerExecution parse(String[] values, BitFlyerExecution previous) {
+            BitFlyerExecution exe = new BitFlyerExecution();
+            exe.id = Long.parseLong(values[0]);
+            exe.exec_date = LocalDateTime.parse(values[1]).atZone(cointoss.util.Chrono.UTC);
+            exe.side = Side.parse(values[2]);
+            exe.price = Num.of(values[3]);
+            exe.size = exe.cumulativeSize = Num.of(values[4]);
+
+            if (values[5] == null) values[5] = "";
+            if (values[6] == null) values[6] = "";
+            exe.buy_child_order_acceptance_id = values[5];
+            exe.sell_child_order_acceptance_id = values[6];
+            exe.delay = estimateDelay(exe);
+            exe.consecutive = previous == null ? Execution.ConsecutiveDifference
+                    : values[5].equals(previous.buy_child_order_acceptance_id) ? Execution.ConsecutiveSameBuyer
+                            : values[6].equals(previous.sell_child_order_acceptance_id) ? Execution.ConsecutiveSameSeller
+                                    : Execution.ConsecutiveDifference;
+
+            return exe;
+        }
     }
 }
