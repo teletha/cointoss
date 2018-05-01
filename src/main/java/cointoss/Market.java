@@ -160,6 +160,10 @@ public class Market implements Disposable {
             orderBook.shorts.fix(e.price);
             orderBook.longs.fix(e.price);
         }));
+
+        service.add(service.positions().to(p -> {
+            System.out.println(p);
+        }));
     }
 
     /**
@@ -282,7 +286,7 @@ public class Market implements Disposable {
      */
     public final Market readLog(Function<MarketLog, Signal<Execution>> log) {
         service.add(log.apply(provider.log()).to(this::tick));
-    
+
         return this;
     }
 
@@ -320,12 +324,12 @@ public class Market implements Disposable {
 
                 order.listeners.accept(e);
 
-                Position position = new Position();
-                position.side = order.side;
-                position.price = e.price;
-                position.size.set(e.size);
-                position.date = e.exec_date;
-                positions.add(position);
+                // Position position = new Position();
+                // position.side = order.side;
+                // position.price = e.price;
+                // position.size.set(e.size);
+                // position.date = e.exec_date;
+                // positions.add(position);
             }
         }
 

@@ -79,7 +79,7 @@ public abstract class MarketService implements Disposable {
      * 
      * @return
      */
-    public abstract Signal<Position> positions();
+    public abstract Signal<Execution> positions();
 
     /**
      * <p>

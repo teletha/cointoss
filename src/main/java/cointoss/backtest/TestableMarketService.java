@@ -19,7 +19,6 @@ import cointoss.Execution;
 import cointoss.MarketLog;
 import cointoss.MarketProvider;
 import cointoss.MarketService;
-import cointoss.Position;
 import cointoss.order.Order;
 import cointoss.order.Order.Quantity;
 import cointoss.order.Order.State;
@@ -49,7 +48,7 @@ class TestableMarketService extends MarketService implements MarketProvider {
     private final ConcurrentLinkedQueue<BackendOrder> orderAll = new ConcurrentLinkedQueue<>();
 
     /** The order manager. */
-    private final Signaling<Position> positions = new Signaling();
+    private final Signaling<Execution> positions = new Signaling();
 
     /** The execution manager. */
     private final LinkedList<Execution> executeds = new LinkedList();
@@ -175,7 +174,7 @@ class TestableMarketService extends MarketService implements MarketProvider {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Position> positions() {
+    public Signal<Execution> positions() {
         return positions.expose;
     }
 
@@ -299,6 +298,7 @@ class TestableMarketService extends MarketService implements MarketProvider {
                     order.state.set(State.COMPLETED);
                     iterator.remove();
                 }
+                positions.accept(exe);
 
                 // replace execution info
                 e.side = exe.side;

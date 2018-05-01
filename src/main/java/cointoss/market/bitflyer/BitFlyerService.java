@@ -35,7 +35,6 @@ import com.google.gson.JsonObject;
 
 import cointoss.Execution;
 import cointoss.MarketService;
-import cointoss.Position;
 import cointoss.Side;
 import cointoss.order.Order;
 import cointoss.order.Order.State;
@@ -76,7 +75,7 @@ public class BitFlyerService extends MarketService {
     private final Set<String> orders = ConcurrentHashMap.newKeySet();
 
     /** The position event. */
-    private final Signaling<Position> positions = new Signaling();
+    private final Signaling<Execution> positions = new Signaling();
 
     /** The market type. */
     private final BitFlyer type;
@@ -227,21 +226,19 @@ public class BitFlyerService extends MarketService {
                     exe.delay = estimateDelay(exe);
 
                     if (orders.contains(buyer)) {
-                        Position position = new Position();
+                        Execution position = new Execution();
                         position.side = Side.BUY;
-                        position.date = exe.exec_date;
+                        position.exec_date = exe.exec_date;
                         position.price = exe.price;
-                        position.size.set(exe.size);
-                        position.id = buyer;
+                        position.size = exe.size;
 
                         positions.accept(position);
                     } else if (orders.contains(seller)) {
-                        Position position = new Position();
+                        Execution position = new Execution();
                         position.side = Side.SELL;
-                        position.date = exe.exec_date;
+                        position.exec_date = exe.exec_date;
                         position.price = exe.price;
-                        position.size.set(exe.size);
-                        position.id = seller;
+                        position.size = exe.size;
 
                         positions.accept(position);
                     }
@@ -345,7 +342,7 @@ public class BitFlyerService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Position> positions() {
+    public Signal<Execution> positions() {
         return positions.expose;
     }
 
