@@ -174,6 +174,15 @@ class LogCodecTest {
     }
 
     @Test
+    void diffNum() {
+        Num current = Num.of(0.12345678);
+
+        String encoded = LogCodec.encodeDiff(current, Num.ZERO);
+        Num decoded = LogCodec.decodeDiff(encoded, Num.ZERO);
+        assert decoded.is(current);
+    }
+
+    @Test
     void diffString() {
         String encoded = LogCodec.encodeDiff("current", "previous");
         String decoded = LogCodec.decodeDiff(encoded, "previous");

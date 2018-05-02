@@ -11,8 +11,11 @@ package cointoss;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -305,8 +308,10 @@ public class MarketLog {
     /**
      * Read log from the specified date.
      * 
-     * @param time A duration.
-     * @param unit A duration unit.
+     * @param time
+     *            A duration.
+     * @param unit
+     *            A duration unit.
      * @return
      */
     public final Signal<Execution> fromLast(int time, ChronoUnit unit) {
@@ -431,7 +436,8 @@ public class MarketLog {
             CsvWriterSettings writerConfig = new CsvWriterSettings();
             writerConfig.getFormat().setDelimiter(' ');
 
-            CsvWriter writer = new CsvWriter(output.toFile(), writerConfig);
+            CsvWriter writer = new CsvWriter(new OutputStreamWriter(new FileOutputStream(output
+                    .toFile()), StandardCharsets.ISO_8859_1), writerConfig);
 
             BitFlyerExecution previous = null;
             String[] row = null;
@@ -450,7 +456,8 @@ public class MarketLog {
     /**
      * Compute compact log file.
      * 
-     * @param file A log file.
+     * @param file
+     *            A log file.
      * @return
      */
     private Path computeCompactLogFile(Path file) {

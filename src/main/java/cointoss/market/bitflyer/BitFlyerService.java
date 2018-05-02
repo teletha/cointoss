@@ -420,7 +420,7 @@ public class BitFlyerService extends MarketService {
             current.id = LogCodec.decodeDelta(values[0], previous.id, 1);
             current.exec_date = LogCodec.decodeDelta(values[1], previous.exec_date, 0);
             current.price = LogCodec.decodeIntegralDelta(values[2], previous.price, 0);
-            current.size = LogCodec.decodeDiff(values[3], previous.size, Num.HUNDRED);
+            current.size = LogCodec.decodeDiff(values[3], previous.size);
             int value = Integer.parseInt(values[4].substring(0, 1));
             if (value <= 3) {
                 current.side = Side.BUY;
@@ -446,7 +446,7 @@ public class BitFlyerService extends MarketService {
             String id = LogCodec.encodeDelta(execution.id, previous.id, 1);
             String time = LogCodec.encodeDelta(execution.exec_date, previous.exec_date, 0);
             String price = LogCodec.encodeIntegralDelta(execution.price, previous.price, 0);
-            String size = LogCodec.encodeDiff(execution.size, previous.size, Num.HUNDRED);
+            String size = LogCodec.encodeDiff(execution.size, previous.size);
             String sideAndConsecutive = String.valueOf(execution.side.isBuy() ? execution.consecutive : 3 + execution.consecutive);
             String delay = LogCodec.encodeDelta(execution.delay, previous.delay, 0);
 
