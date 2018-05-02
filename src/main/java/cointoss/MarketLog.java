@@ -305,10 +305,8 @@ public class MarketLog {
     /**
      * Read log from the specified date.
      * 
-     * @param time
-     *            A duration.
-     * @param unit
-     *            A duration unit.
+     * @param time A duration.
+     * @param unit A duration unit.
      * @return
      */
     public final Signal<Execution> fromLast(int time, ChronoUnit unit) {
@@ -452,12 +450,11 @@ public class MarketLog {
     /**
      * Compute compact log file.
      * 
-     * @param file
-     *            A log file.
+     * @param file A log file.
      * @return
      */
     private Path computeCompactLogFile(Path file) {
-        return file.resolveSibling(file.getFileName().toString().replace(".log", ".clog"));
+        return file.resolveSibling(file.getFileName().toString().replace(".log", ".alog"));
     }
 
     /**
@@ -466,7 +463,7 @@ public class MarketLog {
     public static void main(String[] args) {
         MarketLog log = new MarketLog(BitFlyer.FX_BTC_JPY);
 
-        Filer.walk(log.root, "*.log").to(file -> {
+        Filer.walk(log.root, "*20180425.log").to(file -> {
             log.compact(file);
         });
     }

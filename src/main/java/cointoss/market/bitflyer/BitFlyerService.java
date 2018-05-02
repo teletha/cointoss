@@ -9,14 +9,10 @@
  */
 package cointoss.market.bitflyer;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.time.temporal.ChronoUnit;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +38,7 @@ import cointoss.order.Order.State;
 import cointoss.order.OrderBookListChange;
 import cointoss.order.OrderUnit;
 import cointoss.util.Chrono;
+import cointoss.util.LogCodec;
 import cointoss.util.Num;
 import filer.Filer;
 import kiss.Disposable;
@@ -416,56 +413,26 @@ public class BitFlyerService extends MarketService {
      */
     @Override
     protected Execution decode(String[] values, Execution previous) {
-        System.out.println(Arrays.toString(values));
         if (previous == null) {
             return new Execution(values);
         } else {
             Execution current = new Execution();
-            current.id = previous.id + decode(values[0], 1);
-            current.exec_date = previous.exec_date.plus(decode(values[1], 0), ChronoUnit.MILLIS);
-            current.side = decode(values[2], previous.side);
-            current.price = decode(values[3], previous.price);
-            current.size = decodeSize(values[4], previous.size);
-            current.consecutive = Integer.parseInt(values[5].substring(0, 1));
-            current.delay = previous.delay + decode(values[5].substring(1), 0);
+            current.id = LogCodec.decodeDelta(values[0], previous.id, 1);
+            current.exec_date = LogCodec.decodeDelta(values[1], previous.exec_date, 0);
+            current.price = LogCodec.decodeIntegralDelta(values[2], previous.price, 0);
+            current.size = LogCodec.decodeDiff(values[3], previous.size, Num.HUNDRED);
+            int value = Integer.parseInt(values[4].substring(0, 1));
+            if (value <= 3) {
+                current.side = Side.BUY;
+                current.consecutive = value;
+            } else {
+                current.side = Side.SELL;
+                current.consecutive = value - 3;
+            }
+            current.delay = LogCodec.decodeDelta(values[4].substring(1), previous.delay, 0);
 
             return current;
         }
-    }
-
-    private static long decode(String value, long defaults) {
-        if (value == null || value.isEmpty()) {
-            return defaults;
-        }
-        return Long.parseLong(value);
-    }
-
-    private static int decode(String value, int defaults) {
-        if (value == null || value.isEmpty()) {
-            return defaults;
-        }
-        return Integer.parseInt(value);
-    }
-
-    private static Side decode(String value, Side defaults) {
-        if (value == null || value.isEmpty()) {
-            return defaults;
-        }
-        return Side.parse(value);
-    }
-
-    private static Num decode(String value, Num defaults) {
-        if (value == null || value.isEmpty()) {
-            return defaults;
-        }
-        return Num.of(value).plus(defaults);
-    }
-
-    private static Num decodeSize(String value, Num defaults) {
-        if (value == null || value.isEmpty()) {
-            return defaults;
-        }
-        return Num.of(value).divide(Num.HUNDRED);
     }
 
     /**
@@ -476,79 +443,15 @@ public class BitFlyerService extends MarketService {
         if (previous == null) {
             return execution.toString().split(" ");
         } else {
-            String id = encode(execution.id, previous.id, 1);
-            String time = encode(execution.exec_date, previous.exec_date);
-            String side = encode(execution.side.mark(), previous.side.mark());
-            String price = encode(execution.price, previous.price);
-            String size = execution.size.equals(previous.size) ? "" : execution.size.multiply(Num.HUNDRED).toString();
-            String consecutive = String.valueOf(execution.consecutive);
-            String delay = encode(execution.delay, previous.delay, 0);
+            String id = LogCodec.encodeDelta(execution.id, previous.id, 1);
+            String time = LogCodec.encodeDelta(execution.exec_date, previous.exec_date, 0);
+            String price = LogCodec.encodeIntegralDelta(execution.price, previous.price, 0);
+            String size = LogCodec.encodeDiff(execution.size, previous.size, Num.HUNDRED);
+            String sideAndConsecutive = String.valueOf(execution.side.isBuy() ? execution.consecutive : 3 + execution.consecutive);
+            String delay = LogCodec.encodeDelta(execution.delay, previous.delay, 0);
 
-            return new String[] {id, time, side, price, size, consecutive + delay};
+            return new String[] {id, time, price, size, sideAndConsecutive + delay};
         }
-    }
-
-    /**
-     * Erase duplicated value.
-     * 
-     * @param current
-     * @param previous
-     * @param defaults
-     * @return
-     */
-    private static String encode(Num current, Num previous) {
-        if (current.equals(previous)) {
-            return "";
-        } else {
-            return current.minus(previous).toString();
-        }
-    }
-
-    /**
-     * Erase duplicated value.
-     * 
-     * @param current
-     * @param previous
-     * @param defaults
-     * @return
-     */
-    private static String encode(long current, long previous, long defaults) {
-        long diff = current - previous;
-
-        if (diff == defaults) {
-            return "";
-        } else {
-            return String.valueOf(diff);
-        }
-    }
-
-    /**
-     * Erase duplicated value.
-     * 
-     * @param current
-     * @param previous
-     * @param defaults
-     * @return
-     */
-    private static String encode(ZonedDateTime current, ZonedDateTime previous) {
-        Duration between = Duration.between(previous, current);
-
-        if (between.isZero()) {
-            return "";
-        } else {
-            return String.valueOf(between.toMillis());
-        }
-    }
-
-    /**
-     * Erase duplicated sequence.
-     * 
-     * @param current
-     * @param previous
-     * @return
-     */
-    private static String encode(String current, String previous) {
-        return current.equals(previous) ? "" : current;
     }
 
     /**
