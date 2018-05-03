@@ -9,11 +9,14 @@
  */
 package cointoss;
 
+import java.io.BufferedOutputStream;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -29,6 +32,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import com.github.luben.zstd.ZstdInputStream;
+import com.github.luben.zstd.ZstdOutputStream;
 import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
 import com.univocity.parsers.csv.CsvWriter;
@@ -308,8 +313,10 @@ public class MarketLog {
     /**
      * Read log from the specified date.
      * 
-     * @param time A duration.
-     * @param unit A duration unit.
+     * @param time
+     *            A duration.
+     * @param unit
+     *            A duration unit.
      * @return
      */
     public final Signal<Execution> fromLast(int time, ChronoUnit unit) {
@@ -381,24 +388,33 @@ public class MarketLog {
      */
     public final Signal<Execution> read(Path file) {
         return new Signal<>((observer, disposer) -> {
-            Path compact = computeCompactLogFile(file);
-            boolean hasCompact = Files.exists(compact);
+            try {
+                Path compact = computeCompactLogFile(file);
+                boolean hasCompact = Files.exists(compact);
 
-            CsvParserSettings settings = new CsvParserSettings();
-            settings.getFormat().setDelimiter(' ');
+                CsvParserSettings settings = new CsvParserSettings();
+                settings.getFormat().setDelimiter(' ');
 
-            CsvParser parser = new CsvParser(settings);
-            parser.beginParsing((hasCompact ? compact : file).toFile());
+                CsvParser parser = new CsvParser(settings);
+                if (hasCompact) {
+                    parser.beginParsing(new InputStreamReader(new ZstdInputStream(new FileInputStream(compact
+                            .toFile())), StandardCharsets.ISO_8859_1));
+                } else {
+                    parser.beginParsing(Files.newBufferedReader(file));
+                }
 
-            String[] row;
-            Execution previous = null;
+                String[] row;
+                Execution previous = null;
 
-            while ((row = parser.parseNext()) != null) {
-                observer.accept(previous = provider.service().decode(row, hasCompact ? previous : null));
+                while ((row = parser.parseNext()) != null) {
+                    observer.accept(previous = provider.service().decode(row, hasCompact ? previous : null));
+                }
+
+                parser.stopParsing();
+                return disposer;
+            } catch (Exception e) {
+                throw I.quiet(e);
             }
-
-            parser.stopParsing();
-            return disposer;
         });
     }
 
@@ -434,8 +450,8 @@ public class MarketLog {
             CsvWriterSettings writerConfig = new CsvWriterSettings();
             writerConfig.getFormat().setDelimiter(' ');
 
-            CsvWriter writer = new CsvWriter(new OutputStreamWriter(new FileOutputStream(output
-                    .toFile()), StandardCharsets.ISO_8859_1), writerConfig);
+            CsvWriter writer = new CsvWriter(new OutputStreamWriter(new ZstdOutputStream(new BufferedOutputStream(new FileOutputStream(output
+                    .toFile())), 3), StandardCharsets.ISO_8859_1), writerConfig);
 
             BitFlyerExecution previous = null;
             String[] row = null;
@@ -454,17 +470,32 @@ public class MarketLog {
     /**
      * Compute compact log file.
      * 
-     * @param file A log file.
+     * @param file
+     *            A log file.
      * @return
      */
     private Path computeCompactLogFile(Path file) {
-        return file.resolveSibling(file.getFileName().toString().replace(".log", ".alog"));
+        return file.resolveSibling(file.getFileName().toString().replace(".log", ".clog"));
+    }
+
+    public static void main(String[] args) {
+        MarketLog log = new MarketLog(BitFlyer.FX_BTC_JPY);
+        long start = System.currentTimeMillis();
+        Filer.walk(log.root, "*.log").to(file -> {
+            long s = System.currentTimeMillis();
+            log.read(file).to(e -> {
+            });
+            long e = System.currentTimeMillis();
+            System.out.println("Done " + file + "  " + (e - s));
+        });
+        long end = System.currentTimeMillis();
+        System.out.println(end - start);
     }
 
     /**
      * @param args
      */
-    public static void main(String[] args) {
+    public static void main2(String[] args) {
         MarketLog log = new MarketLog(BitFlyer.FX_BTC_JPY);
 
         Filer.walk(log.root, "*.log").to(file -> {

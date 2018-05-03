@@ -51,8 +51,18 @@ public class BitFlyerServiceTest {
 
     @Test
     void compactLesserDelay() {
+        Execution first = sell(10, 0.07).consecutive(Execution.ConsecutiveDifference).delay(37);
+        Execution second = sell(10, 0.93).consecutive(Execution.ConsecutiveSameSeller).delay(37);
+
+        String[] encoded = service.encode(second, first);
+        Execution decoded = service.decode(encoded, first);
+        assert decoded.equals(second);
+    }
+
+    @Test
+    void test() {
         Execution first = buy(10, 1).delay(5);
-        Execution second = buy(10, 1).delay(3);
+        Execution second = buy(10, 1).delay(7);
 
         String[] encoded = service.encode(second, first);
         Execution decoded = service.decode(encoded, first);
