@@ -312,6 +312,8 @@ public class BitFlyerService extends MarketService {
             } else if (diff < 0) {
                 // some local client time is not stable, so ignore it
                 return Execution.DelayInestimable;
+            } else if (180 < diff) {
+                return Execution.DelayHuge;
             } else {
                 return diff;
             }
@@ -420,8 +422,7 @@ public class BitFlyerService extends MarketService {
             current.id = LogCodec.decodeDelta(values[0], previous.id, 1);
             current.exec_date = LogCodec.decodeDelta(values[1], previous.exec_date, 0);
             current.price = LogCodec.decodeIntegralDelta(values[2], previous.price, 0);
-            current.size = LogCodec.decodeDiff(values[3], previous.size);
-            int value = Integer.parseInt(values[4].substring(0, 1));
+            int value = LogCodec.decodeInt(values[3].charAt(0));
             if (value <= 3) {
                 current.side = Side.BUY;
                 current.consecutive = value;
@@ -429,7 +430,8 @@ public class BitFlyerService extends MarketService {
                 current.side = Side.SELL;
                 current.consecutive = value - 3;
             }
-            current.delay = LogCodec.decodeDelta(values[4].substring(1), previous.delay, 0);
+            current.delay = LogCodec.decodeInt(values[3].charAt(1)) - 3;
+            current.size = LogCodec.decodeDiff(values[3].substring(2), previous.size);
 
             return current;
         }
@@ -448,9 +450,9 @@ public class BitFlyerService extends MarketService {
             String price = LogCodec.encodeIntegralDelta(execution.price, previous.price, 0);
             String size = LogCodec.encodeDiff(execution.size, previous.size);
             String sideAndConsecutive = String.valueOf(execution.side.isBuy() ? execution.consecutive : 3 + execution.consecutive);
-            String delay = LogCodec.encodeDelta(execution.delay, previous.delay, 0);
+            String delay = LogCodec.encodeInt(execution.delay + 3);
 
-            return new String[] {id, time, price, size, sideAndConsecutive + delay};
+            return new String[] {id, time, price, sideAndConsecutive + delay + size};
         }
     }
 

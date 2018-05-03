@@ -31,6 +31,9 @@ public class Execution {
     /** The order delay type. */
     public static final int DelayServerOrder = -2;
 
+    /** The order delay type. */
+    public static final int DelayHuge = -3;
+
     /** The consecutive type. (DEFAULT) */
     public static final int ConsecutiveDifference = 0;
 

@@ -25,12 +25,9 @@ public class LogCodec {
     /**
      * Compute delta value. If it is default value, empty string will be returned.
      * 
-     * @param current
-     *            A current value.
-     * @param previous
-     *            A previous value.
-     * @param defaultValue
-     *            A default value.
+     * @param current A current value.
+     * @param previous A previous value.
+     * @param defaultValue A default value.
      * @return
      */
     public static String encodeDelta(int current, int previous, int defaultValue) {
@@ -46,12 +43,9 @@ public class LogCodec {
     /**
      * Compute delta value. If it is default value, empty string will be returned.
      * 
-     * @param current
-     *            A current value.
-     * @param previous
-     *            A previous value.
-     * @param defaultValue
-     *            A default value.
+     * @param current A current value.
+     * @param previous A previous value.
+     * @param defaultValue A default value.
      * @return
      */
     public static int decodeDelta(String current, int previous, int defaultValue) {
@@ -65,12 +59,9 @@ public class LogCodec {
     /**
      * Compute delta value. If it is default value, empty string will be returned.
      * 
-     * @param current
-     *            A current value.
-     * @param previous
-     *            A previous value.
-     * @param defaultValue
-     *            A default value.
+     * @param current A current value.
+     * @param previous A previous value.
+     * @param defaultValue A default value.
      * @return
      */
     public static String encodeDelta(long current, long previous, long defaultValue) {
@@ -86,12 +77,9 @@ public class LogCodec {
     /**
      * Compute delta value. If it is default value, empty string will be returned.
      * 
-     * @param current
-     *            A current value.
-     * @param previous
-     *            A previous value.
-     * @param defaultValue
-     *            A default value.
+     * @param current A current value.
+     * @param previous A previous value.
+     * @param defaultValue A default value.
      * @return
      */
     public static long decodeDelta(String current, long previous, long defaultValue) {
@@ -105,12 +93,9 @@ public class LogCodec {
     /**
      * Compute delta value. If it is default value, empty string will be returned.
      * 
-     * @param current
-     *            A current value.
-     * @param previous
-     *            A previous value.
-     * @param defaultValue
-     *            A default value.
+     * @param current A current value.
+     * @param previous A previous value.
+     * @param defaultValue A default value.
      * @return
      */
     public static String encodeDelta(ZonedDateTime current, ZonedDateTime previous, long defaultValue) {
@@ -126,12 +111,9 @@ public class LogCodec {
     /**
      * Compute delta value. If it is default value, empty string will be returned.
      * 
-     * @param current
-     *            A current value.
-     * @param previous
-     *            A previous value.
-     * @param defaultValue
-     *            A default value.
+     * @param current A current value.
+     * @param previous A previous value.
+     * @param defaultValue A default value.
      * @return
      */
     public static ZonedDateTime decodeDelta(String current, ZonedDateTime previous, long defaultValue) {
@@ -145,12 +127,9 @@ public class LogCodec {
     /**
      * Compute delta value. If it is default value, empty string will be returned.
      * 
-     * @param current
-     *            A current value.
-     * @param previous
-     *            A previous value.
-     * @param defaultValue
-     *            A default value.
+     * @param current A current value.
+     * @param previous A previous value.
+     * @param defaultValue A default value.
      * @return
      */
     public static String encodeIntegralDelta(Num current, Num previous, int defaultValue) {
@@ -166,12 +145,9 @@ public class LogCodec {
     /**
      * Compute delta value. If it is default value, empty string will be returned.
      * 
-     * @param current
-     *            A current value.
-     * @param previous
-     *            A previous value.
-     * @param defaultValue
-     *            A default value.
+     * @param current A current value.
+     * @param previous A previous value.
+     * @param defaultValue A default value.
      * @return
      */
     public static Num decodeIntegralDelta(String current, Num previous, int defaultValue) {
@@ -185,10 +161,8 @@ public class LogCodec {
     /**
      * Compute diff value. If these are same value, empty string will be returned.
      * 
-     * @param current
-     *            A current value.
-     * @param previous
-     *            A previous value.
+     * @param current A current value.
+     * @param previous A previous value.
      * @return
      */
     public static String encodeDiff(Num current, Num previous) {
@@ -205,10 +179,8 @@ public class LogCodec {
     /**
      * Compute diff value. If these are same value, empty string will be returned.
      * 
-     * @param current
-     *            A current value.
-     * @param previous
-     *            A previous value.
+     * @param current A current value.
+     * @param previous A previous value.
      * @return
      */
     public static Num decodeDiff(String current, Num previous) {
@@ -223,12 +195,9 @@ public class LogCodec {
     /**
      * Compute diff value. If these are same value, empty string will be returned.
      * 
-     * @param current
-     *            A current value.
-     * @param previous
-     *            A previous value.
-     * @param coefficient
-     *            A coefficient to reduce decimal value.
+     * @param current A current value.
+     * @param previous A previous value.
+     * @param coefficient A coefficient to reduce decimal value.
      * @return
      */
     public static String encodeDiff(Num current, Num previous, Num coefficient) {
@@ -242,12 +211,9 @@ public class LogCodec {
     /**
      * Compute diff value. If these are same value, empty string will be returned.
      * 
-     * @param current
-     *            A current value.
-     * @param previous
-     *            A previous value.
-     * @param coefficient
-     *            A coefficient to reduce decimal value.
+     * @param current A current value.
+     * @param previous A previous value.
+     * @param coefficient A coefficient to reduce decimal value.
      * @return
      */
     public static Num decodeDiff(String current, Num previous, Num coefficient) {
@@ -261,10 +227,8 @@ public class LogCodec {
     /**
      * Compute diff value. If these are same value, empty string will be returned.
      * 
-     * @param current
-     *            A current value.
-     * @param previous
-     *            A previous value.
+     * @param current A current value.
+     * @param previous A previous value.
      * @return
      */
     public static String encodeDiff(String current, String previous) {
@@ -278,10 +242,8 @@ public class LogCodec {
     /**
      * Compute diff value. If these are same value, empty string will be returned.
      * 
-     * @param current
-     *            A current value.
-     * @param previous
-     *            A previous value.
+     * @param current A current value.
+     * @param previous A previous value.
      * @return
      */
     public static String decodeDiff(String current, String previous) {
@@ -298,8 +260,8 @@ public class LogCodec {
      * @param value
      * @return
      */
-    private static String encodeInt(int value) {
-        return encode(value);
+    public static String encodeInt(int value) {
+        return encodeLong(value);
     }
 
     /**
@@ -308,8 +270,37 @@ public class LogCodec {
      * @param value
      * @return
      */
-    private static int decodeInt(String value) {
-        return (int) decode(value);
+    public static int decodeInt(String value) {
+        return (int) decodeLong(value);
+    }
+
+    /**
+     * Decode {@link Character} to {@link Integer}.
+     * 
+     * @param value
+     * @return
+     */
+    public static int decodeInt(char value) {
+        return digits[value];
+    }
+
+    /** 1byte charset. */
+    private static final char[] chars = "0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~!\"#$%&'()*+,./¡¢£¤¥¦§¨©ª«¬®¯°±²³´µ¶·¸¹º»¼½¾¿ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþÿ"
+            .toCharArray();
+
+    /** The start index. */
+    private static final int BASE = chars.length;
+
+    /** The pre-computed 'char to digit' mapping. */
+    private static final int[] digits = new int[chars[BASE - 1] + 1];
+
+    // pre-compute mapping
+    static {
+        Arrays.fill(digits, -1);
+
+        for (int i = 0; i < BASE; i++) {
+            digits[chars[i]] = i;
+        }
     }
 
     /**
@@ -318,8 +309,25 @@ public class LogCodec {
      * @param value
      * @return
      */
-    private static String encodeLong(long value) {
-        return encode(value);
+    public static String encodeLong(long value) {
+        // check zero
+        if (value == 0) {
+            return "0";
+        }
+
+        boolean positive = true;
+        if (value < 0) {
+            positive = false;
+            value *= -1;
+        }
+
+        StringBuilder builder = new StringBuilder();
+
+        while (value != 0) {
+            builder.append(chars[(int) (value % BASE)]);
+            value /= BASE;
+        }
+        return positive ? builder.reverse().toString() : "-" + builder.reverse().toString();
     }
 
     /**
@@ -328,70 +336,19 @@ public class LogCodec {
      * @param value
      * @return
      */
-    private static long decodeLong(String value) {
-        return decode(value);
-    }
-
-    private static final char[] digitsChar = "0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~!\"#$%&'()*+,./¡¢£¤¥¦§¨©ª«¬®¯°±²³´µ¶·¸¹º»¼½¾¿ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþÿ"
-            .toCharArray();
-
-    private static final int BASE = digitsChar.length;
-
-    private static final int FAST_SIZE = 'ÿ';
-
-    private static final int[] digitsIndex = new int[FAST_SIZE + 1];
-
-    static {
-        for (int i = 0; i < FAST_SIZE; i++) {
-            digitsIndex[i] = -1;
-        }
-        for (int i = 0; i < BASE; i++) {
-            digitsIndex[digitsChar[i]] = i;
-        }
-        System.out.println(Arrays.toString(digitsIndex));
-    }
-
-    public static long decode(String s) {
+    public static long decodeLong(String value) {
         boolean positive = true;
-        if (s.charAt(0) == '-') {
+        if (value.charAt(0) == '-') {
             positive = false;
-            s = s.substring(1);
+            value = value.substring(1);
         }
 
         long result = 0L;
-        long multiplier = 1;
-        for (int pos = s.length() - 1; pos >= 0; pos--) {
-            int index = getIndex(s, pos);
-            result += index * multiplier;
+        long multiplier = 1L;
+        for (int position = value.length() - 1; 0 <= position; position--) {
+            result += multiplier * digits[value.charAt(position)];
             multiplier *= BASE;
         }
         return positive ? result : -result;
-    }
-
-    public static String encode(long number) {
-        boolean positive = true;
-        if (number < 0) {
-            positive = false;
-            number *= -1;
-        }
-        if (number == 0) return "0";
-        StringBuilder buf = new StringBuilder();
-        while (number != 0) {
-            buf.append(digitsChar[(int) (number % BASE)]);
-            number /= BASE;
-        }
-        return positive ? buf.reverse().toString() : "-" + buf.reverse().toString();
-    }
-
-    private static int getIndex(String s, int pos) {
-        char c = s.charAt(pos);
-        if (c > FAST_SIZE) {
-            throw new IllegalArgumentException("Unknow character for Base62: " + s);
-        }
-        int index = digitsIndex[c];
-        if (index == -1) {
-            throw new IllegalArgumentException("Unknow character for Base62: " + s);
-        }
-        return index;
     }
 }

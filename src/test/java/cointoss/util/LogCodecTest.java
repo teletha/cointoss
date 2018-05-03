@@ -196,4 +196,24 @@ class LogCodecTest {
         assert encoded.equals("");
         assert decoded.equals("current");
     }
+
+    @Test
+    void decodeChar() {
+        for (int i = 0; i <= 188; i++) {
+            String encoded = LogCodec.encodeInt(i);
+            int decoded = LogCodec.decodeInt(encoded.charAt(0));
+
+            assert decoded == i;
+        }
+    }
+
+    @Test
+    void encodeLong() {
+        for (long i = -3000; i <= 3000; i++) {
+            String encoded = LogCodec.encodeLong(i);
+            long decoded = LogCodec.decodeLong(encoded);
+
+            assert decoded == i;
+        }
+    }
 }
