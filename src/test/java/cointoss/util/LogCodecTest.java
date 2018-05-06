@@ -199,7 +199,7 @@ class LogCodecTest {
 
     @Test
     void decodeChar() {
-        for (int i = 0; i <= 188; i++) {
+        for (int i = 0; i <= 186; i++) {
             String encoded = LogCodec.encodeInt(i);
             int decoded = LogCodec.decodeInt(encoded.charAt(0));
 

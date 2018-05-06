@@ -25,12 +25,9 @@ public class LogCodec {
     /**
      * Compute delta value. If it is default value, empty string will be returned.
      * 
-     * @param current
-     *            A current value.
-     * @param previous
-     *            A previous value.
-     * @param defaultValue
-     *            A default value.
+     * @param current A current value.
+     * @param previous A previous value.
+     * @param defaultValue A default value.
      * @return
      */
     public static String encodeDelta(int current, int previous, int defaultValue) {
@@ -46,12 +43,9 @@ public class LogCodec {
     /**
      * Compute delta value. If it is default value, empty string will be returned.
      * 
-     * @param current
-     *            A current value.
-     * @param previous
-     *            A previous value.
-     * @param defaultValue
-     *            A default value.
+     * @param current A current value.
+     * @param previous A previous value.
+     * @param defaultValue A default value.
      * @return
      */
     public static int decodeDelta(String current, int previous, int defaultValue) {
@@ -65,12 +59,9 @@ public class LogCodec {
     /**
      * Compute delta value. If it is default value, empty string will be returned.
      * 
-     * @param current
-     *            A current value.
-     * @param previous
-     *            A previous value.
-     * @param defaultValue
-     *            A default value.
+     * @param current A current value.
+     * @param previous A previous value.
+     * @param defaultValue A default value.
      * @return
      */
     public static String encodeDelta(long current, long previous, long defaultValue) {
@@ -86,12 +77,9 @@ public class LogCodec {
     /**
      * Compute delta value. If it is default value, empty string will be returned.
      * 
-     * @param current
-     *            A current value.
-     * @param previous
-     *            A previous value.
-     * @param defaultValue
-     *            A default value.
+     * @param current A current value.
+     * @param previous A previous value.
+     * @param defaultValue A default value.
      * @return
      */
     public static long decodeDelta(String current, long previous, long defaultValue) {
@@ -105,12 +93,9 @@ public class LogCodec {
     /**
      * Compute delta value. If it is default value, empty string will be returned.
      * 
-     * @param current
-     *            A current value.
-     * @param previous
-     *            A previous value.
-     * @param defaultValue
-     *            A default value.
+     * @param current A current value.
+     * @param previous A previous value.
+     * @param defaultValue A default value.
      * @return
      */
     public static String encodeDelta(ZonedDateTime current, ZonedDateTime previous, long defaultValue) {
@@ -126,12 +111,9 @@ public class LogCodec {
     /**
      * Compute delta value. If it is default value, empty string will be returned.
      * 
-     * @param current
-     *            A current value.
-     * @param previous
-     *            A previous value.
-     * @param defaultValue
-     *            A default value.
+     * @param current A current value.
+     * @param previous A previous value.
+     * @param defaultValue A default value.
      * @return
      */
     public static ZonedDateTime decodeDelta(String current, ZonedDateTime previous, long defaultValue) {
@@ -145,12 +127,9 @@ public class LogCodec {
     /**
      * Compute delta value. If it is default value, empty string will be returned.
      * 
-     * @param current
-     *            A current value.
-     * @param previous
-     *            A previous value.
-     * @param defaultValue
-     *            A default value.
+     * @param current A current value.
+     * @param previous A previous value.
+     * @param defaultValue A default value.
      * @return
      */
     public static String encodeIntegralDelta(Num current, Num previous, int defaultValue) {
@@ -166,12 +145,9 @@ public class LogCodec {
     /**
      * Compute delta value. If it is default value, empty string will be returned.
      * 
-     * @param current
-     *            A current value.
-     * @param previous
-     *            A previous value.
-     * @param defaultValue
-     *            A default value.
+     * @param current A current value.
+     * @param previous A previous value.
+     * @param defaultValue A default value.
      * @return
      */
     public static Num decodeIntegralDelta(String current, Num previous, int defaultValue) {
@@ -185,10 +161,8 @@ public class LogCodec {
     /**
      * Compute diff value. If these are same value, empty string will be returned.
      * 
-     * @param current
-     *            A current value.
-     * @param previous
-     *            A previous value.
+     * @param current A current value.
+     * @param previous A previous value.
      * @return
      */
     public static String encodeDiff(Num current, Num previous) {
@@ -204,10 +178,8 @@ public class LogCodec {
     /**
      * Compute diff value. If these are same value, empty string will be returned.
      * 
-     * @param current
-     *            A current value.
-     * @param previous
-     *            A previous value.
+     * @param current A current value.
+     * @param previous A previous value.
      * @return
      */
     public static Num decodeDiff(String current, Num previous) {
@@ -222,12 +194,9 @@ public class LogCodec {
     /**
      * Compute diff value. If these are same value, empty string will be returned.
      * 
-     * @param current
-     *            A current value.
-     * @param previous
-     *            A previous value.
-     * @param coefficient
-     *            A coefficient to reduce decimal value.
+     * @param current A current value.
+     * @param previous A previous value.
+     * @param coefficient A coefficient to reduce decimal value.
      * @return
      */
     public static String encodeDiff(Num current, Num previous, Num coefficient) {
@@ -241,12 +210,9 @@ public class LogCodec {
     /**
      * Compute diff value. If these are same value, empty string will be returned.
      * 
-     * @param current
-     *            A current value.
-     * @param previous
-     *            A previous value.
-     * @param coefficient
-     *            A coefficient to reduce decimal value.
+     * @param current A current value.
+     * @param previous A previous value.
+     * @param coefficient A coefficient to reduce decimal value.
      * @return
      */
     public static Num decodeDiff(String current, Num previous, Num coefficient) {
@@ -260,10 +226,8 @@ public class LogCodec {
     /**
      * Compute diff value. If these are same value, empty string will be returned.
      * 
-     * @param current
-     *            A current value.
-     * @param previous
-     *            A previous value.
+     * @param current A current value.
+     * @param previous A previous value.
      * @return
      */
     public static String encodeDiff(String current, String previous) {
@@ -277,10 +241,8 @@ public class LogCodec {
     /**
      * Compute diff value. If these are same value, empty string will be returned.
      * 
-     * @param current
-     *            A current value.
-     * @param previous
-     *            A previous value.
+     * @param current A current value.
+     * @param previous A previous value.
      * @return
      */
     public static String decodeDiff(String current, String previous) {
