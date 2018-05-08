@@ -277,7 +277,42 @@ public class MarketLog {
      * @return
      */
     public final Signal<Execution> at(ZonedDateTime date) {
+        // check cache
+        Path file = locateCache(date);
+
         return range(date, date.plusDays(1));
+    }
+
+    /**
+     * Locate local cache file by date.
+     * 
+     * @param dateTime A date info.
+     * @return
+     */
+    private Path locateCache(ZonedDateTime dateTime) {
+        String date = Chrono.DateCompact.format(dateTime);
+
+        // search compressed log
+        Path file = root.resolve("execution" + date + ".zlog");
+
+        if (Files.exists(file)) {
+            return file;
+        }
+
+        // search compact log
+        file = root.resolve("execution" + date + ".clog");
+
+        if (Files.exists(file)) {
+            return file;
+        }
+
+        // search normal log
+        file = root.resolve("execution" + date + ".log");
+
+        if (Files.exists(file)) {
+            return file;
+        }
+        return null;
     }
 
     /**
@@ -313,10 +348,8 @@ public class MarketLog {
     /**
      * Read log from the specified date.
      * 
-     * @param time
-     *            A duration.
-     * @param unit
-     *            A duration unit.
+     * @param time A duration.
+     * @param unit A duration unit.
      * @return
      */
     public final Signal<Execution> fromLast(int time, ChronoUnit unit) {
@@ -470,8 +503,7 @@ public class MarketLog {
     /**
      * Compute compact log file.
      * 
-     * @param file
-     *            A log file.
+     * @param file A log file.
      * @return
      */
     private Path computeCompactLogFile(Path file) {

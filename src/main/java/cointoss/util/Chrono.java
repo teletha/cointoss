@@ -26,6 +26,9 @@ public class Chrono {
     public static final DateTimeFormatter Date = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     /** Reusable format. */
+    public static final DateTimeFormatter DateCompact = DateTimeFormatter.ofPattern("yyyyMMdd");
+
+    /** Reusable format. */
     public static final DateTimeFormatter DateTime = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     /** Reusable format. */

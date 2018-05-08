@@ -51,16 +51,6 @@ public abstract class MarketService implements Disposable {
     public abstract Signal<Order> cancel(Order order);
 
     /**
-     * Acquire the execution sequential key (default is {@link Execution#id}).
-     * 
-     * @param execution A target execution.
-     * @return
-     */
-    public long executionKey(Execution execution) {
-        return execution.id;
-    }
-
-    /**
      * Acquire the execution log in realtime.
      * 
      * @return
@@ -74,6 +64,16 @@ public abstract class MarketService implements Disposable {
      * @return This {@link Signal} will be completed immediately.
      */
     public abstract Signal<Execution> executions(long key);
+
+    /**
+     * Acquire the execution sequential key (default is {@link Execution#id}).
+     * 
+     * @param execution A target execution.
+     * @return
+     */
+    protected long executionKey(Execution execution) {
+        return execution.id;
+    }
 
     /**
      * <p>
