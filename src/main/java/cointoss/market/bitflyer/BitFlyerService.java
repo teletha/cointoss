@@ -56,6 +56,8 @@ import viewtify.Viewtify;
  */
 public class BitFlyerService extends MarketService {
 
+    public static final BitFlyerService FX_BTC_JPY = new BitFlyerService("FX_BTC_JPY", false);
+
     /** The key for internal id. */
     private static final String InternalID = BitFlyerService.class.getName() + "#ID";
 
@@ -74,9 +76,6 @@ public class BitFlyerService extends MarketService {
 
     /** The position event. */
     private final Signaling<Execution> positions = new Signaling();
-
-    /** The market type. */
-    private final BitFlyer type;
 
     /** Flag for test. */
     private final boolean forTest;
@@ -107,8 +106,9 @@ public class BitFlyerService extends MarketService {
     /**
      * @param type
      */
-    BitFlyerService(BitFlyer type, boolean forTest) {
-        this.type = type;
+    BitFlyerService(String type, boolean forTest) {
+        super("BitFlyer", type);
+
         this.forTest = forTest;
 
         List<String> lines = Filer.read(".log/bitflyer/key.txt").toList();
@@ -141,7 +141,7 @@ public class BitFlyerService extends MarketService {
             request.child_order_type = order.isLimit() ? "LIMIT" : "MARKET";
             request.minute_to_expire = 60 * 24;
             request.price = order.price.toInt();
-            request.product_code = type.name();
+            request.product_code = marketName;
             request.side = order.side().name();
             request.size = order.size.toDouble();
             request.time_in_force = order.quantity().abbreviation;
@@ -154,7 +154,7 @@ public class BitFlyerService extends MarketService {
             request.minute_to_expire = 60 * 24;
             request.order_ref_id = id;
             request.price = order.price.toInt();
-            request.product_code = type.name();
+            request.product_code = marketName;
             request.side = order.side().name();
             request.size = order.size.toDouble();
             request.time_in_force = order.quantity().abbreviation;
@@ -182,7 +182,7 @@ public class BitFlyerService extends MarketService {
     @Override
     public Signal<Order> cancel(Order order) {
         CancelRequest cancel = new CancelRequest();
-        cancel.product_code = type.name();
+        cancel.product_code = marketName;
         cancel.account_id = accountId;
         cancel.order_id = (String) order.attributes.get(InternalID);
         cancel.child_order_acceptance_id = order.id;
@@ -208,7 +208,7 @@ public class BitFlyerService extends MarketService {
      */
     @Override
     public Signal<Execution> executions() {
-        return network.jsonRPC("wss://ws.lightstream.bitflyer.com/json-rpc", "lightning_executions_" + type)
+        return network.jsonRPC("wss://ws.lightstream.bitflyer.com/json-rpc", "lightning_executions_" + marketName)
                 .flatIterable(JsonElement::getAsJsonArray)
                 .map(JsonElement::getAsJsonObject)
                 .map(e -> {
@@ -327,8 +327,8 @@ public class BitFlyerService extends MarketService {
      */
     @Override
     public Signal<Execution> executions(long id) {
-        return call("GET", "/v1/executions?product_code=" + type
-                .name() + "&count=499&before=" + (id + 499), "", "*", BitFlyerExecution.class).as(Execution.class);
+        return call("GET", "/v1/executions?product_code=" + marketName + "&count=499&before=" + (id + 499), "", "*", BitFlyerExecution.class)
+                .as(Execution.class);
     }
 
     /**
@@ -336,7 +336,7 @@ public class BitFlyerService extends MarketService {
      */
     @Override
     public Signal<Order> orders() {
-        return call("GET", "/v1/me/getchildorders?child_order_state=ACTIVE&product_code=" + type.name(), "", "*", ChildOrderResponse.class)
+        return call("GET", "/v1/me/getchildorders?child_order_state=ACTIVE&product_code=" + marketName, "", "*", ChildOrderResponse.class)
                 .map(ChildOrderResponse::toOrder);
     }
 
@@ -380,7 +380,7 @@ public class BitFlyerService extends MarketService {
      * @return
      */
     private Signal<OrderBookListChange> snapshotOrderBook() {
-        return call("GET", "/v1/board?product_code=" + type, "", "", OrderBookListChange.class);
+        return call("GET", "/v1/board?product_code=" + marketName, "", "", OrderBookListChange.class);
     }
 
     /**
@@ -389,7 +389,7 @@ public class BitFlyerService extends MarketService {
      * @return
      */
     private Signal<OrderBookListChange> realtimeOrderBook() {
-        return network.jsonRPC("wss://ws.lightstream.bitflyer.com/json-rpc", "lightning_board_" + type)
+        return network.jsonRPC("wss://ws.lightstream.bitflyer.com/json-rpc", "lightning_board_" + marketName)
                 .map(JsonElement::getAsJsonObject)
                 .map(e -> {
                     OrderBookListChange change = new OrderBookListChange();
@@ -712,7 +712,7 @@ public class BitFlyerService extends MarketService {
         public String account_id = accountId;
 
         /** Generic parameter */
-        public String product_code = type.name();
+        public String product_code = marketName;
 
         /** Generic parameter */
         public String lang = "ja";

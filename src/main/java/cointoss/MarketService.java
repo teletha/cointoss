@@ -9,6 +9,8 @@
  */
 package cointoss;
 
+import java.util.Objects;
+
 import cointoss.order.Order;
 import cointoss.order.OrderBookListChange;
 import cointoss.util.Network;
@@ -21,8 +23,31 @@ import kiss.Signal;
  */
 public abstract class MarketService implements Disposable {
 
+    /** The exchange name. */
+    public final String exchangeName;
+
+    /** The market name. */
+    public final String marketName;
+
+    /** The identical market name. */
+    public final String fullName;
+
     /** The network accessor. */
     protected Network network = new Network();
+
+    /**
+     * @param exchangeName
+     * @param marketName
+     */
+    protected MarketService(String exchangeName, String marketName) {
+        this.exchangeName = Objects.requireNonNull(exchangeName);
+        this.marketName = Objects.requireNonNull(marketName);
+        this.fullName = exchangeName + " " + marketName;
+    }
+
+    public MarketLog log() {
+        return new MarketLog(this);
+    }
 
     /**
      * Estimate the curernt order delay (second).

@@ -13,7 +13,7 @@ import java.time.temporal.ChronoUnit;
 
 import cointoss.Side;
 import cointoss.Trader;
-import cointoss.market.bitflyer.BitFlyer;
+import cointoss.market.bitflyer.BitFlyerService;
 import cointoss.ticker.Tick;
 import cointoss.ticker.TickSpan;
 import cointoss.util.Num;
@@ -24,7 +24,7 @@ import cointoss.util.Num;
 class BackTestTest {
 
     public static void main(String[] args) {
-        BackTest.log(() -> BitFlyer.FX_BTC_JPY.log().at(2017, 6, 1)).currency(100000, 0).strategy(() -> new NOP()).trial(1).run();
+        BackTest.log(() -> BitFlyerService.FX_BTC_JPY.log().at(2017, 6, 1)).currency(100000, 0).strategy(() -> new NOP()).trial(1).run();
     }
 
     /**

@@ -39,7 +39,7 @@ import com.univocity.parsers.csv.CsvParserSettings;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
 
-import cointoss.market.bitflyer.BitFlyer;
+import cointoss.market.bitflyer.BitFlyerService;
 import cointoss.market.bitflyer.BitFlyerService.BitFlyerExecution;
 import cointoss.util.Chrono;
 import cointoss.util.Span;
@@ -64,7 +64,7 @@ public class MarketLog {
     private static final DateTimeFormatter fileName = DateTimeFormatter.ofPattern("yyyyMMdd");
 
     /** The market provider. */
-    private final MarketProvider provider;
+    private final MarketService service;
 
     /** The root directory of logs. */
     private final Path root;
@@ -92,9 +92,9 @@ public class MarketLog {
      * 
      * @param provider
      */
-    public MarketLog(MarketProvider provider) {
-        this.provider = Objects.requireNonNull(provider);
-        this.root = Paths.get(".log").resolve(provider.exchangeName()).resolve(provider.name());
+    public MarketLog(MarketService service) {
+        this.service = Objects.requireNonNull(service);
+        this.root = Paths.get(".log").resolve(service.exchangeName).resolve(service.marketName);
 
         try {
             ZonedDateTime start = null;
@@ -149,7 +149,7 @@ public class MarketLog {
 
             // read from realtime API
             if (disposer.isDisposed() == false) {
-                disposer.add(provider.service().executions().effect(e -> {
+                disposer.add(service.executions().effect(e -> {
                     if (e.id == 0) {
                         e.id = ++realtimeId;
                     }
@@ -211,7 +211,7 @@ public class MarketLog {
 
             while (disposer.isDisposed() == false) {
                 try {
-                    List<Execution> executions = provider.service().executions(latestId + 499 * offset).toList();
+                    List<Execution> executions = service.executions(latestId + 499 * offset).toList();
 
                     // skip if there is no new execution
                     if (executions.get(0).id == latestId) {
@@ -440,7 +440,7 @@ public class MarketLog {
                 Execution previous = null;
 
                 while ((row = parser.parseNext()) != null) {
-                    observer.accept(previous = provider.service().decode(row, hasCompact ? previous : null));
+                    observer.accept(previous = service.decode(row, hasCompact ? previous : null));
                 }
 
                 parser.stopParsing();
@@ -490,7 +490,7 @@ public class MarketLog {
             String[] row = null;
             while ((row = parser.parseNext()) != null) {
                 BitFlyerExecution current = BitFlyerExecution.parse(row, previous);
-                writer.writeRow(provider.service().encode(current, previous));
+                writer.writeRow(service.encode(current, previous));
                 previous = current;
             }
             writer.close();
@@ -511,7 +511,7 @@ public class MarketLog {
     }
 
     public static void main(String[] args) {
-        MarketLog log = new MarketLog(BitFlyer.FX_BTC_JPY);
+        MarketLog log = new MarketLog(BitFlyerService.FX_BTC_JPY);
         long start = System.currentTimeMillis();
         Filer.walk(log.root, "*.log").to(file -> {
             long s = System.currentTimeMillis();
@@ -528,7 +528,7 @@ public class MarketLog {
      * @param args
      */
     public static void main2(String[] args) {
-        MarketLog log = new MarketLog(BitFlyer.FX_BTC_JPY);
+        MarketLog log = new MarketLog(BitFlyerService.FX_BTC_JPY);
 
         Filer.walk(log.root, "*.log").to(file -> {
             log.compact(file);

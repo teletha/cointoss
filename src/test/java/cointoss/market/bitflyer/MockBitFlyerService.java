@@ -29,7 +29,7 @@ class MockBitFlyerService extends BitFlyerService {
      * 
      */
     MockBitFlyerService() {
-        super(BitFlyer.FX_BTC_JPY, true);
+        super("FX_BTC_JPY", true);
 
         network = mockNetwork = new MockNetwork();
     }

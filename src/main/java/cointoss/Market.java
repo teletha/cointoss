@@ -49,9 +49,6 @@ public class Market implements Disposable {
 
     private final AtomicReference<Execution> switcher = new AtomicReference<>(SEED);
 
-    /** The market provider. */
-    protected final MarketProvider provider;
-
     /** The market handler. */
     protected final MarketService service;
 
@@ -127,9 +124,8 @@ public class Market implements Disposable {
      * 
      * @param provider A market provider.
      */
-    public Market(MarketProvider provider) {
-        this.provider = Objects.requireNonNull(provider, "Market is not found.");
-        this.service = provider.service();
+    public Market(MarketService service) {
+        this.service = Objects.requireNonNull(service, "Market is not found.");
 
         // build tickers for each span
         for (TickSpan span : TickSpan.values()) {
@@ -294,7 +290,7 @@ public class Market implements Disposable {
      * @return
      */
     public final Market readLog(Function<MarketLog, Signal<Execution>> log) {
-        service.add(log.apply(provider.log()).to(this::tick));
+        service.add(log.apply(service.log()).to(this::tick));
 
         return this;
     }

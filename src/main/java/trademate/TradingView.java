@@ -14,7 +14,7 @@ import java.time.temporal.ChronoUnit;
 import javafx.scene.layout.AnchorPane;
 
 import cointoss.Market;
-import cointoss.market.bitflyer.BitFlyer;
+import cointoss.MarketService;
 import cointoss.order.Order;
 import cointoss.ticker.TickSpan;
 import cointoss.util.Chrono;
@@ -40,7 +40,7 @@ import viewtify.ui.UITab;
  */
 public class TradingView extends View {
 
-    public final BitFlyer provider;
+    public final MarketService service;
 
     private final UITab tab;
 
@@ -78,8 +78,8 @@ public class TradingView extends View {
     /**
      * @param tab
      */
-    public TradingView(BitFlyer provider, UITab tab) {
-        this.provider = provider;
+    public TradingView(MarketService service, UITab tab) {
+        this.service = service;
         this.tab = tab;
     }
 
@@ -116,7 +116,7 @@ public class TradingView extends View {
      */
     @Override
     protected String name() {
-        return TradingView.class.getSimpleName() + View.IDSeparator + provider.fullName();
+        return TradingView.class.getSimpleName() + View.IDSeparator + service.fullName;
     }
 
     /**
@@ -126,7 +126,7 @@ public class TradingView extends View {
      */
     public final synchronized Market market() {
         if (market == null) {
-            Viewtify.Terminator.add(market = new Market(provider).readLog(log -> log.fromLast(2, ChronoUnit.HOURS).share()));
+            Viewtify.Terminator.add(market = new Market(service).readLog(log -> log.fromLast(2, ChronoUnit.HOURS).share()));
         }
         return market;
     }
