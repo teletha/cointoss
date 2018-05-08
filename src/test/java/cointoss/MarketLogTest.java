@@ -16,7 +16,10 @@ import org.junit.jupiter.api.Test;
  */
 class MarketLogTest {
 
+    private MockMarketService service = new MockMarketService();
+
     @Test
     void testName() {
+        MarketLog log = new MarketLog(service);
     }
 }
