@@ -16,7 +16,6 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import cointoss.Execution;
-import cointoss.MarketLog;
 import cointoss.MarketService;
 import cointoss.order.Order;
 import cointoss.order.Order.Quantity;
@@ -64,14 +63,6 @@ class TestableMarketService extends MarketService {
     TestableMarketService(Time lag) {
         super("TestableExchange", "TestableMarket");
         this.lag = lag;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public MarketLog log() {
-        return new MarketLog(this);
     }
 
     /**

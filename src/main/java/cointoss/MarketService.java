@@ -32,6 +32,9 @@ public abstract class MarketService implements Disposable {
     /** The identical market name. */
     public final String fullName;
 
+    /** The execution log. */
+    public final MarketLog log;
+
     /** The network accessor. */
     protected Network network = new Network();
 
@@ -43,10 +46,7 @@ public abstract class MarketService implements Disposable {
         this.exchangeName = Objects.requireNonNull(exchangeName);
         this.marketName = Objects.requireNonNull(marketName);
         this.fullName = exchangeName + " " + marketName;
-    }
-
-    public MarketLog log() {
-        return new MarketLog(this);
+        this.log = new MarketLog(this);
     }
 
     /**

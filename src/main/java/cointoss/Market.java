@@ -290,7 +290,7 @@ public class Market implements Disposable {
      * @return
      */
     public final Market readLog(Function<MarketLog, Signal<Execution>> log) {
-        service.add(log.apply(service.log()).to(this::tick));
+        service.add(log.apply(service.log).to(this::tick));
 
         return this;
     }

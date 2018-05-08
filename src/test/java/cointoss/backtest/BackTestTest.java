@@ -24,7 +24,7 @@ import cointoss.util.Num;
 class BackTestTest {
 
     public static void main(String[] args) {
-        BackTest.log(() -> BitFlyerService.FX_BTC_JPY.log().at(2017, 6, 1)).currency(100000, 0).strategy(() -> new NOP()).trial(1).run();
+        BackTest.log(() -> BitFlyerService.FX_BTC_JPY.log.at(2017, 6, 1)).currency(100000, 0).strategy(() -> new NOP()).trial(1).run();
     }
 
     /**
