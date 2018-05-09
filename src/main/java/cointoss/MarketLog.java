@@ -39,7 +39,6 @@ import com.univocity.parsers.csv.CsvParserSettings;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
 
-import cointoss.market.bitflyer.BitFlyerService;
 import cointoss.market.bitflyer.BitFlyerService.BitFlyerExecution;
 import cointoss.util.Chrono;
 import cointoss.util.Span;
@@ -93,8 +92,18 @@ public class MarketLog {
      * @param provider
      */
     public MarketLog(MarketService service) {
+        this(service, Paths.get(".log").resolve(service.exchangeName).resolve(service.marketName));
+    }
+
+    /**
+     * Create log manager with the specified log store directory.
+     * 
+     * @param service A market service.
+     * @param root A log store directory.
+     */
+    MarketLog(MarketService service, Path root) {
         this.service = Objects.requireNonNull(service);
-        this.root = Paths.get(".log").resolve(service.exchangeName).resolve(service.marketName);
+        this.root = Objects.requireNonNull(root);
 
         try {
             ZonedDateTime start = null;
@@ -277,10 +286,21 @@ public class MarketLog {
      * @return
      */
     public final Signal<Execution> at(ZonedDateTime date) {
+        if (date.isBefore(service.start())) {
+            return Signal.EMPTY;
+        }
+
         // check cache
         Path file = locateCache(date);
 
-        return range(date, date.plusDays(1));
+        // no cache
+        if (file == null) {
+            // try the previous day
+            System.out.println(date);
+            return at(date.minusDays(1));
+        }
+
+        return null;
     }
 
     /**
@@ -510,28 +530,28 @@ public class MarketLog {
         return file.resolveSibling(file.getFileName().toString().replace(".log", ".clog"));
     }
 
-    public static void main(String[] args) {
-        MarketLog log = new MarketLog(BitFlyerService.FX_BTC_JPY);
-        long start = System.currentTimeMillis();
-        Filer.walk(log.root, "*.log").to(file -> {
-            long s = System.currentTimeMillis();
-            log.read(file).to(e -> {
-            });
-            long e = System.currentTimeMillis();
-            System.out.println("Done " + file + "  " + (e - s));
-        });
-        long end = System.currentTimeMillis();
-        System.out.println(end - start);
-    }
-
-    /**
-     * @param args
-     */
-    public static void main2(String[] args) {
-        MarketLog log = new MarketLog(BitFlyerService.FX_BTC_JPY);
-
-        Filer.walk(log.root, "*.log").to(file -> {
-            log.compact(file);
-        });
-    }
+    // public static void main(String[] args) {
+    // MarketLog log = new MarketLog(BitFlyerService.FX_BTC_JPY);
+    // long start = System.currentTimeMillis();
+    // Filer.walk(log.root, "*.log").to(file -> {
+    // long s = System.currentTimeMillis();
+    // log.read(file).to(e -> {
+    // });
+    // long e = System.currentTimeMillis();
+    // System.out.println("Done " + file + " " + (e - s));
+    // });
+    // long end = System.currentTimeMillis();
+    // System.out.println(end - start);
+    // }
+    //
+    // /**
+    // * @param args
+    // */
+    // public static void main2(String[] args) {
+    // MarketLog log = new MarketLog(BitFlyerService.FX_BTC_JPY);
+    //
+    // Filer.walk(log.root, "*.log").to(file -> {
+    // log.compact(file);
+    // });
+    // }
 }

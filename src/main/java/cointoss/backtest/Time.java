@@ -17,7 +17,7 @@ import cointoss.util.Generator;
 /**
  * @version 2018/04/29 15:42:50
  */
-class Time {
+public class Time {
 
     /** The base time */
     static final ZonedDateTime BASE = ZonedDateTime.of(2012, 1, 1, 0, 0, 0, 0, Chrono.UTC);
@@ -61,7 +61,7 @@ class Time {
      * @param seconds
      * @return
      */
-    static Time at(int seconds) {
+    public static Time at(int seconds) {
         return new Time(seconds, seconds);
     }
 
@@ -72,7 +72,7 @@ class Time {
      * @param end
      * @return
      */
-    static Time lag(int start, int end) {
+    public static Time lag(int start, int end) {
         return new Time(start, end);
     }
 }

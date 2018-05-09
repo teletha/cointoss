@@ -23,21 +23,21 @@ import kiss.Table;
 /**
  * @version 2018/04/29 16:07:28
  */
-class TestableMarket extends Market {
+public class TestableMarket extends Market {
 
     /**
      * @param service
      * @param builder
      * @param strategy
      */
-    TestableMarket() {
+    public TestableMarket() {
         super(new TestableMarketService(Time.at(0)));
     }
 
     /**
      * @param delay
      */
-    TestableMarket(int delay) {
+    public TestableMarket(int delay) {
         super(new TestableMarketService(Time.at(delay)));
     }
 
@@ -48,7 +48,7 @@ class TestableMarket extends Market {
      * @param size
      * @param price
      */
-    TestableMarket execute(int size, int price) {
+    public TestableMarket execute(int size, int price) {
         return execute(Side.random(), size, price);
     }
 
@@ -59,7 +59,7 @@ class TestableMarket extends Market {
      * @param size
      * @param price
      */
-    TestableMarket execute(int size, int price, int time) {
+    public TestableMarket execute(int size, int price, int time) {
         return execute(Side.random(), size, price, at(time));
     }
 
@@ -70,7 +70,7 @@ class TestableMarket extends Market {
      * @param size
      * @param price
      */
-    TestableMarket execute(Side side, int size, int price) {
+    public TestableMarket execute(Side side, int size, int price) {
         return execute(side, size, price, at(0));
     }
 
@@ -81,7 +81,7 @@ class TestableMarket extends Market {
      * @param size
      * @param price
      */
-    TestableMarket execute(Side side, Num size, Num price) {
+    public TestableMarket execute(Side side, Num size, Num price) {
         return execute(side, size, price, at(0));
     }
 
@@ -92,7 +92,7 @@ class TestableMarket extends Market {
      * @param size
      * @param price
      */
-    TestableMarket execute(Side side, int size, int price, Time lag) {
+    public TestableMarket execute(Side side, int size, int price, Time lag) {
         return execute(side, Num.of(size), Num.of(price), lag);
     }
 
@@ -103,7 +103,7 @@ class TestableMarket extends Market {
      * @param size
      * @param price
      */
-    TestableMarket execute(Side side, Num size, Num price, Time lag) {
+    public TestableMarket execute(Side side, Num size, Num price, Time lag) {
         Execution e = new Execution();
         e.side = side;
         e.size = e.cumulativeSize = size;
@@ -120,7 +120,7 @@ class TestableMarket extends Market {
      * @param size
      * @param price
      */
-    TestableMarket execute(Execution e) {
+    public TestableMarket execute(Execution e) {
         tick(((TestableMarketService) service).emulate(e));
         return this;
     }
@@ -130,7 +130,7 @@ class TestableMarket extends Market {
      * 
      * @param limitShort
      */
-    void requestAndExecution(Order order) {
+    public void requestAndExecution(Order order) {
         request(order).to(id -> {
             execute(order.side, order.size, order.price);
         });
@@ -143,7 +143,7 @@ class TestableMarket extends Market {
      * 
      * @param order
      */
-    Order requestTo(Order order) {
+    public Order requestTo(Order order) {
         request(order).to();
 
         return order;
@@ -159,7 +159,7 @@ class TestableMarket extends Market {
      * @param rejected
      * @return
      */
-    boolean validateOrderState(int active, int completed, int canceled, int expired, int rejected) {
+    public boolean validateOrderState(int active, int completed, int canceled, int expired, int rejected) {
         Table<State, Order> state = service.orders().toTable(o -> o.state.v);
 
         assert state.get(State.ACTIVE).size() == active;
@@ -177,7 +177,7 @@ class TestableMarket extends Market {
      * @param i
      * @return
      */
-    boolean validateExecutionState(int executed) {
+    public boolean validateExecutionState(int executed) {
         assert service.executions().toList().size() == executed;
 
         return true;

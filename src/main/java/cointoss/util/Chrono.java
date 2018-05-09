@@ -15,7 +15,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 /**
- * @version 2018/02/15 14:56:42
+ * @version 2018/05/09 13:24:12
  */
 public class Chrono {
 
@@ -67,6 +67,18 @@ public class Chrono {
      */
     public static ZonedDateTime utc(double mills) {
         return utc((long) mills);
+    }
+
+    /**
+     * UTC {@link ZonedDateTime} at the specified date.
+     * 
+     * @param year A year.
+     * @param month A month.
+     * @param day A day of month.
+     * @return
+     */
+    public static ZonedDateTime utc(int year, int month, int day) {
+        return ZonedDateTime.of(year, month, day, 0, 0, 0, 0, UTC);
     }
 
     /**

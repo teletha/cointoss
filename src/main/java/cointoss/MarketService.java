@@ -9,6 +9,7 @@
  */
 package cointoss;
 
+import java.time.ZonedDateTime;
 import java.util.Objects;
 
 import cointoss.order.Order;
@@ -48,6 +49,13 @@ public abstract class MarketService implements Disposable {
         this.fullName = exchangeName + " " + marketName;
         this.log = new MarketLog(this);
     }
+
+    /**
+     * Acquire the market starting date.
+     * 
+     * @return
+     */
+    public abstract ZonedDateTime start();
 
     /**
      * Estimate the curernt order delay (second).

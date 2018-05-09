@@ -11,6 +11,7 @@ package cointoss.market.bitflyer;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.HashMap;
@@ -52,7 +53,7 @@ import okhttp3.RequestBody;
 import viewtify.Viewtify;
 
 /**
- * @version 2018/04/30 17:38:26
+ * @version 2018/05/09 13:24:26
  */
 public class BitFlyerService extends MarketService {
 
@@ -118,6 +119,14 @@ public class BitFlyerService extends MarketService {
         this.password = lines.get(3);
         this.accountId = lines.get(4);
         this.intervalOrderCheck = I.signal(0, 1, TimeUnit.SECONDS).map(v -> orders().toList()).share();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ZonedDateTime start() {
+        return Chrono.utc(2017, 4, 1);
     }
 
     /**

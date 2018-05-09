@@ -10,6 +10,7 @@
 package cointoss.backtest;
 
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.concurrent.ConcurrentLinkedDeque;
@@ -22,6 +23,7 @@ import cointoss.order.Order.Quantity;
 import cointoss.order.Order.State;
 import cointoss.order.OrderBookListChange;
 import cointoss.order.OrderType;
+import cointoss.util.Chrono;
 import cointoss.util.Num;
 import kiss.Disposable;
 import kiss.I;
@@ -31,7 +33,7 @@ import kiss.Signaling;
 /**
  * @version 2018/05/08 16:08:12
  */
-class TestableMarketService extends MarketService {
+public class TestableMarketService extends MarketService {
 
     /** The terminator. */
     private final Disposable diposer = Disposable.empty();
@@ -60,9 +62,17 @@ class TestableMarketService extends MarketService {
     /**
     * 
     */
-    TestableMarketService(Time lag) {
+    public TestableMarketService(Time lag) {
         super("TestableExchange", "TestableMarket");
         this.lag = lag;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ZonedDateTime start() {
+        return Chrono.utcNow().truncatedTo(ChronoUnit.DAYS).minusDays(7);
     }
 
     /**
@@ -132,9 +142,7 @@ class TestableMarketService extends MarketService {
      */
     @Override
     public Signal<Execution> executions(long id) {
-        // If this exception will be thrown, it is bug of this program. So we must rethrow the
-        // wrapped error in here.
-        throw new Error();
+        return I.signal(executeds);
     }
 
     /**
