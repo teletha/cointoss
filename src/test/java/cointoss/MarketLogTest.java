@@ -14,8 +14,6 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 
 import antibug.CleanRoom;
 import cointoss.backtest.TestableMarket;
-import cointoss.backtest.TestableMarketService;
-import cointoss.backtest.Time;
 import cointoss.util.Chrono;
 
 /**
@@ -28,9 +26,7 @@ class MarketLogTest {
 
     TestableMarket market = new TestableMarket();
 
-    TestableMarketService service = new TestableMarketService(Time.lag(0, 0));
-
-    MarketLog log = new MarketLog(service, room.root);
+    MarketLog log = new MarketLog(market.service, room.root);
 
     @Test
     void logAtNoServicedDate() {

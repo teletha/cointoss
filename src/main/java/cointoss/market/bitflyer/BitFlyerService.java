@@ -285,8 +285,8 @@ public class BitFlyerService extends MarketService {
 
     /**
      * <p>
-     * Analyze Taker's order ID and obtain approximate order time (Since there is a bot which
-     * specifies non-standard id format, ignore it in that case).
+     * Analyze Taker's order ID and obtain approximate order time (Since there is a bot which specifies
+     * non-standard id format, ignore it in that case).
      * </p>
      * <ol>
      * <li>Execution Date : UTC</li>
@@ -781,6 +781,15 @@ public class BitFlyerService extends MarketService {
                                     : Execution.ConsecutiveDifference;
 
             return exe;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String toString() {
+            return id + " " + exec_date.toLocalDateTime() + " " + side
+                    .mark() + " " + price + " " + size + " " + buy_child_order_acceptance_id + " " + sell_child_order_acceptance_id;
         }
     }
 }
