@@ -11,16 +11,13 @@ package cointoss.market.bitflyer;
 
 import static cointoss.MarketTestSupport.*;
 
-import java.time.ZonedDateTime;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
 import cointoss.Execution;
 import cointoss.Side;
-import cointoss.market.bitflyer.BitFlyerService.BitFlyerExecution;
 import cointoss.order.Order;
-import cointoss.util.Chrono;
 
 /**
  * @version 2018/04/26 10:38:43
@@ -28,46 +25,6 @@ import cointoss.util.Chrono;
 public class BitFlyerServiceTest {
 
     MockBitFlyerService service = new MockBitFlyerService();
-
-    @Test
-    void compactSameDelay() {
-        Execution first = buy(10, 1).delay(5);
-        Execution second = buy(10, 1).delay(5);
-
-        String[] encoded = service.encode(second, first);
-        Execution decoded = service.decode(encoded, first);
-        assert decoded.equals(second);
-    }
-
-    @Test
-    void compactGreaterDelay() {
-        Execution first = buy(10, 1).delay(5);
-        Execution second = buy(10, 1).delay(7);
-
-        String[] encoded = service.encode(second, first);
-        Execution decoded = service.decode(encoded, first);
-        assert decoded.equals(second);
-    }
-
-    @Test
-    void compactLesserDelay() {
-        Execution first = sell(10, 0.07).consecutive(Execution.ConsecutiveDifference).delay(37);
-        Execution second = sell(10, 0.93).consecutive(Execution.ConsecutiveSameSeller).delay(37);
-
-        String[] encoded = service.encode(second, first);
-        Execution decoded = service.decode(encoded, first);
-        assert decoded.equals(second);
-    }
-
-    @Test
-    void test() {
-        Execution first = buy(10, 1).delay(5);
-        Execution second = buy(10, 1).delay(7);
-
-        String[] encoded = service.encode(second, first);
-        Execution decoded = service.decode(encoded, first);
-        assert decoded.equals(second);
-    }
 
     @Test
     void compactSameConsecutiveType() {
@@ -93,25 +50,6 @@ public class BitFlyerServiceTest {
     void normalize() {
         assert BitFlyerService.normalize("2018-04-26T00:32:26.1234567Z").equals("2018-04-26T00:32:26.123");
         assert BitFlyerService.normalize("2018-04-26T00:32:26.19Z").equals("2018-04-26T00:32:26.190");
-    }
-
-    @Test
-    void estimateDelay() {
-        BitFlyerExecution exe = new BitFlyerExecution();
-        exe.side = Side.SELL;
-        exe.exec_date = ZonedDateTime.of(2018, 4, 27, 9, 0, 6, 500000000, Chrono.UTC);
-
-        // user order id
-        exe.sell_child_order_acceptance_id = "JRF20180427-180006-597220";
-        assert BitFlyerService.estimateDelay(exe) == 1;
-
-        // illegal id
-        exe.sell_child_order_acceptance_id = "ABCDEFGHIJKLMN";
-        assert BitFlyerService.estimateDelay(exe) == 0;
-
-        // server order id
-        exe.sell_child_order_acceptance_id = "JRF20180427-090006-597220";
-        assert BitFlyerService.estimateDelay(exe) == -2;
     }
 
     @Test

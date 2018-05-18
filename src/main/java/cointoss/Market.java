@@ -160,12 +160,12 @@ public class Market implements Disposable {
 
                     order.listeners.accept(e);
 
-                    // Position position = new Position();
-                    // position.side = order.side;
-                    // position.price = e.price;
-                    // position.size.set(e.size);
-                    // position.date = e.exec_date;
-                    // positions.add(position);
+                    Position position = new Position();
+                    position.side = order.side;
+                    position.price = e.price;
+                    position.size.set(e.size);
+                    position.date = e.exec_date;
+                    positions.add(position);
                 }
             }
         }));

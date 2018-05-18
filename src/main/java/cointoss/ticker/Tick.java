@@ -60,11 +60,6 @@ public class Tick {
     /** Volume of the period */
     public Num shortPriceDecrease = Num.ZERO;
 
-    private long count = 0;
-
-    /** Average delay time of the period */
-    public Num delay = Num.ZERO;
-
     /**
      * Decode.
      * 
@@ -104,10 +99,6 @@ public class Tick {
         lowPrice = Num.min(lowPrice, exe.price);
         volume = volume.plus(exe.size);
         amount = amount.plus(exe.price.multiply(exe.size));
-
-        if (1 <= exe.delay && exe.delay < 100) {
-            delay = delay.multiply(count).plus(exe.delay).divide(++count);
-        }
 
         if (exe.side.isBuy()) {
             longVolume = longVolume.plus(exe.size);

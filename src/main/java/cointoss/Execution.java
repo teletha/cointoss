@@ -22,18 +22,6 @@ import kiss.Encoder;
  */
 public class Execution {
 
-    /** The order delay type. (DEFAULT) */
-    public static final int DelayUnknown = 0;
-
-    /** The order delay type. */
-    public static final int DelayInestimable = -1;
-
-    /** The order delay type. */
-    public static final int DelayServerOrder = -2;
-
-    /** The order delay type. */
-    public static final int DelayHuge = -3;
-
     /** The consecutive type. (DEFAULT) */
     public static final int ConsecutiveDifference = 0;
 
@@ -70,12 +58,6 @@ public class Execution {
 
     /** date */
     public ZonedDateTime exec_date;
-
-    /**
-     * Optional Attribute : The rough estimated delay time (unit : second). The negative value means
-     * special info.
-     */
-    public int delay;
 
     /** Optional Attribute : The consecutive type. */
     public int consecutive;
@@ -138,18 +120,6 @@ public class Execution {
     }
 
     /**
-     * Set the rough estimated delay time (unit : second). The negative value means special info.
-     * 
-     * @param delay
-     * @return This {@link Execution}.
-     */
-    public final Execution delay(int delay) {
-        this.delay = delay;
-
-        return this;
-    }
-
-    /**
      * Set the consecutive type.
      * 
      * @param consecutivesamebuyer2
@@ -166,7 +136,7 @@ public class Execution {
      */
     @Override
     public String toString() {
-        return id + " " + exec_date.toLocalDateTime() + " " + side.mark() + " " + price + " " + size + " " + delay + " " + consecutive;
+        return id + " " + exec_date.toLocalDateTime() + " " + side.mark() + " " + price + " " + size + " " + consecutive;
     }
 
     /**
@@ -197,10 +167,6 @@ public class Execution {
         }
 
         if (exec_date.isEqual(other.exec_date) == false) {
-            return false;
-        }
-
-        if (delay != other.delay) {
             return false;
         }
 
