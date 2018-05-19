@@ -86,6 +86,9 @@ public class MarketLog {
     /** The current processing cache file. */
     private BufferedWriter cache;
 
+    /** The current log writer. */
+    private Cache logger;
+
     /**
      * Create log manager.
      * 
@@ -104,6 +107,7 @@ public class MarketLog {
     MarketLog(MarketService service, Path root) {
         this.service = Objects.requireNonNull(service);
         this.root = Objects.requireNonNull(root);
+        this.logger = new Cache(ZonedDateTime.of(2000, 1, 1, 0, 0, 0, 0, Chrono.UTC));
 
         try {
             ZonedDateTime start = null;
@@ -191,7 +195,7 @@ public class MarketLog {
                     if (cache == null || cacheLast.isBefore(date)) {
                         I.quiet(cache);
 
-                        final File file = localCacheFile(date).toFile();
+                        final File file = locateCacheLog(date).toFile();
                         file.createNewFile();
 
                         cache = new BufferedWriter(new FileWriter(file, true));
@@ -430,7 +434,7 @@ public class MarketLog {
      * @return
      */
     public final Signal<Execution> read(ZonedDateTime date) {
-        return read(localCacheFile(date));
+        return read(locateCacheLog(date));
     }
 
     /**
@@ -439,7 +443,7 @@ public class MarketLog {
      * @param file
      * @return
      */
-    public final Signal<Execution> read(Path file) {
+    private final Signal<Execution> read(Path file) {
         return new Signal<>((observer, disposer) -> {
             try {
                 Path compact = computeCompactLogFile(file);
@@ -472,13 +476,23 @@ public class MarketLog {
     }
 
     /**
-     * Read log from local cache.
+     * Locate local cache by the specified date.
      * 
      * @param date
      * @return
      */
-    private final Path localCacheFile(ZonedDateTime date) {
+    final Path locateCacheLog(ZonedDateTime date) {
         return root.resolve("execution" + fileName.format(date) + ".log");
+    }
+
+    /**
+     * Locate local compressed cache by the specified date.
+     * 
+     * @param date
+     * @return
+     */
+    final Path locateCompressedLog(ZonedDateTime date) {
+        return root.resolve("execution" + fileName.format(date) + ".clog");
     }
 
     /**
@@ -528,6 +542,67 @@ public class MarketLog {
      */
     private Path computeCompactLogFile(Path file) {
         return file.resolveSibling(file.getFileName().toString().replace(".log", ".clog"));
+    }
+
+    /**
+     * Write the specified {@link Execution} to log file.
+     * 
+     * @param execution
+     */
+    void writeLog(Execution execution) {
+        if (logger.date.equals(execution.exec_date.toLocalDate())) {
+            logger.write(execution);
+        } else {
+
+        }
+    }
+
+    /**
+     * @version 2018/05/19 12:17:09
+     */
+    private class Cache {
+
+        /** The target date. */
+        private final LocalDate date;
+
+        /** The log file. */
+        private final Path log;
+
+        /** The compressed log file. */
+        private final Path compressed;
+
+        /** The latest id. */
+        private long latest;
+
+        /**
+         * @param date
+         */
+        private Cache(ZonedDateTime date) {
+            this.date = date.toLocalDate();
+            this.log = locateCacheLog(date);
+            this.compressed = locateCompressedLog(date);
+        }
+
+        /**
+         * Read cached date.
+         * 
+         * @return
+         */
+        private Signal<Execution> read() {
+            return new Signal<>((observer, disposer) -> {
+
+                return disposer;
+            });
+        }
+
+        /**
+         * Write {@link Execution} log.
+         * 
+         * @param execution
+         */
+        private void write(Execution execution) {
+            System.out.println(execution);
+        }
     }
 
     // public static void main(String[] args) {
