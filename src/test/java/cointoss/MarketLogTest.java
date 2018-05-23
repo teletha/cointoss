@@ -66,7 +66,7 @@ class MarketLogTest {
         exes.add(buy(10, 1));
         exes.add(buy(10, 1));
         exes.add(buy(12, 1));
-        exes.add(buy(14.5, 1));
+        exes.add(buy(13.4, 1));
         exes.add(buy(10, 1));
         exes.add(buy(3.33, 1));
 
@@ -81,43 +81,82 @@ class MarketLogTest {
     }
 
     @Test
-    void compactSameSide() {
-        Execution first = buy(10, 1);
-        Execution second = buy(10, 1);
+    void compactSide() {
+        List<Execution> exes = new ArrayList();
+        exes.add(buy(10, 1));
+        exes.add(buy(10, 1));
+        exes.add(sell(10, 1));
+        exes.add(sell(10, 1));
 
-        String[] encoded = service.encode(second, first);
-        Execution decoded = service.decode(encoded, first);
-        assert decoded.equals(second);
+        for (int i = 1; i < exes.size(); i++) {
+            Execution current = exes.get(i);
+            Execution previous = exes.get(i - 1);
+
+            String[] encoded = service.encode(current, previous);
+            Execution decoded = service.decode(encoded, previous);
+            assert decoded.equals(current);
+        }
     }
 
     @Test
-    void compactDiffSide() {
-        Execution first = buy(10, 1);
-        Execution second = sell(10, 1);
+    void compactId() {
+        List<Execution> exes = new ArrayList();
+        exes.add(buy(10, 1).id(10));
+        exes.add(buy(10, 1).id(12));
+        exes.add(sell(10, 1).id(13));
+        exes.add(sell(10, 1).id(19));
 
-        String[] encoded = service.encode(second, first);
-        Execution decoded = service.decode(encoded, first);
-        assert decoded.equals(second);
+        for (int i = 1; i < exes.size(); i++) {
+            Execution current = exes.get(i);
+            Execution previous = exes.get(i - 1);
+
+            String[] encoded = service.encode(current, previous);
+            Execution decoded = service.decode(encoded, previous);
+            assert decoded.equals(current);
+        }
     }
 
     @Test
-    void compactSameConsecutiveType() {
-        Execution first = buy(10, 1).consecutive(Execution.ConsecutiveSameBuyer);
-        Execution second = buy(10, 1).consecutive(Execution.ConsecutiveSameBuyer);
+    void compactDate() {
+        List<Execution> exes = new ArrayList();
+        exes.add(buy(10, 1).date(2018, 5, 1, 10, 0, 0, 0));
+        exes.add(buy(10, 1).date(2018, 5, 1, 10, 0, 0, 100));
+        exes.add(buy(10, 1).date(2018, 5, 1, 10, 0, 40, 100));
+        exes.add(buy(10, 1).date(2018, 5, 1, 10, 33, 40, 100));
+        exes.add(buy(10, 1).date(2018, 5, 1, 22, 33, 40, 100));
+        exes.add(buy(10, 1).date(2018, 5, 9, 22, 33, 40, 100));
+        exes.add(buy(10, 1).date(2018, 11, 9, 22, 33, 40, 100));
+        exes.add(buy(10, 1).date(2020, 11, 9, 22, 33, 40, 100));
 
-        String[] encoded = service.encode(second, first);
-        Execution decoded = service.decode(encoded, first);
-        assert decoded.equals(second);
+        for (int i = 1; i < exes.size(); i++) {
+            Execution current = exes.get(i);
+            Execution previous = exes.get(i - 1);
+
+            String[] encoded = service.encode(current, previous);
+            Execution decoded = service.decode(encoded, previous);
+            assert decoded.equals(current);
+        }
     }
 
     @Test
-    void compactDiffConsecutiveType() {
-        Execution first = buy(10, 1).consecutive(Execution.ConsecutiveSameBuyer);
-        Execution second = buy(10, 1).consecutive(Execution.ConsecutiveDifference);
+    void compactConsecutiveType() {
+        List<Execution> exes = new ArrayList();
+        exes.add(buy(10, 1).consecutive(Execution.ConsecutiveDifference));
+        exes.add(buy(10, 1).consecutive(Execution.ConsecutiveDifference));
+        exes.add(buy(10, 1).consecutive(Execution.ConsecutiveSameBuyer));
+        exes.add(buy(10, 1).consecutive(Execution.ConsecutiveSameSeller));
+        exes.add(buy(10, 1).consecutive(Execution.ConsecutiveSameSeller));
+        exes.add(buy(10, 1).consecutive(Execution.ConsecutiveSameBuyer));
+        exes.add(buy(10, 1).consecutive(Execution.ConsecutiveDifference));
 
-        String[] encoded = service.encode(second, first);
-        Execution decoded = service.decode(encoded, first);
-        assert decoded.equals(second);
+        for (int i = 1; i < exes.size(); i++) {
+            Execution current = exes.get(i);
+            Execution previous = exes.get(i - 1);
+
+            String[] encoded = service.encode(current, previous);
+            Execution decoded = service.decode(encoded, previous);
+            assert decoded.equals(current);
+        }
     }
 
     @Test

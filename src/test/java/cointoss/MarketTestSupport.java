@@ -16,10 +16,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 
+import cointoss.util.Chrono;
 import cointoss.util.Num;
 
 /**
- * @version 2018/04/29 21:47:23
+ * @version 2018/05/23 17:41:24
  */
 public class MarketTestSupport {
 
@@ -33,7 +34,7 @@ public class MarketTestSupport {
      * @param size
      * @return
      */
-    public static Execution buy(double price, double size) {
+    public static ChainableExecution buy(double price, double size) {
         return buy(Num.of(price), Num.of(size));
     }
 
@@ -44,7 +45,7 @@ public class MarketTestSupport {
      * @param size
      * @return
      */
-    public static Execution buy(Num price, Num size) {
+    public static ChainableExecution buy(Num price, Num size) {
         return execution(Side.BUY, price, size);
     }
 
@@ -55,7 +56,7 @@ public class MarketTestSupport {
      * @param size
      * @return
      */
-    public static Execution sell(double price, double size) {
+    public static ChainableExecution sell(double price, double size) {
         return sell(Num.of(price), Num.of(size));
     }
 
@@ -66,7 +67,7 @@ public class MarketTestSupport {
      * @param size
      * @return
      */
-    public static Execution sell(Num price, Num size) {
+    public static ChainableExecution sell(Num price, Num size) {
         return execution(Side.SELL, price, size);
     }
 
@@ -78,7 +79,7 @@ public class MarketTestSupport {
      * @param size
      * @return
      */
-    public static Execution execution(Side side, double price, double size) {
+    public static ChainableExecution execution(Side side, double price, double size) {
         return execution(side, Num.of(price), Num.of(size));
     }
 
@@ -90,8 +91,8 @@ public class MarketTestSupport {
      * @param size
      * @return
      */
-    public static Execution execution(Side side, Num price, Num size) {
-        Execution exe = new Execution();
+    public static ChainableExecution execution(Side side, Num price, Num size) {
+        ChainableExecution exe = new ChainableExecution();
         exe.id = executionId.getAndIncrement();
         exe.side = Objects.requireNonNull(side);
         exe.price = Objects.requireNonNull(price);
@@ -147,5 +148,53 @@ public class MarketTestSupport {
         position.size.set(Objects.requireNonNull(size));
 
         return position;
+    }
+
+    /**
+     * @version 2018/05/23 17:38:03
+     */
+    public static class ChainableExecution extends Execution {
+
+        /**
+         * Assign id.
+         * 
+         * @param id The id to assign.
+         * @return Chainable API.
+         */
+        public ChainableExecution id(long id) {
+            this.id = id;
+
+            return this;
+        }
+
+        /**
+         * Assign the consecutive type.
+         * 
+         * @param A consective type to assign.
+         * @return Chainable API.
+         */
+        public ChainableExecution consecutive(int type) {
+            this.consecutive = type;
+
+            return this;
+        }
+
+        /**
+         * Assign date.
+         * 
+         * @param year A year value.
+         * @param month A month value.
+         * @param day A day value.
+         * @param hour A hour value.
+         * @param minute A minute value.
+         * @param second A second value.
+         * @param ms A millsecond value.
+         * @return Chainable API.
+         */
+        public ChainableExecution date(int year, int month, int day, int hour, int minute, int second, int ms) {
+            this.exec_date = ZonedDateTime.of(year, month, day, hour, minute, second, ms * 1000000, Chrono.UTC);
+
+            return this;
+        }
     }
 }

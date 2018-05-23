@@ -15,7 +15,7 @@ import java.time.temporal.ChronoUnit;
 import org.junit.jupiter.api.Test;
 
 /**
- * @version 2018/05/02 14:36:50
+ * @version 2018/05/23 17:17:21
  */
 class LogCodecTest {
 
@@ -175,10 +175,14 @@ class LogCodecTest {
 
     @Test
     void diffNum() {
-        Num current = Num.of(0.12345678);
-
+        Num current = Num.of("0.12345678987654321234567898765432123456789876543212345678987654321");
         String encoded = LogCodec.encodeDiff(current, Num.ZERO);
         Num decoded = LogCodec.decodeDiff(encoded, Num.ZERO);
+        assert decoded.is(current);
+
+        current = Num.of("200000000000000000000000000000000000000000000000000000000000000000000000000");
+        encoded = LogCodec.encodeDiff(current, Num.ZERO);
+        decoded = LogCodec.decodeDiff(encoded, Num.ZERO);
         assert decoded.is(current);
     }
 

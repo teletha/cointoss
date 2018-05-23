@@ -120,18 +120,6 @@ public class Execution {
     }
 
     /**
-     * Set the consecutive type.
-     * 
-     * @param consecutivesamebuyer2
-     * @return This {@link Execution}.
-     */
-    public final Execution consecutive(int type) {
-        this.consecutive = type;
-
-        return this;
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override

@@ -171,7 +171,7 @@ public class LogCodec {
         } else {
             int scale = current.scale();
             Num integer = current.scaleByPowerOfTen(scale);
-            return encodeInt(scale) + encodeLong(integer.toLong());
+            return encodeInt(scale + half) + encodeLong(integer.toLong());
         }
     }
 
@@ -186,7 +186,7 @@ public class LogCodec {
         if (current == null || current.isEmpty()) {
             return previous;
         } else {
-            int scale = decodeInt(current.substring(0, 1));
+            int scale = decodeInt(current.substring(0, 1)) - half;
             return Num.of(decodeLong(current.substring(1))).scaleByPowerOfTen(-scale);
         }
     }
@@ -289,6 +289,9 @@ public class LogCodec {
 
     /** The start index. */
     private static final int base = chars.length;
+
+    /** The half size. */
+    private static final int half = base / 2;
 
     /** The pre-computed 'char to digit' mapping. */
     private static final int[] digits = new int[chars[base - 1] + 1];
