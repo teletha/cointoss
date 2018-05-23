@@ -31,6 +31,18 @@ public class Execution {
     /** The consecutive type. */
     public static final int ConsecutiveSameSeller = 2;
 
+    /** The order delay type. (DEFAULT) */
+    public static final int DelayUnknown = 0;
+
+    /** The order delay type. */
+    public static final int DelayInestimable = -1;
+
+    /** The order delay type. */
+    public static final int DelayServerOrder = -2;
+
+    /** The order delay type. */
+    public static final int DelayHuge = -3;
+
     /** The empty object. */
     public static final Execution NONE = new Execution();
 
@@ -61,6 +73,12 @@ public class Execution {
 
     /** Optional Attribute : The consecutive type. */
     public int consecutive;
+
+    /**
+     * Optional Attribute : The rough estimated delay time (unit : second). The negative value means
+     * special info.
+     */
+    public int delay;
 
     /** Optional : The associated execution id. */
     public String yourOrder;
@@ -124,7 +142,7 @@ public class Execution {
      */
     @Override
     public String toString() {
-        return id + " " + exec_date.toLocalDateTime() + " " + side.mark() + " " + price + " " + size + " " + consecutive;
+        return id + " " + exec_date.toLocalDateTime() + " " + side.mark() + " " + price + " " + size + " " + consecutive + " " + delay;
     }
 
     /**
@@ -159,6 +177,10 @@ public class Execution {
         }
 
         if (consecutive != other.consecutive) {
+            return false;
+        }
+
+        if (delay != other.delay) {
             return false;
         }
         return true;

@@ -158,7 +158,7 @@ public abstract class MarketService implements Disposable {
      * @param values
      * @return
      */
-    protected final Execution decode(String[] values, Execution previous) {
+    final Execution decode(String[] values, Execution previous) {
         if (previous == null) {
             return new Execution(values);
         } else {
@@ -186,7 +186,7 @@ public abstract class MarketService implements Disposable {
      * @param execution
      * @return
      */
-    protected final String[] encode(Execution execution, Execution previous) {
+    final String[] encode(Execution execution, Execution previous) {
         if (previous == null) {
             // no diff
             return execution.toString().split(" ");

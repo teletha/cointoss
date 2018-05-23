@@ -31,7 +31,7 @@ import kiss.Signal;
 import kiss.Signaling;
 
 /**
- * @version 2018/05/08 16:08:12
+ * @version 2018/05/23 18:36:07
  */
 public class TestableMarketService extends MarketService {
 
@@ -58,6 +58,13 @@ public class TestableMarketService extends MarketService {
 
     /** The current time. */
     private ZonedDateTime now = Time.BASE;
+
+    /**
+     * 
+     */
+    public TestableMarketService() {
+        this(Time.at(0));
+    }
 
     /**
     * 

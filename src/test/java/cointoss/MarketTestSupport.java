@@ -180,6 +180,18 @@ public class MarketTestSupport {
         }
 
         /**
+         * Assign the delay time.
+         * 
+         * @param A delay time to assign.
+         * @return Chainable API.
+         */
+        public ChainableExecution delay(int delay) {
+            this.delay = delay;
+
+            return this;
+        }
+
+        /**
          * Assign date.
          * 
          * @param year A year value.
