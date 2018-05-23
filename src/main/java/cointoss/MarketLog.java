@@ -39,6 +39,7 @@ import com.univocity.parsers.csv.CsvParserSettings;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
 
+import cointoss.market.bitflyer.BitFlyerService;
 import cointoss.market.bitflyer.BitFlyerService.BitFlyerExecution;
 import cointoss.util.Chrono;
 import cointoss.util.Span;
@@ -619,14 +620,14 @@ public class MarketLog {
     // System.out.println(end - start);
     // }
     //
-    // /**
-    // * @param args
-    // */
-    // public static void main2(String[] args) {
-    // MarketLog log = new MarketLog(BitFlyerService.FX_BTC_JPY);
-    //
-    // Filer.walk(log.root, "*.log").to(file -> {
-    // log.compact(file);
-    // });
-    // }
+    /**
+     * @param args
+     */
+    public static void main(String[] args) {
+        MarketLog log = new MarketLog(BitFlyerService.FX_BTC_JPY);
+
+        Filer.walk(log.root, "*.log").to(file -> {
+            log.compact(file);
+        });
+    }
 }

@@ -365,50 +365,6 @@ public class BitFlyerService extends MarketService {
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected Execution decode(String[] values, Execution previous) {
-        if (previous == null) {
-            return new Execution(values);
-        } else {
-            Execution current = new Execution();
-            current.id = LogCodec.decodeDelta(values[0], previous.id, 1);
-            current.exec_date = LogCodec.decodeDelta(values[1], previous.exec_date, 0);
-            current.price = LogCodec.decodeIntegralDelta(values[2], previous.price, 0);
-            int value = LogCodec.decodeInt(values[3].charAt(0));
-            if (value <= 3) {
-                current.side = Side.BUY;
-                current.consecutive = value;
-            } else {
-                current.side = Side.SELL;
-                current.consecutive = value - 3;
-            }
-            current.size = LogCodec.decodeDiff(values[3].substring(1), previous.size);
-
-            return current;
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected String[] encode(Execution execution, Execution previous) {
-        if (previous == null) {
-            return execution.toString().split(" ");
-        } else {
-            String id = LogCodec.encodeDelta(execution.id, previous.id, 1);
-            String time = LogCodec.encodeDelta(execution.exec_date, previous.exec_date, 0);
-            String price = LogCodec.encodeIntegralDelta(execution.price, previous.price, 0);
-            String size = LogCodec.encodeDiff(execution.size, previous.size);
-            String sideAndConsecutive = String.valueOf(execution.side.isBuy() ? execution.consecutive : 3 + execution.consecutive);
-
-            return new String[] {id, time, price, sideAndConsecutive + size};
-        }
-    }
-
-    /**
      * Call private API.
      */
     private <M> Signal<M> call(String method, String path, Object body, String selector, Class<M> type) {
@@ -450,6 +406,22 @@ public class BitFlyerService extends MarketService {
                     .build();
         }
         return network.rest(request, selector, type);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Num decodePrice(String value, Execution previous) {
+        return LogCodec.decodeIntegralDelta(value, previous.price, 0);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected String encodePrice(Execution execution, Execution previous) {
+        return LogCodec.encodeIntegralDelta(execution.price, previous.price, 0);
     }
 
     protected SessionMaintainer maintainer = new SessionMaintainer();

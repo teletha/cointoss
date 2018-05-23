@@ -27,26 +27,6 @@ public class BitFlyerServiceTest {
     MockBitFlyerService service = new MockBitFlyerService();
 
     @Test
-    void compactSameConsecutiveType() {
-        Execution first = buy(10, 1).consecutive(Execution.ConsecutiveSameBuyer);
-        Execution second = buy(10, 1).consecutive(Execution.ConsecutiveSameBuyer);
-
-        String[] encoded = service.encode(second, first);
-        Execution decoded = service.decode(encoded, first);
-        assert decoded.equals(second);
-    }
-
-    @Test
-    void compactDiffConsecutiveType() {
-        Execution first = buy(10, 1).consecutive(Execution.ConsecutiveSameBuyer);
-        Execution second = buy(10, 1).consecutive(Execution.ConsecutiveDifference);
-
-        String[] encoded = service.encode(second, first);
-        Execution decoded = service.decode(encoded, first);
-        assert decoded.equals(second);
-    }
-
-    @Test
     void normalize() {
         assert BitFlyerService.normalize("2018-04-26T00:32:26.1234567Z").equals("2018-04-26T00:32:26.123");
         assert BitFlyerService.normalize("2018-04-26T00:32:26.19Z").equals("2018-04-26T00:32:26.190");

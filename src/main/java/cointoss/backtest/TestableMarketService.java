@@ -186,26 +186,6 @@ public class TestableMarketService extends MarketService {
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected Execution decode(String[] values, Execution previous) {
-        // If this exception will be thrown, it is bug of this program. So we must rethrow the
-        // wrapped error in here.
-        throw new Error();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected String[] encode(Execution execution, Execution previous) {
-        // If this exception will be thrown, it is bug of this program. So we must rethrow the
-        // wrapped error in here.
-        throw new Error();
-    }
-
-    /**
      * Emulate {@link Execution}.
      * 
      * @param e
