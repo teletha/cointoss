@@ -32,16 +32,10 @@ public class Execution {
     public static final int ConsecutiveSameSeller = 2;
 
     /** The order delay type. (DEFAULT) */
-    public static final int DelayUnknown = 0;
+    public static final int DelayInestimable = 0;
 
-    /** The order delay type. */
-    public static final int DelayInestimable = -1;
-
-    /** The order delay type. */
-    public static final int DelayServerOrder = -2;
-
-    /** The order delay type. */
-    public static final int DelayHuge = -3;
+    /** The order delay type (over 180s). */
+    public static final int DelayHuge = -1;
 
     /** The empty object. */
     public static final Execution NONE = new Execution();
@@ -105,6 +99,8 @@ public class Execution {
         side = Side.parse(values[2]);
         price = Num.of(values[3]);
         size = cumulativeSize = Num.of(values[4]);
+        consecutive = Integer.parseInt(values[5]);
+        delay = Integer.parseInt(values[6]);
     }
 
     /**

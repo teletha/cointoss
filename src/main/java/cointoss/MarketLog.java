@@ -270,8 +270,10 @@ public class MarketLog {
 
             while (disposer.isNotDisposed()) {
                 try {
-                    List<Execution> executions = service.executions(latest + service.executionMaxAcquirableSize() * offset).toList();
-                    System.out.println(executions.size());
+                    List<Execution> executions = service.executions(latest + service.executionMaxAcquirableSize() * offset)
+                            .retry()
+                            .toList();
+
                     // skip if there is no new execution
                     if (executions.isEmpty() || executions.get(0).id == latest) {
                         offset++;
@@ -665,23 +667,45 @@ public class MarketLog {
      */
     public static void main(String[] args) {
         System.out.println(Num.of(10));
-        // MarketLog log = new MarketLog(BitFlyerService.FX_BTC_JPY);
-        //
-        // Filer.walk(log.root, "*.log").to(file -> {
-        // log.read(file).buffer(2, 1).to(exes -> {
-        // if (exes.get(1).id <= exes.get(0).id) {
-        // System.out.println(exes.get(0));
-        // }
-        // });
-        // });
-        fix(2017, 10, 6);
-        fix(2017, 10, 7);
-        fix(2017, 10, 8);
-        fix(2017, 10, 9);
-        fix(2017, 10, 10);
-        fix(2017, 10, 11);
-        fix(2017, 10, 12);
-        fix(2017, 10, 13);
+        MarketLog log = new MarketLog(BitFlyerService.FX_BTC_JPY);
+
+        CsvParserSettings settings = new CsvParserSettings();
+        settings.getFormat().setDelimiter(' ');
+
+        CsvWriterSettings writerConfig = new CsvWriterSettings();
+        writerConfig.getFormat().setDelimiter(' ');
+
+        Filer.walk(log.root, "execution*.log").to(file -> {
+            try {
+                CsvParser parser = new CsvParser(settings);
+                parser.beginParsing(file.toFile());
+
+                Path output = log.computeCompactLogFile(file);
+                System.out.println(output);
+                CsvWriter writer = new CsvWriter(Files.newOutputStream(output), StandardCharsets.ISO_8859_1, writerConfig);
+
+                BitFlyerExecution previous = null;
+                String[] row = null;
+                while ((row = parser.parseNext()) != null) {
+                    BitFlyerExecution current = BitFlyerExecution.parse(row, previous);
+                    Execution exe = new Execution();
+                    exe.id = current.id;
+                    exe.side = current.side;
+                    exe.size = current.size;
+                    exe.price = current.price;
+                    exe.exec_date = current.exec_date;
+                    exe.delay = current.delay;
+                    exe.consecutive = current.consecutive;
+
+                    writer.writeRow(exe.toString());
+                    previous = current;
+                }
+                writer.close();
+                parser.stopParsing();
+            } catch (IOException e) {
+                throw I.quiet(e);
+            }
+        });
     }
 
     public static void fix(int year, int month, int day) {

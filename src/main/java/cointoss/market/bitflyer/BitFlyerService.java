@@ -14,7 +14,6 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -264,8 +263,8 @@ public class BitFlyerService extends MarketService {
 
     /**
      * <p>
-     * Analyze Taker's order ID and obtain approximate order time (Since there is a bot which
-     * specifies non-standard id format, ignore it in that case).
+     * Analyze Taker's order ID and obtain approximate order time (Since there is a bot which specifies
+     * non-standard id format, ignore it in that case).
      * </p>
      * <ol>
      * <li>Execution Date : UTC</li>
@@ -283,7 +282,7 @@ public class BitFlyerService extends MarketService {
             // order format is like the following [JRF20180427-123407-869661]
             // exclude illegal format
             if (taker == null || taker.length() != 25 || !taker.startsWith("JRF")) {
-                return Execution.DelayUnknown;
+                return Execution.DelayInestimable;
             }
 
             // remove tail random numbers
@@ -295,10 +294,11 @@ public class BitFlyerService extends MarketService {
             int diff = (int) (executedTime - orderTime);
 
             // estimate server order (over 9*60*60)
-            if (32000 < diff) {
-                return Execution.DelayServerOrder;
-            } else if (diff < 0) {
-                // some local client time is not stable, so ignore it
+            if (diff < -32000) {
+                diff += 32400;
+            }
+
+            if (diff < 0) {
                 return Execution.DelayInestimable;
             } else if (180 < diff) {
                 return Execution.DelayHuge;
@@ -306,7 +306,7 @@ public class BitFlyerService extends MarketService {
                 return diff;
             }
         } catch (DateTimeParseException e) {
-            return Execution.DelayUnknown;
+            return Execution.DelayInestimable;
         }
     }
 
@@ -743,7 +743,6 @@ public class BitFlyerService extends MarketService {
         public String sell_child_order_acceptance_id = "";
 
         public static BitFlyerExecution parse(String[] values, BitFlyerExecution previous) {
-            System.out.println(Arrays.toString(values));
             BitFlyerExecution exe = new BitFlyerExecution();
             exe.id = Long.parseLong(values[0]);
             exe.exec_date = LocalDateTime.parse(values[1]).atZone(cointoss.util.Chrono.UTC);
@@ -759,6 +758,7 @@ public class BitFlyerService extends MarketService {
                     : values[5].equals(previous.buy_child_order_acceptance_id) ? Execution.ConsecutiveSameBuyer
                             : values[6].equals(previous.sell_child_order_acceptance_id) ? Execution.ConsecutiveSameSeller
                                     : Execution.ConsecutiveDifference;
+            exe.delay = estimateDelay(exe);
 
             return exe;
         }

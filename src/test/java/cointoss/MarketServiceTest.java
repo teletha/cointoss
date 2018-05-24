@@ -154,8 +154,7 @@ class MarketServiceTest {
         exes.add(buy(10, 1).delay(5));
         exes.add(buy(10, 1).delay(Execution.DelayHuge));
         exes.add(buy(10, 1).delay(Execution.DelayInestimable));
-        exes.add(buy(10, 1).delay(Execution.DelayServerOrder));
-        exes.add(buy(10, 1).delay(Execution.DelayUnknown));
+        exes.add(buy(10, 1).delay(Execution.DelayInestimable));
 
         for (int i = 1; i < exes.size(); i++) {
             Execution current = exes.get(i);

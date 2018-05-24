@@ -167,7 +167,7 @@ public abstract class MarketService implements Disposable {
      */
     final Execution decode(String[] values, Execution previous) {
         if (previous == null) {
-            return decode(values);
+            return new Execution(values);
         } else {
             Execution current = new Execution();
             current.id = decodeId(values[0], previous);
@@ -208,16 +208,6 @@ public abstract class MarketService implements Disposable {
 
             return new String[] {id, time, price, sideAndConsecutive + delay + size};
         }
-    }
-
-    /**
-     * Decode {@link Execution}.
-     * 
-     * @param values
-     * @return
-     */
-    protected Execution decode(String[] values) {
-        return new Execution(values);
     }
 
     /**

@@ -193,6 +193,14 @@ public class TestableMarketService extends MarketService {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected long executionMaxAcquirableSize() {
+        return 0;
+    }
+
+    /**
      * Emulate {@link Execution}.
      * 
      * @param e
