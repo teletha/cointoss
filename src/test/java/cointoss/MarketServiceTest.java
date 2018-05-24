@@ -143,4 +143,27 @@ class MarketServiceTest {
             assert decoded.equals(current);
         }
     }
+
+    @Test
+    void compactDelay() {
+        List<Execution> exes = new ArrayList();
+        exes.add(buy(10, 1).delay(1));
+        exes.add(buy(10, 1).delay(1));
+        exes.add(buy(10, 1).delay(3));
+        exes.add(buy(10, 1).delay(10));
+        exes.add(buy(10, 1).delay(5));
+        exes.add(buy(10, 1).delay(Execution.DelayHuge));
+        exes.add(buy(10, 1).delay(Execution.DelayInestimable));
+        exes.add(buy(10, 1).delay(Execution.DelayServerOrder));
+        exes.add(buy(10, 1).delay(Execution.DelayUnknown));
+
+        for (int i = 1; i < exes.size(); i++) {
+            Execution current = exes.get(i);
+            Execution previous = exes.get(i - 1);
+
+            String[] encoded = service.encode(current, previous);
+            Execution decoded = service.decode(encoded, previous);
+            assert decoded.equals(current);
+        }
+    }
 }

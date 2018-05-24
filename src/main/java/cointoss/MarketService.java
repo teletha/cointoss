@@ -160,7 +160,7 @@ public abstract class MarketService implements Disposable {
      */
     final Execution decode(String[] values, Execution previous) {
         if (previous == null) {
-            return new Execution(values);
+            return decode(values);
         } else {
             Execution current = new Execution();
             current.id = decodeId(values[0], previous);
@@ -174,7 +174,8 @@ public abstract class MarketService implements Disposable {
                 current.side = Side.SELL;
                 current.consecutive = value - 3;
             }
-            current.size = decodeSize(values[3].substring(1), previous);
+            current.delay = LogCodec.decodeInt(values[3].charAt(1)) - 3;
+            current.size = decodeSize(values[3].substring(2), previous);
 
             return current;
         }
@@ -195,10 +196,21 @@ public abstract class MarketService implements Disposable {
             String time = encodeDate(execution, previous);
             String price = encodePrice(execution, previous);
             String size = encodeSize(execution, previous);
+            String delay = LogCodec.encodeInt(execution.delay + 3);
             String sideAndConsecutive = String.valueOf(execution.side.isBuy() ? execution.consecutive : 3 + execution.consecutive);
 
-            return new String[] {id, time, price, sideAndConsecutive + size};
+            return new String[] {id, time, price, sideAndConsecutive + delay + size};
         }
+    }
+
+    /**
+     * Decode {@link Execution}.
+     * 
+     * @param values
+     * @return
+     */
+    protected Execution decode(String[] values) {
+        return new Execution(values);
     }
 
     /**
