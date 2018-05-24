@@ -42,6 +42,7 @@ import com.univocity.parsers.csv.CsvWriterSettings;
 import cointoss.market.bitflyer.BitFlyerService;
 import cointoss.market.bitflyer.BitFlyerService.BitFlyerExecution;
 import cointoss.util.Chrono;
+import cointoss.util.Num;
 import cointoss.util.Span;
 import filer.Filer;
 import kiss.I;
@@ -262,6 +263,46 @@ public class MarketLog {
         });
     }
 
+    private Signal<Execution> rest(long id) {
+        return new Signal<>((observer, disposer) -> {
+            long offset = 0;
+            long latest = id;
+
+            while (disposer.isNotDisposed()) {
+                try {
+                    List<Execution> executions = service.executions(latest + service.executionMaxAcquirableSize() * offset).toList();
+                    System.out.println(executions.size());
+                    // skip if there is no new execution
+                    if (executions.isEmpty() || executions.get(0).id == latest) {
+                        offset++;
+                        continue;
+                    }
+                    offset = 0;
+
+                    for (int i = executions.size() - 1; 0 <= i; i--) {
+                        Execution exe = executions.get(i);
+
+                        if (latest < exe.id) {
+                            observer.accept(exe);
+                            latest = exe.id;
+                        }
+                    }
+                } catch (Exception e) {
+                    // ignore to retry
+                }
+
+                try {
+                    Thread.sleep(110);
+                } catch (final InterruptedException e) {
+                    observer.error(e);
+                }
+            }
+            observer.complete();
+
+            return disposer;
+        });
+    }
+
     /**
      * Read log at the specified date.
      * 
@@ -301,11 +342,9 @@ public class MarketLog {
         // no cache
         if (file == null) {
             // try the previous day
-            System.out.println(date);
             return at(date.minusDays(1));
         }
-
-        return null;
+        return read(file);
     }
 
     /**
@@ -464,11 +503,12 @@ public class MarketLog {
                 String[] row;
                 Execution previous = null;
 
-                while ((row = parser.parseNext()) != null) {
+                while ((row = parser.parseNext()) != null && disposer.isNotDisposed()) {
                     observer.accept(previous = service.decode(row, hasCompact ? previous : null));
                 }
 
                 parser.stopParsing();
+                observer.complete();
                 return disposer;
             } catch (Exception e) {
                 throw I.quiet(e);
@@ -624,10 +664,41 @@ public class MarketLog {
      * @param args
      */
     public static void main(String[] args) {
+        System.out.println(Num.of(10));
+        // MarketLog log = new MarketLog(BitFlyerService.FX_BTC_JPY);
+        //
+        // Filer.walk(log.root, "*.log").to(file -> {
+        // log.read(file).buffer(2, 1).to(exes -> {
+        // if (exes.get(1).id <= exes.get(0).id) {
+        // System.out.println(exes.get(0));
+        // }
+        // });
+        // });
+        fix(2017, 10, 6);
+        fix(2017, 10, 7);
+        fix(2017, 10, 8);
+        fix(2017, 10, 9);
+        fix(2017, 10, 10);
+        fix(2017, 10, 11);
+        fix(2017, 10, 12);
+        fix(2017, 10, 13);
+    }
+
+    public static void fix(int year, int month, int day) {
         MarketLog log = new MarketLog(BitFlyerService.FX_BTC_JPY);
 
-        Filer.walk(log.root, "*.log").to(file -> {
-            log.compact(file);
-        });
+        ZonedDateTime date = ZonedDateTime.of(year, month, day, 0, 0, 0, 0, Chrono.UTC);
+
+        // backup
+        Path cache = log.locateCache(date);
+        // clear
+        Filer.delete(cache);
+
+        // restore
+        long start = log.at(date.minusDays(1)).last().map(e -> e.id).to().v;
+        long end = log.at(date.plusDays(1)).first().map(e -> e.id).to().v;
+
+        log.rest(start).takeWhile(e -> e.id < end).to(log::cache);
+        System.out.println("END");
     }
 }

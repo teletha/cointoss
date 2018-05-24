@@ -14,6 +14,7 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -68,6 +69,9 @@ public class BitFlyerService extends MarketService {
 
     /** The realtime data format */
     private static final DateTimeFormatter RealTimeExecutionFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
+
+    /** The max acquirable execution size. */
+    private static final long MAX = 500;
 
     /** The api url. */
     static final String api = "https://api.bitflyer.jp";
@@ -334,8 +338,16 @@ public class BitFlyerService extends MarketService {
      */
     @Override
     public Signal<Execution> executions(long id) {
-        return call("GET", "/v1/executions?product_code=" + marketName + "&count=499&before=" + (id + 499), "", "*", BitFlyerExecution.class)
+        return call("GET", "/v1/executions?product_code=" + marketName + "&count=" + MAX + "&before=" + (id + MAX) + "&after=" + id, "", "*", BitFlyerExecution.class)
                 .as(Execution.class);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected long executionMaxAcquirableSize() {
+        return MAX;
     }
 
     /**
@@ -731,6 +743,7 @@ public class BitFlyerService extends MarketService {
         public String sell_child_order_acceptance_id = "";
 
         public static BitFlyerExecution parse(String[] values, BitFlyerExecution previous) {
+            System.out.println(Arrays.toString(values));
             BitFlyerExecution exe = new BitFlyerExecution();
             exe.id = Long.parseLong(values[0]);
             exe.exec_date = LocalDateTime.parse(values[1]).atZone(cointoss.util.Chrono.UTC);

@@ -110,6 +110,13 @@ public abstract class MarketService implements Disposable {
     }
 
     /**
+     * Configure max acquirable execution size per one request.
+     * 
+     * @return
+     */
+    protected abstract long executionMaxAcquirableSize();
+
+    /**
      * <p>
      * Request all orders.
      * </p>
