@@ -40,7 +40,6 @@ import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
 
 import cointoss.market.bitflyer.BitFlyerService;
-import cointoss.market.bitflyer.BitFlyerService.BitFlyerExecution;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
 import cointoss.util.Span;
@@ -49,7 +48,7 @@ import kiss.I;
 import kiss.Signal;
 
 /**
- * @version 2018/04/25 4:13:13
+ * @version 2018/05/25 9:28:50
  */
 public class MarketLog {
 
@@ -160,10 +159,10 @@ public class MarketLog {
                 }
             }
 
-            final AtomicBoolean completeREST = new AtomicBoolean();
+            AtomicBoolean completeREST = new AtomicBoolean();
 
             // read from realtime API
-            if (disposer.isDisposed() == false) {
+            if (disposer.isNotDisposed()) {
                 disposer.add(service.executions().effect(e -> {
                     if (e.id == 0) {
                         e.id = ++realtimeId;
@@ -173,8 +172,8 @@ public class MarketLog {
             }
 
             // read from REST API
-            if (disposer.isDisposed() == false) {
-                disposer.add(rest().effect(this::cache).effectOnComplete(() -> completeREST.set(true)).to(observer::accept));
+            if (disposer.isNotDisposed()) {
+                disposer.add(rest(latestId).effect(this::cache).effectOnComplete(() -> completeREST.set(true)).to(observer::accept));
             }
 
             return disposer;
@@ -213,30 +212,28 @@ public class MarketLog {
     }
 
     /**
-     * Read data in realtime.
-     * 
-     * @return
-     */
-    /**
      * Read data from REST API.
      */
-    private Signal<Execution> rest() {
-        return new Signal<Execution>((observer, disposer) -> {
-            int offset = 0;
+    private Signal<Execution> rest(long id) {
+        return new Signal<>((observer, disposer) -> {
+            long offset = 0;
+            latestId = id;
 
-            while (disposer.isDisposed() == false) {
+            while (disposer.isNotDisposed()) {
                 try {
-                    List<Execution> executions = service.executions(latestId + 499 * offset).toList();
+                    List<Execution> executions = service.executions(latestId + service.executionMaxAcquirableSize() * offset)
+                            .retry()
+                            .toList();
 
                     // skip if there is no new execution
-                    if (executions.get(0).id == latestId) {
+                    if (executions.isEmpty() || executions.get(0).id == latestId) {
                         offset++;
                         continue;
                     }
                     offset = 0;
 
                     for (int i = executions.size() - 1; 0 <= i; i--) {
-                        final Execution exe = executions.get(i);
+                        Execution exe = executions.get(i);
 
                         if (latestId < exe.id) {
                             observer.accept(exe);
@@ -249,48 +246,6 @@ public class MarketLog {
 
                 if (realtimeId != 0 && realtimeId <= latestId) {
                     break;
-                }
-
-                try {
-                    Thread.sleep(222);
-                } catch (final InterruptedException e) {
-                    observer.error(e);
-                }
-            }
-            observer.complete();
-
-            return disposer;
-        });
-    }
-
-    private Signal<Execution> rest(long id) {
-        return new Signal<>((observer, disposer) -> {
-            long offset = 0;
-            long latest = id;
-
-            while (disposer.isNotDisposed()) {
-                try {
-                    List<Execution> executions = service.executions(latest + service.executionMaxAcquirableSize() * offset)
-                            .retry()
-                            .toList();
-
-                    // skip if there is no new execution
-                    if (executions.isEmpty() || executions.get(0).id == latest) {
-                        offset++;
-                        continue;
-                    }
-                    offset = 0;
-
-                    for (int i = executions.size() - 1; 0 <= i; i--) {
-                        Execution exe = executions.get(i);
-
-                        if (latest < exe.id) {
-                            observer.accept(exe);
-                            latest = exe.id;
-                        }
-                    }
-                } catch (Exception e) {
-                    // ignore to retry
                 }
 
                 try {
@@ -563,12 +518,12 @@ public class MarketLog {
             CsvWriter writer = new CsvWriter(new OutputStreamWriter(new ZstdOutputStream(new BufferedOutputStream(new FileOutputStream(output
                     .toFile())), 3), StandardCharsets.ISO_8859_1), writerConfig);
 
-            BitFlyerExecution previous = null;
+            Execution previous = null;
             String[] row = null;
             while ((row = parser.parseNext()) != null) {
-                BitFlyerExecution current = BitFlyerExecution.parse(row, previous);
-                writer.writeRow(service.encode(current, previous));
-                previous = current;
+                // BitFlyerExecution current = BitFlyerExecution.parse(row, previous);
+                // writer.writeRow(service.encode(current, previous));
+                // previous = current;
             }
             writer.close();
             parser.stopParsing();
@@ -665,46 +620,12 @@ public class MarketLog {
     /**
      * @param args
      */
-    public static void main(String[] args) {
+    public static void main2(String[] args) {
         System.out.println(Num.of(10));
         MarketLog log = new MarketLog(BitFlyerService.FX_BTC_JPY);
 
-        CsvParserSettings settings = new CsvParserSettings();
-        settings.getFormat().setDelimiter(' ');
-
-        CsvWriterSettings writerConfig = new CsvWriterSettings();
-        writerConfig.getFormat().setDelimiter(' ');
-
         Filer.walk(log.root, "execution*.log").to(file -> {
-            try {
-                CsvParser parser = new CsvParser(settings);
-                parser.beginParsing(file.toFile());
 
-                Path output = log.computeCompactLogFile(file);
-                System.out.println(output);
-                CsvWriter writer = new CsvWriter(Files.newOutputStream(output), StandardCharsets.ISO_8859_1, writerConfig);
-
-                BitFlyerExecution previous = null;
-                String[] row = null;
-                while ((row = parser.parseNext()) != null) {
-                    BitFlyerExecution current = BitFlyerExecution.parse(row, previous);
-                    Execution exe = new Execution();
-                    exe.id = current.id;
-                    exe.side = current.side;
-                    exe.size = current.size;
-                    exe.price = current.price;
-                    exe.exec_date = current.exec_date;
-                    exe.delay = current.delay;
-                    exe.consecutive = current.consecutive;
-
-                    writer.writeRow(exe.toString());
-                    previous = current;
-                }
-                writer.close();
-                parser.stopParsing();
-            } catch (IOException e) {
-                throw I.quiet(e);
-            }
         });
     }
 
