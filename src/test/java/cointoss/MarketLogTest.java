@@ -14,6 +14,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.ZonedDateTime;
 import java.util.List;
 
@@ -51,7 +52,7 @@ class MarketLogTest {
 
     @Test
     void readNoLog() {
-        ZonedDateTime today = ZonedDateTime.now();
+        ZonedDateTime today = Chrono.utcNow();
 
         List<Execution> list = log.read(today).toList();
         assert list.isEmpty() == true;
@@ -59,7 +60,7 @@ class MarketLogTest {
 
     @Test
     void readLog() {
-        ZonedDateTime today = ZonedDateTime.now();
+        ZonedDateTime today = Chrono.utcNow();
         List<Execution> original = writeExecutionLog(today);
         List<Execution> restored = log.read(today).toList();
 
@@ -68,11 +69,35 @@ class MarketLogTest {
 
     @Test
     void readCompactLog() {
-        ZonedDateTime today = ZonedDateTime.now();
+        ZonedDateTime today = Chrono.utcNow();
         List<Execution> original = writeCompactExecutionLog(today);
         List<Execution> restored = log.read(today).toList();
 
         assertIterableEquals(original, restored);
+    }
+
+    @Test
+    void createCompactLogFromNormalLogAutomatically() {
+        ZonedDateTime today = Chrono.utcNow();
+        ZonedDateTime yesterday = today.minusDays(1);
+
+        List<Execution> yesterdayLog = writeExecutionLog(yesterday);
+        Path yesterdayCompactLog = log.locateCompactLog(yesterday);
+        assert Files.notExists(yesterdayCompactLog);
+
+        // reading yesterday log will NOT create compact log automatically
+        // because next day's log doesn't exist
+        List<Execution> restored = log.read(yesterday).toList();
+        assertIterableEquals(restored, yesterdayLog);
+        assert Files.notExists(yesterdayCompactLog);
+
+        // reading yesterday log will create compact log automatically
+        // because next day's log exist
+        writeExecutionLog(today);
+
+        restored = log.read(yesterday).toList();
+        assertIterableEquals(restored, yesterdayLog);
+        assert Files.exists(yesterdayCompactLog);
     }
 
     /**

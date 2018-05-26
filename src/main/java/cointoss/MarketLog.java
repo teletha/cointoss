@@ -147,7 +147,7 @@ public class MarketLog {
      * @param start
      * @return
      */
-    public final synchronized Signal<Execution> from(final ZonedDateTime start) {
+    public final synchronized Signal<Execution> from(ZonedDateTime start) {
         return new Signal<Execution>((observer, disposer) -> {
             // read from cache
             if (cacheFirst != null) {
@@ -188,26 +188,26 @@ public class MarketLog {
      * 
      * @param exe
      */
-    private void cache(final Execution exe) {
+    private void cache(Execution exe) {
         if (cacheId < exe.id) {
             cacheId = exe.id;
 
             writer.submit(() -> {
                 try {
-                    final ZonedDateTime date = exe.exec_date;
+                    ZonedDateTime date = exe.exec_date;
 
                     if (cache == null || cacheLast.isBefore(date)) {
                         I.quiet(cache);
 
-                        final File file = locateCache(date).toFile();
+                        File file = locateLog(date).toFile();
                         file.createNewFile();
-
                         cache = new BufferedWriter(new FileWriter(file, true));
                         cacheLast = date.withHour(23).withMinute(59).withSecond(59).withNano(999999999);
                     }
                     cache.write(exe.toString() + "\r\n");
                     cache.flush();
-                } catch (final IOException e) {
+                } catch (IOException e) {
+                    e.printStackTrace();
                     throw I.quiet(e);
                 }
             });
@@ -297,7 +297,7 @@ public class MarketLog {
         }
 
         // check cache
-        Path file = locateCache(date);
+        Path file = locateLog(date);
 
         // no cache
         if (file == null) {
@@ -305,38 +305,6 @@ public class MarketLog {
             return at(date.minusDays(1));
         }
         return read(date);
-    }
-
-    /**
-     * Locate local cache file by date.
-     * 
-     * @param dateTime A date info.
-     * @return
-     */
-    private Path locateCache(ZonedDateTime dateTime) {
-        String date = Chrono.DateCompact.format(dateTime);
-
-        // search compressed log
-        Path file = root.resolve("execution" + date + ".zlog");
-
-        if (Files.exists(file)) {
-            return file;
-        }
-
-        // search compact log
-        file = root.resolve("execution" + date + ".clog");
-
-        if (Files.exists(file)) {
-            return file;
-        }
-
-        // search normal log
-        file = root.resolve("execution" + date + ".log");
-
-        if (Files.exists(file)) {
-            return file;
-        }
-        return null;
     }
 
     /**
@@ -482,6 +450,15 @@ public class MarketLog {
                     return disposer;
                 }
 
+                if (!hasCompact) {
+                    ZonedDateTime nextDay = date.plusDays(1);
+
+                    if (Files.exists(locateCompactLog(nextDay)) || Files.exists(locateLog(nextDay))) {
+                        // compact today log
+                        // writeCompactLog(date, readLog(date, false));
+                    }
+                }
+
                 CsvParserSettings settings = new CsvParserSettings();
                 settings.getFormat().setDelimiter(' ');
 
@@ -492,13 +469,48 @@ public class MarketLog {
                 Execution previous = null;
 
                 while (disposer.isNotDisposed() && (row = parser.parseNext()) != null) {
-                    observer.accept(previous = hasCompact && previous != null ? service.decode(row, previous) : new Execution(row));
+                    Execution e = hasCompact && previous != null ? service.decode(row, previous) : new Execution(row);
+                    observer.accept(e);
+
+                    previous = e;
                 }
 
                 parser.stopParsing();
                 observer.complete();
                 return disposer;
             } catch (Exception e) {
+                throw I.quiet(e);
+            }
+        });
+    }
+
+    /**
+     * Read normal execution log actually.
+     * 
+     * @param date A target date.
+     */
+    Signal<Execution> readLog(ZonedDateTime date, boolean compact) {
+        return new Signal<>((observer, disposer) -> {
+            try {
+                CsvParserSettings settings = new CsvParserSettings();
+                settings.getFormat().setDelimiter(' ');
+
+                CsvParser parser = new CsvParser(settings);
+                parser.beginParsing(compact ? new ZstdInputStream(newInputStream(locateCompactLog(date)))
+                        : newInputStream(locateLog(date)), ISO_8859_1);
+
+                String[] row;
+                Execution previous = null;
+
+                while (disposer.isNotDisposed() && (row = parser.parseNext()) != null) {
+                    observer.accept(previous = compact && previous != null ? service.decode(row, previous) : new Execution(row));
+                }
+
+                parser.stopParsing();
+                observer.complete();
+
+                return disposer;
+            } catch (IOException e) {
                 throw I.quiet(e);
             }
         });
@@ -615,23 +627,5 @@ public class MarketLog {
         Filer.walk(log.root, "execution*.log").to(file -> {
 
         });
-    }
-
-    public static void fix(int year, int month, int day) {
-        MarketLog log = new MarketLog(BitFlyerService.FX_BTC_JPY);
-
-        ZonedDateTime date = ZonedDateTime.of(year, month, day, 0, 0, 0, 0, Chrono.UTC);
-
-        // backup
-        Path cache = log.locateCache(date);
-        // clear
-        Filer.delete(cache);
-
-        // restore
-        long start = log.at(date.minusDays(1)).last().map(e -> e.id).to().v;
-        long end = log.at(date.plusDays(1)).first().map(e -> e.id).to().v;
-
-        log.rest(start).takeWhile(e -> e.id < end).to(log::cache);
-        System.out.println("END");
     }
 }
