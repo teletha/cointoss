@@ -166,26 +166,22 @@ public abstract class MarketService implements Disposable {
      * @return
      */
     final Execution decode(String[] values, Execution previous) {
-        if (previous == null) {
-            return new Execution(values);
+        Execution current = new Execution();
+        current.id = decodeId(values[0], previous);
+        current.exec_date = decodeDate(values[1], previous);
+        current.price = decodePrice(values[2], previous);
+        int value = LogCodec.decodeInt(values[3].charAt(0));
+        if (value < 3) {
+            current.side = Side.BUY;
+            current.consecutive = value;
         } else {
-            Execution current = new Execution();
-            current.id = decodeId(values[0], previous);
-            current.exec_date = decodeDate(values[1], previous);
-            current.price = decodePrice(values[2], previous);
-            int value = LogCodec.decodeInt(values[3].charAt(0));
-            if (value < 3) {
-                current.side = Side.BUY;
-                current.consecutive = value;
-            } else {
-                current.side = Side.SELL;
-                current.consecutive = value - 3;
-            }
-            current.delay = LogCodec.decodeInt(values[3].charAt(1)) - 3;
-            current.size = decodeSize(values[3].substring(2), previous);
-
-            return current;
+            current.side = Side.SELL;
+            current.consecutive = value - 3;
         }
+        current.delay = LogCodec.decodeInt(values[3].charAt(1)) - 3;
+        current.size = decodeSize(values[3].substring(2), previous);
+
+        return current;
     }
 
     /**

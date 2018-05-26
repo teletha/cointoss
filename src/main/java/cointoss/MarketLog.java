@@ -9,20 +9,18 @@
  */
 package cointoss;
 
-import java.io.BufferedOutputStream;
+import static java.nio.charset.StandardCharsets.*;
+import static java.nio.file.Files.*;
+
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -31,6 +29,8 @@ import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.github.luben.zstd.ZstdInputStream;
 import com.github.luben.zstd.ZstdOutputStream;
@@ -48,7 +48,7 @@ import kiss.I;
 import kiss.Signal;
 
 /**
- * @version 2018/05/25 9:28:50
+ * @version 2018/05/26 10:41:05
  */
 public class MarketLog {
 
@@ -62,6 +62,9 @@ public class MarketLog {
 
     /** The file data format */
     private static final DateTimeFormatter fileName = DateTimeFormatter.ofPattern("yyyyMMdd");
+
+    /** The file name pattern. */
+    private static final Pattern Name = Pattern.compile("\\D.(\\d.)\\.log");
 
     /** The market provider. */
     private final MarketService service;
@@ -196,7 +199,7 @@ public class MarketLog {
                     if (cache == null || cacheLast.isBefore(date)) {
                         I.quiet(cache);
 
-                        final File file = locateCacheLog(date).toFile();
+                        final File file = locateCache(date).toFile();
                         file.createNewFile();
 
                         cache = new BufferedWriter(new FileWriter(file, true));
@@ -301,7 +304,7 @@ public class MarketLog {
             // try the previous day
             return at(date.minusDays(1));
         }
-        return read(file);
+        return read(date);
     }
 
     /**
@@ -334,6 +337,43 @@ public class MarketLog {
             return file;
         }
         return null;
+    }
+
+    /**
+     * Locate execution log.
+     * 
+     * @param date A date time.
+     * @return A file location.
+     */
+    Path locateLog(ZonedDateTime date) {
+        return root.resolve("execution" + Chrono.DateCompact.format(date) + ".log");
+    }
+
+    /**
+     * Locate compressed execution log.
+     * 
+     * @param date A date time.
+     * @return A file location.
+     */
+    Path locateCompactLog(ZonedDateTime date) {
+        return root.resolve("compact" + Chrono.DateCompact.format(date) + ".log");
+    }
+
+    /**
+     * Parse date from file name.
+     * 
+     * @param file
+     * @return
+     */
+    private ZonedDateTime parse(Path file) {
+        String name = file.getFileName().toString();
+        Matcher matcher = Name.matcher(name);
+
+        if (matcher.matches()) {
+            return ZonedDateTime.of(LocalDateTime.parse(matcher.group(1)), Chrono.UTC);
+        } else {
+            throw new Error("Illegal file name [" + name + "]");
+        }
     }
 
     /**
@@ -425,43 +465,34 @@ public class MarketLog {
     }
 
     /**
-     * Read {@link Execution} log of the specified {@link LocalDate}.
+     * Read {@link Execution} log of the specified {@link ZonedDateTime}.
      * 
      * @param date
      * @return
      */
     public final Signal<Execution> read(ZonedDateTime date) {
-        return read(locateCacheLog(date));
-    }
-
-    /**
-     * Read {@link Execution} log.
-     * 
-     * @param file
-     * @return
-     */
-    private final Signal<Execution> read(Path file) {
         return new Signal<>((observer, disposer) -> {
             try {
-                Path compact = computeCompactLogFile(file);
+                Path log = locateLog(date);
+                Path compact = locateCompactLog(date);
+                boolean hasLog = Files.isExecutable(log);
                 boolean hasCompact = Files.exists(compact);
+
+                if (!hasLog && !hasCompact) {
+                    return disposer;
+                }
 
                 CsvParserSettings settings = new CsvParserSettings();
                 settings.getFormat().setDelimiter(' ');
 
                 CsvParser parser = new CsvParser(settings);
-                if (hasCompact) {
-                    parser.beginParsing(new InputStreamReader(new ZstdInputStream(new FileInputStream(compact
-                            .toFile())), StandardCharsets.ISO_8859_1));
-                } else {
-                    parser.beginParsing(Files.newBufferedReader(file));
-                }
+                parser.beginParsing(hasCompact ? new ZstdInputStream(newInputStream(compact)) : newInputStream(log), ISO_8859_1);
 
                 String[] row;
                 Execution previous = null;
 
-                while ((row = parser.parseNext()) != null && disposer.isNotDisposed()) {
-                    observer.accept(previous = service.decode(row, hasCompact ? previous : null));
+                while (disposer.isNotDisposed() && (row = parser.parseNext()) != null) {
+                    observer.accept(previous = hasCompact && previous != null ? service.decode(row, previous) : new Execution(row));
                 }
 
                 parser.stopParsing();
@@ -474,72 +505,29 @@ public class MarketLog {
     }
 
     /**
-     * Locate local cache by the specified date.
+     * Write compact execution log actually.
      * 
-     * @param date
-     * @return
+     * @param date A target date.
+     * @param executions A execution log.
      */
-    final Path locateCacheLog(ZonedDateTime date) {
-        return root.resolve("execution" + fileName.format(date) + ".log");
-    }
-
-    /**
-     * Locate local compressed cache by the specified date.
-     * 
-     * @param date
-     * @return
-     */
-    final Path locateCompressedLog(ZonedDateTime date) {
-        return root.resolve("execution" + fileName.format(date) + ".clog");
-    }
-
-    /**
-     * Compact log.
-     * 
-     * @param file
-     */
-    public final void compact(Path file) {
+    void writeCompactLog(ZonedDateTime date, Signal<Execution> executions) {
         try {
-            Path output = computeCompactLogFile(file);
+            Path file = locateCompactLog(date);
 
-            if (Files.exists(output)) {
-                return;
-            }
+            CsvWriterSettings setting = new CsvWriterSettings();
+            setting.getFormat().setDelimiter(' ');
 
-            CsvParserSettings settings = new CsvParserSettings();
-            settings.getFormat().setDelimiter(' ');
+            CsvWriter writer = new CsvWriter(new ZstdOutputStream(Files.newOutputStream(file), 1), ISO_8859_1, setting);
 
-            CsvParser parser = new CsvParser(settings);
-            parser.beginParsing(file.toFile());
-
-            CsvWriterSettings writerConfig = new CsvWriterSettings();
-            writerConfig.getFormat().setDelimiter(' ');
-
-            CsvWriter writer = new CsvWriter(new OutputStreamWriter(new ZstdOutputStream(new BufferedOutputStream(new FileOutputStream(output
-                    .toFile())), 3), StandardCharsets.ISO_8859_1), writerConfig);
-
-            Execution previous = null;
-            String[] row = null;
-            while ((row = parser.parseNext()) != null) {
-                // BitFlyerExecution current = BitFlyerExecution.parse(row, previous);
-                // writer.writeRow(service.encode(current, previous));
-                // previous = current;
-            }
+            Execution[] previous = new Execution[1];
+            executions.to(e -> {
+                writer.writeRow(service.encode(e, previous[0]));
+                previous[0] = e;
+            });
             writer.close();
-            parser.stopParsing();
         } catch (Exception e) {
             throw I.quiet(e);
         }
-    }
-
-    /**
-     * Compute compact log file.
-     * 
-     * @param file A log file.
-     * @return
-     */
-    private Path computeCompactLogFile(Path file) {
-        return file.resolveSibling(file.getFileName().toString().replace(".log", ".clog"));
     }
 
     /**
@@ -566,8 +554,8 @@ public class MarketLog {
         /** The log file. */
         private final Path log;
 
-        /** The compressed log file. */
-        private final Path compressed;
+        /** The compact log file. */
+        private final Path compact;
 
         /** The latest id. */
         private long latest;
@@ -577,8 +565,8 @@ public class MarketLog {
          */
         private Cache(ZonedDateTime date) {
             this.date = date.toLocalDate();
-            this.log = locateCacheLog(date);
-            this.compressed = locateCompressedLog(date);
+            this.log = locateLog(date);
+            this.compact = locateCompactLog(date);
         }
 
         /**

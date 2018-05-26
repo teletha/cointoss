@@ -17,7 +17,10 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 
 import cointoss.util.Chrono;
+import cointoss.util.Generator;
 import cointoss.util.Num;
+import kiss.I;
+import kiss.Signal;
 
 /**
  * @version 2018/05/23 17:41:24
@@ -97,7 +100,7 @@ public class MarketTestSupport {
         exe.side = Objects.requireNonNull(side);
         exe.price = Objects.requireNonNull(price);
         exe.size = exe.cumulativeSize = Objects.requireNonNull(size);
-        exe.exec_date = ZonedDateTime.now().truncatedTo(ChronoUnit.MILLIS);
+        exe.exec_date = Chrono.utcNow().truncatedTo(ChronoUnit.MILLIS);
 
         return exe;
     }
@@ -118,6 +121,21 @@ public class MarketTestSupport {
             list.add(e);
         }
         return list;
+    }
+
+    /**
+     * Create {@link Execution}.
+     * 
+     * @param count A number of executions.
+     * @return
+     */
+    public static Signal<Execution> executionRandomly(int count) {
+        List<Execution> list = new ArrayList();
+
+        for (int i = 0; i < count; i++) {
+            list.add(execution(Side.random(), Generator.randomInt(1, 10), Generator.randomInt(1, 10)));
+        }
+        return I.signal(list);
     }
 
     /**

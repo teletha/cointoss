@@ -9,8 +9,11 @@
  */
 package cointoss;
 
+import static cointoss.MarketTestSupport.*;
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.time.ZonedDateTime;
 import java.util.List;
 
@@ -21,10 +24,9 @@ import antibug.CleanRoom;
 import cointoss.backtest.TestableMarket;
 import cointoss.util.Chrono;
 import kiss.I;
-import kiss.Signal;
 
 /**
- * @version 2018/05/08 13:09:15
+ * @version 2018/05/26 10:37:10
  */
 class MarketLogTest {
 
@@ -48,41 +50,55 @@ class MarketLogTest {
     }
 
     @Test
-    void readNone() {
-        Signal<Execution> exe = log.read(ZonedDateTime.now());
-        assert exe.toList().isEmpty();
+    void readNoLog() {
+        ZonedDateTime today = ZonedDateTime.now();
+
+        List<Execution> list = log.read(today).toList();
+        assert list.isEmpty() == true;
     }
 
     @Test
-    void readCompressedCache() {
-        ZonedDateTime date = ZonedDateTime.now();
+    void readLog() {
+        ZonedDateTime today = ZonedDateTime.now();
+        List<Execution> original = writeExecutionLog(today);
+        List<Execution> restored = log.read(today).toList();
 
-        createCompressedCache(date);
+        assertIterableEquals(original, restored);
+    }
 
-        Signal<Execution> exe = log.read(date);
-        assert exe.toList().isEmpty();
+    @Test
+    void readCompactLog() {
+        ZonedDateTime today = ZonedDateTime.now();
+        List<Execution> original = writeCompactExecutionLog(today);
+        List<Execution> restored = log.read(today).toList();
+
+        assertIterableEquals(original, restored);
     }
 
     /**
-     * Create dummy compressed cache.
+     * Create dummy execution log.
      * 
-     * @param date
+     * @param date A target date.
      */
-    private void createCompressedCache(ZonedDateTime date) {
+    private List<Execution> writeExecutionLog(ZonedDateTime date) {
+        List<Execution> list = executionRandomly(10).toList();
+
         try {
-            Path compressed = log.locateCompressedLog(date);
-
-            // create file
-            Files.createFile(compressed);
-
-            // write dummy log
-            List<Execution> executions = MarketTestSupport.executionSerially(10, Side.BUY, 10, 1);
-
-            for (Execution execution : executions) {
-                log.writeLog(execution);
-            }
-        } catch (Exception e) {
+            Files.write(log.locateLog(date), I.signal(list).map(Execution::toString).toList());
+        } catch (IOException e) {
             throw I.quiet(e);
         }
+        return list;
+    }
+
+    /**
+     * Create dummy compact execution log.
+     * 
+     * @param date A target date.
+     */
+    private List<Execution> writeCompactExecutionLog(ZonedDateTime date) {
+        List<Execution> list = executionRandomly(10).toList();
+        log.writeCompactLog(date, I.signal(list));
+        return list;
     }
 }
