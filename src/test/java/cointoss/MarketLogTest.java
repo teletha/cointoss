@@ -54,7 +54,7 @@ class MarketLogTest {
     void readNoLog() {
         ZonedDateTime today = Chrono.utcNow();
 
-        List<Execution> list = log.read(today).toList();
+        List<Execution> list = log.at(today).toList();
         assert list.isEmpty() == true;
     }
 
@@ -62,7 +62,7 @@ class MarketLogTest {
     void readLog() {
         ZonedDateTime today = Chrono.utcNow();
         List<Execution> original = writeExecutionLog(today);
-        List<Execution> restored = log.read(today).toList();
+        List<Execution> restored = log.at(today).toList();
 
         assertIterableEquals(original, restored);
     }
@@ -71,7 +71,7 @@ class MarketLogTest {
     void readCompactLog() {
         ZonedDateTime today = Chrono.utcNow();
         List<Execution> original = writeCompactExecutionLog(today);
-        List<Execution> restored = log.read(today).toList();
+        List<Execution> restored = log.at(today).toList();
 
         assertIterableEquals(original, restored);
     }
@@ -87,7 +87,7 @@ class MarketLogTest {
 
         // reading yesterday log will NOT create compact log automatically
         // because next day's log doesn't exist
-        List<Execution> restored = log.read(yesterday).toList();
+        List<Execution> restored = log.at(yesterday).toList();
         assertIterableEquals(restored, yesterdayLog);
         assert Files.notExists(yesterdayCompactLog);
 
@@ -95,7 +95,7 @@ class MarketLogTest {
         // because next day's log exist
         writeExecutionLog(today);
 
-        restored = log.read(yesterday).toList();
+        restored = log.at(yesterday).toList();
         assertIterableEquals(restored, yesterdayLog);
         assert Files.exists(yesterdayCompactLog);
     }

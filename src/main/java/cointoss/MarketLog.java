@@ -24,6 +24,7 @@ import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalAccessor;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -220,7 +221,8 @@ public class MarketLog {
                 current = current.withHour(0).withMinute(0).withSecond(0).withNano(0);
 
                 while (disposer.isDisposed() == false && !current.isAfter(cacheLast)) {
-                    disposer.add(read(current).effect(e -> latestId = cacheId = e.id)
+                    disposer.add(new Cache(current).read()
+                            .effect(e -> latestId = cacheId = e.id)
                             .take(e -> e.exec_date.isAfter(start))
                             .to(observer::accept));
                     current = current.plusDays(1);
@@ -355,7 +357,7 @@ public class MarketLog {
             // try the previous day
             return at(date.minusDays(1));
         }
-        return read(date);
+        return new Cache(date).read();
     }
 
     /**
@@ -364,7 +366,7 @@ public class MarketLog {
      * @param date A date time.
      * @return A file location.
      */
-    Path locateLog(ZonedDateTime date) {
+    Path locateLog(TemporalAccessor date) {
         return root.resolve("execution" + Chrono.DateCompact.format(date) + ".log");
     }
 
@@ -374,7 +376,7 @@ public class MarketLog {
      * @param date A date time.
      * @return A file location.
      */
-    Path locateCompactLog(ZonedDateTime date) {
+    Path locateCompactLog(TemporalAccessor date) {
         return root.resolve("compact" + Chrono.DateCompact.format(date) + ".log");
     }
 
@@ -483,93 +485,96 @@ public class MarketLog {
         return range(Span.random(cacheFirst, cacheLast.minusDays(1), days));
     }
 
-    /**
-     * Read {@link Execution} log of the specified {@link ZonedDateTime}.
-     * 
-     * @param date
-     * @return
-     */
-    public final Signal<Execution> read(ZonedDateTime date) {
-        return new Signal<>((observer, disposer) -> {
-            try {
-                Path log = locateLog(date);
-                Path compact = locateCompactLog(date);
-                boolean hasLog = Files.isExecutable(log);
-                boolean hasCompact = Files.exists(compact);
+    // /**
+    // * Read {@link Execution} log of the specified {@link ZonedDateTime}.
+    // *
+    // * @param date
+    // * @return
+    // */
+    // public final Signal<Execution> read(ZonedDateTime date) {
+    // return new Signal<>((observer, disposer) -> {
+    // try {
+    // Path log = locateLog(date);
+    // Path compact = locateCompactLog(date);
+    // boolean hasLog = Files.isExecutable(log);
+    // boolean hasCompact = Files.exists(compact);
+    //
+    // if (!hasLog && !hasCompact) {
+    // return disposer;
+    // }
+    //
+    // if (!hasCompact) {
+    // ZonedDateTime nextDay = date.plusDays(1);
+    //
+    // if (Files.exists(locateCompactLog(nextDay)) || Files.exists(locateLog(nextDay))) {
+    // // compact today log
+    // // writeCompactLog(date, readLog(date, false));
+    // }
+    // }
+    //
+    // CsvParserSettings settings = new CsvParserSettings();
+    // settings.getFormat().setDelimiter(' ');
+    //
+    // CsvParser parser = new CsvParser(settings);
+    // parser.beginParsing(hasCompact ? new ZstdInputStream(newInputStream(compact)) :
+    // newInputStream(log), ISO_8859_1);
+    //
+    // String[] row;
+    // Execution previous = null;
+    //
+    // while (disposer.isNotDisposed() && (row = parser.parseNext()) != null) {
+    // Execution e = hasCompact && previous != null ? service.decode(row, previous) : new
+    // Execution(row);
+    // observer.accept(e);
+    //
+    // previous = e;
+    // }
+    //
+    // parser.stopParsing();
+    // observer.complete();
+    // return disposer;
+    // } catch (Exception e) {
+    // throw I.quiet(e);
+    // }
+    // });
+    // }
 
-                if (!hasLog && !hasCompact) {
-                    return disposer;
-                }
-
-                if (!hasCompact) {
-                    ZonedDateTime nextDay = date.plusDays(1);
-
-                    if (Files.exists(locateCompactLog(nextDay)) || Files.exists(locateLog(nextDay))) {
-                        // compact today log
-                        // writeCompactLog(date, readLog(date, false));
-                    }
-                }
-
-                CsvParserSettings settings = new CsvParserSettings();
-                settings.getFormat().setDelimiter(' ');
-
-                CsvParser parser = new CsvParser(settings);
-                parser.beginParsing(hasCompact ? new ZstdInputStream(newInputStream(compact)) : newInputStream(log), ISO_8859_1);
-
-                String[] row;
-                Execution previous = null;
-
-                while (disposer.isNotDisposed() && (row = parser.parseNext()) != null) {
-                    Execution e = hasCompact && previous != null ? service.decode(row, previous) : new Execution(row);
-                    observer.accept(e);
-
-                    previous = e;
-                }
-
-                parser.stopParsing();
-                observer.complete();
-                return disposer;
-            } catch (Exception e) {
-                throw I.quiet(e);
-            }
-        });
-    }
-
-    /**
-     * Read normal execution log actually.
-     * 
-     * @param date A target date.
-     */
-    Signal<Execution> readLog(ZonedDateTime date, boolean compact) {
-        return new Signal<>((observer, disposer) -> {
-            try {
-                CsvParserSettings settings = new CsvParserSettings();
-                settings.getFormat().setDelimiter(' ');
-
-                CsvParser parser = new CsvParser(settings);
-                parser.beginParsing(compact ? new ZstdInputStream(newInputStream(locateCompactLog(date)))
-                        : newInputStream(locateLog(date)), ISO_8859_1);
-
-                String[] row;
-                Execution previous = null;
-
-                while (disposer.isNotDisposed() && (row = parser.parseNext()) != null) {
-                    observer.accept(previous = compact && previous != null ? service.decode(row, previous) : new Execution(row));
-                }
-
-                parser.stopParsing();
-                observer.complete();
-
-                return disposer;
-            } catch (IOException e) {
-                throw I.quiet(e);
-            }
-        });
-    }
+    // /**
+    // * Read normal execution log actually.
+    // *
+    // * @param date A target date.
+    // */
+    // Signal<Execution> readLog(ZonedDateTime date, boolean compact) {
+    // return new Signal<>((observer, disposer) -> {
+    // try {
+    // CsvParserSettings settings = new CsvParserSettings();
+    // settings.getFormat().setDelimiter(' ');
+    //
+    // CsvParser parser = new CsvParser(settings);
+    // parser.beginParsing(compact ? new ZstdInputStream(newInputStream(locateCompactLog(date)))
+    // : newInputStream(locateLog(date)), ISO_8859_1);
+    //
+    // String[] row;
+    // Execution previous = null;
+    //
+    // while (disposer.isNotDisposed() && (row = parser.parseNext()) != null) {
+    // observer.accept(previous = compact && previous != null ? service.decode(row, previous) : new
+    // Execution(row));
+    // }
+    //
+    // parser.stopParsing();
+    // observer.complete();
+    //
+    // return disposer;
+    // } catch (IOException e) {
+    // throw I.quiet(e);
+    // }
+    // });
+    // }
 
     /**
      * Write compact execution log actually.
-     * 
+     *
      * @param date A target date.
      * @param executions A execution log.
      */
@@ -658,7 +663,73 @@ public class MarketLog {
          */
         private Signal<Execution> read() {
             return new Signal<>((observer, disposer) -> {
-                return disposer;
+                try {
+                    CsvParserSettings parserSetting = new CsvParserSettings();
+                    parserSetting.getFormat().setDelimiter(' ');
+                    CsvParser parser = new CsvParser(parserSetting);
+                    String[] row;
+
+                    if (Files.exists(compact)) {
+                        // read compact log
+                        parser.beginParsing(new ZstdInputStream(Files.newInputStream(compact)), ISO_8859_1);
+
+                        // read fisrt value
+                        row = parser.parseNext();
+
+                        if (row != null) {
+                            Execution previous = new Execution(row);
+                            observer.accept(previous);
+
+                            while (disposer.isNotDisposed() && (row = parser.parseNext()) != null) {
+                                observer.accept(previous = service.decode(row, previous));
+                            }
+                        }
+                    } else if (Files.notExists(log)) {
+                        // no data
+                        return disposer;
+                    } else {
+                        // read normal
+                        parser.beginParsing(Files.newInputStream(log), ISO_8859_1);
+
+                        LocalDate nextDay = date.plusDays(1);
+
+                        if (Files.notExists(locateCompactLog(nextDay)) && Files.notExists(locateLog(nextDay))) {
+                            // read normal log
+                            while (disposer.isNotDisposed() && (row = parser.parseNext()) != null) {
+                                observer.accept(new Execution(row));
+                            }
+                        } else {
+                            // read normal log and make it compact coinstantaneously
+                            CsvWriterSettings setting = new CsvWriterSettings();
+                            setting.getFormat().setDelimiter(' ');
+
+                            CsvWriter writer = new CsvWriter(new ZstdOutputStream(newOutputStream(compact), 1), ISO_8859_1, setting);
+
+                            // read fisrt value
+                            row = parser.parseNext();
+
+                            if (row != null) {
+                                Execution previous = new Execution(row);
+                                observer.accept(previous);
+                                writer.writeRow(previous.toString().split(" "));
+
+                                while (disposer.isNotDisposed() && (row = parser.parseNext()) != null) {
+                                    Execution e = new Execution(row);
+                                    observer.accept(e);
+                                    writer.writeRow(service.encode(e, previous));
+                                    previous = e;
+                                }
+                            }
+                            writer.close();
+                        }
+                    }
+
+                    parser.stopParsing();
+                    observer.complete();
+                    return disposer;
+                } catch (Exception e) {
+                    throw I.quiet(e);
+                }
             });
         }
 
@@ -709,6 +780,7 @@ public class MarketLog {
                 throw I.quiet(e);
             }
         }
+
     }
 
     /**
