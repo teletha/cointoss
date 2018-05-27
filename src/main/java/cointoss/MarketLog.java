@@ -11,11 +11,11 @@ package cointoss;
 
 import static java.nio.charset.StandardCharsets.*;
 import static java.nio.file.Files.*;
+import static java.nio.file.StandardOpenOption.*;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -26,8 +26,12 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -44,13 +48,22 @@ import cointoss.util.Chrono;
 import cointoss.util.Num;
 import cointoss.util.Span;
 import filer.Filer;
+import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
 
 /**
  * @version 2018/05/26 10:41:05
  */
-public class MarketLog {
+public class MarketLog implements Disposable {
+
+    /** The log writer. */
+    private static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(2, run -> {
+        Thread thread = new Thread(run);
+        thread.setName("Market Log Writer");
+        thread.setDaemon(true);
+        return thread;
+    });
 
     /** The writer thread. */
     private static final ExecutorService writer = Executors.newSingleThreadExecutor(run -> {
@@ -86,9 +99,6 @@ public class MarketLog {
 
     /** The latest realtime id. */
     private long realtimeId;
-
-    /** The current processing cache file. */
-    private BufferedWriter cache;
 
     /** The current log writer. */
     private Cache logger;
@@ -142,6 +152,14 @@ public class MarketLog {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void vandalize() {
+        logger.dispose();
+    }
+
+    /**
      * Read date from the specified date.
      * 
      * @param start
@@ -192,25 +210,31 @@ public class MarketLog {
         if (cacheId < exe.id) {
             cacheId = exe.id;
 
-            writer.submit(() -> {
-                try {
-                    ZonedDateTime date = exe.exec_date;
+            if (logger.end.isBefore(exe.exec_date)) {
+                logger.dispose();
+                logger = new Cache(exe.exec_date);
+            }
+            logger.write(exe);
 
-                    if (cache == null || cacheLast.isBefore(date)) {
-                        I.quiet(cache);
-
-                        File file = locateLog(date).toFile();
-                        file.createNewFile();
-                        cache = new BufferedWriter(new FileWriter(file, true));
-                        cacheLast = date.withHour(23).withMinute(59).withSecond(59).withNano(999999999);
-                    }
-                    cache.write(exe.toString() + "\r\n");
-                    cache.flush();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    throw I.quiet(e);
-                }
-            });
+            // writer.submit(() -> {
+            // try {
+            // ZonedDateTime date = exe.exec_date;
+            //
+            // if (cache == null || cacheLast.isBefore(date)) {
+            // I.quiet(cache);
+            //
+            // File file = locateLog(date).toFile();
+            // file.createNewFile();
+            // cache = new BufferedWriter(new FileWriter(file, true));
+            // cacheLast = date.withHour(23).withMinute(59).withSecond(59).withNano(999999999);
+            // }
+            // cache.write(exe.toString() + "\r\n");
+            // cache.flush();
+            // } catch (IOException e) {
+            // e.printStackTrace();
+            // throw I.quiet(e);
+            // }
+            // });
         }
     }
 
@@ -229,7 +253,7 @@ public class MarketLog {
                             .toList();
 
                     // skip if there is no new execution
-                    if (executions.isEmpty() || executions.get(0).id == latestId) {
+                    if (executions.get(0).id == latestId) {
                         offset++;
                         continue;
                     }
@@ -543,25 +567,15 @@ public class MarketLog {
     }
 
     /**
-     * Write the specified {@link Execution} to log file.
-     * 
-     * @param execution
+     * @version 2018/05/27 10:31:20
      */
-    void writeLog(Execution execution) {
-        if (logger.date.equals(execution.exec_date.toLocalDate())) {
-            logger.write(execution);
-        } else {
+    private class Cache implements Disposable {
 
-        }
-    }
+        /** The target datetime. */
+        private final ZonedDateTime start;
 
-    /**
-     * @version 2018/05/19 12:17:09
-     */
-    private class Cache {
-
-        /** The target date. */
-        private final LocalDate date;
+        /** The end datetime */
+        private final ZonedDateTime end;
 
         /** The log file. */
         private final Path log;
@@ -572,13 +586,23 @@ public class MarketLog {
         /** The latest id. */
         private long latest;
 
+        /** The wrting execution queue. */
+        private ConcurrentLinkedQueue<Execution> writing = new ConcurrentLinkedQueue();
+
+        /** The actual log writer. */
+        private final ScheduledFuture writer;
+
         /**
          * @param date
          */
         private Cache(ZonedDateTime date) {
-            this.date = date.toLocalDate();
+            this.start = date.truncatedTo(ChronoUnit.DAYS);
+            this.end = this.start.plusDays(1).minusNanos(1);
             this.log = locateLog(date);
             this.compact = locateCompactLog(date);
+
+            // schedule writing task
+            this.writer = scheduler.scheduleWithFixedDelay(this::write, 30, 30, TimeUnit.SECONDS);
         }
 
         /**
@@ -588,7 +612,6 @@ public class MarketLog {
          */
         private Signal<Execution> read() {
             return new Signal<>((observer, disposer) -> {
-
                 return disposer;
             });
         }
@@ -599,7 +622,43 @@ public class MarketLog {
          * @param execution
          */
         private void write(Execution execution) {
-            System.out.println(execution);
+            writing.add(execution);
+        }
+
+        /**
+         * Write all buffered execution log to file.
+         */
+        private void write() {
+            if (writing.isEmpty()) {
+                return;
+            }
+
+            // switch buffer
+            ConcurrentLinkedQueue<Execution> remaining = writing;
+            writing = new ConcurrentLinkedQueue();
+
+            // build text
+            StringBuilder builder = new StringBuilder();
+
+            for (Execution e : remaining) {
+                builder.append(e).append("\r\n");
+            }
+
+            // write to file
+            try (FileChannel channel = FileChannel.open(log, CREATE, APPEND)) {
+                channel.write(ByteBuffer.wrap(builder.toString().getBytes()));
+            } catch (IOException e) {
+                throw I.quiet(e);
+            }
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void vandalize() {
+            write();
+            writer.cancel(false);
         }
     }
 

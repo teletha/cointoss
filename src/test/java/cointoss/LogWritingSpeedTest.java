@@ -14,6 +14,7 @@ import static java.nio.file.StandardOpenOption.*;
 import java.io.IOException;
 import java.io.Writer;
 import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
 import java.nio.channels.AsynchronousFileChannel;
 import java.nio.channels.FileChannel;
 import java.nio.file.Files;
@@ -48,7 +49,7 @@ public class LogWritingSpeedTest {
 
         for (int i = 0; i < exes.size(); i++) {
             writer.append(exes.get(i) + "\r\n");
-            writer.flush();
+            // writer.flush();
         }
         writer.close();
         long end = System.currentTimeMillis();
@@ -108,7 +109,7 @@ public class LogWritingSpeedTest {
     }
 
     @Test
-    void mapped() throws IOException {
+    void bytebuffer() throws IOException {
         Path file = room.locateFile("bytebuffer");
         FileChannel writer = FileChannel.open(file, APPEND, CREATE);
 
@@ -120,6 +121,7 @@ public class LogWritingSpeedTest {
             builder.append(exes.get(i)).append("\r\n");
 
             if (++now == bufferSize) {
+                CharBuffer cb = CharBuffer.wrap("aaa");
                 ByteBuffer wrap = ByteBuffer.wrap(builder.toString().getBytes());
                 writer.write(wrap);
                 now = 0;

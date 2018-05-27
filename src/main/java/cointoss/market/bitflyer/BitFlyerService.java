@@ -137,6 +137,7 @@ public class BitFlyerService extends MarketService {
      */
     @Override
     public void vandalize() {
+        super.vandalize();
         disposer.dispose();
     }
 
