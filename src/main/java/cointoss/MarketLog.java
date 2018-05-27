@@ -24,14 +24,16 @@ import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Delayed;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -48,27 +50,80 @@ import cointoss.util.Chrono;
 import cointoss.util.Num;
 import cointoss.util.Span;
 import filer.Filer;
-import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
 
 /**
+ * Log Manager.
+ * 
  * @version 2018/05/26 10:41:05
  */
-public class MarketLog implements Disposable {
+public class MarketLog {
+
+    /** NOOP TASK */
+    private static final ScheduledFuture NOOP = new ScheduledFuture() {
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public int compareTo(Delayed o) {
+            return 0;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean cancel(boolean mayInterruptIfRunning) {
+            return false;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean isCancelled() {
+            return false;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean isDone() {
+            return false;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Object get() throws InterruptedException, ExecutionException {
+            return null;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Object get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+            return null;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public long getDelay(TimeUnit unit) {
+            return 0;
+        }
+    };
 
     /** The log writer. */
     private static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(2, run -> {
         Thread thread = new Thread(run);
         thread.setName("Market Log Writer");
-        thread.setDaemon(true);
-        return thread;
-    });
-
-    /** The writer thread. */
-    private static final ExecutorService writer = Executors.newSingleThreadExecutor(run -> {
-        final Thread thread = new Thread(run);
-        thread.setName("Log Writer");
         thread.setDaemon(true);
         return thread;
     });
@@ -100,8 +155,8 @@ public class MarketLog implements Disposable {
     /** The latest realtime id. */
     private long realtimeId;
 
-    /** The current log writer. */
-    private Cache logger;
+    /** The active cache. */
+    private Cache cache;
 
     /**
      * Create log manager.
@@ -121,7 +176,7 @@ public class MarketLog implements Disposable {
     MarketLog(MarketService service, Path root) {
         this.service = Objects.requireNonNull(service);
         this.root = Objects.requireNonNull(root);
-        this.logger = new Cache(ZonedDateTime.of(2000, 1, 1, 0, 0, 0, 0, Chrono.UTC));
+        this.cache = new Cache(ZonedDateTime.of(2000, 1, 1, 0, 0, 0, 0, Chrono.UTC));
 
         try {
             ZonedDateTime start = null;
@@ -149,14 +204,6 @@ public class MarketLog implements Disposable {
         } catch (Exception e) {
             throw I.quiet(e);
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void vandalize() {
-        logger.dispose();
     }
 
     /**
@@ -199,43 +246,6 @@ public class MarketLog implements Disposable {
 
             return disposer;
         });
-    }
-
-    /**
-     * Store cache data.
-     * 
-     * @param exe
-     */
-    private void cache(Execution exe) {
-        if (cacheId < exe.id) {
-            cacheId = exe.id;
-
-            if (logger.end.isBefore(exe.exec_date)) {
-                logger.dispose();
-                logger = new Cache(exe.exec_date);
-            }
-            logger.write(exe);
-
-            // writer.submit(() -> {
-            // try {
-            // ZonedDateTime date = exe.exec_date;
-            //
-            // if (cache == null || cacheLast.isBefore(date)) {
-            // I.quiet(cache);
-            //
-            // File file = locateLog(date).toFile();
-            // file.createNewFile();
-            // cache = new BufferedWriter(new FileWriter(file, true));
-            // cacheLast = date.withHour(23).withMinute(59).withSecond(59).withNano(999999999);
-            // }
-            // cache.write(exe.toString() + "\r\n");
-            // cache.flush();
-            // } catch (IOException e) {
-            // e.printStackTrace();
-            // throw I.quiet(e);
-            // }
-            // });
-        }
     }
 
     /**
@@ -285,6 +295,23 @@ public class MarketLog implements Disposable {
 
             return disposer;
         });
+    }
+
+    /**
+     * Store the {@link Execution} to local cache.
+     * 
+     * @param e An {@link Execution} to store.
+     */
+    private void cache(Execution e) {
+        if (cacheId < e.id) {
+            cacheId = e.id;
+
+            if (!cache.date.isEqual(e.exec_date.toLocalDate())) {
+                cache.disableAutoSave();
+                cache = new Cache(e.exec_date).enableAutoSave();
+            }
+            cache.queue.add(e);
+        }
     }
 
     /**
@@ -413,7 +440,7 @@ public class MarketLog implements Disposable {
      * Read log from the specified start to end.
      * 
      * @param start
-     * @param end
+     * @param limit
      * @return
      */
     public final Signal<Execution> rangeAll() {
@@ -424,7 +451,7 @@ public class MarketLog implements Disposable {
      * Read log from the specified start to end.
      * 
      * @param start
-     * @param end
+     * @param limit
      * @return
      */
     public final Signal<Execution> range(Span span) {
@@ -569,13 +596,10 @@ public class MarketLog implements Disposable {
     /**
      * @version 2018/05/27 10:31:20
      */
-    private class Cache implements Disposable {
+    private class Cache {
 
-        /** The target datetime. */
-        private final ZonedDateTime start;
-
-        /** The end datetime */
-        private final ZonedDateTime end;
+        /** The end date */
+        private final LocalDate date;
 
         /** The log file. */
         private final Path log;
@@ -583,26 +607,48 @@ public class MarketLog implements Disposable {
         /** The compact log file. */
         private final Path compact;
 
-        /** The latest id. */
+        /** The log writing task. */
+        private ScheduledFuture task = NOOP;
+
+        /** The writing execution queue. */
+        private LinkedList<Execution> queue = new LinkedList();
+
+        /** The latest cached id. */
         private long latest;
-
-        /** The wrting execution queue. */
-        private ConcurrentLinkedQueue<Execution> writing = new ConcurrentLinkedQueue();
-
-        /** The actual log writer. */
-        private final ScheduledFuture writer;
 
         /**
          * @param date
          */
         private Cache(ZonedDateTime date) {
-            this.start = date.truncatedTo(ChronoUnit.DAYS);
-            this.end = this.start.plusDays(1).minusNanos(1);
+            this.date = date.toLocalDate();
             this.log = locateLog(date);
             this.compact = locateCompactLog(date);
+        }
 
-            // schedule writing task
-            this.writer = scheduler.scheduleWithFixedDelay(this::write, 30, 30, TimeUnit.SECONDS);
+        /**
+         * Start writing log automatically.
+         * 
+         * @return Chainable API
+         */
+        private Cache enableAutoSave() {
+            if (task == NOOP) {
+                task = scheduler.scheduleWithFixedDelay(this::write, 30, 30, TimeUnit.SECONDS);
+            }
+            return this;
+        }
+
+        /**
+         * Stop writing log automatically.
+         * 
+         * @return
+         */
+        private Cache disableAutoSave() {
+            if (task != NOOP) {
+                task.cancel(false);
+                task = NOOP;
+                write();
+            }
+            return this;
         }
 
         /**
@@ -617,65 +663,54 @@ public class MarketLog implements Disposable {
         }
 
         /**
-         * Write {@link Execution} log.
-         * 
-         * @param execution
-         */
-        private void write(Execution execution) {
-            writing.add(execution);
-        }
-
-        /**
-         * Write all buffered execution log to file.
+         * Write all queued executions to log file.
          */
         private void write() {
-            if (writing.isEmpty()) {
+            if (queue.isEmpty()) {
                 return;
             }
 
             // switch buffer
-            ConcurrentLinkedQueue<Execution> remaining = writing;
-            writing = new ConcurrentLinkedQueue();
+            LinkedList<Execution> remaining = queue;
+            queue = new LinkedList();
 
             // build text
-            StringBuilder builder = new StringBuilder();
+            StringBuilder text = new StringBuilder();
 
             for (Execution e : remaining) {
-                builder.append(e).append("\r\n");
+                text.append(e).append("\r\n");
             }
 
             // write to file
             try (FileChannel channel = FileChannel.open(log, CREATE, APPEND)) {
-                channel.write(ByteBuffer.wrap(builder.toString().getBytes()));
+                channel.write(ByteBuffer.wrap(text.toString().getBytes()));
             } catch (IOException e) {
                 throw I.quiet(e);
             }
         }
 
         /**
-         * {@inheritDoc}
+         * Compact log.
          */
-        @Override
-        public void vandalize() {
-            write();
-            writer.cancel(false);
+        private void compact() {
+            try {
+                CsvWriterSettings setting = new CsvWriterSettings();
+                setting.getFormat().setDelimiter(' ');
+
+                CsvWriter writer = new CsvWriter(new ZstdOutputStream(Files.newOutputStream(compact), 1), ISO_8859_1, setting);
+
+                Execution[] previous = new Execution[1];
+                read().to(e -> {
+                    writer.writeRow(service.encode(e, previous[0]));
+                    previous[0] = e;
+                });
+                writer.close();
+            } catch (IOException e) {
+                throw I.quiet(e);
+            }
         }
     }
 
-    // public static void main(String[] args) {
-    // MarketLog log = new MarketLog(BitFlyerService.FX_BTC_JPY);
-    // long start = System.currentTimeMillis();
-    // Filer.walk(log.root, "*.log").to(file -> {
-    // long s = System.currentTimeMillis();
-    // log.read(file).to(e -> {
-    // });
-    // long e = System.currentTimeMillis();
-    // System.out.println("Done " + file + " " + (e - s));
-    // });
-    // long end = System.currentTimeMillis();
-    // System.out.println(end - start);
-    // }
-    //
     /**
      * @param args
      */

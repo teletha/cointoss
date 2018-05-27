@@ -52,14 +52,6 @@ public abstract class MarketService implements Disposable {
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void vandalize() {
-        log.dispose();
-    }
-
-    /**
      * Acquire the market starting date.
      * 
      * @return
