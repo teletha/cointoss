@@ -36,8 +36,6 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.BiFunction;
-import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -622,23 +620,6 @@ public class MarketLog {
 
                             // read fisrt value
                             row = parser.parseNext();
-
-                            Function<String[], Execution> first = Execution::new;
-                            first = first.compose(values -> {
-                                writer.writeRow(values);
-                                return values;
-                            });
-
-                            BiFunction<Execution, String[], Execution> others = (prev, now) -> {
-                                return new Execution(now);
-                            };
-
-                            I.signal(parser.iterate(Files.newInputStream(log), ISO_8859_1)).scans(values -> {
-                                return new Execution(values);
-                            }, (prev, values) -> {
-                                Execution e = new Execution(values);
-                                return e;
-                            }).to(observer);
 
                             if (row != null) {
                                 Execution previous = new Execution(row);
