@@ -36,6 +36,8 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -485,93 +487,6 @@ public class MarketLog {
         return range(Span.random(cacheFirst, cacheLast.minusDays(1), days));
     }
 
-    // /**
-    // * Read {@link Execution} log of the specified {@link ZonedDateTime}.
-    // *
-    // * @param date
-    // * @return
-    // */
-    // public final Signal<Execution> read(ZonedDateTime date) {
-    // return new Signal<>((observer, disposer) -> {
-    // try {
-    // Path log = locateLog(date);
-    // Path compact = locateCompactLog(date);
-    // boolean hasLog = Files.isExecutable(log);
-    // boolean hasCompact = Files.exists(compact);
-    //
-    // if (!hasLog && !hasCompact) {
-    // return disposer;
-    // }
-    //
-    // if (!hasCompact) {
-    // ZonedDateTime nextDay = date.plusDays(1);
-    //
-    // if (Files.exists(locateCompactLog(nextDay)) || Files.exists(locateLog(nextDay))) {
-    // // compact today log
-    // // writeCompactLog(date, readLog(date, false));
-    // }
-    // }
-    //
-    // CsvParserSettings settings = new CsvParserSettings();
-    // settings.getFormat().setDelimiter(' ');
-    //
-    // CsvParser parser = new CsvParser(settings);
-    // parser.beginParsing(hasCompact ? new ZstdInputStream(newInputStream(compact)) :
-    // newInputStream(log), ISO_8859_1);
-    //
-    // String[] row;
-    // Execution previous = null;
-    //
-    // while (disposer.isNotDisposed() && (row = parser.parseNext()) != null) {
-    // Execution e = hasCompact && previous != null ? service.decode(row, previous) : new
-    // Execution(row);
-    // observer.accept(e);
-    //
-    // previous = e;
-    // }
-    //
-    // parser.stopParsing();
-    // observer.complete();
-    // return disposer;
-    // } catch (Exception e) {
-    // throw I.quiet(e);
-    // }
-    // });
-    // }
-
-    // /**
-    // * Read normal execution log actually.
-    // *
-    // * @param date A target date.
-    // */
-    // Signal<Execution> readLog(ZonedDateTime date, boolean compact) {
-    // return new Signal<>((observer, disposer) -> {
-    // try {
-    // CsvParserSettings settings = new CsvParserSettings();
-    // settings.getFormat().setDelimiter(' ');
-    //
-    // CsvParser parser = new CsvParser(settings);
-    // parser.beginParsing(compact ? new ZstdInputStream(newInputStream(locateCompactLog(date)))
-    // : newInputStream(locateLog(date)), ISO_8859_1);
-    //
-    // String[] row;
-    // Execution previous = null;
-    //
-    // while (disposer.isNotDisposed() && (row = parser.parseNext()) != null) {
-    // observer.accept(previous = compact && previous != null ? service.decode(row, previous) : new
-    // Execution(row));
-    // }
-    //
-    // parser.stopParsing();
-    // observer.complete();
-    //
-    // return disposer;
-    // } catch (IOException e) {
-    // throw I.quiet(e);
-    // }
-    // });
-    // }
-
     /**
      * Write compact execution log actually.
      *
@@ -708,10 +623,27 @@ public class MarketLog {
                             // read fisrt value
                             row = parser.parseNext();
 
+                            Function<String[], Execution> first = Execution::new;
+                            first = first.compose(values -> {
+                                writer.writeRow(values);
+                                return values;
+                            });
+
+                            BiFunction<Execution, String[], Execution> others = (prev, now) -> {
+                                return new Execution(now);
+                            };
+
+                            I.signal(parser.iterate(Files.newInputStream(log), ISO_8859_1)).scans(values -> {
+                                return new Execution(values);
+                            }, (prev, values) -> {
+                                Execution e = new Execution(values);
+                                return e;
+                            }).to(observer);
+
                             if (row != null) {
                                 Execution previous = new Execution(row);
                                 observer.accept(previous);
-                                writer.writeRow(previous.toString().split(" "));
+                                writer.writeRow(row);
 
                                 while (disposer.isNotDisposed() && (row = parser.parseNext()) != null) {
                                     Execution e = new Execution(row);
