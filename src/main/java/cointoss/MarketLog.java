@@ -500,9 +500,9 @@ public class MarketLog {
 
             CsvWriter writer = new CsvWriter(new ZstdOutputStream(Files.newOutputStream(file), 1), ISO_8859_1, setting);
 
-            Execution[] previous = new Execution[1];
+            Execution[] previous = {Execution.NONE};
             executions.to(e -> {
-                writer.writeRow(service.encode(e, previous[0]));
+                writer.writeRow(service.encode(previous[0], e));
                 previous[0] = e;
             });
             writer.close();
@@ -580,61 +580,33 @@ public class MarketLog {
                     CsvParserSettings parserSetting = new CsvParserSettings();
                     parserSetting.getFormat().setDelimiter(' ');
                     CsvParser parser = new CsvParser(parserSetting);
-                    String[] row;
 
                     if (Files.exists(compact)) {
                         // read compact log
-                        parser.beginParsing(new ZstdInputStream(Files.newInputStream(compact)), ISO_8859_1);
-
-                        // read fisrt value
-                        row = parser.parseNext();
-
-                        if (row != null) {
-                            Execution previous = new Execution(row);
-                            observer.accept(previous);
-
-                            while (disposer.isNotDisposed() && (row = parser.parseNext()) != null) {
-                                observer.accept(previous = service.decode(row, previous));
-                            }
-                        }
+                        I.signal(parser.iterate(new ZstdInputStream(Files.newInputStream(compact)), ISO_8859_1))
+                                .scanWith(Execution.NONE, service::decode)
+                                .to(observer);
                     } else if (Files.notExists(log)) {
                         // no data
                         return disposer;
                     } else {
                         // read normal
-                        parser.beginParsing(Files.newInputStream(log), ISO_8859_1);
+                        Signal<Execution> signal = I.signal(parser.iterate(Files.newInputStream(log), ISO_8859_1)).map(Execution::new);
 
                         LocalDate nextDay = date.plusDays(1);
 
-                        if (Files.notExists(locateCompactLog(nextDay)) && Files.notExists(locateLog(nextDay))) {
-                            // read normal log
-                            while (disposer.isNotDisposed() && (row = parser.parseNext()) != null) {
-                                observer.accept(new Execution(row));
-                            }
-                        } else {
-                            // read normal log and make it compact coinstantaneously
+                        if (Files.exists(locateCompactLog(nextDay)) || Files.exists(locateLog(nextDay))) {
+                            // make log compact coinstantaneously
                             CsvWriterSettings setting = new CsvWriterSettings();
                             setting.getFormat().setDelimiter(' ');
-
                             CsvWriter writer = new CsvWriter(new ZstdOutputStream(newOutputStream(compact), 1), ISO_8859_1, setting);
 
-                            // read fisrt value
-                            row = parser.parseNext();
-
-                            if (row != null) {
-                                Execution previous = new Execution(row);
-                                observer.accept(previous);
-                                writer.writeRow(row);
-
-                                while (disposer.isNotDisposed() && (row = parser.parseNext()) != null) {
-                                    Execution e = new Execution(row);
-                                    observer.accept(e);
-                                    writer.writeRow(service.encode(e, previous));
-                                    previous = e;
-                                }
-                            }
-                            writer.close();
+                            signal = signal.map(Execution.NONE, (prev, e) -> {
+                                writer.writeRow(service.encode(prev, e));
+                                return e;
+                            }).effectOnComplete(writer::close);
                         }
+                        signal.to(observer);
                     }
 
                     parser.stopParsing();
@@ -685,7 +657,7 @@ public class MarketLog {
 
                 Execution[] previous = new Execution[1];
                 read().to(e -> {
-                    writer.writeRow(service.encode(e, previous[0]));
+                    writer.writeRow(service.encode(previous[0], e));
                     previous[0] = e;
                 });
                 writer.close();

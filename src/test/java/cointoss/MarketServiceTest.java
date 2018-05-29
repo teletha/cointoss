@@ -37,8 +37,8 @@ class MarketServiceTest {
             Execution current = exes.get(i);
             Execution previous = exes.get(i - 1);
 
-            String[] encoded = service.encode(current, previous);
-            Execution decoded = service.decode(encoded, previous);
+            String[] encoded = service.encode(previous, current);
+            Execution decoded = service.decode(previous, encoded);
             assert decoded.equals(current);
         }
     }
@@ -55,8 +55,8 @@ class MarketServiceTest {
             Execution current = exes.get(i);
             Execution previous = exes.get(i - 1);
 
-            String[] encoded = service.encode(current, previous);
-            Execution decoded = service.decode(encoded, previous);
+            String[] encoded = service.encode(previous, current);
+            Execution decoded = service.decode(previous, encoded);
             assert decoded.equals(current);
         }
     }
@@ -77,8 +77,8 @@ class MarketServiceTest {
             Execution current = exes.get(i);
             Execution previous = exes.get(i - 1);
 
-            String[] encoded = service.encode(current, previous);
-            Execution decoded = service.decode(encoded, previous);
+            String[] encoded = service.encode(previous, current);
+            Execution decoded = service.decode(previous, encoded);
             assert decoded.equals(current);
         }
     }
@@ -97,8 +97,8 @@ class MarketServiceTest {
             Execution current = exes.get(i);
             Execution previous = exes.get(i - 1);
 
-            String[] encoded = service.encode(current, previous);
-            Execution decoded = service.decode(encoded, previous);
+            String[] encoded = service.encode(previous, current);
+            Execution decoded = service.decode(previous, encoded);
             assert decoded.equals(current);
         }
     }
@@ -117,8 +117,8 @@ class MarketServiceTest {
             Execution current = exes.get(i);
             Execution previous = exes.get(i - 1);
 
-            String[] encoded = service.encode(current, previous);
-            Execution decoded = service.decode(encoded, previous);
+            String[] encoded = service.encode(previous, current);
+            Execution decoded = service.decode(previous, encoded);
             assert decoded.equals(current);
         }
     }
@@ -138,8 +138,8 @@ class MarketServiceTest {
             Execution current = exes.get(i);
             Execution previous = exes.get(i - 1);
 
-            String[] encoded = service.encode(current, previous);
-            Execution decoded = service.decode(encoded, previous);
+            String[] encoded = service.encode(previous, current);
+            Execution decoded = service.decode(previous, encoded);
             assert decoded.equals(current);
         }
     }
@@ -160,8 +160,8 @@ class MarketServiceTest {
             Execution current = exes.get(i);
             Execution previous = exes.get(i - 1);
 
-            String[] encoded = service.encode(current, previous);
-            Execution decoded = service.decode(encoded, previous);
+            String[] encoded = service.encode(previous, current);
+            Execution decoded = service.decode(previous, encoded);
             assert decoded.equals(current);
         }
     }

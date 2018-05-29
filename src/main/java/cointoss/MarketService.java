@@ -165,7 +165,7 @@ public abstract class MarketService implements Disposable {
      * @param values
      * @return
      */
-    final Execution decode(String[] values, Execution previous) {
+    final Execution decode(Execution previous, String[] values) {
         Execution current = new Execution();
         current.id = decodeId(values[0], previous);
         current.exec_date = decodeDate(values[1], previous);
@@ -190,20 +190,15 @@ public abstract class MarketService implements Disposable {
      * @param execution
      * @return
      */
-    final String[] encode(Execution execution, Execution previous) {
-        if (previous == null) {
-            // no diff
-            return execution.toString().split(" ");
-        } else {
-            String id = encodeId(execution, previous);
-            String time = encodeDate(execution, previous);
-            String price = encodePrice(execution, previous);
-            String size = encodeSize(execution, previous);
-            String delay = LogCodec.encodeInt(execution.delay + 3);
-            String sideAndConsecutive = String.valueOf(execution.side.isBuy() ? execution.consecutive : 3 + execution.consecutive);
+    final String[] encode(Execution previous, Execution execution) {
+        String id = encodeId(execution, previous);
+        String time = encodeDate(execution, previous);
+        String price = encodePrice(execution, previous);
+        String size = encodeSize(execution, previous);
+        String delay = LogCodec.encodeInt(execution.delay + 3);
+        String sideAndConsecutive = String.valueOf(execution.side.isBuy() ? execution.consecutive : 3 + execution.consecutive);
 
-            return new String[] {id, time, price, sideAndConsecutive + delay + size};
-        }
+        return new String[] {id, time, price, sideAndConsecutive + delay + size};
     }
 
     /**

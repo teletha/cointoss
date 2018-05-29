@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
+import cointoss.util.Chrono;
 import cointoss.util.Num;
 import kiss.Decoder;
 import kiss.Encoder;
@@ -41,8 +42,7 @@ public class Execution {
     public static final Execution NONE = new Execution();
 
     static {
-        NONE.id = 0;
-        NONE.exec_date = ZonedDateTime.now();
+        NONE.exec_date = Chrono.utc(2000, 1, 1);
         NONE.side = Side.BUY;
         NONE.price = Num.ZERO;
         NONE.size = Num.ZERO;
