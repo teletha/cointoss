@@ -10,7 +10,6 @@
 package cointoss.backtest;
 
 import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.concurrent.ConcurrentLinkedDeque;
@@ -23,7 +22,6 @@ import cointoss.order.Order.Quantity;
 import cointoss.order.Order.State;
 import cointoss.order.OrderBookListChange;
 import cointoss.order.OrderType;
-import cointoss.util.Chrono;
 import cointoss.util.Num;
 import kiss.Disposable;
 import kiss.I;
@@ -72,14 +70,6 @@ public class TestableMarketService extends MarketService {
     public TestableMarketService(Time lag) {
         super("TestableExchange", "TestableMarket");
         this.lag = lag;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ZonedDateTime start() {
-        return Chrono.utcNow().truncatedTo(ChronoUnit.DAYS).minusDays(7);
     }
 
     /**

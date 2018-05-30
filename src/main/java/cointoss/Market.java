@@ -84,7 +84,7 @@ public class Market implements Disposable {
     public final Variable<Execution> init = Variable.empty();
 
     /** The latest execution. */
-    public final Variable<Execution> latest = Variable.of(Execution.NONE);
+    public final Variable<Execution> latest = Variable.of(Execution.BASE);
 
     /** The latest price. */
     public final Variable<Num> price = latest.observeNow().map(e -> e.price).diff().to();
@@ -222,6 +222,7 @@ public class Market implements Disposable {
             order.state.set(ACTIVE);
 
             orderItems.add(order);
+            orders.add(order);
 
             return order;
         }).effectOnError(e -> {

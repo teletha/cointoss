@@ -19,7 +19,7 @@ import kiss.Decoder;
 import kiss.Encoder;
 
 /**
- * @version 2018/05/01 16:47:20
+ * @version 2018/05/30 9:07:20
  */
 public class Execution {
 
@@ -39,13 +39,14 @@ public class Execution {
     public static final int DelayHuge = -1;
 
     /** The empty object. */
-    public static final Execution NONE = new Execution();
+    public static final Execution BASE = new Execution();
 
     static {
-        NONE.exec_date = Chrono.utc(2000, 1, 1);
-        NONE.side = Side.BUY;
-        NONE.price = Num.ZERO;
-        NONE.size = Num.ZERO;
+        // don't modify these initial values
+        BASE.exec_date = Chrono.utc(2000, 1, 1);
+        BASE.side = Side.BUY;
+        BASE.price = Num.ZERO;
+        BASE.size = Num.ZERO;
     }
 
     public long id;

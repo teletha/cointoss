@@ -186,7 +186,7 @@ public class MarketLog {
             for (Path file : Filer.walk(root, "execution*.log").toList()) {
                 String name = file.getFileName().toString();
                 ZonedDateTime date = LocalDate.parse(name.substring(9, 17), fileName).atTime(0, 0, 0, 0).atZone(Chrono.UTC);
-
+                System.out.println(date);
                 if (start == null || end == null) {
                     start = date;
                     end = date;
@@ -345,18 +345,6 @@ public class MarketLog {
      * @return
      */
     public final Signal<Execution> at(ZonedDateTime date) {
-        if (date.isBefore(service.start())) {
-            return Signal.EMPTY;
-        }
-
-        // check cache
-        Path file = locateLog(date);
-
-        // no cache
-        if (file == null) {
-            // try the previous day
-            return at(date.minusDays(1));
-        }
         return new Cache(date).read();
     }
 
@@ -486,29 +474,24 @@ public class MarketLog {
     }
 
     /**
-     * Write compact execution log actually.
+     * Compact log at the specified date.
+     * 
+     * @param date A target date.
+     */
+    void compact(ZonedDateTime date) {
+
+    }
+
+    /**
+     * Write compact execution log for test.
      *
      * @param date A target date.
      * @param executions A execution log.
      */
     void writeCompactLog(ZonedDateTime date, Signal<Execution> executions) {
-        try {
-            Path file = locateCompactLog(date);
-
-            CsvWriterSettings setting = new CsvWriterSettings();
-            setting.getFormat().setDelimiter(' ');
-
-            CsvWriter writer = new CsvWriter(new ZstdOutputStream(Files.newOutputStream(file), 1), ISO_8859_1, setting);
-
-            Execution[] previous = {Execution.NONE};
-            executions.to(e -> {
-                writer.writeRow(service.encode(previous[0], e));
-                previous[0] = e;
-            });
-            writer.close();
-        } catch (Exception e) {
-            throw I.quiet(e);
-        }
+        new Cache(date).compact(executions).to(e -> {
+            // do nothing
+        });
     }
 
     /**
@@ -575,47 +558,64 @@ public class MarketLog {
          * @return
          */
         private Signal<Execution> read() {
-            return new Signal<>((observer, disposer) -> {
-                try {
-                    CsvParserSettings parserSetting = new CsvParserSettings();
-                    parserSetting.getFormat().setDelimiter(' ');
-                    CsvParser parser = new CsvParser(parserSetting);
+            try {
+                CsvParserSettings setting = new CsvParserSettings();
+                setting.getFormat().setDelimiter(' ');
+                CsvParser parser = new CsvParser(setting);
 
-                    if (Files.exists(compact)) {
-                        // read compact log
-                        I.signal(parser.iterate(new ZstdInputStream(Files.newInputStream(compact)), ISO_8859_1))
-                                .scanWith(Execution.NONE, service::decode)
-                                .to(observer);
-                    } else if (Files.notExists(log)) {
-                        // no data
-                        return disposer;
-                    } else {
-                        // read normal
-                        Signal<Execution> signal = I.signal(parser.iterate(Files.newInputStream(log), ISO_8859_1)).map(Execution::new);
+                if (Files.exists(compact)) {
+                    // read compact
+                    return I.signal(parser.iterate(new ZstdInputStream(newInputStream(compact)), ISO_8859_1))
+                            .scanWith(Execution.BASE, service::decode)
+                            .effectOnComplete(parser::stopParsing);
+                } else if (Files.notExists(log)) {
+                    // no data
+                    return download();
+                } else {
+                    // read normal
+                    Signal<Execution> signal = I.signal(parser.iterate(newInputStream(log), ISO_8859_1))
+                            .map(Execution::new)
+                            .effectOnComplete(parser::stopParsing);
 
-                        LocalDate nextDay = date.plusDays(1);
-
-                        if (Files.exists(locateCompactLog(nextDay)) || Files.exists(locateLog(nextDay))) {
-                            // make log compact coinstantaneously
-                            CsvWriterSettings setting = new CsvWriterSettings();
-                            setting.getFormat().setDelimiter(' ');
-                            CsvWriter writer = new CsvWriter(new ZstdOutputStream(newOutputStream(compact), 1), ISO_8859_1, setting);
-
-                            signal = signal.map(Execution.NONE, (prev, e) -> {
-                                writer.writeRow(service.encode(prev, e));
-                                return e;
-                            }).effectOnComplete(writer::close);
-                        }
-                        signal.to(observer);
+                    // make log compact coinstantaneously
+                    LocalDate nextDay = date.plusDays(1);
+                    if (Files.exists(locateCompactLog(nextDay)) || Files.exists(locateLog(nextDay))) {
+                        signal = compact(signal);
                     }
 
-                    parser.stopParsing();
-                    observer.complete();
-                    return disposer;
-                } catch (Exception e) {
-                    throw I.quiet(e);
+                    return signal;
                 }
-            });
+            } catch (IOException e) {
+                throw I.quiet(e);
+            }
+        }
+
+        /**
+         * Write compact log from the specified executions.
+         */
+        private Signal<Execution> compact(Signal<Execution> executions) {
+            try {
+                CsvWriterSettings setting = new CsvWriterSettings();
+                setting.getFormat().setDelimiter(' ');
+                CsvWriter writer = new CsvWriter(new ZstdOutputStream(newOutputStream(compact), 1), ISO_8859_1, setting);
+
+                return executions.map(Execution.BASE, (prev, e) -> {
+                    writer.writeRow(service.encode(prev, e));
+                    return e;
+                }).effectOnComplete(writer::close);
+            } catch (IOException e) {
+                throw I.quiet(e);
+            }
+        }
+
+        /**
+         * Try to download from market server.
+         * 
+         * @return
+         */
+        private Signal<Execution> download() {
+            System.out.println(cacheFirst);
+            return Signal.EMPTY;
         }
 
         /**
@@ -639,28 +639,7 @@ public class MarketLog {
 
             // write to file
             try (FileChannel channel = FileChannel.open(log, CREATE, APPEND)) {
-                channel.write(ByteBuffer.wrap(text.toString().getBytes()));
-            } catch (IOException e) {
-                throw I.quiet(e);
-            }
-        }
-
-        /**
-         * Compact log.
-         */
-        private void compact() {
-            try {
-                CsvWriterSettings setting = new CsvWriterSettings();
-                setting.getFormat().setDelimiter(' ');
-
-                CsvWriter writer = new CsvWriter(new ZstdOutputStream(Files.newOutputStream(compact), 1), ISO_8859_1, setting);
-
-                Execution[] previous = new Execution[1];
-                read().to(e -> {
-                    writer.writeRow(service.encode(previous[0], e));
-                    previous[0] = e;
-                });
-                writer.close();
+                channel.write(ByteBuffer.wrap(text.toString().getBytes(ISO_8859_1)));
             } catch (IOException e) {
                 throw I.quiet(e);
             }
@@ -675,8 +654,12 @@ public class MarketLog {
         System.out.println(Num.of(10));
         MarketLog log = new MarketLog(BitFlyerService.FX_BTC_JPY);
 
-        Filer.walk(log.root, "execution*.log").to(file -> {
-
+        log.at(2016, 5, 21).to(e -> {
+            System.out.println(e);
         });
+
+        // Filer.walk(log.root, "execution*.log").to(file -> {
+        //
+        // });
     }
 }

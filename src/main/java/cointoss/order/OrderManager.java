@@ -61,6 +61,18 @@ public class OrderManager {
     }
 
     /**
+     * Add new order.
+     * 
+     * @param order
+     */
+    public void add(Order order) {
+        if (order != null && !orders.contains(order)) {
+            orders.add(order);
+            addition.accept(order);
+        }
+    }
+
+    /**
      * Update local managed {@link Order}.
      * 
      * @param order

@@ -52,13 +52,6 @@ public abstract class MarketService implements Disposable {
     }
 
     /**
-     * Acquire the market starting date.
-     * 
-     * @return
-     */
-    public abstract ZonedDateTime start();
-
-    /**
      * Estimate the curernt order delay (second).
      * 
      * @return
