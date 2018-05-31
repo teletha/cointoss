@@ -60,7 +60,7 @@ public class Network {
                         observer.complete();
                     }
                 } else {
-                    observer.error(new Error("HTTP Status " + code + " " + value));
+                    observer.error(new Error("[" + request.url() + "] HTTP Status " + code + " " + value));
                 }
             } catch (Throwable e) {
                 observer.error(new Error("[" + request.url() + "] throws some error.", e));

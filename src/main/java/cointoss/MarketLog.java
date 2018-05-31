@@ -562,7 +562,6 @@ public class MarketLog {
                 CsvParserSettings setting = new CsvParserSettings();
                 setting.getFormat().setDelimiter(' ');
                 CsvParser parser = new CsvParser(setting);
-
                 if (Files.exists(compact)) {
                     // read compact
                     return I.signal(parser.iterate(new ZstdInputStream(newInputStream(compact)), ISO_8859_1))

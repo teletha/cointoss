@@ -69,7 +69,7 @@ public class BitFlyerService extends MarketService {
     private static final DateTimeFormatter RealTimeExecutionFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
 
     /** The max acquirable execution size. */
-    private static final long MAX = 500;
+    private static final long MAX = 499;
 
     /** The api url. */
     static final String api = "https://api.bitflyer.jp";
