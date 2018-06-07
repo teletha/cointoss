@@ -287,6 +287,16 @@ public class BitFlyerService extends MarketService {
      * {@inheritDoc}
      */
     @Override
+    public Signal<Execution> executions(long start, long end) {
+        return call("GET", "/v1/executions?product_code=" + marketName + "&count=" + MAX + "&before=" + end + "&after=" + start, "", "*", BitFlyerExecution.class)
+                .map(BitFlyerExecution.NONE, (prev, now) -> now.estimate(prev))
+                .as(Execution.class);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     protected long executionMaxAcquirableSize() {
         return MAX;
     }

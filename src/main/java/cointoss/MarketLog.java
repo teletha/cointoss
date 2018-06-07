@@ -259,16 +259,21 @@ public class MarketLog {
             latestId = id;
 
             while (disposer.isNotDisposed()) {
+                System.out.println(latestId);
                 try {
-                    List<Execution> executions = service.executions(latestId + service.executionMaxAcquirableSize() * offset)
-                            .retry()
+                    List<Execution> executions = service.executions(latestId, latestId + service.executionMaxAcquirableSize() * offset)
+                            .retry(3)
                             .toList();
+
+                    System.out.println(executions.size() + "  " + latestId);
 
                     // skip if there is no new execution
                     if (executions.get(0).id == latestId) {
                         offset++;
+                        System.out.println(offset + "  " + (latestId + service.executionMaxAcquirableSize() * offset));
                         continue;
                     }
+
                     offset = 0;
 
                     for (int i = executions.size() - 1; 0 <= i; i--) {
@@ -280,6 +285,7 @@ public class MarketLog {
                         }
                     }
                 } catch (Exception e) {
+                    e.printStackTrace();
                     // ignore to retry
                 }
 

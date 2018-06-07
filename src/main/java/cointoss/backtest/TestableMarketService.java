@@ -146,6 +146,14 @@ public class TestableMarketService extends MarketService {
      * {@inheritDoc}
      */
     @Override
+    public Signal<Execution> executions(long start, long end) {
+        return I.signal(executeds);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Signal<Order> orders() {
         return I.signal(orderAll).as(Order.class);
     }

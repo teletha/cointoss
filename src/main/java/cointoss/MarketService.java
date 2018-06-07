@@ -93,6 +93,14 @@ public abstract class MarketService implements Disposable {
     public abstract Signal<Execution> executions(long key);
 
     /**
+     * Acquire the execution log after the specified key (maybe ID) as much as possible.
+     * 
+     * @param key An execution sequencial key (i.e. ID, datetime etc).
+     * @return This {@link Signal} will be completed immediately.
+     */
+    public abstract Signal<Execution> executions(long start, long end);
+
+    /**
      * Acquire the execution sequential key (default is {@link Execution#id}).
      * 
      * @param execution A target execution.
