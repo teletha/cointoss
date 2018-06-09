@@ -106,6 +106,9 @@ public class BitFlyerService extends MarketService {
     /** The session key. */
     private final String sessionKey = "api_session_v2";
 
+    /** The latest realtime execution id. */
+    private long latestId;
+
     /**
      * @param type
      */
@@ -215,8 +218,10 @@ public class BitFlyerService extends MarketService {
                 .flatIterable(JsonElement::getAsJsonArray)
                 .map(JsonElement::getAsJsonObject)
                 .map(e -> {
+                    long id = e.get("id").getAsLong();
+
                     BitFlyerExecution exe = new BitFlyerExecution();
-                    exe.id = e.get("id").getAsLong();
+                    exe.id = latestId = id != 0 ? id : ++latestId;
                     exe.side = Side.parse(e.get("side").getAsString());
                     exe.price = Num.of(e.get("price").getAsString());
                     exe.size = exe.cumulativeSize = Num.of(e.get("size").getAsString());
@@ -731,8 +736,8 @@ public class BitFlyerService extends MarketService {
 
         /**
          * <p>
-         * Analyze Taker's order ID and obtain approximate order time (Since there is a bot which
-         * specifies non-standard id format, ignore it in that case).
+         * Analyze Taker's order ID and obtain approximate order time (Since there is a bot which specifies
+         * non-standard id format, ignore it in that case).
          * </p>
          * <ol>
          * <li>Execution Date : UTC</li>

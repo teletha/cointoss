@@ -234,9 +234,6 @@ public class MarketLog {
             // read from realtime API
             if (disposer.isNotDisposed()) {
                 disposer.add(service.executions().effect(e -> {
-                    if (e.id == 0) {
-                        e.id = ++realtimeId;
-                    }
                     realtimeId = e.id;
                 }).skipUntil(e -> completeREST.get()).effect(this::cache).to(observer::accept));
             }
@@ -268,7 +265,7 @@ public class MarketLog {
                     System.out.println(executions.size() + "  " + latestId);
 
                     // skip if there is no new execution
-                    if (executions.get(0).id == latestId) {
+                    if (executions.isEmpty() || executions.get(0).id == latestId) {
                         offset++;
                         System.out.println(offset + "  " + (latestId + service.executionMaxAcquirableSize() * offset));
                         continue;
