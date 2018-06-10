@@ -302,6 +302,14 @@ public class BitFlyerService extends MarketService {
      * {@inheritDoc}
      */
     @Override
+    public Execution exectutionLatest() {
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     protected long executionMaxAcquirableSize() {
         return MAX;
     }

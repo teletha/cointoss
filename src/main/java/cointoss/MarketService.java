@@ -101,6 +101,13 @@ public abstract class MarketService implements Disposable {
     public abstract Signal<Execution> executions(long start, long end);
 
     /**
+     * Acquier the latest execution lon in REST API.
+     * 
+     * @return A latest execution log.
+     */
+    public abstract Execution exectutionLatest();
+
+    /**
      * Acquire the execution sequential key (default is {@link Execution#id}).
      * 
      * @param execution A target execution.
