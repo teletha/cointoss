@@ -214,7 +214,10 @@ public class Market implements Disposable {
     public final Signal<Order> request(Order order) {
         order.state.set(REQUESTING);
 
-        return service.request(order).retryWhen(fail -> fail.take(40).delay(100, MILLISECONDS)).map(id -> {
+        return service.request(order).retryWhen(fail -> fail.effect(e -> {
+            System.out.println("Fail " + order + "  retry ");
+            e.printStackTrace();
+        }).take(40).delay(100, MILLISECONDS)).map(id -> {
             order.id = id;
             order.created.set(ZonedDateTime.now());
             order.averagePrice.set(order.price);

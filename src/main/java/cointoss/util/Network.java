@@ -9,6 +9,8 @@
  */
 package cointoss.util;
 
+import static java.util.concurrent.TimeUnit.*;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,12 +32,19 @@ import okhttp3.WebSocket;
 import okhttp3.WebSocketListener;
 
 /**
- * @version 2018/04/30 0:14:00
+ * @version 2018/06/12 18:40:23
  */
 public class Network {
 
+    /** The timeout duration. */
+    private static final long TIMEOUT = 30;
+
     /** The singleton. */
-    private static final OkHttpClient client = new OkHttpClient();
+    private static final OkHttpClient client = new OkHttpClient.Builder() //
+            .connectTimeout(TIMEOUT, SECONDS)
+            .readTimeout(TIMEOUT, SECONDS)
+            .writeTimeout(TIMEOUT, SECONDS)
+            .build();
 
     /**
      * Call private API.
