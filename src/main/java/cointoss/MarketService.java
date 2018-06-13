@@ -78,13 +78,6 @@ public abstract class MarketService implements Disposable {
     public abstract Signal<Order> cancel(Order order);
 
     /**
-     * Acquire the execution log in realtime.
-     * 
-     * @return
-     */
-    public abstract Signal<Execution> executions();
-
-    /**
      * Acquire the execution log after the specified key (maybe ID) as much as possible.
      * 
      * @param key An execution sequencial key (i.e. ID, datetime etc).
@@ -101,7 +94,7 @@ public abstract class MarketService implements Disposable {
     public abstract Signal<Execution> executions(long start, long end);
 
     /**
-     * Acquier the latest execution lon in REST API.
+     * Acquier the latest execution log.
      * 
      * @return A latest execution log.
      */
@@ -123,6 +116,13 @@ public abstract class MarketService implements Disposable {
      * @return
      */
     protected abstract long executionMaxAcquirableSize();
+
+    /**
+     * Acquire the execution log in realtime. This is infinitely.
+     * 
+     * @return
+     */
+    public abstract Signal<Execution> executionsEternally();
 
     /**
      * <p>

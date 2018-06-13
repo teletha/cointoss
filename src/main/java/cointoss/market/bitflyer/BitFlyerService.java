@@ -213,7 +213,7 @@ public class BitFlyerService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Execution> executions() {
+    public Signal<Execution> executionsEternally() {
         return network.jsonRPC("wss://ws.lightstream.bitflyer.com/json-rpc", "lightning_executions_" + marketName)
                 .flatIterable(JsonElement::getAsJsonArray)
                 .map(JsonElement::getAsJsonObject)

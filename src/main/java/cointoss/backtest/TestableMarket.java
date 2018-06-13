@@ -178,7 +178,7 @@ public class TestableMarket extends Market {
      * @return
      */
     public boolean validateExecutionState(int executed) {
-        assert service.executions().toList().size() == executed;
+        assert service.executionsEternally().toList().size() == executed;
 
         return true;
     }

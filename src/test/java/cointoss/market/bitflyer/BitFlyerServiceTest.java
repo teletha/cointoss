@@ -34,7 +34,7 @@ public class BitFlyerServiceTest {
 
     @Test
     void createPositionWhenOrderIsExecuted() {
-        List<Execution> executions = service.executions().toList();
+        List<Execution> executions = service.executionsEternally().toList();
         List<Execution> positions = service.positions().toList();
 
         service.requestWillResponse("ServerAcceptanceID");

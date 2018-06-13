@@ -233,7 +233,7 @@ public class MarketLog {
 
             // read from realtime API
             if (disposer.isNotDisposed()) {
-                disposer.add(service.executions().effect(e -> {
+                disposer.add(service.executionsEternally().effect(e -> {
                     realtimeId = e.id;
                 }).skipUntil(e -> completeREST.get()).effect(this::cache).to(observer::accept));
             }

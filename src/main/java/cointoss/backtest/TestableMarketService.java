@@ -130,7 +130,7 @@ public class TestableMarketService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Execution> executions() {
+    public Signal<Execution> executionsEternally() {
         return I.signal(executeds);
     }
 
