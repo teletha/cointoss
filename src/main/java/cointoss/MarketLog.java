@@ -252,13 +252,13 @@ public class MarketLog {
      */
     private Signal<Execution> rest(long id) {
         return new Signal<>((observer, disposer) -> {
-            long offset = 0;
+            long offset = 1;
             latestId = id;
 
             while (disposer.isNotDisposed()) {
                 try {
                     List<Execution> executions = service.executions(latestId, latestId + service.executionMaxAcquirableSize() * offset)
-                            .retry(3)
+                            .retry(5)
                             .toList();
 
                     // skip if there is no new execution
@@ -267,7 +267,7 @@ public class MarketLog {
                         continue;
                     }
 
-                    offset = 0;
+                    offset = 1;
 
                     for (int i = executions.size() - 1; 0 <= i; i--) {
                         Execution exe = executions.get(i);
@@ -278,18 +278,11 @@ public class MarketLog {
                         }
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
                     // ignore to retry
                 }
 
                 if (realtimeId != 0 && realtimeId <= latestId) {
                     break;
-                }
-
-                try {
-                    Thread.sleep(200);
-                } catch (final InterruptedException e) {
-                    observer.error(e);
                 }
             }
             observer.complete();
