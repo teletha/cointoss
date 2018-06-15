@@ -220,6 +220,10 @@ public class BitFlyerService extends MarketService {
                 .map(e -> {
                     long id = e.get("id").getAsLong();
 
+                    if (id == 0 && latestId == 0) {
+                        return null; // skip
+                    }
+
                     BitFlyerExecution exe = new BitFlyerExecution();
                     exe.id = latestId = id != 0 ? id : ++latestId;
                     exe.side = Side.parse(e.get("side").getAsString());
@@ -252,6 +256,7 @@ public class BitFlyerService extends MarketService {
 
                     return exe;
                 })
+                .skipNull()
                 .map(BitFlyerExecution.NONE, (prev, now) -> now.estimate(prev));
     }
 

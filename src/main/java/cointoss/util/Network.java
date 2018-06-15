@@ -44,6 +44,7 @@ public class Network {
             .connectTimeout(TIMEOUT, SECONDS)
             .readTimeout(TIMEOUT, SECONDS)
             .writeTimeout(TIMEOUT, SECONDS)
+            .retryOnConnectionFailure(true)
             .build();
 
     /**
@@ -115,6 +116,32 @@ public class Network {
                     if (params != null) {
                         observer.accept(params.get("message"));
                     }
+                }
+
+                /**
+                 * {@inheritDoc}
+                 */
+                @Override
+                public void onClosing(WebSocket webSocket, int code, String reason) {
+                    super.onClosing(webSocket, code, reason);
+                    System.out.println("Closing websocket " + code + "  " + reason);
+                }
+
+                /**
+                 * {@inheritDoc}
+                 */
+                @Override
+                public void onClosed(WebSocket webSocket, int code, String reason) {
+                    super.onClosed(webSocket, code, reason);
+                    System.out.println("Closed websocket " + code + "  " + reason);
+                }
+
+                /**
+                 * {@inheritDoc}
+                 */
+                @Override
+                public void onFailure(WebSocket webSocket, Throwable t, Response response) {
+                    System.out.println("Failure websocket " + t + "   " + response);
                 }
             });
 
