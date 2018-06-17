@@ -13,6 +13,7 @@ import static java.util.concurrent.TimeUnit.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import com.github.signalr4j.client.LogLevel;
 import com.github.signalr4j.client.Logger;
@@ -82,11 +83,23 @@ public class Network {
     /**
      * Connect by websocket.
      * 
-     * @param uri
-     * @param channelName
+     * @param uri A target uri.
+     * @param channelName A target channel name.
      * @return
      */
     public Signal<JsonElement> jsonRPC(String uri, String channelName) {
+        return jsonRPC(uri, channelName, e -> {
+        });
+    }
+
+    /**
+     * Connect by websocket.
+     * 
+     * @param uri A target uri.
+     * @param channelName A target channel name.
+     * @return
+     */
+    public Signal<JsonElement> jsonRPC(String uri, String channelName, Consumer<NetworkEvent> event) {
         return new Signal<>((observer, disposer) -> {
             JsonParser parser = new JsonParser();
             Request request = new Request.Builder().url(uri).build();
@@ -103,6 +116,7 @@ public class Network {
                     invoke.params.put("channel", channelName);
 
                     socket.send(I.write(invoke));
+                    event.accept(NetworkEvent.Connected);
                 }
 
                 /**
@@ -142,6 +156,7 @@ public class Network {
                 @Override
                 public void onFailure(WebSocket webSocket, Throwable t, Response response) {
                     System.out.println("Failure websocket " + t + "   " + response);
+                    t.printStackTrace();
                 }
             });
 
@@ -208,5 +223,9 @@ public class Network {
         @Override
         public void log(String message, LogLevel level) {
         }
+    }
+
+    public static enum NetworkEvent {
+        Connected, Disconnected;
     }
 }

@@ -14,6 +14,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.function.Consumer;
 
 import cointoss.Execution;
 import cointoss.MarketService;
@@ -22,6 +23,7 @@ import cointoss.order.Order.Quantity;
 import cointoss.order.Order.State;
 import cointoss.order.OrderBookListChange;
 import cointoss.order.OrderType;
+import cointoss.util.Network.NetworkEvent;
 import cointoss.util.Num;
 import kiss.Disposable;
 import kiss.I;
@@ -130,7 +132,7 @@ public class TestableMarketService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Execution> executionsEternally() {
+    public Signal<Execution> executionsEternally(Consumer<NetworkEvent> event) {
         return I.signal(executeds);
     }
 

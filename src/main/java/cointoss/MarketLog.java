@@ -35,7 +35,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -207,6 +206,8 @@ public class MarketLog {
         }
     }
 
+    private LinkedList<Execution> realtimeBuffer = new LinkedList();
+
     /**
      * Read date from the specified date.
      * 
@@ -229,19 +230,62 @@ public class MarketLog {
                 }
             }
 
-            AtomicBoolean completeREST = new AtomicBoolean();
+            System.out.println("CacheLast " + latestId);
 
             // read from realtime API
             if (disposer.isNotDisposed()) {
-                disposer.add(service.executionsEternally().effect(e -> {
-                    realtimeId = e.id;
-                }).skipUntil(e -> completeREST.get()).effect(this::cache).to(observer::accept));
+
+                service.executionsEternally(e -> {
+                    switch (e) {
+                    case Connected:
+                        Execution restLatest = service.exectutionLatest();
+                        Execution restLast = realtimeBuffer.isEmpty() || realtimeBuffer.get(0).id < restLatest.id ? restLatest
+                                : realtimeBuffer.getFirst();
+                        System.out.println("RESTLatest " + restLatest.id);
+                        System.out.println("REST from " + latestId + " to " + restLast.id);
+                        rest(latestId).effect(this::cache).takeWhile(exe -> exe.id < restLast.id).to(observer::accept, error -> {
+                            error.printStackTrace();
+                        }, () -> {
+                            System.out.println("Read from buffer");
+                            if (realtimeBuffer.isEmpty() == false) {
+                                System.out.println("RealtimeFirst " + realtimeBuffer.getFirst().id);
+                            }
+                            while (realtimeBuffer.isEmpty() == false) {
+                                System.out.println("RealtimeBuffer  from " + realtimeBuffer.getFirst().id + " to " + realtimeBuffer
+                                        .getLast().id);
+                                LinkedList<Execution> list = realtimeBuffer;
+                                realtimeBuffer = new LinkedList();
+
+                                for (Execution execution : list) {
+                                    cache(execution);
+                                    observer.accept(execution);
+                                }
+                            }
+                            System.out.println("END buffer");
+                            realtimeBuffer = null;
+                        });
+                        break;
+                    }
+                }).to(e -> {
+                    System.out.println(e.id);
+                    if (realtimeBuffer != null) {
+                        realtimeBuffer.addLast(e);
+                    } else {
+                        cache(e);
+                        observer.accept(e);
+                    }
+                });
+
+                // disposer.add(service.executionsEternally().effect(e -> {
+                // realtimeId = e.id;
+                // }).skipUntil(e -> completeREST.get()).effect(this::cache).to(observer::accept));
             }
 
-            // read from REST API
-            if (disposer.isNotDisposed()) {
-                disposer.add(rest(latestId).effect(this::cache).effectOnComplete(() -> completeREST.set(true)).to(observer::accept));
-            }
+            // // read from REST API
+            // if (disposer.isNotDisposed()) {
+            // disposer.add(rest(latestId).effect(this::cache).effectOnComplete(() ->
+            // completeREST.set(true)).to(observer::accept));
+            // }
 
             return disposer;
         });
@@ -282,10 +326,10 @@ public class MarketLog {
                 }
 
                 if (realtimeId != 0 && realtimeId <= latestId) {
+                    observer.complete();
                     break;
                 }
             }
-            observer.complete();
 
             return disposer;
         });
