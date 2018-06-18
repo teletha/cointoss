@@ -11,13 +11,11 @@ package cointoss;
 
 import java.time.ZonedDateTime;
 import java.util.Objects;
-import java.util.function.Consumer;
 
 import cointoss.order.Order;
 import cointoss.order.OrderBookListChange;
 import cointoss.util.LogCodec;
 import cointoss.util.Network;
-import cointoss.util.Network.NetworkEvent;
 import cointoss.util.Num;
 import kiss.Disposable;
 import kiss.Signal;
@@ -124,17 +122,7 @@ public abstract class MarketService implements Disposable {
      * 
      * @return
      */
-    public final Signal<Execution> executionsEternally() {
-        return executionsEternally(e -> {
-        });
-    }
-
-    /**
-     * Acquire the execution log in realtime. This is infinitely.
-     * 
-     * @return
-     */
-    public abstract Signal<Execution> executionsEternally(Consumer<NetworkEvent> event);
+    public abstract Signal<Execution> executionsEternally();
 
     /**
      * <p>

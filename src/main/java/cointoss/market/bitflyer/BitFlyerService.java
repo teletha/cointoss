@@ -19,7 +19,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 
 import javafx.scene.control.TextInputDialog;
 
@@ -40,7 +39,6 @@ import cointoss.order.OrderBookListChange;
 import cointoss.order.OrderUnit;
 import cointoss.util.Chrono;
 import cointoss.util.LogCodec;
-import cointoss.util.Network.NetworkEvent;
 import cointoss.util.Num;
 import filer.Filer;
 import kiss.Disposable;
@@ -215,8 +213,8 @@ public class BitFlyerService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Execution> executionsEternally(Consumer<NetworkEvent> event) {
-        return network.jsonRPC("wss://ws.lightstream.bitflyer.com/json-rpc", "lightning_executions_" + marketName, event)
+    public Signal<Execution> executionsEternally() {
+        return network.jsonRPC("wss://ws.lightstream.bitflyer.com/json-rpc", "lightning_executions_" + marketName)
                 .flatIterable(JsonElement::getAsJsonArray)
                 .map(JsonElement::getAsJsonObject)
                 .map(e -> {
@@ -310,8 +308,7 @@ public class BitFlyerService extends MarketService {
      */
     @Override
     public Execution exectutionLatest() {
-        return call("GET", "/v1/executions?product_code=" + marketName + "&count=1", "", "*", BitFlyerExecution.class).as(Execution.class)
-                .to().v;
+        return null;
     }
 
     /**
@@ -752,8 +749,8 @@ public class BitFlyerService extends MarketService {
 
         /**
          * <p>
-         * Analyze Taker's order ID and obtain approximate order time (Since there is a bot which
-         * specifies non-standard id format, ignore it in that case).
+         * Analyze Taker's order ID and obtain approximate order time (Since there is a bot which specifies
+         * non-standard id format, ignore it in that case).
          * </p>
          * <ol>
          * <li>Execution Date : UTC</li>
