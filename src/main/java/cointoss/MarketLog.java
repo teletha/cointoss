@@ -25,6 +25,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAccessor;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -36,6 +37,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -247,6 +249,23 @@ public class MarketLog {
         });
     }
 
+    private Signal<Execution> rest(AtomicLong realtimeLatest) {
+        return new Signal<>((observer, disposer) -> {
+            long start = 0;
+            long end = service.exectutionLatest().id;
+
+            LinkedList<Execution> executions = service.executions(start, end).retry().to(LinkedList.class);
+            Iterator<Execution> iterator = executions.descendingIterator();
+            while (iterator.hasNext()) {
+                Execution execution = iterator.next();
+
+                observer.accept(execution);
+            }
+
+            return disposer;
+        });
+    }
+
     /**
      * Read data from REST API.
      */
@@ -262,16 +281,14 @@ public class MarketLog {
                             .toList();
 
                     // skip if there is no new execution
-                    if (executions.isEmpty() || executions.get(0).id == latestId) {
+                    if (executions.isEmpty()) {
                         offset++;
                         continue;
                     }
 
                     offset = 1;
 
-                    for (int i = executions.size() - 1; 0 <= i; i--) {
-                        Execution exe = executions.get(i);
-
+                    for (Execution exe : executions) {
                         if (latestId < exe.id) {
                             observer.accept(exe);
                             latestId = exe.id;
