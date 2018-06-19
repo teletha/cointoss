@@ -130,7 +130,7 @@ public class TestableMarketService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Execution> executionsEternally() {
+    public Signal<Execution> executionsRealtimely() {
         return I.signal(executeds);
     }
 
@@ -196,7 +196,7 @@ public class TestableMarketService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    protected long executionMaxAcquirableSize() {
+    protected int executionMaxAcquirableSize() {
         return 0;
     }
 

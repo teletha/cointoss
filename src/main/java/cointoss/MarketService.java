@@ -90,7 +90,7 @@ public abstract class MarketService implements Disposable {
      * 
      * @return
      */
-    public abstract Signal<Execution> executionsEternally();
+    public abstract Signal<Execution> executionsRealtimely();
 
     /**
      * Acquier the latest execution log.
@@ -114,7 +114,7 @@ public abstract class MarketService implements Disposable {
      * 
      * @return
      */
-    protected abstract long executionMaxAcquirableSize();
+    protected abstract int executionMaxAcquirableSize();
 
     /**
      * <p>

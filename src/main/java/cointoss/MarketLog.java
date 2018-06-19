@@ -25,6 +25,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAccessor;
+import java.util.ArrayDeque;
 import java.util.LinkedList;
 import java.util.Objects;
 import java.util.concurrent.Delayed;
@@ -180,7 +181,7 @@ public class MarketLog {
             for (Path file : Filer.walk(root, "execution*.log").toList()) {
                 String name = file.getFileName().toString();
                 ZonedDateTime date = LocalDate.parse(name.substring(9, 17), fileName).atTime(0, 0, 0, 0).atZone(Chrono.UTC);
-                System.out.println(date);
+
                 if (start == null || end == null) {
                     start = date;
                     end = date;
@@ -201,72 +202,70 @@ public class MarketLog {
         }
     }
 
-    private Consumer<Execution> realtimeObserver;
+    private Consumer<Execution> realtime;
 
     /**
      * Read date from the specified date.
      * 
-     * @param startDate
+     * @param target The start date.
      * @return
      */
-    public final synchronized Signal<Execution> from(ZonedDateTime startDate) {
+    public final synchronized Signal<Execution> from(ZonedDateTime target) {
         return new Signal<Execution>((observer, disposer) -> {
             // read from cache
             if (cacheFirst != null) {
-                ZonedDateTime current = startDate.isBefore(cacheFirst) ? cacheFirst : startDate.isAfter(cacheLast) ? cacheLast : startDate;
-                current = current.withHour(0).withMinute(0).withSecond(0).withNano(0);
+                ZonedDateTime day = Chrono.between(cacheFirst, target, cacheLast).truncatedTo(ChronoUnit.DAYS);
 
-                while (disposer.isDisposed() == false && !current.isAfter(cacheLast)) {
-                    disposer.add(new Cache(current).read()
+                I.signal(day, d -> d.plusDays(1));
+
+                while (disposer.isNotDisposed() && !day.isAfter(cacheLast)) {
+                    disposer.add(new Cache(day).read()
                             .effect(e -> cacheId = e.id)
-                            .take(e -> e.exec_date.isAfter(startDate))
+                            .take(e -> e.exec_date.isAfter(target))
                             .to(observer::accept));
-                    current = current.plusDays(1);
+                    day = day.plusDays(1);
                 }
             }
 
-            if (disposer.isNotDisposed()) {
-                AtomicReference<Execution> realtime = new AtomicReference(Execution.BASE);
-                realtimeObserver = realtime::set;
+            disposer.add(network().effect(this::cache).to(observer::accept));
 
-                // read from realtime API
-                disposer.add(service.executionsEternally().to(e -> {
-                    realtimeObserver.accept(e); // don't use method reference
-                }));
+            return disposer;
+        });
+    }
 
-                // read from REST API
-                long start = cacheId;
+    private Signal<Execution> network() {
+        return new Signal<>((observer, disposer) -> {
+            AtomicReference<Execution> observedLatest = new AtomicReference(service.exectutionLatest());
+            realtime = observedLatest::set;
 
-                while (disposer.isNotDisposed()) {
-                    LinkedList<Execution> executions = service.executions(start, start + service.executionMaxAcquirableSize())
-                            .to(LinkedList.class);
+            // read from realtime API
+            disposer.add(service.executionsRealtimely().to(e -> {
+                realtime.accept(e); // don't use method reference
+            }));
 
-                    if (executions.isEmpty() == false) {
-                        for (Execution execution : executions) {
-                            cache(execution);
-                            observer.accept(execution);
-                        }
-                        System.out.println("REST Write " + start + "  " + executions.size() + "個");
-                        start = executions.getLast().id;
+            // read from REST API
+            int size = service.executionMaxAcquirableSize();
+            long start = cacheId;
+
+            while (disposer.isNotDisposed()) {
+                ArrayDeque<Execution> executions = service.executions(start, start + size).toCollection(new ArrayDeque(size));
+
+                if (executions.isEmpty() == false) {
+                    executions.forEach(observer);
+                    start = executions.getLast().id;
+                } else {
+                    if (start < observedLatest.get().id) {
+                        // Although there is no data in the current search range, since it has not yet reached the latest
+                        // execution, shift the range backward and search again.
+                        start += size;
+                        continue;
                     } else {
-                        if (start < realtime.get().id) {
-                            // Although there is no data in the current search range, since it has not yet reached the latest
-                            // execution, shift the range backward and search again.
-                            start += service.executionMaxAcquirableSize();
-                            continue;
-                        } else {
-                            // Because the REST API has caught up with the real-time API, it stops the REST API.
-                            System.out.println("RealtimeAPIへ移行 " + start);
-                            realtimeObserver = e -> {
-                                cache(e);
-                                observer.accept(e);
-                            };
-                            break;
-                        }
+                        // Because the REST API has caught up with the real-time API, it stops the REST API.
+                        realtime = observer::accept;
+                        break;
                     }
                 }
             }
-
             return disposer;
         });
     }

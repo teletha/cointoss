@@ -69,7 +69,7 @@ public class BitFlyerService extends MarketService {
     private static final DateTimeFormatter RealTimeExecutionFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
 
     /** The max acquirable execution size. */
-    private static final long MAX = 499;
+    private static final int MAX = 499;
 
     /** The api url. */
     static final String api = "https://api.bitflyer.jp";
@@ -213,7 +213,7 @@ public class BitFlyerService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Execution> executionsEternally() {
+    public Signal<Execution> executionsRealtimely() {
         return network.jsonRPC("wss://ws.lightstream.bitflyer.com/json-rpc", "lightning_executions_" + marketName)
                 .flatIterable(JsonElement::getAsJsonArray)
                 .map(JsonElement::getAsJsonObject)
@@ -308,7 +308,7 @@ public class BitFlyerService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    protected long executionMaxAcquirableSize() {
+    protected int executionMaxAcquirableSize() {
         return MAX;
     }
 
