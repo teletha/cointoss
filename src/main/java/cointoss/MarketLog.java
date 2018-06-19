@@ -34,7 +34,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -146,14 +147,8 @@ public class MarketLog {
     /** The last day. */
     private ZonedDateTime cacheLast;
 
-    /** The latest execution id. */
-    private long latestId = 23164000;
-
     /** The latest cached id. */
     private long cacheId;
-
-    /** The latest realtime id. */
-    private long realtimeId;
 
     /** The active cache. */
     private Cache cache;
@@ -206,6 +201,8 @@ public class MarketLog {
         }
     }
 
+    private Consumer<Execution> realtimeObserver;
+
     /**
      * Read date from the specified date.
      * 
@@ -221,83 +218,54 @@ public class MarketLog {
 
                 while (disposer.isDisposed() == false && !current.isAfter(cacheLast)) {
                     disposer.add(new Cache(current).read()
-                            .effect(e -> latestId = cacheId = e.id)
+                            .effect(e -> cacheId = e.id)
                             .take(e -> e.exec_date.isAfter(startDate))
                             .to(observer::accept));
                     current = current.plusDays(1);
                 }
             }
 
-            AtomicBoolean completeREST = new AtomicBoolean();
-
             if (disposer.isNotDisposed()) {
+                AtomicReference<Execution> realtime = new AtomicReference(Execution.BASE);
+                realtimeObserver = realtime::set;
+
                 // read from realtime API
-                disposer.add(service.executionsEternally().effect(e -> {
-                    realtimeId = e.id;
-                }).skipUntil(e -> completeREST.get()).effect(this::cache).to(observer::accept));
+                disposer.add(service.executionsEternally().to(e -> {
+                    realtimeObserver.accept(e); // don't use method reference
+                }));
 
                 // read from REST API
-                disposer.add(rest().effect(this::cache).effectOnComplete(() -> completeREST.set(true)).to(observer::accept));
+                long start = cacheId;
 
-                // long start = latestId;
-                //
-                // while (disposer.isNotDisposed()) {
-                // LinkedList<Execution> executions = service.executions(start, start +
-                // service.executionMaxAcquirableSize())
-                // .to(LinkedList.class);
-                //
-                // if (executions.isEmpty() == false) {
-                // for (Execution execution : executions) {
-                // observer.accept(execution);
-                // }
-                // start = executions.getLast().id;
-                // } else {
-                // if (start < realtimeId) {
-                // // Although there is no data in the current search range, since it has not yet reached the latest
-                // // execution, shift the range backward and search again.
-                // start += service.executionMaxAcquirableSize();
-                // continue;
-                // } else {
-                // // Because the REST API has caught up with the real-time API, it stops the REST API.
-                // break;
-                // }
-                // }
-                // }
-            }
+                while (disposer.isNotDisposed()) {
+                    LinkedList<Execution> executions = service.executions(start, start + service.executionMaxAcquirableSize())
+                            .to(LinkedList.class);
 
-            return disposer;
-        });
-    }
-
-    /**
-     * Read data from REST API.
-     */
-    private Signal<Execution> rest() {
-        return new Signal<>((observer, disposer) -> {
-            long start = latestId;
-
-            while (disposer.isNotDisposed()) {
-                LinkedList<Execution> executions = service.executions(start, start + service.executionMaxAcquirableSize())
-                        .to(LinkedList.class);
-
-                if (executions.isEmpty() == false) {
-                    for (Execution execution : executions) {
-                        observer.accept(execution);
-                    }
-                    start = executions.getLast().id;
-                } else {
-                    if (start < realtimeId) {
-                        // Although there is no data in the current search range, since it has not yet reached the latest
-                        // execution, shift the range backward and search again.
-                        start += service.executionMaxAcquirableSize();
-                        continue;
+                    if (executions.isEmpty() == false) {
+                        for (Execution execution : executions) {
+                            cache(execution);
+                            observer.accept(execution);
+                        }
+                        System.out.println("REST Write " + start + "  " + executions.size() + "個");
+                        start = executions.getLast().id;
                     } else {
-                        // Because the REST API has caught up with the real-time API, it stops the REST API.
-                        break;
+                        if (start < realtime.get().id) {
+                            // Although there is no data in the current search range, since it has not yet reached the latest
+                            // execution, shift the range backward and search again.
+                            start += service.executionMaxAcquirableSize();
+                            continue;
+                        } else {
+                            // Because the REST API has caught up with the real-time API, it stops the REST API.
+                            System.out.println("RealtimeAPIへ移行 " + start);
+                            realtimeObserver = e -> {
+                                cache(e);
+                                observer.accept(e);
+                            };
+                            break;
+                        }
                     }
                 }
             }
-            observer.complete();
 
             return disposer;
         });
