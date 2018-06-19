@@ -25,9 +25,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAccessor;
-import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.Delayed;
 import java.util.concurrent.ExecutionException;
@@ -37,7 +35,6 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -212,20 +209,20 @@ public class MarketLog {
     /**
      * Read date from the specified date.
      * 
-     * @param start
+     * @param startDate
      * @return
      */
-    public final synchronized Signal<Execution> from(ZonedDateTime start) {
+    public final synchronized Signal<Execution> from(ZonedDateTime startDate) {
         return new Signal<Execution>((observer, disposer) -> {
             // read from cache
             if (cacheFirst != null) {
-                ZonedDateTime current = start.isBefore(cacheFirst) ? cacheFirst : start.isAfter(cacheLast) ? cacheLast : start;
+                ZonedDateTime current = startDate.isBefore(cacheFirst) ? cacheFirst : startDate.isAfter(cacheLast) ? cacheLast : startDate;
                 current = current.withHour(0).withMinute(0).withSecond(0).withNano(0);
 
                 while (disposer.isDisposed() == false && !current.isAfter(cacheLast)) {
                     disposer.add(new Cache(current).read()
                             .effect(e -> latestId = cacheId = e.id)
-                            .take(e -> e.exec_date.isAfter(start))
+                            .take(e -> e.exec_date.isAfter(startDate))
                             .to(observer::accept));
                     current = current.plusDays(1);
                 }
@@ -233,33 +230,39 @@ public class MarketLog {
 
             AtomicBoolean completeREST = new AtomicBoolean();
 
-            // read from realtime API
             if (disposer.isNotDisposed()) {
+                // read from realtime API
                 disposer.add(service.executionsEternally().effect(e -> {
                     realtimeId = e.id;
                 }).skipUntil(e -> completeREST.get()).effect(this::cache).to(observer::accept));
-            }
 
-            // read from REST API
-            if (disposer.isNotDisposed()) {
-                disposer.add(rest(latestId).effect(this::cache).effectOnComplete(() -> completeREST.set(true)).to(observer::accept));
-            }
+                // read from REST API
+                disposer.add(rest().effect(this::cache).effectOnComplete(() -> completeREST.set(true)).to(observer::accept));
 
-            return disposer;
-        });
-    }
-
-    private Signal<Execution> rest(AtomicLong realtimeLatest) {
-        return new Signal<>((observer, disposer) -> {
-            long start = 0;
-            long end = service.exectutionLatest().id;
-
-            LinkedList<Execution> executions = service.executions(start, end).retry().to(LinkedList.class);
-            Iterator<Execution> iterator = executions.descendingIterator();
-            while (iterator.hasNext()) {
-                Execution execution = iterator.next();
-
-                observer.accept(execution);
+                // long start = latestId;
+                //
+                // while (disposer.isNotDisposed()) {
+                // LinkedList<Execution> executions = service.executions(start, start +
+                // service.executionMaxAcquirableSize())
+                // .to(LinkedList.class);
+                //
+                // if (executions.isEmpty() == false) {
+                // for (Execution execution : executions) {
+                // observer.accept(execution);
+                // }
+                // start = executions.getLast().id;
+                // } else {
+                // if (start < realtimeId) {
+                // // Although there is no data in the current search range, since it has not yet reached the latest
+                // // execution, shift the range backward and search again.
+                // start += service.executionMaxAcquirableSize();
+                // continue;
+                // } else {
+                // // Because the REST API has caught up with the real-time API, it stops the REST API.
+                // break;
+                // }
+                // }
+                // }
             }
 
             return disposer;
@@ -269,37 +272,29 @@ public class MarketLog {
     /**
      * Read data from REST API.
      */
-    private Signal<Execution> rest(long id) {
+    private Signal<Execution> rest() {
         return new Signal<>((observer, disposer) -> {
-            long offset = 1;
-            latestId = id;
+            long start = latestId;
 
             while (disposer.isNotDisposed()) {
-                try {
-                    List<Execution> executions = service.executions(latestId, latestId + service.executionMaxAcquirableSize() * offset)
-                            .retry(5)
-                            .toList();
+                LinkedList<Execution> executions = service.executions(start, start + service.executionMaxAcquirableSize())
+                        .to(LinkedList.class);
 
-                    // skip if there is no new execution
-                    if (executions.isEmpty()) {
-                        offset++;
+                if (executions.isEmpty() == false) {
+                    for (Execution execution : executions) {
+                        observer.accept(execution);
+                    }
+                    start = executions.getLast().id;
+                } else {
+                    if (start < realtimeId) {
+                        // Although there is no data in the current search range, since it has not yet reached the latest
+                        // execution, shift the range backward and search again.
+                        start += service.executionMaxAcquirableSize();
                         continue;
+                    } else {
+                        // Because the REST API has caught up with the real-time API, it stops the REST API.
+                        break;
                     }
-
-                    offset = 1;
-
-                    for (Execution exe : executions) {
-                        if (latestId < exe.id) {
-                            observer.accept(exe);
-                            latestId = exe.id;
-                        }
-                    }
-                } catch (Exception e) {
-                    // ignore to retry
-                }
-
-                if (realtimeId != 0 && realtimeId <= latestId) {
-                    break;
                 }
             }
             observer.complete();

@@ -11,6 +11,7 @@ package cointoss;
 
 import java.time.ZonedDateTime;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicReference;
 
 import cointoss.order.Order;
 import cointoss.order.OrderBookListChange;
@@ -84,6 +85,14 @@ public abstract class MarketService implements Disposable {
      * @return This {@link Signal} will be completed immediately.
      */
     public abstract Signal<Execution> executions(long key);
+
+    /**
+     * Acquire the execution log after the specified key (maybe ID) as much as possible.
+     * 
+     * @param key An execution sequencial key (i.e. ID, datetime etc).
+     * @return This {@link Signal} will be completed immediately.
+     */
+    public abstract Signal<Execution> executionsAfter(AtomicReference<Execution> startPointExclusive);
 
     /**
      * Acquire the execution log after the specified key (maybe ID) as much as possible.
