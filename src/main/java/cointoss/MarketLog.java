@@ -149,7 +149,7 @@ public class MarketLog {
     private ZonedDateTime cacheLast;
 
     /** The latest cached id. */
-    private long cacheId;
+    private long cacheId = 264255124;
 
     /** The active cache. */
     private Cache cache;
@@ -207,30 +207,28 @@ public class MarketLog {
     /**
      * Read date from the specified date.
      * 
-     * @param target The start date.
+     * @param start The start date.
      * @return
      */
-    public final synchronized Signal<Execution> from(ZonedDateTime target) {
-        return new Signal<Execution>((observer, disposer) -> {
-            // read from cache
-            if (cacheFirst != null) {
-                ZonedDateTime day = Chrono.between(cacheFirst, target, cacheLast).truncatedTo(ChronoUnit.DAYS);
+    public final synchronized Signal<Execution> from(ZonedDateTime start) {
+        ZonedDateTime startDay = Chrono.between(cacheFirst, start, cacheLast).truncatedTo(ChronoUnit.DAYS);
 
-                I.signal(day, d -> d.plusDays(1));
+        return I.signal(startDay, day -> day.plusDays(1))
+                .takeUntil(day -> cacheLast.isBefore(day))
+                .flatMap(day -> new Cache(day).read())
+                .effect(e -> cacheId = e.id)
+                .effectOnComplete(() -> {
+                    System.out.println("Complete Cache");
+                })
+                .take(e -> e.isAfter(start))
+                .concat(network().effectOnError(err("network")))
+                .effectOnError(err("end"));
+    }
 
-                while (disposer.isNotDisposed() && !day.isAfter(cacheLast)) {
-                    disposer.add(new Cache(day).read()
-                            .effect(e -> cacheId = e.id)
-                            .take(e -> e.exec_date.isAfter(target))
-                            .to(observer::accept));
-                    day = day.plusDays(1);
-                }
-            }
-
-            disposer.add(network().effect(this::cache).to(observer::accept));
-
-            return disposer;
-        });
+    private Consumer<Throwable> err(String name) {
+        return e -> {
+            System.out.println(name + "   " + e.getMessage());
+        };
     }
 
     private Signal<Execution> network() {
@@ -239,7 +237,7 @@ public class MarketLog {
             realtime = observedLatest::set;
 
             // read from realtime API
-            disposer.add(service.executionsRealtimely().to(e -> {
+            disposer.add(service.executionsRealtimely().effectOnError(err("realtime")).to(e -> {
                 realtime.accept(e); // don't use method reference
             }));
 
@@ -248,20 +246,26 @@ public class MarketLog {
             long start = cacheId;
 
             while (disposer.isNotDisposed()) {
-                ArrayDeque<Execution> executions = service.executions(start, start + size).toCollection(new ArrayDeque(size));
+                ArrayDeque<Execution> executions = service.executions(start, start + size)
+                        .effectOnError(err("rest"))
+                        .toCollection(new ArrayDeque(size));
 
                 if (executions.isEmpty() == false) {
+                    System.out.println("REST write " + start + "  " + executions.size() + "個");
                     executions.forEach(observer);
                     start = executions.getLast().id;
                 } else {
                     if (start < observedLatest.get().id) {
-                        // Although there is no data in the current search range, since it has not yet reached the latest
+                        // Although there is no data in the current search range, since it has not
+                        // yet reached the latest
                         // execution, shift the range backward and search again.
                         start += size;
                         continue;
                     } else {
-                        // Because the REST API has caught up with the real-time API, it stops the REST API.
+                        // Because the REST API has caught up with the real-time API, it stops the
+                        // REST API.
                         realtime = observer::accept;
+                        System.out.println("RealtimeAPIへ移行");
                         break;
                     }
                 }
@@ -584,7 +588,6 @@ public class MarketLog {
          * @return
          */
         private Signal<Execution> download() {
-            System.out.println(cacheFirst);
             return Signal.EMPTY;
         }
 
