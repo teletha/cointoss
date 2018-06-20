@@ -213,22 +213,27 @@ public class MarketLog {
     public final synchronized Signal<Execution> from(ZonedDateTime start) {
         ZonedDateTime startDay = Chrono.between(cacheFirst, start, cacheLast).truncatedTo(ChronoUnit.DAYS);
 
+        // List<ZonedDateTime> dates = new ArrayList();
+        //
+        // while (!startDay.isEqual(cacheLast)) {
+        // dates.add(startDay);
+        //
+        // startDay = startDay.plusDays(1);
+        // }
+        // dates.add(cacheLast);
+        System.out.println(startDay + " START");
         return I.signal(startDay, day -> day.plusDays(1))
-                .takeUntil(day -> cacheLast.isBefore(day))
+                .effect(e -> System.out.println(e))
+                .takeWhile(day -> day.isBefore(cacheLast) || day.isEqual(cacheLast))
+                .effect(e -> System.out.println(e + " AFTER"))
+                .effectOnError(Throwable::printStackTrace)
                 .flatMap(day -> new Cache(day).read())
                 .effect(e -> cacheId = e.id)
-                .effectOnComplete(() -> {
-                    System.out.println("Complete Cache");
-                })
                 .take(e -> e.isAfter(start))
-                .concat(network().effectOnError(err("network")))
-                .effectOnError(err("end"));
-    }
-
-    private Consumer<Throwable> err(String name) {
-        return e -> {
-            System.out.println(name + "   " + e.getMessage());
-        };
+                .merge(network().effect(this::cache))
+                .effectOnComplete(() -> {
+                    System.out.println("COMPLETE");
+                });
     }
 
     private Signal<Execution> network() {
@@ -237,7 +242,7 @@ public class MarketLog {
             realtime = observedLatest::set;
 
             // read from realtime API
-            disposer.add(service.executionsRealtimely().effectOnError(err("realtime")).to(e -> {
+            disposer.add(service.executionsRealtimely().to(e -> {
                 realtime.accept(e); // don't use method reference
             }));
 
@@ -246,9 +251,7 @@ public class MarketLog {
             long start = cacheId;
 
             while (disposer.isNotDisposed()) {
-                ArrayDeque<Execution> executions = service.executions(start, start + size)
-                        .effectOnError(err("rest"))
-                        .toCollection(new ArrayDeque(size));
+                ArrayDeque<Execution> executions = service.executions(start, start + size).toCollection(new ArrayDeque(size));
 
                 if (executions.isEmpty() == false) {
                     System.out.println("REST write " + start + "  " + executions.size() + "個");
@@ -257,13 +260,12 @@ public class MarketLog {
                 } else {
                     if (start < observedLatest.get().id) {
                         // Although there is no data in the current search range, since it has not
-                        // yet reached the latest
-                        // execution, shift the range backward and search again.
+                        // yet reached the latest execution, shift the range backward and search again.
                         start += size;
                         continue;
                     } else {
-                        // Because the REST API has caught up with the real-time API, it stops the
-                        // REST API.
+                        // Because the REST API has caught up with the real-time API,
+                        // it stops the REST API.
                         realtime = observer::accept;
                         System.out.println("RealtimeAPIへ移行");
                         break;

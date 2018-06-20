@@ -17,15 +17,12 @@ import kiss.I;
 public class AAA {
 
     public static void main(String[] args) {
-        // return I.signal(startDay, day -> day.plusDays(1))
-        // .takeUntil(day -> cacheLast.isBefore(day))
+        // return I.signal(dates)
+        // .takeUntil(cacheLast::isBefore)
         // .flatMap(day -> new Cache(day).read())
         // .effect(e -> cacheId = e.id)
-        // .effectOnComplete(() -> {
-        // System.out.println("Complete Cache");
-        // })
         // .take(e -> e.isAfter(start))
-        // .concat(network());
+        // .concat(network().effect(this::cache));
         I.signal(10, v -> v + 3).takeUntil(v -> 30 < v).flatMap(v -> {
             return I.signal(v, v + 1, v + 2);
         }).effect(e -> {
