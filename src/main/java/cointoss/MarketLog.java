@@ -221,19 +221,13 @@ public class MarketLog {
         // startDay = startDay.plusDays(1);
         // }
         // dates.add(cacheLast);
-        System.out.println(startDay + " START");
         return I.signal(startDay, day -> day.plusDays(1))
                 .effect(e -> System.out.println(e))
                 .takeWhile(day -> day.isBefore(cacheLast) || day.isEqual(cacheLast))
-                .effect(e -> System.out.println(e + " AFTER"))
-                .effectOnError(Throwable::printStackTrace)
                 .flatMap(day -> new Cache(day).read())
                 .effect(e -> cacheId = e.id)
                 .take(e -> e.isAfter(start))
-                .merge(network().effect(this::cache))
-                .effectOnComplete(() -> {
-                    System.out.println("COMPLETE");
-                });
+                .concat(network().effect(this::cache));
     }
 
     private Signal<Execution> network() {
