@@ -47,9 +47,7 @@ import com.univocity.parsers.csv.CsvParserSettings;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
 
-import cointoss.market.bitflyer.BitFlyerService;
 import cointoss.util.Chrono;
-import cointoss.util.Num;
 import cointoss.util.Span;
 import filer.Filer;
 import kiss.I;
@@ -58,7 +56,7 @@ import kiss.Signal;
 /**
  * Log Manager.
  * 
- * @version 2018/05/26 10:41:05
+ * @version 2018/06/24 8:49:53
  */
 public class MarketLog {
 
@@ -221,6 +219,11 @@ public class MarketLog {
                 .concat(network().effect(this::cache));
     }
 
+    /**
+     * Read date from merket server.
+     * 
+     * @return
+     */
     private Signal<Execution> network() {
         return new Signal<>((observer, disposer) -> {
             AtomicReference<Execution> observedLatest = new AtomicReference(service.exectutionLatest());
@@ -605,21 +608,5 @@ public class MarketLog {
             }
         }
 
-    }
-
-    /**
-     * @param args
-     */
-    public static void main2(String[] args) {
-        System.out.println(Num.of(10));
-        MarketLog log = new MarketLog(BitFlyerService.FX_BTC_JPY);
-
-        log.at(2016, 5, 21).to(e -> {
-            System.out.println(e);
-        });
-
-        // Filer.walk(log.root, "execution*.log").to(file -> {
-        //
-        // });
     }
 }
