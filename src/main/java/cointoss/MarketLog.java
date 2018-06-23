@@ -213,16 +213,7 @@ public class MarketLog {
     public final synchronized Signal<Execution> from(ZonedDateTime start) {
         ZonedDateTime startDay = Chrono.between(cacheFirst, start, cacheLast).truncatedTo(ChronoUnit.DAYS);
 
-        // List<ZonedDateTime> dates = new ArrayList();
-        //
-        // while (!startDay.isEqual(cacheLast)) {
-        // dates.add(startDay);
-        //
-        // startDay = startDay.plusDays(1);
-        // }
-        // dates.add(cacheLast);
         return I.signal(startDay, day -> day.plusDays(1))
-                .effect(e -> System.out.println(e))
                 .takeWhile(day -> day.isBefore(cacheLast) || day.isEqual(cacheLast))
                 .flatMap(day -> new Cache(day).read())
                 .effect(e -> cacheId = e.id)
