@@ -12,6 +12,7 @@ package cointoss;
 import static java.nio.charset.StandardCharsets.*;
 import static java.nio.file.Files.*;
 import static java.nio.file.StandardOpenOption.*;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -42,11 +43,13 @@ import java.util.regex.Pattern;
 
 import com.github.luben.zstd.ZstdInputStream;
 import com.github.luben.zstd.ZstdOutputStream;
+import com.google.common.base.Stopwatch;
 import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
 
+import cointoss.market.bitflyer.BitFlyerService;
 import cointoss.util.Chrono;
 import cointoss.util.Span;
 import filer.Filer;
@@ -146,11 +149,17 @@ public class MarketLog {
     /** The last day. */
     private ZonedDateTime cacheLast;
 
-    /** The latest cached id. */
-    private long cacheId = 264255124;
-
     /** The active cache. */
     private Cache cache;
+
+    /** The latest cached id. */
+    private long cacheId;
+
+    /** Realtime execution observer, this value will be switched. */
+    private Consumer<Execution> realtime;
+
+    /** For debug. */
+    private Stopwatch stopwatch = Stopwatch.createUnstarted();
 
     /**
      * Create log manager.
@@ -173,6 +182,7 @@ public class MarketLog {
         this.cache = new Cache(ZonedDateTime.of(2000, 1, 1, 0, 0, 0, 0, Chrono.UTC));
 
         try {
+            stopwatch.start();
             ZonedDateTime start = null;
             ZonedDateTime end = null;
 
@@ -195,12 +205,11 @@ public class MarketLog {
             }
             this.cacheFirst = start;
             this.cacheLast = end;
+            System.out.println("Find caches " + stopwatch.stop().elapsed().getSeconds() + "s");
         } catch (Exception e) {
             throw I.quiet(e);
         }
     }
-
-    private Consumer<Execution> realtime;
 
     /**
      * Read date from the specified date.
@@ -247,9 +256,9 @@ public class MarketLog {
                     start = executions.getLast().id;
                 } else {
                     if (start < observedLatest.get().id) {
-                        // Although there is no data in the current search range, since it has not
-                        // yet reached the latest execution, shift the range backward and search
-                        // again.
+                        // Although there is no data in the current search range,
+                        // since it has not yet reached the latest execution,
+                        // shift the range backward and search again.
                         start += size;
                         continue;
                     } else {
@@ -420,6 +429,17 @@ public class MarketLog {
     }
 
     /**
+     * Read all caches.
+     * 
+     * @return
+     */
+    final Signal<Cache> caches() {
+        return I.signal(cacheFirst, day -> day.plusDays(1))
+                .takeWhile(day -> day.isBefore(cacheLast) || day.isEqual(cacheLast))
+                .map(Cache::new);
+    }
+
+    /**
      * Create the specified date cache for TEST.
      * 
      * @param date
@@ -468,9 +488,6 @@ public class MarketLog {
         /** The writing execution queue. */
         private LinkedList<Execution> queue = new LinkedList();
 
-        /** The latest cached id. */
-        private long latest;
-
         /**
          * @param date
          */
@@ -507,6 +524,16 @@ public class MarketLog {
         }
 
         /**
+         * Check whether this cache is completed or not.
+         * 
+         * @return
+         */
+        private boolean isCompleted() {
+            LocalDate nextDay = date.plusDays(1);
+            return Files.exists(locateCompactLog(nextDay)) || Files.exists(locateLog(nextDay));
+        }
+
+        /**
          * Read cached date.
          * 
          * @return
@@ -518,24 +545,30 @@ public class MarketLog {
                 CsvParser parser = new CsvParser(setting);
                 if (Files.exists(compact)) {
                     // read compact
+                    stopwatch.start();
                     return I.signal(parser.iterate(new ZstdInputStream(newInputStream(compact)), ISO_8859_1))
                             .scanWith(Execution.BASE, service::decode)
-                            .effectOnComplete(parser::stopParsing);
+                            .effectOnComplete(parser::stopParsing)
+                            .effectOnComplete(() -> {
+                                System.out.println("Read compact log [" + date + "] " + stopwatch.stop().elapsed());
+                            });
                 } else if (Files.notExists(log)) {
                     // no data
                     return download();
                 } else {
                     // read normal
+                    stopwatch.start();
                     Signal<Execution> signal = I.signal(parser.iterate(newInputStream(log), ISO_8859_1))
                             .map(Execution::new)
-                            .effectOnComplete(parser::stopParsing);
+                            .effectOnComplete(parser::stopParsing)
+                            .effectOnComplete(() -> {
+                                System.out.println("Read  log [" + date + "] " + stopwatch.stop().elapsed().getSeconds());
+                            });
 
                     // make log compact coinstantaneously
-                    LocalDate nextDay = date.plusDays(1);
-                    if (Files.exists(locateCompactLog(nextDay)) || Files.exists(locateLog(nextDay))) {
+                    if (isCompleted()) {
                         signal = compact(signal);
                     }
-
                     return signal;
                 }
             } catch (IOException e) {
@@ -580,6 +613,18 @@ public class MarketLog {
         }
 
         /**
+         * Compact this cache if needed.
+         */
+        void compact() {
+            if (isCompleted() && Files.notExists(compact)) {
+                System.out.println("Write compact log [" + date + "]");
+                compact(read()).to(e -> {
+                    // do nothing
+                });
+            }
+        }
+
+        /**
          * Write compact log from the specified executions.
          */
         Signal<Execution> compact(Signal<Execution> executions) {
@@ -599,5 +644,47 @@ public class MarketLog {
             }
         }
 
+        private void test() {
+            try {
+                CsvParserSettings setting = new CsvParserSettings();
+                setting.getFormat().setDelimiter(' ');
+                CsvParser parser = new CsvParser(setting);
+                // read compact
+                stopwatch.reset().start();
+                I.signal(parser.iterate(new ZstdInputStream(newInputStream(compact)), ISO_8859_1))
+                        .scanWith(Execution.BASE, service::decode)
+                        .effectOnComplete(parser::stopParsing)
+                        .effectOnComplete(() -> {
+                            System.out.println("Read compact log [" + date + "] " + stopwatch.stop().elapsed(MILLISECONDS));
+                        })
+                        .to(e -> {
+
+                        });
+
+                // read normal
+                parser = new CsvParser(setting);
+                stopwatch.reset().start();
+                I.signal(parser.iterate(newInputStream(log), ISO_8859_1))
+                        .map(Execution::new)
+                        .effectOnComplete(parser::stopParsing)
+                        .effectOnComplete(() -> {
+                            System.out.println("Read  log [" + date + "] " + stopwatch.stop().elapsed(MILLISECONDS));
+                        })
+                        .to(e -> {
+                        });
+            } catch (IOException e) {
+                throw I.quiet(e);
+            }
+        }
+
+    }
+
+    public static void main(String[] args) {
+        MarketLog log = BitFlyerService.FX_BTC_JPY.log;
+
+        for (int i = 1; i < 10; i++) {
+            Cache cache = log.cache(Chrono.utcNow().minusDays(i));
+            cache.test();
+        }
     }
 }
