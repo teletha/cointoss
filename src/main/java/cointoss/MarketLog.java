@@ -49,7 +49,6 @@ import com.univocity.parsers.csv.CsvParserSettings;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
 
-import cointoss.market.bitflyer.BitFlyerService;
 import cointoss.util.Chrono;
 import cointoss.util.Span;
 import filer.Filer;
@@ -465,7 +464,7 @@ public class MarketLog {
      * @return A file location.
      */
     final Path locateCompactLog(TemporalAccessor date) {
-        return root.resolve("compact").resolve(Chrono.DateCompact.format(date) + ".log");
+        return root.resolve("execution" + Chrono.DateCompact.format(date) + ".clog");
     }
 
     /**
@@ -504,7 +503,7 @@ public class MarketLog {
          */
         private Cache enableAutoSave() {
             if (task == NOOP) {
-                task = scheduler.scheduleWithFixedDelay(this::write, 30, 30, TimeUnit.SECONDS);
+                task = scheduler.scheduleWithFixedDelay(this::write, 60, 60, TimeUnit.SECONDS);
             }
             return this;
         }
@@ -550,7 +549,7 @@ public class MarketLog {
                             .scanWith(Execution.BASE, service::decode)
                             .effectOnComplete(parser::stopParsing)
                             .effectOnComplete(() -> {
-                                System.out.println("Read compact log [" + date + "] " + stopwatch.stop().elapsed());
+                                System.out.println("Read compact log [" + date + "] " + stopwatch.stop().elapsed(MILLISECONDS));
                             });
                 } else if (Files.notExists(log)) {
                     // no data
@@ -562,7 +561,7 @@ public class MarketLog {
                             .map(Execution::new)
                             .effectOnComplete(parser::stopParsing)
                             .effectOnComplete(() -> {
-                                System.out.println("Read  log [" + date + "] " + stopwatch.stop().elapsed().getSeconds());
+                                System.out.println("Read  log [" + date + "] " + stopwatch.stop().elapsed(MILLISECONDS));
                             });
 
                     // make log compact coinstantaneously
@@ -604,23 +603,11 @@ public class MarketLog {
                 text.append(e).append("\r\n");
             }
 
-            // write to file
+            // write normal log
             try (FileChannel channel = FileChannel.open(log, CREATE, APPEND)) {
                 channel.write(ByteBuffer.wrap(text.toString().getBytes(ISO_8859_1)));
             } catch (IOException e) {
                 throw I.quiet(e);
-            }
-        }
-
-        /**
-         * Compact this cache if needed.
-         */
-        void compact() {
-            if (isCompleted() && Files.notExists(compact)) {
-                System.out.println("Write compact log [" + date + "]");
-                compact(read()).to(e -> {
-                    // do nothing
-                });
             }
         }
 
@@ -642,49 +629,6 @@ public class MarketLog {
             } catch (IOException e) {
                 throw I.quiet(e);
             }
-        }
-
-        private void test() {
-            try {
-                CsvParserSettings setting = new CsvParserSettings();
-                setting.getFormat().setDelimiter(' ');
-                CsvParser parser = new CsvParser(setting);
-                // read compact
-                stopwatch.reset().start();
-                I.signal(parser.iterate(new ZstdInputStream(newInputStream(compact)), ISO_8859_1))
-                        .scanWith(Execution.BASE, service::decode)
-                        .effectOnComplete(parser::stopParsing)
-                        .effectOnComplete(() -> {
-                            System.out.println("Read compact log [" + date + "] " + stopwatch.stop().elapsed(MILLISECONDS));
-                        })
-                        .to(e -> {
-
-                        });
-
-                // read normal
-                parser = new CsvParser(setting);
-                stopwatch.reset().start();
-                I.signal(parser.iterate(newInputStream(log), ISO_8859_1))
-                        .map(Execution::new)
-                        .effectOnComplete(parser::stopParsing)
-                        .effectOnComplete(() -> {
-                            System.out.println("Read  log [" + date + "] " + stopwatch.stop().elapsed(MILLISECONDS));
-                        })
-                        .to(e -> {
-                        });
-            } catch (IOException e) {
-                throw I.quiet(e);
-            }
-        }
-
-    }
-
-    public static void main(String[] args) {
-        MarketLog log = BitFlyerService.FX_BTC_JPY.log;
-
-        for (int i = 1; i < 10; i++) {
-            Cache cache = log.cache(Chrono.utcNow().minusDays(i));
-            cache.test();
         }
     }
 }
