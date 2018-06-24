@@ -248,7 +248,8 @@ public class MarketLog {
                 } else {
                     if (start < observedLatest.get().id) {
                         // Although there is no data in the current search range, since it has not
-                        // yet reached the latest execution, shift the range backward and search again.
+                        // yet reached the latest execution, shift the range backward and search
+                        // again.
                         start += size;
                         continue;
                     } else {
@@ -311,26 +312,6 @@ public class MarketLog {
      */
     public final Signal<Execution> at(ZonedDateTime date) {
         return new Cache(date).read();
-    }
-
-    /**
-     * Locate execution log.
-     * 
-     * @param date A date time.
-     * @return A file location.
-     */
-    Path locateLog(TemporalAccessor date) {
-        return root.resolve("execution" + Chrono.DateCompact.format(date) + ".log");
-    }
-
-    /**
-     * Locate compressed execution log.
-     * 
-     * @param date A date time.
-     * @return A file location.
-     */
-    Path locateCompactLog(TemporalAccessor date) {
-        return root.resolve("compact" + Chrono.DateCompact.format(date) + ".log");
     }
 
     /**
@@ -439,30 +420,38 @@ public class MarketLog {
     }
 
     /**
-     * Compact log at the specified date.
+     * Create the specified date cache for TEST.
      * 
-     * @param date A target date.
+     * @param date
      */
-    void compact(ZonedDateTime date) {
-
+    final Cache cache(ZonedDateTime date) {
+        return new Cache(date);
     }
 
     /**
-     * Write compact execution log for test.
-     *
-     * @param date A target date.
-     * @param executions A execution log.
+     * Locate execution log.
+     * 
+     * @param date A date time.
+     * @return A file location.
      */
-    void writeCompactLog(ZonedDateTime date, Signal<Execution> executions) {
-        new Cache(date).compact(executions).to(e -> {
-            // do nothing
-        });
+    final Path locateLog(TemporalAccessor date) {
+        return root.resolve("execution" + Chrono.DateCompact.format(date) + ".log");
+    }
+
+    /**
+     * Locate compressed execution log.
+     * 
+     * @param date A date time.
+     * @return A file location.
+     */
+    final Path locateCompactLog(TemporalAccessor date) {
+        return root.resolve("compact").resolve(Chrono.DateCompact.format(date) + ".log");
     }
 
     /**
      * @version 2018/05/27 10:31:20
      */
-    private class Cache {
+    class Cache {
 
         /** The end date */
         private final LocalDate date;
@@ -555,24 +544,6 @@ public class MarketLog {
         }
 
         /**
-         * Write compact log from the specified executions.
-         */
-        private Signal<Execution> compact(Signal<Execution> executions) {
-            try {
-                CsvWriterSettings setting = new CsvWriterSettings();
-                setting.getFormat().setDelimiter(' ');
-                CsvWriter writer = new CsvWriter(new ZstdOutputStream(newOutputStream(compact), 1), ISO_8859_1, setting);
-
-                return executions.map(Execution.BASE, (prev, e) -> {
-                    writer.writeRow(service.encode(prev, e));
-                    return e;
-                }).effectOnComplete(writer::close);
-            } catch (IOException e) {
-                throw I.quiet(e);
-            }
-        }
-
-        /**
          * Try to download from market server.
          * 
          * @return
@@ -603,6 +574,26 @@ public class MarketLog {
             // write to file
             try (FileChannel channel = FileChannel.open(log, CREATE, APPEND)) {
                 channel.write(ByteBuffer.wrap(text.toString().getBytes(ISO_8859_1)));
+            } catch (IOException e) {
+                throw I.quiet(e);
+            }
+        }
+
+        /**
+         * Write compact log from the specified executions.
+         */
+        Signal<Execution> compact(Signal<Execution> executions) {
+            try {
+                Files.createDirectories(compact.getParent());
+
+                CsvWriterSettings setting = new CsvWriterSettings();
+                setting.getFormat().setDelimiter(' ');
+                CsvWriter writer = new CsvWriter(new ZstdOutputStream(newOutputStream(compact), 1), ISO_8859_1, setting);
+
+                return executions.map(Execution.BASE, (prev, e) -> {
+                    writer.writeRow(service.encode(prev, e));
+                    return e;
+                }).effectOnComplete(writer::close);
             } catch (IOException e) {
                 throw I.quiet(e);
             }

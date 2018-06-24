@@ -122,8 +122,6 @@ class MarketLogTest {
      * @param date A target date.
      */
     private List<Execution> writeCompactExecutionLog(ZonedDateTime date) {
-        List<Execution> list = executionRandomly(10).toList();
-        log.writeCompactLog(date, I.signal(list));
-        return list;
+        return log.cache(date).compact(executionRandomly(10)).toList();
     }
 }
