@@ -29,6 +29,7 @@ import javafx.scene.shape.PathElement;
 import cointoss.Side;
 import cointoss.order.Order.State;
 import cointoss.ticker.Tick;
+import cointoss.util.Chrono;
 import cointoss.util.Num;
 import kiss.I;
 import trademate.Notificator;
@@ -164,11 +165,11 @@ public class ChartPlotArea extends Region {
             mouseTrackHorizontal.layoutLine.requestLayout();
 
             // upper info
-            // chart.ticker.findByEpochSecond((long) x).isPresent(tick -> {
-            // chart.trade.selectDate.text(Chrono.system(tick.start).format(Chrono.DateTime));
-            // chart.trade.selectHigh.text("H " + tick.highPrice.scale(0));
-            // chart.trade.selectLow.text("L " + tick.lowPrice.scale(0));
-            // });
+            chart.ticker.findByEpochSecond((long) x).isPresent(tick -> {
+                chart.chart.selectDate.text(Chrono.system(tick.start).format(Chrono.DateTime));
+                chart.chart.selectHigh.text("H " + tick.highPrice.scale(0));
+                chart.chart.selectLow.text("L " + tick.lowPrice.scale(0));
+            });
         });
 
         // remove on exit
@@ -180,9 +181,9 @@ public class ChartPlotArea extends Region {
             mouseTrackHorizontal.layoutLine.requestLayout();
 
             // upper info
-            // chart.trade.selectDate.text("");
-            // chart.trade.selectHigh.text("");
-            // chart.trade.selectLow.text("");
+            chart.chart.selectDate.text("");
+            chart.chart.selectHigh.text("");
+            chart.chart.selectLow.text("");
         });
     }
 

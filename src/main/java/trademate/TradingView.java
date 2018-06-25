@@ -11,14 +11,11 @@ package trademate;
 
 import java.time.temporal.ChronoUnit;
 
-import javafx.scene.layout.AnchorPane;
-
 import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.order.Order;
-import cointoss.ticker.TickSpan;
 import kiss.I;
-import trademate.chart.CandleChart;
+import trademate.chart.ChartView;
 import trademate.console.Console;
 import trademate.order.OrderBookView;
 import trademate.order.OrderBuilder;
@@ -26,11 +23,8 @@ import trademate.order.OrderCatalog;
 import trademate.order.OrderSet;
 import trademate.order.PositionCatalog;
 import viewtify.UI;
-import viewtify.User;
 import viewtify.View;
 import viewtify.Viewtify;
-import viewtify.ui.UIComboBox;
-import viewtify.ui.UILabel;
 import viewtify.ui.UITab;
 
 /**
@@ -56,19 +50,7 @@ public class TradingView extends View {
 
     public @UI PositionCatalog positions;
 
-    public @UI AnchorPane chart;
-
-    /** Chart UI */
-    public @UI UIComboBox<TickSpan> chartSpan;
-
-    /** Chart UI */
-    public @UI UILabel selectDate;
-
-    /** Chart UI */
-    public @UI UILabel selectHigh;
-
-    /** Chart UI */
-    public @UI UILabel selectLow;
+    public @UI ChartView chart;
 
     /** Market cache. */
     private Market market;
@@ -86,15 +68,7 @@ public class TradingView extends View {
      */
     @Override
     protected void initialize() {
-        CandleChart candleChart = new CandleChart(chart, market()).use(TickSpan.Second5);
-
-        chartSpan.values(0, TickSpan.class).observeNow(candleChart::use).when(User.Scroll, e -> {
-            if (e.getDeltaY() < 0) {
-                chartSpan.ui.getSelectionModel().selectNext();
-            } else {
-                chartSpan.ui.getSelectionModel().selectPrevious();
-            }
-        });
+        chart.setMarket(market());
     }
 
     /**

@@ -48,6 +48,8 @@ public class CandleChart extends Region {
     /** The list of plottable cnadle date. */
     Ticker ticker;
 
+    ChartView chart;
+
     /** The layout manager. */
     private final LayoutAssistant layoutChart = new LayoutAssistant(this)//
             .layoutBy(widthProperty(), heightProperty())
@@ -60,9 +62,10 @@ public class CandleChart extends Region {
     /**
      * 
      */
-    public CandleChart(AnchorPane parent, Market market) {
+    public CandleChart(AnchorPane parent, Market market, ChartView chart) {
         this.market = market;
         this.main = new ChartPlotArea(this, axisX, axisY);
+        this.chart = chart;
 
         parent.getChildren().add(this);
 

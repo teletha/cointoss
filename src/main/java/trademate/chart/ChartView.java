@@ -13,7 +13,9 @@ import javafx.scene.layout.AnchorPane;
 
 import cointoss.Market;
 import cointoss.ticker.TickSpan;
+import kiss.Variable;
 import viewtify.UI;
+import viewtify.User;
 import viewtify.View;
 import viewtify.ui.UIComboBox;
 import viewtify.ui.UILabel;
@@ -24,28 +26,52 @@ import viewtify.ui.UILabel;
 public class ChartView extends View {
 
     /** Chart UI */
-    public @UI UIComboBox<TickSpan> chartSpan;
+    protected @UI UIComboBox<TickSpan> chartSpan;
 
     /** Chart UI */
-    public @UI UILabel selectDate;
+    protected @UI UILabel selectDate;
 
     /** Chart UI */
-    public @UI UILabel selectHigh;
+    protected @UI UILabel selectHigh;
 
     /** Chart UI */
-    public @UI UILabel selectLow;
+    protected @UI UILabel selectLow;
 
     /** Chart UI */
-    public @UI AnchorPane chart;
+    private @UI AnchorPane chart;
+
+    private CandleChart candleChart;
+
+    private final Variable<Market> market = Variable.empty();
 
     /**
      * {@inheritDoc}
      */
     @Override
     protected void initialize() {
+        market.observeNow().to(m -> {
+            candleChart = new CandleChart(chart, m, this).use(TickSpan.Second5);
+        });
+
+        chartSpan.values(0, TickSpan.class).observeNow(tick -> {
+            if (candleChart != null) {
+                candleChart.use(tick);
+            }
+        }).when(User.Scroll, e -> {
+            if (e.getDeltaY() < 0) {
+                chartSpan.ui.getSelectionModel().selectNext();
+            } else {
+                chartSpan.ui.getSelectionModel().selectPrevious();
+            }
+        });
     }
 
+    /**
+     * Set new market.
+     * 
+     * @param market
+     */
     public void setMarket(Market market) {
-        new CandleChart(chart, market).use(TickSpan.Second5);
+        this.market.set(market);
     }
 }
