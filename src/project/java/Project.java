@@ -9,6 +9,8 @@
  */
 public class Project extends bee.api.Project {
 
+    String Log4j = "2.11.0";
+
     {
         product("cointoss", "CoinToss", "1.0");
 
@@ -19,12 +21,12 @@ public class Project extends bee.api.Project {
         require("com.github.teletha", "antibug", "0.6").atTest();
         require("org.apache.commons", "commons-lang3", "3.7");
         require("commons-codec", "commons-codec", "1.11");
-        require("org.apache.logging.log4j", "log4j-core", "2.10.0");
-        require("org.apache.logging.log4j", "log4j-jul", "2.10.0");
-        require("org.slf4j", "slf4j-simple", "1.7.22");
+        require("org.apache.logging.log4j", "log4j-core", Log4j);
+        require("org.apache.logging.log4j", "log4j-jul", Log4j);
+        require("org.apache.logging.log4j", "log4j-slf4j-impl", Log4j);
         require("org.magicwerk", "brownies-collections", "0.9.13");
-        require("com.univocity", "univocity-parsers", "2.6.3");
-        require("com.github.luben", "zstd-jni", "1.3.4-4");
+        require("com.univocity", "univocity-parsers", "2.6.4");
+        require("com.github.luben", "zstd-jni", "1.3.4-11");
         require("com.github.signalr4j", "signalr4j", "2.0.3");
     }
 }

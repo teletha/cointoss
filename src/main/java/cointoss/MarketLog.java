@@ -12,7 +12,6 @@ package cointoss;
 import static java.nio.charset.StandardCharsets.*;
 import static java.nio.file.Files.*;
 import static java.nio.file.StandardOpenOption.*;
-import static java.util.concurrent.TimeUnit.*;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -41,6 +40,9 @@ import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.github.luben.zstd.ZstdInputStream;
 import com.github.luben.zstd.ZstdOutputStream;
 import com.google.common.base.Stopwatch;
@@ -61,6 +63,9 @@ import kiss.Signal;
  * @version 2018/06/24 8:49:53
  */
 public class MarketLog {
+
+    /** The logging system. */
+    private static final Logger log = LogManager.getLogger(MarketLog.class);
 
     /** NOOP TASK */
     private static final ScheduledFuture NOOP = new ScheduledFuture() {
@@ -157,7 +162,7 @@ public class MarketLog {
     /** Realtime execution observer, this value will be switched. */
     private Consumer<Execution> realtime;
 
-    /** For debug. */
+    /** For info. */
     private Stopwatch stopwatch = Stopwatch.createUnstarted();
 
     /**
@@ -181,7 +186,6 @@ public class MarketLog {
         this.cache = new Cache(ZonedDateTime.of(2000, 1, 1, 0, 0, 0, 0, Chrono.UTC));
 
         try {
-            stopwatch.start();
             ZonedDateTime start = null;
             ZonedDateTime end = null;
 
@@ -204,7 +208,6 @@ public class MarketLog {
             }
             this.cacheFirst = start;
             this.cacheLast = end;
-            System.out.println("Find caches " + stopwatch.stop().elapsed().getSeconds() + "s");
         } catch (Exception e) {
             throw I.quiet(e);
         }
@@ -250,7 +253,7 @@ public class MarketLog {
                 ArrayDeque<Execution> executions = service.executions(start, start + size).toCollection(new ArrayDeque(size));
 
                 if (executions.isEmpty() == false) {
-                    System.out.println("REST write " + start + "  " + executions.size() + "個");
+                    log.info("REST write from {}.  size {}", start, executions.size());
                     executions.forEach(observer);
                     start = executions.getLast().id;
                 } else {
@@ -264,7 +267,7 @@ public class MarketLog {
                         // Because the REST API has caught up with the real-time API,
                         // it stops the REST API.
                         realtime = observer::accept;
-                        System.out.println("RealtimeAPIへ移行");
+                        log.info("Switch to Realtime API.");
                         break;
                     }
                 }
@@ -476,7 +479,7 @@ public class MarketLog {
         private final LocalDate date;
 
         /** The log file. */
-        private final Path log;
+        private final Path normal;
 
         /** The compact log file. */
         private final Path compact;
@@ -492,7 +495,7 @@ public class MarketLog {
          */
         private Cache(ZonedDateTime date) {
             this.date = date.toLocalDate();
-            this.log = locateLog(date);
+            this.normal = locateLog(date);
             this.compact = locateCompactLog(date);
         }
 
@@ -549,19 +552,19 @@ public class MarketLog {
                             .scanWith(Execution.BASE, service::decode)
                             .effectOnComplete(parser::stopParsing)
                             .effectOnComplete(() -> {
-                                System.out.println("Read compact log [" + date + "] " + stopwatch.stop().elapsed(MILLISECONDS));
+                                log.info("Read compact log [{}] {}", date, stopwatch.stop().elapsed());
                             });
-                } else if (Files.notExists(log)) {
+                } else if (Files.notExists(normal)) {
                     // no data
                     return download();
                 } else {
                     // read normal
                     stopwatch.start();
-                    Signal<Execution> signal = I.signal(parser.iterate(newInputStream(log), ISO_8859_1))
+                    Signal<Execution> signal = I.signal(parser.iterate(newInputStream(normal), ISO_8859_1))
                             .map(Execution::new)
                             .effectOnComplete(parser::stopParsing)
                             .effectOnComplete(() -> {
-                                System.out.println("Read  log [" + date + "] " + stopwatch.stop().elapsed(MILLISECONDS));
+                                log.info("Read log [{}] {}", date, stopwatch.stop().elapsed());
                             });
 
                     // make log compact coinstantaneously
@@ -604,7 +607,7 @@ public class MarketLog {
             }
 
             // write normal log
-            try (FileChannel channel = FileChannel.open(log, CREATE, APPEND)) {
+            try (FileChannel channel = FileChannel.open(normal, CREATE, APPEND)) {
                 channel.write(ByteBuffer.wrap(text.toString().getBytes(ISO_8859_1)));
             } catch (IOException e) {
                 throw I.quiet(e);

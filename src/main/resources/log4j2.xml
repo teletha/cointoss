@@ -3,7 +3,7 @@
 
     <!-- Properties -->
     <Properties>
-        <Property name="pattern">%d{yyy-MM-dd HH:mm:ss.SSS}   %msg%n</Property>
+        <Property name="pattern">%d{yyyy-MM-dd HH:mm:ss.SSS} %p \t%m%n</Property>
     </Properties>
 
     <!-- Console Appender -->
@@ -15,12 +15,21 @@
         <UI name="UI">
             <PatternLayout pattern="${pattern}" />
         </UI>
+        
+        <RollingFile name="FILE" fileName=".log/system.log" filePattern=".log/system%d{yyyyMMdd}.log">
+            <PatternLayout pattern="${pattern}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+            </Policies>
+            <DefaultRolloverStrategy max="10"/>
+        </RollingFile>
     </Appenders>
 
     <Loggers>
         <Root level="info">
             <AppenderRef ref="SYSTEM" />
             <AppenderRef ref="UI" />
+            <AppenderRef ref="FILE" />
         </Root>
     </Loggers>
 </Configuration>
