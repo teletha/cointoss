@@ -17,8 +17,6 @@ import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.order.Order;
 import cointoss.ticker.TickSpan;
-import cointoss.util.Chrono;
-import cointoss.util.Num;
 import kiss.I;
 import trademate.chart.CandleChart;
 import trademate.console.Console;
@@ -88,19 +86,7 @@ public class TradingView extends View {
      */
     @Override
     protected void initialize() {
-        CandleChart candleChart = new CandleChart(chart, this).graph(plot -> {
-        }).axisX(axis -> {
-            axis.scroll.setVisibleAmount(0.1);
-            axis.scroll.setValue(1);
-
-            long minute = 60;
-            axis.tickLabelFormatter.set(time -> Chrono.systemBySeconds(time).format(Chrono.TimeWithoutSec));
-            axis.units.set(new double[] {minute, 5 * minute, 10 * minute, 30 * minute, 60 * minute, 2 * 60 * minute, 4 * 60 * minute,
-                    6 * 60 * minute, 12 * 60 * minute, 24 * 60 * minute});
-        }).axisY(axis -> {
-            axis.scroll.setVisible(false);
-            axis.tickLabelFormatter.set(v -> Num.of(v).scale(0).toString());
-        }).use(TickSpan.Second5);
+        CandleChart candleChart = new CandleChart(chart, this).use(TickSpan.Second5);
 
         chartSpan.values(0, TickSpan.class).observeNow(candleChart::use).when(User.Scroll, e -> {
             if (e.getDeltaY() < 0) {

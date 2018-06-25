@@ -30,6 +30,9 @@ import viewtify.ui.helper.LayoutAssistant;
  */
 public class CandleChart extends Region {
 
+    /** The time unit interval. */
+    private static long minute = 60;
+
     /** The x-axis UI. */
     public final Axis axisX = new Axis(5, 4, Side.BOTTOM);
 
@@ -67,6 +70,14 @@ public class CandleChart extends Region {
         AnchorPane.setBottomAnchor(this, 15d);
         AnchorPane.setRightAnchor(this, 15d);
         AnchorPane.setLeftAnchor(this, 0d);
+
+        axisX.scroll.setVisible(true);
+        axisX.tickLabelFormatter.set(trade.service::calculateReadableTime);
+        axisX.units.set(new double[] {minute, 5 * minute, 10 * minute, 30 * minute, 60 * minute, 2 * 60 * minute, 4 * 60 * minute,
+                6 * 60 * minute, 12 * 60 * minute, 24 * 60 * minute});
+
+        axisY.scroll.setVisible(false);
+        axisY.tickLabelFormatter.set(trade.service::calculateReadablePrice);
 
         getChildren().addAll(main, axisX, axisY);
     }
