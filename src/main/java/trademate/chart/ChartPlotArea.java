@@ -29,7 +29,6 @@ import javafx.scene.shape.PathElement;
 import cointoss.Side;
 import cointoss.order.Order.State;
 import cointoss.ticker.Tick;
-import cointoss.util.Chrono;
 import cointoss.util.Num;
 import kiss.I;
 import trademate.Notificator;
@@ -165,11 +164,11 @@ public class ChartPlotArea extends Region {
             mouseTrackHorizontal.layoutLine.requestLayout();
 
             // upper info
-            chart.ticker.findByEpochSecond((long) x).isPresent(tick -> {
-                chart.trade.selectDate.text(Chrono.system(tick.start).format(Chrono.DateTime));
-                chart.trade.selectHigh.text("H " + tick.highPrice.scale(0));
-                chart.trade.selectLow.text("L " + tick.lowPrice.scale(0));
-            });
+            // chart.ticker.findByEpochSecond((long) x).isPresent(tick -> {
+            // chart.trade.selectDate.text(Chrono.system(tick.start).format(Chrono.DateTime));
+            // chart.trade.selectHigh.text("H " + tick.highPrice.scale(0));
+            // chart.trade.selectLow.text("L " + tick.lowPrice.scale(0));
+            // });
         });
 
         // remove on exit
@@ -181,9 +180,9 @@ public class ChartPlotArea extends Region {
             mouseTrackHorizontal.layoutLine.requestLayout();
 
             // upper info
-            chart.trade.selectDate.text("");
-            chart.trade.selectHigh.text("");
-            chart.trade.selectLow.text("");
+            // chart.trade.selectDate.text("");
+            // chart.trade.selectHigh.text("");
+            // chart.trade.selectLow.text("");
         });
     }
 
@@ -207,7 +206,7 @@ public class ChartPlotArea extends Region {
             Num price = Num.of(Math.floor(axisY.getValueForPosition(clickedPosition)));
             TickLable label = notifyPrice.createLabel(price);
 
-            label.add(chart.trade.market().signalByPrice(price).on(Viewtify.UIThread).to(exe -> {
+            label.add(chart.market.signalByPrice(price).on(Viewtify.UIThread).to(exe -> {
                 notificator.priceSignal.notify("Rearch to " + price);
                 notifyPrice.remove(label);
             }));
@@ -218,7 +217,7 @@ public class ChartPlotArea extends Region {
      * Visualize order price in chart.
      */
     private void visualizeOrderPrice() {
-        chart.trade.market().orders.added.on(Viewtify.UIThread).to(o -> {
+        chart.market.orders.added.on(Viewtify.UIThread).to(o -> {
             LineMark mark = o.isBuy() ? orderBuyPrice : orderSellPrice;
             TickLable label = mark.createLabel(o.price);
 
@@ -234,7 +233,7 @@ public class ChartPlotArea extends Region {
     private void visualizeLatestPrice() {
         TickLable latest = latestPrice.createLabel();
 
-        chart.trade.market().timeline.map(e -> e.price).diff().on(Viewtify.UIThread).to(price -> {
+        chart.market.timeline.map(e -> e.price).diff().on(Viewtify.UIThread).to(price -> {
             latest.value.set(price.toDouble());
             latestPrice.layoutLine.requestLayout();
         });

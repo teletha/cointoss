@@ -86,7 +86,7 @@ public class TradingView extends View {
      */
     @Override
     protected void initialize() {
-        CandleChart candleChart = new CandleChart(chart, this).use(TickSpan.Second5);
+        CandleChart candleChart = new CandleChart(chart, market()).use(TickSpan.Second5);
 
         chartSpan.values(0, TickSpan.class).observeNow(candleChart::use).when(User.Scroll, e -> {
             if (e.getDeltaY() < 0) {

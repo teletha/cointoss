@@ -50,7 +50,7 @@ public class Market implements Disposable {
     private final AtomicReference<Execution> switcher = new AtomicReference<>(SEED);
 
     /** The market handler. */
-    protected final MarketService service;
+    public final MarketService service;
 
     public final ExecutionFlow flow = new ExecutionFlow(100);
 

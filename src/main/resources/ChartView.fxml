@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <HBox>
+         <children>
+            <ComboBox id="chartSpan" prefWidth="100.0" />
+            <Label id="selectDate" alignment="CENTER" maxHeight="1.7976931348623157E308" HBox.hgrow="ALWAYS">
+               <HBox.margin>
+                  <Insets left="10.0" />
+               </HBox.margin>
+               <font>
+                  <Font size="11.0" />
+               </font>
+            </Label>
+            <Label id="selectHigh" alignment="CENTER" maxHeight="1.7976931348623157E308">
+               <font>
+                  <Font size="11.0" />
+               </font>
+               <HBox.margin>
+                  <Insets left="10.0" />
+               </HBox.margin>
+            </Label>
+            <Label id="selectLow" alignment="CENTER" maxHeight="1.7976931348623157E308">
+               <font>
+                  <Font size="11.0" />
+               </font>
+               <HBox.margin>
+                  <Insets left="10.0" />
+               </HBox.margin>
+            </Label>
+         </children>
+      </HBox>
+      <AnchorPane id="chart" />
+   </children>
+</VBox>

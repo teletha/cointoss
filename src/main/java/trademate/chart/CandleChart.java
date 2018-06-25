@@ -16,13 +16,13 @@ import javafx.geometry.Side;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Region;
 
+import cointoss.Market;
 import cointoss.ticker.Tick;
 import cointoss.ticker.TickSpan;
 import cointoss.ticker.Ticker;
 import cointoss.util.Num;
 import kiss.Disposable;
 import kiss.Variable;
-import trademate.TradingView;
 import viewtify.ui.helper.LayoutAssistant;
 
 /**
@@ -43,7 +43,7 @@ public class CandleChart extends Region {
     public final ChartPlotArea main;
 
     /** The current market. */
-    public final TradingView trade;
+    public final Market market;
 
     /** The list of plottable cnadle date. */
     Ticker ticker;
@@ -60,8 +60,8 @@ public class CandleChart extends Region {
     /**
      * 
      */
-    public CandleChart(AnchorPane parent, TradingView trade) {
-        this.trade = trade;
+    public CandleChart(AnchorPane parent, Market market) {
+        this.market = market;
         this.main = new ChartPlotArea(this, axisX, axisY);
 
         parent.getChildren().add(this);
@@ -72,12 +72,12 @@ public class CandleChart extends Region {
         AnchorPane.setLeftAnchor(this, 0d);
 
         axisX.scroll.setVisible(true);
-        axisX.tickLabelFormatter.set(trade.service::calculateReadableTime);
+        axisX.tickLabelFormatter.set(market.service::calculateReadableTime);
         axisX.units.set(new double[] {minute, 5 * minute, 10 * minute, 30 * minute, 60 * minute, 2 * 60 * minute, 4 * 60 * minute,
                 6 * 60 * minute, 12 * 60 * minute, 24 * 60 * minute});
 
         axisY.scroll.setVisible(false);
-        axisY.tickLabelFormatter.set(trade.service::calculateReadablePrice);
+        axisY.tickLabelFormatter.set(market.service::calculateReadablePrice);
 
         getChildren().addAll(main, axisX, axisY);
     }
@@ -188,7 +188,7 @@ public class CandleChart extends Region {
      * @return
      */
     public final CandleChart use(TickSpan span) {
-        this.ticker = trade.market().tickerBy(span);
+        this.ticker = market.tickerBy(span);
 
         tickerUsage.dispose();
         tickerUsage = ticker.add.startWith((Tick) null).to(tick -> {
