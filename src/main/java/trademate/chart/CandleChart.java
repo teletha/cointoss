@@ -15,10 +15,8 @@ import javafx.geometry.Insets;
 import javafx.geometry.Side;
 import javafx.scene.layout.Region;
 
-import cointoss.ticker.Tick;
-import cointoss.ticker.Ticker;
+import cointoss.util.Chrono;
 import cointoss.util.Num;
-import kiss.Disposable;
 import kiss.Variable;
 import viewtify.ui.helper.LayoutAssistant;
 
@@ -31,16 +29,13 @@ public class CandleChart extends Region {
     private static long minute = 60;
 
     /** The x-axis UI. */
-    public final Axis axisX = new Axis(5, 4, Side.BOTTOM);
+    final Axis axisX = new Axis(5, 4, Side.BOTTOM);
 
     /** The y-axis UI. */
-    public final Axis axisY = new Axis(5, 4, Side.RIGHT);
+    final Axis axisY = new Axis(5, 4, Side.RIGHT);
 
     /** The actual graph drawer. */
-    public final ChartPlotArea main;
-
-    /** The list of plottable cnadle date. */
-    public final Variable<Ticker> ticker = Variable.empty();
+    final ChartPlotArea main;
 
     ChartView chart;
 
@@ -49,9 +44,6 @@ public class CandleChart extends Region {
             .layoutBy(widthProperty(), heightProperty())
             .layoutBy(axisX.scroll.valueProperty(), axisX.scroll.visibleAmountProperty())
             .layoutBy(axisY.scroll.valueProperty(), axisY.scroll.visibleAmountProperty());
-
-    /** The use flag. */
-    private Disposable tickerUsage = Disposable.empty();
 
     /**
      * 
@@ -62,6 +54,7 @@ public class CandleChart extends Region {
 
         axisY.scroll.setVisible(false);
         axisX.scroll.setVisible(true);
+        axisX.tickLabelFormatter.set(time -> Chrono.systemBySeconds(time).format(Chrono.TimeWithoutSec));
         axisX.units.set(new double[] {minute, 5 * minute, 10 * minute, 30 * minute, 60 * minute, 2 * 60 * minute, 4 * 60 * minute,
                 6 * 60 * minute, 12 * 60 * minute, 24 * 60 * minute});
 
@@ -69,24 +62,14 @@ public class CandleChart extends Region {
 
         chart.market.observe().to(m -> {
             // configure axis label
-            axisX.tickLabelFormatter.set(m.service::calculateReadableTime);
             axisY.tickLabelFormatter.set(m.service::calculateReadablePrice);
         });
 
-        ticker.observe().to(ticker -> {
-            tickerUsage.dispose();
-            tickerUsage = ticker.add.startWith((Tick) null).to(tick -> {
-                layoutChart.requestLayout();
-                main.layoutCandle.requestLayout();
-
-                if (0.99 <= axisX.scroll.getValue()) {
-                    axisX.scroll.setValue(1);
-                }
-            });
-            tickerUsage.add(ticker.update.to(tick -> {
-                main.layoutCandleLatest.requestLayout();
-            }));
+        chart.ticker.observe().switchMap(ticker -> ticker.add).to(() -> {
+            layoutChart.requestLayout();
+            main.layoutCandle.requestLayout();
         });
+        chart.ticker.observe().switchMap(ticker -> ticker.update).to(main.layoutCandleLatest::requestLayout);
     }
 
     /**
@@ -124,8 +107,8 @@ public class CandleChart extends Region {
      * Set x-axis range.
      */
     private void setAxisXRange() {
-        axisX.logicalMinValue.set(ticker.v.first().start.toEpochSecond());
-        axisX.logicalMaxValue.set(ticker.v.last().start.toEpochSecond() + 3 * 60);
+        axisX.logicalMinValue.set(chart.ticker.v.first().start.toEpochSecond());
+        axisX.logicalMaxValue.set(chart.ticker.v.last().start.toEpochSecond() + 3 * 60);
     }
 
     /**
@@ -138,7 +121,7 @@ public class CandleChart extends Region {
         double start = axisX.computeVisibleMinValue();
         double end = axisX.computeVisibleMaxValue();
 
-        ticker.v.each(data -> {
+        chart.ticker.v.each(data -> {
             long time = data.start.toEpochSecond();
 
             if (start <= time && time <= end) {

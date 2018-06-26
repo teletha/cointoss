@@ -34,13 +34,12 @@ import javafx.scene.shape.PathElement;
 
 import cointoss.util.Num;
 import kiss.Disposable;
-import trademate.chart.Axis.TickLable;
 import viewtify.Viewtify;
 import viewtify.ui.helper.LayoutAssistant;
 import viewtify.ui.helper.StyleHelper;
 
 /**
- * @version 2018/01/14 9:47:28
+ * @version 2018/06/26 10:59:28
  */
 public class Axis extends Region {
 

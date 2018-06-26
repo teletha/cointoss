@@ -506,7 +506,7 @@ public class MarketLog {
          */
         private Cache enableAutoSave() {
             if (task == NOOP) {
-                task = scheduler.scheduleWithFixedDelay(this::write, 20, 60, TimeUnit.SECONDS);
+                task = scheduler.scheduleWithFixedDelay(this::write, 20, 90, TimeUnit.SECONDS);
             }
             return this;
         }

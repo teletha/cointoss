@@ -13,6 +13,7 @@ import javafx.scene.layout.Pane;
 
 import cointoss.Market;
 import cointoss.ticker.TickSpan;
+import cointoss.ticker.Ticker;
 import kiss.Variable;
 import viewtify.UI;
 import viewtify.User;
@@ -27,6 +28,9 @@ public class ChartView extends View {
 
     /** The associated market. */
     public final Variable<Market> market = Variable.empty();
+
+    /** The list of plottable cnadle date. */
+    public final Variable<Ticker> ticker = Variable.empty();
 
     /** The candle chart UI. */
     public final CandleChart candle = new CandleChart(this);
@@ -52,7 +56,7 @@ public class ChartView extends View {
 
         chartSpan.values(0, TickSpan.class).observeNow(tick -> {
             if (candle != null) {
-                candle.ticker.set(market.v.tickerBy(tick));
+                ticker.set(market.v.tickerBy(tick));
             }
         }).when(User.Scroll, e -> {
             if (e.getDeltaY() < 0) {
