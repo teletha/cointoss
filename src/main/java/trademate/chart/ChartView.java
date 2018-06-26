@@ -33,7 +33,7 @@ public class ChartView extends View {
     public final Variable<Ticker> ticker = Variable.empty();
 
     /** The candle chart UI. */
-    public final CandleChart candle = new CandleChart(this);
+    public final Chart candle = new Chart(this);
 
     /** Chart UI */
     protected @UI UIComboBox<TickSpan> chartSpan;
@@ -46,6 +46,16 @@ public class ChartView extends View {
 
     /** Chart UI */
     protected @UI UILabel selectLow;
+
+    /**
+     * 
+     */
+    private ChartView() {
+        market.observe().to(m -> {
+            // configure axis label
+            candle.axisY.tickLabelFormatter.set(m.service::calculateReadablePrice);
+        });
+    }
 
     /**
      * {@inheritDoc}
@@ -64,11 +74,6 @@ public class ChartView extends View {
             } else {
                 chartSpan.ui.getSelectionModel().selectPrevious();
             }
-        });
-
-        market.observe().to(m -> {
-            // configure axis label
-            candle.axisY.tickLabelFormatter.set(m.service::calculateReadablePrice);
         });
     }
 }

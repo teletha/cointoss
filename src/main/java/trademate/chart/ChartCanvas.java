@@ -39,9 +39,9 @@ import viewtify.ui.helper.LayoutAssistant;
 import viewtify.ui.helper.StyleHelper;
 
 /**
- * @version 2018/04/11 17:26:19
+ * @version 2018/06/26 14:41:42
  */
-public class ChartPlotArea extends Region {
+public class ChartCanvas extends Region {
 
     /** @FIXME Read from css file. */
     private static final Color Buy = Color.rgb(32, 151, 77);
@@ -55,11 +55,11 @@ public class ChartPlotArea extends Region {
     /** The chart node. */
     private final ChartView chart;
 
-    /** The horizontal axis. */
-    final Axis axisX;
+    /** The horizontal axis. (shortcut) */
+    private final Axis axisX;
 
-    /** The vertical axis. */
-    final Axis axisY;
+    /** The vertical axis. (shortcut) */
+    private final Axis axisY;
 
     /** The notificator. */
     private final Notificator notificator = I.make(Notificator.class);
@@ -104,11 +104,13 @@ public class ChartPlotArea extends Region {
     public final LayoutAssistant layoutCandleLatest = new LayoutAssistant(this);
 
     /**
+     * Chart canvas.
+     * 
      * @param chart
      * @param axisX
      * @param axisY
      */
-    public ChartPlotArea(ChartView chart, Axis axisX, Axis axisY) {
+    public ChartCanvas(ChartView chart, Axis axisX, Axis axisY) {
         this.chart = chart;
         this.axisX = axisX;
         this.axisY = axisY;
@@ -143,8 +145,6 @@ public class ChartPlotArea extends Region {
         visualizeOrderPrice();
         visualizeLatestPrice();
         visualizeMouseTrack();
-
-        candles.isResizable();
 
         getChildren()
                 .addAll(backGridVertical, backGridHorizontal, notifyPrice, orderBuyPrice, orderSellPrice, latestPrice, candles, candleLatest, mouseTrackHorizontal, mouseTrackVertical, chartBottom);

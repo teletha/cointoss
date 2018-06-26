@@ -19,9 +19,9 @@ import kiss.Variable;
 import viewtify.ui.helper.LayoutAssistant;
 
 /**
- * @version 2018/06/26 9:33:42
+ * @version 2018/06/26 14:43:06
  */
-public class CandleChart extends Region {
+public class Chart extends Region {
 
     /** The time unit interval. */
     private static long minute = 60;
@@ -32,10 +32,11 @@ public class CandleChart extends Region {
     /** The y-axis UI. */
     public final Axis axisY = new Axis(5, 4, Side.RIGHT);
 
-    /** The actual graph drawer. */
-    final ChartPlotArea main;
+    /** The chart view. */
+    final ChartView chart;
 
-    ChartView chart;
+    /** The actual graph drawer. */
+    final ChartCanvas canvas;
 
     /** The layout manager. */
     private final LayoutAssistant layoutChart = new LayoutAssistant(this);
@@ -43,9 +44,9 @@ public class CandleChart extends Region {
     /**
      * 
      */
-    public CandleChart(ChartView chart) {
+    public Chart(ChartView chart) {
         this.chart = chart;
-        this.main = new ChartPlotArea(chart, axisX, axisY);
+        this.canvas = new ChartCanvas(chart, axisX, axisY);
 
         layoutChart.layoutBy(widthProperty(), heightProperty())
                 .layoutBy(axisX.scroll.valueProperty(), axisX.scroll.visibleAmountProperty())
@@ -58,7 +59,7 @@ public class CandleChart extends Region {
         axisX.units.set(new double[] {minute, 5 * minute, 10 * minute, 30 * minute, 60 * minute, 2 * 60 * minute, 4 * 60 * minute,
                 6 * 60 * minute, 12 * 60 * minute, 24 * 60 * minute});
 
-        getChildren().addAll(main, axisX, axisY);
+        getChildren().addAll(canvas, axisX, axisY);
     }
 
     /**
@@ -87,8 +88,8 @@ public class CandleChart extends Region {
             axisY.layout();
 
             // layout chart
-            main.resizeRelocate(x, y, mainWidth, mainHeight);
-            main.layoutChildren();
+            canvas.resizeRelocate(x, y, mainWidth, mainHeight);
+            canvas.layoutChildren();
         });
     }
 
