@@ -65,5 +65,10 @@ public class ChartView extends View {
                 chartSpan.ui.getSelectionModel().selectPrevious();
             }
         });
+
+        market.observe().to(m -> {
+            // configure axis label
+            candle.axisY.tickLabelFormatter.set(m.service::calculateReadablePrice);
+        });
     }
 }

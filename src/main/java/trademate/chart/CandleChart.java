@@ -9,8 +9,6 @@
  */
 package trademate.chart;
 
-import java.util.function.Consumer;
-
 import javafx.geometry.Insets;
 import javafx.geometry.Side;
 import javafx.scene.layout.Region;
@@ -29,10 +27,10 @@ public class CandleChart extends Region {
     private static long minute = 60;
 
     /** The x-axis UI. */
-    final Axis axisX = new Axis(5, 4, Side.BOTTOM);
+    public final Axis axisX = new Axis(5, 4, Side.BOTTOM);
 
     /** The y-axis UI. */
-    final Axis axisY = new Axis(5, 4, Side.RIGHT);
+    public final Axis axisY = new Axis(5, 4, Side.RIGHT);
 
     /** The actual graph drawer. */
     final ChartPlotArea main;
@@ -40,17 +38,19 @@ public class CandleChart extends Region {
     ChartView chart;
 
     /** The layout manager. */
-    private final LayoutAssistant layoutChart = new LayoutAssistant(this)//
-            .layoutBy(widthProperty(), heightProperty())
-            .layoutBy(axisX.scroll.valueProperty(), axisX.scroll.visibleAmountProperty())
-            .layoutBy(axisY.scroll.valueProperty(), axisY.scroll.visibleAmountProperty());
+    private final LayoutAssistant layoutChart = new LayoutAssistant(this);
 
     /**
      * 
      */
     public CandleChart(ChartView chart) {
         this.chart = chart;
-        this.main = new ChartPlotArea(this, axisX, axisY);
+        this.main = new ChartPlotArea(chart, axisX, axisY);
+
+        layoutChart.layoutBy(widthProperty(), heightProperty())
+                .layoutBy(axisX.scroll.valueProperty(), axisX.scroll.visibleAmountProperty())
+                .layoutBy(axisY.scroll.valueProperty(), axisY.scroll.visibleAmountProperty())
+                .layoutBy(chart.ticker.observe().switchMap(ticker -> ticker.add));
 
         axisY.scroll.setVisible(false);
         axisX.scroll.setVisible(true);
@@ -59,17 +59,6 @@ public class CandleChart extends Region {
                 6 * 60 * minute, 12 * 60 * minute, 24 * 60 * minute});
 
         getChildren().addAll(main, axisX, axisY);
-
-        chart.market.observe().to(m -> {
-            // configure axis label
-            axisY.tickLabelFormatter.set(m.service::calculateReadablePrice);
-        });
-
-        chart.ticker.observe().switchMap(ticker -> ticker.add).to(() -> {
-            layoutChart.requestLayout();
-            main.layoutCandle.requestLayout();
-        });
-        chart.ticker.observe().switchMap(ticker -> ticker.update).to(main.layoutCandleLatest::requestLayout);
     }
 
     /**
@@ -133,41 +122,5 @@ public class CandleChart extends Region {
         Num margin = max.v.minus(min).multiply(Num.of(0.5));
         axisY.logicalMaxValue.set(max.v.plus(margin).toLong());
         axisY.logicalMinValue.set(min.v.minus(margin).toLong());
-    }
-
-    /**
-     * Configure x-axis.
-     * 
-     * @param axis
-     * @return Chainable API.
-     */
-    public final CandleChart axisX(Consumer<Axis> axis) {
-        axis.accept(this.axisX);
-
-        return this;
-    }
-
-    /**
-     * Configure y-axis.
-     * 
-     * @param axis
-     * @return Chainable API.
-     */
-    public final CandleChart axisY(Consumer<Axis> axis) {
-        axis.accept(this.axisY);
-
-        return this;
-    }
-
-    /**
-     * Configure graph plot area.
-     * 
-     * @param graph
-     * @return Chainable API.
-     */
-    public final CandleChart graph(Consumer<ChartPlotArea> graph) {
-        graph.accept(this.main);
-
-        return this;
     }
 }

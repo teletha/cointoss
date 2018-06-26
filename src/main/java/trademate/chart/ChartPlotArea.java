@@ -53,7 +53,7 @@ public class ChartPlotArea extends Region {
     private static final int BarWidth = 3;
 
     /** The chart node. */
-    private final CandleChart chart;
+    private final ChartView chart;
 
     /** The horizontal axis. */
     final Axis axisX;
@@ -108,7 +108,7 @@ public class ChartPlotArea extends Region {
      * @param axisX
      * @param axisY
      */
-    public ChartPlotArea(CandleChart chart, Axis axisX, Axis axisY) {
+    public ChartPlotArea(ChartView chart, Axis axisX, Axis axisY) {
         this.chart = chart;
         this.axisX = axisX;
         this.axisY = axisY;
@@ -132,10 +132,12 @@ public class ChartPlotArea extends Region {
 
         layoutCandle.layoutBy(widthProperty(), heightProperty())
                 .layoutBy(axisX.scroll.valueProperty(), axisX.scroll.visibleAmountProperty())
-                .layoutBy(axisY.scroll.valueProperty(), axisY.scroll.visibleAmountProperty());
+                .layoutBy(axisY.scroll.valueProperty(), axisY.scroll.visibleAmountProperty())
+                .layoutBy(chart.ticker.observe().switchMap(ticker -> ticker.add));
         layoutCandleLatest.layoutBy(widthProperty(), heightProperty())
                 .layoutBy(axisX.scroll.valueProperty(), axisX.scroll.visibleAmountProperty())
-                .layoutBy(axisY.scroll.valueProperty(), axisY.scroll.visibleAmountProperty());
+                .layoutBy(axisY.scroll.valueProperty(), axisY.scroll.visibleAmountProperty())
+                .layoutBy(chart.ticker.observe().switchMap(ticker -> ticker.update));
 
         visualizeNotifyPrice();
         visualizeOrderPrice();
@@ -165,10 +167,10 @@ public class ChartPlotArea extends Region {
             mouseTrackHorizontal.layoutLine.requestLayout();
 
             // upper info
-            chart.chart.ticker.v.findByEpochSecond((long) x).isPresent(tick -> {
-                chart.chart.selectDate.text(Chrono.system(tick.start).format(Chrono.DateTime));
-                chart.chart.selectHigh.text("H " + tick.highPrice.scale(0));
-                chart.chart.selectLow.text("L " + tick.lowPrice.scale(0));
+            chart.ticker.v.findByEpochSecond((long) x).isPresent(tick -> {
+                chart.selectDate.text(Chrono.system(tick.start).format(Chrono.DateTime));
+                chart.selectHigh.text("H " + tick.highPrice.scale(0));
+                chart.selectLow.text("L " + tick.lowPrice.scale(0));
             });
         });
 
@@ -181,9 +183,9 @@ public class ChartPlotArea extends Region {
             mouseTrackHorizontal.layoutLine.requestLayout();
 
             // upper info
-            chart.chart.selectDate.text("");
-            chart.chart.selectHigh.text("");
-            chart.chart.selectLow.text("");
+            chart.selectDate.text("");
+            chart.selectHigh.text("");
+            chart.selectLow.text("");
         });
     }
 
@@ -207,7 +209,7 @@ public class ChartPlotArea extends Region {
             Num price = Num.of(Math.floor(axisY.getValueForPosition(clickedPosition)));
             TickLable label = notifyPrice.createLabel(price);
 
-            label.add(chart.chart.market.v.signalByPrice(price).on(Viewtify.UIThread).to(exe -> {
+            label.add(chart.market.v.signalByPrice(price).on(Viewtify.UIThread).to(exe -> {
                 notificator.priceSignal.notify("Rearch to " + price);
                 notifyPrice.remove(label);
             }));
@@ -218,7 +220,7 @@ public class ChartPlotArea extends Region {
      * Visualize order price in chart.
      */
     private void visualizeOrderPrice() {
-        chart.chart.market.observe().to(market -> {
+        chart.market.observe().to(market -> {
             market.orders.added.on(Viewtify.UIThread).to(o -> {
                 LineMark mark = o.isBuy() ? orderBuyPrice : orderSellPrice;
                 TickLable label = mark.createLabel(o.price);
@@ -236,7 +238,7 @@ public class ChartPlotArea extends Region {
     private void visualizeLatestPrice() {
         TickLable latest = latestPrice.createLabel();
 
-        chart.chart.market.observe().to(market -> {
+        chart.market.observe().to(market -> {
             market.timeline.map(e -> e.price).diff().on(Viewtify.UIThread).to(price -> {
                 latest.value.set(price.toDouble());
                 latestPrice.layoutLine.requestLayout();
@@ -269,10 +271,10 @@ public class ChartPlotArea extends Region {
         layoutCandle.layout(() -> {
             // estimate visible range
             long start = (long) axisX.computeVisibleMinValue();
-            long end = Math.min((long) axisX.computeVisibleMaxValue(), chart.chart.ticker.v.last().start.toEpochSecond());
-            long span = chart.chart.ticker.v.span.duration.getSeconds();
+            long end = Math.min((long) axisX.computeVisibleMaxValue(), chart.ticker.v.last().start.toEpochSecond());
+            long span = chart.ticker.v.span.duration.getSeconds();
             int visibleSize = (int) ((end - start) / span) + 1;
-            int visibleStartIndex = (int) ((start - chart.chart.ticker.v.first().start.toEpochSecond()) / span);
+            int visibleStartIndex = (int) ((start - chart.ticker.v.first().start.toEpochSecond()) / span);
 
             // Redraw all candles.
             GraphicsContext gc = candles.getGraphicsContext2D();
@@ -280,7 +282,7 @@ public class ChartPlotArea extends Region {
 
             // draw chart in visible range
             chartBottom.initialize(visibleSize);
-            chart.chart.ticker.v.each(visibleStartIndex, visibleSize, tick -> {
+            chart.ticker.v.each(visibleStartIndex, visibleSize, tick -> {
                 double x = axisX.getPositionForValue(tick.start.toEpochSecond());
                 double open = axisY.getPositionForValue(tick.openPrice.toDouble());
                 double close = axisY.getPositionForValue(tick.closePrice.toDouble());
@@ -302,7 +304,7 @@ public class ChartPlotArea extends Region {
             GraphicsContext gc = candleLatest.getGraphicsContext2D();
             gc.clearRect(0, 0, candleLatest.getWidth(), candleLatest.getHeight());
 
-            Tick tick = chart.chart.ticker.v.last();
+            Tick tick = chart.ticker.v.last();
 
             double x = axisX.getPositionForValue(tick.start.toEpochSecond());
             double open = axisY.getPositionForValue(tick.openPrice.toDouble());
