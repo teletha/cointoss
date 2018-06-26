@@ -189,7 +189,7 @@ public class MarketLog {
             ZonedDateTime start = null;
             ZonedDateTime end = null;
 
-            for (Path file : Filer.walk(root, "execution*.log").toList()) {
+            for (Path file : Filer.walk(root, "execution*.*og").toList()) {
                 String name = file.getFileName().toString();
                 ZonedDateTime date = LocalDate.parse(name.substring(9, 17), fileName).atTime(0, 0, 0, 0).atZone(Chrono.UTC);
 
@@ -506,7 +506,7 @@ public class MarketLog {
          */
         private Cache enableAutoSave() {
             if (task == NOOP) {
-                task = scheduler.scheduleWithFixedDelay(this::write, 60, 60, TimeUnit.SECONDS);
+                task = scheduler.scheduleWithFixedDelay(this::write, 20, 60, TimeUnit.SECONDS);
             }
             return this;
         }
@@ -609,6 +609,8 @@ public class MarketLog {
             // write normal log
             try (FileChannel channel = FileChannel.open(normal, CREATE, APPEND)) {
                 channel.write(ByteBuffer.wrap(text.toString().getBytes(ISO_8859_1)));
+
+                log.info("Write log until " + remaining.peekLast().exec_date + " at " + service + ".");
             } catch (IOException e) {
                 throw I.quiet(e);
             }

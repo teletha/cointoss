@@ -21,7 +21,7 @@ import viewtify.ui.UIComboBox;
 import viewtify.ui.UILabel;
 
 /**
- * @version 2018/06/26 1:19:42
+ * @version 2018/06/26 9:38:15
  */
 public class ChartView extends View {
 
@@ -40,24 +40,22 @@ public class ChartView extends View {
     /** Chart UI */
     private @UI AnchorPane chart;
 
-    private CandleChart candleChart;
+    /** The associated market. */
+    final Variable<Market> market = Variable.empty();
 
-    private final Variable<Market> market = Variable.empty();
+    /** The candle chart UI. */
+    public final CandleChart candle = new CandleChart(this);
 
     /**
      * {@inheritDoc}
      */
     @Override
     protected void initialize() {
-        market.observeNow().to(m -> {
-            candleChart = new CandleChart(m, this);
-
-            chart.getChildren().add(candleChart);
-        });
+        chart.getChildren().add(candle);
 
         chartSpan.values(0, TickSpan.class).observeNow(tick -> {
-            if (candleChart != null) {
-                candleChart.tickerV.set(market.v.tickerBy(tick));
+            if (candle != null) {
+                candle.ticker.set(market.v.tickerBy(tick));
             }
         }).when(User.Scroll, e -> {
             if (e.getDeltaY() < 0) {

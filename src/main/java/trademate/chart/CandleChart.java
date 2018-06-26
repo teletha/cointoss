@@ -16,7 +16,6 @@ import javafx.geometry.Side;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Region;
 
-import cointoss.Market;
 import cointoss.ticker.Tick;
 import cointoss.ticker.Ticker;
 import cointoss.util.Num;
@@ -25,7 +24,7 @@ import kiss.Variable;
 import viewtify.ui.helper.LayoutAssistant;
 
 /**
- * @version 2018/01/30 19:46:15
+ * @version 2018/06/26 9:33:42
  */
 public class CandleChart extends Region {
 
@@ -41,15 +40,8 @@ public class CandleChart extends Region {
     /** The actual graph drawer. */
     public final ChartPlotArea main;
 
-    /** The current market. */
-    public final Market market;
-
-    /** The current market property. */
-    public final Variable<Market> marketV = Variable.empty();
-
     /** The list of plottable cnadle date. */
-
-    public final Variable<Ticker> tickerV = Variable.empty();
+    public final Variable<Ticker> ticker = Variable.empty();
 
     ChartView chart;
 
@@ -65,10 +57,9 @@ public class CandleChart extends Region {
     /**
      * 
      */
-    public CandleChart(Market market, ChartView chart) {
-        this.market = market;
-        this.main = new ChartPlotArea(this, axisX, axisY);
+    public CandleChart(ChartView chart) {
         this.chart = chart;
+        this.main = new ChartPlotArea(this, axisX, axisY);
 
         AnchorPane.setTopAnchor(this, 10d);
         AnchorPane.setBottomAnchor(this, 15d);
@@ -82,13 +73,13 @@ public class CandleChart extends Region {
 
         getChildren().addAll(main, axisX, axisY);
 
-        marketV.observe().to(m -> {
+        chart.market.observe().to(m -> {
             // configure axis label
             axisX.tickLabelFormatter.set(m.service::calculateReadableTime);
             axisY.tickLabelFormatter.set(m.service::calculateReadablePrice);
         });
 
-        tickerV.observe().to(ticker -> {
+        ticker.observe().to(ticker -> {
             tickerUsage.dispose();
             tickerUsage = ticker.add.startWith((Tick) null).to(tick -> {
                 layoutChart.requestLayout();
@@ -139,8 +130,8 @@ public class CandleChart extends Region {
      * Set x-axis range.
      */
     private void setAxisXRange() {
-        axisX.logicalMinValue.set(tickerV.v.first().start.toEpochSecond());
-        axisX.logicalMaxValue.set(tickerV.v.last().start.toEpochSecond() + 3 * 60);
+        axisX.logicalMinValue.set(ticker.v.first().start.toEpochSecond());
+        axisX.logicalMaxValue.set(ticker.v.last().start.toEpochSecond() + 3 * 60);
     }
 
     /**
@@ -153,7 +144,7 @@ public class CandleChart extends Region {
         double start = axisX.computeVisibleMinValue();
         double end = axisX.computeVisibleMaxValue();
 
-        tickerV.v.each(data -> {
+        ticker.v.each(data -> {
             long time = data.start.toEpochSecond();
 
             if (start <= time && time <= end) {
