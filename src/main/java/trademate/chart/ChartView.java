@@ -9,14 +9,11 @@
  */
 package trademate.chart;
 
-import javafx.scene.layout.Pane;
-
 import cointoss.Market;
 import cointoss.ticker.TickSpan;
 import cointoss.ticker.Ticker;
 import kiss.Variable;
 import viewtify.UI;
-import viewtify.User;
 import viewtify.View;
 import viewtify.ui.UIComboBox;
 import viewtify.ui.UILabel;
@@ -45,23 +42,13 @@ public class ChartView extends View {
     protected @UI UILabel selectLow;
 
     /** The candle chart UI. */
-    private final Chart candle = new Chart(this);
+    private final @UI Chart chart = new Chart(this);
 
     /**
      * {@inheritDoc}
      */
     @Override
     protected void initialize() {
-        ((Pane) root()).getChildren().add(candle);
-
-        chartSpan.values(0, TickSpan.class).when(User.Scroll, e -> {
-            if (e.getDeltaY() < 0) {
-                chartSpan.ui.getSelectionModel().selectNext();
-            } else {
-                chartSpan.ui.getSelectionModel().selectPrevious();
-            }
-        });
-
-        chartSpan.observeNow().combineLatest(market.observeNow()).map(e -> e.ⅱ.tickerBy(e.ⅰ)).to(ticker::set);
+        chartSpan.values(0, TickSpan.class).observeNow().combineLatest(market.observeNow()).map(e -> e.ⅱ.tickerBy(e.ⅰ)).to(ticker::set);
     }
 }

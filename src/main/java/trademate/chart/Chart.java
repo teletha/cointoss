@@ -54,8 +54,8 @@ public class Chart extends Region {
                 .layoutBy(axisY.scroll.valueProperty(), axisY.scroll.visibleAmountProperty())
                 .layoutBy(chart.ticker.observe().switchMap(ticker -> ticker.add.startWithNull()));
 
+        // configure axis label
         chart.market.observe().to(m -> {
-            // configure axis label
             axisX.tickLabelFormatter.set(time -> Chrono.systemBySeconds(time).format(Chrono.TimeWithoutSec));
             axisY.tickLabelFormatter.set(m.service::calculateReadablePrice);
         });

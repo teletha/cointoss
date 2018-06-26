@@ -4,6 +4,7 @@
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
@@ -38,6 +39,7 @@
             </Label>
          </children>
       </HBox>
+      <Pane id="chart" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" />
    </children>
    <padding>
       <Insets bottom="15.0" right="15.0" />
