@@ -14,12 +14,20 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
 import cointoss.Execution;
+import cointoss.util.Chrono;
 import cointoss.util.Num;
 
 /**
  * @version 2018/01/29 13:37:15
  */
 public class Tick {
+
+    /** The null object. */
+    public static final Tick EMPTY = new Tick(Chrono.utcNow(), Chrono.utcNow(), Num.ZERO);
+
+    static {
+        EMPTY.closePrice = Num.ZERO;
+    }
 
     /** Begin time of the tick */
     public final ZonedDateTime start;

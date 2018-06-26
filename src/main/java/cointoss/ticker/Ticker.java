@@ -113,7 +113,8 @@ public class Ticker {
      * @return
      */
     public final Tick first() {
-        return ticks.peekFirst();
+        Tick tick = ticks.peekFirst();
+        return tick == null ? Tick.EMPTY : tick;
     }
 
     /**
@@ -122,7 +123,8 @@ public class Ticker {
      * @return
      */
     public final Tick last() {
-        return ticks.peekLast();
+        Tick tick = ticks.peekLast();
+        return tick == null ? Tick.EMPTY : tick;
     }
 
     /**

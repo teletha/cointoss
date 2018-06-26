@@ -15,6 +15,7 @@ import cointoss.ticker.Ticker;
 import kiss.Variable;
 import viewtify.UI;
 import viewtify.View;
+import viewtify.Viewtify;
 import viewtify.ui.UIComboBox;
 import viewtify.ui.UILabel;
 
@@ -30,7 +31,7 @@ public class ChartView extends View {
     public final Variable<Ticker> ticker = Variable.empty();
 
     /** Chart UI */
-    protected @UI UIComboBox<TickSpan> chartSpan;
+    protected @UI UIComboBox<TickSpan> span;
 
     /** Chart UI */
     protected @UI UILabel selectDate;
@@ -41,7 +42,7 @@ public class ChartView extends View {
     /** Chart UI */
     protected @UI UILabel selectLow;
 
-    /** The candle chart UI. */
+    /** The candle chart. */
     private final @UI Chart chart = new Chart(this);
 
     /**
@@ -49,6 +50,8 @@ public class ChartView extends View {
      */
     @Override
     protected void initialize() {
-        chartSpan.values(0, TickSpan.class).observeNow().combineLatest(market.observeNow()).map(e -> e.ⅱ.tickerBy(e.ⅰ)).to(ticker::set);
+        Viewtify.expand(root());
+
+        span.values(0, TickSpan.class).observeNow().combineLatest(market.observeNow()).map(e -> e.ⅱ.tickerBy(e.ⅰ)).to(ticker::set);
     }
 }
