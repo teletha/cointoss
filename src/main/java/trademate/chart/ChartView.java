@@ -50,12 +50,14 @@ public class ChartView extends View {
     @Override
     protected void initialize() {
         market.observeNow().to(m -> {
-            candleChart = new CandleChart(chart, m, this).use(TickSpan.Second5);
+            candleChart = new CandleChart(m, this);
+
+            chart.getChildren().add(candleChart);
         });
 
         chartSpan.values(0, TickSpan.class).observeNow(tick -> {
             if (candleChart != null) {
-                candleChart.use(tick);
+                candleChart.tickerV.set(market.v.tickerBy(tick));
             }
         }).when(User.Scroll, e -> {
             if (e.getDeltaY() < 0) {

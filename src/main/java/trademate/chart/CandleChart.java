@@ -18,7 +18,6 @@ import javafx.scene.layout.Region;
 
 import cointoss.Market;
 import cointoss.ticker.Tick;
-import cointoss.ticker.TickSpan;
 import cointoss.ticker.Ticker;
 import cointoss.util.Num;
 import kiss.Disposable;
@@ -45,8 +44,12 @@ public class CandleChart extends Region {
     /** The current market. */
     public final Market market;
 
+    /** The current market property. */
+    public final Variable<Market> marketV = Variable.empty();
+
     /** The list of plottable cnadle date. */
-    Ticker ticker;
+
+    public final Variable<Ticker> tickerV = Variable.empty();
 
     ChartView chart;
 
@@ -62,27 +65,43 @@ public class CandleChart extends Region {
     /**
      * 
      */
-    public CandleChart(AnchorPane parent, Market market, ChartView chart) {
+    public CandleChart(Market market, ChartView chart) {
         this.market = market;
         this.main = new ChartPlotArea(this, axisX, axisY);
         this.chart = chart;
-
-        parent.getChildren().add(this);
 
         AnchorPane.setTopAnchor(this, 10d);
         AnchorPane.setBottomAnchor(this, 15d);
         AnchorPane.setRightAnchor(this, 15d);
         AnchorPane.setLeftAnchor(this, 0d);
 
+        axisY.scroll.setVisible(false);
         axisX.scroll.setVisible(true);
-        axisX.tickLabelFormatter.set(market.service::calculateReadableTime);
         axisX.units.set(new double[] {minute, 5 * minute, 10 * minute, 30 * minute, 60 * minute, 2 * 60 * minute, 4 * 60 * minute,
                 6 * 60 * minute, 12 * 60 * minute, 24 * 60 * minute});
 
-        axisY.scroll.setVisible(false);
-        axisY.tickLabelFormatter.set(market.service::calculateReadablePrice);
-
         getChildren().addAll(main, axisX, axisY);
+
+        marketV.observe().to(m -> {
+            // configure axis label
+            axisX.tickLabelFormatter.set(m.service::calculateReadableTime);
+            axisY.tickLabelFormatter.set(m.service::calculateReadablePrice);
+        });
+
+        tickerV.observe().to(ticker -> {
+            tickerUsage.dispose();
+            tickerUsage = ticker.add.startWith((Tick) null).to(tick -> {
+                layoutChart.requestLayout();
+                main.layoutCandle.requestLayout();
+
+                if (0.99 <= axisX.scroll.getValue()) {
+                    axisX.scroll.setValue(1);
+                }
+            });
+            tickerUsage.add(ticker.update.to(tick -> {
+                main.layoutCandleLatest.requestLayout();
+            }));
+        });
     }
 
     /**
@@ -120,8 +139,8 @@ public class CandleChart extends Region {
      * Set x-axis range.
      */
     private void setAxisXRange() {
-        axisX.logicalMinValue.set(ticker.first().start.toEpochSecond());
-        axisX.logicalMaxValue.set(ticker.last().start.toEpochSecond() + 3 * 60);
+        axisX.logicalMinValue.set(tickerV.v.first().start.toEpochSecond());
+        axisX.logicalMaxValue.set(tickerV.v.last().start.toEpochSecond() + 3 * 60);
     }
 
     /**
@@ -134,7 +153,7 @@ public class CandleChart extends Region {
         double start = axisX.computeVisibleMinValue();
         double end = axisX.computeVisibleMaxValue();
 
-        ticker.each(data -> {
+        tickerV.v.each(data -> {
             long time = data.start.toEpochSecond();
 
             if (start <= time && time <= end) {
@@ -181,30 +200,6 @@ public class CandleChart extends Region {
     public final CandleChart graph(Consumer<ChartPlotArea> graph) {
         graph.accept(this.main);
 
-        return this;
-    }
-
-    /**
-     * Specify ticker.
-     * 
-     * @param span
-     * @return
-     */
-    public final CandleChart use(TickSpan span) {
-        this.ticker = market.tickerBy(span);
-
-        tickerUsage.dispose();
-        tickerUsage = ticker.add.startWith((Tick) null).to(tick -> {
-            layoutChart.requestLayout();
-            main.layoutCandle.requestLayout();
-
-            if (0.99 <= axisX.scroll.getValue()) {
-                axisX.scroll.setValue(1);
-            }
-        });
-        tickerUsage.add(ticker.update.to(tick -> {
-            main.layoutCandleLatest.requestLayout();
-        }));
         return this;
     }
 }

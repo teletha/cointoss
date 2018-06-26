@@ -165,7 +165,7 @@ public class ChartPlotArea extends Region {
             mouseTrackHorizontal.layoutLine.requestLayout();
 
             // upper info
-            chart.ticker.findByEpochSecond((long) x).isPresent(tick -> {
+            chart.tickerV.v.findByEpochSecond((long) x).isPresent(tick -> {
                 chart.chart.selectDate.text(Chrono.system(tick.start).format(Chrono.DateTime));
                 chart.chart.selectHigh.text("H " + tick.highPrice.scale(0));
                 chart.chart.selectLow.text("L " + tick.lowPrice.scale(0));
@@ -265,10 +265,10 @@ public class ChartPlotArea extends Region {
         layoutCandle.layout(() -> {
             // estimate visible range
             long start = (long) axisX.computeVisibleMinValue();
-            long end = Math.min((long) axisX.computeVisibleMaxValue(), chart.ticker.last().start.toEpochSecond());
-            long span = chart.ticker.span.duration.getSeconds();
+            long end = Math.min((long) axisX.computeVisibleMaxValue(), chart.tickerV.v.last().start.toEpochSecond());
+            long span = chart.tickerV.v.span.duration.getSeconds();
             int visibleSize = (int) ((end - start) / span) + 1;
-            int visibleStartIndex = (int) ((start - chart.ticker.first().start.toEpochSecond()) / span);
+            int visibleStartIndex = (int) ((start - chart.tickerV.v.first().start.toEpochSecond()) / span);
 
             // Redraw all candles.
             GraphicsContext gc = candles.getGraphicsContext2D();
@@ -276,7 +276,7 @@ public class ChartPlotArea extends Region {
 
             // draw chart in visible range
             chartBottom.initialize(visibleSize);
-            chart.ticker.each(visibleStartIndex, visibleSize, tick -> {
+            chart.tickerV.v.each(visibleStartIndex, visibleSize, tick -> {
                 double x = axisX.getPositionForValue(tick.start.toEpochSecond());
                 double open = axisY.getPositionForValue(tick.openPrice.toDouble());
                 double close = axisY.getPositionForValue(tick.closePrice.toDouble());
@@ -298,7 +298,7 @@ public class ChartPlotArea extends Region {
             GraphicsContext gc = candleLatest.getGraphicsContext2D();
             gc.clearRect(0, 0, candleLatest.getWidth(), candleLatest.getHeight());
 
-            Tick tick = chart.ticker.last();
+            Tick tick = chart.tickerV.v.last();
 
             double x = axisX.getPositionForValue(tick.start.toEpochSecond());
             double open = axisY.getPositionForValue(tick.openPrice.toDouble());
