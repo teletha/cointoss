@@ -19,24 +19,25 @@ import kiss.Variable;
 import viewtify.ui.helper.LayoutAssistant;
 
 /**
- * @version 2018/06/26 14:43:06
+ * @version 2018/06/26 18:55:05
  */
 public class Chart extends Region {
 
     /** The time unit interval. */
-    private static long minute = 60;
+    private static long M = 60;
 
     /** The x-axis UI. */
-    public final Axis axisX = new Axis(5, 4, Side.BOTTOM);
+    public final Axis axisX = new Axis(5, 4, Side.BOTTOM)
+            .units(M, 5 * M, 10 * M, 30 * M, 60 * M, 2 * 60 * M, 4 * 60 * M, 6 * 60 * M, 12 * 60 * M, 24 * 60 * M);
 
     /** The y-axis UI. */
-    public final Axis axisY = new Axis(5, 4, Side.RIGHT);
+    public final Axis axisY = new Axis(5, 4, Side.RIGHT).visibleScroll(false);
 
     /** The chart view. */
-    final ChartView chart;
+    private final ChartView chart;
 
     /** The actual graph drawer. */
-    final ChartCanvas canvas;
+    private final ChartCanvas canvas;
 
     /** The layout manager. */
     private final LayoutAssistant layoutChart = new LayoutAssistant(this);
@@ -51,13 +52,13 @@ public class Chart extends Region {
         layoutChart.layoutBy(widthProperty(), heightProperty())
                 .layoutBy(axisX.scroll.valueProperty(), axisX.scroll.visibleAmountProperty())
                 .layoutBy(axisY.scroll.valueProperty(), axisY.scroll.visibleAmountProperty())
-                .layoutBy(chart.ticker.observe().switchMap(ticker -> ticker.add));
+                .layoutBy(chart.ticker.observe().switchMap(ticker -> ticker.add.startWithNull()));
 
-        axisY.scroll.setVisible(false);
-        axisX.scroll.setVisible(true);
-        axisX.tickLabelFormatter.set(time -> Chrono.systemBySeconds(time).format(Chrono.TimeWithoutSec));
-        axisX.units.set(new double[] {minute, 5 * minute, 10 * minute, 30 * minute, 60 * minute, 2 * 60 * minute, 4 * 60 * minute,
-                6 * 60 * minute, 12 * 60 * minute, 24 * 60 * minute});
+        chart.market.observe().to(m -> {
+            // configure axis label
+            axisX.tickLabelFormatter.set(time -> Chrono.systemBySeconds(time).format(Chrono.TimeWithoutSec));
+            axisY.tickLabelFormatter.set(m.service::calculateReadablePrice);
+        });
 
         getChildren().addAll(canvas, axisX, axisY);
     }

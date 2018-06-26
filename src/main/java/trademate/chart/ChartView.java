@@ -32,9 +32,6 @@ public class ChartView extends View {
     /** The list of plottable cnadle date. */
     public final Variable<Ticker> ticker = Variable.empty();
 
-    /** The candle chart UI. */
-    public final Chart candle = new Chart(this);
-
     /** Chart UI */
     protected @UI UIComboBox<TickSpan> chartSpan;
 
@@ -47,15 +44,8 @@ public class ChartView extends View {
     /** Chart UI */
     protected @UI UILabel selectLow;
 
-    /**
-     * 
-     */
-    private ChartView() {
-        market.observe().to(m -> {
-            // configure axis label
-            candle.axisY.tickLabelFormatter.set(m.service::calculateReadablePrice);
-        });
-    }
+    /** The candle chart UI. */
+    private final Chart candle = new Chart(this);
 
     /**
      * {@inheritDoc}
@@ -64,16 +54,14 @@ public class ChartView extends View {
     protected void initialize() {
         ((Pane) root()).getChildren().add(candle);
 
-        chartSpan.values(0, TickSpan.class).observeNow(tick -> {
-            if (candle != null) {
-                ticker.set(market.v.tickerBy(tick));
-            }
-        }).when(User.Scroll, e -> {
+        chartSpan.values(0, TickSpan.class).when(User.Scroll, e -> {
             if (e.getDeltaY() < 0) {
                 chartSpan.ui.getSelectionModel().selectNext();
             } else {
                 chartSpan.ui.getSelectionModel().selectPrevious();
             }
         });
+
+        chartSpan.observeNow().combineLatest(market.observeNow()).map(e -> e.ⅱ.tickerBy(e.ⅰ)).to(ticker::set);
     }
 }

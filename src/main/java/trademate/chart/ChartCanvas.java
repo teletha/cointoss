@@ -135,11 +135,11 @@ public class ChartCanvas extends Region {
         layoutCandle.layoutBy(widthProperty(), heightProperty())
                 .layoutBy(axisX.scroll.valueProperty(), axisX.scroll.visibleAmountProperty())
                 .layoutBy(axisY.scroll.valueProperty(), axisY.scroll.visibleAmountProperty())
-                .layoutBy(chart.ticker.observe().switchMap(ticker -> ticker.add));
+                .layoutBy(chart.ticker.observe().switchMap(ticker -> ticker.add.startWithNull()));
         layoutCandleLatest.layoutBy(widthProperty(), heightProperty())
                 .layoutBy(axisX.scroll.valueProperty(), axisX.scroll.visibleAmountProperty())
                 .layoutBy(axisY.scroll.valueProperty(), axisY.scroll.visibleAmountProperty())
-                .layoutBy(chart.ticker.observe().switchMap(ticker -> ticker.update));
+                .layoutBy(chart.ticker.observe().switchMap(ticker -> ticker.update.startWithNull()));
 
         visualizeNotifyPrice();
         visualizeOrderPrice();

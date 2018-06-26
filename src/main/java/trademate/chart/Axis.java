@@ -163,6 +163,28 @@ public class Axis extends Region {
         return side.isVertical();
     }
 
+    /**
+     * Configure tick interval units.
+     * 
+     * @param units A tick interval unit list.
+     * @return Chainable API.
+     */
+    public final Axis units(double... units) {
+        this.units.set(units);
+        return this;
+    }
+
+    /**
+     * Configure {@link ScrollBar}'s visibility.
+     * 
+     * @param visible A visibility of scroll bar.
+     * @return Chainable API.
+     */
+    public final Axis visibleScroll(boolean visible) {
+        scroll.setVisible(visible);
+        return this;
+    }
+
     public int tickSize() {
         return tickLabels.getChildren().size();
     }
