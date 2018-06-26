@@ -68,7 +68,7 @@ public class TradingView extends View {
      */
     @Override
     protected void initialize() {
-        chart.setMarket(market());
+        chart.market.set(market());
     }
 
     /**

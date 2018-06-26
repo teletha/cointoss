@@ -21,9 +21,15 @@ import viewtify.ui.UIComboBox;
 import viewtify.ui.UILabel;
 
 /**
- * @version 2018/06/26 9:38:15
+ * @version 2018/06/26 10:14:03
  */
 public class ChartView extends View {
+
+    /** The associated market. */
+    public final Variable<Market> market = Variable.empty();
+
+    /** The candle chart UI. */
+    public final CandleChart candle = new CandleChart(this);
 
     /** Chart UI */
     protected @UI UIComboBox<TickSpan> chartSpan;
@@ -39,12 +45,6 @@ public class ChartView extends View {
 
     /** Chart UI */
     private @UI AnchorPane chart;
-
-    /** The associated market. */
-    final Variable<Market> market = Variable.empty();
-
-    /** The candle chart UI. */
-    public final CandleChart candle = new CandleChart(this);
 
     /**
      * {@inheritDoc}
@@ -64,14 +64,5 @@ public class ChartView extends View {
                 chartSpan.ui.getSelectionModel().selectPrevious();
             }
         });
-    }
-
-    /**
-     * Set new market.
-     * 
-     * @param market
-     */
-    public void setMarket(Market market) {
-        this.market.set(market);
     }
 }
