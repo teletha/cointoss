@@ -13,7 +13,6 @@ import java.util.function.Consumer;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Side;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Region;
 
 import cointoss.ticker.Tick;
@@ -60,11 +59,6 @@ public class CandleChart extends Region {
     public CandleChart(ChartView chart) {
         this.chart = chart;
         this.main = new ChartPlotArea(this, axisX, axisY);
-
-        AnchorPane.setTopAnchor(this, 10d);
-        AnchorPane.setBottomAnchor(this, 15d);
-        AnchorPane.setRightAnchor(this, 15d);
-        AnchorPane.setLeftAnchor(this, 0d);
 
         axisY.scroll.setVisible(false);
         axisX.scroll.setVisible(true);

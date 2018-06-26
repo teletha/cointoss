@@ -9,7 +9,7 @@
  */
 package trademate.chart;
 
-import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Pane;
 
 import cointoss.Market;
 import cointoss.ticker.TickSpan;
@@ -43,15 +43,12 @@ public class ChartView extends View {
     /** Chart UI */
     protected @UI UILabel selectLow;
 
-    /** Chart UI */
-    private @UI AnchorPane chart;
-
     /**
      * {@inheritDoc}
      */
     @Override
     protected void initialize() {
-        chart.getChildren().add(candle);
+        ((Pane) root()).getChildren().add(candle);
 
         chartSpan.values(0, TickSpan.class).observeNow(tick -> {
             if (candle != null) {

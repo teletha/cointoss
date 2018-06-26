@@ -3,7 +3,6 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
@@ -39,6 +38,8 @@
             </Label>
          </children>
       </HBox>
-      <AnchorPane id="chart" />
    </children>
+   <padding>
+      <Insets bottom="15.0" right="15.0" />
+   </padding>
 </VBox>
