@@ -109,3 +109,7 @@
 .ChartVolume {
 	-fx-stroke: -side;
 }
+
+.backtestAnchor {
+  -fx-border-color: red;
+}

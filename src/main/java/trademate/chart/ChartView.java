@@ -15,7 +15,6 @@ import cointoss.ticker.Ticker;
 import kiss.Variable;
 import viewtify.UI;
 import viewtify.View;
-import viewtify.Viewtify;
 import viewtify.ui.UIComboBox;
 import viewtify.ui.UILabel;
 
@@ -50,8 +49,6 @@ public class ChartView extends View {
      */
     @Override
     protected void initialize() {
-        Viewtify.expand(root());
-
         span.values(0, TickSpan.class).observeNow().combineLatest(market.observeNow()).map(e -> e.ⅱ.tickerBy(e.ⅰ)).to(ticker::set);
     }
 }
