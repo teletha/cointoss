@@ -27,7 +27,7 @@ public class ChartView extends View {
     public final Variable<Market> market = Variable.empty();
 
     /** The list of plottable cnadle date. */
-    public final Variable<Ticker> ticker = Variable.empty();
+    public final Variable<Ticker> ticker = Variable.of(Ticker.EMPTY);
 
     /** Chart UI */
     protected @UI UIComboBox<TickSpan> span;
@@ -49,6 +49,8 @@ public class ChartView extends View {
      */
     @Override
     protected void initialize() {
-        span.values(0, TickSpan.class).observeNow().combineLatest(market.observeNow()).map(e -> e.ⅱ.tickerBy(e.ⅰ)).to(ticker::set);
+        span.values(0, TickSpan.class);
+
+        span.observeNow().skipNull().combineLatest(market.observeNow().skipNull()).map(e -> e.ⅱ.tickerBy(e.ⅰ)).to(ticker::set);
     }
 }

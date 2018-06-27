@@ -12,10 +12,10 @@ package trademate;
 import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.market.bitflyer.BitFlyerService;
+import cointoss.ticker.TickSpan;
 import cointoss.util.Chrono;
 import trademate.chart.ChartView;
 import viewtify.UI;
-import viewtify.User;
 import viewtify.View;
 import viewtify.Viewtify;
 import viewtify.ui.UIButton;
@@ -47,14 +47,18 @@ public class BackTestView extends View {
      */
     @Override
     protected void initialize() {
-        chart.market.set(new Market(BitFlyerService.FX_BTC_JPY));
-        Viewtify.Terminator.add(chart.market.get());
-        market.initial(BitFlyerService.FX_BTC_JPY).values(BitFlyerService.FX_BTC_JPY);
+        market.values(0, BitFlyerService.FX_BTC_JPY);
         startDate.initial(Chrono.utcNow().minusDays(10).toLocalDate());
         endDate.initial(Chrono.utcNow().toLocalDate());
 
-        start.when(User.Click).to(e -> {
-            System.out.println("OK");
-        });
+        Market market = new Market(BitFlyerService.FX_BTC_JPY).readLog(log -> log.at(2017, 6, 4));
+
+        Viewtify.Terminator.add(market);
+        chart.ticker.set(market.tickerBy(TickSpan.Minute1));
+        // start.when(User.Click).to(e -> {
+        // chart.market.to(v -> v.readLog(log -> log.range(Chrono.utf(startDate.value()),
+        // Chrono.utf(endDate.value()))));
+        // System.out.println("OK");
+        // });
     }
 }

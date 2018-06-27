@@ -21,9 +21,12 @@ import kiss.Signaling;
 import kiss.Variable;
 
 /**
- * @version 2018/02/02 17:14:53
+ * @version 2018/06/27 15:46:14
  */
 public class Ticker {
+
+    /** Reusable NULL object.. */
+    public static final Ticker EMPTY = new Ticker(TickSpan.Minute1, Signal.EMPTY);
 
     /** The target span. */
     public final TickSpan span;

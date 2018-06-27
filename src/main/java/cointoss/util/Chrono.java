@@ -10,6 +10,7 @@
 package cointoss.util;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -82,6 +83,18 @@ public class Chrono {
     }
 
     /**
+     * UTC {@link ZonedDateTime} at the specified date.
+     * 
+     * @param year A year.
+     * @param month A month.
+     * @param day A day of month.
+     * @return
+     */
+    public static ZonedDateTime utf(LocalDate date) {
+        return date.atTime(0, 0).atZone(UTC);
+    }
+
+    /**
      * System default {@link ZonedDateTime} from current time
      * 
      * @param mills
@@ -142,8 +155,8 @@ public class Chrono {
     }
 
     /**
-     * Ensures that the specified date is between the minimum and maximum date.If the specified date is
-     * out of range, the closest date is returned.
+     * Ensures that the specified date is between the minimum and maximum date.If the specified date
+     * is out of range, the closest date is returned.
      * 
      * @param min A minimum date.
      * @param target A target date.
