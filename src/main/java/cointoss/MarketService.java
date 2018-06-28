@@ -14,6 +14,7 @@ import java.util.Objects;
 
 import cointoss.order.Order;
 import cointoss.order.OrderBookListChange;
+import cointoss.util.Chrono;
 import cointoss.util.LogCodec;
 import cointoss.util.Network;
 import cointoss.util.Num;
@@ -297,6 +298,22 @@ public abstract class MarketService implements Disposable {
      */
     public String calculateReadablePrice(double price) {
         return Num.of(price).scale(0).toString();
+    }
+
+    /**
+     * Calculate human-readable price for display.
+     * 
+     * @param seconds A target time. (second)
+     * @return
+     */
+    public String calculateReadableTime(double seconds) {
+        ZonedDateTime time = Chrono.systemBySeconds(seconds);
+
+        if (time.getMinute() == 0) {
+            return time.format(Chrono.DateTimeWithoutSec);
+        } else {
+            return time.format(Chrono.TimeWithoutSec);
+        }
     }
 
     /**

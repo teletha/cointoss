@@ -33,6 +33,9 @@ public class Chrono {
     public static final DateTimeFormatter DateTime = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     /** Reusable format. */
+    public static final DateTimeFormatter DateTimeWithoutSec = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+
+    /** Reusable format. */
     public static final DateTimeFormatter DateTimeWithT = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
 
     /** Reusable format. */
@@ -155,8 +158,8 @@ public class Chrono {
     }
 
     /**
-     * Ensures that the specified date is between the minimum and maximum date.If the specified date
-     * is out of range, the closest date is returned.
+     * Ensures that the specified date is between the minimum and maximum date.If the specified date is
+     * out of range, the closest date is returned.
      * 
      * @param min A minimum date.
      * @param target A target date.

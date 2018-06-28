@@ -547,7 +547,7 @@ public class MarketLog {
                 CsvParser parser = new CsvParser(setting);
                 if (Files.exists(compact)) {
                     // read compact
-                    stopwatch.start();
+                    stopwatch.reset().start();
                     return I.signal(parser.iterate(new ZstdInputStream(newInputStream(compact)), ISO_8859_1))
                             .scanWith(Execution.BASE, service::decode)
                             .effectOnComplete(parser::stopParsing)
@@ -559,7 +559,7 @@ public class MarketLog {
                     return download();
                 } else {
                     // read normal
-                    stopwatch.start();
+                    stopwatch.reset().start();
                     Signal<Execution> signal = I.signal(parser.iterate(newInputStream(normal), ISO_8859_1))
                             .map(Execution::new)
                             .effectOnComplete(parser::stopParsing)

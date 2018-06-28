@@ -62,12 +62,6 @@ public enum TickSpan {
     Minute30(30, MINUTE_OF_HOUR),
 
     /** SPAN */
-    Minute40(40, MINUTE_OF_HOUR),
-
-    /** SPAN */
-    Minute50(50, MINUTE_OF_HOUR),
-
-    /** SPAN */
     Hour1(1, HOUR_OF_DAY),
 
     /** SPAN */
