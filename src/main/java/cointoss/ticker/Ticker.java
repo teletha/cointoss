@@ -52,34 +52,34 @@ public class Ticker {
     /**
      * 
      */
-    public Ticker(TickSpan span, Signal<Execution> signal) {
+    public Ticker(TickSpan span, Signal<Execution> timeline) {
         this.span = span;
 
-        signal.map(Tick.by(span)).effect(updaters).diff().to(tick -> {
-            lock.writeLock().lock();
-
-            try {
-                // handle unobservable ticks (i.e. server error, maintenance)
-                Tick last = last();
-
-                if (last != null) {
-                    ZonedDateTime nextStart = last.start.plus(span.duration);
-
-                    while (nextStart.isBefore(tick.start)) {
-                        // some ticks were skipped by unknown error, so we will complement
-                        last = new Tick(nextStart, nextStart.plus(span.duration), last.openPrice);
-                        last.closePrice = last.highPrice = last.lowPrice = last.openPrice;
-                        ticks.add(last);
-
-                        nextStart = last.end;
-                    }
-                }
-
-                ticks.add(tick);
-                additions.accept(tick);
-            } finally {
-                lock.writeLock().unlock();
-            }
+        timeline.map(Tick.by(span)).effect(updaters).diff().to(tick -> {
+            // lock.writeLock().lock();
+            //
+            // try {
+            // // handle unobservable ticks (i.e. server error, maintenance)
+            // Tick last = last();
+            //
+            // if (last != null) {
+            // ZonedDateTime nextStart = last.start.plus(span.duration);
+            //
+            // while (nextStart.isBefore(tick.start)) {
+            // // some ticks were skipped by unknown error, so we will complement
+            // last = new Tick(nextStart, nextStart.plus(span.duration), last.openPrice);
+            // last.closePrice = last.highPrice = last.lowPrice = last.openPrice;
+            // ticks.add(last);
+            //
+            // nextStart = last.end;
+            // }
+            // }
+            //
+            // ticks.add(tick);
+            // additions.accept(tick);
+            // } finally {
+            // lock.writeLock().unlock();
+            // }
         });
     }
 

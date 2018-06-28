@@ -23,7 +23,7 @@ import cointoss.util.Num;
 public class Tick {
 
     /** The null object. */
-    public static final Tick EMPTY = new Tick(Chrono.utcNow(), Chrono.utcNow(), Num.ZERO);
+    public static final Tick EMPTY = new Tick(Chrono.utc(2000, 1, 1), Chrono.utc(2000, 1, 1), Num.ZERO);
 
     static {
         EMPTY.closePrice = Num.ZERO;
@@ -262,12 +262,12 @@ public class Tick {
      * @return
      */
     public static Function<Execution, Tick> by(TickSpan span) {
-        AtomicReference<Tick> latest = new AtomicReference();
+        AtomicReference<Tick> latest = new AtomicReference(Tick.EMPTY);
 
         return e -> {
             Tick tick = latest.get();
 
-            if (tick == null || !e.exec_date.isBefore(tick.end)) {
+            if (!e.exec_date.isBefore(tick.end)) {
                 ZonedDateTime start = span.calculateStartTime(e.exec_date);
                 ZonedDateTime end = span.calculateEndTime(e.exec_date);
 

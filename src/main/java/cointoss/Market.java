@@ -321,13 +321,13 @@ public class Market implements Disposable {
         if (init.isAbsent()) init.let(e);
         latest.set(e);
 
-        flow.record(e);
-        flow75.record(e);
-        flow100.record(e);
-        flow200.record(e);
-        flow300.record(e);
-
-        // observe executions
+        // flow.record(e);
+        // flow75.record(e);
+        // flow100.record(e);
+        // flow200.record(e);
+        // flow300.record(e);
+        //
+        // // observe executions
         timelineObservers.accept(e);
     }
 

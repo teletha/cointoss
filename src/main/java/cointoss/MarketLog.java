@@ -51,6 +51,7 @@ import com.univocity.parsers.csv.CsvParserSettings;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
 
+import cointoss.market.bitflyer.BitFlyerService;
 import cointoss.util.Chrono;
 import cointoss.util.Span;
 import filer.Filer;
@@ -547,10 +548,10 @@ public class MarketLog {
                 CsvParser parser = new CsvParser(setting);
                 if (Files.exists(compact)) {
                     // read compact
-                    stopwatch.reset().start();
                     return I.signal(parser.iterate(new ZstdInputStream(newInputStream(compact)), ISO_8859_1))
                             .scanWith(Execution.BASE, service::decode)
                             .effectOnComplete(parser::stopParsing)
+                            .effectOnObserve(() -> stopwatch.reset().start())
                             .effectOnComplete(() -> {
                                 log.info("Read compact log [{}] {}", date, stopwatch.stop().elapsed());
                             });
@@ -559,10 +560,10 @@ public class MarketLog {
                     return download();
                 } else {
                     // read normal
-                    stopwatch.reset().start();
                     Signal<Execution> signal = I.signal(parser.iterate(newInputStream(normal), ISO_8859_1))
                             .map(Execution::new)
                             .effectOnComplete(parser::stopParsing)
+                            .effectOnObserve(() -> stopwatch.reset().start())
                             .effectOnComplete(() -> {
                                 log.info("Read log [{}] {}", date, stopwatch.stop().elapsed());
                             });
@@ -635,5 +636,11 @@ public class MarketLog {
                 throw I.quiet(e);
             }
         }
+    }
+
+    public static void main(String[] args) {
+        Market m = new Market(BitFlyerService.FX_BTC_JPY);
+        m.readLog(log -> log.caches().take(6).concatMap(c -> c.read()));
+        m.dispose();
     }
 }
