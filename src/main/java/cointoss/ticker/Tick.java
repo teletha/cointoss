@@ -18,7 +18,7 @@ import cointoss.util.Chrono;
 import cointoss.util.Num;
 
 /**
- * @version 2018/01/29 13:37:15
+ * @version 2018/06/29 11:09:20
  */
 public class Tick {
 
@@ -48,15 +48,6 @@ public class Tick {
     public Num lowPrice = Num.MAX;
 
     /** Volume of the period */
-    public Num volume = Num.ZERO;
-
-    /** Traded amount during the period */
-    public Num amount = Num.ZERO;
-
-    /** Traded amount during the period */
-    public Num amountSquare = Num.ZERO;
-
-    /** Volume of the period */
     public Num longVolume = Num.ZERO;
 
     /** Volume of the period */
@@ -67,24 +58,6 @@ public class Tick {
 
     /** Volume of the period */
     public Num shortPriceDecrease = Num.ZERO;
-
-    /**
-     * Decode.
-     * 
-     * @param value
-     */
-    public Tick(String value) {
-        String[] values = value.split(" ");
-
-        start = ZonedDateTime.parse(values[0]);
-        end = ZonedDateTime.parse(values[1]);
-        openPrice = Num.of(values[2]);
-        closePrice = Num.of(values[3]);
-        highPrice = Num.of(values[4]);
-        lowPrice = Num.of(values[5]);
-        volume = Num.of(values[6]);
-        amount = Num.of(values[7]);
-    }
 
     /**
     * 
@@ -105,15 +78,13 @@ public class Tick {
         closePrice = exe.price;
         highPrice = Num.max(highPrice, exe.price);
         lowPrice = Num.min(lowPrice, exe.price);
-        volume = volume.plus(exe.size);
-        amount = amount.plus(exe.price.multiply(exe.size));
 
         if (exe.side.isBuy()) {
             longVolume = longVolume.plus(exe.size);
-            longPriceIncrese = longPriceIncrese.plus(exe.price.minus(latest));
+            // longPriceIncrese = longPriceIncrese.plus(exe.price.minus(latest));
         } else {
             shortVolume = shortVolume.plus(exe.size);
-            shortPriceDecrease = shortPriceDecrease.plus(latest.minus(exe.price));
+            // shortPriceDecrease = shortPriceDecrease.plus(latest.minus(exe.price));
         }
     }
 
@@ -126,8 +97,6 @@ public class Tick {
         closePrice = tick.closePrice;
         highPrice = Num.max(highPrice, tick.highPrice);
         lowPrice = Num.min(lowPrice, tick.lowPrice);
-        volume = volume.plus(tick.volume);
-        amount = amount.plus(tick.amount);
         longVolume = longVolume.plus(tick.longVolume);
         longPriceIncrese = longPriceIncrese.plus(tick.longPriceIncrese);
         shortVolume = shortVolume.plus(tick.shortVolume);
@@ -189,28 +158,12 @@ public class Tick {
     }
 
     /**
-     * Get the amount property of this {@link Tick}.
-     * 
-     * @return The amount property.
-     */
-    public final Num getAmount() {
-        return amount;
-    }
-
-    /**
      * Get the volume property of this {@link Tick}.
      * 
      * @return The volume property.
      */
     public final Num getVolume() {
-        return volume;
-    }
-
-    /**
-     * @return
-     */
-    public final Num getWeightMedian() {
-        return amount.divide(volume);
+        return longVolume.plus(shortVolume);
     }
 
     /**
@@ -248,9 +201,9 @@ public class Tick {
                 .append(" ")
                 .append(lowPrice)
                 .append(" ")
-                .append(volume)
+                .append(longVolume)
                 .append(" ")
-                .append(amount);
+                .append(shortVolume);
 
         return builder.toString();
     }

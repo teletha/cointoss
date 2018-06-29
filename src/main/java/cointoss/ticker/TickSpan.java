@@ -29,19 +29,13 @@ public enum TickSpan {
     Second5(5, SECOND_OF_MINUTE),
 
     /** SPAN */
-    Second10(10, SECOND_OF_MINUTE),
-
-    /** SPAN */
-    Second20(20, SECOND_OF_MINUTE),
+    Second15(15, SECOND_OF_MINUTE),
 
     /** SPAN */
     Second30(30, SECOND_OF_MINUTE),
 
     /** SPAN */
     Minute1(1, MINUTE_OF_HOUR),
-
-    /** SPAN */
-    Minute2(2, MINUTE_OF_HOUR),
 
     /** SPAN */
     Minute3(3, MINUTE_OF_HOUR),
@@ -54,9 +48,6 @@ public enum TickSpan {
 
     /** SPAN */
     Minute15(15, MINUTE_OF_HOUR),
-
-    /** SPAN */
-    Minute20(20, MINUTE_OF_HOUR),
 
     /** SPAN */
     Minute30(30, MINUTE_OF_HOUR),
@@ -72,9 +63,6 @@ public enum TickSpan {
 
     /** SPAN */
     Hour4(4, HOUR_OF_DAY),
-
-    /** SPAN */
-    Hour5(5, HOUR_OF_DAY),
 
     /** SPAN */
     Hour6(6, HOUR_OF_DAY),
