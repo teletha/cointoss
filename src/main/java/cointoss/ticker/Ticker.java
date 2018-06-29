@@ -56,30 +56,30 @@ public class Ticker {
         this.span = span;
 
         timeline.map(Tick.by(span)).effect(updaters).diff().to(tick -> {
-            // lock.writeLock().lock();
-            //
-            // try {
-            // // handle unobservable ticks (i.e. server error, maintenance)
-            // Tick last = last();
-            //
-            // if (last != null) {
-            // ZonedDateTime nextStart = last.start.plus(span.duration);
-            //
-            // while (nextStart.isBefore(tick.start)) {
-            // // some ticks were skipped by unknown error, so we will complement
-            // last = new Tick(nextStart, nextStart.plus(span.duration), last.openPrice);
-            // last.closePrice = last.highPrice = last.lowPrice = last.openPrice;
-            // ticks.add(last);
-            //
-            // nextStart = last.end;
-            // }
-            // }
-            //
-            // ticks.add(tick);
-            // additions.accept(tick);
-            // } finally {
-            // lock.writeLock().unlock();
-            // }
+            lock.writeLock().lock();
+
+            try {
+                // handle unobservable ticks (i.e. server error, maintenance)
+                Tick last = last();
+
+                if (last != null) {
+                    ZonedDateTime nextStart = last.start.plus(span.duration);
+
+                    while (nextStart.isBefore(tick.start)) {
+                        // some ticks were skipped by unknown error, so we will complement
+                        last = new Tick(nextStart, nextStart.plus(span.duration), last.openPrice);
+                        last.closePrice = last.highPrice = last.lowPrice = last.openPrice;
+                        ticks.add(last);
+
+                        nextStart = last.end;
+                    }
+                }
+
+                ticks.add(tick);
+                additions.accept(tick);
+            } finally {
+                lock.writeLock().unlock();
+            }
         });
     }
 
@@ -117,7 +117,7 @@ public class Ticker {
      */
     public final Tick first() {
         Tick tick = ticks.peekFirst();
-        return tick == null ? Tick.EMPTY : tick;
+        return tick == null ? Tick.NOW : tick;
     }
 
     /**
@@ -127,7 +127,7 @@ public class Ticker {
      */
     public final Tick last() {
         Tick tick = ticks.peekLast();
-        return tick == null ? Tick.EMPTY : tick;
+        return tick == null ? Tick.NOW : tick;
     }
 
     /**

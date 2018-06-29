@@ -26,6 +26,9 @@ import kiss.I;
 public enum TickSpan {
 
     /** SPAN */
+    Second1(1, SECOND_OF_MINUTE),
+
+    /** SPAN */
     Second5(5, SECOND_OF_MINUTE),
 
     /** SPAN */

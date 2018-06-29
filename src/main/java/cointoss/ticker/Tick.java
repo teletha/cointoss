@@ -23,10 +23,14 @@ import cointoss.util.Num;
 public class Tick {
 
     /** The null object. */
-    public static final Tick EMPTY = new Tick(Chrono.utc(2000, 1, 1), Chrono.utc(2000, 1, 1), Num.ZERO);
+    public static final Tick PAST = new Tick(Chrono.utc(2000, 1, 1), Chrono.utc(2000, 1, 1), Num.ZERO);
+
+    /** The null object. */
+    public static final Tick NOW = new Tick(Chrono.utcNow(), Chrono.utcNow(), Num.ZERO);
 
     static {
-        EMPTY.closePrice = Num.ZERO;
+        PAST.closePrice = Num.ZERO;
+        NOW.closePrice = Num.ZERO;
     }
 
     /** Begin time of the tick */
@@ -81,10 +85,10 @@ public class Tick {
 
         if (exe.side.isBuy()) {
             longVolume = longVolume.plus(exe.size);
-            // longPriceIncrese = longPriceIncrese.plus(exe.price.minus(latest));
+            longPriceIncrese = longPriceIncrese.plus(exe.price.minus(latest));
         } else {
             shortVolume = shortVolume.plus(exe.size);
-            // shortPriceDecrease = shortPriceDecrease.plus(latest.minus(exe.price));
+            shortPriceDecrease = shortPriceDecrease.plus(latest.minus(exe.price));
         }
     }
 
@@ -215,7 +219,7 @@ public class Tick {
      * @return
      */
     public static Function<Execution, Tick> by(TickSpan span) {
-        AtomicReference<Tick> latest = new AtomicReference(Tick.EMPTY);
+        AtomicReference<Tick> latest = new AtomicReference(Tick.PAST);
 
         return e -> {
             Tick tick = latest.get();
