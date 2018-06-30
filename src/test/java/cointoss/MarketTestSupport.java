@@ -28,7 +28,7 @@ import kiss.Signal;
 public class MarketTestSupport {
 
     /** The base time. */
-    public static final ZonedDateTime BaseDate = Chrono.utcNow().truncatedTo(ChronoUnit.MINUTES);
+    public static final ZonedDateTime BaseDate = Chrono.utcNow().truncatedTo(ChronoUnit.DAYS);
 
     /** The execution id manager. */
     private static final AtomicLong executionId = new AtomicLong();

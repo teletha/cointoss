@@ -63,6 +63,10 @@ public class Tick {
     /** Volume of the period */
     public Num shortPriceDecrease = Num.ZERO;
 
+    BaseStatistics base;
+
+    BaseStatistics snapshot;
+
     /**
     * 
     */
@@ -170,6 +174,18 @@ public class Tick {
         return longVolume.plus(shortVolume);
     }
 
+    public Num closePrice() {
+        return base == null ? snapshot.latestPrice : base.latestPrice;
+    }
+
+    public final Num longVolume() {
+        return base == null ? snapshot.longVolume : base.longVolume.minus(snapshot.longVolume);
+    }
+
+    public final Num shortVolume() {
+        return base == null ? snapshot.shortVolume : base.shortVolume.minus(snapshot.shortVolume);
+    }
+
     /**
      * @return
      */
@@ -207,7 +223,11 @@ public class Tick {
                 .append(" ")
                 .append(longVolume)
                 .append(" ")
-                .append(shortVolume);
+                .append(shortVolume)
+                .append(" ")
+                .append(base)
+                .append(" ")
+                .append(snapshot);
 
         return builder.toString();
     }

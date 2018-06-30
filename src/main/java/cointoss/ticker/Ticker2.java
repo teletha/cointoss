@@ -51,14 +51,40 @@ public class Ticker2 {
         this.span = Objects.requireNonNull(span);
     }
 
-    void update(Execution e) {
+    void update(Execution e, BaseStatistics base) {
         if (!e.isBefore(last.end)) {
             ZonedDateTime start = span.calculateStartTime(e.exec_date);
             ZonedDateTime end = span.calculateEndTime(e.exec_date);
 
+            if (last != Tick.PAST) {
+                // handle unobservable ticks (i.e. server error, maintenance)
+                ZonedDateTime nextStart = last.start.plus(span.duration);
+
+                while (nextStart.isBefore(start)) {
+                    last.snapshot = base.snapshot();
+                    last.base = null;
+
+                    // some ticks were skipped by unknown error, so we will complement
+                    last = new Tick(nextStart, nextStart.plus(span.duration), last.openPrice);
+                    last.closePrice = last.highPrice = last.lowPrice = last.openPrice;
+                    ticks.addLast(last);
+                    additions.accept(last);
+
+                    nextStart = last.end;
+                }
+            }
+
+            last.snapshot = base.snapshot();
+            last.base = null;
+
             last = new Tick(start, end, e.price);
+            last.base = base;
+            last.snapshot = base.snapshot();
+
             ticks.addLast(last);
+            additions.accept(last);
         }
+        updaters.accept(last);
     }
 
     /**
@@ -82,10 +108,17 @@ public class Ticker2 {
     }
 
     /**
+     * @return
+     */
+    public int size() {
+        return ticks.size();
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
     public String toString() {
-        return Ticker2.class.getSimpleName() + "[" + span + "]";
+        return Ticker2.class.getSimpleName() + "[" + span + "] " + ticks;
     }
 }

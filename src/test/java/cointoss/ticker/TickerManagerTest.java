@@ -46,11 +46,146 @@ class TickerManagerTest {
         // validate
         manager.tickers().take(between(TickSpan.Minute3, TickSpan.Day7)).to(ticker -> {
             assert ticker.first().highPrice.is(300);
+            assert ticker.last().highPrice.is(300);
         });
-
         manager.tickers().take(between(TickSpan.Second1, TickSpan.Minute1)).to(ticker -> {
             assert ticker.first().highPrice.is(100);
             assert ticker.last().highPrice.is(200);
+        });
+    }
+
+    @Test
+    void updateLowPrice() {
+        TickerManager manager = new TickerManager();
+
+        // update
+        manager.update(buy(300, 1).date(BaseDate));
+
+        // validate
+        manager.tickers().to(ticker -> {
+            assert ticker.first().lowPrice.is(300);
+        });
+
+        // update
+        manager.update(buy(100, 1).date(BaseDate.plusMinutes(1)));
+        manager.update(buy(200, 1).date(BaseDate.plusMinutes(2)));
+
+        // validate
+        manager.tickers().take(between(TickSpan.Minute3, TickSpan.Day7)).to(ticker -> {
+            assert ticker.first().lowPrice.is(100);
+            assert ticker.last().lowPrice.is(100);
+        });
+        manager.tickers().take(between(TickSpan.Second1, TickSpan.Minute1)).to(ticker -> {
+            assert ticker.first().lowPrice.is(300);
+            assert ticker.last().lowPrice.is(200);
+        });
+    }
+
+    @Test
+    void updateOpenPrice() {
+        TickerManager manager = new TickerManager();
+
+        // update
+        manager.update(buy(300, 1).date(BaseDate));
+
+        // validate
+        manager.tickers().to(ticker -> {
+            assert ticker.first().openPrice.is(300);
+        });
+
+        // update
+        manager.update(buy(100, 1).date(BaseDate.plusMinutes(1)));
+        manager.update(buy(200, 1).date(BaseDate.plusMinutes(2)));
+
+        // validate
+        manager.tickers().take(between(TickSpan.Minute3, TickSpan.Day7)).to(ticker -> {
+            assert ticker.first().openPrice.is(300);
+            assert ticker.last().openPrice.is(300);
+        });
+        manager.tickers().take(between(TickSpan.Second1, TickSpan.Minute1)).to(ticker -> {
+            assert ticker.first().openPrice.is(300);
+            assert ticker.last().openPrice.is(200);
+        });
+    }
+
+    @Test
+    void updateClosePrice() {
+        TickerManager manager = new TickerManager();
+
+        // update
+        manager.update(buy(300, 1).date(BaseDate));
+
+        // validate
+        manager.tickers().to(ticker -> {
+            assert ticker.first().closePrice().is(300);
+        });
+
+        // update
+        manager.update(buy(100, 1).date(BaseDate.plusMinutes(1)));
+        manager.update(buy(200, 1).date(BaseDate.plusMinutes(2)));
+
+        // validate
+        manager.tickers().take(between(TickSpan.Minute3, TickSpan.Day7)).to(ticker -> {
+            assert ticker.first().closePrice().is(200);
+            assert ticker.last().closePrice().is(200);
+        });
+        manager.tickers().take(between(TickSpan.Second1, TickSpan.Minute1)).to(ticker -> {
+            assert ticker.first().closePrice().is(300);
+            assert ticker.last().closePrice().is(200);
+        });
+    }
+
+    @Test
+    void updateLongVolume() {
+        TickerManager manager = new TickerManager();
+
+        // update
+        manager.update(buy(300, 1).date(BaseDate));
+
+        // validate
+        manager.tickers().to(ticker -> {
+            assert ticker.first().longVolume().is(1);
+        });
+
+        // update
+        manager.update(buy(100, 1).date(BaseDate.plusMinutes(1)));
+        manager.update(buy(200, 1).date(BaseDate.plusMinutes(2)));
+
+        // validate
+        manager.tickers().take(between(TickSpan.Minute3, TickSpan.Day7)).to(ticker -> {
+            assert ticker.first().longVolume().is(3);
+            assert ticker.last().longVolume().is(3);
+        });
+        manager.tickers().take(between(TickSpan.Second1, TickSpan.Minute1)).to(ticker -> {
+            assert ticker.first().longVolume().is(1);
+            assert ticker.last().longVolume().is(1);
+        });
+    }
+
+    @Test
+    void updateShortVolume() {
+        TickerManager manager = new TickerManager();
+
+        // update
+        manager.update(sell(300, 1).date(BaseDate));
+
+        // validate
+        manager.tickers().to(ticker -> {
+            assert ticker.first().shortVolume().is(1);
+        });
+
+        // update
+        manager.update(sell(100, 1).date(BaseDate.plusMinutes(1)));
+        manager.update(sell(200, 1).date(BaseDate.plusMinutes(2)));
+
+        // validate
+        manager.tickers().take(between(TickSpan.Minute3, TickSpan.Day7)).to(ticker -> {
+            assert ticker.first().shortVolume().is(3);
+            assert ticker.last().shortVolume().is(3);
+        });
+        manager.tickers().take(between(TickSpan.Second1, TickSpan.Minute1)).to(ticker -> {
+            assert ticker.first().shortVolume().is(1);
+            assert ticker.last().shortVolume().is(1);
         });
     }
 

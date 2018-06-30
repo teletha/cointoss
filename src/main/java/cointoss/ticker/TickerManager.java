@@ -20,7 +20,7 @@ import kiss.Signal;
 public class TickerManager {
 
     /** The base tick. */
-    private final Baseline base = new Baseline();
+    private final BaseStatistics base = new BaseStatistics();
 
     /** The number of tickers. */
     private final int size = TickSpan.values().length;
@@ -66,8 +66,11 @@ public class TickerManager {
         Num price = execution.price;
 
         for (Ticker2 ticker : tickers) {
-            ticker.update(execution);
+            ticker.update(execution, base);
         }
+
+        // update base
+        base.update(execution);
 
         // Confirm that the high price is updated in order from the top ticker.
         // If there is an update, it is considered that all tickers below it are updated as well.
@@ -80,15 +83,15 @@ public class TickerManager {
                 break;
             }
         }
-    }
 
-    /**
-     * @version 2018/06/30 1:27:18
-     */
-    private class Baseline {
-
-        private Num longVolume = Num.ZERO;
-
-        private Num shortVolume = Num.ZERO;
+        for (int i = size - 1; 0 <= i; i--) {
+            if (price.isLessThan(tickers[i].last.lowPrice)) {
+                // update low price
+                for (int j = i; 0 <= j; j--) {
+                    tickers[j].last.lowPrice = price;
+                }
+                break;
+            }
+        }
     }
 }

@@ -28,6 +28,7 @@ import cointoss.order.OrderManager;
 import cointoss.ticker.ExecutionFlow;
 import cointoss.ticker.TickSpan;
 import cointoss.ticker.Ticker;
+import cointoss.ticker.TickerManager;
 import cointoss.util.Num;
 import kiss.Disposable;
 import kiss.I;
@@ -67,6 +68,12 @@ public class Market implements Disposable {
 
     /** The execution time line. */
     public final Signal<Execution> timeline = timelineObservers.expose;
+
+    /** The execution observers. */
+    private final Signaling<Execution> timelineObservers2 = new Signaling();
+
+    /** The execution time line. */
+    public final Signal<Execution> timeline2 = timelineObservers2.expose;
 
     /** The execution time line by taker. */
     public final Signal<Execution> timelineByTaker = timeline.map(e -> {
@@ -116,6 +123,9 @@ public class Market implements Disposable {
     /** The ticker manager. */
     private final EnumMap<TickSpan, Ticker> tickers = new EnumMap(TickSpan.class);
 
+    /** The ticker manager. */
+    public final TickerManager tickerManger = new TickerManager();
+
     /** The order manager. */
     private final List<Order> orderItems = new CopyOnWriteArrayList();
 
@@ -131,6 +141,7 @@ public class Market implements Disposable {
         for (TickSpan span : TickSpan.values()) {
             tickers.put(span, new Ticker(span, timeline));
         }
+        timeline2.to(tickerManger::update);
 
         // initialize currency data
         service.baseCurrency().to(v -> {
@@ -300,6 +311,18 @@ public class Market implements Disposable {
     }
 
     /**
+     * Read {@link Execution} log.
+     * 
+     * @param log
+     * @return
+     */
+    public final Market readLog2(Function<MarketLog, Signal<Execution>> log) {
+        service.add(log.apply(service.log).to(this::tick2));
+
+        return this;
+    }
+
+    /**
      * Calculate profit and loss.
      * 
      * @return
@@ -329,6 +352,27 @@ public class Market implements Disposable {
         //
         // // observe executions
         timelineObservers.accept(e);
+    }
+
+    /**
+     * <p>
+     * Process each {@link Execution}.
+     * </p>
+     * 
+     * @param e
+     */
+    protected void tick2(Execution e) {
+        if (init.isAbsent()) init.let(e);
+        latest.set(e);
+
+        // flow.record(e);
+        // flow75.record(e);
+        // flow100.record(e);
+        // flow200.record(e);
+        // flow300.record(e);
+        //
+        // // observe executions
+        timelineObservers2.accept(e);
     }
 
     /**

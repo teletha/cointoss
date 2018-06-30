@@ -116,12 +116,8 @@ public enum TickSpan {
      * @param e
      */
     public ZonedDateTime calculateStartTime(ZonedDateTime time) {
-        return time.with(temporal -> {
-            for (ChronoField erase : eraser) {
-                temporal = temporal.with(erase, 0);
-            }
-            return temporal.with(unit, temporal.getLong(unit) - (temporal.getLong(unit) % amount));
-        });
+        long value = time.getLong(unit);
+        return time.truncatedTo(unit.getBaseUnit()).with(unit, value - (value % amount));
     }
 
     /**
