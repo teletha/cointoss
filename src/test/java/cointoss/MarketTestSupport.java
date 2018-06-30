@@ -27,6 +27,9 @@ import kiss.Signal;
  */
 public class MarketTestSupport {
 
+    /** The base time. */
+    public static final ZonedDateTime BaseDate = Chrono.utcNow().truncatedTo(ChronoUnit.MINUTES);
+
     /** The execution id manager. */
     private static final AtomicLong executionId = new AtomicLong();
 
@@ -223,6 +226,18 @@ public class MarketTestSupport {
          */
         public ChainableExecution date(int year, int month, int day, int hour, int minute, int second, int ms) {
             this.exec_date = ZonedDateTime.of(year, month, day, hour, minute, second, ms * 1000000, Chrono.UTC);
+
+            return this;
+        }
+
+        /**
+         * Assign date.
+         * 
+         * @param time
+         * @return
+         */
+        public ChainableExecution date(ZonedDateTime time) {
+            this.exec_date = Objects.requireNonNull(time);
 
             return this;
         }
