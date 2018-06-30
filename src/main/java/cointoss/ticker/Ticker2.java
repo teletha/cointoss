@@ -27,19 +27,19 @@ public class Ticker2 {
     public final TickSpan span;
 
     /** The event listeners. */
-    private final Signaling<Tick> additions = new Signaling();
+    final Signaling<Tick> additions = new Signaling();
 
     /** The event about adding new tick. */
     public final Signal<Tick> add = additions.expose;
 
     /** The event listeners. */
-    private final Signaling<Tick> updaters = new Signaling();
+    final Signaling<Tick> updaters = new Signaling();
 
     /** The event about update tick. */
     public final Signal<Tick> update = updaters.expose;
 
     /** The tick manager. */
-    private final BigList<Tick> ticks = new BigList();
+    final BigList<Tick> ticks = new BigList();
 
     /** The latest tick. */
     Tick last = Tick.PAST;
@@ -51,7 +51,9 @@ public class Ticker2 {
         this.span = Objects.requireNonNull(span);
     }
 
-    void update(Execution e, BaseStatistics base) {
+    boolean update(Execution e, BaseStatistics base) {
+        boolean created = false;
+
         if (!e.isBefore(last.end)) {
             ZonedDateTime start = span.calculateStartTime(e.exec_date);
             ZonedDateTime end = span.calculateEndTime(e.exec_date);
@@ -83,8 +85,10 @@ public class Ticker2 {
 
             ticks.addLast(last);
             additions.accept(last);
+            created = true;
         }
         updaters.accept(last);
+        return created;
     }
 
     /**

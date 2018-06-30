@@ -639,6 +639,9 @@ public class MarketLog {
         }
     }
 
+    // 13217765 26415290
+    // 1418681 2864837
+
     public static void main(String[] args) {
         Market m2 = new Market(BitFlyerService.FX_BTC_JPY);
         m2.readLog2(log -> log.caches().take(6).concatMap(c -> c.read()).effectOnComplete(() -> {

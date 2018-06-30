@@ -26,9 +26,6 @@ import kiss.I;
 public enum TickSpan {
 
     /** SPAN */
-    Second1(1, SECOND_OF_MINUTE),
-
-    /** SPAN */
     Second5(5, SECOND_OF_MINUTE),
 
     /** SPAN */
@@ -127,5 +124,34 @@ public enum TickSpan {
      */
     public ZonedDateTime calculateEndTime(ZonedDateTime time) {
         return calculateStartTime(time).plus(amount, unit.getBaseUnit());
+    }
+
+    /**
+     * Compute index.
+     * 
+     * @param unit
+     * @param start
+     * @return
+     */
+    static int index(ChronoField unit, boolean start) {
+        TickSpan[] spans = TickSpan.values();
+
+        if (start) {
+            for (int i = 0; i < spans.length; i++) {
+                if (spans[i].unit == unit) {
+                    return spans[i].ordinal();
+                }
+            }
+        } else {
+            for (int i = spans.length - 1; 0 <= i; i--) {
+                if (spans[i].unit == unit) {
+                    return spans[i].ordinal();
+                }
+            }
+        }
+
+        // If this exception will be thrown, it is bug of this program. So we must rethrow the
+        // wrapped error in here.
+        throw new Error();
     }
 }
