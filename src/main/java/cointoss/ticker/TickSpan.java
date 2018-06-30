@@ -14,9 +14,6 @@ import static java.time.temporal.ChronoField.*;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoField;
-import java.util.List;
-
-import kiss.I;
 
 /**
  * Defined tick span.
@@ -26,52 +23,49 @@ import kiss.I;
 public enum TickSpan {
 
     /** SPAN */
-    Second5(5, SECOND_OF_MINUTE),
+    Second5(5, SECOND_OF_MINUTE, 1),
 
     /** SPAN */
-    Second15(15, SECOND_OF_MINUTE),
+    Second15(15, SECOND_OF_MINUTE, 1),
 
     /** SPAN */
-    Second30(30, SECOND_OF_MINUTE),
+    Second30(30, SECOND_OF_MINUTE, 1),
 
     /** SPAN */
-    Minute1(1, MINUTE_OF_HOUR),
+    Minute1(1, MINUTE_OF_HOUR, 1, 2),
 
     /** SPAN */
     Minute3(3, MINUTE_OF_HOUR),
 
     /** SPAN */
-    Minute5(5, MINUTE_OF_HOUR),
+    Minute5(5, MINUTE_OF_HOUR, 1, 2),
 
     /** SPAN */
     Minute10(10, MINUTE_OF_HOUR),
 
     /** SPAN */
-    Minute15(15, MINUTE_OF_HOUR),
+    Minute15(15, MINUTE_OF_HOUR, 1),
 
     /** SPAN */
-    Minute30(30, MINUTE_OF_HOUR),
+    Minute30(30, MINUTE_OF_HOUR, 1),
 
     /** SPAN */
-    Hour1(1, HOUR_OF_DAY),
+    Hour1(1, HOUR_OF_DAY, 1),
 
     /** SPAN */
-    Hour2(2, HOUR_OF_DAY),
-
-    /** SPAN */
-    Hour3(3, HOUR_OF_DAY),
+    Hour2(2, HOUR_OF_DAY, 1, 2),
 
     /** SPAN */
     Hour4(4, HOUR_OF_DAY),
 
     /** SPAN */
-    Hour6(6, HOUR_OF_DAY),
+    Hour6(6, HOUR_OF_DAY, 1),
 
     /** SPAN */
-    Hour12(12, HOUR_OF_DAY),
+    Hour12(12, HOUR_OF_DAY, 1),
 
     /** SPAN */
-    Day1(1, EPOCH_DAY),
+    Day1(1, EPOCH_DAY, 1, 2, 3),
 
     /** SPAN */
     Day2(2, EPOCH_DAY),
@@ -91,20 +85,22 @@ public enum TickSpan {
     /** The unit. */
     private final ChronoField unit;
 
-    /** The lower units. */
-    private final List<ChronoField> eraser;
+    /** The indexes of associated upper tickers. */
+    final int[] associations;
 
     /**
      * @param amount
      * @param unit
      */
-    private TickSpan(long amount, ChronoField unit) {
-        List<ChronoField> units = I.list(HOUR_OF_DAY, MINUTE_OF_HOUR, SECOND_OF_MINUTE, MILLI_OF_SECOND);
-
+    private TickSpan(long amount, ChronoField unit, int... associations) {
         this.amount = amount;
         this.unit = unit;
         this.duration = Duration.of(amount, unit.getBaseUnit());
-        this.eraser = units.subList(units.indexOf(unit) + 1, units.size());
+        this.associations = new int[associations.length];
+
+        for (int i = 0; i < associations.length; i++) {
+            this.associations[i] = associations[i] + ordinal();
+        }
     }
 
     /**
@@ -124,34 +120,5 @@ public enum TickSpan {
      */
     public ZonedDateTime calculateEndTime(ZonedDateTime time) {
         return calculateStartTime(time).plus(amount, unit.getBaseUnit());
-    }
-
-    /**
-     * Compute index.
-     * 
-     * @param unit
-     * @param start
-     * @return
-     */
-    static int index(ChronoField unit, boolean start) {
-        TickSpan[] spans = TickSpan.values();
-
-        if (start) {
-            for (int i = 0; i < spans.length; i++) {
-                if (spans[i].unit == unit) {
-                    return spans[i].ordinal();
-                }
-            }
-        } else {
-            for (int i = spans.length - 1; 0 <= i; i--) {
-                if (spans[i].unit == unit) {
-                    return spans[i].ordinal();
-                }
-            }
-        }
-
-        // If this exception will be thrown, it is bug of this program. So we must rethrow the
-        // wrapped error in here.
-        throw new Error();
     }
 }
