@@ -11,6 +11,8 @@ package cointoss.ticker;
 
 import static cointoss.MarketTestSupport.*;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.junit.jupiter.api.Test;
 
 import com.google.common.base.Predicate;
@@ -20,17 +22,16 @@ import com.google.common.base.Predicate;
  */
 class TickerManagerTest {
 
+    TickerManager manager = new TickerManager();
+
     @Test
     void tickerBy() {
-        TickerManager manager = new TickerManager();
         Ticker2 ticker = manager.tickerBy(TickSpan.Minute1);
         assert ticker != null;
     }
 
     @Test
     void updateHighPrice() {
-        TickerManager manager = new TickerManager();
-
         // update
         manager.update(buy(100, 1).date(BaseDate));
 
@@ -56,8 +57,6 @@ class TickerManagerTest {
 
     @Test
     void updateLowPrice() {
-        TickerManager manager = new TickerManager();
-
         // update
         manager.update(buy(300, 1).date(BaseDate));
 
@@ -83,8 +82,6 @@ class TickerManagerTest {
 
     @Test
     void updateOpenPrice() {
-        TickerManager manager = new TickerManager();
-
         // update
         manager.update(buy(300, 1).date(BaseDate));
 
@@ -110,8 +107,6 @@ class TickerManagerTest {
 
     @Test
     void updateClosePrice() {
-        TickerManager manager = new TickerManager();
-
         // update
         manager.update(buy(300, 1).date(BaseDate));
 
@@ -137,8 +132,6 @@ class TickerManagerTest {
 
     @Test
     void updateLongVolume() {
-        TickerManager manager = new TickerManager();
-
         // update
         manager.update(buy(300, 1).date(BaseDate));
 
@@ -164,8 +157,6 @@ class TickerManagerTest {
 
     @Test
     void updateShortVolume() {
-        TickerManager manager = new TickerManager();
-
         // update
         manager.update(sell(300, 1).date(BaseDate));
 
@@ -194,5 +185,22 @@ class TickerManagerTest {
             int ordinal = e.span.ordinal();
             return start.ordinal() <= ordinal && ordinal <= end.ordinal();
         };
+    }
+
+    @Test
+    void signalUpdate() {
+        AtomicInteger counter = new AtomicInteger();
+        manager.tickers().flatMap(t -> t.update).to(counter::incrementAndGet);
+
+        int size = TickSpan.values().length;
+
+        manager.update(buy(10, 1));
+        assert counter.get() == size;
+        manager.update(buy(20, 1));
+        assert counter.get() == size * 2;
+        manager.update(buy(30, 1).date(BaseDate.plusHours(1)));
+        assert counter.get() == size * 3;
+        manager.update(buy(40, 1).date(BaseDate.plusHours(6)));
+        assert counter.get() == size * 4;
     }
 }

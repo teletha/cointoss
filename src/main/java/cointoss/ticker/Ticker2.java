@@ -95,7 +95,6 @@ public class Ticker2 {
                 lock.writeLock().unlock();
             }
         }
-        updaters.accept(last);
         return created;
     }
 

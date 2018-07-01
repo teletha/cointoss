@@ -73,7 +73,7 @@ public class Tick {
     public Tick(ZonedDateTime start, ZonedDateTime end, Num open) {
         this.start = start;
         this.end = end;
-        this.openPrice = open;
+        this.openPrice = this.highPrice = this.lowPrice = open;
     }
 
     /**
@@ -208,7 +208,7 @@ public class Tick {
      */
     @Override
     public String toString() {
-        StringBuilder builder = new StringBuilder();
+        StringBuilder builder = new StringBuilder("TICK ");
         builder.append(start)
                 .append(" ")
                 .append(end)
