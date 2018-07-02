@@ -103,7 +103,7 @@ public class MarketTestSupport {
         exe.side = Objects.requireNonNull(side);
         exe.price = Objects.requireNonNull(price);
         exe.size = exe.cumulativeSize = Objects.requireNonNull(size);
-        exe.exec_date = Chrono.utcNow().truncatedTo(ChronoUnit.MILLIS);
+        exe.exec_date = BaseDate;
 
         return exe;
     }

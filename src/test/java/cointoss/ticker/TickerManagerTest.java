@@ -10,6 +10,7 @@
 package cointoss.ticker;
 
 import static cointoss.MarketTestSupport.*;
+import static cointoss.ticker.TickSpan.*;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -26,7 +27,7 @@ class TickerManagerTest {
 
     @Test
     void tickerBy() {
-        Ticker2 ticker = manager.tickerBy(TickSpan.Minute1);
+        Ticker2 ticker = manager.tickerBy(Minute1);
         assert ticker != null;
     }
 
@@ -45,11 +46,11 @@ class TickerManagerTest {
         manager.update(buy(200, 1).date(BaseDate.plusMinutes(2)));
 
         // validate
-        manager.tickers().take(between(TickSpan.Minute3, TickSpan.Day7)).to(ticker -> {
+        manager.tickers().take(between(Minute3, Day7)).to(ticker -> {
             assert ticker.first().highPrice.is(300);
             assert ticker.last().highPrice.is(300);
         });
-        manager.tickers().take(between(TickSpan.Second5, TickSpan.Minute1)).to(ticker -> {
+        manager.tickers().take(between(Second5, Minute1)).to(ticker -> {
             assert ticker.first().highPrice.is(100);
             assert ticker.last().highPrice.is(200);
         });
@@ -70,11 +71,11 @@ class TickerManagerTest {
         manager.update(buy(200, 1).date(BaseDate.plusMinutes(2)));
 
         // validate
-        manager.tickers().take(between(TickSpan.Minute3, TickSpan.Day7)).to(ticker -> {
+        manager.tickers().take(between(Minute3, Day7)).to(ticker -> {
             assert ticker.first().lowPrice.is(100);
             assert ticker.last().lowPrice.is(100);
         });
-        manager.tickers().take(between(TickSpan.Second5, TickSpan.Minute1)).to(ticker -> {
+        manager.tickers().take(between(Second5, Minute1)).to(ticker -> {
             assert ticker.first().lowPrice.is(300);
             assert ticker.last().lowPrice.is(200);
         });
@@ -95,11 +96,11 @@ class TickerManagerTest {
         manager.update(buy(200, 1).date(BaseDate.plusMinutes(2)));
 
         // validate
-        manager.tickers().take(between(TickSpan.Minute3, TickSpan.Day7)).to(ticker -> {
+        manager.tickers().take(between(Minute3, Day7)).to(ticker -> {
             assert ticker.first().openPrice.is(300);
             assert ticker.last().openPrice.is(300);
         });
-        manager.tickers().take(between(TickSpan.Second5, TickSpan.Minute1)).to(ticker -> {
+        manager.tickers().take(between(Second5, Minute1)).to(ticker -> {
             assert ticker.first().openPrice.is(300);
             assert ticker.last().openPrice.is(200);
         });
@@ -120,11 +121,11 @@ class TickerManagerTest {
         manager.update(buy(200, 1).date(BaseDate.plusMinutes(2)));
 
         // validate
-        manager.tickers().take(between(TickSpan.Minute3, TickSpan.Day7)).to(ticker -> {
+        manager.tickers().take(between(Minute3, Day7)).to(ticker -> {
             assert ticker.first().closePrice().is(200);
             assert ticker.last().closePrice().is(200);
         });
-        manager.tickers().take(between(TickSpan.Second5, TickSpan.Minute1)).to(ticker -> {
+        manager.tickers().take(between(Second5, Minute1)).to(ticker -> {
             assert ticker.first().closePrice().is(300);
             assert ticker.last().closePrice().is(200);
         });
@@ -145,11 +146,11 @@ class TickerManagerTest {
         manager.update(buy(200, 1).date(BaseDate.plusMinutes(2)));
 
         // validate
-        manager.tickers().take(between(TickSpan.Minute3, TickSpan.Day7)).to(ticker -> {
+        manager.tickers().take(between(Minute3, Day7)).to(ticker -> {
             assert ticker.first().longVolume().is(3);
             assert ticker.last().longVolume().is(3);
         });
-        manager.tickers().take(between(TickSpan.Second5, TickSpan.Minute1)).to(ticker -> {
+        manager.tickers().take(between(Second5, Minute1)).to(ticker -> {
             assert ticker.first().longVolume().is(1);
             assert ticker.last().longVolume().is(1);
         });
@@ -170,11 +171,11 @@ class TickerManagerTest {
         manager.update(sell(200, 1).date(BaseDate.plusMinutes(2)));
 
         // validate
-        manager.tickers().take(between(TickSpan.Minute3, TickSpan.Day7)).to(ticker -> {
+        manager.tickers().take(between(Minute3, Day7)).to(ticker -> {
             assert ticker.first().shortVolume().is(3);
             assert ticker.last().shortVolume().is(3);
         });
-        manager.tickers().take(between(TickSpan.Second5, TickSpan.Minute1)).to(ticker -> {
+        manager.tickers().take(between(Second5, Minute1)).to(ticker -> {
             assert ticker.first().shortVolume().is(1);
             assert ticker.last().shortVolume().is(1);
         });
@@ -185,6 +186,31 @@ class TickerManagerTest {
             int ordinal = e.span.ordinal();
             return start.ordinal() <= ordinal && ordinal <= end.ordinal();
         };
+    }
+
+    @Test
+    void signalAdd() {
+        manager.tickers().flatMap(t -> t.add).to();
+
+        manager.update(buy(10, 1));
+        manager.tickers().to(ticker -> {
+            assert ticker.size() == 1;
+        });
+
+        manager.update(buy(20, 1).date(BaseDate.plusSeconds(5)));
+        assert manager.tickerBy(Second5).size() == 2;
+        manager.tickers().take(between(Second15, Day7)).to(ticker -> {
+            assert ticker.size() == 1;
+        });
+
+        manager.update(buy(30, 1).date(BaseDate.plusMinutes(1)));
+        assert manager.tickerBy(Second5).size() == 13;
+        assert manager.tickerBy(Second15).size() == 5;
+        assert manager.tickerBy(Second30).size() == 3;
+        assert manager.tickerBy(Minute1).size() == 2;
+        manager.tickers().take(between(Minute3, Day7)).to(ticker -> {
+            assert ticker.size() == 1;
+        });
     }
 
     @Test

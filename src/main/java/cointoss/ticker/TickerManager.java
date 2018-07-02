@@ -63,41 +63,39 @@ public class TickerManager {
      * @param execution
      */
     public void update(Execution execution) {
+        int index = updateTicker(tickers[0], execution, 0);
         Num price = execution.price;
-
-        count++;
-        updateTicker(tickers[0], execution, price.compareTo(base.latestPrice), price);
 
         // Confirm that the high price is updated in order from the top ticker.
         // If there is an update, it is considered that all tickers below it are updated as well.
-        // count++;
-        // root: switch (price.compareTo(base.latestPrice)) {
-        // case 1:
-        // for (int i = index; i < size; i++) {
-        // Tick tick = tickers[i].last;
-        //
-        // count++;
-        // if (price.isGreaterThan(tick.highPrice)) {
-        // tick.highPrice = price;
-        // } else {
-        // break root;
-        // }
-        // }
-        // break;
-        //
-        // case -1:
-        // for (int i = index; i < size; i++) {
-        // Tick tick = tickers[i].last;
-        //
-        // count++;
-        // if (price.isLessThan(tick.lowPrice)) {
-        // tick.lowPrice = price;
-        // } else {
-        // break root;
-        // }
-        // }
-        // break;
-        // }
+        count++;
+        switch (price.compareTo(base.latestPrice)) {
+        case 1:
+            for (int i = index; i < size; i++) {
+                Tick tick = tickers[i].last;
+
+                count++;
+                if (price.isGreaterThan(tick.highPrice)) {
+                    tick.highPrice = price;
+                } else {
+                    break;
+                }
+            }
+            break;
+
+        case -1:
+            for (int i = index; i < size; i++) {
+                Tick tick = tickers[i].last;
+
+                count++;
+                if (price.isLessThan(tick.lowPrice)) {
+                    tick.lowPrice = price;
+                } else {
+                    break;
+                }
+            }
+            break;
+        }
 
         // for (int i = index; i < size; i++) {
         // Tick tick = tickers[i].last;
@@ -128,39 +126,15 @@ public class TickerManager {
      * @param ticker
      * @param execution
      */
-    private void updateTicker(Ticker2 ticker, Execution execution, int type, Num price) {
+    private int updateTicker(Ticker2 ticker, Execution execution, int id) {
         if (ticker.update(execution, base)) {
+            id++;
             for (int index : ticker.span.associations) {
-                updateTicker(tickers[index], execution, type, price);
+                id = updateTicker(tickers[index], execution, id);
             }
+            return id;
         } else {
-            switch (type) {
-            case 1:
-                for (int i = ticker.span.ordinal(); i < size; i++) {
-                    Tick tick = tickers[i].last;
-
-                    count++;
-                    if (price.isGreaterThan(tick.highPrice)) {
-                        tick.highPrice = price;
-                    } else {
-                        return;
-                    }
-                }
-                return;
-
-            case -1:
-                for (int i = ticker.span.ordinal(); i < size; i++) {
-                    Tick tick = tickers[i].last;
-
-                    count++;
-                    if (price.isLessThan(tick.lowPrice)) {
-                        tick.lowPrice = price;
-                    } else {
-                        return;
-                    }
-                }
-                return;
-            }
+            return id;
         }
     }
 }
