@@ -285,7 +285,7 @@ public class ChartCanvas extends Region {
             chart.ticker.v.each(visibleStartIndex, visibleSize, tick -> {
                 double x = axisX.getPositionForValue(tick.start.toEpochSecond());
                 double open = axisY.getPositionForValue(tick.openPrice.toDouble());
-                double close = axisY.getPositionForValue(tick.closePrice.toDouble());
+                double close = axisY.getPositionForValue(tick.closePrice().toDouble());
                 double high = axisY.getPositionForValue(tick.highPrice.toDouble());
                 double low = axisY.getPositionForValue(tick.lowPrice.toDouble());
 
@@ -308,7 +308,7 @@ public class ChartCanvas extends Region {
 
             double x = axisX.getPositionForValue(tick.start.toEpochSecond());
             double open = axisY.getPositionForValue(tick.openPrice.toDouble());
-            double close = axisY.getPositionForValue(tick.closePrice.toDouble());
+            double close = axisY.getPositionForValue(tick.closePrice().toDouble());
             double high = axisY.getPositionForValue(tick.highPrice.toDouble());
             double low = axisY.getPositionForValue(tick.lowPrice.toDouble());
 

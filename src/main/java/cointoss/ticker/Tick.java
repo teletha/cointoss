@@ -10,15 +10,12 @@
 package cointoss.ticker;
 
 import java.time.ZonedDateTime;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Function;
 
-import cointoss.Execution;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
 
 /**
- * @version 2018/06/29 11:09:20
+ * @version 2018/07/03 8:40:50
  */
 public class Tick {
 
@@ -43,7 +40,7 @@ public class Tick {
     public final Num openPrice;
 
     /** Close price of the period */
-    public Num closePrice = null;
+    private Num closePrice = null;
 
     /** Max price of the period */
     public Num highPrice = Num.ZERO;
@@ -73,42 +70,7 @@ public class Tick {
     public Tick(ZonedDateTime start, ZonedDateTime end, Num open) {
         this.start = start;
         this.end = end;
-        this.openPrice = this.highPrice = this.lowPrice = open;
-    }
-
-    /**
-     * Assign date.
-     * 
-     * @param exe
-     */
-    public void update(Execution exe) {
-        Num latest = closePrice == null ? openPrice : closePrice;
-        closePrice = exe.price;
-        highPrice = Num.max(highPrice, exe.price);
-        lowPrice = Num.min(lowPrice, exe.price);
-
-        if (exe.side.isBuy()) {
-            longVolume = longVolume.plus(exe.size);
-            longPriceIncrese = longPriceIncrese.plus(exe.price.minus(latest));
-        } else {
-            shortVolume = shortVolume.plus(exe.size);
-            shortPriceDecrease = shortPriceDecrease.plus(latest.minus(exe.price));
-        }
-    }
-
-    /**
-     * Assign date.
-     * 
-     * @param tick
-     */
-    void update(Tick tick) {
-        closePrice = tick.closePrice;
-        highPrice = Num.max(highPrice, tick.highPrice);
-        lowPrice = Num.min(lowPrice, tick.lowPrice);
-        longVolume = longVolume.plus(tick.longVolume);
-        longPriceIncrese = longPriceIncrese.plus(tick.longPriceIncrese);
-        shortVolume = shortVolume.plus(tick.shortVolume);
-        shortPriceDecrease = shortPriceDecrease.plus(tick.shortPriceDecrease);
+        this.openPrice = this.closePrice = this.highPrice = this.lowPrice = open;
     }
 
     /**
@@ -139,33 +101,6 @@ public class Tick {
     }
 
     /**
-     * Get the closePrice property of this {@link Tick}.
-     * 
-     * @return The closePrice property.
-     */
-    public final Num getClosePrice() {
-        return closePrice;
-    }
-
-    /**
-     * Get the maxPrice property of this {@link Tick}.
-     * 
-     * @return The maxPrice property.
-     */
-    public final Num getMaxPrice() {
-        return highPrice;
-    }
-
-    /**
-     * Get the minPrice property of this {@link Tick}.
-     * 
-     * @return The minPrice property.
-     */
-    public final Num getMinPrice() {
-        return lowPrice;
-    }
-
-    /**
      * Get the volume property of this {@link Tick}.
      * 
      * @return The volume property.
@@ -174,6 +109,11 @@ public class Tick {
         return longVolume.plus(shortVolume);
     }
 
+    /**
+     * Get the closePrice property of this {@link Tick}.
+     * 
+     * @return The closePrice property.
+     */
     public Num closePrice() {
         return base == null ? snapshot.latestPrice : base.latestPrice;
     }
@@ -230,29 +170,5 @@ public class Tick {
                 .append(snapshot);
 
         return builder.toString();
-    }
-
-    /**
-     * Create {@link Tick} from {@link Execution}.
-     * 
-     * @param span
-     * @return
-     */
-    public static Function<Execution, Tick> by(TickSpan span) {
-        AtomicReference<Tick> latest = new AtomicReference(Tick.PAST);
-
-        return e -> {
-            Tick tick = latest.get();
-
-            if (!e.exec_date.isBefore(tick.end)) {
-                ZonedDateTime start = span.calculateStartTime(e.exec_date);
-                ZonedDateTime end = span.calculateEndTime(e.exec_date);
-
-                tick = new Tick(start, end, e.price);
-                latest.set(tick);
-            }
-            tick.update(e);
-            return tick;
-        };
     }
 }

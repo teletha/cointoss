@@ -79,7 +79,6 @@ public class Ticker {
 
                         // some ticks were skipped by unknown error, so we will complement
                         last = new Tick(nextStart, nextStart.plus(span.duration), last.openPrice);
-                        last.closePrice = last.highPrice = last.lowPrice = last.openPrice;
                         ticks.addLast(last);
                         additions.accept(last);
 

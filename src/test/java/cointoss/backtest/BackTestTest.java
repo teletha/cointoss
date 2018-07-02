@@ -69,7 +69,7 @@ class BackTestTest {
 
                         // rise under price line
                         market.tickerBy(TickSpan.Second15).add.takeUntil(closingPosition) //
-                                .map(Tick::getClosePrice)
+                                .map(Tick::closePrice)
                                 .takeAt(i -> i % 5 == 0)
                                 .to(e -> {
                                     Num next = e.minus(entry, Math.max(0, 4000 - update * 200));

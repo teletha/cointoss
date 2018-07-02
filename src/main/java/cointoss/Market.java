@@ -68,12 +68,6 @@ public class Market implements Disposable {
     /** The execution time line. */
     public final Signal<Execution> timeline = timelineObservers.expose;
 
-    /** The execution observers. */
-    private final Signaling<Execution> timelineObservers2 = new Signaling();
-
-    /** The execution time line. */
-    public final Signal<Execution> timeline2 = timelineObservers2.expose;
-
     /** The execution time line by taker. */
     public final Signal<Execution> timelineByTaker = timeline.map(e -> {
         Execution previous = switcher.getAndSet(e);
@@ -134,7 +128,7 @@ public class Market implements Disposable {
         this.service = Objects.requireNonNull(service, "Market is not found.");
 
         // build tickers for each span
-        timeline2.to(tickerManger::update);
+        timeline.to(tickerManger::update);
 
         // initialize currency data
         service.baseCurrency().to(v -> {
@@ -365,7 +359,7 @@ public class Market implements Disposable {
         // flow300.record(e);
         //
         // // observe executions
-        timelineObservers2.accept(e);
+        timelineObservers.accept(e);
     }
 
     /**
