@@ -128,12 +128,14 @@ public class TickerManager {
      */
     private int updateTicker(Ticker2 ticker, Execution execution, int id) {
         if (ticker.update(execution, base)) {
+            // added the new tick
             id++;
             for (int index : ticker.span.associations) {
                 id = updateTicker(tickers[index], execution, id);
             }
             return id;
         } else {
+            // kept the current tick
             return id;
         }
     }

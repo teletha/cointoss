@@ -639,11 +639,11 @@ public class MarketLog {
         }
     }
 
-    // 2254659
+    // 2254659 2265305
     // 3085360
-    // 11358704
+    // 11358704 11405735
     // 14885549
-    // 16354731
+    // 16354731 16423240
     // 21619964
     public static void main(String[] args) {
         Market m2 = new Market(BitFlyerService.FX_BTC_JPY);
