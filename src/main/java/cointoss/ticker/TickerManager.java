@@ -26,32 +26,32 @@ public class TickerManager {
     private final int size = TickSpan.values().length;
 
     /** The managed tickers. */
-    private final Ticker2[] tickers = new Ticker2[size];
+    private final Ticker[] tickers = new Ticker[size];
 
     /**
      * 
      */
     public TickerManager() {
         for (int i = 0; i < size; i++) {
-            tickers[i] = new Ticker2(TickSpan.values()[i]);
+            tickers[i] = new Ticker(TickSpan.values()[i]);
         }
     }
 
     /**
-     * Retrieve the {@link Ticker2} by {@link TickSpan}.
+     * Retrieve the {@link Ticker} by {@link TickSpan}.
      * 
      * @param span The target {@link TickSpan}.
      */
-    public Ticker2 tickerBy(TickSpan span) {
+    public Ticker tickerBy(TickSpan span) {
         return tickers[span.ordinal()];
     }
 
     /**
-     * Retrieve all {@link Ticker2}s.
+     * Retrieve all {@link Ticker}s.
      * 
      * @return
      */
-    public Signal<Ticker2> tickers() {
+    public Signal<Ticker> tickers() {
         return I.signal(tickers);
     }
 
@@ -115,7 +115,7 @@ public class TickerManager {
         // update base
         base.update(execution);
 
-        for (Ticker2 ticker : tickers) {
+        for (Ticker ticker : tickers) {
             ticker.updaters.accept(ticker.last);
         }
     }
@@ -126,7 +126,7 @@ public class TickerManager {
      * @param ticker
      * @param execution
      */
-    private int updateTicker(Ticker2 ticker, Execution execution, int id) {
+    private int updateTicker(Ticker ticker, Execution execution, int id) {
         if (ticker.update(execution, base)) {
             // added the new tick
             id++;

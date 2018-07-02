@@ -1,15 +1,16 @@
 /*
- * Copyright (C) 2018 CoinToss Development Team
+ * Copyright (C) 2018 Nameless Production Committee
  *
  * Licensed under the MIT License (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *          https://opensource.org/licenses/MIT
+ *          http://opensource.org/licenses/mit-license.php
  */
 package cointoss.ticker;
 
 import java.time.ZonedDateTime;
+import java.util.Objects;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Consumer;
 
@@ -21,66 +22,83 @@ import kiss.Signaling;
 import kiss.Variable;
 
 /**
- * @version 2018/06/27 15:46:14
+ * @version 2018/06/30 1:32:14
  */
 public class Ticker {
 
     /** Reusable NULL object.. */
-    public static final Ticker EMPTY = new Ticker(TickSpan.Minute1, Signal.EMPTY);
+    public static final Ticker EMPTY = new Ticker(TickSpan.Minute1);
 
-    /** The target span. */
+    /** The span. */
     public final TickSpan span;
 
     /** The event listeners. */
-    private final Signaling<Tick> additions = new Signaling();
+    final Signaling<Tick> additions = new Signaling();
 
     /** The event about adding new tick. */
     public final Signal<Tick> add = additions.expose;
 
     /** The event listeners. */
-    private final Signaling<Tick> updaters = new Signaling();
+    final Signaling<Tick> updaters = new Signaling();
 
     /** The event about update tick. */
     public final Signal<Tick> update = updaters.expose;
 
     /** The tick manager. */
-    private final BigList<Tick> ticks = new BigList();
+    final BigList<Tick> ticks = new BigList();
+
+    /** The latest tick. */
+    Tick last = Tick.PAST;
 
     /** The lock system. */
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
     /**
-     * 
+     * @param span
      */
-    public Ticker(TickSpan span, Signal<Execution> timeline) {
-        this.span = span;
+    public Ticker(TickSpan span) {
+        this.span = Objects.requireNonNull(span);
+    }
 
-        timeline.map(Tick.by(span)).effect(updaters).diff().to(tick -> {
+    boolean update(Execution e, BaseStatistics base) {
+        boolean created = false;
+
+        if (!e.isBefore(last.end)) {
             lock.writeLock().lock();
 
             try {
-                // handle unobservable ticks (i.e. server error, maintenance)
-                Tick last = last();
-
-                if (last != null) {
+                ZonedDateTime start = span.calculateStartTime(e.exec_date);
+                ZonedDateTime end = span.calculateEndTime(e.exec_date);
+                if (last != Tick.PAST) {
+                    // handle unobservable ticks (i.e. server error, maintenance)
                     ZonedDateTime nextStart = last.start.plus(span.duration);
 
-                    while (nextStart.isBefore(tick.start)) {
+                    while (nextStart.isBefore(start)) {
+                        last.snapshot = base.snapshot();
+                        last.base = null;
+
                         // some ticks were skipped by unknown error, so we will complement
                         last = new Tick(nextStart, nextStart.plus(span.duration), last.openPrice);
                         last.closePrice = last.highPrice = last.lowPrice = last.openPrice;
-                        ticks.add(last);
+                        ticks.addLast(last);
+                        additions.accept(last);
 
                         nextStart = last.end;
                     }
                 }
-
-                ticks.add(tick);
-                additions.accept(tick);
+                last.snapshot = base.snapshot();
+                last.base = null;
+                last = new Tick(start, end, e.price);
+                last.base = base;
+                last.snapshot = base.snapshot();
+                ticks.addLast(last);
+                additions.accept(last);
+                created = true;
             } finally {
                 lock.writeLock().unlock();
             }
-        });
+        }
+        return created;
     }
 
     /**
@@ -102,15 +120,6 @@ public class Ticker {
     }
 
     /**
-     * Calculate tick size.
-     * 
-     * @return
-     */
-    public final int size() {
-        return ticks.size();
-    }
-
-    /**
      * Get first tick.
      * 
      * @return
@@ -128,6 +137,13 @@ public class Ticker {
     public final Tick last() {
         Tick tick = ticks.peekLast();
         return tick == null ? Tick.NOW : tick;
+    }
+
+    /**
+     * @return
+     */
+    public int size() {
+        return ticks.size();
     }
 
     /**
@@ -173,5 +189,13 @@ public class Ticker {
         } finally {
             lock.readLock().unlock();
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        return Ticker.class.getSimpleName() + "[" + span + "] " + ticks;
     }
 }

@@ -13,7 +13,6 @@ import static cointoss.order.Order.State.*;
 import static java.util.concurrent.TimeUnit.*;
 
 import java.time.ZonedDateTime;
-import java.util.EnumMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -121,9 +120,6 @@ public class Market implements Disposable {
     private final List<Trader> traders = new CopyOnWriteArrayList<>();
 
     /** The ticker manager. */
-    private final EnumMap<TickSpan, Ticker> tickers = new EnumMap(TickSpan.class);
-
-    /** The ticker manager. */
     public final TickerManager tickerManger = new TickerManager();
 
     /** The order manager. */
@@ -138,9 +134,6 @@ public class Market implements Disposable {
         this.service = Objects.requireNonNull(service, "Market is not found.");
 
         // build tickers for each span
-        for (TickSpan span : TickSpan.values()) {
-            tickers.put(span, new Ticker(span, timeline));
-        }
         timeline2.to(tickerManger::update);
 
         // initialize currency data
@@ -295,7 +288,7 @@ public class Market implements Disposable {
      * @return
      */
     public final Ticker tickerBy(TickSpan span) {
-        return tickers.get(span);
+        return tickerManger.tickerBy(span);
     }
 
     /**

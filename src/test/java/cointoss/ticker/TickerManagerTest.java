@@ -29,7 +29,7 @@ class TickerManagerTest {
 
     @Test
     void tickerBy() {
-        Ticker2 ticker = manager.tickerBy(Minute1);
+        Ticker ticker = manager.tickerBy(Minute1);
         assert ticker != null;
     }
 
@@ -183,7 +183,7 @@ class TickerManagerTest {
         });
     }
 
-    private Predicate<Ticker2> between(TickSpan start, TickSpan end) {
+    private Predicate<Ticker> between(TickSpan start, TickSpan end) {
         return e -> {
             int ordinal = e.span.ordinal();
             return start.ordinal() <= ordinal && ordinal <= end.ordinal();
