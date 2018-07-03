@@ -72,7 +72,7 @@ public class TickerManager {
         switch (price.compareTo(base.latestPrice)) {
         case 1:
             for (int i = index; i < size; i++) {
-                Tick tick = tickers[i].last;
+                Tick tick = tickers[i].currentTick;
 
                 count++;
                 if (price.isGreaterThan(tick.highPrice)) {
@@ -85,7 +85,7 @@ public class TickerManager {
 
         case -1:
             for (int i = index; i < size; i++) {
-                Tick tick = tickers[i].last;
+                Tick tick = tickers[i].currentTick;
 
                 count++;
                 if (price.isLessThan(tick.lowPrice)) {
@@ -101,7 +101,7 @@ public class TickerManager {
         base.update(execution);
 
         for (Ticker ticker : tickers) {
-            ticker.updaters.accept(ticker.last);
+            ticker.updaters.accept(ticker.currentTick);
         }
     }
 

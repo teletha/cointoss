@@ -48,7 +48,7 @@ public class Ticker {
     final BigList<Tick> ticks = new BigList();
 
     /** The latest tick. */
-    Tick last = Tick.initial();
+    Tick currentTick = Tick.initial();
 
     /** The lock system. */
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
@@ -63,34 +63,34 @@ public class Ticker {
     boolean update(Execution e, BaseStatistics base) {
         boolean created = false;
 
-        if (!e.isBefore(last.end)) {
+        if (!e.isBefore(currentTick.end)) {
             lock.writeLock().lock();
 
             try {
                 ZonedDateTime start = span.calculateStartTime(e.exec_date);
-                ZonedDateTime end = span.calculateEndTime(e.exec_date);
-                if (last.start.getYear() != 1970) {
+                ZonedDateTime end = start.plus(span.duration);
+                if (currentTick.start.getYear() != 1970) {
                     // handle unobservable ticks (i.e. server error, maintenance)
-                    ZonedDateTime nextStart = last.start.plus(span.duration);
+                    ZonedDateTime nextStart = currentTick.start.plus(span.duration);
 
                     while (nextStart.isBefore(start)) {
-                        last.freeze();
+                        currentTick.freeze();
 
                         // some ticks were skipped by unknown error, so we will complement
-                        last = new Tick(nextStart, nextStart.plus(span.duration), last.snapshot);
-                        ticks.addLast(last);
-                        additions.accept(last);
+                        currentTick = new Tick(nextStart, nextStart.plus(span.duration), currentTick.snapshot);
+                        ticks.addLast(currentTick);
+                        additions.accept(currentTick);
 
-                        nextStart = last.end;
+                        nextStart = currentTick.end;
                     }
                 }
-                last.freeze();
+                currentTick.freeze();
 
-                last = new Tick(start, end, e.price);
-                last.base = base;
-                last.snapshot = base.snapshot();
-                ticks.addLast(last);
-                additions.accept(last);
+                currentTick = new Tick(start, end, e.price);
+                currentTick.base = base;
+                currentTick.snapshot = base.snapshot();
+                ticks.addLast(currentTick);
+                additions.accept(currentTick);
                 created = true;
             } finally {
                 lock.writeLock().unlock();
@@ -123,8 +123,7 @@ public class Ticker {
      * @return
      */
     public final Tick first() {
-        Tick tick = ticks.peekFirst();
-        return tick == null ? Tick.NOW : tick;
+        return ticks.peekFirst();
     }
 
     /**
@@ -133,8 +132,7 @@ public class Ticker {
      * @return
      */
     public final Tick last() {
-        Tick tick = ticks.peekLast();
-        return tick == null ? Tick.NOW : tick;
+        return ticks.peekLast();
     }
 
     /**

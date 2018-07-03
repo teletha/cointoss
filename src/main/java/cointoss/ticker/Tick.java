@@ -19,9 +19,6 @@ import cointoss.util.Num;
  */
 public class Tick {
 
-    /** The null object. */
-    public static final Tick NOW = new Tick(Chrono.utcNow());
-
     /** Begin time of the tick */
     public final ZonedDateTime start;
 

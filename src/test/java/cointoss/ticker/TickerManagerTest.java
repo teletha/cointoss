@@ -135,7 +135,6 @@ class TickerManagerTest {
     }
 
     @Test
-    @PowerAssertOff
     void updateLongVolume() {
         // update
         manager.update(buy(300, 1).date(BaseDate));
