@@ -28,6 +28,9 @@ public class TickerManager {
     /** The managed tickers. */
     private final Ticker[] tickers = new Ticker[size];
 
+    /** The initialization state. */
+    private boolean initialized;
+
     /**
      * 
      */
@@ -63,6 +66,15 @@ public class TickerManager {
      * @param execution
      */
     public void update(Execution execution) {
+        // initialize tickers once if needed
+        if (initialized == false) {
+            initialized = true;
+
+            for (Ticker ticker : tickers) {
+                ticker.init(execution, base);
+            }
+        }
+
         int index = updateTicker(tickers[0], execution, 0);
         Num price = execution.price;
 
@@ -72,7 +84,7 @@ public class TickerManager {
         switch (price.compareTo(base.latestPrice)) {
         case 1:
             for (int i = index; i < size; i++) {
-                Tick tick = tickers[i].currentTick;
+                Tick tick = tickers[i].current;
 
                 count++;
                 if (price.isGreaterThan(tick.highPrice)) {
@@ -85,7 +97,7 @@ public class TickerManager {
 
         case -1:
             for (int i = index; i < size; i++) {
-                Tick tick = tickers[i].currentTick;
+                Tick tick = tickers[i].current;
 
                 count++;
                 if (price.isLessThan(tick.lowPrice)) {
@@ -101,7 +113,7 @@ public class TickerManager {
         base.update(execution);
 
         for (Ticker ticker : tickers) {
-            ticker.updaters.accept(ticker.currentTick);
+            ticker.updaters.accept(ticker.current);
         }
     }
 

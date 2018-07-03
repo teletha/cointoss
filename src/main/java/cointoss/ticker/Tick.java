@@ -11,7 +11,6 @@ package cointoss.ticker;
 
 import java.time.ZonedDateTime;
 
-import cointoss.util.Chrono;
 import cointoss.util.Num;
 
 /**
@@ -38,13 +37,6 @@ public class Tick {
 
     BaseStatistics snapshot;
 
-    private Tick(ZonedDateTime time) {
-        this.start = time;
-        this.end = time;
-        this.openPrice = this.highPrice = this.lowPrice = Num.ZERO;
-        this.snapshot = this.base = new BaseStatistics();
-    }
-
     /**
      * New {@link Tick}.
      * 
@@ -65,9 +57,12 @@ public class Tick {
      * @param end A end time of period.
      * @param open A open price.
      */
-    public Tick(ZonedDateTime start, ZonedDateTime end, BaseStatistics snapshot) {
-        this(start, end, snapshot.latestPrice);
-        this.snapshot = snapshot;
+    public Tick(ZonedDateTime start, TickSpan span, Num open, BaseStatistics base) {
+        this.start = start;
+        this.end = start.plus(span.duration);
+        this.openPrice = this.highPrice = this.lowPrice = open;
+        this.base = base;
+        this.snapshot = base.snapshot();
     }
 
     /**
@@ -223,9 +218,5 @@ public class Tick {
                 .append(snapshot);
 
         return builder.toString();
-    }
-
-    public static Tick initial() {
-        return new Tick(Chrono.utc(1970, 1, 1));
     }
 }

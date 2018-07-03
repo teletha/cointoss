@@ -112,13 +112,4 @@ public enum TickSpan {
         long value = time.getLong(unit);
         return time.truncatedTo(unit.getBaseUnit()).with(unit, value - (value % amount));
     }
-
-    /**
-     * Calculate start time.
-     * 
-     * @param e
-     */
-    public ZonedDateTime calculateEndTime(ZonedDateTime time) {
-        return calculateStartTime(time).plus(amount, unit.getBaseUnit());
-    }
 }

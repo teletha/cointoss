@@ -22,9 +22,9 @@ import kiss.Signaling;
 import kiss.Variable;
 
 /**
- * @version 2018/06/30 1:32:14
+ * @version 2018/07/03 16:37:44
  */
-public class Ticker {
+public final class Ticker {
 
     /** Reusable NULL object.. */
     public static final Ticker EMPTY = new Ticker(TickSpan.Minute1);
@@ -48,7 +48,7 @@ public class Ticker {
     final BigList<Tick> ticks = new BigList();
 
     /** The latest tick. */
-    Tick currentTick = Tick.initial();
+    Tick current;
 
     /** The lock system. */
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
@@ -60,43 +60,54 @@ public class Ticker {
         this.span = Objects.requireNonNull(span);
     }
 
-    boolean update(Execution e, BaseStatistics base) {
-        boolean created = false;
+    /**
+     * Initialize {@link Ticker}.
+     * 
+     * @param execution The latest {@link Execution}.
+     * @param base The current {@link BaseStatistics}.
+     */
+    final void init(Execution execution, BaseStatistics base) {
+        current = new Tick(span.calculateStartTime(execution.exec_date), span, execution.price, base);
 
-        if (!e.isBefore(currentTick.end)) {
+        ticks.addLast(current);
+        additions.accept(current);
+    }
+
+    /**
+     * Update {@link Ticker} by {@link Execution}.
+     * 
+     * @param execution The latest {@link Execution}.
+     * @param base The current {@link BaseStatistics}.
+     * @return When the new {@link Tick} was added, this method will return <code>true</code>.
+     */
+    final boolean update(Execution execution, BaseStatistics base) {
+        if (!execution.isBefore(current.end)) {
             lock.writeLock().lock();
 
             try {
-                ZonedDateTime start = span.calculateStartTime(e.exec_date);
-                ZonedDateTime end = start.plus(span.duration);
-                if (currentTick.start.getYear() != 1970) {
-                    // handle unobservable ticks (i.e. server error, maintenance)
-                    ZonedDateTime nextStart = currentTick.start.plus(span.duration);
+                ZonedDateTime start = span.calculateStartTime(execution.exec_date);
 
-                    while (nextStart.isBefore(start)) {
-                        currentTick.freeze();
-
-                        // some ticks were skipped by unknown error, so we will complement
-                        currentTick = new Tick(nextStart, nextStart.plus(span.duration), currentTick.snapshot);
-                        ticks.addLast(currentTick);
-                        additions.accept(currentTick);
-
-                        nextStart = currentTick.end;
-                    }
+                // handle unobservable ticks (i.e. server error, maintenance)
+                // some ticks were skipped by unknown error, so we will complement
+                while (current.end.isBefore(start)) {
+                    current.freeze();
+                    current = new Tick(current.end, span, current.closePrice(), base);
+                    ticks.addLast(current);
+                    additions.accept(current);
                 }
-                currentTick.freeze();
 
-                currentTick = new Tick(start, end, e.price);
-                currentTick.base = base;
-                currentTick.snapshot = base.snapshot();
-                ticks.addLast(currentTick);
-                additions.accept(currentTick);
-                created = true;
+                // add the new tick
+                current.freeze();
+                current = new Tick(current.end, span, execution.price, base);
+                ticks.addLast(current);
+                additions.accept(current);
             } finally {
                 lock.writeLock().unlock();
             }
+            return true;
+        } else {
+            return false;
         }
-        return created;
     }
 
     /**
@@ -136,9 +147,11 @@ public class Ticker {
     }
 
     /**
+     * Calculate the {@link Tick} size.
+     * 
      * @return
      */
-    public int size() {
+    public final int size() {
         return ticks.size();
     }
 
