@@ -34,6 +34,7 @@ class TickerManagerTest {
     }
 
     @Test
+    @PowerAssertOff
     void updateHighPrice() {
         // update
         manager.update(buy(100, 1).date(BaseDate));
@@ -56,9 +57,23 @@ class TickerManagerTest {
             assert ticker.first().highPrice.is(100);
             assert ticker.last().highPrice.is(200);
         });
+
+        // update and validate
+        manager.update(buy(300, 1).date(BaseDate.plusMinutes(3)));
+        assert manager.tickerBy(Minute3).last().highPrice.is(300);
+        assert manager.tickerBy(Minute5).last().highPrice.is(300);
+        // update and validate
+        manager.update(buy(400, 1).date(BaseDate.plusMinutes(4)));
+        assert manager.tickerBy(Minute3).last().highPrice.is(400);
+        assert manager.tickerBy(Minute5).last().highPrice.is(400);
+        // update and validate
+        manager.update(buy(500, 1).date(BaseDate.plusMinutes(5)));
+        assert manager.tickerBy(Minute3).last().highPrice.is(500);
+        assert manager.tickerBy(Minute5).last().highPrice.is(500);
     }
 
     @Test
+    @PowerAssertOff
     void updateLowPrice() {
         // update
         manager.update(buy(300, 1).date(BaseDate));
@@ -81,10 +96,22 @@ class TickerManagerTest {
             assert ticker.first().lowPrice.is(300);
             assert ticker.last().lowPrice.is(200);
         });
+
+        // update and validate
+        manager.update(buy(30, 1).date(BaseDate.plusMinutes(3)));
+        assert manager.tickerBy(Minute3).last().lowPrice.is(30);
+        assert manager.tickerBy(Minute5).last().lowPrice.is(30);
+        // update and validate
+        manager.update(buy(20, 1).date(BaseDate.plusMinutes(4)));
+        assert manager.tickerBy(Minute3).last().lowPrice.is(20);
+        assert manager.tickerBy(Minute5).last().lowPrice.is(20);
+        // update and validate
+        manager.update(buy(10, 1).date(BaseDate.plusMinutes(5)));
+        assert manager.tickerBy(Minute3).last().lowPrice.is(10);
+        assert manager.tickerBy(Minute5).last().lowPrice.is(10);
     }
 
     @Test
-    @PowerAssertOff
     void updateOpenPrice() {
         // update
         manager.update(buy(300, 1).date(BaseDate));
