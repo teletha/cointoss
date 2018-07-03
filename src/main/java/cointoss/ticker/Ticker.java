@@ -75,10 +75,11 @@ public class Ticker {
 
                     while (nextStart.isBefore(start)) {
                         last.freeze();
+                        BaseStatistics prev = last.snapshot;
 
                         // some ticks were skipped by unknown error, so we will complement
                         last = new Tick(nextStart, nextStart.plus(span.duration), last.openPrice);
-                        last.snapshot = last.snapshot;
+                        last.snapshot = prev;
                         ticks.addLast(last);
                         additions.accept(last);
 
