@@ -48,7 +48,7 @@ public class Ticker {
     final BigList<Tick> ticks = new BigList();
 
     /** The latest tick. */
-    Tick last = Tick.PAST;
+    Tick last = Tick.initial();
 
     /** The lock system. */
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
@@ -69,24 +69,24 @@ public class Ticker {
             try {
                 ZonedDateTime start = span.calculateStartTime(e.exec_date);
                 ZonedDateTime end = span.calculateEndTime(e.exec_date);
-                if (last != Tick.PAST) {
+                if (last.start.getYear() != 1970) {
                     // handle unobservable ticks (i.e. server error, maintenance)
                     ZonedDateTime nextStart = last.start.plus(span.duration);
 
                     while (nextStart.isBefore(start)) {
-                        last.snapshot = base.snapshot();
-                        last.base = null;
+                        last.freeze();
 
                         // some ticks were skipped by unknown error, so we will complement
                         last = new Tick(nextStart, nextStart.plus(span.duration), last.openPrice);
+                        last.snapshot = last.snapshot;
                         ticks.addLast(last);
                         additions.accept(last);
 
                         nextStart = last.end;
                     }
                 }
-                last.snapshot = base.snapshot();
-                last.base = null;
+                last.freeze();
+
                 last = new Tick(start, end, e.price);
                 last.base = base;
                 last.snapshot = base.snapshot();

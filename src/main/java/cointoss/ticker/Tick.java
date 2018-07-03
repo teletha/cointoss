@@ -20,10 +20,7 @@ import cointoss.util.Num;
 public class Tick {
 
     /** The null object. */
-    public static final Tick PAST = new Tick(Chrono.utc(2000, 1, 1), Chrono.utc(2000, 1, 1), Num.ZERO);
-
-    /** The null object. */
-    public static final Tick NOW = new Tick(Chrono.utcNow(), Chrono.utcNow(), Num.ZERO);
+    public static final Tick NOW = new Tick(Chrono.utcNow());
 
     /** Begin time of the tick */
     public final ZonedDateTime start;
@@ -43,6 +40,13 @@ public class Tick {
     BaseStatistics base;
 
     BaseStatistics snapshot;
+
+    private Tick(ZonedDateTime time) {
+        this.start = time;
+        this.end = time;
+        this.openPrice = this.highPrice = this.lowPrice = Num.ZERO;
+        this.snapshot = this.base = new BaseStatistics();
+    }
 
     /**
      * New {@link Tick}.
@@ -165,6 +169,25 @@ public class Tick {
     }
 
     /**
+     * Make this {@link Tick} immutable.
+     * 
+     * @return
+     */
+    void freeze() {
+        if (base != null) {
+            BaseStatistics snapshot = new BaseStatistics();
+            snapshot.latestPrice = base.latestPrice;
+            snapshot.longVolume = longVolume();
+            snapshot.longPriceIncrease = longPriceIncrease();
+            snapshot.shortVolume = shortVolume();
+            snapshot.shortPriceDecrease = shortPriceDecrease();
+
+            this.snapshot = snapshot;
+            this.base = null;
+        }
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -191,5 +214,9 @@ public class Tick {
                 .append(snapshot);
 
         return builder.toString();
+    }
+
+    public static Tick initial() {
+        return new Tick(Chrono.utc(1970, 1, 1));
     }
 }

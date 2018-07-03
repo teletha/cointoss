@@ -84,6 +84,7 @@ class TickerManagerTest {
     }
 
     @Test
+    @PowerAssertOff
     void updateOpenPrice() {
         // update
         manager.update(buy(300, 1).date(BaseDate));
@@ -134,6 +135,7 @@ class TickerManagerTest {
     }
 
     @Test
+    @PowerAssertOff
     void updateLongVolume() {
         // update
         manager.update(buy(300, 1).date(BaseDate));
@@ -156,6 +158,16 @@ class TickerManagerTest {
             assert ticker.first().longVolume().is(1);
             assert ticker.last().longVolume().is(1);
         });
+
+        // update
+        manager.update(buy(300, 3).date(BaseDate.plusMinutes(3)));
+
+        // validate
+        Ticker ticker = manager.tickerBy(Minute1);
+        assert ticker.ticks.get(0).longVolume().is(1);
+        assert ticker.ticks.get(1).longVolume().is(1);
+        assert ticker.ticks.get(2).longVolume().is(1);
+        assert ticker.ticks.get(3).longVolume().is(3);
     }
 
     @Test
