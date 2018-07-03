@@ -33,9 +33,9 @@ public class Tick {
     /** Min price of the period */
     Num lowPrice = Num.MAX;
 
-    BaseStatistics base;
+    Totality base;
 
-    BaseStatistics snapshot;
+    Totality snapshot;
 
     /**
      * New {@link Tick}.
@@ -57,7 +57,7 @@ public class Tick {
      * @param end A end time of period.
      * @param open A open price.
      */
-    public Tick(ZonedDateTime start, TickSpan span, Num open, BaseStatistics base) {
+    public Tick(ZonedDateTime start, TickSpan span, Num open, Totality base) {
         this.start = start;
         this.end = start.plus(span.duration);
         this.openPrice = this.highPrice = this.lowPrice = open;
@@ -179,7 +179,7 @@ public class Tick {
      */
     void freeze() {
         if (base != null) {
-            BaseStatistics snapshot = new BaseStatistics();
+            Totality snapshot = new Totality();
             snapshot.latestPrice = base.latestPrice;
             snapshot.longVolume = longVolume();
             snapshot.longPriceIncrease = longPriceIncrease();

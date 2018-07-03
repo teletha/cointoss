@@ -52,7 +52,6 @@ import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
 
 import cointoss.market.bitflyer.BitFlyerService;
-import cointoss.ticker.TickSpan;
 import cointoss.util.Chrono;
 import cointoss.util.Span;
 import filer.Filer;
@@ -639,24 +638,10 @@ public class MarketLog {
         }
     }
 
-    // 2254659 2265305
-    // 3085360
-    // 11358704 11405735
-    // 14885549
-    // 16354731 16423240
-    // 21619964
     public static void main(String[] args) {
-        Market m2 = new Market(BitFlyerService.FX_BTC_JPY);
-        m2.readLog2(log -> log.caches().skip(255).take(6).concatMap(c -> c.read()).effectOnComplete(() -> {
-            System.out.println(m2.tickerManger.tickerBy(TickSpan.Minute3).size() + "   " + m2.tickerManger.count);
-        }));
+        Market market = new Market(BitFlyerService.FX_BTC_JPY);
+        market.readLog2(log -> log.caches().skip(255).take(6).concatMap(c -> c.read()));
 
-        Market m = new Market(BitFlyerService.FX_BTC_JPY);
-        // m.readLog(log -> log.caches().take(6).concatMap(c -> c.read()).effectOnComplete(() -> {
-        // System.out.println(m.tickerBy(TickSpan.Minute3).size());
-        // }));
-
-        m.dispose();
-        m2.dispose();
+        market.dispose();
     }
 }

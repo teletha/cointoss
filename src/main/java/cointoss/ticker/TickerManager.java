@@ -15,12 +15,12 @@ import kiss.I;
 import kiss.Signal;
 
 /**
- * @version 2018/06/30 1:22:20
+ * @version 2018/07/03 18:06:20
  */
 public class TickerManager {
 
-    /** The base tick. */
-    private final BaseStatistics base = new BaseStatistics();
+    /** The total sum. */
+    private final Totality totality = new Totality();
 
     /** The number of tickers. */
     private final int size = TickSpan.values().length;
@@ -58,35 +58,32 @@ public class TickerManager {
         return I.signal(tickers);
     }
 
-    public int count;
-
     /**
-     * Update tick.
+     * Update all {@link Ticker}s by {@link Execution}.
      * 
-     * @param execution
+     * @param execution The latest {@link Execution}.
      */
     public void update(Execution execution) {
+        Num price = execution.price;
+
         // initialize tickers once if needed
         if (initialized == false) {
             initialized = true;
 
             for (Ticker ticker : tickers) {
-                ticker.init(execution, base);
+                ticker.init(execution, totality);
             }
         }
 
         int index = updateTicker(tickers[0], execution, 0);
-        Num price = execution.price;
 
         // Confirm that the high price is updated in order from the top ticker.
         // If there is an update, it is considered that all tickers below it are updated as well.
-        count++;
-        switch (price.compareTo(base.latestPrice)) {
+        switch (price.compareTo(totality.latestPrice)) {
         case 1:
             for (int i = index; i < size; i++) {
                 Tick tick = tickers[i].current;
 
-                count++;
                 if (price.isGreaterThan(tick.highPrice)) {
                     tick.highPrice = price;
                 } else {
@@ -99,7 +96,6 @@ public class TickerManager {
             for (int i = index; i < size; i++) {
                 Tick tick = tickers[i].current;
 
-                count++;
                 if (price.isLessThan(tick.lowPrice)) {
                     tick.lowPrice = price;
                 } else {
@@ -110,7 +106,7 @@ public class TickerManager {
         }
 
         // update base
-        base.update(execution);
+        totality.update(execution);
 
         for (Ticker ticker : tickers) {
             ticker.updaters.accept(ticker.current);
@@ -118,13 +114,13 @@ public class TickerManager {
     }
 
     /**
-     * Update all tickers.
-     * 
      * @param ticker
      * @param execution
+     * @param id
+     * @return
      */
     private int updateTicker(Ticker ticker, Execution execution, int id) {
-        if (ticker.update(execution, base)) {
+        if (ticker.createTick(execution, totality)) {
             // added the new tick
             id++;
             for (int index : ticker.span.associations) {

@@ -64,9 +64,9 @@ public final class Ticker {
      * Initialize {@link Ticker}.
      * 
      * @param execution The latest {@link Execution}.
-     * @param base The current {@link BaseStatistics}.
+     * @param base The current {@link Totality}.
      */
-    final void init(Execution execution, BaseStatistics base) {
+    final void init(Execution execution, Totality base) {
         current = new Tick(span.calculateStartTime(execution.exec_date), span, execution.price, base);
 
         ticks.addLast(current);
@@ -74,31 +74,33 @@ public final class Ticker {
     }
 
     /**
-     * Update {@link Ticker} by {@link Execution}.
+     * Add the new {@link Tick} if needed.
      * 
      * @param execution The latest {@link Execution}.
-     * @param base The current {@link BaseStatistics}.
+     * @param totality The current {@link Totality}.
      * @return When the new {@link Tick} was added, this method will return <code>true</code>.
      */
-    final boolean update(Execution execution, BaseStatistics base) {
+    final boolean createTick(Execution execution, Totality totality) {
+        // Make sure whether the execution does not exceed the end time of current tick.
         if (!execution.isBefore(current.end)) {
             lock.writeLock().lock();
 
             try {
+                // If the end time of current tick does not reach the start time of tick which
+                // execution actually belongs to, it is assumed that there was a blank time
+                // (i.e. server error, maintenance). So we complement them in advance.
                 ZonedDateTime start = span.calculateStartTime(execution.exec_date);
 
-                // handle unobservable ticks (i.e. server error, maintenance)
-                // some ticks were skipped by unknown error, so we will complement
                 while (current.end.isBefore(start)) {
                     current.freeze();
-                    current = new Tick(current.end, span, current.closePrice(), base);
+                    current = new Tick(current.end, span, current.closePrice(), totality);
                     ticks.addLast(current);
                     additions.accept(current);
                 }
 
-                // add the new tick
+                // create the latest tick for execution
                 current.freeze();
-                current = new Tick(current.end, span, execution.price, base);
+                current = new Tick(current.end, span, execution.price, totality);
                 ticks.addLast(current);
                 additions.accept(current);
             } finally {
@@ -106,7 +108,7 @@ public final class Ticker {
             }
             return true;
         } else {
-            return false;
+            return false; // end it immediately
         }
     }
 
