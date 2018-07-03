@@ -62,6 +62,18 @@ public class Tick {
     }
 
     /**
+     * New {@link Tick}.
+     * 
+     * @param start A start time of period.
+     * @param end A end time of period.
+     * @param open A open price.
+     */
+    public Tick(ZonedDateTime start, ZonedDateTime end, BaseStatistics snapshot) {
+        this(start, end, snapshot.latestPrice);
+        this.snapshot = snapshot;
+    }
+
+    /**
      * Get the beginTime property of this {@link Tick}.
      * 
      * @return The beginTime property.

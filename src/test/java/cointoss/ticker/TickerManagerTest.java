@@ -203,7 +203,49 @@ class TickerManagerTest {
     }
 
     @Test
-    @PowerAssertOff
+    void complementGap() {
+        manager.update(buy(10, 1));
+        manager.update(buy(30, 1).date(BaseDate.plusMinutes(5)));
+
+        Ticker ticker = manager.tickerBy(Minute1);
+        Tick tick = ticker.ticks.get(0);
+        assert tick.openPrice().is(10);
+        assert tick.closePrice().is(10);
+        assert tick.highPrice().is(10);
+        assert tick.lowPrice().is(10);
+
+        tick = ticker.ticks.get(1);
+        assert tick.openPrice().is(10);
+        assert tick.closePrice().is(10);
+        assert tick.highPrice().is(10);
+        assert tick.lowPrice().is(10);
+
+        tick = ticker.ticks.get(2);
+        assert tick.openPrice().is(10);
+        assert tick.closePrice().is(10);
+        assert tick.highPrice().is(10);
+        assert tick.lowPrice().is(10);
+
+        tick = ticker.ticks.get(3);
+        assert tick.openPrice().is(10);
+        assert tick.closePrice().is(10);
+        assert tick.highPrice().is(10);
+        assert tick.lowPrice().is(10);
+
+        tick = ticker.ticks.get(4);
+        assert tick.openPrice().is(10);
+        assert tick.closePrice().is(10);
+        assert tick.highPrice().is(10);
+        assert tick.lowPrice().is(10);
+
+        tick = ticker.ticks.get(5);
+        assert tick.openPrice().is(30);
+        assert tick.closePrice().is(30);
+        assert tick.highPrice().is(30);
+        assert tick.lowPrice().is(30);
+    }
+
+    @Test
     void signalAdd() {
         manager.tickers().flatMap(t -> t.add).to();
 

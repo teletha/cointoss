@@ -97,21 +97,6 @@ public class TickerManager {
             break;
         }
 
-        // for (int i = index; i < size; i++) {
-        // Tick tick = tickers[i].last;
-        //
-        // count++;
-        // if (price.isGreaterThan(tick.highPrice)) {
-        // tick.highPrice = price;
-        // } else if (price.isLessThan(tick.lowPrice)) {
-        // count++;
-        // tick.lowPrice = price;
-        // } else {
-        // count++;
-        // break;
-        // }
-        // }
-
         // update base
         base.update(execution);
 
