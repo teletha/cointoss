@@ -25,7 +25,7 @@ class BaseStatistics {
     Num longVolume = Num.ZERO;
 
     /** Total volume */
-    Num longPriceIncrese = Num.ZERO;
+    Num longPriceIncrease = Num.ZERO;
 
     /** Total volume */
     Num shortVolume = Num.ZERO;
@@ -38,7 +38,7 @@ class BaseStatistics {
 
         if (execution.side == Side.BUY) {
             longVolume = longVolume.plus(execution.size);
-            longPriceIncrese = longPriceIncrese.plus(price.minus(latestPrice));
+            longPriceIncrease = longPriceIncrease.plus(price.minus(latestPrice));
         } else {
             shortVolume = shortVolume.plus(execution.size);
             shortPriceDecrease = shortPriceDecrease.plus(latestPrice.minus(price));
@@ -57,7 +57,7 @@ class BaseStatistics {
         BaseStatistics snapshot = new BaseStatistics();
         snapshot.latestPrice = latestPrice;
         snapshot.longVolume = longVolume;
-        snapshot.longPriceIncrese = longPriceIncrese;
+        snapshot.longPriceIncrease = longPriceIncrease;
         snapshot.shortVolume = shortVolume;
         snapshot.shortPriceDecrease = shortPriceDecrease;
 
@@ -69,6 +69,6 @@ class BaseStatistics {
      */
     @Override
     public String toString() {
-        return "BaseStatistics [longVolume=" + longVolume + ", longPriceIncrese=" + longPriceIncrese + ", shortVolume=" + shortVolume + ", shortPriceDecrease=" + shortPriceDecrease + "]";
+        return "BaseStatistics [longVolume=" + longVolume + ", longPriceIncrese=" + longPriceIncrease + ", shortVolume=" + shortVolume + ", shortPriceDecrease=" + shortPriceDecrease + "]";
     }
 }

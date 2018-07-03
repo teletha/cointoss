@@ -127,8 +127,8 @@ public class ChartCanvas extends Region {
         this.candleLatest.widthProperty().bind(widthProperty());
         this.candleLatest.heightProperty().bind(heightProperty());
 
-        this.chartBottom.create(tick -> tick.longVolume.toDouble() * 2, Buy);
-        this.chartBottom.create(tick -> tick.shortVolume.toDouble() * 2, Sell);
+        this.chartBottom.create(tick -> tick.longVolume().toDouble() * 2, Buy);
+        this.chartBottom.create(tick -> tick.shortVolume().toDouble() * 2, Sell);
 
         Viewtify.clip(this);
 
@@ -169,8 +169,8 @@ public class ChartCanvas extends Region {
             // upper info
             chart.ticker.v.findByEpochSecond((long) x).isPresent(tick -> {
                 chart.selectDate.text(Chrono.system(tick.start).format(Chrono.DateTime));
-                chart.selectHigh.text("H " + tick.highPrice.scale(0));
-                chart.selectLow.text("L " + tick.lowPrice.scale(0));
+                chart.selectHigh.text("H " + tick.highPrice().scale(0));
+                chart.selectLow.text("L " + tick.lowPrice().scale(0));
             });
         });
 
@@ -286,8 +286,8 @@ public class ChartCanvas extends Region {
                 double x = axisX.getPositionForValue(tick.start.toEpochSecond());
                 double open = axisY.getPositionForValue(tick.openPrice.toDouble());
                 double close = axisY.getPositionForValue(tick.closePrice().toDouble());
-                double high = axisY.getPositionForValue(tick.highPrice.toDouble());
-                double low = axisY.getPositionForValue(tick.lowPrice.toDouble());
+                double high = axisY.getPositionForValue(tick.highPrice().toDouble());
+                double low = axisY.getPositionForValue(tick.lowPrice().toDouble());
 
                 gc.setStroke(open < close ? Sell : Buy);
                 gc.setLineWidth(1);
@@ -309,8 +309,8 @@ public class ChartCanvas extends Region {
             double x = axisX.getPositionForValue(tick.start.toEpochSecond());
             double open = axisY.getPositionForValue(tick.openPrice.toDouble());
             double close = axisY.getPositionForValue(tick.closePrice().toDouble());
-            double high = axisY.getPositionForValue(tick.highPrice.toDouble());
-            double low = axisY.getPositionForValue(tick.lowPrice.toDouble());
+            double high = axisY.getPositionForValue(tick.highPrice().toDouble());
+            double low = axisY.getPositionForValue(tick.lowPrice().toDouble());
 
             gc.setStroke(open < close ? Sell : Buy);
             gc.setLineWidth(1);

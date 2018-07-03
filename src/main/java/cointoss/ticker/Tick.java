@@ -15,7 +15,7 @@ import cointoss.util.Chrono;
 import cointoss.util.Num;
 
 /**
- * @version 2018/07/03 8:40:50
+ * @version 2018/07/03 9:46:26
  */
 public class Tick {
 
@@ -24,11 +24,6 @@ public class Tick {
 
     /** The null object. */
     public static final Tick NOW = new Tick(Chrono.utcNow(), Chrono.utcNow(), Num.ZERO);
-
-    static {
-        PAST.closePrice = Num.ZERO;
-        NOW.closePrice = Num.ZERO;
-    }
 
     /** Begin time of the tick */
     public final ZonedDateTime start;
@@ -39,38 +34,27 @@ public class Tick {
     /** Open price of the period */
     public final Num openPrice;
 
-    /** Close price of the period */
-    private Num closePrice = null;
-
     /** Max price of the period */
-    public Num highPrice = Num.ZERO;
+    Num highPrice = Num.ZERO;
 
     /** Min price of the period */
-    public Num lowPrice = Num.MAX;
-
-    /** Volume of the period */
-    public Num longVolume = Num.ZERO;
-
-    /** Volume of the period */
-    public Num longPriceIncrese = Num.ZERO;
-
-    /** Volume of the period */
-    public Num shortVolume = Num.ZERO;
-
-    /** Volume of the period */
-    public Num shortPriceDecrease = Num.ZERO;
+    Num lowPrice = Num.MAX;
 
     BaseStatistics base;
 
     BaseStatistics snapshot;
 
     /**
-    * 
-    */
+     * New {@link Tick}.
+     * 
+     * @param start A start time of period.
+     * @param end A end time of period.
+     * @param open A open price.
+     */
     public Tick(ZonedDateTime start, ZonedDateTime end, Num open) {
         this.start = start;
         this.end = end;
-        this.openPrice = this.closePrice = this.highPrice = this.lowPrice = open;
+        this.openPrice = this.highPrice = this.lowPrice = open;
     }
 
     /**
@@ -92,55 +76,92 @@ public class Tick {
     }
 
     /**
-     * Get the openPrice property of this {@link Tick}.
+     * Retieve the tick related value.
      * 
-     * @return The openPrice property.
+     * @return The tick related value.
      */
-    public final Num getOpenPrice() {
+    public final Num openPrice() {
         return openPrice;
     }
 
     /**
-     * Get the volume property of this {@link Tick}.
+     * Retieve the tick related value.
      * 
-     * @return The volume property.
+     * @return The tick related value.
      */
-    public final Num getVolume() {
-        return longVolume.plus(shortVolume);
-    }
-
-    /**
-     * Get the closePrice property of this {@link Tick}.
-     * 
-     * @return The closePrice property.
-     */
-    public Num closePrice() {
+    public final Num closePrice() {
         return base == null ? snapshot.latestPrice : base.latestPrice;
     }
 
+    /**
+     * Retieve the tick related value.
+     * 
+     * @return The tick related value.
+     */
+    public final Num highPrice() {
+        return highPrice;
+    }
+
+    /**
+     * Retieve the tick related value.
+     * 
+     * @return The tick related value.
+     */
+    public final Num lowPrice() {
+        return lowPrice;
+    }
+
+    /**
+     * Retieve the tick related value.
+     * 
+     * @return The tick related value.
+     */
     public final Num longVolume() {
         return base == null ? snapshot.longVolume : base.longVolume.minus(snapshot.longVolume);
     }
 
+    /**
+     * Retieve the tick related value.
+     * 
+     * @return The tick related value.
+     */
+    public final Num longPriceIncrease() {
+        return base == null ? snapshot.longPriceIncrease : base.longPriceIncrease.minus(snapshot.longPriceIncrease);
+    }
+
+    /**
+     * Retieve the tick related value.
+     * 
+     * @return The tick related value.
+     */
     public final Num shortVolume() {
         return base == null ? snapshot.shortVolume : base.shortVolume.minus(snapshot.shortVolume);
+    }
+
+    /**
+     * Retieve the tick related value.
+     * 
+     * @return The tick related value.
+     */
+    public final Num shortPriceDecrease() {
+        return base == null ? snapshot.shortPriceDecrease : base.shortPriceDecrease.minus(snapshot.shortPriceDecrease);
     }
 
     /**
      * @return
      */
     public final Num priceVolatility() {
-        Num upPotencial = longVolume.isZero() ? Num.ZERO : longPriceIncrese.divide(longVolume);
-        Num downPotencial = shortVolume.isZero() ? Num.ZERO : shortPriceDecrease.divide(shortVolume);
+        Num upPotencial = longVolume().isZero() ? Num.ZERO : longPriceIncrease().divide(longVolume());
+        Num downPotencial = shortVolume().isZero() ? Num.ZERO : shortPriceDecrease().divide(shortVolume());
         return upPotencial.divide(downPotencial).scale(2);
     }
 
     public final Num upRatio() {
-        return longVolume.isZero() ? Num.ZERO : longPriceIncrese.multiply(longVolume);
+        return longVolume().isZero() ? Num.ZERO : longPriceIncrease().multiply(longVolume());
     }
 
     public final Num downRatio() {
-        return shortVolume.isZero() ? Num.ZERO : shortPriceDecrease.multiply(shortVolume);
+        return shortVolume().isZero() ? Num.ZERO : shortPriceDecrease().multiply(shortVolume());
     }
 
     /**
@@ -155,15 +176,15 @@ public class Tick {
                 .append(" ")
                 .append(openPrice)
                 .append(" ")
-                .append(closePrice)
+                .append(closePrice())
                 .append(" ")
                 .append(highPrice)
                 .append(" ")
                 .append(lowPrice)
                 .append(" ")
-                .append(longVolume)
+                .append(longVolume())
                 .append(" ")
-                .append(shortVolume)
+                .append(shortVolume())
                 .append(" ")
                 .append(base)
                 .append(" ")

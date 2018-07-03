@@ -117,8 +117,8 @@ public class Chart extends Region {
             long time = data.start.toEpochSecond();
 
             if (start <= time && time <= end) {
-                max.set(Num.max(max.v, data.highPrice));
-                min.set(Num.min(min.v, data.lowPrice));
+                max.set(Num.max(max.v, data.highPrice()));
+                min.set(Num.min(min.v, data.lowPrice()));
             }
         });
 
