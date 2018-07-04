@@ -18,10 +18,8 @@ import org.junit.jupiter.api.Test;
 
 import com.google.common.base.Predicate;
 
-import antibug.powerassert.PowerAssertOff;
-
 /**
- * @version 2018/06/30 9:04:39
+ * @version 2018/07/04 10:46:56
  */
 class TickerManagerTest {
 
@@ -34,7 +32,6 @@ class TickerManagerTest {
     }
 
     @Test
-    @PowerAssertOff
     void updateHighPrice() {
         // update
         manager.update(buy(100, 1).date(BaseDate));
@@ -73,7 +70,6 @@ class TickerManagerTest {
     }
 
     @Test
-    @PowerAssertOff
     void updateLowPrice() {
         // update
         manager.update(buy(300, 1).date(BaseDate));
