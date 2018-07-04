@@ -17,7 +17,7 @@ import kiss.Signal;
 /**
  * @version 2018/07/04 10:43:30
  */
-public class TickerManager {
+public final class TickerManager {
 
     /** The total sum. */
     private final Totality totality = new Totality();
