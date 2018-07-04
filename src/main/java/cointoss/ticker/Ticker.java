@@ -70,10 +70,10 @@ public final class Ticker {
      * Initialize {@link Ticker}.
      * 
      * @param execution The latest {@link Execution}.
-     * @param base The current {@link Totality}.
+     * @param totality The current {@link Totality}.
      */
-    final void init(Execution execution, Totality base) {
-        current = new Tick(span.calculateStartTime(execution.exec_date), span, execution.price, base);
+    final void init(Execution execution, Totality totality) {
+        current = new Tick(span.calculateStartTime(execution.exec_date), span, execution.price, totality);
 
         ticks.addLast(current);
         additions.accept(current);

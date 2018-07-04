@@ -14,27 +14,29 @@ import java.time.ZonedDateTime;
 import cointoss.util.Num;
 
 /**
- * @version 2018/07/03 9:46:26
+ * @version 2018/07/05 2:00:28
  */
-public class Tick {
+public final class Tick {
 
     /** Begin time of the tick */
-    public final ZonedDateTime start;
+    public ZonedDateTime start;
 
     /** End time of the tick */
-    public final ZonedDateTime end;
+    public ZonedDateTime end;
 
     /** Open price of the period */
-    public final Num openPrice;
+    public Num openPrice;
 
     /** Max price of the period */
-    Num highPrice = Num.ZERO;
+    Num highPrice;
 
     /** Min price of the period */
-    Num lowPrice = Num.MAX;
+    Num lowPrice;
 
-    Totality base;
+    /** The realtime {@link Totality}. */
+    Totality realtime;
 
+    /** The snapshot {@link Totality} for the period. */
     Totality snapshot;
 
     /**
@@ -44,151 +46,133 @@ public class Tick {
      * @param end A end time of period.
      * @param open A open price.
      */
-    public Tick(ZonedDateTime start, ZonedDateTime end, Num open) {
-        this.start = start;
-        this.end = end;
-        this.openPrice = this.highPrice = this.lowPrice = open;
-    }
-
-    /**
-     * New {@link Tick}.
-     * 
-     * @param start A start time of period.
-     * @param end A end time of period.
-     * @param open A open price.
-     */
-    public Tick(ZonedDateTime start, TickSpan span, Num open, Totality base) {
+    Tick(ZonedDateTime start, TickSpan span, Num open, Totality realtime) {
         this.start = start;
         this.end = start.plus(span.duration);
         this.openPrice = this.highPrice = this.lowPrice = open;
-        this.base = base;
-        this.snapshot = base.snapshot();
+        this.realtime = realtime;
+        this.snapshot = realtime.snapshot();
     }
 
     /**
-     * Get the beginTime property of this {@link Tick}.
+     * Retrieve the start time of this {@link Tick}.
      * 
-     * @return The beginTime property.
+     * @return The start time.
      */
-    public final ZonedDateTime start() {
+    public ZonedDateTime start() {
         return start;
     }
 
     /**
-     * Get the endTime property of this {@link Tick}.
+     * Retrieve the end time of this {@link Tick}.
      * 
-     * @return The endTime property.
+     * @return The end time.
      */
-    public final ZonedDateTime end() {
+    public ZonedDateTime end() {
         return end;
     }
 
     /**
-     * Retieve the tick related value.
+     * Retrieve the tick related value.
      * 
      * @return The tick related value.
      */
-    public final Num openPrice() {
+    public Num openPrice() {
         return openPrice;
     }
 
     /**
-     * Retieve the tick related value.
+     * Retrieve the tick related value.
      * 
      * @return The tick related value.
      */
-    public final Num closePrice() {
-        return base == null ? snapshot.latestPrice : base.latestPrice;
+    public Num closePrice() {
+        return realtime == null ? snapshot.latestPrice : realtime.latestPrice;
     }
 
     /**
-     * Retieve the tick related value.
+     * Retrieve the tick related value.
      * 
      * @return The tick related value.
      */
-    public final Num highPrice() {
+    public Num highPrice() {
         return highPrice;
     }
 
     /**
-     * Retieve the tick related value.
+     * Retrieve the tick related value.
      * 
      * @return The tick related value.
      */
-    public final Num lowPrice() {
+    public Num lowPrice() {
         return lowPrice;
     }
 
     /**
-     * Retieve the tick related value.
+     * Retrieve the tick related value.
      * 
      * @return The tick related value.
      */
-    public final Num longVolume() {
-        return base == null ? snapshot.longVolume : base.longVolume.minus(snapshot.longVolume);
+    public Num longVolume() {
+        return realtime == null ? snapshot.longVolume : realtime.longVolume.minus(snapshot.longVolume);
     }
 
     /**
-     * Retieve the tick related value.
+     * Retrieve the tick related value.
      * 
      * @return The tick related value.
      */
-    public final Num longPriceIncrease() {
-        return base == null ? snapshot.longPriceIncrease : base.longPriceIncrease.minus(snapshot.longPriceIncrease);
+    public Num longPriceIncrease() {
+        return realtime == null ? snapshot.longPriceIncrease : realtime.longPriceIncrease.minus(snapshot.longPriceIncrease);
     }
 
     /**
-     * Retieve the tick related value.
+     * Retrieve the tick related value.
      * 
      * @return The tick related value.
      */
-    public final Num shortVolume() {
-        return base == null ? snapshot.shortVolume : base.shortVolume.minus(snapshot.shortVolume);
+    public Num shortVolume() {
+        return realtime == null ? snapshot.shortVolume : realtime.shortVolume.minus(snapshot.shortVolume);
     }
 
     /**
-     * Retieve the tick related value.
+     * Retrieve the tick related value.
      * 
      * @return The tick related value.
      */
-    public final Num shortPriceDecrease() {
-        return base == null ? snapshot.shortPriceDecrease : base.shortPriceDecrease.minus(snapshot.shortPriceDecrease);
+    public Num shortPriceDecrease() {
+        return realtime == null ? snapshot.shortPriceDecrease : realtime.shortPriceDecrease.minus(snapshot.shortPriceDecrease);
     }
 
     /**
      * @return
      */
-    public final Num priceVolatility() {
+    public Num priceVolatility() {
         Num upPotencial = longVolume().isZero() ? Num.ZERO : longPriceIncrease().divide(longVolume());
         Num downPotencial = shortVolume().isZero() ? Num.ZERO : shortPriceDecrease().divide(shortVolume());
         return upPotencial.divide(downPotencial).scale(2);
     }
 
-    public final Num upRatio() {
+    public Num upRatio() {
         return longVolume().isZero() ? Num.ZERO : longPriceIncrease().multiply(longVolume());
     }
 
-    public final Num downRatio() {
+    public Num downRatio() {
         return shortVolume().isZero() ? Num.ZERO : shortPriceDecrease().multiply(shortVolume());
     }
 
     /**
-     * Make this {@link Tick} immutable.
+     * Make this {@link Tick}'s related values fixed.
      * 
      * @return
      */
     void freeze() {
-        if (base != null) {
-            Totality snapshot = new Totality();
-            snapshot.latestPrice = base.latestPrice;
-            snapshot.longVolume = longVolume();
-            snapshot.longPriceIncrease = longPriceIncrease();
-            snapshot.shortVolume = shortVolume();
-            snapshot.shortPriceDecrease = shortPriceDecrease();
-
-            this.snapshot = snapshot;
-            this.base = null;
-        }
+        snapshot.latestPrice = realtime.latestPrice;
+        snapshot.longVolume = longVolume();
+        snapshot.longPriceIncrease = longPriceIncrease();
+        snapshot.shortVolume = shortVolume();
+        snapshot.shortPriceDecrease = shortPriceDecrease();
+        realtime = null;
     }
 
     /**
@@ -213,7 +197,7 @@ public class Tick {
                 .append(" ")
                 .append(shortVolume())
                 .append(" ")
-                .append(base)
+                .append(realtime)
                 .append(" ")
                 .append(snapshot);
 
