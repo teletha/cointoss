@@ -47,6 +47,9 @@ public final class Ticker {
     /** The tick manager. */
     final BigList<Tick> ticks = new BigList();
 
+    /** The cache of associated tickers. */
+    final Ticker[] associations;
+
     /** The latest tick. */
     Tick current;
 
@@ -54,10 +57,13 @@ public final class Ticker {
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
     /**
-     * @param span
+     * Create {@link Ticker}.
+     * 
+     * @param span An associated span.
      */
-    public Ticker(TickSpan span) {
+    Ticker(TickSpan span) {
         this.span = Objects.requireNonNull(span);
+        this.associations = new Ticker[span.associations.length];
     }
 
     /**

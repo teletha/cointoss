@@ -15,7 +15,7 @@ import kiss.I;
 import kiss.Signal;
 
 /**
- * @version 2018/07/03 18:06:20
+ * @version 2018/07/04 10:43:30
  */
 public class TickerManager {
 
@@ -32,11 +32,17 @@ public class TickerManager {
     private boolean initialized;
 
     /**
-     * 
+     * Create {@link TickerManager}.
      */
     public TickerManager() {
-        for (int i = 0; i < size; i++) {
-            tickers[i] = new Ticker(TickSpan.values()[i]);
+        for (int i = size - 1; 0 <= i; i--) {
+            Ticker ticker = tickers[i] = new Ticker(TickSpan.values()[i]);
+
+            // cache associated tickers
+            int index = 0;
+            for (int association : ticker.span.associations) {
+                ticker.associations[index++] = this.tickers[association];
+            }
         }
     }
 
@@ -75,6 +81,7 @@ public class TickerManager {
 
         Num price = execution.price;
 
+        // update tickers
         update(tickers[0], execution, price, price.compareTo(totality.latestPrice));
 
         // update base
@@ -86,39 +93,64 @@ public class TickerManager {
         }
     }
 
-    private void update(Ticker ticker, Execution execution, Num price, int compare) {
+    /**
+     * Update the specified {@link Ticker}.
+     * 
+     * @param ticker A target ticker to update.
+     * @param execution A latest {@link Execution}.
+     * @param price A latest price to cache.
+     * @param comparisonResult The comparison result between previous price and current price.
+     */
+    private void update(Ticker ticker, Execution execution, Num price, int comparisonResult) {
         if (ticker.createTick(execution, totality)) {
-            for (int index : ticker.span.associations) {
-                update(tickers[index], execution, price, compare);
+            for (Ticker association : ticker.associations) {
+                update(association, execution, price, comparisonResult);
             }
         } else {
-            switch (compare) {
+            // If a new tick is not added, the maximum value and the minimum value will be updated.
+            switch (comparisonResult) {
             case 1:
+                // If it is higher than the previous price, since it is impossible to update the
+                // minimum price in all upper tickers, only update the maximum price.
                 updateHighPrice(ticker, price);
                 break;
             case -1:
+                // If it is lower than the previous price, since it is impossible to update the
+                // maximum price in all upper tickers, only update the minimum price.
                 updateLowPrice(ticker, price);
                 break;
             }
         }
     }
 
+    /**
+     * Update high price of the specified {@link Ticker}.
+     * 
+     * @param ticker A target {@link Ticker} to update high price.
+     * @param price A current price.
+     */
     private void updateHighPrice(Ticker ticker, Num price) {
         if (price.isGreaterThan(ticker.current.highPrice)) {
             ticker.current.highPrice = price;
 
-            for (int index : ticker.span.associations) {
-                updateHighPrice(tickers[index], price);
+            for (Ticker association : ticker.associations) {
+                updateHighPrice(association, price);
             }
         }
     }
 
+    /**
+     * Update low price of the specified {@link Ticker}.
+     * 
+     * @param ticker A target {@link Ticker} to update low price.
+     * @param price A current price.
+     */
     private void updateLowPrice(Ticker ticker, Num price) {
         if (price.isLessThan(ticker.current.lowPrice)) {
             ticker.current.lowPrice = price;
 
-            for (int index : ticker.span.associations) {
-                updateLowPrice(tickers[index], price);
+            for (Ticker association : ticker.associations) {
+                updateLowPrice(association, price);
             }
         }
     }
