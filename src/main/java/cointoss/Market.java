@@ -298,18 +298,6 @@ public class Market implements Disposable {
     }
 
     /**
-     * Read {@link Execution} log.
-     * 
-     * @param log
-     * @return
-     */
-    public final Market readLog2(Function<MarketLog, Signal<Execution>> log) {
-        service.add(log.apply(service.log).to(this::tick2));
-
-        return this;
-    }
-
-    /**
      * Calculate profit and loss.
      * 
      * @return
@@ -328,27 +316,6 @@ public class Market implements Disposable {
      * @param e
      */
     protected void tick(Execution e) {
-        if (init.isAbsent()) init.let(e);
-        latest.set(e);
-
-        // flow.record(e);
-        // flow75.record(e);
-        // flow100.record(e);
-        // flow200.record(e);
-        // flow300.record(e);
-        //
-        // // observe executions
-        timelineObservers.accept(e);
-    }
-
-    /**
-     * <p>
-     * Process each {@link Execution}.
-     * </p>
-     * 
-     * @param e
-     */
-    protected void tick2(Execution e) {
         if (init.isAbsent()) init.let(e);
         latest.set(e);
 

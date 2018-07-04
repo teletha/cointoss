@@ -640,7 +640,7 @@ public class MarketLog {
 
     public static void main(String[] args) {
         Market market = new Market(BitFlyerService.FX_BTC_JPY);
-        market.readLog2(log -> log.caches().skip(255).take(6).concatMap(c -> c.read()));
+        market.readLog(log -> log.caches().skip(255).take(6).concatMap(c -> c.read()));
 
         market.dispose();
     }
