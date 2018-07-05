@@ -54,7 +54,7 @@ public class ExecutionFlow {
      * 
      * @param exe
      */
-    public void record(Execution exe) {
+    public void update(Execution exe) {
         Execution removed = buffer.add(exe);
 
         volume = volume.plus(exe.size);

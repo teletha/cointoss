@@ -9,18 +9,21 @@
  */
 package cointoss.ticker;
 
+import java.time.Duration;
 import java.time.ZonedDateTime;
 
 import org.magicwerk.brownies.collections.GapList;
 
 import cointoss.Execution;
 import cointoss.util.Num;
-import kiss.Signal;
 
 /**
- * @version 2018/01/30 12:36:31
+ * @version 2018/07/05 10:37:46
  */
 public class RealtimeTicker {
+
+    /** The minimum interval. */
+    private static final Duration interval = Duration.ofMillis(1000);
 
     /** The latest execution. */
     public Execution latest = new Execution();
@@ -43,47 +46,53 @@ public class RealtimeTicker {
     /** The recorder. */
     private final GapList<Execution> buffer = GapList.create();
 
+    /** The tick span. */
+    private final TickSpan span;
+
+    private ZonedDateTime checkTime;
+
     /**
      * 
      */
-    public RealtimeTicker(TickSpan span, Signal<Execution> signal) {
-        signal.to(incoming -> {
-            // incoming
-            volume = volume.plus(incoming.size);
+    public RealtimeTicker(TickSpan span) {
+        this.span = span;
+        buffer.addLast(Execution.BASE);
+    }
 
-            if (incoming.side.isBuy()) {
-                longVolume = longVolume.plus(incoming.size);
-                longPriceIncrese = longPriceIncrese.plus(incoming.price.minus(latest.price));
+    void update(Execution incoming) {
+        buffer.addLast(incoming);
+
+        // incoming
+        volume = volume.plus(incoming.size);
+
+        if (incoming.side.isBuy()) {
+            longVolume = longVolume.plus(incoming.size);
+        } else {
+            shortVolume = shortVolume.plus(incoming.size);
+        }
+
+        // outgoing
+        ZonedDateTime threshold = incoming.exec_date.minus(span.duration);
+        Execution first = buffer.peek();
+
+        while (first.exec_date.isBefore(threshold)) {
+            Execution outgoing = buffer.remove();
+            Execution second = buffer.peek();
+
+            volume = volume.minus(outgoing.size);
+
+            if (outgoing.side.isBuy()) {
+                longVolume = longVolume.minus(outgoing.size);
             } else {
-                shortVolume = shortVolume.plus(incoming.size);
-                shortPriceDecrease = shortPriceDecrease.plus(latest.price.minus(incoming.price));
+                shortVolume = shortVolume.minus(outgoing.size);
             }
 
-            // outgoing
-            ZonedDateTime threshold = incoming.exec_date.minus(span.duration);
-            Execution first = buffer.peek();
+            // check next
+            first = second;
+        }
 
-            while (first.exec_date.isBefore(threshold)) {
-                Execution outgoing = buffer.remove();
-                Execution second = buffer.peek();
-
-                volume = volume.minus(outgoing.size);
-
-                if (outgoing.side.isBuy()) {
-                    longVolume = longVolume.minus(outgoing.size);
-                    longPriceIncrese = longPriceIncrese.minus(second.price.minus(outgoing.price));
-                } else {
-                    shortVolume = shortVolume.minus(outgoing.size);
-                    shortPriceDecrease = shortPriceDecrease.minus(outgoing.price.minus(second.price));
-                }
-
-                // check next
-                first = second;
-            }
-
-            // update latest
-            latest = incoming;
-        });
+        // update latest
+        latest = incoming;
     }
 
     /**

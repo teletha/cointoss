@@ -28,45 +28,45 @@ class ExecutionFlowTest {
         ExecutionFlow flow = new ExecutionFlow(3);
         assert flow.latest.price.is(0);
 
-        flow.record(createBuy(0, 1, 1));
+        flow.update(createBuy(0, 1, 1));
         assert flow.latest.price.is(1);
 
-        flow.record(createBuy(0, 10, 1));
+        flow.update(createBuy(0, 10, 1));
         assert flow.latest.price.is(10);
 
-        flow.record(createSell(0, 5, 1));
+        flow.update(createSell(0, 5, 1));
         assert flow.latest.price.is(5);
     }
 
     @Test
     void longValues() {
         ExecutionFlow flow = new ExecutionFlow(3);
-        flow.record(createBuy(0, 1, 1));
+        flow.update(createBuy(0, 1, 1));
         assert flow.longVolume.is(1);
 
-        flow.record(createBuy(0, 2, 1));
+        flow.update(createBuy(0, 2, 1));
         assert flow.longVolume.is(2);
 
-        flow.record(createBuy(0, 4, 2));
+        flow.update(createBuy(0, 4, 2));
         assert flow.longVolume.is(4);
 
-        flow.record(createBuy(0, 6, 1));
+        flow.update(createBuy(0, 6, 1));
         assert flow.longVolume.is(4);
     }
 
     @Test
     void shortValues() {
         ExecutionFlow flow = new ExecutionFlow(3);
-        flow.record(createSell(0, -1, 1));
+        flow.update(createSell(0, -1, 1));
         assert flow.shortVolume.is(1);
 
-        flow.record(createSell(0, -2, 1));
+        flow.update(createSell(0, -2, 1));
         assert flow.shortVolume.is(2);
 
-        flow.record(createSell(0, -4, 2));
+        flow.update(createSell(0, -4, 2));
         assert flow.shortVolume.is(4);
 
-        flow.record(createSell(0, -6, 1));
+        flow.update(createSell(0, -6, 1));
         assert flow.shortVolume.is(4);
     }
 
