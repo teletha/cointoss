@@ -45,8 +45,6 @@ public final class TickerManager {
     /** The managed tickers. */
     private final Ticker[] tickers = new Ticker[size];
 
-    private final RealtimeTicker realtime = new RealtimeTicker(TickSpan.Minute3);
-
     /** The initialization state. */
     private boolean initialized;
 
@@ -112,8 +110,6 @@ public final class TickerManager {
             shortVolume = shortVolume.plus(execution.size);
             shortPriceDecrease = shortPriceDecrease.plus(latestExecution.v.price.minus(price));
         }
-
-        realtime.update(execution);
 
         // update the latest execution at last
         latestExecution.set(execution);
