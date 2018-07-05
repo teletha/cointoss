@@ -121,7 +121,7 @@ public class TestableMarket extends Market {
      * @param price
      */
     public TestableMarket execute(Execution e) {
-        tick(((TestableMarketService) service).emulate(e));
+        timelineObservers.accept(((TestableMarketService) service).emulate(e));
         return this;
     }
 

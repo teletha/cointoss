@@ -47,8 +47,8 @@ public final class Ticker {
     /** The tick manager. */
     final BigList<Tick> ticks = new BigList();
 
-    /** The cache of associated tickers. */
-    final Ticker[] associations;
+    /** The cache of upper tickers. */
+    final Ticker[] uppers;
 
     /** The latest tick. */
     Tick current;
@@ -63,17 +63,17 @@ public final class Ticker {
      */
     Ticker(TickSpan span) {
         this.span = Objects.requireNonNull(span);
-        this.associations = new Ticker[span.associations.length];
+        this.uppers = new Ticker[span.uppers.length];
     }
 
     /**
      * Initialize {@link Ticker}.
      * 
      * @param execution The latest {@link Execution}.
-     * @param totality The current {@link Totality}.
+     * @param realtime The realtime {@link Totality}.
      */
-    final void init(Execution execution, Totality totality) {
-        current = new Tick(span.calculateStartTime(execution.exec_date), span, execution.price, totality);
+    final void init(Execution execution, Totality realtime) {
+        current = new Tick(span.calculateStartTime(execution.exec_date), span, execution.price, realtime);
 
         ticks.addLast(current);
         additions.accept(current);
@@ -83,10 +83,10 @@ public final class Ticker {
      * Add the new {@link Tick} if needed.
      * 
      * @param execution The latest {@link Execution}.
-     * @param totality The current {@link Totality}.
+     * @param realtime The realtime {@link Totality}.
      * @return When the new {@link Tick} was added, this method will return <code>true</code>.
      */
-    final boolean createTick(Execution execution, Totality totality) {
+    final boolean createTick(Execution execution, Totality realtime) {
         // Make sure whether the execution does not exceed the end time of current tick.
         if (!execution.isBefore(current.end)) {
             lock.writeLock().lock();
@@ -99,14 +99,14 @@ public final class Ticker {
 
                 while (current.end.isBefore(start)) {
                     current.freeze();
-                    current = new Tick(current.end, span, current.closePrice(), totality);
+                    current = new Tick(current.end, span, current.closePrice(), realtime);
                     ticks.addLast(current);
                     additions.accept(current);
                 }
 
                 // create the latest tick for execution
                 current.freeze();
-                current = new Tick(current.end, span, execution.price, totality);
+                current = new Tick(current.end, span, execution.price, realtime);
                 ticks.addLast(current);
                 additions.accept(current);
             } finally {

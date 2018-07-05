@@ -63,7 +63,7 @@ public class Market implements Disposable {
     public final ExecutionFlow flow300 = new ExecutionFlow(1600);
 
     /** The execution observers. */
-    private final Signaling<Execution> timelineObservers = new Signaling();
+    protected final Signaling<Execution> timelineObservers = new Signaling();
 
     /** The execution time line. */
     public final Signal<Execution> timeline = timelineObservers.expose;
@@ -80,26 +80,20 @@ public class Market implements Disposable {
         return previous;
     }).skip(e -> e == null || e == SEED);
 
-    /** The initial execution. */
-    public final Variable<Execution> init = Variable.empty();
-
-    /** The latest execution. */
-    public final Variable<Execution> latest = Variable.of(Execution.BASE);
-
-    /** The latest price. */
-    public final Variable<Num> price = latest.observeNow().map(e -> e.price).diff().to();
-
     /** The order book. */
     public final OrderBook orderBook = new OrderBook();
 
     /** The order manager. */
     public final OrderManager orders = new OrderManager();
 
-    /** The position manager. */
-    public final PositionManager positions = new PositionManager(price);
-
     /** The ticker manager. */
     public final TickerManager tickers = new TickerManager();
+
+    /** The latest price. */
+    public final Variable<Num> price = tickers.latest.observeNow().map(e -> e.price).diff().to();
+
+    /** The position manager. */
+    public final PositionManager positions = new PositionManager(price);
 
     /** The amount of base currency. */
     public final Variable<Num> base = Variable.empty();
@@ -268,7 +262,7 @@ public class Market implements Disposable {
      * @return
      */
     public final Signal<Execution> signalByPrice(Num price) {
-        if (latest.v.price.isLessThan(price)) {
+        if (this.price.v.isLessThan(price)) {
             return timeline.take(e -> e.price.isGreaterThanOrEqual(price)).take(1);
         } else {
             return timeline.take(e -> e.price.isLessThanOrEqual(price)).take(1);
@@ -292,7 +286,7 @@ public class Market implements Disposable {
      * @return
      */
     public final Market readLog(Function<MarketLog, Signal<Execution>> log) {
-        service.add(log.apply(service.log).to(this::tick));
+        service.add(log.apply(service.log).to(timelineObservers));
 
         return this;
     }
@@ -304,29 +298,8 @@ public class Market implements Disposable {
      */
     public Num calculateProfit() {
         Num baseProfit = base.v.minus(baseInit);
-        Num targetProfit = target.v.multiply(latest.v.price).minus(targetInit.v.multiply(init.v.price));
+        Num targetProfit = target.v.multiply(price).minus(targetInit.v.multiply(tickers.init.v.price));
         return baseProfit.plus(targetProfit);
-    }
-
-    /**
-     * <p>
-     * Process each {@link Execution}.
-     * </p>
-     * 
-     * @param e
-     */
-    protected void tick(Execution e) {
-        if (init.isAbsent()) init.let(e);
-        latest.set(e);
-
-        // flow.record(e);
-        // flow75.record(e);
-        // flow100.record(e);
-        // flow200.record(e);
-        // flow300.record(e);
-        //
-        // // observe executions
-        timelineObservers.accept(e);
     }
 
     /**

@@ -86,20 +86,20 @@ public enum TickSpan {
     private final ChronoField unit;
 
     /** The indexes of associated upper tickers. */
-    final int[] associations;
+    final int[] uppers;
 
     /**
      * @param amount
      * @param unit
      */
-    private TickSpan(long amount, ChronoField unit, int... associations) {
+    private TickSpan(long amount, ChronoField unit, int... uppers) {
         this.amount = amount;
         this.unit = unit;
         this.duration = Duration.of(amount, unit.getBaseUnit());
-        this.associations = new int[associations.length];
+        this.uppers = new int[uppers.length];
 
-        for (int i = 0; i < associations.length; i++) {
-            this.associations[i] = associations[i] + ordinal();
+        for (int i = 0; i < uppers.length; i++) {
+            this.uppers[i] = uppers[i] + ordinal();
         }
     }
 

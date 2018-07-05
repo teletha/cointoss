@@ -13,14 +13,21 @@ import cointoss.Execution;
 import cointoss.util.Num;
 import kiss.I;
 import kiss.Signal;
+import kiss.Variable;
 
 /**
  * @version 2018/07/04 10:43:30
  */
 public final class TickerManager {
 
-    /** The total sum. */
-    private final Totality totality = new Totality();
+    /** The initial execution. */
+    public final Variable<Execution> init = Variable.empty();
+
+    /** The latest execution. */
+    public final Variable<Execution> latest = Variable.of(Execution.BASE);
+
+    /** The realtime total sum. */
+    private final Totality realtime = new Totality();
 
     /** The number of tickers. */
     private final int size = TickSpan.values().length;
@@ -40,8 +47,8 @@ public final class TickerManager {
 
             // cache associated tickers
             int index = 0;
-            for (int association : ticker.span.associations) {
-                ticker.associations[index++] = this.tickers[association];
+            for (int association : ticker.span.uppers) {
+                ticker.uppers[index++] = this.tickers[association];
             }
         }
     }
@@ -73,19 +80,22 @@ public final class TickerManager {
         // initialize tickers once if needed
         if (initialized == false) {
             initialized = true;
+            init.set(execution);
 
             for (Ticker ticker : tickers) {
-                ticker.init(execution, totality);
+                ticker.init(execution, realtime);
             }
         }
 
         Num price = execution.price;
 
         // update tickers
-        update(tickers[0], execution, price, price.compareTo(totality.latestPrice));
+        update(tickers[0], execution, price, price.compareTo(realtime.latestPrice));
 
         // update base
-        totality.update(execution);
+        realtime.update(execution);
+
+        latest.set(execution);
 
         // notify update event
         for (Ticker ticker : tickers) {
@@ -102,9 +112,9 @@ public final class TickerManager {
      * @param comparisonResult The comparison result between previous price and current price.
      */
     private void update(Ticker ticker, Execution execution, Num price, int comparisonResult) {
-        if (ticker.createTick(execution, totality)) {
-            for (Ticker association : ticker.associations) {
-                update(association, execution, price, comparisonResult);
+        if (ticker.createTick(execution, realtime)) {
+            for (Ticker upper : ticker.uppers) {
+                update(upper, execution, price, comparisonResult);
             }
         } else {
             // If a new tick is not added, the maximum value and the minimum value will be updated.
@@ -133,8 +143,8 @@ public final class TickerManager {
         if (price.isGreaterThan(ticker.current.highPrice)) {
             ticker.current.highPrice = price;
 
-            for (Ticker association : ticker.associations) {
-                updateHighPrice(association, price);
+            for (Ticker upper : ticker.uppers) {
+                updateHighPrice(upper, price);
             }
         }
     }
@@ -149,8 +159,8 @@ public final class TickerManager {
         if (price.isLessThan(ticker.current.lowPrice)) {
             ticker.current.lowPrice = price;
 
-            for (Ticker association : ticker.associations) {
-                updateLowPrice(association, price);
+            for (Ticker upper : ticker.uppers) {
+                updateLowPrice(upper, price);
             }
         }
     }

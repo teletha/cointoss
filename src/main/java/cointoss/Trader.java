@@ -270,8 +270,7 @@ public abstract class Trader implements Disposable {
         /**
          * Create {@link Entry} with {@link Order}.
          * 
-         * @param entry
-         *            A entry order.
+         * @param entry A entry order.
          */
         private Entry(Order entry, Consumer<Entry> initializer) {
             this.order = entry;
@@ -323,11 +322,11 @@ public abstract class Trader implements Disposable {
             Num up, down;
 
             if (side().isBuy()) {
-                up = exitCost.plus(positionSize.multiply(market.latest.v.price));
+                up = exitCost.plus(positionSize.multiply(market.price));
                 down = entryCost;
             } else {
                 up = entryCost;
-                down = exitCost.plus(positionSize.multiply(market.latest.v.price));
+                down = exitCost.plus(positionSize.multiply(market.price));
             }
             return up.minus(down);
         }
@@ -376,10 +375,10 @@ public abstract class Trader implements Disposable {
         public final Span orderTime() {
             Execution last = order.executions.peekLast();
             ZonedDateTime start = order.created.get();
-            ZonedDateTime finish = last == null ? market.latest.v.exec_date : last.exec_date;
+            ZonedDateTime finish = last == null ? market.tickers.latest.v.exec_date : last.exec_date;
 
             if (start.isBefore(finish)) {
-                finish = market.latest.v.exec_date;
+                finish = market.tickers.latest.v.exec_date;
             }
             return new Span(start, finish);
         }
@@ -400,7 +399,7 @@ public abstract class Trader implements Disposable {
             ZonedDateTime finish = start;
 
             if (isActive()) {
-                finish = market.latest.v.exec_date;
+                finish = market.tickers.latest.v.exec_date;
             } else {
                 for (Order order : exit) {
                     Execution last = order.executions.peekLast();
@@ -479,10 +478,8 @@ public abstract class Trader implements Disposable {
         /**
          * Request exit order.
          * 
-         * @param size
-         *            A exit size.
-         * @param price
-         *            A exit price.
+         * @param size A exit size.
+         * @param price A exit price.
          */
         public final void exitLimit(Num size, Num price, Consumer<Order> process) {
             // check size
@@ -500,8 +497,7 @@ public abstract class Trader implements Disposable {
         /**
          * Request exit order.
          * 
-         * @param size
-         *            A exit size.
+         * @param size A exit size.
          */
         public final void exitMarket() {
             exitMarket((Consumer<Order>) null);
@@ -510,8 +506,7 @@ public abstract class Trader implements Disposable {
         /**
          * Request exit order.
          * 
-         * @param size
-         *            A exit size.
+         * @param size A exit size.
          */
         public final void exitMarket(Consumer<Order> process) {
             // check size
@@ -525,8 +520,7 @@ public abstract class Trader implements Disposable {
         /**
          * Request exit order.
          * 
-         * @param size
-         *            A exit size.
+         * @param size A exit size.
          */
         public final void exitMarket(Num size) {
             exitMarket(size, null);
@@ -535,8 +529,7 @@ public abstract class Trader implements Disposable {
         /**
          * Request exit order.
          * 
-         * @param size
-         *            A exit size.
+         * @param size A exit size.
          */
         public final void exitMarket(Num size, Consumer<Order> process) {
             // check size
@@ -549,8 +542,7 @@ public abstract class Trader implements Disposable {
         /**
          * Request exit order.
          * 
-         * @param order
-         *            A exit order.
+         * @param order A exit order.
          */
         private void exit(Order order, Consumer<Order> initializer) {
             exitRemaining = exitRemaining.plus(order.size);
