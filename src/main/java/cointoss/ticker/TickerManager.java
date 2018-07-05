@@ -27,15 +27,6 @@ public final class TickerManager {
     /** The latest execution. */
     public final Variable<Execution> latestExecution = Variable.of(Execution.BASE);
 
-    /** The number of tickers. */
-    private final int size = TickSpan.values().length;
-
-    /** The managed tickers. */
-    private final Ticker[] tickers = new Ticker[size];
-
-    /** The initialization state. */
-    private boolean initialized;
-
     /** Total of long volume since application startup. */
     Num longVolume = Num.ZERO;
 
@@ -48,6 +39,15 @@ public final class TickerManager {
     /** Total of short price decrease since application startup. */
     Num shortPriceDecrease = Num.ZERO;
 
+    /** The number of tickers. */
+    private final int size = TickSpan.values().length;
+
+    /** The managed tickers. */
+    private final Ticker[] tickers = new Ticker[size];
+
+    /** The initialization state. */
+    private boolean initialized;
+
     /**
      * Create {@link TickerManager}.
      */
@@ -55,10 +55,10 @@ public final class TickerManager {
         for (int i = size - 1; 0 <= i; i--) {
             Ticker ticker = tickers[i] = new Ticker(TickSpan.values()[i]);
 
-            // cache associated tickers
+            // cache associated upper tickers
             int index = 0;
-            for (int association : ticker.span.uppers) {
-                ticker.uppers[index++] = this.tickers[association];
+            for (int upper : ticker.span.uppers) {
+                ticker.uppers[index++] = this.tickers[upper];
             }
         }
     }
