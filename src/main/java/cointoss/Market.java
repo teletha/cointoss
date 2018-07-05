@@ -90,7 +90,7 @@ public class Market implements Disposable {
     public final TickerManager tickers = new TickerManager();
 
     /** The latest price. */
-    public final Variable<Num> price = tickers.latest.observeNow().map(e -> e.price).diff().to();
+    public final Variable<Num> price = tickers.latestExecution.observeNow().map(e -> e.price).diff().to();
 
     /** The position manager. */
     public final PositionManager positions = new PositionManager(price);
@@ -298,7 +298,7 @@ public class Market implements Disposable {
      */
     public Num calculateProfit() {
         Num baseProfit = base.v.minus(baseInit);
-        Num targetProfit = target.v.multiply(price).minus(targetInit.v.multiply(tickers.init.v.price));
+        Num targetProfit = target.v.multiply(price).minus(targetInit.v.multiply(tickers.initialExecution.v.price));
         return baseProfit.plus(targetProfit);
     }
 

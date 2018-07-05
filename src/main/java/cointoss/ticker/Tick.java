@@ -14,18 +14,21 @@ import java.time.ZonedDateTime;
 import cointoss.util.Num;
 
 /**
- * @version 2018/07/05 2:00:28
+ * @version 2018/07/05 10:16:39
  */
 public final class Tick {
 
     /** Begin time of the tick */
-    public ZonedDateTime start;
+    public final ZonedDateTime start;
 
     /** End time of the tick */
-    public ZonedDateTime end;
+    public final ZonedDateTime end;
 
     /** Open price of the period */
-    public Num openPrice;
+    public final Num openPrice;
+
+    /** Close price of the period. */
+    Num closePrice;
 
     /** Max price of the period */
     Num highPrice;
@@ -33,25 +36,39 @@ public final class Tick {
     /** Min price of the period */
     Num lowPrice;
 
-    /** The realtime {@link Totality}. */
-    Totality realtime;
+    /** The realtime execution statistic. */
+    TickerManager realtime;
 
-    /** The snapshot {@link Totality} for the period. */
-    Totality snapshot;
+    /** Snapshot of long volume at tick initialization. */
+    Num longVolume;
+
+    /** Snapshot of long price increase at tick initialization. */
+    Num longPriceIncrease;
+
+    /** Snapshot of short volume at tick initialization. */
+    Num shortVolume;
+
+    /** Snapshot of short price decrease at tick initialization. */
+    Num shortPriceDecrease;
 
     /**
      * New {@link Tick}.
      * 
      * @param start A start time of period.
-     * @param end A end time of period.
+     * @param span A tick span.
      * @param open A open price.
+     * @param realtime The realtime execution statistic.
      */
-    Tick(ZonedDateTime start, TickSpan span, Num open, Totality realtime) {
+    Tick(ZonedDateTime start, TickSpan span, Num open, TickerManager realtime) {
         this.start = start;
         this.end = start.plus(span.duration);
         this.openPrice = this.highPrice = this.lowPrice = open;
+
         this.realtime = realtime;
-        this.snapshot = realtime.snapshot();
+        this.longVolume = realtime.longVolume;
+        this.longPriceIncrease = realtime.longPriceIncrease;
+        this.shortVolume = realtime.shortVolume;
+        this.shortPriceDecrease = realtime.shortPriceDecrease;
     }
 
     /**
@@ -87,7 +104,7 @@ public final class Tick {
      * @return The tick related value.
      */
     public Num closePrice() {
-        return realtime == null ? snapshot.latestPrice : realtime.latestPrice;
+        return realtime == null ? closePrice : realtime.latestExecution.v.price;
     }
 
     /**
@@ -114,7 +131,7 @@ public final class Tick {
      * @return The tick related value.
      */
     public Num longVolume() {
-        return realtime == null ? snapshot.longVolume : realtime.longVolume.minus(snapshot.longVolume);
+        return realtime == null ? longVolume : realtime.longVolume.minus(longVolume);
     }
 
     /**
@@ -123,7 +140,7 @@ public final class Tick {
      * @return The tick related value.
      */
     public Num longPriceIncrease() {
-        return realtime == null ? snapshot.longPriceIncrease : realtime.longPriceIncrease.minus(snapshot.longPriceIncrease);
+        return realtime == null ? longPriceIncrease : realtime.longPriceIncrease.minus(longPriceIncrease);
     }
 
     /**
@@ -132,7 +149,7 @@ public final class Tick {
      * @return The tick related value.
      */
     public Num shortVolume() {
-        return realtime == null ? snapshot.shortVolume : realtime.shortVolume.minus(snapshot.shortVolume);
+        return realtime == null ? shortVolume : realtime.shortVolume.minus(shortVolume);
     }
 
     /**
@@ -141,7 +158,7 @@ public final class Tick {
      * @return The tick related value.
      */
     public Num shortPriceDecrease() {
-        return realtime == null ? snapshot.shortPriceDecrease : realtime.shortPriceDecrease.minus(snapshot.shortPriceDecrease);
+        return realtime == null ? shortPriceDecrease : realtime.shortPriceDecrease.minus(shortPriceDecrease);
     }
 
     /**
@@ -167,11 +184,11 @@ public final class Tick {
      * @return
      */
     void freeze() {
-        snapshot.latestPrice = realtime.latestPrice;
-        snapshot.longVolume = longVolume();
-        snapshot.longPriceIncrease = longPriceIncrease();
-        snapshot.shortVolume = shortVolume();
-        snapshot.shortPriceDecrease = shortPriceDecrease();
+        closePrice = realtime.latestExecution.v.price;
+        longVolume = longVolume();
+        longPriceIncrease = longPriceIncrease();
+        shortVolume = shortVolume();
+        shortPriceDecrease = shortPriceDecrease();
         realtime = null;
     }
 
@@ -195,11 +212,7 @@ public final class Tick {
                 .append(" ")
                 .append(longVolume())
                 .append(" ")
-                .append(shortVolume())
-                .append(" ")
-                .append(realtime)
-                .append(" ")
-                .append(snapshot);
+                .append(shortVolume());
 
         return builder.toString();
     }

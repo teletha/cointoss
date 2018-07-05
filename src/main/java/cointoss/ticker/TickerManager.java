@@ -10,24 +10,22 @@
 package cointoss.ticker;
 
 import cointoss.Execution;
+import cointoss.Side;
 import cointoss.util.Num;
 import kiss.I;
 import kiss.Signal;
 import kiss.Variable;
 
 /**
- * @version 2018/07/04 10:43:30
+ * @version 2018/07/05 10:16:44
  */
 public final class TickerManager {
 
     /** The initial execution. */
-    public final Variable<Execution> init = Variable.empty();
+    public final Variable<Execution> initialExecution = Variable.empty();
 
     /** The latest execution. */
-    public final Variable<Execution> latest = Variable.of(Execution.BASE);
-
-    /** The realtime total sum. */
-    private final Totality realtime = new Totality();
+    public final Variable<Execution> latestExecution = Variable.of(Execution.BASE);
 
     /** The number of tickers. */
     private final int size = TickSpan.values().length;
@@ -37,6 +35,18 @@ public final class TickerManager {
 
     /** The initialization state. */
     private boolean initialized;
+
+    /** Total of long volume since application startup. */
+    Num longVolume = Num.ZERO;
+
+    /** Total of long price increase since application startup. */
+    Num longPriceIncrease = Num.ZERO;
+
+    /** Total of short volume since application startup. */
+    Num shortVolume = Num.ZERO;
+
+    /** Total of short price decrease since application startup. */
+    Num shortPriceDecrease = Num.ZERO;
 
     /**
      * Create {@link TickerManager}.
@@ -80,22 +90,29 @@ public final class TickerManager {
         // initialize tickers once if needed
         if (initialized == false) {
             initialized = true;
-            init.set(execution);
+            initialExecution.set(execution);
 
             for (Ticker ticker : tickers) {
-                ticker.init(execution, realtime);
+                ticker.init(execution, this);
             }
         }
 
         Num price = execution.price;
 
         // update tickers
-        update(tickers[0], execution, price, price.compareTo(realtime.latestPrice));
+        update(tickers[0], execution, price, price.compareTo(latestExecution.v.price));
 
-        // update base
-        realtime.update(execution);
+        // update totality of related values
+        if (execution.side == Side.BUY) {
+            longVolume = longVolume.plus(execution.size);
+            longPriceIncrease = longPriceIncrease.plus(price.minus(latestExecution.v.price));
+        } else {
+            shortVolume = shortVolume.plus(execution.size);
+            shortPriceDecrease = shortPriceDecrease.plus(latestExecution.v.price.minus(price));
+        }
 
-        latest.set(execution);
+        // update the latest execution at last
+        latestExecution.set(execution);
 
         // notify update event
         for (Ticker ticker : tickers) {
@@ -112,7 +129,7 @@ public final class TickerManager {
      * @param comparisonResult The comparison result between previous price and current price.
      */
     private void update(Ticker ticker, Execution execution, Num price, int comparisonResult) {
-        if (ticker.createTick(execution, realtime)) {
+        if (ticker.createTick(execution, this)) {
             for (Ticker upper : ticker.uppers) {
                 update(upper, execution, price, comparisonResult);
             }

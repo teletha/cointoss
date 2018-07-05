@@ -22,7 +22,7 @@ import kiss.Signaling;
 import kiss.Variable;
 
 /**
- * @version 2018/07/03 16:37:44
+ * @version 2018/07/05 10:16:49
  */
 public final class Ticker {
 
@@ -70,9 +70,9 @@ public final class Ticker {
      * Initialize {@link Ticker}.
      * 
      * @param execution The latest {@link Execution}.
-     * @param realtime The realtime {@link Totality}.
+     * @param realtime The realtime execution statistic.
      */
-    final void init(Execution execution, Totality realtime) {
+    final void init(Execution execution, TickerManager realtime) {
         current = new Tick(span.calculateStartTime(execution.exec_date), span, execution.price, realtime);
 
         ticks.addLast(current);
@@ -83,10 +83,10 @@ public final class Ticker {
      * Add the new {@link Tick} if needed.
      * 
      * @param execution The latest {@link Execution}.
-     * @param realtime The realtime {@link Totality}.
+     * @param realtime The realtime execution statistic.
      * @return When the new {@link Tick} was added, this method will return <code>true</code>.
      */
-    final boolean createTick(Execution execution, Totality realtime) {
+    final boolean createTick(Execution execution, TickerManager realtime) {
         // Make sure whether the execution does not exceed the end time of current tick.
         if (!execution.isBefore(current.end)) {
             lock.writeLock().lock();
