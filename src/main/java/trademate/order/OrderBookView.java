@@ -79,7 +79,7 @@ public class OrderBookView extends View {
             shortList.values(book.shorts.selectBy(range));
         });
 
-        view.market().tickers.latestPrice.observe().on(Viewtify.UIThread).to(e -> priceLatest.text(e));
+        view.market().tickers.latestExecution.observe().on(Viewtify.UIThread).to(e -> priceLatest.text(e.price));
         view.market().orderBook.spread.observe().on(Viewtify.UIThread).to(price -> priceSpread.text(price));
     }
 

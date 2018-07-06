@@ -51,15 +51,15 @@ public final class PositionManager {
     public final Variable<Num> profit = Variable.of(Num.ZERO);
 
     /** The latest market price. */
-    private final Variable<Num> latest;
+    private final Variable<Execution> latest;
 
     /**
      * Manage {@link Position}.
      * 
      * @param latest A latest market {@link Execution} holder.
      */
-    public PositionManager(Variable<Num> latest) {
-        this.latest = latest == null ? Variable.of(Num.ZERO) : latest;
+    public PositionManager(Variable<Execution> latest) {
+        this.latest = latest == null ? Variable.of(Execution.BASE) : latest;
         this.latest.observe().to(this::calculateProfit);
     }
 
@@ -168,11 +168,11 @@ public final class PositionManager {
     /**
      * Calculate profit variable.
      */
-    private void calculateProfit(Num price) {
+    private void calculateProfit(Execution execution) {
         Num total = Num.ZERO;
 
         for (Position position : positions) {
-            Num profit = position.isBuy() ? price.minus(position.price) : position.price.minus(price);
+            Num profit = position.isBuy() ? execution.price.minus(position.price) : position.price.minus(execution.price);
             profit = profit.multiply(position.size).scale(0);
 
             position.profit.set(profit);

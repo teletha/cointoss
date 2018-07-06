@@ -108,7 +108,7 @@ public class PositionManagerTest {
 
     @Test
     void profit() {
-        Variable<Num> latest = Variable.of(Num.of(20));
+        Variable<Execution> latest = Variable.of(buy(20, 1));
         PositionManager positions = new PositionManager(latest);
         assert positions.profit.is(Num.ZERO);
 
