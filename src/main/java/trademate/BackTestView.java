@@ -56,7 +56,7 @@ public class BackTestView extends View {
 
         Viewtify.Terminator.add(market);
         chart.market.set(market);
-        chart.ticker.set(market.tickerBy(TickSpan.Minute1));
+        chart.ticker.set(market.tickers.tickerBy(TickSpan.Minute1));
 
         start.when(User.Click).to(e -> {
             Market m = new Market(BitFlyerService.FX_BTC_JPY);

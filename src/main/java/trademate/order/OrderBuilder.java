@@ -22,7 +22,6 @@ import cointoss.Side;
 import cointoss.order.Order;
 import cointoss.order.Order.Quantity;
 import cointoss.order.Order.State;
-import cointoss.trader.Spreader;
 import cointoss.util.Num;
 import kiss.I;
 import kiss.WiseBiConsumer;
@@ -142,16 +141,6 @@ public class OrderBuilder extends View {
 
         orderRetreat.when(User.Click).throttle(1000, MILLISECONDS).to(this::retreat);
         orderReverse.when(User.Click).throttle(1000, MILLISECONDS).to(this::reverse);
-
-        Spreader spreader = new Spreader();
-
-        bot.observe(use -> {
-            if (use) {
-                view.market().addTrader(spreader);
-            } else {
-                view.market().removeTrader(spreader);
-            }
-        });
     }
 
     /**

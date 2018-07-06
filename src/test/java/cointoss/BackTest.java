@@ -61,7 +61,7 @@ public class BackTest {
                                 });
 
                         // rise under price line
-                        market.tickerBy(TickSpan.Second15).add.takeUntil(closingPosition) //
+                        market.tickers.tickerBy(TickSpan.Second15).add.takeUntil(closingPosition) //
                                 .map(Tick::closePrice)
                                 .takeAt(i -> i % 5 == 0)
                                 .to(e -> {

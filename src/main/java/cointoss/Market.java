@@ -24,9 +24,6 @@ import cointoss.order.Order;
 import cointoss.order.Order.State;
 import cointoss.order.OrderBook;
 import cointoss.order.OrderManager;
-import cointoss.ticker.ExecutionFlow;
-import cointoss.ticker.TickSpan;
-import cointoss.ticker.Ticker;
 import cointoss.ticker.TickerManager;
 import cointoss.util.Num;
 import kiss.Disposable;
@@ -51,16 +48,6 @@ public class Market implements Disposable {
 
     /** The market handler. */
     public final MarketService service;
-
-    public final ExecutionFlow flow = new ExecutionFlow(100);
-
-    public final ExecutionFlow flow75 = new ExecutionFlow(200);
-
-    public final ExecutionFlow flow100 = new ExecutionFlow(400);
-
-    public final ExecutionFlow flow200 = new ExecutionFlow(800);
-
-    public final ExecutionFlow flow300 = new ExecutionFlow(1600);
 
     /** The execution observers. */
     protected final Signaling<Execution> timelineObservers = new Signaling();
@@ -267,16 +254,6 @@ public class Market implements Disposable {
     }
 
     /**
-     * Get {@link Ticker} by span.
-     * 
-     * @param span
-     * @return
-     */
-    public final Ticker tickerBy(TickSpan span) {
-        return tickers.tickerBy(span);
-    }
-
-    /**
      * Read {@link Execution} log.
      * 
      * @param log
@@ -295,8 +272,7 @@ public class Market implements Disposable {
      */
     public Num calculateProfit() {
         Num baseProfit = base.v.minus(baseInit);
-        Num targetProfit = target.v.multiply(tickers.latest.v.price)
-                .minus(targetInit.v.multiply(tickers.initial.v.price));
+        Num targetProfit = target.v.multiply(tickers.latest.v.price).minus(targetInit.v.multiply(tickers.initial.v.price));
         return baseProfit.plus(targetProfit);
     }
 

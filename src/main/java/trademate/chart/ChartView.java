@@ -51,6 +51,6 @@ public class ChartView extends View {
     protected void initialize() {
         span.values(0, TickSpan.class);
 
-        span.observeNow().skipNull().combineLatest(market.observeNow().skipNull()).map(e -> e.ⅱ.tickerBy(e.ⅰ)).to(ticker::set);
+        span.observeNow().skipNull().combineLatest(market.observeNow().skipNull()).map(e -> e.ⅱ.tickers.tickerBy(e.ⅰ)).to(ticker::set);
     }
 }
