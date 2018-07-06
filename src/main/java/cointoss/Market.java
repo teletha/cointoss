@@ -89,11 +89,8 @@ public class Market implements Disposable {
     /** The ticker manager. */
     public final TickerManager tickers = new TickerManager();
 
-    /** The latest price. */
-    public final Variable<Num> price = tickers.latestExecution.observeNow().map(e -> e.price).diff().to();
-
     /** The position manager. */
-    public final PositionManager positions = new PositionManager(price);
+    public final PositionManager positions = new PositionManager(tickers.latestPrice);
 
     /** The amount of base currency. */
     public final Variable<Num> base = Variable.empty();
@@ -262,7 +259,7 @@ public class Market implements Disposable {
      * @return
      */
     public final Signal<Execution> signalByPrice(Num price) {
-        if (this.price.v.isLessThan(price)) {
+        if (tickers.latestPrice.v.isLessThan(price)) {
             return timeline.take(e -> e.price.isGreaterThanOrEqual(price)).take(1);
         } else {
             return timeline.take(e -> e.price.isLessThanOrEqual(price)).take(1);
@@ -298,7 +295,7 @@ public class Market implements Disposable {
      */
     public Num calculateProfit() {
         Num baseProfit = base.v.minus(baseInit);
-        Num targetProfit = target.v.multiply(price).minus(targetInit.v.multiply(tickers.initialExecution.v.price));
+        Num targetProfit = target.v.multiply(tickers.latestPrice).minus(targetInit.v.multiply(tickers.initialExecution.v.price));
         return baseProfit.plus(targetProfit);
     }
 
