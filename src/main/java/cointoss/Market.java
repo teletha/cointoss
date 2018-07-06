@@ -37,14 +37,7 @@ import kiss.Variable;
  */
 public class Market implements Disposable {
 
-    /** The initial execution. */
-    private static final Execution SEED = new Execution();
-
-    static {
-        SEED.side = Side.BUY;
-    }
-
-    private final AtomicReference<Execution> switcher = new AtomicReference<>(SEED);
+    private final AtomicReference<Execution> switcher = new AtomicReference<>(Execution.BASE);
 
     /** The market handler. */
     public final MarketService service;
@@ -65,7 +58,7 @@ public class Market implements Disposable {
             return null;
         }
         return previous;
-    }).skip(e -> e == null || e == SEED);
+    }).skip(e -> e == null || e == Execution.BASE);
 
     /** The order book. */
     public final OrderBook orderBook = new OrderBook();
