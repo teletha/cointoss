@@ -104,7 +104,7 @@ public final class Tick {
      * @return The tick related value.
      */
     public Num closePrice() {
-        return realtime == null ? closePrice : realtime.latestExecution.v.price;
+        return realtime == null ? closePrice : realtime.latest.v.price;
     }
 
     /**
@@ -184,7 +184,7 @@ public final class Tick {
      * @return
      */
     void freeze() {
-        closePrice = realtime.latestExecution.v.price;
+        closePrice = closePrice();
         longVolume = longVolume();
         longPriceIncrease = longPriceIncrease();
         shortVolume = shortVolume();

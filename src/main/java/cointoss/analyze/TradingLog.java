@@ -93,8 +93,8 @@ public class TradingLog {
      * Analyze trading.
      */
     public TradingLog(Market market, List<Trader> tradings) {
-        Execution init = market.tickers.initialExecution.v;
-        Execution last = market.tickers.latestExecution.v;
+        Execution init = market.tickers.initial.v;
+        Execution last = market.tickers.latest.v;
         this.start = init.exec_date;
         this.startPrice = init.price;
         this.startBaseCurrency = market.baseInit.v;

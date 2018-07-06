@@ -322,11 +322,11 @@ public abstract class Trader implements Disposable {
             Num up, down;
 
             if (side().isBuy()) {
-                up = exitCost.plus(positionSize.multiply(market.tickers.latestExecution.v.price));
+                up = exitCost.plus(positionSize.multiply(market.tickers.latest.v.price));
                 down = entryCost;
             } else {
                 up = entryCost;
-                down = exitCost.plus(positionSize.multiply(market.tickers.latestExecution.v.price));
+                down = exitCost.plus(positionSize.multiply(market.tickers.latest.v.price));
             }
             return up.minus(down);
         }
@@ -375,10 +375,10 @@ public abstract class Trader implements Disposable {
         public final Span orderTime() {
             Execution last = order.executions.peekLast();
             ZonedDateTime start = order.created.get();
-            ZonedDateTime finish = last == null ? market.tickers.latestExecution.v.exec_date : last.exec_date;
+            ZonedDateTime finish = last == null ? market.tickers.latest.v.exec_date : last.exec_date;
 
             if (start.isBefore(finish)) {
-                finish = market.tickers.latestExecution.v.exec_date;
+                finish = market.tickers.latest.v.exec_date;
             }
             return new Span(start, finish);
         }
@@ -399,7 +399,7 @@ public abstract class Trader implements Disposable {
             ZonedDateTime finish = start;
 
             if (isActive()) {
-                finish = market.tickers.latestExecution.v.exec_date;
+                finish = market.tickers.latest.v.exec_date;
             } else {
                 for (Order order : exit) {
                     Execution last = order.executions.peekLast();

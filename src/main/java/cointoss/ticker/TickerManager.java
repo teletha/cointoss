@@ -22,10 +22,10 @@ import kiss.Variable;
 public final class TickerManager {
 
     /** The initial execution. */
-    public final Variable<Execution> initialExecution = Variable.empty();
+    public final Variable<Execution> initial = Variable.empty();
 
     /** The latest execution. */
-    public final Variable<Execution> latestExecution = Variable.of(Execution.BASE);
+    public final Variable<Execution> latest = Variable.of(Execution.BASE);
 
     /** Total of long volume since application startup. */
     Num longVolume = Num.ZERO;
@@ -87,32 +87,33 @@ public final class TickerManager {
      * @param execution The latest {@link Execution}.
      */
     public void update(Execution execution) {
-        // initialize tickers once if needed
+        // inline cache
+        Num price = execution.price;
+
         if (initialized == false) {
+            // initialize tickers once if needed
             initialized = true;
-            initialExecution.set(execution);
+            initial.set(execution);
 
             for (Ticker ticker : tickers) {
                 ticker.init(execution, this);
             }
+        } else {
+            // update tickers
+            update(tickers[0], execution, price, price.compareTo(latest.v.price));
         }
-
-        Num price = execution.price;
-
-        // update tickers
-        update(tickers[0], execution, price, price.compareTo(latestExecution.v.price));
 
         // update totality of related values
         if (execution.side == Side.BUY) {
             longVolume = longVolume.plus(execution.size);
-            longPriceIncrease = longPriceIncrease.plus(price.minus(latestExecution.v.price));
+            longPriceIncrease = longPriceIncrease.plus(price.minus(latest.v.price));
         } else {
             shortVolume = shortVolume.plus(execution.size);
-            shortPriceDecrease = shortPriceDecrease.plus(latestExecution.v.price.minus(price));
+            shortPriceDecrease = shortPriceDecrease.plus(latest.v.price.minus(price));
         }
 
         // update the latest execution at last
-        latestExecution.set(execution);
+        latest.set(execution);
 
         // notify update event
         for (Ticker ticker : tickers) {
