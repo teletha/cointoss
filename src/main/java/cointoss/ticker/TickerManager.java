@@ -17,7 +17,7 @@ import kiss.Signal;
 import kiss.Variable;
 
 /**
- * @version 2018/07/05 10:16:44
+ * @version 2018/07/06 10:21:22
  */
 public final class TickerManager {
 
@@ -84,36 +84,33 @@ public final class TickerManager {
     /**
      * Update all {@link Ticker}s by {@link Execution}.
      * 
-     * @param execution The latest {@link Execution}.
+     * @param e The latest {@link Execution}.
      */
-    public void update(Execution execution) {
-        // inline cache
-        Num price = execution.price;
-
+    public void update(Execution e) {
         if (initialized == false) {
             // initialize tickers once if needed
             initialized = true;
-            initial.set(execution);
+            initial.set(e);
 
             for (Ticker ticker : tickers) {
-                ticker.init(execution, this);
+                ticker.init(e, this);
             }
         } else {
             // update tickers
-            update(tickers[0], execution, price, price.compareTo(latest.v.price));
+            update(tickers[0], e, e.price, e.price.compareTo(latest.v.price));
         }
 
         // update totality of related values
-        if (execution.side == Side.BUY) {
-            longVolume = longVolume.plus(execution.size);
-            longPriceIncrease = longPriceIncrease.plus(price.minus(latest.v.price));
+        if (e.side == Side.BUY) {
+            longVolume = longVolume.plus(e.size);
+            longPriceIncrease = longPriceIncrease.plus(e.price.minus(latest.v.price));
         } else {
-            shortVolume = shortVolume.plus(execution.size);
-            shortPriceDecrease = shortPriceDecrease.plus(latest.v.price.minus(price));
+            shortVolume = shortVolume.plus(e.size);
+            shortPriceDecrease = shortPriceDecrease.plus(latest.v.price.minus(e.price));
         }
 
         // update the latest execution at last
-        latest.set(execution);
+        latest.set(e);
 
         // notify update event
         for (Ticker ticker : tickers) {
