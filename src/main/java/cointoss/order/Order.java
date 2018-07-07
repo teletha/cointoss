@@ -44,9 +44,6 @@ public class Order implements Directional {
     /** The order attribute. */
     public final Map<String, Object> attributes = new HashMap();
 
-    /** The group id. */
-    public long group = -1;
-
     private Num triggerPrice;
 
     private Quantity quantity;

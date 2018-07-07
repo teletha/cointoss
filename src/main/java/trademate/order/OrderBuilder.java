@@ -184,7 +184,6 @@ public class OrderBuilder extends View {
         int increaseInterval = orderDivideIntervalAmount.value();
         Num priceInterval = orderPriceInterval.valueOr(Num.ZERO).multiply(side.isBuy() ? -1 : 1);
         Quantity quantity = orderQuantity.value();
-        long group = System.nanoTime();
 
         for (int i = 0; i < divideSize; i++) {
             Num optimizedSize = increaseInterval == 0 ? Num.ZERO
@@ -194,7 +193,6 @@ public class OrderBuilder extends View {
             Order order = Order.limit(side, size.plus(optimizedSize), optimizedPrice).type(quantity);
             order.state.set(State.REQUESTING);
             order.isDisposed().to(() -> set.sub.remove(order));
-            order.group = group;
 
             set.sub.add(order);
 

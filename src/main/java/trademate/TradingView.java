@@ -99,7 +99,6 @@ public class TradingView extends View {
     public final void order(Order order) {
         OrderSet set = new OrderSet();
         set.sub.add(order);
-        order.group = System.nanoTime();
 
         order(set);
     }
