@@ -98,7 +98,6 @@ public class TestableMarketService extends MarketService {
             child.id = "LOCAL-ACCEPTANCE-" + id++;
             child.state.set(State.ACTIVE);
             child.created.set(now.plusNanos(lag.generate()));
-            child.averagePrice.set(order.price);
             child.sizeRemaining.set(order.size);
             child.sizeExecuted.set(Num.ZERO);
 
@@ -255,9 +254,6 @@ public class TestableMarketService extends MarketService {
                 Num executedSize = Num.min(e.size, order.sizeRemaining.get());
                 if (order.type.isMarket() && executedSize.isNot(0)) {
                     order.marketMinPrice = order.isBuy() ? Num.max(order.marketMinPrice, e.price) : Num.min(order.marketMinPrice, e.price);
-                    order.averagePrice.set(v -> v.multiply(order.sizeExecuted)
-                            .plus(order.marketMinPrice.multiply(executedSize))
-                            .divide(executedSize.plus(order.sizeExecuted)));
                 }
                 order.sizeRemaining.set(v -> v.minus(executedSize));
                 order.sizeExecuted.set(v -> v.plus(executedSize));
@@ -265,7 +261,7 @@ public class TestableMarketService extends MarketService {
                 Execution exe = new Execution();
                 exe.side = order.side();
                 exe.size = exe.cumulativeSize = executedSize;
-                exe.price = order.type.isMarket() ? order.marketMinPrice : order.averagePrice.get();
+                exe.price = order.type.isMarket() ? order.marketMinPrice : order.price;
                 exe.exec_date = e.exec_date;
                 exe.yourOrder = order.id;
                 executeds.add(exe);
@@ -308,9 +304,9 @@ public class TestableMarketService extends MarketService {
         }
 
         if (order.isBuy()) {
-            return order.averagePrice.get().isGreaterThanOrEqual(e.price);
+            return order.price.isGreaterThanOrEqual(e.price);
         } else {
-            return order.averagePrice.get().isLessThanOrEqual(e.price);
+            return order.price.isLessThanOrEqual(e.price);
         }
     }
 
