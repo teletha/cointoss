@@ -204,7 +204,7 @@ class TestableMarketTest {
         assert market.validateOrderState(1, 0, 0, 0, 0);
         market.execute(Side.BUY, 1, 7);
         assert market.validateOrderState(0, 1, 0, 0, 0);
-        assert order.price.is(7);
+        assert order.averagePrice.get().is(7);
 
         order = Order.marketShort(1).when(8);
         market.requestTo(order);
@@ -214,7 +214,7 @@ class TestableMarketTest {
         assert market.validateOrderState(1, 1, 0, 0, 0);
         market.execute(Side.BUY, 1, 9);
         assert market.validateOrderState(0, 2, 0, 0, 0);
-        assert order.price.is(9);
+        assert order.averagePrice.get().is(9);
     }
 
     @Test
@@ -251,7 +251,7 @@ class TestableMarketTest {
         assert market.validateOrderState(1, 0, 0, 0, 0);
         market.execute(Side.BUY, 1, 13);
         assert market.validateOrderState(0, 1, 0, 0, 0);
-        assert order.price.is(13);
+        assert order.averagePrice.get().is(13);
 
         order = Order.marketLong(1).when(12);
         market.requestTo(order);
@@ -261,7 +261,7 @@ class TestableMarketTest {
         assert market.validateOrderState(1, 1, 0, 0, 0);
         market.execute(Side.BUY, 1, 11);
         assert market.validateOrderState(0, 2, 0, 0, 0);
-        assert order.price.is(11);
+        assert order.averagePrice.get().is(11);
     }
 
     @Test
@@ -382,44 +382,44 @@ class TestableMarketTest {
     void marketLong() {
         market.requestTo(Order.marketLong(1));
         market.execute(Side.SELL, 1, 10);
-        assert market.orders().get(0).price.is(10);
+        assert market.orders().get(0).averagePrice.get().is(10);
         assert market.orders().get(0).sizeExecuted.get().is(1);
 
         // divide
         market.requestTo(Order.marketLong(10));
         market.execute(Side.BUY, 5, 10);
         market.execute(Side.BUY, 5, 20);
-        assert market.orders().get(1).price.is(15);
+        assert market.orders().get(1).averagePrice.get().is(15);
         assert market.orders().get(1).sizeExecuted.get().is(10);
 
         // divide overflow
         market.requestTo(Order.marketLong(10));
         market.execute(Side.BUY, 5, 10);
         market.execute(Side.BUY, 14, 20);
-        assert market.orders().get(2).price.is(15);
+        assert market.orders().get(2).averagePrice.get().is(15);
         assert market.orders().get(2).sizeExecuted.get().is(10);
 
         // divide underflow
         market.requestTo(Order.marketLong(10));
         market.execute(Side.BUY, 5, 10);
         market.execute(Side.BUY, 3, 20);
-        assert market.orders().get(3).price.is("13.75");
+        assert market.orders().get(3).averagePrice.get().is("13.75");
         assert market.orders().get(3).sizeExecuted.get().is(8);
         market.execute(Side.BUY, 2, 20);
-        assert market.orders().get(3).price.is("15");
+        assert market.orders().get(3).averagePrice.get().is("15");
 
         // down price
         market.requestTo(Order.marketLong(10));
         market.execute(Side.BUY, 5, 10);
         market.execute(Side.BUY, 5, 5);
-        assert market.orders().get(4).price.is("10");
+        assert market.orders().get(4).averagePrice.get().is("10");
         assert market.orders().get(4).sizeExecuted.get().is(10);
 
         // up price
         market.requestTo(Order.marketLong(10));
         market.execute(Side.BUY, 5, 10);
         market.execute(Side.BUY, 5, 20);
-        assert market.orders().get(5).price.is("15");
+        assert market.orders().get(5).averagePrice.get().is("15");
         assert market.orders().get(5).sizeExecuted.get().is(10);
     }
 
@@ -428,7 +428,7 @@ class TestableMarketTest {
         Order order = Order.marketShort(1);
         market.requestTo(order);
         market.execute(Side.SELL, 1, 10);
-        assert order.price.is(10);
+        assert order.averagePrice.get().is(10);
         assert order.sizeExecuted.get().is(1);
 
         // divide
@@ -436,7 +436,7 @@ class TestableMarketTest {
         market.requestTo(order);
         market.execute(Side.BUY, 5, 10);
         market.execute(Side.BUY, 5, 5);
-        assert order.price.is("7.5");
+        assert order.averagePrice.get().is("7.5");
         assert order.sizeExecuted.get().is(10);
 
         // divide overflow
@@ -444,7 +444,7 @@ class TestableMarketTest {
         market.requestTo(order);
         market.execute(Side.BUY, 5, 10);
         market.execute(Side.BUY, 14, 5);
-        assert order.price.is("7.5");
+        assert order.averagePrice.get().is("7.5");
         assert order.sizeExecuted.get().is(10);
 
         // divide underflow
@@ -452,17 +452,17 @@ class TestableMarketTest {
         market.requestTo(order);
         market.execute(Side.BUY, 5, 20);
         market.execute(Side.BUY, 3, 15);
-        assert order.price.is("18.125");
+        assert order.averagePrice.get().is("18.125");
         assert order.sizeExecuted.get().is(8);
         market.execute(Side.BUY, 2, 10);
-        assert order.price.is("16.5");
+        assert order.averagePrice.get().is("16.5");
 
         // down price
         order = Order.marketShort(10);
         market.requestTo(order);
         market.execute(Side.BUY, 5, 10);
         market.execute(Side.BUY, 5, 5);
-        assert order.price.is("7.5");
+        assert order.averagePrice.get().is("7.5");
         assert order.sizeExecuted.get().is(10);
 
         // up price
@@ -470,7 +470,7 @@ class TestableMarketTest {
         market.requestTo(order);
         market.execute(Side.BUY, 5, 10);
         market.execute(Side.BUY, 5, 20);
-        assert order.price.is("10");
+        assert order.averagePrice.get().is("10");
         assert order.sizeExecuted.get().is(10);
     }
 

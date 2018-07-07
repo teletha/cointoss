@@ -287,7 +287,10 @@ public class Order implements Directional {
      * @return
      */
     public static Order limit(Side position, Num size, Num price) {
-        return new Order(position, size, price, null, null);
+        Order order = new Order(position, size, price, null, null);
+        order.averagePrice.set(price);
+
+        return order;
     }
 
     /**
@@ -469,7 +472,7 @@ public class Order implements Directional {
      */
     @Override
     public String toString() {
-        return side().mark() + size + "@" + price + " 残" + sizeRemaining + " 済" + sizeExecuted + " " + created;
+        return side().mark() + size + "@" + averagePrice + " 残" + sizeRemaining + " 済" + sizeExecuted + " " + created;
     }
 
     /**
