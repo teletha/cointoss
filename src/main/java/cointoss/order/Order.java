@@ -385,40 +385,54 @@ public class Order implements Directional {
     }
 
     /**
-     * <p>
-     * Utility.
-     * </p>
+     * Check the order {@link State}.
      * 
-     * @return
+     * @return The result.
      */
     public final boolean isExpired() {
         return state.is(State.EXPIRED);
     }
 
     /**
-     * <p>
-     * Utility.
-     * </p>
+     * Check the order {@link State}.
      * 
-     * @return
+     * @return The result.
      */
-    public boolean isCanceled() {
+    public final boolean isNotExpired() {
+        return isExpired() == false;
+    }
+
+    /**
+     * Check the order {@link State}.
+     * 
+     * @return The result.
+     */
+    public final boolean isCanceled() {
         return state.is(State.CANCELED);
     }
 
     /**
-     * <p>
-     * Utility.
-     * </p>
+     * Check the order {@link State}.
      * 
-     * @return
+     * @return The result.
+     */
+    public final boolean isNotCanceled() {
+        return isCanceled() == false;
+    }
+
+    /**
+     * Check the order {@link State}.
+     * 
+     * @return The result.
      */
     public final boolean isCompleted() {
         return state.is(State.COMPLETED);
     }
 
     /**
-     * @return
+     * Check the order {@link State}.
+     *
+     * @return The result.
      */
     public final boolean isNotCompleted() {
         return isCompleted() == false;
