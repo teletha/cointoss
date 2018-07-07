@@ -190,7 +190,7 @@ public class Market implements Disposable {
             order.id = id;
             order.created.set(ZonedDateTime.now());
             order.averagePrice.set(order.price);
-            order.remaining.set(order.size);
+            order.sizeRemaining.set(order.size);
             order.state.set(ACTIVE);
 
             orderItems.add(order);
@@ -286,18 +286,17 @@ public class Market implements Disposable {
         }
 
         // for order state
-        Num executed = Num.min(order.remaining, exe.size);
+        Num executed = Num.min(order.sizeRemaining, exe.size);
 
         if (order.type.isMarket() && executed.isNot(0)) {
-            order.averagePrice.set(v -> v.multiply(order.executed_size)
-                    .plus(exe.price.multiply(executed))
-                    .divide(executed.plus(order.executed_size)));
+            order.averagePrice
+                    .set(v -> v.multiply(order.sizeExecuted).plus(exe.price.multiply(executed)).divide(executed.plus(order.sizeExecuted)));
         }
 
-        order.executed_size.set(v -> v.plus(executed));
-        order.remaining.set(v -> v.minus(executed));
+        order.sizeExecuted.set(v -> v.plus(executed));
+        order.sizeRemaining.set(v -> v.minus(executed));
 
-        if (order.remaining.is(Num.ZERO)) {
+        if (order.sizeRemaining.is(Num.ZERO)) {
             order.state.set(State.COMPLETED);
             orderItems.remove(order); // complete order
         }

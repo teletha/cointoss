@@ -29,20 +29,32 @@ import kiss.Variable;
  */
 public class Order implements Directional {
 
-    /** The ordered position. */
-    public final Side side;
-
-    /** The ordered size. */
-    public final Num size;
-
-    /** The ordered price. */
-    public final Num price;
+    /** The order type */
+    public final OrderType type;
 
     /** The order state */
     public final Variable<State> state = Variable.of(State.INIT);
 
-    /** The order type */
-    public final OrderType type;
+    /** The ordered position. */
+    public final Side side;
+
+    /** The ordered price. */
+    public final Num price;
+
+    /** The ordered size. */
+    public final Num size;
+
+    /** The remaining size */
+    public final Variable<Num> sizeRemaining;
+
+    /** The executed size */
+    public final Variable<Num> sizeExecuted = Variable.of(Num.ZERO);
+
+    /** The canceled size */
+    public final Variable<Num> sizeCanceled = Variable.of(Num.ZERO);
+
+    /** The order created date-time */
+    public final Variable<ZonedDateTime> created = Variable.of(ZonedDateTime.now());
 
     /** The order attribute. */
     public final Map<String, Object> attributes = new HashMap();
@@ -71,8 +83,7 @@ public class Order implements Directional {
         this.size = Objects.requireNonNull(size);
         this.price = price == null ? Num.ZERO : price;
         this.type = price == null || price.isZero() ? OrderType.MARKET : OrderType.LIMIT;
-        this.remaining = Variable.of(size);
-        this.executed_size = Variable.of(Num.ZERO);
+        this.sizeRemaining = Variable.of(size);
 
         when(priceLimit);
         type(quantity);
@@ -95,8 +106,7 @@ public class Order implements Directional {
         this.price = price;
         this.size = size;
         this.type = type;
-        this.remaining = Variable.of(size);
-        this.executed_size = Variable.of(Num.ZERO);
+        this.sizeRemaining = Variable.of(size);
     }
 
     /**
@@ -372,21 +382,6 @@ public class Order implements Directional {
     /** The server ID */
     public String id;
 
-    /** The order date */
-    public Variable<ZonedDateTime> created = Variable.of(ZonedDateTime.now());
-
-    /** The remaining size */
-    public final Variable<Num> remaining;
-
-    /** The executed size */
-    public final Variable<Num> executed_size;
-
-    /** The canceled size */
-    public Num cancel_size;
-
-    /** The total commited size */
-    public Num total_commission;
-
     /** Order avarage price */
     public final Variable<Num> averagePrice = Variable.of(Num.ZERO);
 
@@ -477,7 +472,7 @@ public class Order implements Directional {
      */
     @Override
     public String toString() {
-        return side().mark() + size + "@" + averagePrice + " 残" + remaining + " 済" + executed_size + " " + created;
+        return side().mark() + size + "@" + averagePrice + " 残" + sizeRemaining + " 済" + sizeExecuted + " " + created;
     }
 
     /**

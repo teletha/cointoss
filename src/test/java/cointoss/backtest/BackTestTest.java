@@ -94,7 +94,7 @@ class BackTestTest {
                                                 .take(1)
                                                 .to(x -> {
                                                     market.cancel(exit).to(() -> {
-                                                        entry.log("30秒待っても処理されないので指値をキャンセルして成行決済 " + exit.remaining);
+                                                        entry.log("30秒待っても処理されないので指値をキャンセルして成行決済 " + exit.sizeRemaining);
                                                         // entry.exitMarket(exit.outstanding_size);
                                                     });
                                                 });
