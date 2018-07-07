@@ -425,44 +425,6 @@ public class Order implements Directional {
     }
 
     /**
-     * Test whether this order can trade with the specified {@link Execution}.
-     * 
-     * @param e A target {@link Execution}.
-     * @return A result.
-     */
-    public final boolean isTradableWith(Execution e) {
-        return isTradableSizeWith(e) && isTradablePriceWith(e);
-    }
-
-    /**
-     * Test whether this order price can trade with the specified {@link Execution}.
-     * 
-     * @param e A target {@link Execution}.
-     * @return A result.
-     */
-    public final boolean isTradablePriceWith(Execution e) {
-        if (child_order_type == OrderType.MARKET) {
-            return true;
-        }
-
-        if (isBuy()) {
-            return averagePrice.get().isGreaterThanOrEqual(e.price);
-        } else {
-            return averagePrice.get().isLessThanOrEqual(e.price);
-        }
-    }
-
-    /**
-     * Test whether this order size can trade with the specified {@link Execution}.
-     * 
-     * @param e A target {@link Execution}.
-     * @return A result.
-     */
-    public final boolean isTradableSizeWith(Execution e) {
-        return size.isLessThanOrEqual(e.size);
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override

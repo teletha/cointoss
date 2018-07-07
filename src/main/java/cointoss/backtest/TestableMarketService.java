@@ -139,7 +139,8 @@ public class TestableMarketService extends MarketService {
      */
     @Override
     public Execution exectutionLatest() {
-        // If this exception will be thrown, it is bug of this program. So we must rethrow the wrapped error
+        // If this exception will be thrown, it is bug of this program. So we must rethrow the
+        // wrapped error
         // in here.
         throw new Error();
     }
@@ -235,14 +236,14 @@ public class TestableMarketService extends MarketService {
             }
 
             // check quantity condition
-            if (order.quantity() == Quantity.FillOrKill && !order.isTradableWith(e)) {
+            if (order.quantity() == Quantity.FillOrKill && !validateTradable(order, e)) {
                 iterator.remove();
                 orderAll.remove(order);
                 continue;
             }
 
             if (order.quantity() == Quantity.ImmediateOrCancel) {
-                if (order.isTradablePriceWith(e)) {
+                if (validateTradableByPrice(order, e)) {
                     Num min = Num.min(e.size, order.remaining.get());
                     order.remaining.set(min);
                 } else {
@@ -252,7 +253,7 @@ public class TestableMarketService extends MarketService {
                 }
             }
 
-            if (order.isTradablePriceWith(e)) {
+            if (validateTradableByPrice(order, e)) {
                 Num executedSize = Num.min(e.size, order.remaining.get());
                 if (order.child_order_type.isMarket() && executedSize.isNot(0)) {
                     order.marketMinPrice = order.isBuy() ? Num.max(order.marketMinPrice, e.price) : Num.min(order.marketMinPrice, e.price);
@@ -285,6 +286,44 @@ public class TestableMarketService extends MarketService {
             }
         }
         return e;
+    }
+
+    /**
+     * Test whether this order can trade with the specified {@link Execution}.
+     * 
+     * @param e A target {@link Execution}.
+     * @return A result.
+     */
+    private boolean validateTradable(Order order, Execution e) {
+        return validateTradableBySize(order, e) && validateTradableByPrice(order, e);
+    }
+
+    /**
+     * Test whether this order price can trade with the specified {@link Execution}.
+     * 
+     * @param e A target {@link Execution}.
+     * @return A result.
+     */
+    private boolean validateTradableByPrice(Order order, Execution e) {
+        if (order.child_order_type == OrderType.MARKET) {
+            return true;
+        }
+
+        if (order.isBuy()) {
+            return order.averagePrice.get().isGreaterThanOrEqual(e.price);
+        } else {
+            return order.averagePrice.get().isLessThanOrEqual(e.price);
+        }
+    }
+
+    /**
+     * Test whether this order size can trade with the specified {@link Execution}.
+     * 
+     * @param e A target {@link Execution}.
+     * @return A result.
+     */
+    private boolean validateTradableBySize(Order order, Execution e) {
+        return order.size.isLessThanOrEqual(e.size);
     }
 
     /**
