@@ -15,7 +15,11 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import cointoss.Execution;
+import cointoss.order.Order;
+import cointoss.order.Order.State;
+import cointoss.util.Chrono;
 import cointoss.util.MockNetwork;
+import cointoss.util.Num;
 
 /**
  * @version 2018/04/29 21:19:34
@@ -41,6 +45,28 @@ class MockBitFlyerService extends BitFlyerService {
      */
     protected void requestWillResponse(String... orderIds) {
         mockNetwork.request("/v1/me/sendchildorder").willResponse((Object[]) orderIds);
+    }
+
+    /**
+     * Set next response.
+     * 
+     * @param order
+     * @param acceptanceId
+     */
+    protected void ordersWillResponse(Order order, String acceptanceId) {
+        ChildOrderResponse o = new ChildOrderResponse();
+        o.child_order_acceptance_id = acceptanceId;
+        o.child_order_id = acceptanceId;
+        o.side = order.side;
+        o.price = order.price;
+        o.average_price = order.price;
+        o.size = order.size;
+        o.child_order_state = State.ACTIVE;
+        o.child_order_date = Chrono.DateTimeWithT.format(Chrono.utcNow());
+        o.outstanding_size = order.size;
+        o.executed_size = Num.ZERO;
+
+        mockNetwork.request("/v1/me/getchildorders").willResponse(o);
     }
 
     /**

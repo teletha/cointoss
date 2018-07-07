@@ -552,7 +552,7 @@ public class BitFlyerService extends MarketService {
     /**
      * @version 2018/02/14 13:36:32
      */
-    private static class ChildOrderResponse {
+    static class ChildOrderResponse {
 
         public Side side;
 

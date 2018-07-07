@@ -33,6 +33,13 @@ public class BitFlyerServiceTest {
     }
 
     @Test
+    void order() {
+        service.ordersWillResponse(Order.limitLong(1, 10), "FirstOrder");
+        List<Order> orders = service.orders().toList();
+        assert orders.size() == 1;
+    }
+
+    @Test
     void createPositionWhenOrderIsExecuted() {
         List<Execution> executions = service.executionsRealtimely().toList();
         List<Execution> positions = service.positions().toList();

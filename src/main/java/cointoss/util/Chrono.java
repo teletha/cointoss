@@ -23,25 +23,25 @@ public class Chrono {
     /** The UTC zone id. */
     public static final ZoneId UTC = ZoneId.of("UTC");
 
-    /** Reusable format. */
+    /** Reusable format. yyyy-MM-dd */
     public static final DateTimeFormatter Date = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-    /** Reusable format. */
+    /** Reusable format. yyyyMMdd */
     public static final DateTimeFormatter DateCompact = DateTimeFormatter.ofPattern("yyyyMMdd");
 
-    /** Reusable format. */
+    /** Reusable format. yyyy-MM-dd HH:mm:ss */
     public static final DateTimeFormatter DateTime = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-    /** Reusable format. */
+    /** Reusable format. yyyy-MM-dd'T'HH:mm:ss */
     public static final DateTimeFormatter DateTimeWithoutSec = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
-    /** Reusable format. */
+    /** Reusable format. yyyy-MM-dd'T'HH:mm:ss */
     public static final DateTimeFormatter DateTimeWithT = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
 
-    /** Reusable format. */
+    /** Reusable format. HH:mm:ss */
     public static final DateTimeFormatter Time = DateTimeFormatter.ofPattern("HH:mm:ss");
 
-    /** Reusable format. */
+    /** Reusable format. HH:mm */
     public static final DateTimeFormatter TimeWithoutSec = DateTimeFormatter.ofPattern("HH:mm");
 
     /**
