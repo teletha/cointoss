@@ -31,7 +31,7 @@ public class MarketTestSupport {
     public static final ZonedDateTime BaseDate = Chrono.utcNow().truncatedTo(ChronoUnit.DAYS);
 
     /** The execution id manager. */
-    private static final AtomicLong executionId = new AtomicLong();
+    private static final AtomicLong executionId = new AtomicLong(1); // don't use 0
 
     /**
      * Create {@link Execution}.

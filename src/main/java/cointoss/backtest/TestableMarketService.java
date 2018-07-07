@@ -98,7 +98,6 @@ public class TestableMarketService extends MarketService {
             child.id = "LOCAL-ACCEPTANCE-" + id++;
             child.state.set(State.ACTIVE);
             child.created.set(now.plusNanos(lag.generate()));
-            child.child_order_type = order.price.is(0) ? OrderType.MARKET : OrderType.LIMIT;
             child.averagePrice.set(order.price);
             child.remaining.set(order.size);
             child.cancel_size = Num.ZERO;
@@ -255,7 +254,7 @@ public class TestableMarketService extends MarketService {
 
             if (validateTradableByPrice(order, e)) {
                 Num executedSize = Num.min(e.size, order.remaining.get());
-                if (order.child_order_type.isMarket() && executedSize.isNot(0)) {
+                if (order.type.isMarket() && executedSize.isNot(0)) {
                     order.marketMinPrice = order.isBuy() ? Num.max(order.marketMinPrice, e.price) : Num.min(order.marketMinPrice, e.price);
                     order.averagePrice.set(v -> v.multiply(order.executed_size)
                             .plus(order.marketMinPrice.multiply(executedSize))
@@ -267,7 +266,7 @@ public class TestableMarketService extends MarketService {
                 Execution exe = new Execution();
                 exe.side = order.side();
                 exe.size = exe.cumulativeSize = executedSize;
-                exe.price = order.child_order_type.isMarket() ? order.marketMinPrice : order.averagePrice.get();
+                exe.price = order.type.isMarket() ? order.marketMinPrice : order.averagePrice.get();
                 exe.exec_date = e.exec_date;
                 exe.yourOrder = order.id;
                 executeds.add(exe);
@@ -305,7 +304,7 @@ public class TestableMarketService extends MarketService {
      * @return A result.
      */
     private boolean validateTradableByPrice(Order order, Execution e) {
-        if (order.child_order_type == OrderType.MARKET) {
+        if (order.type == OrderType.MARKET) {
             return true;
         }
 

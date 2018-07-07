@@ -60,7 +60,7 @@ class MockBitFlyerService extends BitFlyerService {
         o.addProperty("side", exe.side.name());
         o.addProperty("price", exe.price.toDouble());
         o.addProperty("size", exe.size.toDouble());
-        o.addProperty("exec_date", exe.exec_date.toString());
+        o.addProperty("exec_date", BitFlyerService.RealTimeExecutionFormat.format(exe.exec_date) + "Z");
         o.addProperty("buy_child_order_acceptance_id", buyerId);
         o.addProperty("sell_child_order_acceptance_id", sellerId);
 

@@ -66,7 +66,7 @@ public class BitFlyerService extends MarketService {
     private static final DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss-");
 
     /** The realtime data format */
-    private static final DateTimeFormatter RealTimeExecutionFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
+    static final DateTimeFormatter RealTimeExecutionFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
 
     /** The max acquirable execution size. */
     private static final int MAX = 499;
@@ -742,8 +742,8 @@ public class BitFlyerService extends MarketService {
 
         /**
          * <p>
-         * Analyze Taker's order ID and obtain approximate order time (Since there is a bot which specifies
-         * non-standard id format, ignore it in that case).
+         * Analyze Taker's order ID and obtain approximate order time (Since there is a bot which
+         * specifies non-standard id format, ignore it in that case).
          * </p>
          * <ol>
          * <li>Execution Date : UTC</li>

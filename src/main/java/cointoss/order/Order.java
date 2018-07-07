@@ -41,6 +41,9 @@ public class Order implements Directional {
     /** The order state */
     public final Variable<State> state = Variable.of(State.INIT);
 
+    /** The order type */
+    public final OrderType type;
+
     /** The order attribute. */
     public final Map<String, Object> attributes = new HashMap();
 
@@ -67,12 +70,33 @@ public class Order implements Directional {
         this.side = Objects.requireNonNull(position);
         this.size = Objects.requireNonNull(size);
         this.price = price == null ? Num.ZERO : price;
-        this.child_order_type = price == null ? OrderType.MARKET : OrderType.LIMIT;
+        this.type = price == null || price.isZero() ? OrderType.MARKET : OrderType.LIMIT;
         this.remaining = Variable.of(size);
         this.executed_size = Variable.of(Num.ZERO);
 
         when(priceLimit);
         type(quantity);
+    }
+
+    /**
+     * New {@link Order}.
+     * 
+     * @param id
+     * @param side
+     * @param price
+     * @param size
+     * @param type
+     * @param accepted
+     * @param expired
+     */
+    public Order(String id, Side side, Num price, Num size, OrderType type, ZonedDateTime accepted, ZonedDateTime expired) {
+        this.id = id;
+        this.side = side;
+        this.price = price;
+        this.size = size;
+        this.type = type;
+        this.remaining = Variable.of(size);
+        this.executed_size = Variable.of(Num.ZERO);
     }
 
     /**
@@ -348,14 +372,8 @@ public class Order implements Directional {
     /** The server ID */
     public String id;
 
-    /** Order type */
-    public OrderType child_order_type;
-
     /** The order date */
     public Variable<ZonedDateTime> created = Variable.of(ZonedDateTime.now());
-
-    /** The expire date */
-    public ZonedDateTime expire_date;
 
     /** The remaining size */
     public final Variable<Num> remaining;

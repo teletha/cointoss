@@ -158,8 +158,8 @@ public class Chrono {
     }
 
     /**
-     * Ensures that the specified date is between the minimum and maximum date.If the specified date is
-     * out of range, the closest date is returned.
+     * Ensures that the specified date is between the minimum and maximum date.If the specified date
+     * is out of range, the closest date is returned.
      * 
      * @param min A minimum date.
      * @param target A target date.
