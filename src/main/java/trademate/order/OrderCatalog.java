@@ -82,7 +82,7 @@ public class OrderCatalog extends View {
                 .model(Order.class, Order::side)
                 .render((ui, item) -> ui.text(item).styleOnly(item));
         requestedOrdersAmount.modelByProperty(OrderSet.class, o -> o.amount).modelByVar(Order.class, o -> o.sizeRemaining);
-        requestedOrdersPrice.modelByProperty(OrderSet.class, o -> o.averagePrice).model(Order.class, o -> o.price);
+        requestedOrdersPrice.modelByProperty(OrderSet.class, o -> o.averagePrice).model(Order.class, o -> o.price.v);
     }
 
     /**
@@ -151,7 +151,7 @@ public class OrderCatalog extends View {
      */
     private void reorderClosely(Order order) {
         Viewtify.inWorker(() -> {
-            Num price = view.market().orderBook.computeBestPrice(order.side, order.price, optimizeThreshold.value(), Num.of(2));
+            Num price = view.market().orderBook.computeBestPrice(order.side, order.price.v, optimizeThreshold.value(), Num.of(2));
 
             view.market().cancel(order).to(o -> {
                 view.console.info("{} is canceled.", o);

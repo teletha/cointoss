@@ -146,7 +146,7 @@ public class BitFlyerService extends MarketService {
             ChildOrderRequest request = new ChildOrderRequest();
             request.child_order_type = order.isLimit() ? "LIMIT" : "MARKET";
             request.minute_to_expire = 60 * 24;
-            request.price = order.price.toInt();
+            request.price = order.price.v.toInt();
             request.product_code = marketName;
             request.side = order.side().name();
             request.size = order.size.toDouble();
@@ -159,7 +159,7 @@ public class BitFlyerService extends MarketService {
             request.ord_type = order.isLimit() ? "LIMIT" : "MARKET";
             request.minute_to_expire = 60 * 24;
             request.order_ref_id = id;
-            request.price = order.price.toInt();
+            request.price = order.price.v.toInt();
             request.product_code = marketName;
             request.side = order.side().name();
             request.size = order.size.toDouble();
@@ -577,7 +577,7 @@ public class BitFlyerService extends MarketService {
         public Order toOrder() {
             Order o = Order.limit(side, size, price);
             o.id = child_order_acceptance_id;
-            o.averagePrice.set(average_price);
+            o.price.set(average_price);
             o.sizeRemaining.set(outstanding_size);
             o.sizeExecuted.set(executed_size);
             o.created.set(LocalDateTime.parse(child_order_date, Chrono.DateTimeWithT).atZone(Chrono.UTC));

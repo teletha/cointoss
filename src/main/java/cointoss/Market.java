@@ -189,7 +189,6 @@ public class Market implements Disposable {
         }).take(40).delay(100, MILLISECONDS)).map(id -> {
             order.id = id;
             order.created.set(ZonedDateTime.now());
-            order.averagePrice.set(order.price);
             order.sizeRemaining.set(order.size);
             order.state.set(ACTIVE);
 
@@ -289,7 +288,7 @@ public class Market implements Disposable {
         Num executed = Num.min(order.sizeRemaining, exe.size);
 
         if (order.type.isMarket() && executed.isNot(0)) {
-            order.averagePrice
+            order.price
                     .set(v -> v.multiply(order.sizeExecuted).plus(exe.price.multiply(executed)).divide(executed.plus(order.sizeExecuted)));
         }
 

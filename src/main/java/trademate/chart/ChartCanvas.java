@@ -223,7 +223,7 @@ public class ChartCanvas extends Region {
         chart.market.observe().to(market -> {
             market.orders.added.on(Viewtify.UIThread).to(o -> {
                 LineMark mark = o.isBuy() ? orderBuyPrice : orderSellPrice;
-                TickLable label = mark.createLabel(o.price);
+                TickLable label = mark.createLabel(o.price.v);
 
                 o.state.observe().take(State.CANCELED, State.COMPLETED).take(1).on(Viewtify.UIThread).to(() -> {
                     mark.remove(label);

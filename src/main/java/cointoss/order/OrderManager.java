@@ -83,9 +83,8 @@ public class OrderManager {
         Num executed = Num.min(order.sizeRemaining, exe.size);
 
         if (order.type.isMarket() && executed.isNot(0)) {
-            order.averagePrice.set(v -> v.multiply(order.sizeExecuted)
-                    .plus(exe.price.multiply(executed))
-                    .divide(executed.plus(order.sizeExecuted)));
+            order.price
+                    .set(v -> v.multiply(order.sizeExecuted).plus(exe.price.multiply(executed)).divide(executed.plus(order.sizeExecuted)));
         }
 
         order.sizeExecuted.set(v -> v.plus(executed));

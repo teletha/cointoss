@@ -254,7 +254,7 @@ public class MarketLog {
                 ArrayDeque<Execution> executions = service.executions(start, start + size).toCollection(new ArrayDeque(size));
 
                 if (executions.isEmpty() == false) {
-                    log.info("REST write from {}.  size {}", start, executions.size());
+                    log.info("REST write from {}.  size {}", executions.getFirst().exec_date, executions.size());
                     executions.forEach(observer);
                     start = executions.getLast().id;
                 } else {

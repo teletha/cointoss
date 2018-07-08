@@ -39,7 +39,7 @@ public class Order implements Directional {
     public final Side side;
 
     /** The ordered price. */
-    public final Num price;
+    public final Variable<Num> price;
 
     /** The ordered size. */
     public final Num size;
@@ -81,32 +81,12 @@ public class Order implements Directional {
     protected Order(Side position, Num size, Num price, Num priceLimit, Quantity quantity) {
         this.side = Objects.requireNonNull(position);
         this.size = Objects.requireNonNull(size);
-        this.price = price == null ? Num.ZERO : price;
+        this.price = Variable.of(price == null ? Num.ZERO : price);
         this.type = price == null || price.isZero() ? OrderType.MARKET : OrderType.LIMIT;
         this.sizeRemaining = Variable.of(size);
 
         when(priceLimit);
         type(quantity);
-    }
-
-    /**
-     * New {@link Order}.
-     * 
-     * @param id
-     * @param side
-     * @param price
-     * @param size
-     * @param type
-     * @param accepted
-     * @param expired
-     */
-    public Order(String id, Side side, Num price, Num size, OrderType type, ZonedDateTime accepted, ZonedDateTime expired) {
-        this.id = id;
-        this.side = side;
-        this.price = price;
-        this.size = size;
-        this.type = type;
-        this.sizeRemaining = Variable.of(size);
     }
 
     /**
@@ -287,10 +267,7 @@ public class Order implements Directional {
      * @return
      */
     public static Order limit(Side position, Num size, Num price) {
-        Order order = new Order(position, size, price, null, null);
-        order.averagePrice.set(price);
-
-        return order;
+        return new Order(position, size, price, null, null);
     }
 
     /**
@@ -382,9 +359,6 @@ public class Order implements Directional {
     /** The server ID */
     public String id;
 
-    /** Order avarage price */
-    public final Variable<Num> averagePrice = Variable.of(Num.ZERO);
-
     /** INTERNAL USAGE */
     public Deque<Execution> executions = new ArrayDeque<>();
 
@@ -394,7 +368,7 @@ public class Order implements Directional {
      * @return
      */
     public final boolean isLimit() {
-        return price != null;
+        return price.v != null;
     }
 
     /**
@@ -472,7 +446,7 @@ public class Order implements Directional {
      */
     @Override
     public String toString() {
-        return side().mark() + size + "@" + averagePrice + " 残" + sizeRemaining + " 済" + sizeExecuted + " " + created;
+        return side().mark() + size + "@" + price + " 残" + sizeRemaining + " 済" + sizeExecuted + " " + created;
     }
 
     /**

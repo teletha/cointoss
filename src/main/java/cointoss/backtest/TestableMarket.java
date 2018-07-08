@@ -132,7 +132,7 @@ public class TestableMarket extends Market {
      */
     public void requestAndExecution(Order order) {
         request(order).to(id -> {
-            execute(order.side, order.size, order.price);
+            execute(order.side, order.size, order.price.v);
         });
     }
 
