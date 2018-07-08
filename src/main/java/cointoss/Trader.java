@@ -22,6 +22,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import cointoss.order.Order;
+import cointoss.order.RecordedExecutions;
 import cointoss.util.Num;
 import cointoss.util.Span;
 import kiss.Disposable;
@@ -373,7 +374,7 @@ public abstract class Trader implements Disposable {
          * @return
          */
         public final Span orderTime() {
-            Execution last = order.executions.peekLast();
+            Execution last = order.attribute(RecordedExecutions.class).peekLast();
             ZonedDateTime start = order.created.get();
             ZonedDateTime finish = last == null ? market.tickers.latest.v.exec_date : last.exec_date;
 
@@ -389,7 +390,7 @@ public abstract class Trader implements Disposable {
          * @return
          */
         public final Span holdTime() {
-            Execution first = order.executions.peekFirst();
+            Execution first = order.attribute(RecordedExecutions.class).peekFirst();
 
             if (first == null) {
                 return Span.ZERO;
@@ -402,7 +403,7 @@ public abstract class Trader implements Disposable {
                 finish = market.tickers.latest.v.exec_date;
             } else {
                 for (Order order : exit) {
-                    Execution last = order.executions.peekLast();
+                    Execution last = order.attribute(RecordedExecutions.class).peekLast();
 
                     if (last != null) {
                         finish = last.exec_date;
@@ -417,12 +418,12 @@ public abstract class Trader implements Disposable {
             if (finish.isBefore(start)) {
                 // If this exception will be thrown, it is bug of this program. So we must rethrow
                 // the wrapped error in here.
-                for (Execution e : order.executions) {
+                for (Execution e : order.attribute(RecordedExecutions.class)) {
                     System.out.println("Start Exe " + e);
                 }
 
                 for (Order o : exit) {
-                    for (Execution e : o.executions) {
+                    for (Execution e : o.attribute(RecordedExecutions.class)) {
                         System.out.println("Exit Exe " + e);
                     }
                 }

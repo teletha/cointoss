@@ -95,6 +95,6 @@ public class OrderManager {
         }
 
         // pairing order and execution
-        order.executions.add(exe);
+        order.attribute(RecordedExecutions.class).add(exe);
     }
 }

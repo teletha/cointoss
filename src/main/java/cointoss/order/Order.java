@@ -10,8 +10,6 @@
 package cointoss.order;
 
 import java.time.ZonedDateTime;
-import java.util.ArrayDeque;
-import java.util.Deque;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -334,9 +332,6 @@ public class Order implements Directional {
     public static Order limitShort(int size, int price) {
         return limitShort(Num.of(size), Num.of(price));
     }
-
-    /** INTERNAL USAGE */
-    public Deque<Execution> executions = new ArrayDeque<>();
 
     /**
      * Detect order type.

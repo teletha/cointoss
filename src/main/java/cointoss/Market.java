@@ -24,6 +24,7 @@ import cointoss.order.Order;
 import cointoss.order.OrderBook;
 import cointoss.order.OrderManager;
 import cointoss.order.OrderState;
+import cointoss.order.RecordedExecutions;
 import cointoss.ticker.TickerManager;
 import cointoss.util.Num;
 import kiss.Disposable;
@@ -301,6 +302,6 @@ public class Market implements Disposable {
         }
 
         // pairing order and execution
-        order.executions.add(exe);
+        order.attribute(RecordedExecutions.class).add(exe);
     }
 }
