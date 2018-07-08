@@ -64,7 +64,7 @@ public class Order implements Directional {
 
     private Num triggerPrice;
 
-    private Quantity quantity;
+    private QuantityConditionsEnforcement quantity;
 
     /** The event listeners. */
     public final Signaling<Execution> listeners = new Signaling();
@@ -81,7 +81,7 @@ public class Order implements Directional {
      * @param price
      * @param size
      */
-    protected Order(Side position, Num size, Num price, Num priceLimit, Quantity quantity) {
+    protected Order(Side position, Num size, Num price, Num priceLimit, QuantityConditionsEnforcement quantity) {
         this.side = Objects.requireNonNull(position);
         this.size = Objects.requireNonNull(size);
         this.price = Variable.of(price == null ? Num.ZERO : price);
@@ -134,7 +134,7 @@ public class Order implements Directional {
      * 
      * @return The quantity property.
      */
-    public Quantity quantity() {
+    public QuantityConditionsEnforcement quantity() {
         return quantity;
     }
 
@@ -144,7 +144,7 @@ public class Order implements Directional {
      * @return The quantity property.
      */
     @SuppressWarnings("unused")
-    private Quantity getQuantity() {
+    private QuantityConditionsEnforcement getQuantity() {
         return quantity;
     }
 
@@ -154,7 +154,7 @@ public class Order implements Directional {
      * @param quantity The quantity value to set.
      */
     @SuppressWarnings("unused")
-    private void setQuantity(Quantity quantity) {
+    private void setQuantity(QuantityConditionsEnforcement quantity) {
         this.quantity = quantity;
     }
 
@@ -187,8 +187,8 @@ public class Order implements Directional {
      * @param quantity
      * @return
      */
-    public Order type(Quantity quantity) {
-        this.quantity = quantity == null ? Quantity.GoodTillCanceled : quantity;
+    public Order type(QuantityConditionsEnforcement quantity) {
+        this.quantity = quantity == null ? QuantityConditionsEnforcement.GoodTillCanceled : quantity;
 
         return this;
     }
@@ -334,22 +334,6 @@ public class Order implements Directional {
         return limitShort(Num.of(size), Num.of(price));
     }
 
-    /**
-     * @version 2017/07/22 18:02:37
-     */
-    public static enum Quantity {
-        GoodTillCanceled("GTC"), ImmediateOrCancel("IOC"), FillOrKill("FOK");
-
-        public final String abbreviation;
-
-        /**
-         * @param abbreviation
-         */
-        private Quantity(String abbreviation) {
-            this.abbreviation = abbreviation;
-        }
-    }
-
     /** INTERNAL USAGE */
     public Deque<Execution> executions = new ArrayDeque<>();
 
@@ -441,7 +425,7 @@ public class Order implements Directional {
     }
 
     /**
-     * @version 2017/12/02 14:54:40
+     * @version 2018/07/08 10:37:43
      */
     public enum State {
         INIT, REQUESTING, ACTIVE, COMPLETED, CANCELED, EXPIRED, REJECTED;

@@ -19,8 +19,8 @@ import org.junit.jupiter.api.Test;
 import cointoss.MarketTestSupport;
 import cointoss.Side;
 import cointoss.order.Order;
-import cointoss.order.Order.Quantity;
 import cointoss.order.Order.State;
+import cointoss.order.QuantityConditionsEnforcement;
 import cointoss.util.Num;
 
 /**
@@ -267,27 +267,27 @@ class TestableMarketTest {
     @Test
     void fillOrKillLong() {
         // success
-        market.requestTo(Order.limitLong(10, 10).type(Quantity.FillOrKill));
+        market.requestTo(Order.limitLong(10, 10).type(QuantityConditionsEnforcement.FillOrKill));
         market.execute(Side.BUY, 10, 10);
         assert market.validateOrderState(0, 1, 0, 0, 0);
 
         // large price will success
-        market.requestTo(Order.limitLong(10, 10).type(Quantity.FillOrKill));
+        market.requestTo(Order.limitLong(10, 10).type(QuantityConditionsEnforcement.FillOrKill));
         market.execute(Side.BUY, 10, 9);
         assert market.validateOrderState(0, 2, 0, 0, 0);
 
         // large size will success
-        market.requestTo(Order.limitLong(10, 10).type(Quantity.FillOrKill));
+        market.requestTo(Order.limitLong(10, 10).type(QuantityConditionsEnforcement.FillOrKill));
         market.execute(Side.BUY, 15, 10);
         assert market.validateOrderState(0, 3, 0, 0, 0);
 
         // less size will be failed
-        market.requestTo(Order.limitLong(10, 10).type(Quantity.FillOrKill));
+        market.requestTo(Order.limitLong(10, 10).type(QuantityConditionsEnforcement.FillOrKill));
         market.execute(Side.BUY, 4, 10);
         assert market.validateOrderState(0, 3, 0, 0, 0);
 
         // less price will be failed
-        market.requestTo(Order.limitLong(10, 10).type(Quantity.FillOrKill));
+        market.requestTo(Order.limitLong(10, 10).type(QuantityConditionsEnforcement.FillOrKill));
         market.execute(Side.BUY, 10, 11);
         assert market.validateOrderState(0, 3, 0, 0, 0);
     }
@@ -295,27 +295,27 @@ class TestableMarketTest {
     @Test
     void fillOrKillShort() {
         // success
-        market.requestTo(Order.limitShort(1, 10).type(Quantity.FillOrKill));
+        market.requestTo(Order.limitShort(1, 10).type(QuantityConditionsEnforcement.FillOrKill));
         market.execute(Side.SELL, 1, 10);
         assert market.validateOrderState(0, 1, 0, 0, 0);
 
         // large price will success
-        market.requestTo(Order.limitShort(1, 10).type(Quantity.FillOrKill));
+        market.requestTo(Order.limitShort(1, 10).type(QuantityConditionsEnforcement.FillOrKill));
         market.execute(Side.SELL, 1, 11);
         assert market.validateOrderState(0, 2, 0, 0, 0);
 
         // large size will success
-        market.requestTo(Order.limitShort(10, 10).type(Quantity.FillOrKill));
+        market.requestTo(Order.limitShort(10, 10).type(QuantityConditionsEnforcement.FillOrKill));
         market.execute(Side.SELL, 15, 10);
         assert market.validateOrderState(0, 3, 0, 0, 0);
 
         // less size will be failed
-        market.requestTo(Order.limitShort(10, 10).type(Quantity.FillOrKill));
+        market.requestTo(Order.limitShort(10, 10).type(QuantityConditionsEnforcement.FillOrKill));
         market.execute(Side.SELL, 4, 10);
         assert market.validateOrderState(0, 3, 0, 0, 0);
 
         // less price will be failed
-        market.requestTo(Order.limitShort(10, 10).type(Quantity.FillOrKill));
+        market.requestTo(Order.limitShort(10, 10).type(QuantityConditionsEnforcement.FillOrKill));
         market.execute(Side.SELL, 10, 9);
         assert market.validateOrderState(0, 3, 0, 0, 0);
     }
@@ -323,28 +323,28 @@ class TestableMarketTest {
     @Test
     void immediateOrCancelLong() {
         // success
-        market.requestTo(Order.limitLong(1, 10).type(Quantity.ImmediateOrCancel));
+        market.requestTo(Order.limitLong(1, 10).type(QuantityConditionsEnforcement.ImmediateOrCancel));
         market.execute(Side.BUY, 1, 10);
         assert market.validateOrderState(0, 1, 0, 0, 0);
 
         // large price will success
-        market.requestTo(Order.limitLong(1, 10).type(Quantity.ImmediateOrCancel));
+        market.requestTo(Order.limitLong(1, 10).type(QuantityConditionsEnforcement.ImmediateOrCancel));
         market.execute(Side.BUY, 1, 9);
         assert market.validateOrderState(0, 2, 0, 0, 0);
 
         // large size will success
-        market.requestTo(Order.limitLong(10, 10).type(Quantity.ImmediateOrCancel));
+        market.requestTo(Order.limitLong(10, 10).type(QuantityConditionsEnforcement.ImmediateOrCancel));
         market.execute(Side.BUY, 5, 10);
         assert market.validateOrderState(0, 3, 0, 0, 0);
 
         // less size will success
-        market.requestTo(Order.limitLong(10, 10).type(Quantity.ImmediateOrCancel));
+        market.requestTo(Order.limitLong(10, 10).type(QuantityConditionsEnforcement.ImmediateOrCancel));
         market.execute(Side.BUY, 4, 10);
         assert market.validateOrderState(0, 4, 0, 0, 0);
         assert market.orders().get(3).sizeExecuted.get().is(4);
 
         // less price will be failed
-        market.requestTo(Order.limitLong(1, 10).type(Quantity.ImmediateOrCancel));
+        market.requestTo(Order.limitLong(1, 10).type(QuantityConditionsEnforcement.ImmediateOrCancel));
         market.execute(Side.BUY, 1, 11);
         assert market.validateOrderState(0, 4, 0, 0, 0);
     }
@@ -352,28 +352,28 @@ class TestableMarketTest {
     @Test
     void immediateOrCancelShort() {
         // success
-        market.requestTo(Order.limitShort(1, 10).type(Quantity.ImmediateOrCancel));
+        market.requestTo(Order.limitShort(1, 10).type(QuantityConditionsEnforcement.ImmediateOrCancel));
         market.execute(Side.SELL, 1, 10);
         assert market.validateOrderState(0, 1, 0, 0, 0);
 
         // large price will success
-        market.requestTo(Order.limitShort(1, 10).type(Quantity.ImmediateOrCancel));
+        market.requestTo(Order.limitShort(1, 10).type(QuantityConditionsEnforcement.ImmediateOrCancel));
         market.execute(Side.SELL, 1, 11);
         assert market.validateOrderState(0, 2, 0, 0, 0);
 
         // large size will success
-        market.requestTo(Order.limitShort(10, 10).type(Quantity.ImmediateOrCancel));
+        market.requestTo(Order.limitShort(10, 10).type(QuantityConditionsEnforcement.ImmediateOrCancel));
         market.execute(Side.SELL, 15, 10);
         assert market.validateOrderState(0, 3, 0, 0, 0);
 
         // less size will success
-        market.requestTo(Order.limitShort(10, 10).type(Quantity.ImmediateOrCancel));
+        market.requestTo(Order.limitShort(10, 10).type(QuantityConditionsEnforcement.ImmediateOrCancel));
         market.execute(Side.SELL, 4, 10);
         assert market.validateOrderState(0, 4, 0, 0, 0);
         assert market.orders().get(3).sizeExecuted.get().is(4);
 
         // less price will be failed
-        market.requestTo(Order.limitShort(1, 10).type(Quantity.ImmediateOrCancel));
+        market.requestTo(Order.limitShort(1, 10).type(QuantityConditionsEnforcement.ImmediateOrCancel));
         market.execute(Side.SELL, 1, 9);
         assert market.validateOrderState(0, 4, 0, 0, 0);
     }

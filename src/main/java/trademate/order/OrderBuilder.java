@@ -20,8 +20,8 @@ import javafx.scene.input.ScrollEvent;
 
 import cointoss.Side;
 import cointoss.order.Order;
-import cointoss.order.Order.Quantity;
 import cointoss.order.Order.State;
+import cointoss.order.QuantityConditionsEnforcement;
 import cointoss.util.Num;
 import kiss.I;
 import kiss.WiseBiConsumer;
@@ -101,7 +101,7 @@ public class OrderBuilder extends View {
     private @UI UIButton orderReverse;
 
     /** UI */
-    private @UI UIComboBox<Quantity> orderQuantity;
+    private @UI UIComboBox<QuantityConditionsEnforcement> orderQuantity;
 
     /** UI */
     private @UI TradingView view;
@@ -137,7 +137,7 @@ public class OrderBuilder extends View {
 
         orderLimitLong.when(User.Click).throttle(1000, MILLISECONDS).mapTo(Side.BUY).to(this::requestOrder);
         orderLimitShort.when(User.Click).throttle(1000, MILLISECONDS).mapTo(Side.SELL).to(this::requestOrder);
-        orderQuantity.values(Quantity.values()).initial(Quantity.GoodTillCanceled);
+        orderQuantity.values(QuantityConditionsEnforcement.values()).initial(QuantityConditionsEnforcement.GoodTillCanceled);
 
         orderRetreat.when(User.Click).throttle(1000, MILLISECONDS).to(this::retreat);
         orderReverse.when(User.Click).throttle(1000, MILLISECONDS).to(this::reverse);
@@ -183,7 +183,7 @@ public class OrderBuilder extends View {
         int divideSize = orderDivideSize.value();
         int increaseInterval = orderDivideIntervalAmount.value();
         Num priceInterval = orderPriceInterval.valueOr(Num.ZERO).multiply(side.isBuy() ? -1 : 1);
-        Quantity quantity = orderQuantity.value();
+        QuantityConditionsEnforcement quantity = orderQuantity.value();
 
         for (int i = 0; i < divideSize; i++) {
             Num optimizedSize = increaseInterval == 0 ? Num.ZERO

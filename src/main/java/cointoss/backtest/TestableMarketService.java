@@ -18,10 +18,10 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import cointoss.Execution;
 import cointoss.MarketService;
 import cointoss.order.Order;
-import cointoss.order.Order.Quantity;
 import cointoss.order.Order.State;
 import cointoss.order.OrderBookListChange;
 import cointoss.order.OrderType;
+import cointoss.order.QuantityConditionsEnforcement;
 import cointoss.util.Num;
 import kiss.Disposable;
 import kiss.I;
@@ -233,13 +233,13 @@ public class TestableMarketService extends MarketService {
             }
 
             // check quantity condition
-            if (order.quantity() == Quantity.FillOrKill && !validateTradable(order, e)) {
+            if (order.quantity() == QuantityConditionsEnforcement.FillOrKill && !validateTradable(order, e)) {
                 iterator.remove();
                 orderAll.remove(order);
                 continue;
             }
 
-            if (order.quantity() == Quantity.ImmediateOrCancel) {
+            if (order.quantity() == QuantityConditionsEnforcement.ImmediateOrCancel) {
                 if (validateTradableByPrice(order, e)) {
                     Num min = Num.min(e.size, order.sizeRemaining.get());
                     order.sizeRemaining.set(min);
