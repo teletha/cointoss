@@ -26,9 +26,9 @@ import kiss.Signaling;
 import kiss.Ⅱ;
 
 /**
- * @version 2018/04/28 21:27:16
+ * @version 2018/07/09 2:04:58
  */
-public class OrderManager {
+public final class OrderManager {
 
     /** The actual service. */
     private final MarketService service;
@@ -72,6 +72,15 @@ public class OrderManager {
         }));
     }
 
+    /**
+     * Build the {@link Signal} which requests the specified {@link Order} to the market. This method
+     * DON'T request order, you MUST subscribe {@link Signal}. If you want to request actually, you can
+     * use {@link #requestNow(Order)}.
+     * 
+     * @param order A order to request.
+     * @return A order request process.
+     * @see #requestNow(Order)
+     */
     public Signal<Order> request(Order order) {
         order.state.set(REQUESTING);
 
@@ -91,6 +100,25 @@ public class OrderManager {
         });
     }
 
+    /**
+     * Request the specified {@link Order} to the market actually.
+     * 
+     * @param order A order to request.
+     * @see #request(Order)
+     */
+    public void requestNow(Order order) {
+        request(order).to(I.NoOP);
+    }
+
+    /**
+     * Build the {@link Signal} which cancels the specified {@link Order} from the market. This method
+     * DON'T cancel order, you MUST subscribe {@link Signal}. If you want to cancel actually, you can
+     * use {@link #cancelNow(Order)}.
+     * 
+     * @param order A order to cancel.
+     * @return A order cancel process.
+     * @see #cancelNow(Order)
+     */
     public Signal<Order> cancel(Order order) {
         if (order.state.is(ACTIVE) || order.state.is(OrderState.REQUESTING)) {
             OrderState previous = order.state.set(REQUESTING);
@@ -104,6 +132,16 @@ public class OrderManager {
         } else {
             return I.signal(order);
         }
+    }
+
+    /**
+     * Cancel the specified {@link Order} from the market actually.
+     * 
+     * @param order A order to request.
+     * @see #cancel(Order)
+     */
+    public void cancelNow(Order order) {
+        cancel(order).to(I.NoOP);
     }
 
     /**
@@ -122,18 +160,6 @@ public class OrderManager {
      */
     public boolean hasNoActiveOrder() {
         return managed.isEmpty() == true;
-    }
-
-    /**
-     * Add new order.
-     * 
-     * @param order
-     */
-    public void add(Order order) {
-        if (order != null && !managed.contains(order)) {
-            managed.add(order);
-            addition.accept(order);
-        }
     }
 
     /**

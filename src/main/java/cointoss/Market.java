@@ -27,7 +27,9 @@ import kiss.Signaling;
 import kiss.Variable;
 
 /**
- * @version 2018/04/29 20:17:06
+ * Facade for the market related operations.
+ * 
+ * @version 2018/07/09 2:05:57
  */
 public class Market implements Disposable {
 
@@ -168,20 +170,20 @@ public class Market implements Disposable {
     }
 
     /**
-     * Request order actually.
+     * Shorthand for {@link OrderManager#request(Order)}.
      * 
      * @param order A order to request.
-     * @return A requested order.
+     * @return A order request process.
      */
     public final Signal<Order> request(Order order) {
         return orders.request(order);
     }
 
     /**
-     * Request order canceling.
+     * Shorthand for {@link OrderManager#cancel(Order)}.
      * 
      * @param order A order to cancel.
-     * @return A canceled order.
+     * @return A order cancel process.
      */
     public final Signal<Order> cancel(Order order) {
         return orders.cancel(order);
