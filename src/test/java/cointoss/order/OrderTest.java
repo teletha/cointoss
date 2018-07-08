@@ -11,8 +11,6 @@ package cointoss.order;
 
 import org.junit.jupiter.api.Test;
 
-import cointoss.order.Order.State;
-
 /**
  * @version 2018/07/07 10:55:58
  */
@@ -23,7 +21,7 @@ public class OrderTest {
         Order order = Order.limitLong(1, 10);
         assert order.isNotCanceled();
 
-        order.state.set(State.CANCELED);
+        order.state.set(OrderState.CANCELED);
         assert order.isCanceled();
     }
 
@@ -32,7 +30,7 @@ public class OrderTest {
         Order order = Order.limitLong(1, 10);
         assert order.isNotCompleted();
 
-        order.state.set(State.COMPLETED);
+        order.state.set(OrderState.COMPLETED);
         assert order.isCompleted();
     }
 
@@ -41,7 +39,7 @@ public class OrderTest {
         Order order = Order.limitLong(1, 10);
         assert order.isNotExpired();
 
-        order.state.set(State.EXPIRED);
+        order.state.set(OrderState.EXPIRED);
         assert order.isExpired();
     }
 }

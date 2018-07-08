@@ -16,7 +16,7 @@ import com.google.gson.JsonObject;
 
 import cointoss.Execution;
 import cointoss.order.Order;
-import cointoss.order.Order.State;
+import cointoss.order.OrderState;
 import cointoss.util.Chrono;
 import cointoss.util.MockNetwork;
 import cointoss.util.Num;
@@ -61,7 +61,7 @@ class MockBitFlyerService extends BitFlyerService {
         o.price = order.price.v;
         o.average_price = order.price.v;
         o.size = order.size;
-        o.child_order_state = State.ACTIVE;
+        o.child_order_state = OrderState.ACTIVE;
         o.child_order_date = Chrono.DateTimeWithT.format(Chrono.utcNow());
         o.outstanding_size = order.size;
         o.executed_size = Num.ZERO;

@@ -19,8 +19,8 @@ import org.junit.jupiter.api.Test;
 import cointoss.MarketTestSupport;
 import cointoss.Side;
 import cointoss.order.Order;
-import cointoss.order.Order.State;
 import cointoss.order.QuantityConditionsEnforcement;
+import cointoss.order.OrderState;
 import cointoss.util.Num;
 
 /**
@@ -84,7 +84,7 @@ class TestableMarketTest {
 
         List<Order> orders = market.orders();
         assert orders.size() == 1;
-        assert orders.get(0).state.is(State.COMPLETED);
+        assert orders.get(0).state.is(OrderState.COMPLETED);
 
         // List<Execution> executions = market.backend.executions().toList();
         // assert executions.size() == 2;

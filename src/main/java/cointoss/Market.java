@@ -9,7 +9,7 @@
  */
 package cointoss;
 
-import static cointoss.order.Order.State.*;
+import static cointoss.order.OrderState.*;
 import static java.util.concurrent.TimeUnit.*;
 
 import java.time.ZonedDateTime;
@@ -21,9 +21,9 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
 import cointoss.order.Order;
-import cointoss.order.Order.State;
 import cointoss.order.OrderBook;
 import cointoss.order.OrderManager;
+import cointoss.order.OrderState;
 import cointoss.ticker.TickerManager;
 import cointoss.util.Num;
 import kiss.Disposable;
@@ -197,7 +197,7 @@ public class Market implements Disposable {
 
             return order;
         }).effectOnError(e -> {
-            order.state.set(State.CANCELED);
+            order.state.set(OrderState.CANCELED);
         });
     }
 
@@ -208,8 +208,8 @@ public class Market implements Disposable {
      * @return A canceled order.
      */
     public final Signal<Order> cancel(Order order) {
-        if (order.state.is(ACTIVE) || order.state.is(State.REQUESTING)) {
-            State previous = order.state.set(REQUESTING);
+        if (order.state.is(ACTIVE) || order.state.is(OrderState.REQUESTING)) {
+            OrderState previous = order.state.set(REQUESTING);
 
             return service.cancel(order).effect(o -> {
                 orderItems.remove(o);
@@ -296,7 +296,7 @@ public class Market implements Disposable {
         order.sizeRemaining.set(v -> v.minus(executed));
 
         if (order.sizeRemaining.is(Num.ZERO)) {
-            order.state.set(State.COMPLETED);
+            order.state.set(OrderState.COMPLETED);
             orderItems.remove(order); // complete order
         }
 

@@ -16,7 +16,7 @@ import cointoss.Execution;
 import cointoss.Market;
 import cointoss.Side;
 import cointoss.order.Order;
-import cointoss.order.Order.State;
+import cointoss.order.OrderState;
 import cointoss.util.Num;
 import kiss.Table;
 
@@ -160,13 +160,13 @@ public class TestableMarket extends Market {
      * @return
      */
     public boolean validateOrderState(int active, int completed, int canceled, int expired, int rejected) {
-        Table<State, Order> state = service.orders().toTable(o -> o.state.v);
+        Table<OrderState, Order> state = service.orders().toTable(o -> o.state.v);
 
-        assert state.get(State.ACTIVE).size() == active;
-        assert state.get(State.COMPLETED).size() == completed;
-        assert state.get(State.CANCELED).size() == canceled;
-        assert state.get(State.EXPIRED).size() == expired;
-        assert state.get(State.REJECTED).size() == rejected;
+        assert state.get(OrderState.ACTIVE).size() == active;
+        assert state.get(OrderState.COMPLETED).size() == completed;
+        assert state.get(OrderState.CANCELED).size() == canceled;
+        assert state.get(OrderState.EXPIRED).size() == expired;
+        assert state.get(OrderState.REJECTED).size() == rejected;
 
         return true;
     }

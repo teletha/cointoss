@@ -16,7 +16,7 @@ import javafx.collections.ObservableList;
 
 import cointoss.Side;
 import cointoss.order.Order;
-import cointoss.order.Order.State;
+import cointoss.order.OrderState;
 import cointoss.util.Num;
 import viewtify.Viewtify;
 import viewtify.bind.Calculation;
@@ -31,13 +31,13 @@ public class OrderSet {
     /** Total amount. */
     public final Calculation<Num> amount = Viewtify.calculate(sub)
             .observeVariable(o -> o.state)
-            .map(o -> o.state.is(State.ACTIVE) || o.state.is(State.REQUESTING) ? o.size : Num.ZERO)
+            .map(o -> o.state.is(OrderState.ACTIVE) || o.state.is(OrderState.REQUESTING) ? o.size : Num.ZERO)
             .reduce(Num.ZERO, Num::plus);
 
     /** Total price. */
     public final Calculation<Num> totalPrice = Viewtify.calculate(sub)
             .observeVariable(o -> o.state)
-            .map(o -> o.state.is(State.ACTIVE) || o.state.is(State.REQUESTING) ? o.size.multiply(o.price) : Num.ZERO)
+            .map(o -> o.state.is(OrderState.ACTIVE) || o.state.is(OrderState.REQUESTING) ? o.size.multiply(o.price) : Num.ZERO)
             .reduce(Num.ZERO, Num::plus);
 
     /** Average price. */

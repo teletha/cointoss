@@ -34,9 +34,9 @@ import cointoss.Execution;
 import cointoss.MarketService;
 import cointoss.Side;
 import cointoss.order.Order;
-import cointoss.order.Order.State;
 import cointoss.order.OrderBookListChange;
 import cointoss.order.OrderUnit;
+import cointoss.order.OrderState;
 import cointoss.util.Chrono;
 import cointoss.util.LogCodec;
 import cointoss.util.Num;
@@ -572,7 +572,7 @@ public class BitFlyerService extends MarketService {
 
         public String child_order_date;
 
-        public State child_order_state;
+        public OrderState child_order_state;
 
         public Order toOrder() {
             Order o = Order.limit(side, size, price);

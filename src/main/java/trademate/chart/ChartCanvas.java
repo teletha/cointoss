@@ -27,7 +27,7 @@ import javafx.scene.shape.Path;
 import javafx.scene.shape.PathElement;
 
 import cointoss.Side;
-import cointoss.order.Order.State;
+import cointoss.order.OrderState;
 import cointoss.ticker.Tick;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
@@ -225,7 +225,7 @@ public class ChartCanvas extends Region {
                 LineMark mark = o.isBuy() ? orderBuyPrice : orderSellPrice;
                 TickLable label = mark.createLabel(o.price.v);
 
-                o.state.observe().take(State.CANCELED, State.COMPLETED).take(1).on(Viewtify.UIThread).to(() -> {
+                o.state.observe().take(OrderState.CANCELED, OrderState.COMPLETED).take(1).on(Viewtify.UIThread).to(() -> {
                     mark.remove(label);
                 });
             });

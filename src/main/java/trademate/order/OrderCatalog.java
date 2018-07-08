@@ -9,7 +9,7 @@
  */
 package trademate.order;
 
-import static cointoss.order.Order.State.*;
+import static cointoss.order.OrderState.*;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -19,7 +19,7 @@ import javafx.scene.control.TreeTableRow;
 
 import cointoss.Side;
 import cointoss.order.Order;
-import cointoss.order.Order.State;
+import cointoss.order.OrderState;
 import cointoss.util.Num;
 import kiss.Variable;
 import trademate.TradingView;
@@ -91,7 +91,7 @@ public class OrderCatalog extends View {
      * @param item
      * @return
      */
-    private Variable<State> state(Object item) {
+    private Variable<OrderState> state(Object item) {
         return item instanceof Order ? ((Order) item).state : Variable.of(ACTIVE);
     }
 
@@ -181,11 +181,11 @@ public class OrderCatalog extends View {
      */
     private class CatalogRow extends TreeTableRow<Object> {
 
-        private final Calculation<State> orderState = Viewtify.calculate(itemProperty()).flatVariable(o -> {
+        private final Calculation<OrderState> orderState = Viewtify.calculate(itemProperty()).flatVariable(o -> {
             if (o instanceof Order) {
                 return ((Order) o).state;
             } else {
-                return Variable.of(State.ACTIVE);
+                return Variable.of(OrderState.ACTIVE);
             }
         });
 

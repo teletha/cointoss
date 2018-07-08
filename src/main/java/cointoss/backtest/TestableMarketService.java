@@ -18,10 +18,10 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import cointoss.Execution;
 import cointoss.MarketService;
 import cointoss.order.Order;
-import cointoss.order.Order.State;
 import cointoss.order.OrderBookListChange;
 import cointoss.order.OrderType;
 import cointoss.order.QuantityConditionsEnforcement;
+import cointoss.order.OrderState;
 import cointoss.util.Num;
 import kiss.Disposable;
 import kiss.I;
@@ -96,7 +96,7 @@ public class TestableMarketService extends MarketService {
         return I.signal(order).map(o -> {
             BackendOrder child = new BackendOrder(order);
             child.id.let("LOCAL-ACCEPTANCE-" + id++);
-            child.state.set(State.ACTIVE);
+            child.state.set(OrderState.ACTIVE);
             child.created.set(now.plusNanos(lag.generate()));
             child.sizeRemaining.set(order.size);
             child.sizeExecuted.set(Num.ZERO);
@@ -115,7 +115,7 @@ public class TestableMarketService extends MarketService {
         return new Signal<>((observer, disposer) -> {
             orderActive.removeIf(o -> o.id.equals(order.id));
             I.signal(orderAll).take(o -> o.id.equals(order.id)).take(1).to(o -> {
-                o.state.set(State.CANCELED);
+                o.state.set(OrderState.CANCELED);
                 observer.accept(order);
                 observer.complete();
             });
@@ -270,7 +270,7 @@ public class TestableMarketService extends MarketService {
                 executeds.add(exe);
 
                 if (order.sizeRemaining.get().is(0)) {
-                    order.state.set(State.COMPLETED);
+                    order.state.set(OrderState.COMPLETED);
                     iterator.remove();
                 }
                 positions.accept(exe);

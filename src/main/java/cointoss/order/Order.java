@@ -36,7 +36,7 @@ public class Order implements Directional {
     public final OrderType type;
 
     /** The order state */
-    public final Variable<State> state = Variable.of(State.INIT);
+    public final Variable<OrderState> state = Variable.of(OrderState.INIT);
 
     /** The ordered position. */
     public final Side side;
@@ -199,7 +199,7 @@ public class Order implements Directional {
      * @return
      */
     public Signal<Order> isDisposed() {
-        return state.observe().take(State.CANCELED, State.COMPLETED).take(1).mapTo(this);
+        return state.observe().take(OrderState.CANCELED, OrderState.COMPLETED).take(1).mapTo(this);
     }
 
     /**
@@ -347,16 +347,16 @@ public class Order implements Directional {
     }
 
     /**
-     * Check the order {@link State}.
+     * Check the order {@link OrderState}.
      * 
      * @return The result.
      */
     public final boolean isExpired() {
-        return state.is(State.EXPIRED);
+        return state.is(OrderState.EXPIRED);
     }
 
     /**
-     * Check the order {@link State}.
+     * Check the order {@link OrderState}.
      * 
      * @return The result.
      */
@@ -365,16 +365,16 @@ public class Order implements Directional {
     }
 
     /**
-     * Check the order {@link State}.
+     * Check the order {@link OrderState}.
      * 
      * @return The result.
      */
     public final boolean isCanceled() {
-        return state.is(State.CANCELED);
+        return state.is(OrderState.CANCELED);
     }
 
     /**
-     * Check the order {@link State}.
+     * Check the order {@link OrderState}.
      * 
      * @return The result.
      */
@@ -383,16 +383,16 @@ public class Order implements Directional {
     }
 
     /**
-     * Check the order {@link State}.
+     * Check the order {@link OrderState}.
      * 
      * @return The result.
      */
     public final boolean isCompleted() {
-        return state.is(State.COMPLETED);
+        return state.is(OrderState.COMPLETED);
     }
 
     /**
-     * Check the order {@link State}.
+     * Check the order {@link OrderState}.
      *
      * @return The result.
      */
@@ -422,12 +422,5 @@ public class Order implements Directional {
     @Override
     public String toString() {
         return side().mark() + size + "@" + price + " 残" + sizeRemaining + " 済" + sizeExecuted + " " + created;
-    }
-
-    /**
-     * @version 2018/07/08 10:37:43
-     */
-    public enum State {
-        INIT, REQUESTING, ACTIVE, COMPLETED, CANCELED, EXPIRED, REJECTED;
     }
 }

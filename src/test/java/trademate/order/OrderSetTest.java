@@ -12,7 +12,7 @@ package trademate.order;
 import org.junit.jupiter.api.Test;
 
 import cointoss.order.Order;
-import cointoss.order.Order.State;
+import cointoss.order.OrderState;
 
 /**
  * @version 2018/04/02 16:49:22
@@ -22,9 +22,9 @@ class OrderSetTest {
     @Test
     void set() {
         Order o1 = Order.limitLong(1, 100);
-        o1.state.set(State.ACTIVE);
+        o1.state.set(OrderState.ACTIVE);
         Order o2 = Order.limitLong(1, 200);
-        o2.state.set(State.ACTIVE);
+        o2.state.set(OrderState.ACTIVE);
 
         OrderSet set = new OrderSet();
         set.sub.add(o1);

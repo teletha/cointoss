@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import cointoss.Execution;
-import cointoss.order.Order.State;
 import cointoss.util.Num;
 import kiss.Signal;
 import kiss.Signaling;
@@ -91,7 +90,7 @@ public class OrderManager {
         order.sizeRemaining.set(v -> v.minus(executed));
 
         if (order.sizeRemaining.is(Num.ZERO)) {
-            order.state.set(State.COMPLETED);
+            order.state.set(OrderState.COMPLETED);
             orders.remove(order); // complete order
         }
 
