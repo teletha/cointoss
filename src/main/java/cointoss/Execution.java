@@ -19,7 +19,7 @@ import kiss.Decoder;
 import kiss.Encoder;
 
 /**
- * @version 2018/05/30 9:07:20
+ * @version 2018/07/08 13:51:33
  */
 public class Execution {
 
@@ -43,7 +43,7 @@ public class Execution {
 
     static {
         // don't modify these initial values
-        BASE.exec_date = Chrono.utc(2000, 1, 1);
+        BASE.date = Chrono.utc(2000, 1, 1);
         BASE.side = Side.BUY;
         BASE.price = Num.ZERO;
         BASE.size = Num.ZERO;
@@ -54,17 +54,17 @@ public class Execution {
     /** The side */
     public Side side;
 
-    /** price */
+    /** The executed price */
     public Num price;
 
-    /** size */
+    /** The executed size. */
     public Num size;
 
-    /** size */
+    /** The executed comulative size. */
     public Num cumulativeSize = Num.ZERO;
 
-    /** date */
-    public ZonedDateTime exec_date;
+    /** The executed datetime. */
+    public ZonedDateTime date;
 
     /** Optional Attribute : The consecutive type. */
     public int consecutive;
@@ -96,7 +96,7 @@ public class Execution {
      */
     public Execution(String... values) {
         id = Long.parseLong(values[0]);
-        exec_date = LocalDateTime.parse(values[1]).atZone(cointoss.util.Chrono.UTC);
+        date = LocalDateTime.parse(values[1]).atZone(cointoss.util.Chrono.UTC);
         side = Side.parse(values[2]);
         price = Num.of(values[3]);
         size = cumulativeSize = Num.of(values[4]);
@@ -111,7 +111,7 @@ public class Execution {
      * @return A result.
      */
     public final boolean isBefore(ZonedDateTime time) {
-        return exec_date.isBefore(time);
+        return date.isBefore(time);
     }
 
     /**
@@ -121,7 +121,7 @@ public class Execution {
      * @return A result.
      */
     public final boolean isAfter(ZonedDateTime time) {
-        return exec_date.isAfter(time);
+        return date.isAfter(time);
     }
 
     /**
@@ -131,7 +131,7 @@ public class Execution {
      * @return
      */
     public ZonedDateTime after(long seconds) {
-        return exec_date.plusSeconds(seconds);
+        return date.plusSeconds(seconds);
     }
 
     /**
@@ -139,7 +139,7 @@ public class Execution {
      */
     @Override
     public String toString() {
-        return id + " " + exec_date.toLocalDateTime() + " " + side.mark() + " " + price + " " + size + " " + consecutive + " " + delay;
+        return id + " " + date.toLocalDateTime() + " " + side.mark() + " " + price + " " + size + " " + consecutive + " " + delay;
     }
 
     /**
@@ -169,7 +169,7 @@ public class Execution {
             return false;
         }
 
-        if (exec_date.isEqual(other.exec_date) == false) {
+        if (date.isEqual(other.date) == false) {
             return false;
         }
 

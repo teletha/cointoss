@@ -188,17 +188,17 @@ public abstract class Trader implements Disposable {
         return e -> {
             if (condition.test(e)) {
                 if (testing.get()) {
-                    if (e.exec_date.isAfter(last.get())) {
+                    if (e.date.isAfter(last.get())) {
                         testing.set(false);
                         return true;
                     }
                 } else {
                     testing.set(true);
-                    last.set(e.exec_date.plus(time, unit).minusNanos(1));
+                    last.set(e.date.plus(time, unit).minusNanos(1));
                 }
             } else {
                 if (testing.get()) {
-                    if (e.exec_date.isAfter(last.get())) {
+                    if (e.date.isAfter(last.get())) {
                         testing.set(false);
                     }
                 }
@@ -376,10 +376,10 @@ public abstract class Trader implements Disposable {
         public final Span orderTime() {
             Execution last = order.attribute(RecordedExecutions.class).peekLast();
             ZonedDateTime start = order.created.get();
-            ZonedDateTime finish = last == null ? market.tickers.latest.v.exec_date : last.exec_date;
+            ZonedDateTime finish = last == null ? market.tickers.latest.v.date : last.date;
 
             if (start.isBefore(finish)) {
-                finish = market.tickers.latest.v.exec_date;
+                finish = market.tickers.latest.v.date;
             }
             return new Span(start, finish);
         }
@@ -396,17 +396,17 @@ public abstract class Trader implements Disposable {
                 return Span.ZERO;
             }
 
-            ZonedDateTime start = first.exec_date;
+            ZonedDateTime start = first.date;
             ZonedDateTime finish = start;
 
             if (isActive()) {
-                finish = market.tickers.latest.v.exec_date;
+                finish = market.tickers.latest.v.date;
             } else {
                 for (Order order : exit) {
                     Execution last = order.attribute(RecordedExecutions.class).peekLast();
 
                     if (last != null) {
-                        finish = last.exec_date;
+                        finish = last.date;
                     }
                 }
             }

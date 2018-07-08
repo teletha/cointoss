@@ -108,7 +108,7 @@ public class TestableMarket extends Market {
         e.side = side;
         e.size = e.cumulativeSize = size;
         e.price = price;
-        e.exec_date = lag.to();
+        e.date = lag.to();
 
         return execute(e);
     }

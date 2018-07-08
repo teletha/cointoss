@@ -205,7 +205,7 @@ public class TestableMarketService extends MarketService {
      * @return
      */
     Execution emulate(Execution e) {
-        now = e.exec_date;
+        now = e.date;
 
         // emulate market execution
         Iterator<BackendOrder> iterator = orderActive.iterator();
@@ -214,7 +214,7 @@ public class TestableMarketService extends MarketService {
             BackendOrder order = iterator.next();
 
             // time base filter
-            if (e.exec_date.isBefore(order.created.get())) {
+            if (e.date.isBefore(order.created.get())) {
                 continue;
             }
 
@@ -265,7 +265,7 @@ public class TestableMarketService extends MarketService {
                 exe.side = order.side();
                 exe.size = exe.cumulativeSize = executedSize;
                 exe.price = order.type.isMarket() ? order.marketMinPrice : order.price.get();
-                exe.exec_date = e.exec_date;
+                exe.date = e.date;
                 exe.yourOrder = order.id.v;
                 executeds.add(exe);
 

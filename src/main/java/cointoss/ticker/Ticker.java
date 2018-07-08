@@ -73,7 +73,7 @@ public final class Ticker {
      * @param realtime The realtime execution statistic.
      */
     final void init(Execution execution, TickerManager realtime) {
-        current = new Tick(span.calculateStartTime(execution.exec_date), span, execution.price, realtime);
+        current = new Tick(span.calculateStartTime(execution.date), span, execution.price, realtime);
 
         ticks.addLast(current);
         additions.accept(current);
@@ -95,7 +95,7 @@ public final class Ticker {
                 // If the end time of current tick does not reach the start time of tick which
                 // execution actually belongs to, it is assumed that there was a blank time
                 // (i.e. server error, maintenance). So we complement them in advance.
-                ZonedDateTime start = span.calculateStartTime(execution.exec_date);
+                ZonedDateTime start = span.calculateStartTime(execution.date);
 
                 while (current.end.isBefore(start)) {
                     current.freeze();

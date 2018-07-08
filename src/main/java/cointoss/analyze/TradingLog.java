@@ -95,11 +95,11 @@ public class TradingLog {
     public TradingLog(Market market, List<Trader> tradings) {
         Execution init = market.tickers.initial.v;
         Execution last = market.tickers.latest.v;
-        this.start = init.exec_date;
+        this.start = init.date;
         this.startPrice = init.price;
         this.startBaseCurrency = market.baseInit.v;
         this.startTargetCurrency = market.targetInit.v;
-        this.finish = last.exec_date;
+        this.finish = last.date;
         this.finishPrice = last.price;
         this.finishBaseCurrency = market.base.v;
         this.finishTargetCurrency = market.target.v;

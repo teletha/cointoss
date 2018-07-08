@@ -169,7 +169,7 @@ public abstract class MarketService implements Disposable {
     final Execution decode(Execution previous, String[] values) {
         Execution current = new Execution();
         current.id = decodeId(values[0], previous);
-        current.exec_date = decodeDate(values[1], previous);
+        current.date = decodeDate(values[1], previous);
         current.price = decodePrice(values[2], previous);
         int value = LogCodec.decodeInt(values[3].charAt(0));
         if (value < 3) {
@@ -232,7 +232,7 @@ public abstract class MarketService implements Disposable {
      * @return A decoded execution.
      */
     protected ZonedDateTime decodeDate(String value, Execution previous) {
-        return LogCodec.decodeDelta(value, previous.exec_date, 0);
+        return LogCodec.decodeDelta(value, previous.date, 0);
     }
 
     /**
@@ -243,7 +243,7 @@ public abstract class MarketService implements Disposable {
      * @return An encoded value.
      */
     protected String encodeDate(Execution execution, Execution previous) {
-        return LogCodec.encodeDelta(execution.exec_date, previous.exec_date, 0);
+        return LogCodec.encodeDelta(execution.date, previous.date, 0);
     }
 
     /**

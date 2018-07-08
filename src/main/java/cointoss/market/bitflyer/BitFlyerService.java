@@ -11,6 +11,7 @@ package cointoss.market.bitflyer;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.HashMap;
@@ -231,7 +232,7 @@ public class BitFlyerService extends MarketService {
                     if (orders.contains(buyer)) {
                         Execution position = new Execution();
                         position.side = Side.BUY;
-                        position.exec_date = exe.exec_date;
+                        position.date = exe.exec_date;
                         position.price = exe.price;
                         position.size = exe.size;
                         position.yourOrder = buyer;
@@ -240,7 +241,7 @@ public class BitFlyerService extends MarketService {
                     } else if (orders.contains(seller)) {
                         Execution position = new Execution();
                         position.side = Side.SELL;
-                        position.exec_date = exe.exec_date;
+                        position.date = exe.exec_date;
                         position.price = exe.price;
                         position.size = exe.size;
                         position.yourOrder = seller;
@@ -704,6 +705,9 @@ public class BitFlyerService extends MarketService {
         /** Seller id of this execution. */
         public String sell_child_order_acceptance_id = "";
 
+        /** The executed date-time. */
+        public ZonedDateTime exec_date;
+
         /**
          * Estimate delay and consecutive type.
          * 
@@ -711,6 +715,7 @@ public class BitFlyerService extends MarketService {
          * @return
          */
         private BitFlyerExecution estimate(BitFlyerExecution previous) {
+            this.date = this.exec_date;
             estimateConsecutiveType(previous);
             estimateDelay();
 

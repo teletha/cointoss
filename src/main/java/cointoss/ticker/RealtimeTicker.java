@@ -72,10 +72,10 @@ public class RealtimeTicker {
         }
 
         // outgoing
-        ZonedDateTime threshold = incoming.exec_date.minus(span.duration);
+        ZonedDateTime threshold = incoming.date.minus(span.duration);
         Execution first = buffer.peek();
 
-        while (first.exec_date.isBefore(threshold)) {
+        while (first.date.isBefore(threshold)) {
             Execution outgoing = buffer.remove();
             Execution second = buffer.peek();
 

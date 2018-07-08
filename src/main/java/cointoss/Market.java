@@ -134,7 +134,7 @@ public class Market implements Disposable {
                     position.side = order.side;
                     position.price = e.price;
                     position.size.set(e.size);
-                    position.date = e.exec_date;
+                    position.date = e.date;
                     positions.add(position);
                 }
             }

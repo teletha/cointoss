@@ -103,7 +103,7 @@ public class MarketTestSupport {
         exe.side = Objects.requireNonNull(side);
         exe.price = Objects.requireNonNull(price);
         exe.size = exe.cumulativeSize = Objects.requireNonNull(size);
-        exe.exec_date = BaseDate;
+        exe.date = BaseDate;
 
         return exe;
     }
@@ -225,7 +225,7 @@ public class MarketTestSupport {
          * @return Chainable API.
          */
         public ChainableExecution date(int year, int month, int day, int hour, int minute, int second, int ms) {
-            this.exec_date = ZonedDateTime.of(year, month, day, hour, minute, second, ms * 1000000, Chrono.UTC);
+            this.date = ZonedDateTime.of(year, month, day, hour, minute, second, ms * 1000000, Chrono.UTC);
 
             return this;
         }
@@ -237,7 +237,7 @@ public class MarketTestSupport {
          * @return
          */
         public ChainableExecution date(ZonedDateTime time) {
-            this.exec_date = Objects.requireNonNull(time);
+            this.date = Objects.requireNonNull(time);
 
             return this;
         }

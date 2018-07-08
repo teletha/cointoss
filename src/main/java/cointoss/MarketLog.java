@@ -254,7 +254,7 @@ public class MarketLog {
                 ArrayDeque<Execution> executions = service.executions(start, start + size).toCollection(new ArrayDeque(size));
 
                 if (executions.isEmpty() == false) {
-                    log.info("REST write from {}.  size {}", executions.getFirst().exec_date, executions.size());
+                    log.info("REST write from {}.  size {}", executions.getFirst().date, executions.size());
                     executions.forEach(observer);
                     start = executions.getLast().id;
                 } else {
@@ -286,9 +286,9 @@ public class MarketLog {
         if (cacheId < e.id) {
             cacheId = e.id;
 
-            if (!cache.date.isEqual(e.exec_date.toLocalDate())) {
+            if (!cache.date.isEqual(e.date.toLocalDate())) {
                 cache.disableAutoSave();
-                cache = new Cache(e.exec_date).enableAutoSave();
+                cache = new Cache(e.date).enableAutoSave();
             }
             cache.queue.add(e);
         }
@@ -415,7 +415,7 @@ public class MarketLog {
      */
     public final Signal<Execution> range(ZonedDateTime start, ZonedDateTime end) {
         if (start.isBefore(end)) {
-            return from(start).takeWhile(e -> e.exec_date.isBefore(end));
+            return from(start).takeWhile(e -> e.date.isBefore(end));
         } else {
             return Signal.EMPTY;
         }
@@ -611,7 +611,7 @@ public class MarketLog {
             try (FileChannel channel = FileChannel.open(normal, CREATE, APPEND)) {
                 channel.write(ByteBuffer.wrap(text.toString().getBytes(ISO_8859_1)));
 
-                log.info("Write log until " + remaining.peekLast().exec_date + " at " + service + ".");
+                log.info("Write log until " + remaining.peekLast().date + " at " + service + ".");
             } catch (IOException e) {
                 throw I.quiet(e);
             }

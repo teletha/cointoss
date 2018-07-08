@@ -82,7 +82,7 @@ class ExecutionFlowTest {
         Execution e = new Execution();
         e.price = Num.of(price);
         e.size = Num.of(size);
-        e.exec_date = base.plusSeconds(time);
+        e.date = base.plusSeconds(time);
         e.side = Side.BUY;
 
         return e;
@@ -100,7 +100,7 @@ class ExecutionFlowTest {
         Execution e = new Execution();
         e.price = Num.of(price);
         e.size = Num.of(size);
-        e.exec_date = base.plusSeconds(time);
+        e.date = base.plusSeconds(time);
         e.side = Side.SELL;
 
         return e;
