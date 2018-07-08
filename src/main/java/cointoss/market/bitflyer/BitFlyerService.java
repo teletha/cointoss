@@ -35,8 +35,8 @@ import cointoss.MarketService;
 import cointoss.Side;
 import cointoss.order.Order;
 import cointoss.order.OrderBookListChange;
-import cointoss.order.OrderUnit;
 import cointoss.order.OrderState;
+import cointoss.order.OrderUnit;
 import cointoss.util.Chrono;
 import cointoss.util.LogCodec;
 import cointoss.util.Num;
@@ -57,9 +57,6 @@ import viewtify.Viewtify;
 public class BitFlyerService extends MarketService {
 
     public static final BitFlyerService FX_BTC_JPY = new BitFlyerService("FX_BTC_JPY", false);
-
-    /** The key for internal id. */
-    private static final String InternalID = BitFlyerService.class.getName() + "#ID";
 
     private static final MediaType mime = MediaType.parse("application/json; charset=utf-8");
 
@@ -175,10 +172,7 @@ public class BitFlyerService extends MarketService {
             order.isDisposed().to(() -> orders.remove(v));
 
             // check order state
-            intervalOrderCheck.map(orders -> orders.get(orders.indexOf(order)))
-                    .skipError()
-                    .take(1)
-                    .to(o -> order.attributes.putAll(o.attributes));
+            intervalOrderCheck.map(orders -> orders.get(orders.indexOf(order))).skipError().take(1).to(order::copyAttributeFrom);
         });
     }
 
@@ -190,7 +184,7 @@ public class BitFlyerService extends MarketService {
         CancelRequest cancel = new CancelRequest();
         cancel.product_code = marketName;
         cancel.account_id = accountId;
-        cancel.order_id = (String) order.attributes.get(InternalID);
+        cancel.order_id = order.attribute(Internals.class).id;
         cancel.child_order_acceptance_id = order.id.v;
 
         Signal requestCancel = forTest || maintainer.session() == null || cancel.order_id == null
@@ -582,7 +576,7 @@ public class BitFlyerService extends MarketService {
             o.sizeExecuted.set(executed_size);
             o.created.set(LocalDateTime.parse(child_order_date, Chrono.DateTimeWithT).atZone(Chrono.UTC));
             o.state.set(child_order_state);
-            o.attributes.put(InternalID, child_order_id);
+            o.attribute(Internals.class).id = child_order_id;
 
             return o;
         }
@@ -742,8 +736,8 @@ public class BitFlyerService extends MarketService {
 
         /**
          * <p>
-         * Analyze Taker's order ID and obtain approximate order time (Since there is a bot which
-         * specifies non-standard id format, ignore it in that case).
+         * Analyze Taker's order ID and obtain approximate order time (Since there is a bot which specifies
+         * non-standard id format, ignore it in that case).
          * </p>
          * <ol>
          * <li>Execution Date : UTC</li>
@@ -789,5 +783,13 @@ public class BitFlyerService extends MarketService {
                 delay = Execution.DelayInestimable;
             }
         }
+    }
+
+    /**
+     * @version 2018/07/08 11:32:36
+     */
+    private static class Internals {
+
+        private String id;
     }
 }

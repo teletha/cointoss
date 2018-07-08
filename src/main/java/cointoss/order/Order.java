@@ -12,20 +12,21 @@ package cointoss.order;
 import java.time.ZonedDateTime;
 import java.util.ArrayDeque;
 import java.util.Deque;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 import cointoss.Directional;
 import cointoss.Execution;
 import cointoss.Side;
 import cointoss.util.Num;
+import kiss.I;
 import kiss.Signal;
 import kiss.Signaling;
 import kiss.Variable;
 
 /**
- * @version 2018/07/08 10:32:55
+ * @version 2018/07/08 11:38:28
  */
 public class Order implements Directional {
 
@@ -59,8 +60,8 @@ public class Order implements Directional {
     /** The order created date-time */
     public final Variable<ZonedDateTime> created = Variable.of(ZonedDateTime.now());
 
-    /** The order attribute. */
-    public final Map<String, Object> attributes = new HashMap();
+    /** The attribute holder. */
+    private Map<Class, Object> attributes;
 
     private Num triggerPrice;
 
@@ -398,6 +399,30 @@ public class Order implements Directional {
      */
     public final boolean isNotCompleted() {
         return isCompleted() == false;
+    }
+
+    /**
+     * Retrieve the attribute by the specified type.
+     * 
+     * @param type A attribute type.
+     */
+    public final <T> T attribute(Class<T> type) {
+        if (attributes == null) {
+            attributes = new ConcurrentHashMap();
+        }
+        return (T) attributes.computeIfAbsent(type, key -> I.make(type));
+    }
+
+    /**
+     * Copy all attributes from the specified {@link Order}.
+     * 
+     * @param base
+     */
+    public final void copyAttributeFrom(Order base) {
+        if (attributes == null) {
+            attributes = new ConcurrentHashMap();
+        }
+        attributes.putAll(base.attributes);
     }
 
     /**
