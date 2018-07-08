@@ -95,7 +95,7 @@ public class TestableMarketService extends MarketService {
     public Signal<String> request(Order order) {
         return I.signal(order).map(o -> {
             BackendOrder child = new BackendOrder(order);
-            child.id = "LOCAL-ACCEPTANCE-" + id++;
+            child.id.let("LOCAL-ACCEPTANCE-" + id++);
             child.state.set(State.ACTIVE);
             child.created.set(now.plusNanos(lag.generate()));
             child.sizeRemaining.set(order.size);
@@ -103,7 +103,7 @@ public class TestableMarketService extends MarketService {
 
             orderAll.add(child);
             orderActive.add(child);
-            return child.id;
+            return child.id.v;
         });
     }
 
@@ -266,7 +266,7 @@ public class TestableMarketService extends MarketService {
                 exe.size = exe.cumulativeSize = executedSize;
                 exe.price = order.type.isMarket() ? order.marketMinPrice : order.price.get();
                 exe.exec_date = e.exec_date;
-                exe.yourOrder = order.id;
+                exe.yourOrder = order.id.v;
                 executeds.add(exe);
 
                 if (order.sizeRemaining.get().is(0)) {

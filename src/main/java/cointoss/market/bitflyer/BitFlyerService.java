@@ -191,7 +191,7 @@ public class BitFlyerService extends MarketService {
         cancel.product_code = marketName;
         cancel.account_id = accountId;
         cancel.order_id = (String) order.attributes.get(InternalID);
-        cancel.child_order_acceptance_id = order.id;
+        cancel.child_order_acceptance_id = order.id.v;
 
         Signal requestCancel = forTest || maintainer.session() == null || cancel.order_id == null
                 ? call("POST", "/v1/me/cancelchildorder", cancel, null, null)
@@ -576,7 +576,7 @@ public class BitFlyerService extends MarketService {
 
         public Order toOrder() {
             Order o = Order.limit(side, size, price);
-            o.id = child_order_acceptance_id;
+            o.id.let(child_order_acceptance_id);
             o.price.set(average_price);
             o.sizeRemaining.set(outstanding_size);
             o.sizeExecuted.set(executed_size);

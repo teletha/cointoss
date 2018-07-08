@@ -25,9 +25,12 @@ import kiss.Signaling;
 import kiss.Variable;
 
 /**
- * @version 2017/08/24 23:09:32
+ * @version 2018/07/08 10:32:55
  */
 public class Order implements Directional {
+
+    /** The order identifier for the specific market. */
+    public final Variable<String> id = Variable.empty();
 
     /** The order type */
     public final OrderType type;
@@ -95,15 +98,6 @@ public class Order implements Directional {
     @Override
     public Side side() {
         return side;
-    }
-
-    /**
-     * Aliase for {@link #id}.
-     * 
-     * @return
-     */
-    public String id() {
-        return id;
     }
 
     /**
@@ -355,9 +349,6 @@ public class Order implements Directional {
             this.abbreviation = abbreviation;
         }
     }
-
-    /** The server ID */
-    public String id;
 
     /** INTERNAL USAGE */
     public Deque<Execution> executions = new ArrayDeque<>();

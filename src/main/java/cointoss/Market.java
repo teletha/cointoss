@@ -124,7 +124,7 @@ public class Market implements Disposable {
 
         service.add(service.positions().to(e -> {
             for (Order order : orderItems) {
-                if (order.id().equals(e.yourOrder)) {
+                if (order.id.is(e.yourOrder)) {
                     update(order, e);
 
                     order.listeners.accept(e);
@@ -187,7 +187,7 @@ public class Market implements Disposable {
             System.out.println("Fail " + order + "  retry ");
             e.printStackTrace();
         }).take(40).delay(100, MILLISECONDS)).map(id -> {
-            order.id = id;
+            order.id.let(id);
             order.created.set(ZonedDateTime.now());
             order.sizeRemaining.set(order.size);
             order.state.set(ACTIVE);
