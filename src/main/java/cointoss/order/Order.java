@@ -24,7 +24,7 @@ import kiss.Signaling;
 import kiss.Variable;
 
 /**
- * @version 2018/07/08 11:38:28
+ * @version 2018/07/08 13:10:26
  */
 public class Order implements Directional {
 
@@ -61,9 +61,11 @@ public class Order implements Directional {
     /** The attribute holder. */
     private Map<Class, Object> attributes;
 
-    private Num triggerPrice;
+    /** The stop trigger price. */
+    private Num stopPrice;
 
-    private QuantityConditionsEnforcement quantity;
+    /** The quantity conditions enforcement. */
+    private QuantityCondition quantityCondition;
 
     /** The event listeners. */
     public final Signaling<Execution> listeners = new Signaling();
@@ -80,14 +82,14 @@ public class Order implements Directional {
      * @param price
      * @param size
      */
-    protected Order(Side position, Num size, Num price, Num priceLimit, QuantityConditionsEnforcement quantity) {
+    protected Order(Side position, Num size, Num price, Num priceLimit, QuantityCondition quantity) {
         this.side = Objects.requireNonNull(position);
         this.size = Objects.requireNonNull(size);
         this.price = Variable.of(price == null ? Num.ZERO : price);
         this.type = price == null || price.isZero() ? OrderType.MARKET : OrderType.LIMIT;
         this.sizeRemaining = Variable.of(size);
 
-        when(priceLimit);
+        stopAt(priceLimit);
         type(quantity);
     }
 
@@ -95,100 +97,70 @@ public class Order implements Directional {
      * {@inheritDoc}
      */
     @Override
-    public Side side() {
+    public final Side side() {
         return side;
     }
 
     /**
-     * Get the triggerPrice property of this {@link Order}.
+     * Retrieve the {@link QuantityCondition} of this {@link Order}.
      * 
-     * @return The triggerPrice property.
+     * @return A {@link QuantityCondition}.
      */
-    public Num triggerPrice() {
-        return triggerPrice;
+    public final QuantityCondition quantityCondition() {
+        return quantityCondition;
     }
 
     /**
-     * Get the triggerPrice property of this {@link Order}.
+     * Set the {@link QuantityCondition} of this {@link Order}.
      * 
-     * @return The triggerPrice property.
+     * @param quantityCondition A {@link QuantityCondition} to set.
+     * @return Chainable API.
      */
-    @SuppressWarnings("unused")
-    private Num getTriggerPrice() {
-        return triggerPrice;
-    }
+    public final Order type(QuantityCondition quantityCondition) {
+        this.quantityCondition = quantityCondition == null ? QuantityCondition.GoodTillCanceled : quantityCondition;
 
-    /**
-     * Set the triggerPrice property of this {@link Order}.
-     * 
-     * @param triggerPrice The triggerPrice value to set.
-     */
-    @SuppressWarnings("unused")
-    private void setTriggerPrice(Num triggerPrice) {
-        this.triggerPrice = triggerPrice;
-    }
-
-    /**
-     * Get the quantity property of this {@link Order}.
-     * 
-     * @return The quantity property.
-     */
-    public QuantityConditionsEnforcement quantity() {
-        return quantity;
-    }
-
-    /**
-     * Get the quantity property of this {@link Order}.
-     * 
-     * @return The quantity property.
-     */
-    @SuppressWarnings("unused")
-    private QuantityConditionsEnforcement getQuantity() {
-        return quantity;
-    }
-
-    /**
-     * Set the quantity property of this {@link Order}.
-     * 
-     * @param quantity The quantity value to set.
-     */
-    @SuppressWarnings("unused")
-    private void setQuantity(QuantityConditionsEnforcement quantity) {
-        this.quantity = quantity;
-    }
-
-    /**
-     * ストップ注文の値段を指定
-     * 
-     * @param priceLimit
-     * @return
-     */
-    public Order when(int priceLimit) {
-        return when(Num.of(priceLimit));
-    }
-
-    /**
-     * ストップ注文の値段を指定
-     * 
-     * @param triggerPrice
-     * @return
-     */
-    public Order when(Num triggerPrice) {
-        if (triggerPrice != null) {
-            this.triggerPrice = triggerPrice;
-        }
         return this;
     }
 
     /**
-     * 執行数量条件を指定
+     * Retrieve the stop trigger price of this {@link Order}.
      * 
-     * @param quantity
-     * @return
+     * @return A stop price.
      */
-    public Order type(QuantityConditionsEnforcement quantity) {
-        this.quantity = quantity == null ? QuantityConditionsEnforcement.GoodTillCanceled : quantity;
+    public final Num stopPrice() {
+        return stopPrice;
+    }
 
+    /**
+     * Set stop trigger price of this {@link Order}.
+     * 
+     * @param price A price to stop.
+     * @return Chainable API.
+     */
+    public final Order stopAt(long price) {
+        return stopAt(Num.of(price));
+    }
+
+    /**
+     * Set stop trigger price of this {@link Order}.
+     * 
+     * @param price A price to stop.
+     * @return Chainable API.
+     */
+    public final Order stopAt(double price) {
+        return stopAt(Num.of(price));
+    }
+
+    /**
+     * Set stop trigger price of this {@link Order}.
+     * 
+     * @param price A price to stop.
+     * @return Chainable API.
+     */
+    public final Order stopAt(Num price) {
+        if (price != null) {
+            this.stopPrice = price;
+        }
         return this;
     }
 

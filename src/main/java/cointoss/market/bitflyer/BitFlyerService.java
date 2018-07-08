@@ -147,7 +147,7 @@ public class BitFlyerService extends MarketService {
             request.product_code = marketName;
             request.side = order.side().name();
             request.size = order.size.toDouble();
-            request.time_in_force = order.quantity().abbreviation;
+            request.time_in_force = order.quantityCondition().abbreviation;
 
             call = call("POST", "/v1/me/sendchildorder", request, "child_order_acceptance_id", String.class);
         } else {
@@ -160,7 +160,7 @@ public class BitFlyerService extends MarketService {
             request.product_code = marketName;
             request.side = order.side().name();
             request.size = order.size.toDouble();
-            request.time_in_force = order.quantity().abbreviation;
+            request.time_in_force = order.quantityCondition().abbreviation;
 
             call = call("POST", "https://lightning.bitflyer.jp/api/trade/sendorder", request, "", WebResponse.class)
                     .map(e -> e.data.get("order_ref_id"));
@@ -736,8 +736,8 @@ public class BitFlyerService extends MarketService {
 
         /**
          * <p>
-         * Analyze Taker's order ID and obtain approximate order time (Since there is a bot which specifies
-         * non-standard id format, ignore it in that case).
+         * Analyze Taker's order ID and obtain approximate order time (Since there is a bot which
+         * specifies non-standard id format, ignore it in that case).
          * </p>
          * <ol>
          * <li>Execution Date : UTC</li>

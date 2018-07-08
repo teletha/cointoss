@@ -12,7 +12,7 @@ package cointoss.order;
 /**
  * @version 2018/07/08 10:36:09
  */
-public enum QuantityConditionsEnforcement {
+public enum QuantityCondition {
     GoodTillCanceled("GTC"), ImmediateOrCancel("IOC"), FillOrKill("FOK");
 
     /** A standard abbreviation. */
@@ -21,7 +21,7 @@ public enum QuantityConditionsEnforcement {
     /**
      * @param abbreviation
      */
-    private QuantityConditionsEnforcement(String abbreviation) {
+    private QuantityCondition(String abbreviation) {
         this.abbreviation = abbreviation;
     }
 }

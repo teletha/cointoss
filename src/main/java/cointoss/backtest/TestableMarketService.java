@@ -19,9 +19,9 @@ import cointoss.Execution;
 import cointoss.MarketService;
 import cointoss.order.Order;
 import cointoss.order.OrderBookListChange;
-import cointoss.order.OrderType;
-import cointoss.order.QuantityConditionsEnforcement;
 import cointoss.order.OrderState;
+import cointoss.order.OrderType;
+import cointoss.order.QuantityCondition;
 import cointoss.util.Num;
 import kiss.Disposable;
 import kiss.I;
@@ -219,13 +219,13 @@ public class TestableMarketService extends MarketService {
             }
 
             // check trigger price
-            if (order.triggerPrice() != null && order.triggerArchived == false) {
+            if (order.stopPrice() != null && order.triggerArchived == false) {
                 if (order.isBuy()) {
-                    if (e.price.isGreaterThanOrEqual(order.triggerPrice())) {
+                    if (e.price.isGreaterThanOrEqual(order.stopPrice())) {
                         order.triggerArchived = true;
                     }
                 } else {
-                    if (e.price.isLessThanOrEqual(order.triggerPrice())) {
+                    if (e.price.isLessThanOrEqual(order.stopPrice())) {
                         order.triggerArchived = true;
                     }
                 }
@@ -233,13 +233,13 @@ public class TestableMarketService extends MarketService {
             }
 
             // check quantity condition
-            if (order.quantity() == QuantityConditionsEnforcement.FillOrKill && !validateTradable(order, e)) {
+            if (order.quantityCondition() == QuantityCondition.FillOrKill && !validateTradable(order, e)) {
                 iterator.remove();
                 orderAll.remove(order);
                 continue;
             }
 
-            if (order.quantity() == QuantityConditionsEnforcement.ImmediateOrCancel) {
+            if (order.quantityCondition() == QuantityCondition.ImmediateOrCancel) {
                 if (validateTradableByPrice(order, e)) {
                     Num min = Num.min(e.size, order.sizeRemaining.get());
                     order.sizeRemaining.set(min);
@@ -338,7 +338,7 @@ public class TestableMarketService extends MarketService {
          * @param o
          */
         private BackendOrder(Order o) {
-            super(o.side(), o.size, o.price.v, o.triggerPrice(), o.quantity());
+            super(o.side(), o.size, o.price.v, o.stopPrice(), o.quantityCondition());
         }
     }
 }
