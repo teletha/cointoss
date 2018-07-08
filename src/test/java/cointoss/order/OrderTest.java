@@ -12,6 +12,7 @@ package cointoss.order;
 import org.junit.jupiter.api.Test;
 
 import antibug.ExpectThrow;
+import cointoss.Side;
 
 /**
  * @version 2018/07/08 11:44:58
@@ -77,5 +78,21 @@ public class OrderTest {
 
     private static class Attribute {
         String id;
+    }
+
+    @Test
+    void limit() {
+        Order order = Order.limit(Side.BUY, 1, 20);
+        assert order.side == Side.BUY;
+        assert order.size.is(1);
+        assert order.price.v.is(20);
+    }
+
+    @Test
+    void market() {
+        Order order = Order.market(Side.BUY, 1);
+        assert order.side == Side.BUY;
+        assert order.size.is(1);
+        assert order.price.v.is(0);
     }
 }

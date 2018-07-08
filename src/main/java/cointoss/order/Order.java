@@ -202,138 +202,6 @@ public class Order implements Directional {
     }
 
     /**
-     * 成り行き注文
-     * 
-     * @param position
-     * @param size
-     * @return
-     */
-    public static Order market(Side position, Num size) {
-        return new Order(position, size, null, null, null);
-    }
-
-    /**
-     * 成り行き注文
-     * 
-     * @param size
-     * @return
-     */
-    public static Order marketLong(int size) {
-        return marketLong(Num.of(size));
-    }
-
-    /**
-     * 成り行き注文
-     * 
-     * @param size
-     * @return
-     */
-    public static Order marketLong(Num size) {
-        return market(Side.BUY, size);
-    }
-
-    /**
-     * 成り行き注文
-     * 
-     * @param size
-     * @return
-     */
-    public static Order marketShort(int size) {
-        return marketShort(Num.of(size));
-    }
-
-    /**
-     * 成り行き注文
-     * 
-     * @param size
-     * @return
-     */
-    public static Order marketShort(Num size) {
-        return market(Side.SELL, size);
-    }
-
-    /**
-     * 指値注文
-     * 
-     * @param position
-     * @param size
-     * @return
-     */
-    public static Order limit(Side position, Num size, Num price) {
-        return new Order(position, size, price, null, null);
-    }
-
-    /**
-     * 指値注文
-     * 
-     * @param size
-     * @return
-     */
-    public static Order limitLong(double size, double price) {
-        return limit(Side.BUY, Num.of(size), Num.of(price));
-    }
-
-    /**
-     * 指値注文
-     * 
-     * @param size
-     * @return
-     */
-    public static Order limitLong(Num size, Num price) {
-        return limit(Side.BUY, size, price);
-    }
-
-    /**
-     * 指値注文
-     * 
-     * @param size
-     * @return
-     */
-    public static Order limitLong(String size, String price) {
-        return limitLong(Num.of(size), Num.of(price));
-    }
-
-    /**
-     * 指値注文
-     * 
-     * @param size
-     * @return
-     */
-    public static Order limitLong(int size, int price) {
-        return limitLong(Num.of(size), Num.of(price));
-    }
-
-    /**
-     * 指値注文
-     * 
-     * @param size
-     * @return
-     */
-    public static Order limitShort(Num size, Num price) {
-        return limit(Side.SELL, size, price);
-    }
-
-    /**
-     * 指値注文
-     * 
-     * @param size
-     * @return
-     */
-    public static Order limitShort(String size, String price) {
-        return limitShort(Num.of(size), Num.of(price));
-    }
-
-    /**
-     * 指値注文
-     * 
-     * @param size
-     * @return
-     */
-    public static Order limitShort(int size, int price) {
-        return limitShort(Num.of(size), Num.of(price));
-    }
-
-    /**
      * Detect order type.
      * 
      * @return
@@ -442,5 +310,200 @@ public class Order implements Directional {
     @Override
     public String toString() {
         return side().mark() + size + "@" + price + " 残" + sizeRemaining + " 済" + sizeExecuted + " " + created;
+    }
+
+    /**
+     * Create market order.
+     * 
+     * @param side A {@link Side} of order.
+     * @param size A size of order.
+     * @return A created {@link Order}.
+     */
+    public static Order market(Side side, long size) {
+        return market(side, Num.of(size));
+    }
+
+    /**
+     * Create market order.
+     * 
+     * @param side A {@link Side} of order.
+     * @param size A size of order.
+     * @return A created {@link Order}.
+     */
+    public static Order market(Side side, double size) {
+        return market(side, Num.of(size));
+    }
+
+    /**
+     * Create market order.
+     * 
+     * @param side A {@link Side} of order.
+     * @param size A size of order.
+     * @return A created {@link Order}.
+     */
+    public static Order market(Side side, Num size) {
+        return new Order(side, size, null, null, null);
+    }
+
+    /**
+     * Create LONG market order.
+     * 
+     * @param size A size of order.
+     * @return A created {@link Order}.
+     */
+    public static Order marketLong(long size) {
+        return marketLong(Num.of(size));
+    }
+
+    /**
+     * Create LONG market order.
+     * 
+     * @param size A size of order.
+     * @return A created {@link Order}.
+     */
+    public static Order marketLong(double size) {
+        return marketLong(Num.of(size));
+    }
+
+    /**
+     * Create LONG market order.
+     * 
+     * @param size A size of order.
+     * @return A created {@link Order}.
+     */
+    public static Order marketLong(Num size) {
+        return market(Side.BUY, size);
+    }
+
+    /**
+     * Create SHORT market order.
+     * 
+     * @param size A size of order.
+     * @return A created {@link Order}.
+     */
+    public static Order marketShort(long size) {
+        return marketShort(Num.of(size));
+    }
+
+    /**
+     * Create SHORT market order.
+     * 
+     * @param size A size of order.
+     * @return A created {@link Order}.
+     */
+    public static Order marketShort(double size) {
+        return marketShort(Num.of(size));
+    }
+
+    /**
+     * Create SHORT market order.
+     * 
+     * @param size A size of order.
+     * @return A created {@link Order}.
+     */
+    public static Order marketShort(Num size) {
+        return market(Side.SELL, size);
+    }
+
+    /**
+     * Create limit order.
+     * 
+     * @param side A {@link Side} of order.
+     * @param size A size of order.
+     * @param price A price of order.
+     * @return A created {@link Order}.
+     */
+    public static Order limit(Side side, long size, long price) {
+        return limit(side, Num.of(size), Num.of(price));
+    }
+
+    /**
+     * Create limit order.
+     * 
+     * @param side A {@link Side} of order.
+     * @param size A size of order.
+     * @param price A price of order.
+     * @return A created {@link Order}.
+     */
+    public static Order limit(Side side, double size, double price) {
+        return limit(side, Num.of(size), Num.of(price));
+    }
+
+    /**
+     * Create limit order.
+     * 
+     * @param side A {@link Side} of order.
+     * @param size A size of order.
+     * @param price A price of order.
+     * @return A created {@link Order}.
+     */
+    public static Order limit(Side side, Num size, Num price) {
+        return new Order(side, size, price, null, null);
+    }
+
+    /**
+     * Create LONG limit order.
+     * 
+     * @param size A size of order.
+     * @param price A price of order.
+     * @return A created {@link Order}.
+     */
+    public static Order limitLong(long size, long price) {
+        return limitLong(Num.of(size), Num.of(price));
+    }
+
+    /**
+     * Create LONG limit order.
+     * 
+     * @param size A size of order.
+     * @param price A price of order.
+     * @return A created {@link Order}.
+     */
+    public static Order limitLong(double size, double price) {
+        return limit(Side.BUY, Num.of(size), Num.of(price));
+    }
+
+    /**
+     * Create LONG limit order.
+     * 
+     * @param size A size of order.
+     * @param price A price of order.
+     * @return A created {@link Order}.
+     */
+    public static Order limitLong(Num size, Num price) {
+        return limit(Side.BUY, size, price);
+    }
+
+    /**
+     * Create SHORT limit order.
+     * 
+     * @param size A size of order.
+     * @param price A price of order.
+     * @return A created {@link Order}.
+     */
+    public static Order limitShort(long size, long price) {
+        return limitShort(Num.of(size), Num.of(price));
+    }
+
+    /**
+     * Create SHORT limit order.
+     * 
+     * @param size A size of order.
+     * @param price A price of order.
+     * @return A created {@link Order}.
+     */
+    public static Order limitShort(double size, double price) {
+        return limitShort(Num.of(size), Num.of(price));
+    }
+
+    /**
+     * Create SHORT limit order.
+     * 
+     * @param size A size of order.
+     * @param price A price of order.
+     * @return A created {@link Order}.
+     */
+    public static Order limitShort(Num size, Num price) {
+        return limit(Side.SELL, size, price);
     }
 }
