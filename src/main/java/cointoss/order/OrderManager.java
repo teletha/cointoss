@@ -62,6 +62,8 @@ public final class OrderManager {
      */
     public OrderManager(MarketService service) {
         this.service = service;
+        added.to(managed::add);
+        removed.to(managed::remove);
 
         service.add(service.positions().to(e -> {
             for (Order order : managed) {
@@ -87,12 +89,14 @@ public final class OrderManager {
         return service.request(order).retryWhen(fail -> fail.effect(e -> {
             System.out.println("Fail " + order + "  retry ");
             e.printStackTrace();
-        }).take(40).delay(100, MILLISECONDS)).map(id -> {
+        }).take(20).delay(500, MILLISECONDS)).map(id -> {
             order.id.let(id);
             order.created.set(ZonedDateTime.now());
             order.sizeRemaining.set(order.size);
             order.state.set(ACTIVE);
-            managed.add(order);
+            order.observeTerminating().to(remove::accept);
+
+            addition.accept(order);
 
             return order;
         }).effectOnError(e -> {
@@ -104,10 +108,13 @@ public final class OrderManager {
      * Request the specified {@link Order} to the market actually.
      * 
      * @param order A order to request.
+     * @return A requested {@link Order}.
      * @see #request(Order)
      */
-    public void requestNow(Order order) {
+    public Order requestNow(Order order) {
         request(order).to(I.NoOP);
+
+        return order;
     }
 
     /**
@@ -138,10 +145,13 @@ public final class OrderManager {
      * Cancel the specified {@link Order} from the market actually.
      * 
      * @param order A order to request.
+     * @return A canceled {@link Order}.
      * @see #cancel(Order)
      */
-    public void cancelNow(Order order) {
+    public Order cancelNow(Order order) {
         cancel(order).to(I.NoOP);
+
+        return order;
     }
 
     /**

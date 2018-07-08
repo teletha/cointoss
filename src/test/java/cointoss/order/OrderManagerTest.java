@@ -9,6 +9,8 @@
  */
 package cointoss.order;
 
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
 
 import cointoss.backtest.TestableMarketService;
@@ -27,6 +29,51 @@ class OrderManagerTest {
         orders.requestNow(Order.limitLong(1, 10));
         assert orders.hasActiveOrder() == true;
         assert orders.hasNoActiveOrder() == false;
+    }
+
+    @Test
+    void added() {
+        OrderManager orders = create();
+        List<Order> added = orders.added.toList();
+        assert added.size() == 0;
+
+        orders.requestNow(Order.limitLong(1, 10));
+        assert added.size() == 1;
+        orders.requestNow(Order.limitLong(1, 10));
+        assert added.size() == 2;
+    }
+
+    @Test
+    void removedByCancel() {
+        OrderManager orders = create();
+        Order order1 = orders.requestNow(Order.limitLong(1, 10));
+        Order order2 = orders.requestNow(Order.limitLong(1, 10));
+        List<Order> removed = orders.removed.toList();
+        assert removed.size() == 0;
+
+        orders.cancelNow(order1);
+        assert removed.size() == 1;
+        orders.cancelNow(order2);
+        assert removed.size() == 2;
+    }
+
+    @Test
+    void request() {
+        OrderManager orders = create();
+        assert orders.items.size() == 0;
+        orders.requestNow(Order.limitLong(1, 10));
+        assert orders.items.size() == 1;
+    }
+
+    @Test
+    void cancel() {
+        OrderManager orders = create();
+        Order order = orders.requestNow(Order.limitLong(1, 10));
+        assert orders.items.size() == 1;
+        assert orders.cancelNow(order) == order;
+        assert orders.items.size() == 0;
+        assert orders.cancelNow(order) == order;
+        assert orders.items.size() == 0;
     }
 
     /**
