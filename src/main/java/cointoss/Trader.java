@@ -283,7 +283,7 @@ public abstract class Trader implements Disposable {
 
             // request order
             market.request(order).to(o -> {
-                o.execute.to(exe -> {
+                o.executed.to(exe -> {
                     positionSize = positionSize.plus(exe.size);
                     entryTotalSize = entryTotalSize.plus(exe.size);
                     entryRemaining = entryRemaining.minus(exe.size);
@@ -551,7 +551,7 @@ public abstract class Trader implements Disposable {
             market.request(order).to(o -> {
                 exit.add(o);
 
-                o.execute.to(exe -> {
+                o.executed.to(exe -> {
                     positionSize = positionSize.minus(exe.size);
                     exitTotalSize = exitTotalSize.plus(exe.size);
                     exitRemaining = exitRemaining.minus(exe.size);

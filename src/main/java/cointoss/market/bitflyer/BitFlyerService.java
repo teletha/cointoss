@@ -173,7 +173,9 @@ public class BitFlyerService extends MarketService {
             order.observeTerminating().to(() -> orders.remove(v));
 
             // check order state
-            intervalOrderCheck.map(orders -> orders.get(orders.indexOf(order))).skipError().take(1).to(order::copyAttributeFrom);
+            intervalOrderCheck.map(orders -> orders.get(orders.indexOf(order))).skipError().take(1).to(o -> {
+                order.attribute(Internals.class).id = o.attribute(Internals.class).id;
+            });
         });
     }
 
@@ -741,8 +743,8 @@ public class BitFlyerService extends MarketService {
 
         /**
          * <p>
-         * Analyze Taker's order ID and obtain approximate order time (Since there is a bot which
-         * specifies non-standard id format, ignore it in that case).
+         * Analyze Taker's order ID and obtain approximate order time (Since there is a bot which specifies
+         * non-standard id format, ignore it in that case).
          * </p>
          * <ol>
          * <li>Execution Date : UTC</li>

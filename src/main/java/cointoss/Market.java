@@ -128,8 +128,6 @@ public class Market implements Disposable {
                 if (order.id.is(e.yourOrder)) {
                     update(order, e);
 
-                    order.listeners.accept(e);
-
                     Position position = new Position();
                     position.side = order.side;
                     position.price = e.price;
@@ -302,6 +300,6 @@ public class Market implements Disposable {
         }
 
         // pairing order and execution
-        order.attribute(RecordedExecutions.class).add(exe);
+        order.attribute(RecordedExecutions.class).record(exe);
     }
 }

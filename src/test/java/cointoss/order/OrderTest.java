@@ -62,22 +62,6 @@ public class OrderTest {
         order.attribute(null);
     }
 
-    @Test
-    void copyAttributeFrom() {
-        Order order = Order.limitLong(1, 10);
-        order.attribute(Attribute.class).id = "base";
-
-        Order notExist = Order.limitLong(1, 10);
-        notExist.copyAttributeFrom(order);
-        assert notExist.attribute(Attribute.class).id.equals("base");
-
-        Order exist = Order.limitLong(1, 10);
-        Attribute attribute = exist.attribute(Attribute.class);
-        assert attribute.id == null;
-        exist.copyAttributeFrom(order);
-        assert exist.attribute(Attribute.class).id.equals("base");
-    }
-
     private static class Attribute {
         String id;
     }

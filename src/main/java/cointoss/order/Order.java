@@ -20,7 +20,6 @@ import cointoss.Side;
 import cointoss.util.Num;
 import kiss.I;
 import kiss.Signal;
-import kiss.Signaling;
 import kiss.Variable;
 
 /**
@@ -59,7 +58,7 @@ public class Order implements Directional {
     public final Variable<ZonedDateTime> created = Variable.of(ZonedDateTime.now());
 
     /** The attribute holder. */
-    private Map<Class, Object> attributes;
+    private final Map<Class, Object> attributes = new ConcurrentHashMap();
 
     /** The stop trigger price. */
     private Num stopPrice;
@@ -67,11 +66,8 @@ public class Order implements Directional {
     /** The quantity conditions enforcement. */
     private QuantityCondition quantityCondition;
 
-    /** The event listeners. */
-    public final Signaling<Execution> listeners = new Signaling();
-
-    /** The execution signal. */
-    public final Signal<Execution> execute = listeners.expose;
+    /** The execution event. */
+    public final Signal<Execution> executed = attribute(RecordedExecutions.class).additions.expose;
 
     /**
      * <p>
@@ -242,22 +238,7 @@ public class Order implements Directional {
      * @param type A attribute type.
      */
     public final <T> T attribute(Class<T> type) {
-        if (attributes == null) {
-            attributes = new ConcurrentHashMap();
-        }
         return (T) attributes.computeIfAbsent(type, key -> I.make(type));
-    }
-
-    /**
-     * Copy all attributes from the specified {@link Order}.
-     * 
-     * @param base
-     */
-    public final void copyAttributeFrom(Order base) {
-        if (attributes == null) {
-            attributes = new ConcurrentHashMap();
-        }
-        attributes.putAll(base.attributes);
     }
 
     /**
