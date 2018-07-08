@@ -193,11 +193,11 @@ public class Order implements Directional {
     }
 
     /**
-     * Observe this order's disposing.
+     * Observe when this {@link Order} will be canceled or completed.
      * 
-     * @return
+     * @return A event {@link Signal}.
      */
-    public Signal<Order> isDisposed() {
+    public final Signal<Order> observeTerminating() {
         return state.observe().take(OrderState.CANCELED, OrderState.COMPLETED).take(1).mapTo(this);
     }
 

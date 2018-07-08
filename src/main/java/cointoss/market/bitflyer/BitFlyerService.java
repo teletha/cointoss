@@ -169,7 +169,7 @@ public class BitFlyerService extends MarketService {
         return call.effect(v -> {
             // register order id
             orders.add(v);
-            order.isDisposed().to(() -> orders.remove(v));
+            order.observeTerminating().to(() -> orders.remove(v));
 
             // check order state
             intervalOrderCheck.map(orders -> orders.get(orders.indexOf(order))).skipError().take(1).to(order::copyAttributeFrom);

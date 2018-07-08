@@ -112,7 +112,7 @@ public class OrderCatalog extends View {
      * Create tree item for {@link Order}.
      */
     private void createOrderItem(UITreeItem item, Order order) {
-        item.createItem(order).removeWhen(order.isDisposed());
+        item.createItem(order).removeWhen(order.observeTerminating());
     }
 
     /**

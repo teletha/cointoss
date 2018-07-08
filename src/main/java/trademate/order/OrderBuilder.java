@@ -192,7 +192,7 @@ public class OrderBuilder extends View {
 
             Order order = Order.limit(side, size.plus(optimizedSize), optimizedPrice).type(quantity);
             order.state.set(OrderState.REQUESTING);
-            order.isDisposed().to(() -> set.sub.remove(order));
+            order.observeTerminating().to(() -> set.sub.remove(order));
 
             set.sub.add(order);
 

@@ -9,6 +9,8 @@
  */
 package cointoss.order;
 
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
 
 import antibug.ExpectThrow;
@@ -94,5 +96,53 @@ public class OrderTest {
         assert order.side == Side.BUY;
         assert order.size.is(1);
         assert order.price.v.is(0);
+    }
+
+    @Test
+    void observeTerminatingByCompleted() {
+        Order order = Order.market(Side.BUY, 1);
+        List<Order> result = order.observeTerminating().toList();
+        assert result.isEmpty();
+        order.state.set(OrderState.ACTIVE);
+        assert result.isEmpty();
+        order.state.set(OrderState.EXPIRED);
+        assert result.isEmpty();
+        order.state.set(OrderState.INIT);
+        assert result.isEmpty();
+        order.state.set(OrderState.REJECTED);
+        assert result.isEmpty();
+        order.state.set(OrderState.REQUESTING);
+        assert result.isEmpty();
+
+        order.state.set(OrderState.COMPLETED);
+        assert result.size() == 1;
+        order.state.set(OrderState.CANCELED);
+        assert result.size() == 1;
+        order.state.set(OrderState.COMPLETED);
+        assert result.size() == 1;
+    }
+
+    @Test
+    void observeTerminatingByCanceld() {
+        Order order = Order.market(Side.BUY, 1);
+        List<Order> result = order.observeTerminating().toList();
+        assert result.isEmpty();
+        order.state.set(OrderState.ACTIVE);
+        assert result.isEmpty();
+        order.state.set(OrderState.EXPIRED);
+        assert result.isEmpty();
+        order.state.set(OrderState.INIT);
+        assert result.isEmpty();
+        order.state.set(OrderState.REJECTED);
+        assert result.isEmpty();
+        order.state.set(OrderState.REQUESTING);
+        assert result.isEmpty();
+
+        order.state.set(OrderState.CANCELED);
+        assert result.size() == 1;
+        order.state.set(OrderState.CANCELED);
+        assert result.size() == 1;
+        order.state.set(OrderState.COMPLETED);
+        assert result.size() == 1;
     }
 }
