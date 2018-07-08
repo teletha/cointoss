@@ -9,10 +9,6 @@
  */
 package cointoss;
 
-import static cointoss.order.OrderState.*;
-import static java.util.concurrent.TimeUnit.*;
-
-import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -23,12 +19,9 @@ import java.util.function.Function;
 import cointoss.order.Order;
 import cointoss.order.OrderBook;
 import cointoss.order.OrderManager;
-import cointoss.order.OrderState;
-import cointoss.order.RecordedExecutions;
 import cointoss.ticker.TickerManager;
 import cointoss.util.Num;
 import kiss.Disposable;
-import kiss.I;
 import kiss.Signal;
 import kiss.Signaling;
 import kiss.Variable;
@@ -65,7 +58,7 @@ public class Market implements Disposable {
     public final OrderBook orderBook = new OrderBook();
 
     /** The order manager. */
-    public final OrderManager orders = new OrderManager();
+    public final OrderManager orders;
 
     /** The ticker manager. */
     public final TickerManager tickers = new TickerManager();
@@ -88,9 +81,6 @@ public class Market implements Disposable {
     /** The tarader manager. */
     private final List<Trader> traders = new CopyOnWriteArrayList<>();
 
-    /** The order manager. */
-    private final List<Order> orderItems = new CopyOnWriteArrayList();
-
     /**
      * Build {@link Market} with the specified {@link MarketProvider}.
      * 
@@ -98,6 +88,7 @@ public class Market implements Disposable {
      */
     public Market(MarketService service) {
         this.service = Objects.requireNonNull(service, "Market is not found.");
+        this.orders = new OrderManager(service);
 
         // build tickers for each span
         timeline.to(tickers::update);
@@ -123,20 +114,23 @@ public class Market implements Disposable {
             orderBook.longs.fix(e.price);
         }));
 
-        service.add(service.positions().to(e -> {
-            for (Order order : orderItems) {
-                if (order.id.is(e.yourOrder)) {
-                    update(order, e);
+        orders.updated.to(v -> {
+            Position position = new Position();
+            position.side = v.ⅰ.side;
+            position.price = v.ⅱ.price;
+            position.size.set(v.ⅱ.size);
+            position.date = v.ⅱ.date;
+            positions.add(position);
 
-                    Position position = new Position();
-                    position.side = order.side;
-                    position.price = e.price;
-                    position.size.set(e.size);
-                    position.date = e.date;
-                    positions.add(position);
-                }
+            // update assets
+            if (v.ⅰ.side().isBuy()) {
+                base.set(value -> value.minus(v.ⅱ.size.multiply(v.ⅱ.price)));
+                target.set(value -> value.plus(v.ⅱ.size));
+            } else {
+                base.set(value -> value.plus(v.ⅱ.size.multiply(v.ⅱ.price)));
+                target.set(value -> value.minus(v.ⅱ.size));
             }
-        }));
+        });
     }
 
     /**
@@ -180,24 +174,7 @@ public class Market implements Disposable {
      * @return A requested order.
      */
     public final Signal<Order> request(Order order) {
-        order.state.set(REQUESTING);
-
-        return service.request(order).retryWhen(fail -> fail.effect(e -> {
-            System.out.println("Fail " + order + "  retry ");
-            e.printStackTrace();
-        }).take(40).delay(100, MILLISECONDS)).map(id -> {
-            order.id.let(id);
-            order.created.set(ZonedDateTime.now());
-            order.sizeRemaining.set(order.size);
-            order.state.set(ACTIVE);
-
-            orderItems.add(order);
-            orders.add(order);
-
-            return order;
-        }).effectOnError(e -> {
-            order.state.set(OrderState.CANCELED);
-        });
+        return orders.request(order);
     }
 
     /**
@@ -207,18 +184,7 @@ public class Market implements Disposable {
      * @return A canceled order.
      */
     public final Signal<Order> cancel(Order order) {
-        if (order.state.is(ACTIVE) || order.state.is(OrderState.REQUESTING)) {
-            OrderState previous = order.state.set(REQUESTING);
-
-            return service.cancel(order).effect(o -> {
-                orderItems.remove(o);
-                o.state.set(CANCELED);
-            }).effectOnError(e -> {
-                order.state.set(previous);
-            });
-        } else {
-            return I.signal(order);
-        }
+        return orders.cancel(order);
     }
 
     /**
@@ -265,41 +231,5 @@ public class Market implements Disposable {
         Num baseProfit = base.v.minus(baseInit);
         Num targetProfit = target.v.multiply(tickers.latest.v.price).minus(targetInit.v.multiply(tickers.initial.v.price));
         return baseProfit.plus(targetProfit);
-    }
-
-    /**
-     * Update local managed {@link Order}.
-     * 
-     * @param order
-     * @param exe
-     */
-    private void update(Order order, Execution exe) {
-        // update assets
-        if (order.side().isBuy()) {
-            base.set(v -> v.minus(exe.size.multiply(exe.price)));
-            target.set(v -> v.plus(exe.size));
-        } else {
-            base.set(v -> v.plus(exe.size.multiply(exe.price)));
-            target.set(v -> v.minus(exe.size));
-        }
-
-        // for order state
-        Num executed = Num.min(order.sizeRemaining, exe.size);
-
-        if (order.type.isMarket() && executed.isNot(0)) {
-            order.price
-                    .set(v -> v.multiply(order.sizeExecuted).plus(exe.price.multiply(executed)).divide(executed.plus(order.sizeExecuted)));
-        }
-
-        order.sizeExecuted.set(v -> v.plus(executed));
-        order.sizeRemaining.set(v -> v.minus(executed));
-
-        if (order.sizeRemaining.is(Num.ZERO)) {
-            order.state.set(OrderState.COMPLETED);
-            orderItems.remove(order); // complete order
-        }
-
-        // pairing order and execution
-        order.attribute(RecordedExecutions.class).record(exe);
     }
 }
