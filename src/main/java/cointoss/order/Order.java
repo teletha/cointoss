@@ -54,9 +54,6 @@ public class Order implements Directional {
     /** The remaining size */
     public Num remainingSize;
 
-    /** The execution event. */
-    public final Signal<Execution> executed = attribute(RecordedExecutions.class).additions.expose;
-
     /** The attribute holder. */
     private final Map<Class, Object> attributes = new ConcurrentHashMap();
 
@@ -65,6 +62,9 @@ public class Order implements Directional {
 
     /** The quantity conditions enforcement. */
     private QuantityCondition quantityCondition = QuantityCondition.GoodTillCanceled;
+
+    /** The execution event. */
+    public final Signal<Execution> executed = attribute(RecordedExecutions.class).additions.expose;
 
     /**
      * Hide constructor.

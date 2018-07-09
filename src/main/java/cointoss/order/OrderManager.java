@@ -16,6 +16,7 @@ import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Function;
 
 import cointoss.Execution;
 import cointoss.MarketService;
@@ -26,9 +27,12 @@ import kiss.Signaling;
 import kiss.Ⅱ;
 
 /**
- * @version 2018/07/09 2:04:58
+ * @version 2018/07/09 10:44:08
  */
 public final class OrderManager {
+
+    /** The retry process. */
+    private static final Function<Signal<? extends Throwable>, Signal<?>> RetryProcess = fail -> fail.take(20).delay(250, MILLISECONDS);
 
     /** The actual service. */
     private final MarketService service;
@@ -105,10 +109,7 @@ public final class OrderManager {
     public Signal<Order> request(Order order) {
         order.state.set(REQUESTING);
 
-        return service.request(order).retryWhen(fail -> fail.effect(e -> {
-            System.out.println("Fail " + order + "  retry ");
-            e.printStackTrace();
-        }).take(20).delay(500, MILLISECONDS)).map(id -> {
+        return service.request(order).retryWhen(RetryProcess).map(id -> {
             order.id.let(id);
             order.created.set(ZonedDateTime.now());
             order.state.set(ACTIVE);
@@ -148,7 +149,7 @@ public final class OrderManager {
         if (order.state.is(ACTIVE) || order.state.is(OrderState.REQUESTING)) {
             OrderState previous = order.state.set(REQUESTING);
 
-            return service.cancel(order).effect(o -> {
+            return service.cancel(order).retryWhen(RetryProcess).effect(o -> {
                 managed.remove(o);
                 o.state.set(CANCELED);
             }).effectOnError(e -> {

@@ -11,6 +11,7 @@ package cointoss.market.bitflyer;
 
 import static cointoss.MarketTestSupport.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -27,9 +28,12 @@ public class BitFlyerServiceTest {
     MockBitFlyerService service = new MockBitFlyerService();
 
     @Test
-    void normalize() {
-        assert BitFlyerService.normalize("2018-04-26T00:32:26.1234567Z").equals("2018-04-26T00:32:26.123");
-        assert BitFlyerService.normalize("2018-04-26T00:32:26.19Z").equals("2018-04-26T00:32:26.190");
+    void parse() {
+        assert BitFlyerService.parse("2018-04-26T00:32:26.1234567Z").isEqual(LocalDateTime.parse("2018-04-26T00:32:26.123"));
+        assert BitFlyerService.parse("2018-04-26T00:32:26.19Z").isEqual(LocalDateTime.parse("2018-04-26T00:32:26.190"));
+        assert BitFlyerService.parse("2018-07-09T01:16:20Z").isEqual(LocalDateTime.parse("2018-07-09T01:16:20.000"));
+        assert BitFlyerService.parse("2018-07-09T01:16Z").isEqual(LocalDateTime.parse("2018-07-09T01:16:00.000"));
+        assert BitFlyerService.parse("2018-07-09T01Z").isEqual(LocalDateTime.parse("2018-07-09T01:00:00.000"));
     }
 
     @Test

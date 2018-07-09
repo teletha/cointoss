@@ -64,7 +64,16 @@ public class BitFlyerService extends MarketService {
     private static final DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss-");
 
     /** The realtime data format */
-    static final DateTimeFormatter RealTimeExecutionFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
+    static final DateTimeFormatter RealTimeFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
+
+    /** The realtime data format */
+    static final DateTimeFormatter RealTimeFormatUntilSecond = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+
+    /** The realtime data format */
+    static final DateTimeFormatter RealTimeFormatUntilMinute = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
+
+    /** The realtime data format */
+    static final DateTimeFormatter RealTimeFormatUntilHour = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH");
 
     /** The max acquirable execution size. */
     private static final int MAX = 499;
@@ -226,8 +235,7 @@ public class BitFlyerService extends MarketService {
                     exe.side = Side.parse(e.get("side").getAsString());
                     exe.price = Num.of(e.get("price").getAsString());
                     exe.size = exe.cumulativeSize = Num.of(e.get("size").getAsString());
-                    exe.exec_date = LocalDateTime.parse(normalize(e.get("exec_date").getAsString()), RealTimeExecutionFormat)
-                            .atZone(Chrono.UTC);
+                    exe.exec_date = parse(e.get("exec_date").getAsString()).atZone(Chrono.UTC);
                     String buyer = exe.buy_child_order_acceptance_id = e.get("buy_child_order_acceptance_id").getAsString();
                     String seller = exe.sell_child_order_acceptance_id = e.get("sell_child_order_acceptance_id").getAsString();
 
@@ -263,21 +271,33 @@ public class BitFlyerService extends MarketService {
      * @param time
      * @return
      */
-    static String normalize(String time) {
+    static LocalDateTime parse(String time) {
         int size = time.length();
 
         // remove tail Z
         time = time.substring(0, size - 1);
 
-        // padding 0
-        if (size < 24) {
-            StringBuilder builder = new StringBuilder();
-            for (int i = 0; i < 24 - size; i++) {
-                builder.append("0");
+        switch (size) {
+        case 14:
+            return LocalDateTime.parse(time, RealTimeFormatUntilHour);
+
+        case 17:
+            return LocalDateTime.parse(time, RealTimeFormatUntilMinute);
+
+        case 20:
+            return LocalDateTime.parse(time, RealTimeFormatUntilSecond);
+
+        default:
+            // padding 0
+            if (size < 24) {
+                StringBuilder builder = new StringBuilder();
+                for (int i = 0; i < 24 - size; i++) {
+                    builder.append("0");
+                }
+                time = time + builder;
             }
-            time = time + builder;
+            return LocalDateTime.parse(time.substring(0, 23), RealTimeFormat);
         }
-        return time.substring(0, 23);
     }
 
     /**
