@@ -9,8 +9,11 @@
  */
 package cointoss.order;
 
+import static cointoss.MarketTestSupport.*;
+
 import java.util.List;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import cointoss.backtest.TestableMarketService;
@@ -20,9 +23,35 @@ import cointoss.backtest.TestableMarketService;
  */
 class OrderManagerTest {
 
+    private TestableMarketService service;
+
+    private OrderManager orders;
+
+    @BeforeEach
+    void init() {
+        service = new TestableMarketService();
+        orders = new OrderManager(service);
+    }
+
+    @Test
+    void request() {
+        assert orders.items.size() == 0;
+        orders.requestNow(Order.limitLong(1, 10));
+        assert orders.items.size() == 1;
+    }
+
+    @Test
+    void cancel() {
+        Order order = orders.requestNow(Order.limitLong(1, 10));
+        assert orders.items.size() == 1;
+        assert orders.cancelNow(order) == order;
+        assert orders.items.size() == 0;
+        assert orders.cancelNow(order) == order;
+        assert orders.items.size() == 0;
+    }
+
     @Test
     void hasActiveOrder() {
-        OrderManager orders = create();
         assert orders.hasActiveOrder() == false;
         assert orders.hasNoActiveOrder() == true;
 
@@ -33,7 +62,6 @@ class OrderManagerTest {
 
     @Test
     void added() {
-        OrderManager orders = create();
         List<Order> added = orders.added.toList();
         assert added.size() == 0;
 
@@ -45,12 +73,11 @@ class OrderManagerTest {
 
     @Test
     void removedByCancel() {
-        OrderManager orders = create();
         Order order1 = orders.requestNow(Order.limitLong(1, 10));
         Order order2 = orders.requestNow(Order.limitLong(1, 10));
+
         List<Order> removed = orders.removed.toList();
         assert removed.size() == 0;
-
         orders.cancelNow(order1);
         assert removed.size() == 1;
         orders.cancelNow(order2);
@@ -58,30 +85,24 @@ class OrderManagerTest {
     }
 
     @Test
-    void request() {
-        OrderManager orders = create();
-        assert orders.items.size() == 0;
+    void removedByExecute() {
         orders.requestNow(Order.limitLong(1, 10));
-        assert orders.items.size() == 1;
+
+        List<Order> removed = orders.removed.toList();
+        assert removed.size() == 0;
+        service.emulate(sell(1, 10));
+        assert removed.size() == 1;
     }
 
     @Test
-    void cancel() {
-        OrderManager orders = create();
-        Order order = orders.requestNow(Order.limitLong(1, 10));
-        assert orders.items.size() == 1;
-        assert orders.cancelNow(order) == order;
-        assert orders.items.size() == 0;
-        assert orders.cancelNow(order) == order;
-        assert orders.items.size() == 0;
-    }
+    void removedByExecuteDividedly() {
+        orders.requestNow(Order.limitLong(2, 10));
 
-    /**
-     * Helper to create {@link OrderManager}.
-     * 
-     * @return
-     */
-    private OrderManager create() {
-        return new OrderManager(new TestableMarketService());
+        List<Order> removed = orders.removed.toList();
+        assert removed.size() == 0;
+        service.emulate(sell(1, 10));
+        assert removed.size() == 0;
+        service.emulate(sell(1, 10));
+        assert removed.size() == 1;
     }
 }

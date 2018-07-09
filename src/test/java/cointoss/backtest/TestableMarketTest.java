@@ -493,7 +493,7 @@ class TestableMarketTest {
             size.set(e.cumulativeSize);
         });
 
-        MarketTestSupport.executionSerially(4, Side.SELL, 10, 5).forEach(market::execute);
+        MarketTestSupport.executionSerially(4, Side.SELL, 5, 10).forEach(market::execute);
         market.execute(Side.SELL, 5, 10);
         assert size.get().is(20);
     }
@@ -506,7 +506,7 @@ class TestableMarketTest {
             size.set(e.cumulativeSize);
         });
 
-        MarketTestSupport.executionSerially(4, Side.BUY, 10, 5).forEach(market::execute);
+        MarketTestSupport.executionSerially(4, Side.BUY, 5, 10).forEach(market::execute);
         market.execute(Side.BUY, 5, 10);
         assert size.get().is(20);
     }

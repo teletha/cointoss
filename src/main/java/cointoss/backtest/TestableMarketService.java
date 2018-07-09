@@ -204,7 +204,7 @@ public class TestableMarketService extends MarketService {
      * @param e
      * @return
      */
-    Execution emulate(Execution e) {
+    public Execution emulate(Execution e) {
         now = e.date;
 
         // emulate market execution

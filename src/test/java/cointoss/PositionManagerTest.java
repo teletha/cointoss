@@ -27,7 +27,7 @@ public class PositionManagerTest {
         assert positions.hasPosition() == false;
         assert positions.hasNoPosition() == true;
 
-        positions.add(position(Side.BUY, 10, 1));
+        positions.add(position(Side.BUY, 1, 10));
         assert positions.hasPosition() == true;
         assert positions.hasNoPosition() == false;
     }
@@ -38,7 +38,7 @@ public class PositionManagerTest {
         assert positions.isLong() == false;
         assert positions.isShort() == false;
 
-        positions.add(position(Side.BUY, 10, 1));
+        positions.add(position(Side.BUY, 1, 10));
         assert positions.isLong() == true;
         assert positions.isShort() == false;
     }
@@ -49,7 +49,7 @@ public class PositionManagerTest {
         assert positions.isLong() == false;
         assert positions.isShort() == false;
 
-        positions.add(position(Side.SELL, 10, 1));
+        positions.add(position(Side.SELL, 1, 10));
         assert positions.isLong() == false;
         assert positions.isShort() == true;
     }
@@ -60,23 +60,23 @@ public class PositionManagerTest {
         assert positions.size.is(Num.ZERO);
 
         // long
-        positions.add(position(Side.BUY, 10, 1));
+        positions.add(position(Side.BUY, 1, 10));
         assert positions.size.is(Num.ONE);
 
         // same price long
-        positions.add(position(Side.BUY, 10, 1));
+        positions.add(position(Side.BUY, 1, 10));
         assert positions.size.is(Num.TWO);
 
         // different price long
-        positions.add(position(Side.BUY, 20, 1));
+        positions.add(position(Side.BUY, 1, 20));
         assert positions.size.is(Num.THREE);
 
         // short
-        positions.add(position(Side.SELL, 10, 2));
+        positions.add(position(Side.SELL, 2, 10));
         assert positions.size.is(Num.ONE);
 
         // turn over
-        positions.add(position(Side.SELL, 20, 2));
+        positions.add(position(Side.SELL, 2, 20));
         assert positions.size.is(Num.ONE);
     }
 
@@ -86,58 +86,58 @@ public class PositionManagerTest {
         assert positions.price.is(Num.ZERO);
 
         // long
-        positions.add(position(Side.BUY, 10, 1));
+        positions.add(position(Side.BUY, 1, 10));
         assert positions.price.is(Num.TEN);
 
         // same price long
-        positions.add(position(Side.BUY, 10, 1));
+        positions.add(position(Side.BUY, 1, 10));
         assert positions.price.is(Num.TEN);
 
         // different price long
-        positions.add(position(Side.BUY, 20, 2));
+        positions.add(position(Side.BUY, 2, 20));
         assert positions.price.is(Num.of(15));
 
         // short
-        positions.add(position(Side.SELL, 10, 2));
+        positions.add(position(Side.SELL, 2, 10));
         assert positions.price.is(Num.of(20));
 
         // turn over
-        positions.add(position(Side.SELL, 20, 2));
+        positions.add(position(Side.SELL, 2, 20));
         assert positions.price.is(Num.ZERO);
     }
 
     @Test
     void profit() {
-        Variable<Execution> latest = Variable.of(buy(20, 1));
+        Variable<Execution> latest = Variable.of(buy(1, 20));
         PositionManager positions = new PositionManager(latest);
         assert positions.profit.is(Num.ZERO);
 
         // long
-        positions.add(position(Side.BUY, 10, 1));
+        positions.add(position(Side.BUY, 1, 10));
         assert positions.profit.is(Num.of(10));
 
         // same price long
-        positions.add(position(Side.BUY, 10, 1));
+        positions.add(position(Side.BUY, 1, 10));
         assert positions.profit.is(Num.of(20));
 
         // different price long
-        positions.add(position(Side.BUY, 20, 2));
+        positions.add(position(Side.BUY, 2, 20));
         assert positions.profit.is(Num.of(20));
 
         // short
-        positions.add(position(Side.SELL, 10, 2));
+        positions.add(position(Side.SELL, 2, 10));
         assert positions.profit.is(Num.ZERO);
 
         // turn over
-        positions.add(position(Side.SELL, 20, 2));
+        positions.add(position(Side.SELL, 2, 20));
         assert positions.profit.is(Num.ZERO);
     }
 
     @Test
     void zero() {
         PositionManager positions = new PositionManager(null);
-        positions.add(position(Side.BUY, 10, 1));
-        positions.add(position(Side.SELL, 12, 1));
+        positions.add(position(Side.BUY, 1, 10));
+        positions.add(position(Side.SELL, 1, 12));
 
         assert positions.hasNoPosition();
     }

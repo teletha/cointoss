@@ -28,10 +28,10 @@ class MarketServiceTest {
     @Test
     void compactId() {
         List<Execution> exes = new ArrayList();
-        exes.add(buy(10, 1).id(10));
-        exes.add(buy(10, 1).id(12));
-        exes.add(sell(10, 1).id(13));
-        exes.add(sell(10, 1).id(19));
+        exes.add(buy(1, 10).id(10));
+        exes.add(buy(1, 10).id(12));
+        exes.add(sell(1, 10).id(13));
+        exes.add(sell(1, 10).id(19));
 
         for (int i = 1; i < exes.size(); i++) {
             Execution current = exes.get(i);
@@ -46,10 +46,10 @@ class MarketServiceTest {
     @Test
     void compactSide() {
         List<Execution> exes = new ArrayList();
-        exes.add(buy(10, 1));
-        exes.add(buy(10, 1));
-        exes.add(sell(10, 1));
-        exes.add(sell(10, 1));
+        exes.add(buy(1, 10));
+        exes.add(buy(1, 10));
+        exes.add(sell(1, 10));
+        exes.add(sell(1, 10));
 
         for (int i = 1; i < exes.size(); i++) {
             Execution current = exes.get(i);
@@ -64,14 +64,14 @@ class MarketServiceTest {
     @Test
     void compactDate() {
         List<Execution> exes = new ArrayList();
-        exes.add(buy(10, 1).date(2018, 5, 1, 10, 0, 0, 0));
-        exes.add(buy(10, 1).date(2018, 5, 1, 10, 0, 0, 100));
-        exes.add(buy(10, 1).date(2018, 5, 1, 10, 0, 40, 100));
-        exes.add(buy(10, 1).date(2018, 5, 1, 10, 33, 40, 100));
-        exes.add(buy(10, 1).date(2018, 5, 1, 22, 33, 40, 100));
-        exes.add(buy(10, 1).date(2018, 5, 9, 22, 33, 40, 100));
-        exes.add(buy(10, 1).date(2018, 11, 9, 22, 33, 40, 100));
-        exes.add(buy(10, 1).date(2020, 11, 9, 22, 33, 40, 100));
+        exes.add(buy(1, 10).date(2018, 5, 1, 10, 0, 0, 0));
+        exes.add(buy(1, 10).date(2018, 5, 1, 10, 0, 0, 100));
+        exes.add(buy(1, 10).date(2018, 5, 1, 10, 0, 40, 100));
+        exes.add(buy(1, 10).date(2018, 5, 1, 10, 33, 40, 100));
+        exes.add(buy(1, 10).date(2018, 5, 1, 22, 33, 40, 100));
+        exes.add(buy(1, 10).date(2018, 5, 9, 22, 33, 40, 100));
+        exes.add(buy(1, 10).date(2018, 11, 9, 22, 33, 40, 100));
+        exes.add(buy(1, 10).date(2020, 11, 9, 22, 33, 40, 100));
 
         for (int i = 1; i < exes.size(); i++) {
             Execution current = exes.get(i);
@@ -86,12 +86,12 @@ class MarketServiceTest {
     @Test
     void compactSize() {
         List<Execution> exes = new ArrayList();
-        exes.add(buy(10, 1));
-        exes.add(buy(10, 1));
-        exes.add(buy(10, 2));
-        exes.add(buy(10, 5.4));
-        exes.add(buy(10, 3));
-        exes.add(buy(10, 0.1));
+        exes.add(buy(1, 10));
+        exes.add(buy(1, 10));
+        exes.add(buy(2, 10));
+        exes.add(buy(5.4, 10));
+        exes.add(buy(3, 10));
+        exes.add(buy(0.1, 10));
 
         for (int i = 1; i < exes.size(); i++) {
             Execution current = exes.get(i);
@@ -106,12 +106,12 @@ class MarketServiceTest {
     @Test
     void compactPrice() {
         List<Execution> exes = new ArrayList();
-        exes.add(buy(10, 1));
-        exes.add(buy(10, 1));
-        exes.add(buy(12, 1));
-        exes.add(buy(13.4, 1));
-        exes.add(buy(10, 1));
-        exes.add(buy(3.33, 1));
+        exes.add(buy(1, 10));
+        exes.add(buy(1, 10));
+        exes.add(buy(1, 12));
+        exes.add(buy(1, 13.4));
+        exes.add(buy(1, 10));
+        exes.add(buy(1, 3.33));
 
         for (int i = 1; i < exes.size(); i++) {
             Execution current = exes.get(i);
@@ -126,13 +126,13 @@ class MarketServiceTest {
     @Test
     void compactConsecutiveType() {
         List<Execution> exes = new ArrayList();
-        exes.add(buy(10, 1).consecutive(Execution.ConsecutiveDifference));
-        exes.add(buy(10, 1).consecutive(Execution.ConsecutiveDifference));
-        exes.add(buy(10, 1).consecutive(Execution.ConsecutiveSameBuyer));
-        exes.add(buy(10, 1).consecutive(Execution.ConsecutiveSameSeller));
-        exes.add(buy(10, 1).consecutive(Execution.ConsecutiveSameSeller));
-        exes.add(buy(10, 1).consecutive(Execution.ConsecutiveSameBuyer));
-        exes.add(buy(10, 1).consecutive(Execution.ConsecutiveDifference));
+        exes.add(buy(1, 10).consecutive(Execution.ConsecutiveDifference));
+        exes.add(buy(1, 10).consecutive(Execution.ConsecutiveDifference));
+        exes.add(buy(1, 10).consecutive(Execution.ConsecutiveSameBuyer));
+        exes.add(buy(1, 10).consecutive(Execution.ConsecutiveSameSeller));
+        exes.add(buy(1, 10).consecutive(Execution.ConsecutiveSameSeller));
+        exes.add(buy(1, 10).consecutive(Execution.ConsecutiveSameBuyer));
+        exes.add(buy(1, 10).consecutive(Execution.ConsecutiveDifference));
 
         for (int i = 1; i < exes.size(); i++) {
             Execution current = exes.get(i);
@@ -147,14 +147,14 @@ class MarketServiceTest {
     @Test
     void compactDelay() {
         List<Execution> exes = new ArrayList();
-        exes.add(buy(10, 1).delay(1));
-        exes.add(buy(10, 1).delay(1));
-        exes.add(buy(10, 1).delay(3));
-        exes.add(buy(10, 1).delay(10));
-        exes.add(buy(10, 1).delay(5));
-        exes.add(buy(10, 1).delay(Execution.DelayHuge));
-        exes.add(buy(10, 1).delay(Execution.DelayInestimable));
-        exes.add(buy(10, 1).delay(Execution.DelayInestimable));
+        exes.add(buy(1, 10).delay(1));
+        exes.add(buy(1, 10).delay(1));
+        exes.add(buy(1, 10).delay(3));
+        exes.add(buy(1, 10).delay(10));
+        exes.add(buy(1, 10).delay(5));
+        exes.add(buy(1, 10).delay(Execution.DelayHuge));
+        exes.add(buy(1, 10).delay(Execution.DelayInestimable));
+        exes.add(buy(1, 10).delay(Execution.DelayInestimable));
 
         for (int i = 1; i < exes.size(); i++) {
             Execution current = exes.get(i);

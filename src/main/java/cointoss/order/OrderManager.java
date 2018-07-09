@@ -65,10 +65,29 @@ public final class OrderManager {
         added.to(managed::add);
         removed.to(managed::remove);
 
-        service.add(service.positions().to(e -> {
+        service.add(service.positions().to(exe -> {
             for (Order order : managed) {
-                if (order.id.is(e.yourOrder)) {
-                    update(order, e);
+                if (order.id.is(exe.yourOrder)) {
+                    Num executed = exe.size;
+
+                    if (order.type.isMarket() && executed.isNot(0)) {
+                        order.price.set(v -> v.multiply(order.sizeExecuted)
+                                .plus(exe.price.multiply(executed))
+                                .divide(executed.plus(order.sizeExecuted)));
+                    }
+
+                    order.sizeExecuted.set(v -> v.plus(executed));
+                    order.sizeRemaining.set(v -> v.minus(executed));
+
+                    if (order.sizeRemaining.is(Num.ZERO)) {
+                        order.state.set(OrderState.COMPLETED);
+                    }
+
+                    // pairing order and execution
+                    order.attribute(RecordedExecutions.class).record(exe);
+
+                    updates.accept(I.pair(order, exe));
+                    return;
                 }
             }
         }));
@@ -172,32 +191,4 @@ public final class OrderManager {
         return managed.isEmpty() == true;
     }
 
-    /**
-     * Update local managed {@link Order}.
-     * 
-     * @param order
-     * @param exe
-     */
-    private void update(Order order, Execution exe) {
-        // for order state
-        Num executed = Num.min(order.sizeRemaining, exe.size);
-
-        if (order.type.isMarket() && executed.isNot(0)) {
-            order.price
-                    .set(v -> v.multiply(order.sizeExecuted).plus(exe.price.multiply(executed)).divide(executed.plus(order.sizeExecuted)));
-        }
-
-        order.sizeExecuted.set(v -> v.plus(executed));
-        order.sizeRemaining.set(v -> v.minus(executed));
-
-        if (order.sizeRemaining.is(Num.ZERO)) {
-            order.state.set(OrderState.COMPLETED);
-            managed.remove(order); // complete order
-        }
-
-        // pairing order and execution
-        order.attribute(RecordedExecutions.class).record(exe);
-
-        updates.accept(I.pair(order, exe));
-    }
 }

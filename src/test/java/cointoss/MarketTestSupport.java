@@ -23,7 +23,7 @@ import kiss.I;
 import kiss.Signal;
 
 /**
- * @version 2018/05/23 17:41:24
+ * @version 2018/07/09 9:18:25
  */
 public class MarketTestSupport {
 
@@ -36,68 +36,68 @@ public class MarketTestSupport {
     /**
      * Create {@link Execution}.
      * 
-     * @param price
      * @param size
+     * @param price
      * @return
      */
-    public static ChainableExecution buy(double price, double size) {
-        return buy(Num.of(price), Num.of(size));
+    public static ChainableExecution buy(double size, double price) {
+        return buy(Num.of(size), Num.of(price));
     }
 
     /**
      * Create {@link Execution}.
      * 
-     * @param price
      * @param size
+     * @param price
      * @return
      */
-    public static ChainableExecution buy(Num price, Num size) {
-        return execution(Side.BUY, price, size);
+    public static ChainableExecution buy(Num size, Num price) {
+        return execution(Side.BUY, size, price);
     }
 
     /**
      * Create {@link Execution}.
      * 
-     * @param price
      * @param size
+     * @param price
      * @return
      */
-    public static ChainableExecution sell(double price, double size) {
-        return sell(Num.of(price), Num.of(size));
+    public static ChainableExecution sell(double size, double price) {
+        return sell(Num.of(size), Num.of(price));
     }
 
     /**
      * Create {@link Execution}.
      * 
-     * @param price
      * @param size
+     * @param price
      * @return
      */
-    public static ChainableExecution sell(Num price, Num size) {
-        return execution(Side.SELL, price, size);
-    }
-
-    /**
-     * Create {@link Execution}.
-     * 
-     * @param side
-     * @param price
-     * @param size
-     * @return
-     */
-    public static ChainableExecution execution(Side side, double price, double size) {
-        return execution(side, Num.of(price), Num.of(size));
+    public static ChainableExecution sell(Num size, Num price) {
+        return execution(Side.SELL, size, price);
     }
 
     /**
      * Create {@link Execution}.
      * 
      * @param side
-     * @param price
      * @param size
+     * @param price
      * @return
      */
-    public static ChainableExecution execution(Side side, Num price, Num size) {
+    public static ChainableExecution execution(Side side, double size, double price) {
+        return execution(side, Num.of(size), Num.of(price));
+    }
+
+    /**
+     * Create {@link Execution}.
+     * 
+     * @param side
+     * @param size
+     * @param price
+     * @return
+     */
+    public static ChainableExecution execution(Side side, Num size, Num price) {
         ChainableExecution exe = new ChainableExecution();
         exe.id = executionId.getAndIncrement();
         exe.side = Objects.requireNonNull(side);
@@ -111,15 +111,15 @@ public class MarketTestSupport {
     /**
      * Create {@link Execution}.
      * 
-     * @param price
      * @param size
+     * @param price
      * @return
      */
-    public static List<Execution> executionSerially(int count, Side side, double price, double size) {
+    public static List<Execution> executionSerially(int count, Side side, double size, double price) {
         List<Execution> list = new ArrayList();
 
         for (int i = 0; i < count; i++) {
-            Execution e = execution(side, price, size);
+            Execution e = execution(side, size, price);
             if (i != 0) e.consecutive = side.isBuy() ? Execution.ConsecutiveSameBuyer : Execution.ConsecutiveSameSeller;
             list.add(e);
         }
@@ -145,23 +145,23 @@ public class MarketTestSupport {
      * Create {@link Position}.
      * 
      * @param side
-     * @param price
      * @param size
+     * @param price
      * @return
      */
-    public static Position position(Side side, double price, double size) {
-        return position(side, Num.of(price), Num.of(size));
+    public static Position position(Side side, double size, double price) {
+        return position(side, Num.of(size), Num.of(price));
     }
 
     /**
      * Create {@link Position}.
      * 
      * @param side
-     * @param price
      * @param size
+     * @param price
      * @return
      */
-    public static Position position(Side side, Num price, Num size) {
+    public static Position position(Side side, Num size, Num price) {
         Position position = new Position();
         position.date = ZonedDateTime.now().truncatedTo(ChronoUnit.MILLIS);
         position.side = Objects.requireNonNull(side);

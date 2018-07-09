@@ -48,12 +48,12 @@ public class BitFlyerServiceTest {
         assert service.request(Order.limitLong(1, 10)).to().is("ServerAcceptanceID");
 
         // irrelevant execution
-        service.executionWillResponse(execution(Side.BUY, 10, 1), "DisrelatedBuyer", "DisrelatedSeller");
+        service.executionWillResponse(execution(Side.BUY, 1, 10), "DisrelatedBuyer", "DisrelatedSeller");
         assert executions.size() == 1;
         assert positions.size() == 0;
 
         // my execution
-        service.executionWillResponse(execution(Side.SELL, 10, 1), "ServerAcceptanceID", "DisrelatedSeller");
+        service.executionWillResponse(execution(Side.SELL, 1, 10), "ServerAcceptanceID", "DisrelatedSeller");
         assert executions.size() == 2;
         assert positions.size() == 1;
         assert positions.get(0).side.isBuy();
