@@ -42,20 +42,17 @@ public class Order implements Directional {
     /** The ordered price. */
     public final Variable<Num> price;
 
+    /** The order created date-time */
+    public final Variable<ZonedDateTime> created = Variable.of(ZonedDateTime.now());
+
     /** The ordered size. */
     public final Num size;
 
-    /** The remaining size */
-    public final Variable<Num> sizeRemaining;
-
     /** The executed size */
-    public final Variable<Num> sizeExecuted = Variable.of(Num.ZERO);
+    public Num sizeExecuted = Num.ZERO;
 
-    /** The canceled size */
-    public final Variable<Num> sizeCanceled = Variable.of(Num.ZERO);
-
-    /** The order created date-time */
-    public final Variable<ZonedDateTime> created = Variable.of(ZonedDateTime.now());
+    /** The remaining size */
+    public Num sizeRemaining;
 
     /** The attribute holder. */
     private final Map<Class, Object> attributes = new ConcurrentHashMap();
@@ -80,10 +77,9 @@ public class Order implements Directional {
      */
     protected Order(Side position, Num size, Num price, Num priceLimit, QuantityCondition quantity) {
         this.side = Objects.requireNonNull(position);
-        this.size = Objects.requireNonNull(size);
+        this.size = this.sizeRemaining = Objects.requireNonNull(size);
         this.price = Variable.of(price == null ? Num.ZERO : price);
         this.type = price == null || price.isZero() ? OrderType.MARKET : OrderType.LIMIT;
-        this.sizeRemaining = Variable.of(size);
 
         stopAt(priceLimit);
         type(quantity);

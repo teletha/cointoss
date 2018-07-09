@@ -98,8 +98,7 @@ public class TestableMarketService extends MarketService {
             child.id.let("LOCAL-ACCEPTANCE-" + id++);
             child.state.set(OrderState.ACTIVE);
             child.created.set(now.plusNanos(lag.generate()));
-            child.sizeRemaining.set(order.size);
-            child.sizeExecuted.set(Num.ZERO);
+            child.sizeRemaining = order.size;
 
             orderAll.add(child);
             orderActive.add(child);
@@ -241,8 +240,7 @@ public class TestableMarketService extends MarketService {
 
             if (order.quantityCondition() == QuantityCondition.ImmediateOrCancel) {
                 if (validateTradableByPrice(order, e)) {
-                    Num min = Num.min(e.size, order.sizeRemaining.get());
-                    order.sizeRemaining.set(min);
+                    order.sizeRemaining = Num.min(e.size, order.sizeRemaining);
                 } else {
                     iterator.remove();
                     orderAll.remove(order);
@@ -251,15 +249,15 @@ public class TestableMarketService extends MarketService {
             }
 
             if (validateTradableByPrice(order, e)) {
-                Num executedSize = Num.min(e.size, order.sizeRemaining.get());
+                Num executedSize = Num.min(e.size, order.sizeRemaining);
                 if (order.type.isMarket() && executedSize.isNot(0)) {
                     order.marketMinPrice = order.isBuy() ? Num.max(order.marketMinPrice, e.price) : Num.min(order.marketMinPrice, e.price);
                     order.price.set(v -> v.multiply(order.sizeExecuted)
                             .plus(order.marketMinPrice.multiply(executedSize))
                             .divide(executedSize.plus(order.sizeExecuted)));
                 }
-                order.sizeRemaining.set(v -> v.minus(executedSize));
-                order.sizeExecuted.set(v -> v.plus(executedSize));
+                order.sizeExecuted = order.sizeExecuted.plus(executedSize);
+                order.sizeRemaining = order.sizeRemaining.minus(executedSize);
 
                 Execution exe = new Execution();
                 exe.side = order.side();
@@ -269,7 +267,7 @@ public class TestableMarketService extends MarketService {
                 exe.yourOrder = order.id.v;
                 executeds.add(exe);
 
-                if (order.sizeRemaining.get().is(0)) {
+                if (order.sizeRemaining.isZero()) {
                     order.state.set(OrderState.COMPLETED);
                     iterator.remove();
                 }

@@ -76,8 +76,8 @@ public final class OrderManager {
                                 .divide(executed.plus(order.sizeExecuted)));
                     }
 
-                    order.sizeExecuted.set(v -> v.plus(executed));
-                    order.sizeRemaining.set(v -> v.minus(executed));
+                    order.sizeExecuted = order.sizeExecuted.plus(executed);
+                    order.sizeRemaining = order.sizeRemaining.minus(executed);
 
                     if (order.sizeRemaining.is(Num.ZERO)) {
                         order.state.set(OrderState.COMPLETED);
@@ -111,7 +111,6 @@ public final class OrderManager {
         }).take(20).delay(500, MILLISECONDS)).map(id -> {
             order.id.let(id);
             order.created.set(ZonedDateTime.now());
-            order.sizeRemaining.set(order.size);
             order.state.set(ACTIVE);
             order.observeTerminating().to(remove::accept);
 
