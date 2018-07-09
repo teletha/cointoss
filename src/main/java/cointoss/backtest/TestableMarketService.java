@@ -98,7 +98,7 @@ public class TestableMarketService extends MarketService {
             child.id.let("LOCAL-ACCEPTANCE-" + id++);
             child.state.set(OrderState.ACTIVE);
             child.created.set(now.plusNanos(lag.generate()));
-            child.sizeRemaining = order.size;
+            child.remainingSize = order.size;
 
             orderAll.add(child);
             orderActive.add(child);
@@ -240,7 +240,7 @@ public class TestableMarketService extends MarketService {
 
             if (order.quantityCondition() == QuantityCondition.ImmediateOrCancel) {
                 if (validateTradableByPrice(order, e)) {
-                    order.sizeRemaining = Num.min(e.size, order.sizeRemaining);
+                    order.remainingSize = Num.min(e.size, order.remainingSize);
                 } else {
                     iterator.remove();
                     orderAll.remove(order);
@@ -249,15 +249,15 @@ public class TestableMarketService extends MarketService {
             }
 
             if (validateTradableByPrice(order, e)) {
-                Num executedSize = Num.min(e.size, order.sizeRemaining);
+                Num executedSize = Num.min(e.size, order.remainingSize);
                 if (order.type.isMarket() && executedSize.isNot(0)) {
                     order.marketMinPrice = order.isBuy() ? Num.max(order.marketMinPrice, e.price) : Num.min(order.marketMinPrice, e.price);
-                    order.price.set(v -> v.multiply(order.sizeExecuted)
+                    order.price.set(v -> v.multiply(order.executedSize)
                             .plus(order.marketMinPrice.multiply(executedSize))
-                            .divide(executedSize.plus(order.sizeExecuted)));
+                            .divide(executedSize.plus(order.executedSize)));
                 }
-                order.sizeExecuted = order.sizeExecuted.plus(executedSize);
-                order.sizeRemaining = order.sizeRemaining.minus(executedSize);
+                order.executedSize = order.executedSize.plus(executedSize);
+                order.remainingSize = order.remainingSize.minus(executedSize);
 
                 Execution exe = new Execution();
                 exe.side = order.side();
@@ -267,7 +267,7 @@ public class TestableMarketService extends MarketService {
                 exe.yourOrder = order.id.v;
                 executeds.add(exe);
 
-                if (order.sizeRemaining.isZero()) {
+                if (order.remainingSize.isZero()) {
                     order.state.set(OrderState.COMPLETED);
                     iterator.remove();
                 }
@@ -336,7 +336,10 @@ public class TestableMarketService extends MarketService {
          * @param o
          */
         private BackendOrder(Order o) {
-            super(o.side(), o.size, o.price.v, o.stopPrice(), o.quantityCondition());
+            super(o.side(), o.size, o.price.v);
+
+            stopAt(o.stopPrice());
+            type(o.quantityCondition());
         }
     }
 }

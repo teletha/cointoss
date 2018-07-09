@@ -81,7 +81,7 @@ public class OrderCatalog extends View {
         requestedOrdersSide.modelByProperty(OrderSet.class, o -> o.side)
                 .model(Order.class, Order::side)
                 .render((ui, item) -> ui.text(item).styleOnly(item));
-        requestedOrdersAmount.modelByProperty(OrderSet.class, o -> o.amount).model(Order.class, o -> o.sizeRemaining);
+        requestedOrdersAmount.modelByProperty(OrderSet.class, o -> o.amount).model(Order.class, o -> o.remainingSize);
         requestedOrdersPrice.modelByProperty(OrderSet.class, o -> o.averagePrice).model(Order.class, o -> o.price.v);
     }
 

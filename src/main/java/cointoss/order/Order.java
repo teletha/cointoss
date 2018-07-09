@@ -23,7 +23,7 @@ import kiss.Signal;
 import kiss.Variable;
 
 /**
- * @version 2018/07/08 13:10:26
+ * @version 2018/07/09 10:33:17
  */
 public class Order implements Directional {
 
@@ -49,10 +49,13 @@ public class Order implements Directional {
     public final Num size;
 
     /** The executed size */
-    public Num sizeExecuted = Num.ZERO;
+    public Num executedSize = Num.ZERO;
 
     /** The remaining size */
-    public Num sizeRemaining;
+    public Num remainingSize;
+
+    /** The execution event. */
+    public final Signal<Execution> executed = attribute(RecordedExecutions.class).additions.expose;
 
     /** The attribute holder. */
     private final Map<Class, Object> attributes = new ConcurrentHashMap();
@@ -61,28 +64,20 @@ public class Order implements Directional {
     private Num stopPrice;
 
     /** The quantity conditions enforcement. */
-    private QuantityCondition quantityCondition;
-
-    /** The execution event. */
-    public final Signal<Execution> executed = attribute(RecordedExecutions.class).additions.expose;
+    private QuantityCondition quantityCondition = QuantityCondition.GoodTillCanceled;
 
     /**
-     * <p>
      * Hide constructor.
-     * </p>
      * 
-     * @param position
-     * @param price
-     * @param size
+     * @param side A order direction.
+     * @param size A order size.
+     * @param price A order price.
      */
-    protected Order(Side position, Num size, Num price, Num priceLimit, QuantityCondition quantity) {
-        this.side = Objects.requireNonNull(position);
-        this.size = this.sizeRemaining = Objects.requireNonNull(size);
+    protected Order(Side side, Num size, Num price) {
+        this.side = Objects.requireNonNull(side);
+        this.size = this.remainingSize = Objects.requireNonNull(size);
         this.price = Variable.of(price == null ? Num.ZERO : price);
-        this.type = price == null || price.isZero() ? OrderType.MARKET : OrderType.LIMIT;
-
-        stopAt(priceLimit);
-        type(quantity);
+        this.type = this.price.is(Num.ZERO) ? OrderType.MARKET : OrderType.LIMIT;
     }
 
     /**
@@ -258,7 +253,7 @@ public class Order implements Directional {
      */
     @Override
     public String toString() {
-        return side().mark() + size + "@" + price + " 残" + sizeRemaining + " 済" + sizeExecuted + " " + created;
+        return side().mark() + size + "@" + price + " 残" + remainingSize + " 済" + executedSize + " " + created;
     }
 
     /**
@@ -291,7 +286,7 @@ public class Order implements Directional {
      * @return A created {@link Order}.
      */
     public static Order market(Side side, Num size) {
-        return new Order(side, size, null, null, null);
+        return new Order(side, size, null);
     }
 
     /**
@@ -387,7 +382,7 @@ public class Order implements Directional {
      * @return A created {@link Order}.
      */
     public static Order limit(Side side, Num size, Num price) {
-        return new Order(side, size, price, null, null);
+        return new Order(side, size, price);
     }
 
     /**
