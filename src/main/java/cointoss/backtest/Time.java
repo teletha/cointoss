@@ -20,7 +20,7 @@ import cointoss.util.Generator;
 public class Time {
 
     /** The base time */
-    static final ZonedDateTime BASE = ZonedDateTime.of(2012, 1, 1, 0, 0, 0, 0, Chrono.UTC);
+    static final ZonedDateTime BASE = ZonedDateTime.of(2013, 1, 1, 0, 0, 0, 0, Chrono.UTC);
 
     /** The start time */
     private final int start;
