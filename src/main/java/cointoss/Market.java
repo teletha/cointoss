@@ -69,16 +69,16 @@ public class Market implements Disposable {
     public final PositionManager positions;
 
     /** The amount of base currency. */
-    public final Variable<Num> base = Variable.empty();
+    public final Variable<Num> baseCurrency;
 
     /** The initial amount of base currency. */
-    public final Variable<Num> baseInit = Variable.empty();
+    public final Num initialBaseCurrency;
 
     /** The amount of target currency. */
-    public final Variable<Num> target = Variable.empty();
+    public final Variable<Num> targetCurrency;
 
     /** The initial amount of target currency. */
-    public final Variable<Num> targetInit = Variable.empty();
+    public final Num initialTargetCurrency;
 
     /** The tarader manager. */
     private final List<Trader> traders = new CopyOnWriteArrayList<>();
@@ -93,18 +93,14 @@ public class Market implements Disposable {
         this.orders = new OrderManager(service);
         this.positions = new PositionManager(service, tickers.latest);
 
+        // initialize currency data
+        baseCurrency = service.baseCurrency().to();
+        targetCurrency = service.targetCurrency().to();
+        initialBaseCurrency = baseCurrency.v;
+        initialTargetCurrency = targetCurrency.v;
+
         // build tickers for each span
         timeline.to(tickers::update);
-
-        // initialize currency data
-        service.baseCurrency().to(v -> {
-            this.base.set(v);
-            this.baseInit.let(v);
-        });
-        service.targetCurrency().to(v -> {
-            this.target.set(v);
-            this.targetInit.let(v);
-        });
 
         // orderbook management
         service.add(service.orderBook().to(board -> {
@@ -117,16 +113,16 @@ public class Market implements Disposable {
             orderBook.longs.fix(e.price);
         }));
 
-        orders.updated.to(v -> {
+        service.add(service.executionsRealtimelyForMe().to(e -> {
             // update assets
-            if (v.ⅰ.side().isBuy()) {
-                base.set(value -> value.minus(v.ⅱ.size.multiply(v.ⅱ.price)));
-                target.set(value -> value.plus(v.ⅱ.size));
+            if (e.isBuy()) {
+                baseCurrency.set(value -> value.minus(e.size.multiply(e.price)));
+                targetCurrency.set(value -> value.plus(e.size));
             } else {
-                base.set(value -> value.plus(v.ⅱ.size.multiply(v.ⅱ.price)));
-                target.set(value -> value.minus(v.ⅱ.size));
+                baseCurrency.set(value -> value.plus(e.size.multiply(e.price)));
+                targetCurrency.set(value -> value.minus(e.size));
             }
-        });
+        }));
     }
 
     /**
@@ -224,8 +220,8 @@ public class Market implements Disposable {
      * @return
      */
     public Num calculateProfit() {
-        Num baseProfit = base.v.minus(baseInit);
-        Num targetProfit = target.v.multiply(tickers.latest.v.price).minus(targetInit.v.multiply(tickers.initial.v.price));
+        Num baseProfit = baseCurrency.v.minus(initialBaseCurrency);
+        Num targetProfit = targetCurrency.v.multiply(tickers.latest.v.price).minus(initialTargetCurrency.multiply(tickers.initial.v.price));
         return baseProfit.plus(targetProfit);
     }
 }

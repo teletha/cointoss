@@ -38,7 +38,7 @@ public interface Directional {
      * @return
      */
     default Side inverse() {
-        return isBuy() ? Side.SELL : Side.BUY;
+        return side() == Side.BUY ? Side.SELL : Side.BUY;
     }
 
     /**

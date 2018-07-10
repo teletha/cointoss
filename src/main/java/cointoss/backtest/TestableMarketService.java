@@ -12,6 +12,7 @@ package cointoss.backtest;
 import java.time.ZonedDateTime;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -54,6 +55,12 @@ public class TestableMarketService extends MarketService {
     /** The lag generator. */
     private final Time lag;
 
+    /** The initial base currency. */
+    private final Num baseCurrency;
+
+    /** The initial target currency. */
+    private final Num targetCurrency;
+
     /** The current time. */
     private ZonedDateTime now = Time.BASE;
 
@@ -67,9 +74,25 @@ public class TestableMarketService extends MarketService {
     /**
     * 
     */
+    public TestableMarketService(Num baseCurrency, Num targetCurrency) {
+        this(Time.at(0), baseCurrency, targetCurrency);
+    }
+
+    /**
+    * 
+    */
     public TestableMarketService(Time lag) {
+        this(lag, Num.HUNDRED, Num.ZERO);
+    }
+
+    /**
+    * 
+    */
+    public TestableMarketService(Time lag, Num baseCurrency, Num targetCurrency) {
         super("TestableExchange", "TestableMarket");
         this.lag = lag;
+        this.baseCurrency = Objects.requireNonNull(baseCurrency);
+        this.targetCurrency = Objects.requireNonNull(targetCurrency);
     }
 
     /**
@@ -99,6 +122,7 @@ public class TestableMarketService extends MarketService {
             child.state.set(OrderState.ACTIVE);
             child.created.set(now.plusNanos(lag.generate()));
             child.remainingSize = order.size;
+            System.out.println("REQUEST " + child + "  " + now);
 
             orderAll.add(child);
             orderActive.add(child);
@@ -134,6 +158,14 @@ public class TestableMarketService extends MarketService {
      * {@inheritDoc}
      */
     @Override
+    public Signal<Execution> executionsRealtimelyForMe() {
+        return positions.expose;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Execution exectutionLatest() {
         // If this exception will be thrown, it is bug of this program. So we must rethrow the
         // wrapped error
@@ -161,16 +193,8 @@ public class TestableMarketService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Execution> executionsRealtimelyForMe() {
-        return positions.expose;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public Signal<Num> baseCurrency() {
-        return I.signal(Num.HUNDRED);
+        return I.signal(baseCurrency);
     }
 
     /**
@@ -178,7 +202,7 @@ public class TestableMarketService extends MarketService {
      */
     @Override
     public Signal<Num> targetCurrency() {
-        return I.signal(Num.ZERO);
+        return I.signal(targetCurrency);
     }
 
     /**
@@ -204,6 +228,7 @@ public class TestableMarketService extends MarketService {
      * @return
      */
     public Execution emulate(Execution e) {
+        System.out.println("EXECUTE " + e);
         now = e.date;
 
         // emulate market execution
@@ -211,7 +236,7 @@ public class TestableMarketService extends MarketService {
 
         while (iterator.hasNext()) {
             BackendOrder order = iterator.next();
-
+            System.out.println(e + "  " + order);
             // time base filter
             if (e.date.isBefore(order.created.get())) {
                 continue;

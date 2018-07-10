@@ -17,6 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import cointoss.Directional;
 import cointoss.Execution;
 import cointoss.Side;
+import cointoss.util.Chrono;
 import cointoss.util.Num;
 import kiss.I;
 import kiss.Signal;
@@ -43,7 +44,7 @@ public class Order implements Directional {
     public final Variable<Num> price;
 
     /** The order created date-time */
-    public final Variable<ZonedDateTime> created = Variable.of(ZonedDateTime.now());
+    public final Variable<ZonedDateTime> created = Variable.of(Chrono.utcNow());
 
     /** The ordered size. */
     public final Num size;

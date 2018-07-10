@@ -10,7 +10,6 @@
 package cointoss;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
 import cointoss.util.Chrono;
@@ -19,9 +18,9 @@ import kiss.Decoder;
 import kiss.Encoder;
 
 /**
- * @version 2018/07/08 13:51:33
+ * @version 2018/07/10 21:40:24
  */
-public class Execution {
+public class Execution implements Directional {
 
     /** The consecutive type. (DEFAULT) */
     public static final int ConsecutiveDifference = 0;
@@ -79,22 +78,17 @@ public class Execution {
     public String yourOrder;
 
     /**
-     * 
+     * Create empty {@link Execution}.
      */
     public Execution() {
     }
 
     /**
-     * @param line
+     * Create {@link Execution} with the specified values.
+     * 
+     * @param values A list of values.
      */
-    public Execution(String line) {
-        this(line.split(" "));
-    }
-
-    /**
-     * @param line
-     */
-    public Execution(String... values) {
+    Execution(String... values) {
         id = Long.parseLong(values[0]);
         date = LocalDateTime.parse(values[1]).atZone(cointoss.util.Chrono.UTC);
         side = Side.parse(values[2]);
@@ -102,6 +96,14 @@ public class Execution {
         size = cumulativeSize = Num.of(values[4]);
         consecutive = Integer.parseInt(values[5]);
         delay = Integer.parseInt(values[6]);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Side side() {
+        return side;
     }
 
     /**
@@ -184,12 +186,10 @@ public class Execution {
     }
 
     /**
-     * @version 2017/09/07 23:25:44
+     * @version 2018/07/10 21:53:01
      */
     @SuppressWarnings("unused")
     private static class Codec implements Decoder<ZonedDateTime>, Encoder<ZonedDateTime> {
-
-        private static final ZoneId zone = ZoneId.of("UTC");
 
         /**
          * {@inheritDoc}
@@ -204,7 +204,7 @@ public class Execution {
          */
         @Override
         public ZonedDateTime decode(String value) {
-            return LocalDateTime.parse(value).atZone(zone);
+            return LocalDateTime.parse(value).atZone(Chrono.UTC);
         }
     }
 

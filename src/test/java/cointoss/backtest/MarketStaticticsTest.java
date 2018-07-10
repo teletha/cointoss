@@ -15,7 +15,7 @@ import cointoss.Side;
 import cointoss.order.Order;
 
 /**
- * @version 2018/04/29 20:14:25
+ * @version 2018/07/10 23:17:09
  */
 class MarketStaticticsTest {
 
@@ -24,13 +24,13 @@ class MarketStaticticsTest {
         TestableMarket market = new TestableMarket();
         market.requestAndExecution(Order.limitLong(1, 10));
 
-        assert market.base.v.is(90);
-        assert market.target.v.is(1);
+        assert market.baseCurrency.v.is(90);
+        assert market.targetCurrency.v.is(1);
         assert market.calculateProfit().is(0);
 
         market.requestAndExecution(Order.limitShort(1, 15));
-        assert market.base.v.is(105);
-        assert market.target.v.is(0);
+        assert market.baseCurrency.v.is(105);
+        assert market.targetCurrency.v.is(0);
         assert market.calculateProfit().is(5);
     }
 
@@ -40,8 +40,8 @@ class MarketStaticticsTest {
         market.requestTo(Order.limitLong(1, 10));
         market.execute(Side.BUY, 1, 9);
 
-        assert market.base.v.is(90);
-        assert market.target.v.is(1);
+        assert market.baseCurrency.v.is(90);
+        assert market.targetCurrency.v.is(1);
         assert market.calculateProfit().is(0);
     }
 
@@ -51,8 +51,8 @@ class MarketStaticticsTest {
         market.requestAndExecution(Order.limitLong(1, 10));
         market.requestAndExecution(Order.limitLong(1, 20));
 
-        assert market.base.v.is(70);
-        assert market.target.v.is(2);
+        assert market.baseCurrency.v.is(70);
+        assert market.targetCurrency.v.is(2);
         assert market.calculateProfit().is(10);
     }
 
@@ -63,8 +63,8 @@ class MarketStaticticsTest {
         market.requestAndExecution(Order.limitLong(1, 20));
         market.execute(Side.BUY, 1, 5);
 
-        assert market.base.v.is(70);
-        assert market.target.v.is(2);
+        assert market.baseCurrency.v.is(70);
+        assert market.targetCurrency.v.is(2);
         assert market.calculateProfit().is(-20);
     }
 
@@ -74,8 +74,8 @@ class MarketStaticticsTest {
         market.requestAndExecution(Order.limitShort(1, 10));
         market.requestAndExecution(Order.limitShort(1, 20));
 
-        assert market.base.v.is(130);
-        assert market.target.v.is(-2);
+        assert market.baseCurrency.v.is(130);
+        assert market.targetCurrency.v.is(-2);
         assert market.calculateProfit().is(-10);
     }
 
@@ -85,8 +85,8 @@ class MarketStaticticsTest {
         market.requestAndExecution(Order.limitShort(1, 10));
         market.requestAndExecution(Order.limitLong(1, 20));
 
-        assert market.base.v.is(90);
-        assert market.target.v.is(0);
+        assert market.baseCurrency.v.is(90);
+        assert market.targetCurrency.v.is(0);
         assert market.calculateProfit().is(-10);
     }
 
@@ -96,8 +96,8 @@ class MarketStaticticsTest {
         market.requestAndExecution(Order.limitLong(1, 10));
         market.requestAndExecution(Order.limitShort(1, 20));
 
-        assert market.base.v.is(110);
-        assert market.target.v.is(0);
+        assert market.baseCurrency.v.is(110);
+        assert market.targetCurrency.v.is(0);
         assert market.calculateProfit().is(10);
     }
 }

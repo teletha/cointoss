@@ -102,7 +102,12 @@ public final class PositionManager {
     }
 
     /**
-     * Update position by the specified my execution..
+     * <p>
+     * Update position by the specified my execution.
+     * </p>
+     * <p>
+     * This method is separate for test.
+     * </p>
      * 
      * @param exe A my execution.
      */

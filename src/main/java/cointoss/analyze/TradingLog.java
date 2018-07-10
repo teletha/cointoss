@@ -97,12 +97,12 @@ public class TradingLog {
         Execution last = market.tickers.latest.v;
         this.start = init.date;
         this.startPrice = init.price;
-        this.startBaseCurrency = market.baseInit.v;
-        this.startTargetCurrency = market.targetInit.v;
+        this.startBaseCurrency = market.initialBaseCurrency;
+        this.startTargetCurrency = market.initialTargetCurrency;
         this.finish = last.date;
         this.finishPrice = last.price;
-        this.finishBaseCurrency = market.base.v;
-        this.finishTargetCurrency = market.target.v;
+        this.finishBaseCurrency = market.baseCurrency.v;
+        this.finishTargetCurrency = market.targetCurrency.v;
 
         for (Trader trading : tradings) {
             for (Entry entry : trading.entries) {

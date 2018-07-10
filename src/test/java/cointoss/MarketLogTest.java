@@ -23,6 +23,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 
 import antibug.CleanRoom;
 import cointoss.backtest.TestableMarket;
+import cointoss.backtest.TestableMarketService;
 import cointoss.util.Chrono;
 import kiss.I;
 
@@ -34,7 +35,7 @@ class MarketLogTest {
     @RegisterExtension
     CleanRoom room = new CleanRoom();
 
-    TestableMarket market = new TestableMarket();
+    TestableMarket market = new TestableMarket(new TestableMarketService());
 
     MarketService service = market.service;
 
