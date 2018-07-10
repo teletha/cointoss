@@ -163,7 +163,7 @@ public class MarketTestSupport {
      */
     public static Position position(Side side, Num size, Num price) {
         Position position = new Position();
-        position.date = ZonedDateTime.now().truncatedTo(ChronoUnit.MILLIS);
+        position.date = BaseDate;
         position.side = Objects.requireNonNull(side);
         position.price = Objects.requireNonNull(price);
         position.size.set(Objects.requireNonNull(size));

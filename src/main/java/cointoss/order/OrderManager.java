@@ -69,7 +69,7 @@ public final class OrderManager {
         added.to(managed::add);
         removed.to(managed::remove);
 
-        service.add(service.positions().to(exe -> {
+        service.add(service.executionsRealtimelyForMe().to(exe -> {
             for (Order order : managed) {
                 if (order.id.is(exe.yourOrder)) {
                     Num executed = exe.size;

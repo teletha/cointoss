@@ -66,7 +66,7 @@ public class Market implements Disposable {
     public final TickerManager tickers = new TickerManager();
 
     /** The position manager. */
-    public final PositionManager positions = new PositionManager(tickers.latest);
+    public final PositionManager positions;
 
     /** The amount of base currency. */
     public final Variable<Num> base = Variable.empty();
@@ -91,6 +91,7 @@ public class Market implements Disposable {
     public Market(MarketService service) {
         this.service = Objects.requireNonNull(service, "Market is not found.");
         this.orders = new OrderManager(service);
+        this.positions = new PositionManager(service, tickers.latest);
 
         // build tickers for each span
         timeline.to(tickers::update);
@@ -117,13 +118,6 @@ public class Market implements Disposable {
         }));
 
         orders.updated.to(v -> {
-            Position position = new Position();
-            position.side = v.ⅰ.side;
-            position.price = v.ⅱ.price;
-            position.size.set(v.ⅱ.size);
-            position.date = v.ⅱ.date;
-            positions.add(position);
-
             // update assets
             if (v.ⅰ.side().isBuy()) {
                 base.set(value -> value.minus(v.ⅱ.size.multiply(v.ⅱ.price)));

@@ -161,7 +161,7 @@ public class TestableMarketService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Execution> positions() {
+    public Signal<Execution> executionsRealtimelyForMe() {
         return positions.expose;
     }
 

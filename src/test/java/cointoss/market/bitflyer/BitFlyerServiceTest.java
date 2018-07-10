@@ -46,7 +46,7 @@ public class BitFlyerServiceTest {
     @Test
     void createPositionWhenOrderIsExecuted() {
         List<Execution> executions = service.executionsRealtimely().toList();
-        List<Execution> positions = service.positions().toList();
+        List<Execution> positions = service.executionsRealtimelyForMe().toList();
 
         service.requestWillResponse("ServerAcceptanceID");
         assert service.request(Order.limitLong(1, 10)).to().is("ServerAcceptanceID");

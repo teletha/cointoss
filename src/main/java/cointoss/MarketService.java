@@ -22,7 +22,7 @@ import kiss.Disposable;
 import kiss.Signal;
 
 /**
- * @version 2018/05/23 17:25:31
+ * @version 2018/07/10 17:36:08
  */
 public abstract class MarketService implements Disposable {
 
@@ -89,9 +89,16 @@ public abstract class MarketService implements Disposable {
     /**
      * Acquire the execution log in realtime. This is infinitely.
      * 
-     * @return
+     * @return A event stream of execution log.
      */
     public abstract Signal<Execution> executionsRealtimely();
+
+    /**
+     * Acquire the my execution log (positions) in realtime. This is infinitely.
+     * 
+     * @return A event stream of execution log related to my orders.
+     */
+    public abstract Signal<Execution> executionsRealtimelyForMe();
 
     /**
      * Acquier the latest execution log.
@@ -125,13 +132,6 @@ public abstract class MarketService implements Disposable {
      * @return
      */
     public abstract Signal<Order> orders();
-
-    /**
-     * Acquire the your position log in realtime.
-     * 
-     * @return
-     */
-    public abstract Signal<Execution> positions();
 
     /**
      * <p>

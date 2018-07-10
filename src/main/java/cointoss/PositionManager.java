@@ -58,9 +58,11 @@ public final class PositionManager {
      * 
      * @param latest A latest market {@link Execution} holder.
      */
-    public PositionManager(Variable<Execution> latest) {
+    public PositionManager(MarketService service, Variable<Execution> latest) {
         this.latest = latest == null ? Variable.of(Execution.BASE) : latest;
         this.latest.observe().to(this::calculateProfit);
+
+        service.add(service.executionsRealtimelyForMe().to(this::add));
     }
 
     /**
@@ -100,32 +102,33 @@ public final class PositionManager {
     }
 
     /**
-     * Handle the specified execution on the side.
+     * Update position by the specified my execution..
      * 
-     * @param side A position side.
-     * @param exe A target execution.
+     * @param exe A my execution.
      */
-    void add(Position add) {
-        if (add != null) {
+    void add(Execution e) {
+        if (e != null) {
+            Num size = e.size;
+
             for (Position position : positions) {
-                if (position.side == add.side) {
+                if (position.side == e.side) {
                     // check same price position
-                    if (position.price.is(add.price)) {
-                        position.size.set(add.size.v::plus);
+                    if (position.price.is(e.price)) {
+                        position.size.set(size::plus);
                         calculate();
                         return;
                     }
                 } else {
-                    Num remaining = add.size.v.minus(position.size);
+                    Num remaining = size.minus(position.size);
 
                     if (remaining.isPositive()) {
-                        add.size.set(remaining);
+                        size = remaining;
                         position.size.set(Num.ZERO);
 
                         positions.remove(position);
                         remove.accept(position);
                     } else if (remaining.isZero()) {
-                        add.size.set(remaining);
+                        size = remaining;
                         position.size.set(Num.ZERO);
 
                         positions.remove(position);
@@ -133,16 +136,22 @@ public final class PositionManager {
                         calculate();
                         return;
                     } else {
-                        position.size.set(v -> v.minus(add.size));
+                        position.size.set(remaining.negate());
                         calculate();
                         return;
                     }
                 }
             }
 
-            if (add.size.v.isPositive()) {
-                positions.add(add);
-                addition.accept(add);
+            if (size.isPositive()) {
+                Position position = new Position();
+                position.side = e.side;
+                position.price = e.price;
+                position.size.set(size);
+                position.date = e.date;
+
+                positions.add(position);
+                addition.accept(position);
                 calculate();
             }
         }

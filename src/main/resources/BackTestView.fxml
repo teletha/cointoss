@@ -5,18 +5,13 @@
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-
-<BorderPane xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1">
-   <center>
-      <AnchorPane id="chart" BorderPane.alignment="CENTER" />
-   </center>
-   <right>
-      <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
+<HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <VBox id="chart" HBox.hgrow="ALWAYS" />
+      <VBox prefHeight="200.0" prefWidth="100.0">
          <children>
             <ComboBox id="market" minWidth="250.0" prefWidth="300.0">
                <VBox.margin>
@@ -38,9 +33,8 @@
             <Button id="start" mnemonicParsing="false" text="Start">
                <VBox.margin>
                   <Insets />
-               </VBox.margin>
-            </Button>
+               </VBox.margin></Button>
          </children>
       </VBox>
-   </right>
-</BorderPane>
+   </children>
+</HBox>

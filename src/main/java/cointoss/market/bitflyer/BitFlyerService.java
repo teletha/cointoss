@@ -84,8 +84,8 @@ public class BitFlyerService extends MarketService {
     /** The order management. */
     private final Set<String> orders = ConcurrentHashMap.newKeySet();
 
-    /** The position event. */
-    private final Signaling<Execution> positions = new Signaling();
+    /** The event stream of execution log for me. */
+    private final Signaling<Execution> executionsForMe = new Signaling();
 
     /** Flag for test. */
     private final boolean forTest;
@@ -247,7 +247,7 @@ public class BitFlyerService extends MarketService {
                         position.size = exe.size;
                         position.yourOrder = buyer;
 
-                        positions.accept(position);
+                        executionsForMe.accept(position);
                     } else if (orders.contains(seller)) {
                         Execution position = new Execution();
                         position.side = Side.SELL;
@@ -256,13 +256,21 @@ public class BitFlyerService extends MarketService {
                         position.size = exe.size;
                         position.yourOrder = seller;
 
-                        positions.accept(position);
+                        executionsForMe.accept(position);
                     }
 
                     return exe;
                 })
                 .skipNull()
                 .map(BitFlyerExecution.NONE, (prev, now) -> now.estimate(prev));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Signal<Execution> executionsRealtimelyForMe() {
+        return executionsForMe.expose;
     }
 
     /**
@@ -336,14 +344,6 @@ public class BitFlyerService extends MarketService {
     public Signal<Order> orders() {
         return call("GET", "/v1/me/getchildorders?child_order_state=ACTIVE&product_code=" + marketName, "", "*", ChildOrderResponse.class)
                 .map(ChildOrderResponse::toOrder);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Signal<Execution> positions() {
-        return positions.expose;
     }
 
     /**
