@@ -10,6 +10,7 @@
 package cointoss.ticker;
 
 import static cointoss.MarketTestSupport.*;
+import static cointoss.backtest.Time.*;
 import static cointoss.ticker.TickSpan.*;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -34,7 +35,7 @@ class TickerManagerTest {
     @Test
     void updateHighPrice() {
         // update
-        manager.update(buy(1, 100).date(BaseDate));
+        manager.update(buy(1, 100).date(Base));
 
         // validate
         manager.tickers().to(ticker -> {
@@ -42,8 +43,8 @@ class TickerManagerTest {
         });
 
         // update
-        manager.update(buy(1, 300).date(BaseDate.plusMinutes(1)));
-        manager.update(buy(1, 200).date(BaseDate.plusMinutes(2)));
+        manager.update(buy(1, 300).date(Base.plusMinutes(1)));
+        manager.update(buy(1, 200).date(Base.plusMinutes(2)));
 
         // validate
         manager.tickers().take(between(Minute3, Day7)).to(ticker -> {
@@ -56,15 +57,15 @@ class TickerManagerTest {
         });
 
         // update and validate
-        manager.update(buy(1, 300).date(BaseDate.plusMinutes(3)));
+        manager.update(buy(1, 300).date(Base.plusMinutes(3)));
         assert manager.tickerBy(Minute3).last().highPrice.is(300);
         assert manager.tickerBy(Minute5).last().highPrice.is(300);
         // update and validate
-        manager.update(buy(1, 400).date(BaseDate.plusMinutes(4)));
+        manager.update(buy(1, 400).date(Base.plusMinutes(4)));
         assert manager.tickerBy(Minute3).last().highPrice.is(400);
         assert manager.tickerBy(Minute5).last().highPrice.is(400);
         // update and validate
-        manager.update(buy(1, 500).date(BaseDate.plusMinutes(5)));
+        manager.update(buy(1, 500).date(Base.plusMinutes(5)));
         assert manager.tickerBy(Minute3).last().highPrice.is(500);
         assert manager.tickerBy(Minute5).last().highPrice.is(500);
     }
@@ -72,7 +73,7 @@ class TickerManagerTest {
     @Test
     void updateLowPrice() {
         // update
-        manager.update(buy(1, 300).date(BaseDate));
+        manager.update(buy(1, 300).date(Base));
 
         // validate
         manager.tickers().to(ticker -> {
@@ -80,8 +81,8 @@ class TickerManagerTest {
         });
 
         // update
-        manager.update(buy(1, 100).date(BaseDate.plusMinutes(1)));
-        manager.update(buy(1, 200).date(BaseDate.plusMinutes(2)));
+        manager.update(buy(1, 100).date(Base.plusMinutes(1)));
+        manager.update(buy(1, 200).date(Base.plusMinutes(2)));
 
         // validate
         manager.tickers().take(between(Minute3, Day7)).to(ticker -> {
@@ -94,15 +95,15 @@ class TickerManagerTest {
         });
 
         // update and validate
-        manager.update(buy(1, 30).date(BaseDate.plusMinutes(3)));
+        manager.update(buy(1, 30).date(Base.plusMinutes(3)));
         assert manager.tickerBy(Minute3).last().lowPrice.is(30);
         assert manager.tickerBy(Minute5).last().lowPrice.is(30);
         // update and validate
-        manager.update(buy(1, 20).date(BaseDate.plusMinutes(4)));
+        manager.update(buy(1, 20).date(Base.plusMinutes(4)));
         assert manager.tickerBy(Minute3).last().lowPrice.is(20);
         assert manager.tickerBy(Minute5).last().lowPrice.is(20);
         // update and validate
-        manager.update(buy(1, 10).date(BaseDate.plusMinutes(5)));
+        manager.update(buy(1, 10).date(Base.plusMinutes(5)));
         assert manager.tickerBy(Minute3).last().lowPrice.is(10);
         assert manager.tickerBy(Minute5).last().lowPrice.is(10);
     }
@@ -110,7 +111,7 @@ class TickerManagerTest {
     @Test
     void updateOpenPrice() {
         // update
-        manager.update(buy(1, 300).date(BaseDate));
+        manager.update(buy(1, 300).date(Base));
 
         // validate
         manager.tickers().to(ticker -> {
@@ -118,8 +119,8 @@ class TickerManagerTest {
         });
 
         // update
-        manager.update(buy(1, 100).date(BaseDate.plusMinutes(1)));
-        manager.update(buy(1, 200).date(BaseDate.plusMinutes(2)));
+        manager.update(buy(1, 100).date(Base.plusMinutes(1)));
+        manager.update(buy(1, 200).date(Base.plusMinutes(2)));
 
         // validate
         manager.tickers().take(between(Minute3, Day7)).to(ticker -> {
@@ -135,7 +136,7 @@ class TickerManagerTest {
     @Test
     void updateClosePrice() {
         // update
-        manager.update(buy(1, 300).date(BaseDate));
+        manager.update(buy(1, 300).date(Base));
 
         // validate
         manager.tickers().to(ticker -> {
@@ -143,8 +144,8 @@ class TickerManagerTest {
         });
 
         // update
-        manager.update(buy(1, 100).date(BaseDate.plusMinutes(1)));
-        manager.update(buy(1, 200).date(BaseDate.plusMinutes(2)));
+        manager.update(buy(1, 100).date(Base.plusMinutes(1)));
+        manager.update(buy(1, 200).date(Base.plusMinutes(2)));
 
         // validate
         manager.tickers().take(between(Minute3, Day7)).to(ticker -> {
@@ -160,7 +161,7 @@ class TickerManagerTest {
     @Test
     void updateLongVolume() {
         // update
-        manager.update(buy(1, 300).date(BaseDate));
+        manager.update(buy(1, 300).date(Base));
 
         // validate
         manager.tickers().to(ticker -> {
@@ -168,8 +169,8 @@ class TickerManagerTest {
         });
 
         // update
-        manager.update(buy(1, 100).date(BaseDate.plusMinutes(1)));
-        manager.update(buy(1, 200).date(BaseDate.plusMinutes(2)));
+        manager.update(buy(1, 100).date(Base.plusMinutes(1)));
+        manager.update(buy(1, 200).date(Base.plusMinutes(2)));
 
         // validate
         manager.tickers().take(between(Minute3, Day7)).to(ticker -> {
@@ -182,7 +183,7 @@ class TickerManagerTest {
         });
 
         // update
-        manager.update(buy(3, 300).date(BaseDate.plusMinutes(3)));
+        manager.update(buy(3, 300).date(Base.plusMinutes(3)));
 
         // validate
         Ticker ticker = manager.tickerBy(Minute1);
@@ -195,7 +196,7 @@ class TickerManagerTest {
     @Test
     void updateShortVolume() {
         // update
-        manager.update(sell(1, 300).date(BaseDate));
+        manager.update(sell(1, 300).date(Base));
 
         // validate
         manager.tickers().to(ticker -> {
@@ -203,8 +204,8 @@ class TickerManagerTest {
         });
 
         // update
-        manager.update(sell(1, 100).date(BaseDate.plusMinutes(1)));
-        manager.update(sell(1, 200).date(BaseDate.plusMinutes(2)));
+        manager.update(sell(1, 100).date(Base.plusMinutes(1)));
+        manager.update(sell(1, 200).date(Base.plusMinutes(2)));
 
         // validate
         manager.tickers().take(between(Minute3, Day7)).to(ticker -> {
@@ -227,7 +228,7 @@ class TickerManagerTest {
     @Test
     void complementGap() {
         manager.update(buy(1, 10));
-        manager.update(buy(1, 30).date(BaseDate.plusMinutes(5)));
+        manager.update(buy(1, 30).date(Base.plusMinutes(5)));
 
         Ticker ticker = manager.tickerBy(Minute1);
         Tick tick = ticker.ticks.get(0);
@@ -276,13 +277,13 @@ class TickerManagerTest {
             assert ticker.size() == 1;
         });
 
-        manager.update(buy(1, 20).date(BaseDate.plusSeconds(5)));
+        manager.update(buy(1, 20).date(Base.plusSeconds(5)));
         assert manager.tickerBy(Second5).size() == 2;
         manager.tickers().take(between(Second15, Day7)).to(ticker -> {
             assert ticker.size() == 1;
         });
 
-        manager.update(buy(1, 30).date(BaseDate.plusMinutes(1)));
+        manager.update(buy(1, 30).date(Base.plusMinutes(1)));
         assert manager.tickerBy(Second5).size() == 13;
         assert manager.tickerBy(Second15).size() == 5;
         assert manager.tickerBy(Second30).size() == 3;
@@ -291,14 +292,14 @@ class TickerManagerTest {
             assert ticker.size() == 1;
         });
 
-        manager.update(buy(1, 40).date(BaseDate.plusMinutes(3)));
+        manager.update(buy(1, 40).date(Base.plusMinutes(3)));
         assert manager.tickerBy(Minute1).size() == 4;
         assert manager.tickerBy(Minute3).size() == 2;
         manager.tickers().take(between(Minute5, Day7)).to(ticker -> {
             assert ticker.size() == 1;
         });
 
-        manager.update(buy(1, 50).date(BaseDate.plusMinutes(5)));
+        manager.update(buy(1, 50).date(Base.plusMinutes(5)));
         assert manager.tickerBy(Minute1).size() == 6;
         assert manager.tickerBy(Minute3).size() == 2;
         assert manager.tickerBy(Minute5).size() == 2;
@@ -312,7 +313,7 @@ class TickerManagerTest {
         manager.tickers().flatMap(t -> t.add).to();
 
         manager.update(buy(1, 10));
-        manager.update(buy(1, 30).date(BaseDate.plusMinutes(5)));
+        manager.update(buy(1, 30).date(Base.plusMinutes(5)));
         assert manager.tickerBy(Minute1).size() == 6;
         assert manager.tickerBy(Minute3).size() == 2;
         assert manager.tickerBy(Minute5).size() == 2;
@@ -332,9 +333,9 @@ class TickerManagerTest {
         assert counter.get() == size;
         manager.update(buy(1, 20));
         assert counter.get() == size * 2;
-        manager.update(buy(1, 30).date(BaseDate.plusHours(1)));
+        manager.update(buy(1, 30).date(Base.plusHours(1)));
         assert counter.get() == size * 3;
-        manager.update(buy(1, 40).date(BaseDate.plusHours(6)));
+        manager.update(buy(1, 40).date(Base.plusHours(6)));
         assert counter.get() == size * 4;
     }
 }

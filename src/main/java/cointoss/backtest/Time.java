@@ -10,17 +10,18 @@
 package cointoss.backtest;
 
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 
 import cointoss.util.Chrono;
 import cointoss.util.Generator;
 
 /**
- * @version 2018/04/29 15:42:50
+ * @version 2018/07/11 12:57:18
  */
 public class Time {
 
     /** The base time */
-    static final ZonedDateTime BASE = ZonedDateTime.of(2013, 1, 1, 0, 0, 0, 0, Chrono.UTC);
+    public static final ZonedDateTime Base = Chrono.utcNow().truncatedTo(ChronoUnit.DAYS);
 
     /** The start time */
     private final int start;
@@ -45,7 +46,7 @@ public class Time {
      * @return
      */
     ZonedDateTime to() {
-        return BASE.plusSeconds(Generator.randomInt(start, end));
+        return Base.plusSeconds(Generator.randomInt(start, end));
     }
 
     /**

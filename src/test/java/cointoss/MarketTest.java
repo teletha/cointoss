@@ -19,7 +19,7 @@ import cointoss.order.Order;
 import cointoss.util.Num;
 
 /**
- * @version 2018/07/10 21:56:26
+ * @version 2018/07/11 13:27:20
  */
 class MarketTest {
 
@@ -31,18 +31,43 @@ class MarketTest {
     }
 
     @Test
-    void baseCurrency() {
+    void balance() {
         assert market.initialBaseCurrency.is(100);
         assert market.baseCurrency.is(Num.of(100));
+        assert market.initialTargetCurrency.is(0);
+        assert market.targetCurrency.is(Num.of(0));
 
         // non-matching order
         market.execute(buy(1, 10));
         assert market.initialBaseCurrency.is(100);
         assert market.baseCurrency.is(Num.of(100));
+        assert market.initialTargetCurrency.is(0);
+        assert market.targetCurrency.is(Num.of(0));
 
         // matching order
         market.requestAndExecution(Order.limitLong(1, 10));
         assert market.initialBaseCurrency.is(100);
         assert market.baseCurrency.is(Num.of(90));
+        assert market.initialTargetCurrency.is(0);
+        assert market.targetCurrency.is(Num.of(1));
+
+        market.requestAndExecution(Order.limitLong(2, 20));
+        assert market.initialBaseCurrency.is(100);
+        assert market.baseCurrency.is(Num.of(50));
+        assert market.initialTargetCurrency.is(0);
+        assert market.targetCurrency.is(Num.of(3));
+
+        // exit
+        market.requestAndExecution(Order.limitShort(1, 20));
+        assert market.initialBaseCurrency.is(100);
+        assert market.baseCurrency.is(Num.of(70));
+        assert market.initialTargetCurrency.is(0);
+        assert market.targetCurrency.is(Num.of(2));
+
+        market.requestAndExecution(Order.limitShort(2, 10));
+        assert market.initialBaseCurrency.is(100);
+        assert market.baseCurrency.is(Num.of(90));
+        assert market.initialTargetCurrency.is(0);
+        assert market.targetCurrency.is(Num.of(0));
     }
 }

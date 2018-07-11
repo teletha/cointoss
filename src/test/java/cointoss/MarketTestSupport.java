@@ -10,12 +10,12 @@
 package cointoss;
 
 import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 
+import cointoss.backtest.Time;
 import cointoss.util.Chrono;
 import cointoss.util.Generator;
 import cointoss.util.Num;
@@ -26,9 +26,6 @@ import kiss.Signal;
  * @version 2018/07/09 9:18:25
  */
 public class MarketTestSupport {
-
-    /** The base time. */
-    public static final ZonedDateTime BaseDate = Chrono.utcNow().truncatedTo(ChronoUnit.DAYS);
 
     /** The execution id manager. */
     private static final AtomicLong executionId = new AtomicLong(1); // don't use 0
@@ -103,7 +100,7 @@ public class MarketTestSupport {
         exe.side = Objects.requireNonNull(side);
         exe.price = Objects.requireNonNull(price);
         exe.size = exe.cumulativeSize = Objects.requireNonNull(size);
-        exe.date = BaseDate;
+        exe.date = Time.Base;
 
         return exe;
     }
@@ -163,7 +160,7 @@ public class MarketTestSupport {
      */
     public static Position position(Side side, Num size, Num price) {
         Position position = new Position();
-        position.date = BaseDate;
+        position.date = Time.Base;
         position.side = Objects.requireNonNull(side);
         position.price = Objects.requireNonNull(price);
         position.size.set(Objects.requireNonNull(size));

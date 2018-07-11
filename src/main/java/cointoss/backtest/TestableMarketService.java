@@ -62,7 +62,7 @@ public class TestableMarketService extends MarketService {
     private final Num targetCurrency;
 
     /** The current time. */
-    private ZonedDateTime now = Time.BASE;
+    private ZonedDateTime now = Time.Base;
 
     /**
      * 
@@ -122,7 +122,6 @@ public class TestableMarketService extends MarketService {
             child.state.set(OrderState.ACTIVE);
             child.created.set(now.plusNanos(lag.generate()));
             child.remainingSize = order.size;
-            System.out.println("REQUEST " + child + "  " + now);
 
             orderAll.add(child);
             orderActive.add(child);
@@ -228,7 +227,6 @@ public class TestableMarketService extends MarketService {
      * @return
      */
     public Execution emulate(Execution e) {
-        System.out.println("EXECUTE " + e);
         now = e.date;
 
         // emulate market execution
@@ -236,7 +234,7 @@ public class TestableMarketService extends MarketService {
 
         while (iterator.hasNext()) {
             BackendOrder order = iterator.next();
-            System.out.println(e + "  " + order);
+
             // time base filter
             if (e.date.isBefore(order.created.get())) {
                 continue;
