@@ -35,6 +35,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
@@ -639,6 +640,17 @@ public class MarketLog {
     }
 
     public static void main(String[] args) {
+        BitFlyerService.FX_BTC_JPY.log.caches().skip(255).take(6).to(c -> {
+            AtomicInteger base = new AtomicInteger();
+            AtomicInteger count = new AtomicInteger();
+            c.read().effect(base::incrementAndGet).skip(e -> {
+                return e.consecutive != Execution.ConsecutiveDifference;
+            }).to(count::incrementAndGet);
+            System.out.println(c.date + "   " + base.get() + "  " + count.get());
+        });
+    }
+
+    public static void main2(String[] args) {
         Market market = new Market(BitFlyerService.FX_BTC_JPY);
         market.readLog(log -> log.caches().skip(255).take(6).concatMap(c -> c.read()));
 
