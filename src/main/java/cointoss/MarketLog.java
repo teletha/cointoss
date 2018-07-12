@@ -206,8 +206,8 @@ public class MarketLog {
                     }
                 }
             }
-            this.cacheFirst = start;
-            this.cacheLast = end;
+            this.cacheFirst = start != null ? start : Chrono.utcNow().truncatedTo(ChronoUnit.DAYS);
+            this.cacheLast = end != null ? end : start;
             this.cache = new Cache(cacheFirst);
         } catch (Exception e) {
             throw I.quiet(e);
@@ -651,7 +651,7 @@ public class MarketLog {
     }
 
     public static void main(String[] args) {
-        BitFlyerService.FX_BTC_JPY.log.at(2017, 7, 1).to(e -> {
+        BitFlyerService.FX_BTC_JPY.log.at(2017, 11, 21).to(e -> {
             System.out.println(e);
         });
     }
