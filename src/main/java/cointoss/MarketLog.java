@@ -651,7 +651,7 @@ public class MarketLog {
     }
 
     public static void main(String[] args) {
-        BitFlyerService.FX_BTC_JPY.log.at(2017, 11, 21).to(e -> {
+        BitFlyerService.FX_BTC_JPY.log.at(2018, 3, 23).to(e -> {
             System.out.println(e);
         });
     }
