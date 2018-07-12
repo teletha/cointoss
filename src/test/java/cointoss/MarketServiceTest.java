@@ -19,7 +19,7 @@ import org.junit.jupiter.api.Test;
 import cointoss.backtest.TestableMarketService;
 
 /**
- * @version 2018/05/23 18:34:39
+ * @version 2018/07/12 9:52:30
  */
 class MarketServiceTest {
 
@@ -133,6 +133,8 @@ class MarketServiceTest {
         exes.add(buy(1, 10).consecutive(Execution.ConsecutiveSameSeller));
         exes.add(buy(1, 10).consecutive(Execution.ConsecutiveSameBuyer));
         exes.add(buy(1, 10).consecutive(Execution.ConsecutiveDifference));
+        exes.add(buy(1, 10).consecutive(Execution.ConsecutiveSameBoth));
+        exes.add(buy(1, 10).consecutive(Execution.ConsecutiveSameBoth));
 
         for (int i = 1; i < exes.size(); i++) {
             Execution current = exes.get(i);

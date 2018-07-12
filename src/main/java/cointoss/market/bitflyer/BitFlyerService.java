@@ -750,10 +750,12 @@ public class BitFlyerService extends MarketService {
          * @param previous
          */
         private void estimateConsecutiveType(BitFlyerExecution previous) {
-            if (previous == null) {
-                consecutive = Execution.ConsecutiveDifference;
-            } else if (buy_child_order_acceptance_id.equals(previous.buy_child_order_acceptance_id)) {
-                consecutive = Execution.ConsecutiveSameBuyer;
+            if (buy_child_order_acceptance_id.equals(previous.buy_child_order_acceptance_id)) {
+                if (sell_child_order_acceptance_id.equals(previous.sell_child_order_acceptance_id)) {
+                    consecutive = Execution.ConsecutiveSameBoth;
+                } else {
+                    consecutive = Execution.ConsecutiveSameBuyer;
+                }
             } else if (sell_child_order_acceptance_id.equals(previous.sell_child_order_acceptance_id)) {
                 consecutive = Execution.ConsecutiveSameSeller;
             } else {
@@ -763,8 +765,8 @@ public class BitFlyerService extends MarketService {
 
         /**
          * <p>
-         * Analyze Taker's order ID and obtain approximate order time (Since there is a bot which specifies
-         * non-standard id format, ignore it in that case).
+         * Analyze Taker's order ID and obtain approximate order time (Since there is a bot which
+         * specifies non-standard id format, ignore it in that case).
          * </p>
          * <ol>
          * <li>Execution Date : UTC</li>

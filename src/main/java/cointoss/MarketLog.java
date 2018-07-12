@@ -643,8 +643,8 @@ public class MarketLog {
         BitFlyerService.FX_BTC_JPY.log.caches().skip(255).take(6).to(c -> {
             AtomicInteger base = new AtomicInteger();
             AtomicInteger count = new AtomicInteger();
-            c.read().effect(base::incrementAndGet).skip(e -> {
-                return e.consecutive != Execution.ConsecutiveDifference;
+            c.read().effect(base::incrementAndGet).skip(Execution.BASE, (prev, now) -> {
+                return prev.price.is(now.price) && prev.date.isEqual(now.date) && now.consecutive != Execution.ConsecutiveDifference;
             }).to(count::incrementAndGet);
             System.out.println(c.date + "   " + base.get() + "  " + count.get());
         });

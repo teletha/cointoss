@@ -22,9 +22,12 @@ import kiss.Disposable;
 import kiss.Signal;
 
 /**
- * @version 2018/07/10 17:36:08
+ * @version 2018/07/12 9:52:55
  */
 public abstract class MarketService implements Disposable {
+
+    /** CONSTANTS */
+    private static final int ConsecutiveTypeSize = 4;
 
     /** The exchange name. */
     public final String exchangeName;
@@ -172,12 +175,12 @@ public abstract class MarketService implements Disposable {
         current.date = decodeDate(values[1], previous);
         current.price = decodePrice(values[2], previous);
         int value = LogCodec.decodeInt(values[3].charAt(0));
-        if (value < 3) {
+        if (value < ConsecutiveTypeSize) {
             current.side = Side.BUY;
             current.consecutive = value;
         } else {
             current.side = Side.SELL;
-            current.consecutive = value - 3;
+            current.consecutive = value - ConsecutiveTypeSize;
         }
         current.delay = LogCodec.decodeInt(values[3].charAt(1)) - 3;
         current.size = decodeSize(values[3].substring(2), previous);
@@ -197,7 +200,7 @@ public abstract class MarketService implements Disposable {
         String price = encodePrice(execution, previous);
         String size = encodeSize(execution, previous);
         String delay = LogCodec.encodeInt(execution.delay + 3);
-        String sideAndConsecutive = String.valueOf(execution.side.isBuy() ? execution.consecutive : 3 + execution.consecutive);
+        String sideAndConsecutive = String.valueOf(execution.isBuy() ? execution.consecutive : ConsecutiveTypeSize + execution.consecutive);
 
         return new String[] {id, time, price, sideAndConsecutive + delay + size};
     }

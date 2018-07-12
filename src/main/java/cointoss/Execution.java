@@ -18,7 +18,7 @@ import kiss.Decoder;
 import kiss.Encoder;
 
 /**
- * @version 2018/07/10 21:40:24
+ * @version 2018/07/12 9:52:41
  */
 public class Execution implements Directional {
 
@@ -30,6 +30,9 @@ public class Execution implements Directional {
 
     /** The consecutive type. */
     public static final int ConsecutiveSameSeller = 2;
+
+    /** The consecutive type. */
+    public static final int ConsecutiveSameBoth = 3;
 
     /** The order delay type. (DEFAULT) */
     public static final int DelayInestimable = 0;
