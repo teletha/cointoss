@@ -35,7 +35,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
@@ -62,7 +61,7 @@ import kiss.Signal;
 /**
  * Log Manager.
  * 
- * @version 2018/06/24 8:49:53
+ * @version 2018/07/12 15:50:16
  */
 public class MarketLog {
 
@@ -185,7 +184,6 @@ public class MarketLog {
     MarketLog(MarketService service, Path root) {
         this.service = Objects.requireNonNull(service);
         this.root = Objects.requireNonNull(root);
-        this.cache = new Cache(ZonedDateTime.of(2000, 1, 1, 0, 0, 0, 0, Chrono.UTC));
 
         try {
             ZonedDateTime start = null;
@@ -210,6 +208,7 @@ public class MarketLog {
             }
             this.cacheFirst = start;
             this.cacheLast = end;
+            this.cache = new Cache(cacheFirst);
         } catch (Exception e) {
             throw I.quiet(e);
         }
@@ -252,7 +251,7 @@ public class MarketLog {
             long start = cacheId;
 
             while (disposer.isNotDisposed()) {
-                ArrayDeque<Execution> executions = service.executions(start, start + size).toCollection(new ArrayDeque(size));
+                ArrayDeque<Execution> executions = service.executions(start, start + size).retry().toCollection(new ArrayDeque(size));
 
                 if (executions.isEmpty() == false) {
                     log.info("REST write from {}.  size {}", executions.getFirst().date, executions.size());
@@ -289,6 +288,7 @@ public class MarketLog {
 
             if (!cache.date.isEqual(e.date.toLocalDate())) {
                 cache.disableAutoSave();
+                cache.compact();
                 cache = new Cache(e.date).enableAutoSave();
             }
             cache.queue.add(e);
@@ -619,6 +619,17 @@ public class MarketLog {
         }
 
         /**
+         * Convert normal log to compact log asynchronously.
+         */
+        private void compact() {
+            if (Files.notExists(compact)) {
+                I.schedule(10, TimeUnit.SECONDS, true, () -> {
+                    compact(read()).effectOnComplete(() -> Filer.delete(normal)).to(I.NoOP);
+                });
+            }
+        }
+
+        /**
          * Write compact log from the specified executions.
          */
         Signal<Execution> compact(Signal<Execution> executions) {
@@ -640,13 +651,8 @@ public class MarketLog {
     }
 
     public static void main(String[] args) {
-        BitFlyerService.FX_BTC_JPY.log.caches().skip(255).take(6).to(c -> {
-            AtomicInteger base = new AtomicInteger();
-            AtomicInteger count = new AtomicInteger();
-            c.read().effect(base::incrementAndGet).skip(Execution.BASE, (prev, now) -> {
-                return prev.price.is(now.price) && prev.date.isEqual(now.date) && now.consecutive != Execution.ConsecutiveDifference;
-            }).to(count::incrementAndGet);
-            System.out.println(c.date + "   " + base.get() + "  " + count.get());
+        BitFlyerService.FX_BTC_JPY.log.at(2017, 7, 1).to(e -> {
+            System.out.println(e);
         });
     }
 
