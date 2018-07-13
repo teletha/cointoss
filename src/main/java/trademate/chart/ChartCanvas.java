@@ -129,6 +129,8 @@ public class ChartCanvas extends Region {
 
         this.chartBottom.create(tick -> tick.longVolume().toDouble() * 2, Buy);
         this.chartBottom.create(tick -> tick.shortVolume().toDouble() * 2, Sell);
+        this.chartBottom.create(tick -> tick.longPriceIncrease().toDouble(), Color.ALICEBLUE);
+        this.chartBottom.create(tick -> tick.shortPriceDecrease().toDouble(), Color.AQUA);
 
         Viewtify.clip(this);
 
@@ -171,6 +173,9 @@ public class ChartCanvas extends Region {
                 chart.selectDate.text(Chrono.system(tick.start).format(Chrono.DateTime));
                 chart.selectHigh.text("H " + tick.highPrice().scale(0));
                 chart.selectLow.text("L " + tick.lowPrice().scale(0));
+                chart.selectVolume.text("V " + tick.volume().scale(3));
+                chart.selectLongVolume.text("B " + tick.longVolume().scale(3));
+                chart.selectShortVolume.text("S " + tick.shortVolume().scale(3));
             });
         });
 
@@ -429,7 +434,7 @@ public class ChartCanvas extends Region {
         private class Line {
 
             /** The maximum height. */
-            private final double heightMax = 40;
+            private final double heightMax = 50;
 
             /** The value converter. */
             private final ToDoubleFunction<Tick> converter;

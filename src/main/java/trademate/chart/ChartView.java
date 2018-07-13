@@ -19,7 +19,7 @@ import viewtify.ui.UIComboBox;
 import viewtify.ui.UILabel;
 
 /**
- * @version 2018/06/26 10:14:03
+ * @version 2018/07/14 0:26:27
  */
 public class ChartView extends View {
 
@@ -40,6 +40,15 @@ public class ChartView extends View {
 
     /** Chart UI */
     protected @UI UILabel selectLow;
+
+    /** Chart UI */
+    protected @UI UILabel selectVolume;
+
+    /** Chart UI */
+    protected @UI UILabel selectLongVolume;
+
+    /** Chart UI */
+    protected @UI UILabel selectShortVolume;
 
     /** The candle chart. */
     private final @UI Chart chart = new Chart(this);

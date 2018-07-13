@@ -312,7 +312,7 @@ public abstract class MarketService implements Disposable {
     public String calculateReadableTime(double seconds) {
         ZonedDateTime time = Chrono.systemBySeconds(seconds);
 
-        if (time.getMinute() == 0) {
+        if (time.getMinute() == 0 && time.getHour() % 6 == 0) {
             return time.format(Chrono.DateTimeWithoutSec);
         } else {
             return time.format(Chrono.TimeWithoutSec);

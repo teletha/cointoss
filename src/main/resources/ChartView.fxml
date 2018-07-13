@@ -37,6 +37,30 @@
                   <Insets left="10.0" />
                </HBox.margin>
             </Label>
+            <Label id="selectVolume" alignment="CENTER" maxHeight="1.7976931348623157E308">
+               <font>
+                  <Font size="11.0" />
+               </font>
+               <HBox.margin>
+                  <Insets left="10.0" />
+               </HBox.margin>
+            </Label>
+            <Label id="selectLongVolume" alignment="CENTER" maxHeight="1.7976931348623157E308">
+               <font>
+                  <Font size="11.0" />
+               </font>
+               <HBox.margin>
+                  <Insets left="10.0" />
+               </HBox.margin>
+            </Label>
+            <Label id="selectShortVolume" alignment="CENTER" maxHeight="1.7976931348623157E308">
+               <font>
+                  <Font size="11.0" />
+               </font>
+               <HBox.margin>
+                  <Insets left="10.0" />
+               </HBox.margin>
+            </Label>
          </children>
       </HBox>
       <Pane id="chart" />

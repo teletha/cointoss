@@ -14,7 +14,7 @@ import java.time.ZonedDateTime;
 import cointoss.util.Num;
 
 /**
- * @version 2018/07/05 10:16:39
+ * @version 2018/07/14 0:29:54
  */
 public final class Tick {
 
@@ -123,6 +123,15 @@ public final class Tick {
      */
     public Num lowPrice() {
         return lowPrice;
+    }
+
+    /**
+     * Retrieve the tick related value.
+     * 
+     * @return The tick related value.
+     */
+    public Num volume() {
+        return longVolume.plus(shortVolume);
     }
 
     /**
