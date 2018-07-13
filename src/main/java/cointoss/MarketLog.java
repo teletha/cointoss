@@ -651,12 +651,6 @@ public class MarketLog {
     }
 
     public static void main(String[] args) {
-        BitFlyerService.FX_BTC_JPY.log.at(2018, 3, 23).to(e -> {
-            System.out.println(e);
-        });
-    }
-
-    public static void main2(String[] args) {
         Market market = new Market(BitFlyerService.FX_BTC_JPY);
         market.readLog(log -> log.caches().skip(255).take(6).concatMap(c -> c.read()));
 

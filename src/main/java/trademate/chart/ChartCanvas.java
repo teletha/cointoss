@@ -39,7 +39,7 @@ import viewtify.ui.helper.LayoutAssistant;
 import viewtify.ui.helper.StyleHelper;
 
 /**
- * @version 2018/06/26 14:41:42
+ * @version 2018/07/13 23:47:28
  */
 public class ChartCanvas extends Region {
 
@@ -317,11 +317,13 @@ public class ChartCanvas extends Region {
             gc.strokeLine(x, high, x, low);
             gc.setLineWidth(BarWidth);
             gc.strokeLine(x, open, x, close);
+
+            chartBottom.drawLatest(x, tick);
         });
     }
 
     /**
-     * @version 2018/01/15 20:52:31
+     * @version 2018/07/13 23:46:59
      */
     private class LineChart extends Group {
 
@@ -364,10 +366,10 @@ public class ChartCanvas extends Region {
 
             // ensure size
             if (valueX.length < size) {
-                valueX = new double[size * 2];
+                valueX = new double[size];
 
                 for (Line line : lines) {
-                    line.valueY = new double[size * 2];
+                    line.valueY = new double[size];
                 }
             }
         }
@@ -392,20 +394,37 @@ public class ChartCanvas extends Region {
             double height = getHeight();
             double scale = lines.stream().map(Line::scale).min(Comparator.naturalOrder()).get();
             GraphicsContext gc = candles.getGraphicsContext2D();
+            gc.setLineWidth(1);
 
             for (Line line : lines) {
                 for (int i = 0; i < line.valueY.length; i++) {
                     line.valueY[i] = height - line.valueY[i] * scale;
                 }
-
-                gc.setLineWidth(1);
                 gc.setStroke(line.color);
                 gc.strokePolyline(valueX, line.valueY, index);
             }
         }
 
         /**
-         * @version 2018/01/15 20:38:38
+         * Drawing latest chart line.
+         * 
+         * @param x
+         * @param tick
+         */
+        private void drawLatest(double x, Tick tick) {
+            double height = getHeight();
+            double scale = lines.stream().map(Line::scale).min(Comparator.naturalOrder()).get();
+            GraphicsContext gc = candleLatest.getGraphicsContext2D();
+            gc.setLineWidth(1);
+
+            for (Line line : lines) {
+                gc.setStroke(line.color);
+                gc.strokeLine(valueX[index - 1], line.valueY[index - 1], x, height - line.converter.applyAsDouble(tick) * scale);
+            }
+        }
+
+        /**
+         * @version 2018/07/13 23:46:54
          */
         private class Line {
 
@@ -436,13 +455,13 @@ public class ChartCanvas extends Region {
             /**
              * Calculate value.
              * 
+             * @param x
              * @param tick
-             * @return
              */
             private void calculate(double x, Tick tick) {
                 double calculated = converter.applyAsDouble(tick);
 
-                valueMax = Math.max(valueMax, calculated);
+                if (valueMax < calculated) valueMax = calculated;
                 this.valueY[index] = calculated;
             }
 
