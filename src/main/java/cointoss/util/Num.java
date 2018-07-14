@@ -24,18 +24,17 @@ import kiss.Signal;
 import kiss.Variable;
 
 /**
- * @version 2018/04/29 18:03:37
+ * @version 2018/07/14 13:48:54
  */
 public class Num implements Comparable<Num> {
 
+    // initialize
     static {
         I.load(Codec.class, false);
     }
 
-    public static final MathContext MATH_CONTEXT = new MathContext(16, RoundingMode.HALF_UP);
-
-    /** Not-a-Number instance (infinite error) */
-    public static final Num NaN = new Num();
+    /** The base context. */
+    private static final MathContext CONTEXT = new MathContext(10, RoundingMode.HALF_UP);
 
     /** reuse */
     public static final Num ZERO = of(0);
@@ -59,10 +58,10 @@ public class Num implements Comparable<Num> {
     public static final Num THOUSAND = of(1000);
 
     /** reuse */
-    public static final Num MAX = new Num(new BigDecimal(Long.MAX_VALUE));
+    public static final Num MAX = of(Long.MAX_VALUE);
 
     /** reuse */
-    public static final Num MIN = new Num(new BigDecimal(Long.MIN_VALUE));
+    public static final Num MIN = of(Long.MIN_VALUE);
 
     /** The actual value. */
     private final BigDecimal delegate;
@@ -77,8 +76,7 @@ public class Num implements Comparable<Num> {
     /**
      * Constructor.
      * 
-     * @param value
-     *            primitive value
+     * @param value primitive value
      */
     private Num(BigDecimal value) {
         this.delegate = value;
@@ -88,8 +86,7 @@ public class Num implements Comparable<Num> {
      * Returns a {@code Decimal} whose value is {@code (this + augend)}, with rounding according to
      * the context settings.
      * 
-     * @param augend
-     *            value to be added to this {@code Decimal}.
+     * @param augend value to be added to this {@code Decimal}.
      * @return {@code this + augend}, rounded as necessary
      * @see BigDecimal#add(java.math.BigDecimal, java.math.MathContext)
      */
@@ -101,8 +98,7 @@ public class Num implements Comparable<Num> {
      * Returns a {@code Decimal} whose value is {@code (this + augend)}, with rounding according to
      * the context settings.
      * 
-     * @param augend
-     *            value to be added to this {@code Decimal}.
+     * @param augend value to be added to this {@code Decimal}.
      * @return {@code this + augend}, rounded as necessary
      * @see BigDecimal#add(java.math.BigDecimal, java.math.MathContext)
      */
@@ -114,8 +110,7 @@ public class Num implements Comparable<Num> {
      * Returns a {@code Decimal} whose value is {@code (this + augend)}, with rounding according to
      * the context settings.
      * 
-     * @param augend
-     *            value to be added to this {@code Decimal}.
+     * @param augend value to be added to this {@code Decimal}.
      * @return {@code this + augend}, rounded as necessary
      * @see BigDecimal#add(java.math.BigDecimal, java.math.MathContext)
      */
@@ -127,8 +122,7 @@ public class Num implements Comparable<Num> {
      * Returns a {@code Decimal} whose value is {@code (this + augend)}, with rounding according to
      * the context settings.
      * 
-     * @param augend
-     *            value to be added to this {@code Decimal}.
+     * @param augend value to be added to this {@code Decimal}.
      * @return {@code this + augend}, rounded as necessary
      * @see BigDecimal#add(java.math.BigDecimal, java.math.MathContext)
      */
@@ -140,8 +134,7 @@ public class Num implements Comparable<Num> {
      * Returns a {@code Decimal} whose value is {@code (this + augend)}, with rounding according to
      * the context settings.
      * 
-     * @param augend
-     *            value to be added to this {@code Decimal}.
+     * @param augend value to be added to this {@code Decimal}.
      * @return {@code this + augend}, rounded as necessary
      * @see BigDecimal#add(java.math.BigDecimal, java.math.MathContext)
      */
@@ -153,24 +146,19 @@ public class Num implements Comparable<Num> {
      * Returns a {@code Decimal} whose value is {@code (this + augend)}, with rounding according to
      * the context settings.
      * 
-     * @param augend
-     *            value to be added to this {@code Decimal}.
+     * @param augend value to be added to this {@code Decimal}.
      * @return {@code this + augend}, rounded as necessary
      * @see BigDecimal#add(java.math.BigDecimal, java.math.MathContext)
      */
     public final Num plus(Num augend) {
-        if (augend == null || augend.isNaN()) {
-            return NaN;
-        }
-        return new Num(delegate.add(augend.delegate, MATH_CONTEXT));
+        return new Num(delegate.add(augend.delegate, CONTEXT));
     }
 
     /**
      * Returns a {@code Decimal} whose value is {@code (this - augend)}, with rounding according to
      * the context settings.
      * 
-     * @param subtrahend
-     *            value to be subtracted from this {@code Decimal}.
+     * @param subtrahend value to be subtracted from this {@code Decimal}.
      * @return {@code this - subtrahend}, rounded as necessary
      * @see BigDecimal#subtract(java.math.BigDecimal, java.math.MathContext)
      */
@@ -182,8 +170,7 @@ public class Num implements Comparable<Num> {
      * Returns a {@code Decimal} whose value is {@code (this - augend)}, with rounding according to
      * the context settings.
      * 
-     * @param subtrahend
-     *            value to be subtracted from this {@code Decimal}.
+     * @param subtrahend value to be subtracted from this {@code Decimal}.
      * @return {@code this - subtrahend}, rounded as necessary
      * @see BigDecimal#subtract(java.math.BigDecimal, java.math.MathContext)
      */
@@ -195,8 +182,7 @@ public class Num implements Comparable<Num> {
      * Returns a {@code Decimal} whose value is {@code (this - augend)}, with rounding according to
      * the context settings.
      * 
-     * @param subtrahend
-     *            value to be subtracted from this {@code Decimal}.
+     * @param subtrahend value to be subtracted from this {@code Decimal}.
      * @return {@code this - subtrahend}, rounded as necessary
      * @see BigDecimal#subtract(java.math.BigDecimal, java.math.MathContext)
      */
@@ -208,8 +194,7 @@ public class Num implements Comparable<Num> {
      * Returns a {@code Decimal} whose value is {@code (this - augend)}, with rounding according to
      * the context settings.
      * 
-     * @param subtrahend
-     *            value to be subtracted from this {@code Decimal}.
+     * @param subtrahend value to be subtracted from this {@code Decimal}.
      * @return {@code this - subtrahend}, rounded as necessary
      * @see BigDecimal#subtract(java.math.BigDecimal, java.math.MathContext)
      */
@@ -221,8 +206,7 @@ public class Num implements Comparable<Num> {
      * Returns a {@code Decimal} whose value is {@code (this - augend)}, with rounding according to
      * the context settings.
      * 
-     * @param subtrahend
-     *            value to be subtracted from this {@code Decimal}.
+     * @param subtrahend value to be subtracted from this {@code Decimal}.
      * @return {@code this - subtrahend}, rounded as necessary
      * @see BigDecimal#subtract(java.math.BigDecimal, java.math.MathContext)
      */
@@ -234,24 +218,19 @@ public class Num implements Comparable<Num> {
      * Returns a {@code Decimal} whose value is {@code (this - augend)}, with rounding according to
      * the context settings.
      * 
-     * @param subtrahend
-     *            value to be subtracted from this {@code Decimal}.
+     * @param subtrahend value to be subtracted from this {@code Decimal}.
      * @return {@code this - subtrahend}, rounded as necessary
      * @see BigDecimal#subtract(java.math.BigDecimal, java.math.MathContext)
      */
     public final Num minus(Num subtrahend) {
-        if (subtrahend == null || subtrahend == NaN) {
-            return NaN;
-        }
-        return new Num(delegate.subtract(subtrahend.delegate, MATH_CONTEXT));
+        return new Num(delegate.subtract(subtrahend.delegate, CONTEXT));
     }
 
     /**
      * Returns a {@code Decimal} whose value is {@code this * multiplicand}, with rounding according
      * to the context settings.
      * 
-     * @param multiplicand
-     *            value to be multiplied by this {@code Decimal}.
+     * @param multiplicand value to be multiplied by this {@code Decimal}.
      * @return {@code this * multiplicand}, rounded as necessary
      * @see BigDecimal#multiply(java.math.BigDecimal, java.math.MathContext)
      */
@@ -263,8 +242,7 @@ public class Num implements Comparable<Num> {
      * Returns a {@code Decimal} whose value is {@code this * multiplicand}, with rounding according
      * to the context settings.
      * 
-     * @param multiplicand
-     *            value to be multiplied by this {@code Decimal}.
+     * @param multiplicand value to be multiplied by this {@code Decimal}.
      * @return {@code this * multiplicand}, rounded as necessary
      * @see BigDecimal#multiply(java.math.BigDecimal, java.math.MathContext)
      */
@@ -276,8 +254,7 @@ public class Num implements Comparable<Num> {
      * Returns a {@code Decimal} whose value is {@code this * multiplicand}, with rounding according
      * to the context settings.
      * 
-     * @param multiplicand
-     *            value to be multiplied by this {@code Decimal}.
+     * @param multiplicand value to be multiplied by this {@code Decimal}.
      * @return {@code this * multiplicand}, rounded as necessary
      * @see BigDecimal#multiply(java.math.BigDecimal, java.math.MathContext)
      */
@@ -289,8 +266,7 @@ public class Num implements Comparable<Num> {
      * Returns a {@code Decimal} whose value is {@code this * multiplicand}, with rounding according
      * to the context settings.
      * 
-     * @param multiplicand
-     *            value to be multiplied by this {@code Decimal}.
+     * @param multiplicand value to be multiplied by this {@code Decimal}.
      * @return {@code this * multiplicand}, rounded as necessary
      * @see BigDecimal#multiply(java.math.BigDecimal, java.math.MathContext)
      */
@@ -302,8 +278,7 @@ public class Num implements Comparable<Num> {
      * Returns a {@code Decimal} whose value is {@code this * multiplicand}, with rounding according
      * to the context settings.
      * 
-     * @param multiplicand
-     *            value to be multiplied by this {@code Decimal}.
+     * @param multiplicand value to be multiplied by this {@code Decimal}.
      * @return {@code this * multiplicand}, rounded as necessary
      * @see BigDecimal#multiply(java.math.BigDecimal, java.math.MathContext)
      */
@@ -315,24 +290,19 @@ public class Num implements Comparable<Num> {
      * Returns a {@code Decimal} whose value is {@code this * multiplicand}, with rounding according
      * to the context settings.
      * 
-     * @param multiplicand
-     *            value to be multiplied by this {@code Decimal}.
+     * @param multiplicand value to be multiplied by this {@code Decimal}.
      * @return {@code this * multiplicand}, rounded as necessary
      * @see BigDecimal#multiply(java.math.BigDecimal, java.math.MathContext)
      */
     public final Num multiply(Num multiplicand) {
-        if (multiplicand == null || multiplicand == NaN) {
-            return NaN;
-        }
-        return new Num(delegate.multiply(multiplicand.delegate, MATH_CONTEXT));
+        return new Num(delegate.multiply(multiplicand.delegate, CONTEXT));
     }
 
     /**
      * Returns a {@code Decimal} whose value is {@code (this / divisor)}, with rounding according to
      * the context settings.
      * 
-     * @param divisor
-     *            value by which this {@code Decimal} is to be divided.
+     * @param divisor value by which this {@code Decimal} is to be divided.
      * @return {@code this / divisor}, rounded as necessary
      * @see BigDecimal#divide(java.math.BigDecimal, java.math.MathContext)
      */
@@ -344,8 +314,7 @@ public class Num implements Comparable<Num> {
      * Returns a {@code Decimal} whose value is {@code (this / divisor)}, with rounding according to
      * the context settings.
      * 
-     * @param divisor
-     *            value by which this {@code Decimal} is to be divided.
+     * @param divisor value by which this {@code Decimal} is to be divided.
      * @return {@code this / divisor}, rounded as necessary
      * @see BigDecimal#divide(java.math.BigDecimal, java.math.MathContext)
      */
@@ -357,8 +326,7 @@ public class Num implements Comparable<Num> {
      * Returns a {@code Decimal} whose value is {@code (this / divisor)}, with rounding according to
      * the context settings.
      * 
-     * @param divisor
-     *            value by which this {@code Decimal} is to be divided.
+     * @param divisor value by which this {@code Decimal} is to be divided.
      * @return {@code this / divisor}, rounded as necessary
      * @see BigDecimal#divide(java.math.BigDecimal, java.math.MathContext)
      */
@@ -370,8 +338,7 @@ public class Num implements Comparable<Num> {
      * Returns a {@code Decimal} whose value is {@code (this / divisor)}, with rounding according to
      * the context settings.
      * 
-     * @param divisor
-     *            value by which this {@code Decimal} is to be divided.
+     * @param divisor value by which this {@code Decimal} is to be divided.
      * @return {@code this / divisor}, rounded as necessary
      * @see BigDecimal#divide(java.math.BigDecimal, java.math.MathContext)
      */
@@ -383,8 +350,7 @@ public class Num implements Comparable<Num> {
      * Returns a {@code Decimal} whose value is {@code (this / divisor)}, with rounding according to
      * the context settings.
      * 
-     * @param divisor
-     *            value by which this {@code Decimal} is to be divided.
+     * @param divisor value by which this {@code Decimal} is to be divided.
      * @return {@code this / divisor}, rounded as necessary
      * @see BigDecimal#divide(java.math.BigDecimal, java.math.MathContext)
      */
@@ -396,24 +362,19 @@ public class Num implements Comparable<Num> {
      * Returns a {@code Decimal} whose value is {@code (this / divisor)}, with rounding according to
      * the context settings.
      * 
-     * @param divisor
-     *            value by which this {@code Decimal} is to be divided.
+     * @param divisor value by which this {@code Decimal} is to be divided.
      * @return {@code this / divisor}, rounded as necessary
      * @see BigDecimal#divide(java.math.BigDecimal, java.math.MathContext)
      */
     public final Num divide(Num divisor) {
-        if (this == NaN || divisor == null || divisor == NaN || divisor.isZero()) {
-            return NaN;
-        }
-        return new Num(delegate.divide(divisor.delegate, MATH_CONTEXT));
+        return new Num(delegate.divide(divisor.delegate, CONTEXT));
     }
 
     /**
      * Returns a {@code Decimal} whose value is {@code (this % divisor)}, with rounding according to
      * the context settings.
      * 
-     * @param divisor
-     *            value by which this {@code Decimal} is to be divided.
+     * @param divisor value by which this {@code Decimal} is to be divided.
      * @return {@code this % divisor}, rounded as necessary.
      * @see BigDecimal#remainder(java.math.BigDecimal, java.math.MathContext)
      */
@@ -425,8 +386,7 @@ public class Num implements Comparable<Num> {
      * Returns a {@code Decimal} whose value is {@code (this % divisor)}, with rounding according to
      * the context settings.
      * 
-     * @param divisor
-     *            value by which this {@code Decimal} is to be divided.
+     * @param divisor value by which this {@code Decimal} is to be divided.
      * @return {@code this % divisor}, rounded as necessary.
      * @see BigDecimal#remainder(java.math.BigDecimal, java.math.MathContext)
      */
@@ -438,8 +398,7 @@ public class Num implements Comparable<Num> {
      * Returns a {@code Decimal} whose value is {@code (this % divisor)}, with rounding according to
      * the context settings.
      * 
-     * @param divisor
-     *            value by which this {@code Decimal} is to be divided.
+     * @param divisor value by which this {@code Decimal} is to be divided.
      * @return {@code this % divisor}, rounded as necessary.
      * @see BigDecimal#remainder(java.math.BigDecimal, java.math.MathContext)
      */
@@ -451,8 +410,7 @@ public class Num implements Comparable<Num> {
      * Returns a {@code Decimal} whose value is {@code (this % divisor)}, with rounding according to
      * the context settings.
      * 
-     * @param divisor
-     *            value by which this {@code Decimal} is to be divided.
+     * @param divisor value by which this {@code Decimal} is to be divided.
      * @return {@code this % divisor}, rounded as necessary.
      * @see BigDecimal#remainder(java.math.BigDecimal, java.math.MathContext)
      */
@@ -464,8 +422,7 @@ public class Num implements Comparable<Num> {
      * Returns a {@code Decimal} whose value is {@code (this % divisor)}, with rounding according to
      * the context settings.
      * 
-     * @param divisor
-     *            value by which this {@code Decimal} is to be divided.
+     * @param divisor value by which this {@code Decimal} is to be divided.
      * @return {@code this % divisor}, rounded as necessary.
      * @see BigDecimal#remainder(java.math.BigDecimal, java.math.MathContext)
      */
@@ -477,16 +434,12 @@ public class Num implements Comparable<Num> {
      * Returns a {@code Decimal} whose value is {@code (this % divisor)}, with rounding according to
      * the context settings.
      * 
-     * @param divisor
-     *            value by which this {@code Decimal} is to be divided.
+     * @param divisor value by which this {@code Decimal} is to be divided.
      * @return {@code this % divisor}, rounded as necessary.
      * @see BigDecimal#remainder(java.math.BigDecimal, java.math.MathContext)
      */
     public final Num remainder(Num divisor) {
-        if (this == NaN || divisor == null || divisor == NaN || divisor.isZero()) {
-            return NaN;
-        }
-        return new Num(delegate.remainder(divisor.delegate, MATH_CONTEXT));
+        return new Num(delegate.remainder(divisor.delegate, CONTEXT));
     }
 
     /**
@@ -511,7 +464,7 @@ public class Num implements Comparable<Num> {
      * @return
      */
     public final Num scale(int size, RoundingMode mode) {
-        return this == NaN ? NaN : new Num(delegate.setScale(size, mode));
+        return new Num(delegate.setScale(size, mode));
     }
 
     /**
@@ -544,16 +497,12 @@ public class Num implements Comparable<Num> {
     /**
      * Returns a {@code Decimal} whose value is <tt>(this<sup>n</sup>)</tt>.
      * 
-     * @param n
-     *            power to raise this {@code Decimal} to.
+     * @param n power to raise this {@code Decimal} to.
      * @return <tt>this<sup>n</sup></tt>
      * @see BigDecimal#pow(int, java.math.MathContext)
      */
     public final Num pow(int n) {
-        if (this == NaN) {
-            return NaN;
-        }
-        return new Num(delegate.pow(n, MATH_CONTEXT));
+        return new Num(delegate.pow(n, CONTEXT));
     }
 
     /**
@@ -565,9 +514,6 @@ public class Num implements Comparable<Num> {
      * @see StrictMath#log(double)
      */
     public final Num log() {
-        if (this == NaN) {
-            return NaN;
-        }
         return of(StrictMath.log(delegate.doubleValue()));
     }
 
@@ -579,9 +525,6 @@ public class Num implements Comparable<Num> {
      * @see StrictMath#sqrt(double)
      */
     public final Num sqrt() {
-        if (this == NaN) {
-            return NaN;
-        }
         return of(StrictMath.sqrt(delegate.doubleValue()));
     }
 
@@ -591,9 +534,6 @@ public class Num implements Comparable<Num> {
      * @return {@code abs(this)}
      */
     public final Num abs() {
-        if (this == NaN) {
-            return NaN;
-        }
         return new Num(delegate.abs());
     }
 
@@ -614,9 +554,6 @@ public class Num implements Comparable<Num> {
      * @see BigDecimal#doubleValue()
      */
     public final double toDouble() {
-        if (this == NaN) {
-            return Double.NaN;
-        }
         return delegate.doubleValue();
     }
 
@@ -646,12 +583,6 @@ public class Num implements Comparable<Num> {
      */
     @Override
     public int compareTo(Num other) {
-        if (this == NaN || other == NaN || other == null) {
-            return 0;
-        }
-        if (delegate == null) {
-            System.out.println("OUT " + (this == NaN));
-        }
         return delegate.compareTo(other.delegate);
     }
 
@@ -660,9 +591,6 @@ public class Num implements Comparable<Num> {
      */
     @Override
     public String toString() {
-        if (this == NaN) {
-            return "NaN";
-        }
         return delegate.stripTrailingZeros().toPlainString();
     }
 
@@ -684,10 +612,6 @@ public class Num implements Comparable<Num> {
         }
         if (!(obj instanceof Num)) {
             return false;
-        }
-
-        if (obj == NaN) {
-            return this == NaN;
         }
 
         Num other = (Num) obj;
@@ -750,22 +674,17 @@ public class Num implements Comparable<Num> {
     /**
      * Checks if this value is equal to another.
      * 
-     * @param other
-     *            the other value, not null
+     * @param other the other value, not null
      * @return true is this is greater than the specified value, false otherwise
      */
     public final boolean is(Num other) {
-        if (this == NaN || other == NaN) {
-            return false;
-        }
         return compareTo(other) == 0;
     }
 
     /**
      * Compare {@link Num}.
      * 
-     * @param other
-     *            the other value, not null
+     * @param other the other value, not null
      * @return true is this is greater than the specified value, false otherwise
      */
     public final boolean isNot(int other) {
@@ -775,8 +694,7 @@ public class Num implements Comparable<Num> {
     /**
      * Compare {@link Num}.
      * 
-     * @param other
-     *            the other value, not null
+     * @param other the other value, not null
      * @return true is this is greater than the specified value, false otherwise
      */
     public final boolean isNot(long other) {
@@ -786,8 +704,7 @@ public class Num implements Comparable<Num> {
     /**
      * Compare {@link Num}.
      * 
-     * @param other
-     *            the other value, not null
+     * @param other the other value, not null
      * @return true is this is greater than the specified value, false otherwise
      */
     public final boolean isNot(double other) {
@@ -797,8 +714,7 @@ public class Num implements Comparable<Num> {
     /**
      * Compare {@link Num}.
      * 
-     * @param other
-     *            the other value, not null
+     * @param other the other value, not null
      * @return true is this is greater than the specified value, false otherwise
      */
     public final boolean isNot(String other) {
@@ -808,8 +724,7 @@ public class Num implements Comparable<Num> {
     /**
      * Checks if this value is equal to another.
      * 
-     * @param other
-     *            the other value, not null
+     * @param other the other value, not null
      * @return true is this is greater than the specified value, false otherwise
      */
     public final boolean isNot(Variable<Num> other) {
@@ -819,8 +734,7 @@ public class Num implements Comparable<Num> {
     /**
      * Checks if this value is equal to another.
      * 
-     * @param other
-     *            the other value, not null
+     * @param other the other value, not null
      * @return true is this is greater than the specified value, false otherwise
      */
     public final boolean isNot(Num other) {
@@ -833,7 +747,7 @@ public class Num implements Comparable<Num> {
      * @return true if the value is zero, false otherwise
      */
     public final boolean isZero() {
-        return this != NaN && compareTo(ZERO) == 0;
+        return compareTo(ZERO) == 0;
     }
 
     /**
@@ -851,7 +765,7 @@ public class Num implements Comparable<Num> {
      * @return true if the value is greater than zero, false otherwise
      */
     public final boolean isPositive() {
-        return this != NaN && compareTo(ZERO) > 0;
+        return compareTo(ZERO) > 0;
     }
 
     /**
@@ -860,16 +774,7 @@ public class Num implements Comparable<Num> {
      * @return true if the value is zero or greater, false otherwise
      */
     public final boolean isPositiveOrZero() {
-        return this != NaN && compareTo(ZERO) >= 0;
-    }
-
-    /**
-     * Checks if the value is Not-a-Number.
-     * 
-     * @return true if the value is Not-a-Number (NaN), false otherwise
-     */
-    public final boolean isNaN() {
-        return this == NaN;
+        return compareTo(ZERO) >= 0;
     }
 
     /**
@@ -900,7 +805,7 @@ public class Num implements Comparable<Num> {
      * @return true if the value is less than zero, false otherwise
      */
     public final boolean isNegative() {
-        return this != NaN && compareTo(ZERO) < 0;
+        return compareTo(ZERO) < 0;
     }
 
     /**
@@ -909,14 +814,13 @@ public class Num implements Comparable<Num> {
      * @return true if the value is zero or less, false otherwise
      */
     public final boolean isNegativeOrZero() {
-        return this != NaN && compareTo(ZERO) <= 0;
+        return compareTo(ZERO) <= 0;
     }
 
     /**
      * Checks if this value is greater than another.
      * 
-     * @param other
-     *            the other value, not null
+     * @param other the other value, not null
      * @return true is this is greater than the specified value, false otherwise
      */
     public final boolean isGreaterThan(int other) {
@@ -926,8 +830,7 @@ public class Num implements Comparable<Num> {
     /**
      * Checks if this value is greater than another.
      * 
-     * @param other
-     *            the other value, not null
+     * @param other the other value, not null
      * @return true is this is greater than the specified value, false otherwise
      */
     public final boolean isGreaterThan(long other) {
@@ -937,8 +840,7 @@ public class Num implements Comparable<Num> {
     /**
      * Checks if this value is greater than another.
      * 
-     * @param other
-     *            the other value, not null
+     * @param other the other value, not null
      * @return true is this is greater than the specified value, false otherwise
      */
     public final boolean isGreaterThan(double other) {
@@ -948,8 +850,7 @@ public class Num implements Comparable<Num> {
     /**
      * Checks if this value is greater than another.
      * 
-     * @param other
-     *            the other value, not null
+     * @param other the other value, not null
      * @return true is this is greater than the specified value, false otherwise
      */
     public final boolean isGreaterThan(String other) {
@@ -959,8 +860,7 @@ public class Num implements Comparable<Num> {
     /**
      * Checks if this value is greater than another.
      * 
-     * @param other
-     *            the other value, not null
+     * @param other the other value, not null
      * @return true is this is greater than the specified value, false otherwise
      */
     public final boolean isGreaterThan(Variable<Num> other) {
@@ -970,19 +870,17 @@ public class Num implements Comparable<Num> {
     /**
      * Checks if this value is greater than another.
      * 
-     * @param other
-     *            the other value, not null
+     * @param other the other value, not null
      * @return true is this is greater than the specified value, false otherwise
      */
     public final boolean isGreaterThan(Num other) {
-        return this != NaN && other != NaN && compareTo(other) > 0;
+        return compareTo(other) > 0;
     }
 
     /**
      * Checks if this value is greater than or equal to another.
      * 
-     * @param other
-     *            the other value, not null
+     * @param other the other value, not null
      * @return true is this is greater than or equal to the specified value, false otherwise
      */
     public final boolean isGreaterThanOrEqual(int other) {
@@ -992,8 +890,7 @@ public class Num implements Comparable<Num> {
     /**
      * Checks if this value is greater than or equal to another.
      * 
-     * @param other
-     *            the other value, not null
+     * @param other the other value, not null
      * @return true is this is greater than or equal to the specified value, false otherwise
      */
     public final boolean isGreaterThanOrEqual(long other) {
@@ -1003,8 +900,7 @@ public class Num implements Comparable<Num> {
     /**
      * Checks if this value is greater than or equal to another.
      * 
-     * @param other
-     *            the other value, not null
+     * @param other the other value, not null
      * @return true is this is greater than or equal to the specified value, false otherwise
      */
     public final boolean isGreaterThanOrEqual(double other) {
@@ -1014,8 +910,7 @@ public class Num implements Comparable<Num> {
     /**
      * Checks if this value is greater than or equal to another.
      * 
-     * @param other
-     *            the other value, not null
+     * @param other the other value, not null
      * @return true is this is greater than or equal to the specified value, false otherwise
      */
     public final boolean isGreaterThanOrEqual(String other) {
@@ -1025,8 +920,7 @@ public class Num implements Comparable<Num> {
     /**
      * Checks if this value is greater than or equal to another.
      * 
-     * @param other
-     *            the other value, not null
+     * @param other the other value, not null
      * @return true is this is greater than or equal to the specified value, false otherwise
      */
     public final boolean isGreaterThanOrEqual(Variable<Num> other) {
@@ -1036,19 +930,17 @@ public class Num implements Comparable<Num> {
     /**
      * Checks if this value is greater than or equal to another.
      * 
-     * @param other
-     *            the other value, not null
+     * @param other the other value, not null
      * @return true is this is greater than or equal to the specified value, false otherwise
      */
     public final boolean isGreaterThanOrEqual(Num other) {
-        return other != null && this != NaN && other != NaN && compareTo(other) > -1;
+        return compareTo(other) > -1;
     }
 
     /**
      * Checks if this value is less than another.
      * 
-     * @param other
-     *            the other value, not null
+     * @param other the other value, not null
      * @return true is this is less than the specified value, false otherwise
      */
     public final boolean isLessThan(int other) {
@@ -1058,8 +950,7 @@ public class Num implements Comparable<Num> {
     /**
      * Checks if this value is less than another.
      * 
-     * @param other
-     *            the other value, not null
+     * @param other the other value, not null
      * @return true is this is less than the specified value, false otherwise
      */
     public final boolean isLessThan(long other) {
@@ -1069,8 +960,7 @@ public class Num implements Comparable<Num> {
     /**
      * Checks if this value is less than another.
      * 
-     * @param other
-     *            the other value, not null
+     * @param other the other value, not null
      * @return true is this is less than the specified value, false otherwise
      */
     public final boolean isLessThan(double other) {
@@ -1080,8 +970,7 @@ public class Num implements Comparable<Num> {
     /**
      * Checks if this value is less than another.
      * 
-     * @param other
-     *            the other value, not null
+     * @param other the other value, not null
      * @return true is this is less than the specified value, false otherwise
      */
     public final boolean isLessThan(String other) {
@@ -1091,8 +980,7 @@ public class Num implements Comparable<Num> {
     /**
      * Checks if this value is less than another.
      * 
-     * @param other
-     *            the other value, not null
+     * @param other the other value, not null
      * @return true is this is less than the specified value, false otherwise
      */
     public final boolean isLessThan(Variable<Num> other) {
@@ -1102,19 +990,17 @@ public class Num implements Comparable<Num> {
     /**
      * Checks if this value is less than another.
      * 
-     * @param other
-     *            the other value, not null
+     * @param other the other value, not null
      * @return true is this is less than the specified value, false otherwise
      */
     public final boolean isLessThan(Num other) {
-        return this != NaN && other != NaN && compareTo(other) < 0;
+        return compareTo(other) < 0;
     }
 
     /**
      * Checks if this value is less than or equal to another.
      * 
-     * @param other
-     *            the other value, not null
+     * @param other the other value, not null
      * @return true is this is less than or equal to the specified value, false otherwise
      */
     public final boolean isLessThanOrEqual(int other) {
@@ -1124,8 +1010,7 @@ public class Num implements Comparable<Num> {
     /**
      * Checks if this value is less than or equal to another.
      * 
-     * @param other
-     *            the other value, not null
+     * @param other the other value, not null
      * @return true is this is less than or equal to the specified value, false otherwise
      */
     public final boolean isLessThanOrEqual(long other) {
@@ -1135,8 +1020,7 @@ public class Num implements Comparable<Num> {
     /**
      * Checks if this value is less than or equal to another.
      * 
-     * @param other
-     *            the other value, not null
+     * @param other the other value, not null
      * @return true is this is less than or equal to the specified value, false otherwise
      */
     public final boolean isLessThanOrEqual(double other) {
@@ -1146,8 +1030,7 @@ public class Num implements Comparable<Num> {
     /**
      * Checks if this value is less than or equal to another.
      * 
-     * @param other
-     *            the other value, not null
+     * @param other the other value, not null
      * @return true is this is less than or equal to the specified value, false otherwise
      */
     public final boolean isLessThanOrEqual(String other) {
@@ -1157,8 +1040,7 @@ public class Num implements Comparable<Num> {
     /**
      * Checks if this value is less than or equal to another.
      * 
-     * @param other
-     *            the other value, not null
+     * @param other the other value, not null
      * @return true is this is less than or equal to the specified value, false otherwise
      */
     public final boolean isLessThanOrEqual(Variable<Num> other) {
@@ -1168,12 +1050,11 @@ public class Num implements Comparable<Num> {
     /**
      * Checks if this value is less than or equal to another.
      * 
-     * @param other
-     *            the other value, not null
+     * @param other the other value, not null
      * @return true is this is less than or equal to the specified value, false otherwise
      */
     public final boolean isLessThanOrEqual(Num other) {
-        return other != null && this != NaN && other != NaN && compareTo(other) < 1;
+        return compareTo(other) < 1;
     }
 
     /**
@@ -1206,10 +1087,8 @@ public class Num implements Comparable<Num> {
     /**
      * Increase amount by the specified {@link Directional}.
      * 
-     * @param direction
-     *            A current side.
-     * @param size
-     *            A increase size.
+     * @param direction A current side.
+     * @param size A increase size.
      */
     public final Num plus(Directional direction, int size) {
         return plus(direction, of(size));
@@ -1218,10 +1097,8 @@ public class Num implements Comparable<Num> {
     /**
      * Increase amount by the specified {@link Directional}.
      * 
-     * @param direction
-     *            A current side.
-     * @param size
-     *            A increase size.
+     * @param direction A current side.
+     * @param size A increase size.
      */
     public final Num plus(Directional direction, Num size) {
         return direction.isBuy() ? plus(size) : minus(size);
@@ -1230,10 +1107,8 @@ public class Num implements Comparable<Num> {
     /**
      * Decrease amount by the specified {@link Directional}.
      * 
-     * @param direction
-     *            A current side.
-     * @param size
-     *            A decrease size.
+     * @param direction A current side.
+     * @param size A decrease size.
      */
     public final Num minus(Directional direction, int size) {
         return minus(direction, of(size));
@@ -1242,10 +1117,8 @@ public class Num implements Comparable<Num> {
     /**
      * Decrease amount by the specified {@link Directional}.
      * 
-     * @param direction
-     *            A current side.
-     * @param size
-     *            A decrease size.
+     * @param direction A current side.
+     * @param size A decrease size.
      */
     public final Num minus(Directional direction, Num size) {
         return direction.isSell() ? plus(size) : minus(size);
@@ -1327,7 +1200,7 @@ public class Num implements Comparable<Num> {
      * @return
      */
     public static Num of(int value) {
-        return new Num(new BigDecimal(value, MATH_CONTEXT));
+        return new Num(new BigDecimal(value, CONTEXT));
     }
 
     /**
@@ -1352,7 +1225,7 @@ public class Num implements Comparable<Num> {
      * @return
      */
     public static Num of(long value) {
-        return new Num(new BigDecimal(value, MATH_CONTEXT));
+        return new Num(new BigDecimal(value, CONTEXT));
     }
 
     /**
@@ -1377,7 +1250,7 @@ public class Num implements Comparable<Num> {
      * @return
      */
     public static Num of(float value) {
-        return Float.isNaN(value) ? NaN : new Num(new BigDecimal(value, MATH_CONTEXT));
+        return new Num(new BigDecimal(value, CONTEXT));
     }
 
     /**
@@ -1402,7 +1275,7 @@ public class Num implements Comparable<Num> {
      * @return
      */
     public static Num of(double value) {
-        return Double.isNaN(value) ? NaN : new Num(new BigDecimal(value, MATH_CONTEXT));
+        return new Num(new BigDecimal(value, CONTEXT));
     }
 
     /**
@@ -1427,7 +1300,7 @@ public class Num implements Comparable<Num> {
      * @return
      */
     public static Num of(String value) {
-        return "NaN".equals(value) ? NaN : new Num(new BigDecimal(value, MATH_CONTEXT));
+        return new Num(new BigDecimal(value, CONTEXT));
     }
 
     /**
@@ -1452,10 +1325,6 @@ public class Num implements Comparable<Num> {
      * @return
      */
     public static Num max(Num... decimals) {
-        if (decimals == null || decimals.length == 0) {
-            return Num.NaN;
-        }
-
         Num max = decimals[0];
 
         for (int i = 1; i < decimals.length; i++) {
@@ -1463,7 +1332,7 @@ public class Num implements Comparable<Num> {
                 max = decimals[i];
             }
         }
-        return max == null ? NaN : max;
+        return max;
     }
 
     /**
@@ -1484,10 +1353,6 @@ public class Num implements Comparable<Num> {
      * @return
      */
     public static Num min(Num... decimals) {
-        if (decimals == null || decimals.length == 0) {
-            return Num.NaN;
-        }
-
         Num min = decimals[0];
 
         for (int i = 1; i < decimals.length; i++) {
@@ -1495,18 +1360,15 @@ public class Num implements Comparable<Num> {
                 min = decimals[i];
             }
         }
-        return min == null ? NaN : min;
+        return min;
     }
 
     /**
      * Check the value range.
      * 
-     * @param min
-     *            A minimum value.
-     * @param value
-     *            A target value to check.
-     * @param max
-     *            A maximum value.
+     * @param min A minimum value.
+     * @param value A target value to check.
+     * @param max A maximum value.
      * @return A target value in range.
      */
     public static Num within(Num min, Num value, Num max) {

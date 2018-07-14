@@ -25,10 +25,6 @@ class NumTest {
         assert Num.max(ONE).is(1);
         assert Num.max(ONE, TWO, TEN).is(10);
         assert Num.max(ONE, TWO, of(-10)).is(2);
-        assert Num.max().isNaN();
-        assert Num.max((Num[]) null).isNaN();
-        assert Num.max(ONE, null, TWO).is(2);
-        assert Num.max(null, null, null).isNaN();
     }
 
     @Test
@@ -36,10 +32,6 @@ class NumTest {
         assert Num.min(ONE).is(1);
         assert Num.min(ONE, TWO, TEN).is(1);
         assert Num.min(ONE, TWO, of(-10)).is(-10);
-        assert Num.min().isNaN();
-        assert Num.min((Num[]) null).isNaN();
-        assert Num.min(ONE, null, TWO).is(1);
-        assert Num.min(null, null, null).isNaN();
     }
 
     @Test
@@ -54,7 +46,6 @@ class NumTest {
         assert ONE.plus(TWO).is(3);
         assert ONE.plus(-1).is(0);
         assert ONE.plus("5.5").is(6.5);
-        assert ONE.plus((Num) null).isNaN();
     }
 
     @Test
@@ -62,7 +53,6 @@ class NumTest {
         assert ONE.minus(TWO).is(-1);
         assert ONE.minus(-1).is(2);
         assert ONE.minus("5.5").is(-4.5);
-        assert ONE.minus((Num) null).isNaN();
     }
 
     @Test
@@ -76,7 +66,6 @@ class NumTest {
         assert ONE.multiply(TWO).is(2);
         assert ONE.multiply(-1).is(-1);
         assert ONE.multiply("5.5").is(5.5);
-        assert ONE.multiply((Num) null).isNaN();
     }
 
     @Test
@@ -84,7 +73,6 @@ class NumTest {
         assert ONE.divide(TWO).is(0.5);
         assert ONE.divide(-1).is(-1);
         assert ONE.divide("0.5").is(2);
-        assert ONE.divide((Num) null).isNaN();
     }
 
     @Test
@@ -92,7 +80,6 @@ class NumTest {
         assert TEN.remainder(TWO).is(0);
         assert TEN.remainder(-3).is(1);
         assert TEN.remainder("2.4").is(0.4);
-        assert TEN.remainder((Num) null).isNaN();
     }
 
     @Test
@@ -100,7 +87,6 @@ class NumTest {
         assert ONE.abs().is(1);
         assert Num.of(-1).abs().is(1);
         assert Num.of(-0.5).abs().is(0.5);
-        assert NaN.abs().isNaN();
     }
 
     @Test
@@ -112,8 +98,6 @@ class NumTest {
         assert Num.of(1.234).scale(0).is(1);
         assert Num.of(1.234).scale(1).is(1.2);
         assert Num.of(1.234).scale(2).is(1.23);
-
-        assert NaN.scale(2).isNaN();
     }
 
     @Test
@@ -136,8 +120,6 @@ class NumTest {
         assert Num.of(-2.5).pow(0).is(1);
         assert Num.of(-2.5).pow(1).is(-2.5);
         assert Num.of(-2.5).pow(2).is(6.25);
-
-        assert NaN.pow(1).isNaN();
     }
 
     @Test
@@ -145,7 +127,6 @@ class NumTest {
         assert Num.of(0).sqrt().is(0);
         assert Num.of(1).sqrt().is(1);
         assert Num.of(4).sqrt().is(2);
-        assert NaN.sqrt().isNaN();
     }
 
     @Test
@@ -154,7 +135,6 @@ class NumTest {
         assert ONE.isLessThan(1) == false;
         assert ONE.isLessThan("3");
         assert ONE.isLessThan(TEN);
-        assert ONE.isLessThan((Num) null) == false;
     }
 
     @Test
@@ -163,7 +143,6 @@ class NumTest {
         assert ONE.isLessThanOrEqual(1);
         assert ONE.isLessThanOrEqual("3");
         assert ONE.isLessThanOrEqual(TEN);
-        assert ONE.isLessThanOrEqual((Num) null) == false;
     }
 
     @Test
@@ -180,7 +159,6 @@ class NumTest {
         assert ONE.isGreaterThan(1) == false;
         assert ONE.isGreaterThan("0");
         assert ONE.isGreaterThan(TEN) == false;
-        assert ONE.isGreaterThan((Num) null) == false;
     }
 
     @Test
@@ -189,21 +167,18 @@ class NumTest {
         assert ONE.isGreaterThanOrEqual(1);
         assert ONE.isGreaterThanOrEqual("0");
         assert ONE.isGreaterThanOrEqual(TEN) == false;
-        assert ONE.isGreaterThanOrEqual((Num) null) == false;
     }
 
     @Test
     void isZero() {
         assert Num.of(1).isZero() == false;
         assert Num.of(0).isZero();
-        assert Num.NaN.isZero() == false;
     }
 
     @Test
     void isNotZero() {
         assert Num.of(1).isNotZero();
         assert Num.of(0).isNotZero() == false;
-        assert Num.NaN.isNotZero();
     }
 
     @Test
@@ -211,7 +186,6 @@ class NumTest {
         assert Num.of(1).isPositive() == true;
         assert Num.of(0).isPositive() == false;
         assert Num.of(-1).isPositive() == false;
-        assert Num.NaN.isPositive() == false;
     }
 
     @Test
@@ -219,7 +193,6 @@ class NumTest {
         assert Num.of(1).isPositiveOrZero() == true;
         assert Num.of(0).isPositiveOrZero() == true;
         assert Num.of(-1).isPositiveOrZero() == false;
-        assert Num.NaN.isPositiveOrZero() == false;
     }
 
     @Test
@@ -227,7 +200,6 @@ class NumTest {
         assert Num.of(1).isNegative() == false;
         assert Num.of(0).isNegative() == false;
         assert Num.of(-1).isNegative() == true;
-        assert Num.NaN.isNegative() == false;
     }
 
     @Test
@@ -235,6 +207,5 @@ class NumTest {
         assert Num.of(1).isNegativeOrZero() == false;
         assert Num.of(0).isNegativeOrZero() == true;
         assert Num.of(-1).isNegativeOrZero() == true;
-        assert Num.NaN.isNegativeOrZero() == false;
     }
 }
