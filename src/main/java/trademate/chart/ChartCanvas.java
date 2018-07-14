@@ -129,8 +129,7 @@ public class ChartCanvas extends Region {
 
         this.chartBottom.create(tick -> tick.longVolume().toDouble() * 2, Buy);
         this.chartBottom.create(tick -> tick.shortVolume().toDouble() * 2, Sell);
-        this.chartBottom.create(tick -> tick.longPriceIncrease().toDouble(), Color.ALICEBLUE);
-        this.chartBottom.create(tick -> tick.shortPriceDecrease().toDouble(), Color.AQUA);
+        this.chartBottom.create(tick -> tick.volume().toDouble() * 2, Color.WHITE);
 
         Viewtify.clip(this);
 

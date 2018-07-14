@@ -131,7 +131,7 @@ public final class Tick {
      * @return The tick related value.
      */
     public Num volume() {
-        return longVolume.plus(shortVolume);
+        return longVolume().plus(shortVolume());
     }
 
     /**
