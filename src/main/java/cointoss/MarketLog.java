@@ -237,14 +237,14 @@ public class MarketLog {
      * @return
      */
     private Signal<Execution> network() {
-        return new Signal<>((observer, disposer) -> {
+        return new Signal<Execution>((observer, disposer) -> {
             AtomicReference<Execution> observedLatest = new AtomicReference(service.exectutionLatest());
             realtime = observedLatest::set;
 
             // read from realtime API
             disposer.add(service.executionsRealtimely().to(e -> {
                 realtime.accept(e); // don't use method reference
-            }));
+            }, observer::error, observer::complete));
 
             // read from REST API
             int size = service.executionMaxAcquirableSize();
@@ -274,7 +274,7 @@ public class MarketLog {
                 }
             }
             return disposer;
-        });
+        }).repeatWhen(s -> s.delay(10, TimeUnit.SECONDS));
     }
 
     /**

@@ -87,7 +87,7 @@ public class Network {
      * @return
      */
     public Signal<JsonElement> jsonRPC(String uri, String channelName) {
-        return new Signal<>((observer, disposer) -> {
+        return new Signal<JsonElement>((observer, disposer) -> {
             JsonParser parser = new JsonParser();
             Request request = new Request.Builder().url(uri).build();
 
@@ -141,7 +141,9 @@ public class Network {
                  */
                 @Override
                 public void onFailure(WebSocket webSocket, Throwable t, Response response) {
-                    System.out.println("Failure websocket " + t + "   " + response);
+                    System.out.println(webSocket);
+                    System.out.println(response);
+                    t.printStackTrace();
                 }
             });
 
