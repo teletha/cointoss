@@ -165,10 +165,9 @@ public class TestableMarketService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Execution exectutionLatest() {
+    public Signal<Execution> exectutionLatest() {
         // If this exception will be thrown, it is bug of this program. So we must rethrow the
-        // wrapped error
-        // in here.
+        // wrapped error in here.
         throw new Error();
     }
 

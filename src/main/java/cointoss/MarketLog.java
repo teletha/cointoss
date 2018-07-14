@@ -238,13 +238,15 @@ public class MarketLog {
      */
     private Signal<Execution> network() {
         return new Signal<Execution>((observer, disposer) -> {
-            AtomicReference<Execution> observedLatest = new AtomicReference(service.exectutionLatest());
+            AtomicReference<Execution> observedLatest = new AtomicReference<>();
+            disposer.add(service.exectutionLatest().to(observedLatest::set));
+
             realtime = observedLatest::set;
 
             // read from realtime API
             disposer.add(service.executionsRealtimely().to(e -> {
                 realtime.accept(e); // don't use method reference
-            }, observer::error, observer::complete));
+            }, observer::error));
 
             // read from REST API
             int size = service.executionMaxAcquirableSize();
@@ -252,7 +254,6 @@ public class MarketLog {
 
             while (disposer.isNotDisposed()) {
                 ArrayDeque<Execution> executions = service.executions(start, start + size).retry().toCollection(new ArrayDeque(size));
-
                 if (executions.isEmpty() == false) {
                     log.info("REST write from {}.  size {}", executions.getFirst().date, executions.size());
                     executions.forEach(observer);
@@ -274,7 +275,9 @@ public class MarketLog {
                 }
             }
             return disposer;
-        }).repeatWhen(s -> s.delay(10, TimeUnit.SECONDS));
+        }).retryWhen(s -> s.effect(e -> {
+            System.out.println("Retry after 5 sec " + e);
+        }).delay(5, TimeUnit.SECONDS));
     }
 
     /**

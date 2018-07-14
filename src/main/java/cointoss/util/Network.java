@@ -140,17 +140,15 @@ public class Network {
                  * {@inheritDoc}
                  */
                 @Override
-                public void onFailure(WebSocket webSocket, Throwable t, Response response) {
-                    System.out.println(webSocket);
-                    System.out.println(response);
-                    t.printStackTrace();
+                public void onFailure(WebSocket webSocket, Throwable error, Response response) {
+                    webSocket.cancel();
+                    observer.error(error);
+                    disposer.dispose();
                 }
             });
 
             return disposer.add(() -> {
                 websocket.cancel();
-                client.dispatcher().executorService().shutdown();
-                client.connectionPool().evictAll();
             });
         });
     }
@@ -210,5 +208,13 @@ public class Network {
         @Override
         public void log(String message, LogLevel level) {
         }
+    }
+
+    /**
+     * Shutdown all network resources.
+     */
+    public static void close() {
+        client.dispatcher().executorService().shutdown();
+        client.connectionPool().evictAll();
     }
 }

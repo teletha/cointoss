@@ -108,7 +108,7 @@ public abstract class MarketService implements Disposable {
      * 
      * @return A latest execution log.
      */
-    public abstract Execution exectutionLatest();
+    public abstract Signal<Execution> exectutionLatest();
 
     /**
      * Acquire the execution sequential key (default is {@link Execution#id}).

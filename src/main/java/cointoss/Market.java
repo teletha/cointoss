@@ -20,6 +20,7 @@ import cointoss.order.Order;
 import cointoss.order.OrderBook;
 import cointoss.order.OrderManager;
 import cointoss.ticker.TickerManager;
+import cointoss.util.Network;
 import cointoss.util.Num;
 import kiss.Disposable;
 import kiss.Signal;
@@ -98,6 +99,8 @@ public class Market implements Disposable {
         targetCurrency = service.targetCurrency().to();
         initialBaseCurrency = baseCurrency.v;
         initialTargetCurrency = targetCurrency.v;
+
+        service.add(Network::close);
 
         // build tickers for each span
         timeline.to(tickers::update);
