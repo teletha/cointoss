@@ -37,7 +37,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -54,6 +53,7 @@ import com.univocity.parsers.csv.CsvWriterSettings;
 
 import cointoss.market.bitflyer.BitFlyerService;
 import cointoss.util.Chrono;
+import cointoss.util.Network;
 import cointoss.util.Span;
 import filer.Filer;
 import kiss.I;
@@ -65,9 +65,6 @@ import kiss.Signal;
  * @version 2018/07/12 15:50:16
  */
 public class MarketLog {
-
-    private static Function<Signal<? extends Throwable>, Signal<?>> After5Sec = s -> s.effect(e -> System.out.println("Retry after 5 sec"))
-            .delay(5, TimeUnit.SECONDS);
 
     /** The logging system. */
     private static final Logger log = LogManager.getLogger(MarketLog.class);
@@ -280,7 +277,7 @@ public class MarketLog {
                 }
             }
             return disposer;
-        }).retryWhen(After5Sec);
+        }).retryWhen(Network.After5Sec);
     }
 
     /**

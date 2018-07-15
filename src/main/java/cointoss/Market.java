@@ -9,10 +9,12 @@
  */
 package cointoss;
 
+import static cointoss.util.Network.*;
+import static java.util.concurrent.TimeUnit.*;
+
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
@@ -103,11 +105,11 @@ public class Market implements Disposable {
         timeline.to(tickers::update);
 
         // orderbook management
-        service.add(service.orderBook().to(board -> {
+        service.add(service.orderBook().retryWhen(After5Sec).to(board -> {
             orderBook.shorts.update(board.asks);
             orderBook.longs.update(board.bids);
         }));
-        service.add(timeline.throttle(2, TimeUnit.SECONDS).to(e -> {
+        service.add(timeline.throttle(2, SECONDS).to(e -> {
             // fix error board
             orderBook.shorts.fix(e.price);
             orderBook.longs.fix(e.price);
