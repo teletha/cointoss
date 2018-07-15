@@ -37,6 +37,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -64,6 +65,9 @@ import kiss.Signal;
  * @version 2018/07/12 15:50:16
  */
 public class MarketLog {
+
+    private static Function<Signal<? extends Throwable>, Signal<?>> After5Sec = s -> s.effect(e -> System.out.println("Retry after 5 sec"))
+            .delay(5, TimeUnit.SECONDS);
 
     /** The logging system. */
     private static final Logger log = LogManager.getLogger(MarketLog.class);
@@ -253,7 +257,8 @@ public class MarketLog {
             long start = cacheId;
 
             while (disposer.isNotDisposed()) {
-                ArrayDeque<Execution> executions = service.executions(start, start + size).retry().toCollection(new ArrayDeque(size));
+                ArrayDeque<Execution> executions = service.executions(start, start + size).retry(10).toCollection(new ArrayDeque(size));
+
                 if (executions.isEmpty() == false) {
                     log.info("REST write from {}.  size {}", executions.getFirst().date, executions.size());
                     executions.forEach(observer);
@@ -275,9 +280,7 @@ public class MarketLog {
                 }
             }
             return disposer;
-        }).retryWhen(s -> s.effect(e -> {
-            System.out.println("Retry after 5 sec " + e);
-        }).delay(5, TimeUnit.SECONDS));
+        }).retryWhen(After5Sec);
     }
 
     /**

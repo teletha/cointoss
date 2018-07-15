@@ -28,6 +28,7 @@ public class Project extends bee.api.Project {
         require("com.univocity", "univocity-parsers", "2.6.4");
         require("com.github.luben", "zstd-jni", "1.3.4-11");
         require("org.decimal4j", "decimal4j", "1.0.3");
+        require("com.squareup.okhttp3", "okhttp", "3.11.0");
         require("com.github.signalr4j", "signalr4j", "2.0.3");
     }
 }

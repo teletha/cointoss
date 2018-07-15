@@ -10,6 +10,7 @@
 package trademate;
 
 import cointoss.market.bitflyer.BitFlyerService;
+import cointoss.util.Network;
 import viewtify.ActivationPolicy;
 import viewtify.UI;
 import viewtify.View;
@@ -41,6 +42,7 @@ public class TradeMate extends View {
      */
     public static void main(String[] args) {
         System.setProperty("java.util.logging.manager", "org.apache.logging.log4j.jul.LogManager");
+        Viewtify.Terminator.add(Network::shutdown);
         Viewtify.activate(TradeMate.class, ActivationPolicy.Latest);
     }
 }

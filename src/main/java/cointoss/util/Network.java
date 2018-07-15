@@ -28,19 +28,20 @@ import kiss.Signal;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import okhttp3.ResponseBody;
 import okhttp3.WebSocket;
 import okhttp3.WebSocketListener;
 
 /**
- * @version 2018/06/12 18:40:23
+ * @version 2018/07/15 16:02:02
  */
 public class Network {
 
     /** The timeout duration. */
-    private static final long TIMEOUT = 30;
+    private static final long TIMEOUT = 5;
 
     /** The singleton. */
-    private static final OkHttpClient client = new OkHttpClient.Builder() //
+    private static OkHttpClient client = new OkHttpClient.Builder() //
             .connectTimeout(TIMEOUT, SECONDS)
             .readTimeout(TIMEOUT, SECONDS)
             .writeTimeout(TIMEOUT, SECONDS)
@@ -48,13 +49,21 @@ public class Network {
             .build();
 
     /**
-     * Call private API.
+     * Close all network related resources.
+     */
+    public static synchronized void shutdown() {
+        client.connectionPool().evictAll();
+        client.dispatcher().executorService().shutdown();
+    }
+
+    /**
+     * Call REST API.
      */
     public <M> Signal<M> rest(Request request, String selector, Class<M> type) {
         return new Signal<>((observer, disposer) -> {
-            try (Response response = client.newCall(request).execute()) {
+            try (Response response = client.newCall(request).execute(); ResponseBody body = response.body()) {
+                String value = body.string();
                 int code = response.code();
-                String value = response.body().string();
 
                 if (code == 200) {
                     if (type == null) {
@@ -142,14 +151,14 @@ public class Network {
                 @Override
                 public void onFailure(WebSocket webSocket, Throwable error, Response response) {
                     webSocket.cancel();
-                    observer.error(error);
-                    disposer.dispose();
+
+                    if (!error.getMessage().equals("Socket closed")) {
+                        observer.error(error);
+                    }
                 }
             });
 
-            return disposer.add(() -> {
-                websocket.cancel();
-            });
+            return disposer.add(websocket::cancel);
         });
     }
 
@@ -208,13 +217,5 @@ public class Network {
         @Override
         public void log(String message, LogLevel level) {
         }
-    }
-
-    /**
-     * Shutdown all network resources.
-     */
-    public static void close() {
-        client.dispatcher().executorService().shutdown();
-        client.connectionPool().evictAll();
     }
 }
