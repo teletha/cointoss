@@ -13,6 +13,7 @@ import static java.util.concurrent.TimeUnit.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.github.signalr4j.client.LogLevel;
 import com.github.signalr4j.client.Logger;
@@ -25,6 +26,7 @@ import com.google.gson.JsonParser;
 import kiss.I;
 import kiss.JSON;
 import kiss.Signal;
+import okhttp3.ConnectionPool;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -33,7 +35,7 @@ import okhttp3.WebSocket;
 import okhttp3.WebSocketListener;
 
 /**
- * @version 2018/07/15 16:02:02
+ * @version 2018/07/15 18:19:34
  */
 public class Network {
 
@@ -41,19 +43,47 @@ public class Network {
     private static final long TIMEOUT = 5;
 
     /** The singleton. */
-    private static OkHttpClient client = new OkHttpClient.Builder() //
-            .connectTimeout(TIMEOUT, SECONDS)
-            .readTimeout(TIMEOUT, SECONDS)
-            .writeTimeout(TIMEOUT, SECONDS)
-            .retryOnConnectionFailure(true)
-            .build();
+    private static OkHttpClient client;
+
+    /** The termination state. */
+    private static final AtomicBoolean terminating = new AtomicBoolean();;
 
     /**
-     * Close all network related resources.
+     * Retrieve the client.
+     * 
+     * @return The singleton.
      */
-    public static synchronized void shutdown() {
-        client.connectionPool().evictAll();
-        client.dispatcher().executorService().shutdown();
+    private static synchronized OkHttpClient client() {
+        if (client == null) {
+            client = new OkHttpClient.Builder() //
+                    .connectTimeout(TIMEOUT, SECONDS)
+                    .readTimeout(TIMEOUT, SECONDS)
+                    .writeTimeout(TIMEOUT, SECONDS)
+                    .retryOnConnectionFailure(true)
+                    .build();
+        }
+        return client;
+    }
+
+    /**
+     * Terminate all network related resources if needed.
+     */
+    private static synchronized void terminate() {
+        if (terminating.compareAndSet(false, true)) {
+            I.schedule(50, MILLISECONDS, false, () -> {
+                ConnectionPool pool = client.connectionPool();
+                int all = pool.connectionCount();
+                int idle = pool.idleConnectionCount();
+
+                System.out.println(all + "  " + idle + "   " + client.dispatcher().executorService());
+                if (all - idle == 0) {
+                    pool.evictAll();
+                    client.dispatcher().executorService().shutdown();
+                    client = null;
+                }
+                terminating.set(false);
+            });
+        }
     }
 
     /**
@@ -61,7 +91,7 @@ public class Network {
      */
     public <M> Signal<M> rest(Request request, String selector, Class<M> type) {
         return new Signal<>((observer, disposer) -> {
-            try (Response response = client.newCall(request).execute(); ResponseBody body = response.body()) {
+            try (Response response = client().newCall(request).execute(); ResponseBody body = response.body()) {
                 String value = body.string();
                 int code = response.code();
 
@@ -100,7 +130,7 @@ public class Network {
             JsonParser parser = new JsonParser();
             Request request = new Request.Builder().url(uri).build();
 
-            WebSocket websocket = client.newWebSocket(request, new WebSocketListener() {
+            WebSocket websocket = client().newWebSocket(request, new WebSocketListener() {
 
                 /**
                  * {@inheritDoc}
@@ -131,34 +161,29 @@ public class Network {
                  * {@inheritDoc}
                  */
                 @Override
-                public void onClosing(WebSocket webSocket, int code, String reason) {
-                    super.onClosing(webSocket, code, reason);
-                    System.out.println("Closing websocket " + code + "  " + reason);
+                public void onClosing(WebSocket socket, int code, String reason) {
                 }
 
                 /**
                  * {@inheritDoc}
                  */
                 @Override
-                public void onClosed(WebSocket webSocket, int code, String reason) {
-                    super.onClosed(webSocket, code, reason);
-                    System.out.println("Closed websocket " + code + "  " + reason);
+                public void onClosed(WebSocket socket, int code, String reason) {
+                    terminate();
                 }
 
                 /**
                  * {@inheritDoc}
                  */
                 @Override
-                public void onFailure(WebSocket webSocket, Throwable error, Response response) {
-                    webSocket.cancel();
-
-                    if (!error.getMessage().equals("Socket closed")) {
-                        observer.error(error);
-                    }
+                public void onFailure(WebSocket socket, Throwable error, Response response) {
+                    observer.error(error);
                 }
             });
 
-            return disposer.add(websocket::cancel);
+            return disposer.add(() -> {
+                websocket.close(1000, null);
+            });
         });
     }
 
