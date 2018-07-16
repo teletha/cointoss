@@ -19,6 +19,7 @@ import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
@@ -53,7 +54,7 @@ import com.univocity.parsers.csv.CsvWriterSettings;
 
 import cointoss.market.bitflyer.BitFlyerService;
 import cointoss.util.Chrono;
-import cointoss.util.Network;
+import cointoss.util.RetryPolicy;
 import cointoss.util.Span;
 import filer.Filer;
 import kiss.I;
@@ -167,6 +168,11 @@ public class MarketLog {
     /** For info. */
     private Stopwatch stopwatch = Stopwatch.createUnstarted();
 
+    /** The retry policy. */
+    private final RetryPolicy policy = new RetryPolicy().retryMaximum(100)
+            .delayLinear(Duration.ofSeconds(1))
+            .delayMaximum(Duration.ofMinutes(2));
+
     /**
      * Create log manager.
      * 
@@ -276,8 +282,9 @@ public class MarketLog {
                     }
                 }
             }
+            policy.reset();
             return disposer;
-        }).retryWhen(Network.After5Sec);
+        }).retryWhen(policy);
     }
 
     /**

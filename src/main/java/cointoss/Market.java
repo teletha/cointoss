@@ -9,9 +9,9 @@
  */
 package cointoss;
 
-import static cointoss.util.Network.*;
 import static java.util.concurrent.TimeUnit.*;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -23,6 +23,7 @@ import cointoss.order.OrderBook;
 import cointoss.order.OrderManager;
 import cointoss.ticker.TickerManager;
 import cointoss.util.Num;
+import cointoss.util.RetryPolicy;
 import kiss.Disposable;
 import kiss.Signal;
 import kiss.Signaling;
@@ -82,6 +83,11 @@ public class Market implements Disposable {
     /** The initial amount of target currency. */
     public final Num initialTargetCurrency;
 
+    /** The retry policy. */
+    private final RetryPolicy policy = new RetryPolicy().retryMaximum(100)
+            .delayLinear(Duration.ofSeconds(1))
+            .delayMaximum(Duration.ofMinutes(2));
+
     /** The tarader manager. */
     private final List<Trader> traders = new CopyOnWriteArrayList<>();
 
@@ -105,9 +111,10 @@ public class Market implements Disposable {
         timeline.to(tickers::update);
 
         // orderbook management
-        service.add(service.orderBook().retryWhen(After5Sec).to(board -> {
+        service.add(service.orderBook().retryWhen(policy).to(board -> {
             orderBook.shorts.update(board.asks);
             orderBook.longs.update(board.bids);
+            policy.reset();
         }));
         service.add(timeline.throttle(2, SECONDS).to(e -> {
             // fix error board

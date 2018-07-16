@@ -9,6 +9,7 @@
  */
 package cointoss.util;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -158,8 +159,8 @@ public class Chrono {
     }
 
     /**
-     * Ensures that the specified date is between the minimum and maximum date.If the specified date
-     * is out of range, the closest date is returned.
+     * Ensures that the specified date is between the minimum and maximum date. If the specified date is
+     * out of range, the closest date is returned.
      * 
      * @param min A minimum date.
      * @param target A target date.
@@ -168,5 +169,24 @@ public class Chrono {
      */
     public static ZonedDateTime between(ZonedDateTime min, ZonedDateTime target, ZonedDateTime max) {
         return target.isBefore(min) ? min : target.isAfter(max) ? max : target;
+    }
+
+    /**
+     * Ensures that the specified duration is between the minimum and maximum duration. If the specified
+     * duration is out of range, the closest duration is returned.
+     * 
+     * @param min A minimum duration.
+     * @param target A target duration.
+     * @param max A maximum duration.
+     * @return
+     */
+    public static Duration between(Duration min, Duration target, Duration max) {
+        if (min.compareTo(target) == 1) {
+            return min;
+        }
+        if (target.compareTo(max) == -1) {
+            return target;
+        }
+        return max;
     }
 }

@@ -13,9 +13,7 @@ import static java.util.concurrent.TimeUnit.*;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Function;
 
 import com.github.signalr4j.client.LogLevel;
 import com.github.signalr4j.client.Logger;
@@ -40,11 +38,6 @@ import okhttp3.WebSocketListener;
  * @version 2018/07/15 18:19:34
  */
 public class Network {
-
-    /** Retry strategy. */
-    public static final Function<Signal<? extends Throwable>, Signal<?>> After5Sec = s -> s
-            .effect(e -> System.out.println("Retry after 5 sec"))
-            .delay(5, TimeUnit.SECONDS);
 
     /** The timeout duration. */
     private static final long TIMEOUT = 5;
