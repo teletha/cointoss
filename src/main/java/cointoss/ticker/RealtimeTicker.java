@@ -16,6 +16,7 @@ import org.magicwerk.brownies.collections.GapList;
 
 import cointoss.Execution;
 import cointoss.util.Num;
+import kiss.Variable;
 
 /**
  * @version 2018/07/05 10:37:46
@@ -24,9 +25,6 @@ public class RealtimeTicker {
 
     /** The minimum interval. */
     private static final Duration interval = Duration.ofMillis(1000);
-
-    /** The latest execution. */
-    public Execution latest = new Execution();
 
     /** The volume. */
     public Num volume = Num.ZERO;
@@ -51,11 +49,14 @@ public class RealtimeTicker {
 
     private ZonedDateTime checkTime;
 
+    private final Variable<Execution> latest;
+
     /**
      * 
      */
-    public RealtimeTicker(TickSpan span) {
+    public RealtimeTicker(TickSpan span, Variable<Execution> latest) {
         this.span = span;
+        this.latest = latest;
         buffer.addLast(Execution.BASE);
     }
 
@@ -67,8 +68,10 @@ public class RealtimeTicker {
 
         if (incoming.side.isBuy()) {
             longVolume = longVolume.plus(incoming.size);
+            longPriceIncrese = longPriceIncrese.plus(incoming.price.minus(latest.v.price));
         } else {
             shortVolume = shortVolume.plus(incoming.size);
+            shortPriceDecrease = shortPriceDecrease.plus(latest.v.price.minus(incoming.price));
         }
 
         // outgoing
@@ -83,16 +86,15 @@ public class RealtimeTicker {
 
             if (outgoing.side.isBuy()) {
                 longVolume = longVolume.minus(outgoing.size);
+                longPriceIncrese = longPriceIncrese.minus(second.price.minus(outgoing.price));
             } else {
                 shortVolume = shortVolume.minus(outgoing.size);
+                shortPriceDecrease = shortPriceDecrease.minus(outgoing.price.minus(second.price));
             }
 
             // check next
             first = second;
         }
-
-        // update latest
-        latest = incoming;
     }
 
     /**

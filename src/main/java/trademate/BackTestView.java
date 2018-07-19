@@ -52,7 +52,7 @@ public class BackTestView extends View {
         startDate.initial(Chrono.utcNow().minusDays(10).toLocalDate());
         endDate.initial(Chrono.utcNow().toLocalDate());
 
-        Market market = new Market(BitFlyerService.FX_BTC_JPY).readLog(log -> log.at(2017, 6, 4));
+        Market market = new Market(BitFlyerService.FX_BTC_JPY).readLog(log -> log.at(2018, 7, 17));
 
         Viewtify.Terminator.add(market);
         chart.market.set(market);

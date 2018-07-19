@@ -89,7 +89,13 @@ public class ChartCanvas extends Region {
     private final LineMark orderSellPrice;
 
     /** Chart UI */
-    private final LineChart chartBottom = new LineChart();
+    private final LineChart chartRelative = new LineChart(100);
+
+    /** Chart UI */
+    private final LineChart chartBottom = new LineChart(0);
+
+    /** The chart list. */
+    private final LineChart[] lineCharts = {chartRelative, chartBottom};
 
     /** Chart UI */
     private final Canvas candles = new Canvas();
@@ -130,6 +136,7 @@ public class ChartCanvas extends Region {
         this.chartBottom.create(tick -> tick.longVolume().toDouble() * 2, Buy);
         this.chartBottom.create(tick -> tick.shortVolume().toDouble() * 2, Sell);
         this.chartBottom.create(tick -> tick.volume().toDouble() * 2, Color.WHITE);
+        this.chartRelative.create(tick -> chart.market.v.tickers.realtime.estimateUpPotential().toDouble() * 100, Color.AQUA);
 
         Viewtify.clip(this);
 
@@ -148,7 +155,8 @@ public class ChartCanvas extends Region {
         visualizeMouseTrack();
 
         getChildren()
-                .addAll(backGridVertical, backGridHorizontal, notifyPrice, orderBuyPrice, orderSellPrice, latestPrice, candles, candleLatest, mouseTrackHorizontal, mouseTrackVertical, chartBottom);
+                .addAll(backGridVertical, backGridHorizontal, notifyPrice, orderBuyPrice, orderSellPrice, latestPrice, candles, candleLatest, mouseTrackHorizontal, mouseTrackVertical);
+        getChildren().addAll(lineCharts);
     }
 
     /**
@@ -285,7 +293,9 @@ public class ChartCanvas extends Region {
             gc.clearRect(0, 0, candles.getWidth(), candles.getHeight());
 
             // draw chart in visible range
-            chartBottom.initialize(visibleSize);
+            for (LineChart chart : lineCharts) {
+                chart.initialize(visibleSize);
+            }
             chart.ticker.v.each(visibleStartIndex, visibleSize, tick -> {
                 double x = axisX.getPositionForValue(tick.start.toEpochSecond());
                 double open = axisY.getPositionForValue(tick.openPrice.toDouble());
@@ -299,9 +309,13 @@ public class ChartCanvas extends Region {
                 gc.setLineWidth(BarWidth);
                 gc.strokeLine(x, open, x, close);
 
-                chartBottom.calculate(x, tick);
+                for (LineChart chart : lineCharts) {
+                    chart.calculate(x, tick);
+                }
             });
-            chartBottom.draw();
+            for (LineChart chart : lineCharts) {
+                chart.draw();
+            }
         });
 
         layoutCandleLatest.layout(() -> {
@@ -322,7 +336,9 @@ public class ChartCanvas extends Region {
             gc.setLineWidth(BarWidth);
             gc.strokeLine(x, open, x, close);
 
-            chartBottom.drawLatest(x, tick);
+            for (LineChart chart : lineCharts) {
+                chart.drawLatest(x, tick);
+            }
         });
     }
 
@@ -330,6 +346,9 @@ public class ChartCanvas extends Region {
      * @version 2018/07/13 23:46:59
      */
     private class LineChart extends Group {
+
+        /** The bottom base position. */
+        private final double bottomUp;
 
         /** The poly line. */
         private final List<Line> lines = new CopyOnWriteArrayList();
@@ -343,7 +362,8 @@ public class ChartCanvas extends Region {
         /**
          * 
          */
-        private LineChart() {
+        private LineChart(double bottomUp) {
+            this.bottomUp = bottomUp;
         }
 
         /**
@@ -402,7 +422,7 @@ public class ChartCanvas extends Region {
 
             for (Line line : lines) {
                 for (int i = 0; i < line.valueY.length; i++) {
-                    line.valueY[i] = height - line.valueY[i] * scale;
+                    line.valueY[i] = height - bottomUp - line.valueY[i] * scale;
                 }
                 gc.setStroke(line.color);
                 gc.strokePolyline(valueX, line.valueY, index);
@@ -423,7 +443,7 @@ public class ChartCanvas extends Region {
 
             for (Line line : lines) {
                 gc.setStroke(line.color);
-                gc.strokeLine(valueX[index - 1], line.valueY[index - 1], x, height - line.converter.applyAsDouble(tick) * scale);
+                gc.strokeLine(valueX[index - 1], line.valueY[index - 1], x, height - bottomUp - line.converter.applyAsDouble(tick) * scale);
             }
         }
 

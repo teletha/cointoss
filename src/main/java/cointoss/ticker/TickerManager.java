@@ -27,6 +27,8 @@ public final class TickerManager {
     /** The latest execution. */
     public final Variable<Execution> latest = Variable.of(Execution.BASE);
 
+    public final RealtimeTicker realtime = new RealtimeTicker(TickSpan.Minute1, latest);
+
     /** Total of long volume since application startup. */
     Num longVolume = Num.ZERO;
 
@@ -108,6 +110,7 @@ public final class TickerManager {
             shortVolume = shortVolume.plus(e.size);
             shortPriceDecrease = shortPriceDecrease.plus(latest.v.price.minus(e.price));
         }
+        realtime.update(e);
 
         // update the latest execution at last
         latest.set(e);
