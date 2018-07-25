@@ -12,6 +12,7 @@ package cointoss;
 import static java.nio.charset.StandardCharsets.*;
 import static java.nio.file.Files.*;
 import static java.nio.file.StandardOpenOption.*;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -214,7 +215,7 @@ public class MarketLog {
                 }
             }
             this.cacheFirst = start != null ? start : Chrono.utcNow().truncatedTo(ChronoUnit.DAYS);
-            this.cacheLast = end != null ? end : start;
+            this.cacheLast = end != null ? end : cacheFirst;
             this.cache = new Cache(cacheFirst);
         } catch (Exception e) {
             throw I.quiet(e);
@@ -633,7 +634,7 @@ public class MarketLog {
          */
         private void compact() {
             if (Files.notExists(compact)) {
-                I.schedule(10, TimeUnit.SECONDS, true, () -> {
+                I.schedule(100, MILLISECONDS, true, () -> {
                     compact(read()).effectOnComplete(() -> Filer.delete(normal)).to(I.NoOP);
                 });
             }

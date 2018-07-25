@@ -57,7 +57,11 @@ import viewtify.Viewtify;
  */
 public class BitFlyerService extends MarketService {
 
+    /** Market */
     public static final BitFlyerService FX_BTC_JPY = new BitFlyerService("FX_BTC_JPY", false);
+
+    /** Market */
+    public static final BitFlyerService BTC_JPY = new BitFlyerService("BTC_JPY", false);
 
     private static final MediaType mime = MediaType.parse("application/json; charset=utf-8");
 
@@ -764,8 +768,8 @@ public class BitFlyerService extends MarketService {
 
         /**
          * <p>
-         * Analyze Taker's order ID and obtain approximate order time (Since there is a bot which specifies
-         * non-standard id format, ignore it in that case).
+         * Analyze Taker's order ID and obtain approximate order time (Since there is a bot which
+         * specifies non-standard id format, ignore it in that case).
          * </p>
          * <ol>
          * <li>Execution Date : UTC</li>
