@@ -539,16 +539,6 @@ public class MarketLog {
         }
 
         /**
-         * Check whether this cache is completed or not.
-         * 
-         * @return
-         */
-        private boolean isCompleted() {
-            LocalDate nextDay = date.plusDays(1);
-            return Files.exists(locateCompactLog(nextDay)) || Files.exists(locateLog(nextDay));
-        }
-
-        /**
          * Read cached date.
          * 
          * @return
@@ -581,11 +571,6 @@ public class MarketLog {
                             .effectOnComplete(() -> {
                                 log.info("Read log [{}] {}", date, stopwatch.stop().elapsed());
                             });
-
-                    // make log compact coinstantaneously
-                    // if (isCompleted()) {
-                    // signal = compact(signal);
-                    // }
                     return signal;
                 }
             } catch (IOException e) {
