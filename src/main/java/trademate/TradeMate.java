@@ -9,7 +9,7 @@
  */
 package trademate;
 
-import cointoss.market.bitflyer.BitFlyerService;
+import cointoss.market.bitflyer.BitFlyer;
 import viewtify.ActivationPolicy;
 import viewtify.UI;
 import viewtify.View;
@@ -30,7 +30,7 @@ public class TradeMate extends View {
     protected void initialize() {
         main.load("Setting", SettingView.class)
                 .load("Back Test", BackTestView.class)
-                .load("BitFlyer FX", tab -> new TradingView(BitFlyerService.FX_BTC_JPY, tab))
+                .load("BitFlyer FX", tab -> new TradingView(BitFlyer.FX_BTC_JPY, tab))
                 .initial(0);
     }
 
