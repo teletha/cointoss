@@ -261,7 +261,7 @@ public class MarketLog {
             long start = cacheId;
 
             while (disposer.isNotDisposed()) {
-                ArrayDeque<Execution> executions = service.executions(start, start + size).retry(10).toCollection(new ArrayDeque(size));
+                ArrayDeque<Execution> executions = service.executions(start, start + size).retry().toCollection(new ArrayDeque(size));
 
                 if (executions.isEmpty() == false) {
                     log.info("REST write from {}.  size {}", executions.getFirst().date, executions.size());
@@ -557,6 +557,8 @@ public class MarketLog {
             try {
                 CsvParserSettings setting = new CsvParserSettings();
                 setting.getFormat().setDelimiter(' ');
+                setting.getFormat().setComment('無');
+
                 CsvParser parser = new CsvParser(setting);
                 if (Files.exists(compact)) {
                     // read compact
@@ -581,9 +583,9 @@ public class MarketLog {
                             });
 
                     // make log compact coinstantaneously
-                    if (isCompleted()) {
-                        signal = compact(signal);
-                    }
+                    // if (isCompleted()) {
+                    // signal = compact(signal);
+                    // }
                     return signal;
                 }
             } catch (IOException e) {
@@ -634,7 +636,7 @@ public class MarketLog {
          */
         private void compact() {
             if (Files.notExists(compact)) {
-                I.schedule(100, MILLISECONDS, true, () -> {
+                I.schedule(5, SECONDS, true, () -> {
                     compact(read()).effectOnComplete(() -> Filer.delete(normal)).to(I.NoOP);
                 });
             }
@@ -649,6 +651,7 @@ public class MarketLog {
 
                 CsvWriterSettings setting = new CsvWriterSettings();
                 setting.getFormat().setDelimiter(' ');
+                setting.getFormat().setComment('無');
                 CsvWriter writer = new CsvWriter(new ZstdOutputStream(newOutputStream(compact), 1), ISO_8859_1, setting);
 
                 return executions.map(Execution.BASE, (prev, e) -> {
@@ -662,9 +665,23 @@ public class MarketLog {
     }
 
     public static void main(String[] args) {
-        Market market = new Market(BitFlyerService.FX_BTC_JPY);
-        market.readLog(log -> log.caches().skip(255).take(6).concatMap(c -> c.read()));
-
-        market.dispose();
+        MarketLog log = new MarketLog(BitFlyerService.FX_BTC_JPY);
+        log.fromToday().to(exe -> {
+        });
+        log.service.dispose();
     }
+
+    // public static void main(String[] args) {
+    // Market market = new Market(BitFlyerService.FX_BTC_JPY);
+    // market.readLog(log -> log.fromLast(2).retry());
+    //
+    // market.dispose();
+    // }
+
+    // public static void main(String[] args) {
+    // Market market = new Market(BitFlyerService.FX_BTC_JPY);
+    // market.readLog(log -> log.caches().skip(255).take(6).concatMap(c -> c.read()));
+    //
+    // market.dispose();
+    // }
 }

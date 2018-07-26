@@ -9,13 +9,16 @@
  */
 package cointoss;
 
+import static cointoss.Execution.*;
 import static cointoss.MarketTestSupport.*;
+import static cointoss.Side.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
+import cointoss.MarketTestSupport.ChainableExecution;
 import cointoss.backtest.TestableMarketService;
 
 /**
@@ -157,6 +160,41 @@ class MarketServiceTest {
         exes.add(buy(1, 10).delay(Execution.DelayHuge));
         exes.add(buy(1, 10).delay(Execution.DelayInestimable));
         exes.add(buy(1, 10).delay(Execution.DelayInestimable));
+
+        for (int i = 1; i < exes.size(); i++) {
+            Execution current = exes.get(i);
+            Execution previous = exes.get(i - 1);
+
+            String[] encoded = service.encode(previous, current);
+            Execution decoded = service.decode(previous, encoded);
+            assert decoded.equals(current);
+        }
+    }
+
+    @Test
+    void complex() {
+        List<Execution> exes = new ArrayList();
+        exes.add(new ChainableExecution().id(17003792)
+                .date(2017, 3, 6, 10, 28, 2, 873)
+                .side(BUY)
+                .price(148500)
+                .size(3.4094257)
+                .consecutive(ConsecutiveSameSeller)
+                .delay(1));
+        exes.add(new ChainableExecution().id(17003800)
+                .date(2017, 3, 6, 10, 28, 23, 523)
+                .side(BUY)
+                .price(148500)
+                .size(0.01)
+                .consecutive(ConsecutiveDifference)
+                .delay(1));
+        exes.add(new ChainableExecution().id(17003881)
+                .date(2017, 3, 6, 10, 29, 51, 960)
+                .side(BUY)
+                .price(148450)
+                .size(0.45)
+                .consecutive(ConsecutiveDifference)
+                .delay(1));
 
         for (int i = 1; i < exes.size(); i++) {
             Execution current = exes.get(i);

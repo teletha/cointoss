@@ -238,5 +238,81 @@ public class MarketTestSupport {
 
             return this;
         }
+
+        /**
+         * Assign side.
+         * 
+         * @param side
+         * @return
+         */
+        public ChainableExecution side(Side side) {
+            this.side = Objects.requireNonNull(side);
+
+            return this;
+        }
+
+        /**
+         * Assign price.
+         * 
+         * @param price
+         * @return
+         */
+        public ChainableExecution price(long price) {
+            return price(Num.of(price));
+        }
+
+        /**
+         * Assign price.
+         * 
+         * @param price
+         * @return
+         */
+        public ChainableExecution price(double price) {
+            return price(Num.of(price));
+        }
+
+        /**
+         * Assign price.
+         * 
+         * @param price
+         * @return
+         */
+        public ChainableExecution price(Num price) {
+            this.price = Objects.requireNonNull(price);
+
+            return this;
+        }
+
+        /**
+         * Assign size.
+         * 
+         * @param size
+         * @return
+         */
+        public ChainableExecution size(long size) {
+            return size(Num.of(size));
+        }
+
+        /**
+         * Assign size.
+         * 
+         * @param size
+         * @return
+         */
+        public ChainableExecution size(double size) {
+            return size(Num.of(size));
+        }
+
+        /**
+         * Assign size.
+         * 
+         * @param size
+         * @return
+         */
+        public ChainableExecution size(Num size) {
+            this.size = Objects.requireNonNull(size);
+
+            return this;
+        }
     }
 }
