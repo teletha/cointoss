@@ -55,6 +55,7 @@ import com.univocity.parsers.csv.CsvWriterSettings;
 
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.util.Chrono;
+import cointoss.util.Num;
 import cointoss.util.RetryPolicy;
 import cointoss.util.Span;
 import filer.Filer;
@@ -259,14 +260,30 @@ public class MarketLog {
             // read from REST API
             int size = service.executionMaxAcquirableSize();
             long start = cacheId;
+            Num coefficient = Num.ONE;
 
             while (disposer.isNotDisposed()) {
-                ArrayDeque<Execution> executions = service.executions(start, start + size).retry().toCollection(new ArrayDeque(size));
+                ArrayDeque<Execution> executions = service.executions(start, start + coefficient.multiply(size).toInt())
+                        .retry()
+                        .toCollection(new ArrayDeque(size));
 
-                if (executions.isEmpty() == false) {
-                    log.info("REST write from {}.  size {}", executions.getFirst().date, executions.size());
-                    executions.forEach(observer);
-                    start = executions.getLast().id;
+                int retrieved = executions.size();
+
+                if (retrieved != 0) {
+                    if (size <= retrieved) {
+                        // Since there are too many data acquired, narrow the data range and get it again.
+                        coefficient = Num.max(Num.ONE, coefficient.minus("0.3"));
+                        continue;
+                    } else {
+                        log.info("REST write from {}.  size {} ({})", executions.getFirst().date, executions.size(), coefficient);
+                        executions.forEach(observer);
+                        start = executions.getLast().id;
+
+                        // Since the number of acquired data is too small, expand the data range slightly from next time.
+                        if (retrieved < size * 0.1) {
+                            coefficient = coefficient.plus("0.1");
+                        }
+                    }
                 } else {
                     if (start < observedLatest.get().id) {
                         // Although there is no data in the current search range,
@@ -649,19 +666,20 @@ public class MarketLog {
         }
     }
 
+    // public static void main(String[] args) {
+    // MarketLog log = new MarketLog(BitFlyer.BTC_JPY);
+    // log.at(2018, 7, 18).to(exe -> {
+    // System.out.println(exe);
+    // });
+    // log.service.dispose();
+    // }
+
     public static void main(String[] args) {
-        MarketLog log = new MarketLog(BitFlyer.FX_BTC_JPY);
+        MarketLog log = new MarketLog(BitFlyer.BTC_JPY);
         log.fromToday().to(exe -> {
         });
         log.service.dispose();
     }
-
-    // public static void main(String[] args) {
-    // Market market = new Market(BitFlyerService.FX_BTC_JPY);
-    // market.readLog(log -> log.fromLast(2).retry());
-    //
-    // market.dispose();
-    // }
 
     // public static void main(String[] args) {
     // Market market = new Market(BitFlyerService.FX_BTC_JPY);
