@@ -328,7 +328,7 @@ class BitFlyerService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Execution> exectutionLatest() {
+    public Signal<Execution> executionLatest() {
         return call("GET", "/v1/executions?product_code=" + marketName + "&count=1", "", "^", BitFlyerExecution.class)
                 .map(BitFlyerExecution.NONE, (prev, now) -> now.estimate(prev))
                 .as(Execution.class);

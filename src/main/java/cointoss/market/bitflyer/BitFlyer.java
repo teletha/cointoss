@@ -13,7 +13,7 @@ import cointoss.MarketService;
 import cointoss.market.MarketProvider;
 
 /**
- * @version 2018/07/26 22:52:51
+ * @version 2018/07/28 17:45:22
  */
 public final class BitFlyer extends MarketProvider {
 
@@ -22,4 +22,19 @@ public final class BitFlyer extends MarketProvider {
 
     /** Market */
     public static final MarketService FX_BTC_JPY = new BitFlyerService("FX_BTC_JPY");
+
+    /** Market */
+    public static final MarketService ETH_BTC = new BitFlyerService("ETH_BTC");
+
+    /** Market */
+    public static final MarketService BCH_BTC = new BitFlyerService("BCH_BTC");
+
+    /** Market */
+    public static final MarketService BTCJPY28SEP2018 = new BitFlyerService("BTCJPY28SEP2018");
+
+    /** Market */
+    public static final MarketService BTCJPY03AUG2018 = new BitFlyerService("BTCJPY03AUG2018");
+
+    /** Market */
+    public static final MarketService BTCJPY10AUG2018 = new BitFlyerService("BTCJPY10AUG2018");
 }

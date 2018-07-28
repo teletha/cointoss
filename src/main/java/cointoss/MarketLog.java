@@ -248,7 +248,7 @@ public class MarketLog {
     private Signal<Execution> network() {
         return new Signal<Execution>((observer, disposer) -> {
             AtomicReference<Execution> observedLatest = new AtomicReference<>();
-            disposer.add(service.exectutionLatest().to(observedLatest::set));
+            disposer.add(service.executionLatest().to(observedLatest::set));
 
             realtime = observedLatest::set;
 
@@ -259,7 +259,7 @@ public class MarketLog {
 
             // read from REST API
             int size = service.executionMaxAcquirableSize();
-            long start = cacheId;
+            long start = cacheId != 0 ? cacheId : service.estimateInitialExecutionId();
             Num coefficient = Num.ONE;
 
             while (disposer.isNotDisposed()) {
@@ -272,7 +272,7 @@ public class MarketLog {
                 if (retrieved != 0) {
                     if (size <= retrieved) {
                         // Since there are too many data acquired, narrow the data range and get it again.
-                        coefficient = Num.max(Num.ONE, coefficient.minus("0.3"));
+                        coefficient = Num.max(Num.ONE, coefficient.minus(1));
                         continue;
                     } else {
                         log.info("REST write from {}.  size {} ({})", executions.getFirst().date, executions.size(), coefficient);
@@ -675,9 +675,11 @@ public class MarketLog {
     // }
 
     public static void main(String[] args) {
-        MarketLog log = new MarketLog(BitFlyer.BTC_JPY);
-        log.fromToday().to(exe -> {
-        });
+        MarketLog log = new MarketLog(BitFlyer.BTCJPY28SEP2018);
+        long id = log.service.estimateInitialExecutionId();
+        System.out.println(id);
+        // log.fromToday().to(exe -> {
+        // });
         log.service.dispose();
     }
 

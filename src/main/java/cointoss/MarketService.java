@@ -10,6 +10,7 @@
 package cointoss;
 
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Objects;
 
 import cointoss.order.Order;
@@ -108,7 +109,7 @@ public abstract class MarketService implements Disposable {
      * 
      * @return A latest execution log.
      */
-    public abstract Signal<Execution> exectutionLatest();
+    public abstract Signal<Execution> executionLatest();
 
     /**
      * Acquire the execution sequential key (default is {@link Execution#id}).
@@ -126,6 +127,33 @@ public abstract class MarketService implements Disposable {
      * @return
      */
     protected abstract int executionMaxAcquirableSize();
+
+    /**
+     * Estimate the inital execution id of the {@link Market}.
+     * 
+     * @return
+     */
+    protected long estimateInitialExecutionId() {
+        long start = 0;
+        long end = executionLatest().to().v.id;
+        long middle = (start + end) / 2;
+
+        while (true) {
+            List<Execution> result = executions(start, middle).skipError().toList();
+
+            if (result.isEmpty()) {
+                start = middle;
+                middle = (start + end) / 2;
+            } else {
+                end = result.get(0).id + 1;
+                middle = (start + end) / 2;
+            }
+
+            if (end - start <= 10) {
+                return start;
+            }
+        }
+    }
 
     /**
      * <p>
