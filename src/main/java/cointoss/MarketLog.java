@@ -289,7 +289,8 @@ public class MarketLog {
                         // Although there is no data in the current search range,
                         // since it has not yet reached the latest execution,
                         // shift the range backward and search again.
-                        start += size;
+                        start += coefficient.multiply(size).toInt() - 1;
+                        coefficient = coefficient.plus("0.1");
                         continue;
                     } else {
                         // Because the REST API has caught up with the real-time API,
@@ -637,7 +638,7 @@ public class MarketLog {
          * Convert normal log to compact log asynchronously.
          */
         private void compact() {
-            if (Files.notExists(compact)) {
+            if (Files.notExists(compact) && (!queue.isEmpty() || Files.exists(normal))) {
                 I.schedule(5, SECONDS, true, () -> {
                     compact(read()).effectOnComplete(() -> Filer.delete(normal)).to(I.NoOP);
                 });
@@ -666,20 +667,10 @@ public class MarketLog {
         }
     }
 
-    // public static void main(String[] args) {
-    // MarketLog log = new MarketLog(BitFlyer.BTC_JPY);
-    // log.at(2018, 7, 18).to(exe -> {
-    // System.out.println(exe);
-    // });
-    // log.service.dispose();
-    // }
-
     public static void main(String[] args) {
-        MarketLog log = new MarketLog(BitFlyer.BTCJPY28SEP2018);
-        long id = log.service.estimateInitialExecutionId();
-        System.out.println(id);
-        // log.fromToday().to(exe -> {
-        // });
+        MarketLog log = new MarketLog(BitFlyer.BTCJPY03AUG2018);
+        log.fromToday().to(exe -> {
+        });
         log.service.dispose();
     }
 

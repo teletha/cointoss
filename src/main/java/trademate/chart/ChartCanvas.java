@@ -198,6 +198,9 @@ public class ChartCanvas extends Region {
             chart.selectDate.text("");
             chart.selectHigh.text("");
             chart.selectLow.text("");
+            chart.selectVolume.text("");
+            chart.selectLongVolume.text("");
+            chart.selectShortVolume.text("");
         });
     }
 
