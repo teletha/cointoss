@@ -27,6 +27,8 @@ import javafx.scene.shape.Path;
 import javafx.scene.shape.PathElement;
 
 import cointoss.Side;
+import cointoss.market.bitflyer.BitFlyer;
+import cointoss.market.bitflyer.SFD;
 import cointoss.order.OrderState;
 import cointoss.ticker.Tick;
 import cointoss.util.Chrono;
@@ -89,6 +91,9 @@ public class ChartCanvas extends Region {
     private final LineMark orderSellPrice;
 
     /** Chart UI */
+    private final LineMark sfdPrice;
+
+    /** Chart UI */
     private final LineChart chartRelative = new LineChart(100);
 
     /** Chart UI */
@@ -128,6 +133,7 @@ public class ChartCanvas extends Region {
         this.latestPrice = new LineMark(axisY, ChartClass.PriceLatest);
         this.orderBuyPrice = new LineMark(axisY, ChartClass.OrderSupport, Side.BUY);
         this.orderSellPrice = new LineMark(axisY, ChartClass.OrderSupport, Side.SELL);
+        this.sfdPrice = new LineMark(axisY, ChartClass.PriceSFD);
         this.candles.widthProperty().bind(widthProperty());
         this.candles.heightProperty().bind(heightProperty());
         this.candleLatest.widthProperty().bind(widthProperty());
@@ -153,9 +159,10 @@ public class ChartCanvas extends Region {
         visualizeOrderPrice();
         visualizeLatestPrice();
         visualizeMouseTrack();
+        visualizeSFDPrice();
 
         getChildren()
-                .addAll(backGridVertical, backGridHorizontal, notifyPrice, orderBuyPrice, orderSellPrice, latestPrice, candles, candleLatest, mouseTrackHorizontal, mouseTrackVertical);
+                .addAll(backGridVertical, backGridHorizontal, notifyPrice, orderBuyPrice, orderSellPrice, latestPrice, sfdPrice, candles, candleLatest, mouseTrackHorizontal, mouseTrackVertical);
         getChildren().addAll(lineCharts);
     }
 
@@ -262,6 +269,20 @@ public class ChartCanvas extends Region {
     }
 
     /**
+     * Visualize SFD price in chart.
+     */
+    private void visualizeSFDPrice() {
+        chart.market.observe().to(market -> {
+            if (market.service == BitFlyer.FX_BTC_JPY) {
+                SFD sfd = new SFD();
+                TickLable plus5 = sfdPrice.createLabel();
+
+                sfd.calculatePlus5().on(Viewtify.UIThread).to(p -> plus5.value.set(p.toDouble()));
+            }
+        });
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -273,6 +294,7 @@ public class ChartCanvas extends Region {
         mouseTrackHorizontal.draw();
         notifyPrice.draw();
         latestPrice.draw();
+        sfdPrice.draw();
         orderBuyPrice.draw();
         orderSellPrice.draw();
 

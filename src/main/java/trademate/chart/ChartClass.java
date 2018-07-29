@@ -12,9 +12,9 @@ package trademate.chart;
 import viewtify.CSSName;
 
 /**
- * @version 2018/01/09 0:38:01
+ * @version 2018/07/29 22:51:22
  */
 public enum ChartClass implements CSSName {
 
-    MouseTrack, PriceSignal, PriceLatest, OrderSupport, BackGrid, Label, Line, CandleBar, CandleLine, CandleTopText, ChartVolume, ChartTotalVolume;
+    MouseTrack, PriceSignal, PriceLatest, PriceSFD, OrderSupport, BackGrid, Label, Line, CandleBar, CandleLine, CandleTopText, ChartVolume, ChartTotalVolume;
 }

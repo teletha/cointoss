@@ -110,6 +110,15 @@ public class Execution implements Directional {
     }
 
     /**
+     * Accessor for {@link #price}.
+     * 
+     * @return
+     */
+    public final Num price() {
+        return price;
+    }
+
+    /**
      * Helper method to compare date and time.
      * 
      * @param time

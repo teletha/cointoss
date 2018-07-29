@@ -97,6 +97,14 @@
 	-fx-stroke: rgb(140, 100, 40);
 }
 
+.PriceSFD.Label {
+	-fx-text-fill: rgb(40, 100, 40);
+}
+.PriceSDF.Line {
+	-fx-stroke-width: 0.5;
+	-fx-stroke: rgb(40, 100, 40);
+}
+
 .OrderSupport.Label {
 	-fx-text-fill: -side;
 }
