@@ -44,7 +44,11 @@ public class SFD {
     static final Num minus20 = Num.of("0.80");
 
     /** The latest price of BTC. */
-    private final Variable<Num> latestBTC = BitFlyer.BTC_JPY.executionsRealtimely().map(Execution::price).diff().to();
+    private final Variable<Num> latestBTC = BitFlyer.BTC_JPY.executionsRealtimely()
+            .startWith(BitFlyer.BTC_JPY.executionLatest())
+            .map(Execution::price)
+            .diff()
+            .to();
 
     /**
      * Calculate SFD boundary price.
@@ -53,6 +57,15 @@ public class SFD {
      */
     public Signal<Num> calculatePlus5() {
         return latestBTC.observe().map(price -> calculate(price, plus5));
+    }
+
+    /**
+     * Calculate SFD boundary price.
+     * 
+     * @return
+     */
+    public Signal<Num> calculatePlus10() {
+        return latestBTC.observe().map(price -> calculate(price, plus10));
     }
 
     /**

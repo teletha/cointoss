@@ -258,7 +258,7 @@ public class ChartCanvas extends Region {
      * Visualize latest price in chart.
      */
     private void visualizeLatestPrice() {
-        TickLable latest = latestPrice.createLabel();
+        TickLable latest = latestPrice.createLabel("最新値");
 
         chart.market.observe().to(market -> {
             market.timeline.map(e -> e.price).diff().on(Viewtify.UIThread).to(price -> {
@@ -275,9 +275,18 @@ public class ChartCanvas extends Region {
         chart.market.observe().to(market -> {
             if (market.service == BitFlyer.FX_BTC_JPY) {
                 SFD sfd = new SFD();
-                TickLable plus5 = sfdPrice.createLabel();
+                TickLable plus5 = sfdPrice.createLabel("乖離5%");
+                TickLable plus10 = sfdPrice.createLabel("乖離10%");
 
-                sfd.calculatePlus5().on(Viewtify.UIThread).to(p -> plus5.value.set(p.toDouble()));
+                sfd.calculatePlus5().on(Viewtify.UIThread).to(price -> {
+                    plus5.value.set(price.toDouble());
+                    sfdPrice.layoutLine.requestLayout();
+                });
+
+                sfd.calculatePlus10().on(Viewtify.UIThread).to(price -> {
+                    plus10.value.set(price.toDouble());
+                    sfdPrice.layoutLine.requestLayout();
+                });
             }
         });
     }
@@ -575,7 +584,16 @@ public class ChartCanvas extends Region {
          * @return
          */
         private TickLable createLabel() {
-            return createLabel(null);
+            return createLabel(null, null);
+        }
+
+        /**
+         * Create new mark.
+         * 
+         * @return
+         */
+        private TickLable createLabel(String description) {
+            return createLabel(null, description);
         }
 
         /**
@@ -584,7 +602,16 @@ public class ChartCanvas extends Region {
          * @return
          */
         private TickLable createLabel(Num price) {
-            TickLable label = axis.createLabel(classNames);
+            return createLabel(price, null);
+        }
+
+        /**
+         * Create new mark.
+         * 
+         * @return
+         */
+        private TickLable createLabel(Num price, String description) {
+            TickLable label = axis.createLabel(description, classNames);
             if (price != null) label.value.set(price.toDouble());
             labels.add(label);
 

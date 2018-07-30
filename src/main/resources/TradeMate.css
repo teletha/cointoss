@@ -100,7 +100,7 @@
 .PriceSFD.Label {
 	-fx-text-fill: rgb(40, 100, 40);
 }
-.PriceSDF.Line {
+.PriceSFD.Line {
 	-fx-stroke-width: 0.5;
 	-fx-stroke: rgb(40, 100, 40);
 }

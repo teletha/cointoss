@@ -24,6 +24,7 @@ import javafx.geometry.Side;
 import javafx.scene.Group;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollBar;
+import javafx.scene.control.Tooltip;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.Region;
 import javafx.scene.shape.Line;
@@ -31,6 +32,7 @@ import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.PathElement;
+import javafx.util.Duration;
 
 import cointoss.util.Num;
 import kiss.Disposable;
@@ -447,12 +449,12 @@ public class Axis extends Region {
      * 
      * @return
      */
-    public TickLable createLabel(Enum... classNames) {
-        return new TickLable(classNames);
+    public TickLable createLabel(String description, Enum... classNames) {
+        return new TickLable(description, classNames);
     }
 
     /**
-     * @version 2018/01/08 2:53:23
+     * @version 2018/07/31 6:58:28
      */
     public class TickLable extends Label implements Disposable {
 
@@ -463,9 +465,23 @@ public class Axis extends Region {
          * 
          */
         private TickLable(Enum... classNames) {
+            this(null, classNames);
+        }
+
+        /**
+         * 
+         */
+        private TickLable(String description, Enum... classNames) {
             tickLabels.getChildren().add(this);
             textProperty().bind(Viewtify.calculate(value, () -> tickLabelFormatter.get().apply(value.get())));
             value.addListener(layoutAxis);
+
+            if (description != null && !description.isEmpty()) {
+                Tooltip tooltip = new Tooltip(description);
+                tooltip.setShowDuration(Duration.INDEFINITE);
+                tooltip.setShowDelay(Duration.ZERO);
+                setTooltip(tooltip);
+            }
 
             StyleHelper.of(this).style(ChartClass.Label).style(classNames);
         }
