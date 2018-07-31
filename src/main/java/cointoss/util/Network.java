@@ -106,8 +106,8 @@ public class Network {
                         } else {
                             json.find(selector, type).to(observer);
                         }
-                        observer.complete();
                     }
+                    observer.complete();
                 } else {
                     observer.error(new Error("[" + request.url() + "] HTTP Status " + code + " " + value));
                 }

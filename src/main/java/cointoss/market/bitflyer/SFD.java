@@ -12,7 +12,6 @@ package cointoss.market.bitflyer;
 import cointoss.Execution;
 import cointoss.util.Num;
 import kiss.Signal;
-import kiss.Variable;
 
 /**
  * @version 2018/07/31 9:47:26
@@ -44,15 +43,16 @@ public enum SFD {
     Minus20("0.80");
 
     /** The latest price of BTC. */
-    private static final Variable<Num> latestBTC = BitFlyer.BTC_JPY.executionsRealtimely()
+    private static final Signal<Num> latestBTC = BitFlyer.BTC_JPY.executionsRealtimely()
             .startWith(BitFlyer.BTC_JPY.executionLatest())
             .map(Execution::price)
             .diff()
-            .to();
+            .share();
 
     /** The human-readable percentage. */
     public final Num percentage;
 
+    /** The internal percentage. */
     private final Num diff;
 
     /**
@@ -71,7 +71,7 @@ public enum SFD {
      * @return
      */
     public Signal<Num> boundary() {
-        return latestBTC.observe().map(this::calculate);
+        return latestBTC.map(this::calculate);
     }
 
     /**

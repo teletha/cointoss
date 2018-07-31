@@ -292,10 +292,10 @@ public class ChartCanvas extends Region implements EventHelper<ChartCanvas> {
             if (market.service == BitFlyer.FX_BTC_JPY) {
                 for (SFD sfd : SFD.values()) {
                     TickLable label = sfdPrice.createLabel("乖離" + sfd.percentage + "%");
-                    sfd.boundary().on(Viewtify.UIThread).to(price -> {
+                    market.service.add(sfd.boundary().on(Viewtify.UIThread).to(price -> {
                         label.value.set(price.toDouble());
                         sfdPrice.layoutLine.requestLayout();
-                    });
+                    }));
                 }
             }
         });
