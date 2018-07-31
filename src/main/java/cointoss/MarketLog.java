@@ -53,7 +53,6 @@ import com.univocity.parsers.csv.CsvParserSettings;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
 
-import cointoss.market.bitflyer.BitFlyer;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
 import cointoss.util.RetryPolicy;
@@ -271,7 +270,8 @@ public class MarketLog {
 
                 if (retrieved != 0) {
                     if (size <= retrieved) {
-                        // Since there are too many data acquired, narrow the data range and get it again.
+                        // Since there are too many data acquired, narrow the data range and get it
+                        // again.
                         coefficient = Num.max(Num.ONE, coefficient.minus(1));
                         continue;
                     } else {
@@ -279,7 +279,8 @@ public class MarketLog {
                         executions.forEach(observer);
                         start = executions.getLast().id;
 
-                        // Since the number of acquired data is too small, expand the data range slightly from next time.
+                        // Since the number of acquired data is too small, expand the data range
+                        // slightly from next time.
                         if (retrieved < size * 0.1) {
                             coefficient = coefficient.plus("0.1");
                         }
@@ -667,12 +668,12 @@ public class MarketLog {
         }
     }
 
-    public static void main(String[] args) {
-        MarketLog log = new MarketLog(BitFlyer.BTCJPY03AUG2018);
-        log.fromToday().to(exe -> {
-        });
-        log.service.dispose();
-    }
+    // public static void main(String[] args) {
+    // MarketLog log = new MarketLog(BitFlyer.BTCJPY03AUG2018);
+    // log.fromToday().to(exe -> {
+    // });
+    // log.service.dispose();
+    // }
 
     // public static void main(String[] args) {
     // Market market = new Market(BitFlyerService.FX_BTC_JPY);

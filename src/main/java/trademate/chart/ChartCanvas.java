@@ -16,6 +16,7 @@ import java.util.function.ToDoubleFunction;
 
 import javafx.collections.ObservableList;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.ContextMenuEvent;
@@ -36,14 +37,16 @@ import cointoss.util.Num;
 import kiss.I;
 import trademate.Notificator;
 import trademate.chart.Axis.TickLable;
+import viewtify.User;
 import viewtify.Viewtify;
+import viewtify.ui.helper.EventHelper;
 import viewtify.ui.helper.LayoutAssistant;
 import viewtify.ui.helper.StyleHelper;
 
 /**
  * @version 2018/07/13 23:47:28
  */
-public class ChartCanvas extends Region {
+public class ChartCanvas extends Region implements EventHelper<ChartCanvas> {
 
     /** @FIXME Read from css file. */
     private static final Color Buy = Color.rgb(32, 151, 77);
@@ -155,6 +158,11 @@ public class ChartCanvas extends Region {
                 .layoutBy(axisY.scroll.valueProperty(), axisY.scroll.visibleAmountProperty())
                 .layoutBy(chart.ticker.observe().switchMap(ticker -> ticker.update.startWithNull()));
 
+        // drag and drop
+        when(User.Drag).buffer(2).to(events -> {
+            System.out.println(events);
+        });
+
         visualizeNotifyPrice();
         visualizeOrderPrice();
         visualizeLatestPrice();
@@ -164,6 +172,14 @@ public class ChartCanvas extends Region {
         getChildren()
                 .addAll(backGridVertical, backGridHorizontal, notifyPrice, orderBuyPrice, orderSellPrice, latestPrice, sfdPrice, candles, candleLatest, mouseTrackHorizontal, mouseTrackVertical);
         getChildren().addAll(lineCharts);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Node ui() {
+        return this;
     }
 
     /**
