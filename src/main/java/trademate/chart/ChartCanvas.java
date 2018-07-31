@@ -274,19 +274,13 @@ public class ChartCanvas extends Region {
     private void visualizeSFDPrice() {
         chart.market.observe().to(market -> {
             if (market.service == BitFlyer.FX_BTC_JPY) {
-                SFD sfd = new SFD();
-                TickLable plus5 = sfdPrice.createLabel("乖離5%");
-                TickLable plus10 = sfdPrice.createLabel("乖離10%");
-
-                sfd.calculatePlus5().on(Viewtify.UIThread).to(price -> {
-                    plus5.value.set(price.toDouble());
-                    sfdPrice.layoutLine.requestLayout();
-                });
-
-                sfd.calculatePlus10().on(Viewtify.UIThread).to(price -> {
-                    plus10.value.set(price.toDouble());
-                    sfdPrice.layoutLine.requestLayout();
-                });
+                for (SFD sfd : SFD.values()) {
+                    TickLable label = sfdPrice.createLabel("乖離" + sfd.percentage + "%");
+                    sfd.boundary().on(Viewtify.UIThread).to(price -> {
+                        label.value.set(price.toDouble());
+                        sfdPrice.layoutLine.requestLayout();
+                    });
+                }
             }
         });
     }

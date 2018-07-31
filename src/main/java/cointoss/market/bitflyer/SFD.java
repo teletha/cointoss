@@ -15,48 +15,54 @@ import kiss.Signal;
 import kiss.Variable;
 
 /**
- * @version 2018/07/30 6:46:51
+ * @version 2018/07/31 9:47:26
  */
-public class SFD {
+public enum SFD {
 
     /** The diff constants. */
-    static final Num plus5 = Num.of("1.05");
+    Plus5("1.05"),
 
     /** The diff constants. */
-    static final Num plus10 = Num.of("1.10");
+    Plus10("1.10"),
 
     /** The diff constants. */
-    static final Num plus15 = Num.of("1.15");
+    Plus15("1.15"),
 
     /** The diff constants. */
-    static final Num plus20 = Num.of("1.20");
+    Plus20("1.20"),
 
     /** The diff constants. */
-    static final Num minus5 = Num.of("0.95");
+    Minus5("0.95"),
 
     /** The diff constants. */
-    static final Num minus10 = Num.of("0.90");
+    Minus10("0.90"),
 
     /** The diff constants. */
-    static final Num minus15 = Num.of("0.85");
+    Minus15("0.85"),
 
     /** The diff constants. */
-    static final Num minus20 = Num.of("0.80");
+    Minus20("0.80");
 
     /** The latest price of BTC. */
-    private final Variable<Num> latestBTC = BitFlyer.BTC_JPY.executionsRealtimely()
+    private static final Variable<Num> latestBTC = BitFlyer.BTC_JPY.executionsRealtimely()
             .startWith(BitFlyer.BTC_JPY.executionLatest())
             .map(Execution::price)
             .diff()
             .to();
 
+    /** The human-readable percentage. */
+    public final Num percentage;
+
+    private final Num diff;
+
     /**
-     * Calculate SFD boundary price.
+     * Create {@link SFD}.
      * 
-     * @return
+     * @param diff
      */
-    public Signal<Num> calculatePlus5() {
-        return latestBTC.observe().map(price -> calculate(price, plus5));
+    private SFD(String diff) {
+        this.diff = Num.of(diff);
+        this.percentage = this.diff.minus(Num.ONE).multiply(Num.HUNDRED);
     }
 
     /**
@@ -64,18 +70,17 @@ public class SFD {
      * 
      * @return
      */
-    public Signal<Num> calculatePlus10() {
-        return latestBTC.observe().map(price -> calculate(price, plus10));
+    public Signal<Num> boundary() {
+        return latestBTC.observe().map(this::calculate);
     }
 
     /**
      * Calculate sfd price.
      * 
      * @param price A current price.
-     * @param diff The percentage.
      * @return A calculated SFD price.
      */
-    static final Num calculate(Num price, Num diff) {
+    final Num calculate(Num price) {
         if (diff.isGreaterThan(Num.ONE)) {
             return price.multiply(diff).scaleUp(0);
         } else {
