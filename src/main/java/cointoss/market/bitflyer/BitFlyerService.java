@@ -268,7 +268,7 @@ class BitFlyerService extends MarketService {
                     return exe;
                 })
                 .skipNull()
-                .map(BitFlyerExecution.NONE, (prev, now) -> now.estimate(prev));
+                .maps(BitFlyerExecution.NONE, (prev, now) -> now.estimate(prev));
     }
 
     /**
@@ -320,7 +320,7 @@ class BitFlyerService extends MarketService {
     @Override
     public Signal<Execution> executions(long start, long end) {
         return call("GET", "/v1/executions?product_code=" + marketName + "&count=" + MAX + "&before=" + end + "&after=" + start, "", "^", BitFlyerExecution.class)
-                .map(BitFlyerExecution.NONE, (prev, now) -> now.estimate(prev))
+                .maps(BitFlyerExecution.NONE, (prev, now) -> now.estimate(prev))
                 .as(Execution.class);
     }
 
@@ -330,7 +330,7 @@ class BitFlyerService extends MarketService {
     @Override
     public Signal<Execution> executionLatest() {
         return call("GET", "/v1/executions?product_code=" + marketName + "&count=1", "", "^", BitFlyerExecution.class)
-                .map(BitFlyerExecution.NONE, (prev, now) -> now.estimate(prev))
+                .maps(BitFlyerExecution.NONE, (prev, now) -> now.estimate(prev))
                 .as(Execution.class);
     }
 

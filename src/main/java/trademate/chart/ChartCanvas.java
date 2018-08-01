@@ -158,9 +158,9 @@ public class ChartCanvas extends Region implements EventHelper<ChartCanvas> {
                 .layoutBy(axisY.scroll.valueProperty(), axisY.scroll.visibleAmountProperty())
                 .layoutBy(chart.ticker.observe().switchMap(ticker -> ticker.update.startWithNull()));
 
-        // drag and drop
-        when(User.Drag).buffer(2).to(events -> {
-            System.out.println(events);
+        // drag move
+        when(User.Drag).maps((prev, now) -> now.getX() - prev.getX()).to(e -> {
+            System.out.println(e);
         });
 
         visualizeNotifyPrice();

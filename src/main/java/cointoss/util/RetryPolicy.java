@@ -10,15 +10,15 @@
 package cointoss.util;
 
 import java.time.Duration;
-import java.util.function.Function;
 import java.util.function.LongFunction;
 
 import kiss.Signal;
+import kiss.WiseFunction;
 
 /**
  * @version 2018/07/16 9:21:49
  */
-public final class RetryPolicy implements Function<Signal<? extends Throwable>, Signal<?>> {
+public final class RetryPolicy implements WiseFunction<Signal<? extends Throwable>, Signal<?>> {
 
     /** The maximum times. */
     private long maxTimes;
@@ -150,7 +150,7 @@ public final class RetryPolicy implements Function<Signal<? extends Throwable>, 
      * {@inheritDoc}
      */
     @Override
-    public Signal<?> apply(Signal<? extends Throwable> error) {
+    public Signal<?> APPLY(Signal<? extends Throwable> error) throws Throwable {
         return error.take(() -> ++count <= maxTimes).delay(() -> Chrono.between(minDelay, delay.apply(count), maxDelay)).effect(() -> {
             System.out.println("Retry " + count);
         });

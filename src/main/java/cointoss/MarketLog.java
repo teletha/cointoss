@@ -658,7 +658,7 @@ public class MarketLog {
                 setting.getFormat().setComment('無');
                 CsvWriter writer = new CsvWriter(new ZstdOutputStream(newOutputStream(compact), 1), ISO_8859_1, setting);
 
-                return executions.map(Execution.BASE, (prev, e) -> {
+                return executions.maps(Execution.BASE, (prev, e) -> {
                     writer.writeRow(service.encode(prev, e));
                     return e;
                 }).effectOnComplete(writer::close);
