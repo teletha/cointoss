@@ -27,6 +27,7 @@ import kiss.I;
 import kiss.WiseBiConsumer;
 import trademate.Notificator;
 import trademate.TradingView;
+import viewtify.Key;
 import viewtify.UI;
 import viewtify.View;
 import viewtify.ui.UIButton;
@@ -116,7 +117,9 @@ public class OrderBuilder extends View {
      */
     @Override
     protected void initialize() {
-        orderSize.initial("0").when(User.Scroll, changeBy(orderSizeAmount.ui)).require(positiveNumber);
+        orderSize.initial("0").when(User.Scroll, changeBy(orderSizeAmount.ui)).require(positiveNumber).when(User.input(Key.A), e -> {
+            System.out.println(e);
+        });
         orderSizeAmount.values(3, Num.of("0.001"), Num.of("0.01"), Num.of("0.1"), Num.ONE);
 
         orderPrice.initial("0").when(User.Scroll, changeBy(orderPriceAmount.ui)).require(positiveNumber);

@@ -37,16 +37,17 @@ import cointoss.util.Num;
 import kiss.I;
 import trademate.Notificator;
 import trademate.chart.Axis.TickLable;
+import viewtify.Key;
 import viewtify.Viewtify;
-import viewtify.ui.helper.EventHelper;
 import viewtify.ui.helper.LayoutAssistant;
 import viewtify.ui.helper.StyleHelper;
 import viewtify.ui.helper.User;
+import viewtify.ui.helper.UserActionHelper;
 
 /**
  * @version 2018/07/13 23:47:28
  */
-public class ChartCanvas extends Region implements EventHelper<ChartCanvas> {
+public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas> {
 
     /** @FIXME Read from css file. */
     private static final Color Buy = Color.rgb(32, 151, 77);
@@ -159,8 +160,8 @@ public class ChartCanvas extends Region implements EventHelper<ChartCanvas> {
                 .layoutBy(chart.ticker.observe().switchMap(ticker -> ticker.update.startWithNull()));
 
         // drag move
-        when(User.Gesture).to(e -> {
-            System.out.println("Prime " + e.directions());
+        when(User.input(Key.A)).to(e -> {
+            System.out.println("Prime " + e);
         });
 
         visualizeNotifyPrice();
