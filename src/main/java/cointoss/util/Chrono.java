@@ -12,12 +12,13 @@ package cointoss.util;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 /**
- * @version 2018/05/09 13:24:12
+ * @version 2018/08/03 8:39:27
  */
 public class Chrono {
 
@@ -89,13 +90,21 @@ public class Chrono {
     /**
      * UTC {@link ZonedDateTime} at the specified date.
      * 
-     * @param year A year.
-     * @param month A month.
-     * @param day A day of month.
+     * @param date A target {@link LocalDateTime}.
      * @return
      */
-    public static ZonedDateTime utf(LocalDate date) {
-        return date.atTime(0, 0).atZone(UTC);
+    public static ZonedDateTime utc(LocalDateTime date) {
+        return date.atZone(UTC);
+    }
+
+    /**
+     * UTC {@link ZonedDateTime} at the specified date.
+     * 
+     * @param date A target {@link LocalDate}.
+     * @return
+     */
+    public static ZonedDateTime utc(LocalDate date) {
+        return utc(date.atTime(0, 0));
     }
 
     /**

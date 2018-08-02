@@ -9,7 +9,10 @@
  */
 package trademate;
 
+import java.time.Period;
+
 import cointoss.Market;
+import cointoss.MarketLog;
 import cointoss.MarketService;
 import cointoss.market.MarketProvider;
 import cointoss.market.bitflyer.BitFlyer;
@@ -50,8 +53,14 @@ public class BackTestView extends View {
     @Override
     protected void initialize() {
         market.values(0, MarketProvider.availableMarkets());
-        startDate.initial(Chrono.utcNow().minusDays(10).toLocalDate());
+        startDate.initial(Chrono.utcNow().minusDays(10).toLocalDate()).restrict(date -> {
+            MarketLog log = market.value().log;
+            return Chrono.utc(date).isBefore(log.getLastCacheDate());
+        }).observe((o, n) -> {
+            endDate.value(v -> v.minus(Period.between(n, o)));
+        });
         endDate.initial(Chrono.utcNow().toLocalDate());
+        start.disableWhen(startDate.isInvalid());
 
         Market market = new Market(BitFlyer.BTC_JPY).readLog(log -> log.at(2018, 1, 17));
 
@@ -62,7 +71,7 @@ public class BackTestView extends View {
         start.when(User.MouseClick).to(e -> {
             Market m = new Market(BitFlyer.FX_BTC_JPY);
             chart.market.set(m);
-            chart.market.to(v -> v.readLog(log -> log.range(Chrono.utf(startDate.value()), Chrono.utf(endDate.value()))));
+            chart.market.to(v -> v.readLog(log -> log.range(Chrono.utc(startDate.value()), Chrono.utc(endDate.value()))));
         });
     }
 }

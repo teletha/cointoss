@@ -64,7 +64,7 @@ import kiss.Signal;
 /**
  * Log Manager.
  * 
- * @version 2018/07/12 15:50:16
+ * @version 2018/08/03 8:34:01
  */
 public class MarketLog {
 
@@ -220,6 +220,24 @@ public class MarketLog {
         } catch (Exception e) {
             throw I.quiet(e);
         }
+    }
+
+    /**
+     * Return the first cached date.
+     * 
+     * @return
+     */
+    public final ZonedDateTime getFirstCacheDate() {
+        return cacheFirst;
+    }
+
+    /**
+     * Return the last cached date.
+     * 
+     * @return
+     */
+    public final ZonedDateTime getLastCacheDate() {
+        return cacheLast;
     }
 
     /**
