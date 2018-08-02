@@ -377,7 +377,7 @@ public class MarketLog {
     /**
      * Read log from the specified date.
      * 
-     * @param start
+     * @param init
      * @return
      */
     public final Signal<Execution> fromToday() {
@@ -387,7 +387,7 @@ public class MarketLog {
     /**
      * Read log from the specified date.
      * 
-     * @param start
+     * @param init
      * @return
      */
     public final Signal<Execution> fromYestaday() {
@@ -397,7 +397,7 @@ public class MarketLog {
     /**
      * Read log from the specified date.
      * 
-     * @param start
+     * @param init
      * @return
      */
     public final Signal<Execution> fromLast(int days) {
@@ -418,7 +418,7 @@ public class MarketLog {
     /**
      * Read log from the specified start to end.
      * 
-     * @param start
+     * @param init
      * @param limit
      * @return
      */
@@ -429,7 +429,7 @@ public class MarketLog {
     /**
      * Read log from the specified start to end.
      * 
-     * @param start
+     * @param init
      * @param limit
      * @return
      */

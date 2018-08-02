@@ -17,12 +17,12 @@ import cointoss.ticker.TickSpan;
 import cointoss.util.Chrono;
 import trademate.chart.ChartView;
 import viewtify.UI;
-import viewtify.User;
 import viewtify.View;
 import viewtify.Viewtify;
 import viewtify.ui.UIButton;
 import viewtify.ui.UIComboBox;
 import viewtify.ui.UIDatePicker;
+import viewtify.ui.helper.User;
 
 /**
  * @version 2018/06/26 21:28:54
@@ -59,7 +59,7 @@ public class BackTestView extends View {
         chart.market.set(market);
         chart.ticker.set(market.tickers.tickerBy(TickSpan.Minute1));
 
-        start.when(User.Click).to(e -> {
+        start.when(User.MouseClick).to(e -> {
             Market m = new Market(BitFlyer.FX_BTC_JPY);
             chart.market.set(m);
             chart.market.to(v -> v.readLog(log -> log.range(Chrono.utf(startDate.value()), Chrono.utf(endDate.value()))));

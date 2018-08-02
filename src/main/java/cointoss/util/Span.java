@@ -31,7 +31,7 @@ public class Span {
     public final ZonedDateTime end;
 
     /**
-     * @param start
+     * @param init
      * @param end
      */
     public Span(int startYear, int startMonth, int startDay, int endYear, int endMonth, int endDay) {

@@ -14,10 +14,10 @@ import kiss.Manageable;
 import kiss.Singleton;
 import trademate.Notificator.Type;
 import viewtify.UI;
-import viewtify.User;
 import viewtify.View;
 import viewtify.ui.UICheckBox;
 import viewtify.ui.UIComboBox;
+import viewtify.ui.helper.User;
 
 /**
  * @version 2017/12/15 9:30:13

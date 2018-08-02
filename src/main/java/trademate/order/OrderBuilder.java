@@ -20,21 +20,21 @@ import javafx.scene.input.ScrollEvent;
 
 import cointoss.Side;
 import cointoss.order.Order;
-import cointoss.order.QuantityCondition;
 import cointoss.order.OrderState;
+import cointoss.order.QuantityCondition;
 import cointoss.util.Num;
 import kiss.I;
 import kiss.WiseBiConsumer;
 import trademate.Notificator;
 import trademate.TradingView;
 import viewtify.UI;
-import viewtify.User;
 import viewtify.View;
 import viewtify.ui.UIButton;
 import viewtify.ui.UICheckBox;
 import viewtify.ui.UIComboBox;
 import viewtify.ui.UISpinner;
 import viewtify.ui.UIText;
+import viewtify.ui.helper.User;
 
 /**
  * @version 2018/02/07 17:11:55
@@ -135,12 +135,12 @@ public class OrderBuilder extends View {
         // validate order condition
         orderLimitLong.parent().disableWhen(orderSize.isInvalid().or(orderPrice.isInvalid()));
 
-        orderLimitLong.when(User.Click).throttle(1000, MILLISECONDS).mapTo(Side.BUY).to(this::requestOrder);
-        orderLimitShort.when(User.Click).throttle(1000, MILLISECONDS).mapTo(Side.SELL).to(this::requestOrder);
+        orderLimitLong.when(User.MouseClick).throttle(1000, MILLISECONDS).mapTo(Side.BUY).to(this::requestOrder);
+        orderLimitShort.when(User.MouseClick).throttle(1000, MILLISECONDS).mapTo(Side.SELL).to(this::requestOrder);
         orderQuantity.values(QuantityCondition.values()).initial(QuantityCondition.GoodTillCanceled);
 
-        orderRetreat.when(User.Click).throttle(1000, MILLISECONDS).to(this::retreat);
-        orderReverse.when(User.Click).throttle(1000, MILLISECONDS).to(this::reverse);
+        orderRetreat.when(User.MouseClick).throttle(1000, MILLISECONDS).to(this::retreat);
+        orderReverse.when(User.MouseClick).throttle(1000, MILLISECONDS).to(this::reverse);
     }
 
     /**

@@ -37,11 +37,11 @@ import cointoss.util.Num;
 import kiss.I;
 import trademate.Notificator;
 import trademate.chart.Axis.TickLable;
-import viewtify.User;
 import viewtify.Viewtify;
 import viewtify.ui.helper.EventHelper;
 import viewtify.ui.helper.LayoutAssistant;
 import viewtify.ui.helper.StyleHelper;
+import viewtify.ui.helper.User;
 
 /**
  * @version 2018/07/13 23:47:28
@@ -159,8 +159,8 @@ public class ChartCanvas extends Region implements EventHelper<ChartCanvas> {
                 .layoutBy(chart.ticker.observe().switchMap(ticker -> ticker.update.startWithNull()));
 
         // drag move
-        when(User.Drag).maps((prev, now) -> now.getX() - prev.getX()).to(e -> {
-            System.out.println(e);
+        when(User.Gesture).to(e -> {
+            System.out.println("Prime " + e.directions());
         });
 
         visualizeNotifyPrice();
