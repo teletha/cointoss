@@ -40,6 +40,7 @@ import trademate.chart.Axis.TickLable;
 import viewtify.Viewtify;
 import viewtify.ui.helper.LayoutAssistant;
 import viewtify.ui.helper.StyleHelper;
+import viewtify.ui.helper.User;
 import viewtify.ui.helper.UserActionHelper;
 
 /**
@@ -186,7 +187,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         TickLable labelY = mouseTrackHorizontal.createLabel();
 
         // track on move
-        setOnMouseMoved(e -> {
+        when(User.MouseMove, User.MouseDrag).to(e -> {
             double x = axisX.getValueForPosition(e.getX());
             labelX.value.set(x);
             labelY.value.set(axisY.getValueForPosition(e.getY()));
@@ -206,7 +207,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         });
 
         // remove on exit
-        setOnMouseExited(e -> {
+        when(User.MouseExit).to(e -> {
             labelX.value.set(-1);
             labelY.value.set(-1);
 

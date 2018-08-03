@@ -65,7 +65,7 @@ public class BackTestView extends View {
             endDate.value(v -> v.plus(Period.between(o, n)));
         });
         endDate.initial(Chrono.utcNow().toLocalDate()).uneditable().restrict(date -> {
-            return startDate.value().isBefore(date) ? date : startDate.value();
+            return Chrono.isSameOrAfter(startDate.value(), date);
         });
         start.disableWhen(startDate.isInvalid());
 
