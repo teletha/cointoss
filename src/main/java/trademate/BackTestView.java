@@ -55,16 +55,18 @@ public class BackTestView extends View {
     @Override
     protected void initialize() {
         market.values(0, MarketProvider.availableMarkets());
-        startDate.initial(Chrono.utcNow().minusDays(10).toLocalDate()).require(ui -> {
+        startDate.initial(Chrono.utcNow().minusDays(10).toLocalDate()).uneditable().require(ui -> {
             ZonedDateTime date = Chrono.utc(ui.value());
             MarketLog log = market.value().log;
 
             assert date.isBefore(log.getLastCacheDate()) : I.i18n(Message::logIsNotFound);
             assert date.isAfter(log.getFirstCacheDate()) : I.i18n(Message::logIsNotFound);
         }).observe((o, n) -> {
-            endDate.value(v -> v.minus(Period.between(n, o)));
+            endDate.value(v -> v.plus(Period.between(o, n)));
         });
-        endDate.initial(Chrono.utcNow().toLocalDate());
+        endDate.initial(Chrono.utcNow().toLocalDate()).uneditable().restrict(date -> {
+            return startDate.value().isBefore(date) ? date : startDate.value();
+        });
         start.disableWhen(startDate.isInvalid());
 
         Market market = new Market(BitFlyer.BTC_JPY).readLog(log -> log.at(2018, 1, 17));

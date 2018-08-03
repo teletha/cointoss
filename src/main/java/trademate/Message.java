@@ -30,6 +30,15 @@ public class Message implements Extensible {
     }
 
     /**
+     * Log is not found.
+     * 
+     * @return
+     */
+    public String endDateMustBeAfterStartDate() {
+        return "The end date must be after the start date.";
+    }
+
+    /**
      * Japanese bundle.
      * 
      * @version 2018/08/03 17:06:23
@@ -43,5 +52,14 @@ public class Message implements Extensible {
         public String logIsNotFound() {
             return "指定された日付のログが見つかりません。";
         }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String endDateMustBeAfterStartDate() {
+            return "終了日は開始日よりも後にしてください。";
+        }
+
     }
 }
