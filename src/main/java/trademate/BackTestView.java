@@ -10,6 +10,7 @@
 package trademate;
 
 import java.time.Period;
+import java.time.ZonedDateTime;
 
 import cointoss.Market;
 import cointoss.MarketLog;
@@ -18,6 +19,7 @@ import cointoss.market.MarketProvider;
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.ticker.TickSpan;
 import cointoss.util.Chrono;
+import kiss.I;
 import trademate.chart.ChartView;
 import viewtify.UI;
 import viewtify.View;
@@ -53,9 +55,12 @@ public class BackTestView extends View {
     @Override
     protected void initialize() {
         market.values(0, MarketProvider.availableMarkets());
-        startDate.initial(Chrono.utcNow().minusDays(10).toLocalDate()).restrict(date -> {
+        startDate.initial(Chrono.utcNow().minusDays(10).toLocalDate()).require(ui -> {
+            ZonedDateTime date = Chrono.utc(ui.value());
             MarketLog log = market.value().log;
-            return Chrono.utc(date).isBefore(log.getLastCacheDate());
+
+            assert date.isBefore(log.getLastCacheDate()) : I.i18n(Message::logIsNotFound);
+            assert date.isAfter(log.getFirstCacheDate()) : I.i18n(Message::logIsNotFound);
         }).observe((o, n) -> {
             endDate.value(v -> v.minus(Period.between(n, o)));
         });
