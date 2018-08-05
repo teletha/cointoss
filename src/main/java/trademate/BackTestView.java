@@ -9,8 +9,8 @@
  */
 package trademate;
 
+import java.time.LocalDate;
 import java.time.Period;
-import java.time.ZonedDateTime;
 
 import cointoss.Market;
 import cointoss.MarketLog;
@@ -20,6 +20,7 @@ import cointoss.market.bitflyer.BitFlyer;
 import cointoss.ticker.TickSpan;
 import cointoss.util.Chrono;
 import kiss.I;
+import kiss.Signal;
 import trademate.chart.ChartView;
 import viewtify.UI;
 import viewtify.View;
@@ -54,18 +55,21 @@ public class BackTestView extends View {
      */
     @Override
     protected void initialize() {
+        Signal<LocalDate> cacheLast = market.observe().map(m -> m.log.lastCacheDate().toLocalDate());
+
+        Viewtify.calculate(market.model()).map(MarketService::log).map(MarketLog::lastCacheDate);
+
         market.values(0, MarketProvider.availableMarkets());
-        startDate.initial(Chrono.utcNow().minusDays(10).toLocalDate()).uneditable().require(ui -> {
-            ZonedDateTime date = Chrono.utc(ui.value());
+        startDate.initial(Chrono.utcNow().minusDays(10)).uneditable().require(() -> {
             MarketLog log = market.value().log;
 
-            assert date.isBefore(log.getLastCacheDate()) : I.i18n(Message::logIsNotFound);
-            assert date.isAfter(log.getFirstCacheDate()) : I.i18n(Message::logIsNotFound);
-        }).observe((o, n) -> {
+            assert startDate.isBeforeOrSame(log.lastCacheDate()) : I.i18n(Message::logIsNotFound);
+            assert startDate.isAfterOrSame(log.firstCacheDate()) : I.i18n(Message::logIsNotFound);
+        }).restrictS(v -> v.combineLatest(cacheLast).map(e -> e.ⅰ.isBefore(e.ⅱ))).observe((o, n) -> {
             endDate.value(v -> v.plus(Period.between(o, n)));
         });
-        endDate.initial(Chrono.utcNow().toLocalDate()).uneditable().restrict(date -> {
-            return Chrono.isSameOrAfter(startDate.value(), date);
+        endDate.initial(Chrono.utcNow()).uneditable().require(() -> {
+            assert startDate.isBeforeOrSame(endDate) : I.i18n(Message::endDateMustBeAfterStartDate);
         });
         start.disableWhen(startDate.isInvalid());
 

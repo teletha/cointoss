@@ -227,7 +227,7 @@ public class MarketLog {
      * 
      * @return
      */
-    public final ZonedDateTime getFirstCacheDate() {
+    public final ZonedDateTime firstCacheDate() {
         return cacheFirst;
     }
 
@@ -236,7 +236,7 @@ public class MarketLog {
      * 
      * @return
      */
-    public final ZonedDateTime getLastCacheDate() {
+    public final ZonedDateTime lastCacheDate() {
         return cacheLast;
     }
 

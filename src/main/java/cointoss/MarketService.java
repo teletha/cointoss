@@ -23,7 +23,7 @@ import kiss.Disposable;
 import kiss.Signal;
 
 /**
- * @version 2018/07/12 9:52:55
+ * @version 2018/08/05 0:47:38
  */
 public abstract class MarketService implements Disposable {
 
@@ -153,6 +153,15 @@ public abstract class MarketService implements Disposable {
                 return start;
             }
         }
+    }
+
+    /**
+     * Return {@link MarketLog} of this market.
+     * 
+     * @return
+     */
+    public final MarketLog log() {
+        return log;
     }
 
     /**

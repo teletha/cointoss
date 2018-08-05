@@ -198,12 +198,4 @@ public class Chrono {
         }
         return max;
     }
-
-    public static <C extends Comparable> boolean isSameOrAfter(C base, C sameOrAfter) {
-        return base.compareTo(sameOrAfter) <= 0;
-    }
-
-    public static <C extends Comparable> boolean isSameOrBefore(C base, C sameOrBefore) {
-        return 0 <= base.compareTo(sameOrBefore);
-    }
 }
