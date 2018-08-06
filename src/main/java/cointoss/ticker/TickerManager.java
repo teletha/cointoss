@@ -110,7 +110,6 @@ public final class TickerManager {
             shortVolume = shortVolume.plus(e.size);
             shortPriceDecrease = shortPriceDecrease.plus(latest.v.price.minus(e.price));
         }
-        realtime.update(e);
 
         // update the latest execution at last
         latest.set(e);

@@ -99,8 +99,10 @@ public class Chart extends Region {
      * Set x-axis range.
      */
     private void setAxisXRange() {
-        axisX.logicalMinValue.set(chart.ticker.v.first().start.toEpochSecond());
-        axisX.logicalMaxValue.set(chart.ticker.v.last().start.toEpochSecond() + 3 * 60);
+        if (chart.ticker.v.size() != 0) {
+            axisX.logicalMinValue.set(chart.ticker.v.first().start.toEpochSecond());
+            axisX.logicalMaxValue.set(chart.ticker.v.last().start.toEpochSecond() + 3 * 60);
+        }
     }
 
     /**

@@ -53,6 +53,7 @@ import com.univocity.parsers.csv.CsvParserSettings;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
 
+import cointoss.market.bitflyer.BitFlyer;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
 import cointoss.util.RetryPolicy;
@@ -693,10 +694,16 @@ public class MarketLog {
     // log.service.dispose();
     // }
 
-    // public static void main(String[] args) {
-    // Market market = new Market(BitFlyerService.FX_BTC_JPY);
-    // market.readLog(log -> log.caches().skip(255).take(6).concatMap(c -> c.read()));
-    //
-    // market.dispose();
-    // }
+    public static void main(String[] args) {
+        LocalDate start = LocalDate.of(2018, 2, 1);
+        LocalDate end = LocalDate.of(2018, 2, 7);
+
+        Market market = new Market(BitFlyer.FX_BTC_JPY);
+        market.readLog(log -> log.caches()
+                .skipUntil(d -> d.date.isEqual(start))
+                .takeUntil(d -> d.date.isEqual(end))
+                .concatMap(c -> c.read()));
+
+        market.dispose();
+    }
 }

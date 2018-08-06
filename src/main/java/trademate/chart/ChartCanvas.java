@@ -322,6 +322,10 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
      */
     private void drawCandle() {
         layoutCandle.layout(() -> {
+            if (chart.ticker.v.size() == 0) {
+                return;
+            }
+
             // estimate visible range
             long start = (long) axisX.computeVisibleMinValue();
             long end = Math.min((long) axisX.computeVisibleMaxValue(), chart.ticker.v.last().start.toEpochSecond());
@@ -360,6 +364,10 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         });
 
         layoutCandleLatest.layout(() -> {
+            if (chart.ticker.v.size() == 0) {
+                return;
+            }
+
             GraphicsContext gc = candleLatest.getGraphicsContext2D();
             gc.clearRect(0, 0, candleLatest.getWidth(), candleLatest.getHeight());
 

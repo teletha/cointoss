@@ -30,7 +30,7 @@
                   <DatePicker id="endDate" />
                </children>
             </HBox>
-            <Button id="start" mnemonicParsing="false" text="Start">
+            <Button id="startButton" mnemonicParsing="false" text="Start">
                <VBox.margin>
                   <Insets />
                </VBox.margin></Button>

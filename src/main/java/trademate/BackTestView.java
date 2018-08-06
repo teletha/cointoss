@@ -46,7 +46,7 @@ public class BackTestView extends View {
     private UIDatePicker endDate;
 
     @UI
-    private UIButton start;
+    private UIButton startButton;
 
     @UI
     private ChartView chart;
@@ -57,7 +57,7 @@ public class BackTestView extends View {
     @Override
     protected void initialize() {
         market.values(0, MarketProvider.availableMarkets());
-        startDate.initial(Chrono.utcNow().minusDays(10)).uneditable().validateWhen(market.observe()).validate(() -> {
+        startDate.initial(Chrono.utcNow().minusDays(10)).uneditable().validateWhen(market).validate(() -> {
             MarketLog log = market.value().log;
 
             assert startDate.isBeforeOrSame(log.lastCacheDate()) : I.i18n(Message::logIsNotFound);
@@ -67,21 +67,22 @@ public class BackTestView extends View {
         });
 
         endDate.initial(Chrono.utcNow()).uneditable().validate(() -> {
-            assert endDate.isAfter(startDate) : I.i18n(Message::endDateMustBeAfterStartDate);
+            assert startDate.isBeforeOrSame(endDate) : I.i18n(Message::endDateMustBeAfterStartDate);
         });
 
-        start.disableWhen(startDate.isInvalid());
+        // Market market = new Market(BitFlyer.BTC_JPY).readLog(log -> log.at(2018, 1, 17));
 
-        Market market = new Market(BitFlyer.BTC_JPY).readLog(log -> log.at(2018, 1, 17));
+        // Viewtify.Terminator.add(market);
+        // chart.market.set(market);
+        // chart.ticker.set(market.tickers.tickerBy(TickSpan.Minute1));
 
-        Viewtify.Terminator.add(market);
-        chart.market.set(market);
-        chart.ticker.set(market.tickers.tickerBy(TickSpan.Minute1));
-
-        start.when(User.MouseClick).to(e -> {
+        startButton.disableWhen(startDate.isInvalid()).when(User.MouseClick).to(e -> {
             Market m = new Market(BitFlyer.FX_BTC_JPY);
             chart.market.set(m);
-            chart.market.to(v -> v.readLog(log -> log.range(Chrono.utc(startDate.value()), Chrono.utc(endDate.value()))));
+            chart.ticker.set(m.tickers.tickerBy(TickSpan.Minute1));
+            chart.market.to(v -> v.readLog(log -> log.range(startDate.zoned(), endDate.zoned())));
+
+            Viewtify.Terminator.add(m);
         });
     }
 
