@@ -43,20 +43,16 @@ public class OrderBuilder extends View {
 
     private Predicate<UIText> positiveNumber = ui -> {
         try {
-            return Num.of(ui.text()).isPositive();
-        } catch (
-
-        NumberFormatException e) {
+            return Num.of(ui.value()).isPositive();
+        } catch (NumberFormatException e) {
             return false;
         }
     };
 
     private Predicate<UIText> negativeNumber = ui -> {
         try {
-            return Num.of(ui.text()).isNegative();
-        } catch (
-
-        NumberFormatException e) {
+            return Num.of(ui.value()).isNegative();
+        } catch (NumberFormatException e) {
             return false;
         }
     };
@@ -116,10 +112,10 @@ public class OrderBuilder extends View {
      */
     @Override
     protected void initialize() {
-        orderSize.initial("0").when(User.Scroll, changeBy(orderSizeAmount.ui)).require(positiveNumber);
+        orderSize.initial("0").when(User.Scroll, changeBy(orderSizeAmount.ui)).validate(positiveNumber);
         orderSizeAmount.values(3, Num.of("0.001"), Num.of("0.01"), Num.of("0.1"), Num.ONE);
 
-        orderPrice.initial("0").when(User.Scroll, changeBy(orderPriceAmount.ui)).require(positiveNumber);
+        orderPrice.initial("0").when(User.Scroll, changeBy(orderPriceAmount.ui)).validate(positiveNumber);
         orderPriceAmount.values(0, Num.ONE, Num.HUNDRED, Num.THOUSAND, Num.of(10000));
 
         orderDivideSize.values(0, IntStream.range(1, 31).boxed());
@@ -127,7 +123,7 @@ public class OrderBuilder extends View {
         optimizeThreshold.values(0, Num.range(0, 20));
         orderPriceInterval.initial("0")
                 .when(User.Scroll, changeBy(orderPriceIntervalAmount.ui))
-                .require(positiveNumber)
+                .validate(positiveNumber)
                 .parent()
                 .disableWhen(orderDivideSize.ui.valueProperty().isEqualTo(1));
         orderPriceIntervalAmount.values(0, Num.TEN, Num.HUNDRED, Num.THOUSAND);
@@ -152,15 +148,15 @@ public class OrderBuilder extends View {
      */
     private WiseBiConsumer<ScrollEvent, UIText> changeBy(Spinner<Num> spinner) {
         return (e, ui) -> {
-            Num current = Num.of(ui.text());
+            Num current = Num.of(ui.value());
             double deltaY = e.getDeltaY();
 
             if (deltaY > 0) {
                 // increment
-                ui.text(current.plus(spinner.getValue()));
+                ui.value(current.plus(spinner.getValue()).toString());
             } else if (deltaY < 0) {
                 // decrement
-                ui.text(current.minus(spinner.getValue()));
+                ui.value(current.minus(spinner.getValue()).toString());
             }
         };
     }
