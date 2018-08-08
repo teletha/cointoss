@@ -31,15 +31,14 @@ public class DateSegmentBufferTest {
     @Test
     void get() {
         DateSegmentBuffer<Integer> buffer = new DateSegmentBuffer();
-        buffer.add(0);
-        buffer.add(1);
-        buffer.add(2);
-        buffer.add(3);
+        int size = 1000000;
+        for (int i = 0; i < size; i++) {
+            buffer.add(i);
+        }
 
-        assert buffer.get(0) == 0;
-        assert buffer.get(1) == 1;
-        assert buffer.get(2) == 2;
-        assert buffer.get(3) == 3;
+        for (int i = 0; i < size; i++) {
+            assert buffer.get(i) == i;
+        }
     }
 
     @Test

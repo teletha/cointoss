@@ -65,7 +65,7 @@ public class Execution implements Directional {
     /** The executed comulative size. */
     public Num cumulativeSize = Num.ZERO;
 
-    /** The executed datetime. */
+    /** The executed date-time. */
     public ZonedDateTime date;
 
     /** Optional Attribute : The consecutive type. */
@@ -80,6 +80,9 @@ public class Execution implements Directional {
     /** Optional : The associated execution id. */
     public String yourOrder;
 
+    /** The epoch millseconds of executed date-time. */
+    public long mills;
+
     /**
      * Create empty {@link Execution}.
      */
@@ -93,7 +96,8 @@ public class Execution implements Directional {
      */
     Execution(String... values) {
         id = Long.parseLong(values[0]);
-        date = LocalDateTime.parse(values[1]).atZone(cointoss.util.Chrono.UTC);
+        date = LocalDateTime.parse(values[1]).atZone(Chrono.UTC);
+        mills = Chrono.epochMills(date);
         side = Side.parse(values[2]);
         price = Num.of(values[3]);
         size = cumulativeSize = Num.of(values[4]);

@@ -24,10 +24,10 @@ public class DateSegmentBuffer<E> {
     private long size;
 
     /** The actual data manager. */
-    private final CopyOnWriteArrayList<Object[]> rows = new CopyOnWriteArrayList();
+    private final CopyOnWriteArrayList<Segment> segments = new CopyOnWriteArrayList();
 
-    /** The current row. */
-    private Object[] row;
+    /** The latest segment. */
+    private Segment segment;
 
     /** The next empty index. */
     private int rowNextIndex;
@@ -39,8 +39,8 @@ public class DateSegmentBuffer<E> {
         createNewRow();
     }
 
-    private void createNewRow() {
-        rows.add(row = new Object[FixedRowSize]);
+    private void createNewRow(LocalDate date) {
+        segments.add(segment = new Segment(date));
         rowNextIndex = 0;
     }
 
@@ -49,7 +49,7 @@ public class DateSegmentBuffer<E> {
      * 
      * @return A positive size or zero.
      */
-    public long size() {
+    public final long size() {
         return size;
     }
 
@@ -58,8 +58,28 @@ public class DateSegmentBuffer<E> {
      * 
      * @return
      */
-    public boolean isEmpty() {
+    public final boolean isEmpty() {
         return size == 0;
+    }
+
+    /**
+     * Check whether this {@link DateSegmentBuffer} is empty or not.
+     * 
+     * @return
+     */
+    public final boolean isNotEmpty() {
+        return size != 0;
+    }
+
+    /**
+     * Create new segment for the specified {@link LocalDate}.
+     * 
+     * @param date
+     */
+    public final void createNewSegment(LocalDate date) {
+        if (date != null) {
+
+        }
     }
 
     /**
@@ -68,7 +88,7 @@ public class DateSegmentBuffer<E> {
      * @param item
      */
     public void add(E item) {
-        row[rowNextIndex++] = item;
+        segment[rowNextIndex++] = item;
         size++;
 
         if (rowNextIndex == FixedRowSize) {
@@ -83,9 +103,9 @@ public class DateSegmentBuffer<E> {
      * @return
      */
     public E get(long index) {
-        long remainder = index % FixedRowSize;
-        long quotient = (index - remainder) / FixedRowSize;
-        return (E) rows.get((int) quotient)[(int) remainder];
+        long remainder = index & (FixedRowSize - 1);
+        long quotient = (index - remainder) >> 14;
+        return (E) segments.get((int) quotient)[(int) remainder];
     }
 
     /**
@@ -94,7 +114,7 @@ public class DateSegmentBuffer<E> {
      * @return
      */
     public E peekFirst() {
-        return size == 0 ? null : (E) rows.get(0)[0];
+        return size == 0 ? null : (E) segments.get(0)[0];
     }
 
     /**
@@ -103,7 +123,7 @@ public class DateSegmentBuffer<E> {
      * @return
      */
     public E peekLast() {
-        return size == 0 ? null : (E) row[rowNextIndex - 1];
+        return size == 0 ? null : (E) segment[rowNextIndex - 1];
     }
 
     /**
@@ -136,7 +156,7 @@ public class DateSegmentBuffer<E> {
          * 
          * @param item
          */
-        public void add(E item) {
+        private void add(E item) {
             block[blockNextIndex++] = item;
             size++;
 
@@ -151,14 +171,14 @@ public class DateSegmentBuffer<E> {
          * @param index
          * @return
          */
-        public E get(long index) {
+        private E get(long index) {
             long remainder = index & (FixedRowSize - 1);
             long quotient = (index - remainder) >> 14;
-            return (E) rows.get((int) quotient)[(int) remainder];
+            return (E) segments.get((int) quotient)[(int) remainder];
         }
 
         private void createNewBlock() {
-            rows.add(row = new Object[FixedRowSize]);
+            segments.add(segment = new Object[FixedRowSize]);
             rowNextIndex = 0;
         }
     }

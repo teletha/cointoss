@@ -16,6 +16,8 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoField;
+import java.time.temporal.Temporal;
 
 /**
  * @version 2018/08/03 8:39:27
@@ -168,8 +170,8 @@ public class Chrono {
     }
 
     /**
-     * Ensures that the specified date is between the minimum and maximum date. If the specified date is
-     * out of range, the closest date is returned.
+     * Ensures that the specified date is between the minimum and maximum date. If the specified
+     * date is out of range, the closest date is returned.
      * 
      * @param min A minimum date.
      * @param target A target date.
@@ -181,8 +183,8 @@ public class Chrono {
     }
 
     /**
-     * Ensures that the specified duration is between the minimum and maximum duration. If the specified
-     * duration is out of range, the closest duration is returned.
+     * Ensures that the specified duration is between the minimum and maximum duration. If the
+     * specified duration is out of range, the closest duration is returned.
      * 
      * @param min A minimum duration.
      * @param target A target duration.
@@ -197,5 +199,15 @@ public class Chrono {
             return target;
         }
         return max;
+    }
+
+    /**
+     * Compute epoch millseconds of the specified date.
+     * 
+     * @param date A target date.
+     * @return
+     */
+    public static long epochMills(Temporal date) {
+        return date.getLong(ChronoField.INSTANT_SECONDS) * 1000 + date.getLong(ChronoField.MILLI_OF_SECOND);
     }
 }
