@@ -91,7 +91,7 @@ public class OrderBuilder extends View {
     private @UI UIButton orderLimitShort;
 
     /** UI */
-    private @UI UIButton orderRetreat;
+    private @UI UIButton orderStop;
 
     /** UI */
     private @UI UIButton orderReverse;
@@ -135,8 +135,8 @@ public class OrderBuilder extends View {
         orderLimitShort.when(User.MouseClick).throttle(1000, MILLISECONDS).mapTo(Side.SELL).to(this::requestOrder);
         orderQuantity.values(QuantityCondition.values()).initial(QuantityCondition.GoodTillCanceled);
 
-        orderRetreat.when(User.MouseClick).throttle(1000, MILLISECONDS).to(this::retreat);
-        orderReverse.when(User.MouseClick).throttle(1000, MILLISECONDS).to(this::reverse);
+        orderStop.when(User.MouseClick).to(this::stop);
+        orderReverse.when(User.MouseClick).to(this::reverse);
     }
 
     /**
@@ -200,7 +200,7 @@ public class OrderBuilder extends View {
     /**
      * Request retreat order.
      */
-    private void retreat() {
+    private void stop() {
     }
 
     /**
