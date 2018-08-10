@@ -18,6 +18,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
+import cointoss.market.MarketProvider;
 import cointoss.order.Order;
 import cointoss.order.OrderBook;
 import cointoss.order.OrderManager;
@@ -232,5 +233,19 @@ public class Market implements Disposable {
         Num baseProfit = baseCurrency.v.minus(initialBaseCurrency);
         Num targetProfit = targetCurrency.v.multiply(tickers.latest.v.price).minus(initialTargetCurrency.multiply(tickers.initial.v.price));
         return baseProfit.plus(targetProfit);
+    }
+
+    /**
+     * Stop all positions.
+     */
+    public void stop() {
+        Num bestPrice = orderBook.computeBestPrice(positions, tickers.latest.v.price, Num.ONE, Num.ONE);
+        System.out.println(bestPrice);
+    }
+
+    /**
+     * Stop and reverse all positions.
+     */
+    public void reverse() {
     }
 }

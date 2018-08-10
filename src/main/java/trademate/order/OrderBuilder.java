@@ -201,11 +201,13 @@ public class OrderBuilder extends View {
      * Request retreat order.
      */
     private void stop() {
+        view.market().stop();
     }
 
     /**
      * Request reverse order.
      */
     private void reverse() {
+        view.market().reverse();
     }
 }

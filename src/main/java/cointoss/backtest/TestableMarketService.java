@@ -89,7 +89,11 @@ public class TestableMarketService extends MarketService {
     * 
     */
     public TestableMarketService(Time lag, Num baseCurrency, Num targetCurrency) {
-        super("TestableExchange", "TestableMarket");
+        super("TestableExchange", "TestableMarket", config -> {
+            config.baseCurrencyMinimumBidPrice = Num.ONE;
+            config.targetCurrencyMinimumBidSize = Num.ONE;
+        });
+
         this.lag = lag;
         this.baseCurrency = Objects.requireNonNull(baseCurrency);
         this.targetCurrency = Objects.requireNonNull(targetCurrency);

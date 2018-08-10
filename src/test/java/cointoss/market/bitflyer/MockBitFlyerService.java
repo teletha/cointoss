@@ -33,7 +33,10 @@ class MockBitFlyerService extends BitFlyerService {
      * 
      */
     MockBitFlyerService() {
-        super("FX_BTC_JPY", true);
+        super("FX_BTC_JPY", true, config -> {
+            config.baseCurrencyMinimumBidPrice = Num.of(1);
+            config.targetCurrencyMinimumBidSize = Num.of("0.01");
+        });
 
         network = mockNetwork = new MockNetwork();
     }

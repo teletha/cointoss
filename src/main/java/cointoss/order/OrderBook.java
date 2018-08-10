@@ -9,6 +9,7 @@
  */
 package cointoss.order;
 
+import cointoss.Directional;
 import cointoss.Side;
 import cointoss.util.Num;
 import kiss.Variable;
@@ -60,7 +61,7 @@ public class OrderBook {
      * @param diff
      * @return
      */
-    public Num computeBestPrice(Side side, Num price, Num threshold, Num diff) {
+    public Num computeBestPrice(Directional side, Num price, Num threshold, Num diff) {
         if (threshold.isZero()) {
             return price;
         }

@@ -21,7 +21,7 @@ import kiss.Variable;
 /**
  * @version 2018/04/26 18:11:34
  */
-public final class PositionManager {
+public final class PositionManager implements Directional {
 
     /** The actual position manager. */
     private final List<Position> positions = new CopyOnWriteArrayList();
@@ -99,6 +99,14 @@ public final class PositionManager {
      */
     public boolean isShort() {
         return hasPosition() && positions.get(0).isSell();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Side side() {
+        return isLong() ? Side.BUY : Side.SELL;
     }
 
     /**
