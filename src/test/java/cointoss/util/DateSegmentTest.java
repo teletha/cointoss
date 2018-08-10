@@ -11,26 +11,28 @@ package cointoss.util;
 
 import org.junit.jupiter.api.Test;
 
+import cointoss.util.DateSegmentBuffer.CompletedSegment;
+
 /**
- * @version 2018/08/07 1:49:30
+ * @version 2018/08/11 7:52:02
  */
-public class DateSegmentBufferTest {
+public class DateSegmentTest {
 
     @Test
     void add() {
-        DateSegmentBuffer buffer = new DateSegmentBuffer();
-        assert buffer.size() == 0;
+        CompletedSegment buffer = new CompletedSegment(null);
+        assert buffer.size == 0;
 
         buffer.add(1);
-        assert buffer.size() == 1;
+        assert buffer.size == 1;
 
         buffer.add(2);
-        assert buffer.size() == 2;
+        assert buffer.size == 2;
     }
 
     @Test
     void get() {
-        DateSegmentBuffer<Integer> buffer = new DateSegmentBuffer();
+        CompletedSegment<Integer> buffer = new CompletedSegment(null);
         int size = 1000000;
         for (int i = 0; i < size; i++) {
             buffer.add(i);
@@ -43,7 +45,7 @@ public class DateSegmentBufferTest {
 
     @Test
     void first() {
-        DateSegmentBuffer<Integer> buffer = new DateSegmentBuffer();
+        CompletedSegment<Integer> buffer = new CompletedSegment(null);
         buffer.add(0);
         assert buffer.peekFirst() == 0;
         buffer.add(1);
@@ -56,7 +58,7 @@ public class DateSegmentBufferTest {
 
     @Test
     void last() {
-        DateSegmentBuffer<Integer> buffer = new DateSegmentBuffer();
+        CompletedSegment<Integer> buffer = new CompletedSegment(null);
         buffer.add(0);
         assert buffer.peekLast() == 0;
         buffer.add(1);
