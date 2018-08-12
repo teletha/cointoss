@@ -26,8 +26,11 @@ public final class SegmentBuffer<E> {
     /** The actual size. */
     private int size;
 
-    /** The actual data manager. */
-    private final ConcurrentSkipListMap<LocalDate, Segment<E>> segments = new ConcurrentSkipListMap();
+    /** The completed data manager. */
+    private final ConcurrentSkipListMap<LocalDate, Segment<E>> completeds = new ConcurrentSkipListMap();
+
+    /** The realtime data manager. */
+    private final UncompletedSegment uncompleted = new UncompletedSegment();
 
     /**
      * 
@@ -62,24 +65,36 @@ public final class SegmentBuffer<E> {
         return size != 0;
     }
 
-    /**
-     * Add all items for the specified date.
-     * 
-     * @param date
-     * @param items
-     */
-    public void add(LocalDate date, E... items) {
-        add(date, I.signal(items));
+    public void add(E item) {
+
+    }
+
+    public void add(E... items) {
+
+    }
+
+    public void add(Signal<E> items) {
+
     }
 
     /**
-     * Add all items for the specified date.
+     * Add all completed items of the specified date.
      * 
      * @param date
      * @param items
      */
-    public void add(LocalDate date, Signal<E> items) {
-        segments.computeIfAbsent(date, key -> {
+    public void addCompleted(LocalDate date, E... items) {
+        addCompleted(date, I.signal(items));
+    }
+
+    /**
+     * Add all completed items of the specified date.
+     * 
+     * @param date
+     * @param items
+     */
+    public void addCompleted(LocalDate date, Signal<E> items) {
+        completeds.computeIfAbsent(date, key -> {
             CompletedSegment segment = new CompletedSegment(date, items);
             size += segment.size;
             return segment;
@@ -93,7 +108,7 @@ public final class SegmentBuffer<E> {
      * @return
      */
     public E get(int index) {
-        for (Segment<E> segment : segments.values()) {
+        for (Segment<E> segment : completeds.values()) {
             if (index < segment.size) {
                 return segment.get(index);
             }
@@ -111,7 +126,7 @@ public final class SegmentBuffer<E> {
      * @return
      */
     public E first() {
-        return size == 0 ? null : segments.firstEntry().getValue().first();
+        return size == 0 ? null : completeds.firstEntry().getValue().first();
     }
 
     /**
@@ -120,7 +135,7 @@ public final class SegmentBuffer<E> {
      * @return
      */
     public E last() {
-        return size == 0 ? null : segments.lastEntry().getValue().last();
+        return size == 0 ? null : completeds.lastEntry().getValue().last();
     }
 
     /**
@@ -154,7 +169,7 @@ public final class SegmentBuffer<E> {
             throw new IndexOutOfBoundsException("Start[" + start + "] must be less than end[" + end + "].");
         }
 
-        for (Segment segment : segments.values()) {
+        for (Segment segment : completeds.values()) {
             int size = segment.size;
 
             if (start < size) {
@@ -276,9 +291,9 @@ public final class SegmentBuffer<E> {
     }
 
     /**
-     * @version 2018/08/07 17:25:58
+     * @version 2018/08/13 7:22:22
      */
-    static class CompletedSegment<E> extends Segment<E> {
+    private static class CompletedSegment<E> extends Segment<E> {
 
         /** The associated date. */
         private final LocalDate date;
@@ -291,7 +306,7 @@ public final class SegmentBuffer<E> {
          * 
          * @param date
          */
-        CompletedSegment(LocalDate date, Signal<E> items) {
+        private CompletedSegment(LocalDate date, Signal<E> items) {
             this.date = date;
 
             ArrayList<E> list = new ArrayList(FixedRowSize);
@@ -304,7 +319,7 @@ public final class SegmentBuffer<E> {
          * {@inheritDoc}
          */
         @Override
-        public E get(int index) {
+        E get(int index) {
             return items[index];
         }
 
@@ -312,7 +327,7 @@ public final class SegmentBuffer<E> {
          * {@inheritDoc}
          */
         @Override
-        public E first() {
+        E first() {
             return size == 0 ? null : items[0];
         }
 
@@ -320,7 +335,7 @@ public final class SegmentBuffer<E> {
          * {@inheritDoc}
          */
         @Override
-        public E last() {
+        E last() {
             return size == 0 ? null : items[size - 1];
         }
 
@@ -328,7 +343,7 @@ public final class SegmentBuffer<E> {
          * {@inheritDoc}
          */
         @Override
-        public void each(int start, int end, Consumer<? super E> each) {
+        void each(int start, int end, Consumer<? super E> each) {
             for (int i = start; i < end; i++) {
                 each.accept(items[i]);
             }
@@ -336,14 +351,9 @@ public final class SegmentBuffer<E> {
     }
 
     /**
-     * @version 2018/08/07 17:25:58
+     * @version 2018/08/13 7:22:41
      */
     static class UncompletedSegment<E> extends Segment<E> {
-
-        /** The associated date. */
-        private final LocalDate date;
-
-        int total;
 
         /** The actual data manager. */
         private final CopyOnWriteArrayList<Object[]> blocks = new CopyOnWriteArrayList();
@@ -356,11 +366,8 @@ public final class SegmentBuffer<E> {
 
         /**
          * Completed segment.
-         * 
-         * @param date
          */
-        UncompletedSegment(LocalDate date) {
-            this.date = date;
+        UncompletedSegment() {
             createNewBlock();
         }
 
@@ -404,8 +411,6 @@ public final class SegmentBuffer<E> {
             }
 
             for (Object[] segment : blocks) {
-                int size = segment.length;
-
                 if (start < size) {
                     if (end <= size) {
                         for (int i = start; i < end; i++) {

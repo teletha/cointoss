@@ -23,7 +23,7 @@ class UncompletedSegmentTest {
 
     @Test
     void add() {
-        UncompletedSegment buffer = new UncompletedSegment(null);
+        UncompletedSegment buffer = new UncompletedSegment();
         assert buffer.size == 0;
 
         buffer.add(1);
@@ -35,7 +35,7 @@ class UncompletedSegmentTest {
 
     @Test
     void get() {
-        UncompletedSegment<Integer> buffer = new UncompletedSegment(null);
+        UncompletedSegment<Integer> buffer = new UncompletedSegment();
         int size = 1000000;
         for (int i = 0; i < size; i++) {
             buffer.add(i);
@@ -48,7 +48,7 @@ class UncompletedSegmentTest {
 
     @Test
     void first() {
-        UncompletedSegment<Integer> buffer = new UncompletedSegment(null);
+        UncompletedSegment<Integer> buffer = new UncompletedSegment();
         buffer.add(0);
         assert buffer.first() == 0;
         buffer.add(1);
@@ -61,7 +61,7 @@ class UncompletedSegmentTest {
 
     @Test
     void last() {
-        UncompletedSegment<Integer> buffer = new UncompletedSegment(null);
+        UncompletedSegment<Integer> buffer = new UncompletedSegment();
         buffer.add(0);
         assert buffer.last() == 0;
         buffer.add(1);
@@ -74,11 +74,17 @@ class UncompletedSegmentTest {
 
     @Test
     void each() {
-        UncompletedSegment<Integer> buffer = new UncompletedSegment(null);
-        buffer.add(0);
-        buffer.add(1);
-        buffer.add(2);
+        UncompletedSegment<Integer> buffer = new UncompletedSegment();
+        for (int i = 0; i < 5; i++) {
+            buffer.add(i);
+        }
 
         assertIterableEquals(I.list(0, 1, 2), buffer.each(0, 3).toList());
+        assertIterableEquals(I.list(1, 2, 3), buffer.each(1, 4).toList());
+        assertIterableEquals(I.list(2, 3, 4), buffer.each(2, 5).toList());
+        assertIterableEquals(I.list(3, 4), buffer.each(3, 6).toList());
+        assertIterableEquals(I.list(4), buffer.each(4, 7).toList());
+        assertIterableEquals(I.list(), buffer.each(5, 8).toList());
+        assertIterableEquals(I.list(), buffer.each(6, 9).toList());
     }
 }
