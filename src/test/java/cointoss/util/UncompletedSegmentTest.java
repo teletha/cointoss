@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
 
-import cointoss.util.DateSegmentBuffer.UncompletedSegment;
+import cointoss.util.SegmentBuffer.UncompletedSegment;
 import kiss.I;
 
 /**

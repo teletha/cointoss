@@ -19,9 +19,9 @@ import kiss.I;
 import kiss.Signal;
 
 /**
- * @version 2018/08/07 1:48:42
+ * @version 2018/08/13 7:16:42
  */
-public final class DateSegmentBuffer<E> {
+public final class SegmentBuffer<E> {
 
     /** The actual size. */
     private int size;
@@ -32,11 +32,11 @@ public final class DateSegmentBuffer<E> {
     /**
      * 
      */
-    public DateSegmentBuffer() {
+    public SegmentBuffer() {
     }
 
     /**
-     * Return the size of this {@link DateSegmentBuffer}.
+     * Return the size of this {@link SegmentBuffer}.
      * 
      * @return A positive size or zero.
      */
@@ -45,7 +45,7 @@ public final class DateSegmentBuffer<E> {
     }
 
     /**
-     * Check whether this {@link DateSegmentBuffer} is empty or not.
+     * Check whether this {@link SegmentBuffer} is empty or not.
      * 
      * @return
      */
@@ -54,7 +54,7 @@ public final class DateSegmentBuffer<E> {
     }
 
     /**
-     * Check whether this {@link DateSegmentBuffer} is empty or not.
+     * Check whether this {@link SegmentBuffer} is empty or not.
      * 
      * @return
      */

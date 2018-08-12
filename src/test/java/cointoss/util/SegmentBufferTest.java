@@ -20,7 +20,7 @@ import kiss.I;
 /**
  * @version 2018/08/11 17:20:25
  */
-class DateSegmentBufferTest {
+class SegmentBufferTest {
 
     int size = 10000;
 
@@ -28,7 +28,7 @@ class DateSegmentBufferTest {
 
     @Test
     void addCompleted() {
-        DateSegmentBuffer<Long> buffer = new DateSegmentBuffer();
+        SegmentBuffer<Long> buffer = new SegmentBuffer();
         buffer.add(date, I.signalRange(0, 100000));
 
         assert buffer.size() == 100000;
@@ -39,7 +39,7 @@ class DateSegmentBufferTest {
 
     @Test
     void naturalOrder() {
-        DateSegmentBuffer<Integer> buffer = new DateSegmentBuffer();
+        SegmentBuffer<Integer> buffer = new SegmentBuffer();
 
         for (int i = 0; i < size; i++) {
             buffer.add(date.plusDays(i), i);
@@ -53,7 +53,7 @@ class DateSegmentBufferTest {
 
     @Test
     void reverseOrder() {
-        DateSegmentBuffer<Integer> buffer = new DateSegmentBuffer();
+        SegmentBuffer<Integer> buffer = new SegmentBuffer();
 
         for (int i = 0; i < size; i++) {
             buffer.add(date.minusDays(i), size - 1 - i);
@@ -67,7 +67,7 @@ class DateSegmentBufferTest {
 
     @Test
     void each() {
-        DateSegmentBuffer<Integer> buffer = new DateSegmentBuffer();
+        SegmentBuffer<Integer> buffer = new SegmentBuffer();
         buffer.add(date, 1, 2, 3);
 
         assertIterableEquals(I.list(1, 2, 3), buffer.each().toList());
@@ -75,7 +75,7 @@ class DateSegmentBufferTest {
 
     @Test
     void eachSegments() {
-        DateSegmentBuffer<Integer> buffer = new DateSegmentBuffer();
+        SegmentBuffer<Integer> buffer = new SegmentBuffer();
         buffer.add(date, 1, 2, 3);
         buffer.add(date.plusDays(1), 4, 5, 6);
 
@@ -84,7 +84,7 @@ class DateSegmentBufferTest {
 
     @Test
     void eachSegmentsWithGap() {
-        DateSegmentBuffer<Integer> buffer = new DateSegmentBuffer();
+        SegmentBuffer<Integer> buffer = new SegmentBuffer();
         buffer.add(date, 1, 2);
         buffer.add(date.plusDays(2), 5, 6);
 
@@ -93,7 +93,7 @@ class DateSegmentBufferTest {
 
     @Test
     void eachRange() {
-        DateSegmentBuffer<Integer> buffer = new DateSegmentBuffer();
+        SegmentBuffer<Integer> buffer = new SegmentBuffer();
         buffer.add(date, 1, 2, 3, 4, 5);
 
         assertIterableEquals(I.list(1, 2, 3), buffer.each(0, 3).toList());
@@ -106,7 +106,7 @@ class DateSegmentBufferTest {
 
     @Test
     void eachInvalidRange() {
-        DateSegmentBuffer<Integer> buffer = new DateSegmentBuffer();
+        SegmentBuffer<Integer> buffer = new SegmentBuffer();
         buffer.add(date, 1, 2, 3, 4, 5);
 
         assertThrows(IndexOutOfBoundsException.class, () -> buffer.each(-1, 0).toList());
@@ -115,7 +115,7 @@ class DateSegmentBufferTest {
 
     @Test
     void eachRangeSegments() {
-        DateSegmentBuffer<Integer> buffer = new DateSegmentBuffer();
+        SegmentBuffer<Integer> buffer = new SegmentBuffer();
         buffer.add(date, 1, 2, 3);
         buffer.add(date.plusDays(1), 4, 5, 6);
 
