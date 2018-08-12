@@ -23,19 +23,32 @@ import kiss.Signal;
  */
 public final class SegmentBuffer<E> {
 
+    /** The fixed size of row. */
+    private static final int FixedRowSize = 1 << 14; // 16384
+
     /** The actual size. */
     private int size;
 
     /** The completed data manager. */
     private final ConcurrentSkipListMap<LocalDate, Segment<E>> completeds = new ConcurrentSkipListMap();
 
+    /** The uncompleted size. */
+    private int sizeUncompleted;
+
     /** The realtime data manager. */
-    private final UncompletedSegment<E> uncompleted = new UncompletedSegment();
+    private final CopyOnWriteArrayList<Object[]> blocks = new CopyOnWriteArrayList();
+
+    /** The current block */
+    private Object[] block;
+
+    /** The next empty index. */
+    private int blockNextIndex;
 
     /**
      * 
      */
     public SegmentBuffer() {
+        createNewBlock();
     }
 
     /**
@@ -71,8 +84,13 @@ public final class SegmentBuffer<E> {
      * @param items An items to add.
      */
     public void add(E item) {
-        uncompleted.add(item);
+        block[blockNextIndex++] = item;
         size++;
+        sizeUncompleted++;
+
+        if (blockNextIndex == FixedRowSize) {
+            createNewBlock();
+        }
     }
 
     /**
@@ -126,13 +144,18 @@ public final class SegmentBuffer<E> {
      * @return
      */
     public E get(int index) {
+        // completed
         for (Segment<E> segment : completeds.values()) {
             if (index < segment.size) {
                 return segment.get(index);
             }
             index -= segment.size;
         }
-        return uncompleted.get(index);
+
+        // ucompleted
+        int remainder = index & (FixedRowSize - 1);
+        int quotient = (index - remainder) >> 14;
+        return (E) blocks.get(quotient)[remainder];
     }
 
     /**
@@ -141,7 +164,7 @@ public final class SegmentBuffer<E> {
      * @return
      */
     public E first() {
-        return size == 0 ? null : completeds.firstEntry().getValue().first();
+        return size == 0 ? null : completeds.isEmpty() ? (E) blocks.get(0)[0] : completeds.firstEntry().getValue().first();
     }
 
     /**
@@ -150,7 +173,7 @@ public final class SegmentBuffer<E> {
      * @return
      */
     public E last() {
-        return size == 0 ? null : completeds.lastEntry().getValue().last();
+        return size == 0 ? null : sizeUncompleted != 0 ? (E) block[blockNextIndex - 1] : completeds.lastEntry().getValue().last();
     }
 
     /**
@@ -222,6 +245,7 @@ public final class SegmentBuffer<E> {
             throw new IndexOutOfBoundsException("Start[" + start + "] must be less than end[" + end + "].");
         }
 
+        // completed
         for (Segment segment : completeds.values()) {
             int size = segment.size;
 
@@ -239,16 +263,40 @@ public final class SegmentBuffer<E> {
                 end -= size;
             }
         }
-        uncompleted.each(start, end, each);
+
+        // uncompleted
+        int size = blockNextIndex;
+
+        for (Object[] segment : blocks) {
+            if (start < size) {
+                if (end <= size) {
+                    for (int i = start; i < end; i++) {
+                        each.accept((E) segment[i]);
+                    }
+                    return;
+                } else {
+                    for (int i = start; i < size; i++) {
+                        each.accept((E) segment[i]);
+                    }
+                    start = 0;
+                    end -= size;
+                }
+            } else {
+                start -= size;
+                end -= size;
+            }
+        }
+    }
+
+    private void createNewBlock() {
+        blocks.add(block = new Object[FixedRowSize]);
+        blockNextIndex = 0;
     }
 
     /**
      * @version 2018/08/12 7:35:26
      */
     private static abstract class Segment<E> {
-
-        /** The fixed size of row. */
-        protected static final int FixedRowSize = 1 << 14; // 16384
 
         /**
          * Return the item size.
@@ -356,107 +404,6 @@ public final class SegmentBuffer<E> {
             for (int i = start; i < end; i++) {
                 each.accept(items[i]);
             }
-        }
-    }
-
-    /**
-     * @version 2018/08/13 7:22:41
-     */
-    static class UncompletedSegment<E> extends Segment<E> {
-
-        /** The actual data manager. */
-        private final CopyOnWriteArrayList<Object[]> blocks = new CopyOnWriteArrayList();
-
-        /** The current block */
-        private Object[] block;
-
-        /** The next empty index. */
-        private int blockNextIndex;
-
-        /**
-         * Completed segment.
-         */
-        UncompletedSegment() {
-            createNewBlock();
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        E get(int index) {
-            int remainder = index & (FixedRowSize - 1);
-            int quotient = (index - remainder) >> 14;
-            return (E) blocks.get(quotient)[remainder];
-        }
-
-        /**
-         * Get the first item.
-         * 
-         * @return
-         */
-        @Override
-        E first() {
-            return size == 0 ? null : (E) blocks.get(0)[0];
-        }
-
-        /**
-         * Get the first item.
-         * 
-         * @return
-         */
-        @Override
-        E last() {
-            return size == 0 ? null : (E) block[blockNextIndex - 1];
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        void each(int start, int end, Consumer<? super E> each) {
-            if (end < start) {
-                throw new IndexOutOfBoundsException("Start[" + start + "] must be less than end[" + end + "].");
-            }
-
-            for (Object[] segment : blocks) {
-                if (start < size) {
-                    if (end <= size) {
-                        for (int i = start; i < end; i++) {
-                            each.accept((E) segment[i]);
-                        }
-                        return;
-                    } else {
-                        for (int i = start; i < size; i++) {
-                            each.accept((E) segment[i]);
-                        }
-                        start = 0;
-                        end -= size;
-                    }
-                } else {
-                    start -= size;
-                    end -= size;
-                }
-            }
-        }
-
-        /**
-         * Add the given item at end.
-         * 
-         * @param item
-         */
-        void add(E item) {
-            block[blockNextIndex++] = item;
-            size++;
-
-            if (blockNextIndex == FixedRowSize) {
-                createNewBlock();
-            }
-        }
-
-        private void createNewBlock() {
-            blocks.add(block = new Object[FixedRowSize]);
-            blockNextIndex = 0;
         }
     }
 }

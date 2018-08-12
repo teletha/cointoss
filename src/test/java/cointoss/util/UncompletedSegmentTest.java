@@ -11,9 +11,11 @@ package cointoss.util;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
 import org.junit.jupiter.api.Test;
 
-import cointoss.util.SegmentBuffer.UncompletedSegment;
 import kiss.I;
 
 /**
@@ -23,19 +25,19 @@ class UncompletedSegmentTest {
 
     @Test
     void add() {
-        UncompletedSegment buffer = new UncompletedSegment();
-        assert buffer.size == 0;
+        SegmentBuffer buffer = new SegmentBuffer();
+        assert buffer.size() == 0;
 
         buffer.add(1);
-        assert buffer.size == 1;
+        assert buffer.size() == 1;
 
         buffer.add(2);
-        assert buffer.size == 2;
+        assert buffer.size() == 2;
     }
 
     @Test
     void get() {
-        UncompletedSegment<Integer> buffer = new UncompletedSegment();
+        SegmentBuffer<Integer> buffer = new SegmentBuffer();
         int size = 1000000;
         for (int i = 0; i < size; i++) {
             buffer.add(i);
@@ -48,7 +50,7 @@ class UncompletedSegmentTest {
 
     @Test
     void first() {
-        UncompletedSegment<Integer> buffer = new UncompletedSegment();
+        SegmentBuffer<Integer> buffer = new SegmentBuffer();
         buffer.add(0);
         assert buffer.first() == 0;
         buffer.add(1);
@@ -61,7 +63,7 @@ class UncompletedSegmentTest {
 
     @Test
     void last() {
-        UncompletedSegment<Integer> buffer = new UncompletedSegment();
+        SegmentBuffer<Integer> buffer = new SegmentBuffer();
         buffer.add(0);
         assert buffer.last() == 0;
         buffer.add(1);
@@ -74,7 +76,7 @@ class UncompletedSegmentTest {
 
     @Test
     void each() {
-        UncompletedSegment<Integer> buffer = new UncompletedSegment();
+        SegmentBuffer<Integer> buffer = new SegmentBuffer();
         for (int i = 0; i < 5; i++) {
             buffer.add(i);
         }
@@ -86,5 +88,16 @@ class UncompletedSegmentTest {
         assertIterableEquals(I.list(4), buffer.each(4, 7).toList());
         assertIterableEquals(I.list(), buffer.each(5, 8).toList());
         assertIterableEquals(I.list(), buffer.each(6, 9).toList());
+    }
+
+    @Test
+    void eachHuge() {
+        int size = 1000000;
+        SegmentBuffer<Integer> buffer = new SegmentBuffer();
+        for (int i = 0; i < size; i++) {
+            buffer.add(i);
+        }
+
+        assertIterableEquals(IntStream.range(0, size).boxed().collect(Collectors.toList()), buffer.each().toList());
     }
 }

@@ -14,9 +14,8 @@ import java.util.Objects;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Consumer;
 
-import org.magicwerk.brownies.collections.BigList;
-
 import cointoss.Execution;
+import cointoss.util.SegmentBuffer;
 import kiss.Signal;
 import kiss.Signaling;
 import kiss.Variable;
@@ -45,7 +44,7 @@ public final class Ticker {
     public final Signal<Tick> update = updaters.expose;
 
     /** The tick manager. */
-    final BigList<Tick> ticks = new BigList();
+    final SegmentBuffer<Tick> ticks = new SegmentBuffer();
 
     /** The cache of upper tickers. */
     final Ticker[] uppers;
@@ -75,7 +74,7 @@ public final class Ticker {
     final void init(Execution execution, TickerManager realtime) {
         current = new Tick(span.calculateStartTime(execution.date), span, execution.price, realtime);
 
-        ticks.addLast(current);
+        ticks.add(current);
         additions.accept(current);
     }
 
@@ -100,14 +99,14 @@ public final class Ticker {
                 while (current.end.isBefore(start)) {
                     current.freeze();
                     current = new Tick(current.end, span, current.closePrice(), realtime);
-                    ticks.addLast(current);
+                    ticks.add(current);
                     additions.accept(current);
                 }
 
                 // create the latest tick for execution
                 current.freeze();
                 current = new Tick(current.end, span, execution.price, realtime);
-                ticks.addLast(current);
+                ticks.add(current);
                 additions.accept(current);
             } finally {
                 lock.writeLock().unlock();
@@ -124,7 +123,7 @@ public final class Ticker {
      * @return
      */
     public final ZonedDateTime startTime() {
-        return ticks.isEmpty() ? ZonedDateTime.now() : ticks.peekFirst().start;
+        return ticks.isEmpty() ? ZonedDateTime.now() : ticks.first().start;
     }
 
     /**
@@ -133,7 +132,7 @@ public final class Ticker {
      * @return
      */
     public final ZonedDateTime endTime() {
-        return ticks.isEmpty() ? ZonedDateTime.now() : ticks.peekLast().end;
+        return ticks.isEmpty() ? ZonedDateTime.now() : ticks.last().end;
     }
 
     /**
@@ -142,7 +141,7 @@ public final class Ticker {
      * @return
      */
     public final Tick first() {
-        return ticks.peekFirst();
+        return ticks.first();
     }
 
     /**
@@ -151,7 +150,7 @@ public final class Ticker {
      * @return
      */
     public final Tick last() {
-        return ticks.peekLast();
+        return ticks.last();
     }
 
     /**
