@@ -10,8 +10,12 @@
 package cointoss.util;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Consumer;
 
+import kiss.I;
 import kiss.Signal;
 
 /**
@@ -23,65 +27,55 @@ public final class DateSegmentBuffer<E> {
     private static final int FixedRowSize = 1 << 14; // 16384
 
     /** The actual size. */
-    private long size;
+    private int size;
 
     /** The actual data manager. */
-    private final CopyOnWriteArrayList<CompletedSegment<E>> segments = new CopyOnWriteArrayList();
+    private final ConcurrentSkipListMap<LocalDate, CompletedSegment<E>> segments = new ConcurrentSkipListMap();
 
     /** The latest segment. */
     private CompletedSegment<E> segment;
-
-    /** The next empty index. */
-    private int rowNextIndex;
 
     /**
      * 
      */
     public DateSegmentBuffer() {
-        createNewRow();
-    }
-
-    private void createNewRow(LocalDate date) {
-        segments.add(segment = new CompletedSegment(date));
-        rowNextIndex = 0;
     }
 
     /**
-     * Return the size of this {@link DateSegmentBuffer}.
+     * Return the size of this {@link DateSegmentBufferTest}.
      * 
      * @return A positive size or zero.
      */
-    public final long size() {
+    public int size() {
         return size;
     }
 
     /**
-     * Check whether this {@link DateSegmentBuffer} is empty or not.
+     * Check whether this {@link DateSegmentBufferTest} is empty or not.
      * 
      * @return
      */
-    public final boolean isEmpty() {
+    public boolean isEmpty() {
         return size == 0;
     }
 
     /**
-     * Check whether this {@link DateSegmentBuffer} is empty or not.
+     * Check whether this {@link DateSegmentBufferTest} is empty or not.
      * 
      * @return
      */
-    public final boolean isNotEmpty() {
+    public boolean isNotEmpty() {
         return size != 0;
     }
 
     /**
-     * Create new segment for the specified {@link LocalDate}.
+     * Add all items for the specified date.
      * 
      * @param date
+     * @param items
      */
-    public final void createNewSegment(LocalDate date) {
-        if (date != null) {
-
-        }
+    public void add(LocalDate date, E... items) {
+        add(date, I.signal(items));
     }
 
     /**
@@ -91,11 +85,11 @@ public final class DateSegmentBuffer<E> {
      * @param items
      */
     public void add(LocalDate date, Signal<E> items) {
-        if (segments.isEmpty() || date.isBefore(segments.get(0).date)) {
-            CompletedSegment<E> segment = new CompletedSegment(date);
-            segments.add(0, segment);
-            items.to(segment::add);
-        }
+        segments.computeIfAbsent(date, key -> {
+            CompletedSegment segment = new CompletedSegment(date, items);
+            size += segment.size;
+            return segment;
+        });
     }
 
     /**
@@ -104,43 +98,224 @@ public final class DateSegmentBuffer<E> {
      * @param index
      * @return
      */
-    public E get(long index) {
-        int total = 0;
-        
-        for (CompletedSegment<E> segment : segments) {
-            if (index < total +) {
-                return segment.get(total );
+    public E get(int index) {
+        for (CompletedSegment<E> segment : segments.values()) {
+            if (index < segment.size) {
+                return segment.get(index);
+            }
+            index -= segment.size;
+        }
+
+        // If this exception will be thrown, it is bug of this program.
+        // So we must rethrow the wrapped error in here.
+        throw new Error("FIX ME");
+    }
+
+    /**
+     * Get the first item.
+     * 
+     * @return
+     */
+    public E first() {
+        return size == 0 ? null : segments.firstEntry().getValue().first();
+    }
+
+    /**
+     * Get the first item.
+     * 
+     * @return
+     */
+    public E last() {
+        return size == 0 ? null : segments.lastEntry().getValue().last();
+    }
+
+    /**
+     * Signal all items.
+     * 
+     * @param each An item processor.
+     */
+    public void each(Consumer<? super E> each) {
+        each(0, size, each);
+    }
+
+    /**
+     * Signal all items from start to last.
+     * 
+     * @param start A start index (included).
+     * @param each An item processor.
+     */
+    public void each(int start, Consumer<? super E> each) {
+        each(start, size, each);
+    }
+
+    /**
+     * Signal all items from start to end.
+     * 
+     * @param start A start index (included).
+     * @param end A end index (excluded).
+     * @param each An item processor.
+     */
+    public void each(int start, int end, Consumer<? super E> each) {
+        for (CompletedSegment segment : segments.values()) {
+            int size = segment.size;
+
+            if (start < size) {
+                if (end <= size) {
+                    segment.each(start, end, each);
+                    return;
+                } else {
+                    segment.each(start, size, each);
+                    start = 0;
+                    end -= size;
+                }
+            } else {
+                start -= size;
+                end -= size;
             }
         }
-        long remainder = index & (FixedRowSize - 1);
-        long quotient = (index - remainder) >> 14;
-        return (E) blocks.get((int) quotient)[(int) remainder];
     }
 
     /**
-     * Get the first item.
+     * Signal all items.
      * 
-     * @return
+     * @return An item stream.
      */
-    public E peekFirst() {
-        return size == 0 ? null : segments.get(0).peekFirst();
+    public Signal<E> each() {
+        return each(0, size);
     }
 
     /**
-     * Get the first item.
+     * Signal all items from start to last.
      * 
-     * @return
+     * @param start A start index (included).
+     * @return An item stream.
      */
-    public E peekLast() {
-        return size == 0 ? null : segment.peekLast();
+    public Signal<E> each(int start) {
+        return each(start, size);
     }
 
-    public
+    /**
+     * Signal all items from start to end.
+     * 
+     * @param start A start index (included).
+     * @param end A end index (excluded).
+     * @return An item stream.
+     */
+    public Signal<E> each(int start, int end) {
+        return new Signal<>((observer, disposer) -> {
+            try {
+                each(start, end, observer);
+                observer.complete();
+            } catch (Throwable e) {
+                observer.error(e);
+            }
+            return disposer;
+        });
+    }
+
+    /**
+     * @version 2018/08/12 7:35:26
+     */
+    private static interface Segment<E> {
+        /**
+         * Get an item at the specified index.
+         * 
+         * @param index
+         * @return
+         */
+        E get(int index);
+
+        /**
+         * Get the first item.
+         * 
+         * @return
+         */
+        E first();
+
+        /**
+         * Get the first item.
+         * 
+         * @return
+         */
+        E last();
+
+        /**
+         * Signal all items from start to end.
+         * 
+         * @param start A start index (included).
+         * @param end A end index (excluded).
+         * @param each An item processor.
+         */
+        void each(int start, int end, Consumer<? super E> each);
+    }
 
     /**
      * @version 2018/08/07 17:25:58
      */
-    static class CompletedSegment<E> {
+    static class CompletedSegment<E> implements Segment<E> {
+
+        /** The associated date. */
+        private final LocalDate date;
+
+        /** The total size of this segment. */
+        private final int size;
+
+        /** The actual data manager. */
+        private final E[] items;
+
+        /**
+         * Completed segment.
+         * 
+         * @param date
+         */
+        CompletedSegment(LocalDate date, Signal<E> items) {
+            this.date = date;
+
+            ArrayList<E> list = new ArrayList(FixedRowSize);
+            items.to(list::add);
+            this.items = (E[]) list.toArray();
+            this.size = this.items.length;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public E get(int index) {
+            return items[index];
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public E first() {
+            return size == 0 ? null : items[0];
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public E last() {
+            return size == 0 ? null : items[size - 1];
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void each(int start, int end, Consumer<? super E> each) {
+            for (int i = start; i < end; i++) {
+                each.accept(items[i]);
+            }
+        }
+    }
+
+    /**
+     * @version 2018/08/07 17:25:58
+     */
+    static class UncompletedSegment<E> {
 
         /** The associated date. */
         private final LocalDate date;
@@ -164,7 +339,7 @@ public final class DateSegmentBuffer<E> {
          * 
          * @param date
          */
-        CompletedSegment(LocalDate date) {
+        UncompletedSegment(LocalDate date) {
             this.date = date;
             createNewBlock();
         }
@@ -200,7 +375,7 @@ public final class DateSegmentBuffer<E> {
          * 
          * @return
          */
-        E peekFirst() {
+        E first() {
             return size == 0 ? null : (E) blocks.get(0)[0];
         }
 
@@ -209,7 +384,7 @@ public final class DateSegmentBuffer<E> {
          * 
          * @return
          */
-        E peekLast() {
+        E last() {
             return size == 0 ? null : (E) block[blockNextIndex - 1];
         }
 

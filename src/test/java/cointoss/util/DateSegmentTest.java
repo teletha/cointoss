@@ -9,18 +9,21 @@
  */
 package cointoss.util;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
 
-import cointoss.util.DateSegmentBuffer.CompletedSegment;
+import cointoss.util.DateSegmentBuffer.UncompletedSegment;
 
 /**
  * @version 2018/08/11 7:52:02
  */
-public class DateSegmentTest {
+class DateSegmentTest {
 
     @Test
     void add() {
-        CompletedSegment buffer = new CompletedSegment(null);
+        UncompletedSegment buffer = new UncompletedSegment(null);
         assert buffer.size == 0;
 
         buffer.add(1);
@@ -32,7 +35,7 @@ public class DateSegmentTest {
 
     @Test
     void get() {
-        CompletedSegment<Integer> buffer = new CompletedSegment(null);
+        UncompletedSegment<Integer> buffer = new UncompletedSegment(null);
         int size = 1000000;
         for (int i = 0; i < size; i++) {
             buffer.add(i);
@@ -45,27 +48,37 @@ public class DateSegmentTest {
 
     @Test
     void first() {
-        CompletedSegment<Integer> buffer = new CompletedSegment(null);
+        UncompletedSegment<Integer> buffer = new UncompletedSegment(null);
         buffer.add(0);
-        assert buffer.peekFirst() == 0;
+        assert buffer.first() == 0;
         buffer.add(1);
-        assert buffer.peekFirst() == 0;
+        assert buffer.first() == 0;
         buffer.add(2);
-        assert buffer.peekFirst() == 0;
+        assert buffer.first() == 0;
         buffer.add(3);
-        assert buffer.peekFirst() == 0;
+        assert buffer.first() == 0;
     }
 
     @Test
     void last() {
-        CompletedSegment<Integer> buffer = new CompletedSegment(null);
+        UncompletedSegment<Integer> buffer = new UncompletedSegment(null);
         buffer.add(0);
-        assert buffer.peekLast() == 0;
+        assert buffer.last() == 0;
         buffer.add(1);
-        assert buffer.peekLast() == 1;
+        assert buffer.last() == 1;
         buffer.add(2);
-        assert buffer.peekLast() == 2;
+        assert buffer.last() == 2;
         buffer.add(3);
-        assert buffer.peekLast() == 3;
+        assert buffer.last() == 3;
+    }
+
+    @Test
+    void each() {
+        UncompletedSegment<Integer> buffer = new UncompletedSegment(null);
+        buffer.add(0);
+        buffer.add(1);
+        buffer.add(2);
+
+        List<Integer> list = new ArrayList();
     }
 }
