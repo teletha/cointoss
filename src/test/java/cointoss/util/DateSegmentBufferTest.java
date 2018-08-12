@@ -110,9 +110,7 @@ class DateSegmentBufferTest {
         buffer.add(date, 1, 2, 3, 4, 5);
 
         assertThrows(IndexOutOfBoundsException.class, () -> buffer.each(-1, 0).toList());
-        assertThrows(IndexOutOfBoundsException.class, () -> buffer.each(0, -1).toList());
-        assertThrows(IndexOutOfBoundsException.class, () -> buffer.each(-1, 0).toList());
-        assertThrows(IndexOutOfBoundsException.class, () -> buffer.each(-1, 0).toList());
+        assertThrows(IndexOutOfBoundsException.class, () -> buffer.each(10, 1).toList());
     }
 
     @Test

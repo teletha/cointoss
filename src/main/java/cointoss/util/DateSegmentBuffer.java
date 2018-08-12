@@ -23,17 +23,11 @@ import kiss.Signal;
  */
 public final class DateSegmentBuffer<E> {
 
-    /** The fixed size of row. */
-    private static final int FixedRowSize = 1 << 14; // 16384
-
     /** The actual size. */
     private int size;
 
     /** The actual data manager. */
-    private final ConcurrentSkipListMap<LocalDate, CompletedSegment<E>> segments = new ConcurrentSkipListMap();
-
-    /** The latest segment. */
-    private CompletedSegment<E> segment;
+    private final ConcurrentSkipListMap<LocalDate, Segment<E>> segments = new ConcurrentSkipListMap();
 
     /**
      * 
@@ -42,7 +36,7 @@ public final class DateSegmentBuffer<E> {
     }
 
     /**
-     * Return the size of this {@link DateSegmentBufferTest}.
+     * Return the size of this {@link DateSegmentBuffer}.
      * 
      * @return A positive size or zero.
      */
@@ -51,7 +45,7 @@ public final class DateSegmentBuffer<E> {
     }
 
     /**
-     * Check whether this {@link DateSegmentBufferTest} is empty or not.
+     * Check whether this {@link DateSegmentBuffer} is empty or not.
      * 
      * @return
      */
@@ -60,7 +54,7 @@ public final class DateSegmentBuffer<E> {
     }
 
     /**
-     * Check whether this {@link DateSegmentBufferTest} is empty or not.
+     * Check whether this {@link DateSegmentBuffer} is empty or not.
      * 
      * @return
      */
@@ -99,7 +93,7 @@ public final class DateSegmentBuffer<E> {
      * @return
      */
     public E get(int index) {
-        for (CompletedSegment<E> segment : segments.values()) {
+        for (Segment<E> segment : segments.values()) {
             if (index < segment.size) {
                 return segment.get(index);
             }
@@ -156,7 +150,11 @@ public final class DateSegmentBuffer<E> {
      * @param each An item processor.
      */
     public void each(int start, int end, Consumer<? super E> each) {
-        for (CompletedSegment segment : segments.values()) {
+        if (end < start) {
+            throw new IndexOutOfBoundsException("Start[" + start + "] must be less than end[" + end + "].");
+        }
+
+        for (Segment segment : segments.values()) {
             int size = segment.size;
 
             if (start < size) {
@@ -216,28 +214,37 @@ public final class DateSegmentBuffer<E> {
     /**
      * @version 2018/08/12 7:35:26
      */
-    private static interface Segment<E> {
+    private static abstract class Segment<E> {
+
+        /** The fixed size of row. */
+        protected static final int FixedRowSize = 1 << 14; // 16384
+
+        /**
+         * Return the item size.
+         */
+        protected int size;
+
         /**
          * Get an item at the specified index.
          * 
          * @param index
          * @return
          */
-        E get(int index);
+        abstract E get(int index);
 
         /**
          * Get the first item.
          * 
          * @return
          */
-        E first();
+        abstract E first();
 
         /**
          * Get the first item.
          * 
          * @return
          */
-        E last();
+        abstract E last();
 
         /**
          * Signal all items from start to end.
@@ -246,19 +253,35 @@ public final class DateSegmentBuffer<E> {
          * @param end A end index (excluded).
          * @param each An item processor.
          */
-        void each(int start, int end, Consumer<? super E> each);
+        abstract void each(int start, int end, Consumer<? super E> each);
+
+        /**
+         * Signal all items from start to end.
+         * 
+         * @param start A start index (included).
+         * @param end A end index (excluded).
+         * @return An item stream.
+         */
+        final Signal<E> each(int start, int end) {
+            return new Signal<>((observer, disposer) -> {
+                try {
+                    each(start, end, observer);
+                    observer.complete();
+                } catch (Throwable e) {
+                    observer.error(e);
+                }
+                return disposer;
+            });
+        }
     }
 
     /**
      * @version 2018/08/07 17:25:58
      */
-    static class CompletedSegment<E> implements Segment<E> {
+    static class CompletedSegment<E> extends Segment<E> {
 
         /** The associated date. */
         private final LocalDate date;
-
-        /** The total size of this segment. */
-        private final int size;
 
         /** The actual data manager. */
         private final E[] items;
@@ -315,13 +338,10 @@ public final class DateSegmentBuffer<E> {
     /**
      * @version 2018/08/07 17:25:58
      */
-    static class UncompletedSegment<E> {
+    static class UncompletedSegment<E> extends Segment<E> {
 
         /** The associated date. */
         private final LocalDate date;
-
-        /** The total size of this segment. */
-        int size;
 
         int total;
 
@@ -345,6 +365,68 @@ public final class DateSegmentBuffer<E> {
         }
 
         /**
+         * {@inheritDoc}
+         */
+        @Override
+        E get(int index) {
+            int remainder = index & (FixedRowSize - 1);
+            int quotient = (index - remainder) >> 14;
+            return (E) blocks.get(quotient)[remainder];
+        }
+
+        /**
+         * Get the first item.
+         * 
+         * @return
+         */
+        @Override
+        E first() {
+            return size == 0 ? null : (E) blocks.get(0)[0];
+        }
+
+        /**
+         * Get the first item.
+         * 
+         * @return
+         */
+        @Override
+        E last() {
+            return size == 0 ? null : (E) block[blockNextIndex - 1];
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        void each(int start, int end, Consumer<? super E> each) {
+            if (end < start) {
+                throw new IndexOutOfBoundsException("Start[" + start + "] must be less than end[" + end + "].");
+            }
+
+            for (Object[] segment : blocks) {
+                int size = segment.length;
+
+                if (start < size) {
+                    if (end <= size) {
+                        for (int i = start; i < end; i++) {
+                            each.accept((E) segment[i]);
+                        }
+                        return;
+                    } else {
+                        for (int i = start; i < size; i++) {
+                            each.accept((E) segment[i]);
+                        }
+                        start = 0;
+                        end -= size;
+                    }
+                } else {
+                    start -= size;
+                    end -= size;
+                }
+            }
+        }
+
+        /**
          * Add the given item at end.
          * 
          * @param item
@@ -356,36 +438,6 @@ public final class DateSegmentBuffer<E> {
             if (blockNextIndex == FixedRowSize) {
                 createNewBlock();
             }
-        }
-
-        /**
-         * Get an item at the specified index.
-         * 
-         * @param index
-         * @return
-         */
-        E get(long index) {
-            long remainder = index & (FixedRowSize - 1);
-            long quotient = (index - remainder) >> 14;
-            return (E) blocks.get((int) quotient)[(int) remainder];
-        }
-
-        /**
-         * Get the first item.
-         * 
-         * @return
-         */
-        E first() {
-            return size == 0 ? null : (E) blocks.get(0)[0];
-        }
-
-        /**
-         * Get the first item.
-         * 
-         * @return
-         */
-        E last() {
-            return size == 0 ? null : (E) block[blockNextIndex - 1];
         }
 
         private void createNewBlock() {

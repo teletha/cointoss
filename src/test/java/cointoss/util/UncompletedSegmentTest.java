@@ -9,17 +9,17 @@
  */
 package cointoss.util;
 
-import java.util.ArrayList;
-import java.util.List;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
 
 import cointoss.util.DateSegmentBuffer.UncompletedSegment;
+import kiss.I;
 
 /**
  * @version 2018/08/11 7:52:02
  */
-class DateSegmentTest {
+class UncompletedSegmentTest {
 
     @Test
     void add() {
@@ -79,6 +79,6 @@ class DateSegmentTest {
         buffer.add(1);
         buffer.add(2);
 
-        List<Integer> list = new ArrayList();
+        assertIterableEquals(I.list(0, 1, 2), buffer.each(0, 3).toList());
     }
 }
