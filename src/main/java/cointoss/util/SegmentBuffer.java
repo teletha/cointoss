@@ -30,7 +30,7 @@ public final class SegmentBuffer<E> {
     private final ConcurrentSkipListMap<LocalDate, Segment<E>> completeds = new ConcurrentSkipListMap();
 
     /** The realtime data manager. */
-    private final UncompletedSegment uncompleted = new UncompletedSegment();
+    private final UncompletedSegment<E> uncompleted = new UncompletedSegment();
 
     /**
      * 
@@ -65,23 +65,41 @@ public final class SegmentBuffer<E> {
         return size != 0;
     }
 
+    /**
+     * Add realtime item.
+     * 
+     * @param items An items to add.
+     */
     public void add(E item) {
-
+        uncompleted.add(item);
+        size++;
     }
 
+    /**
+     * Add all realtime items.
+     * 
+     * @param items An items to add.
+     */
     public void add(E... items) {
-
+        for (E item : items) {
+            add(item);
+        }
     }
 
+    /**
+     * Add all realtime items.
+     * 
+     * @param items An items to add.
+     */
     public void add(Signal<E> items) {
-
+        items.to((Consumer<E>) this::add);
     }
 
     /**
      * Add all completed items of the specified date.
      * 
      * @param date
-     * @param items
+     * @param items An items to add.
      */
     public void addCompleted(LocalDate date, E... items) {
         addCompleted(date, I.signal(items));
@@ -91,11 +109,11 @@ public final class SegmentBuffer<E> {
      * Add all completed items of the specified date.
      * 
      * @param date
-     * @param items
+     * @param items An items to add.
      */
     public void addCompleted(LocalDate date, Signal<E> items) {
         completeds.computeIfAbsent(date, key -> {
-            CompletedSegment segment = new CompletedSegment(date, items);
+            CompletedSegment segment = new CompletedSegment(items);
             size += segment.size;
             return segment;
         });
@@ -114,10 +132,7 @@ public final class SegmentBuffer<E> {
             }
             index -= segment.size;
         }
-
-        // If this exception will be thrown, it is bug of this program.
-        // So we must rethrow the wrapped error in here.
-        throw new Error("FIX ME");
+        return uncompleted.get(index);
     }
 
     /**
@@ -136,6 +151,44 @@ public final class SegmentBuffer<E> {
      */
     public E last() {
         return size == 0 ? null : completeds.lastEntry().getValue().last();
+    }
+
+    /**
+     * Signal all items.
+     * 
+     * @return An item stream.
+     */
+    public Signal<E> each() {
+        return each(0, size);
+    }
+
+    /**
+     * Signal all items from start to last.
+     * 
+     * @param start A start index (included).
+     * @return An item stream.
+     */
+    public Signal<E> each(int start) {
+        return each(start, size);
+    }
+
+    /**
+     * Signal all items from start to end.
+     * 
+     * @param start A start index (included).
+     * @param end A end index (excluded).
+     * @return An item stream.
+     */
+    public Signal<E> each(int start, int end) {
+        return new Signal<>((observer, disposer) -> {
+            try {
+                each(start, end, observer);
+                observer.complete();
+            } catch (Throwable e) {
+                observer.error(e);
+            }
+            return disposer;
+        });
     }
 
     /**
@@ -186,44 +239,7 @@ public final class SegmentBuffer<E> {
                 end -= size;
             }
         }
-    }
-
-    /**
-     * Signal all items.
-     * 
-     * @return An item stream.
-     */
-    public Signal<E> each() {
-        return each(0, size);
-    }
-
-    /**
-     * Signal all items from start to last.
-     * 
-     * @param start A start index (included).
-     * @return An item stream.
-     */
-    public Signal<E> each(int start) {
-        return each(start, size);
-    }
-
-    /**
-     * Signal all items from start to end.
-     * 
-     * @param start A start index (included).
-     * @param end A end index (excluded).
-     * @return An item stream.
-     */
-    public Signal<E> each(int start, int end) {
-        return new Signal<>((observer, disposer) -> {
-            try {
-                each(start, end, observer);
-                observer.complete();
-            } catch (Throwable e) {
-                observer.error(e);
-            }
-            return disposer;
-        });
+        uncompleted.each(start, end, each);
     }
 
     /**
@@ -295,20 +311,13 @@ public final class SegmentBuffer<E> {
      */
     private static class CompletedSegment<E> extends Segment<E> {
 
-        /** The associated date. */
-        private final LocalDate date;
-
         /** The actual data manager. */
         private final E[] items;
 
         /**
          * Completed segment.
-         * 
-         * @param date
          */
-        private CompletedSegment(LocalDate date, Signal<E> items) {
-            this.date = date;
-
+        private CompletedSegment(Signal<E> items) {
             ArrayList<E> list = new ArrayList(FixedRowSize);
             items.to(list::add);
             this.items = (E[]) list.toArray();

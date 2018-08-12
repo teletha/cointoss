@@ -121,4 +121,29 @@ class SegmentBufferTest {
 
         assertIterableEquals(I.list(1, 2, 3, 4, 5, 6), buffer.each().toList());
     }
+
+    @Test
+    void addUncompleted() {
+        SegmentBuffer<Long> buffer = new SegmentBuffer();
+        buffer.add(I.signalRange(0, 100000));
+
+        assert buffer.size() == 100000;
+        for (int i = 0; i < 100000; i++) {
+            assert buffer.get(i) == i;
+        }
+    }
+
+    @Test
+    void eachUncompleted() {
+        SegmentBuffer<Integer> buffer = new SegmentBuffer();
+        buffer.add(1, 2, 3, 4, 5);
+
+        assertIterableEquals(I.list(1, 2, 3, 4, 5), buffer.each().toList());
+        assertIterableEquals(I.list(1, 2, 3), buffer.each(0, 3).toList());
+        assertIterableEquals(I.list(2, 3, 4), buffer.each(1, 4).toList());
+        assertIterableEquals(I.list(3, 4, 5), buffer.each(2, 5).toList());
+        assertIterableEquals(I.list(4, 5), buffer.each(3, 6).toList());
+        assertIterableEquals(I.list(5), buffer.each(4, 7).toList());
+        assertIterableEquals(I.list(), buffer.each(5, 8).toList());
+    }
 }
