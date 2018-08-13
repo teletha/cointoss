@@ -26,14 +26,14 @@ public final class SegmentBuffer<E> {
     /** The fixed size of row. */
     private static final int FixedRowSize = 1 << 14; // 16384
 
-    /** The actual size. */
-    private int size;
+    /** The completed size. */
+    private int completedSize;
 
     /** The completed data manager. */
     private final ConcurrentSkipListMap<LocalDate, Segment<E>> completeds = new ConcurrentSkipListMap();
 
     /** The uncompleted size. */
-    private int sizeUncompleted;
+    private int uncompletedSize;
 
     /** The realtime data manager. */
     private final CopyOnWriteArrayList<Object[]> blocks = new CopyOnWriteArrayList();
@@ -57,7 +57,7 @@ public final class SegmentBuffer<E> {
      * @return A positive size or zero.
      */
     public int size() {
-        return size;
+        return completedSize + uncompletedSize;
     }
 
     /**
@@ -66,7 +66,7 @@ public final class SegmentBuffer<E> {
      * @return
      */
     public boolean isEmpty() {
-        return size == 0;
+        return (completedSize + uncompletedSize) == 0;
     }
 
     /**
@@ -75,7 +75,7 @@ public final class SegmentBuffer<E> {
      * @return
      */
     public boolean isNotEmpty() {
-        return size != 0;
+        return (completedSize + uncompletedSize) != 0;
     }
 
     /**
@@ -85,8 +85,7 @@ public final class SegmentBuffer<E> {
      */
     public void add(E item) {
         block[blockNextIndex++] = item;
-        size++;
-        sizeUncompleted++;
+        uncompletedSize++;
 
         if (blockNextIndex == FixedRowSize) {
             createNewBlock();
@@ -132,7 +131,7 @@ public final class SegmentBuffer<E> {
     public void addCompleted(LocalDate date, Signal<E> items) {
         completeds.computeIfAbsent(date, key -> {
             CompletedSegment segment = new CompletedSegment(items);
-            size += segment.size;
+            completedSize += segment.size;
             return segment;
         });
     }
@@ -164,7 +163,7 @@ public final class SegmentBuffer<E> {
      * @return
      */
     public E first() {
-        return size == 0 ? null : completeds.isEmpty() ? (E) blocks.get(0)[0] : completeds.firstEntry().getValue().first();
+        return completedSize != 0 ? completeds.firstEntry().getValue().first() : uncompletedSize != 0 ? (E) blocks.get(0)[0] : null;
     }
 
     /**
@@ -173,7 +172,7 @@ public final class SegmentBuffer<E> {
      * @return
      */
     public E last() {
-        return size == 0 ? null : sizeUncompleted != 0 ? (E) block[blockNextIndex - 1] : completeds.lastEntry().getValue().last();
+        return uncompletedSize != 0 ? (E) block[blockNextIndex - 1] : completedSize != 0 ? completeds.lastEntry().getValue().last() : null;
     }
 
     /**
@@ -182,7 +181,7 @@ public final class SegmentBuffer<E> {
      * @return An item stream.
      */
     public Signal<E> each() {
-        return each(0, size);
+        return each(0, size());
     }
 
     /**
@@ -192,7 +191,7 @@ public final class SegmentBuffer<E> {
      * @return An item stream.
      */
     public Signal<E> each(int start) {
-        return each(start, size);
+        return each(start, size());
     }
 
     /**
@@ -220,7 +219,7 @@ public final class SegmentBuffer<E> {
      * @param each An item processor.
      */
     public void each(Consumer<? super E> each) {
-        each(0, size, each);
+        each(0, size(), each);
     }
 
     /**
@@ -230,7 +229,7 @@ public final class SegmentBuffer<E> {
      * @param each An item processor.
      */
     public void each(int start, Consumer<? super E> each) {
-        each(start, size, each);
+        each(start, size(), each);
     }
 
     /**
@@ -268,7 +267,7 @@ public final class SegmentBuffer<E> {
         for (Object[] segment : blocks) {
             if (start < FixedRowSize) {
                 if (end <= FixedRowSize) {
-                    int stop = Math.min(end, sizeUncompleted);
+                    int stop = Math.min(end, uncompletedSize);
                     for (int i = start; i < stop; i++) {
                         each.accept((E) segment[i]);
                     }
