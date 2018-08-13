@@ -44,7 +44,7 @@ public final class Ticker {
     public final Signal<Tick> update = updaters.expose;
 
     /** The tick manager. */
-    final SegmentBuffer<Tick> ticks = new SegmentBuffer();
+    final SegmentBuffer<Tick> ticks;
 
     /** The cache of upper tickers. */
     final Ticker[] uppers;
@@ -63,6 +63,7 @@ public final class Ticker {
     Ticker(TickSpan span) {
         this.span = Objects.requireNonNull(span);
         this.uppers = new Ticker[span.uppers.length];
+        this.ticks = new SegmentBuffer<Tick>(span.ticksPerDay(), tick -> tick.start.toLocalDate());
     }
 
     /**
@@ -195,6 +196,10 @@ public final class Ticker {
         lock.readLock().lock();
 
         try {
+            if (ticks.isEmpty()) {
+                return Variable.empty();
+            }
+
             int index = (int) ((epochSeconds - first().start.toEpochSecond()) / span.duration.getSeconds());
             return index < size() ? Variable.of(ticks.get(index)) : Variable.empty();
         } finally {

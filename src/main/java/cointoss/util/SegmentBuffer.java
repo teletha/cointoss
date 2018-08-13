@@ -10,10 +10,10 @@
 package cointoss.util;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentSkipListMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import kiss.I;
 import kiss.Signal;
@@ -23,8 +23,11 @@ import kiss.Signal;
  */
 public final class SegmentBuffer<E> {
 
-    /** The fixed size of row. */
-    private static final int FixedRowSize = 1 << 14; // 16384
+    /** The fixed segment size. */
+    private final int segmentSize;
+
+    /** The key extractor. */
+    private final Function<E, LocalDate> extractor;
 
     /** The completed size. */
     private int completedSize;
@@ -35,20 +38,26 @@ public final class SegmentBuffer<E> {
     /** The uncompleted size. */
     private int uncompletedSize;
 
-    /** The realtime data manager. */
-    private final CopyOnWriteArrayList<Object[]> blocks = new CopyOnWriteArrayList();
-
-    /** The current block */
-    private Object[] block;
-
-    /** The next empty index. */
-    private int blockNextIndex;
+    /** The uncompleted date manager. */
+    private Object[] uncompleted;
 
     /**
      * 
      */
-    public SegmentBuffer() {
-        createNewBlock();
+    public SegmentBuffer(int segmentSize) {
+        this(segmentSize, e -> LocalDate.now());
+    }
+
+    /**
+     * 
+     */
+    public SegmentBuffer(int segmentSize, Function<E, LocalDate> extractor) {
+        if (segmentSize < 0) {
+            throw new IllegalArgumentException("Segment size [" + segmentSize + "] must be positive.");
+        }
+        this.segmentSize = segmentSize;
+        this.extractor = Objects.requireNonNull(extractor);
+        this.uncompleted = new Object[segmentSize];
     }
 
     /**
@@ -84,12 +93,18 @@ public final class SegmentBuffer<E> {
      * @param items An items to add.
      */
     public void add(E item) {
-        if (blockNextIndex == FixedRowSize) {
-            createNewBlock();
+        try {
+            uncompleted[uncompletedSize++] = item;
+        } catch (ArrayIndexOutOfBoundsException e) {
+            completeds.computeIfAbsent(extractor.apply((E) uncompleted[0]), key -> {
+                CompletedSegment segment = new CompletedSegment(uncompleted);
+                completedSize += segment.size;
+                return segment;
+            });
+            uncompleted = new Object[segmentSize];
+            uncompletedSize = 0;
+            add(item);
         }
-
-        block[blockNextIndex++] = item;
-        uncompletedSize++;
     }
 
     /**
@@ -130,7 +145,7 @@ public final class SegmentBuffer<E> {
      */
     public void addCompleted(LocalDate date, Signal<E> items) {
         completeds.computeIfAbsent(date, key -> {
-            CompletedSegment segment = new CompletedSegment(items);
+            CompletedSegment segment = new CompletedSegment(segmentSize, items);
             completedSize += segment.size;
             return segment;
         });
@@ -152,9 +167,7 @@ public final class SegmentBuffer<E> {
         }
 
         // ucompleted
-        int remainder = index & (FixedRowSize - 1);
-        int quotient = (index - remainder) >> 14;
-        return (E) blocks.get(quotient)[remainder];
+        return (E) uncompleted[index];
     }
 
     /**
@@ -163,7 +176,14 @@ public final class SegmentBuffer<E> {
      * @return
      */
     public E first() {
-        return completedSize != 0 ? completeds.firstEntry().getValue().first() : uncompletedSize != 0 ? (E) blocks.get(0)[0] : null;
+        if (completedSize != 0) {
+            return completeds.firstEntry().getValue().first();
+        }
+
+        if (uncompletedSize != 0) {
+            return (E) uncompleted[0];
+        }
+        return null;
     }
 
     /**
@@ -172,7 +192,14 @@ public final class SegmentBuffer<E> {
      * @return
      */
     public E last() {
-        return uncompletedSize != 0 ? (E) block[blockNextIndex - 1] : completedSize != 0 ? completeds.lastEntry().getValue().last() : null;
+        if (uncompletedSize != 0) {
+            return (E) uncompleted[uncompletedSize - 1];
+        }
+
+        if (completedSize != 0) {
+            return completeds.lastEntry().getValue().last();
+        }
+        return null;
     }
 
     /**
@@ -247,7 +274,6 @@ public final class SegmentBuffer<E> {
         // completed
         for (Segment segment : completeds.values()) {
             int size = segment.size;
-
             if (start < size) {
                 if (end <= size) {
                     segment.each(start, end, each);
@@ -264,31 +290,11 @@ public final class SegmentBuffer<E> {
         }
 
         // uncompleted
-        for (Object[] segment : blocks) {
-            if (start < FixedRowSize) {
-                if (end <= FixedRowSize) {
-                    int stop = Math.min(end, uncompletedSize);
-                    for (int i = start; i < stop; i++) {
-                        each.accept((E) segment[i]);
-                    }
-                    return;
-                } else {
-                    for (int i = start; i < FixedRowSize; i++) {
-                        each.accept((E) segment[i]);
-                    }
-                    start = 0;
-                    end -= FixedRowSize;
-                }
-            } else {
-                start -= FixedRowSize;
-                end -= FixedRowSize;
+        if (0 < uncompletedSize) {
+            for (int i = start; i < Math.min(end, uncompletedSize); i++) {
+                each.accept((E) uncompleted[i]);
             }
         }
-    }
-
-    private void createNewBlock() {
-        blocks.add(block = new Object[FixedRowSize]);
-        blockNextIndex = 0;
     }
 
     /**
@@ -331,25 +337,6 @@ public final class SegmentBuffer<E> {
          * @param each An item processor.
          */
         abstract void each(int start, int end, Consumer<? super E> each);
-
-        /**
-         * Signal all items from start to end.
-         * 
-         * @param start A start index (included).
-         * @param end A end index (excluded).
-         * @return An item stream.
-         */
-        final Signal<E> each(int start, int end) {
-            return new Signal<>((observer, disposer) -> {
-                try {
-                    each(start, end, observer);
-                    observer.complete();
-                } catch (Throwable e) {
-                    observer.error(e);
-                }
-                return disposer;
-            });
-        }
     }
 
     /**
@@ -358,16 +345,25 @@ public final class SegmentBuffer<E> {
     private static class CompletedSegment<E> extends Segment<E> {
 
         /** The actual data manager. */
-        private final E[] items;
+        private final Object[] items;
 
         /**
          * Completed segment.
          */
-        private CompletedSegment(Signal<E> items) {
-            ArrayList<E> list = new ArrayList(FixedRowSize);
-            items.to(list::add);
-            this.items = (E[]) list.toArray();
-            this.size = this.items.length;
+        private CompletedSegment(int segmentSize, Signal<E> items) {
+            this.items = new Object[segmentSize];
+
+            items.to(e -> {
+                this.items[size++] = e;
+            });
+        }
+
+        /**
+         * Completed segment.
+         */
+        private CompletedSegment(Object[] items) {
+            this.items = items;
+            this.size = items.length;
         }
 
         /**
@@ -375,7 +371,7 @@ public final class SegmentBuffer<E> {
          */
         @Override
         E get(int index) {
-            return items[index];
+            return (E) items[index];
         }
 
         /**
@@ -383,7 +379,7 @@ public final class SegmentBuffer<E> {
          */
         @Override
         E first() {
-            return size == 0 ? null : items[0];
+            return size == 0 ? null : (E) items[0];
         }
 
         /**
@@ -391,7 +387,7 @@ public final class SegmentBuffer<E> {
          */
         @Override
         E last() {
-            return size == 0 ? null : items[size - 1];
+            return size == 0 ? null : (E) items[size - 1];
         }
 
         /**
@@ -399,8 +395,10 @@ public final class SegmentBuffer<E> {
          */
         @Override
         void each(int start, int end, Consumer<? super E> each) {
-            for (int i = start; i < end; i++) {
-                each.accept(items[i]);
+            int stop = Math.min(end, size);
+
+            for (int i = start; i < stop; i++) {
+                each.accept((E) items[i]);
             }
         }
     }

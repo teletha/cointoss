@@ -112,4 +112,17 @@ public enum TickSpan {
         long value = time.getLong(unit);
         return time.truncatedTo(unit.getBaseUnit()).with(unit, value - (value % amount));
     }
+
+    /**
+     * Calculate a number of ticks per day.
+     * 
+     * @return A calculation result.
+     */
+    public int ticksPerDay() {
+        if (duration.toDaysPart() == 0) {
+            return (int) Duration.ofDays(1).dividedBy(duration);
+        } else {
+            return 1;
+        }
+    }
 }
