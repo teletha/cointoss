@@ -14,7 +14,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
-import cointoss.order.OrderBook;
+import cointoss.order.OrderBookManager;
 import cointoss.order.OrderBookList;
 import cointoss.order.OrderBookList.Range;
 import cointoss.order.OrderUnit;
@@ -57,7 +57,7 @@ public class OrderBookView extends View {
     private @UI TradingView view;
 
     /** Order Book. */
-    private OrderBook book;
+    private OrderBookManager book;
 
     /**
      * {@inheritDoc}

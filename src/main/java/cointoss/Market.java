@@ -20,7 +20,7 @@ import java.util.function.Function;
 
 import cointoss.market.MarketProvider;
 import cointoss.order.Order;
-import cointoss.order.OrderBook;
+import cointoss.order.OrderBookManager;
 import cointoss.order.OrderManager;
 import cointoss.ticker.TickerManager;
 import cointoss.util.Num;
@@ -61,7 +61,7 @@ public class Market implements Disposable {
     }).skip(e -> e == null || e == Execution.BASE);
 
     /** The order book. */
-    public final OrderBook orderBook = new OrderBook();
+    public final OrderBookManager orderBook = new OrderBookManager();
 
     /** The order manager. */
     public final OrderManager orders;

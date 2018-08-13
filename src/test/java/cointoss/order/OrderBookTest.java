@@ -9,14 +9,9 @@
  */
 package cointoss.order;
 
-import java.util.concurrent.ConcurrentSkipListMap;
-
-import cointoss.util.Num;
-
 /**
- * @version 2018/08/13 21:34:09
+ * @version 2018/08/13 21:34:30
  */
-public class OrderBook {
+class OrderBookTest {
 
-    private final ConcurrentSkipListMap<Num, Num> orders = new ConcurrentSkipListMap();
 }

@@ -49,12 +49,15 @@ public class OrderBookList {
     final ObservableList<OrderUnit> x100;
 
     /** The base list. */
+    final ObservableList<OrderUnit> x500;
+
+    /** The base list. */
     final ObservableList<OrderUnit> x1000;
 
     /** The base list. */
     final ObservableList<OrderUnit> x10000;
 
-    private Grouped[] group = new Grouped[4];
+    private Grouped[] group = new Grouped[5];
 
     /**
      * @param side
@@ -64,13 +67,15 @@ public class OrderBookList {
         this.x1 = FXCollections.observableList(GapList.create());
         this.x10 = FXCollections.observableList(GapList.create());
         this.x100 = FXCollections.observableList(GapList.create());
+        this.x500 = FXCollections.observableList(GapList.create());
         this.x1000 = FXCollections.observableList(GapList.create());
         this.x10000 = FXCollections.observableList(GapList.create());
 
-        group[0] = new Grouped(side, -1, x10);
-        group[1] = new Grouped(side, -2, x100);
-        group[2] = new Grouped(side, -3, x1000);
-        group[3] = new Grouped(side, -4, x10000);
+        group[0] = new Grouped(side, Num.of(10), x10);
+        group[1] = new Grouped(side, Num.of(100), x100);
+        group[2] = new Grouped(side, Num.of(500), x500);
+        group[3] = new Grouped(side, Num.of(1000), x1000);
+        group[4] = new Grouped(side, Num.of(10000), x10000);
     }
 
     /**
@@ -115,6 +120,9 @@ public class OrderBookList {
 
         case x100:
             return x100;
+
+        case x500:
+            return x500;
 
         case x1000:
             return x1000;
@@ -345,10 +353,21 @@ public class OrderBookList {
     }
 
     /**
+     * Calculate the grouped price.
+     * 
+     * @param price
+     * @param range
+     * @return
+     */
+    static Num calculateGroupedPrice(Num price, Num range) {
+        return price.minus(price.remainder(range));
+    }
+
+    /**
      * @version 2017/12/01 13:04:56
      */
     public static enum Range {
-        x1(1), x10(10), x100(100), x1000(1000), x10000(10000);
+        x1(1), x10(10), x100(100), x500(500), x1000(1000), x10000(10000);
 
         public final int ratio;
 
@@ -376,8 +395,8 @@ public class OrderBookList {
         /** The search direction. */
         private final Side side;
 
-        /** The scale. */
-        private final int scale;
+        /** The price range. */
+        private final Num range;
 
         /** The base list. */
         public final ObservableList<OrderUnit> list;
@@ -386,9 +405,9 @@ public class OrderBookList {
          * @param side
          * @param scale
          */
-        private Grouped(Side side, int scale, ObservableList<OrderUnit> list) {
+        private Grouped(Side side, Num range, ObservableList<OrderUnit> list) {
             this.side = side;
-            this.scale = scale;
+            this.range = range;
             this.list = list;
         }
 
@@ -399,7 +418,7 @@ public class OrderBookList {
          * @param size
          */
         private void update(Num price, Num size) {
-            price = price.scaleDown(scale);
+            price = calculateGroupedPrice(price, range);
 
             if (side == Side.BUY) {
                 head(price, size);
