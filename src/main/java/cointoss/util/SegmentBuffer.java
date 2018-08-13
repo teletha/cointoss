@@ -265,25 +265,24 @@ public final class SegmentBuffer<E> {
         }
 
         // uncompleted
-        int size = blockNextIndex;
-
         for (Object[] segment : blocks) {
-            if (start < size) {
-                if (end <= size) {
-                    for (int i = start; i < end; i++) {
+            if (start < FixedRowSize) {
+                if (end <= FixedRowSize) {
+                    int stop = Math.min(end, sizeUncompleted);
+                    for (int i = start; i < stop; i++) {
                         each.accept((E) segment[i]);
                     }
                     return;
                 } else {
-                    for (int i = start; i < size; i++) {
+                    for (int i = start; i < FixedRowSize; i++) {
                         each.accept((E) segment[i]);
                     }
                     start = 0;
-                    end -= size;
+                    end -= FixedRowSize;
                 }
             } else {
-                start -= size;
-                end -= size;
+                start -= FixedRowSize;
+                end -= FixedRowSize;
             }
         }
     }
