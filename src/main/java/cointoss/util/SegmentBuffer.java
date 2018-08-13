@@ -19,7 +19,7 @@ import kiss.I;
 import kiss.Signal;
 
 /**
- * @version 2018/08/13 7:16:42
+ * @version 2018/08/13 17:28:37
  */
 public final class SegmentBuffer<E> {
 
@@ -33,7 +33,7 @@ public final class SegmentBuffer<E> {
     private int completedSize;
 
     /** The completed data manager. */
-    private final ConcurrentSkipListMap<LocalDate, Segment<E>> completeds = new ConcurrentSkipListMap();
+    private final ConcurrentSkipListMap<LocalDate, Completed<E>> completeds = new ConcurrentSkipListMap();
 
     /** The uncompleted size. */
     private int uncompletedSize;
@@ -97,7 +97,7 @@ public final class SegmentBuffer<E> {
             uncompleted[uncompletedSize++] = item;
         } catch (ArrayIndexOutOfBoundsException e) {
             completeds.computeIfAbsent(extractor.apply((E) uncompleted[0]), key -> {
-                CompletedSegment segment = new CompletedSegment(uncompleted);
+                Completed segment = new Completed(uncompleted);
                 completedSize += segment.size;
                 return segment;
             });
@@ -145,7 +145,7 @@ public final class SegmentBuffer<E> {
      */
     public void addCompleted(LocalDate date, Signal<E> items) {
         completeds.computeIfAbsent(date, key -> {
-            CompletedSegment segment = new CompletedSegment(segmentSize, items);
+            Completed segment = new Completed(segmentSize, items);
             completedSize += segment.size;
             return segment;
         });
@@ -159,7 +159,7 @@ public final class SegmentBuffer<E> {
      */
     public E get(int index) {
         // completed
-        for (Segment<E> segment : completeds.values()) {
+        for (Completed<E> segment : completeds.values()) {
             if (index < segment.size) {
                 return segment.get(index);
             }
@@ -272,7 +272,7 @@ public final class SegmentBuffer<E> {
         }
 
         // completed
-        for (Segment segment : completeds.values()) {
+        for (Completed segment : completeds.values()) {
             int size = segment.size;
             if (start < size) {
                 if (end <= size) {
@@ -298,51 +298,14 @@ public final class SegmentBuffer<E> {
     }
 
     /**
-     * @version 2018/08/12 7:35:26
+     * @version 2018/08/13 7:22:22
      */
-    private static abstract class Segment<E> {
+    private static class Completed<E> {
 
         /**
          * Return the item size.
          */
-        protected int size;
-
-        /**
-         * Get an item at the specified index.
-         * 
-         * @param index
-         * @return
-         */
-        abstract E get(int index);
-
-        /**
-         * Get the first item.
-         * 
-         * @return
-         */
-        abstract E first();
-
-        /**
-         * Get the first item.
-         * 
-         * @return
-         */
-        abstract E last();
-
-        /**
-         * Signal all items from start to end.
-         * 
-         * @param start A start index (included).
-         * @param end A end index (excluded).
-         * @param each An item processor.
-         */
-        abstract void each(int start, int end, Consumer<? super E> each);
-    }
-
-    /**
-     * @version 2018/08/13 7:22:22
-     */
-    private static class CompletedSegment<E> extends Segment<E> {
+        private int size;
 
         /** The actual data manager. */
         private final Object[] items;
@@ -350,7 +313,7 @@ public final class SegmentBuffer<E> {
         /**
          * Completed segment.
          */
-        private CompletedSegment(int segmentSize, Signal<E> items) {
+        private Completed(int segmentSize, Signal<E> items) {
             this.items = new Object[segmentSize];
 
             items.to(e -> {
@@ -361,40 +324,47 @@ public final class SegmentBuffer<E> {
         /**
          * Completed segment.
          */
-        private CompletedSegment(Object[] items) {
+        private Completed(Object[] items) {
             this.items = items;
             this.size = items.length;
         }
 
         /**
-         * {@inheritDoc}
+         * Get an item at the specified index.
+         * 
+         * @param index
+         * @return
          */
-        @Override
-        E get(int index) {
+        private E get(int index) {
             return (E) items[index];
         }
 
         /**
-         * {@inheritDoc}
+         * Get the first item.
+         * 
+         * @return
          */
-        @Override
-        E first() {
+        private E first() {
             return size == 0 ? null : (E) items[0];
         }
 
         /**
-         * {@inheritDoc}
+         * Get the first item.
+         * 
+         * @return
          */
-        @Override
-        E last() {
+        private E last() {
             return size == 0 ? null : (E) items[size - 1];
         }
 
         /**
-         * {@inheritDoc}
+         * Signal all items from start to end.
+         * 
+         * @param start A start index (included).
+         * @param end A end index (excluded).
+         * @param each An item processor.
          */
-        @Override
-        void each(int start, int end, Consumer<? super E> each) {
+        private void each(int start, int end, Consumer<? super E> each) {
             int stop = Math.min(end, size);
 
             for (int i = start; i < stop; i++) {

@@ -400,7 +400,7 @@ public class MarketLog {
      * @return
      */
     public final Signal<Execution> fromToday() {
-        return from(ZonedDateTime.now());
+        return fromLast(0);
     }
 
     /**
@@ -420,18 +420,7 @@ public class MarketLog {
      * @return
      */
     public final Signal<Execution> fromLast(int days) {
-        return fromLast(days, ChronoUnit.DAYS);
-    }
-
-    /**
-     * Read log from the specified date.
-     * 
-     * @param time A duration.
-     * @param unit A duration unit.
-     * @return
-     */
-    public final Signal<Execution> fromLast(int time, ChronoUnit unit) {
-        return from(ZonedDateTime.now(Chrono.UTC).minus(time, unit));
+        return from(Chrono.utcNow().minusDays(days));
     }
 
     /**

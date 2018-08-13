@@ -9,8 +9,6 @@
  */
 package trademate;
 
-import java.time.temporal.ChronoUnit;
-
 import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.order.Order;
@@ -86,7 +84,7 @@ public class TradingView extends View {
      */
     public final synchronized Market market() {
         if (market == null) {
-            Viewtify.Terminator.add(market = new Market(service).readLog(log -> log.fromLast(2, ChronoUnit.HOURS).share()));
+            Viewtify.Terminator.add(market = new Market(service).readLog(log -> log.fromYestaday().share()));
         }
         return market;
     }
