@@ -178,13 +178,8 @@ public final class Ticker {
      */
     public final void each(int start, int size, Consumer<Tick> consumer) {
         lock.readLock().lock();
-
-        size = Math.min(start + size, ticks.size());
-
         try {
-            for (int i = start; i < size; i++) {
-                consumer.accept(ticks.get(i));
-            }
+            ticks.each(start, start + Math.min(start + size, ticks.size()), consumer);
         } finally {
             lock.readLock().unlock();
         }
