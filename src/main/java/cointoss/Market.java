@@ -33,7 +33,7 @@ import kiss.Variable;
 /**
  * Facade for the market related operations.
  * 
- * @version 2018/07/09 2:05:57
+ * @version 2018/08/14 1:04:19
  */
 public class Market implements Disposable {
 
@@ -60,11 +60,11 @@ public class Market implements Disposable {
         return previous;
     }).skip(e -> e == null || e == Execution.BASE);
 
-    /** The order book. */
-    public final OrderBookManager orderBook = new OrderBookManager();
-
     /** The order manager. */
     public final OrderManager orders;
+
+    /** The order books. */
+    public final OrderBookManager orderBook;
 
     /** The ticker manager. */
     public final TickerManager tickers = new TickerManager();
@@ -100,6 +100,7 @@ public class Market implements Disposable {
     public Market(MarketService service) {
         this.service = Objects.requireNonNull(service, "Market is not found.");
         this.orders = new OrderManager(service);
+        this.orderBook = new OrderBookManager(service);
         this.positions = new PositionManager(service, tickers.latest);
 
         // initialize currency data

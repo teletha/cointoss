@@ -23,196 +23,196 @@ import cointoss.util.Num;
 class OrderBookListTest {
 
     @Test
-    public void buy() throws Exception {
-        OrderBookList list = new OrderBookList(Side.BUY);
+    void buy() throws Exception {
+        OrderBookList list = new OrderBookList(Side.BUY, Num.ONE);
 
         // add
         list.update(unit(1000, 1));
-        assert list.x1.get(0).price.is(1000);
+        assert list.base.get(0).price.is(1000);
         // assert list.x1.get(0).total.is(1);
 
         list.update(unit(1002, 1));
-        assert list.x1.get(0).price.is(1002);
+        assert list.base.get(0).price.is(1002);
         // assert list.x1.get(0).total.is(1);
-        assert list.x1.get(1).price.is(1000);
+        assert list.base.get(1).price.is(1000);
         // assert list.x1.get(1).total.is(2);
 
         list.update(unit(1001, 1));
-        assert list.x1.get(0).price.is(1002);
+        assert list.base.get(0).price.is(1002);
         // assert list.x1.get(0).total.is(1);
-        assert list.x1.get(1).price.is(1001);
-        assert list.x1.get(1).size.is(1);
+        assert list.base.get(1).price.is(1001);
+        assert list.base.get(1).size.is(1);
         // assert list.x1.get(1).total.is(2);
-        assert list.x1.get(2).price.is(1000);
+        assert list.base.get(2).price.is(1000);
         // assert list.x1.get(2).total.is(3);
 
         // replace
         list.update(unit(1001, 2));
-        assert list.x1.get(0).price.is(1002);
+        assert list.base.get(0).price.is(1002);
         // assert list.x1.get(0).total.is(1);
-        assert list.x1.get(1).price.is(1001);
-        assert list.x1.get(1).size.is(2);
+        assert list.base.get(1).price.is(1001);
+        assert list.base.get(1).size.is(2);
         // assert list.x1.get(1).total.is(3);
-        assert list.x1.get(2).price.is(1000);
+        assert list.base.get(2).price.is(1000);
         // assert list.x1.get(2).total.is(4);
 
         // remove
         list.update(unit(1000, 0));
-        assert list.x1.size() == 2;
-        assert list.x1.get(0).price.is(1002);
+        assert list.base.size() == 2;
+        assert list.base.get(0).price.is(1002);
         // assert list.x1.get(0).total.is(1);
-        assert list.x1.get(1).price.is(1001);
+        assert list.base.get(1).price.is(1001);
         // assert list.x1.get(1).total.is(3);
 
     }
 
     @Test
-    public void sell() throws Exception {
-        OrderBookList list = new OrderBookList(Side.SELL);
+    void sell() throws Exception {
+        OrderBookList list = new OrderBookList(Side.SELL, Num.ONE);
         list.update(unit(1000, 1));
-        assert list.x1.get(0).price.is(1000);
+        assert list.base.get(0).price.is(1000);
         // assert list.x1.get(0).total.is(1);
 
         list.update(unit(1002, 1));
-        assert list.x1.get(0).price.is(1002);
+        assert list.base.get(0).price.is(1002);
         // assert list.x1.get(0).total.is(2);
-        assert list.x1.get(1).price.is(1000);
+        assert list.base.get(1).price.is(1000);
         // assert list.x1.get(1).total.is(1);
 
         list.update(unit(1001, 1));
-        assert list.x1.get(0).price.is(1002);
+        assert list.base.get(0).price.is(1002);
         // assert list.x1.get(0).total.is(3);
-        assert list.x1.get(1).price.is(1001);
-        assert list.x1.get(1).size.is(1);
+        assert list.base.get(1).price.is(1001);
+        assert list.base.get(1).size.is(1);
         // assert list.x1.get(1).total.is(2);
-        assert list.x1.get(2).price.is(1000);
+        assert list.base.get(2).price.is(1000);
         // assert list.x1.get(2).total.is(1);
 
         // replace
         list.update(unit(1001, 2));
-        assert list.x1.get(0).price.is(1002);
+        assert list.base.get(0).price.is(1002);
         // assert list.x1.get(0).total.is(4);
-        assert list.x1.get(1).price.is(1001);
-        assert list.x1.get(1).size.is(2);
+        assert list.base.get(1).price.is(1001);
+        assert list.base.get(1).size.is(2);
         // assert list.x1.get(1).total.is(3);
-        assert list.x1.get(2).price.is(1000);
+        assert list.base.get(2).price.is(1000);
         // assert list.x1.get(2).total.is(1);
 
         // remove
         list.update(unit(1000, 0));
-        assert list.x1.size() == 2;
-        assert list.x1.get(0).price.is(1002);
+        assert list.base.size() == 2;
+        assert list.base.get(0).price.is(1002);
         // assert list.x1.get(0).total.is(3);
-        assert list.x1.get(1).price.is(1001);
+        assert list.base.get(1).price.is(1001);
         // assert list.x1.get(1).total.is(2);
     }
 
     @Test
-    public void buyFix() throws Exception {
-        OrderBookList list = new OrderBookList(Side.BUY);
+    void buyFix() throws Exception {
+        OrderBookList list = new OrderBookList(Side.BUY, Num.ONE);
         list.update(unit(1007, 1));
         list.update(unit(1006, 1));
         list.update(unit(1005, 1));
         list.update(unit(1004, 1));
         list.update(unit(1003, 1));
         list.update(unit(1000, 1));
-        assert list.x1.size() == 6;
+        assert list.base.size() == 6;
 
         // fix error
         list.fix(Num.of(1006));
-        assertList(list.x1, 0, 1006, 1, 1);
-        assertList(list.x1, 1, 1005, 1, 2);
-        assertList(list.x1, 2, 1004, 1, 3);
-        assert list.x1.size() == 5;
+        assertList(list.base, 0, 1006, 1, 1);
+        assertList(list.base, 1, 1005, 1, 2);
+        assertList(list.base, 2, 1004, 1, 3);
+        assert list.base.size() == 5;
 
         // fix error : multiple
         list.fix(Num.of(1004));
-        assertList(list.x1, 0, 1004, 1, 1);
-        assertList(list.x1, 1, 1003, 1, 2);
-        assertList(list.x1, 2, 1000, 1, 3);
-        assert list.x1.size() == 3;
+        assertList(list.base, 0, 1004, 1, 1);
+        assertList(list.base, 1, 1003, 1, 2);
+        assertList(list.base, 2, 1000, 1, 3);
+        assert list.base.size() == 3;
 
         // fix error : not exits
         list.fix(Num.of(1002));
-        assertList(list.x1, 0, 1000, 1, 1);
-        assert list.x1.size() == 1;
+        assertList(list.base, 0, 1000, 1, 1);
+        assert list.base.size() == 1;
     }
 
     @Test
-    public void sellFix() throws Exception {
-        OrderBookList list = new OrderBookList(Side.SELL);
+    void sellFix() throws Exception {
+        OrderBookList list = new OrderBookList(Side.SELL, Num.ONE);
         list.update(unit(1007, 1));
         list.update(unit(1004, 1));
         list.update(unit(1003, 1));
         list.update(unit(1002, 1));
         list.update(unit(1001, 1));
         list.update(unit(1000, 1));
-        assert list.x1.size() == 6;
+        assert list.base.size() == 6;
 
         // fix error
         list.fix(Num.of(1001));
-        assert list.x1.size() == 5;
+        assert list.base.size() == 5;
 
         // fix error : multiple
         list.fix(Num.of(1003));
-        assert list.x1.size() == 3;
+        assert list.base.size() == 3;
 
         // fix error : not exits
         list.fix(Num.of(1005));
-        assert list.x1.size() == 1;
+        assert list.base.size() == 1;
     }
 
     @Test
-    public void buyGroup() throws Exception {
-        OrderBookList list = new OrderBookList(Side.BUY);
+    void buyGroup() throws Exception {
+        OrderBookList list = new OrderBookList(Side.BUY, Num.ONE, Num.TEN);
         list.update(unit(1000, 1));
-        assertList(list.x10, 0, 1000, 1, 1);
+        assertList(list.selectBy(Num.TEN), 0, 1000, 1, 1);
 
         // add
         list.update(unit(1009, 1));
-        assertList(list.x10, 0, 1000, 2, 2);
+        assertList(list.selectBy(Num.TEN), 0, 1000, 2, 2);
 
         // minus
         list.update(unit(1000, 0));
-        assertList(list.x10, 0, 1000, 1, 1);
+        assertList(list.selectBy(Num.TEN), 0, 1000, 1, 1);
 
         // next group
         list.update(unit(1010, 1));
-        assertList(list.x10, 0, 1010, 1, 1);
-        assertList(list.x10, 1, 1000, 1, 2);
+        assertList(list.selectBy(Num.TEN), 0, 1010, 1, 1);
+        assertList(list.selectBy(Num.TEN), 1, 1000, 1, 2);
 
         // remove
         list.update(unit(1009, 0));
-        assertList(list.x10, 0, 1010, 1, 1);
+        assertList(list.selectBy(Num.TEN), 0, 1010, 1, 1);
     }
 
     @Test
-    public void sellGroup() throws Exception {
-        OrderBookList list = new OrderBookList(Side.SELL);
+    void sellGroup() throws Exception {
+        OrderBookList list = new OrderBookList(Side.SELL, Num.ONE, Num.TEN);
         list.update(unit(1000, 1));
-        assertList(list.x10, 0, 1000, 1, 1);
+        assertList(list.selectBy(Num.TEN), 0, 1000, 1, 1);
 
         // add
         list.update(unit(1009, 1));
-        assertList(list.x10, 0, 1000, 2, 2);
+        assertList(list.selectBy(Num.TEN), 0, 1000, 2, 2);
 
         // minus
         list.update(unit(1000, 0));
-        assertList(list.x10, 0, 1000, 1, 1);
+        assertList(list.selectBy(Num.TEN), 0, 1000, 1, 1);
 
         // next group
         list.update(unit(1010, 1));
-        assertList(list.x10, 0, 1010, 1, 2);
-        assertList(list.x10, 1, 1000, 1, 1);
+        assertList(list.selectBy(Num.TEN), 0, 1010, 1, 2);
+        assertList(list.selectBy(Num.TEN), 1, 1000, 1, 1);
 
         // remove
         list.update(unit(1009, 0));
-        assertList(list.x10, 0, 1010, 1, 1);
+        assertList(list.selectBy(Num.TEN), 0, 1010, 1, 1);
     }
 
     @Test
-    public void buyGroupFix() throws Exception {
-        OrderBookList list = new OrderBookList(Side.BUY);
+    void buyGroupFix() throws Exception {
+        OrderBookList list = new OrderBookList(Side.BUY, Num.ONE, Num.TEN);
         list.update(unit(1061, 1));
         list.update(unit(1060, 1));
         list.update(unit(1051, 1));
@@ -225,32 +225,32 @@ class OrderBookListTest {
         list.update(unit(1024, 1));
         list.update(unit(1001, 1));
         list.update(unit(1000, 1));
-        assert list.x10.size() == 6;
+        assert list.selectBy(Num.TEN).size() == 6;
 
         // fix error
         list.fix(Num.of(1051));
-        assert list.x10.size() == 5;
+        assert list.selectBy(Num.TEN).size() == 5;
 
         // fix error : remaining
         list.fix(Num.of(1050));
-        assert list.x10.size() == 5;
+        assert list.selectBy(Num.TEN).size() == 5;
 
         // fix error : multiple
         list.fix(Num.of(1038));
-        assert list.x10.size() == 3;
+        assert list.selectBy(Num.TEN).size() == 3;
 
         // fix error : overlap
         list.fix(Num.of(1030));
-        assert list.x10.size() == 2;
+        assert list.selectBy(Num.TEN).size() == 2;
 
         // fix error : not exist
         list.fix(Num.of(1010));
-        assert list.x10.size() == 1;
+        assert list.selectBy(Num.TEN).size() == 1;
     }
 
     @Test
-    public void sellGroupFix() throws Exception {
-        OrderBookList list = new OrderBookList(Side.SELL);
+    void sellGroupFix() throws Exception {
+        OrderBookList list = new OrderBookList(Side.SELL, Num.ONE, Num.TEN);
         list.update(unit(1061, 1));
         list.update(unit(1060, 1));
         list.update(unit(1043, 1));
@@ -263,34 +263,34 @@ class OrderBookListTest {
         list.update(unit(1010, 1));
         list.update(unit(1001, 1));
         list.update(unit(1000, 1));
-        assert list.x10.size() == 6;
+        assert list.selectBy(Num.TEN).size() == 6;
 
         // fix error
         list.fix(Num.of(1010));
-        assert list.x10.size() == 5;
+        assert list.selectBy(Num.TEN).size() == 5;
 
         // fix error : remaining
         list.fix(Num.of(1011));
-        assert list.x10.size() == 5;
+        assert list.selectBy(Num.TEN).size() == 5;
 
         // fix error : multiple
         list.fix(Num.of(1031));
-        assert list.x10.size() == 3;
+        assert list.selectBy(Num.TEN).size() == 3;
 
         // fix error : overlap
         list.fix(Num.of(1038));
-        assert list.x10.size() == 2;
+        assert list.selectBy(Num.TEN).size() == 2;
 
         // fix error : not exist
         list.fix(Num.of(1050));
-        assert list.x10.size() == 1;
+        assert list.selectBy(Num.TEN).size() == 1;
     }
 
     @Test
-    public void buyBestPrice() throws Exception {
+    void buyBestPrice() throws Exception {
         Num min = Num.of(1099);
 
-        OrderBookList list = new OrderBookList(Side.BUY);
+        OrderBookList list = new OrderBookList(Side.BUY, Num.ONE);
         list.update(unit(1093, 1)); // total 1
         list.update(unit(1077, 1)); // total 2
         list.update(unit(1051, 2)); // total 4
@@ -305,10 +305,10 @@ class OrderBookListTest {
     }
 
     @Test
-    public void sellBestPrice() throws Exception {
+    void sellBestPrice() throws Exception {
         Num min = Num.of(1000);
 
-        OrderBookList list = new OrderBookList(Side.SELL);
+        OrderBookList list = new OrderBookList(Side.SELL, Num.ONE);
         list.update(unit(1093, 30)); // total 47
         list.update(unit(1077, 7)); // total 17
         list.update(unit(1051, 1)); // total 10
@@ -317,7 +317,7 @@ class OrderBookListTest {
         list.update(unit(1013, 2)); // total 4
         list.update(unit(1001, 1)); // total 2
         list.update(unit(1000, 1)); // total 1
-        System.out.println(list.x1);
+        System.out.println(list.base);
         assert list.computeBestPrice(min, Num.of(10), Num.ONE).is(1050);
         assert list.computeBestPrice(min, Num.of(30), Num.ONE).is(1092);
         assert list.computeBestPrice(min, Num.of(4), Num.ONE).is(1012);

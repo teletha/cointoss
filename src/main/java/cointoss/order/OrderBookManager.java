@@ -10,6 +10,7 @@
 package cointoss.order;
 
 import cointoss.Directional;
+import cointoss.MarketService;
 import cointoss.Side;
 import cointoss.util.Num;
 import kiss.Variable;
@@ -20,10 +21,10 @@ import kiss.Variable;
 public class OrderBookManager {
 
     /** ASK */
-    public final OrderBookList shorts = new OrderBookList(Side.SELL);
+    public final OrderBookList shorts;
 
     /** BID */
-    public final OrderBookList longs = new OrderBookList(Side.BUY);
+    public final OrderBookList longs;
 
     /** The current spread. */
     public final Variable<Num> spread = Variable.of(Num.ZERO);
@@ -31,7 +32,9 @@ public class OrderBookManager {
     /**
      * 
      */
-    public OrderBookManager() {
+    public OrderBookManager(MarketService service) {
+        this.shorts = new OrderBookList(Side.SELL, service.baseCurrencyMinimumBidPrice(), service.orderBookGroupRanges());
+        this.longs = new OrderBookList(Side.BUY, service.baseCurrencyMinimumBidPrice(), service.orderBookGroupRanges());
         shorts.best.observe().combineLatest(longs.best.observe()).to(v -> spread.set(v.ⅰ.price.minus(v.ⅱ.price)));
     }
 

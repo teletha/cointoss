@@ -21,6 +21,7 @@ import cointoss.util.LogCodec;
 import cointoss.util.Network;
 import cointoss.util.Num;
 import kiss.Disposable;
+import kiss.I;
 import kiss.Signal;
 
 /**
@@ -188,6 +189,20 @@ public abstract class MarketService implements Disposable {
      * @return
      */
     public abstract Signal<OrderBookListChange> orderBook();
+
+    /**
+     * Get the price range of grouped order books.
+     */
+    public final List<Num> orderBookGroupRanges() {
+        return configuration.orderBookGroupRanges;
+    }
+
+    /**
+     * Get the price range of grouped order books.
+     */
+    public final List<Num> orderBookGroupRangesWithBase() {
+        return I.signal(configuration.orderBookGroupRanges).startWith(baseCurrencyMinimumBidPrice()).toList();
+    }
 
     /**
      * Build execution from log.

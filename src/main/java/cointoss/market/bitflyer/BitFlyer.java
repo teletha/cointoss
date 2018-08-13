@@ -15,9 +15,10 @@ import cointoss.MarketConfiguration;
 import cointoss.MarketService;
 import cointoss.market.MarketProvider;
 import cointoss.util.Num;
+import kiss.I;
 
 /**
- * @version 2018/07/28 17:45:22
+ * @version 2018/08/14 0:56:58
  */
 public final class BitFlyer extends MarketProvider {
 
@@ -25,6 +26,7 @@ public final class BitFlyer extends MarketProvider {
     private static Consumer<MarketConfiguration> FiatBase = config -> {
         config.baseCurrencyMinimumBidPrice = Num.of(1);
         config.targetCurrencyMinimumBidSize = Num.of("0.01");
+        config.orderBookGroupRanges = I.list(Num.of(100), Num.of(250), Num.of(500), Num.of(1000), Num.of(5000));
     };
 
     /** Reusable market configuration. */

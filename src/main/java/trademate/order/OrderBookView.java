@@ -15,8 +15,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
 import cointoss.order.OrderBookManager;
-import cointoss.order.OrderBookList;
-import cointoss.order.OrderBookList.Range;
 import cointoss.order.OrderUnit;
 import cointoss.util.Num;
 import trademate.TradingView;
@@ -39,7 +37,7 @@ public class OrderBookView extends View {
     private @UI UIListView<OrderUnit> shortList;
 
     /** UI for interval configuration. */
-    private @UI UISpinner<OrderBookList.Range> priceRange;
+    private @UI UISpinner<Num> priceRange;
 
     /** UI for interval configuration. */
     private @UI UILabel priceLatest;
@@ -74,7 +72,7 @@ public class OrderBookView extends View {
                 .filter(hideSize, (unit, size) -> unit.size.isGreaterThanOrEqual(size))
                 .scrollToBottom();
 
-        priceRange.values(0, Range.class).observeNow(range -> {
+        priceRange.values(0, view.market().service.orderBookGroupRangesWithBase()).observeNow(range -> {
             longList.values(book.longs.selectBy(range));
             shortList.values(book.shorts.selectBy(range));
         });
@@ -97,7 +95,7 @@ public class OrderBookView extends View {
             setOnMouseClicked(e -> {
                 if (getListView() == longList.ui) {
                     Num min = getItem().price;
-                    Num max = min.plus(priceRange.value().ratio);
+                    Num max = min.plus(priceRange.value());
                     Num best = book.longs.computeBestPrice(max, Num.of(3), Num.ONE);
                     orderPrice.setText(best.toString());
                 } else {

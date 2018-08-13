@@ -9,12 +9,14 @@
  */
 package cointoss;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import cointoss.util.Num;
 
 /**
- * @version 2018/08/10 8:13:03
+ * @version 2018/08/14 0:55:28
  */
 public final class MarketConfiguration {
 
@@ -29,10 +31,16 @@ public final class MarketConfiguration {
     public Num targetCurrencyMinimumBidSize;
 
     /**
+     * Configure the price range of grouped order books.
+     */
+    public List<Num> orderBookGroupRanges = new ArrayList(4);
+
+    /**
      * Set up and validate.
      */
     void initialize() {
         Objects.requireNonNull(baseCurrencyMinimumBidPrice);
         Objects.requireNonNull(targetCurrencyMinimumBidSize);
+        Objects.requireNonNull(orderBookGroupRanges);
     }
 }
