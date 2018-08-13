@@ -26,7 +26,7 @@ public final class BitFlyer extends MarketProvider {
     private static Consumer<MarketConfiguration> FiatBase = config -> {
         config.baseCurrencyMinimumBidPrice = Num.of(1);
         config.targetCurrencyMinimumBidSize = Num.of("0.01");
-        config.orderBookGroupRanges = I.list(Num.of(100), Num.of(250), Num.of(500), Num.of(1000), Num.of(5000));
+        config.orderBookGroupRanges = I.list(Num.of(100), Num.of(250), Num.of(500), Num.of(1000), Num.of(2500));
     };
 
     /** Reusable market configuration. */

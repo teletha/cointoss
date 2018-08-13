@@ -61,6 +61,7 @@ public class OrderBookList {
      */
     OrderBookList(Side side, Num base, List<Num> ranges) {
         this.side = side;
+
         registerGroupRange(true, List.of(base));
         registerGroupRange(false, ranges);
         this.base = selectBy(base);
@@ -353,7 +354,7 @@ public class OrderBookList {
         private final Num range;
 
         /** The base list. */
-        public final ObservableList<OrderUnit> list;
+        private final ObservableList<OrderUnit> list;
 
         /**
          * @param side
