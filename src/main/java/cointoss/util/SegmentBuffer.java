@@ -84,12 +84,12 @@ public final class SegmentBuffer<E> {
      * @param items An items to add.
      */
     public void add(E item) {
-        block[blockNextIndex++] = item;
-        uncompletedSize++;
-
         if (blockNextIndex == FixedRowSize) {
             createNewBlock();
         }
+
+        block[blockNextIndex++] = item;
+        uncompletedSize++;
     }
 
     /**

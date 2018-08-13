@@ -12,13 +12,15 @@ package cointoss.util;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.LocalDate;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.junit.jupiter.api.Test;
 
 import kiss.I;
 
 /**
- * @version 2018/08/11 17:20:25
+ * @version 2018/08/13 11:17:55
  */
 class SegmentBufferTest {
 
@@ -34,6 +36,24 @@ class SegmentBufferTest {
         assert buffer.size() == 100000;
         for (int i = 0; i < 100000; i++) {
             assert buffer.get(i) == i;
+        }
+    }
+
+    @Test
+    void firstCompleted() {
+        SegmentBuffer<Integer> buffer = new SegmentBuffer();
+        for (int i = 0; i < size; i++) {
+            buffer.addCompleted(date.plusDays(i), i);
+            assert buffer.first() == 0;
+        }
+    }
+
+    @Test
+    void lastCompleted() {
+        SegmentBuffer<Integer> buffer = new SegmentBuffer();
+        for (int i = 0; i < size; i++) {
+            buffer.addCompleted(date.plusDays(i), i);
+            assert buffer.last() == i;
         }
     }
 
@@ -134,6 +154,24 @@ class SegmentBufferTest {
     }
 
     @Test
+    void firstUncompleted() {
+        SegmentBuffer<Integer> buffer = new SegmentBuffer();
+        for (int i = 0; i < 100000; i++) {
+            buffer.add(i);
+            assert buffer.first() == 0;
+        }
+    }
+
+    @Test
+    void lastUncompleted() {
+        SegmentBuffer<Integer> buffer = new SegmentBuffer();
+        for (int i = 0; i < 100000; i++) {
+            buffer.add(i);
+            assert buffer.last() == i;
+        }
+    }
+
+    @Test
     void eachUncompleted() {
         SegmentBuffer<Integer> buffer = new SegmentBuffer();
         buffer.add(1, 2, 3, 4, 5);
@@ -145,5 +183,15 @@ class SegmentBufferTest {
         assertIterableEquals(I.list(4, 5), buffer.each(3, 6).toList());
         assertIterableEquals(I.list(5), buffer.each(4, 7).toList());
         assertIterableEquals(I.list(), buffer.each(5, 8).toList());
+    }
+
+    @Test
+    void eachUncompletedLarge() {
+        int size = 1000000;
+        SegmentBuffer<Integer> buffer = new SegmentBuffer();
+        for (int i = 0; i < size; i++) {
+            buffer.add(i);
+        }
+        assertIterableEquals(IntStream.range(0, size).boxed().collect(Collectors.toList()), buffer.each().toList());
     }
 }
