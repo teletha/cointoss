@@ -161,7 +161,7 @@ public final class SegmentBuffer<E> {
         // completed
         for (Completed<E> segment : completeds.values()) {
             if (index < segment.size) {
-                return segment.get(index);
+                return (E) segment.items[index];
             }
             index -= segment.size;
         }
@@ -327,16 +327,6 @@ public final class SegmentBuffer<E> {
         private Completed(Object[] items) {
             this.items = items;
             this.size = items.length;
-        }
-
-        /**
-         * Get an item at the specified index.
-         * 
-         * @param index
-         * @return
-         */
-        private E get(int index) {
-            return (E) items[index];
         }
 
         /**
