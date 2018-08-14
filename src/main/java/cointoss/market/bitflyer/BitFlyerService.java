@@ -419,6 +419,7 @@ class BitFlyerService extends MarketService {
      * Call private API.
      */
     private <M> Signal<M> call(String method, String path, Object body, String selector, Class<M> type) {
+        System.out.println(body);
         StringBuilder builder = new StringBuilder();
         I.write(body, builder);
 
@@ -571,6 +572,7 @@ class BitFlyerService extends MarketService {
         public int minute_to_expire;
 
         public String time_in_force;
+
     }
 
     /**
@@ -637,6 +639,7 @@ class BitFlyerService extends MarketService {
         public String lang = "ja";
 
         public String account_id;
+
     }
 
     /**
