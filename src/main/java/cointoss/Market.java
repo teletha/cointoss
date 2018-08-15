@@ -242,6 +242,8 @@ public class Market implements Disposable {
     public void stop() {
         Num bestPrice = orderBook.computeBestPrice(positions, tickers.latest.v.price, Num.ONE, Num.ONE);
         System.out.println(bestPrice);
+
+        orders.cancelNowAll();
     }
 
     /**

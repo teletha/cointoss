@@ -11,6 +11,7 @@ package cointoss.util;
 
 import static java.util.concurrent.TimeUnit.*;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -29,10 +30,12 @@ import kiss.Signal;
 import okhttp3.ConnectionPool;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 import okhttp3.WebSocket;
 import okhttp3.WebSocketListener;
+import okio.Buffer;
 
 /**
  * @version 2018/07/15 18:19:34
@@ -86,11 +89,28 @@ public class Network {
         }
     }
 
+    private static String bodyToString(final Request request) {
+        try {
+            RequestBody body = request.body();
+
+            if (body == null) {
+                return "";
+            }
+            final Request copy = request.newBuilder().build();
+            final Buffer buffer = new Buffer();
+            copy.body().writeTo(buffer);
+            return buffer.readUtf8();
+        } catch (final IOException e) {
+            return "did not work";
+        }
+    }
+
     /**
      * Call REST API.
      */
     public <M> Signal<M> rest(Request request, String selector, Class<M> type) {
         return new Signal<>((observer, disposer) -> {
+            System.out.println(request + "  " + bodyToString(request));
             try (Response response = client().newCall(request).execute(); ResponseBody body = response.body()) {
                 String value = body.string();
                 int code = response.code();

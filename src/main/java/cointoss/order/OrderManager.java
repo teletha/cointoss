@@ -98,9 +98,9 @@ public final class OrderManager {
     }
 
     /**
-     * Build the {@link Signal} which requests the specified {@link Order} to the market. This method
-     * DON'T request order, you MUST subscribe {@link Signal}. If you want to request actually, you can
-     * use {@link #requestNow(Order)}.
+     * Build the {@link Signal} which requests the specified {@link Order} to the market. This
+     * method DON'T request order, you MUST subscribe {@link Signal}. If you want to request
+     * actually, you can use {@link #requestNow(Order)}.
      * 
      * @param order A order to request.
      * @return A order request process.
@@ -139,9 +139,9 @@ public final class OrderManager {
     }
 
     /**
-     * Build the {@link Signal} which cancels the specified {@link Order} from the market. This method
-     * DON'T cancel order, you MUST subscribe {@link Signal}. If you want to cancel actually, you can
-     * use {@link #cancelNow(Order)}.
+     * Build the {@link Signal} which cancels the specified {@link Order} from the market. This
+     * method DON'T cancel order, you MUST subscribe {@link Signal}. If you want to cancel actually,
+     * you can use {@link #cancelNow(Order)}.
      * 
      * @param order A order to cancel.
      * @return A order cancel process.
@@ -173,6 +173,15 @@ public final class OrderManager {
         cancel(order).to(I.NoOP);
 
         return order;
+    }
+
+    /**
+     * Cancel all orders.
+     */
+    public void cancelNowAll() {
+        for (Order order : items) {
+            cancelNow(order);
+        }
     }
 
     /**
