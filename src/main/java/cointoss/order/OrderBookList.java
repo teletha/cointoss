@@ -64,9 +64,9 @@ public class OrderBookList {
     OrderBookList(Side side, Num base, List<Num> ranges) {
         this.side = Objects.requireNonNull(side);
 
-        this.base = FXCollections.observableList(GapList.create());
+        this.base = FXCollections.observableList(new OrderUnitList());
         for (Num range : ranges) {
-            groups.add(new Grouped(side, range, FXCollections.observableList(GapList.create())));
+            groups.add(new Grouped(side, range, FXCollections.observableList(new OrderUnitList())));
         }
     }
 
@@ -75,7 +75,7 @@ public class OrderBookList {
      * 
      * @return
      */
-    public synchronized OrderUnit min() {
+    public OrderUnit min() {
         if (base.isEmpty()) {
             return null;
         } else {
@@ -88,7 +88,7 @@ public class OrderBookList {
      * 
      * @return
      */
-    public synchronized OrderUnit max() {
+    public OrderUnit max() {
         if (base.isEmpty()) {
             return null;
         } else {
@@ -111,7 +111,7 @@ public class OrderBookList {
         return base;
     }
 
-    public synchronized Num computeBestPrice(Num threshold, Num diff) {
+    public Num computeBestPrice(Num threshold, Num diff) {
         return computeBestPrice(best.v.price, threshold, diff);
     }
 
@@ -129,7 +129,7 @@ public class OrderBookList {
      * 
      * @return
      */
-    public synchronized Num computeBestPrice(Num start, Num threshold, Num diff) {
+    public Num computeBestPrice(Num start, Num threshold, Num diff) {
         Num total = Num.ZERO;
         if (side == Side.BUY) {
             for (OrderUnit unit : base) {
@@ -438,6 +438,24 @@ public class OrderBookList {
                 }
             }
             list.add(0, new OrderUnit(price, size));
+        }
+    }
+
+    /**
+     * @version 2018/08/19 0:55:26
+     */
+    private static class OrderUnitList extends GapList<OrderUnit> {
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public OrderUnit get(int index) {
+            try {
+                return super.get(index);
+            } catch (IndexOutOfBoundsException e) {
+                return new OrderUnit(Num.ZERO, Num.ZERO);
+            }
         }
     }
 }

@@ -24,9 +24,6 @@ public class OrderUnit implements Comparable<OrderUnit> {
     /** IMMUTABLE */
     public Num size;
 
-    private OrderUnit() {
-    }
-
     /**
      * @param price
      * @param size
