@@ -10,9 +10,8 @@
 package cointoss.order;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Objects;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -26,7 +25,7 @@ import kiss.Signaling;
 import kiss.Variable;
 
 /**
- * @version 2018/08/14 1:27:31
+ * @version 2018/08/18 23:06:19
  */
 public class OrderBookList {
 
@@ -45,12 +44,13 @@ public class OrderBookList {
     /** The base list. */
     final ObservableList<OrderUnit> base;
 
-    private Map<Num, ObservableList<OrderUnit>> lists = new HashMap();
-
-    private List<Grouped> groups = new ArrayList();
+    /** The grouped list. */
+    private final List<Grouped> groups = new ArrayList();
 
     /**
      * @param side
+     * @param base
+     * @param ranges
      */
     OrderBookList(Side side, Num base, Num... ranges) {
         this(side, base, List.of(ranges));
@@ -58,20 +58,15 @@ public class OrderBookList {
 
     /**
      * @param side
+     * @param base
+     * @param ranges
      */
     OrderBookList(Side side, Num base, List<Num> ranges) {
-        this.side = side;
+        this.side = Objects.requireNonNull(side);
 
-        registerGroupRange(true, List.of(base));
-        registerGroupRange(false, ranges);
-        this.base = selectBy(base);
-    }
-
-    private void registerGroupRange(boolean base, List<Num> ranges) {
+        this.base = FXCollections.observableList(GapList.create());
         for (Num range : ranges) {
-            ObservableList<OrderUnit> list = FXCollections.observableList(GapList.create());
-            lists.put(range, list);
-            if (!base) groups.add(new Grouped(side, range, list));
+            groups.add(new Grouped(side, range, FXCollections.observableList(GapList.create())));
         }
     }
 
@@ -108,7 +103,12 @@ public class OrderBookList {
      * @return
      */
     public ObservableList<OrderUnit> selectBy(Num range) {
-        return lists.get(range);
+        for (Grouped grouped : groups) {
+            if (grouped.range.is(range)) {
+                return grouped.list;
+            }
+        }
+        return base;
     }
 
     public synchronized Num computeBestPrice(Num threshold, Num diff) {
