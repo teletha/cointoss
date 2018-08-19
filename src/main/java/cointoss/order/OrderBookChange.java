@@ -15,7 +15,7 @@ import java.util.List;
 /**
  * @version 2018/04/15 20:10:04
  */
-public class OrderBookListChange {
+public class OrderBookChange {
 
     /** The list of long orders. */
     public List<OrderUnit> bids = new ArrayList();

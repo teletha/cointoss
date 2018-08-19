@@ -16,7 +16,7 @@ import cointoss.Position;
 import cointoss.PositionManager;
 import cointoss.Side;
 import cointoss.order.Order;
-import cointoss.order.OrderBookList;
+import cointoss.order.OrderBook;
 import cointoss.util.Num;
 import trademate.TradingView;
 import viewtify.UI;
@@ -79,7 +79,7 @@ public class PositionCatalog extends View {
      * @param position
      */
     private void retreat(Position position) {
-        OrderBookList book = view.market().orderBook.bookFor(position.inverse());
+        OrderBook book = view.market().orderBook.bookFor(position.inverse());
         Num price = book.computeBestPrice(Num.ZERO, Num.TWO);
 
         view.order(Order.limit(position.inverse(), position.size.v, price));

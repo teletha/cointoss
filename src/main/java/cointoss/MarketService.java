@@ -15,7 +15,7 @@ import java.util.Objects;
 import java.util.function.Consumer;
 
 import cointoss.order.Order;
-import cointoss.order.OrderBookListChange;
+import cointoss.order.OrderBookChange;
 import cointoss.util.Chrono;
 import cointoss.util.LogCodec;
 import cointoss.util.Network;
@@ -188,7 +188,7 @@ public abstract class MarketService implements Disposable {
      * 
      * @return
      */
-    public abstract Signal<OrderBookListChange> orderBook();
+    public abstract Signal<OrderBookChange> orderBook();
 
     /**
      * Get the price range of grouped order books.

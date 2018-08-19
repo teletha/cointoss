@@ -27,7 +27,7 @@ import kiss.Variable;
 /**
  * @version 2018/08/18 23:06:19
  */
-public class OrderBookList {
+public class OrderBook {
 
     /** The best order. */
     public final Variable<OrderUnit> best = Variable.empty();
@@ -52,7 +52,7 @@ public class OrderBookList {
      * @param base
      * @param ranges
      */
-    OrderBookList(Side side, Num base, Num... ranges) {
+    OrderBook(Side side, Num base, Num... ranges) {
         this(side, base, List.of(ranges));
     }
 
@@ -61,12 +61,12 @@ public class OrderBookList {
      * @param base
      * @param ranges
      */
-    OrderBookList(Side side, Num base, List<Num> ranges) {
+    OrderBook(Side side, Num base, List<Num> ranges) {
         this.side = Objects.requireNonNull(side);
 
-        this.base = FXCollections.observableList(new OrderUnitList());
+        this.base = FXCollections.observableList(new UnitList());
         for (Num range : ranges) {
-            groups.add(new Grouped(side, range, FXCollections.observableList(new OrderUnitList())));
+            groups.add(new Grouped(side, range, FXCollections.observableList(new UnitList())));
         }
     }
 
@@ -162,7 +162,7 @@ public class OrderBookList {
      * 
      * @param hint A price hint.
      */
-    public synchronized void fix(Num hint) {
+    public void fix(Num hint) {
         if (side == Side.BUY) {
             for (int i = 0; i < base.size();) {
                 OrderUnit unit = base.get(i);
@@ -200,7 +200,7 @@ public class OrderBookList {
      * 
      * @param asks
      */
-    public synchronized void update(List<OrderUnit> units) {
+    public void update(List<OrderUnit> units) {
         if (side == Side.BUY) {
             for (OrderUnit unit : units) {
                 head(unit);
@@ -444,7 +444,8 @@ public class OrderBookList {
     /**
      * @version 2018/08/19 0:55:26
      */
-    private static class OrderUnitList extends GapList<OrderUnit> {
+    @SuppressWarnings("serial")
+    private static class UnitList extends GapList<OrderUnit> {
 
         /**
          * {@inheritDoc}

@@ -37,7 +37,7 @@ import cointoss.MarketConfiguration;
 import cointoss.MarketService;
 import cointoss.Side;
 import cointoss.order.Order;
-import cointoss.order.OrderBookListChange;
+import cointoss.order.OrderBookChange;
 import cointoss.order.OrderState;
 import cointoss.order.OrderUnit;
 import cointoss.util.Chrono;
@@ -379,7 +379,7 @@ class BitFlyerService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<OrderBookListChange> orderBook() {
+    public Signal<OrderBookChange> orderBook() {
         return snapshotOrderBook().merge(realtimeOrderBook());
     }
 
@@ -388,8 +388,8 @@ class BitFlyerService extends MarketService {
      * 
      * @return
      */
-    private Signal<OrderBookListChange> snapshotOrderBook() {
-        return call("GET", "/v1/board?product_code=" + marketName, "", "", OrderBookListChange.class);
+    private Signal<OrderBookChange> snapshotOrderBook() {
+        return call("GET", "/v1/board?product_code=" + marketName, "", "", OrderBookChange.class);
     }
 
     /**
@@ -397,11 +397,11 @@ class BitFlyerService extends MarketService {
      * 
      * @return
      */
-    private Signal<OrderBookListChange> realtimeOrderBook() {
+    private Signal<OrderBookChange> realtimeOrderBook() {
         return network.jsonRPC("wss://ws.lightstream.bitflyer.com/json-rpc", "lightning_board_" + marketName)
                 .map(JsonElement::getAsJsonObject)
                 .map(e -> {
-                    OrderBookListChange change = new OrderBookListChange();
+                    OrderBookChange change = new OrderBookChange();
                     JsonArray asks = e.get("asks").getAsJsonArray();
 
                     for (int i = 0; i < asks.size(); i++) {

@@ -19,7 +19,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import cointoss.Execution;
 import cointoss.MarketService;
 import cointoss.order.Order;
-import cointoss.order.OrderBookListChange;
+import cointoss.order.OrderBookChange;
 import cointoss.order.OrderState;
 import cointoss.order.OrderType;
 import cointoss.order.QuantityCondition;
@@ -211,7 +211,7 @@ public class TestableMarketService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<OrderBookListChange> orderBook() {
+    public Signal<OrderBookChange> orderBook() {
         return Signal.NEVER;
     }
 

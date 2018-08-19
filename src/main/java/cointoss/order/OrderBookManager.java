@@ -21,10 +21,10 @@ import kiss.Variable;
 public class OrderBookManager {
 
     /** ASK */
-    public final OrderBookList shorts;
+    public final OrderBook shorts;
 
     /** BID */
-    public final OrderBookList longs;
+    public final OrderBook longs;
 
     /** The current spread. */
     public final Variable<Num> spread = Variable.of(Num.ZERO);
@@ -33,18 +33,18 @@ public class OrderBookManager {
      * 
      */
     public OrderBookManager(MarketService service) {
-        this.shorts = new OrderBookList(Side.SELL, service.baseCurrencyMinimumBidPrice(), service.orderBookGroupRanges());
-        this.longs = new OrderBookList(Side.BUY, service.baseCurrencyMinimumBidPrice(), service.orderBookGroupRanges());
+        this.shorts = new OrderBook(Side.SELL, service.baseCurrencyMinimumBidPrice(), service.orderBookGroupRanges());
+        this.longs = new OrderBook(Side.BUY, service.baseCurrencyMinimumBidPrice(), service.orderBookGroupRanges());
         shorts.best.observe().combineLatest(longs.best.observe()).to(v -> spread.set(v.ⅰ.price.minus(v.ⅱ.price)));
     }
 
     /**
-     * Retrieve the {@link OrderBookList} for {@link Side}.
+     * Retrieve the {@link OrderBook} for {@link Side}.
      * 
      * @param side
      * @return
      */
-    public OrderBookList bookFor(Side side) {
+    public OrderBook bookFor(Side side) {
         return side.isBuy() ? longs : shorts;
     }
 

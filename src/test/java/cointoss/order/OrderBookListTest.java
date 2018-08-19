@@ -24,7 +24,7 @@ class OrderBookListTest {
 
     @Test
     void buy() throws Exception {
-        OrderBookList list = new OrderBookList(Side.BUY, Num.ONE);
+        OrderBook list = new OrderBook(Side.BUY, Num.ONE);
 
         // add
         list.update(unit(1000, 1));
@@ -68,7 +68,7 @@ class OrderBookListTest {
 
     @Test
     void sell() throws Exception {
-        OrderBookList list = new OrderBookList(Side.SELL, Num.ONE);
+        OrderBook list = new OrderBook(Side.SELL, Num.ONE);
         list.update(unit(1000, 1));
         assert list.base.get(0).price.is(1000);
         // assert list.x1.get(0).total.is(1);
@@ -109,7 +109,7 @@ class OrderBookListTest {
 
     @Test
     void buyFix() throws Exception {
-        OrderBookList list = new OrderBookList(Side.BUY, Num.ONE);
+        OrderBook list = new OrderBook(Side.BUY, Num.ONE);
         list.update(unit(1007, 1));
         list.update(unit(1006, 1));
         list.update(unit(1005, 1));
@@ -140,7 +140,7 @@ class OrderBookListTest {
 
     @Test
     void sellFix() throws Exception {
-        OrderBookList list = new OrderBookList(Side.SELL, Num.ONE);
+        OrderBook list = new OrderBook(Side.SELL, Num.ONE);
         list.update(unit(1007, 1));
         list.update(unit(1004, 1));
         list.update(unit(1003, 1));
@@ -164,7 +164,7 @@ class OrderBookListTest {
 
     @Test
     void buyGroup() throws Exception {
-        OrderBookList list = new OrderBookList(Side.BUY, Num.ONE, Num.TEN);
+        OrderBook list = new OrderBook(Side.BUY, Num.ONE, Num.TEN);
         list.update(unit(1000, 1));
         assertList(list.selectBy(Num.TEN), 0, 1000, 1, 1);
 
@@ -188,7 +188,7 @@ class OrderBookListTest {
 
     @Test
     void sellGroup() throws Exception {
-        OrderBookList list = new OrderBookList(Side.SELL, Num.ONE, Num.TEN);
+        OrderBook list = new OrderBook(Side.SELL, Num.ONE, Num.TEN);
         list.update(unit(1000, 1));
         assertList(list.selectBy(Num.TEN), 0, 1000, 1, 1);
 
@@ -212,7 +212,7 @@ class OrderBookListTest {
 
     @Test
     void buyGroupFix() throws Exception {
-        OrderBookList list = new OrderBookList(Side.BUY, Num.ONE, Num.TEN);
+        OrderBook list = new OrderBook(Side.BUY, Num.ONE, Num.TEN);
         list.update(unit(1061, 1));
         list.update(unit(1060, 1));
         list.update(unit(1051, 1));
@@ -250,7 +250,7 @@ class OrderBookListTest {
 
     @Test
     void sellGroupFix() throws Exception {
-        OrderBookList list = new OrderBookList(Side.SELL, Num.ONE, Num.TEN);
+        OrderBook list = new OrderBook(Side.SELL, Num.ONE, Num.TEN);
         list.update(unit(1061, 1));
         list.update(unit(1060, 1));
         list.update(unit(1043, 1));
@@ -290,7 +290,7 @@ class OrderBookListTest {
     void buyBestPrice() throws Exception {
         Num min = Num.of(1099);
 
-        OrderBookList list = new OrderBookList(Side.BUY, Num.ONE);
+        OrderBook list = new OrderBook(Side.BUY, Num.ONE);
         list.update(unit(1093, 1)); // total 1
         list.update(unit(1077, 1)); // total 2
         list.update(unit(1051, 2)); // total 4
@@ -308,7 +308,7 @@ class OrderBookListTest {
     void sellBestPrice() throws Exception {
         Num min = Num.of(1000);
 
-        OrderBookList list = new OrderBookList(Side.SELL, Num.ONE);
+        OrderBook list = new OrderBook(Side.SELL, Num.ONE);
         list.update(unit(1093, 30)); // total 47
         list.update(unit(1077, 7)); // total 17
         list.update(unit(1051, 1)); // total 10
@@ -351,11 +351,11 @@ class OrderBookListTest {
 
     @Test
     void calculateGroupedPrice() {
-        assert OrderBookList.calculateGroupedPrice(Num.of(100), Num.of(500)).is(Num.of(0));
-        assert OrderBookList.calculateGroupedPrice(Num.of(300), Num.of(500)).is(Num.of(0));
-        assert OrderBookList.calculateGroupedPrice(Num.of(500), Num.of(500)).is(Num.of(500));
-        assert OrderBookList.calculateGroupedPrice(Num.of(700), Num.of(500)).is(Num.of(500));
-        assert OrderBookList.calculateGroupedPrice(Num.of(900), Num.of(500)).is(Num.of(500));
-        assert OrderBookList.calculateGroupedPrice(Num.of(1100), Num.of(500)).is(Num.of(1000));
+        assert OrderBook.calculateGroupedPrice(Num.of(100), Num.of(500)).is(Num.of(0));
+        assert OrderBook.calculateGroupedPrice(Num.of(300), Num.of(500)).is(Num.of(0));
+        assert OrderBook.calculateGroupedPrice(Num.of(500), Num.of(500)).is(Num.of(500));
+        assert OrderBook.calculateGroupedPrice(Num.of(700), Num.of(500)).is(Num.of(500));
+        assert OrderBook.calculateGroupedPrice(Num.of(900), Num.of(500)).is(Num.of(500));
+        assert OrderBook.calculateGroupedPrice(Num.of(1100), Num.of(500)).is(Num.of(1000));
     }
 }
