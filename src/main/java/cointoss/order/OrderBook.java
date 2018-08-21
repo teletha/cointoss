@@ -455,6 +455,7 @@ public class OrderBook {
             try {
                 return super.get(index);
             } catch (IndexOutOfBoundsException e) {
+                System.out.println(e);
                 return new OrderUnit(Num.ZERO, Num.ZERO);
             }
         }

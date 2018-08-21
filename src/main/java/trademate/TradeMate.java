@@ -41,6 +41,7 @@ public class TradeMate extends View {
      * @param args
      */
     public static void main(String[] args) {
+        // configure logging property
         System.setProperty("java.util.logging.manager", "org.apache.logging.log4j.jul.LogManager");
         Viewtify.activate(TradeMate.class, ActivationPolicy.Latest);
     }
