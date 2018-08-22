@@ -10,6 +10,7 @@
 package trademate;
 
 import cointoss.market.bitflyer.BitFlyer;
+import kiss.I;
 import viewtify.ActivationPolicy;
 import viewtify.UI;
 import viewtify.View;
@@ -20,6 +21,10 @@ import viewtify.ui.UITabPane;
  * @version 2017/12/04 13:07:34
  */
 public class TradeMate extends View {
+
+    static {
+        I.load(TradeMate.class, false);
+    }
 
     private @UI UITabPane main;
 

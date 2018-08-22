@@ -379,7 +379,7 @@ class BitFlyerService extends MarketService {
      */
     @Override
     public Signal<OrderBookChange> orderBook() {
-        return snapshotOrderBook().merge(realtimeOrderBook());
+        return snapshotOrderBook().concat(realtimeOrderBook());
     }
 
     /**
@@ -388,7 +388,7 @@ class BitFlyerService extends MarketService {
      * @return
      */
     private Signal<OrderBookChange> snapshotOrderBook() {
-        return call("GET", "/v1/board?product_code=" + marketName, "", "", OrderBookChange.class);
+        return call("PUBLIC", "/v1/board?product_code=" + marketName, "", "", OrderBookChange.class);
     }
 
     /**
@@ -437,7 +437,9 @@ class BitFlyerService extends MarketService {
 
         Request request;
 
-        if (method.equals("GET")) {
+        if (method.equals("PUBLIC")) {
+            request = new Request.Builder().url(api + path).build();
+        } else if (method.equals("GET")) {
             request = new Request.Builder().url(api + path)
                     .addHeader("ACCESS-KEY", accessKey)
                     .addHeader("ACCESS-TIMESTAMP", timestamp)

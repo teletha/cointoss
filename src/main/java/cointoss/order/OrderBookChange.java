@@ -22,4 +22,12 @@ public class OrderBookChange {
 
     /** The list of short orders. */
     public List<OrderUnit> asks = new ArrayList();
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        return "OrderBookChange [bids=" + bids + ", asks=" + asks + "]";
+    }
 }
