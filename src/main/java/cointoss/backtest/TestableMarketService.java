@@ -18,6 +18,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import cointoss.Execution;
 import cointoss.MarketService;
+import cointoss.MarketSetting;
 import cointoss.order.Order;
 import cointoss.order.OrderBookChange;
 import cointoss.order.OrderState;
@@ -89,10 +90,9 @@ public class TestableMarketService extends MarketService {
     * 
     */
     public TestableMarketService(Time lag, Num baseCurrency, Num targetCurrency) {
-        super("TestableExchange", "TestableMarket", config -> {
-            config.baseCurrencyMinimumBidPrice = Num.ONE;
-            config.targetCurrencyMinimumBidSize = Num.ONE;
-        });
+        super("TestableExchange", "TestableMarket", MarketSetting.builder()
+                .baseCurrencyMinimumBidPrice(Num.ONE)
+                .targetCurrencyMinimumBidSize(Num.ONE));
 
         this.lag = lag;
         this.baseCurrency = Objects.requireNonNull(baseCurrency);

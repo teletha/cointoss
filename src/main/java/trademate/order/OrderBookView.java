@@ -72,7 +72,7 @@ public class OrderBookView extends View {
                 .filter(hideSize, (unit, size) -> unit.size.isGreaterThanOrEqual(size))
                 .scrollToBottom();
 
-        priceRange.values(0, view.market().service.orderBookGroupRangesWithBase()).observeNow(range -> {
+        priceRange.values(0, view.market().service.setting.orderBookGroupRangesWithBase()).observeNow(range -> {
             longList.values(book.longs.selectBy(range));
             shortList.values(book.shorts.selectBy(range));
         });
@@ -87,6 +87,8 @@ public class OrderBookView extends View {
     private class CellView extends ListCell<OrderUnit> {
 
         private final Rectangle back = new Rectangle(0, 16);
+
+        private final int scaleSize;
 
         /**
          * @param side
@@ -107,6 +109,7 @@ public class OrderBookView extends View {
 
             back.setFill(color);
             setGraphic(back);
+            scaleSize = view.market().service.setting.targetCurrencyScaleSize();
         }
 
         /**
@@ -120,7 +123,7 @@ public class OrderBookView extends View {
                 if (empty || e == null) {
                     setText(null);
                 } else {
-                    Num normalize = e.size.scale(3);
+                    Num normalize = e.size.scale(scaleSize);
                     setText(e.price() + " " + normalize);
 
                     double width = Math.min(200, normalize.toDouble());

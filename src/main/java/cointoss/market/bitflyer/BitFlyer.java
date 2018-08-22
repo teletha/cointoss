@@ -9,50 +9,48 @@
  */
 package cointoss.market.bitflyer;
 
-import java.util.function.Consumer;
-
-import cointoss.MarketConfiguration;
 import cointoss.MarketService;
+import cointoss.MarketSetting;
 import cointoss.market.MarketProvider;
 import cointoss.util.Num;
 import kiss.I;
 
 /**
- * @version 2018/08/14 0:56:58
+ * @version 2018/08/22 20:44:30
  */
 public final class BitFlyer extends MarketProvider {
 
     /** Reusable market configuration. */
-    private static Consumer<MarketConfiguration> FiatBase = config -> {
-        config.baseCurrencyMinimumBidPrice = Num.of(1);
-        config.targetCurrencyMinimumBidSize = Num.of("0.01");
-        config.orderBookGroupRanges = I.list(Num.of(100), Num.of(250), Num.of(500), Num.of(1000), Num.of(2500));
-    };
+    private static MarketSetting.Builder FiatBaseSetting = MarketSetting.builder()
+            .baseCurrencyMinimumBidPrice(Num.of(1))
+            .targetCurrencyMinimumBidSize(Num.of("0.01"))
+            .targetCurrencyScaleSize(3)
+            .orderBookGroupRanges(I.list(Num.of(100), Num.of(250), Num.of(500), Num.of(1000), Num.of(2500)));
 
     /** Reusable market configuration. */
-    private static Consumer<MarketConfiguration> BTCBase = config -> {
-        config.baseCurrencyMinimumBidPrice = Num.of("0.01");
-        config.targetCurrencyMinimumBidSize = Num.of("0.01");
-    };
+    private static MarketSetting.Builder BTCBaseSetting = MarketSetting.builder()
+            .baseCurrencyMinimumBidPrice(Num.of("0.01"))
+            .targetCurrencyMinimumBidSize(Num.of("0.01"))
+            .targetCurrencyScaleSize(6);
 
     /** Market */
-    public static final MarketService BTC_JPY = new BitFlyerService("BTC_JPY", FiatBase);
+    public static final MarketService BTC_JPY = new BitFlyerService("BTC_JPY", FiatBaseSetting);
 
     /** Market */
-    public static final MarketService FX_BTC_JPY = new BitFlyerService("FX_BTC_JPY", FiatBase);
+    public static final MarketService FX_BTC_JPY = new BitFlyerService("FX_BTC_JPY", FiatBaseSetting);
 
     /** Market */
-    public static final MarketService ETH_BTC = new BitFlyerService("ETH_BTC", BTCBase);
+    public static final MarketService ETH_BTC = new BitFlyerService("ETH_BTC", BTCBaseSetting);
 
     /** Market */
-    public static final MarketService BCH_BTC = new BitFlyerService("BCH_BTC", BTCBase);
+    public static final MarketService BCH_BTC = new BitFlyerService("BCH_BTC", BTCBaseSetting);
 
     /** Market */
-    public static final MarketService BTCJPY28SEP2018 = new BitFlyerService("BTCJPY28SEP2018", FiatBase);
+    public static final MarketService BTCJPY28SEP2018 = new BitFlyerService("BTCJPY28SEP2018", FiatBaseSetting);
 
     /** Market */
-    public static final MarketService BTCJPY03AUG2018 = new BitFlyerService("BTCJPY03AUG2018", FiatBase);
+    public static final MarketService BTCJPY03AUG2018 = new BitFlyerService("BTCJPY03AUG2018", FiatBaseSetting);
 
     /** Market */
-    public static final MarketService BTCJPY10AUG2018 = new BitFlyerService("BTCJPY10AUG2018", FiatBase);
+    public static final MarketService BTCJPY10AUG2018 = new BitFlyerService("BTCJPY10AUG2018", FiatBaseSetting);
 }

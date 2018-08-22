@@ -30,5 +30,6 @@ public class Project extends bee.api.Project {
         require("org.decimal4j", "decimal4j", "1.0.3");
         require("com.squareup.okhttp3", "okhttp", "3.11.0");
         require("com.github.signalr4j", "signalr4j", "2.0.3");
+        require("org.immutables", "value", "2.6.3").atProvided();
     }
 }

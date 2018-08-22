@@ -20,9 +20,8 @@ public class ExitStrategy {
 
     public void execute(Market market) {
         Variable<Num> size = market.positions.size;
-        
+
         if (size.isNot(Num.ZERO)) {
-            market.orderBook.computeBestPrice(market.positions, size.v, market.service.minimumTargetSize())
         }
     }
 }

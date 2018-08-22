@@ -18,6 +18,7 @@ import javafx.collections.ObservableList;
 
 import org.magicwerk.brownies.collections.GapList;
 
+import cointoss.MarketSetting;
 import cointoss.Side;
 import cointoss.util.Num;
 import kiss.Signal;
@@ -52,21 +53,12 @@ public class OrderBook {
      * @param base
      * @param ranges
      */
-    OrderBook(Side side, Num base, Num... ranges) {
-        this(side, base, List.of(ranges));
-    }
-
-    /**
-     * @param side
-     * @param base
-     * @param ranges
-     */
-    OrderBook(Side side, Num base, List<Num> ranges) {
+    OrderBook(MarketSetting setting, Side side) {
         this.side = Objects.requireNonNull(side);
 
         this.base = FXCollections.observableList(new UnitList());
-        for (Num range : ranges) {
-            groups.add(new Grouped(side, range, FXCollections.observableList(new UnitList())));
+        for (Num range : setting.orderBookGroupRanges()) {
+            groups.add(new Grouped(side, range, FXCollections.observableList(new UnitList()), setting));
         }
     }
 
@@ -343,9 +335,9 @@ public class OrderBook {
     }
 
     /**
-     * @version 2017/12/01 2:41:13
+     * @version 2018/08/22 21:44:13
      */
-    private static class Grouped {
+    private class Grouped {
 
         /** The search direction. */
         private final Side side;
@@ -356,14 +348,18 @@ public class OrderBook {
         /** The base list. */
         private final ObservableList<OrderUnit> list;
 
+        /** The cache */
+        private final int size;
+
         /**
          * @param side
-         * @param scale
+         * @param scaleSize
          */
-        private Grouped(Side side, Num range, ObservableList<OrderUnit> list) {
+        private Grouped(Side side, Num range, ObservableList<OrderUnit> list, MarketSetting setting) {
             this.side = side;
             this.range = range;
             this.list = list;
+            this.size = setting.targetCurrencyScaleSize();
         }
 
         /**
@@ -397,7 +393,7 @@ public class OrderBook {
                 } else if (unit.price.is(price)) {
                     Num remaining = unit.size.plus(size);
 
-                    if (remaining.scale(5).isZero()) {
+                    if (remaining.scale(this.size).isZero()) {
                         list.remove(i);
                     } else {
                         list.set(i, unit.size(remaining));

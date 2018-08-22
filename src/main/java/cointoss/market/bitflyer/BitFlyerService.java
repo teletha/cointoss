@@ -20,7 +20,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 
 import javafx.scene.control.TextInputDialog;
 
@@ -33,8 +32,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import cointoss.Execution;
-import cointoss.MarketConfiguration;
 import cointoss.MarketService;
+import cointoss.MarketSetting;
 import cointoss.Side;
 import cointoss.order.Order;
 import cointoss.order.OrderBookChange;
@@ -120,15 +119,15 @@ class BitFlyerService extends MarketService {
     /**
      * @param type
      */
-    BitFlyerService(String type, Consumer<MarketConfiguration> configurator) {
-        this(type, false, configurator);
+    BitFlyerService(String type, MarketSetting.Builder setting) {
+        this(type, false, setting);
     }
 
     /**
      * @param type
      */
-    BitFlyerService(String type, boolean forTest, Consumer<MarketConfiguration> configurator) {
-        super("BitFlyer", type, configurator);
+    BitFlyerService(String type, boolean forTest, MarketSetting.Builder setting) {
+        super("BitFlyer", type, setting);
 
         this.forTest = forTest;
 

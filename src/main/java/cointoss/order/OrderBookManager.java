@@ -33,8 +33,8 @@ public class OrderBookManager {
      * 
      */
     public OrderBookManager(MarketService service) {
-        this.shorts = new OrderBook(Side.SELL, service.baseCurrencyMinimumBidPrice(), service.orderBookGroupRanges());
-        this.longs = new OrderBook(Side.BUY, service.baseCurrencyMinimumBidPrice(), service.orderBookGroupRanges());
+        this.shorts = new OrderBook(service.setting, Side.SELL);
+        this.longs = new OrderBook(service.setting, Side.BUY);
         shorts.best.observe().combineLatest(longs.best.observe()).to(v -> spread.set(v.ⅰ.price.minus(v.ⅱ.price)));
     }
 

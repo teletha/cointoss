@@ -15,6 +15,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import cointoss.Execution;
+import cointoss.MarketSetting;
 import cointoss.order.Order;
 import cointoss.order.OrderState;
 import cointoss.util.Chrono;
@@ -33,10 +34,9 @@ class MockBitFlyerService extends BitFlyerService {
      * 
      */
     MockBitFlyerService() {
-        super("FX_BTC_JPY", true, config -> {
-            config.baseCurrencyMinimumBidPrice = Num.of(1);
-            config.targetCurrencyMinimumBidSize = Num.of("0.01");
-        });
+        super("FX_BTC_JPY", true, MarketSetting.builder()
+                .baseCurrencyMinimumBidPrice(Num.ONE)
+                .targetCurrencyMinimumBidSize(Num.of("0.01")));
 
         network = mockNetwork = new MockNetwork();
     }

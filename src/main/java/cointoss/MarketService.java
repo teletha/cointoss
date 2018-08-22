@@ -12,7 +12,6 @@ package cointoss;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Consumer;
 
 import cointoss.order.Order;
 import cointoss.order.OrderBookChange;
@@ -21,7 +20,6 @@ import cointoss.util.LogCodec;
 import cointoss.util.Network;
 import cointoss.util.Num;
 import kiss.Disposable;
-import kiss.I;
 import kiss.Signal;
 
 /**
@@ -48,20 +46,18 @@ public abstract class MarketService implements Disposable {
     protected Network network = new Network();
 
     /** The market configuration. */
-    private final MarketConfiguration configuration = new MarketConfiguration();
+    public final MarketSetting setting;
 
     /**
      * @param exchangeName
      * @param marketName
      */
-    protected MarketService(String exchangeName, String marketName, Consumer<MarketConfiguration> configurator) {
+    protected MarketService(String exchangeName, String marketName, MarketSetting.Builder setting) {
         this.exchangeName = Objects.requireNonNull(exchangeName);
         this.marketName = Objects.requireNonNull(marketName);
+        this.setting = setting.build();
         this.fullName = exchangeName + " " + marketName;
         this.log = new MarketLog(this);
-
-        configurator.accept(configuration);
-        configuration.initialize();
     }
 
     /**
@@ -189,20 +185,6 @@ public abstract class MarketService implements Disposable {
      * @return
      */
     public abstract Signal<OrderBookChange> orderBook();
-
-    /**
-     * Get the price range of grouped order books.
-     */
-    public final List<Num> orderBookGroupRanges() {
-        return configuration.orderBookGroupRanges;
-    }
-
-    /**
-     * Get the price range of grouped order books.
-     */
-    public final List<Num> orderBookGroupRangesWithBase() {
-        return I.signal(configuration.orderBookGroupRanges).startWith(baseCurrencyMinimumBidPrice()).toList();
-    }
 
     /**
      * Build execution from log.
@@ -366,23 +348,9 @@ public abstract class MarketService implements Disposable {
     public abstract Signal<Num> baseCurrency();
 
     /**
-     * Get the minimum bid price of the base currency.
-     */
-    public final Num baseCurrencyMinimumBidPrice() {
-        return configuration.baseCurrencyMinimumBidPrice;
-    }
-
-    /**
      * Get amount of the target currency.
      */
     public abstract Signal<Num> targetCurrency();
-
-    /**
-     * Get the minimum bid vsize of the target currency.
-     */
-    public final Num targetCurrencyMinimumBidSize() {
-        return configuration.targetCurrencyMinimumBidSize;
-    }
 
     /**
      * {@inheritDoc}
