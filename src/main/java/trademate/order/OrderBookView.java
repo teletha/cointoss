@@ -66,10 +66,9 @@ public class OrderBookView extends View {
 
         hideSize.values(0, Num.range(0, 9)).observe(e -> longList.ui.refresh());
 
-        longList.cell(e -> new CellView(Color.rgb(251, 189, 42, 0.2)))
-                .filter(hideSize, (unit, size) -> unit.size.isGreaterThanOrEqual(size));
+        longList.cell(e -> new CellView(Color.rgb(251, 189, 42, 0.2))).take(hideSize, (unit, size) -> unit.size.isGreaterThanOrEqual(size));
         shortList.cell(e -> new CellView(Color.rgb(247, 105, 77, 0.2)))
-                .filter(hideSize, (unit, size) -> unit.size.isGreaterThanOrEqual(size))
+                .take(hideSize, (unit, size) -> unit.size.isGreaterThanOrEqual(size))
                 .scrollToBottom();
 
         priceRange.values(0, view.market().service.setting.orderBookGroupRangesWithBase()).observeNow(range -> {
@@ -123,7 +122,7 @@ public class OrderBookView extends View {
                 if (empty || e == null) {
                     setText(null);
                 } else {
-                    Num normalize = e.size.scale(scaleSize);
+                    Num normalize = e.size;// .scale(scaleSize);
                     setText(e.price() + " " + normalize);
 
                     double width = Math.min(200, normalize.toDouble());

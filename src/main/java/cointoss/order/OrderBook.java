@@ -26,7 +26,7 @@ import kiss.Signaling;
 import kiss.Variable;
 
 /**
- * @version 2018/08/18 23:06:19
+ * @version 2018/08/23 21:54:29
  */
 public class OrderBook {
 
@@ -393,7 +393,7 @@ public class OrderBook {
                 } else if (unit.price.is(price)) {
                     Num remaining = unit.size.plus(size);
 
-                    if (remaining.scale(this.size).isZero()) {
+                    if (remaining.scaleDown(this.size).isZero()) {
                         list.remove(i);
                     } else {
                         list.set(i, unit.size(remaining));
@@ -422,7 +422,7 @@ public class OrderBook {
                 } else if (unit.price.is(price)) {
                     Num remaining = unit.size.plus(size);
 
-                    if (remaining.scale(5).isZero()) {
+                    if (remaining.scaleDown(this.size).isZero()) {
                         list.remove(i);
                     } else {
                         list.set(i, unit.size(remaining));

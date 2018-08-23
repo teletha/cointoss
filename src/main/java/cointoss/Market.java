@@ -112,17 +112,7 @@ public class Market implements Disposable {
         // build tickers for each span
         timeline.to(tickers::update);
 
-        // orderbook management
-        service.add(service.orderBook().retryWhen(policy).to(board -> {
-            orderBook.shorts.update(board.asks);
-            orderBook.longs.update(board.bids);
-            policy.reset();
-        }));
-        service.add(timeline.throttle(2, SECONDS).to(e -> {
-            // fix error board
-            orderBook.shorts.fix(e.price);
-            orderBook.longs.fix(e.price);
-        }));
+        readOrderBook();
 
         service.add(service.executionsRealtimelyForMe().to(e -> {
             // update assets
@@ -133,6 +123,20 @@ public class Market implements Disposable {
                 baseCurrency.set(value -> value.plus(e.size.multiply(e.price)));
                 targetCurrency.set(value -> value.minus(e.size));
             }
+        }));
+    }
+
+    void readOrderBook() {
+        // orderbook management
+        service.add(service.orderBook().retryWhen(policy).to(board -> {
+            orderBook.shorts.update(board.asks);
+            orderBook.longs.update(board.bids);
+            policy.reset();
+        }));
+        service.add(timeline.throttle(2, SECONDS).to(e -> {
+            // fix error board
+            orderBook.shorts.fix(e.price);
+            orderBook.longs.fix(e.price);
         }));
     }
 

@@ -133,6 +133,8 @@ public class Network {
                 }
             } catch (Throwable e) {
                 observer.error(new Error("[" + request.url() + "] throws some error.", e));
+            } finally {
+                terminate();
             }
             return disposer;
         });

@@ -98,6 +98,7 @@ class NumTest {
         assert Num.of(1.234).scale(0).is(1);
         assert Num.of(1.234).scale(1).is(1.2);
         assert Num.of(1.234).scale(2).is(1.23);
+        assert Num.of(0.05).scale(1).is(0.1);
     }
 
     @Test
@@ -109,6 +110,7 @@ class NumTest {
         assert Num.of(1).scaleDown(1).is(1);
         assert Num.of(12).scaleDown(-1).is(10);
         assert Num.of(123).scaleDown(-1).is(120);
+        assert Num.of(0.05).scaleDown(1).is(0);
     }
 
     @Test

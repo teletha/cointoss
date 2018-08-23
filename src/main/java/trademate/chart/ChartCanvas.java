@@ -535,7 +535,14 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 double calculated = converter.applyAsDouble(tick);
 
                 if (valueMax < calculated) valueMax = calculated;
-                this.valueY[index] = calculated;
+                try {
+                    this.valueY[index] = calculated;
+                } catch (ArrayIndexOutOfBoundsException e) {
+                    // Index 17638 XSize 17638 YSize 17638 LineSize1
+                    System.out.println("Index " + index + "  XSize " + valueX.length + "   YSize " + valueY.length + "   LineSize" + lines
+                            .size());
+                    throw I.quiet(e);
+                }
             }
 
             /**
