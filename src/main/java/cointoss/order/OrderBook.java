@@ -164,6 +164,7 @@ public class OrderBook {
 
                     for (Grouped grouped : groups) {
                         grouped.update(unit.price, unit.size.negate());
+                        grouped.fixHead(hint);
                     }
                 } else {
                     break;
@@ -178,6 +179,7 @@ public class OrderBook {
 
                     for (Grouped grouped : groups) {
                         grouped.update(unit.price, unit.size.negate());
+                        grouped.fixTail(hint);
                     }
                 } else {
                     break;
@@ -434,6 +436,26 @@ public class OrderBook {
                 }
             }
             list.add(0, new OrderUnit(price, size));
+        }
+
+        private void fixHead(Num price) {
+            price = calculateGroupedPrice(price, range);
+
+            OrderUnit unit = list.get(0);
+
+            if (unit.price.isGreaterThan(price)) {
+                list.remove(0);
+            }
+        }
+
+        private void fixTail(Num price) {
+            price = calculateGroupedPrice(price, range);
+
+            OrderUnit unit = list.get(list.size() - 1);
+
+            if (unit.price.isLessThan(price)) {
+                list.remove(list.size() - 1);
+            }
         }
     }
 

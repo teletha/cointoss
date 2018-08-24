@@ -204,7 +204,7 @@
                               <Insets left="4.0" />
                            </padding>
                         </Label>
-                        <Spinner id="hideSize" maxWidth="45.0" minWidth="45.0" prefWidth="45.0" />
+                        <Spinner id="hideSize" maxWidth="53.0" minWidth="53.0" prefWidth="53.0" />
                      </children>
                   </HBox>
                   <ListView id="longList" focusTraversable="false" styleClass="BUY" VBox.vgrow="ALWAYS">
