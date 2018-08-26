@@ -211,5 +211,6 @@ public class OrderBuilder extends View {
      */
     private void reverse() {
         view.market().reverse();
+        Runtime.getRuntime().gc();
     }
 }

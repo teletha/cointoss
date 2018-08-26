@@ -37,7 +37,7 @@ interface MarketSettingData {
     /**
      * Get the price range of grouped order books.
      */
-    List<Num> orderBookGroupRanges();
+    Num[] orderBookGroupRanges();
 
     /**
      * Get the human readable size of target currency.

@@ -13,10 +13,9 @@ import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.market.MarketProvider;
 import cointoss.util.Num;
-import kiss.I;
 
 /**
- * @version 2018/08/22 20:44:30
+ * @version 2018/08/26 13:31:31
  */
 public final class BitFlyer extends MarketProvider {
 
@@ -25,13 +24,14 @@ public final class BitFlyer extends MarketProvider {
             .baseCurrencyMinimumBidPrice(Num.of(1))
             .targetCurrencyMinimumBidSize(Num.of("0.01"))
             .targetCurrencyScaleSize(3)
-            .orderBookGroupRanges(I.list(Num.of(100), Num.of(250), Num.of(500), Num.of(1000), Num.of(2500)));
+            .orderBookGroupRanges(Num.of(50, 100, 250, 500, 1000, 2500, 5000));
 
     /** Reusable market configuration. */
     private static MarketSetting.Builder BTCBaseSetting = MarketSetting.builder()
             .baseCurrencyMinimumBidPrice(Num.of("0.01"))
             .targetCurrencyMinimumBidSize(Num.of("0.01"))
-            .targetCurrencyScaleSize(6);
+            .targetCurrencyScaleSize(6)
+            .orderBookGroupRanges(Num.of(0.01, 0.02, 0.05, 0.1));
 
     /** Market */
     public static final MarketService BTC_JPY = new BitFlyerService("BTC_JPY", FiatBaseSetting);

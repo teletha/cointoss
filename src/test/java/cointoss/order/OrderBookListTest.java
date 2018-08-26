@@ -17,7 +17,6 @@ import org.junit.jupiter.api.Test;
 import cointoss.MarketSetting;
 import cointoss.Side;
 import cointoss.util.Num;
-import kiss.I;
 
 /**
  * @version 2018/04/02 16:46:26
@@ -27,7 +26,7 @@ class OrderBookListTest {
     private MarketSetting setting = MarketSetting.builder()
             .baseCurrencyMinimumBidPrice(Num.ONE)
             .targetCurrencyMinimumBidSize(Num.ONE)
-            .orderBookGroupRanges(I.list(Num.TEN))
+            .orderBookGroupRanges(Num.TEN)
             .build();
 
     @Test

@@ -2,10 +2,10 @@ package cointoss;
 
 import cointoss.util.Num;
 import com.google.common.base.MoreObjects;
-import com.google.common.collect.ImmutableList;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.errorprone.annotations.Var;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import javax.annotation.CheckReturnValue;
@@ -27,13 +27,13 @@ import javax.annotation.processing.Generated;
 public final class MarketSetting implements MarketSettingData {
   private final Num baseCurrencyMinimumBidPrice;
   private final Num targetCurrencyMinimumBidSize;
-  private final ImmutableList<Num> orderBookGroupRanges;
+  private final Num[] orderBookGroupRanges;
   private final int targetCurrencyScaleSize;
 
   private MarketSetting(MarketSetting.Builder builder) {
     this.baseCurrencyMinimumBidPrice = builder.baseCurrencyMinimumBidPrice;
     this.targetCurrencyMinimumBidSize = builder.targetCurrencyMinimumBidSize;
-    this.orderBookGroupRanges = builder.orderBookGroupRanges.build();
+    this.orderBookGroupRanges = builder.orderBookGroupRanges;
     this.targetCurrencyScaleSize = builder.targetCurrencyScaleSizeIsSet()
         ? builder.targetCurrencyScaleSize
         : MarketSettingData.super.targetCurrencyScaleSize();
@@ -59,8 +59,8 @@ public final class MarketSetting implements MarketSettingData {
    * Get the price range of grouped order books.
    */
   @Override
-  public ImmutableList<Num> orderBookGroupRanges() {
-    return orderBookGroupRanges;
+  public Num[] orderBookGroupRanges() {
+    return orderBookGroupRanges.clone();
   }
 
   /**
@@ -85,7 +85,7 @@ public final class MarketSetting implements MarketSettingData {
   private boolean equalTo(MarketSetting another) {
     return baseCurrencyMinimumBidPrice.equals(another.baseCurrencyMinimumBidPrice)
         && targetCurrencyMinimumBidSize.equals(another.targetCurrencyMinimumBidSize)
-        && orderBookGroupRanges.equals(another.orderBookGroupRanges)
+        && Arrays.equals(orderBookGroupRanges, another.orderBookGroupRanges)
         && targetCurrencyScaleSize == another.targetCurrencyScaleSize;
   }
 
@@ -98,7 +98,7 @@ public final class MarketSetting implements MarketSettingData {
     @Var int h = 5381;
     h += (h << 5) + baseCurrencyMinimumBidPrice.hashCode();
     h += (h << 5) + targetCurrencyMinimumBidSize.hashCode();
-    h += (h << 5) + orderBookGroupRanges.hashCode();
+    h += (h << 5) + Arrays.hashCode(orderBookGroupRanges);
     h += (h << 5) + targetCurrencyScaleSize;
     return h;
   }
@@ -113,7 +113,7 @@ public final class MarketSetting implements MarketSettingData {
         .omitNullValues()
         .add("baseCurrencyMinimumBidPrice", baseCurrencyMinimumBidPrice)
         .add("targetCurrencyMinimumBidSize", targetCurrencyMinimumBidSize)
-        .add("orderBookGroupRanges", orderBookGroupRanges)
+        .add("orderBookGroupRanges", Arrays.toString(orderBookGroupRanges))
         .add("targetCurrencyScaleSize", targetCurrencyScaleSize)
         .toString();
   }
@@ -137,13 +137,14 @@ public final class MarketSetting implements MarketSettingData {
   public static final class Builder {
     private static final long INIT_BIT_BASE_CURRENCY_MINIMUM_BID_PRICE = 0x1L;
     private static final long INIT_BIT_TARGET_CURRENCY_MINIMUM_BID_SIZE = 0x2L;
+    private static final long INIT_BIT_ORDER_BOOK_GROUP_RANGES = 0x4L;
     private static final long OPT_BIT_TARGET_CURRENCY_SCALE_SIZE = 0x1L;
-    private long initBits = 0x3L;
+    private long initBits = 0x7L;
     private long optBits;
 
     private @Nullable Num baseCurrencyMinimumBidPrice;
     private @Nullable Num targetCurrencyMinimumBidSize;
-    private ImmutableList.Builder<Num> orderBookGroupRanges = ImmutableList.builder();
+    private @Nullable Num[] orderBookGroupRanges;
     private int targetCurrencyScaleSize;
 
     private Builder() {
@@ -153,7 +154,6 @@ public final class MarketSetting implements MarketSettingData {
      * Fill a builder with attribute values from the provided {@code MarketSetting} instance.
      * Regular attribute values will be replaced with those from the given instance.
      * Absent optional values will not replace present values.
-     * Collection elements and entries will be added, not replaced.
      * @param instance The instance from which to copy values
      * @return {@code this} builder for use in a chained invocation
      */
@@ -171,7 +171,7 @@ public final class MarketSetting implements MarketSettingData {
       Objects.requireNonNull(instance, "instance");
       baseCurrencyMinimumBidPrice(instance.baseCurrencyMinimumBidPrice());
       targetCurrencyMinimumBidSize(instance.targetCurrencyMinimumBidSize());
-      addAllOrderBookGroupRanges(instance.orderBookGroupRanges());
+      orderBookGroupRanges(instance.orderBookGroupRanges());
       targetCurrencyScaleSize(instance.targetCurrencyScaleSize());
       return this;
     }
@@ -201,47 +201,14 @@ public final class MarketSetting implements MarketSettingData {
     }
 
     /**
-     * Adds one element to {@link MarketSetting#orderBookGroupRanges() orderBookGroupRanges} list.
-     * @param element A orderBookGroupRanges element
+     * Initializes the value for the {@link MarketSetting#orderBookGroupRanges() orderBookGroupRanges} attribute.
+     * @param orderBookGroupRanges The elements for orderBookGroupRanges
      * @return {@code this} builder for use in a chained invocation
      */
     @CanIgnoreReturnValue 
-    public final Builder addOrderBookGroupRanges(Num element) {
-      this.orderBookGroupRanges.add(element);
-      return this;
-    }
-
-    /**
-     * Adds elements to {@link MarketSetting#orderBookGroupRanges() orderBookGroupRanges} list.
-     * @param elements An array of orderBookGroupRanges elements
-     * @return {@code this} builder for use in a chained invocation
-     */
-    @CanIgnoreReturnValue 
-    public final Builder addOrderBookGroupRanges(Num... elements) {
-      this.orderBookGroupRanges.add(elements);
-      return this;
-    }
-
-
-    /**
-     * Sets or replaces all elements for {@link MarketSetting#orderBookGroupRanges() orderBookGroupRanges} list.
-     * @param elements An iterable of orderBookGroupRanges elements
-     * @return {@code this} builder for use in a chained invocation
-     */
-    @CanIgnoreReturnValue 
-    public final Builder orderBookGroupRanges(Iterable<? extends Num> elements) {
-      this.orderBookGroupRanges = ImmutableList.builder();
-      return addAllOrderBookGroupRanges(elements);
-    }
-
-    /**
-     * Adds elements to {@link MarketSetting#orderBookGroupRanges() orderBookGroupRanges} list.
-     * @param elements An iterable of orderBookGroupRanges elements
-     * @return {@code this} builder for use in a chained invocation
-     */
-    @CanIgnoreReturnValue 
-    public final Builder addAllOrderBookGroupRanges(Iterable<? extends Num> elements) {
-      this.orderBookGroupRanges.addAll(elements);
+    public final Builder orderBookGroupRanges(Num... orderBookGroupRanges) {
+      this.orderBookGroupRanges = orderBookGroupRanges.clone();
+      initBits &= ~INIT_BIT_ORDER_BOOK_GROUP_RANGES;
       return this;
     }
 
@@ -278,6 +245,7 @@ public final class MarketSetting implements MarketSettingData {
       List<String> attributes = new ArrayList<>();
       if ((initBits & INIT_BIT_BASE_CURRENCY_MINIMUM_BID_PRICE) != 0) attributes.add("baseCurrencyMinimumBidPrice");
       if ((initBits & INIT_BIT_TARGET_CURRENCY_MINIMUM_BID_SIZE) != 0) attributes.add("targetCurrencyMinimumBidSize");
+      if ((initBits & INIT_BIT_ORDER_BOOK_GROUP_RANGES) != 0) attributes.add("orderBookGroupRanges");
       return "Cannot build MarketSetting, some of required attributes are not set " + attributes;
     }
   }

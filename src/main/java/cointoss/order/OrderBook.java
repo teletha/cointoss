@@ -395,7 +395,7 @@ public class OrderBook {
                 } else if (unit.price.is(price)) {
                     Num remaining = unit.size.plus(size);
 
-                    if (remaining.scaleDown(this.size).isZero()) {
+                    if (remaining.scaleDown(this.size).isNegativeOrZero()) {
                         list.remove(i);
                     } else {
                         list.set(i, unit.size(remaining));
@@ -424,7 +424,7 @@ public class OrderBook {
                 } else if (unit.price.is(price)) {
                     Num remaining = unit.size.plus(size);
 
-                    if (remaining.scaleDown(this.size).isZero()) {
+                    if (remaining.scaleDown(this.size).isNegativeOrZero()) {
                         list.remove(i);
                     } else {
                         list.set(i, unit.size(remaining));
