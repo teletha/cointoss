@@ -25,8 +25,8 @@ import cointoss.order.QuantityCondition;
 import cointoss.util.Num;
 import kiss.I;
 import kiss.WiseBiConsumer;
-import trademate.Notificator;
 import trademate.TradingView;
+import trademate.preference.Notificator;
 import viewtify.UI;
 import viewtify.View;
 import viewtify.ui.UIButton;
@@ -212,5 +212,8 @@ public class OrderBuilder extends View {
     private void reverse() {
         view.market().reverse();
         Runtime.getRuntime().gc();
+
+        Notificator notificator = I.make(Notificator.class);
+        notificator.execution.notify("(*‘ω‘ *)");
     }
 }

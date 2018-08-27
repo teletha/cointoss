@@ -20,6 +20,7 @@ import trademate.order.OrderBuilder;
 import trademate.order.OrderCatalog;
 import trademate.order.OrderSet;
 import trademate.order.PositionCatalog;
+import trademate.preference.Notificator;
 import viewtify.UI;
 import viewtify.View;
 import viewtify.Viewtify;
