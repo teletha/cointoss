@@ -14,6 +14,7 @@ import javafx.util.Duration;
 
 import org.controlsfx.control.Notifications;
 
+import cointoss.util.Network;
 import kiss.Extensible;
 import kiss.I;
 import kiss.Variable;
@@ -21,7 +22,7 @@ import viewtify.Preference;
 import viewtify.Viewtify;
 
 /**
- * @version 2018/08/27 10:10:32
+ * @version 2018/08/27 23:27:46
  */
 public class Notificator extends Preference<Notificator> {
 
@@ -44,6 +45,9 @@ public class Notificator extends Preference<Notificator> {
     /** The duration of desktop display. */
     public final Variable<java.time.Duration> desktopDuration = Variable.of(java.time.Duration.ofSeconds(1));
 
+    /** The access token for LINE. */
+    public final Variable<String> lineAccessToken = Variable.empty();
+
     /**
      * 
      */
@@ -52,15 +56,15 @@ public class Notificator extends Preference<Notificator> {
     }
 
     /**
-     * @version 2018/08/27 10:10:29
+     * @version 2018/08/28 0:19:09
      */
     public class Notify {
 
-        /** Showing notification pane. */
-        public final Variable<Boolean> notification = Variable.of(false);
+        /** Showing desktop notification. */
+        public final Variable<Boolean> desktop = Variable.of(false);
 
-        /** External notification. */
-        public final Variable<Boolean> external = Variable.of(false);
+        /** Showing line notification. */
+        public final Variable<Boolean> line = Variable.of(false);
 
         /** Showing notification pane. */
         public final Variable<Sound> sound = Variable.of(Sound.なし);
@@ -77,7 +81,13 @@ public class Notificator extends Preference<Notificator> {
          * @param message
          */
         public void notify(String message) {
-            if (notification.is(true)) {
+            // by sound
+            if (sound.isPresent() && sound.isNot(Sound.なし)) {
+                sound.v.play();
+            }
+
+            // to desktop
+            if (desktop.is(true)) {
                 Viewtify.inUI(() -> {
                     Notifications.create()
                             .darkStyle()
@@ -89,7 +99,11 @@ public class Notificator extends Preference<Notificator> {
                             .show();
                 });
             }
-            sound.get().play();
+
+            // to LINE
+            if (line.is(true)) {
+                I.make(Network.class).line(message).to(I.NoOP);
+            }
         }
     }
 

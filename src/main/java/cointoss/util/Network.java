@@ -28,6 +28,7 @@ import kiss.I;
 import kiss.JSON;
 import kiss.Signal;
 import okhttp3.ConnectionPool;
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -36,9 +37,10 @@ import okhttp3.ResponseBody;
 import okhttp3.WebSocket;
 import okhttp3.WebSocketListener;
 import okio.Buffer;
+import trademate.preference.Notificator;
 
 /**
- * @version 2018/07/15 18:19:34
+ * @version 2018/08/28 0:15:07
  */
 public class Network {
 
@@ -78,7 +80,8 @@ public class Network {
                 int all = pool.connectionCount();
                 int idle = pool.idleConnectionCount();
 
-                System.out.println("DEBUG Network#terminate " + all + "  " + idle + "   " + client.dispatcher().executorService());
+                // System.out.println("DEBUG Network#terminate " + all + " " + idle + " " +
+                // client.dispatcher().executorService());
                 if (all - idle == 0) {
                     pool.evictAll();
                     client.dispatcher().executorService().shutdown();
@@ -89,6 +92,12 @@ public class Network {
         }
     }
 
+    /**
+     * For debug.
+     * 
+     * @param request
+     * @return
+     */
     private static String bodyToString(final Request request) {
         try {
             RequestBody body = request.body();
@@ -110,7 +119,7 @@ public class Network {
      */
     public <M> Signal<M> rest(Request request, String selector, Class<M> type) {
         return new Signal<>((observer, disposer) -> {
-            System.out.println(request + "  " + bodyToString(request));
+            // System.out.println(request + " " + bodyToString(request));
             try (Response response = client().newCall(request).execute(); ResponseBody body = response.body()) {
                 String value = body.string();
                 int code = response.code();
@@ -263,6 +272,26 @@ public class Network {
          */
         @Override
         public void log(String message, LogLevel level) {
+        }
+    }
+
+    /**
+     * Call LINE notify API.
+     * 
+     * @param message A message to send
+     */
+    public Signal<?> line(String message) {
+        Notificator notificator = I.make(Notificator.class);
+
+        if (notificator.lineAccessToken.isPresent()) {
+            Request request = new Request.Builder().url("https://notify-api.line.me/api/notify")
+                    .addHeader("Authorization", "Bearer " + notificator.lineAccessToken)
+                    .post(RequestBody.create(MediaType.parse("application/x-www-form-urlencoded; charset=utf-8"), "message=\r\n" + message))
+                    .build();
+
+            return rest(request, "", null);
+        } else {
+            return Signal.EMPTY;
         }
     }
 }

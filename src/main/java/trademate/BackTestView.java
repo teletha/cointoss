@@ -36,6 +36,9 @@ import viewtify.ui.helper.User;
  */
 public class BackTestView extends View {
 
+    /** The message resource. */
+    private final Message $ = localizeBy(Message.class);
+
     @UI
     private UIComboBox<MarketService> market;
 
@@ -57,16 +60,16 @@ public class BackTestView extends View {
     @Override
     protected void initialize() {
         market.values(0, MarketProvider.availableMarkets());
-        startDate.initial(Chrono.utcNow().minusDays(10)).uneditable().validateWhen(market).validate(() -> {
+        startDate.initial(Chrono.utcNow().minusDays(10)).uneditable().requireWhen(market).require(() -> {
             MarketLog log = market.value().log;
 
-            assert startDate.isBeforeOrSame(log.lastCacheDate()) : I.i18n(Message::logIsNotFound);
-            assert startDate.isAfterOrSame(log.firstCacheDate()) : I.i18n(Message::logIsNotFound);
+            assert startDate.isBeforeOrSame(log.lastCacheDate()) : $.logIsNotFound();
+            assert startDate.isAfterOrSame(log.firstCacheDate()) : $.logIsNotFound();
         }).observe((o, n) -> {
             endDate.value(v -> v.plus(Period.between(o, n)));
         });
 
-        endDate.initial(Chrono.utcNow()).uneditable().validate(() -> {
+        endDate.initial(Chrono.utcNow()).uneditable().require(() -> {
             assert startDate.isBeforeOrSame(endDate) : I.i18n(Message::endDateMustBeAfterStartDate);
         });
 
