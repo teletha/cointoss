@@ -47,6 +47,18 @@
 /* ==========================================================================
  Preference Area
 ===========================================================================*/
+.PreferenceTitle {
+	-fx-font-size: 16px;
+	-fx-pref-width: 200px;
+	-fx-pref-height: 20px;
+	-fx-padding: 10px 0 10px 40px;
+	-fx-cursor: hand;
+}
+
+.PreferenceTitle:hover {
+	-fx-background-color: derive(-fx-base, 15%);
+}
+
 .Block {
 	-fx-padding: 30px 0 30px 0;
 	-fx-border-width: 2px 0 0 0;
@@ -61,6 +73,10 @@
 .Heading {
 	-fx-padding: 0 0 5px 0;
 	-fx-font-size: 16px;
+}
+
+.Description {
+	-fx-padding: 2px 0 7px 0;
 }
 
 
@@ -145,3 +161,4 @@
 .backtestAnchor {
   -fx-border-color: red;
 }
+
