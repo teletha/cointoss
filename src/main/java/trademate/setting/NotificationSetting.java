@@ -43,7 +43,7 @@ public class NotificationSetting extends View<Lang> {
     /** The notificator. */
     private final Notificator notificator = I.make(Notificator.class);
 
-    // private @UI NotifySetting longTrend;
+    private NotifySetting longTrend;
     //
     // private @UI NotifySetting shortTrend;
     //
@@ -53,15 +53,15 @@ public class NotificationSetting extends View<Lang> {
     //
     // private @UI NotifySetting priceSignal;
 
-    private @UI UISpinner<Duration> desktopDuration;
+    private UISpinner<Duration> desktopDuration;
 
-    private @UI UIComboBox<DesktopPosition> desktopPosition;
+    private UIComboBox<DesktopPosition> desktopPosition;
 
     /** The access token for LINE. */
-    private @UI UIPassword lineAccessToken;
+    private UIPassword lineAccessToken;
 
     /** The access token tester. */
-    private @UI UIButton lineTest;
+    private UIButton lineTest;
 
     /**
      * {@inheritDoc}
@@ -72,6 +72,12 @@ public class NotificationSetting extends View<Lang> {
             {
                 vbox(Root, () -> {
                     // Notification Types
+                    vbox(Block, () -> {
+                        label(message.notificationTitle(), Heading);
+                        hbox(FormRow, () -> {
+                            label(message.longTrendRow(), FormLabel);
+                        });
+                    });
 
                     // Desktop
                     vbox(Block, () -> {
@@ -106,7 +112,7 @@ public class NotificationSetting extends View<Lang> {
      */
     @Override
     protected void initialize() {
-        // longTrend.notify = notificator.longTrend;
+        longTrend.notify = notificator.longTrend;
         // shortTrend.notify = notificator.shortTrend;
         // execution.notify = notificator.execution;
         // orderFailed.notify = notificator.orderFailed;
@@ -144,6 +150,23 @@ public class NotificationSetting extends View<Lang> {
 
         /** Enable sound notification. */
         private @UI UIComboBox<Sound> sound;
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected UIDefinition declareUI() {
+            return new UIDefinition() {
+                {
+                    hbox(FormInput, () -> {
+                        label("OK", FormLabel);
+                        $(desktop);
+                        $(line);
+                        $(sound, FormInput);
+                    });
+                }
+            };
+        }
 
         /**
          * {@inheritDoc}

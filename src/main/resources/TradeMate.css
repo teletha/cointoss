@@ -68,14 +68,9 @@
 }
 
 .Block {
-	-fx-padding: 30px 0 30px 0;
-	-fx-border-width: 2px 0 0 0;
+	-fx-padding: 35px 0 35px 0;
+	-fx-border-width: 0 0 2px 0;
 	-fx-border-color: rgb(40, 40, 40);
-}
-
-.Block.First {
-		-fx-padding: 0 0 30px 0;
-		-fx-border-width: 0;
 }
 
 .Heading {
