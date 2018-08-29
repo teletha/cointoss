@@ -42,8 +42,6 @@ public class NotificationSetting extends View<Lang> {
     /** The notificator. */
     private final Notificator notificator = I.make(Notificator.class);
 
-    private @UI DesktopSetting desktop;
-
     private @UI NotifySetting longTrend;
 
     private @UI NotifySetting shortTrend;
@@ -53,6 +51,10 @@ public class NotificationSetting extends View<Lang> {
     private @UI NotifySetting orderFailed;
 
     private @UI NotifySetting priceSignal;
+
+    private @UI UISpinner<Duration> desktopDuration;
+
+    private @UI UIComboBox<DesktopPosition> desktopPosition;
 
     /** The access token for LINE. */
     private @UI UIPassword lineAccessToken;
@@ -70,6 +72,12 @@ public class NotificationSetting extends View<Lang> {
         execution.notify = notificator.execution;
         orderFailed.notify = notificator.orderFailed;
         priceSignal.notify = notificator.priceSignal;
+
+        // For Desktop
+        desktopDuration.values(I.signalRange(2, 30, 2).map(Duration::ofSeconds))
+                .model(notificator.desktopDuration)
+                .text($::desktopDuration);
+        desktopPosition.values(DesktopPosition.class).model(notificator.desktopPosition);
 
         // For LINE
         lineAccessToken.model(notificator.lineAccessToken);
@@ -108,25 +116,6 @@ public class NotificationSetting extends View<Lang> {
             sound.values(Sound.values()).model(notify.sound).when(User.Action, e -> {
                 sound.value().play();
             });
-        }
-    }
-
-    /**
-     * @version 2018/08/27 19:35:15
-     */
-    private class DesktopSetting extends View {
-
-        private @UI UISpinner<Duration> duration;
-
-        private @UI UIComboBox<DesktopPosition> position;
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        protected void initialize() {
-            duration.values(I.signalRange(2, 30, 2).map(Duration::ofSeconds)).model(notificator.desktopDuration).text($::desktopDuration);
-            position.values(DesktopPosition.class).model(notificator.desktopPosition);
         }
     }
 
