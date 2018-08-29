@@ -9,61 +9,56 @@
  */
 package trademate.setting;
 
-import javafx.collections.ObservableList;
-import javafx.scene.Node;
-import javafx.scene.layout.Pane;
+import static trademate.setting.SettingStyles.*;
 
 import kiss.Extensible;
-import kiss.I;
 import kiss.Manageable;
 import kiss.Singleton;
-import viewtify.UI;
 import viewtify.View;
+import viewtify.dsl.UIDefinition;
 import viewtify.ui.UILabel;
+import viewtify.ui.UIPane;
 import viewtify.ui.helper.User;
 
 /**
  * @version 2018/08/29 3:51:53
  */
 @Manageable(lifestyle = Singleton.class)
-public class SettingView extends View {
+public class SettingView extends View<SettingView.Lang> {
 
-    /** The message resource. */
-    @SuppressWarnings("unused")
-    private final Lang $ = localizeBy(Lang.class);
+    private UILabel notification;
 
-    private @UI UILabel notification;
+    private UILabel bitflyer;
 
-    private @UI UILabel bitflyer;
+    private UIPane setting;
 
-    private @UI Pane setting;
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected UIDefinition declareUI() {
+        return new UIDefinition() {
+            {
+                hbox(() -> {
+                    vbox(CategoryPane, () -> {
+                        $(notification, CategoryLabel);
+                        $(bitflyer, CategoryLabel);
+                    });
+                    $(setting);
+                });
+            }
+        };
+    }
 
     /**
      * {@inheritDoc}
      */
     @Override
     protected void initialize() {
-        show(NotificationSetting.class);
+        setting.set(NotificationSetting.class);
 
-        notification.when(User.MouseClick, () -> show(NotificationSetting.class));
-        bitflyer.when(User.MouseClick, () -> show(BitFlyerSetting.class));
-    }
-
-    /**
-     * Show the specified setting view.
-     * 
-     * @param viewType
-     */
-    private <V extends View> void show(Class<V> viewType) {
-        V view = I.make(viewType);
-
-        ObservableList<Node> children = setting.getChildren();
-
-        if (children.isEmpty()) {
-            children.add(view.root());
-        } else {
-            children.set(0, view.root());
-        }
+        notification.when(User.MouseClick, () -> setting.set(NotificationSetting.class));
+        bitflyer.when(User.MouseClick, () -> setting.set(BitFlyerSetting.class));
     }
 
     /**
@@ -71,7 +66,7 @@ public class SettingView extends View {
      */
     @SuppressWarnings("unused")
     @Manageable(lifestyle = Singleton.class)
-    private static class Lang implements Extensible {
+    static class Lang implements Extensible {
 
         /**
          * Category title.
@@ -80,6 +75,15 @@ public class SettingView extends View {
          */
         String notification() {
             return "Notification";
+        }
+
+        /**
+         * Category title.
+         * 
+         * @return
+         */
+        String bitflyer() {
+            return "BitFlyer";
         }
 
         /**

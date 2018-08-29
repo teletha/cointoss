@@ -47,7 +47,11 @@
 /* ==========================================================================
  Preference Area
 ===========================================================================*/
-.PreferenceTitle {
+.CategoryPane {
+  -fx-padding: 40px 0 0 0;
+}
+
+.CategoryLabel {
 	-fx-font-size: 16px;
 	-fx-pref-width: 200px;
 	-fx-pref-height: 20px;
@@ -55,7 +59,7 @@
 	-fx-cursor: hand;
 }
 
-.PreferenceTitle:hover {
+.CategoryLabel:hover {
 	-fx-background-color: derive(-fx-base, 15%);
 }
 

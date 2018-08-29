@@ -20,6 +20,7 @@ import trademate.preference.Notificator;
 import trademate.preference.Notificator.DesktopPosition;
 import trademate.preference.Notificator.Notify;
 import trademate.preference.Sound;
+import trademate.setting.NotificationSetting.Lang;
 import viewtify.UI;
 import viewtify.View;
 import viewtify.ui.UIButton;
@@ -34,9 +35,8 @@ import viewtify.util.Icon;
  * @version 2018/08/27 18:53:30
  */
 @Manageable(lifestyle = Singleton.class)
-public class NotificationSetting extends View {
+public class NotificationSetting extends View<Lang> {
 
-    /** The message resource. */
     private final Lang $ = localizeBy(Lang.class);
 
     /** The notificator. */
@@ -134,7 +134,7 @@ public class NotificationSetting extends View {
      * @version 2018/08/27 21:10:05
      */
     @SuppressWarnings("unused")
-    private static class Lang implements Extensible {
+    static class Lang implements Extensible {
 
         /**
          * Title for the notification.

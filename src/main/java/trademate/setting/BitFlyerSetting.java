@@ -14,9 +14,9 @@ import static trademate.setting.SettingStyles.*;
 import kiss.Extensible;
 import kiss.Manageable;
 import kiss.Singleton;
-import viewtify.UI;
+import trademate.setting.BitFlyerSetting.Lang;
 import viewtify.View;
-import viewtify.fxml.FXML;
+import viewtify.dsl.UIDefinition;
 import viewtify.ui.UILabel;
 import viewtify.ui.UIPassword;
 
@@ -24,45 +24,37 @@ import viewtify.ui.UIPassword;
  * @version 2018/08/27 18:53:30
  */
 @Manageable(lifestyle = Singleton.class)
-public class BitFlyerSetting extends View {
+public class BitFlyerSetting extends View<Lang> {
 
-    /** The message resource. */
-    private final Lang M = localizeBy(Lang.class);
+    private UILabel publicAPIDescription;
 
-    private @UI UILabel publicAPIDescription;
+    private UIPassword apiKey;
 
-    private @UI UILabel apiKeyLabel;
-
-    private @UI UIPassword apiKey;
-
-    private @UI UILabel apiSecretLabel;
-
-    private @UI UIPassword apiSecret;
+    private UIPassword apiSecret;
 
     /**
      * {@inheritDoc}
      */
     @Override
     protected void initialize() {
-        System.out.println("Market View");
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected FXML defineUI() {
-        return new FXML() {
+    protected UIDefinition declareUI() {
+        return new UIDefinition() {
             {
                 vbox(Root, () -> {
                     label("BitFlyer", Heading);
                     $(publicAPIDescription, Description);
                     hbox(FormRow, () -> {
-                        $(apiKeyLabel, FormLabel);
+                        label("API Key", FormLabel);
                         $(apiKey, FormInput);
                     });
                     hbox(FormRow, () -> {
-                        $(apiSecretLabel, FormLabel);
+                        label("API Secret", FormLabel);
                         $(apiSecret, FormInput);
                     });
                 });
@@ -75,7 +67,7 @@ public class BitFlyerSetting extends View {
      */
     @SuppressWarnings("unused")
     @Manageable(lifestyle = Singleton.class)
-    private static class Lang implements Extensible {
+    static class Lang implements Extensible {
 
         /**
          * Label for API key
@@ -84,14 +76,6 @@ public class BitFlyerSetting extends View {
          */
         String publicAPIDescription() {
             return "Please get API key and API secret to use the public API provided by [BitFlyer](https://lightning.bitflyer.jp/developer).";
-        }
-
-        String apiKeyLabel() {
-            return "API Key";
-        }
-
-        String apiSecretLabel() {
-            return "API Secret";
         }
 
         /**

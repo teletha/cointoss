@@ -9,17 +9,13 @@
  */
 package trademate.setting;
 
-import viewtify.fxml.Style;
-import viewtify.fxml.StyleDSL;
+import viewtify.dsl.Style;
+import viewtify.dsl.StyleDSL;
 
 /**
  * @version 2018/08/29 15:08:22
  */
 class SettingStyles extends StyleDSL {
-
-    static {
-        System.out.println("END");
-    }
 
     static Style Root = empty();
 
@@ -32,4 +28,8 @@ class SettingStyles extends StyleDSL {
     static Style FormLabel = empty();
 
     static Style FormInput = empty();
+
+    static Style CategoryPane = empty();
+
+    static Style CategoryLabel = empty();
 }

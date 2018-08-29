@@ -22,6 +22,7 @@ import kiss.Extensible;
 import kiss.I;
 import kiss.Manageable;
 import kiss.Singleton;
+import trademate.BackTestView.Message;
 import trademate.chart.ChartView;
 import viewtify.UI;
 import viewtify.View;
@@ -34,10 +35,7 @@ import viewtify.ui.helper.User;
 /**
  * @version 2018/06/26 21:28:54
  */
-public class BackTestView extends View {
-
-    /** The message resource. */
-    private final Message $ = localizeBy(Message.class);
+public class BackTestView extends View<Message> {
 
     @UI
     private UIComboBox<MarketService> market;
@@ -63,8 +61,8 @@ public class BackTestView extends View {
         startDate.initial(Chrono.utcNow().minusDays(10)).uneditable().requireWhen(market).require(() -> {
             MarketLog log = market.value().log;
 
-            assert startDate.isBeforeOrSame(log.lastCacheDate()) : $.logIsNotFound();
-            assert startDate.isAfterOrSame(log.firstCacheDate()) : $.logIsNotFound();
+            assert startDate.isBeforeOrSame(log.lastCacheDate()) : message.logIsNotFound();
+            assert startDate.isAfterOrSame(log.firstCacheDate()) : message.logIsNotFound();
         }).observe((o, n) -> {
             endDate.value(v -> v.plus(Period.between(o, n)));
         });
@@ -94,7 +92,7 @@ public class BackTestView extends View {
      */
     @SuppressWarnings("unused")
     @Manageable(lifestyle = Singleton.class)
-    private static class Message implements Extensible {
+    static class Message implements Extensible {
 
         /**
          * Log is not found.
