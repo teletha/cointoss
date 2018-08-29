@@ -17,8 +17,8 @@ import javafx.collections.ObservableList;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import trademate.SettingView;
 import trademate.TradingView;
+import trademate.setting.SettingView;
 import viewtify.UI;
 import viewtify.View;
 import viewtify.Viewtify;

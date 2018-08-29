@@ -7,7 +7,7 @@
  *
  *          https://opensource.org/licenses/MIT
  */
-package trademate;
+package trademate.setting;
 
 import kiss.Manageable;
 import kiss.Singleton;
@@ -17,7 +17,7 @@ import viewtify.View;
  * @version 2018/08/27 18:53:30
  */
 @Manageable(lifestyle = Singleton.class)
-public class MarketSettingView extends View {
+public class BitFlyerSetting extends View {
 
     /**
      * {@inheritDoc}

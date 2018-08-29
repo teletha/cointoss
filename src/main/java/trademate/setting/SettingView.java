@@ -7,7 +7,7 @@
  *
  *          https://opensource.org/licenses/MIT
  */
-package trademate;
+package trademate.setting;
 
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
@@ -29,11 +29,12 @@ import viewtify.ui.helper.User;
 public class SettingView extends View {
 
     /** The message resource. */
+    @SuppressWarnings("unused")
     private final Lang $ = localizeBy(Lang.class);
 
-    private @UI UILabel marketCategory;
+    private @UI UILabel notification;
 
-    private @UI UILabel notificationCategory;
+    private @UI UILabel bitflyer;
 
     private @UI Pane setting;
 
@@ -42,10 +43,10 @@ public class SettingView extends View {
      */
     @Override
     protected void initialize() {
-        show(NotificationSettingView.class);
+        show(NotificationSetting.class);
 
-        marketCategory.when(User.MouseClick, () -> show(MarketSettingView.class));
-        notificationCategory.when(User.MouseClick, () -> show(NotificationSettingView.class));
+        notification.when(User.MouseClick, () -> show(NotificationSetting.class));
+        bitflyer.when(User.MouseClick, () -> show(BitFlyerSetting.class));
     }
 
     /**
@@ -68,6 +69,7 @@ public class SettingView extends View {
     /**
      * @version 2018/08/29 3:52:37
      */
+    @SuppressWarnings("unused")
     @Manageable(lifestyle = Singleton.class)
     private static class Lang implements Extensible {
 
@@ -76,16 +78,7 @@ public class SettingView extends View {
          * 
          * @return
          */
-        String marketCategory() {
-            return "Market";
-        }
-
-        /**
-         * Category title.
-         * 
-         * @return
-         */
-        String notificationCategory() {
+        String notification() {
             return "Notification";
         }
 
@@ -98,15 +91,7 @@ public class SettingView extends View {
              * {@inheritDoc}
              */
             @Override
-            String marketCategory() {
-                return "マーケット";
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            String notificationCategory() {
+            String notification() {
                 return "通知";
             }
         }

@@ -7,7 +7,7 @@
  *
  *          https://opensource.org/licenses/MIT
  */
-package trademate;
+package trademate.setting;
 
 import java.time.Duration;
 
@@ -34,7 +34,7 @@ import viewtify.util.Icon;
  * @version 2018/08/27 18:53:30
  */
 @Manageable(lifestyle = Singleton.class)
-public class NotificationSettingView extends View {
+public class NotificationSetting extends View {
 
     /** The message resource. */
     private final Lang $ = localizeBy(Lang.class);

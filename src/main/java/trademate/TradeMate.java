@@ -11,6 +11,7 @@ package trademate;
 
 import cointoss.market.bitflyer.BitFlyer;
 import kiss.I;
+import trademate.setting.SettingView;
 import viewtify.ActivationPolicy;
 import viewtify.UI;
 import viewtify.View;
