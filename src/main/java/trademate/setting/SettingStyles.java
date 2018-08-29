@@ -29,6 +29,8 @@ class SettingStyles extends StyleDSL {
 
     static Style FormInput = empty();
 
+    static Style FormInputMin = empty();
+
     static Style CategoryPane = empty();
 
     static Style CategoryLabel = empty();

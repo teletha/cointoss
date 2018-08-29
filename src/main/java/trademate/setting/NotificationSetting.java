@@ -23,7 +23,6 @@ import trademate.preference.Notificator.DesktopPosition;
 import trademate.preference.Notificator.Notify;
 import trademate.preference.Sound;
 import trademate.setting.NotificationSetting.Lang;
-import viewtify.UI;
 import viewtify.View;
 import viewtify.dsl.UIDefinition;
 import viewtify.ui.UIButton;
@@ -35,7 +34,7 @@ import viewtify.ui.helper.User;
 import viewtify.util.Icon;
 
 /**
- * @version 2018/08/27 18:53:30
+ * @version 2018/08/29 23:25:09
  */
 @Manageable(lifestyle = Singleton.class)
 public class NotificationSetting extends View<Lang> {
@@ -43,15 +42,50 @@ public class NotificationSetting extends View<Lang> {
     /** The notificator. */
     private final Notificator notificator = I.make(Notificator.class);
 
-    private NotifySetting longTrend;
-    //
-    // private @UI NotifySetting shortTrend;
-    //
-    // private @UI NotifySetting execution;
-    //
-    // private @UI NotifySetting orderFailed;
-    //
-    // private @UI NotifySetting priceSignal;
+    /** Enable desktop notification. */
+    private UICheckBox longTrendDesktop;
+
+    /** Enable LINE notification. */
+    private UICheckBox longTrendLine;
+
+    /** Enable sound notification. */
+    private UIComboBox<Sound> longTrendSound;
+
+    /** Enable desktop notification. */
+    private UICheckBox shortTrendDesktop;
+
+    /** Enable LINE notification. */
+    private UICheckBox shortTrendLine;
+
+    /** Enable sound notification. */
+    private UIComboBox<Sound> shortTrendSound;
+
+    /** Enable desktop notification. */
+    private UICheckBox executionDesktop;
+
+    /** Enable LINE notification. */
+    private UICheckBox executionLine;
+
+    /** Enable sound notification. */
+    private UIComboBox<Sound> executionSound;
+
+    /** Enable desktop notification. */
+    private UICheckBox orderFailedDesktop;
+
+    /** Enable LINE notification. */
+    private UICheckBox orderFailedLine;
+
+    /** Enable sound notification. */
+    private UIComboBox<Sound> orderFailedSound;
+
+    /** Enable desktop notification. */
+    private UICheckBox priceSignalDesktop;
+
+    /** Enable LINE notification. */
+    private UICheckBox priceSignalLine;
+
+    /** Enable sound notification. */
+    private UIComboBox<Sound> priceSignalSound;
 
     private UISpinner<Duration> desktopDuration;
 
@@ -76,6 +110,33 @@ public class NotificationSetting extends View<Lang> {
                         label(message.notificationTitle(), Heading);
                         hbox(FormRow, () -> {
                             label(message.longTrendRow(), FormLabel);
+                            $(longTrendDesktop, FormInputMin);
+                            $(longTrendLine, FormInputMin);
+                            $(longTrendSound, FormInput);
+                        });
+                        hbox(FormRow, () -> {
+                            label(message.shortTrendRow(), FormLabel);
+                            $(shortTrendDesktop, FormInputMin);
+                            $(shortTrendLine, FormInputMin);
+                            $(shortTrendSound, FormInput);
+                        });
+                        hbox(FormRow, () -> {
+                            label(message.executionRow(), FormLabel);
+                            $(executionDesktop, FormInputMin);
+                            $(executionLine, FormInputMin);
+                            $(executionSound, FormInput);
+                        });
+                        hbox(FormRow, () -> {
+                            label(message.orderFailedRow(), FormLabel);
+                            $(orderFailedDesktop, FormInputMin);
+                            $(orderFailedLine, FormInputMin);
+                            $(orderFailedSound, FormInput);
+                        });
+                        hbox(FormRow, () -> {
+                            label(message.priceSignalRow(), FormLabel);
+                            $(priceSignalDesktop, FormInputMin);
+                            $(priceSignalLine, FormInputMin);
+                            $(priceSignalSound, FormInput);
                         });
                     });
 
@@ -112,11 +173,12 @@ public class NotificationSetting extends View<Lang> {
      */
     @Override
     protected void initialize() {
-        longTrend.notify = notificator.longTrend;
-        // shortTrend.notify = notificator.shortTrend;
-        // execution.notify = notificator.execution;
-        // orderFailed.notify = notificator.orderFailed;
-        // priceSignal.notify = notificator.priceSignal;
+        // For Notification Type
+        init(notificator.longTrend, longTrendDesktop, longTrendLine, longTrendSound);
+        init(notificator.shortTrend, shortTrendDesktop, shortTrendLine, shortTrendSound);
+        init(notificator.execution, executionDesktop, executionLine, executionSound);
+        init(notificator.orderFailed, orderFailedDesktop, orderFailedLine, orderFailedSound);
+        init(notificator.priceSignal, priceSignalDesktop, priceSignalLine, priceSignalSound);
 
         // For Desktop
         desktopDuration.values(I.signalRange(2, 30, 2).map(Duration::ofSeconds))
@@ -135,50 +197,12 @@ public class NotificationSetting extends View<Lang> {
         });
     }
 
-    /**
-     * @version 2018/08/28 17:53:05
-     */
-    private class NotifySetting extends View {
-
-        private Notify notify;
-
-        /** Enable desktop notification. */
-        private @UI UICheckBox desktop;
-
-        /** Enable LINE notification. */
-        private @UI UICheckBox line;
-
-        /** Enable sound notification. */
-        private @UI UIComboBox<Sound> sound;
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        protected UIDefinition declareUI() {
-            return new UIDefinition() {
-                {
-                    hbox(FormInput, () -> {
-                        label("OK", FormLabel);
-                        $(desktop);
-                        $(line);
-                        $(sound, FormInput);
-                    });
-                }
-            };
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        protected void initialize() {
-            desktop.model(notify.desktop);
-            line.model(notify.line).disableWhen(lineAccessToken.model().isEmpty());
-            sound.values(Sound.values()).model(notify.sound).when(User.Action, e -> {
-                sound.value().play();
-            });
-        }
+    private void init(Notify notify, UICheckBox desktop, UICheckBox line, UIComboBox<Sound> sound) {
+        desktop.model(notify.desktop);
+        line.model(notify.line).disableWhen(lineAccessToken.model().isEmpty());
+        sound.values(Sound.values()).model(notify.sound).when(User.Action, e -> {
+            sound.value().play();
+        });
     }
 
     /**
