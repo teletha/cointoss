@@ -23,7 +23,11 @@
             </Label>
             <HBox>
                <children>
-                  <Label id="APIDescirption" styleClass="Description" text="API Description" />
+                  <Label id="publicAPIDescription" styleClass="Description" text="API Description">
+                     <stylesheets>
+                        <URL value="@../../../resources/TradeMate.css" />
+                        <URL value="@../../../../../../Viewtify/src/main/resources/viewtify/dark.css" />
+                     </stylesheets></Label>
                </children>
             </HBox>
             <GridPane>
