@@ -9,6 +9,8 @@
  */
 package trademate;
 
+import static trademate.setting.SettingStyles.*;
+
 import java.time.Period;
 
 import cointoss.Market;
@@ -24,33 +26,54 @@ import kiss.Manageable;
 import kiss.Singleton;
 import trademate.BackTestView.Message;
 import trademate.chart.ChartView;
-import viewtify.UI;
 import viewtify.View;
 import viewtify.Viewtify;
+import viewtify.dsl.UIDefinition;
 import viewtify.ui.UIButton;
 import viewtify.ui.UIComboBox;
 import viewtify.ui.UIDatePicker;
 import viewtify.ui.helper.User;
 
 /**
- * @version 2018/06/26 21:28:54
+ * @version 2018/08/30 3:16:28
  */
 public class BackTestView extends View<Message> {
 
-    @UI
     private UIComboBox<MarketService> market;
 
-    @UI
     private UIDatePicker startDate;
 
-    @UI
     private UIDatePicker endDate;
 
-    @UI
     private UIButton startButton;
 
-    @UI
     private ChartView chart;
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected UIDefinition declareUI() {
+        return new UIDefinition() {
+            {
+                hbox(() -> {
+                    vbox();
+                    vbox(() -> {
+                        $(market);
+                        hbox(FormRow, () -> {
+                            label(message.startDateLabel(), FormLabel);
+                            $(startDate, FormInput);
+                        });
+                        hbox(FormRow, () -> {
+                            label(message.endDateLabel(), FormLabel);
+                            $(endDate, FormInput);
+                        });
+                        $(startButton);
+                    });
+                });
+            }
+        };
+    }
 
     /**
      * {@inheritDoc}
@@ -95,6 +118,33 @@ public class BackTestView extends View<Message> {
     static class Message implements Extensible {
 
         /**
+         * Label for start button.
+         * 
+         * @return
+         */
+        String startButton() {
+            return "Start";
+        }
+
+        /**
+         * Label for start date.
+         * 
+         * @return
+         */
+        String startDateLabel() {
+            return "Start Date";
+        }
+
+        /**
+         * Label for end date.
+         * 
+         * @return
+         */
+        String endDateLabel() {
+            return "End Date";
+        }
+
+        /**
          * Log is not found.
          * 
          * @return
@@ -118,6 +168,30 @@ public class BackTestView extends View<Message> {
          * @version 2018/08/03 17:06:23
          */
         private static class Message_ja extends Message {
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            String startButton() {
+                return "開始";
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            String startDateLabel() {
+                return "開始日";
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            String endDateLabel() {
+                return "終了日";
+            }
 
             /**
              * {@inheritDoc}
