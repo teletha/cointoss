@@ -59,6 +59,10 @@
 	-fx-background-color: derive(-fx-base, 15%);
 }
 
+.Root {
+  -fx-padding: 20px 30px;
+}
+
 .Block {
 	-fx-padding: 30px 0 30px 0;
 	-fx-border-width: 2px 0 0 0;
@@ -77,6 +81,20 @@
 
 .Description {
 	-fx-padding: 2px 0 7px 0;
+}
+
+.FormRow {
+  -fx-min-height: 30px;
+  -fx-alignment: center-left;
+  -fx-padding: 3px 0;
+}
+
+.FormLabel {
+  -fx-min-width: 100px;
+}
+
+.FormInput {
+  -fx-min-width: 160px;
 }
 
 

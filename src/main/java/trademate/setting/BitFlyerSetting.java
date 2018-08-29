@@ -9,10 +9,16 @@
  */
 package trademate.setting;
 
+import static trademate.setting.SettingStyles.*;
+
 import kiss.Extensible;
 import kiss.Manageable;
 import kiss.Singleton;
+import viewtify.UI;
 import viewtify.View;
+import viewtify.fxml.FXML;
+import viewtify.ui.UILabel;
+import viewtify.ui.UIPassword;
 
 /**
  * @version 2018/08/27 18:53:30
@@ -21,7 +27,17 @@ import viewtify.View;
 public class BitFlyerSetting extends View {
 
     /** The message resource. */
-    private final Lang $ = localizeBy(Lang.class);
+    private final Lang M = localizeBy(Lang.class);
+
+    private @UI UILabel publicAPIDescription;
+
+    private @UI UILabel apiKeyLabel;
+
+    private @UI UIPassword apiKey;
+
+    private @UI UILabel apiSecretLabel;
+
+    private @UI UIPassword apiSecret;
 
     /**
      * {@inheritDoc}
@@ -29,6 +45,29 @@ public class BitFlyerSetting extends View {
     @Override
     protected void initialize() {
         System.out.println("Market View");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected FXML defineUI() {
+        return new FXML() {
+            {
+                vbox(Root, () -> {
+                    label("BitFlyer", Heading);
+                    $(publicAPIDescription, Description);
+                    hbox(FormRow, () -> {
+                        $(apiKeyLabel, FormLabel);
+                        $(apiKey, FormInput);
+                    });
+                    hbox(FormRow, () -> {
+                        $(apiSecretLabel, FormLabel);
+                        $(apiSecret, FormInput);
+                    });
+                });
+            }
+        };
     }
 
     /**
@@ -45,6 +84,14 @@ public class BitFlyerSetting extends View {
          */
         String publicAPIDescription() {
             return "Please get API key and API secret to use the public API provided by [BitFlyer](https://lightning.bitflyer.jp/developer).";
+        }
+
+        String apiKeyLabel() {
+            return "API Key";
+        }
+
+        String apiSecretLabel() {
+            return "API Secret";
         }
 
         /**
