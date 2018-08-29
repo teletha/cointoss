@@ -98,6 +98,18 @@
 
 .FormInputMin {
   -fx-min-width: 60px;
+  -fx-border-color: red;
+  -fx-border-width: 1px;
+}
+
+.FormCheck {
+  -fx-min-width: 60px;
+  -fx-alignment: center;
+}
+
+.FormCheck2 {
+  -fx-min-width: 160px;
+  -fx-alignment: center;
 }
 
 

@@ -109,34 +109,40 @@ public class NotificationSetting extends View<Lang> {
                     vbox(Block, () -> {
                         label(message.notificationTitle(), Heading);
                         hbox(FormRow, () -> {
+                            label("", FormLabel);
+                            hbox(FormCheck, label(message.desktopColumn()));
+                            hbox(FormCheck, label(message.lineColumn()));
+                            hbox(FormCheck2, label(message.soundColumn()));
+                        });
+                        hbox(FormRow, () -> {
                             label(message.longTrendRow(), FormLabel);
-                            $(longTrendDesktop, FormInputMin);
-                            $(longTrendLine, FormInputMin);
-                            $(longTrendSound, FormInput);
+                            hbox(FormCheck, longTrendDesktop);
+                            hbox(FormCheck, longTrendLine);
+                            hbox(FormCheck2, longTrendSound);
                         });
                         hbox(FormRow, () -> {
                             label(message.shortTrendRow(), FormLabel);
-                            $(shortTrendDesktop, FormInputMin);
-                            $(shortTrendLine, FormInputMin);
-                            $(shortTrendSound, FormInput);
+                            hbox(FormCheck, shortTrendDesktop);
+                            hbox(FormCheck, shortTrendLine);
+                            hbox(FormCheck2, shortTrendSound);
                         });
                         hbox(FormRow, () -> {
                             label(message.executionRow(), FormLabel);
-                            $(executionDesktop, FormInputMin);
-                            $(executionLine, FormInputMin);
-                            $(executionSound, FormInput);
+                            hbox(FormCheck, executionDesktop);
+                            hbox(FormCheck, executionLine);
+                            hbox(FormCheck2, executionSound);
                         });
                         hbox(FormRow, () -> {
                             label(message.orderFailedRow(), FormLabel);
-                            $(orderFailedDesktop, FormInputMin);
-                            $(orderFailedLine, FormInputMin);
-                            $(orderFailedSound, FormInput);
+                            hbox(FormCheck, orderFailedDesktop);
+                            hbox(FormCheck, orderFailedLine);
+                            hbox(FormCheck2, orderFailedSound);
                         });
                         hbox(FormRow, () -> {
                             label(message.priceSignalRow(), FormLabel);
-                            $(priceSignalDesktop, FormInputMin);
-                            $(priceSignalLine, FormInputMin);
-                            $(priceSignalSound, FormInput);
+                            hbox(FormCheck, priceSignalDesktop);
+                            hbox(FormCheck, priceSignalLine);
+                            hbox(FormCheck2, priceSignalSound);
                         });
                     });
 

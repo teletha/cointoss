@@ -37,5 +37,7 @@ class SettingStyles extends StyleDSL {
 
     static Style Block = empty();
 
-    static Style First = empty();
+    static Style FormCheck = empty();
+
+    static Style FormCheck2 = empty();
 }
