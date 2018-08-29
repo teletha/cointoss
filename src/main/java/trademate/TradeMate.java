@@ -13,9 +13,9 @@ import cointoss.market.bitflyer.BitFlyer;
 import kiss.I;
 import trademate.setting.SettingView;
 import viewtify.ActivationPolicy;
-import viewtify.UI;
 import viewtify.View;
 import viewtify.Viewtify;
+import viewtify.dsl.UIDefinition;
 import viewtify.ui.UITabPane;
 
 /**
@@ -27,7 +27,19 @@ public class TradeMate extends View {
         I.load(TradeMate.class, false);
     }
 
-    private @UI UITabPane main;
+    private UITabPane main;
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected UIDefinition declareUI() {
+        return new UIDefinition() {
+            {
+                $(main);
+            }
+        };
+    }
 
     /**
      * {@inheritDoc}
