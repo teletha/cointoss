@@ -9,6 +9,8 @@
  */
 package trademate.setting;
 
+import static trademate.setting.SettingStyles.*;
+
 import java.time.Duration;
 
 import cointoss.util.Network;
@@ -23,6 +25,7 @@ import trademate.preference.Sound;
 import trademate.setting.NotificationSetting.Lang;
 import viewtify.UI;
 import viewtify.View;
+import viewtify.dsl.UIDefinition;
 import viewtify.ui.UIButton;
 import viewtify.ui.UICheckBox;
 import viewtify.ui.UIComboBox;
@@ -37,20 +40,18 @@ import viewtify.util.Icon;
 @Manageable(lifestyle = Singleton.class)
 public class NotificationSetting extends View<Lang> {
 
-    private final Lang $ = localizeBy(Lang.class);
-
     /** The notificator. */
     private final Notificator notificator = I.make(Notificator.class);
 
-    private @UI NotifySetting longTrend;
-
-    private @UI NotifySetting shortTrend;
-
-    private @UI NotifySetting execution;
-
-    private @UI NotifySetting orderFailed;
-
-    private @UI NotifySetting priceSignal;
+    // private @UI NotifySetting longTrend;
+    //
+    // private @UI NotifySetting shortTrend;
+    //
+    // private @UI NotifySetting execution;
+    //
+    // private @UI NotifySetting orderFailed;
+    //
+    // private @UI NotifySetting priceSignal;
 
     private @UI UISpinner<Duration> desktopDuration;
 
@@ -66,17 +67,55 @@ public class NotificationSetting extends View<Lang> {
      * {@inheritDoc}
      */
     @Override
+    protected UIDefinition declareUI() {
+        return new UIDefinition() {
+            {
+                vbox(Root, () -> {
+                    // Notification Types
+
+                    // Desktop
+                    vbox(Block, () -> {
+                        label(message.desktopTitle(), Heading);
+                        hbox(FormRow, () -> {
+                            label(message.desktopDurationLabel(), FormLabel);
+                            $(desktopDuration, FormInput);
+                        });
+                        hbox(FormRow, () -> {
+                            label(message.desktopPositionLabel(), FormLabel);
+                            $(desktopPosition, FormInput);
+                        });
+                    });
+
+                    // LINE
+                    vbox(Block, () -> {
+                        label(message.lineTitle(), Heading);
+                        label(message.lineDescription(), Description);
+                        hbox(FormRow, () -> {
+                            label(message.lineAccessTokenLabel(), FormLabel);
+                            $(lineAccessToken, FormInput);
+                            $(lineTest, FormInput);
+                        });
+                    });
+                });
+            }
+        };
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     protected void initialize() {
-        longTrend.notify = notificator.longTrend;
-        shortTrend.notify = notificator.shortTrend;
-        execution.notify = notificator.execution;
-        orderFailed.notify = notificator.orderFailed;
-        priceSignal.notify = notificator.priceSignal;
+        // longTrend.notify = notificator.longTrend;
+        // shortTrend.notify = notificator.shortTrend;
+        // execution.notify = notificator.execution;
+        // orderFailed.notify = notificator.orderFailed;
+        // priceSignal.notify = notificator.priceSignal;
 
         // For Desktop
         desktopDuration.values(I.signalRange(2, 30, 2).map(Duration::ofSeconds))
                 .model(notificator.desktopDuration)
-                .text($::desktopDuration);
+                .text(message::desktopDuration);
         desktopPosition.values(DesktopPosition.class).model(notificator.desktopPosition);
 
         // For LINE
@@ -85,7 +124,7 @@ public class NotificationSetting extends View<Lang> {
             I.make(Network.class).line("TEST").to(e -> {
                 lineAccessToken.decorateBy(Icon.Success);
             }, e -> {
-                lineAccessToken.invalid($.lineTestFailed(lineAccessToken.value()));
+                lineAccessToken.invalid(message.lineTestFailed(lineAccessToken.value()));
             });
         });
     }

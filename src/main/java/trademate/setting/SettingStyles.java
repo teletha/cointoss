@@ -32,4 +32,6 @@ class SettingStyles extends StyleDSL {
     static Style CategoryPane = empty();
 
     static Style CategoryLabel = empty();
+
+    static Style Block = empty();
 }
