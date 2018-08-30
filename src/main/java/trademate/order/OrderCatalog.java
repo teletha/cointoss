@@ -23,18 +23,19 @@ import cointoss.order.OrderState;
 import cointoss.util.Num;
 import kiss.Variable;
 import trademate.TradingView;
-import viewtify.UI;
 import viewtify.View;
 import viewtify.Viewtify;
 import viewtify.bind.Calculation;
-import viewtify.ui.UISpinner;
+import viewtify.dsl.Style;
+import viewtify.dsl.StyleDSL;
+import viewtify.dsl.UIDefinition;
 import viewtify.ui.UITreeItem;
 import viewtify.ui.UITreeTableColumn;
 import viewtify.ui.UITreeTableView;
 import viewtify.ui.UserInterface;
 
 /**
- * @version 2017/12/25 12:25:16
+ * @version 2018/08/30 16:54:37
  */
 public class OrderCatalog extends View {
 
@@ -42,25 +43,39 @@ public class OrderCatalog extends View {
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd HH:mm:ss");
 
     /** UI */
-    private @UI UITreeTableView<Object> orderCatalog;
+    private UITreeTableView<Object> orderCatalog;
 
     /** UI */
-    private @UI UITreeTableColumn<Object, ZonedDateTime> requestedOrdersDate;
+    private UITreeTableColumn<Object, ZonedDateTime> requestedOrdersDate;
 
     /** UI */
-    private @UI UITreeTableColumn<Object, Side> requestedOrdersSide;
+    private UITreeTableColumn<Object, Side> requestedOrdersSide;
 
     /** UI */
-    private @UI UITreeTableColumn<Object, Num> requestedOrdersAmount;
+    private UITreeTableColumn<Object, Num> requestedOrdersAmount;
 
     /** UI */
-    private @UI UITreeTableColumn<Object, Num> requestedOrdersPrice;
-
-    /** UI */
-    private @UI UISpinner<Num> optimizeThreshold;
+    private UITreeTableColumn<Object, Num> requestedOrdersPrice;
 
     /** Parent View */
-    private @UI TradingView view;
+    private TradingView view;
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected UIDefinition declareUI() {
+        return new UIDefinition() {
+            {
+                $(orderCatalog, S.OrderCatalog, () -> {
+                    $(requestedOrdersDate, S.OrderCatalog1);
+                    $(requestedOrdersSide, S.OrderCatalog2);
+                    $(requestedOrdersPrice, S.OrderCatalog1);
+                    $(requestedOrdersAmount, S.OrderCatalog3);
+                });
+            }
+        };
+    }
 
     /**
      * {@inheritDoc}
@@ -71,8 +86,6 @@ public class OrderCatalog extends View {
             Calculation<Boolean> ordersArePassive = orderCatalog.selection().flatVariable(this::state).isNot(ACTIVE);
 
             $.menu("Cancel").disableWhen(ordersArePassive).whenUserClick(e -> act(this::cancel));
-            $.menu("Get Close").disableWhen(ordersArePassive).whenUserClick(e -> act(this::reorderClosely));
-            $.menu("Get Away").disableWhen(ordersArePassive).whenUserClick(e -> act(this::reorderAway));
         });
 
         requestedOrdersDate.modelByProperty(OrderSet.class, o -> o.date)
@@ -145,38 +158,6 @@ public class OrderCatalog extends View {
     }
 
     /**
-     * Reorder {@link Order}.
-     * 
-     * @param order
-     */
-    private void reorderClosely(Order order) {
-        Viewtify.inWorker(() -> {
-            Num price = view.market().orderBook.computeBestPrice(order.side, order.price.v, optimizeThreshold.value(), Num.of(2));
-
-            view.market().cancel(order).to(o -> {
-                view.console.info("{} is canceled.", o);
-
-                view.market().request(Order.limit(order.side, order.size, price)).to(re -> {
-                    view.console.info("{} is reorder.", re);
-                });
-            });
-        });
-    }
-
-    /**
-     * Reorder {@link Order}.
-     * 
-     * @param order
-     */
-    private void reorderAway(Order order) {
-        Viewtify.inWorker(() -> {
-            view.market().cancel(order).to(o -> {
-                view.console.info("{} is canceled.", order);
-            });
-        });
-    }
-
-    /**
      * @version 2017/12/04 14:32:07
      */
     private class CatalogRow extends TreeTableRow<Object> {
@@ -206,5 +187,19 @@ public class OrderCatalog extends View {
 
             // contextMenuProperty().bind(Viewtify.calculate(itemProperty()).map(v -> context.ui));
         }
+    }
+
+    /**
+     * @version 2018/08/30 12:50:36
+     */
+    private static class S extends StyleDSL {
+
+        static Style OrderCatalog = empty();
+
+        static Style OrderCatalog1 = empty();
+
+        static Style OrderCatalog2 = empty();
+
+        static Style OrderCatalog3 = empty();
     }
 }

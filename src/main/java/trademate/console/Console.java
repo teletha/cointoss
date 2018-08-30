@@ -19,9 +19,11 @@ import org.apache.logging.log4j.Logger;
 
 import trademate.TradingView;
 import trademate.setting.SettingView;
-import viewtify.UI;
 import viewtify.View;
 import viewtify.Viewtify;
+import viewtify.dsl.Style;
+import viewtify.dsl.StyleDSL;
+import viewtify.dsl.UIDefinition;
 import viewtify.ui.UIListView;
 
 /**
@@ -35,13 +37,25 @@ public class Console extends View {
     /** The background logger. */
     private Logger logger;
 
-    private @UI SettingView setting;
+    private SettingView setting;
 
-    private @UI TradingView view;
+    private TradingView view;
 
-    private @UI UIListView<String> console;
+    private UIListView<String> console;
 
     final ObservableList<String> messages = FXCollections.observableList(new LinkedList());
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected UIDefinition declareUI() {
+        return new UIDefinition() {
+            {
+                $(console, S.ConsoleView);
+            }
+        };
+    }
 
     /**
      * {@inheritDoc}
@@ -78,5 +92,13 @@ public class Console extends View {
      */
     public void info(String message, Object... params) {
         logger.info(message, params);
+    }
+
+    /**
+     * @version 2018/08/30 12:50:36
+     */
+    private static class S extends StyleDSL {
+
+        static Style ConsoleView = empty();
     }
 }

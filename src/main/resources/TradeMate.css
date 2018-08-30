@@ -205,3 +205,23 @@
 .ExecutionTakerSize {
   -fx-pref-width: 70px;
 }
+
+.ConsoleView {
+   -fx-pref-width: 700px;
+}
+
+.OrderCatalog {
+  -fx-pref-width: 569px;
+}
+
+.OrderCatalog1 {
+  -fx-pref-width: 120px;
+}
+
+.OrderCatalog2 {
+  -fx-pref-width: 70px;
+}
+
+.OrderCatalog3 {
+  -fx-pref-width: 80px;
+}

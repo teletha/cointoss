@@ -12,8 +12,6 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.control.TreeTableColumn?>
-<?import javafx.scene.control.TreeTableView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
@@ -22,14 +20,7 @@
    <bottom>
       <HBox maxHeight="300.0" minHeight="300.0" prefHeight="300.0" BorderPane.alignment="BOTTOM_LEFT">
          <children>
-            <TreeTableView id="orderCatalog" focusTraversable="false" maxWidth="405.0" minWidth="405.0" prefWidth="405.0" showRoot="false">
-               <columns>
-                  <TreeTableColumn id="requestedOrdersDate" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" text="注文" />
-                  <TreeTableColumn id="requestedOrdersSide" maxWidth="70.0" minWidth="70.0" prefWidth="70.0" text="売買" />
-                  <TreeTableColumn id="requestedOrdersAmount" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" text="数量" />
-                  <TreeTableColumn id="requestedOrdersPrice" maxWidth="80.0" minWidth="80.0" text="価格" />
-               </columns>
-            </TreeTableView>
+            <VBox id="orders" />
             <TableView id="positions" focusTraversable="false" maxWidth="525.0" minWidth="525.0" prefWidth="525.0">
                <columns>
                   <TableColumn id="openPositionDate" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" text="建玉" />
@@ -39,7 +30,7 @@
                   <TableColumn id="openPositionProfitAndLoss" maxWidth="100.0" minWidth="100.0" prefWidth="100.0" text="損益" />
                </columns>
             </TableView>
-            <ListView id="console" focusTraversable="false" prefWidth="700.0" />
+            <VBox id="console" />
          </children>
       </HBox>
    </bottom>
