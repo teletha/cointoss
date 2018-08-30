@@ -42,50 +42,15 @@ public class NotificationSetting extends View<Lang> {
     /** The notificator. */
     private final Notificator notificator = I.make(Notificator.class);
 
-    /** Enable desktop notification. */
-    private UICheckBox longTrendDesktop;
+    private NotifySetting longTrend = new NotifySetting(notificator.longTrend);
 
-    /** Enable LINE notification. */
-    private UICheckBox longTrendLine;
+    private NotifySetting shortTrend = new NotifySetting(notificator.shortTrend);
 
-    /** Enable sound notification. */
-    private UIComboBox<Sound> longTrendSound;
+    private NotifySetting execution = new NotifySetting(notificator.execution);
 
-    /** Enable desktop notification. */
-    private UICheckBox shortTrendDesktop;
+    private NotifySetting orderFailed = new NotifySetting(notificator.orderFailed);
 
-    /** Enable LINE notification. */
-    private UICheckBox shortTrendLine;
-
-    /** Enable sound notification. */
-    private UIComboBox<Sound> shortTrendSound;
-
-    /** Enable desktop notification. */
-    private UICheckBox executionDesktop;
-
-    /** Enable LINE notification. */
-    private UICheckBox executionLine;
-
-    /** Enable sound notification. */
-    private UIComboBox<Sound> executionSound;
-
-    /** Enable desktop notification. */
-    private UICheckBox orderFailedDesktop;
-
-    /** Enable LINE notification. */
-    private UICheckBox orderFailedLine;
-
-    /** Enable sound notification. */
-    private UIComboBox<Sound> orderFailedSound;
-
-    /** Enable desktop notification. */
-    private UICheckBox priceSignalDesktop;
-
-    /** Enable LINE notification. */
-    private UICheckBox priceSignalLine;
-
-    /** Enable sound notification. */
-    private UIComboBox<Sound> priceSignalSound;
+    private NotifySetting priceSignal = new NotifySetting(notificator.priceSignal);
 
     private UISpinner<Duration> desktopDuration;
 
@@ -114,36 +79,11 @@ public class NotificationSetting extends View<Lang> {
                             hbox(FormCheck, label(message.lineColumn()));
                             hbox(FormCheck2, label(message.soundColumn()));
                         });
-                        hbox(FormRow, () -> {
-                            label(message.longTrendRow(), FormLabel);
-                            hbox(FormCheck, longTrendDesktop);
-                            hbox(FormCheck, longTrendLine);
-                            hbox(FormCheck2, longTrendSound);
-                        });
-                        hbox(FormRow, () -> {
-                            label(message.shortTrendRow(), FormLabel);
-                            hbox(FormCheck, shortTrendDesktop);
-                            hbox(FormCheck, shortTrendLine);
-                            hbox(FormCheck2, shortTrendSound);
-                        });
-                        hbox(FormRow, () -> {
-                            label(message.executionRow(), FormLabel);
-                            hbox(FormCheck, executionDesktop);
-                            hbox(FormCheck, executionLine);
-                            hbox(FormCheck2, executionSound);
-                        });
-                        hbox(FormRow, () -> {
-                            label(message.orderFailedRow(), FormLabel);
-                            hbox(FormCheck, orderFailedDesktop);
-                            hbox(FormCheck, orderFailedLine);
-                            hbox(FormCheck2, orderFailedSound);
-                        });
-                        hbox(FormRow, () -> {
-                            label(message.priceSignalRow(), FormLabel);
-                            hbox(FormCheck, priceSignalDesktop);
-                            hbox(FormCheck, priceSignalLine);
-                            hbox(FormCheck2, priceSignalSound);
-                        });
+                        $(longTrend);
+                        $(shortTrend);
+                        $(execution);
+                        $(orderFailed);
+                        $(priceSignal);
                     });
 
                     // Desktop
@@ -179,13 +119,6 @@ public class NotificationSetting extends View<Lang> {
      */
     @Override
     protected void initialize() {
-        // For Notification Type
-        init(notificator.longTrend, longTrendDesktop, longTrendLine, longTrendSound);
-        init(notificator.shortTrend, shortTrendDesktop, shortTrendLine, shortTrendSound);
-        init(notificator.execution, executionDesktop, executionLine, executionSound);
-        init(notificator.orderFailed, orderFailedDesktop, orderFailedLine, orderFailedSound);
-        init(notificator.priceSignal, priceSignalDesktop, priceSignalLine, priceSignalSound);
-
         // For Desktop
         desktopDuration.values(I.signalRange(2, 30, 2).map(Duration::ofSeconds))
                 .model(notificator.desktopDuration)
@@ -203,12 +136,57 @@ public class NotificationSetting extends View<Lang> {
         });
     }
 
-    private void init(Notify notify, UICheckBox desktop, UICheckBox line, UIComboBox<Sound> sound) {
-        desktop.model(notify.desktop);
-        line.model(notify.line).disableWhen(lineAccessToken.model().isEmpty());
-        sound.values(Sound.values()).model(notify.sound).when(User.Action, e -> {
-            sound.value().play();
-        });
+    /**
+     * @version 2018/08/30 9:54:57
+     */
+    private class NotifySetting extends View {
+
+        private final Notify notify;
+
+        /** Enable desktop notification. */
+        private UICheckBox desktop;
+
+        /** Enable LINE notification. */
+        private UICheckBox line;
+
+        /** Enable sound notification. */
+        private UIComboBox<Sound> sound;
+
+        /**
+         * @param notify
+         */
+        private NotifySetting(Notify notify) {
+            this.notify = notify;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected void initialize() {
+            desktop.model(notify.desktop);
+            line.model(notify.line).disableWhen(lineAccessToken.model().isEmpty());
+            sound.values(Sound.values()).model(notify.sound).when(User.Action, e -> {
+                sound.value().play();
+            });
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected UIDefinition declareUI() {
+            return new UIDefinition() {
+                {
+                    hbox(FormRow, () -> {
+                        label(notify, FormLabel);
+                        hbox(FormCheck, desktop);
+                        hbox(FormCheck, line);
+                        hbox(FormCheck2, sound);
+                    });
+                }
+            };
+        }
     }
 
     /**
@@ -251,51 +229,6 @@ public class NotificationSetting extends View<Lang> {
          */
         String soundColumn() {
             return "Sound";
-        }
-
-        /**
-         * Row label for the long trend.
-         * 
-         * @return
-         */
-        String longTrendRow() {
-            return "Long Trend";
-        }
-
-        /**
-         * Row label for the short trend.
-         * 
-         * @return
-         */
-        String shortTrendRow() {
-            return "Long Trend";
-        }
-
-        /**
-         * Row label for the execution.
-         * 
-         * @return
-         */
-        String executionRow() {
-            return "Execution";
-        }
-
-        /**
-         * Row label for the failed order.
-         * 
-         * @return
-         */
-        String orderFailedRow() {
-            return "Order Failed";
-        }
-
-        /**
-         * Row label for the price signal.
-         * 
-         * @return
-         */
-        String priceSignalRow() {
-            return "Price Signal";
         }
 
         /**
@@ -399,31 +332,6 @@ public class NotificationSetting extends View<Lang> {
             @Override
             String soundColumn() {
                 return "音声";
-            }
-
-            @Override
-            String longTrendRow() {
-                return "買いトレンド";
-            }
-
-            @Override
-            String shortTrendRow() {
-                return "売りトレンド";
-            }
-
-            @Override
-            String executionRow() {
-                return "約定";
-            }
-
-            @Override
-            String orderFailedRow() {
-                return "注文失敗";
-            }
-
-            @Override
-            String priceSignalRow() {
-                return "指定値へ到達";
             }
 
             @Override

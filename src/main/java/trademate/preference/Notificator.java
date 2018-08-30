@@ -22,22 +22,22 @@ import viewtify.Preference;
 import viewtify.Viewtify;
 
 /**
- * @version 2018/08/27 23:27:46
+ * @version 2018/08/30 10:30:09
  */
 public class Notificator extends Preference<Notificator> {
 
     /** The message resource. */
     private static final Lang message = I.i18n(Lang.class);
 
-    public final Notify longTrend = new Notify();
+    public final Notify longTrend = new Notify(message.longTrend());
 
-    public final Notify shortTrend = new Notify();
+    public final Notify shortTrend = new Notify(message.shortTrend());
 
-    public final Notify execution = new Notify();
+    public final Notify execution = new Notify(message.execution());
 
-    public final Notify orderFailed = new Notify();
+    public final Notify orderFailed = new Notify(message.orderFailed());
 
-    public final Notify priceSignal = new Notify();
+    public final Notify priceSignal = new Notify(message.priceSignal());
 
     /** The desktop position. */
     public final Variable<DesktopPosition> desktopPosition = Variable.of(DesktopPosition.BottomRight);
@@ -56,7 +56,7 @@ public class Notificator extends Preference<Notificator> {
     }
 
     /**
-     * @version 2018/08/28 0:19:09
+     * @version 2018/08/30 10:30:06
      */
     public class Notify {
 
@@ -69,10 +69,14 @@ public class Notificator extends Preference<Notificator> {
         /** Showing notification pane. */
         public final Variable<Sound> sound = Variable.of(Sound.なし);
 
+        /** The type name. */
+        private final String name;
+
         /**
          * 
          */
-        public Notify() {
+        public Notify(String name) {
+            this.name = name;
         }
 
         /**
@@ -104,6 +108,14 @@ public class Notificator extends Preference<Notificator> {
             if (line.is(true)) {
                 I.make(Network.class).line(message).to(I.NoOP);
             }
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String toString() {
+            return name;
         }
     }
 
@@ -186,6 +198,51 @@ public class Notificator extends Preference<Notificator> {
         }
 
         /**
+         * Type name.
+         * 
+         * @return
+         */
+        String longTrend() {
+            return "Long Trend";
+        }
+
+        /**
+         * Type name.
+         * 
+         * @return
+         */
+        String shortTrend() {
+            return "Short Trend";
+        }
+
+        /**
+         * Type name.
+         * 
+         * @return
+         */
+        String execution() {
+            return "Execution";
+        }
+
+        /**
+         * Type name.
+         * 
+         * @return
+         */
+        String orderFailed() {
+            return "Order Failed";
+        }
+
+        /**
+         * Type name.
+         * 
+         * @return
+         */
+        String priceSignal() {
+            return "Price Signal";
+        }
+
+        /**
          * @version 2018/08/27 20:47:17
          */
         @SuppressWarnings("unused")
@@ -221,6 +278,31 @@ public class Notificator extends Preference<Notificator> {
             @Override
             String positionBottomRight() {
                 return "右下";
+            }
+
+            @Override
+            String longTrend() {
+                return "買いトレンド";
+            }
+
+            @Override
+            String shortTrend() {
+                return "売りトレンド";
+            }
+
+            @Override
+            String execution() {
+                return "約定";
+            }
+
+            @Override
+            String orderFailed() {
+                return "注文失敗";
+            }
+
+            @Override
+            String priceSignal() {
+                return "指定値へ到達";
             }
         }
     }
