@@ -97,6 +97,7 @@ public class ChartView extends View {
      */
     private static class S extends StyleDSL {
 
-        static Style Data = empty();
+        static Style Data = () -> {
+        };
     }
 }

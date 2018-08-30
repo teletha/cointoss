@@ -99,6 +99,7 @@ public class Console extends View {
      */
     private static class S extends StyleDSL {
 
-        static Style ConsoleView = empty();
+        static Style ConsoleView = () -> {
+        };
     }
 }

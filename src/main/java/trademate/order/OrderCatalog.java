@@ -60,11 +60,51 @@ public class OrderCatalog extends View {
     /** Parent View */
     private TradingView view;
 
+    private final StyleDSL S = new StyleDSL() {
+        Style OrderCatalog = () -> {
+        };
+
+        Style OrderCatalog1 = () -> {
+        };
+
+        Style OrderCatalog2 = () -> {
+        };
+
+        Style OrderCatalog3 = () -> {
+            display.width(65, px);
+        };
+    };
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected stylist.StyleDSL declareStyle() {
+        return new stylist.StyleDSL() {
+
+        };
+    }
+
     /**
      * {@inheritDoc}
      */
     @Override
     protected UIDefinition declareUI() {
+        var S = new StyleDSL() {
+            Style OrderCatalog = () -> {
+            };
+
+            Style OrderCatalog1 = () -> {
+            };
+
+            Style OrderCatalog2 = () -> {
+            };
+
+            Style OrderCatalog3 = () -> {
+                display.width(65, px);
+            };
+        };
+
         return new UIDefinition() {
             {
                 $(orderCatalog, S.OrderCatalog, () -> {
@@ -194,12 +234,17 @@ public class OrderCatalog extends View {
      */
     private static class S extends StyleDSL {
 
-        static Style OrderCatalog = empty();
+        static Style OrderCatalog = () -> {
+        };
 
-        static Style OrderCatalog1 = empty();
+        static Style OrderCatalog1 = () -> {
+        };
 
-        static Style OrderCatalog2 = empty();
+        static Style OrderCatalog2 = () -> {
+        };
 
-        static Style OrderCatalog3 = empty();
+        static Style OrderCatalog3 = () -> {
+            display.width(65, px);
+        };
     }
 }

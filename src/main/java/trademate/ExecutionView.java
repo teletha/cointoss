@@ -136,8 +136,10 @@ public class ExecutionView extends View {
      */
     private static class S extends StyleDSL {
 
-        static Style ExecutionView = empty();
+        static Style ExecutionView = () -> {
+        };
 
-        static Style ExecutionTakerSize = empty();
+        static Style ExecutionTakerSize = () -> {
+        };
     }
 }

@@ -17,27 +17,39 @@ import viewtify.dsl.StyleDSL;
  */
 public class SettingStyles extends StyleDSL {
 
-    public static final Style Root = empty();
+    public static final Style Root = () -> {
+    };
 
-    public static final Style Heading = empty();
+    public static final Style Heading = () -> {
+    };
 
-    public static final Style Description = empty();
+    public static final Style Description = () -> {
+    };
 
-    public static final Style FormRow = empty();
+    public static final Style FormRow = () -> {
+    };
 
-    public static final Style FormLabel = empty();
+    public static final Style FormLabel = () -> {
+    };
 
-    public static final Style FormInput = empty();
+    public static final Style FormInput = () -> {
+    };
 
-    public static final Style FormInputMin = empty();
+    public static final Style FormInputMin = () -> {
+    };
 
-    public static final Style CategoryPane = empty();
+    public static final Style CategoryPane = () -> {
+    };
 
-    public static final Style CategoryLabel = empty();
+    public static final Style CategoryLabel = () -> {
+    };
 
-    public static final Style Block = empty();
+    public static final Style Block = () -> {
+    };
 
-    public static final Style FormCheck = empty();
+    public static final Style FormCheck = () -> {
+    };
 
-    public static final Style FormCheck2 = empty();
+    public static final Style FormCheck2 = () -> {
+    };
 }
