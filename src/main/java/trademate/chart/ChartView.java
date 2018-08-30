@@ -13,13 +13,15 @@ import cointoss.Market;
 import cointoss.ticker.TickSpan;
 import cointoss.ticker.Ticker;
 import kiss.Variable;
-import viewtify.UI;
 import viewtify.View;
+import viewtify.dsl.Style;
+import viewtify.dsl.StyleDSL;
+import viewtify.dsl.UIDefinition;
 import viewtify.ui.UIComboBox;
 import viewtify.ui.UILabel;
 
 /**
- * @version 2018/07/14 0:26:27
+ * @version 2018/08/30 9:37:10
  */
 public class ChartView extends View {
 
@@ -30,28 +32,51 @@ public class ChartView extends View {
     public final Variable<Ticker> ticker = Variable.of(Ticker.EMPTY);
 
     /** Chart UI */
-    protected @UI UIComboBox<TickSpan> span;
+    protected UIComboBox<TickSpan> span;
 
     /** Chart UI */
-    protected @UI UILabel selectDate;
+    protected UILabel selectDate;
 
     /** Chart UI */
-    protected @UI UILabel selectHigh;
+    protected UILabel selectHigh;
 
     /** Chart UI */
-    protected @UI UILabel selectLow;
+    protected UILabel selectLow;
 
     /** Chart UI */
-    protected @UI UILabel selectVolume;
+    protected UILabel selectVolume;
 
     /** Chart UI */
-    protected @UI UILabel selectLongVolume;
+    protected UILabel selectLongVolume;
 
     /** Chart UI */
-    protected @UI UILabel selectShortVolume;
+    protected UILabel selectShortVolume;
 
     /** The candle chart. */
-    private final @UI Chart chart = new Chart(this);
+    private final Chart chart = new Chart(this);
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected UIDefinition declareUI() {
+        return new UIDefinition() {
+            {
+                vbox(() -> {
+                    hbox(() -> {
+                        $(span);
+                        $(selectDate);
+                        $(selectHigh, S.Data);
+                        $(selectLow, S.Data);
+                        $(selectVolume, S.Data);
+                        $(selectLongVolume, S.Data);
+                        $(selectShortVolume, S.Data);
+                    });
+                    $(chart);
+                });
+            }
+        };
+    }
 
     /**
      * {@inheritDoc}
@@ -60,6 +85,18 @@ public class ChartView extends View {
     protected void initialize() {
         span.values(0, TickSpan.class);
 
-        span.observeNow().skipNull().combineLatest(market.observeNow().skipNull()).map(e -> e.ⅱ.tickers.tickerBy(e.ⅰ)).to(ticker::set);
+        span.observeNow() //
+                .skipNull()
+                .combineLatest(market.observeNow().skipNull())
+                .map(e -> e.ⅱ.tickers.tickerBy(e.ⅰ))
+                .to(ticker::set);
+    }
+
+    /**
+     * @version 2018/08/30 9:07:20
+     */
+    private static class S extends StyleDSL {
+
+        static Style Data = empty();
     }
 }

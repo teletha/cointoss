@@ -57,7 +57,7 @@ public class BackTestView extends View<Message> {
         return new UIDefinition() {
             {
                 hbox(() -> {
-                    vbox();
+                    $(chart);
                     vbox(() -> {
                         $(market);
                         hbox(FormRow, () -> {
