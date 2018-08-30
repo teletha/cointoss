@@ -217,33 +217,10 @@
                   <Cursor fx:constant="DEFAULT" />
                </cursor>
             </VBox>
-            <VBox alignment="CENTER" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="210.0" SplitPane.resizableWithParent="false">
+            <VBox id="executionView" alignment="CENTER" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="210.0" SplitPane.resizableWithParent="false">
                <cursor>
                   <Cursor fx:constant="DEFAULT" />
                </cursor>
-               <children>
-                  <ListView id="executionList" focusTraversable="false" VBox.vgrow="ALWAYS">
-                     <VBox.margin>
-                        <Insets />
-                     </VBox.margin>
-                  </ListView>
-                  <HBox alignment="CENTER">
-                     <children>
-                        <Spinner id="takerSize" maxWidth="70.0" minWidth="70.0" prefWidth="70.0" />
-                        <Label focusTraversable="false" prefWidth="80.0" textOverrun="CLIP" />
-                        <Label alignment="CENTER_RIGHT" focusTraversable="false" prefWidth="90.0" textAlignment="RIGHT" textOverrun="CLIP">
-                           <padding>
-                              <Insets right="20.0" />
-                           </padding>
-                        </Label>
-                     </children>
-                  </HBox>
-                  <ListView id="executionCumulativeList" focusTraversable="false" VBox.vgrow="ALWAYS">
-                     <cursor>
-                        <Cursor fx:constant="DEFAULT" />
-                     </cursor>
-                  </ListView>
-               </children>
             </VBox>
          </items>
       </SplitPane>

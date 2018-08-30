@@ -16,29 +16,49 @@ import javafx.scene.control.ListCell;
 import cointoss.Execution;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
-import viewtify.UI;
 import viewtify.View;
 import viewtify.Viewtify;
+import viewtify.dsl.Style;
+import viewtify.dsl.StyleDSL;
+import viewtify.dsl.UIDefinition;
 import viewtify.ui.UIListView;
 import viewtify.ui.UISpinner;
 import viewtify.ui.UserInterface;
 
 /**
- * @version 2018/01/12 21:29:04
+ * @version 2018/08/30 12:53:20
  */
 public class ExecutionView extends View {
 
     /** The execution list. */
-    private @UI UIListView<Execution> executionList;
+    private UIListView<Execution> executionList;
 
     /** The execution list. */
-    private @UI UIListView<Execution> executionCumulativeList;
+    private UIListView<Execution> executionCumulativeList;
 
     /** UI for interval configuration. */
-    private @UI UISpinner<Integer> takerSize;
+    private UISpinner<Integer> takerSize;
 
     /** Parent View */
-    private @UI TradingView view;
+    private TradingView view;
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected UIDefinition declareUI() {
+        return new UIDefinition() {
+            {
+                vbox(S.ExecutionView, () -> {
+                    $(executionList);
+                    hbox(() -> {
+                        $(takerSize, S.ExecutionTakerSize);
+                    });
+                    $(executionCumulativeList);
+                });
+            }
+        };
+    }
 
     /**
      * {@inheritDoc}
@@ -109,5 +129,15 @@ public class ExecutionView extends View {
                 ui.styleOnly(e.side);
             }
         }
+    }
+
+    /**
+     * @version 2018/08/30 12:50:36
+     */
+    private static class S extends StyleDSL {
+
+        static Style ExecutionView = empty();
+
+        static Style ExecutionTakerSize = empty();
     }
 }
