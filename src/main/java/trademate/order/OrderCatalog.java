@@ -22,12 +22,12 @@ import cointoss.order.Order;
 import cointoss.order.OrderState;
 import cointoss.util.Num;
 import kiss.Variable;
+import stylist.StyleDSL;
 import trademate.TradingView;
 import viewtify.View;
 import viewtify.Viewtify;
 import viewtify.bind.Calculation;
 import viewtify.dsl.Style;
-import viewtify.dsl.StyleDSL;
 import viewtify.dsl.UIDefinition;
 import viewtify.ui.UITreeItem;
 import viewtify.ui.UITreeTableColumn;
@@ -60,58 +60,18 @@ public class OrderCatalog extends View {
     /** Parent View */
     private TradingView view;
 
-    private final StyleDSL S = new StyleDSL() {
-        Style OrderCatalog = () -> {
-        };
-
-        Style OrderCatalog1 = () -> {
-        };
-
-        Style OrderCatalog2 = () -> {
-        };
-
-        Style OrderCatalog3 = () -> {
-            display.width(65, px);
-        };
-    };
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected stylist.StyleDSL declareStyle() {
-        return new stylist.StyleDSL() {
-
-        };
-    }
-
     /**
      * {@inheritDoc}
      */
     @Override
     protected UIDefinition declareUI() {
-        var S = new StyleDSL() {
-            Style OrderCatalog = () -> {
-            };
-
-            Style OrderCatalog1 = () -> {
-            };
-
-            Style OrderCatalog2 = () -> {
-            };
-
-            Style OrderCatalog3 = () -> {
-                display.width(65, px);
-            };
-        };
-
         return new UIDefinition() {
             {
-                $(orderCatalog, S.OrderCatalog, () -> {
-                    $(requestedOrdersDate, S.OrderCatalog1);
-                    $(requestedOrdersSide, S.OrderCatalog2);
-                    $(requestedOrdersPrice, S.OrderCatalog1);
-                    $(requestedOrdersAmount, S.OrderCatalog3);
+                $(orderCatalog, CSS.root, () -> {
+                    $(requestedOrdersDate, CSS.wide);
+                    $(requestedOrdersSide, CSS.narrow);
+                    $(requestedOrdersPrice, CSS.wide);
+                    $(requestedOrdersAmount, CSS.narrow);
                 });
             }
         };
@@ -232,18 +192,17 @@ public class OrderCatalog extends View {
     /**
      * @version 2018/08/30 12:50:36
      */
-    private static class S extends StyleDSL {
+    private static class CSS extends StyleDSL {
 
-        static Style OrderCatalog = () -> {
+        static Style root = () -> {
+            display.width(400, px);
         };
 
-        static Style OrderCatalog1 = () -> {
+        static Style wide = () -> {
+            display.width(120, px);
         };
 
-        static Style OrderCatalog2 = () -> {
-        };
-
-        static Style OrderCatalog3 = () -> {
+        static Style narrow = () -> {
             display.width(65, px);
         };
     }

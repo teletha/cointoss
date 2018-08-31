@@ -36,7 +36,8 @@ class MockBitFlyerService extends BitFlyerService {
     MockBitFlyerService() {
         super("FX_BTC_JPY", true, MarketSetting.builder()
                 .baseCurrencyMinimumBidPrice(Num.ONE)
-                .targetCurrencyMinimumBidSize(Num.of("0.01")));
+                .targetCurrencyMinimumBidSize(Num.of("0.01"))
+                .orderBookGroupRanges(Num.of(1)));
 
         network = mockNetwork = new MockNetwork();
     }

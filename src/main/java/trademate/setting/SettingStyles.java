@@ -9,8 +9,8 @@
  */
 package trademate.setting;
 
+import stylist.StyleDSL;
 import viewtify.dsl.Style;
-import viewtify.dsl.StyleDSL;
 
 /**
  * @version 2018/08/29 15:08:22

@@ -92,7 +92,8 @@ public class TestableMarketService extends MarketService {
     public TestableMarketService(Time lag, Num baseCurrency, Num targetCurrency) {
         super("TestableExchange", "TestableMarket", MarketSetting.builder()
                 .baseCurrencyMinimumBidPrice(Num.ONE)
-                .targetCurrencyMinimumBidSize(Num.ONE));
+                .targetCurrencyMinimumBidSize(Num.ONE)
+                .orderBookGroupRanges(Num.of(1)));
 
         this.lag = lag;
         this.baseCurrency = Objects.requireNonNull(baseCurrency);

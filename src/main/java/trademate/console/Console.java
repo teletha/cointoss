@@ -17,12 +17,12 @@ import javafx.collections.ObservableList;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import stylist.StyleDSL;
 import trademate.TradingView;
 import trademate.setting.SettingView;
 import viewtify.View;
 import viewtify.Viewtify;
 import viewtify.dsl.Style;
-import viewtify.dsl.StyleDSL;
 import viewtify.dsl.UIDefinition;
 import viewtify.ui.UIListView;
 
