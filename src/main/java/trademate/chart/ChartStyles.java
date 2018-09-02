@@ -9,9 +9,9 @@
  */
 package trademate.chart;
 
-import stylist.Style;
 import stylist.StyleDSL;
 import stylist.value.Color;
+import viewtify.dsl.Style;
 
 /**
  * @version 2018/09/03 1:21:23

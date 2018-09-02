@@ -34,10 +34,10 @@ import cointoss.ticker.Tick;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
 import kiss.I;
-import stylist.Style;
 import trademate.chart.Axis.TickLable;
 import trademate.preference.Notificator;
 import viewtify.Viewtify;
+import viewtify.dsl.Style;
 import viewtify.ui.helper.LayoutAssistant;
 import viewtify.ui.helper.StyleHelper;
 import viewtify.ui.helper.User;
@@ -142,10 +142,10 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         this.candleLatest.widthProperty().bind(widthProperty());
         this.candleLatest.heightProperty().bind(heightProperty());
 
-        this.chartBottom.create(tick -> tick.longVolume().toDouble() * 2, Buy);
-        this.chartBottom.create(tick -> tick.shortVolume().toDouble() * 2, Sell);
-        this.chartBottom.create(tick -> tick.volume().toDouble() * 2, Color.WHITE);
-        this.chartRelative.create(tick -> chart.market.v.tickers.realtime.estimateUpPotential().toDouble() * 100, Color.AQUA);
+        this.chartBottom.create(tick -> tick.longVolume().toDouble() * 2, ChartStyles.OrderSupportBuy);
+        this.chartBottom.create(tick -> tick.shortVolume().toDouble() * 2, ChartStyles.OrderSupportSell);
+        this.chartBottom.create(tick -> tick.volume().toDouble() * 2, ChartStyles.BackGrid);
+        this.chartRelative.create(tick -> chart.market.v.tickers.realtime.estimateUpPotential().toDouble() * 100, ChartStyles.PriceSFD);
 
         Viewtify.clip(this);
 
@@ -419,10 +419,10 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
          * Create new line chart.
          * 
          * @param converter
-         * @param color
+         * @param style
          */
-        private void create(ToDoubleFunction<Tick> converter, Color color) {
-            lines.add(new Line(converter, color));
+        private void create(ToDoubleFunction<Tick> converter, Style style) {
+            lines.add(new Line(converter, style));
         }
 
         /**
@@ -518,11 +518,11 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
             /**
              * @param converter
-             * @param color
+             * @param style
              */
-            private Line(ToDoubleFunction<Tick> converter, Color color) {
+            private Line(ToDoubleFunction<Tick> converter, Style style) {
                 this.converter = converter;
-                this.color = color;
+                this.color = style.stroke();
             }
 
             /**
