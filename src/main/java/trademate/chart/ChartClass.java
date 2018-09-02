@@ -16,5 +16,5 @@ import viewtify.CSSName;
  */
 public enum ChartClass implements CSSName {
 
-    MouseTrack, PriceSignal, PriceLatest, PriceSFD, OrderSupport, BackGrid, Label, Line, CandleBar, CandleLine, CandleTopText, ChartVolume, ChartTotalVolume;
+    Label, Line, CandleBar, CandleLine, CandleTopText, ChartVolume, ChartTotalVolume;
 }

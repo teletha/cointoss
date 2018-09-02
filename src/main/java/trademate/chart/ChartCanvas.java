@@ -27,7 +27,6 @@ import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.PathElement;
 
-import cointoss.Side;
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.market.bitflyer.SFD;
 import cointoss.order.OrderState;
@@ -35,6 +34,7 @@ import cointoss.ticker.Tick;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
 import kiss.I;
+import stylist.Style;
 import trademate.chart.Axis.TickLable;
 import trademate.preference.Notificator;
 import viewtify.Viewtify;
@@ -128,15 +128,15 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         this.chart = chart;
         this.axisX = axisX;
         this.axisY = axisY;
-        this.backGridVertical = new LineMark(axisX.forGrid, axisX, ChartClass.BackGrid);
-        this.backGridHorizontal = new LineMark(axisY.forGrid, axisY, ChartClass.BackGrid);
-        this.mouseTrackVertical = new LineMark(axisX, ChartClass.MouseTrack);
-        this.mouseTrackHorizontal = new LineMark(axisY, ChartClass.MouseTrack);
-        this.notifyPrice = new LineMark(axisY, ChartClass.PriceSignal);
-        this.latestPrice = new LineMark(axisY, ChartClass.PriceLatest);
-        this.orderBuyPrice = new LineMark(axisY, ChartClass.OrderSupport, Side.BUY);
-        this.orderSellPrice = new LineMark(axisY, ChartClass.OrderSupport, Side.SELL);
-        this.sfdPrice = new LineMark(axisY, ChartClass.PriceSFD);
+        this.backGridVertical = new LineMark(axisX.forGrid, axisX, ChartStyles.BackGrid);
+        this.backGridHorizontal = new LineMark(axisY.forGrid, axisY, ChartStyles.BackGrid);
+        this.mouseTrackVertical = new LineMark(axisX, ChartStyles.MouseTrack);
+        this.mouseTrackHorizontal = new LineMark(axisY, ChartStyles.MouseTrack);
+        this.notifyPrice = new LineMark(axisY, ChartStyles.PriceSignal);
+        this.latestPrice = new LineMark(axisY, ChartStyles.PriceLatest);
+        this.orderBuyPrice = new LineMark(axisY, ChartStyles.OrderSupportBuy);
+        this.orderSellPrice = new LineMark(axisY, ChartStyles.OrderSupportSell);
+        this.sfdPrice = new LineMark(axisY, ChartStyles.PriceSFD);
         this.candles.widthProperty().bind(widthProperty());
         this.candles.heightProperty().bind(heightProperty());
         this.candleLatest.widthProperty().bind(widthProperty());
@@ -569,7 +569,9 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     private class LineMark extends Path {
 
         /** The class name. */
-        private final Enum[] classNames;
+        private Enum[] classNames;
+
+        private Style[] styles;
 
         /** The model. */
         private final List<TickLable> labels;
@@ -598,6 +600,26 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
             Viewtify.clip(this);
             StyleHelper.of(this).style(ChartClass.Line).style(classNames);
+        }
+
+        /**
+         * @param classNames
+         */
+        private LineMark(Axis axis, Style... styles) {
+            this(new CopyOnWriteArrayList(), axis, styles);
+        }
+
+        /**
+         * @param className
+         * @param labels
+         */
+        private LineMark(List<TickLable> labels, Axis axis, Style... styles) {
+            this.styles = styles;
+            this.labels = labels;
+            this.axis = axis;
+
+            Viewtify.clip(this);
+            StyleHelper.of(this).style(ChartClass.Line).style(styles);
         }
 
         /**
@@ -633,7 +655,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
          * @return
          */
         private TickLable createLabel(Num price, String description) {
-            TickLable label = axis.createLabel(description, classNames);
+            TickLable label = styles == null ? axis.createLabel(description, classNames) : axis.createLabel(description, styles);
             if (price != null) label.value.set(price.toDouble());
             labels.add(label);
 

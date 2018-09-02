@@ -36,6 +36,7 @@ import javafx.util.Duration;
 
 import cointoss.util.Num;
 import kiss.Disposable;
+import stylist.Style;
 import viewtify.Viewtify;
 import viewtify.ui.helper.LayoutAssistant;
 import viewtify.ui.helper.StyleHelper;
@@ -116,7 +117,7 @@ public class Axis extends Region {
         this.side = side;
 
         for (int i = 0; i < tickNumber; i++) {
-            forGrid.add(new TickLable(ChartClass.BackGrid));
+            forGrid.add(new TickLable(ChartStyles.BackGrid));
         }
 
         Viewtify.clip(tickPath, this);
@@ -125,8 +126,8 @@ public class Axis extends Region {
         // ====================================================
         // Initialize UI widget
         // ====================================================
-        tickPath.getStyleClass().setAll(ChartClass.BackGrid.name(), ChartClass.Line.name());
-        baseLine.getStyleClass().setAll(ChartClass.BackGrid.name(), ChartClass.Line.name());
+        tickPath.getStyleClass().setAll(ChartStyles.BackGrid.name(), ChartClass.Line.name());
+        baseLine.getStyleClass().setAll(ChartStyles.BackGrid.name(), ChartClass.Line.name());
 
         lines.getChildren().addAll(tickPath, baseLine);
 
@@ -454,6 +455,15 @@ public class Axis extends Region {
     }
 
     /**
+     * Create new label.
+     * 
+     * @return
+     */
+    public TickLable createLabel(String description, Style... styles) {
+        return new TickLable(description, styles);
+    }
+
+    /**
      * @version 2018/07/31 6:58:28
      */
     public class TickLable extends Label implements Disposable {
@@ -483,7 +493,32 @@ public class Axis extends Region {
                 setTooltip(tooltip);
             }
 
-            StyleHelper.of(this).style(ChartClass.Label).style(classNames);
+            StyleHelper.of(this).style(ChartStyles.Label).style(ChartClass.Label).style(classNames);
+        }
+
+        /**
+         * 
+         */
+        private TickLable(Style... classNames) {
+            this(null, classNames);
+        }
+
+        /**
+         * 
+         */
+        private TickLable(String description, Style... classNames) {
+            tickLabels.getChildren().add(this);
+            textProperty().bind(Viewtify.calculate(value, () -> tickLabelFormatter.get().apply(value.get())));
+            value.addListener(layoutAxis);
+
+            if (description != null && !description.isEmpty()) {
+                Tooltip tooltip = new Tooltip(description);
+                tooltip.setShowDuration(Duration.INDEFINITE);
+                tooltip.setShowDelay(Duration.ZERO);
+                setTooltip(tooltip);
+            }
+
+            StyleHelper.of(this).style(ChartStyles.Label).style(ChartClass.Label).style(classNames);
         }
 
         /**

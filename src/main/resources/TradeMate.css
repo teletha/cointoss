@@ -45,50 +45,6 @@
 }
 
 /* ==========================================================================
- Preference Area
-===========================================================================*/
-.CategoryPane {
-}
-
-.CategoryLabel {
-}
-
-.CategoryLabel:hover {
-	-fx-background-color: derive(-fx-base, 15%);
-}
-
-.Root {
-}
-
-.Block {
-}
-
-.Heading {
-}
-
-.Description {
-}
-
-.FormRow {
-}
-
-.FormLabel {
-}
-
-.FormInput {
-}
-
-.FormInputMin {
-}
-
-.FormCheck {
-}
-
-.FormCheck2 {
-}
-
-
-/* ==========================================================================
  Chart Area
 ===========================================================================*/
 .CandleLine {
@@ -107,69 +63,7 @@
 	-fx-translate-y: -10px;
 }
 
-.Label {
-  -fx-font-size: 11px;
-	-fx-background-color: -fx-background;
-	-fx-opacity: 0.8;
-}
-
-.BackGrid.Label {
-	-fx-text-fill: -fx-mid-text-color;
-}
-.BackGrid.Line {
-	-fx-stroke-width: 0.5;
-	-fx-stroke: rgb(40, 40, 40);
-}
-
-.MouseTrack.Label {
-	-fx-text-fill: -fx-light-text-color;
-}
-.MouseTrack.Line {
-	-fx-stroke-width: 0.5;
-	-fx-stroke: rgb(80, 80, 80);
-}
-
-.PriceSignal.Label {
-	-fx-text-fill: rgb(180, 100, 100);
-}
-.PriceSignal.Line {
-	-fx-stroke-width: 0.5;
-	-fx-stroke: rgb(180, 100, 100);
-}
-
-.PriceLatest.Label {
-	-fx-text-fill: rgb(140, 100, 40);
-}
-.PriceLatest.Line {
-	-fx-stroke-width: 0.5;
-	-fx-stroke: rgb(140, 100, 40);
-}
-
-.PriceSFD.Label {
-	-fx-text-fill: rgb(40, 100, 40);
-}
-.PriceSFD.Line {
-	-fx-stroke-width: 0.5;
-	-fx-stroke: rgb(40, 100, 40);
-}
-
-.OrderSupport.Label {
-	-fx-text-fill: -side;
-}
-.OrderSupport.Line {
-	-fx-stroke-width: 0.5;
-	-fx-stroke: -side;
-	-fx-stroke-dash-array: 2 4;
-}
 
 .ChartVolume {
 	-fx-stroke: -side;
 }
-
-.backtestAnchor {
-  -fx-border-color: red;
-}
-
-/* ==========================================================================
- Trading Area
-===========================================================================*/

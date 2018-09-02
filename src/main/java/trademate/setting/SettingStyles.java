@@ -62,6 +62,10 @@ public class SettingStyles extends StyleDSL {
         padding.vertical(10, px).left(40, px);
         cursor.pointer();
         font.size(16, px);
+
+        hover(() -> {
+            background.color("derive(-fx-base, 15%)");
+        });
     };
 
     public static final Style FormCheck = () -> {
