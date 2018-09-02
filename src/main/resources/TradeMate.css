@@ -48,15 +48,9 @@
  Preference Area
 ===========================================================================*/
 .CategoryPane {
-  -fx-padding: 40px 0 0 0;
 }
 
 .CategoryLabel {
-	-fx-font-size: 16px;
-	-fx-pref-width: 200px;
-	-fx-pref-height: 20px;
-	-fx-padding: 10px 0 10px 40px;
-	-fx-cursor: hand;
 }
 
 .CategoryLabel:hover {
@@ -64,52 +58,33 @@
 }
 
 .Root {
-  -fx-padding: 20px 30px;
 }
 
 .Block {
-	-fx-padding: 35px 0 35px 0;
-	-fx-border-width: 0 0 2px 0;
-	-fx-border-color: rgb(40, 40, 40);
 }
 
 .Heading {
-	-fx-padding: 0 0 5px 0;
-	-fx-font-size: 16px;
 }
 
 .Description {
-	-fx-padding: 2px 0 7px 0;
 }
 
 .FormRow {
-  -fx-min-height: 30px;
-  -fx-alignment: center-left;
-  -fx-padding: 3px 0;
 }
 
 .FormLabel {
-  -fx-min-width: 100px;
 }
 
 .FormInput {
-  -fx-min-width: 160px;
 }
 
 .FormInputMin {
-  -fx-min-width: 60px;
-  -fx-border-color: red;
-  -fx-border-width: 1px;
 }
 
 .FormCheck {
-  -fx-min-width: 60px;
-  -fx-alignment: center;
 }
 
 .FormCheck2 {
-  -fx-min-width: 160px;
-  -fx-alignment: center;
 }
 
 
@@ -198,26 +173,3 @@
 /* ==========================================================================
  Trading Area
 ===========================================================================*/
-.ExecutionView {
-  -fx-pref-width: 210px;
-}
-
-.ExecutionTakerSize {
-  -fx-pref-width: 70px;
-}
-
-.ConsoleView {
-   -fx-pref-width: 700px;
-}
-
-.OrderCatalog_CSS_root {
-  -fx-pref-width: 400px;
-}
-
-.OrderCatalog_CSS_wide {
-  -fx-pref-width: 120px;
-}
-
-.OrderCatalog_CSS_narrow {
-  -fx-pref-width: 65px;
-}

@@ -9,8 +9,6 @@
  */
 package trademate.setting;
 
-import static trademate.setting.SettingStyles.*;
-
 import kiss.Extensible;
 import kiss.Manageable;
 import kiss.Singleton;
@@ -40,9 +38,9 @@ public class SettingView extends View<SettingView.Lang> {
         return new UIDefinition() {
             {
                 hbox(() -> {
-                    vbox(CategoryPane, () -> {
-                        $(notification, CategoryLabel);
-                        $(bitflyer, CategoryLabel);
+                    vbox($.CategoryPane, () -> {
+                        $(notification, $.CategoryLabel);
+                        $(bitflyer, $.CategoryLabel);
                     });
                     $(setting);
                 });
@@ -66,7 +64,7 @@ public class SettingView extends View<SettingView.Lang> {
      */
     @SuppressWarnings("unused")
     @Manageable(lifestyle = Singleton.class)
-    static class Lang implements Extensible {
+    static class Lang extends SettingStyles implements Extensible {
 
         /**
          * Category title.

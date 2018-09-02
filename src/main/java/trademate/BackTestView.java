@@ -9,8 +9,6 @@
  */
 package trademate;
 
-import static trademate.setting.SettingStyles.*;
-
 import java.time.Period;
 
 import cointoss.Market;
@@ -26,6 +24,7 @@ import kiss.Manageable;
 import kiss.Singleton;
 import trademate.BackTestView.Message;
 import trademate.chart.ChartView;
+import trademate.setting.SettingStyles;
 import viewtify.View;
 import viewtify.Viewtify;
 import viewtify.dsl.UIDefinition;
@@ -60,13 +59,13 @@ public class BackTestView extends View<Message> {
                     $(chart);
                     vbox(() -> {
                         $(market);
-                        hbox(FormRow, () -> {
-                            label(message.startDateLabel(), FormLabel);
-                            $(startDate, FormInput);
+                        hbox($.FormRow, () -> {
+                            label($.startDateLabel(), $.FormLabel);
+                            $(startDate, $.FormInput);
                         });
-                        hbox(FormRow, () -> {
-                            label(message.endDateLabel(), FormLabel);
-                            $(endDate, FormInput);
+                        hbox($.FormRow, () -> {
+                            label($.endDateLabel(), $.FormLabel);
+                            $(endDate, $.FormInput);
                         });
                         $(startButton);
                     });
@@ -84,8 +83,8 @@ public class BackTestView extends View<Message> {
         startDate.initial(Chrono.utcNow().minusDays(10)).uneditable().requireWhen(market).require(() -> {
             MarketLog log = market.value().log;
 
-            assert startDate.isBeforeOrSame(log.lastCacheDate()) : message.logIsNotFound();
-            assert startDate.isAfterOrSame(log.firstCacheDate()) : message.logIsNotFound();
+            assert startDate.isBeforeOrSame(log.lastCacheDate()) : $.logIsNotFound();
+            assert startDate.isAfterOrSame(log.firstCacheDate()) : $.logIsNotFound();
         }).observe((o, n) -> {
             endDate.value(v -> v.plus(Period.between(o, n)));
         });
@@ -115,7 +114,7 @@ public class BackTestView extends View<Message> {
      */
     @SuppressWarnings("unused")
     @Manageable(lifestyle = Singleton.class)
-    static class Message implements Extensible {
+    static class Message extends SettingStyles implements Extensible {
 
         /**
          * Label for start button.

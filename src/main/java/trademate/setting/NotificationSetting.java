@@ -9,8 +9,6 @@
  */
 package trademate.setting;
 
-import static trademate.setting.SettingStyles.*;
-
 import java.time.Duration;
 
 import cointoss.util.Network;
@@ -69,15 +67,15 @@ public class NotificationSetting extends View<Lang> {
     protected UIDefinition declareUI() {
         return new UIDefinition() {
             {
-                vbox(Root, () -> {
+                vbox($.Root, () -> {
                     // Notification Types
-                    vbox(Block, () -> {
-                        label(message.notificationTitle(), Heading);
-                        hbox(FormRow, () -> {
-                            label("", FormLabel);
-                            hbox(FormCheck, label(message.desktopColumn()));
-                            hbox(FormCheck, label(message.lineColumn()));
-                            hbox(FormCheck2, label(message.soundColumn()));
+                    vbox($.Block, () -> {
+                        label($.notificationTitle(), $.Heading);
+                        hbox($.FormRow, () -> {
+                            label("", $.FormLabel);
+                            hbox($.FormCheck, label($.desktopColumn()));
+                            hbox($.FormCheck, label($.lineColumn()));
+                            hbox($.FormCheck2, label($.soundColumn()));
                         });
                         $(longTrend);
                         $(shortTrend);
@@ -87,26 +85,26 @@ public class NotificationSetting extends View<Lang> {
                     });
 
                     // Desktop
-                    vbox(Block, () -> {
-                        label(message.desktopTitle(), Heading);
-                        hbox(FormRow, () -> {
-                            label(message.desktopDurationLabel(), FormLabel);
-                            $(desktopDuration, FormInput);
+                    vbox($.Block, () -> {
+                        label($.desktopTitle(), $.Heading);
+                        hbox($.FormRow, () -> {
+                            label($.desktopDurationLabel(), $.FormLabel);
+                            $(desktopDuration, $.FormInput);
                         });
-                        hbox(FormRow, () -> {
-                            label(message.desktopPositionLabel(), FormLabel);
-                            $(desktopPosition, FormInput);
+                        hbox($.FormRow, () -> {
+                            label($.desktopPositionLabel(), $.FormLabel);
+                            $(desktopPosition, $.FormInput);
                         });
                     });
 
                     // LINE
-                    vbox(Block, () -> {
-                        label(message.lineTitle(), Heading);
-                        label(message.lineDescription(), Description);
-                        hbox(FormRow, () -> {
-                            label(message.lineAccessTokenLabel(), FormLabel);
-                            $(lineAccessToken, FormInput);
-                            $(lineTest, FormInput);
+                    vbox($.Block, () -> {
+                        label($.lineTitle(), $.Heading);
+                        label($.lineDescription(), $.Description);
+                        hbox($.FormRow, () -> {
+                            label($.lineAccessTokenLabel(), $.FormLabel);
+                            $(lineAccessToken, $.FormInput);
+                            $(lineTest, $.FormInput);
                         });
                     });
                 });
@@ -122,7 +120,7 @@ public class NotificationSetting extends View<Lang> {
         // For Desktop
         desktopDuration.values(I.signalRange(2, 30, 2).map(Duration::ofSeconds))
                 .model(notificator.desktopDuration)
-                .text(message::desktopDuration);
+                .text($::desktopDuration);
         desktopPosition.values(DesktopPosition.class).model(notificator.desktopPosition);
 
         // For LINE
@@ -131,7 +129,7 @@ public class NotificationSetting extends View<Lang> {
             I.make(Network.class).line("TEST").to(e -> {
                 lineAccessToken.decorateBy(Icon.Success);
             }, e -> {
-                lineAccessToken.invalid(message.lineTestFailed(lineAccessToken.value()));
+                lineAccessToken.invalid($.lineTestFailed(lineAccessToken.value()));
             });
         });
     }
@@ -139,7 +137,7 @@ public class NotificationSetting extends View<Lang> {
     /**
      * @version 2018/08/30 9:54:57
      */
-    private class NotifySetting extends View {
+    private class NotifySetting extends View<Lang> {
 
         private final Notify notify;
 
@@ -178,11 +176,11 @@ public class NotificationSetting extends View<Lang> {
         protected UIDefinition declareUI() {
             return new UIDefinition() {
                 {
-                    hbox(FormRow, () -> {
-                        label(notify, FormLabel);
-                        hbox(FormCheck, desktop);
-                        hbox(FormCheck, line);
-                        hbox(FormCheck2, sound);
+                    hbox($.FormRow, () -> {
+                        label(notify, $.FormLabel);
+                        hbox($.FormCheck, desktop);
+                        hbox($.FormCheck, line);
+                        hbox($.FormCheck2, sound);
                     });
                 }
             };
@@ -193,7 +191,7 @@ public class NotificationSetting extends View<Lang> {
      * @version 2018/08/27 21:10:05
      */
     @SuppressWarnings("unused")
-    static class Lang implements Extensible {
+    static class Lang extends SettingStyles implements Extensible {
 
         /**
          * Title for the notification.

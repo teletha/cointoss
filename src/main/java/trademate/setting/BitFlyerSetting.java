@@ -9,12 +9,10 @@
  */
 package trademate.setting;
 
-import static trademate.setting.SettingStyles.*;
-
 import kiss.Extensible;
 import kiss.Manageable;
 import kiss.Singleton;
-import trademate.setting.BitFlyerSetting.Lang;
+import trademate.setting.BitFlyerSetting.Resources;
 import viewtify.View;
 import viewtify.dsl.UIDefinition;
 import viewtify.ui.UILabel;
@@ -24,7 +22,7 @@ import viewtify.ui.UIPassword;
  * @version 2018/08/27 18:53:30
  */
 @Manageable(lifestyle = Singleton.class)
-public class BitFlyerSetting extends View<Lang> {
+public class BitFlyerSetting extends View<Resources> {
 
     private UILabel publicAPIDescription;
 
@@ -46,16 +44,16 @@ public class BitFlyerSetting extends View<Lang> {
     protected UIDefinition declareUI() {
         return new UIDefinition() {
             {
-                vbox(Root, () -> {
-                    label("BitFlyer", Heading);
-                    $(publicAPIDescription, Description);
-                    hbox(FormRow, () -> {
-                        label("API Key", FormLabel);
-                        $(apiKey, FormInput);
+                vbox($.Root, () -> {
+                    label("BitFlyer", $.Heading);
+                    $(publicAPIDescription, $.Description);
+                    hbox($.FormRow, () -> {
+                        label("API Key", $.FormLabel);
+                        $(apiKey, $.FormInput);
                     });
-                    hbox(FormRow, () -> {
-                        label("API Secret", FormLabel);
-                        $(apiSecret, FormInput);
+                    hbox($.FormRow, () -> {
+                        label("API Secret", $.FormLabel);
+                        $(apiSecret, $.FormInput);
                     });
                 });
             }
@@ -67,7 +65,7 @@ public class BitFlyerSetting extends View<Lang> {
      */
     @SuppressWarnings("unused")
     @Manageable(lifestyle = Singleton.class)
-    static class Lang implements Extensible {
+    static class Resources extends SettingStyles implements Extensible {
 
         /**
          * Label for API key
@@ -81,7 +79,7 @@ public class BitFlyerSetting extends View<Lang> {
         /**
          * @version 2018/08/29 3:53:49
          */
-        private static class Lang_ja extends Lang {
+        private static class Resources_ja extends Resources {
 
             /**
              * {@inheritDoc}
