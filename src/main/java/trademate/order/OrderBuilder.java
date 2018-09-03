@@ -26,7 +26,7 @@ import cointoss.util.Num;
 import kiss.I;
 import kiss.WiseBiConsumer;
 import trademate.TradingView;
-import trademate.preference.Notificator;
+import trademate.setting.Notificator;
 import viewtify.UI;
 import viewtify.View;
 import viewtify.ui.UIButton;

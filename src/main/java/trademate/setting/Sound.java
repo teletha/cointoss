@@ -7,7 +7,7 @@
  *
  *          https://opensource.org/licenses/MIT
  */
-package trademate.preference;
+package trademate.setting;
 
 import java.util.concurrent.TimeUnit;
 

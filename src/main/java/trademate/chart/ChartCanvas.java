@@ -35,7 +35,7 @@ import cointoss.util.Chrono;
 import cointoss.util.Num;
 import kiss.I;
 import trademate.chart.Axis.TickLable;
-import trademate.preference.Notificator;
+import trademate.setting.Notificator;
 import viewtify.Viewtify;
 import viewtify.dsl.Style;
 import viewtify.ui.helper.LayoutAssistant;

@@ -37,7 +37,7 @@ import okhttp3.ResponseBody;
 import okhttp3.WebSocket;
 import okhttp3.WebSocketListener;
 import okio.Buffer;
-import trademate.preference.Notificator;
+import trademate.setting.Notificator;
 
 /**
  * @version 2018/08/28 0:15:07

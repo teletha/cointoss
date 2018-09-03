@@ -7,7 +7,7 @@
  *
  *          https://opensource.org/licenses/MIT
  */
-package trademate.preference;
+package trademate.setting;
 
 import javafx.geometry.Pos;
 import javafx.util.Duration;
