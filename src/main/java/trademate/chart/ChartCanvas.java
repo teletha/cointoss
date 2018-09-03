@@ -145,7 +145,9 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         this.chartBottom.create(tick -> tick.longVolume().toDouble() * 2, ChartStyles.OrderSupportBuy);
         this.chartBottom.create(tick -> tick.shortVolume().toDouble() * 2, ChartStyles.OrderSupportSell);
         // this.chartBottom.create(tick -> tick.volume().toDouble() * 2, ChartStyles.BackGrid);
-        this.chartRelative.create(tick -> chart.market.v.tickers.realtime.estimateUpPotential().toDouble() * 100, ChartStyles.PriceSFD);
+        // this.chartRelative.create(tick ->
+        // chart.market.v.tickers.realtime.estimateUpPotential().toDouble() * 100,
+        // ChartStyles.PriceSFD);
 
         Viewtify.clip(this);
 
@@ -568,10 +570,8 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
      */
     private class LineMark extends Path {
 
-        /** The class name. */
-        private Enum[] classNames;
-
-        private Style[] styles;
+        /** The styles. */
+        private final Style[] styles;
 
         /** The model. */
         private final List<TickLable> labels;
@@ -581,26 +581,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
         /** The layout manager. */
         private final LayoutAssistant layoutLine = layoutCandle.sub();
-
-        /**
-         * @param classNames
-         */
-        private LineMark(Axis axis, Enum... classNames) {
-            this(new CopyOnWriteArrayList(), axis, classNames);
-        }
-
-        /**
-         * @param className
-         * @param labels
-         */
-        private LineMark(List<TickLable> labels, Axis axis, Enum... classNames) {
-            this.classNames = classNames;
-            this.labels = labels;
-            this.axis = axis;
-
-            Viewtify.clip(this);
-            StyleHelper.of(this).style(classNames);
-        }
 
         /**
          * @param classNames
@@ -655,7 +635,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
          * @return
          */
         private TickLable createLabel(Num price, String description) {
-            TickLable label = styles == null ? axis.createLabel(description, classNames) : axis.createLabel(description, styles);
+            TickLable label = axis.createLabel(description, styles);
             if (price != null) label.value.set(price.toDouble());
             labels.add(label);
 
