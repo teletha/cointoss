@@ -49,10 +49,10 @@ public class ExecutionView extends View {
     protected UIDefinition declareUI() {
         return new UIDefinition() {
             {
-                vbox(S.ExecutionView, () -> {
+                vbox(S.Root, () -> {
                     $(executionList);
                     hbox(() -> {
-                        $(takerSize, S.ExecutionTakerSize);
+                        $(takerSize, S.TakerSize);
                     });
                     $(executionCumulativeList);
                 });
@@ -131,15 +131,42 @@ public class ExecutionView extends View {
         }
     }
 
+    private interface AAA extends StyleDSL {
+
+    }
+
     /**
      * @version 2018/08/30 12:50:36
      */
-    private static class S extends StyleDSL {
+    private interface S extends AAA {
 
-        static Style ExecutionView = () -> {
+        Style Root = () -> {
+            display.width(210, px);
+
+            $.hover(() -> {
+                display.width(110, px);
+            });
         };
 
-        static Style ExecutionTakerSize = () -> {
+        Style TakerSize = () -> {
+            display.width(70, px);
         };
+    }
+
+    /**
+     * @version 2018/09/03 18:10:11
+     */
+    enum Styles implements StyleDSL {
+        Root {
+            {
+                display.width(210, px);
+            }
+        },
+
+        TakerSize {
+            {
+                display.width(70, px);
+            }
+        }
     }
 }

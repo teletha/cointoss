@@ -9,6 +9,8 @@
  */
 package trademate.setting;
 
+import static stylist.StyleDSL.*;
+
 import stylist.StyleDSL;
 import stylist.value.Numeric;
 import viewtify.dsl.Style;
@@ -16,71 +18,71 @@ import viewtify.dsl.Style;
 /**
  * @version 2018/08/29 15:08:22
  */
-public class SettingStyles extends StyleDSL {
+public interface SettingStyles extends StyleDSL {
 
-    private static final Numeric blockSpace = new Numeric(35, px);
+    Numeric blockSpace = new Numeric(35, px);
 
-    public static final Style Root = () -> {
+    Style Root = () -> {
         padding.vertical(20, px).horizontal(30, px);
     };
 
-    public static final Style Block = () -> {
+    Style Block = () -> {
         padding.bottom(blockSpace);
         border.bottom.width(2, px).color(rgb(40, 40, 40));
     };
 
-    public static final Style Heading = () -> {
+    Style Heading = () -> {
         padding.top(blockSpace).bottom(5, px);
         font.size(16, px);
     };
 
-    public static final Style Description = () -> {
+    Style Description = () -> {
         padding.top(2, px).bottom(7, px);
     };
 
-    public static final Style Warning = () -> {
+    Style Warning = () -> {
         font.color(rgb(150, 50, 50));
     };
 
-    public static final Style FormRow = () -> {
+    Style FormRow = () -> {
         display.minHeight(30, px);
         padding.vertical(3, px);
         text.verticalAlign.middle();
     };
 
-    public static final Style FormLabel = () -> {
+    Style FormLabel = () -> {
         display.minWidth(100, px);
     };
 
-    public static final Style FormInput = () -> {
+    Style FormInput = () -> {
         display.minWidth(160, px);
     };
 
-    public static final Style FormInputMin = () -> {
+    Style FormInputMin = () -> {
         display.minWidth(60, px);
     };
 
-    public static final Style CategoryPane = () -> {
+    Style CategoryPane = () -> {
         padding.top(40, px);
     };
 
-    public static final Style CategoryLabel = () -> {
+    Style CategoryLabel = () -> {
         display.width(200, px).height(20, px);
         padding.vertical(10, px).left(40, px);
         cursor.pointer();
         font.size(16, px);
 
-        hover(() -> {
+        $.hover(() -> {
             background.color("derive(-fx-base, 15%)");
         });
     };
 
-    public static final Style FormCheck = () -> {
+    Style FormCheck = () -> {
         display.minWidth(60, px);
         text.align.center().verticalAlign.middle();
     };
 
-    public static final Style FormCheck2 = () -> {
+    Style FormCheck2 = () -> {
         display.minWidth(160, px);
         text.align.center().verticalAlign.middle();
     };

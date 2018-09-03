@@ -9,6 +9,8 @@
  */
 package trademate.chart;
 
+import static stylist.StyleDSL.*;
+
 import stylist.StyleDSL;
 import stylist.value.Color;
 import viewtify.dsl.Style;
@@ -16,7 +18,7 @@ import viewtify.dsl.Style;
 /**
  * @version 2018/09/03 1:21:23
  */
-public class ChartStyles extends StyleDSL {
+public class ChartStyles implements StyleDSL {
 
     static Color buy = rgb(32, 151, 77);
 

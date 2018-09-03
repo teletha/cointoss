@@ -192,7 +192,7 @@ public class OrderCatalog extends View {
     /**
      * @version 2018/08/30 12:50:36
      */
-    private static class CSS extends StyleDSL {
+    private static class CSS implements StyleDSL {
 
         static Style root = () -> {
             display.width(400, px);
