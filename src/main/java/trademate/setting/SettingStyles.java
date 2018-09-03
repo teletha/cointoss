@@ -10,6 +10,7 @@
 package trademate.setting;
 
 import stylist.StyleDSL;
+import stylist.value.Numeric;
 import viewtify.dsl.Style;
 
 /**
@@ -17,22 +18,28 @@ import viewtify.dsl.Style;
  */
 public class SettingStyles extends StyleDSL {
 
+    private static final Numeric blockSpace = new Numeric(35, px);
+
     public static final Style Root = () -> {
         padding.vertical(20, px).horizontal(30, px);
     };
 
     public static final Style Block = () -> {
-        padding.vertical(35, px);
+        padding.bottom(blockSpace);
         border.bottom.width(2, px).color(rgb(40, 40, 40));
     };
 
     public static final Style Heading = () -> {
-        padding.bottom(5, px);
+        padding.top(blockSpace).bottom(5, px);
         font.size(16, px);
     };
 
     public static final Style Description = () -> {
         padding.top(2, px).bottom(7, px);
+    };
+
+    public static final Style Warning = () -> {
+        font.color(rgb(150, 50, 50));
     };
 
     public static final Style FormRow = () -> {
