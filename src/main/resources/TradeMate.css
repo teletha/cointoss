@@ -39,27 +39,3 @@
 .tree-table-row-cell.REQUESTING .cell {
   -fx-text-fill: rgb(80, 80, 80);
 }
-
-.separator {
-	-fx-padding: 25px 0px;
-}
-
-/* ==========================================================================
- Chart Area
-===========================================================================*/
-.CandleLine {
-  -fx-stroke: -side;
-  -fx-stroke-width: 1px;
-}
-
-.CandleBar {
-	-fx-fill: -side;
-}
-
-.CandleTopText {
-	-fx-fill: white;
-	-fx-font-size: 9px;
-	-fx-translate-x: -9px;
-	-fx-translate-y: -10px;
-}
-
