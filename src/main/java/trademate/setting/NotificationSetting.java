@@ -9,6 +9,8 @@
  */
 package trademate.setting;
 
+import static trademate.setting.SettingStyles.*;
+
 import java.time.Duration;
 
 import cointoss.util.Network;
@@ -65,15 +67,15 @@ public class NotificationSetting extends View<Lang> {
     protected UIDefinition declareUI() {
         return new UIDefinition() {
             {
-                vbox($.Root, () -> {
+                vbox(Root, () -> {
                     // Notification Types
-                    vbox($.Block, () -> {
-                        label($.notificationTitle(), $.Heading);
-                        hbox($.FormRow, () -> {
-                            label("", $.FormLabel);
-                            hbox($.FormCheck, label($.desktopColumn()));
-                            hbox($.FormCheck, label($.lineColumn()));
-                            hbox($.FormCheck2, label($.soundColumn()));
+                    vbox(Block, () -> {
+                        label($.notificationTitle(), Heading);
+                        hbox(FormRow, () -> {
+                            label("", FormLabel);
+                            hbox(FormCheck, label($.desktopColumn()));
+                            hbox(FormCheck, label($.lineColumn()));
+                            hbox(FormCheck2, label($.soundColumn()));
                         });
                         $(longTrend);
                         $(shortTrend);
@@ -83,26 +85,26 @@ public class NotificationSetting extends View<Lang> {
                     });
 
                     // Desktop
-                    vbox($.Block, () -> {
-                        label($.desktopTitle(), $.Heading);
-                        hbox($.FormRow, () -> {
-                            label($.desktopDurationLabel(), $.FormLabel);
-                            $(desktopDuration, $.FormInput);
+                    vbox(Block, () -> {
+                        label($.desktopTitle(), Heading);
+                        hbox(FormRow, () -> {
+                            label($.desktopDurationLabel(), FormLabel);
+                            $(desktopDuration, FormInput);
                         });
-                        hbox($.FormRow, () -> {
-                            label($.desktopPositionLabel(), $.FormLabel);
-                            $(desktopPosition, $.FormInput);
+                        hbox(FormRow, () -> {
+                            label($.desktopPositionLabel(), FormLabel);
+                            $(desktopPosition, FormInput);
                         });
                     });
 
                     // LINE
-                    vbox($.Block, () -> {
-                        label($.lineTitle(), $.Heading);
-                        label($.lineDescription(), $.Description);
-                        hbox($.FormRow, () -> {
-                            label($.lineAccessTokenLabel(), $.FormLabel);
-                            $(lineAccessToken, $.FormInput);
-                            $(lineTest, $.FormInput);
+                    vbox(Block, () -> {
+                        label($.lineTitle(), Heading);
+                        label($.lineDescription(), Description);
+                        hbox(FormRow, () -> {
+                            label($.lineAccessTokenLabel(), FormLabel);
+                            $(lineAccessToken, FormInput);
+                            $(lineTest, FormInput);
                         });
                     });
                 });
@@ -174,11 +176,11 @@ public class NotificationSetting extends View<Lang> {
         protected UIDefinition declareUI() {
             return new UIDefinition() {
                 {
-                    hbox($.FormRow, () -> {
-                        label(notify, $.FormLabel);
-                        hbox($.FormCheck, desktop);
-                        hbox($.FormCheck, line);
-                        hbox($.FormCheck2, sound);
+                    hbox(FormRow, () -> {
+                        label(notify, FormLabel);
+                        hbox(FormCheck, desktop);
+                        hbox(FormCheck, line);
+                        hbox(FormCheck2, sound);
                     });
                 }
             };
@@ -189,7 +191,7 @@ public class NotificationSetting extends View<Lang> {
      * @version 2018/08/27 21:10:05
      */
     @SuppressWarnings("unused")
-    static class Lang extends SettingStyles implements Extensible {
+    static class Lang implements Extensible {
 
         /**
          * Title for the notification.

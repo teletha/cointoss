@@ -9,6 +9,8 @@
  */
 package trademate.setting;
 
+import static trademate.setting.SettingStyles.*;
+
 import kiss.Extensible;
 import kiss.Manageable;
 import kiss.Singleton;
@@ -44,16 +46,16 @@ public class BitFlyerSetting extends View<Resources> {
     protected UIDefinition declareUI() {
         return new UIDefinition() {
             {
-                vbox($.Root, () -> {
-                    label("BitFlyer", $.Heading);
-                    $(publicAPIDescription, $.Description);
-                    hbox($.FormRow, () -> {
-                        label("API Key", $.FormLabel);
-                        $(apiKey, $.FormInput);
+                vbox(Root, () -> {
+                    label("BitFlyer", Heading);
+                    $(publicAPIDescription, Description);
+                    hbox(FormRow, () -> {
+                        label("API Key", FormLabel);
+                        $(apiKey, FormInput);
                     });
-                    hbox($.FormRow, () -> {
-                        label("API Secret", $.FormLabel);
-                        $(apiSecret, $.FormInput);
+                    hbox(FormRow, () -> {
+                        label("API Secret", FormLabel);
+                        $(apiSecret, FormInput);
                     });
                 });
             }
@@ -65,7 +67,7 @@ public class BitFlyerSetting extends View<Resources> {
      */
     @SuppressWarnings("unused")
     @Manageable(lifestyle = Singleton.class)
-    static class Resources extends SettingStyles implements Extensible {
+    static class Resources implements Extensible {
 
         /**
          * Label for API key

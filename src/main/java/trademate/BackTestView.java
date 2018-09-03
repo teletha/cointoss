@@ -9,6 +9,8 @@
  */
 package trademate;
 
+import static trademate.setting.SettingStyles.*;
+
 import java.time.Period;
 
 import cointoss.Market;
@@ -24,7 +26,6 @@ import kiss.Manageable;
 import kiss.Singleton;
 import trademate.BackTestView.Message;
 import trademate.chart.ChartView;
-import trademate.setting.SettingStyles;
 import viewtify.View;
 import viewtify.Viewtify;
 import viewtify.dsl.UIDefinition;
@@ -59,13 +60,13 @@ public class BackTestView extends View<Message> {
                     $(chart);
                     vbox(() -> {
                         $(market);
-                        hbox($.FormRow, () -> {
-                            label($.startDateLabel(), $.FormLabel);
-                            $(startDate, $.FormInput);
+                        hbox(FormRow, () -> {
+                            label($.startDateLabel(), FormLabel);
+                            $(startDate, FormInput);
                         });
-                        hbox($.FormRow, () -> {
-                            label($.endDateLabel(), $.FormLabel);
-                            $(endDate, $.FormInput);
+                        hbox(FormRow, () -> {
+                            label($.endDateLabel(), FormLabel);
+                            $(endDate, FormInput);
                         });
                         $(startButton);
                     });
@@ -114,7 +115,7 @@ public class BackTestView extends View<Message> {
      */
     @SuppressWarnings("unused")
     @Manageable(lifestyle = Singleton.class)
-    static class Message extends SettingStyles implements Extensible {
+    static class Message implements Extensible {
 
         /**
          * Label for start button.
