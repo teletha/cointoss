@@ -145,9 +145,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         this.chartBottom.create(tick -> tick.longVolume().toDouble() * 2, ChartStyles.OrderSupportBuy);
         this.chartBottom.create(tick -> tick.shortVolume().toDouble() * 2, ChartStyles.OrderSupportSell);
         // this.chartBottom.create(tick -> tick.volume().toDouble() * 2, ChartStyles.BackGrid);
-        // this.chartRelative.create(tick ->
-        // chart.market.v.tickers.realtime.estimateUpPotential().toDouble() * 100,
-        // ChartStyles.PriceSFD);
+        this.chartRelative.create(tick -> chart.market.v.tickers.realtime.estimateUpPotential().toDouble() * 100, ChartStyles.PriceSFD);
 
         Viewtify.clip(this);
 

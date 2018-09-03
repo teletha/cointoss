@@ -126,8 +126,8 @@ public class Axis extends Region {
         // ====================================================
         // Initialize UI widget
         // ====================================================
-        tickPath.getStyleClass().setAll(ChartStyles.BackGrid.name());
-        baseLine.getStyleClass().setAll(ChartStyles.BackGrid.name());
+        StyleHelper.of(tickPath).style(ChartStyles.BackGrid);
+        StyleHelper.of(baseLine).style(ChartStyles.BackGrid);
 
         lines.getChildren().addAll(tickPath, baseLine);
 
