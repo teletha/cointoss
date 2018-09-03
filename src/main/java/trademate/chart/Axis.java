@@ -126,8 +126,8 @@ public class Axis extends Region {
         // ====================================================
         // Initialize UI widget
         // ====================================================
-        tickPath.getStyleClass().setAll(ChartStyles.BackGrid.name(), ChartClass.Line.name());
-        baseLine.getStyleClass().setAll(ChartStyles.BackGrid.name(), ChartClass.Line.name());
+        tickPath.getStyleClass().setAll(ChartStyles.BackGrid.name());
+        baseLine.getStyleClass().setAll(ChartStyles.BackGrid.name());
 
         lines.getChildren().addAll(tickPath, baseLine);
 
@@ -493,7 +493,7 @@ public class Axis extends Region {
                 setTooltip(tooltip);
             }
 
-            StyleHelper.of(this).style(ChartStyles.Label).style(ChartClass.Label).style(classNames);
+            StyleHelper.of(this).style(ChartStyles.Label).style(classNames);
         }
 
         /**
@@ -518,7 +518,7 @@ public class Axis extends Region {
                 setTooltip(tooltip);
             }
 
-            StyleHelper.of(this).style(ChartStyles.Label).style(ChartClass.Label).style(classNames);
+            StyleHelper.of(this).style(ChartStyles.Label).style(classNames);
         }
 
         /**

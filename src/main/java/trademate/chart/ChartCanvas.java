@@ -144,7 +144,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
         this.chartBottom.create(tick -> tick.longVolume().toDouble() * 2, ChartStyles.OrderSupportBuy);
         this.chartBottom.create(tick -> tick.shortVolume().toDouble() * 2, ChartStyles.OrderSupportSell);
-        this.chartBottom.create(tick -> tick.volume().toDouble() * 2, ChartStyles.BackGrid);
+        // this.chartBottom.create(tick -> tick.volume().toDouble() * 2, ChartStyles.BackGrid);
         this.chartRelative.create(tick -> chart.market.v.tickers.realtime.estimateUpPotential().toDouble() * 100, ChartStyles.PriceSFD);
 
         Viewtify.clip(this);
@@ -599,7 +599,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             this.axis = axis;
 
             Viewtify.clip(this);
-            StyleHelper.of(this).style(ChartClass.Line).style(classNames);
+            StyleHelper.of(this).style(classNames);
         }
 
         /**
@@ -619,7 +619,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             this.axis = axis;
 
             Viewtify.clip(this);
-            StyleHelper.of(this).style(ChartClass.Line).style(styles);
+            StyleHelper.of(this).style(styles);
         }
 
         /**
