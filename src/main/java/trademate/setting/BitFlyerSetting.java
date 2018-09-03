@@ -47,15 +47,17 @@ public class BitFlyerSetting extends View<Resources> {
         return new UIDefinition() {
             {
                 vbox(Root, () -> {
-                    label("BitFlyer", Heading);
-                    $(publicAPIDescription, Description);
-                    hbox(FormRow, () -> {
-                        label("API Key", FormLabel);
-                        $(apiKey, FormInput);
-                    });
-                    hbox(FormRow, () -> {
-                        label("API Secret", FormLabel);
-                        $(apiSecret, FormInput);
+                    vbox(Block, () -> {
+                        label("BitFlyer", Heading);
+                        $(publicAPIDescription, Description);
+                        hbox(FormRow, () -> {
+                            label("API Key", FormLabel);
+                            $(apiKey, FormInput);
+                        });
+                        hbox(FormRow, () -> {
+                            label("API Secret", FormLabel);
+                            $(apiSecret, FormInput);
+                        });
                     });
                 });
             }
