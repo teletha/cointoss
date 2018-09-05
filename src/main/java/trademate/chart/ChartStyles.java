@@ -9,8 +9,6 @@
  */
 package trademate.chart;
 
-import static stylist.StyleDSL.*;
-
 import stylist.StyleDSL;
 import stylist.value.Color;
 import viewtify.dsl.Style;
@@ -20,9 +18,9 @@ import viewtify.dsl.Style;
  */
 public class ChartStyles implements StyleDSL {
 
-    static Color buy = rgb(32, 151, 77);
+    static Color buy = $.rgb(32, 151, 77);
 
-    static Color sell = rgb(247, 105, 77);
+    static Color sell = $.rgb(247, 105, 77);
 
     static Style Label = () -> {
         font.size(11, px);
@@ -31,31 +29,31 @@ public class ChartStyles implements StyleDSL {
     };
 
     static Style BackGrid = () -> {
-        stroke.width(0.5, px).color(hsl(0, 0, 16));
+        stroke.width(0.5, px).color($.hsl(0, 0, 16));
         font.color("-fx-mid-text-color");
     };
 
     static Style MouseTrack = () -> {
-        stroke.width(0.5, px).color(rgb(80, 80, 80));
+        stroke.width(0.5, px).color($.rgb(80, 80, 80));
         font.color("-fx-light-text-color");
     };
 
     static Style PriceSignal = () -> {
-        Color color = rgb(180, 100, 100);
+        Color color = $.rgb(180, 100, 100);
 
         stroke.width(0.5, px).color(color);
         font.color(color);
     };
 
     static Style PriceLatest = () -> {
-        Color color = rgb(140, 100, 40);
+        Color color = $.rgb(140, 100, 40);
 
         stroke.width(0.5, px).color(color);
         font.color(color);
     };
 
     static Style PriceSFD = () -> {
-        Color color = rgb(40, 100, 40);
+        Color color = $.rgb(40, 100, 40);
 
         stroke.width(0.5, px).color(color);
         font.color(color);

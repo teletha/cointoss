@@ -9,8 +9,6 @@
  */
 package trademate.setting;
 
-import static stylist.StyleDSL.*;
-
 import stylist.StyleDSL;
 import stylist.value.Numeric;
 import viewtify.dsl.Style;
@@ -28,7 +26,7 @@ public interface SettingStyles extends StyleDSL {
 
     Style Block = () -> {
         padding.bottom(blockSpace);
-        border.bottom.width(2, px).color(rgb(40, 40, 40));
+        border.bottom.width(2, px).color($.rgb(40, 40, 40));
     };
 
     Style Heading = () -> {
@@ -41,7 +39,7 @@ public interface SettingStyles extends StyleDSL {
     };
 
     Style Warning = () -> {
-        font.color(rgb(150, 50, 50));
+        font.color($.rgb(150, 50, 50));
     };
 
     Style FormRow = () -> {
