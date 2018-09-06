@@ -50,12 +50,19 @@ public abstract class MarketProvider implements Extensible {
     }
 
     /**
+     * Get the market account infomation.
+     * 
+     * @return
+     */
+    public abstract MarketAccount account();
+
+    /**
      * Retrieve all {@link MarketProvider}s.
      * 
      * @return
      */
     public static final Signal<MarketProvider> availableProviders() {
-        return I.signal(I.find(MarketProvider.class));
+        return I.signal(I.find(MarketProvider.class)).take(market -> market.account().validate());
     }
 
     /**

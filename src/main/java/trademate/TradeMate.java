@@ -19,7 +19,7 @@ import viewtify.dsl.UIDefinition;
 import viewtify.ui.UITabPane;
 
 /**
- * @version 2017/12/04 13:07:34
+ * @version 2018/09/06 23:45:59
  */
 public class TradeMate extends View {
 

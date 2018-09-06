@@ -14,7 +14,7 @@ import stylist.value.Numeric;
 import viewtify.dsl.Style;
 
 /**
- * @version 2018/08/29 15:08:22
+ * @version 2018/09/06 23:46:11
  */
 public interface SettingStyles extends StyleDSL {
 
@@ -39,7 +39,7 @@ public interface SettingStyles extends StyleDSL {
     };
 
     Style Warning = () -> {
-        font.color($.rgb(150, 50, 50));
+        font.color($.rgb(220, 100, 100));
     };
 
     Style FormRow = () -> {
@@ -49,11 +49,11 @@ public interface SettingStyles extends StyleDSL {
     };
 
     Style FormLabel = () -> {
-        display.minWidth(100, px);
+        display.minWidth(130, px);
     };
 
     Style FormInput = () -> {
-        display.minWidth(160, px);
+        display.minWidth(170, px);
     };
 
     Style FormInputMin = () -> {

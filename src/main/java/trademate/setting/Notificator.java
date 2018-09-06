@@ -17,14 +17,14 @@ import org.controlsfx.control.Notifications;
 import cointoss.util.Network;
 import kiss.Extensible;
 import kiss.I;
+import kiss.Storable;
 import kiss.Variable;
-import viewtify.Preference;
 import viewtify.Viewtify;
 
 /**
- * @version 2018/08/30 10:30:09
+ * @version 2018/09/06 23:40:19
  */
-public class Notificator extends Preference<Notificator> {
+public class Notificator implements Storable<Notificator> {
 
     /** The message resource. */
     private static final Lang message = I.i18n(Lang.class);
@@ -52,7 +52,7 @@ public class Notificator extends Preference<Notificator> {
      * 
      */
     private Notificator() {
-        restore().autoSave();
+        restore().storeAuto();
     }
 
     /**

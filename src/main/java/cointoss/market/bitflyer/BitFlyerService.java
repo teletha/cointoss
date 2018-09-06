@@ -42,7 +42,6 @@ import cointoss.order.OrderUnit;
 import cointoss.util.Chrono;
 import cointoss.util.LogCodec;
 import cointoss.util.Num;
-import filer.Filer;
 import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
@@ -54,7 +53,7 @@ import okhttp3.RequestBody;
 import viewtify.Viewtify;
 
 /**
- * @version 2018/07/26 23:04:15
+ * @version 2018/09/06 23:46:05
  */
 class BitFlyerService extends MarketService {
 
@@ -90,20 +89,8 @@ class BitFlyerService extends MarketService {
     /** Flag for test. */
     private final boolean forTest;
 
-    /** The key. */
-    private final String accessKey;
-
-    /** The token. */
-    private final String accessToken;
-
-    /** The key. */
-    private final String name;
-
-    /** The token. */
-    private final String password;
-
-    /** The token. */
-    private final String accountId;
+    /** The account setting. */
+    private final BitFlyerAccount setting = I.make(BitFlyerAccount.class);
 
     private Disposable disposer = Disposable.empty();
 
@@ -130,13 +117,6 @@ class BitFlyerService extends MarketService {
         super("BitFlyer", type, setting);
 
         this.forTest = forTest;
-
-        List<String> lines = Filer.read(".log/bitflyer/key.txt").toList();
-        this.accessKey = lines.get(0);
-        this.accessToken = lines.get(1);
-        this.name = lines.get(2);
-        this.password = lines.get(3);
-        this.accountId = lines.get(4);
         this.intervalOrderCheck = I.signal(0, 1, TimeUnit.SECONDS).map(v -> orders().toList()).share();
     }
 
@@ -169,7 +149,7 @@ class BitFlyerService extends MarketService {
             call = call("POST", "/v1/me/sendchildorder", request, "child_order_acceptance_id", String.class);
         } else {
             ChildOrderRequestWebAPI request = new ChildOrderRequestWebAPI();
-            request.account_id = accountId;
+            request.account_id = setting.accountId.v;
             request.ord_type = order.isLimit() ? "LIMIT" : "MARKET";
             request.minute_to_expire = 60 * 24;
             request.order_ref_id = id;
@@ -206,7 +186,7 @@ class BitFlyerService extends MarketService {
     public Signal<Order> cancel(Order order) {
         CancelRequest cancel = new CancelRequest();
         cancel.product_code = marketName;
-        cancel.account_id = accountId;
+        cancel.account_id = setting.accountId.v;
         cancel.order_id = order.attribute(Internals.class).id;
         cancel.child_order_acceptance_id = order.id.v;
 
@@ -433,7 +413,7 @@ class BitFlyerService extends MarketService {
      */
     protected <M> Signal<M> call(String method, String path, String body, String selector, Class<M> type) {
         String timestamp = String.valueOf(Chrono.utcNow().toEpochSecond());
-        String sign = new HmacUtils(HmacAlgorithms.HMAC_SHA_256, accessToken).hmacHex(timestamp + method + path + body);
+        String sign = new HmacUtils(HmacAlgorithms.HMAC_SHA_256, setting.apiSecret.v).hmacHex(timestamp + method + path + body);
 
         Request request;
 
@@ -441,13 +421,13 @@ class BitFlyerService extends MarketService {
             request = new Request.Builder().url(api + path).build();
         } else if (method.equals("GET")) {
             request = new Request.Builder().url(api + path)
-                    .addHeader("ACCESS-KEY", accessKey)
+                    .addHeader("ACCESS-KEY", setting.apiKey.v)
                     .addHeader("ACCESS-TIMESTAMP", timestamp)
                     .addHeader("ACCESS-SIGN", sign)
                     .build();
         } else if (method.equals("POST") && !path.startsWith("http")) {
             request = new Request.Builder().url(api + path)
-                    .addHeader("ACCESS-KEY", accessKey)
+                    .addHeader("ACCESS-KEY", setting.apiKey.v)
                     .addHeader("ACCESS-TIMESTAMP", timestamp)
                     .addHeader("ACCESS-SIGN", sign)
                     .addHeader("Content-Type", "application/json")
@@ -514,8 +494,8 @@ class BitFlyerService extends MarketService {
                 try {
                     Browser browser = new Browser().configHeadless(false).configProfile(".log/bitflyer/chrome");
                     browser.load("https://lightning.bitflyer.jp") //
-                            .input("#LoginId", name)
-                            .input("#Password", password)
+                            .input("#LoginId", setting.loginId)
+                            .input("#Password", setting.loginPassword)
                             .click("#login_btn");
 
                     if (browser.uri().equals("https://lightning.bitflyer.jp/Home/TwoFactorAuth")) {
@@ -691,7 +671,7 @@ class BitFlyerService extends MarketService {
     private class WebRequest {
 
         /** Generic parameter */
-        public String account_id = accountId;
+        public String account_id = setting.accountId.v;
 
         /** Generic parameter */
         public String product_code = marketName;

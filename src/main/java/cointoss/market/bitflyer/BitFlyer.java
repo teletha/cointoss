@@ -11,8 +11,10 @@ package cointoss.market.bitflyer;
 
 import cointoss.MarketService;
 import cointoss.MarketSetting;
+import cointoss.market.MarketAccount;
 import cointoss.market.MarketProvider;
 import cointoss.util.Num;
+import kiss.I;
 
 /**
  * @version 2018/08/26 13:31:31
@@ -53,4 +55,12 @@ public final class BitFlyer extends MarketProvider {
 
     /** Market */
     public static final MarketService BTCJPY10AUG2018 = new BitFlyerService("BTCJPY10AUG2018", FiatBaseSetting);
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public MarketAccount account() {
+        return I.make(BitFlyerAccount.class);
+    }
 }

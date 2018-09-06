@@ -11,7 +11,9 @@ package trademate.setting;
 
 import static trademate.setting.SettingStyles.*;
 
+import cointoss.market.bitflyer.BitFlyerAccount;
 import kiss.Extensible;
+import kiss.I;
 import kiss.Manageable;
 import kiss.Singleton;
 import trademate.setting.BitFlyerSetting.Lang;
@@ -22,29 +24,25 @@ import viewtify.ui.UIPassword;
 import viewtify.ui.UIText;
 
 /**
- * @version 2018/08/27 18:53:30
+ * @version 2018/09/06 23:46:18
  */
 @Manageable(lifestyle = Singleton.class)
 public class BitFlyerSetting extends View<Lang> {
+
+    /** The account info. */
+    private final BitFlyerAccount account = I.make(BitFlyerAccount.class);
 
     private UIPassword apiKey;
 
     private UIPassword apiSecret;
 
-    private UICheckBox allowAccountAccess;
-
     private UIText loginId;
 
-    private UIPassword password;
+    private UIPassword loginPassword;
 
     private UIPassword accountId;
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void initialize() {
-    }
+    private UICheckBox loginBackground;
 
     /**
      * {@inheritDoc}
@@ -66,7 +64,7 @@ public class BitFlyerSetting extends View<Lang> {
                             $(apiSecret, FormInput);
                         });
 
-                        label("非公開APIの利用", Heading);
+                        label($.privateAPITitle(), Heading);
                         label($.privateAPIDescription(), Description);
                         label($.privateAPIWarning(), Description, Warning);
                         hbox(FormRow, () -> {
@@ -75,16 +73,32 @@ public class BitFlyerSetting extends View<Lang> {
                         });
                         hbox(FormRow, () -> {
                             label("Password", FormLabel);
-                            $(password, FormInput);
+                            $(loginPassword, FormInput);
                         });
                         hbox(FormRow, () -> {
                             label("Account ID", FormLabel);
                             $(accountId, FormInput);
                         });
+                        hbox(FormRow, () -> {
+                            label($.loginExplicitly(), FormLabel);
+                            $(loginBackground, FormInput);
+                        });
                     });
                 });
             }
         };
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void initialize() {
+        apiKey.model(account.apiKey);
+        apiSecret.model(account.apiSecret);
+        loginId.model(account.loginId);
+        loginPassword.model(account.loginPassword);
+        accountId.model(account.accountId);
     }
 
     /**
@@ -103,13 +117,17 @@ public class BitFlyerSetting extends View<Lang> {
             return "Please get API key and API secret to use the public API provided by [BitFlyer](https://lightning.bitflyer.jp/developer).";
         }
 
+        String privateAPITitle() {
+            return "Usage of Private API";
+        }
+
         /**
          * Desciption for private API.
          * 
          * @return
          */
         String privateAPIDescription() {
-            return "";
+            return "We will try to speed up trading by using private API.\r\nTradeaMate acquires the account specific infomation(e.g. session id) by logging in automatically.";
         }
 
         /**
@@ -118,7 +136,16 @@ public class BitFlyerSetting extends View<Lang> {
          * @return
          */
         String privateAPIWarning() {
-            return "";
+            return "WARNING : This setting will allow all operations on your account.";
+        }
+
+        /**
+         * Description label for login.
+         * 
+         * @return
+         */
+        String loginExplicitly() {
+            return "Login explicitly";
         }
 
         /**
@@ -138,6 +165,14 @@ public class BitFlyerSetting extends View<Lang> {
              * {@inheritDoc}
              */
             @Override
+            String privateAPITitle() {
+                return "非公開APIの利用";
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
             String privateAPIDescription() {
                 return "非公開APIを利用して取引の高速化を図ります。\r\nブラウザを使用して自動でログインを行いアカウント固有のIDやセッション情報を取得します。";
             }
@@ -147,7 +182,15 @@ public class BitFlyerSetting extends View<Lang> {
              */
             @Override
             String privateAPIWarning() {
-                return "この設定を行うとあなたのアカウントに対する全ての操作を許可することになります。ご承知の上、使用してください。";
+                return "注意 : この設定を行うとあなたのアカウントに対する全ての操作を許可することになります。";
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            String loginExplicitly() {
+                return "ログイン画面を表示";
             }
         }
     }
