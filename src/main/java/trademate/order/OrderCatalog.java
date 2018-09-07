@@ -197,6 +197,7 @@ public class OrderCatalog extends View<Lang> {
         };
 
         ValueStyle<OrderState> State = state -> {
+
             $.descendant(() -> {
                 font.color($.rgb(80, 80, 80));
             });
