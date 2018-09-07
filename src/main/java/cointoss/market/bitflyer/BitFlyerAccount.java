@@ -36,7 +36,7 @@ public class BitFlyerAccount extends MarketAccount<BitFlyerAccount> {
      * Hide constructor.
      */
     private BitFlyerAccount() {
-        restore().storeAuto();
+        restore().auto();
     }
 
     /**

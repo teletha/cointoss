@@ -52,7 +52,7 @@ public class Notificator implements Storable<Notificator> {
      * 
      */
     private Notificator() {
-        restore().storeAuto();
+        restore().auto();
     }
 
     /**
