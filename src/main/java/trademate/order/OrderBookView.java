@@ -169,12 +169,14 @@ public class OrderBookView extends View {
         };
 
         Style Book = () -> {
+            text.unselectable();
+
             $.descendant(() -> {
                 font.color("inherit");
                 text.indent(66, px);
             });
 
-            $.descendant(".scroll-bar:horizontal").descendant(() -> {
+            $.select(".scroll-bar:horizontal").descendant(() -> {
                 padding.size(0, px);
             });
         };

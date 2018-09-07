@@ -24,6 +24,7 @@ import cointoss.util.Num;
 import kiss.Extensible;
 import kiss.Variable;
 import stylist.StyleDSL;
+import stylist.ValueStyle;
 import trademate.TradingView;
 import trademate.order.OrderCatalog.Lang;
 import viewtify.View;
@@ -69,11 +70,11 @@ public class OrderCatalog extends View<Lang> {
     protected UIDefinition declareUI() {
         return new UIDefinition() {
             {
-                $(table, CSS.root, () -> {
-                    $(date, CSS.wide);
-                    $(side, CSS.narrow);
-                    $(price, CSS.wide);
-                    $(amount, CSS.narrow);
+                $(table, S.Root, () -> {
+                    $(date, S.Wide);
+                    $(side, S.Narrow);
+                    $(price, S.Wide);
+                    $(amount, S.Narrow);
                 });
             }
         };
@@ -177,36 +178,35 @@ public class OrderCatalog extends View<Lang> {
         /** The enhanced ui. */
         private final UserInterface ui = Viewtify.wrap(this, OrderCatalog.this);
 
-        // /** Context Menu */
-        // private final UIContextMenu context = UI.contextMenu($ -> {
-        // $.menu("Cancel").disableWhen(orderState.isNot(ACTIVE)).whenUserClick(e ->
-        // cancel(getItem()));
-        // });
-
         /**
          * 
          */
         private CatalogRow() {
             ui.styleOnly(orderState);
-
-            // contextMenuProperty().bind(Viewtify.calculate(itemProperty()).map(v -> context.ui));
         }
     }
 
     /**
-     * @version 2018/08/30 12:50:36
+     * @version 2018/09/07 14:14:11
      */
-    private static class CSS implements StyleDSL {
+    private interface S extends StyleDSL {
 
-        static Style root = () -> {
+        Style Root = () -> {
             display.width(400, px);
+            text.unselectable();
         };
 
-        static Style wide = () -> {
+        ValueStyle<OrderState> State = state -> {
+            $.descendant(() -> {
+                font.color($.rgb(80, 80, 80));
+            });
+        };
+
+        Style Wide = () -> {
             display.width(120, px);
         };
 
-        static Style narrow = () -> {
+        Style Narrow = () -> {
             display.width(65, px);
         };
     }

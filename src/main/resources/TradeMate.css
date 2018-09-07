@@ -17,10 +17,6 @@
 	-fx-text-fill: -side;
 }
 
-#requestedOrdersDate {
-  -fx-alignment: CENTER_LEFT;
-}
-
-.tree-table-row-cell.REQUESTING .cell {
+.REQUESTING .cell {
   -fx-text-fill: rgb(80, 80, 80);
 }

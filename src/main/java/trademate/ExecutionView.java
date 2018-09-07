@@ -138,6 +138,10 @@ public class ExecutionView extends View {
 
         Style Root = () -> {
             display.width(210, px);
+
+            $.descendant(() -> {
+                text.unselectable();
+            });
         };
 
         Style TakerSize = () -> {
