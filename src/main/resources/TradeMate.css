@@ -17,21 +17,6 @@
 	-fx-text-fill: -side;
 }
 
-#shortList .list-cell,
-#longList .list-cell {
-	-fx-text-fill: inherit;
-	-fx-label-padding: 0 0 0 66px;
-}
-
-#shortList .scroll-bar:horizontal *,
-#longList .scroll-bar:horizontal * {
-    -fx-padding: 0;
-}
-
-#priceLatest {
-	-fx-label-padding: 0 0 0 8px;
-}
-
 #requestedOrdersDate {
   -fx-alignment: CENTER_LEFT;
 }

@@ -64,7 +64,8 @@ public class OrderBuilder extends View {
     private @UI UISpinner<Num> orderSizeAmount;
 
     /** UI */
-    private @UI UIText orderPrice;
+    @UI
+    UIText orderPrice;
 
     /** UI */
     private @UI UISpinner<Num> orderPriceAmount;

@@ -9,53 +9,74 @@
  */
 package trademate.order;
 
+import static trademate.TradeMateStyle.*;
+
 import javafx.scene.control.ListCell;
-import javafx.scene.control.TextField;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
 import cointoss.order.OrderBookManager;
 import cointoss.order.OrderUnit;
 import cointoss.util.Num;
+import stylist.StyleDSL;
 import trademate.TradingView;
-import viewtify.UI;
 import viewtify.View;
 import viewtify.Viewtify;
+import viewtify.dsl.Style;
+import viewtify.dsl.UIDefinition;
 import viewtify.ui.UILabel;
 import viewtify.ui.UIListView;
 import viewtify.ui.UISpinner;
 
 /**
- * @version 2018/01/23 14:13:06
+ * @version 2018/09/07 12:39:29
  */
 public class OrderBookView extends View {
 
     /** UI for long maker. */
-    private @UI UIListView<OrderUnit> longList;
+    private UIListView<OrderUnit> longList;
 
     /** UI for maker. */
-    private @UI UIListView<OrderUnit> shortList;
+    private UIListView<OrderUnit> shortList;
 
     /** UI for interval configuration. */
-    private @UI UISpinner<Num> priceRange;
+    private UISpinner<Num> priceRange;
 
     /** UI for interval configuration. */
-    private @UI UILabel priceLatest;
+    private UILabel priceLatest;
 
     /** UI for interval configuration. */
-    private @UI UILabel priceSpread;
-
-    /** UI for order. */
-    private @UI TextField orderPrice;
+    private UILabel priceSpread;
 
     /** UI for interval configuration. */
-    private @UI UISpinner<Num> hideSize;
+    private UISpinner<Num> hideSize;
 
     /** Parent View */
-    private @UI TradingView view;
+    private TradingView view;
 
     /** Order Book. */
     private OrderBookManager book;
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected UIDefinition declareUI() {
+        return new UIDefinition() {
+            {
+                vbox(S.Root, () -> {
+                    $(shortList, S.Book, Short);
+                    hbox(() -> {
+                        $(priceRange, S.PriceRange);
+                        $(priceLatest, S.PriceLatest);
+                        $(priceSpread, S.PriceSpread);
+                        $(hideSize, S.HideSize);
+                    });
+                    $(longList, S.Book, Long);
+                });
+            }
+        };
+    }
 
     /**
      * {@inheritDoc}
@@ -98,11 +119,11 @@ public class OrderBookView extends View {
                     Num min = getItem().price;
                     Num max = min.plus(priceRange.value());
                     Num best = book.longs.computeBestPrice(max, Num.of(3), Num.ONE);
-                    orderPrice.setText(best.toString());
+                    view.builder.orderPrice.value(best.toString());
                 } else {
                     Num min = getItem().price;
                     Num best = book.shorts.computeBestPrice(min, Num.of(3), Num.ONE);
-                    orderPrice.setText(best.toString());
+                    view.builder.orderPrice.value(best.toString());
                 }
             });
 
@@ -136,5 +157,43 @@ public class OrderBookView extends View {
                 }
             });
         }
+    }
+
+    /**
+     * @version 2018/09/07 10:49:03
+     */
+    private interface S extends StyleDSL {
+
+        Style Root = () -> {
+            display.width(220, px);
+        };
+
+        Style Book = () -> {
+            $.descendant(() -> {
+                font.color("inherit");
+                text.indent(66, px);
+            });
+
+            $.descendant(".scroll-bar:horizontal").descendant(() -> {
+                padding.size(0, px);
+            });
+        };
+
+        Style PriceRange = () -> {
+            display.width(72, px);
+        };
+
+        Style PriceLatest = () -> {
+            display.width(60, px).height(25, px);
+            text.indent(10, px);
+        };
+
+        Style PriceSpread = () -> {
+            display.width(50, px).height(25, px);
+        };
+
+        Style HideSize = () -> {
+            display.width(53, px);
+        };
     }
 }

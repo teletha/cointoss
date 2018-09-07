@@ -41,7 +41,7 @@ public class TradingView extends View {
 
     public @UI Console console;
 
-    public @UI OrderBookView board;
+    public @UI OrderBookView books;
 
     public @UI OrderBuilder builder;
 
