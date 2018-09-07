@@ -21,9 +21,11 @@ import cointoss.Side;
 import cointoss.order.Order;
 import cointoss.order.OrderState;
 import cointoss.util.Num;
+import kiss.Extensible;
 import kiss.Variable;
 import stylist.StyleDSL;
 import trademate.TradingView;
+import trademate.order.OrderCatalog.Lang;
 import viewtify.View;
 import viewtify.Viewtify;
 import viewtify.bind.Calculation;
@@ -37,25 +39,25 @@ import viewtify.ui.UserInterface;
 /**
  * @version 2018/08/30 16:54:37
  */
-public class OrderCatalog extends View {
+public class OrderCatalog extends View<Lang> {
 
     /** The date formatter. */
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd HH:mm:ss");
 
     /** UI */
-    private UITreeTableView<Object> orderCatalog;
+    private UITreeTableView<Object> table;
 
     /** UI */
-    private UITreeTableColumn<Object, ZonedDateTime> requestedOrdersDate;
+    private UITreeTableColumn<Object, ZonedDateTime> date;
 
     /** UI */
-    private UITreeTableColumn<Object, Side> requestedOrdersSide;
+    private UITreeTableColumn<Object, Side> side;
 
     /** UI */
-    private UITreeTableColumn<Object, Num> requestedOrdersAmount;
+    private UITreeTableColumn<Object, Num> amount;
 
     /** UI */
-    private UITreeTableColumn<Object, Num> requestedOrdersPrice;
+    private UITreeTableColumn<Object, Num> price;
 
     /** Parent View */
     private TradingView view;
@@ -67,11 +69,11 @@ public class OrderCatalog extends View {
     protected UIDefinition declareUI() {
         return new UIDefinition() {
             {
-                $(orderCatalog, CSS.root, () -> {
-                    $(requestedOrdersDate, CSS.wide);
-                    $(requestedOrdersSide, CSS.narrow);
-                    $(requestedOrdersPrice, CSS.wide);
-                    $(requestedOrdersAmount, CSS.narrow);
+                $(table, CSS.root, () -> {
+                    $(date, CSS.wide);
+                    $(side, CSS.narrow);
+                    $(price, CSS.wide);
+                    $(amount, CSS.narrow);
                 });
             }
         };
@@ -82,20 +84,22 @@ public class OrderCatalog extends View {
      */
     @Override
     protected void initialize() {
-        orderCatalog.selectMultipleRows().render(table -> new CatalogRow()).context($ -> {
-            Calculation<Boolean> ordersArePassive = orderCatalog.selection().flatVariable(this::state).isNot(ACTIVE);
+        table.selectMultipleRows().render(table -> new CatalogRow()).context($ -> {
+            Calculation<Boolean> ordersArePassive = table.selection().flatVariable(this::state).isNot(ACTIVE);
 
             $.menu("Cancel").disableWhen(ordersArePassive).whenUserClick(e -> act(this::cancel));
         });
 
-        requestedOrdersDate.modelByProperty(OrderSet.class, o -> o.date)
+        date.header($.date())
+                .modelByProperty(OrderSet.class, o -> o.date)
                 .modelByVar(Order.class, o -> o.created)
                 .render((ui, item) -> ui.text(formatter.format(item)));
-        requestedOrdersSide.modelByProperty(OrderSet.class, o -> o.side)
+        side.header($.side())
+                .modelByProperty(OrderSet.class, o -> o.side)
                 .model(Order.class, Order::side)
                 .render((ui, item) -> ui.text(item).styleOnly(item));
-        requestedOrdersAmount.modelByProperty(OrderSet.class, o -> o.amount).model(Order.class, o -> o.remainingSize);
-        requestedOrdersPrice.modelByProperty(OrderSet.class, o -> o.averagePrice).model(Order.class, o -> o.price.v);
+        amount.header($.amount()).modelByProperty(OrderSet.class, o -> o.amount).model(Order.class, o -> o.remainingSize);
+        price.header($.price()).modelByProperty(OrderSet.class, o -> o.averagePrice).model(Order.class, o -> o.price.v);
     }
 
     /**
@@ -114,7 +118,7 @@ public class OrderCatalog extends View {
      * @param set
      */
     public void createOrderItem(OrderSet set) {
-        UITreeItem item = orderCatalog.root.createItem(set).expand(set.sub.size() != 1).removeWhenEmpty();
+        UITreeItem item = table.root.createItem(set).expand(set.sub.size() != 1).removeWhenEmpty();
 
         for (Order order : set.sub) {
             createOrderItem(item, order);
@@ -134,7 +138,7 @@ public class OrderCatalog extends View {
      * @param order
      */
     private void act(Consumer<Order> forOrder) {
-        for (Object order : orderCatalog.selection()) {
+        for (Object order : table.selection()) {
             if (order instanceof Order) {
                 forOrder.accept((Order) order);
             } else {
@@ -205,5 +209,65 @@ public class OrderCatalog extends View {
         static Style narrow = () -> {
             display.width(65, px);
         };
+    }
+
+    /**
+     * @version 2018/09/07 10:29:37
+     */
+    static class Lang implements Extensible {
+
+        String date() {
+            return "Date";
+        }
+
+        String side() {
+            return "Side";
+        }
+
+        String amount() {
+            return "Amount";
+        }
+
+        String price() {
+            return "Price";
+        }
+
+        /**
+         * @version 2018/09/07 10:44:14
+         */
+        private static class Lang_ja extends Lang {
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            String date() {
+                return "日付";
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            String side() {
+                return "売買";
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            String amount() {
+                return "数量";
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            String price() {
+                return "値段";
+            }
+        }
     }
 }
