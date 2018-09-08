@@ -65,7 +65,7 @@ public class ChartView extends View {
                 vbox(() -> {
                     hbox(() -> {
                         $(span);
-                        $(selectDate);
+                        $(selectDate, S.Data);
                         $(selectHigh, S.Data);
                         $(selectLow, S.Data);
                         $(selectVolume, S.Data);
@@ -93,11 +93,15 @@ public class ChartView extends View {
     }
 
     /**
-     * @version 2018/08/30 9:07:20
+     * @version 2018/09/08 20:10:52
      */
-    private static class S implements StyleDSL {
+    private interface S extends StyleDSL {
 
         static Style Data = () -> {
+            font.size(11, px);
+            text.verticalAlign.middle();
+            display.height(25, px).minWidth(50, px);
+            padding.left(7, px);
         };
     }
 }
