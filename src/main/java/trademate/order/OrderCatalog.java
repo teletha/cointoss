@@ -10,6 +10,7 @@
 package trademate.order;
 
 import static cointoss.order.OrderState.*;
+import static trademate.TradeMateStyle.*;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -98,7 +99,7 @@ public class OrderCatalog extends View<Lang> {
         side.header($.side())
                 .modelByProperty(OrderSet.class, o -> o.side)
                 .model(Order.class, Order::side)
-                .render((ui, item) -> ui.text(item).styleOnly(item));
+                .render((ui, side) -> ui.text(side).styleOnly(Side.of(side)));
         amount.header($.amount()).modelByProperty(OrderSet.class, o -> o.amount).model(Order.class, o -> o.remainingSize);
         price.header($.price()).modelByProperty(OrderSet.class, o -> o.averagePrice).model(Order.class, o -> o.price.v);
     }
@@ -167,13 +168,13 @@ public class OrderCatalog extends View<Lang> {
      */
     private class CatalogRow extends TreeTableRow<Object> {
 
-        private final Calculation<OrderState> orderState = Viewtify.calculate(itemProperty()).flatVariable(o -> {
+        private final Calculation<stylist.Style> orderState = Viewtify.calculate(itemProperty()).flatVariable(o -> {
             if (o instanceof Order) {
                 return ((Order) o).state;
             } else {
                 return Variable.of(OrderState.ACTIVE);
             }
-        });
+        }).map(S.State::of);
 
         /** The enhanced ui. */
         private final UserInterface ui = Viewtify.wrap(this, OrderCatalog.this);
@@ -197,9 +198,13 @@ public class OrderCatalog extends View<Lang> {
         };
 
         ValueStyle<OrderState> State = state -> {
-            $.descendant(() -> {
-                font.color($.rgb(80, 80, 80));
-            });
+            switch (state) {
+            case REQUESTING:
+                $.descendant(() -> {
+                    font.color($.rgb(80, 80, 80));
+                });
+                break;
+            }
         };
 
         Style Wide = () -> {

@@ -9,6 +9,8 @@
  */
 package trademate;
 
+import static trademate.TradeMateStyle.*;
+
 import java.util.stream.IntStream;
 
 import javafx.scene.control.ListCell;
@@ -126,7 +128,7 @@ public class ExecutionView extends View {
             } else {
                 setText(Chrono.system(e.date).format(Chrono.Time) + "  " + e.price + "円  " + (comulative ? e.cumulativeSize : e.size)
                         .scale(6) + "  " + e.delay);
-                ui.styleOnly(e.side);
+                ui.styleOnly(Side.of(e.side));
             }
         }
     }

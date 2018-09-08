@@ -9,6 +9,8 @@
  */
 package trademate.order;
 
+import static trademate.TradeMateStyle.*;
+
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -26,7 +28,7 @@ import viewtify.ui.UITableColumn;
 import viewtify.ui.UITableView;
 
 /**
- * @version 2018/04/26 14:54:03
+ * @version 2018/09/08 18:33:32
  */
 public class PositionCatalog extends View {
 
@@ -62,7 +64,7 @@ public class PositionCatalog extends View {
         PositionManager manager = view.market().positions;
 
         openPositionDate.model(o -> o.date).render((ui, item) -> ui.text(formatter.format(item)));
-        openPositionSide.model(o -> o.side).render((ui, item) -> ui.text(item).styleOnly(item));
+        openPositionSide.model(o -> o.side).render((ui, side) -> ui.text(side).styleOnly(Side.of(side)));
         openPositionAmount.modelByVar(o -> o.size).header("数量 ", manager.size);
         openPositionPrice.model(o -> o.price).header("価格 ", manager.price);
         openPositionProfitAndLoss.modelByVar(o -> o.profit).header("損益 ", manager.profit);

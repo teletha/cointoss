@@ -450,15 +450,6 @@ public class Axis extends Region {
      * 
      * @return
      */
-    public TickLable createLabel(String description, Enum... classNames) {
-        return new TickLable(description, classNames);
-    }
-
-    /**
-     * Create new label.
-     * 
-     * @return
-     */
     public TickLable createLabel(String description, Style... styles) {
         return new TickLable(description, styles);
     }
@@ -470,31 +461,6 @@ public class Axis extends Region {
 
         /** The associated value. */
         public final DoubleProperty value = new SimpleDoubleProperty();
-
-        /**
-         * 
-         */
-        private TickLable(Enum... classNames) {
-            this(null, classNames);
-        }
-
-        /**
-         * 
-         */
-        private TickLable(String description, Enum... classNames) {
-            tickLabels.getChildren().add(this);
-            textProperty().bind(Viewtify.calculate(value, () -> tickLabelFormatter.get().apply(value.get())));
-            value.addListener(layoutAxis);
-
-            if (description != null && !description.isEmpty()) {
-                Tooltip tooltip = new Tooltip(description);
-                tooltip.setShowDuration(Duration.INDEFINITE);
-                tooltip.setShowDelay(Duration.ZERO);
-                setTooltip(tooltip);
-            }
-
-            StyleHelper.of(this).style(ChartStyles.Label).style(classNames);
-        }
 
         /**
          * 

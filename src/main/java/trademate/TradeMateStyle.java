@@ -9,7 +9,9 @@
  */
 package trademate;
 
+import cointoss.Side;
 import stylist.StyleDSL;
+import stylist.ValueStyle;
 import stylist.value.Color;
 import viewtify.dsl.Style;
 
@@ -28,5 +30,9 @@ public interface TradeMateStyle extends StyleDSL {
 
     Style Short = () -> {
         font.color(SELL);
+    };
+
+    ValueStyle<Side> Side = side -> {
+        font.color(side.isBuy() ? BUY : SELL);
     };
 }
