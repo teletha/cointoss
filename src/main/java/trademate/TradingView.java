@@ -21,8 +21,8 @@ import trademate.order.OrderCatalog;
 import trademate.order.OrderSet;
 import trademate.order.PositionCatalog;
 import trademate.setting.Notificator;
+import viewtify.UI;
 import viewtify.Viewtify;
-import viewtify.dsl.UIDefinition;
 import viewtify.ui.View;
 
 /**
@@ -62,8 +62,8 @@ public class TradingView extends View {
      * {@inheritDoc}
      */
     @Override
-    protected UIDefinition declareUI() {
-        return new UIDefinition() {
+    protected UI declareUI() {
+        return new UI() {
             {
                 vbox(() -> {
                     hbox(() -> {

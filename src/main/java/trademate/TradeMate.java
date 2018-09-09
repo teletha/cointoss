@@ -13,8 +13,8 @@ import cointoss.market.bitflyer.BitFlyer;
 import kiss.I;
 import trademate.setting.SettingView;
 import viewtify.ActivationPolicy;
+import viewtify.UI;
 import viewtify.Viewtify;
-import viewtify.dsl.UIDefinition;
 import viewtify.ui.UITabPane;
 import viewtify.ui.View;
 
@@ -33,8 +33,8 @@ public class TradeMate extends View {
      * {@inheritDoc}
      */
     @Override
-    protected UIDefinition declareUI() {
-        return new UIDefinition() {
+    protected UI declareUI() {
+        return new UI() {
             {
                 $(main);
             }

@@ -17,7 +17,7 @@ import kiss.I;
 import kiss.Manageable;
 import kiss.Singleton;
 import trademate.setting.BitFlyerSetting.Lang;
-import viewtify.dsl.UIDefinition;
+import viewtify.UI;
 import viewtify.ui.UICheckBox;
 import viewtify.ui.UIPassword;
 import viewtify.ui.UIText;
@@ -48,8 +48,8 @@ public class BitFlyerSetting extends View<Lang> {
      * {@inheritDoc}
      */
     @Override
-    protected UIDefinition declareUI() {
-        return new UIDefinition() {
+    protected UI declareUI() {
+        return new UI() {
             {
                 vbox(Root, () -> {
                     vbox(Block, () -> {

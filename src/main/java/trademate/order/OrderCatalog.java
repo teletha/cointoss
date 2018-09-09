@@ -28,10 +28,10 @@ import stylist.StyleDSL;
 import stylist.ValueStyle;
 import trademate.TradingView;
 import trademate.order.OrderCatalog.Lang;
+import viewtify.Style;
+import viewtify.UI;
 import viewtify.Viewtify;
 import viewtify.bind.Calculation;
-import viewtify.dsl.Style;
-import viewtify.dsl.UIDefinition;
 import viewtify.ui.UITreeItem;
 import viewtify.ui.UITreeTableColumn;
 import viewtify.ui.UITreeTableView;
@@ -68,8 +68,8 @@ public class OrderCatalog extends View<Lang> {
      * {@inheritDoc}
      */
     @Override
-    protected UIDefinition declareUI() {
-        return new UIDefinition() {
+    protected UI declareUI() {
+        return new UI() {
             {
                 $(table, S.Root, () -> {
                     $(date, S.Wide);

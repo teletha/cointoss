@@ -20,9 +20,9 @@ import cointoss.order.OrderUnit;
 import cointoss.util.Num;
 import stylist.StyleDSL;
 import trademate.TradingView;
+import viewtify.Style;
+import viewtify.UI;
 import viewtify.Viewtify;
-import viewtify.dsl.Style;
-import viewtify.dsl.UIDefinition;
 import viewtify.ui.UILabel;
 import viewtify.ui.UIListView;
 import viewtify.ui.UISpinner;
@@ -61,8 +61,8 @@ public class OrderBookView extends View {
      * {@inheritDoc}
      */
     @Override
-    protected UIDefinition declareUI() {
-        return new UIDefinition() {
+    protected UI declareUI() {
+        return new UI() {
             {
                 vbox(S.Root, () -> {
                     $(shortList, S.Book, Short);

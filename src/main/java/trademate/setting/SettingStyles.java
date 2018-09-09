@@ -11,7 +11,7 @@ package trademate.setting;
 
 import stylist.StyleDSL;
 import stylist.value.Numeric;
-import viewtify.dsl.Style;
+import viewtify.Style;
 
 /**
  * @version 2018/09/06 23:46:11

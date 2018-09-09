@@ -14,7 +14,7 @@ import static trademate.setting.SettingStyles.*;
 import kiss.Extensible;
 import kiss.Manageable;
 import kiss.Singleton;
-import viewtify.dsl.UIDefinition;
+import viewtify.UI;
 import viewtify.ui.UILabel;
 import viewtify.ui.UIPane;
 import viewtify.ui.View;
@@ -36,8 +36,8 @@ public class SettingView extends View<SettingView.Lang> {
      * {@inheritDoc}
      */
     @Override
-    protected UIDefinition declareUI() {
-        return new UIDefinition() {
+    protected UI declareUI() {
+        return new UI() {
             {
                 hbox(() -> {
                     vbox(CategoryPane, () -> {

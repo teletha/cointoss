@@ -19,9 +19,9 @@ import cointoss.Execution;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
 import stylist.StyleDSL;
+import viewtify.Style;
+import viewtify.UI;
 import viewtify.Viewtify;
-import viewtify.dsl.Style;
-import viewtify.dsl.UIDefinition;
 import viewtify.ui.UIListView;
 import viewtify.ui.UISpinner;
 import viewtify.ui.UserInterface;
@@ -48,8 +48,8 @@ public class ExecutionView extends View {
      * {@inheritDoc}
      */
     @Override
-    protected UIDefinition declareUI() {
-        return new UIDefinition() {
+    protected UI declareUI() {
+        return new UI() {
             {
                 vbox(S.Root, () -> {
                     $(executionList);

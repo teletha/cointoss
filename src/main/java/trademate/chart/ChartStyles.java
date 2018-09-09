@@ -11,7 +11,7 @@ package trademate.chart;
 
 import stylist.StyleDSL;
 import stylist.value.Color;
-import viewtify.dsl.Style;
+import viewtify.Style;
 
 /**
  * @version 2018/09/03 1:21:23

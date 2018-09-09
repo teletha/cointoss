@@ -31,8 +31,8 @@ import trademate.TradeMateStyle;
 import trademate.TradingView;
 import trademate.order.OrderBuilder.Lang;
 import trademate.setting.Notificator;
-import viewtify.dsl.Style;
-import viewtify.dsl.UIDefinition;
+import viewtify.Style;
+import viewtify.UI;
 import viewtify.ui.UIButton;
 import viewtify.ui.UIComboBox;
 import viewtify.ui.UISpinner;
@@ -117,8 +117,8 @@ public class OrderBuilder extends View<Lang> {
      * {@inheritDoc}
      */
     @Override
-    protected UIDefinition declareUI() {
-        return new UIDefinition() {
+    protected UI declareUI() {
+        return new UI() {
             {
                 vbox(S.Root, () -> {
                     hbox(S.Row, () -> {

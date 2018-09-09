@@ -20,9 +20,9 @@ import org.apache.logging.log4j.Logger;
 import stylist.StyleDSL;
 import trademate.TradingView;
 import trademate.setting.SettingView;
+import viewtify.Style;
+import viewtify.UI;
 import viewtify.Viewtify;
-import viewtify.dsl.Style;
-import viewtify.dsl.UIDefinition;
 import viewtify.ui.UIListView;
 import viewtify.ui.View;
 
@@ -49,8 +49,8 @@ public class Console extends View {
      * {@inheritDoc}
      */
     @Override
-    protected UIDefinition declareUI() {
-        return new UIDefinition() {
+    protected UI declareUI() {
+        return new UI() {
             {
                 $(console, S.ConsoleView);
             }

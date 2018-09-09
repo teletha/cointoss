@@ -24,9 +24,9 @@ import kiss.Extensible;
 import stylist.StyleDSL;
 import trademate.TradingView;
 import trademate.order.PositionCatalog.Lang;
+import viewtify.Style;
+import viewtify.UI;
 import viewtify.Viewtify;
-import viewtify.dsl.Style;
-import viewtify.dsl.UIDefinition;
 import viewtify.ui.UITableColumn;
 import viewtify.ui.UITableView;
 import viewtify.ui.View;
@@ -64,8 +64,8 @@ public class PositionCatalog extends View<Lang> {
      * {@inheritDoc}
      */
     @Override
-    protected UIDefinition declareUI() {
-        return new UIDefinition() {
+    protected UI declareUI() {
+        return new UI() {
             {
                 $(table, S.Root, () -> {
                     $(date, S.Wide);

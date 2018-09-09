@@ -21,7 +21,7 @@ import kiss.Singleton;
 import trademate.setting.NotificationSetting.Lang;
 import trademate.setting.Notificator.DesktopPosition;
 import trademate.setting.Notificator.Notify;
-import viewtify.dsl.UIDefinition;
+import viewtify.UI;
 import viewtify.ui.UIButton;
 import viewtify.ui.UICheckBox;
 import viewtify.ui.UIComboBox;
@@ -64,8 +64,8 @@ public class NotificationSetting extends View<Lang> {
      * {@inheritDoc}
      */
     @Override
-    protected UIDefinition declareUI() {
-        return new UIDefinition() {
+    protected UI declareUI() {
+        return new UI() {
             {
                 vbox(Root, () -> {
                     // Notification Types
@@ -173,8 +173,8 @@ public class NotificationSetting extends View<Lang> {
          * {@inheritDoc}
          */
         @Override
-        protected UIDefinition declareUI() {
-            return new UIDefinition() {
+        protected UI declareUI() {
+            return new UI() {
                 {
                     hbox(FormRow, () -> {
                         label(notify, FormLabel);

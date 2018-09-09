@@ -26,8 +26,8 @@ import kiss.Manageable;
 import kiss.Singleton;
 import trademate.BackTestView.Message;
 import trademate.chart.ChartView;
+import viewtify.UI;
 import viewtify.Viewtify;
-import viewtify.dsl.UIDefinition;
 import viewtify.ui.UIButton;
 import viewtify.ui.UIComboBox;
 import viewtify.ui.UIDatePicker;
@@ -53,8 +53,8 @@ public class BackTestView extends View<Message> {
      * {@inheritDoc}
      */
     @Override
-    protected UIDefinition declareUI() {
-        return new UIDefinition() {
+    protected UI declareUI() {
+        return new UI() {
             {
                 hbox(() -> {
                     $(chart);

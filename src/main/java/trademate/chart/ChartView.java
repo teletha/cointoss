@@ -14,8 +14,8 @@ import cointoss.ticker.TickSpan;
 import cointoss.ticker.Ticker;
 import kiss.Variable;
 import stylist.StyleDSL;
-import viewtify.dsl.Style;
-import viewtify.dsl.UIDefinition;
+import viewtify.Style;
+import viewtify.UI;
 import viewtify.ui.UIComboBox;
 import viewtify.ui.UILabel;
 import viewtify.ui.View;
@@ -59,8 +59,8 @@ public class ChartView extends View {
      * {@inheritDoc}
      */
     @Override
-    protected UIDefinition declareUI() {
-        return new UIDefinition() {
+    protected UI declareUI() {
+        return new UI() {
             {
                 vbox(() -> {
                     hbox(() -> {
