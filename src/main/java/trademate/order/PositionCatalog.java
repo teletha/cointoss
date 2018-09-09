@@ -20,41 +20,63 @@ import cointoss.Side;
 import cointoss.order.Order;
 import cointoss.order.OrderBook;
 import cointoss.util.Num;
+import kiss.Extensible;
+import stylist.StyleDSL;
 import trademate.TradingView;
-import viewtify.UI;
+import trademate.order.PositionCatalog.Lang;
 import viewtify.View;
 import viewtify.Viewtify;
+import viewtify.dsl.Style;
+import viewtify.dsl.UIDefinition;
 import viewtify.ui.UITableColumn;
 import viewtify.ui.UITableView;
 
 /**
  * @version 2018/09/08 18:33:32
  */
-public class PositionCatalog extends View {
+public class PositionCatalog extends View<Lang> {
 
     /** The date formatter. */
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd HH:mm:ss");
 
     /** UI */
-    private @UI UITableView<Position> positions;
+    private UITableView<Position> table;
 
     /** UI */
-    private @UI UITableColumn<Position, ZonedDateTime> openPositionDate;
+    private UITableColumn<Position, ZonedDateTime> date;
 
     /** UI */
-    private @UI UITableColumn<Position, Side> openPositionSide;
+    private UITableColumn<Position, Side> side;
 
     /** UI */
-    private @UI UITableColumn<Position, Num> openPositionAmount;
+    private UITableColumn<Position, Num> amount;
 
     /** UI */
-    private @UI UITableColumn<Position, Num> openPositionPrice;
+    private UITableColumn<Position, Num> price;
 
     /** UI */
-    private @UI UITableColumn<Position, Num> openPositionProfitAndLoss;
+    private UITableColumn<Position, Num> profit;
 
     /** Parent View */
-    private @UI TradingView view;
+    private TradingView view;
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected UIDefinition declareUI() {
+        return new UIDefinition() {
+            {
+                $(table, S.Root, () -> {
+                    $(date, S.Wide);
+                    $(side, S.Narrow);
+                    $(price, S.Wide);
+                    $(amount, S.Normal);
+                    $(profit, S.Normal);
+                });
+            }
+        };
+    }
 
     /**
      * {@inheritDoc}
@@ -63,15 +85,15 @@ public class PositionCatalog extends View {
     protected void initialize() {
         PositionManager manager = view.market().positions;
 
-        openPositionDate.model(o -> o.date).render((ui, item) -> ui.text(formatter.format(item)));
-        openPositionSide.model(o -> o.side).render((ui, side) -> ui.text(side).styleOnly(Side.of(side)));
-        openPositionAmount.modelByVar(o -> o.size).header("数量 ", manager.size);
-        openPositionPrice.model(o -> o.price).header("価格 ", manager.price);
-        openPositionProfitAndLoss.modelByVar(o -> o.profit).header("損益 ", manager.profit);
+        date.header($.date()).model(o -> o.date).render((ui, item) -> ui.text(formatter.format(item)));
+        side.header($.side()).model(o -> o.side).render((ui, side) -> ui.text(side).styleOnly(Side.of(side)));
+        price.model(o -> o.price).header($.price(), manager.price);
+        amount.modelByVar(o -> o.size).header($.amount(), manager.size);
+        profit.modelByVar(o -> o.profit).header($.profit(), manager.profit);
 
-        positions.ui.setItems(Viewtify.observe(manager.items, manager.added, manager.removed));
-        positions.selectMultipleRows().context($ -> {
-            $.menu("撤退").whenUserClick(() -> positions.selection().forEach(this::retreat));
+        table.ui.setItems(Viewtify.observe(manager.items, manager.added, manager.removed));
+        table.selectMultipleRows().context($ -> {
+            $.menu("撤退").whenUserClick(() -> table.selection().forEach(this::retreat));
         });
     }
 
@@ -85,5 +107,100 @@ public class PositionCatalog extends View {
         Num price = book.computeBestPrice(Num.ZERO, Num.TWO);
 
         view.order(Order.limit(position.inverse(), position.size.v, price));
+    }
+
+    /**
+     * @version 2018/09/07 14:14:11
+     */
+    private interface S extends StyleDSL {
+
+        Style Root = () -> {
+            display.width(525, px);
+            text.unselectable();
+        };
+
+        Style Wide = () -> {
+            display.width(120, px);
+        };
+
+        Style Normal = () -> {
+            display.width(100, px);
+        };
+
+        Style Narrow = () -> {
+            display.width(70, px);
+        };
+    }
+
+    /**
+     * @version 2018/09/07 10:29:37
+     */
+    static class Lang implements Extensible {
+
+        String date() {
+            return "Date";
+        }
+
+        String side() {
+            return "Side";
+        }
+
+        String amount() {
+            return "Amount";
+        }
+
+        String price() {
+            return "Price";
+        }
+
+        String profit() {
+            return "Profit";
+        }
+
+        /**
+         * @version 2018/09/07 10:44:14
+         */
+        private static class Lang_ja extends Lang {
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            String date() {
+                return "日付";
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            String side() {
+                return "売買";
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            String amount() {
+                return "数量";
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            String price() {
+                return "値段";
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            String profit() {
+                return "損益";
+            }
+        }
     }
 }
