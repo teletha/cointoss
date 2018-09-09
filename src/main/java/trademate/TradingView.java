@@ -21,10 +21,9 @@ import trademate.order.OrderCatalog;
 import trademate.order.OrderSet;
 import trademate.order.PositionCatalog;
 import trademate.setting.Notificator;
-import viewtify.View;
 import viewtify.Viewtify;
 import viewtify.dsl.UIDefinition;
-import viewtify.ui.UITab;
+import viewtify.ui.View;
 
 /**
  * @version 2018/09/09 12:53:14
@@ -32,8 +31,6 @@ import viewtify.ui.UITab;
 public class TradingView extends View {
 
     public final MarketService service;
-
-    private final UITab tab;
 
     private final Notificator notificator = I.make(Notificator.class);
 
@@ -55,13 +52,10 @@ public class TradingView extends View {
     private Market market;
 
     /**
-     * @param tab
+     * @param service
      */
-    public TradingView(MarketService service, UITab tab) {
+    public TradingView(MarketService service) {
         this.service = service;
-        this.tab = tab;
-
-        initializeLazy(null);
     }
 
     /**

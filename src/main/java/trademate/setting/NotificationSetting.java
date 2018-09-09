@@ -21,13 +21,13 @@ import kiss.Singleton;
 import trademate.setting.NotificationSetting.Lang;
 import trademate.setting.Notificator.DesktopPosition;
 import trademate.setting.Notificator.Notify;
-import viewtify.View;
 import viewtify.dsl.UIDefinition;
 import viewtify.ui.UIButton;
 import viewtify.ui.UICheckBox;
 import viewtify.ui.UIComboBox;
 import viewtify.ui.UIPassword;
 import viewtify.ui.UISpinner;
+import viewtify.ui.View;
 import viewtify.ui.helper.User;
 import viewtify.util.Icon;
 

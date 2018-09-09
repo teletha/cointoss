@@ -20,11 +20,11 @@ import org.apache.logging.log4j.Logger;
 import stylist.StyleDSL;
 import trademate.TradingView;
 import trademate.setting.SettingView;
-import viewtify.View;
 import viewtify.Viewtify;
 import viewtify.dsl.Style;
 import viewtify.dsl.UIDefinition;
 import viewtify.ui.UIListView;
+import viewtify.ui.View;
 
 /**
  * @version 2017/11/19 6:48:15

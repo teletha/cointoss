@@ -20,13 +20,13 @@ import cointoss.order.OrderUnit;
 import cointoss.util.Num;
 import stylist.StyleDSL;
 import trademate.TradingView;
-import viewtify.View;
 import viewtify.Viewtify;
 import viewtify.dsl.Style;
 import viewtify.dsl.UIDefinition;
 import viewtify.ui.UILabel;
 import viewtify.ui.UIListView;
 import viewtify.ui.UISpinner;
+import viewtify.ui.View;
 
 /**
  * @version 2018/09/07 12:39:29

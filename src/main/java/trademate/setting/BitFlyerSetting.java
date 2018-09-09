@@ -17,11 +17,11 @@ import kiss.I;
 import kiss.Manageable;
 import kiss.Singleton;
 import trademate.setting.BitFlyerSetting.Lang;
-import viewtify.View;
 import viewtify.dsl.UIDefinition;
 import viewtify.ui.UICheckBox;
 import viewtify.ui.UIPassword;
 import viewtify.ui.UIText;
+import viewtify.ui.View;
 
 /**
  * @version 2018/09/06 23:46:18

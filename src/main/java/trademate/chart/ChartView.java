@@ -14,11 +14,11 @@ import cointoss.ticker.TickSpan;
 import cointoss.ticker.Ticker;
 import kiss.Variable;
 import stylist.StyleDSL;
-import viewtify.View;
 import viewtify.dsl.Style;
 import viewtify.dsl.UIDefinition;
 import viewtify.ui.UIComboBox;
 import viewtify.ui.UILabel;
+import viewtify.ui.View;
 
 /**
  * @version 2018/08/30 9:37:10

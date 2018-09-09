@@ -24,12 +24,12 @@ import kiss.Extensible;
 import stylist.StyleDSL;
 import trademate.TradingView;
 import trademate.order.PositionCatalog.Lang;
-import viewtify.View;
 import viewtify.Viewtify;
 import viewtify.dsl.Style;
 import viewtify.dsl.UIDefinition;
 import viewtify.ui.UITableColumn;
 import viewtify.ui.UITableView;
+import viewtify.ui.View;
 
 /**
  * @version 2018/09/08 18:33:32

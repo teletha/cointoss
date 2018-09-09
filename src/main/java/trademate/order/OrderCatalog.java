@@ -28,7 +28,6 @@ import stylist.StyleDSL;
 import stylist.ValueStyle;
 import trademate.TradingView;
 import trademate.order.OrderCatalog.Lang;
-import viewtify.View;
 import viewtify.Viewtify;
 import viewtify.bind.Calculation;
 import viewtify.dsl.Style;
@@ -37,6 +36,7 @@ import viewtify.ui.UITreeItem;
 import viewtify.ui.UITreeTableColumn;
 import viewtify.ui.UITreeTableView;
 import viewtify.ui.UserInterface;
+import viewtify.ui.View;
 
 /**
  * @version 2018/08/30 16:54:37

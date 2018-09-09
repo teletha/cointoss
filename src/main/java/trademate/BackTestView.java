@@ -26,12 +26,12 @@ import kiss.Manageable;
 import kiss.Singleton;
 import trademate.BackTestView.Message;
 import trademate.chart.ChartView;
-import viewtify.View;
 import viewtify.Viewtify;
 import viewtify.dsl.UIDefinition;
 import viewtify.ui.UIButton;
 import viewtify.ui.UIComboBox;
 import viewtify.ui.UIDatePicker;
+import viewtify.ui.View;
 import viewtify.ui.helper.User;
 
 /**

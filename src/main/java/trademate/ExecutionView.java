@@ -19,13 +19,13 @@ import cointoss.Execution;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
 import stylist.StyleDSL;
-import viewtify.View;
 import viewtify.Viewtify;
 import viewtify.dsl.Style;
 import viewtify.dsl.UIDefinition;
 import viewtify.ui.UIListView;
 import viewtify.ui.UISpinner;
 import viewtify.ui.UserInterface;
+import viewtify.ui.View;
 
 /**
  * @version 2018/08/30 12:53:20

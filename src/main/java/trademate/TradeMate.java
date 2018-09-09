@@ -13,10 +13,10 @@ import cointoss.market.bitflyer.BitFlyer;
 import kiss.I;
 import trademate.setting.SettingView;
 import viewtify.ActivationPolicy;
-import viewtify.View;
 import viewtify.Viewtify;
 import viewtify.dsl.UIDefinition;
 import viewtify.ui.UITabPane;
+import viewtify.ui.View;
 
 /**
  * @version 2018/09/06 23:45:59
@@ -48,8 +48,8 @@ public class TradeMate extends View {
     protected void initialize() {
         main.load("Setting", SettingView.class)
                 .load("Back Test", BackTestView.class)
-                .load("BitFlyer FX", tab -> new TradingView(BitFlyer.FX_BTC_JPY, tab))
-                .load("BitFlyer BTC", tab -> new TradingView(BitFlyer.BTC_JPY, tab))
+                .load("BitFlyer FX", tab -> new TradingView(BitFlyer.FX_BTC_JPY))
+                .load("BitFlyer BTC", tab -> new TradingView(BitFlyer.BTC_JPY))
                 .initial(0);
     }
 

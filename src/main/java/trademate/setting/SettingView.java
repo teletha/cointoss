@@ -14,10 +14,10 @@ import static trademate.setting.SettingStyles.*;
 import kiss.Extensible;
 import kiss.Manageable;
 import kiss.Singleton;
-import viewtify.View;
 import viewtify.dsl.UIDefinition;
 import viewtify.ui.UILabel;
 import viewtify.ui.UIPane;
+import viewtify.ui.View;
 import viewtify.ui.helper.User;
 
 /**

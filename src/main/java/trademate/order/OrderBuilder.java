@@ -31,13 +31,13 @@ import trademate.TradeMateStyle;
 import trademate.TradingView;
 import trademate.order.OrderBuilder.Lang;
 import trademate.setting.Notificator;
-import viewtify.View;
 import viewtify.dsl.Style;
 import viewtify.dsl.UIDefinition;
 import viewtify.ui.UIButton;
 import viewtify.ui.UIComboBox;
 import viewtify.ui.UISpinner;
 import viewtify.ui.UIText;
+import viewtify.ui.View;
 import viewtify.ui.helper.User;
 
 /**
