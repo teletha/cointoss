@@ -2,13 +2,7 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.Cursor?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.CheckBox?>
-<?import javafx.scene.control.ComboBox?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.Spinner?>
 <?import javafx.scene.control.SplitPane?>
-<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
@@ -29,131 +23,7 @@
    <right>
       <SplitPane id="TradingSplitPane" dividerPositions="0.5, 0.5" focusTraversable="false" prefHeight="-1.0" prefWidth="-1.0">
          <items>
-            <VBox maxWidth="-Infinity" minWidth="-Infinity" prefWidth="280.0" SplitPane.resizableWithParent="false">
-               <children>
-                  <HBox alignment="CENTER_LEFT" VBox.vgrow="NEVER">
-                     <children>
-                        <Label alignment="CENTER" prefHeight="27.0" prefWidth="60.0" style="&#10;" text="数量" textAlignment="CENTER" wrapText="false" />
-                        <TextField id="orderSize" maxWidth="100.0">
-                           <HBox.margin>
-                              <Insets right="20.0" />
-                           </HBox.margin>
-                        </TextField>
-                        <Spinner id="orderSizeAmount" focusTraversable="false" maxWidth="70.0" />
-                     </children>
-                     <VBox.margin>
-                        <Insets top="5.0" />
-                     </VBox.margin>
-                  </HBox>
-                  <HBox alignment="CENTER_LEFT">
-                     <children>
-                        <Label alignment="CENTER" prefHeight="27.0" prefWidth="60.0" style="&#10;" text="価格" textAlignment="CENTER" wrapText="false" />
-                        <TextField id="orderPrice" maxWidth="100.0">
-                           <HBox.margin>
-                              <Insets right="20.0" />
-                           </HBox.margin>
-                        </TextField>
-                        <Spinner id="orderPriceAmount" focusTraversable="false" maxWidth="70.0" />
-                     </children>
-                     <VBox.margin>
-                        <Insets top="5.0" />
-                     </VBox.margin>
-                  </HBox>
-                  <HBox alignment="CENTER_LEFT">
-                     <children>
-                        <Label alignment="CENTER" prefHeight="27.0" prefWidth="60.0" style="&#10;" text="分散数" textAlignment="CENTER" wrapText="false" />
-                        <Spinner id="orderDivideSize" maxWidth="100.0">
-                           <HBox.margin>
-                              <Insets right="20.0" />
-                           </HBox.margin>
-                        </Spinner>
-                        <Spinner id="orderDivideIntervalAmount" focusTraversable="false" maxWidth="70.0" />
-                     </children>
-                     <VBox.margin>
-                        <Insets top="5.0" />
-                     </VBox.margin>
-                  </HBox>
-                  <HBox alignment="CENTER_LEFT">
-                     <children>
-                        <Label alignment="CENTER" prefHeight="27.0" prefWidth="60.0" style="&#10;" text="価格間隔" textAlignment="CENTER" wrapText="false" />
-                        <TextField id="orderPriceInterval" maxWidth="100.0">
-                           <HBox.margin>
-                              <Insets right="20.0" />
-                           </HBox.margin>
-                        </TextField>
-                        <Spinner id="orderPriceIntervalAmount" focusTraversable="false" maxWidth="70.0" />
-                     </children>
-                     <VBox.margin>
-                        <Insets top="5.0" />
-                     </VBox.margin>
-                  </HBox>
-                  <HBox alignment="CENTER_LEFT">
-                     <children>
-                        <Label alignment="CENTER" prefHeight="27.0" prefWidth="60.0" style="&#10;" text="閾枚数" textAlignment="CENTER" wrapText="false" />
-                        <Spinner id="optimizeThreshold" focusTraversable="false" maxWidth="100.0">
-                           <HBox.margin>
-                              <Insets right="20.0" />
-                           </HBox.margin>
-                        </Spinner>
-                     </children>
-                     <VBox.margin>
-                        <Insets top="5.0" />
-                     </VBox.margin>
-                  </HBox>
-                  <HBox alignment="CENTER_LEFT">
-                     <children>
-                        <Label alignment="CENTER" prefHeight="40.0" prefWidth="60.0" style="&#10;" text="指値" textAlignment="CENTER" wrapText="false" />
-                        <HBox alignment="CENTER_LEFT" prefWidth="120.0">
-                           <children>
-                              <Button id="orderLimitShort" mnemonicParsing="false" prefHeight="30.0" prefWidth="51.0" styleClass="SELL" text="売り" textAlignment="CENTER" textFill="#9f9f9f">
-                                 <HBox.margin>
-                                    <Insets />
-                                 </HBox.margin>
-                              </Button>
-                              <Button id="orderLimitLong" alignment="CENTER" mnemonicParsing="false" prefHeight="30.0" prefWidth="51.0" styleClass="BUY" text="買い" textAlignment="CENTER" textFill="#9f9f9f">
-                                 <HBox.margin>
-                                    <Insets />
-                                 </HBox.margin>
-                              </Button>
-                           </children>
-                        </HBox>
-                        <ComboBox id="orderQuantity" maxWidth="70.0" minWidth="70.0" prefWidth="70.0" />
-                     </children>
-                  </HBox>
-                  <HBox alignment="CENTER_LEFT">
-                     <children>
-                        <Label alignment="CENTER" prefHeight="40.0" prefWidth="60.0" style="&#10;" text="決済" textAlignment="CENTER" wrapText="false" />
-                        <HBox alignment="CENTER_LEFT" prefWidth="120.0">
-                           <children>
-                              <Button id="orderStop" mnemonicParsing="false" prefHeight="30.0" prefWidth="51.0" text="撤退" textAlignment="CENTER" textFill="#9f9f9f">
-                                 <HBox.margin>
-                                    <Insets />
-                                 </HBox.margin>
-                              </Button>
-                              <Button id="orderReverse" alignment="CENTER" mnemonicParsing="false" prefHeight="30.0" prefWidth="51.0" text="ドテン" textAlignment="CENTER" textFill="#9f9f9f">
-                                 <HBox.margin>
-                                    <Insets />
-                                 </HBox.margin>
-                              </Button>
-                           </children>
-                        </HBox>
-                     </children>
-                  </HBox>
-                  <VBox>
-                     <children>
-                        <CheckBox id="bot" mnemonicParsing="false" text="Bot" />
-                        <HBox>
-                           <children>
-                              <Label alignment="CENTER" prefHeight="27.0" prefWidth="60.0" style="&#10;" text="数量" textAlignment="CENTER" wrapText="false" />
-                              <TextField id="orderSize" maxWidth="100.0" />
-                           </children>
-                        </HBox>
-                     </children>
-                     <VBox.margin>
-                        <Insets left="10.0" top="50.0" />
-                     </VBox.margin>
-                  </VBox>
-               </children>
+            <VBox id="builder" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="280.0" SplitPane.resizableWithParent="false">
                <padding>
                   <Insets left="10.0" right="10.0" />
                </padding>

@@ -23,14 +23,18 @@ import cointoss.order.Order;
 import cointoss.order.OrderState;
 import cointoss.order.QuantityCondition;
 import cointoss.util.Num;
+import kiss.Extensible;
 import kiss.I;
 import kiss.WiseBiConsumer;
+import stylist.StyleDSL;
+import trademate.TradeMateStyle;
 import trademate.TradingView;
+import trademate.order.OrderBuilder.Lang;
 import trademate.setting.Notificator;
-import viewtify.UI;
 import viewtify.View;
+import viewtify.dsl.Style;
+import viewtify.dsl.UIDefinition;
 import viewtify.ui.UIButton;
-import viewtify.ui.UICheckBox;
 import viewtify.ui.UIComboBox;
 import viewtify.ui.UISpinner;
 import viewtify.ui.UIText;
@@ -39,12 +43,14 @@ import viewtify.ui.helper.User;
 /**
  * @version 2018/02/07 17:11:55
  */
-public class OrderBuilder extends View {
+public class OrderBuilder extends View<Lang> {
 
     private Predicate<UIText> positiveNumber = ui -> {
         try {
             return Num.of(ui.value()).isPositive();
-        } catch (NumberFormatException e) {
+        } catch (
+
+        NumberFormatException e) {
             return false;
         }
     };
@@ -52,61 +58,108 @@ public class OrderBuilder extends View {
     private Predicate<UIText> negativeNumber = ui -> {
         try {
             return Num.of(ui.value()).isNegative();
-        } catch (NumberFormatException e) {
+        } catch (
+
+        NumberFormatException e) {
             return false;
         }
     };
 
     /** UI */
-    private @UI UIText orderSize;
+    private UIText orderSize;
 
     /** UI */
-    private @UI UISpinner<Num> orderSizeAmount;
+    private UISpinner<Num> orderSizeAmount;
 
     /** UI */
-    @UI
+
     UIText orderPrice;
 
     /** UI */
-    private @UI UISpinner<Num> orderPriceAmount;
+    private UISpinner<Num> orderPriceAmount;
 
     /** UI */
-    private @UI UISpinner<Integer> orderDivideSize;
+    private UISpinner<Integer> orderDivideSize;
 
     /** UI */
-    private @UI UISpinner<Integer> orderDivideIntervalAmount;
+    private UISpinner<Integer> orderDivideIntervalAmount;
 
     /** UI */
-    private @UI UISpinner<Num> optimizeThreshold;
+    private UISpinner<Num> optimizeThreshold;
 
     /** UI */
-    private @UI UIText orderPriceInterval;
+    private UIText orderPriceInterval;
 
     /** UI */
-    private @UI UISpinner<Num> orderPriceIntervalAmount;
+    private UISpinner<Num> orderPriceIntervalAmount;
 
     /** UI */
-    private @UI UIButton orderLimitLong;
+    private UIButton orderLimitLong;
 
     /** UI */
-    private @UI UIButton orderLimitShort;
+    private UIButton orderLimitShort;
 
     /** UI */
-    private @UI UIButton orderStop;
+    private UIButton orderStop;
 
     /** UI */
-    private @UI UIButton orderReverse;
+    private UIButton orderReverse;
 
     /** UI */
-    private @UI UIComboBox<QuantityCondition> orderQuantity;
+    private UIComboBox<QuantityCondition> orderQuantity;
 
     /** UI */
-    private @UI TradingView view;
-
-    /** UI */
-    private @UI UICheckBox bot;
+    private TradingView view;
 
     private Notificator notificator = I.make(Notificator.class);
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected UIDefinition declareUI() {
+        return new UIDefinition() {
+            {
+                vbox(S.Root, () -> {
+                    hbox(S.Row, () -> {
+                        label("数量", S.Label);
+                        $(orderSize, S.Form);
+                        $(orderSizeAmount, S.FormMin);
+                    });
+                    hbox(S.Row, () -> {
+                        label("価格", S.Label);
+                        $(orderPrice, S.Form);
+                        $(orderPriceAmount, S.FormMin);
+                    });
+                    hbox(S.Row, () -> {
+                        label("分散数", S.Label);
+                        $(orderDivideSize, S.Form);
+                        $(orderDivideIntervalAmount, S.FormMin);
+                    });
+                    hbox(S.Row, () -> {
+                        label("価格間隔", S.Label);
+                        $(orderPriceInterval, S.Form);
+                        $(orderPriceIntervalAmount, S.FormMin);
+                    });
+                    hbox(S.Row, () -> {
+                        label("閾枚数", S.Label);
+                        $(optimizeThreshold, S.Form);
+                    });
+                    hbox(S.Row, () -> {
+                        label("指値", S.Label);
+                        $(orderLimitShort, S.FormButton, TradeMateStyle.Short);
+                        $(orderLimitLong, S.FormButton, TradeMateStyle.Long);
+                        $(orderQuantity, S.FormMin);
+                    });
+                    hbox(S.Row, () -> {
+                        label("決済", S.Label);
+                        $(orderStop, S.FormButton);
+                        $(orderReverse, S.FormButton);
+                    });
+                });
+            }
+        };
+    }
 
     /**
      * {@inheritDoc}
@@ -134,12 +187,12 @@ public class OrderBuilder extends View {
         // validate order condition
         orderLimitLong.parent().disableWhen(orderSize.isInvalid().or(orderPrice.isInvalid()));
 
-        orderLimitLong.when(User.MouseClick).throttle(1000, MILLISECONDS).mapTo(Side.BUY).to(this::requestOrder);
-        orderLimitShort.when(User.MouseClick).throttle(1000, MILLISECONDS).mapTo(Side.SELL).to(this::requestOrder);
+        orderLimitLong.text($.buy()).when(User.MouseClick).throttle(1000, MILLISECONDS).mapTo(Side.BUY).to(this::requestOrder);
+        orderLimitShort.text($.sell()).when(User.MouseClick).throttle(1000, MILLISECONDS).mapTo(Side.SELL).to(this::requestOrder);
         orderQuantity.values(QuantityCondition.values()).initial(QuantityCondition.GoodTillCanceled);
 
-        orderStop.when(User.MouseClick).to(this::stop);
-        orderReverse.when(User.MouseClick).to(this::reverse);
+        orderStop.text($.stop()).when(User.MouseClick).to(this::stop);
+        orderReverse.text($.reverse()).when(User.MouseClick).to(this::reverse);
     }
 
     /**
@@ -216,5 +269,158 @@ public class OrderBuilder extends View {
 
         Notificator notificator = I.make(Notificator.class);
         notificator.execution.notify("(*‘ω‘ *)");
+    }
+
+    /**
+     * @version 2018/09/09 9:14:18
+     */
+    private interface S extends StyleDSL {
+
+        Style Root = () -> {
+            padding.horizontal(10, px);
+            display.width(280, px);
+        };
+
+        Style Row = () -> {
+            padding.top(8, px);
+        };
+
+        Style Label = () -> {
+            display.width(60, px);
+            display.height(27, px);
+        };
+
+        Style Form = () -> {
+            // padding.right(20, px);
+            display.maxWidth(100, px).height(27, px);
+        };
+
+        Style FormMin = () -> {
+            display.maxWidth(70, px).height(27, px);
+        };
+
+        Style FormButton = () -> {
+            display.width(51, px).height(31, px);
+        };
+    }
+
+    /**
+     * @version 2018/09/07 10:29:37
+     */
+    static class Lang implements Extensible {
+
+        String date() {
+            return "Date";
+        }
+
+        String side() {
+            return "Side";
+        }
+
+        String amount() {
+            return "Amount";
+        }
+
+        String price() {
+            return "Price";
+        }
+
+        String profit() {
+            return "Profit";
+        }
+
+        String sell() {
+            return "Sell";
+        }
+
+        String buy() {
+            return "Buy";
+        }
+
+        String stop() {
+            return "Stop";
+        }
+
+        String reverse() {
+            return "Reverse";
+        }
+
+        /**
+         * @version 2018/09/07 10:44:14
+         */
+        private static class Lang_ja extends Lang {
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            String date() {
+                return "日付";
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            String side() {
+                return "売買";
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            String amount() {
+                return "数量";
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            String price() {
+                return "値段";
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            String profit() {
+                return "損益";
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            String sell() {
+                return "売り";
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            String buy() {
+                return "買い";
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            String stop() {
+                return "撤退";
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            String reverse() {
+                return "ドテン";
+            }
+        }
     }
 }
