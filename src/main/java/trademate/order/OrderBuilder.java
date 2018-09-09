@@ -283,6 +283,7 @@ public class OrderBuilder extends View<Lang> {
 
         Style Row = () -> {
             padding.top(8, px);
+            text.verticalAlign.middle();
         };
 
         Style Label = () -> {
@@ -291,12 +292,12 @@ public class OrderBuilder extends View<Lang> {
         };
 
         Style Form = () -> {
-            margin.right(20, px);
             display.maxWidth(100, px).height(27, px);
         };
 
         Style FormMin = () -> {
             display.maxWidth(70, px).height(27, px);
+            margin.left(15, px);
         };
 
         Style FormButton = () -> {
