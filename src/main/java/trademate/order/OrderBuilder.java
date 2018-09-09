@@ -291,7 +291,7 @@ public class OrderBuilder extends View<Lang> {
         };
 
         Style Form = () -> {
-            // padding.right(20, px);
+            margin.right(20, px);
             display.maxWidth(100, px).height(27, px);
         };
 
