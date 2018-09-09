@@ -278,7 +278,7 @@ public class OrderBuilder extends View<Lang> {
 
         Style Root = () -> {
             padding.horizontal(10, px);
-            display.width(280, px);
+            display.minWidth(280, px);
         };
 
         Style Row = () -> {

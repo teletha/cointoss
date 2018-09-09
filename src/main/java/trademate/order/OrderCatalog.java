@@ -193,7 +193,7 @@ public class OrderCatalog extends View<Lang> {
     private interface S extends StyleDSL {
 
         Style Root = () -> {
-            display.width(400, px);
+            display.width(400, px).minHeight(300, px);
             text.unselectable();
         };
 

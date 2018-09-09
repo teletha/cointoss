@@ -165,7 +165,7 @@ public class OrderBookView extends View {
     private interface S extends StyleDSL {
 
         Style Root = () -> {
-            display.width(220, px);
+            display.minWidth(220, px);
         };
 
         Style Book = () -> {

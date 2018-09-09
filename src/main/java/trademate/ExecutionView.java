@@ -139,7 +139,7 @@ public class ExecutionView extends View {
     private interface S extends StyleDSL {
 
         Style Root = () -> {
-            display.width(210, px);
+            display.minWidth(210, px);
 
             $.descendant(() -> {
                 text.unselectable();

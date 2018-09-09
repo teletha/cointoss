@@ -21,13 +21,13 @@ import trademate.order.OrderCatalog;
 import trademate.order.OrderSet;
 import trademate.order.PositionCatalog;
 import trademate.setting.Notificator;
-import viewtify.UI;
 import viewtify.View;
 import viewtify.Viewtify;
+import viewtify.dsl.UIDefinition;
 import viewtify.ui.UITab;
 
 /**
- * @version 2018/02/07 17:12:03
+ * @version 2018/09/09 12:53:14
  */
 public class TradingView extends View {
 
@@ -37,19 +37,19 @@ public class TradingView extends View {
 
     private final Notificator notificator = I.make(Notificator.class);
 
-    public @UI ExecutionView executionView;
+    public ExecutionView executionView;
 
-    public @UI Console console;
+    public Console console;
 
-    public @UI OrderBookView books;
+    public OrderBookView books;
 
-    public @UI OrderBuilder builder;
+    public OrderBuilder builder;
 
-    public @UI OrderCatalog orders;
+    public OrderCatalog orders;
 
-    public @UI PositionCatalog positions;
+    public PositionCatalog positions;
 
-    public @UI ChartView chart;
+    public ChartView chart;
 
     /** Market cache. */
     private Market market;
@@ -60,6 +60,32 @@ public class TradingView extends View {
     public TradingView(MarketService service, UITab tab) {
         this.service = service;
         this.tab = tab;
+
+        initializeLazy(null);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected UIDefinition declareUI() {
+        return new UIDefinition() {
+            {
+                vbox(() -> {
+                    hbox(() -> {
+                        $(chart);
+                        $(builder);
+                        $(books);
+                        $(executionView);
+                    });
+                    hbox(() -> {
+                        $(orders);
+                        $(positions);
+                        $(console);
+                    });
+                });
+            }
+        };
     }
 
     /**
