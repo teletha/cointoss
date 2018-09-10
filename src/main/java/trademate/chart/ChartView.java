@@ -62,8 +62,8 @@ public class ChartView extends View {
     protected UI declareUI() {
         return new UI() {
             {
-                vbox(() -> {
-                    hbox(() -> {
+                $(vbox, () -> {
+                    $(hbox, () -> {
                         $(span);
                         $(selectDate, S.Data);
                         $(selectHigh, S.Data);

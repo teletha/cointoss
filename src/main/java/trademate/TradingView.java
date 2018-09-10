@@ -65,14 +65,14 @@ public class TradingView extends View {
     protected UI declareUI() {
         return new UI() {
             {
-                vbox(() -> {
-                    hbox(() -> {
+                $(vbox, () -> {
+                    $(hbox, () -> {
                         $(chart);
                         $(builder);
                         $(books);
                         $(executionView);
                     });
-                    hbox(() -> {
+                    $(hbox, () -> {
                         $(orders);
                         $(positions);
                         $(console);

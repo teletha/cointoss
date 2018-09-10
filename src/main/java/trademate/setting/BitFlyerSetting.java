@@ -51,15 +51,15 @@ public class BitFlyerSetting extends View<Lang> {
     protected UI declareUI() {
         return new UI() {
             {
-                vbox(Root, () -> {
-                    vbox(Block, () -> {
+                $(vbox, Root, () -> {
+                    $(vbox, Block, () -> {
                         label("BitFlyer", Heading);
                         label($.publicAPIDescription(), Description);
-                        hbox(FormRow, () -> {
+                        $(hbox, FormRow, () -> {
                             label("API Key", FormLabel);
                             $(apiKey, FormInput);
                         });
-                        hbox(FormRow, () -> {
+                        $(hbox, FormRow, () -> {
                             label("API Secret", FormLabel);
                             $(apiSecret, FormInput);
                         });
@@ -67,19 +67,19 @@ public class BitFlyerSetting extends View<Lang> {
                         label($.privateAPITitle(), Heading);
                         label($.privateAPIDescription(), Description);
                         label($.privateAPIWarning(), Description, Warning);
-                        hbox(FormRow, () -> {
+                        $(hbox, FormRow, () -> {
                             label("Login ID", FormLabel);
                             $(loginId, FormInput);
                         });
-                        hbox(FormRow, () -> {
+                        $(hbox, FormRow, () -> {
                             label("Password", FormLabel);
                             $(loginPassword, FormInput);
                         });
-                        hbox(FormRow, () -> {
+                        $(hbox, FormRow, () -> {
                             label("Account ID", FormLabel);
                             $(accountId, FormInput);
                         });
-                        hbox(FormRow, () -> {
+                        $(hbox, FormRow, () -> {
                             label($.loginExplicitly(), FormLabel);
                             $(loginBackground, FormInput);
                         });

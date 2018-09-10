@@ -120,38 +120,38 @@ public class OrderBuilder extends View<Lang> {
     protected UI declareUI() {
         return new UI() {
             {
-                vbox(S.Root, () -> {
-                    hbox(S.Row, () -> {
+                $(vbox, S.Root, () -> {
+                    $(hbox, S.Row, () -> {
                         label("数量", S.Label);
                         $(orderSize, S.Form);
                         $(orderSizeAmount, S.FormMin);
                     });
-                    hbox(S.Row, () -> {
+                    $(hbox, S.Row, () -> {
                         label("価格", S.Label);
                         $(orderPrice, S.Form);
                         $(orderPriceAmount, S.FormMin);
                     });
-                    hbox(S.Row, () -> {
+                    $(hbox, S.Row, () -> {
                         label("分散数", S.Label);
                         $(orderDivideSize, S.Form);
                         $(orderDivideIntervalAmount, S.FormMin);
                     });
-                    hbox(S.Row, () -> {
+                    $(hbox, S.Row, () -> {
                         label("価格間隔", S.Label);
                         $(orderPriceInterval, S.Form);
                         $(orderPriceIntervalAmount, S.FormMin);
                     });
-                    hbox(S.Row, () -> {
+                    $(hbox, S.Row, () -> {
                         label("閾枚数", S.Label);
                         $(optimizeThreshold, S.Form);
                     });
-                    hbox(S.Row, () -> {
+                    $(hbox, S.Row, () -> {
                         label("指値", S.Label);
                         $(orderLimitShort, S.FormButton, TradeMateStyle.Short);
                         $(orderLimitLong, S.FormButton, TradeMateStyle.Long);
                         $(orderQuantity, S.FormMin);
                     });
-                    hbox(S.Row, () -> {
+                    $(hbox, S.Row, () -> {
                         label("決済", S.Label);
                         $(orderStop, S.FormButton);
                         $(orderReverse, S.FormButton);

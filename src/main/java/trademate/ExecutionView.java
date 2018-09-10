@@ -51,9 +51,9 @@ public class ExecutionView extends View {
     protected UI declareUI() {
         return new UI() {
             {
-                vbox(S.Root, () -> {
+                $(vbox, S.Root, () -> {
                     $(executionList);
-                    hbox(() -> {
+                    $(hbox, () -> {
                         $(takerSize, S.TakerSize);
                     });
                     $(executionCumulativeList);

@@ -41,8 +41,8 @@ public class SettingView extends View<SettingView.Lang> {
     protected UI declareUI() {
         return new UI() {
             {
-                hbox(() -> {
-                    vbox(S.CategoryPane, () -> {
+                $(hbox, () -> {
+                    $(vbox, S.CategoryPane, () -> {
                         $(notification, S.CategoryLabel);
                         $(bitflyer, S.CategoryLabel);
                     });

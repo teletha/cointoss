@@ -64,9 +64,9 @@ public class OrderBookView extends View {
     protected UI declareUI() {
         return new UI() {
             {
-                vbox(S.Root, () -> {
+                $(vbox, S.Root, () -> {
                     $(shortList, S.Book, Short);
-                    hbox(() -> {
+                    $(hbox, () -> {
                         $(priceRange, S.PriceRange);
                         $(priceLatest, S.PriceLatest);
                         $(priceSpread, S.PriceSpread);

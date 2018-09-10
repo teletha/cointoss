@@ -56,15 +56,15 @@ public class BackTestView extends View<Message> {
     protected UI declareUI() {
         return new UI() {
             {
-                hbox(() -> {
+                $(hbox, () -> {
                     $(chart);
-                    vbox(() -> {
+                    $(vbox, () -> {
                         $(market);
-                        hbox(FormRow, () -> {
+                        $(hbox, FormRow, () -> {
                             label($.startDateLabel(), FormLabel);
                             $(startDate, FormInput);
                         });
-                        hbox(FormRow, () -> {
+                        $(hbox, FormRow, () -> {
                             label($.endDateLabel(), FormLabel);
                             $(endDate, FormInput);
                         });

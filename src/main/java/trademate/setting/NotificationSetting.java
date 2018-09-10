@@ -67,15 +67,15 @@ public class NotificationSetting extends View<Lang> {
     protected UI declareUI() {
         return new UI() {
             {
-                vbox(Root, () -> {
+                $(vbox, Root, () -> {
                     // Notification Types
-                    vbox(Block, () -> {
+                    $(vbox, Block, () -> {
                         label($.notificationTitle(), Heading);
-                        hbox(FormRow, () -> {
+                        $(hbox, FormRow, () -> {
                             label("", FormLabel);
-                            hbox(FormCheck, label($.desktopColumn()));
-                            hbox(FormCheck, label($.lineColumn()));
-                            hbox(FormCheck2, label($.soundColumn()));
+                            label($.desktopColumn(), FormCheck);
+                            label($.lineColumn(), FormCheck);
+                            label($.soundColumn(), FormCheck2);
                         });
                         $(longTrend);
                         $(shortTrend);
@@ -85,23 +85,23 @@ public class NotificationSetting extends View<Lang> {
                     });
 
                     // Desktop
-                    vbox(Block, () -> {
+                    $(vbox, Block, () -> {
                         label($.desktopTitle(), Heading);
-                        hbox(FormRow, () -> {
+                        $(hbox, FormRow, () -> {
                             label($.desktopDurationLabel(), FormLabel);
                             $(desktopDuration, FormInput);
                         });
-                        hbox(FormRow, () -> {
+                        $(hbox, FormRow, () -> {
                             label($.desktopPositionLabel(), FormLabel);
                             $(desktopPosition, FormInput);
                         });
                     });
 
                     // LINE
-                    vbox(Block, () -> {
+                    $(vbox, Block, () -> {
                         label($.lineTitle(), Heading);
                         label($.lineDescription(), Description);
-                        hbox(FormRow, () -> {
+                        $(hbox, FormRow, () -> {
                             label($.lineAccessTokenLabel(), FormLabel);
                             $(lineAccessToken, FormInput);
                             $(lineTest, FormInput);
@@ -176,11 +176,17 @@ public class NotificationSetting extends View<Lang> {
         protected UI declareUI() {
             return new UI() {
                 {
-                    hbox(FormRow, () -> {
+                    $(hbox, FormRow, () -> {
                         label(notify, FormLabel);
-                        hbox(FormCheck, desktop);
-                        hbox(FormCheck, line);
-                        hbox(FormCheck2, sound);
+                        $(hbox, FormCheck, () -> {
+                            $(desktop);
+                        });
+                        $(hbox, FormCheck, () -> {
+                            $(line);
+                        });
+                        $(hbox, FormCheck2, () -> {
+                            $(sound);
+                        });
                     });
                 }
             };
