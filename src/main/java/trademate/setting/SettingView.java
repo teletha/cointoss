@@ -28,6 +28,10 @@ import viewtify.ui.helper.User;
 @Manageable(lifestyle = Singleton.class)
 public class SettingView extends View<SettingView.Lang> {
 
+    private UILabel general;
+
+    private UILabel appearance;
+
     private UILabel notification;
 
     private UILabel bitflyer;
@@ -43,6 +47,8 @@ public class SettingView extends View<SettingView.Lang> {
             {
                 $(hbox, () -> {
                     $(vbox, S.CategoryPane, () -> {
+                        $(general, S.CategoryLabel);
+                        $(appearance, S.CategoryLabel);
                         $(notification, S.CategoryLabel);
                         $(bitflyer, S.CategoryLabel);
                     });
@@ -59,12 +65,14 @@ public class SettingView extends View<SettingView.Lang> {
     protected void initialize() {
         select(notification, NotificationSetting.class);
 
+        general.when(User.MouseClick, () -> select(general, GeneralSetting.class));
+        appearance.when(User.MouseClick, () -> select(appearance, AppearanceSetting.class));
         notification.when(User.MouseClick, () -> select(notification, NotificationSetting.class));
         bitflyer.when(User.MouseClick, () -> select(bitflyer, BitFlyerSetting.class));
     }
 
     private void select(UILabel selected, Class<? extends View> view) {
-        for (UILabel label : List.of(notification, bitflyer)) {
+        for (UILabel label : List.of(general, appearance, notification, bitflyer)) {
             if (label == selected) {
                 label.style(S.Selected);
             } else {
@@ -101,11 +109,28 @@ public class SettingView extends View<SettingView.Lang> {
     }
 
     /**
-     * @version 2018/08/29 3:52:37
+     * @version 2018/09/10 20:14:06
      */
     @SuppressWarnings("unused")
     @Manageable(lifestyle = Singleton.class)
     static class Lang implements Extensible {
+        /**
+         * Category title.
+         * 
+         * @return
+         */
+        String general() {
+            return "General";
+        }
+
+        /**
+         * Category title.
+         * 
+         * @return
+         */
+        String appearance() {
+            return "Appearance";
+        }
 
         /**
          * Category title.
@@ -129,6 +154,22 @@ public class SettingView extends View<SettingView.Lang> {
          * @version 2018/08/29 3:53:49
          */
         private static class Lang_ja extends Lang {
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            String general() {
+                return "一般";
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            String appearance() {
+                return "外観";
+            }
 
             /**
              * {@inheritDoc}
