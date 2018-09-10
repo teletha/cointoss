@@ -42,6 +42,7 @@ import viewtify.ui.helper.LayoutAssistant;
 import viewtify.ui.helper.StyleHelper;
 import viewtify.ui.helper.User;
 import viewtify.ui.helper.UserActionHelper;
+import viewtify.util.FXUtils;
 
 /**
  * @version 2018/07/13 23:47:28
@@ -522,7 +523,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
              */
             private Line(ToDoubleFunction<Tick> converter, Style style) {
                 this.converter = converter;
-                this.color = style.stroke();
+                this.color = FXUtils.color(style, "stroke");
             }
 
             /**
