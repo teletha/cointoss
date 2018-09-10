@@ -61,21 +61,6 @@ public interface SettingStyles extends StyleDSL {
         display.minWidth(60, px);
     };
 
-    Style CategoryPane = () -> {
-        padding.top(40, px);
-    };
-
-    Style CategoryLabel = () -> {
-        display.width(200, px).height(20, px);
-        padding.vertical(10, px).left(40, px);
-        cursor.pointer();
-        font.size(16, px);
-
-        $.hover(() -> {
-            background.color("derive(-fx-base, 15%)");
-        });
-    };
-
     Style FormCheck = () -> {
         display.minWidth(60, px);
         text.align.center().verticalAlign.middle();

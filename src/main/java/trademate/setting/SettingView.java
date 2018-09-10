@@ -9,11 +9,13 @@
  */
 package trademate.setting;
 
-import static trademate.setting.SettingStyles.*;
+import java.util.List;
 
 import kiss.Extensible;
 import kiss.Manageable;
 import kiss.Singleton;
+import stylist.StyleDSL;
+import viewtify.Style;
 import viewtify.UI;
 import viewtify.ui.UILabel;
 import viewtify.ui.UIPane;
@@ -40,9 +42,9 @@ public class SettingView extends View<SettingView.Lang> {
         return new UI() {
             {
                 hbox(() -> {
-                    vbox(CategoryPane, () -> {
-                        $(notification, CategoryLabel);
-                        $(bitflyer, CategoryLabel);
+                    vbox(S.CategoryPane, () -> {
+                        $(notification, S.CategoryLabel);
+                        $(bitflyer, S.CategoryLabel);
                     });
                     $(setting);
                 });
@@ -55,10 +57,47 @@ public class SettingView extends View<SettingView.Lang> {
      */
     @Override
     protected void initialize() {
-        setting.set(NotificationSetting.class);
+        select(notification, NotificationSetting.class);
 
-        notification.when(User.MouseClick, () -> setting.set(NotificationSetting.class));
-        bitflyer.when(User.MouseClick, () -> setting.set(BitFlyerSetting.class));
+        notification.when(User.MouseClick, () -> select(notification, NotificationSetting.class));
+        bitflyer.when(User.MouseClick, () -> select(bitflyer, BitFlyerSetting.class));
+    }
+
+    private void select(UILabel selected, Class<? extends View> view) {
+        for (UILabel label : List.of(notification, bitflyer)) {
+            if (label == selected) {
+                label.style(S.Selected);
+            } else {
+                label.unstyle(S.Selected);
+            }
+        }
+        setting.set(view);
+    }
+
+    /**
+     * @version 2018/09/10 9:53:37
+     */
+    interface S extends StyleDSL {
+
+        Style CategoryPane = () -> {
+            padding.top(40, px);
+        };
+
+        Style CategoryLabel = () -> {
+            display.width(200, px).height(20, px);
+            padding.vertical(10, px).left(40, px);
+            cursor.pointer();
+            font.size(16, px);
+
+            $.hover(() -> {
+                background.color("derive(-fx-base, 15%)");
+            });
+        };
+
+        Style Selected = () -> {
+            background.color("derive(-fx-base, 6%)");
+        };
+
     }
 
     /**
