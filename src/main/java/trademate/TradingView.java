@@ -21,8 +21,8 @@ import trademate.order.OrderCatalog;
 import trademate.order.OrderSet;
 import trademate.order.PositionCatalog;
 import trademate.setting.Notificator;
-import viewtify.UI;
 import viewtify.Viewtify;
+import viewtify.ui.UI;
 import viewtify.ui.View;
 
 /**

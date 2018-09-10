@@ -21,7 +21,7 @@ import kiss.Singleton;
 import trademate.setting.NotificationSetting.Lang;
 import trademate.setting.Notificator.DesktopPosition;
 import trademate.setting.Notificator.Notify;
-import viewtify.UI;
+import viewtify.ui.UI;
 import viewtify.ui.UIButton;
 import viewtify.ui.UICheckBox;
 import viewtify.ui.UIComboBox;

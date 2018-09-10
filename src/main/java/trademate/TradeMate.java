@@ -13,8 +13,8 @@ import cointoss.market.bitflyer.BitFlyer;
 import kiss.I;
 import trademate.setting.SettingView;
 import viewtify.ActivationPolicy;
-import viewtify.UI;
 import viewtify.Viewtify;
+import viewtify.ui.UI;
 import viewtify.ui.UITabPane;
 import viewtify.ui.View;
 

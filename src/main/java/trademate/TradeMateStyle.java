@@ -10,10 +10,10 @@
 package trademate;
 
 import cointoss.Side;
+import stylist.Style;
 import stylist.StyleDSL;
 import stylist.ValueStyle;
 import stylist.value.Color;
-import viewtify.Style;
 
 /**
  * @version 2018/09/07 10:57:21

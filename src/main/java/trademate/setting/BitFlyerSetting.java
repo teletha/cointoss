@@ -17,7 +17,7 @@ import kiss.I;
 import kiss.Manageable;
 import kiss.Singleton;
 import trademate.setting.BitFlyerSetting.Lang;
-import viewtify.UI;
+import viewtify.ui.UI;
 import viewtify.ui.UICheckBox;
 import viewtify.ui.UIPassword;
 import viewtify.ui.UIText;
