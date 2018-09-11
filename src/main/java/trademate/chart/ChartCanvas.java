@@ -197,7 +197,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             mouseTrackHorizontal.layoutLine.requestLayout();
 
             // upper info
-            chart.ticker.v.findByEpochSecond((long) x).isPresent(tick -> {
+            chart.ticker.v.findByEpochSecond((long) x).to(tick -> {
                 chart.selectDate.text(Chrono.system(tick.start).format(Chrono.DateTime));
                 chart.selectHigh.text("H " + tick.highPrice().scale(0));
                 chart.selectLow.text("L " + tick.lowPrice().scale(0));
