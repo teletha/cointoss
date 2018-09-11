@@ -11,21 +11,15 @@ package trademate.setting;
 
 import static trademate.setting.SettingStyles.*;
 
-import javafx.scene.Node;
-
 import kiss.Extensible;
 import kiss.I;
 import kiss.Manageable;
 import kiss.Singleton;
-import stylist.value.Color;
 import trademate.Theme;
 import trademate.setting.AppearanceSetting.Lang;
-import viewtify.Viewtify;
 import viewtify.ui.UI;
 import viewtify.ui.UIColorPicker;
 import viewtify.ui.View;
-import viewtify.ui.helper.User;
-import viewtify.util.FXUtils;
 
 /**
  * @version 2018/09/10 20:28:10
@@ -68,12 +62,8 @@ public class AppearanceSetting extends View<Lang> {
      */
     @Override
     protected void initialize() {
-        buy.model(theme.Long).when(User.Action, c -> {
-            Color color = FXUtils.color(buy.value());
-            Node ui = Viewtify.view().ui();
-            System.out.println(ui + "   " + color.toRGB());
-            ui.setStyle("-fx-background:" + color.toRGB() + ";");
-        });
+        buy.model(theme.Long);
+        sell.model(theme.Short);
     }
 
     /**
