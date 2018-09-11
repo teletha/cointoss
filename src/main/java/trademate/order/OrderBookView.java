@@ -195,7 +195,7 @@ public class OrderBookView extends View {
         };
 
         Style HideSize = () -> {
-            display.width(53, px);
+            display.width(60, px);
         };
     }
 }
