@@ -48,9 +48,7 @@ public class OrderBuilder extends View<Lang> {
     private Predicate<UIText> positiveNumber = ui -> {
         try {
             return Num.of(ui.value()).isPositive();
-        } catch (
-
-        NumberFormatException e) {
+        } catch (NumberFormatException e) {
             return false;
         }
     };
@@ -58,9 +56,7 @@ public class OrderBuilder extends View<Lang> {
     private Predicate<UIText> negativeNumber = ui -> {
         try {
             return Num.of(ui.value()).isNegative();
-        } catch (
-
-        NumberFormatException e) {
+        } catch (NumberFormatException e) {
             return false;
         }
     };

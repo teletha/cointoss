@@ -163,7 +163,7 @@ public class NotificationSetting extends View<Lang> {
         @Override
         protected void initialize() {
             desktop.model(notify.desktop);
-            line.model(notify.line).disableWhen(lineAccessToken.model().isEmpty());
+            line.model(notify.line).disableWhen(notificator.lineAccessToken.observeNow().map(String::isEmpty));
             sound.values(Sound.values()).model(notify.sound).when(User.Action, e -> {
                 sound.value().play();
             });
