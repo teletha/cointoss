@@ -85,7 +85,7 @@ public class OrderBookView extends View {
     protected void initialize() {
         book = view.market().orderBook;
 
-        hideSize.values(0, Num.range(0, 99)).observe(longList.ui::refresh);
+        hideSize.values(0, Num.range(0, 99));
 
         longList.cell(e -> new CellView(Color.rgb(251, 189, 42, 0.2))).take(hideSize, (unit, size) -> unit.size.isGreaterThanOrEqual(size));
         shortList.cell(e -> new CellView(Color.rgb(247, 105, 77, 0.2)))
@@ -187,7 +187,7 @@ public class OrderBookView extends View {
 
         Style PriceLatest = () -> {
             display.width(60, px).height(25, px);
-            text.indent(10, px);
+            text.indent(12, px);
         };
 
         Style PriceSpread = () -> {
