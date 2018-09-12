@@ -16,6 +16,8 @@ import java.util.Objects;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.magicwerk.brownies.collections.GapList;
 
 import cointoss.MarketSetting;
@@ -29,6 +31,9 @@ import kiss.Variable;
  * @version 2018/08/23 21:54:29
  */
 public class OrderBook {
+
+    /* Logging */
+    private static final Logger log = LogManager.getLogger();
 
     /** The best order. */
     public final Variable<OrderUnit> best = Variable.empty();
@@ -473,7 +478,7 @@ public class OrderBook {
             try {
                 return super.get(index);
             } catch (IndexOutOfBoundsException e) {
-                System.out.println(e);
+                log.error(e.getMessage(), e);
                 return new OrderUnit(Num.ZERO, Num.ZERO);
             }
         }
