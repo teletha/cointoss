@@ -261,7 +261,7 @@ public class OrderBuilder extends View<Lang> {
      */
     private void reverse() {
         view.market().reverse();
-        Runtime.getRuntime().gc();
+        // Runtime.getRuntime().gc();
 
         Notificator notificator = I.make(Notificator.class);
         notificator.execution.notify("(*‘ω‘ *)");

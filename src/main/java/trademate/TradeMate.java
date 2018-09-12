@@ -9,6 +9,9 @@
  */
 package trademate;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import cointoss.market.bitflyer.BitFlyer;
 import kiss.I;
 import trademate.setting.SettingView;
@@ -23,7 +26,10 @@ import viewtify.ui.View;
  */
 public class TradeMate extends View {
 
+    private static final Logger log = LogManager.getLogger();
+
     static {
+        Thread.setDefaultUncaughtExceptionHandler((t, e) -> log.error(e.getMessage(), e));
         I.load(TradeMate.class, false);
     }
 
@@ -60,7 +66,6 @@ public class TradeMate extends View {
      */
     public static void main(String[] args) {
         // configure logging property
-        System.setProperty("java.util.logging.manager", "org.apache.logging.log4j.jul.LogManager");
         Viewtify.activate(TradeMate.class, ActivationPolicy.Latest);
     }
 }

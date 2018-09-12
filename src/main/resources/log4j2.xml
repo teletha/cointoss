@@ -21,7 +21,12 @@
             <Policies>
                 <TimeBasedTriggeringPolicy />
             </Policies>
-            <DefaultRolloverStrategy max="10"/>
+            <DefaultRolloverStrategy>
+	            <Delete basePath=".log" maxDepth="1">
+	                <IfFileName glob="system*.log" />
+	                <IfLastModified age="30d" />
+	            </Delete>
+	        </DefaultRolloverStrategy>
         </RollingFile>
     </Appenders>
 
