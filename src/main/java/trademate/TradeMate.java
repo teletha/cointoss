@@ -65,7 +65,6 @@ public class TradeMate extends View {
      * @param args
      */
     public static void main(String[] args) {
-        // configure logging property
         Viewtify.activate(TradeMate.class, ActivationPolicy.Latest);
     }
 }

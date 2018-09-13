@@ -478,8 +478,7 @@ public class OrderBook {
             try {
                 return super.get(index);
             } catch (IndexOutOfBoundsException e) {
-                log.error(e.getMessage(), e);
-                return new OrderUnit(Num.ZERO, Num.ZERO);
+                return get(index - 1);
             }
         }
     }
