@@ -27,7 +27,6 @@ import com.google.gson.JsonParser;
 import kiss.I;
 import kiss.JSON;
 import kiss.Signal;
-import okhttp3.ConnectionPool;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -70,34 +69,35 @@ public class Network {
         return client;
     }
 
-    /**
-     * Terminate all network related resources if needed.
-     */
-    private static synchronized void terminateIfNeeded() {
-        if (terminating.compareAndSet(false, true)) {
-            I.schedule(50, MILLISECONDS, false, () -> {
-                ConnectionPool pool = client.connectionPool();
-                int all = pool.connectionCount();
-                int idle = pool.idleConnectionCount();
-
-                // System.out.println("DEBUG Network#terminate " + all + " " + idle + " " +
-                // client.dispatcher().executorService());
-                if (all - idle == 0) {
-                    pool.evictAll();
-                    client.dispatcher().executorService().shutdown();
-                    client = null;
-                }
-                terminating.set(false);
-            });
-        }
-    }
+    // /**
+    // * Terminate all network related resources if needed.
+    // */
+    // private static synchronized void terminateIfNeeded() {
+    // if (terminating.compareAndSet(false, true)) {
+    // I.schedule(50, MILLISECONDS, false, () -> {
+    // ConnectionPool pool = client.connectionPool();
+    // int all = pool.connectionCount();
+    // int idle = pool.idleConnectionCount();
+    //
+    // // System.out.println("DEBUG Network#terminate " + all + " " + idle + " " +
+    // // client.dispatcher().executorService());
+    // if (all - idle == 0) {
+    // pool.evictAll();
+    // client.dispatcher().executorService().shutdown();
+    // client = null;
+    // }
+    // terminating.set(false);
+    // });
+    // }
+    // }
 
     /**
      * Terminate all network resources forcibly.
      */
     public static synchronized void terminate() {
+        System.out.println(client);
         if (client != null) {
-            client.dispatcher().executorService().shutdown();
+            client.dispatcher().executorService().shutdownNow();
             client.connectionPool().evictAll();
             client = null;
         }
@@ -154,7 +154,6 @@ public class Network {
             } catch (Throwable e) {
                 observer.error(new Error("[" + request.url() + "] throws some error.", e));
             } finally {
-                terminateIfNeeded();
             }
             return disposer;
         });
@@ -211,7 +210,6 @@ public class Network {
                  */
                 @Override
                 public void onClosed(WebSocket socket, int code, String reason) {
-                    terminateIfNeeded();
                 }
 
                 /**
