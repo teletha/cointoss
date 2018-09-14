@@ -40,7 +40,7 @@ import okio.Buffer;
 import trademate.setting.Notificator;
 
 /**
- * @version 2018/08/28 0:15:07
+ * @version 2018/09/15 1:37:59
  */
 public class Network {
 
@@ -51,7 +51,7 @@ public class Network {
     private static OkHttpClient client;
 
     /** The termination state. */
-    private static final AtomicBoolean terminating = new AtomicBoolean();;
+    private static final AtomicBoolean terminating = new AtomicBoolean();
 
     /**
      * Retrieve the client.
@@ -73,7 +73,7 @@ public class Network {
     /**
      * Terminate all network related resources if needed.
      */
-    private static synchronized void terminate() {
+    private static synchronized void terminateIfNeeded() {
         if (terminating.compareAndSet(false, true)) {
             I.schedule(50, MILLISECONDS, false, () -> {
                 ConnectionPool pool = client.connectionPool();
@@ -89,6 +89,17 @@ public class Network {
                 }
                 terminating.set(false);
             });
+        }
+    }
+
+    /**
+     * Terminate all network resources forcibly.
+     */
+    public static synchronized void terminate() {
+        if (client != null) {
+            client.dispatcher().executorService().shutdown();
+            client.connectionPool().evictAll();
+            client = null;
         }
     }
 
@@ -143,7 +154,7 @@ public class Network {
             } catch (Throwable e) {
                 observer.error(new Error("[" + request.url() + "] throws some error.", e));
             } finally {
-                terminate();
+                terminateIfNeeded();
             }
             return disposer;
         });
@@ -200,7 +211,7 @@ public class Network {
                  */
                 @Override
                 public void onClosed(WebSocket socket, int code, String reason) {
-                    terminate();
+                    terminateIfNeeded();
                 }
 
                 /**

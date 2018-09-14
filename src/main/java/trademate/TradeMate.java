@@ -13,6 +13,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import cointoss.market.bitflyer.BitFlyer;
+import cointoss.util.Network;
 import kiss.I;
 import trademate.setting.SettingView;
 import viewtify.ActivationPolicy;
@@ -66,5 +67,6 @@ public class TradeMate extends View {
      */
     public static void main(String[] args) {
         Viewtify.activate(TradeMate.class, ActivationPolicy.Latest);
+        Viewtify.Terminator.add(Network::terminate);
     }
 }
