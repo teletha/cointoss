@@ -19,10 +19,11 @@ import kiss.Extensible;
 import kiss.I;
 import kiss.Storable;
 import kiss.Variable;
+import trademate.TradeMate;
 import viewtify.Viewtify;
 
 /**
- * @version 2018/09/06 23:40:19
+ * @version 2018/09/16 8:44:00
  */
 public class Notificator implements Storable<Notificator> {
 
@@ -99,7 +100,7 @@ public class Notificator implements Storable<Notificator> {
                             .position(desktopPosition.v.position)
                             .hideAfter(Duration.seconds(desktopDuration.v.getSeconds()))
                             .text(message)
-                            .owner(Viewtify.screen())
+                            .owner(I.make(TradeMate.class).screen())
                             .show();
                 });
             }

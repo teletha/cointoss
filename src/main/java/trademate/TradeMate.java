@@ -14,6 +14,8 @@ import org.apache.logging.log4j.Logger;
 
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.util.Network;
+import kiss.Manageable;
+import kiss.Singleton;
 import trademate.setting.SettingView;
 import viewtify.Viewtify;
 import viewtify.ui.UI;
@@ -21,8 +23,9 @@ import viewtify.ui.UITabPane;
 import viewtify.ui.View;
 
 /**
- * @version 2018/09/06 23:45:59
+ * @version 2018/09/16 8:43:30
  */
+@Manageable(lifestyle = Singleton.class)
 public class TradeMate extends View {
 
     private UITabPane main;
