@@ -14,7 +14,6 @@ import static java.util.concurrent.TimeUnit.*;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.github.signalr4j.client.LogLevel;
 import com.github.signalr4j.client.Logger;
@@ -39,7 +38,7 @@ import okio.Buffer;
 import trademate.setting.Notificator;
 
 /**
- * @version 2018/09/15 1:37:59
+ * @version 2018/09/15 12:30:31
  */
 public class Network {
 
@@ -48,9 +47,6 @@ public class Network {
 
     /** The singleton. */
     private static OkHttpClient client;
-
-    /** The termination state. */
-    private static final AtomicBoolean terminating = new AtomicBoolean();
 
     /**
      * Retrieve the client.
@@ -69,33 +65,10 @@ public class Network {
         return client;
     }
 
-    // /**
-    // * Terminate all network related resources if needed.
-    // */
-    // private static synchronized void terminateIfNeeded() {
-    // if (terminating.compareAndSet(false, true)) {
-    // I.schedule(50, MILLISECONDS, false, () -> {
-    // ConnectionPool pool = client.connectionPool();
-    // int all = pool.connectionCount();
-    // int idle = pool.idleConnectionCount();
-    //
-    // // System.out.println("DEBUG Network#terminate " + all + " " + idle + " " +
-    // // client.dispatcher().executorService());
-    // if (all - idle == 0) {
-    // pool.evictAll();
-    // client.dispatcher().executorService().shutdown();
-    // client = null;
-    // }
-    // terminating.set(false);
-    // });
-    // }
-    // }
-
     /**
      * Terminate all network resources forcibly.
      */
     public static synchronized void terminate() {
-        System.out.println(client);
         if (client != null) {
             client.dispatcher().executorService().shutdownNow();
             client.connectionPool().evictAll();
@@ -153,7 +126,6 @@ public class Network {
                 }
             } catch (Throwable e) {
                 observer.error(new Error("[" + request.url() + "] throws some error.", e));
-            } finally {
             }
             return disposer;
         });

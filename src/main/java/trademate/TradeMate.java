@@ -15,7 +15,6 @@ import org.apache.logging.log4j.Logger;
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.util.Network;
 import trademate.setting.SettingView;
-import viewtify.ActivationPolicy;
 import viewtify.Viewtify;
 import viewtify.ui.UI;
 import viewtify.ui.UITabPane;
@@ -62,10 +61,7 @@ public class TradeMate extends View {
         Logger log = LogManager.getLogger();
         Thread.setDefaultUncaughtExceptionHandler((t, e) -> log.error(e.getMessage(), e));
 
-        // terminate resources on application end
-        Viewtify.Terminator.add(Network::terminate);
-
         // activate application
-        Viewtify.activate(TradeMate.class, ActivationPolicy.Latest);
+        Viewtify.application().useDarkTheme().onTerminating(Network::terminate).activate(TradeMate.class);
     }
 }
