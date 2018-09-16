@@ -17,6 +17,7 @@ import cointoss.util.Network;
 import kiss.Manageable;
 import kiss.Singleton;
 import trademate.setting.SettingView;
+import viewtify.Theme;
 import viewtify.Viewtify;
 import viewtify.ui.UI;
 import viewtify.ui.UITabPane;
@@ -65,6 +66,6 @@ public class TradeMate extends View {
         Thread.setDefaultUncaughtExceptionHandler((t, e) -> log.error(e.getMessage(), e));
 
         // activate application
-        Viewtify.application().useDarkTheme().onTerminating(Network::terminate).activate(TradeMate.class);
+        Viewtify.application().use(Theme.Dark).icon("icon/app.png").onTerminating(Network::terminate).activate(TradeMate.class);
     }
 }
