@@ -23,18 +23,18 @@ import kiss.Table;
 /**
  * @version 2018/09/18 21:18:07
  */
-public class BackwardMarket extends Market {
+public class VerifiableMarket extends Market {
 
     /** Hide super class field. */
-    public final BackwardMarketService service;
+    public final VerifiableMarketService service;
 
     /**
-     * Create {@link BackwardMarket} with default {@link BackwardMarketService}.
+     * Create {@link VerifiableMarket} with default {@link VerifiableMarketService}.
      */
-    public BackwardMarket() {
-        super(new BackwardMarketService());
+    public VerifiableMarket() {
+        super(new VerifiableMarketService());
 
-        this.service = (BackwardMarketService) super.service;
+        this.service = (VerifiableMarketService) super.service;
     }
 
     /**
@@ -44,7 +44,7 @@ public class BackwardMarket extends Market {
      * @param size
      * @param price
      */
-    public BackwardMarket execute(int size, int price) {
+    public VerifiableMarket execute(int size, int price) {
         return execute(Side.random(), size, price);
     }
 
@@ -55,7 +55,7 @@ public class BackwardMarket extends Market {
      * @param size
      * @param price
      */
-    public BackwardMarket execute(int size, int price, int time) {
+    public VerifiableMarket execute(int size, int price, int time) {
         return execute(Side.random(), size, price, at(time));
     }
 
@@ -66,7 +66,7 @@ public class BackwardMarket extends Market {
      * @param size
      * @param price
      */
-    public BackwardMarket execute(Side side, int size, int price) {
+    public VerifiableMarket execute(Side side, int size, int price) {
         return execute(side, size, price, at(0));
     }
 
@@ -77,7 +77,7 @@ public class BackwardMarket extends Market {
      * @param size
      * @param price
      */
-    public BackwardMarket execute(Side side, Num size, Num price) {
+    public VerifiableMarket execute(Side side, Num size, Num price) {
         return execute(side, size, price, at(0));
     }
 
@@ -88,7 +88,7 @@ public class BackwardMarket extends Market {
      * @param size
      * @param price
      */
-    public BackwardMarket execute(Side side, int size, int price, Time lag) {
+    public VerifiableMarket execute(Side side, int size, int price, Time lag) {
         return execute(side, Num.of(size), Num.of(price), lag);
     }
 
@@ -99,7 +99,7 @@ public class BackwardMarket extends Market {
      * @param size
      * @param price
      */
-    public BackwardMarket execute(Side side, Num size, Num price, Time lag) {
+    public VerifiableMarket execute(Side side, Num size, Num price, Time lag) {
         Execution e = new Execution();
         e.side = side;
         e.size = e.cumulativeSize = size;
@@ -116,7 +116,7 @@ public class BackwardMarket extends Market {
      * @param size
      * @param price
      */
-    public BackwardMarket execute(Execution e) {
+    public VerifiableMarket execute(Execution e) {
         timelineObservers.accept(service.emulate(e));
         return this;
     }

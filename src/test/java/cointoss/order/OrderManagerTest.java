@@ -16,20 +16,20 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import cointoss.backtest.BackwardMarketService;
+import cointoss.backtest.VerifiableMarketService;
 
 /**
  * @version 2018/07/09 2:07:07
  */
 class OrderManagerTest {
 
-    private BackwardMarketService service;
+    private VerifiableMarketService service;
 
     private OrderManager orders;
 
     @BeforeEach
     void init() {
-        service = new BackwardMarketService();
+        service = new VerifiableMarketService();
         orders = new OrderManager(service);
     }
 

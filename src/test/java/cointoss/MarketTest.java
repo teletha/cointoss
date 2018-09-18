@@ -14,7 +14,7 @@ import static cointoss.MarketTestSupport.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import cointoss.backtest.BackwardMarket;
+import cointoss.backtest.VerifiableMarket;
 import cointoss.order.Order;
 import cointoss.util.Num;
 
@@ -23,11 +23,11 @@ import cointoss.util.Num;
  */
 class MarketTest {
 
-    BackwardMarket market;
+    VerifiableMarket market;
 
     @BeforeEach
     void init() {
-        market = new BackwardMarket();
+        market = new VerifiableMarket();
     }
 
     @Test

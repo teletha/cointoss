@@ -32,7 +32,7 @@ import kiss.Signaling;
 /**
  * @version 2018/09/18 20:37:42
  */
-public class BackwardMarketService extends MarketService {
+public class VerifiableMarketService extends MarketService {
 
     /** The terminator. */
     private final Disposable diposer = Disposable.empty();
@@ -67,7 +67,7 @@ public class BackwardMarketService extends MarketService {
     /**
      * 
      */
-    public BackwardMarketService() {
+    public VerifiableMarketService() {
         super("TestableExchange", "TestableMarket", MarketSetting.builder()
                 .baseCurrencyMinimumBidPrice(Num.ONE)
                 .targetCurrencyMinimumBidSize(Num.ONE)
@@ -80,7 +80,7 @@ public class BackwardMarketService extends MarketService {
      * @param lag
      * @return
      */
-    protected final BackwardMarketService lag(int lag) {
+    protected final VerifiableMarketService lag(int lag) {
         this.lag = Time.at(lag);
 
         return this;
@@ -92,7 +92,7 @@ public class BackwardMarketService extends MarketService {
      * @param lag
      * @return
      */
-    protected final BackwardMarketService lag(int start, int end) {
+    protected final VerifiableMarketService lag(int start, int end) {
         this.lag = Time.lag(start, end);
 
         return this;

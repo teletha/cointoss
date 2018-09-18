@@ -116,7 +116,7 @@ public class BackTest {
     /**
      * @version 2018/04/29 14:59:08
      */
-    private class BackTestService extends BackwardMarketService {
+    private class BackTestService extends VerifiableMarketService {
 
         /**
          */

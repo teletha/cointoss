@@ -19,14 +19,14 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import cointoss.MarketTestSupport.ChainableExecution;
-import cointoss.backtest.BackwardMarketService;
+import cointoss.backtest.VerifiableMarketService;
 
 /**
  * @version 2018/07/12 9:52:30
  */
 class MarketServiceTest {
 
-    MarketService service = new BackwardMarketService();
+    MarketService service = new VerifiableMarketService();
 
     @Test
     void compactId() {

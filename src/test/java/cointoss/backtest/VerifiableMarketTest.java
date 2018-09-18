@@ -26,11 +26,11 @@ import cointoss.util.Num;
 /**
  * @version 2018/04/29 16:12:46
  */
-class BackwardMarketTest {
+class VerifiableMarketTest {
 
     static final Num FIVE = Num.of(5);
 
-    BackwardMarket market = new BackwardMarket();
+    VerifiableMarket market = new VerifiableMarket();
 
     @Test
     void requestOrder() {
@@ -157,7 +157,7 @@ class BackwardMarketTest {
 
     @Test
     void lag() {
-        BackwardMarket market = new BackwardMarket();
+        VerifiableMarket market = new VerifiableMarket();
         market.service.lag(5);
 
         market.requestTo(Order.limitLong(10, 10));
