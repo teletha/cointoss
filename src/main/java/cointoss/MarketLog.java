@@ -55,6 +55,7 @@ import com.univocity.parsers.csv.CsvWriterSettings;
 
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.util.Chrono;
+import cointoss.util.Network;
 import cointoss.util.Num;
 import cointoss.util.RetryPolicy;
 import cointoss.util.Span;
@@ -694,5 +695,6 @@ public class MarketLog {
                 .concatMap(c -> c.read()));
 
         market.dispose();
+        Network.terminate();
     }
 }

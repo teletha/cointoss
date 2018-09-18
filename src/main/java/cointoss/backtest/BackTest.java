@@ -121,7 +121,7 @@ public class BackTest {
         /**
          */
         private BackTestService() {
-            super(Time.lag(0, 10));
+            lag(0, 10);
         }
 
         /**

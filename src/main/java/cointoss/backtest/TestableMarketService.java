@@ -12,7 +12,6 @@ package cointoss.backtest;
 import java.time.ZonedDateTime;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.Objects;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -31,7 +30,7 @@ import kiss.Signal;
 import kiss.Signaling;
 
 /**
- * @version 2018/05/23 18:36:07
+ * @version 2018/09/18 20:37:42
  */
 public class TestableMarketService extends MarketService {
 
@@ -54,13 +53,13 @@ public class TestableMarketService extends MarketService {
     private final LinkedList<Execution> executeds = new LinkedList();
 
     /** The lag generator. */
-    private final Time lag;
+    private Time lag = Time.at(0);
 
     /** The initial base currency. */
-    private final Num baseCurrency;
+    private final Num baseCurrency = Num.HUNDRED;
 
     /** The initial target currency. */
-    private final Num targetCurrency;
+    private final Num targetCurrency = Num.ZERO;
 
     /** The current time. */
     private ZonedDateTime now = Time.Base;
@@ -69,35 +68,34 @@ public class TestableMarketService extends MarketService {
      * 
      */
     public TestableMarketService() {
-        this(Time.at(0));
-    }
-
-    /**
-    * 
-    */
-    public TestableMarketService(Num baseCurrency, Num targetCurrency) {
-        this(Time.at(0), baseCurrency, targetCurrency);
-    }
-
-    /**
-    * 
-    */
-    public TestableMarketService(Time lag) {
-        this(lag, Num.HUNDRED, Num.ZERO);
-    }
-
-    /**
-    * 
-    */
-    public TestableMarketService(Time lag, Num baseCurrency, Num targetCurrency) {
         super("TestableExchange", "TestableMarket", MarketSetting.builder()
                 .baseCurrencyMinimumBidPrice(Num.ONE)
                 .targetCurrencyMinimumBidSize(Num.ONE)
                 .orderBookGroupRanges(Num.of(1)));
+    }
 
-        this.lag = lag;
-        this.baseCurrency = Objects.requireNonNull(baseCurrency);
-        this.targetCurrency = Objects.requireNonNull(targetCurrency);
+    /**
+     * Configure fixed lag.
+     * 
+     * @param lag
+     * @return
+     */
+    protected final TestableMarketService lag(int lag) {
+        this.lag = Time.at(lag);
+
+        return this;
+    }
+
+    /**
+     * Configure random lag.
+     * 
+     * @param lag
+     * @return
+     */
+    protected final TestableMarketService lag(int start, int end) {
+        this.lag = Time.lag(start, end);
+
+        return this;
     }
 
     /**

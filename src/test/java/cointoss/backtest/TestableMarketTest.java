@@ -157,7 +157,7 @@ class TestableMarketTest {
 
     @Test
     void lag() {
-        TestableMarket market = new TestableMarket(new TestableMarketService(Time.at(5)));
+        TestableMarket market = new TestableMarket(new TestableMarketService().lag(5));
 
         market.requestTo(Order.limitLong(10, 10));
         market.execute(Side.BUY, 5, 10, Time.at(3));
