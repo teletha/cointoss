@@ -14,7 +14,6 @@ import static cointoss.backtest.Time.*;
 
 import cointoss.Execution;
 import cointoss.Market;
-import cointoss.MarketService;
 import cointoss.Side;
 import cointoss.order.Order;
 import cointoss.order.OrderState;
@@ -22,24 +21,20 @@ import cointoss.util.Num;
 import kiss.Table;
 
 /**
- * @version 2018/07/10 23:37:19
+ * @version 2018/09/18 21:18:07
  */
 public class TestableMarket extends Market {
+
+    /** Hide super class field. */
+    public final TestableMarketService service;
 
     /**
      * Create {@link TestableMarket} with default {@link TestableMarketService}.
      */
     public TestableMarket() {
-        this(new TestableMarketService());
-    }
+        super(new TestableMarketService());
 
-    /**
-     * Create {@link TestableMarket} with the specified {@link TestableMarketService}.
-     * 
-     * @param service
-     */
-    public TestableMarket(MarketService service) {
-        super(service);
+        this.service = (TestableMarketService) super.service;
     }
 
     /**
@@ -122,7 +117,7 @@ public class TestableMarket extends Market {
      * @param price
      */
     public TestableMarket execute(Execution e) {
-        timelineObservers.accept(((TestableMarketService) service).emulate(e));
+        timelineObservers.accept(service.emulate(e));
         return this;
     }
 
