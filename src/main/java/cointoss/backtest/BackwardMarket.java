@@ -23,18 +23,18 @@ import kiss.Table;
 /**
  * @version 2018/09/18 21:18:07
  */
-public class TestableMarket extends Market {
+public class BackwardMarket extends Market {
 
     /** Hide super class field. */
-    public final TestableMarketService service;
+    public final BackwardMarketService service;
 
     /**
-     * Create {@link TestableMarket} with default {@link TestableMarketService}.
+     * Create {@link BackwardMarket} with default {@link BackwardMarketService}.
      */
-    public TestableMarket() {
-        super(new TestableMarketService());
+    public BackwardMarket() {
+        super(new BackwardMarketService());
 
-        this.service = (TestableMarketService) super.service;
+        this.service = (BackwardMarketService) super.service;
     }
 
     /**
@@ -44,7 +44,7 @@ public class TestableMarket extends Market {
      * @param size
      * @param price
      */
-    public TestableMarket execute(int size, int price) {
+    public BackwardMarket execute(int size, int price) {
         return execute(Side.random(), size, price);
     }
 
@@ -55,7 +55,7 @@ public class TestableMarket extends Market {
      * @param size
      * @param price
      */
-    public TestableMarket execute(int size, int price, int time) {
+    public BackwardMarket execute(int size, int price, int time) {
         return execute(Side.random(), size, price, at(time));
     }
 
@@ -66,7 +66,7 @@ public class TestableMarket extends Market {
      * @param size
      * @param price
      */
-    public TestableMarket execute(Side side, int size, int price) {
+    public BackwardMarket execute(Side side, int size, int price) {
         return execute(side, size, price, at(0));
     }
 
@@ -77,7 +77,7 @@ public class TestableMarket extends Market {
      * @param size
      * @param price
      */
-    public TestableMarket execute(Side side, Num size, Num price) {
+    public BackwardMarket execute(Side side, Num size, Num price) {
         return execute(side, size, price, at(0));
     }
 
@@ -88,7 +88,7 @@ public class TestableMarket extends Market {
      * @param size
      * @param price
      */
-    public TestableMarket execute(Side side, int size, int price, Time lag) {
+    public BackwardMarket execute(Side side, int size, int price, Time lag) {
         return execute(side, Num.of(size), Num.of(price), lag);
     }
 
@@ -99,7 +99,7 @@ public class TestableMarket extends Market {
      * @param size
      * @param price
      */
-    public TestableMarket execute(Side side, Num size, Num price, Time lag) {
+    public BackwardMarket execute(Side side, Num size, Num price, Time lag) {
         Execution e = new Execution();
         e.side = side;
         e.size = e.cumulativeSize = size;
@@ -116,7 +116,7 @@ public class TestableMarket extends Market {
      * @param size
      * @param price
      */
-    public TestableMarket execute(Execution e) {
+    public BackwardMarket execute(Execution e) {
         timelineObservers.accept(service.emulate(e));
         return this;
     }

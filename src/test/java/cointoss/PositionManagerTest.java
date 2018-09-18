@@ -16,7 +16,7 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import cointoss.backtest.TestableMarketService;
+import cointoss.backtest.BackwardMarketService;
 import cointoss.util.Num;
 import kiss.Variable;
 
@@ -27,14 +27,14 @@ class PositionManagerTest {
 
     Variable<Execution> latest;
 
-    TestableMarketService service;
+    BackwardMarketService service;
 
     PositionManager positions;
 
     @BeforeEach
     void init() {
         latest = Variable.of(Execution.BASE);
-        service = new TestableMarketService();
+        service = new BackwardMarketService();
         positions = new PositionManager(service, latest);
     }
 

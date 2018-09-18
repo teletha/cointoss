@@ -22,7 +22,7 @@ import kiss.I;
  */
 public abstract class TraderTestSupport extends Trader {
 
-    protected TestableMarket market;
+    protected BackwardMarket market;
 
     protected TradingLog log;
 
@@ -30,7 +30,7 @@ public abstract class TraderTestSupport extends Trader {
      * @param provider
      */
     public TraderTestSupport() {
-        super.market = market = new TestableMarket();
+        super.market = market = new BackwardMarket();
         super.market.addTrader(this);
     }
 

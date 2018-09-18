@@ -26,11 +26,11 @@ import cointoss.util.Num;
 /**
  * @version 2018/04/29 16:12:46
  */
-class TestableMarketTest {
+class BackwardMarketTest {
 
     static final Num FIVE = Num.of(5);
 
-    TestableMarket market = new TestableMarket();
+    BackwardMarket market = new BackwardMarket();
 
     @Test
     void requestOrder() {
@@ -157,7 +157,7 @@ class TestableMarketTest {
 
     @Test
     void lag() {
-        TestableMarket market = new TestableMarket();
+        BackwardMarket market = new BackwardMarket();
         market.service.lag(5);
 
         market.requestTo(Order.limitLong(10, 10));

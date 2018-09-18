@@ -21,7 +21,7 @@ class MarketStaticticsTest {
 
     @Test
     void market() {
-        TestableMarket market = new TestableMarket();
+        BackwardMarket market = new BackwardMarket();
         market.requestAndExecution(Order.limitLong(1, 10));
 
         assert market.baseCurrency.v.is(90);
@@ -36,7 +36,7 @@ class MarketStaticticsTest {
 
     @Test
     void longOnly() {
-        TestableMarket market = new TestableMarket();
+        BackwardMarket market = new BackwardMarket();
         market.requestTo(Order.limitLong(1, 10));
         market.execute(Side.BUY, 1, 9);
 
@@ -47,7 +47,7 @@ class MarketStaticticsTest {
 
     @Test
     void longMultiple() {
-        TestableMarket market = new TestableMarket();
+        BackwardMarket market = new BackwardMarket();
         market.requestAndExecution(Order.limitLong(1, 10));
         market.requestAndExecution(Order.limitLong(1, 20));
 
@@ -58,7 +58,7 @@ class MarketStaticticsTest {
 
     @Test
     void longDown() {
-        TestableMarket market = new TestableMarket();
+        BackwardMarket market = new BackwardMarket();
         market.requestAndExecution(Order.limitLong(1, 10));
         market.requestAndExecution(Order.limitLong(1, 20));
         market.execute(Side.BUY, 1, 5);
@@ -70,7 +70,7 @@ class MarketStaticticsTest {
 
     @Test
     void shortMultiple() {
-        TestableMarket market = new TestableMarket();
+        BackwardMarket market = new BackwardMarket();
         market.requestAndExecution(Order.limitShort(1, 10));
         market.requestAndExecution(Order.limitShort(1, 20));
 
@@ -81,7 +81,7 @@ class MarketStaticticsTest {
 
     @Test
     void shortLong() {
-        TestableMarket market = new TestableMarket();
+        BackwardMarket market = new BackwardMarket();
         market.requestAndExecution(Order.limitShort(1, 10));
         market.requestAndExecution(Order.limitLong(1, 20));
 
@@ -92,7 +92,7 @@ class MarketStaticticsTest {
 
     @Test
     void longShort() {
-        TestableMarket market = new TestableMarket();
+        BackwardMarket market = new BackwardMarket();
         market.requestAndExecution(Order.limitLong(1, 10));
         market.requestAndExecution(Order.limitShort(1, 20));
 
