@@ -95,7 +95,7 @@ public class TradingView extends View {
      */
     @Override
     protected String name() {
-        return TradingView.class.getSimpleName() + View.IDSeparator + service.fullName;
+        return TradingView.class.getSimpleName() + View.IDSeparator + service.marketIdentity();
     }
 
     /**

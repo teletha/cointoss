@@ -21,7 +21,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 import antibug.CleanRoom;
-import cointoss.backtest.VerifiableMarket;
 import cointoss.util.Chrono;
 import kiss.I;
 

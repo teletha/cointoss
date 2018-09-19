@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Test;
 
 import cointoss.MarketTestSupport;
 import cointoss.Side;
+import cointoss.VerifiableMarket;
 import cointoss.order.Order;
 import cointoss.order.OrderState;
 import cointoss.order.QuantityCondition;

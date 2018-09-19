@@ -19,7 +19,6 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import cointoss.MarketTestSupport.ChainableExecution;
-import cointoss.backtest.VerifiableMarketService;
 
 /**
  * @version 2018/07/12 9:52:30

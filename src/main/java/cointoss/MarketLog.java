@@ -22,13 +22,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAccessor;
 import java.util.ArrayDeque;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.Delayed;
 import java.util.concurrent.ExecutionException;
@@ -39,8 +39,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -48,6 +46,9 @@ import org.apache.logging.log4j.Logger;
 import com.github.luben.zstd.ZstdInputStream;
 import com.github.luben.zstd.ZstdOutputStream;
 import com.google.common.base.Stopwatch;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
 import com.univocity.parsers.csv.CsvWriter;
@@ -144,14 +145,26 @@ public class MarketLog {
     /** The file data format */
     private static final DateTimeFormatter fileName = DateTimeFormatter.ofPattern("yyyyMMdd");
 
-    /** The file name pattern. */
-    private static final Pattern Name = Pattern.compile("\\D.(\\d.)\\.log");
-
     /** The market provider. */
     private final MarketService service;
 
     /** The root directory of logs. */
     private final Path root;
+
+    /** In-memory cache. */
+    private final LoadingCache<ZonedDateTime, List<Execution>> memory = CacheBuilder.newBuilder()
+            .maximumSize(25)
+            .expireAfterAccess(15, MINUTES)
+            .build(new CacheLoader<>() {
+
+                /**
+                 * {@inheritDoc}
+                 */
+                @Override
+                public List<Execution> load(ZonedDateTime key) throws Exception {
+                    return new Cache(key).read().toList();
+                }
+            });
 
     /** The first day. */
     private ZonedDateTime cacheFirst;
@@ -167,9 +180,6 @@ public class MarketLog {
 
     /** Realtime execution observer, this value will be switched. */
     private Consumer<Execution> realtime;
-
-    /** For info. */
-    private Stopwatch stopwatch = Stopwatch.createUnstarted();
 
     /** The retry policy. */
     private final RetryPolicy policy = new RetryPolicy().retryMaximum(100)
@@ -374,23 +384,14 @@ public class MarketLog {
      * @return
      */
     public final Signal<Execution> at(ZonedDateTime date) {
-        return new Cache(date).read();
-    }
+        Stopwatch stopwatch = Stopwatch.createUnstarted();
 
-    /**
-     * Parse date from file name.
-     * 
-     * @param file
-     * @return
-     */
-    private ZonedDateTime parse(Path file) {
-        String name = file.getFileName().toString();
-        Matcher matcher = Name.matcher(name);
-
-        if (matcher.matches()) {
-            return ZonedDateTime.of(LocalDateTime.parse(matcher.group(1)), Chrono.UTC);
-        } else {
-            throw new Error("Illegal file name [" + name + "]");
+        try {
+            return I.signal(memory.get(date)).effectOnObserve(() -> stopwatch.reset().start()).effectOnComplete(() -> {
+                log.info("Process executions [{}] {}", date, stopwatch.stop().elapsed());
+            });
+        } catch (ExecutionException e) {
+            throw I.quiet(e);
         }
     }
 
@@ -454,11 +455,7 @@ public class MarketLog {
      * @return
      */
     public final Signal<Execution> range(ZonedDateTime start, ZonedDateTime end) {
-        if (start.isBefore(end)) {
-            return from(start).takeWhile(e -> e.date.isBefore(end));
-        } else {
-            return Signal.EMPTY;
-        }
+        return I.signal(start, day -> day.plusDays(1)).takeUntil(day -> day.isEqual(end)).flatMap(day -> at(day));
     }
 
     /**
@@ -572,6 +569,8 @@ public class MarketLog {
          * @return
          */
         private Signal<Execution> read() {
+            Stopwatch stopwatch = Stopwatch.createUnstarted();
+
             try {
                 CsvParserSettings setting = new CsvParserSettings();
                 setting.getFormat().setDelimiter(' ');
@@ -583,7 +582,7 @@ public class MarketLog {
                     return I.signal(parser.iterate(new ZstdInputStream(newInputStream(compact)), ISO_8859_1))
                             .scanWith(Execution.BASE, service::decode)
                             .effectOnComplete(parser::stopParsing)
-                            .effectOnObserve(() -> stopwatch.reset().start())
+                            .effectOnObserve(stopwatch::start)
                             .effectOnComplete(() -> {
                                 log.info("Read compact log [{}] {}", date, stopwatch.stop().elapsed());
                             });
@@ -595,7 +594,7 @@ public class MarketLog {
                     Signal<Execution> signal = I.signal(parser.iterate(newInputStream(normal), ISO_8859_1))
                             .map(Execution::new)
                             .effectOnComplete(parser::stopParsing)
-                            .effectOnObserve(() -> stopwatch.reset().start())
+                            .effectOnObserve(stopwatch::start)
                             .effectOnComplete(() -> {
                                 log.info("Read log [{}] {}", date, stopwatch.stop().elapsed());
                             });
@@ -677,22 +676,16 @@ public class MarketLog {
         }
     }
 
-    // public static void main(String[] args) {
-    // MarketLog log = new MarketLog(BitFlyer.BTCJPY03AUG2018);
-    // log.fromToday().to(exe -> {
-    // });
-    // log.service.dispose();
-    // }
-
     public static void main(String[] args) {
         LocalDate start = LocalDate.of(2018, 2, 1);
-        LocalDate end = LocalDate.of(2018, 2, 7);
+        LocalDate end = LocalDate.of(2018, 2, 5);
 
-        Market market = new Market(BitFlyer.FX_BTC_JPY);
-        market.readLog(log -> log.caches()
-                .skipUntil(d -> d.date.isEqual(start))
-                .takeUntil(d -> d.date.isEqual(end))
-                .concatMap(c -> c.read()));
+        VerifiableMarket market = new VerifiableMarket(BitFlyer.FX_BTC_JPY);
+
+        Signal<LocalDate> range = I.signal(start, day -> day.plusDays(1)).takeUntil(day -> day.isEqual(end));
+
+        market.readLog(log -> range.flatMap(day -> log.at(day)));
+        market.readLog(log -> range.flatMap(day -> log.at(day)));
 
         market.dispose();
         Network.terminate();

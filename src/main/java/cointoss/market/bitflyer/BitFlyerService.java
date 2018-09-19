@@ -114,7 +114,7 @@ class BitFlyerService extends MarketService {
      * @param type
      */
     BitFlyerService(String type, boolean forTest, MarketSetting.Builder setting) {
-        super("BitFlyer", type, setting);
+        super("BitFlyer", type, setting.build());
 
         this.forTest = forTest;
         this.intervalOrderCheck = I.signal(0, 1, TimeUnit.SECONDS).map(v -> orders().toList()).share();
@@ -683,7 +683,6 @@ class BitFlyerService extends MarketService {
     /**
      * @version 2018/02/09 11:42:24
      */
-    @SuppressWarnings("unused")
     private static class WebResponse {
 
         /** Generic parameter */

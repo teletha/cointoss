@@ -12,6 +12,7 @@ package cointoss.backtest;
 import org.junit.jupiter.api.Test;
 
 import cointoss.Side;
+import cointoss.VerifiableMarket;
 import cointoss.order.Order;
 
 /**

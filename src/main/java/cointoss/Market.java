@@ -46,7 +46,7 @@ public class Market implements Disposable {
     protected final Signaling<Execution> timelineObservers = new Signaling();
 
     /** The execution time line. */
-    public final Signal<Execution> timeline = timelineObservers.expose;
+    public final Signal<Execution> timeline = timelineObservers.expose.skipComplete();
 
     /** The execution time line by taker. */
     public final Signal<Execution> timelineByTaker = timeline.map(e -> {
@@ -110,7 +110,11 @@ public class Market implements Disposable {
         initialTargetCurrency = targetCurrency.v;
 
         // build tickers for each span
-        timeline.to(tickers::update);
+        timeline.to(tickers::update, e -> {
+
+        }, () -> {
+            System.out.println("Complete");
+        });
 
         readOrderBook();
 

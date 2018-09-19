@@ -45,14 +45,14 @@ public class Time {
      * 
      * @return
      */
-    ZonedDateTime to() {
+    public ZonedDateTime to() {
         return Base.plusSeconds(Generator.randomInt(start, end));
     }
 
     /**
      * @return
      */
-    long generate() {
+    public long generate() {
         return Generator.randomLong(start * 1000000000L, end * 1000000000L);
     }
 

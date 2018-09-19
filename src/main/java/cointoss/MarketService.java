@@ -36,9 +36,6 @@ public abstract class MarketService implements Disposable {
     /** The market name. */
     public final String marketName;
 
-    /** The identical market name. */
-    public final String fullName;
-
     /** The execution log. */
     public final MarketLog log;
 
@@ -52,12 +49,20 @@ public abstract class MarketService implements Disposable {
      * @param exchangeName
      * @param marketName
      */
-    protected MarketService(String exchangeName, String marketName, MarketSetting.Builder setting) {
+    protected MarketService(String exchangeName, String marketName, MarketSetting setting) {
         this.exchangeName = Objects.requireNonNull(exchangeName);
         this.marketName = Objects.requireNonNull(marketName);
-        this.setting = setting.build();
-        this.fullName = exchangeName + " " + marketName;
+        this.setting = setting;
         this.log = new MarketLog(this);
+    }
+
+    /**
+     * Returns the identity of market.
+     * 
+     * @return A market identity.
+     */
+    public final String marketIdentity() {
+        return exchangeName + " " + marketName;
     }
 
     /**
@@ -357,6 +362,6 @@ public abstract class MarketService implements Disposable {
      */
     @Override
     public String toString() {
-        return fullName;
+        return marketIdentity();
     }
 }

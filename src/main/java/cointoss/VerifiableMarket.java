@@ -8,13 +8,11 @@
  *
  *          https://opensource.org/licenses/MIT
  */
-package cointoss.backtest;
+package cointoss;
 
 import static cointoss.backtest.Time.*;
 
-import cointoss.Execution;
-import cointoss.Market;
-import cointoss.Side;
+import cointoss.backtest.Time;
 import cointoss.order.Order;
 import cointoss.order.OrderState;
 import cointoss.util.Num;
@@ -32,7 +30,14 @@ public class VerifiableMarket extends Market {
      * Create {@link VerifiableMarket} with default {@link VerifiableMarketService}.
      */
     public VerifiableMarket() {
-        super(new VerifiableMarketService());
+        this(new VerifiableMarketService());
+    }
+
+    /**
+     * Create {@link VerifiableMarket} with default {@link VerifiableMarketService}.
+     */
+    public VerifiableMarket(MarketService service) {
+        super(new VerifiableMarketService(service));
 
         this.service = (VerifiableMarketService) super.service;
     }

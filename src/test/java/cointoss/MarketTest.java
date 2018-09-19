@@ -14,7 +14,6 @@ import static cointoss.MarketTestSupport.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import cointoss.backtest.VerifiableMarket;
 import cointoss.order.Order;
 import cointoss.util.Num;
 

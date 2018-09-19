@@ -16,6 +16,7 @@ import java.util.stream.IntStream;
 import cointoss.Execution;
 import cointoss.Market;
 import cointoss.Trader;
+import cointoss.VerifiableMarketService;
 import cointoss.util.Num;
 import kiss.I;
 import kiss.Signal;

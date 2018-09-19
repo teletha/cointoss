@@ -7,7 +7,7 @@
  *
  *          https://opensource.org/licenses/MIT
  */
-package cointoss.backtest;
+package cointoss;
 
 import java.time.ZonedDateTime;
 import java.util.Iterator;
@@ -15,9 +15,7 @@ import java.util.LinkedList;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import cointoss.Execution;
-import cointoss.MarketService;
-import cointoss.MarketSetting;
+import cointoss.backtest.Time;
 import cointoss.order.Order;
 import cointoss.order.OrderBookChange;
 import cointoss.order.OrderState;
@@ -64,6 +62,8 @@ public class VerifiableMarketService extends MarketService {
     /** The current time. */
     private ZonedDateTime now = Time.Base;
 
+    private MarketService delegation;
+
     /**
      * 
      */
@@ -71,7 +71,17 @@ public class VerifiableMarketService extends MarketService {
         super("TestableExchange", "TestableMarket", MarketSetting.builder()
                 .baseCurrencyMinimumBidPrice(Num.ONE)
                 .targetCurrencyMinimumBidSize(Num.ONE)
-                .orderBookGroupRanges(Num.of(1)));
+                .orderBookGroupRanges(Num.of(1))
+                .build());
+    }
+
+    /**
+     * 
+     */
+    public VerifiableMarketService(MarketService delegation) {
+        super(delegation.exchangeName, delegation.marketName, delegation.setting);
+
+        this.delegation = delegation;
     }
 
     /**
@@ -80,7 +90,7 @@ public class VerifiableMarketService extends MarketService {
      * @param lag
      * @return
      */
-    protected final VerifiableMarketService lag(int lag) {
+    public final VerifiableMarketService lag(int lag) {
         this.lag = Time.at(lag);
 
         return this;
@@ -92,7 +102,7 @@ public class VerifiableMarketService extends MarketService {
      * @param lag
      * @return
      */
-    protected final VerifiableMarketService lag(int start, int end) {
+    public final VerifiableMarketService lag(int start, int end) {
         this.lag = Time.lag(start, end);
 
         return this;
@@ -366,5 +376,69 @@ public class VerifiableMarketService extends MarketService {
             stopAt(o.stopPrice());
             type(o.quantityCondition());
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected long decodeId(String value, Execution previous) {
+        return delegation.decodeId(value, previous);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected String encodeId(Execution execution, Execution previous) {
+        return delegation.encodeId(execution, previous);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected ZonedDateTime decodeDate(String value, Execution previous) {
+        return delegation.decodeDate(value, previous);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected String encodeDate(Execution execution, Execution previous) {
+        return delegation.encodeDate(execution, previous);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Num decodeSize(String value, Execution previous) {
+        return delegation.decodeSize(value, previous);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected String encodeSize(Execution execution, Execution previous) {
+        return delegation.encodeSize(execution, previous);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Num decodePrice(String value, Execution previous) {
+        return delegation.decodePrice(value, previous);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected String encodePrice(Execution execution, Execution previous) {
+        return delegation.encodePrice(execution, previous);
     }
 }
