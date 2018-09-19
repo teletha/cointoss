@@ -20,6 +20,7 @@ import java.util.function.Function;
 
 import cointoss.market.MarketProvider;
 import cointoss.order.Order;
+import cointoss.order.OrderBook;
 import cointoss.order.OrderBookManager;
 import cointoss.order.OrderManager;
 import cointoss.ticker.TickerManager;
@@ -130,7 +131,10 @@ public class Market implements Disposable {
         }));
     }
 
-    void readOrderBook() {
+    /**
+     * Start reading {@link OrderBook}.
+     */
+    protected void readOrderBook() {
         // orderbook management
         service.add(service.orderBook().retryWhen(policy).to(board -> {
             orderBook.shorts.update(board.asks);

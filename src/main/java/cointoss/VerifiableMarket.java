@@ -43,6 +43,14 @@ public class VerifiableMarket extends Market {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readOrderBook() {
+        // do nothing
+    }
+
+    /**
      * Emulate execution event.
      * 
      * @param time

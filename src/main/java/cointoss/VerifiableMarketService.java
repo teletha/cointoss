@@ -383,7 +383,11 @@ public class VerifiableMarketService extends MarketService {
      */
     @Override
     protected long decodeId(String value, Execution previous) {
-        return delegation.decodeId(value, previous);
+        if (delegation == null) {
+            return super.decodeId(value, previous);
+        } else {
+            return delegation.decodeId(value, previous);
+        }
     }
 
     /**
@@ -391,7 +395,11 @@ public class VerifiableMarketService extends MarketService {
      */
     @Override
     protected String encodeId(Execution execution, Execution previous) {
-        return delegation.encodeId(execution, previous);
+        if (delegation == null) {
+            return super.encodeId(execution, previous);
+        } else {
+            return delegation.encodeId(execution, previous);
+        }
     }
 
     /**
@@ -399,7 +407,11 @@ public class VerifiableMarketService extends MarketService {
      */
     @Override
     protected ZonedDateTime decodeDate(String value, Execution previous) {
-        return delegation.decodeDate(value, previous);
+        if (delegation == null) {
+            return super.decodeDate(value, previous);
+        } else {
+            return delegation.decodeDate(value, previous);
+        }
     }
 
     /**
@@ -407,7 +419,11 @@ public class VerifiableMarketService extends MarketService {
      */
     @Override
     protected String encodeDate(Execution execution, Execution previous) {
-        return delegation.encodeDate(execution, previous);
+        if (delegation == null) {
+            return super.encodeDate(execution, previous);
+        } else {
+            return delegation.encodeDate(execution, previous);
+        }
     }
 
     /**
@@ -415,7 +431,11 @@ public class VerifiableMarketService extends MarketService {
      */
     @Override
     protected Num decodeSize(String value, Execution previous) {
-        return delegation.decodeSize(value, previous);
+        if (delegation == null) {
+            return super.decodeSize(value, previous);
+        } else {
+            return delegation.decodeSize(value, previous);
+        }
     }
 
     /**
@@ -423,7 +443,11 @@ public class VerifiableMarketService extends MarketService {
      */
     @Override
     protected String encodeSize(Execution execution, Execution previous) {
-        return delegation.encodeSize(execution, previous);
+        if (delegation == null) {
+            return super.encodeSize(execution, previous);
+        } else {
+            return delegation.encodeSize(execution, previous);
+        }
     }
 
     /**
@@ -431,7 +455,11 @@ public class VerifiableMarketService extends MarketService {
      */
     @Override
     protected Num decodePrice(String value, Execution previous) {
-        return delegation.decodePrice(value, previous);
+        if (delegation == null) {
+            return super.decodePrice(value, previous);
+        } else {
+            return delegation.decodePrice(value, previous);
+        }
     }
 
     /**
@@ -439,6 +467,10 @@ public class VerifiableMarketService extends MarketService {
      */
     @Override
     protected String encodePrice(Execution execution, Execution previous) {
-        return delegation.encodePrice(execution, previous);
+        if (delegation == null) {
+            return super.encodePrice(execution, previous);
+        } else {
+            return delegation.encodePrice(execution, previous);
+        }
     }
 }
