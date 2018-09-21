@@ -93,6 +93,17 @@ public class ChartView extends View {
     }
 
     /**
+     * Configure UI.
+     * 
+     * @param show
+     * @return
+     */
+    public ChartView showLatestPrice(boolean show) {
+        chart.canvas.showLatestPrice.set(show);
+        return this;
+    }
+
+    /**
      * @version 2018/09/08 20:10:52
      */
     private interface S extends StyleDSL {

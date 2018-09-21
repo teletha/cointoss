@@ -111,11 +111,7 @@ public class Market implements Disposable {
         initialTargetCurrency = targetCurrency.v;
 
         // build tickers for each span
-        timeline.to(tickers::update, e -> {
-
-        }, () -> {
-            System.out.println("Complete");
-        });
+        timeline.to(tickers::update);
 
         readOrderBook();
 

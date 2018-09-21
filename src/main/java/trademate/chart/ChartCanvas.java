@@ -34,6 +34,7 @@ import cointoss.ticker.Tick;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
 import kiss.I;
+import kiss.Variable;
 import stylist.Style;
 import trademate.chart.Axis.TickLable;
 import trademate.setting.Notificator;
@@ -117,6 +118,9 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
     /** Flag whether candle chart shoud layout on the next rendering phase or not. */
     public final LayoutAssistant layoutCandleLatest = new LayoutAssistant(this);
+
+    /** The chart configuration. */
+    final Variable<Boolean> showLatestPrice = Variable.of(true);
 
     /**
      * Chart canvas.

@@ -387,7 +387,7 @@ public class MarketLog {
         Stopwatch stopwatch = Stopwatch.createUnstarted();
 
         try {
-            return I.signal(memory.get(date)).effectOnObserve(() -> stopwatch.reset().start()).effectOnComplete(() -> {
+            return I.signal(memory.get(date)).effectOnObserve(() -> stopwatch.reset().start()).effectOnTerminate(() -> {
                 log.info("Process executions [{}] {}", date, stopwatch.stop().elapsed());
             });
         } catch (ExecutionException e) {

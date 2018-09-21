@@ -38,7 +38,7 @@ public class Chart extends Region {
     private final ChartView chart;
 
     /** The actual graph drawer. */
-    private final ChartCanvas canvas;
+    final ChartCanvas canvas;
 
     /** The layout manager. */
     private final LayoutAssistant layoutChart = new LayoutAssistant(this);
