@@ -16,6 +16,7 @@ import kiss.Variable;
 import stylist.Style;
 import stylist.StyleDSL;
 import viewtify.ui.UI;
+import viewtify.ui.UICheckBox;
 import viewtify.ui.UIComboBox;
 import viewtify.ui.UILabel;
 import viewtify.ui.View;
@@ -55,6 +56,8 @@ public class ChartView extends View {
     /** The candle chart. */
     private final Chart chart = new Chart(this);
 
+    protected UICheckBox latest;
+
     /**
      * {@inheritDoc}
      */
@@ -71,6 +74,7 @@ public class ChartView extends View {
                         $(selectVolume, S.Data);
                         $(selectLongVolume, S.Data);
                         $(selectShortVolume, S.Data);
+                        $(latest, S.Data);
                     });
                     $(chart);
                 });
@@ -90,6 +94,8 @@ public class ChartView extends View {
                 .combineLatest(market.observeNow().skipNull())
                 .map(e -> e.ⅱ.tickers.tickerBy(e.ⅰ))
                 .to(ticker::set);
+
+        latest.model(chart.canvas.showLatestPrice);
     }
 
     /**

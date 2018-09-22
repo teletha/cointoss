@@ -278,11 +278,15 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     private void visualizeLatestPrice() {
         TickLable latest = latestPrice.createLabel("最新値");
 
-        chart.market.observe().to(market -> {
-            market.timeline.map(e -> e.price).diff().on(Viewtify.UIThread).to(price -> {
-                latest.value.set(price.toDouble());
-                latestPrice.layoutLine.requestLayout();
+        chart.market.observe().observeWhile(showLatestPrice.observeNow()).effectOnObserve(dis -> {
+            System.out.println("Start observe");
+
+            dis.add(() -> {
+                System.out.println("dispose");
             });
+        }).switchMap(market -> market.timeline).map(e -> e.price).diff().on(Viewtify.UIThread).to(price -> {
+            latest.value.set(price.toDouble());
+            latestPrice.layoutLine.requestLayout();
         });
     }
 
