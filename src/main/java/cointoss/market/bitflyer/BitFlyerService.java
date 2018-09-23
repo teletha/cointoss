@@ -203,7 +203,7 @@ class BitFlyerService extends MarketService {
      */
     @Override
     public Signal<Integer> delay() {
-        return Signal.NEVER;
+        return Signal.never();
     }
 
     /**

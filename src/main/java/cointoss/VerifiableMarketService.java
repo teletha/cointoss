@@ -221,7 +221,7 @@ public class VerifiableMarketService extends MarketService {
      */
     @Override
     public Signal<OrderBookChange> orderBook() {
-        return Signal.NEVER;
+        return Signal.never();
     }
 
     /**

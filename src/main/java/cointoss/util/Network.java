@@ -272,7 +272,7 @@ public class Network {
 
             return rest(request, "", null);
         } else {
-            return Signal.EMPTY;
+            return Signal.empty();
         }
     }
 }
