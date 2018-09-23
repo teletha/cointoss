@@ -32,6 +32,8 @@ public class SettingView extends View<SettingView.Lang> {
 
     private UILabel appearance;
 
+    private UILabel chart;
+
     private UILabel notification;
 
     private UILabel bitflyer;
@@ -49,6 +51,7 @@ public class SettingView extends View<SettingView.Lang> {
                     $(vbox, S.CategoryPane, () -> {
                         $(general, S.CategoryLabel);
                         $(appearance, S.CategoryLabel);
+                        $(chart, S.CategoryLabel);
                         $(notification, S.CategoryLabel);
                         $(bitflyer, S.CategoryLabel);
                     });
@@ -67,6 +70,7 @@ public class SettingView extends View<SettingView.Lang> {
 
         general.when(User.MouseClick, () -> select(general, GeneralSetting.class));
         appearance.when(User.MouseClick, () -> select(appearance, AppearanceSetting.class));
+        chart.when(User.MouseClick, () -> select(appearance, ChartSetting.class));
         notification.when(User.MouseClick, () -> select(notification, NotificationSetting.class));
         bitflyer.when(User.MouseClick, () -> select(bitflyer, BitFlyerSetting.class));
     }
@@ -137,6 +141,15 @@ public class SettingView extends View<SettingView.Lang> {
          * 
          * @return
          */
+        String chart() {
+            return "Chart";
+        }
+
+        /**
+         * Category title.
+         * 
+         * @return
+         */
         String notification() {
             return "Notification";
         }
@@ -169,6 +182,14 @@ public class SettingView extends View<SettingView.Lang> {
             @Override
             String appearance() {
                 return "外観";
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            String chart() {
+                return "チャート";
             }
 
             /**

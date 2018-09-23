@@ -46,8 +46,20 @@ public class Market implements Disposable {
     /** The execution observers. */
     protected final Signaling<Execution> timelineObservers = new Signaling();
 
+    /** The order manager. */
+    public final OrderManager orders;
+
+    /** The order books. */
+    public final OrderBookManager orderBook;
+
+    /** The ticker manager. */
+    public final TickerManager tickers = new TickerManager();
+
     /** The execution time line. */
     public final Signal<Execution> timeline = timelineObservers.expose.skipComplete();
+
+    /** The execution time line with current value. */
+    public final Signal<Execution> timelineNow = timeline.startWith(tickers.latest);
 
     /** The execution time line by taker. */
     public final Signal<Execution> timelineByTaker = timeline.map(e -> {
@@ -60,15 +72,6 @@ public class Market implements Disposable {
         }
         return previous;
     }).skip(e -> e == null || e == Execution.BASE);
-
-    /** The order manager. */
-    public final OrderManager orders;
-
-    /** The order books. */
-    public final OrderBookManager orderBook;
-
-    /** The ticker manager. */
-    public final TickerManager tickers = new TickerManager();
 
     /** The position manager. */
     public final PositionManager positions;
@@ -205,6 +208,15 @@ public class Market implements Disposable {
      */
     public final List<Order> orders() {
         return service.orders().toList();
+    }
+
+    /**
+     * Shorthand accessor to the latest price.
+     * 
+     * @return
+     */
+    public final Signal<Num> latestPrice() {
+        return timelineNow.map(Execution::price).diff();
     }
 
     /**

@@ -12,6 +12,7 @@ package trademate.chart;
 import cointoss.Market;
 import cointoss.ticker.TickSpan;
 import cointoss.ticker.Ticker;
+import kiss.I;
 import kiss.Variable;
 import stylist.Style;
 import stylist.StyleDSL;
@@ -56,6 +57,9 @@ public class ChartView extends View {
     /** The candle chart. */
     private final Chart chart = new Chart(this);
 
+    /** The chart setting. */
+    private final ChartDisplaySetting setting = I.make(ChartDisplaySetting.class);
+
     protected UICheckBox latest;
 
     /**
@@ -95,18 +99,7 @@ public class ChartView extends View {
                 .map(e -> e.ⅱ.tickers.tickerBy(e.ⅰ))
                 .to(ticker::set);
 
-        latest.model(chart.canvas.showLatestPrice);
-    }
-
-    /**
-     * Configure UI.
-     * 
-     * @param show
-     * @return
-     */
-    public ChartView showLatestPrice(boolean show) {
-        chart.canvas.showLatestPrice.set(show);
-        return this;
+        latest.model(setting.showLatestPrice);
     }
 
     /**
