@@ -9,16 +9,13 @@
  */
 package trademate.chart;
 
-import kiss.Manageable;
-import kiss.Singleton;
-import kiss.Storable;
 import kiss.Variable;
+import viewtify.model.ModelHelper;
 
 /**
  * @version 2018/09/24 7:07:55
  */
-@Manageable(lifestyle = Singleton.class)
-public class ChartDisplaySetting implements Storable<ChartDisplaySetting> {
+public class ChartDisplaySetting extends ModelHelper<ChartDisplaySetting> {
 
     /** The chart configuration. */
     public final Variable<Boolean> showLatestPrice = Variable.of(true);
