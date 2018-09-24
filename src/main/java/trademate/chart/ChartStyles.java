@@ -36,6 +36,7 @@ public interface ChartStyles extends StyleDSL {
     Style MouseTrack = () -> {
         stroke.width(0.5, px).color($.rgb(80, 80, 80));
         font.color("-fx-light-text-color");
+        display.zIndex(1);
     };
 
     Style PriceSignal = () -> {
