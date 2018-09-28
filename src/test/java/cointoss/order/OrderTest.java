@@ -9,11 +9,12 @@
  */
 package cointoss.order;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-import antibug.ExpectThrow;
 import cointoss.Side;
 
 /**
@@ -56,10 +57,11 @@ public class OrderTest {
         assert attribute.id == null;
     }
 
-    @ExpectThrow(NullPointerException.class)
+    @Test
     void attributeNull() {
         Order order = Order.limitLong(1, 10);
-        order.attribute(null);
+
+        assertThrows(NullPointerException.class, () -> order.attribute(null));
     }
 
     private static class Attribute {
