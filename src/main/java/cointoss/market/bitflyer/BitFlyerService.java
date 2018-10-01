@@ -46,7 +46,7 @@ import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
 import kiss.Signaling;
-import marionette.Browser;
+import marionette.browser.Browser;
 import okhttp3.MediaType;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -491,34 +491,32 @@ class BitFlyerService extends MarketService {
             if (started == false) {
                 started = true;
 
-                try {
-                    Browser browser = new Browser().configHeadless(false).configProfile(".log/bitflyer/chrome");
-                    browser.load("https://lightning.bitflyer.jp") //
-                            .input("#LoginId", setting.loginId)
-                            .input("#Password", setting.loginPassword)
-                            .click("#login_btn");
+                Browser browser = Browser.build(pref -> {
+                    pref.profile(".log/bitflyer/chrome");
+                });
 
-                    if (browser.uri().equals("https://lightning.bitflyer.jp/Home/TwoFactorAuth")) {
-                        Viewtify.inUI(() -> {
-                            String code = new TextInputDialog().showAndWait()
-                                    .orElseThrow(() -> new IllegalArgumentException("二段階認証の確認コードが間違っています"))
-                                    .trim();
+                browser.load("https://lightning.bitflyer.jp") //
+                        .input("#LoginId", setting.loginId)
+                        .input("#Password", setting.loginPassword)
+                        .click("#login_btn");
 
-                            Viewtify.inWorker(() -> {
-                                browser.click("form > label").input("#ConfirmationCode", code).click("form > button");
-                                session = browser.cookie(sessionKey);
-                                browser.reload();
-                                browser.dispose();
-                            });
+                if (browser.uri().equals("https://lightning.bitflyer.jp/Home/TwoFactorAuth")) {
+                    Viewtify.inUI(() -> {
+                        String code = new TextInputDialog().showAndWait()
+                                .orElseThrow(() -> new IllegalArgumentException("二段階認証の確認コードが間違っています"))
+                                .trim();
+
+                        Viewtify.inWorker(() -> {
+                            browser.click("form > label").input("#ConfirmationCode", code).click("form > button");
+                            session = browser.cookie(sessionKey);
+                            browser.reload();
+                            browser.dispose();
                         });
-                    } else {
-                        session = browser.cookie(sessionKey);
-                        browser.reload();
-                        browser.dispose();
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    throw I.quiet(e);
+                    });
+                } else {
+                    session = browser.cookie(sessionKey);
+                    browser.reload();
+                    browser.dispose();
                 }
             }
         }
