@@ -25,8 +25,8 @@ public class Project extends bee.api.Project {
         require("org.apache.logging.log4j", "log4j-core", Log4j);
         require("org.apache.logging.log4j", "log4j-slf4j-impl", Log4j);
         require("org.magicwerk", "brownies-collections", "0.9.13");
-        require("com.univocity", "univocity-parsers", "2.7.2");
-        require("com.github.luben", "zstd-jni", "1.3.5-2");
+        require("com.univocity", "univocity-parsers", "2.7.6");
+        require("com.github.luben", "zstd-jni", "1.3.6-1");
         require("org.decimal4j", "decimal4j", "1.0.3");
         require("com.squareup.okhttp3", "okhttp", "3.11.0");
         require("com.github.signalr4j", "signalr4j", "2.0.3");

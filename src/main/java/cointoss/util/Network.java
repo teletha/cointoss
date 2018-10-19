@@ -205,7 +205,7 @@ public class Network {
     @SuppressWarnings("unused")
     private static class JsonRPC {
 
-        public long id;
+        public long id = 123;
 
         public String jsonrpc = "2.0";
 

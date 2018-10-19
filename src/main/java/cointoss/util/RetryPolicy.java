@@ -151,8 +151,9 @@ public final class RetryPolicy implements WiseFunction<Signal<? extends Throwabl
      */
     @Override
     public Signal<?> APPLY(Signal<? extends Throwable> error) throws Throwable {
-        return error.take(() -> ++count <= maxTimes).delay(() -> Chrono.between(minDelay, delay.apply(count), maxDelay)).effect(() -> {
-            System.out.println("Retry " + count);
+        return error.take(() -> ++count <= maxTimes).delay(() -> Chrono.between(minDelay, delay.apply(count), maxDelay)).effect(e -> {
+            System.out.println("Retry " + count + "   " + e);
+            e.printStackTrace();
         });
     }
 }
