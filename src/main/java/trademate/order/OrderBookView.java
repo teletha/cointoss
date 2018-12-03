@@ -84,6 +84,8 @@ public class OrderBookView extends View {
     @Override
     protected void initialize() {
         book = view.market().orderBook;
+        book.longs.setOperator(Viewtify.UIThread);
+        book.shorts.setOperator(Viewtify.UIThread);
 
         hideSize.values(0, Num.range(0, 99));
 

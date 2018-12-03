@@ -12,6 +12,7 @@ package cointoss.order;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -28,7 +29,7 @@ import kiss.Signaling;
 import kiss.Variable;
 
 /**
- * @version 2018/08/23 21:54:29
+ * @version 2018/12/03 19:18:59
  */
 public class OrderBook {
 
@@ -53,6 +54,11 @@ public class OrderBook {
     /** The grouped list. */
     private final List<Grouped> groups = new ArrayList();
 
+    /** The book operator thread. */
+    private Consumer<Runnable> operator = task -> {
+        task.run();
+    };
+
     /**
      * @param side
      * @param base
@@ -61,9 +67,20 @@ public class OrderBook {
     OrderBook(MarketSetting setting, Side side) {
         this.side = Objects.requireNonNull(side);
 
-        this.base = FXCollections.observableList(new UnitList());
+        this.base = FXCollections.observableList(new GapList());
         for (Num range : setting.orderBookGroupRanges()) {
-            groups.add(new Grouped(side, range, FXCollections.observableList(new UnitList()), setting));
+            groups.add(new Grouped(side, range, FXCollections.observableList(new GapList()), setting));
+        }
+    }
+
+    /**
+     * Set book operator thread.
+     * 
+     * @param operator
+     */
+    public void setOperator(Consumer<Runnable> operator) {
+        if (operator != null) {
+            this.operator = operator;
         }
     }
 
@@ -160,38 +177,40 @@ public class OrderBook {
      * @param hint A price hint.
      */
     public void fix(Num hint) {
-        if (side == Side.BUY) {
-            for (int i = 0; i < base.size();) {
-                OrderUnit unit = base.get(i);
+        operator.accept(() -> {
+            if (side == Side.BUY) {
+                for (int i = 0; i < base.size();) {
+                    OrderUnit unit = base.get(i);
 
-                if (unit != null && unit.price.isGreaterThan(hint)) {
-                    base.remove(i);
+                    if (unit != null && unit.price.isGreaterThan(hint)) {
+                        base.remove(i);
 
-                    for (Grouped grouped : groups) {
-                        grouped.update(unit.price, unit.size.negate());
-                        grouped.fixHead(hint);
+                        for (Grouped grouped : groups) {
+                            grouped.update(unit.price, unit.size.negate());
+                            grouped.fixHead(hint);
+                        }
+                    } else {
+                        break;
                     }
-                } else {
-                    break;
+                }
+            } else {
+                for (int i = base.size() - 1; 0 <= i; i--) {
+                    OrderUnit unit = base.get(i);
+
+                    if (unit != null && unit.price.isLessThan(hint)) {
+                        base.remove(i);
+
+                        for (Grouped grouped : groups) {
+                            grouped.update(unit.price, unit.size.negate());
+                            grouped.fixTail(hint);
+                        }
+                    } else {
+                        break;
+                    }
                 }
             }
-        } else {
-            for (int i = base.size() - 1; 0 <= i; i--) {
-                OrderUnit unit = base.get(i);
-
-                if (unit != null && unit.price.isLessThan(hint)) {
-                    base.remove(i);
-
-                    for (Grouped grouped : groups) {
-                        grouped.update(unit.price, unit.size.negate());
-                        grouped.fixTail(hint);
-                    }
-                } else {
-                    break;
-                }
-            }
-        }
-        modify.accept(true);
+            modify.accept(true);
+        });
     }
 
     /**
@@ -200,25 +219,27 @@ public class OrderBook {
      * @param asks
      */
     public void update(List<OrderUnit> units) {
-        if (side == Side.BUY) {
-            for (OrderUnit unit : units) {
-                head(unit);
+        operator.accept(() -> {
+            if (side == Side.BUY) {
+                for (OrderUnit unit : units) {
+                    head(unit);
+                }
+
+                if (base.isEmpty() == false) {
+                    best.set(base.get(0));
+                }
+            } else {
+                for (OrderUnit unit : units) {
+                    tail(unit);
+                }
+
+                if (base.isEmpty() == false) {
+                    best.set(base.get(base.size() - 1));
+                }
             }
 
-            if (base.isEmpty() == false) {
-                best.set(base.get(0));
-            }
-        } else {
-            for (OrderUnit unit : units) {
-                tail(unit);
-            }
-
-            if (base.isEmpty() == false) {
-                best.set(base.get(base.size() - 1));
-            }
-        }
-
-        modify.accept(true);
+            modify.accept(true);
+        });
     }
 
     // private void calculateTotal(ObservableList<OrderUnit> units) {
@@ -460,25 +481,6 @@ public class OrderBook {
 
             if (unit.price.isLessThan(price)) {
                 list.remove(list.size() - 1);
-            }
-        }
-    }
-
-    /**
-     * @version 2018/08/19 0:55:26
-     */
-    @SuppressWarnings("serial")
-    private static class UnitList extends GapList<OrderUnit> {
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public OrderUnit get(int index) {
-            try {
-                return super.get(index);
-            } catch (IndexOutOfBoundsException e) {
-                return get(index - 1);
             }
         }
     }

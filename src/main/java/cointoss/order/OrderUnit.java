@@ -14,7 +14,7 @@ import cointoss.util.Num;
 /**
  * Immutable.
  * 
- * @version 2017/11/13 22:53:25
+ * @version 2018/12/03 16:28:32
  */
 public class OrderUnit implements Comparable<OrderUnit> {
 
@@ -33,10 +33,20 @@ public class OrderUnit implements Comparable<OrderUnit> {
         this.size = size;
     }
 
+    /**
+     * For method reference.
+     * 
+     * @return
+     */
     public Num price() {
         return price;
     }
 
+    /**
+     * For method reference.
+     * 
+     * @return
+     */
     public Num size() {
         return size;
     }
