@@ -21,7 +21,6 @@ import javafx.scene.input.ScrollEvent;
 import cointoss.Side;
 import cointoss.order.Order;
 import cointoss.order.OrderState;
-import cointoss.order.QuantityCondition;
 import cointoss.util.Num;
 import kiss.Extensible;
 import kiss.I;
@@ -34,7 +33,6 @@ import trademate.order.OrderBuilder.Lang;
 import trademate.setting.Notificator;
 import viewtify.ui.UI;
 import viewtify.ui.UIButton;
-import viewtify.ui.UIComboBox;
 import viewtify.ui.UISpinner;
 import viewtify.ui.UIText;
 import viewtify.ui.View;
@@ -96,13 +94,13 @@ public class OrderBuilder extends View<Lang> {
     private UIButton orderLimitShort;
 
     /** UI */
+    private UIButton orderCancel;
+
+    /** UI */
     private UIButton orderStop;
 
     /** UI */
     private UIButton orderReverse;
-
-    /** UI */
-    private UIComboBox<QuantityCondition> orderQuantity;
 
     /** UI */
     private TradingView view;
@@ -145,10 +143,10 @@ public class OrderBuilder extends View<Lang> {
                         label("指値", S.Label);
                         $(orderLimitShort, S.FormButton, TradeShacklesStyle.Short);
                         $(orderLimitLong, S.FormButton, TradeShacklesStyle.Long);
-                        $(orderQuantity, S.FormMin);
                     });
                     $(hbox, S.Row, () -> {
                         label("決済", S.Label);
+                        $(orderCancel, S.FormButton);
                         $(orderStop, S.FormButton);
                         $(orderReverse, S.FormButton);
                     });
@@ -185,10 +183,10 @@ public class OrderBuilder extends View<Lang> {
 
         orderLimitLong.text($.buy()).when(User.MouseClick).throttle(1000, MILLISECONDS).mapTo(Side.BUY).to(this::requestOrder);
         orderLimitShort.text($.sell()).when(User.MouseClick).throttle(1000, MILLISECONDS).mapTo(Side.SELL).to(this::requestOrder);
-        orderQuantity.values(QuantityCondition.values()).initial(QuantityCondition.GoodTillCanceled);
 
-        orderStop.text($.stop()).when(User.MouseClick).to(this::stop);
-        orderReverse.text($.reverse()).when(User.MouseClick).to(this::reverse);
+        orderCancel.text($.cancel()).when(User.MouseClick).to(view.market()::cancel);
+        orderStop.text($.stop()).when(User.MouseClick).to(view.market()::stop);
+        orderReverse.text($.reverse()).when(User.MouseClick).to(view.market()::reverse);
     }
 
     /**
@@ -231,14 +229,13 @@ public class OrderBuilder extends View<Lang> {
         int divideSize = orderDivideSize.value();
         int increaseInterval = orderDivideIntervalAmount.value();
         Num priceInterval = orderPriceInterval.valueOr(Num.ZERO).multiply(side.isBuy() ? -1 : 1);
-        QuantityCondition quantity = orderQuantity.value();
 
         for (int i = 0; i < divideSize; i++) {
             Num optimizedSize = increaseInterval == 0 ? Num.ZERO
                     : Num.of(i).divide(increaseInterval).scale(0, RoundingMode.FLOOR).multiply(initSize.divide(2));
             Num optimizedPrice = view.market().orderBook.computeBestPrice(side, price, optimizeThreshold.value(), Num.of(2));
 
-            Order order = Order.limit(side, size.plus(optimizedSize), optimizedPrice).type(quantity);
+            Order order = Order.limit(side, size.plus(optimizedSize), optimizedPrice);
             order.state.set(OrderState.REQUESTING);
             order.observeTerminating().to(() -> set.sub.remove(order));
 
@@ -247,24 +244,6 @@ public class OrderBuilder extends View<Lang> {
             price = optimizedPrice.plus(priceInterval);
         }
         view.order(set);
-    }
-
-    /**
-     * Request retreat order.
-     */
-    private void stop() {
-        view.market().stop();
-    }
-
-    /**
-     * Request reverse order.
-     */
-    private void reverse() {
-        view.market().reverse();
-        // Runtime.getRuntime().gc();
-
-        Notificator notificator = I.make(Notificator.class);
-        notificator.execution.notify("(*‘ω‘ *)");
     }
 
     /**
@@ -297,7 +276,7 @@ public class OrderBuilder extends View<Lang> {
         };
 
         Style FormButton = () -> {
-            display.width(51, px).height(31, px);
+            display.width(62, px).height(31, px);
         };
     }
 
@@ -332,6 +311,10 @@ public class OrderBuilder extends View<Lang> {
 
         String buy() {
             return "Buy";
+        }
+
+        String cancel() {
+            return "Cancel";
         }
 
         String stop() {
@@ -401,6 +384,14 @@ public class OrderBuilder extends View<Lang> {
             @Override
             String buy() {
                 return "買い";
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            String cancel() {
+                return "キャンセル";
             }
 
             /**
