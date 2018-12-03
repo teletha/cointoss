@@ -180,11 +180,13 @@ public class OrderBook {
     public void fix(Num hint) {
         operator.accept(() -> {
             if (side == Side.BUY) {
-                for (int i = 0; i < base.size();) {
-                    OrderUnit unit = base.get(i);
+                ListIterator<OrderUnit> iterator = base.listIterator();
+
+                while (iterator.hasNext()) {
+                    OrderUnit unit = iterator.next();
 
                     if (unit != null && unit.price.isGreaterThan(hint)) {
-                        base.remove(i);
+                        iterator.remove();
 
                         for (Grouped grouped : groups) {
                             grouped.update(unit.price, unit.size.negate());
@@ -195,11 +197,13 @@ public class OrderBook {
                     }
                 }
             } else {
-                for (int i = base.size() - 1; 0 <= i; i--) {
-                    OrderUnit unit = base.get(i);
+                ListIterator<OrderUnit> iterator = base.listIterator(base.size());
+
+                while (iterator.hasPrevious()) {
+                    OrderUnit unit = iterator.previous();
 
                     if (unit != null && unit.price.isLessThan(hint)) {
-                        base.remove(i);
+                        iterator.remove();
 
                         for (Grouped grouped : groups) {
                             grouped.update(unit.price, unit.size.negate());
