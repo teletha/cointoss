@@ -9,7 +9,7 @@
  */
 package trademate.order;
 
-import static trademate.TradeMateStyle.*;
+import static trademate.TradeShacklesStyle.*;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;

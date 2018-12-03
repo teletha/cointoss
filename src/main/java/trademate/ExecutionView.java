@@ -9,7 +9,7 @@
  */
 package trademate;
 
-import static trademate.TradeMateStyle.*;
+import static trademate.TradeShacklesStyle.*;
 
 import java.util.stream.IntStream;
 

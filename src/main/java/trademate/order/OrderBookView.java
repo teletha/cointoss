@@ -9,7 +9,7 @@
  */
 package trademate.order;
 
-import static trademate.TradeMateStyle.*;
+import static trademate.TradeShacklesStyle.*;
 
 import javafx.scene.control.ListCell;
 import javafx.scene.paint.Color;

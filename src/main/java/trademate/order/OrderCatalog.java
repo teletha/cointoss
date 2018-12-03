@@ -10,7 +10,7 @@
 package trademate.order;
 
 import static cointoss.order.OrderState.*;
-import static trademate.TradeMateStyle.*;
+import static trademate.TradeShacklesStyle.*;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
