@@ -9,8 +9,8 @@
  */
 package trademate.order;
 
-import static cointoss.order.OrderState.*;
-import static trademate.TradeShacklesStyle.*;
+import static cointoss.order.OrderState.ACTIVE;
+import static trademate.TradeShacklesStyle.Side;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -23,6 +23,7 @@ import cointoss.order.Order;
 import cointoss.order.OrderState;
 import cointoss.util.Num;
 import kiss.Extensible;
+import kiss.Signal;
 import kiss.Variable;
 import stylist.Style;
 import stylist.StyleDSL;
@@ -168,12 +169,15 @@ public class OrderCatalog extends View<Lang> {
      */
     private class CatalogRow extends TreeTableRow<Object> {
 
-        private final Calculation<stylist.Style> orderState = Viewtify.calculate(itemProperty()).flatVariable(o -> {
+        private final Signal<Style> orderStateStyle = Viewtify.signalNow(itemProperty()).flatVariable(o -> {
+            System.out.println(o);
             if (o instanceof Order) {
                 return ((Order) o).state;
             } else {
                 return Variable.of(OrderState.ACTIVE);
             }
+        }).as(OrderState.class).effect(s -> {
+            System.out.println(s);
         }).map(S.State::of);
 
         /** The enhanced ui. */
@@ -183,7 +187,7 @@ public class OrderCatalog extends View<Lang> {
          * 
          */
         private CatalogRow() {
-            ui.styleOnly(orderState);
+            ui.styleOnly(orderStateStyle);
         }
     }
 
