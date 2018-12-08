@@ -35,6 +35,15 @@ interface MarketSettingData {
     Num targetCurrencyMinimumBidSize();
 
     /**
+     * Get the bid size range of target currency.
+     */
+    default List<Num> targetCurrencyBidSizes() {
+        Num base = targetCurrencyMinimumBidSize();
+
+        return List.of(base, base.multiply(10), base.multiply(100), base.multiply(1000));
+    }
+
+    /**
      * Get the price range of grouped order books.
      */
     Num[] orderBookGroupRanges();

@@ -163,7 +163,7 @@ public class OrderBuilder extends View<Lang> {
         orderSize.initial("0").when(User.Scroll, changeBy(orderSizeAmount.ui)).require(positiveNumber).when(User.MiddleClick, e -> {
             orderSize.value(view.market().positions.size.toString());
         });
-        orderSizeAmount.values(3, Num.of("0.001"), Num.of("0.01"), Num.of("0.1"), Num.ONE);
+        orderSizeAmount.values(0, view.service.setting.targetCurrencyBidSizes());
 
         orderPrice.initial("0").when(User.Scroll, changeBy(orderPriceAmount.ui)).require(positiveNumber);
         orderPriceAmount.values(0, Num.ONE, Num.HUNDRED, Num.THOUSAND, Num.of(10000));
