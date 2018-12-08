@@ -90,6 +90,15 @@ public class Order implements Directional {
     }
 
     /**
+     * For method reference.
+     * 
+     * @return
+     */
+    public final Variable<OrderState> state() {
+        return state;
+    }
+
+    /**
      * Retrieve the {@link QuantityCondition} of this {@link Order}.
      * 
      * @return A {@link QuantityCondition}.

@@ -9,7 +9,9 @@
  */
 package cointoss.order;
 
-import static cointoss.order.OrderState.*;
+import static cointoss.order.OrderState.ACTIVE;
+import static cointoss.order.OrderState.CANCELED;
+import static cointoss.order.OrderState.REQUESTING;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
@@ -109,9 +111,7 @@ public final class OrderManager {
     public Signal<Order> request(Order order) {
         order.state.set(REQUESTING);
 
-        return service.request(order).effectOnError(e -> {
-            e.printStackTrace();
-        }).retryWhen(policy).map(id -> {
+        return service.request(order).retryWhen(policy).map(id -> {
             order.id.let(id);
             order.created.set(ZonedDateTime.now());
             order.state.set(ACTIVE);

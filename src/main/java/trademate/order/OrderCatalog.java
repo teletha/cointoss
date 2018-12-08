@@ -23,7 +23,6 @@ import cointoss.order.Order;
 import cointoss.order.OrderState;
 import cointoss.util.Num;
 import kiss.Extensible;
-import kiss.Signal;
 import kiss.Variable;
 import stylist.Style;
 import stylist.StyleDSL;
@@ -40,7 +39,7 @@ import viewtify.ui.UserInterface;
 import viewtify.ui.View;
 
 /**
- * @version 2018/08/30 16:54:37
+ * @version 2018/12/08 14:55:08
  */
 public class OrderCatalog extends View<Lang> {
 
@@ -165,20 +164,9 @@ public class OrderCatalog extends View<Lang> {
     }
 
     /**
-     * @version 2017/12/04 14:32:07
+     * @version 2018/12/08 14:55:02
      */
     private class CatalogRow extends TreeTableRow<Object> {
-
-        private final Signal<Style> orderStateStyle = Viewtify.signalNow(itemProperty()).flatVariable(o -> {
-            System.out.println(o);
-            if (o instanceof Order) {
-                return ((Order) o).state;
-            } else {
-                return Variable.of(OrderState.ACTIVE);
-            }
-        }).as(OrderState.class).effect(s -> {
-            System.out.println(s);
-        }).map(S.State::of);
 
         /** The enhanced ui. */
         private final UserInterface ui = Viewtify.wrap(this, OrderCatalog.this);
@@ -187,7 +175,7 @@ public class OrderCatalog extends View<Lang> {
          * 
          */
         private CatalogRow() {
-            ui.styleOnly(orderStateStyle);
+            ui.styleOnly(Viewtify.signalNow(itemProperty()).as(Order.class).switchVariable(Order::state).map(S.State::of));
         }
     }
 
