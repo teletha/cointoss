@@ -9,7 +9,7 @@
  */
 package trademate.order;
 
-import static java.util.concurrent.TimeUnit.*;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import java.math.RoundingMode;
 import java.util.function.Predicate;
@@ -206,7 +206,7 @@ public class OrderBuilder extends View<Lang> {
                 ui.value(current.plus(spinner.getValue()).toString());
             } else if (deltaY < 0) {
                 // decrement
-                ui.value(current.minus(spinner.getValue()).toString());
+                ui.value(Num.max(Num.ZERO, current.minus(spinner.getValue())).toString());
             }
         };
     }
