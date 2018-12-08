@@ -9,6 +9,9 @@
  */
 package cointoss.market.bitflyer;
 
+import static cointoss.order.OrderState.ACTIVE;
+import static cointoss.order.OrderState.REQUESTING;
+
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -163,7 +166,9 @@ class BitFlyerService extends MarketService {
                     .map(e -> e.data.get("order_ref_id"));
         }
 
-        return call.effect(v -> {
+        return call.effectAfter(() -> {
+            order.state.set(REQUESTING);
+        }).effect(v -> {
             // register order id
             orders.add(v);
             order.observeTerminating().to(() -> orders.remove(v));
@@ -174,6 +179,7 @@ class BitFlyerService extends MarketService {
                     .skipError()
                     .take(1)
                     .to(o -> {
+                        order.state.set(ACTIVE);
                         order.attribute(Internals.class).id = o.attribute(Internals.class).id;
                     });
         });
