@@ -15,11 +15,11 @@ import cointoss.order.Order;
 import kiss.I;
 import trademate.chart.ChartView;
 import trademate.console.Console;
+import trademate.info.TradeInfomationView;
 import trademate.order.OrderBookView;
 import trademate.order.OrderBuilder;
 import trademate.order.OrderCatalog;
 import trademate.order.OrderSet;
-import trademate.order.PositionCatalog;
 import trademate.setting.Notificator;
 import viewtify.Viewtify;
 import viewtify.ui.UI;
@@ -44,7 +44,7 @@ public class TradingView extends View {
 
     public OrderCatalog orders;
 
-    public PositionCatalog positions;
+    public TradeInfomationView positions;
 
     public ChartView chart;
 

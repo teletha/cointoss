@@ -110,6 +110,19 @@ public final class PositionManager implements Directional {
     }
 
     /**
+     * Add {@link Position} manually.
+     * 
+     * @param position
+     */
+    public void add(Position position) {
+        if (position != null) {
+            positions.add(position);
+            addition.accept(position);
+            calculate();
+        }
+    }
+
+    /**
      * <p>
      * Update position by the specified my execution.
      * </p>

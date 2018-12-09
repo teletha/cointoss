@@ -7,12 +7,7 @@
  *
  *          https://opensource.org/licenses/MIT
  */
-package trademate.order;
-
-import static trademate.TradeShacklesStyle.*;
-
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
+package trademate.info;
 
 import cointoss.Position;
 import cointoss.PositionManager;
@@ -24,38 +19,29 @@ import kiss.Extensible;
 import stylist.Style;
 import stylist.StyleDSL;
 import trademate.TradingView;
-import trademate.order.PositionCatalog.Lang;
-import viewtify.Viewtify;
+import trademate.info.TradeInfomationView.Lang;
 import viewtify.ui.UI;
-import viewtify.ui.UITableColumn;
-import viewtify.ui.UITableView;
+import viewtify.ui.UIButton;
+import viewtify.ui.UILabel;
 import viewtify.ui.View;
+import viewtify.ui.helper.User;
 
 /**
  * @version 2018/09/08 18:33:32
  */
-public class PositionCatalog extends View<Lang> {
-
-    /** The date formatter. */
-    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd HH:mm:ss");
+public class TradeInfomationView extends View<Lang> {
 
     /** UI */
-    private UITableView<Position> table;
+    private UILabel positionSize;
 
     /** UI */
-    private UITableColumn<Position, ZonedDateTime> date;
+    private UILabel positionPrice;
 
     /** UI */
-    private UITableColumn<Position, Side> side;
+    private UILabel positionProfit;
 
     /** UI */
-    private UITableColumn<Position, Num> amount;
-
-    /** UI */
-    private UITableColumn<Position, Num> price;
-
-    /** UI */
-    private UITableColumn<Position, Num> profit;
+    private UIButton add;
 
     /** Parent View */
     private TradingView view;
@@ -67,12 +53,20 @@ public class PositionCatalog extends View<Lang> {
     protected UI declareUI() {
         return new UI() {
             {
-                $(table, S.Root, () -> {
-                    $(date, S.Wide);
-                    $(side, S.Narrow);
-                    $(price, S.Wide);
-                    $(amount, S.Normal);
-                    $(profit, S.Normal);
+                $(vbox, S.Root, () -> {
+                    $(hbox, S.Row, () -> {
+                        label("数量", S.Label);
+                        $(positionSize, S.Normal);
+                    });
+                    $(hbox, S.Row, () -> {
+                        label("価格", S.Label);
+                        $(positionPrice, S.Normal);
+                    });
+                    $(hbox, S.Row, () -> {
+                        label("損益", S.Label);
+                        $(positionProfit, S.Normal);
+                    });
+                    $(add);
                 });
             }
         };
@@ -85,15 +79,18 @@ public class PositionCatalog extends View<Lang> {
     protected void initialize() {
         PositionManager manager = view.market().positions;
 
-        date.header($.date()).model(o -> o.date).render((ui, item) -> ui.text(formatter.format(item)));
-        side.header($.side()).model(o -> o.side).render((ui, side) -> ui.text(side).styleOnly(Side.of(side)));
-        price.model(o -> o.price).header($.price(), manager.price);
-        amount.modelByVar(o -> o.size).header($.amount(), manager.size);
-        profit.modelByVar(o -> o.profit).header($.profit(), manager.profit);
+        positionSize.text(manager.size);
+        positionPrice.text(manager.price);
+        positionProfit.text(manager.profit);
 
-        table.ui.setItems(Viewtify.observe(manager.items, manager.added, manager.removed));
-        table.selectMultipleRows().context($ -> {
-            $.menu("撤退").whenUserClick(() -> table.selection().forEach(this::retreat));
+        add.text("ADD").when(User.Action).to(() -> {
+            Position position = new Position();
+            position.price = Num.of(10000);
+            position.size.set(Num.of(1));
+            position.side = Side.BUY;
+            System.out.println("add position");
+
+            manager.add(position);
         });
     }
 
@@ -117,6 +114,16 @@ public class PositionCatalog extends View<Lang> {
         Style Root = () -> {
             display.width(525, px);
             text.unselectable();
+        };
+
+        Style Row = () -> {
+            padding.top(8, px);
+            text.verticalAlign.middle();
+        };
+
+        Style Label = () -> {
+            display.width(60, px);
+            display.height(27, px);
         };
 
         Style Wide = () -> {
