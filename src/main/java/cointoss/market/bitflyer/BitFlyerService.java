@@ -9,8 +9,7 @@
  */
 package cointoss.market.bitflyer;
 
-import static cointoss.order.OrderState.ACTIVE;
-import static cointoss.order.OrderState.REQUESTING;
+import static cointoss.order.OrderState.*;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -81,7 +80,7 @@ class BitFlyerService extends MarketService {
     private static final int MAX = 499;
 
     /** The api url. */
-    static final String api = "https://api.bitflyer.jp";
+    static final String api = "https://api.bitflyer.com";
 
     /** The order management. */
     private final Set<String> orders = ConcurrentHashMap.newKeySet();
