@@ -10,16 +10,12 @@
 package cointoss;
 
 import static java.nio.charset.StandardCharsets.*;
-import static java.nio.file.Files.*;
 import static java.nio.file.StandardOpenOption.*;
 import static java.util.concurrent.TimeUnit.*;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
@@ -60,9 +56,11 @@ import cointoss.util.Network;
 import cointoss.util.Num;
 import cointoss.util.RetryPolicy;
 import cointoss.util.Span;
-import filer.Filer;
 import kiss.I;
 import kiss.Signal;
+import psychopath.Directory;
+import psychopath.File;
+import psychopath.Locator;
 
 /**
  * Log Manager.
@@ -149,7 +147,7 @@ public class MarketLog {
     private final MarketService service;
 
     /** The root directory of logs. */
-    private final Path root;
+    private final Directory root;
 
     /** In-memory cache. */
     private final LoadingCache<ZonedDateTime, List<Execution>> memory = CacheBuilder.newBuilder()
@@ -192,7 +190,7 @@ public class MarketLog {
      * @param provider
      */
     public MarketLog(MarketService service) {
-        this(service, Paths.get(".log").resolve(service.exchangeName).resolve(service.marketName));
+        this(service, Locator.directory(".log").directory(service.exchangeName).directory(service.marketName));
     }
 
     /**
@@ -201,7 +199,7 @@ public class MarketLog {
      * @param service A market service.
      * @param root A log store directory.
      */
-    MarketLog(MarketService service, Path root) {
+    MarketLog(MarketService service, Directory root) {
         this.service = Objects.requireNonNull(service);
         this.root = Objects.requireNonNull(root);
 
@@ -209,8 +207,8 @@ public class MarketLog {
             ZonedDateTime start = null;
             ZonedDateTime end = null;
 
-            for (Path file : Filer.walk(root, "execution*.*og").toList()) {
-                String name = file.getFileName().toString();
+            for (File file : root.walkFiles("execution*.*og").toList()) {
+                String name = file.name();
                 ZonedDateTime date = LocalDate.parse(name.substring(9, 17), fileName).atTime(0, 0, 0, 0).atZone(Chrono.UTC);
 
                 if (start == null || end == null) {
@@ -494,8 +492,8 @@ public class MarketLog {
      * @param date A date time.
      * @return A file location.
      */
-    final Path locateLog(TemporalAccessor date) {
-        return root.resolve("execution" + Chrono.DateCompact.format(date) + ".log");
+    final File locateLog(TemporalAccessor date) {
+        return root.file("execution" + Chrono.DateCompact.format(date) + ".log");
     }
 
     /**
@@ -504,8 +502,8 @@ public class MarketLog {
      * @param date A date time.
      * @return A file location.
      */
-    final Path locateCompactLog(TemporalAccessor date) {
-        return root.resolve("execution" + Chrono.DateCompact.format(date) + ".clog");
+    final File locateCompactLog(TemporalAccessor date) {
+        return root.file("execution" + Chrono.DateCompact.format(date) + ".clog");
     }
 
     /**
@@ -517,10 +515,10 @@ public class MarketLog {
         private final LocalDate date;
 
         /** The log file. */
-        private final Path normal;
+        private final File normal;
 
         /** The compact log file. */
-        private final Path compact;
+        private final File compact;
 
         /** The log writing task. */
         private ScheduledFuture task = NOOP;
@@ -577,21 +575,21 @@ public class MarketLog {
                 setting.getFormat().setComment('無');
 
                 CsvParser parser = new CsvParser(setting);
-                if (Files.exists(compact)) {
+                if (compact.isPresent()) {
                     // read compact
-                    return I.signal(parser.iterate(new ZstdInputStream(newInputStream(compact)), ISO_8859_1))
+                    return I.signal(parser.iterate(new ZstdInputStream(compact.newInputStream()), ISO_8859_1))
                             .scanWith(Execution.BASE, service::decode)
                             .effectOnComplete(parser::stopParsing)
                             .effectOnObserve(stopwatch::start)
                             .effectOnComplete(() -> {
                                 log.info("Read compact log [{}] {}", date, stopwatch.stop().elapsed());
                             });
-                } else if (Files.notExists(normal)) {
+                } else if (normal.isAbsent()) {
                     // no data
                     return download();
                 } else {
                     // read normal
-                    Signal<Execution> signal = I.signal(parser.iterate(newInputStream(normal), ISO_8859_1))
+                    Signal<Execution> signal = I.signal(parser.iterate(normal.newInputStream(), ISO_8859_1))
                             .map(Execution::new)
                             .effectOnComplete(parser::stopParsing)
                             .effectOnObserve(stopwatch::start)
@@ -634,7 +632,7 @@ public class MarketLog {
             }
 
             // write normal log
-            try (FileChannel channel = FileChannel.open(normal, CREATE, APPEND)) {
+            try (FileChannel channel = FileChannel.open(normal.asJavaPath(), CREATE, APPEND)) {
                 channel.write(ByteBuffer.wrap(text.toString().getBytes(ISO_8859_1)));
 
                 log.info("Write log until " + remaining.peekLast().date + " at " + service + ".");
@@ -647,9 +645,9 @@ public class MarketLog {
          * Convert normal log to compact log asynchronously.
          */
         private void compact() {
-            if (Files.notExists(compact) && (!queue.isEmpty() || Files.exists(normal))) {
+            if (compact.isAbsent() && (!queue.isEmpty() || normal.isPresent())) {
                 I.schedule(5, SECONDS, true, () -> {
-                    compact(read()).effectOnComplete(() -> Filer.delete(normal)).to(I.NoOP);
+                    compact(read()).effectOnComplete(() -> normal.delete()).to(I.NoOP);
                 });
             }
         }
@@ -659,12 +657,12 @@ public class MarketLog {
          */
         Signal<Execution> compact(Signal<Execution> executions) {
             try {
-                Files.createDirectories(compact.getParent());
+                compact.parent().create();
 
                 CsvWriterSettings setting = new CsvWriterSettings();
                 setting.getFormat().setDelimiter(' ');
                 setting.getFormat().setComment('無');
-                CsvWriter writer = new CsvWriter(new ZstdOutputStream(newOutputStream(compact), 1), ISO_8859_1, setting);
+                CsvWriter writer = new CsvWriter(new ZstdOutputStream(compact.newOutputStream(), 1), ISO_8859_1, setting);
 
                 return executions.maps(Execution.BASE, (prev, e) -> {
                     writer.writeRow(service.encode(prev, e));

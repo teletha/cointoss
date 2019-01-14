@@ -12,8 +12,6 @@ package cointoss;
 import static cointoss.MarketTestSupport.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.time.ZonedDateTime;
 import java.util.List;
 
@@ -23,6 +21,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import antibug.CleanRoom;
 import cointoss.util.Chrono;
 import kiss.I;
+import psychopath.Locator;
 
 /**
  * @version 2018/05/26 10:37:10
@@ -36,7 +35,7 @@ class MarketLogTest {
 
     MarketService service = market.service;
 
-    MarketLog log = new MarketLog(service, room.root);
+    MarketLog log = new MarketLog(service, Locator.directory(room.root));
 
     @Test
     void logAtNoServicedDate() {
@@ -81,12 +80,7 @@ class MarketLogTest {
      */
     private List<Execution> writeExecutionLog(ZonedDateTime date) {
         List<Execution> list = executionRandomly(10).toList();
-
-        try {
-            Files.write(log.locateLog(date), I.signal(list).map(Execution::toString).toList());
-        } catch (IOException e) {
-            throw I.quiet(e);
-        }
+        log.locateLog(date).text(I.signal(list).map(Execution::toString).toList());
         return list;
     }
 
