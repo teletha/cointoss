@@ -207,7 +207,7 @@ public class MarketLog {
             ZonedDateTime start = null;
             ZonedDateTime end = null;
 
-            for (File file : root.walkFiles("execution*.*og").toList()) {
+            for (File file : root.walkFile("execution*.*og").toList()) {
                 String name = file.name();
                 ZonedDateTime date = LocalDate.parse(name.substring(9, 17), fileName).atTime(0, 0, 0, 0).atZone(Chrono.UTC);
 
