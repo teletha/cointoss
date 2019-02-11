@@ -91,7 +91,7 @@ public class BackTestView extends View<Message> {
         });
 
         endDate.initial(Chrono.utcNow()).uneditable().require(() -> {
-            assert startDate.isBeforeOrSame(endDate) : I.i18n(Message::endDateMustBeAfterStartDate);
+            assert startDate.isBeforeOrSame(endDate) : I.i18n(Message.class).endDateMustBeAfterStartDate();
         });
 
         // Market market = new Market(BitFlyer.BTC_JPY).readLog(log -> log.at(2018, 1, 17));
