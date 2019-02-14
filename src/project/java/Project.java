@@ -12,7 +12,7 @@ public class Project extends bee.api.Project {
     String Log4j = "2.11.1";
 
     {
-        product("cointoss", "CoinToss", "1.0");
+        product("cointoss", "cointoss", "1.0");
 
         require("com.github.teletha", "sinobu", "1.0");
         require("com.github.teletha", "viewtify", "1.0");
@@ -29,5 +29,7 @@ public class Project extends bee.api.Project {
         require("com.squareup.okhttp3", "okhttp", "3.12.0");
         require("com.github.signalr4j", "signalr4j", "2.0.3");
         require("org.immutables", "value", "2.6.3").atProvided();
+
+        versionControlSystem("https://github.com/teletha/cointoss");
     }
 }
