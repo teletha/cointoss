@@ -9,7 +9,7 @@
  */
 package trademate.order;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.math.RoundingMode;
 import java.util.function.Predicate;
@@ -179,7 +179,7 @@ public class OrderBuilder extends View<Lang> {
         orderPriceIntervalAmount.values(0, Num.TEN, Num.HUNDRED, Num.THOUSAND);
 
         // validate order condition
-        orderLimitLong.parent().disableWhen(orderSize.isInvalid().or(orderPrice.isInvalid()));
+        orderLimitLong.parent().disableWhen(orderSize.isInvalid(), orderPrice.isInvalid());
 
         orderLimitLong.text($.buy()).when(User.MouseClick).throttle(1000, MILLISECONDS).mapTo(Side.BUY).to(this::requestOrder);
         orderLimitShort.text($.sell()).when(User.MouseClick).throttle(1000, MILLISECONDS).mapTo(Side.SELL).to(this::requestOrder);
