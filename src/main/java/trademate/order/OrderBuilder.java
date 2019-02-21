@@ -27,7 +27,7 @@ import kiss.I;
 import kiss.WiseBiConsumer;
 import stylist.Style;
 import stylist.StyleDSL;
-import trademate.TradeShacklesStyle;
+import trademate.TradeMateStyle;
 import trademate.TradingView;
 import trademate.order.OrderBuilder.Lang;
 import trademate.setting.Notificator;
@@ -141,8 +141,8 @@ public class OrderBuilder extends View<Lang> {
                     });
                     $(hbox, S.Row, () -> {
                         label("指値", S.Label);
-                        $(orderLimitShort, S.FormButton, TradeShacklesStyle.Short);
-                        $(orderLimitLong, S.FormButton, TradeShacklesStyle.Long);
+                        $(orderLimitShort, S.FormButton, TradeMateStyle.Short);
+                        $(orderLimitLong, S.FormButton, TradeMateStyle.Long);
                     });
                     $(hbox, S.Row, () -> {
                         label("決済", S.Label);

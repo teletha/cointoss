@@ -19,7 +19,7 @@ import kiss.Extensible;
 import kiss.I;
 import kiss.Storable;
 import kiss.Variable;
-import trademate.TradeShackles;
+import trademate.TradeMate;
 import viewtify.Viewtify;
 
 /**
@@ -100,7 +100,7 @@ public class Notificator implements Storable<Notificator> {
                             .position(desktopPosition.v.position)
                             .hideAfter(Duration.seconds(desktopDuration.v.getSeconds()))
                             .text(message)
-                            .owner(I.make(TradeShackles.class).screen())
+                            .owner(I.make(TradeMate.class).screen())
                             .show();
                 });
             }

@@ -27,7 +27,7 @@ import viewtify.ui.View;
  * @version 2018/09/16 8:43:30
  */
 @Manageable(lifestyle = Singleton.class)
-public class TradeShackles extends View {
+public class TradeMate extends View {
 
     private UITabPane main;
 
@@ -66,6 +66,6 @@ public class TradeShackles extends View {
         Thread.setDefaultUncaughtExceptionHandler((t, e) -> log.error(e.getMessage(), e));
 
         // activate application
-        Viewtify.application().use(Theme.Dark).icon("icon/app.png").onTerminating(Network::terminate).activate(TradeShackles.class);
+        Viewtify.application().use(Theme.Dark).icon("icon/app.png").onTerminating(Network::terminate).activate(TradeMate.class);
     }
 }
