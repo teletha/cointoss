@@ -16,11 +16,13 @@ import kiss.Extensible;
 import kiss.I;
 import kiss.Manageable;
 import kiss.Singleton;
+import viewtify.translator.Text;
 import viewtify.ui.UI;
 import viewtify.ui.UICheckBox;
 import viewtify.ui.UIPassword;
 import viewtify.ui.UIText;
 import viewtify.ui.View;
+import viewtify.ui.helper.User;
 
 /**
  * @version 2018/09/06 23:46:18
@@ -29,7 +31,7 @@ import viewtify.ui.View;
 public class BitFlyerSetting extends View {
 
     /** The locale resource. */
-    private final Lang $ = I.i18n(Lang.class);
+    private final Message $ = I.i18n(Message.class);
 
     /** The account info. */
     private final BitFlyerAccount account = I.make(BitFlyerAccount.class);
@@ -56,7 +58,7 @@ public class BitFlyerSetting extends View {
                 $(vbox, Root, () -> {
                     $(vbox, Block, () -> {
                         label("BitFlyer", Heading);
-                        label($.publicAPIDescription(), Description);
+                        label(T.publicAPIDescription, Description);
                         $(hbox, FormRow, () -> {
                             label("API Key", FormLabel);
                             $(apiKey, FormInput);
@@ -66,9 +68,9 @@ public class BitFlyerSetting extends View {
                             $(apiSecret, FormInput);
                         });
 
-                        label($.privateAPITitle(), Heading);
-                        label($.privateAPIDescription(), Description);
-                        label($.privateAPIWarning(), Description, Warning);
+                        label(T.privateAPITitle, Heading);
+                        label(T.privateAPIDescription, Description);
+                        label(T.privateAPIWarning, Description, Warning);
                         $(hbox, FormRow, () -> {
                             label("Login ID", FormLabel);
                             $(loginId, FormInput);
@@ -101,6 +103,62 @@ public class BitFlyerSetting extends View {
         loginId.model(account.loginId);
         loginPassword.model(account.loginPassword);
         accountId.model(account.accountId);
+
+        loginBackground.when(User.Action).to(() -> {
+            viewtify.translator.Lang.change();
+        });
+    }
+
+    interface T {
+        Text publicAPIDescription = () -> {
+            switch (lang()) {
+            case JP:
+                return "[BitFlyer](https://lightning.bitflyer.jp/developer)の提供する公開APIを利用するためにAPIキーとAPIシークレットを取得してください。";
+
+            default:
+                return "Please get API key and API secret to use the public API provided by [BitFlyer](https://lightning.bitflyer.jp/developer).";
+            }
+        };
+
+        Text privateAPITitle = () -> {
+            switch (lang()) {
+            case JP:
+                return "非公開APIの利用";
+
+            default:
+                return "Usage of Private API";
+            }
+        };
+
+        Text privateAPIDescription = () -> {
+            switch (lang()) {
+            case JP:
+                return "非公開APIを利用して取引の高速化を図ります。\r\nブラウザを使用して自動でログインを行いアカウント固有のIDやセッション情報を取得します。";
+
+            default:
+                return "We will try to speed up trading by using private API.\r\nTradeMate acquires the account specific infomation(e.g. session id) by logging in automatically.";
+            }
+        };
+
+        Text privateAPIWarning = () -> {
+            switch (lang()) {
+            case JP:
+                return "注意 : この設定を行うとあなたのアカウントに対する全ての操作を許可することになります。";
+
+            default:
+                return "WARNING : This setting will allow all operations on your account.";
+            }
+        };
+
+        Text loginExplicitly = () -> {
+            switch (lang()) {
+            case JP:
+                return "ログイン画面を表示";
+
+            default:
+                return "Login explicitly";
+            }
+        };
     }
 
     /**
@@ -108,7 +166,7 @@ public class BitFlyerSetting extends View {
      */
     @SuppressWarnings("unused")
     @Manageable(lifestyle = Singleton.class)
-    static class Lang implements Extensible {
+    static class Message implements Extensible {
 
         /**
          * Label for API key
@@ -153,7 +211,7 @@ public class BitFlyerSetting extends View {
         /**
          * @version 2018/08/29 3:53:49
          */
-        private static class Lang_ja extends Lang {
+        private static class Message_ja extends Message {
 
             /**
              * {@inheritDoc}
