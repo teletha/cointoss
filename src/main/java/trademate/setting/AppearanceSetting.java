@@ -16,7 +16,6 @@ import kiss.I;
 import kiss.Manageable;
 import kiss.Singleton;
 import trademate.Theme;
-import trademate.setting.AppearanceSetting.Lang;
 import viewtify.ui.UI;
 import viewtify.ui.UIColorPicker;
 import viewtify.ui.View;
@@ -25,7 +24,10 @@ import viewtify.ui.View;
  * @version 2018/09/10 20:28:10
  */
 @Manageable(lifestyle = Singleton.class)
-public class AppearanceSetting extends View<Lang> {
+public class AppearanceSetting extends View {
+
+    /** The locale resource. */
+    private final Lang $ = I.i18n(Lang.class);
 
     private Theme theme = I.make(Theme.class);
 

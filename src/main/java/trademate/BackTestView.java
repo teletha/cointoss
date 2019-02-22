@@ -24,7 +24,6 @@ import kiss.Extensible;
 import kiss.I;
 import kiss.Manageable;
 import kiss.Singleton;
-import trademate.BackTestView.Message;
 import trademate.chart.ChartView;
 import viewtify.Viewtify;
 import viewtify.ui.UI;
@@ -37,7 +36,10 @@ import viewtify.ui.helper.User;
 /**
  * @version 2018/08/30 3:16:28
  */
-public class BackTestView extends View<Message> {
+public class BackTestView extends View {
+
+    /** The locale resource. */
+    private final Lang $ = I.i18n(Lang.class);
 
     private UIComboBox<MarketService> market;
 
@@ -91,7 +93,7 @@ public class BackTestView extends View<Message> {
         });
 
         endDate.initial(Chrono.utcNow()).uneditable().require(() -> {
-            assert startDate.isBeforeOrSame(endDate) : I.i18n(Message.class).endDateMustBeAfterStartDate();
+            assert startDate.isBeforeOrSame(endDate) : $.endDateMustBeAfterStartDate();
         });
 
         // Market market = new Market(BitFlyer.BTC_JPY).readLog(log -> log.at(2018, 1, 17));
@@ -115,7 +117,7 @@ public class BackTestView extends View<Message> {
      */
     @SuppressWarnings("unused")
     @Manageable(lifestyle = Singleton.class)
-    static class Message implements Extensible {
+    static class Lang implements Extensible {
 
         /**
          * Label for start button.
@@ -167,7 +169,7 @@ public class BackTestView extends View<Message> {
          * 
          * @version 2018/08/03 17:06:23
          */
-        private static class Message_ja extends Message {
+        private static class Lang_ja extends Lang {
 
             /**
              * {@inheritDoc}

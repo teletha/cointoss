@@ -12,6 +12,7 @@ package trademate.setting;
 import java.util.List;
 
 import kiss.Extensible;
+import kiss.I;
 import kiss.Manageable;
 import kiss.Singleton;
 import stylist.Style;
@@ -26,7 +27,10 @@ import viewtify.ui.helper.User;
  * @version 2018/08/29 3:51:53
  */
 @Manageable(lifestyle = Singleton.class)
-public class SettingView extends View<SettingView.Lang> {
+public class SettingView extends View {
+
+    /** The locale resource. */
+    private final Lang $ = I.i18n(Lang.class);
 
     private UILabel general;
 
@@ -68,11 +72,11 @@ public class SettingView extends View<SettingView.Lang> {
     protected void initialize() {
         select(notification, NotificationSetting.class);
 
-        general.when(User.MouseClick, () -> select(general, GeneralSetting.class));
-        appearance.when(User.MouseClick, () -> select(appearance, AppearanceSetting.class));
-        chart.when(User.MouseClick, () -> select(appearance, ChartSetting.class));
-        notification.when(User.MouseClick, () -> select(notification, NotificationSetting.class));
-        bitflyer.when(User.MouseClick, () -> select(bitflyer, BitFlyerSetting.class));
+        general.text($::general).when(User.MouseClick, () -> select(general, GeneralSetting.class));
+        appearance.text($::appearance).when(User.MouseClick, () -> select(appearance, AppearanceSetting.class));
+        chart.text($::chart).when(User.MouseClick, () -> select(appearance, ChartSetting.class));
+        notification.text($::notification).when(User.MouseClick, () -> select(notification, NotificationSetting.class));
+        bitflyer.text($::bitflyer).when(User.MouseClick, () -> select(bitflyer, BitFlyerSetting.class));
     }
 
     private void select(UILabel selected, Class<? extends View> view) {

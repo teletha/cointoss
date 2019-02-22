@@ -15,13 +15,12 @@ import java.math.RoundingMode;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
 
-import javafx.scene.control.Spinner;
-import javafx.scene.input.ScrollEvent;
-
 import cointoss.Side;
 import cointoss.order.Order;
 import cointoss.order.OrderState;
 import cointoss.util.Num;
+import javafx.scene.control.Spinner;
+import javafx.scene.input.ScrollEvent;
 import kiss.Extensible;
 import kiss.I;
 import kiss.WiseBiConsumer;
@@ -29,7 +28,6 @@ import stylist.Style;
 import stylist.StyleDSL;
 import trademate.TradeMateStyle;
 import trademate.TradingView;
-import trademate.order.OrderBuilder.Lang;
 import trademate.setting.Notificator;
 import viewtify.ui.UI;
 import viewtify.ui.UIButton;
@@ -41,7 +39,10 @@ import viewtify.ui.helper.User;
 /**
  * @version 2018/02/07 17:11:55
  */
-public class OrderBuilder extends View<Lang> {
+public class OrderBuilder extends View {
+
+    /** The locale resource. */
+    private final Lang $ = I.i18n(Lang.class);
 
     private Predicate<UIText> positiveNumber = ui -> {
         try {

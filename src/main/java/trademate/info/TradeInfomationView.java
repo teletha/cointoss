@@ -16,10 +16,10 @@ import cointoss.order.Order;
 import cointoss.order.OrderBook;
 import cointoss.util.Num;
 import kiss.Extensible;
+import kiss.I;
 import stylist.Style;
 import stylist.StyleDSL;
 import trademate.TradingView;
-import trademate.info.TradeInfomationView.Lang;
 import viewtify.ui.UI;
 import viewtify.ui.UIButton;
 import viewtify.ui.UILabel;
@@ -29,7 +29,10 @@ import viewtify.ui.helper.User;
 /**
  * @version 2018/09/08 18:33:32
  */
-public class TradeInfomationView extends View<Lang> {
+public class TradeInfomationView extends View {
+
+    /** The locale resource. */
+    private final Lang $ = I.i18n(Lang.class);
 
     /** UI */
     private UILabel positionSize;

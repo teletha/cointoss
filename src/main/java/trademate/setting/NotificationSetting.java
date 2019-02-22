@@ -18,7 +18,6 @@ import kiss.Extensible;
 import kiss.I;
 import kiss.Manageable;
 import kiss.Singleton;
-import trademate.setting.NotificationSetting.Lang;
 import trademate.setting.Notificator.DesktopPosition;
 import trademate.setting.Notificator.Notify;
 import viewtify.ui.UI;
@@ -35,7 +34,10 @@ import viewtify.util.Icon;
  * @version 2018/08/29 23:25:09
  */
 @Manageable(lifestyle = Singleton.class)
-public class NotificationSetting extends View<Lang> {
+public class NotificationSetting extends View {
+
+    /** The locale resource. */
+    private final Lang $ = I.i18n(Lang.class);
 
     /** The notificator. */
     private final Notificator notificator = I.make(Notificator.class);
@@ -137,7 +139,7 @@ public class NotificationSetting extends View<Lang> {
     /**
      * @version 2018/08/30 9:54:57
      */
-    private class NotifySetting extends View<Lang> {
+    private class NotifySetting extends View {
 
         private final Notify notify;
 

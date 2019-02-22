@@ -16,7 +16,6 @@ import kiss.Extensible;
 import kiss.I;
 import kiss.Manageable;
 import kiss.Singleton;
-import trademate.setting.BitFlyerSetting.Lang;
 import viewtify.ui.UI;
 import viewtify.ui.UICheckBox;
 import viewtify.ui.UIPassword;
@@ -27,7 +26,10 @@ import viewtify.ui.View;
  * @version 2018/09/06 23:46:18
  */
 @Manageable(lifestyle = Singleton.class)
-public class BitFlyerSetting extends View<Lang> {
+public class BitFlyerSetting extends View {
+
+    /** The locale resource. */
+    private final Lang $ = I.i18n(Lang.class);
 
     /** The account info. */
     private final BitFlyerAccount account = I.make(BitFlyerAccount.class);

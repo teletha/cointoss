@@ -9,26 +9,25 @@
  */
 package trademate.order;
 
-import static cointoss.order.OrderState.ACTIVE;
-import static trademate.TradeMateStyle.Side;
+import static cointoss.order.OrderState.*;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.function.Consumer;
 
-import javafx.scene.control.TreeTableRow;
-
 import cointoss.Side;
 import cointoss.order.Order;
 import cointoss.order.OrderState;
 import cointoss.util.Num;
+import javafx.scene.control.TreeTableRow;
 import kiss.Extensible;
+import kiss.I;
 import kiss.Variable;
 import stylist.Style;
 import stylist.StyleDSL;
 import stylist.ValueStyle;
+import trademate.TradeMateStyle;
 import trademate.TradingView;
-import trademate.order.OrderCatalog.Lang;
 import viewtify.Viewtify;
 import viewtify.bind.Calculation;
 import viewtify.ui.UI;
@@ -41,10 +40,13 @@ import viewtify.ui.View;
 /**
  * @version 2018/12/08 14:55:08
  */
-public class OrderCatalog extends View<Lang> {
+public class OrderCatalog extends View {
 
     /** The date formatter. */
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd HH:mm:ss");
+
+    /** The locale resource. */
+    private final Lang $ = I.i18n(Lang.class);
 
     /** UI */
     private UITreeTableView<Object> table;
@@ -99,7 +101,7 @@ public class OrderCatalog extends View<Lang> {
         side.header($.side())
                 .modelByProperty(OrderSet.class, o -> o.side)
                 .model(Order.class, Order::side)
-                .render((ui, side) -> ui.text(side).styleOnly(Side.of(side)));
+                .render((ui, side) -> ui.text(side).styleOnly(TradeMateStyle.Side.of(side)));
         amount.header($.amount()).modelByProperty(OrderSet.class, o -> o.amount).model(Order.class, o -> o.remainingSize);
         price.header($.price()).modelByProperty(OrderSet.class, o -> o.averagePrice).model(Order.class, o -> o.price.v);
     }
