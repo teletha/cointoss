@@ -11,13 +11,12 @@ package trademate.setting;
 
 import java.util.List;
 
-import kiss.Extensible;
-import kiss.I;
 import kiss.Manageable;
 import kiss.Singleton;
 import stylist.Style;
 import stylist.StyleDSL;
-import viewtify.translator.Text;
+import viewtify.localize.Lang;
+import viewtify.localize.Text;
 import viewtify.ui.UI;
 import viewtify.ui.UILabel;
 import viewtify.ui.UIPane;
@@ -29,9 +28,6 @@ import viewtify.ui.helper.User;
  */
 @Manageable(lifestyle = Singleton.class)
 public class SettingView extends View {
-
-    /** The locale resource. */
-    private final Message $ = I.i18n(Message.class);
 
     private UILabel general;
 
@@ -53,12 +49,12 @@ public class SettingView extends View {
         return new UI() {
             {
                 $(hbox, () -> {
-                    $(vbox, S.CategoryPane, () -> {
-                        $(general, S.CategoryLabel);
-                        $(appearance, S.CategoryLabel);
-                        $(chart, S.CategoryLabel);
-                        $(notification, S.CategoryLabel);
-                        $(bitflyer, S.CategoryLabel);
+                    $(vbox, $.CategoryPane, () -> {
+                        $(general, $.CategoryLabel);
+                        $(appearance, $.CategoryLabel);
+                        $(chart, $.CategoryLabel);
+                        $(notification, $.CategoryLabel);
+                        $(bitflyer, $.CategoryLabel);
                     });
                     $(setting);
                 });
@@ -73,28 +69,28 @@ public class SettingView extends View {
     protected void initialize() {
         select(notification, NotificationSetting.class);
 
-        general.text(T.general).when(User.MouseClick, () -> select(general, GeneralSetting.class));
-        appearance.text(T.appearance).when(User.MouseClick, () -> select(appearance, AppearanceSetting.class));
-        chart.text(T.chart).when(User.MouseClick, () -> select(appearance, ChartSetting.class));
-        notification.text(T.notification).when(User.MouseClick, () -> select(notification, NotificationSetting.class));
-        bitflyer.text(T.bitflyer).when(User.MouseClick, () -> select(bitflyer, BitFlyerSetting.class));
+        general.text($.General).when(User.MouseClick, () -> select(general, GeneralSetting.class));
+        appearance.text($.Appearance).when(User.MouseClick, () -> select(appearance, AppearanceSetting.class));
+        chart.text($.Chart).when(User.MouseClick, () -> select(appearance, ChartSetting.class));
+        notification.text($.Notification).when(User.MouseClick, () -> select(notification, NotificationSetting.class));
+        bitflyer.text($.Bitflyer).when(User.MouseClick, () -> select(bitflyer, BitFlyerSetting.class));
     }
 
     private void select(UILabel selected, Class<? extends View> view) {
         for (UILabel label : List.of(general, appearance, notification, bitflyer)) {
             if (label == selected) {
-                label.style(S.Selected);
+                label.style($.Selected);
             } else {
-                label.unstyle(S.Selected);
+                label.unstyle($.Selected);
             }
         }
         setting.set(view);
     }
 
     /**
-     * @version 2018/09/10 9:53:37
+     * Resource definition.
      */
-    interface S extends StyleDSL {
+    interface $ extends StyleDSL {
 
         Style CategoryPane = () -> {
             padding.top(40, px);
@@ -115,143 +111,14 @@ public class SettingView extends View {
             background.color("derive(-fx-base, 6%)");
         };
 
-    }
+        Text General = Text.of("General").set(Lang.JA, "一般");
 
-    /**
-     * 
-     */
-    interface T {
+        Text Appearance = Text.of("Appearance").set(Lang.JA, "外観");
 
-        Text general = () -> {
-            switch (lang()) {
-            case JP:
-                return "一般";
+        Text Chart = Text.of("Chart").set(Lang.JA, "チャート");
 
-            default:
-                return "General";
-            }
-        };
+        Text Notification = Text.of("Notification").set(Lang.JA, "通知");
 
-        Text appearance = () -> {
-            switch (lang()) {
-            case JP:
-                return "外観";
-
-            default:
-                return "Appearance";
-            }
-        };
-
-        Text chart = () -> {
-            switch (lang()) {
-            case JP:
-                return "チャート";
-
-            default:
-                return "Chart";
-            }
-        };
-
-        Text notification = () -> {
-            switch (lang()) {
-            case JP:
-                return "通知";
-
-            default:
-                return "Notification";
-            }
-        };
-
-        Text bitflyer = () -> "Bitflyer";
-    }
-
-    /**
-     * @version 2018/09/10 20:14:06
-     */
-    @SuppressWarnings("unused")
-    @Manageable(lifestyle = Singleton.class)
-    static class Message implements Extensible {
-        /**
-         * Category title.
-         * 
-         * @return
-         */
-        String general() {
-            return "General";
-        }
-
-        /**
-         * Category title.
-         * 
-         * @return
-         */
-        String appearance() {
-            return "Appearance";
-        }
-
-        /**
-         * Category title.
-         * 
-         * @return
-         */
-        String chart() {
-            return "Chart";
-        }
-
-        /**
-         * Category title.
-         * 
-         * @return
-         */
-        String notification() {
-            return "Notification";
-        }
-
-        /**
-         * Category title.
-         * 
-         * @return
-         */
-        String bitflyer() {
-            return "BitFlyer";
-        }
-
-        /**
-         * @version 2018/08/29 3:53:49
-         */
-        private static class Lang_ja extends Message {
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            String general() {
-                return "一般";
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            String appearance() {
-                return "外観";
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            String chart() {
-                return "チャート";
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            String notification() {
-                return "通知";
-            }
-        }
+        Text Bitflyer = Text.of("Bitflyer");
     }
 }

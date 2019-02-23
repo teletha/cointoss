@@ -16,7 +16,8 @@ import kiss.Extensible;
 import kiss.I;
 import kiss.Manageable;
 import kiss.Singleton;
-import viewtify.translator.Text;
+import viewtify.localize.Lang;
+import viewtify.localize.Text;
 import viewtify.ui.UI;
 import viewtify.ui.UICheckBox;
 import viewtify.ui.UIPassword;
@@ -29,9 +30,6 @@ import viewtify.ui.helper.User;
  */
 @Manageable(lifestyle = Singleton.class)
 public class BitFlyerSetting extends View {
-
-    /** The locale resource. */
-    private final Message $ = I.i18n(Message.class);
 
     /** The account info. */
     private final BitFlyerAccount account = I.make(BitFlyerAccount.class);
@@ -54,11 +52,26 @@ public class BitFlyerSetting extends View {
     @Override
     protected UI declareUI() {
         return new UI() {
+            Text PublicAPIDescription = Text
+                    .of("Please get API key and API secret to use the public API provided by [BitFlyer](https://lightning.bitflyer.jp/developer).")
+                    .set(Lang.JA, "[BitFlyer](https://lightning.bitflyer.jp/developer)の提供する公開APIを利用するためにAPIキーとAPIシークレットを取得してください。");
+
+            Text PrivateAPITitle = Text.of("Usage of Private API").set(Lang.JA, "非公開APIの利用");
+
+            Text PrivateAPIDescription = Text
+                    .of("We will try to speed up trading by using private API.\nTradeMate acquires the account specific infomation(e.g. session id) by logging in automatically.")
+                    .set(Lang.JA, "非公開APIを利用して取引の高速化を図ります。\nブラウザを使用して自動でログインを行いアカウント固有のIDやセッション情報を取得します。");
+
+            Text PrivateAPIWarning = Text.of("WARNING : This setting will allow all operations on your account.")
+                    .set(Lang.JA, "注意 : この設定を行うとあなたのアカウントに対する全ての操作を許可することになります。");
+
+            Text LoginExplicitly = Text.of("Login explicitly").set(Lang.JA, "ログイン画面を表示");
+
             {
                 $(vbox, Root, () -> {
                     $(vbox, Block, () -> {
                         label("BitFlyer", Heading);
-                        label(T.publicAPIDescription, Description);
+                        label(PublicAPIDescription, Description);
                         $(hbox, FormRow, () -> {
                             label("API Key", FormLabel);
                             $(apiKey, FormInput);
@@ -68,9 +81,9 @@ public class BitFlyerSetting extends View {
                             $(apiSecret, FormInput);
                         });
 
-                        label(T.privateAPITitle, Heading);
-                        label(T.privateAPIDescription, Description);
-                        label(T.privateAPIWarning, Description, Warning);
+                        label(PrivateAPITitle, Heading);
+                        label(PrivateAPIDescription, Description);
+                        label(PrivateAPIWarning, Description, Warning);
                         $(hbox, FormRow, () -> {
                             label("Login ID", FormLabel);
                             $(loginId, FormInput);
@@ -84,7 +97,7 @@ public class BitFlyerSetting extends View {
                             $(accountId, FormInput);
                         });
                         $(hbox, FormRow, () -> {
-                            label($.loginExplicitly(), FormLabel);
+                            label(LoginExplicitly, FormLabel);
                             $(loginBackground, FormInput);
                         });
                     });
@@ -105,60 +118,8 @@ public class BitFlyerSetting extends View {
         accountId.model(account.accountId);
 
         loginBackground.when(User.Action).to(() -> {
-            viewtify.translator.Lang.change();
+            viewtify.localize.Lang.change();
         });
-    }
-
-    interface T {
-        Text publicAPIDescription = () -> {
-            switch (lang()) {
-            case JP:
-                return "[BitFlyer](https://lightning.bitflyer.jp/developer)の提供する公開APIを利用するためにAPIキーとAPIシークレットを取得してください。";
-
-            default:
-                return "Please get API key and API secret to use the public API provided by [BitFlyer](https://lightning.bitflyer.jp/developer).";
-            }
-        };
-
-        Text privateAPITitle = () -> {
-            switch (lang()) {
-            case JP:
-                return "非公開APIの利用";
-
-            default:
-                return "Usage of Private API";
-            }
-        };
-
-        Text privateAPIDescription = () -> {
-            switch (lang()) {
-            case JP:
-                return "非公開APIを利用して取引の高速化を図ります。\r\nブラウザを使用して自動でログインを行いアカウント固有のIDやセッション情報を取得します。";
-
-            default:
-                return "We will try to speed up trading by using private API.\r\nTradeMate acquires the account specific infomation(e.g. session id) by logging in automatically.";
-            }
-        };
-
-        Text privateAPIWarning = () -> {
-            switch (lang()) {
-            case JP:
-                return "注意 : この設定を行うとあなたのアカウントに対する全ての操作を許可することになります。";
-
-            default:
-                return "WARNING : This setting will allow all operations on your account.";
-            }
-        };
-
-        Text loginExplicitly = () -> {
-            switch (lang()) {
-            case JP:
-                return "ログイン画面を表示";
-
-            default:
-                return "Login explicitly";
-            }
-        };
     }
 
     /**
