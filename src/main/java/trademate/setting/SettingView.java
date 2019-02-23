@@ -16,6 +16,7 @@ import kiss.Singleton;
 import stylist.Style;
 import stylist.StyleDSL;
 import viewtify.localize.Lang;
+import viewtify.localize.Localizer;
 import viewtify.localize.Text;
 import viewtify.ui.UI;
 import viewtify.ui.UILabel;
@@ -120,5 +121,9 @@ public class SettingView extends View {
         Text Notification = Text.of("Notification").set(Lang.JA, "通知");
 
         Text Bitflyer = Text.of("Bitflyer");
+    }
+
+    public static void main(String[] args) {
+        new Localizer().addAllClassesIn(SettingStyles.class).localize();
     }
 }
