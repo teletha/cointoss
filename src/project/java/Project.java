@@ -22,11 +22,11 @@ public class Project extends bee.api.Project {
         require("commons-codec", "commons-codec", "1.11");
         require("org.apache.logging.log4j", "log4j-core", Log4j);
         require("org.apache.logging.log4j", "log4j-slf4j-impl", Log4j);
-        require("org.magicwerk", "brownies-collections", "0.9.13");
-        require("com.univocity", "univocity-parsers", "2.7.6");
-        require("com.github.luben", "zstd-jni", "1.3.7-2");
+        require("org.magicwerk", "brownies-collections", "LATEST");
+        require("com.univocity", "univocity-parsers", "LATEST");
+        require("com.github.luben", "zstd-jni", "LATEST");
         require("org.decimal4j", "decimal4j", "1.0.3");
-        require("com.squareup.okhttp3", "okhttp", "3.12.0");
+        require("com.squareup.okhttp3", "okhttp", "LATEST");
         require("com.github.signalr4j", "signalr4j", "2.0.3");
         require("org.immutables", "value", "2.6.3").atProvided();
 
