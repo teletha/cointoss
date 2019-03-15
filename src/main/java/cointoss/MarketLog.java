@@ -646,7 +646,7 @@ public class MarketLog {
          */
         private void compact() {
             if (compact.isAbsent() && (!queue.isEmpty() || normal.isPresent())) {
-                I.schedule(5, SECONDS, I.parallel, () -> {
+                I.schedule(5, SECONDS, I.scheduler, () -> {
                     compact(read()).effectOnComplete(() -> normal.delete()).to(I.NoOP);
                 });
             }
