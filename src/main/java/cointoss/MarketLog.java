@@ -259,7 +259,8 @@ public class MarketLog {
     public final synchronized Signal<Execution> from(ZonedDateTime start) {
         ZonedDateTime startDay = Chrono.between(cacheFirst, start, cacheLast).truncatedTo(ChronoUnit.DAYS);
 
-        return I.signal(startDay, day -> day.plusDays(1))
+        return I.signal(startDay)
+                .recurse(day -> day.plusDays(1))
                 .takeWhile(day -> day.isBefore(cacheLast) || day.isEqual(cacheLast))
                 .flatMap(day -> new Cache(day).read())
                 .effect(e -> cacheId = e.id)
@@ -453,7 +454,7 @@ public class MarketLog {
      * @return
      */
     public final Signal<Execution> range(ZonedDateTime start, ZonedDateTime end) {
-        return I.signal(start, day -> day.plusDays(1)).takeUntil(day -> day.isEqual(end)).flatMap(day -> at(day));
+        return I.signal(start).recurse(day -> day.plusDays(1)).takeUntil(day -> day.isEqual(end)).flatMap(day -> at(day));
     }
 
     /**
@@ -472,7 +473,8 @@ public class MarketLog {
      * @return
      */
     final Signal<Cache> caches() {
-        return I.signal(cacheFirst, day -> day.plusDays(1))
+        return I.signal(cacheFirst)
+                .recurse(day -> day.plusDays(1))
                 .takeWhile(day -> day.isBefore(cacheLast) || day.isEqual(cacheLast))
                 .map(Cache::new);
     }
@@ -680,7 +682,7 @@ public class MarketLog {
 
         VerifiableMarket market = new VerifiableMarket(BitFlyer.FX_BTC_JPY);
 
-        Signal<LocalDate> range = I.signal(start, day -> day.plusDays(1)).takeUntil(day -> day.isEqual(end));
+        Signal<LocalDate> range = I.signal(start).recurse(day -> day.plusDays(1)).takeUntil(day -> day.isEqual(end));
 
         market.readLog(log -> range.flatMap(day -> log.at(day)));
         market.readLog(log -> range.flatMap(day -> log.at(day)));

@@ -31,7 +31,7 @@ class SegmentBufferTest {
     @Test
     void addCompleted() {
         SegmentBuffer<Long> buffer = new SegmentBuffer(100000);
-        buffer.addCompleted(date, I.signalRange(0, 100000));
+        buffer.addCompleted(date, I.signal(0L).recurse(v -> v + 1).take(100000));
 
         assert buffer.size() == 100000;
         for (int i = 0; i < 100000; i++) {
@@ -145,7 +145,7 @@ class SegmentBufferTest {
     @Test
     void addUncompleted() {
         SegmentBuffer<Long> buffer = new SegmentBuffer(100000);
-        buffer.add(I.signalRange(0, 100000));
+        buffer.add(I.signal(0L).recurse(v -> v + 1).take(100000));
 
         assert buffer.size() == 100000;
         for (int i = 0; i < 100000; i++) {
@@ -156,7 +156,7 @@ class SegmentBufferTest {
     @Test
     void addUncompletedOverflow() {
         SegmentBuffer<Long> buffer = new SegmentBuffer<>(10000, e -> LocalDate.now().plusDays(e / 10000));
-        buffer.add(I.signalRange(0, 100000));
+        buffer.add(I.signal(0L).recurse(v -> v + 1).take(100000));
 
         assert buffer.size() == 100000;
         for (int i = 0; i < 100000; i++) {

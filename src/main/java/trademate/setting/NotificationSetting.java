@@ -120,7 +120,7 @@ public class NotificationSetting extends View {
     @Override
     protected void initialize() {
         // For Desktop
-        desktopDuration.values(I.signalRange(2, 30, 2).map(Duration::ofSeconds))
+        desktopDuration.values(I.signal(2).recurse(v -> v + 2).take(30).map(Duration::ofSeconds))
                 .model(notificator.desktopDuration)
                 .text($::desktopDuration);
         desktopPosition.values(DesktopPosition.class).model(notificator.desktopPosition);
