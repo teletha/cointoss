@@ -17,6 +17,7 @@ import java.util.Objects;
 import java.util.stream.IntStream;
 
 import cointoss.Directional;
+import cointoss.Trader;
 import kiss.Decoder;
 import kiss.Encoder;
 import kiss.I;
@@ -30,7 +31,7 @@ public class Num implements Comparable<Num> {
 
     // initialize
     static {
-        I.load(Codec.class, false);
+        I.load(Trader.class);
     }
 
     /** The base context. */
@@ -83,8 +84,8 @@ public class Num implements Comparable<Num> {
     }
 
     /**
-     * Returns a {@code Decimal} whose value is {@code (this + augend)}, with rounding according to the
-     * context settings.
+     * Returns a {@code Decimal} whose value is {@code (this + augend)}, with rounding according to
+     * the context settings.
      * 
      * @param augend value to be added to this {@code Decimal}.
      * @return {@code this + augend}, rounded as necessary
@@ -95,8 +96,8 @@ public class Num implements Comparable<Num> {
     }
 
     /**
-     * Returns a {@code Decimal} whose value is {@code (this + augend)}, with rounding according to the
-     * context settings.
+     * Returns a {@code Decimal} whose value is {@code (this + augend)}, with rounding according to
+     * the context settings.
      * 
      * @param augend value to be added to this {@code Decimal}.
      * @return {@code this + augend}, rounded as necessary
@@ -107,8 +108,8 @@ public class Num implements Comparable<Num> {
     }
 
     /**
-     * Returns a {@code Decimal} whose value is {@code (this + augend)}, with rounding according to the
-     * context settings.
+     * Returns a {@code Decimal} whose value is {@code (this + augend)}, with rounding according to
+     * the context settings.
      * 
      * @param augend value to be added to this {@code Decimal}.
      * @return {@code this + augend}, rounded as necessary
@@ -119,8 +120,8 @@ public class Num implements Comparable<Num> {
     }
 
     /**
-     * Returns a {@code Decimal} whose value is {@code (this + augend)}, with rounding according to the
-     * context settings.
+     * Returns a {@code Decimal} whose value is {@code (this + augend)}, with rounding according to
+     * the context settings.
      * 
      * @param augend value to be added to this {@code Decimal}.
      * @return {@code this + augend}, rounded as necessary
@@ -131,8 +132,8 @@ public class Num implements Comparable<Num> {
     }
 
     /**
-     * Returns a {@code Decimal} whose value is {@code (this + augend)}, with rounding according to the
-     * context settings.
+     * Returns a {@code Decimal} whose value is {@code (this + augend)}, with rounding according to
+     * the context settings.
      * 
      * @param augend value to be added to this {@code Decimal}.
      * @return {@code this + augend}, rounded as necessary
@@ -143,8 +144,8 @@ public class Num implements Comparable<Num> {
     }
 
     /**
-     * Returns a {@code Decimal} whose value is {@code (this + augend)}, with rounding according to the
-     * context settings.
+     * Returns a {@code Decimal} whose value is {@code (this + augend)}, with rounding according to
+     * the context settings.
      * 
      * @param augend value to be added to this {@code Decimal}.
      * @return {@code this + augend}, rounded as necessary
@@ -155,8 +156,8 @@ public class Num implements Comparable<Num> {
     }
 
     /**
-     * Returns a {@code Decimal} whose value is {@code (this - augend)}, with rounding according to the
-     * context settings.
+     * Returns a {@code Decimal} whose value is {@code (this - augend)}, with rounding according to
+     * the context settings.
      * 
      * @param subtrahend value to be subtracted from this {@code Decimal}.
      * @return {@code this - subtrahend}, rounded as necessary
@@ -167,8 +168,8 @@ public class Num implements Comparable<Num> {
     }
 
     /**
-     * Returns a {@code Decimal} whose value is {@code (this - augend)}, with rounding according to the
-     * context settings.
+     * Returns a {@code Decimal} whose value is {@code (this - augend)}, with rounding according to
+     * the context settings.
      * 
      * @param subtrahend value to be subtracted from this {@code Decimal}.
      * @return {@code this - subtrahend}, rounded as necessary
@@ -179,8 +180,8 @@ public class Num implements Comparable<Num> {
     }
 
     /**
-     * Returns a {@code Decimal} whose value is {@code (this - augend)}, with rounding according to the
-     * context settings.
+     * Returns a {@code Decimal} whose value is {@code (this - augend)}, with rounding according to
+     * the context settings.
      * 
      * @param subtrahend value to be subtracted from this {@code Decimal}.
      * @return {@code this - subtrahend}, rounded as necessary
@@ -191,8 +192,8 @@ public class Num implements Comparable<Num> {
     }
 
     /**
-     * Returns a {@code Decimal} whose value is {@code (this - augend)}, with rounding according to the
-     * context settings.
+     * Returns a {@code Decimal} whose value is {@code (this - augend)}, with rounding according to
+     * the context settings.
      * 
      * @param subtrahend value to be subtracted from this {@code Decimal}.
      * @return {@code this - subtrahend}, rounded as necessary
@@ -203,8 +204,8 @@ public class Num implements Comparable<Num> {
     }
 
     /**
-     * Returns a {@code Decimal} whose value is {@code (this - augend)}, with rounding according to the
-     * context settings.
+     * Returns a {@code Decimal} whose value is {@code (this - augend)}, with rounding according to
+     * the context settings.
      * 
      * @param subtrahend value to be subtracted from this {@code Decimal}.
      * @return {@code this - subtrahend}, rounded as necessary
@@ -215,8 +216,8 @@ public class Num implements Comparable<Num> {
     }
 
     /**
-     * Returns a {@code Decimal} whose value is {@code (this - augend)}, with rounding according to the
-     * context settings.
+     * Returns a {@code Decimal} whose value is {@code (this - augend)}, with rounding according to
+     * the context settings.
      * 
      * @param subtrahend value to be subtracted from this {@code Decimal}.
      * @return {@code this - subtrahend}, rounded as necessary
@@ -227,8 +228,8 @@ public class Num implements Comparable<Num> {
     }
 
     /**
-     * Returns a {@code Decimal} whose value is {@code this * multiplicand}, with rounding according to
-     * the context settings.
+     * Returns a {@code Decimal} whose value is {@code this * multiplicand}, with rounding according
+     * to the context settings.
      * 
      * @param multiplicand value to be multiplied by this {@code Decimal}.
      * @return {@code this * multiplicand}, rounded as necessary
@@ -239,8 +240,8 @@ public class Num implements Comparable<Num> {
     }
 
     /**
-     * Returns a {@code Decimal} whose value is {@code this * multiplicand}, with rounding according to
-     * the context settings.
+     * Returns a {@code Decimal} whose value is {@code this * multiplicand}, with rounding according
+     * to the context settings.
      * 
      * @param multiplicand value to be multiplied by this {@code Decimal}.
      * @return {@code this * multiplicand}, rounded as necessary
@@ -251,8 +252,8 @@ public class Num implements Comparable<Num> {
     }
 
     /**
-     * Returns a {@code Decimal} whose value is {@code this * multiplicand}, with rounding according to
-     * the context settings.
+     * Returns a {@code Decimal} whose value is {@code this * multiplicand}, with rounding according
+     * to the context settings.
      * 
      * @param multiplicand value to be multiplied by this {@code Decimal}.
      * @return {@code this * multiplicand}, rounded as necessary
@@ -263,8 +264,8 @@ public class Num implements Comparable<Num> {
     }
 
     /**
-     * Returns a {@code Decimal} whose value is {@code this * multiplicand}, with rounding according to
-     * the context settings.
+     * Returns a {@code Decimal} whose value is {@code this * multiplicand}, with rounding according
+     * to the context settings.
      * 
      * @param multiplicand value to be multiplied by this {@code Decimal}.
      * @return {@code this * multiplicand}, rounded as necessary
@@ -275,8 +276,8 @@ public class Num implements Comparable<Num> {
     }
 
     /**
-     * Returns a {@code Decimal} whose value is {@code this * multiplicand}, with rounding according to
-     * the context settings.
+     * Returns a {@code Decimal} whose value is {@code this * multiplicand}, with rounding according
+     * to the context settings.
      * 
      * @param multiplicand value to be multiplied by this {@code Decimal}.
      * @return {@code this * multiplicand}, rounded as necessary
@@ -287,8 +288,8 @@ public class Num implements Comparable<Num> {
     }
 
     /**
-     * Returns a {@code Decimal} whose value is {@code this * multiplicand}, with rounding according to
-     * the context settings.
+     * Returns a {@code Decimal} whose value is {@code this * multiplicand}, with rounding according
+     * to the context settings.
      * 
      * @param multiplicand value to be multiplied by this {@code Decimal}.
      * @return {@code this * multiplicand}, rounded as necessary
@@ -299,8 +300,8 @@ public class Num implements Comparable<Num> {
     }
 
     /**
-     * Returns a {@code Decimal} whose value is {@code (this / divisor)}, with rounding according to the
-     * context settings.
+     * Returns a {@code Decimal} whose value is {@code (this / divisor)}, with rounding according to
+     * the context settings.
      * 
      * @param divisor value by which this {@code Decimal} is to be divided.
      * @return {@code this / divisor}, rounded as necessary
@@ -311,8 +312,8 @@ public class Num implements Comparable<Num> {
     }
 
     /**
-     * Returns a {@code Decimal} whose value is {@code (this / divisor)}, with rounding according to the
-     * context settings.
+     * Returns a {@code Decimal} whose value is {@code (this / divisor)}, with rounding according to
+     * the context settings.
      * 
      * @param divisor value by which this {@code Decimal} is to be divided.
      * @return {@code this / divisor}, rounded as necessary
@@ -323,8 +324,8 @@ public class Num implements Comparable<Num> {
     }
 
     /**
-     * Returns a {@code Decimal} whose value is {@code (this / divisor)}, with rounding according to the
-     * context settings.
+     * Returns a {@code Decimal} whose value is {@code (this / divisor)}, with rounding according to
+     * the context settings.
      * 
      * @param divisor value by which this {@code Decimal} is to be divided.
      * @return {@code this / divisor}, rounded as necessary
@@ -335,8 +336,8 @@ public class Num implements Comparable<Num> {
     }
 
     /**
-     * Returns a {@code Decimal} whose value is {@code (this / divisor)}, with rounding according to the
-     * context settings.
+     * Returns a {@code Decimal} whose value is {@code (this / divisor)}, with rounding according to
+     * the context settings.
      * 
      * @param divisor value by which this {@code Decimal} is to be divided.
      * @return {@code this / divisor}, rounded as necessary
@@ -347,8 +348,8 @@ public class Num implements Comparable<Num> {
     }
 
     /**
-     * Returns a {@code Decimal} whose value is {@code (this / divisor)}, with rounding according to the
-     * context settings.
+     * Returns a {@code Decimal} whose value is {@code (this / divisor)}, with rounding according to
+     * the context settings.
      * 
      * @param divisor value by which this {@code Decimal} is to be divided.
      * @return {@code this / divisor}, rounded as necessary
@@ -359,8 +360,8 @@ public class Num implements Comparable<Num> {
     }
 
     /**
-     * Returns a {@code Decimal} whose value is {@code (this / divisor)}, with rounding according to the
-     * context settings.
+     * Returns a {@code Decimal} whose value is {@code (this / divisor)}, with rounding according to
+     * the context settings.
      * 
      * @param divisor value by which this {@code Decimal} is to be divided.
      * @return {@code this / divisor}, rounded as necessary
@@ -371,8 +372,8 @@ public class Num implements Comparable<Num> {
     }
 
     /**
-     * Returns a {@code Decimal} whose value is {@code (this % divisor)}, with rounding according to the
-     * context settings.
+     * Returns a {@code Decimal} whose value is {@code (this % divisor)}, with rounding according to
+     * the context settings.
      * 
      * @param divisor value by which this {@code Decimal} is to be divided.
      * @return {@code this % divisor}, rounded as necessary.
@@ -383,8 +384,8 @@ public class Num implements Comparable<Num> {
     }
 
     /**
-     * Returns a {@code Decimal} whose value is {@code (this % divisor)}, with rounding according to the
-     * context settings.
+     * Returns a {@code Decimal} whose value is {@code (this % divisor)}, with rounding according to
+     * the context settings.
      * 
      * @param divisor value by which this {@code Decimal} is to be divided.
      * @return {@code this % divisor}, rounded as necessary.
@@ -395,8 +396,8 @@ public class Num implements Comparable<Num> {
     }
 
     /**
-     * Returns a {@code Decimal} whose value is {@code (this % divisor)}, with rounding according to the
-     * context settings.
+     * Returns a {@code Decimal} whose value is {@code (this % divisor)}, with rounding according to
+     * the context settings.
      * 
      * @param divisor value by which this {@code Decimal} is to be divided.
      * @return {@code this % divisor}, rounded as necessary.
@@ -407,8 +408,8 @@ public class Num implements Comparable<Num> {
     }
 
     /**
-     * Returns a {@code Decimal} whose value is {@code (this % divisor)}, with rounding according to the
-     * context settings.
+     * Returns a {@code Decimal} whose value is {@code (this % divisor)}, with rounding according to
+     * the context settings.
      * 
      * @param divisor value by which this {@code Decimal} is to be divided.
      * @return {@code this % divisor}, rounded as necessary.
@@ -419,8 +420,8 @@ public class Num implements Comparable<Num> {
     }
 
     /**
-     * Returns a {@code Decimal} whose value is {@code (this % divisor)}, with rounding according to the
-     * context settings.
+     * Returns a {@code Decimal} whose value is {@code (this % divisor)}, with rounding according to
+     * the context settings.
      * 
      * @param divisor value by which this {@code Decimal} is to be divided.
      * @return {@code this % divisor}, rounded as necessary.
@@ -431,8 +432,8 @@ public class Num implements Comparable<Num> {
     }
 
     /**
-     * Returns a {@code Decimal} whose value is {@code (this % divisor)}, with rounding according to the
-     * context settings.
+     * Returns a {@code Decimal} whose value is {@code (this % divisor)}, with rounding according to
+     * the context settings.
      * 
      * @param divisor value by which this {@code Decimal} is to be divided.
      * @return {@code this % divisor}, rounded as necessary.
@@ -506,8 +507,9 @@ public class Num implements Comparable<Num> {
     }
 
     /**
-     * Returns the correctly rounded natural logarithm (base e) of the <code>double</code> value of this
-     * {@code Decimal}. /!\ Warning! Uses the {@code StrictMath#log(double)} method under the hood.
+     * Returns the correctly rounded natural logarithm (base e) of the <code>double</code> value of
+     * this {@code Decimal}. /!\ Warning! Uses the {@code StrictMath#log(double)} method under the
+     * hood.
      * 
      * @return the natural logarithm (base e) of {@code this}
      * @see StrictMath#log(double)
@@ -537,7 +539,8 @@ public class Num implements Comparable<Num> {
     }
 
     /**
-     * Returns a {@code Num} whose value is {@code (-this)}, and whose scale is {@code this.scale()}.
+     * Returns a {@code Num} whose value is {@code (-this)}, and whose scale is
+     * {@code this.scale()}.
      *
      * @return {@code -this}.
      */
