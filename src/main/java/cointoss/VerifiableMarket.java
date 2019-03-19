@@ -12,11 +12,15 @@ package cointoss;
 
 import static cointoss.backtest.Time.*;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import cointoss.backtest.Time;
 import cointoss.order.Order;
 import cointoss.order.OrderState;
 import cointoss.util.Num;
-import kiss.Table;
 
 /**
  * @version 2018/09/18 21:18:07
@@ -169,7 +173,9 @@ public class VerifiableMarket extends Market {
      * @return
      */
     public boolean validateOrderState(int active, int completed, int canceled, int expired, int rejected) {
-        Table<OrderState, Order> state = service.orders().toTable(o -> o.state.v);
+        Map<OrderState, List<Order>> state = new HashMap();
+
+        service.orders().to(o -> state.computeIfAbsent(o.state.v, s -> new ArrayList()).add(o));
 
         assert state.get(OrderState.ACTIVE).size() == active;
         assert state.get(OrderState.COMPLETED).size() == completed;
