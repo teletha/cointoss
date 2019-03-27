@@ -611,7 +611,7 @@ public class MarketLog {
          * @return
          */
         private Signal<Execution> download() {
-            return Signal.empty();
+            return I.signal();
         }
 
         /**
