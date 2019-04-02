@@ -16,6 +16,8 @@ import cointoss.util.Chrono;
 import cointoss.util.Num;
 import kiss.Decoder;
 import kiss.Encoder;
+import kiss.Manageable;
+import kiss.Singleton;
 
 /**
  * @version 2018/07/12 9:52:41
@@ -202,9 +204,9 @@ public class Execution implements Directional {
     }
 
     /**
-     * @version 2018/07/10 21:53:01
+     * 
      */
-    @SuppressWarnings("unused")
+    @Manageable(lifestyle = Singleton.class)
     private static class Codec implements Decoder<ZonedDateTime>, Encoder<ZonedDateTime> {
 
         /**
