@@ -18,7 +18,7 @@ import kiss.WiseFunction;
 /**
  * @version 2018/07/16 9:21:49
  */
-public final class RetryPolicy implements WiseFunction<Signal<? extends Throwable>, Signal<?>> {
+public final class RetryPolicy implements WiseFunction<Signal<Throwable>, Signal<?>> {
 
     /** The maximum times. */
     private long maxTimes;
@@ -150,7 +150,7 @@ public final class RetryPolicy implements WiseFunction<Signal<? extends Throwabl
      * {@inheritDoc}
      */
     @Override
-    public Signal<?> APPLY(Signal<? extends Throwable> error) throws Throwable {
+    public Signal<?> APPLY(Signal<Throwable> error) throws Throwable {
         return error.take(() -> ++count <= maxTimes).delay(() -> Chrono.between(minDelay, delay.apply(count), maxDelay)).effect(e -> {
             System.out.println("Retry " + count + "   " + e);
             e.printStackTrace();
