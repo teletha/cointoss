@@ -14,6 +14,8 @@ import java.util.Objects;
 import cointoss.util.Generator;
 import kiss.Decoder;
 import kiss.Encoder;
+import kiss.Manageable;
+import kiss.Singleton;
 
 /**
  * @version 2017/07/21 19:47:35
@@ -118,9 +120,9 @@ public enum Side implements Directional {
     }
 
     /**
-     * @version 2017/08/23 0:08:13
+     * 
      */
-    @SuppressWarnings("unused")
+    @Manageable(lifestyle = Singleton.class)
     private static class Codec implements Encoder<Side>, Decoder<Side> {
 
         /**
