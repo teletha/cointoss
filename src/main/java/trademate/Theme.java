@@ -15,9 +15,6 @@ import kiss.Storable;
 import kiss.Variable;
 import stylist.value.Color;
 
-/**
- * @version 2018/09/10 22:17:23
- */
 @Manageable(lifestyle = Singleton.class)
 public class Theme implements Storable<Theme> {
 
