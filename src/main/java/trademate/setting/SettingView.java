@@ -15,9 +15,8 @@ import kiss.Manageable;
 import kiss.Singleton;
 import stylist.Style;
 import stylist.StyleDSL;
-import viewtify.localize.Lang;
-import viewtify.localize.Localizer;
-import viewtify.localize.Text;
+import transcript.Lang;
+import transcript.Transcript;
 import viewtify.ui.UI;
 import viewtify.ui.UILabel;
 import viewtify.ui.UIPane;
@@ -112,18 +111,14 @@ public class SettingView extends View {
             background.color("derive(-fx-base, 6%)");
         };
 
-        Text General = Text.of("General").set(Lang.JA, "一般");
+        Transcript General = Transcript.of("General").set(Lang.JA, "一般");
 
-        Text Appearance = Text.of("Appearance").set(Lang.JA, "外観");
+        Transcript Appearance = Transcript.of("Appearance").set(Lang.JA, "外観");
 
-        Text Chart = Text.of("Chart").set(Lang.JA, "チャート");
+        Transcript Chart = Transcript.of("Chart").set(Lang.JA, "チャート");
 
-        Text Notification = Text.of("Notification").set(Lang.JA, "通知");
+        Transcript Notification = Transcript.of("Notification").set(Lang.JA, "通知");
 
-        Text Bitflyer = Text.of("Bitflyer");
-    }
-
-    public static void main(String[] args) {
-        new Localizer().addAllClassesIn(SettingStyles.class).localize();
+        Transcript Bitflyer = Transcript.of("Bitflyer");
     }
 }

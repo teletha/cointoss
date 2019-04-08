@@ -16,8 +16,8 @@ import kiss.Extensible;
 import kiss.I;
 import kiss.Manageable;
 import kiss.Singleton;
-import viewtify.localize.Lang;
-import viewtify.localize.Text;
+import transcript.Lang;
+import transcript.Transcript;
 import viewtify.ui.UI;
 import viewtify.ui.UICheckBox;
 import viewtify.ui.UIPassword;
@@ -25,9 +25,6 @@ import viewtify.ui.UIText;
 import viewtify.ui.View;
 import viewtify.ui.helper.User;
 
-/**
- * @version 2018/09/06 23:46:18
- */
 @Manageable(lifestyle = Singleton.class)
 public class BitFlyerSetting extends View {
 
@@ -52,20 +49,20 @@ public class BitFlyerSetting extends View {
     @Override
     protected UI declareUI() {
         return new UI() {
-            Text PublicAPIDescription = Text
+            Transcript PublicAPIDescription = Transcript
                     .of("Please get API key and API secret to use the public API provided by [BitFlyer](https://lightning.bitflyer.jp/developer).")
                     .set(Lang.JA, "[BitFlyer](https://lightning.bitflyer.jp/developer)の提供する公開APIを利用するためにAPIキーとAPIシークレットを取得してください。");
 
-            Text PrivateAPITitle = Text.of("Usage of Private API").set(Lang.JA, "非公開APIの利用");
+            Transcript PrivateAPITitle = Transcript.of("Usage of Private API").set(Lang.JA, "非公開APIの利用");
 
-            Text PrivateAPIDescription = Text
+            Transcript PrivateAPIDescription = Transcript
                     .of("We will try to speed up trading by using private API.\nTradeMate acquires the account specific infomation(e.g. session id) by logging in automatically.")
                     .set(Lang.JA, "非公開APIを利用して取引の高速化を図ります。\nブラウザを使用して自動でログインを行いアカウント固有のIDやセッション情報を取得します。");
 
-            Text PrivateAPIWarning = Text.of("WARNING : This setting will allow all operations on your account.")
+            Transcript PrivateAPIWarning = Transcript.of("WARNING : This setting will allow all operations on your account.")
                     .set(Lang.JA, "注意 : この設定を行うとあなたのアカウントに対する全ての操作を許可することになります。");
 
-            Text LoginExplicitly = Text.of("Login explicitly").set(Lang.JA, "ログイン画面を表示");
+            Transcript LoginExplicitly = Transcript.of("Login explicitly").set(Lang.JA, "ログイン画面を表示");
 
             {
                 $(vbox, Root, () -> {
@@ -118,7 +115,11 @@ public class BitFlyerSetting extends View {
         accountId.model(account.accountId);
 
         loginBackground.when(User.Action).to(() -> {
-            viewtify.localize.Lang.change();
+            if (Lang.current() == Lang.EN) {
+                Transcript.setDefault(Lang.JA);
+            } else {
+                Transcript.setDefault(Lang.EN);
+            }
         });
     }
 
