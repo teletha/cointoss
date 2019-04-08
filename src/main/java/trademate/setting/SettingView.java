@@ -115,9 +115,9 @@ public class SettingView extends View {
 
         Transcript Appearance = Transcript.of("Appearance").set(Lang.JA, "外観");
 
-        Transcript Chart = Transcript.of("Chart").set(Lang.JA, "チャート");
+        Transcript Chart = Transcript.of("Chart");
 
-        Transcript Notification = Transcript.of("Notification").set(Lang.JA, "通知");
+        Transcript Notification = Transcript.of("Notification");
 
         Transcript Bitflyer = Transcript.of("Bitflyer");
     }

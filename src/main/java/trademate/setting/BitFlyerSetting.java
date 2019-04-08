@@ -59,8 +59,7 @@ public class BitFlyerSetting extends View {
                     .of("We will try to speed up trading by using private API.\nTradeMate acquires the account specific infomation(e.g. session id) by logging in automatically.")
                     .set(Lang.JA, "非公開APIを利用して取引の高速化を図ります。\nブラウザを使用して自動でログインを行いアカウント固有のIDやセッション情報を取得します。");
 
-            Transcript PrivateAPIWarning = Transcript.of("WARNING : This setting will allow all operations on your account.")
-                    .set(Lang.JA, "注意 : この設定を行うとあなたのアカウントに対する全ての操作を許可することになります。");
+            Transcript PrivateAPIWarning = Transcript.of("WARNING : This setting will allow all operations on your account.");
 
             Transcript LoginExplicitly = Transcript.of("Login explicitly").set(Lang.JA, "ログイン画面を表示");
 
