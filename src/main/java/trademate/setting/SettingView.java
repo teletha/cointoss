@@ -15,7 +15,6 @@ import kiss.Manageable;
 import kiss.Singleton;
 import stylist.Style;
 import stylist.StyleDSL;
-import transcript.Lang;
 import transcript.Transcript;
 import viewtify.ui.UI;
 import viewtify.ui.UILabel;
@@ -111,9 +110,9 @@ public class SettingView extends View {
             background.color("derive(-fx-base, 6%)");
         };
 
-        Transcript General = Transcript.of("General").set(Lang.JA, "一般");
+        Transcript General = Transcript.of("General");
 
-        Transcript Appearance = Transcript.of("Appearance").set(Lang.JA, "外観");
+        Transcript Appearance = Transcript.of("Appearance");
 
         Transcript Chart = Transcript.of("Chart");
 

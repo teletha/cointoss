@@ -50,18 +50,16 @@ public class BitFlyerSetting extends View {
     protected UI declareUI() {
         return new UI() {
             Transcript PublicAPIDescription = Transcript
-                    .of("Please get API key and API secret to use the public API provided by [BitFlyer](https://lightning.bitflyer.jp/developer).")
-                    .set(Lang.JA, "[BitFlyer](https://lightning.bitflyer.jp/developer)の提供する公開APIを利用するためにAPIキーとAPIシークレットを取得してください。");
+                    .of("Please get API key and API secret to use the public API provided by [BitFlyer](https://lightning.bitflyer.jp/developer).");
 
-            Transcript PrivateAPITitle = Transcript.of("Usage of Private API").set(Lang.JA, "非公開APIの利用");
+            Transcript PrivateAPITitle = Transcript.of("Usage of Private API");
 
             Transcript PrivateAPIDescription = Transcript
-                    .of("We will try to speed up trading by using private API.\nTradeMate acquires the account specific infomation(e.g. session id) by logging in automatically.")
-                    .set(Lang.JA, "非公開APIを利用して取引の高速化を図ります。\nブラウザを使用して自動でログインを行いアカウント固有のIDやセッション情報を取得します。");
+                    .of("We will try to speed up trading by using private API.\nTradeMate acquires the account specific infomation(e.g. session id) by logging in automatically.");
 
             Transcript PrivateAPIWarning = Transcript.of("WARNING : This setting will allow all operations on your account.");
 
-            Transcript LoginExplicitly = Transcript.of("Login explicitly").set(Lang.JA, "ログイン画面を表示");
+            Transcript LoginExplicitly = Transcript.of("Login explicitly");
 
             {
                 $(vbox, Root, () -> {
