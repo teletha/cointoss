@@ -1,0 +1,30 @@
+Appearance
+外観
+
+Bitflyer
+ビットフライヤー
+
+Chart
+チャート
+
+General
+一般
+
+Login explicitly
+明示的にログイン
+
+Notification
+通知
+
+Please get API key and API secret to use the public API provided by [BitFlyer](https://lightning.bitflyer.jp/developer).
+[BitFlyer](https://lightning.bitflyer.jp/developer)の提供する公開APIを利用するためにAPIキーとAPIシークレットを取得してください。
+
+Usage of Private API
+非公開APIの利用
+
+WARNING : This setting will allow all operations on your account.
+注意 : この設定を行うとあなたのアカウントに対する全ての操作を許可することになります。
+
+We will try to speed up trading by using private API.␣TradeMate acquires the account specific infomation(e.g. session id) by logging in automatically.
+非公開APIを利用して取引の高速化を図ります。␣ブラウザを使用して自動でログインを行いアカウント固有のIDやセッション情報を取得します。
+

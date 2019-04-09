@@ -110,14 +110,14 @@ public class SettingView extends View {
             background.color("derive(-fx-base, 6%)");
         };
 
-        Transcript General = Transcript.of("General");
+        Transcript General = Transcript.en("General");
 
-        Transcript Appearance = Transcript.of("Appearance");
+        Transcript Appearance = Transcript.en("Appearance");
 
-        Transcript Chart = Transcript.of("Chart");
+        Transcript Chart = Transcript.en("Chart");
 
-        Transcript Notification = Transcript.of("Notification");
+        Transcript Notification = Transcript.en("Notification");
 
-        Transcript Bitflyer = Transcript.of("Bitflyer");
+        Transcript Bitflyer = Transcript.en("Bitflyer");
     }
 }

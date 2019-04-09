@@ -50,16 +50,16 @@ public class BitFlyerSetting extends View {
     protected UI declareUI() {
         return new UI() {
             Transcript PublicAPIDescription = Transcript
-                    .of("Please get API key and API secret to use the public API provided by [BitFlyer](https://lightning.bitflyer.jp/developer).");
+                    .en("Please get API key and API secret to use the public API provided by [BitFlyer](https://lightning.bitflyer.jp/developer).");
 
-            Transcript PrivateAPITitle = Transcript.of("Usage of Private API");
+            Transcript PrivateAPITitle = Transcript.en("Usage of Private API");
 
             Transcript PrivateAPIDescription = Transcript
-                    .of("We will try to speed up trading by using private API.\nTradeMate acquires the account specific infomation(e.g. session id) by logging in automatically.");
+                    .en("We will try to speed up trading by using private API.\nTradeMate acquires the account specific infomation(e.g. session id) by logging in automatically.");
 
-            Transcript PrivateAPIWarning = Transcript.of("WARNING : This setting will allow all operations on your account.");
+            Transcript PrivateAPIWarning = Transcript.en("WARNING : This setting will allow all operations on your account.");
 
-            Transcript LoginExplicitly = Transcript.of("Login explicitly");
+            Transcript LoginExplicitly = Transcript.en("Login explicitly");
 
             {
                 $(vbox, Root, () -> {
