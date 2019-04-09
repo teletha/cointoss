@@ -124,7 +124,7 @@ public class NotificationSetting extends View {
         // For Desktop
         desktopDuration.values(I.signal(2).recurse(v -> v + 2).take(30).map(Duration::ofSeconds))
                 .model(notificator.desktopDuration)
-                .text($::desktopDuration);
+                .text(duration -> duration.getSeconds() + en("seconds").get());
         desktopPosition.values(DesktopPosition.class).model(notificator.desktopPosition);
 
         // For LINE
@@ -133,7 +133,8 @@ public class NotificationSetting extends View {
             I.make(Network.class).line("TEST").to(e -> {
                 lineAccessToken.decorateBy(Icon.Success);
             }, e -> {
-                lineAccessToken.invalid($.lineTestFailed(lineAccessToken.value()));
+                lineAccessToken.invalid(en("The specified token [$1] is incorrect. Specify the correct token and then test again.")
+                        .get(lineAccessToken.value()));
             });
         });
 
@@ -212,16 +213,6 @@ public class NotificationSetting extends View {
     static class Lang2 implements Extensible {
 
         /**
-         * Display duration of desktop notification.
-         * 
-         * @param duration
-         * @return
-         */
-        String desktopDuration(Duration duration) {
-            return duration.getSeconds() + " seconds";
-        }
-
-        /**
          * LINE test was failed.
          * 
          * @param token
@@ -235,11 +226,6 @@ public class NotificationSetting extends View {
          * @version 2018/08/27 21:11:28
          */
         private static class Lang_ja extends Lang2 {
-
-            @Override
-            String desktopDuration(Duration duration) {
-                return duration.getSeconds() + "秒";
-            }
 
             @Override
             String lineTestFailed(String token) {

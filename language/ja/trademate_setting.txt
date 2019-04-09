@@ -73,6 +73,9 @@ Short Trend
 Sound
 サウンド
 
+The specified token [$1] is incorrect. Specify the correct token and then test again.
+指定されたトークン[$1]は正しくありません。 正しいトークンを指定して,もう一度テストしてください。
+
 TopLeft
 左上
 
@@ -90,4 +93,7 @@ We will try to speed up trading by using private API.␣TradeMate acquires the a
 
 You can notify LINE by specifying the access token acquired from [LINE Notify](https://notify-bot.line.me/).
 [LINE Notify](https://notify-bot.line.me/)から取得したアクセストークンを指定することでLINEに通知することが出来ます。
+
+seconds
+秒
 
