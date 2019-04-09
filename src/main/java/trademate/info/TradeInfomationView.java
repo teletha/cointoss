@@ -9,6 +9,8 @@
  */
 package trademate.info;
 
+import static transcript.Transcript.*;
+
 import cointoss.Position;
 import cointoss.PositionManager;
 import cointoss.Side;
@@ -16,7 +18,6 @@ import cointoss.order.Order;
 import cointoss.order.OrderBook;
 import cointoss.util.Num;
 import kiss.Extensible;
-import kiss.I;
 import stylist.Style;
 import stylist.StyleDSL;
 import trademate.TradingView;
@@ -30,9 +31,6 @@ import viewtify.ui.helper.User;
  * @version 2018/09/08 18:33:32
  */
 public class TradeInfomationView extends View {
-
-    /** The locale resource. */
-    private final Lang $ = I.i18n(Lang.class);
 
     /** UI */
     private UILabel positionSize;
@@ -58,15 +56,15 @@ public class TradeInfomationView extends View {
             {
                 $(vbox, S.Root, () -> {
                     $(hbox, S.Row, () -> {
-                        label("数量", S.Label);
+                        label(en("Amount"), S.Label);
                         $(positionSize, S.Normal);
                     });
                     $(hbox, S.Row, () -> {
-                        label("価格", S.Label);
+                        label(en("Price"), S.Label);
                         $(positionPrice, S.Normal);
                     });
                     $(hbox, S.Row, () -> {
-                        label("損益", S.Label);
+                        label(en("Profit"), S.Label);
                         $(positionProfit, S.Normal);
                     });
                     $(add);
@@ -140,77 +138,5 @@ public class TradeInfomationView extends View {
         Style Narrow = () -> {
             display.width(70, px);
         };
-    }
-
-    /**
-     * @version 2018/09/07 10:29:37
-     */
-    static class Lang implements Extensible {
-
-        String date() {
-            return "Date";
-        }
-
-        String side() {
-            return "Side";
-        }
-
-        String amount() {
-            return "Amount";
-        }
-
-        String price() {
-            return "Price";
-        }
-
-        String profit() {
-            return "Profit";
-        }
-
-        /**
-         * @version 2018/09/07 10:44:14
-         */
-        private static class Lang_ja extends Lang {
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            String date() {
-                return "日付";
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            String side() {
-                return "売買";
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            String amount() {
-                return "数量";
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            String price() {
-                return "値段";
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            String profit() {
-                return "損益";
-            }
-        }
     }
 }

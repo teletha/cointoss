@@ -89,7 +89,7 @@ public class SettingView extends View {
     /**
      * Resource definition.
      */
-    interface $ extends StyleDSL {
+    private interface $ extends StyleDSL {
 
         Style CategoryPane = () -> {
             padding.top(40, px);

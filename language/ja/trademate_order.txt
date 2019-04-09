@@ -1,0 +1,15 @@
+Buy
+買い
+
+Cancel
+キャンセル
+
+Reverse
+ドテン
+
+Sell
+売り
+
+Stop
+撤退
+

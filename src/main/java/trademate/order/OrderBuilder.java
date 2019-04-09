@@ -10,18 +10,20 @@
 package trademate.order;
 
 import static java.util.concurrent.TimeUnit.*;
+import static trademate.CommonText.*;
+import static transcript.Transcript.*;
 
 import java.math.RoundingMode;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
 
+import javafx.scene.control.Spinner;
+import javafx.scene.input.ScrollEvent;
+
 import cointoss.Side;
 import cointoss.order.Order;
 import cointoss.order.OrderState;
 import cointoss.util.Num;
-import javafx.scene.control.Spinner;
-import javafx.scene.input.ScrollEvent;
-import kiss.Extensible;
 import kiss.I;
 import kiss.WiseBiConsumer;
 import stylist.Style;
@@ -40,9 +42,6 @@ import viewtify.ui.helper.User;
  * @version 2018/02/07 17:11:55
  */
 public class OrderBuilder extends View {
-
-    /** The locale resource. */
-    private final Lang $ = I.i18n(Lang.class);
 
     private Predicate<UIText> positiveNumber = ui -> {
         try {
@@ -117,12 +116,12 @@ public class OrderBuilder extends View {
             {
                 $(vbox, S.Root, () -> {
                     $(hbox, S.Row, () -> {
-                        label("数量", S.Label);
+                        label(Amount, S.Label);
                         $(orderSize, S.Form);
                         $(orderSizeAmount, S.FormMin);
                     });
                     $(hbox, S.Row, () -> {
-                        label("価格", S.Label);
+                        label(Price, S.Label);
                         $(orderPrice, S.Form);
                         $(orderPriceAmount, S.FormMin);
                     });
@@ -182,12 +181,12 @@ public class OrderBuilder extends View {
         // validate order condition
         orderLimitLong.parent().disableWhen(orderSize.isInvalid(), orderPrice.isInvalid());
 
-        orderLimitLong.text($.buy()).when(User.MouseClick).throttle(1000, MILLISECONDS).mapTo(Side.BUY).to(this::requestOrder);
-        orderLimitShort.text($.sell()).when(User.MouseClick).throttle(1000, MILLISECONDS).mapTo(Side.SELL).to(this::requestOrder);
+        orderLimitLong.text(Buy).when(User.MouseClick).throttle(1000, MILLISECONDS).mapTo(Side.BUY).to(this::requestOrder);
+        orderLimitShort.text(Sell).when(User.MouseClick).throttle(1000, MILLISECONDS).mapTo(Side.SELL).to(this::requestOrder);
 
-        orderCancel.text($.cancel()).when(User.MouseClick).to(view.market()::cancel);
-        orderStop.text($.stop()).when(User.MouseClick).to(view.market()::stop);
-        orderReverse.text($.reverse()).when(User.MouseClick).to(view.market()::reverse);
+        orderCancel.text(en("Cancel")).when(User.MouseClick).to(view.market()::cancel);
+        orderStop.text(en("Stop")).when(User.MouseClick).to(view.market()::stop);
+        orderReverse.text(en("Reverse")).when(User.MouseClick).to(view.market()::reverse);
     }
 
     /**
@@ -279,137 +278,5 @@ public class OrderBuilder extends View {
         Style FormButton = () -> {
             display.width(62, px).height(31, px);
         };
-    }
-
-    /**
-     * @version 2018/09/07 10:29:37
-     */
-    static class Lang implements Extensible {
-
-        String date() {
-            return "Date";
-        }
-
-        String side() {
-            return "Side";
-        }
-
-        String amount() {
-            return "Amount";
-        }
-
-        String price() {
-            return "Price";
-        }
-
-        String profit() {
-            return "Profit";
-        }
-
-        String sell() {
-            return "Sell";
-        }
-
-        String buy() {
-            return "Buy";
-        }
-
-        String cancel() {
-            return "Cancel";
-        }
-
-        String stop() {
-            return "Stop";
-        }
-
-        String reverse() {
-            return "Reverse";
-        }
-
-        /**
-         * @version 2018/09/07 10:44:14
-         */
-        private static class Lang_ja extends Lang {
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            String date() {
-                return "日付";
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            String side() {
-                return "売買";
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            String amount() {
-                return "数量";
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            String price() {
-                return "値段";
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            String profit() {
-                return "損益";
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            String sell() {
-                return "売り";
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            String buy() {
-                return "買い";
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            String cancel() {
-                return "キャンセル";
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            String stop() {
-                return "撤退";
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            String reverse() {
-                return "ドテン";
-            }
-        }
     }
 }

@@ -14,12 +14,14 @@ import javafx.util.Duration;
 
 import org.controlsfx.control.Notifications;
 
+import com.google.common.base.Supplier;
+
 import cointoss.util.Network;
-import kiss.Extensible;
 import kiss.I;
 import kiss.Storable;
 import kiss.Variable;
 import trademate.TradeMate;
+import transcript.Transcript;
 import viewtify.Viewtify;
 
 /**
@@ -27,18 +29,25 @@ import viewtify.Viewtify;
  */
 public class Notificator implements Storable<Notificator> {
 
-    /** The message resource. */
-    private static final Lang message = I.i18n(Lang.class);
+    private static final Transcript LongTrend = Transcript.en("Long Trend");
 
-    public final Notify longTrend = new Notify(message.longTrend());
+    private static final Transcript ShortTrend = Transcript.en("Short Trend");
 
-    public final Notify shortTrend = new Notify(message.shortTrend());
+    private static final Transcript Execution = Transcript.en("Execution");
 
-    public final Notify execution = new Notify(message.execution());
+    private static final Transcript OrderFailed = Transcript.en("Order Failed");
 
-    public final Notify orderFailed = new Notify(message.orderFailed());
+    private static final Transcript PriceSignal = Transcript.en("Price Signal");
 
-    public final Notify priceSignal = new Notify(message.priceSignal());
+    public final Notify longTrend = new Notify(LongTrend);
+
+    public final Notify shortTrend = new Notify(ShortTrend);
+
+    public final Notify execution = new Notify(Execution);
+
+    public final Notify orderFailed = new Notify(OrderFailed);
+
+    public final Notify priceSignal = new Notify(PriceSignal);
 
     /** The desktop position. */
     public final Variable<DesktopPosition> desktopPosition = Variable.of(DesktopPosition.BottomRight);
@@ -59,7 +68,7 @@ public class Notificator implements Storable<Notificator> {
     /**
      * @version 2018/08/30 10:30:06
      */
-    public class Notify {
+    public class Notify implements Supplier<String> {
 
         /** Showing desktop notification. */
         public final Variable<Boolean> desktop = Variable.of(false);
@@ -71,12 +80,12 @@ public class Notificator implements Storable<Notificator> {
         public final Variable<Sound> sound = Variable.of(Sound.なし);
 
         /** The type name. */
-        private final String name;
+        private final CharSequence name;
 
         /**
          * 
          */
-        public Notify(String name) {
+        public Notify(CharSequence name) {
             this.name = name;
         }
 
@@ -85,7 +94,7 @@ public class Notificator implements Storable<Notificator> {
          * 
          * @param message
          */
-        public void notify(String message) {
+        public void notify(CharSequence message) {
             // by sound
             if (sound.isPresent() && sound.isNot(Sound.なし)) {
                 sound.v.play();
@@ -99,7 +108,7 @@ public class Notificator implements Storable<Notificator> {
                             .hideCloseButton()
                             .position(desktopPosition.v.position)
                             .hideAfter(Duration.seconds(desktopDuration.v.getSeconds()))
-                            .text(message)
+                            .text(message.toString())
                             .owner(I.make(TradeMate.class).screen())
                             .show();
                 });
@@ -115,25 +124,35 @@ public class Notificator implements Storable<Notificator> {
          * {@inheritDoc}
          */
         @Override
-        public String toString() {
-            return name;
+        public String get() {
+            return name.toString();
         }
     }
 
     /**
-     * @version 2018/08/27 20:42:39
+     * 
      */
     public static enum DesktopPosition {
-        TopLeft(Pos.TOP_LEFT), TopRight(Pos.TOP_RIGHT), BottomLeft(Pos.BOTTOM_LEFT), BottomRight(Pos.BOTTOM_RIGHT);
+        TopLeft(Pos.TOP_LEFT, Transcript.en("TopLeft")),
+
+        TopRight(Pos.TOP_RIGHT, Transcript.en("TopRight")),
+
+        BottomLeft(Pos.BOTTOM_LEFT, Transcript.en("BottomLeft")),
+
+        BottomRight(Pos.BOTTOM_RIGHT, Transcript.en("BottomRight"));
 
         /** The actual position. */
         private final Pos position;
 
+        /** The readable text. */
+        private final Transcript text;
+
         /**
          * @param position
          */
-        private DesktopPosition(Pos position) {
+        private DesktopPosition(Pos position, Transcript text) {
             this.position = position;
+            this.text = text;
         }
 
         /**
@@ -141,170 +160,7 @@ public class Notificator implements Storable<Notificator> {
          */
         @Override
         public String toString() {
-            switch (this) {
-            case TopLeft:
-                return message.positionTopLeft();
-
-            case TopRight:
-                return message.positionTopRight();
-
-            case BottomLeft:
-                return message.positionBottomLeft();
-
-            default:
-                return message.positionBottomRight();
-            }
-        }
-    }
-
-    /**
-     * @version 2018/08/27 20:45:08
-     */
-    private static class Lang implements Extensible {
-
-        /**
-         * Indicate desktop position.
-         * 
-         * @return
-         */
-        String positionTopLeft() {
-            return "TopLeft";
-        }
-
-        /**
-         * Indicate desktop position.
-         * 
-         * @return
-         */
-        String positionTopRight() {
-            return "TopRight";
-        }
-
-        /**
-         * Indicate desktop position.
-         * 
-         * @return
-         */
-        String positionBottomLeft() {
-            return "BottomLeft";
-        }
-
-        /**
-         * Indicate desktop position.
-         * 
-         * @return
-         */
-        String positionBottomRight() {
-            return "BottomRight";
-        }
-
-        /**
-         * Type name.
-         * 
-         * @return
-         */
-        String longTrend() {
-            return "Long Trend";
-        }
-
-        /**
-         * Type name.
-         * 
-         * @return
-         */
-        String shortTrend() {
-            return "Short Trend";
-        }
-
-        /**
-         * Type name.
-         * 
-         * @return
-         */
-        String execution() {
-            return "Execution";
-        }
-
-        /**
-         * Type name.
-         * 
-         * @return
-         */
-        String orderFailed() {
-            return "Order Failed";
-        }
-
-        /**
-         * Type name.
-         * 
-         * @return
-         */
-        String priceSignal() {
-            return "Price Signal";
-        }
-
-        /**
-         * @version 2018/08/27 20:47:17
-         */
-        @SuppressWarnings("unused")
-        private static class Lang_ja extends Lang {
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            String positionTopLeft() {
-                return "左上";
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            String positionTopRight() {
-                return "右上";
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            String positionBottomLeft() {
-                return "左下";
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            String positionBottomRight() {
-                return "右下";
-            }
-
-            @Override
-            String longTrend() {
-                return "買いトレンド";
-            }
-
-            @Override
-            String shortTrend() {
-                return "売りトレンド";
-            }
-
-            @Override
-            String execution() {
-                return "約定";
-            }
-
-            @Override
-            String orderFailed() {
-                return "注文失敗";
-            }
-
-            @Override
-            String priceSignal() {
-                return "指定値へ到達";
-            }
+            return text.toString();
         }
     }
 }

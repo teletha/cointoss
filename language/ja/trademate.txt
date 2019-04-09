@@ -1,0 +1,21 @@
+Amount
+数量
+
+Buy
+買い
+
+End Date
+終了日
+
+No logs were found for the specified date.
+指定された日付のログが見つかりませんでした。
+
+Price
+値段
+
+Sell
+売り
+
+Start Date
+開始日
+

@@ -9,9 +9,10 @@
  */
 package trademate.setting;
 
+import static trademate.CommonText.*;
 import static trademate.setting.SettingStyles.*;
+import static transcript.Transcript.*;
 
-import kiss.Extensible;
 import kiss.I;
 import kiss.Manageable;
 import kiss.Singleton;
@@ -20,14 +21,8 @@ import viewtify.ui.UI;
 import viewtify.ui.UIColorPicker;
 import viewtify.ui.View;
 
-/**
- * @version 2018/09/10 20:28:10
- */
 @Manageable(lifestyle = Singleton.class)
 public class AppearanceSetting extends View {
-
-    /** The locale resource. */
-    private final Lang $ = I.i18n(Lang.class);
 
     private Theme theme = I.make(Theme.class);
 
@@ -44,13 +39,13 @@ public class AppearanceSetting extends View {
             {
                 $(vbox, Root, () -> {
                     $(vbox, Block, () -> {
-                        label($::color, Heading);
+                        label(en("Colors"), Heading);
                         $(hbox, FormRow, () -> {
-                            label($::buy, FormLabel);
+                            label(Buy, FormLabel);
                             $(buy, FormInput);
                         });
                         $(hbox, FormRow, () -> {
-                            label($::sell, FormLabel);
+                            label(Sell, FormLabel);
                             $(sell, FormInput);
                         });
                     });
@@ -66,37 +61,5 @@ public class AppearanceSetting extends View {
     protected void initialize() {
         buy.model(theme.Long);
         sell.model(theme.Short);
-    }
-
-    /**
-     * @version 2018/09/10 20:18:55
-     */
-    static class Lang implements Extensible {
-
-        String color() {
-            return "Colors";
-        }
-
-        String buy() {
-            return "Long";
-        }
-
-        String sell() {
-            return "Short";
-        }
-
-        /**
-         * @version 2018/09/10 20:29:01
-         */
-        private static class Lang_ja extends Lang {
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            String color() {
-                return "色";
-            }
-        }
     }
 }

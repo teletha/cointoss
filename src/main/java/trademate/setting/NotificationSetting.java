@@ -10,6 +10,7 @@
 package trademate.setting;
 
 import static trademate.setting.SettingStyles.*;
+import static transcript.Transcript.*;
 
 import java.time.Duration;
 
@@ -20,6 +21,7 @@ import kiss.Manageable;
 import kiss.Singleton;
 import trademate.setting.Notificator.DesktopPosition;
 import trademate.setting.Notificator.Notify;
+import transcript.Lang;
 import viewtify.ui.UI;
 import viewtify.ui.UIButton;
 import viewtify.ui.UICheckBox;
@@ -37,7 +39,7 @@ import viewtify.util.Icon;
 public class NotificationSetting extends View {
 
     /** The locale resource. */
-    private final Lang $ = I.i18n(Lang.class);
+    private final Lang2 $ = I.i18n(Lang2.class);
 
     /** The notificator. */
     private final Notificator notificator = I.make(Notificator.class);
@@ -72,12 +74,12 @@ public class NotificationSetting extends View {
                 $(vbox, Root, () -> {
                     // Notification Types
                     $(vbox, Block, () -> {
-                        label($.notificationTitle(), Heading);
+                        label(en("Notification Type"), Heading);
                         $(hbox, FormRow, () -> {
                             label("", FormLabel);
-                            label($.desktopColumn(), FormCheck);
-                            label($.lineColumn(), FormCheck);
-                            label($.soundColumn(), FormCheck2);
+                            label(en("Desktop"), FormCheck);
+                            label(en("LINE"), FormCheck);
+                            label(en("Sound"), FormCheck2);
                         });
                         $(longTrend);
                         $(shortTrend);
@@ -88,23 +90,23 @@ public class NotificationSetting extends View {
 
                     // Desktop
                     $(vbox, Block, () -> {
-                        label($.desktopTitle(), Heading);
+                        label(en("Desktop Notification"), Heading);
                         $(hbox, FormRow, () -> {
-                            label($.desktopDurationLabel(), FormLabel);
+                            label(en("Display Time"), FormLabel);
                             $(desktopDuration, FormInput);
                         });
                         $(hbox, FormRow, () -> {
-                            label($.desktopPositionLabel(), FormLabel);
+                            label(en("Display Position"), FormLabel);
                             $(desktopPosition, FormInput);
                         });
                     });
 
                     // LINE
                     $(vbox, Block, () -> {
-                        label($.lineTitle(), Heading);
-                        label($.lineDescription(), Description);
+                        label(en("LINE Notification"), Heading);
+                        label(en("You can notify LINE by specifying the access token acquired from [LINE Notify](https://notify-bot.line.me/)."), Description);
                         $(hbox, FormRow, () -> {
-                            label($.lineAccessTokenLabel(), FormLabel);
+                            label(en("Access Token"), FormLabel);
                             $(lineAccessToken, FormInput);
                             $(lineTest, FormInput);
                         });
@@ -127,12 +129,20 @@ public class NotificationSetting extends View {
 
         // For LINE
         lineAccessToken.model(notificator.lineAccessToken);
-        lineTest.when(User.Action, () -> {
+        lineTest.text(en("Send test message")).when(User.Action, () -> {
             I.make(Network.class).line("TEST").to(e -> {
                 lineAccessToken.decorateBy(Icon.Success);
             }, e -> {
                 lineAccessToken.invalid($.lineTestFailed(lineAccessToken.value()));
             });
+        });
+
+        lineTest.when(User.Action).to(() -> {
+            if (Lang.current() == Lang.EN) {
+                Lang.JA.setDefault();
+            } else {
+                Lang.EN.setDefault();
+            }
         });
     }
 
@@ -199,61 +209,7 @@ public class NotificationSetting extends View {
      * @version 2018/08/27 21:10:05
      */
     @SuppressWarnings("unused")
-    static class Lang implements Extensible {
-
-        /**
-         * Title for the notification.
-         * 
-         * @return
-         */
-        String notificationTitle() {
-            return "Notification Type";
-        }
-
-        /**
-         * Column label for the desktop notification.
-         * 
-         * @return
-         */
-        String desktopColumn() {
-            return "Desktop";
-        }
-
-        /**
-         * Column label for the LINE notification.
-         * 
-         * @return
-         */
-        String lineColumn() {
-            return "LINE";
-        }
-
-        /**
-         * Column label for the sound notification.
-         * 
-         * @return
-         */
-        String soundColumn() {
-            return "Sound";
-        }
-
-        /**
-         * Title for the desktop notification.
-         * 
-         * @return
-         */
-        String desktopTitle() {
-            return "Desktop";
-        }
-
-        /**
-         * Display duration label for desktop notification.
-         * 
-         * @return
-         */
-        String desktopDurationLabel() {
-            return "Duration";
-        }
+    static class Lang2 implements Extensible {
 
         /**
          * Display duration of desktop notification.
@@ -263,51 +219,6 @@ public class NotificationSetting extends View {
          */
         String desktopDuration(Duration duration) {
             return duration.getSeconds() + " seconds";
-        }
-
-        /**
-         * Display position label for desktop notification.
-         * 
-         * @return
-         */
-        String desktopPositionLabel() {
-            return "Position";
-        }
-
-        /**
-         * Title for LINE.
-         * 
-         * @return
-         */
-        String lineTitle() {
-            return "LINE";
-        }
-
-        /**
-         * Description for LINE.
-         * 
-         * @return
-         */
-        String lineDescription() {
-            return "You can notify LINE by specifying the access token acquired from LINE Notify.";
-        }
-
-        /**
-         * Label access token of LINE.
-         * 
-         * @return
-         */
-        String lineAccessTokenLabel() {
-            return "Access Token";
-        }
-
-        /**
-         * Label for the test button of LINE notify.
-         * 
-         * @return
-         */
-        String lineTest() {
-            return "Send test message";
         }
 
         /**
@@ -323,61 +234,11 @@ public class NotificationSetting extends View {
         /**
          * @version 2018/08/27 21:11:28
          */
-        private static class Lang_ja extends Lang {
-
-            @Override
-            String notificationTitle() {
-                return "通知の種類";
-            }
-
-            @Override
-            String desktopColumn() {
-                return "デスクトップ";
-            }
-
-            @Override
-            String soundColumn() {
-                return "音声";
-            }
-
-            @Override
-            String desktopTitle() {
-                return "デスクトップへの通知";
-            }
-
-            @Override
-            String desktopDurationLabel() {
-                return "表示時間";
-            }
+        private static class Lang_ja extends Lang2 {
 
             @Override
             String desktopDuration(Duration duration) {
                 return duration.getSeconds() + "秒";
-            }
-
-            @Override
-            String desktopPositionLabel() {
-                return "表示位置";
-            }
-
-            @Override
-            String lineTitle() {
-                return "LINEへの通知";
-            }
-
-            @Override
-            String lineDescription() {
-                return "[LINE Notify](https://notify-bot.line.me/)から取得したアクセストークンを指定することでLINEに通知することが出来ます。";
-            }
-
-            @Override
-            String lineAccessTokenLabel() {
-                return "アクセストークン";
-            }
-
-            @Override
-            String lineTest() {
-                return "テストメッセージを送信";
             }
 
             @Override

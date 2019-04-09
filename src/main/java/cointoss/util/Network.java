@@ -261,7 +261,7 @@ public class Network {
      * 
      * @param message A message to send
      */
-    public Signal<?> line(String message) {
+    public Signal<?> line(CharSequence message) {
         Notificator notificator = I.make(Notificator.class);
 
         if (notificator.lineAccessToken.isPresent()) {

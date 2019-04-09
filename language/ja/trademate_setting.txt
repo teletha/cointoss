@@ -1,23 +1,83 @@
+Access Token
+アクセス・トークン
+
 Appearance
 外観
 
 Bitflyer
 ビットフライヤー
 
+BottomLeft
+左下
+
+BottomRight
+右下
+
 Chart
 チャート
+
+Colors
+色
+
+Desktop
+デスクトップ
+
+Desktop Notification
+デスクトップへの通知
+
+Display Position
+表示位置
+
+Display Time
+表示時間
+
+Execution
+約定
 
 General
 一般
 
+LINE
+LINE
+
+LINE Notification
+LINEへの通知
+
 Login explicitly
 明示的にログイン
+
+Long Trend
+買いトレンド
 
 Notification
 通知
 
+Notification Type
+通知の種類
+
+Order Failed
+注文失敗
+
 Please get API key and API secret to use the public API provided by [BitFlyer](https://lightning.bitflyer.jp/developer).
 [BitFlyer](https://lightning.bitflyer.jp/developer)の提供する公開APIを利用するためにAPIキーとAPIシークレットを取得してください。
+
+Price Signal
+指定値へ到達
+
+Send test message
+テスト・メッセージの送信
+
+Short Trend
+売りトレンド
+
+Sound
+サウンド
+
+TopLeft
+左上
+
+TopRight
+右上
 
 Usage of Private API
 非公開APIの利用
@@ -27,4 +87,7 @@ WARNING : This setting will allow all operations on your account.
 
 We will try to speed up trading by using private API.␣TradeMate acquires the account specific infomation(e.g. session id) by logging in automatically.
 非公開APIを利用して取引の高速化を図ります。␣ブラウザを使用して自動でログインを行いアカウント固有のIDやセッション情報を取得します。
+
+You can notify LINE by specifying the access token acquired from [LINE Notify](https://notify-bot.line.me/).
+[LINE Notify](https://notify-bot.line.me/)から取得したアクセストークンを指定することでLINEに通知することが出来ます。
 

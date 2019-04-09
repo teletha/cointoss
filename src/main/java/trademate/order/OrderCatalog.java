@@ -10,18 +10,18 @@
 package trademate.order;
 
 import static cointoss.order.OrderState.*;
+import static trademate.CommonText.*;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.function.Consumer;
 
+import javafx.scene.control.TreeTableRow;
+
 import cointoss.Side;
 import cointoss.order.Order;
 import cointoss.order.OrderState;
 import cointoss.util.Num;
-import javafx.scene.control.TreeTableRow;
-import kiss.Extensible;
-import kiss.I;
 import kiss.Variable;
 import stylist.Style;
 import stylist.StyleDSL;
@@ -37,16 +37,10 @@ import viewtify.ui.UITreeTableView;
 import viewtify.ui.UserInterface;
 import viewtify.ui.View;
 
-/**
- * @version 2018/12/08 14:55:08
- */
 public class OrderCatalog extends View {
 
     /** The date formatter. */
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd HH:mm:ss");
-
-    /** The locale resource. */
-    private final Lang $ = I.i18n(Lang.class);
 
     /** UI */
     private UITreeTableView<Object> table;
@@ -91,19 +85,19 @@ public class OrderCatalog extends View {
         table.selectMultipleRows().render(table -> new CatalogRow()).context($ -> {
             Calculation<Boolean> ordersArePassive = table.selection().flatVariable(this::state).isNot(ACTIVE);
 
-            $.menu("Cancel").disableWhen(ordersArePassive).whenUserClick(e -> act(this::cancel));
+            $.menu(Cancel).disableWhen(ordersArePassive).whenUserClick(e -> act(this::cancel));
         });
 
-        date.header($.date())
+        date.header(Date)
                 .modelByProperty(OrderSet.class, o -> o.date)
                 .modelByVar(Order.class, o -> o.created)
                 .render((ui, item) -> ui.text(formatter.format(item)));
-        side.header($.side())
+        side.header(SiDe)
                 .modelByProperty(OrderSet.class, o -> o.side)
                 .model(Order.class, Order::side)
                 .render((ui, side) -> ui.text(side).styleOnly(TradeMateStyle.Side.of(side)));
-        amount.header($.amount()).modelByProperty(OrderSet.class, o -> o.amount).model(Order.class, o -> o.remainingSize);
-        price.header($.price()).modelByProperty(OrderSet.class, o -> o.averagePrice).model(Order.class, o -> o.price.v);
+        amount.header(Amount).modelByProperty(OrderSet.class, o -> o.amount).model(Order.class, o -> o.remainingSize);
+        price.header(Price).modelByProperty(OrderSet.class, o -> o.averagePrice).model(Order.class, o -> o.price.v);
     }
 
     /**
@@ -208,65 +202,5 @@ public class OrderCatalog extends View {
         Style Narrow = () -> {
             display.width(65, px);
         };
-    }
-
-    /**
-     * @version 2018/09/07 10:29:37
-     */
-    static class Lang implements Extensible {
-
-        String date() {
-            return "Date";
-        }
-
-        String side() {
-            return "Side";
-        }
-
-        String amount() {
-            return "Amount";
-        }
-
-        String price() {
-            return "Price";
-        }
-
-        /**
-         * @version 2018/09/07 10:44:14
-         */
-        private static class Lang_ja extends Lang {
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            String date() {
-                return "日付";
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            String side() {
-                return "売買";
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            String amount() {
-                return "数量";
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            String price() {
-                return "値段";
-            }
-        }
     }
 }

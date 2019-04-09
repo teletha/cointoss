@@ -10,6 +10,7 @@
 package trademate;
 
 import static trademate.setting.SettingStyles.*;
+import static transcript.Transcript.*;
 
 import java.time.Period;
 
@@ -20,11 +21,8 @@ import cointoss.market.MarketProvider;
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.ticker.TickSpan;
 import cointoss.util.Chrono;
-import kiss.Extensible;
-import kiss.I;
-import kiss.Manageable;
-import kiss.Singleton;
 import trademate.chart.ChartView;
+import transcript.Transcript;
 import viewtify.Viewtify;
 import viewtify.ui.UI;
 import viewtify.ui.UIButton;
@@ -33,13 +31,11 @@ import viewtify.ui.UIDatePicker;
 import viewtify.ui.View;
 import viewtify.ui.helper.User;
 
-/**
- * @version 2018/08/30 3:16:28
- */
 public class BackTestView extends View {
 
-    /** The locale resource. */
-    private final Lang $ = I.i18n(Lang.class);
+    private static final Transcript LogIsNotFound = Transcript.en("No logs were found for the specified date.");
+
+    private static final Transcript EndDateMustBeAfterStartDate = Transcript.en("The end date must be after the start date.");
 
     private UIComboBox<MarketService> market;
 
@@ -63,11 +59,11 @@ public class BackTestView extends View {
                     $(vbox, () -> {
                         $(market);
                         $(hbox, FormRow, () -> {
-                            label($.startDateLabel(), FormLabel);
+                            label(en("Start Date"), FormLabel);
                             $(startDate, FormInput);
                         });
                         $(hbox, FormRow, () -> {
-                            label($.endDateLabel(), FormLabel);
+                            label(en("End Date"), FormLabel);
                             $(endDate, FormInput);
                         });
                         $(startButton);
@@ -86,14 +82,14 @@ public class BackTestView extends View {
         startDate.initial(Chrono.utcNow().minusDays(10)).uneditable().requireWhen(market).require(() -> {
             MarketLog log = market.value().log;
 
-            assert startDate.isBeforeOrSame(log.lastCacheDate()) : $.logIsNotFound();
-            assert startDate.isAfterOrSame(log.firstCacheDate()) : $.logIsNotFound();
+            assert startDate.isBeforeOrSame(log.lastCacheDate()) : LogIsNotFound;
+            assert startDate.isAfterOrSame(log.firstCacheDate()) : LogIsNotFound;
         }).observe((o, n) -> {
             endDate.value(v -> v.plus(Period.between(o, n)));
         });
 
         endDate.initial(Chrono.utcNow()).uneditable().require(() -> {
-            assert startDate.isBeforeOrSame(endDate) : $.endDateMustBeAfterStartDate();
+            assert startDate.isBeforeOrSame(endDate) : EndDateMustBeAfterStartDate;
         });
 
         // Market market = new Market(BitFlyer.BTC_JPY).readLog(log -> log.at(2018, 1, 17));
@@ -110,106 +106,5 @@ public class BackTestView extends View {
 
             Viewtify.Terminator.add(m);
         });
-    }
-
-    /**
-     * @version 2018/08/03 17:01:00
-     */
-    @SuppressWarnings("unused")
-    @Manageable(lifestyle = Singleton.class)
-    static class Lang implements Extensible {
-
-        /**
-         * Label for start button.
-         * 
-         * @return
-         */
-        String startButton() {
-            return "Start";
-        }
-
-        /**
-         * Label for start date.
-         * 
-         * @return
-         */
-        String startDateLabel() {
-            return "Start Date";
-        }
-
-        /**
-         * Label for end date.
-         * 
-         * @return
-         */
-        String endDateLabel() {
-            return "End Date";
-        }
-
-        /**
-         * Log is not found.
-         * 
-         * @return
-         */
-        public String logIsNotFound() {
-            return "No logs were found for the specified date.";
-        }
-
-        /**
-         * Log is not found.
-         * 
-         * @return
-         */
-        public String endDateMustBeAfterStartDate() {
-            return "The end date must be after the start date.";
-        }
-
-        /**
-         * Japanese bundle.
-         * 
-         * @version 2018/08/03 17:06:23
-         */
-        private static class Lang_ja extends Lang {
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            String startButton() {
-                return "開始";
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            String startDateLabel() {
-                return "開始日";
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            String endDateLabel() {
-                return "終了日";
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            public String logIsNotFound() {
-                return "指定された日付のログが見つかりません。";
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            public String endDateMustBeAfterStartDate() {
-                return "終了日は開始日よりも後にしてください。";
-            }
-        }
     }
 }
