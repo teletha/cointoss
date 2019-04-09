@@ -113,9 +113,9 @@ public class BitFlyerSetting extends View {
 
         loginBackground.when(User.Action).to(() -> {
             if (Lang.current() == Lang.EN) {
-                Transcript.setDefault(Lang.JA);
+                Lang.JA.setDefault();
             } else {
-                Transcript.setDefault(Lang.EN);
+                Lang.EN.setDefault();
             }
         });
     }
