@@ -9,6 +9,8 @@
  */
 package trademate;
 
+import java.util.Locale;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -71,7 +73,7 @@ public class TradeMate extends View {
         Viewtify.application()
                 .use(Theme.Dark)
                 .icon("icon/app.png")
-                .language(Lang.of(I.env("trademate.language", "ja")))
+                .language(Lang.of(I.env("language", Locale.getDefault().getLanguage())))
                 .onTerminating(Network::terminate)
                 .activate(TradeMate.class);
     }

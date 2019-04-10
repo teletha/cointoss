@@ -49,7 +49,12 @@ public interface SettingStyles extends StyleDSL {
     };
 
     Style FormLabel = () -> {
-        display.minWidth(130, px);
+        display.minWidth(120, px);
+        padding.top(4, px);
+    };
+
+    Style FormHeaderLabel = () -> {
+        text.align.center();
     };
 
     Style FormInput = () -> {

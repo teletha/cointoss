@@ -46,7 +46,9 @@ public class OrderBuilder extends View {
     private Predicate<UIText> positiveNumber = ui -> {
         try {
             return Num.of(ui.value()).isPositive();
-        } catch (NumberFormatException e) {
+        } catch (
+
+        NumberFormatException e) {
             return false;
         }
     };
@@ -54,7 +56,9 @@ public class OrderBuilder extends View {
     private Predicate<UIText> negativeNumber = ui -> {
         try {
             return Num.of(ui.value()).isNegative();
-        } catch (NumberFormatException e) {
+        } catch (
+
+        NumberFormatException e) {
             return false;
         }
     };
@@ -264,6 +268,7 @@ public class OrderBuilder extends View {
         Style Label = () -> {
             display.width(60, px);
             display.height(27, px);
+            padding.top(5, px);
         };
 
         Style Form = () -> {

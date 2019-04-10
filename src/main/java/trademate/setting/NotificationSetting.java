@@ -69,9 +69,9 @@ public class NotificationSetting extends View {
                         label(en("Notification Type"), Heading);
                         $(hbox, FormRow, () -> {
                             label("", FormLabel);
-                            label(en("Desktop"), FormCheck);
-                            label(en("LINE"), FormCheck);
-                            label(en("Sound"), FormCheck2);
+                            label(en("Desktop"), FormCheck, FormHeaderLabel);
+                            label(en("LINE"), FormCheck, FormHeaderLabel);
+                            label(en("Sound"), FormCheck2, FormHeaderLabel);
                         });
                         $(longTrend);
                         $(shortTrend);
