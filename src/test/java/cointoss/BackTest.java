@@ -23,6 +23,7 @@ public class BackTest {
     /**
      * @version 2017/09/05 20:19:04
      */
+    @SuppressWarnings("unused")
     private static class BreakoutTrading extends Trader {
 
         private int update;

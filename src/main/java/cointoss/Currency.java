@@ -9,7 +9,6 @@
  */
 package cointoss;
 
-import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -25,7 +24,7 @@ import java.util.TreeSet;
  * 
  * @version 2018/04/29 17:52:57
  */
-public class Currency implements Comparable<Currency>, Serializable {
+public class Currency implements Comparable<Currency> {
 
     private static final Map<String, Currency> currencies = new HashMap<>();
 
@@ -741,7 +740,7 @@ public class Currency implements Comparable<Currency>, Serializable {
     /**
      * @version 2018/04/29 17:54:01
      */
-    private static class CurrencyAttributes implements Serializable {
+    private static class CurrencyAttributes {
 
         public final Set<String> codes;
 

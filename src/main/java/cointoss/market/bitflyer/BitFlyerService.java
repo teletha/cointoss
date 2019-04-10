@@ -527,12 +527,6 @@ class BitFlyerService extends MarketService {
         }
 
         /**
-         * Maintain the session.
-         */
-        private void maintain() {
-        }
-
-        /**
          * {@inheritDoc}
          */
         @Override

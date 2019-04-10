@@ -14,5 +14,6 @@ import java.util.ArrayList;
 /**
  * @version 2017/06/18 17:17:37
  */
+@SuppressWarnings("serial")
 public class OKCoinExecutions extends ArrayList<OKCoinExecution> {
 }

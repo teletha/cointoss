@@ -17,6 +17,7 @@ import java.util.function.IntFunction;
 /**
  * @version 2017/09/10 11:55:00
  */
+@SuppressWarnings("unused")
 public class RingBuffer<T> implements Iterable<T> {
 
     /** The name */

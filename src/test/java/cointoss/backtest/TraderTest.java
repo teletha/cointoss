@@ -9,15 +9,13 @@
  */
 package cointoss.backtest;
 
-import static cointoss.Side.*;
-import static java.time.temporal.ChronoUnit.*;
+import static cointoss.Side.BUY;
+import static java.time.temporal.ChronoUnit.SECONDS;
 
 import org.junit.jupiter.api.Test;
 
 import cointoss.Execution;
 import cointoss.Side;
-import cointoss.Trader;
-import cointoss.Trader.Entry;
 import cointoss.util.Num;
 import kiss.Variable;
 

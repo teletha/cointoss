@@ -566,6 +566,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     /**
      * @version 2018/01/12 21:54:07
      */
+    @SuppressWarnings("unused")
     private class TopMark extends Path {
 
     }
@@ -663,6 +664,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         /**
          * Hide all marks.
          */
+        @SuppressWarnings("unused")
         private void hide() {
             layoutLine.requestLayout();
         }
@@ -670,6 +672,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         /**
          * Show all marks.
          */
+        @SuppressWarnings("unused")
         private void show() {
             layoutLine.requestLayout();
         }

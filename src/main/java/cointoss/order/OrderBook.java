@@ -18,8 +18,6 @@ import java.util.function.Consumer;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.magicwerk.brownies.collections.GapList;
 
 import cointoss.MarketSetting;
@@ -33,9 +31,6 @@ import kiss.Variable;
  * @version 2018/12/03 20:26:50
  */
 public class OrderBook {
-
-    /* Logging */
-    private static final Logger log = LogManager.getLogger();
 
     /** The best order. */
     public final Variable<OrderUnit> best = Variable.empty();

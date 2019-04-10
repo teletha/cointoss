@@ -24,13 +24,11 @@ import cointoss.Side;
 import cointoss.order.Order;
 import cointoss.order.OrderState;
 import cointoss.util.Num;
-import kiss.I;
 import kiss.WiseBiConsumer;
 import stylist.Style;
 import stylist.StyleDSL;
 import trademate.TradeMateStyle;
 import trademate.TradingView;
-import trademate.setting.Notificator;
 import viewtify.ui.UI;
 import viewtify.ui.UIButton;
 import viewtify.ui.UISpinner;
@@ -38,24 +36,11 @@ import viewtify.ui.UIText;
 import viewtify.ui.View;
 import viewtify.ui.helper.User;
 
-/**
- * @version 2018/02/07 17:11:55
- */
 public class OrderBuilder extends View {
 
     private Predicate<UIText> positiveNumber = ui -> {
         try {
             return Num.of(ui.value()).isPositive();
-        } catch (
-
-        NumberFormatException e) {
-            return false;
-        }
-    };
-
-    private Predicate<UIText> negativeNumber = ui -> {
-        try {
-            return Num.of(ui.value()).isNegative();
         } catch (
 
         NumberFormatException e) {
@@ -108,8 +93,6 @@ public class OrderBuilder extends View {
 
     /** UI */
     private TradingView view;
-
-    private Notificator notificator = I.make(Notificator.class);
 
     /**
      * {@inheritDoc}

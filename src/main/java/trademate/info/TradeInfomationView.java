@@ -9,7 +9,7 @@
  */
 package trademate.info;
 
-import static transcript.Transcript.*;
+import static transcript.Transcript.en;
 
 import cointoss.Position;
 import cointoss.PositionManager;
@@ -17,7 +17,6 @@ import cointoss.Side;
 import cointoss.order.Order;
 import cointoss.order.OrderBook;
 import cointoss.util.Num;
-import kiss.Extensible;
 import stylist.Style;
 import stylist.StyleDSL;
 import trademate.TradingView;
@@ -100,6 +99,7 @@ public class TradeInfomationView extends View {
      * 
      * @param position
      */
+    @SuppressWarnings("unused")
     private void retreat(Position position) {
         OrderBook book = view.market().orderBook.bookFor(position.inverse());
         Num price = book.computeBestPrice(Num.ZERO, Num.TWO);
@@ -110,6 +110,7 @@ public class TradeInfomationView extends View {
     /**
      * @version 2018/09/07 14:14:11
      */
+    @SuppressWarnings("unused")
     private interface S extends StyleDSL {
 
         Style Root = () -> {

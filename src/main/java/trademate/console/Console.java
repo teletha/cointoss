@@ -20,7 +20,6 @@ import org.apache.logging.log4j.Logger;
 import stylist.Style;
 import stylist.StyleDSL;
 import trademate.TradingView;
-import trademate.setting.SettingView;
 import viewtify.Viewtify;
 import viewtify.ui.UI;
 import viewtify.ui.UIListView;
@@ -36,8 +35,6 @@ public class Console extends View {
 
     /** The background logger. */
     private Logger logger;
-
-    private SettingView setting;
 
     private TradingView view;
 

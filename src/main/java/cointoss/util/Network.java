@@ -9,7 +9,7 @@
  */
 package cointoss.util;
 
-import static java.util.concurrent.TimeUnit.*;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -82,6 +82,7 @@ public class Network {
      * @param request
      * @return
      */
+    @SuppressWarnings("unused")
     private static String bodyToString(final Request request) {
         try {
             RequestBody body = request.body();

@@ -9,7 +9,6 @@
  */
 package cointoss.ticker;
 
-import java.time.Duration;
 import java.time.ZonedDateTime;
 
 import org.magicwerk.brownies.collections.GapList;
@@ -22,9 +21,6 @@ import kiss.Variable;
  * @version 2018/07/05 10:37:46
  */
 public class RealtimeTicker {
-
-    /** The minimum interval. */
-    private static final Duration interval = Duration.ofMillis(1000);
 
     /** The volume. */
     public Num volume = Num.ZERO;
@@ -46,8 +42,6 @@ public class RealtimeTicker {
 
     /** The tick span. */
     private final TickSpan span;
-
-    private ZonedDateTime checkTime;
 
     private final Variable<Execution> latest;
 
