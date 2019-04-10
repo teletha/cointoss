@@ -4,6 +4,9 @@ Amount
 Buy
 買い
 
+Cancel
+キャンセル
+
 End Date
 終了日
 
@@ -15,6 +18,9 @@ Price
 
 Sell
 売り
+
+Side
+サイド
 
 Start Date
 開始日

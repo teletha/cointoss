@@ -15,7 +15,6 @@ import static transcript.Transcript.*;
 import java.time.Duration;
 
 import cointoss.util.Network;
-import kiss.Extensible;
 import kiss.I;
 import kiss.Manageable;
 import kiss.Singleton;
@@ -32,14 +31,8 @@ import viewtify.ui.View;
 import viewtify.ui.helper.User;
 import viewtify.util.Icon;
 
-/**
- * @version 2018/08/29 23:25:09
- */
 @Manageable(lifestyle = Singleton.class)
 public class NotificationSetting extends View {
-
-    /** The locale resource. */
-    private final Lang2 $ = I.i18n(Lang2.class);
 
     /** The notificator. */
     private final Notificator notificator = I.make(Notificator.class);
@@ -133,8 +126,8 @@ public class NotificationSetting extends View {
             I.make(Network.class).line("TEST").to(e -> {
                 lineAccessToken.decorateBy(Icon.Success);
             }, e -> {
-                lineAccessToken.invalid(en("The specified token [$1] is incorrect. Specify the correct token and then test again.")
-                        .get(lineAccessToken.value()));
+                lineAccessToken.invalid(en("The specified token [{0}] is incorrect. Specify the correct token and then test again.")
+                        .with(lineAccessToken.value()));
             });
         });
 
@@ -203,34 +196,6 @@ public class NotificationSetting extends View {
                     });
                 }
             };
-        }
-    }
-
-    /**
-     * @version 2018/08/27 21:10:05
-     */
-    @SuppressWarnings("unused")
-    static class Lang2 implements Extensible {
-
-        /**
-         * LINE test was failed.
-         * 
-         * @param token
-         * @return
-         */
-        String lineTestFailed(String token) {
-            return "The specified token [" + token + "] is incorrect. Specify the correct token and then test again.";
-        }
-
-        /**
-         * @version 2018/08/27 21:11:28
-         */
-        private static class Lang_ja extends Lang2 {
-
-            @Override
-            String lineTestFailed(String token) {
-                return "指定されたアクセストークン [" + token + "] は正しくありません。\r\n正しいトークンを指定した後に、再度テストを行ってください。";
-            }
         }
     }
 }

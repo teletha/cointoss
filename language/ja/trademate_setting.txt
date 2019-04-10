@@ -73,8 +73,8 @@ Short Trend
 Sound
 サウンド
 
-The specified token [$1] is incorrect. Specify the correct token and then test again.
-指定されたトークン[$1]は正しくありません。 正しいトークンを指定して,もう一度テストしてください。
+The specified token [{0}] is incorrect. Specify the correct token and then test again.
+指定されたトークン[{0}]は正しくありません。 正しいトークンを指定して,もう一度テストしてください。
 
 TopLeft
 左上
