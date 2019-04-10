@@ -20,7 +20,6 @@ import kiss.Manageable;
 import kiss.Singleton;
 import trademate.setting.Notificator.DesktopPosition;
 import trademate.setting.Notificator.Notify;
-import transcript.Lang;
 import viewtify.ui.UI;
 import viewtify.ui.UIButton;
 import viewtify.ui.UICheckBox;
@@ -129,14 +128,6 @@ public class NotificationSetting extends View {
                 lineAccessToken.invalid(en("The specified token [{0}] is incorrect. Specify the correct token and then test again.")
                         .with(lineAccessToken.value()));
             });
-        });
-
-        lineTest.when(User.Action).to(() -> {
-            if (Lang.current() == Lang.EN) {
-                Lang.JA.setDefault();
-            } else {
-                Lang.EN.setDefault();
-            }
         });
     }
 

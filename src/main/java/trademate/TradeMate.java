@@ -14,9 +14,11 @@ import org.apache.logging.log4j.Logger;
 
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.util.Network;
+import kiss.I;
 import kiss.Manageable;
 import kiss.Singleton;
 import trademate.setting.SettingView;
+import transcript.Lang;
 import viewtify.Theme;
 import viewtify.Viewtify;
 import viewtify.ui.UI;
@@ -66,6 +68,11 @@ public class TradeMate extends View {
         Thread.setDefaultUncaughtExceptionHandler((t, e) -> log.error(e.getMessage(), e));
 
         // activate application
-        Viewtify.application().use(Theme.Dark).icon("icon/app.png").onTerminating(Network::terminate).activate(TradeMate.class);
+        Viewtify.application()
+                .use(Theme.Dark)
+                .icon("icon/app.png")
+                .language(Lang.of(I.env("trademate.language", "ja")))
+                .onTerminating(Network::terminate)
+                .activate(TradeMate.class);
     }
 }

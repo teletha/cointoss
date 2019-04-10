@@ -7,6 +7,9 @@ Buy
 Cancel
 キャンセル
 
+Date
+日付
+
 End Date
 終了日
 

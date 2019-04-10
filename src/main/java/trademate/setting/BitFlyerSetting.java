@@ -12,7 +12,6 @@ package trademate.setting;
 import static trademate.setting.SettingStyles.*;
 
 import cointoss.market.bitflyer.BitFlyerAccount;
-import kiss.Extensible;
 import kiss.I;
 import kiss.Manageable;
 import kiss.Singleton;
@@ -118,99 +117,5 @@ public class BitFlyerSetting extends View {
                 Lang.EN.setDefault();
             }
         });
-    }
-
-    /**
-     * @version 2018/08/29 3:52:37
-     */
-    @SuppressWarnings("unused")
-    @Manageable(lifestyle = Singleton.class)
-    static class Message implements Extensible {
-
-        /**
-         * Label for API key
-         * 
-         * @return
-         */
-        String publicAPIDescription() {
-            return "Please get API key and API secret to use the public API provided by [BitFlyer](https://lightning.bitflyer.jp/developer).";
-        }
-
-        String privateAPITitle() {
-            return "Usage of Private API";
-        }
-
-        /**
-         * Desciption for private API.
-         * 
-         * @return
-         */
-        String privateAPIDescription() {
-            return "We will try to speed up trading by using private API.\r\nTradeaMate acquires the account specific infomation(e.g. session id) by logging in automatically.";
-        }
-
-        /**
-         * Warning for private API.
-         * 
-         * @return
-         */
-        String privateAPIWarning() {
-            return "WARNING : This setting will allow all operations on your account.";
-        }
-
-        /**
-         * Description label for login.
-         * 
-         * @return
-         */
-        String loginExplicitly() {
-            return "Login explicitly";
-        }
-
-        /**
-         * @version 2018/08/29 3:53:49
-         */
-        private static class Message_ja extends Message {
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            String publicAPIDescription() {
-                return "[BitFlyer](https://lightning.bitflyer.jp/developer)の提供する公開APIを利用するためにAPIキーとAPIシークレットを取得してください。";
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            String privateAPITitle() {
-                return "非公開APIの利用";
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            String privateAPIDescription() {
-                return "非公開APIを利用して取引の高速化を図ります。\r\nブラウザを使用して自動でログインを行いアカウント固有のIDやセッション情報を取得します。";
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            String privateAPIWarning() {
-                return "注意 : この設定を行うとあなたのアカウントに対する全ての操作を許可することになります。";
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            String loginExplicitly() {
-                return "ログイン画面を表示";
-            }
-        }
     }
 }
