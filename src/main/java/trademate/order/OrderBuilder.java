@@ -9,9 +9,9 @@
  */
 package trademate.order;
 
-import static java.util.concurrent.TimeUnit.*;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static trademate.CommonText.*;
-import static transcript.Transcript.*;
+import static transcript.Transcript.en;
 
 import java.math.RoundingMode;
 import java.util.function.Predicate;
@@ -130,26 +130,26 @@ public class OrderBuilder extends View {
                         $(orderPriceAmount, S.FormMin);
                     });
                     $(hbox, S.Row, () -> {
-                        label("分散数", S.Label);
+                        label(en("Variances"), S.Label);
                         $(orderDivideSize, S.Form);
                         $(orderDivideIntervalAmount, S.FormMin);
                     });
                     $(hbox, S.Row, () -> {
-                        label("価格間隔", S.Label);
+                        label(en("Price Interval"), S.Label);
                         $(orderPriceInterval, S.Form);
                         $(orderPriceIntervalAmount, S.FormMin);
                     });
                     $(hbox, S.Row, () -> {
-                        label("閾枚数", S.Label);
+                        label(en("Threshold"), S.Label);
                         $(optimizeThreshold, S.Form);
                     });
                     $(hbox, S.Row, () -> {
-                        label("指値", S.Label);
+                        label(en("Limit Entry"), S.Label);
                         $(orderLimitShort, S.FormButton, TradeMateStyle.Short);
                         $(orderLimitLong, S.FormButton, TradeMateStyle.Long);
                     });
                     $(hbox, S.Row, () -> {
-                        label("決済", S.Label);
+                        label(en("Exit"), S.Label);
                         $(orderCancel, S.FormButton);
                         $(orderStop, S.FormButton);
                         $(orderReverse, S.FormButton);

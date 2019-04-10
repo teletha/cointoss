@@ -10,6 +10,7 @@
 package trademate.setting;
 
 import static trademate.setting.SettingStyles.*;
+import static transcript.Transcript.en;
 
 import cointoss.market.bitflyer.BitFlyerAccount;
 import kiss.I;
@@ -82,11 +83,11 @@ public class BitFlyerSetting extends View {
                             $(loginId, FormInput);
                         });
                         $(hbox, FormRow, () -> {
-                            label("Password", FormLabel);
+                            label(en("Password"), FormLabel);
                             $(loginPassword, FormInput);
                         });
                         $(hbox, FormRow, () -> {
-                            label("Account ID", FormLabel);
+                            label(en("Account ID"), FormLabel);
                             $(accountId, FormInput);
                         });
                         $(hbox, FormRow, () -> {

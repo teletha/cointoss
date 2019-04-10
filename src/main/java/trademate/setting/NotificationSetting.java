@@ -10,7 +10,7 @@
 package trademate.setting;
 
 import static trademate.setting.SettingStyles.*;
-import static transcript.Transcript.*;
+import static transcript.Transcript.en;
 
 import java.time.Duration;
 

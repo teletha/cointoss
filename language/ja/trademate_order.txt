@@ -4,6 +4,15 @@ Buy
 Cancel
 キャンセル
 
+Limit Entry
+指値
+
+Exit
+撤退
+
+Price Interval
+価格間隔
+
 Reverse
 ドテン
 
@@ -12,4 +21,10 @@ Sell
 
 Stop
 撤退
+
+Threshold
+閾枚数
+
+Variances
+分散数
 
