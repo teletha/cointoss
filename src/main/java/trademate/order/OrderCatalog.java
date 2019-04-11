@@ -16,12 +16,11 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.function.Consumer;
 
-import javafx.scene.control.TreeTableRow;
-
 import cointoss.Side;
 import cointoss.order.Order;
 import cointoss.order.OrderState;
 import cointoss.util.Num;
+import javafx.scene.control.TreeTableRow;
 import kiss.Variable;
 import stylist.Style;
 import stylist.StyleDSL;
@@ -191,6 +190,9 @@ public class OrderCatalog extends View {
                 $.descendant(() -> {
                     font.color($.rgb(80, 80, 80));
                 });
+                break;
+
+            default:
                 break;
             }
         };
