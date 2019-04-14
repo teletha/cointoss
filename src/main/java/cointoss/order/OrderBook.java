@@ -14,46 +14,31 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Objects;
 import java.util.function.Consumer;
-
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import java.util.function.UnaryOperator;
 
 import org.magicwerk.brownies.collections.GapList;
 
 import cointoss.MarketSetting;
 import cointoss.Side;
 import cointoss.util.Num;
-import kiss.Signal;
-import kiss.Signaling;
 import kiss.Variable;
 
-/**
- * @version 2018/12/03 20:26:50
- */
 public class OrderBook {
 
     /** The best order. */
     public final Variable<OrderUnit> best = Variable.empty();
 
-    /** The modified event listeners. */
-    private final Signaling<Boolean> modify = new Signaling();
-
-    /** The modified event stream. */
-    public final Signal<Boolean> modified = modify.expose;
-
     /** The search direction. */
     private final Side side;
 
     /** The base list. */
-    final ObservableList<OrderUnit> base;
+    List<OrderUnit> base;
 
     /** The grouped list. */
     private final List<Grouped> groups = new ArrayList();
 
     /** The book operator thread. */
-    private Consumer<Runnable> operator = task -> {
-        task.run();
-    };
+    private Consumer<Runnable> operator = Runnable::run;
 
     /**
      * @param side
@@ -63,9 +48,9 @@ public class OrderBook {
     OrderBook(MarketSetting setting, Side side) {
         this.side = Objects.requireNonNull(side);
 
-        this.base = FXCollections.observableList(new GapList());
+        this.base = new GapList();
         for (Num range : setting.orderBookGroupRanges()) {
-            groups.add(new Grouped(side, range, FXCollections.observableList(new GapList()), setting));
+            groups.add(new Grouped(side, range, new GapList(), setting));
         }
     }
 
@@ -74,9 +59,24 @@ public class OrderBook {
      * 
      * @param operator
      */
-    public void setOperator(Consumer<Runnable> operator) {
+    public final void setOperator(Consumer<Runnable> operator) {
         if (operator != null) {
             this.operator = operator;
+        }
+    }
+
+    /**
+     * Replace the order book management container with your container.
+     * 
+     * @param <L>
+     * @param builder
+     * @return
+     */
+    public final void setContainer(UnaryOperator<List<OrderUnit>> builder) {
+        base = builder.apply(base);
+
+        for (Grouped grouped : groups) {
+            grouped.list = builder.apply(grouped.list);
         }
     }
 
@@ -112,7 +112,7 @@ public class OrderBook {
      * @param ratio
      * @return
      */
-    public ObservableList<OrderUnit> selectBy(Num range) {
+    public List<OrderUnit> selectBy(Num range) {
         for (Grouped grouped : groups) {
             if (grouped.range.is(range)) {
                 return grouped.list;
@@ -209,7 +209,6 @@ public class OrderBook {
                     }
                 }
             }
-            modify.accept(true);
         });
     }
 
@@ -237,8 +236,6 @@ public class OrderBook {
                     best.set(base.get(base.size() - 1));
                 }
             }
-
-            modify.accept(true);
         });
     }
 
@@ -376,7 +373,7 @@ public class OrderBook {
         private final Num range;
 
         /** The base list. */
-        private final ObservableList<OrderUnit> list;
+        private List<OrderUnit> list;
 
         /** The cache */
         private final int size;
@@ -385,7 +382,7 @@ public class OrderBook {
          * @param side
          * @param scaleSize
          */
-        private Grouped(Side side, Num range, ObservableList<OrderUnit> list, MarketSetting setting) {
+        private Grouped(Side side, Num range, List<OrderUnit> list, MarketSetting setting) {
             this.side = side;
             this.range = range;
             this.list = list;

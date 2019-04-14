@@ -11,6 +11,8 @@ package trademate.order;
 
 import static trademate.TradeMateStyle.*;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.scene.control.ListCell;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -84,6 +86,8 @@ public class OrderBookView extends View {
     @Override
     protected void initialize() {
         book = view.market().orderBook;
+        book.longs.setContainer(FXCollections::observableList);
+        book.shorts.setContainer(FXCollections::observableList);
         book.longs.setOperator(Viewtify.UIThread);
         book.shorts.setOperator(Viewtify.UIThread);
 
@@ -95,8 +99,8 @@ public class OrderBookView extends View {
                 .scrollToBottom();
 
         priceRange.values(0, view.market().service.setting.orderBookGroupRangesWithBase()).observeNow(range -> {
-            longList.values(book.longs.selectBy(range));
-            shortList.values(book.shorts.selectBy(range));
+            longList.values((ObservableList) book.longs.selectBy(range));
+            shortList.values((ObservableList) book.shorts.selectBy(range));
         });
 
         view.market().tickers.latest.observe().on(Viewtify.UIThread).to(e -> priceLatest.text(e.price));
