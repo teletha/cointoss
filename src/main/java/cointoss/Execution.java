@@ -111,7 +111,7 @@ public class Execution implements Directional {
      * {@inheritDoc}
      */
     @Override
-    public Direction side() {
+    public Direction direction() {
         return side;
     }
 

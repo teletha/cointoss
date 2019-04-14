@@ -109,7 +109,7 @@ public final class PositionManager implements Directional {
      * {@inheritDoc}
      */
     @Override
-    public Direction side() {
+    public Direction direction() {
         return isLong() ? Direction.BUY : Direction.SELL;
     }
 

@@ -295,7 +295,7 @@ public class VerifiableMarketService extends MarketService {
                 order.remainingSize = order.remainingSize.minus(executedSize);
 
                 Execution exe = new Execution();
-                exe.side = order.side();
+                exe.side = order.direction();
                 exe.size = exe.cumulativeSize = executedSize;
                 exe.price = order.type.isMarket() ? order.marketMinPrice : order.price.get();
                 exe.date = e.date;
@@ -371,7 +371,7 @@ public class VerifiableMarketService extends MarketService {
          * @param o
          */
         private BackendOrder(Order o) {
-            super(o.side(), o.size, o.price.v);
+            super(o.direction(), o.size, o.price.v);
 
             stopAt(o.stopPrice());
             type(o.quantityCondition());

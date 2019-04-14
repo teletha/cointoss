@@ -64,7 +64,7 @@ public enum Direction implements Directional {
      * {@inheritDoc}
      */
     @Override
-    public Direction side() {
+    public Direction direction() {
         return this;
     }
 

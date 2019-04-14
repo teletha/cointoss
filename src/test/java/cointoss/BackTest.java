@@ -44,7 +44,7 @@ public class BackTest {
                     if (latest == null) {
                         side = Direction.random();
                     } else {
-                        side = latest.isWin() ? latest.side() : latest.inverse();
+                        side = latest.isWin() ? latest.direction() : latest.inverse();
                     }
 
                     entryMarket(side, maxPositionSize, entry -> {

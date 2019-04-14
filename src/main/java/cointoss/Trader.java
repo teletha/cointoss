@@ -301,8 +301,8 @@ public abstract class Trader implements Disposable {
          * {@inheritDoc}
          */
         @Override
-        public Direction side() {
-            return order.side();
+        public Direction direction() {
+            return order.direction();
         }
 
         /**
@@ -322,7 +322,7 @@ public abstract class Trader implements Disposable {
         public final Num profit() {
             Num up, down;
 
-            if (side().isBuy()) {
+            if (direction().isBuy()) {
                 up = exitCost.plus(positionSize.multiply(market.tickers.latest.v.price));
                 down = entryCost;
             } else {
@@ -597,7 +597,7 @@ public abstract class Trader implements Disposable {
                     .append("/")
                     .append(entrySize())
                     .append("@")
-                    .append(side().mark())
+                    .append(direction().mark())
                     .append(entryPrice().asJPY(1))
                     .append(" → ")
                     .append(exitPrice().asJPY(1))

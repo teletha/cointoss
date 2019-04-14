@@ -93,7 +93,7 @@ public class OrderCatalog extends View {
                 .render((ui, item) -> ui.text(formatter.format(item)));
         side.header(SiDe)
                 .modelByProperty(OrderSet.class, o -> o.side)
-                .model(Order.class, Order::side)
+                .model(Order.class, Order::direction)
                 .render((ui, side) -> ui.text(side).styleOnly(TradeMateStyle.Side.of(side)));
         amount.header(Amount).modelByProperty(OrderSet.class, o -> o.amount).model(Order.class, o -> o.remainingSize);
         price.header(Price).modelByProperty(OrderSet.class, o -> o.averagePrice).model(Order.class, o -> o.price.v);

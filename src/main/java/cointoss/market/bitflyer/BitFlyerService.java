@@ -144,7 +144,7 @@ class BitFlyerService extends MarketService {
             request.minute_to_expire = 60 * 24;
             request.price = order.price.v.toInt();
             request.product_code = marketName;
-            request.side = order.side().name();
+            request.side = order.direction().name();
             request.size = order.size.toDouble();
             request.time_in_force = order.quantityCondition().abbreviation;
 
@@ -157,7 +157,7 @@ class BitFlyerService extends MarketService {
             request.order_ref_id = id;
             request.price = order.price.v.toInt();
             request.product_code = marketName;
-            request.side = order.side().name();
+            request.side = order.direction().name();
             request.size = order.size.toDouble();
             request.time_in_force = order.quantityCondition().abbreviation;
 

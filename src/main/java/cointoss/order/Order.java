@@ -85,7 +85,7 @@ public class Order implements Directional {
      * {@inheritDoc}
      */
     @Override
-    public final Direction side() {
+    public final Direction direction() {
         return side;
     }
 
@@ -263,7 +263,7 @@ public class Order implements Directional {
      */
     @Override
     public String toString() {
-        return side().mark() + size + "@" + price + " 残" + remainingSize + " 済" + executedSize + " " + created;
+        return direction().mark() + size + "@" + price + " 残" + remainingSize + " 済" + executedSize + " " + created;
     }
 
     /**
