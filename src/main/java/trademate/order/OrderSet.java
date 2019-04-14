@@ -14,7 +14,7 @@ import java.time.ZonedDateTime;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import cointoss.Side;
+import cointoss.Direction;
 import cointoss.order.Order;
 import cointoss.order.OrderState;
 import cointoss.util.Num;
@@ -44,7 +44,7 @@ public class OrderSet {
     public final Calculation<Num> averagePrice = Viewtify.calculate(totalPrice, amount, (total, amount) -> total.divide(amount).scale(0));
 
     /** Side */
-    public final Calculation<Side> side = Viewtify.calculate(sub).item(0).map(o -> o.side);
+    public final Calculation<Direction> side = Viewtify.calculate(sub).item(0).map(o -> o.side);
 
     /** The latest date */
     public final Calculation<ZonedDateTime> date = Viewtify.calculate(sub).item(0).flatVariable(o -> o.created);

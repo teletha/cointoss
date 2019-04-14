@@ -10,7 +10,7 @@
 package cointoss.ticker;
 
 import cointoss.Execution;
-import cointoss.Side;
+import cointoss.Direction;
 import cointoss.util.Num;
 import kiss.I;
 import kiss.Signal;
@@ -103,7 +103,7 @@ public final class TickerManager {
         }
 
         // update totality of related values
-        if (e.side == Side.BUY) {
+        if (e.side == Direction.BUY) {
             longVolume = longVolume.plus(e.size);
             longPriceIncrease = longPriceIncrease.plus(e.price.minus(latest.v.price));
         } else {

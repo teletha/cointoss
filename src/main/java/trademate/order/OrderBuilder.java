@@ -20,7 +20,7 @@ import java.util.stream.IntStream;
 import javafx.scene.control.Spinner;
 import javafx.scene.input.ScrollEvent;
 
-import cointoss.Side;
+import cointoss.Direction;
 import cointoss.order.Order;
 import cointoss.order.OrderState;
 import cointoss.util.Num;
@@ -168,8 +168,8 @@ public class OrderBuilder extends View {
         // validate order condition
         orderLimitLong.parent().disableWhen(orderSize.isInvalid(), orderPrice.isInvalid());
 
-        orderLimitLong.text(Buy).when(User.MouseClick).throttle(1000, MILLISECONDS).mapTo(Side.BUY).to(this::requestOrder);
-        orderLimitShort.text(Sell).when(User.MouseClick).throttle(1000, MILLISECONDS).mapTo(Side.SELL).to(this::requestOrder);
+        orderLimitLong.text(Buy).when(User.MouseClick).throttle(1000, MILLISECONDS).mapTo(Direction.BUY).to(this::requestOrder);
+        orderLimitShort.text(Sell).when(User.MouseClick).throttle(1000, MILLISECONDS).mapTo(Direction.SELL).to(this::requestOrder);
 
         orderCancel.text(en("Cancel")).when(User.MouseClick).to(view.market()::cancel);
         orderStop.text(en("Stop")).when(User.MouseClick).to(view.market()::stop);
@@ -204,7 +204,7 @@ public class OrderBuilder extends View {
      * @param side
      * @return
      */
-    private void requestOrder(Side side) {
+    private void requestOrder(Direction side) {
         OrderSet set = new OrderSet();
 
         // ========================================

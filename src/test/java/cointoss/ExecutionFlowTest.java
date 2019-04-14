@@ -83,7 +83,7 @@ class ExecutionFlowTest {
         e.price = Num.of(price);
         e.size = Num.of(size);
         e.date = base.plusSeconds(time);
-        e.side = Side.BUY;
+        e.side = Direction.BUY;
 
         return e;
     }
@@ -101,7 +101,7 @@ class ExecutionFlowTest {
         e.price = Num.of(price);
         e.size = Num.of(size);
         e.date = base.plusSeconds(time);
-        e.side = Side.SELL;
+        e.side = Direction.SELL;
 
         return e;
     }

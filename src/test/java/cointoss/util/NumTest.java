@@ -13,7 +13,7 @@ import static cointoss.util.Num.*;
 
 import org.junit.jupiter.api.Test;
 
-import cointoss.Side;
+import cointoss.Direction;
 
 /**
  * @version 2018/04/02 16:46:50
@@ -57,8 +57,8 @@ class NumTest {
 
     @Test
     void minusDirectional() {
-        assert HUNDRED.minus(Side.BUY, 20).is(80);
-        assert HUNDRED.minus(Side.SELL, 20).is(120);
+        assert HUNDRED.minus(Direction.BUY, 20).is(80);
+        assert HUNDRED.minus(Direction.SELL, 20).is(120);
     }
 
     @Test
@@ -149,10 +149,10 @@ class NumTest {
 
     @Test
     void isLessThanDirectional() {
-        assert HUNDRED.isLessThan(Side.BUY, 120) == true;
-        assert HUNDRED.isLessThan(Side.BUY, 80) == false;
-        assert HUNDRED.isLessThan(Side.SELL, 120) == false;
-        assert HUNDRED.isLessThan(Side.SELL, 80) == true;
+        assert HUNDRED.isLessThan(Direction.BUY, 120) == true;
+        assert HUNDRED.isLessThan(Direction.BUY, 80) == false;
+        assert HUNDRED.isLessThan(Direction.SELL, 120) == false;
+        assert HUNDRED.isLessThan(Direction.SELL, 80) == true;
     }
 
     @Test

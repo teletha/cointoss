@@ -11,7 +11,7 @@ package trademate.info;
 
 import static transcript.Transcript.en;
 
-import cointoss.Side;
+import cointoss.Direction;
 import cointoss.order.Order;
 import cointoss.order.OrderBook;
 import cointoss.position.Position;
@@ -87,7 +87,7 @@ public class TradeInfomationView extends View {
             Position position = new Position();
             position.price = Num.of(10000);
             position.size.set(Num.of(1));
-            position.side = Side.BUY;
+            position.side = Direction.BUY;
             System.out.println("add position");
 
             manager.add(position);

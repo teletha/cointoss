@@ -9,7 +9,7 @@
  */
 package cointoss.analyze;
 
-import static cointoss.Side.*;
+import static cointoss.Direction.*;
 
 import org.junit.jupiter.api.Test;
 

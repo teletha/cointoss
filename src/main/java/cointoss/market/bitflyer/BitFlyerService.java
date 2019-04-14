@@ -36,7 +36,7 @@ import com.google.gson.JsonObject;
 import cointoss.Execution;
 import cointoss.MarketService;
 import cointoss.MarketSetting;
-import cointoss.Side;
+import cointoss.Direction;
 import cointoss.order.Order;
 import cointoss.order.OrderBookChange;
 import cointoss.order.OrderState;
@@ -228,7 +228,7 @@ class BitFlyerService extends MarketService {
 
                     BitFlyerExecution exe = new BitFlyerExecution();
                     exe.id = latestId = id != 0 ? id : ++latestId;
-                    exe.side = Side.parse(e.get("side").getAsString());
+                    exe.side = Direction.parse(e.get("side").getAsString());
                     exe.price = Num.of(e.get("price").getAsString());
                     exe.size = exe.cumulativeSize = Num.of(e.get("size").getAsString());
                     exe.exec_date = parse(e.get("exec_date").getAsString()).atZone(Chrono.UTC);
@@ -237,7 +237,7 @@ class BitFlyerService extends MarketService {
 
                     if (orders.contains(buyer)) {
                         Execution position = new Execution();
-                        position.side = Side.BUY;
+                        position.side = Direction.BUY;
                         position.date = exe.exec_date;
                         position.price = exe.price;
                         position.size = exe.size;
@@ -246,7 +246,7 @@ class BitFlyerService extends MarketService {
                         executionsForMe.accept(position);
                     } else if (orders.contains(seller)) {
                         Execution position = new Execution();
-                        position.side = Side.SELL;
+                        position.side = Direction.SELL;
                         position.date = exe.exec_date;
                         position.price = exe.price;
                         position.size = exe.size;
@@ -561,7 +561,7 @@ class BitFlyerService extends MarketService {
      */
     static class ChildOrderResponse {
 
-        public Side side;
+        public Direction side;
 
         public String child_order_id;
 

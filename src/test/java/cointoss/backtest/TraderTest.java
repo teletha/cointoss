@@ -9,13 +9,13 @@
  */
 package cointoss.backtest;
 
-import static cointoss.Side.BUY;
+import static cointoss.Direction.BUY;
 import static java.time.temporal.ChronoUnit.SECONDS;
 
 import org.junit.jupiter.api.Test;
 
 import cointoss.Execution;
-import cointoss.Side;
+import cointoss.Direction;
 import cointoss.util.Num;
 import kiss.Variable;
 
@@ -29,7 +29,7 @@ class TraderTest extends TraderTestSupport {
         assert hasPosition() == false;
 
         // try entry
-        Entry entry = entryLimit(Side.BUY, Num.ONE, Num.TEN, null);
+        Entry entry = entryLimit(Direction.BUY, Num.ONE, Num.TEN, null);
         assert entry.remaining().is(0);
 
         // execute
@@ -44,34 +44,34 @@ class TraderTest extends TraderTestSupport {
         assert entry == null;
 
         // null size
-        entry = entryLimit(Side.BUY, null, Num.ONE, null);
+        entry = entryLimit(Direction.BUY, null, Num.ONE, null);
         assert entry == null;
 
         // zero size
-        entry = entryLimit(Side.BUY, Num.ZERO, Num.ONE, null);
+        entry = entryLimit(Direction.BUY, Num.ZERO, Num.ONE, null);
         assert entry == null;
 
         // negative size
-        entry = entryLimit(Side.BUY, Num.of(-1), Num.ONE, null);
+        entry = entryLimit(Direction.BUY, Num.of(-1), Num.ONE, null);
         assert entry == null;
 
         // null price
-        entry = entryLimit(Side.BUY, Num.ONE, null, null);
+        entry = entryLimit(Direction.BUY, Num.ONE, null, null);
         assert entry == null;
 
         // zero price
-        entry = entryLimit(Side.BUY, Num.ONE, Num.ZERO, null);
+        entry = entryLimit(Direction.BUY, Num.ONE, Num.ZERO, null);
         assert entry == null;
 
         // negative price
-        entry = entryLimit(Side.BUY, Num.ONE, Num.of(-1), null);
+        entry = entryLimit(Direction.BUY, Num.ONE, Num.of(-1), null);
         assert entry == null;
     }
 
     @Test
     void entryMarket() {
         // try entry
-        Entry entry = entryMarket(Side.BUY, Num.ONE, null);
+        Entry entry = entryMarket(Direction.BUY, Num.ONE, null);
         assert entry.remaining().is(0);
 
         // execute
@@ -86,22 +86,22 @@ class TraderTest extends TraderTestSupport {
         assert entry == null;
 
         // null size
-        entry = entryMarket(Side.BUY, null, null);
+        entry = entryMarket(Direction.BUY, null, null);
         assert entry == null;
 
         // zero size
-        entry = entryMarket(Side.BUY, Num.ZERO, null);
+        entry = entryMarket(Direction.BUY, Num.ZERO, null);
         assert entry == null;
 
         // negative size
-        entry = entryMarket(Side.BUY, Num.of(-1), null);
+        entry = entryMarket(Direction.BUY, Num.of(-1), null);
         assert entry == null;
     }
 
     @Test
     void exitLimit() {
         // entry and execute
-        Entry entry = entryLimit(Side.BUY, Num.ONE, Num.TEN, null);
+        Entry entry = entryLimit(Direction.BUY, Num.ONE, Num.TEN, null);
         market.execute(1, 10);
         assert entry.remaining().is(1);
 
@@ -116,7 +116,7 @@ class TraderTest extends TraderTestSupport {
     @Test
     void exitLimitInvalidParameters() {
         // entry and execute
-        Entry entry = entryLimit(Side.BUY, Num.ONE, Num.TEN, null);
+        Entry entry = entryLimit(Direction.BUY, Num.ONE, Num.TEN, null);
         market.execute(1, 10);
         assert entry.remaining().is(1);
 
@@ -148,7 +148,7 @@ class TraderTest extends TraderTestSupport {
     @Test
     void exitMarket() {
         // entry and execute
-        Entry entry = entryLimit(Side.BUY, Num.ONE, Num.TEN, null);
+        Entry entry = entryLimit(Direction.BUY, Num.ONE, Num.TEN, null);
         market.execute(1, 10);
         assert entry.remaining().is(1);
 
@@ -163,7 +163,7 @@ class TraderTest extends TraderTestSupport {
     @Test
     void exitMarketInvalidPrameters() {
         // entry and execute
-        Entry entry = entryLimit(Side.BUY, Num.ONE, Num.TEN, null);
+        Entry entry = entryLimit(Direction.BUY, Num.ONE, Num.TEN, null);
         market.execute(1, 10);
         assert entry.remaining().is(1);
 
@@ -186,7 +186,7 @@ class TraderTest extends TraderTestSupport {
         assert completed.isAbsent();
 
         // entry
-        entryLimit(Side.BUY, Num.ONE, Num.TEN, null);
+        entryLimit(Direction.BUY, Num.ONE, Num.TEN, null);
         assert completed.isAbsent();
 
         // execute
@@ -200,7 +200,7 @@ class TraderTest extends TraderTestSupport {
         assert completed.isAbsent();
 
         // entry
-        Entry entry = entryLimit(Side.BUY, Num.ONE, Num.TEN, null);
+        Entry entry = entryLimit(Direction.BUY, Num.ONE, Num.TEN, null);
         market.execute(1, 10);
         assert completed.isAbsent();
 
@@ -219,7 +219,7 @@ class TraderTest extends TraderTestSupport {
         assert completed.isAbsent();
 
         // entry
-        Entry entry = entryLimit(Side.BUY, Num.ONE, Num.TEN, null);
+        Entry entry = entryLimit(Direction.BUY, Num.ONE, Num.TEN, null);
         market.execute(1, 10);
         assert completed.isAbsent();
 

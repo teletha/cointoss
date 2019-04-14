@@ -20,7 +20,7 @@ public interface Directional {
      * @return
      */
     default boolean isBuy() {
-        return side() == Side.BUY;
+        return side() == Direction.BUY;
     }
 
     /**
@@ -29,22 +29,22 @@ public interface Directional {
      * @return
      */
     default boolean isSell() {
-        return side() == Side.SELL;
+        return side() == Direction.SELL;
     }
 
     /**
-     * Utility to inverse {@link Side}.
+     * Utility to inverse {@link Direction}.
      * 
      * @return
      */
-    default Side inverse() {
-        return side() == Side.BUY ? Side.SELL : Side.BUY;
+    default Direction inverse() {
+        return side() == Direction.BUY ? Direction.SELL : Direction.BUY;
     }
 
     /**
-     * Get {@link Side}.
+     * Get {@link Direction}.
      * 
      * @return
      */
-    Side side();
+    Direction side();
 }

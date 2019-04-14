@@ -16,7 +16,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.function.Consumer;
 
-import cointoss.Side;
+import cointoss.Direction;
 import cointoss.order.Order;
 import cointoss.order.OrderState;
 import cointoss.util.Num;
@@ -48,7 +48,7 @@ public class OrderCatalog extends View {
     private UITreeTableColumn<Object, ZonedDateTime> date;
 
     /** UI */
-    private UITreeTableColumn<Object, Side> side;
+    private UITreeTableColumn<Object, Direction> side;
 
     /** UI */
     private UITreeTableColumn<Object, Num> amount;

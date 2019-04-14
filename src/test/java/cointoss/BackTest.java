@@ -39,10 +39,10 @@ public class BackTest {
             market.timeline.to(exe -> {
                 if (hasPosition() == false) {
                     Entry latest = latest();
-                    Side side;
+                    Direction side;
 
                     if (latest == null) {
-                        side = Side.random();
+                        side = Direction.random();
                     } else {
                         side = latest.isWin() ? latest.side() : latest.inverse();
                     }

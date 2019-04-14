@@ -62,7 +62,7 @@ public class VerifiableMarket extends Market {
      * @param price
      */
     public VerifiableMarket execute(int size, int price) {
-        return execute(Side.random(), size, price);
+        return execute(Direction.random(), size, price);
     }
 
     /**
@@ -73,7 +73,7 @@ public class VerifiableMarket extends Market {
      * @param price
      */
     public VerifiableMarket execute(int size, int price, int time) {
-        return execute(Side.random(), size, price, at(time));
+        return execute(Direction.random(), size, price, at(time));
     }
 
     /**
@@ -83,7 +83,7 @@ public class VerifiableMarket extends Market {
      * @param size
      * @param price
      */
-    public VerifiableMarket execute(Side side, int size, int price) {
+    public VerifiableMarket execute(Direction side, int size, int price) {
         return execute(side, size, price, at(0));
     }
 
@@ -94,7 +94,7 @@ public class VerifiableMarket extends Market {
      * @param size
      * @param price
      */
-    public VerifiableMarket execute(Side side, Num size, Num price) {
+    public VerifiableMarket execute(Direction side, Num size, Num price) {
         return execute(side, size, price, at(0));
     }
 
@@ -105,7 +105,7 @@ public class VerifiableMarket extends Market {
      * @param size
      * @param price
      */
-    public VerifiableMarket execute(Side side, int size, int price, Time lag) {
+    public VerifiableMarket execute(Direction side, int size, int price, Time lag) {
         return execute(side, Num.of(size), Num.of(price), lag);
     }
 
@@ -116,7 +116,7 @@ public class VerifiableMarket extends Market {
      * @param size
      * @param price
      */
-    public VerifiableMarket execute(Side side, Num size, Num price, Time lag) {
+    public VerifiableMarket execute(Direction side, Num size, Num price, Time lag) {
         Execution e = new Execution();
         e.side = side;
         e.size = e.cumulativeSize = size;

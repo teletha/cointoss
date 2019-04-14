@@ -11,7 +11,7 @@ package cointoss.backtest;
 
 import org.junit.jupiter.api.BeforeEach;
 
-import cointoss.Side;
+import cointoss.Direction;
 import cointoss.Trader;
 import cointoss.VerifiableMarket;
 import cointoss.analyze.TradingLog;
@@ -59,7 +59,7 @@ public abstract class TraderTestSupport extends Trader {
      * @param exitSize
      * @param exitPrice
      */
-    protected final void entryAndExit(Side side, double entrySize, double entryPrice, double exitSize, double exitPrice) {
+    protected final void entryAndExit(Direction side, double entrySize, double entryPrice, double exitSize, double exitPrice) {
         entryAndExit(side, Num.of(entrySize), Num.of(entryPrice), Num.of(exitSize), Num.of(exitPrice));
     }
 
@@ -72,7 +72,7 @@ public abstract class TraderTestSupport extends Trader {
      * @param exitSize
      * @param exitPrice
      */
-    protected final void entryAndExit(Side side, Num entrySize, Num entryPrice, Num exitSize, Num exitPrice) {
+    protected final void entryAndExit(Direction side, Num entrySize, Num entryPrice, Num exitSize, Num exitPrice) {
         entryLimit(side, entrySize, entryPrice, entry -> {
             market.execute(side, entrySize, entryPrice);
 
@@ -90,7 +90,7 @@ public abstract class TraderTestSupport extends Trader {
      * @param entryPrice
      * @return
      */
-    protected final Exit entry(Side side, double entrySize, double entryPrice) {
+    protected final Exit entry(Direction side, double entrySize, double entryPrice) {
         return entry(side, Num.of(entrySize), Num.of(entryPrice));
     }
 
@@ -102,7 +102,7 @@ public abstract class TraderTestSupport extends Trader {
      * @param entryPrice
      * @return
      */
-    protected final Exit entry(Side side, Num entrySize, Num entryPrice) {
+    protected final Exit entry(Direction side, Num entrySize, Num entryPrice) {
         return new Exit(entryLimit(side, entrySize, entryPrice, entry -> {
             market.execute(side, entrySize, entryPrice);
         }));

@@ -12,7 +12,7 @@ package cointoss.position;
 import java.time.ZonedDateTime;
 
 import cointoss.Directional;
-import cointoss.Side;
+import cointoss.Direction;
 import cointoss.util.Num;
 import kiss.Variable;
 
@@ -22,7 +22,7 @@ import kiss.Variable;
 public class Position implements Directional {
 
     /** The position side. */
-    public Side side;
+    public Direction side;
 
     /** The position price. */
     public Num price;
@@ -43,7 +43,7 @@ public class Position implements Directional {
      * {@inheritDoc}
      */
     @Override
-    public Side side() {
+    public Direction side() {
         return side;
     }
 }

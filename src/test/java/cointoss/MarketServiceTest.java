@@ -11,7 +11,7 @@ package cointoss;
 
 import static cointoss.Execution.*;
 import static cointoss.MarketTestSupport.*;
-import static cointoss.Side.*;
+import static cointoss.Direction.*;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -11,7 +11,7 @@ package cointoss.order;
 
 import cointoss.Directional;
 import cointoss.MarketService;
-import cointoss.Side;
+import cointoss.Direction;
 import cointoss.util.Num;
 import kiss.Variable;
 
@@ -33,18 +33,18 @@ public class OrderBookManager {
      * 
      */
     public OrderBookManager(MarketService service) {
-        this.shorts = new OrderBook(service.setting, Side.SELL);
-        this.longs = new OrderBook(service.setting, Side.BUY);
+        this.shorts = new OrderBook(service.setting, Direction.SELL);
+        this.longs = new OrderBook(service.setting, Direction.BUY);
         shorts.best.observe().combineLatest(longs.best.observe()).to(v -> spread.set(v.ⅰ.price.minus(v.ⅱ.price)));
     }
 
     /**
-     * Retrieve the {@link OrderBook} for {@link Side}.
+     * Retrieve the {@link OrderBook} for {@link Direction}.
      * 
      * @param side
      * @return
      */
-    public OrderBook bookFor(Side side) {
+    public OrderBook bookFor(Direction side) {
         return side.isBuy() ? longs : shorts;
     }
 

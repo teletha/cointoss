@@ -15,7 +15,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import cointoss.MarketSetting;
-import cointoss.Side;
+import cointoss.Direction;
 import cointoss.util.Num;
 
 /**
@@ -31,7 +31,7 @@ class OrderBookListTest {
 
     @Test
     void buy() throws Exception {
-        OrderBook list = new OrderBook(setting, Side.BUY);
+        OrderBook list = new OrderBook(setting, Direction.BUY);
 
         // add
         list.update(unit(1000, 1));
@@ -75,7 +75,7 @@ class OrderBookListTest {
 
     @Test
     void sell() throws Exception {
-        OrderBook list = new OrderBook(setting, Side.SELL);
+        OrderBook list = new OrderBook(setting, Direction.SELL);
         list.update(unit(1000, 1));
         assert list.base.get(0).price.is(1000);
         // assert list.x1.get(0).total.is(1);
@@ -116,7 +116,7 @@ class OrderBookListTest {
 
     @Test
     void buyFix() throws Exception {
-        OrderBook list = new OrderBook(setting, Side.BUY);
+        OrderBook list = new OrderBook(setting, Direction.BUY);
         list.update(unit(1007, 1));
         list.update(unit(1006, 1));
         list.update(unit(1005, 1));
@@ -147,7 +147,7 @@ class OrderBookListTest {
 
     @Test
     void sellFix() throws Exception {
-        OrderBook list = new OrderBook(setting, Side.SELL);
+        OrderBook list = new OrderBook(setting, Direction.SELL);
         list.update(unit(1007, 1));
         list.update(unit(1004, 1));
         list.update(unit(1003, 1));
@@ -171,7 +171,7 @@ class OrderBookListTest {
 
     @Test
     void buyGroup() throws Exception {
-        OrderBook list = new OrderBook(setting, Side.BUY);
+        OrderBook list = new OrderBook(setting, Direction.BUY);
         list.update(unit(1000, 1));
         assertList(list.selectBy(Num.TEN), 0, 1000, 1, 1);
 
@@ -195,7 +195,7 @@ class OrderBookListTest {
 
     @Test
     void sellGroup() throws Exception {
-        OrderBook list = new OrderBook(setting, Side.SELL);
+        OrderBook list = new OrderBook(setting, Direction.SELL);
         list.update(unit(1000, 1));
         assertList(list.selectBy(Num.TEN), 0, 1000, 1, 1);
 
@@ -219,7 +219,7 @@ class OrderBookListTest {
 
     @Test
     void buyGroupFix() throws Exception {
-        OrderBook list = new OrderBook(setting, Side.BUY);
+        OrderBook list = new OrderBook(setting, Direction.BUY);
         list.update(unit(1061, 1));
         list.update(unit(1060, 1));
         list.update(unit(1051, 1));
@@ -257,7 +257,7 @@ class OrderBookListTest {
 
     @Test
     void sellGroupFix() throws Exception {
-        OrderBook list = new OrderBook(setting, Side.SELL);
+        OrderBook list = new OrderBook(setting, Direction.SELL);
         list.update(unit(1061, 1));
         list.update(unit(1060, 1));
         list.update(unit(1043, 1));
@@ -297,7 +297,7 @@ class OrderBookListTest {
     void buyBestPrice() throws Exception {
         Num min = Num.of(1099);
 
-        OrderBook list = new OrderBook(setting, Side.BUY);
+        OrderBook list = new OrderBook(setting, Direction.BUY);
         list.update(unit(1093, 1)); // total 1
         list.update(unit(1077, 1)); // total 2
         list.update(unit(1051, 2)); // total 4
@@ -315,7 +315,7 @@ class OrderBookListTest {
     void sellBestPrice() throws Exception {
         Num min = Num.of(1000);
 
-        OrderBook list = new OrderBook(setting, Side.SELL);
+        OrderBook list = new OrderBook(setting, Direction.SELL);
         list.update(unit(1093, 30)); // total 47
         list.update(unit(1077, 7)); // total 17
         list.update(unit(1051, 1)); // total 10

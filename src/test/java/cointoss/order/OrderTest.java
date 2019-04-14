@@ -15,7 +15,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-import cointoss.Side;
+import cointoss.Direction;
 
 /**
  * @version 2018/07/08 11:44:58
@@ -70,23 +70,23 @@ public class OrderTest {
 
     @Test
     void limit() {
-        Order order = Order.limit(Side.BUY, 1, 20);
-        assert order.side == Side.BUY;
+        Order order = Order.limit(Direction.BUY, 1, 20);
+        assert order.side == Direction.BUY;
         assert order.size.is(1);
         assert order.price.v.is(20);
     }
 
     @Test
     void market() {
-        Order order = Order.market(Side.BUY, 1);
-        assert order.side == Side.BUY;
+        Order order = Order.market(Direction.BUY, 1);
+        assert order.side == Direction.BUY;
         assert order.size.is(1);
         assert order.price.v.is(0);
     }
 
     @Test
     void observeTerminatingByCompleted() {
-        Order order = Order.market(Side.BUY, 1);
+        Order order = Order.market(Direction.BUY, 1);
         List<Order> result = order.observeTerminating().toList();
         assert result.isEmpty();
         order.state.set(OrderState.ACTIVE);
@@ -110,7 +110,7 @@ public class OrderTest {
 
     @Test
     void observeTerminatingByCanceld() {
-        Order order = Order.market(Side.BUY, 1);
+        Order order = Order.market(Direction.BUY, 1);
         List<Order> result = order.observeTerminating().toList();
         assert result.isEmpty();
         order.state.set(OrderState.ACTIVE);

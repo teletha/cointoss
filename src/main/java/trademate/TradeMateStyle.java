@@ -9,7 +9,7 @@
  */
 package trademate;
 
-import cointoss.Side;
+import cointoss.Direction;
 import stylist.Style;
 import stylist.StyleDSL;
 import stylist.ValueStyle;
@@ -32,7 +32,7 @@ public interface TradeMateStyle extends StyleDSL {
         font.color(SELL);
     };
 
-    ValueStyle<Side> Side = side -> {
+    ValueStyle<Direction> Side = side -> {
         font.color(side.isBuy() ? BUY : SELL);
     };
 }

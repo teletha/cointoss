@@ -19,7 +19,7 @@ import java.util.function.UnaryOperator;
 import org.magicwerk.brownies.collections.GapList;
 
 import cointoss.MarketSetting;
-import cointoss.Side;
+import cointoss.Direction;
 import cointoss.util.Num;
 import kiss.Variable;
 
@@ -29,7 +29,7 @@ public class OrderBook {
     public final Variable<OrderUnit> best = Variable.empty();
 
     /** The search direction. */
-    private final Side side;
+    private final Direction side;
 
     /** The base list. */
     List<OrderUnit> base;
@@ -45,7 +45,7 @@ public class OrderBook {
      * @param base
      * @param ranges
      */
-    OrderBook(MarketSetting setting, Side side) {
+    OrderBook(MarketSetting setting, Direction side) {
         this.side = Objects.requireNonNull(side);
 
         this.base = new GapList();
@@ -141,7 +141,7 @@ public class OrderBook {
      */
     public Num computeBestPrice(Num start, Num threshold, Num diff) {
         Num total = Num.ZERO;
-        if (side == Side.BUY) {
+        if (side == Direction.BUY) {
             for (OrderUnit unit : base) {
                 if (unit.price.isLessThan(start)) {
                     total = total.plus(unit.size);
@@ -174,7 +174,7 @@ public class OrderBook {
      */
     public void fix(Num hint) {
         operator.accept(() -> {
-            if (side == Side.BUY) {
+            if (side == Direction.BUY) {
                 ListIterator<OrderUnit> iterator = base.listIterator();
 
                 while (iterator.hasNext()) {
@@ -219,7 +219,7 @@ public class OrderBook {
      */
     public void update(List<OrderUnit> units) {
         operator.accept(() -> {
-            if (side == Side.BUY) {
+            if (side == Direction.BUY) {
                 for (OrderUnit unit : units) {
                     head(unit);
                 }
@@ -367,7 +367,7 @@ public class OrderBook {
     private class Grouped {
 
         /** The search direction. */
-        private final Side side;
+        private final Direction side;
 
         /** The price range. */
         private final Num range;
@@ -382,7 +382,7 @@ public class OrderBook {
          * @param side
          * @param scaleSize
          */
-        private Grouped(Side side, Num range, List<OrderUnit> list, MarketSetting setting) {
+        private Grouped(Direction side, Num range, List<OrderUnit> list, MarketSetting setting) {
             this.side = side;
             this.range = range;
             this.list = list;
@@ -398,7 +398,7 @@ public class OrderBook {
         private void update(Num price, Num size) {
             price = calculateGroupedPrice(price, range);
 
-            if (side == Side.BUY) {
+            if (side == Direction.BUY) {
                 head(price, size);
             } else {
                 tail(price, size);

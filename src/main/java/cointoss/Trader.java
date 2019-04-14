@@ -110,7 +110,7 @@ public abstract class Trader implements Disposable {
      * @param side
      * @param size
      */
-    protected final Entry entryLimit(Side side, Num size, Num price, Consumer<Entry> process) {
+    protected final Entry entryLimit(Direction side, Num size, Num price, Consumer<Entry> process) {
         // check side
         if (side == null) {
             return null;
@@ -135,7 +135,7 @@ public abstract class Trader implements Disposable {
      * @param side
      * @param size
      */
-    protected final Entry entryMarket(Side side, Num size, Consumer<Entry> process) {
+    protected final Entry entryMarket(Direction side, Num size, Consumer<Entry> process) {
         // check side
         if (side == null) {
             return null;
@@ -301,7 +301,7 @@ public abstract class Trader implements Disposable {
          * {@inheritDoc}
          */
         @Override
-        public Side side() {
+        public Direction side() {
             return order.side();
         }
 

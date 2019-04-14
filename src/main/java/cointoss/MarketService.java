@@ -204,10 +204,10 @@ public abstract class MarketService implements Disposable {
         current.price = decodePrice(values[2], previous);
         int value = LogCodec.decodeInt(values[3].charAt(0));
         if (value < ConsecutiveTypeSize) {
-            current.side = Side.BUY;
+            current.side = Direction.BUY;
             current.consecutive = value;
         } else {
-            current.side = Side.SELL;
+            current.side = Direction.SELL;
             current.consecutive = value - ConsecutiveTypeSize;
         }
         current.delay = LogCodec.decodeInt(values[3].charAt(1)) - 3;

@@ -50,7 +50,7 @@ public class MarketTestSupport {
      * @return
      */
     public static ChainableExecution buy(Num size, Num price) {
-        return execution(Side.BUY, size, price);
+        return execution(Direction.BUY, size, price);
     }
 
     /**
@@ -72,7 +72,7 @@ public class MarketTestSupport {
      * @return
      */
     public static ChainableExecution sell(Num size, Num price) {
-        return execution(Side.SELL, size, price);
+        return execution(Direction.SELL, size, price);
     }
 
     /**
@@ -83,7 +83,7 @@ public class MarketTestSupport {
      * @param price
      * @return
      */
-    public static ChainableExecution execution(Side side, double size, double price) {
+    public static ChainableExecution execution(Direction side, double size, double price) {
         return execution(side, Num.of(size), Num.of(price));
     }
 
@@ -95,7 +95,7 @@ public class MarketTestSupport {
      * @param price
      * @return
      */
-    public static ChainableExecution execution(Side side, Num size, Num price) {
+    public static ChainableExecution execution(Direction side, Num size, Num price) {
         ChainableExecution exe = new ChainableExecution();
         exe.id = executionId.getAndIncrement();
         exe.side = Objects.requireNonNull(side);
@@ -113,7 +113,7 @@ public class MarketTestSupport {
      * @param price
      * @return
      */
-    public static List<Execution> executionSerially(int count, Side side, double size, double price) {
+    public static List<Execution> executionSerially(int count, Direction side, double size, double price) {
         List<Execution> list = new ArrayList();
 
         for (int i = 0; i < count; i++) {
@@ -134,7 +134,7 @@ public class MarketTestSupport {
         List<Execution> list = new ArrayList();
 
         for (int i = 0; i < count; i++) {
-            list.add(execution(Side.random(), Generator.randomInt(1, 10), Generator.randomInt(1, 10)));
+            list.add(execution(Direction.random(), Generator.randomInt(1, 10), Generator.randomInt(1, 10)));
         }
         return I.signal(list);
     }
@@ -147,7 +147,7 @@ public class MarketTestSupport {
      * @param price
      * @return
      */
-    public static Position position(Side side, double size, double price) {
+    public static Position position(Direction side, double size, double price) {
         return position(side, Num.of(size), Num.of(price));
     }
 
@@ -159,7 +159,7 @@ public class MarketTestSupport {
      * @param price
      * @return
      */
-    public static Position position(Side side, Num size, Num price) {
+    public static Position position(Direction side, Num size, Num price) {
         Position position = new Position();
         position.date = Time.Base;
         position.side = Objects.requireNonNull(side);
@@ -246,7 +246,7 @@ public class MarketTestSupport {
          * @param side
          * @return
          */
-        public ChainableExecution side(Side side) {
+        public ChainableExecution side(Direction side) {
             this.side = Objects.requireNonNull(side);
 
             return this;

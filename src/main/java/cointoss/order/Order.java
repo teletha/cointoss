@@ -16,7 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import cointoss.Directional;
 import cointoss.Execution;
-import cointoss.Side;
+import cointoss.Direction;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
 import kiss.I;
@@ -38,7 +38,7 @@ public class Order implements Directional {
     public final Variable<OrderState> state = Variable.of(OrderState.INIT);
 
     /** The ordered position. */
-    public final Side side;
+    public final Direction side;
 
     /** The ordered price. */
     public final Variable<Num> price;
@@ -74,7 +74,7 @@ public class Order implements Directional {
      * @param size A order size.
      * @param price A order price.
      */
-    protected Order(Side side, Num size, Num price) {
+    protected Order(Direction side, Num size, Num price) {
         this.side = Objects.requireNonNull(side);
         this.size = this.remainingSize = Objects.requireNonNull(size);
         this.price = Variable.of(price == null ? Num.ZERO : price);
@@ -85,7 +85,7 @@ public class Order implements Directional {
      * {@inheritDoc}
      */
     @Override
-    public final Side side() {
+    public final Direction side() {
         return side;
     }
 
@@ -269,33 +269,33 @@ public class Order implements Directional {
     /**
      * Create market order.
      * 
-     * @param side A {@link Side} of order.
+     * @param side A {@link Direction} of order.
      * @param size A size of order.
      * @return A created {@link Order}.
      */
-    public static Order market(Side side, long size) {
+    public static Order market(Direction side, long size) {
         return market(side, Num.of(size));
     }
 
     /**
      * Create market order.
      * 
-     * @param side A {@link Side} of order.
+     * @param side A {@link Direction} of order.
      * @param size A size of order.
      * @return A created {@link Order}.
      */
-    public static Order market(Side side, double size) {
+    public static Order market(Direction side, double size) {
         return market(side, Num.of(size));
     }
 
     /**
      * Create market order.
      * 
-     * @param side A {@link Side} of order.
+     * @param side A {@link Direction} of order.
      * @param size A size of order.
      * @return A created {@link Order}.
      */
-    public static Order market(Side side, Num size) {
+    public static Order market(Direction side, Num size) {
         return new Order(side, size, null);
     }
 
@@ -326,7 +326,7 @@ public class Order implements Directional {
      * @return A created {@link Order}.
      */
     public static Order marketLong(Num size) {
-        return market(Side.BUY, size);
+        return market(Direction.BUY, size);
     }
 
     /**
@@ -356,42 +356,42 @@ public class Order implements Directional {
      * @return A created {@link Order}.
      */
     public static Order marketShort(Num size) {
-        return market(Side.SELL, size);
+        return market(Direction.SELL, size);
     }
 
     /**
      * Create limit order.
      * 
-     * @param side A {@link Side} of order.
+     * @param side A {@link Direction} of order.
      * @param size A size of order.
      * @param price A price of order.
      * @return A created {@link Order}.
      */
-    public static Order limit(Side side, long size, long price) {
+    public static Order limit(Direction side, long size, long price) {
         return limit(side, Num.of(size), Num.of(price));
     }
 
     /**
      * Create limit order.
      * 
-     * @param side A {@link Side} of order.
+     * @param side A {@link Direction} of order.
      * @param size A size of order.
      * @param price A price of order.
      * @return A created {@link Order}.
      */
-    public static Order limit(Side side, double size, double price) {
+    public static Order limit(Direction side, double size, double price) {
         return limit(side, Num.of(size), Num.of(price));
     }
 
     /**
      * Create limit order.
      * 
-     * @param side A {@link Side} of order.
+     * @param side A {@link Direction} of order.
      * @param size A size of order.
      * @param price A price of order.
      * @return A created {@link Order}.
      */
-    public static Order limit(Side side, Num size, Num price) {
+    public static Order limit(Direction side, Num size, Num price) {
         return new Order(side, size, price);
     }
 
@@ -414,7 +414,7 @@ public class Order implements Directional {
      * @return A created {@link Order}.
      */
     public static Order limitLong(double size, double price) {
-        return limit(Side.BUY, Num.of(size), Num.of(price));
+        return limit(Direction.BUY, Num.of(size), Num.of(price));
     }
 
     /**
@@ -425,7 +425,7 @@ public class Order implements Directional {
      * @return A created {@link Order}.
      */
     public static Order limitLong(Num size, Num price) {
-        return limit(Side.BUY, size, price);
+        return limit(Direction.BUY, size, price);
     }
 
     /**
@@ -458,6 +458,6 @@ public class Order implements Directional {
      * @return A created {@link Order}.
      */
     public static Order limitShort(Num size, Num price) {
-        return limit(Side.SELL, size, price);
+        return limit(Direction.SELL, size, price);
     }
 }

@@ -11,7 +11,7 @@ package cointoss.backtest;
 
 import org.junit.jupiter.api.Test;
 
-import cointoss.Side;
+import cointoss.Direction;
 import cointoss.VerifiableMarket;
 import cointoss.order.Order;
 
@@ -39,7 +39,7 @@ class MarketStaticticsTest {
     void longOnly() {
         VerifiableMarket market = new VerifiableMarket();
         market.requestTo(Order.limitLong(1, 10));
-        market.execute(Side.BUY, 1, 9);
+        market.execute(Direction.BUY, 1, 9);
 
         assert market.baseCurrency.v.is(90);
         assert market.targetCurrency.v.is(1);
@@ -62,7 +62,7 @@ class MarketStaticticsTest {
         VerifiableMarket market = new VerifiableMarket();
         market.requestAndExecution(Order.limitLong(1, 10));
         market.requestAndExecution(Order.limitLong(1, 20));
-        market.execute(Side.BUY, 1, 5);
+        market.execute(Direction.BUY, 1, 5);
 
         assert market.baseCurrency.v.is(70);
         assert market.targetCurrency.v.is(2);

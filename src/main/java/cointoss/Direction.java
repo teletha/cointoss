@@ -20,7 +20,7 @@ import kiss.Singleton;
 /**
  * @version 2017/07/21 19:47:35
  */
-public enum Side implements Directional {
+public enum Direction implements Directional {
     BUY, SELL;
 
     /**
@@ -36,7 +36,7 @@ public enum Side implements Directional {
      * @return
      */
     @Override
-    public Side inverse() {
+    public Direction inverse() {
         return this == BUY ? SELL : BUY;
     }
 
@@ -64,7 +64,7 @@ public enum Side implements Directional {
      * {@inheritDoc}
      */
     @Override
-    public Side side() {
+    public Direction side() {
         return this;
     }
 
@@ -72,7 +72,7 @@ public enum Side implements Directional {
      * @param position
      * @return
      */
-    public boolean isPair(Side position) {
+    public boolean isPair(Direction position) {
         return this != Objects.requireNonNull(position);
     }
 
@@ -88,7 +88,7 @@ public enum Side implements Directional {
      * @param position
      * @return
      */
-    public boolean isSame(Side position) {
+    public boolean isSame(Direction position) {
         return this == Objects.requireNonNull(position);
     }
 
@@ -103,8 +103,8 @@ public enum Side implements Directional {
     /**
      * @return
      */
-    public static Side random() {
-        return Generator.random(Side.class);
+    public static Direction random() {
+        return Generator.random(Direction.class);
     }
 
     /**
@@ -115,7 +115,7 @@ public enum Side implements Directional {
      * @param value
      * @return
      */
-    public static Side parse(String value) {
+    public static Direction parse(String value) {
         return value == null || value.startsWith("S") ? SELL : BUY;
     }
 
@@ -123,13 +123,13 @@ public enum Side implements Directional {
      * 
      */
     @Manageable(lifestyle = Singleton.class)
-    private static class Codec implements Encoder<Side>, Decoder<Side> {
+    private static class Codec implements Encoder<Direction>, Decoder<Direction> {
 
         /**
          * {@inheritDoc}
          */
         @Override
-        public Side decode(String value) {
+        public Direction decode(String value) {
             return parse(value);
         }
 
@@ -137,7 +137,7 @@ public enum Side implements Directional {
          * {@inheritDoc}
          */
         @Override
-        public String encode(Side value) {
+        public String encode(Direction value) {
             return value.mark();
         }
     }

@@ -11,7 +11,7 @@ package cointoss.backtest;
 
 import java.time.temporal.ChronoUnit;
 
-import cointoss.Side;
+import cointoss.Direction;
 import cointoss.Trader;
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.ticker.Tick;
@@ -45,10 +45,10 @@ class BackTestTest {
             market.timeline.to(exe -> {
                 if (hasPosition() == false) {
                     Entry latest = latest();
-                    Side side;
+                    Direction side;
 
                     if (latest == null) {
-                        side = Side.random();
+                        side = Direction.random();
                     } else {
                         side = latest.isWin() ? latest.side() : latest.inverse();
                     }

@@ -48,7 +48,7 @@ public class Execution implements Directional {
     static {
         // don't modify these initial values
         BASE.date = Chrono.utc(2000, 1, 1);
-        BASE.side = Side.BUY;
+        BASE.side = Direction.BUY;
         BASE.price = Num.ZERO;
         BASE.size = Num.ZERO;
     }
@@ -56,7 +56,7 @@ public class Execution implements Directional {
     public long id;
 
     /** The side */
-    public Side side;
+    public Direction side;
 
     /** The executed price */
     public Num price;
@@ -100,7 +100,7 @@ public class Execution implements Directional {
         id = Long.parseLong(values[0]);
         date = LocalDateTime.parse(values[1]).atZone(Chrono.UTC);
         mills = Chrono.epochMills(date);
-        side = Side.parse(values[2]);
+        side = Direction.parse(values[2]);
         price = Num.of(values[3]);
         size = cumulativeSize = Num.of(values[4]);
         consecutive = Integer.parseInt(values[5]);
@@ -111,7 +111,7 @@ public class Execution implements Directional {
      * {@inheritDoc}
      */
     @Override
-    public Side side() {
+    public Direction side() {
         return side;
     }
 

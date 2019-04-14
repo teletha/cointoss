@@ -16,7 +16,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import cointoss.Directional;
 import cointoss.Execution;
 import cointoss.MarketService;
-import cointoss.Side;
+import cointoss.Direction;
 import cointoss.util.Num;
 import kiss.Signal;
 import kiss.Signaling;
@@ -109,8 +109,8 @@ public final class PositionManager implements Directional {
      * {@inheritDoc}
      */
     @Override
-    public Side side() {
-        return isLong() ? Side.BUY : Side.SELL;
+    public Direction side() {
+        return isLong() ? Direction.BUY : Direction.SELL;
     }
 
     /**
