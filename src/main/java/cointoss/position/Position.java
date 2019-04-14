@@ -7,10 +7,12 @@
  *
  *          https://opensource.org/licenses/MIT
  */
-package cointoss;
+package cointoss.position;
 
 import java.time.ZonedDateTime;
 
+import cointoss.Directional;
+import cointoss.Side;
 import cointoss.util.Num;
 import kiss.Variable;
 

@@ -7,12 +7,16 @@
  *
  *          https://opensource.org/licenses/MIT
  */
-package cointoss;
+package cointoss.position;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import cointoss.Directional;
+import cointoss.Execution;
+import cointoss.MarketService;
+import cointoss.Side;
 import cointoss.util.Num;
 import kiss.Signal;
 import kiss.Signaling;

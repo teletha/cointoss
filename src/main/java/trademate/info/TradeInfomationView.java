@@ -11,11 +11,11 @@ package trademate.info;
 
 import static transcript.Transcript.en;
 
-import cointoss.Position;
-import cointoss.PositionManager;
 import cointoss.Side;
 import cointoss.order.Order;
 import cointoss.order.OrderBook;
+import cointoss.position.Position;
+import cointoss.position.PositionManager;
 import cointoss.util.Num;
 import stylist.Style;
 import stylist.StyleDSL;

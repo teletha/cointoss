@@ -7,7 +7,7 @@
  *
  *          https://opensource.org/licenses/MIT
  */
-package cointoss;
+package cointoss.position;
 
 import static cointoss.MarketTestSupport.*;
 
@@ -16,6 +16,11 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import cointoss.Execution;
+import cointoss.Side;
+import cointoss.VerifiableMarketService;
+import cointoss.position.Position;
+import cointoss.position.PositionManager;
 import cointoss.util.Num;
 import kiss.Variable;
 
