@@ -9,7 +9,7 @@
  */
 package cointoss;
 
-import static java.util.concurrent.TimeUnit.*;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.time.Duration;
 import java.util.List;
@@ -41,7 +41,7 @@ public class Market implements Disposable {
 
     private final AtomicReference<Execution> switcher = new AtomicReference<>(Execution.BASE);
 
-    /** The market handler. */
+    /** The target market servicce. */
     public final MarketService service;
 
     /** The execution observers. */
@@ -119,16 +119,17 @@ public class Market implements Disposable {
 
         readOrderBook();
 
-        service.add(service.executionsRealtimelyForMe().to(e -> {
-            // update assets
-            if (e.isBuy()) {
-                baseCurrency.set(value -> value.minus(e.size.multiply(e.price)));
-                targetCurrency.set(value -> value.plus(e.size));
-            } else {
-                baseCurrency.set(value -> value.plus(e.size.multiply(e.price)));
-                targetCurrency.set(value -> value.minus(e.size));
-            }
-        }));
+        service.add(service.executionsRealtimelyForMe()
+                .to(e -> {
+                    // update assets
+                    if (e.isBuy()) {
+                        baseCurrency.set(value -> value.minus(e.size.multiply(e.price)));
+                        targetCurrency.set(value -> value.plus(e.size));
+                    } else {
+                        baseCurrency.set(value -> value.plus(e.size.multiply(e.price)));
+                        targetCurrency.set(value -> value.minus(e.size));
+                    }
+                }));
     }
 
     /**
