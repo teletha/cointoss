@@ -27,7 +27,7 @@ import cointoss.util.Num;
 /**
  * @version 2018/04/29 16:12:46
  */
-class VerifiableMarketTest {
+class VerifiableMarketTest extends MarketTestSupport {
 
     static final Num FIVE = Num.of(5);
 
@@ -495,7 +495,7 @@ class VerifiableMarketTest {
             size.set(e.cumulativeSize);
         });
 
-        MarketTestSupport.executionSerially(4, Direction.SELL, 5, 10).forEach(market::execute);
+        executionSerially(4, Direction.SELL, 5, 10).forEach(market::execute);
         market.execute(Direction.SELL, 5, 10);
         assert size.get().is(20);
     }
@@ -508,7 +508,7 @@ class VerifiableMarketTest {
             size.set(e.cumulativeSize);
         });
 
-        MarketTestSupport.executionSerially(4, Direction.BUY, 5, 10).forEach(market::execute);
+        executionSerially(4, Direction.BUY, 5, 10).forEach(market::execute);
         market.execute(Direction.BUY, 5, 10);
         assert size.get().is(20);
     }

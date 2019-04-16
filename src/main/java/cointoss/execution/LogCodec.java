@@ -7,13 +7,15 @@
  *
  *          https://opensource.org/licenses/MIT
  */
-package cointoss.util;
+package cointoss.execution;
 
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 
+import cointoss.Execution;
 import cointoss.MarketLog;
+import cointoss.util.Num;
 
 /**
  * Special codec for time serise data (i.e. {@link MarketLog}).
@@ -21,6 +23,94 @@ import cointoss.MarketLog;
  * @version 2018/05/02 12:47:04
  */
 public class LogCodec {
+
+    /**
+     * Decode id.
+     * 
+     * @param value A encoded value.
+     * @param previous A previous execution.
+     * @return A decoded execution.
+     */
+    public long decodeId(String value, Execution previous) {
+        return decodeDelta(value, previous.id, 1);
+    }
+
+    /**
+     * Encode id.
+     * 
+     * @param execution A current execution.
+     * @param previous A previous execution.
+     * @return An encoded value.
+     */
+    public String encodeId(Execution execution, Execution previous) {
+        return encodeDelta(execution.id, previous.id, 1);
+    }
+
+    /**
+     * Decode date.
+     * 
+     * @param value A encoded value.
+     * @param previous A previous execution.
+     * @return A decoded execution.
+     */
+    public ZonedDateTime decodeDate(String value, Execution previous) {
+        return decodeDelta(value, previous.date, 0);
+    }
+
+    /**
+     * Encode date.
+     * 
+     * @param execution A current execution.
+     * @param previous A previous execution.
+     * @return An encoded value.
+     */
+    public String encodeDate(Execution execution, Execution previous) {
+        return encodeDelta(execution.date, previous.date, 0);
+    }
+
+    /**
+     * Decode size.
+     * 
+     * @param value A encoded value.
+     * @param previous A previous execution.
+     * @return A decoded execution.
+     */
+    public Num decodeSize(String value, Execution previous) {
+        return decodeDiff(value, previous.size);
+    }
+
+    /**
+     * Encode size.
+     * 
+     * @param execution A current execution.
+     * @param previous A previous execution.
+     * @return An encoded value.
+     */
+    public String encodeSize(Execution execution, Execution previous) {
+        return encodeDiff(execution.size, previous.size);
+    }
+
+    /**
+     * Decode price.
+     * 
+     * @param value A encoded value.
+     * @param previous A previous execution.
+     * @return A decoded execution.
+     */
+    public Num decodePrice(String value, Execution previous) {
+        return decodeDiff(value, previous.price);
+    }
+
+    /**
+     * Encode price.
+     * 
+     * @param execution A current execution.
+     * @param previous A previous execution.
+     * @return An encoded value.
+     */
+    public String encodePrice(Execution execution, Execution previous) {
+        return encodeDiff(execution.price, previous.price);
+    }
 
     /**
      * Compute delta value. If it is default value, empty string will be returned.

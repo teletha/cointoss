@@ -10,7 +10,7 @@
  */
 package cointoss;
 
-import static cointoss.backtest.Time.*;
+import static cointoss.backtest.Time.at;
 
 import java.util.ArrayList;
 import java.util.Collections;

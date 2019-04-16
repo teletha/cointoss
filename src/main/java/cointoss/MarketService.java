@@ -13,10 +13,10 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Objects;
 
+import cointoss.execution.LogCodec;
 import cointoss.order.Order;
 import cointoss.order.OrderBookChange;
 import cointoss.util.Chrono;
-import cointoss.util.LogCodec;
 import cointoss.util.Network;
 import cointoss.util.Num;
 import kiss.Disposable;

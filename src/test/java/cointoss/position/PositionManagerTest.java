@@ -17,8 +17,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import cointoss.Execution;
-import cointoss.Direction;
 import cointoss.VerifiableMarketService;
+import cointoss.Direction;
 import cointoss.position.Position;
 import cointoss.position.PositionManager;
 import cointoss.util.Num;

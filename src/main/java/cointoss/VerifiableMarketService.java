@@ -15,6 +15,7 @@ import java.util.LinkedList;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import cointoss.MarketSetting;
 import cointoss.backtest.Time;
 import cointoss.order.Order;
 import cointoss.order.OrderBookChange;
