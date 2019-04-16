@@ -13,6 +13,7 @@ import java.time.temporal.ChronoUnit;
 
 import cointoss.ticker.Tick;
 import cointoss.ticker.TickSpan;
+import cointoss.trade.Trader;
 import cointoss.util.Num;
 
 /**
@@ -31,10 +32,11 @@ public class BackTest {
         private Num underPrice;
 
         /**
-         * {@inheritDoc}
+         * @param market
          */
-        @Override
-        protected void initialize() {
+        public BreakoutTrading(Market market) {
+            super(market);
+
             // various events
             market.timeline.to(exe -> {
                 if (hasPosition() == false) {

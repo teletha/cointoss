@@ -9,7 +9,7 @@
  */
 package cointoss;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.time.Duration;
 import java.util.List;
@@ -25,6 +25,7 @@ import cointoss.order.OrderBookManager;
 import cointoss.order.OrderManager;
 import cointoss.position.PositionManager;
 import cointoss.ticker.TickerManager;
+import cointoss.trade.Trader;
 import cointoss.util.Num;
 import cointoss.util.RetryPolicy;
 import kiss.Disposable;
@@ -147,32 +148,6 @@ public class Market implements Disposable {
             orderBook.shorts.fix(e.price);
             orderBook.longs.fix(e.price);
         }));
-    }
-
-    /**
-     * Add market trader to this market.
-     * 
-     * @param trader A trader to add.
-     */
-    public final void addTrader(Trader trader) {
-        if (trader != null) {
-            traders.add(trader);
-            trader.market = this;
-            trader.initialize();
-        }
-    }
-
-    /**
-     * Remove market trader to this market.
-     * 
-     * @param trader A trader to remove.
-     */
-    public final void removeTrader(Trader trader) {
-        if (trader != null) {
-            traders.remove(trader);
-            trader.dispose();
-            trader.market = null;
-        }
     }
 
     /**

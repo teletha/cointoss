@@ -17,8 +17,8 @@ import java.util.List;
 
 import cointoss.Execution;
 import cointoss.Market;
-import cointoss.Trader;
-import cointoss.Trader.Entry;
+import cointoss.trade.Trader;
+import cointoss.trade.Trader.Entry;
 import cointoss.util.Num;
 
 /**

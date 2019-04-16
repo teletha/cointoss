@@ -17,7 +17,7 @@ import java.util.Objects;
 import java.util.stream.IntStream;
 
 import cointoss.Directional;
-import cointoss.Trader;
+import cointoss.trade.Trader;
 import kiss.Decoder;
 import kiss.Encoder;
 import kiss.I;

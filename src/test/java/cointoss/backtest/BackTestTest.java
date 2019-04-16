@@ -12,10 +12,11 @@ package cointoss.backtest;
 import java.time.temporal.ChronoUnit;
 
 import cointoss.Direction;
-import cointoss.Trader;
+import cointoss.Market;
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.ticker.Tick;
 import cointoss.ticker.TickSpan;
+import cointoss.trade.Trader;
 import cointoss.util.Num;
 
 /**
@@ -24,7 +25,7 @@ import cointoss.util.Num;
 class BackTestTest {
 
     public static void main(String[] args) {
-        BackTest.log(() -> BitFlyer.FX_BTC_JPY.log.at(2017, 6, 1)).currency(100000, 0).strategy(() -> new NOP()).trial(1).run();
+        BackTest.log(() -> BitFlyer.FX_BTC_JPY.log.at(2017, 6, 1)).currency(100000, 0).strategy(NOP::new).trial(1).run();
     }
 
     /**
@@ -37,10 +38,11 @@ class BackTestTest {
         private Num underPrice;
 
         /**
-         * {@inheritDoc}
+         * @param market
          */
-        @Override
-        protected void initialize() {
+        public NOP(Market market) {
+            super(market);
+
             // various events
             market.timeline.to(exe -> {
                 if (hasPosition() == false) {

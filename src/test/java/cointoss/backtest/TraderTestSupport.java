@@ -12,9 +12,9 @@ package cointoss.backtest;
 import org.junit.jupiter.api.BeforeEach;
 
 import cointoss.Direction;
-import cointoss.Trader;
 import cointoss.VerifiableMarket;
 import cointoss.analyze.TradingLog;
+import cointoss.trade.Trader;
 import cointoss.util.Num;
 import kiss.I;
 
