@@ -82,7 +82,7 @@ public class Num implements Comparable<Num> {
      * @param value primitive value
      */
     private Num(BigDecimal value) {
-        this.delegate = value;
+        this.delegate = Objects.requireNonNull(value);
     }
 
     /**

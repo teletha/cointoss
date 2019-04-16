@@ -31,16 +31,8 @@ public abstract class TraderTestSupport extends Trader {
      * @param provider
      */
     public TraderTestSupport() {
-        super.market = market = new VerifiableMarket();
-        super.market.addTrader(this);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected final void initialize() {
-        // do nothing
+        super(new VerifiableMarket());
+        market = (VerifiableMarket) super.market;
     }
 
     @BeforeEach
