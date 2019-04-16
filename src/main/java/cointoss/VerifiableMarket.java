@@ -13,6 +13,7 @@ package cointoss;
 import static cointoss.backtest.Time.*;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -150,19 +151,6 @@ public class VerifiableMarket extends Market {
     }
 
     /**
-     * <p>
-     * Helper method to request {@link Order}.
-     * </p>
-     * 
-     * @param order
-     */
-    public Order requestTo(Order order) {
-        request(order).to();
-
-        return order;
-    }
-
-    /**
      * Validate order state by size.
      * 
      * @param active
@@ -177,11 +165,11 @@ public class VerifiableMarket extends Market {
 
         service.orders().to(o -> state.computeIfAbsent(o.state.v, s -> new ArrayList()).add(o));
 
-        assert state.get(OrderState.ACTIVE).size() == active;
-        assert state.get(OrderState.COMPLETED).size() == completed;
-        assert state.get(OrderState.CANCELED).size() == canceled;
-        assert state.get(OrderState.EXPIRED).size() == expired;
-        assert state.get(OrderState.REJECTED).size() == rejected;
+        assert state.getOrDefault(OrderState.ACTIVE, Collections.EMPTY_LIST).size() == active;
+        assert state.getOrDefault(OrderState.COMPLETED, Collections.EMPTY_LIST).size() == completed;
+        assert state.getOrDefault(OrderState.CANCELED, Collections.EMPTY_LIST).size() == canceled;
+        assert state.getOrDefault(OrderState.EXPIRED, Collections.EMPTY_LIST).size() == expired;
+        assert state.getOrDefault(OrderState.REJECTED, Collections.EMPTY_LIST).size() == rejected;
 
         return true;
     }

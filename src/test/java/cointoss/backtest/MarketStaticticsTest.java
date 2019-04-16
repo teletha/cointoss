@@ -38,7 +38,7 @@ class MarketStaticticsTest {
     @Test
     void longOnly() {
         VerifiableMarket market = new VerifiableMarket();
-        market.requestTo(Order.limitLong(1, 10));
+        market.request(Order.limitLong(1, 10)).to();
         market.execute(Direction.BUY, 1, 9);
 
         assert market.baseCurrency.v.is(90);
