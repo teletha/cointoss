@@ -10,14 +10,13 @@
 package cointoss.backtest;
 
 import java.util.Objects;
-import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
 
 import cointoss.Execution;
 import cointoss.Market;
+import cointoss.Trader;
 import cointoss.VerifiableMarketService;
-import cointoss.trade.Trader;
 import cointoss.util.Num;
 import kiss.I;
 import kiss.Signal;
@@ -37,7 +36,7 @@ public class BackTest {
     private Num target = Num.ZERO;
 
     /** The strategy generator. */
-    private Function<Market, Trader> strategy;
+    private Supplier<Trader> strategy;
 
     /** A number of trials. */
     private int trial = 1;
@@ -84,7 +83,7 @@ public class BackTest {
      * @param strategy
      * @return
      */
-    public BackTest strategy(Function<Market, Trader> strategy) {
+    public BackTest strategy(Supplier<Trader> strategy) {
         this.strategy = Objects.requireNonNull(strategy);
         return this;
     }
@@ -109,7 +108,7 @@ public class BackTest {
     public void run() {
         IntStream.range(0, trial).parallel().forEach(index -> {
             Market market = new Market(new BackTestService());
-            strategy.apply(market);
+            market.addTrader(strategy.get());
             market.readLog(v -> log.get());
             market.dispose();
         });

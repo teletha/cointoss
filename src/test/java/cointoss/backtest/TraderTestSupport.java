@@ -12,9 +12,9 @@ package cointoss.backtest;
 import org.junit.jupiter.api.BeforeEach;
 
 import cointoss.Direction;
+import cointoss.Trader;
 import cointoss.VerifiableMarket;
 import cointoss.analyze.TradingLog;
-import cointoss.trade.Trader;
 import cointoss.util.Num;
 import kiss.I;
 
@@ -31,8 +31,16 @@ public abstract class TraderTestSupport extends Trader {
      * @param provider
      */
     public TraderTestSupport() {
-        super(new VerifiableMarket());
-        market = (VerifiableMarket) super.market;
+        super.market = market = new VerifiableMarket();
+        super.market.addTrader(this);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected final void initialize() {
+        // do nothing
     }
 
     @BeforeEach

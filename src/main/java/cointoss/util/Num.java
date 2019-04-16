@@ -17,7 +17,7 @@ import java.util.Objects;
 import java.util.stream.IntStream;
 
 import cointoss.Directional;
-import cointoss.trade.Trader;
+import cointoss.Trader;
 import kiss.Decoder;
 import kiss.Encoder;
 import kiss.I;
@@ -82,7 +82,7 @@ public class Num implements Comparable<Num> {
      * @param value primitive value
      */
     private Num(BigDecimal value) {
-        this.delegate = Objects.requireNonNull(value);
+        this.delegate = value;
     }
 
     /**

@@ -7,7 +7,7 @@
  *
  *          https://opensource.org/licenses/MIT
  */
-package cointoss.trade;
+package cointoss;
 
 import java.time.ZonedDateTime;
 import java.time.temporal.TemporalUnit;
@@ -15,17 +15,12 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import cointoss.Direction;
-import cointoss.Directional;
-import cointoss.Execution;
-import cointoss.Market;
 import cointoss.order.Order;
 import cointoss.order.RecordedExecutions;
 import cointoss.util.Num;
@@ -40,7 +35,7 @@ import kiss.Signaling;
 public abstract class Trader implements Disposable {
 
     /** The market. */
-    protected final Market market;
+    protected Market market;
 
     /** The signal observers. */
     private final Signaling<Boolean> closePositions = new Signaling();
@@ -70,13 +65,9 @@ public abstract class Trader implements Disposable {
     private final List<Entry> actives = new ArrayList();
 
     /**
-     * Initialize {@link Trader}.
-     * 
-     * @param market
+     * Initialize this trading strategy.
      */
-    protected Trader(Market market) {
-        this.market = Objects.requireNonNull(market);
-    }
+    protected abstract void initialize();
 
     /**
      * {@inheritDoc}
