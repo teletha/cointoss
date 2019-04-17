@@ -12,8 +12,8 @@ package cointoss.backtest;
 import org.junit.jupiter.api.Test;
 
 import cointoss.Direction;
-import cointoss.VerifiableMarket;
 import cointoss.order.Order;
+import cointoss.verify.VerifiableMarket;
 
 /**
  * @version 2018/07/10 23:17:09

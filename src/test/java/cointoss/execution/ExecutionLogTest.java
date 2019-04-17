@@ -20,8 +20,8 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 
 import antibug.CleanRoom;
 import cointoss.MarketService;
-import cointoss.VerifiableMarket;
 import cointoss.util.Chrono;
+import cointoss.verify.VerifiableMarket;
 import kiss.I;
 import psychopath.Locator;
 

@@ -8,7 +8,7 @@
  *
  *          https://opensource.org/licenses/MIT
  */
-package cointoss;
+package cointoss.verify;
 
 import static cointoss.backtest.Time.at;
 
@@ -18,6 +18,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import cointoss.Direction;
+import cointoss.Market;
+import cointoss.MarketService;
 import cointoss.backtest.Time;
 import cointoss.execution.Execution;
 import cointoss.order.Order;

@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 
 import cointoss.order.Order;
 import cointoss.util.Num;
+import cointoss.verify.VerifiableMarket;
 
 /**
  * @version 2018/07/11 13:27:20

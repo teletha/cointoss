@@ -7,7 +7,7 @@
  *
  *          https://opensource.org/licenses/MIT
  */
-package cointoss;
+package cointoss.verify;
 
 import java.time.ZonedDateTime;
 import java.util.Iterator;
@@ -15,6 +15,8 @@ import java.util.LinkedList;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import cointoss.MarketService;
+import cointoss.MarketSetting;
 import cointoss.backtest.Time;
 import cointoss.execution.Execution;
 import cointoss.order.Order;

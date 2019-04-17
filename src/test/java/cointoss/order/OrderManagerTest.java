@@ -16,7 +16,7 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import cointoss.VerifiableMarketService;
+import cointoss.verify.VerifiableMarketService;
 
 /**
  * @version 2018/07/09 2:07:07

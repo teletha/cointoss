@@ -52,13 +52,13 @@ import com.univocity.parsers.csv.CsvWriterSettings;
 
 import cointoss.Market;
 import cointoss.MarketService;
-import cointoss.VerifiableMarket;
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.util.Chrono;
 import cointoss.util.Network;
 import cointoss.util.Num;
 import cointoss.util.RetryPolicy;
 import cointoss.util.Span;
+import cointoss.verify.VerifiableMarket;
 import kiss.I;
 import kiss.Signal;
 import psychopath.Directory;

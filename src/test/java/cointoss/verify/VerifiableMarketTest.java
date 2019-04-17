@@ -7,7 +7,7 @@
  *
  *          https://opensource.org/licenses/MIT
  */
-package cointoss.backtest;
+package cointoss.verify;
 
 import static cointoss.util.Num.*;
 
@@ -18,11 +18,12 @@ import org.junit.jupiter.api.Test;
 
 import cointoss.Direction;
 import cointoss.MarketTestSupport;
-import cointoss.VerifiableMarket;
+import cointoss.backtest.Time;
 import cointoss.order.Order;
 import cointoss.order.OrderState;
 import cointoss.order.QuantityCondition;
 import cointoss.util.Num;
+import cointoss.verify.VerifiableMarket;
 
 /**
  * @version 2018/04/29 16:12:46

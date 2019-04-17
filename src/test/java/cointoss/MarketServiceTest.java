@@ -20,6 +20,7 @@ import org.junit.jupiter.api.Test;
 
 import cointoss.MarketTestSupport.ChainableExecution;
 import cointoss.execution.Execution;
+import cointoss.verify.VerifiableMarketService;
 
 /**
  * @version 2018/07/12 9:52:30
