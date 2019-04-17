@@ -229,6 +229,14 @@ public class VerifiableMarketService extends MarketService {
      * {@inheritDoc}
      */
     @Override
+    public ExecutionCodec codec() {
+        return delegation == null ? super.codec() : delegation.codec();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     protected int executionMaxAcquirableSize() {
         return 0;
     }
@@ -377,13 +385,5 @@ public class VerifiableMarketService extends MarketService {
             stopAt(o.stopPrice());
             type(o.quantityCondition());
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ExecutionCodec codec() {
-        return delegation == null ? super.codec() : delegation.codec();
     }
 }

@@ -349,6 +349,14 @@ class BitFlyerService extends MarketService {
      * {@inheritDoc}
      */
     @Override
+    public ExecutionCodec codec() {
+        return compressor;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Signal<Order> orders() {
         return call("GET", "/v1/me/getchildorders?child_order_state=ACTIVE&product_code=" + marketName, "", "*", ChildOrderResponse.class)
                 .map(ChildOrderResponse::toOrder);
@@ -460,14 +468,6 @@ class BitFlyerService extends MarketService {
                     .build();
         }
         return network.rest(request, selector, type);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ExecutionCodec codec() {
-        return compressor;
     }
 
     protected SessionMaintainer maintainer = new SessionMaintainer();
