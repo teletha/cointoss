@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 class ExecutionLoggerTest {
 
     @Test
-    void decodeChar() {
+    void encodeInt() {
         for (int i = 0; i <= 186; i++) {
             String encoded = ExecutionLogger.encodeInt(i);
             int decoded = ExecutionLogger.decodeInt(encoded.charAt(0));
