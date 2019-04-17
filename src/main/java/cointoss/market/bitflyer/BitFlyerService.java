@@ -35,8 +35,8 @@ import cointoss.Direction;
 import cointoss.Execution;
 import cointoss.MarketService;
 import cointoss.MarketSetting;
-import cointoss.execution.DeltaLogWriter;
-import cointoss.execution.LogWriter;
+import cointoss.execution.DeltaLogCompressor;
+import cointoss.execution.LogCompressor;
 import cointoss.order.Order;
 import cointoss.order.OrderBookChange;
 import cointoss.order.OrderState;
@@ -81,6 +81,19 @@ class BitFlyerService extends MarketService {
 
     /** The api url. */
     static final String api = "https://api.bitflyer.com";
+
+    /** The specialized compressor. */
+    private static final LogCompressor compressor = new DeltaLogCompressor() {
+        @Override
+        protected Num decodePrice(String value, Execution previous) {
+            return decodeIntegralDelta(value, previous.price, 0);
+        }
+
+        @Override
+        protected String encodePrice(Execution execution, Execution previous) {
+            return encodeIntegralDelta(execution.price, previous.price, 0);
+        }
+    };
 
     /** The order management. */
     private final Set<String> orders = ConcurrentHashMap.newKeySet();
@@ -453,18 +466,8 @@ class BitFlyerService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public LogWriter codec() {
-        return new DeltaLogWriter() {
-            @Override
-            protected Num decodePrice(String value, Execution previous) {
-                return decodeIntegralDelta(value, previous.price, 0);
-            }
-
-            @Override
-            protected String encodePrice(Execution execution, Execution previous) {
-                return encodeIntegralDelta(execution.price, previous.price, 0);
-            }
-        };
+    public LogCompressor codec() {
+        return compressor;
     }
 
     protected SessionMaintainer maintainer = new SessionMaintainer();

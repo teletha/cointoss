@@ -13,19 +13,23 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Objects;
 
-import cointoss.execution.LogWriter;
+import cointoss.execution.LogCompressor;
 import cointoss.order.Order;
 import cointoss.order.OrderBookChange;
 import cointoss.util.Chrono;
 import cointoss.util.Network;
 import cointoss.util.Num;
 import kiss.Disposable;
+import kiss.I;
 import kiss.Signal;
 
 /**
  * @version 2018/08/05 0:47:38
  */
 public abstract class MarketService implements Disposable {
+
+    /** The singleton. */
+    private static final LogCompressor compressor = I.make(LogCompressor.class);
 
     /** The exchange name. */
     public final String exchangeName;
@@ -170,8 +174,13 @@ public abstract class MarketService implements Disposable {
         return log;
     }
 
-    public LogWriter codec() {
-        return new LogWriter();
+    /**
+     * Return {@link LogCompressor} of this market.
+     * 
+     * @return
+     */
+    public LogCompressor codec() {
+        return compressor;
     }
 
     /**

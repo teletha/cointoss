@@ -15,11 +15,14 @@ import java.util.Arrays;
 import cointoss.Direction;
 import cointoss.Execution;
 import cointoss.util.Num;
+import kiss.Manageable;
+import kiss.Singleton;
 
 /**
  * {@link Execution} log writer.
  */
-public class LogWriter {
+@Manageable(lifestyle = Singleton.class)
+public class LogCompressor {
 
     /** CONSTANTS */
     private static final int ConsecutiveTypeSize = 4;

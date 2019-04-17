@@ -15,7 +15,10 @@ import java.time.temporal.ChronoUnit;
 import cointoss.Execution;
 import cointoss.util.Num;
 
-public class DeltaLogWriter extends LogWriter {
+/**
+ * {@link DeltaLogCompressor} writes compact size log by using the delta.
+ */
+public class DeltaLogCompressor extends LogCompressor {
 
     /**
      * Decode id.
