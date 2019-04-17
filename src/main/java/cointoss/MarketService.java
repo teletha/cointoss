@@ -13,7 +13,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Objects;
 
-import cointoss.execution.LogCompressor;
+import cointoss.execution.ExecutionCodec;
 import cointoss.order.Order;
 import cointoss.order.OrderBookChange;
 import cointoss.util.Chrono;
@@ -29,7 +29,7 @@ import kiss.Signal;
 public abstract class MarketService implements Disposable {
 
     /** The singleton. */
-    private static final LogCompressor compressor = I.make(LogCompressor.class);
+    private static final ExecutionCodec codec = I.make(ExecutionCodec.class);
 
     /** The exchange name. */
     public final String exchangeName;
@@ -175,12 +175,12 @@ public abstract class MarketService implements Disposable {
     }
 
     /**
-     * Return {@link LogCompressor} of this market.
+     * Return {@link ExecutionCodec} of this market.
      * 
      * @return
      */
-    public LogCompressor codec() {
-        return compressor;
+    public ExecutionCodec codec() {
+        return codec;
     }
 
     /**

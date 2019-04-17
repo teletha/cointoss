@@ -11,13 +11,13 @@ package cointoss.execution;
 
 import org.junit.jupiter.api.Test;
 
-class DeltaLogWriterTest {
+class ExecutionCodecTest {
 
     @Test
     void decodeChar() {
         for (int i = 0; i <= 186; i++) {
-            String encoded = LogCompressor.encodeInt(i);
-            int decoded = LogCompressor.decodeInt(encoded.charAt(0));
+            String encoded = ExecutionCodec.encodeInt(i);
+            int decoded = ExecutionCodec.decodeInt(encoded.charAt(0));
 
             assert decoded == i;
         }
@@ -26,8 +26,8 @@ class DeltaLogWriterTest {
     @Test
     void encodeLong() {
         for (long i = -3000; i <= 3000; i++) {
-            String encoded = LogCompressor.encodeLong(i);
-            long decoded = LogCompressor.decodeLong(encoded);
+            String encoded = ExecutionCodec.encodeLong(i);
+            long decoded = ExecutionCodec.decodeLong(encoded);
 
             assert decoded == i;
         }

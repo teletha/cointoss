@@ -16,9 +16,9 @@ import cointoss.Execution;
 import cointoss.util.Num;
 
 /**
- * {@link DeltaLogCompressor} writes compact size log by using the delta.
+ * {@link ExecutionDeltaCodec} writes compact size log by using the delta.
  */
-public class DeltaLogCompressor extends LogCompressor {
+public class ExecutionDeltaCodec extends ExecutionCodec {
 
     /**
      * Decode id.

@@ -22,7 +22,7 @@ import kiss.Singleton;
  * {@link Execution} log writer.
  */
 @Manageable(lifestyle = Singleton.class)
-public class LogCompressor {
+public class ExecutionCodec {
 
     /** CONSTANTS */
     private static final int ConsecutiveTypeSize = 4;

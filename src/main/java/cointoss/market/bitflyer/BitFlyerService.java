@@ -35,8 +35,8 @@ import cointoss.Direction;
 import cointoss.Execution;
 import cointoss.MarketService;
 import cointoss.MarketSetting;
-import cointoss.execution.DeltaLogCompressor;
-import cointoss.execution.LogCompressor;
+import cointoss.execution.ExecutionDeltaCodec;
+import cointoss.execution.ExecutionCodec;
 import cointoss.order.Order;
 import cointoss.order.OrderBookChange;
 import cointoss.order.OrderState;
@@ -83,7 +83,7 @@ class BitFlyerService extends MarketService {
     static final String api = "https://api.bitflyer.com";
 
     /** The specialized compressor. */
-    private static final LogCompressor compressor = new DeltaLogCompressor() {
+    private static final ExecutionCodec compressor = new ExecutionDeltaCodec() {
         @Override
         protected Num decodePrice(String value, Execution previous) {
             return decodeIntegralDelta(value, previous.price, 0);
@@ -466,7 +466,7 @@ class BitFlyerService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public LogCompressor codec() {
+    public ExecutionCodec codec() {
         return compressor;
     }
 
