@@ -610,7 +610,7 @@ public class ExecutionLog {
                 if (compact.isPresent()) {
                     // read compact
                     return I.signal(parser.iterate(new ZstdInputStream(compact.newInputStream()), ISO_8859_1))
-                            .scanWith(Execution.BASE, service.codec()::decode)
+                            .scanWith(Execution.BASE, service.setting.executionCodec()::decode)
                             .effectOnComplete(parser::stopParsing)
                             .effectOnObserve(stopwatch::start)
                             .effectOnComplete(() -> {
@@ -695,9 +695,10 @@ public class ExecutionLog {
                 setting.getFormat().setDelimiter(' ');
                 setting.getFormat().setComment('無');
                 CsvWriter writer = new CsvWriter(new ZstdOutputStream(compact.newOutputStream(), 1), ISO_8859_1, setting);
+                ExecutionCodec codec = service.setting.executionCodec();
 
                 return executions.maps(Execution.BASE, (prev, e) -> {
-                    writer.writeRow(service.codec().encode(prev, e));
+                    writer.writeRow(codec.encode(prev, e));
                     return e;
                 }).effectOnComplete(writer::close);
             } catch (IOException e) {

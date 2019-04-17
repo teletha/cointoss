@@ -37,8 +37,6 @@ import cointoss.Direction;
 import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.execution.Execution;
-import cointoss.execution.ExecutionCodec;
-import cointoss.execution.ExecutionDeltaCodec;
 import cointoss.order.Order;
 import cointoss.order.OrderBookChange;
 import cointoss.order.OrderState;
@@ -79,19 +77,6 @@ class BitFlyerService extends MarketService {
 
     /** The api url. */
     static final String api = "https://api.bitflyer.com";
-
-    /** The specialized compressor. */
-    private static final ExecutionCodec compressor = new ExecutionDeltaCodec() {
-        @Override
-        protected Num decodePrice(String value, Execution previous) {
-            return decodeIntegralDelta(value, previous.price, 0);
-        }
-
-        @Override
-        protected String encodePrice(Execution execution, Execution previous) {
-            return encodeIntegralDelta(execution.price, previous.price, 0);
-        }
-    };
 
     /** The order management. */
     private final Set<String> orders = ConcurrentHashMap.newKeySet();
@@ -334,14 +319,6 @@ class BitFlyerService extends MarketService {
         return call("GET", "/v1/executions?product_code=" + marketName + "&count=1", "", "^", BitFlyerExecution.class)
                 .maps(BitFlyerExecution.NONE, (prev, now) -> now.estimate(prev))
                 .as(Execution.class);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ExecutionCodec codec() {
-        return compressor;
     }
 
     /**

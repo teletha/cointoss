@@ -13,6 +13,9 @@ import java.util.List;
 
 import org.immutables.value.Value;
 
+import cointoss.execution.ExecutionCodec;
+import cointoss.execution.ExecutionDeltaCodec;
+import cointoss.execution.ExecutionLog;
 import cointoss.util.ImmutableData;
 import cointoss.util.Num;
 import kiss.I;
@@ -71,5 +74,15 @@ interface MarketSettingData {
     @Value.Default
     default int acquirableExecutionSize() {
         return 100;
+    }
+
+    /**
+     * Configure {@link ExecutionLog} codec.
+     * 
+     * @return
+     */
+    @Value.Default
+    default ExecutionCodec executionCodec() {
+        return new ExecutionDeltaCodec();
     }
 }

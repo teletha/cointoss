@@ -13,7 +13,6 @@ import java.time.ZonedDateTime;
 import java.util.Objects;
 
 import cointoss.execution.Execution;
-import cointoss.execution.ExecutionCodec;
 import cointoss.execution.ExecutionLog;
 import cointoss.order.Order;
 import cointoss.order.OrderBookChange;
@@ -21,16 +20,12 @@ import cointoss.util.Chrono;
 import cointoss.util.Network;
 import cointoss.util.Num;
 import kiss.Disposable;
-import kiss.I;
 import kiss.Signal;
 
 /**
  * @version 2018/08/05 0:47:38
  */
 public abstract class MarketService implements Disposable {
-
-    /** The singleton. */
-    private static final ExecutionCodec codec = I.make(ExecutionCodec.class);
 
     /** The exchange name. */
     public final String exchangeName;
@@ -139,15 +134,6 @@ public abstract class MarketService implements Disposable {
      */
     public final ExecutionLog log() {
         return log;
-    }
-
-    /**
-     * Return {@link ExecutionCodec} of this market.
-     * 
-     * @return
-     */
-    public ExecutionCodec codec() {
-        return codec;
     }
 
     /**

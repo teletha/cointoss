@@ -17,7 +17,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import cointoss.backtest.Time;
 import cointoss.execution.Execution;
-import cointoss.execution.ExecutionCodec;
 import cointoss.order.Order;
 import cointoss.order.OrderBookChange;
 import cointoss.order.OrderState;
@@ -64,8 +63,6 @@ public class VerifiableMarketService extends MarketService {
     /** The current time. */
     private ZonedDateTime now = Time.Base;
 
-    private MarketService delegation;
-
     /**
      * 
      */
@@ -82,8 +79,6 @@ public class VerifiableMarketService extends MarketService {
      */
     public VerifiableMarketService(MarketService delegation) {
         super(delegation.exchangeName, delegation.marketName, delegation.setting);
-
-        this.delegation = delegation;
     }
 
     /**
@@ -224,14 +219,6 @@ public class VerifiableMarketService extends MarketService {
     @Override
     public Signal<OrderBookChange> orderBook() {
         return Signal.never();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ExecutionCodec codec() {
-        return delegation == null ? super.codec() : delegation.codec();
     }
 
     /**
