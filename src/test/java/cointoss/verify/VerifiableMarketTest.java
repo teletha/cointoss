@@ -23,11 +23,7 @@ import cointoss.order.Order;
 import cointoss.order.OrderState;
 import cointoss.order.QuantityCondition;
 import cointoss.util.Num;
-import cointoss.verify.VerifiableMarket;
 
-/**
- * @version 2018/04/29 16:12:46
- */
 class VerifiableMarketTest extends MarketTestSupport {
 
     static final Num FIVE = Num.of(5);

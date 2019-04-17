@@ -19,7 +19,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 import antibug.CleanRoom;
-import cointoss.MarketService;
 import cointoss.util.Chrono;
 import cointoss.verify.VerifiableMarket;
 import kiss.I;
@@ -32,9 +31,7 @@ class ExecutionLogTest {
 
     VerifiableMarket market = new VerifiableMarket();
 
-    MarketService service = market.service;
-
-    ExecutionLog log = new ExecutionLog(service, Locator.directory(room.root));
+    ExecutionLog log = new ExecutionLog(market.service, Locator.directory(room.root));
 
     @Test
     void logAtNoServicedDate() {
