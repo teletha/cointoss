@@ -15,9 +15,9 @@ import java.time.temporal.ChronoUnit;
 import cointoss.util.Num;
 
 /**
- * {@link ExecutionDeltaCodec} writes compact size log by using the delta.
+ * {@link ExecutionDeltaLogger} writes compact size log by using the delta.
  */
-public class ExecutionDeltaCodec extends ExecutionCodec {
+public class ExecutionDeltaLogger extends ExecutionLogger {
 
     /**
      * Decode id.

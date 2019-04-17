@@ -12,7 +12,7 @@ package cointoss.market.bitflyer;
 import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.execution.Execution;
-import cointoss.execution.ExecutionDeltaCodec;
+import cointoss.execution.ExecutionDeltaLogger;
 import cointoss.market.MarketAccount;
 import cointoss.market.MarketProvider;
 import cointoss.util.Num;
@@ -27,7 +27,7 @@ public final class BitFlyer extends MarketProvider {
             .targetCurrencyScaleSize(3)
             .orderBookGroupRanges(Num.of(50, 100, 250, 500, 1000, 2500, 5000))
             .acquirableExecutionSize(499)
-            .executionCodec(new BitFlyerCodec());
+            .executionLogger(new BitFlyerCodec());
 
     /** Reusable market configuration. */
     private static MarketSetting.Builder BTCBaseSetting = MarketSetting.builder()
@@ -36,7 +36,7 @@ public final class BitFlyer extends MarketProvider {
             .targetCurrencyScaleSize(6)
             .orderBookGroupRanges(Num.of(0.01, 0.02, 0.05, 0.1))
             .acquirableExecutionSize(499)
-            .executionCodec(new BitFlyerCodec());
+            .executionLogger(new BitFlyerCodec());
 
     /** Market */
     public static final MarketService BTC_JPY = new BitFlyerService("BTC_JPY", FiatBaseSetting);
@@ -68,7 +68,7 @@ public final class BitFlyer extends MarketProvider {
     }
 
     /** The specialized codec. */
-    private static class BitFlyerCodec extends ExecutionDeltaCodec {
+    private static class BitFlyerCodec extends ExecutionDeltaLogger {
         @Override
         protected Num decodePrice(String value, Execution previous) {
             return decodeIntegralDelta(value, previous.price, 0);

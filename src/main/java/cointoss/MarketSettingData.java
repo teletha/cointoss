@@ -13,9 +13,9 @@ import java.util.List;
 
 import org.immutables.value.Value;
 
-import cointoss.execution.ExecutionCodec;
-import cointoss.execution.ExecutionDeltaCodec;
+import cointoss.execution.ExecutionDeltaLogger;
 import cointoss.execution.ExecutionLog;
+import cointoss.execution.ExecutionLogger;
 import cointoss.util.ImmutableData;
 import cointoss.util.Num;
 import kiss.I;
@@ -77,12 +77,12 @@ interface MarketSettingData {
     }
 
     /**
-     * Configure {@link ExecutionLog} codec.
+     * Configure {@link ExecutionLog} parser.
      * 
      * @return
      */
     @Value.Default
-    default ExecutionCodec executionCodec() {
-        return new ExecutionDeltaCodec();
+    default ExecutionLogger executionLogger() {
+        return new ExecutionDeltaLogger();
     }
 }

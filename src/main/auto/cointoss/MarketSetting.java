@@ -1,6 +1,6 @@
 package cointoss;
 
-import cointoss.execution.ExecutionCodec;
+import cointoss.execution.ExecutionLogger;
 import cointoss.util.Num;
 import com.google.common.base.MoreObjects;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
@@ -31,7 +31,7 @@ public final class MarketSetting implements MarketSettingData {
   private final Num[] orderBookGroupRanges;
   private final int targetCurrencyScaleSize;
   private final int acquirableExecutionSize;
-  private final ExecutionCodec executionCodec;
+  private final ExecutionLogger executionLogger;
 
   private MarketSetting(MarketSetting.Builder builder) {
     this.baseCurrencyMinimumBidPrice = builder.baseCurrencyMinimumBidPrice;
@@ -43,12 +43,12 @@ public final class MarketSetting implements MarketSettingData {
     if (builder.acquirableExecutionSizeIsSet()) {
       initShim.acquirableExecutionSize(builder.acquirableExecutionSize);
     }
-    if (builder.executionCodec != null) {
-      initShim.executionCodec(builder.executionCodec);
+    if (builder.executionLogger != null) {
+      initShim.executionLogger(builder.executionLogger);
     }
     this.targetCurrencyScaleSize = initShim.targetCurrencyScaleSize();
     this.acquirableExecutionSize = initShim.acquirableExecutionSize();
-    this.executionCodec = initShim.executionCodec();
+    this.executionLogger = initShim.executionLogger();
     this.initShim = null;
   }
 
@@ -96,29 +96,29 @@ public final class MarketSetting implements MarketSettingData {
       acquirableExecutionSizeBuildStage = STAGE_INITIALIZED;
     }
 
-    private byte executionCodecBuildStage = STAGE_UNINITIALIZED;
-    private ExecutionCodec executionCodec;
+    private byte executionLoggerBuildStage = STAGE_UNINITIALIZED;
+    private ExecutionLogger executionLogger;
 
-    ExecutionCodec executionCodec() {
-      if (executionCodecBuildStage == STAGE_INITIALIZING) throw new IllegalStateException(formatInitCycleMessage());
-      if (executionCodecBuildStage == STAGE_UNINITIALIZED) {
-        executionCodecBuildStage = STAGE_INITIALIZING;
-        this.executionCodec = Objects.requireNonNull(executionCodecInitialize(), "executionCodec");
-        executionCodecBuildStage = STAGE_INITIALIZED;
+    ExecutionLogger executionLogger() {
+      if (executionLoggerBuildStage == STAGE_INITIALIZING) throw new IllegalStateException(formatInitCycleMessage());
+      if (executionLoggerBuildStage == STAGE_UNINITIALIZED) {
+        executionLoggerBuildStage = STAGE_INITIALIZING;
+        this.executionLogger = Objects.requireNonNull(executionLoggerInitialize(), "executionLogger");
+        executionLoggerBuildStage = STAGE_INITIALIZED;
       }
-      return this.executionCodec;
+      return this.executionLogger;
     }
 
-    void executionCodec(ExecutionCodec executionCodec) {
-      this.executionCodec = executionCodec;
-      executionCodecBuildStage = STAGE_INITIALIZED;
+    void executionLogger(ExecutionLogger executionLogger) {
+      this.executionLogger = executionLogger;
+      executionLoggerBuildStage = STAGE_INITIALIZED;
     }
 
     private String formatInitCycleMessage() {
       List<String> attributes = new ArrayList<>();
       if (targetCurrencyScaleSizeBuildStage == STAGE_INITIALIZING) attributes.add("targetCurrencyScaleSize");
       if (acquirableExecutionSizeBuildStage == STAGE_INITIALIZING) attributes.add("acquirableExecutionSize");
-      if (executionCodecBuildStage == STAGE_INITIALIZING) attributes.add("executionCodec");
+      if (executionLoggerBuildStage == STAGE_INITIALIZING) attributes.add("executionLogger");
       return "Cannot build MarketSetting, attribute initializers form cycle " + attributes;
     }
   }
@@ -131,8 +131,8 @@ public final class MarketSetting implements MarketSettingData {
     return MarketSettingData.super.acquirableExecutionSize();
   }
 
-  private ExecutionCodec executionCodecInitialize() {
-    return MarketSettingData.super.executionCodec();
+  private ExecutionLogger executionLoggerInitialize() {
+    return MarketSettingData.super.executionLogger();
   }
 
   /**
@@ -184,16 +184,16 @@ public final class MarketSetting implements MarketSettingData {
   }
 
   /**
-   * Configure {@link ExecutionLog} codec.
+   * Configure {@link ExecutionLog} parser.
    * 
    * @return
    */
   @Override
-  public ExecutionCodec executionCodec() {
+  public ExecutionLogger executionLogger() {
     InitShim shim = this.initShim;
     return shim != null
-        ? shim.executionCodec()
-        : this.executionCodec;
+        ? shim.executionLogger()
+        : this.executionLogger;
   }
 
   /**
@@ -213,11 +213,11 @@ public final class MarketSetting implements MarketSettingData {
         && Arrays.equals(orderBookGroupRanges, another.orderBookGroupRanges)
         && targetCurrencyScaleSize == another.targetCurrencyScaleSize
         && acquirableExecutionSize == another.acquirableExecutionSize
-        && executionCodec.equals(another.executionCodec);
+        && executionLogger.equals(another.executionLogger);
   }
 
   /**
-   * Computes a hash code from attributes: {@code baseCurrencyMinimumBidPrice}, {@code targetCurrencyMinimumBidSize}, {@code orderBookGroupRanges}, {@code targetCurrencyScaleSize}, {@code acquirableExecutionSize}, {@code executionCodec}.
+   * Computes a hash code from attributes: {@code baseCurrencyMinimumBidPrice}, {@code targetCurrencyMinimumBidSize}, {@code orderBookGroupRanges}, {@code targetCurrencyScaleSize}, {@code acquirableExecutionSize}, {@code executionLogger}.
    * @return hashCode value
    */
   @Override
@@ -228,7 +228,7 @@ public final class MarketSetting implements MarketSettingData {
     h += (h << 5) + Arrays.hashCode(orderBookGroupRanges);
     h += (h << 5) + targetCurrencyScaleSize;
     h += (h << 5) + acquirableExecutionSize;
-    h += (h << 5) + executionCodec.hashCode();
+    h += (h << 5) + executionLogger.hashCode();
     return h;
   }
 
@@ -245,7 +245,7 @@ public final class MarketSetting implements MarketSettingData {
         .add("orderBookGroupRanges", Arrays.toString(orderBookGroupRanges))
         .add("targetCurrencyScaleSize", targetCurrencyScaleSize)
         .add("acquirableExecutionSize", acquirableExecutionSize)
-        .add("executionCodec", executionCodec)
+        .add("executionLogger", executionLogger)
         .toString();
   }
 
@@ -258,7 +258,7 @@ public final class MarketSetting implements MarketSettingData {
    *    .orderBookGroupRanges(cointoss.util.Num) // required {@link MarketSetting#orderBookGroupRanges() orderBookGroupRanges}
    *    .targetCurrencyScaleSize(int) // optional {@link MarketSetting#targetCurrencyScaleSize() targetCurrencyScaleSize}
    *    .acquirableExecutionSize(int) // optional {@link MarketSetting#acquirableExecutionSize() acquirableExecutionSize}
-   *    .executionCodec(cointoss.execution.ExecutionCodec) // optional {@link MarketSetting#executionCodec() executionCodec}
+   *    .executionLogger(cointoss.execution.ExecutionLogger) // optional {@link MarketSetting#executionLogger() executionLogger}
    *    .build();
    * </pre>
    * @return A new MarketSetting builder
@@ -290,7 +290,7 @@ public final class MarketSetting implements MarketSettingData {
     private @Nullable Num[] orderBookGroupRanges;
     private int targetCurrencyScaleSize;
     private int acquirableExecutionSize;
-    private @Nullable ExecutionCodec executionCodec;
+    private @Nullable ExecutionLogger executionLogger;
 
     private Builder() {
     }
@@ -319,7 +319,7 @@ public final class MarketSetting implements MarketSettingData {
       orderBookGroupRanges(instance.orderBookGroupRanges());
       targetCurrencyScaleSize(instance.targetCurrencyScaleSize());
       acquirableExecutionSize(instance.acquirableExecutionSize());
-      executionCodec(instance.executionCodec());
+      executionLogger(instance.executionLogger());
       return this;
     }
 
@@ -386,14 +386,14 @@ public final class MarketSetting implements MarketSettingData {
     }
 
     /**
-     * Initializes the value for the {@link MarketSetting#executionCodec() executionCodec} attribute.
-     * <p><em>If not set, this attribute will have a default value as returned by the initializer of {@link MarketSetting#executionCodec() executionCodec}.</em>
-     * @param executionCodec The value for executionCodec 
+     * Initializes the value for the {@link MarketSetting#executionLogger() executionLogger} attribute.
+     * <p><em>If not set, this attribute will have a default value as returned by the initializer of {@link MarketSetting#executionLogger() executionLogger}.</em>
+     * @param executionLogger The value for executionLogger 
      * @return {@code this} builder for use in a chained invocation
      */
     @CanIgnoreReturnValue 
-    public final Builder executionCodec(ExecutionCodec executionCodec) {
-      this.executionCodec = Objects.requireNonNull(executionCodec, "executionCodec");
+    public final Builder executionLogger(ExecutionLogger executionLogger) {
+      this.executionLogger = Objects.requireNonNull(executionLogger, "executionLogger");
       return this;
     }
 

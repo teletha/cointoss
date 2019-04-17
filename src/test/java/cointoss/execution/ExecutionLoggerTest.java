@@ -11,13 +11,13 @@ package cointoss.execution;
 
 import org.junit.jupiter.api.Test;
 
-class ExecutionCodecTest {
+class ExecutionLoggerTest {
 
     @Test
     void decodeChar() {
         for (int i = 0; i <= 186; i++) {
-            String encoded = ExecutionCodec.encodeInt(i);
-            int decoded = ExecutionCodec.decodeInt(encoded.charAt(0));
+            String encoded = ExecutionLogger.encodeInt(i);
+            int decoded = ExecutionLogger.decodeInt(encoded.charAt(0));
 
             assert decoded == i;
         }
@@ -26,8 +26,8 @@ class ExecutionCodecTest {
     @Test
     void encodeLong() {
         for (long i = -3000; i <= 3000; i++) {
-            String encoded = ExecutionCodec.encodeLong(i);
-            long decoded = ExecutionCodec.decodeLong(encoded);
+            String encoded = ExecutionLogger.encodeLong(i);
+            long decoded = ExecutionLogger.decodeLong(encoded);
 
             assert decoded == i;
         }

@@ -21,7 +21,7 @@ import kiss.Singleton;
  * {@link Execution} log writer.
  */
 @Manageable(lifestyle = Singleton.class)
-public class ExecutionCodec {
+public class ExecutionLogger {
 
     /** CONSTANTS */
     private static final int ConsecutiveTypeSize = 4;

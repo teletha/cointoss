@@ -41,8 +41,8 @@ class MarketServiceTest {
             Execution current = exes.get(i);
             Execution previous = exes.get(i - 1);
 
-            String[] encoded = service.setting.executionCodec().encode(previous, current);
-            Execution decoded = service.setting.executionCodec().decode(previous, encoded);
+            String[] encoded = service.setting.executionLogger().encode(previous, current);
+            Execution decoded = service.setting.executionLogger().decode(previous, encoded);
             assert decoded.equals(current);
         }
     }
@@ -59,8 +59,8 @@ class MarketServiceTest {
             Execution current = exes.get(i);
             Execution previous = exes.get(i - 1);
 
-            String[] encoded = service.setting.executionCodec().encode(previous, current);
-            Execution decoded = service.setting.executionCodec().decode(previous, encoded);
+            String[] encoded = service.setting.executionLogger().encode(previous, current);
+            Execution decoded = service.setting.executionLogger().decode(previous, encoded);
             assert decoded.equals(current);
         }
     }
@@ -81,8 +81,8 @@ class MarketServiceTest {
             Execution current = exes.get(i);
             Execution previous = exes.get(i - 1);
 
-            String[] encoded = service.setting.executionCodec().encode(previous, current);
-            Execution decoded = service.setting.executionCodec().decode(previous, encoded);
+            String[] encoded = service.setting.executionLogger().encode(previous, current);
+            Execution decoded = service.setting.executionLogger().decode(previous, encoded);
             assert decoded.equals(current);
         }
     }
@@ -101,8 +101,8 @@ class MarketServiceTest {
             Execution current = exes.get(i);
             Execution previous = exes.get(i - 1);
 
-            String[] encoded = service.setting.executionCodec().encode(previous, current);
-            Execution decoded = service.setting.executionCodec().decode(previous, encoded);
+            String[] encoded = service.setting.executionLogger().encode(previous, current);
+            Execution decoded = service.setting.executionLogger().decode(previous, encoded);
             assert decoded.equals(current);
         }
     }
@@ -121,8 +121,8 @@ class MarketServiceTest {
             Execution current = exes.get(i);
             Execution previous = exes.get(i - 1);
 
-            String[] encoded = service.setting.executionCodec().encode(previous, current);
-            Execution decoded = service.setting.executionCodec().decode(previous, encoded);
+            String[] encoded = service.setting.executionLogger().encode(previous, current);
+            Execution decoded = service.setting.executionLogger().decode(previous, encoded);
             assert decoded.equals(current);
         }
     }
@@ -144,8 +144,8 @@ class MarketServiceTest {
             Execution current = exes.get(i);
             Execution previous = exes.get(i - 1);
 
-            String[] encoded = service.setting.executionCodec().encode(previous, current);
-            Execution decoded = service.setting.executionCodec().decode(previous, encoded);
+            String[] encoded = service.setting.executionLogger().encode(previous, current);
+            Execution decoded = service.setting.executionLogger().decode(previous, encoded);
             assert decoded.equals(current);
         }
     }
@@ -166,8 +166,8 @@ class MarketServiceTest {
             Execution current = exes.get(i);
             Execution previous = exes.get(i - 1);
 
-            String[] encoded = service.setting.executionCodec().encode(previous, current);
-            Execution decoded = service.setting.executionCodec().decode(previous, encoded);
+            String[] encoded = service.setting.executionLogger().encode(previous, current);
+            Execution decoded = service.setting.executionLogger().decode(previous, encoded);
             assert decoded.equals(current);
         }
     }
@@ -201,8 +201,8 @@ class MarketServiceTest {
             Execution current = exes.get(i);
             Execution previous = exes.get(i - 1);
 
-            String[] encoded = service.setting.executionCodec().encode(previous, current);
-            Execution decoded = service.setting.executionCodec().decode(previous, encoded);
+            String[] encoded = service.setting.executionLogger().encode(previous, current);
+            Execution decoded = service.setting.executionLogger().decode(previous, encoded);
             assert decoded.equals(current);
         }
     }
