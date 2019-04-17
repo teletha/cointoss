@@ -7,10 +7,10 @@
  *
  *          https://opensource.org/licenses/MIT
  */
-package cointoss;
+package cointoss.execution;
 
-import static cointoss.MarketTestSupport.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static cointoss.MarketTestSupport.executionRandomly;
+import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -19,14 +19,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 import antibug.CleanRoom;
+import cointoss.MarketService;
+import cointoss.VerifiableMarket;
 import cointoss.util.Chrono;
 import kiss.I;
 import psychopath.Locator;
 
-/**
- * @version 2018/05/26 10:37:10
- */
-class MarketLogTest {
+class ExecutionLogTest {
 
     @RegisterExtension
     CleanRoom room = new CleanRoom();
@@ -35,7 +34,7 @@ class MarketLogTest {
 
     MarketService service = market.service;
 
-    MarketLog log = new MarketLog(service, Locator.directory(room.root));
+    ExecutionLog log = new ExecutionLog(service, Locator.directory(room.root));
 
     @Test
     void logAtNoServicedDate() {

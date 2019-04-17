@@ -15,7 +15,7 @@ import java.util.stream.IntStream;
 
 import javafx.scene.control.ListCell;
 
-import cointoss.Execution;
+import cointoss.execution.Execution;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
 import stylist.Style;

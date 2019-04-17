@@ -10,8 +10,8 @@
 package cointoss;
 
 import static cointoss.Direction.*;
-import static cointoss.Execution.*;
 import static cointoss.MarketTestSupport.*;
+import static cointoss.execution.Execution.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +19,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import cointoss.MarketTestSupport.ChainableExecution;
+import cointoss.execution.Execution;
 
 /**
  * @version 2018/07/12 9:52:30

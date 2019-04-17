@@ -14,7 +14,7 @@ import java.util.Objects;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Consumer;
 
-import cointoss.Execution;
+import cointoss.execution.Execution;
 import cointoss.util.SegmentBuffer;
 import kiss.Signal;
 import kiss.Signaling;

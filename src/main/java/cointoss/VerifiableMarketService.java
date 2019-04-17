@@ -16,6 +16,7 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import cointoss.backtest.Time;
+import cointoss.execution.Execution;
 import cointoss.execution.ExecutionCodec;
 import cointoss.order.Order;
 import cointoss.order.OrderBookChange;
@@ -231,14 +232,6 @@ public class VerifiableMarketService extends MarketService {
     @Override
     public ExecutionCodec codec() {
         return delegation == null ? super.codec() : delegation.codec();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected int executionMaxAcquirableSize() {
-        return 0;
     }
 
     /**

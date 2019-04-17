@@ -10,10 +10,11 @@
 package cointoss;
 
 import java.time.ZonedDateTime;
-import java.util.List;
 import java.util.Objects;
 
+import cointoss.execution.Execution;
 import cointoss.execution.ExecutionCodec;
+import cointoss.execution.ExecutionLog;
 import cointoss.order.Order;
 import cointoss.order.OrderBookChange;
 import cointoss.util.Chrono;
@@ -38,7 +39,7 @@ public abstract class MarketService implements Disposable {
     public final String marketName;
 
     /** The execution log. */
-    public final MarketLog log;
+    public final ExecutionLog log;
 
     /** The network accessor. */
     protected Network network = new Network();
@@ -54,7 +55,7 @@ public abstract class MarketService implements Disposable {
         this.exchangeName = Objects.requireNonNull(exchangeName);
         this.marketName = Objects.requireNonNull(marketName);
         this.setting = setting;
-        this.log = new MarketLog(this);
+        this.log = new ExecutionLog(this);
     }
 
     /**
@@ -132,45 +133,11 @@ public abstract class MarketService implements Disposable {
     }
 
     /**
-     * Configure max acquirable execution size per one request.
+     * Return {@link ExecutionLog} of this market.
      * 
      * @return
      */
-    protected abstract int executionMaxAcquirableSize();
-
-    /**
-     * Estimate the inital execution id of the {@link Market}.
-     * 
-     * @return
-     */
-    protected long estimateInitialExecutionId() {
-        long start = 0;
-        long end = executionLatest().to().v.id;
-        long middle = (start + end) / 2;
-
-        while (true) {
-            List<Execution> result = executions(start, middle).skipError().toList();
-
-            if (result.isEmpty()) {
-                start = middle;
-                middle = (start + end) / 2;
-            } else {
-                end = result.get(0).id + 1;
-                middle = (start + end) / 2;
-            }
-
-            if (end - start <= 10) {
-                return start;
-            }
-        }
-    }
-
-    /**
-     * Return {@link MarketLog} of this market.
-     * 
-     * @return
-     */
-    public final MarketLog log() {
+    public final ExecutionLog log() {
         return log;
     }
 

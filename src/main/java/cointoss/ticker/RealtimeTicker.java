@@ -13,7 +13,7 @@ import java.time.ZonedDateTime;
 
 import org.magicwerk.brownies.collections.GapList;
 
-import cointoss.Execution;
+import cointoss.execution.Execution;
 import cointoss.util.Num;
 import kiss.Variable;
 

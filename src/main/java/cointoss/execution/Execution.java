@@ -7,11 +7,13 @@
  *
  *          https://opensource.org/licenses/MIT
  */
-package cointoss;
+package cointoss.execution;
 
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 
+import cointoss.Direction;
+import cointoss.Directional;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
 import kiss.Decoder;

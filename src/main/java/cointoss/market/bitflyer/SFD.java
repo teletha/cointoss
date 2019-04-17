@@ -9,7 +9,7 @@
  */
 package cointoss.market.bitflyer;
 
-import cointoss.Execution;
+import cointoss.execution.Execution;
 import cointoss.util.Num;
 import kiss.Signal;
 

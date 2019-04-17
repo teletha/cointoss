@@ -18,6 +18,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
+import cointoss.execution.Execution;
+import cointoss.execution.ExecutionLog;
 import cointoss.market.MarketProvider;
 import cointoss.order.Order;
 import cointoss.order.OrderBook;
@@ -241,7 +243,7 @@ public class Market implements Disposable {
      * @param log
      * @return
      */
-    public final Market readLog(Function<MarketLog, Signal<Execution>> log) {
+    public final Market readLog(Function<ExecutionLog, Signal<Execution>> log) {
         service.add(log.apply(service.log).to(timelineObservers));
 
         return this;

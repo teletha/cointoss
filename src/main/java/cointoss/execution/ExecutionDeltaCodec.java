@@ -12,7 +12,6 @@ package cointoss.execution;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 
-import cointoss.Execution;
 import cointoss.util.Num;
 
 /**

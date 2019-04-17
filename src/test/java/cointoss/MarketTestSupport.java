@@ -16,6 +16,7 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 
 import cointoss.backtest.Time;
+import cointoss.execution.Execution;
 import cointoss.position.Position;
 import cointoss.util.Chrono;
 import cointoss.util.Generator;

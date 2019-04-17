@@ -23,6 +23,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
+import javafx.scene.control.TextInputDialog;
+
 import org.apache.commons.codec.digest.HmacAlgorithms;
 import org.apache.commons.codec.digest.HmacUtils;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -32,18 +34,17 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import cointoss.Direction;
-import cointoss.Execution;
 import cointoss.MarketService;
 import cointoss.MarketSetting;
-import cointoss.execution.ExecutionDeltaCodec;
+import cointoss.execution.Execution;
 import cointoss.execution.ExecutionCodec;
+import cointoss.execution.ExecutionDeltaCodec;
 import cointoss.order.Order;
 import cointoss.order.OrderBookChange;
 import cointoss.order.OrderState;
 import cointoss.order.OrderUnit;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
-import javafx.scene.control.TextInputDialog;
 import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
@@ -76,9 +77,6 @@ class BitFlyerService extends MarketService {
     /** The realtime data format */
     static final DateTimeFormatter RealTimeFormatUntilHour = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH");
 
-    /** The max acquirable execution size. */
-    private static final int MAX = 499;
-
     /** The api url. */
     static final String api = "https://api.bitflyer.com";
 
@@ -105,7 +103,7 @@ class BitFlyerService extends MarketService {
     private final boolean forTest;
 
     /** The account setting. */
-    private final BitFlyerAccount setting = I.make(BitFlyerAccount.class);
+    private final BitFlyerAccount account = I.make(BitFlyerAccount.class);
 
     private Disposable disposer = Disposable.empty();
 
@@ -164,7 +162,7 @@ class BitFlyerService extends MarketService {
             call = call("POST", "/v1/me/sendchildorder", request, "child_order_acceptance_id", String.class);
         } else {
             ChildOrderRequestWebAPI request = new ChildOrderRequestWebAPI();
-            request.account_id = setting.accountId.v;
+            request.account_id = account.accountId.v;
             request.ord_type = order.isLimit() ? "LIMIT" : "MARKET";
             request.minute_to_expire = 60 * 24;
             request.order_ref_id = id;
@@ -204,7 +202,7 @@ class BitFlyerService extends MarketService {
     public Signal<Order> cancel(Order order) {
         CancelRequest cancel = new CancelRequest();
         cancel.product_code = marketName;
-        cancel.account_id = setting.accountId.v;
+        cancel.account_id = account.accountId.v;
         cancel.order_id = order.attribute(Internals.class).id;
         cancel.child_order_acceptance_id = order.id.v;
 
@@ -322,9 +320,10 @@ class BitFlyerService extends MarketService {
      */
     @Override
     public Signal<Execution> executions(long start, long end) {
-        return call("GET", "/v1/executions?product_code=" + marketName + "&count=" + MAX + "&before=" + end + "&after=" + start, "", "^", BitFlyerExecution.class)
-                .maps(BitFlyerExecution.NONE, (prev, now) -> now.estimate(prev))
-                .as(Execution.class);
+        return call("GET", "/v1/executions?product_code=" + marketName + "&count=" + setting
+                .acquirableExecutionSize() + "&before=" + end + "&after=" + start, "", "^", BitFlyerExecution.class)
+                        .maps(BitFlyerExecution.NONE, (prev, now) -> now.estimate(prev))
+                        .as(Execution.class);
     }
 
     /**
@@ -335,14 +334,6 @@ class BitFlyerService extends MarketService {
         return call("GET", "/v1/executions?product_code=" + marketName + "&count=1", "", "^", BitFlyerExecution.class)
                 .maps(BitFlyerExecution.NONE, (prev, now) -> now.estimate(prev))
                 .as(Execution.class);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected int executionMaxAcquirableSize() {
-        return MAX;
     }
 
     /**
@@ -439,7 +430,7 @@ class BitFlyerService extends MarketService {
      */
     protected <M> Signal<M> call(String method, String path, String body, String selector, Class<M> type) {
         String timestamp = String.valueOf(Chrono.utcNow().toEpochSecond());
-        String sign = new HmacUtils(HmacAlgorithms.HMAC_SHA_256, setting.apiSecret.v).hmacHex(timestamp + method + path + body);
+        String sign = new HmacUtils(HmacAlgorithms.HMAC_SHA_256, account.apiSecret.v).hmacHex(timestamp + method + path + body);
 
         Request request;
 
@@ -447,13 +438,13 @@ class BitFlyerService extends MarketService {
             request = new Request.Builder().url(api + path).build();
         } else if (method.equals("GET")) {
             request = new Request.Builder().url(api + path)
-                    .addHeader("ACCESS-KEY", setting.apiKey.v)
+                    .addHeader("ACCESS-KEY", account.apiKey.v)
                     .addHeader("ACCESS-TIMESTAMP", timestamp)
                     .addHeader("ACCESS-SIGN", sign)
                     .build();
         } else if (method.equals("POST") && !path.startsWith("http")) {
             request = new Request.Builder().url(api + path)
-                    .addHeader("ACCESS-KEY", setting.apiKey.v)
+                    .addHeader("ACCESS-KEY", account.apiKey.v)
                     .addHeader("ACCESS-TIMESTAMP", timestamp)
                     .addHeader("ACCESS-SIGN", sign)
                     .addHeader("Content-Type", "application/json")
@@ -506,8 +497,8 @@ class BitFlyerService extends MarketService {
                 });
 
                 browser.load("https://lightning.bitflyer.jp") //
-                        .input("#LoginId", setting.loginId)
-                        .input("#Password", setting.loginPassword)
+                        .input("#LoginId", account.loginId)
+                        .input("#Password", account.loginPassword)
                         .click("#login_btn");
 
                 if (browser.uri().equals("https://lightning.bitflyer.jp/Home/TwoFactorAuth")) {
@@ -673,7 +664,7 @@ class BitFlyerService extends MarketService {
     private class WebRequest {
 
         /** Generic parameter */
-        public String account_id = setting.accountId.v;
+        public String account_id = account.accountId.v;
 
         /** Generic parameter */
         public String product_code = marketName;

@@ -25,8 +25,8 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-import cointoss.Execution;
 import cointoss.Direction;
+import cointoss.execution.Execution;
 import cointoss.order.Order;
 
 /**

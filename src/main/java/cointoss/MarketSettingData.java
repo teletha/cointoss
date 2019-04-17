@@ -62,4 +62,14 @@ interface MarketSettingData {
     default List<Num> orderBookGroupRangesWithBase() {
         return I.signal(orderBookGroupRanges()).startWith(baseCurrencyMinimumBidPrice()).toList();
     }
+
+    /**
+     * Configure max acquirable execution size per one request.
+     * 
+     * @return
+     */
+    @Value.Default
+    default int acquirableExecutionSize() {
+        return 100;
+    }
 }

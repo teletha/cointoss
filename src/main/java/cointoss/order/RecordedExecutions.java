@@ -11,7 +11,7 @@ package cointoss.order;
 
 import java.util.LinkedList;
 
-import cointoss.Execution;
+import cointoss.execution.Execution;
 import kiss.Signaling;
 
 /**

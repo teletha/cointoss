@@ -14,8 +14,8 @@ import static java.time.temporal.ChronoUnit.SECONDS;
 
 import org.junit.jupiter.api.Test;
 
-import cointoss.Execution;
 import cointoss.Direction;
+import cointoss.execution.Execution;
 import cointoss.util.Num;
 import kiss.Variable;
 

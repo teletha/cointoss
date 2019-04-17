@@ -19,8 +19,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import cointoss.Execution;
 import cointoss.MarketService;
+import cointoss.execution.Execution;
 import cointoss.util.Num;
 import cointoss.util.RetryPolicy;
 import kiss.I;

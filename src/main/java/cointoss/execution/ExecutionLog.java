@@ -7,9 +7,9 @@
  *
  *          https://opensource.org/licenses/MIT
  */
-package cointoss;
+package cointoss.execution;
 
-import static java.nio.charset.StandardCharsets.*;
+import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static java.nio.file.StandardOpenOption.*;
 import static java.util.concurrent.TimeUnit.*;
 
@@ -50,6 +50,9 @@ import com.univocity.parsers.csv.CsvParserSettings;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
 
+import cointoss.Market;
+import cointoss.MarketService;
+import cointoss.VerifiableMarket;
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.util.Chrono;
 import cointoss.util.Network;
@@ -67,10 +70,10 @@ import psychopath.Locator;
  * 
  * @version 2018/08/03 8:34:01
  */
-public class MarketLog {
+public class ExecutionLog {
 
     /** The logging system. */
-    private static final Logger log = LogManager.getLogger(MarketLog.class);
+    private static final Logger log = LogManager.getLogger(ExecutionLog.class);
 
     /** NOOP TASK */
     private static final ScheduledFuture NOOP = new ScheduledFuture() {
@@ -189,7 +192,7 @@ public class MarketLog {
      * 
      * @param provider
      */
-    public MarketLog(MarketService service) {
+    public ExecutionLog(MarketService service) {
         this(service, Locator.directory(".log").directory(service.exchangeName).directory(service.marketName));
     }
 
@@ -199,7 +202,7 @@ public class MarketLog {
      * @param service A market service.
      * @param root A log store directory.
      */
-    MarketLog(MarketService service, Directory root) {
+    ExecutionLog(MarketService service, Directory root) {
         this.service = Objects.requireNonNull(service);
         this.root = Objects.requireNonNull(root);
 
@@ -286,8 +289,8 @@ public class MarketLog {
             }, observer::error));
 
             // read from REST API
-            int size = service.executionMaxAcquirableSize();
-            long start = cacheId != 0 ? cacheId : service.estimateInitialExecutionId();
+            int size = service.setting.acquirableExecutionSize();
+            long start = cacheId != 0 ? cacheId : estimateInitialExecutionId();
             Num coefficient = Num.ONE;
 
             while (disposer.isNotDisposed()) {
@@ -506,6 +509,33 @@ public class MarketLog {
      */
     final File locateCompactLog(TemporalAccessor date) {
         return root.file("execution" + Chrono.DateCompact.format(date) + ".clog");
+    }
+
+    /**
+     * Estimate the inital execution id of the {@link Market}.
+     * 
+     * @return
+     */
+    private long estimateInitialExecutionId() {
+        long start = 0;
+        long end = service.executionLatest().to().v.id;
+        long middle = (start + end) / 2;
+
+        while (true) {
+            List<Execution> result = service.executions(start, middle).skipError().toList();
+
+            if (result.isEmpty()) {
+                start = middle;
+                middle = (start + end) / 2;
+            } else {
+                end = result.get(0).id + 1;
+                middle = (start + end) / 2;
+            }
+
+            if (end - start <= 10) {
+                return start;
+            }
+        }
     }
 
     /**

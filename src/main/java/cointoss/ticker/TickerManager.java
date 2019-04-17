@@ -9,8 +9,8 @@
  */
 package cointoss.ticker;
 
-import cointoss.Execution;
 import cointoss.Direction;
+import cointoss.execution.Execution;
 import cointoss.util.Num;
 import kiss.I;
 import kiss.Signal;

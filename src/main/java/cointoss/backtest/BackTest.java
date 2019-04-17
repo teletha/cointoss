@@ -13,10 +13,10 @@ import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
 
-import cointoss.Execution;
 import cointoss.Market;
 import cointoss.Trader;
 import cointoss.VerifiableMarketService;
+import cointoss.execution.Execution;
 import cointoss.util.Num;
 import kiss.I;
 import kiss.Signal;
