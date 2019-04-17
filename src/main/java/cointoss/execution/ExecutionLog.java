@@ -695,10 +695,10 @@ public class ExecutionLog {
                 setting.getFormat().setDelimiter(' ');
                 setting.getFormat().setComment('無');
                 CsvWriter writer = new CsvWriter(new ZstdOutputStream(compact.newOutputStream(), 1), ISO_8859_1, setting);
-                ExecutionLogger codec = service.setting.executionLogger();
+                ExecutionLogger logger = service.setting.executionLogger();
 
                 return executions.maps(Execution.BASE, (prev, e) -> {
-                    writer.writeRow(codec.encode(prev, e));
+                    writer.writeRow(logger.encode(prev, e));
                     return e;
                 }).effectOnComplete(writer::close);
             } catch (IOException e) {

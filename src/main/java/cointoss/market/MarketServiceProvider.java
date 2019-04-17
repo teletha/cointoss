@@ -20,11 +20,8 @@ import kiss.Manageable;
 import kiss.Signal;
 import kiss.Singleton;
 
-/**
- * @version 2018/07/26 23:37:36
- */
 @Manageable(lifestyle = Singleton.class)
-public abstract class MarketProvider implements Extensible {
+public abstract class MarketServiceProvider implements Extensible {
 
     /** The collection of markets. */
     private final List<MarketService> markets = I.signal(getClass().getFields())
@@ -37,7 +34,7 @@ public abstract class MarketProvider implements Extensible {
     /**
      * Initialization.
      */
-    protected MarketProvider() {
+    protected MarketServiceProvider() {
     }
 
     /**
@@ -57,20 +54,20 @@ public abstract class MarketProvider implements Extensible {
     public abstract MarketAccount account();
 
     /**
-     * Retrieve all {@link MarketProvider}s.
+     * Retrieve all {@link MarketServiceProvider}s.
      * 
      * @return
      */
-    public static final Signal<MarketProvider> availableProviders() {
-        return I.signal(I.find(MarketProvider.class)).take(market -> market.account().validate());
+    public static final Signal<MarketServiceProvider> availableProviders() {
+        return I.signal(I.find(MarketServiceProvider.class)).take(market -> market.account().validate());
     }
 
     /**
-     * Retrieve all {@link MarketProvider}s.
+     * Retrieve all {@link MarketService}s.
      * 
      * @return
      */
-    public static final Signal<MarketService> availableMarkets() {
-        return availableProviders().flatIterable(MarketProvider::markets);
+    public static final Signal<MarketService> availableMarketServices() {
+        return availableProviders().flatIterable(MarketServiceProvider::markets);
     }
 }

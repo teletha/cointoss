@@ -17,7 +17,7 @@ import java.time.Period;
 import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.execution.ExecutionLog;
-import cointoss.market.MarketProvider;
+import cointoss.market.MarketServiceProvider;
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.ticker.TickSpan;
 import cointoss.util.Chrono;
@@ -78,7 +78,7 @@ public class BackTestView extends View {
      */
     @Override
     protected void initialize() {
-        market.values(0, MarketProvider.availableMarkets());
+        market.values(0, MarketServiceProvider.availableMarketServices());
         startDate.initial(Chrono.utcNow().minusDays(10)).uneditable().requireWhen(market).require(() -> {
             ExecutionLog log = market.value().log;
 

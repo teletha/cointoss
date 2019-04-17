@@ -20,7 +20,7 @@ import java.util.function.Function;
 
 import cointoss.execution.Execution;
 import cointoss.execution.ExecutionLog;
-import cointoss.market.MarketProvider;
+import cointoss.market.MarketServiceProvider;
 import cointoss.order.Order;
 import cointoss.order.OrderBook;
 import cointoss.order.OrderBookManager;
@@ -100,7 +100,7 @@ public class Market implements Disposable {
     private final List<Trader> traders = new CopyOnWriteArrayList<>();
 
     /**
-     * Build {@link Market} with the specified {@link MarketProvider}.
+     * Build {@link Market} with the specified {@link MarketServiceProvider}.
      * 
      * @param provider A market provider.
      */

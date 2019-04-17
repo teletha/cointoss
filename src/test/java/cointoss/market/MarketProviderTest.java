@@ -25,6 +25,6 @@ class MarketProviderTest {
 
     @Test
     void provider() {
-        assert MarketProvider.availableProviders().toList().isEmpty() == false;
+        assert MarketServiceProvider.availableProviders().toList().isEmpty() == false;
     }
 }

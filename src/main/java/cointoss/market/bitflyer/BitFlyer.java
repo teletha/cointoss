@@ -14,11 +14,11 @@ import cointoss.MarketSetting;
 import cointoss.execution.Execution;
 import cointoss.execution.ExecutionDeltaLogger;
 import cointoss.market.MarketAccount;
-import cointoss.market.MarketProvider;
+import cointoss.market.MarketServiceProvider;
 import cointoss.util.Num;
 import kiss.I;
 
-public final class BitFlyer extends MarketProvider {
+public final class BitFlyer extends MarketServiceProvider {
 
     /** Reusable market configuration. */
     private static MarketSetting.Builder FiatBaseSetting = MarketSetting.builder()
@@ -67,7 +67,7 @@ public final class BitFlyer extends MarketProvider {
         return I.make(BitFlyerAccount.class);
     }
 
-    /** The specialized codec. */
+    /** The specialized logger. */
     private static class BitFlyerCodec extends ExecutionDeltaLogger {
         @Override
         protected Num decodePrice(String value, Execution previous) {
