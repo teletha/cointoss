@@ -23,8 +23,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
-import javafx.scene.control.TextInputDialog;
-
 import org.apache.commons.codec.digest.HmacAlgorithms;
 import org.apache.commons.codec.digest.HmacUtils;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -37,13 +35,15 @@ import cointoss.Direction;
 import cointoss.Execution;
 import cointoss.MarketService;
 import cointoss.MarketSetting;
-import cointoss.execution.LogCodec;
+import cointoss.execution.DeltaLogWriter;
+import cointoss.execution.LogWriter;
 import cointoss.order.Order;
 import cointoss.order.OrderBookChange;
 import cointoss.order.OrderState;
 import cointoss.order.OrderUnit;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
+import javafx.scene.control.TextInputDialog;
 import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
@@ -453,16 +453,18 @@ class BitFlyerService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    protected Num decodePrice(String value, Execution previous) {
-        return LogCodec.decodeIntegralDelta(value, previous.price, 0);
-    }
+    public LogWriter codec() {
+        return new DeltaLogWriter() {
+            @Override
+            protected Num decodePrice(String value, Execution previous) {
+                return decodeIntegralDelta(value, previous.price, 0);
+            }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected String encodePrice(Execution execution, Execution previous) {
-        return LogCodec.encodeIntegralDelta(execution.price, previous.price, 0);
+            @Override
+            protected String encodePrice(Execution execution, Execution previous) {
+                return encodeIntegralDelta(execution.price, previous.price, 0);
+            }
+        };
     }
 
     protected SessionMaintainer maintainer = new SessionMaintainer();

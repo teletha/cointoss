@@ -9,7 +9,7 @@
  */
 package cointoss;
 
-import static java.nio.charset.StandardCharsets.ISO_8859_1;
+import static java.nio.charset.StandardCharsets.*;
 import static java.nio.file.StandardOpenOption.*;
 import static java.util.concurrent.TimeUnit.*;
 
@@ -580,7 +580,7 @@ public class MarketLog {
                 if (compact.isPresent()) {
                     // read compact
                     return I.signal(parser.iterate(new ZstdInputStream(compact.newInputStream()), ISO_8859_1))
-                            .scanWith(Execution.BASE, service::decode)
+                            .scanWith(Execution.BASE, service.codec()::decode)
                             .effectOnComplete(parser::stopParsing)
                             .effectOnObserve(stopwatch::start)
                             .effectOnComplete(() -> {
@@ -667,7 +667,7 @@ public class MarketLog {
                 CsvWriter writer = new CsvWriter(new ZstdOutputStream(compact.newOutputStream(), 1), ISO_8859_1, setting);
 
                 return executions.maps(Execution.BASE, (prev, e) -> {
-                    writer.writeRow(service.encode(prev, e));
+                    writer.writeRow(service.codec().encode(prev, e));
                     return e;
                 }).effectOnComplete(writer::close);
             } catch (IOException e) {

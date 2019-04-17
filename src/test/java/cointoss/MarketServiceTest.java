@@ -9,9 +9,9 @@
  */
 package cointoss;
 
+import static cointoss.Direction.*;
 import static cointoss.Execution.*;
 import static cointoss.MarketTestSupport.*;
-import static cointoss.Direction.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,8 +39,8 @@ class MarketServiceTest {
             Execution current = exes.get(i);
             Execution previous = exes.get(i - 1);
 
-            String[] encoded = service.encode(previous, current);
-            Execution decoded = service.decode(previous, encoded);
+            String[] encoded = service.codec().encode(previous, current);
+            Execution decoded = service.codec().decode(previous, encoded);
             assert decoded.equals(current);
         }
     }
@@ -57,8 +57,8 @@ class MarketServiceTest {
             Execution current = exes.get(i);
             Execution previous = exes.get(i - 1);
 
-            String[] encoded = service.encode(previous, current);
-            Execution decoded = service.decode(previous, encoded);
+            String[] encoded = service.codec().encode(previous, current);
+            Execution decoded = service.codec().decode(previous, encoded);
             assert decoded.equals(current);
         }
     }
@@ -79,8 +79,8 @@ class MarketServiceTest {
             Execution current = exes.get(i);
             Execution previous = exes.get(i - 1);
 
-            String[] encoded = service.encode(previous, current);
-            Execution decoded = service.decode(previous, encoded);
+            String[] encoded = service.codec().encode(previous, current);
+            Execution decoded = service.codec().decode(previous, encoded);
             assert decoded.equals(current);
         }
     }
@@ -99,8 +99,8 @@ class MarketServiceTest {
             Execution current = exes.get(i);
             Execution previous = exes.get(i - 1);
 
-            String[] encoded = service.encode(previous, current);
-            Execution decoded = service.decode(previous, encoded);
+            String[] encoded = service.codec().encode(previous, current);
+            Execution decoded = service.codec().decode(previous, encoded);
             assert decoded.equals(current);
         }
     }
@@ -119,8 +119,8 @@ class MarketServiceTest {
             Execution current = exes.get(i);
             Execution previous = exes.get(i - 1);
 
-            String[] encoded = service.encode(previous, current);
-            Execution decoded = service.decode(previous, encoded);
+            String[] encoded = service.codec().encode(previous, current);
+            Execution decoded = service.codec().decode(previous, encoded);
             assert decoded.equals(current);
         }
     }
@@ -142,8 +142,8 @@ class MarketServiceTest {
             Execution current = exes.get(i);
             Execution previous = exes.get(i - 1);
 
-            String[] encoded = service.encode(previous, current);
-            Execution decoded = service.decode(previous, encoded);
+            String[] encoded = service.codec().encode(previous, current);
+            Execution decoded = service.codec().decode(previous, encoded);
             assert decoded.equals(current);
         }
     }
@@ -164,8 +164,8 @@ class MarketServiceTest {
             Execution current = exes.get(i);
             Execution previous = exes.get(i - 1);
 
-            String[] encoded = service.encode(previous, current);
-            Execution decoded = service.decode(previous, encoded);
+            String[] encoded = service.codec().encode(previous, current);
+            Execution decoded = service.codec().decode(previous, encoded);
             assert decoded.equals(current);
         }
     }
@@ -199,8 +199,8 @@ class MarketServiceTest {
             Execution current = exes.get(i);
             Execution previous = exes.get(i - 1);
 
-            String[] encoded = service.encode(previous, current);
-            Execution decoded = service.decode(previous, encoded);
+            String[] encoded = service.codec().encode(previous, current);
+            Execution decoded = service.codec().decode(previous, encoded);
             assert decoded.equals(current);
         }
     }

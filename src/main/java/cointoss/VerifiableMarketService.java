@@ -15,8 +15,8 @@ import java.util.LinkedList;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import cointoss.MarketSetting;
 import cointoss.backtest.Time;
+import cointoss.execution.LogWriter;
 import cointoss.order.Order;
 import cointoss.order.OrderBookChange;
 import cointoss.order.OrderState;
@@ -383,95 +383,7 @@ public class VerifiableMarketService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    protected long decodeId(String value, Execution previous) {
-        if (delegation == null) {
-            return super.decodeId(value, previous);
-        } else {
-            return delegation.decodeId(value, previous);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected String encodeId(Execution execution, Execution previous) {
-        if (delegation == null) {
-            return super.encodeId(execution, previous);
-        } else {
-            return delegation.encodeId(execution, previous);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected ZonedDateTime decodeDate(String value, Execution previous) {
-        if (delegation == null) {
-            return super.decodeDate(value, previous);
-        } else {
-            return delegation.decodeDate(value, previous);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected String encodeDate(Execution execution, Execution previous) {
-        if (delegation == null) {
-            return super.encodeDate(execution, previous);
-        } else {
-            return delegation.encodeDate(execution, previous);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected Num decodeSize(String value, Execution previous) {
-        if (delegation == null) {
-            return super.decodeSize(value, previous);
-        } else {
-            return delegation.decodeSize(value, previous);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected String encodeSize(Execution execution, Execution previous) {
-        if (delegation == null) {
-            return super.encodeSize(execution, previous);
-        } else {
-            return delegation.encodeSize(execution, previous);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected Num decodePrice(String value, Execution previous) {
-        if (delegation == null) {
-            return super.decodePrice(value, previous);
-        } else {
-            return delegation.decodePrice(value, previous);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected String encodePrice(Execution execution, Execution previous) {
-        if (delegation == null) {
-            return super.encodePrice(execution, previous);
-        } else {
-            return delegation.encodePrice(execution, previous);
-        }
+    public LogWriter codec() {
+        return delegation == null ? super.codec() : delegation.codec();
     }
 }

@@ -13,7 +13,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Objects;
 
-import cointoss.execution.LogCodec;
+import cointoss.execution.LogWriter;
 import cointoss.order.Order;
 import cointoss.order.OrderBookChange;
 import cointoss.util.Chrono;
@@ -26,9 +26,6 @@ import kiss.Signal;
  * @version 2018/08/05 0:47:38
  */
 public abstract class MarketService implements Disposable {
-
-    /** CONSTANTS */
-    private static final int ConsecutiveTypeSize = 4;
 
     /** The exchange name. */
     public final String exchangeName;
@@ -173,6 +170,10 @@ public abstract class MarketService implements Disposable {
         return log;
     }
 
+    public LogWriter codec() {
+        return new LogWriter();
+    }
+
     /**
      * <p>
      * Request all orders.
@@ -190,136 +191,6 @@ public abstract class MarketService implements Disposable {
      * @return
      */
     public abstract Signal<OrderBookChange> orderBook();
-
-    /**
-     * Build execution from log.
-     * 
-     * @param values
-     * @return
-     */
-    final Execution decode(Execution previous, String[] values) {
-        Execution current = new Execution();
-        current.id = decodeId(values[0], previous);
-        current.date = decodeDate(values[1], previous);
-        current.price = decodePrice(values[2], previous);
-        int value = LogCodec.decodeInt(values[3].charAt(0));
-        if (value < ConsecutiveTypeSize) {
-            current.side = Direction.BUY;
-            current.consecutive = value;
-        } else {
-            current.side = Direction.SELL;
-            current.consecutive = value - ConsecutiveTypeSize;
-        }
-        current.delay = LogCodec.decodeInt(values[3].charAt(1)) - 3;
-        current.size = decodeSize(values[3].substring(2), previous);
-
-        return current;
-    }
-
-    /**
-     * Build log from execution.
-     * 
-     * @param execution
-     * @return
-     */
-    final String[] encode(Execution previous, Execution execution) {
-        String id = encodeId(execution, previous);
-        String time = encodeDate(execution, previous);
-        String price = encodePrice(execution, previous);
-        String size = encodeSize(execution, previous);
-        String delay = LogCodec.encodeInt(execution.delay + 3);
-        String sideAndConsecutive = String.valueOf(execution.isBuy() ? execution.consecutive : ConsecutiveTypeSize + execution.consecutive);
-
-        return new String[] {id, time, price, sideAndConsecutive + delay + size};
-    }
-
-    /**
-     * Decode id.
-     * 
-     * @param value A encoded value.
-     * @param previous A previous execution.
-     * @return A decoded execution.
-     */
-    protected long decodeId(String value, Execution previous) {
-        return LogCodec.decodeDelta(value, previous.id, 1);
-    }
-
-    /**
-     * Encode id.
-     * 
-     * @param execution A current execution.
-     * @param previous A previous execution.
-     * @return An encoded value.
-     */
-    protected String encodeId(Execution execution, Execution previous) {
-        return LogCodec.encodeDelta(execution.id, previous.id, 1);
-    }
-
-    /**
-     * Decode date.
-     * 
-     * @param value A encoded value.
-     * @param previous A previous execution.
-     * @return A decoded execution.
-     */
-    protected ZonedDateTime decodeDate(String value, Execution previous) {
-        return LogCodec.decodeDelta(value, previous.date, 0);
-    }
-
-    /**
-     * Encode date.
-     * 
-     * @param execution A current execution.
-     * @param previous A previous execution.
-     * @return An encoded value.
-     */
-    protected String encodeDate(Execution execution, Execution previous) {
-        return LogCodec.encodeDelta(execution.date, previous.date, 0);
-    }
-
-    /**
-     * Decode size.
-     * 
-     * @param value A encoded value.
-     * @param previous A previous execution.
-     * @return A decoded execution.
-     */
-    protected Num decodeSize(String value, Execution previous) {
-        return LogCodec.decodeDiff(value, previous.size);
-    }
-
-    /**
-     * Encode size.
-     * 
-     * @param execution A current execution.
-     * @param previous A previous execution.
-     * @return An encoded value.
-     */
-    protected String encodeSize(Execution execution, Execution previous) {
-        return LogCodec.encodeDiff(execution.size, previous.size);
-    }
-
-    /**
-     * Decode price.
-     * 
-     * @param value A encoded value.
-     * @param previous A previous execution.
-     * @return A decoded execution.
-     */
-    protected Num decodePrice(String value, Execution previous) {
-        return LogCodec.decodeDiff(value, previous.price);
-    }
-
-    /**
-     * Encode price.
-     * 
-     * @param execution A current execution.
-     * @param previous A previous execution.
-     * @return An encoded value.
-     */
-    protected String encodePrice(Execution execution, Execution previous) {
-        return LogCodec.encodeDiff(execution.price, previous.price);
-    }
 
     /**
      * Calculate human-readable price for display.
