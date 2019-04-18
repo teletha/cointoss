@@ -15,12 +15,12 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 
-import cointoss.backtest.Time;
 import cointoss.execution.Execution;
 import cointoss.position.Position;
 import cointoss.util.Chrono;
 import cointoss.util.Generator;
 import cointoss.util.Num;
+import cointoss.verify.TimeLag;
 import kiss.I;
 import kiss.Signal;
 
@@ -102,7 +102,7 @@ public class MarketTestSupport {
         exe.side = Objects.requireNonNull(side);
         exe.price = Objects.requireNonNull(price);
         exe.size = exe.cumulativeSize = Objects.requireNonNull(size);
-        exe.date = Time.Base;
+        exe.date = TimeLag.Base;
 
         return exe;
     }
@@ -162,7 +162,7 @@ public class MarketTestSupport {
      */
     public static Position position(Direction side, Num size, Num price) {
         Position position = new Position();
-        position.date = Time.Base;
+        position.date = TimeLag.Base;
         position.side = Objects.requireNonNull(side);
         position.price = Objects.requireNonNull(price);
         position.size.set(Objects.requireNonNull(size));

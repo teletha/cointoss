@@ -10,8 +10,6 @@
  */
 package cointoss.verify;
 
-import static cointoss.backtest.Time.at;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -21,7 +19,6 @@ import java.util.Map;
 import cointoss.Direction;
 import cointoss.Market;
 import cointoss.MarketService;
-import cointoss.backtest.Time;
 import cointoss.execution.Execution;
 import cointoss.order.Order;
 import cointoss.order.OrderState;
@@ -78,7 +75,7 @@ public class VerifiableMarket extends Market {
      * @param price
      */
     public VerifiableMarket execute(int size, int price, int time) {
-        return execute(Direction.random(), size, price, at(time));
+        return execute(Direction.random(), size, price, new TimeLag(time));
     }
 
     /**
@@ -89,7 +86,7 @@ public class VerifiableMarket extends Market {
      * @param price
      */
     public VerifiableMarket execute(Direction side, int size, int price) {
-        return execute(side, size, price, at(0));
+        return execute(side, size, price, new TimeLag(0));
     }
 
     /**
@@ -100,7 +97,7 @@ public class VerifiableMarket extends Market {
      * @param price
      */
     public VerifiableMarket execute(Direction side, Num size, Num price) {
-        return execute(side, size, price, at(0));
+        return execute(side, size, price, new TimeLag(0));
     }
 
     /**
@@ -110,7 +107,7 @@ public class VerifiableMarket extends Market {
      * @param size
      * @param price
      */
-    public VerifiableMarket execute(Direction side, int size, int price, Time lag) {
+    public VerifiableMarket execute(Direction side, int size, int price, TimeLag lag) {
         return execute(side, Num.of(size), Num.of(price), lag);
     }
 
@@ -121,7 +118,7 @@ public class VerifiableMarket extends Market {
      * @param size
      * @param price
      */
-    public VerifiableMarket execute(Direction side, Num size, Num price, Time lag) {
+    public VerifiableMarket execute(Direction side, Num size, Num price, TimeLag lag) {
         Execution e = new Execution();
         e.side = side;
         e.size = e.cumulativeSize = size;

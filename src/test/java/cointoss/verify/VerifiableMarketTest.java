@@ -18,7 +18,6 @@ import org.junit.jupiter.api.Test;
 
 import cointoss.Direction;
 import cointoss.MarketTestSupport;
-import cointoss.backtest.Time;
 import cointoss.order.Order;
 import cointoss.order.OrderState;
 import cointoss.order.QuantityCondition;
@@ -159,11 +158,11 @@ class VerifiableMarketTest extends MarketTestSupport {
         market.service.lag(5);
 
         market.request(Order.limitLong(10, 10)).to();
-        market.execute(Direction.BUY, 5, 10, Time.at(3));
-        market.execute(Direction.BUY, 4, 10, Time.at(4));
-        market.execute(Direction.BUY, 3, 10, Time.at(5));
-        market.execute(Direction.BUY, 2, 10, Time.at(6));
-        market.execute(Direction.BUY, 1, 10, Time.at(7));
+        market.execute(Direction.BUY, 5, 10, new TimeLag(3));
+        market.execute(Direction.BUY, 4, 10, new TimeLag(4));
+        market.execute(Direction.BUY, 3, 10, new TimeLag(5));
+        market.execute(Direction.BUY, 2, 10, new TimeLag(6));
+        market.execute(Direction.BUY, 1, 10, new TimeLag(7));
 
         assert market.validateExecutionState(3);
         assert market.validateOrderState(1, 0, 0, 0, 0);

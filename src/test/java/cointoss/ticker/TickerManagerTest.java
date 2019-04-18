@@ -10,8 +10,8 @@
 package cointoss.ticker;
 
 import static cointoss.MarketTestSupport.*;
-import static cointoss.backtest.Time.*;
 import static cointoss.ticker.TickSpan.*;
+import static cointoss.verify.TimeLag.*;
 
 import java.util.concurrent.atomic.AtomicInteger;
 

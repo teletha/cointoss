@@ -17,7 +17,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import cointoss.MarketService;
 import cointoss.MarketSetting;
-import cointoss.backtest.Time;
 import cointoss.execution.Execution;
 import cointoss.order.Order;
 import cointoss.order.OrderBookChange;
@@ -54,7 +53,7 @@ public class VerifiableMarketService extends MarketService {
     private final LinkedList<Execution> executeds = new LinkedList();
 
     /** The lag generator. */
-    private Time lag = Time.at(0);
+    private TimeLag lag = new TimeLag(0);
 
     /** The initial base currency. */
     private final Num baseCurrency = Num.HUNDRED;
@@ -63,7 +62,7 @@ public class VerifiableMarketService extends MarketService {
     private final Num targetCurrency = Num.ZERO;
 
     /** The current time. */
-    private ZonedDateTime now = Time.Base;
+    private ZonedDateTime now = TimeLag.Base;
 
     /**
      * 
@@ -90,7 +89,7 @@ public class VerifiableMarketService extends MarketService {
      * @return
      */
     public final VerifiableMarketService lag(int lag) {
-        this.lag = Time.at(lag);
+        this.lag = new TimeLag(lag);
 
         return this;
     }
@@ -102,7 +101,7 @@ public class VerifiableMarketService extends MarketService {
      * @return
      */
     public final VerifiableMarketService lag(int start, int end) {
-        this.lag = Time.lag(start, end);
+        this.lag = new TimeLag(start, end);
 
         return this;
     }
