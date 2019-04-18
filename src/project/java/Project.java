@@ -19,8 +19,8 @@ public class Project extends bee.api.Project {
         require("com.github.teletha", "marionette");
         require("com.github.teletha", "antibug").atTest();
         require("org.apache.commons", "commons-lang3");
-        require("org.apache.commons", "commons-rng-sampling");
         require("commons-codec", "commons-codec");
+        require("com.github.haifengl", "smile-core");
         require("org.apache.logging.log4j", "log4j-core", Log4j);
         require("org.apache.logging.log4j", "log4j-slf4j-impl", Log4j);
         require("org.magicwerk", "brownies-collections");
