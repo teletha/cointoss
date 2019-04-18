@@ -27,7 +27,7 @@ public final class BitFlyer extends MarketServiceProvider {
             .targetCurrencyScaleSize(3)
             .orderBookGroupRanges(Num.of(50, 100, 250, 500, 1000, 2500, 5000))
             .acquirableExecutionSize(499)
-            .executionLogger(new BitFlyerCodec());
+            .executionLogger(BitFlyerLogger.class);
 
     /** Reusable market configuration. */
     private static MarketSetting.Builder BTCBaseSetting = MarketSetting.builder()
@@ -36,7 +36,7 @@ public final class BitFlyer extends MarketServiceProvider {
             .targetCurrencyScaleSize(6)
             .orderBookGroupRanges(Num.of(0.01, 0.02, 0.05, 0.1))
             .acquirableExecutionSize(499)
-            .executionLogger(new BitFlyerCodec());
+            .executionLogger(BitFlyerLogger.class);
 
     /** Market */
     public static final MarketService BTC_JPY = new BitFlyerService("BTC_JPY", FiatBaseSetting);
@@ -68,7 +68,7 @@ public final class BitFlyer extends MarketServiceProvider {
     }
 
     /** The specialized logger. */
-    private static class BitFlyerCodec extends ExecutionDeltaLogger {
+    private static class BitFlyerLogger extends ExecutionDeltaLogger {
         @Override
         protected Num decodePrice(String value, Execution previous) {
             return decodeIntegralDelta(value, previous.price, 0);

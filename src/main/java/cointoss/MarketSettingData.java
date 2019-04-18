@@ -82,7 +82,7 @@ interface MarketSettingData {
      * @return
      */
     @Value.Default
-    default ExecutionLogger executionLogger() {
-        return new ExecutionDeltaLogger();
+    default Class<? extends ExecutionLogger> executionLogger() {
+        return ExecutionDeltaLogger.class;
     }
 }

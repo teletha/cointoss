@@ -31,7 +31,7 @@ public final class MarketSetting implements MarketSettingData {
   private final Num[] orderBookGroupRanges;
   private final int targetCurrencyScaleSize;
   private final int acquirableExecutionSize;
-  private final ExecutionLogger executionLogger;
+  private final Class<? extends ExecutionLogger> executionLogger;
 
   private MarketSetting(MarketSetting.Builder builder) {
     this.baseCurrencyMinimumBidPrice = builder.baseCurrencyMinimumBidPrice;
@@ -97,9 +97,9 @@ public final class MarketSetting implements MarketSettingData {
     }
 
     private byte executionLoggerBuildStage = STAGE_UNINITIALIZED;
-    private ExecutionLogger executionLogger;
+    private Class<? extends ExecutionLogger> executionLogger;
 
-    ExecutionLogger executionLogger() {
+    Class<? extends ExecutionLogger> executionLogger() {
       if (executionLoggerBuildStage == STAGE_INITIALIZING) throw new IllegalStateException(formatInitCycleMessage());
       if (executionLoggerBuildStage == STAGE_UNINITIALIZED) {
         executionLoggerBuildStage = STAGE_INITIALIZING;
@@ -109,7 +109,7 @@ public final class MarketSetting implements MarketSettingData {
       return this.executionLogger;
     }
 
-    void executionLogger(ExecutionLogger executionLogger) {
+    void executionLogger(Class<? extends ExecutionLogger> executionLogger) {
       this.executionLogger = executionLogger;
       executionLoggerBuildStage = STAGE_INITIALIZED;
     }
@@ -131,7 +131,7 @@ public final class MarketSetting implements MarketSettingData {
     return MarketSettingData.super.acquirableExecutionSize();
   }
 
-  private ExecutionLogger executionLoggerInitialize() {
+  private Class<? extends ExecutionLogger> executionLoggerInitialize() {
     return MarketSettingData.super.executionLogger();
   }
 
@@ -189,7 +189,7 @@ public final class MarketSetting implements MarketSettingData {
    * @return
    */
   @Override
-  public ExecutionLogger executionLogger() {
+  public Class<? extends ExecutionLogger> executionLogger() {
     InitShim shim = this.initShim;
     return shim != null
         ? shim.executionLogger()
@@ -258,7 +258,7 @@ public final class MarketSetting implements MarketSettingData {
    *    .orderBookGroupRanges(cointoss.util.Num) // required {@link MarketSetting#orderBookGroupRanges() orderBookGroupRanges}
    *    .targetCurrencyScaleSize(int) // optional {@link MarketSetting#targetCurrencyScaleSize() targetCurrencyScaleSize}
    *    .acquirableExecutionSize(int) // optional {@link MarketSetting#acquirableExecutionSize() acquirableExecutionSize}
-   *    .executionLogger(cointoss.execution.ExecutionLogger) // optional {@link MarketSetting#executionLogger() executionLogger}
+   *    .executionLogger(Class&amp;lt;? extends cointoss.execution.ExecutionLogger&amp;gt;) // optional {@link MarketSetting#executionLogger() executionLogger}
    *    .build();
    * </pre>
    * @return A new MarketSetting builder
@@ -290,7 +290,7 @@ public final class MarketSetting implements MarketSettingData {
     private @Nullable Num[] orderBookGroupRanges;
     private int targetCurrencyScaleSize;
     private int acquirableExecutionSize;
-    private @Nullable ExecutionLogger executionLogger;
+    private @Nullable Class<? extends ExecutionLogger> executionLogger;
 
     private Builder() {
     }
@@ -392,7 +392,7 @@ public final class MarketSetting implements MarketSettingData {
      * @return {@code this} builder for use in a chained invocation
      */
     @CanIgnoreReturnValue 
-    public final Builder executionLogger(ExecutionLogger executionLogger) {
+    public final Builder executionLogger(Class<? extends ExecutionLogger> executionLogger) {
       this.executionLogger = Objects.requireNonNull(executionLogger, "executionLogger");
       return this;
     }

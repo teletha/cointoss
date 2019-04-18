@@ -9,7 +9,7 @@
  */
 package cointoss.execution;
 
-import static java.nio.charset.StandardCharsets.ISO_8859_1;
+import static java.nio.charset.StandardCharsets.*;
 import static java.nio.file.StandardOpenOption.*;
 import static java.util.concurrent.TimeUnit.*;
 
@@ -187,6 +187,9 @@ public class ExecutionLog {
             .delayLinear(Duration.ofSeconds(1))
             .delayMaximum(Duration.ofMinutes(2));
 
+    /** The log parser. */
+    private final ExecutionLogger logger;
+
     /**
      * Create log manager.
      * 
@@ -205,6 +208,7 @@ public class ExecutionLog {
     ExecutionLog(MarketService service, Directory root) {
         this.service = Objects.requireNonNull(service);
         this.root = Objects.requireNonNull(root);
+        this.logger = I.make(service.setting.executionLogger());
 
         try {
             ZonedDateTime start = null;
@@ -610,7 +614,7 @@ public class ExecutionLog {
                 if (compact.isPresent()) {
                     // read compact
                     return I.signal(parser.iterate(new ZstdInputStream(compact.newInputStream()), ISO_8859_1))
-                            .scanWith(Execution.BASE, service.setting.executionLogger()::decode)
+                            .scanWith(Execution.BASE, logger::decode)
                             .effectOnComplete(parser::stopParsing)
                             .effectOnObserve(stopwatch::start)
                             .effectOnComplete(() -> {
@@ -695,7 +699,6 @@ public class ExecutionLog {
                 setting.getFormat().setDelimiter(' ');
                 setting.getFormat().setComment('無');
                 CsvWriter writer = new CsvWriter(new ZstdOutputStream(compact.newOutputStream(), 1), ISO_8859_1, setting);
-                ExecutionLogger logger = service.setting.executionLogger();
 
                 return executions.maps(Execution.BASE, (prev, e) -> {
                     writer.writeRow(logger.encode(prev, e));
