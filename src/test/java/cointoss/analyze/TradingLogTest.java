@@ -37,10 +37,10 @@ public class TradingLogTest extends TraderTestSupport {
 
         TradingLog log = createLog();
         assert log.complete == 1;
-        assert log.profit.max.is(5);
-        assert log.profit.min.is(5);
-        assert log.profit.size == 1;
-        assert log.profit.total.is(5);
+        assert log.profit.max().is(5);
+        assert log.profit.min().is(5);
+        assert log.profit.size() == 1;
+        assert log.profit.total().is(5);
     }
 
     @Test
@@ -49,10 +49,10 @@ public class TradingLogTest extends TraderTestSupport {
 
         TradingLog log = createLog();
         assert log.complete == 1;
-        assert log.loss.max.is(-5);
-        assert log.loss.min.is(-5);
-        assert log.loss.size == 1;
-        assert log.loss.total.is(-5);
+        assert log.loss.max().is(-5);
+        assert log.loss.min().is(-5);
+        assert log.loss.size() == 1;
+        assert log.loss.total().is(-5);
     }
 
     @Test
@@ -61,10 +61,10 @@ public class TradingLogTest extends TraderTestSupport {
 
         TradingLog log = createLog();
         assert log.complete == 1;
-        assert log.profit.max.is("7.5");
-        assert log.profit.min.is("7.5");
-        assert log.profit.size == 1;
-        assert log.profit.total.is("7.5");
+        assert log.profit.max().is("7.5");
+        assert log.profit.min().is("7.5");
+        assert log.profit.size() == 1;
+        assert log.profit.total().is("7.5");
     }
 
     @Test
@@ -73,10 +73,10 @@ public class TradingLogTest extends TraderTestSupport {
 
         TradingLog log = createLog();
         assert log.complete == 1;
-        assert log.profit.max.is("5");
-        assert log.profit.min.is("5");
-        assert log.profit.size == 1;
-        assert log.profit.total.is("5");
+        assert log.profit.max().is("5");
+        assert log.profit.min().is("5");
+        assert log.profit.size() == 1;
+        assert log.profit.total().is("5");
     }
 
     @Test
@@ -96,10 +96,10 @@ public class TradingLogTest extends TraderTestSupport {
 
         TradingLog log = createLog();
         assert log.active == 1;
-        assert log.profit.max.is(5);
-        assert log.profit.min.is(5);
-        assert log.profit.size == 1;
-        assert log.profit.total.is(5);
+        assert log.profit.max().is(5);
+        assert log.profit.min().is(5);
+        assert log.profit.size() == 1;
+        assert log.profit.total().is(5);
     }
 
     @Test
@@ -108,10 +108,10 @@ public class TradingLogTest extends TraderTestSupport {
 
         TradingLog log = createLog();
         assert log.active == 1;
-        assert log.loss.max.is(-5);
-        assert log.loss.min.is(-5);
-        assert log.loss.size == 1;
-        assert log.loss.total.is(-5);
+        assert log.loss.max().is(-5);
+        assert log.loss.min().is(-5);
+        assert log.loss.size() == 1;
+        assert log.loss.total().is(-5);
     }
 
     @Test
@@ -120,10 +120,10 @@ public class TradingLogTest extends TraderTestSupport {
 
         TradingLog log = createLog();
         assert log.active == 1;
-        assert log.profit.max.is("7.5");
-        assert log.profit.min.is("7.5");
-        assert log.profit.size == 1;
-        assert log.profit.total.is("7.5");
+        assert log.profit.max().is("7.5");
+        assert log.profit.min().is("7.5");
+        assert log.profit.size() == 1;
+        assert log.profit.total().is("7.5");
     }
 
     @Test
@@ -132,10 +132,10 @@ public class TradingLogTest extends TraderTestSupport {
 
         TradingLog log = createLog();
         assert log.active == 1;
-        assert log.profit.max.is("10");
-        assert log.profit.min.is("10");
-        assert log.profit.size == 1;
-        assert log.profit.total.is("10");
+        assert log.profit.max().is("10");
+        assert log.profit.min().is("10");
+        assert log.profit.size() == 1;
+        assert log.profit.total().is("10");
     }
 
     @Test
@@ -148,10 +148,10 @@ public class TradingLogTest extends TraderTestSupport {
         assert log.active == 1;
         assert log.cancel == 0;
         assert log.total == 2;
-        assert log.profit.max.is(10);
-        assert log.profit.min.is(5);
-        assert log.profit.size == 2;
-        assert log.profit.total.is("15");
+        assert log.profit.max().is(10);
+        assert log.profit.min().is(5);
+        assert log.profit.size() == 2;
+        assert log.profit.total().is("15");
         assert log.profit.mean().is("7.5");
     }
 
@@ -167,20 +167,20 @@ public class TradingLogTest extends TraderTestSupport {
         assert log.complete == 4;
         assert log.total == 4;
 
-        assert log.profit.size == 2;
-        assert log.profit.max.is(10);
-        assert log.profit.min.is(5);
-        assert log.profit.total.is(15);
+        assert log.profit.size() == 2;
+        assert log.profit.max().is(10);
+        assert log.profit.min().is(5);
+        assert log.profit.total().is(15);
 
-        assert log.loss.size == 2;
-        assert log.loss.max.is(-5);
-        assert log.loss.min.is(-10);
-        assert log.loss.total.is(-15);
+        assert log.loss.size() == 2;
+        assert log.loss.max().is(-5);
+        assert log.loss.min().is(-10);
+        assert log.loss.total().is(-15);
 
-        assert log.profitAndLoss.size == 4;
-        assert log.profitAndLoss.max.is(10);
-        assert log.profitAndLoss.min.is(-10);
-        assert log.profitAndLoss.total.is(0);
+        assert log.profitAndLoss.size() == 4;
+        assert log.profitAndLoss.max().is(10);
+        assert log.profitAndLoss.min().is(-10);
+        assert log.profitAndLoss.total().is(0);
     }
 
     @Test

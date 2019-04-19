@@ -11,28 +11,40 @@ package cointoss.analyze;
 
 import cointoss.util.Num;
 
-/**
- * @version 2017/08/30 20:45:02
- */
-/**
- * @version 2017/09/04 14:13:21
- */
-public class AmountSummary {
+public class NumSummary {
 
     /** MAX value. */
-    public Num min = Num.ZERO;
+    private Num min = Num.ZERO;
 
     /** MIN value. */
-    public Num max = Num.ZERO;
+    private Num max = Num.ZERO;
 
     /** Total value. */
-    public Num total = Num.ZERO;
+    private Num total = Num.ZERO;
 
     /** Number of values. */
-    public int size = 0;
+    private int size = 0;
 
     /** Number of positive values. */
-    int positive = 0;
+    private int positive = 0;
+
+    /**
+     * Calculate maximum.
+     * 
+     * @return A maximum.
+     */
+    public Num max() {
+        return max;
+    }
+
+    /**
+     * Calculate minimum.
+     * 
+     * @return A minimum.
+     */
+    public Num min() {
+        return min;
+    }
 
     /**
      * Calculate mean.
@@ -41,6 +53,24 @@ public class AmountSummary {
      */
     public Num mean() {
         return total.divide(Math.max(size, 1));
+    }
+
+    /**
+     * The number of items.
+     * 
+     * @return
+     */
+    public int size() {
+        return size;
+    }
+
+    /**
+     * Calculate total value.
+     * 
+     * @return A total value.
+     */
+    public Num total() {
+        return total;
     }
 
     /**

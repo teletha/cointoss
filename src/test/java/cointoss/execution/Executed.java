@@ -87,7 +87,7 @@ public class Executed extends Execution {
      * @param A delay time to assign.
      * @return Chainable API.
      */
-    public Executed delay(int delay) {
+    public final Executed delay(int delay) {
         this.delay = delay;
 
         return this;
@@ -99,7 +99,7 @@ public class Executed extends Execution {
      * @param A consective type to assign.
      * @return Chainable API.
      */
-    public Executed consecutive(int type) {
+    public final Executed consecutive(int type) {
         this.consecutive = type;
 
         return this;

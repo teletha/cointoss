@@ -9,7 +9,7 @@
  */
 package cointoss.analyze;
 
-import static cointoss.util.Num.*;
+import static cointoss.util.Num.HUNDRED;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -36,13 +36,13 @@ public class TradingLog {
     public LongSummary holdTime = new LongSummary();
 
     /** summary */
-    public AmountSummary profit = new AmountSummary();
+    public NumSummary profit = new NumSummary();
 
     /** summary */
-    public AmountSummary loss = new AmountSummary();
+    public NumSummary loss = new NumSummary();
 
     /** summary */
-    public AmountSummary profitAndLoss = new AmountSummary();
+    public NumSummary profitAndLoss = new NumSummary();
 
     /** The max draw down. */
     public Num drawDown = Num.ZERO;
@@ -50,7 +50,7 @@ public class TradingLog {
     /** The max draw down. */
     public Num drawDownRate = Num.ZERO;
 
-    /** The max total profit and loss. */
+    /** The max total() profit and loss. */
     private Num maxTotalProfitAndLoss = Num.ZERO;
 
     /** A number of created positions. */
@@ -127,8 +127,8 @@ public class TradingLog {
                 profitAndLoss.add(profitOrLoss);
                 if (profitOrLoss.isPositive()) profit.add(profitOrLoss);
                 if (profitOrLoss.isNegative()) loss.add(profitOrLoss);
-                maxTotalProfitAndLoss = Num.max(maxTotalProfitAndLoss, profitAndLoss.total);
-                drawDown = Num.max(drawDown, maxTotalProfitAndLoss.minus(profitAndLoss.total));
+                maxTotalProfitAndLoss = Num.max(maxTotalProfitAndLoss, profitAndLoss.total());
+                drawDown = Num.max(drawDown, maxTotalProfitAndLoss.minus(profitAndLoss.total()));
                 drawDownRate = Num
                         .max(drawDownRate, drawDown.divide(assetInitial().plus(maxTotalProfitAndLoss)).multiply(HUNDRED).scale(1));
             }
@@ -145,12 +145,12 @@ public class TradingLog {
     }
 
     /**
-     * Calculate total assets.
+     * Calculate total() assets.
      * 
      * @return
      */
     public Num asset() {
-        return assetInitial().plus(profitAndLoss.total);
+        return assetInitial().plus(profitAndLoss.total());
     }
 
     /**
@@ -168,14 +168,14 @@ public class TradingLog {
      * Calculate winning rate.
      */
     public Num winningRate() {
-        return profitAndLoss.size == 0 ? Num.ZERO : Num.of(profit.size).divide(Num.of(profitAndLoss.size)).multiply(HUNDRED).scale(1);
+        return profitAndLoss.size() == 0 ? Num.ZERO : Num.of(profit.size()).divide(Num.of(profitAndLoss.size())).multiply(HUNDRED).scale(1);
     }
 
     /**
      * Calculate profit factor.
      */
     public Num profitFactor() {
-        return profit.total.divide(loss.total.isZero() ? Num.ONE : loss.total.abs()).scale(3);
+        return profit.total().divide(loss.total().isZero() ? Num.ONE : loss.total().abs()).scale(3);
     }
 
     /**
