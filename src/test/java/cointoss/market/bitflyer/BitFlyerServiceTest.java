@@ -18,14 +18,12 @@ package cointoss.market.bitflyer;
  *          http://opensource.org/licenses/mit-license.php
  */
 
-import static cointoss.MarketTestSupport.execution;
-
 import java.time.LocalDateTime;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-import cointoss.Direction;
+import cointoss.Executed;
 import cointoss.execution.Execution;
 import cointoss.order.Order;
 
@@ -61,12 +59,12 @@ public class BitFlyerServiceTest {
         assert service.request(Order.buy(1).price(10)).to().is("ServerAcceptanceID");
 
         // irrelevant execution
-        service.executionWillResponse(execution(Direction.BUY, 1, 10), "DisrelatedBuyer", "DisrelatedSeller");
+        service.executionWillResponse(Executed.buy(1).price(10), "DisrelatedBuyer", "DisrelatedSeller");
         assert executions.size() == 1;
         assert positions.size() == 0;
 
         // my execution
-        service.executionWillResponse(execution(Direction.SELL, 1, 10), "ServerAcceptanceID", "DisrelatedSeller");
+        service.executionWillResponse(Executed.sell(1).price(10), "ServerAcceptanceID", "DisrelatedSeller");
         assert executions.size() == 2;
         assert positions.size() == 1;
         assert positions.get(0).side.isBuy();

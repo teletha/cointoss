@@ -9,8 +9,6 @@
  */
 package cointoss;
 
-import static cointoss.MarketTestSupport.buy;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -38,7 +36,7 @@ class MarketTest {
         assert market.targetCurrency.is(Num.of(0));
 
         // non-matching order
-        market.execute(buy(1, 10));
+        market.execute(Executed.buy(1).price(10));
         assert market.initialBaseCurrency.is(100);
         assert market.baseCurrency.is(Num.of(100));
         assert market.initialTargetCurrency.is(0);

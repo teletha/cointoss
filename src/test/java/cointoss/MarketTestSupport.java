@@ -40,86 +40,11 @@ public class MarketTestSupport {
      * @param price
      * @return
      */
-    public static ChainableExecution buy(double size, double price) {
-        return buy(Num.of(size), Num.of(price));
-    }
-
-    /**
-     * Create {@link Execution}.
-     * 
-     * @param size
-     * @param price
-     * @return
-     */
-    public static ChainableExecution buy(Num size, Num price) {
-        return execution(Direction.BUY, size, price);
-    }
-
-    /**
-     * Create {@link Execution}.
-     * 
-     * @param size
-     * @param price
-     * @return
-     */
-    public static ChainableExecution sell(double size, double price) {
-        return sell(Num.of(size), Num.of(price));
-    }
-
-    /**
-     * Create {@link Execution}.
-     * 
-     * @param size
-     * @param price
-     * @return
-     */
-    public static ChainableExecution sell(Num size, Num price) {
-        return execution(Direction.SELL, size, price);
-    }
-
-    /**
-     * Create {@link Execution}.
-     * 
-     * @param side
-     * @param size
-     * @param price
-     * @return
-     */
-    public static ChainableExecution execution(Direction side, double size, double price) {
-        return execution(side, Num.of(size), Num.of(price));
-    }
-
-    /**
-     * Create {@link Execution}.
-     * 
-     * @param side
-     * @param size
-     * @param price
-     * @return
-     */
-    public static ChainableExecution execution(Direction side, Num size, Num price) {
-        ChainableExecution exe = new ChainableExecution();
-        exe.id = executionId.getAndIncrement();
-        exe.side = Objects.requireNonNull(side);
-        exe.price = Objects.requireNonNull(price);
-        exe.size = exe.cumulativeSize = Objects.requireNonNull(size);
-        exe.date = TimeLag.Base;
-
-        return exe;
-    }
-
-    /**
-     * Create {@link Execution}.
-     * 
-     * @param size
-     * @param price
-     * @return
-     */
     public static List<Execution> executionSerially(int count, Direction side, double size, double price) {
         List<Execution> list = new ArrayList();
 
         for (int i = 0; i < count; i++) {
-            Execution e = execution(side, size, price);
+            Execution e = Executed.of(side, Num.of(size)).price(price);
             if (i != 0) e.consecutive = side.isBuy() ? Execution.ConsecutiveSameBuyer : Execution.ConsecutiveSameSeller;
             list.add(e);
         }
@@ -136,7 +61,7 @@ public class MarketTestSupport {
         List<Execution> list = new ArrayList();
 
         for (int i = 0; i < count; i++) {
-            list.add(execution(Direction.random(), RandomUtils.nextInt(1, 10), RandomUtils.nextInt(1, 10)));
+            list.add(Executed.of(Direction.random(), Num.of(RandomUtils.nextInt(1, 10))).price(RandomUtils.nextInt(1, 10)));
         }
         return I.signal(list);
     }

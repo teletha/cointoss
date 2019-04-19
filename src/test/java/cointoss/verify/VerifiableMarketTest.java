@@ -15,6 +15,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.Test;
 
 import cointoss.Direction;
+import cointoss.Executed;
 import cointoss.MarketTestSupport;
 import cointoss.order.Order;
 import cointoss.order.OrderState;
@@ -39,7 +40,7 @@ class VerifiableMarketTest extends MarketTestSupport {
         assert order.remainingSize.is(1);
         assert order.executedSize.is(0);
 
-        market.execute(Direction.BUY, 1, 10);
+        market.execute(Executed.buy(1).price(10));
         assert order.remainingSize.is(0);
         assert order.executedSize.is(1);
     }

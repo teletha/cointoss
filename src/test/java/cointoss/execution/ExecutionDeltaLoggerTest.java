@@ -10,7 +10,6 @@
 package cointoss.execution;
 
 import static cointoss.Direction.BUY;
-import static cointoss.MarketTestSupport.*;
 import static cointoss.execution.Execution.*;
 
 import java.time.ZonedDateTime;
@@ -20,6 +19,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
+import cointoss.Executed;
 import cointoss.MarketTestSupport.ChainableExecution;
 import cointoss.util.Num;
 
@@ -212,10 +212,10 @@ class ExecutionDeltaLoggerTest {
     @Test
     void compactId() {
         List<Execution> exes = new ArrayList();
-        exes.add(buy(1, 10).id(10));
-        exes.add(buy(1, 10).id(12));
-        exes.add(sell(1, 10).id(13));
-        exes.add(sell(1, 10).id(19));
+        exes.add(Executed.buy(1).price(10).id(10));
+        exes.add(Executed.buy(1).price(10).id(12));
+        exes.add(Executed.sell(1).price(10).id(13));
+        exes.add(Executed.sell(1).price(10).id(19));
 
         for (int i = 1; i < exes.size(); i++) {
             Execution current = exes.get(i);
@@ -230,10 +230,10 @@ class ExecutionDeltaLoggerTest {
     @Test
     void compactSide() {
         List<Execution> exes = new ArrayList();
-        exes.add(buy(1, 10));
-        exes.add(buy(1, 10));
-        exes.add(sell(1, 10));
-        exes.add(sell(1, 10));
+        exes.add(Executed.buy(1).price(10));
+        exes.add(Executed.buy(1).price(10));
+        exes.add(Executed.sell(1).price(10));
+        exes.add(Executed.sell(1).price(10));
 
         for (int i = 1; i < exes.size(); i++) {
             Execution current = exes.get(i);
@@ -248,14 +248,14 @@ class ExecutionDeltaLoggerTest {
     @Test
     void compactDate() {
         List<Execution> exes = new ArrayList();
-        exes.add(buy(1, 10).date(2018, 5, 1, 10, 0, 0, 0));
-        exes.add(buy(1, 10).date(2018, 5, 1, 10, 0, 0, 100));
-        exes.add(buy(1, 10).date(2018, 5, 1, 10, 0, 40, 100));
-        exes.add(buy(1, 10).date(2018, 5, 1, 10, 33, 40, 100));
-        exes.add(buy(1, 10).date(2018, 5, 1, 22, 33, 40, 100));
-        exes.add(buy(1, 10).date(2018, 5, 9, 22, 33, 40, 100));
-        exes.add(buy(1, 10).date(2018, 11, 9, 22, 33, 40, 100));
-        exes.add(buy(1, 10).date(2020, 11, 9, 22, 33, 40, 100));
+        exes.add(Executed.buy(1).price(10).date(2018, 5, 1, 10, 0, 0, 0));
+        exes.add(Executed.buy(1).price(10).date(2018, 5, 1, 10, 0, 0, 100));
+        exes.add(Executed.buy(1).price(10).date(2018, 5, 1, 10, 0, 40, 100));
+        exes.add(Executed.buy(1).price(10).date(2018, 5, 1, 10, 33, 40, 100));
+        exes.add(Executed.buy(1).price(10).date(2018, 5, 1, 22, 33, 40, 100));
+        exes.add(Executed.buy(1).price(10).date(2018, 5, 9, 22, 33, 40, 100));
+        exes.add(Executed.buy(1).price(10).date(2018, 11, 9, 22, 33, 40, 100));
+        exes.add(Executed.buy(1).price(10).date(2020, 11, 9, 22, 33, 40, 100));
 
         for (int i = 1; i < exes.size(); i++) {
             Execution current = exes.get(i);
@@ -270,12 +270,12 @@ class ExecutionDeltaLoggerTest {
     @Test
     void compactSize() {
         List<Execution> exes = new ArrayList();
-        exes.add(buy(1, 10));
-        exes.add(buy(1, 10));
-        exes.add(buy(2, 10));
-        exes.add(buy(5.4, 10));
-        exes.add(buy(3, 10));
-        exes.add(buy(0.1, 10));
+        exes.add(Executed.buy(1).price(10));
+        exes.add(Executed.buy(1).price(10));
+        exes.add(Executed.buy(2).price(10));
+        exes.add(Executed.buy(5.4).price(10));
+        exes.add(Executed.buy(3).price(10));
+        exes.add(Executed.buy(0.1).price(10));
 
         for (int i = 1; i < exes.size(); i++) {
             Execution current = exes.get(i);
@@ -290,12 +290,12 @@ class ExecutionDeltaLoggerTest {
     @Test
     void compactPrice() {
         List<Execution> exes = new ArrayList();
-        exes.add(buy(1, 10));
-        exes.add(buy(1, 10));
-        exes.add(buy(1, 12));
-        exes.add(buy(1, 13.4));
-        exes.add(buy(1, 10));
-        exes.add(buy(1, 3.33));
+        exes.add(Executed.buy(1).price(10));
+        exes.add(Executed.buy(1).price(10));
+        exes.add(Executed.buy(1).price(12));
+        exes.add(Executed.buy(1).price(13.4));
+        exes.add(Executed.buy(1).price(10));
+        exes.add(Executed.buy(1).price(3.33));
 
         for (int i = 1; i < exes.size(); i++) {
             Execution current = exes.get(i);
@@ -310,15 +310,15 @@ class ExecutionDeltaLoggerTest {
     @Test
     void compactConsecutiveType() {
         List<Execution> exes = new ArrayList();
-        exes.add(buy(1, 10).consecutive(Execution.ConsecutiveDifference));
-        exes.add(buy(1, 10).consecutive(Execution.ConsecutiveDifference));
-        exes.add(buy(1, 10).consecutive(Execution.ConsecutiveSameBuyer));
-        exes.add(buy(1, 10).consecutive(Execution.ConsecutiveSameSeller));
-        exes.add(buy(1, 10).consecutive(Execution.ConsecutiveSameSeller));
-        exes.add(buy(1, 10).consecutive(Execution.ConsecutiveSameBuyer));
-        exes.add(buy(1, 10).consecutive(Execution.ConsecutiveDifference));
-        exes.add(buy(1, 10).consecutive(Execution.ConsecutiveSameBoth));
-        exes.add(buy(1, 10).consecutive(Execution.ConsecutiveSameBoth));
+        exes.add(Executed.buy(1).price(10).consecutive(Execution.ConsecutiveDifference));
+        exes.add(Executed.buy(1).price(10).consecutive(Execution.ConsecutiveDifference));
+        exes.add(Executed.buy(1).price(10).consecutive(Execution.ConsecutiveSameBuyer));
+        exes.add(Executed.buy(1).price(10).consecutive(Execution.ConsecutiveSameSeller));
+        exes.add(Executed.buy(1).price(10).consecutive(Execution.ConsecutiveSameSeller));
+        exes.add(Executed.buy(1).price(10).consecutive(Execution.ConsecutiveSameBuyer));
+        exes.add(Executed.buy(1).price(10).consecutive(Execution.ConsecutiveDifference));
+        exes.add(Executed.buy(1).price(10).consecutive(Execution.ConsecutiveSameBoth));
+        exes.add(Executed.buy(1).price(10).consecutive(Execution.ConsecutiveSameBoth));
 
         for (int i = 1; i < exes.size(); i++) {
             Execution current = exes.get(i);
@@ -333,14 +333,14 @@ class ExecutionDeltaLoggerTest {
     @Test
     void compactDelay() {
         List<Execution> exes = new ArrayList();
-        exes.add(buy(1, 10).delay(1));
-        exes.add(buy(1, 10).delay(1));
-        exes.add(buy(1, 10).delay(3));
-        exes.add(buy(1, 10).delay(10));
-        exes.add(buy(1, 10).delay(5));
-        exes.add(buy(1, 10).delay(Execution.DelayHuge));
-        exes.add(buy(1, 10).delay(Execution.DelayInestimable));
-        exes.add(buy(1, 10).delay(Execution.DelayInestimable));
+        exes.add(Executed.buy(1).price(10).delay(1));
+        exes.add(Executed.buy(1).price(10).delay(1));
+        exes.add(Executed.buy(1).price(10).delay(3));
+        exes.add(Executed.buy(1).price(10).delay(10));
+        exes.add(Executed.buy(1).price(10).delay(5));
+        exes.add(Executed.buy(1).price(10).delay(Execution.DelayHuge));
+        exes.add(Executed.buy(1).price(10).delay(Execution.DelayInestimable));
+        exes.add(Executed.buy(1).price(10).delay(Execution.DelayInestimable));
 
         for (int i = 1; i < exes.size(); i++) {
             Execution current = exes.get(i);

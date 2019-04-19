@@ -9,18 +9,14 @@
  */
 package cointoss.order;
 
-import static cointoss.MarketTestSupport.sell;
-
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import cointoss.Executed;
 import cointoss.verify.VerifiableMarketService;
 
-/**
- * @version 2018/07/09 2:07:07
- */
 class OrderManagerTest {
 
     private VerifiableMarketService service;
@@ -90,7 +86,7 @@ class OrderManagerTest {
 
         List<Order> removed = orders.removed.toList();
         assert removed.size() == 0;
-        service.emulate(sell(1, 10));
+        service.emulate(Executed.sell(1).price(10));
         assert removed.size() == 1;
     }
 
@@ -100,9 +96,9 @@ class OrderManagerTest {
 
         List<Order> removed = orders.removed.toList();
         assert removed.size() == 0;
-        service.emulate(sell(1, 10));
+        service.emulate(Executed.sell(1).price(10));
         assert removed.size() == 0;
-        service.emulate(sell(1, 10));
+        service.emulate(Executed.sell(1).price(10));
         assert removed.size() == 1;
     }
 }
