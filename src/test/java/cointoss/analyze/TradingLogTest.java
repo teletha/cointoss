@@ -14,6 +14,7 @@ import static cointoss.Direction.*;
 import org.junit.jupiter.api.Test;
 
 import cointoss.backtest.TraderTestSupport;
+import cointoss.trade.TradingLog;
 
 /**
  * @version 2018/04/02 16:44:56

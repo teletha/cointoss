@@ -78,7 +78,7 @@ public class NumSummary {
      * 
      * @param value
      */
-    void add(Num value) {
+    public void add(Num value) {
         min = min.isZero() ? value : Num.min(min, value);
         max = max.isZero() ? value : Num.max(max, value);
         total = total.plus(value);

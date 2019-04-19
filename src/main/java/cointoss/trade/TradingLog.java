@@ -7,7 +7,7 @@
  *
  *          https://opensource.org/licenses/MIT
  */
-package cointoss.analyze;
+package cointoss.trade;
 
 import static cointoss.util.Num.HUNDRED;
 
@@ -18,12 +18,11 @@ import java.util.List;
 import cointoss.Market;
 import cointoss.Trader;
 import cointoss.Trader.Entry;
+import cointoss.analyze.LongSummary;
+import cointoss.analyze.NumSummary;
 import cointoss.execution.Execution;
 import cointoss.util.Num;
 
-/**
- * @version 2017/09/11 18:31:10
- */
 public class TradingLog {
 
     /** The duration format. */

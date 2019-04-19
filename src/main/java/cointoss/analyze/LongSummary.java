@@ -33,7 +33,7 @@ public class LongSummary {
      * 
      * @param value
      */
-    void add(long value) {
+    public void add(long value) {
         min = Math.min(min, value);
         max = Math.max(max, value);
         total += value;
