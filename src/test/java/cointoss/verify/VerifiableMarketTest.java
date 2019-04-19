@@ -15,14 +15,13 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.Test;
 
 import cointoss.Direction;
-import cointoss.MarketTestSupport;
 import cointoss.execution.Executed;
 import cointoss.order.Order;
 import cointoss.order.OrderState;
 import cointoss.order.QuantityCondition;
 import cointoss.util.Num;
 
-class VerifiableMarketTest extends MarketTestSupport {
+class VerifiableMarketTest {
 
     VerifiableMarket market = new VerifiableMarket();
 
