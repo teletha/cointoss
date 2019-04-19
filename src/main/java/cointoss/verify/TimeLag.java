@@ -13,9 +13,13 @@ import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 
-import cointoss.util.Chrono;
-import cointoss.util.Generator;
+import org.apache.commons.lang3.RandomUtils;
 
+import cointoss.util.Chrono;
+
+/**
+ * Network time lag emulator.
+ */
 public class TimeLag {
 
     /** The base time */
@@ -55,13 +59,13 @@ public class TimeLag {
      * @return
      */
     public ZonedDateTime to() {
-        return Base.plusSeconds(Generator.randomInt(min, max));
+        return Base.plusSeconds(RandomUtils.nextInt(min, max));
     }
 
     /**
      * @return
      */
     public long generate() {
-        return Generator.randomLong(min * 1000000000L, max * 1000000000L);
+        return RandomUtils.nextLong(min * 1000000000L, max * 1000000000L);
     }
 }

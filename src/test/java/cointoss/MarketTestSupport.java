@@ -15,10 +15,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.apache.commons.lang3.RandomUtils;
+
 import cointoss.execution.Execution;
 import cointoss.position.Position;
 import cointoss.util.Chrono;
-import cointoss.util.Generator;
 import cointoss.util.Num;
 import cointoss.verify.TimeLag;
 import kiss.I;
@@ -135,7 +136,7 @@ public class MarketTestSupport {
         List<Execution> list = new ArrayList();
 
         for (int i = 0; i < count; i++) {
-            list.add(execution(Direction.random(), Generator.randomInt(1, 10), Generator.randomInt(1, 10)));
+            list.add(execution(Direction.random(), RandomUtils.nextInt(1, 10), RandomUtils.nextInt(1, 10)));
         }
         return I.signal(list);
     }

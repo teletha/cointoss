@@ -11,7 +11,8 @@ package cointoss;
 
 import java.util.Objects;
 
-import cointoss.util.Generator;
+import org.apache.commons.lang3.RandomUtils;
+
 import kiss.Decoder;
 import kiss.Encoder;
 import kiss.Manageable;
@@ -101,10 +102,12 @@ public enum Direction implements Directional {
     }
 
     /**
-     * @return
+     * Generate random {@link Direction}.
+     * 
+     * @return A random value.
      */
     public static Direction random() {
-        return Generator.random(Direction.class);
+        return RandomUtils.nextBoolean() ? BUY : SELL;
     }
 
     /**

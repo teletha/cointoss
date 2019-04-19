@@ -13,6 +13,8 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 
+import org.apache.commons.lang3.RandomUtils;
+
 /**
  * @version 2017/09/03 22:04:28
  */
@@ -76,7 +78,7 @@ public class Span {
      */
     public static Span random(ZonedDateTime start, ZonedDateTime end, int size) {
         long days = ChronoUnit.DAYS.between(start, end.minusDays(size));
-        long offset = Generator.randomLong(0, days);
+        long offset = RandomUtils.nextLong(0, days);
         return new Span(start.plusDays(offset), start.plusDays(offset + size));
     }
 }
