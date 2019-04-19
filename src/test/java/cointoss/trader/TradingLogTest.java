@@ -7,7 +7,7 @@
  *
  *          https://opensource.org/licenses/MIT
  */
-package cointoss.analyze;
+package cointoss.trader;
 
 import static cointoss.Direction.*;
 
