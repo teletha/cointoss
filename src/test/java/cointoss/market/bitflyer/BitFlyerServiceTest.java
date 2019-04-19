@@ -18,7 +18,7 @@ package cointoss.market.bitflyer;
  *          http://opensource.org/licenses/mit-license.php
  */
 
-import static cointoss.MarketTestSupport.*;
+import static cointoss.MarketTestSupport.execution;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -47,7 +47,7 @@ public class BitFlyerServiceTest {
 
     @Test
     void order() {
-        service.ordersWillResponse(Order.limitLong(1, 10), "FirstOrder");
+        service.ordersWillResponse(Order.buy(1).price(10), "FirstOrder");
         List<Order> orders = service.orders().toList();
         assert orders.size() == 1;
     }
@@ -58,7 +58,7 @@ public class BitFlyerServiceTest {
         List<Execution> positions = service.executionsRealtimelyForMe().toList();
 
         service.requestWillResponse("ServerAcceptanceID");
-        assert service.request(Order.limitLong(1, 10)).to().is("ServerAcceptanceID");
+        assert service.request(Order.buy(1).price(10)).to().is("ServerAcceptanceID");
 
         // irrelevant execution
         service.executionWillResponse(execution(Direction.BUY, 1, 10), "DisrelatedBuyer", "DisrelatedSeller");

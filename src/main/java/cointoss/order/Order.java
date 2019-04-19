@@ -14,9 +14,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
+import cointoss.Direction;
 import cointoss.Directional;
 import cointoss.execution.Execution;
-import cointoss.Direction;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
 import kiss.I;
@@ -87,6 +87,39 @@ public class Order implements Directional {
     @Override
     public final Direction direction() {
         return side;
+    }
+
+    /**
+     * Set your order price.
+     * 
+     * @param price A price to set.
+     * @return Chainable API.
+     */
+    public final Order price(long price) {
+        return price(Num.of(price));
+    }
+
+    /**
+     * Set your order price.
+     * 
+     * @param price A price to set.
+     * @return Chainable API.
+     */
+    public final Order price(double price) {
+        return price(Num.of(price));
+    }
+
+    /**
+     * Set your order price.
+     * 
+     * @param price A price to set.
+     * @return Chainable API.
+     */
+    public final Order price(Num price) {
+        if (price != null) {
+            this.price.set(price);
+        }
+        return this;
     }
 
     /**
@@ -267,197 +300,95 @@ public class Order implements Directional {
     }
 
     /**
-     * Create market order.
+     * Build the new buying order.
      * 
-     * @param side A {@link Direction} of order.
-     * @param size A size of order.
-     * @return A created {@link Order}.
+     * @param size Your order size.
+     * @return A new {@link Order}.
      */
-    public static Order market(Direction side, long size) {
-        return market(side, Num.of(size));
+    public static Order buy(long size) {
+        return buy(Num.of(size));
     }
 
     /**
-     * Create market order.
+     * Build the new buying order.
      * 
-     * @param side A {@link Direction} of order.
-     * @param size A size of order.
-     * @return A created {@link Order}.
+     * @param size Your order size.
+     * @return A new {@link Order}.
      */
-    public static Order market(Direction side, double size) {
-        return market(side, Num.of(size));
+    public static Order buy(double size) {
+        return buy(Num.of(size));
     }
 
     /**
-     * Create market order.
+     * Build the new buying order.
      * 
-     * @param side A {@link Direction} of order.
-     * @param size A size of order.
-     * @return A created {@link Order}.
+     * @param size Your order size.
+     * @return A new {@link Order}.
      */
-    public static Order market(Direction side, Num size) {
-        return new Order(side, size, null);
+    public static Order buy(Num size) {
+        return of(Direction.BUY, size);
     }
 
     /**
-     * Create LONG market order.
+     * Build the new selling order.
      * 
-     * @param size A size of order.
-     * @return A created {@link Order}.
+     * @param size Your order size.
+     * @return A new {@link Order}.
      */
-    public static Order marketLong(long size) {
-        return marketLong(Num.of(size));
+    public static Order sell(long size) {
+        return sell(Num.of(size));
     }
 
     /**
-     * Create LONG market order.
+     * Build the new selling order.
      * 
-     * @param size A size of order.
-     * @return A created {@link Order}.
+     * @param size Your order size.
+     * @return A new {@link Order}.
      */
-    public static Order marketLong(double size) {
-        return marketLong(Num.of(size));
+    public static Order sell(double size) {
+        return sell(Num.of(size));
     }
 
     /**
-     * Create LONG market order.
+     * Build the new selling order.
      * 
-     * @param size A size of order.
-     * @return A created {@link Order}.
+     * @param size Your order size.
+     * @return A new {@link Order}.
      */
-    public static Order marketLong(Num size) {
-        return market(Direction.BUY, size);
+    public static Order sell(Num size) {
+        return of(Direction.SELL, size);
     }
 
     /**
-     * Create SHORT market order.
+     * Build the new order.
      * 
-     * @param size A size of order.
-     * @return A created {@link Order}.
+     * @param direction A order direction.
+     * @param size Your order size.
+     * @return A new {@link Order}.
      */
-    public static Order marketShort(long size) {
-        return marketShort(Num.of(size));
+    public static Order of(Direction direction, long size) {
+        return of(direction, Num.of(size));
     }
 
     /**
-     * Create SHORT market order.
+     * Build the new order.
      * 
-     * @param size A size of order.
-     * @return A created {@link Order}.
+     * @param direction A order direction.
+     * @param size Your order size.
+     * @return A new {@link Order}.
      */
-    public static Order marketShort(double size) {
-        return marketShort(Num.of(size));
+    public static Order of(Direction direction, double size) {
+        return of(direction, Num.of(size));
     }
 
     /**
-     * Create SHORT market order.
+     * Build the new order.
      * 
-     * @param size A size of order.
-     * @return A created {@link Order}.
+     * @param direction A order direction.
+     * @param size Your order size.
+     * @return A new {@link Order}.
      */
-    public static Order marketShort(Num size) {
-        return market(Direction.SELL, size);
-    }
-
-    /**
-     * Create limit order.
-     * 
-     * @param side A {@link Direction} of order.
-     * @param size A size of order.
-     * @param price A price of order.
-     * @return A created {@link Order}.
-     */
-    public static Order limit(Direction side, long size, long price) {
-        return limit(side, Num.of(size), Num.of(price));
-    }
-
-    /**
-     * Create limit order.
-     * 
-     * @param side A {@link Direction} of order.
-     * @param size A size of order.
-     * @param price A price of order.
-     * @return A created {@link Order}.
-     */
-    public static Order limit(Direction side, double size, double price) {
-        return limit(side, Num.of(size), Num.of(price));
-    }
-
-    /**
-     * Create limit order.
-     * 
-     * @param side A {@link Direction} of order.
-     * @param size A size of order.
-     * @param price A price of order.
-     * @return A created {@link Order}.
-     */
-    public static Order limit(Direction side, Num size, Num price) {
-        return new Order(side, size, price);
-    }
-
-    /**
-     * Create LONG limit order.
-     * 
-     * @param size A size of order.
-     * @param price A price of order.
-     * @return A created {@link Order}.
-     */
-    public static Order limitLong(long size, long price) {
-        return limitLong(Num.of(size), Num.of(price));
-    }
-
-    /**
-     * Create LONG limit order.
-     * 
-     * @param size A size of order.
-     * @param price A price of order.
-     * @return A created {@link Order}.
-     */
-    public static Order limitLong(double size, double price) {
-        return limit(Direction.BUY, Num.of(size), Num.of(price));
-    }
-
-    /**
-     * Create LONG limit order.
-     * 
-     * @param size A size of order.
-     * @param price A price of order.
-     * @return A created {@link Order}.
-     */
-    public static Order limitLong(Num size, Num price) {
-        return limit(Direction.BUY, size, price);
-    }
-
-    /**
-     * Create SHORT limit order.
-     * 
-     * @param size A size of order.
-     * @param price A price of order.
-     * @return A created {@link Order}.
-     */
-    public static Order limitShort(long size, long price) {
-        return limitShort(Num.of(size), Num.of(price));
-    }
-
-    /**
-     * Create SHORT limit order.
-     * 
-     * @param size A size of order.
-     * @param price A price of order.
-     * @return A created {@link Order}.
-     */
-    public static Order limitShort(double size, double price) {
-        return limitShort(Num.of(size), Num.of(price));
-    }
-
-    /**
-     * Create SHORT limit order.
-     * 
-     * @param size A size of order.
-     * @param price A price of order.
-     * @return A created {@link Order}.
-     */
-    public static Order limitShort(Num size, Num price) {
-        return limit(Direction.SELL, size, price);
+    public static Order of(Direction direction, Num size) {
+        return new Order(direction, size, null);
     }
 }

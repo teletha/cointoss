@@ -9,7 +9,7 @@
  */
 package cointoss.order;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.List;
 
@@ -24,7 +24,7 @@ public class OrderTest {
 
     @Test
     void isCanceled() {
-        Order order = Order.limitLong(1, 10);
+        Order order = Order.buy(1).price(10);
         assert order.isNotCanceled();
 
         order.state.set(OrderState.CANCELED);
@@ -33,7 +33,7 @@ public class OrderTest {
 
     @Test
     void isCompleted() {
-        Order order = Order.limitLong(1, 10);
+        Order order = Order.buy(1).price(10);
         assert order.isNotCompleted();
 
         order.state.set(OrderState.COMPLETED);
@@ -42,7 +42,7 @@ public class OrderTest {
 
     @Test
     void isExpired() {
-        Order order = Order.limitLong(1, 10);
+        Order order = Order.buy(1).price(10);
         assert order.isNotExpired();
 
         order.state.set(OrderState.EXPIRED);
@@ -51,7 +51,7 @@ public class OrderTest {
 
     @Test
     void attribute() {
-        Order order = Order.limitLong(1, 10);
+        Order order = Order.buy(1).price(10);
         Attribute attribute = order.attribute(Attribute.class);
         assert attribute != null;
         assert attribute.id == null;
@@ -59,7 +59,7 @@ public class OrderTest {
 
     @Test
     void attributeNull() {
-        Order order = Order.limitLong(1, 10);
+        Order order = Order.buy(1).price(10);
 
         assertThrows(NullPointerException.class, () -> order.attribute(null));
     }
@@ -70,7 +70,7 @@ public class OrderTest {
 
     @Test
     void limit() {
-        Order order = Order.limit(Direction.BUY, 1, 20);
+        Order order = Order.of(Direction.BUY, 1).price(20);
         assert order.side == Direction.BUY;
         assert order.size.is(1);
         assert order.price.v.is(20);
@@ -78,7 +78,7 @@ public class OrderTest {
 
     @Test
     void market() {
-        Order order = Order.market(Direction.BUY, 1);
+        Order order = Order.of(Direction.BUY, 1);
         assert order.side == Direction.BUY;
         assert order.size.is(1);
         assert order.price.v.is(0);
@@ -86,7 +86,7 @@ public class OrderTest {
 
     @Test
     void observeTerminatingByCompleted() {
-        Order order = Order.market(Direction.BUY, 1);
+        Order order = Order.of(Direction.BUY, 1);
         List<Order> result = order.observeTerminating().toList();
         assert result.isEmpty();
         order.state.set(OrderState.ACTIVE);
@@ -110,7 +110,7 @@ public class OrderTest {
 
     @Test
     void observeTerminatingByCanceld() {
-        Order order = Order.market(Direction.BUY, 1);
+        Order order = Order.of(Direction.BUY, 1);
         List<Order> result = order.observeTerminating().toList();
         assert result.isEmpty();
         order.state.set(OrderState.ACTIVE);

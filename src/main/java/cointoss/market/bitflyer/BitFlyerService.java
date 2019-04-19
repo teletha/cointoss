@@ -555,7 +555,7 @@ class BitFlyerService extends MarketService {
         public OrderState child_order_state;
 
         public Order toOrder() {
-            Order o = Order.limit(side, size, price);
+            Order o = Order.of(side, size).price(price);
             o.id.let(child_order_acceptance_id);
             o.price.set(average_price);
             o.remainingSize = outstanding_size;

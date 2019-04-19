@@ -31,7 +31,7 @@ class VerifiableMarketTest extends MarketTestSupport {
 
     @Test
     void requestOrder() {
-        Order order = market.request(Order.limitLong(1, 10)).to().v;
+        Order order = market.request(Order.buy(1).price(10)).to().v;
         assert order.isBuy();
         assert order.executedSize.is(ZERO);
         assert market.orders().size() == 1;
@@ -39,7 +39,7 @@ class VerifiableMarketTest extends MarketTestSupport {
 
     @Test
     void execute() {
-        Order order = market.request(Order.limitLong(1, 10)).to().v;
+        Order order = market.request(Order.buy(1).price(10)).to().v;
         assert order.remainingSize.is(ONE);
         assert order.executedSize.is(ZERO);
 
@@ -50,7 +50,7 @@ class VerifiableMarketTest extends MarketTestSupport {
 
     @Test
     void executeDivided() {
-        Order order = market.request(Order.limitLong(10, 10)).to().v;
+        Order order = market.request(Order.buy(10).price(10)).to().v;
         assert order.remainingSize.is(TEN);
         assert order.executedSize.is(ZERO);
 
@@ -66,7 +66,7 @@ class VerifiableMarketTest extends MarketTestSupport {
 
     @Test
     void executeOverflow() {
-        market.request(Order.limitLong(10, 10)).to(order -> {
+        market.request(Order.buy(10).price(10)).to(order -> {
             assert order.remainingSize.is(10);
             assert order.executedSize.is(0);
 
@@ -91,7 +91,7 @@ class VerifiableMarketTest extends MarketTestSupport {
 
     @Test
     void executeExtra() {
-        market.request(Order.limitLong(10, 10)).to(order -> {
+        market.request(Order.buy(10).price(10)).to(order -> {
             assert order.remainingSize.is(10);
             assert order.executedSize.is(0);
 
@@ -110,7 +110,7 @@ class VerifiableMarketTest extends MarketTestSupport {
 
     @Test
     void executeLongWithUpperPrice() {
-        market.request(Order.limitLong(10, 10)).to(order -> {
+        market.request(Order.buy(10).price(10)).to(order -> {
             market.execute(Direction.BUY, 5, 12);
             market.execute(Direction.SELL, 5, 13);
         });
@@ -121,7 +121,7 @@ class VerifiableMarketTest extends MarketTestSupport {
 
     @Test
     void executeLongWithLowerPrice() {
-        market.request(Order.limitLong(10, 10)).to(order -> {
+        market.request(Order.buy(10).price(10)).to(order -> {
             market.execute(Direction.BUY, 5, 8);
             market.execute(Direction.SELL, 5, 7);
         });
@@ -132,7 +132,7 @@ class VerifiableMarketTest extends MarketTestSupport {
 
     @Test
     void executeShortWithUpperPrice() {
-        market.request(Order.limitShort(10, 10)).to(order -> {
+        market.request(Order.sell(10).price(10)).to(order -> {
             market.execute(Direction.BUY, 5, 12);
             market.execute(Direction.SELL, 5, 13);
         });
@@ -143,7 +143,7 @@ class VerifiableMarketTest extends MarketTestSupport {
 
     @Test
     void executeShortWithLowerPrice() {
-        market.request(Order.limitShort(10, 10)).to(order -> {
+        market.request(Order.sell(10).price(10)).to(order -> {
             market.execute(Direction.BUY, 5, 8);
             market.execute(Direction.SELL, 5, 7);
         });
@@ -157,7 +157,7 @@ class VerifiableMarketTest extends MarketTestSupport {
         VerifiableMarket market = new VerifiableMarket();
         market.service.lag(5);
 
-        market.request(Order.limitLong(10, 10)).to();
+        market.request(Order.buy(10).price(10)).to();
         market.execute(Direction.BUY, 5, 10, new TimeLag(3));
         market.execute(Direction.BUY, 4, 10, new TimeLag(4));
         market.execute(Direction.BUY, 3, 10, new TimeLag(5));
@@ -170,7 +170,7 @@ class VerifiableMarketTest extends MarketTestSupport {
 
     @Test
     void shortWithTrigger() {
-        market.request(Order.limitShort(1, 7).stopAt(8)).to();
+        market.request(Order.sell(1).price(7).stopAt(8)).to();
         market.execute(Direction.BUY, 1, 9);
         assert market.validateOrderState(1, 0, 0, 0, 0);
         market.execute(Direction.BUY, 1, 8);
@@ -181,7 +181,7 @@ class VerifiableMarketTest extends MarketTestSupport {
 
     @Test
     void shortWithTriggerSamePrice() {
-        market.request(Order.limitShort(1, 8).stopAt(8)).to();
+        market.request(Order.sell(1).price(8).stopAt(8)).to();
         market.execute(Direction.BUY, 1, 9);
         assert market.validateOrderState(1, 0, 0, 0, 0);
         market.execute(Direction.BUY, 1, 8);
@@ -194,7 +194,7 @@ class VerifiableMarketTest extends MarketTestSupport {
 
     @Test
     void shortMarketWithTrigger() {
-        Order order = Order.marketShort(1).stopAt(8);
+        Order order = Order.sell(1).stopAt(8);
         market.request(order).to();
         market.execute(Direction.BUY, 1, 9);
         assert market.validateOrderState(1, 0, 0, 0, 0);
@@ -204,7 +204,7 @@ class VerifiableMarketTest extends MarketTestSupport {
         assert market.validateOrderState(0, 1, 0, 0, 0);
         assert order.price.v.is(7);
 
-        order = Order.marketShort(1).stopAt(8);
+        order = Order.sell(1).stopAt(8);
         market.request(order).to();
         market.execute(Direction.BUY, 1, 9);
         assert market.validateOrderState(1, 1, 0, 0, 0);
@@ -217,7 +217,7 @@ class VerifiableMarketTest extends MarketTestSupport {
 
     @Test
     void longWithTrigger() {
-        market.request(Order.limitLong(1, 13).stopAt(12)).to();
+        market.request(Order.buy(1).price(13).stopAt(12)).to();
         market.execute(Direction.BUY, 1, 11);
         assert market.validateOrderState(1, 0, 0, 0, 0);
         market.execute(Direction.BUY, 1, 12);
@@ -228,7 +228,7 @@ class VerifiableMarketTest extends MarketTestSupport {
 
     @Test
     void longWithTriggerSamePrice() {
-        market.request(Order.limitLong(1, 12).stopAt(12)).to();
+        market.request(Order.buy(1).price(12).stopAt(12)).to();
         market.execute(Direction.BUY, 1, 11);
         assert market.validateOrderState(1, 0, 0, 0, 0);
         market.execute(Direction.BUY, 1, 12);
@@ -241,7 +241,7 @@ class VerifiableMarketTest extends MarketTestSupport {
 
     @Test
     void longMarketWithTrigger() {
-        Order order = Order.marketLong(1).stopAt(12);
+        Order order = Order.buy(1).stopAt(12);
         market.request(order).to();
         market.execute(Direction.BUY, 1, 11);
         assert market.validateOrderState(1, 0, 0, 0, 0);
@@ -251,7 +251,7 @@ class VerifiableMarketTest extends MarketTestSupport {
         assert market.validateOrderState(0, 1, 0, 0, 0);
         assert order.price.v.is(13);
 
-        order = Order.marketLong(1).stopAt(12);
+        order = Order.buy(1).stopAt(12);
         market.request(order).to();
         market.execute(Direction.BUY, 1, 11);
         assert market.validateOrderState(1, 1, 0, 0, 0);
@@ -265,27 +265,27 @@ class VerifiableMarketTest extends MarketTestSupport {
     @Test
     void fillOrKillLong() {
         // success
-        market.request(Order.limitLong(10, 10).type(QuantityCondition.FillOrKill)).to();
+        market.request(Order.buy(10).price(10).type(QuantityCondition.FillOrKill)).to();
         market.execute(Direction.BUY, 10, 10);
         assert market.validateOrderState(0, 1, 0, 0, 0);
 
         // large price will success
-        market.request(Order.limitLong(10, 10).type(QuantityCondition.FillOrKill)).to();
+        market.request(Order.buy(10).price(10).type(QuantityCondition.FillOrKill)).to();
         market.execute(Direction.BUY, 10, 9);
         assert market.validateOrderState(0, 2, 0, 0, 0);
 
         // large size will success
-        market.request(Order.limitLong(10, 10).type(QuantityCondition.FillOrKill)).to();
+        market.request(Order.buy(10).price(10).type(QuantityCondition.FillOrKill)).to();
         market.execute(Direction.BUY, 15, 10);
         assert market.validateOrderState(0, 3, 0, 0, 0);
 
         // less size will be failed
-        market.request(Order.limitLong(10, 10).type(QuantityCondition.FillOrKill)).to();
+        market.request(Order.buy(10).price(10).type(QuantityCondition.FillOrKill)).to();
         market.execute(Direction.BUY, 4, 10);
         assert market.validateOrderState(0, 3, 0, 0, 0);
 
         // less price will be failed
-        market.request(Order.limitLong(10, 10).type(QuantityCondition.FillOrKill)).to();
+        market.request(Order.buy(10).price(10).type(QuantityCondition.FillOrKill)).to();
         market.execute(Direction.BUY, 10, 11);
         assert market.validateOrderState(0, 3, 0, 0, 0);
     }
@@ -293,27 +293,27 @@ class VerifiableMarketTest extends MarketTestSupport {
     @Test
     void fillOrKillShort() {
         // success
-        market.request(Order.limitShort(1, 10).type(QuantityCondition.FillOrKill)).to();
+        market.request(Order.sell(1).price(10).type(QuantityCondition.FillOrKill)).to();
         market.execute(Direction.SELL, 1, 10);
         assert market.validateOrderState(0, 1, 0, 0, 0);
 
         // large price will success
-        market.request(Order.limitShort(1, 10).type(QuantityCondition.FillOrKill)).to();
+        market.request(Order.sell(1).price(10).type(QuantityCondition.FillOrKill)).to();
         market.execute(Direction.SELL, 1, 11);
         assert market.validateOrderState(0, 2, 0, 0, 0);
 
         // large size will success
-        market.request(Order.limitShort(10, 10).type(QuantityCondition.FillOrKill)).to();
+        market.request(Order.sell(10).price(10).type(QuantityCondition.FillOrKill)).to();
         market.execute(Direction.SELL, 15, 10);
         assert market.validateOrderState(0, 3, 0, 0, 0);
 
         // less size will be failed
-        market.request(Order.limitShort(10, 10).type(QuantityCondition.FillOrKill)).to();
+        market.request(Order.sell(10).price(10).type(QuantityCondition.FillOrKill)).to();
         market.execute(Direction.SELL, 4, 10);
         assert market.validateOrderState(0, 3, 0, 0, 0);
 
         // less price will be failed
-        market.request(Order.limitShort(10, 10).type(QuantityCondition.FillOrKill)).to();
+        market.request(Order.sell(10).price(10).type(QuantityCondition.FillOrKill)).to();
         market.execute(Direction.SELL, 10, 9);
         assert market.validateOrderState(0, 3, 0, 0, 0);
     }
@@ -321,28 +321,28 @@ class VerifiableMarketTest extends MarketTestSupport {
     @Test
     void immediateOrCancelLong() {
         // success
-        market.request(Order.limitLong(1, 10).type(QuantityCondition.ImmediateOrCancel)).to();
+        market.request(Order.buy(1).price(10).type(QuantityCondition.ImmediateOrCancel)).to();
         market.execute(Direction.BUY, 1, 10);
         assert market.validateOrderState(0, 1, 0, 0, 0);
 
         // large price will success
-        market.request(Order.limitLong(1, 10).type(QuantityCondition.ImmediateOrCancel)).to();
+        market.request(Order.buy(1).price(10).type(QuantityCondition.ImmediateOrCancel)).to();
         market.execute(Direction.BUY, 1, 9);
         assert market.validateOrderState(0, 2, 0, 0, 0);
 
         // large size will success
-        market.request(Order.limitLong(10, 10).type(QuantityCondition.ImmediateOrCancel)).to();
+        market.request(Order.buy(10).price(10).type(QuantityCondition.ImmediateOrCancel)).to();
         market.execute(Direction.BUY, 5, 10);
         assert market.validateOrderState(0, 3, 0, 0, 0);
 
         // less size will success
-        market.request(Order.limitLong(10, 10).type(QuantityCondition.ImmediateOrCancel)).to();
+        market.request(Order.buy(10).price(10).type(QuantityCondition.ImmediateOrCancel)).to();
         market.execute(Direction.BUY, 4, 10);
         assert market.validateOrderState(0, 4, 0, 0, 0);
         assert market.orders().get(3).executedSize.is(4);
 
         // less price will be failed
-        market.request(Order.limitLong(1, 10).type(QuantityCondition.ImmediateOrCancel)).to();
+        market.request(Order.buy(1).price(10).type(QuantityCondition.ImmediateOrCancel)).to();
         market.execute(Direction.BUY, 1, 11);
         assert market.validateOrderState(0, 4, 0, 0, 0);
     }
@@ -350,55 +350,55 @@ class VerifiableMarketTest extends MarketTestSupport {
     @Test
     void immediateOrCancelShort() {
         // success
-        market.request(Order.limitShort(1, 10).type(QuantityCondition.ImmediateOrCancel)).to();
+        market.request(Order.sell(1).price(10).type(QuantityCondition.ImmediateOrCancel)).to();
         market.execute(Direction.SELL, 1, 10);
         assert market.validateOrderState(0, 1, 0, 0, 0);
 
         // large price will success
-        market.request(Order.limitShort(1, 10).type(QuantityCondition.ImmediateOrCancel)).to();
+        market.request(Order.sell(1).price(10).type(QuantityCondition.ImmediateOrCancel)).to();
         market.execute(Direction.SELL, 1, 11);
         assert market.validateOrderState(0, 2, 0, 0, 0);
 
         // large size will success
-        market.request(Order.limitShort(10, 10).type(QuantityCondition.ImmediateOrCancel)).to();
+        market.request(Order.sell(10).price(10).type(QuantityCondition.ImmediateOrCancel)).to();
         market.execute(Direction.SELL, 15, 10);
         assert market.validateOrderState(0, 3, 0, 0, 0);
 
         // less size will success
-        market.request(Order.limitShort(10, 10).type(QuantityCondition.ImmediateOrCancel)).to();
+        market.request(Order.sell(10).price(10).type(QuantityCondition.ImmediateOrCancel)).to();
         market.execute(Direction.SELL, 4, 10);
         assert market.validateOrderState(0, 4, 0, 0, 0);
         assert market.orders().get(3).executedSize.is(4);
 
         // less price will be failed
-        market.request(Order.limitShort(1, 10).type(QuantityCondition.ImmediateOrCancel)).to();
+        market.request(Order.sell(1).price(10).type(QuantityCondition.ImmediateOrCancel)).to();
         market.execute(Direction.SELL, 1, 9);
         assert market.validateOrderState(0, 4, 0, 0, 0);
     }
 
     @Test
     void marketLong() {
-        market.request(Order.marketLong(1)).to();
+        market.request(Order.buy(1)).to();
         market.execute(Direction.SELL, 1, 10);
         assert market.orders().get(0).price.v.is(10);
         assert market.orders().get(0).executedSize.is(1);
 
         // divide
-        market.request(Order.marketLong(10)).to();
+        market.request(Order.buy(10)).to();
         market.execute(Direction.BUY, 5, 10);
         market.execute(Direction.BUY, 5, 20);
         assert market.orders().get(1).price.v.is(15);
         assert market.orders().get(1).executedSize.is(10);
 
         // divide overflow
-        market.request(Order.marketLong(10)).to();
+        market.request(Order.buy(10)).to();
         market.execute(Direction.BUY, 5, 10);
         market.execute(Direction.BUY, 14, 20);
         assert market.orders().get(2).price.v.is(15);
         assert market.orders().get(2).executedSize.is(10);
 
         // divide underflow
-        market.request(Order.marketLong(10)).to();
+        market.request(Order.buy(10)).to();
         market.execute(Direction.BUY, 5, 10);
         market.execute(Direction.BUY, 3, 20);
         assert market.orders().get(3).price.v.is("13.75");
@@ -407,14 +407,14 @@ class VerifiableMarketTest extends MarketTestSupport {
         assert market.orders().get(3).price.v.is("15");
 
         // down price
-        market.request(Order.marketLong(10)).to();
+        market.request(Order.buy(10)).to();
         market.execute(Direction.BUY, 5, 10);
         market.execute(Direction.BUY, 5, 5);
         assert market.orders().get(4).price.v.is("10");
         assert market.orders().get(4).executedSize.is(10);
 
         // up price
-        market.request(Order.marketLong(10)).to();
+        market.request(Order.buy(10)).to();
         market.execute(Direction.BUY, 5, 10);
         market.execute(Direction.BUY, 5, 20);
         assert market.orders().get(5).price.v.is("15");
@@ -423,14 +423,14 @@ class VerifiableMarketTest extends MarketTestSupport {
 
     @Test
     void marketShort() {
-        Order order = Order.marketShort(1);
+        Order order = Order.sell(1);
         market.request(order).to();
         market.execute(Direction.SELL, 1, 10);
         assert order.price.v.is(10);
         assert order.executedSize.is(1);
 
         // divide
-        order = Order.marketShort(10);
+        order = Order.sell(10);
         market.request(order).to();
         market.execute(Direction.BUY, 5, 10);
         market.execute(Direction.BUY, 5, 5);
@@ -438,7 +438,7 @@ class VerifiableMarketTest extends MarketTestSupport {
         assert order.executedSize.is(10);
 
         // divide overflow
-        order = Order.marketShort(10);
+        order = Order.sell(10);
         market.request(order).to();
         market.execute(Direction.BUY, 5, 10);
         market.execute(Direction.BUY, 14, 5);
@@ -446,7 +446,7 @@ class VerifiableMarketTest extends MarketTestSupport {
         assert order.executedSize.is(10);
 
         // divide underflow
-        order = Order.marketShort(10);
+        order = Order.sell(10);
         market.request(order).to();
         market.execute(Direction.BUY, 5, 20);
         market.execute(Direction.BUY, 3, 15);
@@ -456,7 +456,7 @@ class VerifiableMarketTest extends MarketTestSupport {
         assert order.price.v.is("16.5");
 
         // down price
-        order = Order.marketShort(10);
+        order = Order.sell(10);
         market.request(order).to();
         market.execute(Direction.BUY, 5, 10);
         market.execute(Direction.BUY, 5, 5);
@@ -464,7 +464,7 @@ class VerifiableMarketTest extends MarketTestSupport {
         assert order.executedSize.is(10);
 
         // up price
-        order = Order.marketShort(10);
+        order = Order.sell(10);
         market.request(order).to();
         market.execute(Direction.BUY, 5, 10);
         market.execute(Direction.BUY, 5, 20);
@@ -474,7 +474,7 @@ class VerifiableMarketTest extends MarketTestSupport {
 
     @Test
     void cancel() {
-        Order order = market.request(Order.limitShort(1, 12)).to().v;
+        Order order = market.request(Order.sell(1).price(12)).to().v;
         market.execute(Direction.BUY, 1, 11);
         assert market.validateOrderState(1, 0, 0, 0, 0);
         market.cancel(order).to();

@@ -222,7 +222,7 @@ public class OrderBuilder extends View {
                     : Num.of(i).divide(increaseInterval).scale(0, RoundingMode.FLOOR).multiply(initSize.divide(2));
             Num optimizedPrice = view.market().orderBook.computeBestPrice(side, price, optimizeThreshold.value(), Num.of(2));
 
-            Order order = Order.limit(side, size.plus(optimizedSize), optimizedPrice);
+            Order order = Order.of(side, size.plus(optimizedSize)).price(optimizedPrice);
             order.state.set(OrderState.REQUESTING);
             order.observeTerminating().to(() -> set.sub.remove(order));
 

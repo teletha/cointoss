@@ -104,7 +104,7 @@ public class TradeInfomationView extends View {
         OrderBook book = view.market().orderBook.bookFor(position.inverse());
         Num price = book.computeBestPrice(Num.ZERO, Num.TWO);
 
-        view.order(Order.limit(position.inverse(), position.size.v, price));
+        view.order(Order.of(position.inverse(), position.size.v).price(price));
     }
 
     /**
