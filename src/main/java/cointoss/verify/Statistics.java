@@ -7,7 +7,7 @@
  *
  *          https://opensource.org/licenses/MIT
  */
-package cointoss.analyze;
+package cointoss.verify;
 
 import cointoss.util.Num;
 
@@ -15,7 +15,7 @@ import cointoss.util.Num;
  * This class provides a means of updating summary statistics as each new data point is added. The
  * data points are not stored, and values are updated with online algorithm.
  */
-public class NumSummary {
+public class Statistics {
 
     /** MAX value. */
     private Num min = Num.ZERO;
@@ -29,34 +29,87 @@ public class NumSummary {
     /** Number of values. */
     private int size = 0;
 
+    /** Mean value. */
     private Num mean = Num.ZERO;
 
+    /** Temporary values to calculate variance. */
     private Num m2 = Num.ZERO, m3 = Num.ZERO, m4 = Num.ZERO;
 
+    /**
+     * Add new value to summarize.
+     * 
+     * @param value A value to add.
+     * @return Chainable API.
+     */
+    public Statistics add(long value) {
+        return add(Num.of(value));
+    }
+
+    /**
+     * Add new value to summarize.
+     * 
+     * @param value A value to add.
+     * @return Chainable API.
+     */
+    public Statistics add(double value) {
+        return add(Num.of(value));
+    }
+
+    /**
+     * Add new value to summarize.
+     * 
+     * @param value A value to add.
+     * @return Chainable API.
+     */
+    public Statistics add(Num value) {
+        size++;
+        min = min.isZero() ? value : Num.min(min, value);
+        max = max.isZero() ? value : Num.max(max, value);
+        total = total.plus(value);
+    
+        Num delta = value.minus(mean);
+        Num deltaN = delta.divide(size);
+        Num deltaN2 = deltaN.pow(2);
+        Num term = delta.multiply(deltaN).multiply(size - 1);
+    
+        mean = mean.plus(deltaN);
+        m4 = m4.plus(term.multiply(deltaN2).multiply(size * size - 3 * size + 3).plus(deltaN2.multiply(m2).multiply(6)))
+                .minus(deltaN.multiply(m3).multiply(4));
+        m3 = m3.plus(term.multiply(deltaN).multiply(size - 2).minus(deltaN.multiply(m2).multiply(3)));
+        m2 = m2.plus(delta.multiply(value.minus(mean)));
+    
+        return this;
+    }
+
+    /**
+     * Calculate kurtosis value.
+     * 
+     * @return A kurtosis value.
+     */
     public Num kurtosis() {
         return m2.isZero() ? Num.ZERO : m4.multiply(size).divide(m2.pow(2)).minus(3);
     }
 
     /**
-     * Calculate maximum.
+     * Calculate maximum value.
      * 
-     * @return A maximum.
+     * @return A maximum value.
      */
     public Num max() {
         return max;
     }
 
     /**
-     * Calculate minimum.
+     * Calculate minimum value.
      * 
-     * @return A minimum.
+     * @return A minimum value.
      */
     public Num min() {
         return min;
     }
 
     /**
-     * Calculate mean.
+     * Calculate mean value.
      * 
      * @return A mean value.
      */
@@ -65,7 +118,7 @@ public class NumSummary {
     }
 
     /**
-     * Calculate skweness.
+     * Calculate skweness value.
      * 
      * @return A sckewness value.
      */
@@ -109,32 +162,6 @@ public class NumSummary {
      */
     public Num variance() {
         return m2.divide(size + 1e-15);
-    }
-
-    /**
-     * Add new value to summarize.
-     * 
-     * @param value A value to add.
-     * @return Chainable API.
-     */
-    public NumSummary add(Num value) {
-        size++;
-        min = min.isZero() ? value : Num.min(min, value);
-        max = max.isZero() ? value : Num.max(max, value);
-        total = total.plus(value);
-
-        Num delta = value.minus(mean);
-        Num deltaN = delta.divide(size);
-        Num deltaN2 = deltaN.pow(2);
-        Num term = delta.multiply(deltaN).multiply(size - 1);
-
-        mean = mean.plus(deltaN);
-        m4 = m4.plus(term.multiply(deltaN2).multiply(size * size - 3 * size + 3).plus(deltaN2.multiply(m2).multiply(6)))
-                .minus(deltaN.multiply(m3).multiply(4));
-        m3 = m3.plus(term.multiply(deltaN).multiply(size - 2).minus(deltaN.multiply(m2).multiply(3)));
-        m2 = m2.plus(delta.multiply(value.minus(mean)));
-
-        return this;
     }
 
     /**

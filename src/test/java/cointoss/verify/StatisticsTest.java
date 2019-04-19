@@ -7,17 +7,18 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss.analyze;
+package cointoss.verify;
 
 import org.junit.jupiter.api.Test;
 
 import cointoss.util.Num;
+import cointoss.verify.Statistics;
 
-class NumSummaryTest {
+class StatisticsTest {
 
     @Test
     void mean() {
-        NumSummary summary = new NumSummary();
+        Statistics summary = new Statistics();
         summary.add(Num.of(10));
         assert summary.mean().is(10);
 
@@ -30,7 +31,7 @@ class NumSummaryTest {
 
     @Test
     void total() {
-        NumSummary summary = new NumSummary();
+        Statistics summary = new Statistics();
         summary.add(Num.of(10));
         assert summary.total().is(10);
 
@@ -43,7 +44,7 @@ class NumSummaryTest {
 
     @Test
     void size() {
-        NumSummary summary = new NumSummary();
+        Statistics summary = new Statistics();
         summary.add(Num.of(10));
         assert summary.size() == 1;
 
@@ -56,7 +57,7 @@ class NumSummaryTest {
 
     @Test
     void min() {
-        NumSummary summary = new NumSummary();
+        Statistics summary = new Statistics();
         summary.add(Num.of(10));
         assert summary.min().is(10);
 
@@ -69,7 +70,7 @@ class NumSummaryTest {
 
     @Test
     void max() {
-        NumSummary summary = new NumSummary();
+        Statistics summary = new Statistics();
         summary.add(Num.of(10));
         assert summary.max().is(10);
 
@@ -82,7 +83,7 @@ class NumSummaryTest {
 
     @Test
     void variance() {
-        NumSummary summary = new NumSummary();
+        Statistics summary = new Statistics();
         summary.add(Num.of(10));
         assert summary.variance().is(0);
 
@@ -95,7 +96,7 @@ class NumSummaryTest {
 
     @Test
     void standardDeviation() {
-        NumSummary summary = new NumSummary();
+        Statistics summary = new Statistics();
         summary.add(Num.of(10));
         assert summary.standardDeviation().is(0);
 
@@ -108,7 +109,7 @@ class NumSummaryTest {
 
     @Test
     void skewness() {
-        NumSummary summary = new NumSummary();
+        Statistics summary = new Statistics();
         summary.add(Num.of(10));
         assert summary.skewness().is(0);
 
@@ -121,7 +122,7 @@ class NumSummaryTest {
 
     @Test
     void kurtosis() {
-        NumSummary summary = new NumSummary();
+        Statistics summary = new Statistics();
         summary.add(Num.of(10));
         assert summary.kurtosis().is(0);
 

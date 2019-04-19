@@ -18,10 +18,9 @@ import java.util.List;
 import cointoss.Market;
 import cointoss.Trader;
 import cointoss.Trader.Entry;
-import cointoss.analyze.LongSummary;
-import cointoss.analyze.NumSummary;
 import cointoss.execution.Execution;
 import cointoss.util.Num;
+import cointoss.verify.Statistics;
 
 public class TradingLog {
 
@@ -29,19 +28,19 @@ public class TradingLog {
     private static final DateTimeFormatter durationHM = DateTimeFormatter.ofPattern("MM/dd' 'HH:mm");
 
     /** summary */
-    public LongSummary orderTime = new LongSummary();
+    public Statistics orderTime = new Statistics();
 
     /** summary */
-    public LongSummary holdTime = new LongSummary();
+    public Statistics holdTime = new Statistics();
 
     /** summary */
-    public NumSummary profit = new NumSummary();
+    public Statistics profit = new Statistics();
 
     /** summary */
-    public NumSummary loss = new NumSummary();
+    public Statistics loss = new Statistics();
 
     /** summary */
-    public NumSummary profitAndLoss = new NumSummary();
+    public Statistics profitAndLoss = new Statistics();
 
     /** The max draw down. */
     public Num drawDown = Num.ZERO;
