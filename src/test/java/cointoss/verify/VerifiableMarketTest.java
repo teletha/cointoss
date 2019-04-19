@@ -9,8 +9,6 @@
  */
 package cointoss.verify;
 
-import static cointoss.util.Num.*;
-
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -25,42 +23,40 @@ import cointoss.util.Num;
 
 class VerifiableMarketTest extends MarketTestSupport {
 
-    static final Num FIVE = Num.of(5);
-
     VerifiableMarket market = new VerifiableMarket();
 
     @Test
     void requestOrder() {
         Order order = market.request(Order.buy(1).price(10)).to().v;
         assert order.isBuy();
-        assert order.executedSize.is(ZERO);
+        assert order.executedSize.is(0);
         assert market.orders().size() == 1;
     }
 
     @Test
     void execute() {
         Order order = market.request(Order.buy(1).price(10)).to().v;
-        assert order.remainingSize.is(ONE);
-        assert order.executedSize.is(ZERO);
+        assert order.remainingSize.is(1);
+        assert order.executedSize.is(0);
 
         market.execute(Direction.BUY, 1, 10);
-        assert order.remainingSize.is(ZERO);
-        assert order.executedSize.is(ONE);
+        assert order.remainingSize.is(0);
+        assert order.executedSize.is(1);
     }
 
     @Test
     void executeDivided() {
         Order order = market.request(Order.buy(10).price(10)).to().v;
-        assert order.remainingSize.is(TEN);
-        assert order.executedSize.is(ZERO);
+        assert order.remainingSize.is(10);
+        assert order.executedSize.is(0);
 
         market.execute(Direction.SELL, 5, 10);
-        assert order.remainingSize.is(FIVE);
-        assert order.executedSize.is(FIVE);
+        assert order.remainingSize.is(5);
+        assert order.executedSize.is(5);
 
         market.execute(Direction.SELL, 5, 10);
-        assert order.remainingSize.is(ZERO);
-        assert order.executedSize.is(TEN);
+        assert order.remainingSize.is(0);
+        assert order.executedSize.is(10);
         assert market.validateExecutionState(2);
     }
 
