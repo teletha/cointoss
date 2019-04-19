@@ -18,7 +18,7 @@ import org.junit.jupiter.api.Test;
 
 import com.google.common.base.Predicate;
 
-import cointoss.Executed;
+import cointoss.execution.Executed;
 
 /**
  * @version 2018/07/04 10:46:56

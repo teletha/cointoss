@@ -15,8 +15,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.Test;
 
 import cointoss.Direction;
-import cointoss.Executed;
 import cointoss.MarketTestSupport;
+import cointoss.execution.Executed;
 import cointoss.order.Order;
 import cointoss.order.OrderState;
 import cointoss.order.QuantityCondition;
@@ -488,7 +488,7 @@ class VerifiableMarketTest extends MarketTestSupport {
             size.set(e.cumulativeSize);
         });
 
-        executionSerially(4, Direction.SELL, 5, 10).forEach(market::execute);
+        market.executeSequencially(4, Executed.sell(5).price(10));
         market.execute(Direction.SELL, 5, 10);
         assert size.get().is(20);
     }
@@ -501,7 +501,7 @@ class VerifiableMarketTest extends MarketTestSupport {
             size.set(e.cumulativeSize);
         });
 
-        executionSerially(4, Direction.BUY, 5, 10).forEach(market::execute);
+        market.executeSequencially(4, Executed.buy(5).price(10));
         market.execute(Direction.BUY, 5, 10);
         assert size.get().is(20);
     }

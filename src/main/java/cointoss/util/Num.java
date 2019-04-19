@@ -16,6 +16,8 @@ import java.text.DecimalFormat;
 import java.util.Objects;
 import java.util.stream.IntStream;
 
+import org.apache.commons.lang3.RandomUtils;
+
 import cointoss.Directional;
 import cointoss.Trader;
 import kiss.Decoder;
@@ -1385,6 +1387,17 @@ public class Num implements Comparable<Num> {
      */
     public static Signal<Num> range(int start, int end) {
         return I.signal(IntStream.rangeClosed(start, end).mapToObj(Num::of)::iterator);
+    }
+
+    /**
+     * Create {@link Num} with random number between min and max.
+     * 
+     * @param minInclusive A minimum number (inclusive).
+     * @param maxExclusive A maximum number (exclusive).
+     * @return A random number.
+     */
+    public static Num random(double minInclusive, double maxExclusive) {
+        return of(RandomUtils.nextDouble(minInclusive, maxExclusive));
     }
 
     /**

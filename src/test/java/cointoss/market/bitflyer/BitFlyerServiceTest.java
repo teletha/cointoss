@@ -23,7 +23,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-import cointoss.Executed;
+import cointoss.execution.Executed;
 import cointoss.execution.Execution;
 import cointoss.order.Order;
 

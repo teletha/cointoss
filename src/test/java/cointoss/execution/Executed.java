@@ -7,12 +7,14 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss;
+package cointoss.execution;
 
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
-import cointoss.execution.Execution;
+import cointoss.Direction;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
 import cointoss.verify.TimeLag;
@@ -190,5 +192,40 @@ public class Executed extends Execution {
         e.date = TimeLag.Base;
 
         return e;
+    }
+
+    /**
+     * Create the specified numbers of {@link Execution}.
+     * 
+     * @param numbers
+     * @return
+     */
+    public static List<Execution> random(int numbers) {
+        List<Execution> list = new ArrayList();
+
+        for (int i = 0; i < numbers; i++) {
+            Executed e = Executed.of(Direction.random(), Num.random(1, 10)).price(Num.random(1, 10));
+            list.add(e);
+        }
+
+        return list;
+    }
+
+    /**
+     * Create the sequence of {@link Execution}s.
+     * 
+     * @param size
+     * @param price
+     * @return
+     */
+    public static List<Execution> sequence(int count, Direction side, double size, double price) {
+        List<Execution> list = new ArrayList();
+
+        for (int i = 0; i < count; i++) {
+            Executed e = Executed.of(side, Num.of(size)).price(price);
+            if (i != 0) e.consecutive = side.isBuy() ? ConsecutiveSameBuyer : ConsecutiveSameSeller;
+            list.add(e);
+        }
+        return list;
     }
 }

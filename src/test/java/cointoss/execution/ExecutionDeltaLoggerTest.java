@@ -9,7 +9,6 @@
  */
 package cointoss.execution;
 
-import static cointoss.Direction.BUY;
 import static cointoss.execution.Execution.*;
 
 import java.time.ZonedDateTime;
@@ -19,8 +18,6 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-import cointoss.Executed;
-import cointoss.MarketTestSupport.ChainableExecution;
 import cointoss.util.Num;
 
 class ExecutionDeltaLoggerTest {
@@ -355,25 +352,22 @@ class ExecutionDeltaLoggerTest {
     @Test
     void complex() {
         List<Execution> exes = new ArrayList();
-        exes.add(new ChainableExecution().id(17003792)
+        exes.add(Executed.buy(3.4094257)
+                .id(17003792)
                 .date(2017, 3, 6, 10, 28, 2, 873)
-                .side(BUY)
                 .price(148500)
-                .size(3.4094257)
                 .consecutive(ConsecutiveSameSeller)
                 .delay(1));
-        exes.add(new ChainableExecution().id(17003800)
+        exes.add(Executed.buy(0.01)
+                .id(17003800)
                 .date(2017, 3, 6, 10, 28, 23, 523)
-                .side(BUY)
                 .price(148500)
-                .size(0.01)
                 .consecutive(ConsecutiveDifference)
                 .delay(1));
-        exes.add(new ChainableExecution().id(17003881)
+        exes.add(Executed.buy(0.45)
+                .id(17003881)
                 .date(2017, 3, 6, 10, 29, 51, 960)
-                .side(BUY)
                 .price(148450)
-                .size(0.45)
                 .consecutive(ConsecutiveDifference)
                 .delay(1));
 

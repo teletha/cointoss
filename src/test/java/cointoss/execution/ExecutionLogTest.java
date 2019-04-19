@@ -9,7 +9,6 @@
  */
 package cointoss.execution;
 
-import static cointoss.MarketTestSupport.executionRandomly;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 
 import java.time.ZonedDateTime;
@@ -75,7 +74,7 @@ class ExecutionLogTest {
      * @param date A target date.
      */
     private List<Execution> writeExecutionLog(ZonedDateTime date) {
-        List<Execution> list = executionRandomly(10).toList();
+        List<Execution> list = Executed.random(10);
         log.locateLog(date).text(I.signal(list).map(Execution::toString).toList());
         return list;
     }
@@ -86,6 +85,6 @@ class ExecutionLogTest {
      * @param date A target date.
      */
     private List<Execution> writeCompactExecutionLog(ZonedDateTime date) {
-        return log.cache(date).compact(executionRandomly(10)).toList();
+        return log.cache(date).compact(I.signal(Executed.random(10))).toList();
     }
 }

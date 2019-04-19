@@ -141,6 +141,32 @@ public class VerifiableMarket extends Market {
     }
 
     /**
+     * Emulate execution event.
+     * 
+     * @param count A number of {@link Execution}s.
+     * @param e An execution mold.
+     */
+    public void executeSequencially(int count, Execution e) {
+        if (e != null) {
+            execute(e);
+
+            for (int i = 1; i < count; i++) {
+                Execution copy = new Execution();
+                copy.size = copy.cumulativeSize = e.size;
+                copy.date = e.date;
+                copy.delay = e.delay;
+                copy.id = e.id ^ (97 + i);
+                copy.mills = e.mills;
+                copy.price = e.price;
+                copy.side = e.side;
+                copy.consecutive = e.side.isBuy() ? Execution.ConsecutiveSameBuyer : Execution.ConsecutiveSameSeller;
+
+                execute(copy);
+            }
+        }
+    }
+
+    /**
      * Emulate order and execution event.
      * 
      * @param limitShort
