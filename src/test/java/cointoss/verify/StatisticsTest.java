@@ -12,134 +12,133 @@ package cointoss.verify;
 import org.junit.jupiter.api.Test;
 
 import cointoss.util.Num;
-import cointoss.verify.Statistics;
 
 class StatisticsTest {
 
     @Test
     void mean() {
-        Statistics summary = new Statistics();
-        summary.add(Num.of(10));
-        assert summary.mean().is(10);
+        Statistics statistics = new Statistics();
+        statistics.add(Num.of(10));
+        assert statistics.mean().is(10);
 
-        summary.add(Num.of(20));
-        assert summary.mean().is(15);
+        statistics.add(Num.of(20));
+        assert statistics.mean().is(15);
 
-        summary.add(Num.of(30));
-        assert summary.mean().is(20);
+        statistics.add(Num.of(30));
+        assert statistics.mean().is(20);
     }
 
     @Test
     void total() {
-        Statistics summary = new Statistics();
-        summary.add(Num.of(10));
-        assert summary.total().is(10);
+        Statistics statistics = new Statistics();
+        statistics.add(Num.of(10));
+        assert statistics.total().is(10);
 
-        summary.add(Num.of(20));
-        assert summary.total().is(30);
+        statistics.add(Num.of(20));
+        assert statistics.total().is(30);
 
-        summary.add(Num.of(30));
-        assert summary.total().is(60);
+        statistics.add(Num.of(30));
+        assert statistics.total().is(60);
     }
 
     @Test
     void size() {
-        Statistics summary = new Statistics();
-        summary.add(Num.of(10));
-        assert summary.size() == 1;
+        Statistics statistics = new Statistics();
+        statistics.add(Num.of(10));
+        assert statistics.size() == 1;
 
-        summary.add(Num.of(20));
-        assert summary.size() == 2;
+        statistics.add(Num.of(20));
+        assert statistics.size() == 2;
 
-        summary.add(Num.of(30));
-        assert summary.size() == 3;
+        statistics.add(Num.of(30));
+        assert statistics.size() == 3;
     }
 
     @Test
     void min() {
-        Statistics summary = new Statistics();
-        summary.add(Num.of(10));
-        assert summary.min().is(10);
+        Statistics statistics = new Statistics();
+        statistics.add(Num.of(10));
+        assert statistics.min().is(10);
 
-        summary.add(Num.of(20));
-        assert summary.min().is(10);
+        statistics.add(Num.of(20));
+        assert statistics.min().is(10);
 
-        summary.add(Num.of(5));
-        assert summary.min().is(5);
+        statistics.add(Num.of(5));
+        assert statistics.min().is(5);
     }
 
     @Test
     void max() {
-        Statistics summary = new Statistics();
-        summary.add(Num.of(10));
-        assert summary.max().is(10);
+        Statistics statistics = new Statistics();
+        statistics.add(Num.of(10));
+        assert statistics.max().is(10);
 
-        summary.add(Num.of(20));
-        assert summary.max().is(20);
+        statistics.add(Num.of(20));
+        assert statistics.max().is(20);
 
-        summary.add(Num.of(5));
-        assert summary.max().is(20);
+        statistics.add(Num.of(5));
+        assert statistics.max().is(20);
     }
 
     @Test
     void variance() {
-        Statistics summary = new Statistics();
-        summary.add(Num.of(10));
-        assert summary.variance().is(0);
+        Statistics statistics = new Statistics();
+        statistics.add(Num.of(10));
+        assert statistics.variance().is(0);
 
-        summary.add(Num.of(20));
-        assert summary.variance().is(25);
+        statistics.add(Num.of(20));
+        assert statistics.variance().is(25);
 
-        summary.add(Num.of(30));
-        assert summary.variance().is(66.6666666666667);
+        statistics.add(Num.of(30));
+        assert statistics.variance().is(66.6666666666667);
     }
 
     @Test
     void standardDeviation() {
-        Statistics summary = new Statistics();
-        summary.add(Num.of(10));
-        assert summary.standardDeviation().is(0);
+        Statistics statistics = new Statistics();
+        statistics.add(Num.of(10));
+        assert statistics.standardDeviation().is(0);
 
-        summary.add(Num.of(20));
-        assert summary.standardDeviation().is(5);
+        statistics.add(Num.of(20));
+        assert statistics.standardDeviation().is(5);
 
-        summary.add(Num.of(30));
-        assert summary.standardDeviation().is(8.16496580927726);
+        statistics.add(Num.of(30));
+        assert statistics.standardDeviation().is(8.16496580927726);
     }
 
     @Test
     void skewness() {
-        Statistics summary = new Statistics();
-        summary.add(Num.of(10));
-        assert summary.skewness().is(0);
+        Statistics statistics = new Statistics();
+        statistics.add(Num.of(10));
+        assert statistics.skewness().is(0);
 
-        summary.add(Num.of(20));
-        assert summary.skewness().is(0);
+        statistics.add(Num.of(20));
+        assert statistics.skewness().is(0);
 
-        summary.add(Num.of(10));
-        assert summary.skewness().is(0.707106782);
+        statistics.add(Num.of(10));
+        assert statistics.skewness().is(0.707106782);
     }
 
     @Test
     void kurtosis() {
-        Statistics summary = new Statistics();
-        summary.add(Num.of(10));
-        assert summary.kurtosis().is(0);
+        Statistics statistics = new Statistics();
+        statistics.add(Num.of(10));
+        assert statistics.kurtosis().is(0);
 
-        summary.add(Num.of(20));
-        assert summary.kurtosis().is(-2);
+        statistics.add(Num.of(20));
+        assert statistics.kurtosis().is(-2);
 
-        summary.add(Num.of(30));
-        assert summary.kurtosis().is(-1.5);
+        statistics.add(Num.of(30));
+        assert statistics.kurtosis().is(-1.5);
 
-        summary.add(Num.of(20));
-        summary.add(Num.of(20));
-        summary.add(Num.of(20));
-        assert summary.kurtosis().is(0);
+        statistics.add(Num.of(20));
+        statistics.add(Num.of(20));
+        statistics.add(Num.of(20));
+        assert statistics.kurtosis().is(0);
 
-        summary.add(Num.of(20));
-        summary.add(Num.of(20));
-        summary.add(Num.of(20));
-        assert summary.kurtosis().is(1.5);
+        statistics.add(Num.of(20));
+        statistics.add(Num.of(20));
+        statistics.add(Num.of(20));
+        assert statistics.kurtosis().is(1.5);
     }
 }

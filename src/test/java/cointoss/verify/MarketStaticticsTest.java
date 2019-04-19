@@ -7,7 +7,7 @@
  *
  *          https://opensource.org/licenses/MIT
  */
-package cointoss.backtest;
+package cointoss.verify;
 
 import org.junit.jupiter.api.Test;
 
