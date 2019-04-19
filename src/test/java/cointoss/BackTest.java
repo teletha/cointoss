@@ -13,6 +13,7 @@ import java.time.temporal.ChronoUnit;
 
 import cointoss.ticker.Tick;
 import cointoss.ticker.TickSpan;
+import cointoss.trade.Trader;
 import cointoss.util.Num;
 
 /**

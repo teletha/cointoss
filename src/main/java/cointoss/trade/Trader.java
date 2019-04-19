@@ -7,7 +7,7 @@
  *
  *          https://opensource.org/licenses/MIT
  */
-package cointoss;
+package cointoss.trade;
 
 import java.time.ZonedDateTime;
 import java.time.temporal.TemporalUnit;
@@ -21,6 +21,9 @@ import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+import cointoss.Direction;
+import cointoss.Directional;
+import cointoss.Market;
 import cointoss.execution.Execution;
 import cointoss.order.Order;
 import cointoss.order.RecordedExecutions;

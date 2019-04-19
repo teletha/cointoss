@@ -14,7 +14,6 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
@@ -96,9 +95,6 @@ public class Market implements Disposable {
             .delayLinear(Duration.ofSeconds(1))
             .delayMaximum(Duration.ofMinutes(2));
 
-    /** The tarader manager. */
-    private final List<Trader> traders = new CopyOnWriteArrayList<>();
-
     /**
      * Build {@link Market} with the specified {@link MarketServiceProvider}.
      * 
@@ -149,32 +145,6 @@ public class Market implements Disposable {
             orderBook.shorts.fix(e.price);
             orderBook.longs.fix(e.price);
         }));
-    }
-
-    /**
-     * Add market trader to this market.
-     * 
-     * @param trader A trader to add.
-     */
-    public final void addTrader(Trader trader) {
-        if (trader != null) {
-            traders.add(trader);
-            trader.market = this;
-            trader.initialize();
-        }
-    }
-
-    /**
-     * Remove market trader to this market.
-     * 
-     * @param trader A trader to remove.
-     */
-    public final void removeTrader(Trader trader) {
-        if (trader != null) {
-            traders.remove(trader);
-            trader.dispose();
-            trader.market = null;
-        }
     }
 
     /**

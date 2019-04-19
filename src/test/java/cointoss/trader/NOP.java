@@ -7,14 +7,14 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss.backtest;
+package cointoss.trader;
 
 import java.time.temporal.ChronoUnit;
 
 import cointoss.Direction;
-import cointoss.Trader;
 import cointoss.ticker.Tick;
 import cointoss.ticker.TickSpan;
+import cointoss.trade.Trader;
 import cointoss.util.Num;
 
 /**

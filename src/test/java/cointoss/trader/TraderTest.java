@@ -7,7 +7,7 @@
  *
  *          https://opensource.org/licenses/MIT
  */
-package cointoss.backtest;
+package cointoss.trader;
 
 import static cointoss.Direction.BUY;
 import static java.time.temporal.ChronoUnit.SECONDS;

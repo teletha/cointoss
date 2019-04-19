@@ -16,9 +16,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import cointoss.Market;
-import cointoss.Trader;
-import cointoss.Trader.Entry;
 import cointoss.execution.Execution;
+import cointoss.trade.Trader.Entry;
 import cointoss.util.Num;
 import cointoss.verify.Statistics;
 

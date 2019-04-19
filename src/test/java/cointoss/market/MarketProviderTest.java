@@ -11,16 +11,13 @@ package cointoss.market;
 
 import org.junit.jupiter.api.Test;
 
-import cointoss.util.Num;
+import cointoss.Market;
+import kiss.I;
 
-/**
- * @version 2018/07/26 23:49:05
- */
 class MarketProviderTest {
 
     static {
-        // dirty code to load extensions
-        assert Num.ZERO != null;
+        I.load(Market.class);
     }
 
     @Test

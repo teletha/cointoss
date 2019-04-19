@@ -7,12 +7,12 @@
  *
  *          https://opensource.org/licenses/MIT
  */
-package cointoss.backtest;
+package cointoss.trader;
 
 import org.junit.jupiter.api.BeforeEach;
 
 import cointoss.Direction;
-import cointoss.Trader;
+import cointoss.trade.Trader;
 import cointoss.trade.TradingLog;
 import cointoss.util.Num;
 import cointoss.verify.VerifiableMarket;
@@ -32,7 +32,6 @@ public abstract class TraderTestSupport extends Trader {
      */
     public TraderTestSupport() {
         super.market = market = new VerifiableMarket();
-        super.market.addTrader(this);
     }
 
     /**

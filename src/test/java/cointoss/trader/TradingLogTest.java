@@ -13,7 +13,6 @@ import static cointoss.Direction.*;
 
 import org.junit.jupiter.api.Test;
 
-import cointoss.backtest.TraderTestSupport;
 import cointoss.trade.TradingLog;
 
 /**

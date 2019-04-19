@@ -19,7 +19,7 @@ import java.util.stream.IntStream;
 import org.apache.commons.lang3.RandomUtils;
 
 import cointoss.Directional;
-import cointoss.Trader;
+import cointoss.trade.Trader;
 import kiss.Decoder;
 import kiss.Encoder;
 import kiss.I;
