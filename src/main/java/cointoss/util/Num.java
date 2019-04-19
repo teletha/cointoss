@@ -511,6 +511,17 @@ public class Num implements Comparable<Num> {
     }
 
     /**
+     * Returns a {@code Decimal} whose value is <tt>(this<sup>n</sup>)</tt>.
+     * 
+     * @param n power to raise this {@code Decimal} to.
+     * @return <tt>this<sup>n</sup></tt>
+     * @see BigDecimal#pow(int, java.math.MathContext)
+     */
+    public final Num pow(double n) {
+        return of(Math.pow(toDouble(), n));
+    }
+
+    /**
      * Returns the correctly rounded natural logarithm (base e) of the <code>double</code> value of
      * this {@code Decimal}. /!\ Warning! Uses the {@code StrictMath#log(double)} method under the
      * hood.

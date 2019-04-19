@@ -73,6 +73,7 @@ class NumTest {
         assert ONE.divide(TWO).is(0.5);
         assert ONE.divide(-1).is(-1);
         assert ONE.divide("0.5").is(2);
+        assert ZERO.divide(ONE).is(0);
     }
 
     @Test

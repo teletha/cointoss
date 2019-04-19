@@ -105,4 +105,40 @@ class NumSummaryTest {
         summary.add(Num.of(30));
         assert summary.standardDeviation().is(8.16496580927726);
     }
+
+    @Test
+    void skewness() {
+        NumSummary summary = new NumSummary();
+        summary.add(Num.of(10));
+        assert summary.skewness().is(0);
+
+        summary.add(Num.of(20));
+        assert summary.skewness().is(0);
+
+        summary.add(Num.of(10));
+        assert summary.skewness().is(0.707106782);
+    }
+
+    @Test
+    void kurtosis() {
+        NumSummary summary = new NumSummary();
+        summary.add(Num.of(10));
+        assert summary.kurtosis().is(0);
+
+        summary.add(Num.of(20));
+        assert summary.kurtosis().is(-2);
+
+        summary.add(Num.of(30));
+        assert summary.kurtosis().is(-1.5);
+
+        summary.add(Num.of(20));
+        summary.add(Num.of(20));
+        summary.add(Num.of(20));
+        assert summary.kurtosis().is(0);
+
+        summary.add(Num.of(20));
+        summary.add(Num.of(20));
+        summary.add(Num.of(20));
+        assert summary.kurtosis().is(1.5);
+    }
 }

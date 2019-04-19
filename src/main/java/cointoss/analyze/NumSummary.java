@@ -33,6 +33,10 @@ public class NumSummary {
 
     private Num m2 = Num.ZERO, m3 = Num.ZERO, m4 = Num.ZERO;
 
+    public Num kurtosis() {
+        return m2.isZero() ? Num.ZERO : m4.multiply(size).divide(m2.pow(2)).minus(3);
+    }
+
     /**
      * Calculate maximum.
      * 
@@ -54,14 +58,21 @@ public class NumSummary {
     /**
      * Calculate mean.
      * 
-     * @return
+     * @return A mean value.
      */
     public Num mean() {
         return mean;
     }
 
+    /**
+     * Calculate skweness.
+     * 
+     * @return A sckewness value.
+     */
     public Num skewness() {
-        return m3.multiply(Math.sqrt(size)).divide(m2.pow(1.5));
+        Num divide = m3.multiply(Math.sqrt(size));
+
+        return divide.isZero() ? Num.ZERO : divide.divide(m2.pow(1.5));
     }
 
     /**
