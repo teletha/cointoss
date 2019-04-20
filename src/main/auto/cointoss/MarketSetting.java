@@ -58,6 +58,24 @@ public final class MarketSetting implements MarketSettingData {
     this.initShim = null;
   }
 
+  private MarketSetting(
+      Num baseCurrencyMinimumBidPrice,
+      Num targetCurrencyMinimumBidSize,
+      Num[] orderBookGroupRanges,
+      int targetCurrencyScaleSize,
+      int acquirableExecutionSize,
+      Class<? extends ExecutionLogger> executionLogger,
+      RetryPolicy retryPolicy) {
+    this.baseCurrencyMinimumBidPrice = baseCurrencyMinimumBidPrice;
+    this.targetCurrencyMinimumBidSize = targetCurrencyMinimumBidSize;
+    this.orderBookGroupRanges = orderBookGroupRanges;
+    this.targetCurrencyScaleSize = targetCurrencyScaleSize;
+    this.acquirableExecutionSize = acquirableExecutionSize;
+    this.executionLogger = executionLogger;
+    this.retryPolicy = retryPolicy;
+    this.initShim = null;
+  }
+
   private static final byte STAGE_INITIALIZING = -1;
   private static final byte STAGE_UNINITIALIZED = 0;
   private static final byte STAGE_INITIALIZED = 1;
@@ -239,6 +257,136 @@ public final class MarketSetting implements MarketSettingData {
   }
 
   /**
+   * Copy the current immutable object by setting a value for the {@link MarketSetting#baseCurrencyMinimumBidPrice() baseCurrencyMinimumBidPrice} attribute.
+   * A shallow reference equality check is used to prevent copying of the same value by returning {@code this}.
+   * @param value A new value for baseCurrencyMinimumBidPrice
+   * @return A modified copy of the {@code this} object
+   */
+  public final MarketSetting withBaseCurrencyMinimumBidPrice(Num value) {
+    if (this.baseCurrencyMinimumBidPrice == value) return this;
+    Num newValue = Objects.requireNonNull(value, "baseCurrencyMinimumBidPrice");
+    return new MarketSetting(
+        newValue,
+        this.targetCurrencyMinimumBidSize,
+        this.orderBookGroupRanges,
+        this.targetCurrencyScaleSize,
+        this.acquirableExecutionSize,
+        this.executionLogger,
+        this.retryPolicy);
+  }
+
+  /**
+   * Copy the current immutable object by setting a value for the {@link MarketSetting#targetCurrencyMinimumBidSize() targetCurrencyMinimumBidSize} attribute.
+   * A shallow reference equality check is used to prevent copying of the same value by returning {@code this}.
+   * @param value A new value for targetCurrencyMinimumBidSize
+   * @return A modified copy of the {@code this} object
+   */
+  public final MarketSetting withTargetCurrencyMinimumBidSize(Num value) {
+    if (this.targetCurrencyMinimumBidSize == value) return this;
+    Num newValue = Objects.requireNonNull(value, "targetCurrencyMinimumBidSize");
+    return new MarketSetting(
+        this.baseCurrencyMinimumBidPrice,
+        newValue,
+        this.orderBookGroupRanges,
+        this.targetCurrencyScaleSize,
+        this.acquirableExecutionSize,
+        this.executionLogger,
+        this.retryPolicy);
+  }
+
+  /**
+   * Copy the current immutable object with elements that replace the content of {@link MarketSetting#orderBookGroupRanges() orderBookGroupRanges}.
+   * The array is cloned before being saved as attribute values.
+   * @param elements The non-null elements for orderBookGroupRanges
+   * @return A modified copy of {@code this} object
+   */
+  public final MarketSetting withOrderBookGroupRanges(Num... elements) {
+    Num[] newValue = elements.clone();
+    return new MarketSetting(
+        this.baseCurrencyMinimumBidPrice,
+        this.targetCurrencyMinimumBidSize,
+        newValue,
+        this.targetCurrencyScaleSize,
+        this.acquirableExecutionSize,
+        this.executionLogger,
+        this.retryPolicy);
+  }
+
+  /**
+   * Copy the current immutable object by setting a value for the {@link MarketSetting#targetCurrencyScaleSize() targetCurrencyScaleSize} attribute.
+   * A value equality check is used to prevent copying of the same value by returning {@code this}.
+   * @param value A new value for targetCurrencyScaleSize
+   * @return A modified copy of the {@code this} object
+   */
+  public final MarketSetting withTargetCurrencyScaleSize(int value) {
+    if (this.targetCurrencyScaleSize == value) return this;
+    return new MarketSetting(
+        this.baseCurrencyMinimumBidPrice,
+        this.targetCurrencyMinimumBidSize,
+        this.orderBookGroupRanges,
+        value,
+        this.acquirableExecutionSize,
+        this.executionLogger,
+        this.retryPolicy);
+  }
+
+  /**
+   * Copy the current immutable object by setting a value for the {@link MarketSetting#acquirableExecutionSize() acquirableExecutionSize} attribute.
+   * A value equality check is used to prevent copying of the same value by returning {@code this}.
+   * @param value A new value for acquirableExecutionSize
+   * @return A modified copy of the {@code this} object
+   */
+  public final MarketSetting withAcquirableExecutionSize(int value) {
+    if (this.acquirableExecutionSize == value) return this;
+    return new MarketSetting(
+        this.baseCurrencyMinimumBidPrice,
+        this.targetCurrencyMinimumBidSize,
+        this.orderBookGroupRanges,
+        this.targetCurrencyScaleSize,
+        value,
+        this.executionLogger,
+        this.retryPolicy);
+  }
+
+  /**
+   * Copy the current immutable object by setting a value for the {@link MarketSetting#executionLogger() executionLogger} attribute.
+   * A shallow reference equality check is used to prevent copying of the same value by returning {@code this}.
+   * @param value A new value for executionLogger
+   * @return A modified copy of the {@code this} object
+   */
+  public final MarketSetting withExecutionLogger(Class<? extends ExecutionLogger> value) {
+    if (this.executionLogger == value) return this;
+    Class<? extends ExecutionLogger> newValue = Objects.requireNonNull(value, "executionLogger");
+    return new MarketSetting(
+        this.baseCurrencyMinimumBidPrice,
+        this.targetCurrencyMinimumBidSize,
+        this.orderBookGroupRanges,
+        this.targetCurrencyScaleSize,
+        this.acquirableExecutionSize,
+        newValue,
+        this.retryPolicy);
+  }
+
+  /**
+   * Copy the current immutable object by setting a value for the {@link MarketSetting#retryPolicy() retryPolicy} attribute.
+   * A shallow reference equality check is used to prevent copying of the same value by returning {@code this}.
+   * @param value A new value for retryPolicy
+   * @return A modified copy of the {@code this} object
+   */
+  public final MarketSetting withRetryPolicy(RetryPolicy value) {
+    if (this.retryPolicy == value) return this;
+    RetryPolicy newValue = Objects.requireNonNull(value, "retryPolicy");
+    return new MarketSetting(
+        this.baseCurrencyMinimumBidPrice,
+        this.targetCurrencyMinimumBidSize,
+        this.orderBookGroupRanges,
+        this.targetCurrencyScaleSize,
+        this.acquirableExecutionSize,
+        this.executionLogger,
+        newValue);
+  }
+
+  /**
    * This instance is equal to all instances of {@code MarketSetting} that have equal attribute values.
    * @return {@code true} if {@code this} is equal to {@code another} instance
    */
@@ -292,6 +440,22 @@ public final class MarketSetting implements MarketSettingData {
         .add("executionLogger", executionLogger)
         .add("retryPolicy", retryPolicy)
         .toString();
+  }
+
+  /**
+   * Creates an immutable copy of a {@link MarketSettingData} value.
+   * Uses accessors to get values to initialize the new immutable instance.
+   * If an instance is already immutable, it is returned as is.
+   * @param instance The instance to copy
+   * @return A copied immutable MarketSetting instance
+   */
+  static MarketSetting copyOf(MarketSettingData instance) {
+    if (instance instanceof MarketSetting) {
+      return (MarketSetting) instance;
+    }
+    return MarketSetting.builder()
+        .from(instance)
+        .build();
   }
 
   /**

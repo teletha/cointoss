@@ -9,7 +9,7 @@
  */
 package cointoss;
 
-import static java.util.concurrent.TimeUnit.*;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.util.List;
 import java.util.Objects;
@@ -26,6 +26,7 @@ import cointoss.order.OrderManager;
 import cointoss.position.PositionManager;
 import cointoss.ticker.TickerManager;
 import cointoss.util.Num;
+import cointoss.util.RetryPolicy;
 import kiss.Disposable;
 import kiss.Signal;
 import kiss.Signaling;
@@ -127,10 +128,13 @@ public class Market implements Disposable {
      * Start reading {@link OrderBook}.
      */
     protected void readOrderBook() {
+        RetryPolicy policy = service.setting.retryPolicy();
+
         // orderbook management
-        service.add(service.orderBook().retryWhen(service.setting.retryPolicy()).to(board -> {
+        service.add(service.orderBook().retryWhen(policy).to(board -> {
             orderBook.shorts.update(board.asks);
             orderBook.longs.update(board.bids);
+            policy.reset();
         }));
         service.add(timeline.throttle(2, SECONDS).to(e -> {
             // fix error board

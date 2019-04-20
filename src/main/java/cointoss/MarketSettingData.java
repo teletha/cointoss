@@ -9,6 +9,8 @@
  */
 package cointoss;
 
+import static org.immutables.value.Value.Style.ImplementationVisibility.PUBLIC;
+
 import java.time.Duration;
 import java.util.List;
 
@@ -17,7 +19,6 @@ import org.immutables.value.Value;
 import cointoss.execution.ExecutionDeltaLogger;
 import cointoss.execution.ExecutionLog;
 import cointoss.execution.ExecutionLogger;
-import cointoss.util.ImmutableData;
 import cointoss.util.Num;
 import cointoss.util.RetryPolicy;
 import kiss.I;
@@ -25,8 +26,8 @@ import kiss.I;
 /**
  * @version 2018/08/22 19:55:10
  */
-@ImmutableData
 @Value.Immutable
+@Value.Style(typeAbstract = "*Data", typeImmutable = "*", visibility = PUBLIC)
 interface MarketSettingData {
 
     /**
