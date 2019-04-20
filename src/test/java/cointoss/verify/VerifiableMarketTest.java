@@ -39,13 +39,18 @@ class VerifiableMarketTest {
 
     @Test
     void execute() {
-        Order order = market.request(Order.buy(1).price(10)).to().v;
-        assert order.remainingSize.is(1);
-        assert order.executedSize.is(0);
+        market.request(Order.buy(1).price(10)).to(order -> {
+            assert order.remainingSize.is(1);
+            assert order.executedSize.is(0);
 
-        market.execute(Executed.buy(1).price(10));
-        assert order.remainingSize.is(0);
-        assert order.executedSize.is(1);
+            market.execute(Executed.buy(1).price(10));
+            assert order.remainingSize.is(1);
+            assert order.executedSize.is(0);
+
+            market.execute(Executed.buy(1).price(9));
+            assert order.remainingSize.is(0);
+            assert order.executedSize.is(1);
+        });
     }
 
     @Test
