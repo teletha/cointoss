@@ -23,12 +23,9 @@ import cointoss.util.Num;
 import cointoss.util.RetryPolicy;
 import kiss.I;
 
-/**
- * @version 2018/08/22 19:55:10
- */
 @Value.Immutable
-@Value.Style(typeAbstract = "*Data", typeImmutable = "*", visibility = PUBLIC)
-interface MarketSettingData {
+@Value.Style(typeAbstract = "*Skeleton", typeImmutable = "*", visibility = PUBLIC)
+interface MarketSettingSkeleton {
 
     /**
      * Get the minimum bid price of the base currency.

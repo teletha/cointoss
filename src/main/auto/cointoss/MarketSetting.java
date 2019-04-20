@@ -18,15 +18,18 @@ import javax.annotation.concurrent.NotThreadSafe;
 import org.immutables.value.Generated;
 
 /**
- * @version 2018/08/22 19:55:10
+ * Immutable implementation of {@link MarketSettingSkeleton}.
+ * <p>
+ * Use the builder to create immutable instances:
+ * {@code MarketSetting.builder()}.
  */
-@Generated(from = "MarketSettingData", generator = "Immutables")
+@Generated(from = "MarketSettingSkeleton", generator = "Immutables")
 @SuppressWarnings({"all"})
 @ParametersAreNonnullByDefault
 @javax.annotation.processing.Generated("org.immutables.processor.ProxyProcessor")
 @Immutable
 @CheckReturnValue
-public final class MarketSetting implements MarketSettingData {
+public final class MarketSetting implements MarketSettingSkeleton {
   private final Num baseCurrencyMinimumBidPrice;
   private final Num targetCurrencyMinimumBidSize;
   private final Num[] orderBookGroupRanges;
@@ -82,7 +85,7 @@ public final class MarketSetting implements MarketSettingData {
   @SuppressWarnings("Immutable")
   private transient volatile InitShim initShim = new InitShim();
 
-  @Generated(from = "MarketSettingData", generator = "Immutables")
+  @Generated(from = "MarketSettingSkeleton", generator = "Immutables")
   private final class InitShim {
     private byte targetCurrencyScaleSizeBuildStage = STAGE_UNINITIALIZED;
     private int targetCurrencyScaleSize;
@@ -167,19 +170,19 @@ public final class MarketSetting implements MarketSettingData {
   }
 
   private int targetCurrencyScaleSizeInitialize() {
-    return MarketSettingData.super.targetCurrencyScaleSize();
+    return MarketSettingSkeleton.super.targetCurrencyScaleSize();
   }
 
   private int acquirableExecutionSizeInitialize() {
-    return MarketSettingData.super.acquirableExecutionSize();
+    return MarketSettingSkeleton.super.acquirableExecutionSize();
   }
 
   private Class<? extends ExecutionLogger> executionLoggerInitialize() {
-    return MarketSettingData.super.executionLogger();
+    return MarketSettingSkeleton.super.executionLogger();
   }
 
   private RetryPolicy retryPolicyInitialize() {
-    return MarketSettingData.super.retryPolicy();
+    return MarketSettingSkeleton.super.retryPolicy();
   }
 
   /**
@@ -443,13 +446,13 @@ public final class MarketSetting implements MarketSettingData {
   }
 
   /**
-   * Creates an immutable copy of a {@link MarketSettingData} value.
+   * Creates an immutable copy of a {@link MarketSettingSkeleton} value.
    * Uses accessors to get values to initialize the new immutable instance.
    * If an instance is already immutable, it is returned as is.
    * @param instance The instance to copy
    * @return A copied immutable MarketSetting instance
    */
-  static MarketSetting copyOf(MarketSettingData instance) {
+  static MarketSetting copyOf(MarketSettingSkeleton instance) {
     if (instance instanceof MarketSetting) {
       return (MarketSetting) instance;
     }
@@ -484,7 +487,7 @@ public final class MarketSetting implements MarketSettingData {
    * <p><em>{@code Builder} is not thread-safe and generally should not be stored in a field or collection,
    * but instead used immediately to create instances.</em>
    */
-  @Generated(from = "MarketSettingData", generator = "Immutables")
+  @Generated(from = "MarketSettingSkeleton", generator = "Immutables")
   @NotThreadSafe
   public static final class Builder {
     private static final long INIT_BIT_BASE_CURRENCY_MINIMUM_BID_PRICE = 0x1L;
@@ -514,16 +517,16 @@ public final class MarketSetting implements MarketSettingData {
      * @return {@code this} builder for use in a chained invocation
      */
     public final Builder from(MarketSetting instance) {
-      return from((MarketSettingData) instance);
+      return from((MarketSettingSkeleton) instance);
     }
 
     /**
-     * Copy abstract value type {@code MarketSettingData} instance into builder.
+     * Copy abstract value type {@code MarketSettingSkeleton} instance into builder.
      * @param instance The instance from which to copy values
      * @return {@code this} builder for use in a chained invocation
      */
     @CanIgnoreReturnValue 
-    final Builder from(MarketSettingData instance) {
+    final Builder from(MarketSettingSkeleton instance) {
       Objects.requireNonNull(instance, "instance");
       baseCurrencyMinimumBidPrice(instance.baseCurrencyMinimumBidPrice());
       targetCurrencyMinimumBidSize(instance.targetCurrencyMinimumBidSize());
