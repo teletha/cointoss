@@ -24,6 +24,7 @@ import cointoss.order.OrderState;
 import cointoss.order.OrderType;
 import cointoss.order.QuantityCondition;
 import cointoss.util.Num;
+import cointoss.util.RetryPolicy;
 import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
@@ -72,6 +73,7 @@ public class VerifiableMarketService extends MarketService {
                 .baseCurrencyMinimumBidPrice(Num.ONE)
                 .targetCurrencyMinimumBidSize(Num.ONE)
                 .orderBookGroupRanges(Num.of(1))
+                .retryPolicy(new RetryPolicy().retryMaximum(0))
                 .build());
     }
 

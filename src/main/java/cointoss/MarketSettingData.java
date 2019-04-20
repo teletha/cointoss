@@ -9,6 +9,7 @@
  */
 package cointoss;
 
+import java.time.Duration;
 import java.util.List;
 
 import org.immutables.value.Value;
@@ -18,6 +19,7 @@ import cointoss.execution.ExecutionLog;
 import cointoss.execution.ExecutionLogger;
 import cointoss.util.ImmutableData;
 import cointoss.util.Num;
+import cointoss.util.RetryPolicy;
 import kiss.I;
 
 /**
@@ -84,5 +86,15 @@ interface MarketSettingData {
     @Value.Default
     default Class<? extends ExecutionLogger> executionLogger() {
         return ExecutionDeltaLogger.class;
+    }
+
+    /**
+     * Configure {@link RetryPolicy}.
+     * 
+     * @return
+     */
+    @Value.Default
+    default RetryPolicy retryPolicy() {
+        return new RetryPolicy().retryMaximum(100).delayLinear(Duration.ofMillis(250)).delayMaximum(Duration.ofMinutes(2));
     }
 }

@@ -9,11 +9,8 @@
  */
 package cointoss.order;
 
-import static cointoss.order.OrderState.ACTIVE;
-import static cointoss.order.OrderState.CANCELED;
-import static cointoss.order.OrderState.REQUESTING;
+import static cointoss.order.OrderState.*;
 
-import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -22,7 +19,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import cointoss.MarketService;
 import cointoss.execution.Execution;
 import cointoss.util.Num;
-import cointoss.util.RetryPolicy;
 import kiss.I;
 import kiss.Signal;
 import kiss.Signaling;
@@ -32,9 +28,6 @@ import kiss.Ⅱ;
  * @version 2018/07/17 0:08:29
  */
 public final class OrderManager {
-
-    /** The retry policy. */
-    private static final RetryPolicy policy = new RetryPolicy().retryMaximum(20).delay(Duration.ofMillis(250));
 
     /** The actual service. */
     private final MarketService service;
@@ -111,7 +104,7 @@ public final class OrderManager {
     public Signal<Order> request(Order order) {
         order.state.set(REQUESTING);
 
-        return service.request(order).retryWhen(policy).map(id -> {
+        return service.request(order).retryWhen(service.setting.retryPolicy()).map(id -> {
             order.id.let(id);
             order.created.set(ZonedDateTime.now());
             order.state.set(ACTIVE);
@@ -151,7 +144,7 @@ public final class OrderManager {
         if (order.state.is(ACTIVE) || order.state.is(OrderState.REQUESTING)) {
             OrderState previous = order.state.set(REQUESTING);
 
-            return service.cancel(order).retryWhen(policy).effect(o -> {
+            return service.cancel(order).retryWhen(service.setting.retryPolicy()).effect(o -> {
                 managed.remove(o);
                 o.state.set(CANCELED);
             }).effectOnError(e -> {

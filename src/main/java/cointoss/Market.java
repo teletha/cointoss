@@ -9,9 +9,8 @@
  */
 package cointoss;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.*;
 
-import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
@@ -27,7 +26,6 @@ import cointoss.order.OrderManager;
 import cointoss.position.PositionManager;
 import cointoss.ticker.TickerManager;
 import cointoss.util.Num;
-import cointoss.util.RetryPolicy;
 import kiss.Disposable;
 import kiss.Signal;
 import kiss.Signaling;
@@ -90,11 +88,6 @@ public class Market implements Disposable {
     /** The initial amount of target currency. */
     public final Num initialTargetCurrency;
 
-    /** The retry policy. */
-    private final RetryPolicy policy = new RetryPolicy().retryMaximum(100)
-            .delayLinear(Duration.ofSeconds(1))
-            .delayMaximum(Duration.ofMinutes(2));
-
     /**
      * Build {@link Market} with the specified {@link MarketServiceProvider}.
      * 
@@ -135,10 +128,9 @@ public class Market implements Disposable {
      */
     protected void readOrderBook() {
         // orderbook management
-        service.add(service.orderBook().retryWhen(policy).to(board -> {
+        service.add(service.orderBook().retryWhen(service.setting.retryPolicy()).to(board -> {
             orderBook.shorts.update(board.asks);
             orderBook.longs.update(board.bids);
-            policy.reset();
         }));
         service.add(timeline.throttle(2, SECONDS).to(e -> {
             // fix error board

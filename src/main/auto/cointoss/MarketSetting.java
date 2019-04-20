@@ -2,6 +2,7 @@ package cointoss;
 
 import cointoss.execution.ExecutionLogger;
 import cointoss.util.Num;
+import cointoss.util.RetryPolicy;
 import com.google.common.base.MoreObjects;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.errorprone.annotations.Var;
@@ -32,6 +33,7 @@ public final class MarketSetting implements MarketSettingData {
   private final int targetCurrencyScaleSize;
   private final int acquirableExecutionSize;
   private final Class<? extends ExecutionLogger> executionLogger;
+  private final RetryPolicy retryPolicy;
 
   private MarketSetting(MarketSetting.Builder builder) {
     this.baseCurrencyMinimumBidPrice = builder.baseCurrencyMinimumBidPrice;
@@ -46,9 +48,13 @@ public final class MarketSetting implements MarketSettingData {
     if (builder.executionLogger != null) {
       initShim.executionLogger(builder.executionLogger);
     }
+    if (builder.retryPolicy != null) {
+      initShim.retryPolicy(builder.retryPolicy);
+    }
     this.targetCurrencyScaleSize = initShim.targetCurrencyScaleSize();
     this.acquirableExecutionSize = initShim.acquirableExecutionSize();
     this.executionLogger = initShim.executionLogger();
+    this.retryPolicy = initShim.retryPolicy();
     this.initShim = null;
   }
 
@@ -114,11 +120,30 @@ public final class MarketSetting implements MarketSettingData {
       executionLoggerBuildStage = STAGE_INITIALIZED;
     }
 
+    private byte retryPolicyBuildStage = STAGE_UNINITIALIZED;
+    private RetryPolicy retryPolicy;
+
+    RetryPolicy retryPolicy() {
+      if (retryPolicyBuildStage == STAGE_INITIALIZING) throw new IllegalStateException(formatInitCycleMessage());
+      if (retryPolicyBuildStage == STAGE_UNINITIALIZED) {
+        retryPolicyBuildStage = STAGE_INITIALIZING;
+        this.retryPolicy = Objects.requireNonNull(retryPolicyInitialize(), "retryPolicy");
+        retryPolicyBuildStage = STAGE_INITIALIZED;
+      }
+      return this.retryPolicy;
+    }
+
+    void retryPolicy(RetryPolicy retryPolicy) {
+      this.retryPolicy = retryPolicy;
+      retryPolicyBuildStage = STAGE_INITIALIZED;
+    }
+
     private String formatInitCycleMessage() {
       List<String> attributes = new ArrayList<>();
       if (targetCurrencyScaleSizeBuildStage == STAGE_INITIALIZING) attributes.add("targetCurrencyScaleSize");
       if (acquirableExecutionSizeBuildStage == STAGE_INITIALIZING) attributes.add("acquirableExecutionSize");
       if (executionLoggerBuildStage == STAGE_INITIALIZING) attributes.add("executionLogger");
+      if (retryPolicyBuildStage == STAGE_INITIALIZING) attributes.add("retryPolicy");
       return "Cannot build MarketSetting, attribute initializers form cycle " + attributes;
     }
   }
@@ -133,6 +158,10 @@ public final class MarketSetting implements MarketSettingData {
 
   private Class<? extends ExecutionLogger> executionLoggerInitialize() {
     return MarketSettingData.super.executionLogger();
+  }
+
+  private RetryPolicy retryPolicyInitialize() {
+    return MarketSettingData.super.retryPolicy();
   }
 
   /**
@@ -197,6 +226,19 @@ public final class MarketSetting implements MarketSettingData {
   }
 
   /**
+   * Configure {@link RetryPolicy}.
+   * 
+   * @return
+   */
+  @Override
+  public RetryPolicy retryPolicy() {
+    InitShim shim = this.initShim;
+    return shim != null
+        ? shim.retryPolicy()
+        : this.retryPolicy;
+  }
+
+  /**
    * This instance is equal to all instances of {@code MarketSetting} that have equal attribute values.
    * @return {@code true} if {@code this} is equal to {@code another} instance
    */
@@ -213,11 +255,12 @@ public final class MarketSetting implements MarketSettingData {
         && Arrays.equals(orderBookGroupRanges, another.orderBookGroupRanges)
         && targetCurrencyScaleSize == another.targetCurrencyScaleSize
         && acquirableExecutionSize == another.acquirableExecutionSize
-        && executionLogger.equals(another.executionLogger);
+        && executionLogger.equals(another.executionLogger)
+        && retryPolicy.equals(another.retryPolicy);
   }
 
   /**
-   * Computes a hash code from attributes: {@code baseCurrencyMinimumBidPrice}, {@code targetCurrencyMinimumBidSize}, {@code orderBookGroupRanges}, {@code targetCurrencyScaleSize}, {@code acquirableExecutionSize}, {@code executionLogger}.
+   * Computes a hash code from attributes: {@code baseCurrencyMinimumBidPrice}, {@code targetCurrencyMinimumBidSize}, {@code orderBookGroupRanges}, {@code targetCurrencyScaleSize}, {@code acquirableExecutionSize}, {@code executionLogger}, {@code retryPolicy}.
    * @return hashCode value
    */
   @Override
@@ -229,6 +272,7 @@ public final class MarketSetting implements MarketSettingData {
     h += (h << 5) + targetCurrencyScaleSize;
     h += (h << 5) + acquirableExecutionSize;
     h += (h << 5) + executionLogger.hashCode();
+    h += (h << 5) + retryPolicy.hashCode();
     return h;
   }
 
@@ -246,6 +290,7 @@ public final class MarketSetting implements MarketSettingData {
         .add("targetCurrencyScaleSize", targetCurrencyScaleSize)
         .add("acquirableExecutionSize", acquirableExecutionSize)
         .add("executionLogger", executionLogger)
+        .add("retryPolicy", retryPolicy)
         .toString();
   }
 
@@ -259,6 +304,7 @@ public final class MarketSetting implements MarketSettingData {
    *    .targetCurrencyScaleSize(int) // optional {@link MarketSetting#targetCurrencyScaleSize() targetCurrencyScaleSize}
    *    .acquirableExecutionSize(int) // optional {@link MarketSetting#acquirableExecutionSize() acquirableExecutionSize}
    *    .executionLogger(Class&amp;lt;? extends cointoss.execution.ExecutionLogger&amp;gt;) // optional {@link MarketSetting#executionLogger() executionLogger}
+   *    .retryPolicy(cointoss.util.RetryPolicy) // optional {@link MarketSetting#retryPolicy() retryPolicy}
    *    .build();
    * </pre>
    * @return A new MarketSetting builder
@@ -291,6 +337,7 @@ public final class MarketSetting implements MarketSettingData {
     private int targetCurrencyScaleSize;
     private int acquirableExecutionSize;
     private @Nullable Class<? extends ExecutionLogger> executionLogger;
+    private @Nullable RetryPolicy retryPolicy;
 
     private Builder() {
     }
@@ -320,6 +367,7 @@ public final class MarketSetting implements MarketSettingData {
       targetCurrencyScaleSize(instance.targetCurrencyScaleSize());
       acquirableExecutionSize(instance.acquirableExecutionSize());
       executionLogger(instance.executionLogger());
+      retryPolicy(instance.retryPolicy());
       return this;
     }
 
@@ -394,6 +442,18 @@ public final class MarketSetting implements MarketSettingData {
     @CanIgnoreReturnValue 
     public final Builder executionLogger(Class<? extends ExecutionLogger> executionLogger) {
       this.executionLogger = Objects.requireNonNull(executionLogger, "executionLogger");
+      return this;
+    }
+
+    /**
+     * Initializes the value for the {@link MarketSetting#retryPolicy() retryPolicy} attribute.
+     * <p><em>If not set, this attribute will have a default value as returned by the initializer of {@link MarketSetting#retryPolicy() retryPolicy}.</em>
+     * @param retryPolicy The value for retryPolicy 
+     * @return {@code this} builder for use in a chained invocation
+     */
+    @CanIgnoreReturnValue 
+    public final Builder retryPolicy(RetryPolicy retryPolicy) {
+      this.retryPolicy = Objects.requireNonNull(retryPolicy, "retryPolicy");
       return this;
     }
 

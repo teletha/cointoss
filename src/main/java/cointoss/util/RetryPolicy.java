@@ -12,6 +12,7 @@ package cointoss.util;
 import java.time.Duration;
 import java.util.function.LongFunction;
 
+import kiss.I;
 import kiss.Signal;
 import kiss.WiseFunction;
 
@@ -52,9 +53,7 @@ public final class RetryPolicy implements WiseFunction<Signal<Throwable>, Signal
      * @return Chainable API.
      */
     public RetryPolicy retryMaximum(long times) {
-        if (1 <= times) {
-            maxTimes = times;
-        }
+        maxTimes = times;
         return this;
     }
 
@@ -151,6 +150,10 @@ public final class RetryPolicy implements WiseFunction<Signal<Throwable>, Signal
      */
     @Override
     public Signal<?> APPLY(Signal<Throwable> error) throws Throwable {
+        if (maxTimes <= 0) {
+            return error.flatMap(e -> I.signalError(e));
+        }
+
         return error.take(() -> ++count <= maxTimes).delay(() -> Chrono.between(minDelay, delay.apply(count), maxDelay)).effect(e -> {
             System.out.println("Retry " + count + "   " + e);
             e.printStackTrace();
