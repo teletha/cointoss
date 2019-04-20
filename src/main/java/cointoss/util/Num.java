@@ -19,7 +19,7 @@ import java.util.stream.IntStream;
 import org.apache.commons.lang3.RandomUtils;
 
 import cointoss.Directional;
-import cointoss.trade.Trader;
+import cointoss.Market;
 import kiss.Decoder;
 import kiss.Encoder;
 import kiss.I;
@@ -35,7 +35,7 @@ public class Num implements Comparable<Num> {
 
     // initialize
     static {
-        I.load(Trader.class);
+        I.load(Market.class);
     }
 
     /** The base context. */

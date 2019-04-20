@@ -7,10 +7,11 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss.verify;
+package cointoss.analyze;
 
 import org.junit.jupiter.api.Test;
 
+import cointoss.analyze.Statistics;
 import cointoss.util.Num;
 
 class StatisticsTest {

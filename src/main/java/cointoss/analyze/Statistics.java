@@ -7,7 +7,7 @@
  *
  *          https://opensource.org/licenses/MIT
  */
-package cointoss.verify;
+package cointoss.analyze;
 
 import cointoss.util.Num;
 
