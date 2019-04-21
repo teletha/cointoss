@@ -348,8 +348,9 @@ public class VerifiableMarketService extends MarketService {
          * @param o
          */
         private BackendOrder(Order o) {
-            super(o.direction(), o.size, o.price);
+            super(o.direction(), o.size);
 
+            price(o.price);
             type(o.quantityCondition());
         }
     }

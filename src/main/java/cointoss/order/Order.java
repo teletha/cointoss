@@ -32,12 +32,16 @@ import kiss.Variable;
 public class Order implements Directional {
 
     /** The updater. */
+    private static final MethodHandle typeHandler;
+
+    /** The updater. */
     private static final MethodHandle priceHandler;
 
     /** The updater. */
     private static final MethodHandle conditionHandler;
 
     static {
+        typeHandler = find("type");
         priceHandler = find("price");
         conditionHandler = find("condition");
     }
@@ -63,7 +67,7 @@ public class Order implements Directional {
     public final Variable<String> id = Variable.empty();
 
     /** The order type */
-    public final OrderType type;
+    public final OrderType type = OrderType.MARKET;
 
     /** The order state */
     public final Variable<OrderState> state = Variable.of(OrderState.INIT);
@@ -72,7 +76,7 @@ public class Order implements Directional {
     public final Direction side;
 
     /** The ordered price. */
-    public final Num price;
+    public final Num price = Num.ZERO;
 
     /** The order created date-time */
     public final Variable<ZonedDateTime> created = Variable.of(Chrono.utcNow());
@@ -102,11 +106,9 @@ public class Order implements Directional {
      * @param size A order size.
      * @param price A order price.
      */
-    protected Order(Direction side, Num size, Num price) {
+    protected Order(Direction side, Num size) {
         this.side = Objects.requireNonNull(side);
         this.size = this.remainingSize = Objects.requireNonNull(size);
-        this.price = price == null ? Num.ZERO : price;
-        this.type = this.price.isZero() ? OrderType.MARKET : OrderType.LIMIT;
     }
 
     /**
@@ -150,6 +152,10 @@ public class Order implements Directional {
 
         try {
             priceHandler.invokeExact(this, price);
+
+            if (state.is(OrderState.INIT)) {
+                typeHandler.invoke(this, price.isZero() ? OrderType.MARKET : OrderType.LIMIT);
+            }
         } catch (Throwable e) {
             throw I.quiet(e);
         }
@@ -379,6 +385,6 @@ public class Order implements Directional {
      * @return A new {@link Order}.
      */
     public static Order of(Direction direction, Num size) {
-        return new Order(direction, size, null);
+        return new Order(direction, size);
     }
 }
