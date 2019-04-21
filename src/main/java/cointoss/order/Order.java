@@ -84,8 +84,11 @@ public class Order implements Directional {
     /** The order state */
     public final Variable<OrderState> state = Variable.of(OrderState.INIT);
 
-    /** The order created date-time */
-    public final Variable<ZonedDateTime> created = Variable.of(Chrono.utcNow());
+    /** The requested time of this {@link Order}. */
+    public final Variable<ZonedDateTime> requested = Variable.of(Chrono.utcNow());
+
+    /** The terminated time of this {@link Order}. */
+    public final Variable<ZonedDateTime> terminated = Variable.empty();
 
     /** The execution event. */
     public final Signal<Execution> executed = attribute(RecordedExecutions.class).additions.expose;
@@ -291,7 +294,7 @@ public class Order implements Directional {
      */
     @Override
     public String toString() {
-        return direction().mark() + size + "@" + price + " 残" + remainingSize + " 済" + executedSize + " " + created;
+        return direction().mark() + size + "@" + price + " 残" + remainingSize + " 済" + executedSize + " " + requested;
     }
 
     /**
