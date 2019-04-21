@@ -9,6 +9,9 @@
  */
 package cointoss.order;
 
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.reflect.Field;
 import java.time.ZonedDateTime;
 import java.util.Map;
 import java.util.Objects;
@@ -27,6 +30,34 @@ import kiss.Variable;
  * @version 2018/07/09 10:33:17
  */
 public class Order implements Directional {
+
+    /** The updater. */
+    private static final MethodHandle priceHandler;
+
+    /** The updater. */
+    private static final MethodHandle conditionHandler;
+
+    static {
+        priceHandler = find("price");
+        conditionHandler = find("condition");
+    }
+
+    /**
+     * Find field updater.
+     * 
+     * @param name A field name.
+     * @return An updater.
+     */
+    private static MethodHandle find(String name) {
+        try {
+            Field field = Order.class.getField(name);
+            field.setAccessible(true);
+
+            return MethodHandles.lookup().unreflectSetter(field);
+        } catch (Exception e) {
+            throw I.quiet(e);
+        }
+    }
 
     /** The order identifier for the specific market. */
     public final Variable<String> id = Variable.empty();
@@ -49,6 +80,9 @@ public class Order implements Directional {
     /** The ordered size. */
     public final Num size;
 
+    /** The quantity conditions enforcement. */
+    public final QuantityCondition condition = QuantityCondition.GoodTillCanceled;
+
     /** The executed size */
     public Num executedSize = Num.ZERO;
 
@@ -57,9 +91,6 @@ public class Order implements Directional {
 
     /** The attribute holder. */
     private final Map<Class, Object> attributes = new ConcurrentHashMap();
-
-    /** The quantity conditions enforcement. */
-    private QuantityCondition quantityCondition = QuantityCondition.GoodTillCanceled;
 
     /** The execution event. */
     public final Signal<Execution> executed = attribute(RecordedExecutions.class).additions.expose;
@@ -134,7 +165,7 @@ public class Order implements Directional {
      * @return A {@link QuantityCondition}.
      */
     public final QuantityCondition quantityCondition() {
-        return quantityCondition;
+        return condition;
     }
 
     /**
@@ -144,8 +175,15 @@ public class Order implements Directional {
      * @return Chainable API.
      */
     public final Order type(QuantityCondition quantityCondition) {
-        this.quantityCondition = quantityCondition == null ? QuantityCondition.GoodTillCanceled : quantityCondition;
+        if (quantityCondition == null) {
+            quantityCondition = QuantityCondition.GoodTillCanceled;
+        }
 
+        try {
+            conditionHandler.invoke(this, quantityCondition == null ? QuantityCondition.GoodTillCanceled : quantityCondition);
+        } catch (Throwable e) {
+            throw I.quiet(e);
+        }
         return this;
     }
 

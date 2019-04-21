@@ -131,4 +131,11 @@ public class OrderTest {
         order.state.set(OrderState.COMPLETED);
         assert result.size() == 1;
     }
+
+    @Test
+    void condition() {
+        assert Order.buy(1).condition == QuantityCondition.GoodTillCanceled;
+        assert Order.buy(1).type(QuantityCondition.FillOrKill).condition == QuantityCondition.FillOrKill;
+        assert Order.buy(1).type(null).condition == QuantityCondition.GoodTillCanceled;
+    }
 }
