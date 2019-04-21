@@ -186,7 +186,7 @@ public class VerifiableMarket extends Market {
      */
     public void requestAndExecution(Order order) {
         request(order).to(id -> {
-            execute(order.side, order.size, order.price.v);
+            execute(order.side, order.size, order.price.v.minus(order.side, service.setting.baseCurrencyMinimumBidPrice()));
         });
     }
 

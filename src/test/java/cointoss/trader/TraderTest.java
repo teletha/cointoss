@@ -9,8 +9,8 @@
  */
 package cointoss.trader;
 
-import static cointoss.Direction.BUY;
-import static java.time.temporal.ChronoUnit.SECONDS;
+import static cointoss.Direction.*;
+import static java.time.temporal.ChronoUnit.*;
 
 import org.junit.jupiter.api.Test;
 
@@ -102,14 +102,14 @@ class TraderTest extends TraderTestSupport {
     void exitLimit() {
         // entry and execute
         Entry entry = entryLimit(Direction.BUY, Num.ONE, Num.TEN, null);
-        market.execute(1, 10);
+        market.execute(1, 9);
         assert entry.remaining().is(1);
 
         // try exit
         entry.exitLimit(Num.ONE, Num.TEN, null);
         assert entry.remaining().is(1);
 
-        market.execute(1, 10);
+        market.execute(1, 11);
         assert entry.remaining().is(0);
     }
 
@@ -117,7 +117,7 @@ class TraderTest extends TraderTestSupport {
     void exitLimitInvalidParameters() {
         // entry and execute
         Entry entry = entryLimit(Direction.BUY, Num.ONE, Num.TEN, null);
-        market.execute(1, 10);
+        market.execute(1, 9);
         assert entry.remaining().is(1);
 
         // null size
@@ -149,14 +149,14 @@ class TraderTest extends TraderTestSupport {
     void exitMarket() {
         // entry and execute
         Entry entry = entryLimit(Direction.BUY, Num.ONE, Num.TEN, null);
-        market.execute(1, 10);
+        market.execute(1, 9);
         assert entry.remaining().is(1);
 
         // try exit
         entry.exitMarket(Num.ONE);
         assert entry.remaining().is(1);
 
-        market.execute(1, 10);
+        market.execute(1, 11);
         assert entry.remaining().is(0);
     }
 
@@ -164,7 +164,7 @@ class TraderTest extends TraderTestSupport {
     void exitMarketInvalidPrameters() {
         // entry and execute
         Entry entry = entryLimit(Direction.BUY, Num.ONE, Num.TEN, null);
-        market.execute(1, 10);
+        market.execute(1, 9);
         assert entry.remaining().is(1);
 
         // null size
@@ -190,7 +190,7 @@ class TraderTest extends TraderTestSupport {
         assert completed.isAbsent();
 
         // execute
-        market.execute(1, 10);
+        market.execute(1, 9);
         assert completed.is(true);
     }
 
@@ -201,7 +201,7 @@ class TraderTest extends TraderTestSupport {
 
         // entry
         Entry entry = entryLimit(Direction.BUY, Num.ONE, Num.TEN, null);
-        market.execute(1, 10);
+        market.execute(1, 9);
         assert completed.isAbsent();
 
         // exit
@@ -209,7 +209,7 @@ class TraderTest extends TraderTestSupport {
         assert completed.isAbsent();
 
         // execute
-        market.execute(1, 10);
+        market.execute(1, 11);
         assert completed.is(true);
     }
 
@@ -220,7 +220,7 @@ class TraderTest extends TraderTestSupport {
 
         // entry
         Entry entry = entryLimit(Direction.BUY, Num.ONE, Num.TEN, null);
-        market.execute(1, 10);
+        market.execute(1, 9);
         assert completed.isAbsent();
 
         // exit
@@ -228,7 +228,7 @@ class TraderTest extends TraderTestSupport {
         assert completed.isAbsent();
 
         // execute
-        market.execute(1, 10);
+        market.execute(1, 11);
         assert completed.is(true);
     }
 

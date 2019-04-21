@@ -86,7 +86,7 @@ class OrderManagerTest {
 
         List<Order> removed = orders.removed.toList();
         assert removed.size() == 0;
-        service.emulate(Executed.sell(1).price(10));
+        service.emulate(Executed.sell(1).price(9));
         assert removed.size() == 1;
     }
 
@@ -96,9 +96,9 @@ class OrderManagerTest {
 
         List<Order> removed = orders.removed.toList();
         assert removed.size() == 0;
-        service.emulate(Executed.sell(1).price(10));
+        service.emulate(Executed.sell(1).price(9));
         assert removed.size() == 0;
-        service.emulate(Executed.sell(1).price(10));
+        service.emulate(Executed.sell(1).price(9));
         assert removed.size() == 1;
     }
 }
