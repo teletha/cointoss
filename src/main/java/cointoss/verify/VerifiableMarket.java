@@ -10,23 +10,13 @@
  */
 package cointoss.verify;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import cointoss.Direction;
 import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.execution.Execution;
 import cointoss.order.Order;
-import cointoss.order.OrderState;
 import cointoss.util.Num;
 
-/**
- * @version 2018/09/18 21:18:07
- */
 public class VerifiableMarket extends Market {
 
     /** Hide super class field. */
@@ -188,41 +178,5 @@ public class VerifiableMarket extends Market {
         request(order).to(id -> {
             execute(order.side, order.size, order.price.v.minus(order.side, service.setting.baseCurrencyMinimumBidPrice()));
         });
-    }
-
-    /**
-     * Validate order state by size.
-     * 
-     * @param active
-     * @param completed
-     * @param canceled
-     * @param expired
-     * @param rejected
-     * @return
-     */
-    public boolean validateOrderState(int active, int completed, int canceled, int expired, int rejected) {
-        Map<OrderState, List<Order>> state = new HashMap();
-
-        service.orders().to(o -> state.computeIfAbsent(o.state.v, s -> new ArrayList()).add(o));
-
-        assert state.getOrDefault(OrderState.ACTIVE, Collections.EMPTY_LIST).size() == active;
-        assert state.getOrDefault(OrderState.COMPLETED, Collections.EMPTY_LIST).size() == completed;
-        assert state.getOrDefault(OrderState.CANCELED, Collections.EMPTY_LIST).size() == canceled;
-        assert state.getOrDefault(OrderState.EXPIRED, Collections.EMPTY_LIST).size() == expired;
-        assert state.getOrDefault(OrderState.REJECTED, Collections.EMPTY_LIST).size() == rejected;
-
-        return true;
-    }
-
-    /**
-     * Validate execution state by size.
-     * 
-     * @param i
-     * @return
-     */
-    public boolean validateExecutionState(int executed) {
-        assert service.executionsRealtimely().toList().size() == executed;
-
-        return true;
     }
 }

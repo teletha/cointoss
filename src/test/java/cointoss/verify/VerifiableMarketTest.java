@@ -311,30 +311,39 @@ class VerifiableMarketTest {
     @Disabled
     void immediateOrCancelShort() {
         // success
-        market.request(Order.sell(1).price(10).type(QuantityCondition.ImmediateOrCancel)).to();
-        market.execute(Executed.sell(1).price(10));
-        assert market.validateOrderState(0, 1, 0, 0, 0);
+        market.request(Order.sell(1).price(10).type(QuantityCondition.ImmediateOrCancel)).to(order -> {
+            market.execute(Executed.sell(1).price(11));
+            assert order.isCompleted();
+            assert order.isNotCanceled();
+        });
 
-        // large price will success
-        market.request(Order.sell(1).price(10).type(QuantityCondition.ImmediateOrCancel)).to();
-        market.execute(Executed.sell(1).price(11));
-        assert market.validateOrderState(0, 2, 0, 0, 0);
+        // over price will success
+        market.request(Order.sell(1).price(10).type(QuantityCondition.ImmediateOrCancel)).to(order -> {
+            market.execute(Executed.sell(1).price(12));
+            assert order.isCompleted();
+            assert order.isNotCanceled();
+        });
 
-        // large size will success
-        market.request(Order.sell(10).price(10).type(QuantityCondition.ImmediateOrCancel)).to();
-        market.execute(Executed.sell(15).price(10));
-        assert market.validateOrderState(0, 3, 0, 0, 0);
+        // over size will success
+        market.request(Order.sell(10).price(10).type(QuantityCondition.ImmediateOrCancel)).to(order -> {
+            market.execute(Executed.sell(15).price(11));
+            assert order.isCompleted();
+            assert order.isNotCanceled();
+        });
 
         // less size will success
-        market.request(Order.sell(10).price(10).type(QuantityCondition.ImmediateOrCancel)).to();
-        market.execute(Executed.sell(4).price(10));
-        assert market.validateOrderState(0, 4, 0, 0, 0);
-        assert market.orders().get(3).executedSize.is(4);
+        market.request(Order.sell(10).price(10).type(QuantityCondition.ImmediateOrCancel)).to(order -> {
+            market.execute(Executed.sell(4).price(11));
+            assert order.isNotCompleted();
+            assert order.isCanceled();
+        });
 
         // less price will be failed
-        market.request(Order.sell(1).price(10).type(QuantityCondition.ImmediateOrCancel)).to();
-        market.execute(Executed.sell(1).price(9));
-        assert market.validateOrderState(0, 4, 0, 0, 0);
+        market.request(Order.sell(1).price(10).type(QuantityCondition.ImmediateOrCancel)).to(order -> {
+            market.execute(Executed.sell(1).price(9));
+            assert order.isNotCompleted();
+            assert order.isCanceled();
+        });
     }
 
     @Test
@@ -435,13 +444,19 @@ class VerifiableMarketTest {
 
     @Test
     void cancel() {
-        Order order = market.request(Order.sell(1).price(12)).to().v;
-        market.execute(Executed.buy(1).price(11));
-        assert market.validateOrderState(1, 0, 0, 0, 0);
-        market.cancel(order).to();
-        assert market.validateOrderState(0, 0, 1, 0, 0);
-        market.execute(Executed.buy(1).price(12));
-        assert market.validateOrderState(0, 0, 1, 0, 0);
+        market.request(Order.sell(1).price(12)).to(order -> {
+            market.execute(Executed.buy(1).price(11));
+            assert order.isNotCanceled();
+            assert order.isNotCompleted();
+
+            market.cancel(order).to();
+            assert order.isCanceled();
+            assert order.isNotCompleted();
+
+            market.execute(Executed.buy(1).price(13));
+            assert order.isCanceled();
+            assert order.isNotCompleted();
+        });
     }
 
     @Test
