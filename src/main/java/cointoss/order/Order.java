@@ -63,9 +63,6 @@ public class Order implements Directional {
         }
     }
 
-    /** The order identifier for the specific market. */
-    public final Variable<String> id = Variable.empty();
-
     /** The ordered position. */
     public final Direction direction;
 
@@ -81,6 +78,9 @@ public class Order implements Directional {
     /** The quantity conditions enforcement. */
     public final QuantityCondition condition = QuantityCondition.GoodTillCanceled;
 
+    /** The order identifier for the specific market. */
+    public final Variable<String> id = Variable.empty();
+
     /** The order state */
     public final Variable<OrderState> state = Variable.of(OrderState.INIT);
 
@@ -88,7 +88,7 @@ public class Order implements Directional {
     public final Variable<ZonedDateTime> created = Variable.of(Chrono.utcNow());
 
     /** The executed size */
-    public Num executedSize = Num.ZERO;
+    public final Variable<Num> executedSize = Variable.of(Num.ZERO);
 
     /** The remaining size */
     public Num remainingSize;
