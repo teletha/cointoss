@@ -135,6 +135,19 @@ public class VerifiableMarket extends Market {
      * @param size
      * @param price
      */
+    public VerifiableMarket execute(Execution e, TimeLag lag) {
+        e.date = lag.to();
+
+        return execute(e);
+    }
+
+    /**
+     * Emulate execution event.
+     * 
+     * @param side
+     * @param size
+     * @param price
+     */
     public VerifiableMarket execute(Execution e) {
         timelineObservers.accept(service.emulate(e));
         return this;
