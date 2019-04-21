@@ -72,7 +72,7 @@ public class Order implements Directional {
     public final Direction side;
 
     /** The ordered price. */
-    public final Variable<Num> price;
+    public final Num price;
 
     /** The order created date-time */
     public final Variable<ZonedDateTime> created = Variable.of(Chrono.utcNow());
@@ -105,8 +105,8 @@ public class Order implements Directional {
     protected Order(Direction side, Num size, Num price) {
         this.side = Objects.requireNonNull(side);
         this.size = this.remainingSize = Objects.requireNonNull(size);
-        this.price = Variable.of(price == null ? Num.ZERO : price);
-        this.type = this.price.is(Num.ZERO) ? OrderType.MARKET : OrderType.LIMIT;
+        this.price = price == null ? Num.ZERO : price;
+        this.type = this.price.isZero() ? OrderType.MARKET : OrderType.LIMIT;
     }
 
     /**
@@ -144,8 +144,14 @@ public class Order implements Directional {
      * @return Chainable API.
      */
     public final Order price(Num price) {
-        if (price != null) {
-            this.price.set(price);
+        if (price == null || price.isNegative()) {
+            price = Num.ZERO;
+        }
+
+        try {
+            priceHandler.invokeExact(this, price);
+        } catch (Throwable e) {
+            throw I.quiet(e);
         }
         return this;
     }

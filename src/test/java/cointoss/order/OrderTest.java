@@ -73,7 +73,7 @@ public class OrderTest {
         Order order = Order.of(Direction.BUY, 1).price(20);
         assert order.side == Direction.BUY;
         assert order.size.is(1);
-        assert order.price.v.is(20);
+        assert order.price.is(20);
     }
 
     @Test
@@ -81,7 +81,7 @@ public class OrderTest {
         Order order = Order.of(Direction.BUY, 1);
         assert order.side == Direction.BUY;
         assert order.size.is(1);
-        assert order.price.v.is(0);
+        assert order.price.is(0);
     }
 
     @Test

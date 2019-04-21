@@ -265,7 +265,7 @@ public class VerifiableMarketService extends MarketService {
                 Num executedSize = Num.min(e.size, order.remainingSize);
                 if (order.type.isMarket() && executedSize.isNot(0)) {
                     order.marketMinPrice = order.isBuy() ? Num.max(order.marketMinPrice, e.price) : Num.min(order.marketMinPrice, e.price);
-                    order.price.set(v -> v.multiply(order.executedSize)
+                    order.price(order.price.multiply(order.executedSize)
                             .plus(order.marketMinPrice.multiply(executedSize))
                             .divide(executedSize.plus(order.executedSize)));
                 }
@@ -275,7 +275,7 @@ public class VerifiableMarketService extends MarketService {
                 Execution exe = new Execution();
                 exe.side = order.direction();
                 exe.size = exe.cumulativeSize = executedSize;
-                exe.price = order.type.isMarket() ? order.marketMinPrice : order.price.get();
+                exe.price = order.type.isMarket() ? order.marketMinPrice : order.price;
                 exe.date = e.date;
                 exe.yourOrder = order.id.v;
                 executeds.add(exe);
@@ -318,11 +318,11 @@ public class VerifiableMarketService extends MarketService {
         }
 
         if (order.isBuy()) {
-            Num price = order.price.v;
+            Num price = order.price;
 
             return price.isGreaterThan(e.price) || price.is(setting.baseCurrencyMinimumBidPrice());
         } else {
-            return order.price.v.isLessThan(e.price);
+            return order.price.isLessThan(e.price);
         }
     }
 
@@ -348,7 +348,7 @@ public class VerifiableMarketService extends MarketService {
          * @param o
          */
         private BackendOrder(Order o) {
-            super(o.direction(), o.size, o.price.v);
+            super(o.direction(), o.size, o.price);
 
             type(o.quantityCondition());
         }

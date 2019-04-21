@@ -62,8 +62,8 @@ class MockBitFlyerService extends BitFlyerService {
         o.child_order_acceptance_id = acceptanceId;
         o.child_order_id = acceptanceId;
         o.side = order.side;
-        o.price = order.price.v;
-        o.average_price = order.price.v;
+        o.price = order.price;
+        o.average_price = order.price;
         o.size = order.size;
         o.child_order_state = OrderState.ACTIVE;
         o.child_order_date = Chrono.DateTimeWithT.format(Chrono.utcNow());

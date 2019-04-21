@@ -261,7 +261,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     private void visualizeOrderPrice() {
         chart.market.observe().switchMap(m -> m.orders.added).on(Viewtify.UIThread).to(o -> {
             LineMark mark = o.isBuy() ? orderBuyPrice : orderSellPrice;
-            TickLable label = mark.createLabel(o.price.v);
+            TickLable label = mark.createLabel(o.price);
 
             o.observeTerminating().on(Viewtify.UIThread).to(() -> {
                 mark.remove(label);
