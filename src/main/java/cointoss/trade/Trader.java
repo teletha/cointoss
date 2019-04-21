@@ -25,6 +25,7 @@ import cointoss.Direction;
 import cointoss.Directional;
 import cointoss.Market;
 import cointoss.execution.Execution;
+import cointoss.order.MyOrder;
 import cointoss.order.Order;
 import cointoss.order.RecordedExecutions;
 import cointoss.util.Num;
@@ -130,7 +131,7 @@ public abstract class Trader implements Disposable {
             return null;
         }
 
-        return new Entry(Order.of(side, size).price(price), process);
+        return new Entry(MyOrder.of(side, size).price(price), process);
     }
 
     /**
@@ -149,7 +150,7 @@ public abstract class Trader implements Disposable {
         if (size == null || size.isLessThanOrEqual(Num.ZERO)) {
             return null;
         }
-        return new Entry(Order.of(side, size), process);
+        return new Entry(MyOrder.of(side, size), process);
     }
 
     /**
@@ -243,7 +244,7 @@ public abstract class Trader implements Disposable {
     public class Entry implements Directional {
 
         /** The entry order. */
-        public final Order order;
+        public Order order;
 
         /** The list exit orders. */
         final List<Order> exit = new ArrayList<>();
@@ -277,8 +278,7 @@ public abstract class Trader implements Disposable {
          * 
          * @param entry A entry order.
          */
-        private Entry(Order entry, Consumer<Entry> initializer) {
-            this.order = entry;
+        private Entry(MyOrder entry, Consumer<Entry> initializer) {
             this.entryRemaining = entry.size;
 
             // create new entry
@@ -286,7 +286,8 @@ public abstract class Trader implements Disposable {
             actives.add(this);
 
             // request order
-            market.request(order).to(o -> {
+            market.request(entry).to(o -> {
+                this.order = o;
                 o.executed.to(exe -> {
                     positionSize = positionSize.plus(exe.size);
                     entryTotalSize = entryTotalSize.plus(exe.size);
@@ -496,7 +497,7 @@ public abstract class Trader implements Disposable {
             if (price == null || price.isLessThanOrEqual(Num.ZERO)) {
                 return;
             }
-            exit(Order.of(order.inverse(), size).price(price), process);
+            exit(MyOrder.of(order.inverse(), size).price(price), process);
         }
 
         /**
@@ -541,7 +542,7 @@ public abstract class Trader implements Disposable {
             if (size == null || size.isLessThanOrEqual(Num.ZERO)) {
                 return;
             }
-            exit(Order.of(order.inverse(), size), process);
+            exit(MyOrder.of(order.inverse(), size), process);
         }
 
         /**
@@ -549,7 +550,7 @@ public abstract class Trader implements Disposable {
          * 
          * @param order A exit order.
          */
-        private void exit(Order order, Consumer<Order> initializer) {
+        private void exit(MyOrder order, Consumer<Order> initializer) {
             exitRemaining = exitRemaining.plus(order.size);
 
             market.request(order).to(o -> {

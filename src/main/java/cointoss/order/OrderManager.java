@@ -101,7 +101,8 @@ public final class OrderManager {
      * @return A order request process.
      * @see #requestNow(Order)
      */
-    public Signal<Order> request(Order order) {
+    public Signal<Order> request(MyOrder o) {
+        Order order = new Order(o);
         order.state.set(REQUESTING);
 
         return service.request(order).retryWhen(service.setting.retryPolicy()).map(id -> {
@@ -125,10 +126,8 @@ public final class OrderManager {
      * @return A requested {@link Order}.
      * @see #request(Order)
      */
-    public Order requestNow(Order order) {
-        request(order).to(I.NoOP);
-
-        return order;
+    public Order requestNow(MyOrder order) {
+        return request(order).to().v;
     }
 
     /**

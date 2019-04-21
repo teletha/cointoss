@@ -19,6 +19,7 @@ import java.util.function.Function;
 import cointoss.execution.Execution;
 import cointoss.execution.ExecutionLog;
 import cointoss.market.MarketServiceProvider;
+import cointoss.order.MyOrder;
 import cointoss.order.Order;
 import cointoss.order.OrderBook;
 import cointoss.order.OrderBookManager;
@@ -157,7 +158,7 @@ public class Market implements Disposable {
      * @param order A order to request.
      * @return A order request process.
      */
-    public final Signal<Order> request(Order order) {
+    public final Signal<Order> request(MyOrder order) {
         return orders.request(order);
     }
 

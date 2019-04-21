@@ -13,7 +13,7 @@ package cointoss.verify;
 import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.execution.Execution;
-import cointoss.order.Order;
+import cointoss.order.MyOrder;
 
 public class VerifiableMarket extends Market {
 
@@ -111,8 +111,8 @@ public class VerifiableMarket extends Market {
      * 
      * @param limitShort
      */
-    public void requestAndExecution(Order order) {
-        request(order).to(id -> {
+    public void requestAndExecution(MyOrder o) {
+        request(o).to(order -> {
             Execution e = new Execution();
             e.side = order.side;
             e.size = order.size;

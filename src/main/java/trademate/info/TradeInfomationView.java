@@ -12,8 +12,6 @@ package trademate.info;
 import static transcript.Transcript.en;
 
 import cointoss.Direction;
-import cointoss.order.Order;
-import cointoss.order.OrderBook;
 import cointoss.position.Position;
 import cointoss.position.PositionManager;
 import cointoss.util.Num;
@@ -92,19 +90,6 @@ public class TradeInfomationView extends View {
 
             manager.add(position);
         });
-    }
-
-    /**
-     * Request exit order.
-     * 
-     * @param position
-     */
-    @SuppressWarnings("unused")
-    private void retreat(Position position) {
-        OrderBook book = view.market().orderBook.bookFor(position.inverse());
-        Num price = book.computeBestPrice(Num.ZERO, Num.TWO);
-
-        view.order(Order.of(position.inverse(), position.size.v).price(price));
     }
 
     /**
