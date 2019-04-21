@@ -244,20 +244,6 @@ public class VerifiableMarketService extends MarketService {
                 continue;
             }
 
-            // check trigger price
-            if (order.stopPrice() != null && order.triggerArchived == false) {
-                if (order.isBuy()) {
-                    if (e.price.isGreaterThanOrEqual(order.stopPrice())) {
-                        order.triggerArchived = true;
-                    }
-                } else {
-                    if (e.price.isLessThanOrEqual(order.stopPrice())) {
-                        order.triggerArchived = true;
-                    }
-                }
-                continue;
-            }
-
             // check quantity condition
             if (order.quantityCondition() == QuantityCondition.FillOrKill && !validateTradable(order, e)) {
                 iterator.remove();
@@ -355,9 +341,6 @@ public class VerifiableMarketService extends MarketService {
      */
     private static class BackendOrder extends Order {
 
-        /** The trigger state. */
-        private boolean triggerArchived;
-
         /** The minimum price for market order. */
         private Num marketMinPrice = isBuy() ? Num.ZERO : Num.MAX;
 
@@ -367,7 +350,6 @@ public class VerifiableMarketService extends MarketService {
         private BackendOrder(Order o) {
             super(o.direction(), o.size, o.price.v);
 
-            stopAt(o.stopPrice());
             type(o.quantityCondition());
         }
     }

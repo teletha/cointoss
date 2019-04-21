@@ -58,9 +58,6 @@ public class Order implements Directional {
     /** The attribute holder. */
     private final Map<Class, Object> attributes = new ConcurrentHashMap();
 
-    /** The stop trigger price. */
-    private Num stopPrice;
-
     /** The quantity conditions enforcement. */
     private QuantityCondition quantityCondition = QuantityCondition.GoodTillCanceled;
 
@@ -149,48 +146,6 @@ public class Order implements Directional {
     public final Order type(QuantityCondition quantityCondition) {
         this.quantityCondition = quantityCondition == null ? QuantityCondition.GoodTillCanceled : quantityCondition;
 
-        return this;
-    }
-
-    /**
-     * Retrieve the stop trigger price of this {@link Order}.
-     * 
-     * @return A stop price.
-     */
-    public final Num stopPrice() {
-        return stopPrice;
-    }
-
-    /**
-     * Set stop trigger price of this {@link Order}.
-     * 
-     * @param price A price to stop.
-     * @return Chainable API.
-     */
-    public final Order stopAt(long price) {
-        return stopAt(Num.of(price));
-    }
-
-    /**
-     * Set stop trigger price of this {@link Order}.
-     * 
-     * @param price A price to stop.
-     * @return Chainable API.
-     */
-    public final Order stopAt(double price) {
-        return stopAt(Num.of(price));
-    }
-
-    /**
-     * Set stop trigger price of this {@link Order}.
-     * 
-     * @param price A price to stop.
-     * @return Chainable API.
-     */
-    public final Order stopAt(Num price) {
-        if (price != null) {
-            this.stopPrice = price;
-        }
         return this;
     }
 
