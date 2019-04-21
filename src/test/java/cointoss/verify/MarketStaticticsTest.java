@@ -12,7 +12,7 @@ package cointoss.verify;
 import org.junit.jupiter.api.Test;
 
 import cointoss.execution.Executed;
-import cointoss.order.MyOrder;
+import cointoss.order.Order;
 
 /**
  * @version 2018/07/10 23:17:09
@@ -22,13 +22,13 @@ class MarketStaticticsTest {
     @Test
     void market() {
         VerifiableMarket market = new VerifiableMarket();
-        market.requestAndExecution(MyOrder.buy(1).price(10));
+        market.requestAndExecution(Order.buy(1).price(10));
 
         assert market.baseCurrency.v.is(90);
         assert market.targetCurrency.v.is(1);
         assert market.calculateProfit().is(0);
 
-        market.requestAndExecution(MyOrder.sell(1).price(15));
+        market.requestAndExecution(Order.sell(1).price(15));
         assert market.baseCurrency.v.is(105);
         assert market.targetCurrency.v.is(0);
         assert market.calculateProfit().is(5);
@@ -37,7 +37,7 @@ class MarketStaticticsTest {
     @Test
     void longOnly() {
         VerifiableMarket market = new VerifiableMarket();
-        market.request(MyOrder.buy(1).price(10)).to();
+        market.request(Order.buy(1).price(10)).to();
         market.execute(Executed.buy(1).price(9));
 
         assert market.baseCurrency.v.is(90);
@@ -48,8 +48,8 @@ class MarketStaticticsTest {
     @Test
     void longMultiple() {
         VerifiableMarket market = new VerifiableMarket();
-        market.requestAndExecution(MyOrder.buy(1).price(10));
-        market.requestAndExecution(MyOrder.buy(1).price(20));
+        market.requestAndExecution(Order.buy(1).price(10));
+        market.requestAndExecution(Order.buy(1).price(20));
 
         assert market.baseCurrency.v.is(70);
         assert market.targetCurrency.v.is(2);
@@ -59,8 +59,8 @@ class MarketStaticticsTest {
     @Test
     void longDown() {
         VerifiableMarket market = new VerifiableMarket();
-        market.requestAndExecution(MyOrder.buy(1).price(10));
-        market.requestAndExecution(MyOrder.buy(1).price(20));
+        market.requestAndExecution(Order.buy(1).price(10));
+        market.requestAndExecution(Order.buy(1).price(20));
         market.execute(Executed.buy(1).price(5));
 
         assert market.baseCurrency.v.is(70);
@@ -71,8 +71,8 @@ class MarketStaticticsTest {
     @Test
     void shortMultiple() {
         VerifiableMarket market = new VerifiableMarket();
-        market.requestAndExecution(MyOrder.sell(1).price(10));
-        market.requestAndExecution(MyOrder.sell(1).price(20));
+        market.requestAndExecution(Order.sell(1).price(10));
+        market.requestAndExecution(Order.sell(1).price(20));
 
         assert market.baseCurrency.v.is(130);
         assert market.targetCurrency.v.is(-2);
@@ -82,8 +82,8 @@ class MarketStaticticsTest {
     @Test
     void shortLong() {
         VerifiableMarket market = new VerifiableMarket();
-        market.requestAndExecution(MyOrder.sell(1).price(10));
-        market.requestAndExecution(MyOrder.buy(1).price(20));
+        market.requestAndExecution(Order.sell(1).price(10));
+        market.requestAndExecution(Order.buy(1).price(20));
 
         assert market.baseCurrency.v.is(90);
         assert market.targetCurrency.v.is(0);
@@ -93,8 +93,8 @@ class MarketStaticticsTest {
     @Test
     void longShort() {
         VerifiableMarket market = new VerifiableMarket();
-        market.requestAndExecution(MyOrder.buy(1).price(10));
-        market.requestAndExecution(MyOrder.sell(1).price(20));
+        market.requestAndExecution(Order.buy(1).price(10));
+        market.requestAndExecution(Order.sell(1).price(20));
 
         assert market.baseCurrency.v.is(110);
         assert market.targetCurrency.v.is(0);

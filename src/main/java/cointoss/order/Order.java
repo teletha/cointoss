@@ -78,14 +78,6 @@ public class Order implements Directional {
         this.type = this.price.is(Num.ZERO) ? OrderType.MARKET : OrderType.LIMIT;
     }
 
-    Order(MyOrder o) {
-        this.side = o.direction;
-        this.size = this.remainingSize = o.size;
-        this.price = Variable.of(o.price);
-        this.quantityCondition = o.condition;
-        this.type = this.price.v.isZero() ? OrderType.MARKET : OrderType.LIMIT;
-    }
-
     /**
      * {@inheritDoc}
      */

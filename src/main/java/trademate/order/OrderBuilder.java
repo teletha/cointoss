@@ -21,14 +21,14 @@ import javafx.scene.control.Spinner;
 import javafx.scene.input.ScrollEvent;
 
 import cointoss.Direction;
-import cointoss.order.MyOrder;
+import cointoss.order.Order;
+import cointoss.order.OrderState;
 import cointoss.util.Num;
 import kiss.WiseBiConsumer;
 import stylist.Style;
 import stylist.StyleDSL;
 import trademate.TradeMateStyle;
 import trademate.TradingView;
-import viewtify.Viewtify;
 import viewtify.ui.UI;
 import viewtify.ui.UIButton;
 import viewtify.ui.UISpinner;
@@ -205,6 +205,8 @@ public class OrderBuilder extends View {
      * @return
      */
     private void requestOrder(Direction side) {
+        OrderSet set = new OrderSet();
+
         // ========================================
         // Create Model
         // ========================================
@@ -220,10 +222,15 @@ public class OrderBuilder extends View {
                     : Num.of(i).divide(increaseInterval).scale(0, RoundingMode.FLOOR).multiply(initSize.divide(2));
             Num optimizedPrice = view.market().orderBook.computeBestPrice(side, price, optimizeThreshold.value(), Num.of(2));
 
-            view.market().request(MyOrder.of(side, size.plus(optimizedSize)).price(optimizedPrice)).on(Viewtify.WorkerThread).to(order -> {
-            });
+            Order order = Order.of(side, size.plus(optimizedSize)).price(optimizedPrice);
+            order.state.set(OrderState.REQUESTING);
+            order.observeTerminating().to(() -> set.sub.remove(order));
+
+            set.sub.add(order);
+
             price = optimizedPrice.plus(priceInterval);
         }
+        view.order(set);
     }
 
     /**
