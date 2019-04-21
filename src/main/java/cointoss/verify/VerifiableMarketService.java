@@ -245,13 +245,13 @@ public class VerifiableMarketService extends MarketService {
             }
 
             // check quantity condition
-            if (order.quantityCondition() == QuantityCondition.FillOrKill && !validateTradable(order, e)) {
+            if (order.condition == QuantityCondition.FillOrKill && !validateTradable(order, e)) {
                 iterator.remove();
                 orderAll.remove(order);
                 continue;
             }
 
-            if (order.quantityCondition() == QuantityCondition.ImmediateOrCancel) {
+            if (order.condition == QuantityCondition.ImmediateOrCancel) {
                 if (validateTradableByPrice(order, e)) {
                     order.remainingSize = Num.min(e.size, order.remainingSize);
                 } else {
@@ -351,7 +351,7 @@ public class VerifiableMarketService extends MarketService {
             super(o.direction(), o.size);
 
             price(o.price);
-            type(o.quantityCondition());
+            type(o.condition);
         }
     }
 }

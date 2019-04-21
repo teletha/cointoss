@@ -179,15 +179,6 @@ public class Order implements Directional {
     }
 
     /**
-     * Retrieve the {@link QuantityCondition} of this {@link Order}.
-     * 
-     * @return A {@link QuantityCondition}.
-     */
-    public final QuantityCondition quantityCondition() {
-        return condition;
-    }
-
-    /**
      * Set the {@link QuantityCondition} of this {@link Order}.
      * 
      * @param quantityCondition A {@link QuantityCondition} to set.
