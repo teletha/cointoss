@@ -61,7 +61,7 @@ class MockBitFlyerService extends BitFlyerService {
         ChildOrderResponse o = new ChildOrderResponse();
         o.child_order_acceptance_id = acceptanceId;
         o.child_order_id = acceptanceId;
-        o.side = order.side;
+        o.side = order.direction;
         o.price = order.price;
         o.average_price = order.price;
         o.size = order.size;

@@ -32,10 +32,10 @@ import kiss.Variable;
 public class Order implements Directional {
 
     /** The updater. */
-    private static final MethodHandle typeHandler;
+    private static final MethodHandle priceHandler;
 
     /** The updater. */
-    private static final MethodHandle priceHandler;
+    private static final MethodHandle typeHandler;
 
     /** The updater. */
     private static final MethodHandle conditionHandler;
@@ -66,26 +66,26 @@ public class Order implements Directional {
     /** The order identifier for the specific market. */
     public final Variable<String> id = Variable.empty();
 
-    /** The order type */
-    public final OrderType type = OrderType.MARKET;
-
-    /** The order state */
-    public final Variable<OrderState> state = Variable.of(OrderState.INIT);
-
     /** The ordered position. */
-    public final Direction side;
-
-    /** The ordered price. */
-    public final Num price = Num.ZERO;
-
-    /** The order created date-time */
-    public final Variable<ZonedDateTime> created = Variable.of(Chrono.utcNow());
+    public final Direction direction;
 
     /** The ordered size. */
     public final Num size;
 
+    /** The ordered price. */
+    public final Num price = Num.ZERO;
+
+    /** The order type */
+    public final OrderType type = OrderType.MARKET;
+
     /** The quantity conditions enforcement. */
     public final QuantityCondition condition = QuantityCondition.GoodTillCanceled;
+
+    /** The order state */
+    public final Variable<OrderState> state = Variable.of(OrderState.INIT);
+
+    /** The order created date-time */
+    public final Variable<ZonedDateTime> created = Variable.of(Chrono.utcNow());
 
     /** The executed size */
     public Num executedSize = Num.ZERO;
@@ -102,13 +102,20 @@ public class Order implements Directional {
     /**
      * Hide constructor.
      * 
-     * @param side A order direction.
+     * @param direction A order direction.
      * @param size A order size.
-     * @param price A order price.
      */
-    protected Order(Direction side, Num size) {
-        this.side = Objects.requireNonNull(side);
-        this.size = this.remainingSize = Objects.requireNonNull(size);
+    protected Order(Direction direction, Num size) {
+        if (direction == null) {
+            throw new IllegalArgumentException(Order.class.getSimpleName() + " requires direction.");
+        }
+
+        if (size == null || size.isNegativeOrZero()) {
+            throw new IllegalArgumentException(Order.class.getSimpleName() + " requires positive size.");
+        }
+
+        this.direction = direction;
+        this.size = this.remainingSize = size;
     }
 
     /**
@@ -116,7 +123,7 @@ public class Order implements Directional {
      */
     @Override
     public final Direction direction() {
-        return side;
+        return direction;
     }
 
     /**

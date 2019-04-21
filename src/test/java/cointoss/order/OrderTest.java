@@ -16,6 +16,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import cointoss.Direction;
+import cointoss.util.Num;
 
 /**
  * @version 2018/07/08 11:44:58
@@ -71,7 +72,7 @@ public class OrderTest {
     @Test
     void limit() {
         Order order = Order.of(Direction.BUY, 1).price(20);
-        assert order.side == Direction.BUY;
+        assert order.direction == Direction.BUY;
         assert order.size.is(1);
         assert order.price.is(20);
     }
@@ -79,7 +80,7 @@ public class OrderTest {
     @Test
     void market() {
         Order order = Order.of(Direction.BUY, 1);
-        assert order.side == Direction.BUY;
+        assert order.direction == Direction.BUY;
         assert order.size.is(1);
         assert order.price.is(0);
     }
@@ -130,6 +131,37 @@ public class OrderTest {
         assert result.size() == 1;
         order.state.set(OrderState.COMPLETED);
         assert result.size() == 1;
+    }
+
+    @Test
+    void direction() {
+        assert Order.buy(1).direction.isBuy();
+        assert Order.sell(1).direction.isSell();
+        assert Order.of(Direction.BUY, 1).direction.isBuy();
+        assert Order.of(Direction.SELL, 1).direction.isSell();
+
+        assertThrows(IllegalArgumentException.class, () -> Order.of(null, 1));
+    }
+
+    @Test
+    void size() {
+        assert Order.buy(1).size.is(1);
+        assert Order.buy(2.3).size.is(2.3);
+
+        assertThrows(IllegalArgumentException.class, () -> Order.buy(0));
+        assertThrows(IllegalArgumentException.class, () -> Order.buy(-1));
+        assertThrows(IllegalArgumentException.class, () -> Order.buy(null));
+    }
+
+    @Test
+    void price() {
+        assert Order.buy(1).price(1L).price.is(1);
+        assert Order.buy(1).price(2.3).price.is(2.3);
+        assert Order.buy(1).price(Num.ONE).price.is(1);
+
+        assert Order.buy(1).price(0).price.is(0);
+        assert Order.buy(1).price(-1).price.is(0);
+        assert Order.buy(1).price(null).price.is(0);
     }
 
     @Test

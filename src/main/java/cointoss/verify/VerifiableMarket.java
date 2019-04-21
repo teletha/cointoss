@@ -47,7 +47,7 @@ public class VerifiableMarket extends Market {
     /**
      * Emulate execution event.
      * 
-     * @param side
+     * @param direction
      * @param size
      * @param price
      */
@@ -58,7 +58,7 @@ public class VerifiableMarket extends Market {
     /**
      * Emulate execution event.
      * 
-     * @param side
+     * @param direction
      * @param size
      * @param price
      */
@@ -71,7 +71,7 @@ public class VerifiableMarket extends Market {
     /**
      * Emulate execution event.
      * 
-     * @param side
+     * @param direction
      * @param size
      * @param price
      */
@@ -114,10 +114,10 @@ public class VerifiableMarket extends Market {
     public void requestAndExecution(Order order) {
         request(order).to(id -> {
             Execution e = new Execution();
-            e.side = order.side;
+            e.side = order.direction;
             e.size = order.size;
             e.date = order.created.v;
-            e.price = order.price.minus(order.side, service.setting.baseCurrencyMinimumBidPrice());
+            e.price = order.price.minus(order.direction, service.setting.baseCurrencyMinimumBidPrice());
 
             execute(e);
         });
