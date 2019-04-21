@@ -87,17 +87,17 @@ public class Order implements Directional {
     /** The order created date-time */
     public final Variable<ZonedDateTime> created = Variable.of(Chrono.utcNow());
 
+    /** The execution event. */
+    public final Signal<Execution> executed = attribute(RecordedExecutions.class).additions.expose;
+
     /** The executed size */
     public final Variable<Num> executedSize = Variable.of(Num.ZERO);
 
     /** The remaining size */
-    public Num remainingSize;
+    public final Variable<Num> remainingSize = Variable.empty();
 
     /** The attribute holder. */
     private final Map<Class, Object> attributes = new ConcurrentHashMap();
-
-    /** The execution event. */
-    public final Signal<Execution> executed = attribute(RecordedExecutions.class).additions.expose;
 
     /**
      * Hide constructor.
@@ -115,7 +115,8 @@ public class Order implements Directional {
         }
 
         this.direction = direction;
-        this.size = this.remainingSize = size;
+        this.size = size;
+        this.remainingSize.set(size);
     }
 
     /**
@@ -198,15 +199,6 @@ public class Order implements Directional {
     }
 
     /**
-     * Observe when this {@link Order} will be canceled or completed.
-     * 
-     * @return A event {@link Signal}.
-     */
-    public final Signal<Order> observeTerminating() {
-        return state.observe().take(OrderState.CANCELED, OrderState.COMPLETED).take(1).mapTo(this);
-    }
-
-    /**
      * Check the order {@link OrderState}.
      * 
      * @return The result.
@@ -267,6 +259,15 @@ public class Order implements Directional {
      */
     public final <T> T attribute(Class<T> type) {
         return (T) attributes.computeIfAbsent(type, key -> I.make(type));
+    }
+
+    /**
+     * Observe when this {@link Order} will be canceled or completed.
+     * 
+     * @return A event {@link Signal}.
+     */
+    public final Signal<Order> observeTerminating() {
+        return state.observe().take(OrderState.CANCELED, OrderState.COMPLETED).take(1).mapTo(this);
     }
 
     /**

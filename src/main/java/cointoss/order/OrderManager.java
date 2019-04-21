@@ -76,7 +76,7 @@ public final class OrderManager {
                     }
 
                     order.executedSize.set(v -> v.plus(executed));
-                    order.remainingSize = order.remainingSize.minus(executed);
+                    order.remainingSize.set(v -> v.minus(executed));
 
                     if (order.remainingSize.is(Num.ZERO)) {
                         order.state.set(OrderState.COMPLETED);

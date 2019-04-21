@@ -134,7 +134,7 @@ public class VerifiableMarketService extends MarketService {
             child.id.let("LOCAL-ACCEPTANCE-" + id++);
             child.state.set(OrderState.ACTIVE);
             child.created.set(now.plusNanos(lag.generate()));
-            child.remainingSize = order.size;
+            child.remainingSize.set(order.size);
 
             orderAll.add(child);
             orderActive.add(child);
@@ -253,7 +253,7 @@ public class VerifiableMarketService extends MarketService {
 
             if (order.condition == QuantityCondition.ImmediateOrCancel) {
                 if (validateTradableByPrice(order, e)) {
-                    order.remainingSize = Num.min(e.size, order.remainingSize);
+                    order.remainingSize.set(v -> Num.min(e.size, v));
                 } else {
                     iterator.remove();
                     orderAll.remove(order);
@@ -262,7 +262,7 @@ public class VerifiableMarketService extends MarketService {
             }
 
             if (validateTradableByPrice(order, e)) {
-                Num executedSize = Num.min(e.size, order.remainingSize);
+                Num executedSize = Num.min(e.size, order.remainingSize.v);
                 if (order.type.isMarket() && executedSize.isNot(0)) {
                     order.marketMinPrice = order.isBuy() ? Num.max(order.marketMinPrice, e.price) : Num.min(order.marketMinPrice, e.price);
                     order.price(order.price.multiply(order.executedSize)
@@ -270,7 +270,7 @@ public class VerifiableMarketService extends MarketService {
                             .divide(executedSize.plus(order.executedSize)));
                 }
                 order.executedSize.set(v -> v.plus(executedSize));
-                order.remainingSize = order.remainingSize.minus(executedSize);
+                order.remainingSize.set(v -> v.minus(executedSize));
 
                 Execution exe = new Execution();
                 exe.side = order.direction();
@@ -280,7 +280,7 @@ public class VerifiableMarketService extends MarketService {
                 exe.yourOrder = order.id.v;
                 executeds.add(exe);
 
-                if (order.remainingSize.isZero()) {
+                if (order.remainingSize.v.isZero()) {
                     order.state.set(OrderState.COMPLETED);
                     iterator.remove();
                 }
