@@ -136,7 +136,7 @@ class BitFlyerService extends MarketService {
 
         if (forTest || maintainer.session() == null) {
             ChildOrderRequest request = new ChildOrderRequest();
-            request.child_order_type = order.isLimit() ? "LIMIT" : "MARKET";
+            request.child_order_type = order.type.name();
             request.minute_to_expire = 60 * 24;
             request.price = order.price.v.toInt();
             request.product_code = marketName;
@@ -148,7 +148,7 @@ class BitFlyerService extends MarketService {
         } else {
             ChildOrderRequestWebAPI request = new ChildOrderRequestWebAPI();
             request.account_id = account.accountId.v;
-            request.ord_type = order.isLimit() ? "LIMIT" : "MARKET";
+            request.ord_type = order.type.name();
             request.minute_to_expire = 60 * 24;
             request.order_ref_id = id;
             request.price = order.price.v.toInt();

@@ -197,15 +197,6 @@ public class Order implements Directional {
     }
 
     /**
-     * Detect order type.
-     * 
-     * @return
-     */
-    public final boolean isLimit() {
-        return price.v != null;
-    }
-
-    /**
      * Check the order {@link OrderState}.
      * 
      * @return The result.
