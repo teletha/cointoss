@@ -10,12 +10,10 @@
  */
 package cointoss.verify;
 
-import cointoss.Direction;
 import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.execution.Execution;
 import cointoss.order.Order;
-import cointoss.util.Num;
 
 public class VerifiableMarket extends Market {
 
@@ -49,73 +47,12 @@ public class VerifiableMarket extends Market {
     /**
      * Emulate execution event.
      * 
-     * @param time
-     * @param size
-     * @param price
-     */
-    public VerifiableMarket execute(int size, int price) {
-        return execute(Direction.random(), size, price);
-    }
-
-    /**
-     * Emulate execution event.
-     * 
-     * @param time
-     * @param size
-     * @param price
-     */
-    public VerifiableMarket execute(int size, int price, int time) {
-        return execute(Direction.random(), size, price, new TimeLag(time));
-    }
-
-    /**
-     * Emulate execution event.
-     * 
      * @param side
      * @param size
      * @param price
      */
-    public VerifiableMarket execute(Direction side, int size, int price) {
-        return execute(side, size, price, new TimeLag(0));
-    }
-
-    /**
-     * Emulate execution event.
-     * 
-     * @param side
-     * @param size
-     * @param price
-     */
-    public VerifiableMarket execute(Direction side, Num size, Num price) {
-        return execute(side, size, price, new TimeLag(0));
-    }
-
-    /**
-     * Emulate execution event.
-     * 
-     * @param side
-     * @param size
-     * @param price
-     */
-    public VerifiableMarket execute(Direction side, int size, int price, TimeLag lag) {
-        return execute(side, Num.of(size), Num.of(price), lag);
-    }
-
-    /**
-     * Emulate execution event.
-     * 
-     * @param side
-     * @param size
-     * @param price
-     */
-    public VerifiableMarket execute(Direction side, Num size, Num price, TimeLag lag) {
-        Execution e = new Execution();
-        e.side = side;
-        e.size = e.cumulativeSize = size;
-        e.price = price;
-        e.date = lag.to();
-
-        return execute(e);
+    public VerifiableMarket execute(Execution e, int lag) {
+        return execute(e, new TimeLag(lag));
     }
 
     /**
@@ -176,7 +113,13 @@ public class VerifiableMarket extends Market {
      */
     public void requestAndExecution(Order order) {
         request(order).to(id -> {
-            execute(order.side, order.size, order.price.v.minus(order.side, service.setting.baseCurrencyMinimumBidPrice()));
+            Execution e = new Execution();
+            e.side = order.side;
+            e.size = order.size;
+            e.date = order.created.v;
+            e.price = order.price.v.minus(order.side, service.setting.baseCurrencyMinimumBidPrice());
+
+            execute(e);
         });
     }
 }
