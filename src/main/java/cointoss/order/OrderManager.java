@@ -18,7 +18,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import cointoss.MarketService;
 import cointoss.execution.Execution;
-import cointoss.order.Order.Executions;
 import cointoss.util.Num;
 import kiss.I;
 import kiss.Signal;
@@ -84,7 +83,7 @@ public final class OrderManager {
                     }
 
                     // pairing order and execution
-                    order.relation(Executions.class).register(exe);
+                    order.execute(exe);
 
                     updates.accept(I.pair(order, exe));
                     return;

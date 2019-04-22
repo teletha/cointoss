@@ -26,7 +26,6 @@ import cointoss.Directional;
 import cointoss.Market;
 import cointoss.execution.Execution;
 import cointoss.order.Order;
-import cointoss.order.Order.Executions;
 import cointoss.util.Num;
 import cointoss.util.Span;
 import kiss.Disposable;
@@ -256,12 +255,6 @@ public abstract class Trader implements Disposable {
         /** The current position size. */
         private Num positionSize = Num.ZERO;
 
-        /** The remaining size of entry order. */
-        private Num entryRemaining;
-
-        /** The total size of entry order. */
-        private Num entryTotalSize = Num.ZERO;
-
         /** The total cost of entry order. */
         private Num entryCost = Num.ZERO;
 
@@ -281,7 +274,6 @@ public abstract class Trader implements Disposable {
          */
         private Entry(Order entry, Consumer<Entry> initializer) {
             this.order = entry;
-            this.entryRemaining = entry.size;
 
             // create new entry
             entries.add(this);
@@ -291,8 +283,6 @@ public abstract class Trader implements Disposable {
             market.request(order).to(o -> {
                 market.orders.updated.take(u -> u.ⅰ == o).map(Ⅱ::ⅱ).to(exe -> {
                     positionSize = positionSize.plus(exe.size);
-                    entryTotalSize = entryTotalSize.plus(exe.size);
-                    entryRemaining = entryRemaining.minus(exe.size);
                     entryCost = entryCost.plus(exe.price.multiply(exe.size));
 
                     if (o.isCompleted()) {
@@ -344,7 +334,7 @@ public abstract class Trader implements Disposable {
          * @return
          */
         public final Num entrySize() {
-            return entryTotalSize;
+            return order.executedSize.v;
         }
 
         /**
@@ -353,7 +343,7 @@ public abstract class Trader implements Disposable {
          * @return
          */
         public final Num entryPrice() {
-            return entryTotalSize.isZero() ? Num.ZERO : entryCost.divide(entryTotalSize);
+            return order.executedSize.v.isZero() ? Num.ZERO : entryCost.divide(order.executedSize);
         }
 
         /**
@@ -380,7 +370,7 @@ public abstract class Trader implements Disposable {
          * @return
          */
         public final Span orderTime() {
-            Variable<Execution> last = order.relation(Executions.class).last();
+            Variable<Execution> last = order.last();
             ZonedDateTime start = order.creationTime.get();
             ZonedDateTime finish = last.map(v -> v.date).or(market.tickers.latest.v.date);
 
@@ -396,7 +386,7 @@ public abstract class Trader implements Disposable {
          * @return
          */
         public final Span holdTime() {
-            Variable<Execution> first = order.relation(Executions.class).first();
+            Variable<Execution> first = order.first();
 
             if (first.isAbsent()) {
                 return Span.ZERO;
@@ -409,7 +399,7 @@ public abstract class Trader implements Disposable {
                 finish = market.tickers.latest.v.date;
             } else {
                 for (Order order : exit) {
-                    Variable<Execution> last = order.relation(Executions.class).last();
+                    Variable<Execution> last = order.last();
 
                     if (last.isPresent()) {
                         finish = last.v.date;
@@ -424,12 +414,12 @@ public abstract class Trader implements Disposable {
             if (finish.isBefore(start)) {
                 // If this exception will be thrown, it is bug of this program. So we must rethrow
                 // the wrapped error in here.
-                order.relation(Executions.class).all().to(e -> {
+                order.all().to(e -> {
                     System.out.println("Start Exe " + e);
                 });
 
                 for (Order o : exit) {
-                    o.relation(Executions.class).all().to(e -> {
+                    o.all().to(e -> {
                         System.out.println("Exit Exe " + e);
                     });
                 }
@@ -458,7 +448,7 @@ public abstract class Trader implements Disposable {
          * Cehck whether this position is not activated.
          */
         public final boolean isInitial() {
-            return order.size.is(entryRemaining);
+            return order.size.is(order.remainingSize);
         }
 
         /**
@@ -472,7 +462,7 @@ public abstract class Trader implements Disposable {
          * Cehck whether this position was completed.
          */
         public final boolean isCompleted() {
-            return positionSize.isZero() && entryRemaining.isZero();
+            return positionSize.isZero() && order.remainingSize.v.isZero();
         }
 
         /**

@@ -97,6 +97,12 @@ public class Order implements Directional {
     /** The relation holder. */
     private Map<Class, Object> relations;
 
+    /** The entry holder. */
+    private final LinkedList<Execution> entries = new LinkedList();
+
+    /** The exit holder. */
+    private final LinkedList<Order> exits = new LinkedList();
+
     /**
      * Hide constructor.
      * 
@@ -285,6 +291,43 @@ public class Order implements Directional {
     }
 
     /**
+     * Register entry or exit execution.
+     */
+    final void execute(Execution execution) {
+        entries.add(execution);
+    }
+
+    /**
+     * Retrieve first {@link Execution}.
+     * 
+     * @return
+     */
+    @Deprecated
+    public Variable<Execution> first() {
+        return Variable.of(entries.peekFirst());
+    }
+
+    /**
+     * Retrieve last {@link Execution}.
+     * 
+     * @return
+     */
+    @Deprecated
+    public Variable<Execution> last() {
+        return Variable.of(entries.peekLast());
+    }
+
+    /**
+     * Retrieve all {@link Execution}s.
+     * 
+     * @return
+     */
+    @Deprecated
+    public Signal<Execution> all() {
+        return I.signal(entries);
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -399,53 +442,6 @@ public class Order implements Directional {
      */
     public static Order of(Direction direction, Num size) {
         return new Order(direction, size);
-    }
-
-    /**
-     * Order related execution holder.
-     */
-    public static class Executions {
-
-        /** The actual holder. */
-        private final LinkedList<Execution> items = new LinkedList();
-
-        /**
-         * Rgister the specified {@link Execution}.
-         * 
-         * @param execution An {@link Execution} to register.
-         */
-        public void register(Execution execution) {
-            if (execution != null) {
-                items.add(execution);
-            }
-        }
-
-        /**
-         * Retrieve first {@link Execution}.
-         * 
-         * @return
-         */
-        public Variable<Execution> first() {
-            return Variable.of(items.peekFirst());
-        }
-
-        /**
-         * Retrieve last {@link Execution}.
-         * 
-         * @return
-         */
-        public Variable<Execution> last() {
-            return Variable.of(items.peekLast());
-        }
-
-        /**
-         * Retrieve all {@link Execution}s.
-         * 
-         * @return
-         */
-        public Signal<Execution> all() {
-            return I.signal(items);
-        }
     }
 
     /**
