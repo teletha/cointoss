@@ -116,7 +116,7 @@ public class VerifiableMarket extends Market {
             Execution e = new Execution();
             e.side = order.direction;
             e.size = order.size;
-            e.date = order.requested.v;
+            e.date = order.creationTime.v;
             e.price = order.price.minus(order.direction, service.setting.baseCurrencyMinimumBidPrice());
 
             execute(e);

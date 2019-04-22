@@ -133,7 +133,7 @@ public class VerifiableMarketService extends MarketService {
             BackendOrder child = new BackendOrder(order);
             child.id.let("LOCAL-ACCEPTANCE-" + id++);
             child.state.set(OrderState.ACTIVE);
-            child.requested.set(now.plusNanos(lag.generate()));
+            child.creationTime.set(now.plusNanos(lag.generate()));
             child.remainingSize.set(order.size);
 
             orderAll.add(child);
@@ -240,7 +240,7 @@ public class VerifiableMarketService extends MarketService {
             BackendOrder order = iterator.next();
 
             // time base filter
-            if (e.date.isBefore(order.requested.get())) {
+            if (e.date.isBefore(order.creationTime.get())) {
                 continue;
             }
 

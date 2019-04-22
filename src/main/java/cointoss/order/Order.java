@@ -13,6 +13,7 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.time.ZonedDateTime;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -24,6 +25,7 @@ import cointoss.util.Chrono;
 import cointoss.util.Num;
 import kiss.I;
 import kiss.Signal;
+import kiss.Signaling;
 import kiss.Variable;
 
 /**
@@ -85,13 +87,13 @@ public class Order implements Directional {
     public final Variable<OrderState> state = Variable.of(OrderState.INIT);
 
     /** The requested time of this {@link Order}. */
-    public final Variable<ZonedDateTime> requested = Variable.of(Chrono.utcNow());
+    public final Variable<ZonedDateTime> creationTime = Variable.of(Chrono.utcNow());
 
     /** The terminated time of this {@link Order}. */
-    public final Variable<ZonedDateTime> terminated = Variable.empty();
+    public final Variable<ZonedDateTime> terminationTime = Variable.empty();
 
     /** The execution event. */
-    public final Signal<Execution> executed = attribute(RecordedExecutions.class).additions.expose;
+    public final Signal<Execution> executed = attribute(Relations.class).s.expose;
 
     /** The executed size */
     public final Variable<Num> executedSize = Variable.of(Num.ZERO);
@@ -100,7 +102,7 @@ public class Order implements Directional {
     public final Variable<Num> remainingSize = Variable.empty();
 
     /** The attribute holder. */
-    private final Map<Class, Object> attributes = new ConcurrentHashMap();
+    private Map<Class, Object> attributes;
 
     /**
      * Hide constructor.
@@ -261,6 +263,9 @@ public class Order implements Directional {
      * @param type A attribute type.
      */
     public final <T> T attribute(Class<T> type) {
+        if (attributes == null) {
+            attributes = new ConcurrentHashMap();
+        }
         return (T) attributes.computeIfAbsent(type, key -> I.make(type));
     }
 
@@ -294,7 +299,7 @@ public class Order implements Directional {
      */
     @Override
     public String toString() {
-        return direction().mark() + size + "@" + price + " 残" + remainingSize + " 済" + executedSize + " " + requested;
+        return direction().mark() + size + "@" + price + " 残" + remainingSize + " 済" + executedSize + " " + creationTime;
     }
 
     /**
@@ -388,5 +393,55 @@ public class Order implements Directional {
      */
     public static Order of(Direction direction, Num size) {
         return new Order(direction, size);
+    }
+
+    /**
+     * Order related execution holder.
+     */
+    public static class Relations {
+
+        /** The actual holder. */
+        private final LinkedList<Execution> items = new LinkedList();
+
+        private final Signaling<Execution> s = new Signaling();
+
+        /**
+         * Rgister the specified {@link Execution}.
+         * 
+         * @param execution An {@link Execution} to register.
+         */
+        public void register(Execution execution) {
+            if (execution != null) {
+                items.add(execution);
+                s.accept(execution);
+            }
+        }
+
+        /**
+         * Retrieve first {@link Execution}.
+         * 
+         * @return
+         */
+        public Variable<Execution> first() {
+            return Variable.of(items.peekFirst());
+        }
+
+        /**
+         * Retrieve last {@link Execution}.
+         * 
+         * @return
+         */
+        public Variable<Execution> last() {
+            return Variable.of(items.peekLast());
+        }
+
+        /**
+         * Retrieve all {@link Execution}s.
+         * 
+         * @return
+         */
+        public Signal<Execution> all() {
+            return I.signal(items);
+        }
     }
 }

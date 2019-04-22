@@ -18,6 +18,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import cointoss.MarketService;
 import cointoss.execution.Execution;
+import cointoss.order.Order.Relations;
 import cointoss.util.Num;
 import kiss.I;
 import kiss.Signal;
@@ -83,7 +84,7 @@ public final class OrderManager {
                     }
 
                     // pairing order and execution
-                    order.attribute(RecordedExecutions.class).record(exe);
+                    order.attribute(Relations.class).register(exe);
 
                     updates.accept(I.pair(order, exe));
                     return;
@@ -106,7 +107,7 @@ public final class OrderManager {
 
         return service.request(order).retryWhen(service.setting.retryPolicy()).map(id -> {
             order.id.let(id);
-            order.requested.set(ZonedDateTime.now());
+            order.creationTime.set(ZonedDateTime.now());
             order.state.set(ACTIVE);
             order.observeTerminating().to(remove::accept);
 

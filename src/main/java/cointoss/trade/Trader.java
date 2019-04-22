@@ -26,12 +26,13 @@ import cointoss.Directional;
 import cointoss.Market;
 import cointoss.execution.Execution;
 import cointoss.order.Order;
-import cointoss.order.RecordedExecutions;
+import cointoss.order.Order.Relations;
 import cointoss.util.Num;
 import cointoss.util.Span;
 import kiss.Disposable;
 import kiss.Signal;
 import kiss.Signaling;
+import kiss.Variable;
 
 /**
  * @version 2017/09/05 19:39:34
@@ -378,9 +379,9 @@ public abstract class Trader implements Disposable {
          * @return
          */
         public final Span orderTime() {
-            Execution last = order.attribute(RecordedExecutions.class).peekLast();
-            ZonedDateTime start = order.requested.get();
-            ZonedDateTime finish = last == null ? market.tickers.latest.v.date : last.date;
+            Variable<Execution> last = order.attribute(Relations.class).last();
+            ZonedDateTime start = order.creationTime.get();
+            ZonedDateTime finish = last.map(v -> v.date).or(market.tickers.latest.v.date);
 
             if (start.isBefore(finish)) {
                 finish = market.tickers.latest.v.date;
@@ -394,23 +395,23 @@ public abstract class Trader implements Disposable {
          * @return
          */
         public final Span holdTime() {
-            Execution first = order.attribute(RecordedExecutions.class).peekFirst();
+            Variable<Execution> first = order.attribute(Relations.class).first();
 
-            if (first == null) {
+            if (first.isAbsent()) {
                 return Span.ZERO;
             }
 
-            ZonedDateTime start = first.date;
+            ZonedDateTime start = first.v.date;
             ZonedDateTime finish = start;
 
             if (isActive()) {
                 finish = market.tickers.latest.v.date;
             } else {
                 for (Order order : exit) {
-                    Execution last = order.attribute(RecordedExecutions.class).peekLast();
+                    Variable<Execution> last = order.attribute(Relations.class).last();
 
-                    if (last != null) {
-                        finish = last.date;
+                    if (last.isPresent()) {
+                        finish = last.v.date;
                     }
                 }
             }
@@ -422,14 +423,14 @@ public abstract class Trader implements Disposable {
             if (finish.isBefore(start)) {
                 // If this exception will be thrown, it is bug of this program. So we must rethrow
                 // the wrapped error in here.
-                for (Execution e : order.attribute(RecordedExecutions.class)) {
+                order.attribute(Relations.class).all().to(e -> {
                     System.out.println("Start Exe " + e);
-                }
+                });
 
                 for (Order o : exit) {
-                    for (Execution e : o.attribute(RecordedExecutions.class)) {
+                    o.attribute(Relations.class).all().to(e -> {
                         System.out.println("Exit Exe " + e);
-                    }
+                    });
                 }
 
                 throw new Error(finish + "   " + start);
