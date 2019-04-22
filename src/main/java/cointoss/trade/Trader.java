@@ -26,13 +26,14 @@ import cointoss.Directional;
 import cointoss.Market;
 import cointoss.execution.Execution;
 import cointoss.order.Order;
-import cointoss.order.Order.Relations;
+import cointoss.order.Order.Executions;
 import cointoss.util.Num;
 import cointoss.util.Span;
 import kiss.Disposable;
 import kiss.Signal;
 import kiss.Signaling;
 import kiss.Variable;
+import kiss.Ⅱ;
 
 /**
  * @version 2017/09/05 19:39:34
@@ -288,7 +289,7 @@ public abstract class Trader implements Disposable {
 
             // request order
             market.request(order).to(o -> {
-                o.executed.to(exe -> {
+                market.orders.updated.take(u -> u.ⅰ == o).map(Ⅱ::ⅱ).to(exe -> {
                     positionSize = positionSize.plus(exe.size);
                     entryTotalSize = entryTotalSize.plus(exe.size);
                     entryRemaining = entryRemaining.minus(exe.size);
@@ -379,7 +380,7 @@ public abstract class Trader implements Disposable {
          * @return
          */
         public final Span orderTime() {
-            Variable<Execution> last = order.attribute(Relations.class).last();
+            Variable<Execution> last = order.relation(Executions.class).last();
             ZonedDateTime start = order.creationTime.get();
             ZonedDateTime finish = last.map(v -> v.date).or(market.tickers.latest.v.date);
 
@@ -395,7 +396,7 @@ public abstract class Trader implements Disposable {
          * @return
          */
         public final Span holdTime() {
-            Variable<Execution> first = order.attribute(Relations.class).first();
+            Variable<Execution> first = order.relation(Executions.class).first();
 
             if (first.isAbsent()) {
                 return Span.ZERO;
@@ -408,7 +409,7 @@ public abstract class Trader implements Disposable {
                 finish = market.tickers.latest.v.date;
             } else {
                 for (Order order : exit) {
-                    Variable<Execution> last = order.attribute(Relations.class).last();
+                    Variable<Execution> last = order.relation(Executions.class).last();
 
                     if (last.isPresent()) {
                         finish = last.v.date;
@@ -423,12 +424,12 @@ public abstract class Trader implements Disposable {
             if (finish.isBefore(start)) {
                 // If this exception will be thrown, it is bug of this program. So we must rethrow
                 // the wrapped error in here.
-                order.attribute(Relations.class).all().to(e -> {
+                order.relation(Executions.class).all().to(e -> {
                     System.out.println("Start Exe " + e);
                 });
 
                 for (Order o : exit) {
-                    o.attribute(Relations.class).all().to(e -> {
+                    o.relation(Executions.class).all().to(e -> {
                         System.out.println("Exit Exe " + e);
                     });
                 }
@@ -556,7 +557,7 @@ public abstract class Trader implements Disposable {
             market.request(order).to(o -> {
                 exit.add(o);
 
-                o.executed.to(exe -> {
+                market.orders.updated.take(u -> u.ⅰ == o).map(Ⅱ::ⅱ).to(exe -> {
                     positionSize = positionSize.minus(exe.size);
                     exitTotalSize = exitTotalSize.plus(exe.size);
                     exitRemaining = exitRemaining.minus(exe.size);

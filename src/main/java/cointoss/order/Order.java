@@ -25,12 +25,8 @@ import cointoss.util.Chrono;
 import cointoss.util.Num;
 import kiss.I;
 import kiss.Signal;
-import kiss.Signaling;
 import kiss.Variable;
 
-/**
- * @version 2018/07/09 10:33:17
- */
 public class Order implements Directional {
 
     /** The updater. */
@@ -92,17 +88,14 @@ public class Order implements Directional {
     /** The terminated time of this {@link Order}. */
     public final Variable<ZonedDateTime> terminationTime = Variable.empty();
 
-    /** The execution event. */
-    public final Signal<Execution> executed = attribute(Relations.class).s.expose;
-
     /** The executed size */
     public final Variable<Num> executedSize = Variable.of(Num.ZERO);
 
     /** The remaining size */
     public final Variable<Num> remainingSize = Variable.empty();
 
-    /** The attribute holder. */
-    private Map<Class, Object> attributes;
+    /** The relation holder. */
+    private Map<Class, Object> relations;
 
     /**
      * Hide constructor.
@@ -258,15 +251,15 @@ public class Order implements Directional {
     }
 
     /**
-     * Retrieve the attribute by the specified type.
+     * Retrieve the relation by type.
      * 
-     * @param type A attribute type.
+     * @param type A relation type.
      */
-    public final <T> T attribute(Class<T> type) {
-        if (attributes == null) {
-            attributes = new ConcurrentHashMap();
+    public final <T> T relation(Class<T> type) {
+        if (relations == null) {
+            relations = new ConcurrentHashMap();
         }
-        return (T) attributes.computeIfAbsent(type, key -> I.make(type));
+        return (T) relations.computeIfAbsent(type, key -> I.make(type));
     }
 
     /**
@@ -398,12 +391,10 @@ public class Order implements Directional {
     /**
      * Order related execution holder.
      */
-    public static class Relations {
+    public static class Executions {
 
         /** The actual holder. */
         private final LinkedList<Execution> items = new LinkedList();
-
-        private final Signaling<Execution> s = new Signaling();
 
         /**
          * Rgister the specified {@link Execution}.
@@ -413,7 +404,6 @@ public class Order implements Directional {
         public void register(Execution execution) {
             if (execution != null) {
                 items.add(execution);
-                s.accept(execution);
             }
         }
 

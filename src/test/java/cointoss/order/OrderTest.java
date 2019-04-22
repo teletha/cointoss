@@ -53,7 +53,7 @@ public class OrderTest {
     @Test
     void attribute() {
         Order order = Order.buy(1).price(10);
-        Attribute attribute = order.attribute(Attribute.class);
+        Attribute attribute = order.relation(Attribute.class);
         assert attribute != null;
         assert attribute.id == null;
     }
@@ -62,7 +62,7 @@ public class OrderTest {
     void attributeNull() {
         Order order = Order.buy(1).price(10);
 
-        assertThrows(NullPointerException.class, () -> order.attribute(null));
+        assertThrows(NullPointerException.class, () -> order.relation(null));
     }
 
     private static class Attribute {

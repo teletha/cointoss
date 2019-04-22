@@ -175,7 +175,7 @@ class BitFlyerService extends MarketService {
                     .take(1)
                     .to(o -> {
                         order.state.set(ACTIVE);
-                        order.attribute(Internals.class).id = o.attribute(Internals.class).id;
+                        order.relation(Internals.class).id = o.relation(Internals.class).id;
                     });
         });
     }
@@ -188,7 +188,7 @@ class BitFlyerService extends MarketService {
         CancelRequest cancel = new CancelRequest();
         cancel.product_code = marketName;
         cancel.account_id = account.accountId.v;
-        cancel.order_id = order.attribute(Internals.class).id;
+        cancel.order_id = order.relation(Internals.class).id;
         cancel.child_order_acceptance_id = order.id.v;
 
         Signal requestCancel = forTest || maintainer.session() == null || cancel.order_id == null
@@ -562,7 +562,7 @@ class BitFlyerService extends MarketService {
             o.executedSize.set(executed_size);
             o.creationTime.set(LocalDateTime.parse(child_order_date, Chrono.DateTimeWithT).atZone(Chrono.UTC));
             o.state.set(child_order_state);
-            o.attribute(Internals.class).id = child_order_id;
+            o.relation(Internals.class).id = child_order_id;
 
             return o;
         }
