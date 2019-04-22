@@ -263,6 +263,19 @@ public class Order implements Directional {
     }
 
     /**
+     * Write log.
+     * 
+     * @param comment
+     * @return
+     */
+    public final Order log(String comment) {
+        if (comment != null && !comment.isEmpty()) {
+            relation(Log.class).items.add(comment);
+        }
+        return this;
+    }
+
+    /**
      * Observe when this {@link Order} will be canceled or completed.
      * 
      * @return A event {@link Signal}.
@@ -433,5 +446,14 @@ public class Order implements Directional {
         public Signal<Execution> all() {
             return I.signal(items);
         }
+    }
+
+    /**
+     * Log for {@link Order}.
+     */
+    private static class Log {
+
+        /** The actual log. */
+        private final LinkedList<String> items = new LinkedList();
     }
 }
