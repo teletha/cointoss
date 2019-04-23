@@ -21,6 +21,7 @@ import cointoss.util.Network;
 import cointoss.util.Num;
 import kiss.Disposable;
 import kiss.Signal;
+import kiss.Ⅲ;
 
 /**
  * @version 2018/08/05 0:47:38
@@ -108,7 +109,7 @@ public abstract class MarketService implements Disposable {
      * 
      * @return A event stream of execution log related to my orders.
      */
-    public abstract Signal<Execution> executionsRealtimelyForMe();
+    public abstract Signal<Ⅲ<Direction, String, Execution>> executionsRealtimelyForMe();
 
     /**
      * Acquier the latest execution log.

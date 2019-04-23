@@ -15,6 +15,7 @@ import java.util.LinkedList;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import cointoss.Direction;
 import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.execution.Execution;
@@ -29,6 +30,7 @@ import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
 import kiss.Signaling;
+import kiss.Ⅲ;
 
 /**
  * @version 2018/09/18 20:37:42
@@ -48,7 +50,7 @@ public class VerifiableMarketService extends MarketService {
     private final ConcurrentLinkedQueue<BackendOrder> orderAll = new ConcurrentLinkedQueue<>();
 
     /** The order manager. */
-    private final Signaling<Execution> positions = new Signaling();
+    private final Signaling<Ⅲ<Direction, String, Execution>> positions = new Signaling();
 
     /** The execution manager. */
     private final LinkedList<Execution> executeds = new LinkedList();
@@ -170,7 +172,7 @@ public class VerifiableMarketService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Execution> executionsRealtimelyForMe() {
+    public Signal<Ⅲ<Direction, String, Execution>> executionsRealtimelyForMe() {
         return positions.expose;
     }
 
@@ -284,7 +286,7 @@ public class VerifiableMarketService extends MarketService {
                     order.state.set(OrderState.COMPLETED);
                     iterator.remove();
                 }
-                positions.accept(exe);
+                positions.accept(I.pair(exe.side, order.id.v, exe));
 
                 // replace execution info
                 e.side = exe.side;

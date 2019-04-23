@@ -13,14 +13,15 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import cointoss.Direction;
 import cointoss.Directional;
 import cointoss.MarketService;
 import cointoss.execution.Execution;
-import cointoss.Direction;
 import cointoss.util.Num;
 import kiss.Signal;
 import kiss.Signaling;
 import kiss.Variable;
+import kiss.Ⅲ;
 
 /**
  * @version 2018/04/26 18:11:34
@@ -66,7 +67,7 @@ public final class PositionManager implements Directional {
         this.latest = latest == null ? Variable.of(Execution.BASE) : latest;
         this.latest.observe().to(this::calculateProfit);
 
-        service.add(service.executionsRealtimelyForMe().to(this::add));
+        service.add(service.executionsRealtimelyForMe().map(Ⅲ::ⅲ).to(this::add));
     }
 
     /**

@@ -64,9 +64,10 @@ public final class OrderManager {
         added.to(managed::add);
         removed.to(managed::remove);
 
-        service.add(service.executionsRealtimelyForMe().to(exe -> {
+        service.add(service.executionsRealtimelyForMe().to(v -> {
             for (Order order : managed) {
-                if (order.id.is(exe.yourOrder)) {
+                if (order.id.is(v.ⅱ)) {
+                    Execution exe = v.ⅲ;
                     Num executed = exe.size;
 
                     if (order.type.isMarket() && executed.isNot(0)) {
@@ -75,8 +76,8 @@ public final class OrderManager {
                                 .divide(executed.plus(order.executedSize)));
                     }
 
-                    order.executedSize.set(v -> v.plus(executed));
-                    order.remainingSize.set(v -> v.minus(executed));
+                    order.executedSize.set(s -> s.plus(executed));
+                    order.remainingSize.set(s -> s.minus(executed));
 
                     if (order.remainingSize.is(Num.ZERO)) {
                         order.state.set(OrderState.COMPLETED);

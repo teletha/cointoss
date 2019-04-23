@@ -249,9 +249,6 @@ public abstract class Trader implements Disposable {
         /** The list exit orders. */
         final List<Order> exit = new ArrayList<>();
 
-        /** The detail log. */
-        final List<String> logs = new ArrayList();
-
         /** The current position size. */
         private Num positionSize = Num.ZERO;
 
@@ -326,15 +323,6 @@ public abstract class Trader implements Disposable {
                 down = exitCost.plus(positionSize.multiply(market.tickers.latest.v.price));
             }
             return up.minus(down);
-        }
-
-        /**
-         * Calculate total executed entry size.
-         * 
-         * @return
-         */
-        public final Num entrySize() {
-            return order.executedSize.v;
         }
 
         /**
@@ -567,18 +555,6 @@ public abstract class Trader implements Disposable {
         }
 
         /**
-         * <p>
-         * Write detail log.
-         * </p>
-         * 
-         * @param message
-         * @param params
-         */
-        public void log(String message, Object... params) {
-            logs.add(String.format(message, params));
-        }
-
-        /**
          * {@inheritDoc}
          */
         @Override
@@ -591,7 +567,7 @@ public abstract class Trader implements Disposable {
                     .append("\t")
                     .append(exitSize())
                     .append("/")
-                    .append(entrySize())
+                    .append(order.executedSize)
                     .append("@")
                     .append(direction().mark())
                     .append(entryPrice().asJPY(1))

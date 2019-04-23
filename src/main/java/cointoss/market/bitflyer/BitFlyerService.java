@@ -47,6 +47,7 @@ import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
 import kiss.Signaling;
+import kiss.Ⅲ;
 import marionette.browser.Browser;
 import okhttp3.MediaType;
 import okhttp3.Request;
@@ -82,7 +83,7 @@ class BitFlyerService extends MarketService {
     private final Set<String> orders = ConcurrentHashMap.newKeySet();
 
     /** The event stream of execution log for me. */
-    private final Signaling<Execution> executionsForMe = new Signaling();
+    private final Signaling<Ⅲ<Direction, String, Execution>> executionsForMe = new Signaling();
 
     /** Flag for test. */
     private final boolean forTest;
@@ -232,23 +233,9 @@ class BitFlyerService extends MarketService {
                     String seller = exe.sell_child_order_acceptance_id = e.get("sell_child_order_acceptance_id").getAsString();
 
                     if (orders.contains(buyer)) {
-                        Execution position = new Execution();
-                        position.side = Direction.BUY;
-                        position.date = exe.exec_date;
-                        position.price = exe.price;
-                        position.size = exe.size;
-                        position.yourOrder = buyer;
-
-                        executionsForMe.accept(position);
+                        executionsForMe.accept(I.pair(Direction.BUY, buyer, exe));
                     } else if (orders.contains(seller)) {
-                        Execution position = new Execution();
-                        position.side = Direction.SELL;
-                        position.date = exe.exec_date;
-                        position.price = exe.price;
-                        position.size = exe.size;
-                        position.yourOrder = seller;
-
-                        executionsForMe.accept(position);
+                        executionsForMe.accept(I.pair(Direction.SELL, seller, exe));
                     }
 
                     return exe;
@@ -261,7 +248,7 @@ class BitFlyerService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Execution> executionsRealtimelyForMe() {
+    public Signal<Ⅲ<Direction, String, Execution>> executionsRealtimelyForMe() {
         return executionsForMe.expose;
     }
 

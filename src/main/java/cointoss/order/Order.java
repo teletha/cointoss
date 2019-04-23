@@ -282,6 +282,16 @@ public class Order implements Directional {
     }
 
     /**
+     * Write log.
+     * 
+     * @param comment
+     * @param params
+     */
+    public void log(String comment, Object... params) {
+        log(String.format(comment, params));
+    }
+
+    /**
      * Observe when this {@link Order} will be canceled or completed.
      * 
      * @return A event {@link Signal}.

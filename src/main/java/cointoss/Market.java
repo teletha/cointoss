@@ -111,17 +111,18 @@ public class Market implements Disposable {
 
         readOrderBook();
 
-        service.add(service.executionsRealtimelyForMe()
-                .to(e -> {
-                    // update assets
-                    if (e.isBuy()) {
-                        baseCurrency.set(value -> value.minus(e.size.multiply(e.price)));
-                        targetCurrency.set(value -> value.plus(e.size));
-                    } else {
-                        baseCurrency.set(value -> value.plus(e.size.multiply(e.price)));
-                        targetCurrency.set(value -> value.minus(e.size));
-                    }
-                }));
+        service.add(service.executionsRealtimelyForMe().to(v -> {
+            Execution e = v.ⅲ;
+
+            // update assets
+            if (e.isBuy()) {
+                baseCurrency.set(value -> value.minus(e.size.multiply(e.price)));
+                targetCurrency.set(value -> value.plus(e.size));
+            } else {
+                baseCurrency.set(value -> value.plus(e.size.multiply(e.price)));
+                targetCurrency.set(value -> value.minus(e.size));
+            }
+        }));
     }
 
     /**
