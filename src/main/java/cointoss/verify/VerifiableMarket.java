@@ -111,7 +111,7 @@ public class VerifiableMarket extends Market {
      * 
      * @param limitShort
      */
-    public void requestAndExecution(Order order) {
+    public void requestThenExecute(Order order) {
         request(order).to(id -> {
             Execution e = new Execution();
             e.side = order.direction;

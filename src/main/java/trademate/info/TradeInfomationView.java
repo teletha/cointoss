@@ -11,12 +11,7 @@ package trademate.info;
 
 import static transcript.Transcript.en;
 
-import cointoss.Direction;
-import cointoss.order.Order;
-import cointoss.order.OrderBook;
-import cointoss.position.Position;
 import cointoss.position.PositionManager;
-import cointoss.util.Num;
 import stylist.Style;
 import stylist.StyleDSL;
 import trademate.TradingView;
@@ -24,7 +19,6 @@ import viewtify.ui.UI;
 import viewtify.ui.UIButton;
 import viewtify.ui.UILabel;
 import viewtify.ui.View;
-import viewtify.ui.helper.User;
 
 /**
  * @version 2018/09/08 18:33:32
@@ -82,29 +76,6 @@ public class TradeInfomationView extends View {
         positionSize.text(manager.size);
         positionPrice.text(manager.price);
         positionProfit.text(manager.profit);
-
-        add.text("ADD").when(User.Action).to(() -> {
-            Position position = new Position();
-            position.price = Num.of(10000);
-            position.size.set(Num.of(1));
-            position.side = Direction.BUY;
-            System.out.println("add position");
-
-            manager.add(position);
-        });
-    }
-
-    /**
-     * Request exit order.
-     * 
-     * @param position
-     */
-    @SuppressWarnings("unused")
-    private void retreat(Position position) {
-        OrderBook book = view.market().orderBook.bookFor(position.inverse());
-        Num price = book.computeBestPrice(Num.ZERO, Num.TWO);
-
-        view.order(Order.of(position.inverse(), position.size.v).price(price));
     }
 
     /**
