@@ -94,6 +94,9 @@ public class Order implements Directional {
     /** The remaining size */
     public final Variable<Num> remainingSize = Variable.empty();
 
+    /** The total cost. */
+    public final Variable<Num> cost = Variable.of(Num.ZERO);
+
     /** The relation holder. */
     private Map<Class, Object> relations;
 
