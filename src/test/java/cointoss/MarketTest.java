@@ -44,26 +44,26 @@ class MarketTest {
         assert market.targetCurrency.is(Num.of(0));
 
         // matching order
-        market.requestThenExecute(Order.buy(1).price(10));
+        market.requestAndExecution(Order.buy(1).price(10));
         assert market.initialBaseCurrency.is(100);
         assert market.baseCurrency.is(Num.of(90));
         assert market.initialTargetCurrency.is(0);
         assert market.targetCurrency.is(Num.of(1));
 
-        market.requestThenExecute(Order.buy(2).price(20));
+        market.requestAndExecution(Order.buy(2).price(20));
         assert market.initialBaseCurrency.is(100);
         assert market.baseCurrency.is(Num.of(50));
         assert market.initialTargetCurrency.is(0);
         assert market.targetCurrency.is(Num.of(3));
 
         // exit
-        market.requestThenExecute(Order.sell(1).price(20));
+        market.requestAndExecution(Order.sell(1).price(20));
         assert market.initialBaseCurrency.is(100);
         assert market.baseCurrency.is(Num.of(70));
         assert market.initialTargetCurrency.is(0);
         assert market.targetCurrency.is(Num.of(2));
 
-        market.requestThenExecute(Order.sell(2).price(10));
+        market.requestAndExecution(Order.sell(2).price(10));
         assert market.initialBaseCurrency.is(100);
         assert market.baseCurrency.is(Num.of(90));
         assert market.initialTargetCurrency.is(0);

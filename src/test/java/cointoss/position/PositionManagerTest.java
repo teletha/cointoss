@@ -9,6 +9,8 @@
  */
 package cointoss.position;
 
+import java.util.List;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -180,5 +182,55 @@ class PositionManagerTest {
         assert positions.size.is(Num.of(1));
         positions.add(Executed.sell(1).price(10));
         assert positions.size.is(Num.of(2));
+    }
+
+    @Test
+    void added() {
+        List<Position> added = positions.added.toList();
+        assert added.size() == 0;
+
+        positions.add(Executed.buy(1).price(10));
+        assert added.size() == 1;
+
+        // same price
+        positions.add(Executed.buy(1).price(10));
+        assert added.size() == 1;
+
+        // difference price
+        positions.add(Executed.buy(1).price(30));
+        assert added.size() == 2;
+
+        // exit partially
+        positions.add(Executed.sell(2).price(40));
+        assert added.size() == 2;
+
+        // exit overflow
+        positions.add(Executed.sell(2).price(50));
+        assert added.size() == 3;
+    }
+
+    @Test
+    void removed() {
+        List<Position> removed = positions.removed.toList();
+        assert removed.size() == 0;
+
+        positions.add(Executed.buy(1).price(10));
+        assert removed.size() == 0;
+
+        // same price
+        positions.add(Executed.buy(1).price(10));
+        assert removed.size() == 0;
+
+        // difference price
+        positions.add(Executed.buy(1).price(30));
+        assert removed.size() == 0;
+
+        // exit partially
+        positions.add(Executed.sell(2).price(40));
+        assert removed.size() == 1;
+
+        // exit overflow
+        positions.add(Executed.sell(2).price(50));
+        assert removed.size() == 2;
     }
 }

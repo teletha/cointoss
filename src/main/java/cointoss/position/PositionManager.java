@@ -9,39 +9,65 @@
  */
 package cointoss.position;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+
 import cointoss.Direction;
+import cointoss.Directional;
 import cointoss.MarketService;
 import cointoss.execution.Execution;
 import cointoss.util.Num;
+import kiss.Signal;
+import kiss.Signaling;
 import kiss.Variable;
+import kiss.Ⅲ;
 
-public final class PositionManager {
+/**
+ * @version 2018/04/26 18:11:34
+ */
+public final class PositionManager implements Directional {
 
-    private final Variable<Num> amount = Variable.of(Num.ZERO);
+    /** The actual position manager. */
+    private final List<Position> positions = new CopyOnWriteArrayList();
+
+    /** The unmodifiable open positions. */
+    public final List<Position> items = Collections.unmodifiableList(positions);
+
+    /** position remove event. */
+    private final Signaling<Position> remove = new Signaling();
+
+    /** position remove event. */
+    public final Signal<Position> removed = remove.expose;
+
+    /** position add event. */
+    private final Signaling<Position> addition = new Signaling();
+
+    /** position add event. */
+    public final Signal<Position> added = addition.expose;
 
     /** The total size. */
-    public final Variable<Num> size = amount.observeNow().map(Num::abs).to();
-
-    private final Variable<Num> cost = Variable.of(Num.ZERO);
+    public final Variable<Num> size = Variable.of(Num.ZERO);
 
     /** The average price. */
-    public final Variable<Num> price = cost.observeNow()
-            .combineLatest(amount.observeNow())
-            .map(v -> v.ⅱ.isZero() ? Num.ZERO : v.ⅰ.divide(v.ⅱ))
-            .to();
+    public final Variable<Num> price = Variable.of(Num.ZERO);
 
     /** The total profit and loss. */
-    public final Variable<Num> profit;
+    public final Variable<Num> profit = Variable.of(Num.ZERO);
+
+    /** The latest market price. */
+    private final Variable<Execution> latest;
 
     /**
-     * Manage position.
+     * Manage {@link Position}.
      * 
      * @param latest A latest market {@link Execution} holder.
      */
     public PositionManager(MarketService service, Variable<Execution> latest) {
-        this.profit = price.observeNow().combineLatest(latest.observeNow()).map(v -> v.ⅱ.price.minus(v.ⅰ).multiply(size)).to();
+        this.latest = latest == null ? Variable.of(Execution.BASE) : latest;
+        this.latest.observe().to(this::calculateProfit);
 
-        service.add(service.executionsRealtimelyForMe().to(v -> add(v.ⅰ, v.ⅲ)));
+        service.add(service.executionsRealtimelyForMe().map(Ⅲ::ⅲ).to(this::add));
     }
 
     /**
@@ -50,7 +76,7 @@ public final class PositionManager {
      * @return A result.
      */
     public boolean hasPosition() {
-        return amount.v.isNotZero();
+        return positions.isEmpty() == false;
     }
 
     /**
@@ -59,7 +85,7 @@ public final class PositionManager {
      * @return A result.
      */
     public boolean hasNoPosition() {
-        return amount.v.isZero();
+        return positions.isEmpty() == true;
     }
 
     /**
@@ -68,7 +94,7 @@ public final class PositionManager {
      * @return
      */
     public boolean isLong() {
-        return amount.v.isPositive();
+        return hasPosition() && positions.get(0).isBuy();
     }
 
     /**
@@ -77,11 +103,28 @@ public final class PositionManager {
      * @return
      */
     public boolean isShort() {
-        return amount.v.isNegative();
+        return hasPosition() && positions.get(0).isSell();
     }
 
-    void add(Execution e) {
-        add(e.side, e);
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Direction direction() {
+        return isLong() ? Direction.BUY : Direction.SELL;
+    }
+
+    /**
+     * Add {@link Position} manually.
+     * 
+     * @param position
+     */
+    public void add(Position position) {
+        if (position != null) {
+            positions.add(position);
+            addition.accept(position);
+            calculate();
+        }
     }
 
     /**
@@ -94,8 +137,87 @@ public final class PositionManager {
      * 
      * @param exe A my execution.
      */
-    void add(Direction direction, Execution e) {
-        amount.set(v -> v.plus(direction, e.size));
-        cost.set(v -> v.plus(direction, e.size.multiply(e.price)));
+    void add(Execution e) {
+        if (e != null) {
+            Num size = e.size;
+
+            for (Position position : positions) {
+                if (position.side == e.side) {
+                    // check same price position
+                    if (position.price.is(e.price)) {
+                        position.size.set(size::plus);
+                        calculate();
+                        return;
+                    }
+                } else {
+                    Num remaining = size.minus(position.size);
+
+                    if (remaining.isPositive()) {
+                        size = remaining;
+                        position.size.set(Num.ZERO);
+
+                        positions.remove(position);
+                        remove.accept(position);
+                    } else if (remaining.isZero()) {
+                        size = remaining;
+                        position.size.set(Num.ZERO);
+
+                        positions.remove(position);
+                        remove.accept(position);
+                        calculate();
+                        return;
+                    } else {
+                        position.size.set(remaining.negate());
+                        calculate();
+                        return;
+                    }
+                }
+            }
+
+            if (size.isPositive()) {
+                Position position = new Position();
+                position.side = e.side;
+                position.price = e.price;
+                position.size.set(size);
+                position.date = e.date;
+
+                positions.add(position);
+                addition.accept(position);
+                calculate();
+            }
+        }
+    }
+
+    /**
+     * Calculate some variables.
+     */
+    private void calculate() {
+        Num size = Num.ZERO;
+        Num price = Num.ZERO;
+
+        for (Position position : positions) {
+            size = size.plus(position.size);
+            price = price.plus(position.price.multiply(position.size));
+        }
+
+        this.size.set(size);
+        this.price.set(size.isZero() ? Num.ZERO : price.divide(size));
+        calculateProfit(latest.v);
+    }
+
+    /**
+     * Calculate profit variable.
+     */
+    private void calculateProfit(Execution execution) {
+        Num total = Num.ZERO;
+
+        for (Position position : positions) {
+            Num profit = position.isBuy() ? execution.price.minus(position.price) : position.price.minus(execution.price);
+            profit = profit.multiply(position.size).scale(0);
+
+            position.profit.set(profit);
+            total = total.plus(profit);
+        }
+        this.profit.set(total);
     }
 }
