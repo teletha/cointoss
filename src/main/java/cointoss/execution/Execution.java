@@ -81,9 +81,6 @@ public class Execution implements Directional {
      */
     public int delay;
 
-    /** Optional : The associated execution id. */
-    public String yourOrder;
-
     /** The epoch millseconds of executed date-time. */
     public long mills;
 
