@@ -15,14 +15,16 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 import cointoss.Direction;
+import cointoss.Market;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
 import cointoss.verify.TimeLag;
+import cointoss.verify.VerifiableMarket;
 
 /**
  * Chainable API for {@link Execution}.
  */
-public class Executed extends Execution {
+public class Executing extends Execution {
 
     /** The execution id manager. */
     private static final AtomicLong executionId = new AtomicLong(1); // don't use 0
@@ -33,7 +35,7 @@ public class Executed extends Execution {
      * @param price An executed price.
      * @return Chainable API.
      */
-    public final Executed price(long price) {
+    public final Executing price(long price) {
         return price(Num.of(price));
     }
 
@@ -43,7 +45,7 @@ public class Executed extends Execution {
      * @param price An executed price.
      * @return Chainable API.
      */
-    public final Executed price(double price) {
+    public final Executing price(double price) {
         return price(Num.of(price));
     }
 
@@ -53,7 +55,7 @@ public class Executed extends Execution {
      * @param price An executed price.
      * @return Chainable API.
      */
-    public final Executed price(Num price) {
+    public final Executing price(Num price) {
         this.price = price;
 
         return this;
@@ -65,7 +67,7 @@ public class Executed extends Execution {
      * @param id An executed id.
      * @return Chainable API.
      */
-    public final Executed id(long id) {
+    public final Executing id(long id) {
         this.id = id;
 
         return this;
@@ -77,7 +79,7 @@ public class Executed extends Execution {
      * @param date An executed date.
      * @return Chainable API.
      */
-    public final Executed date(int year, int month, int day, int hour, int minute, int second, int ms) {
+    public final Executing date(int year, int month, int day, int hour, int minute, int second, int ms) {
         return date(ZonedDateTime.of(year, month, day, hour, minute, second, ms * 1000000, Chrono.UTC));
     }
 
@@ -87,7 +89,7 @@ public class Executed extends Execution {
      * @param A delay time to assign.
      * @return Chainable API.
      */
-    public final Executed delay(int delay) {
+    public final Executing delay(int delay) {
         this.delay = delay;
 
         return this;
@@ -99,7 +101,7 @@ public class Executed extends Execution {
      * @param A consective type to assign.
      * @return Chainable API.
      */
-    public final Executed consecutive(int type) {
+    public final Executing consecutive(int type) {
         this.consecutive = type;
 
         return this;
@@ -111,19 +113,28 @@ public class Executed extends Execution {
      * @param date An executed date.
      * @return Chainable API.
      */
-    public final Executed date(ZonedDateTime date) {
+    public final Executing date(ZonedDateTime date) {
         this.date = date;
 
         return this;
     }
 
     /**
+     * Execute on the specified market.
+     * 
+     * @param market A target {@link Market}.
+     */
+    public final void on(VerifiableMarket market) {
+        market.perform(this);
+    }
+
+    /**
      * Create new buying {@link Execution}.
      * 
      * @param size A execution size.
      * @return Chainable API.
      */
-    public static Executed buy(long size) {
+    public static Executing buy(long size) {
         return buy(Num.of(size));
     }
 
@@ -133,7 +144,7 @@ public class Executed extends Execution {
      * @param size A execution size.
      * @return Chainable API.
      */
-    public static Executed buy(double size) {
+    public static Executing buy(double size) {
         return buy(Num.of(size));
     }
 
@@ -143,7 +154,7 @@ public class Executed extends Execution {
      * @param size A execution size.
      * @return Chainable API.
      */
-    public static Executed buy(Num size) {
+    public static Executing buy(Num size) {
         return of(Direction.BUY, size);
     }
 
@@ -153,7 +164,7 @@ public class Executed extends Execution {
      * @param size A execution size.
      * @return Chainable API.
      */
-    public static Executed sell(long size) {
+    public static Executing sell(long size) {
         return sell(Num.of(size));
     }
 
@@ -163,7 +174,7 @@ public class Executed extends Execution {
      * @param size A execution size.
      * @return Chainable API.
      */
-    public static Executed sell(double size) {
+    public static Executing sell(double size) {
         return sell(Num.of(size));
     }
 
@@ -173,7 +184,7 @@ public class Executed extends Execution {
      * @param size A execution size.
      * @return Chainable API.
      */
-    public static Executed sell(Num size) {
+    public static Executing sell(Num size) {
         return of(Direction.SELL, size);
     }
 
@@ -184,8 +195,8 @@ public class Executed extends Execution {
      * @param size An execution size.
      * @return Chainable API.
      */
-    public static Executed of(Direction direction, Num size) {
-        Executed e = new Executed();
+    public static Executing of(Direction direction, Num size) {
+        Executing e = new Executing();
         e.id = executionId.getAndIncrement();
         e.side = direction;
         e.size = e.cumulativeSize = size;
@@ -204,7 +215,7 @@ public class Executed extends Execution {
         List<Execution> list = new ArrayList();
 
         for (int i = 0; i < numbers; i++) {
-            Executed e = Executed.of(Direction.random(), Num.random(1, 10)).price(Num.random(1, 10));
+            Executing e = Executing.of(Direction.random(), Num.random(1, 10)).price(Num.random(1, 10));
             list.add(e);
         }
 
@@ -222,7 +233,7 @@ public class Executed extends Execution {
         List<Execution> list = new ArrayList();
 
         for (int i = 0; i < count; i++) {
-            Executed e = Executed.of(side, Num.of(size)).price(price);
+            Executing e = Executing.of(side, Num.of(size)).price(price);
             if (i != 0) e.consecutive = side.isBuy() ? ConsecutiveSameBuyer : ConsecutiveSameSeller;
             list.add(e);
         }

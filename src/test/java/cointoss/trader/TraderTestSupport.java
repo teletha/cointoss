@@ -12,7 +12,7 @@ package cointoss.trader;
 import org.junit.jupiter.api.BeforeEach;
 
 import cointoss.Direction;
-import cointoss.execution.Executed;
+import cointoss.execution.Executing;
 import cointoss.trade.Trader;
 import cointoss.trade.TradingLog;
 import cointoss.util.Num;
@@ -77,10 +77,10 @@ public abstract class TraderTestSupport extends Trader {
      */
     protected final void entryAndExit(Direction side, Num entrySize, Num entryPrice, Num exitSize, Num exitPrice) {
         entryLimit(side, entrySize, entryPrice, entry -> {
-            market.execute(Executed.of(side, entrySize).price(entryPrice.minus(side, min)));
+            market.perform(Executing.of(side, entrySize).price(entryPrice.minus(side, min)));
 
             entry.exitLimit(exitSize, exitPrice, exit -> {
-                market.execute(Executed.of(side.inverse(), exitSize).price(exitPrice.minus(side.inverse(), min)));
+                market.perform(Executing.of(side.inverse(), exitSize).price(exitPrice.minus(side.inverse(), min)));
             });
         });
     }
@@ -107,7 +107,7 @@ public abstract class TraderTestSupport extends Trader {
      */
     protected final Exit entry(Direction side, Num entrySize, Num entryPrice) {
         return new Exit(entryLimit(side, entrySize, entryPrice, entry -> {
-            market.execute(Executed.of(side, entrySize).price(entryPrice.minus(side, min)));
+            market.perform(Executing.of(side, entrySize).price(entryPrice.minus(side, min)));
         }));
     }
 
@@ -155,10 +155,10 @@ public abstract class TraderTestSupport extends Trader {
         public final Exit exit(Num exitSize, Num exitPrice, Num... executionSize) {
             entry.exitLimit(exitSize, exitPrice, exit -> {
                 if (executionSize.length == 0) {
-                    market.execute(Executed.of(entry.inverse(), exitSize).price(exitPrice.minus(entry.inverse(), min)));
+                    market.perform(Executing.of(entry.inverse(), exitSize).price(exitPrice.minus(entry.inverse(), min)));
                 } else {
                     for (Num execution : executionSize) {
-                        market.execute(Executed.of(entry.inverse(), execution).price(exitPrice.minus(entry.inverse(), min)));
+                        market.perform(Executing.of(entry.inverse(), execution).price(exitPrice.minus(entry.inverse(), min)));
                     }
                 }
             });

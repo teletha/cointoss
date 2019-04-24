@@ -12,7 +12,7 @@ package cointoss;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import cointoss.execution.Executed;
+import cointoss.execution.Executing;
 import cointoss.order.Order;
 import cointoss.util.Num;
 import cointoss.verify.VerifiableMarket;
@@ -37,7 +37,7 @@ class MarketTest {
         assert market.targetCurrency.is(Num.of(0));
 
         // non-matching order
-        market.execute(Executed.buy(1).price(10));
+        market.perform(Executing.buy(1).price(10));
         assert market.initialBaseCurrency.is(100);
         assert market.baseCurrency.is(Num.of(100));
         assert market.initialTargetCurrency.is(0);

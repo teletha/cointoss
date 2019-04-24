@@ -18,6 +18,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import cointoss.MarketService;
 import cointoss.execution.Execution;
+import cointoss.position.Entry;
 import cointoss.util.Num;
 import kiss.I;
 import kiss.Signal;
@@ -117,6 +118,10 @@ public final class OrderManager {
         }).effectOnError(e -> {
             order.state.set(OrderState.CANCELED);
         });
+    }
+
+    public Signal<Entry> requestEntry(Order order) {
+        return request(order).map(o -> new Entry(this, o));
     }
 
     /**

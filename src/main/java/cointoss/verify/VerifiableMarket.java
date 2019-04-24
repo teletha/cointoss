@@ -51,33 +51,33 @@ public class VerifiableMarket extends Market {
      * @param size
      * @param price
      */
-    public VerifiableMarket execute(Execution e, int lag) {
-        return execute(e, new TimeLag(lag));
-    }
-
-    /**
-     * Emulate execution event.
-     * 
-     * @param direction
-     * @param size
-     * @param price
-     */
-    public VerifiableMarket execute(Execution e, TimeLag lag) {
-        e.date = lag.to();
-
-        return execute(e);
-    }
-
-    /**
-     * Emulate execution event.
-     * 
-     * @param direction
-     * @param size
-     * @param price
-     */
-    public VerifiableMarket execute(Execution e) {
+    public VerifiableMarket perform(Execution e) {
         timelineObservers.accept(service.emulate(e));
         return this;
+    }
+
+    /**
+     * Emulate execution event.
+     * 
+     * @param direction
+     * @param size
+     * @param price
+     */
+    public VerifiableMarket perform(Execution e, int lag) {
+        return perform(e, new TimeLag(lag));
+    }
+
+    /**
+     * Emulate execution event.
+     * 
+     * @param direction
+     * @param size
+     * @param price
+     */
+    public VerifiableMarket perform(Execution e, TimeLag lag) {
+        e.date = lag.to();
+
+        return perform(e);
     }
 
     /**
@@ -86,9 +86,9 @@ public class VerifiableMarket extends Market {
      * @param count A number of {@link Execution}s.
      * @param e An execution mold.
      */
-    public void executeSequencially(int count, Execution e) {
+    public void performSequencially(int count, Execution e) {
         if (e != null) {
-            execute(e);
+            perform(e);
 
             for (int i = 1; i < count; i++) {
                 Execution copy = new Execution();
@@ -101,7 +101,7 @@ public class VerifiableMarket extends Market {
                 copy.side = e.side;
                 copy.consecutive = e.side.isBuy() ? Execution.ConsecutiveSameBuyer : Execution.ConsecutiveSameSeller;
 
-                execute(copy);
+                perform(copy);
             }
         }
     }
@@ -119,7 +119,7 @@ public class VerifiableMarket extends Market {
             e.date = order.creationTime.v;
             e.price = order.price.minus(order.direction, service.setting.baseCurrencyMinimumBidPrice());
 
-            execute(e);
+            perform(e);
         });
     }
 }

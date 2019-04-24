@@ -9,78 +9,150 @@
  */
 package cointoss.position;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import cointoss.execution.Executing;
 import cointoss.order.Order;
-import cointoss.util.Num;
+import cointoss.verify.VerifiableMarket;
 
 class EntryTest {
 
-    @Test
-    void entryExecutedSize() {
-        Order order1 = Order.buy(10).price(100);
-        Order order2 = Order.buy(5).price(100);
+    VerifiableMarket m;
 
-        Entry entry = new Entry();
-        entry.addEntry(order1);
-        entry.addEntry(order2);
-        assert entry.entryExecutedSize.v.is(0);
-
-        order1.executedSize.set(Num.of(1));
-        assert entry.entryExecutedSize.v.is(1);
-        order1.executedSize.set(Num.of(2));
-        assert entry.entryExecutedSize.v.is(2);
-        order1.executedSize.set(Num.of(3));
-        assert entry.entryExecutedSize.v.is(3);
-
-        order2.executedSize.set(Num.of(1));
-        assert entry.entryExecutedSize.v.is(4);
+    @BeforeEach
+    void setup() {
+        m = new VerifiableMarket();
     }
 
     @Test
-    void entryRemainingSize() {
-        Order order1 = Order.buy(10).price(100);
-        Order order2 = Order.buy(5).price(100);
+    void entrySize() {
+        m.orders.requestEntry(Order.buy(10).price(10)).to(e -> {
+            // execute partially
+            m.perform(Executing.buy(1).price(9));
+            assert e.entrySize.v.is(10);
+            assert e.entryRemainingSize.v.is(9);
+            assert e.entryExecutedSize.v.is(1);
 
-        Entry entry = new Entry();
-        entry.addEntry(order1);
-        entry.addEntry(order2);
-        assert entry.entryRemainingSize.v.is(15);
+            // execute additionally
+            m.perform(Executing.buy(2).price(9));
+            assert e.entrySize.v.is(10);
+            assert e.entryRemainingSize.v.is(7);
+            assert e.entryExecutedSize.v.is(3);
 
-        order1.remainingSize.set(Num.of(9));
-        assert entry.entryRemainingSize.v.is(14);
-        order1.remainingSize.set(Num.of(8));
-        assert entry.entryRemainingSize.v.is(13);
-        order1.remainingSize.set(Num.of(7));
-        assert entry.entryRemainingSize.v.is(12);
+            // execute completely
+            m.perform(Executing.buy(10).price(9));
+            assert e.entrySize.v.is(10);
+            assert e.entryRemainingSize.v.is(0);
+            assert e.entryExecutedSize.v.is(10);
 
-        order2.remainingSize.set(Num.of(4));
-        assert entry.entryRemainingSize.v.is(11);
+            // no effect
+            m.perform(Executing.buy(3).price(9));
+            assert e.entrySize.v.is(10);
+            assert e.entryRemainingSize.v.is(0);
+            assert e.entryExecutedSize.v.is(10);
+        });
+    }
+
+    @Test
+    void cancelInitialEntry() {
+        m.orders.requestEntry(Order.buy(10).price(10)).to(e -> {
+            // cancel
+            e.cancelEntry();
+            assert e.entrySize.v.is(0);
+            assert e.entryRemainingSize.v.is(0);
+            assert e.entryExecutedSize.v.is(0);
+
+            // no effect
+            m.perform(Executing.buy(3).price(9));
+            assert e.entrySize.v.is(0);
+            assert e.entryRemainingSize.v.is(0);
+            assert e.entryExecutedSize.v.is(0);
+        });
+    }
+
+    @Test
+    void cancelPartialEntry() {
+        m.orders.requestEntry(Order.buy(10).price(10)).to(e -> {
+            // execute partially
+            m.perform(Executing.buy(3).price(9));
+            assert e.entrySize.v.is(10);
+            assert e.entryRemainingSize.v.is(7);
+            assert e.entryExecutedSize.v.is(3);
+
+            // cancel
+            e.cancelEntry();
+            assert e.entrySize.v.is(3);
+            assert e.entryRemainingSize.v.is(0);
+            assert e.entryExecutedSize.v.is(3);
+
+            // no effect
+            m.perform(Executing.buy(3).price(9));
+            assert e.entrySize.v.is(3);
+            assert e.entryRemainingSize.v.is(0);
+            assert e.entryExecutedSize.v.is(3);
+        });
+    }
+
+    @Test
+    void cancelCompleteEntry() {
+        m.orders.requestEntry(Order.buy(10).price(10)).to(e -> {
+            // execute partially
+            m.perform(Executing.buy(10).price(9));
+            assert e.entrySize.v.is(10);
+            assert e.entryRemainingSize.v.is(0);
+            assert e.entryExecutedSize.v.is(10);
+
+            // cancel
+            e.cancelEntry();
+            assert e.entrySize.v.is(10);
+            assert e.entryRemainingSize.v.is(0);
+            assert e.entryExecutedSize.v.is(10);
+
+            // no effect
+            m.perform(Executing.buy(3).price(9));
+            assert e.entrySize.v.is(10);
+            assert e.entryRemainingSize.v.is(0);
+            assert e.entryExecutedSize.v.is(10);
+        });
     }
 
     @Test
     void positionSize() {
-        Order in = Order.buy(10).price(100);
-        Order out = Order.buy(5).price(100);
+        m.orders.requestEntry(Order.buy(10).price(10)).to(e -> {
+            // execute entry partially
+            m.perform(Executing.buy(1).price(9));
+            assert e.positionSize.v.is(1);
 
-        Entry entry = new Entry();
-        entry.addEntry(in);
-        entry.addExit(out);
-        assert entry.positionSize.v.is(0);
+            // execute entry additionally
+            m.perform(Executing.buy(2).price(9));
+            assert e.positionSize.v.is(3);
 
-        in.executedSize.set(Num.of(1));
-        assert entry.positionSize.v.is(1);
-        in.executedSize.set(Num.of(3));
-        assert entry.positionSize.v.is(3);
-        in.executedSize.set(Num.of(5));
-        assert entry.positionSize.v.is(5);
+            // execute entry completely
+            m.perform(Executing.buy(10).price(9));
+            assert e.positionSize.v.is(10);
 
-        out.executedSize.set(Num.of(2));
-        assert entry.positionSize.v.is(3);
-    }
+            // no effect
+            m.perform(Executing.buy(3).price(9));
+            assert e.positionSize.v.is(10);
 
-    @Test
-    void entyPice() {
+            e.requestExit(Order.sell(10).price(12)).to(() -> {
+                // execute exit partially
+                m.perform(Executing.sell(1).price(13));
+                assert e.positionSize.v.is(9);
 
+                // execute exit additionally
+                m.perform(Executing.buy(2).price(13));
+                assert e.positionSize.v.is(7);
+
+                // execute exit completely
+                m.perform(Executing.buy(10).price(13));
+                assert e.positionSize.v.is(0);
+
+                // no effect
+                m.perform(Executing.buy(3).price(13));
+                assert e.positionSize.v.is(0);
+            });
+        });
     }
 }

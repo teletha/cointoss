@@ -14,6 +14,7 @@ import java.util.LinkedList;
 import cointoss.Direction;
 import cointoss.Directional;
 import cointoss.order.Order;
+import cointoss.order.OrderManager;
 import cointoss.util.Num;
 import kiss.I;
 import kiss.Signal;
@@ -34,7 +35,10 @@ public class Entry implements Directional {
     public final Variable<Num> entryRemainingSize = entries.expose.flatMap(v -> diff(v.remainingSize)).scanWith(Num.ZERO, Num::plus).to();
 
     /** The entry info. */
-    public final Variable<Num> entryExecutedSize = entries.expose.flatMap(v -> diff(v.executedSize)).scanWith(Num.ZERO, Num::plus).to();
+    public final Variable<Num> entryExecutedSize = entries.expose.flatMap(v -> diff(v.executedSize))
+            .scanWith(Num.ZERO, Num::plus)
+            .startWith(Num.ZERO)
+            .to();
 
     /** The entry info. */
     public final Variable<Num> entryPice = entries.expose.flatMap(v -> diff(v.cost))
@@ -55,7 +59,10 @@ public class Entry implements Directional {
     public final Variable<Num> exitRemainingSize = exits.expose.flatMap(v -> diff(v.remainingSize)).scanWith(Num.ZERO, Num::plus).to();
 
     /** The exit info. */
-    public final Variable<Num> exitExecutedSize = exits.expose.flatMap(v -> diff(v.executedSize)).scanWith(Num.ZERO, Num::plus).to();
+    public final Variable<Num> exitExecutedSize = exits.expose.flatMap(v -> diff(v.executedSize))
+            .scanWith(Num.ZERO, Num::plus)
+            .startWith(Num.ZERO)
+            .to();
 
     /** The exit info. */
     public final Variable<Num> exitPice = exits.expose.flatMap(v -> diff(v.cost))
@@ -65,20 +72,35 @@ public class Entry implements Directional {
             .to();
 
     /** The position info. */
-    public final Variable<Num> positionSize = entryExecutedSize.observe()
-            .combineLatest(exitExecutedSize.observe())
+    public final Variable<Num> positionSize = entryExecutedSize.observeNow()
+            .combineLatest(exitExecutedSize.observeNow())
             .startWith(I.pair(Num.ZERO, Num.ZERO))
             .map(v -> v.ⅰ.minus(v.ⅱ))
             .to();
+
+    private final OrderManager service;
+
+    /**
+     * Create new {@link Entry}.
+     * 
+     * @param service
+     * @param entry
+     */
+    public Entry(OrderManager service, Order entry) {
+        this.service = service;
+        addEntry(entry);
+    }
 
     /**
      * Add entry order.
      * 
      * @param order
      */
-    public void addEntry(Order order) {
+    public Entry addEntry(Order order) {
         entryOrders.add(order);
         entries.accept(order);
+
+        return this;
     }
 
     /**
@@ -86,9 +108,32 @@ public class Entry implements Directional {
      * 
      * @param order
      */
-    public void addExit(Order order) {
+    public Entry addExit(Order order) {
         exitOrders.add(order);
         exits.accept(order);
+
+        return this;
+    }
+
+    /**
+     * Cancel all entry orders.
+     */
+    public void cancelEntry() {
+        for (Order entry : entryOrders) {
+            if (entry.isNotCanceled() && entry.isNotCompleted()) {
+                service.cancel(entry).to(order -> {
+                    Num remaining = entryRemainingSize.set(v -> v.minus(order.remainingSize));
+                    entrySize.set(v -> v.minus(remaining));
+                });
+            }
+        }
+    }
+
+    public Signal<Entry> requestExit(Order order) {
+        return service.request(order).map(exit -> {
+            addExit(exit);
+            return this;
+        });
     }
 
     /**
