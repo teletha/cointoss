@@ -9,7 +9,7 @@
  */
 package cointoss;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.util.List;
 import java.util.Objects;
@@ -23,6 +23,7 @@ import cointoss.order.Order;
 import cointoss.order.OrderBook;
 import cointoss.order.OrderBookManager;
 import cointoss.order.OrderManager;
+import cointoss.position.EntryManager;
 import cointoss.position.PositionManager;
 import cointoss.ticker.TickerManager;
 import cointoss.util.Num;
@@ -77,6 +78,8 @@ public class Market implements Disposable {
     /** The position manager. */
     public final PositionManager positions;
 
+    public final EntryManager entries;
+
     /** The amount of base currency. */
     public final Variable<Num> baseCurrency;
 
@@ -99,6 +102,7 @@ public class Market implements Disposable {
         this.orders = new OrderManager(service);
         this.orderBook = new OrderBookManager(service);
         this.positions = new PositionManager(service, tickers.latest);
+        this.entries = new EntryManager();
 
         // initialize currency data
         baseCurrency = service.baseCurrency().to();

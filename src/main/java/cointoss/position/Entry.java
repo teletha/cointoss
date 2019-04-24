@@ -11,6 +11,8 @@ package cointoss.position;
 
 import java.util.LinkedList;
 
+import cointoss.Direction;
+import cointoss.Directional;
 import cointoss.order.Order;
 import cointoss.util.Num;
 import kiss.I;
@@ -18,12 +20,15 @@ import kiss.Signal;
 import kiss.Signaling;
 import kiss.Variable;
 
-public class Entry {
+public class Entry implements Directional {
 
     /** Then entry holder. */
     private final LinkedList<Order> entryOrders = new LinkedList();
 
     private Signaling<Order> entries = new Signaling();
+
+    /** The entry info. */
+    public final Variable<Num> entrySize = entries.expose.map(v -> v.size).scanWith(Num.ZERO, Num::plus).to();
 
     /** The entry info. */
     public final Variable<Num> entryRemainingSize = entries.expose.flatMap(v -> diff(v.remainingSize)).scanWith(Num.ZERO, Num::plus).to();
@@ -42,6 +47,9 @@ public class Entry {
     private final LinkedList<Order> exitOrders = new LinkedList();
 
     private Signaling<Order> exits = new Signaling();
+
+    /** The exit info. */
+    public final Variable<Num> exitSize = exits.expose.map(v -> v.size).scanWith(Num.ZERO, Num::plus).to();
 
     /** The exit info. */
     public final Variable<Num> exitRemainingSize = exits.expose.flatMap(v -> diff(v.remainingSize)).scanWith(Num.ZERO, Num::plus).to();
@@ -83,7 +91,15 @@ public class Entry {
         exits.accept(order);
     }
 
-    private static Signal<Num> diff(Variable<Num> value) {
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Direction direction() {
+        return entryOrders.peekFirst().direction();
+    }
+
+    static Signal<Num> diff(Variable<Num> value) {
         return value.observeNow().maps(Num.ZERO, (prev, now) -> now.minus(prev));
     }
 }
