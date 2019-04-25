@@ -12,8 +12,8 @@ package cointoss.position;
 import java.util.LinkedList;
 
 import cointoss.util.Num;
+import cointoss.util.NumVar;
 import kiss.Signaling;
-import kiss.Variable;
 
 public class EntryManager {
 
@@ -21,10 +21,10 @@ public class EntryManager {
 
     private final Signaling<Entry> entries = new Signaling();
 
-    public final Variable<Num> size = entries.expose.flatMap(v -> v.positionSize.diff())
+    public final NumVar size = entries.expose.flatMap(v -> v.positionSize.diff())
             .scanWith(Num.ZERO, Num::plus)
             .startWith(Num.ZERO)
-            .to();
+            .to(NumVar.class, NumVar::set);
 
     public void add(Entry entry) {
         entries.accept(entry);
