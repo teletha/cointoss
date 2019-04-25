@@ -23,6 +23,7 @@ import cointoss.Directional;
 import cointoss.execution.Execution;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
+import cointoss.util.NumVar;
 import kiss.I;
 import kiss.Signal;
 import kiss.Variable;
@@ -89,13 +90,13 @@ public class Order implements Directional {
     public final Variable<ZonedDateTime> terminationTime = Variable.empty();
 
     /** The executed size */
-    public final Variable<Num> executedSize = Variable.of(Num.ZERO);
+    public final NumVar executedSize = NumVar.zero();
 
     /** The remaining size */
-    public final Variable<Num> remainingSize = Variable.empty();
+    public final NumVar remainingSize = NumVar.zero();
 
     /** The total cost. */
-    public final Variable<Num> cost = Variable.of(Num.ZERO);
+    public final NumVar cost = NumVar.zero();
 
     /** The relation holder. */
     private Map<Class, Object> relations;

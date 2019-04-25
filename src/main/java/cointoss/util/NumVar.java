@@ -9,8 +9,12 @@
  */
 package cointoss.util;
 
+import kiss.Signal;
 import kiss.Variable;
 
+/**
+ * Sepcialization of {@link Variable} for {@link Num}.
+ */
 public class NumVar extends Variable<Num> {
 
     /**
@@ -38,6 +42,15 @@ public class NumVar extends Variable<Num> {
      */
     public boolean is(double value) {
         return v.is(value);
+    }
+
+    /**
+     * Observer the difference value whenever value will be changed.
+     * 
+     * @return A stream of the difference value.
+     */
+    public Signal<Num> diff() {
+        return observeNow().maps(Num.ZERO, (prev, now) -> now.minus(prev));
     }
 
     /**
@@ -70,6 +83,11 @@ public class NumVar extends Variable<Num> {
         return new NumVar(value);
     }
 
+    /**
+     * Create zero variable.
+     * 
+     * @return A created variable.
+     */
     public static NumVar zero() {
         return of(Num.ZERO);
     }

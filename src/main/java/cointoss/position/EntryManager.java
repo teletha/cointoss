@@ -21,7 +21,7 @@ public class EntryManager {
 
     private final Signaling<Entry> entries = new Signaling();
 
-    public final Variable<Num> size = entries.expose.flatMap(v -> Entry.diff(v.positionSize))
+    public final Variable<Num> size = entries.expose.flatMap(v -> v.positionSize.diff())
             .scanWith(Num.ZERO, Num::plus)
             .startWith(Num.ZERO)
             .to();

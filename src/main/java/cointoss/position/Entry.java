@@ -20,7 +20,6 @@ import cointoss.util.NumVar;
 import kiss.I;
 import kiss.Signal;
 import kiss.Signaling;
-import kiss.Variable;
 
 public class Entry implements Directional {
 
@@ -33,18 +32,18 @@ public class Entry implements Directional {
     public final NumVar entrySize = entries.expose.map(v -> v.size).scanWith(Num.ZERO, Num::plus).to(NumVar.class, NumVar::set);
 
     /** The entry info. */
-    public final NumVar entryRemainingSize = entries.expose.flatMap(v -> diff(v.remainingSize))
+    public final NumVar entryRemainingSize = entries.expose.flatMap(v -> v.remainingSize.diff())
             .scanWith(Num.ZERO, Num::plus)
             .to(NumVar.class, NumVar::set);
 
     /** The entry info. */
-    public final NumVar entryExecutedSize = entries.expose.flatMap(v -> diff(v.executedSize))
+    public final NumVar entryExecutedSize = entries.expose.flatMap(v -> v.executedSize.diff())
             .scanWith(Num.ZERO, Num::plus)
             .startWith(Num.ZERO)
             .to(NumVar.class, NumVar::set);
 
     /** The entry info. */
-    public final NumVar entryPice = entries.expose.flatMap(v -> diff(v.cost))
+    public final NumVar entryPice = entries.expose.flatMap(v -> v.cost.diff())
             .scanWith(Num.ZERO, Num::plus)
             .combineLatest(entryExecutedSize.observeNow())
             .map(v -> v.ⅱ.isZero() ? Num.ZERO : v.ⅰ.divide(v.ⅱ))
@@ -59,18 +58,18 @@ public class Entry implements Directional {
     public final NumVar exitSize = exits.expose.map(v -> v.size).scanWith(Num.ZERO, Num::plus).to(NumVar.class, NumVar::set);
 
     /** The exit info. */
-    public final NumVar exitRemainingSize = exits.expose.flatMap(v -> diff(v.remainingSize))
+    public final NumVar exitRemainingSize = exits.expose.flatMap(v -> v.remainingSize.diff())
             .scanWith(Num.ZERO, Num::plus)
             .to(NumVar.class, NumVar::set);
 
     /** The exit info. */
-    public final NumVar exitExecutedSize = exits.expose.flatMap(v -> diff(v.executedSize))
+    public final NumVar exitExecutedSize = exits.expose.flatMap(v -> v.executedSize.diff())
             .scanWith(Num.ZERO, Num::plus)
             .startWith(Num.ZERO)
             .to(NumVar.class, NumVar::set);
 
     /** The exit info. */
-    public final NumVar exitPice = exits.expose.flatMap(v -> diff(v.cost))
+    public final NumVar exitPice = exits.expose.flatMap(v -> v.cost.diff())
             .scanWith(Num.ZERO, Num::plus)
             .combineLatest(exitExecutedSize.observeNow())
             .map(v -> v.ⅱ.isZero() ? Num.ZERO : v.ⅰ.divide(v.ⅱ))
@@ -147,9 +146,5 @@ public class Entry implements Directional {
     @Override
     public Direction direction() {
         return entryOrders.peekFirst().direction();
-    }
-
-    static Signal<Num> diff(Variable<Num> value) {
-        return value.observeNow().maps(Num.ZERO, (prev, now) -> now.minus(prev));
     }
 }
