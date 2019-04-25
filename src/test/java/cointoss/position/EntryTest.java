@@ -30,27 +30,27 @@ class EntryTest {
         m.orders.requestEntry(Order.buy(10).price(10)).to(e -> {
             // execute partially
             m.perform(Executing.buy(1).price(9));
-            assert e.entrySize.v.is(10);
-            assert e.entryRemainingSize.v.is(9);
-            assert e.entryExecutedSize.v.is(1);
+            assert e.entrySize.is(10);
+            assert e.entryRemainingSize.is(9);
+            assert e.entryExecutedSize.is(1);
 
             // execute additionally
             m.perform(Executing.buy(2).price(9));
-            assert e.entrySize.v.is(10);
-            assert e.entryRemainingSize.v.is(7);
-            assert e.entryExecutedSize.v.is(3);
+            assert e.entrySize.is(10);
+            assert e.entryRemainingSize.is(7);
+            assert e.entryExecutedSize.is(3);
 
             // execute completely
             m.perform(Executing.buy(10).price(9));
-            assert e.entrySize.v.is(10);
-            assert e.entryRemainingSize.v.is(0);
-            assert e.entryExecutedSize.v.is(10);
+            assert e.entrySize.is(10);
+            assert e.entryRemainingSize.is(0);
+            assert e.entryExecutedSize.is(10);
 
             // no effect
             m.perform(Executing.buy(3).price(9));
-            assert e.entrySize.v.is(10);
-            assert e.entryRemainingSize.v.is(0);
-            assert e.entryExecutedSize.v.is(10);
+            assert e.entrySize.is(10);
+            assert e.entryRemainingSize.is(0);
+            assert e.entryExecutedSize.is(10);
         });
     }
 
@@ -59,15 +59,15 @@ class EntryTest {
         m.orders.requestEntry(Order.buy(10).price(10)).to(e -> {
             // cancel
             e.cancelEntry();
-            assert e.entrySize.v.is(0);
-            assert e.entryRemainingSize.v.is(0);
-            assert e.entryExecutedSize.v.is(0);
+            assert e.entrySize.is(0);
+            assert e.entryRemainingSize.is(0);
+            assert e.entryExecutedSize.is(0);
 
             // no effect
             m.perform(Executing.buy(3).price(9));
-            assert e.entrySize.v.is(0);
-            assert e.entryRemainingSize.v.is(0);
-            assert e.entryExecutedSize.v.is(0);
+            assert e.entrySize.is(0);
+            assert e.entryRemainingSize.is(0);
+            assert e.entryExecutedSize.is(0);
         });
     }
 
@@ -76,21 +76,21 @@ class EntryTest {
         m.orders.requestEntry(Order.buy(10).price(10)).to(e -> {
             // execute partially
             m.perform(Executing.buy(3).price(9));
-            assert e.entrySize.v.is(10);
-            assert e.entryRemainingSize.v.is(7);
-            assert e.entryExecutedSize.v.is(3);
+            assert e.entrySize.is(10);
+            assert e.entryRemainingSize.is(7);
+            assert e.entryExecutedSize.is(3);
 
             // cancel
             e.cancelEntry();
-            assert e.entrySize.v.is(3);
-            assert e.entryRemainingSize.v.is(0);
-            assert e.entryExecutedSize.v.is(3);
+            assert e.entrySize.is(3);
+            assert e.entryRemainingSize.is(0);
+            assert e.entryExecutedSize.is(3);
 
             // no effect
             m.perform(Executing.buy(3).price(9));
-            assert e.entrySize.v.is(3);
-            assert e.entryRemainingSize.v.is(0);
-            assert e.entryExecutedSize.v.is(3);
+            assert e.entrySize.is(3);
+            assert e.entryRemainingSize.is(0);
+            assert e.entryExecutedSize.is(3);
         });
     }
 
@@ -99,21 +99,21 @@ class EntryTest {
         m.orders.requestEntry(Order.buy(10).price(10)).to(e -> {
             // execute partially
             m.perform(Executing.buy(10).price(9));
-            assert e.entrySize.v.is(10);
-            assert e.entryRemainingSize.v.is(0);
-            assert e.entryExecutedSize.v.is(10);
+            assert e.entrySize.is(10);
+            assert e.entryRemainingSize.is(0);
+            assert e.entryExecutedSize.is(10);
 
             // cancel
             e.cancelEntry();
-            assert e.entrySize.v.is(10);
-            assert e.entryRemainingSize.v.is(0);
-            assert e.entryExecutedSize.v.is(10);
+            assert e.entrySize.is(10);
+            assert e.entryRemainingSize.is(0);
+            assert e.entryExecutedSize.is(10);
 
             // no effect
             m.perform(Executing.buy(3).price(9));
-            assert e.entrySize.v.is(10);
-            assert e.entryRemainingSize.v.is(0);
-            assert e.entryExecutedSize.v.is(10);
+            assert e.entrySize.is(10);
+            assert e.entryRemainingSize.is(0);
+            assert e.entryExecutedSize.is(10);
         });
     }
 
@@ -122,36 +122,36 @@ class EntryTest {
         m.orders.requestEntry(Order.buy(10).price(10)).to(e -> {
             // execute entry partially
             m.perform(Executing.buy(1).price(9));
-            assert e.positionSize.v.is(1);
+            assert e.positionSize.is(1);
 
             // execute entry additionally
             m.perform(Executing.buy(2).price(9));
-            assert e.positionSize.v.is(3);
+            assert e.positionSize.is(3);
 
             // execute entry completely
             m.perform(Executing.buy(10).price(9));
-            assert e.positionSize.v.is(10);
+            assert e.positionSize.is(10);
 
             // no effect
             m.perform(Executing.buy(3).price(9));
-            assert e.positionSize.v.is(10);
+            assert e.positionSize.is(10);
 
             e.requestExit(Order.sell(10).price(12)).to(() -> {
                 // execute exit partially
                 m.perform(Executing.sell(1).price(13));
-                assert e.positionSize.v.is(9);
+                assert e.positionSize.is(9);
 
                 // execute exit additionally
                 m.perform(Executing.buy(2).price(13));
-                assert e.positionSize.v.is(7);
+                assert e.positionSize.is(7);
 
                 // execute exit completely
                 m.perform(Executing.buy(10).price(13));
-                assert e.positionSize.v.is(0);
+                assert e.positionSize.is(0);
 
                 // no effect
                 m.perform(Executing.buy(3).price(13));
-                assert e.positionSize.v.is(0);
+                assert e.positionSize.is(0);
             });
         });
     }

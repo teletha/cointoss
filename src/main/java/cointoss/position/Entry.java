@@ -16,6 +16,7 @@ import cointoss.Directional;
 import cointoss.order.Order;
 import cointoss.order.OrderManager;
 import cointoss.util.Num;
+import cointoss.util.NumVar;
 import kiss.I;
 import kiss.Signal;
 import kiss.Signaling;
@@ -29,23 +30,25 @@ public class Entry implements Directional {
     private Signaling<Order> entries = new Signaling();
 
     /** The entry info. */
-    public final Variable<Num> entrySize = entries.expose.map(v -> v.size).scanWith(Num.ZERO, Num::plus).to();
+    public final NumVar entrySize = entries.expose.map(v -> v.size).scanWith(Num.ZERO, Num::plus).to(NumVar.class, NumVar::set);
 
     /** The entry info. */
-    public final Variable<Num> entryRemainingSize = entries.expose.flatMap(v -> diff(v.remainingSize)).scanWith(Num.ZERO, Num::plus).to();
+    public final NumVar entryRemainingSize = entries.expose.flatMap(v -> diff(v.remainingSize))
+            .scanWith(Num.ZERO, Num::plus)
+            .to(NumVar.class, NumVar::set);
 
     /** The entry info. */
-    public final Variable<Num> entryExecutedSize = entries.expose.flatMap(v -> diff(v.executedSize))
+    public final NumVar entryExecutedSize = entries.expose.flatMap(v -> diff(v.executedSize))
             .scanWith(Num.ZERO, Num::plus)
             .startWith(Num.ZERO)
-            .to();
+            .to(NumVar.class, NumVar::set);
 
     /** The entry info. */
-    public final Variable<Num> entryPice = entries.expose.flatMap(v -> diff(v.cost))
+    public final NumVar entryPice = entries.expose.flatMap(v -> diff(v.cost))
             .scanWith(Num.ZERO, Num::plus)
             .combineLatest(entryExecutedSize.observeNow())
             .map(v -> v.ⅱ.isZero() ? Num.ZERO : v.ⅰ.divide(v.ⅱ))
-            .to();
+            .to(NumVar.class, NumVar::set);
 
     /** Then exit holder. */
     private final LinkedList<Order> exitOrders = new LinkedList();
@@ -53,30 +56,32 @@ public class Entry implements Directional {
     private Signaling<Order> exits = new Signaling();
 
     /** The exit info. */
-    public final Variable<Num> exitSize = exits.expose.map(v -> v.size).scanWith(Num.ZERO, Num::plus).to();
+    public final NumVar exitSize = exits.expose.map(v -> v.size).scanWith(Num.ZERO, Num::plus).to(NumVar.class, NumVar::set);
 
     /** The exit info. */
-    public final Variable<Num> exitRemainingSize = exits.expose.flatMap(v -> diff(v.remainingSize)).scanWith(Num.ZERO, Num::plus).to();
+    public final NumVar exitRemainingSize = exits.expose.flatMap(v -> diff(v.remainingSize))
+            .scanWith(Num.ZERO, Num::plus)
+            .to(NumVar.class, NumVar::set);
 
     /** The exit info. */
-    public final Variable<Num> exitExecutedSize = exits.expose.flatMap(v -> diff(v.executedSize))
+    public final NumVar exitExecutedSize = exits.expose.flatMap(v -> diff(v.executedSize))
             .scanWith(Num.ZERO, Num::plus)
             .startWith(Num.ZERO)
-            .to();
+            .to(NumVar.class, NumVar::set);
 
     /** The exit info. */
-    public final Variable<Num> exitPice = exits.expose.flatMap(v -> diff(v.cost))
+    public final NumVar exitPice = exits.expose.flatMap(v -> diff(v.cost))
             .scanWith(Num.ZERO, Num::plus)
             .combineLatest(exitExecutedSize.observeNow())
             .map(v -> v.ⅱ.isZero() ? Num.ZERO : v.ⅰ.divide(v.ⅱ))
-            .to();
+            .to(NumVar.class, NumVar::set);
 
     /** The position info. */
-    public final Variable<Num> positionSize = entryExecutedSize.observeNow()
+    public final NumVar positionSize = entryExecutedSize.observeNow()
             .combineLatest(exitExecutedSize.observeNow())
             .startWith(I.pair(Num.ZERO, Num.ZERO))
             .map(v -> v.ⅰ.minus(v.ⅱ))
-            .to();
+            .to(NumVar.class, NumVar::set);
 
     private final OrderManager service;
 
