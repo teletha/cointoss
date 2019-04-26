@@ -28,7 +28,7 @@ public class Chrono {
     public static final ZoneId UTC = ZoneId.of("UTC");
 
     /** The minimum UTC time. */
-    public static final ZonedDateTime MIN = ZonedDateTime.of(2018, 4, 26, 0, 0, 0, 0, UTC);
+    public static final ZonedDateTime MIN = ZonedDateTime.of(1970, 1, 1, 0, 0, 0, 0, UTC);
 
     /** Reusable format. yyyy-MM-dd */
     public static final DateTimeFormatter Date = DateTimeFormatter.ofPattern("yyyy-MM-dd");

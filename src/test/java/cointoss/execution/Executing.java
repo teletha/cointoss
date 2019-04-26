@@ -18,7 +18,6 @@ import cointoss.Direction;
 import cointoss.Market;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
-import cointoss.verify.TimeLag;
 import cointoss.verify.VerifiableMarket;
 
 /**
@@ -200,7 +199,7 @@ public class Executing extends Execution {
         e.id = executionId.getAndIncrement();
         e.side = direction;
         e.size = e.cumulativeSize = size;
-        e.date = TimeLag.Base;
+        e.date = Chrono.MIN;
 
         return e;
     }

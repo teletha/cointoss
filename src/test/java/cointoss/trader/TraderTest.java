@@ -9,8 +9,8 @@
  */
 package cointoss.trader;
 
-import static cointoss.Direction.*;
-import static java.time.temporal.ChronoUnit.*;
+import static cointoss.Direction.BUY;
+import static java.time.temporal.ChronoUnit.SECONDS;
 
 import org.junit.jupiter.api.Test;
 
@@ -239,22 +239,22 @@ class TraderTest extends TraderTestSupport {
         assert state.isAbsent();
 
         // keep more than 10
-        market.perform(Executing.buy(1).price(15), 1);
-        market.perform(Executing.buy(1).price(15), 4);
-        market.perform(Executing.buy(1).price(15), 8);
+        market.perform(Executing.buy(1).price(15), 2);
+        market.perform(Executing.buy(1).price(15), 2);
+        market.perform(Executing.buy(1).price(15), 2);
         assert state.isAbsent();
 
         // keep less than 10 during 3 seconds
-        market.perform(Executing.buy(1).price(9), 10);
-        market.perform(Executing.buy(1).price(9), 12);
-        market.perform(Executing.buy(1).price(15), 13);
-        market.perform(Executing.buy(1).price(15), 18);
+        market.perform(Executing.buy(1).price(9), 1);
+        market.perform(Executing.buy(1).price(9), 1);
+        market.perform(Executing.buy(1).price(15), 3);
+        market.perform(Executing.buy(1).price(15), 3);
         assert state.isAbsent();
 
         // keep less than 10 during 5 seconds
-        market.perform(Executing.buy(1).price(9), 10);
-        market.perform(Executing.buy(1).price(9), 12);
-        market.perform(Executing.buy(1).price(9), 15);
+        market.perform(Executing.buy(1).price(9), 3);
+        market.perform(Executing.buy(1).price(9), 3);
+        market.perform(Executing.buy(1).price(9), 3);
         assert state.isPresent();
     }
 

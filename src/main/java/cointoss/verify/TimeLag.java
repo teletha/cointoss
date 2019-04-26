@@ -10,7 +10,6 @@
 package cointoss.verify;
 
 import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 
 import org.apache.commons.lang3.RandomUtils;
@@ -21,9 +20,6 @@ import cointoss.util.Chrono;
  * Network time lag emulator.
  */
 public class TimeLag {
-
-    /** The base time */
-    public static final ZonedDateTime Base = Chrono.utcNow().truncatedTo(ChronoUnit.DAYS);
 
     /** The minimum time lag (ms). */
     private final int min;
@@ -59,7 +55,7 @@ public class TimeLag {
      * @return
      */
     public ZonedDateTime to() {
-        return Base.plusSeconds(RandomUtils.nextInt(min, max));
+        return Chrono.MIN.plusSeconds(RandomUtils.nextInt(min, max));
     }
 
     /**

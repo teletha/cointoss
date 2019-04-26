@@ -10,8 +10,8 @@
 package cointoss.ticker;
 
 import static cointoss.ticker.TickSpan.*;
-import static cointoss.verify.TimeLag.Base;
 
+import java.time.ZonedDateTime;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.jupiter.api.Test;
@@ -19,11 +19,14 @@ import org.junit.jupiter.api.Test;
 import com.google.common.base.Predicate;
 
 import cointoss.execution.Executing;
+import cointoss.util.Chrono;
 
 /**
  * @version 2018/07/04 10:46:56
  */
 class TickerManagerTest {
+
+    ZonedDateTime Base = Chrono.MIN;
 
     TickerManager manager = new TickerManager();
 
