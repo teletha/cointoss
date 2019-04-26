@@ -21,7 +21,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import cointoss.Direction;
 import cointoss.Directional;
 import cointoss.execution.Execution;
-import cointoss.util.Chrono;
 import cointoss.util.Num;
 import cointoss.util.NumVar;
 import kiss.I;
@@ -84,7 +83,7 @@ public class Order implements Directional {
     public final Variable<OrderState> state = Variable.of(OrderState.INIT);
 
     /** The requested time of this {@link Order}. */
-    public final Variable<ZonedDateTime> creationTime = Variable.of(Chrono.utcNow());
+    public final Variable<ZonedDateTime> creationTime = Variable.empty();
 
     /** The terminated time of this {@link Order}. */
     public final Variable<ZonedDateTime> terminationTime = Variable.empty();

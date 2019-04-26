@@ -135,7 +135,7 @@ public class VerifiableMarketService extends MarketService {
             BackendOrder child = new BackendOrder(order);
             child.id.let("LOCAL-ACCEPTANCE-" + id++);
             child.state.set(OrderState.ACTIVE);
-            child.creationTime.set(now.plusNanos(lag.generate()));
+            child.creationTime.set(now());
             child.remainingSize.set(order.size);
 
             orderAll.add(child);
@@ -227,6 +227,14 @@ public class VerifiableMarketService extends MarketService {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ZonedDateTime now() {
+        return now;
+    };
+
+    /**
      * Emulate {@link Execution}.
      * 
      * @param e
@@ -240,7 +248,7 @@ public class VerifiableMarketService extends MarketService {
 
         while (iterator.hasNext()) {
             BackendOrder order = iterator.next();
-            System.out.println(e.date + "  " + order.creationTime + "   " + order);
+
             // time base filter
             if (e.date.isBefore(order.creationTime.get())) {
                 continue;

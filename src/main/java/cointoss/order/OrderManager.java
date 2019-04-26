@@ -11,7 +11,6 @@ package cointoss.order;
 
 import static cointoss.order.OrderState.*;
 
-import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -107,7 +106,7 @@ public final class OrderManager {
 
         return service.request(order).retryWhen(service.setting.retryPolicy()).map(id -> {
             order.id.let(id);
-            order.creationTime.set(ZonedDateTime.now());
+            order.creationTime.set(service.now());
             order.state.set(ACTIVE);
             order.observeTerminating().to(remove::accept);
 

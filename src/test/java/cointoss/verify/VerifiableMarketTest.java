@@ -184,25 +184,6 @@ class VerifiableMarketTest {
     }
 
     @Test
-    void lag() {
-        VerifiableMarket market = new VerifiableMarket();
-        market.service.lag(5);
-
-        market.request(Order.buy(10).price(10)).to(order -> {
-            market.perform(Executing.buy(5).price(7), new TimeLag(3));
-            assert order.remainingSize.is(10);
-            market.perform(Executing.buy(4).price(7), new TimeLag(4));
-            assert order.remainingSize.is(10);
-            market.perform(Executing.buy(3).price(7), new TimeLag(5));
-            assert order.remainingSize.is(7);
-            market.perform(Executing.buy(2).price(7), new TimeLag(6));
-            assert order.remainingSize.is(5);
-            market.perform(Executing.buy(1).price(7), new TimeLag(7));
-            assert order.remainingSize.is(4);
-        });
-    }
-
-    @Test
     void fillOrKillLong() {
         // success
         market.request(Order.buy(10).price(10).type(QuantityCondition.FillOrKill)).to(order -> {

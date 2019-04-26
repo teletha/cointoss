@@ -101,4 +101,14 @@ class OrderManagerTest {
         service.emulate(Executing.sell(1).price(9));
         assert removed.size() == 1;
     }
+
+    @Test
+    void requestedOrderHaveCreationTime() {
+        Order order = Order.buy(1).price(10);
+        assert order.creationTime.isAbsent();
+
+        orders.request(order).to(o -> {
+            assert o.creationTime.v.isEqual(service.now());
+        });
+    }
 }

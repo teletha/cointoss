@@ -16,6 +16,7 @@ import cointoss.execution.Execution;
 import cointoss.execution.ExecutionLog;
 import cointoss.order.Order;
 import cointoss.order.OrderBookChange;
+import cointoss.time.Clock;
 import cointoss.util.Chrono;
 import cointoss.util.Network;
 import cointoss.util.Num;
@@ -26,7 +27,7 @@ import kiss.Ⅲ;
 /**
  * @version 2018/08/05 0:47:38
  */
-public abstract class MarketService implements Disposable {
+public abstract class MarketService implements Disposable, Clock {
 
     /** The exchange name. */
     public final String exchangeName;
@@ -190,6 +191,21 @@ public abstract class MarketService implements Disposable {
      * Get amount of the target currency.
      */
     public abstract Signal<Num> targetCurrency();
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ZonedDateTime now() {
+        return Chrono.utcNow();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void vandalize() {
+    }
 
     /**
      * {@inheritDoc}
