@@ -59,25 +59,14 @@ public class VerifiableMarket extends Market {
     }
 
     /**
-     * Emulate execution event.
+     * Emulate execution event with time lag.
      * 
-     * @param direction
-     * @param size
-     * @param price
+     * @param e An emulated {@link Execution}.
+     * @param lag A lag time. (second)
+     * @return
      */
     public VerifiableMarket perform(Execution e, int lag) {
-        return perform(e, new TimeLag(lag));
-    }
-
-    /**
-     * Emulate execution event.
-     * 
-     * @param direction
-     * @param size
-     * @param price
-     */
-    public VerifiableMarket perform(Execution e, TimeLag lag) {
-        e.date = lag.to();
+        e.date = service.now().plusSeconds(lag);
 
         return perform(e);
     }

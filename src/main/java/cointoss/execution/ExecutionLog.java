@@ -710,7 +710,7 @@ public class ExecutionLog {
         }
     }
 
-    public static void main(String[] args) {
+    public static void main2(String[] args) {
         LocalDate start = LocalDate.of(2018, 2, 1);
         LocalDate end = LocalDate.of(2018, 2, 5);
 

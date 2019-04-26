@@ -24,6 +24,7 @@ import cointoss.order.OrderBookChange;
 import cointoss.order.OrderState;
 import cointoss.order.OrderType;
 import cointoss.order.QuantityCondition;
+import cointoss.util.Chrono;
 import cointoss.util.Num;
 import cointoss.util.RetryPolicy;
 import kiss.Disposable;
@@ -55,17 +56,14 @@ public class VerifiableMarketService extends MarketService {
     /** The execution manager. */
     private final LinkedList<Execution> executeds = new LinkedList();
 
-    /** The lag generator. */
-    private TimeLag lag = new TimeLag(0);
-
     /** The initial base currency. */
     private final Num baseCurrency = Num.HUNDRED;
 
     /** The initial target currency. */
     private final Num targetCurrency = Num.ZERO;
 
-    /** The current time. */
-    private ZonedDateTime now = TimeLag.Base;
+    /** The latest execution time. */
+    private ZonedDateTime now = Chrono.MIN;
 
     /**
      * 
@@ -84,30 +82,6 @@ public class VerifiableMarketService extends MarketService {
      */
     public VerifiableMarketService(MarketService delegation) {
         super(delegation.exchangeName, delegation.marketName, delegation.setting.withRetryPolicy(new RetryPolicy().retryMaximum(0)));
-    }
-
-    /**
-     * Configure fixed lag.
-     * 
-     * @param lag
-     * @return
-     */
-    public final VerifiableMarketService lag(int lag) {
-        this.lag = new TimeLag(lag);
-
-        return this;
-    }
-
-    /**
-     * Configure random lag.
-     * 
-     * @param lag
-     * @return
-     */
-    public final VerifiableMarketService lag(int start, int end) {
-        this.lag = new TimeLag(start, end);
-
-        return this;
     }
 
     /**
