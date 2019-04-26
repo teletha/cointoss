@@ -82,7 +82,7 @@ public class Entry implements Directional {
             .map(v -> v.ⅰ.minus(v.ⅱ))
             .to(NumVar.class, NumVar::set);
 
-    private final OrderManager service;
+    private final OrderManager manager;
 
     /**
      * Create new {@link Entry}.
@@ -91,7 +91,7 @@ public class Entry implements Directional {
      * @param entry
      */
     public Entry(OrderManager service, Order entry) {
-        this.service = service;
+        this.manager = service;
         addEntry(entry);
     }
 
@@ -125,7 +125,7 @@ public class Entry implements Directional {
     public void cancelEntry() {
         for (Order entry : entryOrders) {
             if (entry.isNotCanceled() && entry.isNotCompleted()) {
-                service.cancel(entry).to(order -> {
+                manager.cancel(entry).to(order -> {
                     Num remaining = entryRemainingSize.set(v -> v.minus(order.remainingSize));
                     entrySize.set(v -> v.minus(remaining));
                 });
@@ -134,7 +134,7 @@ public class Entry implements Directional {
     }
 
     public Signal<Entry> requestExit(Order order) {
-        return service.request(order).map(exit -> {
+        return manager.request(order).map(exit -> {
             addExit(exit);
             return this;
         });

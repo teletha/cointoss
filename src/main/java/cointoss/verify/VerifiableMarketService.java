@@ -240,7 +240,7 @@ public class VerifiableMarketService extends MarketService {
 
         while (iterator.hasNext()) {
             BackendOrder order = iterator.next();
-
+            System.out.println(e.date + "  " + order.creationTime + "   " + order);
             // time base filter
             if (e.date.isBefore(order.creationTime.get())) {
                 continue;

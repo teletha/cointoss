@@ -76,7 +76,6 @@ public final class OrderManager {
                                 .plus(exe.price.multiply(executed))
                                 .divide(executed.plus(order.executedSize)));
                     }
-
                     order.executedSize.set(s -> s.plus(executed));
                     order.remainingSize.set(s -> s.minus(executed));
 
