@@ -65,6 +65,9 @@ public class VerifiableMarketService extends MarketService {
     /** The latest execution time. */
     private ZonedDateTime now = Chrono.MIN;
 
+    /** The lag emulator. */
+    public Latency latency = Latency.zero();
+
     /**
      * 
      */
@@ -109,7 +112,7 @@ public class VerifiableMarketService extends MarketService {
             BackendOrder child = new BackendOrder(order);
             child.id.let("LOCAL-ACCEPTANCE-" + id++);
             child.state.set(OrderState.ACTIVE);
-            child.creationTime.set(now());
+            child.creationTime.set(latency.emulate(now()));
             child.remainingSize.set(order.size);
 
             orderAll.add(child);
