@@ -87,7 +87,6 @@ public final class Ticker {
      * @return When the new {@link Tick} was added, this method will return <code>true</code>.
      */
     final boolean createTick(Execution execution, TickerManager realtime) {
-        System.out.println(execution);
         // Make sure whether the execution does not exceed the end time of current tick.
         if (!execution.isBefore(current.end)) {
             lock.writeLock().lock();
