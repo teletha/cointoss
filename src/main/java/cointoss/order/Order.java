@@ -308,6 +308,7 @@ public class Order implements Directional {
      */
     final void execute(Execution execution) {
         entries.add(execution);
+        cost.set(v -> v.plus(execution.size.multiply(execution.price)));
     }
 
     /**

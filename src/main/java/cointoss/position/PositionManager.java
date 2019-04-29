@@ -137,7 +137,7 @@ public final class PositionManager implements Directional {
      * 
      * @param exe A my execution.
      */
-    void add(Execution e) {
+    public void add(Execution e) {
         if (e != null) {
             Num size = e.size;
 

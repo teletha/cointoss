@@ -55,6 +55,27 @@ class EntryTest {
     }
 
     @Test
+    void entryPrice() {
+        market.orders.requestEntry(Order.buy(10).price(10)).to(e -> {
+            // execute partially
+            market.perform(Executing.buy(1).price(9));
+            assert e.entryPice.is(10);
+
+            // execute additionally
+            market.perform(Executing.buy(2).price(9));
+            assert e.entryPice.is(10);
+
+            // execute completely
+            market.perform(Executing.buy(10).price(9));
+            assert e.entryPice.is(10);
+
+            // no effect
+            market.perform(Executing.buy(3).price(9));
+            assert e.entryPice.is(10);
+        });
+    }
+
+    @Test
     void exitSize() {
         market.performEntry(Order.buy(10).price(10), Order.sell(10).price(12)).to(e -> {
             // execute exit partially

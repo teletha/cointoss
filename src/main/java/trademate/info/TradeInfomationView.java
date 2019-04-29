@@ -9,9 +9,12 @@
  */
 package trademate.info;
 
-import static transcript.Transcript.en;
+import static transcript.Transcript.*;
+
+import org.apache.commons.lang3.RandomUtils;
 
 import cointoss.Direction;
+import cointoss.execution.Execution;
 import cointoss.order.Order;
 import cointoss.order.OrderBook;
 import cointoss.position.Position;
@@ -43,6 +46,9 @@ public class TradeInfomationView extends View {
     /** UI */
     private UIButton add;
 
+    /** UI */
+    private UIButton remove;
+
     /** Parent View */
     private TradingView view;
 
@@ -67,6 +73,7 @@ public class TradeInfomationView extends View {
                         $(positionProfit, S.Normal);
                     });
                     $(add);
+                    $(remove);
                 });
             }
         };
@@ -84,13 +91,23 @@ public class TradeInfomationView extends View {
         positionProfit.text(manager.profit);
 
         add.text("ADD").when(User.Action).to(() -> {
-            Position position = new Position();
-            position.price = Num.of(10000);
-            position.size.set(Num.of(1));
-            position.side = Direction.BUY;
+            Execution e = new Execution();
+            e.price = Num.of(RandomUtils.nextInt(10000, 50000));
+            e.size = Num.of(RandomUtils.nextInt(1, 10));
+            e.side = Direction.BUY;
             System.out.println("add position");
 
-            manager.add(position);
+            manager.add(e);
+        });
+
+        remove.text("REMOVE").when(User.Action).to(() -> {
+            Execution e = new Execution();
+            e.price = Num.of(100000);
+            e.size = Num.of(2);
+            e.side = Direction.SELL;
+            System.out.println("remove position");
+
+            manager.add(e);
         });
     }
 
