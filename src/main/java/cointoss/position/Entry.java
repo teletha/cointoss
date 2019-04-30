@@ -133,11 +133,12 @@ public class Entry implements Directional {
         }
     }
 
+    public Signal<Entry> requestEntry(Order order) {
+        return manager.request(order).effect(this::addEntry).mapTo(this);
+    }
+
     public Signal<Entry> requestExit(Order order) {
-        return manager.request(order).map(exit -> {
-            addExit(exit);
-            return this;
-        });
+        return manager.request(order).effect(this::addExit).mapTo(this);
     }
 
     /**

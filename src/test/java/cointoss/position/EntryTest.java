@@ -76,6 +76,22 @@ class EntryTest {
     }
 
     @Test
+    void multiEntryPrice() {
+        market.orders.requestEntry(Order.buy(10).price(10)).to(e -> {
+            // execute completely
+            market.perform(Executing.buy(10).price(9));
+            assert e.entryPice.is(10);
+
+            // second entry
+            e.requestEntry(Order.buy(10).price(20)).to(() -> {
+                // execute completely
+                market.perform(Executing.buy(10).price(19));
+                assert e.entryPice.is(15);
+            });
+        });
+    }
+
+    @Test
     void exitSize() {
         market.performEntry(Order.buy(10).price(10), Order.sell(10).price(12)).to(e -> {
             // execute exit partially
