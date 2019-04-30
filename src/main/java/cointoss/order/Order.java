@@ -362,7 +362,7 @@ public class Order implements Directional {
      */
     @Override
     public String toString() {
-        return direction().mark() + size + "@" + price + " 残" + remainingSize + " 済" + executedSize + " " + creationTime;
+        return direction().mark() + size + "@" + price + " 残" + remainingSize + " 済" + executedSize + " " + creationTime + " " + state;
     }
 
     /**
