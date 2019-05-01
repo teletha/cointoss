@@ -10,8 +10,10 @@
 package cointoss.verify;
 
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -67,6 +69,12 @@ public class VerifiableMarketService extends MarketService {
 
     /** The lag emulator. */
     public Latency latency = Latency.zero();
+
+    /** The cancel order manager. */
+    private boolean hasCancelOrder = false;
+
+    /** The cancel order manager. */
+    private final List<Order> cancelOrders = new ArrayList();
 
     /**
      * 
@@ -127,6 +135,12 @@ public class VerifiableMarketService extends MarketService {
     @Override
     public Signal<Order> cancel(Order order) {
         return new Signal<>((observer, disposer) -> {
+            BackendOrder backend = findBy(order);
+
+            if (backend != null) {
+                backend.cancelTime = latency.emulate(now);
+            }
+
             orderActive.removeIf(o -> o.id.equals(order.id));
             I.signal(orderAll).take(o -> o.id.equals(order.id)).take(1).to(o -> {
                 o.state.set(OrderState.CANCELED);
@@ -323,18 +337,40 @@ public class VerifiableMarketService extends MarketService {
     }
 
     /**
+     * Find {@link BackendOrder} by fronend {@link Order}.
+     * 
+     * @param order
+     * @return
+     */
+    private BackendOrder findBy(Order order) {
+        for (BackendOrder back : orderActive) {
+            if (back.front == order) {
+                return back;
+            }
+        }
+        return null;
+    }
+
+    /**
      * For test.
      */
     private static class BackendOrder extends Order {
 
+        /** The frontend order. */
+        private final Order front;
+
         /** The minimum price for market order. */
         private Num marketMinPrice = isBuy() ? Num.ZERO : Num.MAX;
+
+        /** The time which this order will be canceled completely. */
+        private ZonedDateTime cancelTime;
 
         /**
          * @param o
          */
         private BackendOrder(Order o) {
             super(o.direction(), o.size);
+            front = o;
 
             price(o.price);
             type(o.condition);
