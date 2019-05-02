@@ -79,7 +79,7 @@ public class Execution implements Directional {
     public final ZonedDateTime date = null;
 
     /** The epoch millseconds of executed date-time. */
-    public final long mills = 0;
+    public final long mills;
 
     /** Optional Attribute : The consecutive type. */
     public int consecutive;
@@ -94,6 +94,7 @@ public class Execution implements Directional {
      * Create empty {@link Execution}.
      */
     public Execution() {
+        this.mills = 0;
     }
 
     /**
@@ -103,6 +104,7 @@ public class Execution implements Directional {
      */
     Execution(String... values) {
         id = Long.parseLong(values[0]);
+        mills = 0;
         date(LocalDateTime.parse(values[1]).atZone(Chrono.UTC));
         side = Direction.parse(values[2]);
         price = Num.of(values[3]);
@@ -128,7 +130,7 @@ public class Execution implements Directional {
     public Execution date(ZonedDateTime date) {
         try {
             dateUpdater.invoke(this, date);
-            millsUpdater.invokeExact(this, Chrono.epochMills(date));
+            millsUpdater.invoke(this, Chrono.epochMills(date));
         } catch (Throwable e) {
             throw I.quiet(e);
         }

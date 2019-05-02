@@ -10,6 +10,8 @@
  */
 package cointoss.verify;
 
+import java.time.ZonedDateTime;
+
 import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.execution.Execution;
@@ -54,8 +56,7 @@ public class VerifiableMarket extends Market {
      * @param price
      */
     public VerifiableMarket perform(Execution e) {
-        timelineObservers.accept(service.emulate(e));
-        return this;
+        return perform(e, service.now());
     }
 
     /**
@@ -66,9 +67,13 @@ public class VerifiableMarket extends Market {
      * @return
      */
     public VerifiableMarket perform(Execution e, int lag) {
-        e.date(service.now().plusSeconds(lag));
+        return perform(e, service.now().plusSeconds(lag));
+    }
 
-        return perform(e);
+    private VerifiableMarket perform(Execution e, ZonedDateTime date) {
+        e.date(date);
+        timelineObservers.accept(service.emulate(e));
+        return this;
     }
 
     /**
