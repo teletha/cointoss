@@ -10,10 +10,8 @@
 package cointoss.verify;
 
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -35,9 +33,6 @@ import kiss.Signal;
 import kiss.Signaling;
 import kiss.Ⅲ;
 
-/**
- * @version 2018/09/18 20:37:42
- */
 public class VerifiableMarketService extends MarketService {
 
     /** The terminator. */
@@ -69,12 +64,6 @@ public class VerifiableMarketService extends MarketService {
 
     /** The lag emulator. */
     public Latency latency = Latency.zero();
-
-    /** The cancel order manager. */
-    private boolean hasCancelOrder = false;
-
-    /** The cancel order manager. */
-    private final List<Order> cancelOrders = new ArrayList();
 
     /**
      * 
@@ -373,7 +362,13 @@ public class VerifiableMarketService extends MarketService {
         private Num marketMinPrice = isBuy() ? Num.ZERO : Num.MAX;
 
         /**
-         * The time which this order will be canceled completely. Useing epoch mills to make
+         * The time which this order is created, Using epoch mills to make time-related calculation
+         * faster.
+         */
+        private long createTimeMills;
+
+        /**
+         * The time which this order will be canceled completely. Using epoch mills to make
          * time-related calculation faster.
          */
         private long cancelTimeMills;
