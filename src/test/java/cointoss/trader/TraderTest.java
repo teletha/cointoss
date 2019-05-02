@@ -9,8 +9,8 @@
  */
 package cointoss.trader;
 
-import static cointoss.Direction.BUY;
-import static java.time.temporal.ChronoUnit.SECONDS;
+import static cointoss.Direction.*;
+import static java.time.temporal.ChronoUnit.*;
 
 import org.junit.jupiter.api.Test;
 

@@ -9,12 +9,13 @@
  */
 package cointoss.verify;
 
-import static java.time.temporal.ChronoUnit.SECONDS;
+import static java.time.temporal.ChronoUnit.*;
 
 import org.junit.jupiter.api.Test;
 
 import cointoss.execution.Executing;
 import cointoss.order.Order;
+import kiss.Variable;
 
 class LatencyTest {
 
@@ -56,20 +57,19 @@ class LatencyTest {
             market.perform(Executing.buy(1).price(11), 3);
             assert order.isNotCanceled();
 
-            market.cancel(order).to(() -> {
-                // after 0 sec, order isn't canceled
-                market.perform(Executing.buy(1).price(11));
-                assert order.isNotCanceled();
+            Variable<Order> result = market.cancel(order).to();
 
-                // after 1 sec, order isn't canceled
-                market.perform(Executing.buy(1).price(11), 1);
-                assert order.isNotCanceled();
-                System.out.println(order.isNotCanceled());
+            // after 0 sec, order isn't canceled yet
+            market.perform(Executing.buy(1).price(11), 0);
+            assert order.isNotCanceled();
 
-                // after 3 sec, order is accepted
-                market.perform(Executing.buy(1).price(11), 2);
-                assert order.isCanceled();
-            });
+            // after 1 sec, order isn't canceled yet
+            market.perform(Executing.buy(1).price(11), 1);
+            assert order.isNotCanceled();
+
+            // after 3 sec, order is accepted
+            market.perform(Executing.buy(1).price(11), 2);
+            assert order.isCanceled();
         });
     }
 }

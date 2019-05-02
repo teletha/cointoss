@@ -66,7 +66,7 @@ public class VerifiableMarket extends Market {
      * @return
      */
     public VerifiableMarket perform(Execution e, int lag) {
-        e.date = service.now().plusSeconds(lag);
+        e.date(service.now().plusSeconds(lag));
 
         return perform(e);
     }
@@ -84,10 +84,9 @@ public class VerifiableMarket extends Market {
             for (int i = 1; i < count; i++) {
                 Execution copy = new Execution();
                 copy.size = copy.cumulativeSize = e.size;
-                copy.date = e.date;
+                copy.date(service.now());
                 copy.delay = e.delay;
                 copy.id = e.id ^ (97 + i);
-                copy.mills = e.mills;
                 copy.price = e.price;
                 copy.side = e.side;
                 copy.consecutive = e.side.isBuy() ? Execution.ConsecutiveSameBuyer : Execution.ConsecutiveSameSeller;
@@ -102,7 +101,7 @@ public class VerifiableMarket extends Market {
             Execution exe = new Execution();
             exe.side = entryOrder.direction;
             exe.size = entryOrder.size;
-            exe.date = entryOrder.creationTime.v;
+            exe.date(service.now());
             exe.price = entryOrder.price.minus(entryOrder.direction, service.setting.baseCurrencyMinimumBidPrice());
 
             perform(exe);
@@ -119,7 +118,7 @@ public class VerifiableMarket extends Market {
             Execution e = new Execution();
             e.side = order.direction;
             e.size = order.size;
-            e.date = order.creationTime.v;
+            e.date(service.now());
             e.price = order.price.minus(order.direction, service.setting.baseCurrencyMinimumBidPrice());
 
             perform(e);

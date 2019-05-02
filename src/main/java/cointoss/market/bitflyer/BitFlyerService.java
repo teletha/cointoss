@@ -686,7 +686,7 @@ class BitFlyerService extends MarketService {
          * @return
          */
         private BitFlyerExecution estimate(BitFlyerExecution previous) {
-            this.date = this.exec_date;
+            date(this.exec_date);
             estimateConsecutiveType(previous);
             estimateDelay();
 

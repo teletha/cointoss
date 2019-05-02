@@ -35,7 +35,7 @@ public class ExecutionLogger {
     public Execution decode(Execution previous, String[] values) {
         Execution current = new Execution();
         current.id = decodeId(values[0], previous);
-        current.date = decodeDate(values[1], previous);
+        current.date(decodeDate(values[1], previous));
         current.price = decodePrice(values[2], previous);
         int value = decodeInt(values[3].charAt(0));
         if (value < ConsecutiveTypeSize) {

@@ -9,7 +9,7 @@
  */
 package cointoss.execution;
 
-import static org.junit.jupiter.api.Assertions.assertIterableEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.ZonedDateTime;
 import java.util.List;

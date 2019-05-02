@@ -9,22 +9,28 @@
  */
 package cointoss.execution;
 
+import java.lang.invoke.MethodHandle;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 
 import cointoss.Direction;
 import cointoss.Directional;
 import cointoss.util.Chrono;
+import cointoss.util.IcyManipulator;
 import cointoss.util.Num;
 import kiss.Decoder;
 import kiss.Encoder;
+import kiss.I;
 import kiss.Manageable;
 import kiss.Singleton;
 
-/**
- * @version 2018/07/12 9:52:41
- */
 public class Execution implements Directional {
+
+    /** The field updater. */
+    private static final MethodHandle dateUpdater = IcyManipulator.updater(Execution.class, "date");
+
+    /** The field updater. */
+    private static final MethodHandle millsUpdater = IcyManipulator.updater(Execution.class, "mills");
 
     /** The consecutive type. (DEFAULT) */
     public static final int ConsecutiveDifference = 0;
@@ -49,7 +55,7 @@ public class Execution implements Directional {
 
     static {
         // don't modify these initial values
-        BASE.date = Chrono.utc(2000, 1, 1);
+        BASE.date(Chrono.utc(2000, 1, 1));
         BASE.side = Direction.BUY;
         BASE.price = Num.ZERO;
         BASE.size = Num.ZERO;
@@ -70,7 +76,10 @@ public class Execution implements Directional {
     public Num cumulativeSize = Num.ZERO;
 
     /** The executed date-time. */
-    public ZonedDateTime date;
+    public final ZonedDateTime date = null;
+
+    /** The epoch millseconds of executed date-time. */
+    public final long mills = 0;
 
     /** Optional Attribute : The consecutive type. */
     public int consecutive;
@@ -80,9 +89,6 @@ public class Execution implements Directional {
      * special info.
      */
     public int delay;
-
-    /** The epoch millseconds of executed date-time. */
-    public long mills;
 
     /**
      * Create empty {@link Execution}.
@@ -97,8 +103,7 @@ public class Execution implements Directional {
      */
     Execution(String... values) {
         id = Long.parseLong(values[0]);
-        date = LocalDateTime.parse(values[1]).atZone(Chrono.UTC);
-        mills = Chrono.epochMills(date);
+        date(LocalDateTime.parse(values[1]).atZone(Chrono.UTC));
         side = Direction.parse(values[2]);
         price = Num.of(values[3]);
         size = cumulativeSize = Num.of(values[4]);
@@ -112,6 +117,23 @@ public class Execution implements Directional {
     @Override
     public Direction direction() {
         return side;
+    }
+
+    /**
+     * Set executed date.
+     * 
+     * @param date An executed date.
+     * @return Chainable API.
+     */
+    public Execution date(ZonedDateTime date) {
+        try {
+            dateUpdater.invoke(this, date);
+            millsUpdater.invokeExact(this, Chrono.epochMills(date));
+            System.out.println(mills + "  " + date + "  " + Chrono.epochMills(date));
+        } catch (Throwable e) {
+            throw I.quiet(e);
+        }
+        return this;
     }
 
     /**

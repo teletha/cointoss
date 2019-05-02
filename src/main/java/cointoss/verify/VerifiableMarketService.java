@@ -276,7 +276,7 @@ public class VerifiableMarketService extends MarketService {
                 exe.side = order.direction();
                 exe.size = exe.cumulativeSize = executedSize;
                 exe.price = order.type.isMarket() ? order.marketMinPrice : order.price;
-                exe.date = e.date;
+                exe.date(e.date);
                 executeds.add(exe);
 
                 if (order.remainingSize.v.isZero()) {

@@ -79,7 +79,7 @@ public class Executing extends Execution {
      * @return Chainable API.
      */
     public final Executing date(int year, int month, int day, int hour, int minute, int second, int ms) {
-        return date(ZonedDateTime.of(year, month, day, hour, minute, second, ms * 1000000, Chrono.UTC));
+        return (Executing) date(ZonedDateTime.of(year, month, day, hour, minute, second, ms * 1000000, Chrono.UTC));
     }
 
     /**
@@ -102,18 +102,6 @@ public class Executing extends Execution {
      */
     public final Executing consecutive(int type) {
         this.consecutive = type;
-
-        return this;
-    }
-
-    /**
-     * Set executed date.
-     * 
-     * @param date An executed date.
-     * @return Chainable API.
-     */
-    public final Executing date(ZonedDateTime date) {
-        this.date = date;
 
         return this;
     }
@@ -199,7 +187,7 @@ public class Executing extends Execution {
         e.id = executionId.getAndIncrement();
         e.side = direction;
         e.size = e.cumulativeSize = size;
-        e.date = Chrono.MIN;
+        e.date(Chrono.MIN);
 
         return e;
     }
