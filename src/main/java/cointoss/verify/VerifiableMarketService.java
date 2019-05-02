@@ -134,21 +134,25 @@ public class VerifiableMarketService extends MarketService {
      */
     @Override
     public Signal<Order> cancel(Order order) {
-        return new Signal<>((observer, disposer) -> {
-            BackendOrder backend = findBy(order);
+        BackendOrder backend = findBy(order);
 
-            if (backend != null) {
-                backend.cancelTime = latency.emulate(now);
-            }
+        // associated backend order is not found, do nothing
+        if (backend == null) {
+            return I.signal();
+        }
 
-            orderActive.removeIf(o -> o.id.equals(order.id));
-            I.signal(orderAll).take(o -> o.id.equals(order.id)).take(1).to(o -> {
-                o.state.set(OrderState.CANCELED);
-                observer.accept(order);
-                observer.complete();
-            });
-            return disposer;
-        });
+        // when latency is zero, cancel order immediately
+        ZonedDateTime delay = latency.emulate(now);
+
+        if (delay == now) {
+            backend.cancel();
+            return I.signal(order);
+        }
+
+        // backend order will be canceled in the specified delay
+        backend.cancelTimeMills = Chrono.epochMills(delay);
+
+        return backend.canceling.expose;
     }
 
     /**
@@ -242,6 +246,12 @@ public class VerifiableMarketService extends MarketService {
 
             // time base filter
             if (e.date.isBefore(order.creationTime.get())) {
+                continue;
+            }
+
+            // check canceling time
+            if (order.cancelTimeMills != 0 && order.cancelTimeMills <= e.mills) {
+                order.cancel();
                 continue;
             }
 
@@ -354,7 +364,7 @@ public class VerifiableMarketService extends MarketService {
     /**
      * For test.
      */
-    private static class BackendOrder extends Order {
+    private class BackendOrder extends Order {
 
         /** The frontend order. */
         private final Order front;
@@ -362,8 +372,14 @@ public class VerifiableMarketService extends MarketService {
         /** The minimum price for market order. */
         private Num marketMinPrice = isBuy() ? Num.ZERO : Num.MAX;
 
-        /** The time which this order will be canceled completely. */
-        private ZonedDateTime cancelTime;
+        /**
+         * The time which this order will be canceled completely. Useing epoch mills to make
+         * time-related calculation faster.
+         */
+        private long cancelTimeMills;
+
+        /** The cancel event emitter. */
+        private final Signaling<Order> canceling = new Signaling();
 
         /**
          * @param o
@@ -374,6 +390,18 @@ public class VerifiableMarketService extends MarketService {
 
             price(o.price);
             type(o.condition);
+        }
+
+        /**
+         * Cancel this order actually.
+         */
+        private void cancel() {
+            orderActive.removeIf(o -> o.id.equals(id));
+            I.signal(orderAll).take(o -> o.id.equals(id)).take(1).to(o -> {
+                o.state.set(OrderState.CANCELED);
+                canceling.accept(front);
+                canceling.complete();
+            });
         }
     }
 }
