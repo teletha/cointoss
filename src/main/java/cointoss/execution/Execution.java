@@ -129,7 +129,6 @@ public class Execution implements Directional {
         try {
             dateUpdater.invoke(this, date);
             millsUpdater.invokeExact(this, Chrono.epochMills(date));
-            System.out.println(mills + "  " + date + "  " + Chrono.epochMills(date));
         } catch (Throwable e) {
             throw I.quiet(e);
         }
