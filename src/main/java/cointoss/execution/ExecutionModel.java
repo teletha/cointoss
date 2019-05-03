@@ -16,7 +16,6 @@ import cointoss.Directional;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
 import icy.manipulator.Icy;
-import icy.manipulator.Initializer;
 
 @Icy
 public class ExecutionModel implements Directional {
@@ -40,7 +39,7 @@ public class ExecutionModel implements Directional {
     public static final int DelayHuge = -1;
 
     /** The identifier. */
-    public long id = 0;
+    public long id;
 
     /** The side */
     public Direction side = Direction.BUY;
@@ -58,16 +57,41 @@ public class ExecutionModel implements Directional {
     public ZonedDateTime date = null;
 
     /** The epoch millseconds of executed date-time. */
-    public final long mills = Initializer.Long();
+    public final long mills;
 
     /** Optional Attribute : The consecutive type. */
-    public int consecutive = ConsecutiveDifference;
+    public int consecutive;
 
     /**
      * Optional Attribute : The rough estimated delay time (unit : second). The negative value means
      * special info.
      */
-    public int delay = DelayInestimable;
+    public int delay;
+
+    public ExecutionModel() {
+        this(0, Direction.BUY, Num.ZERO, Num.ZERO, Num.ZERO, null, ConsecutiveDifference, DelayInestimable);
+    }
+
+    /**
+     * @param side
+     * @param price
+     * @param size
+     * @param cumulativeSize
+     * @param date
+     * @param consecutive
+     * @param delay
+     */
+    public ExecutionModel(long id, Direction side, Num price, Num size, Num cumulativeSize, ZonedDateTime date, int consecutive, int delay) {
+        this.id = id;
+        this.side = side;
+        this.price = price;
+        this.size = size;
+        this.cumulativeSize = cumulativeSize;
+        this.date = date;
+        this.mills = 0;
+        this.consecutive = consecutive;
+        this.delay = delay;
+    }
 
     /**
      * {@inheritDoc}
