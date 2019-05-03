@@ -223,7 +223,7 @@ class BitFlyerService extends MarketService {
                     }
 
                     BitFlyerExecution exe = new BitFlyerExecution();
-                    exe.id = latestId = id != 0 ? id : ++latestId;
+                    exe.id(latestId = id != 0 ? id : ++latestId);
                     exe.side = Direction.parse(e.get("side").getAsString());
                     exe.price = Num.of(e.get("price").getAsString());
                     exe.size = exe.cumulativeSize = Num.of(e.get("size").getAsString());

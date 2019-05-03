@@ -39,22 +39,22 @@ public class ExecutionModel implements Directional {
     public static final int DelayHuge = -1;
 
     /** The identifier. */
-    public long id;
+    public final long id;
 
     /** The side */
-    public Direction side = Direction.BUY;
+    public Direction side;
 
     /** The executed price */
-    public Num price = Num.ZERO;
+    public Num price;
 
     /** The executed size. */
-    public Num size = Num.ZERO;
+    public Num size;
 
     /** The executed comulative size. */
-    public Num cumulativeSize = Num.ZERO;
+    public Num cumulativeSize;
 
     /** The executed date-time. */
-    public ZonedDateTime date = null;
+    public ZonedDateTime date;
 
     /** The epoch millseconds of executed date-time. */
     public final long mills;
@@ -68,11 +68,17 @@ public class ExecutionModel implements Directional {
      */
     public int delay;
 
+    /**
+     * Create default {@link ExecutionModel}.
+     */
     public ExecutionModel() {
         this(0, Direction.BUY, Num.ZERO, Num.ZERO, Num.ZERO, null, ConsecutiveDifference, DelayInestimable);
     }
 
     /**
+     * Create {@link ExecutionModel} with specified values.
+     * 
+     * @param id
      * @param side
      * @param price
      * @param size
