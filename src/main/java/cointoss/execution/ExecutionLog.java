@@ -614,7 +614,7 @@ public class ExecutionLog {
                 if (compact.isPresent()) {
                     // read compact
                     return I.signal(parser.iterate(new ZstdInputStream(compact.newInputStream()), ISO_8859_1))
-                            .scanWith(Executions.BASE, logger::decode)
+                            .scanWith(Execution.BASE, logger::decode)
                             .effectOnComplete(parser::stopParsing)
                             .effectOnObserve(stopwatch::start)
                             .effectOnComplete(() -> {
@@ -626,7 +626,7 @@ public class ExecutionLog {
                 } else {
                     // read normal
                     Signal<Execution> signal = I.signal(parser.iterate(normal.newInputStream(), ISO_8859_1))
-                            .map(Executions::of)
+                            .map(Execution::new)
                             .effectOnComplete(parser::stopParsing)
                             .effectOnObserve(stopwatch::start)
                             .effectOnComplete(() -> {
@@ -700,7 +700,7 @@ public class ExecutionLog {
                 setting.getFormat().setComment('無');
                 CsvWriter writer = new CsvWriter(new ZstdOutputStream(compact.newOutputStream(), 1), ISO_8859_1, setting);
 
-                return executions.maps(Executions.BASE, (prev, e) -> {
+                return executions.maps(Execution.BASE, (prev, e) -> {
                     writer.writeRow(logger.encode(prev, e));
                     return e;
                 }).effectOnComplete(writer::close);

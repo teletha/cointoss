@@ -54,9 +54,8 @@ public class Executing extends Execution {
      * @param price An executed price.
      * @return Chainable API.
      */
-    @Override
     public final Executing price(Num price) {
-        super.price(price);
+        this.price = price;
 
         return this;
     }
@@ -67,9 +66,8 @@ public class Executing extends Execution {
      * @param id An executed id.
      * @return Chainable API.
      */
-    @Override
     public final Executing id(long id) {
-        super.id(id);
+        this.id = id;
 
         return this;
     }
@@ -90,9 +88,8 @@ public class Executing extends Execution {
      * @param A delay time to assign.
      * @return Chainable API.
      */
-    @Override
     public final Executing delay(int delay) {
-        super.delay(delay);
+        this.delay = delay;
 
         return this;
     }
@@ -103,9 +100,8 @@ public class Executing extends Execution {
      * @param A consective type to assign.
      * @return Chainable API.
      */
-    @Override
     public final Executing consecutive(int type) {
-        super.consecutive(type);
+        this.consecutive = type;
 
         return this;
     }
@@ -187,11 +183,13 @@ public class Executing extends Execution {
      * @return Chainable API.
      */
     public static Executing of(Direction direction, Num size) {
-        return (Executing) new Executing().id(executionId.getAndIncrement())
-                .side(direction)
-                .size(size)
-                .cumulativeSize(size)
-                .date(Chrono.MIN);
+        Executing e = new Executing();
+        e.id = executionId.getAndIncrement();
+        e.side = direction;
+        e.size = e.cumulativeSize = size;
+        e.date(Chrono.MIN);
+
+        return e;
     }
 
     /**
@@ -223,7 +221,7 @@ public class Executing extends Execution {
 
         for (int i = 0; i < count; i++) {
             Executing e = Executing.of(side, Num.of(size)).price(price);
-            if (i != 0) e.consecutive(side.isBuy() ? ConsecutiveSameBuyer : ConsecutiveSameSeller);
+            if (i != 0) e.consecutive = side.isBuy() ? ConsecutiveSameBuyer : ConsecutiveSameSeller;
             list.add(e);
         }
         return list;

@@ -18,7 +18,7 @@ import cointoss.util.Num;
 import icy.manipulator.Icy;
 
 @Icy
-public class ExecutionModel implements Directional {
+class ExecutionXModel implements Directional {
 
     /** The consecutive type. (DEFAULT) */
     public static final int ConsecutiveDifference = 0;
@@ -38,66 +38,38 @@ public class ExecutionModel implements Directional {
     /** The order delay type (over 180s). */
     public static final int DelayHuge = -1;
 
+    /** The empty object. */
+    public static final ExecutionX BASE = ExecutionX.with().date(Chrono.utc(2000, 1, 1)).ice();
+
     /** The identifier. */
-    public final long id;
+    public final long id = 0;
 
     /** The side */
-    public Direction side;
+    public final Direction side = Direction.BUY;
 
     /** The executed price */
-    public Num price;
+    public final Num price = Num.ZERO;
 
     /** The executed size. */
-    public Num size;
+    public final Num size = Num.ZERO;
 
     /** The executed comulative size. */
-    public Num cumulativeSize;
+    public final Num cumulativeSize = Num.ZERO;
 
     /** The executed date-time. */
-    public ZonedDateTime date;
+    public final ZonedDateTime date = null;
 
     /** The epoch millseconds of executed date-time. */
-    public final long mills;
+    public final long mills = 0;
 
     /** Optional Attribute : The consecutive type. */
-    public int consecutive;
+    public final int consecutive = ConsecutiveDifference;
 
     /**
      * Optional Attribute : The rough estimated delay time (unit : second). The negative value means
      * special info.
      */
-    public int delay;
-
-    /**
-     * Create default {@link ExecutionModel}.
-     */
-    public ExecutionModel() {
-        this(0, Direction.BUY, Num.ZERO, Num.ZERO, Num.ZERO, null, ConsecutiveDifference, DelayInestimable);
-    }
-
-    /**
-     * Create {@link ExecutionModel} with specified values.
-     * 
-     * @param id
-     * @param side
-     * @param price
-     * @param size
-     * @param cumulativeSize
-     * @param date
-     * @param consecutive
-     * @param delay
-     */
-    public ExecutionModel(long id, Direction side, Num price, Num size, Num cumulativeSize, ZonedDateTime date, int consecutive, int delay) {
-        this.id = id;
-        this.side = side;
-        this.price = price;
-        this.size = size;
-        this.cumulativeSize = cumulativeSize;
-        this.date = date;
-        this.mills = 0;
-        this.consecutive = consecutive;
-        this.delay = delay;
-    }
+    public final int delay = DelayInestimable;
 
     /**
      * {@inheritDoc}
@@ -110,8 +82,7 @@ public class ExecutionModel implements Directional {
     /**
      * 
      */
-    @Icy.Derive(by = "date", to = "mills")
-    void date(Execution model) {
+    void date(ZonedDateTime date, ExecutionX model) {
         model.mills(Chrono.epochMills(date));
     }
 
@@ -158,11 +129,11 @@ public class ExecutionModel implements Directional {
      */
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof ExecutionModel == false) {
+        if (obj instanceof ExecutionXModel == false) {
             return false;
         }
 
-        ExecutionModel other = (ExecutionModel) obj;
+        ExecutionXModel other = (ExecutionXModel) obj;
 
         if (id != other.id) {
             return false;
@@ -193,4 +164,5 @@ public class ExecutionModel implements Directional {
         }
         return true;
     }
+
 }

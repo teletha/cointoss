@@ -18,7 +18,6 @@ import java.util.function.Function;
 
 import cointoss.execution.Execution;
 import cointoss.execution.ExecutionLog;
-import cointoss.execution.Executions;
 import cointoss.market.MarketServiceProvider;
 import cointoss.order.Order;
 import cointoss.order.OrderBook;
@@ -41,7 +40,7 @@ import kiss.Variable;
  */
 public class Market implements Disposable {
 
-    private final AtomicReference<Execution> switcher = new AtomicReference<>(Executions.BASE);
+    private final AtomicReference<Execution> switcher = new AtomicReference<>(Execution.BASE);
 
     /** The target market servicce. */
     public final MarketService service;
@@ -70,11 +69,11 @@ public class Market implements Disposable {
 
         if (e.consecutive == Execution.ConsecutiveSameBuyer || e.consecutive == Execution.ConsecutiveSameSeller) {
             // same taker
-            e.cumulativeSize(previous.cumulativeSize.plus(e.size));
+            e.cumulativeSize = previous.cumulativeSize.plus(e.size);
             return null;
         }
         return previous;
-    }).skip(e -> e == null || e == Executions.BASE);
+    }).skip(e -> e == null || e == Execution.BASE);
 
     /** The position manager. */
     public final PositionManager positions;
