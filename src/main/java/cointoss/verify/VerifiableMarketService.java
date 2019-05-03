@@ -272,7 +272,7 @@ public class VerifiableMarketService extends MarketService {
                 order.executedSize.set(v -> v.plus(executedSize));
                 order.remainingSize.set(v -> v.minus(executedSize));
 
-                Execution exe = new Execution();
+                Execution exe = Execution.with();
                 exe.side = order.direction();
                 exe.size = exe.cumulativeSize = executedSize;
                 exe.price = order.type.isMarket() ? order.marketMinPrice : order.price;

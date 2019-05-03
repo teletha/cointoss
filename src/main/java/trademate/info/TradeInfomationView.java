@@ -9,7 +9,7 @@
  */
 package trademate.info;
 
-import static transcript.Transcript.*;
+import static transcript.Transcript.en;
 
 import org.apache.commons.lang3.RandomUtils;
 
@@ -91,7 +91,7 @@ public class TradeInfomationView extends View {
         positionProfit.text(manager.profit);
 
         add.text("ADD").when(User.Action).to(() -> {
-            Execution e = new Execution();
+            Execution e = Execution.with();
             e.price = Num.of(RandomUtils.nextInt(10000, 50000));
             e.size = Num.of(RandomUtils.nextInt(1, 10));
             e.side = Direction.BUY;
@@ -101,7 +101,7 @@ public class TradeInfomationView extends View {
         });
 
         remove.text("REMOVE").when(User.Action).to(() -> {
-            Execution e = new Execution();
+            Execution e = Execution.with();
             e.price = Num.of(100000);
             e.size = Num.of(2);
             e.side = Direction.SELL;

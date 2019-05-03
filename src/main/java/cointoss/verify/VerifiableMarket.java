@@ -87,7 +87,7 @@ public class VerifiableMarket extends Market {
             perform(e);
 
             for (int i = 1; i < count; i++) {
-                Execution copy = new Execution();
+                Execution copy = Execution.with();
                 copy.size = copy.cumulativeSize = e.size;
                 copy.date(service.now());
                 copy.delay = e.delay;
@@ -103,7 +103,7 @@ public class VerifiableMarket extends Market {
 
     public Signal<Entry> performEntry(Order entryOrder, Order exitOrder) {
         return orders.requestEntry(entryOrder).effect(entry -> {
-            Execution exe = new Execution();
+            Execution exe = Execution.with();
             exe.side = entryOrder.direction;
             exe.size = entryOrder.size;
             exe.date(service.now());
@@ -120,7 +120,7 @@ public class VerifiableMarket extends Market {
      */
     public void requestAndExecution(Order order) {
         request(order).to(id -> {
-            Execution e = new Execution();
+            Execution e = Execution.with();
             e.side = order.direction;
             e.size = order.size;
             e.date(service.now());

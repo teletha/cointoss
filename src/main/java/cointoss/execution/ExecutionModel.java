@@ -9,16 +9,30 @@
  */
 package cointoss.execution;
 
+import java.lang.invoke.MethodHandle;
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 
 import cointoss.Direction;
 import cointoss.Directional;
 import cointoss.util.Chrono;
+import cointoss.util.IcyManipulator;
 import cointoss.util.Num;
 import icy.manipulator.Icy;
+import kiss.Decoder;
+import kiss.Encoder;
+import kiss.I;
+import kiss.Manageable;
+import kiss.Singleton;
 
 @Icy
-class ExecutionXModel implements Directional {
+public class ExecutionModel implements Directional {
+
+    /** The field updater. */
+    private static final MethodHandle dateUpdater = IcyManipulator.updater(ExecutionModel.class, "date");
+
+    /** The field updater. */
+    private static final MethodHandle millsUpdater = IcyManipulator.updater(ExecutionModel.class, "mills");
 
     /** The consecutive type. (DEFAULT) */
     public static final int ConsecutiveDifference = 0;
@@ -38,38 +52,41 @@ class ExecutionXModel implements Directional {
     /** The order delay type (over 180s). */
     public static final int DelayHuge = -1;
 
-    /** The empty object. */
-    public static final ExecutionX BASE = ExecutionX.with().date(Chrono.utc(2000, 1, 1)).ice();
-
-    /** The identifier. */
-    public final long id = 0;
+    public long id;
 
     /** The side */
-    public final Direction side = Direction.BUY;
+    public Direction side;
 
     /** The executed price */
-    public final Num price = Num.ZERO;
+    public Num price;
 
     /** The executed size. */
-    public final Num size = Num.ZERO;
+    public Num size;
 
     /** The executed comulative size. */
-    public final Num cumulativeSize = Num.ZERO;
+    public Num cumulativeSize = Num.ZERO;
 
     /** The executed date-time. */
     public final ZonedDateTime date = null;
 
     /** The epoch millseconds of executed date-time. */
-    public final long mills = 0;
+    public final long mills;
 
     /** Optional Attribute : The consecutive type. */
-    public final int consecutive = ConsecutiveDifference;
+    public int consecutive;
 
     /**
      * Optional Attribute : The rough estimated delay time (unit : second). The negative value means
      * special info.
      */
-    public final int delay = DelayInestimable;
+    public int delay;
+
+    /**
+     * Create empty {@link ExecutionModel}.
+     */
+    public ExecutionModel() {
+        this.mills = 0;
+    }
 
     /**
      * {@inheritDoc}
@@ -80,10 +97,28 @@ class ExecutionXModel implements Directional {
     }
 
     /**
+     * Set executed date.
      * 
+     * @param date An executed date.
+     * @return Chainable API.
      */
-    void date(ZonedDateTime date, ExecutionX model) {
-        model.mills(Chrono.epochMills(date));
+    public ExecutionModel date(ZonedDateTime date) {
+        try {
+            dateUpdater.invoke(this, date);
+            millsUpdater.invoke(this, Chrono.epochMills(date));
+        } catch (Throwable e) {
+            throw I.quiet(e);
+        }
+        return this;
+    }
+
+    /**
+     * Accessor for {@link #price}.
+     * 
+     * @return
+     */
+    public Num price() {
+        return price;
     }
 
     /**
@@ -129,11 +164,11 @@ class ExecutionXModel implements Directional {
      */
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof ExecutionXModel == false) {
+        if (obj instanceof ExecutionModel == false) {
             return false;
         }
 
-        ExecutionXModel other = (ExecutionXModel) obj;
+        ExecutionModel other = (ExecutionModel) obj;
 
         if (id != other.id) {
             return false;
@@ -163,6 +198,29 @@ class ExecutionXModel implements Directional {
             return false;
         }
         return true;
+    }
+
+    /**
+     * 
+     */
+    @Manageable(lifestyle = Singleton.class)
+    private static class Codec implements Decoder<ZonedDateTime>, Encoder<ZonedDateTime> {
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String encode(ZonedDateTime value) {
+            return value.toLocalDate().toString();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public ZonedDateTime decode(String value) {
+            return LocalDateTime.parse(value).atZone(Chrono.UTC);
+        }
     }
 
 }
