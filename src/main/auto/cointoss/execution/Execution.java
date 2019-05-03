@@ -119,6 +119,7 @@ public abstract class Execution extends ExecutionModel implements Manipulatable<
      public Execution date(ZonedDateTime value) {
          try {
              dateUpdater.invoke(this, value);
+             super.mills(this);
          } catch (Throwable e) {
              throw new Error(e);
          }
@@ -136,7 +137,7 @@ public abstract class Execution extends ExecutionModel implements Manipulatable<
      /**
      * Modify mills property.
      */
-     public Execution mills(long value) {
+     protected Execution mills(long value) {
          try {
              millsUpdater.invoke(this, value);
          } catch (Throwable e) {
@@ -291,17 +292,6 @@ public abstract class Execution extends ExecutionModel implements Manipulatable<
                  return this;
              }
              return new Icy(this.id, this.side, this.price, this.size, this.cumulativeSize, value, this.mills, this.consecutive, this.delay);
-         }
-
-         /**
-          * {@inheritDoc}
-          */
-         @Override
-         public Execution mills(long value) {
-             if (this.mills == value) {
-                 return this;
-             }
-             return new Icy(this.id, this.side, this.price, this.size, this.cumulativeSize, this.date, value, this.consecutive, this.delay);
          }
 
          /**

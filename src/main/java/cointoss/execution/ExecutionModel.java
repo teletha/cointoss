@@ -9,30 +9,21 @@
  */
 package cointoss.execution;
 
-import java.lang.invoke.MethodHandle;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 
 import cointoss.Direction;
 import cointoss.Directional;
 import cointoss.util.Chrono;
-import cointoss.util.IcyManipulator;
 import cointoss.util.Num;
 import icy.manipulator.Icy;
 import kiss.Decoder;
 import kiss.Encoder;
-import kiss.I;
 import kiss.Manageable;
 import kiss.Singleton;
 
 @Icy
 public class ExecutionModel implements Directional {
-
-    /** The field updater. */
-    private static final MethodHandle dateUpdater = IcyManipulator.updater(ExecutionModel.class, "date");
-
-    /** The field updater. */
-    private static final MethodHandle millsUpdater = IcyManipulator.updater(ExecutionModel.class, "mills");
 
     /** The consecutive type. (DEFAULT) */
     public static final int ConsecutiveDifference = 0;
@@ -96,20 +87,9 @@ public class ExecutionModel implements Directional {
         return side;
     }
 
-    /**
-     * Set executed date.
-     * 
-     * @param date An executed date.
-     * @return Chainable API.
-     */
-    public ExecutionModel date(ZonedDateTime date) {
-        try {
-            dateUpdater.invoke(this, date);
-            millsUpdater.invoke(this, Chrono.epochMills(date));
-        } catch (Throwable e) {
-            throw I.quiet(e);
-        }
-        return this;
+    @Icy.Derive(by = "date", to = "mills")
+    void mills(Execution model) {
+        model.mills(Chrono.epochMills(date));
     }
 
     /**
