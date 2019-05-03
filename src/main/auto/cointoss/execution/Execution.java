@@ -12,6 +12,9 @@ import java.time.ZonedDateTime;
 public abstract class Execution extends ExecutionModel implements Manipulatable<Execution> {
 
      /** The final property updater. */
+     private static final java.lang.invoke.MethodHandle idUpdater = icy.manipulator.Manipulator.updater(ExecutionModel.class, "id");
+
+     /** The final property updater. */
      private static final java.lang.invoke.MethodHandle dateUpdater = icy.manipulator.Manipulator.updater(ExecutionModel.class, "date");
 
      /** The final property updater. */
@@ -37,7 +40,11 @@ public abstract class Execution extends ExecutionModel implements Manipulatable<
      * Modify id property.
      */
      public Execution id(long value) {
-         this.id = value;
+         try {
+             idUpdater.invoke(this, value);
+         } catch (Throwable e) {
+             throw new Error(e);
+         }
 
          return this;
      }
@@ -209,7 +216,7 @@ public abstract class Execution extends ExecutionModel implements Manipulatable<
           * HIDE CONSTRUCTOR
           */
          private Icy(long id, Direction side, Num price, Num size, Num cumulativeSize, ZonedDateTime date, long mills, int consecutive, int delay) {
-                 this.id = id;
+                 super.id(id);
                  this.side = side;
                  this.price = price;
                  this.size = size;
@@ -327,7 +334,7 @@ public abstract class Execution extends ExecutionModel implements Manipulatable<
           */
          private Melty(Execution base) {
              if (base != null) {
-                 this.id = base.id;
+                 super.id(base.id);
                  this.side = base.side;
                  this.price = base.price;
                  this.size = base.size;

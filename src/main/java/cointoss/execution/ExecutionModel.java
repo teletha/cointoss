@@ -43,7 +43,8 @@ public class ExecutionModel implements Directional {
     /** The order delay type (over 180s). */
     public static final int DelayHuge = -1;
 
-    public long id;
+    /** The identifier. */
+    public final long id;
 
     /** The side */
     public Direction side;
@@ -55,10 +56,10 @@ public class ExecutionModel implements Directional {
     public Num size;
 
     /** The executed comulative size. */
-    public Num cumulativeSize = Num.ZERO;
+    public Num cumulativeSize;
 
     /** The executed date-time. */
-    public final ZonedDateTime date = null;
+    public final ZonedDateTime date;
 
     /** The epoch millseconds of executed date-time. */
     public final long mills;
@@ -76,7 +77,30 @@ public class ExecutionModel implements Directional {
      * Create empty {@link ExecutionModel}.
      */
     public ExecutionModel() {
-        this.mills = 0;
+        this(0, Direction.BUY, Num.ZERO, Num.ZERO, Num.ZERO, null, 0, ConsecutiveDifference, DelayInestimable);
+    }
+
+    /**
+     * @param id
+     * @param side
+     * @param price
+     * @param size
+     * @param cumulativeSize
+     * @param date
+     * @param mills
+     * @param consecutive
+     * @param delay
+     */
+    private ExecutionModel(long id, Direction side, Num price, Num size, Num cumulativeSize, ZonedDateTime date, long mills, int consecutive, int delay) {
+        this.id = id;
+        this.side = side;
+        this.price = price;
+        this.size = size;
+        this.cumulativeSize = cumulativeSize;
+        this.date = date;
+        this.mills = mills;
+        this.consecutive = consecutive;
+        this.delay = delay;
     }
 
     /**
