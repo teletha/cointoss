@@ -87,14 +87,11 @@ public class VerifiableMarket extends Market {
             perform(e);
 
             for (int i = 1; i < count; i++) {
-                Execution copy = new Execution();
-                copy.size = copy.cumulativeSize = e.size;
-                copy.date(service.now());
-                copy.delay = e.delay;
-                copy.id = e.id ^ (97 + i);
-                copy.price = e.price;
-                copy.side = e.side;
-                copy.consecutive = e.side.isBuy() ? Execution.ConsecutiveSameBuyer : Execution.ConsecutiveSameSeller;
+                Execution copy = Execution.with(e)
+                        .cumulativeSize(e.size)
+                        .date(service.now())
+                        .id(e.id ^ (97 + i))
+                        .consecutive(e.side.isBuy() ? Execution.ConsecutiveSameBuyer : Execution.ConsecutiveSameSeller);
 
                 perform(copy);
             }
@@ -103,11 +100,11 @@ public class VerifiableMarket extends Market {
 
     public Signal<Entry> performEntry(Order entryOrder, Order exitOrder) {
         return orders.requestEntry(entryOrder).effect(entry -> {
-            Execution exe = new Execution();
-            exe.side = entryOrder.direction;
-            exe.size = entryOrder.size;
-            exe.date(service.now());
-            exe.price = entryOrder.price.minus(entryOrder.direction, service.setting.baseCurrencyMinimumBidPrice());
+            Execution exe = Execution.with()
+                    .side(entryOrder.direction)
+                    .size(entryOrder.size)
+                    .date(service.now())
+                    .price(entryOrder.price.minus(entryOrder.direction, service.setting.baseCurrencyMinimumBidPrice()));
 
             perform(exe);
         }).flatMap(entry -> entry.requestExit(exitOrder));
@@ -120,11 +117,11 @@ public class VerifiableMarket extends Market {
      */
     public void requestAndExecution(Order order) {
         request(order).to(id -> {
-            Execution e = new Execution();
-            e.side = order.direction;
-            e.size = order.size;
-            e.date(service.now());
-            e.price = order.price.minus(order.direction, service.setting.baseCurrencyMinimumBidPrice());
+            Execution e = Execution.with()
+                    .side(order.direction)
+                    .size(order.size)
+                    .date(service.now())
+                    .price(order.price.minus(order.direction, service.setting.baseCurrencyMinimumBidPrice()));
 
             perform(e);
         });

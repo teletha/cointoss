@@ -11,6 +11,7 @@ package cointoss.ticker;
 
 import cointoss.Direction;
 import cointoss.execution.Execution;
+import cointoss.execution.Executions;
 import cointoss.util.Num;
 import kiss.I;
 import kiss.Signal;
@@ -25,7 +26,7 @@ public final class TickerManager {
     public final Variable<Execution> initial = Variable.empty();
 
     /** The latest execution. */
-    public final Variable<Execution> latest = Variable.of(Execution.BASE);
+    public final Variable<Execution> latest = Variable.of(Executions.BASE);
 
     public final RealtimeTicker realtime = new RealtimeTicker(TickSpan.Minute1, latest);
 

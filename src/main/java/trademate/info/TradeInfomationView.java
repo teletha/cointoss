@@ -91,20 +91,17 @@ public class TradeInfomationView extends View {
         positionProfit.text(manager.profit);
 
         add.text("ADD").when(User.Action).to(() -> {
-            Execution e = new Execution();
-            e.price = Num.of(RandomUtils.nextInt(10000, 50000));
-            e.size = Num.of(RandomUtils.nextInt(1, 10));
-            e.side = Direction.BUY;
+            Execution e = Execution.with()
+                    .price(Num.of(RandomUtils.nextInt(10000, 50000)))
+                    .size(Num.of(RandomUtils.nextInt(1, 10)))
+                    .side(Direction.BUY);
             System.out.println("add position");
 
             manager.add(e);
         });
 
         remove.text("REMOVE").when(User.Action).to(() -> {
-            Execution e = new Execution();
-            e.price = Num.of(100000);
-            e.size = Num.of(2);
-            e.side = Direction.SELL;
+            Execution e = Execution.with().price(Num.of(100000)).size(Num.of(2)).side(Direction.SELL);
             System.out.println("remove position");
 
             manager.add(e);

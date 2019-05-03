@@ -272,11 +272,12 @@ public class VerifiableMarketService extends MarketService {
                 order.executedSize.set(v -> v.plus(executedSize));
                 order.remainingSize.set(v -> v.minus(executedSize));
 
-                Execution exe = new Execution();
-                exe.side = order.direction();
-                exe.size = exe.cumulativeSize = executedSize;
-                exe.price = order.type.isMarket() ? order.marketMinPrice : order.price;
-                exe.date(e.date);
+                Execution exe = Execution.with()
+                        .side(order.direction)
+                        .size(executedSize)
+                        .cumulativeSize(executedSize)
+                        .price(order.type.isMarket() ? order.marketMinPrice : order.price)
+                        .date(e.date);
                 executeds.add(exe);
 
                 if (order.remainingSize.v.isZero()) {
@@ -286,9 +287,9 @@ public class VerifiableMarketService extends MarketService {
                 positions.accept(I.pair(exe.side, order.id.v, exe));
 
                 // replace execution info
-                e.side = exe.side;
-                e.size = e.cumulativeSize = exe.size;
-                e.price = exe.price;
+                e.side(exe.side);
+                e.size(exe.size).cumulativeSize(exe.size);
+                e.price(exe.price);
                 break;
             }
         }

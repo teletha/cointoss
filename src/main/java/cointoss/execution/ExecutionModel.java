@@ -16,9 +16,10 @@ import cointoss.Directional;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
 import icy.manipulator.Icy;
+import icy.manipulator.Initializer;
 
 @Icy
-class ExecutionXModel implements Directional {
+public class ExecutionModel implements Directional {
 
     /** The consecutive type. (DEFAULT) */
     public static final int ConsecutiveDifference = 0;
@@ -38,38 +39,35 @@ class ExecutionXModel implements Directional {
     /** The order delay type (over 180s). */
     public static final int DelayHuge = -1;
 
-    /** The empty object. */
-    public static final ExecutionX BASE = ExecutionX.with().date(Chrono.utc(2000, 1, 1)).ice();
-
     /** The identifier. */
-    public final long id = 0;
+    public long id = 0;
 
     /** The side */
-    public final Direction side = Direction.BUY;
+    public Direction side = Direction.BUY;
 
     /** The executed price */
-    public final Num price = Num.ZERO;
+    public Num price = Num.ZERO;
 
     /** The executed size. */
-    public final Num size = Num.ZERO;
+    public Num size = Num.ZERO;
 
     /** The executed comulative size. */
-    public final Num cumulativeSize = Num.ZERO;
+    public Num cumulativeSize = Num.ZERO;
 
     /** The executed date-time. */
-    public final ZonedDateTime date = null;
+    public ZonedDateTime date = null;
 
     /** The epoch millseconds of executed date-time. */
-    public final long mills = 0;
+    public final long mills = Initializer.Long();
 
     /** Optional Attribute : The consecutive type. */
-    public final int consecutive = ConsecutiveDifference;
+    public int consecutive = ConsecutiveDifference;
 
     /**
      * Optional Attribute : The rough estimated delay time (unit : second). The negative value means
      * special info.
      */
-    public final int delay = DelayInestimable;
+    public int delay = DelayInestimable;
 
     /**
      * {@inheritDoc}
@@ -82,7 +80,8 @@ class ExecutionXModel implements Directional {
     /**
      * 
      */
-    void date(ZonedDateTime date, ExecutionX model) {
+    @Icy.Derive(by = "date", to = "mills")
+    void date(Execution model) {
         model.mills(Chrono.epochMills(date));
     }
 
@@ -129,11 +128,11 @@ class ExecutionXModel implements Directional {
      */
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof ExecutionXModel == false) {
+        if (obj instanceof ExecutionModel == false) {
             return false;
         }
 
-        ExecutionXModel other = (ExecutionXModel) obj;
+        ExecutionModel other = (ExecutionModel) obj;
 
         if (id != other.id) {
             return false;
@@ -164,5 +163,4 @@ class ExecutionXModel implements Directional {
         }
         return true;
     }
-
 }
