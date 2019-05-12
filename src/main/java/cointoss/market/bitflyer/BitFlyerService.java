@@ -23,6 +23,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
+import javafx.scene.control.TextInputDialog;
+
 import org.apache.commons.codec.digest.HmacAlgorithms;
 import org.apache.commons.codec.digest.HmacUtils;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -41,7 +43,6 @@ import cointoss.order.OrderState;
 import cointoss.order.OrderUnit;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
-import javafx.scene.control.TextInputDialog;
 import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
@@ -223,10 +224,12 @@ class BitFlyerService extends MarketService {
                     }
 
                     BitFlyerExecution exe = new BitFlyerExecution();
-                    exe.id = latestId = id != 0 ? id : ++latestId;
-                    exe.side = Direction.parse(e.get("side").getAsString());
-                    exe.price = Num.of(e.get("price").getAsString());
-                    exe.size = exe.cumulativeSize = Num.of(e.get("size").getAsString());
+                    exe.setId(latestId = id != 0 ? id : ++latestId);
+                    exe.setDirection(Direction.parse(e.get("side").getAsString()));
+                    exe.setPrice(Num.of(e.get("price").getAsString()));
+                    Num size = Num.of(e.get("size").getAsString());
+                    exe.setSize(size);
+                    exe.setCumulativeSize(size);
                     exe.exec_date = parse(e.get("exec_date").getAsString()).atZone(Chrono.UTC);
                     String buyer = exe.buy_child_order_acceptance_id = e.get("buy_child_order_acceptance_id").getAsString();
                     String seller = exe.sell_child_order_acceptance_id = e.get("sell_child_order_acceptance_id").getAsString();
@@ -686,11 +689,83 @@ class BitFlyerService extends MarketService {
          * @return
          */
         private BitFlyerExecution estimate(BitFlyerExecution previous) {
-            date(this.exec_date);
+            setDate(this.exec_date);
             estimateConsecutiveType(previous);
             estimateDelay();
 
             return this;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected void setDirection(Direction value) {
+            super.setDirection(value);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected void setSize(Num value) {
+            super.setSize(value);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected void setId(long value) {
+            super.setId(value);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected void setPrice(Num value) {
+            super.setPrice(value);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected void setCumulativeSize(Num value) {
+            super.setCumulativeSize(value);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected void setDate(ZonedDateTime value) {
+            super.setDate(value);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected void setMills(long value) {
+            super.setMills(value);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected void setConsecutive(int value) {
+            super.setConsecutive(value);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected void setDelay(int value) {
+            super.setDelay(value);
         }
 
         /**
@@ -701,14 +776,14 @@ class BitFlyerService extends MarketService {
         private void estimateConsecutiveType(BitFlyerExecution previous) {
             if (buy_child_order_acceptance_id.equals(previous.buy_child_order_acceptance_id)) {
                 if (sell_child_order_acceptance_id.equals(previous.sell_child_order_acceptance_id)) {
-                    consecutive = Execution.ConsecutiveSameBoth;
+                    setConsecutive(Execution.ConsecutiveSameBoth);
                 } else {
-                    consecutive = Execution.ConsecutiveSameBuyer;
+                    setConsecutive(Execution.ConsecutiveSameBuyer);
                 }
             } else if (sell_child_order_acceptance_id.equals(previous.sell_child_order_acceptance_id)) {
-                consecutive = Execution.ConsecutiveSameSeller;
+                setConsecutive(Execution.ConsecutiveSameSeller);
             } else {
-                consecutive = Execution.ConsecutiveDifference;
+                setConsecutive(Execution.ConsecutiveDifference);
             }
         }
 
@@ -727,13 +802,13 @@ class BitFlyerService extends MarketService {
          * @return
          */
         private void estimateDelay() {
-            String taker = side.isBuy() ? buy_child_order_acceptance_id : sell_child_order_acceptance_id;
+            String taker = direction.isBuy() ? buy_child_order_acceptance_id : sell_child_order_acceptance_id;
 
             try {
                 // order format is like the following [JRF20180427-123407-869661]
                 // exclude illegal format
                 if (taker == null || taker.length() != 25 || !taker.startsWith("JRF")) {
-                    delay = Execution.DelayInestimable;
+                    setDelay(DelayInestimable);
                     return;
                 }
 
@@ -751,14 +826,14 @@ class BitFlyerService extends MarketService {
                 }
 
                 if (diff < 0) {
-                    delay = Execution.DelayInestimable;
+                    setDelay(DelayInestimable);
                 } else if (180 < diff) {
-                    delay = Execution.DelayHuge;
+                    setDelay(DelayHuge);
                 } else {
-                    delay = diff;
+                    setDelay(diff);
                 }
             } catch (DateTimeParseException e) {
-                delay = Execution.DelayInestimable;
+                setDelay(DelayInestimable);
             }
         }
     }

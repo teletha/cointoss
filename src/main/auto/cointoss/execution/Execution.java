@@ -2,459 +2,762 @@ package cointoss.execution;
 
 import cointoss.Direction;
 import cointoss.util.Num;
-import icy.manipulator.Accessor;
-import icy.manipulator.Manipulatable;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.time.ZonedDateTime;
+import javax.annotation.processing.Generated;
 
 /**
- * {@link Manipulatable} model for {@link ExecutionModel}.
+ * Generated model for {@link ExecutionModel}.
  */
-public abstract class Execution extends ExecutionModel implements Manipulatable<Execution> {
+@Generated("Icy Manipulator")
+public abstract class Execution extends ExecutionModel {
 
-     /** The final property updater. */
-     private static final java.lang.invoke.MethodHandle idUpdater = icy.manipulator.Manipulator.updater(ExecutionModel.class, "id");
-
-     /** The final property updater. */
-     private static final java.lang.invoke.MethodHandle dateUpdater = icy.manipulator.Manipulator.updater(ExecutionModel.class, "date");
-
-     /** The final property updater. */
-     private static final java.lang.invoke.MethodHandle millsUpdater = icy.manipulator.Manipulator.updater(ExecutionModel.class, "mills");
-
-     /** The model manipulator for reuse. */
-     private static final Manipulator MANIPULATOR = new Manipulator(null);
-
-     /**
-      * HIDE CONSTRUCTOR
-      */
-     protected Execution() {
-     }
-
-     /**
-     * Retrieve id property.
+    /**
+     * Create special method invoker.
+     *
+     * @param name A target method name.
+     * @param parameterTypes A list of method parameter types.
+     * @return A special method invoker.
      */
-     public long id() {
-         return this.id;
-     }
+    private static final MethodHandle invoker(String name, Class... parameterTypes)  {
+        try {
+            Method method = ExecutionModel.class.getDeclaredMethod(name, parameterTypes);
+            method.setAccessible(true);
+            return MethodHandles.lookup().unreflect(method);
+        } catch (Throwable e) {
+            throw new Error(e);
+        }
+    }
 
-     /**
-     * Modify id property.
+    /** The overload method invoker. */
+    private static final MethodHandle sizeint= invoker("size", int.class);
+
+    /** The overload method invoker. */
+    private static final MethodHandle sizefloat= invoker("size", float.class);
+
+    /** The overload method invoker. */
+    private static final MethodHandle sizelong= invoker("size", long.class);
+
+    /** The overload method invoker. */
+    private static final MethodHandle sizedouble= invoker("size", double.class);
+
+    /** The overload method invoker. */
+    private static final MethodHandle priceint= invoker("price", int.class);
+
+    /** The overload method invoker. */
+    private static final MethodHandle pricelong= invoker("price", long.class);
+
+    /** The overload method invoker. */
+    private static final MethodHandle pricefloat= invoker("price", float.class);
+
+    /** The overload method invoker. */
+    private static final MethodHandle pricedouble= invoker("price", double.class);
+
+    /** The overload method invoker. */
+    private static final MethodHandle dateintintintintintintint= invoker("date", int.class, int.class, int.class, int.class, int.class, int.class, int.class);
+
+    /**
+     * Create special property updater.
+     *
+     * @param name A target property name.
+     * @return A special property updater.
      */
-     public Execution id(long value) {
-         try {
-             idUpdater.invoke(this, value);
-         } catch (Throwable e) {
-             throw new Error(e);
-         }
+    private static final MethodHandle updater(String name)  {
+        try {
+            Field field = Execution.class.getDeclaredField(name);
+            field.setAccessible(true);
+            return MethodHandles.lookup().unreflectSetter(field);
+        } catch (Throwable e) {
+            throw new Error(e);
+        }
+    }
 
-         return this;
-     }
+    /** The final property updater. */
+    private static final MethodHandle directionUpdater = updater("direction");
 
-     /**
-     * Retrieve side property.
+    /** The final property updater. */
+    private static final MethodHandle sizeUpdater = updater("size");
+
+    /** The final property updater. */
+    private static final MethodHandle idUpdater = updater("id");
+
+    /** The final property updater. */
+    private static final MethodHandle priceUpdater = updater("price");
+
+    /** The final property updater. */
+    private static final MethodHandle cumulativeSizeUpdater = updater("cumulativeSize");
+
+    /** The final property updater. */
+    private static final MethodHandle dateUpdater = updater("date");
+
+    /** The final property updater. */
+    private static final MethodHandle millsUpdater = updater("mills");
+
+    /** The final property updater. */
+    private static final MethodHandle consecutiveUpdater = updater("consecutive");
+
+    /** The final property updater. */
+    private static final MethodHandle delayUpdater = updater("delay");
+
+    /** The exposed property. */
+    public final Direction direction;
+
+    /** The exposed property. */
+    public final Num size;
+
+    /** The exposed property. */
+    public final long id;
+
+    /** The exposed property. */
+    public final Num price;
+
+    /** The exposed property. */
+    public Num cumulativeSize;
+
+    /** The exposed property. */
+    public final ZonedDateTime date;
+
+    /** The exposed property. */
+    public final long mills;
+
+    /** The exposed property. */
+    public final int consecutive;
+
+    /** The exposed property. */
+    public final int delay;
+
+    /**
+     * HIDE CONSTRUCTOR
      */
-     public Direction side() {
-         return this.side;
-     }
+    protected Execution() {
+        this.direction = null;
+        this.size = null;
+        this.id = super.id();
+        this.price = super.price();
+        this.cumulativeSize = super.cumulativeSize();
+        this.date = super.date();
+        this.mills = super.mills();
+        this.consecutive = super.consecutive();
+        this.delay = super.delay();
+    }
 
-     /**
-     * Modify side property.
+    /**
+     * Retrieve direction property.
      */
-     public Execution side(Direction value) {
-         this.side = value;
+    @Override
+    public final Direction direction() {
+        return this.direction;
+    }
 
-         return this;
-     }
-
-     /**
-     * Retrieve price property.
+    /**
+     * Provide classic getter API.
      */
-     public Num price() {
-         return this.price;
-     }
+    @SuppressWarnings("unused")
+    private final Direction getDirection() {
+        return this.direction;
+    }
 
-     /**
-     * Modify price property.
+    /**
+     * Provide classic setter API.
      */
-     public Execution price(Num value) {
-         this.price = value;
+    @SuppressWarnings("unused")
+    protected void setDirection(Direction value) {
+        ((ÅssignableDirection) this).direction(value);
+    }
 
-         return this;
-     }
-
-     /**
+    /**
      * Retrieve size property.
      */
-     public Num size() {
-         return this.size;
-     }
+    @Override
+    public final Num size() {
+        return this.size;
+    }
 
-     /**
-     * Modify size property.
+    /**
+     * Provide classic getter API.
      */
-     public Execution size(Num value) {
-         this.size = value;
+    @SuppressWarnings("unused")
+    private final Num getSize() {
+        return this.size;
+    }
 
-         return this;
-     }
+    /**
+     * Provide classic setter API.
+     */
+    @SuppressWarnings("unused")
+    protected void setSize(Num value) {
+        ((ÅssignableSize) this).size(value);
+    }
 
-     /**
+    /**
+     * Retrieve id property.
+     */
+    @Override
+    public final long id() {
+        return this.id;
+    }
+
+    /**
+     * Provide classic getter API.
+     */
+    @SuppressWarnings("unused")
+    private final long getId() {
+        return this.id;
+    }
+
+    /**
+     * Provide classic setter API.
+     */
+    @SuppressWarnings("unused")
+    protected void setId(long value) {
+        ((ÅssignableÅrbitrary) this).id(value);
+    }
+
+    /**
+     * Retrieve price property.
+     */
+    @Override
+    public final Num price() {
+        return this.price;
+    }
+
+    /**
+     * Provide classic getter API.
+     */
+    @SuppressWarnings("unused")
+    private final Num getPrice() {
+        return this.price;
+    }
+
+    /**
+     * Provide classic setter API.
+     */
+    @SuppressWarnings("unused")
+    protected void setPrice(Num value) {
+        ((ÅssignableÅrbitrary) this).price(value);
+    }
+
+    /**
      * Retrieve cumulativeSize property.
      */
-     public Num cumulativeSize() {
-         return this.cumulativeSize;
-     }
+    @Override
+    public final Num cumulativeSize() {
+        return this.cumulativeSize;
+    }
 
-     /**
-     * Modify cumulativeSize property.
+    /**
+     * Provide classic getter API.
      */
-     public Execution cumulativeSize(Num value) {
-         this.cumulativeSize = value;
+    @SuppressWarnings("unused")
+    private final Num getCumulativeSize() {
+        return this.cumulativeSize;
+    }
 
-         return this;
-     }
+    /**
+     * Provide classic setter API.
+     */
+    @SuppressWarnings("unused")
+    protected void setCumulativeSize(Num value) {
+        ((ÅssignableÅrbitrary) this).cumulativeSize(value);
+    }
 
-     /**
+    /**
      * Retrieve date property.
      */
-     public ZonedDateTime date() {
-         return this.date;
-     }
+    @Override
+    public final ZonedDateTime date() {
+        return this.date;
+    }
 
-     /**
-     * Modify date property.
+    /**
+     * Provide classic getter API.
      */
-     public Execution date(ZonedDateTime value) {
-         try {
-             dateUpdater.invoke(this, value);
-             super.mills(this);
-         } catch (Throwable e) {
-             throw new Error(e);
-         }
+    @SuppressWarnings("unused")
+    private final ZonedDateTime getDate() {
+        return this.date;
+    }
 
-         return this;
-     }
+    /**
+     * Provide classic setter API.
+     */
+    @SuppressWarnings("unused")
+    protected void setDate(ZonedDateTime value) {
+        ((ÅssignableÅrbitrary) this).date(value);
+    }
 
-     /**
+    /**
      * Retrieve mills property.
      */
-     public long mills() {
-         return this.mills;
-     }
+    @Override
+    public final long mills() {
+        return this.mills;
+    }
 
-     /**
-     * Modify mills property.
+    /**
+     * Provide classic getter API.
      */
-     protected Execution mills(long value) {
-         try {
-             millsUpdater.invoke(this, value);
-         } catch (Throwable e) {
-             throw new Error(e);
-         }
+    @SuppressWarnings("unused")
+    private final long getMills() {
+        return this.mills;
+    }
 
-         return this;
-     }
+    /**
+     * Provide classic setter API.
+     */
+    @SuppressWarnings("unused")
+    protected void setMills(long value) {
+        ((ÅssignableÅrbitrary) this).mills(value);
+    }
 
-     /**
+    /**
      * Retrieve consecutive property.
      */
-     public int consecutive() {
-         return this.consecutive;
-     }
+    @Override
+    public final int consecutive() {
+        return this.consecutive;
+    }
 
-     /**
-     * Modify consecutive property.
+    /**
+     * Provide classic getter API.
      */
-     public Execution consecutive(int value) {
-         this.consecutive = value;
+    @SuppressWarnings("unused")
+    private final int getConsecutive() {
+        return this.consecutive;
+    }
 
-         return this;
-     }
+    /**
+     * Provide classic setter API.
+     */
+    @SuppressWarnings("unused")
+    protected void setConsecutive(int value) {
+        ((ÅssignableÅrbitrary) this).consecutive(value);
+    }
 
-     /**
+    /**
      * Retrieve delay property.
      */
-     public int delay() {
-         return this.delay;
-     }
+    @Override
+    public final int delay() {
+        return this.delay;
+    }
 
-     /**
-     * Modify delay property.
+    /**
+     * Provide classic getter API.
      */
-     public Execution delay(int value) {
-         this.delay = value;
+    @SuppressWarnings("unused")
+    private final int getDelay() {
+        return this.delay;
+    }
 
-         return this;
-     }
+    /**
+     * Provide classic setter API.
+     */
+    @SuppressWarnings("unused")
+    protected void setDelay(int value) {
+        ((ÅssignableÅrbitrary) this).delay(value);
+    }
 
-     /**
-      * Create model builder without base model.
-      */
-     public static final Execution with() {
-         return new Melty(null);
-     }
+    /** The singleton builder. */
+    public static final  Ìnstantiator<?> with = new Ìnstantiator();
 
-     /**
-      * Create model builder using the specified definition as base model.
-      */
-     public static final Execution with(Execution base) {
-         return new Melty(base);
-     }
+    /**
+     * Builder namespace for {@link Execution}.
+     */
+    public static final class Ìnstantiator<Self extends Execution & ÅssignableÅrbitrary<Self>> {
+        /**
+         * Create uninitialized {@link Execution}.
+         */
+        public final <T extends Self> T direction(Direction direction, Num num) {
+            Åssignable o = new Åssignable();
+            o.direction(direction);
+            o.size(num);
+            return (T) o;
+        }
+        /**
+         * Create uninitialized {@link Execution}.
+         */
+        public final <T extends Self> T direction(Direction direction, int size) {
+            Åssignable o = new Åssignable();
+            o.direction(direction);
+            o.size(size);
+            return (T) o;
+        }
+        /**
+         * Create uninitialized {@link Execution}.
+         */
+        public final <T extends Self> T direction(Direction direction, float size) {
+            Åssignable o = new Åssignable();
+            o.direction(direction);
+            o.size(size);
+            return (T) o;
+        }
+        /**
+         * Create uninitialized {@link Execution}.
+         */
+        public final <T extends Self> T direction(Direction direction, long size) {
+            Åssignable o = new Åssignable();
+            o.direction(direction);
+            o.size(size);
+            return (T) o;
+        }
+        /**
+         * Create uninitialized {@link Execution}.
+         */
+        public final <T extends Self> T direction(Direction direction, double size) {
+            Åssignable o = new Åssignable();
+            o.direction(direction);
+            o.size(size);
+            return (T) o;
+        }
+        /**
+         * Create uninitialized {@link Execution}.
+         */
+        public final <T extends Self> T buy(Num num) {
+            Åssignable o = new Åssignable();
+            o.buy();
+            o.size(num);
+            return (T) o;
+        }
+        /**
+         * Create uninitialized {@link Execution}.
+         */
+        public final <T extends Self> T buy(int size) {
+            Åssignable o = new Åssignable();
+            o.buy();
+            o.size(size);
+            return (T) o;
+        }
+        /**
+         * Create uninitialized {@link Execution}.
+         */
+        public final <T extends Self> T buy(float size) {
+            Åssignable o = new Åssignable();
+            o.buy();
+            o.size(size);
+            return (T) o;
+        }
+        /**
+         * Create uninitialized {@link Execution}.
+         */
+        public final <T extends Self> T buy(long size) {
+            Åssignable o = new Åssignable();
+            o.buy();
+            o.size(size);
+            return (T) o;
+        }
+        /**
+         * Create uninitialized {@link Execution}.
+         */
+        public final <T extends Self> T buy(double size) {
+            Åssignable o = new Åssignable();
+            o.buy();
+            o.size(size);
+            return (T) o;
+        }
+        /**
+         * Create uninitialized {@link Execution}.
+         */
+        public final <T extends Self> T sell(Num num) {
+            Åssignable o = new Åssignable();
+            o.sell();
+            o.size(num);
+            return (T) o;
+        }
+        /**
+         * Create uninitialized {@link Execution}.
+         */
+        public final <T extends Self> T sell(int size) {
+            Åssignable o = new Åssignable();
+            o.sell();
+            o.size(size);
+            return (T) o;
+        }
+        /**
+         * Create uninitialized {@link Execution}.
+         */
+        public final <T extends Self> T sell(float size) {
+            Åssignable o = new Åssignable();
+            o.sell();
+            o.size(size);
+            return (T) o;
+        }
+        /**
+         * Create uninitialized {@link Execution}.
+         */
+        public final <T extends Self> T sell(long size) {
+            Åssignable o = new Åssignable();
+            o.sell();
+            o.size(size);
+            return (T) o;
+        }
+        /**
+         * Create uninitialized {@link Execution}.
+         */
+        public final <T extends Self> T sell(double size) {
+            Åssignable o = new Åssignable();
+            o.sell();
+            o.size(size);
+            return (T) o;
+        }
+    }
 
-     /**
-      * Create model manipulator.
-      */
-     public static final Manipulator<Execution>manipulate() {
-         return MANIPULATOR;
-     }
+    /**
+     * Property assignment API.
+     */
+    public static interface ÅssignableDirection<Next> {
+        /**
+         * The base setter.
+         */
+        default Next direction(Direction value) {
+            try {
+                directionUpdater.invoke(this, value);
+            } catch (Throwable e) {
+                throw new Error(e);
+            }
+            return (Next) this;
+        }
 
-     /**
-      * Immutable Model.
-      */
-     private static final class Icy extends Execution {
+        /**
+         * The overload setter.
+         */
+        default Next buy() {
+            return direction(Direction.BUY);
+        }
 
-         /**
-          * HIDE CONSTRUCTOR
-          */
-         private Icy(long id, Direction side, Num price, Num size, Num cumulativeSize, ZonedDateTime date, long mills, int consecutive, int delay) {
-                 super.id(id);
-                 this.side = side;
-                 this.price = price;
-                 this.size = size;
-                 this.cumulativeSize = cumulativeSize;
-                 super.date(date);
-                 super.mills(mills);
-                 this.consecutive = consecutive;
-                 this.delay = delay;
-         }
+        /**
+         * The overload setter.
+         */
+        default Next sell() {
+            return direction(Direction.SELL);
+        }
+    }
 
-         /**
-          * {@inheritDoc}
-          */
-         @Override
-         public Execution melt() {
-             return new Melty(this);
-         }
+    /**
+     * Property assignment API.
+     */
+    public static interface ÅssignableSize<Next> {
+        /**
+         * The base setter.
+         */
+        default Next size(Num value) {
+            try {
+                sizeUpdater.invoke(this, value);
+            } catch (Throwable e) {
+                throw new Error(e);
+            }
+            return (Next) this;
+        }
 
-         /**
-          * {@inheritDoc}
-          */
-         @Override
-         public Execution id(long value) {
-             if (this.id == value) {
-                 return this;
-             }
-             return new Icy(value, this.side, this.price, this.size, this.cumulativeSize, this.date, this.mills, this.consecutive, this.delay);
-         }
+        /**
+         * The overload setter.
+         */
+        default Next size(int size) {
+            try {
+                return size((Num) sizeint.invoke(this, size));
+            } catch (Throwable e) {
+                throw new Error(e);
+            }
+        }
 
-         /**
-          * {@inheritDoc}
-          */
-         @Override
-         public Execution side(Direction value) {
-             if (this.side == value) {
-                 return this;
-             }
-             return new Icy(this.id, value, this.price, this.size, this.cumulativeSize, this.date, this.mills, this.consecutive, this.delay);
-         }
+        /**
+         * The overload setter.
+         */
+        default Next size(float size) {
+            try {
+                return size((Num) sizefloat.invoke(this, size));
+            } catch (Throwable e) {
+                throw new Error(e);
+            }
+        }
 
-         /**
-          * {@inheritDoc}
-          */
-         @Override
-         public Execution price(Num value) {
-             if (this.price == value) {
-                 return this;
-             }
-             return new Icy(this.id, this.side, value, this.size, this.cumulativeSize, this.date, this.mills, this.consecutive, this.delay);
-         }
+        /**
+         * The overload setter.
+         */
+        default Next size(long size) {
+            try {
+                return size((Num) sizelong.invoke(this, size));
+            } catch (Throwable e) {
+                throw new Error(e);
+            }
+        }
 
-         /**
-          * {@inheritDoc}
-          */
-         @Override
-         public Execution size(Num value) {
-             if (this.size == value) {
-                 return this;
-             }
-             return new Icy(this.id, this.side, this.price, value, this.cumulativeSize, this.date, this.mills, this.consecutive, this.delay);
-         }
+        /**
+         * The overload setter.
+         */
+        default Next size(double size) {
+            try {
+                return size((Num) sizedouble.invoke(this, size));
+            } catch (Throwable e) {
+                throw new Error(e);
+            }
+        }
+    }
 
-         /**
-          * {@inheritDoc}
-          */
-         @Override
-         public Execution cumulativeSize(Num value) {
-             if (this.cumulativeSize == value) {
-                 return this;
-             }
-             return new Icy(this.id, this.side, this.price, this.size, value, this.date, this.mills, this.consecutive, this.delay);
-         }
+    /**
+     * Property assignment API.
+     */
+    public static interface ÅssignableÅrbitrary<Next extends Execution> {
+        /**
+         * The base setter.
+         */
+        default Next id(long value) {
+            try {
+                idUpdater.invoke(this, value);
+            } catch (Throwable e) {
+                throw new Error(e);
+            }
+            return (Next) this;
+        }
+        /**
+         * The base setter.
+         */
+        default Next price(Num value) {
+            try {
+                priceUpdater.invoke(this, value);
+            } catch (Throwable e) {
+                throw new Error(e);
+            }
+            return (Next) this;
+        }
 
-         /**
-          * {@inheritDoc}
-          */
-         @Override
-         public Execution date(ZonedDateTime value) {
-             if (this.date == value) {
-                 return this;
-             }
-             return new Icy(this.id, this.side, this.price, this.size, this.cumulativeSize, value, this.mills, this.consecutive, this.delay);
-         }
+        /**
+         * The overload setter.
+         */
+        default Next price(int price) {
+            try {
+                return price((Num) priceint.invoke(this, price));
+            } catch (Throwable e) {
+                throw new Error(e);
+            }
+        }
 
-         /**
-          * {@inheritDoc}
-          */
-         @Override
-         public Execution consecutive(int value) {
-             if (this.consecutive == value) {
-                 return this;
-             }
-             return new Icy(this.id, this.side, this.price, this.size, this.cumulativeSize, this.date, this.mills, value, this.delay);
-         }
+        /**
+         * The overload setter.
+         */
+        default Next price(long price) {
+            try {
+                return price((Num) pricelong.invoke(this, price));
+            } catch (Throwable e) {
+                throw new Error(e);
+            }
+        }
 
-         /**
-          * {@inheritDoc}
-          */
-         @Override
-         public Execution delay(int value) {
-             if (this.delay == value) {
-                 return this;
-             }
-             return new Icy(this.id, this.side, this.price, this.size, this.cumulativeSize, this.date, this.mills, this.consecutive, value);
-         }
+        /**
+         * The overload setter.
+         */
+        default Next price(float price) {
+            try {
+                return price((Num) pricefloat.invoke(this, price));
+            } catch (Throwable e) {
+                throw new Error(e);
+            }
+        }
 
-     }
-     /**
-      * Mutable Model.
-      */
-     private static final class Melty extends Execution {
+        /**
+         * The overload setter.
+         */
+        default Next price(double price) {
+            try {
+                return price((Num) pricedouble.invoke(this, price));
+            } catch (Throwable e) {
+                throw new Error(e);
+            }
+        }
+        /**
+         * The base setter.
+         */
+        default Next cumulativeSize(Num value) {
+            try {
+                cumulativeSizeUpdater.invoke(this, value);
+            } catch (Throwable e) {
+                throw new Error(e);
+            }
+            return (Next) this;
+        }
+        /**
+         * The base setter.
+         */
+        default Next date(ZonedDateTime value) {
+            try {
+                dateUpdater.invoke(this, value);
+            } catch (Throwable e) {
+                throw new Error(e);
+            }
+            return (Next) this;
+        }
 
-         /**
-          * HIDE CONSTRUCTOR
-          */
-         private Melty(Execution base) {
-             if (base != null) {
-                 super.id(base.id);
-                 this.side = base.side;
-                 this.price = base.price;
-                 this.size = base.size;
-                 this.cumulativeSize = base.cumulativeSize;
-                 super.date(base.date);
-                 super.mills(base.mills);
-                 this.consecutive = base.consecutive;
-                 this.delay = base.delay;
-             }
-         }
+        /**
+         * The overload setter.
+         */
+        default Next date(int year, int month, int day, int hour, int minute, int second, int ms) {
+            try {
+                return date((ZonedDateTime) dateintintintintintintint.invoke(this, year, month, day, hour, minute, second, ms));
+            } catch (Throwable e) {
+                throw new Error(e);
+            }
+        }
+        /**
+         * The base setter.
+         */
+        default Next mills(long value) {
+            try {
+                millsUpdater.invoke(this, value);
+            } catch (Throwable e) {
+                throw new Error(e);
+            }
+            return (Next) this;
+        }
+        /**
+         * The base setter.
+         */
+        default Next consecutive(int value) {
+            try {
+                consecutiveUpdater.invoke(this, value);
+            } catch (Throwable e) {
+                throw new Error(e);
+            }
+            return (Next) this;
+        }
+        /**
+         * The base setter.
+         */
+        default Next delay(int value) {
+            try {
+                delayUpdater.invoke(this, value);
+            } catch (Throwable e) {
+                throw new Error(e);
+            }
+            return (Next) this;
+        }
+    }
 
-         /**
-          * {@inheritDoc}
-          */
-         @Override
-         public Execution ice() {
-             return new Icy(id, side, price, size, cumulativeSize, date, mills, consecutive, delay);
-         }
-     }
-     /**
-      * Model Manipulator.
-      */
-     public static final class Manipulator<RootModel> extends icy.manipulator.Manipulator<RootModel,Execution> {
+    /**
+     * Internal aggregated API.
+     */
+    protected static interface ÅssignableAll extends ÅssignableDirection, ÅssignableSize {
+    }
 
-         /** The accessor for id property. */
-         private static final Accessor ID = Accessor.<Execution, Long> of(Execution::id,  Execution::id);
+    /**
+     * Mutable Model.
+     */
+    private static final class Åssignable extends Execution implements ÅssignableAll, ÅssignableÅrbitrary {
+    }
 
-         /** The accessor for side property. */
-         private static final Accessor SIDE = Accessor.<Execution, Direction> of(Execution::side,  Execution::side);
-
-         /** The accessor for price property. */
-         private static final Accessor PRICE = Accessor.<Execution, Num> of(Execution::price,  Execution::price);
-
-         /** The accessor for size property. */
-         private static final Accessor SIZE = Accessor.<Execution, Num> of(Execution::size,  Execution::size);
-
-         /** The accessor for cumulativeSize property. */
-         private static final Accessor CUMULATIVESIZE = Accessor.<Execution, Num> of(Execution::cumulativeSize,  Execution::cumulativeSize);
-
-         /** The accessor for date property. */
-         private static final Accessor DATE = Accessor.<Execution, ZonedDateTime> of(Execution::date,  Execution::date);
-
-         /** The accessor for mills property. */
-         private static final Accessor MILLS = Accessor.<Execution, Long> of(Execution::mills,  Execution::mills);
-
-         /** The accessor for consecutive property. */
-         private static final Accessor CONSECUTIVE = Accessor.<Execution, Integer> of(Execution::consecutive,  Execution::consecutive);
-
-         /** The accessor for delay property. */
-         private static final Accessor DELAY = Accessor.<Execution, Integer> of(Execution::delay,  Execution::delay);
-
-         /**
-          * Construct operator.
-          */
-         public Manipulator(Accessor<RootModel,Execution> parent) {
-             super(parent);
-         }
-
-         /**
-          * Property operator.
-          */
-         public Accessor<RootModel,Long> id() {
-             return parent.then(ID);
-         }
-
-         /**
-          * Property operator.
-          */
-         public Accessor<RootModel,Direction> side() {
-             return parent.then(SIDE);
-         }
-
-         /**
-          * Property operator.
-          */
-         public Accessor<RootModel,Num> price() {
-             return parent.then(PRICE);
-         }
-
-         /**
-          * Property operator.
-          */
-         public Accessor<RootModel,Num> size() {
-             return parent.then(SIZE);
-         }
-
-         /**
-          * Property operator.
-          */
-         public Accessor<RootModel,Num> cumulativeSize() {
-             return parent.then(CUMULATIVESIZE);
-         }
-
-         /**
-          * Property operator.
-          */
-         public Accessor<RootModel,ZonedDateTime> date() {
-             return parent.then(DATE);
-         }
-
-         /**
-          * Property operator.
-          */
-         public Accessor<RootModel,Long> mills() {
-             return parent.then(MILLS);
-         }
-
-         /**
-          * Property operator.
-          */
-         public Accessor<RootModel,Integer> consecutive() {
-             return parent.then(CONSECUTIVE);
-         }
-
-         /**
-          * Property operator.
-          */
-         public Accessor<RootModel,Integer> delay() {
-             return parent.then(DELAY);
-         }
-
-     }
+    /**
+     * The identifier for properties.
+     */
+    static final class My {
+        static final String Direction = "direction";
+        static final String Size = "size";
+        static final String Id = "id";
+        static final String Price = "price";
+        static final String CumulativeSize = "cumulativeSize";
+        static final String Date = "date";
+        static final String Mills = "mills";
+        static final String Consecutive = "consecutive";
+        static final String Delay = "delay";
+    }
 }

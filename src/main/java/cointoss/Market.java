@@ -70,6 +70,7 @@ public class Market implements Disposable {
 
         if (e.consecutive == Execution.ConsecutiveSameBuyer || e.consecutive == Execution.ConsecutiveSameSeller) {
             // same taker
+            System.out.println(e.size + "  " + previous.cumulativeSize);
             e.cumulativeSize = previous.cumulativeSize.plus(e.size);
             return null;
         }

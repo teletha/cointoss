@@ -61,7 +61,7 @@ public class RealtimeTicker {
         // incoming
         volume = volume.plus(incoming.size);
 
-        if (incoming.side.isBuy()) {
+        if (incoming.direction.isBuy()) {
             longVolume = longVolume.plus(incoming.size);
             longPriceIncrese = longPriceIncrese.plus(incoming.price.minus(latest.v.price));
         } else {
@@ -79,7 +79,7 @@ public class RealtimeTicker {
 
             volume = volume.minus(outgoing.size);
 
-            if (outgoing.side.isBuy()) {
+            if (outgoing.direction.isBuy()) {
                 longVolume = longVolume.minus(outgoing.size);
                 longPriceIncrese = longPriceIncrese.minus(second.price.minus(outgoing.price));
             } else {

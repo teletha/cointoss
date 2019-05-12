@@ -11,6 +11,9 @@ package cointoss.execution;
 
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 import cointoss.Direction;
 import cointoss.Directional;
@@ -22,8 +25,11 @@ import kiss.Encoder;
 import kiss.Manageable;
 import kiss.Singleton;
 
-@Icy
-public class ExecutionModel implements Directional {
+@Icy(classicSetterModifier = "protected", grouping = 2)
+public abstract class ExecutionModel implements Directional {
+
+    /** The internal id counter. */
+    private static final AtomicLong counter = new AtomicLong(1);
 
     /** The consecutive type. (DEFAULT) */
     public static final int ConsecutiveDifference = 0;
@@ -43,77 +49,101 @@ public class ExecutionModel implements Directional {
     /** The order delay type (over 180s). */
     public static final int DelayHuge = -1;
 
-    /** The identifier. */
-    public final long id;
-
-    /** The side */
-    public Direction side;
-
-    /** The executed price */
-    public Num price;
-
-    /** The executed size. */
-    public Num size;
-
-    /** The executed comulative size. */
-    public Num cumulativeSize;
-
-    /** The executed date-time. */
-    public final ZonedDateTime date;
-
-    /** The epoch millseconds of executed date-time. */
-    public final long mills;
-
-    /** Optional Attribute : The consecutive type. */
-    public int consecutive;
-
     /**
-     * Optional Attribute : The rough estimated delay time (unit : second). The negative value means
-     * special info.
-     */
-    public int delay;
-
-    /**
-     * Create empty {@link ExecutionModel}.
-     */
-    public ExecutionModel() {
-        this(0, Direction.BUY, Num.ZERO, Num.ZERO, Num.ZERO, null, 0, ConsecutiveDifference, DelayInestimable);
-    }
-
-    /**
-     * @param id
-     * @param side
-     * @param price
-     * @param size
-     * @param cumulativeSize
-     * @param date
-     * @param mills
-     * @param consecutive
-     * @param delay
-     */
-    private ExecutionModel(long id, Direction side, Num price, Num size, Num cumulativeSize, ZonedDateTime date, long mills, int consecutive, int delay) {
-        this.id = id;
-        this.side = side;
-        this.price = price;
-        this.size = size;
-        this.cumulativeSize = cumulativeSize;
-        this.date = date;
-        this.mills = mills;
-        this.consecutive = consecutive;
-        this.delay = delay;
-    }
-
-    /**
-     * {@inheritDoc}
+     * Execution {@link Direction}.
+     * 
+     * @return
      */
     @Override
-    public Direction direction() {
-        return side;
+    @Icy.Property
+    public abstract Direction direction();
+
+    // @Icy.Overload("direction")
+    // private Direction buy() {
+    // return Direction.BUY;
+    // }
+    //
+    // @Icy.Overload("direction")
+    // private Direction sell() {
+    // return Direction.SELL;
+    // }
+
+    /**
+     * Size.
+     * 
+     * @return
+     */
+    @Icy.Property
+    public abstract Num size();
+
+    @Icy.Overload("size")
+    private Num size(int size) {
+        return Num.of(size);
     }
 
-    @Icy.Derive(by = "date", to = "mills")
-    void mills(Execution model) {
-        model.mills(Chrono.epochMills(date));
+    @Icy.Overload("size")
+    private Num size(float size) {
+        return Num.of(size);
+    }
+
+    @Icy.Overload("size")
+    private Num size(long size) {
+        return Num.of(size);
+    }
+
+    @Icy.Overload("size")
+    private Num size(double size) {
+        return Num.of(size);
+    }
+
+    /**
+     * Execution id.
+     * 
+     * @return
+     */
+    @Icy.Property
+    public long id() {
+        return counter.getAndIncrement();
+    }
+
+    /**
+     * Price.
+     * 
+     * @return
+     */
+    @Icy.Property
+    public Num price() {
+        return Num.ZERO;
+    }
+
+    @Icy.Overload("price")
+    private Num price(int price) {
+        return Num.of(price);
+    }
+
+    @Icy.Overload("price")
+    private Num price(long price) {
+        return Num.of(price);
+    }
+
+    @Icy.Overload("price")
+    private Num price(float price) {
+        return Num.of(price);
+    }
+
+    @Icy.Overload("price")
+    private Num price(double price) {
+        return Num.of(price);
+    }
+
+    /**
+     * Size.
+     * 
+     * @return
+     */
+    @Icy.Property(mutable = true)
+    public Num cumulativeSize() {
+        return Num.ZERO;
     }
 
     /**
@@ -121,8 +151,44 @@ public class ExecutionModel implements Directional {
      * 
      * @return
      */
-    public Num price() {
-        return price;
+    @Icy.Property
+    public ZonedDateTime date() {
+        return Chrono.MIN;
+    }
+
+    @Icy.Overload("date")
+    private ZonedDateTime date(int year, int month, int day, int hour, int minute, int second, int ms) {
+        return ZonedDateTime.of(year, month, day, hour, minute, second, ms * 1000000, Chrono.UTC);
+    }
+
+    /**
+     * Accessor for {@link #price}.
+     * 
+     * @return
+     */
+    @Icy.Property
+    public long mills() {
+        return 0;
+    }
+
+    /**
+     * Accessor for {@link #price}.
+     * 
+     * @return
+     */
+    @Icy.Property
+    public int consecutive() {
+        return ConsecutiveDifference;
+    }
+
+    /**
+     * Accessor for {@link #price}.
+     * 
+     * @return
+     */
+    @Icy.Property
+    public int delay() {
+        return DelayInestimable;
     }
 
     /**
@@ -132,7 +198,7 @@ public class ExecutionModel implements Directional {
      * @return A result.
      */
     public final boolean isBefore(ZonedDateTime time) {
-        return date.isBefore(time);
+        return date().isBefore(time);
     }
 
     /**
@@ -142,7 +208,7 @@ public class ExecutionModel implements Directional {
      * @return A result.
      */
     public final boolean isAfter(ZonedDateTime time) {
-        return date.isAfter(time);
+        return date().isAfter(time);
     }
 
     /**
@@ -152,7 +218,7 @@ public class ExecutionModel implements Directional {
      * @return
      */
     public ZonedDateTime after(long seconds) {
-        return date.plusSeconds(seconds);
+        return date().plusSeconds(seconds);
     }
 
     /**
@@ -160,7 +226,8 @@ public class ExecutionModel implements Directional {
      */
     @Override
     public String toString() {
-        return id + " " + date.toLocalDateTime() + " " + side.mark() + " " + price + " " + size + " " + consecutive + " " + delay;
+        return id() + " " + date().toLocalDateTime() + " " + direction()
+                .mark() + " " + price() + " " + size() + " " + consecutive() + " " + delay();
     }
 
     /**
@@ -174,34 +241,69 @@ public class ExecutionModel implements Directional {
 
         ExecutionModel other = (ExecutionModel) obj;
 
-        if (id != other.id) {
+        if (id() != other.id()) {
             return false;
         }
 
-        if (side != other.side) {
+        if (direction() != other.direction()) {
             return false;
         }
 
-        if (price.isNot(other.price)) {
+        if (price().isNot(other.price())) {
             return false;
         }
 
-        if (size.isNot(other.size)) {
+        if (size().isNot(other.size())) {
             return false;
         }
 
-        if (date.isEqual(other.date) == false) {
+        if (date().isEqual(other.date()) == false) {
             return false;
         }
 
-        if (consecutive != other.consecutive) {
+        if (consecutive() != other.consecutive()) {
             return false;
         }
 
-        if (delay != other.delay) {
+        if (delay() != other.delay()) {
             return false;
         }
         return true;
+    }
+
+    /**
+     * Create the specified numbers of {@link Execution}.
+     * 
+     * @param numbers
+     * @return
+     */
+    public static List<Execution> random(int numbers) {
+        List<Execution> list = new ArrayList();
+
+        for (int i = 0; i < numbers; i++) {
+            Execution e = Execution.with.direction(Direction.random(), Num.random(1, 10)).price(Num.random(1, 10));
+            list.add(e);
+        }
+
+        return list;
+    }
+
+    /**
+     * Create the sequence of {@link Execution}s.
+     * 
+     * @param size
+     * @param price
+     * @return
+     */
+    public static List<Execution> sequence(int count, Direction side, double size, double price) {
+        List<Execution> list = new ArrayList();
+
+        for (int i = 0; i < count; i++) {
+            Execution e = Execution.with.direction(side, Num.of(size)).price(price);
+            if (i != 0) e.setConsecutive(side.isBuy() ? ConsecutiveSameBuyer : ConsecutiveSameSeller);
+            list.add(e);
+        }
+        return list;
     }
 
     /**

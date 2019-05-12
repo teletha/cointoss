@@ -18,15 +18,7 @@ import cointoss.util.Num;
 public class Executions {
 
     /** The empty object. */
-    public static final Execution BASE = Execution.with();
-
-    static {
-        // don't modify these initial values
-        BASE.date(Chrono.utc(2000, 1, 1));
-        BASE.side = Direction.BUY;
-        BASE.price = Num.ZERO;
-        BASE.size = Num.ZERO;
-    }
+    public static final Execution BASE = Execution.with.buy(Num.ZERO).date(Chrono.utc(2000, 1, 1));
 
     /**
      * Create {@link ExecutionModel} with the specified values.
@@ -34,15 +26,14 @@ public class Executions {
      * @param values A list of values.
      */
     public static Execution of(String... values) {
-        Execution e = Execution.with();
-        e.id = Long.parseLong(values[0]);
-        e.date(LocalDateTime.parse(values[1]).atZone(Chrono.UTC));
-        e.side = Direction.parse(values[2]);
-        e.price = Num.of(values[3]);
-        e.size = e.cumulativeSize = Num.of(values[4]);
-        e.consecutive = Integer.parseInt(values[5]);
-        e.delay = Integer.parseInt(values[6]);
+        Num size = Num.of(values[4]);
 
-        return e;
+        return Execution.with.direction(Direction.parse(values[2]), size)
+                .cumulativeSize(size)
+                .price(Num.of(values[3]))
+                .id(Long.parseLong(values[0]))
+                .date(LocalDateTime.parse(values[1]).atZone(Chrono.UTC))
+                .consecutive(Integer.parseInt(values[5]))
+                .delay(Integer.parseInt(values[6]));
     }
 }

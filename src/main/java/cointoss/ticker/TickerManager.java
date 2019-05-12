@@ -104,7 +104,7 @@ public final class TickerManager {
         }
 
         // update totality of related values
-        if (e.side == Direction.BUY) {
+        if (e.direction == Direction.BUY) {
             longVolume = longVolume.plus(e.size);
             longPriceIncrease = longPriceIncrease.plus(e.price.minus(latest.v.price));
         } else {

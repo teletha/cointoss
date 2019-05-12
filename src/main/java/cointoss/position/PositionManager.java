@@ -143,7 +143,7 @@ public final class PositionManager implements Directional {
             Num size = e.size;
 
             for (Position position : positions) {
-                if (position.side == e.side) {
+                if (position.side == e.direction) {
                     // check same price position
                     if (position.price.is(e.price)) {
                         position.size.set(size::plus);
@@ -177,7 +177,7 @@ public final class PositionManager implements Directional {
 
             if (size.isPositive()) {
                 Position position = new Position();
-                position.side = e.side;
+                position.side = e.direction;
                 position.price = e.price;
                 position.size.set(size);
                 position.date = e.date;

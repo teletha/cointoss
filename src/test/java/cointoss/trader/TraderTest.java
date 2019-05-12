@@ -9,13 +9,12 @@
  */
 package cointoss.trader;
 
-import static cointoss.Direction.*;
-import static java.time.temporal.ChronoUnit.*;
+import static cointoss.Direction.BUY;
+import static java.time.temporal.ChronoUnit.SECONDS;
 
 import org.junit.jupiter.api.Test;
 
 import cointoss.Direction;
-import cointoss.execution.Executing;
 import cointoss.execution.Execution;
 import cointoss.util.Num;
 import kiss.Variable;
@@ -34,7 +33,7 @@ class TraderTest extends TraderTestSupport {
         assert entry.remaining().is(0);
 
         // execute
-        market.perform(Executing.buy(1).price(10));
+        market.perform(Execution.with.buy(1).price(10));
         entry.remaining().is(1);
     }
 
@@ -76,7 +75,7 @@ class TraderTest extends TraderTestSupport {
         assert entry.remaining().is(0);
 
         // execute
-        market.perform(Executing.buy(1).price(10));
+        market.perform(Execution.with.buy(1).price(10));
         assert entry.remaining().is(1);
     }
 
@@ -103,14 +102,14 @@ class TraderTest extends TraderTestSupport {
     void exitLimit() {
         // entry and execute
         Entry entry = entryLimit(Direction.BUY, Num.ONE, Num.TEN, null);
-        market.perform(Executing.buy(1).price(9));
+        market.perform(Execution.with.buy(1).price(9));
         assert entry.remaining().is(1);
 
         // try exit
         entry.exitLimit(Num.ONE, Num.TEN, null);
         assert entry.remaining().is(1);
 
-        market.perform(Executing.buy(1).price(11));
+        market.perform(Execution.with.buy(1).price(11));
         assert entry.remaining().is(0);
     }
 
@@ -118,7 +117,7 @@ class TraderTest extends TraderTestSupport {
     void exitLimitInvalidParameters() {
         // entry and execute
         Entry entry = entryLimit(Direction.BUY, Num.ONE, Num.TEN, null);
-        market.perform(Executing.buy(1).price(9));
+        market.perform(Execution.with.buy(1).price(9));
         assert entry.remaining().is(1);
 
         // null size
@@ -150,14 +149,14 @@ class TraderTest extends TraderTestSupport {
     void exitMarket() {
         // entry and execute
         Entry entry = entryLimit(Direction.BUY, Num.ONE, Num.TEN, null);
-        market.perform(Executing.buy(1).price(9));
+        market.perform(Execution.with.buy(1).price(9));
         assert entry.remaining().is(1);
 
         // try exit
         entry.exitMarket(Num.ONE);
         assert entry.remaining().is(1);
 
-        market.perform(Executing.buy(1).price(11));
+        market.perform(Execution.with.buy(1).price(11));
         assert entry.remaining().is(0);
     }
 
@@ -165,7 +164,7 @@ class TraderTest extends TraderTestSupport {
     void exitMarketInvalidPrameters() {
         // entry and execute
         Entry entry = entryLimit(Direction.BUY, Num.ONE, Num.TEN, null);
-        market.perform(Executing.buy(1).price(9));
+        market.perform(Execution.with.buy(1).price(9));
         assert entry.remaining().is(1);
 
         // null size
@@ -191,7 +190,7 @@ class TraderTest extends TraderTestSupport {
         assert completed.isAbsent();
 
         // execute
-        market.perform(Executing.buy(1).price(9));
+        market.perform(Execution.with.buy(1).price(9));
         assert completed.is(true);
     }
 
@@ -202,7 +201,7 @@ class TraderTest extends TraderTestSupport {
 
         // entry
         Entry entry = entryLimit(Direction.BUY, Num.ONE, Num.TEN, null);
-        market.perform(Executing.buy(1).price(9));
+        market.perform(Execution.with.buy(1).price(9));
         assert completed.isAbsent();
 
         // exit
@@ -210,7 +209,7 @@ class TraderTest extends TraderTestSupport {
         assert completed.isAbsent();
 
         // execute
-        market.perform(Executing.buy(1).price(11));
+        market.perform(Execution.with.buy(1).price(11));
         assert completed.is(true);
     }
 
@@ -221,7 +220,7 @@ class TraderTest extends TraderTestSupport {
 
         // entry
         Entry entry = entryLimit(Direction.BUY, Num.ONE, Num.TEN, null);
-        market.perform(Executing.buy(1).price(9));
+        market.perform(Execution.with.buy(1).price(9));
         assert completed.isAbsent();
 
         // exit
@@ -229,7 +228,7 @@ class TraderTest extends TraderTestSupport {
         assert completed.isAbsent();
 
         // execute
-        market.perform(Executing.buy(1).price(11));
+        market.perform(Execution.with.buy(1).price(11));
         assert completed.is(true);
     }
 
@@ -239,22 +238,22 @@ class TraderTest extends TraderTestSupport {
         assert state.isAbsent();
 
         // keep more than 10
-        market.perform(Executing.buy(1).price(15), 2);
-        market.perform(Executing.buy(1).price(15), 2);
-        market.perform(Executing.buy(1).price(15), 2);
+        market.perform(Execution.with.buy(1).price(15), 2);
+        market.perform(Execution.with.buy(1).price(15), 2);
+        market.perform(Execution.with.buy(1).price(15), 2);
         assert state.isAbsent();
 
         // keep less than 10 during 3 seconds
-        market.perform(Executing.buy(1).price(9), 1);
-        market.perform(Executing.buy(1).price(9), 1);
-        market.perform(Executing.buy(1).price(15), 3);
-        market.perform(Executing.buy(1).price(15), 3);
+        market.perform(Execution.with.buy(1).price(9), 1);
+        market.perform(Execution.with.buy(1).price(9), 1);
+        market.perform(Execution.with.buy(1).price(15), 3);
+        market.perform(Execution.with.buy(1).price(15), 3);
         assert state.isAbsent();
 
         // keep less than 10 during 5 seconds
-        market.perform(Executing.buy(1).price(9), 3);
-        market.perform(Executing.buy(1).price(9), 3);
-        market.perform(Executing.buy(1).price(9), 3);
+        market.perform(Execution.with.buy(1).price(9), 3);
+        market.perform(Execution.with.buy(1).price(9), 3);
+        market.perform(Execution.with.buy(1).price(9), 3);
         assert state.isPresent();
     }
 
