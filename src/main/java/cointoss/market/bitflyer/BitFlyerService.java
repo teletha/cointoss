@@ -23,6 +23,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
+import javafx.scene.control.TextInputDialog;
+
 import org.apache.commons.codec.digest.HmacAlgorithms;
 import org.apache.commons.codec.digest.HmacUtils;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -41,7 +43,6 @@ import cointoss.order.OrderState;
 import cointoss.order.OrderUnit;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
-import javafx.scene.control.TextInputDialog;
 import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
@@ -292,7 +293,21 @@ class BitFlyerService extends MarketService {
     @Override
     public Signal<Execution> executions(long start, long end) {
         return call("GET", "/v1/executions?product_code=" + marketName + "&count=" + setting
-                .acquirableExecutionSize() + "&before=" + end + "&after=" + start, "", "^", BitFlyerExecution.class)
+                .acquirableExecutionSize() + "&before=" + end + "&after=" + start, "").flatIterable(JsonElement::getAsJsonArray)
+                        .map(JsonElement::getAsJsonObject)
+                        .reverse()
+                        .map(e -> {
+                            BitFlyerExecution exe = new BitFlyerExecution();
+                            exe.id = e.get("id").getAsLong();
+                            exe.side = Direction.parse(e.get("side").getAsString());
+                            exe.price = Num.of(e.get("price").getAsString());
+                            exe.size = exe.cumulativeSize = Num.of(e.get("size").getAsString());
+                            exe.exec_date = LocalDateTime.parse(e.get("exec_date").getAsString()).atZone(Chrono.UTC);
+                            exe.buy_child_order_acceptance_id = e.get("buy_child_order_acceptance_id").getAsString();
+                            exe.sell_child_order_acceptance_id = e.get("sell_child_order_acceptance_id").getAsString();
+
+                            return exe;
+                        })
                         .maps(BitFlyerExecution.NONE, (prev, now) -> now.estimate(prev))
                         .as(Execution.class);
     }
@@ -302,7 +317,21 @@ class BitFlyerService extends MarketService {
      */
     @Override
     public Signal<Execution> executionLatest() {
-        return call("GET", "/v1/executions?product_code=" + marketName + "&count=1", "", "^", BitFlyerExecution.class)
+        return call("GET", "/v1/executions?product_code=" + marketName + "&count=1", "").flatIterable(JsonElement::getAsJsonArray)
+                .map(JsonElement::getAsJsonObject)
+                .reverse()
+                .map(e -> {
+                    BitFlyerExecution exe = new BitFlyerExecution();
+                    exe.id = e.get("id").getAsLong();
+                    exe.side = Direction.parse(e.get("side").getAsString());
+                    exe.price = Num.of(e.get("price").getAsString());
+                    exe.size = exe.cumulativeSize = Num.of(e.get("size").getAsString());
+                    exe.exec_date = LocalDateTime.parse(e.get("exec_date").getAsString()).atZone(Chrono.UTC);
+                    exe.buy_child_order_acceptance_id = e.get("buy_child_order_acceptance_id").getAsString();
+                    exe.sell_child_order_acceptance_id = e.get("sell_child_order_acceptance_id").getAsString();
+
+                    return exe;
+                })
                 .maps(BitFlyerExecution.NONE, (prev, now) -> now.estimate(prev))
                 .as(Execution.class);
     }
@@ -422,6 +451,42 @@ class BitFlyerService extends MarketService {
                     .build();
         }
         return network.rest(request, selector, type);
+    }
+
+    /**
+     * Call private API.
+     */
+    protected Signal<JsonElement> call(String method, String path, String body) {
+        String timestamp = String.valueOf(Chrono.utcNow().toEpochSecond());
+        String sign = new HmacUtils(HmacAlgorithms.HMAC_SHA_256, account.apiSecret.v).hmacHex(timestamp + method + path + body);
+
+        Request request;
+
+        if (method.equals("PUBLIC")) {
+            request = new Request.Builder().url(api + path).build();
+        } else if (method.equals("GET")) {
+            request = new Request.Builder().url(api + path)
+                    .addHeader("ACCESS-KEY", account.apiKey.v)
+                    .addHeader("ACCESS-TIMESTAMP", timestamp)
+                    .addHeader("ACCESS-SIGN", sign)
+                    .build();
+        } else if (method.equals("POST") && !path.startsWith("http")) {
+            request = new Request.Builder().url(api + path)
+                    .addHeader("ACCESS-KEY", account.apiKey.v)
+                    .addHeader("ACCESS-TIMESTAMP", timestamp)
+                    .addHeader("ACCESS-SIGN", sign)
+                    .addHeader("Content-Type", "application/json")
+                    .post(RequestBody.create(mime, body))
+                    .build();
+        } else {
+            request = new Request.Builder().url(path)
+                    .addHeader("Content-Type", "application/json")
+                    .addHeader("Cookie", sessionKey + "=" + maintainer.session)
+                    .addHeader("X-Requested-With", "XMLHttpRequest")
+                    .post(RequestBody.create(mime, body))
+                    .build();
+        }
+        return network.rest(request);
     }
 
     protected SessionMaintainer maintainer = new SessionMaintainer();

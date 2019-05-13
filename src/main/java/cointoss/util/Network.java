@@ -37,9 +37,6 @@ import okhttp3.WebSocketListener;
 import okio.Buffer;
 import trademate.setting.Notificator;
 
-/**
- * @version 2018/09/15 12:30:31
- */
 public class Network {
 
     /** The timeout duration. */
@@ -97,6 +94,29 @@ public class Network {
         } catch (final IOException e) {
             return "did not work";
         }
+    }
+
+    /**
+     * Call REST API.
+     */
+    public Signal<JsonElement> rest(Request request) {
+        return new Signal<>((observer, disposer) -> {
+            // System.out.println(request + " " + bodyToString(request));
+            try (Response response = client().newCall(request).execute(); ResponseBody body = response.body()) {
+                String value = body.string();
+                int code = response.code();
+
+                if (code == 200) {
+                    observer.accept(new JsonParser().parse(value));
+                    observer.complete();
+                } else {
+                    observer.error(new Error("[" + request.url() + "] HTTP Status " + code + " " + value));
+                }
+            } catch (Throwable e) {
+                observer.error(new Error("[" + request.url() + "] throws some error.", e));
+            }
+            return disposer;
+        });
     }
 
     /**
