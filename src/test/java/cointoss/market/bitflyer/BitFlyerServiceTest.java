@@ -24,6 +24,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import cointoss.Direction;
+import cointoss.execution.Executing;
 import cointoss.execution.Execution;
 import cointoss.order.Order;
 import kiss.Ⅲ;
@@ -60,12 +61,12 @@ public class BitFlyerServiceTest {
         assert service.request(Order.buy(1).price(10)).to().is("ServerAcceptanceID");
 
         // irrelevant execution
-        service.executionWillResponse(Execution.with.buy(1).price(10), "DisrelatedBuyer", "DisrelatedSeller");
+        service.executionWillResponse(Executing.buy(1).price(10), "DisrelatedBuyer", "DisrelatedSeller");
         assert executions.size() == 1;
         assert positions.size() == 0;
 
         // my execution
-        service.executionWillResponse(Execution.with.sell(1).price(10), "ServerAcceptanceID", "DisrelatedSeller");
+        service.executionWillResponse(Executing.sell(1).price(10), "ServerAcceptanceID", "DisrelatedSeller");
         assert executions.size() == 2;
         assert positions.size() == 1;
         assert positions.get(0).ⅰ.isBuy();

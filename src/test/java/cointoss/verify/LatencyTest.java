@@ -9,11 +9,11 @@
  */
 package cointoss.verify;
 
-import static java.time.temporal.ChronoUnit.SECONDS;
+import static java.time.temporal.ChronoUnit.*;
 
 import org.junit.jupiter.api.Test;
 
-import cointoss.execution.Execution;
+import cointoss.execution.Executing;
 import cointoss.order.Order;
 import kiss.Variable;
 
@@ -26,19 +26,19 @@ class LatencyTest {
 
         market.request(Order.buy(1).price(10)).to(order -> {
             // after 0 sec, order isn't accepted
-            market.perform(Execution.with.buy(1).price(9));
+            market.perform(Executing.buy(1).price(9));
             assert order.isNotCompleted();
 
             // after 1 sec, order isn't accepted
-            market.perform(Execution.with.buy(1).price(9), 1);
+            market.perform(Executing.buy(1).price(9), 1);
             assert order.isNotCompleted();
 
             // after 2 sec, order isn't accepted
-            market.perform(Execution.with.buy(1).price(9), 1);
+            market.perform(Executing.buy(1).price(9), 1);
             assert order.isNotCompleted();
 
             // after 3 sec, order is accepted
-            market.perform(Execution.with.buy(1).price(9), 1);
+            market.perform(Executing.buy(1).price(9), 1);
             assert order.isCompleted();
         });
     }
@@ -50,25 +50,25 @@ class LatencyTest {
 
         market.request(Order.buy(1).price(10)).to(order -> {
             // after 0 sec, order isn't accepted
-            market.perform(Execution.with.buy(1).price(11));
+            market.perform(Executing.buy(1).price(11));
             assert order.isNotCanceled();
 
             // after 3 sec, order is accepted
-            market.perform(Execution.with.buy(1).price(11), 3);
+            market.perform(Executing.buy(1).price(11), 3);
             assert order.isNotCanceled();
 
             Variable<Order> result = market.cancel(order).to();
 
             // after 0 sec, order isn't canceled yet
-            market.perform(Execution.with.buy(1).price(11), 0);
+            market.perform(Executing.buy(1).price(11), 0);
             assert order.isNotCanceled();
 
             // after 1 sec, order isn't canceled yet
-            market.perform(Execution.with.buy(1).price(11), 1);
+            market.perform(Executing.buy(1).price(11), 1);
             assert order.isNotCanceled();
 
             // after 3 sec, order is accepted
-            market.perform(Execution.with.buy(1).price(11), 2);
+            market.perform(Executing.buy(1).price(11), 2);
             assert order.isCanceled();
         });
     }

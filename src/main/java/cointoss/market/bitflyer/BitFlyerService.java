@@ -23,8 +23,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
-import javafx.scene.control.TextInputDialog;
-
 import org.apache.commons.codec.digest.HmacAlgorithms;
 import org.apache.commons.codec.digest.HmacUtils;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -43,6 +41,7 @@ import cointoss.order.OrderState;
 import cointoss.order.OrderUnit;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
+import javafx.scene.control.TextInputDialog;
 import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
@@ -63,9 +62,6 @@ class BitFlyerService extends MarketService {
     private static final MediaType mime = MediaType.parse("application/json; charset=utf-8");
 
     private static final DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss-");
-
-    /** The bitflyer ID date fromat. */
-    private static final DateTimeFormatter IDDateFormat = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss");
 
     /** The realtime data format */
     static final DateTimeFormatter RealTimeFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
@@ -216,115 +212,35 @@ class BitFlyerService extends MarketService {
      */
     @Override
     public Signal<Execution> executionsRealtimely() {
-        BitFlyerExecution2[] previous = new BitFlyerExecution2[] {BitFlyerExecution2.NONE};
-
         return network.jsonRPC("wss://ws.lightstream.bitflyer.com/json-rpc", "lightning_executions_" + marketName)
                 .flatIterable(JsonElement::getAsJsonArray)
                 .map(JsonElement::getAsJsonObject)
-                .map(e -> parse(e, previous))
-                .skipNull();
-    }
+                .map(e -> {
+                    long id = e.get("id").getAsLong();
 
-    private Execution parse(JsonObject e, BitFlyerExecution2[] previous) {
+                    if (id == 0 && latestId == 0) {
+                        return null; // skip
+                    }
 
-        long id = e.get("id").getAsLong();
+                    BitFlyerExecution exe = new BitFlyerExecution();
+                    exe.id = latestId = id != 0 ? id : ++latestId;
+                    exe.side = Direction.parse(e.get("side").getAsString());
+                    exe.price = Num.of(e.get("price").getAsString());
+                    exe.size = exe.cumulativeSize = Num.of(e.get("size").getAsString());
+                    exe.exec_date = parse(e.get("exec_date").getAsString()).atZone(Chrono.UTC);
+                    String buyer = exe.buy_child_order_acceptance_id = e.get("buy_child_order_acceptance_id").getAsString();
+                    String seller = exe.sell_child_order_acceptance_id = e.get("sell_child_order_acceptance_id").getAsString();
 
-        if (id == 0 && latestId == 0) {
-            return null; // skip
-        }
+                    if (orders.contains(buyer)) {
+                        executionsForMe.accept(I.pair(Direction.BUY, buyer, exe));
+                    } else if (orders.contains(seller)) {
+                        executionsForMe.accept(I.pair(Direction.SELL, seller, exe));
+                    }
 
-        BitFlyerExecution2 prev = previous[0];
-
-        Direction direction = Direction.parse(e.get("side").getAsString());
-        String buyer = e.get("buy_child_order_acceptance_id").getAsString();
-        String seller = e.get("sell_child_order_acceptance_id").getAsString();
-        ZonedDateTime date = parse(e.get("exec_date").getAsString()).atZone(Chrono.UTC);
-
-        int delay = estimateDelay(direction.isBuy() ? buyer : seller, date);
-        int consecutiveType = estimateConsecutiveType(prev, buyer, seller);
-
-        BitFlyerExecution2 now = BitFlyerExecution2.with.direction(direction, Num.of(e.get("size").getAsString()))
-                .price(Num.of(e.get("price").getAsString()))
-                .id(latestId = id != 0 ? id : ++latestId)
-                .date(date)
-                .consecutive(consecutiveType)
-                .delay(delay);
-
-        now.buyer = buyer;
-        now.seller = seller;
-
-        if (orders.contains(buyer)) {
-            executionsForMe.accept(I.pair(Direction.BUY, buyer, now));
-        } else if (orders.contains(seller)) {
-            executionsForMe.accept(I.pair(Direction.SELL, seller, now));
-        }
-        return previous[0] = now;
-    }
-
-    /**
-     * Estimate consecutive type.
-     * 
-     * @param previous
-     */
-    private int estimateConsecutiveType(BitFlyerExecution2 previous, String buy_child_order_acceptance_id, String sell_child_order_acceptance_id) {
-        if (buy_child_order_acceptance_id.equals(previous.buyer)) {
-            if (sell_child_order_acceptance_id.equals(previous.seller)) {
-                return Execution.ConsecutiveSameBoth;
-            } else {
-                return Execution.ConsecutiveSameBuyer;
-            }
-        } else if (sell_child_order_acceptance_id.equals(previous.seller)) {
-            return Execution.ConsecutiveSameSeller;
-        } else {
-            return Execution.ConsecutiveDifference;
-        }
-    }
-
-    /**
-     * <p>
-     * Analyze Taker's order ID and obtain approximate order time (Since there is a bot which
-     * specifies non-standard id format, ignore it in that case).
-     * </p>
-     * <ol>
-     * <li>Execution Date : UTC</li>
-     * <li>Server Order ID Date : UTC (i.e. stop-limit or IFD order)</li>
-     * <li>User Order ID Date : JST+9:00</li>
-     * </ol>
-     *
-     * @param exe
-     * @return
-     */
-    private int estimateDelay(String taker, ZonedDateTime date) {
-        try {
-            // order format is like the following [JRF20180427-123407-869661]
-            // exclude illegal format
-            if (taker == null || taker.length() != 25 || !taker.startsWith("JRF")) {
-                return Execution.DelayInestimable;
-            }
-
-            // remove tail random numbers
-            taker = taker.substring(3, 18);
-
-            // parse as datetime
-            long orderTime = LocalDateTime.parse(taker, IDDateFormat).toEpochSecond(ZoneOffset.UTC);
-            long executedTime = date.toEpochSecond() + 1;
-            int diff = (int) (executedTime - orderTime);
-
-            // estimate server order (over 9*60*60)
-            if (diff < -32000) {
-                diff += 32400;
-            }
-
-            if (diff < 0) {
-                return Execution.DelayInestimable;
-            } else if (180 < diff) {
-                return Execution.DelayHuge;
-            } else {
-                return diff;
-            }
-        } catch (DateTimeParseException e) {
-            return Execution.DelayInestimable;
-        }
+                    return exe;
+                })
+                .skipNull()
+                .maps(BitFlyerExecution.NONE, (prev, now) -> now.estimate(prev));
     }
 
     /**
@@ -375,14 +291,10 @@ class BitFlyerService extends MarketService {
      */
     @Override
     public Signal<Execution> executions(long start, long end) {
-        BitFlyerExecution2[] previous = new BitFlyerExecution2[] {BitFlyerExecution2.NONE};
-
         return call("GET", "/v1/executions?product_code=" + marketName + "&count=" + setting
-                .acquirableExecutionSize() + "&before=" + end + "&after=" + start, "").flatIterable(JsonElement::getAsJsonArray)
-                        .map(JsonElement::getAsJsonObject)
-                        .map(e -> parse(e, previous))
-                        .skipNull();
-
+                .acquirableExecutionSize() + "&before=" + end + "&after=" + start, "", "^", BitFlyerExecution.class)
+                        .maps(BitFlyerExecution.NONE, (prev, now) -> now.estimate(prev))
+                        .as(Execution.class);
     }
 
     /**
@@ -390,11 +302,9 @@ class BitFlyerService extends MarketService {
      */
     @Override
     public Signal<Execution> executionLatest() {
-        BitFlyerExecution2[] previous = new BitFlyerExecution2[] {BitFlyerExecution2.NONE};
-
-        return call("GET", "/v1/executions?product_code=" + marketName + "&count=1", "").effect(e -> {
-            System.out.println(e);
-        }).flatIterable(JsonElement::getAsJsonArray).map(JsonElement::getAsJsonObject).map(e -> parse(e, previous)).skipNull();
+        return call("GET", "/v1/executions?product_code=" + marketName + "&count=1", "", "^", BitFlyerExecution.class)
+                .maps(BitFlyerExecution.NONE, (prev, now) -> now.estimate(prev))
+                .as(Execution.class);
     }
 
     /**
@@ -512,42 +422,6 @@ class BitFlyerService extends MarketService {
                     .build();
         }
         return network.rest(request, selector, type);
-    }
-
-    /**
-     * Call private API.
-     */
-    protected Signal<JsonElement> call(String method, String path, String body) {
-        String timestamp = String.valueOf(Chrono.utcNow().toEpochSecond());
-        String sign = new HmacUtils(HmacAlgorithms.HMAC_SHA_256, account.apiSecret.v).hmacHex(timestamp + method + path + body);
-
-        Request request;
-
-        if (method.equals("PUBLIC")) {
-            request = new Request.Builder().url(api + path).build();
-        } else if (method.equals("GET")) {
-            request = new Request.Builder().url(api + path)
-                    .addHeader("ACCESS-KEY", account.apiKey.v)
-                    .addHeader("ACCESS-TIMESTAMP", timestamp)
-                    .addHeader("ACCESS-SIGN", sign)
-                    .build();
-        } else if (method.equals("POST") && !path.startsWith("http")) {
-            request = new Request.Builder().url(api + path)
-                    .addHeader("ACCESS-KEY", account.apiKey.v)
-                    .addHeader("ACCESS-TIMESTAMP", timestamp)
-                    .addHeader("ACCESS-SIGN", sign)
-                    .addHeader("Content-Type", "application/json")
-                    .post(RequestBody.create(mime, body))
-                    .build();
-        } else {
-            request = new Request.Builder().url(path)
-                    .addHeader("Content-Type", "application/json")
-                    .addHeader("Cookie", sessionKey + "=" + maintainer.session)
-                    .addHeader("X-Requested-With", "XMLHttpRequest")
-                    .post(RequestBody.create(mime, body))
-                    .build();
-        }
-        return network.restAsJsonElement(request);
     }
 
     protected SessionMaintainer maintainer = new SessionMaintainer();
@@ -782,6 +656,110 @@ class BitFlyerService extends MarketService {
         @Override
         public String toString() {
             return "WebResponse [status=" + status + ", error_message=" + error_message + ", data=" + data + "]";
+        }
+    }
+
+    /**
+     * @version 2018/05/25 9:37:29
+     */
+    private static class BitFlyerExecution extends Execution {
+
+        /** The empty object. */
+        private static final BitFlyerExecution NONE = new BitFlyerExecution();
+
+        /** The bitflyer ID date fromat. */
+        private static final DateTimeFormatter Format = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss");
+
+        /** Buyer id of this execution. */
+        public String buy_child_order_acceptance_id = "";
+
+        /** Seller id of this execution. */
+        public String sell_child_order_acceptance_id = "";
+
+        /** The executed date-time. */
+        public ZonedDateTime exec_date;
+
+        /**
+         * Estimate delay and consecutive type.
+         * 
+         * @param previous
+         * @return
+         */
+        private BitFlyerExecution estimate(BitFlyerExecution previous) {
+            date(this.exec_date);
+            estimateConsecutiveType(previous);
+            estimateDelay();
+
+            return this;
+        }
+
+        /**
+         * Estimate consecutive type.
+         * 
+         * @param previous
+         */
+        private void estimateConsecutiveType(BitFlyerExecution previous) {
+            if (buy_child_order_acceptance_id.equals(previous.buy_child_order_acceptance_id)) {
+                if (sell_child_order_acceptance_id.equals(previous.sell_child_order_acceptance_id)) {
+                    consecutive = Execution.ConsecutiveSameBoth;
+                } else {
+                    consecutive = Execution.ConsecutiveSameBuyer;
+                }
+            } else if (sell_child_order_acceptance_id.equals(previous.sell_child_order_acceptance_id)) {
+                consecutive = Execution.ConsecutiveSameSeller;
+            } else {
+                consecutive = Execution.ConsecutiveDifference;
+            }
+        }
+
+        /**
+         * <p>
+         * Analyze Taker's order ID and obtain approximate order time (Since there is a bot which
+         * specifies non-standard id format, ignore it in that case).
+         * </p>
+         * <ol>
+         * <li>Execution Date : UTC</li>
+         * <li>Server Order ID Date : UTC (i.e. stop-limit or IFD order)</li>
+         * <li>User Order ID Date : JST+9:00</li>
+         * </ol>
+         *
+         * @param exe
+         * @return
+         */
+        private void estimateDelay() {
+            String taker = side.isBuy() ? buy_child_order_acceptance_id : sell_child_order_acceptance_id;
+
+            try {
+                // order format is like the following [JRF20180427-123407-869661]
+                // exclude illegal format
+                if (taker == null || taker.length() != 25 || !taker.startsWith("JRF")) {
+                    delay = Execution.DelayInestimable;
+                    return;
+                }
+
+                // remove tail random numbers
+                taker = taker.substring(3, 18);
+
+                // parse as datetime
+                long orderTime = LocalDateTime.parse(taker, Format).toEpochSecond(ZoneOffset.UTC);
+                long executedTime = exec_date.toEpochSecond() + 1;
+                int diff = (int) (executedTime - orderTime);
+
+                // estimate server order (over 9*60*60)
+                if (diff < -32000) {
+                    diff += 32400;
+                }
+
+                if (diff < 0) {
+                    delay = Execution.DelayInestimable;
+                } else if (180 < diff) {
+                    delay = Execution.DelayHuge;
+                } else {
+                    delay = diff;
+                }
+            } catch (DateTimeParseException e) {
+                delay = Execution.DelayInestimable;
+            }
         }
     }
 

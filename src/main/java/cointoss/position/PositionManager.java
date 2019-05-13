@@ -17,7 +17,6 @@ import cointoss.Direction;
 import cointoss.Directional;
 import cointoss.MarketService;
 import cointoss.execution.Execution;
-import cointoss.execution.Executions;
 import cointoss.util.Num;
 import kiss.Signal;
 import kiss.Signaling;
@@ -65,7 +64,7 @@ public final class PositionManager implements Directional {
      * @param latest A latest market {@link Execution} holder.
      */
     public PositionManager(MarketService service, Variable<Execution> latest) {
-        this.latest = latest == null ? Variable.of(Executions.BASE) : latest;
+        this.latest = latest == null ? Variable.of(Execution.BASE) : latest;
         this.latest.observe().to(this::calculateProfit);
 
         service.add(service.executionsRealtimelyForMe().map(Ⅲ::ⅲ).to(this::add));
@@ -143,7 +142,7 @@ public final class PositionManager implements Directional {
             Num size = e.size;
 
             for (Position position : positions) {
-                if (position.side == e.direction) {
+                if (position.side == e.side) {
                     // check same price position
                     if (position.price.is(e.price)) {
                         position.size.set(size::plus);
@@ -177,7 +176,7 @@ public final class PositionManager implements Directional {
 
             if (size.isPositive()) {
                 Position position = new Position();
-                position.side = e.direction;
+                position.side = e.side;
                 position.price = e.price;
                 position.size.set(size);
                 position.date = e.date;

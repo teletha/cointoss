@@ -17,7 +17,6 @@ public class Project extends bee.api.Project {
         require("com.github.teletha", "sinobu");
         require("com.github.teletha", "viewtify");
         require("com.github.teletha", "marionette");
-        require("com.github.teletha", "icymanipulator").atAnnotation();
         require("com.github.teletha", "antibug").atTest();
         require("org.apache.commons", "commons-lang3");
         require("commons-codec", "commons-codec");

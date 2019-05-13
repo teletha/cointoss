@@ -14,7 +14,6 @@ import java.time.ZonedDateTime;
 import org.magicwerk.brownies.collections.GapList;
 
 import cointoss.execution.Execution;
-import cointoss.execution.Executions;
 import cointoss.util.Num;
 import kiss.Variable;
 
@@ -52,7 +51,7 @@ public class RealtimeTicker {
     public RealtimeTicker(TickSpan span, Variable<Execution> latest) {
         this.span = span;
         this.latest = latest;
-        buffer.addLast(Executions.BASE);
+        buffer.addLast(Execution.BASE);
     }
 
     void update(Execution incoming) {
@@ -61,7 +60,7 @@ public class RealtimeTicker {
         // incoming
         volume = volume.plus(incoming.size);
 
-        if (incoming.direction.isBuy()) {
+        if (incoming.side.isBuy()) {
             longVolume = longVolume.plus(incoming.size);
             longPriceIncrese = longPriceIncrese.plus(incoming.price.minus(latest.v.price));
         } else {
@@ -79,7 +78,7 @@ public class RealtimeTicker {
 
             volume = volume.minus(outgoing.size);
 
-            if (outgoing.direction.isBuy()) {
+            if (outgoing.side.isBuy()) {
                 longVolume = longVolume.minus(outgoing.size);
                 longPriceIncrese = longPriceIncrese.minus(second.price.minus(outgoing.price));
             } else {

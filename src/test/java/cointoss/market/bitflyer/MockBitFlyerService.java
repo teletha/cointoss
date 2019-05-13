@@ -87,7 +87,7 @@ class MockBitFlyerService extends BitFlyerService {
 
         JsonObject o = new JsonObject();
         o.addProperty("id", exe.id);
-        o.addProperty("side", exe.direction.name());
+        o.addProperty("side", exe.side.name());
         o.addProperty("price", exe.price.toDouble());
         o.addProperty("size", exe.size.toDouble());
         o.addProperty("exec_date", BitFlyerService.RealTimeFormat.format(exe.date) + "Z");

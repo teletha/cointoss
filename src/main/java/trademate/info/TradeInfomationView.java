@@ -9,8 +9,12 @@
  */
 package trademate.info;
 
-import static transcript.Transcript.en;
+import static transcript.Transcript.*;
 
+import org.apache.commons.lang3.RandomUtils;
+
+import cointoss.Direction;
+import cointoss.execution.Execution;
 import cointoss.order.Order;
 import cointoss.order.OrderBook;
 import cointoss.position.Position;
@@ -87,23 +91,23 @@ public class TradeInfomationView extends View {
         positionProfit.text(manager.profit);
 
         add.text("ADD").when(User.Action).to(() -> {
-            // Execution e = Execution.with();
-            // e.price = Num.of(RandomUtils.nextInt(10000, 50000));
-            // e.size = Num.of(RandomUtils.nextInt(1, 10));
-            // e.side = Direction.BUY;
-            // System.out.println("add position");
+            Execution e = new Execution();
+            e.price = Num.of(RandomUtils.nextInt(10000, 50000));
+            e.size = Num.of(RandomUtils.nextInt(1, 10));
+            e.side = Direction.BUY;
+            System.out.println("add position");
 
-            // manager.add(e);
+            manager.add(e);
         });
 
         remove.text("REMOVE").when(User.Action).to(() -> {
-            // Execution e = Execution.with();
-            // e.price = Num.of(100000);
-            // e.size = Num.of(2);
-            // e.side = Direction.SELL;
-            // System.out.println("remove position");
+            Execution e = new Execution();
+            e.price = Num.of(100000);
+            e.size = Num.of(2);
+            e.side = Direction.SELL;
+            System.out.println("remove position");
 
-            // manager.add(e);
+            manager.add(e);
         });
     }
 
