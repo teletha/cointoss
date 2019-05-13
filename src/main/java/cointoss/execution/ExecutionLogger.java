@@ -33,22 +33,23 @@ public class ExecutionLogger {
      * @return
      */
     public Execution decode(Execution previous, String[] values) {
-        Execution current = new Execution();
-        current.id = decodeId(values[0], previous);
-        current.date(decodeDate(values[1], previous));
-        current.price = decodePrice(values[2], previous);
+        Direction direction;
+        int consecutive;
         int value = decodeInt(values[3].charAt(0));
         if (value < ConsecutiveTypeSize) {
-            current.side = Direction.BUY;
-            current.consecutive = value;
+            direction = Direction.BUY;
+            consecutive = value;
         } else {
-            current.side = Direction.SELL;
-            current.consecutive = value - ConsecutiveTypeSize;
+            direction = Direction.SELL;
+            consecutive = value - ConsecutiveTypeSize;
         }
-        current.delay = decodeInt(values[3].charAt(1)) - 3;
-        current.size = decodeSize(values[3].substring(2), previous);
 
-        return current;
+        return Execution.with.direction(direction, decodeSize(values[3].substring(2), previous))
+                .id(decodeId(values[0], previous))
+                .date(decodeDate(values[1], previous))
+                .price(decodePrice(values[2], previous))
+                .delay(decodeInt(values[3].charAt(1)) - 3)
+                .consecutive(consecutive);
     }
 
     /**

@@ -239,14 +239,12 @@ class BitFlyerService extends MarketService {
                     int consecutiveType = estimateConsecutiveType(previous[0], previous[1], buyer, seller);
                     int delay = estimateDelay(taker, date);
 
-                    Execution exe = new Execution();
-                    exe.id = id;
-                    exe.side = direction;
-                    exe.price = price;
-                    exe.size = exe.cumulativeSize = size;
-                    exe.date(date);
-                    exe.consecutive = consecutiveType;
-                    exe.delay = delay;
+                    Execution exe = Execution.with.direction(direction, size)
+                            .id(id)
+                            .price(price)
+                            .date(date)
+                            .consecutive(consecutiveType)
+                            .delay(delay);
 
                     if (orders.contains(buyer)) {
                         executionsForMe.accept(I.pair(Direction.BUY, buyer, exe));
@@ -350,14 +348,7 @@ class BitFlyerService extends MarketService {
         int consecutiveType = estimateConsecutiveType(previous[0], previous[1], buyer, seller);
         int delay = estimateDelay(taker, date);
 
-        Execution exe = new Execution();
-        exe.id = id;
-        exe.side = direction;
-        exe.price = price;
-        exe.size = exe.cumulativeSize = size;
-        exe.date(date);
-        exe.consecutive = consecutiveType;
-        exe.delay = delay;
+        Execution exe = Execution.with.direction(direction, size).id(id).price(price).date(date).consecutive(consecutiveType).delay(delay);
 
         previous[0] = buyer;
         previous[1] = seller;

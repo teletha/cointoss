@@ -9,7 +9,7 @@
  */
 package cointoss;
 
-import static java.util.concurrent.TimeUnit.*;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.util.List;
 import java.util.Objects;
@@ -18,6 +18,7 @@ import java.util.function.Function;
 
 import cointoss.execution.Execution;
 import cointoss.execution.ExecutionLog;
+import cointoss.execution.Executions;
 import cointoss.market.MarketServiceProvider;
 import cointoss.order.Order;
 import cointoss.order.OrderBook;
@@ -40,7 +41,7 @@ import kiss.Variable;
  */
 public class Market implements Disposable {
 
-    private final AtomicReference<Execution> switcher = new AtomicReference<>(Execution.BASE);
+    private final AtomicReference<Execution> switcher = new AtomicReference<>(Executions.BASE);
 
     /** The target market servicce. */
     public final MarketService service;
@@ -73,7 +74,7 @@ public class Market implements Disposable {
             return null;
         }
         return previous;
-    }).skip(e -> e == null || e == Execution.BASE);
+    }).skip(e -> e == null || e == Executions.BASE);
 
     /** The position manager. */
     public final PositionManager positions;

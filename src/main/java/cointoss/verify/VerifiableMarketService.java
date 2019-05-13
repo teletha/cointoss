@@ -272,24 +272,24 @@ public class VerifiableMarketService extends MarketService {
                 order.executedSize.set(v -> v.plus(executedSize));
                 order.remainingSize.set(v -> v.minus(executedSize));
 
-                Execution exe = new Execution();
-                exe.side = order.direction();
-                exe.size = exe.cumulativeSize = executedSize;
-                exe.price = order.type.isMarket() ? order.marketMinPrice : order.price;
-                exe.date(e.date);
+                Execution exe = Execution.with.direction(order.direction(), executedSize)
+                        .price(order.type.isMarket() ? order.marketMinPrice : order.price)
+                        .date(e.date);
                 executeds.add(exe);
 
                 if (order.remainingSize.v.isZero()) {
                     order.state.set(OrderState.COMPLETED);
                     iterator.remove();
                 }
-                positions.accept(I.pair(exe.side, order.id.v, exe));
+                positions.accept(I.pair(exe.direction, order.id.v, exe));
 
                 // replace execution info
-                e.side = exe.side;
-                e.size = e.cumulativeSize = exe.size;
-                e.price = exe.price;
-                break;
+                return Execution.with.direction(e.direction, exe.size)
+                        .price(exe.price)
+                        .date(e.date)
+                        .id(e.id)
+                        .consecutive(e.consecutive)
+                        .delay(e.delay);
             }
         }
         return e;
