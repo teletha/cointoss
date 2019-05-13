@@ -64,6 +64,9 @@ class BitFlyerService extends MarketService {
 
     private static final DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss-");
 
+    /** The bitflyer ID date fromat. */
+    private static final DateTimeFormatter IdFormat = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss");
+
     /** The realtime data format */
     static final DateTimeFormatter RealTimeFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
 
@@ -213,6 +216,8 @@ class BitFlyerService extends MarketService {
      */
     @Override
     public Signal<Execution> executionsRealtimely() {
+        String[] previous = new String[] {"", ""};
+
         return network.jsonRPC("wss://ws.lightstream.bitflyer.com/json-rpc", "lightning_executions_" + marketName)
                 .flatIterable(JsonElement::getAsJsonArray)
                 .map(JsonElement::getAsJsonObject)
@@ -223,14 +228,25 @@ class BitFlyerService extends MarketService {
                         return null; // skip
                     }
 
-                    BitFlyerExecution exe = new BitFlyerExecution();
-                    exe.id = latestId = id != 0 ? id : ++latestId;
-                    exe.side = Direction.parse(e.get("side").getAsString());
-                    exe.price = Num.of(e.get("price").getAsString());
-                    exe.size = exe.cumulativeSize = Num.of(e.get("size").getAsString());
-                    exe.exec_date = parse(e.get("exec_date").getAsString()).atZone(Chrono.UTC);
-                    String buyer = exe.buy_child_order_acceptance_id = e.get("buy_child_order_acceptance_id").getAsString();
-                    String seller = exe.sell_child_order_acceptance_id = e.get("sell_child_order_acceptance_id").getAsString();
+                    id = latestId = id != 0 ? id : ++latestId;
+                    Direction direction = Direction.parse(e.get("side").getAsString());
+                    Num size = Num.of(e.get("size").getAsString());
+                    Num price = Num.of(e.get("price").getAsString());
+                    ZonedDateTime date = parse(e.get("exec_date").getAsString()).atZone(Chrono.UTC);
+                    String buyer = e.get("buy_child_order_acceptance_id").getAsString();
+                    String seller = e.get("sell_child_order_acceptance_id").getAsString();
+                    String taker = direction.isBuy() ? buyer : seller;
+                    int consecutiveType = estimateConsecutiveType(previous[0], previous[1], buyer, seller);
+                    int delay = estimateDelay(taker, date);
+
+                    Execution exe = new Execution();
+                    exe.id = id;
+                    exe.side = direction;
+                    exe.price = price;
+                    exe.size = exe.cumulativeSize = size;
+                    exe.date(date);
+                    exe.consecutive = consecutiveType;
+                    exe.delay = delay;
 
                     if (orders.contains(buyer)) {
                         executionsForMe.accept(I.pair(Direction.BUY, buyer, exe));
@@ -238,10 +254,12 @@ class BitFlyerService extends MarketService {
                         executionsForMe.accept(I.pair(Direction.SELL, seller, exe));
                     }
 
+                    previous[0] = buyer;
+                    previous[1] = seller;
+
                     return exe;
                 })
-                .skipNull()
-                .maps(BitFlyerExecution.NONE, (prev, now) -> now.estimate(prev));
+                .skipNull();
     }
 
     /**
@@ -292,24 +310,12 @@ class BitFlyerService extends MarketService {
      */
     @Override
     public Signal<Execution> executions(long start, long end) {
+        String[] previous = new String[] {"", ""};
+
         return call("GET", "/v1/executions?product_code=" + marketName + "&count=" + setting
                 .acquirableExecutionSize() + "&before=" + end + "&after=" + start, "").flatIterable(JsonElement::getAsJsonArray)
-                        .map(JsonElement::getAsJsonObject)
                         .reverse()
-                        .map(e -> {
-                            BitFlyerExecution exe = new BitFlyerExecution();
-                            exe.id = e.get("id").getAsLong();
-                            exe.side = Direction.parse(e.get("side").getAsString());
-                            exe.price = Num.of(e.get("price").getAsString());
-                            exe.size = exe.cumulativeSize = Num.of(e.get("size").getAsString());
-                            exe.exec_date = LocalDateTime.parse(e.get("exec_date").getAsString()).atZone(Chrono.UTC);
-                            exe.buy_child_order_acceptance_id = e.get("buy_child_order_acceptance_id").getAsString();
-                            exe.sell_child_order_acceptance_id = e.get("sell_child_order_acceptance_id").getAsString();
-
-                            return exe;
-                        })
-                        .maps(BitFlyerExecution.NONE, (prev, now) -> now.estimate(prev))
-                        .as(Execution.class);
+                        .map(e -> convert(e, previous));
     }
 
     /**
@@ -317,23 +323,112 @@ class BitFlyerService extends MarketService {
      */
     @Override
     public Signal<Execution> executionLatest() {
-        return call("GET", "/v1/executions?product_code=" + marketName + "&count=1", "").flatIterable(JsonElement::getAsJsonArray)
-                .map(JsonElement::getAsJsonObject)
-                .reverse()
-                .map(e -> {
-                    BitFlyerExecution exe = new BitFlyerExecution();
-                    exe.id = e.get("id").getAsLong();
-                    exe.side = Direction.parse(e.get("side").getAsString());
-                    exe.price = Num.of(e.get("price").getAsString());
-                    exe.size = exe.cumulativeSize = Num.of(e.get("size").getAsString());
-                    exe.exec_date = LocalDateTime.parse(e.get("exec_date").getAsString()).atZone(Chrono.UTC);
-                    exe.buy_child_order_acceptance_id = e.get("buy_child_order_acceptance_id").getAsString();
-                    exe.sell_child_order_acceptance_id = e.get("sell_child_order_acceptance_id").getAsString();
+        String[] previous = new String[] {"", ""};
 
-                    return exe;
-                })
-                .maps(BitFlyerExecution.NONE, (prev, now) -> now.estimate(prev))
-                .as(Execution.class);
+        return call("GET", "/v1/executions?product_code=" + marketName + "&count=1", "").flatIterable(JsonElement::getAsJsonArray)
+                .map(e -> convert(e, previous));
+    }
+
+    /**
+     * Convert to {@link Execution}.
+     * 
+     * @param json
+     * @param previous
+     * @return
+     */
+    private Execution convert(JsonElement json, String[] previous) {
+        JsonObject e = json.getAsJsonObject();
+
+        long id = e.get("id").getAsLong();
+        Direction direction = Direction.parse(e.get("side").getAsString());
+        Num size = Num.of(e.get("size").getAsString());
+        Num price = Num.of(e.get("price").getAsString());
+        ZonedDateTime date = LocalDateTime.parse(e.get("exec_date").getAsString()).atZone(Chrono.UTC);
+        String buyer = e.get("buy_child_order_acceptance_id").getAsString();
+        String seller = e.get("sell_child_order_acceptance_id").getAsString();
+        String taker = direction.isBuy() ? buyer : seller;
+        int consecutiveType = estimateConsecutiveType(previous[0], previous[1], buyer, seller);
+        int delay = estimateDelay(taker, date);
+
+        Execution exe = new Execution();
+        exe.id = id;
+        exe.side = direction;
+        exe.price = price;
+        exe.size = exe.cumulativeSize = size;
+        exe.date(date);
+        exe.consecutive = consecutiveType;
+        exe.delay = delay;
+
+        previous[0] = buyer;
+        previous[1] = seller;
+
+        return exe;
+    }
+
+    /**
+     * Estimate consecutive type.
+     * 
+     * @param previous
+     */
+    private int estimateConsecutiveType(String prevBuyer, String prevSeller, String buyer, String seller) {
+        if (buyer.equals(prevBuyer)) {
+            if (seller.equals(prevSeller)) {
+                return Execution.ConsecutiveSameBoth;
+            } else {
+                return Execution.ConsecutiveSameBuyer;
+            }
+        } else if (seller.equals(prevSeller)) {
+            return Execution.ConsecutiveSameSeller;
+        } else {
+            return Execution.ConsecutiveDifference;
+        }
+    }
+
+    /**
+     * <p>
+     * Analyze Taker's order ID and obtain approximate order time (Since there is a bot which
+     * specifies non-standard id format, ignore it in that case).
+     * </p>
+     * <ol>
+     * <li>Execution Date : UTC</li>
+     * <li>Server Order ID Date : UTC (i.e. stop-limit or IFD order)</li>
+     * <li>User Order ID Date : JST+9:00</li>
+     * </ol>
+     *
+     * @param exe
+     * @return
+     */
+    private int estimateDelay(String taker, ZonedDateTime date) {
+        try {
+            // order format is like the following [JRF20180427-123407-869661]
+            // exclude illegal format
+            if (taker == null || taker.length() != 25 || !taker.startsWith("JRF")) {
+                return Execution.DelayInestimable;
+            }
+
+            // remove tail random numbers
+            taker = taker.substring(3, 18);
+
+            // parse as datetime
+            long orderTime = LocalDateTime.parse(taker, IdFormat).toEpochSecond(ZoneOffset.UTC);
+            long executedTime = date.toEpochSecond() + 1;
+            int diff = (int) (executedTime - orderTime);
+
+            // estimate server order (over 9*60*60)
+            if (diff < -32000) {
+                diff += 32400;
+            }
+
+            if (diff < 0) {
+                return Execution.DelayInestimable;
+            } else if (180 < diff) {
+                return Execution.DelayHuge;
+            } else {
+                return diff;
+            }
+        } catch (DateTimeParseException e) {
+            return Execution.DelayInestimable;
+        }
     }
 
     /**
@@ -721,110 +816,6 @@ class BitFlyerService extends MarketService {
         @Override
         public String toString() {
             return "WebResponse [status=" + status + ", error_message=" + error_message + ", data=" + data + "]";
-        }
-    }
-
-    /**
-     * @version 2018/05/25 9:37:29
-     */
-    private static class BitFlyerExecution extends Execution {
-
-        /** The empty object. */
-        private static final BitFlyerExecution NONE = new BitFlyerExecution();
-
-        /** The bitflyer ID date fromat. */
-        private static final DateTimeFormatter Format = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss");
-
-        /** Buyer id of this execution. */
-        public String buy_child_order_acceptance_id = "";
-
-        /** Seller id of this execution. */
-        public String sell_child_order_acceptance_id = "";
-
-        /** The executed date-time. */
-        public ZonedDateTime exec_date;
-
-        /**
-         * Estimate delay and consecutive type.
-         * 
-         * @param previous
-         * @return
-         */
-        private BitFlyerExecution estimate(BitFlyerExecution previous) {
-            date(this.exec_date);
-            estimateConsecutiveType(previous);
-            estimateDelay();
-
-            return this;
-        }
-
-        /**
-         * Estimate consecutive type.
-         * 
-         * @param previous
-         */
-        private void estimateConsecutiveType(BitFlyerExecution previous) {
-            if (buy_child_order_acceptance_id.equals(previous.buy_child_order_acceptance_id)) {
-                if (sell_child_order_acceptance_id.equals(previous.sell_child_order_acceptance_id)) {
-                    consecutive = Execution.ConsecutiveSameBoth;
-                } else {
-                    consecutive = Execution.ConsecutiveSameBuyer;
-                }
-            } else if (sell_child_order_acceptance_id.equals(previous.sell_child_order_acceptance_id)) {
-                consecutive = Execution.ConsecutiveSameSeller;
-            } else {
-                consecutive = Execution.ConsecutiveDifference;
-            }
-        }
-
-        /**
-         * <p>
-         * Analyze Taker's order ID and obtain approximate order time (Since there is a bot which
-         * specifies non-standard id format, ignore it in that case).
-         * </p>
-         * <ol>
-         * <li>Execution Date : UTC</li>
-         * <li>Server Order ID Date : UTC (i.e. stop-limit or IFD order)</li>
-         * <li>User Order ID Date : JST+9:00</li>
-         * </ol>
-         *
-         * @param exe
-         * @return
-         */
-        private void estimateDelay() {
-            String taker = side.isBuy() ? buy_child_order_acceptance_id : sell_child_order_acceptance_id;
-
-            try {
-                // order format is like the following [JRF20180427-123407-869661]
-                // exclude illegal format
-                if (taker == null || taker.length() != 25 || !taker.startsWith("JRF")) {
-                    delay = Execution.DelayInestimable;
-                    return;
-                }
-
-                // remove tail random numbers
-                taker = taker.substring(3, 18);
-
-                // parse as datetime
-                long orderTime = LocalDateTime.parse(taker, Format).toEpochSecond(ZoneOffset.UTC);
-                long executedTime = exec_date.toEpochSecond() + 1;
-                int diff = (int) (executedTime - orderTime);
-
-                // estimate server order (over 9*60*60)
-                if (diff < -32000) {
-                    diff += 32400;
-                }
-
-                if (diff < 0) {
-                    delay = Execution.DelayInestimable;
-                } else if (180 < diff) {
-                    delay = Execution.DelayHuge;
-                } else {
-                    delay = diff;
-                }
-            } catch (DateTimeParseException e) {
-                delay = Execution.DelayInestimable;
-            }
         }
     }
 
