@@ -298,6 +298,7 @@ public class ExecutionLog {
             Num coefficient = Num.ONE;
 
             while (disposer.isNotDisposed()) {
+                System.out.println(disposer.isDisposed());
                 ArrayDeque<Execution> executions = service.executions(start, start + coefficient.multiply(size).toInt())
                         .retry()
                         .toCollection(new ArrayDeque(size));

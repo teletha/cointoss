@@ -104,7 +104,6 @@ public class Network {
      */
     public <M> Signal<M> rest(Request request, String selector, Class<M> type) {
         return new Signal<>((observer, disposer) -> {
-            // System.out.println(request + " " + bodyToString(request));
             try (Response response = client().newCall(request).execute(); ResponseBody body = response.body()) {
                 String value = body.string();
                 int code = response.code();
@@ -121,6 +120,30 @@ public class Network {
                             json.find(selector, type).to(observer);
                         }
                     }
+                    observer.complete();
+                } else {
+                    observer.error(new Error("[" + request.url() + "] HTTP Status " + code + " " + value));
+                }
+            } catch (Throwable e) {
+                observer.error(new Error("[" + request.url() + "] throws some error.", e));
+            }
+            return disposer;
+        });
+    }
+
+    /**
+     * Call REST API.
+     */
+    public Signal<JsonElement> restAsJsonElement(Request request) {
+        JsonParser parser = new JsonParser();
+
+        return new Signal<>((observer, disposer) -> {
+            try (Response response = client().newCall(request).execute(); ResponseBody body = response.body()) {
+                String value = body.string();
+                int code = response.code();
+
+                if (code == 200) {
+                    observer.accept(parser.parse(value));
                     observer.complete();
                 } else {
                     observer.error(new Error("[" + request.url() + "] HTTP Status " + code + " " + value));

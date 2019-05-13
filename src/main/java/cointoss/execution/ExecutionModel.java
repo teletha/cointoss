@@ -25,7 +25,7 @@ import kiss.Encoder;
 import kiss.Manageable;
 import kiss.Singleton;
 
-@Icy(classicSetterModifier = "protected", grouping = 2)
+@Icy(classicSetterModifier = "", grouping = 2)
 public abstract class ExecutionModel implements Directional {
 
     /** The internal id counter. */
@@ -94,6 +94,12 @@ public abstract class ExecutionModel implements Directional {
     @Icy.Overload("size")
     private Num size(double size) {
         return Num.of(size);
+    }
+
+    @Icy.Intercept("size")
+    private Num initializeCumulativeSize(Num size, Execution.ÅssignableÅrbitrary model) {
+        model.cumulativeSize(size);
+        return size;
     }
 
     /**

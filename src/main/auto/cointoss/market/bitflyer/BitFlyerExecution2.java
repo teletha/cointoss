@@ -1,6 +1,7 @@
 package cointoss.market.bitflyer;
 
 import cointoss.Direction;
+import cointoss.util.Num;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
@@ -62,41 +63,136 @@ public abstract class BitFlyerExecution2 extends BitFlyerExecution2Model {
         /**
          * Create uninitialized {@link BitFlyerExecution2}.
          */
-        public final <T extends ÅssignableSize<Self>> T direction(Direction direction) {
+        public final <T extends Self> T direction(Direction direction, Num num) {
             Åssignable o = new Åssignable();
             o.direction(direction);
+            o.size(num);
             return (T) o;
         }
         /**
          * Create uninitialized {@link BitFlyerExecution2}.
          */
-        public final <T extends ÅssignableSize<Self>> T buy() {
+        public final <T extends Self> T direction(Direction direction, int size) {
+            Åssignable o = new Åssignable();
+            o.direction(direction);
+            o.size(size);
+            return (T) o;
+        }
+        /**
+         * Create uninitialized {@link BitFlyerExecution2}.
+         */
+        public final <T extends Self> T direction(Direction direction, float size) {
+            Åssignable o = new Åssignable();
+            o.direction(direction);
+            o.size(size);
+            return (T) o;
+        }
+        /**
+         * Create uninitialized {@link BitFlyerExecution2}.
+         */
+        public final <T extends Self> T direction(Direction direction, long size) {
+            Åssignable o = new Åssignable();
+            o.direction(direction);
+            o.size(size);
+            return (T) o;
+        }
+        /**
+         * Create uninitialized {@link BitFlyerExecution2}.
+         */
+        public final <T extends Self> T direction(Direction direction, double size) {
+            Åssignable o = new Åssignable();
+            o.direction(direction);
+            o.size(size);
+            return (T) o;
+        }
+        /**
+         * Create uninitialized {@link BitFlyerExecution2}.
+         */
+        public final <T extends Self> T buy(Num num) {
             Åssignable o = new Åssignable();
             o.buy();
+            o.size(num);
             return (T) o;
         }
         /**
          * Create uninitialized {@link BitFlyerExecution2}.
          */
-        public final <T extends ÅssignableSize<Self>> T sell() {
-            Åssignable o = new Åssignable();
-            o.sell();
-            return (T) o;
-        }
-        /**
-         * Create uninitialized {@link BitFlyerExecution2}.
-         */
-        public final <T extends ÅssignableSize<Self>> T buy() {
+        public final <T extends Self> T buy(int size) {
             Åssignable o = new Åssignable();
             o.buy();
+            o.size(size);
             return (T) o;
         }
         /**
          * Create uninitialized {@link BitFlyerExecution2}.
          */
-        public final <T extends ÅssignableSize<Self>> T sell() {
+        public final <T extends Self> T buy(float size) {
+            Åssignable o = new Åssignable();
+            o.buy();
+            o.size(size);
+            return (T) o;
+        }
+        /**
+         * Create uninitialized {@link BitFlyerExecution2}.
+         */
+        public final <T extends Self> T buy(long size) {
+            Åssignable o = new Åssignable();
+            o.buy();
+            o.size(size);
+            return (T) o;
+        }
+        /**
+         * Create uninitialized {@link BitFlyerExecution2}.
+         */
+        public final <T extends Self> T buy(double size) {
+            Åssignable o = new Åssignable();
+            o.buy();
+            o.size(size);
+            return (T) o;
+        }
+        /**
+         * Create uninitialized {@link BitFlyerExecution2}.
+         */
+        public final <T extends Self> T sell(Num num) {
             Åssignable o = new Åssignable();
             o.sell();
+            o.size(num);
+            return (T) o;
+        }
+        /**
+         * Create uninitialized {@link BitFlyerExecution2}.
+         */
+        public final <T extends Self> T sell(int size) {
+            Åssignable o = new Åssignable();
+            o.sell();
+            o.size(size);
+            return (T) o;
+        }
+        /**
+         * Create uninitialized {@link BitFlyerExecution2}.
+         */
+        public final <T extends Self> T sell(float size) {
+            Åssignable o = new Åssignable();
+            o.sell();
+            o.size(size);
+            return (T) o;
+        }
+        /**
+         * Create uninitialized {@link BitFlyerExecution2}.
+         */
+        public final <T extends Self> T sell(long size) {
+            Åssignable o = new Åssignable();
+            o.sell();
+            o.size(size);
+            return (T) o;
+        }
+        /**
+         * Create uninitialized {@link BitFlyerExecution2}.
+         */
+        public final <T extends Self> T sell(double size) {
+            Åssignable o = new Åssignable();
+            o.sell();
+            o.size(size);
             return (T) o;
         }
     }

@@ -1,6 +1,7 @@
 package cointoss.execution;
 
 import cointoss.Direction;
+import cointoss.execution.Execution.ÅssignableÅrbitrary;
 import cointoss.util.Num;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -32,31 +33,34 @@ public abstract class Execution extends ExecutionModel {
         }
     }
 
-    /** The overload method invoker. */
+    /** The overload or intercept method invoker. */
     private static final MethodHandle sizeint= invoker("size", int.class);
 
-    /** The overload method invoker. */
+    /** The overload or intercept method invoker. */
     private static final MethodHandle sizefloat= invoker("size", float.class);
 
-    /** The overload method invoker. */
+    /** The overload or intercept method invoker. */
     private static final MethodHandle sizelong= invoker("size", long.class);
 
-    /** The overload method invoker. */
+    /** The overload or intercept method invoker. */
     private static final MethodHandle sizedouble= invoker("size", double.class);
 
-    /** The overload method invoker. */
+    /** The overload or intercept method invoker. */
+    private static final MethodHandle initializeCumulativeSizeNumÅssignableÅrbitrary= invoker("initializeCumulativeSize", Num.class, ÅssignableÅrbitrary.class);
+
+    /** The overload or intercept method invoker. */
     private static final MethodHandle priceint= invoker("price", int.class);
 
-    /** The overload method invoker. */
+    /** The overload or intercept method invoker. */
     private static final MethodHandle pricelong= invoker("price", long.class);
 
-    /** The overload method invoker. */
+    /** The overload or intercept method invoker. */
     private static final MethodHandle pricefloat= invoker("price", float.class);
 
-    /** The overload method invoker. */
+    /** The overload or intercept method invoker. */
     private static final MethodHandle pricedouble= invoker("price", double.class);
 
-    /** The overload method invoker. */
+    /** The overload or intercept method invoker. */
     private static final MethodHandle dateintintintintintintint= invoker("date", int.class, int.class, int.class, int.class, int.class, int.class, int.class);
 
     /**
@@ -164,7 +168,7 @@ public abstract class Execution extends ExecutionModel {
      * Provide classic setter API.
      */
     @SuppressWarnings("unused")
-    protected void setDirection(Direction value) {
+     void setDirection(Direction value) {
         ((ÅssignableDirection) this).direction(value);
     }
 
@@ -188,7 +192,7 @@ public abstract class Execution extends ExecutionModel {
      * Provide classic setter API.
      */
     @SuppressWarnings("unused")
-    protected void setSize(Num value) {
+     void setSize(Num value) {
         ((ÅssignableSize) this).size(value);
     }
 
@@ -212,7 +216,7 @@ public abstract class Execution extends ExecutionModel {
      * Provide classic setter API.
      */
     @SuppressWarnings("unused")
-    protected void setId(long value) {
+     void setId(long value) {
         ((ÅssignableÅrbitrary) this).id(value);
     }
 
@@ -236,7 +240,7 @@ public abstract class Execution extends ExecutionModel {
      * Provide classic setter API.
      */
     @SuppressWarnings("unused")
-    protected void setPrice(Num value) {
+     void setPrice(Num value) {
         ((ÅssignableÅrbitrary) this).price(value);
     }
 
@@ -260,7 +264,7 @@ public abstract class Execution extends ExecutionModel {
      * Provide classic setter API.
      */
     @SuppressWarnings("unused")
-    protected void setCumulativeSize(Num value) {
+     void setCumulativeSize(Num value) {
         ((ÅssignableÅrbitrary) this).cumulativeSize(value);
     }
 
@@ -284,7 +288,7 @@ public abstract class Execution extends ExecutionModel {
      * Provide classic setter API.
      */
     @SuppressWarnings("unused")
-    protected void setDate(ZonedDateTime value) {
+     void setDate(ZonedDateTime value) {
         ((ÅssignableÅrbitrary) this).date(value);
     }
 
@@ -308,7 +312,7 @@ public abstract class Execution extends ExecutionModel {
      * Provide classic setter API.
      */
     @SuppressWarnings("unused")
-    protected void setMills(long value) {
+     void setMills(long value) {
         ((ÅssignableÅrbitrary) this).mills(value);
     }
 
@@ -332,7 +336,7 @@ public abstract class Execution extends ExecutionModel {
      * Provide classic setter API.
      */
     @SuppressWarnings("unused")
-    protected void setConsecutive(int value) {
+     void setConsecutive(int value) {
         ((ÅssignableÅrbitrary) this).consecutive(value);
     }
 
@@ -356,7 +360,7 @@ public abstract class Execution extends ExecutionModel {
      * Provide classic setter API.
      */
     @SuppressWarnings("unused")
-    protected void setDelay(int value) {
+     void setDelay(int value) {
         ((ÅssignableÅrbitrary) this).delay(value);
     }
 
@@ -544,7 +548,7 @@ public abstract class Execution extends ExecutionModel {
          */
         default Next size(Num value) {
             try {
-                sizeUpdater.invoke(this, value);
+                sizeUpdater.invoke(this, initializeCumulativeSizeNumÅssignableÅrbitrary.invoke(this, value, this));
             } catch (Throwable e) {
                 throw new Error(e);
             }
