@@ -1,13 +1,13 @@
 package cointoss.execution;
 
 import cointoss.Direction;
-import cointoss.execution.Execution.ÅssignableÅrbitrary;
 import cointoss.util.Num;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.time.ZonedDateTime;
+import java.util.function.Consumer;
 import javax.annotation.processing.Generated;
 
 /**
@@ -46,7 +46,7 @@ public abstract class Execution extends ExecutionModel {
     private static final MethodHandle sizedouble= invoker("size", double.class);
 
     /** The overload or intercept method invoker. */
-    private static final MethodHandle initializeCumulativeSizeNumÅssignableÅrbitrary= invoker("initializeCumulativeSize", Num.class, ÅssignableÅrbitrary.class);
+    private static final MethodHandle initializeCumulativeSizeNumConsumer= invoker("initializeCumulativeSize", Num.class, Consumer.class);
 
     /** The overload or intercept method invoker. */
     private static final MethodHandle priceint= invoker("price", int.class);
@@ -548,7 +548,7 @@ public abstract class Execution extends ExecutionModel {
          */
         default Next size(Num value) {
             try {
-                sizeUpdater.invoke(this, initializeCumulativeSizeNumÅssignableÅrbitrary.invoke(this, value, this));
+                sizeUpdater.invoke(this, initializeCumulativeSizeNumConsumer.invoke(this, value, (Consumer<Num>) ((Åssignable) this)::cumulativeSize));
             } catch (Throwable e) {
                 throw new Error(e);
             }

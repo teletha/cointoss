@@ -14,6 +14,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Consumer;
 
 import cointoss.Direction;
 import cointoss.Directional;
@@ -87,8 +88,8 @@ public abstract class ExecutionModel implements Directional {
     }
 
     @Icy.Intercept("size")
-    private Num initializeCumulativeSize(Num size, Execution.ÅssignableÅrbitrary model) {
-        model.cumulativeSize(size);
+    private Num initializeCumulativeSize(Num size, Consumer<Num> cumulativeSize) {
+        cumulativeSize.accept(size);
         return size;
     }
 
