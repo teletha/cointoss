@@ -158,6 +158,12 @@ public abstract class ExecutionModel implements Directional {
         return ZonedDateTime.of(year, month, day, hour, minute, second, ms * 1000000, Chrono.UTC);
     }
 
+    @Icy.Intercept("date")
+    private ZonedDateTime mills(ZonedDateTime date, Consumer<Long> mills) {
+        mills.accept(date.toInstant().toEpochMilli());
+        return date;
+    }
+
     /**
      * Accessor for {@link #price}.
      * 

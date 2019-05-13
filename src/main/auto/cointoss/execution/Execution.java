@@ -63,6 +63,9 @@ public abstract class Execution extends ExecutionModel {
     /** The overload or intercept method invoker. */
     private static final MethodHandle dateintintintintintintint= invoker("date", int.class, int.class, int.class, int.class, int.class, int.class, int.class);
 
+    /** The overload or intercept method invoker. */
+    private static final MethodHandle millsZonedDateTimeConsumer= invoker("mills", ZonedDateTime.class, Consumer.class);
+
     /**
      * Create special property updater.
      *
@@ -686,7 +689,7 @@ public abstract class Execution extends ExecutionModel {
          */
         default Next date(ZonedDateTime value) {
             try {
-                dateUpdater.invoke(this, value);
+                dateUpdater.invoke(this, millsZonedDateTimeConsumer.invoke(this, value, (Consumer<Long>) ((Åssignable) this)::mills));
             } catch (Throwable e) {
                 throw new Error(e);
             }
