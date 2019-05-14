@@ -113,8 +113,8 @@ public abstract class ExecutionModel implements Directional {
     }
 
     @Icy.Intercept("size")
-    private Num initializeCumulativeSize(Num size, Consumer<Num> cumulativeSize) {
-        cumulativeSize.accept(size);
+    private Num assignWithAccumulative(Num size, Consumer<Num> accumulative) {
+        accumulative.accept(size);
         return size;
     }
 
@@ -188,7 +188,7 @@ public abstract class ExecutionModel implements Directional {
      * @return
      */
     @Icy.Property(mutable = true)
-    public Num cumulativeSize() {
+    public Num accumulative() {
         return Num.ZERO;
     }
 
@@ -220,7 +220,7 @@ public abstract class ExecutionModel implements Directional {
     }
 
     @Icy.Intercept("date")
-    private ZonedDateTime mills(ZonedDateTime date, LongConsumer mills) {
+    private ZonedDateTime assignWithMills(ZonedDateTime date, LongConsumer mills) {
         mills.accept(date.toInstant().toEpochMilli());
         return date;
     }

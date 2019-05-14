@@ -70,7 +70,7 @@ public class ExecutionView extends View {
         // configure UI
         takerSize.values(IntStream.range(1, 51).boxed()).initial(10);
         executionList.cell(v -> new Cell(false));
-        executionCumulativeList.cell(v -> new Cell(true)).take(takerSize, (e, size) -> e.cumulativeSize.isGreaterThanOrEqual(size));
+        executionCumulativeList.cell(v -> new Cell(true)).take(takerSize, (e, size) -> e.accumulative.isGreaterThanOrEqual(size));
 
         // load execution log
         Viewtify.inWorker(() -> {
@@ -86,7 +86,7 @@ public class ExecutionView extends View {
         // load big taker log
         Viewtify.inWorker(() -> {
             return view.market().timelineByTaker.on(Viewtify.UIThread).to(e -> {
-                if (e.cumulativeSize.isGreaterThanOrEqual(Num.ONE)) {
+                if (e.accumulative.isGreaterThanOrEqual(Num.ONE)) {
                     executionCumulativeList.add(0, e);
 
                     if (2000 < executionCumulativeList.size()) {
@@ -126,7 +126,7 @@ public class ExecutionView extends View {
                 setText(null);
                 setGraphic(null);
             } else {
-                setText(Chrono.system(e.date).format(Chrono.Time) + "  " + e.price + "円  " + (comulative ? e.cumulativeSize : e.size)
+                setText(Chrono.system(e.date).format(Chrono.Time) + "  " + e.price + "円  " + (comulative ? e.accumulative : e.size)
                         .scale(6) + "  " + e.delay);
                 ui.styleOnly(Side.of(e.direction));
             }

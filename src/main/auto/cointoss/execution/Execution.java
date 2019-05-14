@@ -47,7 +47,7 @@ public abstract class Execution extends ExecutionModel {
     private static final MethodHandle size$1360390150= invoker("size", double.class);
 
     /** The overload or intercept method invoker. */
-    private static final MethodHandle initializeCumulativeSize$393740119= invoker("initializeCumulativeSize", Num.class, Consumer.class);
+    private static final MethodHandle assignWithAccumulative$393740119= invoker("assignWithAccumulative", Num.class, Consumer.class);
 
     /** The overload or intercept method invoker. */
     private static final MethodHandle price$101282980= invoker("price", int.class);
@@ -65,7 +65,7 @@ public abstract class Execution extends ExecutionModel {
     private static final MethodHandle date$852566916= invoker("date", int.class, int.class, int.class, int.class, int.class, int.class, int.class);
 
     /** The overload or intercept method invoker. */
-    private static final MethodHandle mills$1373199327= invoker("mills", ZonedDateTime.class, LongConsumer.class);
+    private static final MethodHandle assignWithMills$1373199327= invoker("assignWithMills", ZonedDateTime.class, LongConsumer.class);
 
     /**
      * Create special property updater.
@@ -96,7 +96,7 @@ public abstract class Execution extends ExecutionModel {
     private static final MethodHandle priceUpdater = updater("price");
 
     /** The final property updater. */
-    private static final MethodHandle cumulativeSizeUpdater = updater("cumulativeSize");
+    private static final MethodHandle accumulativeUpdater = updater("accumulative");
 
     /** The final property updater. */
     private static final MethodHandle dateUpdater = updater("date");
@@ -123,7 +123,7 @@ public abstract class Execution extends ExecutionModel {
     public final Num price;
 
     /** The exposed property. */
-    public Num cumulativeSize;
+    public Num accumulative;
 
     /** The exposed property. */
     public final ZonedDateTime date;
@@ -145,7 +145,7 @@ public abstract class Execution extends ExecutionModel {
         this.size = null;
         this.id = super.id();
         this.price = super.price();
-        this.cumulativeSize = super.cumulativeSize();
+        this.accumulative = super.accumulative();
         this.date = super.date();
         this.mills = super.mills();
         this.consecutive = super.consecutive();
@@ -278,28 +278,28 @@ public abstract class Execution extends ExecutionModel {
      *  @return
      */
     @Override
-    public final Num cumulativeSize() {
-        return this.cumulativeSize;
+    public final Num accumulative() {
+        return this.accumulative;
     }
 
     /**
      * Provide classic getter API.
      *
-     * @return A value of cumulativeSize property.
+     * @return A value of accumulative property.
      */
     @SuppressWarnings("unused")
-    private final Num getCumulativeSize() {
-        return this.cumulativeSize;
+    private final Num getAccumulative() {
+        return this.accumulative;
     }
 
     /**
      * Provide classic setter API.
      *
-     * @paran value A new value of cumulativeSize property to assign.
+     * @paran value A new value of accumulative property to assign.
      */
     @SuppressWarnings("unused")
-    private void setCumulativeSize(Num value) {
-        ((ÅssignableÅrbitrary) this).cumulativeSize(value);
+    private void setAccumulative(Num value) {
+        ((ÅssignableÅrbitrary) this).accumulative(value);
     }
 
     /**
@@ -623,7 +623,7 @@ public abstract class Execution extends ExecutionModel {
          */
         default Next size(Num value) {
             try {
-                sizeUpdater.invoke(this, initializeCumulativeSize$393740119.invoke(this, value, (Consumer<Num>) ((Åssignable) this)::cumulativeSize));
+                sizeUpdater.invoke(this, assignWithAccumulative$393740119.invoke(this, value, (Consumer<Num>) ((Åssignable) this)::accumulative));
             } catch (Throwable e) {
                 throw new Error(e);
             }
@@ -779,14 +779,14 @@ public abstract class Execution extends ExecutionModel {
         }
 
         /**
-         * Assign cumulativeSize property.
+         * Assign accumulative property.
          * 
          * @param value A new value to assign.
          * @return The next assignable model.
          */
-        default Next cumulativeSize(Num value) {
+        default Next accumulative(Num value) {
             try {
-                cumulativeSizeUpdater.invoke(this, value);
+                accumulativeUpdater.invoke(this, value);
             } catch (Throwable e) {
                 throw new Error(e);
             }
@@ -801,7 +801,7 @@ public abstract class Execution extends ExecutionModel {
          */
         default Next date(ZonedDateTime value) {
             try {
-                dateUpdater.invoke(this, mills$1373199327.invoke(this, value, (LongConsumer) ((Åssignable) this)::mills));
+                dateUpdater.invoke(this, assignWithMills$1373199327.invoke(this, value, (LongConsumer) ((Åssignable) this)::mills));
             } catch (Throwable e) {
                 throw new Error(e);
             }
@@ -894,7 +894,7 @@ public abstract class Execution extends ExecutionModel {
         static final String Size = "size";
         static final String Id = "id";
         static final String Price = "price";
-        static final String CumulativeSize = "cumulativeSize";
+        static final String Accumulative = "accumulative";
         static final String Date = "date";
         static final String Mills = "mills";
         static final String Consecutive = "consecutive";
