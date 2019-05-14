@@ -335,9 +335,6 @@ public abstract class ExecutionModel implements Directional {
         return true;
     }
 
-    /** The empty object. */
-    public static final Execution BASE = Execution.with.buy(0).date(Chrono.utc(2000, 1, 1));
-
     /**
      * Create the specified numbers of {@link Execution}.
      * 

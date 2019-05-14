@@ -111,4 +111,11 @@ class OrderManagerTest {
             assert o.creationTime.v.isEqual(service.now());
         });
     }
+
+    @Test
+    void size() {
+        orders.requestEntry(Order.buy(1).price(10)).to(entry -> {
+            assert orders.positionSize.is(0);
+        });
+    }
 }

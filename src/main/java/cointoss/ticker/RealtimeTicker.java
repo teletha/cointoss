@@ -13,8 +13,8 @@ import java.time.ZonedDateTime;
 
 import org.magicwerk.brownies.collections.GapList;
 
+import cointoss.Market;
 import cointoss.execution.Execution;
-import cointoss.execution.ExecutionModel;
 import cointoss.util.Num;
 import kiss.Variable;
 
@@ -52,7 +52,7 @@ public class RealtimeTicker {
     public RealtimeTicker(TickSpan span, Variable<Execution> latest) {
         this.span = span;
         this.latest = latest;
-        buffer.addLast(ExecutionModel.BASE);
+        buffer.addLast(Market.BASE);
     }
 
     void update(Execution incoming) {

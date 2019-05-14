@@ -18,15 +18,14 @@ import java.util.function.Function;
 
 import cointoss.execution.Execution;
 import cointoss.execution.ExecutionLog;
-import cointoss.execution.ExecutionModel;
 import cointoss.market.MarketServiceProvider;
 import cointoss.order.Order;
 import cointoss.order.OrderBook;
 import cointoss.order.OrderBookManager;
 import cointoss.order.OrderManager;
-import cointoss.position.EntryManager;
 import cointoss.position.PositionManager;
 import cointoss.ticker.TickerManager;
+import cointoss.util.Chrono;
 import cointoss.util.Num;
 import cointoss.util.RetryPolicy;
 import kiss.Disposable;
@@ -41,7 +40,10 @@ import kiss.Variable;
  */
 public class Market implements Disposable {
 
-    private final AtomicReference<Execution> switcher = new AtomicReference<>(ExecutionModel.BASE);
+    /** The empty object. */
+    public static final Execution BASE = Execution.with.buy(0).date(Chrono.utc(2000, 1, 1));
+
+    private final AtomicReference<Execution> switcher = new AtomicReference<>(Market.BASE);
 
     /** The target market servicce. */
     public final MarketService service;
@@ -74,12 +76,10 @@ public class Market implements Disposable {
             return null;
         }
         return previous;
-    }).skip(e -> e == null || e == ExecutionModel.BASE);
+    }).skip(e -> e == null || e == Market.BASE);
 
     /** The position manager. */
     public final PositionManager positions;
-
-    public final EntryManager entries;
 
     /** The amount of base currency. */
     public final Variable<Num> baseCurrency;
@@ -103,7 +103,6 @@ public class Market implements Disposable {
         this.orders = new OrderManager(service);
         this.orderBook = new OrderBookManager(service);
         this.positions = new PositionManager(service, tickers.latest);
-        this.entries = new EntryManager();
 
         // initialize currency data
         baseCurrency = service.baseCurrency().to();

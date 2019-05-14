@@ -14,8 +14,8 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import cointoss.Market;
 import cointoss.execution.Execution;
-import cointoss.execution.ExecutionModel;
 import cointoss.util.Num;
 import cointoss.verify.VerifiableMarketService;
 import kiss.Variable;
@@ -33,7 +33,7 @@ class PositionManagerTest {
 
     @BeforeEach
     void init() {
-        latest = Variable.of(ExecutionModel.BASE);
+        latest = Variable.of(Market.BASE);
         service = new VerifiableMarketService();
         positions = new PositionManager(service, latest);
     }
