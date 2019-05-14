@@ -18,6 +18,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -50,6 +51,7 @@ import com.univocity.parsers.csv.CsvParserSettings;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
 
+import cointoss.Direction;
 import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.market.bitflyer.BitFlyer;
@@ -614,7 +616,7 @@ public class ExecutionLog {
                 if (compact.isPresent()) {
                     // read compact
                     return I.signal(parser.iterate(new ZstdInputStream(compact.newInputStream()), ISO_8859_1))
-                            .scanWith(Executions.BASE, logger::decode)
+                            .scanWith(ExecutionModel.BASE, logger::decode)
                             .effectOnComplete(parser::stopParsing)
                             .effectOnObserve(stopwatch::start)
                             .effectOnComplete(() -> {
@@ -626,7 +628,7 @@ public class ExecutionLog {
                 } else {
                     // read normal
                     Signal<Execution> signal = I.signal(parser.iterate(normal.newInputStream(), ISO_8859_1))
-                            .map(Executions::of)
+                            .map(this::parse)
                             .effectOnComplete(parser::stopParsing)
                             .effectOnObserve(stopwatch::start)
                             .effectOnComplete(() -> {
@@ -637,6 +639,21 @@ public class ExecutionLog {
             } catch (IOException e) {
                 throw I.quiet(e);
             }
+        }
+
+        /**
+         * Parse execution data.
+         * 
+         * @param values
+         * @return
+         */
+        private Execution parse(String[] values) {
+            return Execution.with.direction(Direction.parse(values[2]), Num.of(values[4]))
+                    .price(Num.of(values[3]))
+                    .id(Long.parseLong(values[0]))
+                    .date(LocalDateTime.parse(values[1]).atZone(Chrono.UTC))
+                    .consecutive(Integer.parseInt(values[5]))
+                    .delay(Integer.parseInt(values[6]));
         }
 
         /**
@@ -700,7 +717,7 @@ public class ExecutionLog {
                 setting.getFormat().setComment('無');
                 CsvWriter writer = new CsvWriter(new ZstdOutputStream(compact.newOutputStream(), 1), ISO_8859_1, setting);
 
-                return executions.maps(Executions.BASE, (prev, e) -> {
+                return executions.maps(ExecutionModel.BASE, (prev, e) -> {
                     writer.writeRow(logger.encode(prev, e));
                     return e;
                 }).effectOnComplete(writer::close);

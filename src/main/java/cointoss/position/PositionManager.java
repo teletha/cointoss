@@ -17,7 +17,7 @@ import cointoss.Direction;
 import cointoss.Directional;
 import cointoss.MarketService;
 import cointoss.execution.Execution;
-import cointoss.execution.Executions;
+import cointoss.execution.ExecutionModel;
 import cointoss.util.Num;
 import kiss.Signal;
 import kiss.Signaling;
@@ -65,7 +65,7 @@ public final class PositionManager implements Directional {
      * @param latest A latest market {@link Execution} holder.
      */
     public PositionManager(MarketService service, Variable<Execution> latest) {
-        this.latest = latest == null ? Variable.of(Executions.BASE) : latest;
+        this.latest = latest == null ? Variable.of(ExecutionModel.BASE) : latest;
         this.latest.observe().to(this::calculateProfit);
 
         service.add(service.executionsRealtimelyForMe().map(Ⅲ::ⅲ).to(this::add));

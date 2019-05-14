@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
+import java.util.function.LongConsumer;
 
 import cointoss.Direction;
 import cointoss.Directional;
@@ -26,7 +27,7 @@ import kiss.Encoder;
 import kiss.Manageable;
 import kiss.Singleton;
 
-@Icy(classicSetterModifier = "", grouping = 2)
+@Icy(grouping = 2)
 public abstract class ExecutionModel implements Directional {
 
     /** The internal id counter. */
@@ -67,21 +68,45 @@ public abstract class ExecutionModel implements Directional {
     @Icy.Property
     public abstract Num size();
 
+    /**
+     * Set executed size by value.
+     * 
+     * @param size An executed size.
+     * @return Chainable API.
+     */
     @Icy.Overload("size")
     private Num size(int size) {
         return Num.of(size);
     }
 
+    /**
+     * Set executed size by value.
+     * 
+     * @param size An executed size.
+     * @return Chainable API.
+     */
     @Icy.Overload("size")
     private Num size(float size) {
         return Num.of(size);
     }
 
+    /**
+     * Set executed size by value.
+     * 
+     * @param size An executed size.
+     * @return Chainable API.
+     */
     @Icy.Overload("size")
     private Num size(long size) {
         return Num.of(size);
     }
 
+    /**
+     * Set executed size by value.
+     * 
+     * @param size An executed size.
+     * @return Chainable API.
+     */
     @Icy.Overload("size")
     private Num size(double size) {
         return Num.of(size);
@@ -104,7 +129,7 @@ public abstract class ExecutionModel implements Directional {
     }
 
     /**
-     * Price.
+     * Exectution price.
      * 
      * @return
      */
@@ -113,21 +138,45 @@ public abstract class ExecutionModel implements Directional {
         return Num.ZERO;
     }
 
+    /**
+     * Set price by value.
+     * 
+     * @param price A price.
+     * @return Chainable API.
+     */
     @Icy.Overload("price")
     private Num price(int price) {
         return Num.of(price);
     }
 
+    /**
+     * Set price by value.
+     * 
+     * @param price A price.
+     * @return Chainable API.
+     */
     @Icy.Overload("price")
     private Num price(long price) {
         return Num.of(price);
     }
 
+    /**
+     * Set price by value.
+     * 
+     * @param price A price.
+     * @return Chainable API.
+     */
     @Icy.Overload("price")
     private Num price(float price) {
         return Num.of(price);
     }
 
+    /**
+     * Set price by value.
+     * 
+     * @param price A price.
+     * @return Chainable API.
+     */
     @Icy.Overload("price")
     private Num price(double price) {
         return Num.of(price);
@@ -153,13 +202,25 @@ public abstract class ExecutionModel implements Directional {
         return Chrono.MIN;
     }
 
+    /**
+     * Assign executed date.
+     * 
+     * @param year Year.
+     * @param month Month.
+     * @param day Day of month.
+     * @param hour Hour.
+     * @param minute Minute.
+     * @param second Second.
+     * @param ms Mill second.
+     * @return
+     */
     @Icy.Overload("date")
     private ZonedDateTime date(int year, int month, int day, int hour, int minute, int second, int ms) {
         return ZonedDateTime.of(year, month, day, hour, minute, second, ms * 1000000, Chrono.UTC);
     }
 
     @Icy.Intercept("date")
-    private ZonedDateTime mills(ZonedDateTime date, Consumer<Long> mills) {
+    private ZonedDateTime mills(ZonedDateTime date, LongConsumer mills) {
         mills.accept(date.toInstant().toEpochMilli());
         return date;
     }
@@ -274,6 +335,9 @@ public abstract class ExecutionModel implements Directional {
         return true;
     }
 
+    /** The empty object. */
+    public static final Execution BASE = Execution.with.buy(0).date(Chrono.utc(2000, 1, 1));
+
     /**
      * Create the specified numbers of {@link Execution}.
      * 
@@ -284,8 +348,7 @@ public abstract class ExecutionModel implements Directional {
         List<Execution> list = new ArrayList();
 
         for (int i = 0; i < numbers; i++) {
-            Execution e = Execution.with.direction(Direction.random(), Num.random(1, 10)).price(Num.random(1, 10));
-            list.add(e);
+            list.add(Execution.with.direction(Direction.random(), Num.random(1, 10)).price(Num.random(1, 10)));
         }
 
         return list;
@@ -302,9 +365,9 @@ public abstract class ExecutionModel implements Directional {
         List<Execution> list = new ArrayList();
 
         for (int i = 0; i < count; i++) {
-            Execution e = Execution.with.direction(side, Num.of(size)).price(price);
-            if (i != 0) e.setConsecutive(side.isBuy() ? ConsecutiveSameBuyer : ConsecutiveSameSeller);
-            list.add(e);
+            list.add(Execution.with.direction(side, size)
+                    .price(price)
+                    .consecutive(i == 0 ? ConsecutiveDifference : side.isBuy() ? ConsecutiveSameBuyer : ConsecutiveSameSeller));
         }
         return list;
     }

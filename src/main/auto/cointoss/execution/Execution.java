@@ -8,6 +8,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.time.ZonedDateTime;
 import java.util.function.Consumer;
+import java.util.function.LongConsumer;
 import javax.annotation.processing.Generated;
 
 /**
@@ -34,37 +35,37 @@ public abstract class Execution extends ExecutionModel {
     }
 
     /** The overload or intercept method invoker. */
-    private static final MethodHandle sizeint= invoker("size", int.class);
+    private static final MethodHandle size$101282980= invoker("size", int.class);
 
     /** The overload or intercept method invoker. */
-    private static final MethodHandle sizefloat= invoker("size", float.class);
+    private static final MethodHandle size$765519919= invoker("size", float.class);
 
     /** The overload or intercept method invoker. */
-    private static final MethodHandle sizelong= invoker("size", long.class);
+    private static final MethodHandle size$1096207375= invoker("size", long.class);
 
     /** The overload or intercept method invoker. */
-    private static final MethodHandle sizedouble= invoker("size", double.class);
+    private static final MethodHandle size$1360390150= invoker("size", double.class);
 
     /** The overload or intercept method invoker. */
-    private static final MethodHandle initializeCumulativeSizeNumConsumer= invoker("initializeCumulativeSize", Num.class, Consumer.class);
+    private static final MethodHandle initializeCumulativeSize$393740119= invoker("initializeCumulativeSize", Num.class, Consumer.class);
 
     /** The overload or intercept method invoker. */
-    private static final MethodHandle priceint= invoker("price", int.class);
+    private static final MethodHandle price$101282980= invoker("price", int.class);
 
     /** The overload or intercept method invoker. */
-    private static final MethodHandle pricelong= invoker("price", long.class);
+    private static final MethodHandle price$1096207375= invoker("price", long.class);
 
     /** The overload or intercept method invoker. */
-    private static final MethodHandle pricefloat= invoker("price", float.class);
+    private static final MethodHandle price$765519919= invoker("price", float.class);
 
     /** The overload or intercept method invoker. */
-    private static final MethodHandle pricedouble= invoker("price", double.class);
+    private static final MethodHandle price$1360390150= invoker("price", double.class);
 
     /** The overload or intercept method invoker. */
-    private static final MethodHandle dateintintintintintintint= invoker("date", int.class, int.class, int.class, int.class, int.class, int.class, int.class);
+    private static final MethodHandle date$852566916= invoker("date", int.class, int.class, int.class, int.class, int.class, int.class, int.class);
 
     /** The overload or intercept method invoker. */
-    private static final MethodHandle millsZonedDateTimeConsumer= invoker("mills", ZonedDateTime.class, Consumer.class);
+    private static final MethodHandle mills$1373199327= invoker("mills", ZonedDateTime.class, LongConsumer.class);
 
     /**
      * Create special property updater.
@@ -152,7 +153,9 @@ public abstract class Execution extends ExecutionModel {
     }
 
     /**
-     * Retrieve direction property.
+     * Execution {@link Direction}.
+     *  
+     *  @return
      */
     @Override
     public final Direction direction() {
@@ -161,6 +164,8 @@ public abstract class Execution extends ExecutionModel {
 
     /**
      * Provide classic getter API.
+     *
+     * @return A value of direction property.
      */
     @SuppressWarnings("unused")
     private final Direction getDirection() {
@@ -169,14 +174,18 @@ public abstract class Execution extends ExecutionModel {
 
     /**
      * Provide classic setter API.
+     *
+     * @paran value A new value of direction property to assign.
      */
     @SuppressWarnings("unused")
-     void setDirection(Direction value) {
+    private void setDirection(Direction value) {
         ((ÅssignableDirection) this).direction(value);
     }
 
     /**
-     * Retrieve size property.
+     * Size.
+     *  
+     *  @return
      */
     @Override
     public final Num size() {
@@ -185,6 +194,8 @@ public abstract class Execution extends ExecutionModel {
 
     /**
      * Provide classic getter API.
+     *
+     * @return A value of size property.
      */
     @SuppressWarnings("unused")
     private final Num getSize() {
@@ -193,14 +204,18 @@ public abstract class Execution extends ExecutionModel {
 
     /**
      * Provide classic setter API.
+     *
+     * @paran value A new value of size property to assign.
      */
     @SuppressWarnings("unused")
-     void setSize(Num value) {
+    private void setSize(Num value) {
         ((ÅssignableSize) this).size(value);
     }
 
     /**
-     * Retrieve id property.
+     * Execution id.
+     *  
+     *  @return
      */
     @Override
     public final long id() {
@@ -209,6 +224,8 @@ public abstract class Execution extends ExecutionModel {
 
     /**
      * Provide classic getter API.
+     *
+     * @return A value of id property.
      */
     @SuppressWarnings("unused")
     private final long getId() {
@@ -217,14 +234,18 @@ public abstract class Execution extends ExecutionModel {
 
     /**
      * Provide classic setter API.
+     *
+     * @paran value A new value of id property to assign.
      */
     @SuppressWarnings("unused")
-     void setId(long value) {
+    private void setId(long value) {
         ((ÅssignableÅrbitrary) this).id(value);
     }
 
     /**
-     * Retrieve price property.
+     * Exectution price.
+     *  
+     *  @return
      */
     @Override
     public final Num price() {
@@ -233,6 +254,8 @@ public abstract class Execution extends ExecutionModel {
 
     /**
      * Provide classic getter API.
+     *
+     * @return A value of price property.
      */
     @SuppressWarnings("unused")
     private final Num getPrice() {
@@ -241,14 +264,18 @@ public abstract class Execution extends ExecutionModel {
 
     /**
      * Provide classic setter API.
+     *
+     * @paran value A new value of price property to assign.
      */
     @SuppressWarnings("unused")
-     void setPrice(Num value) {
+    private void setPrice(Num value) {
         ((ÅssignableÅrbitrary) this).price(value);
     }
 
     /**
-     * Retrieve cumulativeSize property.
+     * Size.
+     *  
+     *  @return
      */
     @Override
     public final Num cumulativeSize() {
@@ -257,6 +284,8 @@ public abstract class Execution extends ExecutionModel {
 
     /**
      * Provide classic getter API.
+     *
+     * @return A value of cumulativeSize property.
      */
     @SuppressWarnings("unused")
     private final Num getCumulativeSize() {
@@ -265,14 +294,18 @@ public abstract class Execution extends ExecutionModel {
 
     /**
      * Provide classic setter API.
+     *
+     * @paran value A new value of cumulativeSize property to assign.
      */
     @SuppressWarnings("unused")
-     void setCumulativeSize(Num value) {
+    private void setCumulativeSize(Num value) {
         ((ÅssignableÅrbitrary) this).cumulativeSize(value);
     }
 
     /**
-     * Retrieve date property.
+     * Accessor for {@link #price}.
+     *  
+     *  @return
      */
     @Override
     public final ZonedDateTime date() {
@@ -281,6 +314,8 @@ public abstract class Execution extends ExecutionModel {
 
     /**
      * Provide classic getter API.
+     *
+     * @return A value of date property.
      */
     @SuppressWarnings("unused")
     private final ZonedDateTime getDate() {
@@ -289,14 +324,18 @@ public abstract class Execution extends ExecutionModel {
 
     /**
      * Provide classic setter API.
+     *
+     * @paran value A new value of date property to assign.
      */
     @SuppressWarnings("unused")
-     void setDate(ZonedDateTime value) {
+    private void setDate(ZonedDateTime value) {
         ((ÅssignableÅrbitrary) this).date(value);
     }
 
     /**
-     * Retrieve mills property.
+     * Accessor for {@link #price}.
+     *  
+     *  @return
      */
     @Override
     public final long mills() {
@@ -305,6 +344,8 @@ public abstract class Execution extends ExecutionModel {
 
     /**
      * Provide classic getter API.
+     *
+     * @return A value of mills property.
      */
     @SuppressWarnings("unused")
     private final long getMills() {
@@ -313,14 +354,18 @@ public abstract class Execution extends ExecutionModel {
 
     /**
      * Provide classic setter API.
+     *
+     * @paran value A new value of mills property to assign.
      */
     @SuppressWarnings("unused")
-     void setMills(long value) {
+    private void setMills(long value) {
         ((ÅssignableÅrbitrary) this).mills(value);
     }
 
     /**
-     * Retrieve consecutive property.
+     * Accessor for {@link #price}.
+     *  
+     *  @return
      */
     @Override
     public final int consecutive() {
@@ -329,6 +374,8 @@ public abstract class Execution extends ExecutionModel {
 
     /**
      * Provide classic getter API.
+     *
+     * @return A value of consecutive property.
      */
     @SuppressWarnings("unused")
     private final int getConsecutive() {
@@ -337,14 +384,18 @@ public abstract class Execution extends ExecutionModel {
 
     /**
      * Provide classic setter API.
+     *
+     * @paran value A new value of consecutive property to assign.
      */
     @SuppressWarnings("unused")
-     void setConsecutive(int value) {
+    private void setConsecutive(int value) {
         ((ÅssignableÅrbitrary) this).consecutive(value);
     }
 
     /**
-     * Retrieve delay property.
+     * Accessor for {@link #price}.
+     *  
+     *  @return
      */
     @Override
     public final int delay() {
@@ -353,6 +404,8 @@ public abstract class Execution extends ExecutionModel {
 
     /**
      * Provide classic getter API.
+     *
+     * @return A value of delay property.
      */
     @SuppressWarnings("unused")
     private final int getDelay() {
@@ -361,9 +414,11 @@ public abstract class Execution extends ExecutionModel {
 
     /**
      * Provide classic setter API.
+     *
+     * @paran value A new value of delay property to assign.
      */
     @SuppressWarnings("unused")
-     void setDelay(int value) {
+    private void setDelay(int value) {
         ((ÅssignableÅrbitrary) this).delay(value);
     }
 
@@ -371,143 +426,148 @@ public abstract class Execution extends ExecutionModel {
     public static final  Ìnstantiator<?> with = new Ìnstantiator();
 
     /**
-     * Builder namespace for {@link Execution}.
+     * Namespace for {@link Execution}  builder methods.
      */
     public static final class Ìnstantiator<Self extends Execution & ÅssignableÅrbitrary<Self>> {
+
         /**
-         * Create uninitialized {@link Execution}.
+         * Create new {@link Execution} with the specified direction property.
+         * 
+         * @return The next assignable model.
          */
-        public final <T extends Self> T direction(Direction direction, Num num) {
+        public final Self direction(Direction direction, Num num) {
             Åssignable o = new Åssignable();
             o.direction(direction);
             o.size(num);
-            return (T) o;
+            return (Self) o;
         }
+
         /**
-         * Create uninitialized {@link Execution}.
+         * Create new {@link Execution} with the specified direction property.
+         * 
+         * @return The next assignable model.
          */
-        public final <T extends Self> T direction(Direction direction, int size) {
+        public final Self direction(Direction direction, int size) {
             Åssignable o = new Åssignable();
             o.direction(direction);
             o.size(size);
-            return (T) o;
+            return (Self) o;
         }
+
         /**
-         * Create uninitialized {@link Execution}.
+         * Create new {@link Execution} with the specified direction property.
+         * 
+         * @return The next assignable model.
          */
-        public final <T extends Self> T direction(Direction direction, float size) {
+        public final Self direction(Direction direction, float size) {
             Åssignable o = new Åssignable();
             o.direction(direction);
             o.size(size);
-            return (T) o;
+            return (Self) o;
         }
+
         /**
-         * Create uninitialized {@link Execution}.
+         * Create new {@link Execution} with the specified direction property.
+         * 
+         * @return The next assignable model.
          */
-        public final <T extends Self> T direction(Direction direction, long size) {
+        public final Self direction(Direction direction, long size) {
             Åssignable o = new Åssignable();
             o.direction(direction);
             o.size(size);
-            return (T) o;
+            return (Self) o;
         }
+
         /**
-         * Create uninitialized {@link Execution}.
+         * Create new {@link Execution} with the specified direction property.
+         * 
+         * @return The next assignable model.
          */
-        public final <T extends Self> T direction(Direction direction, double size) {
+        public final Self direction(Direction direction, double size) {
             Åssignable o = new Åssignable();
             o.direction(direction);
             o.size(size);
-            return (T) o;
+            return (Self) o;
         }
-        /**
-         * Create uninitialized {@link Execution}.
-         */
-        public final <T extends Self> T buy(Num num) {
+
+        /** Set direction property with Direction.BUY */
+        public final Self buy(Num num) {
             Åssignable o = new Åssignable();
             o.buy();
             o.size(num);
-            return (T) o;
+            return (Self) o;
         }
-        /**
-         * Create uninitialized {@link Execution}.
-         */
-        public final <T extends Self> T buy(int size) {
+
+        /** Set direction property with Direction.BUY */
+        public final Self buy(int size) {
             Åssignable o = new Åssignable();
             o.buy();
             o.size(size);
-            return (T) o;
+            return (Self) o;
         }
-        /**
-         * Create uninitialized {@link Execution}.
-         */
-        public final <T extends Self> T buy(float size) {
+
+        /** Set direction property with Direction.BUY */
+        public final Self buy(float size) {
             Åssignable o = new Åssignable();
             o.buy();
             o.size(size);
-            return (T) o;
+            return (Self) o;
         }
-        /**
-         * Create uninitialized {@link Execution}.
-         */
-        public final <T extends Self> T buy(long size) {
+
+        /** Set direction property with Direction.BUY */
+        public final Self buy(long size) {
             Åssignable o = new Åssignable();
             o.buy();
             o.size(size);
-            return (T) o;
+            return (Self) o;
         }
-        /**
-         * Create uninitialized {@link Execution}.
-         */
-        public final <T extends Self> T buy(double size) {
+
+        /** Set direction property with Direction.BUY */
+        public final Self buy(double size) {
             Åssignable o = new Åssignable();
             o.buy();
             o.size(size);
-            return (T) o;
+            return (Self) o;
         }
-        /**
-         * Create uninitialized {@link Execution}.
-         */
-        public final <T extends Self> T sell(Num num) {
+
+        /** Set direction property with Direction.SELL */
+        public final Self sell(Num num) {
             Åssignable o = new Åssignable();
             o.sell();
             o.size(num);
-            return (T) o;
+            return (Self) o;
         }
-        /**
-         * Create uninitialized {@link Execution}.
-         */
-        public final <T extends Self> T sell(int size) {
+
+        /** Set direction property with Direction.SELL */
+        public final Self sell(int size) {
             Åssignable o = new Åssignable();
             o.sell();
             o.size(size);
-            return (T) o;
+            return (Self) o;
         }
-        /**
-         * Create uninitialized {@link Execution}.
-         */
-        public final <T extends Self> T sell(float size) {
+
+        /** Set direction property with Direction.SELL */
+        public final Self sell(float size) {
             Åssignable o = new Åssignable();
             o.sell();
             o.size(size);
-            return (T) o;
+            return (Self) o;
         }
-        /**
-         * Create uninitialized {@link Execution}.
-         */
-        public final <T extends Self> T sell(long size) {
+
+        /** Set direction property with Direction.SELL */
+        public final Self sell(long size) {
             Åssignable o = new Åssignable();
             o.sell();
             o.size(size);
-            return (T) o;
+            return (Self) o;
         }
-        /**
-         * Create uninitialized {@link Execution}.
-         */
-        public final <T extends Self> T sell(double size) {
+
+        /** Set direction property with Direction.SELL */
+        public final Self sell(double size) {
             Åssignable o = new Åssignable();
             o.sell();
             o.size(size);
-            return (T) o;
+            return (Self) o;
         }
     }
 
@@ -515,8 +575,12 @@ public abstract class Execution extends ExecutionModel {
      * Property assignment API.
      */
     public static interface ÅssignableDirection<Next> {
+
         /**
-         * The base setter.
+         * Assign direction property.
+         * 
+         * @param value A new value to assign.
+         * @return The next assignable model.
          */
         default Next direction(Direction value) {
             try {
@@ -528,14 +592,18 @@ public abstract class Execution extends ExecutionModel {
         }
 
         /**
-         * The overload setter.
+         * Assign {@link Direction#BUY} to direction property.
+         * 
+         * @return The next assignable model.
          */
         default Next buy() {
             return direction(Direction.BUY);
         }
 
         /**
-         * The overload setter.
+         * Assign {@link Direction#SELL} to direction property.
+         * 
+         * @return The next assignable model.
          */
         default Next sell() {
             return direction(Direction.SELL);
@@ -546,12 +614,16 @@ public abstract class Execution extends ExecutionModel {
      * Property assignment API.
      */
     public static interface ÅssignableSize<Next> {
+
         /**
-         * The base setter.
+         * Assign size property.
+         * 
+         * @param value A new value to assign.
+         * @return The next assignable model.
          */
         default Next size(Num value) {
             try {
-                sizeUpdater.invoke(this, initializeCumulativeSizeNumConsumer.invoke(this, value, (Consumer<Num>) ((Åssignable) this)::cumulativeSize));
+                sizeUpdater.invoke(this, initializeCumulativeSize$393740119.invoke(this, value, (Consumer<Num>) ((Åssignable) this)::cumulativeSize));
             } catch (Throwable e) {
                 throw new Error(e);
             }
@@ -559,44 +631,56 @@ public abstract class Execution extends ExecutionModel {
         }
 
         /**
-         * The overload setter.
+         * Set executed size by value.
+         *  
+         *  @param size An executed size.
+         *  @return Chainable API.
          */
         default Next size(int size) {
             try {
-                return size((Num) sizeint.invoke(this, size));
+                return size((Num) size$101282980.invoke(this, size));
             } catch (Throwable e) {
                 throw new Error(e);
             }
         }
 
         /**
-         * The overload setter.
+         * Set executed size by value.
+         *  
+         *  @param size An executed size.
+         *  @return Chainable API.
          */
         default Next size(float size) {
             try {
-                return size((Num) sizefloat.invoke(this, size));
+                return size((Num) size$765519919.invoke(this, size));
             } catch (Throwable e) {
                 throw new Error(e);
             }
         }
 
         /**
-         * The overload setter.
+         * Set executed size by value.
+         *  
+         *  @param size An executed size.
+         *  @return Chainable API.
          */
         default Next size(long size) {
             try {
-                return size((Num) sizelong.invoke(this, size));
+                return size((Num) size$1096207375.invoke(this, size));
             } catch (Throwable e) {
                 throw new Error(e);
             }
         }
 
         /**
-         * The overload setter.
+         * Set executed size by value.
+         *  
+         *  @param size An executed size.
+         *  @return Chainable API.
          */
         default Next size(double size) {
             try {
-                return size((Num) sizedouble.invoke(this, size));
+                return size((Num) size$1360390150.invoke(this, size));
             } catch (Throwable e) {
                 throw new Error(e);
             }
@@ -607,8 +691,12 @@ public abstract class Execution extends ExecutionModel {
      * Property assignment API.
      */
     public static interface ÅssignableÅrbitrary<Next extends Execution> {
+
         /**
-         * The base setter.
+         * Assign id property.
+         * 
+         * @param value A new value to assign.
+         * @return The next assignable model.
          */
         default Next id(long value) {
             try {
@@ -618,8 +706,12 @@ public abstract class Execution extends ExecutionModel {
             }
             return (Next) this;
         }
+
         /**
-         * The base setter.
+         * Assign price property.
+         * 
+         * @param value A new value to assign.
+         * @return The next assignable model.
          */
         default Next price(Num value) {
             try {
@@ -631,50 +723,66 @@ public abstract class Execution extends ExecutionModel {
         }
 
         /**
-         * The overload setter.
+         * Set price by value.
+         *  
+         *  @param price A price.
+         *  @return Chainable API.
          */
         default Next price(int price) {
             try {
-                return price((Num) priceint.invoke(this, price));
+                return price((Num) price$101282980.invoke(this, price));
             } catch (Throwable e) {
                 throw new Error(e);
             }
         }
 
         /**
-         * The overload setter.
+         * Set price by value.
+         *  
+         *  @param price A price.
+         *  @return Chainable API.
          */
         default Next price(long price) {
             try {
-                return price((Num) pricelong.invoke(this, price));
+                return price((Num) price$1096207375.invoke(this, price));
             } catch (Throwable e) {
                 throw new Error(e);
             }
         }
 
         /**
-         * The overload setter.
+         * Set price by value.
+         *  
+         *  @param price A price.
+         *  @return Chainable API.
          */
         default Next price(float price) {
             try {
-                return price((Num) pricefloat.invoke(this, price));
+                return price((Num) price$765519919.invoke(this, price));
             } catch (Throwable e) {
                 throw new Error(e);
             }
         }
 
         /**
-         * The overload setter.
+         * Set price by value.
+         *  
+         *  @param price A price.
+         *  @return Chainable API.
          */
         default Next price(double price) {
             try {
-                return price((Num) pricedouble.invoke(this, price));
+                return price((Num) price$1360390150.invoke(this, price));
             } catch (Throwable e) {
                 throw new Error(e);
             }
         }
+
         /**
-         * The base setter.
+         * Assign cumulativeSize property.
+         * 
+         * @param value A new value to assign.
+         * @return The next assignable model.
          */
         default Next cumulativeSize(Num value) {
             try {
@@ -684,12 +792,16 @@ public abstract class Execution extends ExecutionModel {
             }
             return (Next) this;
         }
+
         /**
-         * The base setter.
+         * Assign date property.
+         * 
+         * @param value A new value to assign.
+         * @return The next assignable model.
          */
         default Next date(ZonedDateTime value) {
             try {
-                dateUpdater.invoke(this, millsZonedDateTimeConsumer.invoke(this, value, (Consumer<Long>) ((Åssignable) this)::mills));
+                dateUpdater.invoke(this, mills$1373199327.invoke(this, value, (LongConsumer) ((Åssignable) this)::mills));
             } catch (Throwable e) {
                 throw new Error(e);
             }
@@ -697,17 +809,30 @@ public abstract class Execution extends ExecutionModel {
         }
 
         /**
-         * The overload setter.
+         * Assign executed date.
+         *  
+         *  @param year Year.
+         *  @param month Month.
+         *  @param day Day of month.
+         *  @param hour Hour.
+         *  @param minute Minute.
+         *  @param second Second.
+         *  @param ms Mill second.
+         *  @return
          */
         default Next date(int year, int month, int day, int hour, int minute, int second, int ms) {
             try {
-                return date((ZonedDateTime) dateintintintintintintint.invoke(this, year, month, day, hour, minute, second, ms));
+                return date((ZonedDateTime) date$852566916.invoke(this, year, month, day, hour, minute, second, ms));
             } catch (Throwable e) {
                 throw new Error(e);
             }
         }
+
         /**
-         * The base setter.
+         * Assign mills property.
+         * 
+         * @param value A new value to assign.
+         * @return The next assignable model.
          */
         default Next mills(long value) {
             try {
@@ -717,8 +842,12 @@ public abstract class Execution extends ExecutionModel {
             }
             return (Next) this;
         }
+
         /**
-         * The base setter.
+         * Assign consecutive property.
+         * 
+         * @param value A new value to assign.
+         * @return The next assignable model.
          */
         default Next consecutive(int value) {
             try {
@@ -728,8 +857,12 @@ public abstract class Execution extends ExecutionModel {
             }
             return (Next) this;
         }
+
         /**
-         * The base setter.
+         * Assign delay property.
+         * 
+         * @param value A new value to assign.
+         * @return The next assignable model.
          */
         default Next delay(int value) {
             try {
