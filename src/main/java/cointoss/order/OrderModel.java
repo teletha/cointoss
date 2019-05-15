@@ -29,6 +29,27 @@ import kiss.Variable;
 @Icy(grouping = 2)
 public abstract class OrderModel implements Directional {
 
+    /** The requested time of this order. */
+    public final Variable<ZonedDateTime> creationTime = Variable.empty();
+
+    /** The termiated time of this order. */
+    public final Variable<ZonedDateTime> terminationTime = Variable.empty();
+
+    /** The executed size. */
+    public final NumVar executedSize = NumVar.zero();
+
+    /** The remaining size. */
+    public final NumVar remainingSize = NumVar.zero();
+
+    /** The order state. */
+    public final Variable<OrderState> state = Variable.of(OrderState.INIT);
+
+    /** The order identifier for the specific market. */
+    public final Variable<String> id = Variable.empty();
+
+    /** The total cost. */
+    public final NumVar cost = NumVar.zero();
+
     /** The relation holder. */
     private Map<Class, Object> relations;
 
@@ -113,7 +134,7 @@ public abstract class OrderModel implements Directional {
         if (size.isNegativeOrZero()) {
             throw new IllegalArgumentException("Order size must be positive.");
         }
-        remainingSize().set(size);
+        remainingSize.set(size);
         return size;
     }
 
@@ -183,7 +204,7 @@ public abstract class OrderModel implements Directional {
             price = Num.ZERO;
         }
 
-        if (state().is(OrderState.INIT)) {
+        if (state.is(OrderState.INIT)) {
             type.accept(price.isZero() ? OrderType.MARKET : OrderType.LIMIT);
         }
         return price;
@@ -210,82 +231,12 @@ public abstract class OrderModel implements Directional {
     }
 
     /**
-     * The order identifier for the specific market.
-     * 
-     * @return
-     */
-    @Icy.Property
-    public Variable<String> id() {
-        return Variable.empty();
-    }
-
-    /**
-     * The order state.
-     * 
-     * @return
-     */
-    @Icy.Property
-    public Variable<OrderState> state() {
-        return Variable.of(OrderState.INIT);
-    }
-
-    /**
-     * The requested time of this order.
-     * 
-     * @return
-     */
-    @Icy.Property
-    public Variable<ZonedDateTime> creationTime() {
-        return Variable.empty();
-    }
-
-    /**
-     * The termiated time of this order.
-     * 
-     * @return
-     */
-    @Icy.Property
-    public Variable<ZonedDateTime> terminationTime() {
-        return Variable.empty();
-    }
-
-    /**
-     * The executed size.
-     * 
-     * @return
-     */
-    @Icy.Property
-    public NumVar executedSize() {
-        return NumVar.zero();
-    }
-
-    /**
-     * The remaining size.
-     * 
-     * @return
-     */
-    @Icy.Property
-    public NumVar remainingSize() {
-        return NumVar.zero();
-    }
-
-    /**
-     * The total cost.
-     * 
-     * @return
-     */
-    @Icy.Property
-    public NumVar cost() {
-        return NumVar.zero();
-    }
-
-    /**
      * Check the order {@link OrderState}.
      * 
      * @return The result.
      */
     public final boolean isExpired() {
-        return state().is(OrderState.EXPIRED);
+        return state.is(OrderState.EXPIRED);
     }
 
     /**
@@ -303,7 +254,7 @@ public abstract class OrderModel implements Directional {
      * @return The result.
      */
     public final boolean isCanceled() {
-        return state().is(OrderState.CANCELED);
+        return state.is(OrderState.CANCELED);
     }
 
     /**
@@ -321,7 +272,7 @@ public abstract class OrderModel implements Directional {
      * @return The result.
      */
     public final boolean isCompleted() {
-        return state().is(OrderState.COMPLETED);
+        return state.is(OrderState.COMPLETED);
     }
 
     /**
@@ -374,7 +325,7 @@ public abstract class OrderModel implements Directional {
      * @return A event {@link Signal}.
      */
     public final Signal<Order> observeTerminating() {
-        return state().observe().take(OrderState.CANCELED, OrderState.COMPLETED).take(1).mapTo((Order) this);
+        return state.observe().take(OrderState.CANCELED, OrderState.COMPLETED).take(1).mapTo((Order) this);
     }
 
     /**
@@ -382,7 +333,7 @@ public abstract class OrderModel implements Directional {
      */
     final void execute(Execution execution) {
         entries.add(execution);
-        cost().set(v -> v.plus(execution.size.multiply(execution.price)));
+        cost.set(v -> v.plus(execution.size.multiply(execution.price)));
     }
 
     /**
@@ -420,7 +371,7 @@ public abstract class OrderModel implements Directional {
      */
     @Override
     public int hashCode() {
-        return Objects.hashCode(id());
+        return Objects.hashCode(id);
     }
 
     /**
@@ -428,7 +379,7 @@ public abstract class OrderModel implements Directional {
      */
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof Order ? Objects.equals(id(), ((Order) obj).id()) : false;
+        return obj instanceof Order ? Objects.equals(id, ((Order) obj).id) : false;
     }
 
     /**
@@ -436,8 +387,7 @@ public abstract class OrderModel implements Directional {
      */
     @Override
     public String toString() {
-        return direction()
-                .mark() + size() + "@" + price() + " 残" + remainingSize() + " 済" + executedSize() + " " + creationTime() + " " + state();
+        return direction().mark() + size() + "@" + price() + " 残" + remainingSize + " 済" + executedSize + " " + creationTime + " " + state;
     }
 
     /**

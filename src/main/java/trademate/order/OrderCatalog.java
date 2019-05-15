@@ -171,7 +171,7 @@ public class OrderCatalog extends View {
          * 
          */
         private CatalogRow() {
-            ui.styleOnly(Viewtify.signalNow(itemProperty()).as(Order.class).switchVariable(Order::state).map(S.State::of));
+            ui.styleOnly(Viewtify.signalNow(itemProperty()).as(Order.class).switchVariable(o -> o.state).map(S.State::of));
         }
     }
 
