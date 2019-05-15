@@ -71,7 +71,7 @@ public class OrderTest {
 
     @Test
     void limit() {
-        Order order = Order.of(Direction.BUY, 1).price(20);
+        Order order = Order.direction(Direction.BUY, 1).price(20);
         assert order.direction == Direction.BUY;
         assert order.size.is(1);
         assert order.price.is(20);
@@ -79,7 +79,7 @@ public class OrderTest {
 
     @Test
     void market() {
-        Order order = Order.of(Direction.BUY, 1);
+        Order order = Order.direction(Direction.BUY, 1);
         assert order.direction == Direction.BUY;
         assert order.size.is(1);
         assert order.price.is(0);
@@ -87,7 +87,7 @@ public class OrderTest {
 
     @Test
     void observeTerminatingByCompleted() {
-        Order order = Order.of(Direction.BUY, 1);
+        Order order = Order.direction(Direction.BUY, 1);
         List<Order> result = order.observeTerminating().toList();
         assert result.isEmpty();
         order.state.set(OrderState.ACTIVE);
@@ -111,7 +111,7 @@ public class OrderTest {
 
     @Test
     void observeTerminatingByCanceld() {
-        Order order = Order.of(Direction.BUY, 1);
+        Order order = Order.direction(Direction.BUY, 1);
         List<Order> result = order.observeTerminating().toList();
         assert result.isEmpty();
         order.state.set(OrderState.ACTIVE);
@@ -137,10 +137,10 @@ public class OrderTest {
     void direction() {
         assert Order.buy(1).direction.isBuy();
         assert Order.sell(1).direction.isSell();
-        assert Order.of(Direction.BUY, 1).direction.isBuy();
-        assert Order.of(Direction.SELL, 1).direction.isSell();
+        assert Order.direction(Direction.BUY, 1).direction.isBuy();
+        assert Order.direction(Direction.SELL, 1).direction.isSell();
 
-        assertThrows(IllegalArgumentException.class, () -> Order.of(null, 1));
+        assertThrows(IllegalArgumentException.class, () -> Order.direction(null, 1));
     }
 
     @Test
@@ -167,7 +167,7 @@ public class OrderTest {
     @Test
     void condition() {
         assert Order.buy(1).condition == QuantityCondition.GoodTillCanceled;
-        assert Order.buy(1).type(QuantityCondition.FillOrKill).condition == QuantityCondition.FillOrKill;
-        assert Order.buy(1).type(null).condition == QuantityCondition.GoodTillCanceled;
+        assert Order.buy(1).quantityCondition(QuantityCondition.FillOrKill).condition == QuantityCondition.FillOrKill;
+        assert Order.buy(1).quantityCondition(null).condition == QuantityCondition.GoodTillCanceled;
     }
 }

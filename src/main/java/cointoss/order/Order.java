@@ -189,7 +189,7 @@ public class Order implements Directional {
      * @param quantityCondition A {@link QuantityCondition} to set.
      * @return Chainable API.
      */
-    public final Order type(QuantityCondition quantityCondition) {
+    public final Order quantityCondition(QuantityCondition quantityCondition) {
         if (quantityCondition == null) {
             quantityCondition = QuantityCondition.GoodTillCanceled;
         }
@@ -389,7 +389,7 @@ public class Order implements Directional {
      * @return A new {@link Order}.
      */
     public static Order buy(Num size) {
-        return of(Direction.BUY, size);
+        return direction(Direction.BUY, size);
     }
 
     /**
@@ -419,7 +419,7 @@ public class Order implements Directional {
      * @return A new {@link Order}.
      */
     public static Order sell(Num size) {
-        return of(Direction.SELL, size);
+        return direction(Direction.SELL, size);
     }
 
     /**
@@ -429,8 +429,8 @@ public class Order implements Directional {
      * @param size Your order size.
      * @return A new {@link Order}.
      */
-    public static Order of(Direction direction, long size) {
-        return of(direction, Num.of(size));
+    public static Order direction(Direction direction, long size) {
+        return direction(direction, Num.of(size));
     }
 
     /**
@@ -440,8 +440,8 @@ public class Order implements Directional {
      * @param size Your order size.
      * @return A new {@link Order}.
      */
-    public static Order of(Direction direction, double size) {
-        return of(direction, Num.of(size));
+    public static Order direction(Direction direction, double size) {
+        return direction(direction, Num.of(size));
     }
 
     /**
@@ -451,7 +451,7 @@ public class Order implements Directional {
      * @param size Your order size.
      * @return A new {@link Order}.
      */
-    public static Order of(Direction direction, Num size) {
+    public static Order direction(Direction direction, Num size) {
         return new Order(direction, size);
     }
 

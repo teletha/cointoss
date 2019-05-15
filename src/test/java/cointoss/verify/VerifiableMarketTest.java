@@ -186,31 +186,31 @@ class VerifiableMarketTest {
     @Test
     void fillOrKillLong() {
         // success
-        market.request(Order.buy(10).price(10).type(QuantityCondition.FillOrKill)).to(order -> {
+        market.request(Order.buy(10).price(10).quantityCondition(QuantityCondition.FillOrKill)).to(order -> {
             market.perform(Execution.with.buy(10).price(9));
             assert order.isCompleted();
         });
 
         // over price will success
-        market.request(Order.buy(10).price(10).type(QuantityCondition.FillOrKill)).to(order -> {
+        market.request(Order.buy(10).price(10).quantityCondition(QuantityCondition.FillOrKill)).to(order -> {
             market.perform(Execution.with.buy(10).price(5));
             assert order.isCompleted();
         });
 
         // over size will success
-        market.request(Order.buy(10).price(10).type(QuantityCondition.FillOrKill)).to(order -> {
+        market.request(Order.buy(10).price(10).quantityCondition(QuantityCondition.FillOrKill)).to(order -> {
             market.perform(Execution.with.buy(15).price(9));
             assert order.isCompleted();
         });
 
         // less size will be failed
-        market.request(Order.buy(10).price(10).type(QuantityCondition.FillOrKill)).to(order -> {
+        market.request(Order.buy(10).price(10).quantityCondition(QuantityCondition.FillOrKill)).to(order -> {
             market.perform(Execution.with.buy(4).price(5));
             assert order.isNotCompleted();
         });
 
         // less price will be failed
-        market.request(Order.buy(10).price(10).type(QuantityCondition.FillOrKill)).to(order -> {
+        market.request(Order.buy(10).price(10).quantityCondition(QuantityCondition.FillOrKill)).to(order -> {
             market.perform(Execution.with.buy(10).price(11));
             assert order.isNotCompleted();
         });
@@ -219,31 +219,31 @@ class VerifiableMarketTest {
     @Test
     void fillOrKillShort() {
         // success
-        market.request(Order.sell(1).price(10).type(QuantityCondition.FillOrKill)).to(order -> {
+        market.request(Order.sell(1).price(10).quantityCondition(QuantityCondition.FillOrKill)).to(order -> {
             market.perform(Execution.with.sell(1).price(11));
             assert order.isCompleted();
         });
 
         // over price will success
-        market.request(Order.sell(1).price(10).type(QuantityCondition.FillOrKill)).to(order -> {
+        market.request(Order.sell(1).price(10).quantityCondition(QuantityCondition.FillOrKill)).to(order -> {
             market.perform(Execution.with.sell(1).price(11));
             assert order.isCompleted();
         });
 
         // over size will success
-        market.request(Order.sell(10).price(10).type(QuantityCondition.FillOrKill)).to(order -> {
+        market.request(Order.sell(10).price(10).quantityCondition(QuantityCondition.FillOrKill)).to(order -> {
             market.perform(Execution.with.sell(15).price(11));
             assert order.isCompleted();
         });
 
         // less size will be failed
-        market.request(Order.sell(10).price(10).type(QuantityCondition.FillOrKill)).to(order -> {
+        market.request(Order.sell(10).price(10).quantityCondition(QuantityCondition.FillOrKill)).to(order -> {
             market.perform(Execution.with.sell(4).price(11));
             assert order.isNotCompleted();
         });
 
         // less price will be failed
-        market.request(Order.sell(10).price(10).type(QuantityCondition.FillOrKill)).to(order -> {
+        market.request(Order.sell(10).price(10).quantityCondition(QuantityCondition.FillOrKill)).to(order -> {
             market.perform(Execution.with.sell(10).price(9));
             assert order.isNotCompleted();
         });
@@ -253,35 +253,35 @@ class VerifiableMarketTest {
     @Disabled
     void immediateOrCancelLong() {
         // success
-        market.request(Order.buy(1).price(10).type(QuantityCondition.ImmediateOrCancel)).to(order -> {
+        market.request(Order.buy(1).price(10).quantityCondition(QuantityCondition.ImmediateOrCancel)).to(order -> {
             market.perform(Execution.with.buy(1).price(9));
             assert order.isCompleted();
             assert order.isNotCanceled();
         });
 
         // over price will success
-        market.request(Order.buy(1).price(10).type(QuantityCondition.ImmediateOrCancel)).to(order -> {
+        market.request(Order.buy(1).price(10).quantityCondition(QuantityCondition.ImmediateOrCancel)).to(order -> {
             market.perform(Execution.with.buy(1).price(9));
             assert order.isCompleted();
             assert order.isNotCanceled();
         });
 
         // over size will success
-        market.request(Order.buy(1).price(10).type(QuantityCondition.ImmediateOrCancel)).to(order -> {
+        market.request(Order.buy(1).price(10).quantityCondition(QuantityCondition.ImmediateOrCancel)).to(order -> {
             market.perform(Execution.with.buy(5).price(9));
             assert order.isCompleted();
             assert order.isNotCanceled();
         });
 
         // less size will success
-        market.request(Order.buy(10).price(10).type(QuantityCondition.ImmediateOrCancel)).to(order -> {
+        market.request(Order.buy(10).price(10).quantityCondition(QuantityCondition.ImmediateOrCancel)).to(order -> {
             market.perform(Execution.with.buy(4).price(9));
             assert order.isCompleted();
             assert order.isNotCanceled();
         });
 
         // less price will be failed
-        market.request(Order.buy(1).price(10).type(QuantityCondition.ImmediateOrCancel)).to(order -> {
+        market.request(Order.buy(1).price(10).quantityCondition(QuantityCondition.ImmediateOrCancel)).to(order -> {
             market.perform(Execution.with.buy(1).price(11));
             assert order.isNotCompleted();
             assert order.isCanceled();
@@ -292,35 +292,35 @@ class VerifiableMarketTest {
     @Disabled
     void immediateOrCancelShort() {
         // success
-        market.request(Order.sell(1).price(10).type(QuantityCondition.ImmediateOrCancel)).to(order -> {
+        market.request(Order.sell(1).price(10).quantityCondition(QuantityCondition.ImmediateOrCancel)).to(order -> {
             market.perform(Execution.with.sell(1).price(11));
             assert order.isCompleted();
             assert order.isNotCanceled();
         });
 
         // over price will success
-        market.request(Order.sell(1).price(10).type(QuantityCondition.ImmediateOrCancel)).to(order -> {
+        market.request(Order.sell(1).price(10).quantityCondition(QuantityCondition.ImmediateOrCancel)).to(order -> {
             market.perform(Execution.with.sell(1).price(12));
             assert order.isCompleted();
             assert order.isNotCanceled();
         });
 
         // over size will success
-        market.request(Order.sell(10).price(10).type(QuantityCondition.ImmediateOrCancel)).to(order -> {
+        market.request(Order.sell(10).price(10).quantityCondition(QuantityCondition.ImmediateOrCancel)).to(order -> {
             market.perform(Execution.with.sell(15).price(11));
             assert order.isCompleted();
             assert order.isNotCanceled();
         });
 
         // less size will success
-        market.request(Order.sell(10).price(10).type(QuantityCondition.ImmediateOrCancel)).to(order -> {
+        market.request(Order.sell(10).price(10).quantityCondition(QuantityCondition.ImmediateOrCancel)).to(order -> {
             market.perform(Execution.with.sell(4).price(11));
             assert order.isNotCompleted();
             assert order.isCanceled();
         });
 
         // less price will be failed
-        market.request(Order.sell(1).price(10).type(QuantityCondition.ImmediateOrCancel)).to(order -> {
+        market.request(Order.sell(1).price(10).quantityCondition(QuantityCondition.ImmediateOrCancel)).to(order -> {
             market.perform(Execution.with.sell(1).price(9));
             assert order.isNotCompleted();
             assert order.isCanceled();
