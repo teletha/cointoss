@@ -16,6 +16,7 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import cointoss.Direction;
+import cointoss.Directional;
 import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.execution.Execution;
@@ -107,14 +108,14 @@ public class VerifiableMarketService extends MarketService {
     public Signal<String> request(Order order) {
         return I.signal(order).map(o -> {
             BackendOrder child = new BackendOrder(order);
-            child.id.let("LOCAL-ACCEPTANCE-" + id++);
-            child.state.set(OrderState.ACTIVE);
-            child.creationTime.set(latency.emulate(now()));
-            child.remainingSize.set(order.size);
+            child.id = "LOCAL-ACCEPTANCE-" + id++;
+            child.state = OrderState.ACTIVE;
+            child.creationTime = latency.emulate(now());
+            child.remainingSize = order.size;
 
             orderAll.add(child);
             orderActive.add(child);
-            return child.id.v;
+            return child.id;
         });
     }
 
@@ -183,7 +184,15 @@ public class VerifiableMarketService extends MarketService {
      */
     @Override
     public Signal<Order> orders() {
-        return I.signal(orderAll).as(Order.class);
+        return I.signal(orderAll).map(o -> {
+            Order order = Order.of(o.direction, o.size).price(o.price).type(o.condition);
+            order.id.set(o.id);
+            order.state.set(o.state);
+            order.executedSize.set(o.executedSize);
+            order.remainingSize.set(o.remainingSize);
+
+            return order;
+        });
     }
 
     /**
@@ -234,7 +243,7 @@ public class VerifiableMarketService extends MarketService {
             BackendOrder order = iterator.next();
 
             // time base filter
-            if (e.date.isBefore(order.creationTime.get())) {
+            if (e.date.isBefore(order.creationTime)) {
                 continue;
             }
 
@@ -253,7 +262,7 @@ public class VerifiableMarketService extends MarketService {
 
             if (order.condition == QuantityCondition.ImmediateOrCancel) {
                 if (validateTradableByPrice(order, e)) {
-                    order.remainingSize.set(v -> Num.min(e.size, v));
+                    order.remainingSize = Num.min(e.size, order.remainingSize);
                 } else {
                     iterator.remove();
                     orderAll.remove(order);
@@ -262,26 +271,26 @@ public class VerifiableMarketService extends MarketService {
             }
 
             if (validateTradableByPrice(order, e)) {
-                Num executedSize = Num.min(e.size, order.remainingSize.v);
+                Num executedSize = Num.min(e.size, order.remainingSize);
                 if (order.type.isMarket() && executedSize.isNot(0)) {
                     order.marketMinPrice = order.isBuy() ? Num.max(order.marketMinPrice, e.price) : Num.min(order.marketMinPrice, e.price);
-                    order.price(order.price.multiply(order.executedSize)
+                    order.price = order.price.multiply(order.executedSize)
                             .plus(order.marketMinPrice.multiply(executedSize))
-                            .divide(executedSize.plus(order.executedSize)));
+                            .divide(executedSize.plus(order.executedSize));
                 }
-                order.executedSize.set(v -> v.plus(executedSize));
-                order.remainingSize.set(v -> v.minus(executedSize));
+                order.executedSize = order.executedSize.plus(executedSize);
+                order.remainingSize = order.remainingSize.minus(executedSize);
 
                 Execution exe = Execution.with.direction(order.direction(), executedSize)
                         .price(order.type.isMarket() ? order.marketMinPrice : order.price)
                         .date(e.date);
                 executeds.add(exe);
 
-                if (order.remainingSize.v.isZero()) {
-                    order.state.set(OrderState.COMPLETED);
+                if (order.remainingSize.isZero()) {
+                    order.state = OrderState.COMPLETED;
                     iterator.remove();
                 }
-                positions.accept(I.pair(exe.direction, order.id.v, exe));
+                positions.accept(I.pair(exe.direction, order.id, exe));
 
                 // replace execution info
                 return Execution.with.direction(e.direction, exe.size)
@@ -301,7 +310,7 @@ public class VerifiableMarketService extends MarketService {
      * @param e A target {@link Execution}.
      * @return A result.
      */
-    private boolean validateTradable(Order order, Execution e) {
+    private boolean validateTradable(BackendOrder order, Execution e) {
         return validateTradableBySize(order, e) && validateTradableByPrice(order, e);
     }
 
@@ -311,7 +320,7 @@ public class VerifiableMarketService extends MarketService {
      * @param e A target {@link Execution}.
      * @return A result.
      */
-    private boolean validateTradableByPrice(Order order, Execution e) {
+    private boolean validateTradableByPrice(BackendOrder order, Execution e) {
         if (order.type == OrderType.MARKET) {
             return true;
         }
@@ -331,7 +340,7 @@ public class VerifiableMarketService extends MarketService {
      * @param e A target {@link Execution}.
      * @return A result.
      */
-    private boolean validateTradableBySize(Order order, Execution e) {
+    private boolean validateTradableBySize(BackendOrder order, Execution e) {
         return order.size.isLessThanOrEqual(e.size);
     }
 
@@ -353,13 +362,43 @@ public class VerifiableMarketService extends MarketService {
     /**
      * For test.
      */
-    private class BackendOrder extends Order {
+    private class BackendOrder implements Directional {
 
         /** The frontend order. */
         private final Order front;
 
+        /** The order direction. */
+        private final Direction direction;
+
+        /** The order size. */
+        private final Num size;
+
+        /** The order id. */
+        private String id;
+
+        /** The order price. */
+        private Num price;
+
+        /** The order type. */
+        private OrderType type;
+
+        /** The order type. */
+        private QuantityCondition condition;
+
+        /** The created time. */
+        private ZonedDateTime creationTime;
+
+        /** The order state. */
+        private OrderState state;
+
+        /** The order state. */
+        private Num remainingSize;
+
+        /** The order state. */
+        private Num executedSize;
+
         /** The minimum price for market order. */
-        private Num marketMinPrice = isBuy() ? Num.ZERO : Num.MAX;
+        private Num marketMinPrice;
 
         /**
          * The time which this order is created, Using epoch mills to make time-related calculation
@@ -377,14 +416,29 @@ public class VerifiableMarketService extends MarketService {
         private final Signaling<Order> canceling = new Signaling();
 
         /**
+         * Create backend managed order.
+         * 
          * @param o
          */
         private BackendOrder(Order o) {
-            super(o.direction(), o.size);
-            front = o;
+            this.front = o;
+            this.direction = o.direction;
+            this.size = o.size;
+            this.remainingSize = o.remainingSize.v;
+            this.executedSize = o.executedSize.v;
+            this.price = o.price;
+            this.type = o.type;
+            this.condition = o.condition;
+            this.creationTime = o.creationTime.v;
+            this.marketMinPrice = isBuy() ? Num.ZERO : Num.MAX;
+        }
 
-            price(o.price);
-            type(o.condition);
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Direction direction() {
+            return direction;
         }
 
         /**
@@ -393,7 +447,7 @@ public class VerifiableMarketService extends MarketService {
         private void cancel() {
             orderActive.removeIf(o -> o.id.equals(id));
             I.signal(orderAll).take(o -> o.id.equals(id)).take(1).to(o -> {
-                o.state.set(OrderState.CANCELED);
+                o.state = OrderState.CANCELED;
                 canceling.accept(front);
                 canceling.complete();
             });
