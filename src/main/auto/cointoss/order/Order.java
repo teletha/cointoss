@@ -7,7 +7,6 @@ import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.function.Consumer;
-import java.util.function.UnaryOperator;
 import javax.annotation.processing.Generated;
 
 /**
@@ -199,17 +198,6 @@ public abstract class Order extends OrderModel {
     @Override
     public final Num price() {
         return this.price;
-    }
-
-    /**
-     * Assign the new value of price property.
-     *
-     * @paran value The price property assigner which accepts the current value and returns new value.
-     * @return Chainable API.
-     */
-    public final Order price(UnaryOperator<Num> value) {
-        setPrice(value.apply(this.price));
-        return this;
     }
 
     /**

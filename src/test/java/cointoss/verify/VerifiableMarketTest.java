@@ -377,7 +377,8 @@ class VerifiableMarketTest {
         Order order = Order.with.sell(1);
         market.request(order).to();
         market.perform(Execution.with.sell(1).price(10));
-        assert order.price.is(10);
+        assert order.price.is(0);
+        assert order.averagePrice.is(10);
         assert order.executedSize.is(1);
 
         // divide
@@ -385,7 +386,8 @@ class VerifiableMarketTest {
         market.request(order).to();
         market.perform(Execution.with.buy(5).price(10));
         market.perform(Execution.with.buy(5).price(5));
-        assert order.price.is("7.5");
+        assert order.price.is(0);
+        assert order.averagePrice.is(7.5);
         assert order.executedSize.is(10);
 
         // divide overflow
@@ -393,7 +395,8 @@ class VerifiableMarketTest {
         market.request(order).to();
         market.perform(Execution.with.buy(5).price(10));
         market.perform(Execution.with.buy(14).price(5));
-        assert order.price.is("7.5");
+        assert order.price.is(0);
+        assert order.averagePrice.is(7.5);
         assert order.executedSize.is(10);
 
         // divide underflow

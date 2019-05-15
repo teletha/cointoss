@@ -47,6 +47,9 @@ public abstract class OrderModel implements Directional {
     /** The order identifier for the specific market. */
     public final Variable<String> id = Variable.empty();
 
+    /** The average price. */
+    public final NumVar averagePrice = NumVar.zero();
+
     /** The total cost. */
     public final NumVar cost = NumVar.zero();
 
@@ -143,7 +146,7 @@ public abstract class OrderModel implements Directional {
      * 
      * @return
      */
-    @Icy.Property(mutable = true)
+    @Icy.Property
     public Num price() {
         return Num.ZERO;
     }
