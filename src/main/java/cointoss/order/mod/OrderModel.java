@@ -7,7 +7,7 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss.order;
+package cointoss.order.mod;
 
 import java.time.ZonedDateTime;
 import java.util.LinkedList;
@@ -17,6 +17,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import cointoss.Direction;
 import cointoss.Directional;
 import cointoss.execution.Execution;
+import cointoss.order.Order;
+import cointoss.order.OrderState;
+import cointoss.order.OrderType;
+import cointoss.order.QuantityCondition;
 import cointoss.util.Num;
 import cointoss.util.NumVar;
 import icy.manipulator.Icy;
@@ -25,7 +29,7 @@ import kiss.Signal;
 import kiss.Variable;
 
 @Icy(grouping = 2)
-public abstract class Order2Model implements Directional {
+public abstract class OrderModel implements Directional {
 
     /** The relation holder. */
     private Map<Class, Object> relations;
@@ -39,6 +43,14 @@ public abstract class Order2Model implements Directional {
     @Icy.Property
     @Override
     public abstract Direction direction();
+
+    @Icy.Intercept("direction")
+    private Direction validate(Direction direction) {
+        if (direction == null) {
+            throw new IllegalArgumentException("Required");
+        }
+        return direction;
+    }
 
     /**
      * The initial ordered size.
@@ -90,6 +102,20 @@ public abstract class Order2Model implements Directional {
     @Icy.Overload("size")
     private Num size(double size) {
         return Num.of(size);
+    }
+
+    /**
+     * Size valication.
+     * 
+     * @param size
+     * @return
+     */
+    @Icy.Intercept("size")
+    private Num validateSize(Num size) {
+        if (size.isNegativeOrZero()) {
+            throw new IllegalArgumentException("Order size must be positive.");
+        }
+        return size;
     }
 
     /**
@@ -147,6 +173,20 @@ public abstract class Order2Model implements Directional {
     }
 
     /**
+     * Validate order price.
+     * 
+     * @param price
+     * @return
+     */
+    @Icy.Intercept("price")
+    private Num price(Num price) {
+        if (price.isNegative()) {
+            price = Num.ZERO;
+        }
+        return price;
+    }
+
+    /**
      * The order type.
      * 
      * @return
@@ -172,7 +212,7 @@ public abstract class Order2Model implements Directional {
      * @return
      */
     @Icy.Property
-    public Variable<Num> id() {
+    public Variable<String> id() {
         return Variable.empty();
     }
 
@@ -308,7 +348,7 @@ public abstract class Order2Model implements Directional {
      * @param comment
      * @return
      */
-    public final Order2Model log(String comment) {
+    public final OrderModel log(String comment) {
         if (comment != null && !comment.isEmpty()) {
             relation(Log.class).items.add(comment);
         }
@@ -330,8 +370,8 @@ public abstract class Order2Model implements Directional {
      * 
      * @return A event {@link Signal}.
      */
-    public final Signal<Order2> observeTerminating() {
-        return state().observe().take(OrderState.CANCELED, OrderState.COMPLETED).take(1).mapTo((Order2) this);
+    public final Signal<Order> observeTerminating() {
+        return state().observe().take(OrderState.CANCELED, OrderState.COMPLETED).take(1).mapTo((Order) this);
     }
 
     /**

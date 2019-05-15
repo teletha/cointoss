@@ -18,6 +18,18 @@ import javax.annotation.processing.Generated;
 public abstract class Execution extends ExecutionModel {
 
     /**
+     * Deceive complier that the specified checked exception is unchecked exception.
+     *
+     * @param <T> A dummy type for {@link RuntimeException}.
+     * @param throwable Any error.
+     * @return A runtime error.
+     * @throws T Dummy error to deceive compiler.
+     */
+    private static final <T extends Throwable> T quiet(Throwable throwable) throws T {
+        throw (T) throwable;
+    }
+
+    /**
      * Create special method invoker.
      *
      * @param name A target method name.
@@ -30,7 +42,7 @@ public abstract class Execution extends ExecutionModel {
             method.setAccessible(true);
             return MethodHandles.lookup().unreflect(method);
         } catch (Throwable e) {
-            throw new Error(e);
+            throw quiet(e);
         }
     }
 
@@ -79,7 +91,7 @@ public abstract class Execution extends ExecutionModel {
             field.setAccessible(true);
             return MethodHandles.lookup().unreflectSetter(field);
         } catch (Throwable e) {
-            throw new Error(e);
+            throw quiet(e);
         }
     }
 
@@ -243,6 +255,15 @@ public abstract class Execution extends ExecutionModel {
     }
 
     /**
+     * Provide accesser to super default value.
+     *
+     * @return A default value.
+     */
+    private final long åccessToDefaultId() {
+        return super.id();
+    }
+
+    /**
      * Exectution price.
      *  
      *  @return
@@ -270,6 +291,15 @@ public abstract class Execution extends ExecutionModel {
     @SuppressWarnings("unused")
     private void setPrice(Num value) {
         ((ÅssignableÅrbitrary) this).price(value);
+    }
+
+    /**
+     * Provide accesser to super default value.
+     *
+     * @return A default value.
+     */
+    private final Num åccessToDefaultPrice() {
+        return super.price();
     }
 
     /**
@@ -303,6 +333,15 @@ public abstract class Execution extends ExecutionModel {
     }
 
     /**
+     * Provide accesser to super default value.
+     *
+     * @return A default value.
+     */
+    private final Num åccessToDefaultAccumulative() {
+        return super.accumulative();
+    }
+
+    /**
      * Accessor for {@link #price}.
      *  
      *  @return
@@ -330,6 +369,15 @@ public abstract class Execution extends ExecutionModel {
     @SuppressWarnings("unused")
     private void setDate(ZonedDateTime value) {
         ((ÅssignableÅrbitrary) this).date(value);
+    }
+
+    /**
+     * Provide accesser to super default value.
+     *
+     * @return A default value.
+     */
+    private final ZonedDateTime åccessToDefaultDate() {
+        return super.date();
     }
 
     /**
@@ -363,6 +411,15 @@ public abstract class Execution extends ExecutionModel {
     }
 
     /**
+     * Provide accesser to super default value.
+     *
+     * @return A default value.
+     */
+    private final long åccessToDefaultMills() {
+        return super.mills();
+    }
+
+    /**
      * Accessor for {@link #price}.
      *  
      *  @return
@@ -393,6 +450,15 @@ public abstract class Execution extends ExecutionModel {
     }
 
     /**
+     * Provide accesser to super default value.
+     *
+     * @return A default value.
+     */
+    private final int åccessToDefaultConsecutive() {
+        return super.consecutive();
+    }
+
+    /**
      * Accessor for {@link #price}.
      *  
      *  @return
@@ -420,6 +486,15 @@ public abstract class Execution extends ExecutionModel {
     @SuppressWarnings("unused")
     private void setDelay(int value) {
         ((ÅssignableÅrbitrary) this).delay(value);
+    }
+
+    /**
+     * Provide accesser to super default value.
+     *
+     * @return A default value.
+     */
+    private final int åccessToDefaultDelay() {
+        return super.delay();
     }
 
     /** The singleton builder. */
@@ -583,10 +658,13 @@ public abstract class Execution extends ExecutionModel {
          * @return The next assignable model.
          */
         default Next direction(Direction value) {
+            if (value == null) {
+                throw new IllegalArgumentException("The direction property requires non-null value.");
+            }
             try {
                 directionUpdater.invoke(this, value);
             } catch (Throwable e) {
-                throw new Error(e);
+                throw quiet(e);
             }
             return (Next) this;
         }
@@ -622,10 +700,13 @@ public abstract class Execution extends ExecutionModel {
          * @return The next assignable model.
          */
         default Next size(Num value) {
+            if (value == null) {
+                throw new IllegalArgumentException("The size property requires non-null value.");
+            }
             try {
                 sizeUpdater.invoke(this, assignWithAccumulative$393740119.invoke(this, value, (Consumer<Num>) ((Åssignable) this)::accumulative));
             } catch (Throwable e) {
-                throw new Error(e);
+                throw quiet(e);
             }
             return (Next) this;
         }
@@ -640,7 +721,7 @@ public abstract class Execution extends ExecutionModel {
             try {
                 return size((Num) size$101282980.invoke(this, size));
             } catch (Throwable e) {
-                throw new Error(e);
+                throw quiet(e);
             }
         }
 
@@ -654,7 +735,7 @@ public abstract class Execution extends ExecutionModel {
             try {
                 return size((Num) size$765519919.invoke(this, size));
             } catch (Throwable e) {
-                throw new Error(e);
+                throw quiet(e);
             }
         }
 
@@ -668,7 +749,7 @@ public abstract class Execution extends ExecutionModel {
             try {
                 return size((Num) size$1096207375.invoke(this, size));
             } catch (Throwable e) {
-                throw new Error(e);
+                throw quiet(e);
             }
         }
 
@@ -682,7 +763,7 @@ public abstract class Execution extends ExecutionModel {
             try {
                 return size((Num) size$1360390150.invoke(this, size));
             } catch (Throwable e) {
-                throw new Error(e);
+                throw quiet(e);
             }
         }
     }
@@ -702,7 +783,7 @@ public abstract class Execution extends ExecutionModel {
             try {
                 idUpdater.invoke(this, value);
             } catch (Throwable e) {
-                throw new Error(e);
+                throw quiet(e);
             }
             return (Next) this;
         }
@@ -714,10 +795,13 @@ public abstract class Execution extends ExecutionModel {
          * @return The next assignable model.
          */
         default Next price(Num value) {
+            if (value == null) {
+                value = ((Execution) this).åccessToDefaultPrice();
+            }
             try {
                 priceUpdater.invoke(this, value);
             } catch (Throwable e) {
-                throw new Error(e);
+                throw quiet(e);
             }
             return (Next) this;
         }
@@ -732,7 +816,7 @@ public abstract class Execution extends ExecutionModel {
             try {
                 return price((Num) price$101282980.invoke(this, price));
             } catch (Throwable e) {
-                throw new Error(e);
+                throw quiet(e);
             }
         }
 
@@ -746,7 +830,7 @@ public abstract class Execution extends ExecutionModel {
             try {
                 return price((Num) price$1096207375.invoke(this, price));
             } catch (Throwable e) {
-                throw new Error(e);
+                throw quiet(e);
             }
         }
 
@@ -760,7 +844,7 @@ public abstract class Execution extends ExecutionModel {
             try {
                 return price((Num) price$765519919.invoke(this, price));
             } catch (Throwable e) {
-                throw new Error(e);
+                throw quiet(e);
             }
         }
 
@@ -774,7 +858,7 @@ public abstract class Execution extends ExecutionModel {
             try {
                 return price((Num) price$1360390150.invoke(this, price));
             } catch (Throwable e) {
-                throw new Error(e);
+                throw quiet(e);
             }
         }
 
@@ -785,10 +869,13 @@ public abstract class Execution extends ExecutionModel {
          * @return The next assignable model.
          */
         default Next accumulative(Num value) {
+            if (value == null) {
+                value = ((Execution) this).åccessToDefaultAccumulative();
+            }
             try {
                 accumulativeUpdater.invoke(this, value);
             } catch (Throwable e) {
-                throw new Error(e);
+                throw quiet(e);
             }
             return (Next) this;
         }
@@ -800,10 +887,13 @@ public abstract class Execution extends ExecutionModel {
          * @return The next assignable model.
          */
         default Next date(ZonedDateTime value) {
+            if (value == null) {
+                value = ((Execution) this).åccessToDefaultDate();
+            }
             try {
                 dateUpdater.invoke(this, assignWithMills$1373199327.invoke(this, value, (LongConsumer) ((Åssignable) this)::mills));
             } catch (Throwable e) {
-                throw new Error(e);
+                throw quiet(e);
             }
             return (Next) this;
         }
@@ -824,7 +914,7 @@ public abstract class Execution extends ExecutionModel {
             try {
                 return date((ZonedDateTime) date$852566916.invoke(this, year, month, day, hour, minute, second, ms));
             } catch (Throwable e) {
-                throw new Error(e);
+                throw quiet(e);
             }
         }
 
@@ -838,7 +928,7 @@ public abstract class Execution extends ExecutionModel {
             try {
                 millsUpdater.invoke(this, value);
             } catch (Throwable e) {
-                throw new Error(e);
+                throw quiet(e);
             }
             return (Next) this;
         }
@@ -853,7 +943,7 @@ public abstract class Execution extends ExecutionModel {
             try {
                 consecutiveUpdater.invoke(this, value);
             } catch (Throwable e) {
-                throw new Error(e);
+                throw quiet(e);
             }
             return (Next) this;
         }
@@ -868,7 +958,7 @@ public abstract class Execution extends ExecutionModel {
             try {
                 delayUpdater.invoke(this, value);
             } catch (Throwable e) {
-                throw new Error(e);
+                throw quiet(e);
             }
             return (Next) this;
         }
