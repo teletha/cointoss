@@ -32,13 +32,13 @@ class OrderManagerTest {
     @Test
     void request() {
         assert orders.items.size() == 0;
-        orders.requestNow(Order.buy(1).price(10));
+        orders.requestNow(Order.with.buy(1).price(10));
         assert orders.items.size() == 1;
     }
 
     @Test
     void cancel() {
-        Order order = orders.requestNow(Order.buy(1).price(10));
+        Order order = orders.requestNow(Order.with.buy(1).price(10));
         assert orders.items.size() == 1;
         assert orders.cancelNow(order) == order;
         assert orders.items.size() == 0;
@@ -51,7 +51,7 @@ class OrderManagerTest {
         assert orders.hasActiveOrder() == false;
         assert orders.hasNoActiveOrder() == true;
 
-        orders.requestNow(Order.buy(1).price(10));
+        orders.requestNow(Order.with.buy(1).price(10));
         assert orders.hasActiveOrder() == true;
         assert orders.hasNoActiveOrder() == false;
     }
@@ -61,16 +61,16 @@ class OrderManagerTest {
         List<Order> added = orders.added.toList();
         assert added.size() == 0;
 
-        orders.requestNow(Order.buy(1).price(10));
+        orders.requestNow(Order.with.buy(1).price(10));
         assert added.size() == 1;
-        orders.requestNow(Order.buy(1).price(10));
+        orders.requestNow(Order.with.buy(1).price(10));
         assert added.size() == 2;
     }
 
     @Test
     void removedByCancel() {
-        Order order1 = orders.requestNow(Order.buy(1).price(10));
-        Order order2 = orders.requestNow(Order.buy(1).price(10));
+        Order order1 = orders.requestNow(Order.with.buy(1).price(10));
+        Order order2 = orders.requestNow(Order.with.buy(1).price(10));
 
         List<Order> removed = orders.removed.toList();
         assert removed.size() == 0;
@@ -82,7 +82,7 @@ class OrderManagerTest {
 
     @Test
     void removedByExecute() {
-        orders.requestNow(Order.buy(1).price(10));
+        orders.requestNow(Order.with.buy(1).price(10));
 
         List<Order> removed = orders.removed.toList();
         assert removed.size() == 0;
@@ -92,7 +92,7 @@ class OrderManagerTest {
 
     @Test
     void removedByExecuteDividedly() {
-        orders.requestNow(Order.buy(2).price(10));
+        orders.requestNow(Order.with.buy(2).price(10));
 
         List<Order> removed = orders.removed.toList();
         assert removed.size() == 0;
@@ -104,7 +104,7 @@ class OrderManagerTest {
 
     @Test
     void requestedOrderHaveCreationTime() {
-        Order order = Order.buy(1).price(10);
+        Order order = Order.with.buy(1).price(10);
         assert order.creationTime.isAbsent();
 
         orders.request(order).to(o -> {
@@ -114,7 +114,7 @@ class OrderManagerTest {
 
     @Test
     void size() {
-        orders.requestEntry(Order.buy(1).price(10)).to(entry -> {
+        orders.requestEntry(Order.with.buy(1).price(10)).to(entry -> {
             assert orders.positionSize.is(0);
         });
     }

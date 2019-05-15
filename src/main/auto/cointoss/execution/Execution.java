@@ -9,6 +9,7 @@ import java.lang.reflect.Method;
 import java.time.ZonedDateTime;
 import java.util.function.Consumer;
 import java.util.function.LongConsumer;
+import java.util.function.UnaryOperator;
 import javax.annotation.processing.Generated;
 
 /**
@@ -135,7 +136,7 @@ public abstract class Execution extends ExecutionModel {
     public final Num price;
 
     /** The exposed property. */
-    public Num accumulative;
+    public final Num accumulative;
 
     /** The exposed property. */
     public final ZonedDateTime date;
@@ -310,6 +311,17 @@ public abstract class Execution extends ExecutionModel {
     @Override
     public final Num accumulative() {
         return this.accumulative;
+    }
+
+    /**
+     * Assign the new value of accumulative property.
+     *
+     * @paran value The accumulative property assigner which accepts the current value and returns new value.
+     * @return Chainable API.
+     */
+    public final Execution accumulative(UnaryOperator<Num> value) {
+        setAccumulative(value.apply(this.accumulative));
+        return this;
     }
 
     /**

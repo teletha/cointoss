@@ -9,7 +9,7 @@
  */
 package trademate.info;
 
-import static transcript.Transcript.en;
+import static transcript.Transcript.*;
 
 import cointoss.order.Order;
 import cointoss.order.OrderBook;
@@ -97,7 +97,7 @@ public class TradeInfomationView extends View {
         OrderBook book = view.market().orderBook.bookFor(position.inverse());
         Num price = book.computeBestPrice(Num.ZERO, Num.TWO);
 
-        view.order(Order.direction(position.inverse(), position.size.v).price(price));
+        view.order(Order.with.direction(position.inverse(), position.size.v).price(price));
     }
 
     /**

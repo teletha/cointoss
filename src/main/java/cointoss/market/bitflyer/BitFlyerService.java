@@ -23,8 +23,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
-import javafx.scene.control.TextInputDialog;
-
 import org.apache.commons.codec.digest.HmacAlgorithms;
 import org.apache.commons.codec.digest.HmacUtils;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -43,6 +41,7 @@ import cointoss.order.OrderState;
 import cointoss.order.OrderUnit;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
+import javafx.scene.control.TextInputDialog;
 import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
@@ -692,9 +691,8 @@ class BitFlyerService extends MarketService {
         public OrderState child_order_state;
 
         public Order toOrder() {
-            Order o = Order.direction(side, size).price(price);
+            Order o = Order.with.direction(side, size).price(average_price);
             o.id.let(child_order_acceptance_id);
-            o.price(average_price);
             o.remainingSize.set(outstanding_size);
             o.executedSize.set(executed_size);
             o.creationTime.set(LocalDateTime.parse(child_order_date, Chrono.DateTimeWithT).atZone(Chrono.UTC));

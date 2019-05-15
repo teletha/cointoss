@@ -9,7 +9,7 @@
  */
 package cointoss.verify;
 
-import static java.time.temporal.ChronoUnit.SECONDS;
+import static java.time.temporal.ChronoUnit.*;
 
 import org.junit.jupiter.api.Test;
 
@@ -24,7 +24,7 @@ class LatencyTest {
         VerifiableMarket market = new VerifiableMarket();
         market.service.latency = Latency.fixed(3, SECONDS);
 
-        market.request(Order.buy(1).price(10)).to(order -> {
+        market.request(Order.with.buy(1).price(10)).to(order -> {
             // after 0 sec, order isn't accepted
             market.perform(Execution.with.buy(1).price(9));
             assert order.isNotCompleted();
@@ -48,7 +48,7 @@ class LatencyTest {
         VerifiableMarket market = new VerifiableMarket();
         market.service.latency = Latency.fixed(3, SECONDS);
 
-        market.request(Order.buy(1).price(10)).to(order -> {
+        market.request(Order.with.buy(1).price(10)).to(order -> {
             // after 0 sec, order isn't accepted
             market.perform(Execution.with.buy(1).price(11));
             assert order.isNotCanceled();

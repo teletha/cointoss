@@ -7,20 +7,18 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss.order.mod;
+package cointoss.order;
 
 import java.time.ZonedDateTime;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 
 import cointoss.Direction;
 import cointoss.Directional;
 import cointoss.execution.Execution;
-import cointoss.order.Order;
-import cointoss.order.OrderState;
-import cointoss.order.OrderType;
-import cointoss.order.QuantityCondition;
 import cointoss.util.Num;
 import cointoss.util.NumVar;
 import icy.manipulator.Icy;
@@ -115,6 +113,7 @@ public abstract class OrderModel implements Directional {
         if (size.isNegativeOrZero()) {
             throw new IllegalArgumentException("Order size must be positive.");
         }
+        remainingSize().set(size);
         return size;
     }
 
@@ -123,7 +122,7 @@ public abstract class OrderModel implements Directional {
      * 
      * @return
      */
-    @Icy.Property
+    @Icy.Property(mutable = true)
     public Num price() {
         return Num.ZERO;
     }
@@ -179,9 +178,13 @@ public abstract class OrderModel implements Directional {
      * @return
      */
     @Icy.Intercept("price")
-    private Num price(Num price) {
+    private Num price(Num price, Consumer<OrderType> type) {
         if (price.isNegative()) {
             price = Num.ZERO;
+        }
+
+        if (state().is(OrderState.INIT)) {
+            type.accept(price.isZero() ? OrderType.MARKET : OrderType.LIMIT);
         }
         return price;
     }
@@ -366,7 +369,7 @@ public abstract class OrderModel implements Directional {
     }
 
     /**
-     * Observe when this {@link Order} will be canceled or completed.
+     * Observe when this {@link OldOrder} will be canceled or completed.
      * 
      * @return A event {@link Signal}.
      */
@@ -413,7 +416,32 @@ public abstract class OrderModel implements Directional {
     }
 
     /**
-     * Log for {@link Order}.
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof Order ? Objects.equals(id(), ((Order) obj).id()) : false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        return direction()
+                .mark() + size() + "@" + price() + " 残" + remainingSize() + " 済" + executedSize() + " " + creationTime() + " " + state();
+    }
+
+    /**
+     * Log for {@link OldOrder}.
      */
     private static class Log {
 

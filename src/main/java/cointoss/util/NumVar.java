@@ -45,6 +45,33 @@ public class NumVar extends Variable<Num> {
     }
 
     /**
+     * Test value.
+     * 
+     * @return
+     */
+    public boolean isPositive() {
+        return v.isPositive();
+    }
+
+    /**
+     * Test value.
+     * 
+     * @return
+     */
+    public boolean isNegative() {
+        return v.isNegative();
+    }
+
+    /**
+     * Test value.
+     * 
+     * @return
+     */
+    public boolean isZero() {
+        return v.isZero();
+    }
+
+    /**
      * Observer the difference value whenever value will be changed.
      * 
      * @return A stream of the difference value.

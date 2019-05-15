@@ -21,9 +21,9 @@ class OrderSetTest {
 
     @Test
     void set() {
-        Order o1 = Order.buy(1).price(100);
+        Order o1 = Order.with.buy(1).price(100);
         o1.state.set(OrderState.ACTIVE);
-        Order o2 = Order.buy(1).price(200);
+        Order o2 = Order.with.buy(1).price(200);
         o2.state.set(OrderState.ACTIVE);
 
         OrderSet set = new OrderSet();

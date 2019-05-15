@@ -131,7 +131,7 @@ public abstract class Trader implements Disposable {
             return null;
         }
 
-        return new Entry(Order.direction(side, size).price(price), process);
+        return new Entry(Order.with.direction(side, size).price(price), process);
     }
 
     /**
@@ -150,7 +150,7 @@ public abstract class Trader implements Disposable {
         if (size == null || size.isLessThanOrEqual(Num.ZERO)) {
             return null;
         }
-        return new Entry(Order.direction(side, size), process);
+        return new Entry(Order.with.direction(side, size), process);
     }
 
     /**
@@ -476,7 +476,7 @@ public abstract class Trader implements Disposable {
             if (price == null || price.isLessThanOrEqual(Num.ZERO)) {
                 return;
             }
-            exit(Order.direction(order.inverse(), size).price(price), process);
+            exit(Order.with.direction(order.inverse(), size).price(price), process);
         }
 
         /**
@@ -521,7 +521,7 @@ public abstract class Trader implements Disposable {
             if (size == null || size.isLessThanOrEqual(Num.ZERO)) {
                 return;
             }
-            exit(Order.direction(order.inverse(), size), process);
+            exit(Order.with.direction(order.inverse(), size), process);
         }
 
         /**
