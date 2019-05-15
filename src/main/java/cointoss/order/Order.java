@@ -103,9 +103,6 @@ public class Order implements Directional {
     /** The entry holder. */
     private final LinkedList<Execution> entries = new LinkedList();
 
-    /** The exit holder. */
-    private final LinkedList<Order> exits = new LinkedList();
-
     /**
      * Hide constructor.
      * 
