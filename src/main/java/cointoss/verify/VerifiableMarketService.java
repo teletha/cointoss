@@ -428,7 +428,7 @@ public class VerifiableMarketService extends MarketService {
             this.executedSize = o.executedSize.v;
             this.price = o.price;
             this.type = o.type;
-            this.condition = o.condition;
+            this.condition = o.quantityCondition;
             this.creationTime = o.creationTime.v;
             this.marketMinPrice = isBuy() ? Num.ZERO : Num.MAX;
         }

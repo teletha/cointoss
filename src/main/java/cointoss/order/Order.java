@@ -74,7 +74,7 @@ public class Order implements Directional {
     public final OrderType type = OrderType.MARKET;
 
     /** The quantity conditions enforcement. */
-    public final QuantityCondition condition = QuantityCondition.GoodTillCanceled;
+    public final QuantityCondition quantityCondition = QuantityCondition.GoodTillCanceled;
 
     /** The order identifier for the specific market. */
     public final Variable<String> id = Variable.empty();

@@ -166,8 +166,8 @@ public class OrderTest {
 
     @Test
     void condition() {
-        assert Order.buy(1).condition == QuantityCondition.GoodTillCanceled;
-        assert Order.buy(1).quantityCondition(QuantityCondition.FillOrKill).condition == QuantityCondition.FillOrKill;
-        assert Order.buy(1).quantityCondition(null).condition == QuantityCondition.GoodTillCanceled;
+        assert Order.buy(1).quantityCondition == QuantityCondition.GoodTillCanceled;
+        assert Order.buy(1).quantityCondition(QuantityCondition.FillOrKill).quantityCondition == QuantityCondition.FillOrKill;
+        assert Order.buy(1).quantityCondition(null).quantityCondition == QuantityCondition.GoodTillCanceled;
     }
 }
