@@ -7,7 +7,7 @@
  *
  *          https://opensource.org/licenses/MIT
  */
-package cointoss.position;
+package cointoss.order;
 
 import java.util.Collections;
 import java.util.List;
@@ -22,7 +22,6 @@ import cointoss.util.Num;
 import kiss.Signal;
 import kiss.Signaling;
 import kiss.Variable;
-import kiss.Ⅲ;
 
 /**
  * @version 2018/04/26 18:11:34
@@ -68,7 +67,7 @@ public final class PositionManager implements Directional {
         this.latest = latest == null ? Variable.of(Market.BASE) : latest;
         this.latest.observe().to(this::calculateProfit);
 
-        service.add(service.executionsRealtimelyForMe().map(Ⅲ::ⅲ).to(this::add));
+        service.add(service.executionsRealtimelyForMe().to(e -> add(e.ⅰ, e.ⅲ)));
     }
 
     /**
@@ -129,6 +128,15 @@ public final class PositionManager implements Directional {
     }
 
     /**
+     * For test.
+     * 
+     * @param e
+     */
+    void add(Execution e) {
+        add(e.direction, e);
+    }
+
+    /**
      * <p>
      * Update position by the specified my execution.
      * </p>
@@ -138,12 +146,12 @@ public final class PositionManager implements Directional {
      * 
      * @param exe A my execution.
      */
-    public void add(Execution e) {
+    public void add(Direction direction, Execution e) {
         if (e != null) {
             Num size = e.size;
 
             for (Position position : positions) {
-                if (position.side == e.direction) {
+                if (position.side == direction) {
                     // check same price position
                     if (position.price.is(e.price)) {
                         position.size.set(size::plus);
@@ -177,7 +185,7 @@ public final class PositionManager implements Directional {
 
             if (size.isPositive()) {
                 Position position = new Position();
-                position.side = e.direction;
+                position.side = direction;
                 position.price = e.price;
                 position.size.set(size);
                 position.date = e.date;

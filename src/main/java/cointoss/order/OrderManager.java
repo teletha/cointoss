@@ -15,12 +15,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import cointoss.Direction;
 import cointoss.MarketService;
 import cointoss.execution.Execution;
 import cointoss.util.Num;
 import kiss.I;
 import kiss.Signal;
 import kiss.Signaling;
+import kiss.Variable;
 import kiss.Ⅱ;
 
 /**
@@ -55,6 +57,15 @@ public final class OrderManager {
     /** The order update event. */
     public final Signal<Ⅱ<Order, Execution>> updated = updates.expose;
 
+    /** The current position direction. */
+    public final Variable<Direction> positionDirection = Variable.empty();
+
+    /** The current total position size. */
+    public final Variable<Num> positionSize = Variable.of(Num.ZERO);
+
+    /** The curretn position average price. */
+    public final Variable<Num> positionPrice = Variable.of(Num.ZERO);
+
     /**
      * @param service
      */
@@ -64,14 +75,20 @@ public final class OrderManager {
         removed.to(managed::remove);
 
         service.add(service.executionsRealtimelyForMe().to(v -> {
+            // manage position
+            Direction direction = v.ⅰ;
+            String id = v.ⅱ;
+            Execution execution = v.ⅲ;
+            System.out.println(direction + "  " + execution);
+
+            // manage order
             for (Order order : managed) {
-                if (order.id.equals(v.ⅱ)) {
-                    Execution exe = v.ⅲ;
-                    Num executed = exe.size;
+                if (order.id.equals(id)) {
+                    Num executed = execution.size;
 
                     if (order.type.isMarket() && executed.isNot(0)) {
                         order.price(n -> n.multiply(order.executedSize)
-                                .plus(exe.price.multiply(executed))
+                                .plus(execution.price.multiply(executed))
                                 .divide(executed.plus(order.executedSize)));
                     }
                     order.setExecutedSize(order.executedSize.plus(executed));
@@ -82,9 +99,9 @@ public final class OrderManager {
                     }
 
                     // pairing order and execution
-                    order.entries.add(exe);
+                    order.entries.add(execution);
 
-                    updates.accept(I.pair(order, exe));
+                    updates.accept(I.pair(order, execution));
                     return;
                 }
             }
@@ -194,5 +211,4 @@ public final class OrderManager {
     public boolean hasNoActiveOrder() {
         return managed.isEmpty() == true;
     }
-
 }

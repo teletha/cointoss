@@ -13,8 +13,8 @@ import static transcript.Transcript.*;
 
 import cointoss.order.Order;
 import cointoss.order.OrderBook;
-import cointoss.position.Position;
-import cointoss.position.PositionManager;
+import cointoss.order.Position;
+import cointoss.order.PositionManager;
 import cointoss.util.Num;
 import stylist.Style;
 import stylist.StyleDSL;

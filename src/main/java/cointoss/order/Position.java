@@ -7,7 +7,7 @@
  *
  *          https://opensource.org/licenses/MIT
  */
-package cointoss.position;
+package cointoss.order;
 
 import java.time.ZonedDateTime;
 

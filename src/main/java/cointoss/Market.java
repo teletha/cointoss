@@ -23,7 +23,7 @@ import cointoss.order.Order;
 import cointoss.order.OrderBook;
 import cointoss.order.OrderBookManager;
 import cointoss.order.OrderManager;
-import cointoss.position.PositionManager;
+import cointoss.order.PositionManager;
 import cointoss.ticker.TickerManager;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
