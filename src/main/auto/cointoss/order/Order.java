@@ -6,6 +6,7 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.time.ZonedDateTime;
 import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
 import javax.annotation.processing.Generated;
@@ -84,6 +85,9 @@ public abstract class Order extends OrderModel {
     /** The overload or intercept method invoker. */
     private static final MethodHandle executedSize$1566479191= invoker("executedSize", Num.class);
 
+    /** The overload or intercept method invoker. */
+    private static final MethodHandle creationTime$1965660209= invoker("creationTime", ZonedDateTime.class);
+
     /**
      * Create special property updater.
      *
@@ -124,6 +128,9 @@ public abstract class Order extends OrderModel {
     /** The final property updater. */
     private static final MethodHandle idUpdater = updater("id");
 
+    /** The final property updater. */
+    private static final MethodHandle creationTimeUpdater = updater("creationTime");
+
     /** The exposed property. */
     public final Direction direction;
 
@@ -148,6 +155,9 @@ public abstract class Order extends OrderModel {
     /** The exposed property. */
     public final String id;
 
+    /** The exposed property. */
+    public final ZonedDateTime creationTime;
+
     /**
      * HIDE CONSTRUCTOR
      */
@@ -160,6 +170,7 @@ public abstract class Order extends OrderModel {
         this.remainingSize = super.remainingSize();
         this.executedSize = super.executedSize();
         this.id = super.id();
+        this.creationTime = super.creationTime();
     }
 
     /** {@inheritDoc} */
@@ -461,6 +472,45 @@ public abstract class Order extends OrderModel {
      */
     private final String åccessToDefaultId() {
         return super.id();
+    }
+
+    /**
+     * The requested time of this order.
+     *  
+     *  @return
+     */
+    @Override
+    public final ZonedDateTime creationTime() {
+        return this.creationTime;
+    }
+
+    /**
+     * Provide classic getter API.
+     *
+     * @return A value of creationTime property.
+     */
+    @SuppressWarnings("unused")
+    private final ZonedDateTime getCreationTime() {
+        return this.creationTime;
+    }
+
+    /**
+     * Provide classic setter API.
+     *
+     * @paran value A new value of creationTime property to assign.
+     */
+    @SuppressWarnings("unused")
+    final void setCreationTime(ZonedDateTime value) {
+        ((ÅssignableÅrbitrary) this).creationTime(value);
+    }
+
+    /**
+     * Provide accesser to super default value.
+     *
+     * @return A default value.
+     */
+    private final ZonedDateTime åccessToDefaultCreationTime() {
+        return super.creationTime();
     }
 
     /** The singleton builder. */
@@ -947,6 +997,24 @@ public abstract class Order extends OrderModel {
             }
             return (Next) this;
         }
+
+        /**
+         * Assign creationTime property.
+         * 
+         * @param value A new value to assign.
+         * @return The next assignable model.
+         */
+        default Next creationTime(ZonedDateTime value) {
+            if (value == null) {
+                value = ((Order) this).åccessToDefaultCreationTime();
+            }
+            try {
+                creationTimeUpdater.invoke(this, creationTime$1965660209.invoke(this, value));
+            } catch (Throwable e) {
+                throw quiet(e);
+            }
+            return (Next) this;
+        }
     }
 
     /**
@@ -973,5 +1041,6 @@ public abstract class Order extends OrderModel {
         static final String RemainingSize = "remainingSize";
         static final String ExecutedSize = "executedSize";
         static final String Id = "id";
+        static final String CreationTime = "creationTime";
     }
 }

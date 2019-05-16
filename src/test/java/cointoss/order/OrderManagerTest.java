@@ -105,10 +105,10 @@ class OrderManagerTest {
     @Test
     void requestedOrderHaveCreationTime() {
         Order order = Order.with.buy(1).price(10);
-        assert order.creationTime.isAbsent();
+        assert order.creationTime == null;
 
         orders.request(order).to(o -> {
-            assert o.creationTime.v.isEqual(service.now());
+            assert o.creationTime.isEqual(service.now());
         });
     }
 

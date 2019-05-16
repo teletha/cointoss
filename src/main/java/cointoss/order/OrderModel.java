@@ -30,9 +30,6 @@ import kiss.Variable;
 @Icy(grouping = 2, classicSetterModifier = "final")
 public abstract class OrderModel implements Directional {
 
-    /** The requested time of this order. */
-    public final Variable<ZonedDateTime> creationTime = Variable.empty();
-
     /** The termiated time of this order. */
     public final Variable<ZonedDateTime> terminationTime = Variable.empty();
 
@@ -346,6 +343,48 @@ public abstract class OrderModel implements Directional {
     abstract void setId(String id);
 
     /**
+     * The requested time of this order.
+     * 
+     * @return
+     */
+    @Icy.Property
+    public ZonedDateTime creationTime() {
+        return null;
+    }
+
+    /**
+     * Expose internal setter.
+     */
+    abstract void setCreationTime(ZonedDateTime date);
+
+    /** The value stream. */
+    private final Signaling<ZonedDateTime> creationTime = new Signaling();
+
+    @Icy.Intercept("creationTime")
+    private ZonedDateTime creationTime(ZonedDateTime size) {
+        creationTime.accept(size);
+        return size;
+    }
+
+    /**
+     * Observe value modification.
+     * 
+     * @return
+     */
+    public final Signal<ZonedDateTime> observeCreationTime() {
+        return creationTime.expose;
+    }
+
+    /**
+     * Observe value modification.
+     * 
+     * @return
+     */
+    public final Signal<ZonedDateTime> observeCreationTimeNow() {
+        return observeCreationTime().startWith(creationTime());
+    }
+
+    /**
      * Check the order {@link OrderState}.
      * 
      * @return The result.
@@ -503,7 +542,7 @@ public abstract class OrderModel implements Directional {
     @Override
     public String toString() {
         return direction()
-                .mark() + size() + "@" + price() + " 残" + remainingSize() + " 済" + executedSize + " " + creationTime + " " + state;
+                .mark() + size() + "@" + price() + " 残" + remainingSize() + " 済" + executedSize + " " + creationTime() + " " + state;
     }
 
     /**

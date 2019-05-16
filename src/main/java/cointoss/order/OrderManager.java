@@ -116,7 +116,7 @@ public final class OrderManager {
 
         return service.request(order).retryWhen(service.setting.retryPolicy()).map(id -> {
             order.setId(id);
-            order.creationTime.set(service.now());
+            order.setCreationTime(service.now());
             order.state.set(ACTIVE);
             order.observeTerminating().to(remove::accept);
 

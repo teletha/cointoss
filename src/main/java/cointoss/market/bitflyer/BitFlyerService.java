@@ -696,8 +696,8 @@ class BitFlyerService extends MarketService {
                     .price(average_price)
                     .remainingSize(outstanding_size)
                     .executedSize(executed_size)
-                    .id(child_order_acceptance_id);
-            o.creationTime.set(LocalDateTime.parse(child_order_date, Chrono.DateTimeWithT).atZone(Chrono.UTC));
+                    .id(child_order_acceptance_id)
+                    .creationTime(LocalDateTime.parse(child_order_date, Chrono.DateTimeWithT).atZone(Chrono.UTC));
             o.state.set(child_order_state);
             o.relation(Internals.class).id = child_order_id;
 
