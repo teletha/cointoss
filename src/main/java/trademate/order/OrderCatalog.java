@@ -9,19 +9,18 @@
  */
 package trademate.order;
 
-import static cointoss.order.OrderState.ACTIVE;
+import static cointoss.order.OrderState.*;
 import static trademate.CommonText.*;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.function.Consumer;
 
-import javafx.scene.control.TreeTableRow;
-
 import cointoss.Direction;
 import cointoss.order.Order;
 import cointoss.order.OrderState;
 import cointoss.util.Num;
+import javafx.scene.control.TreeTableRow;
 import kiss.Variable;
 import stylist.Style;
 import stylist.StyleDSL;
