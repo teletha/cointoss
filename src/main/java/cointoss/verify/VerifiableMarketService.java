@@ -14,6 +14,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.function.Consumer;
 
 import cointoss.Direction;
 import cointoss.Directional;
@@ -105,7 +106,7 @@ public class VerifiableMarketService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<String> request(Order order) {
+    public Signal<String> request(Order order, Consumer<OrderState> state) {
         return I.signal(order).map(o -> {
             BackendOrder child = new BackendOrder(order);
             child.id = "LOCAL-ACCEPTANCE-" + id++;
@@ -190,8 +191,8 @@ public class VerifiableMarketService extends MarketService {
                     .quantityCondition(o.condition)
                     .remainingSize(o.remainingSize)
                     .executedSize(o.executedSize)
-                    .id(o.id);
-            order.state.set(o.state);
+                    .id(o.id)
+                    .state(o.state);
 
             return order;
         });

@@ -9,7 +9,7 @@
  */
 package cointoss.market.bitflyer;
 
-import static cointoss.order.OrderState.*;
+import static cointoss.order.OrderState.ACTIVE;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 import javafx.scene.control.TextInputDialog;
 
@@ -134,7 +135,7 @@ class BitFlyerService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<String> request(Order order) {
+    public Signal<String> request(Order order, Consumer<OrderState> state) {
         Signal<String> call;
         String id = "JRF" + Chrono.utcNow().format(format) + RandomStringUtils.randomNumeric(6);
 
@@ -165,9 +166,7 @@ class BitFlyerService extends MarketService {
                     .map(e -> e.data.get("order_ref_id"));
         }
 
-        return call.effectAfter(() -> {
-            order.state.set(REQUESTING);
-        }).effect(v -> {
+        return call.effect(v -> {
             // register order id
             orders.add(v);
             order.observeTerminating().to(() -> orders.remove(v));
@@ -178,7 +177,7 @@ class BitFlyerService extends MarketService {
                     .skipError()
                     .take(1)
                     .to(o -> {
-                        order.state.set(ACTIVE);
+                        state.accept(ACTIVE);
                         order.relation(Internals.class).id = o.relation(Internals.class).id;
                     });
         });
@@ -696,9 +695,9 @@ class BitFlyerService extends MarketService {
                     .price(average_price)
                     .remainingSize(outstanding_size)
                     .executedSize(executed_size)
+                    .state(child_order_state)
                     .id(child_order_acceptance_id)
                     .creationTime(LocalDateTime.parse(child_order_date, Chrono.DateTimeWithT).atZone(Chrono.UTC));
-            o.state.set(child_order_state);
             o.relation(Internals.class).id = child_order_id;
 
             return o;

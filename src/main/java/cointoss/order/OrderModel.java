@@ -30,9 +30,6 @@ import kiss.Variable;
 @Icy(grouping = 2, classicSetterModifier = "final")
 public abstract class OrderModel implements Directional {
 
-    /** The order state. */
-    public final Variable<OrderState> state = Variable.of(OrderState.INIT);
-
     /** The total cost. */
     public final NumVar cost = NumVar.zero();
 
@@ -190,7 +187,7 @@ public abstract class OrderModel implements Directional {
             price = Num.ZERO;
         }
 
-        if (state.is(OrderState.INIT)) {
+        if (state() == OrderState.INIT) {
             type.accept(price.isZero() ? OrderType.MARKET : OrderType.LIMIT);
         }
         return price;
@@ -225,13 +222,6 @@ public abstract class OrderModel implements Directional {
     public Num remainingSize() {
         return Num.ZERO;
     }
-
-    /**
-     * Expose internal setter.
-     * 
-     * @param size
-     */
-    abstract void setRemainingSize(Num size);
 
     /** The value stream. */
     private final Signaling<Num> remainingSize = new Signaling();
@@ -278,13 +268,6 @@ public abstract class OrderModel implements Directional {
     public Num executedSize() {
         return Num.ZERO;
     }
-
-    /**
-     * Expose internal setter.
-     * 
-     * @param size
-     */
-    abstract void setExecutedSize(Num size);
 
     /** The value stream. */
     private final Signaling<Num> executedSize = new Signaling();
@@ -333,13 +316,6 @@ public abstract class OrderModel implements Directional {
     }
 
     /**
-     * Expose internal setter.
-     * 
-     * @param id
-     */
-    abstract void setId(String id);
-
-    /**
      * The requested time of this order.
      * 
      * @return
@@ -348,11 +324,6 @@ public abstract class OrderModel implements Directional {
     public ZonedDateTime creationTime() {
         return null;
     }
-
-    /**
-     * Expose internal setter.
-     */
-    abstract void setCreationTime(ZonedDateTime date);
 
     /** The value stream. */
     private final Signaling<ZonedDateTime> creationTime = new Signaling();
@@ -391,11 +362,6 @@ public abstract class OrderModel implements Directional {
         return null;
     }
 
-    /**
-     * Expose internal setter.
-     */
-    abstract void setTerminationTime(ZonedDateTime date);
-
     /** The value stream. */
     private final Signaling<ZonedDateTime> terminationTime = new Signaling();
 
@@ -424,12 +390,49 @@ public abstract class OrderModel implements Directional {
     }
 
     /**
+     * The termiated time of this order.
+     * 
+     * @return
+     */
+    @Icy.Property
+    public OrderState state() {
+        return OrderState.INIT;
+    }
+
+    /** The value stream. */
+    private final Signaling<OrderState> state = new Signaling();
+
+    @Icy.Intercept("state")
+    private OrderState state(OrderState v) {
+        state.accept(v);
+        return v;
+    }
+
+    /**
+     * Observe value modification.
+     * 
+     * @return
+     */
+    public final Signal<OrderState> observeState() {
+        return state.expose;
+    }
+
+    /**
+     * Observe value modification.
+     * 
+     * @return
+     */
+    public final Signal<OrderState> observeStateNow() {
+        return observeState().startWith(state());
+    }
+
+    /**
      * Check the order {@link OrderState}.
      * 
      * @return The result.
      */
     public final boolean isExpired() {
-        return state.is(OrderState.EXPIRED);
+        return state() == OrderState.EXPIRED;
     }
 
     /**
@@ -447,7 +450,7 @@ public abstract class OrderModel implements Directional {
      * @return The result.
      */
     public final boolean isCanceled() {
-        return state.is(OrderState.CANCELED);
+        return state() == OrderState.CANCELED;
     }
 
     /**
@@ -465,7 +468,7 @@ public abstract class OrderModel implements Directional {
      * @return The result.
      */
     public final boolean isCompleted() {
-        return state.is(OrderState.COMPLETED);
+        return state() == OrderState.COMPLETED;
     }
 
     /**
@@ -518,7 +521,7 @@ public abstract class OrderModel implements Directional {
      * @return A event {@link Signal}.
      */
     public final Signal<Order> observeTerminating() {
-        return state.observe().take(OrderState.CANCELED, OrderState.COMPLETED).take(1).mapTo((Order) this);
+        return observeState().take(OrderState.CANCELED, OrderState.COMPLETED).take(1).mapTo((Order) this);
     }
 
     /**

@@ -11,11 +11,13 @@ package cointoss;
 
 import java.time.ZonedDateTime;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 import cointoss.execution.Execution;
 import cointoss.execution.ExecutionLog;
 import cointoss.order.Order;
 import cointoss.order.OrderBookChange;
+import cointoss.order.OrderState;
 import cointoss.util.Chrono;
 import cointoss.util.Network;
 import cointoss.util.Num;
@@ -78,7 +80,7 @@ public abstract class MarketService implements Disposable {
      * @param order A order to request.
      * @return A requested order.
      */
-    public abstract Signal<String> request(Order order);
+    public abstract Signal<String> request(Order order, Consumer<OrderState> state);
 
     /**
      * <p>

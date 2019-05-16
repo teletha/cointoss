@@ -107,7 +107,7 @@ public class OrderCatalog extends View {
      * @return
      */
     private Variable<OrderState> state(Object item) {
-        return item instanceof Order ? ((Order) item).state : Variable.of(ACTIVE);
+        return item instanceof Order ? Variable.of(((Order) item).state) : Variable.of(ACTIVE);
     }
 
     /**
@@ -171,7 +171,7 @@ public class OrderCatalog extends View {
          * 
          */
         private CatalogRow() {
-            ui.styleOnly(Viewtify.signalNow(itemProperty()).as(Order.class).switchVariable(o -> o.state).map(S.State::of));
+            ui.styleOnly(Viewtify.signalNow(itemProperty()).as(Order.class).switchMap(o -> o.observeStateNow()).map(S.State::of));
         }
     }
 

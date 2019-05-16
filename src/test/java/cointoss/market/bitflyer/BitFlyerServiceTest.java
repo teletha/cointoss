@@ -57,7 +57,7 @@ public class BitFlyerServiceTest {
         List<Ⅲ<Direction, String, Execution>> positions = service.executionsRealtimelyForMe().toList();
 
         service.requestWillResponse("ServerAcceptanceID");
-        assert service.request(Order.with.buy(1).price(10)).to().is("ServerAcceptanceID");
+        assert service.request(Order.with.buy(1).price(10), null).to().is("ServerAcceptanceID");
 
         // irrelevant execution
         service.executionWillResponse(Execution.with.buy(1).price(10), "DisrelatedBuyer", "DisrelatedSeller");

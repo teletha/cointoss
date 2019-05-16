@@ -92,12 +92,12 @@ class VerifiableMarketTest {
             market.perform(Execution.with.buy(5).price(9));
             assert order.remainingSize.is(5);
             assert order.executedSize.is(5);
-            assert order.state.is(ACTIVE);
+            assert order.state == ACTIVE;
 
             market.perform(Execution.with.buy(5).price(9));
             assert order.remainingSize.is(0);
             assert order.executedSize.is(10);
-            assert order.state.is(COMPLETED);
+            assert order.state == COMPLETED;
         });
     }
 
@@ -110,12 +110,12 @@ class VerifiableMarketTest {
             market.perform(Execution.with.buy(7).price(9));
             assert order.remainingSize.is(3);
             assert order.executedSize.is(7);
-            assert order.state.is(ACTIVE);
+            assert order.state == ACTIVE;
 
             market.perform(Execution.with.buy(7).price(9));
             assert order.remainingSize.is(0);
             assert order.executedSize.is(10);
-            assert order.state.is(COMPLETED);
+            assert order.state == COMPLETED;
         });
     }
 
@@ -143,7 +143,7 @@ class VerifiableMarketTest {
 
             assert order.remainingSize.is(10);
             assert order.executedSize.is(0);
-            assert order.state.is(ACTIVE);
+            assert order.state == ACTIVE;
         });
     }
 
@@ -155,7 +155,7 @@ class VerifiableMarketTest {
 
             assert order.remainingSize.is(0);
             assert order.executedSize.is(10);
-            assert order.state.is(COMPLETED);
+            assert order.state == COMPLETED;
         });
     }
 
@@ -167,7 +167,7 @@ class VerifiableMarketTest {
 
             assert order.remainingSize.is(0);
             assert order.executedSize.is(10);
-            assert order.state.is(COMPLETED);
+            assert order.state == COMPLETED;
         });
     }
 
@@ -179,7 +179,7 @@ class VerifiableMarketTest {
 
             assert order.remainingSize.is(10);
             assert order.executedSize.is(0);
-            assert order.state.is(ACTIVE);
+            assert order.state == ACTIVE;
         });
     }
 

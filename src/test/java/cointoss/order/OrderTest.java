@@ -9,7 +9,7 @@
  */
 package cointoss.order;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.List;
 
@@ -28,7 +28,7 @@ public class OrderTest {
         Order order = Order.with.buy(1).price(10);
         assert order.isNotCanceled();
 
-        order.state.set(OrderState.CANCELED);
+        order.setState(OrderState.CANCELED);
         assert order.isCanceled();
     }
 
@@ -37,7 +37,7 @@ public class OrderTest {
         Order order = Order.with.buy(1).price(10);
         assert order.isNotCompleted();
 
-        order.state.set(OrderState.COMPLETED);
+        order.setState(OrderState.COMPLETED);
         assert order.isCompleted();
     }
 
@@ -46,7 +46,7 @@ public class OrderTest {
         Order order = Order.with.buy(1).price(10);
         assert order.isNotExpired();
 
-        order.state.set(OrderState.EXPIRED);
+        order.setState(OrderState.EXPIRED);
         assert order.isExpired();
     }
 
@@ -90,22 +90,22 @@ public class OrderTest {
         Order order = Order.with.direction(Direction.BUY, 1);
         List<Order> result = order.observeTerminating().toList();
         assert result.isEmpty();
-        order.state.set(OrderState.ACTIVE);
+        order.setState(OrderState.ACTIVE);
         assert result.isEmpty();
-        order.state.set(OrderState.EXPIRED);
+        order.setState(OrderState.EXPIRED);
         assert result.isEmpty();
-        order.state.set(OrderState.INIT);
+        order.setState(OrderState.INIT);
         assert result.isEmpty();
-        order.state.set(OrderState.REJECTED);
+        order.setState(OrderState.REJECTED);
         assert result.isEmpty();
-        order.state.set(OrderState.REQUESTING);
+        order.setState(OrderState.REQUESTING);
         assert result.isEmpty();
 
-        order.state.set(OrderState.COMPLETED);
+        order.setState(OrderState.COMPLETED);
         assert result.size() == 1;
-        order.state.set(OrderState.CANCELED);
+        order.setState(OrderState.CANCELED);
         assert result.size() == 1;
-        order.state.set(OrderState.COMPLETED);
+        order.setState(OrderState.COMPLETED);
         assert result.size() == 1;
     }
 
@@ -114,22 +114,22 @@ public class OrderTest {
         Order order = Order.with.direction(Direction.BUY, 1);
         List<Order> result = order.observeTerminating().toList();
         assert result.isEmpty();
-        order.state.set(OrderState.ACTIVE);
+        order.setState(OrderState.ACTIVE);
         assert result.isEmpty();
-        order.state.set(OrderState.EXPIRED);
+        order.setState(OrderState.EXPIRED);
         assert result.isEmpty();
-        order.state.set(OrderState.INIT);
+        order.setState(OrderState.INIT);
         assert result.isEmpty();
-        order.state.set(OrderState.REJECTED);
+        order.setState(OrderState.REJECTED);
         assert result.isEmpty();
-        order.state.set(OrderState.REQUESTING);
+        order.setState(OrderState.REQUESTING);
         assert result.isEmpty();
 
-        order.state.set(OrderState.CANCELED);
+        order.setState(OrderState.CANCELED);
         assert result.size() == 1;
-        order.state.set(OrderState.CANCELED);
+        order.setState(OrderState.CANCELED);
         assert result.size() == 1;
-        order.state.set(OrderState.COMPLETED);
+        order.setState(OrderState.COMPLETED);
         assert result.size() == 1;
     }
 

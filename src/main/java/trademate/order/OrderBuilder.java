@@ -9,20 +9,21 @@
  */
 package trademate.order;
 
-import static java.util.concurrent.TimeUnit.*;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static trademate.CommonText.*;
-import static transcript.Transcript.*;
+import static transcript.Transcript.en;
 
 import java.math.RoundingMode;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
 
+import javafx.scene.control.Spinner;
+import javafx.scene.input.ScrollEvent;
+
 import cointoss.Direction;
 import cointoss.order.Order;
 import cointoss.order.OrderState;
 import cointoss.util.Num;
-import javafx.scene.control.Spinner;
-import javafx.scene.input.ScrollEvent;
 import kiss.WiseBiConsumer;
 import stylist.Style;
 import stylist.StyleDSL;
@@ -221,8 +222,7 @@ public class OrderBuilder extends View {
                     : Num.of(i).divide(increaseInterval).scale(0, RoundingMode.FLOOR).multiply(initSize.divide(2));
             Num optimizedPrice = view.market().orderBook.computeBestPrice(side, price, optimizeThreshold.value(), Num.of(2));
 
-            Order order = Order.with.direction(side, size.plus(optimizedSize)).price(optimizedPrice);
-            order.state.set(OrderState.REQUESTING);
+            Order order = Order.with.direction(side, size.plus(optimizedSize)).price(optimizedPrice).state(OrderState.REQUESTING);
             order.observeTerminating().to(() -> set.sub.remove(order));
 
             set.sub.add(order);

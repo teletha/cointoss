@@ -30,14 +30,14 @@ public class OrderSet {
 
     /** Total amount. */
     public final Calculation<Num> amount = Viewtify.calculate(sub)
-            .observeVariable(o -> o.state)
-            .map(o -> o.state.is(OrderState.ACTIVE) || o.state.is(OrderState.REQUESTING) ? o.size : Num.ZERO)
+            .observeVariable(o -> o.observeStateNow().to())
+            .map(o -> o.state == OrderState.ACTIVE || o.state == OrderState.REQUESTING ? o.size : Num.ZERO)
             .reduce(Num.ZERO, Num::plus);
 
     /** Total price. */
     public final Calculation<Num> totalPrice = Viewtify.calculate(sub)
-            .observeVariable(o -> o.state)
-            .map(o -> o.state.is(OrderState.ACTIVE) || o.state.is(OrderState.REQUESTING) ? o.size.multiply(o.price) : Num.ZERO)
+            .observeVariable(o -> o.observeStateNow().to())
+            .map(o -> o.state == OrderState.ACTIVE || o.state == OrderState.REQUESTING ? o.size.multiply(o.price) : Num.ZERO)
             .reduce(Num.ZERO, Num::plus);
 
     /** Average price. */

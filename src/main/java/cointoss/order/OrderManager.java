@@ -89,7 +89,7 @@ public final class OrderManager {
                     order.setRemainingSize(order.remainingSize.minus(executed));
 
                     if (order.remainingSize.is(Num.ZERO)) {
-                        order.state.set(OrderState.COMPLETED);
+                        order.setState(COMPLETED);
                     }
 
                     // pairing order and execution
@@ -112,19 +112,19 @@ public final class OrderManager {
      * @see #requestNow(Order)
      */
     public Signal<Order> request(Order order) {
-        order.state.set(REQUESTING);
+        order.setState(REQUESTING);
 
-        return service.request(order).retryWhen(service.setting.retryPolicy()).map(id -> {
+        return service.request(order, order::setState).retryWhen(service.setting.retryPolicy()).map(id -> {
+            order.setState(ACTIVE);
             order.setId(id);
             order.setCreationTime(service.now());
-            order.state.set(ACTIVE);
             order.observeTerminating().to(remove::accept);
 
             addition.accept(order);
 
             return order;
         }).effectOnError(e -> {
-            order.state.set(OrderState.CANCELED);
+            order.setState(CANCELED);
         });
     }
 
@@ -155,14 +155,15 @@ public final class OrderManager {
      * @see #cancelNow(Order)
      */
     public Signal<Order> cancel(Order order) {
-        if (order.state.is(ACTIVE) || order.state.is(OrderState.REQUESTING)) {
-            OrderState previous = order.state.set(REQUESTING);
+        if (order.state == ACTIVE || order.state == REQUESTING) {
+            OrderState previous = order.state;
+            order.setState(REQUESTING);
 
             return service.cancel(order).retryWhen(service.setting.retryPolicy()).effect(o -> {
                 managed.remove(o);
-                o.state.set(CANCELED);
+                o.setState(CANCELED);
             }).effectOnError(e -> {
-                order.state.set(previous);
+                order.setState(previous);
             });
         } else {
             return I.signal(order);

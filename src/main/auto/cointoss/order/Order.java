@@ -91,6 +91,9 @@ public abstract class Order extends OrderModel {
     /** The overload or intercept method invoker. */
     private static final MethodHandle terminationTime$1965660209= invoker("terminationTime", ZonedDateTime.class);
 
+    /** The overload or intercept method invoker. */
+    private static final MethodHandle state$1391871188= invoker("state", OrderState.class);
+
     /**
      * Create special property updater.
      *
@@ -137,6 +140,9 @@ public abstract class Order extends OrderModel {
     /** The final property updater. */
     private static final MethodHandle terminationTimeUpdater = updater("terminationTime");
 
+    /** The final property updater. */
+    private static final MethodHandle stateUpdater = updater("state");
+
     /** The exposed property. */
     public final Direction direction;
 
@@ -167,6 +173,9 @@ public abstract class Order extends OrderModel {
     /** The exposed property. */
     public final ZonedDateTime terminationTime;
 
+    /** The exposed property. */
+    public final OrderState state;
+
     /**
      * HIDE CONSTRUCTOR
      */
@@ -181,6 +190,7 @@ public abstract class Order extends OrderModel {
         this.id = super.id();
         this.creationTime = super.creationTime();
         this.terminationTime = super.terminationTime();
+        this.state = super.state();
     }
 
     /** {@inheritDoc} */
@@ -560,6 +570,45 @@ public abstract class Order extends OrderModel {
      */
     private final ZonedDateTime åccessToDefaultTerminationTime() {
         return super.terminationTime();
+    }
+
+    /**
+     * The termiated time of this order.
+     *  
+     *  @return
+     */
+    @Override
+    public final OrderState state() {
+        return this.state;
+    }
+
+    /**
+     * Provide classic getter API.
+     *
+     * @return A value of state property.
+     */
+    @SuppressWarnings("unused")
+    private final OrderState getState() {
+        return this.state;
+    }
+
+    /**
+     * Provide classic setter API.
+     *
+     * @paran value A new value of state property to assign.
+     */
+    @SuppressWarnings("unused")
+    final void setState(OrderState value) {
+        ((ÅssignableÅrbitrary) this).state(value);
+    }
+
+    /**
+     * Provide accesser to super default value.
+     *
+     * @return A default value.
+     */
+    private final OrderState åccessToDefaultState() {
+        return super.state();
     }
 
     /** The singleton builder. */
@@ -1082,6 +1131,87 @@ public abstract class Order extends OrderModel {
             }
             return (Next) this;
         }
+
+        /**
+         * Assign state property.
+         * 
+         * @param value A new value to assign.
+         * @return The next assignable model.
+         */
+        default Next state(OrderState value) {
+            if (value == null) {
+                value = ((Order) this).åccessToDefaultState();
+            }
+            try {
+                stateUpdater.invoke(this, state$1391871188.invoke(this, value));
+            } catch (Throwable e) {
+                throw quiet(e);
+            }
+            return (Next) this;
+        }
+
+        /**
+         * Assign {@link OrderState#ACTIVE} to state property.
+         * 
+         * @return The next assignable model.
+         */
+        default Next active() {
+            return state(OrderState.ACTIVE);
+        }
+
+        /**
+         * Assign {@link OrderState#CANCELED} to state property.
+         * 
+         * @return The next assignable model.
+         */
+        default Next canceled() {
+            return state(OrderState.CANCELED);
+        }
+
+        /**
+         * Assign {@link OrderState#COMPLETED} to state property.
+         * 
+         * @return The next assignable model.
+         */
+        default Next completed() {
+            return state(OrderState.COMPLETED);
+        }
+
+        /**
+         * Assign {@link OrderState#EXPIRED} to state property.
+         * 
+         * @return The next assignable model.
+         */
+        default Next expired() {
+            return state(OrderState.EXPIRED);
+        }
+
+        /**
+         * Assign {@link OrderState#INIT} to state property.
+         * 
+         * @return The next assignable model.
+         */
+        default Next init() {
+            return state(OrderState.INIT);
+        }
+
+        /**
+         * Assign {@link OrderState#REJECTED} to state property.
+         * 
+         * @return The next assignable model.
+         */
+        default Next rejected() {
+            return state(OrderState.REJECTED);
+        }
+
+        /**
+         * Assign {@link OrderState#REQUESTING} to state property.
+         * 
+         * @return The next assignable model.
+         */
+        default Next requesting() {
+            return state(OrderState.REQUESTING);
+        }
     }
 
     /**
@@ -1110,5 +1240,6 @@ public abstract class Order extends OrderModel {
         static final String Id = "id";
         static final String CreationTime = "creationTime";
         static final String TerminationTime = "terminationTime";
+        static final String State = "state";
     }
 }
