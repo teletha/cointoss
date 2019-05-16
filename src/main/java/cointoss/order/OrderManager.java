@@ -81,14 +81,14 @@ public final class OrderManager {
                     Num executed = exe.size;
 
                     if (order.type.isMarket() && executed.isNot(0)) {
-                        order.averagePrice.set(n -> n.multiply(order.executedSize)
+                        order.price(n -> n.multiply(order.executedSize)
                                 .plus(exe.price.multiply(executed))
                                 .divide(executed.plus(order.executedSize)));
                     }
                     order.executedSize.set(s -> s.plus(executed));
-                    order.setRemainingSize(order.remainingSize.v.minus(executed));
+                    order.remainingSize.set(s -> s.minus(executed));
 
-                    if (order.remainingSize.v.is(Num.ZERO)) {
+                    if (order.remainingSize.is(Num.ZERO)) {
                         order.state.set(OrderState.COMPLETED);
                     }
 

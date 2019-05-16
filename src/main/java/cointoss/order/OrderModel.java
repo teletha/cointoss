@@ -21,12 +21,10 @@ import cointoss.Directional;
 import cointoss.execution.Execution;
 import cointoss.util.Num;
 import cointoss.util.NumVar;
-import cointoss.util.Observable;
 import icy.manipulator.Icy;
 import kiss.I;
 import kiss.Signal;
 import kiss.Variable;
-import kiss.Ⅱ;
 
 @Icy(grouping = 2)
 public abstract class OrderModel implements Directional {
@@ -40,14 +38,14 @@ public abstract class OrderModel implements Directional {
     /** The executed size. */
     public final NumVar executedSize = NumVar.zero();
 
+    /** The remaining size. */
+    public final NumVar remainingSize = NumVar.zero();
+
     /** The order state. */
     public final Variable<OrderState> state = Variable.of(OrderState.INIT);
 
     /** The order identifier for the specific market. */
     public final Variable<String> id = Variable.empty();
-
-    /** The average price. */
-    public final NumVar averagePrice = NumVar.zero();
 
     /** The total cost. */
     public final NumVar cost = NumVar.zero();
@@ -57,8 +55,6 @@ public abstract class OrderModel implements Directional {
 
     /** The entry holder. */
     private final LinkedList<Execution> entries = new LinkedList();
-
-    private final Ⅱ<Observable<Num>, Consumer<Num>> remains = Observable.of(Num.ZERO);
 
     /**
      * {@inheritDoc}
@@ -138,7 +134,7 @@ public abstract class OrderModel implements Directional {
         if (size.isNegativeOrZero()) {
             throw new IllegalArgumentException("Order size must be positive.");
         }
-        setRemainingSize(size);
+        remainingSize.set(size);
         return size;
     }
 
@@ -147,7 +143,7 @@ public abstract class OrderModel implements Directional {
      * 
      * @return
      */
-    @Icy.Property
+    @Icy.Property(mutable = true)
     public Num price() {
         return Num.ZERO;
     }
@@ -232,26 +228,6 @@ public abstract class OrderModel implements Directional {
     @Icy.Property
     public QuantityCondition quantityCondition() {
         return QuantityCondition.GoodTillCanceled;
-    }
-
-    /**
-     * Remaining size of this order.
-     * 
-     * @return
-     */
-    @Icy.Property
-    public Observable<Num> remainingSize() {
-        return remains.ⅰ;
-    }
-
-    @Icy.Overload("remainingSize")
-    private Observable<Num> remainingSize(Num size) {
-        setRemainingSize(size);
-        return remains.ⅰ;
-    }
-
-    void setRemainingSize(Num size) {
-        remains.ⅱ.accept(size);
     }
 
     /**
@@ -411,8 +387,7 @@ public abstract class OrderModel implements Directional {
      */
     @Override
     public String toString() {
-        return direction()
-                .mark() + size() + "@" + price() + " 残" + remainingSize() + " 済" + executedSize + " " + creationTime + " " + state;
+        return direction().mark() + size() + "@" + price() + " 残" + remainingSize + " 済" + executedSize + " " + creationTime + " " + state;
     }
 
     /**

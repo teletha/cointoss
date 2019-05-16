@@ -126,7 +126,7 @@ public class Entry implements Directional {
         for (Order entry : entryOrders) {
             if (entry.isNotCanceled() && entry.isNotCompleted()) {
                 manager.cancel(entry).to(order -> {
-                    Num remaining = entryRemainingSize.set(v -> v.minus(order.remainingSize.v));
+                    Num remaining = entryRemainingSize.set(v -> v.minus(order.remainingSize));
                     entrySize.set(v -> v.minus(remaining));
                 });
             }

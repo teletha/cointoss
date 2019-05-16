@@ -2,12 +2,12 @@ package cointoss.order;
 
 import cointoss.Direction;
 import cointoss.util.Num;
-import cointoss.util.Observable;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.function.Consumer;
+import java.util.function.UnaryOperator;
 import javax.annotation.processing.Generated;
 
 /**
@@ -78,9 +78,6 @@ public abstract class Order extends OrderModel {
     /** The overload or intercept method invoker. */
     private static final MethodHandle price$299539787= invoker("price", Num.class, Consumer.class);
 
-    /** The overload or intercept method invoker. */
-    private static final MethodHandle remainingSize$1566479191= invoker("remainingSize", Num.class);
-
     /**
      * Create special property updater.
      *
@@ -112,9 +109,6 @@ public abstract class Order extends OrderModel {
     /** The final property updater. */
     private static final MethodHandle quantityConditionUpdater = updater("quantityCondition");
 
-    /** The final property updater. */
-    private static final MethodHandle remainingSizeUpdater = updater("remainingSize");
-
     /** The exposed property. */
     public final Direction direction;
 
@@ -130,9 +124,6 @@ public abstract class Order extends OrderModel {
     /** The exposed property. */
     public final QuantityCondition quantityCondition;
 
-    /** The exposed property. */
-    public final Observable<Num> remainingSize;
-
     /**
      * HIDE CONSTRUCTOR
      */
@@ -142,7 +133,6 @@ public abstract class Order extends OrderModel {
         this.price = super.price();
         this.type = super.type();
         this.quantityCondition = super.quantityCondition();
-        this.remainingSize = super.remainingSize();
     }
 
     /** {@inheritDoc} */
@@ -209,6 +199,17 @@ public abstract class Order extends OrderModel {
     @Override
     public final Num price() {
         return this.price;
+    }
+
+    /**
+     * Assign the new value of price property.
+     *
+     * @paran value The price property assigner which accepts the current value and returns new value.
+     * @return Chainable API.
+     */
+    public final Order price(UnaryOperator<Num> value) {
+        setPrice(value.apply(this.price));
+        return this;
     }
 
     /**
@@ -316,45 +317,6 @@ public abstract class Order extends OrderModel {
      */
     private final QuantityCondition åccessToDefaultQuantityCondition() {
         return super.quantityCondition();
-    }
-
-    /**
-     * Remaining size of this order.
-     *  
-     *  @return
-     */
-    @Override
-    public final Observable<Num> remainingSize() {
-        return this.remainingSize;
-    }
-
-    /**
-     * Provide classic getter API.
-     *
-     * @return A value of remainingSize property.
-     */
-    @SuppressWarnings("unused")
-    private final Observable<Num> getRemainingSize() {
-        return this.remainingSize;
-    }
-
-    /**
-     * Provide classic setter API.
-     *
-     * @paran value A new value of remainingSize property to assign.
-     */
-    @SuppressWarnings("unused")
-    private void setRemainingSize(Observable<Num> value) {
-        ((ÅssignableÅrbitrary) this).remainingSize(value);
-    }
-
-    /**
-     * Provide accesser to super default value.
-     *
-     * @return A default value.
-     */
-    private final Observable<Num> åccessToDefaultRemainingSize() {
-        return super.remainingSize();
     }
 
     /** The singleton builder. */
@@ -762,15 +724,6 @@ public abstract class Order extends OrderModel {
         }
 
         /**
-         * Assign {@link QuantityCondition#FillOrKill} to quantityCondition property.
-         * 
-         * @return The next assignable model.
-         */
-        default Next fillOrKill() {
-            return quantityCondition(QuantityCondition.FillOrKill);
-        }
-
-        /**
          * Assign {@link QuantityCondition#GoodTillCanceled} to quantityCondition property.
          * 
          * @return The next assignable model.
@@ -789,34 +742,12 @@ public abstract class Order extends OrderModel {
         }
 
         /**
-         * Assign remainingSize property.
-         * 
-         * @param value A new value to assign.
-         * @return The next assignable model.
-         */
-        default Next remainingSize(Observable<Num> value) {
-            if (value == null) {
-                value = ((Order) this).åccessToDefaultRemainingSize();
-            }
-            try {
-                remainingSizeUpdater.invoke(this, value);
-            } catch (Throwable e) {
-                throw quiet(e);
-            }
-            return (Next) this;
-        }
-
-        /**
-         * Assign remainingSize property.
+         * Assign {@link QuantityCondition#FillOrKill} to quantityCondition property.
          * 
          * @return The next assignable model.
          */
-        default Next remainingSize(Num size) {
-            try {
-                return remainingSize((Observable<Num>) remainingSize$1566479191.invoke(this, size));
-            } catch (Throwable e) {
-                throw quiet(e);
-            }
+        default Next fillOrKill() {
+            return quantityCondition(QuantityCondition.FillOrKill);
         }
     }
 
@@ -841,6 +772,5 @@ public abstract class Order extends OrderModel {
         static final String Price = "price";
         static final String Type = "type";
         static final String QuantityCondition = "quantityCondition";
-        static final String RemainingSize = "remainingSize";
     }
 }

@@ -436,7 +436,7 @@ public abstract class Trader implements Disposable {
          * Cehck whether this position is not activated.
          */
         public final boolean isInitial() {
-            return order.size.is(order.remainingSize.v);
+            return order.size.is(order.remainingSize);
         }
 
         /**
