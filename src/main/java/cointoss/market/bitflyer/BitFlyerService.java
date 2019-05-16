@@ -193,7 +193,7 @@ class BitFlyerService extends MarketService {
         cancel.product_code = marketName;
         cancel.account_id = account.accountId.v;
         cancel.order_id = order.relation(Internals.class).id;
-        cancel.child_order_acceptance_id = order.id.v;
+        cancel.child_order_acceptance_id = order.id;
 
         Signal requestCancel = forTest || maintainer.session() == null || cancel.order_id == null
                 ? call("POST", "/v1/me/cancelchildorder", cancel, null, null)
@@ -692,8 +692,11 @@ class BitFlyerService extends MarketService {
         public OrderState child_order_state;
 
         public Order toOrder() {
-            Order o = Order.with.direction(side, size).price(average_price).remainingSize(outstanding_size).executedSize(executed_size);
-            o.id.let(child_order_acceptance_id);
+            Order o = Order.with.direction(side, size)
+                    .price(average_price)
+                    .remainingSize(outstanding_size)
+                    .executedSize(executed_size)
+                    .id(child_order_acceptance_id);
             o.creationTime.set(LocalDateTime.parse(child_order_date, Chrono.DateTimeWithT).atZone(Chrono.UTC));
             o.state.set(child_order_state);
             o.relation(Internals.class).id = child_order_id;

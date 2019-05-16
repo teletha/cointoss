@@ -76,7 +76,7 @@ public final class OrderManager {
 
         service.add(service.executionsRealtimelyForMe().to(v -> {
             for (Order order : managed) {
-                if (order.id.is(v.ⅱ)) {
+                if (order.id.equals(v.ⅱ)) {
                     Execution exe = v.ⅲ;
                     Num executed = exe.size;
 
@@ -115,7 +115,7 @@ public final class OrderManager {
         order.state.set(REQUESTING);
 
         return service.request(order).retryWhen(service.setting.retryPolicy()).map(id -> {
-            order.id.let(id);
+            order.setId(id);
             order.creationTime.set(service.now());
             order.state.set(ACTIVE);
             order.observeTerminating().to(remove::accept);

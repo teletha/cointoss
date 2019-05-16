@@ -189,8 +189,8 @@ public class VerifiableMarketService extends MarketService {
                     .price(o.price)
                     .quantityCondition(o.condition)
                     .remainingSize(o.remainingSize)
-                    .executedSize(o.executedSize);
-            order.id.set(o.id);
+                    .executedSize(o.executedSize)
+                    .id(o.id);
             order.state.set(o.state);
 
             return order;

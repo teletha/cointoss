@@ -39,9 +39,6 @@ public abstract class OrderModel implements Directional {
     /** The order state. */
     public final Variable<OrderState> state = Variable.of(OrderState.INIT);
 
-    /** The order identifier for the specific market. */
-    public final Variable<String> id = Variable.empty();
-
     /** The total cost. */
     public final NumVar cost = NumVar.zero();
 
@@ -332,6 +329,23 @@ public abstract class OrderModel implements Directional {
     }
 
     /**
+     * The order identifier for the specific market.
+     * 
+     * @return
+     */
+    @Icy.Property
+    public String id() {
+        return "";
+    }
+
+    /**
+     * Expose internal setter.
+     * 
+     * @param id
+     */
+    abstract void setId(String id);
+
+    /**
      * Check the order {@link OrderState}.
      * 
      * @return The result.
@@ -472,7 +486,7 @@ public abstract class OrderModel implements Directional {
      */
     @Override
     public int hashCode() {
-        return Objects.hashCode(id);
+        return Objects.hashCode(id());
     }
 
     /**
@@ -480,7 +494,7 @@ public abstract class OrderModel implements Directional {
      */
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof Order ? Objects.equals(id, ((Order) obj).id) : false;
+        return obj instanceof Order ? Objects.equals(id(), ((Order) obj).id()) : false;
     }
 
     /**

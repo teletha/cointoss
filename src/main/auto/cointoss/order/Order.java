@@ -121,6 +121,9 @@ public abstract class Order extends OrderModel {
     /** The final property updater. */
     private static final MethodHandle executedSizeUpdater = updater("executedSize");
 
+    /** The final property updater. */
+    private static final MethodHandle idUpdater = updater("id");
+
     /** The exposed property. */
     public final Direction direction;
 
@@ -142,6 +145,9 @@ public abstract class Order extends OrderModel {
     /** The exposed property. */
     public final Num executedSize;
 
+    /** The exposed property. */
+    public final String id;
+
     /**
      * HIDE CONSTRUCTOR
      */
@@ -153,6 +159,7 @@ public abstract class Order extends OrderModel {
         this.quantityCondition = super.quantityCondition();
         this.remainingSize = super.remainingSize();
         this.executedSize = super.executedSize();
+        this.id = super.id();
     }
 
     /** {@inheritDoc} */
@@ -415,6 +422,45 @@ public abstract class Order extends OrderModel {
      */
     private final Num åccessToDefaultExecutedSize() {
         return super.executedSize();
+    }
+
+    /**
+     * The order identifier for the specific market.
+     *  
+     *  @return
+     */
+    @Override
+    public final String id() {
+        return this.id;
+    }
+
+    /**
+     * Provide classic getter API.
+     *
+     * @return A value of id property.
+     */
+    @SuppressWarnings("unused")
+    private final String getId() {
+        return this.id;
+    }
+
+    /**
+     * Provide classic setter API.
+     *
+     * @paran value A new value of id property to assign.
+     */
+    @SuppressWarnings("unused")
+    final void setId(String value) {
+        ((ÅssignableÅrbitrary) this).id(value);
+    }
+
+    /**
+     * Provide accesser to super default value.
+     *
+     * @return A default value.
+     */
+    private final String åccessToDefaultId() {
+        return super.id();
     }
 
     /** The singleton builder. */
@@ -883,6 +929,24 @@ public abstract class Order extends OrderModel {
             }
             return (Next) this;
         }
+
+        /**
+         * Assign id property.
+         * 
+         * @param value A new value to assign.
+         * @return The next assignable model.
+         */
+        default Next id(String value) {
+            if (value == null) {
+                value = ((Order) this).åccessToDefaultId();
+            }
+            try {
+                idUpdater.invoke(this, value);
+            } catch (Throwable e) {
+                throw quiet(e);
+            }
+            return (Next) this;
+        }
     }
 
     /**
@@ -908,5 +972,6 @@ public abstract class Order extends OrderModel {
         static final String QuantityCondition = "quantityCondition";
         static final String RemainingSize = "remainingSize";
         static final String ExecutedSize = "executedSize";
+        static final String Id = "id";
     }
 }
