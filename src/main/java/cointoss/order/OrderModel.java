@@ -20,7 +20,6 @@ import cointoss.Direction;
 import cointoss.Directional;
 import cointoss.execution.Execution;
 import cointoss.util.Num;
-import cointoss.util.NumVar;
 import icy.manipulator.Icy;
 import kiss.I;
 import kiss.Signal;
@@ -31,7 +30,7 @@ import kiss.Variable;
 public abstract class OrderModel implements Directional {
 
     /** The total cost. */
-    public final NumVar cost = NumVar.zero();
+    final Variable<Num> cost = Variable.of(Num.ZERO);
 
     /** The relation holder. */
     private Map<Class, Object> relations;
@@ -303,6 +302,15 @@ public abstract class OrderModel implements Directional {
      */
     public final Signal<Num> observeExecutedSizeDiff() {
         return observeExecutedSizeNow().maps(Num.ZERO, (prev, now) -> now.minus(prev));
+    }
+
+    /**
+     * Observe value diff.
+     * 
+     * @return
+     */
+    final Signal<Num> observeCostDiff() {
+        return cost.observeNow().maps(Num.ZERO, (prev, now) -> now.minus(prev));
     }
 
     /**

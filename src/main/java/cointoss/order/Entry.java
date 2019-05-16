@@ -13,7 +13,6 @@ import java.util.LinkedList;
 
 import cointoss.Direction;
 import cointoss.Directional;
-import cointoss.order.Order;
 import cointoss.util.Num;
 import cointoss.util.NumVar;
 import kiss.I;
@@ -42,7 +41,7 @@ public class Entry implements Directional {
             .to(NumVar.class, NumVar::set);
 
     /** The entry info. */
-    public final NumVar entryPice = entries.expose.flatMap(v -> v.cost.diff())
+    public final NumVar entryPice = entries.expose.flatMap(v -> v.observeCostDiff())
             .scanWith(Num.ZERO, Num::plus)
             .combineLatest(entryExecutedSize.observeNow())
             .map(v -> v.ⅱ.isZero() ? Num.ZERO : v.ⅰ.divide(v.ⅱ))
@@ -68,7 +67,7 @@ public class Entry implements Directional {
             .to(NumVar.class, NumVar::set);
 
     /** The exit info. */
-    public final NumVar exitPice = exits.expose.flatMap(v -> v.cost.diff())
+    public final NumVar exitPice = exits.expose.flatMap(v -> v.observeCostDiff())
             .scanWith(Num.ZERO, Num::plus)
             .combineLatest(exitExecutedSize.observeNow())
             .map(v -> v.ⅱ.isZero() ? Num.ZERO : v.ⅰ.divide(v.ⅱ))
