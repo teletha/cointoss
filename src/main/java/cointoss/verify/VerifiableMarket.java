@@ -15,9 +15,7 @@ import java.time.ZonedDateTime;
 import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.execution.Execution;
-import cointoss.order.Entry;
 import cointoss.order.Order;
-import kiss.Signal;
 
 public class VerifiableMarket extends Market {
 
@@ -97,16 +95,6 @@ public class VerifiableMarket extends Market {
                 perform(copy);
             }
         }
-    }
-
-    public Signal<Entry> performEntry(Order entryOrder, Order exitOrder) {
-        return orders.requestEntry(entryOrder).effect(entry -> {
-            Execution exe = Execution.with.direction(entryOrder.direction, entryOrder.size)
-                    .date(service.now())
-                    .price(entryOrder.price.minus(entryOrder.direction, service.setting.baseCurrencyMinimumBidPrice()));
-
-            perform(exe);
-        }).flatMap(entry -> entry.requestExit(exitOrder));
     }
 
     /**

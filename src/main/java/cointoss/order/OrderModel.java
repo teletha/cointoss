@@ -29,9 +29,6 @@ import kiss.Variable;
 @Icy(grouping = 2, classicSetterModifier = "final")
 public abstract class OrderModel implements Directional {
 
-    /** The total cost. */
-    final Variable<Num> cost = Variable.of(Num.ZERO);
-
     /** The relation holder. */
     private Map<Class, Object> relations;
 
@@ -213,52 +210,6 @@ public abstract class OrderModel implements Directional {
     }
 
     /**
-     * Calculate the average price of this order.
-     * 
-     * @return
-     */
-    @Icy.Property
-    public Num averagePrice() {
-        return Num.ZERO;
-    }
-
-    /** The value stream. */
-    private final Signaling<Num> averagePrice = new Signaling();
-
-    @Icy.Intercept("averagePrice")
-    private Num averagePrice(Num size) {
-        averagePrice.accept(size);
-        return size;
-    }
-
-    /**
-     * Observe value modification.
-     * 
-     * @return
-     */
-    public final Signal<Num> observeAveragePrice() {
-        return averagePrice.expose;
-    }
-
-    /**
-     * Observe value modification.
-     * 
-     * @return
-     */
-    public final Signal<Num> observeAveragePriceNow() {
-        return observeAveragePrice().startWith(remainingSize());
-    }
-
-    /**
-     * Observe value diff.
-     * 
-     * @return
-     */
-    public final Signal<Num> observeAveragePriceDiff() {
-        return observeAveragePriceNow().maps(Num.ZERO, (prev, now) -> now.minus(prev));
-    }
-
-    /**
      * Calculate the remaining size of this order.
      * 
      * @return
@@ -348,15 +299,6 @@ public abstract class OrderModel implements Directional {
      */
     public final Signal<Num> observeExecutedSizeDiff() {
         return observeExecutedSizeNow().maps(Num.ZERO, (prev, now) -> now.minus(prev));
-    }
-
-    /**
-     * Observe value diff.
-     * 
-     * @return
-     */
-    final Signal<Num> observeCostDiff() {
-        return cost.observeNow().maps(Num.ZERO, (prev, now) -> now.minus(prev));
     }
 
     /**
@@ -583,7 +525,6 @@ public abstract class OrderModel implements Directional {
      */
     final void execute(Execution execution) {
         entries.add(execution);
-        cost.set(v -> v.plus(execution.size.multiply(execution.price)));
     }
 
     /**

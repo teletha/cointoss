@@ -80,9 +80,6 @@ public abstract class Order extends OrderModel {
     private static final MethodHandle price$299539787= invoker("price", Num.class, Consumer.class);
 
     /** The overload or intercept method invoker. */
-    private static final MethodHandle averagePrice$1566479191= invoker("averagePrice", Num.class);
-
-    /** The overload or intercept method invoker. */
     private static final MethodHandle remainingSize$1566479191= invoker("remainingSize", Num.class);
 
     /** The overload or intercept method invoker. */
@@ -129,9 +126,6 @@ public abstract class Order extends OrderModel {
     private static final MethodHandle quantityConditionUpdater = updater("quantityCondition");
 
     /** The final property updater. */
-    private static final MethodHandle averagePriceUpdater = updater("averagePrice");
-
-    /** The final property updater. */
     private static final MethodHandle remainingSizeUpdater = updater("remainingSize");
 
     /** The final property updater. */
@@ -165,9 +159,6 @@ public abstract class Order extends OrderModel {
     public final QuantityCondition quantityCondition;
 
     /** The exposed property. */
-    public final Num averagePrice;
-
-    /** The exposed property. */
     public final Num remainingSize;
 
     /** The exposed property. */
@@ -194,7 +185,6 @@ public abstract class Order extends OrderModel {
         this.price = super.price();
         this.type = super.type();
         this.quantityCondition = super.quantityCondition();
-        this.averagePrice = super.averagePrice();
         this.remainingSize = super.remainingSize();
         this.executedSize = super.executedSize();
         this.id = super.id();
@@ -385,45 +375,6 @@ public abstract class Order extends OrderModel {
      */
     private final QuantityCondition åccessToDefaultQuantityCondition() {
         return super.quantityCondition();
-    }
-
-    /**
-     * Calculate the average price of this order.
-     *  
-     *  @return
-     */
-    @Override
-    public final Num averagePrice() {
-        return this.averagePrice;
-    }
-
-    /**
-     * Provide classic getter API.
-     *
-     * @return A value of averagePrice property.
-     */
-    @SuppressWarnings("unused")
-    private final Num getAveragePrice() {
-        return this.averagePrice;
-    }
-
-    /**
-     * Provide classic setter API.
-     *
-     * @paran value A new value of averagePrice property to assign.
-     */
-    @SuppressWarnings("unused")
-    final void setAveragePrice(Num value) {
-        ((ÅssignableÅrbitrary) this).averagePrice(value);
-    }
-
-    /**
-     * Provide accesser to super default value.
-     *
-     * @return A default value.
-     */
-    private final Num åccessToDefaultAveragePrice() {
-        return super.averagePrice();
     }
 
     /**
@@ -1092,24 +1043,6 @@ public abstract class Order extends OrderModel {
         }
 
         /**
-         * Assign averagePrice property.
-         * 
-         * @param value A new value to assign.
-         * @return The next assignable model.
-         */
-        default Next averagePrice(Num value) {
-            if (value == null) {
-                value = ((Order) this).åccessToDefaultAveragePrice();
-            }
-            try {
-                averagePriceUpdater.invoke(this, averagePrice$1566479191.invoke(this, value));
-            } catch (Throwable e) {
-                throw quiet(e);
-            }
-            return (Next) this;
-        }
-
-        /**
          * Assign remainingSize property.
          * 
          * @param value A new value to assign.
@@ -1302,7 +1235,6 @@ public abstract class Order extends OrderModel {
         static final String Price = "price";
         static final String Type = "type";
         static final String QuantityCondition = "quantityCondition";
-        static final String AveragePrice = "averagePrice";
         static final String RemainingSize = "remainingSize";
         static final String ExecutedSize = "executedSize";
         static final String Id = "id";

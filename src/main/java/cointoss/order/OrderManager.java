@@ -18,7 +18,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import cointoss.MarketService;
 import cointoss.execution.Execution;
 import cointoss.util.Num;
-import cointoss.util.NumVar;
 import kiss.I;
 import kiss.Signal;
 import kiss.Signaling;
@@ -55,15 +54,6 @@ public final class OrderManager {
 
     /** The order update event. */
     public final Signal<Ⅱ<Order, Execution>> updated = updates.expose;
-
-    /** The entry events. */
-    private final Signaling<Entry> entries = new Signaling();
-
-    /** The total position. */
-    public final NumVar positionSize = entries.expose.flatMap(v -> v.positionSize.diff())
-            .scanWith(Num.ZERO, Num::plus)
-            .startWith(Num.ZERO)
-            .to(NumVar.class, NumVar::set);
 
     /**
      * @param service
@@ -125,10 +115,6 @@ public final class OrderManager {
         }).effectOnError(e -> {
             order.setState(CANCELED);
         });
-    }
-
-    public Signal<Entry> requestEntry(Order order) {
-        return request(order).map(o -> new Entry(this, o));
     }
 
     /**
