@@ -36,9 +36,6 @@ public abstract class OrderModel implements Directional {
     /** The termiated time of this order. */
     public final Variable<ZonedDateTime> terminationTime = Variable.empty();
 
-    /** The remaining size. */
-    public final NumVar executedSize = NumVar.zero();
-
     /** The order state. */
     public final Variable<OrderState> state = Variable.of(OrderState.INIT);
 
@@ -228,6 +225,11 @@ public abstract class OrderModel implements Directional {
         return QuantityCondition.GoodTillCanceled;
     }
 
+    /**
+     * Calculate the remaining size of this order.
+     * 
+     * @return
+     */
     @Icy.Property
     public Num remainingSize() {
         return Num.ZERO;
@@ -274,6 +276,59 @@ public abstract class OrderModel implements Directional {
      */
     public final Signal<Num> observeRemainingSizeDiff() {
         return observeRemainingSizeNow().maps(Num.ZERO, (prev, now) -> now.minus(prev));
+    }
+
+    /**
+     * Calculate executed size of this order.
+     * 
+     * @return
+     */
+    @Icy.Property
+    public Num executedSize() {
+        return Num.ZERO;
+    }
+
+    /**
+     * Expose internal setter.
+     * 
+     * @param size
+     */
+    abstract void setExecutedSize(Num size);
+
+    /** The value stream. */
+    private final Signaling<Num> executedSize = new Signaling();
+
+    @Icy.Intercept("executedSize")
+    private Num executedSize(Num size) {
+        executedSize.accept(size);
+        return size;
+    }
+
+    /**
+     * Observe value modification.
+     * 
+     * @return
+     */
+    public final Signal<Num> observeExecutedSize() {
+        return executedSize.expose;
+    }
+
+    /**
+     * Observe value modification.
+     * 
+     * @return
+     */
+    public final Signal<Num> observeExecutedSizeNow() {
+        return observeExecutedSize().startWith(executedSize());
+    }
+
+    /**
+     * Observe value diff.
+     * 
+     * @return
+     */
+    public final Signal<Num> observeExecutedSizeDiff() {
+        return observeExecutedSizeNow().maps(Num.ZERO, (prev, now) -> now.minus(prev));
     }
 
     /**

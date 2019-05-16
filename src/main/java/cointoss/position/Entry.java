@@ -20,7 +20,6 @@ import cointoss.util.NumVar;
 import kiss.I;
 import kiss.Signal;
 import kiss.Signaling;
-import kiss.Viewable;
 
 public class Entry implements Directional {
 
@@ -38,7 +37,7 @@ public class Entry implements Directional {
             .to(NumVar.class, NumVar::set);
 
     /** The entry info. */
-    public final NumVar entryExecutedSize = entries.expose.flatMap(v -> v.executedSize.diff())
+    public final NumVar entryExecutedSize = entries.expose.flatMap(v -> v.observeExecutedSizeDiff())
             .scanWith(Num.ZERO, Num::plus)
             .startWith(Num.ZERO)
             .to(NumVar.class, NumVar::set);
@@ -64,7 +63,7 @@ public class Entry implements Directional {
             .to(NumVar.class, NumVar::set);
 
     /** The exit info. */
-    public final NumVar exitExecutedSize = exits.expose.flatMap(v -> v.executedSize.diff())
+    public final NumVar exitExecutedSize = exits.expose.flatMap(v -> v.observeExecutedSizeDiff())
             .scanWith(Num.ZERO, Num::plus)
             .startWith(Num.ZERO)
             .to(NumVar.class, NumVar::set);

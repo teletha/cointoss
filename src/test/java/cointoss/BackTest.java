@@ -81,7 +81,7 @@ public class BackTest {
                                 .take(keep(5, ChronoUnit.SECONDS, e -> e.price.isLessThan(entry, underPrice)))
                                 .take(1)
                                 .to(e -> {
-                                    entry.exitLimit(entry.order.executedSize.v, underPrice, exit -> {
+                                    entry.exitLimit(entry.order.executedSize, underPrice, exit -> {
                                         entry.order.log("10秒以上約定値が%s以下になったので指値で決済開始", underPrice);
 
                                         market.timeline.takeUntil(completingEntry)

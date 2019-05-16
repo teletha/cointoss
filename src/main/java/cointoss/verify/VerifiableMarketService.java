@@ -188,10 +188,10 @@ public class VerifiableMarketService extends MarketService {
             Order order = Order.with.direction(o.direction, o.size)
                     .price(o.price)
                     .quantityCondition(o.condition)
-                    .remainingSize(o.remainingSize);
+                    .remainingSize(o.remainingSize)
+                    .executedSize(o.executedSize);
             order.id.set(o.id);
             order.state.set(o.state);
-            order.executedSize.set(o.executedSize);
 
             return order;
         });
@@ -427,7 +427,7 @@ public class VerifiableMarketService extends MarketService {
             this.direction = o.direction;
             this.size = o.size;
             this.remainingSize = o.remainingSize;
-            this.executedSize = o.executedSize.v;
+            this.executedSize = o.executedSize;
             this.price = o.price;
             this.type = o.type;
             this.condition = o.quantityCondition;

@@ -331,7 +331,7 @@ public abstract class Trader implements Disposable {
          * @return
          */
         public final Num entryPrice() {
-            return order.executedSize.v.isZero() ? Num.ZERO : entryCost.divide(order.executedSize);
+            return order.executedSize.isZero() ? Num.ZERO : entryCost.divide(order.executedSize);
         }
 
         /**

@@ -81,6 +81,9 @@ public abstract class Order extends OrderModel {
     /** The overload or intercept method invoker. */
     private static final MethodHandle remainingSize$1566479191= invoker("remainingSize", Num.class);
 
+    /** The overload or intercept method invoker. */
+    private static final MethodHandle executedSize$1566479191= invoker("executedSize", Num.class);
+
     /**
      * Create special property updater.
      *
@@ -115,6 +118,9 @@ public abstract class Order extends OrderModel {
     /** The final property updater. */
     private static final MethodHandle remainingSizeUpdater = updater("remainingSize");
 
+    /** The final property updater. */
+    private static final MethodHandle executedSizeUpdater = updater("executedSize");
+
     /** The exposed property. */
     public final Direction direction;
 
@@ -133,6 +139,9 @@ public abstract class Order extends OrderModel {
     /** The exposed property. */
     public final Num remainingSize;
 
+    /** The exposed property. */
+    public final Num executedSize;
+
     /**
      * HIDE CONSTRUCTOR
      */
@@ -143,6 +152,7 @@ public abstract class Order extends OrderModel {
         this.type = super.type();
         this.quantityCondition = super.quantityCondition();
         this.remainingSize = super.remainingSize();
+        this.executedSize = super.executedSize();
     }
 
     /** {@inheritDoc} */
@@ -330,9 +340,9 @@ public abstract class Order extends OrderModel {
     }
 
     /**
-     * Return the remainingSize property.
-     *
-     * @return A value of remainingSize property.
+     * Calculate the remaining size of this order.
+     *  
+     *  @return
      */
     @Override
     public final Num remainingSize() {
@@ -366,6 +376,45 @@ public abstract class Order extends OrderModel {
      */
     private final Num åccessToDefaultRemainingSize() {
         return super.remainingSize();
+    }
+
+    /**
+     * Calculate executed size of this order.
+     *  
+     *  @return
+     */
+    @Override
+    public final Num executedSize() {
+        return this.executedSize;
+    }
+
+    /**
+     * Provide classic getter API.
+     *
+     * @return A value of executedSize property.
+     */
+    @SuppressWarnings("unused")
+    private final Num getExecutedSize() {
+        return this.executedSize;
+    }
+
+    /**
+     * Provide classic setter API.
+     *
+     * @paran value A new value of executedSize property to assign.
+     */
+    @SuppressWarnings("unused")
+    final void setExecutedSize(Num value) {
+        ((ÅssignableÅrbitrary) this).executedSize(value);
+    }
+
+    /**
+     * Provide accesser to super default value.
+     *
+     * @return A default value.
+     */
+    private final Num åccessToDefaultExecutedSize() {
+        return super.executedSize();
     }
 
     /** The singleton builder. */
@@ -773,6 +822,15 @@ public abstract class Order extends OrderModel {
         }
 
         /**
+         * Assign {@link QuantityCondition#FillOrKill} to quantityCondition property.
+         * 
+         * @return The next assignable model.
+         */
+        default Next fillOrKill() {
+            return quantityCondition(QuantityCondition.FillOrKill);
+        }
+
+        /**
          * Assign {@link QuantityCondition#GoodTillCanceled} to quantityCondition property.
          * 
          * @return The next assignable model.
@@ -791,15 +849,6 @@ public abstract class Order extends OrderModel {
         }
 
         /**
-         * Assign {@link QuantityCondition#FillOrKill} to quantityCondition property.
-         * 
-         * @return The next assignable model.
-         */
-        default Next fillOrKill() {
-            return quantityCondition(QuantityCondition.FillOrKill);
-        }
-
-        /**
          * Assign remainingSize property.
          * 
          * @param value A new value to assign.
@@ -811,6 +860,24 @@ public abstract class Order extends OrderModel {
             }
             try {
                 remainingSizeUpdater.invoke(this, remainingSize$1566479191.invoke(this, value));
+            } catch (Throwable e) {
+                throw quiet(e);
+            }
+            return (Next) this;
+        }
+
+        /**
+         * Assign executedSize property.
+         * 
+         * @param value A new value to assign.
+         * @return The next assignable model.
+         */
+        default Next executedSize(Num value) {
+            if (value == null) {
+                value = ((Order) this).åccessToDefaultExecutedSize();
+            }
+            try {
+                executedSizeUpdater.invoke(this, executedSize$1566479191.invoke(this, value));
             } catch (Throwable e) {
                 throw quiet(e);
             }
@@ -840,5 +907,6 @@ public abstract class Order extends OrderModel {
         static final String Type = "type";
         static final String QuantityCondition = "quantityCondition";
         static final String RemainingSize = "remainingSize";
+        static final String ExecutedSize = "executedSize";
     }
 }
