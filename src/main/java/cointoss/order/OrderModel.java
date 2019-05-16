@@ -33,7 +33,7 @@ public abstract class OrderModel implements Directional {
     private Map<Class, Object> relations;
 
     /** The entry holder. */
-    private final LinkedList<Execution> entries = new LinkedList();
+    final LinkedList<Execution> entries = new LinkedList();
 
     /**
      * {@inheritDoc}
@@ -41,14 +41,6 @@ public abstract class OrderModel implements Directional {
     @Icy.Property
     @Override
     public abstract Direction direction();
-
-    @Icy.Intercept("direction")
-    private Direction validate(Direction direction) {
-        if (direction == null) {
-            throw new IllegalArgumentException("Required");
-        }
-        return direction;
-    }
 
     /**
      * The initial ordered size.
@@ -518,13 +510,6 @@ public abstract class OrderModel implements Directional {
      */
     public final Signal<Order> observeTerminating() {
         return observeState().take(OrderState.CANCELED, OrderState.COMPLETED).take(1).mapTo((Order) this);
-    }
-
-    /**
-     * Register entry or exit execution.
-     */
-    final void execute(Execution execution) {
-        entries.add(execution);
     }
 
     /**

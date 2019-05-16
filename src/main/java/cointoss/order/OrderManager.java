@@ -82,7 +82,7 @@ public final class OrderManager {
                     }
 
                     // pairing order and execution
-                    order.execute(exe);
+                    order.entries.add(exe);
 
                     updates.accept(I.pair(order, exe));
                     return;

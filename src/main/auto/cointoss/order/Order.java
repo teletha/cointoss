@@ -47,9 +47,6 @@ public abstract class Order extends OrderModel {
     }
 
     /** The overload or intercept method invoker. */
-    private static final MethodHandle validate$1315602328= invoker("validate", Direction.class);
-
-    /** The overload or intercept method invoker. */
     private static final MethodHandle size$101282980= invoker("size", int.class);
 
     /** The overload or intercept method invoker. */
@@ -776,7 +773,7 @@ public abstract class Order extends OrderModel {
                 throw new IllegalArgumentException("The direction property requires non-null value.");
             }
             try {
-                directionUpdater.invoke(this, validate$1315602328.invoke(this, value));
+                directionUpdater.invoke(this, value);
             } catch (Throwable e) {
                 throw quiet(e);
             }
