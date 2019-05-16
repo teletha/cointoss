@@ -30,9 +30,6 @@ import kiss.Variable;
 @Icy(grouping = 2, classicSetterModifier = "final")
 public abstract class OrderModel implements Directional {
 
-    /** The termiated time of this order. */
-    public final Variable<ZonedDateTime> terminationTime = Variable.empty();
-
     /** The order state. */
     public final Variable<OrderState> state = Variable.of(OrderState.INIT);
 
@@ -361,9 +358,9 @@ public abstract class OrderModel implements Directional {
     private final Signaling<ZonedDateTime> creationTime = new Signaling();
 
     @Icy.Intercept("creationTime")
-    private ZonedDateTime creationTime(ZonedDateTime size) {
-        creationTime.accept(size);
-        return size;
+    private ZonedDateTime creationTime(ZonedDateTime date) {
+        creationTime.accept(date);
+        return date;
     }
 
     /**
@@ -382,6 +379,48 @@ public abstract class OrderModel implements Directional {
      */
     public final Signal<ZonedDateTime> observeCreationTimeNow() {
         return observeCreationTime().startWith(creationTime());
+    }
+
+    /**
+     * The termiated time of this order.
+     * 
+     * @return
+     */
+    @Icy.Property
+    public ZonedDateTime terminationTime() {
+        return null;
+    }
+
+    /**
+     * Expose internal setter.
+     */
+    abstract void setTerminationTime(ZonedDateTime date);
+
+    /** The value stream. */
+    private final Signaling<ZonedDateTime> terminationTime = new Signaling();
+
+    @Icy.Intercept("terminationTime")
+    private ZonedDateTime terminationTime(ZonedDateTime date) {
+        terminationTime.accept(date);
+        return date;
+    }
+
+    /**
+     * Observe value modification.
+     * 
+     * @return
+     */
+    public final Signal<ZonedDateTime> observeTerminationTime() {
+        return creationTime.expose;
+    }
+
+    /**
+     * Observe value modification.
+     * 
+     * @return
+     */
+    public final Signal<ZonedDateTime> observeTerminationTimeNow() {
+        return observeTerminationTime().startWith(terminationTime());
     }
 
     /**

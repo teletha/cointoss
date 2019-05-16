@@ -88,6 +88,9 @@ public abstract class Order extends OrderModel {
     /** The overload or intercept method invoker. */
     private static final MethodHandle creationTime$1965660209= invoker("creationTime", ZonedDateTime.class);
 
+    /** The overload or intercept method invoker. */
+    private static final MethodHandle terminationTime$1965660209= invoker("terminationTime", ZonedDateTime.class);
+
     /**
      * Create special property updater.
      *
@@ -131,6 +134,9 @@ public abstract class Order extends OrderModel {
     /** The final property updater. */
     private static final MethodHandle creationTimeUpdater = updater("creationTime");
 
+    /** The final property updater. */
+    private static final MethodHandle terminationTimeUpdater = updater("terminationTime");
+
     /** The exposed property. */
     public final Direction direction;
 
@@ -158,6 +164,9 @@ public abstract class Order extends OrderModel {
     /** The exposed property. */
     public final ZonedDateTime creationTime;
 
+    /** The exposed property. */
+    public final ZonedDateTime terminationTime;
+
     /**
      * HIDE CONSTRUCTOR
      */
@@ -171,6 +180,7 @@ public abstract class Order extends OrderModel {
         this.executedSize = super.executedSize();
         this.id = super.id();
         this.creationTime = super.creationTime();
+        this.terminationTime = super.terminationTime();
     }
 
     /** {@inheritDoc} */
@@ -511,6 +521,45 @@ public abstract class Order extends OrderModel {
      */
     private final ZonedDateTime åccessToDefaultCreationTime() {
         return super.creationTime();
+    }
+
+    /**
+     * The termiated time of this order.
+     *  
+     *  @return
+     */
+    @Override
+    public final ZonedDateTime terminationTime() {
+        return this.terminationTime;
+    }
+
+    /**
+     * Provide classic getter API.
+     *
+     * @return A value of terminationTime property.
+     */
+    @SuppressWarnings("unused")
+    private final ZonedDateTime getTerminationTime() {
+        return this.terminationTime;
+    }
+
+    /**
+     * Provide classic setter API.
+     *
+     * @paran value A new value of terminationTime property to assign.
+     */
+    @SuppressWarnings("unused")
+    final void setTerminationTime(ZonedDateTime value) {
+        ((ÅssignableÅrbitrary) this).terminationTime(value);
+    }
+
+    /**
+     * Provide accesser to super default value.
+     *
+     * @return A default value.
+     */
+    private final ZonedDateTime åccessToDefaultTerminationTime() {
+        return super.terminationTime();
     }
 
     /** The singleton builder. */
@@ -1015,6 +1064,24 @@ public abstract class Order extends OrderModel {
             }
             return (Next) this;
         }
+
+        /**
+         * Assign terminationTime property.
+         * 
+         * @param value A new value to assign.
+         * @return The next assignable model.
+         */
+        default Next terminationTime(ZonedDateTime value) {
+            if (value == null) {
+                value = ((Order) this).åccessToDefaultTerminationTime();
+            }
+            try {
+                terminationTimeUpdater.invoke(this, terminationTime$1965660209.invoke(this, value));
+            } catch (Throwable e) {
+                throw quiet(e);
+            }
+            return (Next) this;
+        }
     }
 
     /**
@@ -1042,5 +1109,6 @@ public abstract class Order extends OrderModel {
         static final String ExecutedSize = "executedSize";
         static final String Id = "id";
         static final String CreationTime = "creationTime";
+        static final String TerminationTime = "terminationTime";
     }
 }

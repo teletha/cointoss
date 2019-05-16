@@ -90,7 +90,7 @@ public class OrderCatalog extends View {
 
         date.header(Date)
                 .modelByProperty(OrderSet.class, o -> o.date)
-                .model(Order.class, o -> o.creationTime)
+                .modelByVar(Order.class, o -> o.observeCreationTimeNow().to())
                 .render((ui, item) -> ui.text(formatter.format(item)));
         side.header(SiDe)
                 .modelByProperty(OrderSet.class, o -> o.side)
