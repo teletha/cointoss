@@ -151,10 +151,10 @@ public final class PositionManager implements Directional {
             Num size = e.size;
 
             for (Position position : positions) {
-                if (position.side == direction) {
+                if (position.direction == direction) {
                     // check same price position
                     if (position.price.is(e.price)) {
-                        position.size.set(size::plus);
+                        position.setSize(position.size.plus(size));
                         calculate();
                         return;
                     }
@@ -163,20 +163,20 @@ public final class PositionManager implements Directional {
 
                     if (remaining.isPositive()) {
                         size = remaining;
-                        position.size.set(Num.ZERO);
+                        position.setSize(Num.ZERO);
 
                         positions.remove(position);
                         remove.accept(position);
                     } else if (remaining.isZero()) {
                         size = remaining;
-                        position.size.set(Num.ZERO);
+                        position.setSize(Num.ZERO);
 
                         positions.remove(position);
                         remove.accept(position);
                         calculate();
                         return;
                     } else {
-                        position.size.set(remaining.negate());
+                        position.setSize(remaining.negate());
                         calculate();
                         return;
                     }
@@ -184,11 +184,7 @@ public final class PositionManager implements Directional {
             }
 
             if (size.isPositive()) {
-                Position position = new Position();
-                position.side = direction;
-                position.price = e.price;
-                position.size.set(size);
-                position.date = e.date;
+                Position position = Position.with.direction(direction).price(e.price).size(size).date(e.date);
 
                 positions.add(position);
                 addition.accept(position);
@@ -224,7 +220,7 @@ public final class PositionManager implements Directional {
             Num profit = position.isBuy() ? execution.price.minus(position.price) : position.price.minus(execution.price);
             profit = profit.multiply(position.size).scale(0);
 
-            position.profit.set(profit);
+            position.setProfit(profit);
             total = total.plus(profit);
         }
         this.profit.set(total);
