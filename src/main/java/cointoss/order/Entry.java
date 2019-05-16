@@ -7,14 +7,13 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss.position;
+package cointoss.order;
 
 import java.util.LinkedList;
 
 import cointoss.Direction;
 import cointoss.Directional;
 import cointoss.order.Order;
-import cointoss.order.OrderManager;
 import cointoss.util.Num;
 import cointoss.util.NumVar;
 import kiss.I;

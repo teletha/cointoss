@@ -15,8 +15,8 @@ import java.time.ZonedDateTime;
 import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.execution.Execution;
+import cointoss.order.Entry;
 import cointoss.order.Order;
-import cointoss.position.Entry;
 import kiss.Signal;
 
 public class VerifiableMarket extends Market {
