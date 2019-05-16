@@ -450,7 +450,7 @@ public abstract class Trader implements Disposable {
          * Cehck whether this position was completed.
          */
         public final boolean isCompleted() {
-            return positionSize.isZero() && order.remainingSize.v.isZero();
+            return positionSize.isZero() && order.remainingSize.isZero();
         }
 
         /**

@@ -61,7 +61,7 @@ public abstract class Order extends OrderModel {
     private static final MethodHandle size$1360390150= invoker("size", double.class);
 
     /** The overload or intercept method invoker. */
-    private static final MethodHandle validateSize$1566479191= invoker("validateSize", Num.class);
+    private static final MethodHandle validateSize$393740119= invoker("validateSize", Num.class, Consumer.class);
 
     /** The overload or intercept method invoker. */
     private static final MethodHandle price$101282980= invoker("price", int.class);
@@ -77,6 +77,9 @@ public abstract class Order extends OrderModel {
 
     /** The overload or intercept method invoker. */
     private static final MethodHandle price$299539787= invoker("price", Num.class, Consumer.class);
+
+    /** The overload or intercept method invoker. */
+    private static final MethodHandle remainingSize$1566479191= invoker("remainingSize", Num.class);
 
     /**
      * Create special property updater.
@@ -109,6 +112,9 @@ public abstract class Order extends OrderModel {
     /** The final property updater. */
     private static final MethodHandle quantityConditionUpdater = updater("quantityCondition");
 
+    /** The final property updater. */
+    private static final MethodHandle remainingSizeUpdater = updater("remainingSize");
+
     /** The exposed property. */
     public final Direction direction;
 
@@ -124,6 +130,9 @@ public abstract class Order extends OrderModel {
     /** The exposed property. */
     public final QuantityCondition quantityCondition;
 
+    /** The exposed property. */
+    public final Num remainingSize;
+
     /**
      * HIDE CONSTRUCTOR
      */
@@ -133,6 +142,7 @@ public abstract class Order extends OrderModel {
         this.price = super.price();
         this.type = super.type();
         this.quantityCondition = super.quantityCondition();
+        this.remainingSize = super.remainingSize();
     }
 
     /** {@inheritDoc} */
@@ -157,7 +167,7 @@ public abstract class Order extends OrderModel {
      * @paran value A new value of direction property to assign.
      */
     @SuppressWarnings("unused")
-    private void setDirection(Direction value) {
+    final void setDirection(Direction value) {
         ((ÅssignableDirection) this).direction(value);
     }
 
@@ -187,7 +197,7 @@ public abstract class Order extends OrderModel {
      * @paran value A new value of size property to assign.
      */
     @SuppressWarnings("unused")
-    private void setSize(Num value) {
+    final void setSize(Num value) {
         ((ÅssignableSize) this).size(value);
     }
 
@@ -228,7 +238,7 @@ public abstract class Order extends OrderModel {
      * @paran value A new value of price property to assign.
      */
     @SuppressWarnings("unused")
-    private void setPrice(Num value) {
+    final void setPrice(Num value) {
         ((ÅssignableÅrbitrary) this).price(value);
     }
 
@@ -267,7 +277,7 @@ public abstract class Order extends OrderModel {
      * @paran value A new value of type property to assign.
      */
     @SuppressWarnings("unused")
-    private void setType(OrderType value) {
+    final void setType(OrderType value) {
         ((ÅssignableÅrbitrary) this).type(value);
     }
 
@@ -306,7 +316,7 @@ public abstract class Order extends OrderModel {
      * @paran value A new value of quantityCondition property to assign.
      */
     @SuppressWarnings("unused")
-    private void setQuantityCondition(QuantityCondition value) {
+    final void setQuantityCondition(QuantityCondition value) {
         ((ÅssignableÅrbitrary) this).quantityCondition(value);
     }
 
@@ -317,6 +327,45 @@ public abstract class Order extends OrderModel {
      */
     private final QuantityCondition åccessToDefaultQuantityCondition() {
         return super.quantityCondition();
+    }
+
+    /**
+     * Return the remainingSize property.
+     *
+     * @return A value of remainingSize property.
+     */
+    @Override
+    public final Num remainingSize() {
+        return this.remainingSize;
+    }
+
+    /**
+     * Provide classic getter API.
+     *
+     * @return A value of remainingSize property.
+     */
+    @SuppressWarnings("unused")
+    private final Num getRemainingSize() {
+        return this.remainingSize;
+    }
+
+    /**
+     * Provide classic setter API.
+     *
+     * @paran value A new value of remainingSize property to assign.
+     */
+    @SuppressWarnings("unused")
+    final void setRemainingSize(Num value) {
+        ((ÅssignableÅrbitrary) this).remainingSize(value);
+    }
+
+    /**
+     * Provide accesser to super default value.
+     *
+     * @return A default value.
+     */
+    private final Num åccessToDefaultRemainingSize() {
+        return super.remainingSize();
     }
 
     /** The singleton builder. */
@@ -526,7 +575,7 @@ public abstract class Order extends OrderModel {
                 throw new IllegalArgumentException("The size property requires non-null value.");
             }
             try {
-                sizeUpdater.invoke(this, validateSize$1566479191.invoke(this, value));
+                sizeUpdater.invoke(this, validateSize$393740119.invoke(this, value, (Consumer<Num>) ((Åssignable) this)::remainingSize));
             } catch (Throwable e) {
                 throw quiet(e);
             }
@@ -749,6 +798,24 @@ public abstract class Order extends OrderModel {
         default Next fillOrKill() {
             return quantityCondition(QuantityCondition.FillOrKill);
         }
+
+        /**
+         * Assign remainingSize property.
+         * 
+         * @param value A new value to assign.
+         * @return The next assignable model.
+         */
+        default Next remainingSize(Num value) {
+            if (value == null) {
+                value = ((Order) this).åccessToDefaultRemainingSize();
+            }
+            try {
+                remainingSizeUpdater.invoke(this, remainingSize$1566479191.invoke(this, value));
+            } catch (Throwable e) {
+                throw quiet(e);
+            }
+            return (Next) this;
+        }
     }
 
     /**
@@ -772,5 +839,6 @@ public abstract class Order extends OrderModel {
         static final String Price = "price";
         static final String Type = "type";
         static final String QuantityCondition = "quantityCondition";
+        static final String RemainingSize = "remainingSize";
     }
 }

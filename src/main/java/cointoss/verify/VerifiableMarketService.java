@@ -185,11 +185,13 @@ public class VerifiableMarketService extends MarketService {
     @Override
     public Signal<Order> orders() {
         return I.signal(orderAll).map(o -> {
-            Order order = Order.with.direction(o.direction, o.size).price(o.price).quantityCondition(o.condition);
+            Order order = Order.with.direction(o.direction, o.size)
+                    .price(o.price)
+                    .quantityCondition(o.condition)
+                    .remainingSize(o.remainingSize);
             order.id.set(o.id);
             order.state.set(o.state);
             order.executedSize.set(o.executedSize);
-            order.remainingSize.set(o.remainingSize);
 
             return order;
         });
@@ -424,7 +426,7 @@ public class VerifiableMarketService extends MarketService {
             this.front = o;
             this.direction = o.direction;
             this.size = o.size;
-            this.remainingSize = o.remainingSize.v;
+            this.remainingSize = o.remainingSize;
             this.executedSize = o.executedSize.v;
             this.price = o.price;
             this.type = o.type;

@@ -24,9 +24,10 @@ import cointoss.util.NumVar;
 import icy.manipulator.Icy;
 import kiss.I;
 import kiss.Signal;
+import kiss.Signaling;
 import kiss.Variable;
 
-@Icy(grouping = 2)
+@Icy(grouping = 2, classicSetterModifier = "final")
 public abstract class OrderModel implements Directional {
 
     /** The requested time of this order. */
@@ -35,11 +36,8 @@ public abstract class OrderModel implements Directional {
     /** The termiated time of this order. */
     public final Variable<ZonedDateTime> terminationTime = Variable.empty();
 
-    /** The executed size. */
-    public final NumVar executedSize = NumVar.zero();
-
     /** The remaining size. */
-    public final NumVar remainingSize = NumVar.zero();
+    public final NumVar executedSize = NumVar.zero();
 
     /** The order state. */
     public final Variable<OrderState> state = Variable.of(OrderState.INIT);
@@ -124,17 +122,17 @@ public abstract class OrderModel implements Directional {
     }
 
     /**
-     * Size valication.
+     * Size validation.
      * 
      * @param size
      * @return
      */
     @Icy.Intercept("size")
-    private Num validateSize(Num size) {
+    private Num validateSize(Num size, Consumer<Num> remainingSize) {
         if (size.isNegativeOrZero()) {
             throw new IllegalArgumentException("Order size must be positive.");
         }
-        remainingSize.set(size);
+        remainingSize.accept(size);
         return size;
     }
 
@@ -228,6 +226,54 @@ public abstract class OrderModel implements Directional {
     @Icy.Property
     public QuantityCondition quantityCondition() {
         return QuantityCondition.GoodTillCanceled;
+    }
+
+    @Icy.Property
+    public Num remainingSize() {
+        return Num.ZERO;
+    }
+
+    /**
+     * Expose internal setter.
+     * 
+     * @param size
+     */
+    abstract void setRemainingSize(Num size);
+
+    /** The value stream. */
+    private final Signaling<Num> remainingSize = new Signaling();
+
+    @Icy.Intercept("remainingSize")
+    private Num remainingSize(Num size) {
+        remainingSize.accept(size);
+        return size;
+    }
+
+    /**
+     * Observe value modification.
+     * 
+     * @return
+     */
+    public final Signal<Num> observeRemainingSize() {
+        return remainingSize.expose;
+    }
+
+    /**
+     * Observe value modification.
+     * 
+     * @return
+     */
+    public final Signal<Num> observeRemainingSizeNow() {
+        return observeRemainingSize().startWith(remainingSize());
+    }
+
+    /**
+     * Observe value diff.
+     * 
+     * @return
+     */
+    public final Signal<Num> observeRemainingSizeDiff() {
+        return observeRemainingSizeNow().maps(Num.ZERO, (prev, now) -> now.minus(prev));
     }
 
     /**
@@ -387,7 +433,8 @@ public abstract class OrderModel implements Directional {
      */
     @Override
     public String toString() {
-        return direction().mark() + size() + "@" + price() + " 残" + remainingSize + " 済" + executedSize + " " + creationTime + " " + state;
+        return direction()
+                .mark() + size() + "@" + price() + " 残" + remainingSize() + " 済" + executedSize + " " + creationTime + " " + state;
     }
 
     /**
