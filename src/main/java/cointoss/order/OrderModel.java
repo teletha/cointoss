@@ -213,6 +213,52 @@ public abstract class OrderModel implements Directional {
     }
 
     /**
+     * Calculate the average price of this order.
+     * 
+     * @return
+     */
+    @Icy.Property
+    public Num averagePrice() {
+        return Num.ZERO;
+    }
+
+    /** The value stream. */
+    private final Signaling<Num> averagePrice = new Signaling();
+
+    @Icy.Intercept("averagePrice")
+    private Num averagePrice(Num size) {
+        averagePrice.accept(size);
+        return size;
+    }
+
+    /**
+     * Observe value modification.
+     * 
+     * @return
+     */
+    public final Signal<Num> observeAveragePrice() {
+        return averagePrice.expose;
+    }
+
+    /**
+     * Observe value modification.
+     * 
+     * @return
+     */
+    public final Signal<Num> observeAveragePriceNow() {
+        return observeAveragePrice().startWith(remainingSize());
+    }
+
+    /**
+     * Observe value diff.
+     * 
+     * @return
+     */
+    public final Signal<Num> observeAveragePriceDiff() {
+        return observeAveragePriceNow().maps(Num.ZERO, (prev, now) -> now.minus(prev));
+    }
+
+    /**
      * Calculate the remaining size of this order.
      * 
      * @return
