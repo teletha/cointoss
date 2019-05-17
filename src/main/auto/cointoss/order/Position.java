@@ -104,7 +104,6 @@ public abstract class Position extends PositionModel {
      *
      * @paran value A new value of direction property to assign.
      */
-    @SuppressWarnings("unused")
     final void setDirection(Direction value) {
         ((ÅssignableDirection) this).direction(value);
     }
@@ -134,7 +133,6 @@ public abstract class Position extends PositionModel {
      *
      * @paran value A new value of price property to assign.
      */
-    @SuppressWarnings("unused")
     final void setPrice(Num value) {
         ((ÅssignablePrice) this).price(value);
     }
@@ -164,7 +162,6 @@ public abstract class Position extends PositionModel {
      *
      * @paran value A new value of size property to assign.
      */
-    @SuppressWarnings("unused")
     final void setSize(Num value) {
         ((ÅssignableSize) this).size(value);
     }
@@ -194,7 +191,6 @@ public abstract class Position extends PositionModel {
      *
      * @paran value A new value of date property to assign.
      */
-    @SuppressWarnings("unused")
     final void setDate(ZonedDateTime value) {
         ((ÅssignableDate) this).date(value);
     }
@@ -224,7 +220,6 @@ public abstract class Position extends PositionModel {
      *
      * @paran value A new value of profit property to assign.
      */
-    @SuppressWarnings("unused")
     final void setProfit(Num value) {
         ((ÅssignableÅrbitrary) this).profit(value);
     }

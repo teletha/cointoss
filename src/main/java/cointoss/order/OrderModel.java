@@ -26,7 +26,7 @@ import kiss.Signal;
 import kiss.Signaling;
 import kiss.Variable;
 
-@Icy(grouping = 2, classicSetterModifier = "final")
+@Icy(grouping = 2, setterModifier = "final")
 public abstract class OrderModel implements Directional {
 
     /** The relation holder. */

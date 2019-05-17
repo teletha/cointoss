@@ -16,7 +16,7 @@ import cointoss.Directional;
 import cointoss.util.Num;
 import icy.manipulator.Icy;
 
-@Icy(classicSetterModifier = "final")
+@Icy(setterModifier = "final")
 public abstract class PositionModel implements Directional {
 
     /**

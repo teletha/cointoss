@@ -191,7 +191,7 @@ public abstract class Execution extends ExecutionModel {
      * @paran value A new value of direction property to assign.
      */
     @SuppressWarnings("unused")
-    private void setDirection(Direction value) {
+    private final void setDirection(Direction value) {
         ((ÅssignableDirection) this).direction(value);
     }
 
@@ -221,7 +221,7 @@ public abstract class Execution extends ExecutionModel {
      * @paran value A new value of size property to assign.
      */
     @SuppressWarnings("unused")
-    private void setSize(Num value) {
+    private final void setSize(Num value) {
         ((ÅssignableSize) this).size(value);
     }
 
@@ -251,7 +251,7 @@ public abstract class Execution extends ExecutionModel {
      * @paran value A new value of id property to assign.
      */
     @SuppressWarnings("unused")
-    private void setId(long value) {
+    private final void setId(long value) {
         ((ÅssignableÅrbitrary) this).id(value);
     }
 
@@ -290,7 +290,7 @@ public abstract class Execution extends ExecutionModel {
      * @paran value A new value of price property to assign.
      */
     @SuppressWarnings("unused")
-    private void setPrice(Num value) {
+    private final void setPrice(Num value) {
         ((ÅssignableÅrbitrary) this).price(value);
     }
 
@@ -340,7 +340,7 @@ public abstract class Execution extends ExecutionModel {
      * @paran value A new value of accumulative property to assign.
      */
     @SuppressWarnings("unused")
-    private void setAccumulative(Num value) {
+    private final void setAccumulative(Num value) {
         ((ÅssignableÅrbitrary) this).accumulative(value);
     }
 
@@ -379,7 +379,7 @@ public abstract class Execution extends ExecutionModel {
      * @paran value A new value of date property to assign.
      */
     @SuppressWarnings("unused")
-    private void setDate(ZonedDateTime value) {
+    private final void setDate(ZonedDateTime value) {
         ((ÅssignableÅrbitrary) this).date(value);
     }
 
@@ -418,7 +418,7 @@ public abstract class Execution extends ExecutionModel {
      * @paran value A new value of mills property to assign.
      */
     @SuppressWarnings("unused")
-    private void setMills(long value) {
+    private final void setMills(long value) {
         ((ÅssignableÅrbitrary) this).mills(value);
     }
 
@@ -457,7 +457,7 @@ public abstract class Execution extends ExecutionModel {
      * @paran value A new value of consecutive property to assign.
      */
     @SuppressWarnings("unused")
-    private void setConsecutive(int value) {
+    private final void setConsecutive(int value) {
         ((ÅssignableÅrbitrary) this).consecutive(value);
     }
 
@@ -496,7 +496,7 @@ public abstract class Execution extends ExecutionModel {
      * @paran value A new value of delay property to assign.
      */
     @SuppressWarnings("unused")
-    private void setDelay(int value) {
+    private final void setDelay(int value) {
         ((ÅssignableÅrbitrary) this).delay(value);
     }
 

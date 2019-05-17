@@ -211,7 +211,6 @@ public abstract class Order extends OrderModel {
      *
      * @paran value A new value of direction property to assign.
      */
-    @SuppressWarnings("unused")
     final void setDirection(Direction value) {
         ((ÅssignableDirection) this).direction(value);
     }
@@ -241,7 +240,6 @@ public abstract class Order extends OrderModel {
      *
      * @paran value A new value of size property to assign.
      */
-    @SuppressWarnings("unused")
     final void setSize(Num value) {
         ((ÅssignableSize) this).size(value);
     }
@@ -282,7 +280,6 @@ public abstract class Order extends OrderModel {
      *
      * @paran value A new value of price property to assign.
      */
-    @SuppressWarnings("unused")
     final void setPrice(Num value) {
         ((ÅssignableÅrbitrary) this).price(value);
     }
@@ -321,7 +318,6 @@ public abstract class Order extends OrderModel {
      *
      * @paran value A new value of type property to assign.
      */
-    @SuppressWarnings("unused")
     final void setType(OrderType value) {
         ((ÅssignableÅrbitrary) this).type(value);
     }
@@ -360,7 +356,6 @@ public abstract class Order extends OrderModel {
      *
      * @paran value A new value of quantityCondition property to assign.
      */
-    @SuppressWarnings("unused")
     final void setQuantityCondition(QuantityCondition value) {
         ((ÅssignableÅrbitrary) this).quantityCondition(value);
     }
@@ -399,7 +394,6 @@ public abstract class Order extends OrderModel {
      *
      * @paran value A new value of remainingSize property to assign.
      */
-    @SuppressWarnings("unused")
     final void setRemainingSize(Num value) {
         ((ÅssignableÅrbitrary) this).remainingSize(value);
     }
@@ -438,7 +432,6 @@ public abstract class Order extends OrderModel {
      *
      * @paran value A new value of executedSize property to assign.
      */
-    @SuppressWarnings("unused")
     final void setExecutedSize(Num value) {
         ((ÅssignableÅrbitrary) this).executedSize(value);
     }
@@ -477,7 +470,6 @@ public abstract class Order extends OrderModel {
      *
      * @paran value A new value of id property to assign.
      */
-    @SuppressWarnings("unused")
     final void setId(String value) {
         ((ÅssignableÅrbitrary) this).id(value);
     }
@@ -516,7 +508,6 @@ public abstract class Order extends OrderModel {
      *
      * @paran value A new value of creationTime property to assign.
      */
-    @SuppressWarnings("unused")
     final void setCreationTime(ZonedDateTime value) {
         ((ÅssignableÅrbitrary) this).creationTime(value);
     }
@@ -555,7 +546,6 @@ public abstract class Order extends OrderModel {
      *
      * @paran value A new value of terminationTime property to assign.
      */
-    @SuppressWarnings("unused")
     final void setTerminationTime(ZonedDateTime value) {
         ((ÅssignableÅrbitrary) this).terminationTime(value);
     }
@@ -594,7 +584,6 @@ public abstract class Order extends OrderModel {
      *
      * @paran value A new value of state property to assign.
      */
-    @SuppressWarnings("unused")
     final void setState(OrderState value) {
         ((ÅssignableÅrbitrary) this).state(value);
     }
