@@ -21,7 +21,7 @@ import viewtify.Viewtify;
  */
 public enum Sound {
 
-    なし, 追加, 注目, クリア, 来た, 完了, 削除, 下, エラー, 失敗, ゴール, 行くよ, スタート, 成功, 何か不安定みたい, 上, がーん, ばばーん, じゃじゃーん, 始めるよ, ブレークポイント, やったー, うわーん;
+    Defeat, Dominating, DoubleKill, EnemyDominating, EnemyDoubleKill, EnemyGodlike, EnemyInhibitorIsRespawned, EnemyKillingSpree, EnemyLegendary, EnemyLegendaryKill, EnemyPentaKill, EnemyQuadraKill, EnemyRampage, EnemyTripleKill, EnemyUnstoppable, Godlike, KillingSpree, Legendary, LegendaryKill, MinionHasSpawned, PentaKill, QuadraKill, Rampage, SummonerWasDisconnected, TripleKill, Unstoppable, Victory, WelcomtoSummonersRift, YourTeamDestoryedInhibitor, うわーん, がーん, じゃじゃーん, だよ, ばばーん, やったー, エラー, クリア, ゴール, スタート, ブレークポイント, 上, 下, 何か不安定みたい, 削除, 失敗, 始めるよ, 完了, 成功, 来た, 注目, 行くよ, 追加, なし;
 
     private final Signaling<String> ons = new Signaling<>();
 
@@ -43,4 +43,13 @@ public enum Sound {
             ons.accept("PLAY");
         }
     }
+
+    // public static void main(String[] args) {
+    // String value = Locator.directory("src/main/resources/sound")
+    // .walkFile()
+    // .map(file -> file.base())
+    // .scan(Collectors.joining(", ", "", ";"))
+    // .to().v;
+    // System.out.println(value);
+    // }
 }
