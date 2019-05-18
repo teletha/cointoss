@@ -76,10 +76,8 @@ public final class OrderManager {
 
         service.add(service.executionsRealtimelyForMe().to(v -> {
             // manage position
-            Direction direction = v.ⅰ;
             String id = v.ⅱ;
             Execution execution = v.ⅲ;
-            System.out.println(direction + "  " + execution);
 
             // manage order
             for (Order order : managed) {

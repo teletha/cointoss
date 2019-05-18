@@ -1002,6 +1002,15 @@ public abstract class Order extends OrderModel {
         }
 
         /**
+         * Assign {@link QuantityCondition#FillOrKill} to quantityCondition property.
+         * 
+         * @return The next assignable model.
+         */
+        default Next fillOrKill() {
+            return quantityCondition(QuantityCondition.FillOrKill);
+        }
+
+        /**
          * Assign {@link QuantityCondition#GoodTillCanceled} to quantityCondition property.
          * 
          * @return The next assignable model.
@@ -1017,15 +1026,6 @@ public abstract class Order extends OrderModel {
          */
         default Next immediateOrCancel() {
             return quantityCondition(QuantityCondition.ImmediateOrCancel);
-        }
-
-        /**
-         * Assign {@link QuantityCondition#FillOrKill} to quantityCondition property.
-         * 
-         * @return The next assignable model.
-         */
-        default Next fillOrKill() {
-            return quantityCondition(QuantityCondition.FillOrKill);
         }
 
         /**
@@ -1137,39 +1137,12 @@ public abstract class Order extends OrderModel {
         }
 
         /**
-         * Assign {@link OrderState#INIT} to state property.
-         * 
-         * @return The next assignable model.
-         */
-        default Next init() {
-            return state(OrderState.INIT);
-        }
-
-        /**
-         * Assign {@link OrderState#REQUESTING} to state property.
-         * 
-         * @return The next assignable model.
-         */
-        default Next requesting() {
-            return state(OrderState.REQUESTING);
-        }
-
-        /**
          * Assign {@link OrderState#ACTIVE} to state property.
          * 
          * @return The next assignable model.
          */
         default Next active() {
             return state(OrderState.ACTIVE);
-        }
-
-        /**
-         * Assign {@link OrderState#COMPLETED} to state property.
-         * 
-         * @return The next assignable model.
-         */
-        default Next completed() {
-            return state(OrderState.COMPLETED);
         }
 
         /**
@@ -1182,6 +1155,15 @@ public abstract class Order extends OrderModel {
         }
 
         /**
+         * Assign {@link OrderState#COMPLETED} to state property.
+         * 
+         * @return The next assignable model.
+         */
+        default Next completed() {
+            return state(OrderState.COMPLETED);
+        }
+
+        /**
          * Assign {@link OrderState#EXPIRED} to state property.
          * 
          * @return The next assignable model.
@@ -1191,12 +1173,30 @@ public abstract class Order extends OrderModel {
         }
 
         /**
+         * Assign {@link OrderState#INIT} to state property.
+         * 
+         * @return The next assignable model.
+         */
+        default Next init() {
+            return state(OrderState.INIT);
+        }
+
+        /**
          * Assign {@link OrderState#REJECTED} to state property.
          * 
          * @return The next assignable model.
          */
         default Next rejected() {
             return state(OrderState.REJECTED);
+        }
+
+        /**
+         * Assign {@link OrderState#REQUESTING} to state property.
+         * 
+         * @return The next assignable model.
+         */
+        default Next requesting() {
+            return state(OrderState.REQUESTING);
         }
     }
 
