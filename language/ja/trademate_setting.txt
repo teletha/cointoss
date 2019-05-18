@@ -1,6 +1,9 @@
 Access Token
 アクセス・トークン
 
+Account ID
+アカウントID
+
 Appearance
 外観
 
@@ -57,6 +60,9 @@ Notification Type
 
 Order Failed
 注文失敗
+
+Password
+パスワード
 
 Please get API key and API secret to use the public API provided by [BitFlyer](https://lightning.bitflyer.jp/developer).
 [BitFlyer](https://lightning.bitflyer.jp/developer)の提供する公開APIを利用するためにAPIキーとAPIシークレットを取得してください。
