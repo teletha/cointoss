@@ -48,4 +48,17 @@ public class OrderSet {
 
     /** The latest date */
     public final Calculation<ZonedDateTime> date = Viewtify.calculate(sub).item(0).flatMap(o -> o.observeCreationTimeNow());
+
+    /**
+     * Add order.
+     * 
+     * @param order
+     * @return
+     */
+    public OrderSet add(Order order) {
+        if (order != null) {
+            sub.add(order);
+        }
+        return this;
+    }
 }

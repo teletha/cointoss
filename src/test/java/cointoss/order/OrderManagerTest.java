@@ -104,4 +104,20 @@ class OrderManagerTest {
             assert o.creationTime.isEqual(market.service.now());
         });
     }
+
+    @Test
+    void manages() {
+        List<Order> list = orders.manages().toList();
+        assert list.size() == 0;
+
+        orders.requestNow(Order.with.buy(1).price(1));
+        assert list.size() == 1;
+
+        List<Order> other = orders.manages().toList();
+        assert other.size() == 1;
+
+        orders.requestNow(Order.with.sell(1).price(1));
+        assert other.size() == 2;
+        assert list.size() == 2;
+    }
 }

@@ -112,6 +112,15 @@ public final class OrderManager {
     }
 
     /**
+     * Stream for the current managed {@link Order}s and the incoming {@link Order}s.
+     * 
+     * @return
+     */
+    public Signal<Order> manages() {
+        return I.signal(managed).merge(added);
+    }
+
+    /**
      * Build the {@link Signal} which requests the specified {@link Order} to the market. This
      * method DON'T request order, you MUST subscribe {@link Signal}. If you want to request
      * actually, you can use {@link #requestNow(Order)}.

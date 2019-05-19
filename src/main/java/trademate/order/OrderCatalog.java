@@ -9,18 +9,20 @@
  */
 package trademate.order;
 
-import static cointoss.order.OrderState.*;
+import static cointoss.order.OrderState.ACTIVE;
 import static trademate.CommonText.*;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import java.util.function.Consumer;
+
+import javafx.scene.control.TreeTableRow;
 
 import cointoss.Direction;
 import cointoss.order.Order;
 import cointoss.order.OrderState;
 import cointoss.util.Num;
-import javafx.scene.control.TreeTableRow;
 import kiss.I;
 import kiss.Variable;
 import stylist.Style;
@@ -99,20 +101,20 @@ public class OrderCatalog extends View {
         amount.header(Amount).modelByProperty(OrderSet.class, o -> o.amount).model(Order.class, o -> o.remainingSize);
         price.header(Price).modelByProperty(OrderSet.class, o -> o.averagePrice).model(Order.class, o -> o.price);
 
-        OrderSet buys = new OrderSet();
-        OrderSet sells = new OrderSet();
-        I.signal(view.market().orders.items).to(order -> {
-            if (order.isBuy()) {
-                buys.sub.add(order);
-            } else {
-                sells.sub.add(order);
-            }
-        }, e -> {
+        // initialize orders on server
+        I.signal(view.market().orders.items)
+                .take(Order::isBuy)
+                .sort(Comparator.reverseOrder())
+                .scanWith(new OrderSet(), OrderSet::add)
+                .last()
+                .to(this::createOrderItem);
 
-        }, () -> {
-            if (!buys.sub.isEmpty()) createOrderItem(buys);
-            if (!sells.sub.isEmpty()) createOrderItem(sells);
-        });
+        I.signal(view.market().orders.items)
+                .take(Order::isSell)
+                .sort(Comparator.naturalOrder())
+                .scanWith(new OrderSet(), OrderSet::add)
+                .last()
+                .to(this::createOrderItem);
     }
 
     /**
@@ -131,6 +133,10 @@ public class OrderCatalog extends View {
      * @param set
      */
     public void createOrderItem(OrderSet set) {
+        if (set.sub.isEmpty()) {
+            return;
+        }
+
         UITreeItem item = table.root.createItem(set).expand(set.sub.size() != 1).removeWhenEmpty();
 
         for (Order order : set.sub) {

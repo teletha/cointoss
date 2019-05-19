@@ -14,12 +14,6 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.ToDoubleFunction;
 
-import cointoss.Market;
-import cointoss.market.bitflyer.BitFlyer;
-import cointoss.market.bitflyer.SFD;
-import cointoss.ticker.Tick;
-import cointoss.util.Chrono;
-import cointoss.util.Num;
 import javafx.collections.ObservableList;
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -32,6 +26,13 @@ import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.PathElement;
+
+import cointoss.Market;
+import cointoss.market.bitflyer.BitFlyer;
+import cointoss.market.bitflyer.SFD;
+import cointoss.ticker.Tick;
+import cointoss.util.Chrono;
+import cointoss.util.Num;
 import kiss.I;
 import stylist.Style;
 import trademate.chart.Axis.TickLable;
@@ -258,7 +259,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
      * Visualize order price in chart.
      */
     private void visualizeOrderPrice() {
-        chart.market.observe().switchMap(m -> m.orders.added.merge(I.signal(m.orders.items))).on(Viewtify.UIThread).to(o -> {
+        chart.market.observe().switchMap(m -> m.orders.manages()).on(Viewtify.UIThread).to(o -> {
             LineMark mark = o.isBuy() ? orderBuyPrice : orderSellPrice;
             TickLable label = mark.createLabel(o.price);
 

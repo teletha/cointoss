@@ -27,7 +27,7 @@ import kiss.Signaling;
 import kiss.Variable;
 
 @Icy(grouping = 2, setterModifier = "final")
-public abstract class OrderModel implements Directional {
+public abstract class OrderModel implements Directional, Comparable<OrderModel> {
 
     /** The relation holder. */
     private Map<Class, Object> relations;
@@ -540,6 +540,14 @@ public abstract class OrderModel implements Directional {
     @Deprecated
     public Signal<Execution> all() {
         return I.signal(entries);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int compareTo(OrderModel o) {
+        return price().compareTo(o.price());
     }
 
     /**
