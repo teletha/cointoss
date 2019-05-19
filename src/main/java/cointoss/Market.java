@@ -11,7 +11,6 @@ package cointoss;
 
 import static java.util.concurrent.TimeUnit.*;
 
-import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
@@ -174,15 +173,6 @@ public class Market implements Disposable {
      */
     public final Signal<Order> cancel(Order order) {
         return orders.cancel(order);
-    }
-
-    /**
-     * List up all orders.
-     * 
-     * @return A list of all orders.
-     */
-    public final List<Order> orders() {
-        return service.orders().toList();
     }
 
     /**

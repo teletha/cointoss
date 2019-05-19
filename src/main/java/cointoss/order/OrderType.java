@@ -13,7 +13,7 @@ package cointoss.order;
  * @version 2017/07/24 14:17:46
  */
 public enum OrderType {
-    LIMIT, MARKET;
+    Make, Take;
 
     /**
      * Helper.
@@ -21,6 +21,6 @@ public enum OrderType {
      * @return
      */
     public boolean isMarket() {
-        return this == MARKET;
+        return this == Take;
     }
 }

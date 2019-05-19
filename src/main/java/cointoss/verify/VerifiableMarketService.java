@@ -324,7 +324,7 @@ public class VerifiableMarketService extends MarketService {
      * @return A result.
      */
     private boolean validateTradableByPrice(BackendOrder order, Execution e) {
-        if (order.type == OrderType.MARKET) {
+        if (order.type == OrderType.Take) {
             return true;
         }
 

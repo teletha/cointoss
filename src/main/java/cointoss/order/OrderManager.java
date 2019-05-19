@@ -74,6 +74,10 @@ public final class OrderManager {
         added.to(managed::add);
         removed.to(managed::remove);
 
+        // retrieve orders on server
+        service.orders().to(addition::accept);
+
+        // retrieve orders on realtime
         service.add(service.executionsRealtimelyForMe().to(v -> {
             // manage position
             String id = v.ⅱ;

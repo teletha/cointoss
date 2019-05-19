@@ -966,21 +966,21 @@ public abstract class Order extends OrderModel {
         }
 
         /**
-         * Assign {@link OrderType#LIMIT} to type property.
+         * Assign {@link OrderType#Make} to type property.
          * 
          * @return The next assignable model.
          */
-        default Next limit() {
-            return type(OrderType.LIMIT);
+        default Next make() {
+            return type(OrderType.Make);
         }
 
         /**
-         * Assign {@link OrderType#MARKET} to type property.
+         * Assign {@link OrderType#Take} to type property.
          * 
          * @return The next assignable model.
          */
-        default Next market() {
-            return type(OrderType.MARKET);
+        default Next take() {
+            return type(OrderType.Take);
         }
 
         /**

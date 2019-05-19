@@ -9,19 +9,19 @@
  */
 package trademate.order;
 
-import static cointoss.order.OrderState.ACTIVE;
+import static cointoss.order.OrderState.*;
 import static trademate.CommonText.*;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.function.Consumer;
 
-import javafx.scene.control.TreeTableRow;
-
 import cointoss.Direction;
 import cointoss.order.Order;
 import cointoss.order.OrderState;
 import cointoss.util.Num;
+import javafx.scene.control.TreeTableRow;
+import kiss.I;
 import kiss.Variable;
 import stylist.Style;
 import stylist.StyleDSL;
@@ -98,6 +98,21 @@ public class OrderCatalog extends View {
                 .render((ui, side) -> ui.text(side).styleOnly(TradeMateStyle.Side.of(side)));
         amount.header(Amount).modelByProperty(OrderSet.class, o -> o.amount).model(Order.class, o -> o.remainingSize);
         price.header(Price).modelByProperty(OrderSet.class, o -> o.averagePrice).model(Order.class, o -> o.price);
+
+        OrderSet buys = new OrderSet();
+        OrderSet sells = new OrderSet();
+        I.signal(view.market().orders.items).to(order -> {
+            if (order.isBuy()) {
+                buys.sub.add(order);
+            } else {
+                sells.sub.add(order);
+            }
+        }, e -> {
+
+        }, () -> {
+            if (!buys.sub.isEmpty()) createOrderItem(buys);
+            if (!sells.sub.isEmpty()) createOrderItem(sells);
+        });
     }
 
     /**

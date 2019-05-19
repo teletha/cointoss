@@ -176,7 +176,7 @@ public abstract class OrderModel implements Directional {
         }
 
         if (state() == OrderState.INIT) {
-            type.accept(price.isZero() ? OrderType.MARKET : OrderType.LIMIT);
+            type.accept(price.isZero() ? OrderType.Take : OrderType.Make);
         }
         return price;
     }
@@ -188,7 +188,7 @@ public abstract class OrderModel implements Directional {
      */
     @Icy.Property
     public OrderType type() {
-        return OrderType.MARKET;
+        return OrderType.Take;
     }
 
     /**

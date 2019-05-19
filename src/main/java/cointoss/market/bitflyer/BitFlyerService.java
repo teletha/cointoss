@@ -9,7 +9,7 @@
  */
 package cointoss.market.bitflyer;
 
-import static cointoss.order.OrderState.ACTIVE;
+import static cointoss.order.OrderState.*;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -23,8 +23,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
-
-import javafx.scene.control.TextInputDialog;
 
 import org.apache.commons.codec.digest.HmacAlgorithms;
 import org.apache.commons.codec.digest.HmacUtils;
@@ -41,9 +39,11 @@ import cointoss.execution.Execution;
 import cointoss.order.Order;
 import cointoss.order.OrderBookChange;
 import cointoss.order.OrderState;
+import cointoss.order.OrderType;
 import cointoss.order.OrderUnit;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
+import javafx.scene.control.TextInputDialog;
 import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
@@ -692,11 +692,12 @@ class BitFlyerService extends MarketService {
 
         public Order toOrder() {
             Order o = Order.with.direction(side, size)
-                    .price(average_price)
+                    .price(price)
                     .remainingSize(outstanding_size)
                     .executedSize(executed_size)
                     .state(child_order_state)
                     .id(child_order_acceptance_id)
+                    .type(OrderType.Make)
                     .creationTime(LocalDateTime.parse(child_order_date, Chrono.DateTimeWithT).atZone(Chrono.UTC));
             o.relation(Internals.class).id = child_order_id;
 
