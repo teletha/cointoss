@@ -75,6 +75,7 @@ public final class OrderManager {
         removed.to(managed::remove);
 
         // retrieve orders on server
+        // don't use orders().to(addition); it completes addition signaling itself
         service.orders().to(addition::accept);
 
         // retrieve orders on realtime

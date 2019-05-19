@@ -9,7 +9,7 @@
  */
 package cointoss;
 
-import static org.immutables.value.Value.Style.ImplementationVisibility.PUBLIC;
+import static org.immutables.value.Value.Style.ImplementationVisibility.*;
 
 import java.time.Duration;
 import java.util.List;
@@ -93,6 +93,6 @@ interface MarketSettingSkeleton {
      */
     @Value.Default
     default RetryPolicy retryPolicy() {
-        return new RetryPolicy().retryMaximum(100).delayLinear(Duration.ofMillis(250)).delayMaximum(Duration.ofMinutes(2));
+        return new RetryPolicy().retryMaximum(5).delayLinear(Duration.ofMillis(1000)).delayMaximum(Duration.ofMinutes(2));
     }
 }
