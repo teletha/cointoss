@@ -13,6 +13,7 @@ import org.junit.jupiter.api.BeforeEach;
 
 import cointoss.Direction;
 import cointoss.execution.Execution;
+import cointoss.trade.Entry;
 import cointoss.trade.Trader;
 import cointoss.trade.TradingLog;
 import cointoss.util.Num;

@@ -18,7 +18,6 @@ import java.util.List;
 import cointoss.Market;
 import cointoss.analyze.Statistics;
 import cointoss.execution.Execution;
-import cointoss.trade.Trader.Entry;
 import cointoss.util.Num;
 
 public class TradingLog {

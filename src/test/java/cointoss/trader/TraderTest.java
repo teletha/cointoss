@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 
 import cointoss.Direction;
 import cointoss.execution.Execution;
+import cointoss.trade.Entry;
 import cointoss.util.Num;
 import kiss.Variable;
 
