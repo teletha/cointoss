@@ -190,9 +190,15 @@ public abstract class Execution extends ExecutionModel {
      *
      * @paran value A new value of direction property to assign.
      */
-    @SuppressWarnings("unused")
     private final void setDirection(Direction value) {
-        ((ÅssignableDirection) this).direction(value);
+        if (value == null) {
+            throw new IllegalArgumentException("The direction property requires non-null value.");
+        }
+        try {
+            directionUpdater.invoke(this, value);
+        } catch (Throwable e) {
+            throw quiet(e);
+        }
     }
 
     /**
@@ -220,9 +226,15 @@ public abstract class Execution extends ExecutionModel {
      *
      * @paran value A new value of size property to assign.
      */
-    @SuppressWarnings("unused")
     private final void setSize(Num value) {
-        ((ÅssignableSize) this).size(value);
+        if (value == null) {
+            throw new IllegalArgumentException("The size property requires non-null value.");
+        }
+        try {
+            sizeUpdater.invoke(this, assignWithAccumulative$393740119.invoke(this, value, (Consumer<Num>) ((Åssignable) this)::accumulative));
+        } catch (Throwable e) {
+            throw quiet(e);
+        }
     }
 
     /**
@@ -250,9 +262,12 @@ public abstract class Execution extends ExecutionModel {
      *
      * @paran value A new value of id property to assign.
      */
-    @SuppressWarnings("unused")
     private final void setId(long value) {
-        ((ÅssignableÅrbitrary) this).id(value);
+        try {
+            idUpdater.invoke(this, value);
+        } catch (Throwable e) {
+            throw quiet(e);
+        }
     }
 
     /**
@@ -289,9 +304,15 @@ public abstract class Execution extends ExecutionModel {
      *
      * @paran value A new value of price property to assign.
      */
-    @SuppressWarnings("unused")
     private final void setPrice(Num value) {
-        ((ÅssignableÅrbitrary) this).price(value);
+        if (value == null) {
+            value = ((Execution) this).åccessToDefaultPrice();
+        }
+        try {
+            priceUpdater.invoke(this, value);
+        } catch (Throwable e) {
+            throw quiet(e);
+        }
     }
 
     /**
@@ -339,9 +360,15 @@ public abstract class Execution extends ExecutionModel {
      *
      * @paran value A new value of accumulative property to assign.
      */
-    @SuppressWarnings("unused")
     private final void setAccumulative(Num value) {
-        ((ÅssignableÅrbitrary) this).accumulative(value);
+        if (value == null) {
+            value = ((Execution) this).åccessToDefaultAccumulative();
+        }
+        try {
+            accumulativeUpdater.invoke(this, value);
+        } catch (Throwable e) {
+            throw quiet(e);
+        }
     }
 
     /**
@@ -378,9 +405,15 @@ public abstract class Execution extends ExecutionModel {
      *
      * @paran value A new value of date property to assign.
      */
-    @SuppressWarnings("unused")
     private final void setDate(ZonedDateTime value) {
-        ((ÅssignableÅrbitrary) this).date(value);
+        if (value == null) {
+            value = ((Execution) this).åccessToDefaultDate();
+        }
+        try {
+            dateUpdater.invoke(this, assignWithMills$1373199327.invoke(this, value, (LongConsumer) ((Åssignable) this)::mills));
+        } catch (Throwable e) {
+            throw quiet(e);
+        }
     }
 
     /**
@@ -417,9 +450,12 @@ public abstract class Execution extends ExecutionModel {
      *
      * @paran value A new value of mills property to assign.
      */
-    @SuppressWarnings("unused")
     private final void setMills(long value) {
-        ((ÅssignableÅrbitrary) this).mills(value);
+        try {
+            millsUpdater.invoke(this, value);
+        } catch (Throwable e) {
+            throw quiet(e);
+        }
     }
 
     /**
@@ -456,9 +492,12 @@ public abstract class Execution extends ExecutionModel {
      *
      * @paran value A new value of consecutive property to assign.
      */
-    @SuppressWarnings("unused")
     private final void setConsecutive(int value) {
-        ((ÅssignableÅrbitrary) this).consecutive(value);
+        try {
+            consecutiveUpdater.invoke(this, value);
+        } catch (Throwable e) {
+            throw quiet(e);
+        }
     }
 
     /**
@@ -495,9 +534,12 @@ public abstract class Execution extends ExecutionModel {
      *
      * @paran value A new value of delay property to assign.
      */
-    @SuppressWarnings("unused")
     private final void setDelay(int value) {
-        ((ÅssignableÅrbitrary) this).delay(value);
+        try {
+            delayUpdater.invoke(this, value);
+        } catch (Throwable e) {
+            throw quiet(e);
+        }
     }
 
     /**
@@ -670,14 +712,7 @@ public abstract class Execution extends ExecutionModel {
          * @return The next assignable model.
          */
         default Next direction(Direction value) {
-            if (value == null) {
-                throw new IllegalArgumentException("The direction property requires non-null value.");
-            }
-            try {
-                directionUpdater.invoke(this, value);
-            } catch (Throwable e) {
-                throw quiet(e);
-            }
+            ((Execution) this).setDirection(value);
             return (Next) this;
         }
 
@@ -712,14 +747,7 @@ public abstract class Execution extends ExecutionModel {
          * @return The next assignable model.
          */
         default Next size(Num value) {
-            if (value == null) {
-                throw new IllegalArgumentException("The size property requires non-null value.");
-            }
-            try {
-                sizeUpdater.invoke(this, assignWithAccumulative$393740119.invoke(this, value, (Consumer<Num>) ((Åssignable) this)::accumulative));
-            } catch (Throwable e) {
-                throw quiet(e);
-            }
+            ((Execution) this).setSize(value);
             return (Next) this;
         }
 
@@ -792,11 +820,7 @@ public abstract class Execution extends ExecutionModel {
          * @return The next assignable model.
          */
         default Next id(long value) {
-            try {
-                idUpdater.invoke(this, value);
-            } catch (Throwable e) {
-                throw quiet(e);
-            }
+            ((Execution) this).setId(value);
             return (Next) this;
         }
 
@@ -807,14 +831,7 @@ public abstract class Execution extends ExecutionModel {
          * @return The next assignable model.
          */
         default Next price(Num value) {
-            if (value == null) {
-                value = ((Execution) this).åccessToDefaultPrice();
-            }
-            try {
-                priceUpdater.invoke(this, value);
-            } catch (Throwable e) {
-                throw quiet(e);
-            }
+            ((Execution) this).setPrice(value);
             return (Next) this;
         }
 
@@ -881,14 +898,7 @@ public abstract class Execution extends ExecutionModel {
          * @return The next assignable model.
          */
         default Next accumulative(Num value) {
-            if (value == null) {
-                value = ((Execution) this).åccessToDefaultAccumulative();
-            }
-            try {
-                accumulativeUpdater.invoke(this, value);
-            } catch (Throwable e) {
-                throw quiet(e);
-            }
+            ((Execution) this).setAccumulative(value);
             return (Next) this;
         }
 
@@ -899,14 +909,7 @@ public abstract class Execution extends ExecutionModel {
          * @return The next assignable model.
          */
         default Next date(ZonedDateTime value) {
-            if (value == null) {
-                value = ((Execution) this).åccessToDefaultDate();
-            }
-            try {
-                dateUpdater.invoke(this, assignWithMills$1373199327.invoke(this, value, (LongConsumer) ((Åssignable) this)::mills));
-            } catch (Throwable e) {
-                throw quiet(e);
-            }
+            ((Execution) this).setDate(value);
             return (Next) this;
         }
 
@@ -937,11 +940,7 @@ public abstract class Execution extends ExecutionModel {
          * @return The next assignable model.
          */
         default Next mills(long value) {
-            try {
-                millsUpdater.invoke(this, value);
-            } catch (Throwable e) {
-                throw quiet(e);
-            }
+            ((Execution) this).setMills(value);
             return (Next) this;
         }
 
@@ -952,11 +951,7 @@ public abstract class Execution extends ExecutionModel {
          * @return The next assignable model.
          */
         default Next consecutive(int value) {
-            try {
-                consecutiveUpdater.invoke(this, value);
-            } catch (Throwable e) {
-                throw quiet(e);
-            }
+            ((Execution) this).setConsecutive(value);
             return (Next) this;
         }
 
@@ -967,11 +962,7 @@ public abstract class Execution extends ExecutionModel {
          * @return The next assignable model.
          */
         default Next delay(int value) {
-            try {
-                delayUpdater.invoke(this, value);
-            } catch (Throwable e) {
-                throw quiet(e);
-            }
+            ((Execution) this).setDelay(value);
             return (Next) this;
         }
     }

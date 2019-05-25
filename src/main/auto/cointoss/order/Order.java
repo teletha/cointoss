@@ -2,6 +2,8 @@ package cointoss.order;
 
 import cointoss.Direction;
 import cointoss.util.Num;
+import cointoss.util.ObservableNumProperty;
+import cointoss.util.ObservableProperty;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
@@ -10,6 +12,7 @@ import java.time.ZonedDateTime;
 import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
 import javax.annotation.processing.Generated;
+import kiss.Signal;
 
 /**
  * Generated model for {@link OrderModel}.
@@ -75,21 +78,6 @@ public abstract class Order extends OrderModel {
 
     /** The overload or intercept method invoker. */
     private static final MethodHandle price$299539787= invoker("price", Num.class, Consumer.class);
-
-    /** The overload or intercept method invoker. */
-    private static final MethodHandle remainingSize$1566479191= invoker("remainingSize", Num.class);
-
-    /** The overload or intercept method invoker. */
-    private static final MethodHandle executedSize$1566479191= invoker("executedSize", Num.class);
-
-    /** The overload or intercept method invoker. */
-    private static final MethodHandle creationTime$1965660209= invoker("creationTime", ZonedDateTime.class);
-
-    /** The overload or intercept method invoker. */
-    private static final MethodHandle terminationTime$1965660209= invoker("terminationTime", ZonedDateTime.class);
-
-    /** The overload or intercept method invoker. */
-    private static final MethodHandle state$1391871188= invoker("state", OrderState.class);
 
     /**
      * Create special property updater.
@@ -158,8 +146,26 @@ public abstract class Order extends OrderModel {
     /** The exposed property. */
     public final Num remainingSize;
 
+    /** The property customizer. */
+    private final ObservableNumProperty remainingSizeCustomizer = new ObservableNumProperty() {
+
+        @Override
+        public Num get() {
+            return remainingSize;
+        }
+    };
+
     /** The exposed property. */
     public final Num executedSize;
+
+    /** The property customizer. */
+    private final ObservableNumProperty executedSizeCustomizer = new ObservableNumProperty() {
+
+        @Override
+        public Num get() {
+            return executedSize;
+        }
+    };
 
     /** The exposed property. */
     public final String id;
@@ -167,11 +173,38 @@ public abstract class Order extends OrderModel {
     /** The exposed property. */
     public final ZonedDateTime creationTime;
 
+    /** The property customizer. */
+    private final ObservableProperty<ZonedDateTime> creationTimeCustomizer = new ObservableProperty<ZonedDateTime>() {
+
+        @Override
+        public ZonedDateTime get() {
+            return creationTime;
+        }
+    };
+
     /** The exposed property. */
     public final ZonedDateTime terminationTime;
 
+    /** The property customizer. */
+    private final ObservableProperty<ZonedDateTime> terminationTimeCustomizer = new ObservableProperty<ZonedDateTime>() {
+
+        @Override
+        public ZonedDateTime get() {
+            return terminationTime;
+        }
+    };
+
     /** The exposed property. */
     public final OrderState state;
+
+    /** The property customizer. */
+    private final ObservableProperty<OrderState> stateCustomizer = new ObservableProperty<OrderState>() {
+
+        @Override
+        public OrderState get() {
+            return state;
+        }
+    };
 
     /**
      * HIDE CONSTRUCTOR
@@ -212,7 +245,14 @@ public abstract class Order extends OrderModel {
      * @paran value A new value of direction property to assign.
      */
     final void setDirection(Direction value) {
-        ((ÅssignableDirection) this).direction(value);
+        if (value == null) {
+            throw new IllegalArgumentException("The direction property requires non-null value.");
+        }
+        try {
+            directionUpdater.invoke(this, value);
+        } catch (Throwable e) {
+            throw quiet(e);
+        }
     }
 
     /**
@@ -241,7 +281,14 @@ public abstract class Order extends OrderModel {
      * @paran value A new value of size property to assign.
      */
     final void setSize(Num value) {
-        ((ÅssignableSize) this).size(value);
+        if (value == null) {
+            throw new IllegalArgumentException("The size property requires non-null value.");
+        }
+        try {
+            sizeUpdater.invoke(this, validateSize$393740119.invoke(this, value, (Consumer<Num>) ((Åssignable) this)::remainingSize));
+        } catch (Throwable e) {
+            throw quiet(e);
+        }
     }
 
     /**
@@ -281,7 +328,14 @@ public abstract class Order extends OrderModel {
      * @paran value A new value of price property to assign.
      */
     final void setPrice(Num value) {
-        ((ÅssignableÅrbitrary) this).price(value);
+        if (value == null) {
+            value = ((Order) this).åccessToDefaultPrice();
+        }
+        try {
+            priceUpdater.invoke(this, price$299539787.invoke(this, value, (Consumer<OrderType>) ((Åssignable) this)::type));
+        } catch (Throwable e) {
+            throw quiet(e);
+        }
     }
 
     /**
@@ -319,7 +373,14 @@ public abstract class Order extends OrderModel {
      * @paran value A new value of type property to assign.
      */
     final void setType(OrderType value) {
-        ((ÅssignableÅrbitrary) this).type(value);
+        if (value == null) {
+            value = ((Order) this).åccessToDefaultType();
+        }
+        try {
+            typeUpdater.invoke(this, value);
+        } catch (Throwable e) {
+            throw quiet(e);
+        }
     }
 
     /**
@@ -357,7 +418,14 @@ public abstract class Order extends OrderModel {
      * @paran value A new value of quantityCondition property to assign.
      */
     final void setQuantityCondition(QuantityCondition value) {
-        ((ÅssignableÅrbitrary) this).quantityCondition(value);
+        if (value == null) {
+            value = ((Order) this).åccessToDefaultQuantityCondition();
+        }
+        try {
+            quantityConditionUpdater.invoke(this, value);
+        } catch (Throwable e) {
+            throw quiet(e);
+        }
     }
 
     /**
@@ -395,7 +463,14 @@ public abstract class Order extends OrderModel {
      * @paran value A new value of remainingSize property to assign.
      */
     final void setRemainingSize(Num value) {
-        ((ÅssignableÅrbitrary) this).remainingSize(value);
+        if (value == null) {
+            value = ((Order) this).åccessToDefaultRemainingSize();
+        }
+        try {
+            remainingSizeUpdater.invoke(this, value);
+        } catch (Throwable e) {
+            throw quiet(e);
+        }
     }
 
     /**
@@ -405,6 +480,33 @@ public abstract class Order extends OrderModel {
      */
     private final Num åccessToDefaultRemainingSize() {
         return super.remainingSize();
+    }
+
+    /**
+     * Observe property diff.
+     *  
+     *  @return
+     */
+    public final Signal<Num> observeRemainingSizeDiff() {
+        return remainingSizeCustomizer.observe$Diff();
+    }
+
+    /**
+     * Observe property modification.
+     *  
+     *  @return
+     */
+    public final Signal<Num> observeRemainingSize() {
+        return remainingSizeCustomizer.observe$();
+    }
+
+    /**
+     * Observe property modification with the current value.
+     *  
+     *  @return
+     */
+    public final Signal<Num> observeRemainingSizeNow() {
+        return remainingSizeCustomizer.observe$Now();
     }
 
     /**
@@ -433,7 +535,14 @@ public abstract class Order extends OrderModel {
      * @paran value A new value of executedSize property to assign.
      */
     final void setExecutedSize(Num value) {
-        ((ÅssignableÅrbitrary) this).executedSize(value);
+        if (value == null) {
+            value = ((Order) this).åccessToDefaultExecutedSize();
+        }
+        try {
+            executedSizeUpdater.invoke(this, value);
+        } catch (Throwable e) {
+            throw quiet(e);
+        }
     }
 
     /**
@@ -443,6 +552,33 @@ public abstract class Order extends OrderModel {
      */
     private final Num åccessToDefaultExecutedSize() {
         return super.executedSize();
+    }
+
+    /**
+     * Observe property diff.
+     *  
+     *  @return
+     */
+    public final Signal<Num> observeExecutedSizeDiff() {
+        return executedSizeCustomizer.observe$Diff();
+    }
+
+    /**
+     * Observe property modification.
+     *  
+     *  @return
+     */
+    public final Signal<Num> observeExecutedSize() {
+        return executedSizeCustomizer.observe$();
+    }
+
+    /**
+     * Observe property modification with the current value.
+     *  
+     *  @return
+     */
+    public final Signal<Num> observeExecutedSizeNow() {
+        return executedSizeCustomizer.observe$Now();
     }
 
     /**
@@ -471,7 +607,14 @@ public abstract class Order extends OrderModel {
      * @paran value A new value of id property to assign.
      */
     final void setId(String value) {
-        ((ÅssignableÅrbitrary) this).id(value);
+        if (value == null) {
+            value = ((Order) this).åccessToDefaultId();
+        }
+        try {
+            idUpdater.invoke(this, value);
+        } catch (Throwable e) {
+            throw quiet(e);
+        }
     }
 
     /**
@@ -509,7 +652,15 @@ public abstract class Order extends OrderModel {
      * @paran value A new value of creationTime property to assign.
      */
     final void setCreationTime(ZonedDateTime value) {
-        ((ÅssignableÅrbitrary) this).creationTime(value);
+        if (value == null) {
+            value = ((Order) this).åccessToDefaultCreationTime();
+        }
+        try {
+            creationTimeUpdater.invoke(this, value);
+            creationTimeCustomizer.accept(this.creationTime);
+        } catch (Throwable e) {
+            throw quiet(e);
+        }
     }
 
     /**
@@ -519,6 +670,24 @@ public abstract class Order extends OrderModel {
      */
     private final ZonedDateTime åccessToDefaultCreationTime() {
         return super.creationTime();
+    }
+
+    /**
+     * Observe property modification.
+     *  
+     *  @return
+     */
+    public final Signal<ZonedDateTime> observeCreationTime() {
+        return creationTimeCustomizer.observe$();
+    }
+
+    /**
+     * Observe property modification with the current value.
+     *  
+     *  @return
+     */
+    public final Signal<ZonedDateTime> observeCreationTimeNow() {
+        return creationTimeCustomizer.observe$Now();
     }
 
     /**
@@ -547,7 +716,15 @@ public abstract class Order extends OrderModel {
      * @paran value A new value of terminationTime property to assign.
      */
     final void setTerminationTime(ZonedDateTime value) {
-        ((ÅssignableÅrbitrary) this).terminationTime(value);
+        if (value == null) {
+            value = ((Order) this).åccessToDefaultTerminationTime();
+        }
+        try {
+            terminationTimeUpdater.invoke(this, value);
+            terminationTimeCustomizer.accept(this.terminationTime);
+        } catch (Throwable e) {
+            throw quiet(e);
+        }
     }
 
     /**
@@ -557,6 +734,24 @@ public abstract class Order extends OrderModel {
      */
     private final ZonedDateTime åccessToDefaultTerminationTime() {
         return super.terminationTime();
+    }
+
+    /**
+     * Observe property modification.
+     *  
+     *  @return
+     */
+    public final Signal<ZonedDateTime> observeTerminationTime() {
+        return terminationTimeCustomizer.observe$();
+    }
+
+    /**
+     * Observe property modification with the current value.
+     *  
+     *  @return
+     */
+    public final Signal<ZonedDateTime> observeTerminationTimeNow() {
+        return terminationTimeCustomizer.observe$Now();
     }
 
     /**
@@ -585,7 +780,15 @@ public abstract class Order extends OrderModel {
      * @paran value A new value of state property to assign.
      */
     final void setState(OrderState value) {
-        ((ÅssignableÅrbitrary) this).state(value);
+        if (value == null) {
+            value = ((Order) this).åccessToDefaultState();
+        }
+        try {
+            stateUpdater.invoke(this, value);
+            stateCustomizer.accept(this.state);
+        } catch (Throwable e) {
+            throw quiet(e);
+        }
     }
 
     /**
@@ -595,6 +798,24 @@ public abstract class Order extends OrderModel {
      */
     private final OrderState åccessToDefaultState() {
         return super.state();
+    }
+
+    /**
+     * Observe property modification.
+     *  
+     *  @return
+     */
+    public final Signal<OrderState> observeState() {
+        return stateCustomizer.observe$();
+    }
+
+    /**
+     * Observe property modification with the current value.
+     *  
+     *  @return
+     */
+    public final Signal<OrderState> observeStateNow() {
+        return stateCustomizer.observe$Now();
     }
 
     /** The singleton builder. */
@@ -758,14 +979,7 @@ public abstract class Order extends OrderModel {
          * @return The next assignable model.
          */
         default Next direction(Direction value) {
-            if (value == null) {
-                throw new IllegalArgumentException("The direction property requires non-null value.");
-            }
-            try {
-                directionUpdater.invoke(this, value);
-            } catch (Throwable e) {
-                throw quiet(e);
-            }
+            ((Order) this).setDirection(value);
             return (Next) this;
         }
 
@@ -800,14 +1014,7 @@ public abstract class Order extends OrderModel {
          * @return The next assignable model.
          */
         default Next size(Num value) {
-            if (value == null) {
-                throw new IllegalArgumentException("The size property requires non-null value.");
-            }
-            try {
-                sizeUpdater.invoke(this, validateSize$393740119.invoke(this, value, (Consumer<Num>) ((Åssignable) this)::remainingSize));
-            } catch (Throwable e) {
-                throw quiet(e);
-            }
+            ((Order) this).setSize(value);
             return (Next) this;
         }
 
@@ -880,14 +1087,7 @@ public abstract class Order extends OrderModel {
          * @return The next assignable model.
          */
         default Next price(Num value) {
-            if (value == null) {
-                value = ((Order) this).åccessToDefaultPrice();
-            }
-            try {
-                priceUpdater.invoke(this, price$299539787.invoke(this, value, (Consumer<OrderType>) ((Åssignable) this)::type));
-            } catch (Throwable e) {
-                throw quiet(e);
-            }
+            ((Order) this).setPrice(value);
             return (Next) this;
         }
 
@@ -954,14 +1154,7 @@ public abstract class Order extends OrderModel {
          * @return The next assignable model.
          */
         default Next type(OrderType value) {
-            if (value == null) {
-                value = ((Order) this).åccessToDefaultType();
-            }
-            try {
-                typeUpdater.invoke(this, value);
-            } catch (Throwable e) {
-                throw quiet(e);
-            }
+            ((Order) this).setType(value);
             return (Next) this;
         }
 
@@ -990,14 +1183,7 @@ public abstract class Order extends OrderModel {
          * @return The next assignable model.
          */
         default Next quantityCondition(QuantityCondition value) {
-            if (value == null) {
-                value = ((Order) this).åccessToDefaultQuantityCondition();
-            }
-            try {
-                quantityConditionUpdater.invoke(this, value);
-            } catch (Throwable e) {
-                throw quiet(e);
-            }
+            ((Order) this).setQuantityCondition(value);
             return (Next) this;
         }
 
@@ -1035,14 +1221,7 @@ public abstract class Order extends OrderModel {
          * @return The next assignable model.
          */
         default Next remainingSize(Num value) {
-            if (value == null) {
-                value = ((Order) this).åccessToDefaultRemainingSize();
-            }
-            try {
-                remainingSizeUpdater.invoke(this, remainingSize$1566479191.invoke(this, value));
-            } catch (Throwable e) {
-                throw quiet(e);
-            }
+            ((Order) this).setRemainingSize(value);
             return (Next) this;
         }
 
@@ -1053,14 +1232,7 @@ public abstract class Order extends OrderModel {
          * @return The next assignable model.
          */
         default Next executedSize(Num value) {
-            if (value == null) {
-                value = ((Order) this).åccessToDefaultExecutedSize();
-            }
-            try {
-                executedSizeUpdater.invoke(this, executedSize$1566479191.invoke(this, value));
-            } catch (Throwable e) {
-                throw quiet(e);
-            }
+            ((Order) this).setExecutedSize(value);
             return (Next) this;
         }
 
@@ -1071,14 +1243,7 @@ public abstract class Order extends OrderModel {
          * @return The next assignable model.
          */
         default Next id(String value) {
-            if (value == null) {
-                value = ((Order) this).åccessToDefaultId();
-            }
-            try {
-                idUpdater.invoke(this, value);
-            } catch (Throwable e) {
-                throw quiet(e);
-            }
+            ((Order) this).setId(value);
             return (Next) this;
         }
 
@@ -1089,14 +1254,7 @@ public abstract class Order extends OrderModel {
          * @return The next assignable model.
          */
         default Next creationTime(ZonedDateTime value) {
-            if (value == null) {
-                value = ((Order) this).åccessToDefaultCreationTime();
-            }
-            try {
-                creationTimeUpdater.invoke(this, creationTime$1965660209.invoke(this, value));
-            } catch (Throwable e) {
-                throw quiet(e);
-            }
+            ((Order) this).setCreationTime(value);
             return (Next) this;
         }
 
@@ -1107,14 +1265,7 @@ public abstract class Order extends OrderModel {
          * @return The next assignable model.
          */
         default Next terminationTime(ZonedDateTime value) {
-            if (value == null) {
-                value = ((Order) this).åccessToDefaultTerminationTime();
-            }
-            try {
-                terminationTimeUpdater.invoke(this, terminationTime$1965660209.invoke(this, value));
-            } catch (Throwable e) {
-                throw quiet(e);
-            }
+            ((Order) this).setTerminationTime(value);
             return (Next) this;
         }
 
@@ -1125,14 +1276,7 @@ public abstract class Order extends OrderModel {
          * @return The next assignable model.
          */
         default Next state(OrderState value) {
-            if (value == null) {
-                value = ((Order) this).åccessToDefaultState();
-            }
-            try {
-                stateUpdater.invoke(this, state$1391871188.invoke(this, value));
-            } catch (Throwable e) {
-                throw quiet(e);
-            }
+            ((Order) this).setState(value);
             return (Next) this;
         }
 

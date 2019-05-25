@@ -105,7 +105,14 @@ public abstract class Position extends PositionModel {
      * @paran value A new value of direction property to assign.
      */
     final void setDirection(Direction value) {
-        ((ÅssignableDirection) this).direction(value);
+        if (value == null) {
+            throw new IllegalArgumentException("The direction property requires non-null value.");
+        }
+        try {
+            directionUpdater.invoke(this, value);
+        } catch (Throwable e) {
+            throw quiet(e);
+        }
     }
 
     /**
@@ -134,7 +141,14 @@ public abstract class Position extends PositionModel {
      * @paran value A new value of price property to assign.
      */
     final void setPrice(Num value) {
-        ((ÅssignablePrice) this).price(value);
+        if (value == null) {
+            throw new IllegalArgumentException("The price property requires non-null value.");
+        }
+        try {
+            priceUpdater.invoke(this, value);
+        } catch (Throwable e) {
+            throw quiet(e);
+        }
     }
 
     /**
@@ -163,7 +177,14 @@ public abstract class Position extends PositionModel {
      * @paran value A new value of size property to assign.
      */
     final void setSize(Num value) {
-        ((ÅssignableSize) this).size(value);
+        if (value == null) {
+            throw new IllegalArgumentException("The size property requires non-null value.");
+        }
+        try {
+            sizeUpdater.invoke(this, value);
+        } catch (Throwable e) {
+            throw quiet(e);
+        }
     }
 
     /**
@@ -192,7 +213,14 @@ public abstract class Position extends PositionModel {
      * @paran value A new value of date property to assign.
      */
     final void setDate(ZonedDateTime value) {
-        ((ÅssignableDate) this).date(value);
+        if (value == null) {
+            throw new IllegalArgumentException("The date property requires non-null value.");
+        }
+        try {
+            dateUpdater.invoke(this, value);
+        } catch (Throwable e) {
+            throw quiet(e);
+        }
     }
 
     /**
@@ -221,7 +249,14 @@ public abstract class Position extends PositionModel {
      * @paran value A new value of profit property to assign.
      */
     final void setProfit(Num value) {
-        ((ÅssignableÅrbitrary) this).profit(value);
+        if (value == null) {
+            value = ((Position) this).åccessToDefaultProfit();
+        }
+        try {
+            profitUpdater.invoke(this, value);
+        } catch (Throwable e) {
+            throw quiet(e);
+        }
     }
 
     /**
@@ -279,14 +314,7 @@ public abstract class Position extends PositionModel {
          * @return The next assignable model.
          */
         default Next direction(Direction value) {
-            if (value == null) {
-                throw new IllegalArgumentException("The direction property requires non-null value.");
-            }
-            try {
-                directionUpdater.invoke(this, value);
-            } catch (Throwable e) {
-                throw quiet(e);
-            }
+            ((Position) this).setDirection(value);
             return (Next) this;
         }
 
@@ -321,14 +349,7 @@ public abstract class Position extends PositionModel {
          * @return The next assignable model.
          */
         default Next price(Num value) {
-            if (value == null) {
-                throw new IllegalArgumentException("The price property requires non-null value.");
-            }
-            try {
-                priceUpdater.invoke(this, value);
-            } catch (Throwable e) {
-                throw quiet(e);
-            }
+            ((Position) this).setPrice(value);
             return (Next) this;
         }
     }
@@ -345,14 +366,7 @@ public abstract class Position extends PositionModel {
          * @return The next assignable model.
          */
         default Next size(Num value) {
-            if (value == null) {
-                throw new IllegalArgumentException("The size property requires non-null value.");
-            }
-            try {
-                sizeUpdater.invoke(this, value);
-            } catch (Throwable e) {
-                throw quiet(e);
-            }
+            ((Position) this).setSize(value);
             return (Next) this;
         }
     }
@@ -369,14 +383,7 @@ public abstract class Position extends PositionModel {
          * @return The next assignable model.
          */
         default Next date(ZonedDateTime value) {
-            if (value == null) {
-                throw new IllegalArgumentException("The date property requires non-null value.");
-            }
-            try {
-                dateUpdater.invoke(this, value);
-            } catch (Throwable e) {
-                throw quiet(e);
-            }
+            ((Position) this).setDate(value);
             return (Next) this;
         }
     }
@@ -393,14 +400,7 @@ public abstract class Position extends PositionModel {
          * @return The next assignable model.
          */
         default Next profit(Num value) {
-            if (value == null) {
-                value = ((Position) this).åccessToDefaultProfit();
-            }
-            try {
-                profitUpdater.invoke(this, value);
-            } catch (Throwable e) {
-                throw quiet(e);
-            }
+            ((Position) this).setProfit(value);
             return (Next) this;
         }
     }

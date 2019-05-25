@@ -20,10 +20,11 @@ import cointoss.Direction;
 import cointoss.Directional;
 import cointoss.execution.Execution;
 import cointoss.util.Num;
+import cointoss.util.ObservableNumProperty;
+import cointoss.util.ObservableProperty;
 import icy.manipulator.Icy;
 import kiss.I;
 import kiss.Signal;
-import kiss.Signaling;
 import kiss.Variable;
 
 @Icy(grouping = 2, setterModifier = "final")
@@ -206,45 +207,9 @@ public abstract class OrderModel implements Directional, Comparable<OrderModel> 
      * 
      * @return
      */
-    @Icy.Property
+    @Icy.Property(custom = ObservableNumProperty.class)
     public Num remainingSize() {
         return Num.ZERO;
-    }
-
-    /** The value stream. */
-    private final Signaling<Num> remainingSize = new Signaling();
-
-    @Icy.Intercept("remainingSize")
-    private Num remainingSize(Num size) {
-        remainingSize.accept(size);
-        return size;
-    }
-
-    /**
-     * Observe value modification.
-     * 
-     * @return
-     */
-    public final Signal<Num> observeRemainingSize() {
-        return remainingSize.expose;
-    }
-
-    /**
-     * Observe value modification.
-     * 
-     * @return
-     */
-    public final Signal<Num> observeRemainingSizeNow() {
-        return observeRemainingSize().startWith(remainingSize());
-    }
-
-    /**
-     * Observe value diff.
-     * 
-     * @return
-     */
-    public final Signal<Num> observeRemainingSizeDiff() {
-        return observeRemainingSizeNow().maps(Num.ZERO, (prev, now) -> now.minus(prev));
     }
 
     /**
@@ -252,45 +217,9 @@ public abstract class OrderModel implements Directional, Comparable<OrderModel> 
      * 
      * @return
      */
-    @Icy.Property
+    @Icy.Property(custom = ObservableNumProperty.class)
     public Num executedSize() {
         return Num.ZERO;
-    }
-
-    /** The value stream. */
-    private final Signaling<Num> executedSize = new Signaling();
-
-    @Icy.Intercept("executedSize")
-    private Num executedSize(Num size) {
-        executedSize.accept(size);
-        return size;
-    }
-
-    /**
-     * Observe value modification.
-     * 
-     * @return
-     */
-    public final Signal<Num> observeExecutedSize() {
-        return executedSize.expose;
-    }
-
-    /**
-     * Observe value modification.
-     * 
-     * @return
-     */
-    public final Signal<Num> observeExecutedSizeNow() {
-        return observeExecutedSize().startWith(executedSize());
-    }
-
-    /**
-     * Observe value diff.
-     * 
-     * @return
-     */
-    public final Signal<Num> observeExecutedSizeDiff() {
-        return observeExecutedSizeNow().maps(Num.ZERO, (prev, now) -> now.minus(prev));
     }
 
     /**
@@ -308,110 +237,29 @@ public abstract class OrderModel implements Directional, Comparable<OrderModel> 
      * 
      * @return
      */
-    @Icy.Property
+    @Icy.Property(custom = ObservableProperty.class)
     public ZonedDateTime creationTime() {
         return null;
     }
 
-    /** The value stream. */
-    private final Signaling<ZonedDateTime> creationTime = new Signaling();
-
-    @Icy.Intercept("creationTime")
-    private ZonedDateTime creationTime(ZonedDateTime date) {
-        creationTime.accept(date);
-        return date;
-    }
-
-    /**
-     * Observe value modification.
-     * 
-     * @return
-     */
-    public final Signal<ZonedDateTime> observeCreationTime() {
-        return creationTime.expose;
-    }
-
-    /**
-     * Observe value modification.
-     * 
-     * @return
-     */
-    public final Signal<ZonedDateTime> observeCreationTimeNow() {
-        return observeCreationTime().startWith(creationTime());
-    }
-
     /**
      * The termiated time of this order.
      * 
      * @return
      */
-    @Icy.Property
+    @Icy.Property(custom = ObservableProperty.class)
     public ZonedDateTime terminationTime() {
         return null;
     }
 
-    /** The value stream. */
-    private final Signaling<ZonedDateTime> terminationTime = new Signaling();
-
-    @Icy.Intercept("terminationTime")
-    private ZonedDateTime terminationTime(ZonedDateTime date) {
-        terminationTime.accept(date);
-        return date;
-    }
-
-    /**
-     * Observe value modification.
-     * 
-     * @return
-     */
-    public final Signal<ZonedDateTime> observeTerminationTime() {
-        return creationTime.expose;
-    }
-
-    /**
-     * Observe value modification.
-     * 
-     * @return
-     */
-    public final Signal<ZonedDateTime> observeTerminationTimeNow() {
-        return observeTerminationTime().startWith(terminationTime());
-    }
-
     /**
      * The termiated time of this order.
      * 
      * @return
      */
-    @Icy.Property
+    @Icy.Property(custom = ObservableProperty.class)
     public OrderState state() {
         return OrderState.INIT;
-    }
-
-    /** The value stream. */
-    private final Signaling<OrderState> state = new Signaling();
-
-    @Icy.Intercept("state")
-    private OrderState state(OrderState v) {
-        state.accept(v);
-        return v;
-    }
-
-    /**
-     * Observe value modification.
-     * 
-     * @return
-     */
-    public final Signal<OrderState> observeState() {
-        return state.expose;
-    }
-
-    /**
-     * Observe value modification.
-     * 
-     * @return
-     */
-    public final Signal<OrderState> observeStateNow() {
-        return observeState().startWith(state());
     }
 
     /**
@@ -422,6 +270,8 @@ public abstract class OrderModel implements Directional, Comparable<OrderModel> 
     public final boolean isExpired() {
         return state() == OrderState.EXPIRED;
     }
+
+    public abstract Signal<OrderState> observeState();
 
     /**
      * Check the order {@link OrderState}.
@@ -572,7 +422,7 @@ public abstract class OrderModel implements Directional, Comparable<OrderModel> 
     @Override
     public String toString() {
         return direction()
-                .mark() + size() + "@" + price() + " 残" + remainingSize() + " 済" + executedSize + " " + creationTime() + " " + state;
+                .mark() + size() + "@" + price() + " 残" + remainingSize() + " 済" + executedSize() + " " + creationTime() + " " + state();
     }
 
     /**
