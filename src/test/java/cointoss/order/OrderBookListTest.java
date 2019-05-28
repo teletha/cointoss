@@ -25,7 +25,7 @@ class OrderBookListTest {
 
     private MarketSetting setting = MarketSetting.with.baseCurrencyMinimumBidPrice(Num.ONE)
             .targetCurrencyMinimumBidSize(Num.ONE)
-            .orderBookGroupRanges(new Num[] {Num.TEN});
+            .orderBookGroupRanges(Num.TEN);
 
     @Test
     void buy() throws Exception {

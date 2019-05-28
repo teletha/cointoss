@@ -57,34 +57,34 @@ public abstract class Order extends OrderModel {
     }
 
     /** The overload or intercept method invoker. */
-    private static final MethodHandle size$206368966= invoker("size", int.class);
+    private static final MethodHandle size$126014067= invoker("size", int.class);
 
     /** The overload or intercept method invoker. */
-    private static final MethodHandle size$660433933= invoker("size", float.class);
+    private static final MethodHandle size$692723629= invoker("size", float.class);
 
     /** The overload or intercept method invoker. */
-    private static final MethodHandle size$991121389= invoker("size", long.class);
+    private static final MethodHandle size$464205572= invoker("size", long.class);
 
     /** The overload or intercept method invoker. */
-    private static final MethodHandle size$1465476136= invoker("size", double.class);
+    private static final MethodHandle size$1908112380= invoker("size", double.class);
 
     /** The overload or intercept method invoker. */
-    private static final MethodHandle validateSize$2021592163= invoker("validateSize", Num.class, Consumer.class);
+    private static final MethodHandle validateSize$1448859332= invoker("validateSize", Num.class, Consumer.class);
 
     /** The overload or intercept method invoker. */
-    private static final MethodHandle price$206368966= invoker("price", int.class);
+    private static final MethodHandle price$126014067= invoker("price", int.class);
 
     /** The overload or intercept method invoker. */
-    private static final MethodHandle price$991121389= invoker("price", long.class);
+    private static final MethodHandle price$464205572= invoker("price", long.class);
 
     /** The overload or intercept method invoker. */
-    private static final MethodHandle price$660433933= invoker("price", float.class);
+    private static final MethodHandle price$692723629= invoker("price", float.class);
 
     /** The overload or intercept method invoker. */
-    private static final MethodHandle price$1465476136= invoker("price", double.class);
+    private static final MethodHandle price$1908112380= invoker("price", double.class);
 
     /** The overload or intercept method invoker. */
-    private static final MethodHandle price$467437283= invoker("price", Num.class, Consumer.class);
+    private static final MethodHandle price$492090858= invoker("price", Num.class, Consumer.class);
 
     /**
      * Create special property updater.
@@ -292,7 +292,7 @@ public abstract class Order extends OrderModel {
             throw new IllegalArgumentException("The size property requires non-null value.");
         }
         try {
-            sizeUpdater.invoke(this, validateSize$2021592163.invoke(this, value, (Consumer<Num>) ((Åssignable) this)::remainingSize));
+            sizeUpdater.invoke(this, validateSize$1448859332.invoke(this, value, (Consumer<Num>) ((Åssignable) this)::remainingSize));
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -339,7 +339,7 @@ public abstract class Order extends OrderModel {
             value = ((Order) this).åccessToDefaultPrice();
         }
         try {
-            priceUpdater.invoke(this, price$467437283.invoke(this, value, (Consumer<OrderType>) ((Åssignable) this)::type));
+            priceUpdater.invoke(this, price$492090858.invoke(this, value, (Consumer<OrderType>) ((Åssignable) this)::type));
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -840,10 +840,10 @@ public abstract class Order extends OrderModel {
          * 
          * @return The next assignable model.
          */
-        public final Self direction(Direction direction, Num num) {
+        public final Self direction(Direction direction, Num size) {
             Åssignable o = new Åssignable();
             o.direction(direction);
-            o.size(num);
+            o.size(size);
             return (Self) o;
         }
 
@@ -895,15 +895,15 @@ public abstract class Order extends OrderModel {
             return (Self) o;
         }
 
-        /** Set direction property with Direction.BUY */
-        public final Self buy(Num num) {
+        /** Set direction property with BUY. */
+        public final Self buy(Num size) {
             Åssignable o = new Åssignable();
             o.buy();
-            o.size(num);
+            o.size(size);
             return (Self) o;
         }
 
-        /** Set direction property with Direction.BUY */
+        /** Set direction property with BUY. */
         public final Self buy(int size) {
             Åssignable o = new Åssignable();
             o.buy();
@@ -911,7 +911,7 @@ public abstract class Order extends OrderModel {
             return (Self) o;
         }
 
-        /** Set direction property with Direction.BUY */
+        /** Set direction property with BUY. */
         public final Self buy(float size) {
             Åssignable o = new Åssignable();
             o.buy();
@@ -919,7 +919,7 @@ public abstract class Order extends OrderModel {
             return (Self) o;
         }
 
-        /** Set direction property with Direction.BUY */
+        /** Set direction property with BUY. */
         public final Self buy(long size) {
             Åssignable o = new Åssignable();
             o.buy();
@@ -927,7 +927,7 @@ public abstract class Order extends OrderModel {
             return (Self) o;
         }
 
-        /** Set direction property with Direction.BUY */
+        /** Set direction property with BUY. */
         public final Self buy(double size) {
             Åssignable o = new Åssignable();
             o.buy();
@@ -935,15 +935,15 @@ public abstract class Order extends OrderModel {
             return (Self) o;
         }
 
-        /** Set direction property with Direction.SELL */
-        public final Self sell(Num num) {
+        /** Set direction property with SELL. */
+        public final Self sell(Num size) {
             Åssignable o = new Åssignable();
             o.sell();
-            o.size(num);
+            o.size(size);
             return (Self) o;
         }
 
-        /** Set direction property with Direction.SELL */
+        /** Set direction property with SELL. */
         public final Self sell(int size) {
             Åssignable o = new Åssignable();
             o.sell();
@@ -951,7 +951,7 @@ public abstract class Order extends OrderModel {
             return (Self) o;
         }
 
-        /** Set direction property with Direction.SELL */
+        /** Set direction property with SELL. */
         public final Self sell(float size) {
             Åssignable o = new Åssignable();
             o.sell();
@@ -959,7 +959,7 @@ public abstract class Order extends OrderModel {
             return (Self) o;
         }
 
-        /** Set direction property with Direction.SELL */
+        /** Set direction property with SELL. */
         public final Self sell(long size) {
             Åssignable o = new Åssignable();
             o.sell();
@@ -967,7 +967,7 @@ public abstract class Order extends OrderModel {
             return (Self) o;
         }
 
-        /** Set direction property with Direction.SELL */
+        /** Set direction property with SELL. */
         public final Self sell(double size) {
             Åssignable o = new Åssignable();
             o.sell();
@@ -1035,7 +1035,7 @@ public abstract class Order extends OrderModel {
          */
         default Next size(int size) {
             try {
-                return size((Num) size$206368966.invoke(this, size));
+                return size((Num) size$126014067.invoke(this, size));
             } catch (Throwable e) {
                 throw quiet(e);
             }
@@ -1049,7 +1049,7 @@ public abstract class Order extends OrderModel {
          */
         default Next size(float size) {
             try {
-                return size((Num) size$660433933.invoke(this, size));
+                return size((Num) size$692723629.invoke(this, size));
             } catch (Throwable e) {
                 throw quiet(e);
             }
@@ -1063,7 +1063,7 @@ public abstract class Order extends OrderModel {
          */
         default Next size(long size) {
             try {
-                return size((Num) size$991121389.invoke(this, size));
+                return size((Num) size$464205572.invoke(this, size));
             } catch (Throwable e) {
                 throw quiet(e);
             }
@@ -1077,7 +1077,7 @@ public abstract class Order extends OrderModel {
          */
         default Next size(double size) {
             try {
-                return size((Num) size$1465476136.invoke(this, size));
+                return size((Num) size$1908112380.invoke(this, size));
             } catch (Throwable e) {
                 throw quiet(e);
             }
@@ -1108,7 +1108,7 @@ public abstract class Order extends OrderModel {
          */
         default Next price(int price) {
             try {
-                return price((Num) price$206368966.invoke(this, price));
+                return price((Num) price$126014067.invoke(this, price));
             } catch (Throwable e) {
                 throw quiet(e);
             }
@@ -1122,7 +1122,7 @@ public abstract class Order extends OrderModel {
          */
         default Next price(long price) {
             try {
-                return price((Num) price$991121389.invoke(this, price));
+                return price((Num) price$464205572.invoke(this, price));
             } catch (Throwable e) {
                 throw quiet(e);
             }
@@ -1136,7 +1136,7 @@ public abstract class Order extends OrderModel {
          */
         default Next price(float price) {
             try {
-                return price((Num) price$660433933.invoke(this, price));
+                return price((Num) price$692723629.invoke(this, price));
             } catch (Throwable e) {
                 throw quiet(e);
             }
@@ -1150,7 +1150,7 @@ public abstract class Order extends OrderModel {
          */
         default Next price(double price) {
             try {
-                return price((Num) price$1465476136.invoke(this, price));
+                return price((Num) price$1908112380.invoke(this, price));
             } catch (Throwable e) {
                 throw quiet(e);
             }

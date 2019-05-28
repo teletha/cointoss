@@ -73,7 +73,7 @@ public class VerifiableMarketService extends MarketService {
     public VerifiableMarketService() {
         super("TestableExchange", "TestableMarket", MarketSetting.with.baseCurrencyMinimumBidPrice(Num.ONE)
                 .targetCurrencyMinimumBidSize(Num.ONE)
-                .orderBookGroupRanges(new Num[] {Num.ONE})
+                .orderBookGroupRanges(Num.ONE)
                 .retryPolicy(new RetryPolicy().retryMaximum(0)));
     }
 

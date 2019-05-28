@@ -290,14 +290,14 @@ public abstract class Position extends PositionModel {
             return (T) o;
         }
 
-        /** Set direction property with Direction.BUY */
+        /** Set direction property with BUY. */
         public final <T extends ÅssignablePrice<ÅssignableSize<ÅssignableDate<Self>>>> T buy() {
             Åssignable o = new Åssignable();
             o.buy();
             return (T) o;
         }
 
-        /** Set direction property with Direction.SELL */
+        /** Set direction property with SELL. */
         public final <T extends ÅssignablePrice<ÅssignableSize<ÅssignableDate<Self>>>> T sell() {
             Åssignable o = new Åssignable();
             o.sell();

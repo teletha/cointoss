@@ -52,7 +52,7 @@ public abstract class MarketSetting extends MarketSettingModel {
     }
 
     /** The overload or intercept method invoker. */
-    private static final MethodHandle deriveByMinBid$1397582373= invoker("deriveByMinBid", Num.class, Consumer.class);
+    private static final MethodHandle deriveByMinBid$592625071= invoker("deriveByMinBid", Num.class, Consumer.class);
 
     /**
      * Create special property updater.
@@ -190,7 +190,7 @@ public abstract class MarketSetting extends MarketSettingModel {
             throw new IllegalArgumentException("The targetCurrencyMinimumBidSize property requires non-null value.");
         }
         try {
-            targetCurrencyMinimumBidSizeUpdater.invoke(this, deriveByMinBid$1397582373.invoke(this, value, (Consumer<List<Num>>) ((Åssignable) this)::targetCurrencyBidSizes));
+            targetCurrencyMinimumBidSizeUpdater.invoke(this, deriveByMinBid$592625071.invoke(this, value, (Consumer<List<Num>>) ((Åssignable) this)::targetCurrencyBidSizes));
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -463,9 +463,9 @@ public abstract class MarketSetting extends MarketSettingModel {
          * 
          * @return The next assignable model.
          */
-        public final <T extends ÅssignableTargetCurrencyMinimumBidSize<ÅssignableOrderBookGroupRanges<Self>>> T baseCurrencyMinimumBidPrice(Num num) {
+        public final <T extends ÅssignableTargetCurrencyMinimumBidSize<ÅssignableOrderBookGroupRanges<Self>>> T baseCurrencyMinimumBidPrice(Num baseCurrencyMinimumBidPrice) {
             Åssignable o = new Åssignable();
-            o.baseCurrencyMinimumBidPrice(num);
+            o.baseCurrencyMinimumBidPrice(baseCurrencyMinimumBidPrice);
             return (T) o;
         }
     }
@@ -515,7 +515,7 @@ public abstract class MarketSetting extends MarketSettingModel {
          * @param value A new value to assign.
          * @return The next assignable model.
          */
-        default Next orderBookGroupRanges(Num[] value) {
+        default Next orderBookGroupRanges(Num... value) {
             ((MarketSetting) this).setOrderBookGroupRanges(value);
             return (Next) this;
         }
