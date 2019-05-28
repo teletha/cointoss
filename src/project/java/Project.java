@@ -30,7 +30,6 @@ public class Project extends bee.api.Project {
         require("org.decimal4j", "decimal4j");
         require("com.squareup.okhttp3", "okhttp", "3.14.1");
         require("com.github.signalr4j", "signalr4j", "2.0.3");
-        require("org.immutables", "value").atAnnotation();
 
         versionControlSystem("https://github.com/teletha/cointoss");
     }

@@ -9,60 +9,65 @@
  */
 package cointoss;
 
-import static org.immutables.value.Value.Style.ImplementationVisibility.*;
-
 import java.time.Duration;
 import java.util.List;
-
-import org.immutables.value.Value;
+import java.util.function.Consumer;
 
 import cointoss.execution.ExecutionDeltaLogger;
 import cointoss.execution.ExecutionLog;
 import cointoss.execution.ExecutionLogger;
 import cointoss.util.Num;
 import cointoss.util.RetryPolicy;
+import icy.manipulator.Icy;
 import kiss.I;
 
-@Value.Immutable
-@Value.Style(typeAbstract = "*Skeleton", typeImmutable = "*", visibility = PUBLIC)
-interface MarketSettingSkeleton {
+@Icy
+public abstract class MarketSettingModel {
 
     /**
      * Get the minimum bid price of the base currency.
      */
-    Num baseCurrencyMinimumBidPrice();
+    @Icy.Property
+    public abstract Num baseCurrencyMinimumBidPrice();
 
     /**
      * Get the minimum bid size of the target currency.
      */
-    Num targetCurrencyMinimumBidSize();
+    @Icy.Property
+    public abstract Num targetCurrencyMinimumBidSize();
+
+    @Icy.Intercept("targetCurrencyMinimumBidSize")
+    private Num deriveByMinBid(Num minBid, Consumer<List<Num>> targetCurrencyBidSizes) {
+        targetCurrencyBidSizes.accept(List.of(minBid, minBid.multiply(10), minBid.multiply(100), minBid.multiply(1000)));
+        return minBid;
+    }
 
     /**
      * Get the bid size range of target currency.
      */
-    default List<Num> targetCurrencyBidSizes() {
-        Num base = targetCurrencyMinimumBidSize();
-
-        return List.of(base, base.multiply(10), base.multiply(100), base.multiply(1000));
+    @Icy.Property
+    public List<Num> targetCurrencyBidSizes() {
+        return List.of(Num.ONE);
     }
 
     /**
      * Get the price range of grouped order books.
      */
-    Num[] orderBookGroupRanges();
+    @Icy.Property
+    public abstract Num[] orderBookGroupRanges();
 
     /**
      * Get the human readable size of target currency.
      */
-    @Value.Default
-    default int targetCurrencyScaleSize() {
+    @Icy.Property
+    public int targetCurrencyScaleSize() {
         return 0;
     }
 
     /**
      * Get the price range of grouped order books.
      */
-    default List<Num> orderBookGroupRangesWithBase() {
+    public List<Num> orderBookGroupRangesWithBase() {
         return I.signal(orderBookGroupRanges()).startWith(baseCurrencyMinimumBidPrice()).toList();
     }
 
@@ -71,8 +76,8 @@ interface MarketSettingSkeleton {
      * 
      * @return
      */
-    @Value.Default
-    default int acquirableExecutionSize() {
+    @Icy.Property
+    public int acquirableExecutionSize() {
         return 100;
     }
 
@@ -81,8 +86,8 @@ interface MarketSettingSkeleton {
      * 
      * @return
      */
-    @Value.Default
-    default Class<? extends ExecutionLogger> executionLogger() {
+    @Icy.Property
+    public Class<? extends ExecutionLogger> executionLogger() {
         return ExecutionDeltaLogger.class;
     }
 
@@ -91,8 +96,8 @@ interface MarketSettingSkeleton {
      * 
      * @return
      */
-    @Value.Default
-    default RetryPolicy retryPolicy() {
+    @Icy.Property(mutable = true)
+    public RetryPolicy retryPolicy() {
         return new RetryPolicy().retryMaximum(5).delayLinear(Duration.ofMillis(1000)).delayMaximum(Duration.ofMinutes(2));
     }
 }

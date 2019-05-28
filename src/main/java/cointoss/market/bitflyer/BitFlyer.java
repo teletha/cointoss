@@ -21,20 +21,18 @@ import kiss.I;
 public final class BitFlyer extends MarketServiceProvider {
 
     /** Reusable market configuration. */
-    private static MarketSetting.Builder FiatBaseSetting = MarketSetting.builder()
-            .baseCurrencyMinimumBidPrice(Num.of(1))
+    private static MarketSetting FiatBaseSetting = MarketSetting.with.baseCurrencyMinimumBidPrice(Num.of(1))
             .targetCurrencyMinimumBidSize(Num.of("0.01"))
-            .targetCurrencyScaleSize(3)
             .orderBookGroupRanges(Num.of(50, 100, 250, 500, 1000, 2500, 5000))
+            .targetCurrencyScaleSize(3)
             .acquirableExecutionSize(499)
             .executionLogger(BitFlyerLogger.class);
 
     /** Reusable market configuration. */
-    private static MarketSetting.Builder BTCBaseSetting = MarketSetting.builder()
-            .baseCurrencyMinimumBidPrice(Num.of("0.01"))
+    private static MarketSetting BTCBaseSetting = MarketSetting.with.baseCurrencyMinimumBidPrice(Num.of("0.01"))
             .targetCurrencyMinimumBidSize(Num.of("0.01"))
-            .targetCurrencyScaleSize(6)
             .orderBookGroupRanges(Num.of(0.01, 0.02, 0.05, 0.1))
+            .targetCurrencyScaleSize(6)
             .acquirableExecutionSize(499)
             .executionLogger(BitFlyerLogger.class);
 

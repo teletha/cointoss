@@ -9,7 +9,7 @@
  */
 package cointoss.market.bitflyer;
 
-import static cointoss.order.OrderState.*;
+import static cointoss.order.OrderState.ACTIVE;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -23,6 +23,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+
+import javafx.scene.control.TextInputDialog;
 
 import org.apache.commons.codec.digest.HmacAlgorithms;
 import org.apache.commons.codec.digest.HmacUtils;
@@ -43,7 +45,6 @@ import cointoss.order.OrderType;
 import cointoss.order.OrderUnit;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
-import javafx.scene.control.TextInputDialog;
 import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
@@ -109,15 +110,15 @@ class BitFlyerService extends MarketService {
     /**
      * @param type
      */
-    BitFlyerService(String type, MarketSetting.Builder setting) {
+    BitFlyerService(String type, MarketSetting setting) {
         this(type, false, setting);
     }
 
     /**
      * @param type
      */
-    BitFlyerService(String type, boolean forTest, MarketSetting.Builder setting) {
-        super("BitFlyer", type, setting.build());
+    BitFlyerService(String type, boolean forTest, MarketSetting setting) {
+        super("BitFlyer", type, setting);
 
         this.forTest = forTest;
         this.intervalOrderCheck = I.signal(0, 1, TimeUnit.SECONDS).map(v -> orders().toList()).share();

@@ -71,19 +71,17 @@ public class VerifiableMarketService extends MarketService {
      * 
      */
     public VerifiableMarketService() {
-        super("TestableExchange", "TestableMarket", MarketSetting.builder()
-                .baseCurrencyMinimumBidPrice(Num.ONE)
+        super("TestableExchange", "TestableMarket", MarketSetting.with.baseCurrencyMinimumBidPrice(Num.ONE)
                 .targetCurrencyMinimumBidSize(Num.ONE)
-                .orderBookGroupRanges(Num.of(1))
-                .retryPolicy(new RetryPolicy().retryMaximum(0))
-                .build());
+                .orderBookGroupRanges(new Num[] {Num.ONE})
+                .retryPolicy(new RetryPolicy().retryMaximum(0)));
     }
 
     /**
      * 
      */
     public VerifiableMarketService(MarketService delegation) {
-        super(delegation.exchangeName, delegation.marketName, delegation.setting.withRetryPolicy(new RetryPolicy().retryMaximum(0)));
+        super(delegation.exchangeName, delegation.marketName, delegation.setting.retryPolicy(o -> new RetryPolicy().retryMaximum(0)));
     }
 
     /**

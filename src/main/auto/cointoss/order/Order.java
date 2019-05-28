@@ -1,9 +1,16 @@
 package cointoss.order;
 
 import cointoss.Direction;
+import cointoss.order.Order;
+import cointoss.order.OrderModel;
+import cointoss.order.OrderState;
+import cointoss.order.OrderType;
+import cointoss.order.QuantityCondition;
 import cointoss.util.Num;
 import cointoss.util.ObservableNumProperty;
 import cointoss.util.ObservableProperty;
+import java.lang.String;
+import java.lang.Throwable;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
@@ -50,34 +57,34 @@ public abstract class Order extends OrderModel {
     }
 
     /** The overload or intercept method invoker. */
-    private static final MethodHandle size$101373314= invoker("size", int.class);
+    private static final MethodHandle size$206368966= invoker("size", int.class);
 
     /** The overload or intercept method invoker. */
-    private static final MethodHandle size$765429585= invoker("size", float.class);
+    private static final MethodHandle size$660433933= invoker("size", float.class);
 
     /** The overload or intercept method invoker. */
-    private static final MethodHandle size$1096117041= invoker("size", long.class);
+    private static final MethodHandle size$991121389= invoker("size", long.class);
 
     /** The overload or intercept method invoker. */
-    private static final MethodHandle size$1360480484= invoker("size", double.class);
+    private static final MethodHandle size$1465476136= invoker("size", double.class);
 
     /** The overload or intercept method invoker. */
-    private static final MethodHandle validateSize$1338268701= invoker("validateSize", Num.class, Consumer.class);
+    private static final MethodHandle validateSize$2021592163= invoker("validateSize", Num.class, Consumer.class);
 
     /** The overload or intercept method invoker. */
-    private static final MethodHandle price$101373314= invoker("price", int.class);
+    private static final MethodHandle price$206368966= invoker("price", int.class);
 
     /** The overload or intercept method invoker. */
-    private static final MethodHandle price$1096117041= invoker("price", long.class);
+    private static final MethodHandle price$991121389= invoker("price", long.class);
 
     /** The overload or intercept method invoker. */
-    private static final MethodHandle price$765429585= invoker("price", float.class);
+    private static final MethodHandle price$660433933= invoker("price", float.class);
 
     /** The overload or intercept method invoker. */
-    private static final MethodHandle price$1360480484= invoker("price", double.class);
+    private static final MethodHandle price$1465476136= invoker("price", double.class);
 
     /** The overload or intercept method invoker. */
-    private static final MethodHandle price$1402543715= invoker("price", Num.class, Consumer.class);
+    private static final MethodHandle price$467437283= invoker("price", Num.class, Consumer.class);
 
     /**
      * Create special property updater.
@@ -285,7 +292,7 @@ public abstract class Order extends OrderModel {
             throw new IllegalArgumentException("The size property requires non-null value.");
         }
         try {
-            sizeUpdater.invoke(this, validateSize$1338268701.invoke(this, value, (Consumer<Num>) ((Åssignable) this)::remainingSize));
+            sizeUpdater.invoke(this, validateSize$2021592163.invoke(this, value, (Consumer<Num>) ((Åssignable) this)::remainingSize));
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -332,7 +339,7 @@ public abstract class Order extends OrderModel {
             value = ((Order) this).åccessToDefaultPrice();
         }
         try {
-            priceUpdater.invoke(this, price$1402543715.invoke(this, value, (Consumer<OrderType>) ((Åssignable) this)::type));
+            priceUpdater.invoke(this, price$467437283.invoke(this, value, (Consumer<OrderType>) ((Åssignable) this)::type));
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -1028,7 +1035,7 @@ public abstract class Order extends OrderModel {
          */
         default Next size(int size) {
             try {
-                return size((Num) size$101373314.invoke(this, size));
+                return size((Num) size$206368966.invoke(this, size));
             } catch (Throwable e) {
                 throw quiet(e);
             }
@@ -1042,7 +1049,7 @@ public abstract class Order extends OrderModel {
          */
         default Next size(float size) {
             try {
-                return size((Num) size$765429585.invoke(this, size));
+                return size((Num) size$660433933.invoke(this, size));
             } catch (Throwable e) {
                 throw quiet(e);
             }
@@ -1056,7 +1063,7 @@ public abstract class Order extends OrderModel {
          */
         default Next size(long size) {
             try {
-                return size((Num) size$1096117041.invoke(this, size));
+                return size((Num) size$991121389.invoke(this, size));
             } catch (Throwable e) {
                 throw quiet(e);
             }
@@ -1070,7 +1077,7 @@ public abstract class Order extends OrderModel {
          */
         default Next size(double size) {
             try {
-                return size((Num) size$1360480484.invoke(this, size));
+                return size((Num) size$1465476136.invoke(this, size));
             } catch (Throwable e) {
                 throw quiet(e);
             }
@@ -1101,7 +1108,7 @@ public abstract class Order extends OrderModel {
          */
         default Next price(int price) {
             try {
-                return price((Num) price$101373314.invoke(this, price));
+                return price((Num) price$206368966.invoke(this, price));
             } catch (Throwable e) {
                 throw quiet(e);
             }
@@ -1115,7 +1122,7 @@ public abstract class Order extends OrderModel {
          */
         default Next price(long price) {
             try {
-                return price((Num) price$1096117041.invoke(this, price));
+                return price((Num) price$991121389.invoke(this, price));
             } catch (Throwable e) {
                 throw quiet(e);
             }
@@ -1129,7 +1136,7 @@ public abstract class Order extends OrderModel {
          */
         default Next price(float price) {
             try {
-                return price((Num) price$765429585.invoke(this, price));
+                return price((Num) price$660433933.invoke(this, price));
             } catch (Throwable e) {
                 throw quiet(e);
             }
@@ -1143,7 +1150,7 @@ public abstract class Order extends OrderModel {
          */
         default Next price(double price) {
             try {
-                return price((Num) price$1360480484.invoke(this, price));
+                return price((Num) price$1465476136.invoke(this, price));
             } catch (Throwable e) {
                 throw quiet(e);
             }

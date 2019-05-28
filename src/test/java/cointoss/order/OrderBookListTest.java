@@ -14,8 +14,8 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-import cointoss.MarketSetting;
 import cointoss.Direction;
+import cointoss.MarketSetting;
 import cointoss.util.Num;
 
 /**
@@ -23,11 +23,9 @@ import cointoss.util.Num;
  */
 class OrderBookListTest {
 
-    private MarketSetting setting = MarketSetting.builder()
-            .baseCurrencyMinimumBidPrice(Num.ONE)
+    private MarketSetting setting = MarketSetting.with.baseCurrencyMinimumBidPrice(Num.ONE)
             .targetCurrencyMinimumBidSize(Num.ONE)
-            .orderBookGroupRanges(Num.TEN)
-            .build();
+            .orderBookGroupRanges(new Num[] {Num.TEN});
 
     @Test
     void buy() throws Exception {
