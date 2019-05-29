@@ -52,7 +52,7 @@ public abstract class MarketSetting extends MarketSettingModel {
     }
 
     /** The overload or intercept method invoker. */
-    private static final MethodHandle deriveByMinBid$592625071= invoker("deriveByMinBid", Num.class, Consumer.class);
+    private static final MethodHandle deriveByMinBid$63004241= invoker("deriveByMinBid", Num.class, Consumer.class);
 
     /**
      * Create special property updater.
@@ -190,7 +190,7 @@ public abstract class MarketSetting extends MarketSettingModel {
             throw new IllegalArgumentException("The targetCurrencyMinimumBidSize property requires non-null value.");
         }
         try {
-            targetCurrencyMinimumBidSizeUpdater.invoke(this, deriveByMinBid$592625071.invoke(this, value, (Consumer<List<Num>>) ((Åssignable) this)::targetCurrencyBidSizes));
+            targetCurrencyMinimumBidSizeUpdater.invoke(this, deriveByMinBid$63004241.invoke(this, value, (Consumer<List<Num>>) ((Åssignable) this)::targetCurrencyBidSizes));
         } catch (Throwable e) {
             throw quiet(e);
         }
