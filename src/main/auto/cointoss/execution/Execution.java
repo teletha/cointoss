@@ -51,37 +51,37 @@ public abstract class Execution extends ExecutionModel {
     }
 
     /** The overload or intercept method invoker. */
-    private static final MethodHandle size$126014067= invoker("size", int.class);
+    private static final MethodHandle size$926550818= invoker("size", int.class);
 
     /** The overload or intercept method invoker. */
-    private static final MethodHandle size$692723629= invoker("size", float.class);
+    private static final MethodHandle size$1073516310= invoker("size", float.class);
 
     /** The overload or intercept method invoker. */
-    private static final MethodHandle size$464205572= invoker("size", long.class);
+    private static final MethodHandle size$406915549= invoker("size", long.class);
 
     /** The overload or intercept method invoker. */
-    private static final MethodHandle size$1908112380= invoker("size", double.class);
+    private static final MethodHandle size$1933934151= invoker("size", double.class);
 
     /** The overload or intercept method invoker. */
-    private static final MethodHandle assignWithAccumulative$1448859332= invoker("assignWithAccumulative", Num.class, Consumer.class);
+    private static final MethodHandle assignWithAccumulative$2067028491= invoker("assignWithAccumulative", Num.class, Consumer.class);
 
     /** The overload or intercept method invoker. */
-    private static final MethodHandle price$126014067= invoker("price", int.class);
+    private static final MethodHandle price$926550818= invoker("price", int.class);
 
     /** The overload or intercept method invoker. */
-    private static final MethodHandle price$464205572= invoker("price", long.class);
+    private static final MethodHandle price$406915549= invoker("price", long.class);
 
     /** The overload or intercept method invoker. */
-    private static final MethodHandle price$692723629= invoker("price", float.class);
+    private static final MethodHandle price$1073516310= invoker("price", float.class);
 
     /** The overload or intercept method invoker. */
-    private static final MethodHandle price$1908112380= invoker("price", double.class);
+    private static final MethodHandle price$1933934151= invoker("price", double.class);
 
     /** The overload or intercept method invoker. */
-    private static final MethodHandle date$24711245= invoker("date", int.class, int.class, int.class, int.class, int.class, int.class, int.class);
+    private static final MethodHandle date$10485054= invoker("date", int.class, int.class, int.class, int.class, int.class, int.class, int.class);
 
     /** The overload or intercept method invoker. */
-    private static final MethodHandle assignWithMills$1986662529= invoker("assignWithMills", ZonedDateTime.class, LongConsumer.class);
+    private static final MethodHandle assignWithMills$1926139999= invoker("assignWithMills", ZonedDateTime.class, LongConsumer.class);
 
     /**
      * Create special property updater.
@@ -234,7 +234,7 @@ public abstract class Execution extends ExecutionModel {
             throw new IllegalArgumentException("The size property requires non-null value.");
         }
         try {
-            sizeUpdater.invoke(this, assignWithAccumulative$1448859332.invoke(this, value, (Consumer<Num>) ((Åssignable) this)::accumulative));
+            sizeUpdater.invoke(this, assignWithAccumulative$2067028491.invoke(this, value, (Consumer<Num>) ((Åssignable) this)::accumulative));
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -413,7 +413,7 @@ public abstract class Execution extends ExecutionModel {
             value = ((Execution) this).åccessToDefaultDate();
         }
         try {
-            dateUpdater.invoke(this, assignWithMills$1986662529.invoke(this, value, (LongConsumer) ((Åssignable) this)::mills));
+            dateUpdater.invoke(this, assignWithMills$1926139999.invoke(this, value, (LongConsumer) ((Åssignable) this)::mills));
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -762,7 +762,7 @@ public abstract class Execution extends ExecutionModel {
          */
         default Next size(int size) {
             try {
-                return size((Num) size$126014067.invoke(this, size));
+                return size((Num) size$926550818.invoke(this, size));
             } catch (Throwable e) {
                 throw quiet(e);
             }
@@ -776,7 +776,7 @@ public abstract class Execution extends ExecutionModel {
          */
         default Next size(float size) {
             try {
-                return size((Num) size$692723629.invoke(this, size));
+                return size((Num) size$1073516310.invoke(this, size));
             } catch (Throwable e) {
                 throw quiet(e);
             }
@@ -790,7 +790,7 @@ public abstract class Execution extends ExecutionModel {
          */
         default Next size(long size) {
             try {
-                return size((Num) size$464205572.invoke(this, size));
+                return size((Num) size$406915549.invoke(this, size));
             } catch (Throwable e) {
                 throw quiet(e);
             }
@@ -804,7 +804,7 @@ public abstract class Execution extends ExecutionModel {
          */
         default Next size(double size) {
             try {
-                return size((Num) size$1908112380.invoke(this, size));
+                return size((Num) size$1933934151.invoke(this, size));
             } catch (Throwable e) {
                 throw quiet(e);
             }
@@ -846,7 +846,7 @@ public abstract class Execution extends ExecutionModel {
          */
         default Next price(int price) {
             try {
-                return price((Num) price$126014067.invoke(this, price));
+                return price((Num) price$926550818.invoke(this, price));
             } catch (Throwable e) {
                 throw quiet(e);
             }
@@ -860,7 +860,7 @@ public abstract class Execution extends ExecutionModel {
          */
         default Next price(long price) {
             try {
-                return price((Num) price$464205572.invoke(this, price));
+                return price((Num) price$406915549.invoke(this, price));
             } catch (Throwable e) {
                 throw quiet(e);
             }
@@ -874,7 +874,7 @@ public abstract class Execution extends ExecutionModel {
          */
         default Next price(float price) {
             try {
-                return price((Num) price$692723629.invoke(this, price));
+                return price((Num) price$1073516310.invoke(this, price));
             } catch (Throwable e) {
                 throw quiet(e);
             }
@@ -888,7 +888,7 @@ public abstract class Execution extends ExecutionModel {
          */
         default Next price(double price) {
             try {
-                return price((Num) price$1908112380.invoke(this, price));
+                return price((Num) price$1933934151.invoke(this, price));
             } catch (Throwable e) {
                 throw quiet(e);
             }
@@ -930,7 +930,7 @@ public abstract class Execution extends ExecutionModel {
          */
         default Next date(int year, int month, int day, int hour, int minute, int second, int ms) {
             try {
-                return date((ZonedDateTime) date$24711245.invoke(this, year, month, day, hour, minute, second, ms));
+                return date((ZonedDateTime) date$10485054.invoke(this, year, month, day, hour, minute, second, ms));
             } catch (Throwable e) {
                 throw quiet(e);
             }
