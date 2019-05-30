@@ -295,47 +295,6 @@ public abstract class ExecutionModel implements Directional {
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof ExecutionModel == false) {
-            return false;
-        }
-
-        ExecutionModel other = (ExecutionModel) obj;
-
-        if (id() != other.id()) {
-            return false;
-        }
-
-        if (direction() != other.direction()) {
-            return false;
-        }
-
-        if (price().isNot(other.price())) {
-            return false;
-        }
-
-        if (size().isNot(other.size())) {
-            return false;
-        }
-
-        if (date().isEqual(other.date()) == false) {
-            return false;
-        }
-
-        if (consecutive() != other.consecutive()) {
-            return false;
-        }
-
-        if (delay() != other.delay()) {
-            return false;
-        }
-        return true;
-    }
-
-    /**
      * Create the specified numbers of {@link Execution}.
      * 
      * @param numbers
