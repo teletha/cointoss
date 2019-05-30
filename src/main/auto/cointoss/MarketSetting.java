@@ -52,7 +52,7 @@ public abstract class MarketSetting extends MarketSettingModel {
     }
 
     /** The overload or intercept method invoker. */
-    private static final MethodHandle deriveByMinBid$63004241= invoker("deriveByMinBid", Num.class, Consumer.class);
+    private static final MethodHandle deriveByMinBid$473121199= invoker("deriveByMinBid", Num.class, Consumer.class);
 
     /**
      * Create special property updater.
@@ -190,7 +190,7 @@ public abstract class MarketSetting extends MarketSettingModel {
             throw new IllegalArgumentException("The targetCurrencyMinimumBidSize property requires non-null value.");
         }
         try {
-            targetCurrencyMinimumBidSizeUpdater.invoke(this, deriveByMinBid$63004241.invoke(this, value, (Consumer<List<Num>>) ((Åssignable) this)::targetCurrencyBidSizes));
+            targetCurrencyMinimumBidSizeUpdater.invoke(this, deriveByMinBid$473121199.invoke(this, value, (Consumer<List<Num>>) ((Åssignable) this)::targetCurrencyBidSizes));
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -251,22 +251,13 @@ public abstract class MarketSetting extends MarketSettingModel {
      */
     private final void setTargetCurrencyBidSizes(List<Num> value) {
         if (value == null) {
-            value = ((MarketSetting) this).åccessToDefaultTargetCurrencyBidSizes();
+            value = super.targetCurrencyBidSizes();
         }
         try {
             targetCurrencyBidSizesUpdater.invoke(this, value);
         } catch (Throwable e) {
             throw quiet(e);
         }
-    }
-
-    /**
-     * Provide accesser to super default value.
-     *
-     * @return A default value.
-     */
-    private final List<Num> åccessToDefaultTargetCurrencyBidSizes() {
-        return super.targetCurrencyBidSizes();
     }
 
     /** Get the human readable size of target currency. */
@@ -296,15 +287,6 @@ public abstract class MarketSetting extends MarketSettingModel {
         } catch (Throwable e) {
             throw quiet(e);
         }
-    }
-
-    /**
-     * Provide accesser to super default value.
-     *
-     * @return A default value.
-     */
-    private final int åccessToDefaultTargetCurrencyScaleSize() {
-        return super.targetCurrencyScaleSize();
     }
 
     /**
@@ -341,15 +323,6 @@ public abstract class MarketSetting extends MarketSettingModel {
     }
 
     /**
-     * Provide accesser to super default value.
-     *
-     * @return A default value.
-     */
-    private final int åccessToDefaultAcquirableExecutionSize() {
-        return super.acquirableExecutionSize();
-    }
-
-    /**
      * Configure {@link ExecutionLog} parser.
      *  
      *  @return
@@ -376,22 +349,13 @@ public abstract class MarketSetting extends MarketSettingModel {
      */
     private final void setExecutionLogger(Class<? extends ExecutionLogger> value) {
         if (value == null) {
-            value = ((MarketSetting) this).åccessToDefaultExecutionLogger();
+            value = super.executionLogger();
         }
         try {
             executionLoggerUpdater.invoke(this, value);
         } catch (Throwable e) {
             throw quiet(e);
         }
-    }
-
-    /**
-     * Provide accesser to super default value.
-     *
-     * @return A default value.
-     */
-    private final Class<? extends ExecutionLogger> åccessToDefaultExecutionLogger() {
-        return super.executionLogger();
     }
 
     /**
@@ -432,22 +396,13 @@ public abstract class MarketSetting extends MarketSettingModel {
      */
     private final void setRetryPolicy(RetryPolicy value) {
         if (value == null) {
-            value = ((MarketSetting) this).åccessToDefaultRetryPolicy();
+            value = super.retryPolicy();
         }
         try {
             retryPolicyUpdater.invoke(this, value);
         } catch (Throwable e) {
             throw quiet(e);
         }
-    }
-
-    /**
-     * Provide accesser to super default value.
-     *
-     * @return A default value.
-     */
-    private final RetryPolicy åccessToDefaultRetryPolicy() {
-        return super.retryPolicy();
     }
 
     /** The singleton builder. */

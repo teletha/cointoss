@@ -253,22 +253,13 @@ public abstract class Position extends PositionModel {
      */
     final void setProfit(Num value) {
         if (value == null) {
-            value = ((Position) this).åccessToDefaultProfit();
+            value = super.profit();
         }
         try {
             profitUpdater.invoke(this, value);
         } catch (Throwable e) {
             throw quiet(e);
         }
-    }
-
-    /**
-     * Provide accesser to super default value.
-     *
-     * @return A default value.
-     */
-    private final Num åccessToDefaultProfit() {
-        return super.profit();
     }
 
     /** The singleton builder. */

@@ -57,34 +57,34 @@ public abstract class Order extends OrderModel {
     }
 
     /** The overload or intercept method invoker. */
-    private static final MethodHandle size$926550818= invoker("size", int.class);
+    private static final MethodHandle size$101354429= invoker("size", int.class);
 
     /** The overload or intercept method invoker. */
-    private static final MethodHandle size$1073516310= invoker("size", float.class);
+    private static final MethodHandle size$698532521= invoker("size", float.class);
 
     /** The overload or intercept method invoker. */
-    private static final MethodHandle size$406915549= invoker("size", long.class);
+    private static final MethodHandle size$1093866057= invoker("size", long.class);
 
     /** The overload or intercept method invoker. */
-    private static final MethodHandle size$1933934151= invoker("size", double.class);
+    private static final MethodHandle size$912239839= invoker("size", double.class);
 
     /** The overload or intercept method invoker. */
-    private static final MethodHandle validateSize$2067028491= invoker("validateSize", Num.class, Consumer.class);
+    private static final MethodHandle validateSize$1683249437= invoker("validateSize", Num.class, Consumer.class);
 
     /** The overload or intercept method invoker. */
-    private static final MethodHandle price$926550818= invoker("price", int.class);
+    private static final MethodHandle price$101354429= invoker("price", int.class);
 
     /** The overload or intercept method invoker. */
-    private static final MethodHandle price$406915549= invoker("price", long.class);
+    private static final MethodHandle price$1093866057= invoker("price", long.class);
 
     /** The overload or intercept method invoker. */
-    private static final MethodHandle price$1073516310= invoker("price", float.class);
+    private static final MethodHandle price$698532521= invoker("price", float.class);
 
     /** The overload or intercept method invoker. */
-    private static final MethodHandle price$1933934151= invoker("price", double.class);
+    private static final MethodHandle price$912239839= invoker("price", double.class);
 
     /** The overload or intercept method invoker. */
-    private static final MethodHandle price$1110260017= invoker("price", Num.class, Consumer.class);
+    private static final MethodHandle price$1654949385= invoker("price", Num.class, Consumer.class);
 
     /**
      * Create special property updater.
@@ -292,7 +292,7 @@ public abstract class Order extends OrderModel {
             throw new IllegalArgumentException("The size property requires non-null value.");
         }
         try {
-            sizeUpdater.invoke(this, validateSize$2067028491.invoke(this, value, (Consumer<Num>) ((Åssignable) this)::remainingSize));
+            sizeUpdater.invoke(this, validateSize$1683249437.invoke(this, value, (Consumer<Num>) ((Åssignable) this)::remainingSize));
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -336,22 +336,13 @@ public abstract class Order extends OrderModel {
      */
     final void setPrice(Num value) {
         if (value == null) {
-            value = ((Order) this).åccessToDefaultPrice();
+            value = super.price();
         }
         try {
-            priceUpdater.invoke(this, price$1110260017.invoke(this, value, (Consumer<OrderType>) ((Åssignable) this)::type));
+            priceUpdater.invoke(this, price$1654949385.invoke(this, value, (Consumer<OrderType>) ((Åssignable) this)::type));
         } catch (Throwable e) {
             throw quiet(e);
         }
-    }
-
-    /**
-     * Provide accesser to super default value.
-     *
-     * @return A default value.
-     */
-    private final Num åccessToDefaultPrice() {
-        return super.price();
     }
 
     /**
@@ -381,22 +372,13 @@ public abstract class Order extends OrderModel {
      */
     final void setType(OrderType value) {
         if (value == null) {
-            value = ((Order) this).åccessToDefaultType();
+            value = super.type();
         }
         try {
             typeUpdater.invoke(this, value);
         } catch (Throwable e) {
             throw quiet(e);
         }
-    }
-
-    /**
-     * Provide accesser to super default value.
-     *
-     * @return A default value.
-     */
-    private final OrderType åccessToDefaultType() {
-        return super.type();
     }
 
     /**
@@ -426,22 +408,13 @@ public abstract class Order extends OrderModel {
      */
     final void setQuantityCondition(QuantityCondition value) {
         if (value == null) {
-            value = ((Order) this).åccessToDefaultQuantityCondition();
+            value = super.quantityCondition();
         }
         try {
             quantityConditionUpdater.invoke(this, value);
         } catch (Throwable e) {
             throw quiet(e);
         }
-    }
-
-    /**
-     * Provide accesser to super default value.
-     *
-     * @return A default value.
-     */
-    private final QuantityCondition åccessToDefaultQuantityCondition() {
-        return super.quantityCondition();
     }
 
     /**
@@ -471,7 +444,7 @@ public abstract class Order extends OrderModel {
      */
     final void setRemainingSize(Num value) {
         if (value == null) {
-            value = ((Order) this).åccessToDefaultRemainingSize();
+            value = super.remainingSize();
         }
         try {
             remainingSizeUpdater.invoke(this, value);
@@ -482,22 +455,28 @@ public abstract class Order extends OrderModel {
     }
 
     /**
-     * Provide accesser to super default value.
-     *
-     * @return A default value.
+     * Observe property diff.
+     *  
+     *  @return
      */
-    private final Num åccessToDefaultRemainingSize() {
-        return super.remainingSize();
-    }
-
     public final Signal<Num> observeRemainingSizeDiff() {
         return remainingSizeCustomizer.observe$Diff();
     }
 
+    /**
+     * Observe property modification.
+     *  
+     *  @return
+     */
     public final Signal<Num> observeRemainingSize() {
         return remainingSizeCustomizer.observe$();
     }
 
+    /**
+     * Observe property modification with the current value.
+     *  
+     *  @return
+     */
     public final Signal<Num> observeRemainingSizeNow() {
         return remainingSizeCustomizer.observe$Now();
     }
@@ -529,7 +508,7 @@ public abstract class Order extends OrderModel {
      */
     final void setExecutedSize(Num value) {
         if (value == null) {
-            value = ((Order) this).åccessToDefaultExecutedSize();
+            value = super.executedSize();
         }
         try {
             executedSizeUpdater.invoke(this, value);
@@ -540,22 +519,28 @@ public abstract class Order extends OrderModel {
     }
 
     /**
-     * Provide accesser to super default value.
-     *
-     * @return A default value.
+     * Observe property diff.
+     *  
+     *  @return
      */
-    private final Num åccessToDefaultExecutedSize() {
-        return super.executedSize();
-    }
-
     public final Signal<Num> observeExecutedSizeDiff() {
         return executedSizeCustomizer.observe$Diff();
     }
 
+    /**
+     * Observe property modification.
+     *  
+     *  @return
+     */
     public final Signal<Num> observeExecutedSize() {
         return executedSizeCustomizer.observe$();
     }
 
+    /**
+     * Observe property modification with the current value.
+     *  
+     *  @return
+     */
     public final Signal<Num> observeExecutedSizeNow() {
         return executedSizeCustomizer.observe$Now();
     }
@@ -587,22 +572,13 @@ public abstract class Order extends OrderModel {
      */
     final void setId(String value) {
         if (value == null) {
-            value = ((Order) this).åccessToDefaultId();
+            value = super.id();
         }
         try {
             idUpdater.invoke(this, value);
         } catch (Throwable e) {
             throw quiet(e);
         }
-    }
-
-    /**
-     * Provide accesser to super default value.
-     *
-     * @return A default value.
-     */
-    private final String åccessToDefaultId() {
-        return super.id();
     }
 
     /**
@@ -632,7 +608,7 @@ public abstract class Order extends OrderModel {
      */
     final void setCreationTime(ZonedDateTime value) {
         if (value == null) {
-            value = ((Order) this).åccessToDefaultCreationTime();
+            value = super.creationTime();
         }
         try {
             creationTimeUpdater.invoke(this, value);
@@ -643,18 +619,19 @@ public abstract class Order extends OrderModel {
     }
 
     /**
-     * Provide accesser to super default value.
-     *
-     * @return A default value.
+     * Observe property modification.
+     *  
+     *  @return
      */
-    private final ZonedDateTime åccessToDefaultCreationTime() {
-        return super.creationTime();
-    }
-
     public final Signal<ZonedDateTime> observeCreationTime() {
         return creationTimeCustomizer.observe$();
     }
 
+    /**
+     * Observe property modification with the current value.
+     *  
+     *  @return
+     */
     public final Signal<ZonedDateTime> observeCreationTimeNow() {
         return creationTimeCustomizer.observe$Now();
     }
@@ -686,7 +663,7 @@ public abstract class Order extends OrderModel {
      */
     final void setTerminationTime(ZonedDateTime value) {
         if (value == null) {
-            value = ((Order) this).åccessToDefaultTerminationTime();
+            value = super.terminationTime();
         }
         try {
             terminationTimeUpdater.invoke(this, value);
@@ -697,18 +674,19 @@ public abstract class Order extends OrderModel {
     }
 
     /**
-     * Provide accesser to super default value.
-     *
-     * @return A default value.
+     * Observe property modification.
+     *  
+     *  @return
      */
-    private final ZonedDateTime åccessToDefaultTerminationTime() {
-        return super.terminationTime();
-    }
-
     public final Signal<ZonedDateTime> observeTerminationTime() {
         return terminationTimeCustomizer.observe$();
     }
 
+    /**
+     * Observe property modification with the current value.
+     *  
+     *  @return
+     */
     public final Signal<ZonedDateTime> observeTerminationTimeNow() {
         return terminationTimeCustomizer.observe$Now();
     }
@@ -740,7 +718,7 @@ public abstract class Order extends OrderModel {
      */
     final void setState(OrderState value) {
         if (value == null) {
-            value = ((Order) this).åccessToDefaultState();
+            value = super.state();
         }
         try {
             stateUpdater.invoke(this, value);
@@ -751,18 +729,19 @@ public abstract class Order extends OrderModel {
     }
 
     /**
-     * Provide accesser to super default value.
-     *
-     * @return A default value.
+     * Observe property modification.
+     *  
+     *  @return
      */
-    private final OrderState åccessToDefaultState() {
-        return super.state();
-    }
-
     public final Signal<OrderState> observeState() {
         return stateCustomizer.observe$();
     }
 
+    /**
+     * Observe property modification with the current value.
+     *  
+     *  @return
+     */
     public final Signal<OrderState> observeStateNow() {
         return stateCustomizer.observe$Now();
     }
@@ -975,7 +954,7 @@ public abstract class Order extends OrderModel {
          */
         default Next size(int size) {
             try {
-                return size((Num) size$926550818.invoke(this, size));
+                return size((Num) size$101354429.invoke(this, size));
             } catch (Throwable e) {
                 throw quiet(e);
             }
@@ -989,7 +968,7 @@ public abstract class Order extends OrderModel {
          */
         default Next size(float size) {
             try {
-                return size((Num) size$1073516310.invoke(this, size));
+                return size((Num) size$698532521.invoke(this, size));
             } catch (Throwable e) {
                 throw quiet(e);
             }
@@ -1003,7 +982,7 @@ public abstract class Order extends OrderModel {
          */
         default Next size(long size) {
             try {
-                return size((Num) size$406915549.invoke(this, size));
+                return size((Num) size$1093866057.invoke(this, size));
             } catch (Throwable e) {
                 throw quiet(e);
             }
@@ -1017,7 +996,7 @@ public abstract class Order extends OrderModel {
          */
         default Next size(double size) {
             try {
-                return size((Num) size$1933934151.invoke(this, size));
+                return size((Num) size$912239839.invoke(this, size));
             } catch (Throwable e) {
                 throw quiet(e);
             }
@@ -1048,7 +1027,7 @@ public abstract class Order extends OrderModel {
          */
         default Next price(int price) {
             try {
-                return price((Num) price$926550818.invoke(this, price));
+                return price((Num) price$101354429.invoke(this, price));
             } catch (Throwable e) {
                 throw quiet(e);
             }
@@ -1062,7 +1041,7 @@ public abstract class Order extends OrderModel {
          */
         default Next price(long price) {
             try {
-                return price((Num) price$406915549.invoke(this, price));
+                return price((Num) price$1093866057.invoke(this, price));
             } catch (Throwable e) {
                 throw quiet(e);
             }
@@ -1076,7 +1055,7 @@ public abstract class Order extends OrderModel {
          */
         default Next price(float price) {
             try {
-                return price((Num) price$1073516310.invoke(this, price));
+                return price((Num) price$698532521.invoke(this, price));
             } catch (Throwable e) {
                 throw quiet(e);
             }
@@ -1090,7 +1069,7 @@ public abstract class Order extends OrderModel {
          */
         default Next price(double price) {
             try {
-                return price((Num) price$1933934151.invoke(this, price));
+                return price((Num) price$912239839.invoke(this, price));
             } catch (Throwable e) {
                 throw quiet(e);
             }
@@ -1137,15 +1116,6 @@ public abstract class Order extends OrderModel {
         }
 
         /**
-         * Assign {@link QuantityCondition#FillOrKill} to quantityCondition property.
-         * 
-         * @return The next assignable model.
-         */
-        default Next fillOrKill() {
-            return quantityCondition(QuantityCondition.FillOrKill);
-        }
-
-        /**
          * Assign {@link QuantityCondition#GoodTillCanceled} to quantityCondition property.
          * 
          * @return The next assignable model.
@@ -1161,6 +1131,15 @@ public abstract class Order extends OrderModel {
          */
         default Next immediateOrCancel() {
             return quantityCondition(QuantityCondition.ImmediateOrCancel);
+        }
+
+        /**
+         * Assign {@link QuantityCondition#FillOrKill} to quantityCondition property.
+         * 
+         * @return The next assignable model.
+         */
+        default Next fillOrKill() {
+            return quantityCondition(QuantityCondition.FillOrKill);
         }
 
         /**
@@ -1230,21 +1209,30 @@ public abstract class Order extends OrderModel {
         }
 
         /**
+         * Assign {@link OrderState#INIT} to state property.
+         * 
+         * @return The next assignable model.
+         */
+        default Next init() {
+            return state(OrderState.INIT);
+        }
+
+        /**
+         * Assign {@link OrderState#REQUESTING} to state property.
+         * 
+         * @return The next assignable model.
+         */
+        default Next requesting() {
+            return state(OrderState.REQUESTING);
+        }
+
+        /**
          * Assign {@link OrderState#ACTIVE} to state property.
          * 
          * @return The next assignable model.
          */
         default Next active() {
             return state(OrderState.ACTIVE);
-        }
-
-        /**
-         * Assign {@link OrderState#CANCELED} to state property.
-         * 
-         * @return The next assignable model.
-         */
-        default Next canceled() {
-            return state(OrderState.CANCELED);
         }
 
         /**
@@ -1257,6 +1245,15 @@ public abstract class Order extends OrderModel {
         }
 
         /**
+         * Assign {@link OrderState#CANCELED} to state property.
+         * 
+         * @return The next assignable model.
+         */
+        default Next canceled() {
+            return state(OrderState.CANCELED);
+        }
+
+        /**
          * Assign {@link OrderState#EXPIRED} to state property.
          * 
          * @return The next assignable model.
@@ -1266,30 +1263,12 @@ public abstract class Order extends OrderModel {
         }
 
         /**
-         * Assign {@link OrderState#INIT} to state property.
-         * 
-         * @return The next assignable model.
-         */
-        default Next init() {
-            return state(OrderState.INIT);
-        }
-
-        /**
          * Assign {@link OrderState#REJECTED} to state property.
          * 
          * @return The next assignable model.
          */
         default Next rejected() {
             return state(OrderState.REJECTED);
-        }
-
-        /**
-         * Assign {@link OrderState#REQUESTING} to state property.
-         * 
-         * @return The next assignable model.
-         */
-        default Next requesting() {
-            return state(OrderState.REQUESTING);
         }
     }
 
