@@ -17,26 +17,23 @@ import cointoss.util.Num;
 import icy.manipulator.Icy;
 
 @Icy(setterModifier = "final")
-public abstract class PositionModel implements Directional {
+public interface PositionModel extends Directional {
 
-    /**
-     * {@inheritDoc}
-     */
     @Icy.Property
     @Override
-    public abstract Direction direction();
+    Direction direction();
 
     @Icy.Property
-    public abstract Num price();
+    Num price();
 
     @Icy.Property
-    public abstract Num size();
+    Num size();
 
     @Icy.Property
-    public Num profit() {
+    ZonedDateTime date();
+
+    @Icy.Property
+    default Num profit() {
         return Num.ZERO;
     }
-
-    @Icy.Property
-    public abstract ZonedDateTime date();
 }
