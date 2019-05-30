@@ -96,7 +96,7 @@ public interface MarketSettingModel {
      * 
      * @return
      */
-    @Icy.Property(mutable = true)
+    @Icy.Property(copiable = true)
     default RetryPolicy retryPolicy() {
         return new RetryPolicy().retryMaximum(5).delayLinear(Duration.ofMillis(1000)).delayMaximum(Duration.ofMinutes(2));
     }
