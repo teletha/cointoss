@@ -22,19 +22,19 @@ import icy.manipulator.Icy;
 import kiss.I;
 
 @Icy
-public abstract class MarketSettingModel {
+public interface MarketSettingModel {
 
     /**
      * Get the minimum bid price of the base currency.
      */
     @Icy.Property
-    public abstract Num baseCurrencyMinimumBidPrice();
+    Num baseCurrencyMinimumBidPrice();
 
     /**
      * Get the minimum bid size of the target currency.
      */
     @Icy.Property
-    public abstract Num targetCurrencyMinimumBidSize();
+    Num targetCurrencyMinimumBidSize();
 
     @Icy.Intercept("targetCurrencyMinimumBidSize")
     private Num deriveByMinBid(Num minBid, Consumer<List<Num>> targetCurrencyBidSizes) {
@@ -46,7 +46,7 @@ public abstract class MarketSettingModel {
      * Get the bid size range of target currency.
      */
     @Icy.Property
-    public List<Num> targetCurrencyBidSizes() {
+    default List<Num> targetCurrencyBidSizes() {
         return List.of(Num.ONE);
     }
 
@@ -54,20 +54,20 @@ public abstract class MarketSettingModel {
      * Get the price range of grouped order books.
      */
     @Icy.Property
-    public abstract Num[] orderBookGroupRanges();
+    Num[] orderBookGroupRanges();
 
     /**
      * Get the human readable size of target currency.
      */
     @Icy.Property
-    public int targetCurrencyScaleSize() {
+    default int targetCurrencyScaleSize() {
         return 0;
     }
 
     /**
      * Get the price range of grouped order books.
      */
-    public List<Num> orderBookGroupRangesWithBase() {
+    default List<Num> orderBookGroupRangesWithBase() {
         return I.signal(orderBookGroupRanges()).startWith(baseCurrencyMinimumBidPrice()).toList();
     }
 
@@ -77,7 +77,7 @@ public abstract class MarketSettingModel {
      * @return
      */
     @Icy.Property
-    public int acquirableExecutionSize() {
+    default int acquirableExecutionSize() {
         return 100;
     }
 
@@ -87,7 +87,7 @@ public abstract class MarketSettingModel {
      * @return
      */
     @Icy.Property
-    public Class<? extends ExecutionLogger> executionLogger() {
+    default Class<? extends ExecutionLogger> executionLogger() {
         return ExecutionDeltaLogger.class;
     }
 
@@ -97,7 +97,7 @@ public abstract class MarketSettingModel {
      * @return
      */
     @Icy.Property(mutable = true)
-    public RetryPolicy retryPolicy() {
+    default RetryPolicy retryPolicy() {
         return new RetryPolicy().retryMaximum(5).delayLinear(Duration.ofMillis(1000)).delayMaximum(Duration.ofMinutes(2));
     }
 }
