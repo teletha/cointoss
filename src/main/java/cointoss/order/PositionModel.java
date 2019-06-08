@@ -16,7 +16,7 @@ import cointoss.Directional;
 import cointoss.util.Num;
 import icy.manipulator.Icy;
 
-@Icy(setterModifier = "final")
+@Icy
 public interface PositionModel extends Directional {
 
     @Icy.Property
@@ -26,13 +26,13 @@ public interface PositionModel extends Directional {
     @Icy.Property
     Num price();
 
-    @Icy.Property
+    @Icy.Property(mutable = true)
     Num size();
 
     @Icy.Property
     ZonedDateTime date();
 
-    @Icy.Property
+    @Icy.Property(mutable = true)
     default Num profit() {
         return Num.ZERO;
     }

@@ -262,6 +262,17 @@ public abstract class OrderModel implements Directional, Comparable<OrderModel> 
         return OrderState.INIT;
     }
 
+    public abstract Signal<OrderState> observeState();
+
+    /**
+     * Observe when this {@link OldOrder} will be canceled or completed.
+     * 
+     * @return A event {@link Signal}.
+     */
+    public final Signal<Order> observeTerminating() {
+        return observeState().take(OrderState.CANCELED, OrderState.COMPLETED).take(1).mapTo((Order) this);
+    }
+
     /**
      * Check the order {@link OrderState}.
      * 
@@ -270,8 +281,6 @@ public abstract class OrderModel implements Directional, Comparable<OrderModel> 
     public final boolean isExpired() {
         return state() == OrderState.EXPIRED;
     }
-
-    public abstract Signal<OrderState> observeState();
 
     /**
      * Check the order {@link OrderState}.
@@ -351,15 +360,6 @@ public abstract class OrderModel implements Directional, Comparable<OrderModel> 
      */
     public final void log(String comment, Object... params) {
         log(String.format(comment, params));
-    }
-
-    /**
-     * Observe when this {@link OldOrder} will be canceled or completed.
-     * 
-     * @return A event {@link Signal}.
-     */
-    public final Signal<Order> observeTerminating() {
-        return observeState().take(OrderState.CANCELED, OrderState.COMPLETED).take(1).mapTo((Order) this);
     }
 
     /**

@@ -9,7 +9,7 @@
  */
 package cointoss;
 
-import static java.util.concurrent.TimeUnit.*;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
@@ -71,7 +71,7 @@ public class Market implements Disposable {
 
         if (e.consecutive == Execution.ConsecutiveSameBuyer || e.consecutive == Execution.ConsecutiveSameSeller) {
             // same taker
-            e.accumulative(v -> previous.accumulative.plus(v));
+            e.assignAccumulative(v -> previous.accumulative.plus(v));
             return null;
         }
         return previous;
