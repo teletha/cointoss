@@ -27,7 +27,7 @@ import kiss.I;
 import kiss.Signal;
 import kiss.Variable;
 
-@Icy(grouping = 2, setterModifier = "final")
+@Icy(grouping = 2)
 public abstract class OrderModel implements Directional, Comparable<OrderModel> {
 
     /** The relation holder. */
@@ -207,7 +207,7 @@ public abstract class OrderModel implements Directional, Comparable<OrderModel> 
      * 
      * @return
      */
-    @Icy.Property(custom = ObservableNumProperty.class)
+    @Icy.Property(custom = ObservableNumProperty.class, mutable = true)
     public Num remainingSize() {
         return Num.ZERO;
     }
@@ -217,7 +217,7 @@ public abstract class OrderModel implements Directional, Comparable<OrderModel> 
      * 
      * @return
      */
-    @Icy.Property(custom = ObservableNumProperty.class)
+    @Icy.Property(custom = ObservableNumProperty.class, mutable = true)
     public Num executedSize() {
         return Num.ZERO;
     }
@@ -227,7 +227,7 @@ public abstract class OrderModel implements Directional, Comparable<OrderModel> 
      * 
      * @return
      */
-    @Icy.Property
+    @Icy.Property(mutable = true)
     public String id() {
         return "";
     }
@@ -237,7 +237,7 @@ public abstract class OrderModel implements Directional, Comparable<OrderModel> 
      * 
      * @return
      */
-    @Icy.Property(custom = ObservableProperty.class)
+    @Icy.Property(custom = ObservableProperty.class, mutable = true)
     public ZonedDateTime creationTime() {
         return null;
     }
@@ -247,7 +247,7 @@ public abstract class OrderModel implements Directional, Comparable<OrderModel> 
      * 
      * @return
      */
-    @Icy.Property(custom = ObservableProperty.class)
+    @Icy.Property(custom = ObservableProperty.class, mutable = true)
     public ZonedDateTime terminationTime() {
         return null;
     }
@@ -257,7 +257,7 @@ public abstract class OrderModel implements Directional, Comparable<OrderModel> 
      * 
      * @return
      */
-    @Icy.Property(custom = ObservableProperty.class)
+    @Icy.Property(custom = ObservableProperty.class, mutable = true)
     public OrderState state() {
         return OrderState.INIT;
     }

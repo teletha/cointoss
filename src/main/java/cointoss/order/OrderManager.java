@@ -94,11 +94,11 @@ public final class OrderManager {
                                 .plus(execution.price.multiply(executed))
                                 .divide(executed.plus(order.executedSize)));
                     }
-                    order.setExecutedSize(order.executedSize.plus(executed));
-                    order.setRemainingSize(order.remainingSize.minus(executed));
+                    order.assignExecutedSize(size -> size.plus(executed));
+                    order.assignRemainingSize(size -> size.minus(executed));
 
                     if (order.remainingSize.is(Num.ZERO)) {
-                        order.setState(COMPLETED);
+                        order.assignState(COMPLETED);
                     }
 
                     // pairing order and execution
@@ -130,19 +130,19 @@ public final class OrderManager {
      * @see #requestNow(Order)
      */
     public Signal<Order> request(Order order) {
-        order.setState(REQUESTING);
+        order.assignState(REQUESTING);
 
-        return service.request(order, order::setState).retryWhen(service.setting.retryPolicy()).map(id -> {
-            order.setState(ACTIVE);
-            order.setId(id);
-            order.setCreationTime(service.now());
+        return service.request(order, order::assignState).retryWhen(service.setting.retryPolicy()).map(id -> {
+            order.assignState(ACTIVE);
+            order.assignId(id);
+            order.assignCreationTime(service.now());
             order.observeTerminating().to(remove::accept);
 
             addition.accept(order);
 
             return order;
         }).effectOnError(e -> {
-            order.setState(CANCELED);
+            order.assignState(CANCELED);
         });
     }
 
@@ -171,13 +171,13 @@ public final class OrderManager {
     public Signal<Order> cancel(Order order) {
         if (order.state == ACTIVE || order.state == REQUESTING) {
             OrderState previous = order.state;
-            order.setState(REQUESTING);
+            order.assignState(REQUESTING);
 
             return service.cancel(order).retryWhen(service.setting.retryPolicy()).effect(o -> {
                 managed.remove(o);
-                o.setState(CANCELED);
+                o.assignState(CANCELED);
             }).effectOnError(e -> {
-                order.setState(previous);
+                order.assignState(previous);
             });
         } else {
             return I.signal(order);
