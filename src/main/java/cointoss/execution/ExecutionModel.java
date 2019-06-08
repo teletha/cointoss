@@ -11,8 +11,6 @@ package cointoss.execution;
 
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 import java.util.function.LongConsumer;
@@ -292,40 +290,6 @@ public abstract class ExecutionModel implements Directional {
     public String toString() {
         return id() + " " + date().toLocalDateTime() + " " + direction()
                 .mark() + " " + price() + " " + size() + " " + consecutive() + " " + delay();
-    }
-
-    /**
-     * Create the specified numbers of {@link Execution}.
-     * 
-     * @param numbers
-     * @return
-     */
-    public static List<Execution> random(int numbers) {
-        List<Execution> list = new ArrayList();
-
-        for (int i = 0; i < numbers; i++) {
-            list.add(Execution.with.direction(Direction.random(), Num.random(1, 10)).price(Num.random(1, 10)));
-        }
-
-        return list;
-    }
-
-    /**
-     * Create the sequence of {@link Execution}s.
-     * 
-     * @param size
-     * @param price
-     * @return
-     */
-    public static List<Execution> sequence(int count, Direction side, double size, double price) {
-        List<Execution> list = new ArrayList();
-
-        for (int i = 0; i < count; i++) {
-            list.add(Execution.with.direction(side, size)
-                    .price(price)
-                    .consecutive(i == 0 ? ConsecutiveDifference : side.isBuy() ? ConsecutiveSameBuyer : ConsecutiveSameSeller));
-        }
-        return list;
     }
 
     /**
