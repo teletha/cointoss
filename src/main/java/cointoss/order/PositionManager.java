@@ -220,7 +220,7 @@ public final class PositionManager implements Directional {
             Num profit = position.isBuy() ? execution.price.minus(position.price) : position.price.minus(execution.price);
             profit = profit.multiply(position.size).scale(0);
 
-            position.assignSize(profit);
+            position.assignProfit(profit);
             total = total.plus(profit);
         }
         this.profit.set(total);
