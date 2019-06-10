@@ -20,9 +20,6 @@ import cointoss.util.Num;
 import cointoss.verify.VerifiableMarket;
 import kiss.I;
 
-/**
- * @version 2018/04/02 16:49:10
- */
 public abstract class TraderTestSupport extends Trader {
 
     protected VerifiableMarket market;
@@ -35,16 +32,10 @@ public abstract class TraderTestSupport extends Trader {
      * @param provider
      */
     public TraderTestSupport() {
-        super.market = market = new VerifiableMarket();
-        this.min = market.service.setting.baseCurrencyMinimumBidPrice();
-    }
+        super(new VerifiableMarket());
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected final void initialize() {
-        // do nothing
+        this.market = (VerifiableMarket) super.market;
+        this.min = market.service.setting.baseCurrencyMinimumBidPrice();
     }
 
     @BeforeEach

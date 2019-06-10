@@ -33,10 +33,11 @@ public class BackTest {
         private Num underPrice;
 
         /**
-         * {@inheritDoc}
+         * @param market
          */
-        @Override
-        protected void initialize() {
+        private BreakoutTrading(Market market) {
+            super(market);
+
             // various events
             market.timeline.to(exe -> {
                 if (hasPosition() == false) {

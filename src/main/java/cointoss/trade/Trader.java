@@ -15,6 +15,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BooleanSupplier;
@@ -29,13 +30,10 @@ import cointoss.util.Num;
 import kiss.Signal;
 import kiss.Signaling;
 
-/**
- * @version 2017/09/05 19:39:34
- */
 public abstract class Trader {
 
     /** The market. */
-    protected Market market;
+    protected final Market market;
 
     /** The signal observers. */
     final Signaling<Boolean> closePositions = new Signaling();
@@ -65,9 +63,13 @@ public abstract class Trader {
     final List<Entry> actives = new ArrayList();
 
     /**
-     * Initialize this trading strategy.
+     * Declare your strategy.
+     * 
+     * @param market A target market to deal.
      */
-    protected abstract void initialize();
+    protected Trader(Market market) {
+        this.market = Objects.requireNonNull(market);
+    }
 
     /**
      * Detect position state.
