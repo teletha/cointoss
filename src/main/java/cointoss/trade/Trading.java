@@ -9,19 +9,15 @@
  */
 package cointoss.trade;
 
-import java.util.function.BiConsumer;
-
+import cointoss.execution.Execution;
 import cointoss.order.Order;
-import cointoss.order.OrderManager;
-import icy.manipulator.Icy;
 import kiss.Signal;
 
-@Icy
-public abstract class StopLossModel {
+public abstract class Trading {
 
-    @Icy.Property
-    public abstract Signal<?> when();
+    protected abstract void createEntry(NewEntry entry);
 
-    @Icy.Property
-    public abstract BiConsumer<OrderManager, Order> how();
+    protected abstract Signal<Order> createExit(Order entry, Execution exe);
+
+    protected abstract Signal<Order> createLossCut(Order entry, Execution exe);
 }

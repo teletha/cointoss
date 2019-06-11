@@ -23,9 +23,6 @@ import cointoss.util.Span;
 import kiss.Variable;
 import kiss.Ⅱ;
 
-/**
- * @version 2017/09/17 19:59:43
- */
 public class Entry implements Directional {
 
     /**

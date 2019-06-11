@@ -99,6 +99,20 @@ public abstract class Trader {
     }
 
     /**
+     * Create entry with the specified order.
+     * 
+     * @param order
+     * @param entry
+     */
+    protected final void entry(Order order, Trading entry) {
+        if (order == null) {
+            return;
+        }
+
+        entry.createEntry(NewEntry.with.trader(this).order(order));
+    }
+
+    /**
      * Request entry order.
      * 
      * @param side

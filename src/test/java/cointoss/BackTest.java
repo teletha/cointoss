@@ -9,13 +9,22 @@
  */
 package cointoss;
 
+import static java.time.temporal.ChronoUnit.*;
+
 import java.time.temporal.ChronoUnit;
 
+import cointoss.execution.Execution;
+import cointoss.order.Order;
 import cointoss.ticker.Tick;
 import cointoss.ticker.TickSpan;
 import cointoss.trade.Entry;
+import cointoss.trade.NewEntry;
+import cointoss.trade.StopLoss;
+import cointoss.trade.StopStrategy;
 import cointoss.trade.Trader;
+import cointoss.trade.Trading;
 import cointoss.util.Num;
+import kiss.Signal;
 
 /**
  * @version 2017/09/19 23:45:54
@@ -49,6 +58,35 @@ public class BackTest {
                     } else {
                         side = latest.isWin() ? latest.direction() : latest.inverse();
                     }
+
+                    entry(Order.with.direction(side, 0.01), new Trading() {
+
+                        int update = 1;
+
+                        @Override
+                        protected void createEntry(NewEntry entry) {
+                            entry.cancelAfter(5, MINUTES);
+                            entry.set(StopStrategy.Take);
+
+                            StopLoss.with.when(market.timeline.take(keep(5, SECONDS, e -> e.price.isLessThan(entry, underPrice))))
+                                    .how((manager, exit) -> {
+                                        manager.requestNow(exit);
+
+                                        entry.log("10秒以上約定値が%s以下になったので指値で決済開始", underPrice);
+
+                                    });
+                        }
+
+                        @Override
+                        protected Signal<Order> createLossCut(Order entry, Execution exe) {
+                            return null;
+                        }
+
+                        @Override
+                        protected Signal<Order> createExit(Order entry, Execution exe) {
+                            return null;
+                        }
+                    });
 
                     entryMarket(side, maxPositionSize, entry -> {
                         update = 1;
