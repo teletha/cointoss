@@ -9,11 +9,18 @@
  */
 package cointoss.trade;
 
+import java.time.ZonedDateTime;
+import java.time.temporal.TemporalUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BooleanSupplier;
+import java.util.function.Predicate;
 
 import cointoss.Direction;
 import cointoss.Directional;
+import cointoss.execution.Execution;
 import cointoss.order.Order;
 import cointoss.trade.OrderStrategy.Makable;
 import cointoss.trade.OrderStrategy.Takable;
@@ -60,6 +67,11 @@ public abstract class Entry implements Directional {
     protected abstract void stop();
 
     /**
+     * Declare exit orders.
+     */
+    protected abstract void stopLoss();
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -79,8 +91,54 @@ public abstract class Entry implements Directional {
         return (S) new OrderStrategy.with.OrderStrategies();
     }
 
-    public void cancel() {
+    /**
+     * <p>
+     * Create rule which the specified condition is fulfilled during the specified duration.
+     * </p>
+     * 
+     * @param time
+     * @param unit
+     * @param condition
+     * @return
+     */
+    protected final Predicate<Execution> keep(int time, TemporalUnit unit, BooleanSupplier condition) {
+        return keep(time, unit, e -> condition.getAsBoolean());
+    }
 
+    /**
+     * <p>
+     * Create rule which the specified condition is fulfilled during the specified duration.
+     * </p>
+     * 
+     * @param time
+     * @param unit
+     * @param condition
+     * @return
+     */
+    protected final Predicate<Execution> keep(int time, TemporalUnit unit, Predicate<Execution> condition) {
+        AtomicBoolean testing = new AtomicBoolean();
+        AtomicReference<ZonedDateTime> last = new AtomicReference(ZonedDateTime.now());
+
+        return e -> {
+            if (condition.test(e)) {
+                if (testing.get()) {
+                    if (e.date.isAfter(last.get())) {
+                        testing.set(false);
+                        return true;
+                    }
+                } else {
+                    testing.set(true);
+                    last.set(e.date.plus(time, unit).minusNanos(1));
+                }
+            } else {
+                if (testing.get()) {
+                    if (e.date.isAfter(last.get())) {
+                        testing.set(false);
+                    }
+                }
+            }
+            return false;
+        };
     }
 
     // /**
@@ -104,4 +162,5 @@ public abstract class Entry implements Directional {
     // .append(exitPrice().asJPY(1))
     // .toString();
     // }
+
 }

@@ -9,22 +9,11 @@
  */
 package cointoss.trade;
 
-import java.time.ZonedDateTime;
-import java.time.temporal.TemporalUnit;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Deque;
-import java.util.List;
+import java.util.LinkedList;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.BooleanSupplier;
-import java.util.function.Predicate;
+import java.util.function.Function;
 
 import cointoss.Market;
-import cointoss.execution.Execution;
-import cointoss.order.Order;
-import cointoss.util.Num;
 import kiss.Signal;
 import kiss.Signaling;
 
@@ -32,12 +21,6 @@ public abstract class Trader {
 
     /** The market. */
     protected final Market market;
-
-    /** The signal observers. */
-    final Signaling<Boolean> closePositions = new Signaling();
-
-    /** The trade related signal. */
-    protected final Signal<Boolean> closingPosition = closePositions.expose;
 
     /** The signal observers. */
     final Signaling<Boolean> completeEntries = new Signaling();
@@ -51,14 +34,8 @@ public abstract class Trader {
     /** The trade related signal. */
     protected final Signal<Boolean> completingExit = completeExits.expose;
 
-    /** The user setting. */
-    protected Num maxPositionSize = Num.of(1);
-
     /** All managed entries. */
-    public final Deque<Entry> entries = new ArrayDeque<>();
-
-    /*** All active posiitons. */
-    final List<Entry> actives = new ArrayList();
+    private final LinkedList<Entry> entries = new LinkedList<>();
 
     /**
      * Declare your strategy.
@@ -70,21 +47,14 @@ public abstract class Trader {
     }
 
     /**
-     * Detect position state.
+     * Add {@link Entry}.
      * 
-     * @return
+     * @param entry An entry to add.
      */
-    protected final boolean hasPosition() {
-        return actives.isEmpty() == false;
-    }
-
-    /**
-     * Detect position state.
-     * 
-     * @return
-     */
-    protected final boolean hasNotPosition() {
-        return actives.isEmpty() == true;
+    protected final void add(Entry entry) {
+        if (entry != null) {
+            entries.add(entry);
+        }
     }
 
     /**
@@ -96,86 +66,7 @@ public abstract class Trader {
         return entries.peekLast();
     }
 
-    /**
-     * Close entry and position.
-     * 
-     * @param oae
-     */
-    protected final void close() {
-        closePositions.accept(true);
-    }
+    protected final <T> void entryWhen(Signal<T> timing, Function<T, Entry> entryBuilder) {
 
-    /**
-     * <p>
-     * Create rule which the specified condition is fulfilled during the specified duration.
-     * </p>
-     * 
-     * @param time
-     * @param unit
-     * @param condition
-     * @return
-     */
-    protected final Predicate<Execution> keep(int time, TemporalUnit unit, BooleanSupplier condition) {
-        return keep(time, unit, e -> condition.getAsBoolean());
-    }
-
-    /**
-     * <p>
-     * Create rule which the specified condition is fulfilled during the specified duration.
-     * </p>
-     * 
-     * @param time
-     * @param unit
-     * @param condition
-     * @return
-     */
-    protected final Predicate<Execution> keep(int time, TemporalUnit unit, Predicate<Execution> condition) {
-        AtomicBoolean testing = new AtomicBoolean();
-        AtomicReference<ZonedDateTime> last = new AtomicReference(ZonedDateTime.now());
-
-        return e -> {
-            if (condition.test(e)) {
-                if (testing.get()) {
-                    if (e.date.isAfter(last.get())) {
-                        testing.set(false);
-                        return true;
-                    }
-                } else {
-                    testing.set(true);
-                    last.set(e.date.plus(time, unit).minusNanos(1));
-                }
-            } else {
-                if (testing.get()) {
-                    if (e.date.isAfter(last.get())) {
-                        testing.set(false);
-                    }
-                }
-            }
-            return false;
-        };
-    }
-
-    /**
-     * Cancel entry.
-     * 
-     * @param entry
-     */
-    protected final void cancel(Entry entry) {
-        if (entry != null) {
-            entry.cancel();
-        }
-    }
-
-    /**
-     * Cancel entry.
-     * 
-     * @param order
-     */
-    protected final void cancel(Order order) {
-        if (order != null && order.isNotCompleted()) {
-            market.cancel(order).to(id -> {
-
-            });
-        }
     }
 }

@@ -9,7 +9,7 @@
  */
 package cointoss;
 
-import static cointoss.ticker.TickSpan.*;
+import static cointoss.ticker.TickSpan.Minute1;
 import static java.time.temporal.ChronoUnit.*;
 
 import cointoss.trade.Entry;
@@ -29,27 +29,28 @@ public class BackTest {
             super(market);
 
             // various events
-            market.tickers.of(Minute1).add.to(tick -> {
-                if (hasPosition() == false) {
+            entryWhen(market.tickers.of(Minute1).add, tick -> {
+                return new Entry(Direction.random()) {
+                    Num diff = Num.of(-2000);
 
-                    new Entry(Direction.random()) {
-                        Num diff = Num.of(-2000);
+                    @Override
+                    protected void order() {
+                        order(0.01).makeBestPrice().cancelAfter(5, MINUTES);
+                    }
 
-                        @Override
-                        protected void order() {
-                            order(0.01).makeBestPrice().cancelAfter(5, MINUTES);
-                        }
+                    @Override
+                    protected void stop() {
+                        stop.when(market.timeline.take(e -> e.price.isGreaterThan(this, price)))
+                                .how(OrderStrategy.with.makeLowest().cancelAfter(30, SECONDS).take());
 
-                        @Override
-                        protected void stop() {
-                            stop.when(market.timeline.take(e -> e.price.isGreaterThan(this, price)))
-                                    .how(OrderStrategy.with.makeLowest().cancelAfter(30, SECONDS).take());
+                    }
 
-                            stopLoss.when(market.timeline.take(keep(5, SECONDS, e -> e.price.isLessThan(this, price.plus(diff)))))
-                                    .how(OrderStrategy.with.make(price.plus(diff)).cancelAfter(30, SECONDS).take());
-                        }
-                    };
-                }
+                    @Override
+                    protected void stopLoss() {
+                        stopLoss.when(market.timeline.take(keep(5, SECONDS, e -> e.price.isLessThan(this, price.plus(diff)))))
+                                .how(OrderStrategy.with.make(price.plus(diff)).cancelAfter(30, SECONDS).take());
+                    }
+                };
             });
         }
     }
