@@ -142,7 +142,7 @@ class BitFlyerService extends MarketService {
 
         if (forTest || maintainer.session() == null) {
             ChildOrderRequest request = new ChildOrderRequest();
-            request.child_order_type = order.type == OrderType.Make ? "LIMIT" : "MARKET";
+            request.child_order_type = order.type == OrderType.Maker ? "LIMIT" : "MARKET";
             request.minute_to_expire = 60 * 24;
             request.price = order.price.toInt();
             request.product_code = marketName;
@@ -154,7 +154,7 @@ class BitFlyerService extends MarketService {
         } else {
             ChildOrderRequestWebAPI request = new ChildOrderRequestWebAPI();
             request.account_id = account.accountId.v;
-            request.ord_type = order.type == OrderType.Make ? "LIMIT" : "MARKET";
+            request.ord_type = order.type == OrderType.Maker ? "LIMIT" : "MARKET";
             request.minute_to_expire = 60 * 24;
             request.order_ref_id = id;
             request.price = order.price.toInt();
@@ -698,7 +698,7 @@ class BitFlyerService extends MarketService {
                     .executedSize(executed_size)
                     .state(child_order_state)
                     .id(child_order_acceptance_id)
-                    .type(OrderType.Make)
+                    .type(OrderType.Maker)
                     .creationTime(LocalDateTime.parse(child_order_date, Chrono.DateTimeWithT).atZone(Chrono.UTC));
             o.relation(Internals.class).id = child_order_id;
 

@@ -273,7 +273,7 @@ public class VerifiableMarketService extends MarketService {
 
             if (validateTradableByPrice(order, e)) {
                 Num executedSize = Num.min(e.size, order.remainingSize);
-                if (order.type.isMarket() && executedSize.isNot(0)) {
+                if (order.type.isTaker() && executedSize.isNot(0)) {
                     order.marketMinPrice = order.isBuy() ? Num.max(order.marketMinPrice, e.price) : Num.min(order.marketMinPrice, e.price);
                     order.price = order.price.multiply(order.executedSize)
                             .plus(order.marketMinPrice.multiply(executedSize))
@@ -283,7 +283,7 @@ public class VerifiableMarketService extends MarketService {
                 order.remainingSize = order.remainingSize.minus(executedSize);
 
                 Execution exe = Execution.with.direction(order.direction(), executedSize)
-                        .price(order.type.isMarket() ? order.marketMinPrice : order.price)
+                        .price(order.type.isTaker() ? order.marketMinPrice : order.price)
                         .date(e.date);
                 executeds.add(exe);
 
@@ -322,7 +322,7 @@ public class VerifiableMarketService extends MarketService {
      * @return A result.
      */
     private boolean validateTradableByPrice(BackendOrder order, Execution e) {
-        if (order.type == OrderType.Take) {
+        if (order.type == OrderType.Taker) {
             return true;
         }
 

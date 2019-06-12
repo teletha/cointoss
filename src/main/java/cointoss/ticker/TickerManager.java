@@ -71,7 +71,7 @@ public final class TickerManager {
      * 
      * @param span The target {@link TickSpan}.
      */
-    public Ticker tickerBy(TickSpan span) {
+    public Ticker of(TickSpan span) {
         return tickers[span.ordinal()];
     }
 

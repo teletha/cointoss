@@ -58,28 +58,6 @@ public abstract class OrderModel implements Directional, Comparable<OrderModel> 
      * @return Chainable API.
      */
     @Icy.Overload("size")
-    private Num size(int size) {
-        return Num.of(size);
-    }
-
-    /**
-     * Set order size by value.
-     * 
-     * @param size An executed size.
-     * @return Chainable API.
-     */
-    @Icy.Overload("size")
-    private Num size(float size) {
-        return Num.of(size);
-    }
-
-    /**
-     * Set order size by value.
-     * 
-     * @param size An executed size.
-     * @return Chainable API.
-     */
-    @Icy.Overload("size")
     private Num size(long size) {
         return Num.of(size);
     }
@@ -127,29 +105,7 @@ public abstract class OrderModel implements Directional, Comparable<OrderModel> 
      * @return Chainable API.
      */
     @Icy.Overload("price")
-    private Num price(int price) {
-        return Num.of(price);
-    }
-
-    /**
-     * Set price by value.
-     * 
-     * @param price A price.
-     * @return Chainable API.
-     */
-    @Icy.Overload("price")
     private Num price(long price) {
-        return Num.of(price);
-    }
-
-    /**
-     * Set price by value.
-     * 
-     * @param price A price.
-     * @return Chainable API.
-     */
-    @Icy.Overload("price")
-    private Num price(float price) {
         return Num.of(price);
     }
 
@@ -177,7 +133,7 @@ public abstract class OrderModel implements Directional, Comparable<OrderModel> 
         }
 
         if (state() == OrderState.INIT) {
-            type.accept(price.isZero() ? OrderType.Take : OrderType.Make);
+            type.accept(price.isZero() ? OrderType.Taker : OrderType.Maker);
         }
         return price;
     }
@@ -189,7 +145,7 @@ public abstract class OrderModel implements Directional, Comparable<OrderModel> 
      */
     @Icy.Property
     public OrderType type() {
-        return OrderType.Take;
+        return OrderType.Taker;
     }
 
     /**

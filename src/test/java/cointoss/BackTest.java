@@ -9,133 +9,46 @@
  */
 package cointoss;
 
+import static cointoss.ticker.TickSpan.*;
 import static java.time.temporal.ChronoUnit.*;
 
-import java.time.temporal.ChronoUnit;
-
-import cointoss.execution.Execution;
-import cointoss.order.Order;
-import cointoss.ticker.Tick;
-import cointoss.ticker.TickSpan;
 import cointoss.trade.Entry;
-import cointoss.trade.NewEntry;
-import cointoss.trade.StopLoss;
-import cointoss.trade.StopStrategy;
+import cointoss.trade.OrderStrategy;
 import cointoss.trade.Trader;
-import cointoss.trade.Trading;
 import cointoss.util.Num;
-import kiss.Signal;
 
-/**
- * @version 2017/09/19 23:45:54
- */
 public class BackTest {
 
     /**
-     * @version 2017/09/05 20:19:04
+     * 
      */
     @SuppressWarnings("unused")
     private static class BreakoutTrading extends Trader {
 
-        private int update;
-
-        private Num underPrice;
-
-        /**
-         * @param market
-         */
         private BreakoutTrading(Market market) {
             super(market);
 
             // various events
-            market.timeline.to(exe -> {
+            market.tickers.of(Minute1).add.to(tick -> {
                 if (hasPosition() == false) {
-                    Entry latest = latest();
-                    Direction side;
 
-                    if (latest == null) {
-                        side = Direction.random();
-                    } else {
-                        side = latest.isWin() ? latest.direction() : latest.inverse();
-                    }
-
-                    entry(Order.with.direction(side, 0.01), new Trading() {
-
-                        int update = 1;
+                    new Entry(Direction.random()) {
+                        Num diff = Num.of(-2000);
 
                         @Override
-                        protected void createEntry(NewEntry entry) {
-                            entry.cancelAfter(5, MINUTES);
-                            entry.set(StopStrategy.Take);
-
-                            StopLoss.with.when(market.timeline.take(keep(5, SECONDS, e -> e.price.isLessThan(entry, underPrice))))
-                                    .how((manager, exit) -> {
-                                        manager.requestNow(exit);
-
-                                        entry.log("10秒以上約定値が%s以下になったので指値で決済開始", underPrice);
-
-                                    });
+                        protected void order() {
+                            order(0.01).makeBestPrice().cancelAfter(5, MINUTES);
                         }
 
                         @Override
-                        protected Signal<Order> createLossCut(Order entry, Execution exe) {
-                            return null;
+                        protected void stop() {
+                            stop.when(market.timeline.take(e -> e.price.isGreaterThan(this, price)))
+                                    .how(OrderStrategy.with.makeLowest().cancelAfter(30, SECONDS).take());
+
+                            stopLoss.when(market.timeline.take(keep(5, SECONDS, e -> e.price.isLessThan(this, price.plus(diff)))))
+                                    .how(OrderStrategy.with.make(price.plus(diff)).cancelAfter(30, SECONDS).take());
                         }
-
-                        @Override
-                        protected Signal<Order> createExit(Order entry, Execution exe) {
-                            return null;
-                        }
-                    });
-
-                    entryMarket(side, maxPositionSize, entry -> {
-                        update = 1;
-                        underPrice = exe.price.minus(entry, 4000);
-
-                        // cancel timing
-                        market.timeline.takeUntil(completingEntry)
-                                .take(keep(5, ChronoUnit.MINUTES, entry.order::isNotCompleted))
-                                .take(1)
-                                .mapTo(entry.order)
-                                .to(t -> {
-                                    System.out.println("cancel " + entry.order);
-                                    cancel(entry);
-                                });
-
-                        // rise under price line
-                        market.tickers.tickerBy(TickSpan.Second15).add.takeUntil(closingPosition) //
-                                .map(Tick::closePrice)
-                                .takeAt(i -> i % 5 == 0)
-                                .to(e -> {
-                                    Num next = e.minus(entry, Math.max(0, 4000 - update * 200));
-
-                                    if (next.isGreaterThan(entry, underPrice)) {
-                                        entry.order.log("最低価格を%sから%sに再設定 参考値%s", underPrice, next, e);
-                                        update++;
-                                        underPrice = next;
-                                    }
-                                });
-
-                        // loss cut
-                        market.timeline.takeUntil(closingPosition) //
-                                .take(keep(5, ChronoUnit.SECONDS, e -> e.price.isLessThan(entry, underPrice)))
-                                .take(1)
-                                .to(e -> {
-                                    entry.exitLimit(entry.order.executedSize, underPrice, exit -> {
-                                        entry.order.log("10秒以上約定値が%s以下になったので指値で決済開始", underPrice);
-
-                                        market.timeline.takeUntil(completingEntry)
-                                                .take(keep(30, ChronoUnit.SECONDS, exit::isNotCompleted))
-                                                .take(1)
-                                                .to(x -> {
-                                                    market.cancel(exit).to(() -> {
-                                                        entry.order.log("30秒待っても処理されないので指値をキャンセルして成行決済 " + exit.remainingSize);
-                                                        // entry.exitMarket(exit.outstanding_size);
-                                                    });
-                                                });
-                                    });
-                                });
-                    });
+                    };
                 }
             });
         }

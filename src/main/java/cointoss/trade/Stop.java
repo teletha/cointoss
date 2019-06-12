@@ -9,19 +9,12 @@
  */
 package cointoss.trade;
 
-import java.util.function.BiConsumer;
-
-import cointoss.order.Order;
-import cointoss.order.OrderManager;
-import icy.manipulator.Icy;
+import cointoss.order.Orderable;
 import kiss.Signal;
 
-@Icy
-public abstract class StopLossModel {
+public class Stop {
 
-    @Icy.Property
-    public abstract Signal<?> when();
-
-    @Icy.Property
-    public abstract BiConsumer<OrderManager, Order> how();
+    public Orderable when(Signal<?> timing) {
+        return null;
+    }
 }

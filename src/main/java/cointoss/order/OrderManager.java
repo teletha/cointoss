@@ -89,7 +89,7 @@ public final class OrderManager {
                 if (order.id.equals(id)) {
                     Num executed = execution.size;
 
-                    if (order.type.isMarket() && executed.isNot(0)) {
+                    if (order.type.isTaker() && executed.isNot(0)) {
                         order.assignPrice(n -> n.multiply(order.executedSize)
                                 .plus(execution.price.multiply(executed))
                                 .divide(executed.plus(order.executedSize)));

@@ -9,18 +9,24 @@
  */
 package cointoss.order;
 
-/**
- * @version 2017/07/24 14:17:46
- */
 public enum OrderType {
-    Make, Take;
+    Maker, Taker;
 
     /**
-     * Helper.
+     * Detect order type.
      * 
-     * @return
+     * @return A result.
      */
-    public boolean isMarket() {
-        return this == Take;
+    public boolean isTaker() {
+        return this == Taker;
+    }
+
+    /**
+     * Detect order type.
+     * 
+     * @return A result.
+     */
+    public boolean isMaker() {
+        return this == Maker;
     }
 }

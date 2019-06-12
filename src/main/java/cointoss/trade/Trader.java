@@ -19,10 +19,8 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BooleanSupplier;
-import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import cointoss.Direction;
 import cointoss.Market;
 import cointoss.execution.Execution;
 import cointoss.order.Order;
@@ -99,64 +97,6 @@ public abstract class Trader {
     }
 
     /**
-     * Create entry with the specified order.
-     * 
-     * @param order
-     * @param entry
-     */
-    protected final void entry(Order order, Trading entry) {
-        if (order == null) {
-            return;
-        }
-
-        entry.createEntry(NewEntry.with.trader(this).order(order));
-    }
-
-    /**
-     * Request entry order.
-     * 
-     * @param side
-     * @param size
-     */
-    protected final Entry entryLimit(Direction side, Num size, Num price, Consumer<Entry> process) {
-        // check side
-        if (side == null) {
-            return null;
-        }
-
-        // check size
-        if (size == null || size.isLessThanOrEqual(Num.ZERO)) {
-            return null;
-        }
-
-        // check price
-        if (price == null || price.isLessThanOrEqual(Num.ZERO)) {
-            return null;
-        }
-
-        return new Entry(this, Order.with.direction(side, size).price(price), process);
-    }
-
-    /**
-     * Request entry order.
-     * 
-     * @param side
-     * @param size
-     */
-    protected final Entry entryMarket(Direction side, Num size, Consumer<Entry> process) {
-        // check side
-        if (side == null) {
-            return null;
-        }
-
-        // check size
-        if (size == null || size.isLessThanOrEqual(Num.ZERO)) {
-            return null;
-        }
-        return new Entry(this, Order.with.direction(side, size), process);
-    }
-
-    /**
      * Close entry and position.
      * 
      * @param oae
@@ -221,10 +161,8 @@ public abstract class Trader {
      * @param entry
      */
     protected final void cancel(Entry entry) {
-        if (entry != null && entry.order.isNotCompleted()) {
-            market.cancel(entry.order).to(id -> {
-                close();
-            });
+        if (entry != null) {
+            entry.cancel();
         }
     }
 

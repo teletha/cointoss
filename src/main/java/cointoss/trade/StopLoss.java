@@ -9,15 +9,12 @@
  */
 package cointoss.trade;
 
-import cointoss.execution.Execution;
-import cointoss.order.Order;
+import cointoss.order.Orderable;
 import kiss.Signal;
 
-public abstract class Trading {
+public class StopLoss {
 
-    protected abstract void createEntry(NewEntry entry);
-
-    protected abstract Signal<Order> createExit(Order entry, Execution exe);
-
-    protected abstract Signal<Order> createLossCut(Order entry, Execution exe);
+    public Orderable when(Signal<?> timing) {
+        return null;
+    }
 }

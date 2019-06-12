@@ -101,7 +101,7 @@ public class BackTestView extends View {
         startButton.disableWhen(startDate.isInvalid()).when(User.MouseClick).to(e -> {
             Market m = new Market(BitFlyer.FX_BTC_JPY);
             chart.market.set(m);
-            chart.ticker.set(m.tickers.tickerBy(TickSpan.Minute1));
+            chart.ticker.set(m.tickers.of(TickSpan.Minute1));
             chart.market.to(v -> v.readLog(log -> log.range(startDate.zoned(), endDate.zoned())));
 
             Viewtify.Terminator.add(m);

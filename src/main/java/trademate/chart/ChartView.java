@@ -96,7 +96,7 @@ public class ChartView extends View {
         span.observeNow() //
                 .skipNull()
                 .combineLatest(market.observeNow().skipNull())
-                .map(e -> e.ⅱ.tickers.tickerBy(e.ⅰ))
+                .map(e -> e.ⅱ.tickers.of(e.ⅰ))
                 .to(ticker::set);
 
         latest.model(setting.showLatestPrice);
