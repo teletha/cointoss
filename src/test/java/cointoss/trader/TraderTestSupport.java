@@ -9,24 +9,20 @@
  */
 package cointoss.trader;
 
-import org.junit.jupiter.api.BeforeEach;
-
 import cointoss.Direction;
 import cointoss.execution.Execution;
-import cointoss.trade.Entry;
 import cointoss.trade.Trader;
 import cointoss.trade.TradingLog;
 import cointoss.util.Num;
 import cointoss.verify.VerifiableMarket;
 import kiss.I;
+import kiss.Signal;
 
 public abstract class TraderTestSupport extends Trader {
 
     protected VerifiableMarket market;
 
     protected TradingLog log;
-
-    private final Num min;
 
     /**
      * @param provider
@@ -35,14 +31,10 @@ public abstract class TraderTestSupport extends Trader {
         super(new VerifiableMarket());
 
         this.market = (VerifiableMarket) super.market;
-        this.min = market.service.setting.baseCurrencyMinimumBidPrice();
     }
 
-    @BeforeEach
-    public void init() {
-        close();
-
-        entries.clear();
+    protected final Signal<?> now() {
+        return I.signal("ok");
     }
 
     /**

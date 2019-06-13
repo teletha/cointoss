@@ -16,26 +16,34 @@ import org.junit.jupiter.api.Test;
 
 import cointoss.Direction;
 import cointoss.execution.Execution;
-import cointoss.trade.Entry;
 import cointoss.util.Num;
 import kiss.Variable;
 
-/**
- * @version 2018/04/02 16:48:42
- */
 class TraderTest extends TraderTestSupport {
 
     @Test
-    void entryLimit() {
-        assert hasPosition() == false;
+    void entryMake() {
+        when(now(), v -> {
+            return new Entry(Direction.BUY) {
 
-        // try entry
-        Entry entry = entryLimit(Direction.BUY, Num.ONE, Num.TEN, null);
-        assert entry.remaining().is(0);
+                @Override
+                protected void order() {
+                    order(1).make(10);
+                }
+            };
+        });
 
-        // execute
-        market.perform(Execution.with.buy(1).price(10));
-        entry.remaining().is(1);
+        Entry entry = latest();
+        assert entry != null;
+        assert entry.isBuy();
+        assert entry.entrySize.v.is(1);
+        assert entry.entryExecutedSize.v.is(0);
+        assert entry.entryPrice.v.is(0);
+
+        market.perform(Execution.with.buy(1).price(9));
+        assert entry.entrySize.v.is(1);
+        assert entry.entryExecutedSize.v.is(1);
+        assert entry.entryPrice.v.is(0);
     }
 
     @Test

@@ -75,7 +75,7 @@ public interface FundManagerModel {
      * 
      * @return
      */
-    @Icy.Property(mutable = true)
+    @Icy.Property(mutable = true, copiable = true)
     default Num losscutRange() {
         return Num.of(-2000);
     }
@@ -102,9 +102,17 @@ public interface FundManagerModel {
      * 
      * @return
      */
-    @Icy.Property(mutable = true)
-    default Num riskRewardRatio() {
-        return Num.of(1.5);
+    @Icy.Property(mutable = true, copiable = true)
+    default double riskRewardRatio() {
+        return 1.5;
+    }
+
+    @Icy.Intercept("riskRewardRatio")
+    private double validateRiskRewardRatio(double value) {
+        if (value < 0.1) {
+            value = 0.1;
+        }
+        return value;
     }
 
     /**

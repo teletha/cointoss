@@ -9,10 +9,9 @@
  */
 package cointoss;
 
-import static cointoss.ticker.TickSpan.*;
-import static java.time.temporal.ChronoUnit.*;
+import static cointoss.ticker.TickSpan.Minute1;
+import static java.time.temporal.ChronoUnit.MINUTES;
 
-import cointoss.trade.Entry;
 import cointoss.trade.Trader;
 
 public class BackTest {
@@ -26,8 +25,7 @@ public class BackTest {
         private Sample(Market market) {
             super(market);
 
-            // various events
-            entryWhen(market.tickers.of(Minute1).add, tick -> {
+            when(market.tickers.of(Minute1).add, tick -> {
                 return new Entry(Direction.random()) {
 
                     @Override

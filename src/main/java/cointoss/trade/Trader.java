@@ -9,15 +9,31 @@
  */
 package cointoss.trade;
 
+import java.time.ZonedDateTime;
+import java.time.temporal.TemporalUnit;
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BooleanSupplier;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
+import cointoss.Direction;
+import cointoss.Directional;
 import cointoss.Market;
+import cointoss.execution.Execution;
+import cointoss.order.Order;
+import cointoss.trade.OrderStrategy.Makable;
+import cointoss.trade.OrderStrategy.Takable;
+import cointoss.trade.OrderStrategy.with.OrderStrategyImpl;
+import cointoss.util.Num;
 import kiss.Disposable;
 import kiss.Signal;
 import kiss.Signaling;
+import kiss.Variable;
 
 public abstract class Trader {
 
@@ -59,17 +75,6 @@ public abstract class Trader {
     }
 
     /**
-     * Add {@link Entry}.
-     * 
-     * @param entry An entry to add.
-     */
-    protected final void add(Entry entry) {
-        if (entry != null) {
-            entries.add(entry);
-        }
-    }
-
-    /**
      * Return the latest completed or canceled entry.
      * 
      * @return
@@ -85,7 +90,7 @@ public abstract class Trader {
      * @param timing
      * @param builder
      */
-    protected final <T> void entryWhen(Signal<T> timing, Function<T, Entry> builder) {
+    protected final <T> void when(Signal<T> timing, Function<T, Entry> builder) {
         if (timing == null || builder == null) {
             return;
         }
@@ -94,9 +99,239 @@ public abstract class Trader {
             Entry entry = builder.apply(value);
 
             if (entry != null) {
-                entry.trader = this;
                 entries.add(entry);
+
+                entry.order();
+                entry.entryDeclarations.forEach(Runnable::run);
             }
         }));
+    }
+
+    /**
+     * <p>
+     * Create rule which the specified condition is fulfilled during the specified duration.
+     * </p>
+     * 
+     * @param time
+     * @param unit
+     * @param condition
+     * @return
+     */
+    protected final Predicate<Execution> keep(int time, TemporalUnit unit, BooleanSupplier condition) {
+        return keep(time, unit, e -> condition.getAsBoolean());
+    }
+
+    /**
+     * <p>
+     * Create rule which the specified condition is fulfilled during the specified duration.
+     * </p>
+     * 
+     * @param time
+     * @param unit
+     * @param condition
+     * @return
+     */
+    protected final Predicate<Execution> keep(int time, TemporalUnit unit, Predicate<Execution> condition) {
+        AtomicBoolean testing = new AtomicBoolean();
+        AtomicReference<ZonedDateTime> last = new AtomicReference(ZonedDateTime.now());
+
+        return e -> {
+            if (condition.test(e)) {
+                if (testing.get()) {
+                    if (e.date.isAfter(last.get())) {
+                        testing.set(false);
+                        return true;
+                    }
+                } else {
+                    testing.set(true);
+                    last.set(e.date.plus(time, unit).minusNanos(1));
+                }
+            } else {
+                if (testing.get()) {
+                    if (e.date.isAfter(last.get())) {
+                        testing.set(false);
+                    }
+                }
+            }
+            return false;
+        };
+    }
+
+    /**
+     * Declarative entry and exit definition.
+     */
+    public abstract class Entry implements Directional {
+
+        /** The entry direction. */
+        protected final Direction direction;
+
+        /** The fund management for this entry. */
+        protected final FundManager funds;
+
+        protected final Stop stop = new Stop();
+
+        protected final StopLoss stopLoss = new StopLoss();
+
+        protected Num price;
+
+        /** The entry price. */
+        public final Variable<Num> entryPrice = Variable.of(Num.ZERO);
+
+        /** The total entry size. */
+        public final Variable<Num> entrySize = Variable.of(Num.ZERO);
+
+        /** The total executed entry size. */
+        public final Variable<Num> entryExecutedSize = Variable.of(Num.ZERO);
+
+        /** The profit or loss on this {@link Entry}. */
+        protected final Variable<Num> profit = Variable.of(Num.ZERO);
+
+        /** The list entry orders. */
+        private final List<Order> entries = new ArrayList<>();
+
+        /** The declaration manager. */
+        private List<Runnable> entryDeclarations = new ArrayList();
+
+        /** The list exit orders. */
+        private final List<Order> exits = new ArrayList<>();
+
+        /**
+         * @param directional
+         */
+        protected Entry(Directional directional) {
+            this(directional, null);
+        }
+
+        /**
+         * @param directional
+         */
+        protected Entry(Directional directional, FundManager funds) {
+            this.direction = directional.direction();
+            this.funds = funds == null ? Trader.this.funds : funds;
+        }
+
+        /**
+         * Declare entry order.
+         */
+        protected abstract void order();
+
+        /**
+         * We will order with the specified quantity. Use the return the {@link Takable} &
+         * {@link Makable} value to define the details of the ordering method.
+         * 
+         * @param <S> Ordering interface
+         * @param size A entry size.
+         * @return A ordering method.
+         */
+        protected final <S extends Takable & Makable> S order(long size) {
+            return order(Num.of(size));
+        }
+
+        /**
+         * We will order with the specified quantity. Use the return the {@link Takable} &
+         * {@link Makable} value to define the details of the ordering method.
+         * 
+         * @param <S> Ordering interface
+         * @param size A entry size.
+         * @return A ordering method.
+         */
+        protected final <S extends Takable & Makable> S order(double size) {
+            return order(Num.of(size));
+        }
+
+        /**
+         * We will order with the specified quantity. Use the return the {@link Takable} &
+         * {@link Makable} value to define the details of the ordering method.
+         * 
+         * @param <S> Ordering interface
+         * @param size A entry size.
+         * @return A ordering method.
+         */
+        protected final <S extends Takable & Makable> S order(Num size) {
+            if (size == null || size.isLessThan(market.service.setting.targetCurrencyMinimumBidSize)) {
+                throw new Error("Entry size is less than minimum bid size.");
+            }
+
+            OrderStrategyImpl implementation = new OrderStrategy.with.OrderStrategyImpl();
+            entryDeclarations.add(() -> {
+                if (implementation.actions.isEmpty()) implementation.take();
+                implementation.execute(market, direction, size, null, this::processAddEntryOrder);
+            });
+            return (S) implementation;
+        }
+
+        /**
+         * Process for additional entry order.
+         * 
+         * @param order
+         */
+        private void processAddEntryOrder(Order order) {
+            entries.add(order);
+            entrySize.set(order.size::plus);
+            order.observeExecutedSize().to(v -> {
+                System.out.println(v);
+            });
+        }
+
+        /**
+         * Declare exit order.
+         */
+        protected void fixProfit() {
+            fixProfitAtRiskRewardRatio();
+        }
+
+        /**
+         * 
+         * 
+         */
+        protected final void fixProfitAtRiskRewardRatio() {
+
+        }
+
+        /**
+         * Declare exit orders. Loss cutting is the only element in the trade that investors can
+         * control.
+         */
+        protected void stopLoss() {
+            stopLossAtAcceptableRisk();
+        }
+
+        /**
+         * Declare exit order.
+         */
+        protected final void stopLossAtAcceptableRisk() {
+            stop.when(profit.observeNow().take(v -> v.isLessThan(funds.riskAssets().negate()))).how(OrderStrategy.with.take());
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public final Direction direction() {
+            return direction;
+        }
+
+        // /**
+        // * {@inheritDoc}
+        // */
+        // @Override
+        // public String toString() {
+        // return new StringBuilder() //
+        // .append("注文 ")
+        // .append(holdTime())
+        // .append("\t 損益")
+        // .append(profit().asJPY(4))
+        // .append("\t")
+        // .append(exitSize())
+        // .append("/")
+        // .append(order.executedSize)
+        // .append("@")
+        // .append(direction().mark())
+        // .append(entryPrice().asJPY(1))
+        // .append(" → ")
+        // .append(exitPrice().asJPY(1))
+        // .toString();
+        // }
+
     }
 }

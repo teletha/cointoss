@@ -12,13 +12,14 @@ package cointoss.trade;
 import java.time.temporal.ChronoUnit;
 import java.util.LinkedList;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 import cointoss.Direction;
 import cointoss.Market;
 import cointoss.order.Order;
 import cointoss.util.Num;
+import cointoss.util.PentaConsumer;
 import kiss.I;
-import kiss.WiseTriConsumer;
 
 public interface OrderStrategy {
 
@@ -124,7 +125,7 @@ public interface OrderStrategy {
          * @return Maker is cancellable.
          */
         public static Cancellable make(Num price) {
-            return new OrderStrategies().make(price);
+            return new OrderStrategyImpl().make(price);
         }
 
         /**
@@ -133,7 +134,7 @@ public interface OrderStrategy {
          * @return Maker is cancellable.
          */
         public static Cancellable makeLowest() {
-            return new OrderStrategies().makeBestPrice();
+            return new OrderStrategyImpl().makeBestPrice();
         }
 
         /**
@@ -142,31 +143,28 @@ public interface OrderStrategy {
          * @return Taker is NOT cancellable.
          */
         public static OrderStrategy take() {
-            return new OrderStrategies().take();
+            return new OrderStrategyImpl().take();
         }
 
         /**
          * 
          */
-        static class OrderStrategies implements Takable, Makable, Cancellable {
+        static class OrderStrategyImpl implements Takable, Makable, Cancellable {
 
             /** The action sequence. */
-            private LinkedList<WiseTriConsumer<Market, Direction, Num>> actions = new LinkedList();
-
-            /** The actual orders. */
-            private LinkedList<Order> orders = new LinkedList();
+            LinkedList<PentaConsumer<Market, Direction, Num, Order, Consumer<Order>>> actions = new LinkedList();
 
             /**
              * {@inheritDoc}
              */
             @Override
             public OrderStrategy take() {
-                actions.add((market, direction, size) -> {
+                actions.add((market, direction, size, previous, orders) -> {
                     Order order = Order.with.direction(direction, size);
-                    orders.add(order);
+                    orders.accept(order);
 
                     market.orders.request(order).to(() -> {
-                        execute(market, direction, size);
+                        execute(market, direction, size, order, orders);
                     });
                 });
                 return this;
@@ -177,12 +175,12 @@ public interface OrderStrategy {
              */
             @Override
             public Cancellable make(Num price) {
-                actions.add((market, direction, size) -> {
+                actions.add((market, direction, size, previous, orders) -> {
                     Order order = Order.with.direction(direction, size).price(price);
-                    orders.add(order);
+                    orders.accept(order);
 
                     market.orders.request(order).to(() -> {
-                        execute(market, direction, size);
+                        execute(market, direction, size, order, orders);
                     });
                 });
                 return this;
@@ -193,13 +191,9 @@ public interface OrderStrategy {
              */
             @Override
             public Cancellable makeBestPrice() {
-                actions.add((market, direction, size) -> {
-                    Order order = Order.with.direction(direction, size).price(market.orderBook.bookFor(direction).best.v.price);
-                    orders.add(order);
-
-                    market.orders.request(order).to(() -> {
-                        execute(market, direction, size);
-                    });
+                actions.add((market, direction, size, previous, orders) -> {
+                    make(market.orderBook.bookFor(direction).best.v.price);
+                    execute(market, direction, size, previous, orders);
                 });
                 return this;
             }
@@ -209,14 +203,12 @@ public interface OrderStrategy {
              */
             @Override
             public <S extends Takable & Makable> S cancelAfter(long time, ChronoUnit unit) {
-                actions.add((market, direction, size) -> {
-                    Order order = orders.peekLast();
-
-                    if (order != null && order.isNotCompleted()) {
+                actions.add((market, direction, size, previous, orders) -> {
+                    if (previous != null && previous.isNotCompleted()) {
                         I.schedule(time, TimeUnit.of(unit), () -> {
-                            if (order.isNotCompleted()) {
-                                market.orders.cancel(order).to(() -> {
-                                    execute(market, direction, size);
+                            if (previous.isNotCompleted()) {
+                                market.orders.cancel(previous).to(() -> {
+                                    execute(market, direction, size, null, orders);
                                 });
                             }
                         });
@@ -232,11 +224,11 @@ public interface OrderStrategy {
              * @param direction
              * @param size
              */
-            void execute(Market market, Direction direction, Num size) {
-                WiseTriConsumer<Market, Direction, Num> action = actions.pollFirst();
+            void execute(Market market, Direction direction, Num size, Order previous, Consumer<Order> orders) {
+                PentaConsumer<Market, Direction, Num, Order, Consumer<Order>> action = actions.pollFirst();
 
                 if (action != null) {
-                    action.accept(market, direction, size);
+                    action.accept(market, direction, size, previous, orders);
                 }
             }
         }
