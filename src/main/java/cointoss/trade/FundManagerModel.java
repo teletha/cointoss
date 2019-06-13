@@ -15,24 +15,115 @@ import icy.manipulator.Icy;
 @Icy
 public interface FundManagerModel {
 
+    /**
+     * Your total assets.
+     * 
+     * @return
+     */
     @Icy.Property
     Num totalAssets();
 
-    @Icy.Property
-    default Num riskRatio() {
-        return Num.of(0.01);
+    @Icy.Overload("totalAssets")
+    private Num totalAssets(long value) {
+        return Num.of(value);
     }
 
-    default Num riskAsserts() {
-        return totalAssets().multiply(riskRatio());
+    @Icy.Overload("totalAssets")
+    private Num totalAssets(double value) {
+        return Num.of(value);
     }
 
+    /**
+     * Config the acceptable risk asset ratio.
+     * 
+     * @return
+     */
     @Icy.Property
-    default Num riskRweardRatio() {
+    default double riskAssetsRatio() {
+        return 0.01;
+    }
+
+    /**
+     * Risk assets ratio can accepts between 0.001 and 0.5.
+     * 
+     * @param ratio
+     * @return
+     */
+    @Icy.Intercept("riskAssetsRatio")
+    private double validateRiskAssetsRatio(double ratio) {
+        if (ratio < 0.001) {
+            ratio = 0.001;
+        }
+
+        if (0.05 < ratio) {
+            ratio = 0.05;
+        }
+        return ratio;
+    }
+
+    /**
+     * Compute risk assets.
+     * 
+     * @return
+     */
+    default Num riskAssets() {
+        return totalAssets().multiply(riskAssetsRatio());
+    }
+
+    /**
+     * Config losscut range.
+     * 
+     * @return
+     */
+    @Icy.Property(mutable = true)
+    default Num losscutRange() {
+        return Num.of(-2000);
+    }
+
+    @Icy.Intercept("losscutRange")
+    private Num validateLosscutRange(Num value) {
+        if (value.isPositive()) {
+            value = Num.ZERO;
+        }
+        return value;
+    }
+
+    /**
+     * Config losscut range.
+     * 
+     * @return
+     */
+    default Num profitRange() {
+        return losscutRange().multiply(riskRewardRatio()).abs();
+    }
+
+    /**
+     * Config losscut range.
+     * 
+     * @return
+     */
+    @Icy.Property(mutable = true)
+    default Num riskRewardRatio() {
         return Num.of(1.5);
     }
 
-    default Num ruinProbability() {
-        return null;
+    /**
+     * Market histrical volatility.
+     * 
+     * @return
+     */
+    @Icy.Property(mutable = true)
+    default Num historicalVolatility() {
+        return Num.ZERO;
+    }
+
+    /**
+     * Market liquidity.
+     * 
+     * @return
+     */
+    @Icy.Property(mutable = true)
+    default Num liquidity() {
+        return Num.ZERO;
     }
 }

@@ -9,7 +9,7 @@
  */
 package cointoss;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
@@ -30,7 +30,6 @@ import cointoss.util.RetryPolicy;
 import kiss.Disposable;
 import kiss.Signal;
 import kiss.Signaling;
-import kiss.Variable;
 
 /**
  * Facade for the market related operations.
@@ -80,18 +79,6 @@ public class Market implements Disposable {
     /** The position manager. */
     public final PositionManager positions;
 
-    /** The amount of base currency. */
-    public final Variable<Num> baseCurrency;
-
-    /** The initial amount of base currency. */
-    public final Num initialBaseCurrency;
-
-    /** The amount of target currency. */
-    public final Variable<Num> targetCurrency;
-
-    /** The initial amount of target currency. */
-    public final Num initialTargetCurrency;
-
     /**
      * Build {@link Market} with the specified {@link MarketServiceProvider}.
      * 
@@ -103,29 +90,10 @@ public class Market implements Disposable {
         this.orderBook = new OrderBookManager(service);
         this.positions = new PositionManager(service, tickers.latest);
 
-        // initialize currency data
-        baseCurrency = service.baseCurrency().to();
-        targetCurrency = service.targetCurrency().to();
-        initialBaseCurrency = baseCurrency.v;
-        initialTargetCurrency = targetCurrency.v;
-
         // build tickers for each span
         timeline.to(tickers::update);
 
         readOrderBook();
-
-        service.add(service.executionsRealtimelyForMe().to(v -> {
-            Execution e = v.ⅲ;
-
-            // update assets
-            if (e.isBuy()) {
-                baseCurrency.set(value -> value.minus(e.size.multiply(e.price)));
-                targetCurrency.set(value -> value.plus(e.size));
-            } else {
-                baseCurrency.set(value -> value.plus(e.size.multiply(e.price)));
-                targetCurrency.set(value -> value.minus(e.size));
-            }
-        }));
     }
 
     /**
@@ -208,17 +176,6 @@ public class Market implements Disposable {
         service.add(log.apply(service.log).to(timelineObservers));
 
         return this;
-    }
-
-    /**
-     * Calculate profit and loss.
-     * 
-     * @return
-     */
-    public Num calculateProfit() {
-        Num baseProfit = baseCurrency.v.minus(initialBaseCurrency);
-        Num targetProfit = targetCurrency.v.multiply(tickers.latest.v.price).minus(initialTargetCurrency.multiply(tickers.initial.v.price));
-        return baseProfit.plus(targetProfit);
     }
 
     /**

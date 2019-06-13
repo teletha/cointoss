@@ -25,16 +25,14 @@ import cointoss.order.Order;
 import cointoss.trade.OrderStrategy.Makable;
 import cointoss.trade.OrderStrategy.Takable;
 import cointoss.util.Num;
+import kiss.Variable;
 
 /**
  * Declarative entry and exit definition.
  */
 public abstract class Entry implements Directional {
 
-    /**
-     * 
-     */
-    private final Trader trader;
+    protected Trader trader;
 
     /** The entry direction. */
     public final Direction direction;
@@ -51,43 +49,69 @@ public abstract class Entry implements Directional {
 
     protected Num price;
 
+    /** The profit or loss on this {@link Entry}. */
+    protected final Variable<Num> profit = Variable.of(Num.ZERO);
+
+    /**
+     * @param direction
+     */
     protected Entry(Direction direction) {
         this.trader = null;
         this.direction = direction;
     }
 
     /**
-     * Declare entry orders.
+     * Declare entry order.
      */
     protected abstract void order();
 
     /**
-     * Declare exit orders.
+     * Declare exit order.
      */
-    protected abstract void stop();
+    protected void fixProfit() {
+        fixProfitAtRiskRewardRatio();
+    }
 
     /**
-     * Declare exit orders.
+     * 
+     * 
      */
-    protected abstract void stopLoss();
+    protected final void fixProfitAtRiskRewardRatio() {
+
+    }
+
+    /**
+     * Declare exit orders. Loss cutting is the only element in the trade that investors can
+     * control.
+     */
+    protected void stopLoss() {
+        stopLossAtAcceptableRisk();
+    }
+
+    /**
+     * Declare exit order.
+     */
+    protected final void stopLossAtAcceptableRisk() {
+        stop.when(profit.observeNow().take(v -> v.isLessThan(trader.funds.riskAssets().negate()))).how(OrderStrategy.with.take());
+    }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Direction direction() {
+    public final Direction direction() {
         return direction;
     }
 
-    protected <S extends Takable & Makable> S order(long size) {
+    protected final <S extends Takable & Makable> S order(long size) {
         return order(Num.of(size));
     }
 
-    protected <S extends Takable & Makable> S order(double size) {
+    protected final <S extends Takable & Makable> S order(double size) {
         return order(Num.of(size));
     }
 
-    protected <S extends Takable & Makable> S order(Num size) {
+    protected final <S extends Takable & Makable> S order(Num size) {
         return (S) new OrderStrategy.with.OrderStrategies();
     }
 
