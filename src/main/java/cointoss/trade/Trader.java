@@ -18,6 +18,7 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BooleanSupplier;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -33,7 +34,6 @@ import cointoss.util.Num;
 import kiss.Disposable;
 import kiss.Signal;
 import kiss.Signaling;
-import kiss.Variable;
 
 public abstract class Trader {
 
@@ -160,7 +160,7 @@ public abstract class Trader {
     /**
      * Declarative entry and exit definition.
      */
-    public abstract class Entry implements Directional {
+    public abstract class Entry extends EntryStatus implements Directional {
 
         /** The entry direction. */
         protected final Direction direction;
@@ -168,23 +168,7 @@ public abstract class Trader {
         /** The fund management for this entry. */
         protected final FundManager funds;
 
-        protected final Stop stop = new Stop();
-
         protected final StopLoss stopLoss = new StopLoss();
-
-        protected Num price;
-
-        /** The entry price. */
-        public final Variable<Num> entryPrice = Variable.of(Num.ZERO);
-
-        /** The total entry size. */
-        public final Variable<Num> entrySize = Variable.of(Num.ZERO);
-
-        /** The total executed entry size. */
-        public final Variable<Num> entryExecutedSize = Variable.of(Num.ZERO);
-
-        /** The profit or loss on this {@link Entry}. */
-        protected final Variable<Num> profit = Variable.of(Num.ZERO);
 
         /** The list entry orders. */
         private final List<Order> entries = new ArrayList<>();
@@ -267,10 +251,29 @@ public abstract class Trader {
          */
         private void processAddEntryOrder(Order order) {
             entries.add(order);
-            entrySize.set(order.size::plus);
+            setEntrySize(entrySize.plus(order.size));
+
             order.observeExecutedSize().to(v -> {
-                System.out.println(v);
+                updateOrderRelatedStatus(entries, this::setEntryPrice, this::setEntryExecutedSize);
             });
+        }
+
+        /**
+         * Calculate average price and total executed size.
+         * 
+         * @param orders
+         */
+        private void updateOrderRelatedStatus(List<Order> orders, Consumer<Num> priceSetter, Consumer<Num> sizeSetter) {
+            Num totalSize = Num.ZERO;
+            Num totalPrice = Num.ZERO;
+
+            for (Order order : orders) {
+                totalSize = totalSize.plus(order.executedSize);
+                totalPrice = totalPrice.plus(order.executedSize.multiply(order.price));
+            }
+
+            sizeSetter.accept(totalSize);
+            priceSetter.accept(totalPrice.divide(totalSize));
         }
 
         /**
@@ -278,6 +281,17 @@ public abstract class Trader {
          */
         protected void fixProfit() {
             fixProfitAtRiskRewardRatio();
+        }
+
+        /**
+         * Declare exit order
+         * 
+         * @param <S>
+         * @param timing
+         * @param strategy
+         */
+        protected final <S extends Takable & Makable> void fixProfitWhen(Signal<?> timing, Consumer<S> strategy) {
+
         }
 
         /**

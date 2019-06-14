@@ -89,7 +89,7 @@ public abstract class OrderModel implements Directional, Comparable<OrderModel> 
     }
 
     /**
-     * The initial ordered price.
+     * An average price.
      * 
      * @return
      */
