@@ -9,8 +9,6 @@
  */
 package cointoss.order;
 
-import cointoss.trade.OrderStrategy;
-
 public interface Orderable {
 
     void how(OrderStrategy strategy);

@@ -27,9 +27,9 @@ import cointoss.Directional;
 import cointoss.Market;
 import cointoss.execution.Execution;
 import cointoss.order.Order;
-import cointoss.trade.OrderStrategy.Makable;
-import cointoss.trade.OrderStrategy.Takable;
-import cointoss.trade.OrderStrategy.with.OrderStrategyImpl;
+import cointoss.order.OrderStrategy;
+import cointoss.order.OrderStrategy.Makable;
+import cointoss.order.OrderStrategy.Takable;
 import cointoss.util.Num;
 import kiss.Disposable;
 import kiss.Signal;
@@ -207,8 +207,8 @@ public abstract class Trader {
          * @param size A entry size.
          * @return A ordering method.
          */
-        protected final <S extends Takable & Makable> S order(long size) {
-            return order(Num.of(size));
+        protected final <S extends Takable & Makable> void order(long size, Consumer<S> declaration) {
+            order(Num.of(size), declaration);
         }
 
         /**
@@ -219,8 +219,8 @@ public abstract class Trader {
          * @param size A entry size.
          * @return A ordering method.
          */
-        protected final <S extends Takable & Makable> S order(double size) {
-            return order(Num.of(size));
+        protected final <S extends Takable & Makable> void order(double size, Consumer<S> declaration) {
+            order(Num.of(size), declaration);
         }
 
         /**
@@ -231,17 +231,11 @@ public abstract class Trader {
          * @param size A entry size.
          * @return A ordering method.
          */
-        protected final <S extends Takable & Makable> S order(Num size) {
+        protected final <S extends Takable & Makable> void order(Num size, Consumer<S> declaration) {
             if (size == null || size.isLessThan(market.service.setting.targetCurrencyMinimumBidSize)) {
                 throw new Error("Entry size is less than minimum bid size.");
             }
-
-            OrderStrategyImpl implementation = new OrderStrategy.with.OrderStrategyImpl();
-            entryDeclarations.add(() -> {
-                if (implementation.actions.isEmpty()) implementation.take();
-                implementation.execute(market, direction, size, null, this::processAddEntryOrder);
-            });
-            return (S) implementation;
+            market.request(direction, size, declaration).to(this::processAddEntryOrder);
         }
 
         /**

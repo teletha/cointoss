@@ -9,8 +9,8 @@
  */
 package cointoss.trader;
 
-import static cointoss.Direction.*;
-import static java.time.temporal.ChronoUnit.*;
+import static cointoss.Direction.BUY;
+import static java.time.temporal.ChronoUnit.SECONDS;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -29,7 +29,7 @@ class TraderTest extends TraderTestSupport {
 
                 @Override
                 protected void order() {
-                    order(1).make(10);
+                    order(1, s -> s.make(10));
                 }
             };
         });
@@ -55,7 +55,7 @@ class TraderTest extends TraderTestSupport {
 
                 @Override
                 protected void order() {
-                    order(1).make(10);
+                    order(1, s -> s.make(10));
                 }
 
                 @Override
@@ -81,7 +81,7 @@ class TraderTest extends TraderTestSupport {
 
                 @Override
                 protected void order() {
-                    order(1).make(10);
+                    order(1, s -> s.make(10));
                 }
             };
         });
