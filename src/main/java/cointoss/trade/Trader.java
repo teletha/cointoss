@@ -102,7 +102,6 @@ public abstract class Trader {
                 entries.add(entry);
 
                 entry.order();
-                entry.entryDeclarations.forEach(Runnable::run);
             }
         }));
     }
@@ -172,9 +171,6 @@ public abstract class Trader {
 
         /** The list entry orders. */
         private final List<Order> entries = new ArrayList<>();
-
-        /** The declaration manager. */
-        private List<Runnable> entryDeclarations = new ArrayList();
 
         /** The list exit orders. */
         private final List<Order> exits = new ArrayList<>();
