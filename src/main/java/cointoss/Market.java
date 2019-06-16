@@ -9,7 +9,7 @@
  */
 package cointoss;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.time.temporal.ChronoUnit;
 import java.util.LinkedList;
@@ -145,13 +145,51 @@ public class Market implements Disposable {
     }
 
     /**
-     * Request order which has the specified direction and size by your {@link OrderStrategy}.
+     * Order with specified direction and quantity. You can also declaratively describe the ordering
+     * strategy. If you do not describe the ordering strategy, it will be processed as a market
+     * order.
      * 
-     * @param <S>
-     * @param directional
-     * @param size
-     * @param declaration
-     * @return
+     * @param <S> {@link Takable} or {@link Makable}.
+     * @param directional A dirction of the order.
+     * @param size A quantity of the order.
+     * @param declaration Your order strategy.
+     * @return Returns all the {@link Order}s used in this strategy. Complete event occurs when all
+     *         strategies are performed. (Note: not when all orders are completed but when the
+     *         strategy is completed)
+     */
+    public final <S extends Takable & Makable> Signal<Order> request(Directional directional, long size, Consumer<S> declaration) {
+        return request(directional, Num.of(size), declaration);
+    }
+
+    /**
+     * Order with specified direction and quantity. You can also declaratively describe the ordering
+     * strategy. If you do not describe the ordering strategy, it will be processed as a market
+     * order.
+     * 
+     * @param <S> {@link Takable} or {@link Makable}.
+     * @param directional A dirction of the order.
+     * @param size A quantity of the order.
+     * @param declaration Your order strategy.
+     * @return Returns all the {@link Order}s used in this strategy. Complete event occurs when all
+     *         strategies are performed. (Note: not when all orders are completed but when the
+     *         strategy is completed)
+     */
+    public final <S extends Takable & Makable> Signal<Order> request(Directional directional, double size, Consumer<S> declaration) {
+        return request(directional, Num.of(size), declaration);
+    }
+
+    /**
+     * Order with specified direction and quantity. You can also declaratively describe the ordering
+     * strategy. If you do not describe the ordering strategy, it will be processed as a market
+     * order.
+     * 
+     * @param <S> {@link Takable} or {@link Makable}.
+     * @param directional A dirction of the order.
+     * @param size A quantity of the order.
+     * @param declaration Your order strategy.
+     * @return Returns all the {@link Order}s used in this strategy. Complete event occurs when all
+     *         strategies are performed. (Note: not when all orders are completed but when the
+     *         strategy is completed)
      */
     public final <S extends Takable & Makable> Signal<Order> request(Directional directional, Num size, Consumer<S> declaration) {
         return new Signal<>((observer, disposer) -> {
@@ -313,7 +351,9 @@ public class Market implements Disposable {
         private void execute(Market market, Direction direction, Num size, Order previous, Observer<? super Order> observer) {
             PentaConsumer<Market, Direction, Num, Order, Observer<? super Order>> action = actions.pollFirst();
 
-            if (action != null) {
+            if (action == null) {
+                observer.complete();
+            } else {
                 action.accept(market, direction, size, previous, observer);
             }
         }
