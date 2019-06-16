@@ -9,8 +9,8 @@
  */
 package cointoss.order;
 
-import static cointoss.Direction.*;
-import static java.time.temporal.ChronoUnit.*;
+import static cointoss.Direction.BUY;
+import static java.time.temporal.ChronoUnit.SECONDS;
 
 import java.util.List;
 
@@ -61,8 +61,13 @@ class OrderStrategyTest {
         assert o.state == OrderState.ACTIVE;
         assert completed == false;
 
-        market.perform(Execution.with.buy(1).price(11));
-        assert o.state == OrderState.COMPLETED;
-        assert o.price.is(11);
+        market.perform(Execution.with.buy(1).price(11), 1);
+        assert o.state == OrderState.ACTIVE;
+        market.perform(Execution.with.buy(1).price(12), 1);
+        assert o.state == OrderState.ACTIVE;
+        market.perform(Execution.with.buy(1).price(13), 1);
+        assert o.state == OrderState.ACTIVE;
+        market.perform(Execution.with.buy(1).price(14), 1);
+        assert o.state == OrderState.CANCELED;
     }
 }

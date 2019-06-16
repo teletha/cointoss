@@ -36,6 +36,7 @@ public class VerifiableMarket extends Market {
         super(new VerifiableMarketService(service));
 
         this.service = (VerifiableMarketService) super.service;
+        this.scheduler = new CountingScheduler();
     }
 
     /**
@@ -71,6 +72,7 @@ public class VerifiableMarket extends Market {
     private VerifiableMarket perform(Execution e, ZonedDateTime date) {
         ((Execution.ÅssignableÅrbitrary) e).date(date);
         timelineObservers.accept(service.emulate(e));
+        ((CountingScheduler) scheduler).setTime(date);
         return this;
     }
 
