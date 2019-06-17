@@ -38,10 +38,11 @@ class CountingScheduler implements ScheduledExecutorService {
     /**
      * @param time
      */
-    public void setTime(ZonedDateTime time) {
+    void setTime(ZonedDateTime time) {
         now = time;
 
         while (!queue.isEmpty() && queue.peek().time.compareTo(time) <= 0) {
+            System.out.println(queue.peek().time + "  " + time);
             queue.poll().run();
         }
     }
