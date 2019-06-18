@@ -10,10 +10,21 @@
 package cointoss.verify;
 
 import java.time.ZonedDateTime;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.PriorityQueue;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.Delayed;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 
 import cointoss.Direction;
@@ -63,6 +74,15 @@ public class VerifiableMarketService extends MarketService {
 
     /** The latest execution time. */
     private ZonedDateTime now = Chrono.MIN;
+
+    /** The latest execution epoch mills. */
+    private long nowMills = 0;
+
+    /** The testable scheduler. */
+    private final SchedulerEmulator scheduler = new SchedulerEmulator();
+
+    /** The task queue. */
+    private final PriorityQueue<Task> tasks = new PriorityQueue();
 
     /** The lag emulator. */
     public Latency latency = Latency.zero();
@@ -229,6 +249,14 @@ public class VerifiableMarketService extends MarketService {
     };
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ScheduledExecutorService scheduler() {
+        return scheduler;
+    }
+
+    /**
      * Emulate {@link Execution}.
      * 
      * @param e
@@ -236,6 +264,7 @@ public class VerifiableMarketService extends MarketService {
      */
     public Execution emulate(Execution e) {
         now = e.date;
+        nowMills = e.mills;
 
         // emulate market execution
         Iterator<BackendOrder> iterator = orderActive.iterator();
@@ -302,6 +331,11 @@ public class VerifiableMarketService extends MarketService {
                         .delay(e.delay);
             }
         }
+
+        while (!tasks.isEmpty() && tasks.peek().activeTime <= nowMills) {
+            tasks.poll().run();
+        }
+
         return e;
     }
 
@@ -452,6 +486,288 @@ public class VerifiableMarketService extends MarketService {
                 canceling.accept(front);
                 canceling.complete();
             });
+        }
+    }
+
+    /**
+     * 
+     */
+    private class SchedulerEmulator implements ScheduledExecutorService {
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void shutdown() {
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public List<Runnable> shutdownNow() {
+            return null;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean isShutdown() {
+            return false;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean isTerminated() {
+            return false;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean awaitTermination(long timeout, TimeUnit unit) throws InterruptedException {
+            return false;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public <T> Future<T> submit(Callable<T> task) {
+            return null;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public <T> Future<T> submit(Runnable task, T result) {
+            return null;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Future<?> submit(Runnable task) {
+            return submit(task, null);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks) throws InterruptedException {
+            return null;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit)
+                throws InterruptedException {
+            return null;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public <T> T invokeAny(Collection<? extends Callable<T>> tasks) throws InterruptedException, ExecutionException {
+            return null;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public <T> T invokeAny(Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit)
+                throws InterruptedException, ExecutionException, TimeoutException {
+            return null;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void execute(Runnable command) {
+            schedule(command, 0, TimeUnit.SECONDS);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public ScheduledFuture<?> schedule(Runnable command, long delay, TimeUnit unit) {
+            Task future = new Task(unit.toMillis(delay), command);
+
+            if (delay <= 0) {
+                future.run();
+            } else {
+                tasks.add(future);
+            }
+            return future;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public <V> ScheduledFuture<V> schedule(Callable<V> callable, long delay, TimeUnit unit) {
+            Task future = new Task(unit.toMillis(delay), callable);
+
+            if (delay <= 0) {
+                future.run();
+            } else {
+                tasks.add(future);
+            }
+            return future;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public ScheduledFuture<?> scheduleAtFixedRate(Runnable command, long initialDelay, long period, TimeUnit unit) {
+            return null;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public ScheduledFuture<?> scheduleWithFixedDelay(Runnable command, long initialDelay, long delay, TimeUnit unit) {
+            return null;
+        }
+    }
+
+    /**
+     * 
+     */
+    private class Task<V> implements ScheduledFuture, Callable<V>, Runnable {
+
+        /** The active time by epoch mills. */
+        private final long activeTime;
+
+        private final Callable<V> action;
+
+        private boolean cancelled;
+
+        private boolean done;
+
+        /**
+         * @param mills
+         * @param action
+         */
+        private Task(long delay, Runnable action) {
+            this(delay, () -> {
+                action.run();
+                return null;
+            });
+        }
+
+        /**
+         * @param delayMills
+         * @param action
+         */
+        private Task(long delayMills, Callable<V> action) {
+            this.activeTime = nowMills + delayMills;
+            this.action = action;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void run() {
+            try {
+                call();
+            } catch (Exception e) {
+                throw I.quiet(e);
+            }
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public V call() throws Exception {
+            return action.call();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public long getDelay(TimeUnit unit) {
+            throw new Error();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public int compareTo(Delayed o) {
+            Task other = (Task) o;
+
+            if (activeTime == other.activeTime) {
+                return 0;
+            }
+            return activeTime < other.activeTime ? -1 : 1;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean cancel(boolean mayInterruptIfRunning) {
+            cancelled = true;
+            return tasks.remove(this);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean isCancelled() {
+            return cancelled;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean isDone() {
+            return done;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Object get() throws InterruptedException, ExecutionException {
+            throw new Error();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Object get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+            throw new Error();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String toString() {
+            return "Task[" + activeTime + "]";
         }
     }
 }

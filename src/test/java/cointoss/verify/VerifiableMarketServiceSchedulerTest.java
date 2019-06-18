@@ -11,38 +11,33 @@ package cointoss.verify;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 
-import java.time.ZonedDateTime;
+import java.util.concurrent.ScheduledExecutorService;
 
 import org.junit.jupiter.api.Test;
 
-import cointoss.util.Chrono;
+import cointoss.execution.Execution;
 
-class CountingSchedulerTest {
-
-    ZonedDateTime time = Chrono.utc(2019, 1, 1);
+class VerifiableMarketServiceSchedulerTest {
 
     @Test
     void schedule() {
         Value v = new Value();
 
-        CountingScheduler scheduler = new CountingScheduler();
+        VerifiableMarket market = new VerifiableMarket();
+        ScheduledExecutorService scheduler = market.service.scheduler();
+        market.perform(Execution.with.buy(1));
+
         scheduler.schedule(() -> v.value++, 5, SECONDS);
         assert v.value == 0;
 
-        scheduler.setTime(time);
-        assert v.value == 1;
+        market.perform(Execution.with.buy(1), 1); // total 1
+        assert v.value == 0;
 
-        scheduler.schedule(() -> v.value++, 5, SECONDS);
-        assert v.value == 1;
+        market.perform(Execution.with.buy(1), 2); // total 3
+        assert v.value == 0;
 
-        scheduler.setTime(time.plusSeconds(1));
+        market.perform(Execution.with.buy(1), 2); // total 5
         assert v.value == 1;
-
-        scheduler.setTime(time.plusSeconds(3));
-        assert v.value == 1;
-
-        scheduler.setTime(time.plusSeconds(5));
-        assert v.value == 2;
     }
 
     private static class Value {

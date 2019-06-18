@@ -14,8 +14,6 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import java.time.temporal.ChronoUnit;
 import java.util.LinkedList;
 import java.util.Objects;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
@@ -92,9 +90,6 @@ public class Market implements Disposable {
     /** The position manager. */
     public final PositionManager positions;
 
-    /** The scheduler. */
-    public ScheduledExecutorService scheduler;
-
     /**
      * Build {@link Market} with the specified {@link MarketServiceProvider}.
      * 
@@ -105,12 +100,6 @@ public class Market implements Disposable {
         this.orders = new OrderManager(service);
         this.orderBook = new OrderBookManager(service);
         this.positions = new PositionManager(service, tickers.latest);
-        this.scheduler = Executors.newScheduledThreadPool(5, r -> {
-            Thread thread = new Thread(r);
-            thread.setDaemon(true);
-            thread.setName(service.marketIdentity());
-            return thread;
-        });
 
         // build tickers for each span
         timeline.to(tickers::update);
@@ -340,7 +329,7 @@ public class Market implements Disposable {
         public <S extends OrderStrategy.Takable & OrderStrategy.Makable> S cancelAfter(long time, ChronoUnit unit) {
             actions.add((market, direction, size, previous, orders) -> {
                 if (previous != null && previous.isNotCompleted()) {
-                    I.schedule(time, TimeUnit.of(unit), scheduler, () -> {
+                    I.schedule(time, TimeUnit.of(unit), service.scheduler(), () -> {
                         if (previous.isNotCompleted()) {
                             market.orders.cancel(previous).to(() -> {
                                 execute(market, direction, size, null, orders);

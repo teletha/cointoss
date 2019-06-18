@@ -11,6 +11,8 @@ package cointoss;
 
 import java.time.ZonedDateTime;
 import java.util.Objects;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Consumer;
 
 import cointoss.execution.Execution;
@@ -25,9 +27,6 @@ import kiss.Disposable;
 import kiss.Signal;
 import kiss.Ⅲ;
 
-/**
- * @version 2018/08/05 0:47:38
- */
 public abstract class MarketService implements Disposable {
 
     /** The exchange name. */
@@ -44,6 +43,14 @@ public abstract class MarketService implements Disposable {
 
     /** The market configuration. */
     public final MarketSetting setting;
+
+    /** The market specific scheduler. */
+    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(8, task -> {
+        Thread thread = new Thread();
+        thread.setName(marketIdentity());
+        thread.setDaemon(true);
+        return thread;
+    });
 
     /**
      * @param exchangeName
@@ -193,8 +200,22 @@ public abstract class MarketService implements Disposable {
      */
     public abstract Signal<Num> targetCurrency();
 
+    /**
+     * Get the current time.
+     * 
+     * @return The current time.
+     */
     public ZonedDateTime now() {
         return Chrono.utcNow();
+    }
+
+    /**
+     * Get the market scheduler.
+     * 
+     * @return A scheduler.
+     */
+    public ScheduledExecutorService scheduler() {
+        return scheduler;
     }
 
     /**
