@@ -30,7 +30,7 @@ public class BackTest {
 
                     @Override
                     protected void order() {
-                        order(0.01).makeBestPrice().cancelAfter(5, MINUTES);
+                        order(0.01, s -> s.makeBestPrice().cancelAfter(5, MINUTES));
                     }
                 };
             });

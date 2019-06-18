@@ -27,7 +27,6 @@ import cointoss.Directional;
 import cointoss.Market;
 import cointoss.execution.Execution;
 import cointoss.order.Order;
-import cointoss.order.OrderStrategy;
 import cointoss.order.OrderStrategy.Makable;
 import cointoss.order.OrderStrategy.Takable;
 import cointoss.util.Num;
@@ -304,7 +303,6 @@ public abstract class Trader {
          * Declare exit order.
          */
         protected final void stopLossAtAcceptableRisk() {
-            stop.when(profit.observeNow().take(v -> v.isLessThan(funds.riskAssets().negate()))).how(OrderStrategy.with.take());
         }
 
         /**
