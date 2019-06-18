@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Test;
 
 import cointoss.execution.Execution;
 import cointoss.verify.VerifiableMarket;
+import kiss.Signaling;
 
 class OrderStrategyTest {
 
@@ -95,5 +96,21 @@ class OrderStrategyTest {
         market.perform(Execution.with.buy(0.5).price(13), 1); // total 3
         assert o.state == OrderState.CANCELED;
         assert o.executedSize.is(0.5);
+    }
+
+    @Test
+    void cancelWhen() {
+        Signaling signaling = new Signaling();
+        List<Order> orders = market.request(BUY, 1, s -> s.make(10).cancelWhen(signaling.expose)).toList();
+
+        Order o = orders.get(0);
+        assert o.state == OrderState.ACTIVE;
+        market.perform(Execution.with.buy(1).price(11));
+        assert o.state == OrderState.ACTIVE;
+        market.perform(Execution.with.buy(1).price(12));
+        assert o.state == OrderState.ACTIVE;
+
+        signaling.accept("cancel");
+        assert o.state == OrderState.CANCELED;
     }
 }

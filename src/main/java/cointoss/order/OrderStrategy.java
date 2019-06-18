@@ -12,6 +12,7 @@ package cointoss.order;
 import java.time.temporal.ChronoUnit;
 
 import cointoss.util.Num;
+import kiss.Signal;
 
 public interface OrderStrategy {
 
@@ -83,5 +84,14 @@ public interface OrderStrategy {
          * @return
          */
         <S extends Takable & Makable> S cancelAfter(long time, ChronoUnit unit);
+
+        /**
+         * Cancel the order if it remains after the specified time has passed.
+         * 
+         * @param <S>
+         * @param timing A timing to cancel order.
+         * @return
+         */
+        <S extends Takable & Makable> S cancelWhen(Signal<?> timing);
     }
 }

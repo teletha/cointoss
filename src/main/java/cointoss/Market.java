@@ -327,9 +327,17 @@ public class Market implements Disposable {
          */
         @Override
         public <S extends OrderStrategy.Takable & OrderStrategy.Makable> S cancelAfter(long time, ChronoUnit unit) {
+            return cancelWhen(I.signal(time, time, TimeUnit.of(unit), service.scheduler()));
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public <S extends Takable & Makable> S cancelWhen(Signal<?> timing) {
             actions.add((market, direction, size, previous, orders) -> {
                 if (previous != null && previous.isNotCompleted()) {
-                    I.schedule(time, TimeUnit.of(unit), service.scheduler(), () -> {
+                    timing.first().to(() -> {
                         if (previous.isNotCompleted()) {
                             market.orders.cancel(previous).to(() -> {
                                 execute(market, direction, size, null, orders);
