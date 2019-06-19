@@ -166,8 +166,6 @@ public abstract class Trader {
         /** The fund management for this entry. */
         protected final FundManager funds;
 
-        protected final StopLoss stopLoss = new StopLoss();
-
         /** The list entry orders. */
         private final List<Order> entries = new ArrayList<>();
 
@@ -334,6 +332,5 @@ public abstract class Trader {
         // .append(exitPrice().asJPY(1))
         // .toString();
         // }
-
     }
 }
