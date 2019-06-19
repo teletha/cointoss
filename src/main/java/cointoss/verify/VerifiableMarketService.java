@@ -129,7 +129,7 @@ public class VerifiableMarketService extends MarketService {
             BackendOrder child = new BackendOrder(order);
             child.id = "LOCAL-ACCEPTANCE-" + id++;
             child.state = OrderState.ACTIVE;
-            child.creationTime = latency.emulate(now());
+            child.createTimeMills = nowMills + latency.lag();
             child.remainingSize = order.size;
 
             orderAll.add(child);
@@ -273,7 +273,7 @@ public class VerifiableMarketService extends MarketService {
             BackendOrder order = iterator.next();
 
             // time base filter
-            if (e.date.isBefore(order.creationTime)) {
+            if (e.mills < order.createTimeMills) {
                 continue;
             }
 
@@ -420,9 +420,6 @@ public class VerifiableMarketService extends MarketService {
         /** The order type. */
         private QuantityCondition condition;
 
-        /** The created time. */
-        private ZonedDateTime creationTime;
-
         /** The order state. */
         private OrderState state;
 
@@ -464,7 +461,7 @@ public class VerifiableMarketService extends MarketService {
             this.price = o.price;
             this.type = o.type;
             this.condition = o.quantityCondition;
-            this.creationTime = o.creationTime;
+            this.createTimeMills = o.creationTime.toInstant().toEpochMilli();
             this.marketMinPrice = isBuy() ? Num.ZERO : Num.MAX;
         }
 

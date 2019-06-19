@@ -11,6 +11,7 @@ package cointoss.verify;
 
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Emulation for network latency.
@@ -25,12 +26,30 @@ public interface Latency {
     ZonedDateTime emulate(ZonedDateTime time);
 
     /**
+     * Modify time by lag.
+     * 
+     * @return The modified time.
+     */
+    long lag();
+
+    /**
      * Build no lag.
      * 
      * @return A create {@link Latency}.
      */
     static Latency zero() {
-        return date -> date;
+        return new Latency() {
+
+            @Override
+            public long lag() {
+                return 0;
+            }
+
+            @Override
+            public ZonedDateTime emulate(ZonedDateTime time) {
+                return time;
+            }
+        };
     }
 
     /**
@@ -41,6 +60,19 @@ public interface Latency {
      * @return A created {@link Latency}.
      */
     static Latency fixed(long time, ChronoUnit unit) {
-        return date -> date.plus(time, unit);
+        long lag = TimeUnit.of(unit).toMillis(time);
+
+        return new Latency() {
+
+            @Override
+            public long lag() {
+                return lag;
+            }
+
+            @Override
+            public ZonedDateTime emulate(ZonedDateTime date) {
+                return date.plus(time, unit);
+            }
+        };
     }
 }

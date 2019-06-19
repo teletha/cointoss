@@ -14,6 +14,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import cointoss.execution.Execution;
+import cointoss.util.Chrono;
 import cointoss.verify.VerifiableMarket;
 
 class OrderManagerTest {
@@ -98,7 +99,7 @@ class OrderManagerTest {
     @Test
     void requestedOrderHaveCreationTime() {
         Order order = Order.with.buy(1).price(10);
-        assert order.creationTime == null;
+        assert order.creationTime == Chrono.MIN;
 
         orders.request(order).to(o -> {
             assert o.creationTime.isEqual(market.service.now());

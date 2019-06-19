@@ -19,6 +19,7 @@ import java.util.function.Consumer;
 import cointoss.Direction;
 import cointoss.Directional;
 import cointoss.execution.Execution;
+import cointoss.util.Chrono;
 import cointoss.util.Num;
 import cointoss.util.ObservableNumProperty;
 import cointoss.util.ObservableProperty;
@@ -195,7 +196,7 @@ public abstract class OrderModel implements Directional, Comparable<OrderModel> 
      */
     @Icy.Property(custom = ObservableProperty.class, mutable = true)
     public ZonedDateTime creationTime() {
-        return null;
+        return Chrono.MIN;
     }
 
     /**
