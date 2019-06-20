@@ -172,6 +172,9 @@ public abstract class Trader {
         /** The list exit orders. */
         private final List<Order> exits = new ArrayList<>();
 
+        /** The exit disposer. */
+        private final Disposable diposer = Disposable.empty();
+
         /**
          * @param directional
          */
@@ -185,6 +188,8 @@ public abstract class Trader {
         protected Entry(Directional directional, FundManager funds) {
             this.direction = directional.direction();
             this.funds = funds == null ? Trader.this.funds : funds;
+
+            disposer.add(observeEntryExecutedSize().first().to(this::exit));
         }
 
         /**
@@ -241,7 +246,7 @@ public abstract class Trader {
             setEntrySize(entrySize.plus(order.size));
 
             order.observeExecutedSize().to(v -> {
-                updateOrderRelatedStatus(entries, this::setEntryPrice, this::setEntryExecutedSize);
+                updateOrderRelatedStatus(entries, this::setEntryPrice, this::setEntryExecutedSize, false);
             });
         }
 
@@ -250,7 +255,7 @@ public abstract class Trader {
          * 
          * @param orders
          */
-        private void updateOrderRelatedStatus(List<Order> orders, Consumer<Num> priceSetter, Consumer<Num> sizeSetter) {
+        private void updateOrderRelatedStatus(List<Order> orders, Consumer<Num> priceSetter, Consumer<Num> sizeSetter, boolean exit) {
             Num totalSize = Num.ZERO;
             Num totalPrice = Num.ZERO;
 
@@ -261,13 +266,15 @@ public abstract class Trader {
 
             sizeSetter.accept(totalSize);
             priceSetter.accept(totalPrice.divide(totalSize));
+            if (exit) setRealizedProfit(exitPrice.minus(direction, entryPrice).multiply(totalSize));
         }
 
         /**
-         * Declare exit order.
+         * Declare exit order. Loss cutting is the only element in the trade that investors can
+         * control.
          */
-        protected void fixProfit() {
-            fixProfitAtRiskRewardRatio();
+        protected void exit() {
+            exitAtRiskRewardRatio();
         }
 
         /**
@@ -277,30 +284,32 @@ public abstract class Trader {
          * @param timing
          * @param strategy
          */
-        protected final <S extends Takable & Makable> void fixProfitWhen(Signal<?> timing, Consumer<S> strategy) {
+        protected final <S extends Takable & Makable> void exitWhen(Signal<?> timing, Consumer<S> strategy) {
+            disposer.add(timing.first().to(() -> {
+                market.request(direction.inverse(), entryExecutedSize.minus(exitExecutedSize), strategy).to(this::processAddExitOrder);
+            }));
+        }
 
+        /**
+         * Process for additional exit order.
+         * 
+         * @param order
+         */
+        private void processAddExitOrder(Order order) {
+            exits.add(order);
+            setExitSize(exitSize.plus(order.size));
+
+            order.observeExecutedSize().to(v -> {
+                updateOrderRelatedStatus(exits, this::setExitPrice, this::setExitExecutedSize, true);
+            });
         }
 
         /**
          * 
          * 
          */
-        protected final void fixProfitAtRiskRewardRatio() {
+        protected final void exitAtRiskRewardRatio() {
 
-        }
-
-        /**
-         * Declare exit orders. Loss cutting is the only element in the trade that investors can
-         * control.
-         */
-        protected void stopLoss() {
-            stopLossAtAcceptableRisk();
-        }
-
-        /**
-         * Declare exit order.
-         */
-        protected final void stopLossAtAcceptableRisk() {
         }
 
         /**

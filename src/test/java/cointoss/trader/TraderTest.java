@@ -9,8 +9,8 @@
  */
 package cointoss.trader;
 
-import static cointoss.Direction.*;
-import static java.time.temporal.ChronoUnit.*;
+import static cointoss.Direction.BUY;
+import static java.time.temporal.ChronoUnit.SECONDS;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -49,7 +49,7 @@ class TraderTest extends TraderTestSupport {
     }
 
     @Test
-    void fixProfitMake() {
+    void exitMakeAtPrice() {
         when(now(), v -> {
             return new Entry(Direction.BUY) {
 
@@ -59,8 +59,8 @@ class TraderTest extends TraderTestSupport {
                 }
 
                 @Override
-                protected void fixProfit() {
-                    fixProfitWhen(now(), s -> s.make(20));
+                protected void exit() {
+                    exitWhen(now(), s -> s.make(20));
                 }
             };
         });
@@ -72,6 +72,26 @@ class TraderTest extends TraderTestSupport {
         assert entry.entrySize.is(1);
         assert entry.entryExecutedSize.is(1);
         assert entry.entryPrice.is(10);
+
+        // exit order
+        assert entry.exitSize.is(1);
+        assert entry.exitExecutedSize.is(0);
+        assert entry.exitPrice.is(0);
+
+        // don't execute exit order
+        market.perform(Execution.with.buy(1).price(15));
+        assert entry.exitSize.is(1);
+        assert entry.exitExecutedSize.is(0);
+        assert entry.exitPrice.is(0);
+
+        // execute exit order
+        market.perform(Execution.with.buy(1).price(21));
+        assert entry.exitSize.is(1);
+        assert entry.exitExecutedSize.is(1);
+        assert entry.exitPrice.is(20);
+
+        // check profit
+        assert entry.realizedProfit.is(10);
     }
 
     @Test
@@ -87,11 +107,11 @@ class TraderTest extends TraderTestSupport {
         });
 
         Entry e = latest();
-        assert e.profit.is(0);
+        assert e.realizedProfit.is(0);
 
         // execute entry order
         market.perform(Execution.with.buy(1).price(9));
-        assert e.profit.is(-1);
+        assert e.realizedProfit.is(-1);
     }
 
     @Test

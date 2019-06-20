@@ -47,12 +47,52 @@ public abstract class EntryStatusModel {
     }
 
     /**
-     * A total profit or loss of this entry.
+     * A total size of exit orders.
      * 
-     * @return A total profit or loss of this entry.
+     * @return A total size of exit orders.
      */
     @Icy.Property(custom = ObservableNumProperty.class)
-    public Num profit() {
+    public Num exitSize() {
+        return Num.ZERO;
+    }
+
+    /**
+     * A total size of executed exit orders.
+     * 
+     * @return A total size of executed exit orders.
+     */
+    @Icy.Property(custom = ObservableNumProperty.class)
+    public Num exitExecutedSize() {
+        return Num.ZERO;
+    }
+
+    /**
+     * An average price of executed exit orders.
+     * 
+     * @return An average price of executed exit orders.
+     */
+    @Icy.Property(custom = ObservableNumProperty.class)
+    public Num exitPrice() {
+        return Num.ZERO;
+    }
+
+    /**
+     * A realized profit or loss of this entry.
+     * 
+     * @return A realized profit or loss of this entry.
+     */
+    @Icy.Property(custom = ObservableNumProperty.class)
+    public Num realizedProfit() {
+        return Num.ZERO;
+    }
+
+    /**
+     * An unrealized profit or loss of this entry.
+     * 
+     * @return An unrealized profit or loss of this entry.
+     */
+    @Icy.Property(custom = ObservableNumProperty.class)
+    public Num unrealizedProfit() {
         return Num.ZERO;
     }
 }
