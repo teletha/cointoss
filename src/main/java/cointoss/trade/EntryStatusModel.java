@@ -75,24 +75,4 @@ public abstract class EntryStatusModel {
     public Num exitPrice() {
         return Num.ZERO;
     }
-
-    /**
-     * A realized profit or loss of this entry.
-     * 
-     * @return A realized profit or loss of this entry.
-     */
-    @Icy.Property(custom = ObservableNumProperty.class)
-    public Num realizedProfit() {
-        return Num.ZERO;
-    }
-
-    /**
-     * An unrealized profit or loss of this entry.
-     * 
-     * @return An unrealized profit or loss of this entry.
-     */
-    @Icy.Property(custom = ObservableNumProperty.class)
-    public Num unrealizedProfit() {
-        return Num.ZERO;
-    }
 }

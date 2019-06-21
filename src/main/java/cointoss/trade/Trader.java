@@ -193,6 +193,34 @@ public abstract class Trader {
         }
 
         /**
+         * A total profit or loss of this entry.
+         * 
+         * @return A total profit or loss of this entry.
+         */
+        public Signal<Num> profit() {
+            return realizedProfit().combineLatest(unrealizedProfit()).map(e -> e.ⅰ.plus(e.ⅱ));
+        }
+
+        /**
+         * A realized profit or loss of this entry.
+         * 
+         * @return A realized profit or loss of this entry.
+         */
+        public Signal<Num> realizedProfit() {
+            return observeExitSizeNow().map(size -> exitPrice.minus(direction, entryPrice).multiply(size));
+        }
+
+        /**
+         * An unrealized profit or loss of this entry.
+         * 
+         * @return An unrealized profit or loss of this entry.
+         */
+        public Signal<Num> unrealizedProfit() {
+            return market.tickers.latest.observeNow()
+                    .map(e -> e.price.minus(direction, entryPrice).multiply(entrySize.minus(exitExecutedSize)));
+        }
+
+        /**
          * Declare entry order.
          */
         protected abstract void order();
@@ -246,7 +274,7 @@ public abstract class Trader {
             setEntrySize(entrySize.plus(order.size));
 
             order.observeExecutedSize().to(v -> {
-                updateOrderRelatedStatus(entries, this::setEntryPrice, this::setEntryExecutedSize, false);
+                updateOrderRelatedStatus(entries, this::setEntryPrice, this::setEntryExecutedSize);
             });
         }
 
@@ -255,7 +283,7 @@ public abstract class Trader {
          * 
          * @param orders
          */
-        private void updateOrderRelatedStatus(List<Order> orders, Consumer<Num> priceSetter, Consumer<Num> sizeSetter, boolean exit) {
+        private void updateOrderRelatedStatus(List<Order> orders, Consumer<Num> priceSetter, Consumer<Num> sizeSetter) {
             Num totalSize = Num.ZERO;
             Num totalPrice = Num.ZERO;
 
@@ -266,7 +294,6 @@ public abstract class Trader {
 
             sizeSetter.accept(totalSize);
             priceSetter.accept(totalPrice.divide(totalSize));
-            if (exit) setRealizedProfit(exitPrice.minus(direction, entryPrice).multiply(totalSize));
         }
 
         /**
@@ -300,7 +327,7 @@ public abstract class Trader {
             setExitSize(exitSize.plus(order.size));
 
             order.observeExecutedSize().to(v -> {
-                updateOrderRelatedStatus(exits, this::setExitPrice, this::setExitExecutedSize, true);
+                updateOrderRelatedStatus(exits, this::setExitPrice, this::setExitExecutedSize);
             });
         }
 

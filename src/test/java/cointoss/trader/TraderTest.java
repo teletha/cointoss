@@ -9,8 +9,8 @@
  */
 package cointoss.trader;
 
-import static cointoss.Direction.BUY;
-import static java.time.temporal.ChronoUnit.SECONDS;
+import static cointoss.Direction.*;
+import static java.time.temporal.ChronoUnit.*;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -89,9 +89,6 @@ class TraderTest extends TraderTestSupport {
         assert entry.exitSize.is(1);
         assert entry.exitExecutedSize.is(1);
         assert entry.exitPrice.is(20);
-
-        // check profit
-        assert entry.realizedProfit.is(10);
     }
 
     @Test
@@ -101,17 +98,24 @@ class TraderTest extends TraderTestSupport {
 
                 @Override
                 protected void order() {
-                    order(1, s -> s.make(10));
+                    order(3, s -> s.make(10));
+                }
+
+                @Override
+                protected void exit() {
+                    exitWhen(now(), s -> s.make(20));
                 }
             };
         });
 
         Entry e = latest();
-        assert e.realizedProfit.is(0);
+        Variable<Num> profit = e.profit().to();
+        Variable<Num> realized = e.realizedProfit().to();
+        Variable<Num> unrealized = e.unrealizedProfit().to();
 
-        // execute entry order
-        market.perform(Execution.with.buy(1).price(9));
-        assert e.realizedProfit.is(-1);
+        assert profit.v.is(0);
+        assert realized.v.is(0);
+        assert unrealized.v.is(0);
     }
 
     @Test
