@@ -190,34 +190,18 @@ public abstract class Trader {
             this.funds = funds == null ? Trader.this.funds : funds;
 
             disposer.add(observeEntryExecutedSize().first().to(this::exit));
-        }
 
-        /**
-         * A total profit or loss of this entry.
-         * 
-         * @return A total profit or loss of this entry.
-         */
-        public Signal<Num> profit() {
-            return realizedProfit().combineLatest(unrealizedProfit()).map(e -> e.ⅰ.plus(e.ⅱ));
-        }
-
-        /**
-         * A realized profit or loss of this entry.
-         * 
-         * @return A realized profit or loss of this entry.
-         */
-        public Signal<Num> realizedProfit() {
-            return observeExitSizeNow().map(size -> exitPrice.minus(direction, entryPrice).multiply(size));
-        }
-
-        /**
-         * An unrealized profit or loss of this entry.
-         * 
-         * @return An unrealized profit or loss of this entry.
-         */
-        public Signal<Num> unrealizedProfit() {
-            return market.tickers.latest.observeNow()
-                    .map(e -> e.price.minus(direction, entryPrice).multiply(entrySize.minus(exitExecutedSize)));
+            // calculate profit
+            observeExitExecutedSize().to(size -> {
+                System.out.println(size);
+                setRealizedProfit(exitPrice.minus(direction, entryPrice).multiply(size));
+            }, diposer);
+            observeEntryExecutedSize().combineLatest(market.tickers.latest.observe()).to(e -> {
+                setUnrealizedProfit(e.ⅱ.price.minus(direction, entryPrice).multiply(entryExecutedSize.minus(exitExecutedSize)));
+            }, diposer);
+            observeRealizedProfitNow().combineLatest(observeUnrealizedProfit()).to(e -> {
+                setProfit(e.ⅰ.plus(e.ⅱ));
+            }, diposer);
         }
 
         /**
@@ -292,8 +276,8 @@ public abstract class Trader {
                 totalPrice = totalPrice.plus(order.executedSize.multiply(order.price));
             }
 
-            sizeSetter.accept(totalSize);
             priceSetter.accept(totalPrice.divide(totalSize));
+            sizeSetter.accept(totalSize);
         }
 
         /**
@@ -302,6 +286,38 @@ public abstract class Trader {
          */
         protected void exit() {
             exitAtRiskRewardRatio();
+        }
+
+        /**
+         * Declare exit order by price. Loss cutting is the only element in the trade that investors
+         * can control.
+         * 
+         * @param price An exit price.
+         */
+        protected final void exitAt(long price) {
+            exitAt(Num.of(price));
+        }
+
+        /**
+         * Declare exit order by price. Loss cutting is the only element in the trade that investors
+         * can control.
+         * 
+         * @param price An exit price.
+         */
+        protected final void exitAt(double price) {
+            exitAt(Num.of(price));
+        }
+
+        /**
+         * Declare exit order by price. Loss cutting is the only element in the trade that investors
+         * can control.
+         * 
+         * @param price An exit price.
+         */
+        protected final void exitAt(Num price) {
+            observeEntryExecutedSizeDiff().to(size -> {
+                market.request(direction.inverse(), size, s -> s.make(price)).to(this::processAddExitOrder);
+            });
         }
 
         /**
@@ -325,8 +341,9 @@ public abstract class Trader {
         private void processAddExitOrder(Order order) {
             exits.add(order);
             setExitSize(exitSize.plus(order.size));
-
+            System.out.println(order);
             order.observeExecutedSize().to(v -> {
+                System.out.println("Exit order " + v);
                 updateOrderRelatedStatus(exits, this::setExitPrice, this::setExitExecutedSize);
             });
         }

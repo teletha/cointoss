@@ -9,8 +9,8 @@
  */
 package cointoss.trader;
 
-import static cointoss.Direction.*;
-import static java.time.temporal.ChronoUnit.*;
+import static cointoss.Direction.BUY;
+import static java.time.temporal.ChronoUnit.SECONDS;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -60,7 +60,7 @@ class TraderTest extends TraderTestSupport {
 
                 @Override
                 protected void exit() {
-                    exitWhen(now(), s -> s.make(20));
+                    exitAt(20);
                 }
             };
         });
@@ -103,19 +103,52 @@ class TraderTest extends TraderTestSupport {
 
                 @Override
                 protected void exit() {
-                    exitWhen(now(), s -> s.make(20));
+                    exitAt(20);
                 }
             };
         });
 
         Entry e = latest();
-        Variable<Num> profit = e.profit().to();
-        Variable<Num> realized = e.realizedProfit().to();
-        Variable<Num> unrealized = e.unrealizedProfit().to();
 
-        assert profit.v.is(0);
-        assert realized.v.is(0);
-        assert unrealized.v.is(0);
+        assert e.profit.is(0);
+        assert e.realizedProfit.is(0);
+        assert e.unrealizedProfit.is(0);
+
+        // entry 1
+        market.perform(Execution.with.buy(1).price(9));
+        assert e.profit.is(0);
+        assert e.realizedProfit.is(0);
+        assert e.unrealizedProfit.is(0);
+
+        // execute profit
+        market.perform(Execution.with.buy(1).price(15));
+        assert e.profit.is(5);
+        assert e.realizedProfit.is(0);
+        assert e.unrealizedProfit.is(5);
+
+        // exit 1
+        market.perform(Execution.with.buy(1).price(21));
+        assert e.profit.is(10);
+        assert e.realizedProfit.is(10);
+        assert e.unrealizedProfit.is(0);
+
+        // entry 2
+        market.perform(Execution.with.buy(2).price(9));
+        assert e.profit.is(10);
+        assert e.realizedProfit.is(10);
+        assert e.unrealizedProfit.is(0);
+
+        // execute profit
+        market.perform(Execution.with.buy(1).price(15));
+        assert e.profit.is(20);
+        assert e.realizedProfit.is(10);
+        assert e.unrealizedProfit.is(10);
+
+        // exit 2
+        market.perform(Execution.with.buy(2).price(21));
+        assert e.profit.is(30);
+        assert e.realizedProfit.is(30);
+        assert e.unrealizedProfit.is(0);
     }
 
     @Test
