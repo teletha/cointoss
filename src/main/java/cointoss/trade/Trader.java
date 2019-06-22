@@ -31,6 +31,7 @@ import cointoss.order.OrderStrategy.Makable;
 import cointoss.order.OrderStrategy.Takable;
 import cointoss.util.Num;
 import kiss.Disposable;
+import kiss.I;
 import kiss.Signal;
 import kiss.Signaling;
 
@@ -192,8 +193,7 @@ public abstract class Trader {
             disposer.add(observeEntryExecutedSize().first().to(this::exit));
 
             // calculate profit
-            observeExitExecutedSize().to(size -> {
-                System.out.println(size);
+            observeExitExecutedSize().effectOnce(this::disposeEntries).to(size -> {
                 setRealizedProfit(exitPrice.minus(direction, entryPrice).multiply(size));
             }, diposer);
             observeEntryExecutedSize().combineLatest(market.tickers.latest.observe()).to(e -> {
@@ -202,6 +202,12 @@ public abstract class Trader {
             observeRealizedProfitNow().combineLatest(observeUnrealizedProfit()).to(e -> {
                 setProfit(e.ⅰ.plus(e.ⅱ));
             }, diposer);
+        }
+
+        private void disposeEntries() {
+            I.signal(entries).take(o -> o.isNotCompleted() && o.isNotCanceled()).flatMap(market::cancel).to(o -> {
+
+            });
         }
 
         /**
@@ -341,9 +347,8 @@ public abstract class Trader {
         private void processAddExitOrder(Order order) {
             exits.add(order);
             setExitSize(exitSize.plus(order.size));
-            System.out.println(order);
+
             order.observeExecutedSize().to(v -> {
-                System.out.println("Exit order " + v);
                 updateOrderRelatedStatus(exits, this::setExitPrice, this::setExitExecutedSize);
             });
         }
