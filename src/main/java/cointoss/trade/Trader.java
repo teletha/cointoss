@@ -9,9 +9,9 @@
  */
 package cointoss.trade;
 
+import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.time.temporal.TemporalUnit;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -27,9 +27,12 @@ import cointoss.Directional;
 import cointoss.Market;
 import cointoss.execution.Execution;
 import cointoss.order.Order;
+import cointoss.order.OrderState;
 import cointoss.order.OrderStrategy.Makable;
 import cointoss.order.OrderStrategy.Orderable;
 import cointoss.order.OrderStrategy.Takable;
+import cointoss.util.Chrono;
+import cointoss.util.LinkedQueue;
 import cointoss.util.Num;
 import kiss.Disposable;
 import kiss.I;
@@ -158,6 +161,15 @@ public abstract class Trader {
     }
 
     /**
+     * Create the trading log snapshot.
+     * 
+     * @return
+     */
+    public TradingLog log() {
+        return new TradingLog(entries);
+    }
+
+    /**
      * Declarative entry and exit definition.
      */
     public abstract class Entry extends EntryStatus implements Directional {
@@ -169,10 +181,10 @@ public abstract class Trader {
         protected final FundManager funds;
 
         /** The list entry orders. */
-        private final List<Order> entries = new ArrayList<>();
+        private final LinkedQueue<Order> entries = new LinkedQueue<>();
 
         /** The list exit orders. */
-        private final List<Order> exits = new ArrayList<>();
+        private final LinkedQueue<Order> exits = new LinkedQueue<>();
 
         /** The exit disposer. */
         private final Disposable diposer = Disposable.empty();
@@ -211,12 +223,52 @@ public abstract class Trader {
             });
         }
 
+        /**
+         * Check {@link OrderState} of this entry.
+         * 
+         * @return A result.
+         */
+        public final boolean isActive() {
+            return isTerminated() == false;
+        }
+
+        /**
+         * Check {@link OrderState} of this entry.
+         * 
+         * @return A result.
+         */
+        public final boolean isTerminated() {
+            return isEntryTerminated() && isExitTerminated();
+        }
+
+        /**
+         * Check {@link OrderState} of this entry.
+         * 
+         * @return A result.
+         */
         public final boolean isEntryTerminated() {
             return entries.stream().allMatch(Order::isTerminated);
         }
 
+        /**
+         * Check {@link OrderState} of this entry.
+         * 
+         * @return A result.
+         */
         public final boolean isExitTerminated() {
             return exits.stream().allMatch(Order::isTerminated);
+        }
+
+        /**
+         * Compute position holding time.
+         */
+        public final Duration holdTime() {
+            ZonedDateTime start = entries.first().flatMap(o -> o.executions.first()).map(Execution::date).or(Chrono.MIN);
+            ZonedDateTime end = exits.last().flatMap(o -> o.executions.last()).map(Execution::date).or(Chrono.MIN);
+            System.out.println(entries);
+            System.out.println(exits);
+
+            return Duration.between(start, end);
         }
 
         /**

@@ -20,13 +20,13 @@ import cointoss.Direction;
 import cointoss.Directional;
 import cointoss.execution.Execution;
 import cointoss.util.Chrono;
+import cointoss.util.LinkedQueue;
 import cointoss.util.Num;
 import cointoss.util.ObservableProperty;
 import icy.manipulator.Icy;
 import kiss.I;
 import kiss.Signal;
 import kiss.Signaling;
-import kiss.Variable;
 
 @Icy(grouping = 2)
 public abstract class OrderModel implements Directional, Comparable<OrderModel> {
@@ -40,8 +40,8 @@ public abstract class OrderModel implements Directional, Comparable<OrderModel> 
     /** The size related signal. */
     private final Signaling<Num> executedSize = new Signaling();
 
-    /** The entry holder. */
-    final LinkedList<Execution> entries = new LinkedList();
+    /** The internal associated execution holder. */
+    public final LinkedQueue<Execution> executions = new LinkedQueue();
 
     /**
      * {@inheritDoc}
@@ -254,13 +254,14 @@ public abstract class OrderModel implements Directional, Comparable<OrderModel> 
     }
 
     /**
-     * Update size atomically.
+     * Update execution atomically.
      * 
-     * @param size
+     * @param e
      */
-    final void executed(Num size) {
-        setRemainingSize(remainingSize().minus(size));
-        setExecutedSize(executedSize().plus(size));
+    final void executed(Execution e) {
+        executions.add(e);
+        setRemainingSize(remainingSize().minus(e.size));
+        setExecutedSize(executedSize().plus(e.size));
 
         remainingSize.accept(remainingSize());
         executedSize.accept(executedSize());
@@ -315,6 +316,24 @@ public abstract class OrderModel implements Directional, Comparable<OrderModel> 
      */
     public final Signal<Order> observeTerminating() {
         return observeState().take(OrderState.CANCELED, OrderState.COMPLETED).take(1).mapTo((Order) this);
+    }
+
+    /**
+     * Check {@link OrderState}.
+     * 
+     * @return The result.
+     */
+    public final boolean isActive() {
+        return state() == OrderState.ACTIVE;
+    }
+
+    /**
+     * Check {@link OrderState}.
+     * 
+     * @return The result.
+     */
+    public final boolean isNotActive() {
+        return isActive() == false;
     }
 
     /**
@@ -422,36 +441,6 @@ public abstract class OrderModel implements Directional, Comparable<OrderModel> 
      */
     public final void log(String comment, Object... params) {
         log(String.format(comment, params));
-    }
-
-    /**
-     * Retrieve first {@link Execution}.
-     * 
-     * @return
-     */
-    @Deprecated
-    public Variable<Execution> first() {
-        return Variable.of(entries.peekFirst());
-    }
-
-    /**
-     * Retrieve last {@link Execution}.
-     * 
-     * @return
-     */
-    @Deprecated
-    public Variable<Execution> last() {
-        return Variable.of(entries.peekLast());
-    }
-
-    /**
-     * Retrieve all {@link Execution}s.
-     * 
-     * @return
-     */
-    @Deprecated
-    public Signal<Execution> all() {
-        return I.signal(entries);
     }
 
     /**

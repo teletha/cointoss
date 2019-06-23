@@ -9,8 +9,12 @@
  */
 package cointoss.trader;
 
+import java.time.ZonedDateTime;
+
+import cointoss.Direction;
+import cointoss.execution.Execution;
+import cointoss.order.OrderStrategy.Orderable;
 import cointoss.trade.Trader;
-import cointoss.trade.TradingLog;
 import cointoss.verify.VerifiableMarket;
 import kiss.I;
 import kiss.Signal;
@@ -18,8 +22,6 @@ import kiss.Signal;
 public abstract class TraderTestSupport extends Trader {
 
     protected VerifiableMarket market;
-
-    protected TradingLog log;
 
     /**
      * @param provider
@@ -40,11 +42,41 @@ public abstract class TraderTestSupport extends Trader {
     }
 
     /**
-     * Create current log.
+     * Config delay.
      * 
+     * @param delay
      * @return
      */
-    protected final TradingLog createLog() {
-        return new TradingLog(market, I.list(this));
+    protected final ZonedDateTime second(long delay) {
+        return market.service.now().plusSeconds(delay);
+    }
+
+    /**
+     * Shorthand method to entry and exit.
+     * 
+     * @param direction
+     * @param entry
+     * @param exit
+     */
+    protected final void entryAndExit(Direction direction, Execution entry, Execution exit) {
+        when(now(), v -> new Entry(direction) {
+
+            @Override
+            protected void order() {
+                order(entry.size, Orderable::take);
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            protected void exit() {
+                exitAt(exit.price, Orderable::take);
+            }
+        });
+
+        market.perform(entry);
+        market.perform(exit);
+        market.perform(exit);
     }
 }

@@ -21,22 +21,20 @@ import cointoss.trade.TradingLog;
 public class TradingLogTest extends TraderTestSupport {
 
     @Test
-    void complete() {
-        entry(BUY, 1, 10).exit(1, 15);
-
-        TradingLog log = createLog();
-        assert log.complete == 1;
+    void initialized() {
+        TradingLog log = log();
+        assert log.terminated == 0;
         assert log.active == 0;
         assert log.cancel == 0;
-        assert log.total == 1;
+        assert log.total == 0;
     }
 
     @Test
     void completeProfit() {
-        entry(BUY, 1, 10).exit(1, 15);
+        entryAndExit(BUY, 1, 10).exit(1, 15);
 
         TradingLog log = createLog();
-        assert log.complete == 1;
+        assert log.terminated == 1;
         assert log.profit.max().is(5);
         assert log.profit.min().is(5);
         assert log.profit.size() == 1;
@@ -45,10 +43,10 @@ public class TradingLogTest extends TraderTestSupport {
 
     @Test
     void completeLoss() {
-        entry(SELL, 1, 10).exit(1, 15);
+        entryAndExit(SELL, 1, 10).exit(1, 15);
 
         TradingLog log = createLog();
-        assert log.complete == 1;
+        assert log.terminated == 1;
         assert log.loss.max().is(-5);
         assert log.loss.min().is(-5);
         assert log.loss.size() == 1;
@@ -57,10 +55,10 @@ public class TradingLogTest extends TraderTestSupport {
 
     @Test
     void completeProfitMultiExitOrders() {
-        entry(BUY, 1, 10).exit(0.5, 15).exit(0.5, 20);
+        entryAndExit(BUY, 1, 10).exit(0.5, 15).exit(0.5, 20);
 
         TradingLog log = createLog();
-        assert log.complete == 1;
+        assert log.terminated == 1;
         assert log.profit.max().is("7.5");
         assert log.profit.min().is("7.5");
         assert log.profit.size() == 1;
@@ -69,10 +67,10 @@ public class TradingLogTest extends TraderTestSupport {
 
     @Test
     void completeProfitMultiExitExecutions() {
-        entry(BUY, 1, 10).exit(1, 15, 0.5, 0.5);
+        entryAndExit(BUY, 1, 10).exit(1, 15, 0.5, 0.5);
 
         TradingLog log = createLog();
-        assert log.complete == 1;
+        assert log.terminated == 1;
         assert log.profit.max().is("5");
         assert log.profit.min().is("5");
         assert log.profit.size() == 1;
@@ -81,10 +79,10 @@ public class TradingLogTest extends TraderTestSupport {
 
     @Test
     void active() {
-        entry(BUY, 1, 10).exit(0.5, 15);
+        entryAndExit(BUY, 1, 10).exit(0.5, 15);
 
         TradingLog log = createLog();
-        assert log.complete == 0;
+        assert log.terminated == 0;
         assert log.active == 1;
         assert log.cancel == 0;
         assert log.total == 1;
@@ -92,7 +90,7 @@ public class TradingLogTest extends TraderTestSupport {
 
     @Test
     void activeProfit() {
-        entry(BUY, 1, 10).exit(0.5, 15);
+        entryAndExit(BUY, 1, 10).exit(0.5, 15);
 
         TradingLog log = createLog();
         assert log.active == 1;
@@ -104,7 +102,7 @@ public class TradingLogTest extends TraderTestSupport {
 
     @Test
     void activeLoss() {
-        entry(SELL, 1, 10).exit(0.5, 15);
+        entryAndExit(SELL, 1, 10).exit(0.5, 15);
 
         TradingLog log = createLog();
         assert log.active == 1;
@@ -116,7 +114,7 @@ public class TradingLogTest extends TraderTestSupport {
 
     @Test
     void activeProfitMultipleExitOrders() {
-        entry(BUY, 1, 10).exit(0.5, 15).exit(0.2, 20);
+        entryAndExit(BUY, 1, 10).exit(0.5, 15).exit(0.2, 20);
 
         TradingLog log = createLog();
         assert log.active == 1;
@@ -128,7 +126,7 @@ public class TradingLogTest extends TraderTestSupport {
 
     @Test
     void activeProfitMultiExitExecutions() {
-        entry(BUY, 1, 10).exit(1, 20, 0.2, 0.3);
+        entryAndExit(BUY, 1, 10).exit(1, 20, 0.2, 0.3);
 
         TradingLog log = createLog();
         assert log.active == 1;
@@ -140,11 +138,11 @@ public class TradingLogTest extends TraderTestSupport {
 
     @Test
     void entries() {
-        entry(BUY, 1, 10).exit(1, 15);
-        entry(BUY, 1, 15).exit(1, 25, 0.5);
+        entryAndExit(BUY, 1, 10).exit(1, 15);
+        entryAndExit(BUY, 1, 15).exit(1, 25, 0.5);
 
         TradingLog log = createLog();
-        assert log.complete == 1;
+        assert log.terminated == 1;
         assert log.active == 1;
         assert log.cancel == 0;
         assert log.total == 2;
@@ -157,14 +155,14 @@ public class TradingLogTest extends TraderTestSupport {
 
     @Test
     void profitAndLoss() {
-        entry(BUY, 1, 10).exit(1, 15);
-        entry(BUY, 1, 15).exit(1, 25);
+        entryAndExit(BUY, 1, 10).exit(1, 15);
+        entryAndExit(BUY, 1, 15).exit(1, 25);
 
-        entry(SELL, 1, 25).exit(1, 30);
-        entry(SELL, 1, 30).exit(1, 40);
+        entryAndExit(SELL, 1, 25).exit(1, 30);
+        entryAndExit(SELL, 1, 30).exit(1, 40);
 
         TradingLog log = createLog();
-        assert log.complete == 4;
+        assert log.terminated == 4;
         assert log.total == 4;
 
         assert log.profit.size() == 2;
@@ -186,12 +184,12 @@ public class TradingLogTest extends TraderTestSupport {
     @Test
     void winningRate1() {
         // win
-        entry(BUY, 1, 10).exit(1, 15);
-        entry(BUY, 1, 15).exit(1, 25);
+        entryAndExit(BUY, 1, 10).exit(1, 15);
+        entryAndExit(BUY, 1, 15).exit(1, 25);
 
         // lose
-        entry(SELL, 1, 25).exit(1, 30);
-        entry(SELL, 1, 30).exit(1, 40);
+        entryAndExit(SELL, 1, 25).exit(1, 30);
+        entryAndExit(SELL, 1, 30).exit(1, 40);
 
         TradingLog log = createLog();
         assert log.winningRate().is(50);
@@ -200,11 +198,11 @@ public class TradingLogTest extends TraderTestSupport {
     @Test
     void winningRate2() {
         // win
-        entry(BUY, 1, 10).exit(1, 15);
-        entry(BUY, 1, 15).exit(1, 25);
+        entryAndExit(BUY, 1, 10).exit(1, 15);
+        entryAndExit(BUY, 1, 15).exit(1, 25);
 
         // lose
-        entry(SELL, 1, 25).exit(1, 30);
+        entryAndExit(SELL, 1, 25).exit(1, 30);
 
         TradingLog log = createLog();
         assert log.winningRate().is("66.7");
@@ -213,8 +211,8 @@ public class TradingLogTest extends TraderTestSupport {
     @Test
     void winningRateNoWin() {
         // lose
-        entry(SELL, 1, 25).exit(1, 30);
-        entry(SELL, 1, 25).exit(1, 30);
+        entryAndExit(SELL, 1, 25).exit(1, 30);
+        entryAndExit(SELL, 1, 25).exit(1, 30);
 
         TradingLog log = createLog();
         assert log.winningRate().is("0");
@@ -223,8 +221,8 @@ public class TradingLogTest extends TraderTestSupport {
     @Test
     void winningRateNoLose() {
         // win
-        entry(BUY, 1, 25).exit(1, 30);
-        entry(BUY, 1, 25).exit(1, 30);
+        entryAndExit(BUY, 1, 25).exit(1, 30);
+        entryAndExit(BUY, 1, 25).exit(1, 30);
 
         TradingLog log = createLog();
         assert log.winningRate().is("100");
@@ -233,12 +231,12 @@ public class TradingLogTest extends TraderTestSupport {
     @Test
     void profitFactorSame() {
         // win
-        entry(BUY, 1, 10).exit(1, 15);
-        entry(BUY, 1, 15).exit(1, 25);
+        entryAndExit(BUY, 1, 10).exit(1, 15);
+        entryAndExit(BUY, 1, 15).exit(1, 25);
 
         // lose
-        entry(SELL, 1, 25).exit(1, 30);
-        entry(SELL, 1, 30).exit(1, 40);
+        entryAndExit(SELL, 1, 25).exit(1, 30);
+        entryAndExit(SELL, 1, 30).exit(1, 40);
 
         TradingLog log = createLog();
         assert log.profitFactor().is(1);
@@ -247,11 +245,11 @@ public class TradingLogTest extends TraderTestSupport {
     @Test
     void profitFactorUp() {
         // win
-        entry(BUY, 1, 10).exit(1, 15);
-        entry(BUY, 1, 15).exit(1, 25);
+        entryAndExit(BUY, 1, 10).exit(1, 15);
+        entryAndExit(BUY, 1, 15).exit(1, 25);
 
         // lose
-        entry(SELL, 1, 20).exit(1, 30);
+        entryAndExit(SELL, 1, 20).exit(1, 30);
 
         TradingLog log = createLog();
         assert log.profitFactor().is("1.5");
@@ -260,11 +258,11 @@ public class TradingLogTest extends TraderTestSupport {
     @Test
     void profitFactorDown() {
         // win
-        entry(BUY, 1, 10).exit(1, 20);
+        entryAndExit(BUY, 1, 10).exit(1, 20);
 
         // lose
-        entry(SELL, 1, 25).exit(1, 30);
-        entry(SELL, 1, 30).exit(1, 40);
+        entryAndExit(SELL, 1, 25).exit(1, 30);
+        entryAndExit(SELL, 1, 30).exit(1, 40);
 
         TradingLog log = createLog();
         assert log.profitFactor().is("0.667");
@@ -273,7 +271,7 @@ public class TradingLogTest extends TraderTestSupport {
     @Test
     void profitFactorNoLose() {
         // win
-        entry(BUY, 1, 10).exit(1, 20);
+        entryAndExit(BUY, 1, 10).exit(1, 20);
 
         TradingLog log = createLog();
         assert log.profitFactor().is("10");
@@ -282,8 +280,8 @@ public class TradingLogTest extends TraderTestSupport {
     @Test
     void profitFactorNoWin() {
         // lose
-        entry(SELL, 1, 25).exit(1, 30);
-        entry(SELL, 1, 30).exit(1, 40);
+        entryAndExit(SELL, 1, 25).exit(1, 30);
+        entryAndExit(SELL, 1, 30).exit(1, 40);
 
         TradingLog log = createLog();
         assert log.profitFactor().is("0");
@@ -292,11 +290,11 @@ public class TradingLogTest extends TraderTestSupport {
     @Test
     void drawDown1() {
         // win
-        entry(BUY, 1, 10).exit(1, 15);
-        entry(BUY, 1, 10).exit(1, 15);
+        entryAndExit(BUY, 1, 10).exit(1, 15);
+        entryAndExit(BUY, 1, 10).exit(1, 15);
 
         // lose
-        entry(SELL, 1, 25).exit(1, 30);
+        entryAndExit(SELL, 1, 25).exit(1, 30);
 
         TradingLog log = createLog();
         assert log.drawDown.is(5);
@@ -305,13 +303,13 @@ public class TradingLogTest extends TraderTestSupport {
 
     @Test
     void drawDown2() {
-        entry(BUY, 1, 10).exit(1, 30); // win 20
-        entry(SELL, 1, 25).exit(1, 30); // lose -5
-        entry(BUY, 1, 10).exit(1, 40); // win 30
-        entry(SELL, 1, 25).exit(1, 50); // lose -25
-        entry(SELL, 1, 25).exit(1, 30); // lose -5
-        entry(SELL, 1, 25).exit(1, 35); // lose -10
-        entry(BUY, 1, 10).exit(1, 40); // win 30
+        entryAndExit(BUY, 1, 10).exit(1, 30); // win 20
+        entryAndExit(SELL, 1, 25).exit(1, 30); // lose -5
+        entryAndExit(BUY, 1, 10).exit(1, 40); // win 30
+        entryAndExit(SELL, 1, 25).exit(1, 50); // lose -25
+        entryAndExit(SELL, 1, 25).exit(1, 30); // lose -5
+        entryAndExit(SELL, 1, 25).exit(1, 35); // lose -10
+        entryAndExit(BUY, 1, 10).exit(1, 40); // win 30
 
         TradingLog log = createLog();
         assert log.drawDown.is(40);
@@ -320,9 +318,9 @@ public class TradingLogTest extends TraderTestSupport {
 
     @Test
     void drawDown3() {
-        entry(BUY, 1, 10).exit(1, 30); // win 20
-        entry(BUY, 1, 10).exit(1, 40); // win 30
-        entry(BUY, 1, 10).exit(1, 40); // win 30
+        entryAndExit(BUY, 1, 10).exit(1, 30); // win 20
+        entryAndExit(BUY, 1, 10).exit(1, 40); // win 30
+        entryAndExit(BUY, 1, 10).exit(1, 40); // win 30
 
         TradingLog log = createLog();
         assert log.drawDown.is(0);
@@ -331,10 +329,10 @@ public class TradingLogTest extends TraderTestSupport {
 
     @Test
     void drawDown4() {
-        entry(SELL, 1, 25).exit(1, 30); // lose -5
-        entry(SELL, 1, 25).exit(1, 50); // lose -25
-        entry(SELL, 1, 25).exit(1, 30); // lose -5
-        entry(SELL, 1, 25).exit(1, 35); // lose -10
+        entryAndExit(SELL, 1, 25).exit(1, 30); // lose -5
+        entryAndExit(SELL, 1, 25).exit(1, 50); // lose -25
+        entryAndExit(SELL, 1, 25).exit(1, 30); // lose -5
+        entryAndExit(SELL, 1, 25).exit(1, 35); // lose -10
 
         TradingLog log = createLog();
         assert log.drawDown.is(45);
@@ -343,19 +341,19 @@ public class TradingLogTest extends TraderTestSupport {
 
     @Test
     void asset() {
-        entry(BUY, 1, 10).exit(1, 30); // win 20
+        entryAndExit(BUY, 1, 10).exit(1, 30); // win 20
         assert createLog().asset().is(120);
-        entry(SELL, 1, 25).exit(1, 30); // lose -5
+        entryAndExit(SELL, 1, 25).exit(1, 30); // lose -5
         assert createLog().asset().is(115);
-        entry(BUY, 1, 10).exit(1, 40); // win 30
+        entryAndExit(BUY, 1, 10).exit(1, 40); // win 30
         assert createLog().asset().is(145);
-        entry(SELL, 1, 25).exit(1, 50); // lose -25
+        entryAndExit(SELL, 1, 25).exit(1, 50); // lose -25
         assert createLog().asset().is(120);
-        entry(SELL, 1, 25).exit(1, 30); // lose -5
+        entryAndExit(SELL, 1, 25).exit(1, 30); // lose -5
         assert createLog().asset().is(115);
-        entry(SELL, 1, 25).exit(1, 35); // lose -10
+        entryAndExit(SELL, 1, 25).exit(1, 35); // lose -10
         assert createLog().asset().is(105);
-        entry(BUY, 1, 10).exit(1, 40); // win 30
+        entryAndExit(BUY, 1, 10).exit(1, 40); // win 30
         assert createLog().asset().is(135);
     }
 }

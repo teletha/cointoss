@@ -54,7 +54,7 @@ public class VerifiableMarket extends Market {
      * @param price
      */
     public VerifiableMarket perform(Execution e) {
-        return perform(e, service.now());
+        return perform(e, e.date.isAfter(service.now()) ? e.date : service.now());
     }
 
     /**

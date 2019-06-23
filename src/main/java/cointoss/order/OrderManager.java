@@ -94,14 +94,11 @@ public final class OrderManager {
                                 .plus(execution.price.multiply(executed))
                                 .divide(executed.plus(order.executedSize)));
                     }
-                    order.executed(executed);
+                    order.executed(execution);
 
                     if (order.remainingSize.is(Num.ZERO)) {
                         order.assignState(COMPLETED);
                     }
-
-                    // pairing order and execution
-                    order.entries.add(execution);
 
                     updates.accept(I.pair(order, execution));
                     return;
