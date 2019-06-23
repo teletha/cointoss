@@ -71,6 +71,12 @@ public interface OrderStrategy {
     }
 
     /**
+     * Both order strategy.
+     */
+    public static interface Orderable extends Takable, Makable {
+    }
+
+    /**
      * Cancelling order strategy.
      */
     public static interface Cancellable extends OrderStrategy {

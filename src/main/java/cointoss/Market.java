@@ -29,6 +29,7 @@ import cointoss.order.OrderManager;
 import cointoss.order.OrderStrategy;
 import cointoss.order.OrderStrategy.Cancellable;
 import cointoss.order.OrderStrategy.Makable;
+import cointoss.order.OrderStrategy.Orderable;
 import cointoss.order.OrderStrategy.Takable;
 import cointoss.order.PositionManager;
 import cointoss.ticker.TickerManager;
@@ -157,7 +158,7 @@ public class Market implements Disposable {
      *         strategies are performed. (Note: not when all orders are completed but when the
      *         strategy is completed)
      */
-    public final <S extends Takable & Makable> Signal<Order> request(Directional directional, long size, Consumer<S> declaration) {
+    public final Signal<Order> request(Directional directional, long size, Consumer<Orderable> declaration) {
         return request(directional, Num.of(size), declaration);
     }
 
@@ -174,7 +175,7 @@ public class Market implements Disposable {
      *         strategies are performed. (Note: not when all orders are completed but when the
      *         strategy is completed)
      */
-    public final <S extends Takable & Makable> Signal<Order> request(Directional directional, double size, Consumer<S> declaration) {
+    public final Signal<Order> request(Directional directional, double size, Consumer<Orderable> declaration) {
         return request(directional, Num.of(size), declaration);
     }
 
@@ -191,10 +192,10 @@ public class Market implements Disposable {
      *         strategies are performed. (Note: not when all orders are completed but when the
      *         strategy is completed)
      */
-    public final <S extends Takable & Makable> Signal<Order> request(Directional directional, Num size, Consumer<S> declaration) {
+    public final Signal<Order> request(Directional directional, Num size, Consumer<Orderable> declaration) {
         return new Signal<>((observer, disposer) -> {
             MarketOrderStrategy strategy = new MarketOrderStrategy();
-            declaration.accept((S) strategy);
+            declaration.accept(strategy);
 
             if (strategy.actions.isEmpty()) {
                 strategy.take();
@@ -273,7 +274,7 @@ public class Market implements Disposable {
     /**
      * 
      */
-    private class MarketOrderStrategy implements Takable, Makable, Cancellable {
+    private class MarketOrderStrategy implements Orderable, Takable, Makable, Cancellable {
 
         /** The action sequence. */
         private final LinkedList<PentaConsumer<Market, Direction, Num, Order, Observer<? super Order>>> actions = new LinkedList();

@@ -9,7 +9,7 @@
  */
 package cointoss.trader;
 
-import static java.time.temporal.ChronoUnit.*;
+import static java.time.temporal.ChronoUnit.SECONDS;
 
 import org.junit.jupiter.api.Test;
 
@@ -20,7 +20,7 @@ import kiss.Variable;
 class TraderTest extends TraderTestSupport {
 
     @Test
-    void entryMake() {
+    void entryBuy() {
         when(now(), v -> {
             return new Entry(Direction.BUY) {
 
@@ -40,6 +40,32 @@ class TraderTest extends TraderTestSupport {
 
         // execute entry order
         market.perform(Execution.with.buy(1).price(9));
+        assert entry.entrySize.is(1);
+        assert entry.entryExecutedSize.is(1);
+        assert entry.entryPrice.is(10);
+    }
+
+    @Test
+    void entrySell() {
+        when(now(), v -> {
+            return new Entry(Direction.SELL) {
+
+                @Override
+                protected void order() {
+                    order(1, s -> s.make(10));
+                }
+            };
+        });
+
+        Entry entry = latest();
+        assert entry != null;
+        assert entry.isSell();
+        assert entry.entrySize.is(1);
+        assert entry.entryExecutedSize.is(0);
+        assert entry.entryPrice.is(0);
+
+        // execute entry order
+        market.perform(Execution.with.buy(1).price(11));
         assert entry.entrySize.is(1);
         assert entry.entryExecutedSize.is(1);
         assert entry.entryPrice.is(10);
@@ -86,6 +112,41 @@ class TraderTest extends TraderTestSupport {
         assert entry.exitSize.is(1);
         assert entry.exitExecutedSize.is(1);
         assert entry.exitPrice.is(20);
+    }
+
+    @Test
+    void exitTake() {
+        when(now(), v -> {
+            return new Entry(Direction.BUY) {
+
+                @Override
+                protected void order() {
+                    order(1, s -> s.make(10));
+                }
+
+                @Override
+                protected void exit() {
+                    exitAt(20, s -> s.take());
+                }
+            };
+        });
+
+        Entry entry = latest();
+
+        // execute entry order
+        market.perform(Execution.with.buy(1).price(9));
+        assert entry.entrySize.is(1);
+        assert entry.entryExecutedSize.is(1);
+        assert entry.entryPrice.is(10);
+
+        // activate exit order
+        market.perform(Execution.with.buy(1).price(20));
+
+        // execute exit order
+        market.perform(Execution.with.buy(1).price(22));
+        assert entry.exitSize.is(1);
+        assert entry.exitExecutedSize.is(1);
+        assert entry.exitPrice.is(22);
     }
 
     @Test

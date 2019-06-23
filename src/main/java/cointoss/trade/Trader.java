@@ -28,6 +28,7 @@ import cointoss.Market;
 import cointoss.execution.Execution;
 import cointoss.order.Order;
 import cointoss.order.OrderStrategy.Makable;
+import cointoss.order.OrderStrategy.Orderable;
 import cointoss.order.OrderStrategy.Takable;
 import cointoss.util.Num;
 import kiss.Disposable;
@@ -231,7 +232,7 @@ public abstract class Trader {
          * @param size A entry size.
          * @return A ordering method.
          */
-        protected final <S extends Takable & Makable> void order(long size, Consumer<S> declaration) {
+        protected final void order(long size, Consumer<Orderable> declaration) {
             order(Num.of(size), declaration);
         }
 
@@ -243,7 +244,7 @@ public abstract class Trader {
          * @param size A entry size.
          * @return A ordering method.
          */
-        protected final <S extends Takable & Makable> void order(double size, Consumer<S> declaration) {
+        protected final void order(double size, Consumer<Orderable> declaration) {
             order(Num.of(size), declaration);
         }
 
@@ -255,7 +256,7 @@ public abstract class Trader {
          * @param size A entry size.
          * @return A ordering method.
          */
-        protected final <S extends Takable & Makable> void order(Num size, Consumer<S> declaration) {
+        protected final void order(Num size, Consumer<Orderable> declaration) {
             if (size == null || size.isLessThan(market.service.setting.targetCurrencyMinimumBidSize)) {
                 throw new Error("Entry size is less than minimum bid size.");
             }
@@ -342,13 +343,51 @@ public abstract class Trader {
         }
 
         /**
+         * Declare exit order by price. Loss cutting is the only element in the trade that investors
+         * can control.
+         * 
+         * @param price An exit price.
+         */
+        protected final void exitAt(long price, Consumer<Orderable> strategy) {
+            exitAt(Num.of(price), strategy);
+        }
+
+        /**
+         * Declare exit order by price. Loss cutting is the only element in the trade that investors
+         * can control.
+         * 
+         * @param price An exit price.
+         */
+        protected final void exitAt(double price, Consumer<Orderable> strategy) {
+            exitAt(Num.of(price), strategy);
+        }
+
+        /**
+         * Declare exit order by price. Loss cutting is the only element in the trade that investors
+         * can control.
+         * 
+         * @param price An exit price.
+         */
+        protected final void exitAt(Num price, Consumer<Orderable> strategy) {
+            if (price.isGreaterThan(direction, entryPrice)) {
+                market.tickers.latest.observe().take(e -> e.price.isGreaterThanOrEqual(direction, price)).first().to(e -> {
+                    market.request(direction.inverse(), entryExecutedSize.minus(exitExecutedSize), strategy).to(this::processAddExitOrder);
+                });
+            } else {
+                market.tickers.latest.observe().take(e -> e.price.isLessThanOrEqual(direction, price)).first().to(e -> {
+                    market.request(direction.inverse(), entryExecutedSize.minus(exitExecutedSize), strategy).to(this::processAddExitOrder);
+                });
+            }
+        }
+
+        /**
          * Declare exit order
          * 
          * @param <S>
          * @param timing
          * @param strategy
          */
-        protected final <S extends Takable & Makable> void exitWhen(Signal<?> timing, Consumer<S> strategy) {
+        protected final void exitWhen(Signal<?> timing, Consumer<Orderable> strategy) {
             disposer.add(timing.first().to(() -> {
                 market.request(direction.inverse(), entryExecutedSize.minus(exitExecutedSize), strategy).to(this::processAddExitOrder);
             }));
