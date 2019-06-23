@@ -13,7 +13,6 @@ import static java.time.temporal.ChronoUnit.*;
 
 import org.junit.jupiter.api.Test;
 
-import antibug.powerassert.PowerAssertOff;
 import cointoss.Direction;
 import cointoss.execution.Execution;
 import kiss.Variable;
@@ -172,7 +171,6 @@ class TraderTest extends TraderTestSupport {
     }
 
     @Test
-    @PowerAssertOff
     void profitSell() {
         when(now(), v -> {
             return new Entry(Direction.SELL) {
