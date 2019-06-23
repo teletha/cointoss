@@ -13,6 +13,7 @@ import static java.time.temporal.ChronoUnit.*;
 
 import org.junit.jupiter.api.Test;
 
+import antibug.powerassert.PowerAssertOff;
 import cointoss.Direction;
 import cointoss.execution.Execution;
 import kiss.Variable;
@@ -171,6 +172,7 @@ class TraderTest extends TraderTestSupport {
     }
 
     @Test
+    @PowerAssertOff
     void profitSell() {
         when(now(), v -> {
             return new Entry(Direction.SELL) {
@@ -218,7 +220,7 @@ class TraderTest extends TraderTestSupport {
     }
 
     @Test
-    void loss() {
+    void lossBuy() {
         when(now(), v -> {
             return new Entry(Direction.BUY) {
 
@@ -262,6 +264,56 @@ class TraderTest extends TraderTestSupport {
 
         // exit all
         market.perform(Execution.with.buy(1).price(10));
+        assert e.profit.is(-20);
+        assert e.realizedProfit.is(-20);
+        assert e.unrealizedProfit.is(0);
+    }
+
+    @Test
+    void lossSell() {
+        when(now(), v -> {
+            return new Entry(Direction.SELL) {
+
+                @Override
+                protected void order() {
+                    order(2, s -> s.make(10));
+                }
+
+                @Override
+                protected void exit() {
+                    exitAt(20);
+                }
+            };
+        });
+
+        Entry e = latest();
+        assert e.profit.is(0);
+        assert e.realizedProfit.is(0);
+        assert e.unrealizedProfit.is(0);
+
+        // entry partially
+        market.perform(Execution.with.buy(2).price(11));
+        assert e.profit.is(0);
+        assert e.realizedProfit.is(0);
+        assert e.unrealizedProfit.is(0);
+
+        // execute loss
+        market.perform(Execution.with.buy(1).price(15));
+        assert e.profit.is(-10);
+        assert e.realizedProfit.is(0);
+        assert e.unrealizedProfit.is(-10);
+
+        // activate stop loss
+        market.perform(Execution.with.buy(1).price(20));
+
+        // exit partially
+        market.perform(Execution.with.buy(1).price(20));
+        assert e.profit.is(-20);
+        assert e.realizedProfit.is(-10);
+        assert e.unrealizedProfit.is(-10);
+
+        // exit all
+        market.perform(Execution.with.buy(1).price(20));
         assert e.profit.is(-20);
         assert e.realizedProfit.is(-20);
         assert e.unrealizedProfit.is(0);

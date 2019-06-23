@@ -194,11 +194,10 @@ public abstract class Trader {
 
             // calculate profit
             observeExitExecutedSize().effectOnce(this::disposeEntries).to(size -> {
-                setRealizedProfit(exitPrice.minus(direction, entryPrice).multiply(size));
+                setRealizedProfit(exitPrice.diff(direction, entryPrice).multiply(size));
             }, diposer);
             observeEntryExecutedSize().combineLatest(market.tickers.latest.observe()).to(e -> {
-                System.out.println("Unrealized " + e.ⅱ.price + "  " + entryPrice + "  " + entryExecutedSize + "  " + exitExecutedSize);
-                setUnrealizedProfit(e.ⅱ.price.minus(direction, entryPrice).multiply(entryExecutedSize.minus(exitExecutedSize)));
+                setUnrealizedProfit(e.ⅱ.price.diff(direction, entryPrice).multiply(entryExecutedSize.minus(exitExecutedSize)));
             }, diposer);
             observeRealizedProfitNow().combineLatest(observeUnrealizedProfit()).to(e -> {
                 setProfit(e.ⅰ.plus(e.ⅱ));
@@ -273,7 +272,6 @@ public abstract class Trader {
             setEntrySize(entrySize.plus(order.size));
 
             order.observeExecutedSize().to(v -> {
-                System.out.println(order);
                 updateOrderRelatedStatus(entries, this::setEntryPrice, this::setEntryExecutedSize);
             });
         }

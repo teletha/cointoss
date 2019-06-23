@@ -1141,6 +1141,26 @@ public class Num implements Comparable<Num> {
     }
 
     /**
+     * Decrease amount by the specified {@link Directional}.
+     * 
+     * @param direction A current side.
+     * @param size A decrease size.
+     */
+    public final Num diff(Directional direction, int size) {
+        return diff(direction, of(size));
+    }
+
+    /**
+     * Decrease amount by the specified {@link Directional}.
+     * 
+     * @param direction A current side.
+     * @param size A decrease size.
+     */
+    public final Num diff(Directional direction, Num size) {
+        return direction.isSell() ? size.minus(this) : minus(size);
+    }
+
+    /**
      * Compare {@link Num}.
      * 
      * @param direction
