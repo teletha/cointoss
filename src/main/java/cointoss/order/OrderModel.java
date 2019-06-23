@@ -21,11 +21,11 @@ import cointoss.Directional;
 import cointoss.execution.Execution;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
-import cointoss.util.ObservableNumProperty;
 import cointoss.util.ObservableProperty;
 import icy.manipulator.Icy;
 import kiss.I;
 import kiss.Signal;
+import kiss.Signaling;
 import kiss.Variable;
 
 @Icy(grouping = 2)
@@ -33,6 +33,12 @@ public abstract class OrderModel implements Directional, Comparable<OrderModel> 
 
     /** The relation holder. */
     private Map<Class, Object> relations;
+
+    /** The size related signal. */
+    private final Signaling<Num> remainingSize = new Signaling();
+
+    /** The size related signal. */
+    private final Signaling<Num> executedSize = new Signaling();
 
     /** The entry holder. */
     final LinkedList<Execution> entries = new LinkedList();
@@ -164,9 +170,43 @@ public abstract class OrderModel implements Directional, Comparable<OrderModel> 
      * 
      * @return
      */
-    @Icy.Property(custom = ObservableNumProperty.class, mutable = true)
+    @Icy.Property(setterModifier = "final")
     public Num remainingSize() {
         return Num.ZERO;
+    }
+
+    /**
+     * Expose setter to update size atomically.
+     * 
+     * @param size
+     */
+    abstract void setRemainingSize(Num size);
+
+    /**
+     * Observe remaining size modification.
+     * 
+     * @return
+     */
+    public final Signal<Num> observeRemainingSize() {
+        return remainingSize.expose;
+    }
+
+    /**
+     * Observe remaining size modification.
+     * 
+     * @return
+     */
+    public final Signal<Num> observeRemainingSizeNow() {
+        return observeRemainingSize().startWith(remainingSize());
+    }
+
+    /**
+     * Observe remaining size modification.
+     * 
+     * @return
+     */
+    public final Signal<Num> observeRemainingSizeDiff() {
+        return observeRemainingSizeNow().maps(Num.ZERO, (prev, now) -> now.minus(prev));
     }
 
     /**
@@ -174,9 +214,56 @@ public abstract class OrderModel implements Directional, Comparable<OrderModel> 
      * 
      * @return
      */
-    @Icy.Property(custom = ObservableNumProperty.class, mutable = true)
+    @Icy.Property(setterModifier = "final")
     public Num executedSize() {
         return Num.ZERO;
+    }
+
+    /**
+     * Expose setter to update size atomically.
+     * 
+     * @param size
+     */
+    abstract void setExecutedSize(Num size);
+
+    /**
+     * Observe executed size modification.
+     * 
+     * @return
+     */
+    public final Signal<Num> observeExecutedSize() {
+        return executedSize.expose;
+    }
+
+    /**
+     * Observe executed size modification.
+     * 
+     * @return
+     */
+    public final Signal<Num> observeExecutedSizeNow() {
+        return observeExecutedSize().startWith(executedSize());
+    }
+
+    /**
+     * Observe executed size modification.
+     * 
+     * @return
+     */
+    public final Signal<Num> observeExecutedSizeDiff() {
+        return observeExecutedSizeNow().maps(Num.ZERO, (prev, now) -> now.minus(prev));
+    }
+
+    /**
+     * Update size atomically.
+     * 
+     * @param size
+     */
+    final void executed(Num size) {
+        setRemainingSize(remainingSize().minus(size));
+        setExecutedSize(executedSize().plus(size));
+
+        remainingSize.accept(remainingSize());
+        executedSize.accept(executedSize());
     }
 
     /**
@@ -231,7 +318,7 @@ public abstract class OrderModel implements Directional, Comparable<OrderModel> 
     }
 
     /**
-     * Check the order {@link OrderState}.
+     * Check {@link OrderState}.
      * 
      * @return The result.
      */
@@ -240,7 +327,7 @@ public abstract class OrderModel implements Directional, Comparable<OrderModel> 
     }
 
     /**
-     * Check the order {@link OrderState}.
+     * Check {@link OrderState}.
      * 
      * @return The result.
      */
@@ -249,7 +336,7 @@ public abstract class OrderModel implements Directional, Comparable<OrderModel> 
     }
 
     /**
-     * Check the order {@link OrderState}.
+     * Check {@link OrderState}.
      * 
      * @return The result.
      */
@@ -258,7 +345,7 @@ public abstract class OrderModel implements Directional, Comparable<OrderModel> 
     }
 
     /**
-     * Check the order {@link OrderState}.
+     * Check {@link OrderState}.
      * 
      * @return The result.
      */
@@ -267,7 +354,25 @@ public abstract class OrderModel implements Directional, Comparable<OrderModel> 
     }
 
     /**
-     * Check the order {@link OrderState}.
+     * Check {@link OrderState}.
+     * 
+     * @return The result.
+     */
+    public final boolean isTerminated() {
+        return isCompleted() || isCanceled();
+    }
+
+    /**
+     * Check {@link OrderState}.
+     *
+     * @return The result.
+     */
+    public final boolean isNotTerminated() {
+        return isTerminated() == false;
+    }
+
+    /**
+     * Check {@link OrderState}.
      * 
      * @return The result.
      */

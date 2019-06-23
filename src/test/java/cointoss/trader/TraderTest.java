@@ -9,15 +9,12 @@
  */
 package cointoss.trader;
 
-import static cointoss.Direction.BUY;
-import static java.time.temporal.ChronoUnit.SECONDS;
+import static java.time.temporal.ChronoUnit.*;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import cointoss.Direction;
 import cointoss.execution.Execution;
-import cointoss.util.Num;
 import kiss.Variable;
 
 class TraderTest extends TraderTestSupport {
@@ -92,7 +89,7 @@ class TraderTest extends TraderTestSupport {
     }
 
     @Test
-    void profit() {
+    void exitWillStopAllEntries() {
         when(now(), v -> {
             return new Entry(Direction.BUY) {
 
@@ -110,250 +107,164 @@ class TraderTest extends TraderTestSupport {
 
         Entry e = latest();
 
-        assert e.profit.is(0);
-        assert e.realizedProfit.is(0);
-        assert e.unrealizedProfit.is(0);
-
-        // entry 1
-        market.perform(Execution.with.buy(1).price(9));
-        assert e.profit.is(0);
-        assert e.realizedProfit.is(0);
-        assert e.unrealizedProfit.is(0);
-
-        // execute profit
-        market.perform(Execution.with.buy(1).price(15));
-        assert e.profit.is(5);
-        assert e.realizedProfit.is(0);
-        assert e.unrealizedProfit.is(5);
-
-        // exit 1
-        market.perform(Execution.with.buy(1).price(21));
-        assert e.profit.is(10);
-        assert e.realizedProfit.is(10);
-        assert e.unrealizedProfit.is(0);
-
-        // entry 2
+        // entry partially
         market.perform(Execution.with.buy(2).price(9));
-        assert e.profit.is(10);
-        assert e.realizedProfit.is(10);
+        assert e.isEntryTerminated() == false;
+        assert e.isExitTerminated() == false;
+
+        // exit pertially
+        market.perform(Execution.with.buy(1).price(21));
+        assert e.isEntryTerminated();
+        assert e.isExitTerminated() == false;
+
+        // exit all
+        market.perform(Execution.with.buy(1).price(21));
+        assert e.isEntryTerminated();
+        assert e.isExitTerminated();
+    }
+
+    @Test
+    void profitBuy() {
+        when(now(), v -> {
+            return new Entry(Direction.BUY) {
+
+                @Override
+                protected void order() {
+                    order(3, s -> s.make(10));
+                }
+
+                @Override
+                protected void exit() {
+                    exitAt(20);
+                }
+            };
+        });
+
+        Entry e = latest();
+        assert e.profit.is(0);
+        assert e.realizedProfit.is(0);
+        assert e.unrealizedProfit.is(0);
+
+        // entry partially
+        market.perform(Execution.with.buy(2).price(9));
+        assert e.profit.is(0);
+        assert e.realizedProfit.is(0);
         assert e.unrealizedProfit.is(0);
 
         // execute profit
         market.perform(Execution.with.buy(1).price(15));
+        assert e.profit.is(10);
+        assert e.realizedProfit.is(0);
+        assert e.unrealizedProfit.is(10);
+
+        // exit partially
+        market.perform(Execution.with.buy(1).price(21));
         assert e.profit.is(20);
         assert e.realizedProfit.is(10);
         assert e.unrealizedProfit.is(10);
 
-        // exit 2
-        market.perform(Execution.with.buy(2).price(21));
-        assert e.profit.is(30);
-        assert e.realizedProfit.is(30);
+        // exit all
+        market.perform(Execution.with.buy(1).price(21));
+        assert e.profit.is(20);
+        assert e.realizedProfit.is(20);
         assert e.unrealizedProfit.is(0);
     }
 
     @Test
-    @Disabled
-    void entryLimitInvalidParameters() {
-        // null side
-        Entry entry = entryLimit(null, Num.ONE, Num.ONE, null);
-        assert entry == null;
+    void profitSell() {
+        when(now(), v -> {
+            return new Entry(Direction.SELL) {
 
-        // null size
-        entry = entryLimit(Direction.BUY, null, Num.ONE, null);
-        assert entry == null;
+                @Override
+                protected void order() {
+                    order(3, s -> s.make(20));
+                }
 
-        // zero size
-        entry = entryLimit(Direction.BUY, Num.ZERO, Num.ONE, null);
-        assert entry == null;
+                @Override
+                protected void exit() {
+                    exitAt(10);
+                }
+            };
+        });
 
-        // negative size
-        entry = entryLimit(Direction.BUY, Num.of(-1), Num.ONE, null);
-        assert entry == null;
+        Entry e = latest();
+        assert e.profit.is(0);
+        assert e.realizedProfit.is(0);
+        assert e.unrealizedProfit.is(0);
 
-        // null price
-        entry = entryLimit(Direction.BUY, Num.ONE, null, null);
-        assert entry == null;
+        // entry partially
+        market.perform(Execution.with.buy(2).price(21));
+        assert e.profit.is(0);
+        assert e.realizedProfit.is(0);
+        assert e.unrealizedProfit.is(0);
 
-        // zero price
-        entry = entryLimit(Direction.BUY, Num.ONE, Num.ZERO, null);
-        assert entry == null;
+        // execute profit
+        market.perform(Execution.with.buy(1).price(15));
+        assert e.profit.is(10);
+        assert e.realizedProfit.is(0);
+        assert e.unrealizedProfit.is(10);
 
-        // negative price
-        entry = entryLimit(Direction.BUY, Num.ONE, Num.of(-1), null);
-        assert entry == null;
+        // exit partially
+        market.perform(Execution.with.buy(1).price(9));
+        assert e.profit.is(20);
+        assert e.realizedProfit.is(10);
+        assert e.unrealizedProfit.is(10);
+
+        // exit all
+        market.perform(Execution.with.buy(1).price(9));
+        assert e.profit.is(20);
+        assert e.realizedProfit.is(20);
+        assert e.unrealizedProfit.is(0);
     }
 
     @Test
-    @Disabled
-    void entryMarket() {
-        // try entry
-        Entry entry = entryMarket(Direction.BUY, Num.ONE, null);
-        assert entry.remaining().is(0);
+    void loss() {
+        when(now(), v -> {
+            return new Entry(Direction.BUY) {
 
-        // execute
+                @Override
+                protected void order() {
+                    order(2, s -> s.make(20));
+                }
+
+                @Override
+                protected void exit() {
+                    exitAt(10);
+                }
+            };
+        });
+
+        Entry e = latest();
+        assert e.profit.is(0);
+        assert e.realizedProfit.is(0);
+        assert e.unrealizedProfit.is(0);
+
+        // entry partially
+        market.perform(Execution.with.buy(2).price(19));
+        assert e.profit.is(0);
+        assert e.realizedProfit.is(0);
+        assert e.unrealizedProfit.is(0);
+
+        // execute loss
+        market.perform(Execution.with.buy(1).price(15));
+        assert e.profit.is(-10);
+        assert e.realizedProfit.is(0);
+        assert e.unrealizedProfit.is(-10);
+
+        // activate stop loss
         market.perform(Execution.with.buy(1).price(10));
-        assert entry.remaining().is(1);
-    }
 
-    @Test
-    @Disabled
-    void entryMarketInvalidParameters() {
-        // null side
-        Entry entry = entryMarket(null, Num.ONE, null);
-        assert entry == null;
+        // exit partially
+        market.perform(Execution.with.buy(1).price(10));
+        assert e.profit.is(-20);
+        assert e.realizedProfit.is(-10);
+        assert e.unrealizedProfit.is(-10);
 
-        // null size
-        entry = entryMarket(Direction.BUY, null, null);
-        assert entry == null;
-
-        // zero size
-        entry = entryMarket(Direction.BUY, Num.ZERO, null);
-        assert entry == null;
-
-        // negative size
-        entry = entryMarket(Direction.BUY, Num.of(-1), null);
-        assert entry == null;
-    }
-
-    @Test
-    @Disabled
-    void exitLimit() {
-        // entry and execute
-        Entry entry = entryLimit(Direction.BUY, Num.ONE, Num.TEN, null);
-        market.perform(Execution.with.buy(1).price(9));
-        assert entry.remaining().is(1);
-
-        // try exit
-        entry.exitLimit(Num.ONE, Num.TEN, null);
-        assert entry.remaining().is(1);
-
-        market.perform(Execution.with.buy(1).price(11));
-        assert entry.remaining().is(0);
-    }
-
-    @Test
-    @Disabled
-    void exitLimitInvalidParameters() {
-        // entry and execute
-        Entry entry = entryLimit(Direction.BUY, Num.ONE, Num.TEN, null);
-        market.perform(Execution.with.buy(1).price(9));
-        assert entry.remaining().is(1);
-
-        // null size
-        entry.exitLimit(null, Num.ONE, null);
-        assert entry.remaining().is(1);
-
-        // zero size
-        entry.exitLimit(Num.ZERO, Num.ONE, null);
-        assert entry.remaining().is(1);
-
-        // negative size
-        entry.exitLimit(Num.of(-1), Num.ONE, null);
-        assert entry.remaining().is(1);
-
-        // null price
-        entry.exitLimit(Num.ONE, null, null);
-        assert entry.remaining().is(1);
-
-        // zero price
-        entry.exitLimit(Num.ONE, Num.ZERO, null);
-        assert entry.remaining().is(1);
-
-        // negative price
-        entry.exitLimit(Num.ONE, Num.of(-1), null);
-        assert entry.remaining().is(1);
-    }
-
-    @Test
-    @Disabled
-    void exitMarket() {
-        // entry and execute
-        Entry entry = entryLimit(Direction.BUY, Num.ONE, Num.TEN, null);
-        market.perform(Execution.with.buy(1).price(9));
-        assert entry.remaining().is(1);
-
-        // try exit
-        entry.exitMarket(Num.ONE);
-        assert entry.remaining().is(1);
-
-        market.perform(Execution.with.buy(1).price(11));
-        assert entry.remaining().is(0);
-    }
-
-    @Test
-    @Disabled
-    void exitMarketInvalidPrameters() {
-        // entry and execute
-        Entry entry = entryLimit(Direction.BUY, Num.ONE, Num.TEN, null);
-        market.perform(Execution.with.buy(1).price(9));
-        assert entry.remaining().is(1);
-
-        // null size
-        entry.exitMarket((Num) null);
-        assert entry.remaining().is(1);
-
-        // zero size
-        entry.exitMarket(Num.ZERO);
-        assert entry.remaining().is(1);
-
-        // negative size
-        entry.exitMarket(Num.of(-1));
-        assert entry.remaining().is(1);
-    }
-
-    @Test
-    @Disabled
-    void completingEntry() {
-        Variable<Boolean> completed = completingEntry.to();
-        assert completed.isAbsent();
-
-        // entry
-        entryLimit(Direction.BUY, Num.ONE, Num.TEN, null);
-        assert completed.isAbsent();
-
-        // execute
-        market.perform(Execution.with.buy(1).price(9));
-        assert completed.is(true);
-    }
-
-    @Test
-    @Disabled
-    void completingExit() {
-        Variable<Boolean> completed = completingExit.to();
-        assert completed.isAbsent();
-
-        // entry
-        Entry entry = entryLimit(Direction.BUY, Num.ONE, Num.TEN, null);
-        market.perform(Execution.with.buy(1).price(9));
-        assert completed.isAbsent();
-
-        // exit
-        entry.exitLimit(Num.ONE, Num.TEN, null);
-        assert completed.isAbsent();
-
-        // execute
-        market.perform(Execution.with.buy(1).price(11));
-        assert completed.is(true);
-    }
-
-    @Test
-    @Disabled
-    void closingPosition() {
-        Variable<Boolean> completed = closingPosition.to();
-        assert completed.isAbsent();
-
-        // entry
-        Entry entry = entryLimit(Direction.BUY, Num.ONE, Num.TEN, null);
-        market.perform(Execution.with.buy(1).price(9));
-        assert completed.isAbsent();
-
-        // exit
-        entry.exitLimit(Num.ONE, Num.TEN, null);
-        assert completed.isAbsent();
-
-        // execute
-        market.perform(Execution.with.buy(1).price(11));
-        assert completed.is(true);
+        // exit all
+        market.perform(Execution.with.buy(1).price(10));
+        assert e.profit.is(-20);
+        assert e.realizedProfit.is(-20);
+        assert e.unrealizedProfit.is(0);
     }
 
     @Test
@@ -379,31 +290,5 @@ class TraderTest extends TraderTestSupport {
         market.perform(Execution.with.buy(1).price(9), 3);
         market.perform(Execution.with.buy(1).price(9), 3);
         assert state.isPresent();
-    }
-
-    @Test
-    @Disabled
-    void testHasPosition() {
-        assert hasPosition() == false;
-        Exit exiter = entry(BUY, 1, 10);
-        assert hasPosition() == true;
-        exiter.exit(1, 10);
-        assert hasPosition() == false;
-    }
-
-    @Test
-    @Disabled
-    void isWinAndLose() {
-        entry(BUY, 1, 5).exit(1, 10);
-        assert latest().isWin() == true;
-        assert latest().isLose() == false;
-
-        entry(BUY, 1, 5).exit(1, 3);
-        assert latest().isWin() == false;
-        assert latest().isLose() == true;
-
-        entry(BUY, 1, 5).exit(1, 5);
-        assert latest().isWin() == false;
-        assert latest().isLose() == false;
     }
 }

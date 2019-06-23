@@ -9,10 +9,11 @@
  */
 package cointoss.order;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.List;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import cointoss.Direction;
@@ -169,5 +170,25 @@ public class OrderTest {
         assert Order.with.buy(1).quantityCondition == QuantityCondition.GoodTillCanceled;
         assert Order.with.buy(1).quantityCondition(QuantityCondition.FillOrKill).quantityCondition == QuantityCondition.FillOrKill;
         assert Order.with.buy(1).quantityCondition(null).quantityCondition == QuantityCondition.GoodTillCanceled;
+    }
+
+    @Test
+    void updateSizeAtomically() {
+        Order o = Order.with.buy(3);
+        assert o.remainingSize.is(3);
+        assert o.executedSize.is(0);
+
+        o.observeRemainingSize().to(size -> {
+
+        });
+        List<Num> executedInUpdatingRemaining = o.observeRemainingSize().map(size -> o.executedSize).toList();
+        List<Num> remainingInUpdatingExecuted = o.observeExecutedSize().map(size -> o.remainingSize).toList();
+
+        o.executed(Num.of(1));
+        o.executed(Num.of(1));
+        o.executed(Num.of(1));
+
+        Assertions.assertIterableEquals(executedInUpdatingRemaining, List.of(Num.of(1), Num.of(2), Num.of(3)));
+        Assertions.assertIterableEquals(remainingInUpdatingExecuted, List.of(Num.of(2), Num.of(1), Num.of(0)));
     }
 }

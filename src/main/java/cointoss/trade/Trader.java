@@ -197,6 +197,7 @@ public abstract class Trader {
                 setRealizedProfit(exitPrice.minus(direction, entryPrice).multiply(size));
             }, diposer);
             observeEntryExecutedSize().combineLatest(market.tickers.latest.observe()).to(e -> {
+                System.out.println("Unrealized " + e.ⅱ.price + "  " + entryPrice + "  " + entryExecutedSize + "  " + exitExecutedSize);
                 setUnrealizedProfit(e.ⅱ.price.minus(direction, entryPrice).multiply(entryExecutedSize.minus(exitExecutedSize)));
             }, diposer);
             observeRealizedProfitNow().combineLatest(observeUnrealizedProfit()).to(e -> {
@@ -208,6 +209,14 @@ public abstract class Trader {
             I.signal(entries).take(o -> o.isNotCompleted() && o.isNotCanceled()).flatMap(market::cancel).to(o -> {
 
             });
+        }
+
+        public final boolean isEntryTerminated() {
+            return entries.stream().allMatch(Order::isTerminated);
+        }
+
+        public final boolean isExitTerminated() {
+            return exits.stream().allMatch(Order::isTerminated);
         }
 
         /**
@@ -264,6 +273,7 @@ public abstract class Trader {
             setEntrySize(entrySize.plus(order.size));
 
             order.observeExecutedSize().to(v -> {
+                System.out.println(order);
                 updateOrderRelatedStatus(entries, this::setEntryPrice, this::setEntryExecutedSize);
             });
         }
@@ -321,9 +331,16 @@ public abstract class Trader {
          * @param price An exit price.
          */
         protected final void exitAt(Num price) {
-            observeEntryExecutedSizeDiff().to(size -> {
-                market.request(direction.inverse(), size, s -> s.make(price)).to(this::processAddExitOrder);
-            });
+            if (price.isGreaterThan(direction, entryPrice)) {
+                observeEntryExecutedSizeDiff().to(size -> {
+                    market.request(direction.inverse(), size, s -> s.make(price)).to(this::processAddExitOrder);
+                });
+            } else {
+                market.tickers.latest.observe().take(e -> e.price.isLessThanOrEqual(direction, price)).first().to(e -> {
+                    market.request(direction.inverse(), entryExecutedSize.minus(exitExecutedSize), s -> s.take())
+                            .to(this::processAddExitOrder);
+                });
+            }
         }
 
         /**
