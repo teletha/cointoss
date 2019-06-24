@@ -14,7 +14,6 @@ import static cointoss.execution.Execution.with;
 
 import org.junit.jupiter.api.Test;
 
-import antibug.powerassert.PowerAssertOff;
 import cointoss.execution.Execution;
 import cointoss.trade.TradingLog;
 
@@ -29,6 +28,24 @@ public class TradingLogTest extends TraderTestSupport {
         assert log.active == 0;
         assert log.cancel == 0;
         assert log.total == 1;
+    }
+
+    @Test
+    void entries() {
+        entryAndExit(Execution.with.buy(1).price(10), Execution.with.buy(1).price(20));
+        entryAndExit(Execution.with.buy(1).price(30), Execution.with.buy(1).price(50));
+        entryAndExit(Execution.with.buy(1).price(30), Execution.with.buy(1).price(10));
+
+        TradingLog log = log();
+        System.out.println(log);
+        assert log.terminated == 3;
+        assert log.active == 0;
+        assert log.cancel == 0;
+        assert log.total == 3;
+        assert log.profit.max().is(20);
+        assert log.profit.min().is(-20);
+        assert log.profit.total().is(10);
+        assert log.profit.mean().is("3");
     }
 
     @Test
@@ -56,81 +73,14 @@ public class TradingLogTest extends TraderTestSupport {
     }
 
     @Test
-    @PowerAssertOff
     void activeEntry() {
         entry(Execution.with.buy(1).price(10));
 
         TradingLog log = log();
-        System.out.println(log);
         assert log.terminated == 0;
         assert log.active == 1;
         assert log.cancel == 0;
         assert log.total == 1;
-    }
-
-    @Test
-    void activeProfit() {
-        entryAndExit(BUY, 1, 10).exit(0.5, 15);
-
-        TradingLog log = log();
-        assert log.active == 1;
-        assert log.profit.max().is(5);
-        assert log.profit.min().is(5);
-        assert log.profit.size() == 1;
-        assert log.profit.total().is(5);
-    }
-
-    @Test
-    void activeLoss() {
-        entryAndExit(SELL, 1, 10).exit(0.5, 15);
-
-        TradingLog log = log();
-        assert log.active == 1;
-        assert log.loss.max().is(-5);
-        assert log.loss.min().is(-5);
-        assert log.loss.size() == 1;
-        assert log.loss.total().is(-5);
-    }
-
-    @Test
-    void activeProfitMultipleExitOrders() {
-        entryAndExit(BUY, 1, 10).exit(0.5, 15).exit(0.2, 20);
-
-        TradingLog log = log();
-        assert log.active == 1;
-        assert log.profit.max().is("7.5");
-        assert log.profit.min().is("7.5");
-        assert log.profit.size() == 1;
-        assert log.profit.total().is("7.5");
-    }
-
-    @Test
-    void activeProfitMultiExitExecutions() {
-        entryAndExit(BUY, 1, 10).exit(1, 20, 0.2, 0.3);
-
-        TradingLog log = log();
-        assert log.active == 1;
-        assert log.profit.max().is("10");
-        assert log.profit.min().is("10");
-        assert log.profit.size() == 1;
-        assert log.profit.total().is("10");
-    }
-
-    @Test
-    void entries() {
-        entryAndExit(BUY, 1, 10).exit(1, 15);
-        entryAndExit(BUY, 1, 15).exit(1, 25, 0.5);
-
-        TradingLog log = log();
-        assert log.terminated == 1;
-        assert log.active == 1;
-        assert log.cancel == 0;
-        assert log.total == 2;
-        assert log.profit.max().is(10);
-        assert log.profit.min().is(5);
-        assert log.profit.size() == 2;
-        assert log.profit.total().is("15");
-        assert log.profit.mean().is("7.5");
     }
 
     @Test

@@ -115,8 +115,8 @@ public class TradingLog {
         String EOL = "\r\n";
 
         StringBuilder builder = new StringBuilder();
-        builder.append("発注 ").append(orderTime);
-        builder.append("保持 ").append(holdTime);
+        builder.append("発注 ").append(orderTime).append(EOL);
+        builder.append("保持 ").append(holdTime).append(EOL);
         builder.append("損失 ").append(loss).append(EOL);
         builder.append("利益 ").append(profit).append(EOL);
         builder.append("取引 ")
