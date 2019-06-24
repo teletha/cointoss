@@ -11,7 +11,6 @@ package cointoss.trader;
 
 import java.time.ZonedDateTime;
 
-import cointoss.Direction;
 import cointoss.execution.Execution;
 import cointoss.order.OrderStrategy.Orderable;
 import cointoss.trade.Trader;
@@ -51,15 +50,25 @@ public abstract class TraderTestSupport extends Trader {
         return market.service.now().plusSeconds(delay);
     }
 
+    protected final void entry(Execution entry) {
+        when(now(), v -> new Entry(entry) {
+
+            @Override
+            protected void order() {
+                order(entry.size, Orderable::take);
+            }
+        });
+        market.perform(entry);
+    }
+
     /**
      * Shorthand method to entry and exit.
      * 
-     * @param direction
      * @param entry
      * @param exit
      */
-    protected final void entryAndExit(Direction direction, Execution entry, Execution exit) {
-        when(now(), v -> new Entry(direction) {
+    protected final void entryAndExit(Execution entry, Execution exit) {
+        when(now(), v -> new Entry(entry) {
 
             @Override
             protected void order() {

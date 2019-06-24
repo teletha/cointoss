@@ -9,8 +9,6 @@
  */
 package cointoss.trader;
 
-import static cointoss.Direction.BUY;
-
 import java.time.Duration;
 
 import org.junit.jupiter.api.Test;
@@ -21,9 +19,17 @@ class EntryTest extends TraderTestSupport {
 
     @Test
     void holdTime() {
-        entryAndExit(BUY, Execution.with.buy(1).price(10).date(second(0)), Execution.with.buy(1).price(20).date(second(10)));
+        entryAndExit(Execution.with.buy(1).price(10).date(second(0)), Execution.with.buy(1).price(20).date(second(10)));
 
         Entry e = latest();
         assert e.holdTime().equals(Duration.ofSeconds(10));
+    }
+
+    @Test
+    void isTerminated() {
+        entry(Execution.with.buy(1).price(10));
+
+        Entry e = latest();
+        assert e.isTerminated() == false;
     }
 }

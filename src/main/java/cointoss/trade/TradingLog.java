@@ -43,7 +43,7 @@ public class TradingLog {
     public Num drawDown = Num.ZERO;
 
     /** The max draw down. */
-    public Num drawDownRate = Num.ZERO;
+    public Num drawDownRatio = Num.ZERO;
 
     /** The max total() profit and loss. */
     private Num maxTotalProfitAndLoss = Num.ZERO;
@@ -60,39 +60,25 @@ public class TradingLog {
     /** A number of canceled entries. */
     public int cancel = 0;
 
-    /** The starting date. */
-    public final ZonedDateTime start;
-
-    /** The starting trading rate. */
-    public final Num startPrice;
-
-    /** The finishing date. */
-    public final ZonedDateTime finish;
-
-    /** The finishing trading rate. */
-    public final Num finishPrice;
-
     /**
      * Analyze trading.
      */
-    public TradingLog(List<Entry> entries) {
+    public TradingLog(FundManager funds, List<Entry> entries) {
         for (Entry entry : entries) {
             total++;
             if (entry.isActive()) active++;
             if (entry.isTerminated()) terminated++;
 
             // calculate order and hold time
-            orderTime.add(entry.orderTime());
-            holdTime.add(entry.holdTime());
+            holdTime.add(entry.holdTime().toMillis());
 
             // calculate profit and loss
-            Num profitOrLoss = entry.profit();
-            profitAndLoss.add(profitOrLoss);
-            if (profitOrLoss.isPositive()) profit.add(profitOrLoss);
-            if (profitOrLoss.isNegative()) loss.add(profitOrLoss);
+            profitAndLoss.add(entry.profit);
+            if (entry.profit.isPositive()) profit.add(entry.profit);
+            if (entry.profit.isNegative()) loss.add(entry.profit);
             maxTotalProfitAndLoss = Num.max(maxTotalProfitAndLoss, profitAndLoss.total());
             drawDown = Num.max(drawDown, maxTotalProfitAndLoss.minus(profitAndLoss.total()));
-            drawDownRate = Num.max(drawDownRate, drawDown.divide(assetInitial().plus(maxTotalProfitAndLoss)).multiply(HUNDRED).scale(1));
+            drawDownRatio = Num.max(drawDownRatio, drawDown.divide(funds.totalAssets.plus(maxTotalProfitAndLoss)).scale(3));
         }
     }
 
@@ -126,11 +112,13 @@ public class TradingLog {
      */
     @Override
     public String toString() {
+        String EOL = "\r\n";
+
         StringBuilder builder = new StringBuilder();
         builder.append("発注 ").append(orderTime);
         builder.append("保持 ").append(holdTime);
-        builder.append("損失 ").append(loss).append("\r\n");
-        builder.append("利益 ").append(profit).append("\r\n");
+        builder.append("損失 ").append(loss).append(EOL);
+        builder.append("利益 ").append(profit).append(EOL);
         builder.append("取引 ")
                 .append(profitAndLoss) //
                 .append(" (勝率")
@@ -139,14 +127,18 @@ public class TradingLog {
                 .append(" PF")
                 .append(profitFactor())
                 .append(" DD")
-                .append(drawDownRate)
+                .append(drawDownRatio)
                 .append("% ")
-                .append(String.format("総%d 済%d 残%d 中止%d)%n", total, terminated, active, cancel));
-        builder.append("開始 ").append(format(start, startPrice, startBaseCurrency, startTargetCurrency)).append("\r\n");
-        builder.append("終了 ")
-                .append(format(finish, finishPrice, finishBaseCurrency, finishTargetCurrency))
-                .append(" (損益 " + profit().asJPY(1))
-                .append(")\r\n");
+                .append("総")
+                .append(total)
+                .append(" 済")
+                .append(terminated)
+                .append(" 残")
+                .append(active)
+                .append(" 中止")
+                .append(cancel)
+                .append(")")
+                .append(EOL);
 
         return builder.toString();
     }
