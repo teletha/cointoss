@@ -256,7 +256,7 @@ public abstract class Trader {
          * @return A result.
          */
         public final boolean isExitTerminated() {
-            return exits.stream().allMatch(Order::isTerminated);
+            return exits.isEmpty() == false && exits.stream().allMatch(Order::isTerminated);
         }
 
         /**
