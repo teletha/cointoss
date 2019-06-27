@@ -11,6 +11,7 @@ package cointoss.trade;
 
 import static cointoss.util.Num.HUNDRED;
 
+import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -25,16 +26,16 @@ public class TradingLog {
     private static final DateTimeFormatter durationHM = DateTimeFormatter.ofPattern("MM/dd' 'HH:mm");
 
     /** summary */
-    public Statistics orderTime = new Statistics();
+    public Statistics orderTime = new Statistics().formatter(v -> Duration.ofMillis(v.toLong()).toString());
 
     /** summary */
-    public Statistics holdTime = new Statistics();
+    public Statistics holdTime = new Statistics().formatter(v -> Duration.ofMillis(v.toLong()).toString());
 
     /** summary */
     public Statistics profit = new Statistics();
 
     /** summary */
-    public Statistics loss = new Statistics();
+    public Statistics loss = new Statistics().negative();
 
     /** summary */
     public Statistics profitAndLoss = new Statistics();

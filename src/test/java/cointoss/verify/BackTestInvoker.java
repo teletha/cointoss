@@ -9,17 +9,18 @@
  */
 package cointoss.verify;
 
-import static cointoss.ticker.TickSpan.*;
-
 import cointoss.Direction;
 import cointoss.Market;
 import cointoss.market.bitflyer.BitFlyer;
+import cointoss.ticker.TickSpan;
 import cointoss.trade.Trader;
 import cointoss.trade.TradingLog;
 
 public class BackTestInvoker {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
+        Thread.sleep(20000);
+
         TradingLog log = BackTest.with.service(BitFlyer.FX_BTC_JPY)
                 .start(2019, 6, 1)
                 .end(2019, 6, 1)
@@ -37,7 +38,7 @@ public class BackTestInvoker {
         private Sample(Market market) {
             super(market);
 
-            when(market.tickers.of(Hour1).add, tick -> {
+            when(market.tickers.of(TickSpan.Hour1).add, tick -> {
                 return new Entry(Direction.random()) {
 
                     @Override

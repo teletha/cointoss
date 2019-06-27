@@ -9,6 +9,8 @@
  */
 package cointoss.analyze;
 
+import java.util.function.Function;
+
 import cointoss.util.Num;
 
 /**
@@ -34,6 +36,34 @@ public class Statistics {
 
     /** Temporary values to calculate variance. */
     private Num m2 = Num.ZERO, m3 = Num.ZERO, m4 = Num.ZERO;
+
+    /** The value formatter. */
+    private Function<Num, String> formatter = num -> num.toString();
+
+    private boolean negative = false;
+
+    /**
+     * Set value formatter.
+     * 
+     * @param formatter A value formatter.
+     * @return Chainable API.
+     */
+    public Statistics formatter(Function<Num, String> formatter) {
+        if (formatter != null) {
+            this.formatter = formatter;
+        }
+        return this;
+    }
+
+    /**
+     * Set this {@link Statistics} deal with negative values.
+     * 
+     * @return Chainable API.
+     */
+    public Statistics negative() {
+        this.negative = true;
+        return this;
+    }
 
     /**
      * Add new value to summarize.
@@ -66,18 +96,18 @@ public class Statistics {
         min = min.isZero() ? value : Num.min(min, value);
         max = max.isZero() ? value : Num.max(max, value);
         total = total.plus(value);
-    
+
         Num delta = value.minus(mean);
         Num deltaN = delta.divide(size);
         Num deltaN2 = deltaN.pow(2);
         Num term = delta.multiply(deltaN).multiply(size - 1);
-    
+
         mean = mean.plus(deltaN);
         m4 = m4.plus(term.multiply(deltaN2).multiply(size * size - 3 * size + 3).plus(deltaN2.multiply(m2).multiply(6)))
                 .minus(deltaN.multiply(m3).multiply(4));
         m3 = m3.plus(term.multiply(deltaN).multiply(size - 2).minus(deltaN.multiply(m2).multiply(3)));
         m2 = m2.plus(delta.multiply(value.minus(mean)));
-    
+
         return this;
     }
 
@@ -170,13 +200,13 @@ public class Statistics {
     @Override
     public String toString() {
         return new StringBuilder().append("最小")
-                .append(min.asJPY(7))
+                .append(formatter.apply(negative ? max : min))
                 .append("\t最大")
-                .append(max.asJPY(7))
+                .append(formatter.apply(negative ? min : max))
                 .append("\t平均")
-                .append(mean().asJPY(7))
+                .append(formatter.apply(mean))
                 .append("\t合計")
-                .append(total.asJPY(12))
+                .append(formatter.apply(total))
                 .toString();
     }
 }

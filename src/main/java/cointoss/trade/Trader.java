@@ -310,6 +310,7 @@ public abstract class Trader {
             if (size == null || size.isLessThan(market.service.setting.targetCurrencyMinimumBidSize)) {
                 throw new Error("Entry size is less than minimum bid size.");
             }
+            System.out.println("orders");
             market.request(direction, size, declaration).to(this::processAddEntryOrder);
         }
 

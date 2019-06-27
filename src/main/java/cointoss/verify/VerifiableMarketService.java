@@ -10,14 +10,13 @@
 package cointoss.verify;
 
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ConcurrentLinkedDeque;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Delayed;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -55,10 +54,10 @@ public class VerifiableMarketService extends MarketService {
     private int id = 0;
 
     /** The order manager. */
-    private final ConcurrentLinkedDeque<BackendOrder> orderActive = new ConcurrentLinkedDeque<>();
+    private final Collection<BackendOrder> orderActive = new ArrayList<>();
 
     /** The order manager. */
-    private final ConcurrentLinkedQueue<BackendOrder> orderAll = new ConcurrentLinkedQueue<>();
+    private final Collection<BackendOrder> orderAll = new ArrayList<>();
 
     /** The order manager. */
     private final Signaling<Ⅲ<Direction, String, Execution>> positions = new Signaling();

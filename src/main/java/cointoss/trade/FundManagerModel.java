@@ -14,7 +14,6 @@ import icy.manipulator.Icy;
 
 @Icy
 public interface FundManagerModel {
-
     /**
      * Your total assets.
      * 
