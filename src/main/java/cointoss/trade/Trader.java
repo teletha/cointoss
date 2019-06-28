@@ -166,7 +166,7 @@ public abstract class Trader {
      * @return
      */
     public TradingLog log() {
-        return new TradingLog(funds, entries);
+        return new TradingLog(funds, entries, market.tickers.latest.v.price);
     }
 
     /**
@@ -208,12 +208,6 @@ public abstract class Trader {
             // calculate profit
             observeExitExecutedSize().effectOnce(this::disposeEntries).to(size -> {
                 setRealizedProfit(exitPrice.diff(direction, entryPrice).multiply(size));
-            }, diposer);
-            observeEntryExecutedSize().combineLatest(market.tickers.latest.observe()).to(e -> {
-                setUnrealizedProfit(e.ⅱ.price.diff(direction, entryPrice).multiply(entryExecutedSize.minus(exitExecutedSize)));
-            }, diposer);
-            observeRealizedProfitNow().combineLatest(observeUnrealizedProfit()).to(e -> {
-                setProfit(e.ⅰ.plus(e.ⅱ));
             }, diposer);
         }
 

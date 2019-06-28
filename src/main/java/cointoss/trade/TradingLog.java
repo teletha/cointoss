@@ -9,7 +9,7 @@
  */
 package cointoss.trade;
 
-import static cointoss.util.Num.HUNDRED;
+import static cointoss.util.Num.*;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
@@ -64,7 +64,7 @@ public class TradingLog {
     /**
      * Analyze trading.
      */
-    public TradingLog(FundManager funds, List<Entry> entries) {
+    public TradingLog(FundManager funds, List<Entry> entries, Num currentPrice) {
         for (Entry entry : entries) {
             total++;
             if (entry.isActive()) active++;
@@ -74,9 +74,11 @@ public class TradingLog {
             holdTime.add(entry.holdTime().toMillis());
 
             // calculate profit and loss
-            profitAndLoss.add(entry.profit);
-            if (entry.profit.isPositive()) profit.add(entry.profit);
-            if (entry.profit.isNegative()) loss.add(entry.profit);
+            Num pol = entry.profit(currentPrice);
+
+            profitAndLoss.add(pol);
+            if (pol.isPositive()) profit.add(pol);
+            if (pol.isNegative()) loss.add(pol);
             maxTotalProfitAndLoss = Num.max(maxTotalProfitAndLoss, profitAndLoss.total());
             drawDown = Num.max(drawDown, maxTotalProfitAndLoss.minus(profitAndLoss.total()));
             drawDownRatio = Num.max(drawDownRatio, drawDown.divide(funds.totalAssets.plus(maxTotalProfitAndLoss)).scale(3));

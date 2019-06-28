@@ -9,12 +9,13 @@
  */
 package cointoss.trade;
 
+import cointoss.Directional;
 import cointoss.util.Num;
 import cointoss.util.ObservableNumProperty;
 import icy.manipulator.Icy;
 
 @Icy(setterModifier = "final")
-public abstract class EntryStatusModel {
+public abstract class EntryStatusModel implements Directional {
 
     /**
      * A total size of entry orders.
@@ -77,13 +78,14 @@ public abstract class EntryStatusModel {
     }
 
     /**
-     * A total profit or loss of this entry.
+     * Calculate total profit or loss on the current price. From the point of performance view,
+     * profit is not calculated realtimely.
      * 
+     * @param currentPrice A current price.
      * @return A total profit or loss of this entry.
      */
-    @Icy.Property(custom = ObservableNumProperty.class)
-    public Num profit() {
-        return Num.ZERO;
+    public final Num profit(Num currentPrice) {
+        return realizedProfit().plus(unrealizedProfit(currentPrice));
     }
 
     /**
@@ -97,12 +99,13 @@ public abstract class EntryStatusModel {
     }
 
     /**
-     * An unrealized profit or loss of this entry.
+     * Calculate unrealized profit or loss on the current price. From the point of performance view,
+     * unrealized profit is not calculated realtimely.
      * 
+     * @param currentPrice A current price.
      * @return An unrealized profit or loss of this entry.
      */
-    @Icy.Property(custom = ObservableNumProperty.class)
-    public Num unrealizedProfit() {
-        return Num.ZERO;
+    public final Num unrealizedProfit(Num currentPrice) {
+        return currentPrice.diff(direction(), entryPrice()).multiply(entryExecutedSize().minus(exitExecutedSize()));
     }
 }
