@@ -26,6 +26,7 @@ public class BackTestInvoker {
                 .get(0);
 
         System.out.println(log);
+        System.out.println(log.exits);
     }
 
     /**

@@ -184,7 +184,7 @@ public abstract class Trader {
         private final LinkedQueue<Order> entries = new LinkedQueue<>();
 
         /** The list exit orders. */
-        private final LinkedQueue<Order> exits = new LinkedQueue<>();
+        final LinkedQueue<Order> exits = new LinkedQueue<>();
 
         /** The exit disposer. */
         private final Disposable diposer = Disposable.empty();
@@ -376,8 +376,8 @@ public abstract class Trader {
          */
         protected final void exitAt(Num price) {
             if (price.isGreaterThan(direction, entryPrice)) {
-                observeEntryExecutedSizeDiff().to(size -> {
-                    market.request(direction.inverse(), size, s -> s.make(price)).to(this::processAddExitOrder);
+                observeEntryExecutedSize().to(size -> {
+                    market.request(direction.inverse(), size.minus(exitSize), s -> s.make(price)).to(this::processAddExitOrder);
                 });
             } else {
                 market.tickers.latest.observe().take(e -> e.price.isLessThanOrEqual(direction, price)).first().to(e -> {

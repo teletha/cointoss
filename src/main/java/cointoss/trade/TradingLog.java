@@ -58,6 +58,8 @@ public class TradingLog {
     /** A number of canceled entries. */
     public int cancel = 0;
 
+    public int exits;
+
     /**
      * Analyze trading.
      */
@@ -68,6 +70,7 @@ public class TradingLog {
         this.profitAndLoss = new Statistics().formatter(format);
 
         for (Entry entry : entries) {
+            exits += entry.exits.stream().map(o -> o.executions.size()).reduce(0, (a, b) -> a + b);
             total++;
             if (entry.isActive()) active++;
             if (entry.isTerminated()) terminated++;
