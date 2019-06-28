@@ -12,18 +12,15 @@ package cointoss.trade;
 import static cointoss.util.Num.*;
 
 import java.time.Duration;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.function.Function;
 
+import cointoss.Market;
 import cointoss.analyze.Statistics;
 import cointoss.trade.Trader.Entry;
 import cointoss.util.Num;
 
 public class TradingLog {
-
-    /** The duration format. */
-    private static final DateTimeFormatter durationHM = DateTimeFormatter.ofPattern("MM/dd' 'HH:mm");
 
     /** summary */
     public Statistics orderTime = new Statistics().formatter(v -> Duration.ofMillis(v.toLong()).toString());
@@ -32,13 +29,13 @@ public class TradingLog {
     public Statistics holdTime = new Statistics().formatter(v -> Duration.ofMillis(v.toLong()).toString());
 
     /** summary */
-    public Statistics profit = new Statistics();
+    public final Statistics profit;
 
     /** summary */
-    public Statistics loss = new Statistics().negative();
+    public final Statistics loss;
 
     /** summary */
-    public Statistics profitAndLoss = new Statistics();
+    public final Statistics profitAndLoss;
 
     /** The max draw down. */
     public Num drawDown = Num.ZERO;
@@ -64,7 +61,12 @@ public class TradingLog {
     /**
      * Analyze trading.
      */
-    public TradingLog(FundManager funds, List<Entry> entries, Num currentPrice) {
+    public TradingLog(Market market, FundManager funds, List<Entry> entries) {
+        Function<Num, String> format = v -> v.scale(market.service.setting.baseCurrencyScaleSize).toString();
+        this.profit = new Statistics().formatter(format);
+        this.loss = new Statistics().formatter(format).negative();
+        this.profitAndLoss = new Statistics().formatter(format);
+
         for (Entry entry : entries) {
             total++;
             if (entry.isActive()) active++;
@@ -74,7 +76,7 @@ public class TradingLog {
             holdTime.add(entry.holdTime().toMillis());
 
             // calculate profit and loss
-            Num pol = entry.profit(currentPrice);
+            Num pol = entry.profit(market.latestPrice());
 
             profitAndLoss.add(pol);
             if (pol.isPositive()) profit.add(pol);
@@ -97,17 +99,6 @@ public class TradingLog {
      */
     public Num profitFactor() {
         return profit.total().divide(loss.total().isZero() ? Num.ONE : loss.total().abs()).scale(3);
-    }
-
-    /**
-     * Format {@link Num}.
-     * 
-     * @param base
-     * @return
-     */
-    private String format(ZonedDateTime time, Num price, Num base, Num target) {
-        return durationHM.format(time) + " " + base.asJPY() + "\t" + target.asBTC() + "(" + price
-                .asJPY(1) + ")\t総計" + base.plus(target.multiply(price)).asJPY();
     }
 
     /**

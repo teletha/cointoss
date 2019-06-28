@@ -9,7 +9,7 @@
  */
 package cointoss;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.time.temporal.ChronoUnit;
 import java.util.LinkedList;
@@ -222,7 +222,16 @@ public class Market implements Disposable {
      * 
      * @return
      */
-    public final Signal<Num> latestPrice() {
+    public final Num latestPrice() {
+        return tickers.latest.v.price;
+    }
+
+    /**
+     * Shorthand accessor to the latest price.
+     * 
+     * @return
+     */
+    public final Signal<Num> observeLatestPrice() {
         return timelineNow.map(Execution::price).diff();
     }
 

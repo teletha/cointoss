@@ -9,7 +9,7 @@
  */
 package cointoss.trader;
 
-import static java.time.temporal.ChronoUnit.SECONDS;
+import static java.time.temporal.ChronoUnit.*;
 
 import org.junit.jupiter.api.Test;
 
@@ -202,33 +202,33 @@ class TraderTest extends TraderTestSupport {
         });
 
         Entry e = latest();
-        assert e.profit.is(0);
+        assert e.profit(market.latestPrice()).is(0);
         assert e.realizedProfit.is(0);
-        assert e.unrealizedProfit.is(0);
+        assert e.unrealizedProfit(market.latestPrice()).is(0);
 
         // entry partially
         market.perform(Execution.with.buy(2).price(9));
-        assert e.profit.is(0);
+        assert e.profit(market.latestPrice()).is(0);
         assert e.realizedProfit.is(0);
-        assert e.unrealizedProfit.is(0);
+        assert e.unrealizedProfit(market.latestPrice()).is(0);
 
         // execute profit
         market.perform(Execution.with.buy(1).price(15));
-        assert e.profit.is(10);
+        assert e.profit(market.latestPrice()).is(10);
         assert e.realizedProfit.is(0);
-        assert e.unrealizedProfit.is(10);
+        assert e.unrealizedProfit(market.latestPrice()).is(10);
 
         // exit partially
         market.perform(Execution.with.buy(1).price(21));
-        assert e.profit.is(20);
+        assert e.profit(market.latestPrice()).is(20);
         assert e.realizedProfit.is(10);
-        assert e.unrealizedProfit.is(10);
+        assert e.unrealizedProfit(market.latestPrice()).is(10);
 
         // exit all
         market.perform(Execution.with.buy(1).price(21));
-        assert e.profit.is(20);
+        assert e.profit(market.latestPrice()).is(20);
         assert e.realizedProfit.is(20);
-        assert e.unrealizedProfit.is(0);
+        assert e.unrealizedProfit(market.latestPrice()).is(0);
     }
 
     @Test
@@ -249,33 +249,33 @@ class TraderTest extends TraderTestSupport {
         });
 
         Entry e = latest();
-        assert e.profit.is(0);
+        assert e.profit(market.latestPrice()).is(0);
         assert e.realizedProfit.is(0);
-        assert e.unrealizedProfit.is(0);
+        assert e.unrealizedProfit(market.latestPrice()).is(0);
 
         // entry partially
         market.perform(Execution.with.buy(2).price(21));
-        assert e.profit.is(0);
+        assert e.profit(market.latestPrice()).is(0);
         assert e.realizedProfit.is(0);
-        assert e.unrealizedProfit.is(0);
+        assert e.unrealizedProfit(market.latestPrice()).is(0);
 
         // execute profit
         market.perform(Execution.with.buy(1).price(15));
-        assert e.profit.is(10);
+        assert e.profit(market.latestPrice()).is(10);
         assert e.realizedProfit.is(0);
-        assert e.unrealizedProfit.is(10);
+        assert e.unrealizedProfit(market.latestPrice()).is(10);
 
         // exit partially
         market.perform(Execution.with.buy(1).price(9));
-        assert e.profit.is(20);
+        assert e.profit(market.latestPrice()).is(20);
         assert e.realizedProfit.is(10);
-        assert e.unrealizedProfit.is(10);
+        assert e.unrealizedProfit(market.latestPrice()).is(10);
 
         // exit all
         market.perform(Execution.with.buy(1).price(9));
-        assert e.profit.is(20);
+        assert e.profit(market.latestPrice()).is(20);
         assert e.realizedProfit.is(20);
-        assert e.unrealizedProfit.is(0);
+        assert e.unrealizedProfit(market.latestPrice()).is(0);
     }
 
     @Test
@@ -296,36 +296,36 @@ class TraderTest extends TraderTestSupport {
         });
 
         Entry e = latest();
-        assert e.profit.is(0);
+        assert e.profit(market.latestPrice()).is(0);
         assert e.realizedProfit.is(0);
-        assert e.unrealizedProfit.is(0);
+        assert e.unrealizedProfit(market.latestPrice()).is(0);
 
         // entry partially
         market.perform(Execution.with.buy(2).price(19));
-        assert e.profit.is(0);
+        assert e.profit(market.latestPrice()).is(0);
         assert e.realizedProfit.is(0);
-        assert e.unrealizedProfit.is(0);
+        assert e.unrealizedProfit(market.latestPrice()).is(0);
 
         // execute loss
         market.perform(Execution.with.buy(1).price(15));
-        assert e.profit.is(-10);
+        assert e.profit(market.latestPrice()).is(-10);
         assert e.realizedProfit.is(0);
-        assert e.unrealizedProfit.is(-10);
+        assert e.unrealizedProfit(market.latestPrice()).is(-10);
 
         // activate stop loss
         market.perform(Execution.with.buy(1).price(10));
 
         // exit partially
         market.perform(Execution.with.buy(1).price(10));
-        assert e.profit.is(-20);
+        assert e.profit(market.latestPrice()).is(-20);
         assert e.realizedProfit.is(-10);
-        assert e.unrealizedProfit.is(-10);
+        assert e.unrealizedProfit(market.latestPrice()).is(-10);
 
         // exit all
         market.perform(Execution.with.buy(1).price(10));
-        assert e.profit.is(-20);
+        assert e.profit(market.latestPrice()).is(-20);
         assert e.realizedProfit.is(-20);
-        assert e.unrealizedProfit.is(0);
+        assert e.unrealizedProfit(market.latestPrice()).is(0);
     }
 
     @Test
@@ -346,36 +346,36 @@ class TraderTest extends TraderTestSupport {
         });
 
         Entry e = latest();
-        assert e.profit.is(0);
+        assert e.profit(market.latestPrice()).is(0);
         assert e.realizedProfit.is(0);
-        assert e.unrealizedProfit.is(0);
+        assert e.unrealizedProfit(market.latestPrice()).is(0);
 
         // entry partially
         market.perform(Execution.with.buy(2).price(11));
-        assert e.profit.is(0);
+        assert e.profit(market.latestPrice()).is(0);
         assert e.realizedProfit.is(0);
-        assert e.unrealizedProfit.is(0);
+        assert e.unrealizedProfit(market.latestPrice()).is(0);
 
         // execute loss
         market.perform(Execution.with.buy(1).price(15));
-        assert e.profit.is(-10);
+        assert e.profit(market.latestPrice()).is(-10);
         assert e.realizedProfit.is(0);
-        assert e.unrealizedProfit.is(-10);
+        assert e.unrealizedProfit(market.latestPrice()).is(-10);
 
         // activate stop loss
         market.perform(Execution.with.buy(1).price(20));
 
         // exit partially
         market.perform(Execution.with.buy(1).price(20));
-        assert e.profit.is(-20);
+        assert e.profit(market.latestPrice()).is(-20);
         assert e.realizedProfit.is(-10);
-        assert e.unrealizedProfit.is(-10);
+        assert e.unrealizedProfit(market.latestPrice()).is(-10);
 
         // exit all
         market.perform(Execution.with.buy(1).price(20));
-        assert e.profit.is(-20);
+        assert e.profit(market.latestPrice()).is(-20);
         assert e.realizedProfit.is(-20);
-        assert e.unrealizedProfit.is(0);
+        assert e.unrealizedProfit(market.latestPrice()).is(0);
     }
 
     @Test

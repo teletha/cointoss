@@ -19,8 +19,6 @@ import cointoss.trade.TradingLog;
 public class BackTestInvoker {
 
     public static void main(String[] args) throws InterruptedException {
-        Thread.sleep(4000);
-
         TradingLog log = BackTest.with.service(BitFlyer.FX_BTC_JPY)
                 .start(2019, 6, 1)
                 .end(2019, 6, 1)
@@ -51,7 +49,7 @@ public class BackTestInvoker {
                      */
                     @Override
                     protected void exit() {
-                        exitAt(entryPrice.plus(direction, 3000));
+                        exitAt(entryPrice.plus(direction, -5000));
                     }
                 };
             });

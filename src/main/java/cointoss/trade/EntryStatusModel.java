@@ -9,6 +9,7 @@
  */
 package cointoss.trade;
 
+import cointoss.Direction;
 import cointoss.Directional;
 import cointoss.util.Num;
 import cointoss.util.ObservableNumProperty;
@@ -16,6 +17,14 @@ import icy.manipulator.Icy;
 
 @Icy(setterModifier = "final")
 public abstract class EntryStatusModel implements Directional {
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Direction direction() {
+        throw new Error("This method never will be called! Fix bug!");
+    }
 
     /**
      * A total size of entry orders.

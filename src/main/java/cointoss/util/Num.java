@@ -1074,33 +1074,6 @@ public class Num implements Comparable<Num> {
     }
 
     /**
-     * Format as JPY.
-     * 
-     * @return
-     */
-    public final String asJPY() {
-        return asJPY(10);
-    }
-
-    /**
-     * Format as JPY.
-     * 
-     * @return
-     */
-    public final String asJPY(int size) {
-        return String.format("%," + size + ".0f円", delegate.doubleValue());
-    }
-
-    /**
-     * Format as BTC.
-     * 
-     * @return
-     */
-    public final String asBTC() {
-        return String.format("B%3.4f", delegate.doubleValue());
-    }
-
-    /**
      * Increase amount by the specified {@link Directional}.
      * 
      * @param direction A current side.

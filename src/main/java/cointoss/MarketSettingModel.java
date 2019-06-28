@@ -57,6 +57,14 @@ public interface MarketSettingModel {
     Num[] orderBookGroupRanges();
 
     /**
+     * Get the human readable size of base currency.
+     */
+    @Icy.Property
+    default int baseCurrencyScaleSize() {
+        return 0;
+    }
+
+    /**
      * Get the human readable size of target currency.
      */
     @Icy.Property

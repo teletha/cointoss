@@ -14,6 +14,12 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.ToDoubleFunction;
 
+import cointoss.Market;
+import cointoss.market.bitflyer.BitFlyer;
+import cointoss.market.bitflyer.SFD;
+import cointoss.ticker.Tick;
+import cointoss.util.Chrono;
+import cointoss.util.Num;
 import javafx.collections.ObservableList;
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -26,13 +32,6 @@ import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.PathElement;
-
-import cointoss.Market;
-import cointoss.market.bitflyer.BitFlyer;
-import cointoss.market.bitflyer.SFD;
-import cointoss.ticker.Tick;
-import cointoss.util.Chrono;
-import cointoss.util.Num;
 import kiss.I;
 import stylist.Style;
 import trademate.chart.Axis.TickLable;
@@ -275,7 +274,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     private void visualizeLatestPrice() {
         chart.market.observeNow() //
                 .skipNull()
-                .switchMap(Market::latestPrice)
+                .switchMap(Market::observeLatestPrice)
                 .on(Viewtify.UIThread)
                 .effectOnLifecycle(disposer -> {
                     TickLable latest = latestPrice.createLabel("最新値");

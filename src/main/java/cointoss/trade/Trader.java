@@ -166,7 +166,7 @@ public abstract class Trader {
      * @return
      */
     public TradingLog log() {
-        return new TradingLog(funds, entries, market.tickers.latest.v.price);
+        return new TradingLog(market, funds, entries);
     }
 
     /**
@@ -258,7 +258,7 @@ public abstract class Trader {
          */
         public final Duration holdTime() {
             ZonedDateTime start = entries.first().flatMap(o -> o.executions.first()).map(Execution::date).or(Chrono.MIN);
-            ZonedDateTime end = exits.last().flatMap(o -> o.executions.last()).map(Execution::date).or(Chrono.MIN);
+            ZonedDateTime end = exits.last().flatMap(o -> o.executions.last()).map(Execution::date).or(market.service.now());
 
             return Duration.between(start, end);
         }
