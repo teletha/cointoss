@@ -13,6 +13,7 @@ import cointoss.Direction;
 import cointoss.Directional;
 import cointoss.util.Num;
 import cointoss.util.ObservableNumProperty;
+import cointoss.util.PerformanceSensitive;
 import icy.manipulator.Icy;
 
 @Icy(setterModifier = "final")
@@ -87,12 +88,12 @@ public abstract class EntryStatusModel implements Directional {
     }
 
     /**
-     * Calculate total profit or loss on the current price. From the point of performance view,
-     * profit is not calculated realtimely.
+     * Calculate total profit or loss on the current price.
      * 
      * @param currentPrice A current price.
      * @return A total profit or loss of this entry.
      */
+    @PerformanceSensitive
     public final Num profit(Num currentPrice) {
         return realizedProfit().plus(unrealizedProfit(currentPrice));
     }
@@ -108,12 +109,12 @@ public abstract class EntryStatusModel implements Directional {
     }
 
     /**
-     * Calculate unrealized profit or loss on the current price. From the point of performance view,
-     * unrealized profit is not calculated realtimely.
+     * Calculate unrealized profit or loss on the current price.
      * 
      * @param currentPrice A current price.
      * @return An unrealized profit or loss of this entry.
      */
+    @PerformanceSensitive
     public final Num unrealizedProfit(Num currentPrice) {
         return currentPrice.diff(direction(), entryPrice()).multiply(entryExecutedSize().minus(exitExecutedSize()));
     }

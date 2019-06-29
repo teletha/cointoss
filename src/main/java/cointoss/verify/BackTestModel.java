@@ -53,7 +53,11 @@ public interface BackTestModel {
 
         List<Trader> traders = traderBuilder.apply(market);
 
-        market.readLog(log -> log.range(start(), end()).effect(e -> market.perform(e)));
+        market.readLog(log -> log.range(start(), end()).effect(e -> market.perform(e)).effectOnError(e -> {
+            e.printStackTrace();
+        }).effectOnComplete(() -> {
+            System.out.println("complete");
+        }));
 
         return I.signal(traders).map(Trader::log).toList();
     }

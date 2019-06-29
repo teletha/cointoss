@@ -41,7 +41,7 @@ public class BackTestInvoker {
 
                     @Override
                     protected void order() {
-                        order(0.01, s -> s.make(market.tickers.latest.v.price));
+                        order(3, s -> s.make(market.tickers.latest.v.price));
                     }
 
                     /**
@@ -49,7 +49,8 @@ public class BackTestInvoker {
                      */
                     @Override
                     protected void exit() {
-                        exitAt(entryPrice.plus(direction, -3000));
+                        exitAt(entryPrice.plus(direction, 30000));
+                        exitAt(entryPrice.plus(direction, -20000));
                     }
                 };
             });

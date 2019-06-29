@@ -186,8 +186,11 @@ public abstract class Trader {
         /** The list exit orders. */
         private final LinkedQueue<Order> exits = new LinkedQueue<>();
 
+        /** The entry disposer. */
+        private final Disposable disposerForEntry = Disposable.empty();
+
         /** The exit disposer. */
-        private final Disposable diposer = Disposable.empty();
+        private final Disposable disposerForExit = Disposable.empty();
 
         /**
          * @param directional
@@ -203,18 +206,32 @@ public abstract class Trader {
             this.direction = directional.direction();
             this.funds = funds == null ? Trader.this.funds : funds;
 
-            disposer.add(observeEntryExecutedSize().first().to(this::exit));
+            disposerForExit.add(observeEntryExecutedSize().first().to(this::exit));
 
             // calculate profit
-            observeExitExecutedSize().effectOnce(this::disposeEntries).to(size -> {
+            disposerForExit.add(observeExitExecutedSize().effectOnce(this::disposeEntry).to(size -> {
                 setRealizedProfit(exitPrice.diff(direction, entryPrice).multiply(size));
-            }, diposer);
+            }));
         }
 
-        private void disposeEntries() {
-            I.signal(entries).take(o -> o.isNotCompleted() && o.isNotCanceled()).flatMap(market::cancel).to(o -> {
+        /**
+         * Dispose all entry related resources.
+         */
+        private void disposeEntry() {
+            // cancel all remaining entry orders
+            I.signal(entries).take(Order::isNotTerminated).flatMap(market::cancel).to(v -> {
+                // do nothing
+            }, disposerForEntry::dispose);
+        }
 
-            });
+        /**
+         * Dispose all exit related resources.
+         */
+        private void disposeExit() {
+            // cancel all remaining exit orders
+            I.signal(exits).take(Order::isNotTerminated).flatMap(market::cancel).to(v -> {
+                // do nothing
+            }, disposerForExit::dispose);
         }
 
         /**
@@ -375,16 +392,7 @@ public abstract class Trader {
          * @param price An exit price.
          */
         protected final void exitAt(Num price) {
-            if (price.isGreaterThan(direction, entryPrice)) {
-                observeEntryExecutedSizeNow().to(size -> {
-                    market.request(direction.inverse(), size.minus(exitSize), s -> s.make(price)).to(this::processAddExitOrder);
-                });
-            } else {
-                market.tickers.latest.observe().take(e -> e.price.isLessThanOrEqual(direction, price)).first().to(e -> {
-                    market.request(direction.inverse(), entryExecutedSize.minus(exitExecutedSize), s -> s.take())
-                            .to(this::processAddExitOrder);
-                });
-            }
+            exitAt(price, price.isGreaterThan(direction, entryPrice) ? s -> s.make(price) : Orderable::take);
         }
 
         /**
@@ -416,10 +424,23 @@ public abstract class Trader {
         protected final void exitAt(Num price, Consumer<Orderable> strategy) {
             if (price.isGreaterThan(direction, entryPrice)) {
                 market.tickers.latest.observe().take(e -> e.price.isGreaterThanOrEqual(direction, price)).first().to(e -> {
+
+                    Num v = entryExecutedSize.minus(exitExecutedSize);
+
+                    if (v.isNegativeOrZero()) {
+                        System.out.println("@@@ " + this);
+                    }
+
                     market.request(direction.inverse(), entryExecutedSize.minus(exitExecutedSize), strategy).to(this::processAddExitOrder);
                 });
             } else {
                 market.tickers.latest.observe().take(e -> e.price.isLessThanOrEqual(direction, price)).first().to(e -> {
+                    Num v = entryExecutedSize.minus(exitExecutedSize);
+
+                    if (v.isNegativeOrZero()) {
+                        System.out.println("@@@ " + this);
+                    }
+
                     market.request(direction.inverse(), entryExecutedSize.minus(exitExecutedSize), strategy).to(this::processAddExitOrder);
                 });
             }
@@ -433,7 +454,7 @@ public abstract class Trader {
          * @param strategy
          */
         protected final void exitWhen(Signal<?> timing, Consumer<Orderable> strategy) {
-            disposer.add(timing.first().to(() -> {
+            disposerForExit.add(timing.first().to(() -> {
                 market.request(direction.inverse(), entryExecutedSize.minus(exitExecutedSize), strategy).to(this::processAddExitOrder);
             }));
         }
@@ -473,7 +494,9 @@ public abstract class Trader {
          */
         @Override
         public String toString() {
-            StringBuilder builder = new StringBuilder("Entry ").append(direction).append("\r\n");
+            ZonedDateTime start = entries.first().map(o -> o.creationTime).or(market.service.now());
+
+            StringBuilder builder = new StringBuilder("Entry ").append(direction).append(" ").append(start).append("\r\n");
             format(builder, "IN", entries, entryPrice, entrySize, entryExecutedSize);
             format(builder, "OUT", exits, exitPrice, exitSize, exitExecutedSize);
             return builder.toString();
@@ -490,6 +513,8 @@ public abstract class Trader {
                     .append(price.scale(market.service.setting.baseCurrencyScaleSize))
                     .append("\t size ")
                     .append(executedSize + "/" + size)
+                    .append("\t ")
+                    .append(orders)
                     .append("\r\n");
         }
     }
