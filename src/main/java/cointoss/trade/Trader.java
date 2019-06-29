@@ -184,7 +184,7 @@ public abstract class Trader {
         private final LinkedQueue<Order> entries = new LinkedQueue<>();
 
         /** The list exit orders. */
-        final LinkedQueue<Order> exits = new LinkedQueue<>();
+        private final LinkedQueue<Order> exits = new LinkedQueue<>();
 
         /** The exit disposer. */
         private final Disposable diposer = Disposable.empty();
@@ -468,26 +468,29 @@ public abstract class Trader {
             return direction;
         }
 
-        // /**
-        // * {@inheritDoc}
-        // */
-        // @Override
-        // public String toString() {
-        // return new StringBuilder() //
-        // .append("注文 ")
-        // .append(holdTime())
-        // .append("\t 損益")
-        // .append(profit().asJPY(4))
-        // .append("\t")
-        // .append(exitSize())
-        // .append("/")
-        // .append(order.executedSize)
-        // .append("@")
-        // .append(direction().mark())
-        // .append(entryPrice().asJPY(1))
-        // .append(" → ")
-        // .append(exitPrice().asJPY(1))
-        // .toString();
-        // }
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String toString() {
+            StringBuilder builder = new StringBuilder("Entry ").append(direction).append("\r\n");
+            format(builder, "IN", entries, entryPrice, entrySize, entryExecutedSize);
+            format(builder, "OUT", exits, exitPrice, exitSize, exitExecutedSize);
+            return builder.toString();
+        }
+
+        private void format(StringBuilder builder, String type, List<Order> orders, Num price, Num size, Num executedSize) {
+            builder.append("\t")
+                    .append(type)
+                    .append("\t order ")
+                    .append(orders.size())
+                    .append("\texe ")
+                    .append(orders.stream().flatMap(o -> o.executions.stream()).count())
+                    .append("\tprice ")
+                    .append(price.scale(market.service.setting.baseCurrencyScaleSize))
+                    .append("\t size ")
+                    .append(executedSize + "/" + size)
+                    .append("\r\n");
+        }
     }
 }

@@ -9,24 +9,24 @@
  */
 package cointoss.trade;
 
-import static cointoss.util.Num.*;
+import static cointoss.util.Num.HUNDRED;
 
-import java.time.Duration;
 import java.util.List;
 import java.util.function.Function;
 
 import cointoss.Market;
 import cointoss.analyze.Statistics;
 import cointoss.trade.Trader.Entry;
+import cointoss.util.Chrono;
 import cointoss.util.Num;
 
 public class TradingLog {
 
     /** summary */
-    public Statistics orderTime = new Statistics().formatter(v -> Duration.ofMillis(v.toLong()).toString());
+    public Statistics orderTime = new Statistics().formatter(Chrono::formatAsDuration);
 
     /** summary */
-    public Statistics holdTime = new Statistics().formatter(v -> Duration.ofMillis(v.toLong()).toString());
+    public final Statistics holdTime = new Statistics().formatter(Chrono::formatAsDuration);
 
     /** summary */
     public final Statistics profit;
@@ -58,7 +58,8 @@ public class TradingLog {
     /** A number of canceled entries. */
     public int cancel = 0;
 
-    public int exits;
+    /** The all entries. */
+    private final List<Entry> entries;
 
     /**
      * Analyze trading.
@@ -68,9 +69,9 @@ public class TradingLog {
         this.profit = new Statistics().formatter(format);
         this.loss = new Statistics().formatter(format).negative();
         this.profitAndLoss = new Statistics().formatter(format);
+        this.entries = entries;
 
         for (Entry entry : entries) {
-            exits += entry.exits.stream().map(o -> o.executions.size()).reduce(0, (a, b) -> a + b);
             total++;
             if (entry.isActive()) active++;
             if (entry.isTerminated()) terminated++;
@@ -112,6 +113,10 @@ public class TradingLog {
         String EOL = "\r\n";
 
         StringBuilder builder = new StringBuilder();
+
+        for (Entry entry : entries) {
+            builder.append(entry);
+        }
         builder.append("発注 ").append(orderTime).append(EOL);
         builder.append("保持 ").append(holdTime).append(EOL);
         builder.append("損失 ").append(loss).append(EOL);

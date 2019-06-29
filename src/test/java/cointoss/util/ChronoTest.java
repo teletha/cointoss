@@ -52,4 +52,16 @@ class ChronoTest {
         assert Chrono.epochMills(ZonedDateTime.of(1970, 1, 1, 0, 0, 1, 0, Chrono.UTC)) == 1000L;
         assert Chrono.epochMills(ZonedDateTime.of(2018, 4, 4, 10, 11, 14, 0, Chrono.UTC)) == 1522836674000L;
     }
+
+    @Test
+    void formatAsDuration() {
+        assert Chrono.formatAsDuration(1 * 1000).equals("1");
+        assert Chrono.formatAsDuration(10 * 1000).equals("10");
+        assert Chrono.formatAsDuration(64 * 1000).equals("1:04");
+        assert Chrono.formatAsDuration(13 * 60 * 1000).equals("13:00");
+        assert Chrono.formatAsDuration(60 * 60 * 1000 + 1 * 1000).equals("1:00:01");
+        assert Chrono.formatAsDuration(22 * 60 * 60 * 1000 + 12 * 1000).equals("22:00:12");
+        assert Chrono.formatAsDuration(24 * 60 * 60 * 1000).equals("1:00:00:00");
+        assert Chrono.formatAsDuration(11 * 24 * 60 * 60 * 1000).equals("11:00:00:00");
+    }
 }

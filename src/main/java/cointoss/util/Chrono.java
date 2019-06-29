@@ -213,4 +213,64 @@ public class Chrono {
     public static long epochMills(Temporal date) {
         return date.getLong(ChronoField.INSTANT_SECONDS) * 1000 + date.getLong(ChronoField.MILLI_OF_SECOND);
     }
+
+    /**
+     * Format the duration (mills) to human-readable expression.
+     * 
+     * @param mills
+     * @return
+     */
+    public static String formatAsDuration(Num mills) {
+        return formatAsDuration(mills.toLong());
+    }
+
+    /**
+     * Format the duration (mills) to human-readable expression.
+     * 
+     * @param mills
+     * @return
+     */
+    public static String formatAsDuration(long mills) {
+        long seconds = mills / 1000;
+
+        int day = 24 * 60 * 60;
+        int hour = 60 * 60;
+        int minute = 60;
+
+        long days = seconds / day;
+        seconds = seconds % day;
+        long hours = seconds / hour;
+        seconds = seconds % hour;
+        long minutes = seconds / minute;
+        seconds = seconds % minute;
+
+        return new StringBuilder() //
+                .append(formatAsTime(days, false, true))
+                .append(formatAsTime(hours, 0 < days, true))
+                .append(formatAsTime(minutes, 0 < days || 0 < hours, true))
+                .append(formatAsTime(seconds, 0 < days || 0 < hours || 0 < minutes, false))
+                .toString();
+    }
+
+    /**
+     * Format as human-readable time.
+     * 
+     * @param value
+     * @param hasPrev
+     * @return
+     */
+    private static String formatAsTime(long value, boolean hasPrev, boolean hasNext) {
+        String expression;
+
+        if (0 == value && !hasPrev) {
+            return "";
+        } else {
+            expression = String.valueOf(value);
+
+            if (expression.length() == 1 && hasPrev) {
+                expression = "0".concat(expression);
+            }
+        }
+        return hasNext ? expression.concat(":") : expression;
+    }
 }
