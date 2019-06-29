@@ -23,16 +23,19 @@ import cointoss.util.Num;
 public class TradingLog {
 
     /** summary */
-    public Statistics orderTime = new Statistics().formatter(Chrono::formatAsDuration);
-
-    /** summary */
     public final Statistics holdTime = new Statistics().formatter(Chrono::formatAsDuration);
 
     /** summary */
     public final Statistics profit;
 
     /** summary */
+    public final Statistics profitRange;
+
+    /** summary */
     public final Statistics loss;
+
+    /** summary */
+    public final Statistics lossRange;
 
     /** summary */
     public final Statistics profitAndLoss;
@@ -67,7 +70,9 @@ public class TradingLog {
     public TradingLog(Market market, FundManager funds, List<Entry> entries) {
         Function<Num, String> format = v -> v.scale(market.service.setting.baseCurrencyScaleSize).toString();
         this.profit = new Statistics().formatter(format);
+        this.profitRange = new Statistics().formatter(format);
         this.loss = new Statistics().formatter(format).negative();
+        this.lossRange = new Statistics().formatter(format).negative();
         this.profitAndLoss = new Statistics().formatter(format);
         this.entries = entries;
 
@@ -81,10 +86,16 @@ public class TradingLog {
 
             // calculate profit and loss
             Num pol = entry.profit(market.latestPrice());
+            Num pips = pol.divide(entry.entryExecutedSize);
 
             profitAndLoss.add(pol);
-            if (pol.isPositive()) profit.add(pol);
-            if (pol.isNegative()) loss.add(pol);
+            if (pol.isPositiveOrZero()) {
+                profit.add(pol);
+                profitRange.add(pips);
+            } else {
+                loss.add(pol);
+                lossRange.add(pips);
+            }
             maxTotalProfitAndLoss = Num.max(maxTotalProfitAndLoss, profitAndLoss.total());
             drawDown = Num.max(drawDown, maxTotalProfitAndLoss.minus(profitAndLoss.total()));
             drawDownRatio = Num.max(drawDownRatio, drawDown.divide(funds.totalAssets.plus(maxTotalProfitAndLoss)).scale(3));
@@ -117,10 +128,11 @@ public class TradingLog {
         for (Entry entry : entries) {
             builder.append(entry);
         }
-        builder.append("発注 ").append(orderTime).append(EOL);
         builder.append("保持 ").append(holdTime).append(EOL);
-        builder.append("損失 ").append(loss).append(EOL);
         builder.append("利益 ").append(profit).append(EOL);
+        builder.append("利幅 ").append(profitRange).append(EOL);
+        builder.append("損失 ").append(loss).append(EOL);
+        builder.append("損幅 ").append(lossRange).append(EOL);
         builder.append("取引 ")
                 .append(profitAndLoss) //
                 .append(" (勝率")

@@ -376,7 +376,7 @@ public abstract class Trader {
          */
         protected final void exitAt(Num price) {
             if (price.isGreaterThan(direction, entryPrice)) {
-                observeEntryExecutedSize().to(size -> {
+                observeEntryExecutedSizeNow().to(size -> {
                     market.request(direction.inverse(), size.minus(exitSize), s -> s.make(price)).to(this::processAddExitOrder);
                 });
             } else {

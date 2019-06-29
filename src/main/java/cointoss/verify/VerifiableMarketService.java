@@ -10,13 +10,13 @@
 package cointoss.verify;
 
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.Delayed;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -54,10 +54,10 @@ public class VerifiableMarketService extends MarketService {
     private int id = 0;
 
     /** The order manager. */
-    private final Collection<BackendOrder> orderActive = new ArrayList<>();
+    private final Collection<BackendOrder> orderActive = new ConcurrentLinkedDeque<>();
 
     /** The order manager. */
-    private final Collection<BackendOrder> orderAll = new ArrayList<>();
+    private final Collection<BackendOrder> orderAll = new ConcurrentLinkedDeque<>();
 
     /** The order manager. */
     private final Signaling<Ⅲ<Direction, String, Execution>> positions = new Signaling();
@@ -482,6 +482,14 @@ public class VerifiableMarketService extends MarketService {
                 canceling.accept(front);
                 canceling.complete();
             });
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String toString() {
+            return "BackendOrder [direction=" + direction + ", size=" + size + ", id=" + id + ", price=" + price + ", type=" + type + ", condition=" + condition + ", state=" + state + ", remainingSize=" + remainingSize + ", executedSize=" + executedSize + ", marketMinPrice=" + marketMinPrice + ", createTimeMills=" + createTimeMills + ", cancelTimeMills=" + cancelTimeMills + "]";
         }
     }
 
