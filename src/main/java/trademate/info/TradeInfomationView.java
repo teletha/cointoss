@@ -83,8 +83,9 @@ public class TradeInfomationView extends View {
 
         positionSize.text(manager.size);
         positionPrice.text(manager.price);
-        positionProfit.text(manager.profit);
-
+        view.market().tickers.latest.observe().to(e -> {
+            positionProfit.text(manager.profit(e.price));
+        });
     }
 
     /**

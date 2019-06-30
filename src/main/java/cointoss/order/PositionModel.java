@@ -14,26 +14,35 @@ import java.time.ZonedDateTime;
 import cointoss.Direction;
 import cointoss.Directional;
 import cointoss.util.Num;
+import cointoss.util.apology.PerformanceSensitive;
 import icy.manipulator.Icy;
 
 @Icy
-public interface PositionModel extends Directional {
+public abstract class PositionModel implements Directional {
 
     @Icy.Property
     @Override
-    Direction direction();
+    public abstract Direction direction();
 
     @Icy.Property
-    Num price();
+    public abstract Num price();
 
     @Icy.Property(mutable = true)
-    Num size();
+    public abstract Num size();
 
     @Icy.Property
-    ZonedDateTime date();
+    public abstract ZonedDateTime date();
 
-    @Icy.Property(mutable = true)
-    default Num profit() {
-        return Num.ZERO;
+    /**
+     * Calculate total profit or loss on the current price.
+     * 
+     * @param currentPrice A current price.
+     * @return A total profit or loss of this entry.
+     */
+    @PerformanceSensitive
+    public final Num profit(Num currentPrice) {
+        Num profit = isBuy() ? currentPrice.minus(price()) : price().minus(currentPrice);
+
+        return profit.multiply(size()).scale(0);
     }
 }

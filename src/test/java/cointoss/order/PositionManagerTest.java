@@ -14,10 +14,7 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import cointoss.Market;
 import cointoss.execution.Execution;
-import cointoss.order.Position;
-import cointoss.order.PositionManager;
 import cointoss.util.Num;
 import cointoss.verify.VerifiableMarketService;
 import kiss.Variable;
@@ -35,9 +32,8 @@ class PositionManagerTest {
 
     @BeforeEach
     void init() {
-        latest = Variable.of(Market.BASE);
         service = new VerifiableMarketService();
-        positions = new PositionManager(service, latest);
+        positions = new PositionManager(service);
     }
 
     @Test
@@ -122,28 +118,27 @@ class PositionManagerTest {
 
     @Test
     void profit() {
-        latest.set(Execution.with.buy(1).price(20));
-        assert positions.profit.is(Num.ZERO);
+        assert positions.profit(Num.of(20)).is(Num.ZERO);
 
         // long
         positions.add(Execution.with.buy(1).price(10));
-        assert positions.profit.is(Num.of(10));
+        assert positions.profit(Num.of(20)).is(Num.of(10));
 
         // same price long
         positions.add(Execution.with.buy(1).price(10));
-        assert positions.profit.is(Num.of(20));
+        assert positions.profit(Num.of(20)).is(Num.of(20));
 
         // different price long
         positions.add(Execution.with.buy(2).price(20));
-        assert positions.profit.is(Num.of(20));
+        assert positions.profit(Num.of(20)).is(Num.of(20));
 
         // short
         positions.add(Execution.with.sell(2).price(10));
-        assert positions.profit.is(Num.ZERO);
+        assert positions.profit(Num.of(20)).is(Num.ZERO);
 
         // turn over
         positions.add(Execution.with.sell(2).price(20));
-        assert positions.profit.is(Num.ZERO);
+        assert positions.profit(Num.of(20)).is(Num.ZERO);
     }
 
     @Test

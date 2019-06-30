@@ -14,18 +14,13 @@ import cointoss.Market;
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.ticker.TickSpan;
 import cointoss.trade.Trader;
-import cointoss.trade.TradingLog;
 
 public class BackTestInvoker {
 
     public static void main(String[] args) throws InterruptedException {
-        TradingLog log = BackTest.with.service(BitFlyer.FX_BTC_JPY)
-                .start(2019, 6, 1)
-                .end(2019, 6, 1)
-                .run(market -> new Sample(market))
-                .get(0);
-
-        System.out.println(log);
+        BackTest backtest = BackTest.with.service(BitFlyer.FX_BTC_JPY).start(2019, 6, 1).end(2019, 6, 1);
+        System.out.println(backtest.run(market -> new Sample(market)).get(0));
+        System.out.println(backtest.time);
     }
 
     /**

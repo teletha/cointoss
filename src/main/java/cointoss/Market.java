@@ -9,7 +9,7 @@
  */
 package cointoss;
 
-import static java.util.concurrent.TimeUnit.*;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.time.temporal.ChronoUnit;
 import java.util.LinkedList;
@@ -100,7 +100,7 @@ public class Market implements Disposable {
         this.service = Objects.requireNonNull(service, "Market is not found.");
         this.orders = new OrderManager(service);
         this.orderBook = new OrderBookManager(service);
-        this.positions = new PositionManager(service, tickers.latest);
+        this.positions = new PositionManager(service);
 
         // build tickers for each span
         timeline.to(tickers::update);

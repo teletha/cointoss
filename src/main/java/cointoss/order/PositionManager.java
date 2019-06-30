@@ -15,10 +15,10 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import cointoss.Direction;
 import cointoss.Directional;
-import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.execution.Execution;
 import cointoss.util.Num;
+import cointoss.util.apology.PerformanceSensitive;
 import kiss.Signal;
 import kiss.Signaling;
 import kiss.Variable;
@@ -52,21 +52,10 @@ public final class PositionManager implements Directional {
     /** The average price. */
     public final Variable<Num> price = Variable.of(Num.ZERO);
 
-    /** The total profit and loss. */
-    public final Variable<Num> profit = Variable.of(Num.ZERO);
-
-    /** The latest market price. */
-    private final Variable<Execution> latest;
-
     /**
      * Manage {@link Position}.
-     * 
-     * @param latest A latest market {@link Execution} holder.
      */
-    public PositionManager(MarketService service, Variable<Execution> latest) {
-        this.latest = latest == null ? Variable.of(Market.BASE) : latest;
-        this.latest.observe().to(this::calculateProfit);
-
+    public PositionManager(MarketService service) {
         service.add(service.executionsRealtimelyForMe().to(e -> add(e.ⅰ, e.ⅲ)));
     }
 
@@ -112,6 +101,21 @@ public final class PositionManager implements Directional {
     @Override
     public Direction direction() {
         return isLong() ? Direction.BUY : Direction.SELL;
+    }
+
+    /**
+     * Calculate total profit or loss on the current price.
+     * 
+     * @param currentPrice A current price.
+     * @return A total profit or loss of this entry.
+     */
+    @PerformanceSensitive
+    public final Num profit(Num currentPrice) {
+        Num total = Num.ZERO;
+        for (Position position : positions) {
+            total = total.plus(position.profit(currentPrice));
+        }
+        return total;
     }
 
     /**
@@ -207,22 +211,5 @@ public final class PositionManager implements Directional {
 
         this.size.set(size);
         this.price.set(size.isZero() ? Num.ZERO : price.divide(size));
-        calculateProfit(latest.v);
-    }
-
-    /**
-     * Calculate profit variable.
-     */
-    private void calculateProfit(Execution execution) {
-        Num total = Num.ZERO;
-
-        for (Position position : positions) {
-            Num profit = position.isBuy() ? execution.price.minus(position.price) : position.price.minus(execution.price);
-            profit = profit.multiply(position.size).scale(0);
-
-            position.assignProfit(profit);
-            total = total.plus(profit);
-        }
-        this.profit.set(total);
     }
 }
