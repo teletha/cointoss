@@ -7,7 +7,7 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss.trader;
+package cointoss.trade;
 
 import org.junit.jupiter.api.Test;
 

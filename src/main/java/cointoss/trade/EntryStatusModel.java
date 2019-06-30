@@ -13,7 +13,7 @@ import cointoss.Direction;
 import cointoss.Directional;
 import cointoss.util.Num;
 import cointoss.util.ObservableNumProperty;
-import cointoss.util.PerformanceSensitive;
+import cointoss.util.apology.PerformanceSensitive;
 import icy.manipulator.Icy;
 
 @Icy(setterModifier = "final")

@@ -310,6 +310,19 @@ public abstract class OrderModel implements Directional, Comparable<OrderModel> 
     public abstract Signal<OrderState> observeState();
 
     /**
+     * Calculate canceled size.
+     * 
+     * @return
+     */
+    public final Num canceledSize() {
+        if (state() != OrderState.CANCELED) {
+            return Num.ZERO;
+        } else {
+            return size().minus(executedSize());
+        }
+    }
+
+    /**
      * Observe when this {@link OldOrder} will be canceled or completed.
      * 
      * @return A event {@link Signal}.

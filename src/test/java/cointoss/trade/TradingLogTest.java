@@ -7,7 +7,7 @@
  *
  *          https://opensource.org/licenses/MIT
  */
-package cointoss.trader;
+package cointoss.trade;
 
 import static cointoss.execution.Execution.*;
 

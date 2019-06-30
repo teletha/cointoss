@@ -7,7 +7,7 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss.trader;
+package cointoss.trade;
 
 import java.time.Duration;
 
@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 
 import cointoss.Direction;
 import cointoss.execution.Execution;
+import cointoss.order.Order;
 
 class EntryTest extends TraderTestSupport {
 
@@ -78,5 +79,43 @@ class EntryTest extends TraderTestSupport {
 
         market.perform(Execution.with.buy(0.5).price(21));
         assert e.isExitTerminated() == true;
+    }
+
+    @Test
+    void exitAndStop() {
+        when(now(), v -> new Entry(Direction.BUY) {
+            @Override
+            protected void order() {
+                order(1, s -> s.make(10));
+            }
+
+            @Override
+            protected void exit() {
+                exitAt(20);
+                exitAt(5);
+            }
+        });
+
+        Entry e = latest();
+        assert e.exits.size() == 0;
+
+        market.perform(Execution.with.buy(1).price(9));
+        assert e.exits.size() == 1; // exit is ordered
+        assert e.entryExecutedSize.is(1);
+        assert e.exitExecutedSize.is(0);
+
+        market.perform(Execution.with.buy(0.1).price(5)); // trigger stop
+        market.perform(Execution.with.buy(0.5).price(5));
+        assert e.exits.size() == 2; // stop is ordered
+        assert e.exits.stream().allMatch(Order::isActive);
+        assert e.isExitTerminated() == false;
+        assert e.entryExecutedSize.is(1);
+        assert e.exitExecutedSize.is(0.5);
+
+        market.perform(Execution.with.buy(0.7).price(5));
+        assert e.exits.stream().allMatch(Order::isTerminated); // exit is canceled
+        assert e.isExitTerminated() == true;
+        assert e.entryExecutedSize.is(1);
+        assert e.exitExecutedSize.is(1);
     }
 }
