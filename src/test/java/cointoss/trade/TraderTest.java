@@ -9,7 +9,7 @@
  */
 package cointoss.trade;
 
-import static java.time.temporal.ChronoUnit.SECONDS;
+import static java.time.temporal.ChronoUnit.*;
 
 import org.junit.jupiter.api.Test;
 
@@ -93,6 +93,7 @@ class TraderTest extends TraderTestSupport {
 
         // execute entry order
         market.perform(Execution.with.buy(1).price(9));
+        market.elapse(1, SECONDS);
         assert entry.entrySize.is(1);
         assert entry.entryExecutedSize.is(1);
         assert entry.entryPrice.is(10);
@@ -171,6 +172,7 @@ class TraderTest extends TraderTestSupport {
 
         // entry partially
         market.perform(Execution.with.buy(2).price(9));
+        market.elapse(1, SECONDS);
         assert e.isEntryTerminated() == false;
         assert e.isExitTerminated() == false;
 
@@ -209,6 +211,7 @@ class TraderTest extends TraderTestSupport {
 
         // entry partially
         market.perform(Execution.with.buy(2).price(9));
+        market.elapse(1, SECONDS);
         assert e.profit(market.latestPrice()).is(0);
         assert e.realizedProfit.is(0);
         assert e.unrealizedProfit(market.latestPrice()).is(0);
@@ -257,6 +260,7 @@ class TraderTest extends TraderTestSupport {
 
         // entry partially
         market.perform(Execution.with.buy(2).price(21));
+        market.elapse(1, SECONDS);
         assert e.profit(market.latestPrice()).is(0);
         assert e.realizedProfit.is(0);
         assert e.unrealizedProfit(market.latestPrice()).is(0);

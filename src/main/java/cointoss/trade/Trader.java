@@ -9,6 +9,8 @@
  */
 package cointoss.trade;
 
+import static java.util.concurrent.TimeUnit.*;
+
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.time.temporal.TemporalUnit;
@@ -397,8 +399,9 @@ public abstract class Trader {
          */
         protected final void exitAt(Num price) {
             if (price.isGreaterThan(direction, entryPrice)) {
-                disposerForExit.add(observeEntryExecutedSizeDiff().to(size -> {
-                    market.request(direction.inverse(), size, s -> s.make(price)).to(this::processAddExitOrder);
+                disposerForExit.add(observeEntryExecutedSizeDiff().debounce(1, SECONDS, market.service.scheduler()).to(size -> {
+                    market.request(direction.inverse(), entryExecutedSize.minus(exitSize), s -> s.make(price))
+                            .to(this::processAddExitOrder);
                 }));
             } else {
                 disposerForExit.add(market.tickers.latest.observe().take(e -> e.price.isLessThanOrEqual(direction, price)).first().to(e -> {

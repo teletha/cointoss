@@ -9,6 +9,8 @@
  */
 package cointoss.trade;
 
+import static java.util.concurrent.TimeUnit.*;
+
 import java.time.Duration;
 
 import org.junit.jupiter.api.Test;
@@ -74,11 +76,37 @@ class EntryTest extends TraderTestSupport {
         market.perform(Execution.with.buy(1).price(9));
         assert e.isExitTerminated() == false;
 
+        market.elapse(1, SECONDS);
         market.perform(Execution.with.buy(0.5).price(21));
         assert e.isExitTerminated() == false;
 
         market.perform(Execution.with.buy(0.5).price(21));
         assert e.isExitTerminated() == true;
+    }
+
+    @Test
+    void entryWithMultipleExecutionAndExitAtPrice() {
+        when(now(), v -> new Entry(Direction.BUY) {
+            @Override
+            protected void order() {
+                order(1, s -> s.make(10));
+            }
+
+            @Override
+            protected void exit() {
+                exitAt(20);
+            }
+        });
+
+        Entry e = latest();
+        assert e.exits.size() == 0;
+
+        market.perform(Execution.with.buy(0.1).price(9));
+        market.perform(Execution.with.buy(0.2).price(9));
+        market.perform(Execution.with.buy(0.3).price(9));
+        market.perform(Execution.with.buy(0.4).price(9));
+        market.elapse(1, SECONDS);
+        assert e.exits.size() == 1;
     }
 
     @Test
@@ -100,6 +128,7 @@ class EntryTest extends TraderTestSupport {
         assert e.exits.size() == 0;
 
         market.perform(Execution.with.buy(1).price(9));
+        market.elapse(1, SECONDS);
         assert e.exits.size() == 1; // exit is ordered
         assert e.entryExecutedSize.is(1);
         assert e.exitExecutedSize.is(0);

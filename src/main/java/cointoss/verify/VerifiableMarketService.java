@@ -256,6 +256,22 @@ public class VerifiableMarketService extends MarketService {
     }
 
     /**
+     * Elapse market time.
+     * 
+     * @param time
+     * @param unit
+     * @return
+     */
+    final void elapse(long time, TimeUnit unit) {
+        now = now.plus(time, unit.toChronoUnit());
+        nowMills = nowMills + unit.toMillis(time);
+
+        while (!tasks.isEmpty() && tasks.peek().activeTime <= nowMills) {
+            tasks.poll().run();
+        }
+    }
+
+    /**
      * Emulate {@link Execution}.
      * 
      * @param e
@@ -320,6 +336,10 @@ public class VerifiableMarketService extends MarketService {
                     iterator.remove();
                 }
                 positions.accept(I.pair(exe.direction, order.id, exe));
+
+                while (!tasks.isEmpty() && tasks.peek().activeTime <= nowMills) {
+                    tasks.poll().run();
+                }
 
                 // replace execution info
                 return Execution.with.direction(e.direction, exe.size)
