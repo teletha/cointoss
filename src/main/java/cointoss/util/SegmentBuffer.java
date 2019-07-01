@@ -187,7 +187,7 @@ public final class SegmentBuffer<E> {
     }
 
     /**
-     * Get the first item.
+     * Get the last item.
      * 
      * @return
      */

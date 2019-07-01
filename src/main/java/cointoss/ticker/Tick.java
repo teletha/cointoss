@@ -13,9 +13,6 @@ import java.time.ZonedDateTime;
 
 import cointoss.util.Num;
 
-/**
- * @version 2018/07/14 0:29:54
- */
 public final class Tick {
 
     /** Begin time of the tick */
@@ -26,6 +23,9 @@ public final class Tick {
 
     /** Open price of the period */
     public final Num openPrice;
+
+    /** The previous tick. */
+    public final Tick previous;
 
     /** Close price of the period. */
     Num closePrice;
@@ -59,7 +59,8 @@ public final class Tick {
      * @param open A open price.
      * @param realtime The realtime execution statistic.
      */
-    Tick(ZonedDateTime start, TickSpan span, Num open, TickerManager realtime) {
+    Tick(Tick previous, ZonedDateTime start, TickSpan span, Num open, TickerManager realtime) {
+        this.previous = previous;
         this.start = start;
         this.end = start.plus(span.duration);
         this.openPrice = this.highPrice = this.lowPrice = open;

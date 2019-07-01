@@ -73,7 +73,7 @@ public final class Ticker {
      * @param realtime The realtime execution statistic.
      */
     final void init(Execution execution, TickerManager realtime) {
-        current = new Tick(span.calculateStartTime(execution.date), span, execution.price, realtime);
+        current = new Tick(ticks.last(), span.calculateStartTime(execution.date), span, execution.price, realtime);
 
         ticks.add(current);
         additions.accept(current);
@@ -99,14 +99,14 @@ public final class Ticker {
 
                 while (current.end.isBefore(start)) {
                     current.freeze();
-                    current = new Tick(current.end, span, current.closePrice(), realtime);
+                    current = new Tick(ticks.last(), current.end, span, current.closePrice(), realtime);
                     ticks.add(current);
                     additions.accept(current);
                 }
 
                 // create the latest tick for execution
                 current.freeze();
-                current = new Tick(current.end, span, execution.price, realtime);
+                current = new Tick(ticks.last(), current.end, span, execution.price, realtime);
                 ticks.add(current);
                 additions.accept(current);
             } finally {
