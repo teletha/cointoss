@@ -19,6 +19,7 @@ import cointoss.util.Num;
 import stylist.Style;
 import stylist.StyleDSL;
 import trademate.TradingView;
+import viewtify.Viewtify;
 import viewtify.ui.UI;
 import viewtify.ui.UIButton;
 import viewtify.ui.UILabel;
@@ -83,7 +84,7 @@ public class TradeInfomationView extends View {
 
         positionSize.text(manager.size);
         positionPrice.text(manager.price);
-        view.market().tickers.latest.observe().to(e -> {
+        view.market().tickers.latest.observe().on(Viewtify.UIThread).to(e -> {
             positionProfit.text(manager.profit(e.price));
         });
     }

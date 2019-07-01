@@ -86,7 +86,7 @@ public class TradingLog {
 
             // calculate profit and loss
             Num pol = entry.profit(market.latestPrice());
-            Num pips = pol.divide(entry.entryExecutedSize);
+            Num pips = entry.entryExecutedSize.isZero() ? Num.ZERO : pol.divide(entry.entryExecutedSize);
 
             profitAndLoss.add(pol);
             if (pol.isPositiveOrZero()) {

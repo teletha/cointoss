@@ -12,10 +12,9 @@ package cointoss.verify;
 import cointoss.Direction;
 import cointoss.Market;
 import cointoss.market.bitflyer.BitFlyer;
-import cointoss.ticker.Tick;
 import cointoss.ticker.TickSpan;
+import cointoss.ticker.Ticker;
 import cointoss.trade.Trader;
-import cointoss.util.Num;
 
 public class BackTestInvoker {
 
@@ -33,16 +32,7 @@ public class BackTestInvoker {
         private Sample(Market market) {
             super(market);
 
-            when(market.tickers.of(TickSpan.Hour1).add.skip(1), tick -> {
-
-                Tick prev = tick.previous;
-                Num range = prev.highPrice().minus(prev.lowPrice());
-                System.out.println(tick.previous + " @" + range);
-
-                if (range.isLessThan(2000)) {
-                    return null;
-                }
-
+            when(market.tickers.of(TickSpan.Hour1).add, tick -> {
                 return new Entry(Direction.random()) {
 
                     @Override
@@ -55,8 +45,8 @@ public class BackTestInvoker {
                      */
                     @Override
                     protected void exit() {
-                        exitAt(entryPrice.plus(direction, range.multiply(0.5)));
-                        exitAt(entryPrice.plus(direction, range.multiply(0.3).negate()));
+                        exitAt(entryPrice.plus(direction, 6000));
+                        exitAt(entryPrice.plus(direction, -3000));
                     }
                 };
             });

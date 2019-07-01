@@ -9,7 +9,7 @@
  */
 package cointoss.trade;
 
-import static java.util.concurrent.TimeUnit.*;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
@@ -17,6 +17,7 @@ import java.time.temporal.TemporalUnit;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BooleanSupplier;
@@ -369,6 +370,17 @@ public abstract class Trader {
          */
         protected void exit() {
             exitAtRiskRewardRatio();
+        }
+
+        /**
+         * Declare exit order by price. Loss cutting is the only element in the trade that investors
+         * can control.
+         * 
+         * @param time
+         * @param unit
+         */
+        protected final void exitAfter(long time, TimeUnit unit) {
+            exitWhen(I.signal(time, 0, unit, market.service.scheduler()).first(), Orderable::take);
         }
 
         /**
