@@ -13,7 +13,6 @@ import java.time.ZonedDateTime;
 
 import cointoss.execution.Execution;
 import cointoss.order.OrderStrategy.Orderable;
-import cointoss.trade.Trader;
 import cointoss.verify.VerifiableMarket;
 import kiss.I;
 import kiss.Signal;
@@ -54,8 +53,8 @@ public abstract class TraderTestSupport extends Trader {
         when(now(), v -> new Entry(entry) {
 
             @Override
-            protected void order() {
-                order(entry.size, Orderable::take);
+            protected void entry() {
+                entry(entry.size, Orderable::take);
             }
         });
         market.perform(entry);
@@ -71,8 +70,8 @@ public abstract class TraderTestSupport extends Trader {
         when(now(), v -> new Entry(entry) {
 
             @Override
-            protected void order() {
-                order(entry.size, Orderable::take);
+            protected void entry() {
+                entry(entry.size, Orderable::take);
             }
 
             /**

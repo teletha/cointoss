@@ -9,7 +9,7 @@
  */
 package cointoss.trade;
 
-import static java.util.concurrent.TimeUnit.*;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.time.Duration;
 
@@ -41,8 +41,8 @@ class EntryTest extends TraderTestSupport {
     void isEntryTerminated() {
         when(now(), v -> new Entry(Direction.BUY) {
             @Override
-            protected void order() {
-                order(1, s -> s.make(10));
+            protected void entry() {
+                entry(1, s -> s.make(10));
             }
         });
 
@@ -60,8 +60,8 @@ class EntryTest extends TraderTestSupport {
     void isExitTerminated() {
         when(now(), v -> new Entry(Direction.BUY) {
             @Override
-            protected void order() {
-                order(1, s -> s.make(10));
+            protected void entry() {
+                entry(1, s -> s.make(10));
             }
 
             @Override
@@ -88,8 +88,8 @@ class EntryTest extends TraderTestSupport {
     void entryWithMultipleExecutionAndExitAtPrice() {
         when(now(), v -> new Entry(Direction.BUY) {
             @Override
-            protected void order() {
-                order(1, s -> s.make(10));
+            protected void entry() {
+                entry(1, s -> s.make(10));
             }
 
             @Override
@@ -113,8 +113,8 @@ class EntryTest extends TraderTestSupport {
     void exitAndStop() {
         when(now(), v -> new Entry(Direction.BUY) {
             @Override
-            protected void order() {
-                order(1, s -> s.make(10));
+            protected void entry() {
+                entry(1, s -> s.make(10));
             }
 
             @Override

@@ -109,7 +109,7 @@ public abstract class Trader {
             if (entry != null) {
                 entries.add(entry);
 
-                entry.order();
+                entry.entry();
             }
         }));
     }
@@ -291,7 +291,7 @@ public abstract class Trader {
         /**
          * Declare entry order.
          */
-        protected abstract void order();
+        protected abstract void entry();
 
         /**
          * We will order with the specified quantity. Use the return the {@link Takable} &
@@ -301,8 +301,8 @@ public abstract class Trader {
          * @param size A entry size.
          * @return A ordering method.
          */
-        protected final void order(long size, Consumer<Orderable> declaration) {
-            order(Num.of(size), declaration);
+        protected final void entry(long size, Consumer<Orderable> declaration) {
+            entry(Num.of(size), declaration);
         }
 
         /**
@@ -313,8 +313,8 @@ public abstract class Trader {
          * @param size A entry size.
          * @return A ordering method.
          */
-        protected final void order(double size, Consumer<Orderable> declaration) {
-            order(Num.of(size), declaration);
+        protected final void entry(double size, Consumer<Orderable> declaration) {
+            entry(Num.of(size), declaration);
         }
 
         /**
@@ -325,7 +325,7 @@ public abstract class Trader {
          * @param size A entry size.
          * @return A ordering method.
          */
-        protected final void order(Num size, Consumer<Orderable> declaration) {
+        protected final void entry(Num size, Consumer<Orderable> declaration) {
             if (size == null || size.isLessThan(market.service.setting.targetCurrencyMinimumBidSize)) {
                 throw new Error("Entry size is less than minimum bid size.");
             }

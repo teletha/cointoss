@@ -9,7 +9,7 @@
  */
 package cointoss.trade;
 
-import static java.time.temporal.ChronoUnit.*;
+import static java.time.temporal.ChronoUnit.SECONDS;
 
 import org.junit.jupiter.api.Test;
 
@@ -26,8 +26,8 @@ class TraderTest extends TraderTestSupport {
             return new Entry(Direction.BUY) {
 
                 @Override
-                protected void order() {
-                    order(1, s -> s.make(10));
+                protected void entry() {
+                    entry(1, s -> s.make(10));
                 }
             };
         });
@@ -39,7 +39,7 @@ class TraderTest extends TraderTestSupport {
         assert entry.entryExecutedSize.is(0);
         assert entry.entryPrice.is(0);
 
-        // execute entry order
+        // execute entry entry
         market.perform(Execution.with.buy(1).price(9));
         assert entry.entrySize.is(1);
         assert entry.entryExecutedSize.is(1);
@@ -52,8 +52,8 @@ class TraderTest extends TraderTestSupport {
             return new Entry(Direction.SELL) {
 
                 @Override
-                protected void order() {
-                    order(1, s -> s.make(10));
+                protected void entry() {
+                    entry(1, s -> s.make(10));
                 }
             };
         });
@@ -65,7 +65,7 @@ class TraderTest extends TraderTestSupport {
         assert entry.entryExecutedSize.is(0);
         assert entry.entryPrice.is(0);
 
-        // execute entry order
+        // execute entry entry
         market.perform(Execution.with.buy(1).price(11));
         assert entry.entrySize.is(1);
         assert entry.entryExecutedSize.is(1);
@@ -78,8 +78,8 @@ class TraderTest extends TraderTestSupport {
             return new Entry(Direction.BUY) {
 
                 @Override
-                protected void order() {
-                    order(1, s -> s.make(10));
+                protected void entry() {
+                    entry(1, s -> s.make(10));
                 }
 
                 @Override
@@ -91,25 +91,25 @@ class TraderTest extends TraderTestSupport {
 
         Entry entry = latest();
 
-        // execute entry order
+        // execute entry entry
         market.perform(Execution.with.buy(1).price(9));
         market.elapse(1, SECONDS);
         assert entry.entrySize.is(1);
         assert entry.entryExecutedSize.is(1);
         assert entry.entryPrice.is(10);
 
-        // exit order
+        // exit entry
         assert entry.exitSize.is(1);
         assert entry.exitExecutedSize.is(0);
         assert entry.exitPrice.is(0);
 
-        // don't execute exit order
+        // don't execute exit entry
         market.perform(Execution.with.buy(1).price(15));
         assert entry.exitSize.is(1);
         assert entry.exitExecutedSize.is(0);
         assert entry.exitPrice.is(0);
 
-        // execute exit order
+        // execute exit entry
         market.perform(Execution.with.buy(1).price(21));
         assert entry.exitSize.is(1);
         assert entry.exitExecutedSize.is(1);
@@ -122,8 +122,8 @@ class TraderTest extends TraderTestSupport {
             return new Entry(Direction.BUY) {
 
                 @Override
-                protected void order() {
-                    order(1, s -> s.make(10));
+                protected void entry() {
+                    entry(1, s -> s.make(10));
                 }
 
                 @Override
@@ -135,16 +135,16 @@ class TraderTest extends TraderTestSupport {
 
         Entry entry = latest();
 
-        // execute entry order
+        // execute entry entry
         market.perform(Execution.with.buy(1).price(9));
         assert entry.entrySize.is(1);
         assert entry.entryExecutedSize.is(1);
         assert entry.entryPrice.is(10);
 
-        // activate exit order
+        // activate exit entry
         market.perform(Execution.with.buy(1).price(20));
 
-        // execute exit order
+        // execute exit entry
         market.perform(Execution.with.buy(1).price(22));
         assert entry.exitSize.is(1);
         assert entry.exitExecutedSize.is(1);
@@ -157,8 +157,8 @@ class TraderTest extends TraderTestSupport {
             return new Entry(Direction.BUY) {
 
                 @Override
-                protected void order() {
-                    order(3, s -> s.make(10));
+                protected void entry() {
+                    entry(3, s -> s.make(10));
                 }
 
                 @Override
@@ -193,8 +193,8 @@ class TraderTest extends TraderTestSupport {
             return new Entry(Direction.BUY) {
 
                 @Override
-                protected void order() {
-                    order(3, s -> s.make(10));
+                protected void entry() {
+                    entry(3, s -> s.make(10));
                 }
 
                 @Override
@@ -242,8 +242,8 @@ class TraderTest extends TraderTestSupport {
             return new Entry(Direction.SELL) {
 
                 @Override
-                protected void order() {
-                    order(3, s -> s.make(20));
+                protected void entry() {
+                    entry(3, s -> s.make(20));
                 }
 
                 @Override
@@ -290,8 +290,8 @@ class TraderTest extends TraderTestSupport {
             return new Entry(Direction.BUY) {
 
                 @Override
-                protected void order() {
-                    order(2, s -> s.make(20));
+                protected void entry() {
+                    entry(2, s -> s.make(20));
                 }
 
                 @Override
@@ -340,8 +340,8 @@ class TraderTest extends TraderTestSupport {
             return new Entry(Direction.SELL) {
 
                 @Override
-                protected void order() {
-                    order(2, s -> s.make(10));
+                protected void entry() {
+                    entry(2, s -> s.make(10));
                 }
 
                 @Override

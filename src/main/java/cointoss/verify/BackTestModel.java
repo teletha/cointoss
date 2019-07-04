@@ -21,6 +21,7 @@ import cointoss.MarketService;
 import cointoss.trade.Trader;
 import cointoss.trade.TradingLog;
 import cointoss.util.Chrono;
+import cointoss.util.Num;
 import icy.manipulator.Icy;
 import kiss.I;
 
@@ -48,12 +49,35 @@ public abstract class BackTestModel {
         return Chrono.utc(LocalDate.of(year, month, day));
     }
 
+    @Icy.Property
+    public Num initialBaseCurrency() {
+        return Num.ZERO;
+    }
+
+    @Icy.Overload("initialBaseCurrency")
+    private Num initialBaseCurrency(double value) {
+        return Num.of(value);
+    }
+
+    @Icy.Property
+    public Num initialTargetCurrency() {
+        return Num.ZERO;
+    }
+
+    @Icy.Overload("initialTargetCurrency")
+    private Num initialTargetCurrency(double value) {
+        return Num.of(value);
+    }
+
     public final List<TradingLog> run(Function<Market, Trader> traderBuilder) {
         return runs(market -> List.of(traderBuilder.apply(market)));
     }
 
     public final List<TradingLog> runs(Function<Market, List<Trader>> traderBuilder) {
         VerifiableMarket market = new VerifiableMarket(service());
+        market.service.baseCurrency = initialBaseCurrency();
+        market.service.targetCurrency = initialTargetCurrency();
+
         List<Trader> traders = traderBuilder.apply(market);
 
         time.start();

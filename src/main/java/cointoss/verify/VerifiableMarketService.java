@@ -66,10 +66,10 @@ public class VerifiableMarketService extends MarketService {
     private final LinkedList<Execution> executeds = new LinkedList();
 
     /** The initial base currency. */
-    private final Num baseCurrency = Num.HUNDRED;
+    public Num baseCurrency = Num.HUNDRED;
 
     /** The initial target currency. */
-    private final Num targetCurrency = Num.ZERO;
+    public Num targetCurrency = Num.ZERO;
 
     /** The latest execution time. */
     private ZonedDateTime now = Chrono.MIN;

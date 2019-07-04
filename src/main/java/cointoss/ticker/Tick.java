@@ -12,6 +12,8 @@ package cointoss.ticker;
 import java.time.ZonedDateTime;
 
 import cointoss.util.Num;
+import kiss.I;
+import kiss.Signal;
 
 public final class Tick {
 
@@ -200,6 +202,15 @@ public final class Tick {
         shortVolume = shortVolume();
         shortPriceDecrease = shortPriceDecrease();
         realtime = null;
+    }
+
+    /**
+     * Retrieve the previous tick sequentially.
+     * 
+     * @param size A number of ticks.
+     */
+    public Signal<Tick> previous(int size) {
+        return I.signal(this).recurse(self -> self.previous).take(size);
     }
 
     /**

@@ -11,6 +11,7 @@ package cointoss.trade;
 
 import static cointoss.util.Num.HUNDRED;
 
+import java.text.NumberFormat;
 import java.util.List;
 import java.util.function.Function;
 
@@ -68,7 +69,7 @@ public class TradingLog {
      * Analyze trading.
      */
     public TradingLog(Market market, FundManager funds, List<Entry> entries) {
-        Function<Num, String> format = v -> v.scale(market.service.setting.baseCurrencyScaleSize).toString();
+        Function<Num, String> format = v -> v.scale(market.service.setting.baseCurrencyScaleSize).format(NumberFormat.getNumberInstance());
         this.profit = new Statistics().formatter(format);
         this.profitRange = new Statistics().formatter(format);
         this.loss = new Statistics().formatter(format).negative();
@@ -128,20 +129,19 @@ public class TradingLog {
         for (Entry entry : entries) {
             builder.append(entry);
         }
-        builder.append("保持 ").append(holdTime).append(EOL);
+        builder.append("時間 ").append(holdTime).append(EOL);
         builder.append("利益 ").append(profit).append(EOL);
         builder.append("利幅 ").append(profitRange).append(EOL);
         builder.append("損失 ").append(loss).append(EOL);
         builder.append("損幅 ").append(lossRange).append(EOL);
-        builder.append("取引 ")
-                .append(profitAndLoss) //
-                .append(" (勝率")
+        builder.append("総合 ").append(profitAndLoss).append(EOL);
+        builder.append("勝率")
                 .append(winningRate())
                 .append("% ")
                 .append(" PF")
                 .append(profitFactor())
                 .append(" DD")
-                .append(drawDownRatio)
+                .append(drawDownRatio.multiply(100))
                 .append("% ")
                 .append("総")
                 .append(total)
@@ -151,7 +151,6 @@ public class TradingLog {
                 .append(active)
                 .append(" 中止")
                 .append(cancel)
-                .append(")")
                 .append(EOL);
 
         return builder.toString();

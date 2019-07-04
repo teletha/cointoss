@@ -200,13 +200,33 @@ public class Statistics {
     @Override
     public String toString() {
         return new StringBuilder().append("最小")
-                .append(formatter.apply(negative ? max : min))
+                .append(padding(formatter.apply(negative ? max : min)))
                 .append("\t最大")
-                .append(formatter.apply(negative ? min : max))
+                .append(padding(formatter.apply(negative ? min : max)))
                 .append("\t平均")
-                .append(formatter.apply(mean))
+                .append(padding(formatter.apply(mean)))
                 .append("\t合計")
-                .append(formatter.apply(total))
+                .append(padding(formatter.apply(total)))
                 .toString();
+    }
+
+    /**
+     * Padding left.
+     * 
+     * @param value
+     * @return
+     */
+    private String padding(String value) {
+        int length = value.length();
+
+        if (4 < length) {
+            return value;
+        }
+
+        StringBuilder builder = new StringBuilder(value);
+        for (int i = length; i < 4; i++) {
+            builder.append(" ");
+        }
+        return builder.toString();
     }
 }

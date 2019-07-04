@@ -12,7 +12,7 @@ package cointoss.util;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
-import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.Objects;
 import java.util.stream.IntStream;
 
@@ -1094,6 +1094,16 @@ public class Num implements Comparable<Num> {
     }
 
     /**
+     * Increase amount by the specified {@link Directional}.
+     * 
+     * @param direction A current side.
+     * @param size A increase size.
+     */
+    public final Num plus(Directional direction, Variable<Num> size) {
+        return direction.isBuy() ? plus(size) : minus(size);
+    }
+
+    /**
      * Decrease amount by the specified {@link Directional}.
      * 
      * @param direction A current side.
@@ -1110,6 +1120,16 @@ public class Num implements Comparable<Num> {
      * @param size A decrease size.
      */
     public final Num minus(Directional direction, Num size) {
+        return direction.isSell() ? plus(size) : minus(size);
+    }
+
+    /**
+     * Decrease amount by the specified {@link Directional}.
+     * 
+     * @param direction A current side.
+     * @param size A decrease size.
+     */
+    public final Num minus(Directional direction, Variable<Num> size) {
         return direction.isSell() ? plus(size) : minus(size);
     }
 
@@ -1195,10 +1215,12 @@ public class Num implements Comparable<Num> {
     }
 
     /**
-     * @param format
-     * @return
+     * Format this number.
+     * 
+     * @param format Your number format.
+     * @return A formatted value.
      */
-    public String format(DecimalFormat format) {
+    public String format(NumberFormat format) {
         return format.format(delegate);
     }
 
