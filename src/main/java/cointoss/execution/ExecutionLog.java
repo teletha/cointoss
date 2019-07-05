@@ -300,6 +300,11 @@ public class ExecutionLog {
             Num coefficient = Num.ONE;
 
             while (disposer.isNotDisposed()) {
+                try {
+                    Thread.sleep(650);
+                } catch (InterruptedException e1) {
+                    throw I.quiet(e1);
+                }
                 ArrayDeque<Execution> executions = service.executions(start, start + coefficient.multiply(size).toInt())
                         .retry()
                         .toCollection(new ArrayDeque(size));
