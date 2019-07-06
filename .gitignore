@@ -1,6 +1,5 @@
 .*
 !/.gitignore
-src/main/auto/
 
 # Created by https://www.gitignore.io/api/Java,Maven,Windows,Eclipse
 
