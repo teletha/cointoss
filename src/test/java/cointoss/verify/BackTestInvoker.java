@@ -19,7 +19,7 @@ import cointoss.util.Num;
 public class BackTestInvoker {
 
     public static void main(String[] args) throws InterruptedException {
-        BackTest backtest = BackTest.with.service(BitFlyer.FX_BTC_JPY).start(2019, 6, 10).end(2019, 6, 15).initialBaseCurrency(3000000);
+        BackTest backtest = BackTest.with.service(BitFlyer.FX_BTC_JPY).start(2019, 6, 10).end(2019, 6, 10).initialBaseCurrency(3000000);
         System.out.println(backtest.run(market -> new Sample(market)).get(0));
         System.out.println(backtest.time);
     }
