@@ -27,6 +27,7 @@ import java.util.ArrayDeque;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Delayed;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
@@ -284,10 +285,12 @@ public class ExecutionLog {
      */
     private Signal<Execution> network() {
         return new Signal<Execution>((observer, disposer) -> {
+            ConcurrentLinkedQueue<Execution> realtimeQueue = new ConcurrentLinkedQueue();
             AtomicReference<Execution> observedLatest = new AtomicReference<>();
             disposer.add(service.executionLatest().to(observedLatest::set));
 
-            realtime = observedLatest::set;
+            realtime = realtimeQueue::add;
+            // realtime = observedLatest::set;
 
             // read from realtime API
             disposer.add(service.executionsRealtimely().to(e -> {
@@ -329,7 +332,7 @@ public class ExecutionLog {
                         }
                     }
                 } else {
-                    if (start < observedLatest.get().id) {
+                    if (start < realtimeQueue.peek().id) {
                         // Although there is no data in the current search range,
                         // since it has not yet reached the latest execution,
                         // shift the range backward and search again.
@@ -339,6 +342,13 @@ public class ExecutionLog {
                     } else {
                         // Because the REST API has caught up with the real-time API,
                         // it stops the REST API.
+                        log.info("Switch to Realtime Cache.");
+                        while (!realtimeQueue.isEmpty()) {
+                            ConcurrentLinkedQueue<Execution> queue = realtimeQueue;
+                            realtimeQueue = new ConcurrentLinkedQueue();
+                            queue.forEach(observer);
+                            log.info("Cache write from {}.  size {}", queue.peek().date, queue.size());
+                        }
                         realtime = observer::accept;
                         log.info("Switch to Realtime API.");
                         break;
