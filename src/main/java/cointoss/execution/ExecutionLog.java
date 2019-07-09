@@ -9,7 +9,7 @@
  */
 package cointoss.execution;
 
-import static java.nio.charset.StandardCharsets.ISO_8859_1;
+import static java.nio.charset.StandardCharsets.*;
 import static java.nio.file.StandardOpenOption.*;
 import static java.util.concurrent.TimeUnit.*;
 
@@ -27,7 +27,7 @@ import java.util.ArrayDeque;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.Delayed;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
@@ -35,7 +35,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 import org.apache.logging.log4j.LogManager;
@@ -285,12 +284,9 @@ public class ExecutionLog {
      */
     private Signal<Execution> network() {
         return new Signal<Execution>((observer, disposer) -> {
-            ConcurrentLinkedQueue<Execution> realtimeQueue = new ConcurrentLinkedQueue();
-            AtomicReference<Execution> observedLatest = new AtomicReference<>();
-            disposer.add(service.executionLatest().to(observedLatest::set));
+            ConcurrentLinkedDeque<Execution> realtimeQueue = new ConcurrentLinkedDeque();
 
             realtime = realtimeQueue::add;
-            // realtime = observedLatest::set;
 
             // read from realtime API
             disposer.add(service.executionsRealtimely().to(e -> {
@@ -303,11 +299,6 @@ public class ExecutionLog {
             Num coefficient = Num.ONE;
 
             while (disposer.isNotDisposed()) {
-                try {
-                    Thread.sleep(650);
-                } catch (InterruptedException e1) {
-                    throw I.quiet(e1);
-                }
                 ArrayDeque<Execution> executions = service.executions(start, start + coefficient.multiply(size).toInt())
                         .retry()
                         .toCollection(new ArrayDeque(size));
@@ -332,7 +323,7 @@ public class ExecutionLog {
                         }
                     }
                 } else {
-                    if (start < realtimeQueue.peek().id) {
+                    if (realtimeQueue.isEmpty() || start < realtimeQueue.peek().id) {
                         // Although there is no data in the current search range,
                         // since it has not yet reached the latest execution,
                         // shift the range backward and search again.
@@ -344,10 +335,10 @@ public class ExecutionLog {
                         // it stops the REST API.
                         log.info("Switch to Realtime Cache.");
                         while (!realtimeQueue.isEmpty()) {
-                            ConcurrentLinkedQueue<Execution> queue = realtimeQueue;
-                            realtimeQueue = new ConcurrentLinkedQueue();
+                            ConcurrentLinkedDeque<Execution> queue = realtimeQueue;
+                            realtimeQueue = new ConcurrentLinkedDeque();
                             queue.forEach(observer);
-                            log.info("Cache write from {}.  size {}", queue.peek().date, queue.size());
+                            log.info("Cache write from {} to {}.  size {}", queue.peek().id, queue.peekLast().id, queue.size());
                         }
                         realtime = observer::accept;
                         log.info("Switch to Realtime API.");

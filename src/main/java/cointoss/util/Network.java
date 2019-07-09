@@ -9,7 +9,7 @@
  */
 package cointoss.util;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -19,6 +19,7 @@ import com.github.signalr4j.client.LogLevel;
 import com.github.signalr4j.client.Logger;
 import com.github.signalr4j.client.hubs.HubConnection;
 import com.github.signalr4j.client.hubs.HubProxy;
+import com.google.common.util.concurrent.RateLimiter;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -100,8 +101,18 @@ public class Network {
      * Call REST API.
      */
     public Signal<JsonElement> rest(Request request) {
+        return rest(request, null);
+    }
+
+    /**
+     * Call REST API.
+     */
+    public Signal<JsonElement> rest(Request request, RateLimiter limiter) {
         return new Signal<>((observer, disposer) -> {
-            // System.out.println(request + " " + bodyToString(request));
+            if (limiter != null) {
+                limiter.acquire();
+            }
+
             try (Response response = client().newCall(request).execute(); ResponseBody body = response.body()) {
                 String value = body.string();
                 int code = response.code();
@@ -123,8 +134,18 @@ public class Network {
      * Call REST API.
      */
     public <M> Signal<M> rest(Request request, String selector, Class<M> type) {
+        return rest(request, selector, type, null);
+    }
+
+    /**
+     * Call REST API.
+     */
+    public <M> Signal<M> rest(Request request, String selector, Class<M> type, RateLimiter limiter) {
         return new Signal<>((observer, disposer) -> {
-            // System.out.println(request + " " + bodyToString(request));
+            if (limiter != null) {
+                limiter.acquire();
+            }
+
             try (Response response = client().newCall(request).execute(); ResponseBody body = response.body()) {
                 String value = body.string();
                 int code = response.code();
