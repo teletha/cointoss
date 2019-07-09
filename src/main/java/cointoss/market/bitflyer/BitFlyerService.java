@@ -11,6 +11,7 @@ package cointoss.market.bitflyer;
 
 import static cointoss.order.OrderState.*;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -28,7 +29,6 @@ import org.apache.commons.codec.digest.HmacAlgorithms;
 import org.apache.commons.codec.digest.HmacUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 
-import com.google.common.util.concurrent.RateLimiter;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -42,6 +42,7 @@ import cointoss.order.OrderBookChange;
 import cointoss.order.OrderState;
 import cointoss.order.OrderType;
 import cointoss.order.OrderUnit;
+import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
 import javafx.scene.control.TextInputDialog;
@@ -70,7 +71,7 @@ class BitFlyerService extends MarketService {
     private static final DateTimeFormatter IdFormat = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss");
 
     /** The bitflyer API limit. */
-    private static final RateLimiter APILimiter = RateLimiter.create(1.66);
+    private static final APILimiter Limit = APILimiter.with.limit(500).refresh(Duration.ofMinutes(5));
 
     /** The realtime data format */
     static final DateTimeFormatter RealTimeFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
@@ -125,14 +126,6 @@ class BitFlyerService extends MarketService {
 
         this.forTest = forTest;
         this.intervalOrderCheck = I.signal(0, 1, TimeUnit.SECONDS).map(v -> orders().toList()).share();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public RateLimiter limiter() {
-        return APILimiter;
     }
 
     /**
@@ -547,7 +540,7 @@ class BitFlyerService extends MarketService {
                     .post(RequestBody.create(mime, body))
                     .build();
         }
-        return network.rest(request, selector, type, APILimiter);
+        return network.rest(request, selector, type, Limit);
     }
 
     /**
@@ -583,7 +576,7 @@ class BitFlyerService extends MarketService {
                     .post(RequestBody.create(mime, body))
                     .build();
         }
-        return network.rest(request, APILimiter);
+        return network.rest(request, Limit);
     }
 
     protected SessionMaintainer maintainer = new SessionMaintainer();

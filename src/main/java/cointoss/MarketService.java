@@ -15,8 +15,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Consumer;
 
-import com.google.common.util.concurrent.RateLimiter;
-
 import cointoss.execution.Execution;
 import cointoss.execution.ExecutionLog;
 import cointoss.order.Order;
@@ -53,9 +51,6 @@ public abstract class MarketService implements Disposable {
         thread.setDaemon(true);
         return thread;
     });
-
-    /** The default limiter. */
-    private final RateLimiter infiniteLimiter = RateLimiter.create(Double.MAX_VALUE);
 
     /**
      * @param exchangeName
@@ -221,15 +216,6 @@ public abstract class MarketService implements Disposable {
      */
     public ScheduledExecutorService scheduler() {
         return scheduler;
-    }
-
-    /**
-     * Get the market limiter.
-     * 
-     * @return A limiter.
-     */
-    public RateLimiter limiter() {
-        return infiniteLimiter;
     }
 
     /**

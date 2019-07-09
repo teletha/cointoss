@@ -19,7 +19,6 @@ import com.github.signalr4j.client.LogLevel;
 import com.github.signalr4j.client.Logger;
 import com.github.signalr4j.client.hubs.HubConnection;
 import com.github.signalr4j.client.hubs.HubProxy;
-import com.google.common.util.concurrent.RateLimiter;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -107,7 +106,7 @@ public class Network {
     /**
      * Call REST API.
      */
-    public Signal<JsonElement> rest(Request request, RateLimiter limiter) {
+    public Signal<JsonElement> rest(Request request, APILimiter limiter) {
         return new Signal<>((observer, disposer) -> {
             if (limiter != null) {
                 limiter.acquire();
@@ -140,7 +139,7 @@ public class Network {
     /**
      * Call REST API.
      */
-    public <M> Signal<M> rest(Request request, String selector, Class<M> type, RateLimiter limiter) {
+    public <M> Signal<M> rest(Request request, String selector, Class<M> type, APILimiter limiter) {
         return new Signal<>((observer, disposer) -> {
             if (limiter != null) {
                 limiter.acquire();

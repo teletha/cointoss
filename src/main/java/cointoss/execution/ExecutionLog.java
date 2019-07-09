@@ -338,7 +338,7 @@ public class ExecutionLog {
                             ConcurrentLinkedDeque<Execution> queue = realtimeQueue;
                             realtimeQueue = new ConcurrentLinkedDeque();
                             queue.forEach(observer);
-                            log.info("Cache write from {} to {}.  size {}", queue.peek().id, queue.peekLast().id, queue.size());
+                            log.info("Cache write from {} to {}.  size {}", queue.peek().date, queue.peekLast().date, queue.size());
                         }
                         realtime = observer::accept;
                         log.info("Switch to Realtime API.");
