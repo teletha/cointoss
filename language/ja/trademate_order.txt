@@ -4,17 +4,20 @@ Buy
 Cancel
 キャンセル
 
-Limit Entry
-指値
-
 Exit
 撤退
+
+Limit Entry
+指値
 
 Price Interval
 価格間隔
 
 Reverse
 ドテン
+
+SFD
+SFD
 
 Sell
 売り
