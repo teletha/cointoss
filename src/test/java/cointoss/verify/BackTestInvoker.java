@@ -9,19 +9,25 @@
  */
 package cointoss.verify;
 
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
 import cointoss.Direction;
 import cointoss.Market;
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.ticker.TickSpan;
 import cointoss.trade.Trader;
-import cointoss.util.Num;
 
 public class BackTestInvoker {
 
     public static void main(String[] args) throws InterruptedException {
-        BackTest backtest = BackTest.with.service(BitFlyer.FX_BTC_JPY).start(2019, 6, 10).end(2019, 6, 10).initialBaseCurrency(3000000);
-        System.out.println(backtest.run(market -> new Sample(market)).get(0));
-        System.out.println(backtest.time);
+        BackTest.with.service(BitFlyer.FX_BTC_JPY)
+                .start(2019, 6, 10)
+                .end(2019, 6, 12)
+                .initialBaseCurrency(3000000)
+                .exclusiveExecution(false)
+                .runs(market -> List
+                        .of(new Sample(market), new Sample(market), new Sample(market), new Sample(market), new Sample(market)));
     }
 
     /**
@@ -32,16 +38,8 @@ public class BackTestInvoker {
         private Sample(Market market) {
             super(market);
 
-            when(market.tickers.of(TickSpan.Hour1).add.skip(10), tick -> {
-                Num averageRange = tick.previous(10)
-                        .scanWith(Num.ZERO, (v, t) -> v.plus(t.highPrice().minus(t.lowPrice())))
-                        .last()
-                        .map(v -> v.divide(10))
-                        .to().v;
-
-                int trend = tick.previous.previous(3).take(t -> t.closePrice().minus(t.openPrice).isPositiveOrZero()).toList().size();
-
-                return new Entry(1 < trend ? Direction.BUY : Direction.SELL) {
+            when(market.tickers.of(TickSpan.Hour1).add.skip(1), tick -> {
+                return new Entry(Direction.random()) {
 
                     @Override
                     protected void entry() {
@@ -53,8 +51,9 @@ public class BackTestInvoker {
                      */
                     @Override
                     protected void exit() {
-                        exitAt(entryPrice.plus(direction, averageRange.multiply(2)));
-                        exitAt(entryPrice.minus(direction, averageRange.multiply(0.5)));
+                        exitAt(entryPrice.plus(direction, 5000));
+                        exitAt(entryPrice.minus(direction, 5000));
+                        exitAfter(15, TimeUnit.MINUTES);
                     }
                 };
             });

@@ -19,7 +19,7 @@ import javax.annotation.processing.Generated;
  * Generated model for {@link BackTestModel}.
  */
 @Generated("Icy Manipulator")
-public abstract class BackTest extends BackTestModel {
+public abstract class BackTest implements BackTestModel {
 
     /**
      * Deceive complier that the specified checked exception is unchecked exception.
@@ -88,6 +88,9 @@ public abstract class BackTest extends BackTestModel {
     private static final MethodHandle endUpdater = updater("end");
 
     /** The final property updater. */
+    private static final MethodHandle exclusiveExecutionUpdater = updater("exclusiveExecution");
+
+    /** The final property updater. */
     private static final MethodHandle initialBaseCurrencyUpdater = updater("initialBaseCurrency");
 
     /** The final property updater. */
@@ -103,6 +106,9 @@ public abstract class BackTest extends BackTestModel {
     public final ZonedDateTime end;
 
     /** The exposed property. */
+    public final boolean exclusiveExecution;
+
+    /** The exposed property. */
     public final Num initialBaseCurrency;
 
     /** The exposed property. */
@@ -115,14 +121,15 @@ public abstract class BackTest extends BackTestModel {
         this.service = null;
         this.start = null;
         this.end = null;
-        this.initialBaseCurrency = super.initialBaseCurrency();
-        this.initialTargetCurrency = super.initialTargetCurrency();
+        this.exclusiveExecution = BackTestModel.super.exclusiveExecution();
+        this.initialBaseCurrency = BackTestModel.super.initialBaseCurrency();
+        this.initialTargetCurrency = BackTestModel.super.initialTargetCurrency();
     }
 
     /**
-     * Return the service property.
-     *
-     * @return A value of service property.
+     * Set the target market.
+     *  
+     *  @return
      */
     @Override
     public final MarketService service() {
@@ -156,9 +163,9 @@ public abstract class BackTest extends BackTestModel {
     }
 
     /**
-     * Return the start property.
-     *
-     * @return A value of start property.
+     * Set the start date.
+     *  
+     *  @return
      */
     @Override
     public final ZonedDateTime start() {
@@ -192,9 +199,9 @@ public abstract class BackTest extends BackTestModel {
     }
 
     /**
-     * Return the end property.
-     *
-     * @return A value of end property.
+     * Set the end date.
+     *  
+     *  @return
      */
     @Override
     public final ZonedDateTime end() {
@@ -228,9 +235,42 @@ public abstract class BackTest extends BackTestModel {
     }
 
     /**
-     * Return the initialBaseCurrency property.
+     * Set the emulatiom mode.
+     *  
+     *  @return
+     */
+    @Override
+    public final boolean exclusiveExecution() {
+        return this.exclusiveExecution;
+    }
+
+    /**
+     * Provide classic getter API.
      *
-     * @return A value of initialBaseCurrency property.
+     * @return A value of exclusiveExecution property.
+     */
+    @SuppressWarnings("unused")
+    private final boolean getExclusiveExecution() {
+        return this.exclusiveExecution;
+    }
+
+    /**
+     * Provide classic setter API.
+     *
+     * @paran value A new value of exclusiveExecution property to assign.
+     */
+    private final void setExclusiveExecution(boolean value) {
+        try {
+            exclusiveExecutionUpdater.invoke(this, value);
+        } catch (Throwable e) {
+            throw quiet(e);
+        }
+    }
+
+    /**
+     * Set the initial assets.
+     *  
+     *  @return
      */
     @Override
     public final Num initialBaseCurrency() {
@@ -254,7 +294,7 @@ public abstract class BackTest extends BackTestModel {
      */
     private final void setInitialBaseCurrency(Num value) {
         if (value == null) {
-            value = super.initialBaseCurrency();
+            value = BackTestModel.super.initialBaseCurrency();
         }
         try {
             initialBaseCurrencyUpdater.invoke(this, value);
@@ -264,9 +304,9 @@ public abstract class BackTest extends BackTestModel {
     }
 
     /**
-     * Return the initialTargetCurrency property.
-     *
-     * @return A value of initialTargetCurrency property.
+     * Set the initial assets.
+     *  
+     *  @return
      */
     @Override
     public final Num initialTargetCurrency() {
@@ -290,7 +330,7 @@ public abstract class BackTest extends BackTestModel {
      */
     private final void setInitialTargetCurrency(Num value) {
         if (value == null) {
-            value = super.initialTargetCurrency();
+            value = BackTestModel.super.initialTargetCurrency();
         }
         try {
             initialTargetCurrencyUpdater.invoke(this, value);
@@ -310,6 +350,7 @@ public abstract class BackTest extends BackTestModel {
         builder.append("service=").append(service).append(", ");
         builder.append("start=").append(start).append(", ");
         builder.append("end=").append(end).append(", ");
+        builder.append("exclusiveExecution=").append(exclusiveExecution).append(", ");
         builder.append("initialBaseCurrency=").append(initialBaseCurrency).append(", ");
         builder.append("initialTargetCurrency=").append(initialTargetCurrency).append("]");
         return builder.toString();
@@ -322,7 +363,7 @@ public abstract class BackTest extends BackTestModel {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(service, start, end, initialBaseCurrency, initialTargetCurrency);
+        return Objects.hash(service, start, end, exclusiveExecution, initialBaseCurrency, initialTargetCurrency);
     }
 
     /**
@@ -340,6 +381,7 @@ public abstract class BackTest extends BackTestModel {
         if (!Objects.equals(service, other.service)) return false;
         if (!Objects.equals(start, other.start)) return false;
         if (!Objects.equals(end, other.end)) return false;
+        if (exclusiveExecution != other.exclusiveExecution) return false;
         if (!Objects.equals(initialBaseCurrency, other.initialBaseCurrency)) return false;
         if (!Objects.equals(initialTargetCurrency, other.initialTargetCurrency)) return false;
         return true;
@@ -399,9 +441,9 @@ public abstract class BackTest extends BackTestModel {
         }
 
         /**
-         * Assign start property.
-         * 
-         * @return The next assignable model.
+         * Set the start date.
+         *  
+         *  @return
          */
         default Next start(int year, int month, int day) {
             try {
@@ -429,9 +471,9 @@ public abstract class BackTest extends BackTestModel {
         }
 
         /**
-         * Assign end property.
-         * 
-         * @return The next assignable model.
+         * Set the end date.
+         *  
+         *  @return
          */
         default Next end(int year, int month, int day) {
             try {
@@ -448,6 +490,17 @@ public abstract class BackTest extends BackTestModel {
     public static interface ÅssignableÅrbitrary<Next extends BackTest> {
 
         /**
+         * Assign exclusiveExecution property.
+         * 
+         * @param value A new value to assign.
+         * @return The next assignable model.
+         */
+        default Next exclusiveExecution(boolean value) {
+            ((BackTest) this).setExclusiveExecution(value);
+            return (Next) this;
+        }
+
+        /**
          * Assign initialBaseCurrency property.
          * 
          * @param value A new value to assign.
@@ -459,9 +512,9 @@ public abstract class BackTest extends BackTestModel {
         }
 
         /**
-         * Assign initialBaseCurrency property.
-         * 
-         * @return The next assignable model.
+         * Set the initial assets.
+         *  
+         *  @return
          */
         default Next initialBaseCurrency(double value) {
             try {
@@ -483,9 +536,9 @@ public abstract class BackTest extends BackTestModel {
         }
 
         /**
-         * Assign initialTargetCurrency property.
-         * 
-         * @return The next assignable model.
+         * Set the initial assets.
+         *  
+         *  @return
          */
         default Next initialTargetCurrency(double value) {
             try {
@@ -515,6 +568,7 @@ public abstract class BackTest extends BackTestModel {
         static final String Service = "service";
         static final String Start = "start";
         static final String End = "end";
+        static final String ExclusiveExecution = "exclusiveExecution";
         static final String InitialBaseCurrency = "initialBaseCurrency";
         static final String InitialTargetCurrency = "initialTargetCurrency";
     }

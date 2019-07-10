@@ -83,8 +83,11 @@ public class VerifiableMarketService extends MarketService {
     /** The task queue. */
     private final PriorityQueue<Task> tasks = new PriorityQueue();
 
-    /** The lag emulator. */
+    /** The emulation for lag. */
     public Latency latency = Latency.zero();
+
+    /** The emulation mode for exclusive execution. */
+    public boolean exclusiveExecution = true;
 
     /**
      * 
@@ -336,6 +339,10 @@ public class VerifiableMarketService extends MarketService {
                     iterator.remove();
                 }
                 positions.accept(I.pair(exe.direction, order.id, exe));
+
+                if (!exclusiveExecution) {
+                    continue;
+                }
 
                 while (!tasks.isEmpty() && tasks.peek().activeTime <= nowMills) {
                     tasks.poll().run();

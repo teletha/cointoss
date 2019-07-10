@@ -9,9 +9,10 @@
  */
 package cointoss.trade;
 
-import static cointoss.util.Num.HUNDRED;
+import static cointoss.util.Num.*;
 
 import java.text.NumberFormat;
+import java.time.Duration;
 import java.util.List;
 import java.util.function.Function;
 
@@ -64,6 +65,9 @@ public class TradingLog {
 
     /** The all entries. */
     private final List<Entry> entries;
+
+    /** The exected duration. */
+    public Duration duration = Duration.ZERO;
 
     /**
      * Analyze trading.
@@ -118,24 +122,29 @@ public class TradingLog {
     }
 
     /**
-     * {@inheritDoc}
+     * Output result by text format.
+     * 
+     * @param detail
+     * @return
      */
-    @Override
-    public String toString() {
+    public final String showByText(boolean detail) {
         String EOL = "\r\n";
 
         StringBuilder builder = new StringBuilder();
 
-        for (Entry entry : entries) {
-            builder.append(entry);
+        if (detail) {
+            for (Entry entry : entries) {
+                builder.append(entry);
+            }
         }
-        builder.append("時間 ").append(holdTime).append(EOL);
-        builder.append("利益 ").append(profit).append(EOL);
+        builder.append("時間 ").append(holdTime).append("\t実行").append(Chrono.formatAsDuration(duration.toMillis())).append(EOL);
+        // builder.append("利益 ").append(profit).append(EOL);
         builder.append("利幅 ").append(profitRange).append(EOL);
-        builder.append("損失 ").append(loss).append(EOL);
+        // builder.append("損失 ").append(loss).append(EOL);
         builder.append("損幅 ").append(lossRange).append(EOL);
-        builder.append("総合 ").append(profitAndLoss).append(EOL);
-        builder.append("勝率")
+        builder.append("総合 ")
+                .append(profitAndLoss)
+                .append("\t勝率")
                 .append(winningRate())
                 .append("% ")
                 .append(" PF")
@@ -154,5 +163,13 @@ public class TradingLog {
                 .append(EOL);
 
         return builder.toString();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        return showByText(false);
     }
 }

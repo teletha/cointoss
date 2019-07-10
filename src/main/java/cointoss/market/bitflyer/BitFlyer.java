@@ -48,15 +48,6 @@ public final class BitFlyer extends MarketServiceProvider {
     /** Market */
     public static final MarketService BCH_BTC = new BitFlyerService("BCH_BTC", BTCBaseSetting);
 
-    /** Market */
-    public static final MarketService BTCJPY28SEP2018 = new BitFlyerService("BTCJPY28SEP2018", FiatBaseSetting);
-
-    /** Market */
-    public static final MarketService BTCJPY03AUG2018 = new BitFlyerService("BTCJPY03AUG2018", FiatBaseSetting);
-
-    /** Market */
-    public static final MarketService BTCJPY10AUG2018 = new BitFlyerService("BTCJPY10AUG2018", FiatBaseSetting);
-
     /**
      * {@inheritDoc}
      */
