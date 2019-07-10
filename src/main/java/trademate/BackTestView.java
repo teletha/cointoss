@@ -10,7 +10,7 @@
 package trademate;
 
 import static trademate.setting.SettingStyles.*;
-import static transcript.Transcript.*;
+import static transcript.Transcript.en;
 
 import java.time.Period;
 
@@ -18,7 +18,6 @@ import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.execution.ExecutionLog;
 import cointoss.market.MarketServiceProvider;
-import cointoss.market.bitflyer.BitFlyer;
 import cointoss.ticker.TickSpan;
 import cointoss.util.Chrono;
 import trademate.chart.ChartView;
@@ -37,7 +36,7 @@ public class BackTestView extends View {
 
     private static final Transcript EndDateMustBeAfterStartDate = Transcript.en("The end date must be after the start date.");
 
-    private UIComboBox<MarketService> market;
+    private UIComboBox<MarketService> marketSelection;
 
     private UIDatePicker startDate;
 
@@ -57,7 +56,7 @@ public class BackTestView extends View {
                 $(hbox, () -> {
                     $(chart);
                     $(vbox, () -> {
-                        $(market);
+                        $(marketSelection);
                         $(hbox, FormRow, () -> {
                             label(en("Start Date"), FormLabel);
                             $(startDate, FormInput);
@@ -78,9 +77,9 @@ public class BackTestView extends View {
      */
     @Override
     protected void initialize() {
-        market.values(0, MarketServiceProvider.availableMarketServices());
-        startDate.initial(Chrono.utcNow().minusDays(10)).uneditable().requireWhen(market).require(() -> {
-            ExecutionLog log = market.value().log;
+        marketSelection.values(0, MarketServiceProvider.availableMarketServices());
+        startDate.initial(Chrono.utcNow().minusDays(10)).uneditable().requireWhen(marketSelection).require(() -> {
+            ExecutionLog log = marketSelection.value().log;
 
             assert startDate.isBeforeOrSame(log.lastCacheDate()) : LogIsNotFound;
             assert startDate.isAfterOrSame(log.firstCacheDate()) : LogIsNotFound;
@@ -98,13 +97,13 @@ public class BackTestView extends View {
         // chart.market.set(market);
         // chart.ticker.set(market.tickers.tickerBy(TickSpan.Minute1));
 
-        startButton.disableWhen(startDate.isInvalid()).when(User.MouseClick).to(e -> {
-            Market m = new Market(BitFlyer.FX_BTC_JPY);
-            chart.market.set(m);
-            chart.ticker.set(m.tickers.of(TickSpan.Minute1));
+        startButton.text(en("Run")).disableWhen(startDate.isInvalid()).when(User.MouseClick).to(e -> {
+            Market market = new Market(marketSelection.value());
+            chart.market.set(market);
+            chart.ticker.set(market.tickers.of(TickSpan.Minute1));
             chart.market.to(v -> v.readLog(log -> log.range(startDate.zoned(), endDate.zoned())));
 
-            Viewtify.Terminator.add(m);
+            Viewtify.Terminator.add(market);
         });
     }
 }

@@ -19,6 +19,9 @@ No logs were found for the specified date.
 Price
 値段
 
+Run
+実行
+
 Sell
 売り
 

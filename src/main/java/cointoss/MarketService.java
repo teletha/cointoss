@@ -17,13 +17,16 @@ import java.util.function.Consumer;
 
 import cointoss.execution.Execution;
 import cointoss.execution.ExecutionLog;
+import cointoss.market.MarketServiceProvider;
 import cointoss.order.Order;
 import cointoss.order.OrderBookChange;
 import cointoss.order.OrderState;
 import cointoss.util.Chrono;
 import cointoss.util.Network;
 import cointoss.util.Num;
+import kiss.Decoder;
 import kiss.Disposable;
+import kiss.Encoder;
 import kiss.Signal;
 import kiss.Ⅲ;
 
@@ -231,5 +234,28 @@ public abstract class MarketService implements Disposable {
     @Override
     public String toString() {
         return marketIdentity();
+    }
+
+    /**
+     * Codec.
+     */
+    @SuppressWarnings("unused")
+    private static class Codec implements Decoder<MarketService>, Encoder<MarketService> {
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String encode(MarketService value) {
+            return value.toString();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public MarketService decode(String value) {
+            return MarketServiceProvider.by(value).or((MarketService) null);
+        }
     }
 }

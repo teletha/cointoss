@@ -19,6 +19,7 @@ import kiss.I;
 import kiss.Manageable;
 import kiss.Signal;
 import kiss.Singleton;
+import kiss.Variable;
 
 @Manageable(lifestyle = Singleton.class)
 public abstract class MarketServiceProvider implements Extensible {
@@ -69,5 +70,15 @@ public abstract class MarketServiceProvider implements Extensible {
      */
     public static final Signal<MarketService> availableMarketServices() {
         return availableProviders().flatIterable(MarketServiceProvider::markets);
+    }
+
+    /**
+     * Retrieve by identical name.
+     * 
+     * @param identity
+     * @return
+     */
+    public static final Variable<MarketService> by(String identity) {
+        return availableMarketServices().take(service -> service.marketIdentity().equals(identity)).to();
     }
 }
