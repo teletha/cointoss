@@ -14,7 +14,6 @@ import java.util.concurrent.TimeUnit;
 
 import cointoss.Direction;
 import cointoss.Market;
-import cointoss.analyze.UIVisualizer;
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.ticker.TickSpan;
 import cointoss.trade.Trader;
@@ -28,7 +27,7 @@ public class BackTestInvoker {
                 .initialBaseCurrency(3000000)
                 .exclusiveExecution(false)
                 .runs(market -> List
-                        .of(new Sample(market), new Sample(market), new Sample(market), new Sample(market), new Sample(market)), new UIVisualizer());
+                        .of(new Sample(market), new Sample(market), new Sample(market), new Sample(market), new Sample(market)));
     }
 
     /**

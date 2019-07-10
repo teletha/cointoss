@@ -19,8 +19,8 @@ import java.util.function.Function;
 
 import cointoss.Market;
 import cointoss.MarketService;
-import cointoss.analyze.ConsoleVisualizer;
-import cointoss.analyze.Visualizer;
+import cointoss.analyze.ConsoleAnalyzer;
+import cointoss.analyze.Analyzer;
 import cointoss.trade.Trader;
 import cointoss.trade.TradingLog;
 import cointoss.util.Chrono;
@@ -131,7 +131,17 @@ public interface BackTestModel {
      * @return
      */
     default void run(Function<Market, Trader> traderBuilder) {
-        runs(market -> List.of(traderBuilder.apply(market)));
+        run(traderBuilder, new ConsoleAnalyzer());
+    }
+
+    /**
+     * Run with {@link Trader}s.
+     * 
+     * @param traderBuilder
+     * @return
+     */
+    default void run(Function<Market, Trader> traderBuilder, Analyzer visualizer) {
+        runs(market -> List.of(traderBuilder.apply(market)), visualizer);
     }
 
     /**
@@ -141,7 +151,7 @@ public interface BackTestModel {
      * @return
      */
     default void runs(Function<Market, List<Trader>> traderBuilder) {
-        runs(traderBuilder, new ConsoleVisualizer());
+        runs(traderBuilder, new ConsoleAnalyzer());
     }
 
     /**
@@ -150,7 +160,7 @@ public interface BackTestModel {
      * @param traderBuilder
      * @return
      */
-    default void runs(Function<Market, List<Trader>> traderBuilder, Visualizer visualizer) {
+    default void runs(Function<Market, List<Trader>> traderBuilder, Analyzer visualizer) {
         VerifiableMarket market = new VerifiableMarket(service());
         market.service.exclusiveExecution = exclusiveExecution();
         market.service.baseCurrency = initialBaseCurrency();
@@ -170,7 +180,7 @@ public interface BackTestModel {
         }
 
         if (visualizer != null) {
-            visualizer.visualize(logs);
+            visualizer.analyze(logs);
         }
     }
 }

@@ -13,12 +13,15 @@ import java.util.List;
 
 import cointoss.trade.TradingLog;
 
-public interface Visualizer {
+public class ConsoleAnalyzer implements Analyzer {
 
     /**
-     * Visualize the given {@link TradingLog}s.
-     * 
-     * @param logs A list of logs to visialize.
+     * {@inheritDoc}
      */
-    void visualize(List<TradingLog> logs);
+    @Override
+    public void analyze(List<TradingLog> logs) {
+        for (TradingLog log : logs) {
+            System.out.println(log);
+        }
+    }
 }
