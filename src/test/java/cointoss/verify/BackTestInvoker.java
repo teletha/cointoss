@@ -14,6 +14,7 @@ import java.util.concurrent.TimeUnit;
 
 import cointoss.Direction;
 import cointoss.Market;
+import cointoss.analyze.UIVisualizer;
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.ticker.TickSpan;
 import cointoss.trade.Trader;
@@ -23,11 +24,11 @@ public class BackTestInvoker {
     public static void main(String[] args) throws InterruptedException {
         BackTest.with.service(BitFlyer.FX_BTC_JPY)
                 .start(2019, 6, 10)
-                .end(2019, 6, 12)
+                .end(2019, 6, 10)
                 .initialBaseCurrency(3000000)
                 .exclusiveExecution(false)
                 .runs(market -> List
-                        .of(new Sample(market), new Sample(market), new Sample(market), new Sample(market), new Sample(market)));
+                        .of(new Sample(market), new Sample(market), new Sample(market), new Sample(market), new Sample(market)), new UIVisualizer());
     }
 
     /**

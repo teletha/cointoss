@@ -19,6 +19,8 @@ import java.util.function.Function;
 
 import cointoss.Market;
 import cointoss.MarketService;
+import cointoss.analyze.ConsoleVisualizer;
+import cointoss.analyze.Visualizer;
 import cointoss.trade.Trader;
 import cointoss.trade.TradingLog;
 import cointoss.util.Chrono;
@@ -139,6 +141,16 @@ public interface BackTestModel {
      * @return
      */
     default void runs(Function<Market, List<Trader>> traderBuilder) {
+        runs(traderBuilder, new ConsoleVisualizer());
+    }
+
+    /**
+     * Run with {@link Trader}s.
+     * 
+     * @param traderBuilder
+     * @return
+     */
+    default void runs(Function<Market, List<Trader>> traderBuilder, Visualizer visualizer) {
         VerifiableMarket market = new VerifiableMarket(service());
         market.service.exclusiveExecution = exclusiveExecution();
         market.service.baseCurrency = initialBaseCurrency();
@@ -157,9 +169,8 @@ public interface BackTestModel {
             logs.add(log);
         }
 
-        // output result
-        for (TradingLog log : logs) {
-            System.out.println(log);
+        if (visualizer != null) {
+            visualizer.visualize(logs);
         }
     }
 }
