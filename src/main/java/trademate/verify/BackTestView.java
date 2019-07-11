@@ -9,7 +9,7 @@
  */
 package trademate.verify;
 
-import static transcript.Transcript.*;
+import static transcript.Transcript.en;
 
 import java.time.Period;
 import java.util.List;
@@ -116,9 +116,6 @@ public class BackTestView extends View implements Analyzer {
                     .initialBaseCurrency(3000000)
                     .exclusiveExecution(false)
                     .runs(market -> {
-                        chart.market.set(market);
-                        chart.ticker.set(market.tickers.of(TickSpan.Minute5));
-
                         return List.of(new Sample(market));
                     }, this);
         }, e -> {
@@ -130,12 +127,16 @@ public class BackTestView extends View implements Analyzer {
      * {@inheritDoc}
      */
     @Override
-    public void analyze(List<TradingLog> logs) {
+    public void analyze(Market market, List<TradingLog> logs) {
         for (TradingLog log : logs) {
             System.out.println(log.showByText(true));
         }
 
         Viewtify.inUI(() -> {
+            // update chart
+            chart.market.set(market);
+            chart.ticker.set(market.tickers.of(TickSpan.Minute5));
+
             logSelection.values(logs);
         });
     }

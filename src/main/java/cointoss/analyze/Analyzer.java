@@ -11,6 +11,7 @@ package cointoss.analyze;
 
 import java.util.List;
 
+import cointoss.Market;
 import cointoss.trade.TradingLog;
 
 public interface Analyzer {
@@ -18,7 +19,8 @@ public interface Analyzer {
     /**
      * Analyze the given {@link TradingLog}s.
      * 
+     * @param market A target market.
      * @param logs A list of logs to visialize.
      */
-    void analyze(List<TradingLog> logs);
+    void analyze(Market market, List<TradingLog> logs);
 }

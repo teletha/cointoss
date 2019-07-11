@@ -11,6 +11,7 @@ package cointoss.analyze;
 
 import java.util.List;
 
+import cointoss.Market;
 import cointoss.trade.TradingLog;
 
 public class ConsoleAnalyzer implements Analyzer {
@@ -19,7 +20,7 @@ public class ConsoleAnalyzer implements Analyzer {
      * {@inheritDoc}
      */
     @Override
-    public void analyze(List<TradingLog> logs) {
+    public void analyze(Market market, List<TradingLog> logs) {
         for (TradingLog log : logs) {
             System.out.println(log);
         }

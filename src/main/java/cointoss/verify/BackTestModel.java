@@ -180,7 +180,7 @@ public interface BackTestModel {
         }
 
         if (visualizer != null) {
-            visualizer.analyze(logs);
+            visualizer.analyze(market, logs);
         }
     }
 }
