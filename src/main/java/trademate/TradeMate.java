@@ -20,6 +20,7 @@ import kiss.I;
 import kiss.Manageable;
 import kiss.Singleton;
 import trademate.setting.SettingView;
+import trademate.verify.BackTestView;
 import transcript.Lang;
 import viewtify.Theme;
 import viewtify.Viewtify;

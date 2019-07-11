@@ -7,9 +7,9 @@
  *
  *          https://opensource.org/licenses/MIT
  */
-package trademate;
+package trademate.verify;
 
-import static transcript.Transcript.en;
+import static transcript.Transcript.*;
 
 import java.time.Period;
 import java.util.List;
@@ -113,6 +113,7 @@ public class BackTestView extends View implements Analyzer {
             BackTest.with.service(marketSelection.value())
                     .start(startDate.zoned())
                     .end(endDate.zoned())
+                    .initialBaseCurrency(3000000)
                     .exclusiveExecution(false)
                     .runs(market -> {
                         chart.market.set(market);
@@ -120,6 +121,8 @@ public class BackTestView extends View implements Analyzer {
 
                         return List.of(new Sample(market));
                     }, this);
+        }, e -> {
+            e.printStackTrace();
         });
     }
 
@@ -128,7 +131,13 @@ public class BackTestView extends View implements Analyzer {
      */
     @Override
     public void analyze(List<TradingLog> logs) {
-        logSelection.values(logs);
+        for (TradingLog log : logs) {
+            System.out.println(log.showByText(true));
+        }
+
+        Viewtify.inUI(() -> {
+            logSelection.values(logs);
+        });
     }
 
     /**
@@ -139,7 +148,7 @@ public class BackTestView extends View implements Analyzer {
         private Sample(Market market) {
             super(market);
 
-            when(market.tickers.of(TickSpan.Hour1).add.skip(1), tick -> {
+            when(market.tickers.of(TickSpan.Hour4).add.skip(1).take(1), tick -> {
                 return new Entry(Direction.random()) {
 
                     @Override

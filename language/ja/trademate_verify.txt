@@ -1,0 +1,15 @@
+End Date
+終了日
+
+No logs were found for the specified date.
+指定された日付のログが見つかりませんでした。
+
+Run
+実行
+
+Start Date
+開始日
+
+The end date must be after the start date.
+終了日は開始日より後でなければなりません。
+
