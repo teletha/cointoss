@@ -16,12 +16,13 @@ import org.magicwerk.brownies.collections.GapList;
 import cointoss.Market;
 import cointoss.execution.Execution;
 import cointoss.util.Num;
+import kiss.Disposable;
 import kiss.Variable;
 
 /**
  * @version 2018/07/05 10:37:46
  */
-public class RealtimeTicker {
+public class RealtimeTicker implements Disposable {
 
     /** The volume. */
     public Num volume = Num.ZERO;
@@ -117,5 +118,13 @@ public class RealtimeTicker {
      */
     public Num estimateDownPotential() {
         return shortVolume.isZero() ? Num.ZERO : shortPriceDecrease.divide(shortVolume).scale(3);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void vandalize() {
+        buffer.clear();
     }
 }

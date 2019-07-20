@@ -13,6 +13,7 @@ import cointoss.Direction;
 import cointoss.Market;
 import cointoss.execution.Execution;
 import cointoss.util.Num;
+import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
 import kiss.Variable;
@@ -20,7 +21,7 @@ import kiss.Variable;
 /**
  * @version 2018/07/06 10:21:22
  */
-public final class TickerManager {
+public final class TickerManager implements Disposable {
 
     /** The initial execution. */
     public final Variable<Execution> initial = Variable.empty();
@@ -181,5 +182,16 @@ public final class TickerManager {
                 updateLowPrice(upper, price);
             }
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void vandalize() {
+        for (Ticker ticker : tickers) {
+            ticker.dispose();
+        }
+        realtime.dispose();
     }
 }

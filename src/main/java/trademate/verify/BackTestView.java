@@ -9,7 +9,7 @@
  */
 package trademate.verify;
 
-import static transcript.Transcript.en;
+import static transcript.Transcript.*;
 
 import java.time.Period;
 import java.util.List;
@@ -138,6 +138,8 @@ public class BackTestView extends View implements Analyzer {
             chart.ticker.set(market.tickers.of(TickSpan.Minute5));
 
             logSelection.values(logs);
+
+            market.dispose();
         });
     }
 

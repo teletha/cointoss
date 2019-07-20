@@ -298,6 +298,14 @@ public final class SegmentBuffer<E> {
     }
 
     /**
+     * Clear all items.
+     */
+    public void clear() {
+        uncompleted = new Object[segmentSize];
+        completeds.clear();
+    }
+
+    /**
      * @version 2018/08/13 7:22:22
      */
     private static class Completed<E> {

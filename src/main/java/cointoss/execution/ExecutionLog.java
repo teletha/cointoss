@@ -156,7 +156,7 @@ public class ExecutionLog {
 
     /** In-memory cache. */
     private final LoadingCache<ZonedDateTime, List<Execution>> memory = CacheBuilder.newBuilder()
-            .maximumSize(25)
+            .maximumSize(3)
             .expireAfterAccess(15, MINUTES)
             .build(new CacheLoader<>() {
 

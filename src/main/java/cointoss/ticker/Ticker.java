@@ -16,6 +16,7 @@ import java.util.function.Consumer;
 
 import cointoss.execution.Execution;
 import cointoss.util.SegmentBuffer;
+import kiss.Disposable;
 import kiss.Signal;
 import kiss.Signaling;
 import kiss.Variable;
@@ -23,7 +24,7 @@ import kiss.Variable;
 /**
  * @version 2018/07/05 10:16:49
  */
-public final class Ticker {
+public final class Ticker implements Disposable {
 
     /** Reusable NULL object.. */
     public static final Ticker EMPTY = new Ticker(TickSpan.Minute1);
@@ -213,5 +214,13 @@ public final class Ticker {
     @Override
     public String toString() {
         return Ticker.class.getSimpleName() + "[" + span + "] " + ticks;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void vandalize() {
+        ticks.clear();
     }
 }
