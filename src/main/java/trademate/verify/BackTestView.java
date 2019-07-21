@@ -25,6 +25,7 @@ import cointoss.ticker.TickSpan;
 import cointoss.trade.Trader;
 import cointoss.trade.TradingLog;
 import cointoss.util.Chrono;
+import cointoss.util.Num;
 import cointoss.verify.BackTest;
 import trademate.chart.ChartView;
 import trademate.setting.SettingStyles;
@@ -34,6 +35,8 @@ import viewtify.ui.UI;
 import viewtify.ui.UIButton;
 import viewtify.ui.UIComboBox;
 import viewtify.ui.UIDatePicker;
+import viewtify.ui.UITableColumn;
+import viewtify.ui.UITableView;
 import viewtify.ui.View;
 import viewtify.ui.helper.User;
 
@@ -55,28 +58,50 @@ public class BackTestView extends View implements Analyzer {
 
     private UIComboBox<TradingLog> logSelection;
 
+    /** UI */
+    private UITableView results;
+
+    /** UI */
+    private UITableColumn<TradingLog, String> name;
+
+    /** UI */
+    private UITableColumn<TradingLog, Num> profitAndLoss;
+
+    /** UI */
+    private UITableColumn<TradingLog, Num> winRatio;
+
+    /** UI */
+    private UITableColumn<TradingLog, Num> riskRewardRatio;
+
     /**
      * UI definition.
      */
     private class UIDefinition extends UI implements SettingStyles {
         {
-            $(hbox, () -> {
-                $(chart);
-                $(vbox, () -> {
-                    $(marketSelection);
-                    $(hbox, FormRow, () -> {
-                        label(en("Start Date"), FormLabel);
-                        $(startDate, FormInput);
+            $(vbox, () -> {
+                $(hbox, () -> {
+                    $(chart);
+                    $(vbox, () -> {
+                        $(marketSelection);
+                        $(hbox, FormRow, () -> {
+                            label(en("Start Date"), FormLabel);
+                            $(startDate, FormInput);
+                        });
+                        $(hbox, FormRow, () -> {
+                            label(en("End Date"), FormLabel);
+                            $(endDate, FormInput);
+                        });
+                        $(runner);
                     });
-                    $(hbox, FormRow, () -> {
-                        label(en("End Date"), FormLabel);
-                        $(endDate, FormInput);
-                    });
-                    $(runner);
                 });
 
-                $(vbox, () -> {
-                    $(logSelection);
+                $(hbox, () -> {
+                    $(results, () -> {
+                        $(name);
+                        $(profitAndLoss);
+                        $(winRatio);
+                        $(riskRewardRatio);
+                    });
                 });
             });
         }
