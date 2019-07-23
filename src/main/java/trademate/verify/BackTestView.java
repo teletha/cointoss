@@ -9,7 +9,7 @@
  */
 package trademate.verify;
 
-import static transcript.Transcript.*;
+import static transcript.Transcript.en;
 
 import java.time.Period;
 import java.util.List;
@@ -27,6 +27,8 @@ import cointoss.trade.TradingLog;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
 import cointoss.verify.BackTest;
+import stylist.Style;
+import stylist.StyleDSL;
 import trademate.chart.ChartView;
 import trademate.setting.SettingStyles;
 import transcript.Transcript;
@@ -76,7 +78,8 @@ public class BackTestView extends View implements Analyzer {
     /**
      * UI definition.
      */
-    private class UIDefinition extends UI implements SettingStyles {
+    private class UIDefinition extends UI implements SettingStyles, Styles {
+
         {
             $(vbox, () -> {
                 $(hbox, () -> {
@@ -96,7 +99,7 @@ public class BackTestView extends View implements Analyzer {
                 });
 
                 $(hbox, () -> {
-                    $(results, () -> {
+                    $(results, Results, () -> {
                         $(name);
                         $(profitAndLoss);
                         $(winRatio);
@@ -105,6 +108,19 @@ public class BackTestView extends View implements Analyzer {
                 });
             });
         }
+    }
+
+    /**
+     * 
+     */
+    private interface Styles extends StyleDSL {
+        Style Results = () -> {
+            display.width(300, px).maxHeight(150, px).minHeight(150, px);
+        };
+
+        Style Chart = () -> {
+            display.width(300, px).height(150, px);
+        };
     }
 
     /**
