@@ -17,6 +17,7 @@ import cointoss.Market;
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.ticker.TickSpan;
 import cointoss.trade.Trader;
+import cointoss.util.Num;
 
 public class BackTestInvoker {
 
@@ -53,6 +54,9 @@ public class BackTestInvoker {
                     protected void exit() {
                         exitAt(entryPrice.plus(direction, 5000));
                         exitAt(entryPrice.minus(direction, 5000));
+                        market.tickers.of(TickSpan.Second5).add.to(t -> {
+                            Num losscut = Num.min(direction, entryPrice.minus(direction, 5000), t.openPrice.minus(direction, 5000));
+                        });
                         exitAfter(15, TimeUnit.MINUTES);
                     }
                 };

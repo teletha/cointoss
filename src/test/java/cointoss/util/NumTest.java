@@ -28,10 +28,24 @@ class NumTest {
     }
 
     @Test
+    void maxOnSell() {
+        assert Num.max(Direction.SELL, ONE).is(1);
+        assert Num.max(Direction.SELL, ONE, TWO, TEN).is(1);
+        assert Num.max(Direction.SELL, ONE, TWO, of(-10)).is(-10);
+    }
+
+    @Test
     void min() {
         assert Num.min(ONE).is(1);
         assert Num.min(ONE, TWO, TEN).is(1);
         assert Num.min(ONE, TWO, of(-10)).is(-10);
+    }
+
+    @Test
+    void minOnSell() {
+        assert Num.min(Direction.SELL, ONE).is(1);
+        assert Num.min(Direction.SELL, ONE, TWO, TEN).is(10);
+        assert Num.min(Direction.SELL, ONE, TWO, of(-10)).is(2);
     }
 
     @Test

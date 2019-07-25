@@ -18,6 +18,7 @@ import java.util.stream.IntStream;
 
 import org.apache.commons.lang3.RandomUtils;
 
+import cointoss.Direction;
 import cointoss.Directional;
 import cointoss.Market;
 import kiss.Decoder;
@@ -1356,10 +1357,20 @@ public class Num implements Comparable<Num> {
      * @return
      */
     public static Num max(Num... decimals) {
+        return max(Direction.BUY, decimals);
+    }
+
+    /**
+     * Detect max value.
+     * 
+     * @param decimals
+     * @return
+     */
+    public static Num max(Directional direction, Num... decimals) {
         Num max = decimals[0];
 
         for (int i = 1; i < decimals.length; i++) {
-            if (max == null || max.isLessThan(decimals[i])) {
+            if (max == null || max.isLessThan(direction, decimals[i])) {
                 max = decimals[i];
             }
         }
@@ -1384,10 +1395,20 @@ public class Num implements Comparable<Num> {
      * @return
      */
     public static Num min(Num... decimals) {
+        return min(Direction.BUY, decimals);
+    }
+
+    /**
+     * Detect min value.
+     * 
+     * @param decimals
+     * @return
+     */
+    public static Num min(Directional direction, Num... decimals) {
         Num min = decimals[0];
 
         for (int i = 1; i < decimals.length; i++) {
-            if (min == null || min.isGreaterThan(decimals[i])) {
+            if (min == null || min.isGreaterThan(direction, decimals[i])) {
                 min = decimals[i];
             }
         }
