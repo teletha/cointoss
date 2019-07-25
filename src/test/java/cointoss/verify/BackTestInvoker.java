@@ -10,21 +10,22 @@
 package cointoss.verify;
 
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import cointoss.Direction;
 import cointoss.Market;
 import cointoss.market.bitflyer.BitFlyer;
+import cointoss.ticker.Tick;
 import cointoss.ticker.TickSpan;
 import cointoss.trade.Trader;
 import cointoss.util.Num;
+import kiss.Variable;
 
 public class BackTestInvoker {
 
     public static void main(String[] args) throws InterruptedException {
         BackTest.with.service(BitFlyer.FX_BTC_JPY)
-                .start(2019, 6, 10)
-                .end(2019, 6, 10)
+                .start(2019, 6, 14)
+                .end(2019, 6, 15)
                 .initialBaseCurrency(3000000)
                 .exclusiveExecution(false)
                 .runs(market -> List
@@ -39,7 +40,7 @@ public class BackTestInvoker {
         private Sample(Market market) {
             super(market);
 
-            when(market.tickers.of(TickSpan.Hour1).add.skip(1), tick -> {
+            when(market.tickers.of(TickSpan.Hour1).add, tick -> {
                 return new Entry(Direction.random()) {
 
                     @Override
@@ -53,11 +54,13 @@ public class BackTestInvoker {
                     @Override
                     protected void exit() {
                         exitAt(entryPrice.plus(direction, 5000));
-                        exitAt(entryPrice.minus(direction, 5000));
-                        market.tickers.of(TickSpan.Second5).add.to(t -> {
-                            Num losscut = Num.min(direction, entryPrice.minus(direction, 5000), t.openPrice.minus(direction, 5000));
-                        });
-                        exitAfter(15, TimeUnit.MINUTES);
+
+                        Variable<Num> loss = market.tickers.of(TickSpan.Second5).add.map(Tick::openPrice)
+                                .startWith(entryPrice)
+                                .scan(p -> p, (prev, now) -> Num.max(direction, prev, now))
+                                .map(p -> p.minus(direction, 4000))
+                                .to();
+                        exitAt(loss);
                     }
                 };
             });

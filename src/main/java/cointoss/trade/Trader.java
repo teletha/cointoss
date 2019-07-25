@@ -9,7 +9,7 @@
  */
 package cointoss.trade;
 
-import static java.util.concurrent.TimeUnit.*;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
@@ -42,6 +42,7 @@ import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
 import kiss.Signaling;
+import kiss.Variable;
 
 public abstract class Trader {
 
@@ -410,7 +411,17 @@ public abstract class Trader {
          * @param price An exit price.
          */
         protected final void exitAt(Num price) {
-            if (price.isGreaterThan(direction, entryPrice)) {
+            exitAt(Variable.of(price));
+        }
+
+        /**
+         * Declare exit order by price. Loss cutting is the only element in the trade that investors
+         * can control.
+         * 
+         * @param price An exit price.
+         */
+        protected final void exitAt(Variable<Num> price) {
+            if (entryPrice.isLessThan(direction, price)) {
                 disposerForExit.add(observeEntryExecutedSizeDiff().debounce(1, SECONDS, market.service.scheduler()).to(size -> {
                     market.request(direction.inverse(), entryExecutedSize.minus(exitSize), s -> s.make(price))
                             .to(this::processAddExitOrder);

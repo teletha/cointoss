@@ -13,6 +13,7 @@ import java.time.temporal.ChronoUnit;
 
 import cointoss.util.Num;
 import kiss.Signal;
+import kiss.Variable;
 
 public interface OrderStrategy {
 
@@ -61,6 +62,16 @@ public interface OrderStrategy {
          * @return Maker is cancellable.
          */
         Cancellable make(Num price);
+
+        /**
+         * Limit order with the specified price.
+         * 
+         * @param price A limit price.
+         * @return Maker is cancellable.
+         */
+        default Cancellable make(Variable<Num> price) {
+            return make(price.v);
+        }
 
         /**
          * Limit order with the best limit price by referrencing order books.

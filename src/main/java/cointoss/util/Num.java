@@ -1172,7 +1172,29 @@ public class Num implements Comparable<Num> {
      * @param other
      * @return
      */
+    public final boolean isGreaterThan(Directional direction, Variable<Num> price) {
+        return direction.isBuy() ? isGreaterThan(price) : isLessThan(price);
+    }
+
+    /**
+     * Compare {@link Num}.
+     * 
+     * @param direction
+     * @param other
+     * @return
+     */
     public final boolean isGreaterThanOrEqual(Directional direction, Num other) {
+        return direction.isBuy() ? isGreaterThanOrEqual(other) : isLessThanOrEqual(other);
+    }
+
+    /**
+     * Compare {@link Num}.
+     * 
+     * @param direction
+     * @param other
+     * @return
+     */
+    public final boolean isGreaterThanOrEqual(Directional direction, Variable<Num> other) {
         return direction.isBuy() ? isGreaterThanOrEqual(other) : isLessThanOrEqual(other);
     }
 
@@ -1205,7 +1227,29 @@ public class Num implements Comparable<Num> {
      * @param other
      * @return
      */
+    public final boolean isLessThan(Directional direction, Variable<Num> other) {
+        return direction.isBuy() ? isLessThan(other) : isGreaterThan(other);
+    }
+
+    /**
+     * Compare {@link Num}.
+     * 
+     * @param direction
+     * @param other
+     * @return
+     */
     public final boolean isLessThanOrEqual(Directional direction, Num other) {
+        return direction.isBuy() ? isLessThanOrEqual(other) : isGreaterThanOrEqual(other);
+    }
+
+    /**
+     * Compare {@link Num}.
+     * 
+     * @param direction
+     * @param other
+     * @return
+     */
+    public final boolean isLessThanOrEqual(Directional direction, Variable<Num> other) {
         return direction.isBuy() ? isLessThanOrEqual(other) : isGreaterThanOrEqual(other);
     }
 
