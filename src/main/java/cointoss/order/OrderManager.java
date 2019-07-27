@@ -45,6 +45,12 @@ public final class OrderManager {
     /** The order remove event. */
     public final Signal<Order> removed = remove.expose;
 
+    /** The order request event. */
+    private final Signaling<Order> request = new Signaling();
+
+    /** The order request event. */
+    public final Signal<Order> requesting = request.expose;
+
     /** The order add event. */
     private final Signaling<Order> addition = new Signaling();
 
@@ -127,6 +133,7 @@ public final class OrderManager {
      */
     public Signal<Order> request(Order order) {
         order.assignState(REQUESTING);
+        request.accept(order);
 
         return service.request(order, order::assignState).retryWhen(service.setting.retryPolicy()).map(id -> {
             order.assignState(ACTIVE);

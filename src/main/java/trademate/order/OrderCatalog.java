@@ -17,7 +17,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.function.Consumer;
 
-import javafx.scene.control.TreeTableRow;
+import javafx.scene.control.TableRow;
 
 import cointoss.Direction;
 import cointoss.order.Order;
@@ -33,9 +33,8 @@ import trademate.TradingView;
 import viewtify.Viewtify;
 import viewtify.bind.Calculation;
 import viewtify.ui.UI;
-import viewtify.ui.UITreeItem;
-import viewtify.ui.UITreeTableColumn;
-import viewtify.ui.UITreeTableView;
+import viewtify.ui.UITableColumn;
+import viewtify.ui.UITableView;
 import viewtify.ui.UserInterface;
 import viewtify.ui.View;
 
@@ -45,19 +44,19 @@ public class OrderCatalog extends View {
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd HH:mm:ss");
 
     /** UI */
-    private UITreeTableView<Object> table;
+    private UITableView<Order> table;
 
     /** UI */
-    private UITreeTableColumn<Object, ZonedDateTime> date;
+    private UITableColumn<Order, ZonedDateTime> date;
 
     /** UI */
-    private UITreeTableColumn<Object, Direction> side;
+    private UITableColumn<Order, Direction> side;
 
     /** UI */
-    private UITreeTableColumn<Object, Num> amount;
+    private UITableColumn<Order, Num> amount;
 
     /** UI */
-    private UITreeTableColumn<Object, Num> price;
+    private UITableColumn<Order, Num> price;
 
     /** Parent View */
     private TradingView view;
@@ -85,46 +84,24 @@ public class OrderCatalog extends View {
     @Override
     protected void initialize() {
         table.selectMultipleRows().render(table -> new CatalogRow()).context($ -> {
-            Calculation<Boolean> ordersArePassive = table.selection().flatVariable(this::state).isNot(ACTIVE);
+            Calculation<Boolean> ordersArePassive = table.selection().flatVariable(o -> Variable.of(o.state)).isNot(ACTIVE);
 
             $.menu(Cancel).disableWhen(ordersArePassive).whenUserClick(e -> act(this::cancel));
         });
 
         date.header(Date)
-                .modelByProperty(OrderSet.class, o -> o.date)
                 .modelByVar(Order.class, o -> o.observeCreationTimeNow().to())
                 .render((ui, item) -> ui.text(formatter.format(item)));
-        side.header(SiDe)
-                .modelByProperty(OrderSet.class, o -> o.side)
-                .model(Order.class, Order::direction)
-                .render((ui, side) -> ui.text(side).styleOnly(TradeMateStyle.Side.of(side)));
-        amount.header(Amount).modelByProperty(OrderSet.class, o -> o.amount).model(Order.class, o -> o.remainingSize);
-        price.header(Price).modelByProperty(OrderSet.class, o -> o.averagePrice).model(Order.class, o -> o.price);
+        side.header(SiDe).model(Order.class, Order::direction).render((ui, side) -> ui.text(side).styleOnly(TradeMateStyle.Side.of(side)));
+        amount.header(Amount).model(Order.class, o -> o.remainingSize);
+        price.header(Price).model(Order.class, o -> o.price);
 
         // initialize orders on server
-        I.signal(view.market().orders.items)
-                .take(Order::isBuy)
-                .sort(Comparator.reverseOrder())
-                .scanWith(new OrderSet(), OrderSet::add)
-                .last()
-                .to(this::createOrderItem);
+        I.signal(view.market().orders.items).take(Order::isBuy).sort(Comparator.reverseOrder()).to(this::createOrderItem);
+        I.signal(view.market().orders.items).take(Order::isSell).sort(Comparator.naturalOrder()).to(this::createOrderItem);
 
-        I.signal(view.market().orders.items)
-                .take(Order::isSell)
-                .sort(Comparator.naturalOrder())
-                .scanWith(new OrderSet(), OrderSet::add)
-                .last()
-                .to(this::createOrderItem);
-    }
-
-    /**
-     * Compute order state.
-     * 
-     * @param item
-     * @return
-     */
-    private Variable<OrderState> state(Object item) {
-        return item instanceof Order ? Variable.of(((Order) item).state) : Variable.of(ACTIVE);
+        // observe orders on clinet
+        view.market().orders.requesting.to(this::createOrderItem);
     }
 
     /**
@@ -132,23 +109,11 @@ public class OrderCatalog extends View {
      * 
      * @param set
      */
-    public void createOrderItem(OrderSet set) {
-        if (set.sub.isEmpty()) {
-            return;
+    private void createOrderItem(Order order) {
+        if (order != null) {
+            table.values.add(order);
+            order.observeTerminating().on(Viewtify.UIThread).to(() -> table.values.remove(order));
         }
-
-        UITreeItem item = table.root.createItem(set).expand(set.sub.size() != 1).removeWhenEmpty();
-
-        for (Order order : set.sub) {
-            createOrderItem(item, order);
-        }
-    }
-
-    /**
-     * Create tree item for {@link Order}.
-     */
-    private void createOrderItem(UITreeItem item, Order order) {
-        item.createItem(order).removeWhen(order.observeTerminating());
     }
 
     /**
@@ -157,14 +122,8 @@ public class OrderCatalog extends View {
      * @param order
      */
     private void act(Consumer<Order> forOrder) {
-        for (Object order : table.selection()) {
-            if (order instanceof Order) {
-                forOrder.accept((Order) order);
-            } else {
-                for (Order child : ((OrderSet) order).sub) {
-                    forOrder.accept(child);
-                }
-            }
+        for (Order order : table.selection()) {
+            forOrder.accept(order);
         }
     }
 
@@ -183,7 +142,7 @@ public class OrderCatalog extends View {
     /**
      * @version 2018/12/08 14:55:02
      */
-    private class CatalogRow extends TreeTableRow<Object> {
+    private class CatalogRow extends TableRow<Order> {
 
         /** The enhanced ui. */
         private final UserInterface ui = Viewtify.wrap(this, OrderCatalog.this);

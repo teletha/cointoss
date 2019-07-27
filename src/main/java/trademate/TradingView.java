@@ -11,28 +11,19 @@ package trademate;
 
 import cointoss.Market;
 import cointoss.MarketService;
-import cointoss.order.Order;
-import kiss.I;
 import trademate.chart.ChartView;
 import trademate.console.Console;
 import trademate.info.TradeInfomationView;
 import trademate.order.OrderBookView;
 import trademate.order.OrderBuilder;
 import trademate.order.OrderCatalog;
-import trademate.order.OrderSet;
-import trademate.setting.Notificator;
 import viewtify.Viewtify;
 import viewtify.ui.UI;
 import viewtify.ui.View;
 
-/**
- * @version 2018/09/09 12:53:14
- */
 public class TradingView extends View {
 
     public final MarketService service;
-
-    private final Notificator notificator = I.make(Notificator.class);
 
     public ExecutionView executionView;
 
@@ -108,42 +99,5 @@ public class TradingView extends View {
             Viewtify.Terminator.add(market = new Market(service).readLog(log -> log.fromYestaday().share()));
         }
         return market;
-    }
-
-    /**
-     * Reqest order to the market.
-     * 
-     * @param order
-     */
-    public final void order(Order order) {
-        OrderSet set = new OrderSet();
-        set.sub.add(order);
-
-        order(set);
-    }
-
-    /**
-     * Reqest order to the market.
-     * 
-     * @param set
-     */
-    public final void order(OrderSet set) {
-        // ========================================
-        // Create View Model
-        // ========================================
-        orders.createOrderItem(set);
-
-        // ========================================
-        // Request to Server
-        // ========================================
-        for (Order order : set.sub) {
-            Viewtify.inWorker(() -> {
-                market().request(order).to(o -> {
-                    // ok
-                }, e -> {
-                    notificator.orderFailed.notify("Reject : " + e.getMessage() + "\r\n" + order);
-                });
-            });
-        }
     }
 }

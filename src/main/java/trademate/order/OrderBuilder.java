@@ -26,6 +26,7 @@ import cointoss.market.bitflyer.SFD;
 import cointoss.order.Order;
 import cointoss.order.OrderState;
 import cointoss.util.Num;
+import kiss.I;
 import kiss.WiseBiConsumer;
 import stylist.Style;
 import stylist.StyleDSL;
@@ -220,20 +221,8 @@ public class OrderBuilder extends View {
         orderLimitShort.text(Sell).when(User.MouseClick).throttle(1000, MILLISECONDS).mapTo(Direction.SELL).to(this::requestOrder);
 
         orderCancel.text(en("Cancel")).when(User.MouseClick).to(view.market()::cancel);
-        orderStop.text(en("Stop")).when(User.MouseClick).to(() -> {
-            OrderSet set = new OrderSet();
-            view.market().stop().to(o -> {
-                set.sub.add(o);
-            });
-            view.order(set);
-        });
-        orderReverse.text(en("Reverse")).when(User.MouseClick).to(() -> {
-            OrderSet set = new OrderSet();
-            view.market().reverse().to(o -> {
-                set.sub.add(o);
-            });
-            view.order(set);
-        });
+        orderStop.text(en("Stop")).when(User.MouseClick).to(() -> view.market().stop().to(I.NoOP));
+        orderReverse.text(en("Reverse")).when(User.MouseClick).to(() -> view.market().reverse().to(I.NoOP));
 
         if (view.market().service == BitFlyer.FX_BTC_JPY) {
             view.market().service.add(SFD.latestBTC.on(Viewtify.UIThread).to(price -> {
@@ -277,31 +266,28 @@ public class OrderBuilder extends View {
      * @return
      */
     private void requestOrder(Direction side) {
-        OrderSet set = new OrderSet();
+        Viewtify.inWorker(() -> {
+            // ========================================
+            // Create Model
+            // ========================================
+            Num size = orderSize.valueOr(Num.ZERO);
+            Num initSize = size;
+            Num price = orderPrice.valueOr(Num.ZERO);
+            int divideSize = orderDivideSize.value();
+            int increaseInterval = orderDivideIntervalAmount.value();
+            Num priceInterval = orderPriceInterval.valueOr(Num.ZERO).multiply(side.isBuy() ? -1 : 1);
 
-        // ========================================
-        // Create Model
-        // ========================================
-        Num size = orderSize.valueOr(Num.ZERO);
-        Num initSize = size;
-        Num price = orderPrice.valueOr(Num.ZERO);
-        int divideSize = orderDivideSize.value();
-        int increaseInterval = orderDivideIntervalAmount.value();
-        Num priceInterval = orderPriceInterval.valueOr(Num.ZERO).multiply(side.isBuy() ? -1 : 1);
+            for (int i = 0; i < divideSize; i++) {
+                Num optimizedSize = increaseInterval == 0 ? Num.ZERO
+                        : Num.of(i).divide(increaseInterval).scale(0, RoundingMode.FLOOR).multiply(initSize.divide(2));
+                Num optimizedPrice = view.market().orderBook.computeBestPrice(side, price, optimizeThreshold.value(), Num.of(2));
 
-        for (int i = 0; i < divideSize; i++) {
-            Num optimizedSize = increaseInterval == 0 ? Num.ZERO
-                    : Num.of(i).divide(increaseInterval).scale(0, RoundingMode.FLOOR).multiply(initSize.divide(2));
-            Num optimizedPrice = view.market().orderBook.computeBestPrice(side, price, optimizeThreshold.value(), Num.of(2));
+                Order order = Order.with.direction(side, size.plus(optimizedSize)).price(optimizedPrice).state(OrderState.REQUESTING);
+                price = optimizedPrice.plus(priceInterval);
 
-            Order order = Order.with.direction(side, size.plus(optimizedSize)).price(optimizedPrice).state(OrderState.REQUESTING);
-            order.observeTerminating().to(() -> set.sub.remove(order));
-
-            set.sub.add(order);
-
-            price = optimizedPrice.plus(priceInterval);
-        }
-        view.order(set);
+                view.market().request(order).to(I.NoOP);
+            }
+        });
     }
 
     /**
