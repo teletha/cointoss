@@ -49,7 +49,7 @@ public abstract class MarketService implements Disposable {
 
     /** The market specific scheduler. */
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(8, task -> {
-        Thread thread = new Thread();
+        Thread thread = new Thread(task);
         thread.setName(marketIdentity());
         thread.setDaemon(true);
         return thread;

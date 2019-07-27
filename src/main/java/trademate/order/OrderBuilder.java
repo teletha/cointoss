@@ -220,8 +220,20 @@ public class OrderBuilder extends View {
         orderLimitShort.text(Sell).when(User.MouseClick).throttle(1000, MILLISECONDS).mapTo(Direction.SELL).to(this::requestOrder);
 
         orderCancel.text(en("Cancel")).when(User.MouseClick).to(view.market()::cancel);
-        orderStop.text(en("Stop")).when(User.MouseClick).to(view.market()::stop);
-        orderReverse.text(en("Reverse")).when(User.MouseClick).to(view.market()::reverse);
+        orderStop.text(en("Stop")).when(User.MouseClick).to(() -> {
+            OrderSet set = new OrderSet();
+            view.market().stop().to(o -> {
+                set.sub.add(o);
+            });
+            view.order(set);
+        });
+        orderReverse.text(en("Reverse")).when(User.MouseClick).to(() -> {
+            OrderSet set = new OrderSet();
+            view.market().reverse().to(o -> {
+                set.sub.add(o);
+            });
+            view.order(set);
+        });
 
         if (view.market().service == BitFlyer.FX_BTC_JPY) {
             view.market().service.add(SFD.latestBTC.on(Viewtify.UIThread).to(price -> {

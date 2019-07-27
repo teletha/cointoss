@@ -24,8 +24,8 @@ public class BackTestInvoker {
 
     public static void main(String[] args) throws InterruptedException {
         BackTest.with.service(BitFlyer.FX_BTC_JPY)
-                .start(2019, 6, 14)
-                .end(2019, 6, 15)
+                .start(2019, 7, 14)
+                .end(2019, 7, 14)
                 .initialBaseCurrency(3000000)
                 .exclusiveExecution(false)
                 .runs(market -> List
@@ -53,7 +53,7 @@ public class BackTestInvoker {
                      */
                     @Override
                     protected void exit() {
-                        exitAt(entryPrice.plus(direction, 5000));
+                        exitAt(entryPrice.plus(direction, 5500));
 
                         Variable<Num> loss = market.tickers.of(TickSpan.Second5).add.map(Tick::openPrice)
                                 .startWith(entryPrice)

@@ -9,8 +9,6 @@
  */
 package cointoss;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
-
 import java.time.temporal.ChronoUnit;
 import java.util.LinkedList;
 import java.util.Objects;
@@ -120,7 +118,7 @@ public class Market implements Disposable {
             orderBook.longs.update(board.bids);
             policy.reset();
         }));
-        service.add(timeline.throttle(2, SECONDS).to(e -> {
+        service.add(timeline.throttle(2, TimeUnit.SECONDS).to(e -> {
             // fix error board
             orderBook.shorts.fix(e.price);
             orderBook.longs.fix(e.price);
@@ -218,6 +216,34 @@ public class Market implements Disposable {
     }
 
     /**
+     * Stop all positions.
+     */
+    public final Signal<Order> stop() {
+        return stop(null);
+    }
+
+    /**
+     * Stop all positions with {@link OrderStrategy}.
+     */
+    public final Signal<Order> stop(Consumer<Orderable> strategy) {
+        if (positions.hasNoPosition()) {
+            return I.signal();
+        } else {
+            return request(positions.direction().inverse(), positions.size.v, Objects
+                    .requireNonNullElse(strategy, s -> s.make(positions.price.v.scale(service.setting.baseCurrencyScaleSize))
+                            .cancelAfter(5, ChronoUnit.SECONDS)
+                            .take()));
+        }
+    }
+
+    /**
+     * Stop and reverse all positions.
+     */
+    public final Signal<Order> reverse() {
+        return request(Direction.BUY, 0.01, s -> s.make(1013456).cancelAfter(5, ChronoUnit.SECONDS));
+    }
+
+    /**
      * Shorthand accessor to the latest price.
      * 
      * @return
@@ -262,22 +288,10 @@ public class Market implements Disposable {
     }
 
     /**
-     * Stop all positions.
-     */
-    public void stop() {
-    }
-
-    /**
      * Cancel all orders.
      */
     public void cancel() {
         orders.cancelNowAll();
-    }
-
-    /**
-     * Stop and reverse all positions.
-     */
-    public void reverse() {
     }
 
     /**
@@ -347,6 +361,7 @@ public class Market implements Disposable {
         public <S extends Takable & Makable> S cancelWhen(Signal<?> timing) {
             actions.add((market, direction, size, previous, orders) -> {
                 if (previous != null && previous.isNotCompleted()) {
+
                     timing.first().to(() -> {
                         if (previous.isNotCompleted()) {
                             market.orders.cancel(previous).to(() -> {
