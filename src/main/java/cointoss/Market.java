@@ -387,6 +387,7 @@ public class Market implements Disposable {
             if (action == null) {
                 observer.complete();
             } else {
+                System.out.println("exe");
                 action.accept(market, direction, size, previous, observer);
             }
         }
