@@ -52,7 +52,7 @@ class OrderManagerTest {
 
     @Test
     void added() {
-        List<Order> added = orders.added.toList();
+        List<Order> added = orders.add.toList();
         assert added.size() == 0;
 
         orders.requestNow(Order.with.buy(1).price(10));

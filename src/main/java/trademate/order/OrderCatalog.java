@@ -101,7 +101,7 @@ public class OrderCatalog extends View {
         I.signal(view.market().orders.items).take(Order::isSell).sort(Comparator.naturalOrder()).to(this::createOrderItem);
 
         // observe orders on clinet
-        view.market().orders.requesting.to(this::createOrderItem);
+        view.market().orders.add.to(this::createOrderItem);
     }
 
     /**

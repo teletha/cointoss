@@ -39,23 +39,17 @@ public final class OrderManager {
     /** The unmodifiable exposed active orders. */
     public final List<Order> items = Collections.unmodifiableList(managed);
 
-    /** The order remove event. */
-    private final Signaling<Order> remove = new Signaling();
-
-    /** The order remove event. */
-    public final Signal<Order> removed = remove.expose;
-
-    /** The order request event. */
-    private final Signaling<Order> request = new Signaling();
-
-    /** The order request event. */
-    public final Signal<Order> requesting = request.expose;
-
-    /** The order add event. */
+    /** The order adding event. */
     private final Signaling<Order> addition = new Signaling();
 
-    /** The order add event. */
-    public final Signal<Order> added = addition.expose;
+    /** The order adding event. */
+    public final Signal<Order> add = addition.expose;
+
+    /** The order removed event. */
+    private final Signaling<Order> remove = new Signaling();
+
+    /** The order removed event. */
+    public final Signal<Order> removed = remove.expose;
 
     /** The order update event. */
     private final Signaling<Ⅱ<Order, Execution>> updates = new Signaling();
@@ -77,7 +71,7 @@ public final class OrderManager {
      */
     public OrderManager(MarketService service) {
         this.service = service;
-        added.to(managed::add);
+        add.to(managed::add);
         removed.to(managed::remove);
 
         // retrieve orders on server
@@ -119,7 +113,7 @@ public final class OrderManager {
      * @return
      */
     public Signal<Order> manages() {
-        return I.signal(managed).merge(added);
+        return I.signal(managed).merge(add);
     }
 
     /**
@@ -133,15 +127,13 @@ public final class OrderManager {
      */
     public Signal<Order> request(Order order) {
         order.assignState(REQUESTING);
-        request.accept(order);
+        addition.accept(order);
 
         return service.request(order, order::assignState).retryWhen(service.setting.retryPolicy()).map(id -> {
             order.assignState(ACTIVE);
             order.assignId(id);
             order.assignCreationTime(service.now());
             order.observeTerminating().to(remove::accept);
-
-            addition.accept(order);
 
             return order;
         }).effectOnError(e -> {
