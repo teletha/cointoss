@@ -153,12 +153,10 @@ public class OrderBuilder extends View {
                         $(optimizeThreshold, S.Form);
                     });
                     $(hbox, S.Row, () -> {
-                        label(en("Limit Entry"), S.Label);
                         $(orderLimitShort, S.FormButton, TradeMateStyle.Short);
                         $(orderLimitLong, S.FormButton, TradeMateStyle.Long);
                     });
                     $(hbox, S.Row, () -> {
-                        label(en("Exit"), S.Label);
                         $(orderCancel, S.FormButton);
                         $(orderStop, S.FormButton);
                         $(orderReverse, S.FormButton);
@@ -306,7 +304,7 @@ public class OrderBuilder extends View {
         };
 
         Style Label = () -> {
-            display.width(60, px);
+            display.width(80, px);
             display.height(27, px);
             padding.top(5, px);
         };
@@ -318,7 +316,7 @@ public class OrderBuilder extends View {
         };
 
         Style Form = () -> {
-            display.maxWidth(100, px).height(27, px);
+            display.maxWidth(80, px).height(27, px);
         };
 
         Style FormMin = () -> {
