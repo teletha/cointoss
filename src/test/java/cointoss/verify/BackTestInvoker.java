@@ -21,7 +21,6 @@ import cointoss.ticker.Tick;
 import cointoss.ticker.TickSpan;
 import cointoss.trade.Trader;
 import cointoss.util.Num;
-import kiss.Variable;
 
 public class BackTestInvoker {
 
@@ -30,8 +29,8 @@ public class BackTestInvoker {
         Thread.setDefaultUncaughtExceptionHandler((t, e) -> log.error(e.getMessage(), e));
 
         BackTest.with.service(BitFlyer.FX_BTC_JPY)
-                .start(2019, 7, 22)
-                .end(2019, 7, 22)
+                .start(2019, 7, 8)
+                .end(2019, 7, 8)
                 .initialBaseCurrency(3000000)
                 .exclusiveExecution(false)
                 .runs(market -> List
@@ -46,12 +45,16 @@ public class BackTestInvoker {
         private Sample(Market market) {
             super(market);
 
-            when(market.tickers.of(TickSpan.Minute5).add, tick -> {
+            when(market.tickers.of(TickSpan.Minute5).add.skip(1), tick -> {
                 Tick prev = tick.previous;
                 Num upperBound = prev.highPrice().minus(prev.closePrice());
                 Num lowerBound = prev.closePrice().minus(prev.lowPrice());
-                Num boundRatio = upperBound.divide(lowerBound);
+                Num boundRatio = lowerBound.isZero() ? upperBound : upperBound.divide(lowerBound);
                 Num boundMax = Num.max(upperBound, lowerBound);
+
+                if (boundMax.isGreaterThan(3000)) {
+                    return null;
+                }
 
                 return new Entry(Direction.random()) {
 
@@ -65,14 +68,15 @@ public class BackTestInvoker {
                      */
                     @Override
                     protected void exit() {
-                        exitAt(entryPrice.plus(direction, boundMax));
+                        exitAt(entryPrice.plus(direction, 500));
+                        // exitAt(entryPrice.minus(direction, 200));
 
-                        Variable<Num> loss = market.tickers.of(TickSpan.Second5).add.map(Tick::openPrice)
-                                .startWith(entryPrice)
-                                .scan(p -> p, (prev, now) -> Num.max(direction, prev, now))
-                                .map(p -> p.minus(direction, boundMax.divide(0.75)))
-                                .to();
-                        exitAt(loss);
+                        // Variable<Num> loss =
+                        // market.tickers.of(TickSpan.Second5).add.map(Tick::openPrice)
+                        // .startWith(entryPrice)
+                        // .scan(p -> p, (prev, now) -> Num.max(direction, prev, now))
+                        // .map(p -> p.minus(direction, boundMax.divide(0.7)))
+                        // .to();
                     }
                 };
             });
