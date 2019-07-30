@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
+import antibug.powerassert.PowerAssertOff;
 import cointoss.Direction;
 import cointoss.execution.Execution;
 import cointoss.order.Order;
@@ -52,6 +53,7 @@ public class BitFlyerServiceTest {
     }
 
     @Test
+    @PowerAssertOff
     void createPositionWhenOrderIsExecuted() {
         List<Execution> executions = service.executionsRealtimely().toList();
         List<Ⅲ<Direction, String, Execution>> positions = service.executionsRealtimelyForMe().toList();

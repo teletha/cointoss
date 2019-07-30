@@ -9,7 +9,7 @@
  */
 package cointoss.util;
 
-import static java.util.concurrent.TimeUnit.*;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -99,7 +99,7 @@ public class Network {
     /**
      * Call REST API.
      */
-    public Signal<JsonElement> rest(Request request) {
+    public final Signal<JsonElement> rest(Request request) {
         return rest(request, null);
     }
 
@@ -132,7 +132,7 @@ public class Network {
     /**
      * Call REST API.
      */
-    public <M> Signal<M> rest(Request request, String selector, Class<M> type) {
+    public final <M> Signal<M> rest(Request request, String selector, Class<M> type) {
         return rest(request, selector, type, null);
     }
 
