@@ -10,6 +10,7 @@
 package cointoss.verify;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -68,8 +69,8 @@ public class BackTestInvoker {
                      */
                     @Override
                     protected void exit() {
-                        exitAt(entryPrice.plus(direction, 500));
-                        // exitAt(entryPrice.minus(direction, 200));
+                        exitAt(entryPrice.minus(direction, 1000));
+                        exitAfter(5, TimeUnit.MINUTES);
 
                         // Variable<Num> loss =
                         // market.tickers.of(TickSpan.Second5).add.map(Tick::openPrice)
