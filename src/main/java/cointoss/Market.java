@@ -229,10 +229,9 @@ public class Market implements Disposable {
         if (positions.hasNoPosition()) {
             return I.signal();
         } else {
+            System.out.println("ok");
             return request(positions.direction().inverse(), positions.size.v, Objects
-                    .requireNonNullElse(strategy, s -> s.make(positions.price.v.scale(service.setting.baseCurrencyScaleSize))
-                            .cancelAfter(5, ChronoUnit.SECONDS)
-                            .take()));
+                    .requireNonNullElse(strategy, OrderStrategy.stop(3, ChronoUnit.SECONDS)));
         }
     }
 
@@ -324,12 +323,7 @@ public class Market implements Disposable {
         @Override
         public OrderStrategy.Cancellable make(Num price) {
             actions.add((market, direction, size, previous, orders) -> {
-                Order order = Order.with.direction(direction, size).price(price);
-                orders.accept(order);
-
-                market.orders.request(order).to(() -> {
-                    execute(market, direction, size, order, orders);
-                });
+                make(price, market, direction, size, previous, orders);
             });
             return this;
         }
@@ -340,10 +334,40 @@ public class Market implements Disposable {
         @Override
         public OrderStrategy.Cancellable makeBestPrice() {
             actions.add((market, direction, size, previous, orders) -> {
-                make(market.orderBook.bookFor(direction).best.v.price);
-                execute(market, direction, size, previous, orders);
+                make(market.orderBook.bookFor(direction).best.v.price, market, direction, size, previous, orders);
             });
             return this;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Cancellable makePositionPrice() {
+            actions.add((market, direction, size, previous, orders) -> {
+                make(market.positions.price.v
+                        .scale(market.service.setting.baseCurrencyScaleSize), market, direction, size, previous, orders);
+            });
+            return this;
+        }
+
+        /**
+         * Request make order.
+         * 
+         * @param price
+         * @param market
+         * @param direction
+         * @param size
+         * @param previous
+         * @param orders
+         */
+        private void make(Num price, Market market, Direction direction, Num size, Order previous, Observer<? super Order> orders) {
+            Order order = Order.with.direction(direction, size).price(price);
+            orders.accept(order);
+
+            market.orders.request(order).to(() -> {
+                execute(market, direction, size, order, orders);
+            });
         }
 
         /**

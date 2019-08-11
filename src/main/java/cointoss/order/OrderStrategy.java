@@ -10,12 +10,26 @@
 package cointoss.order;
 
 import java.time.temporal.ChronoUnit;
+import java.util.function.Consumer;
 
 import cointoss.util.Num;
 import kiss.Signal;
 import kiss.Variable;
 
 public interface OrderStrategy {
+
+    /**
+     * Make stop order with waiting time.
+     * 
+     * @param time
+     * @param unit
+     * @return
+     */
+    static Consumer<Orderable> stop(long time, ChronoUnit unit) {
+        return s -> {
+            s.makeBestPrice().cancelAfter(time, unit).take();
+        };
+    }
 
     /**
      * Taker order strategy.
@@ -79,6 +93,13 @@ public interface OrderStrategy {
          * @return Maker is cancellable.
          */
         Cancellable makeBestPrice();
+
+        /**
+         * Limit order with the current position price.
+         * 
+         * @return Maker is cancellable.
+         */
+        Cancellable makePositionPrice();
     }
 
     /**
