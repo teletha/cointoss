@@ -12,6 +12,7 @@ package cointoss.order;
 import java.time.temporal.ChronoUnit;
 import java.util.function.Consumer;
 
+import cointoss.Direction;
 import cointoss.util.Num;
 import kiss.Signal;
 import kiss.Variable;
@@ -88,11 +89,36 @@ public interface OrderStrategy {
         }
 
         /**
-         * Limit order with the best limit price by referrencing order books.
+         * Limit order with the best price by referrencing order books.
          * 
          * @return Maker is cancellable.
          */
         Cancellable makeBestPrice();
+
+        /**
+         * Limit order with the best price by referrencing order books.
+         * 
+         * @return Maker is cancellable.
+         */
+        Cancellable makeBestPrice(Direction direction);
+
+        /**
+         * Limit order with the best price by referrencing order books.
+         * 
+         * @return Maker is cancellable.
+         */
+        default Cancellable makeBestSellPrice() {
+            return makeBestPrice(Direction.SELL);
+        }
+
+        /**
+         * Limit order with the best price by referrencing order books.
+         * 
+         * @return Maker is cancellable.
+         */
+        default Cancellable makeBestBuyPrice() {
+            return makeBestPrice(Direction.BUY);
+        }
 
         /**
          * Limit order with the current position price.

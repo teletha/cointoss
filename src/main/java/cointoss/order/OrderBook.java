@@ -18,8 +18,8 @@ import java.util.function.UnaryOperator;
 
 import org.magicwerk.brownies.collections.GapList;
 
-import cointoss.MarketSetting;
 import cointoss.Direction;
+import cointoss.MarketSetting;
 import cointoss.util.Num;
 import kiss.Variable;
 
@@ -121,29 +121,40 @@ public class OrderBook {
         return base;
     }
 
-    public Num computeBestPrice(Num threshold, Num diff) {
+    /**
+     * Compute the best price with your conditions (diff price).
+     * 
+     * @param diff A difference price.
+     * @return A computed best price.
+     */
+    public final Num computeBestPrice(Num diff) {
+        return computeBestPrice(best.v.price, Num.ZERO, diff);
+    }
+
+    /**
+     * Compute the best price with your conditions (threashold volume and diff price).
+     * 
+     * @param threshold A threashold volume.
+     * @param diff A difference price.
+     * @return A computed best price.
+     */
+    public final Num computeBestPrice(Num threshold, Num diff) {
         return computeBestPrice(best.v.price, threshold, diff);
     }
 
     /**
-     * <pre>
-     * ■板の価格をクリックしたときの仕様
-     * 板の価格を１回クリックするとその価格が入力される
-     * 板の価格を２回クリックするとその価格グループで大きい板手前の有利な価格が入力される。
-     * 例)
-     * ２００円でグルーピングしてるときそのグループ内で0.9～3枚目の手前
-     * １０００円でグルーピングしてるときそのグループ内で3～10枚目の手前
-     * 3～10枚と変動基準は売り板買い板の仲値からの距離で変動する。
-     * １グループ目3枚目の手前、１０グループ目以降１０枚になる。
-     * </pre>
+     * Compute the best price with your conditions (start price, threashold volume and diff price).
      * 
-     * @return
+     * @param start A start price.
+     * @param threshold A threashold volume.
+     * @param diff A difference price.
+     * @return A computed best price.
      */
-    public Num computeBestPrice(Num start, Num threshold, Num diff) {
+    public final Num computeBestPrice(Num start, Num threshold, Num diff) {
         Num total = Num.ZERO;
         if (side == Direction.BUY) {
             for (OrderUnit unit : base) {
-                if (unit.price.isLessThan(start)) {
+                if (unit.price.isLessThanOrEqual(start)) {
                     total = total.plus(unit.size);
 
                     if (total.isGreaterThanOrEqual(threshold)) {

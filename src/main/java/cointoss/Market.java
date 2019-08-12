@@ -229,9 +229,8 @@ public class Market implements Disposable {
         if (positions.hasNoPosition()) {
             return I.signal();
         } else {
-            System.out.println("ok");
             return request(positions.direction().inverse(), positions.size.v, Objects
-                    .requireNonNullElse(strategy, OrderStrategy.stop(3, ChronoUnit.SECONDS)));
+                    .requireNonNullElse(strategy, OrderStrategy.stop(1, ChronoUnit.SECONDS)));
         }
     }
 
@@ -239,7 +238,7 @@ public class Market implements Disposable {
      * Stop and reverse all positions.
      */
     public final Signal<Order> reverse() {
-        return request(Direction.BUY, 0.01, s -> s.make(1013456).cancelAfter(5, ChronoUnit.SECONDS));
+        return request(Direction.BUY, 0.01, s -> s.makeBestBuyPrice()).merge(request(Direction.SELL, 0.01, s -> s.makeBestSellPrice()));
     }
 
     /**
@@ -334,7 +333,20 @@ public class Market implements Disposable {
         @Override
         public OrderStrategy.Cancellable makeBestPrice() {
             actions.add((market, direction, size, previous, orders) -> {
-                make(market.orderBook.bookFor(direction).best.v.price, market, direction, size, previous, orders);
+                make(market.orderBook.bookFor(direction).best.v.price
+                        .plus(direction, market.service.setting.baseCurrencyMinimumBidPrice), market, direction, size, previous, orders);
+            });
+            return this;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Cancellable makeBestPrice(Direction directionForBestPrice) {
+            actions.add((market, direction, size, previous, orders) -> {
+                make(market.orderBook.bookFor(directionForBestPrice).best.v.price
+                        .plus(directionForBestPrice, market.service.setting.baseCurrencyMinimumBidPrice), market, direction, size, previous, orders);
             });
             return this;
         }
@@ -385,11 +397,12 @@ public class Market implements Disposable {
         public <S extends Takable & Makable> S cancelWhen(Signal<?> timing) {
             actions.add((market, direction, size, previous, orders) -> {
                 if (previous != null && previous.isNotCompleted()) {
-
                     timing.first().to(() -> {
                         if (previous.isNotCompleted()) {
                             market.orders.cancel(previous).to(() -> {
-                                execute(market, direction, size, null, orders);
+                                if (previous.isNotCompleted()) {
+                                    execute(market, direction, previous.remainingSize, null, orders);
+                                }
                             });
                         }
                     });

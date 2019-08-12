@@ -18,9 +18,6 @@ import cointoss.Direction;
 import cointoss.MarketSetting;
 import cointoss.util.Num;
 
-/**
- * @version 2018/04/02 16:46:26
- */
 class OrderBookListTest {
 
     private MarketSetting setting = MarketSetting.with.baseCurrencyMinimumBidPrice(Num.ONE)
@@ -28,7 +25,7 @@ class OrderBookListTest {
             .orderBookGroupRanges(Num.TEN);
 
     @Test
-    void buy() throws Exception {
+    void buy() {
         OrderBook list = new OrderBook(setting, Direction.BUY);
 
         // add
@@ -72,7 +69,7 @@ class OrderBookListTest {
     }
 
     @Test
-    void sell() throws Exception {
+    void sell() {
         OrderBook list = new OrderBook(setting, Direction.SELL);
         list.update(unit(1000, 1));
         assert list.base.get(0).price.is(1000);
@@ -113,7 +110,7 @@ class OrderBookListTest {
     }
 
     @Test
-    void buyFix() throws Exception {
+    void buyFix() {
         OrderBook list = new OrderBook(setting, Direction.BUY);
         list.update(unit(1007, 1));
         list.update(unit(1006, 1));
@@ -144,7 +141,7 @@ class OrderBookListTest {
     }
 
     @Test
-    void sellFix() throws Exception {
+    void sellFix() {
         OrderBook list = new OrderBook(setting, Direction.SELL);
         list.update(unit(1007, 1));
         list.update(unit(1004, 1));
@@ -168,7 +165,7 @@ class OrderBookListTest {
     }
 
     @Test
-    void buyGroup() throws Exception {
+    void buyGroup() {
         OrderBook list = new OrderBook(setting, Direction.BUY);
         list.update(unit(1000, 1));
         assertList(list.selectBy(Num.TEN), 0, 1000, 1, 1);
@@ -192,7 +189,7 @@ class OrderBookListTest {
     }
 
     @Test
-    void sellGroup() throws Exception {
+    void sellGroup() {
         OrderBook list = new OrderBook(setting, Direction.SELL);
         list.update(unit(1000, 1));
         assertList(list.selectBy(Num.TEN), 0, 1000, 1, 1);
@@ -216,7 +213,7 @@ class OrderBookListTest {
     }
 
     @Test
-    void buyGroupFix() throws Exception {
+    void buyGroupFix() {
         OrderBook list = new OrderBook(setting, Direction.BUY);
         list.update(unit(1061, 1));
         list.update(unit(1060, 1));
@@ -254,7 +251,7 @@ class OrderBookListTest {
     }
 
     @Test
-    void sellGroupFix() throws Exception {
+    void sellGroupFix() {
         OrderBook list = new OrderBook(setting, Direction.SELL);
         list.update(unit(1061, 1));
         list.update(unit(1060, 1));
@@ -292,7 +289,7 @@ class OrderBookListTest {
     }
 
     @Test
-    void buyBestPrice() throws Exception {
+    void buyBestPrice() {
         Num min = Num.of(1099);
 
         OrderBook list = new OrderBook(setting, Direction.BUY);
@@ -310,7 +307,17 @@ class OrderBookListTest {
     }
 
     @Test
-    void sellBestPrice() throws Exception {
+    void buyBestPriceWithDiffOnly() {
+        OrderBook list = new OrderBook(setting, Direction.BUY);
+        list.update(unit(1000, 1));
+        assert list.computeBestPrice(Num.of(1)).is(1001);
+        assert list.computeBestPrice(Num.of(2)).is(1002);
+        assert list.computeBestPrice(Num.of(20)).is(1020);
+        assert list.computeBestPrice(Num.of(100)).is(1100);
+    }
+
+    @Test
+    void sellBestPrice() {
         Num min = Num.of(1000);
 
         OrderBook list = new OrderBook(setting, Direction.SELL);
@@ -322,10 +329,19 @@ class OrderBookListTest {
         list.update(unit(1013, 2)); // total 4
         list.update(unit(1001, 1)); // total 2
         list.update(unit(1000, 1)); // total 1
-        System.out.println(list.base);
         assert list.computeBestPrice(min, Num.of(10), Num.ONE).is(1050);
         assert list.computeBestPrice(min, Num.of(30), Num.ONE).is(1092);
         assert list.computeBestPrice(min, Num.of(4), Num.ONE).is(1012);
+    }
+
+    @Test
+    void sellBestPriceWithDiffOnly() {
+        OrderBook list = new OrderBook(setting, Direction.SELL);
+        list.update(unit(1000, 1));
+        assert list.computeBestPrice(Num.of(1)).is(999);
+        assert list.computeBestPrice(Num.of(2)).is(998);
+        assert list.computeBestPrice(Num.of(20)).is(980);
+        assert list.computeBestPrice(Num.of(100)).is(900);
     }
 
     /**
