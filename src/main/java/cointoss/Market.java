@@ -230,7 +230,7 @@ public class Market implements Disposable {
             return I.signal();
         } else {
             return request(positions.direction().inverse(), positions.size.v, Objects
-                    .requireNonNullElse(strategy, OrderStrategy.stop(1, ChronoUnit.SECONDS)));
+                    .requireNonNullElse(strategy, OrderStrategy.stop(3, ChronoUnit.SECONDS)));
         }
     }
 
@@ -333,8 +333,8 @@ public class Market implements Disposable {
         @Override
         public Cancellable makeBestPrice() {
             actions.add((market, direction, size, previous, orders) -> {
-                make(market.orderBook.bookFor(direction).best.v.price
-                        .plus(direction, market.service.setting.baseCurrencyMinimumBidPrice), market, direction, size, previous, orders);
+                make(market.orderBook.bookFor(direction)
+                        .computeBestPrice(market.service.setting.baseCurrencyMinimumBidPrice), market, direction, size, previous, orders);
             });
             return this;
         }
@@ -345,8 +345,8 @@ public class Market implements Disposable {
         @Override
         public Cancellable makeBestPrice(Direction directionForBestPrice) {
             actions.add((market, direction, size, previous, orders) -> {
-                make(market.orderBook.bookFor(directionForBestPrice).best.v.price
-                        .plus(directionForBestPrice, market.service.setting.baseCurrencyMinimumBidPrice), market, direction, size, previous, orders);
+                make(market.orderBook.bookFor(directionForBestPrice)
+                        .computeBestPrice(market.service.setting.baseCurrencyMinimumBidPrice), market, direction, size, previous, orders);
             });
             return this;
         }
