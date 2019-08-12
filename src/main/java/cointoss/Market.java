@@ -223,7 +223,7 @@ public class Market implements Disposable {
     }
 
     /**
-     * Stop all positions with {@link OrderStrategy}.
+     * Stop all positions with {@link Orderable}.
      */
     public final Signal<Order> stop(Consumer<Orderable> strategy) {
         if (positions.hasNoPosition()) {
@@ -320,7 +320,7 @@ public class Market implements Disposable {
          * {@inheritDoc}
          */
         @Override
-        public OrderStrategy.Cancellable make(Num price) {
+        public Cancellable make(Num price) {
             actions.add((market, direction, size, previous, orders) -> {
                 make(price, market, direction, size, previous, orders);
             });
@@ -331,7 +331,7 @@ public class Market implements Disposable {
          * {@inheritDoc}
          */
         @Override
-        public OrderStrategy.Cancellable makeBestPrice() {
+        public Cancellable makeBestPrice() {
             actions.add((market, direction, size, previous, orders) -> {
                 make(market.orderBook.bookFor(direction).best.v.price
                         .plus(direction, market.service.setting.baseCurrencyMinimumBidPrice), market, direction, size, previous, orders);
@@ -386,7 +386,7 @@ public class Market implements Disposable {
          * {@inheritDoc}
          */
         @Override
-        public <S extends OrderStrategy.Takable & OrderStrategy.Makable> S cancelAfter(long time, ChronoUnit unit) {
+        public <S extends Takable & Makable> S cancelAfter(long time, ChronoUnit unit) {
             return cancelWhen(I.signal(time, 0, TimeUnit.of(unit), service.scheduler()));
         }
 
