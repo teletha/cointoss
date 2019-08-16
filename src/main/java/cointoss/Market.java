@@ -226,13 +226,13 @@ public class Market implements Disposable {
     /**
      * Stop all positions with {@link Orderable}.
      */
-    public final Signal<Order> stop(Consumer<Orderable> strategy) {
+    public final Signal<Order> stop(WiseConsumer<Orderable> strategy) {
         if (positions.hasNoPosition()) {
             return I.signal();
         }
 
         if (strategy == null) {
-            strategy = I.recurse((WiseConsumer<Orderable> self, Orderable s) -> {
+            strategy = I.recurse((self, s) -> {
                 if (positions.price.v.isLessThan(positions.direction(), tickers.latest.v.price)) {
                     // loss
                     s.makeBestPrice(positions.direction()).cancelAfter(2, ChronoUnit.SECONDS).take();
