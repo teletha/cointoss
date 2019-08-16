@@ -132,6 +132,14 @@ public interface OrderStrategy {
      * Both order strategy.
      */
     public static interface Orderable extends Takable, Makable {
+
+        /**
+         * Use the chained strategy.
+         * 
+         * @param strategy
+         * @return
+         */
+        OrderStrategy next(Consumer<Orderable> strategy);
     }
 
     /**
@@ -147,7 +155,7 @@ public interface OrderStrategy {
          * @param unit A time unit.
          * @return
          */
-        <S extends Takable & Makable> S cancelAfter(long time, ChronoUnit unit);
+        Orderable cancelAfter(long time, ChronoUnit unit);
 
         /**
          * Cancel the order if it remains after the specified time has passed.
@@ -156,6 +164,6 @@ public interface OrderStrategy {
          * @param timing A timing to cancel order.
          * @return
          */
-        <S extends Takable & Makable> S cancelWhen(Signal<?> timing);
+        Orderable cancelWhen(Signal<?> timing);
     }
 }

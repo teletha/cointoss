@@ -40,6 +40,7 @@ import kiss.I;
 import kiss.Observer;
 import kiss.Signal;
 import kiss.Signaling;
+import kiss.WiseConsumer;
 
 /**
  * Facade for the market related operations.
@@ -228,10 +229,20 @@ public class Market implements Disposable {
     public final Signal<Order> stop(Consumer<Orderable> strategy) {
         if (positions.hasNoPosition()) {
             return I.signal();
-        } else {
-            return request(positions.direction().inverse(), positions.size.v, Objects
-                    .requireNonNullElse(strategy, OrderStrategy.stop(3, ChronoUnit.SECONDS)));
         }
+
+        if (strategy == null) {
+            strategy = I.recurse((WiseConsumer<Orderable> self, Orderable s) -> {
+                if (positions.price.v.isLessThan(positions.direction(), tickers.latest.v.price)) {
+                    // loss
+                    s.makeBestPrice(positions.direction()).cancelAfter(2, ChronoUnit.SECONDS).take();
+                } else {
+                    // profit
+                    s.makeBestPrice(positions.direction().inverse()).cancelAfter(5, ChronoUnit.SECONDS).next(self);
+                }
+            });
+        }
+        return request(positions.direction().inverse(), positions.size.v, strategy);
     }
 
     /**
@@ -299,6 +310,20 @@ public class Market implements Disposable {
 
         /** The action sequence. */
         private final LinkedList<PentaConsumer<Market, Direction, Num, Order, Observer<? super Order>>> actions = new LinkedList();
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public OrderStrategy next(Consumer<Orderable> strategy) {
+            if (strategy != null) {
+                actions.add((market, direction, size, previous, orders) -> {
+                    strategy.accept(this);
+                    execute(market, direction, size, previous, orders);
+                });
+            }
+            return this;
+        }
 
         /**
          * {@inheritDoc}
@@ -386,7 +411,7 @@ public class Market implements Disposable {
          * {@inheritDoc}
          */
         @Override
-        public <S extends Takable & Makable> S cancelAfter(long time, ChronoUnit unit) {
+        public Orderable cancelAfter(long time, ChronoUnit unit) {
             return cancelWhen(I.signal(time, 0, TimeUnit.of(unit), service.scheduler()));
         }
 
@@ -394,7 +419,7 @@ public class Market implements Disposable {
          * {@inheritDoc}
          */
         @Override
-        public <S extends Takable & Makable> S cancelWhen(Signal<?> timing) {
+        public Orderable cancelWhen(Signal<?> timing) {
             actions.add((market, direction, size, previous, orders) -> {
                 if (previous != null && previous.isNotCompleted()) {
                     timing.first().to(() -> {
@@ -408,7 +433,7 @@ public class Market implements Disposable {
                     });
                 }
             });
-            return (S) this;
+            return this;
         }
 
         /**

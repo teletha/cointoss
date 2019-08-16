@@ -17,8 +17,11 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import cointoss.execution.Execution;
+import cointoss.order.OrderStrategy.Orderable;
 import cointoss.verify.VerifiableMarket;
+import kiss.I;
 import kiss.Signaling;
+import kiss.WiseConsumer;
 
 class OrderStrategyTest {
 
@@ -112,5 +115,61 @@ class OrderStrategyTest {
 
         signaling.accept("cancel");
         assert o.state == OrderState.CANCELED;
+    }
+
+    @Test
+    void next() {
+        Signaling signaling = new Signaling();
+        List<Order> orders = market.request(BUY, 1, s -> s.make(10).cancelWhen(signaling.expose).next(n -> n.make(20))).toList();
+
+        Order o = orders.get(0);
+        assert orders.size() == 1;
+        assert o.price.is(10);
+        assert o.state == OrderState.ACTIVE;
+        market.perform(Execution.with.buy(1).price(11));
+        assert o.state == OrderState.ACTIVE;
+        market.perform(Execution.with.buy(1).price(12));
+        assert o.state == OrderState.ACTIVE;
+
+        signaling.accept("cancel");
+        assert o.state == OrderState.CANCELED;
+
+        o = orders.get(1);
+        assert orders.size() == 2;
+        assert o.price.is(20);
+        assert o.state == OrderState.ACTIVE;
+        market.perform(Execution.with.buy(1).price(11));
+        assert o.state == OrderState.COMPLETED;
+    }
+
+    @Test
+    void nextRecursively() {
+        Signaling signaling = new Signaling();
+
+        WiseConsumer<Orderable> strategy = I.recurse((self, s) -> {
+            s.make(10).cancelWhen(signaling.expose).next(self);
+        });
+
+        List<Order> orders = market.request(BUY, 1, strategy).toList();
+
+        assert orders.size() == 1;
+        assert orders.get(0).state == OrderState.ACTIVE;
+        signaling.accept("cancel");
+        assert orders.get(0).state == OrderState.CANCELED;
+
+        assert orders.size() == 2;
+        assert orders.get(1).state == OrderState.ACTIVE;
+        signaling.accept("cancel");
+        assert orders.get(1).state == OrderState.CANCELED;
+
+        assert orders.size() == 3;
+        assert orders.get(2).state == OrderState.ACTIVE;
+        signaling.accept("cancel");
+        assert orders.get(2).state == OrderState.CANCELED;
+
+        assert orders.size() == 4;
+        assert orders.get(3).state == OrderState.ACTIVE;
+        signaling.accept("cancel");
+        assert orders.get(3).state == OrderState.CANCELED;
     }
 }
