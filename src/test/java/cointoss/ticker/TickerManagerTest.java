@@ -169,7 +169,7 @@ class TickerManagerTest {
 
         // validate
         manager.tickers().to(ticker -> {
-            assert ticker.first().longVolume().is(1);
+            assert ticker.first().buyVolume().is(1);
         });
 
         // update
@@ -178,12 +178,12 @@ class TickerManagerTest {
 
         // validate
         manager.tickers().take(between(Minute3, Day7)).to(ticker -> {
-            assert ticker.first().longVolume().is(3);
-            assert ticker.last().longVolume().is(3);
+            assert ticker.first().buyVolume().is(3);
+            assert ticker.last().buyVolume().is(3);
         });
         manager.tickers().take(between(Second5, Minute1)).to(ticker -> {
-            assert ticker.first().longVolume().is(1);
-            assert ticker.last().longVolume().is(1);
+            assert ticker.first().buyVolume().is(1);
+            assert ticker.last().buyVolume().is(1);
         });
 
         // update
@@ -191,10 +191,10 @@ class TickerManagerTest {
 
         // validate
         Ticker ticker = manager.of(Minute1);
-        assert ticker.ticks.get(0).longVolume().is(1);
-        assert ticker.ticks.get(1).longVolume().is(1);
-        assert ticker.ticks.get(2).longVolume().is(1);
-        assert ticker.ticks.get(3).longVolume().is(3);
+        assert ticker.ticks.get(0).buyVolume().is(1);
+        assert ticker.ticks.get(1).buyVolume().is(1);
+        assert ticker.ticks.get(2).buyVolume().is(1);
+        assert ticker.ticks.get(3).buyVolume().is(3);
     }
 
     @Test
@@ -204,7 +204,7 @@ class TickerManagerTest {
 
         // validate
         manager.tickers().to(ticker -> {
-            assert ticker.first().shortVolume().is(1);
+            assert ticker.first().sellVolume().is(1);
         });
 
         // update
@@ -213,12 +213,12 @@ class TickerManagerTest {
 
         // validate
         manager.tickers().take(between(Minute3, Day7)).to(ticker -> {
-            assert ticker.first().shortVolume().is(3);
-            assert ticker.last().shortVolume().is(3);
+            assert ticker.first().sellVolume().is(3);
+            assert ticker.last().sellVolume().is(3);
         });
         manager.tickers().take(between(Second5, Minute1)).to(ticker -> {
-            assert ticker.first().shortVolume().is(1);
-            assert ticker.last().shortVolume().is(1);
+            assert ticker.first().sellVolume().is(1);
+            assert ticker.last().sellVolume().is(1);
         });
     }
 

@@ -10,7 +10,6 @@
 package cointoss.verify;
 
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -30,12 +29,11 @@ public class BackTestInvoker {
         Thread.setDefaultUncaughtExceptionHandler((t, e) -> log.error(e.getMessage(), e));
 
         BackTest.with.service(BitFlyer.FX_BTC_JPY)
-                .start(2019, 7, 8)
-                .end(2019, 7, 8)
+                .start(2019, 8, 13)
+                .end(2019, 8, 13)
                 .initialBaseCurrency(3000000)
                 .exclusiveExecution(false)
-                .runs(market -> List
-                        .of(new Sample(market), new Sample(market), new Sample(market), new Sample(market), new Sample(market)));
+                .runs(market -> List.of(new Sample(market)));
     }
 
     /**
@@ -46,22 +44,19 @@ public class BackTestInvoker {
         private Sample(Market market) {
             super(market);
 
-            when(market.tickers.of(TickSpan.Minute5).add.skip(1), tick -> {
-                Tick prev = tick.previous;
-                Num upperBound = prev.highPrice().minus(prev.closePrice());
-                Num lowerBound = prev.closePrice().minus(prev.lowPrice());
-                Num boundRatio = lowerBound.isZero() ? upperBound : upperBound.divide(lowerBound);
-                Num boundMax = Num.max(upperBound, lowerBound);
-
-                if (boundMax.isGreaterThan(3000)) {
+            when(market.tickers.of(TickSpan.Minute1).add.skip(1), tick -> {
+                if (market.positions.hasPosition()) {
+                    System.out.println(market.positions.items);
                     return null;
                 }
 
-                return new Entry(Direction.random()) {
+                Indicator indicator = new Indicator();
+
+                return new Entry(indicator.direction) {
 
                     @Override
                     protected void entry() {
-                        entry(0.5, s -> s.make(market.tickers.latest.v.price));
+                        entry(0.1, s -> s.make(market.latestPrice()));
                     }
 
                     /**
@@ -69,18 +64,33 @@ public class BackTestInvoker {
                      */
                     @Override
                     protected void exit() {
-                        exitAt(entryPrice.minus(direction, 1000));
-                        exitAfter(5, TimeUnit.MINUTES);
-
-                        // Variable<Num> loss =
-                        // market.tickers.of(TickSpan.Second5).add.map(Tick::openPrice)
-                        // .startWith(entryPrice)
-                        // .scan(p -> p, (prev, now) -> Num.max(direction, prev, now))
-                        // .map(p -> p.minus(direction, boundMax.divide(0.7)))
-                        // .to();
+                        exitWhen(market.tickers.of(TickSpan.Second5).add.take(t -> new Indicator().direction != direction).first(), s -> {
+                            System.out.println("EXIT " + market.positions.items);
+                            s.take();
+                        });
                     }
                 };
             });
+        }
+
+        private class Indicator {
+
+            Num buyVolume = Num.ZERO;
+
+            Num sellVolume = Num.ZERO;
+
+            Direction direction;
+
+            private Indicator() {
+                Tick t = market.tickers.of(TickSpan.Second5).last();
+
+                for (int i = 10; 0 < i; i--) {
+                    buyVolume = buyVolume.plus(t.buyVolume().multiply(i));
+                    sellVolume = sellVolume.plus(t.sellVolume().multiply(i));
+                    t = t.previous;
+                }
+                direction = buyVolume.isGreaterThan(sellVolume) ? Direction.BUY : Direction.SELL;
+            }
         }
     }
 }

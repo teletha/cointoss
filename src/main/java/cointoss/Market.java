@@ -233,7 +233,7 @@ public class Market implements Disposable {
 
         if (strategy == null) {
             strategy = I.recurse((self, s) -> {
-                if (positions.price.v.isLessThan(positions.direction(), tickers.latest.v.price)) {
+                if (positions.price.v.isLessThan(positions.direction(), latestPrice())) {
                     // loss
                     s.makeBestPrice(positions.direction()).cancelAfter(2, ChronoUnit.SECONDS).take();
                 } else {

@@ -146,8 +146,8 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         this.candleLatest.widthProperty().bind(widthProperty());
         this.candleLatest.heightProperty().bind(heightProperty());
 
-        this.chartBottom.create(tick -> tick.longVolume().toDouble() * 2, ChartStyles.OrderSupportBuy);
-        this.chartBottom.create(tick -> tick.shortVolume().toDouble() * 2, ChartStyles.OrderSupportSell);
+        this.chartBottom.create(tick -> tick.buyVolume().toDouble() * 2, ChartStyles.OrderSupportBuy);
+        this.chartBottom.create(tick -> tick.sellVolume().toDouble() * 2, ChartStyles.OrderSupportSell);
         // this.chartBottom.create(tick -> tick.volume().toDouble() * 2, ChartStyles.BackGrid);
         this.chartRelative.create(tick -> chart.market.v.tickers.realtime.estimateUpPotential().toDouble() * 100, ChartStyles.PriceSFD);
 
@@ -205,8 +205,8 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 chart.selectHigh.text("H " + tick.highPrice().scale(0));
                 chart.selectLow.text("L " + tick.lowPrice().scale(0));
                 chart.selectVolume.text("V " + tick.volume().scale(3));
-                chart.selectLongVolume.text("B " + tick.longVolume().scale(3));
-                chart.selectShortVolume.text("S " + tick.shortVolume().scale(3));
+                chart.selectLongVolume.text("B " + tick.buyVolume().scale(3));
+                chart.selectShortVolume.text("S " + tick.sellVolume().scale(3));
             });
         });
 
