@@ -147,4 +147,84 @@ class EntryTest extends TraderTestSupport {
         assert e.entryExecutedSize.is(1);
         assert e.exitExecutedSize.is(1);
     }
+
+    @Test
+    void imcompletedEntryTakerWillNotStopExitTakerInExclusiveExecutionMarketService() {
+        when(now(), v -> new Entry(Direction.BUY) {
+
+            @Override
+            protected void entry() {
+                entry(1, s -> s.take());
+            }
+
+            @Override
+            protected void exit() {
+                exitWhen(now(), s -> s.take());
+            }
+        });
+
+        Entry e = latest();
+
+        market.perform(Execution.with.buy(0.5).price(15));
+        assert e.entrySize.is(1);
+        assert e.entryExecutedSize.is(0.5);
+        assert e.exitSize.is(0.5);
+        assert e.exitExecutedSize.is(0);
+
+        market.perform(Execution.with.buy(0.5).price(15));
+        assert e.entrySize.is(1);
+        assert e.entryExecutedSize.is(1);
+        assert e.exitSize.is(0.5);
+        assert e.exitExecutedSize.is(0);
+
+        market.perform(Execution.with.buy(0.5).price(15));
+        assert e.entrySize.is(1);
+        assert e.entryExecutedSize.is(1);
+        assert e.exitSize.is(1);
+        assert e.exitExecutedSize.is(0.5);
+
+        market.perform(Execution.with.buy(0.5).price(15));
+        assert e.entrySize.is(1);
+        assert e.entryExecutedSize.is(1);
+        assert e.exitSize.is(1);
+        assert e.exitExecutedSize.is(1);
+    }
+
+    @Test
+    void imcompletedEntryTakerWillNotStopExitTakerInNonExclusiveExecutionMarketService() {
+        market.service.exclusiveExecution = false;
+
+        when(now(), v -> new Entry(Direction.BUY) {
+
+            @Override
+            protected void entry() {
+                entry(1, s -> s.take());
+            }
+
+            @Override
+            protected void exit() {
+                exitWhen(now(), s -> s.take());
+            }
+        });
+
+        Entry e = latest();
+
+        market.perform(Execution.with.buy(0.5).price(15));
+        assert e.entrySize.is(1);
+        assert e.entryExecutedSize.is(0.5);
+        assert e.exitSize.is(0.5);
+        assert e.exitExecutedSize.is(0);
+
+        market.perform(Execution.with.buy(0.5).price(15));
+        assert e.entrySize.is(1);
+        assert e.entryExecutedSize.is(1);
+        assert e.exitSize.is(1);
+        assert e.exitExecutedSize.is(0.5);
+
+        market.perform(Execution.with.buy(0.5).price(15));
+        assert e.entrySize.is(1);
+        assert e.entryExecutedSize.is(1);
+        assert e.exitSize.is(1);
+        assert e.exitExecutedSize.is(1);
+    }
 }

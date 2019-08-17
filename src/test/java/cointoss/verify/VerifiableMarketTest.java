@@ -328,7 +328,7 @@ class VerifiableMarketTest {
     }
 
     @Test
-    void marketLong() {
+    void takeLong() {
         Order order = market.request(Order.with.buy(1)).to().v;
         market.perform(Execution.with.sell(1).price(10));
         assert order.price.is(10);
@@ -373,7 +373,7 @@ class VerifiableMarketTest {
     }
 
     @Test
-    void marketShort() {
+    void takeShort() {
         Order order = Order.with.sell(1);
         market.request(order).to();
         market.perform(Execution.with.sell(1).price(10));

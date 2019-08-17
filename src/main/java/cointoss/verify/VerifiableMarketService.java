@@ -144,7 +144,7 @@ public class VerifiableMarketService extends MarketService {
         BackendOrder backend = findBy(order);
 
         // associated backend order is not found, do nothing
-        if (backend == null) {
+        if (backend == null || backend.type.isTaker()) {
             return I.signal();
         }
 
@@ -327,8 +327,6 @@ public class VerifiableMarketService extends MarketService {
                         .price(order.type.isTaker() ? order.marketMinPrice : order.price)
                         .date(e.date);
                 executeds.add(exe);
-
-                System.out.println(e + "      " + orderActive);
 
                 if (order.remainingSize.isZero()) {
                     order.state = OrderState.COMPLETED;

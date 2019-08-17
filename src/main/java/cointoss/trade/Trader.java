@@ -506,6 +506,14 @@ public abstract class Trader {
             order.observeExecutedSize().to(v -> {
                 updateOrderRelatedStatus(exits, this::setExitPrice, this::setExitExecutedSize);
             });
+
+            order.observeTerminating().to(() -> {
+                Num remains = entryExecutedSize.minus(exitExecutedSize);
+
+                if (remains.isPositive()) {
+                    market.request(direction.inverse(), remains, s -> s.take()).to(this::processAddExitOrder);
+                }
+            });
         }
 
         /**
