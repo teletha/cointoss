@@ -329,47 +329,47 @@ class VerifiableMarketTest {
 
     @Test
     void marketLong() {
-        market.request(Order.with.buy(1)).to();
+        Order order = market.request(Order.with.buy(1)).to().v;
         market.perform(Execution.with.sell(1).price(10));
-        assert market.service.orders().toList().get(0).price.is(10);
-        assert market.service.orders().toList().get(0).executedSize.is(1);
+        assert order.price.is(10);
+        assert order.executedSize.is(1);
 
         // divide
-        market.request(Order.with.buy(10)).to();
+        order = market.request(Order.with.buy(10)).to().v;
         market.perform(Execution.with.buy(5).price(10));
         market.perform(Execution.with.buy(5).price(20));
-        assert market.service.orders().toList().get(1).price.is(15);
-        assert market.service.orders().toList().get(1).executedSize.is(10);
+        assert order.price.is(15);
+        assert order.executedSize.is(10);
 
         // divide overflow
-        market.request(Order.with.buy(10)).to();
+        order = market.request(Order.with.buy(10)).to().v;
         market.perform(Execution.with.buy(5).price(10));
         market.perform(Execution.with.buy(14).price(20));
-        assert market.service.orders().toList().get(2).price.is(15);
-        assert market.service.orders().toList().get(2).executedSize.is(10);
+        assert order.price.is(15);
+        assert order.executedSize.is(10);
 
         // divide underflow
-        market.request(Order.with.buy(10)).to();
+        order = market.request(Order.with.buy(10)).to().v;
         market.perform(Execution.with.buy(5).price(10));
         market.perform(Execution.with.buy(3).price(20));
-        assert market.service.orders().toList().get(3).price.is("13.75");
-        assert market.service.orders().toList().get(3).executedSize.is(8);
+        assert order.price.is("13.75");
+        assert order.executedSize.is(8);
         market.perform(Execution.with.buy(2).price(20));
-        assert market.service.orders().toList().get(3).price.is("15");
+        assert order.price.is("15");
 
         // down price
-        market.request(Order.with.buy(10)).to();
+        order = market.request(Order.with.buy(10)).to().v;
         market.perform(Execution.with.buy(5).price(10));
         market.perform(Execution.with.buy(5).price(5));
-        assert market.service.orders().toList().get(4).price.is("10");
-        assert market.service.orders().toList().get(4).executedSize.is(10);
+        assert order.price.is("10");
+        assert order.executedSize.is(10);
 
         // up price
-        market.request(Order.with.buy(10)).to();
+        order = market.request(Order.with.buy(10)).to().v;
         market.perform(Execution.with.buy(5).price(10));
         market.perform(Execution.with.buy(5).price(20));
-        assert market.service.orders().toList().get(5).price.is("15");
-        assert market.service.orders().toList().get(5).executedSize.is(10);
+        assert order.price.is("15");
+        assert order.executedSize.is(10);
     }
 
     @Test

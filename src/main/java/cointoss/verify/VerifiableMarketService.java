@@ -57,9 +57,6 @@ public class VerifiableMarketService extends MarketService {
     private final Collection<BackendOrder> orderActive = new ConcurrentLinkedDeque<>();
 
     /** The order manager. */
-    private final Collection<BackendOrder> orderAll = new ConcurrentLinkedDeque<>();
-
-    /** The order manager. */
     private final Signaling<Ⅲ<Direction, String, Execution>> positions = new Signaling();
 
     /** The execution manager. */
@@ -134,7 +131,6 @@ public class VerifiableMarketService extends MarketService {
             child.createTimeMills = nowMills + latency.lag();
             child.remainingSize = order.size;
 
-            orderAll.add(child);
             orderActive.add(child);
             return child.id;
         });
@@ -205,7 +201,7 @@ public class VerifiableMarketService extends MarketService {
      */
     @Override
     public Signal<Order> orders() {
-        return I.signal(orderAll).map(o -> {
+        return I.signal(orderActive).map(o -> {
             Order order = Order.with.direction(o.direction, o.size)
                     .price(o.price)
                     .quantityCondition(o.condition)
@@ -304,7 +300,6 @@ public class VerifiableMarketService extends MarketService {
             // check quantity condition
             if (order.condition == QuantityCondition.FillOrKill && !validateTradable(order, e)) {
                 iterator.remove();
-                orderAll.remove(order);
                 continue;
             }
 
@@ -313,7 +308,6 @@ public class VerifiableMarketService extends MarketService {
                     order.remainingSize = Num.min(e.size, order.remainingSize);
                 } else {
                     iterator.remove();
-                    orderAll.remove(order);
                     continue;
                 }
             }
@@ -334,9 +328,7 @@ public class VerifiableMarketService extends MarketService {
                         .date(e.date);
                 executeds.add(exe);
 
-                if (exe.id == 1454610 || 1454609 == exe.id || exe.id == 1454608) {
-                    System.out.println("@@@ " + validateTradableByPrice(order, e) + "   " + e + "     " + order + "  " + orderActive);
-                }
+                System.out.println(e + "      " + orderActive);
 
                 if (order.remainingSize.isZero()) {
                     order.state = OrderState.COMPLETED;
@@ -507,11 +499,11 @@ public class VerifiableMarketService extends MarketService {
          * Cancel this order actually.
          */
         private void cancel() {
-            orderActive.removeIf(o -> o.id.equals(id));
-            I.signal(orderAll).take(o -> o.id.equals(id)).take(1).to(o -> {
+            I.signal(orderActive).take(o -> o.id.equals(id)).take(1).to(o -> {
                 o.state = OrderState.CANCELED;
                 canceling.accept(front);
                 canceling.complete();
+                orderActive.remove(o);
             });
         }
 
