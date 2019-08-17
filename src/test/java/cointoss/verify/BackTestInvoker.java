@@ -46,7 +46,6 @@ public class BackTestInvoker {
 
             when(market.tickers.of(TickSpan.Minute1).add.skip(1), tick -> {
                 if (market.positions.hasPosition()) {
-                    System.out.println(market.positions.items);
                     return null;
                 }
 
@@ -56,7 +55,7 @@ public class BackTestInvoker {
 
                     @Override
                     protected void entry() {
-                        entry(0.1, s -> s.make(market.latestPrice()));
+                        entry(0.5, s -> s.take());
                     }
 
                     /**
@@ -65,7 +64,6 @@ public class BackTestInvoker {
                     @Override
                     protected void exit() {
                         exitWhen(market.tickers.of(TickSpan.Second5).add.take(t -> new Indicator().direction != direction).first(), s -> {
-                            System.out.println("EXIT " + market.positions.items);
                             s.take();
                         });
                     }

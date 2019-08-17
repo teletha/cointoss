@@ -334,6 +334,10 @@ public class VerifiableMarketService extends MarketService {
                         .date(e.date);
                 executeds.add(exe);
 
+                if (exe.id == 1454610 || 1454609 == exe.id || exe.id == 1454608) {
+                    System.out.println("@@@ " + validateTradableByPrice(order, e) + "   " + e + "     " + order + "  " + orderActive);
+                }
+
                 if (order.remainingSize.isZero()) {
                     order.state = OrderState.COMPLETED;
                     iterator.remove();

@@ -160,6 +160,7 @@ public final class PositionManager implements Directional {
                     if (position.price.is(e.price)) {
                         position.assignSize(position.size.plus(size));
                         calculate();
+                        System.out.println("   " + this.size + "  " + e + "   " + items);
                         return;
                     }
                 } else {
@@ -178,10 +179,12 @@ public final class PositionManager implements Directional {
                         positions.remove(position);
                         remove.accept(position);
                         calculate();
+                        System.out.println("   " + this.size + "  " + e + "   " + items);
                         return;
                     } else {
                         position.assignSize(remaining.negate());
                         calculate();
+                        System.out.println("   " + this.size + "  " + e + "   " + items);
                         return;
                     }
                 }
@@ -193,6 +196,7 @@ public final class PositionManager implements Directional {
                 positions.add(position);
                 addition.accept(position);
                 calculate();
+                System.out.println("   " + this.size + "  " + e + "   " + items);
             }
         }
     }
