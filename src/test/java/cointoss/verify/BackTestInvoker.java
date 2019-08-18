@@ -32,7 +32,7 @@ public class BackTestInvoker {
                 .start(2019, 8, 13)
                 .end(2019, 8, 13)
                 .initialBaseCurrency(3000000)
-                .exclusiveExecution(false)
+                .exclusiveExecution(true)
                 .runs(market -> List.of(new Sample(market)));
     }
 
@@ -50,6 +50,10 @@ public class BackTestInvoker {
                 }
 
                 Indicator indicator = new Indicator();
+
+                if (indicator.diff.isLessThan(1)) {
+                    return null;
+                }
 
                 return new Entry(indicator.direction) {
 
@@ -79,15 +83,19 @@ public class BackTestInvoker {
 
             Direction direction;
 
+            Num diff;
+
             private Indicator() {
                 Tick t = market.tickers.of(TickSpan.Second5).last();
 
-                for (int i = 10; 0 < i; i--) {
-                    buyVolume = buyVolume.plus(t.buyVolume().multiply(i));
-                    sellVolume = sellVolume.plus(t.sellVolume().multiply(i));
+                for (int i = 2; 0 < i; i--) {
+                    buyVolume = buyVolume.plus(t.buyVolume().multiply(1));
+                    sellVolume = sellVolume.plus(t.sellVolume().multiply(1));
                     t = t.previous;
                 }
                 direction = buyVolume.isGreaterThan(sellVolume) ? Direction.BUY : Direction.SELL;
+
+                diff = buyVolume.minus(sellVolume).abs();
             }
         }
     }

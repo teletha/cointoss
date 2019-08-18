@@ -5,6 +5,7 @@ import cointoss.execution.Execution;
 import cointoss.execution.ExecutionModel;
 import cointoss.util.Num;
 import java.lang.Override;
+import java.lang.String;
 import java.lang.Throwable;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -128,6 +129,9 @@ public abstract class Execution extends ExecutionModel {
     /** The final property updater. */
     private static final MethodHandle delayUpdater = updater("delay");
 
+    /** The final property updater. */
+    private static final MethodHandle infoUpdater = updater("info");
+
     /** The exposed property. */
     public final Direction direction;
 
@@ -155,6 +159,9 @@ public abstract class Execution extends ExecutionModel {
     /** The exposed property. */
     public final int delay;
 
+    /** The exposed property. */
+    public final String info;
+
     /**
      * HIDE CONSTRUCTOR
      */
@@ -168,6 +175,7 @@ public abstract class Execution extends ExecutionModel {
         this.mills = super.mills();
         this.consecutive = super.consecutive();
         this.delay = super.delay();
+        this.info = super.info();
     }
 
     /**
@@ -505,13 +513,49 @@ public abstract class Execution extends ExecutionModel {
     }
 
     /**
+     * Accessor for {@link #info}.
+     *  
+     *  @return
+     */
+    @Override
+    public final String info() {
+        return this.info;
+    }
+
+    /**
+     * Provide classic getter API.
+     *
+     * @return A value of info property.
+     */
+    @SuppressWarnings("unused")
+    private final String getInfo() {
+        return this.info;
+    }
+
+    /**
+     * Provide classic setter API.
+     *
+     * @paran value A new value of info property to assign.
+     */
+    private final void setInfo(String value) {
+        if (value == null) {
+            value = super.info();
+        }
+        try {
+            infoUpdater.invoke(this, value);
+        } catch (Throwable e) {
+            throw quiet(e);
+        }
+    }
+
+    /**
      * Generates a hash code for a sequence of property values. The hash code is generated as if all the property values were placed into an array, and that array were hashed by calling Arrays.hashCode(Object[]). 
      *
      * @return A hash value of the sequence of property values.
      */
     @Override
     public int hashCode() {
-        return Objects.hash(direction, size, id, price, accumulative, date, mills, consecutive, delay);
+        return Objects.hash(direction, size, id, price, accumulative, date, mills, consecutive, delay, info);
     }
 
     /**
@@ -535,6 +579,7 @@ public abstract class Execution extends ExecutionModel {
         if (mills != other.mills) return false;
         if (consecutive != other.consecutive) return false;
         if (delay != other.delay) return false;
+        if (!Objects.equals(info, other.info)) return false;
         return true;
     }
 
@@ -992,6 +1037,17 @@ public abstract class Execution extends ExecutionModel {
             ((Execution) this).setDelay(value);
             return (Next) this;
         }
+
+        /**
+         * Assign info property.
+         * 
+         * @param value A new value to assign.
+         * @return The next assignable model.
+         */
+        default Next info(String value) {
+            ((Execution) this).setInfo(value);
+            return (Next) this;
+        }
     }
 
     /**
@@ -1019,5 +1075,6 @@ public abstract class Execution extends ExecutionModel {
         static final String Mills = "mills";
         static final String Consecutive = "consecutive";
         static final String Delay = "delay";
+        static final String Info = "info";
     }
 }

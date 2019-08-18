@@ -254,6 +254,16 @@ public abstract class ExecutionModel implements Directional {
     }
 
     /**
+     * Accessor for {@link #info}.
+     * 
+     * @return
+     */
+    @Icy.Property
+    public String info() {
+        return null;
+    }
+
+    /**
      * Helper method to compare date and time.
      * 
      * @param time

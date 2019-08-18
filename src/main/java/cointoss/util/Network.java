@@ -12,8 +12,12 @@ package cointoss.util;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.apache.logging.log4j.LogManager;
 
 import com.github.signalr4j.client.LogLevel;
 import com.github.signalr4j.client.Logger;
@@ -39,8 +43,14 @@ import trademate.setting.Notificator;
 
 public class Network {
 
+    /** The logging system. */
+    private static final org.apache.logging.log4j.Logger log = LogManager.getLogger(Network.class);
+
     /** The timeout duration. */
     private static final long TIMEOUT = 5;
+
+    /** The proxy server. */
+    private static Proxy proxy;
 
     /** The singleton. */
     private static OkHttpClient client;
@@ -57,9 +67,21 @@ public class Network {
                     .readTimeout(TIMEOUT, SECONDS)
                     .writeTimeout(TIMEOUT, SECONDS)
                     .retryOnConnectionFailure(true)
+                    .proxy(proxy)
                     .build();
         }
         return client;
+    }
+
+    /**
+     * Use proxy server.
+     * 
+     * @param uri
+     * @param port
+     */
+    public static void proxy(String uri, int port) {
+        proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(uri, port));
+        log.info("Use proxy " + uri + ":" + port);
     }
 
     /**
@@ -176,6 +198,65 @@ public class Network {
      * Connect by websocket.
      * 
      * @param uri
+     * @param jsonCommnad
+     * @return
+     */
+    public Signal<JsonElement> websocket(String uri, Object jsonCommnad) {
+        return new Signal<JsonElement>((observer, disposer) -> {
+            JsonParser parser = new JsonParser();
+            Request request = new Request.Builder().url(uri).build();
+
+            WebSocket websocket = client().newWebSocket(request, new WebSocketListener() {
+
+                /**
+                 * {@inheritDoc}
+                 */
+                @Override
+                public void onOpen(WebSocket socket, Response response) {
+                    socket.send(I.write(jsonCommnad));
+                }
+
+                /**
+                 * {@inheritDoc}
+                 */
+                @Override
+                public void onMessage(WebSocket socket, String text) {
+                    observer.accept(parser.parse(text).getAsJsonObject());
+                }
+
+                /**
+                 * {@inheritDoc}
+                 */
+                @Override
+                public void onClosing(WebSocket socket, int code, String reason) {
+                }
+
+                /**
+                 * {@inheritDoc}
+                 */
+                @Override
+                public void onClosed(WebSocket socket, int code, String reason) {
+                }
+
+                /**
+                 * {@inheritDoc}
+                 */
+                @Override
+                public void onFailure(WebSocket socket, Throwable error, Response response) {
+                    observer.error(error);
+                }
+            });
+
+            return disposer.add(() -> {
+                websocket.close(1000, null);
+            });
+        });
+    }
+
+    /**
+     * Connect by websocket.
+     * 
+     * @param uri
      * @param channelName
      * @return
      */
@@ -241,7 +322,7 @@ public class Network {
     }
 
     /**
-     * @version 2018/04/26 21:09:09
+     * JsonRPC model.
      */
     @SuppressWarnings("unused")
     private static class JsonRPC {

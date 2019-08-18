@@ -9,7 +9,7 @@
  */
 package cointoss.execution;
 
-import static java.nio.charset.StandardCharsets.*;
+import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static java.nio.file.StandardOpenOption.*;
 import static java.util.concurrent.TimeUnit.*;
 
@@ -54,13 +54,12 @@ import com.univocity.parsers.csv.CsvWriterSettings;
 import cointoss.Direction;
 import cointoss.Market;
 import cointoss.MarketService;
-import cointoss.market.bitflyer.BitFlyer;
+import cointoss.market.bitmex.BitMex;
 import cointoss.util.Chrono;
 import cointoss.util.Network;
 import cointoss.util.Num;
 import cointoss.util.RetryPolicy;
 import cointoss.util.Span;
-import cointoss.verify.VerifiableMarket;
 import kiss.I;
 import kiss.Signal;
 import psychopath.Directory;
@@ -295,18 +294,18 @@ public class ExecutionLog {
 
             // read from REST API
             int size = service.setting.acquirableExecutionSize();
-            long start = cacheId != 0 ? cacheId : estimateInitialExecutionId();
+            long start = cacheId != 0 ? cacheId : service.estimateInitialExecutionId();
             Num coefficient = Num.ONE;
 
             while (disposer.isNotDisposed()) {
-                ArrayDeque<Execution> executions = service.executions(start, start + coefficient.multiply(size).toInt())
+                ArrayDeque<Execution> executions = service.executions(start, start + coefficient.multiply(size).toLong())
                         .retry()
                         .toCollection(new ArrayDeque(size));
 
                 int retrieved = executions.size();
 
                 if (retrieved != 0) {
-                    if (size <= retrieved) {
+                    if (size < retrieved) {
                         // Since there are too many data acquired, narrow the data range and get it
                         // again.
                         coefficient = Num.max(Num.ONE, coefficient.minus(1));
@@ -524,33 +523,6 @@ public class ExecutionLog {
     }
 
     /**
-     * Estimate the inital execution id of the {@link Market}.
-     * 
-     * @return
-     */
-    private long estimateInitialExecutionId() {
-        long start = 0;
-        long end = service.executionLatest().to().v.id;
-        long middle = (start + end) / 2;
-
-        while (true) {
-            List<Execution> result = service.executions(start, middle).skipError().toList();
-
-            if (result.isEmpty()) {
-                start = middle;
-                middle = (start + end) / 2;
-            } else {
-                end = result.get(0).id + 1;
-                middle = (start + end) / 2;
-            }
-
-            if (end - start <= 10) {
-                return start;
-            }
-        }
-    }
-
-    /**
      * @version 2018/05/27 10:31:20
      */
     class Cache {
@@ -577,6 +549,15 @@ public class ExecutionLog {
             this.date = date.toLocalDate();
             this.normal = locateLog(date);
             this.compact = locateCompactLog(date);
+        }
+
+        /**
+         * Check whether the cache file exist or not.
+         * 
+         * @return
+         */
+        private boolean exist() {
+            return normal.isPresent() || compact.isPresent();
         }
 
         /**
@@ -691,11 +672,12 @@ public class ExecutionLog {
             }
 
             // write normal log
-            try (FileChannel channel = FileChannel.open(normal.asJavaPath(), CREATE, APPEND)) {
+            try (FileChannel channel = FileChannel.open(normal.create().asJavaPath(), CREATE, APPEND)) {
                 channel.write(ByteBuffer.wrap(text.toString().getBytes(ISO_8859_1)));
 
                 log.info("Write log until " + remaining.peekLast().date + " at " + service + ".");
             } catch (IOException e) {
+                e.printStackTrace();
                 throw I.quiet(e);
             }
         }
@@ -733,18 +715,80 @@ public class ExecutionLog {
         }
     }
 
-    public static void main2(String[] args) {
-        LocalDate start = LocalDate.of(2018, 2, 1);
-        LocalDate end = LocalDate.of(2018, 2, 5);
+    public static void main3(String[] args) {
+        Network.proxy("118.27.37.20", 3128);
 
-        VerifiableMarket market = new VerifiableMarket(BitFlyer.FX_BTC_JPY);
+        ExecutionLog log = new ExecutionLog(BitMex.XBT_USD);
+        log.fetch(276877099, Chrono.utc(2019, 7, 1), Chrono.utc(2019, 7, 31));
 
-        Signal<LocalDate> range = I.signal(start).recurse(day -> day.plusDays(1)).takeUntil(day -> day.isEqual(end));
-
-        market.readLog(log -> range.flatMap(day -> log.at(day)));
-        market.readLog(log -> range.flatMap(day -> log.at(day)));
-
-        market.dispose();
         Network.terminate();
+    }
+
+    public static void main(String[] args) {
+        Network.proxy("203.188.249.150", 39705);
+
+        ExecutionLog log = new ExecutionLog(BitMex.XBT_USD);
+        log.fetch(246639999, Chrono.utc(2019, 6, 1), Chrono.utc(2019, 6, 30));
+
+        Network.terminate();
+    }
+
+    /**
+     * Helper to collect log from the specified starting point. <br>
+     * 201908 - 308219999<br>
+     * 201907 - 276877099<br>
+     * 201906 - 246639999<br>
+     * 201904 - 204569409<br>
+     * 
+     * @param startId
+     */
+    private void fetch(long startId, ZonedDateTime startDay, ZonedDateTime endDay) {
+        Cache latestCache = new Cache(startDay);
+
+        while (latestCache.exist()) {
+            startDay = startDay.plusDays(1);
+            Cache nextCache = new Cache(startDay);
+
+            if (!nextCache.exist()) {
+                startId = latestCache.read().last().to().v.id;
+                break;
+            } else {
+                latestCache = nextCache;
+            }
+        }
+
+        // read from REST API
+        int size = service.setting.acquirableExecutionSize();
+        Num coefficient = Num.ONE;
+
+        while (true) {
+            ArrayDeque<Execution> executions = service.executions(startId, startId + coefficient.multiply(size).toLong())
+                    .effectOnError(Throwable::printStackTrace)
+                    .retry()
+                    .toCollection(new ArrayDeque(size));
+
+            int retrieved = executions.size();
+
+            if (retrieved != 0) {
+                if (size < retrieved) {
+                    // Since there are too many data acquired, narrow the data range and get it
+                    // again.
+                    coefficient = Num.max(Num.ONE, coefficient.minus(1));
+                    continue;
+                } else {
+                    log.info("REST write from {}.  size {} ({})", executions.getFirst().date, executions.size(), coefficient);
+                    executions.forEach(this::cache);
+                    startId = executions.getLast().id;
+
+                    // Since the number of acquired data is too small, expand the data range
+                    // slightly from next time.
+                    if (retrieved < size * 0.1) {
+                        coefficient = coefficient.plus("0.1");
+                    }
+                }
+            } else {
+                break;
+            }
+        }
     }
 }
