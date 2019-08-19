@@ -715,16 +715,13 @@ public class ExecutionLog {
         }
     }
 
-    public static void main3(String[] args) {
-        Network.proxy("118.27.37.20", 3128);
+    public static void main(String[] args) {
+        Market market = new Market(BitMex.XBT_USD);
+        market.readLog(log -> log.fromYestaday());
 
-        ExecutionLog log = new ExecutionLog(BitMex.XBT_USD);
-        log.fetch(276877099, Chrono.utc(2019, 7, 1), Chrono.utc(2019, 7, 31));
-
-        Network.terminate();
     }
 
-    public static void main(String[] args) {
+    public static void main6(String[] args) {
         Network.proxy("203.188.249.150", 39705);
 
         ExecutionLog log = new ExecutionLog(BitMex.XBT_USD);
