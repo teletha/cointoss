@@ -43,11 +43,7 @@ public enum SFD {
     Minus20("0.80");
 
     /** The latest price of BTC. */
-    public static final Signal<Num> latestBTC = BitFlyer.BTC_JPY.executionsRealtimely()
-            .startWith(BitFlyer.BTC_JPY.executionLatest())
-            .map(Execution::price)
-            .diff()
-            .share();
+    public static final Signal<Num> latestBTC = BitFlyer.BTC_JPY.executionsRealtimely().map(Execution::price).diff().share();
 
     /** The human-readable percentage. */
     public final Num percentage;

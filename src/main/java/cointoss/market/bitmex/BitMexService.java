@@ -97,35 +97,20 @@ class BitMexService extends MarketService {
     public Signal<Execution> executionsRealtimely() {
         WebSocketCommand command = new WebSocketCommand();
         command.op = "subscribe";
-        command.args.add("trade:XBTUSD");
+        command.args.add("trade:" + marketName);
 
-        long[] ids = new long[2];
+        long start = 0;
+        AtomicInteger increment = new AtomicInteger();
+        Object[] consecutives = new Object[2];
 
         return network.websocket("wss://www.bitmex.com/realtime", command).flatMap(json -> {
             JsonArray array = json.getAsJsonObject().getAsJsonArray("data");
 
             if (array == null) {
                 return I.signal();
+            } else {
+                return I.signal(array).map(e -> convert(e, start, increment, consecutives));
             }
-
-            return I.signal(array).map(e -> {
-                JsonObject o = e.getAsJsonObject();
-                ZonedDateTime date = ZonedDateTime.parse(o.get("timestamp").getAsString(), RealTimeFormat);
-                long id = date.toInstant().toEpochMilli() * 1000;
-
-                if (id == ids[0]) {
-                    ids[1] = ids[1] + 1;
-                    id += ids[1];
-                } else {
-                    ids[0] = id;
-                    ids[1] = 0;
-                }
-
-                return Execution.with.direction(Direction.parse(o.get("side").getAsString()), o.get("homeNotional").getAsDouble())
-                        .price(o.get("price").getAsDouble())
-                        .date(date)
-                        .id(id);
-            });
         });
     }
 
@@ -143,6 +128,14 @@ class BitMexService extends MarketService {
     @Override
     public Signal<Execution> executionLatest() {
         return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isSequencialId() {
+        return false;
     }
 
     /**
@@ -212,7 +205,8 @@ class BitMexService extends MarketService {
                 .id(start + increment.getAndIncrement())
                 .price(price)
                 .date(date)
-                .consecutive(consecutive);
+                .consecutive(consecutive)
+                .info(e.get("trdMatchID").getAsString());
     }
 
     /**
@@ -237,6 +231,5 @@ class BitMexService extends MarketService {
         public String op;
 
         public List<String> args = new ArrayList();
-
     }
 }

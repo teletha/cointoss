@@ -35,7 +35,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.function.Consumer;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Function;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -61,6 +62,7 @@ import cointoss.util.Num;
 import cointoss.util.RetryPolicy;
 import cointoss.util.Span;
 import kiss.I;
+import kiss.Observer;
 import kiss.Signal;
 import psychopath.Directory;
 import psychopath.File;
@@ -180,16 +182,13 @@ public class ExecutionLog {
     /** The latest cached id. */
     private long cacheId;
 
-    /** Realtime execution observer, this value will be switched. */
-    private Consumer<Execution> realtime;
+    /** The log parser. */
+    private final ExecutionLogger logger;
 
     /** The retry policy. */
     private final RetryPolicy policy = new RetryPolicy().retryMaximum(100)
             .delayLinear(Duration.ofSeconds(1))
             .delayMaximum(Duration.ofMinutes(2));
-
-    /** The log parser. */
-    private final ExecutionLogger logger;
 
     /**
      * Create log manager.
@@ -277,20 +276,83 @@ public class ExecutionLog {
     }
 
     /**
+     * 
+     */
+    private static class Buffer implements Observer<Execution> {
+
+        private final boolean assignable;
+
+        private AtomicLong id = new AtomicLong();
+
+        private Function<Execution, Execution> assigner = Function.identity();
+
+        private ConcurrentLinkedDeque<Execution> realtime = new ConcurrentLinkedDeque();
+
+        private Observer<? super Execution> destination = realtime::add;
+
+        /**
+         * Build {@link Buffer}.
+         * 
+         * @param assignable
+         */
+        private Buffer(boolean assignable) {
+            this.assignable = assignable;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void accept(Execution e) {
+            destination.accept(assigner.apply(e));
+        }
+
+        private boolean canSwitch(Execution e) {
+            Execution first = realtime.peekFirst();
+
+            if (first == null) {
+                return false;
+            }
+
+            if (assignable) {
+                return e.info.equals(first.info);
+            } else {
+                return e.id == first.id;
+            }
+        }
+
+        private void switchToRealtime(long currentId, Observer<? super Execution> observer) {
+            log.info("Switch to Realtime Cache.");
+
+            if (assignable) {
+                id.set(currentId);
+                assigner = e -> e.assignId(id.getAndIncrement());
+            }
+
+            while (!realtime.isEmpty()) {
+                ConcurrentLinkedDeque<Execution> queue = realtime;
+                realtime = new ConcurrentLinkedDeque();
+                for (Execution e : queue) {
+                    observer.accept(assigner.apply(e));
+                }
+                log.info("Cache write from {} to {}.  size {}", queue.peek().date, queue.peekLast().date, queue.size());
+            }
+            destination = observer;
+            log.info("Switch to Realtime API.");
+        }
+    }
+
+    /**
      * Read date from merket server.
      * 
      * @return
      */
     private Signal<Execution> network() {
         return new Signal<Execution>((observer, disposer) -> {
-            ConcurrentLinkedDeque<Execution> realtimeQueue = new ConcurrentLinkedDeque();
-
-            realtime = realtimeQueue::add;
+            Buffer buffer = new Buffer(!service.isSequencialId());
 
             // read from realtime API
-            disposer.add(service.executionsRealtimely().to(e -> {
-                realtime.accept(e); // don't use method reference
-            }, observer::error));
+            disposer.add(service.executionsRealtimely().to(buffer));
 
             // read from REST API
             int size = service.setting.acquirableExecutionSize();
@@ -312,7 +374,17 @@ public class ExecutionLog {
                         continue;
                     } else {
                         log.info("REST write from {}.  size {} ({})", executions.getFirst().date, executions.size(), coefficient);
-                        executions.forEach(observer);
+
+                        for (Execution execution : executions) {
+                            if (!buffer.canSwitch(execution)) {
+                                observer.accept(execution);
+                            } else {
+                                // Because the REST API has caught up with the real-time API,
+                                // it stops the REST API.
+                                buffer.switchToRealtime(execution.id, observer);
+                                return disposer;
+                            }
+                        }
                         start = executions.getLast().id;
 
                         // Since the number of acquired data is too small, expand the data range
@@ -322,7 +394,7 @@ public class ExecutionLog {
                         }
                     }
                 } else {
-                    if (realtimeQueue.isEmpty() || start < realtimeQueue.peek().id) {
+                    if (buffer.realtime.isEmpty() || start < buffer.realtime.peek().id) {
                         // Although there is no data in the current search range,
                         // since it has not yet reached the latest execution,
                         // shift the range backward and search again.
@@ -332,20 +404,11 @@ public class ExecutionLog {
                     } else {
                         // Because the REST API has caught up with the real-time API,
                         // it stops the REST API.
-                        log.info("Switch to Realtime Cache.");
-                        while (!realtimeQueue.isEmpty()) {
-                            ConcurrentLinkedDeque<Execution> queue = realtimeQueue;
-                            realtimeQueue = new ConcurrentLinkedDeque();
-                            queue.forEach(observer);
-                            log.info("Cache write from {} to {}.  size {}", queue.peek().date, queue.peekLast().date, queue.size());
-                        }
-                        realtime = observer::accept;
-                        log.info("Switch to Realtime API.");
+                        buffer.switchToRealtime(start, observer);
                         break;
                     }
                 }
             }
-            policy.reset();
             return disposer;
         }).retryWhen(policy);
     }
@@ -721,11 +784,20 @@ public class ExecutionLog {
 
     }
 
-    public static void main6(String[] args) {
-        Network.proxy("203.188.249.150", 39705);
+    public static void main3(String[] args) {
+        Network.proxy("54.39.53.104", 3128);
 
         ExecutionLog log = new ExecutionLog(BitMex.XBT_USD);
-        log.fetch(246639999, Chrono.utc(2019, 6, 1), Chrono.utc(2019, 6, 30));
+        log.fetch(276877099, Chrono.utc(2019, 7, 1), Chrono.utc(2019, 7, 31));
+
+        Network.terminate();
+    }
+
+    public static void main7(String[] args) {
+        Network.proxy("178.128.231.246", 3128);
+
+        ExecutionLog log = new ExecutionLog(BitMex.XBT_USD);
+        log.fetch(0, Chrono.utc(2018, 1, 1), Chrono.utc(2019, 7, 31));
 
         Network.terminate();
     }

@@ -61,6 +61,8 @@ public class TradeMate extends View {
 
     /**
      * Entry point.
+     * <h4>実装予定機能</h4>
+     * <li>含み損を耐えてからプラテンしたら必ずプラスで決済させる</li>
      * 
      * @param args
      */

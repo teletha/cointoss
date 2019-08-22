@@ -121,7 +121,7 @@ public abstract class ExecutionModel implements Directional {
      * 
      * @return
      */
-    @Icy.Property
+    @Icy.Property(mutable = true)
     public long id() {
         return counter.getAndIncrement();
     }
@@ -291,6 +291,20 @@ public abstract class ExecutionModel implements Directional {
      */
     public ZonedDateTime after(long seconds) {
         return date().plusSeconds(seconds);
+    }
+
+    /**
+     * Check each equality.
+     * 
+     * @param other
+     * @return
+     */
+    public boolean equals(Execution other) {
+        if (other.info == null) {
+            return id() == other.id;
+        } else {
+            return info() == other.info;
+        }
     }
 
     /**

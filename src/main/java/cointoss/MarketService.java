@@ -16,6 +16,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Consumer;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import cointoss.execution.Execution;
 import cointoss.execution.ExecutionLog;
 import cointoss.market.MarketServiceProvider;
@@ -32,6 +35,9 @@ import kiss.Signal;
 import kiss.Ⅲ;
 
 public abstract class MarketService implements Disposable {
+
+    /** The logging system. */
+    protected static final Logger logger = LogManager.getLogger(MarketService.class);
 
     /** The exchange name. */
     public final String exchangeName;
@@ -130,6 +136,15 @@ public abstract class MarketService implements Disposable {
      * @return A latest execution log.
      */
     public abstract Signal<Execution> executionLatest();
+
+    /**
+     * This market retruns the sequencial id explicitly or not.
+     * 
+     * @return
+     */
+    public boolean isSequencialId() {
+        return true;
+    }
 
     /**
      * Estimate the inital execution id of the {@link Market}.

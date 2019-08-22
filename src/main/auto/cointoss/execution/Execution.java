@@ -15,6 +15,7 @@ import java.time.ZonedDateTime;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.LongConsumer;
+import java.util.function.LongUnaryOperator;
 import java.util.function.UnaryOperator;
 import javax.annotation.processing.Generated;
 
@@ -258,6 +259,28 @@ public abstract class Execution extends ExecutionModel {
     @Override
     public final long id() {
         return this.id;
+    }
+
+    /**
+     * Assign the new value of id property.
+     *
+     * @paran value The new id property value to assign.
+     * @return Chainable API.
+     */
+    public final Execution assignId(long value) {
+        setId(value);
+        return this;
+    }
+
+    /**
+     * Assign the new value of id property.
+     *
+     * @paran value The id property assigner which accepts the current value and returns new value.
+     * @return Chainable API.
+     */
+    public final Execution assignId(LongUnaryOperator value) {
+        setId(value.applyAsLong(this.id));
+        return this;
     }
 
     /**
