@@ -134,14 +134,6 @@ class BitMexService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public boolean isSequencialId() {
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public long estimateInitialExecutionId() {
         return 0;
     }

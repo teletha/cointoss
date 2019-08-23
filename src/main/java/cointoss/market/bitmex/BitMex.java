@@ -23,14 +23,16 @@ public final class BitMex extends MarketServiceProvider {
             .targetCurrencyMinimumBidSize(Num.of("0.01"))
             .orderBookGroupRanges(Num.of(50, 100, 250, 500, 1000, 2500, 5000))
             .targetCurrencyScaleSize(3)
-            .acquirableExecutionSize(500);
+            .acquirableExecutionSize(500)
+            .executionWithSequentialId(false);
 
     /** Reusable market configuration. */
     private static MarketSetting BTCBaseSetting = MarketSetting.with.baseCurrencyMinimumBidPrice(Num.of("0.01"))
             .targetCurrencyMinimumBidSize(Num.of("0.01"))
             .orderBookGroupRanges(Num.of(0.01, 0.02, 0.05, 0.1))
             .targetCurrencyScaleSize(6)
-            .acquirableExecutionSize(500);
+            .acquirableExecutionSize(500)
+            .executionWithSequentialId(false);
 
     /** Market */
     public static final MarketService XBT_USD = new BitMexService("XBTUSD", FiatBaseSetting);

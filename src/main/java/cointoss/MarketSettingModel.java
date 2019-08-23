@@ -100,6 +100,16 @@ public interface MarketSettingModel {
     }
 
     /**
+     * Configure {@link ExecutionLog} parser.
+     * 
+     * @return
+     */
+    @Icy.Property
+    default boolean executionWithSequentialId() {
+        return true;
+    }
+
+    /**
      * Configure {@link RetryPolicy}.
      * 
      * @return

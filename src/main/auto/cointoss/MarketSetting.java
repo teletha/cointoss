@@ -97,6 +97,9 @@ public abstract class MarketSetting implements MarketSettingModel {
     private static final MethodHandle executionLoggerUpdater = updater("executionLogger");
 
     /** The final property updater. */
+    private static final MethodHandle executionWithSequentialIdUpdater = updater("executionWithSequentialId");
+
+    /** The final property updater. */
     private static final MethodHandle retryPolicyUpdater = updater("retryPolicy");
 
     /** The exposed property. */
@@ -124,6 +127,9 @@ public abstract class MarketSetting implements MarketSettingModel {
     public final Class<? extends ExecutionLogger> executionLogger;
 
     /** The exposed property. */
+    public final boolean executionWithSequentialId;
+
+    /** The exposed property. */
     public final RetryPolicy retryPolicy;
 
     /**
@@ -138,6 +144,7 @@ public abstract class MarketSetting implements MarketSettingModel {
         this.targetCurrencyScaleSize = MarketSettingModel.super.targetCurrencyScaleSize();
         this.acquirableExecutionSize = MarketSettingModel.super.acquirableExecutionSize();
         this.executionLogger = MarketSettingModel.super.executionLogger();
+        this.executionWithSequentialId = MarketSettingModel.super.executionWithSequentialId();
         this.retryPolicy = MarketSettingModel.super.retryPolicy();
     }
 
@@ -397,6 +404,39 @@ public abstract class MarketSetting implements MarketSettingModel {
     }
 
     /**
+     * Configure {@link ExecutionLog} parser.
+     *  
+     *  @return
+     */
+    @Override
+    public final boolean executionWithSequentialId() {
+        return this.executionWithSequentialId;
+    }
+
+    /**
+     * Provide classic getter API.
+     *
+     * @return A value of executionWithSequentialId property.
+     */
+    @SuppressWarnings("unused")
+    private final boolean getExecutionWithSequentialId() {
+        return this.executionWithSequentialId;
+    }
+
+    /**
+     * Provide classic setter API.
+     *
+     * @paran value A new value of executionWithSequentialId property to assign.
+     */
+    private final void setExecutionWithSequentialId(boolean value) {
+        try {
+            executionWithSequentialIdUpdater.invoke(this, value);
+        } catch (Throwable e) {
+            throw quiet(e);
+        }
+    }
+
+    /**
      * Configure {@link RetryPolicy}.
      *  
      *  @return
@@ -448,6 +488,7 @@ public abstract class MarketSetting implements MarketSettingModel {
         builder.append("targetCurrencyScaleSize=").append(targetCurrencyScaleSize).append(", ");
         builder.append("acquirableExecutionSize=").append(acquirableExecutionSize).append(", ");
         builder.append("executionLogger=").append(executionLogger).append(", ");
+        builder.append("executionWithSequentialId=").append(executionWithSequentialId).append(", ");
         builder.append("retryPolicy=").append(retryPolicy).append("]");
         return builder.toString();
     }
@@ -459,7 +500,7 @@ public abstract class MarketSetting implements MarketSettingModel {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(baseCurrencyMinimumBidPrice, targetCurrencyMinimumBidSize, orderBookGroupRanges, targetCurrencyBidSizes, baseCurrencyScaleSize, targetCurrencyScaleSize, acquirableExecutionSize, executionLogger, retryPolicy);
+        return Objects.hash(baseCurrencyMinimumBidPrice, targetCurrencyMinimumBidSize, orderBookGroupRanges, targetCurrencyBidSizes, baseCurrencyScaleSize, targetCurrencyScaleSize, acquirableExecutionSize, executionLogger, executionWithSequentialId, retryPolicy);
     }
 
     /**
@@ -482,6 +523,7 @@ public abstract class MarketSetting implements MarketSettingModel {
         if (targetCurrencyScaleSize != other.targetCurrencyScaleSize) return false;
         if (acquirableExecutionSize != other.acquirableExecutionSize) return false;
         if (!Objects.equals(executionLogger, other.executionLogger)) return false;
+        if (executionWithSequentialId != other.executionWithSequentialId) return false;
         if (!Objects.equals(retryPolicy, other.retryPolicy)) return false;
         return true;
     }
@@ -496,7 +538,7 @@ public abstract class MarketSetting implements MarketSettingModel {
         if (this.retryPolicy == value) {
             return this;
         }
-        return with.baseCurrencyMinimumBidPrice(this.baseCurrencyMinimumBidPrice).targetCurrencyMinimumBidSize(this.targetCurrencyMinimumBidSize).orderBookGroupRanges(this.orderBookGroupRanges).targetCurrencyBidSizes(this.targetCurrencyBidSizes).baseCurrencyScaleSize(this.baseCurrencyScaleSize).targetCurrencyScaleSize(this.targetCurrencyScaleSize).acquirableExecutionSize(this.acquirableExecutionSize).executionLogger(this.executionLogger).retryPolicy(value);
+        return with.baseCurrencyMinimumBidPrice(this.baseCurrencyMinimumBidPrice).targetCurrencyMinimumBidSize(this.targetCurrencyMinimumBidSize).orderBookGroupRanges(this.orderBookGroupRanges).targetCurrencyBidSizes(this.targetCurrencyBidSizes).baseCurrencyScaleSize(this.baseCurrencyScaleSize).targetCurrencyScaleSize(this.targetCurrencyScaleSize).acquirableExecutionSize(this.acquirableExecutionSize).executionLogger(this.executionLogger).executionWithSequentialId(this.executionWithSequentialId).retryPolicy(value);
     }
 
     /** The singleton builder. */
@@ -631,6 +673,17 @@ public abstract class MarketSetting implements MarketSettingModel {
         }
 
         /**
+         * Assign executionWithSequentialId property.
+         * 
+         * @param value A new value to assign.
+         * @return The next assignable model.
+         */
+        default Next executionWithSequentialId(boolean value) {
+            ((MarketSetting) this).setExecutionWithSequentialId(value);
+            return (Next) this;
+        }
+
+        /**
          * Assign retryPolicy property.
          * 
          * @param value A new value to assign.
@@ -666,6 +719,7 @@ public abstract class MarketSetting implements MarketSettingModel {
         static final String TargetCurrencyScaleSize = "targetCurrencyScaleSize";
         static final String AcquirableExecutionSize = "acquirableExecutionSize";
         static final String ExecutionLogger = "executionLogger";
+        static final String ExecutionWithSequentialId = "executionWithSequentialId";
         static final String RetryPolicy = "retryPolicy";
     }
 }

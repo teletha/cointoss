@@ -138,15 +138,6 @@ public abstract class MarketService implements Disposable {
     public abstract Signal<Execution> executionLatest();
 
     /**
-     * This market retruns the sequencial id explicitly or not.
-     * 
-     * @return
-     */
-    public boolean isSequencialId() {
-        return true;
-    }
-
-    /**
      * Estimate the inital execution id of the {@link Market}.
      * 
      * @return

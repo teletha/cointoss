@@ -276,135 +276,70 @@ public class ExecutionLog {
     }
 
     /**
-     * 
-     */
-    private static class Buffer implements Observer<Execution> {
-
-        private final boolean assignable;
-
-        private AtomicLong id = new AtomicLong();
-
-        private Function<Execution, Execution> assigner = Function.identity();
-
-        private ConcurrentLinkedDeque<Execution> realtime = new ConcurrentLinkedDeque();
-
-        private Observer<? super Execution> destination = realtime::add;
-
-        /**
-         * Build {@link Buffer}.
-         * 
-         * @param assignable
-         */
-        private Buffer(boolean assignable) {
-            this.assignable = assignable;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void accept(Execution e) {
-            destination.accept(assigner.apply(e));
-        }
-
-        private boolean canSwitch(Execution e) {
-            Execution first = realtime.peekFirst();
-
-            if (first == null) {
-                return false;
-            }
-
-            if (assignable) {
-                return e.info.equals(first.info);
-            } else {
-                return e.id == first.id;
-            }
-        }
-
-        private void switchToRealtime(long currentId, Observer<? super Execution> observer) {
-            log.info("Switch to Realtime Cache.");
-
-            if (assignable) {
-                id.set(currentId);
-                assigner = e -> e.assignId(id.getAndIncrement());
-            }
-
-            while (!realtime.isEmpty()) {
-                ConcurrentLinkedDeque<Execution> queue = realtime;
-                realtime = new ConcurrentLinkedDeque();
-                for (Execution e : queue) {
-                    observer.accept(assigner.apply(e));
-                }
-                log.info("Cache write from {} to {}.  size {}", queue.peek().date, queue.peekLast().date, queue.size());
-            }
-            destination = observer;
-            log.info("Switch to Realtime API.");
-        }
-    }
-
-    /**
      * Read date from merket server.
      * 
      * @return
      */
     private Signal<Execution> network() {
         return new Signal<Execution>((observer, disposer) -> {
-            Buffer buffer = new Buffer(!service.isSequencialId());
+            BufferFromRestToRealtime buffer = new BufferFromRestToRealtime(service.setting.executionWithSequentialId);
 
             // read from realtime API
             disposer.add(service.executionsRealtimely().to(buffer));
 
             // read from REST API
             int size = service.setting.acquirableExecutionSize();
-            long start = cacheId != 0 ? cacheId : service.estimateInitialExecutionId();
+            long startId = cacheId != 0 ? cacheId : service.estimateInitialExecutionId();
             Num coefficient = Num.ONE;
 
             while (disposer.isNotDisposed()) {
-                ArrayDeque<Execution> executions = service.executions(start, start + coefficient.multiply(size).toLong())
+                ArrayDeque<Execution> rests = service.executions(startId, startId + coefficient.multiply(size).toLong())
                         .retry()
                         .toCollection(new ArrayDeque(size));
 
-                int retrieved = executions.size();
+                int retrieved = rests.size();
 
                 if (retrieved != 0) {
+                    // REST API returns some executions
                     if (size < retrieved) {
-                        // Since there are too many data acquired, narrow the data range and get it
-                        // again.
+                        // Since there are too many data acquired,
+                        // narrow the data range and get it again.
                         coefficient = Num.max(Num.ONE, coefficient.minus(1));
                         continue;
                     } else {
-                        log.info("REST write from {}.  size {} ({})", executions.getFirst().date, executions.size(), coefficient);
+                        log.info("REST write from {}.  size {} ({})", rests.getFirst().date, rests.size(), coefficient);
 
-                        for (Execution execution : executions) {
+                        for (Execution execution : rests) {
                             if (!buffer.canSwitch(execution)) {
                                 observer.accept(execution);
                             } else {
-                                // Because the REST API has caught up with the real-time API,
-                                // it stops the REST API.
+                                // REST API has caught up with the real-time API,
+                                // we must switch to realtime API.
                                 buffer.switchToRealtime(execution.id, observer);
                                 return disposer;
                             }
                         }
-                        start = executions.getLast().id;
+                        startId = rests.peekLast().id;
 
-                        // Since the number of acquired data is too small, expand the data range
-                        // slightly from next time.
+                        // The number of acquired data is too small,
+                        // expand the data range slightly from next time.
                         if (retrieved < size * 0.1) {
                             coefficient = coefficient.plus("0.1");
                         }
                     }
                 } else {
-                    if (buffer.realtime.isEmpty() || start < buffer.realtime.peek().id) {
+                    // REST API returns empty execution
+                    if (buffer.realtime.isEmpty() || startId < buffer.realtime.peek().id) {
                         // Although there is no data in the current search range,
                         // since it has not yet reached the latest execution,
                         // shift the range backward and search again.
-                        start += coefficient.multiply(size).toInt() - 1;
+                        startId += coefficient.multiply(size).toInt() - 1;
                         coefficient = coefficient.plus("0.1");
                         continue;
                     } else {
-                        // Because the REST API has caught up with the real-time API,
-                        // it stops the REST API.
-                        buffer.switchToRealtime(start, observer);
+                        // REST API has caught up with the real-time API,
+                        // we must switch to realtime API.
+                        buffer.switchToRealtime(startId, observer);
                         break;
                     }
                 }
@@ -778,6 +713,86 @@ public class ExecutionLog {
         }
     }
 
+    /**
+     * 
+     */
+    private class BufferFromRestToRealtime implements Observer<Execution> {
+
+        /** The flag whether execution record holds the sequential id or not. */
+        private final boolean sequntial;
+
+        /** The locally managed sequential id. */
+        private final AtomicLong id = new AtomicLong();
+
+        /** The id rewriter. (default is not rewritable) */
+        private Function<Execution, Execution> rewriter = Function.identity();
+
+        /** The actual realtime execution buffer. */
+        private ConcurrentLinkedDeque<Execution> realtime = new ConcurrentLinkedDeque();
+
+        /** The execution event receiver. */
+        private Observer<? super Execution> destination = realtime::add;
+
+        /**
+         * Build {@link BufferFromRestToRealtime}.
+         * 
+         * @param sequntial
+         */
+        private BufferFromRestToRealtime(boolean sequntial) {
+            this.sequntial = sequntial;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void accept(Execution e) {
+            destination.accept(rewriter.apply(e));
+        }
+
+        /**
+         * Test whether the specified execution is queued in realtime buffer or not.
+         * 
+         * @param e An execution which is retrieved by REST API.
+         * @return
+         */
+        private boolean canSwitch(Execution e) {
+            Execution first = realtime.peekFirst();
+
+            // realtime buffer is empty
+            if (first == null) {
+                return false;
+            }
+            return sequntial ? e.id == first.id : e.info.equals(first.info);
+        }
+
+        /**
+         * Switch to realtime API.
+         * 
+         * @param currentId
+         * @param observer
+         */
+        private void switchToRealtime(long currentId, Observer<? super Execution> observer) {
+            log.info(service.marketIdentity() + " switch to Realtime API.");
+
+            if (!sequntial) {
+                id.set(currentId);
+                rewriter = e -> e.assignId(id.getAndIncrement());
+            }
+
+            while (!realtime.isEmpty()) {
+                ConcurrentLinkedDeque<Execution> buffer = realtime;
+                realtime = new ConcurrentLinkedDeque();
+                for (Execution e : buffer) {
+                    observer.accept(rewriter.apply(e));
+                }
+                log.info("Realtime buffer write from {} to {}.  size {}", buffer.peek().date, buffer.peekLast().date, buffer.size());
+            }
+            destination = observer;
+            policy.reset();
+        }
+    }
+
     public static void main(String[] args) {
         Market market = new Market(BitMex.XBT_USD);
         market.readLog(log -> log.fromYestaday());
@@ -788,7 +803,7 @@ public class ExecutionLog {
         Network.proxy("54.39.53.104", 3128);
 
         ExecutionLog log = new ExecutionLog(BitMex.XBT_USD);
-        log.fetch(276877099, Chrono.utc(2019, 7, 1), Chrono.utc(2019, 7, 31));
+        log.fetch(204569409, Chrono.utc(2019, 4, 1), Chrono.utc(2019, 5, 31));
 
         Network.terminate();
     }
