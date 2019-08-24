@@ -36,6 +36,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.apache.logging.log4j.LogManager;
@@ -282,7 +283,7 @@ public class ExecutionLog {
      */
     private Signal<Execution> network() {
         return new Signal<Execution>((observer, disposer) -> {
-            BufferFromRestToRealtime buffer = new BufferFromRestToRealtime(service.setting.executionWithSequentialId);
+            BufferFromRestToRealtime buffer = new BufferFromRestToRealtime(service.setting.executionWithSequentialId, observer::error);
 
             // read from realtime API
             disposer.add(service.executionsRealtimely().to(buffer));
@@ -721,6 +722,9 @@ public class ExecutionLog {
         /** The flag whether execution record holds the sequential id or not. */
         private final boolean sequntial;
 
+        /** The upper error handler. */
+        private final Consumer<? super Throwable> error;
+
         /** The locally managed sequential id. */
         private final AtomicLong id = new AtomicLong();
 
@@ -738,8 +742,9 @@ public class ExecutionLog {
          * 
          * @param sequntial
          */
-        private BufferFromRestToRealtime(boolean sequntial) {
+        private BufferFromRestToRealtime(boolean sequntial, Consumer<? super Throwable> error) {
             this.sequntial = sequntial;
+            this.error = error;
         }
 
         /**
@@ -748,6 +753,14 @@ public class ExecutionLog {
         @Override
         public void accept(Execution e) {
             destination.accept(rewriter.apply(e));
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void error(Throwable e) {
+            error.accept(e);
         }
 
         /**

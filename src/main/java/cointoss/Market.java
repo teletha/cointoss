@@ -425,7 +425,7 @@ public class Market implements Disposable {
                     timing.first().to(() -> {
                         if (previous.isNotCompleted()) {
                             market.orders.cancel(previous).to(() -> {
-                                if (previous.isNotCompleted()) {
+                                if (previous.isCanceled()) {
                                     execute(market, direction, previous.remainingSize, null, orders);
                                 }
                             });
