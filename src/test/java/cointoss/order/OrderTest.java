@@ -192,4 +192,34 @@ public class OrderTest {
         Assertions.assertIterableEquals(executedInUpdatingRemaining, List.of(Num.of(1), Num.of(2), Num.of(3)));
         Assertions.assertIterableEquals(remainingInUpdatingExecuted, List.of(Num.of(2), Num.of(1), Num.of(0)));
     }
+
+    @Test
+    void stateTransitionCompleted() {
+        Order o = Order.with.buy(1);
+        assert o.state == OrderState.INIT;
+
+        o.assignState(OrderState.REQUESTING);
+        assert o.state == OrderState.REQUESTING;
+
+        o.assignState(OrderState.COMPLETED);
+        assert o.state == OrderState.COMPLETED;
+
+        o.assignState(OrderState.ACTIVE);
+        assert o.state == OrderState.COMPLETED;
+    }
+
+    @Test
+    void stateTransitionCancelled() {
+        Order o = Order.with.buy(1);
+        assert o.state == OrderState.INIT;
+
+        o.assignState(OrderState.REQUESTING);
+        assert o.state == OrderState.REQUESTING;
+
+        o.assignState(OrderState.CANCELED);
+        assert o.state == OrderState.CANCELED;
+
+        o.assignState(OrderState.ACTIVE);
+        assert o.state == OrderState.CANCELED;
+    }
 }

@@ -126,19 +126,23 @@ public final class OrderManager {
      * @see #requestNow(Order)
      */
     public Signal<Order> request(Order order) {
-        order.assignState(REQUESTING);
-        addition.accept(order);
+        if (order.state == OrderState.INIT || order.state == OrderState.REQUESTING) {
+            order.assignState(REQUESTING);
+            addition.accept(order);
 
-        return service.request(order, order::assignState).retryWhen(service.setting.retryPolicy()).map(id -> {
-            order.assignState(ACTIVE);
-            order.assignId(id);
-            order.assignCreationTime(service.now());
-            order.observeTerminating().to(remove::accept);
+            return service.request(order, order::assignState).retryWhen(service.setting.retryPolicy()).map(id -> {
+                order.assignState(ACTIVE);
+                order.assignId(id);
+                order.assignCreationTime(service.now());
+                order.observeTerminating().to(remove::accept);
 
-            return order;
-        }).effectOnError(e -> {
-            order.assignState(CANCELED);
-        });
+                return order;
+            }).effectOnError(e -> {
+                order.assignState(CANCELED);
+            });
+        } else {
+            return I.signal(order);
+        }
     }
 
     /**

@@ -307,6 +307,19 @@ public abstract class OrderModel implements Directional, Comparable<OrderModel> 
         return OrderState.INIT;
     }
 
+    @Icy.Intercept("state")
+    private OrderState validateState(OrderState state) {
+        OrderState current = state();
+
+        switch (current) {
+        case CANCELED:
+        case COMPLETED:
+            return current;
+        default:
+            return state;
+        }
+    }
+
     public abstract Signal<OrderState> observeState();
 
     /**

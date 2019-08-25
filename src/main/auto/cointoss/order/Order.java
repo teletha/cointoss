@@ -73,6 +73,9 @@ public abstract class Order extends OrderModel {
     /** The overload or intercept method invoker. */
     private static final MethodHandle price$1654949385= invoker("price", Num.class, Consumer.class);
 
+    /** The overload or intercept method invoker. */
+    private static final MethodHandle validateState$41283920= invoker("validateState", OrderState.class);
+
     /**
      * Create special property updater.
      *
@@ -713,7 +716,7 @@ public abstract class Order extends OrderModel {
             value = super.state();
         }
         try {
-            stateUpdater.invoke(this, value);
+            stateUpdater.invoke(this, validateState$41283920.invoke(this, value));
             stateCustomizer.accept(this.state);
         } catch (Throwable e) {
             throw quiet(e);
