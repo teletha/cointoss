@@ -93,7 +93,7 @@ public class OrderCatalog extends View {
                 .modelByVar(Order.class, o -> o.observeCreationTimeNow().to())
                 .render((ui, item) -> ui.text(formatter.format(item)));
         side.header(SiDe).model(Order.class, Order::direction).render((ui, side) -> ui.text(side).styleOnly(TradeMateStyle.Side.of(side)));
-        amount.header(Amount).model(Order.class, o -> o.remainingSize);
+        amount.header(Amount).modelByVar(Order.class, o -> o.observeRemainingSizeNow().to());
         price.header(Price).model(Order.class, o -> o.price);
 
         // initialize orders on server
