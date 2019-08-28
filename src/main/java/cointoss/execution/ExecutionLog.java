@@ -812,11 +812,11 @@ public class ExecutionLog {
 
     }
 
-    public static void main3(String[] args) {
+    public static void main2(String[] args) {
         Network.proxy("54.39.53.104", 3128);
 
         ExecutionLog log = new ExecutionLog(BitMex.XBT_USD);
-        log.fetch(204569409, Chrono.utc(2019, 4, 1), Chrono.utc(2019, 5, 31));
+        log.fetch(177063809, Chrono.utc(2019, 1, 1), Chrono.utc(2019, 3, 31));
 
         Network.terminate();
     }

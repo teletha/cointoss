@@ -165,16 +165,6 @@ public abstract class MarketService implements Disposable {
     }
 
     /**
-     * Acquire the execution sequential key (default is {@link Execution#id}).
-     * 
-     * @param execution A target execution.
-     * @return
-     */
-    protected long executionKey(Execution execution) {
-        return execution.id;
-    }
-
-    /**
      * Return {@link ExecutionLog} of this market.
      * 
      * @return
