@@ -108,7 +108,7 @@ class BitFlyerService extends MarketService {
     private final Signal<List<Order>> intervalOrderCheck;
 
     /** The shared order manager. */
-    private final Set<List<Execution>> manaementBuffer = ConcurrentHashMap.newKeySet();
+    private final Set<List<Execution>> identifiersWhileOrderRequesting = ConcurrentHashMap.newKeySet();
 
     /** The session key. */
     private final String sessionKey = "api_session_v2";
@@ -154,8 +154,8 @@ class BitFlyerService extends MarketService {
         //
         // Record all execution history from ordering to response, and check if there is already an
         // execution record at response.
-        List<Execution> identifiers = new LinkedList();
-        manaementBuffer.add(identifiers);
+        List<Execution> identifiers = new LinkedContainer();
+        identifiersWhileOrderRequesting.add(identifiers);
 
         if (forTest || maintainer.session() == null) {
             ChildOrderRequest request = new ChildOrderRequest();
@@ -192,7 +192,7 @@ class BitFlyerService extends MarketService {
             // Since ID registration has been completed, it is possible to detect contracts from the
             // real-time API. Check if there is an order in the execution history recorded after
             // placing the order.
-            manaementBuffer.remove(identifiers);
+            identifiersWhileOrderRequesting.remove(identifiers);
             for (Execution buffered : identifiers) {
                 if (buffered.info.equals(v)) {
                     executionsForMe.accept(I.pair(Direction.BUY, v, buffered));
@@ -211,6 +211,8 @@ class BitFlyerService extends MarketService {
                         order.relation(Internals.class).id = o.relation(Internals.class).id;
 
                     });
+        }).effectOnTerminate(() -> {
+
         });
     }
 
@@ -282,8 +284,8 @@ class BitFlyerService extends MarketService {
                         executionsForMe.accept(I.pair(Direction.BUY, buyer, exe));
                     } else if (orders.contains(seller)) {
                         executionsForMe.accept(I.pair(Direction.SELL, seller, exe));
-                    } else if (!manaementBuffer.isEmpty()) {
-                        for (List<Execution> list : manaementBuffer) {
+                    } else if (!identifiersWhileOrderRequesting.isEmpty()) {
+                        for (List<Execution> list : identifiersWhileOrderRequesting) {
                             list.add(exe);
                         }
                     }
@@ -853,5 +855,28 @@ class BitFlyerService extends MarketService {
     private static class Internals {
 
         private String id;
+    }
+
+    /**
+     * 
+     */
+    @SuppressWarnings("serial")
+    private static class LinkedContainer extends LinkedList<Execution> {
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean equals(Object o) {
+            return this == o;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public int hashCode() {
+            return System.identityHashCode(this);
+        }
     }
 }
