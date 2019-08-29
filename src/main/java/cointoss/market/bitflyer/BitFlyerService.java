@@ -18,6 +18,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -106,6 +107,9 @@ class BitFlyerService extends MarketService {
     /** The shared order list. */
     private final Signal<List<Order>> intervalOrderCheck;
 
+    /** The shared order manager. */
+    private final Set<List<Execution>> manaementBuffer = ConcurrentHashMap.newKeySet();
+
     /** The session key. */
     private final String sessionKey = "api_session_v2";
 
@@ -145,6 +149,14 @@ class BitFlyerService extends MarketService {
         Signal<String> call;
         String id = "JRF" + Chrono.utcNow().format(format) + RandomStringUtils.randomNumeric(6);
 
+        // If the execution history comes to the real-time API before response, the order cannot be
+        // identified from the real-time API.
+        //
+        // Record all execution history from ordering to response, and check if there is already an
+        // execution record at response.
+        List<Execution> identifiers = new LinkedList();
+        manaementBuffer.add(identifiers);
+
         if (forTest || maintainer.session() == null) {
             ChildOrderRequest request = new ChildOrderRequest();
             request.child_order_type = order.type == OrderType.Maker ? "LIMIT" : "MARKET";
@@ -177,6 +189,18 @@ class BitFlyerService extends MarketService {
             orders.add(v);
             order.observeTerminating().to(() -> orders.remove(v));
 
+            // Since ID registration has been completed, it is possible to detect contracts from the
+            // real-time API. Check if there is an order in the execution history recorded after
+            // placing the order.
+            manaementBuffer.remove(identifiers);
+            for (Execution buffered : identifiers) {
+                if (buffered.info.equals(v)) {
+                    executionsForMe.accept(I.pair(Direction.BUY, v, buffered));
+                } else if (buffered.detail.equals(v)) {
+                    executionsForMe.accept(I.pair(Direction.SELL, v, buffered));
+                }
+            }
+
             // check order state
             intervalOrderCheck.takeUntil(order.observeTerminating())
                     .map(orders -> orders.get(orders.indexOf(order)))
@@ -185,6 +209,7 @@ class BitFlyerService extends MarketService {
                     .to(o -> {
                         state.accept(ACTIVE);
                         order.relation(Internals.class).id = o.relation(Internals.class).id;
+
                     });
         });
     }
@@ -249,12 +274,18 @@ class BitFlyerService extends MarketService {
                             .price(price)
                             .date(date)
                             .consecutive(consecutiveType)
-                            .delay(delay);
+                            .delay(delay)
+                            .info(buyer)
+                            .detail(seller);
 
                     if (orders.contains(buyer)) {
                         executionsForMe.accept(I.pair(Direction.BUY, buyer, exe));
                     } else if (orders.contains(seller)) {
                         executionsForMe.accept(I.pair(Direction.SELL, seller, exe));
+                    } else if (!manaementBuffer.isEmpty()) {
+                        for (List<Execution> list : manaementBuffer) {
+                            list.add(exe);
+                        }
                     }
 
                     previous[0] = buyer;

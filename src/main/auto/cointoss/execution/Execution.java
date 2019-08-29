@@ -133,6 +133,9 @@ public abstract class Execution extends ExecutionModel {
     /** The final property updater. */
     private static final MethodHandle infoUpdater = updater("info");
 
+    /** The final property updater. */
+    private static final MethodHandle detailUpdater = updater("detail");
+
     /** The exposed property. */
     public final Direction direction;
 
@@ -163,6 +166,9 @@ public abstract class Execution extends ExecutionModel {
     /** The exposed property. */
     public final String info;
 
+    /** The exposed property. */
+    public final String detail;
+
     /**
      * HIDE CONSTRUCTOR
      */
@@ -177,6 +183,7 @@ public abstract class Execution extends ExecutionModel {
         this.consecutive = super.consecutive();
         this.delay = super.delay();
         this.info = super.info();
+        this.detail = super.detail();
     }
 
     /**
@@ -572,13 +579,49 @@ public abstract class Execution extends ExecutionModel {
     }
 
     /**
+     * Accessor for {@link #detail}.
+     *  
+     *  @return
+     */
+    @Override
+    public final String detail() {
+        return this.detail;
+    }
+
+    /**
+     * Provide classic getter API.
+     *
+     * @return A value of detail property.
+     */
+    @SuppressWarnings("unused")
+    private final String getDetail() {
+        return this.detail;
+    }
+
+    /**
+     * Provide classic setter API.
+     *
+     * @paran value A new value of detail property to assign.
+     */
+    private final void setDetail(String value) {
+        if (value == null) {
+            value = super.detail();
+        }
+        try {
+            detailUpdater.invoke(this, value);
+        } catch (Throwable e) {
+            throw quiet(e);
+        }
+    }
+
+    /**
      * Generates a hash code for a sequence of property values. The hash code is generated as if all the property values were placed into an array, and that array were hashed by calling Arrays.hashCode(Object[]). 
      *
      * @return A hash value of the sequence of property values.
      */
     @Override
     public int hashCode() {
-        return Objects.hash(direction, size, id, price, accumulative, date, mills, consecutive, delay, info);
+        return Objects.hash(direction, size, id, price, accumulative, date, mills, consecutive, delay, info, detail);
     }
 
     /**
@@ -603,6 +646,7 @@ public abstract class Execution extends ExecutionModel {
         if (consecutive != other.consecutive) return false;
         if (delay != other.delay) return false;
         if (!Objects.equals(info, other.info)) return false;
+        if (!Objects.equals(detail, other.detail)) return false;
         return true;
     }
 
@@ -1071,6 +1115,17 @@ public abstract class Execution extends ExecutionModel {
             ((Execution) this).setInfo(value);
             return (Next) this;
         }
+
+        /**
+         * Assign detail property.
+         * 
+         * @param value A new value to assign.
+         * @return The next assignable model.
+         */
+        default Next detail(String value) {
+            ((Execution) this).setDetail(value);
+            return (Next) this;
+        }
     }
 
     /**
@@ -1099,5 +1154,6 @@ public abstract class Execution extends ExecutionModel {
         static final String Consecutive = "consecutive";
         static final String Delay = "delay";
         static final String Info = "info";
+        static final String Detail = "detail";
     }
 }
