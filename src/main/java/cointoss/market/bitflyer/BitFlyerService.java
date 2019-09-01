@@ -130,7 +130,11 @@ class BitFlyerService extends MarketService {
         super("BitFlyer", type, setting);
 
         this.forTest = forTest;
-        this.intervalOrderCheck = I.signal(0, 1, TimeUnit.SECONDS).map(v -> orders().toList()).share();
+        this.intervalOrderCheck = I.signal(0, 1, TimeUnit.SECONDS)
+                .map(v -> call("GET", "/v1/me/getchildorders?count=500&product_code=" + marketName, "", "*", ChildOrderResponse.class)
+                        .map(ChildOrderResponse::toOrder)
+                        .toList())
+                .share();
     }
 
     /**
@@ -211,8 +215,6 @@ class BitFlyerService extends MarketService {
                         order.relation(Internals.class).id = o.relation(Internals.class).id;
 
                     });
-        }).effectOnTerminate(() -> {
-
         });
     }
 
@@ -230,7 +232,25 @@ class BitFlyerService extends MarketService {
         Signal requestCancel = forTest || maintainer.session() == null || cancel.order_id == null
                 ? call("POST", "/v1/me/cancelchildorder", cancel, null, null)
                 : call("POST", "https://lightning.bitflyer.jp/api/trade/cancelorder", cancel, null, WebResponse.class);
-        Signal<List<Order>> isCanceled = intervalOrderCheck.take(orders -> !orders.contains(order));
+        Signal<List<Order>> isCanceled = intervalOrderCheck.take(orders -> {
+            int index = orders.indexOf(order);
+
+            if (index == -1) {
+                return true; // fully canceled
+            }
+
+            Order original = orders.get(index);
+
+            switch (original.state) {
+            case COMPLETED: // completed
+            case CANCELED: // partially completed and remaings canceled
+                order.terminated(original.state, original.remainingSize, original.executedSize);
+                return true;
+
+            default:
+                return false; // order is still active
+            }
+        });
 
         return requestCancel.combine(isCanceled).take(1).mapTo(order);
     }

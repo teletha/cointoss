@@ -260,11 +260,35 @@ public abstract class OrderModel implements Directional, Comparable<OrderModel> 
      */
     final void executed(Execution e) {
         executions.add(e);
-        setRemainingSize(remainingSize().minus(e.size));
-        setExecutedSize(executedSize().plus(e.size));
 
-        remainingSize.accept(remainingSize());
-        executedSize.accept(executedSize());
+        if (isNotCompleted()) {
+            setRemainingSize(remainingSize().minus(e.size));
+            setExecutedSize(executedSize().plus(e.size));
+
+            remainingSize.accept(remainingSize());
+            executedSize.accept(executedSize());
+        }
+    }
+
+    /**
+     * Complete or cancel this order with the specified remaining and executed size.
+     * 
+     * @param completeOrCancel
+     * @param remainingSize
+     * @param executedSize
+     */
+    public final void terminated(OrderState completeOrCancel, Num remaining, Num executed) {
+        switch (completeOrCancel) {
+        case COMPLETED:
+        case CANCELED:
+            setRemainingSize(remaining);
+            setExecutedSize(executed);
+            setState(completeOrCancel);
+
+            remainingSize.accept(remaining);
+            executedSize.accept(executed);
+            break;
+        }
     }
 
     /**
@@ -302,10 +326,17 @@ public abstract class OrderModel implements Directional, Comparable<OrderModel> 
      * 
      * @return
      */
-    @Icy.Property(custom = ObservableProperty.class, mutable = true)
+    @Icy.Property(custom = ObservableProperty.class, mutable = true, setterModifier = "final")
     public OrderState state() {
         return OrderState.INIT;
     }
+
+    /**
+     * Expose setter to update size atomically.
+     * 
+     * @param size
+     */
+    abstract void setState(OrderState size);
 
     @Icy.Intercept("state")
     private OrderState validateState(OrderState state) {

@@ -711,7 +711,7 @@ public abstract class Order extends OrderModel {
      *
      * @paran value A new value of state property to assign.
      */
-    private final void setState(OrderState value) {
+    final void setState(OrderState value) {
         if (value == null) {
             value = super.state();
         }
