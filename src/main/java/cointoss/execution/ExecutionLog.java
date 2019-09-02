@@ -806,7 +806,7 @@ public class ExecutionLog {
         }
     }
 
-    public static void main3(String[] args) {
+    public static void main2(String[] args) {
         Market market = new Market(BitMex.XBT_USD);
         market.readLog(log -> log.fromYestaday());
 
@@ -816,13 +816,13 @@ public class ExecutionLog {
         Network.proxy("54.39.53.104", 3128);
 
         ExecutionLog log = new ExecutionLog(BitMex.XBT_USD);
-        log.fetch(115364009, Chrono.utc(2018, 9, 1), Chrono.utc(2018, 12, 31));
+        log.fetch(100, Chrono.utc(2018, 1, 1), Chrono.utc(2019, 1, 31));
 
         Network.terminate();
     }
 
     public static void main7(String[] args) {
-        Network.proxy("178.128.231.246", 3128);
+        Network.proxy("54.39.53.104", 3128);
 
         ExecutionLog log = new ExecutionLog(BitMex.XBT_USD);
         log.fetch(0, Chrono.utc(2018, 1, 1), Chrono.utc(2019, 7, 31));
