@@ -277,7 +277,7 @@ public abstract class OrderModel implements Directional, Comparable<OrderModel> 
      * @param remainingSize
      * @param executedSize
      */
-    public final void terminated(OrderState completeOrCancel, Num remaining, Num executed) {
+    final void terminated(OrderState completeOrCancel, Num remaining, Num executed) {
         switch (completeOrCancel) {
         case COMPLETED:
         case CANCELED:

@@ -43,6 +43,7 @@ import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
 import kiss.Signaling;
+import kiss.Ⅱ;
 import kiss.Ⅲ;
 
 public class VerifiableMarketService extends MarketService {
@@ -140,7 +141,7 @@ public class VerifiableMarketService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Order> cancel(Order order) {
+    public Signal<Ⅱ<OrderState, Num>> cancel(Order order) {
         BackendOrder backend = findBy(order);
 
         // associated backend order is not found, do nothing
@@ -153,13 +154,13 @@ public class VerifiableMarketService extends MarketService {
 
         if (delay == now) {
             backend.cancel();
-            return I.signal(order);
+            return I.signal(I.pair(OrderState.CANCELED, backend.remainingSize));
         }
 
         // backend order will be canceled in the specified delay
         backend.cancelTimeMills = Chrono.epochMills(delay);
 
-        return backend.canceling.expose;
+        return backend.canceling.expose.map(o -> I.pair(OrderState.CANCELED, backend.remainingSize));
     }
 
     /**

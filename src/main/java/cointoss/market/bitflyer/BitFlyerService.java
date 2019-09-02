@@ -52,6 +52,7 @@ import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
 import kiss.Signaling;
+import kiss.Ⅱ;
 import kiss.Ⅲ;
 import marionette.browser.Browser;
 import okhttp3.MediaType;
@@ -222,21 +223,21 @@ class BitFlyerService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Order> cancel(Order order) {
+    public Signal<Ⅱ<OrderState, Num>> cancel(Order order) {
         CancelRequest cancel = new CancelRequest();
         cancel.product_code = marketName;
         cancel.account_id = account.accountId.v;
         cancel.order_id = order.relation(Internals.class).id;
         cancel.child_order_acceptance_id = order.id;
 
-        Signal requestCancel = forTest || maintainer.session() == null || cancel.order_id == null
+        Signal<?> requestCancel = forTest || maintainer.session() == null || cancel.order_id == null
                 ? call("POST", "/v1/me/cancelchildorder", cancel, null, null)
                 : call("POST", "https://lightning.bitflyer.jp/api/trade/cancelorder", cancel, null, WebResponse.class);
-        Signal<List<Order>> isCanceled = intervalOrderCheck.take(orders -> {
+        Signal<Ⅱ<OrderState, Num>> isCanceled = intervalOrderCheck.flatMap(orders -> {
             int index = orders.indexOf(order);
 
             if (index == -1) {
-                return true; // fully canceled
+                return I.signal(I.pair(OrderState.CANCELED, Num.ZERO)); // fully canceled
             }
 
             Order original = orders.get(index);
@@ -244,15 +245,14 @@ class BitFlyerService extends MarketService {
             switch (original.state) {
             case COMPLETED: // completed
             case CANCELED: // partially completed and remaings canceled
-                order.terminated(original.state, original.remainingSize, original.executedSize);
-                return true;
+                return I.signal(I.pair(original.state, original.remainingSize));
 
             default:
-                return false; // order is still active
+                return I.signal(); // order is still active
             }
         });
 
-        return requestCancel.combine(isCanceled).take(1).mapTo(order);
+        return requestCancel.combine(isCanceled).take(1).map(e -> e.ⅱ);
     }
 
     /**

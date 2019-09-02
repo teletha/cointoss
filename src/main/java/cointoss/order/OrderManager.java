@@ -173,11 +173,12 @@ public final class OrderManager {
             order.assignState(REQUESTING);
 
             return service.cancel(order).retryWhen(service.setting.retryPolicy()).effect(o -> {
-                managed.remove(o);
-                o.assignState(CANCELED);
+                managed.remove(order);
+                order.setRemainingSize(o.ⅱ);
+                order.assignState(CANCELED);
             }).effectOnError(e -> {
                 order.assignState(previous);
-            });
+            }).mapTo(order);
         } else {
             return I.signal(order);
         }
