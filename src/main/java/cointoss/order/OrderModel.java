@@ -214,17 +214,27 @@ public abstract class OrderModel implements Directional, Comparable<OrderModel> 
      * 
      * @return
      */
-    @Icy.Property(setterModifier = "final")
+    @Icy.Property
     public Num executedSize() {
         return Num.ZERO;
     }
 
     /**
-     * Expose setter to update size atomically.
+     * Calculate the executed size from the remaining size automatically.
      * 
-     * @param size
+     * @param remainings
+     * @param executedSize
+     * @return
      */
-    abstract void setExecutedSize(Num size);
+    @Icy.Intercept("remainingSize")
+    private Num calculateExecutedSize(Num remainings, Consumer<Num> executedSize) {
+        if (size() == null) {
+            executedSize.accept(Num.ZERO);
+        } else {
+            executedSize.accept(size().minus(remainings));
+        }
+        return remainings;
+    }
 
     /**
      * Observe executed size modification.
@@ -263,7 +273,6 @@ public abstract class OrderModel implements Directional, Comparable<OrderModel> 
 
         if (isNotCompleted()) {
             setRemainingSize(remainingSize().minus(e.size));
-            setExecutedSize(executedSize().plus(e.size));
 
             remainingSize.accept(remainingSize());
             executedSize.accept(executedSize());
@@ -282,7 +291,6 @@ public abstract class OrderModel implements Directional, Comparable<OrderModel> 
         case COMPLETED:
         case CANCELED:
             setRemainingSize(remaining);
-            setExecutedSize(executed);
             setState(completeOrCancel);
 
             remainingSize.accept(remaining);

@@ -172,10 +172,10 @@ public final class OrderManager {
             OrderState previous = order.state;
             order.assignState(REQUESTING);
 
-            return service.cancel(order).retryWhen(service.setting.retryPolicy()).effect(o -> {
+            return service.cancel(order).retryWhen(service.setting.retryPolicy()).effect(result -> {
                 managed.remove(order);
-                order.setRemainingSize(o.ⅱ);
-                order.assignState(CANCELED);
+                order.setRemainingSize(result.ⅱ);
+                order.assignState(result.ⅰ);
             }).effectOnError(e -> {
                 order.assignState(previous);
             }).mapTo(order);

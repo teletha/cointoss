@@ -237,22 +237,22 @@ class BitFlyerService extends MarketService {
             int index = orders.indexOf(order);
 
             if (index == -1) {
-                return I.signal(I.pair(OrderState.CANCELED, Num.ZERO)); // fully canceled
+                return I.signal(I.pair(OrderState.CANCELED, order.remainingSize)); // fully canceled
             }
 
-            Order original = orders.get(index);
+            Order latest = orders.get(index);
 
-            switch (original.state) {
+            switch (latest.state) {
             case COMPLETED: // completed
             case CANCELED: // partially completed and remaings canceled
-                return I.signal(I.pair(original.state, original.remainingSize));
+                return I.signal(I.pair(latest.state, latest.remainingSize));
 
             default:
                 return I.signal(); // order is still active
             }
         });
 
-        return requestCancel.combine(isCanceled).take(1).map(e -> e.ⅱ);
+        return requestCancel.combine(isCanceled).take(1).map(Ⅱ::ⅱ);
     }
 
     /**
