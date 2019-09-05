@@ -12,6 +12,8 @@ package cointoss.util;
 import java.time.Duration;
 import java.util.function.LongFunction;
 
+import com.google.common.annotations.VisibleForTesting;
+
 import kiss.I;
 import kiss.Signal;
 import kiss.WiseFunction;
@@ -34,7 +36,8 @@ public final class RetryPolicy implements WiseFunction<Signal<Throwable>, Signal
     private LongFunction<Duration> delay;
 
     /** The retry counter. */
-    private long count;
+    @VisibleForTesting
+    long count;
 
     /**
      * Default {@link RetryPolicy}.
@@ -42,7 +45,7 @@ public final class RetryPolicy implements WiseFunction<Signal<Throwable>, Signal
     public RetryPolicy() {
         reset();
         delay(Duration.ZERO);
-        retryMaximum(Long.MAX_VALUE);
+        tryMaximum(Long.MAX_VALUE);
         delayMinimum(Duration.ZERO).delayMaximum(Duration.ofMinutes(30));
     }
 
@@ -52,7 +55,7 @@ public final class RetryPolicy implements WiseFunction<Signal<Throwable>, Signal
      * @param times A retry times.
      * @return Chainable API.
      */
-    public RetryPolicy retryMaximum(long times) {
+    public RetryPolicy tryMaximum(long times) {
         maxTimes = times;
         return this;
     }

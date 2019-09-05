@@ -752,6 +752,7 @@ class BitFlyerService extends MarketService {
         public OrderState child_order_state;
 
         public Order toOrder() {
+            System.out.println(child_order_state + "  " + size + "   " + outstanding_size + "  " + executed_size + "  " + cancel_size);
             Order o = Order.with.direction(side, size)
                     .price(price)
                     .remainingSize(outstanding_size)

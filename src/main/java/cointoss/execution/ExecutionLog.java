@@ -187,7 +187,7 @@ public class ExecutionLog {
     private final ExecutionLogger logger;
 
     /** The retry policy. */
-    private final RetryPolicy policy = new RetryPolicy().retryMaximum(100)
+    private final RetryPolicy policy = new RetryPolicy().tryMaximum(100)
             .delayLinear(Duration.ofSeconds(1))
             .delayMaximum(Duration.ofMinutes(2));
 
