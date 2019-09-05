@@ -74,9 +74,6 @@ public abstract class Order extends OrderModel {
     private static final MethodHandle price$1654949385= invoker("price", Num.class, Consumer.class);
 
     /** The overload or intercept method invoker. */
-    private static final MethodHandle calculateExecutedSize$1683249437= invoker("calculateExecutedSize", Num.class, Consumer.class);
-
-    /** The overload or intercept method invoker. */
     private static final MethodHandle validateState$41283920= invoker("validateState", OrderState.class);
 
     /**
@@ -433,7 +430,7 @@ public abstract class Order extends OrderModel {
             value = super.remainingSize();
         }
         try {
-            remainingSizeUpdater.invoke(this, calculateExecutedSize$1683249437.invoke(this, value, (Consumer<Num>) ((Åssignable) this)::executedSize));
+            remainingSizeUpdater.invoke(this, value);
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -464,7 +461,7 @@ public abstract class Order extends OrderModel {
      *
      * @paran value A new value of executedSize property to assign.
      */
-    private final void setExecutedSize(Num value) {
+    final void setExecutedSize(Num value) {
         if (value == null) {
             value = super.executedSize();
         }
@@ -675,28 +672,6 @@ public abstract class Order extends OrderModel {
     @Override
     public final OrderState state() {
         return this.state;
-    }
-
-    /**
-     * Assign the new value of state property.
-     *
-     * @paran value The new state property value to assign.
-     * @return Chainable API.
-     */
-    public final Order assignState(OrderState value) {
-        setState(value);
-        return this;
-    }
-
-    /**
-     * Assign the new value of state property.
-     *
-     * @paran value The state property assigner which accepts the current value and returns new value.
-     * @return Chainable API.
-     */
-    public final Order assignState(UnaryOperator<OrderState> value) {
-        setState(value.apply(this.state));
-        return this;
     }
 
     /**

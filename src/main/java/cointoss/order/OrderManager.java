@@ -97,7 +97,7 @@ public final class OrderManager {
                     order.executed(execution);
 
                     if (order.remainingSize.is(Num.ZERO)) {
-                        order.assignState(COMPLETED);
+                        order.setState(COMPLETED);
                     }
 
                     updates.accept(I.pair(order, execution));
@@ -127,18 +127,18 @@ public final class OrderManager {
      */
     public Signal<Order> request(Order order) {
         if (order.state == OrderState.INIT || order.state == OrderState.REQUESTING) {
-            order.assignState(REQUESTING);
+            order.setState(REQUESTING);
             addition.accept(order);
 
-            return service.request(order, order::assignState).retryWhen(service.setting.retryPolicy()).map(id -> {
-                order.assignState(ACTIVE);
+            return service.request(order, order::setState).retryWhen(service.setting.retryPolicy()).map(id -> {
+                order.setState(ACTIVE);
                 order.assignId(id);
                 order.assignCreationTime(service.now());
                 order.observeTerminating().to(remove::accept);
 
                 return order;
             }).effectOnError(e -> {
-                order.assignState(CANCELED);
+                order.setState(CANCELED);
             });
         } else {
             return I.signal(order);
@@ -170,14 +170,16 @@ public final class OrderManager {
     public Signal<Order> cancel(Order order) {
         if (order.state == ACTIVE || order.state == REQUESTING) {
             OrderState previous = order.state;
-            order.assignState(REQUESTING);
+            order.setState(REQUESTING);
 
             return service.cancel(order).retryWhen(service.setting.retryPolicy()).effect(result -> {
+                System.out.println("Canceled " + result.ⅰ + " " + result.ⅱ);
                 managed.remove(order);
-                order.setRemainingSize(result.ⅱ);
-                order.assignState(result.ⅰ);
+                order.setExecutedSize(result.ⅱ);
+                order.setRemainingSize(order.size.minus(result.ⅱ));
+                order.setState(result.ⅰ);
             }).effectOnError(e -> {
-                order.assignState(previous);
+                order.setState(previous);
             }).mapTo(order);
         } else {
             return I.signal(order);

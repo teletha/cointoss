@@ -237,7 +237,7 @@ class BitFlyerService extends MarketService {
             int index = orders.indexOf(order);
 
             if (index == -1) {
-                return I.signal(I.pair(OrderState.CANCELED, order.remainingSize)); // fully canceled
+                return I.signal(I.pair(OrderState.CANCELED, order.executedSize)); // fully canceled
             }
 
             Order latest = orders.get(index);
@@ -245,7 +245,7 @@ class BitFlyerService extends MarketService {
             switch (latest.state) {
             case COMPLETED: // completed
             case CANCELED: // partially completed and remaings canceled
-                return I.signal(I.pair(latest.state, latest.remainingSize));
+                return I.signal(I.pair(latest.state, latest.executedSize));
 
             default:
                 return I.signal(); // order is still active
@@ -744,6 +744,8 @@ class BitFlyerService extends MarketService {
         public Num outstanding_size;
 
         public Num executed_size;
+
+        public Num cancel_size;
 
         public String child_order_date;
 

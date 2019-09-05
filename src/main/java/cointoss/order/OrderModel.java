@@ -214,27 +214,17 @@ public abstract class OrderModel implements Directional, Comparable<OrderModel> 
      * 
      * @return
      */
-    @Icy.Property
+    @Icy.Property(setterModifier = "final")
     public Num executedSize() {
         return Num.ZERO;
     }
 
     /**
-     * Calculate the executed size from the remaining size automatically.
+     * Expose setter to update size atomically.
      * 
-     * @param remainings
-     * @param executedSize
-     * @return
+     * @param size
      */
-    @Icy.Intercept("remainingSize")
-    private Num calculateExecutedSize(Num remainings, Consumer<Num> executedSize) {
-        if (size() == null) {
-            executedSize.accept(Num.ZERO);
-        } else {
-            executedSize.accept(size().minus(remainings));
-        }
-        return remainings;
-    }
+    abstract void setExecutedSize(Num size);
 
     /**
      * Observe executed size modification.
@@ -273,29 +263,10 @@ public abstract class OrderModel implements Directional, Comparable<OrderModel> 
 
         if (isNotCompleted()) {
             setRemainingSize(remainingSize().minus(e.size));
+            setExecutedSize(executedSize().plus(e.size));
 
             remainingSize.accept(remainingSize());
             executedSize.accept(executedSize());
-        }
-    }
-
-    /**
-     * Complete or cancel this order with the specified remaining and executed size.
-     * 
-     * @param completeOrCancel
-     * @param remainingSize
-     * @param executedSize
-     */
-    final void terminated(OrderState completeOrCancel, Num remaining, Num executed) {
-        switch (completeOrCancel) {
-        case COMPLETED:
-        case CANCELED:
-            setRemainingSize(remaining);
-            setState(completeOrCancel);
-
-            remainingSize.accept(remaining);
-            executedSize.accept(executed);
-            break;
         }
     }
 
@@ -334,7 +305,7 @@ public abstract class OrderModel implements Directional, Comparable<OrderModel> 
      * 
      * @return
      */
-    @Icy.Property(custom = ObservableProperty.class, mutable = true, setterModifier = "final")
+    @Icy.Property(custom = ObservableProperty.class, setterModifier = "final")
     public OrderState state() {
         return OrderState.INIT;
     }

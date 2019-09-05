@@ -222,13 +222,13 @@ public class OrderBuilder extends View {
         orderReverse.text(en("Reverse")).when(User.MouseClick).to(() -> view.market().reverse().to(I.NoOP));
 
         buyNearest.text("Buy Near").when(User.MouseClick).to(() -> {
-            view.market().request(Direction.BUY, 0.01, s -> s.makeBestPrice().cancelAfter(500, ChronoUnit.MILLIS)).to(o -> {
+            view.market().request(Direction.BUY, 0.05, s -> s.makeBestPrice().cancelAfter(500, ChronoUnit.MILLIS)).to(o -> {
 
             });
         });
 
         sellNearest.text("Sell Near").when(User.MouseClick).to(() -> {
-            view.market().request(Direction.SELL, 0.01, s -> s.makeBestPrice().cancelAfter(500, ChronoUnit.MILLIS)).to(o -> {
+            view.market().request(Direction.SELL, 0.05, s -> s.makeBestPrice().cancelAfter(500, ChronoUnit.MILLIS)).to(o -> {
 
             });
         });

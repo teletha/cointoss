@@ -104,7 +104,7 @@ public abstract class MarketService implements Disposable {
      * Request canceling the specified order.
      * 
      * @param order A order to cancel.
-     * @return The single stream of canceled order's state and remaining size.
+     * @return The single stream of canceled order's state and executed size.
      */
     public abstract Signal<Ⅱ<OrderState, Num>> cancel(Order order);
 
