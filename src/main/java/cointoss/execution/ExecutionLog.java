@@ -806,13 +806,13 @@ public class ExecutionLog {
         }
     }
 
-    public static void main2(String[] args) {
+    public static void main(String[] args) {
         Market market = new Market(BitMex.XBT_USD);
         market.readLog(log -> log.fromYestaday());
 
     }
 
-    public static void main(String[] args) {
+    public static void main3(String[] args) {
         Network.proxy("54.39.53.104", 3128);
 
         ExecutionLog log = new ExecutionLog(BitMex.XBT_USD);

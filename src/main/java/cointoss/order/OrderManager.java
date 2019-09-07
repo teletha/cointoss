@@ -131,7 +131,6 @@ public final class OrderManager {
             addition.accept(order);
 
             return service.request(order, order::setState).retryWhen(service.setting.retryPolicy()).map(id -> {
-                order.setState(ACTIVE);
                 order.assignId(id);
                 order.assignCreationTime(service.now());
                 order.observeTerminating().to(remove::accept);
