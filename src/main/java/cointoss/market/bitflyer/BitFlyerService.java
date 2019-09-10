@@ -594,7 +594,7 @@ class BitFlyerService extends MarketService {
                     .post(RequestBody.create(mime, body))
                     .build();
         }
-        return network.rest(request, selector, type, Limit);
+        return network.rest(request, selector, type, Limit).retryWhen(setting.retryPolicy);
     }
 
     /**
@@ -630,7 +630,7 @@ class BitFlyerService extends MarketService {
                     .post(RequestBody.create(mime, body))
                     .build();
         }
-        return network.rest(request, Limit);
+        return network.rest(request, Limit).retryWhen(setting.retryPolicy);
     }
 
     protected SessionMaintainer maintainer = new SessionMaintainer();
@@ -752,7 +752,6 @@ class BitFlyerService extends MarketService {
         public OrderState child_order_state;
 
         public Order toOrder() {
-            System.out.println(child_order_state + "  " + size + "   " + outstanding_size + "  " + executed_size + "  " + cancel_size);
             Order o = Order.with.direction(side, size)
                     .price(price)
                     .remainingSize(outstanding_size)
