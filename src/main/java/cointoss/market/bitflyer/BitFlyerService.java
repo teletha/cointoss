@@ -245,6 +245,11 @@ class BitFlyerService extends MarketService {
             switch (latest.state) {
             case COMPLETED: // completed
             case CANCELED: // partially completed and remaings canceled
+                Num untrackedExecutedSize = latest.executedSize.minus(order.executedSize);
+
+                executionsForMe.accept(I.pair(order.direction, order.id, Execution.with.direction(order.direction, untrackedExecutedSize)
+                        .price(order.price)));
+
                 return I.signal(I.pair(latest.state, latest.executedSize));
 
             default:
