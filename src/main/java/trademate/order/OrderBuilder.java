@@ -14,7 +14,6 @@ import static trademate.CommonText.*;
 import static transcript.Transcript.en;
 
 import java.math.RoundingMode;
-import java.time.temporal.ChronoUnit;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
 
@@ -98,12 +97,6 @@ public class OrderBuilder extends View {
     private UIButton orderReverse;
 
     /** UI */
-    private UIButton buyNearest;
-
-    /** UI */
-    private UIButton sellNearest;
-
-    /** UI */
     private TradingView view;
 
     /** UI */
@@ -111,6 +104,15 @@ public class OrderBuilder extends View {
 
     /** UI */
     private UILabel sfdPrice499;
+
+    /** UI */
+    private UILabel sfdPrice498;
+
+    /** UI */
+    private UILabel sfdPrice497;
+
+    /** UI */
+    private UILabel sfdPrice495;
 
     /** UI */
     private UILabel sfdPrice494;
@@ -161,21 +163,20 @@ public class OrderBuilder extends View {
                     });
 
                     $(hbox, S.Row, () -> {
-                        $(orderCancel, S.FormButton);
-                        $(orderStop, S.FormButton);
-                        $(orderReverse, S.FormButton);
-                    });
-
-                    $(hbox, S.Row, () -> {
-                        $(buyNearest, S.FormButton);
-                        $(sellNearest, S.FormButton);
-                    });
-
-                    $(hbox, S.Row, () -> {
                         $(sfdPrice500, S.SFD);
                     });
                     $(hbox, S.Row, () -> {
                         $(sfdPrice499, S.SFD);
+                    });
+                    $(hbox, S.Row, () -> {
+                        $(sfdPrice498, S.SFD);
+                    });
+                    $(hbox, S.Row, () -> {
+                        $(sfdPrice497, S.SFD);
+                    });
+
+                    $(hbox, S.Row, () -> {
+                        $(sfdPrice495, S.SFD);
                     });
                     $(hbox, S.Row, () -> {
                         $(sfdPrice494, S.SFD);
@@ -221,22 +222,13 @@ public class OrderBuilder extends View {
         orderStop.text(en("Stop")).when(User.MouseClick).to(() -> view.market().stop().to(I.NoOP));
         orderReverse.text(en("Reverse")).when(User.MouseClick).to(() -> view.market().reverse().to(I.NoOP));
 
-        buyNearest.text("Buy Near").when(User.MouseClick).to(() -> {
-            view.market().request(Direction.BUY, 0.02, s -> s.makeBestPrice().cancelAfter(500, ChronoUnit.MILLIS)).to(o -> {
-
-            });
-        });
-
-        sellNearest.text("Sell Near").when(User.MouseClick).to(() -> {
-            view.market().request(Direction.SELL, 0.02, s -> s.makeBestPrice().cancelAfter(500, ChronoUnit.MILLIS)).to(o -> {
-
-            });
-        });
-
         if (view.market().service == BitFlyer.FX_BTC_JPY) {
             view.market().service.add(SFD.latestBTC.on(Viewtify.UIThread).to(price -> {
                 sfdPrice500.text("5.00% " + price.multiply(1.05).scale(0));
                 sfdPrice499.text("4.99% " + price.multiply(1.0499).scale(1));
+                sfdPrice498.text("4.98% " + price.multiply(1.0498).scale(2));
+                sfdPrice497.text("4.97% " + price.multiply(1.0497).scale(3));
+                sfdPrice495.text("4.95% " + price.multiply(1.0495).scale(4));
                 sfdPrice494.text("4.94% " + price.multiply(1.0494).scale(5));
                 sfdPrice490.text("4.90% " + price.multiply(1.0490).scale(6));
             }));

@@ -25,8 +25,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import com.google.common.annotations.VisibleForTesting;
-
 import cointoss.Direction;
 import cointoss.Directional;
 import cointoss.Market;
@@ -39,6 +37,7 @@ import cointoss.order.OrderStrategy.Takable;
 import cointoss.util.Chrono;
 import cointoss.util.LinkedQueue;
 import cointoss.util.Num;
+import cointoss.util.apology.VisibleForTest;
 import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
@@ -187,11 +186,11 @@ public abstract class Trader {
         protected final FundManager funds;
 
         /** The list entry orders. */
-        @VisibleForTesting
+        @VisibleForTest
         final LinkedQueue<Order> entries = new LinkedQueue<>();
 
         /** The list exit orders. */
-        @VisibleForTesting
+        @VisibleForTest
         final LinkedQueue<Order> exits = new LinkedQueue<>();
 
         /** The entry disposer. */

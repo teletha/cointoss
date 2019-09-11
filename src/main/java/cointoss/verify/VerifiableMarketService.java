@@ -43,7 +43,6 @@ import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
 import kiss.Signaling;
-import kiss.Ⅱ;
 import kiss.Ⅲ;
 
 public class VerifiableMarketService extends MarketService {
@@ -94,14 +93,14 @@ public class VerifiableMarketService extends MarketService {
         super("TestableExchange", "TestableMarket", MarketSetting.with.baseCurrencyMinimumBidPrice(Num.ONE)
                 .targetCurrencyMinimumBidSize(Num.ONE)
                 .orderBookGroupRanges(Num.ONE)
-                .retryPolicy(new RetryPolicy().tryMaximum(0)));
+                .retryPolicy(new RetryPolicy().retryMaximum(0)));
     }
 
     /**
      * 
      */
     public VerifiableMarketService(MarketService delegation) {
-        super(delegation.exchangeName, delegation.marketName, delegation.setting.withRetryPolicy(new RetryPolicy().tryMaximum(0)));
+        super(delegation.exchangeName, delegation.marketName, delegation.setting.withRetryPolicy(new RetryPolicy().retryMaximum(0)));
     }
 
     /**
@@ -141,7 +140,7 @@ public class VerifiableMarketService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Ⅱ<OrderState, Num>> cancel(Order order) {
+    public Signal<Order> cancel(Order order) {
         BackendOrder backend = findBy(order);
 
         // associated backend order is not found, do nothing
@@ -154,13 +153,13 @@ public class VerifiableMarketService extends MarketService {
 
         if (delay == now) {
             backend.cancel();
-            return I.signal(I.pair(OrderState.CANCELED, backend.remainingSize));
+            return I.signal(order);
         }
 
         // backend order will be canceled in the specified delay
         backend.cancelTimeMills = Chrono.epochMills(delay);
 
-        return backend.canceling.expose.map(o -> I.pair(OrderState.CANCELED, backend.remainingSize));
+        return backend.canceling.expose;
     }
 
     /**

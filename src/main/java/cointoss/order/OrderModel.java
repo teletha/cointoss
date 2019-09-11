@@ -260,14 +260,11 @@ public abstract class OrderModel implements Directional, Comparable<OrderModel> 
      */
     final void executed(Execution e) {
         executions.add(e);
+        setRemainingSize(remainingSize().minus(e.size));
+        setExecutedSize(executedSize().plus(e.size));
 
-        if (isNotCompleted()) {
-            setRemainingSize(remainingSize().minus(e.size));
-            setExecutedSize(executedSize().plus(e.size));
-
-            remainingSize.accept(remainingSize());
-            executedSize.accept(executedSize());
-        }
+        remainingSize.accept(remainingSize());
+        executedSize.accept(executedSize());
     }
 
     /**
@@ -305,17 +302,10 @@ public abstract class OrderModel implements Directional, Comparable<OrderModel> 
      * 
      * @return
      */
-    @Icy.Property(custom = ObservableProperty.class, setterModifier = "final")
+    @Icy.Property(custom = ObservableProperty.class, mutable = true)
     public OrderState state() {
         return OrderState.INIT;
     }
-
-    /**
-     * Expose setter to update size atomically.
-     * 
-     * @param size
-     */
-    abstract void setState(OrderState size);
 
     @Icy.Intercept("state")
     private OrderState validateState(OrderState state) {

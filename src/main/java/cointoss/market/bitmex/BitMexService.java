@@ -32,7 +32,6 @@ import cointoss.util.APILimiter;
 import cointoss.util.Num;
 import kiss.I;
 import kiss.Signal;
-import kiss.Ⅱ;
 import kiss.Ⅲ;
 import okhttp3.Request;
 
@@ -72,7 +71,7 @@ class BitMexService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Ⅱ<OrderState, Num>> cancel(Order order) {
+    public Signal<Order> cancel(Order order) {
         return null;
     }
 

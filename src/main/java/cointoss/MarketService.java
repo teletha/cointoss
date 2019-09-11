@@ -32,7 +32,6 @@ import kiss.Decoder;
 import kiss.Disposable;
 import kiss.Encoder;
 import kiss.Signal;
-import kiss.Ⅱ;
 import kiss.Ⅲ;
 
 public abstract class MarketService implements Disposable {
@@ -101,12 +100,13 @@ public abstract class MarketService implements Disposable {
     public abstract Signal<String> request(Order order, Consumer<OrderState> state);
 
     /**
-     * Request canceling the specified order.
+     * <p>
+     * Request order canceling.
+     * </p>
      * 
      * @param order A order to cancel.
-     * @return The single stream of canceled order's state and executed size.
      */
-    public abstract Signal<Ⅱ<OrderState, Num>> cancel(Order order);
+    public abstract Signal<Order> cancel(Order order);
 
     /**
      * Acquire the execution log between start (exclusive) and end (exclusive) key.

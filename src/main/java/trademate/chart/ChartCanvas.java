@@ -263,6 +263,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             TickLable label = mark.createLabel(o.price);
 
             o.observeTerminating().on(Viewtify.UIThread).to(e -> {
+                System.out.println("remove order line " + e);
                 mark.remove(label);
             });
         });

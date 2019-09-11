@@ -52,7 +52,6 @@ import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
 import kiss.Signaling;
-import kiss.Ⅱ;
 import kiss.Ⅲ;
 import marionette.browser.Browser;
 import okhttp3.MediaType;
@@ -131,11 +130,7 @@ class BitFlyerService extends MarketService {
         super("BitFlyer", type, setting);
 
         this.forTest = forTest;
-        this.intervalOrderCheck = I.signal(0, 1, TimeUnit.SECONDS)
-                .map(v -> call("GET", "/v1/me/getchildorders?count=500&product_code=" + marketName, "", "*", ChildOrderResponse.class)
-                        .map(ChildOrderResponse::toOrder)
-                        .toList())
-                .share();
+        this.intervalOrderCheck = I.signal(0, 1, TimeUnit.SECONDS).map(v -> orders().toList()).share();
     }
 
     /**
@@ -216,6 +211,8 @@ class BitFlyerService extends MarketService {
                         order.relation(Internals.class).id = o.relation(Internals.class).id;
 
                     });
+        }).effectOnTerminate(() -> {
+
         });
     }
 
@@ -223,41 +220,19 @@ class BitFlyerService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Ⅱ<OrderState, Num>> cancel(Order order) {
+    public Signal<Order> cancel(Order order) {
         CancelRequest cancel = new CancelRequest();
         cancel.product_code = marketName;
         cancel.account_id = account.accountId.v;
         cancel.order_id = order.relation(Internals.class).id;
         cancel.child_order_acceptance_id = order.id;
 
-        Signal<?> requestCancel = forTest || maintainer.session() == null || cancel.order_id == null
+        Signal requestCancel = forTest || maintainer.session() == null || cancel.order_id == null
                 ? call("POST", "/v1/me/cancelchildorder", cancel, null, null)
                 : call("POST", "https://lightning.bitflyer.jp/api/trade/cancelorder", cancel, null, WebResponse.class);
-        Signal<Ⅱ<OrderState, Num>> isCanceled = intervalOrderCheck.flatMap(orders -> {
-            int index = orders.indexOf(order);
+        Signal<List<Order>> isCanceled = intervalOrderCheck.take(orders -> !orders.contains(order));
 
-            if (index == -1) {
-                return I.signal(I.pair(OrderState.CANCELED, order.executedSize)); // fully canceled
-            }
-
-            Order latest = orders.get(index);
-
-            switch (latest.state) {
-            case COMPLETED: // completed
-            case CANCELED: // partially completed and remaings canceled
-                Num untrackedExecutedSize = latest.executedSize.minus(order.executedSize);
-
-                executionsForMe.accept(I.pair(order.direction, order.id, Execution.with.direction(order.direction, untrackedExecutedSize)
-                        .price(order.price)));
-
-                return I.signal(I.pair(latest.state, latest.executedSize));
-
-            default:
-                return I.signal(); // order is still active
-            }
-        });
-
-        return requestCancel.combine(isCanceled).take(1).map(Ⅱ::ⅱ);
+        return requestCancel.combine(isCanceled).take(1).mapTo(order);
     }
 
     /**
@@ -599,7 +574,7 @@ class BitFlyerService extends MarketService {
                     .post(RequestBody.create(mime, body))
                     .build();
         }
-        return network.rest(request, selector, type, Limit).retryWhen(setting.retryPolicy);
+        return network.rest(request, selector, type, Limit);
     }
 
     /**
@@ -635,7 +610,7 @@ class BitFlyerService extends MarketService {
                     .post(RequestBody.create(mime, body))
                     .build();
         }
-        return network.rest(request, Limit).retryWhen(setting.retryPolicy);
+        return network.rest(request, Limit);
     }
 
     protected SessionMaintainer maintainer = new SessionMaintainer();
@@ -749,8 +724,6 @@ class BitFlyerService extends MarketService {
         public Num outstanding_size;
 
         public Num executed_size;
-
-        public Num cancel_size;
 
         public String child_order_date;
 

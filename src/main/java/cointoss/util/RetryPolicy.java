@@ -45,7 +45,7 @@ public final class RetryPolicy implements WiseFunction<Signal<Throwable>, Signal
     public RetryPolicy() {
         reset();
         delay(Duration.ZERO);
-        tryMaximum(Long.MAX_VALUE);
+        retryMaximum(Long.MAX_VALUE);
         delayMinimum(Duration.ZERO).delayMaximum(Duration.ofMinutes(30));
     }
 
@@ -55,7 +55,7 @@ public final class RetryPolicy implements WiseFunction<Signal<Throwable>, Signal
      * @param times A retry times.
      * @return Chainable API.
      */
-    public RetryPolicy tryMaximum(long times) {
+    public RetryPolicy retryMaximum(long times) {
         maxTimes = times;
         return this;
     }

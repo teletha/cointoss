@@ -30,7 +30,7 @@ public class OrderTest {
         Order order = Order.with.buy(1).price(10);
         assert order.isNotCanceled();
 
-        order.setState(OrderState.CANCELED);
+        order.assignState(OrderState.CANCELED);
         assert order.isCanceled();
     }
 
@@ -39,7 +39,7 @@ public class OrderTest {
         Order order = Order.with.buy(1).price(10);
         assert order.isNotCompleted();
 
-        order.setState(OrderState.COMPLETED);
+        order.assignState(OrderState.COMPLETED);
         assert order.isCompleted();
     }
 
@@ -48,7 +48,7 @@ public class OrderTest {
         Order order = Order.with.buy(1).price(10);
         assert order.isNotExpired();
 
-        order.setState(OrderState.EXPIRED);
+        order.assignState(OrderState.EXPIRED);
         assert order.isExpired();
     }
 
@@ -92,22 +92,22 @@ public class OrderTest {
         Order order = Order.with.direction(Direction.BUY, 1);
         List<Order> result = order.observeTerminating().toList();
         assert result.isEmpty();
-        order.setState(OrderState.ACTIVE);
+        order.assignState(OrderState.ACTIVE);
         assert result.isEmpty();
-        order.setState(OrderState.EXPIRED);
+        order.assignState(OrderState.EXPIRED);
         assert result.isEmpty();
-        order.setState(OrderState.INIT);
+        order.assignState(OrderState.INIT);
         assert result.isEmpty();
-        order.setState(OrderState.REJECTED);
+        order.assignState(OrderState.REJECTED);
         assert result.isEmpty();
-        order.setState(OrderState.REQUESTING);
+        order.assignState(OrderState.REQUESTING);
         assert result.isEmpty();
 
-        order.setState(OrderState.COMPLETED);
+        order.assignState(OrderState.COMPLETED);
         assert result.size() == 1;
-        order.setState(OrderState.CANCELED);
+        order.assignState(OrderState.CANCELED);
         assert result.size() == 1;
-        order.setState(OrderState.COMPLETED);
+        order.assignState(OrderState.COMPLETED);
         assert result.size() == 1;
     }
 
@@ -116,22 +116,22 @@ public class OrderTest {
         Order order = Order.with.direction(Direction.BUY, 1);
         List<Order> result = order.observeTerminating().toList();
         assert result.isEmpty();
-        order.setState(OrderState.ACTIVE);
+        order.assignState(OrderState.ACTIVE);
         assert result.isEmpty();
-        order.setState(OrderState.EXPIRED);
+        order.assignState(OrderState.EXPIRED);
         assert result.isEmpty();
-        order.setState(OrderState.INIT);
+        order.assignState(OrderState.INIT);
         assert result.isEmpty();
-        order.setState(OrderState.REJECTED);
+        order.assignState(OrderState.REJECTED);
         assert result.isEmpty();
-        order.setState(OrderState.REQUESTING);
+        order.assignState(OrderState.REQUESTING);
         assert result.isEmpty();
 
-        order.setState(OrderState.CANCELED);
+        order.assignState(OrderState.CANCELED);
         assert result.size() == 1;
-        order.setState(OrderState.CANCELED);
+        order.assignState(OrderState.CANCELED);
         assert result.size() == 1;
-        order.setState(OrderState.COMPLETED);
+        order.assignState(OrderState.COMPLETED);
         assert result.size() == 1;
     }
 
@@ -198,13 +198,13 @@ public class OrderTest {
         Order o = Order.with.buy(1);
         assert o.state == OrderState.INIT;
 
-        o.setState(OrderState.REQUESTING);
+        o.assignState(OrderState.REQUESTING);
         assert o.state == OrderState.REQUESTING;
 
-        o.setState(OrderState.COMPLETED);
+        o.assignState(OrderState.COMPLETED);
         assert o.state == OrderState.COMPLETED;
 
-        o.setState(OrderState.ACTIVE);
+        o.assignState(OrderState.ACTIVE);
         assert o.state == OrderState.COMPLETED;
     }
 
@@ -213,13 +213,13 @@ public class OrderTest {
         Order o = Order.with.buy(1);
         assert o.state == OrderState.INIT;
 
-        o.setState(OrderState.REQUESTING);
+        o.assignState(OrderState.REQUESTING);
         assert o.state == OrderState.REQUESTING;
 
-        o.setState(OrderState.CANCELED);
+        o.assignState(OrderState.CANCELED);
         assert o.state == OrderState.CANCELED;
 
-        o.setState(OrderState.ACTIVE);
+        o.assignState(OrderState.ACTIVE);
         assert o.state == OrderState.CANCELED;
     }
 }

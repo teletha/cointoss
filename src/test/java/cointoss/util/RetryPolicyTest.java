@@ -22,7 +22,7 @@ class RetryPolicyTest {
 
     @Test
     void retryMaximum() {
-        RetryPolicy policy = new RetryPolicy().tryMaximum(3);
+        RetryPolicy policy = new RetryPolicy().retryMaximum(3);
         assert I.signal("ok").map(new FailAction()).retryWhen(policy).to().is("OK");
         assert policy.count == 3;
     }
@@ -47,7 +47,7 @@ class RetryPolicyTest {
 
     @Test
     void delayConstants() {
-        RetryPolicy retry = new RetryPolicy().tryMaximum(2).delay(Duration.ofMillis(100));
+        RetryPolicy retry = new RetryPolicy().retryMaximum(2).delay(Duration.ofMillis(100));
         Signaling<String> signal = new Signaling();
         Variable<String> latest = signal.expose.retryWhen(retry).to();
 

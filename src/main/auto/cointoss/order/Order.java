@@ -675,6 +675,28 @@ public abstract class Order extends OrderModel {
     }
 
     /**
+     * Assign the new value of state property.
+     *
+     * @paran value The new state property value to assign.
+     * @return Chainable API.
+     */
+    public final Order assignState(OrderState value) {
+        setState(value);
+        return this;
+    }
+
+    /**
+     * Assign the new value of state property.
+     *
+     * @paran value The state property assigner which accepts the current value and returns new value.
+     * @return Chainable API.
+     */
+    public final Order assignState(UnaryOperator<OrderState> value) {
+        setState(value.apply(this.state));
+        return this;
+    }
+
+    /**
      * Provide classic getter API.
      *
      * @return A value of state property.
@@ -689,7 +711,7 @@ public abstract class Order extends OrderModel {
      *
      * @paran value A new value of state property to assign.
      */
-    final void setState(OrderState value) {
+    private final void setState(OrderState value) {
         if (value == null) {
             value = super.state();
         }
