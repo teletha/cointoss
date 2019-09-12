@@ -9,12 +9,14 @@
  */
 package cointoss.util;
 
-import static java.time.temporal.ChronoUnit.*;
+import static java.time.temporal.ChronoUnit.MINUTES;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.concurrent.TimeUnit;
 import java.util.function.LongFunction;
+
+import com.google.common.annotations.VisibleForTesting;
 
 import icy.manipulator.Icy;
 import kiss.I;
@@ -24,7 +26,8 @@ import kiss.WiseFunction;
 @Icy
 public abstract class RetryModel implements WiseFunction<Signal<Throwable>, Signal<?>> {
 
-    private long count;
+    @VisibleForTesting
+    long count;
 
     @Icy.Property
     abstract long limit();
@@ -66,7 +69,7 @@ public abstract class RetryModel implements WiseFunction<Signal<Throwable>, Sign
 
     @Icy.Property
     Duration delayMinimum() {
-        return Duration.of(200, MILLIS);
+        return Duration.ZERO;
     }
 
     @Icy.Property
@@ -90,11 +93,8 @@ public abstract class RetryModel implements WiseFunction<Signal<Throwable>, Sign
             return error.flatMap(e -> I.signalError(e));
         }
 
-        return error.take(() -> ++count <= limit())
-                .delay(() -> Chrono.between(delayMinimum(), delay().apply(count), delayMaximum()))
-                .effect(e -> {
-                    System.out.println("Retry " + count + "   " + e);
-                    e.printStackTrace();
-                });
+        return error.take(limit()).delay(() -> {
+            return Chrono.between(delayMinimum(), delay().apply(count++), delayMaximum());
+        }, null);
     }
 }

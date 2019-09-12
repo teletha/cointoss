@@ -9,65 +9,76 @@
  */
 package cointoss.util;
 
-import java.time.temporal.ChronoUnit;
+import static java.time.temporal.ChronoUnit.MILLIS;
 
 import org.junit.jupiter.api.Test;
 
+import com.google.gson.JsonElement;
+
+import kiss.Observer;
+import kiss.WiseFunction;
+
 class RetryPolicyTest {
 
+    ErrorNetwork network = new ErrorNetwork();
+
+    WiseFunction<String, String> throwError = e -> {
+        throw new Error();
+    };
+
     @Test
-    void rety() {
-        Retry rety = Retry.with.limit(3).delay(1, ChronoUnit.SECONDS);
+    void limit() {
+        Retry rety = Retry.with.limit(3);
+        Result result = new Result();
+
+        network.rest(null).retryWhen(rety).to(result);
+        assert rety.count == 3;
+        assert result.error != null;
     }
 
-    // @Test
-    // void retryMaximum() {
-    // RetryPolicy policy = new RetryPolicy().retryMaximum(3);
-    // assert I.signal("ok").map(new FailAction()).retryWhen(policy).to().is("OK");
-    // assert policy.count == 3;
-    // }
-    //
-    // private static class FailAction implements WiseFunction<String, String> {
-    //
-    // private int max = 3;
-    //
-    // private int current = 0;
-    //
-    // /**
-    // * {@inheritDoc}
-    // */
-    // @Override
-    // public String APPLY(String value) {
-    // if (++current < max) {
-    // throw new Error();
-    // }
-    // return value.toUpperCase();
-    // }
-    // }
-    //
-    // @Test
-    // void delayConstants() {
-    // RetryPolicy retry = new RetryPolicy().retryMaximum(2).delay(Duration.ofMillis(100));
-    // Signaling<String> signal = new Signaling();
-    // Variable<String> latest = signal.expose.retryWhen(retry).to();
-    //
-    // signal.accept("ok");
-    // assert latest.is("ok");
-    //
-    // signal.error(new Error());
-    // signal.accept("retry 1");
-    // assert latest.is("retry 1");
-    //
-    // signal.error(new Error());
-    // signal.accept("retry 2");
-    // assert latest.is("retry 2");
-    //
-    // signal.error(new Error());
-    // signal.accept("retry 3");
-    // assert latest.is("retry 3");
-    //
-    // signal.error(new Error());
-    // signal.accept("don't retry forever");
-    // assert latest.is("retry 3");
-    // }
+    @Test
+    void delay() {
+        Retry rety = Retry.with.limit(2).delay(100, MILLIS);
+        Result result = new Result();
+
+        network.rest(null).retryWhen(rety).to(result);
+        assert rety.count == 3;
+        assert result.error != null;
+    }
+
+    /**
+     * 
+     */
+    private static class Result implements Observer<JsonElement> {
+
+        private JsonElement value;
+
+        private Throwable error;
+
+        private boolean complete;
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void accept(JsonElement t) {
+            value = t;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void complete() {
+            complete = true;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void error(Throwable e) {
+            error = e;
+        }
+    }
 }

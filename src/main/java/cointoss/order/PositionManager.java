@@ -13,12 +13,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import org.apache.logging.log4j.util.PerformanceSensitive;
+
 import cointoss.Direction;
 import cointoss.Directional;
 import cointoss.MarketService;
 import cointoss.execution.Execution;
 import cointoss.util.Num;
-import cointoss.util.apology.PerformanceSensitive;
 import kiss.Signal;
 import kiss.Signaling;
 import kiss.Variable;
