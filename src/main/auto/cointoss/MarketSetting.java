@@ -4,7 +4,7 @@ import cointoss.MarketSetting;
 import cointoss.MarketSettingModel;
 import cointoss.execution.ExecutionLogger;
 import cointoss.util.Num;
-import cointoss.util.RetryPolicy;
+import cointoss.util.Retry;
 import java.lang.Class;
 import java.lang.Override;
 import java.lang.StringBuilder;
@@ -130,7 +130,7 @@ public abstract class MarketSetting implements MarketSettingModel {
     public final boolean executionWithSequentialId;
 
     /** The exposed property. */
-    public final RetryPolicy retryPolicy;
+    public final Retry retryPolicy;
 
     /**
      * HIDE CONSTRUCTOR
@@ -442,7 +442,7 @@ public abstract class MarketSetting implements MarketSettingModel {
      *  @return
      */
     @Override
-    public final RetryPolicy retryPolicy() {
+    public final Retry retryPolicy() {
         return this.retryPolicy;
     }
 
@@ -452,7 +452,7 @@ public abstract class MarketSetting implements MarketSettingModel {
      * @return A value of retryPolicy property.
      */
     @SuppressWarnings("unused")
-    private final RetryPolicy getRetryPolicy() {
+    private final Retry getRetryPolicy() {
         return this.retryPolicy;
     }
 
@@ -461,7 +461,7 @@ public abstract class MarketSetting implements MarketSettingModel {
      *
      * @paran value A new value of retryPolicy property to assign.
      */
-    private final void setRetryPolicy(RetryPolicy value) {
+    private final void setRetryPolicy(Retry value) {
         if (value == null) {
             value = MarketSettingModel.super.retryPolicy();
         }
@@ -534,7 +534,7 @@ public abstract class MarketSetting implements MarketSettingModel {
      * @param value A new value to assign.
      * @return A created new model instance.
      */
-    public MarketSetting withRetryPolicy(RetryPolicy value) {
+    public MarketSetting withRetryPolicy(Retry value) {
         if (this.retryPolicy == value) {
             return this;
         }
@@ -689,7 +689,7 @@ public abstract class MarketSetting implements MarketSettingModel {
          * @param value A new value to assign.
          * @return The next assignable model.
          */
-        default Next retryPolicy(RetryPolicy value) {
+        default Next retryPolicy(Retry value) {
             ((MarketSetting) this).setRetryPolicy(value);
             return (Next) this;
         }

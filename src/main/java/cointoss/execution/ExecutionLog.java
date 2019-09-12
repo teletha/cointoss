@@ -60,7 +60,7 @@ import cointoss.market.bitmex.BitMex;
 import cointoss.util.Chrono;
 import cointoss.util.Network;
 import cointoss.util.Num;
-import cointoss.util.RetryPolicy;
+import cointoss.util.Retry;
 import cointoss.util.Span;
 import kiss.I;
 import kiss.Observer;
@@ -187,9 +187,7 @@ public class ExecutionLog {
     private final ExecutionLogger logger;
 
     /** The retry policy. */
-    private final RetryPolicy policy = new RetryPolicy().retryMaximum(100)
-            .delayLinear(Duration.ofSeconds(1))
-            .delayMaximum(Duration.ofMinutes(2));
+    private final Retry policy = Retry.with.limit(100).delayLinear(Duration.ofSeconds(1)).delayMaximum(Duration.ofMinutes(2));
 
     /**
      * Create log manager.
@@ -806,13 +804,13 @@ public class ExecutionLog {
         }
     }
 
-    public static void main3(String[] args) {
+    public static void main(String[] args) {
         Market market = new Market(BitMex.XBT_USD);
         market.readLog(log -> log.fromYestaday());
 
     }
 
-    public static void main(String[] args) {
+    public static void main2(String[] args) {
         Network.proxy("54.39.53.104", 3128);
 
         ExecutionLog log = new ExecutionLog(BitMex.XBT_USD);

@@ -725,6 +725,8 @@ class BitFlyerService extends MarketService {
 
         public Num executed_size;
 
+        public Num canceled_size;
+
         public String child_order_date;
 
         public OrderState child_order_state;

@@ -9,6 +9,7 @@
  */
 package cointoss.verify;
 
+import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.Iterator;
@@ -38,7 +39,7 @@ import cointoss.order.OrderType;
 import cointoss.order.QuantityCondition;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
-import cointoss.util.RetryPolicy;
+import cointoss.util.Retry;
 import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
@@ -93,14 +94,15 @@ public class VerifiableMarketService extends MarketService {
         super("TestableExchange", "TestableMarket", MarketSetting.with.baseCurrencyMinimumBidPrice(Num.ONE)
                 .targetCurrencyMinimumBidSize(Num.ONE)
                 .orderBookGroupRanges(Num.ONE)
-                .retryPolicy(new RetryPolicy().retryMaximum(0)));
+                .retryPolicy(Retry.with.unlimit().delayMaximum(Duration.ZERO)));
     }
 
     /**
      * 
      */
     public VerifiableMarketService(MarketService delegation) {
-        super(delegation.exchangeName, delegation.marketName, delegation.setting.withRetryPolicy(new RetryPolicy().retryMaximum(0)));
+        super(delegation.exchangeName, delegation.marketName, delegation.setting
+                .withRetryPolicy(Retry.with.unlimit().delayMaximum(Duration.ZERO)));
     }
 
     /**
