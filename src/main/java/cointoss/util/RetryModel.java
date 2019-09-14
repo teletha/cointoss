@@ -9,10 +9,11 @@
  */
 package cointoss.util;
 
-import static java.time.temporal.ChronoUnit.MINUTES;
+import static java.time.temporal.ChronoUnit.*;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.LongFunction;
 
@@ -77,6 +78,11 @@ public abstract class RetryModel implements WiseFunction<Signal<Throwable>, Sign
         return Duration.of(30, MINUTES);
     }
 
+    @Icy.Property
+    ScheduledExecutorService scheduler() {
+        return null;
+    }
+
     /**
      * Reset count.
      */
@@ -92,9 +98,6 @@ public abstract class RetryModel implements WiseFunction<Signal<Throwable>, Sign
         if (limit() <= 0) {
             return error.flatMap(e -> I.signalError(e));
         }
-
-        return error.take(limit()).delay(() -> {
-            return Chrono.between(delayMinimum(), delay().apply(count++), delayMaximum());
-        }, null);
+        return error.take(limit()).delay(() -> Chrono.between(delayMinimum(), delay().apply(count++), delayMaximum()), scheduler());
     }
 }

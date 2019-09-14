@@ -12,6 +12,7 @@ import java.lang.reflect.Method;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.LongFunction;
 import javax.annotation.processing.Generated;
@@ -97,6 +98,9 @@ public abstract class Retry extends RetryModel {
     /** The final property updater. */
     private static final MethodHandle delayMaximumUpdater = updater("delayMaximum");
 
+    /** The final property updater. */
+    private static final MethodHandle schedulerUpdater = updater("scheduler");
+
     /** The exposed property. */
     final long limit;
 
@@ -109,6 +113,9 @@ public abstract class Retry extends RetryModel {
     /** The exposed property. */
     final Duration delayMaximum;
 
+    /** The exposed property. */
+    final ScheduledExecutorService scheduler;
+
     /**
      * HIDE CONSTRUCTOR
      */
@@ -117,6 +124,7 @@ public abstract class Retry extends RetryModel {
         this.delay = super.delay();
         this.delayMinimum = super.delayMinimum();
         this.delayMaximum = super.delayMaximum();
+        this.scheduler = super.scheduler();
     }
 
     /**
@@ -261,6 +269,42 @@ public abstract class Retry extends RetryModel {
     }
 
     /**
+     * Return the scheduler property.
+     *
+     * @return A value of scheduler property.
+     */
+    @Override
+    final ScheduledExecutorService scheduler() {
+        return this.scheduler;
+    }
+
+    /**
+     * Provide classic getter API.
+     *
+     * @return A value of scheduler property.
+     */
+    @SuppressWarnings("unused")
+    private final ScheduledExecutorService getScheduler() {
+        return this.scheduler;
+    }
+
+    /**
+     * Provide classic setter API.
+     *
+     * @paran value A new value of scheduler property to assign.
+     */
+    private final void setScheduler(ScheduledExecutorService value) {
+        if (value == null) {
+            value = super.scheduler();
+        }
+        try {
+            schedulerUpdater.invoke(this, value);
+        } catch (Throwable e) {
+            throw quiet(e);
+        }
+    }
+
+    /**
      * Show all property values.
      *
      * @return All property values.
@@ -271,7 +315,8 @@ public abstract class Retry extends RetryModel {
         builder.append("limit=").append(limit).append(", ");
         builder.append("delay=").append(delay).append(", ");
         builder.append("delayMinimum=").append(delayMinimum).append(", ");
-        builder.append("delayMaximum=").append(delayMaximum).append("]");
+        builder.append("delayMaximum=").append(delayMaximum).append(", ");
+        builder.append("scheduler=").append(scheduler).append("]");
         return builder.toString();
     }
 
@@ -282,7 +327,7 @@ public abstract class Retry extends RetryModel {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(limit, delay, delayMinimum, delayMaximum);
+        return Objects.hash(limit, delay, delayMinimum, delayMaximum, scheduler);
     }
 
     /**
@@ -301,6 +346,7 @@ public abstract class Retry extends RetryModel {
         if (!Objects.equals(delay, other.delay)) return false;
         if (!Objects.equals(delayMinimum, other.delayMinimum)) return false;
         if (!Objects.equals(delayMaximum, other.delayMaximum)) return false;
+        if (!Objects.equals(scheduler, other.scheduler)) return false;
         return true;
     }
 
@@ -467,6 +513,17 @@ public abstract class Retry extends RetryModel {
             ((Retry) this).setDelayMaximum(value);
             return (Next) this;
         }
+
+        /**
+         * Assign scheduler property.
+         * 
+         * @param value A new value to assign.
+         * @return The next assignable model.
+         */
+        default Next scheduler(ScheduledExecutorService value) {
+            ((Retry) this).setScheduler(value);
+            return (Next) this;
+        }
     }
 
     /**
@@ -489,5 +546,6 @@ public abstract class Retry extends RetryModel {
         static final String Delay = "delay";
         static final String DelayMinimum = "delayMinimum";
         static final String DelayMaximum = "delayMaximum";
+        static final String Scheduler = "scheduler";
     }
 }

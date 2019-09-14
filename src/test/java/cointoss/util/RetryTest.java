@@ -9,22 +9,20 @@
  */
 package cointoss.util;
 
-import static java.time.temporal.ChronoUnit.MILLIS;
+import static java.time.temporal.ChronoUnit.*;
 
 import org.junit.jupiter.api.Test;
 
 import com.google.gson.JsonElement;
 
+import antibug.Chronus;
 import kiss.Observer;
-import kiss.WiseFunction;
 
-class RetryPolicyTest {
+class RetryTest {
+
+    Chronus chronus = new Chronus();
 
     ErrorNetwork network = new ErrorNetwork();
-
-    WiseFunction<String, String> throwError = e -> {
-        throw new Error();
-    };
 
     @Test
     void limit() {
@@ -38,10 +36,13 @@ class RetryPolicyTest {
 
     @Test
     void delay() {
-        Retry rety = Retry.with.limit(2).delay(100, MILLIS);
+        Retry rety = Retry.with.limit(3).delay(100, MILLIS).scheduler(chronus);
         Result result = new Result();
 
         network.rest(null).retryWhen(rety).to(result);
+        assert rety.count == 1;
+        assert result.error == null;
+        chronus.await();
         assert rety.count == 3;
         assert result.error != null;
     }
