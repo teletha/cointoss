@@ -9,7 +9,7 @@
  */
 package cointoss.util;
 
-import static java.time.temporal.ChronoUnit.*;
+import static java.time.temporal.ChronoUnit.MINUTES;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;

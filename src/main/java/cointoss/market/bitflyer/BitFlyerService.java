@@ -52,6 +52,7 @@ import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
 import kiss.Signaling;
+import kiss.WiseConsumer;
 import kiss.Ⅲ;
 import marionette.browser.Browser;
 import okhttp3.MediaType;
@@ -60,7 +61,11 @@ import okhttp3.RequestBody;
 import viewtify.Viewtify;
 
 /**
- * @version 2018/09/06 23:46:05
+ * <p>
+ * Since the order API and the real-time execution API are completely separate systems, execution
+ * data may arrive before the order response, or execution data may arrive after the cancellation
+ * response.
+ * </p>
  */
 class BitFlyerService extends MarketService {
 
@@ -93,7 +98,10 @@ class BitFlyerService extends MarketService {
     /** The order management. */
     private final Set<String> orders = ConcurrentHashMap.newKeySet();
 
-    /** The event stream of execution log for me. */
+    /** The shared event stream of real-time execution log. */
+    private Signal<Execution> executions;
+
+    /** The event stream of real-time execution log for me. */
     private final Signaling<Ⅲ<Direction, String, Execution>> executionsForMe = new Signaling();
 
     /** Flag for test. */
@@ -149,14 +157,6 @@ class BitFlyerService extends MarketService {
         Signal<String> call;
         String id = "JRF" + Chrono.utcNow().format(format) + RandomStringUtils.randomNumeric(6);
 
-        // If the execution history comes to the real-time API before response, the order cannot be
-        // identified from the real-time API.
-        //
-        // Record all execution history from ordering to response, and check if there is already an
-        // execution record at response.
-        List<Execution> identifiers = new LinkedContainer();
-        identifiersWhileOrderRequesting.add(identifiers);
-
         if (forTest || maintainer.session() == null) {
             ChildOrderRequest request = new ChildOrderRequest();
             request.child_order_type = order.type == OrderType.Maker ? "LIMIT" : "MARKET";
@@ -189,18 +189,6 @@ class BitFlyerService extends MarketService {
             orders.add(v);
             order.observeTerminating().to(() -> orders.remove(v));
 
-            // Since ID registration has been completed, it is possible to detect contracts from the
-            // real-time API. Check if there is an order in the execution history recorded after
-            // placing the order.
-            identifiersWhileOrderRequesting.remove(identifiers);
-            for (Execution buffered : identifiers) {
-                if (buffered.info.equals(v)) {
-                    executionsForMe.accept(I.pair(Direction.BUY, v, buffered));
-                } else if (buffered.detail.equals(v)) {
-                    executionsForMe.accept(I.pair(Direction.SELL, v, buffered));
-                }
-            }
-
             // check order state
             intervalOrderCheck.takeUntil(order.observeTerminating())
                     .map(orders -> orders.get(orders.indexOf(order)))
@@ -211,9 +199,50 @@ class BitFlyerService extends MarketService {
                         order.relation(Internals.class).id = o.relation(Internals.class).id;
 
                     });
-        }).effectOnTerminate(() -> {
+        }).effect(new ComplementExecutionWhileOrderRequestAndResponse());
+    }
 
-        });
+    /**
+     * <p>
+     * If the execution data comes to the real-time API before the oreder's response, the order
+     * cannot be identified from the real-time API.
+     * </p>
+     * <p>
+     * Record all execution data from request to response, and check if there is already an
+     * execution data at response.
+     * </p>
+     */
+    private class ComplementExecutionWhileOrderRequestAndResponse implements WiseConsumer<String> {
+
+        /** The realtime execution manager. */
+        private final LinkedList<Execution> executions = new LinkedList();
+
+        /** The disposer for realtime execution stream. */
+        private final Disposable disposer;
+
+        /**
+         * 
+         */
+        private ComplementExecutionWhileOrderRequestAndResponse() {
+            disposer = executionsRealtimely().to(executions::add);
+        }
+
+        /**
+         * Because ID registration has been completed, it is possible to detect contracts from the
+         * real-time API. Check if there is an order in the execution data recorded after placing
+         * the order.
+         */
+        @Override
+        public void ACCEPT(String orderId) throws Throwable {
+            disposer.dispose();
+            executions.forEach(e -> {
+                if (e.info.equals(orderId)) {
+                    executionsForMe.accept(I.pair(Direction.BUY, orderId, e));
+                } else if (e.detail.equals(orderId)) {
+                    executionsForMe.accept(I.pair(Direction.SELL, orderId, e));
+                }
+            });
+        }
     }
 
     /**
@@ -247,55 +276,60 @@ class BitFlyerService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Execution> executionsRealtimely() {
-        String[] previous = new String[] {"", ""};
+    public synchronized Signal<Execution> executionsRealtimely() {
+        if (executions != null) {
+            return executions;
+        } else {
+            String[] previous = new String[] {"", ""};
 
-        return network.jsonRPC("wss://ws.lightstream.bitflyer.com/json-rpc", "lightning_executions_" + marketName)
-                .flatIterable(JsonElement::getAsJsonArray)
-                .map(JsonElement::getAsJsonObject)
-                .map(e -> {
-                    long id = e.get("id").getAsLong();
+            return executions = network.jsonRPC("wss://ws.lightstream.bitflyer.com/json-rpc", "lightning_executions_" + marketName)
+                    .flatIterable(JsonElement::getAsJsonArray)
+                    .map(JsonElement::getAsJsonObject)
+                    .map(e -> {
+                        long id = e.get("id").getAsLong();
 
-                    if (id == 0 && latestId == 0) {
-                        return null; // skip
-                    }
-
-                    id = latestId = id != 0 ? id : ++latestId;
-                    Direction direction = Direction.parse(e.get("side").getAsString());
-                    Num size = Num.of(e.get("size").getAsString());
-                    Num price = Num.of(e.get("price").getAsString());
-                    ZonedDateTime date = parse(e.get("exec_date").getAsString()).atZone(Chrono.UTC);
-                    String buyer = e.get("buy_child_order_acceptance_id").getAsString();
-                    String seller = e.get("sell_child_order_acceptance_id").getAsString();
-                    String taker = direction.isBuy() ? buyer : seller;
-                    int consecutiveType = estimateConsecutiveType(previous[0], previous[1], buyer, seller);
-                    int delay = estimateDelay(taker, date);
-
-                    Execution exe = Execution.with.direction(direction, size)
-                            .id(id)
-                            .price(price)
-                            .date(date)
-                            .consecutive(consecutiveType)
-                            .delay(delay)
-                            .info(buyer)
-                            .detail(seller);
-
-                    if (orders.contains(buyer)) {
-                        executionsForMe.accept(I.pair(Direction.BUY, buyer, exe));
-                    } else if (orders.contains(seller)) {
-                        executionsForMe.accept(I.pair(Direction.SELL, seller, exe));
-                    } else if (!identifiersWhileOrderRequesting.isEmpty()) {
-                        for (List<Execution> list : identifiersWhileOrderRequesting) {
-                            list.add(exe);
+                        if (id == 0 && latestId == 0) {
+                            return null; // skip
                         }
-                    }
 
-                    previous[0] = buyer;
-                    previous[1] = seller;
+                        id = latestId = id != 0 ? id : ++latestId;
+                        Direction direction = Direction.parse(e.get("side").getAsString());
+                        Num size = Num.of(e.get("size").getAsString());
+                        Num price = Num.of(e.get("price").getAsString());
+                        ZonedDateTime date = parse(e.get("exec_date").getAsString()).atZone(Chrono.UTC);
+                        String buyer = e.get("buy_child_order_acceptance_id").getAsString();
+                        String seller = e.get("sell_child_order_acceptance_id").getAsString();
+                        String taker = direction.isBuy() ? buyer : seller;
+                        int consecutiveType = estimateConsecutiveType(previous[0], previous[1], buyer, seller);
+                        int delay = estimateDelay(taker, date);
 
-                    return exe;
-                })
-                .skipNull();
+                        Execution exe = Execution.with.direction(direction, size)
+                                .id(id)
+                                .price(price)
+                                .date(date)
+                                .consecutive(consecutiveType)
+                                .delay(delay)
+                                .info(buyer)
+                                .detail(seller);
+
+                        if (orders.contains(buyer)) {
+                            executionsForMe.accept(I.pair(Direction.BUY, buyer, exe));
+                        } else if (orders.contains(seller)) {
+                            executionsForMe.accept(I.pair(Direction.SELL, seller, exe));
+                        } else if (!identifiersWhileOrderRequesting.isEmpty()) {
+                            for (List<Execution> list : identifiersWhileOrderRequesting) {
+                                list.add(exe);
+                            }
+                        }
+
+                        previous[0] = buyer;
+                        previous[1] = seller;
+
+                        return exe;
+                    })
+                    .skipNull()
+                    .share();
+        }
     }
 
     /**
