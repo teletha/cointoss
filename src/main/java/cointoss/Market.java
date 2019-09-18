@@ -29,7 +29,6 @@ import cointoss.order.OrderStrategy.Cancellable;
 import cointoss.order.OrderStrategy.Makable;
 import cointoss.order.OrderStrategy.Orderable;
 import cointoss.order.OrderStrategy.Takable;
-import cointoss.order.PositionManager;
 import cointoss.ticker.TickerManager;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
@@ -87,9 +86,6 @@ public class Market implements Disposable {
         return previous;
     }).skip(e -> e == null || e == Market.BASE);
 
-    /** The position manager. */
-    public final PositionManager positions;
-
     /**
      * Build {@link Market} with the specified {@link MarketServiceProvider}.
      * 
@@ -99,7 +95,6 @@ public class Market implements Disposable {
         this.service = Objects.requireNonNull(service, "Market is not found.");
         this.orders = new OrderManager(service);
         this.orderBook = new OrderBookManager(service);
-        this.positions = new PositionManager(service);
 
         // build tickers for each span
         timeline.to(tickers::update);
@@ -227,22 +222,22 @@ public class Market implements Disposable {
      * Stop all positions with {@link Orderable}.
      */
     public final Signal<Order> stop(WiseConsumer<Orderable> strategy) {
-        if (positions.hasNoPosition()) {
+        if (orders.hasNoPosition()) {
             return I.signal();
         }
 
         if (strategy == null) {
             strategy = I.recurse((self, s) -> {
-                if (positions.price.v.isLessThan(positions.direction(), latestPrice())) {
+                if (orders.positionPrice.v.isLessThan(orders.positionDirection(), latestPrice())) {
                     // loss
-                    s.makeBestPrice(positions.direction()).cancelAfter(2, ChronoUnit.SECONDS).take();
+                    s.makeBestPrice(orders.positionDirection()).cancelAfter(2, ChronoUnit.SECONDS).take();
                 } else {
                     // profit
-                    s.makeBestPrice(positions.direction().inverse()).cancelAfter(5, ChronoUnit.SECONDS).next(self);
+                    s.makeBestPrice(orders.positionDirection().inverse()).cancelAfter(5, ChronoUnit.SECONDS).next(self);
                 }
             });
         }
-        return request(positions.direction().inverse(), positions.size.v, strategy);
+        return request(orders.positionDirection().inverse(), orders.positionSize.v, strategy);
     }
 
     /**
@@ -382,7 +377,7 @@ public class Market implements Disposable {
         @Override
         public Cancellable makePositionPrice() {
             actions.add((market, direction, size, previous, orders) -> {
-                make(market.positions.price.v
+                make(market.orders.positionPrice.v
                         .scale(market.service.setting.baseCurrencyScaleSize), market, direction, size, previous, orders);
             });
             return this;

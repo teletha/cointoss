@@ -28,12 +28,12 @@ class PositionManagerTest {
 
     VerifiableMarketService service;
 
-    PositionManager positions;
+    OrderManager positions;
 
     @BeforeEach
     void init() {
         service = new VerifiableMarketService();
-        positions = new PositionManager(service);
+        positions = new OrderManager(service);
     }
 
     @Test
@@ -48,72 +48,72 @@ class PositionManagerTest {
 
     @Test
     void isLong() {
-        assert positions.isLong() == false;
-        assert positions.isShort() == false;
+        assert positions.hasLongPosition() == false;
+        assert positions.hasShortPosition() == false;
 
         positions.add(Execution.with.buy(1).price(10));
-        assert positions.isLong() == true;
-        assert positions.isShort() == false;
+        assert positions.hasLongPosition() == true;
+        assert positions.hasShortPosition() == false;
     }
 
     @Test
     void isShort() {
-        assert positions.isLong() == false;
-        assert positions.isShort() == false;
+        assert positions.hasLongPosition() == false;
+        assert positions.hasShortPosition() == false;
 
         positions.add(Execution.with.sell(1).price(10));
-        assert positions.isLong() == false;
-        assert positions.isShort() == true;
+        assert positions.hasLongPosition() == false;
+        assert positions.hasShortPosition() == true;
     }
 
     @Test
     void size() {
-        assert positions.size.is(Num.ZERO);
+        assert positions.positionSize.is(Num.ZERO);
 
         // long
         positions.add(Execution.with.buy(1).price(10));
-        assert positions.size.is(Num.ONE);
+        assert positions.positionSize.is(Num.ONE);
 
         // same price long
         positions.add(Execution.with.buy(1).price(10));
-        assert positions.size.is(Num.TWO);
+        assert positions.positionSize.is(Num.TWO);
 
         // different price long
         positions.add(Execution.with.buy(1).price(20));
-        assert positions.size.is(Num.THREE);
+        assert positions.positionSize.is(Num.THREE);
 
         // short
         positions.add(Execution.with.sell(2).price(10));
-        assert positions.size.is(Num.ONE);
+        assert positions.positionSize.is(Num.ONE);
 
         // turn over
         positions.add(Execution.with.sell(2).price(20));
-        assert positions.size.is(Num.ONE);
+        assert positions.positionSize.is(Num.ONE);
     }
 
     @Test
     void price() {
-        assert positions.price.is(Num.ZERO);
+        assert positions.positionPrice.is(Num.ZERO);
 
         // long
         positions.add(Execution.with.buy(1).price(10));
-        assert positions.price.is(Num.TEN);
+        assert positions.positionPrice.is(Num.TEN);
 
         // same price long
         positions.add(Execution.with.buy(1).price(10));
-        assert positions.price.is(Num.TEN);
+        assert positions.positionPrice.is(Num.TEN);
 
         // different price long
         positions.add(Execution.with.buy(2).price(20));
-        assert positions.price.is(Num.of(15));
+        assert positions.positionPrice.is(Num.of(15));
 
         // short
         positions.add(Execution.with.sell(2).price(10));
-        assert positions.price.is(Num.of(20));
+        assert positions.positionPrice.is(Num.of(20));
 
         // turn over
         positions.add(Execution.with.sell(2).price(20));
-        assert positions.price.is(Num.ZERO);
+        assert positions.positionPrice.is(Num.ZERO);
     }
 
     @Test
@@ -152,38 +152,38 @@ class PositionManagerTest {
     @Test
     void increase() {
         positions.add(Execution.with.sell(3).price(10));
-        assert positions.size.is(Num.of(3));
+        assert positions.positionSize.is(Num.of(3));
         positions.add(Execution.with.buy(1).price(10));
-        assert positions.size.is(Num.of(2));
+        assert positions.positionSize.is(Num.of(2));
         positions.add(Execution.with.buy(1).price(10));
-        assert positions.size.is(Num.of(1));
+        assert positions.positionSize.is(Num.of(1));
         positions.add(Execution.with.buy(1).price(10));
-        assert positions.size.is(Num.of(0));
+        assert positions.positionSize.is(Num.of(0));
         positions.add(Execution.with.buy(1).price(10));
-        assert positions.size.is(Num.of(1));
+        assert positions.positionSize.is(Num.of(1));
         positions.add(Execution.with.buy(1).price(10));
-        assert positions.size.is(Num.of(2));
+        assert positions.positionSize.is(Num.of(2));
     }
 
     @Test
     void decrease() {
         positions.add(Execution.with.buy(3).price(10));
-        assert positions.size.is(Num.of(3));
+        assert positions.positionSize.is(Num.of(3));
         positions.add(Execution.with.sell(1).price(10));
-        assert positions.size.is(Num.of(2));
+        assert positions.positionSize.is(Num.of(2));
         positions.add(Execution.with.sell(1).price(10));
-        assert positions.size.is(Num.of(1));
+        assert positions.positionSize.is(Num.of(1));
         positions.add(Execution.with.sell(1).price(10));
-        assert positions.size.is(Num.of(0));
+        assert positions.positionSize.is(Num.of(0));
         positions.add(Execution.with.sell(1).price(10));
-        assert positions.size.is(Num.of(1));
+        assert positions.positionSize.is(Num.of(1));
         positions.add(Execution.with.sell(1).price(10));
-        assert positions.size.is(Num.of(2));
+        assert positions.positionSize.is(Num.of(2));
     }
 
     @Test
     void added() {
-        List<Position> added = positions.added.toList();
+        List<Position> added = positions.positionAdded.toList();
         assert added.size() == 0;
 
         positions.add(Execution.with.buy(1).price(10));
@@ -208,7 +208,7 @@ class PositionManagerTest {
 
     @Test
     void removed() {
-        List<Position> removed = positions.removed.toList();
+        List<Position> removed = positions.positionRemoved.toList();
         assert removed.size() == 0;
 
         positions.add(Execution.with.buy(1).price(10));

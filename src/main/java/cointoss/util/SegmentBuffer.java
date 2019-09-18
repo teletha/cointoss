@@ -90,7 +90,7 @@ public final class SegmentBuffer<E> {
     /**
      * Add realtime item.
      * 
-     * @param items An items to add.
+     * @param positions An items to add.
      */
     public void add(E item) {
         try {

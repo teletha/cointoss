@@ -408,7 +408,7 @@ public abstract class Execution extends ExecutionModel {
     }
 
     /**
-     * Accessor for {@link #price}.
+     * Accessor for {@link #positionPrice}.
      *  
      *  @return
      */
@@ -444,7 +444,7 @@ public abstract class Execution extends ExecutionModel {
     }
 
     /**
-     * Accessor for {@link #price}.
+     * Accessor for {@link #positionPrice}.
      *  
      *  @return
      */
@@ -477,7 +477,7 @@ public abstract class Execution extends ExecutionModel {
     }
 
     /**
-     * Accessor for {@link #price}.
+     * Accessor for {@link #positionPrice}.
      *  
      *  @return
      */
@@ -510,7 +510,7 @@ public abstract class Execution extends ExecutionModel {
     }
 
     /**
-     * Accessor for {@link #price}.
+     * Accessor for {@link #positionPrice}.
      *  
      *  @return
      */

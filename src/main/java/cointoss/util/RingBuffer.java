@@ -51,7 +51,7 @@ public class RingBuffer<T> implements Iterable<T> {
     }
 
     /**
-     * @param size
+     * @param positionSize
      */
     public RingBuffer(RingBuffer buffer, String name) {
         this.name = name;

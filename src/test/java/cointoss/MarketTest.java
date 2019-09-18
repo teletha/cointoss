@@ -33,7 +33,7 @@ public class MarketTest {
     @PowerAssertOff
     void stop() {
         market.requestAndExecution(Order.with.buy(1).price(10));
-        assert market.positions.hasPosition();
+        assert market.orders.hasPosition();
 
         List<Order> orders = market.stop(s -> s.take()).toList();
         Order order = orders.get(0);

@@ -195,7 +195,7 @@ public class OrderBuilder extends View {
     @Override
     protected void initialize() {
         orderSize.initial("0").when(User.Scroll, changeBy(orderSizeAmount.ui)).require(positiveNumber).when(User.MiddleClick, e -> {
-            orderSize.value(view.market().positions.size.toString());
+            orderSize.value(view.market().orders.positionSize.toString());
         });
         orderSizeAmount.values(0, view.service.setting.targetCurrencyBidSizes());
 

@@ -191,7 +191,7 @@ public abstract class ExecutionModel implements Directional {
     }
 
     /**
-     * Accessor for {@link #price}.
+     * Accessor for {@link #positionPrice}.
      * 
      * @return
      */
@@ -224,7 +224,7 @@ public abstract class ExecutionModel implements Directional {
     }
 
     /**
-     * Accessor for {@link #price}.
+     * Accessor for {@link #positionPrice}.
      * 
      * @return
      */
@@ -234,7 +234,7 @@ public abstract class ExecutionModel implements Directional {
     }
 
     /**
-     * Accessor for {@link #price}.
+     * Accessor for {@link #positionPrice}.
      * 
      * @return
      */
@@ -244,7 +244,7 @@ public abstract class ExecutionModel implements Directional {
     }
 
     /**
-     * Accessor for {@link #price}.
+     * Accessor for {@link #positionPrice}.
      * 
      * @return
      */
