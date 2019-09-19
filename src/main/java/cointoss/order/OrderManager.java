@@ -30,7 +30,7 @@ import kiss.Variable;
 import kiss.Ⅱ;
 
 /**
- * @version 2018/07/17 0:08:29
+ * 
  */
 public final class OrderManager {
 
