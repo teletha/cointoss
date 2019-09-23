@@ -9,7 +9,7 @@
  */
 package cointoss.util;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -344,17 +344,20 @@ public class Network {
      * @param channel
      * @return
      */
-    public Signal<JsonElement> signalr(String uri, String query, String channel, String event) {
+    public Signal<JsonElement> signalr(String uri, String query, String channel, String... events) {
         return new Signal<>((observer, disposer) -> {
             // Connect to the server
             HubConnection connection = new HubConnection(uri, query, true, new NullLogger());
             connection.error(observer::error);
             HubProxy proxy = connection.createHubProxy(channel);
-            proxy.subscribe(event).addReceivedHandler(array -> {
-                for (JsonElement e : array) {
-                    observer.accept(e);
-                }
-            });
+
+            for (String event : events) {
+                proxy.subscribe(event).addReceivedHandler(array -> {
+                    for (JsonElement e : array) {
+                        observer.accept(e);
+                    }
+                });
+            }
 
             // Start the connection
             connection.start();

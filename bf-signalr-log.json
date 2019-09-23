@@ -1,0 +1,180 @@
+[
+	{
+		"order": {
+			"account_id": "**********",
+			"order_id": "JFX20190923-050844-232549F",
+			"product_code": "FX_BTC_JPY",
+			"side": "BUY",
+			"order_type": "LIMIT",
+			"price": 1120178,
+			"average_price": 1120178,
+			"size": 0.01,
+			"order_state": "ACTIVE",
+			"expire_date": "2019-10-23T05:08:44",
+			"order_date": "2019-09-23T05:08:44",
+			"order_ref_id": "JRF20190923-050844-548695",
+			"outstanding_size": 0.00780215,
+			"cancel_size": 0,
+			"executed_size": 0.00219785,
+			"max_commission": 0,
+			"total_commission": 0,
+			"reason": null,
+			"parent_order_id": "",
+			"time_in_force": "GTC",
+			"order_events": [
+				{
+					"execution_id": null,
+					"order_event": "NEW",
+					"event_date": "2019-09-23T05:08:44",
+					"price": 1120178,
+					"size": 0.01,
+					"commission": 0,
+					"sfd": 0,
+					"reason": "",
+					"self_match": false,
+					"user_match": false
+				},
+				{
+					"execution_id": null,
+					"order_event": "ACK",
+					"event_date": "2019-09-23T05:08:44.6322601Z",
+					"price": 1120178,
+					"size": 0.01,
+					"commission": 0,
+					"sfd": 0,
+					"reason": "",
+					"self_match": false,
+					"user_match": false
+				},
+				{
+					"execution_id": "JEX20190923-050848-237380F",
+					"order_event": "EXECUTION",
+					"event_date": "2019-09-23T05:08:48.9653874Z",
+					"price": 1120178,
+					"size": 0.00219785,
+					"commission": 0,
+					"sfd": 0,
+					"reason": "",
+					"self_match": false,
+					"user_match": false
+				}
+			],
+			"OrderStateForGUI": "PARTIAL"
+		},
+		"order_event_updates": [
+			{
+				"execution_id": "JEX20190923-050848-237380F",
+				"order_event": "EXECUTION",
+				"event_date": "2019-09-23T05:08:48.9653874Z",
+				"price": 1120178,
+				"size": 0.00219785,
+				"commission": 0,
+				"sfd": 0,
+				"reason": "",
+				"self_match": false,
+				"user_match": false
+			}
+		]
+	},
+	{
+		"order": {
+			"account_id": "**********",
+			"order_id": "JFX20190923-050844-232549F",
+			"product_code": "FX_BTC_JPY",
+			"side": "BUY",
+			"order_type": "LIMIT",
+			"price": 1120178,
+			"average_price": 1120178,
+			"size": 0.01,
+			"order_state": "COMPLETED",
+			"expire_date": "2019-10-23T05:08:44",
+			"order_date": "2019-09-23T05:08:44",
+			"order_ref_id": "JRF20190923-050844-548695",
+			"outstanding_size": 0,
+			"cancel_size": 0,
+			"executed_size": 0.01,
+			"max_commission": 0,
+			"total_commission": 0,
+			"reason": null,
+			"parent_order_id": "",
+			"time_in_force": "GTC",
+			"order_events": [
+				{
+					"execution_id": null,
+					"order_event": "NEW",
+					"event_date": "2019-09-23T05:08:44",
+					"price": 1120178,
+					"size": 0.01,
+					"commission": 0,
+					"sfd": 0,
+					"reason": "",
+					"self_match": false,
+					"user_match": false
+				},
+				{
+					"execution_id": null,
+					"order_event": "ACK",
+					"event_date": "2019-09-23T05:08:44.6322601Z",
+					"price": 1120178,
+					"size": 0.01,
+					"commission": 0,
+					"sfd": 0,
+					"reason": "",
+					"self_match": false,
+					"user_match": false
+				},
+				{
+					"execution_id": "JEX20190923-050848-237380F",
+					"order_event": "EXECUTION",
+					"event_date": "2019-09-23T05:08:48.9653874Z",
+					"price": 1120178,
+					"size": 0.00219785,
+					"commission": 0,
+					"sfd": 0,
+					"reason": "",
+					"self_match": false,
+					"user_match": false
+				},
+				{
+					"execution_id": "JEX20190923-050848-237405F",
+					"order_event": "EXECUTION",
+					"event_date": "2019-09-23T05:08:48.9653874Z",
+					"price": 1120178,
+					"size": 0.00780215,
+					"commission": 0,
+					"sfd": 0,
+					"reason": "",
+					"self_match": false,
+					"user_match": false
+				}
+			],
+			"OrderStateForGUI": "COMPLETED"
+		},
+		"order_event_updates": [
+			{
+				"execution_id": "JEX20190923-050848-237380F",
+				"order_event": "EXECUTION",
+				"event_date": "2019-09-23T05:08:48.9653874Z",
+				"price": 1120178,
+				"size": 0.00219785,
+				"commission": 0,
+				"sfd": 0,
+				"reason": "",
+				"self_match": false,
+				"user_match": false
+			},
+			{
+				"execution_id": "JEX20190923-050848-237405F",
+				"order_event": "EXECUTION",
+				"event_date": "2019-09-23T05:08:48.9653874Z",
+				"price": 1120178,
+				"size": 0.00780215,
+				"commission": 0,
+				"sfd": 0,
+				"reason": "",
+				"self_match": false,
+				"user_match": false
+			}
+		]
+	}
+]
