@@ -12,9 +12,6 @@ package cointoss.market.bitflyer;
 import cointoss.market.MarketAccount;
 import kiss.Variable;
 
-/**
- * @version 2018/09/06 21:25:30
- */
 public class BitFlyerAccount extends MarketAccount<BitFlyerAccount> {
 
     /** The API key. */
@@ -31,6 +28,9 @@ public class BitFlyerAccount extends MarketAccount<BitFlyerAccount> {
 
     /** The account id. */
     public final Variable<String> accountId = Variable.empty();
+
+    /** The account token. */
+    public final Variable<String> accountToken = Variable.empty();
 
     /**
      * Hide constructor.

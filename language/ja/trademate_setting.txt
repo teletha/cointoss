@@ -1,8 +1,11 @@
 Access Token
-アクセス・トークン
+アクセストークン
 
 Account ID
 アカウントID
+
+Account Token
+アカウントトークン
 
 Appearance
 外観

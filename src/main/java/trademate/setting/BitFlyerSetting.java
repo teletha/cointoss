@@ -10,7 +10,7 @@
 package trademate.setting;
 
 import static trademate.setting.SettingStyles.*;
-import static transcript.Transcript.en;
+import static transcript.Transcript.*;
 
 import cointoss.market.bitflyer.BitFlyerAccount;
 import kiss.I;
@@ -40,6 +40,8 @@ public class BitFlyerSetting extends View {
     private UIPassword loginPassword;
 
     private UIPassword accountId;
+
+    private UIPassword accountToken;
 
     private UICheckBox loginBackground;
 
@@ -91,9 +93,14 @@ public class BitFlyerSetting extends View {
                             $(accountId, FormInput);
                         });
                         $(hbox, FormRow, () -> {
+                            label(en("Account Token"), FormLabel);
+                            $(accountToken, FormInput);
+                        });
+                        $(hbox, FormRow, () -> {
                             label(LoginExplicitly, FormLabel);
                             $(loginBackground, FormInput);
                         });
+
                     });
                 });
             }
@@ -110,6 +117,7 @@ public class BitFlyerSetting extends View {
         loginId.model(account.loginId);
         loginPassword.model(account.loginPassword);
         accountId.model(account.accountId);
+        accountToken.model(account.accountToken);
 
         loginBackground.when(User.Action).to(() -> {
             if (Lang.current() == Lang.EN) {
