@@ -220,6 +220,14 @@ public class VerifiableMarketService extends MarketService {
      * {@inheritDoc}
      */
     @Override
+    public Signal<Order> ordersRealtimely() {
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Signal<Num> baseCurrency() {
         return I.signal(baseCurrency);
     }

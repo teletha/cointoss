@@ -158,6 +158,14 @@ class BitMexService extends MarketService {
      * {@inheritDoc}
      */
     @Override
+    public Signal<Order> ordersRealtimely() {
+        return I.signal();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Signal<Num> baseCurrency() {
         return null;
     }

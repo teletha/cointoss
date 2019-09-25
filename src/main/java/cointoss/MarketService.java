@@ -183,6 +183,13 @@ public abstract class MarketService implements Disposable {
     public abstract Signal<Order> orders();
 
     /**
+     * Acquire the order state in realtime. This is infinitely.
+     * 
+     * @return A event stream of order state.
+     */
+    public abstract Signal<Order> ordersRealtimely();
+
+    /**
      * <p>
      * Get amount of the base and target currency.
      * </p>

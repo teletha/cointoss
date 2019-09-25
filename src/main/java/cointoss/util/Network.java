@@ -9,7 +9,7 @@
  */
 package cointoss.util;
 
-import static java.util.concurrent.TimeUnit.*;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -362,9 +362,7 @@ public class Network {
             // Start the connection
             connection.start();
 
-            return disposer.add(() -> {
-                connection.disconnect();
-            });
+            return disposer.add(connection::disconnect);
         });
     }
 

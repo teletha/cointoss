@@ -9,7 +9,7 @@
  */
 package cointoss.market.bitflyer;
 
-import static cointoss.order.OrderState.*;
+import static cointoss.order.OrderState.ACTIVE;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -25,6 +25,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+
+import javafx.scene.control.TextInputDialog;
 
 import org.apache.commons.codec.digest.HmacAlgorithms;
 import org.apache.commons.codec.digest.HmacUtils;
@@ -46,11 +48,11 @@ import cointoss.order.OrderUnit;
 import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
-import javafx.scene.control.TextInputDialog;
 import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
 import kiss.Signaling;
+import kiss.Variable;
 import kiss.WiseConsumer;
 import kiss.Ⅲ;
 import marionette.browser.Browser;
@@ -123,6 +125,9 @@ class BitFlyerService extends MarketService {
     /** The latest realtime execution id. */
     private long latestId;
 
+    /** The realtime user order state. */
+    private Variable<JsonObject> realtimeOrders;
+
     /**
      * @param type
      */
@@ -138,6 +143,19 @@ class BitFlyerService extends MarketService {
 
         this.forTest = forTest;
         this.intervalOrderCheck = I.signal(0, 1, TimeUnit.SECONDS).map(v -> orders().toList()).share();
+    }
+
+    private synchronized Variable<JsonObject> realtimeOrders() {
+        if (realtimeOrders == null) {
+            realtimeOrders = Variable.empty();
+            disposer.add(network
+                    .signalr("https://signal.bitflyer.com/signalr/hubs", "account_id=" + account.accountId + "&token=" + account.accountToken + "&products=" + marketName + "%2Cheartbeat", "BFEXHub", "ReceiveOrderUpdates")
+                    .flatIterable(JsonElement::getAsJsonArray)
+                    .map(e -> e.getAsJsonObject().getAsJsonObject("order"))
+                    .take(e -> e.get("product_code").getAsString().equals(marketName))
+                    .to(realtimeOrders::set));
+        }
+        return realtimeOrders;
     }
 
     /**
@@ -183,7 +201,12 @@ class BitFlyerService extends MarketService {
                     .map(e -> e.data.get("order_ref_id"));
         }
 
+        realtimeOrders().observe().to(e -> {
+            System.out.println(e);
+        });
+
         return call.effect(v -> {
+            System.out.println(v);
             // register order id
             orders.add(v);
             order.observeTerminating().to(() -> orders.remove(v));
@@ -196,7 +219,7 @@ class BitFlyerService extends MarketService {
                     .to(o -> {
                         state.accept(ACTIVE);
                         order.relation(Internals.class).id = o.relation(Internals.class).id;
-
+                        System.out.println("Order reqested");
                     });
         }).effect(new ComplementExecutionWhileOrderRequestAndResponse());
     }
@@ -258,7 +281,9 @@ class BitFlyerService extends MarketService {
         Signal requestCancel = forTest || maintainer.session() == null || cancel.order_id == null
                 ? call("POST", "/v1/me/cancelchildorder", cancel, null, null)
                 : call("POST", "https://lightning.bitflyer.jp/api/trade/cancelorder", cancel, null, WebResponse.class);
-        Signal<List<Order>> isCanceled = intervalOrderCheck.take(orders -> !orders.contains(order));
+        Signal<List<Order>> isCanceled = intervalOrderCheck.take(orders -> !orders.contains(order)).effect(e -> {
+            System.out.println("order canceld");
+        });
 
         return requestCancel.combine(isCanceled).take(1).mapTo(order);
     }
@@ -500,6 +525,14 @@ class BitFlyerService extends MarketService {
     public Signal<Order> orders() {
         return call("GET", "/v1/me/getchildorders?child_order_state=ACTIVE&product_code=" + marketName, "", "*", ChildOrderResponse.class)
                 .map(ChildOrderResponse::toOrder);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Signal<Order> ordersRealtimely() {
+        return null;
     }
 
     /**
