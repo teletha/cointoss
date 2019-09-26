@@ -13,7 +13,6 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-import antibug.powerassert.PowerAssertOff;
 import cointoss.execution.Execution;
 import cointoss.order.Order;
 import cointoss.verify.VerifiableMarket;
@@ -30,7 +29,6 @@ public class MarketTest {
     }
 
     @Test
-    @PowerAssertOff
     void stop() {
         market.requestAndExecution(Order.with.buy(1).price(10));
         assert market.orders.hasPosition();

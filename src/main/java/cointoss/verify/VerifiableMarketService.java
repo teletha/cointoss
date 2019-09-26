@@ -344,6 +344,7 @@ public class VerifiableMarketService extends MarketService {
                 }
 
                 orderUpdating.accept(Order.with.direction(order.direction, order.size)
+                        .price(order.price)
                         .id(order.id)
                         .state(order.state)
                         .executedSize(order.executedSize)

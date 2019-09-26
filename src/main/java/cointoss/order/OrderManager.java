@@ -164,6 +164,7 @@ public final class OrderManager {
                         .take(o -> o.id.equals(id))
                         .effectOnTerminate(() -> remove.accept(order))
                         .to(o -> {
+                            order.assignPrice(o.price);
                             order.setExecutedSize(o.executedSize);
                             order.setRemainingSize(o.remainingSize);
                             order.assignState(o.state);
