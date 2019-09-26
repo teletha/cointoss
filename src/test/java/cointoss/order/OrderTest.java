@@ -9,7 +9,7 @@
  */
 package cointoss.order;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.List;
 
@@ -142,7 +142,7 @@ public class OrderTest {
         assert Order.with.direction(Direction.BUY, 1).direction.isBuy();
         assert Order.with.direction(Direction.SELL, 1).direction.isSell();
 
-        assertThrows(IllegalArgumentException.class, () -> Order.with.direction(null, 1));
+        assertThrows(IllegalArgumentException.class, () -> Order.with.direction((Direction) null, 1));
     }
 
     @Test

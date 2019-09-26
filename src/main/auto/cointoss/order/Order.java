@@ -56,6 +56,9 @@ public abstract class Order extends OrderModel {
     }
 
     /** The overload or intercept method invoker. */
+    private static final MethodHandle direction$927011984= invoker("direction", String.class);
+
+    /** The overload or intercept method invoker. */
     private static final MethodHandle size$1093866057= invoker("size", long.class);
 
     /** The overload or intercept method invoker. */
@@ -846,6 +849,45 @@ public abstract class Order extends OrderModel {
             o.size(size);
             return (Self)o;
         }
+
+        /**
+         * Specify direction by literal.
+         *  
+         *  @param direction A direction literal.
+         *  @return A parsed direction.
+         */
+        public Self direction(String direction, Num size) {
+            Åssignable o = new Åssignable();
+            o.direction(direction);
+            o.size(size);
+            return (Self)o;
+        }
+
+        /**
+         * Specify direction by literal.
+         *  
+         *  @param direction A direction literal.
+         *  @return A parsed direction.
+         */
+        public Self direction(String direction, long size) {
+            Åssignable o = new Åssignable();
+            o.direction(direction);
+            o.size(size);
+            return (Self)o;
+        }
+
+        /**
+         * Specify direction by literal.
+         *  
+         *  @param direction A direction literal.
+         *  @return A parsed direction.
+         */
+        public Self direction(String direction, double size) {
+            Åssignable o = new Åssignable();
+            o.direction(direction);
+            o.size(size);
+            return (Self)o;
+        }
     }
 
     /**
@@ -880,6 +922,20 @@ public abstract class Order extends OrderModel {
          */
         default Next sell() {
             return direction(Direction.SELL);
+        }
+
+        /**
+         * Specify direction by literal.
+         *  
+         *  @param direction A direction literal.
+         *  @return A parsed direction.
+         */
+        default Next direction(String direction) {
+            try {
+                return direction((Direction) direction$927011984.invoke(this, direction));
+            } catch (Throwable e) {
+                throw quiet(e);
+            }
         }
     }
 

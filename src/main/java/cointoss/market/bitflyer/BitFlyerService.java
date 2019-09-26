@@ -9,7 +9,7 @@
  */
 package cointoss.market.bitflyer;
 
-import static cointoss.order.OrderState.ACTIVE;
+import static cointoss.order.OrderState.*;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -25,8 +25,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
-
-import javafx.scene.control.TextInputDialog;
 
 import org.apache.commons.codec.digest.HmacAlgorithms;
 import org.apache.commons.codec.digest.HmacUtils;
@@ -48,6 +46,7 @@ import cointoss.order.OrderUnit;
 import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
+import javafx.scene.control.TextInputDialog;
 import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
@@ -99,6 +98,9 @@ class BitFlyerService extends MarketService {
     /** The order management. */
     private final Set<String> orders = ConcurrentHashMap.newKeySet();
 
+    /** The realtime user order state. */
+    private Variable<Order> orderStream;
+
     /** The shared event stream of real-time execution log. */
     private Signal<Execution> executions;
 
@@ -125,9 +127,6 @@ class BitFlyerService extends MarketService {
     /** The latest realtime execution id. */
     private long latestId;
 
-    /** The realtime user order state. */
-    private Variable<JsonObject> realtimeOrders;
-
     /**
      * @param type
      */
@@ -143,19 +142,6 @@ class BitFlyerService extends MarketService {
 
         this.forTest = forTest;
         this.intervalOrderCheck = I.signal(0, 1, TimeUnit.SECONDS).map(v -> orders().toList()).share();
-    }
-
-    private synchronized Variable<JsonObject> realtimeOrders() {
-        if (realtimeOrders == null) {
-            realtimeOrders = Variable.empty();
-            disposer.add(network
-                    .signalr("https://signal.bitflyer.com/signalr/hubs", "account_id=" + account.accountId + "&token=" + account.accountToken + "&products=" + marketName + "%2Cheartbeat", "BFEXHub", "ReceiveOrderUpdates")
-                    .flatIterable(JsonElement::getAsJsonArray)
-                    .map(e -> e.getAsJsonObject().getAsJsonObject("order"))
-                    .take(e -> e.get("product_code").getAsString().equals(marketName))
-                    .to(realtimeOrders::set));
-        }
-        return realtimeOrders;
     }
 
     /**
@@ -200,10 +186,6 @@ class BitFlyerService extends MarketService {
             call = call("POST", "https://lightning.bitflyer.jp/api/trade/sendorder", request, "", WebResponse.class)
                     .map(e -> e.data.get("order_ref_id"));
         }
-
-        realtimeOrders().observe().to(e -> {
-            System.out.println(e);
-        });
 
         return call.effect(v -> {
             System.out.println(v);
@@ -531,8 +513,24 @@ class BitFlyerService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Order> ordersRealtimely() {
-        return null;
+    public synchronized Signal<Order> ordersRealtimely() {
+        if (orderStream == null) {
+            orderStream = Variable.empty();
+            disposer.add(network
+                    .signalr("https://signal.bitflyer.com/signalr/hubs", "account_id=" + account.accountId + "&token=" + account.accountToken + "&products=" + marketName + "%2Cheartbeat", "BFEXHub", "ReceiveOrderUpdates")
+                    .flatIterable(JsonElement::getAsJsonArray)
+                    .map(e -> e.getAsJsonObject().getAsJsonObject("order"))
+                    .take(e -> e.get("product_code").getAsString().equals(marketName))
+                    .map(e -> Order.with.direction(e.get("side").getAsString(), Num.of(e.get("size").getAsString()))
+                            .executedSize(Num.of(e.get("executed_size").getAsString()))
+                            .remainingSize(Num.of(e.get("outstanding_size").getAsString()))
+                            .price(e.get("price").getAsDouble())
+                            .id(e.get("order_ref_id").getAsString())
+                            .state(OrderState.valueOf(e.get("order_state").getAsString()))
+                            .type(OrderType.valueOf(e.get("order_type").getAsString())))
+                    .to(orderStream::set));
+        }
+        return orderStream.observe();
     }
 
     /**

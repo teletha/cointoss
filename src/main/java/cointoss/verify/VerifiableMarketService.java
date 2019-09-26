@@ -58,7 +58,7 @@ public class VerifiableMarketService extends MarketService {
     private final Collection<BackendOrder> orderActive = new ConcurrentLinkedDeque<>();
 
     /** The order manager. */
-    private final Signaling<Ⅲ<Direction, String, Execution>> positions = new Signaling();
+    private final Signaling<Order> orderUpdating = new Signaling();
 
     /** The execution manager. */
     private final LinkedList<Execution> executeds = new LinkedList();
@@ -177,7 +177,7 @@ public class VerifiableMarketService extends MarketService {
      */
     @Override
     public Signal<Ⅲ<Direction, String, Execution>> executionsRealtimelyForMe() {
-        return positions.expose;
+        return null;
     }
 
     /**
@@ -221,7 +221,7 @@ public class VerifiableMarketService extends MarketService {
      */
     @Override
     public Signal<Order> ordersRealtimely() {
-        return null;
+        return orderUpdating.expose;
     }
 
     /**
@@ -342,7 +342,12 @@ public class VerifiableMarketService extends MarketService {
                     order.state = OrderState.COMPLETED;
                     iterator.remove();
                 }
-                positions.accept(I.pair(exe.direction, order.id, exe));
+
+                orderUpdating.accept(Order.with.direction(order.direction, order.size)
+                        .id(order.id)
+                        .state(order.state)
+                        .executedSize(order.executedSize)
+                        .remainingSize(order.remainingSize));
 
                 if (!exclusiveExecution) {
                     continue;

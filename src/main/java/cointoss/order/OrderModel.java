@@ -51,6 +51,17 @@ public abstract class OrderModel implements Directional, Comparable<OrderModel> 
     public abstract Direction direction();
 
     /**
+     * Specify direction by literal.
+     * 
+     * @param direction A direction literal.
+     * @return A parsed direction.
+     */
+    @Icy.Overload("direction")
+    private Direction direction(String direction) {
+        return Direction.parse(direction);
+    }
+
+    /**
      * The initial ordered size.
      * 
      * @return
@@ -336,7 +347,16 @@ public abstract class OrderModel implements Directional, Comparable<OrderModel> 
     }
 
     /**
-     * Observe when this {@link OldOrder} will be canceled or completed.
+     * Observe when this {@link Order} will be active.
+     * 
+     * @return A event {@link Signal}.
+     */
+    public final Signal<Order> observeActivating() {
+        return observeState().take(OrderState.ACTIVE).take(1).mapTo((Order) this);
+    }
+
+    /**
+     * Observe when this {@link Order} will be canceled or completed.
      * 
      * @return A event {@link Signal}.
      */
