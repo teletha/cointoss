@@ -18,7 +18,7 @@ import java.util.function.Function;
 
 import cointoss.Market;
 import cointoss.analyze.Statistics;
-import cointoss.trade.Trader.Entry;
+import cointoss.trade.Trader.Trade;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
 
@@ -64,7 +64,7 @@ public class TradingLog {
     public int cancel = 0;
 
     /** The all entries. */
-    private final List<Entry> entries;
+    private final List<Trade> entries;
 
     /** The exected duration. */
     public Duration duration = Duration.ZERO;
@@ -72,7 +72,7 @@ public class TradingLog {
     /**
      * Analyze trading.
      */
-    public TradingLog(Market market, FundManager funds, List<Entry> entries) {
+    public TradingLog(Market market, FundManager funds, List<Trade> entries) {
         Function<Num, String> format = v -> v.scale(market.service.setting.baseCurrencyScaleSize).format(NumberFormat.getNumberInstance());
         this.profit = new Statistics().formatter(format);
         this.profitRange = new Statistics().formatter(format);
@@ -81,7 +81,7 @@ public class TradingLog {
         this.profitAndLoss = new Statistics().formatter(format);
         this.entries = entries;
 
-        for (Entry entry : entries) {
+        for (Trade entry : entries) {
             total++;
             if (entry.isActive()) active++;
             if (entry.isTerminated()) terminated++;
@@ -133,7 +133,7 @@ public class TradingLog {
         StringBuilder builder = new StringBuilder();
 
         if (detail) {
-            for (Entry entry : entries) {
+            for (Trade entry : entries) {
                 builder.append(entry);
             }
         }

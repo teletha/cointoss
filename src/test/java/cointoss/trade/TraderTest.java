@@ -23,7 +23,7 @@ class TraderTest extends TraderTestSupport {
     @Test
     void entryBuy() {
         when(now(), v -> {
-            return new Entry(Direction.BUY) {
+            return new Trade(Direction.BUY) {
 
                 @Override
                 protected void entry() {
@@ -32,14 +32,14 @@ class TraderTest extends TraderTestSupport {
             };
         });
 
-        Entry entry = latest();
+        Trade entry = latest();
         assert entry != null;
         assert entry.isBuy();
         assert entry.entrySize.is(1);
         assert entry.entryExecutedSize.is(0);
         assert entry.entryPrice.is(0);
 
-        // execute entry entry
+        // execute entry
         market.perform(Execution.with.buy(1).price(9));
         assert entry.entrySize.is(1);
         assert entry.entryExecutedSize.is(1);
@@ -49,7 +49,7 @@ class TraderTest extends TraderTestSupport {
     @Test
     void entrySell() {
         when(now(), v -> {
-            return new Entry(Direction.SELL) {
+            return new Trade(Direction.SELL) {
 
                 @Override
                 protected void entry() {
@@ -58,14 +58,14 @@ class TraderTest extends TraderTestSupport {
             };
         });
 
-        Entry entry = latest();
+        Trade entry = latest();
         assert entry != null;
         assert entry.isSell();
         assert entry.entrySize.is(1);
         assert entry.entryExecutedSize.is(0);
         assert entry.entryPrice.is(0);
 
-        // execute entry entry
+        // execute entry
         market.perform(Execution.with.buy(1).price(11));
         assert entry.entrySize.is(1);
         assert entry.entryExecutedSize.is(1);
@@ -75,7 +75,7 @@ class TraderTest extends TraderTestSupport {
     @Test
     void exitMakeAtPrice() {
         when(now(), v -> {
-            return new Entry(Direction.BUY) {
+            return new Trade(Direction.BUY) {
 
                 @Override
                 protected void entry() {
@@ -89,9 +89,9 @@ class TraderTest extends TraderTestSupport {
             };
         });
 
-        Entry entry = latest();
+        Trade entry = latest();
 
-        // execute entry entry
+        // execute entry
         market.perform(Execution.with.buy(1).price(9));
         market.elapse(1, SECONDS);
         assert entry.entrySize.is(1);
@@ -119,7 +119,7 @@ class TraderTest extends TraderTestSupport {
     @Test
     void exitTake() {
         when(now(), v -> {
-            return new Entry(Direction.BUY) {
+            return new Trade(Direction.BUY) {
 
                 @Override
                 protected void entry() {
@@ -133,9 +133,9 @@ class TraderTest extends TraderTestSupport {
             };
         });
 
-        Entry entry = latest();
+        Trade entry = latest();
 
-        // execute entry entry
+        // execute entry
         market.perform(Execution.with.buy(1).price(9));
         assert entry.entrySize.is(1);
         assert entry.entryExecutedSize.is(1);
@@ -154,7 +154,7 @@ class TraderTest extends TraderTestSupport {
     @Test
     void exitWillStopAllEntries() {
         when(now(), v -> {
-            return new Entry(Direction.BUY) {
+            return new Trade(Direction.BUY) {
 
                 @Override
                 protected void entry() {
@@ -168,7 +168,7 @@ class TraderTest extends TraderTestSupport {
             };
         });
 
-        Entry e = latest();
+        Trade e = latest();
 
         // entry partially
         market.perform(Execution.with.buy(2).price(9));
@@ -190,7 +190,7 @@ class TraderTest extends TraderTestSupport {
     @Test
     void profitBuy() {
         when(now(), v -> {
-            return new Entry(Direction.BUY) {
+            return new Trade(Direction.BUY) {
 
                 @Override
                 protected void entry() {
@@ -204,7 +204,7 @@ class TraderTest extends TraderTestSupport {
             };
         });
 
-        Entry e = latest();
+        Trade e = latest();
         assert e.profit(market.latestPrice()).is(0);
         assert e.realizedProfit.is(0);
         assert e.unrealizedProfit(market.latestPrice()).is(0);
@@ -239,7 +239,7 @@ class TraderTest extends TraderTestSupport {
     @PowerAssertOff
     void profitSell() {
         when(now(), v -> {
-            return new Entry(Direction.SELL) {
+            return new Trade(Direction.SELL) {
 
                 @Override
                 protected void entry() {
@@ -253,7 +253,7 @@ class TraderTest extends TraderTestSupport {
             };
         });
 
-        Entry e = latest();
+        Trade e = latest();
         assert e.profit(market.latestPrice()).is(0);
         assert e.realizedProfit.is(0);
         assert e.unrealizedProfit(market.latestPrice()).is(0);
@@ -287,7 +287,7 @@ class TraderTest extends TraderTestSupport {
     @Test
     void lossBuy() {
         when(now(), v -> {
-            return new Entry(Direction.BUY) {
+            return new Trade(Direction.BUY) {
 
                 @Override
                 protected void entry() {
@@ -301,7 +301,7 @@ class TraderTest extends TraderTestSupport {
             };
         });
 
-        Entry e = latest();
+        Trade e = latest();
         assert e.profit(market.latestPrice()).is(0);
         assert e.realizedProfit.is(0);
         assert e.unrealizedProfit(market.latestPrice()).is(0);
@@ -337,7 +337,7 @@ class TraderTest extends TraderTestSupport {
     @Test
     void lossSell() {
         when(now(), v -> {
-            return new Entry(Direction.SELL) {
+            return new Trade(Direction.SELL) {
 
                 @Override
                 protected void entry() {
@@ -351,7 +351,7 @@ class TraderTest extends TraderTestSupport {
             };
         });
 
-        Entry e = latest();
+        Trade e = latest();
         assert e.profit(market.latestPrice()).is(0);
         assert e.realizedProfit.is(0);
         assert e.unrealizedProfit(market.latestPrice()).is(0);

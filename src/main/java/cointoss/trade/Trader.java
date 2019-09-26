@@ -66,7 +66,7 @@ public abstract class Trader {
     protected final Signal<Boolean> completingExit = completeExits.expose;
 
     /** All managed entries. */
-    private final LinkedList<Entry> entries = new LinkedList<>();
+    private final LinkedList<Trade> entries = new LinkedList<>();
 
     /** The alive state. */
     private final AtomicBoolean enable = new AtomicBoolean(true);
@@ -89,7 +89,7 @@ public abstract class Trader {
      * 
      * @return
      */
-    protected final Entry latest() {
+    protected final Trade latest() {
         return entries.peekLast();
     }
 
@@ -100,13 +100,13 @@ public abstract class Trader {
      * @param timing
      * @param builder
      */
-    protected final <T> void when(Signal<T> timing, Function<T, Entry> builder) {
+    protected final <T> void when(Signal<T> timing, Function<T, Trade> builder) {
         if (timing == null || builder == null) {
             return;
         }
 
         disposer.add(timing.takeWhile(v -> enable.get()).to(value -> {
-            Entry entry = builder.apply(value);
+            Trade entry = builder.apply(value);
 
             if (entry != null) {
                 entries.add(entry);
@@ -178,7 +178,7 @@ public abstract class Trader {
     /**
      * Declarative entry and exit definition.
      */
-    public abstract class Entry extends EntryStatus implements Directional {
+    public abstract class Trade extends EntryStatus implements Directional {
 
         /** The entry direction. */
         protected final Direction direction;
@@ -203,14 +203,14 @@ public abstract class Trader {
         /**
          * @param directional
          */
-        protected Entry(Directional directional) {
+        protected Trade(Directional directional) {
             this(directional, null);
         }
 
         /**
          * @param directional
          */
-        protected Entry(Directional directional, FundManager funds) {
+        protected Trade(Directional directional, FundManager funds) {
             this.direction = directional.direction();
             this.funds = funds == null ? Trader.this.funds : funds;
 

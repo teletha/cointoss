@@ -25,7 +25,7 @@ class EntryTest extends TraderTestSupport {
     void holdTime() {
         entryAndExit(Execution.with.buy(1).price(10).date(second(0)), Execution.with.buy(1).price(20).date(second(10)));
 
-        Entry e = latest();
+        Trade e = latest();
         assert e.holdTime().equals(Duration.ofSeconds(10));
     }
 
@@ -33,20 +33,20 @@ class EntryTest extends TraderTestSupport {
     void isTerminated() {
         entry(Execution.with.buy(1).price(10));
 
-        Entry e = latest();
+        Trade e = latest();
         assert e.isTerminated() == false;
     }
 
     @Test
     void isEntryTerminated() {
-        when(now(), v -> new Entry(Direction.BUY) {
+        when(now(), v -> new Trade(Direction.BUY) {
             @Override
             protected void entry() {
                 entry(1, s -> s.make(10));
             }
         });
 
-        Entry e = latest();
+        Trade e = latest();
         assert e.isEntryTerminated() == false;
 
         market.perform(Execution.with.buy(0.5).price(9));
@@ -58,7 +58,7 @@ class EntryTest extends TraderTestSupport {
 
     @Test
     void isExitTerminated() {
-        when(now(), v -> new Entry(Direction.BUY) {
+        when(now(), v -> new Trade(Direction.BUY) {
             @Override
             protected void entry() {
                 entry(1, s -> s.make(10));
@@ -70,7 +70,7 @@ class EntryTest extends TraderTestSupport {
             }
         });
 
-        Entry e = latest();
+        Trade e = latest();
         assert e.isExitTerminated() == false;
 
         market.perform(Execution.with.buy(1).price(9));
@@ -86,7 +86,7 @@ class EntryTest extends TraderTestSupport {
 
     @Test
     void entryWithMultipleExecutionAndExitAtPrice() {
-        when(now(), v -> new Entry(Direction.BUY) {
+        when(now(), v -> new Trade(Direction.BUY) {
             @Override
             protected void entry() {
                 entry(1, s -> s.make(10));
@@ -98,7 +98,7 @@ class EntryTest extends TraderTestSupport {
             }
         });
 
-        Entry e = latest();
+        Trade e = latest();
         assert e.exits.size() == 0;
 
         market.perform(Execution.with.buy(0.1).price(9));
@@ -111,7 +111,7 @@ class EntryTest extends TraderTestSupport {
 
     @Test
     void exitAndStop() {
-        when(now(), v -> new Entry(Direction.BUY) {
+        when(now(), v -> new Trade(Direction.BUY) {
             @Override
             protected void entry() {
                 entry(1, s -> s.make(10));
@@ -124,7 +124,7 @@ class EntryTest extends TraderTestSupport {
             }
         });
 
-        Entry e = latest();
+        Trade e = latest();
         assert e.exits.size() == 0;
 
         market.perform(Execution.with.buy(1).price(9));
@@ -150,7 +150,7 @@ class EntryTest extends TraderTestSupport {
 
     @Test
     void imcompletedEntryTakerWillNotStopExitTakerInExclusiveExecutionMarketService() {
-        when(now(), v -> new Entry(Direction.BUY) {
+        when(now(), v -> new Trade(Direction.BUY) {
 
             @Override
             protected void entry() {
@@ -163,7 +163,7 @@ class EntryTest extends TraderTestSupport {
             }
         });
 
-        Entry e = latest();
+        Trade e = latest();
 
         market.perform(Execution.with.buy(0.5).price(15));
         assert e.entrySize.is(1);
@@ -194,7 +194,7 @@ class EntryTest extends TraderTestSupport {
     void imcompletedEntryTakerWillNotStopExitTakerInNonExclusiveExecutionMarketService() {
         market.service.exclusiveExecution = false;
 
-        when(now(), v -> new Entry(Direction.BUY) {
+        when(now(), v -> new Trade(Direction.BUY) {
 
             @Override
             protected void entry() {
@@ -207,7 +207,7 @@ class EntryTest extends TraderTestSupport {
             }
         });
 
-        Entry e = latest();
+        Trade e = latest();
 
         market.perform(Execution.with.buy(0.5).price(15));
         assert e.entrySize.is(1);

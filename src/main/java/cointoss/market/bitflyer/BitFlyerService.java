@@ -9,7 +9,7 @@
  */
 package cointoss.market.bitflyer;
 
-import static cointoss.order.OrderState.*;
+import static cointoss.order.OrderState.ACTIVE;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -25,6 +25,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+
+import javafx.scene.control.TextInputDialog;
 
 import org.apache.commons.codec.digest.HmacAlgorithms;
 import org.apache.commons.codec.digest.HmacUtils;
@@ -46,7 +48,6 @@ import cointoss.order.OrderUnit;
 import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
-import javafx.scene.control.TextInputDialog;
 import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
@@ -527,7 +528,7 @@ class BitFlyerService extends MarketService {
                             .price(e.get("price").getAsDouble())
                             .id(e.get("order_ref_id").getAsString())
                             .state(OrderState.valueOf(e.get("order_state").getAsString()))
-                            .type(OrderType.valueOf(e.get("order_type").getAsString())))
+                            .type(e.get("order_type").getAsString().equals("LIMIT") ? OrderType.Maker : OrderType.Taker))
                     .to(orderStream::set));
         }
         return orderStream.observe();
