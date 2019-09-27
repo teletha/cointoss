@@ -32,6 +32,6 @@ public class BitMexAccount extends MarketAccount<BitMexAccount> {
      */
     @Override
     protected boolean validate() {
-        return apiKey.isNot(String::isEmpty) && apiSecret.isNot(String::isEmpty);
+        return apiKey.isPresent() && apiSecret.isPresent();
     }
 }
