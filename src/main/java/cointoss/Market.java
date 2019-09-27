@@ -222,22 +222,24 @@ public class Market implements Disposable {
      * Stop all positions with {@link Orderable}.
      */
     public final Signal<Order> stop(WiseConsumer<Orderable> strategy) {
-        if (orders.hasNoPosition()) {
-            return I.signal();
-        }
-
-        if (strategy == null) {
-            strategy = I.recurse((self, s) -> {
-                if (orders.positionPrice.v.isLessThan(orders.positionDirection(), latestPrice())) {
-                    // loss
-                    s.makeBestPrice(orders.positionDirection()).cancelAfter(2, ChronoUnit.SECONDS).take();
-                } else {
-                    // profit
-                    s.makeBestPrice(orders.positionDirection().inverse()).cancelAfter(5, ChronoUnit.SECONDS).next(self);
-                }
-            });
-        }
-        return request(orders.positionDirection().inverse(), orders.positionSize.v, strategy);
+        return I.signal();
+        // if (orders.hasNoPosition()) {
+        // return I.signal();
+        // }
+        //
+        // if (strategy == null) {
+        // strategy = I.recurse((self, s) -> {
+        // if (orders.positionPrice.v.isLessThan(orders.positionDirection(), latestPrice())) {
+        // // loss
+        // s.makeBestPrice(orders.positionDirection()).cancelAfter(2, ChronoUnit.SECONDS).take();
+        // } else {
+        // // profit
+        // s.makeBestPrice(orders.positionDirection().inverse()).cancelAfter(5,
+        // ChronoUnit.SECONDS).next(self);
+        // }
+        // });
+        // }
+        // return request(orders.positionDirection().inverse(), orders.positionSize.v, strategy);
     }
 
     /**
@@ -376,11 +378,13 @@ public class Market implements Disposable {
          */
         @Override
         public Cancellable makePositionPrice() {
-            actions.add((market, direction, size, previous, orders) -> {
-                make(market.orders.positionPrice.v
-                        .scale(market.service.setting.baseCurrencyScaleSize), market, direction, size, previous, orders);
-            });
-            return this;
+            throw new Error("FIX ME");
+            // actions.add((market, direction, size, previous, orders) -> {
+            // make(market.orders.positionPrice.v
+            // .scale(market.service.setting.baseCurrencyScaleSize), market, direction, size,
+            // previous, orders);
+            // });
+            // return this;
         }
 
         /**

@@ -45,10 +45,6 @@ public class BackTestInvoker {
             super(market);
 
             when(market.tickers.of(TickSpan.Minute1).add.skip(1), tick -> {
-                if (market.orders.hasPosition()) {
-                    return null;
-                }
-
                 Indicator indicator = new Indicator();
 
                 if (indicator.diff.isLessThan(1)) {

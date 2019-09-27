@@ -27,13 +27,10 @@ class VerifiableMarketTest {
 
     @Test
     void requestBuyLimitOrder() {
-        assert market.orders.hasNoActiveOrder();
-
         market.request(Order.with.buy(1).price(1)).to(order -> {
             assert order.isBuy();
             assert order.executedSize.is(0);
             assert order.remainingSize.is(1);
-            assert market.orders.hasActiveOrder();
         });
     }
 

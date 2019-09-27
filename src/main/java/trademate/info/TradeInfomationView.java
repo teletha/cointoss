@@ -9,7 +9,7 @@
  */
 package trademate.info;
 
-import static transcript.Transcript.en;
+import static transcript.Transcript.*;
 
 import cointoss.order.OrderBook;
 import cointoss.order.OrderManager;
@@ -18,7 +18,6 @@ import cointoss.util.Num;
 import stylist.Style;
 import stylist.StyleDSL;
 import trademate.TradingView;
-import viewtify.Viewtify;
 import viewtify.ui.UI;
 import viewtify.ui.UIButton;
 import viewtify.ui.UILabel;
@@ -80,12 +79,6 @@ public class TradeInfomationView extends View {
     @Override
     protected void initialize() {
         OrderManager manager = view.market().orders;
-
-        positionSize.text(manager.positionSize);
-        positionPrice.text(manager.positionPrice);
-        view.market().tickers.latest.observe().on(Viewtify.UIThread).to(e -> {
-            positionProfit.text(manager.profit(e.price));
-        });
     }
 
     /**

@@ -41,16 +41,6 @@ class OrderManagerTest {
     }
 
     @Test
-    void hasActiveOrder() {
-        assert orders.hasActiveOrder() == false;
-        assert orders.hasNoActiveOrder() == true;
-
-        orders.requestNow(Order.with.buy(1).price(10));
-        assert orders.hasActiveOrder() == true;
-        assert orders.hasNoActiveOrder() == false;
-    }
-
-    @Test
     void added() {
         List<Order> added = orders.add.toList();
         assert added.size() == 0;
