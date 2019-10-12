@@ -52,7 +52,6 @@ import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
 import kiss.Signaling;
-import kiss.Variable;
 import kiss.WiseConsumer;
 import kiss.Ⅲ;
 import marionette.browser.Browser;
@@ -99,9 +98,6 @@ class BitFlyerService extends MarketService {
     /** The order management. */
     private final Set<String> orders = ConcurrentHashMap.newKeySet();
 
-    /** The realtime user order state. */
-    private Variable<Order> orderStream;
-
     /** The shared event stream of real-time execution log. */
     private Signal<Execution> executions;
 
@@ -113,8 +109,6 @@ class BitFlyerService extends MarketService {
 
     /** The account setting. */
     private final BitFlyerAccount account = I.make(BitFlyerAccount.class);
-
-    private Disposable disposer = Disposable.empty();
 
     /** The shared order list. */
     private final Signal<List<Order>> intervalOrderCheck;
@@ -143,14 +137,6 @@ class BitFlyerService extends MarketService {
 
         this.forTest = forTest;
         this.intervalOrderCheck = I.signal(0, 1, TimeUnit.SECONDS).map(v -> orders().toList()).share();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void vandalize() {
-        disposer.dispose();
     }
 
     /**
@@ -514,24 +500,19 @@ class BitFlyerService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public synchronized Signal<Order> ordersRealtimely() {
-        if (orderStream == null) {
-            orderStream = Variable.empty();
-            disposer.add(network
-                    .signalr("https://signal.bitflyer.com/signalr/hubs", "account_id=" + account.accountId + "&token=" + account.accountToken + "&products=" + marketName + "%2Cheartbeat", "BFEXHub", "ReceiveOrderUpdates")
-                    .flatIterable(JsonElement::getAsJsonArray)
-                    .map(e -> e.getAsJsonObject().getAsJsonObject("order"))
-                    .take(e -> e.get("product_code").getAsString().equals(marketName))
-                    .map(e -> Order.with.direction(e.get("side").getAsString(), Num.of(e.get("size").getAsString()))
-                            .executedSize(Num.of(e.get("executed_size").getAsString()))
-                            .remainingSize(Num.of(e.get("outstanding_size").getAsString()))
-                            .price(e.get("price").getAsDouble())
-                            .id(e.get("order_ref_id").getAsString())
-                            .state(OrderState.valueOf(e.get("order_state").getAsString()))
-                            .type(e.get("order_type").getAsString().equals("LIMIT") ? OrderType.Maker : OrderType.Taker))
-                    .to(orderStream::set));
-        }
-        return orderStream.observe();
+    protected Signal<Order> connectOrdersRealtimely() {
+        return network
+                .signalr("https://signal.bitflyer.com/signalr/hubs", "account_id=" + account.accountId + "&token=" + account.accountToken + "&products=" + marketName + "%2Cheartbeat", "BFEXHub", "ReceiveOrderUpdates")
+                .flatIterable(JsonElement::getAsJsonArray)
+                .map(e -> e.getAsJsonObject().getAsJsonObject("order"))
+                .take(e -> e.get("product_code").getAsString().equals(marketName))
+                .map(e -> Order.with.direction(e.get("side").getAsString(), Num.of(e.get("size").getAsString()))
+                        .executedSize(Num.of(e.get("executed_size").getAsString()))
+                        .remainingSize(Num.of(e.get("outstanding_size").getAsString()))
+                        .price(e.get("price").getAsDouble())
+                        .id(e.get("order_ref_id").getAsString())
+                        .state(OrderState.valueOf(e.get("order_state").getAsString()))
+                        .type(e.get("order_type").getAsString().equals("LIMIT") ? OrderType.Maker : OrderType.Taker));
     }
 
     /**

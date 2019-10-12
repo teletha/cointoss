@@ -32,6 +32,7 @@ import kiss.Decoder;
 import kiss.Disposable;
 import kiss.Encoder;
 import kiss.Signal;
+import kiss.Variable;
 import kiss.Ⅲ;
 
 public abstract class MarketService implements Disposable {
@@ -48,6 +49,9 @@ public abstract class MarketService implements Disposable {
     /** The execution log. */
     public final ExecutionLog log;
 
+    /** The service disposer. */
+    protected final Disposable disposer = Disposable.empty();
+
     /** The network accessor. */
     protected Network network = new Network();
 
@@ -61,6 +65,9 @@ public abstract class MarketService implements Disposable {
         thread.setDaemon(true);
         return thread;
     });
+
+    /** The realtime user order state. */
+    private Variable<Order> orderStream;
 
     /**
      * @param exchangeName
@@ -187,7 +194,20 @@ public abstract class MarketService implements Disposable {
      * 
      * @return A event stream of order state.
      */
-    public abstract Signal<Order> ordersRealtimely();
+    public final synchronized Signal<Order> ordersRealtimely() {
+        if (orderStream == null) {
+            orderStream = Variable.empty();
+            disposer.add(connectOrdersRealtimely().to(orderStream::set));
+        }
+        return orderStream.observe();
+    }
+
+    /**
+     * Connect to the realtime order stream.
+     * 
+     * @return
+     */
+    protected abstract Signal<Order> connectOrdersRealtimely();
 
     /**
      * <p>
@@ -256,7 +276,8 @@ public abstract class MarketService implements Disposable {
      * {@inheritDoc}
      */
     @Override
-    public void vandalize() {
+    public final void vandalize() {
+        disposer.dispose();
     }
 
     /**

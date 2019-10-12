@@ -40,16 +40,12 @@ import cointoss.order.QuantityCondition;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
 import cointoss.util.Retry;
-import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
 import kiss.Signaling;
 import kiss.Ⅲ;
 
 public class VerifiableMarketService extends MarketService {
-
-    /** The terminator. */
-    private final Disposable diposer = Disposable.empty();
 
     /** The managed id. */
     private int id = 0;
@@ -111,14 +107,6 @@ public class VerifiableMarketService extends MarketService {
     @Override
     public Signal<Integer> delay() {
         return I.signal(0);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void vandalize() {
-        diposer.dispose();
     }
 
     /**
@@ -220,7 +208,7 @@ public class VerifiableMarketService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Order> ordersRealtimely() {
+    protected Signal<Order> connectOrdersRealtimely() {
         return orderUpdating.expose;
     }
 

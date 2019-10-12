@@ -158,7 +158,7 @@ class BitMexService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Order> ordersRealtimely() {
+    protected Signal<Order> connectOrdersRealtimely() {
         return I.signal();
     }
 
