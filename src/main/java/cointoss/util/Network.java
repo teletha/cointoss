@@ -14,6 +14,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
+import java.net.http.HttpRequest;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -154,6 +155,33 @@ public class Network {
     /**
      * Call REST API.
      */
+    public final Signal<JSON> rest(HttpRequest request) {
+        return rest(request, null);
+    }
+
+    /**
+     * Call REST API.
+     */
+    public Signal<JSON> rest(HttpRequest request, APILimiter limiter) {
+        return new Signal<>((observer, disposer) -> {
+            if (limiter != null) {
+                limiter.acquire();
+            }
+
+            try {
+                observer.accept(I.json(request));
+                observer.complete();
+            } catch (Throwable e) {
+                e.printStackTrace();
+                observer.error(new Error("[" + request.uri() + "] throws some error.", e));
+            }
+            return disposer;
+        });
+    }
+
+    /**
+     * Call REST API.
+     */
     public final <M> Signal<M> rest(Request request, String selector, Class<M> type) {
         return rest(request, selector, type, null);
     }
@@ -190,6 +218,40 @@ public class Network {
             } catch (Throwable e) {
                 observer.error(new Error("[" + request.url() + "] throws some error.", e));
             }
+            return disposer;
+        });
+    }
+
+    /**
+     * Call REST API.
+     */
+    public final <M> Signal<M> rest(HttpRequest request, String selector, Class<M> type) {
+        return rest(request, selector, type, null);
+    }
+
+    /**
+     * Call REST API.
+     */
+    public <M> Signal<M> rest(HttpRequest request, String selector, Class<M> type, APILimiter limiter) {
+        return new Signal<>((observer, disposer) -> {
+            if (limiter != null) {
+                limiter.acquire();
+            }
+
+            try {
+                JSON json = I.json(request);
+
+                if (selector == null || selector.isEmpty()) {
+                    observer.accept(json.to(type));
+                } else {
+                    json.find(selector, type).to(observer);
+                }
+                observer.complete();
+            } catch (Throwable e) {
+                e.printStackTrace();
+                observer.error(new Error("[" + request.uri() + "] throws some error.", e));
+            }
+
             return disposer;
         });
     }

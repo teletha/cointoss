@@ -9,7 +9,7 @@
  */
 package cointoss.util;
 
-import static java.time.temporal.ChronoUnit.*;
+import static java.time.temporal.ChronoUnit.MILLIS;
 
 import org.junit.jupiter.api.Test;
 
@@ -17,6 +17,7 @@ import com.google.gson.JsonElement;
 
 import antibug.Chronus;
 import kiss.Observer;
+import okhttp3.Request;
 
 class RetryTest {
 
@@ -29,7 +30,7 @@ class RetryTest {
         Retry rety = Retry.with.limit(3);
         Result result = new Result();
 
-        network.rest(null).retryWhen(rety).to(result);
+        network.rest((Request) null).retryWhen(rety).to(result);
         assert rety.count == 3;
         assert result.error != null;
     }
@@ -39,7 +40,7 @@ class RetryTest {
         Retry rety = Retry.with.limit(3).delay(100, MILLIS).scheduler(chronus);
         Result result = new Result();
 
-        network.rest(null).retryWhen(rety).to(result);
+        network.rest((Request) null).retryWhen(rety).to(result);
         assert rety.count == 1;
         assert result.error == null;
         chronus.await();

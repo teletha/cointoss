@@ -11,6 +11,11 @@ package cointoss.market.bitflyer;
 
 import static cointoss.order.OrderState.ACTIVE;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.http.HttpRequest;
+import java.net.http.HttpRequest.BodyPublishers;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -50,14 +55,12 @@ import cointoss.util.Chrono;
 import cointoss.util.Num;
 import kiss.Disposable;
 import kiss.I;
+import kiss.JSON;
 import kiss.Signal;
 import kiss.Signaling;
 import kiss.WiseConsumer;
 import kiss.Ⅲ;
 import marionette.browser.Browser;
-import okhttp3.MediaType;
-import okhttp3.Request;
-import okhttp3.RequestBody;
 import viewtify.Viewtify;
 
 /**
@@ -68,9 +71,6 @@ import viewtify.Viewtify;
  * </p>
  */
 class BitFlyerService extends MarketService {
-
-    /** REUSE */
-    private static final MediaType mime = MediaType.parse("application/json; charset=utf-8");
 
     private static final DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss-");
 
@@ -376,8 +376,7 @@ class BitFlyerService extends MarketService {
         String[] previous = new String[] {"", ""};
 
         return call("GET", "/v1/executions?product_code=" + marketName + "&count=" + setting
-                .acquirableExecutionSize() + "&before=" + end + "&after=" + start, "").flatIterable(JsonElement::getAsJsonArray)
-                        .reverse()
+                .acquirableExecutionSize() + "&before=" + end + "&after=" + start, "").flatMap(e -> e.find("^"))
                         .map(e -> convert(e, previous));
     }
 
@@ -388,8 +387,7 @@ class BitFlyerService extends MarketService {
     public Signal<Execution> executionLatest() {
         String[] previous = new String[] {"", ""};
 
-        return call("GET", "/v1/executions?product_code=" + marketName + "&count=1", "").flatIterable(JsonElement::getAsJsonArray)
-                .map(e -> convert(e, previous));
+        return call("GET", "/v1/executions?product_code=" + marketName + "&count=1", "").map(e -> convert(e, previous));
     }
 
     /**
@@ -399,16 +397,14 @@ class BitFlyerService extends MarketService {
      * @param previous
      * @return
      */
-    private Execution convert(JsonElement json, String[] previous) {
-        JsonObject e = json.getAsJsonObject();
-
-        long id = e.get("id").getAsLong();
-        Direction direction = Direction.parse(e.get("side").getAsString());
-        Num size = Num.of(e.get("size").getAsString());
-        Num price = Num.of(e.get("price").getAsString());
-        ZonedDateTime date = LocalDateTime.parse(e.get("exec_date").getAsString()).atZone(Chrono.UTC);
-        String buyer = e.get("buy_child_order_acceptance_id").getAsString();
-        String seller = e.get("sell_child_order_acceptance_id").getAsString();
+    private Execution convert(JSON json, String[] previous) {
+        long id = Long.parseLong(json.value("id"));
+        Direction direction = Direction.parse(json.value("side"));
+        Num size = Num.of(json.value("size"));
+        Num price = Num.of(json.value("price"));
+        ZonedDateTime date = LocalDateTime.parse(json.value("exec_date")).atZone(Chrono.UTC);
+        String buyer = json.value("buy_child_order_acceptance_id");
+        String seller = json.value("sell_child_order_acceptance_id");
         String taker = direction.isBuy() ? buyer : seller;
         int consecutiveType = estimateConsecutiveType(previous[0], previous[1], buyer, seller);
         int delay = estimateDelay(taker, date);
@@ -594,69 +590,77 @@ class BitFlyerService extends MarketService {
         String timestamp = String.valueOf(Chrono.utcNow().toEpochSecond());
         String sign = new HmacUtils(HmacAlgorithms.HMAC_SHA_256, account.apiSecret.v).hmacHex(timestamp + method + path + body);
 
-        Request request;
+        try {
+            HttpRequest request;
 
-        if (method.equals("PUBLIC")) {
-            request = new Request.Builder().url(api + path).build();
-        } else if (method.equals("GET")) {
-            request = new Request.Builder().url(api + path)
-                    .addHeader("ACCESS-KEY", account.apiKey.v)
-                    .addHeader("ACCESS-TIMESTAMP", timestamp)
-                    .addHeader("ACCESS-SIGN", sign)
-                    .build();
-        } else if (method.equals("POST") && !path.startsWith("http")) {
-            request = new Request.Builder().url(api + path)
-                    .addHeader("ACCESS-KEY", account.apiKey.v)
-                    .addHeader("ACCESS-TIMESTAMP", timestamp)
-                    .addHeader("ACCESS-SIGN", sign)
-                    .addHeader("Content-Type", "application/json")
-                    .post(RequestBody.create(mime, body))
-                    .build();
-        } else {
-            request = new Request.Builder().url(path)
-                    .addHeader("Content-Type", "application/json")
-                    .addHeader("Cookie", sessionKey + "=" + maintainer.session)
-                    .addHeader("X-Requested-With", "XMLHttpRequest")
-                    .post(RequestBody.create(mime, body))
-                    .build();
+            if (method.equals("PUBLIC")) {
+                request = HttpRequest.newBuilder(new URI(api + path)).build();
+            } else if (method.equals("GET")) {
+                request = HttpRequest.newBuilder(new URI(api + path))
+                        .header("ACCESS-KEY", account.apiKey.v)
+                        .header("ACCESS-TIMESTAMP", timestamp)
+                        .header("ACCESS-SIGN", sign)
+                        .build();
+            } else if (method.equals("POST") && !path.startsWith("http")) {
+                request = HttpRequest.newBuilder(new URI(api + path))
+                        .header("ACCESS-KEY", account.apiKey.v)
+                        .header("ACCESS-TIMESTAMP", timestamp)
+                        .header("ACCESS-SIGN", sign)
+                        .header("Content-Type", "application/json")
+                        .POST(BodyPublishers.ofString(body, StandardCharsets.UTF_8))
+                        .build();
+            } else {
+                request = HttpRequest.newBuilder(new URI(path))
+                        .header("Content-Type", "application/json")
+                        .header("Cookie", sessionKey + "=" + maintainer.session)
+                        .header("X-Requested-With", "XMLHttpRequest")
+                        .POST(BodyPublishers.ofString(body, StandardCharsets.UTF_8))
+                        .build();
+            }
+            return network.rest(request, selector, type, Limit);
+        } catch (URISyntaxException e) {
+            throw I.quiet(e);
         }
-        return network.rest(request, selector, type, Limit);
     }
 
     /**
      * Call private API.
      */
-    protected Signal<JsonElement> call(String method, String path, String body) {
+    protected Signal<JSON> call(String method, String path, String body) {
         String timestamp = String.valueOf(Chrono.utcNow().toEpochSecond());
         String sign = new HmacUtils(HmacAlgorithms.HMAC_SHA_256, account.apiSecret.v).hmacHex(timestamp + method + path + body);
 
-        Request request;
+        try {
+            HttpRequest http;
 
-        if (method.equals("PUBLIC")) {
-            request = new Request.Builder().url(api + path).build();
-        } else if (method.equals("GET")) {
-            request = new Request.Builder().url(api + path)
-                    .addHeader("ACCESS-KEY", account.apiKey.v)
-                    .addHeader("ACCESS-TIMESTAMP", timestamp)
-                    .addHeader("ACCESS-SIGN", sign)
-                    .build();
-        } else if (method.equals("POST") && !path.startsWith("http")) {
-            request = new Request.Builder().url(api + path)
-                    .addHeader("ACCESS-KEY", account.apiKey.v)
-                    .addHeader("ACCESS-TIMESTAMP", timestamp)
-                    .addHeader("ACCESS-SIGN", sign)
-                    .addHeader("Content-Type", "application/json")
-                    .post(RequestBody.create(mime, body))
-                    .build();
-        } else {
-            request = new Request.Builder().url(path)
-                    .addHeader("Content-Type", "application/json")
-                    .addHeader("Cookie", sessionKey + "=" + maintainer.session)
-                    .addHeader("X-Requested-With", "XMLHttpRequest")
-                    .post(RequestBody.create(mime, body))
-                    .build();
+            if (method.equals("PUBLIC")) {
+                http = HttpRequest.newBuilder(new URI(api + path)).build();
+            } else if (method.equals("GET")) {
+                http = HttpRequest.newBuilder(new URI(api + path))
+                        .header("ACCESS-KEY", account.apiKey.v)
+                        .header("ACCESS-TIMESTAMP", timestamp)
+                        .header("ACCESS-SIGN", sign)
+                        .build();
+            } else if (method.equals("POST") && !path.startsWith("http")) {
+                http = HttpRequest.newBuilder(new URI(api + path))
+                        .header("ACCESS-KEY", account.apiKey.v)
+                        .header("ACCESS-TIMESTAMP", timestamp)
+                        .header("ACCESS-SIGN", sign)
+                        .header("Content-Type", "application/json")
+                        .POST(BodyPublishers.ofString(body, StandardCharsets.UTF_8))
+                        .build();
+            } else {
+                http = HttpRequest.newBuilder(new URI(path))
+                        .header("Content-Type", "application/json")
+                        .header("Cookie", sessionKey + "=" + maintainer.session)
+                        .header("X-Requested-With", "XMLHttpRequest")
+                        .POST(BodyPublishers.ofString(body, StandardCharsets.UTF_8))
+                        .build();
+            }
+            return network.rest(http, Limit);
+        } catch (URISyntaxException e) {
+            throw I.quiet(e);
         }
-        return network.rest(request, Limit);
     }
 
     protected SessionMaintainer maintainer = new SessionMaintainer();
