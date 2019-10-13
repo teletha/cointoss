@@ -14,9 +14,13 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
+import java.net.URI;
+import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
+import java.net.http.WebSocket.Builder;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CompletionStage;
 
 import org.apache.logging.log4j.LogManager;
 
@@ -315,6 +319,74 @@ public class Network {
         });
     }
 
+    public Signal<JSON> jsonRPC2(String uri, String channelName) {
+        return new Signal<JSON>((observer, disposer) -> {
+            try {
+                HttpClient client = HttpClient.newHttpClient();
+                Builder builder = client.newWebSocketBuilder();
+                java.net.http.WebSocket webSocket = builder.buildAsync(new URI(uri), new java.net.http.WebSocket.Listener() {
+
+                    private StringBuilder buffer = new StringBuilder();
+
+                    /**
+                     * {@inheritDoc}
+                     */
+                    @Override
+                    public void onOpen(java.net.http.WebSocket webSocket) {
+                        JsonRPC invoke = new JsonRPC();
+                        invoke.method = "subscribe";
+                        invoke.params.put("channel", channelName);
+
+                        webSocket.sendText(I.write(invoke), true);
+                        java.net.http.WebSocket.Listener.super.onOpen(webSocket);
+                    }
+
+                    /**
+                     * {@inheritDoc}
+                     */
+                    @Override
+                    public CompletionStage<?> onText(java.net.http.WebSocket webSocket, CharSequence data, boolean last) {
+                        try {
+                            System.out.println(data);
+                            buffer.append(data);
+
+                            if (last) {
+                                I.json(buffer).find("params").flatMap(e -> e.find("message")).to(observer::accept, e -> {
+                                    e.printStackTrace();
+                                    observer.error(e);
+                                }, () -> {
+                                    observer.complete();
+                                });
+                                buffer = new StringBuilder();
+                            }
+
+                            return java.net.http.WebSocket.Listener.super.onText(webSocket, data, last);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            throw I.quiet(e);
+                        }
+                    }
+
+                    /**
+                     * {@inheritDoc}
+                     */
+                    @Override
+                    public void onError(java.net.http.WebSocket webSocket, Throwable error) {
+                        error.printStackTrace();
+                        observer.error(error);
+                    }
+                }).join();
+
+                return disposer.add(() -> {
+                    webSocket.sendClose(1000, "BYE");
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw I.quiet(e);
+            }
+        });
+    }
+
     /**
      * Connect by websocket.
      * 
@@ -459,5 +531,14 @@ public class Network {
         } else {
             return I.signal();
         }
+    }
+
+    public static void main(String[] args) throws InterruptedException {
+        Network network = new Network();
+        network.jsonRPC2("wss://ws.lightstream.bitflyer.com/json-rpc", "lightning_executions_FX_BTC_JPY").to(e -> {
+            System.out.println(e);
+        });
+
+        Thread.sleep(10000);
     }
 }
