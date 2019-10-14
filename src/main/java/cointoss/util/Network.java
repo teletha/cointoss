@@ -9,7 +9,7 @@
  */
 package cointoss.util;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -21,6 +21,7 @@ import java.net.http.WebSocket.Builder;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletionStage;
+import java.util.function.Consumer;
 
 import org.apache.logging.log4j.LogManager;
 
@@ -540,5 +541,53 @@ public class Network {
         });
 
         Thread.sleep(10000);
+    }
+
+    private static Signal<CharSequence> websocket(String uri, Consumer<java.net.http.WebSocket>... opener) {
+        return new Signal<>((observer, disposer) -> {
+            return disposer.add(HttpClient.newHttpClient()
+                    .newWebSocketBuilder()
+                    .buildAsync(URI.create(uri), new java.net.http.WebSocket.Listener() {
+
+                        /** The message buffer. */
+                        private StringBuilder message = new StringBuilder();
+
+                        @Override
+                        public void onOpen(java.net.http.WebSocket s) {
+                            for (Consumer<java.net.http.WebSocket> o : opener) {
+                                o.accept(s);
+                            }
+                            s.request(1);
+                        }
+
+                        @Override
+                        public CompletionStage<?> onText(java.net.http.WebSocket s, CharSequence data, boolean last) {
+                            message.append(data);
+                            if (last) {
+                                StringBuilder prev = message;
+                                System.out.println(prev);
+                                message = new StringBuilder();
+                                observer.accept(prev);
+                            }
+                            s.request(1);
+                            return null;
+                        }
+
+                        @Override
+                        public void onError(java.net.http.WebSocket s, Throwable error) {
+                            observer.error(error);
+                        }
+
+                        /**
+                         * {@inheritDoc}
+                         */
+                        @Override
+                        public CompletionStage<?> onClose(java.net.http.WebSocket s, int statusCode, String reason) {
+                            observer.complete();
+                            return null;
+                        }
+                    })
+                    .join()::abort);
+        });
     }
 }
