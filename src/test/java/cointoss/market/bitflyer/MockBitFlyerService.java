@@ -9,11 +9,10 @@
  */
 package cointoss.market.bitflyer;
 
+import java.time.ZonedDateTime;
 import java.util.Objects;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-
+import cointoss.Direction;
 import cointoss.MarketSetting;
 import cointoss.execution.Execution;
 import cointoss.order.Order;
@@ -21,6 +20,7 @@ import cointoss.order.OrderState;
 import cointoss.util.Chrono;
 import cointoss.util.MockNetwork;
 import cointoss.util.Num;
+import kiss.JSON;
 
 /**
  * @version 2018/04/29 21:19:34
@@ -84,18 +84,35 @@ class MockBitFlyerService extends BitFlyerService {
         Objects.requireNonNull(buyerId);
         Objects.requireNonNull(sellerId);
 
-        JsonObject o = new JsonObject();
-        o.addProperty("id", exe.id);
-        o.addProperty("side", exe.direction.name());
-        o.addProperty("price", exe.price.toDouble());
-        o.addProperty("size", exe.size.toDouble());
-        o.addProperty("exec_date", BitFlyerService.RealTimeFormat.format(exe.date) + "Z");
-        o.addProperty("buy_child_order_acceptance_id", buyerId);
-        o.addProperty("sell_child_order_acceptance_id", sellerId);
+        JSON json = new JSON() //
+                .set("id", exe.id)
+                .set("side", exe.direction.name())
+                .set("price", exe.price.toDouble())
+                .set("size", exe.size.toDouble())
+                .set("exec_date", BitFlyerService.RealTimeFormat.format(exe.date) + "Z")
+                .set("buy_child_order_acceptance_id", buyerId)
+                .set("sell_child_order_acceptance_id", sellerId);
 
-        JsonArray root = new JsonArray();
-        root.add(o);
+        mockNetwork.connect("wss://ws.lightstream.bitflyer.com/json-rpc").willResponse(json);
+    }
 
-        mockNetwork.connect("wss://ws.lightstream.bitflyer.com/json-rpc").willResponse(root);
+    /**
+     * 
+     */
+    private static class BitFylerExecution {
+
+        public String id;
+
+        public Direction side;
+
+        public Num price;
+
+        public Num size;
+
+        public ZonedDateTime exec_date;
+
+        public String buy_child_order_acceptance_id;
+
+        public String sell_child_order_acceptance_id;
     }
 }

@@ -37,9 +37,7 @@ import org.apache.commons.codec.digest.HmacAlgorithms;
 import org.apache.commons.codec.digest.HmacUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 
 import cointoss.Direction;
 import cointoss.MarketService;
@@ -175,7 +173,6 @@ class BitFlyerService extends MarketService {
         }
 
         return call.effect(v -> {
-            System.out.println(v);
             // register order id
             orders.add(v);
             order.observeTerminating().to(() -> orders.remove(v));
@@ -276,22 +273,20 @@ class BitFlyerService extends MarketService {
             String[] previous = new String[] {"", ""};
 
             return executions = network.jsonRPC("wss://ws.lightstream.bitflyer.com/json-rpc", "lightning_executions_" + marketName)
-                    .flatIterable(JsonElement::getAsJsonArray)
-                    .map(JsonElement::getAsJsonObject)
                     .map(e -> {
-                        long id = e.get("id").getAsLong();
+                        long id = e.get("id", long.class);
 
                         if (id == 0 && latestId == 0) {
                             return null; // skip
                         }
 
                         id = latestId = id != 0 ? id : ++latestId;
-                        Direction direction = Direction.parse(e.get("side").getAsString());
-                        Num size = Num.of(e.get("size").getAsString());
-                        Num price = Num.of(e.get("price").getAsString());
-                        ZonedDateTime date = parse(e.get("exec_date").getAsString()).atZone(Chrono.UTC);
-                        String buyer = e.get("buy_child_order_acceptance_id").getAsString();
-                        String seller = e.get("sell_child_order_acceptance_id").getAsString();
+                        Direction direction = e.get("side", Direction.class);
+                        Num size = e.get("size", Num.class);
+                        Num price = e.get("price", Num.class);
+                        ZonedDateTime date = parse(e.get("exec_date")).atZone(Chrono.UTC);
+                        String buyer = e.get("buy_child_order_acceptance_id");
+                        String seller = e.get("sell_child_order_acceptance_id");
                         String taker = direction.isBuy() ? buyer : seller;
                         int consecutiveType = estimateConsecutiveType(previous[0], previous[1], buyer, seller);
                         int delay = estimateDelay(taker, date);
@@ -398,13 +393,13 @@ class BitFlyerService extends MarketService {
      * @return
      */
     private Execution convert(JSON json, String[] previous) {
-        long id = Long.parseLong(json.value("id"));
-        Direction direction = Direction.parse(json.value("side"));
-        Num size = Num.of(json.value("size"));
-        Num price = Num.of(json.value("price"));
-        ZonedDateTime date = LocalDateTime.parse(json.value("exec_date")).atZone(Chrono.UTC);
-        String buyer = json.value("buy_child_order_acceptance_id");
-        String seller = json.value("sell_child_order_acceptance_id");
+        long id = Long.parseLong(json.get("id"));
+        Direction direction = Direction.parse(json.get("side"));
+        Num size = Num.of(json.get("size"));
+        Num price = Num.of(json.get("price"));
+        ZonedDateTime date = LocalDateTime.parse(json.get("exec_date")).atZone(Chrono.UTC);
+        String buyer = json.get("buy_child_order_acceptance_id");
+        String seller = json.get("sell_child_order_acceptance_id");
         String taker = direction.isBuy() ? buyer : seller;
         int consecutiveType = estimateConsecutiveType(previous[0], previous[1], buyer, seller);
         int delay = estimateDelay(taker, date);
@@ -552,25 +547,16 @@ class BitFlyerService extends MarketService {
      * @return
      */
     private Signal<OrderBookChange> realtimeOrderBook() {
-        return network.jsonRPC("wss://ws.lightstream.bitflyer.com/json-rpc", "lightning_board_" + marketName)
-                .map(JsonElement::getAsJsonObject)
-                .map(e -> {
-                    OrderBookChange change = new OrderBookChange();
-                    JsonArray asks = e.get("asks").getAsJsonArray();
-
-                    for (int i = 0; i < asks.size(); i++) {
-                        JsonObject ask = asks.get(i).getAsJsonObject();
-                        change.asks.add(new OrderUnit(Num.of(ask.get("price").getAsString()), Num.of(ask.get("size").getAsString())));
-                    }
-
-                    JsonArray bids = e.get("bids").getAsJsonArray();
-
-                    for (int i = 0; i < bids.size(); i++) {
-                        JsonObject bid = bids.get(i).getAsJsonObject();
-                        change.bids.add(new OrderUnit(Num.of(bid.get("price").getAsString()), Num.of(bid.get("size").getAsString())));
-                    }
-                    return change;
-                });
+        return network.jsonRPC("wss://ws.lightstream.bitflyer.com/json-rpc", "lightning_board_" + marketName).map(e -> {
+            OrderBookChange change = new OrderBookChange();
+            e.find("asks").to(ask -> {
+                change.asks.add(new OrderUnit(Num.of(ask.get("price")), Num.of(ask.get("size"))));
+            });
+            e.find("bids").to(bid -> {
+                change.bids.add(new OrderUnit(Num.of(bid.get("price")), Num.of(bid.get("size"))));
+            });
+            return change;
+        });
     }
 
     /**
