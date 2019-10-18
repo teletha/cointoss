@@ -9,10 +9,11 @@
  */
 package cointoss.market.bitflyer;
 
-import java.time.ZonedDateTime;
 import java.util.Objects;
 
-import cointoss.Direction;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+
 import cointoss.MarketSetting;
 import cointoss.execution.Execution;
 import cointoss.order.Order;
@@ -20,7 +21,7 @@ import cointoss.order.OrderState;
 import cointoss.util.Chrono;
 import cointoss.util.MockNetwork;
 import cointoss.util.Num;
-import kiss.JSON;
+import kiss.I;
 
 /**
  * @version 2018/04/29 21:19:34
@@ -84,35 +85,19 @@ class MockBitFlyerService extends BitFlyerService {
         Objects.requireNonNull(buyerId);
         Objects.requireNonNull(sellerId);
 
-        JSON json = new JSON() //
-                .set("id", exe.id)
-                .set("side", exe.direction.name())
-                .set("price", exe.price.toDouble())
-                .set("size", exe.size.toDouble())
-                .set("exec_date", BitFlyerService.RealTimeFormat.format(exe.date) + "Z")
-                .set("buy_child_order_acceptance_id", buyerId)
-                .set("sell_child_order_acceptance_id", sellerId);
+        JsonObject o = new JsonObject();
+        o.addProperty("id", exe.id);
+        o.addProperty("side", exe.direction.name());
+        o.addProperty("price", exe.price.toDouble());
+        o.addProperty("size", exe.size.toDouble());
+        o.addProperty("exec_date", BitFlyerService.RealTimeFormat.format(exe.date) + "Z");
+        o.addProperty("buy_child_order_acceptance_id", buyerId);
 
-        mockNetwork.connect("wss://ws.lightstream.bitflyer.com/json-rpc").willResponse(json);
-    }
+        o.addProperty("sell_child_order_acceptance_id", sellerId);
 
-    /**
-     * 
-     */
-    private static class BitFylerExecution {
+        JsonArray root = new JsonArray();
+        root.add(o);
 
-        public String id;
-
-        public Direction side;
-
-        public Num price;
-
-        public Num size;
-
-        public ZonedDateTime exec_date;
-
-        public String buy_child_order_acceptance_id;
-
-        public String sell_child_order_acceptance_id;
+        mockNetwork.connect("wss://ws.lightstream.bitflyer.com/json-rpc").willResponse(I.json(root.toString()));
     }
 }

@@ -273,6 +273,7 @@ class BitFlyerService extends MarketService {
             String[] previous = new String[] {"", ""};
 
             return executions = network.jsonRPC("wss://ws.lightstream.bitflyer.com/json-rpc", "lightning_executions_" + marketName)
+                    .flatMap(e -> e.find("*"))
                     .map(e -> {
                         long id = e.get("id", long.class);
 
@@ -284,9 +285,9 @@ class BitFlyerService extends MarketService {
                         Direction direction = e.get("side", Direction.class);
                         Num size = e.get("size", Num.class);
                         Num price = e.get("price", Num.class);
-                        ZonedDateTime date = parse(e.get("exec_date")).atZone(Chrono.UTC);
-                        String buyer = e.get("buy_child_order_acceptance_id");
-                        String seller = e.get("sell_child_order_acceptance_id");
+                        ZonedDateTime date = parse(e.get("exec_date", String.class)).atZone(Chrono.UTC);
+                        String buyer = e.get("buy_child_order_acceptance_id", String.class);
+                        String seller = e.get("sell_child_order_acceptance_id", String.class);
                         String taker = direction.isBuy() ? buyer : seller;
                         int consecutiveType = estimateConsecutiveType(previous[0], previous[1], buyer, seller);
                         int delay = estimateDelay(taker, date);
@@ -371,7 +372,7 @@ class BitFlyerService extends MarketService {
         String[] previous = new String[] {"", ""};
 
         return call("GET", "/v1/executions?product_code=" + marketName + "&count=" + setting
-                .acquirableExecutionSize() + "&before=" + end + "&after=" + start, "").flatMap(e -> e.find("^"))
+                .acquirableExecutionSize() + "&before=" + end + "&after=" + start, "").flatMap(e -> e.find("*").reverse())
                         .map(e -> convert(e, previous));
     }
 
@@ -393,13 +394,13 @@ class BitFlyerService extends MarketService {
      * @return
      */
     private Execution convert(JSON json, String[] previous) {
-        long id = Long.parseLong(json.get("id"));
-        Direction direction = Direction.parse(json.get("side"));
-        Num size = Num.of(json.get("size"));
-        Num price = Num.of(json.get("price"));
-        ZonedDateTime date = LocalDateTime.parse(json.get("exec_date")).atZone(Chrono.UTC);
-        String buyer = json.get("buy_child_order_acceptance_id");
-        String seller = json.get("sell_child_order_acceptance_id");
+        long id = json.get("id", long.class);
+        Direction direction = json.get("side", Direction.class);
+        Num size = json.get("size", Num.class);
+        Num price = json.get("price", Num.class);
+        ZonedDateTime date = LocalDateTime.parse(json.get("exec_date", String.class)).atZone(Chrono.UTC);
+        String buyer = json.get("buy_child_order_acceptance_id", String.class);
+        String seller = json.get("sell_child_order_acceptance_id", String.class);
         String taker = direction.isBuy() ? buyer : seller;
         int consecutiveType = estimateConsecutiveType(previous[0], previous[1], buyer, seller);
         int delay = estimateDelay(taker, date);
@@ -549,11 +550,11 @@ class BitFlyerService extends MarketService {
     private Signal<OrderBookChange> realtimeOrderBook() {
         return network.jsonRPC("wss://ws.lightstream.bitflyer.com/json-rpc", "lightning_board_" + marketName).map(e -> {
             OrderBookChange change = new OrderBookChange();
-            e.find("asks").to(ask -> {
-                change.asks.add(new OrderUnit(Num.of(ask.get("price")), Num.of(ask.get("size"))));
+            e.find("asks.*").to(ask -> {
+                change.asks.add(new OrderUnit(ask.get("price", Num.class), ask.get("size", Num.class)));
             });
-            e.find("bids").to(bid -> {
-                change.bids.add(new OrderUnit(Num.of(bid.get("price")), Num.of(bid.get("size"))));
+            e.find("bids.*").to(bid -> {
+                change.bids.add(new OrderUnit(bid.get("price", Num.class), bid.get("size", Num.class)));
             });
             return change;
         });
