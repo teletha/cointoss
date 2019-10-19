@@ -9,16 +9,17 @@
  */
 package cointoss.util;
 
-import java.net.http.HttpRequest;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Queue;
 
-import kiss.JSON;
+import com.google.gson.JsonElement;
+
 import kiss.Signal;
 import kiss.Signaling;
+import okhttp3.Request;
 
 /**
  * @version 2018/04/30 10:38:28
@@ -35,16 +36,8 @@ public class MockNetwork extends Network {
      * {@inheritDoc}
      */
     @Override
-    public Signal<JSON> rest(HttpRequest request, APILimiter limiter) {
-        return super.rest(request, limiter);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public <M> Signal<M> rest(HttpRequest request, String selector, Class<M> type, APILimiter limiter) {
-        String path = request.uri().getPath();
+    public final <M> Signal<M> rest(Request request, String selector, Class<M> type, APILimiter limiter) {
+        String path = request.url().encodedPath();
         MockResponse mock = responses.get(path);
 
         if (mock == null) {
@@ -62,7 +55,7 @@ public class MockNetwork extends Network {
      * {@inheritDoc}
      */
     @Override
-    public final Signal<JSON> jsonRPC(String uri, String channelName) {
+    public final Signal<JsonElement> jsonRPC(String uri, String channelName) {
         return websockets.computeIfAbsent(uri, key -> new MockSocket()).signaling.expose;
     }
 
@@ -122,14 +115,14 @@ public class MockNetwork extends Network {
      */
     public static class MockSocket {
 
-        private final Signaling<JSON> signaling = new Signaling();
+        private final Signaling<JsonElement> signaling = new Signaling();
 
         /**
          * Describe the reseponse value.
          * 
          * @param value
          */
-        public void willResponse(JSON data) {
+        public void willResponse(JsonElement data) {
             signaling.accept(data);
         }
     }

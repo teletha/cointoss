@@ -14,13 +14,8 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.CompletionStage;
-import java.util.function.Consumer;
 
 import org.apache.logging.log4j.LogManager;
 
@@ -29,6 +24,7 @@ import com.github.signalr4j.client.Logger;
 import com.github.signalr4j.client.hubs.HubConnection;
 import com.github.signalr4j.client.hubs.HubProxy;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import kiss.I;
@@ -158,33 +154,6 @@ public class Network {
     /**
      * Call REST API.
      */
-    public final Signal<JSON> rest(HttpRequest request) {
-        return rest(request, null);
-    }
-
-    /**
-     * Call REST API.
-     */
-    public Signal<JSON> rest(HttpRequest request, APILimiter limiter) {
-        return new Signal<>((observer, disposer) -> {
-            if (limiter != null) {
-                limiter.acquire();
-            }
-
-            try {
-                observer.accept(I.json(request));
-                observer.complete();
-            } catch (Throwable e) {
-                e.printStackTrace();
-                observer.error(new Error("[" + request.uri() + "] throws some error.", e));
-            }
-            return disposer;
-        });
-    }
-
-    /**
-     * Call REST API.
-     */
     public final <M> Signal<M> rest(Request request, String selector, Class<M> type) {
         return rest(request, selector, type, null);
     }
@@ -221,40 +190,6 @@ public class Network {
             } catch (Throwable e) {
                 observer.error(new Error("[" + request.url() + "] throws some error.", e));
             }
-            return disposer;
-        });
-    }
-
-    /**
-     * Call REST API.
-     */
-    public final <M> Signal<M> rest(HttpRequest request, String selector, Class<M> type) {
-        return rest(request, selector, type, null);
-    }
-
-    /**
-     * Call REST API.
-     */
-    public <M> Signal<M> rest(HttpRequest request, String selector, Class<M> type, APILimiter limiter) {
-        return new Signal<>((observer, disposer) -> {
-            if (limiter != null) {
-                limiter.acquire();
-            }
-
-            try {
-                JSON json = I.json(request);
-
-                if (selector == null || selector.isEmpty()) {
-                    observer.accept(json.to(type));
-                } else {
-                    json.find(selector, type).to(observer);
-                }
-                observer.complete();
-            } catch (Throwable e) {
-                e.printStackTrace();
-                observer.error(new Error("[" + request.uri() + "] throws some error.", e));
-            }
-
             return disposer;
         });
     }
@@ -322,17 +257,68 @@ public class Network {
      * Connect by websocket.
      * 
      * @param uri
-     * @param jsonCommnad
+     * @param channelName
      * @return
      */
-    public Signal<JSON> jsonRPC(String uri, String channelName) {
-        return websocket(uri, s -> {
-            JsonRPC invoke = new JsonRPC();
-            invoke.method = "subscribe";
-            invoke.params.put("channel", channelName);
+    public Signal<JsonElement> jsonRPC(String uri, String channelName) {
+        return new Signal<JsonElement>((observer, disposer) -> {
+            JsonParser parser = new JsonParser();
+            Request request = new Request.Builder().url(uri).build();
 
-            s.sendText(I.write(invoke), true);
-        }).flatMap(text -> I.json(text).find("params.message"));
+            WebSocket websocket = client().newWebSocket(request, new WebSocketListener() {
+
+                /**
+                 * {@inheritDoc}
+                 */
+                @Override
+                public void onOpen(WebSocket socket, Response response) {
+                    JsonRPC invoke = new JsonRPC();
+                    invoke.method = "subscribe";
+                    invoke.params.put("channel", channelName);
+
+                    socket.send(I.write(invoke));
+                }
+
+                /**
+                 * {@inheritDoc}
+                 */
+                @Override
+                public void onMessage(WebSocket socket, String text) {
+                    JsonObject e = parser.parse(text).getAsJsonObject();
+                    JsonObject params = e.getAsJsonObject("params");
+
+                    if (params != null) {
+                        observer.accept(params.get("message"));
+                    }
+                }
+
+                /**
+                 * {@inheritDoc}
+                 */
+                @Override
+                public void onClosing(WebSocket socket, int code, String reason) {
+                }
+
+                /**
+                 * {@inheritDoc}
+                 */
+                @Override
+                public void onClosed(WebSocket socket, int code, String reason) {
+                }
+
+                /**
+                 * {@inheritDoc}
+                 */
+                @Override
+                public void onFailure(WebSocket socket, Throwable error, Response response) {
+                    observer.error(error);
+                }
+            });
+
+            return disposer.add(() -> {
+                websocket.close(1000, null);
+            });
+        });
     }
 
     /**
@@ -411,52 +397,5 @@ public class Network {
         } else {
             return I.signal();
         }
-    }
-
-    private static Signal<CharSequence> websocket(String uri, Consumer<java.net.http.WebSocket>... opener) {
-        return new Signal<>((observer, disposer) -> {
-            return disposer.add(HttpClient.newHttpClient()
-                    .newWebSocketBuilder()
-                    .buildAsync(URI.create(uri), new java.net.http.WebSocket.Listener() {
-
-                        /** The message buffer. */
-                        private StringBuilder message = new StringBuilder();
-
-                        @Override
-                        public void onOpen(java.net.http.WebSocket s) {
-                            for (Consumer<java.net.http.WebSocket> o : opener) {
-                                o.accept(s);
-                            }
-                            s.request(1);
-                        }
-
-                        @Override
-                        public CompletionStage<?> onText(java.net.http.WebSocket s, CharSequence data, boolean last) {
-                            message.append(data);
-                            if (last) {
-                                StringBuilder prev = message;
-                                message = new StringBuilder();
-                                observer.accept(prev);
-                            }
-                            s.request(1);
-                            return null;
-                        }
-
-                        @Override
-                        public void onError(java.net.http.WebSocket s, Throwable error) {
-                            observer.error(error);
-                        }
-
-                        /**
-                         * {@inheritDoc}
-                         */
-                        @Override
-                        public CompletionStage<?> onClose(java.net.http.WebSocket s, int statusCode, String reason) {
-                            observer.complete();
-                            return null;
-                        }
-                    })
-                    .join()::abort);
-        });
     }
 }

@@ -21,7 +21,6 @@ import cointoss.order.OrderState;
 import cointoss.util.Chrono;
 import cointoss.util.MockNetwork;
 import cointoss.util.Num;
-import kiss.I;
 
 /**
  * @version 2018/04/29 21:19:34
@@ -92,12 +91,11 @@ class MockBitFlyerService extends BitFlyerService {
         o.addProperty("size", exe.size.toDouble());
         o.addProperty("exec_date", BitFlyerService.RealTimeFormat.format(exe.date) + "Z");
         o.addProperty("buy_child_order_acceptance_id", buyerId);
-
         o.addProperty("sell_child_order_acceptance_id", sellerId);
 
         JsonArray root = new JsonArray();
         root.add(o);
 
-        mockNetwork.connect("wss://ws.lightstream.bitflyer.com/json-rpc").willResponse(I.json(root.toString()));
+        mockNetwork.connect("wss://ws.lightstream.bitflyer.com/json-rpc").willResponse(root);
     }
 }
