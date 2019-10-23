@@ -54,7 +54,7 @@ public class VerifiableMarketService extends MarketService {
     private final Collection<BackendOrder> orderActive = new ConcurrentLinkedDeque<>();
 
     /** The order manager. */
-    private final Signaling<Order> orderUpdating = new Signaling();
+    private final Signaling<Ⅲ<Direction, String, Execution>> positions = new Signaling();
 
     /** The execution manager. */
     private final LinkedList<Execution> executeds = new LinkedList();
@@ -113,6 +113,14 @@ public class VerifiableMarketService extends MarketService {
      * {@inheritDoc}
      */
     @Override
+    protected Signal<Order> connectOrdersRealtimely() {
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Signal<String> request(Order order, Consumer<OrderState> state) {
         return I.signal(order).map(o -> {
             BackendOrder child = new BackendOrder(order);
@@ -165,7 +173,7 @@ public class VerifiableMarketService extends MarketService {
      */
     @Override
     public Signal<Ⅲ<Direction, String, Execution>> executionsRealtimelyForMe() {
-        return null;
+        return positions.expose;
     }
 
     /**
@@ -202,14 +210,6 @@ public class VerifiableMarketService extends MarketService {
 
             return order;
         });
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected Signal<Order> connectOrdersRealtimely() {
-        return orderUpdating.expose;
     }
 
     /**
@@ -330,13 +330,7 @@ public class VerifiableMarketService extends MarketService {
                     order.state = OrderState.COMPLETED;
                     iterator.remove();
                 }
-
-                orderUpdating.accept(Order.with.direction(order.direction, order.size)
-                        .price(order.price)
-                        .id(order.id)
-                        .state(order.state)
-                        .executedSize(order.executedSize)
-                        .remainingSize(order.remainingSize));
+                positions.accept(I.pair(exe.direction, order.id, exe));
 
                 if (!exclusiveExecution) {
                     continue;
