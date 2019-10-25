@@ -136,7 +136,11 @@ class BitFlyerService extends MarketService {
         super("BitFlyer", type, setting);
 
         this.forTest = forTest;
-        this.intervalOrderCheck = I.signal(0, 1, TimeUnit.SECONDS).map(v -> orders().toList()).share();
+        this.intervalOrderCheck = I.signal(0, 1, TimeUnit.SECONDS)
+                .map(v -> call("GET", "/v1/me/getchildorders?product_code=" + marketName, "", "*", ChildOrderResponse.class)
+                        .map(ChildOrderResponse::toOrder)
+                        .toList())
+                .share();
     }
 
     /**
@@ -250,11 +254,8 @@ class BitFlyerService extends MarketService {
         Signal requestCancel = forTest || maintainer.session() == null || cancel.order_id == null
                 ? call("POST", "/v1/me/cancelchildorder", cancel, null, null)
                 : call("POST", "https://lightning.bitflyer.jp/api/trade/cancelorder", cancel, null, WebResponse.class);
-        Signal<List<Order>> isCanceled = intervalOrderCheck.take(orders -> !orders.contains(order)).effect(e -> {
-            System.out.println("order canceld");
-        });
 
-        return requestCancel.combine(isCanceled).take(1).mapTo(order);
+        return requestCancel.mapTo(order);
     }
 
     /**
@@ -492,7 +493,16 @@ class BitFlyerService extends MarketService {
      */
     @Override
     public Signal<Order> orders() {
-        return call("GET", "/v1/me/getchildorders?child_order_state=ACTIVE&product_code=" + marketName, "", "*", ChildOrderResponse.class)
+        return call("GET", "/v1/me/getchildorders?product_code=" + marketName, "", "*", ChildOrderResponse.class)
+                .map(ChildOrderResponse::toOrder);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Signal<Order> orders(OrderState state) {
+        return call("GET", "/v1/me/getchildorders?child_order_state=" + state + "&product_code=" + marketName, "", "*", ChildOrderResponse.class)
                 .map(ChildOrderResponse::toOrder);
     }
 

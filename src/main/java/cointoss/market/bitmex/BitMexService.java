@@ -150,6 +150,14 @@ class BitMexService extends MarketService {
      * {@inheritDoc}
      */
     @Override
+    public Signal<Order> orders(OrderState state) {
+        return I.signal();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Signal<OrderBookChange> orderBook() {
         return I.signal();
     }

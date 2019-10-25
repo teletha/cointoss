@@ -14,6 +14,7 @@ import static cointoss.order.OrderState.*;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.util.PerformanceSensitive;
 
@@ -85,11 +86,16 @@ public final class OrderManager {
     /** The current position average price. */
     public final Variable<Num> positionPrice = Variable.of(Num.ZERO);
 
+    /** The shared order list. */
+    private final Signal<List<Order>> intervalOrderCheck;
+
     /**
      * @param service
      */
     public OrderManager(MarketService service) {
         this.service = service;
+        this.intervalOrderCheck = I.signal(0, 1, TimeUnit.SECONDS, service.scheduler()).map(v -> service.orders().toList()).share();
+
         add.to(managed::add);
         removed.to(managed::remove);
 
@@ -193,7 +199,29 @@ public final class OrderManager {
             OrderState previous = order.state;
             order.assignState(REQUESTING);
 
-            return service.cancel(order).retryWhen(service.setting.retryPolicy()).effect(o -> {
+            Signal<List<Order>> isCancelled = intervalOrderCheck.take(orders -> {
+                for (Order listed : orders) {
+                    if (order.id.equals(listed.id)) {
+                        if (listed.state == ACTIVE) {
+                            return false;
+                        }
+
+                        switch (listed.state) {
+                        case ACTIVE:
+                            return false;
+
+                        case COMPLETED:
+                        case CANCELED:
+                            order.updateAtomically(listed.remainingSize, listed.executedSize);
+                            order.assignState(listed.state);
+                            return true;
+                        }
+                    }
+                }
+                return true; // cancelled
+            });
+
+            return service.cancel(order).retryWhen(service.setting.retryPolicy()).combine(isCancelled).take(1).mapTo(order).effect(o -> {
                 managed.remove(o);
                 o.assignState(CANCELED);
             }).effectOnError(e -> {

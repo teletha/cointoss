@@ -216,6 +216,24 @@ public class VerifiableMarketService extends MarketService {
      * {@inheritDoc}
      */
     @Override
+    public Signal<Order> orders(OrderState state) {
+        return I.signal(orderActive).take(o -> o.state == state).map(o -> {
+            Order order = Order.with.direction(o.direction, o.size)
+                    .price(o.price)
+                    .quantityCondition(o.condition)
+                    .remainingSize(o.remainingSize)
+                    .executedSize(o.executedSize)
+                    .id(o.id)
+                    .state(o.state);
+
+            return order;
+        });
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Signal<Num> baseCurrency() {
         return I.signal(baseCurrency);
     }

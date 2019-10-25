@@ -181,13 +181,18 @@ public abstract class MarketService implements Disposable {
     }
 
     /**
-     * <p>
      * Request all orders.
-     * </p>
      * 
      * @return
      */
     public abstract Signal<Order> orders();
+
+    /**
+     * Request all orders with the specified state.
+     * 
+     * @return
+     */
+    public abstract Signal<Order> orders(OrderState state);
 
     /**
      * Acquire the order state in realtime. This is infinitely.
