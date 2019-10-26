@@ -309,7 +309,7 @@ abstract class ExecutionModel implements Directional {
      * @param other
      * @return
      */
-    public boolean equals(Execution other) {
+    public boolean equals(cointoss.execution.Execution other) {
         if (other.info == null) {
             return id() == other.id;
         } else {

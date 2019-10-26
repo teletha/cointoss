@@ -115,7 +115,7 @@ interface MarketSettingModel {
      * @return
      */
     @Icy.Property(copiable = true)
-    default Retry retryPolicy() {
+    default cointoss.util.Retry retryPolicy() {
         return Retry.with.limit(5).delayLinear(Duration.ofMillis(1000)).delayMaximum(Duration.ofMinutes(3));
     }
 }

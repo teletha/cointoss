@@ -270,7 +270,7 @@ abstract class OrderModel implements Directional, Comparable<OrderModel> {
      * 
      * @param e
      */
-    final void executed(Execution e) {
+    final void executed(cointoss.execution.Execution e) {
         executions.add(e);
         setRemainingSize(remainingSize().minus(e.size));
         setExecutedSize(executedSize().plus(e.size));
