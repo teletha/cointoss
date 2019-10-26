@@ -9,7 +9,7 @@
  */
 package cointoss.market.bitflyer;
 
-import static cointoss.order.OrderState.ACTIVE;
+import static cointoss.order.OrderState.*;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -25,8 +25,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
-
-import javafx.scene.control.TextInputDialog;
 
 import org.apache.commons.codec.digest.HmacAlgorithms;
 import org.apache.commons.codec.digest.HmacUtils;
@@ -48,11 +46,13 @@ import cointoss.order.OrderUnit;
 import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
+import javafx.scene.control.TextInputDialog;
 import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
 import kiss.Signaling;
 import kiss.WiseConsumer;
+import kiss.Ⅱ;
 import kiss.Ⅲ;
 import marionette.browser.Browser;
 import okhttp3.MediaType;
@@ -244,18 +244,35 @@ class BitFlyerService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Order> cancel(Order order) {
+    public Signal<Ⅲ<OrderState, Num, Num>> cancel(Order order) {
         CancelRequest cancel = new CancelRequest();
         cancel.product_code = marketName;
         cancel.account_id = account.accountId.v;
         cancel.order_id = order.relation(Internals.class).id;
         cancel.child_order_acceptance_id = order.id;
 
-        Signal requestCancel = forTest || maintainer.session() == null || cancel.order_id == null
+        Signal<?> requestCancel = forTest || maintainer.session() == null || cancel.order_id == null
                 ? call("POST", "/v1/me/cancelchildorder", cancel, null, null)
                 : call("POST", "https://lightning.bitflyer.jp/api/trade/cancelorder", cancel, null, WebResponse.class);
 
-        return requestCancel.mapTo(order);
+        Signal<Ⅲ<OrderState, Num, Num>> isCancelled = intervalOrderCheck.map(orders -> {
+            for (Order listed : orders) {
+                if (order.id.equals(listed.id)) {
+                    switch (listed.state) {
+                    case ACTIVE:
+                        return null;
+
+                    case COMPLETED:
+                    case CANCELED:
+                    default:
+                        return I.pair(listed.state, listed.remainingSize, listed.executedSize);
+                    }
+                }
+            }
+            return I.pair(OrderState.CANCELED, order.remainingSize, order.executedSize);
+        }).skipNull();
+
+        return requestCancel.combine(isCancelled).take(1).map(Ⅱ::ⅱ);
     }
 
     /**

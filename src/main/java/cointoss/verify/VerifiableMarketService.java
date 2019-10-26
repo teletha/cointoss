@@ -138,7 +138,7 @@ public class VerifiableMarketService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Order> cancel(Order order) {
+    public Signal<Ⅲ<OrderState, Num, Num>> cancel(Order order) {
         BackendOrder backend = findBy(order);
 
         // associated backend order is not found, do nothing
@@ -151,7 +151,7 @@ public class VerifiableMarketService extends MarketService {
 
         if (delay == now) {
             backend.cancel();
-            return I.signal(order);
+            return I.signal(I.pair(OrderState.CANCELED, backend.remainingSize, backend.executedSize));
         }
 
         // backend order will be canceled in the specified delay
@@ -481,7 +481,7 @@ public class VerifiableMarketService extends MarketService {
         private long cancelTimeMills;
 
         /** The cancel event emitter. */
-        private final Signaling<Order> canceling = new Signaling();
+        private final Signaling<Ⅲ<OrderState, Num, Num>> canceling = new Signaling();
 
         /**
          * Create backend managed order.
@@ -515,7 +515,7 @@ public class VerifiableMarketService extends MarketService {
         private void cancel() {
             I.signal(orderActive).take(o -> o.id.equals(id)).take(1).to(o -> {
                 o.state = OrderState.CANCELED;
-                canceling.accept(front);
+                canceling.accept(I.pair(OrderState.CANCELED, o.remainingSize, o.executedSize));
                 canceling.complete();
                 orderActive.remove(o);
             });

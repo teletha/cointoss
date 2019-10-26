@@ -14,7 +14,6 @@ import static cointoss.order.OrderState.*;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.util.PerformanceSensitive;
 
@@ -86,16 +85,11 @@ public final class OrderManager {
     /** The current position average price. */
     public final Variable<Num> positionPrice = Variable.of(Num.ZERO);
 
-    /** The shared order list. */
-    private final Signal<List<Order>> intervalOrderCheck;
-
     /**
      * @param service
      */
     public OrderManager(MarketService service) {
         this.service = service;
-        this.intervalOrderCheck = I.signal(0, 1, TimeUnit.SECONDS, service.scheduler()).map(v -> service.orders().toList()).share();
-
         add.to(managed::add);
         removed.to(managed::remove);
 
@@ -103,7 +97,7 @@ public final class OrderManager {
 
         // retrieve orders on server
         // don't use orders().to(addition); it completes addition signaling itself
-        service.orders().to(addition::accept);
+        service.orders(OrderState.ACTIVE).to(addition::accept);
 
         // retrieve orders on realtime
         service.add(service.executionsRealtimelyForMe().to(v -> {
@@ -117,14 +111,14 @@ public final class OrderManager {
                     Num executed = execution.size;
 
                     if (order.type.isTaker() && executed.isNot(0)) {
-                        order.assignPrice(n -> n.multiply(order.executedSize)
+                        order.setPrice(order.price.multiply(order.executedSize)
                                 .plus(execution.price.multiply(executed))
                                 .divide(executed.plus(order.executedSize)));
                     }
                     order.executed(execution);
 
                     if (order.remainingSize.is(Num.ZERO)) {
-                        order.assignState(COMPLETED);
+                        order.setState(COMPLETED);
                     }
 
                     updates.accept(I.pair(order, execution));
@@ -154,18 +148,18 @@ public final class OrderManager {
      */
     public Signal<Order> request(Order order) {
         if (order.state == OrderState.INIT || order.state == OrderState.REQUESTING) {
-            order.assignState(REQUESTING);
+            order.setState(REQUESTING);
             addition.accept(order);
 
-            return service.request(order, order::assignState).retryWhen(service.setting.retryPolicy()).map(id -> {
-                order.assignState(ACTIVE);
-                order.assignId(id);
-                order.assignCreationTime(service.now());
+            return service.request(order, order::setState).retryWhen(service.setting.retryPolicy()).map(id -> {
+                order.setState(ACTIVE);
+                order.setId(id);
+                order.setCreationTime(service.now());
                 order.observeTerminating().to(remove::accept);
 
                 return order;
             }).effectOnError(e -> {
-                order.assignState(CANCELED);
+                order.setState(CANCELED);
             });
         } else {
             return I.signal(order);
@@ -197,35 +191,16 @@ public final class OrderManager {
     public Signal<Order> cancel(Order order) {
         if (order.state == ACTIVE || order.state == REQUESTING) {
             OrderState previous = order.state;
-            order.assignState(REQUESTING);
+            order.setState(REQUESTING);
 
-            Signal<List<Order>> isCancelled = intervalOrderCheck.take(orders -> {
-                for (Order listed : orders) {
-                    if (order.id.equals(listed.id)) {
-                        if (listed.state == ACTIVE) {
-                            return false;
-                        }
+            return service.cancel(order).retryWhen(service.setting.retryPolicy()).map(v -> {
+                order.updateAtomically(v.ⅱ, v.ⅲ);
+                order.setState(v.ⅰ);
+                managed.remove(order);
 
-                        switch (listed.state) {
-                        case ACTIVE:
-                            return false;
-
-                        case COMPLETED:
-                        case CANCELED:
-                            order.updateAtomically(listed.remainingSize, listed.executedSize);
-                            order.assignState(listed.state);
-                            return true;
-                        }
-                    }
-                }
-                return true; // cancelled
-            });
-
-            return service.cancel(order).retryWhen(service.setting.retryPolicy()).combine(isCancelled).take(1).mapTo(order).effect(o -> {
-                managed.remove(o);
-                o.assignState(CANCELED);
+                return order;
             }).effectOnError(e -> {
-                order.assignState(previous);
+                order.setState(previous);
             });
         } else {
             return I.signal(order);

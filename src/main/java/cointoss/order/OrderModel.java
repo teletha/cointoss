@@ -27,6 +27,7 @@ import icy.manipulator.Icy;
 import kiss.I;
 import kiss.Signal;
 import kiss.Signaling;
+import kiss.Ⅲ;
 
 @Icy(grouping = 2)
 public abstract class OrderModel implements Directional, Comparable<OrderModel> {
@@ -111,7 +112,7 @@ public abstract class OrderModel implements Directional, Comparable<OrderModel> 
      * 
      * @return
      */
-    @Icy.Property(mutable = true)
+    @Icy.Property(setterModifier = "final")
     public Num price() {
         return Num.ZERO;
     }
@@ -293,11 +294,25 @@ public abstract class OrderModel implements Directional, Comparable<OrderModel> 
     }
 
     /**
+     * Update size atomically.
+     * 
+     * @param remainingSize
+     * @param executedSize
+     */
+    final void updateAtomically(Ⅲ<OrderState, Num, Num> state) {
+        setRemainingSize(state.ⅱ);
+        setExecutedSize(state.ⅲ);
+
+        this.remainingSize.accept(state.ⅱ);
+        this.executedSize.accept(state.ⅲ);
+    }
+
+    /**
      * The order identifier for the specific market.
      * 
      * @return
      */
-    @Icy.Property(mutable = true)
+    @Icy.Property(setterModifier = "final")
     public String id() {
         return "";
     }
@@ -307,7 +322,7 @@ public abstract class OrderModel implements Directional, Comparable<OrderModel> 
      * 
      * @return
      */
-    @Icy.Property(custom = ObservableProperty.class, mutable = true)
+    @Icy.Property(custom = ObservableProperty.class, setterModifier = "final")
     public ZonedDateTime creationTime() {
         return Chrono.MIN;
     }
@@ -317,7 +332,7 @@ public abstract class OrderModel implements Directional, Comparable<OrderModel> 
      * 
      * @return
      */
-    @Icy.Property(custom = ObservableProperty.class, mutable = true)
+    @Icy.Property(custom = ObservableProperty.class, setterModifier = "final")
     public ZonedDateTime terminationTime() {
         return null;
     }
@@ -327,7 +342,7 @@ public abstract class OrderModel implements Directional, Comparable<OrderModel> 
      * 
      * @return
      */
-    @Icy.Property(custom = ObservableProperty.class, mutable = true)
+    @Icy.Property(custom = ObservableProperty.class, setterModifier = "final")
     public OrderState state() {
         return OrderState.INIT;
     }

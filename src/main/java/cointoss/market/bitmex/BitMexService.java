@@ -71,7 +71,7 @@ class BitMexService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Order> cancel(Order order) {
+    public Signal<Ⅲ<OrderState, Num, Num>> cancel(Order order) {
         return null;
     }
 

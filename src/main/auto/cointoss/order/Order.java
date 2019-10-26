@@ -16,7 +16,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.time.ZonedDateTime;
 import java.util.function.Consumer;
-import java.util.function.UnaryOperator;
 import javax.annotation.processing.Generated;
 import kiss.Signal;
 
@@ -284,28 +283,6 @@ public class Order extends OrderModel {
     }
 
     /**
-     * Assign the new value of price property.
-     *
-     * @paran value The new price property value to assign.
-     * @return Chainable API.
-     */
-    public final Order assignPrice(Num value) {
-        setPrice(value);
-        return this;
-    }
-
-    /**
-     * Assign the new value of price property.
-     *
-     * @paran value The price property assigner which accepts the current value and returns new value.
-     * @return Chainable API.
-     */
-    public final Order assignPrice(UnaryOperator<Num> value) {
-        setPrice(value.apply(this.price));
-        return this;
-    }
-
-    /**
      * Provide classic getter API.
      *
      * @return A value of price property.
@@ -320,7 +297,7 @@ public class Order extends OrderModel {
      *
      * @paran value A new value of price property to assign.
      */
-    private final void setPrice(Num value) {
+    final void setPrice(Num value) {
         if (value == null) {
             value = super.price();
         }
@@ -486,28 +463,6 @@ public class Order extends OrderModel {
     }
 
     /**
-     * Assign the new value of id property.
-     *
-     * @paran value The new id property value to assign.
-     * @return Chainable API.
-     */
-    public final Order assignId(String value) {
-        setId(value);
-        return this;
-    }
-
-    /**
-     * Assign the new value of id property.
-     *
-     * @paran value The id property assigner which accepts the current value and returns new value.
-     * @return Chainable API.
-     */
-    public final Order assignId(UnaryOperator<String> value) {
-        setId(value.apply(this.id));
-        return this;
-    }
-
-    /**
      * Provide classic getter API.
      *
      * @return A value of id property.
@@ -522,7 +477,7 @@ public class Order extends OrderModel {
      *
      * @paran value A new value of id property to assign.
      */
-    private final void setId(String value) {
+    final void setId(String value) {
         if (value == null) {
             value = super.id();
         }
@@ -544,28 +499,6 @@ public class Order extends OrderModel {
     }
 
     /**
-     * Assign the new value of creationTime property.
-     *
-     * @paran value The new creationTime property value to assign.
-     * @return Chainable API.
-     */
-    public final Order assignCreationTime(ZonedDateTime value) {
-        setCreationTime(value);
-        return this;
-    }
-
-    /**
-     * Assign the new value of creationTime property.
-     *
-     * @paran value The creationTime property assigner which accepts the current value and returns new value.
-     * @return Chainable API.
-     */
-    public final Order assignCreationTime(UnaryOperator<ZonedDateTime> value) {
-        setCreationTime(value.apply(this.creationTime));
-        return this;
-    }
-
-    /**
      * Provide classic getter API.
      *
      * @return A value of creationTime property.
@@ -580,7 +513,7 @@ public class Order extends OrderModel {
      *
      * @paran value A new value of creationTime property to assign.
      */
-    private final void setCreationTime(ZonedDateTime value) {
+    final void setCreationTime(ZonedDateTime value) {
         if (value == null) {
             value = super.creationTime();
         }
@@ -611,28 +544,6 @@ public class Order extends OrderModel {
     }
 
     /**
-     * Assign the new value of terminationTime property.
-     *
-     * @paran value The new terminationTime property value to assign.
-     * @return Chainable API.
-     */
-    public final Order assignTerminationTime(ZonedDateTime value) {
-        setTerminationTime(value);
-        return this;
-    }
-
-    /**
-     * Assign the new value of terminationTime property.
-     *
-     * @paran value The terminationTime property assigner which accepts the current value and returns new value.
-     * @return Chainable API.
-     */
-    public final Order assignTerminationTime(UnaryOperator<ZonedDateTime> value) {
-        setTerminationTime(value.apply(this.terminationTime));
-        return this;
-    }
-
-    /**
      * Provide classic getter API.
      *
      * @return A value of terminationTime property.
@@ -647,7 +558,7 @@ public class Order extends OrderModel {
      *
      * @paran value A new value of terminationTime property to assign.
      */
-    private final void setTerminationTime(ZonedDateTime value) {
+    final void setTerminationTime(ZonedDateTime value) {
         if (value == null) {
             value = super.terminationTime();
         }
@@ -678,28 +589,6 @@ public class Order extends OrderModel {
     }
 
     /**
-     * Assign the new value of state property.
-     *
-     * @paran value The new state property value to assign.
-     * @return Chainable API.
-     */
-    public final Order assignState(OrderState value) {
-        setState(value);
-        return this;
-    }
-
-    /**
-     * Assign the new value of state property.
-     *
-     * @paran value The state property assigner which accepts the current value and returns new value.
-     * @return Chainable API.
-     */
-    public final Order assignState(UnaryOperator<OrderState> value) {
-        setState(value.apply(this.state));
-        return this;
-    }
-
-    /**
      * Provide classic getter API.
      *
      * @return A value of state property.
@@ -714,7 +603,7 @@ public class Order extends OrderModel {
      *
      * @paran value A new value of state property to assign.
      */
-    private final void setState(OrderState value) {
+    final void setState(OrderState value) {
         if (value == null) {
             value = super.state();
         }

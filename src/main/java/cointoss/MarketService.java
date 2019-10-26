@@ -97,9 +97,7 @@ public abstract class MarketService implements Disposable {
     public abstract Signal<Integer> delay();
 
     /**
-     * <p>
      * Request order actually.
-     * </p>
      * 
      * @param order A order to request.
      * @return A requested order.
@@ -107,13 +105,12 @@ public abstract class MarketService implements Disposable {
     public abstract Signal<String> request(Order order, Consumer<OrderState> state);
 
     /**
-     * <p>
-     * Request order canceling.
-     * </p>
+     * Request order cancelling actually.
      * 
      * @param order A order to cancel.
+     * @return A cancelled order result (state, remainingSize, executedSize).
      */
-    public abstract Signal<Order> cancel(Order order);
+    public abstract Signal<Ⅲ<OrderState, Num, Num>> cancel(Order order);
 
     /**
      * Acquire the execution log between start (exclusive) and end (exclusive) key.
