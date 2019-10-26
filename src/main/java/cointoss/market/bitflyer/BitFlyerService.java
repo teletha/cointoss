@@ -136,11 +136,7 @@ class BitFlyerService extends MarketService {
         super("BitFlyer", type, setting);
 
         this.forTest = forTest;
-        this.intervalOrderCheck = I.signal(0, 1, TimeUnit.SECONDS)
-                .map(v -> call("GET", "/v1/me/getchildorders?product_code=" + marketName, "", "*", ChildOrderResponse.class)
-                        .map(ChildOrderResponse::toOrder)
-                        .toList())
-                .share();
+        this.intervalOrderCheck = I.signal(0, 1, TimeUnit.SECONDS).map(v -> orders().toList()).share();
     }
 
     /**
@@ -179,7 +175,6 @@ class BitFlyerService extends MarketService {
         }
 
         return call.effect(v -> {
-            System.out.println(v);
             // register order id
             orders.add(v);
             order.observeTerminating().to(() -> orders.remove(v));
@@ -192,7 +187,6 @@ class BitFlyerService extends MarketService {
                     .to(o -> {
                         state.accept(ACTIVE);
                         order.relation(Internals.class).id = o.relation(Internals.class).id;
-                        System.out.println("Order reqested");
                     });
         }).effect(new ComplementExecutionWhileOrderRequestAndResponse());
     }
