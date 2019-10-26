@@ -28,7 +28,7 @@ import cointoss.util.Num;
 import icy.manipulator.Icy;
 
 @Icy
-public interface BackTestModel {
+interface BackTestModel {
 
     /**
      * Set the target market.

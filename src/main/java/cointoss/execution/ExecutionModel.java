@@ -26,7 +26,7 @@ import kiss.Manageable;
 import kiss.Singleton;
 
 @Icy(grouping = 2)
-public abstract class ExecutionModel implements Directional {
+abstract class ExecutionModel implements Directional {
 
     /** The internal id counter. */
     private static final AtomicLong counter = new AtomicLong(1);

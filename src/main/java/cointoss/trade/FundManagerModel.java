@@ -13,7 +13,7 @@ import cointoss.util.Num;
 import icy.manipulator.Icy;
 
 @Icy
-public interface FundManagerModel {
+interface FundManagerModel {
     /**
      * Your total assets.
      * 

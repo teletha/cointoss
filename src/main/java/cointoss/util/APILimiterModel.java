@@ -15,7 +15,7 @@ import icy.manipulator.Icy;
 import kiss.I;
 
 @Icy
-public abstract class APILimiterModel {
+abstract class APILimiterModel {
 
     private long storedPermits = 0;
 

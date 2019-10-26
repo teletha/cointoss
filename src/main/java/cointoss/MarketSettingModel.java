@@ -22,7 +22,7 @@ import icy.manipulator.Icy;
 import kiss.I;
 
 @Icy
-public interface MarketSettingModel {
+interface MarketSettingModel {
 
     /**
      * Get the minimum bid price of the base currency.

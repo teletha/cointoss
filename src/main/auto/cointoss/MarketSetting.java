@@ -22,7 +22,7 @@ import javax.annotation.processing.Generated;
  * Generated model for {@link MarketSettingModel}.
  */
 @Generated("Icy Manipulator")
-public abstract class MarketSetting implements MarketSettingModel {
+public class MarketSetting implements MarketSettingModel {
 
     /**
      * Deceive complier that the specified checked exception is unchecked exception.

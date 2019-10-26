@@ -30,7 +30,7 @@ import kiss.Signaling;
 import kiss.Ⅲ;
 
 @Icy(grouping = 2)
-public abstract class OrderModel implements Directional, Comparable<OrderModel> {
+abstract class OrderModel implements Directional, Comparable<OrderModel> {
 
     /** The relation holder. */
     private Map<Class, Object> relations;

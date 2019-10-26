@@ -23,7 +23,7 @@ import javax.annotation.processing.Generated;
  * Generated model for {@link ExecutionModel}.
  */
 @Generated("Icy Manipulator")
-public abstract class Execution extends ExecutionModel {
+public class Execution extends ExecutionModel {
 
     /**
      * Deceive complier that the specified checked exception is unchecked exception.

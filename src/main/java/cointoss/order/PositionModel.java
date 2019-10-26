@@ -19,7 +19,7 @@ import cointoss.util.Num;
 import icy.manipulator.Icy;
 
 @Icy
-public abstract class PositionModel implements Directional {
+abstract class PositionModel implements Directional {
 
     @Icy.Property
     @Override

@@ -18,7 +18,7 @@ import kiss.Signal;
  * Generated model for {@link EntryStatusModel}.
  */
 @Generated("Icy Manipulator")
-public abstract class EntryStatus extends EntryStatusModel {
+public class EntryStatus extends EntryStatusModel {
 
     /**
      * Deceive complier that the specified checked exception is unchecked exception.

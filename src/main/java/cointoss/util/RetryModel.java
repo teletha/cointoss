@@ -25,7 +25,7 @@ import kiss.Signal;
 import kiss.WiseFunction;
 
 @Icy
-public abstract class RetryModel implements WiseFunction<Signal<Throwable>, Signal<?>> {
+abstract class RetryModel implements WiseFunction<Signal<Throwable>, Signal<?>> {
 
     @VisibleForTesting
     long count;

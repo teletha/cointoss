@@ -18,7 +18,7 @@ import cointoss.util.ObservableNumProperty;
 import icy.manipulator.Icy;
 
 @Icy(setterModifier = "final")
-public abstract class EntryStatusModel implements Directional {
+abstract class EntryStatusModel implements Directional {
 
     /**
      * {@inheritDoc}
