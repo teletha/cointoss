@@ -156,6 +156,20 @@ public class VerifiableMarketService extends MarketService {
         });
     }
 
+    /** The prepared execution store. */
+    private final LinkedList<Execution> executionsAfterOrderCancelResponse = new LinkedList();
+
+    /**
+     * Prepare executions which are reveived after order cancel response.
+     * 
+     * @param e
+     */
+    public void emulateExecutionAfterOrderCancelResponse(Execution e) {
+        if (e != null) {
+            executionsAfterOrderCancelResponse.add(e);
+        }
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -505,6 +519,9 @@ public class VerifiableMarketService extends MarketService {
         /** The cancel event emitter. */
         private final Signaling<Ⅲ<OrderState, Num, Num>> canceling = new Signaling();
 
+        /** The prepared execution store. */
+        private final LinkedList<Execution> executionsAfterOrderCancelResponse = new LinkedList();
+
         /**
          * Create backend managed order.
          * 
@@ -540,6 +557,13 @@ public class VerifiableMarketService extends MarketService {
                 canceling.accept(I.pair(OrderState.CANCELED, o.remainingSize, o.executedSize));
                 canceling.complete();
                 orderActive.remove(o);
+
+            });
+        }
+
+        private void cancelBeforeEexecution() {
+            I.signal(orderActive).take(o -> o.id.equals(id)).take(1).to(o -> {
+
             });
         }
 
