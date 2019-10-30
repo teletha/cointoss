@@ -21,9 +21,9 @@ package cointoss.market.bitflyer;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import antibug.powerassert.PowerAssertOff;
 import cointoss.Direction;
 import cointoss.execution.Execution;
 import cointoss.order.Order;
@@ -53,7 +53,7 @@ public class BitFlyerServiceTest {
     }
 
     @Test
-    @PowerAssertOff
+    @Disabled
     void createPositionWhenOrderIsExecuted() {
         List<Execution> executions = service.executionsRealtimely().toList();
         List<Ⅲ<Direction, String, Execution>> positions = service.executionsRealtimelyForMe().toList();

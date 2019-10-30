@@ -9,8 +9,6 @@
  */
 package cointoss.market.bitflyer;
 
-import static cointoss.order.OrderState.*;
-
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -25,6 +23,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+
+import javafx.scene.control.TextInputDialog;
 
 import org.apache.commons.codec.digest.HmacAlgorithms;
 import org.apache.commons.codec.digest.HmacUtils;
@@ -46,7 +46,6 @@ import cointoss.order.OrderUnit;
 import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
-import javafx.scene.control.TextInputDialog;
 import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
@@ -174,21 +173,30 @@ class BitFlyerService extends MarketService {
                     .map(e -> e.data.get("order_ref_id"));
         }
 
-        return call.effect(v -> {
-            // register order id
-            orders.add(v);
-            order.observeTerminating().to(() -> orders.remove(v));
+        ComplementExecutionWhileOrderRequestAndResponse complement = new ComplementExecutionWhileOrderRequestAndResponse();
 
-            // check order state
-            intervalOrderCheck.takeUntil(order.observeTerminating())
-                    .map(orders -> orders.get(orders.indexOf(order)))
-                    .skipError()
-                    .take(1)
-                    .to(o -> {
-                        state.accept(ACTIVE);
-                        order.relation(Internals.class).id = o.relation(Internals.class).id;
-                    });
-        }).effect(new ComplementExecutionWhileOrderRequestAndResponse());
+        return call.effect(orderId -> {
+            // register order id
+            orders.add(orderId);
+            order.observeTerminating().to(() -> orders.remove(orderId));
+
+            complement.ACCEPT(orderId);
+        }).combineLatest(intervalOrderCheck).take(v -> {
+            for (Order listed : v.ⅱ) {
+                if (listed.id.equals(v.ⅰ)) {
+                    switch (listed.state) {
+                    case ACTIVE:
+                    case COMPLETED:
+                    case CANCELED:
+                        order.relation(Internals.class).id = listed.relation(Internals.class).id;
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }).take(1).map(v -> v.ⅰ).effectOnComplete(() -> {
+
+        });
     }
 
     /**
