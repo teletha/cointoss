@@ -117,6 +117,20 @@ public class VerifiableMarketService extends MarketService {
         return null;
     }
 
+    /** The prepared execution store. */
+    private final LinkedList<Execution> executionsBeforeOrderResponse = new LinkedList();
+
+    /**
+     * Prepare executions which are reveived before order response.
+     * 
+     * @param e
+     */
+    public void emulateExecutionBeforeOrderResponse(Execution e) {
+        if (e != null) {
+            executionsBeforeOrderResponse.add(e);
+        }
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -130,6 +144,14 @@ public class VerifiableMarketService extends MarketService {
             child.remainingSize = order.size;
 
             orderActive.add(child);
+
+            if (!executionsBeforeOrderResponse.isEmpty()) {
+                for (Execution execution : executionsBeforeOrderResponse) {
+                    emulate(execution);
+                }
+                executionsBeforeOrderResponse.clear();
+            }
+
             return child.id;
         });
     }
