@@ -15,7 +15,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Consumer;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -62,7 +61,7 @@ class BitMexService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<String> request(Order order, Consumer<OrderState> state) {
+    public Signal<String> request(Order order) {
         return null;
     }
 

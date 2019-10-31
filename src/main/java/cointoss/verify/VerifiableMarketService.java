@@ -25,7 +25,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.function.Consumer;
 
 import cointoss.Direction;
 import cointoss.Directional;
@@ -134,7 +133,7 @@ public class VerifiableMarketService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<String> request(Order order, Consumer<OrderState> state) {
+    public Signal<String> request(Order order) {
         return I.signal(order).map(o -> {
             BackendOrder child = new BackendOrder(order);
             child.id = "LOCAL-ACCEPTANCE-" + id++;

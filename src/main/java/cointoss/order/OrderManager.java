@@ -93,16 +93,14 @@ public final class OrderManager {
         service.orders(OrderState.ACTIVE).to(addition::accept);
 
         // retrieve orders on realtime
-        service.add(service.ordersRealtimely()
-                .to(o -> {
-                    // manage order
-                    for (Order order : managed) {
-                        if (order.id.equals(o.id)) {
-                            update(order, o);
-                            return;
-                        }
-                    }
-                }));
+        service.add(service.ordersRealtimely().to(o -> {
+            for (Order order : managed) {
+                if (order.id.equals(o.id)) {
+                    update(order, o);
+                    return;
+                }
+            }
+        }));
     }
 
     private void update(Order order, Order o) {
@@ -135,7 +133,7 @@ public final class OrderManager {
 
             Complementer complementer = new Complementer(order);
 
-            return service.request(order, order::setState)
+            return service.request(order)
                     .retryWhen(service.setting.retryPolicy())
                     .effectOnObserve(complementer::start)
                     .effect(complementer::complement)

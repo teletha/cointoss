@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 
 import javafx.scene.control.TextInputDialog;
 
@@ -135,7 +134,7 @@ class BitFlyerService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<String> request(Order order, Consumer<OrderState> state) {
+    public Signal<String> request(Order order) {
         Signal<String> call;
         String id = "JRF" + Chrono.utcNow().format(format) + RandomStringUtils.randomNumeric(6);
 

@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.function.Consumer;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -101,10 +100,10 @@ public abstract class MarketService implements Disposable {
      * @param order A order to request.
      * @return A requested order.
      */
-    public abstract Signal<String> request(Order order, Consumer<OrderState> state);
+    public abstract Signal<String> request(Order order);
 
     /**
-     * Request order cancelling actually.
+     * Request canceling order actually.
      * 
      * @param order A order to cancel.
      * @return A cancelled order result (state, remainingSize, executedSize).
