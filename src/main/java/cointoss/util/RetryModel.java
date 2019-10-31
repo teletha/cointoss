@@ -96,8 +96,17 @@ abstract class RetryModel implements WiseFunction<Signal<Throwable>, Signal<?>> 
     @Override
     public Signal<?> APPLY(Signal<Throwable> error) throws Throwable {
         if (limit() <= 0) {
-            return error.flatMap(e -> I.signalError(e));
+            return error.flatMap(e -> {
+                return I.signalError(e);
+            });
         }
-        return error.take(limit()).delay(() -> Chrono.between(delayMinimum(), delay().apply(count++), delayMaximum()), scheduler());
+
+        return error.flatMap(e -> {
+            if (e instanceof AssertionError) {
+                return I.signalError(e);
+            } else {
+                return I.signal(e);
+            }
+        }).take(limit()).delay(() -> Chrono.between(delayMinimum(), delay().apply(count++), delayMaximum()), scheduler());
     }
 }

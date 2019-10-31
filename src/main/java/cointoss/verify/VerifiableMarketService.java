@@ -43,7 +43,6 @@ import cointoss.util.Retry;
 import kiss.I;
 import kiss.Signal;
 import kiss.Signaling;
-import kiss.Ⅲ;
 
 public class VerifiableMarketService extends MarketService {
 
@@ -190,6 +189,7 @@ public class VerifiableMarketService extends MarketService {
             orderUpdateRealtimely.accept(Order.with.direction(backend.direction, backend.size)
                     .id(backend.id)
                     .state(OrderState.CANCELED)
+                    .price(backend.price)
                     .remainingSize(backend.remainingSize)
                     .executedSize(backend.executedSize));
             return I.signal(order);
@@ -198,7 +198,7 @@ public class VerifiableMarketService extends MarketService {
         // backend order will be canceled in the specified delay
         backend.cancelTimeMills = Chrono.epochMills(delay);
 
-        return backend.canceling.expose.mapTo(order);
+        return backend.canceling.expose;
     }
 
     /**
@@ -384,6 +384,7 @@ public class VerifiableMarketService extends MarketService {
 
                 orderUpdateRealtimely.accept(Order.with.direction(order.direction, order.size)
                         .id(order.id)
+                        .type(order.type)
                         .price(order.price)
                         .remainingSize(order.remainingSize)
                         .executedSize(order.executedSize)
@@ -520,7 +521,7 @@ public class VerifiableMarketService extends MarketService {
         private long cancelTimeMills;
 
         /** The cancel event emitter. */
-        private final Signaling<Ⅲ<String, OrderState, Num>> canceling = new Signaling();
+        private final Signaling<Order> canceling = new Signaling();
 
         /** The prepared execution store. */
         private final LinkedList<Execution> executionsAfterOrderCancelResponse = new LinkedList();
@@ -555,18 +556,21 @@ public class VerifiableMarketService extends MarketService {
          * Cancel this order actually.
          */
         private void cancel() {
-            I.signal(orderActive).take(o -> o.id.equals(id)).take(1).to(o -> {
-                o.state = OrderState.CANCELED;
-                canceling.accept(I.pair(id, OrderState.CANCELED, o.remainingSize));
-                canceling.complete();
-                orderActive.remove(o);
+            orderActive.remove(this);
 
-            });
+            state = OrderState.CANCELED;
+            orderUpdateRealtimely.accept(Order.with.direction(direction, size)
+                    .id(id)
+                    .state(state)
+                    .price(price)
+                    .remainingSize(remainingSize)
+                    .executedSize(executedSize));
+
+            canceling.accept(front);
         }
 
         private void cancelBeforeEexecution() {
             I.signal(orderActive).take(o -> o.id.equals(id)).take(1).to(o -> {
-
             });
         }
 

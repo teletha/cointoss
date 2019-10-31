@@ -15,6 +15,7 @@ import java.time.Duration;
 
 import org.junit.jupiter.api.Test;
 
+import antibug.powerassert.PowerAssertOff;
 import cointoss.Direction;
 import cointoss.execution.Execution;
 import cointoss.order.Order;
@@ -110,6 +111,7 @@ class EntryTest extends TraderTestSupport {
     }
 
     @Test
+    @PowerAssertOff
     void exitAndStop() {
         when(now(), v -> new Trade(Direction.BUY) {
             @Override

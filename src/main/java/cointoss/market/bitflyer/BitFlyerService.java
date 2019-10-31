@@ -252,35 +252,29 @@ class BitFlyerService extends MarketService {
         cancel.order_id = order.relation(Internals.class).id;
         cancel.child_order_acceptance_id = order.id;
 
-        Signal<?> requestCancel = forTest || maintainer.session() == null || cancel.order_id == null
+        Signal<?> call = forTest || maintainer.session() == null || cancel.order_id == null
                 ? call("POST", "/v1/me/cancelchildorder", cancel, null, null)
                 : call("POST", "https://lightning.bitflyer.jp/api/trade/cancelorder", cancel, null, WebResponse.class);
 
         Signal<Order> isCancelled = intervalOrderCheck.map(orders -> {
             for (Order listed : orders) {
                 if (order.id.equals(listed.id)) {
-                    switch (listed.state) {
-                    case ACTIVE:
+                    if (listed.isTerminated()) {
+                        return listed;
+                    } else {
                         return null;
-
-                    case COMPLETED:
-                    case CANCELED:
-                    default:
-                        orderUpdateRealtimely.accept(listed);
-                        return order;
                     }
                 }
             }
 
-            orderUpdateRealtimely.accept(Order.with.direction(order.direction, order.size)
+            return Order.with.direction(order.direction, order.size)
                     .id(order.id)
                     .state(OrderState.CANCELED)
                     .remainingSize(order.remainingSize)
-                    .executedSize(order.executedSize));
-            return order;
+                    .executedSize(order.executedSize);
         }).skipNull();
 
-        return requestCancel.combine(isCancelled).take(1).map(v -> v.ⅱ);
+        return call.combine(isCancelled).take(1).map(v -> v.ⅱ).effect(orderUpdateRealtimely::accept);
     }
 
     /**
