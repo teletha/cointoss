@@ -54,9 +54,6 @@ public class VerifiableMarketService extends MarketService {
     /** The order manager. */
     private final Signaling<Order> orderUpdateRealtimely = new Signaling();
 
-    /** The execution manager. */
-    private final LinkedList<Execution> executeds = new LinkedList();
-
     /** The initial base currency. */
     public Num baseCurrency = Num.HUNDRED;
 
@@ -205,7 +202,9 @@ public class VerifiableMarketService extends MarketService {
      */
     @Override
     public Signal<Execution> executionsRealtimely() {
-        return I.signal(executeds);
+        // If this exception will be thrown, it is bug of this program. So we must rethrow the
+        // wrapped error in here.
+        throw new Error();
     }
 
     /**
@@ -223,7 +222,9 @@ public class VerifiableMarketService extends MarketService {
      */
     @Override
     public Signal<Execution> executions(long start, long end) {
-        return I.signal(executeds);
+        // If this exception will be thrown, it is bug of this program. So we must rethrow the
+        // wrapped error in here.
+        throw new Error();
     }
 
     /**
@@ -374,7 +375,6 @@ public class VerifiableMarketService extends MarketService {
                 Execution exe = Execution.with.direction(order.direction(), executedSize)
                         .price(order.type.isTaker() ? order.marketMinPrice : order.price)
                         .date(e.date);
-                executeds.add(exe);
 
                 if (order.remainingSize.isZero()) {
                     order.state = OrderState.COMPLETED;
