@@ -54,10 +54,7 @@ public class VerifiableMarketService extends MarketService {
     private final Collection<BackendOrder> orderActive = new ConcurrentLinkedDeque<>();
 
     /** The order manager. */
-    private final Signaling<Ⅲ<Direction, String, Execution>> positions = new Signaling();
-
-    /** The order manager. */
-    private final Signaling<Ⅲ<String, OrderState, Num>> orderUpdateRealtimely = new Signaling();
+    private final Signaling<Order> orderUpdateRealtimely = new Signaling();
 
     /** The execution manager. */
     private final LinkedList<Execution> executeds = new LinkedList();
@@ -116,7 +113,7 @@ public class VerifiableMarketService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    protected Signal<Ⅲ<String, OrderState, Num>> connectOrdersRealtimely() {
+    protected Signal<Order> connectOrdersRealtimely() {
         return orderUpdateRealtimely.expose;
     }
 
@@ -190,7 +187,11 @@ public class VerifiableMarketService extends MarketService {
 
         if (delay == now) {
             backend.cancel();
-            orderUpdateRealtimely.accept(I.pair(order.id, OrderState.CANCELED, backend.remainingSize));
+            orderUpdateRealtimely.accept(Order.with.direction(backend.direction, backend.size)
+                    .id(backend.id)
+                    .state(OrderState.CANCELED)
+                    .remainingSize(backend.remainingSize)
+                    .executedSize(backend.executedSize));
             return I.signal(order);
         }
 
@@ -206,14 +207,6 @@ public class VerifiableMarketService extends MarketService {
     @Override
     public Signal<Execution> executionsRealtimely() {
         return I.signal(executeds);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Signal<Ⅲ<Direction, String, Execution>> executionsRealtimelyForMe() {
-        return positions.expose;
     }
 
     /**
@@ -388,7 +381,13 @@ public class VerifiableMarketService extends MarketService {
                     order.state = OrderState.COMPLETED;
                     iterator.remove();
                 }
-                positions.accept(I.pair(exe.direction, order.id, exe));
+
+                orderUpdateRealtimely.accept(Order.with.direction(order.direction, order.size)
+                        .id(order.id)
+                        .price(order.price)
+                        .remainingSize(order.remainingSize)
+                        .executedSize(order.executedSize)
+                        .state(order.state));
 
                 if (!exclusiveExecution) {
                     continue;

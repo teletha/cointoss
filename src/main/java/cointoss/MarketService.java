@@ -33,7 +33,6 @@ import kiss.Disposable;
 import kiss.Encoder;
 import kiss.Signal;
 import kiss.Variable;
-import kiss.Ⅲ;
 
 public abstract class MarketService implements Disposable {
 
@@ -67,7 +66,7 @@ public abstract class MarketService implements Disposable {
     });
 
     /** The realtime user order state. */
-    private Variable<Ⅲ<String, OrderState, Num>> orderStream;
+    private Variable<Order> orderStream;
 
     /**
      * @param exchangeName
@@ -126,13 +125,6 @@ public abstract class MarketService implements Disposable {
      * @return A event stream of execution log.
      */
     public abstract Signal<Execution> executionsRealtimely();
-
-    /**
-     * Acquire the my execution log (positions) in realtime. This is infinitely.
-     * 
-     * @return A event stream of execution log related to my orders.
-     */
-    public abstract Signal<Ⅲ<Direction, String, Execution>> executionsRealtimelyForMe();
 
     /**
      * Acquier the latest execution log.
@@ -196,7 +188,7 @@ public abstract class MarketService implements Disposable {
      * 
      * @return A event stream of order state.
      */
-    public final synchronized Signal<Ⅲ<String, OrderState, Num>> ordersRealtimely() {
+    public final synchronized Signal<Order> ordersRealtimely() {
         if (orderStream == null) {
             orderStream = Variable.empty();
             disposer.add(connectOrdersRealtimely().to(orderStream::set));
@@ -209,7 +201,7 @@ public abstract class MarketService implements Disposable {
      * 
      * @return
      */
-    protected abstract Signal<Ⅲ<String, OrderState, Num>> connectOrdersRealtimely();
+    protected abstract Signal<Order> connectOrdersRealtimely();
 
     /**
      * <p>

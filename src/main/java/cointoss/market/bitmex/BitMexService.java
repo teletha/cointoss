@@ -32,7 +32,6 @@ import cointoss.util.APILimiter;
 import cointoss.util.Num;
 import kiss.I;
 import kiss.Signal;
-import kiss.Ⅲ;
 import okhttp3.Request;
 
 class BitMexService extends MarketService {
@@ -118,14 +117,6 @@ class BitMexService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Ⅲ<Direction, String, Execution>> executionsRealtimelyForMe() {
-        return I.signal();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public Signal<Execution> executionLatest() {
         return null;
     }
@@ -166,7 +157,7 @@ class BitMexService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    protected Signal<Ⅲ<String, OrderState, Num>> connectOrdersRealtimely() {
+    protected Signal<Order> connectOrdersRealtimely() {
         return I.signal();
     }
 

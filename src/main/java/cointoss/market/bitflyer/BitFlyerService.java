@@ -19,10 +19,11 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+
+import javafx.scene.control.TextInputDialog;
 
 import org.apache.commons.codec.digest.HmacAlgorithms;
 import org.apache.commons.codec.digest.HmacUtils;
@@ -44,12 +45,10 @@ import cointoss.order.OrderUnit;
 import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
-import javafx.scene.control.TextInputDialog;
 import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
 import kiss.Signaling;
-import kiss.Ⅲ;
 import marionette.browser.Browser;
 import okhttp3.MediaType;
 import okhttp3.Request;
@@ -94,14 +93,8 @@ class BitFlyerService extends MarketService {
     /** The internal order manager. */
     private final Map<String, Order> orders = new ConcurrentHashMap();
 
-    /** The order management. */
-    private final Set<String> orderIds = ConcurrentHashMap.newKeySet();
-
     /** The shared event stream of real-time execution log. */
     private Signal<Execution> executions;
-
-    /** The event stream of real-time execution log for me. */
-    private final Signaling<Ⅲ<Direction, String, Execution>> executionsForMe = new Signaling();
 
     /** Flag for test. */
     private final boolean forTest;
@@ -113,7 +106,7 @@ class BitFlyerService extends MarketService {
     private final Signal<List<Order>> intervalOrderCheck;
 
     /** The event stream of real-time order update. */
-    private final Signaling<Ⅲ<String, OrderState, Num>> orderUpdateRealtimely = new Signaling();
+    private final Signaling<Order> orderUpdateRealtimely = new Signaling();
 
     /** The session key. */
     private final String sessionKey = "api_session_v2";
@@ -175,7 +168,10 @@ class BitFlyerService extends MarketService {
 
         Complementer complementer = new Complementer(order);
 
-        return call.effectOnObserve(complementer::start).effect(complementer::complement).effectOnTerminate(complementer::stop);
+        return call //
+                .effectOnObserve(complementer::start)
+                .effect(complementer::complement)
+                .effectOnTerminate(complementer::stop);
     }
 
     /**
@@ -261,7 +257,6 @@ class BitFlyerService extends MarketService {
                 : call("POST", "https://lightning.bitflyer.jp/api/trade/cancelorder", cancel, null, WebResponse.class);
 
         Signal<Order> isCancelled = intervalOrderCheck.map(orders -> {
-            System.out.println(orders);
             for (Order listed : orders) {
                 if (order.id.equals(listed.id)) {
                     switch (listed.state) {
@@ -271,12 +266,17 @@ class BitFlyerService extends MarketService {
                     case COMPLETED:
                     case CANCELED:
                     default:
-                        orderUpdateRealtimely.accept(I.pair(order.id, listed.state, listed.remainingSize));
+                        orderUpdateRealtimely.accept(listed);
                         return order;
                     }
                 }
             }
-            orderUpdateRealtimely.accept(I.pair(order.id, OrderState.CANCELED, order.remainingSize));
+
+            orderUpdateRealtimely.accept(Order.with.direction(order.direction, order.size)
+                    .id(order.id)
+                    .state(OrderState.CANCELED)
+                    .remainingSize(order.remainingSize)
+                    .executedSize(order.executedSize));
             return order;
         }).skipNull();
 
@@ -351,14 +351,6 @@ class BitFlyerService extends MarketService {
                     .skipNull()
                     .share();
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Signal<Ⅲ<Direction, String, Execution>> executionsRealtimelyForMe() {
-        return executionsForMe.expose;
     }
 
     /**
@@ -537,7 +529,7 @@ class BitFlyerService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    protected Signal<Ⅲ<String, OrderState, Num>> connectOrdersRealtimely() {
+    protected Signal<Order> connectOrdersRealtimely() {
         return orderUpdateRealtimely.expose;
     }
 
@@ -550,7 +542,11 @@ class BitFlyerService extends MarketService {
     private void updateOrder(Order o, Execution e) {
         Num remaining = o.remainingSize.minus(e.size);
 
-        orderUpdateRealtimely.accept(I.pair(o.id, remaining.isZero() ? OrderState.COMPLETED : OrderState.ACTIVE, remaining));
+        orderUpdateRealtimely.accept(Order.with.direction(o.direction, o.size)
+                .id(o.id)
+                .state(remaining.isZero() ? OrderState.COMPLETED : OrderState.ACTIVE)
+                .remainingSize(remaining)
+                .executedSize(o.executedSize.plus(e.size)));
     }
 
     /**
@@ -941,28 +937,5 @@ class BitFlyerService extends MarketService {
     private static class Internals {
 
         private String id;
-    }
-
-    /**
-     * 
-     */
-    @SuppressWarnings("serial")
-    private static class LinkedContainer extends LinkedList<Execution> {
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public boolean equals(Object o) {
-            return this == o;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public int hashCode() {
-            return System.identityHashCode(this);
-        }
     }
 }

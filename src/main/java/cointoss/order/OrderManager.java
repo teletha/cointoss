@@ -93,38 +93,28 @@ public final class OrderManager {
         add.to(managed::add);
         removed.to(managed::remove);
 
-        service.add(service.executionsRealtimelyForMe().to(e -> add(e.ⅰ, e.ⅲ)));
-
         // retrieve orders on server
         // don't use orders().to(addition); it completes addition signaling itself
         service.orders(OrderState.ACTIVE).to(addition::accept);
 
         // retrieve orders on realtime
-        service.add(service.ordersRealtimely().to(v -> {
-            // manage position
-            String id = v.ⅰ;
-            OrderState state = v.ⅱ;
-            Num remaining = v.ⅲ;
+        service.add(service.ordersRealtimely()
+                .to(o -> {
+                    // manage order
+                    for (Order order : managed) {
+                        if (order.id.equals(o.id)) {
+                            order.setState(o.state);
+                            order.setPrice(o.price);
+                            order.updateAtomically(o.remainingSize, o.executedSize);
+                            System.out.println("Order update " + order);
 
-            // manage order
-            for (Order order : managed) {
-                if (order.id.equals(id)) {
-                    order.setState(state);
-                    order.setRemainingSize(remaining);
-                    System.out.println("remove order " + order);
-                    switch (state) {
-                    case CANCELED:
-                    case COMPLETED:
-                        remove.accept(order);
-                        break;
-
-                    default:
-                        break; // do nothing
+                            if (o.isTerminated()) {
+                                remove.accept(order);
+                            }
+                            return;
+                        }
                     }
-                    return;
-                }
-            }
-        }));
+                }));
     }
 
     private void update(Order order, Execution execution) {
