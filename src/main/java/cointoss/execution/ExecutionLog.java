@@ -9,7 +9,7 @@
  */
 package cointoss.execution;
 
-import static java.nio.charset.StandardCharsets.ISO_8859_1;
+import static java.nio.charset.StandardCharsets.*;
 import static java.nio.file.StandardOpenOption.*;
 import static java.util.concurrent.TimeUnit.*;
 
@@ -774,7 +774,7 @@ public class ExecutionLog {
             if (first == null) {
                 return false;
             }
-            return sequntial ? e.id == first.id : e.info.equals(first.info);
+            return sequntial ? e.id == first.id : e.buyer.equals(first.buyer);
         }
 
         /**

@@ -254,22 +254,22 @@ abstract class ExecutionModel implements Directional {
     }
 
     /**
-     * Accessor for {@link #info}.
+     * Accessor for {@link #buyer}.
      * 
      * @return
      */
     @Icy.Property
-    public String info() {
+    public String buyer() {
         return null;
     }
 
     /**
-     * Accessor for {@link #detail}.
+     * Accessor for {@link #seller}.
      * 
      * @return
      */
     @Icy.Property
-    public String detail() {
+    public String seller() {
         return null;
     }
 
@@ -310,10 +310,10 @@ abstract class ExecutionModel implements Directional {
      * @return
      */
     public boolean equals(cointoss.execution.Execution other) {
-        if (other.info == null) {
+        if (other.buyer == null) {
             return id() == other.id;
         } else {
-            return info() == other.info;
+            return buyer() == other.buyer;
         }
     }
 

@@ -24,8 +24,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
-import javafx.scene.control.TextInputDialog;
-
 import org.apache.commons.codec.digest.HmacAlgorithms;
 import org.apache.commons.codec.digest.HmacUtils;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -46,12 +44,11 @@ import cointoss.order.OrderUnit;
 import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
+import javafx.scene.control.TextInputDialog;
 import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
 import kiss.Signaling;
-import kiss.WiseConsumer;
-import kiss.Ⅱ;
 import kiss.Ⅲ;
 import marionette.browser.Browser;
 import okhttp3.MediaType;
@@ -94,8 +91,11 @@ class BitFlyerService extends MarketService {
     /** The api url. */
     static final String api = "https://api.bitflyer.com";
 
+    /** The internal order manager. */
+    private final Map<String, Order> orders = new ConcurrentHashMap();
+
     /** The order management. */
-    private final Set<String> orders = ConcurrentHashMap.newKeySet();
+    private final Set<String> orderIds = ConcurrentHashMap.newKeySet();
 
     /** The shared event stream of real-time execution log. */
     private Signal<Execution> executions;
@@ -112,8 +112,8 @@ class BitFlyerService extends MarketService {
     /** The shared order list. */
     private final Signal<List<Order>> intervalOrderCheck;
 
-    /** The shared order manager. */
-    private final Set<List<Execution>> identifiersWhileOrderRequesting = ConcurrentHashMap.newKeySet();
+    /** The event stream of real-time order update. */
+    private final Signaling<Ⅲ<String, OrderState, Num>> orderUpdateRealtimely = new Signaling();
 
     /** The session key. */
     private final String sessionKey = "api_session_v2";
@@ -173,33 +173,15 @@ class BitFlyerService extends MarketService {
                     .map(e -> e.data.get("order_ref_id"));
         }
 
-        ComplementExecutionWhileOrderRequestAndResponse complement = new ComplementExecutionWhileOrderRequestAndResponse();
+        Complementer complementer = new Complementer(order);
 
-        return call.effect(orderId -> {
-            // register order id
-            orders.add(orderId);
-            order.observeTerminating().to(() -> orders.remove(orderId));
-
-            complement.ACCEPT(orderId);
-        }).combineLatest(intervalOrderCheck).take(v -> {
-            for (Order listed : v.ⅱ) {
-                if (listed.id.equals(v.ⅰ)) {
-                    switch (listed.state) {
-                    case ACTIVE:
-                    case COMPLETED:
-                    case CANCELED:
-                        order.relation(Internals.class).id = listed.relation(Internals.class).id;
-                        return true;
-                    }
-                }
-            }
-            return false;
-        }).take(1).map(v -> v.ⅰ).effectOnComplete(() -> {
-
-        });
+        return call.effectOnObserve(complementer::start).effect(complementer::complement).effectOnTerminate(complementer::stop);
     }
 
     /**
+     * <p>
+     * Comlement executions while order request and response.
+     * </p>
      * <p>
      * If the execution data comes to the real-time API before the oreder's response, the order
      * cannot be identified from the real-time API.
@@ -209,19 +191,36 @@ class BitFlyerService extends MarketService {
      * execution data at response.
      * </p>
      */
-    private class ComplementExecutionWhileOrderRequestAndResponse implements WiseConsumer<String> {
+    private class Complementer {
+
+        /** The associated order. */
+        private final Order order;
 
         /** The realtime execution manager. */
         private final LinkedList<Execution> executions = new LinkedList();
 
         /** The disposer for realtime execution stream. */
-        private final Disposable disposer;
+        private Disposable disposer;
 
         /**
          * 
          */
-        private ComplementExecutionWhileOrderRequestAndResponse() {
+        private Complementer(Order order) {
+            this.order = order;
+        }
+
+        /**
+         * Start complementing.
+         */
+        private void start() {
             disposer = executionsRealtimely().to(executions::add);
+        }
+
+        /**
+         * Stop complementing.
+         */
+        private void stop() {
+            disposer.dispose();
         }
 
         /**
@@ -229,16 +228,20 @@ class BitFlyerService extends MarketService {
          * real-time API. Check if there is an order in the execution data recorded after placing
          * the order.
          */
-        @Override
-        public void ACCEPT(String orderId) throws Throwable {
+        private void complement(String orderId) {
+            // stop recording realtime executions and register order id atomically
             disposer.dispose();
+            orders.put(orderId, order);
+
+            // check order executions while request and response
             executions.forEach(e -> {
-                if (e.info.equals(orderId)) {
-                    executionsForMe.accept(I.pair(Direction.BUY, orderId, e));
-                } else if (e.detail.equals(orderId)) {
-                    executionsForMe.accept(I.pair(Direction.SELL, orderId, e));
+                if (e.buyer.equals(orderId) || e.seller.equals(orderId)) {
+                    updateOrder(order, e);
                 }
             });
+
+            // order termination will unregister
+            order.observeTerminating().to(() -> orders.remove(orderId));
         }
     }
 
@@ -246,7 +249,7 @@ class BitFlyerService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Ⅲ<OrderState, Num, Num>> cancel(Order order) {
+    public Signal<Order> cancel(Order order) {
         CancelRequest cancel = new CancelRequest();
         cancel.product_code = marketName;
         cancel.account_id = account.accountId.v;
@@ -257,7 +260,8 @@ class BitFlyerService extends MarketService {
                 ? call("POST", "/v1/me/cancelchildorder", cancel, null, null)
                 : call("POST", "https://lightning.bitflyer.jp/api/trade/cancelorder", cancel, null, WebResponse.class);
 
-        Signal<Ⅲ<OrderState, Num, Num>> isCancelled = intervalOrderCheck.map(orders -> {
+        Signal<Order> isCancelled = intervalOrderCheck.map(orders -> {
+            System.out.println(orders);
             for (Order listed : orders) {
                 if (order.id.equals(listed.id)) {
                     switch (listed.state) {
@@ -267,14 +271,16 @@ class BitFlyerService extends MarketService {
                     case COMPLETED:
                     case CANCELED:
                     default:
-                        return I.pair(listed.state, listed.remainingSize, listed.executedSize);
+                        orderUpdateRealtimely.accept(I.pair(order.id, listed.state, listed.remainingSize));
+                        return order;
                     }
                 }
             }
-            return I.pair(OrderState.CANCELED, order.remainingSize, order.executedSize);
+            orderUpdateRealtimely.accept(I.pair(order.id, OrderState.CANCELED, order.remainingSize));
+            return order;
         }).skipNull();
 
-        return requestCancel.combine(isCancelled).take(1).map(Ⅱ::ⅱ);
+        return requestCancel.combine(isCancelled).take(1).map(v -> v.ⅱ);
     }
 
     /**
@@ -322,16 +328,18 @@ class BitFlyerService extends MarketService {
                                 .date(date)
                                 .consecutive(consecutiveType)
                                 .delay(delay)
-                                .info(buyer)
-                                .detail(seller);
+                                .buyer(buyer)
+                                .seller(seller);
 
-                        if (orders.contains(buyer)) {
-                            executionsForMe.accept(I.pair(Direction.BUY, buyer, exe));
-                        } else if (orders.contains(seller)) {
-                            executionsForMe.accept(I.pair(Direction.SELL, seller, exe));
-                        } else if (!identifiersWhileOrderRequesting.isEmpty()) {
-                            for (List<Execution> list : identifiersWhileOrderRequesting) {
-                                list.add(exe);
+                        Order o = orders.get(buyer);
+
+                        if (o != null) {
+                            updateOrder(o, exe);
+                        } else {
+                            o = orders.get(seller);
+
+                            if (o != null) {
+                                updateOrder(o, exe);
                             }
                         }
 
@@ -529,19 +537,20 @@ class BitFlyerService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    protected Signal<Order> connectOrdersRealtimely() {
-        return network
-                .signalr("https://signal.bitflyer.com/signalr/hubs", "account_id=" + account.accountId + "&token=" + account.accountToken + "&products=" + marketName + "%2Cheartbeat", "BFEXHub", "ReceiveOrderUpdates")
-                .flatIterable(JsonElement::getAsJsonArray)
-                .map(e -> e.getAsJsonObject().getAsJsonObject("order"))
-                .take(e -> e.get("product_code").getAsString().equals(marketName))
-                .map(e -> Order.with.direction(e.get("side").getAsString(), Num.of(e.get("size").getAsString()))
-                        .executedSize(Num.of(e.get("executed_size").getAsString()))
-                        .remainingSize(Num.of(e.get("outstanding_size").getAsString()))
-                        .price(e.get("price").getAsDouble())
-                        .id(e.get("order_ref_id").getAsString())
-                        .state(OrderState.valueOf(e.get("order_state").getAsString()))
-                        .type(e.get("order_type").getAsString().equals("LIMIT") ? OrderType.Maker : OrderType.Taker));
+    protected Signal<Ⅲ<String, OrderState, Num>> connectOrdersRealtimely() {
+        return orderUpdateRealtimely.expose;
+    }
+
+    /**
+     * Update order by execution.
+     * 
+     * @param o
+     * @param e
+     */
+    private void updateOrder(Order o, Execution e) {
+        Num remaining = o.remainingSize.minus(e.size);
+
+        orderUpdateRealtimely.accept(I.pair(o.id, remaining.isZero() ? OrderState.COMPLETED : OrderState.ACTIVE, remaining));
     }
 
     /**

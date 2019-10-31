@@ -71,7 +71,7 @@ class BitMexService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Ⅲ<OrderState, Num, Num>> cancel(Order order) {
+    public Signal<Order> cancel(Order order) {
         return null;
     }
 
@@ -166,7 +166,7 @@ class BitMexService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    protected Signal<Order> connectOrdersRealtimely() {
+    protected Signal<Ⅲ<String, OrderState, Num>> connectOrdersRealtimely() {
         return I.signal();
     }
 
@@ -214,7 +214,7 @@ class BitMexService extends MarketService {
                 .price(price)
                 .date(date)
                 .consecutive(consecutive)
-                .info(e.get("trdMatchID").getAsString());
+                .buyer(e.get("trdMatchID").getAsString());
     }
 
     /**

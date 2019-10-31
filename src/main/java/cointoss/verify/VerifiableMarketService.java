@@ -56,6 +56,9 @@ public class VerifiableMarketService extends MarketService {
     /** The order manager. */
     private final Signaling<Ⅲ<Direction, String, Execution>> positions = new Signaling();
 
+    /** The order manager. */
+    private final Signaling<Ⅲ<String, OrderState, Num>> orderUpdateRealtimely = new Signaling();
+
     /** The execution manager. */
     private final LinkedList<Execution> executeds = new LinkedList();
 
@@ -113,8 +116,8 @@ public class VerifiableMarketService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    protected Signal<Order> connectOrdersRealtimely() {
-        return null;
+    protected Signal<Ⅲ<String, OrderState, Num>> connectOrdersRealtimely() {
+        return orderUpdateRealtimely.expose;
     }
 
     /** The prepared execution store. */
@@ -174,7 +177,7 @@ public class VerifiableMarketService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Ⅲ<OrderState, Num, Num>> cancel(Order order) {
+    public Signal<Order> cancel(Order order) {
         BackendOrder backend = findBy(order);
 
         // associated backend order is not found, do nothing
@@ -187,13 +190,14 @@ public class VerifiableMarketService extends MarketService {
 
         if (delay == now) {
             backend.cancel();
-            return I.signal(I.pair(OrderState.CANCELED, backend.remainingSize, backend.executedSize));
+            orderUpdateRealtimely.accept(I.pair(order.id, OrderState.CANCELED, backend.remainingSize));
+            return I.signal(order);
         }
 
         // backend order will be canceled in the specified delay
         backend.cancelTimeMills = Chrono.epochMills(delay);
 
-        return backend.canceling.expose;
+        return backend.canceling.expose.mapTo(order);
     }
 
     /**
@@ -517,7 +521,7 @@ public class VerifiableMarketService extends MarketService {
         private long cancelTimeMills;
 
         /** The cancel event emitter. */
-        private final Signaling<Ⅲ<OrderState, Num, Num>> canceling = new Signaling();
+        private final Signaling<Ⅲ<String, OrderState, Num>> canceling = new Signaling();
 
         /** The prepared execution store. */
         private final LinkedList<Execution> executionsAfterOrderCancelResponse = new LinkedList();
@@ -554,7 +558,7 @@ public class VerifiableMarketService extends MarketService {
         private void cancel() {
             I.signal(orderActive).take(o -> o.id.equals(id)).take(1).to(o -> {
                 o.state = OrderState.CANCELED;
-                canceling.accept(I.pair(OrderState.CANCELED, o.remainingSize, o.executedSize));
+                canceling.accept(I.pair(id, OrderState.CANCELED, o.remainingSize));
                 canceling.complete();
                 orderActive.remove(o);
 

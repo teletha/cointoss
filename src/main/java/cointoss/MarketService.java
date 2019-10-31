@@ -67,7 +67,7 @@ public abstract class MarketService implements Disposable {
     });
 
     /** The realtime user order state. */
-    private Variable<Order> orderStream;
+    private Variable<Ⅲ<String, OrderState, Num>> orderStream;
 
     /**
      * @param exchangeName
@@ -110,7 +110,7 @@ public abstract class MarketService implements Disposable {
      * @param order A order to cancel.
      * @return A cancelled order result (state, remainingSize, executedSize).
      */
-    public abstract Signal<Ⅲ<OrderState, Num, Num>> cancel(Order order);
+    public abstract Signal<Order> cancel(Order order);
 
     /**
      * Acquire the execution log between start (exclusive) and end (exclusive) key.
@@ -196,7 +196,7 @@ public abstract class MarketService implements Disposable {
      * 
      * @return A event stream of order state.
      */
-    public final synchronized Signal<Order> ordersRealtimely() {
+    public final synchronized Signal<Ⅲ<String, OrderState, Num>> ordersRealtimely() {
         if (orderStream == null) {
             orderStream = Variable.empty();
             disposer.add(connectOrdersRealtimely().to(orderStream::set));
@@ -209,7 +209,7 @@ public abstract class MarketService implements Disposable {
      * 
      * @return
      */
-    protected abstract Signal<Order> connectOrdersRealtimely();
+    protected abstract Signal<Ⅲ<String, OrderState, Num>> connectOrdersRealtimely();
 
     /**
      * <p>

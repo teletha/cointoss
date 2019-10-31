@@ -13,6 +13,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
+import antibug.powerassert.PowerAssertOff;
 import cointoss.execution.Execution;
 import cointoss.util.Chrono;
 import cointoss.verify.VerifiableMarket;
@@ -52,6 +53,7 @@ class OrderManagerTest {
     }
 
     @Test
+    @PowerAssertOff
     void removedByCancel() {
         Order order1 = orders.requestNow(Order.with.buy(1).price(10));
         Order order2 = orders.requestNow(Order.with.buy(1).price(10));

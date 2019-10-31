@@ -12,7 +12,6 @@ package cointoss.order;
 import static cointoss.order.OrderState.*;
 
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -24,13 +23,11 @@ import cointoss.Direction;
 import cointoss.MarketService;
 import cointoss.execution.Execution;
 import cointoss.util.Num;
-import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
 import kiss.Signaling;
 import kiss.Variable;
 import kiss.Ⅱ;
-import kiss.Ⅲ;
 
 /**
  * 
@@ -103,15 +100,27 @@ public final class OrderManager {
         service.orders(OrderState.ACTIVE).to(addition::accept);
 
         // retrieve orders on realtime
-        service.add(service.executionsRealtimelyForMe().to(v -> {
+        service.add(service.ordersRealtimely().to(v -> {
             // manage position
-            String id = v.ⅱ;
-            Execution execution = v.ⅲ;
+            String id = v.ⅰ;
+            OrderState state = v.ⅱ;
+            Num remaining = v.ⅲ;
 
             // manage order
             for (Order order : managed) {
                 if (order.id.equals(id)) {
-                    update(order, execution);
+                    order.setState(state);
+                    order.setRemainingSize(remaining);
+                    System.out.println("remove order " + order);
+                    switch (state) {
+                    case CANCELED:
+                    case COMPLETED:
+                        remove.accept(order);
+                        break;
+
+                    default:
+                        break; // do nothing
+                    }
                     return;
                 }
             }
@@ -157,88 +166,20 @@ public final class OrderManager {
         if (order.state == OrderState.INIT || order.state == OrderState.REQUESTING) {
             order.setState(REQUESTING);
 
-            Complementer complementer = new Complementer(order);
+            return service.request(order, order::setState).retryWhen(service.setting.retryPolicy()).map(id -> {
+                order.setState(ACTIVE);
+                order.setId(id);
+                order.setCreationTime(service.now());
+                order.observeTerminating().to(remove::accept);
 
-            return service.request(order, order::setState)
-                    .retryWhen(service.setting.retryPolicy())
-                    .effectOnObserve(complementer::start)
-                    .effectOnTerminate(complementer::stop)
-                    .map(id -> {
-                        order.setState(ACTIVE);
-                        order.setId(id);
-                        order.setCreationTime(service.now());
-                        order.observeTerminating().to(remove::accept);
+                addition.accept(order);
 
-                        complementer.complement(id);
-                        addition.accept(order);
-
-                        return order;
-                    })
-                    .effectOnError(e -> {
-                        order.setState(CANCELED);
-                    });
+                return order;
+            }).effectOnError(e -> {
+                order.setState(CANCELED);
+            });
         } else {
             return I.signal(order);
-        }
-    }
-
-    /**
-     * <p>
-     * Comlement executions while order request and response.
-     * </p>
-     * <p>
-     * If the execution data comes to the real-time API before the oreder's response, the order
-     * cannot be identified from the real-time API.
-     * </p>
-     * <p>
-     * Record all execution data from request to response, and check if there is already an
-     * execution data at response.
-     * </p>
-     */
-    private class Complementer {
-
-        /** The associated order. */
-        private final Order order;
-
-        /** The realtime execution manager. */
-        private final LinkedList<Ⅲ<Direction, String, Execution>> executions = new LinkedList();
-
-        /** The disposer for realtime execution stream. */
-        private Disposable disposer;
-
-        /**
-         * 
-         */
-        private Complementer(Order order) {
-            this.order = order;
-        }
-
-        /**
-         * Start complementing.
-         */
-        private void start() {
-            disposer = service.executionsRealtimelyForMe().to(executions::add);
-        }
-
-        /**
-         * Stop complementing.
-         */
-        private void stop() {
-            disposer.dispose();
-        }
-
-        /**
-         * Because ID registration has been completed, it is possible to detect contracts from the
-         * real-time API. Check if there is an order in the execution data recorded after placing
-         * the order.
-         */
-        private void complement(String orderId) {
-            disposer.dispose();
-            executions.forEach(e -> {
-                if (e.ⅱ.equals(orderId)) {
-                    update(order, e.ⅲ);
-                }
-            });
         }
     }
 
@@ -269,13 +210,7 @@ public final class OrderManager {
             OrderState previous = order.state;
             order.setState(REQUESTING);
 
-            return service.cancel(order).retryWhen(service.setting.retryPolicy()).map(v -> {
-                order.updateAtomically(v.ⅱ, v.ⅲ);
-                order.setState(v.ⅰ);
-                managed.remove(order);
-
-                return order;
-            }).effectOnError(e -> {
+            return service.cancel(order).retryWhen(service.setting.retryPolicy()).effectOnError(e -> {
                 order.setState(previous);
             });
         } else {
