@@ -9,7 +9,7 @@
  */
 package cointoss.trade;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
@@ -284,8 +284,8 @@ public abstract class Trader {
          * Compute position holding time.
          */
         public final Duration holdTime() {
-            ZonedDateTime start = entries.first().flatMap(o -> o.executions.first()).map(Execution::date).or(Chrono.MIN);
-            ZonedDateTime end = exits.last().flatMap(o -> o.executions.last()).map(Execution::date).or(market.service.now());
+            ZonedDateTime start = entries.first().map(o -> o.creationTime).or(Chrono.MIN);
+            ZonedDateTime end = exits.last().map(o -> o.terminationTime).or(market.service.now());
 
             return Duration.between(start, end);
         }
@@ -555,8 +555,6 @@ public abstract class Trader {
                     .append(type)
                     .append("\t order ")
                     .append(orders.size())
-                    .append("\texe ")
-                    .append(orders.stream().flatMap(o -> o.executions.stream()).count())
                     .append("\tprice ")
                     .append(price.scale(market.service.setting.baseCurrencyScaleSize))
                     .append("\t size ")

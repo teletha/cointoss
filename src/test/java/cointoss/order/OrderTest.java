@@ -17,7 +17,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import cointoss.Direction;
-import cointoss.execution.Execution;
 import cointoss.util.Num;
 
 /**
@@ -185,9 +184,9 @@ public class OrderTest {
         List<Num> executedInUpdatingRemaining = o.observeRemainingSize().map(size -> o.executedSize).toList();
         List<Num> remainingInUpdatingExecuted = o.observeExecutedSize().map(size -> o.remainingSize).toList();
 
-        o.executed(Execution.with.buy(1));
-        o.executed(Execution.with.buy(1));
-        o.executed(Execution.with.buy(1));
+        o.updateAtomically(Num.of(2), Num.of(1));
+        o.updateAtomically(Num.of(1), Num.of(2));
+        o.updateAtomically(Num.of(0), Num.of(3));
 
         Assertions.assertIterableEquals(executedInUpdatingRemaining, List.of(Num.of(1), Num.of(2), Num.of(3)));
         Assertions.assertIterableEquals(remainingInUpdatingExecuted, List.of(Num.of(2), Num.of(1), Num.of(0)));

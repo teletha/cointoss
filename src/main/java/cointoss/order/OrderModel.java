@@ -18,16 +18,13 @@ import java.util.function.Consumer;
 
 import cointoss.Direction;
 import cointoss.Directional;
-import cointoss.execution.Execution;
 import cointoss.util.Chrono;
-import cointoss.util.LinkedQueue;
 import cointoss.util.Num;
 import cointoss.util.ObservableProperty;
 import icy.manipulator.Icy;
 import kiss.I;
 import kiss.Signal;
 import kiss.Signaling;
-import kiss.Ⅲ;
 
 @Icy(grouping = 2)
 abstract class OrderModel implements Directional, Comparable<OrderModel> {
@@ -40,9 +37,6 @@ abstract class OrderModel implements Directional, Comparable<OrderModel> {
 
     /** The size related signal. */
     private final Signaling<Num> executedSize = new Signaling();
-
-    /** The internal associated execution holder. */
-    public final LinkedQueue<Execution> executions = new LinkedQueue();
 
     /**
      * {@inheritDoc}
@@ -266,20 +260,6 @@ abstract class OrderModel implements Directional, Comparable<OrderModel> {
     }
 
     /**
-     * Update execution atomically.
-     * 
-     * @param e
-     */
-    final void executed(cointoss.execution.Execution e) {
-        executions.add(e);
-        setRemainingSize(remainingSize().minus(e.size));
-        setExecutedSize(executedSize().plus(e.size));
-
-        remainingSize.accept(remainingSize());
-        executedSize.accept(executedSize());
-    }
-
-    /**
      * Update size atomically.
      * 
      * @param remainingSize
@@ -291,20 +271,6 @@ abstract class OrderModel implements Directional, Comparable<OrderModel> {
 
         this.remainingSize.accept(remainingSize);
         this.executedSize.accept(executedSize);
-    }
-
-    /**
-     * Update size atomically.
-     * 
-     * @param remainingSize
-     * @param executedSize
-     */
-    final void updateAtomically(Ⅲ<OrderState, Num, Num> state) {
-        setRemainingSize(state.ⅱ);
-        setExecutedSize(state.ⅲ);
-
-        this.remainingSize.accept(state.ⅱ);
-        this.executedSize.accept(state.ⅲ);
     }
 
     /**

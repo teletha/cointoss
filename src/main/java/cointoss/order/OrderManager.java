@@ -107,6 +107,10 @@ public final class OrderManager {
         order.setPrice(o.price);
         order.updateAtomically(o.remainingSize, o.executedSize);
         order.setState(o.state);
+
+        if (o.isTerminated()) {
+            order.setTerminationTime(service.now());
+        }
     }
 
     /**
