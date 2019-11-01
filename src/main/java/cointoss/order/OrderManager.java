@@ -93,22 +93,28 @@ public final class OrderManager {
         service.orders(OrderState.ACTIVE).to(addition::accept);
 
         // retrieve orders on realtime
-        service.add(service.ordersRealtimely().to(o -> {
+        service.add(service.ordersRealtimely().to(updater -> {
             for (Order order : managed) {
-                if (order.id.equals(o.id)) {
-                    update(order, o);
+                if (order.id.equals(updater.id)) {
+                    update(order, updater);
                     return;
                 }
             }
         }));
     }
 
-    private void update(Order order, Order o) {
-        order.setPrice(o.price);
-        order.updateAtomically(o.remainingSize, o.executedSize);
-        order.setState(o.state);
+    /**
+     * Update order state.
+     * 
+     * @param order Your order to update.
+     * @param updater A new order info.
+     */
+    private void update(Order order, Order updater) {
+        order.setPrice(updater.price);
+        order.updateAtomically(updater.remainingSize, updater.executedSize);
+        order.setState(updater.state);
 
-        if (o.isTerminated()) {
+        if (updater.isTerminated()) {
             order.setTerminationTime(service.now());
         }
     }

@@ -181,14 +181,19 @@ public class VerifiableMarketService extends MarketService {
         ZonedDateTime delay = latency.emulate(now);
 
         if (delay == now) {
-            backend.cancel();
-            orderUpdateRealtimely.accept(Order.with.direction(backend.direction, backend.size)
-                    .id(backend.id)
-                    .state(OrderState.CANCELED)
-                    .price(backend.price)
-                    .remainingSize(backend.remainingSize)
-                    .executedSize(backend.executedSize));
-            return I.signal(order);
+            Signal<BackendOrder> response = I.signal(backend);
+
+            if (executionsAfterOrderCancelResponse.isEmpty()) {
+                response = response.effect(() -> {
+                    backend.cancel();
+                });
+            } else {
+                response = response.effectOnComplete(() -> {
+                    executionsAfterOrderCancelResponse.forEach(this::emulate);
+                    backend.cancel();
+                });
+            }
+            return response.mapTo(order);
         }
 
         // backend order will be canceled in the specified delay
