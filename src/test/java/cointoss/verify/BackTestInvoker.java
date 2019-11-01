@@ -11,9 +11,6 @@ package cointoss.verify;
 
 import java.util.List;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import cointoss.Direction;
 import cointoss.Market;
 import cointoss.market.bitflyer.BitFlyer;
@@ -25,9 +22,6 @@ import cointoss.util.Num;
 public class BackTestInvoker {
 
     public static void main(String[] args) throws InterruptedException {
-        Logger log = LogManager.getLogger();
-        Thread.setDefaultUncaughtExceptionHandler((t, e) -> log.error(e.getMessage(), e));
-
         BackTest.with.service(BitFlyer.FX_BTC_JPY)
                 .start(2019, 8, 13)
                 .end(2019, 8, 13)
