@@ -294,13 +294,6 @@ public class Market implements Disposable {
     }
 
     /**
-     * Cancel all orders.
-     */
-    public void cancel() {
-        orders.cancelNowAll();
-    }
-
-    /**
      * 
      */
     private class MarketOrderStrategy implements Orderable, Takable, Makable, Cancellable {

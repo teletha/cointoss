@@ -22,7 +22,7 @@ class TraderTest extends TraderTestSupport {
     @Test
     void entryBuy() {
         when(now(), v -> {
-            return new Trade(Direction.BUY) {
+            return new TradingScenario(Direction.BUY) {
 
                 @Override
                 protected void entry() {
@@ -31,24 +31,24 @@ class TraderTest extends TraderTestSupport {
             };
         });
 
-        Trade entry = latest();
-        assert entry != null;
-        assert entry.isBuy();
-        assert entry.entrySize.is(1);
-        assert entry.entryExecutedSize.is(0);
-        assert entry.entryPrice.is(0);
+        TradingScenario scenario = latest();
+        assert scenario != null;
+        assert scenario.isBuy();
+        assert scenario.entrySize.is(1);
+        assert scenario.entryExecutedSize.is(0);
+        assert scenario.entryPrice.is(0);
 
         // execute entry
         market.perform(Execution.with.buy(1).price(9));
-        assert entry.entrySize.is(1);
-        assert entry.entryExecutedSize.is(1);
-        assert entry.entryPrice.is(10);
+        assert scenario.entrySize.is(1);
+        assert scenario.entryExecutedSize.is(1);
+        assert scenario.entryPrice.is(10);
     }
 
     @Test
     void entrySell() {
         when(now(), v -> {
-            return new Trade(Direction.SELL) {
+            return new TradingScenario(Direction.SELL) {
 
                 @Override
                 protected void entry() {
@@ -57,24 +57,24 @@ class TraderTest extends TraderTestSupport {
             };
         });
 
-        Trade entry = latest();
-        assert entry != null;
-        assert entry.isSell();
-        assert entry.entrySize.is(1);
-        assert entry.entryExecutedSize.is(0);
-        assert entry.entryPrice.is(0);
+        TradingScenario scenario = latest();
+        assert scenario != null;
+        assert scenario.isSell();
+        assert scenario.entrySize.is(1);
+        assert scenario.entryExecutedSize.is(0);
+        assert scenario.entryPrice.is(0);
 
         // execute entry
         market.perform(Execution.with.buy(1).price(11));
-        assert entry.entrySize.is(1);
-        assert entry.entryExecutedSize.is(1);
-        assert entry.entryPrice.is(10);
+        assert scenario.entrySize.is(1);
+        assert scenario.entryExecutedSize.is(1);
+        assert scenario.entryPrice.is(10);
     }
 
     @Test
     void exitMakeAtPrice() {
         when(now(), v -> {
-            return new Trade(Direction.BUY) {
+            return new TradingScenario(Direction.BUY) {
 
                 @Override
                 protected void entry() {
@@ -88,37 +88,37 @@ class TraderTest extends TraderTestSupport {
             };
         });
 
-        Trade entry = latest();
+        TradingScenario scenario = latest();
 
         // execute entry
         market.perform(Execution.with.buy(1).price(9));
         market.elapse(1, SECONDS);
-        assert entry.entrySize.is(1);
-        assert entry.entryExecutedSize.is(1);
-        assert entry.entryPrice.is(10);
+        assert scenario.entrySize.is(1);
+        assert scenario.entryExecutedSize.is(1);
+        assert scenario.entryPrice.is(10);
 
         // exit entry
-        assert entry.exitSize.is(1);
-        assert entry.exitExecutedSize.is(0);
-        assert entry.exitPrice.is(0);
+        assert scenario.exitSize.is(1);
+        assert scenario.exitExecutedSize.is(0);
+        assert scenario.exitPrice.is(0);
 
         // don't execute exit entry
         market.perform(Execution.with.buy(1).price(15));
-        assert entry.exitSize.is(1);
-        assert entry.exitExecutedSize.is(0);
-        assert entry.exitPrice.is(0);
+        assert scenario.exitSize.is(1);
+        assert scenario.exitExecutedSize.is(0);
+        assert scenario.exitPrice.is(0);
 
         // execute exit entry
         market.perform(Execution.with.buy(1).price(21));
-        assert entry.exitSize.is(1);
-        assert entry.exitExecutedSize.is(1);
-        assert entry.exitPrice.is(20);
+        assert scenario.exitSize.is(1);
+        assert scenario.exitExecutedSize.is(1);
+        assert scenario.exitPrice.is(20);
     }
 
     @Test
     void exitTake() {
         when(now(), v -> {
-            return new Trade(Direction.BUY) {
+            return new TradingScenario(Direction.BUY) {
 
                 @Override
                 protected void entry() {
@@ -132,28 +132,28 @@ class TraderTest extends TraderTestSupport {
             };
         });
 
-        Trade entry = latest();
+        TradingScenario scenario = latest();
 
         // execute entry
         market.perform(Execution.with.buy(1).price(9));
-        assert entry.entrySize.is(1);
-        assert entry.entryExecutedSize.is(1);
-        assert entry.entryPrice.is(10);
+        assert scenario.entrySize.is(1);
+        assert scenario.entryExecutedSize.is(1);
+        assert scenario.entryPrice.is(10);
 
         // activate exit entry
         market.perform(Execution.with.buy(1).price(20));
 
         // execute exit entry
         market.perform(Execution.with.buy(1).price(22));
-        assert entry.exitSize.is(1);
-        assert entry.exitExecutedSize.is(1);
-        assert entry.exitPrice.is(22);
+        assert scenario.exitSize.is(1);
+        assert scenario.exitExecutedSize.is(1);
+        assert scenario.exitPrice.is(22);
     }
 
     @Test
     void exitWillStopAllEntries() {
         when(now(), v -> {
-            return new Trade(Direction.BUY) {
+            return new TradingScenario(Direction.BUY) {
 
                 @Override
                 protected void entry() {
@@ -167,29 +167,29 @@ class TraderTest extends TraderTestSupport {
             };
         });
 
-        Trade e = latest();
+        TradingScenario scenario = latest();
 
         // entry partially
         market.perform(Execution.with.buy(2).price(9));
         market.elapse(1, SECONDS);
-        assert e.isEntryTerminated() == false;
-        assert e.isExitTerminated() == false;
+        assert scenario.isEntryTerminated() == false;
+        assert scenario.isExitTerminated() == false;
 
         // exit pertially
         market.perform(Execution.with.buy(1).price(21));
-        assert e.isEntryTerminated();
-        assert e.isExitTerminated() == false;
+        assert scenario.isEntryTerminated();
+        assert scenario.isExitTerminated() == false;
 
         // exit all
         market.perform(Execution.with.buy(1).price(21));
-        assert e.isEntryTerminated();
-        assert e.isExitTerminated();
+        assert scenario.isEntryTerminated();
+        assert scenario.isExitTerminated();
     }
 
     @Test
     void profitBuy() {
         when(now(), v -> {
-            return new Trade(Direction.BUY) {
+            return new TradingScenario(Direction.BUY) {
 
                 @Override
                 protected void entry() {
@@ -203,41 +203,41 @@ class TraderTest extends TraderTestSupport {
             };
         });
 
-        Trade e = latest();
-        assert e.profit(market.latestPrice()).is(0);
-        assert e.realizedProfit.is(0);
-        assert e.unrealizedProfit(market.latestPrice()).is(0);
+        TradingScenario scenario = latest();
+        assert scenario.profit(market.latestPrice()).is(0);
+        assert scenario.realizedProfit.is(0);
+        assert scenario.unrealizedProfit(market.latestPrice()).is(0);
 
         // entry partially
         market.perform(Execution.with.buy(2).price(9));
         market.elapse(1, SECONDS);
-        assert e.profit(market.latestPrice()).is(0);
-        assert e.realizedProfit.is(0);
-        assert e.unrealizedProfit(market.latestPrice()).is(0);
+        assert scenario.profit(market.latestPrice()).is(0);
+        assert scenario.realizedProfit.is(0);
+        assert scenario.unrealizedProfit(market.latestPrice()).is(0);
 
         // execute profit
         market.perform(Execution.with.buy(1).price(15));
-        assert e.profit(market.latestPrice()).is(10);
-        assert e.realizedProfit.is(0);
-        assert e.unrealizedProfit(market.latestPrice()).is(10);
+        assert scenario.profit(market.latestPrice()).is(10);
+        assert scenario.realizedProfit.is(0);
+        assert scenario.unrealizedProfit(market.latestPrice()).is(10);
 
         // exit partially
         market.perform(Execution.with.buy(1).price(21));
-        assert e.profit(market.latestPrice()).is(20);
-        assert e.realizedProfit.is(10);
-        assert e.unrealizedProfit(market.latestPrice()).is(10);
+        assert scenario.profit(market.latestPrice()).is(20);
+        assert scenario.realizedProfit.is(10);
+        assert scenario.unrealizedProfit(market.latestPrice()).is(10);
 
         // exit all
         market.perform(Execution.with.buy(1).price(21));
-        assert e.profit(market.latestPrice()).is(20);
-        assert e.realizedProfit.is(20);
-        assert e.unrealizedProfit(market.latestPrice()).is(0);
+        assert scenario.profit(market.latestPrice()).is(20);
+        assert scenario.realizedProfit.is(20);
+        assert scenario.unrealizedProfit(market.latestPrice()).is(0);
     }
 
     @Test
     void profitSell() {
         when(now(), v -> {
-            return new Trade(Direction.SELL) {
+            return new TradingScenario(Direction.SELL) {
 
                 @Override
                 protected void entry() {
@@ -251,41 +251,41 @@ class TraderTest extends TraderTestSupport {
             };
         });
 
-        Trade e = latest();
-        assert e.profit(market.latestPrice()).is(0);
-        assert e.realizedProfit.is(0);
-        assert e.unrealizedProfit(market.latestPrice()).is(0);
+        TradingScenario scenario = latest();
+        assert scenario.profit(market.latestPrice()).is(0);
+        assert scenario.realizedProfit.is(0);
+        assert scenario.unrealizedProfit(market.latestPrice()).is(0);
 
         // entry partially
         market.perform(Execution.with.buy(2).price(21));
         market.elapse(1, SECONDS);
-        assert e.profit(market.latestPrice()).is(0);
-        assert e.realizedProfit.is(0);
-        assert e.unrealizedProfit(market.latestPrice()).is(0);
+        assert scenario.profit(market.latestPrice()).is(0);
+        assert scenario.realizedProfit.is(0);
+        assert scenario.unrealizedProfit(market.latestPrice()).is(0);
 
         // execute profit
         market.perform(Execution.with.buy(1).price(15));
-        assert e.profit(market.latestPrice()).is(10);
-        assert e.realizedProfit.is(0);
-        assert e.unrealizedProfit(market.latestPrice()).is(10);
+        assert scenario.profit(market.latestPrice()).is(10);
+        assert scenario.realizedProfit.is(0);
+        assert scenario.unrealizedProfit(market.latestPrice()).is(10);
 
         // exit partially
         market.perform(Execution.with.buy(1).price(9));
-        assert e.profit(market.latestPrice()).is(20);
-        assert e.realizedProfit.is(10);
-        assert e.unrealizedProfit(market.latestPrice()).is(10);
+        assert scenario.profit(market.latestPrice()).is(20);
+        assert scenario.realizedProfit.is(10);
+        assert scenario.unrealizedProfit(market.latestPrice()).is(10);
 
         // exit all
         market.perform(Execution.with.buy(1).price(9));
-        assert e.profit(market.latestPrice()).is(20);
-        assert e.realizedProfit.is(20);
-        assert e.unrealizedProfit(market.latestPrice()).is(0);
+        assert scenario.profit(market.latestPrice()).is(20);
+        assert scenario.realizedProfit.is(20);
+        assert scenario.unrealizedProfit(market.latestPrice()).is(0);
     }
 
     @Test
     void lossBuy() {
         when(now(), v -> {
-            return new Trade(Direction.BUY) {
+            return new TradingScenario(Direction.BUY) {
 
                 @Override
                 protected void entry() {
@@ -299,43 +299,43 @@ class TraderTest extends TraderTestSupport {
             };
         });
 
-        Trade e = latest();
-        assert e.profit(market.latestPrice()).is(0);
-        assert e.realizedProfit.is(0);
-        assert e.unrealizedProfit(market.latestPrice()).is(0);
+        TradingScenario scenario = latest();
+        assert scenario.profit(market.latestPrice()).is(0);
+        assert scenario.realizedProfit.is(0);
+        assert scenario.unrealizedProfit(market.latestPrice()).is(0);
 
         // entry partially
         market.perform(Execution.with.buy(2).price(19));
-        assert e.profit(market.latestPrice()).is(0);
-        assert e.realizedProfit.is(0);
-        assert e.unrealizedProfit(market.latestPrice()).is(0);
+        assert scenario.profit(market.latestPrice()).is(0);
+        assert scenario.realizedProfit.is(0);
+        assert scenario.unrealizedProfit(market.latestPrice()).is(0);
 
         // execute loss
         market.perform(Execution.with.buy(1).price(15));
-        assert e.profit(market.latestPrice()).is(-10);
-        assert e.realizedProfit.is(0);
-        assert e.unrealizedProfit(market.latestPrice()).is(-10);
+        assert scenario.profit(market.latestPrice()).is(-10);
+        assert scenario.realizedProfit.is(0);
+        assert scenario.unrealizedProfit(market.latestPrice()).is(-10);
 
         // activate stop loss
         market.perform(Execution.with.buy(1).price(10));
 
         // exit partially
         market.perform(Execution.with.buy(1).price(10));
-        assert e.profit(market.latestPrice()).is(-20);
-        assert e.realizedProfit.is(-10);
-        assert e.unrealizedProfit(market.latestPrice()).is(-10);
+        assert scenario.profit(market.latestPrice()).is(-20);
+        assert scenario.realizedProfit.is(-10);
+        assert scenario.unrealizedProfit(market.latestPrice()).is(-10);
 
         // exit all
         market.perform(Execution.with.buy(1).price(10));
-        assert e.profit(market.latestPrice()).is(-20);
-        assert e.realizedProfit.is(-20);
-        assert e.unrealizedProfit(market.latestPrice()).is(0);
+        assert scenario.profit(market.latestPrice()).is(-20);
+        assert scenario.realizedProfit.is(-20);
+        assert scenario.unrealizedProfit(market.latestPrice()).is(0);
     }
 
     @Test
     void lossSell() {
         when(now(), v -> {
-            return new Trade(Direction.SELL) {
+            return new TradingScenario(Direction.SELL) {
 
                 @Override
                 protected void entry() {
@@ -349,37 +349,37 @@ class TraderTest extends TraderTestSupport {
             };
         });
 
-        Trade e = latest();
-        assert e.profit(market.latestPrice()).is(0);
-        assert e.realizedProfit.is(0);
-        assert e.unrealizedProfit(market.latestPrice()).is(0);
+        TradingScenario scenario = latest();
+        assert scenario.profit(market.latestPrice()).is(0);
+        assert scenario.realizedProfit.is(0);
+        assert scenario.unrealizedProfit(market.latestPrice()).is(0);
 
         // entry partially
         market.perform(Execution.with.buy(2).price(11));
-        assert e.profit(market.latestPrice()).is(0);
-        assert e.realizedProfit.is(0);
-        assert e.unrealizedProfit(market.latestPrice()).is(0);
+        assert scenario.profit(market.latestPrice()).is(0);
+        assert scenario.realizedProfit.is(0);
+        assert scenario.unrealizedProfit(market.latestPrice()).is(0);
 
         // execute loss
         market.perform(Execution.with.buy(1).price(15));
-        assert e.profit(market.latestPrice()).is(-10);
-        assert e.realizedProfit.is(0);
-        assert e.unrealizedProfit(market.latestPrice()).is(-10);
+        assert scenario.profit(market.latestPrice()).is(-10);
+        assert scenario.realizedProfit.is(0);
+        assert scenario.unrealizedProfit(market.latestPrice()).is(-10);
 
         // activate stop loss
         market.perform(Execution.with.buy(1).price(20));
 
         // exit partially
         market.perform(Execution.with.buy(1).price(20));
-        assert e.profit(market.latestPrice()).is(-20);
-        assert e.realizedProfit.is(-10);
-        assert e.unrealizedProfit(market.latestPrice()).is(-10);
+        assert scenario.profit(market.latestPrice()).is(-20);
+        assert scenario.realizedProfit.is(-10);
+        assert scenario.unrealizedProfit(market.latestPrice()).is(-10);
 
         // exit all
         market.perform(Execution.with.buy(1).price(20));
-        assert e.profit(market.latestPrice()).is(-20);
-        assert e.realizedProfit.is(-20);
-        assert e.unrealizedProfit(market.latestPrice()).is(0);
+        assert scenario.profit(market.latestPrice()).is(-20);
+        assert scenario.realizedProfit.is(-20);
+        assert scenario.unrealizedProfit(market.latestPrice()).is(0);
     }
 
     @Test

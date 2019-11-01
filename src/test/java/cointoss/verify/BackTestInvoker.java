@@ -51,7 +51,7 @@ public class BackTestInvoker {
                     return null;
                 }
 
-                return new Trade(indicator.direction) {
+                return new TradingScenario(indicator.direction) {
 
                     @Override
                     protected void entry() {

@@ -215,7 +215,7 @@ public class OrderBuilder extends View {
         orderLimitLong.text(Buy).when(User.MouseClick).throttle(1000, MILLISECONDS).mapTo(Direction.BUY).to(this::requestOrder);
         orderLimitShort.text(Sell).when(User.MouseClick).throttle(1000, MILLISECONDS).mapTo(Direction.SELL).to(this::requestOrder);
 
-        orderCancel.text(en("Cancel")).when(User.MouseClick).to(() -> view.market().cancel());
+        orderCancel.text(en("Cancel")).when(User.MouseClick).to(() -> view.market().orders.cancelNowAll());
         orderStop.text(en("Stop")).when(User.MouseClick).to(() -> view.market().stop().to(I.NoOP));
         orderReverse.text(en("Reverse")).when(User.MouseClick).to(() -> view.market().reverse().to(I.NoOP));
 

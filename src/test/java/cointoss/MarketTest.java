@@ -11,7 +11,6 @@ package cointoss;
 
 import java.util.List;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import cointoss.execution.Execution;
@@ -30,17 +29,13 @@ public class MarketTest {
     }
 
     @Test
-    @Disabled
     void stop() {
         market.requestAndExecution(Order.with.buy(1).price(10));
 
         List<Order> orders = market.stop(s -> s.take()).toList();
-        Order order = orders.get(0);
-        assert order.isSell();
-        assert order.remainingSize.is(1);
-        assert order.executedSize.is(0);
 
         market.perform(Execution.with.sell(1).price(12));
+        Order order = orders.get(0);
         assert order.remainingSize.is(0);
         assert order.executedSize.is(1);
     }

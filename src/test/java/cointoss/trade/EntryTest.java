@@ -26,40 +26,40 @@ class EntryTest extends TraderTestSupport {
     void holdTime() {
         entryAndExit(Execution.with.buy(1).price(10).date(second(0)), Execution.with.buy(1).price(20).date(second(10)));
 
-        Trade e = latest();
-        assert e.holdTime().equals(Duration.ofSeconds(10));
+        TradingScenario scenario = latest();
+        assert scenario.holdTime().equals(Duration.ofSeconds(10));
     }
 
     @Test
     void isTerminated() {
         entry(Execution.with.buy(1).price(10));
 
-        Trade e = latest();
-        assert e.isTerminated() == false;
+        TradingScenario scenario = latest();
+        assert scenario.isTerminated() == false;
     }
 
     @Test
     void isEntryTerminated() {
-        when(now(), v -> new Trade(Direction.BUY) {
+        when(now(), v -> new TradingScenario(Direction.BUY) {
             @Override
             protected void entry() {
                 entry(1, s -> s.make(10));
             }
         });
 
-        Trade e = latest();
-        assert e.isEntryTerminated() == false;
+        TradingScenario scenario = latest();
+        assert scenario.isEntryTerminated() == false;
 
         market.perform(Execution.with.buy(0.5).price(9));
-        assert e.isEntryTerminated() == false;
+        assert scenario.isEntryTerminated() == false;
 
         market.perform(Execution.with.buy(0.5).price(9));
-        assert e.isEntryTerminated() == true;
+        assert scenario.isEntryTerminated() == true;
     }
 
     @Test
     void isExitTerminated() {
-        when(now(), v -> new Trade(Direction.BUY) {
+        when(now(), v -> new TradingScenario(Direction.BUY) {
             @Override
             protected void entry() {
                 entry(1, s -> s.make(10));
@@ -71,23 +71,23 @@ class EntryTest extends TraderTestSupport {
             }
         });
 
-        Trade e = latest();
-        assert e.isExitTerminated() == false;
+        TradingScenario scenario = latest();
+        assert scenario.isExitTerminated() == false;
 
         market.perform(Execution.with.buy(1).price(9));
-        assert e.isExitTerminated() == false;
+        assert scenario.isExitTerminated() == false;
 
         market.elapse(1, SECONDS);
         market.perform(Execution.with.buy(0.5).price(21));
-        assert e.isExitTerminated() == false;
+        assert scenario.isExitTerminated() == false;
 
         market.perform(Execution.with.buy(0.5).price(21));
-        assert e.isExitTerminated() == true;
+        assert scenario.isExitTerminated() == true;
     }
 
     @Test
     void entryWithMultipleExecutionAndExitAtPrice() {
-        when(now(), v -> new Trade(Direction.BUY) {
+        when(now(), v -> new TradingScenario(Direction.BUY) {
             @Override
             protected void entry() {
                 entry(1, s -> s.make(10));
@@ -99,21 +99,21 @@ class EntryTest extends TraderTestSupport {
             }
         });
 
-        Trade e = latest();
-        assert e.exits.size() == 0;
+        TradingScenario scenario = latest();
+        assert scenario.exits.size() == 0;
 
         market.perform(Execution.with.buy(0.1).price(9));
         market.perform(Execution.with.buy(0.2).price(9));
         market.perform(Execution.with.buy(0.3).price(9));
         market.perform(Execution.with.buy(0.4).price(9));
         market.elapse(1, SECONDS);
-        assert e.exits.size() == 1;
+        assert scenario.exits.size() == 1;
     }
 
     @Test
     @PowerAssertOff
     void exitAndStop() {
-        when(now(), v -> new Trade(Direction.BUY) {
+        when(now(), v -> new TradingScenario(Direction.BUY) {
             @Override
             protected void entry() {
                 entry(1, s -> s.make(10));
@@ -126,33 +126,33 @@ class EntryTest extends TraderTestSupport {
             }
         });
 
-        Trade e = latest();
-        assert e.exits.size() == 0;
+        TradingScenario scenario = latest();
+        assert scenario.exits.size() == 0;
 
         market.perform(Execution.with.buy(1).price(9));
         market.elapse(1, SECONDS);
-        assert e.exits.size() == 1; // exit is ordered
-        assert e.entryExecutedSize.is(1);
-        assert e.exitExecutedSize.is(0);
+        assert scenario.exits.size() == 1; // exit is ordered
+        assert scenario.entryExecutedSize.is(1);
+        assert scenario.exitExecutedSize.is(0);
 
         market.perform(Execution.with.buy(0.1).price(5)); // trigger stop
         market.perform(Execution.with.buy(0.5).price(5));
-        assert e.exits.size() == 2; // stop is ordered
-        assert e.exits.stream().allMatch(Order::isActive);
-        assert e.isExitTerminated() == false;
-        assert e.entryExecutedSize.is(1);
-        assert e.exitExecutedSize.is(0.5);
+        assert scenario.exits.size() == 2; // stop is ordered
+        assert scenario.exits.stream().allMatch(Order::isActive);
+        assert scenario.isExitTerminated() == false;
+        assert scenario.entryExecutedSize.is(1);
+        assert scenario.exitExecutedSize.is(0.5);
 
         market.perform(Execution.with.buy(0.7).price(5));
-        assert e.exits.stream().allMatch(Order::isTerminated); // exit is canceled
-        assert e.isExitTerminated() == true;
-        assert e.entryExecutedSize.is(1);
-        assert e.exitExecutedSize.is(1);
+        assert scenario.exits.stream().allMatch(Order::isTerminated); // exit is canceled
+        assert scenario.isExitTerminated() == true;
+        assert scenario.entryExecutedSize.is(1);
+        assert scenario.exitExecutedSize.is(1);
     }
 
     @Test
     void imcompletedEntryTakerWillNotStopExitTakerInExclusiveExecutionMarketService() {
-        when(now(), v -> new Trade(Direction.BUY) {
+        when(now(), v -> new TradingScenario(Direction.BUY) {
 
             @Override
             protected void entry() {
@@ -165,38 +165,38 @@ class EntryTest extends TraderTestSupport {
             }
         });
 
-        Trade e = latest();
+        TradingScenario scenario = latest();
 
         market.perform(Execution.with.buy(0.5).price(15));
-        assert e.entrySize.is(1);
-        assert e.entryExecutedSize.is(0.5);
-        assert e.exitSize.is(0.5);
-        assert e.exitExecutedSize.is(0);
+        assert scenario.entrySize.is(1);
+        assert scenario.entryExecutedSize.is(0.5);
+        assert scenario.exitSize.is(0.5);
+        assert scenario.exitExecutedSize.is(0);
 
         market.perform(Execution.with.buy(0.5).price(15));
-        assert e.entrySize.is(1);
-        assert e.entryExecutedSize.is(1);
-        assert e.exitSize.is(0.5);
-        assert e.exitExecutedSize.is(0);
+        assert scenario.entrySize.is(1);
+        assert scenario.entryExecutedSize.is(1);
+        assert scenario.exitSize.is(0.5);
+        assert scenario.exitExecutedSize.is(0);
 
         market.perform(Execution.with.buy(0.5).price(15));
-        assert e.entrySize.is(1);
-        assert e.entryExecutedSize.is(1);
-        assert e.exitSize.is(1);
-        assert e.exitExecutedSize.is(0.5);
+        assert scenario.entrySize.is(1);
+        assert scenario.entryExecutedSize.is(1);
+        assert scenario.exitSize.is(1);
+        assert scenario.exitExecutedSize.is(0.5);
 
         market.perform(Execution.with.buy(0.5).price(15));
-        assert e.entrySize.is(1);
-        assert e.entryExecutedSize.is(1);
-        assert e.exitSize.is(1);
-        assert e.exitExecutedSize.is(1);
+        assert scenario.entrySize.is(1);
+        assert scenario.entryExecutedSize.is(1);
+        assert scenario.exitSize.is(1);
+        assert scenario.exitExecutedSize.is(1);
     }
 
     @Test
     void imcompletedEntryTakerWillNotStopExitTakerInNonExclusiveExecutionMarketService() {
         market.service.exclusiveExecution = false;
 
-        when(now(), v -> new Trade(Direction.BUY) {
+        when(now(), v -> new TradingScenario(Direction.BUY) {
 
             @Override
             protected void entry() {
@@ -209,24 +209,24 @@ class EntryTest extends TraderTestSupport {
             }
         });
 
-        Trade e = latest();
+        TradingScenario scenario = latest();
 
         market.perform(Execution.with.buy(0.5).price(15));
-        assert e.entrySize.is(1);
-        assert e.entryExecutedSize.is(0.5);
-        assert e.exitSize.is(0.5);
-        assert e.exitExecutedSize.is(0);
+        assert scenario.entrySize.is(1);
+        assert scenario.entryExecutedSize.is(0.5);
+        assert scenario.exitSize.is(0.5);
+        assert scenario.exitExecutedSize.is(0);
 
         market.perform(Execution.with.buy(0.5).price(15));
-        assert e.entrySize.is(1);
-        assert e.entryExecutedSize.is(1);
-        assert e.exitSize.is(1);
-        assert e.exitExecutedSize.is(0.5);
+        assert scenario.entrySize.is(1);
+        assert scenario.entryExecutedSize.is(1);
+        assert scenario.exitSize.is(1);
+        assert scenario.exitExecutedSize.is(0.5);
 
         market.perform(Execution.with.buy(0.5).price(15));
-        assert e.entrySize.is(1);
-        assert e.entryExecutedSize.is(1);
-        assert e.exitSize.is(1);
-        assert e.exitExecutedSize.is(1);
+        assert scenario.entrySize.is(1);
+        assert scenario.entryExecutedSize.is(1);
+        assert scenario.exitSize.is(1);
+        assert scenario.exitExecutedSize.is(1);
     }
 }

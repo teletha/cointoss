@@ -66,7 +66,7 @@ public abstract class Trader {
     protected final Signal<Boolean> completingExit = completeExits.expose;
 
     /** All managed entries. */
-    private final LinkedList<Trade> entries = new LinkedList<>();
+    private final LinkedList<TradingScenario> entries = new LinkedList<>();
 
     /** The alive state. */
     private final AtomicBoolean enable = new AtomicBoolean(true);
@@ -89,7 +89,7 @@ public abstract class Trader {
      * 
      * @return
      */
-    protected final Trade latest() {
+    protected final TradingScenario latest() {
         return entries.peekLast();
     }
 
@@ -100,13 +100,13 @@ public abstract class Trader {
      * @param timing
      * @param builder
      */
-    protected final <T> void when(Signal<T> timing, Function<T, Trade> builder) {
+    protected final <T> void when(Signal<T> timing, Function<T, TradingScenario> builder) {
         if (timing == null || builder == null) {
             return;
         }
 
         disposer.add(timing.takeWhile(v -> enable.get()).to(value -> {
-            Trade entry = builder.apply(value);
+            TradingScenario entry = builder.apply(value);
 
             if (entry != null) {
                 entries.add(entry);
@@ -178,7 +178,7 @@ public abstract class Trader {
     /**
      * Declarative entry and exit definition.
      */
-    public abstract class Trade extends EntryStatus implements Directional {
+    public abstract class TradingScenario extends EntryStatus implements Directional {
 
         /** The entry direction. */
         protected final Direction direction;
@@ -203,14 +203,14 @@ public abstract class Trader {
         /**
          * @param directional
          */
-        protected Trade(Directional directional) {
+        protected TradingScenario(Directional directional) {
             this(directional, null);
         }
 
         /**
          * @param directional
          */
-        protected Trade(Directional directional, FundManager funds) {
+        protected TradingScenario(Directional directional, FundManager funds) {
             this.direction = directional.direction();
             this.funds = funds == null ? Trader.this.funds : funds;
 

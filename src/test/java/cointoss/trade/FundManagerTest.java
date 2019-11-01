@@ -11,8 +11,6 @@ package cointoss.trade;
 
 import org.junit.jupiter.api.Test;
 
-import cointoss.trade.FundManager;
-
 class FundManagerTest {
 
     @Test

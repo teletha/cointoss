@@ -50,7 +50,7 @@ public abstract class TraderTestSupport extends Trader {
     }
 
     protected final void entry(Execution entry) {
-        when(now(), v -> new Trade(entry) {
+        when(now(), v -> new TradingScenario(entry) {
 
             @Override
             protected void entry() {
@@ -67,7 +67,7 @@ public abstract class TraderTestSupport extends Trader {
      * @param exit
      */
     protected final void entryAndExit(Execution entry, Execution exit) {
-        when(now(), v -> new Trade(entry) {
+        when(now(), v -> new TradingScenario(entry) {
 
             @Override
             protected void entry() {
