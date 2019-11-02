@@ -38,10 +38,10 @@ public class BackTestInvoker {
         private Sample(Market market) {
             super(market);
 
-            when(market.tickers.of(TickSpan.Minute1).add.skip(1), tick -> {
+            when(market.tickers.of(TickSpan.Second5).add.skip(12), tick -> {
                 Indicator indicator = new Indicator();
 
-                if (indicator.diff.isLessThan(1)) {
+                if (indicator.diff.isLessThan(8)) {
                     return null;
                 }
 
@@ -49,7 +49,7 @@ public class BackTestInvoker {
 
                     @Override
                     protected void entry() {
-                        entry(0.5, s -> s.take());
+                        entry(0.1, s -> s.make(market.latestPrice().minus(direction, 150)));
                     }
 
                     /**
@@ -57,9 +57,8 @@ public class BackTestInvoker {
                      */
                     @Override
                     protected void exit() {
-                        exitWhen(market.tickers.of(TickSpan.Second5).add.take(t -> new Indicator().direction != direction).first(), s -> {
-                            s.take();
-                        });
+                        exitAt(entryPrice.plus(direction, 2000));
+                        exitAt(entryPrice.minus(direction, 1400));
                     }
                 };
             });
@@ -78,9 +77,9 @@ public class BackTestInvoker {
             private Indicator() {
                 Tick t = market.tickers.of(TickSpan.Second5).last();
 
-                for (int i = 2; 0 < i; i--) {
-                    buyVolume = buyVolume.plus(t.buyVolume().multiply(1));
-                    sellVolume = sellVolume.plus(t.sellVolume().multiply(1));
+                for (int i = 12; 0 < i; i--) {
+                    buyVolume = buyVolume.plus(t.buyVolume());
+                    sellVolume = sellVolume.plus(t.sellVolume());
                     t = t.previous;
                 }
                 direction = buyVolume.isGreaterThan(sellVolume) ? Direction.BUY : Direction.SELL;
