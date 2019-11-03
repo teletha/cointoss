@@ -100,7 +100,7 @@ public abstract class Trader {
      * @param timing
      * @param builder
      */
-    protected final <T> void when(Signal<T> timing, Function<T, TradingScenario> builder) {
+    protected final <T> void when3(Signal<T> timing, Function<T, TradingScenario> builder) {
         if (timing == null || builder == null) {
             return;
         }
@@ -223,6 +223,9 @@ public abstract class Trader {
             observeExitExecutedSize().take(size -> size.is(entryExecutedSize)).first().to(() -> {
                 disposeExit();
             });
+
+            Trader.this.entries.add(this);
+            entry();
         }
 
         /**
@@ -287,6 +290,34 @@ public abstract class Trader {
             ZonedDateTime end = exits.last().map(o -> o.terminationTime).or(market.service.now());
 
             return Duration.between(start, end);
+        }
+
+        /**
+         * Set up entry at your timing.
+         * 
+         * @param <T>
+         * @param timing
+         * @param builder
+         */
+        protected final <T> void when(Signal<T> timing, Consumer<T> builder) {
+            if (timing == null || builder == null) {
+                return;
+            }
+
+            disposer.add(timing.takeWhile(v -> enable.get()).to(value -> {
+                builder.accept(value);
+            }));
+        }
+
+        /**
+         * Set up entry at your timing.
+         * 
+         * @param <T>
+         * @param timing
+         * @param builder
+         */
+        protected final <T> void when(Signal<T> timing, Runnable builder) {
+            when(timing, t -> builder.run());
         }
 
         /**

@@ -38,25 +38,25 @@ public class BackTestInvoker {
         private Sample(Market market) {
             super(market);
 
-            when(market.tickers.of(TickSpan.Second5).add.skip(12), tick -> {
-                return new TradingScenario() {
+            new TradingScenario() {
 
-                    @Override
-                    protected void entry() {
+                @Override
+                protected void entry() {
+                    when(market.tickers.of(TickSpan.Second5).add.skip(12), t -> {
                         Indicator indicator = new Indicator();
 
                         if (indicator.diff.isGreaterThan(8)) {
                             entry(indicator.direction, 0.1, s -> s.make(market.latestPrice().minus(indicator.direction, 150)));
                         }
-                    }
+                    });
+                }
 
-                    @Override
-                    protected void exit() {
-                        exitAt(entryPrice.plus(this, 2000));
-                        exitAt(entryPrice.minus(this, 1400));
-                    }
-                };
-            });
+                @Override
+                protected void exit() {
+                    exitAt(entryPrice.plus(this, 2000));
+                    exitAt(entryPrice.minus(this, 1400));
+                }
+            };
         }
 
         private class Indicator {

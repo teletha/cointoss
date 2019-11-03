@@ -50,13 +50,15 @@ public abstract class TraderTestSupport extends Trader {
     }
 
     protected final void entry(Execution e) {
-        when(now(), v -> new TradingScenario() {
+        new TradingScenario() {
 
             @Override
             protected void entry() {
-                entry(e, e.size, Orderable::take);
+                when(now(), v -> {
+                    entry(e, e.size, Orderable::take);
+                });
             }
-        });
+        };
         market.perform(e);
     }
 
@@ -67,11 +69,13 @@ public abstract class TraderTestSupport extends Trader {
      * @param exit
      */
     protected final void entryAndExit(Execution e, Execution exit) {
-        when(now(), v -> new TradingScenario() {
+        new TradingScenario() {
 
             @Override
             protected void entry() {
-                entry(e, e.size, Orderable::take);
+                when(now(), t -> {
+                    entry(e, e.size, Orderable::take);
+                });
             }
 
             /**
@@ -81,7 +85,7 @@ public abstract class TraderTestSupport extends Trader {
             protected void exit() {
                 exitAt(exit.price, Orderable::take);
             }
-        });
+        };
 
         market.perform(e);
         market.perform(exit);
