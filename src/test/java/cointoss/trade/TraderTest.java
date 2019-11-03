@@ -21,14 +21,16 @@ class TraderTest extends TraderTestSupport {
 
     @Test
     void entryBuy() {
-        when(now(), v -> {
-            return new Scenario() {
+        when(now(), v -> new Scenario() {
 
-                @Override
-                protected void entry() {
-                    entry(Direction.BUY, 1, s -> s.make(10));
-                }
-            };
+            @Override
+            protected void entry() {
+                entry(Direction.BUY, 1, s -> s.make(10));
+            }
+
+            @Override
+            protected void exit() {
+            }
         });
 
         Scenario scenario = latest();
@@ -47,14 +49,16 @@ class TraderTest extends TraderTestSupport {
 
     @Test
     void entrySell() {
-        when(now(), v -> {
-            return new Scenario() {
+        when(now(), v -> new Scenario() {
 
-                @Override
-                protected void entry() {
-                    entry(Direction.SELL, 1, s -> s.make(10));
-                }
-            };
+            @Override
+            protected void entry() {
+                entry(Direction.SELL, 1, s -> s.make(10));
+            }
+
+            @Override
+            protected void exit() {
+            }
         });
 
         Scenario scenario = latest();
@@ -73,19 +77,17 @@ class TraderTest extends TraderTestSupport {
 
     @Test
     void exitMakeAtPrice() {
-        when(now(), v -> {
-            return new Scenario() {
+        when(now(), v -> new Scenario() {
 
-                @Override
-                protected void entry() {
-                    entry(Direction.BUY, 1, s -> s.make(10));
-                }
+            @Override
+            protected void entry() {
+                entry(Direction.BUY, 1, s -> s.make(10));
+            }
 
-                @Override
-                protected void exit() {
-                    exitAt(20);
-                }
-            };
+            @Override
+            protected void exit() {
+                exitAt(20);
+            }
         });
 
         Scenario scenario = latest();
@@ -117,19 +119,17 @@ class TraderTest extends TraderTestSupport {
 
     @Test
     void exitTake() {
-        when(now(), v -> {
-            return new Scenario() {
+        when(now(), v -> new Scenario() {
 
-                @Override
-                protected void entry() {
-                    entry(Direction.BUY, 1, s -> s.make(10));
-                }
+            @Override
+            protected void entry() {
+                entry(Direction.BUY, 1, s -> s.make(10));
+            }
 
-                @Override
-                protected void exit() {
-                    exitAt(20, s -> s.take());
-                }
-            };
+            @Override
+            protected void exit() {
+                exitAt(20, s -> s.take());
+            }
         });
 
         Scenario scenario = latest();
@@ -152,19 +152,17 @@ class TraderTest extends TraderTestSupport {
 
     @Test
     void exitWillStopAllEntries() {
-        when(now(), v -> {
-            return new Scenario() {
+        when(now(), v -> new Scenario() {
 
-                @Override
-                protected void entry() {
-                    entry(Direction.BUY, 3, s -> s.make(10));
-                }
+            @Override
+            protected void entry() {
+                entry(Direction.BUY, 3, s -> s.make(10));
+            }
 
-                @Override
-                protected void exit() {
-                    exitAt(20);
-                }
-            };
+            @Override
+            protected void exit() {
+                exitAt(20);
+            }
         });
 
         Scenario scenario = latest();
@@ -188,19 +186,17 @@ class TraderTest extends TraderTestSupport {
 
     @Test
     void profitBuy() {
-        when(now(), v -> {
-            return new Scenario() {
+        when(now(), v -> new Scenario() {
 
-                @Override
-                protected void entry() {
-                    entry(Direction.BUY, 3, s -> s.make(10));
-                }
+            @Override
+            protected void entry() {
+                entry(Direction.BUY, 3, s -> s.make(10));
+            }
 
-                @Override
-                protected void exit() {
-                    exitAt(20);
-                }
-            };
+            @Override
+            protected void exit() {
+                exitAt(20);
+            }
         });
 
         Scenario scenario = latest();
@@ -236,19 +232,17 @@ class TraderTest extends TraderTestSupport {
 
     @Test
     void profitSell() {
-        when(now(), v -> {
-            return new Scenario() {
+        when(now(), v -> new Scenario() {
 
-                @Override
-                protected void entry() {
-                    entry(Direction.SELL, 3, s -> s.make(20));
-                }
+            @Override
+            protected void entry() {
+                entry(Direction.SELL, 3, s -> s.make(20));
+            }
 
-                @Override
-                protected void exit() {
-                    exitAt(10);
-                }
-            };
+            @Override
+            protected void exit() {
+                exitAt(10);
+            }
         });
 
         Scenario scenario = latest();
@@ -284,19 +278,17 @@ class TraderTest extends TraderTestSupport {
 
     @Test
     void lossBuy() {
-        when(now(), v -> {
-            return new Scenario() {
+        when(now(), v -> new Scenario() {
 
-                @Override
-                protected void entry() {
-                    entry(Direction.BUY, 2, s -> s.make(20));
-                }
+            @Override
+            protected void entry() {
+                entry(Direction.BUY, 2, s -> s.make(20));
+            }
 
-                @Override
-                protected void exit() {
-                    exitAt(10);
-                }
-            };
+            @Override
+            protected void exit() {
+                exitAt(10);
+            }
         });
 
         Scenario scenario = latest();
@@ -334,19 +326,17 @@ class TraderTest extends TraderTestSupport {
 
     @Test
     void lossSell() {
-        when(now(), v -> {
-            return new Scenario() {
+        when(now(), v -> new Scenario() {
 
-                @Override
-                protected void entry() {
-                    entry(Direction.SELL, 2, s -> s.make(10));
-                }
+            @Override
+            protected void entry() {
+                entry(Direction.SELL, 2, s -> s.make(10));
+            }
 
-                @Override
-                protected void exit() {
-                    exitAt(20);
-                }
-            };
+            @Override
+            protected void exit() {
+                exitAt(20);
+            }
         });
 
         Scenario scenario = latest();

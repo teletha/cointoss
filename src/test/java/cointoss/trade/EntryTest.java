@@ -45,6 +45,10 @@ class EntryTest extends TraderTestSupport {
             protected void entry() {
                 entry(Direction.BUY, 1, s -> s.make(10));
             }
+
+            @Override
+            protected void exit() {
+            }
         });
 
         Scenario scenario = latest();

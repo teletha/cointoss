@@ -56,6 +56,10 @@ public abstract class TraderTestSupport extends Trader {
             protected void entry() {
                 entry(e, e.size, Orderable::take);
             }
+
+            @Override
+            protected void exit() {
+            }
         });
         market.perform(e);
     }

@@ -22,6 +22,7 @@ import cointoss.analyze.Analyzer;
 import cointoss.execution.ExecutionLog;
 import cointoss.market.MarketServiceProvider;
 import cointoss.ticker.TickSpan;
+import cointoss.trade.Scenario;
 import cointoss.trade.Trader;
 import cointoss.trade.TradingLog;
 import cointoss.util.Chrono;

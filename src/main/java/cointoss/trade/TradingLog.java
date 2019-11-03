@@ -18,7 +18,6 @@ import java.util.function.Function;
 
 import cointoss.Market;
 import cointoss.analyze.Statistics;
-import cointoss.trade.Trader.Scenario;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
 

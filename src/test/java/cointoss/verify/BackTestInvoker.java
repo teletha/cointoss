@@ -16,6 +16,7 @@ import cointoss.Market;
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.ticker.Tick;
 import cointoss.ticker.TickSpan;
+import cointoss.trade.Scenario;
 import cointoss.trade.Trader;
 import cointoss.util.Num;
 
