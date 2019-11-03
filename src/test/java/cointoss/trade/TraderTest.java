@@ -22,7 +22,7 @@ class TraderTest extends TraderTestSupport {
     @Test
     void entryBuy() {
         when(now(), v -> {
-            return new TradingScenario() {
+            return new Scenario() {
 
                 @Override
                 protected void entry() {
@@ -31,7 +31,7 @@ class TraderTest extends TraderTestSupport {
             };
         });
 
-        TradingScenario scenario = latest();
+        Scenario scenario = latest();
         assert scenario != null;
         assert scenario.isBuy();
         assert scenario.entrySize.is(1);
@@ -48,7 +48,7 @@ class TraderTest extends TraderTestSupport {
     @Test
     void entrySell() {
         when(now(), v -> {
-            return new TradingScenario() {
+            return new Scenario() {
 
                 @Override
                 protected void entry() {
@@ -57,7 +57,7 @@ class TraderTest extends TraderTestSupport {
             };
         });
 
-        TradingScenario scenario = latest();
+        Scenario scenario = latest();
         assert scenario != null;
         assert scenario.isSell();
         assert scenario.entrySize.is(1);
@@ -74,7 +74,7 @@ class TraderTest extends TraderTestSupport {
     @Test
     void exitMakeAtPrice() {
         when(now(), v -> {
-            return new TradingScenario() {
+            return new Scenario() {
 
                 @Override
                 protected void entry() {
@@ -88,7 +88,7 @@ class TraderTest extends TraderTestSupport {
             };
         });
 
-        TradingScenario scenario = latest();
+        Scenario scenario = latest();
 
         // execute entry
         market.perform(Execution.with.buy(1).price(9));
@@ -118,7 +118,7 @@ class TraderTest extends TraderTestSupport {
     @Test
     void exitTake() {
         when(now(), v -> {
-            return new TradingScenario() {
+            return new Scenario() {
 
                 @Override
                 protected void entry() {
@@ -132,7 +132,7 @@ class TraderTest extends TraderTestSupport {
             };
         });
 
-        TradingScenario scenario = latest();
+        Scenario scenario = latest();
 
         // execute entry
         market.perform(Execution.with.buy(1).price(9));
@@ -153,7 +153,7 @@ class TraderTest extends TraderTestSupport {
     @Test
     void exitWillStopAllEntries() {
         when(now(), v -> {
-            return new TradingScenario() {
+            return new Scenario() {
 
                 @Override
                 protected void entry() {
@@ -167,7 +167,7 @@ class TraderTest extends TraderTestSupport {
             };
         });
 
-        TradingScenario scenario = latest();
+        Scenario scenario = latest();
 
         // entry partially
         market.perform(Execution.with.buy(2).price(9));
@@ -189,7 +189,7 @@ class TraderTest extends TraderTestSupport {
     @Test
     void profitBuy() {
         when(now(), v -> {
-            return new TradingScenario() {
+            return new Scenario() {
 
                 @Override
                 protected void entry() {
@@ -203,7 +203,7 @@ class TraderTest extends TraderTestSupport {
             };
         });
 
-        TradingScenario scenario = latest();
+        Scenario scenario = latest();
         assert scenario.profit(market.latestPrice()).is(0);
         assert scenario.realizedProfit.is(0);
         assert scenario.unrealizedProfit(market.latestPrice()).is(0);
@@ -237,7 +237,7 @@ class TraderTest extends TraderTestSupport {
     @Test
     void profitSell() {
         when(now(), v -> {
-            return new TradingScenario() {
+            return new Scenario() {
 
                 @Override
                 protected void entry() {
@@ -251,7 +251,7 @@ class TraderTest extends TraderTestSupport {
             };
         });
 
-        TradingScenario scenario = latest();
+        Scenario scenario = latest();
         assert scenario.profit(market.latestPrice()).is(0);
         assert scenario.realizedProfit.is(0);
         assert scenario.unrealizedProfit(market.latestPrice()).is(0);
@@ -285,7 +285,7 @@ class TraderTest extends TraderTestSupport {
     @Test
     void lossBuy() {
         when(now(), v -> {
-            return new TradingScenario() {
+            return new Scenario() {
 
                 @Override
                 protected void entry() {
@@ -299,7 +299,7 @@ class TraderTest extends TraderTestSupport {
             };
         });
 
-        TradingScenario scenario = latest();
+        Scenario scenario = latest();
         assert scenario.profit(market.latestPrice()).is(0);
         assert scenario.realizedProfit.is(0);
         assert scenario.unrealizedProfit(market.latestPrice()).is(0);
@@ -335,7 +335,7 @@ class TraderTest extends TraderTestSupport {
     @Test
     void lossSell() {
         when(now(), v -> {
-            return new TradingScenario() {
+            return new Scenario() {
 
                 @Override
                 protected void entry() {
@@ -349,7 +349,7 @@ class TraderTest extends TraderTestSupport {
             };
         });
 
-        TradingScenario scenario = latest();
+        Scenario scenario = latest();
         assert scenario.profit(market.latestPrice()).is(0);
         assert scenario.realizedProfit.is(0);
         assert scenario.unrealizedProfit(market.latestPrice()).is(0);

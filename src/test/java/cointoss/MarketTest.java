@@ -13,7 +13,6 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-import cointoss.execution.Execution;
 import cointoss.order.Order;
 import cointoss.verify.VerifiableMarket;
 
@@ -26,17 +25,5 @@ public class MarketTest {
         List<Order> orders = market.stop().toList();
 
         assert orders.isEmpty();
-    }
-
-    @Test
-    void stop() {
-        market.requestAndExecution(Order.with.buy(1).price(10));
-
-        List<Order> orders = market.stop(s -> s.take()).toList();
-
-        market.perform(Execution.with.sell(1).price(12));
-        Order order = orders.get(0);
-        assert order.remainingSize.is(0);
-        assert order.executedSize.is(1);
     }
 }

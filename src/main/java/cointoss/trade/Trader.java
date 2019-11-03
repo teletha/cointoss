@@ -66,7 +66,7 @@ public abstract class Trader {
     protected final Signal<Boolean> completingExit = completeExits.expose;
 
     /** All managed entries. */
-    private final LinkedList<TradingScenario> entries = new LinkedList<>();
+    private final LinkedList<Scenario> entries = new LinkedList<>();
 
     /** The alive state. */
     private final AtomicBoolean enable = new AtomicBoolean(true);
@@ -89,7 +89,7 @@ public abstract class Trader {
      * 
      * @return
      */
-    protected final TradingScenario latest() {
+    protected final Scenario latest() {
         return entries.peekLast();
     }
 
@@ -100,13 +100,13 @@ public abstract class Trader {
      * @param timing
      * @param builder
      */
-    protected final <T> void when(Signal<T> timing, Function<T, TradingScenario> builder) {
+    protected final <T> void when(Signal<T> timing, Function<T, Scenario> builder) {
         if (timing == null || builder == null) {
             return;
         }
 
         disposer.add(timing.takeWhile(v -> enable.get()).to(value -> {
-            TradingScenario entry = builder.apply(value);
+            Scenario entry = builder.apply(value);
 
             if (entry != null) {
                 entry.entry();
@@ -180,7 +180,7 @@ public abstract class Trader {
     /**
      * Declarative entry and exit definition.
      */
-    public abstract class TradingScenario extends EntryStatus implements Directional {
+    public abstract class Scenario extends EntryStatus implements Directional {
 
         /** The entry direction. */
         private Directional directional;
@@ -205,14 +205,14 @@ public abstract class Trader {
         /**
          * @param directional
          */
-        protected TradingScenario() {
+        protected Scenario() {
             this(null);
         }
 
         /**
          * @param directional
          */
-        protected TradingScenario(FundManager funds) {
+        protected Scenario(FundManager funds) {
             this.funds = funds == null ? Trader.this.funds : funds;
 
             disposerForExit.add(observeEntryExecutedSize().first().to(this::exit));
@@ -434,8 +434,7 @@ public abstract class Trader {
                             Num v = entryExecutedSize.minus(exitExecutedSize);
 
                             if (v.isNegativeOrZero()) {
-                                System.out.println(v);
-                                System.out.println(this);
+                                System.out.println("The exit executed size exceeds the entr executed size.\r\n" + toString());
                             }
 
                             market.request(directional.inverse(), entryExecutedSize.minus(exitExecutedSize), Orderable::take)
@@ -542,9 +541,7 @@ public abstract class Trader {
          */
         @Override
         public String toString() {
-            ZonedDateTime start = entries.first().map(o -> o.creationTime).or(market.service.now());
-
-            StringBuilder builder = new StringBuilder("Scenario ").append(directional).append(" ").append(start).append("\r\n");
+            StringBuilder builder = new StringBuilder("Scenario ").append(directional).append("\r\n");
             format(builder, "IN", entries, entryPrice, entrySize, entryExecutedSize, calculateCanceledSize(entries));
             format(builder, "OUT", exits, exitPrice, exitSize, exitExecutedSize, calculateCanceledSize(exits));
             return builder.toString();

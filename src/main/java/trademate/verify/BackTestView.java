@@ -193,7 +193,7 @@ public class BackTestView extends View implements Analyzer {
             super(market);
 
             when(market.tickers.of(TickSpan.Hour4).add.skip(1).take(1), tick -> {
-                return new TradingScenario() {
+                return new Scenario() {
 
                     @Override
                     protected void entry() {

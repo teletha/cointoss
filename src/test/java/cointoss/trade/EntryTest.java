@@ -26,7 +26,7 @@ class EntryTest extends TraderTestSupport {
     void holdTime() {
         entryAndExit(Execution.with.buy(1).price(10).date(second(0)), Execution.with.buy(1).price(20).date(second(10)));
 
-        TradingScenario scenario = latest();
+        Scenario scenario = latest();
         assert scenario.holdTime().equals(Duration.ofSeconds(10));
     }
 
@@ -34,20 +34,20 @@ class EntryTest extends TraderTestSupport {
     void isTerminated() {
         entry(Execution.with.buy(1).price(10));
 
-        TradingScenario scenario = latest();
+        Scenario scenario = latest();
         assert scenario.isTerminated() == false;
     }
 
     @Test
     void isEntryTerminated() {
-        when(now(), v -> new TradingScenario() {
+        when(now(), v -> new Scenario() {
             @Override
             protected void entry() {
                 entry(Direction.BUY, 1, s -> s.make(10));
             }
         });
 
-        TradingScenario scenario = latest();
+        Scenario scenario = latest();
         assert scenario.isEntryTerminated() == false;
 
         market.perform(Execution.with.buy(0.5).price(9));
@@ -59,7 +59,7 @@ class EntryTest extends TraderTestSupport {
 
     @Test
     void isExitTerminated() {
-        when(now(), v -> new TradingScenario() {
+        when(now(), v -> new Scenario() {
             @Override
             protected void entry() {
                 entry(Direction.BUY, 1, s -> s.make(10));
@@ -71,7 +71,7 @@ class EntryTest extends TraderTestSupport {
             }
         });
 
-        TradingScenario scenario = latest();
+        Scenario scenario = latest();
         assert scenario.isExitTerminated() == false;
 
         market.perform(Execution.with.buy(1).price(9));
@@ -87,7 +87,7 @@ class EntryTest extends TraderTestSupport {
 
     @Test
     void entryWithMultipleExecutionAndExitAtPrice() {
-        when(now(), v -> new TradingScenario() {
+        when(now(), v -> new Scenario() {
             @Override
             protected void entry() {
                 entry(Direction.BUY, 1, s -> s.make(10));
@@ -99,7 +99,7 @@ class EntryTest extends TraderTestSupport {
             }
         });
 
-        TradingScenario scenario = latest();
+        Scenario scenario = latest();
         assert scenario.exits.size() == 0;
 
         market.perform(Execution.with.buy(0.1).price(9));
@@ -113,7 +113,7 @@ class EntryTest extends TraderTestSupport {
     @Test
     @PowerAssertOff
     void exitAndStop() {
-        when(now(), v -> new TradingScenario() {
+        when(now(), v -> new Scenario() {
             @Override
             protected void entry() {
                 entry(Direction.BUY, 1, s -> s.make(10));
@@ -126,7 +126,7 @@ class EntryTest extends TraderTestSupport {
             }
         });
 
-        TradingScenario scenario = latest();
+        Scenario scenario = latest();
         assert scenario.exits.size() == 0;
 
         market.perform(Execution.with.buy(1).price(9));
@@ -152,7 +152,7 @@ class EntryTest extends TraderTestSupport {
 
     @Test
     void imcompletedEntryTakerWillNotStopExitTakerInExclusiveExecutionMarketService() {
-        when(now(), v -> new TradingScenario() {
+        when(now(), v -> new Scenario() {
 
             @Override
             protected void entry() {
@@ -165,7 +165,7 @@ class EntryTest extends TraderTestSupport {
             }
         });
 
-        TradingScenario scenario = latest();
+        Scenario scenario = latest();
 
         market.perform(Execution.with.buy(0.5).price(15));
         assert scenario.entrySize.is(1);
@@ -196,7 +196,7 @@ class EntryTest extends TraderTestSupport {
     void imcompletedEntryTakerWillNotStopExitTakerInNonExclusiveExecutionMarketService() {
         market.service.exclusiveExecution = false;
 
-        when(now(), v -> new TradingScenario() {
+        when(now(), v -> new Scenario() {
 
             @Override
             protected void entry() {
@@ -209,7 +209,7 @@ class EntryTest extends TraderTestSupport {
             }
         });
 
-        TradingScenario scenario = latest();
+        Scenario scenario = latest();
 
         market.perform(Execution.with.buy(0.5).price(15));
         assert scenario.entrySize.is(1);
