@@ -192,22 +192,25 @@ public class BackTestView extends View implements Analyzer {
         private Sample(Market market) {
             super(market);
 
-            new TradingScenario() {
+            when(market.tickers.of(TickSpan.Hour4).add.skip(1).take(1), tick -> {
+                return new TradingScenario() {
 
-                @Override
-                protected void entry() {
-                    when(market.tickers.of(TickSpan.Hour4).add.skip(1).take(1), tick -> {
+                    @Override
+                    protected void entry() {
                         entry(Direction.random(), 3, s -> s.make(market.tickers.latest.v.price));
-                    });
-                }
+                    }
 
-                @Override
-                protected void exit() {
-                    exitAt(entryPrice.plus(this, 5000));
-                    exitAt(entryPrice.minus(this, 5000));
-                    exitAfter(15, TimeUnit.MINUTES);
-                }
-            };
+                    /**
+                     * {@inheritDoc}
+                     */
+                    @Override
+                    protected void exit() {
+                        exitAt(entryPrice.plus(this, 5000));
+                        exitAt(entryPrice.minus(this, 5000));
+                        exitAfter(15, TimeUnit.MINUTES);
+                    }
+                };
+            });
         }
     }
 }

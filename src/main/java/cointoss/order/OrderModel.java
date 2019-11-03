@@ -513,8 +513,14 @@ abstract class OrderModel implements Directional, Comparable<OrderModel> {
      */
     @Override
     public String toString() {
-        return direction()
-                .mark() + size() + "@" + price() + " 残" + remainingSize() + " 済" + executedSize() + " " + creationTime() + " " + state();
+        StringBuilder builder = new StringBuilder();
+        builder.append(direction().mark());
+        builder.append(executedSize()).append("/").append(size()).append("(").append(canceledSize()).append(")@").append(price());
+        builder.append("\t").append(state());
+        builder.append("\t").append(creationTime().toLocalDateTime()).append("～").append(terminationTime().toLocalDateTime());
+        builder.append("(").append(Chrono.formatAsDuration(creationTime(), terminationTime())).append(")");
+
+        return builder.toString();
     }
 
     /**

@@ -15,6 +15,7 @@ import java.time.Duration;
 
 import org.junit.jupiter.api.Test;
 
+import antibug.powerassert.PowerAssertOff;
 import cointoss.Direction;
 import cointoss.execution.Execution;
 import cointoss.order.Order;
@@ -39,15 +40,12 @@ class EntryTest extends TraderTestSupport {
 
     @Test
     void isEntryTerminated() {
-        new TradingScenario() {
-
+        when(now(), v -> new TradingScenario() {
             @Override
             protected void entry() {
-                when(now(), () -> {
-                    entry(Direction.BUY, 1, s -> s.make(10));
-                });
+                entry(Direction.BUY, 1, s -> s.make(10));
             }
-        };
+        });
 
         TradingScenario scenario = latest();
         assert scenario.isEntryTerminated() == false;
@@ -61,20 +59,17 @@ class EntryTest extends TraderTestSupport {
 
     @Test
     void isExitTerminated() {
-        new TradingScenario() {
-
+        when(now(), v -> new TradingScenario() {
             @Override
             protected void entry() {
-                when(now(), () -> {
-                    entry(Direction.BUY, 1, s -> s.make(10));
-                });
+                entry(Direction.BUY, 1, s -> s.make(10));
             }
 
             @Override
             protected void exit() {
                 exitAt(20);
             }
-        };
+        });
 
         TradingScenario scenario = latest();
         assert scenario.isExitTerminated() == false;
@@ -92,20 +87,17 @@ class EntryTest extends TraderTestSupport {
 
     @Test
     void entryWithMultipleExecutionAndExitAtPrice() {
-        new TradingScenario() {
-
+        when(now(), v -> new TradingScenario() {
             @Override
             protected void entry() {
-                when(now(), () -> {
-                    entry(Direction.BUY, 1, s -> s.make(10));
-                });
+                entry(Direction.BUY, 1, s -> s.make(10));
             }
 
             @Override
             protected void exit() {
                 exitAt(20);
             }
-        };
+        });
 
         TradingScenario scenario = latest();
         assert scenario.exits.size() == 0;
@@ -119,14 +111,12 @@ class EntryTest extends TraderTestSupport {
     }
 
     @Test
+    @PowerAssertOff
     void exitAndStop() {
-        new TradingScenario() {
-
+        when(now(), v -> new TradingScenario() {
             @Override
             protected void entry() {
-                when(now(), () -> {
-                    entry(Direction.BUY, 1, s -> s.make(10));
-                });
+                entry(Direction.BUY, 1, s -> s.make(10));
             }
 
             @Override
@@ -134,7 +124,7 @@ class EntryTest extends TraderTestSupport {
                 exitAt(20);
                 exitAt(5);
             }
-        };
+        });
 
         TradingScenario scenario = latest();
         assert scenario.exits.size() == 0;
@@ -162,20 +152,18 @@ class EntryTest extends TraderTestSupport {
 
     @Test
     void imcompletedEntryTakerWillNotStopExitTakerInExclusiveExecutionMarketService() {
-        new TradingScenario() {
+        when(now(), v -> new TradingScenario() {
 
             @Override
             protected void entry() {
-                when(now(), () -> {
-                    entry(Direction.BUY, 1, s -> s.take());
-                });
+                entry(Direction.BUY, 1, s -> s.take());
             }
 
             @Override
             protected void exit() {
                 exitWhen(now(), s -> s.take());
             }
-        };
+        });
 
         TradingScenario scenario = latest();
 
@@ -208,20 +196,18 @@ class EntryTest extends TraderTestSupport {
     void imcompletedEntryTakerWillNotStopExitTakerInNonExclusiveExecutionMarketService() {
         market.service.exclusiveExecution = false;
 
-        new TradingScenario() {
+        when(now(), v -> new TradingScenario() {
 
             @Override
             protected void entry() {
-                when(now(), () -> {
-                    entry(Direction.BUY, 1, s -> s.take());
-                });
+                entry(Direction.BUY, 1, s -> s.take());
             }
 
             @Override
             protected void exit() {
                 exitWhen(now(), s -> s.take());
             }
-        };
+        });
 
         TradingScenario scenario = latest();
 

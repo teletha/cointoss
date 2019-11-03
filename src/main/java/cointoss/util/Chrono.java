@@ -220,6 +220,16 @@ public class Chrono {
      * @param mills
      * @return
      */
+    public static String formatAsDuration(ZonedDateTime start, ZonedDateTime end) {
+        return formatAsDuration(Duration.between(start, end).toMillis());
+    }
+
+    /**
+     * Format the duration (mills) to human-readable expression.
+     * 
+     * @param mills
+     * @return
+     */
     public static String formatAsDuration(Num mills) {
         return formatAsDuration(mills.toLong());
     }
@@ -244,12 +254,16 @@ public class Chrono {
         long minutes = seconds / minute;
         seconds = seconds % minute;
 
-        return new StringBuilder() //
-                .append(formatAsTime(days, false, true))
-                .append(formatAsTime(hours, 0 < days, true))
-                .append(formatAsTime(minutes, 0 < days || 0 < hours, true))
-                .append(formatAsTime(seconds, 0 < days || 0 < hours || 0 < minutes, false))
-                .toString();
+        if (days == 0 && hours == 0 && minutes == 0 && seconds == 0) {
+            return "." + mills;
+        } else {
+            return new StringBuilder() //
+                    .append(formatAsTime(days, false, true))
+                    .append(formatAsTime(hours, 0 < days, true))
+                    .append(formatAsTime(minutes, 0 < days || 0 < hours, true))
+                    .append(formatAsTime(seconds, 0 < days || 0 < hours || 0 < minutes, false))
+                    .toString();
+        }
     }
 
     /**

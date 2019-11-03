@@ -21,15 +21,15 @@ class TraderTest extends TraderTestSupport {
 
     @Test
     void entryBuy() {
-        new TradingScenario() {
+        when(now(), v -> {
+            return new TradingScenario() {
 
-            @Override
-            protected void entry() {
-                when(now(), () -> {
+                @Override
+                protected void entry() {
                     entry(Direction.BUY, 1, s -> s.make(10));
-                });
-            }
-        };
+                }
+            };
+        });
 
         TradingScenario scenario = latest();
         assert scenario != null;
@@ -47,15 +47,15 @@ class TraderTest extends TraderTestSupport {
 
     @Test
     void entrySell() {
-        new TradingScenario() {
+        when(now(), v -> {
+            return new TradingScenario() {
 
-            @Override
-            protected void entry() {
-                when(now(), () -> {
+                @Override
+                protected void entry() {
                     entry(Direction.SELL, 1, s -> s.make(10));
-                });
-            }
-        };
+                }
+            };
+        });
 
         TradingScenario scenario = latest();
         assert scenario != null;
@@ -73,20 +73,20 @@ class TraderTest extends TraderTestSupport {
 
     @Test
     void exitMakeAtPrice() {
-        new TradingScenario() {
+        when(now(), v -> {
+            return new TradingScenario() {
 
-            @Override
-            protected void entry() {
-                when(now(), () -> {
+                @Override
+                protected void entry() {
                     entry(Direction.BUY, 1, s -> s.make(10));
-                });
-            }
+                }
 
-            @Override
-            protected void exit() {
-                exitAt(20);
-            }
-        };
+                @Override
+                protected void exit() {
+                    exitAt(20);
+                }
+            };
+        });
 
         TradingScenario scenario = latest();
 
@@ -117,20 +117,20 @@ class TraderTest extends TraderTestSupport {
 
     @Test
     void exitTake() {
-        new TradingScenario() {
+        when(now(), v -> {
+            return new TradingScenario() {
 
-            @Override
-            protected void entry() {
-                when(now(), () -> {
+                @Override
+                protected void entry() {
                     entry(Direction.BUY, 1, s -> s.make(10));
-                });
-            }
+                }
 
-            @Override
-            protected void exit() {
-                exitAt(20, s -> s.take());
-            }
-        };
+                @Override
+                protected void exit() {
+                    exitAt(20, s -> s.take());
+                }
+            };
+        });
 
         TradingScenario scenario = latest();
 
@@ -152,20 +152,20 @@ class TraderTest extends TraderTestSupport {
 
     @Test
     void exitWillStopAllEntries() {
-        new TradingScenario() {
+        when(now(), v -> {
+            return new TradingScenario() {
 
-            @Override
-            protected void entry() {
-                when(now(), () -> {
+                @Override
+                protected void entry() {
                     entry(Direction.BUY, 3, s -> s.make(10));
-                });
-            }
+                }
 
-            @Override
-            protected void exit() {
-                exitAt(20);
-            }
-        };
+                @Override
+                protected void exit() {
+                    exitAt(20);
+                }
+            };
+        });
 
         TradingScenario scenario = latest();
 
@@ -188,20 +188,20 @@ class TraderTest extends TraderTestSupport {
 
     @Test
     void profitBuy() {
-        new TradingScenario() {
+        when(now(), v -> {
+            return new TradingScenario() {
 
-            @Override
-            protected void entry() {
-                when(now(), () -> {
+                @Override
+                protected void entry() {
                     entry(Direction.BUY, 3, s -> s.make(10));
-                });
-            }
+                }
 
-            @Override
-            protected void exit() {
-                exitAt(20);
-            }
-        };
+                @Override
+                protected void exit() {
+                    exitAt(20);
+                }
+            };
+        });
 
         TradingScenario scenario = latest();
         assert scenario.profit(market.latestPrice()).is(0);
@@ -236,20 +236,20 @@ class TraderTest extends TraderTestSupport {
 
     @Test
     void profitSell() {
-        new TradingScenario() {
+        when(now(), v -> {
+            return new TradingScenario() {
 
-            @Override
-            protected void entry() {
-                when(now(), () -> {
+                @Override
+                protected void entry() {
                     entry(Direction.SELL, 3, s -> s.make(20));
-                });
-            }
+                }
 
-            @Override
-            protected void exit() {
-                exitAt(10);
-            }
-        };
+                @Override
+                protected void exit() {
+                    exitAt(10);
+                }
+            };
+        });
 
         TradingScenario scenario = latest();
         assert scenario.profit(market.latestPrice()).is(0);
@@ -284,20 +284,20 @@ class TraderTest extends TraderTestSupport {
 
     @Test
     void lossBuy() {
-        new TradingScenario() {
+        when(now(), v -> {
+            return new TradingScenario() {
 
-            @Override
-            protected void entry() {
-                when(now(), () -> {
+                @Override
+                protected void entry() {
                     entry(Direction.BUY, 2, s -> s.make(20));
-                });
-            }
+                }
 
-            @Override
-            protected void exit() {
-                exitAt(10);
-            }
-        };
+                @Override
+                protected void exit() {
+                    exitAt(10);
+                }
+            };
+        });
 
         TradingScenario scenario = latest();
         assert scenario.profit(market.latestPrice()).is(0);
@@ -334,20 +334,20 @@ class TraderTest extends TraderTestSupport {
 
     @Test
     void lossSell() {
-        new TradingScenario() {
+        when(now(), v -> {
+            return new TradingScenario() {
 
-            @Override
-            protected void entry() {
-                when(now(), () -> {
+                @Override
+                protected void entry() {
                     entry(Direction.SELL, 2, s -> s.make(10));
-                });
-            }
+                }
 
-            @Override
-            protected void exit() {
-                exitAt(20);
-            }
-        };
+                @Override
+                protected void exit() {
+                    exitAt(20);
+                }
+            };
+        });
 
         TradingScenario scenario = latest();
         assert scenario.profit(market.latestPrice()).is(0);

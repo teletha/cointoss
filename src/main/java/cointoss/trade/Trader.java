@@ -100,7 +100,7 @@ public abstract class Trader {
      * @param timing
      * @param builder
      */
-    protected final <T> void when3(Signal<T> timing, Function<T, TradingScenario> builder) {
+    protected final <T> void when(Signal<T> timing, Function<T, TradingScenario> builder) {
         if (timing == null || builder == null) {
             return;
         }
@@ -109,9 +109,11 @@ public abstract class Trader {
             TradingScenario entry = builder.apply(value);
 
             if (entry != null) {
-                entries.add(entry);
-
                 entry.entry();
+
+                if (entry.entries.isEmpty() == false) {
+                    entries.add(entry);
+                }
             }
         }));
     }
@@ -223,9 +225,6 @@ public abstract class Trader {
             observeExitExecutedSize().take(size -> size.is(entryExecutedSize)).first().to(() -> {
                 disposeExit();
             });
-
-            Trader.this.entries.add(this);
-            entry();
         }
 
         /**
@@ -290,34 +289,6 @@ public abstract class Trader {
             ZonedDateTime end = exits.last().map(o -> o.terminationTime).or(market.service.now());
 
             return Duration.between(start, end);
-        }
-
-        /**
-         * Set up entry at your timing.
-         * 
-         * @param <T>
-         * @param timing
-         * @param builder
-         */
-        protected final <T> void when(Signal<T> timing, Consumer<T> builder) {
-            if (timing == null || builder == null) {
-                return;
-            }
-
-            disposer.add(timing.takeWhile(v -> enable.get()).to(value -> {
-                builder.accept(value);
-            }));
-        }
-
-        /**
-         * Set up entry at your timing.
-         * 
-         * @param <T>
-         * @param timing
-         * @param builder
-         */
-        protected final <T> void when(Signal<T> timing, Runnable builder) {
-            when(timing, t -> builder.run());
         }
 
         /**
@@ -573,7 +544,7 @@ public abstract class Trader {
         public String toString() {
             ZonedDateTime start = entries.first().map(o -> o.creationTime).or(market.service.now());
 
-            StringBuilder builder = new StringBuilder("Entry ").append(directional).append(" ").append(start).append("\r\n");
+            StringBuilder builder = new StringBuilder("Scenario ").append(directional).append(" ").append(start).append("\r\n");
             format(builder, "IN", entries, entryPrice, entrySize, entryExecutedSize, calculateCanceledSize(entries));
             format(builder, "OUT", exits, exitPrice, exitSize, exitExecutedSize, calculateCanceledSize(exits));
             return builder.toString();
@@ -591,10 +562,11 @@ public abstract class Trader {
                     .append("\tprice ")
                     .append(price.scale(market.service.setting.baseCurrencyScaleSize))
                     .append("\t size ")
-                    .append(executedSize + "/" + size.minus(canceledSize) + "(" + canceledSize + ")")
-                    .append("\t ")
-                    .append(orders)
-                    .append("\r\n");
+                    .append(executedSize + "/" + size.minus(canceledSize) + "(" + canceledSize + ")\r\n");
+
+            for (Order order : orders) {
+                builder.append("\t\t ").append(order).append("\r\n");
+            }
         }
     }
 }
