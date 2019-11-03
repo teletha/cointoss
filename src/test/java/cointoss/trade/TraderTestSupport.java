@@ -49,29 +49,29 @@ public abstract class TraderTestSupport extends Trader {
         return market.service.now().plusSeconds(delay);
     }
 
-    protected final void entry(Execution entry) {
-        when(now(), v -> new TradingScenario(entry) {
+    protected final void entry(Execution e) {
+        when(now(), v -> new TradingScenario() {
 
             @Override
             protected void entry() {
-                entry(entry.size, Orderable::take);
+                entry(e, e.size, Orderable::take);
             }
         });
-        market.perform(entry);
+        market.perform(e);
     }
 
     /**
      * Shorthand method to entry and exit.
      * 
-     * @param entry
+     * @param eentry
      * @param exit
      */
-    protected final void entryAndExit(Execution entry, Execution exit) {
-        when(now(), v -> new TradingScenario(entry) {
+    protected final void entryAndExit(Execution e, Execution exit) {
+        when(now(), v -> new TradingScenario() {
 
             @Override
             protected void entry() {
-                entry(entry.size, Orderable::take);
+                entry(e, e.size, Orderable::take);
             }
 
             /**
@@ -83,7 +83,7 @@ public abstract class TraderTestSupport extends Trader {
             }
         });
 
-        market.perform(entry);
+        market.perform(e);
         market.perform(exit);
         market.perform(exit);
     }

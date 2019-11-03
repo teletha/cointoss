@@ -193,11 +193,11 @@ public class BackTestView extends View implements Analyzer {
             super(market);
 
             when(market.tickers.of(TickSpan.Hour4).add.skip(1).take(1), tick -> {
-                return new TradingScenario(Direction.random()) {
+                return new TradingScenario() {
 
                     @Override
                     protected void entry() {
-                        entry(3, s -> s.make(market.tickers.latest.v.price));
+                        entry(Direction.random(), 3, s -> s.make(market.tickers.latest.v.price));
                     }
 
                     /**
@@ -205,8 +205,8 @@ public class BackTestView extends View implements Analyzer {
                      */
                     @Override
                     protected void exit() {
-                        exitAt(entryPrice.plus(direction, 5000));
-                        exitAt(entryPrice.minus(direction, 5000));
+                        exitAt(entryPrice.plus(this, 5000));
+                        exitAt(entryPrice.minus(this, 5000));
                         exitAfter(15, TimeUnit.MINUTES);
                     }
                 };

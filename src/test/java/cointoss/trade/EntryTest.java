@@ -40,10 +40,10 @@ class EntryTest extends TraderTestSupport {
 
     @Test
     void isEntryTerminated() {
-        when(now(), v -> new TradingScenario(Direction.BUY) {
+        when(now(), v -> new TradingScenario() {
             @Override
             protected void entry() {
-                entry(1, s -> s.make(10));
+                entry(Direction.BUY, 1, s -> s.make(10));
             }
         });
 
@@ -59,10 +59,10 @@ class EntryTest extends TraderTestSupport {
 
     @Test
     void isExitTerminated() {
-        when(now(), v -> new TradingScenario(Direction.BUY) {
+        when(now(), v -> new TradingScenario() {
             @Override
             protected void entry() {
-                entry(1, s -> s.make(10));
+                entry(Direction.BUY, 1, s -> s.make(10));
             }
 
             @Override
@@ -87,10 +87,10 @@ class EntryTest extends TraderTestSupport {
 
     @Test
     void entryWithMultipleExecutionAndExitAtPrice() {
-        when(now(), v -> new TradingScenario(Direction.BUY) {
+        when(now(), v -> new TradingScenario() {
             @Override
             protected void entry() {
-                entry(1, s -> s.make(10));
+                entry(Direction.BUY, 1, s -> s.make(10));
             }
 
             @Override
@@ -113,10 +113,10 @@ class EntryTest extends TraderTestSupport {
     @Test
     @PowerAssertOff
     void exitAndStop() {
-        when(now(), v -> new TradingScenario(Direction.BUY) {
+        when(now(), v -> new TradingScenario() {
             @Override
             protected void entry() {
-                entry(1, s -> s.make(10));
+                entry(Direction.BUY, 1, s -> s.make(10));
             }
 
             @Override
@@ -152,11 +152,11 @@ class EntryTest extends TraderTestSupport {
 
     @Test
     void imcompletedEntryTakerWillNotStopExitTakerInExclusiveExecutionMarketService() {
-        when(now(), v -> new TradingScenario(Direction.BUY) {
+        when(now(), v -> new TradingScenario() {
 
             @Override
             protected void entry() {
-                entry(1, s -> s.take());
+                entry(Direction.BUY, 1, s -> s.take());
             }
 
             @Override
@@ -196,11 +196,11 @@ class EntryTest extends TraderTestSupport {
     void imcompletedEntryTakerWillNotStopExitTakerInNonExclusiveExecutionMarketService() {
         market.service.exclusiveExecution = false;
 
-        when(now(), v -> new TradingScenario(Direction.BUY) {
+        when(now(), v -> new TradingScenario() {
 
             @Override
             protected void entry() {
-                entry(1, s -> s.take());
+                entry(Direction.BUY, 1, s -> s.take());
             }
 
             @Override

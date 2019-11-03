@@ -22,11 +22,11 @@ class TraderTest extends TraderTestSupport {
     @Test
     void entryBuy() {
         when(now(), v -> {
-            return new TradingScenario(Direction.BUY) {
+            return new TradingScenario() {
 
                 @Override
                 protected void entry() {
-                    entry(1, s -> s.make(10));
+                    entry(Direction.BUY, 1, s -> s.make(10));
                 }
             };
         });
@@ -48,11 +48,11 @@ class TraderTest extends TraderTestSupport {
     @Test
     void entrySell() {
         when(now(), v -> {
-            return new TradingScenario(Direction.SELL) {
+            return new TradingScenario() {
 
                 @Override
                 protected void entry() {
-                    entry(1, s -> s.make(10));
+                    entry(Direction.SELL, 1, s -> s.make(10));
                 }
             };
         });
@@ -74,11 +74,11 @@ class TraderTest extends TraderTestSupport {
     @Test
     void exitMakeAtPrice() {
         when(now(), v -> {
-            return new TradingScenario(Direction.BUY) {
+            return new TradingScenario() {
 
                 @Override
                 protected void entry() {
-                    entry(1, s -> s.make(10));
+                    entry(Direction.BUY, 1, s -> s.make(10));
                 }
 
                 @Override
@@ -118,11 +118,11 @@ class TraderTest extends TraderTestSupport {
     @Test
     void exitTake() {
         when(now(), v -> {
-            return new TradingScenario(Direction.BUY) {
+            return new TradingScenario() {
 
                 @Override
                 protected void entry() {
-                    entry(1, s -> s.make(10));
+                    entry(Direction.BUY, 1, s -> s.make(10));
                 }
 
                 @Override
@@ -153,11 +153,11 @@ class TraderTest extends TraderTestSupport {
     @Test
     void exitWillStopAllEntries() {
         when(now(), v -> {
-            return new TradingScenario(Direction.BUY) {
+            return new TradingScenario() {
 
                 @Override
                 protected void entry() {
-                    entry(3, s -> s.make(10));
+                    entry(Direction.BUY, 3, s -> s.make(10));
                 }
 
                 @Override
@@ -189,11 +189,11 @@ class TraderTest extends TraderTestSupport {
     @Test
     void profitBuy() {
         when(now(), v -> {
-            return new TradingScenario(Direction.BUY) {
+            return new TradingScenario() {
 
                 @Override
                 protected void entry() {
-                    entry(3, s -> s.make(10));
+                    entry(Direction.BUY, 3, s -> s.make(10));
                 }
 
                 @Override
@@ -237,11 +237,11 @@ class TraderTest extends TraderTestSupport {
     @Test
     void profitSell() {
         when(now(), v -> {
-            return new TradingScenario(Direction.SELL) {
+            return new TradingScenario() {
 
                 @Override
                 protected void entry() {
-                    entry(3, s -> s.make(20));
+                    entry(Direction.SELL, 3, s -> s.make(20));
                 }
 
                 @Override
@@ -285,11 +285,11 @@ class TraderTest extends TraderTestSupport {
     @Test
     void lossBuy() {
         when(now(), v -> {
-            return new TradingScenario(Direction.BUY) {
+            return new TradingScenario() {
 
                 @Override
                 protected void entry() {
-                    entry(2, s -> s.make(20));
+                    entry(Direction.BUY, 2, s -> s.make(20));
                 }
 
                 @Override
@@ -335,11 +335,11 @@ class TraderTest extends TraderTestSupport {
     @Test
     void lossSell() {
         when(now(), v -> {
-            return new TradingScenario(Direction.SELL) {
+            return new TradingScenario() {
 
                 @Override
                 protected void entry() {
-                    entry(2, s -> s.make(10));
+                    entry(Direction.SELL, 2, s -> s.make(10));
                 }
 
                 @Override

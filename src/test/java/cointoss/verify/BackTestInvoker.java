@@ -39,26 +39,21 @@ public class BackTestInvoker {
             super(market);
 
             when(market.tickers.of(TickSpan.Second5).add.skip(12), tick -> {
-                Indicator indicator = new Indicator();
-
-                if (indicator.diff.isLessThan(8)) {
-                    return null;
-                }
-
-                return new TradingScenario(indicator.direction) {
+                return new TradingScenario() {
 
                     @Override
                     protected void entry() {
-                        entry(0.1, s -> s.make(market.latestPrice().minus(direction, 150)));
+                        Indicator indicator = new Indicator();
+
+                        if (indicator.diff.isGreaterThan(8)) {
+                            entry(indicator.direction, 0.1, s -> s.make(market.latestPrice().minus(indicator.direction, 150)));
+                        }
                     }
 
-                    /**
-                     * {@inheritDoc}
-                     */
                     @Override
                     protected void exit() {
-                        exitAt(entryPrice.plus(direction, 2000));
-                        exitAt(entryPrice.minus(direction, 1400));
+                        exitAt(entryPrice.plus(this, 2000));
+                        exitAt(entryPrice.minus(this, 1400));
                     }
                 };
             });
