@@ -28,7 +28,25 @@ public class BackTestInvoker {
                 .end(2019, 8, 13)
                 .initialBaseCurrency(3000000)
                 .exclusiveExecution(true)
-                .runs(market -> List.of(new Sample(market)));
+                .runs2(market -> List.of(new Scenario() {
+
+                    @Override
+                    protected void entry() {
+                        when(market.tickers.of(TickSpan.Second5).add.skip(12), tick -> {
+                            Indicator indicator = new Indicator(market);
+
+                            if (indicator.diff.isGreaterThan(8)) {
+                                entry(indicator.direction, 0.1, s -> s.make(market.latestPrice().minus(indicator.direction, 150)));
+                            }
+                        });
+                    }
+
+                    @Override
+                    protected void exit() {
+                        exitAt(entryPrice.plus(this, 2000));
+                        exitAt(entryPrice.minus(this, 1400));
+                    }
+                }));
     }
 
     /**
@@ -43,7 +61,7 @@ public class BackTestInvoker {
 
                 @Override
                 protected void entry() {
-                    Indicator indicator = new Indicator();
+                    Indicator indicator = new Indicator(market);
 
                     if (indicator.diff.isGreaterThan(8)) {
                         entry(indicator.direction, 0.1, s -> s.make(market.latestPrice().minus(indicator.direction, 150)));
@@ -57,29 +75,29 @@ public class BackTestInvoker {
                 }
             });
         }
+    }
 
-        private class Indicator {
+    private static class Indicator {
 
-            Num buyVolume = Num.ZERO;
+        Num buyVolume = Num.ZERO;
 
-            Num sellVolume = Num.ZERO;
+        Num sellVolume = Num.ZERO;
 
-            Direction direction;
+        Direction direction;
 
-            Num diff;
+        Num diff;
 
-            private Indicator() {
-                Tick t = market.tickers.of(TickSpan.Second5).last();
+        private Indicator(Market market) {
+            Tick t = market.tickers.of(TickSpan.Second5).last();
 
-                for (int i = 12; 0 < i; i--) {
-                    buyVolume = buyVolume.plus(t.buyVolume());
-                    sellVolume = sellVolume.plus(t.sellVolume());
-                    t = t.previous;
-                }
-                direction = buyVolume.isGreaterThan(sellVolume) ? Direction.BUY : Direction.SELL;
-
-                diff = buyVolume.minus(sellVolume).abs();
+            for (int i = 12; 0 < i; i--) {
+                buyVolume = buyVolume.plus(t.buyVolume());
+                sellVolume = sellVolume.plus(t.sellVolume());
+                t = t.previous;
             }
+            direction = buyVolume.isGreaterThan(sellVolume) ? Direction.BUY : Direction.SELL;
+
+            diff = buyVolume.minus(sellVolume).abs();
         }
     }
 }

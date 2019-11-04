@@ -21,6 +21,7 @@ import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.analyze.Analyzer;
 import cointoss.analyze.ConsoleAnalyzer;
+import cointoss.trade.Scenario;
 import cointoss.trade.Trader;
 import cointoss.trade.TradingLog;
 import cointoss.util.Chrono;
@@ -174,6 +175,50 @@ interface BackTestModel {
         LocalDateTime end = LocalDateTime.now();
 
         for (Trader trader : traders) {
+            TradingLog log = trader.log();
+            log.duration = Duration.between(start, end);
+            logs.add(log);
+        }
+
+        if (visualizer != null) {
+            visualizer.analyze(market, logs);
+        }
+    }
+
+    /**
+     * Run with {@link Trader}s.
+     * 
+     * @param traderBuilder
+     * @return
+     */
+    default void runs2(Function<Market, List<Scenario>> traderBuilder) {
+        runs2(traderBuilder, new ConsoleAnalyzer());
+    }
+
+    /**
+     * Run with {@link Trader}s.
+     * 
+     * @param traderBuilder
+     * @return
+     */
+    default void runs2(Function<Market, List<Scenario>> traderBuilder, Analyzer visualizer) {
+        VerifiableMarket market = new VerifiableMarket(service());
+        market.service.exclusiveExecution = exclusiveExecution();
+        market.service.baseCurrency = initialBaseCurrency();
+        market.service.targetCurrency = initialTargetCurrency();
+
+        List<TradingLog> logs = new ArrayList();
+        List<Scenario> traders = traderBuilder.apply(market);
+
+        for (Scenario scenario : traders) {
+            scenario.activate(market);
+        }
+
+        LocalDateTime start = LocalDateTime.now();
+        market.readLog(log -> log.range(start(), end()).effect(e -> market.perform(e)));
+        LocalDateTime end = LocalDateTime.now();
+
+        for (Scenario trader : traders) {
             TradingLog log = trader.log();
             log.duration = Duration.between(start, end);
             logs.add(log);
