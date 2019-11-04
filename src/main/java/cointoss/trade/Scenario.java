@@ -424,7 +424,7 @@ public abstract class Scenario extends EntryStatus implements Directional {
     private Object value;
 
     /** All managed entries. */
-    private final LinkedList<Scenario> scenarios = new LinkedList<>();
+    final LinkedList<Scenario> scenarios = new LinkedList<>();
 
     /** The disposer manager. */
     private final Disposable disposer = Disposable.empty();
