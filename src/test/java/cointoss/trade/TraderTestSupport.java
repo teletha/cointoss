@@ -13,8 +13,31 @@ import java.time.ZonedDateTime;
 
 import cointoss.execution.Execution;
 import cointoss.order.OrderStrategy.Orderable;
+import cointoss.verify.VerifiableMarket;
+import kiss.I;
+import kiss.Signal;
 
-public abstract class TraderTestSupport {
+public abstract class TraderTestSupport extends Trader {
+
+    protected VerifiableMarket market;
+
+    /**
+     * @param provider
+     */
+    public TraderTestSupport() {
+        super(new VerifiableMarket());
+
+        this.market = (VerifiableMarket) super.market;
+    }
+
+    /**
+     * Timing function.
+     * 
+     * @return
+     */
+    protected final Signal<?> now() {
+        return I.signal("ok");
+    }
 
     /**
      * Config delay.
@@ -26,31 +49,46 @@ public abstract class TraderTestSupport {
         return market.service.now().plusSeconds(delay);
     }
 
+    protected final void entry(Execution e) {
+        when(now(), v -> new Scenario() {
+
+            @Override
+            protected void entry() {
+                entry(e, e.size, Orderable::take);
+            }
+
+            @Override
+            protected void exit() {
+            }
+        });
+        market.perform(e);
+    }
+
     /**
      * Shorthand method to entry and exit.
      * 
      * @param eentry
      * @param exit
      */
-    protected final VerifiableScenario entryAndExit(Execution e, Execution exit) {
-        VerifiableScenario verifiable = new VerifiableScenario() {
+    protected final void entryAndExit(Execution e, Execution exit) {
+        when(now(), v -> new Scenario() {
+
             @Override
             protected void entry() {
-                when(now(), v -> {
-                    entry(e, e.size, Orderable::take);
-                });
+                entry(e, e.size, Orderable::take);
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             protected void exit() {
                 exitAt(exit.price, Orderable::take);
             }
-        };
+        });
 
-        verifiable.market.perform(e);
-        verifiable.market.perform(exit);
-        verifiable.market.perform(exit);
-
-        return verifiable;
+        market.perform(e);
+        market.perform(exit);
+        market.perform(exit);
     }
 }

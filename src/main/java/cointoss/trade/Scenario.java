@@ -13,23 +13,15 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
-import java.time.temporal.TemporalUnit;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
 
 import com.google.common.annotations.VisibleForTesting;
 
 import cointoss.Direction;
 import cointoss.Directional;
 import cointoss.Market;
-import cointoss.execution.Execution;
 import cointoss.order.Order;
 import cointoss.order.OrderState;
 import cointoss.order.OrderStrategy.Makable;
@@ -417,113 +409,5 @@ public abstract class Scenario extends EntryStatus implements Directional {
         for (Order order : orders) {
             builder.append("\t\t ").append(order).append("\r\n");
         }
-    }
-
-    private Kind kind = Kind.RootEntry;
-
-    private Object value;
-
-    /** All managed entries. */
-    final LinkedList<Scenario> scenarios = new LinkedList<>();
-
-    /** The disposer manager. */
-    private final Disposable disposer = Disposable.empty();
-
-    protected final <T> void when(Signal<T> timing, Consumer<T> process) {
-        switch (kind) {
-        case RootEntry:
-            disposer.add(timing.to(v -> {
-                Scenario sub = I.make(getClass());
-                sub.market = market;
-                sub.funds = funds;
-                sub.kind = Kind.ScenarioEntry;
-                sub.value = v;
-                sub.entry();
-
-                if (!sub.entries.isEmpty()) {
-                    scenarios.add(sub);
-                }
-            }));
-            break;
-
-        case ScenarioEntry:
-            process.accept((T) value);
-            break;
-
-        default:
-            break;
-        }
-    }
-
-    /**
-     * <p>
-     * Create rule which the specified condition is fulfilled during the specified duration.
-     * </p>
-     * 
-     * @param time
-     * @param unit
-     * @param condition
-     * @return
-     */
-    protected final Predicate<Execution> keep(int time, TemporalUnit unit, BooleanSupplier condition) {
-        return keep(time, unit, e -> condition.getAsBoolean());
-    }
-
-    /**
-     * <p>
-     * Create rule which the specified condition is fulfilled during the specified duration.
-     * </p>
-     * 
-     * @param time
-     * @param unit
-     * @param condition
-     * @return
-     */
-    protected final Predicate<Execution> keep(int time, TemporalUnit unit, Predicate<Execution> condition) {
-        AtomicBoolean testing = new AtomicBoolean();
-        AtomicReference<ZonedDateTime> last = new AtomicReference(ZonedDateTime.now());
-
-        return e -> {
-            if (condition.test(e)) {
-                if (testing.get()) {
-                    if (e.date.isAfter(last.get())) {
-                        testing.set(false);
-                        return true;
-                    }
-                } else {
-                    testing.set(true);
-                    last.set(e.date.plus(time, unit).minusNanos(1));
-                }
-            } else {
-                if (testing.get()) {
-                    if (e.date.isAfter(last.get())) {
-                        testing.set(false);
-                    }
-                }
-            }
-            return false;
-        };
-    }
-
-    public void activate(Market market) {
-        this.market = Objects.requireNonNull(market);
-        this.funds = FundManager.with.totalAssets(market.service.baseCurrency().first().to().v);
-        entry();
-    }
-
-    /**
-     * Create the trading log snapshot.
-     * 
-     * @return
-     */
-    public TradingLog log() {
-        return new TradingLog(market, funds, scenarios);
-    }
-
-    /**
-     * 
-     */
-    private enum Kind {
-        RootEntry, RootExit, ScenarioEntry, ScenarioExit;
     }
 }
