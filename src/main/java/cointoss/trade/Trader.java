@@ -23,7 +23,6 @@ import cointoss.Market;
 import cointoss.execution.Execution;
 import kiss.Disposable;
 import kiss.Signal;
-import kiss.Signaling;
 
 public abstract class Trader {
 
@@ -32,18 +31,6 @@ public abstract class Trader {
 
     /** The fund management. */
     protected final FundManager funds;
-
-    /** The signal observers. */
-    final Signaling<Boolean> completeEntries = new Signaling();
-
-    /** The trade related signal. */
-    protected final Signal<Boolean> completingEntry = completeEntries.expose;
-
-    /** The signal observers. */
-    final Signaling<Boolean> completeExits = new Signaling();
-
-    /** The trade related signal. */
-    protected final Signal<Boolean> completingExit = completeExits.expose;
 
     /** All managed entries. */
     final LinkedList<Scenario> entries = new LinkedList<>();
@@ -59,7 +46,7 @@ public abstract class Trader {
      * 
      * @param market A target market to deal.
      */
-    protected Trader(Market market) {
+    public Trader(Market market) {
         this.market = Objects.requireNonNull(market);
         this.funds = FundManager.with.totalAssets(market.service.baseCurrency().first().to().v);
     }
@@ -70,8 +57,9 @@ public abstract class Trader {
      * @param <T>
      * @param timing
      * @param builder
+     * @return Chainable API.
      */
-    protected final <T> void when(Signal<T> timing, Function<T, Scenario> builder) {
+    public final <T> Trader when(Signal<T> timing, Function<T, Scenario> builder) {
         Objects.requireNonNull(timing);
         Objects.requireNonNull(builder);
 
@@ -88,33 +76,39 @@ public abstract class Trader {
                 }
             }
         }));
+        return this;
     }
 
     /**
-     * <p>
+     * Create the snapshot of trading log.
+     * 
+     * @return
+     */
+    public final TradingLog log() {
+        return new TradingLog(market, funds, entries);
+    }
+
+    /**
      * Create rule which the specified condition is fulfilled during the specified duration.
-     * </p>
      * 
      * @param time
      * @param unit
      * @param condition
      * @return
      */
-    protected final Predicate<Execution> keep(int time, TemporalUnit unit, BooleanSupplier condition) {
+    public static final Predicate<Execution> keep(int time, TemporalUnit unit, BooleanSupplier condition) {
         return keep(time, unit, e -> condition.getAsBoolean());
     }
 
     /**
-     * <p>
      * Create rule which the specified condition is fulfilled during the specified duration.
-     * </p>
      * 
      * @param time
      * @param unit
      * @param condition
      * @return
      */
-    protected final Predicate<Execution> keep(int time, TemporalUnit unit, Predicate<Execution> condition) {
+    public static final Predicate<Execution> keep(int time, TemporalUnit unit, Predicate<Execution> condition) {
         AtomicBoolean testing = new AtomicBoolean();
         AtomicReference<ZonedDateTime> last = new AtomicReference(ZonedDateTime.now());
 
@@ -138,14 +132,5 @@ public abstract class Trader {
             }
             return false;
         };
-    }
-
-    /**
-     * Create the trading log snapshot.
-     * 
-     * @return
-     */
-    public TradingLog log() {
-        return new TradingLog(market, funds, entries);
     }
 }

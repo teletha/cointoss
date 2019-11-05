@@ -9,18 +9,17 @@
  */
 package cointoss.trade;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.time.Duration;
 
 import org.junit.jupiter.api.Test;
 
-import antibug.powerassert.PowerAssertOff;
 import cointoss.Direction;
 import cointoss.execution.Execution;
 import cointoss.order.Order;
 
-class EntryTest extends TraderTestSupport {
+class ScenarioTest extends TraderTestSupport {
 
     @Test
     void holdTime() {
@@ -115,7 +114,6 @@ class EntryTest extends TraderTestSupport {
     }
 
     @Test
-    @PowerAssertOff
     void exitAndStop() {
         when(now(), v -> new Scenario() {
             @Override

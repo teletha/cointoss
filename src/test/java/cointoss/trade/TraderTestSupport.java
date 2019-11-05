@@ -87,9 +87,6 @@ public abstract class TraderTestSupport extends Trader {
                 entry(e, e.size, Orderable::take);
             }
 
-            /**
-             * {@inheritDoc}
-             */
             @Override
             protected void exit() {
                 exitAt(exit.price, Orderable::take);
