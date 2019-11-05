@@ -46,7 +46,7 @@ public abstract class Trader {
     protected final Signal<Boolean> completingExit = completeExits.expose;
 
     /** All managed entries. */
-    private final LinkedList<Scenario> entries = new LinkedList<>();
+    final LinkedList<Scenario> entries = new LinkedList<>();
 
     /** The alive state. */
     private final AtomicBoolean enable = new AtomicBoolean(true);
@@ -65,15 +65,6 @@ public abstract class Trader {
     }
 
     /**
-     * Return the latest completed or canceled entry.
-     * 
-     * @return
-     */
-    protected final Scenario latest() {
-        return entries.peekLast();
-    }
-
-    /**
      * Set up entry at your timing.
      * 
      * @param <T>
@@ -81,9 +72,8 @@ public abstract class Trader {
      * @param builder
      */
     protected final <T> void when(Signal<T> timing, Function<T, Scenario> builder) {
-        if (timing == null || builder == null) {
-            return;
-        }
+        Objects.requireNonNull(timing);
+        Objects.requireNonNull(builder);
 
         disposer.add(timing.takeWhile(v -> enable.get()).to(value -> {
             Scenario scenario = builder.apply(value);

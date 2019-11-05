@@ -9,7 +9,7 @@
  */
 package cointoss.trade;
 
-import static java.time.temporal.ChronoUnit.SECONDS;
+import static java.time.temporal.ChronoUnit.*;
 
 import org.junit.jupiter.api.Test;
 
@@ -33,18 +33,23 @@ class TraderTest extends TraderTestSupport {
             }
         });
 
-        Scenario scenario = latest();
-        assert scenario != null;
-        assert scenario.isBuy();
-        assert scenario.entrySize.is(1);
-        assert scenario.entryExecutedSize.is(0);
-        assert scenario.entryPrice.is(0);
+        Scenario s = latest();
+        assert s.isBuy();
+        assert s.entrySize.is(1);
+        assert s.entryExecutedSize.is(0);
+        assert s.entryPrice.is(0);
 
         // execute entry
-        market.perform(Execution.with.buy(1).price(9));
-        assert scenario.entrySize.is(1);
-        assert scenario.entryExecutedSize.is(1);
-        assert scenario.entryPrice.is(10);
+        market.perform(Execution.with.buy(0.5).price(9));
+        assert s.entrySize.is(1);
+        assert s.entryExecutedSize.is(0.5);
+        assert s.entryPrice.is(10);
+
+        // execute entry
+        market.perform(Execution.with.buy(0.5).price(9));
+        assert s.entrySize.is(1);
+        assert s.entryExecutedSize.is(1);
+        assert s.entryPrice.is(10);
     }
 
     @Test
@@ -61,18 +66,23 @@ class TraderTest extends TraderTestSupport {
             }
         });
 
-        Scenario scenario = latest();
-        assert scenario != null;
-        assert scenario.isSell();
-        assert scenario.entrySize.is(1);
-        assert scenario.entryExecutedSize.is(0);
-        assert scenario.entryPrice.is(0);
+        Scenario s = latest();
+        assert s.isSell();
+        assert s.entrySize.is(1);
+        assert s.entryExecutedSize.is(0);
+        assert s.entryPrice.is(0);
 
         // execute entry
-        market.perform(Execution.with.buy(1).price(11));
-        assert scenario.entrySize.is(1);
-        assert scenario.entryExecutedSize.is(1);
-        assert scenario.entryPrice.is(10);
+        market.perform(Execution.with.buy(0.5).price(11));
+        assert s.entrySize.is(1);
+        assert s.entryExecutedSize.is(0.5);
+        assert s.entryPrice.is(10);
+
+        // execute entry
+        market.perform(Execution.with.buy(0.5).price(11));
+        assert s.entrySize.is(1);
+        assert s.entryExecutedSize.is(1);
+        assert s.entryPrice.is(10);
     }
 
     @Test
@@ -90,31 +100,31 @@ class TraderTest extends TraderTestSupport {
             }
         });
 
-        Scenario scenario = latest();
+        Scenario s = latest();
 
         // execute entry
         market.perform(Execution.with.buy(1).price(9));
         market.elapse(1, SECONDS);
-        assert scenario.entrySize.is(1);
-        assert scenario.entryExecutedSize.is(1);
-        assert scenario.entryPrice.is(10);
+        assert s.entrySize.is(1);
+        assert s.entryExecutedSize.is(1);
+        assert s.entryPrice.is(10);
 
         // exit entry
-        assert scenario.exitSize.is(1);
-        assert scenario.exitExecutedSize.is(0);
-        assert scenario.exitPrice.is(0);
+        assert s.exitSize.is(1);
+        assert s.exitExecutedSize.is(0);
+        assert s.exitPrice.is(0);
 
         // don't execute exit entry
         market.perform(Execution.with.buy(1).price(15));
-        assert scenario.exitSize.is(1);
-        assert scenario.exitExecutedSize.is(0);
-        assert scenario.exitPrice.is(0);
+        assert s.exitSize.is(1);
+        assert s.exitExecutedSize.is(0);
+        assert s.exitPrice.is(0);
 
         // execute exit entry
         market.perform(Execution.with.buy(1).price(21));
-        assert scenario.exitSize.is(1);
-        assert scenario.exitExecutedSize.is(1);
-        assert scenario.exitPrice.is(20);
+        assert s.exitSize.is(1);
+        assert s.exitExecutedSize.is(1);
+        assert s.exitPrice.is(20);
     }
 
     @Test
@@ -165,23 +175,23 @@ class TraderTest extends TraderTestSupport {
             }
         });
 
-        Scenario scenario = latest();
+        Scenario s = latest();
 
         // entry partially
         market.perform(Execution.with.buy(2).price(9));
         market.elapse(1, SECONDS);
-        assert scenario.isEntryTerminated() == false;
-        assert scenario.isExitTerminated() == false;
+        assert s.isEntryTerminated() == false;
+        assert s.isExitTerminated() == false;
 
         // exit pertially
         market.perform(Execution.with.buy(1).price(21));
-        assert scenario.isEntryTerminated();
-        assert scenario.isExitTerminated() == false;
+        assert s.isEntryTerminated();
+        assert s.isExitTerminated() == false;
 
         // exit all
         market.perform(Execution.with.buy(1).price(21));
-        assert scenario.isEntryTerminated();
-        assert scenario.isExitTerminated();
+        assert s.isEntryTerminated();
+        assert s.isExitTerminated();
     }
 
     @Test
@@ -199,35 +209,35 @@ class TraderTest extends TraderTestSupport {
             }
         });
 
-        Scenario scenario = latest();
-        assert scenario.profit(market.latestPrice()).is(0);
-        assert scenario.realizedProfit.is(0);
-        assert scenario.unrealizedProfit(market.latestPrice()).is(0);
+        Scenario s = latest();
+        assert s.profit(market.latestPrice()).is(0);
+        assert s.realizedProfit.is(0);
+        assert s.unrealizedProfit(market.latestPrice()).is(0);
 
         // entry partially
         market.perform(Execution.with.buy(2).price(9));
         market.elapse(1, SECONDS);
-        assert scenario.profit(market.latestPrice()).is(0);
-        assert scenario.realizedProfit.is(0);
-        assert scenario.unrealizedProfit(market.latestPrice()).is(0);
+        assert s.profit(market.latestPrice()).is(0);
+        assert s.realizedProfit.is(0);
+        assert s.unrealizedProfit(market.latestPrice()).is(0);
 
         // execute profit
         market.perform(Execution.with.buy(1).price(15));
-        assert scenario.profit(market.latestPrice()).is(10);
-        assert scenario.realizedProfit.is(0);
-        assert scenario.unrealizedProfit(market.latestPrice()).is(10);
+        assert s.profit(market.latestPrice()).is(10);
+        assert s.realizedProfit.is(0);
+        assert s.unrealizedProfit(market.latestPrice()).is(10);
 
         // exit partially
         market.perform(Execution.with.buy(1).price(21));
-        assert scenario.profit(market.latestPrice()).is(20);
-        assert scenario.realizedProfit.is(10);
-        assert scenario.unrealizedProfit(market.latestPrice()).is(10);
+        assert s.profit(market.latestPrice()).is(20);
+        assert s.realizedProfit.is(10);
+        assert s.unrealizedProfit(market.latestPrice()).is(10);
 
         // exit all
         market.perform(Execution.with.buy(1).price(21));
-        assert scenario.profit(market.latestPrice()).is(20);
-        assert scenario.realizedProfit.is(20);
-        assert scenario.unrealizedProfit(market.latestPrice()).is(0);
+        assert s.profit(market.latestPrice()).is(20);
+        assert s.realizedProfit.is(20);
+        assert s.unrealizedProfit(market.latestPrice()).is(0);
     }
 
     @Test
@@ -245,35 +255,35 @@ class TraderTest extends TraderTestSupport {
             }
         });
 
-        Scenario scenario = latest();
-        assert scenario.profit(market.latestPrice()).is(0);
-        assert scenario.realizedProfit.is(0);
-        assert scenario.unrealizedProfit(market.latestPrice()).is(0);
+        Scenario s = latest();
+        assert s.profit(market.latestPrice()).is(0);
+        assert s.realizedProfit.is(0);
+        assert s.unrealizedProfit(market.latestPrice()).is(0);
 
         // entry partially
         market.perform(Execution.with.buy(2).price(21));
         market.elapse(1, SECONDS);
-        assert scenario.profit(market.latestPrice()).is(0);
-        assert scenario.realizedProfit.is(0);
-        assert scenario.unrealizedProfit(market.latestPrice()).is(0);
+        assert s.profit(market.latestPrice()).is(0);
+        assert s.realizedProfit.is(0);
+        assert s.unrealizedProfit(market.latestPrice()).is(0);
 
         // execute profit
         market.perform(Execution.with.buy(1).price(15));
-        assert scenario.profit(market.latestPrice()).is(10);
-        assert scenario.realizedProfit.is(0);
-        assert scenario.unrealizedProfit(market.latestPrice()).is(10);
+        assert s.profit(market.latestPrice()).is(10);
+        assert s.realizedProfit.is(0);
+        assert s.unrealizedProfit(market.latestPrice()).is(10);
 
         // exit partially
         market.perform(Execution.with.buy(1).price(9));
-        assert scenario.profit(market.latestPrice()).is(20);
-        assert scenario.realizedProfit.is(10);
-        assert scenario.unrealizedProfit(market.latestPrice()).is(10);
+        assert s.profit(market.latestPrice()).is(20);
+        assert s.realizedProfit.is(10);
+        assert s.unrealizedProfit(market.latestPrice()).is(10);
 
         // exit all
         market.perform(Execution.with.buy(1).price(9));
-        assert scenario.profit(market.latestPrice()).is(20);
-        assert scenario.realizedProfit.is(20);
-        assert scenario.unrealizedProfit(market.latestPrice()).is(0);
+        assert s.profit(market.latestPrice()).is(20);
+        assert s.realizedProfit.is(20);
+        assert s.unrealizedProfit(market.latestPrice()).is(0);
     }
 
     @Test
@@ -291,37 +301,37 @@ class TraderTest extends TraderTestSupport {
             }
         });
 
-        Scenario scenario = latest();
-        assert scenario.profit(market.latestPrice()).is(0);
-        assert scenario.realizedProfit.is(0);
-        assert scenario.unrealizedProfit(market.latestPrice()).is(0);
+        Scenario s = latest();
+        assert s.profit(market.latestPrice()).is(0);
+        assert s.realizedProfit.is(0);
+        assert s.unrealizedProfit(market.latestPrice()).is(0);
 
         // entry partially
         market.perform(Execution.with.buy(2).price(19));
-        assert scenario.profit(market.latestPrice()).is(0);
-        assert scenario.realizedProfit.is(0);
-        assert scenario.unrealizedProfit(market.latestPrice()).is(0);
+        assert s.profit(market.latestPrice()).is(0);
+        assert s.realizedProfit.is(0);
+        assert s.unrealizedProfit(market.latestPrice()).is(0);
 
         // execute loss
         market.perform(Execution.with.buy(1).price(15));
-        assert scenario.profit(market.latestPrice()).is(-10);
-        assert scenario.realizedProfit.is(0);
-        assert scenario.unrealizedProfit(market.latestPrice()).is(-10);
+        assert s.profit(market.latestPrice()).is(-10);
+        assert s.realizedProfit.is(0);
+        assert s.unrealizedProfit(market.latestPrice()).is(-10);
 
         // activate stop loss
         market.perform(Execution.with.buy(1).price(10));
 
         // exit partially
         market.perform(Execution.with.buy(1).price(10));
-        assert scenario.profit(market.latestPrice()).is(-20);
-        assert scenario.realizedProfit.is(-10);
-        assert scenario.unrealizedProfit(market.latestPrice()).is(-10);
+        assert s.profit(market.latestPrice()).is(-20);
+        assert s.realizedProfit.is(-10);
+        assert s.unrealizedProfit(market.latestPrice()).is(-10);
 
         // exit all
         market.perform(Execution.with.buy(1).price(10));
-        assert scenario.profit(market.latestPrice()).is(-20);
-        assert scenario.realizedProfit.is(-20);
-        assert scenario.unrealizedProfit(market.latestPrice()).is(0);
+        assert s.profit(market.latestPrice()).is(-20);
+        assert s.realizedProfit.is(-20);
+        assert s.unrealizedProfit(market.latestPrice()).is(0);
     }
 
     @Test
@@ -339,37 +349,37 @@ class TraderTest extends TraderTestSupport {
             }
         });
 
-        Scenario scenario = latest();
-        assert scenario.profit(market.latestPrice()).is(0);
-        assert scenario.realizedProfit.is(0);
-        assert scenario.unrealizedProfit(market.latestPrice()).is(0);
+        Scenario s = latest();
+        assert s.profit(market.latestPrice()).is(0);
+        assert s.realizedProfit.is(0);
+        assert s.unrealizedProfit(market.latestPrice()).is(0);
 
         // entry partially
         market.perform(Execution.with.buy(2).price(11));
-        assert scenario.profit(market.latestPrice()).is(0);
-        assert scenario.realizedProfit.is(0);
-        assert scenario.unrealizedProfit(market.latestPrice()).is(0);
+        assert s.profit(market.latestPrice()).is(0);
+        assert s.realizedProfit.is(0);
+        assert s.unrealizedProfit(market.latestPrice()).is(0);
 
         // execute loss
         market.perform(Execution.with.buy(1).price(15));
-        assert scenario.profit(market.latestPrice()).is(-10);
-        assert scenario.realizedProfit.is(0);
-        assert scenario.unrealizedProfit(market.latestPrice()).is(-10);
+        assert s.profit(market.latestPrice()).is(-10);
+        assert s.realizedProfit.is(0);
+        assert s.unrealizedProfit(market.latestPrice()).is(-10);
 
         // activate stop loss
         market.perform(Execution.with.buy(1).price(20));
 
         // exit partially
         market.perform(Execution.with.buy(1).price(20));
-        assert scenario.profit(market.latestPrice()).is(-20);
-        assert scenario.realizedProfit.is(-10);
-        assert scenario.unrealizedProfit(market.latestPrice()).is(-10);
+        assert s.profit(market.latestPrice()).is(-20);
+        assert s.realizedProfit.is(-10);
+        assert s.unrealizedProfit(market.latestPrice()).is(-10);
 
         // exit all
         market.perform(Execution.with.buy(1).price(20));
-        assert scenario.profit(market.latestPrice()).is(-20);
-        assert scenario.realizedProfit.is(-20);
-        assert scenario.unrealizedProfit(market.latestPrice()).is(0);
+        assert s.profit(market.latestPrice()).is(-20);
+        assert s.realizedProfit.is(-20);
+        assert s.unrealizedProfit(market.latestPrice()).is(0);
     }
 
     @Test

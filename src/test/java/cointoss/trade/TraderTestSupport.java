@@ -31,6 +31,15 @@ public abstract class TraderTestSupport extends Trader {
     }
 
     /**
+     * Return the latest completed or canceled entry.
+     * 
+     * @return
+     */
+    protected final Scenario latest() {
+        return entries.peekLast();
+    }
+
+    /**
      * Timing function.
      * 
      * @return
