@@ -1,7 +1,7 @@
 package cointoss.trade;
 
 import cointoss.trade.EntryStatus;
-import cointoss.trade.EntryStatusModel;
+import cointoss.trade.ScenarioBaseModel;
 import cointoss.util.Num;
 import cointoss.util.ObservableNumProperty;
 import java.lang.Override;
@@ -15,10 +15,10 @@ import javax.annotation.processing.Generated;
 import kiss.Signal;
 
 /**
- * Generated model for {@link EntryStatusModel}.
+ * Generated model for {@link ScenarioBaseModel}.
  */
 @Generated("Icy Manipulator")
-public class EntryStatus extends EntryStatusModel {
+public class EntryStatus extends ScenarioBaseModel {
 
     /**
      * Deceive complier that the specified checked exception is unchecked exception.
