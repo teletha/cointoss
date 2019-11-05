@@ -19,7 +19,7 @@ import javax.annotation.processing.Generated;
  * Generated model for {@link BackTestModel}.
  */
 @Generated("Icy Manipulator")
-public class BackTest implements BackTestModel {
+public class BackTest extends BackTestModel {
 
     /**
      * Deceive complier that the specified checked exception is unchecked exception.
@@ -121,9 +121,9 @@ public class BackTest implements BackTestModel {
         this.service = null;
         this.start = null;
         this.end = null;
-        this.exclusiveExecution = BackTestModel.super.exclusiveExecution();
-        this.initialBaseCurrency = BackTestModel.super.initialBaseCurrency();
-        this.initialTargetCurrency = BackTestModel.super.initialTargetCurrency();
+        this.exclusiveExecution = super.exclusiveExecution();
+        this.initialBaseCurrency = super.initialBaseCurrency();
+        this.initialTargetCurrency = super.initialTargetCurrency();
     }
 
     /**
@@ -294,7 +294,7 @@ public class BackTest implements BackTestModel {
      */
     private final void setInitialBaseCurrency(Num value) {
         if (value == null) {
-            value = BackTestModel.super.initialBaseCurrency();
+            value = super.initialBaseCurrency();
         }
         try {
             initialBaseCurrencyUpdater.invoke(this, value);
@@ -330,7 +330,7 @@ public class BackTest implements BackTestModel {
      */
     private final void setInitialTargetCurrency(Num value) {
         if (value == null) {
-            value = BackTestModel.super.initialTargetCurrency();
+            value = super.initialTargetCurrency();
         }
         try {
             initialTargetCurrencyUpdater.invoke(this, value);

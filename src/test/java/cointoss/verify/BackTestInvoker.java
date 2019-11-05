@@ -9,8 +9,6 @@
  */
 package cointoss.verify;
 
-import java.util.List;
-
 import cointoss.Direction;
 import cointoss.Market;
 import cointoss.market.bitflyer.BitFlyer;
@@ -28,7 +26,8 @@ public class BackTestInvoker {
                 .end(2019, 8, 13)
                 .initialBaseCurrency(3000000)
                 .exclusiveExecution(true)
-                .runs(market -> List.of(new Sample(market)));
+                .trader(Sample::new)
+                .run();
     }
 
     /**

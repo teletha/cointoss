@@ -26,9 +26,10 @@ import cointoss.trade.TradingLog;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
 import icy.manipulator.Icy;
+import kiss.I;
 
 @Icy
-interface BackTestModel {
+abstract class BackTestModel {
 
     /**
      * Set the target market.
@@ -36,7 +37,7 @@ interface BackTestModel {
      * @return
      */
     @Icy.Property
-    MarketService service();
+    public abstract MarketService service();
 
     /**
      * Set the start date.
@@ -44,7 +45,7 @@ interface BackTestModel {
      * @return
      */
     @Icy.Property
-    ZonedDateTime start();
+    public abstract ZonedDateTime start();
 
     /**
      * Set the start date.
@@ -62,7 +63,7 @@ interface BackTestModel {
      * @return
      */
     @Icy.Property
-    ZonedDateTime end();
+    public abstract ZonedDateTime end();
 
     /**
      * Set the end date.
@@ -80,7 +81,7 @@ interface BackTestModel {
      * @return
      */
     @Icy.Property
-    default boolean exclusiveExecution() {
+    public boolean exclusiveExecution() {
         return true;
     }
 
@@ -90,7 +91,7 @@ interface BackTestModel {
      * @return
      */
     @Icy.Property
-    default Num initialBaseCurrency() {
+    public Num initialBaseCurrency() {
         return Num.ZERO;
     }
 
@@ -110,7 +111,7 @@ interface BackTestModel {
      * @return
      */
     @Icy.Property
-    default Num initialTargetCurrency() {
+    public Num initialTargetCurrency() {
         return Num.ZERO;
     }
 
@@ -124,50 +125,29 @@ interface BackTestModel {
         return Num.of(value);
     }
 
-    /**
-     * Run with {@link Trader}s.
-     * 
-     * @param traderBuilder
-     * @return
-     */
-    default void run(Function<Market, Trader> traderBuilder) {
-        run(traderBuilder, new ConsoleAnalyzer());
+    private List<Function<Market, Trader>> traders = new ArrayList();
+
+    public BackTest trader(Function<Market, Trader> trader) {
+        traders.add(trader);
+        return (BackTest) (Object) this;
     }
 
-    /**
-     * Run with {@link Trader}s.
-     * 
-     * @param traderBuilder
-     * @return
-     */
-    default void run(Function<Market, Trader> traderBuilder, Analyzer visualizer) {
-        runs(market -> List.of(traderBuilder.apply(market)), visualizer);
+    public void run() {
+        run(new ConsoleAnalyzer());
     }
 
-    /**
-     * Run with {@link Trader}s.
-     * 
-     * @param traderBuilder
-     * @return
-     */
-    default void runs(Function<Market, List<Trader>> traderBuilder) {
-        runs(traderBuilder, new ConsoleAnalyzer());
-    }
+    public void run(Analyzer analyzer) {
+        if (analyzer == null) {
+            analyzer = new ConsoleAnalyzer();
+        }
 
-    /**
-     * Run with {@link Trader}s.
-     * 
-     * @param traderBuilder
-     * @return
-     */
-    default void runs(Function<Market, List<Trader>> traderBuilder, Analyzer visualizer) {
         VerifiableMarket market = new VerifiableMarket(service());
         market.service.exclusiveExecution = exclusiveExecution();
         market.service.baseCurrency = initialBaseCurrency();
         market.service.targetCurrency = initialTargetCurrency();
 
         List<TradingLog> logs = new ArrayList();
-        List<Trader> traders = traderBuilder.apply(market);
+        List<Trader> traders = I.signal(this.traders).map(t -> t.apply(market)).toList();
 
         LocalDateTime start = LocalDateTime.now();
         market.readLog(log -> log.range(start(), end()).effect(e -> market.perform(e)));
@@ -178,9 +158,6 @@ interface BackTestModel {
             log.duration = Duration.between(start, end);
             logs.add(log);
         }
-
-        if (visualizer != null) {
-            visualizer.analyze(market, logs);
-        }
+        analyzer.analyze(market, logs);
     }
 }
