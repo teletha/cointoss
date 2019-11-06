@@ -29,7 +29,7 @@ import icy.manipulator.Icy;
 import kiss.I;
 
 @Icy
-abstract class BackTestModel {
+interface BackTestModel {
 
     /**
      * Set the target market.
@@ -37,7 +37,7 @@ abstract class BackTestModel {
      * @return
      */
     @Icy.Property
-    public abstract MarketService service();
+    MarketService service();
 
     /**
      * Set the start date.
@@ -45,7 +45,7 @@ abstract class BackTestModel {
      * @return
      */
     @Icy.Property
-    public abstract ZonedDateTime start();
+    ZonedDateTime start();
 
     /**
      * Set the start date.
@@ -63,7 +63,7 @@ abstract class BackTestModel {
      * @return
      */
     @Icy.Property
-    public abstract ZonedDateTime end();
+    ZonedDateTime end();
 
     /**
      * Set the end date.
@@ -76,12 +76,20 @@ abstract class BackTestModel {
     }
 
     /**
+     * Set the end date.
+     * 
+     * @return
+     */
+    @Icy.Property
+    List<Function<Market, Trader>> traders();
+
+    /**
      * Set the emulatiom mode.
      * 
      * @return
      */
     @Icy.Property
-    public boolean exclusiveExecution() {
+    default boolean exclusiveExecution() {
         return true;
     }
 
@@ -91,7 +99,7 @@ abstract class BackTestModel {
      * @return
      */
     @Icy.Property
-    public Num initialBaseCurrency() {
+    default Num initialBaseCurrency() {
         return Num.ZERO;
     }
 
@@ -111,7 +119,7 @@ abstract class BackTestModel {
      * @return
      */
     @Icy.Property
-    public Num initialTargetCurrency() {
+    default Num initialTargetCurrency() {
         return Num.ZERO;
     }
 
@@ -125,18 +133,19 @@ abstract class BackTestModel {
         return Num.of(value);
     }
 
-    private List<Function<Market, Trader>> traders = new ArrayList();
-
-    public BackTest trader(Function<Market, Trader> trader) {
-        traders.add(trader);
-        return (BackTest) (Object) this;
-    }
-
-    public void run() {
+    /**
+     * Activate test with {@link ConsoleAnalyzer}.
+     */
+    default void run() {
         run(new ConsoleAnalyzer());
     }
 
-    public void run(Analyzer analyzer) {
+    /**
+     * Activate test with your {@link Analyzer}.
+     * 
+     * @param analyzer
+     */
+    default void run(Analyzer analyzer) {
         if (analyzer == null) {
             analyzer = new ConsoleAnalyzer();
         }
@@ -147,7 +156,7 @@ abstract class BackTestModel {
         market.service.targetCurrency = initialTargetCurrency();
 
         List<TradingLog> logs = new ArrayList();
-        List<Trader> traders = I.signal(this.traders).map(t -> t.apply(market)).toList();
+        List<Trader> traders = I.signal(traders()).map(t -> t.apply(market)).toList();
 
         LocalDateTime start = LocalDateTime.now();
         market.readLog(log -> log.range(start(), end()).effect(e -> market.perform(e)));

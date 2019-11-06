@@ -1,6 +1,8 @@
 package cointoss.verify;
 
+import cointoss.Market;
 import cointoss.MarketService;
+import cointoss.trade.Trader;
 import cointoss.util.Num;
 import cointoss.verify.BackTest;
 import cointoss.verify.BackTestModel;
@@ -12,14 +14,16 @@ import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Objects;
+import java.util.function.Function;
 import javax.annotation.processing.Generated;
 
 /**
  * Generated model for {@link BackTestModel}.
  */
 @Generated("Icy Manipulator")
-public class BackTest extends BackTestModel {
+public class BackTest implements BackTestModel {
 
     /**
      * Deceive complier that the specified checked exception is unchecked exception.
@@ -88,6 +92,9 @@ public class BackTest extends BackTestModel {
     private static final MethodHandle endUpdater = updater("end");
 
     /** The final property updater. */
+    private static final MethodHandle tradersUpdater = updater("traders");
+
+    /** The final property updater. */
     private static final MethodHandle exclusiveExecutionUpdater = updater("exclusiveExecution");
 
     /** The final property updater. */
@@ -106,6 +113,9 @@ public class BackTest extends BackTestModel {
     public final ZonedDateTime end;
 
     /** The exposed property. */
+    public final List<Function<Market, Trader>> traders;
+
+    /** The exposed property. */
     public final boolean exclusiveExecution;
 
     /** The exposed property. */
@@ -121,9 +131,10 @@ public class BackTest extends BackTestModel {
         this.service = null;
         this.start = null;
         this.end = null;
-        this.exclusiveExecution = super.exclusiveExecution();
-        this.initialBaseCurrency = super.initialBaseCurrency();
-        this.initialTargetCurrency = super.initialTargetCurrency();
+        this.traders = null;
+        this.exclusiveExecution = BackTestModel.super.exclusiveExecution();
+        this.initialBaseCurrency = BackTestModel.super.initialBaseCurrency();
+        this.initialTargetCurrency = BackTestModel.super.initialTargetCurrency();
     }
 
     /**
@@ -235,6 +246,42 @@ public class BackTest extends BackTestModel {
     }
 
     /**
+     * Set the end date.
+     *  
+     *  @return
+     */
+    @Override
+    public final List<Function<Market, Trader>> traders() {
+        return this.traders;
+    }
+
+    /**
+     * Provide classic getter API.
+     *
+     * @return A value of traders property.
+     */
+    @SuppressWarnings("unused")
+    private final List<Function<Market, Trader>> getTraders() {
+        return this.traders;
+    }
+
+    /**
+     * Provide classic setter API.
+     *
+     * @paran value A new value of traders property to assign.
+     */
+    private final void setTraders(List<Function<Market, Trader>> value) {
+        if (value == null) {
+            throw new IllegalArgumentException("The traders property requires non-null value.");
+        }
+        try {
+            tradersUpdater.invoke(this, value);
+        } catch (Throwable e) {
+            throw quiet(e);
+        }
+    }
+
+    /**
      * Set the emulatiom mode.
      *  
      *  @return
@@ -294,7 +341,7 @@ public class BackTest extends BackTestModel {
      */
     private final void setInitialBaseCurrency(Num value) {
         if (value == null) {
-            value = super.initialBaseCurrency();
+            value = BackTestModel.super.initialBaseCurrency();
         }
         try {
             initialBaseCurrencyUpdater.invoke(this, value);
@@ -330,7 +377,7 @@ public class BackTest extends BackTestModel {
      */
     private final void setInitialTargetCurrency(Num value) {
         if (value == null) {
-            value = super.initialTargetCurrency();
+            value = BackTestModel.super.initialTargetCurrency();
         }
         try {
             initialTargetCurrencyUpdater.invoke(this, value);
@@ -350,6 +397,7 @@ public class BackTest extends BackTestModel {
         builder.append("service=").append(service).append(", ");
         builder.append("start=").append(start).append(", ");
         builder.append("end=").append(end).append(", ");
+        builder.append("traders=").append(traders).append(", ");
         builder.append("exclusiveExecution=").append(exclusiveExecution).append(", ");
         builder.append("initialBaseCurrency=").append(initialBaseCurrency).append(", ");
         builder.append("initialTargetCurrency=").append(initialTargetCurrency).append("]");
@@ -363,7 +411,7 @@ public class BackTest extends BackTestModel {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(service, start, end, exclusiveExecution, initialBaseCurrency, initialTargetCurrency);
+        return Objects.hash(service, start, end, traders, exclusiveExecution, initialBaseCurrency, initialTargetCurrency);
     }
 
     /**
@@ -381,6 +429,7 @@ public class BackTest extends BackTestModel {
         if (!Objects.equals(service, other.service)) return false;
         if (!Objects.equals(start, other.start)) return false;
         if (!Objects.equals(end, other.end)) return false;
+        if (!Objects.equals(traders, other.traders)) return false;
         if (exclusiveExecution != other.exclusiveExecution) return false;
         if (!Objects.equals(initialBaseCurrency, other.initialBaseCurrency)) return false;
         if (!Objects.equals(initialTargetCurrency, other.initialTargetCurrency)) return false;
@@ -400,7 +449,7 @@ public class BackTest extends BackTestModel {
          * 
          * @return The next assignable model.
          */
-        public ÅssignableStart<ÅssignableEnd<Self>> service(MarketService service) {
+        public ÅssignableStart<ÅssignableEnd<ÅssignableTraders<Self>>> service(MarketService service) {
             Åssignable o = new Åssignable();
             o.service(service);
             return o;
@@ -487,6 +536,32 @@ public class BackTest extends BackTestModel {
     /**
      * Property assignment API.
      */
+    public static interface ÅssignableTraders<Next> {
+
+        /**
+         * Assign traders property.
+         * 
+         * @param value A new value to assign.
+         * @return The next assignable model.
+         */
+        default Next traders(List<Function<Market, Trader>> value) {
+            ((BackTest) this).setTraders(value);
+            return (Next) this;
+        }
+
+        /**
+         * Assign traders property.
+         * 
+         * @return The next assignable model.
+         */
+        default Next traders(Function<Market, Trader>... values) {
+            return traders(List.of(values));
+        }
+    }
+
+    /**
+     * Property assignment API.
+     */
     public static interface ÅssignableÅrbitrary<Next extends BackTest> {
 
         /**
@@ -552,7 +627,7 @@ public class BackTest extends BackTestModel {
     /**
      * Internal aggregated API.
      */
-    protected static interface ÅssignableAll extends ÅssignableService, ÅssignableStart, ÅssignableEnd {
+    protected static interface ÅssignableAll extends ÅssignableService, ÅssignableStart, ÅssignableEnd, ÅssignableTraders {
     }
 
     /**
@@ -568,6 +643,7 @@ public class BackTest extends BackTestModel {
         static final String Service = "service";
         static final String Start = "start";
         static final String End = "end";
+        static final String Traders = "traders";
         static final String ExclusiveExecution = "exclusiveExecution";
         static final String InitialBaseCurrency = "initialBaseCurrency";
         static final String InitialTargetCurrency = "initialTargetCurrency";

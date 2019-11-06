@@ -629,6 +629,15 @@ public class MarketSetting implements MarketSettingModel {
         }
 
         /**
+         * Assign targetCurrencyBidSizes property.
+         * 
+         * @return The next assignable model.
+         */
+        default Next targetCurrencyBidSizes(Num... values) {
+            return targetCurrencyBidSizes(List.of(values));
+        }
+
+        /**
          * Assign baseCurrencyScaleSize property.
          * 
          * @param value A new value to assign.

@@ -155,9 +155,9 @@ public class BackTestView extends View implements Analyzer {
             BackTest.with.service(marketSelection.value())
                     .start(startDate.zoned())
                     .end(endDate.zoned())
+                    .traders(Sample::new)
                     .initialBaseCurrency(3000000)
                     .exclusiveExecution(false)
-                    .trader(Sample::new)
                     .run(this);
         }, e -> {
             e.printStackTrace();
