@@ -84,16 +84,6 @@ interface BackTestModel {
     List<Function<Market, Trader>> traders();
 
     /**
-     * Set the emulatiom mode.
-     * 
-     * @return
-     */
-    @Icy.Property
-    default boolean exclusiveExecution() {
-        return true;
-    }
-
-    /**
      * Set the initial assets.
      * 
      * @return
@@ -151,7 +141,6 @@ interface BackTestModel {
         }
 
         VerifiableMarket market = new VerifiableMarket(service());
-        market.service.exclusiveExecution = exclusiveExecution();
         market.service.baseCurrency = initialBaseCurrency();
         market.service.targetCurrency = initialTargetCurrency();
 

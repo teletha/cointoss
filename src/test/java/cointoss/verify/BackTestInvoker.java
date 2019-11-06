@@ -26,7 +26,6 @@ public class BackTestInvoker {
                 .end(2019, 8, 13)
                 .traders(Sample::new)
                 .initialBaseCurrency(3000000)
-                .exclusiveExecution(true)
                 .run();
     }
 

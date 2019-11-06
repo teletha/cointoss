@@ -318,42 +318,4 @@ class ScenarioTest extends TraderTestSupport {
         assert s.exitSize.is(1);
         assert s.exitExecutedSize.is(1);
     }
-
-    @Test
-    void imcompletedEntryTakerWillNotStopExitTakerInNonExclusiveExecutionMarketService() {
-        market.service.exclusiveExecution = false;
-
-        when(now(), v -> new Scenario() {
-
-            @Override
-            protected void entry() {
-                entry(Direction.BUY, 1, s -> s.take());
-            }
-
-            @Override
-            protected void exit() {
-                exitWhen(now(), s -> s.take());
-            }
-        });
-
-        Scenario s = latest();
-
-        market.perform(Execution.with.buy(0.5).price(15));
-        assert s.entrySize.is(1);
-        assert s.entryExecutedSize.is(0.5);
-        assert s.exitSize.is(0.5);
-        assert s.exitExecutedSize.is(0);
-
-        market.perform(Execution.with.buy(0.5).price(15));
-        assert s.entrySize.is(1);
-        assert s.entryExecutedSize.is(1);
-        assert s.exitSize.is(1);
-        assert s.exitExecutedSize.is(0.5);
-
-        market.perform(Execution.with.buy(0.5).price(15));
-        assert s.entrySize.is(1);
-        assert s.entryExecutedSize.is(1);
-        assert s.exitSize.is(1);
-        assert s.exitExecutedSize.is(1);
-    }
 }

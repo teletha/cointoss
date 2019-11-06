@@ -25,6 +25,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Consumer;
 
 import cointoss.Direction;
 import cointoss.Directional;
@@ -44,6 +45,10 @@ import kiss.Signal;
 import kiss.Signaling;
 
 public class VerifiableMarketService extends MarketService {
+
+    /** The no-operation flow. */
+    private static final Consumer<Execution> NOOP = e -> {
+    };
 
     /** The managed id. */
     private int id = 0;
@@ -74,9 +79,6 @@ public class VerifiableMarketService extends MarketService {
 
     /** The emulation for lag. */
     public Latency latency = Latency.zero();
-
-    /** The emulation mode for exclusive execution. */
-    public boolean exclusiveExecution = true;
 
     /**
      * 
@@ -153,7 +155,7 @@ public class VerifiableMarketService extends MarketService {
 
             if (!executionsBeforeOrderResponse.isEmpty()) {
                 for (Execution execution : executionsBeforeOrderResponse) {
-                    emulate(execution);
+                    emulate(execution, NOOP);
                 }
                 executionsBeforeOrderResponse.clear();
             }
@@ -200,7 +202,7 @@ public class VerifiableMarketService extends MarketService {
                 });
             } else {
                 response = response.effectOnComplete(() -> {
-                    executionsAfterOrderCancelResponse.forEach(this::emulate);
+                    executionsAfterOrderCancelResponse.forEach(e -> emulate(e, NOOP));
                     backend.cancel();
                 });
             }
@@ -339,9 +341,9 @@ public class VerifiableMarketService extends MarketService {
      * Emulate {@link Execution}.
      * 
      * @param e
-     * @return
+     * @param executor
      */
-    public Execution emulate(Execution e) {
+    public void emulate(Execution e, Consumer<Execution> executor) {
         now = e.date;
         nowMills = e.mills;
 
@@ -401,29 +403,24 @@ public class VerifiableMarketService extends MarketService {
                         .executedSize(order.executedSize)
                         .state(order.state));
 
-                if (!exclusiveExecution) {
-                    continue;
-                }
-
                 while (!tasks.isEmpty() && tasks.peek().activeTime <= nowMills) {
                     tasks.poll().run();
                 }
 
                 // replace execution info
-                return Execution.with.direction(e.direction, executedSize)
+                executor.accept(Execution.with.direction(e.direction, executedSize)
                         .price(order.type.isTaker() ? order.marketMinPrice : order.price)
                         .date(e.date)
                         .id(e.id)
                         .consecutive(e.consecutive)
-                        .delay(e.delay);
+                        .delay(e.delay));
             }
         }
 
         while (!tasks.isEmpty() && tasks.peek().activeTime <= nowMills) {
             tasks.poll().run();
         }
-
-        return e;
+        executor.accept(e);
     }
 
     /**

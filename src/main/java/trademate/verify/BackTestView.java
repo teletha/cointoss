@@ -9,7 +9,7 @@
  */
 package trademate.verify;
 
-import static transcript.Transcript.*;
+import static transcript.Transcript.en;
 
 import java.time.Period;
 import java.util.List;
@@ -157,7 +157,6 @@ public class BackTestView extends View implements Analyzer {
                     .end(endDate.zoned())
                     .traders(Sample::new)
                     .initialBaseCurrency(3000000)
-                    .exclusiveExecution(false)
                     .run(this);
         }, e -> {
             e.printStackTrace();

@@ -72,7 +72,7 @@ public class VerifiableMarket extends Market {
 
     private VerifiableMarket perform(Execution e, ZonedDateTime date) {
         ((Execution.ÅssignableÅrbitrary) e).date(date);
-        timelineObservers.accept(service.emulate(e));
+        service.emulate(e, timelineObservers);
         return this;
     }
 

@@ -95,9 +95,6 @@ public class BackTest implements BackTestModel {
     private static final MethodHandle tradersUpdater = updater("traders");
 
     /** The final property updater. */
-    private static final MethodHandle exclusiveExecutionUpdater = updater("exclusiveExecution");
-
-    /** The final property updater. */
     private static final MethodHandle initialBaseCurrencyUpdater = updater("initialBaseCurrency");
 
     /** The final property updater. */
@@ -116,9 +113,6 @@ public class BackTest implements BackTestModel {
     public final List<Function<Market, Trader>> traders;
 
     /** The exposed property. */
-    public final boolean exclusiveExecution;
-
-    /** The exposed property. */
     public final Num initialBaseCurrency;
 
     /** The exposed property. */
@@ -132,7 +126,6 @@ public class BackTest implements BackTestModel {
         this.start = null;
         this.end = null;
         this.traders = null;
-        this.exclusiveExecution = BackTestModel.super.exclusiveExecution();
         this.initialBaseCurrency = BackTestModel.super.initialBaseCurrency();
         this.initialTargetCurrency = BackTestModel.super.initialTargetCurrency();
     }
@@ -282,39 +275,6 @@ public class BackTest implements BackTestModel {
     }
 
     /**
-     * Set the emulatiom mode.
-     *  
-     *  @return
-     */
-    @Override
-    public final boolean exclusiveExecution() {
-        return this.exclusiveExecution;
-    }
-
-    /**
-     * Provide classic getter API.
-     *
-     * @return A value of exclusiveExecution property.
-     */
-    @SuppressWarnings("unused")
-    private final boolean getExclusiveExecution() {
-        return this.exclusiveExecution;
-    }
-
-    /**
-     * Provide classic setter API.
-     *
-     * @paran value A new value of exclusiveExecution property to assign.
-     */
-    private final void setExclusiveExecution(boolean value) {
-        try {
-            exclusiveExecutionUpdater.invoke(this, value);
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
-    }
-
-    /**
      * Set the initial assets.
      *  
      *  @return
@@ -398,7 +358,6 @@ public class BackTest implements BackTestModel {
         builder.append("start=").append(start).append(", ");
         builder.append("end=").append(end).append(", ");
         builder.append("traders=").append(traders).append(", ");
-        builder.append("exclusiveExecution=").append(exclusiveExecution).append(", ");
         builder.append("initialBaseCurrency=").append(initialBaseCurrency).append(", ");
         builder.append("initialTargetCurrency=").append(initialTargetCurrency).append("]");
         return builder.toString();
@@ -411,7 +370,7 @@ public class BackTest implements BackTestModel {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(service, start, end, traders, exclusiveExecution, initialBaseCurrency, initialTargetCurrency);
+        return Objects.hash(service, start, end, traders, initialBaseCurrency, initialTargetCurrency);
     }
 
     /**
@@ -430,7 +389,6 @@ public class BackTest implements BackTestModel {
         if (!Objects.equals(start, other.start)) return false;
         if (!Objects.equals(end, other.end)) return false;
         if (!Objects.equals(traders, other.traders)) return false;
-        if (exclusiveExecution != other.exclusiveExecution) return false;
         if (!Objects.equals(initialBaseCurrency, other.initialBaseCurrency)) return false;
         if (!Objects.equals(initialTargetCurrency, other.initialTargetCurrency)) return false;
         return true;
@@ -565,17 +523,6 @@ public class BackTest implements BackTestModel {
     public static interface ÅssignableÅrbitrary<Next extends BackTest> {
 
         /**
-         * Assign exclusiveExecution property.
-         * 
-         * @param value A new value to assign.
-         * @return The next assignable model.
-         */
-        default Next exclusiveExecution(boolean value) {
-            ((BackTest) this).setExclusiveExecution(value);
-            return (Next) this;
-        }
-
-        /**
          * Assign initialBaseCurrency property.
          * 
          * @param value A new value to assign.
@@ -644,7 +591,6 @@ public class BackTest implements BackTestModel {
         static final String Start = "start";
         static final String End = "end";
         static final String Traders = "traders";
-        static final String ExclusiveExecution = "exclusiveExecution";
         static final String InitialBaseCurrency = "initialBaseCurrency";
         static final String InitialTargetCurrency = "initialTargetCurrency";
     }

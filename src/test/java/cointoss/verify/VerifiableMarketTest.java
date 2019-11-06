@@ -124,15 +124,14 @@ class VerifiableMarketTest {
 
     @Test
     void singleExecutionFillMultipleOders() {
-        market.service.exclusiveExecution = false;
-        Order order1 = market.orders.requestNow(Order.with.buy(0.4).price(10));
-        Order order2 = market.orders.requestNow(Order.with.buy(0.6).price(10));
-        assert order1.isActive();
-        assert order2.isActive();
+        Order order1 = market.orders.requestNow(Order.with.buy(0.2).price(10));
+        Order order2 = market.orders.requestNow(Order.with.buy(0.8).price(10));
+        assert order1.executedSize.is(0);
+        assert order2.executedSize.is(0);
 
-        market.perform(Execution.with.buy(1).price(9));
-        assert order1.isCompleted();
-        assert order2.isCompleted();
+        market.perform(Execution.with.buy(0.5).price(9));
+        assert order1.executedSize.is(0.2);
+        assert order2.executedSize.is(0.3);
     }
 
     @Test
