@@ -16,13 +16,14 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BooleanSupplier;
-import java.util.function.Function;
 import java.util.function.Predicate;
 
 import cointoss.Market;
 import cointoss.execution.Execution;
 import kiss.Disposable;
 import kiss.Signal;
+import kiss.WiseFunction;
+import kiss.WiseSupplier;
 
 public abstract class Trader {
 
@@ -59,7 +60,19 @@ public abstract class Trader {
      * @param builder
      * @return Chainable API.
      */
-    public final <T> Trader when(Signal<T> timing, Function<T, Scenario> builder) {
+    public final <T> Trader when(Signal<T> timing, WiseSupplier<Scenario> builder) {
+        return when(timing, v -> builder.get());
+    }
+
+    /**
+     * Set up entry at your timing.
+     * 
+     * @param <T>
+     * @param timing
+     * @param builder
+     * @return Chainable API.
+     */
+    public final <T> Trader when(Signal<T> timing, WiseFunction<T, Scenario> builder) {
         Objects.requireNonNull(timing);
         Objects.requireNonNull(builder);
 

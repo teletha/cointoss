@@ -9,8 +9,6 @@
  */
 package cointoss.verify;
 
-import org.ta4j.core.Indicator;
-
 import cointoss.Direction;
 import cointoss.Market;
 import cointoss.market.bitflyer.BitFlyer;
@@ -39,17 +37,6 @@ public class BackTestInvoker {
 
         private Sample(Market market) {
             super(market);
-
-            when(market.tickers.of(TickSpan.Second5).add.skip(12), (tick, e) -> {
-                Indicator indicator = new Indicator(market);
-
-                if (indicator.diff.isGreaterThan(8)) {
-                    e.entry(indicator.direction, 0.1, s -> s.make(market.latestPrice().minus(indicator.direction, 150)), () -> {
-                        e.exitAt(entryPrice.plus(this, 2000));
-                        e.exitAt(entryPrice.minus(this, 1400));
-                    });
-                }
-            });
 
             when(market.tickers.of(TickSpan.Second5).add.skip(12), tick -> new Scenario() {
 

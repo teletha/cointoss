@@ -9,7 +9,7 @@
  */
 package cointoss.trade;
 
-import static java.util.concurrent.TimeUnit.*;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.time.Duration;
 
@@ -80,7 +80,8 @@ class ScenarioTest extends TraderTestSupport {
         market.perform(Execution.with.buy(1).price(9));
         assert scenario.isExitTerminated() == false;
 
-        market.elapse(1, SECONDS);
+        awaitOrderBufferingTime();
+
         market.perform(Execution.with.buy(0.5).price(21));
         assert scenario.isExitTerminated() == false;
 
@@ -89,7 +90,7 @@ class ScenarioTest extends TraderTestSupport {
     }
 
     @Test
-    void entryWithMultipleExecutionAndExitAtPrice() {
+    void entryWithMultipleExecutionsAndSingleExit() {
         when(now(), v -> new Scenario() {
             @Override
             protected void entry() {
@@ -109,8 +110,54 @@ class ScenarioTest extends TraderTestSupport {
         market.perform(Execution.with.buy(0.2).price(9));
         market.perform(Execution.with.buy(0.3).price(9));
         market.perform(Execution.with.buy(0.4).price(9));
-        market.elapse(1, SECONDS);
+
+        awaitOrderBufferingTime();
         assert scenario.exits.size() == 1;
+        assert scenario.exitSize.is(1);
+        assert scenario.exitExecutedSize.is(0);
+    }
+
+    @Test
+    void entryWithMultipleExecutionsAndMultipleExits() {
+        when(now(), v -> new Scenario() {
+            @Override
+            protected void entry() {
+                entry(Direction.BUY, 1, s -> s.make(10));
+            }
+
+            @Override
+            protected void exit() {
+                exitAt(20);
+            }
+        });
+
+        Scenario scenario = latest();
+        assert scenario.exits.size() == 0;
+
+        // first entry
+        market.perform(Execution.with.buy(0.1).price(9));
+        market.perform(Execution.with.buy(0.2).price(9));
+
+        awaitOrderBufferingTime();
+        assert scenario.exits.size() == 1;
+        assert scenario.exitSize.is(0.3);
+        assert scenario.exitExecutedSize.is(0);
+
+        // second entry
+        market.perform(Execution.with.buy(0.3).price(9));
+
+        awaitOrderBufferingTime();
+        assert scenario.exits.size() == 2;
+        assert scenario.exitSize.is(0.6);
+        assert scenario.exitExecutedSize.is(0);
+
+        // third entry
+        market.perform(Execution.with.buy(0.5).price(9));
+
+        awaitOrderBufferingTime();
+        assert scenario.exits.size() == 3;
+        assert scenario.exitSize.is(1);
+        assert scenario.exitExecutedSize.is(0);
     }
 
     @Test

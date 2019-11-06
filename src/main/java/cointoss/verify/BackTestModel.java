@@ -137,7 +137,7 @@ interface BackTestModel {
      * Activate test with {@link ConsoleAnalyzer}.
      */
     default void run() {
-        run(new ConsoleAnalyzer());
+        run(null);
     }
 
     /**

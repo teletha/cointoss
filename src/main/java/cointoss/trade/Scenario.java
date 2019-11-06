@@ -217,6 +217,7 @@ public abstract class Scenario extends EntryStatus implements Directional {
 
         priceSetter.accept(totalPrice.divide(totalSize));
         sizeSetter.accept(totalSize);
+
     }
 
     /**

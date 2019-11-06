@@ -10,6 +10,7 @@
 package cointoss.trade;
 
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 
 import cointoss.execution.Execution;
 import cointoss.order.OrderStrategy.Orderable;
@@ -46,6 +47,13 @@ public abstract class TraderTestSupport extends Trader {
      */
     protected final Signal<?> now() {
         return I.signal("ok");
+    }
+
+    /**
+     * Elapse time for order buffering.
+     */
+    protected final void awaitOrderBufferingTime() {
+        market.elapse(1, ChronoUnit.SECONDS);
     }
 
     /**
