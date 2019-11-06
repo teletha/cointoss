@@ -24,9 +24,9 @@ public class BackTestInvoker {
         BackTest.with.service(BitFlyer.FX_BTC_JPY)
                 .start(2019, 8, 13)
                 .end(2019, 8, 13)
+                .trader(Sample::new)
                 .initialBaseCurrency(3000000)
                 .exclusiveExecution(true)
-                .trader(Sample::new)
                 .run();
     }
 
