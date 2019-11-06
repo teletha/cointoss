@@ -124,6 +124,7 @@ class VerifiableMarketTest {
 
     @Test
     void singleExecutionFillMultipleOders() {
+        market.service.exclusiveExecution = false;
         Order order1 = market.orders.requestNow(Order.with.buy(0.4).price(10));
         Order order2 = market.orders.requestNow(Order.with.buy(0.6).price(10));
         assert order1.isActive();

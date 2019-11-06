@@ -70,7 +70,7 @@ class OrderManagerTest {
 
         List<Order> removed = orders.removed.toList();
         assert removed.size() == 0;
-        market.service.emulate(Execution.with.sell(1).price(9));
+        market.perform(Execution.with.sell(1).price(9));
         assert removed.size() == 1;
     }
 
@@ -80,9 +80,9 @@ class OrderManagerTest {
 
         List<Order> removed = orders.removed.toList();
         assert removed.size() == 0;
-        market.service.emulate(Execution.with.sell(1).price(9));
+        market.perform(Execution.with.sell(1).price(9));
         assert removed.size() == 0;
-        market.service.emulate(Execution.with.sell(1).price(9));
+        market.perform(Execution.with.sell(1).price(9));
         assert removed.size() == 1;
     }
 
@@ -122,7 +122,7 @@ class OrderManagerTest {
         assert o.remainingSize.is(0.5);
         assert o.executedSize.is(0.5);
 
-        market.service.emulate(Execution.with.buy(0.5).price(9));
+        market.perform(Execution.with.buy(0.5).price(9));
         assert o.remainingSize.is(0);
         assert o.executedSize.is(1);
     }
