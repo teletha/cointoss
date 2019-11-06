@@ -13,6 +13,7 @@ import static cointoss.order.OrderState.*;
 
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -24,6 +25,11 @@ import cointoss.util.Num;
 class VerifiableMarketTest {
 
     VerifiableMarket market = new VerifiableMarket();
+
+    @BeforeEach
+    void initialize() {
+        market.service.clear();
+    }
 
     @Test
     void requestBuyLimitOrder() {
@@ -114,6 +120,18 @@ class VerifiableMarketTest {
             assert order.executedSize.is(10);
             assert order.state == COMPLETED;
         });
+    }
+
+    @Test
+    void singleExecutionFillMultipleOders() {
+        Order order1 = market.orders.requestNow(Order.with.buy(0.4).price(10));
+        Order order2 = market.orders.requestNow(Order.with.buy(0.6).price(10));
+        assert order1.isActive();
+        assert order2.isActive();
+
+        market.perform(Execution.with.buy(1).price(9));
+        assert order1.isCompleted();
+        assert order2.isCompleted();
     }
 
     @Test

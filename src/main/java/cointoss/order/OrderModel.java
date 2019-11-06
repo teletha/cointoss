@@ -517,9 +517,12 @@ abstract class OrderModel implements Directional, Comparable<OrderModel> {
         builder.append(direction().mark());
         builder.append(executedSize()).append("/").append(size()).append("(").append(canceledSize()).append(")@").append(price());
         builder.append("\t").append(state());
-        builder.append("\t").append(creationTime().toLocalDateTime()).append("～").append(terminationTime().toLocalDateTime());
-        builder.append("(").append(Chrono.formatAsDuration(creationTime(), terminationTime())).append(")");
-
+        if (terminationTime() == null) {
+            builder.append("\t").append(creationTime().toLocalDateTime()).append("～  ");
+        } else {
+            builder.append("\t").append(creationTime().toLocalDateTime()).append("～").append(terminationTime().toLocalDateTime());
+            builder.append("(").append(Chrono.formatAsDuration(creationTime(), terminationTime())).append(")");
+        }
         return builder.toString();
     }
 

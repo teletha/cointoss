@@ -12,6 +12,8 @@ package cointoss.trade;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 
+import org.junit.jupiter.api.BeforeEach;
+
 import cointoss.execution.Execution;
 import cointoss.order.OrderStrategy.Orderable;
 import cointoss.verify.VerifiableMarket;
@@ -29,6 +31,12 @@ public abstract class TraderTestSupport extends Trader {
         super(new VerifiableMarket());
 
         this.market = (VerifiableMarket) super.market;
+    }
+
+    @BeforeEach
+    void initialize() {
+        market.service.clear();
+        entries.clear();
     }
 
     /**

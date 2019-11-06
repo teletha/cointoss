@@ -97,6 +97,17 @@ public class VerifiableMarketService extends MarketService {
     }
 
     /**
+     * Clear all data.
+     */
+    public void clear() {
+        id = 0;
+        orderActive.clear();
+        now = Chrono.MIN;
+        nowMills = 0;
+        tasks.clear();
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -377,10 +388,6 @@ public class VerifiableMarketService extends MarketService {
                 order.executedSize = order.executedSize.plus(executedSize);
                 order.remainingSize = order.remainingSize.minus(executedSize);
 
-                Execution exe = Execution.with.direction(order.direction(), executedSize)
-                        .price(order.type.isTaker() ? order.marketMinPrice : order.price)
-                        .date(e.date);
-
                 if (order.remainingSize.isZero()) {
                     order.state = OrderState.COMPLETED;
                     iterator.remove();
@@ -403,8 +410,8 @@ public class VerifiableMarketService extends MarketService {
                 }
 
                 // replace execution info
-                return Execution.with.direction(e.direction, exe.size)
-                        .price(exe.price)
+                return Execution.with.direction(e.direction, executedSize)
+                        .price(order.type.isTaker() ? order.marketMinPrice : order.price)
                         .date(e.date)
                         .id(e.id)
                         .consecutive(e.consecutive)

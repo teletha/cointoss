@@ -357,13 +357,14 @@ public abstract class Scenario extends EntryStatus implements Directional {
             updateOrderRelatedStatus(exits, this::setExitPrice, this::setExitExecutedSize);
         });
 
-        order.observeTerminating().to(() -> {
-            Num remains = entryExecutedSize.minus(exitExecutedSize);
-
-            if (remains.isPositive()) {
-                market.request(directional.inverse(), remains, s -> s.take()).to(this::processAddExitOrder);
-            }
-        });
+        // order.observeTerminating().to(() -> {
+        // Num remains = entryExecutedSize.minus(exitExecutedSize);
+        //
+        // if (remains.isPositive()) {
+        // market.request(directional.inverse(), remains, s ->
+        // s.take()).to(this::processAddExitOrder);
+        // }
+        // });
     }
 
     /**
