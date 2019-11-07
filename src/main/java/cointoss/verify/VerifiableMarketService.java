@@ -46,8 +46,8 @@ import kiss.Signaling;
 
 public class VerifiableMarketService extends MarketService {
 
-    /** The no-operation flow. */
-    private static final Consumer<Execution> NOOP = e -> {
+    /** No OP */
+    private static final Consumer<Execution> noop = e -> {
     };
 
     /** The managed id. */
@@ -155,7 +155,7 @@ public class VerifiableMarketService extends MarketService {
 
             if (!executionsBeforeOrderResponse.isEmpty()) {
                 for (Execution execution : executionsBeforeOrderResponse) {
-                    emulate(execution, NOOP);
+                    emulate(execution, noop);
                 }
                 executionsBeforeOrderResponse.clear();
             }
@@ -202,7 +202,7 @@ public class VerifiableMarketService extends MarketService {
                 });
             } else {
                 response = response.effectOnComplete(() -> {
-                    executionsAfterOrderCancelResponse.forEach(e -> emulate(e, NOOP));
+                    executionsAfterOrderCancelResponse.forEach(e -> emulate(e, noop));
                     backend.cancel();
                 });
             }
@@ -341,9 +341,9 @@ public class VerifiableMarketService extends MarketService {
      * Emulate {@link Execution}.
      * 
      * @param e
-     * @param executor
+     * @return
      */
-    public void emulate(Execution e, Consumer<Execution> executor) {
+    void emulate(Execution e, Consumer<Execution> executor) {
         now = e.date;
         nowMills = e.mills;
 
@@ -414,12 +414,14 @@ public class VerifiableMarketService extends MarketService {
                         .id(e.id)
                         .consecutive(e.consecutive)
                         .delay(e.delay));
+                return;
             }
         }
 
         while (!tasks.isEmpty() && tasks.peek().activeTime <= nowMills) {
             tasks.poll().run();
         }
+
         executor.accept(e);
     }
 
