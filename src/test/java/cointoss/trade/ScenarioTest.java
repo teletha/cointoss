@@ -309,21 +309,25 @@ class ScenarioTest extends TraderTestSupport {
         when(now(), v -> new Scenario() {
             @Override
             protected void entry() {
-                entry(Direction.BUY, 1, s -> s.make(10));
+                entry(Direction.BUY, 1, s -> s.make(1700));
             }
 
             @Override
             protected void exit() {
-                exitAt(5, s -> s.take());
+                exitAt(entryPrice.plus(1000));
+                exitAt(entryPrice.minus(500), s -> s.take());
             }
         });
 
         Scenario s = latest();
-        assert s.exits.size() == 0;
 
-        market.perform(Execution.with.buy(0.3).price(3));
-        market.perform(Execution.with.buy(0.4).price(3));
-        awaitOrderBufferingTime();
+        market.perform(Execution.with.buy(0.2).price(1850));
+        market.perform(Execution.with.buy(5.5).price(1850));
+        market.perform(Execution.with.buy(3.16).price(1850));
+        market.perform(Execution.with.buy(0.1).price(1036));
+        market.perform(Execution.with.buy(0.25).price(1247));
+        market.perform(Execution.with.buy(2.2).price(1850));
+        market.perform(Execution.with.buy(4.6823314).price(1346));
         assert s.exits.size() == 1;
         assert s.entryExecutedSize.is(0.7);
         assert s.exitExecutedSize.is(0);
