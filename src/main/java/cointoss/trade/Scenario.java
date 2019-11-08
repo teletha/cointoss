@@ -331,7 +331,9 @@ public abstract class Scenario extends EntryStatus implements Directional {
                                 .to(this::processExitOrder);
                     }));
         } else {
-            disposerForExit.add(market.tickers.latest.observe().take(e -> e.price.isLessThanOrEqual(directional, price)).first().to(e -> {
+            disposerForExit.add(market.tickers.latest.observe().take(e -> {
+                return e.price.isLessThanOrEqual(directional, price);
+            }).first().to(e -> {
                 market.request(directional.inverse(), entryExecutedSize.minus(exitExecutedSize), strategy).to(this::processExitOrder);
             }));
         }
