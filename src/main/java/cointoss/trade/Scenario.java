@@ -67,16 +67,17 @@ public abstract class Scenario extends EntryStatus implements Directional {
      * 
      */
     public Scenario() {
-        disposerForExit.add(observeEntryExecutedSize().to(this::exit));
 
         // calculate profit
-        disposerForExit.add(observeExitExecutedSize().effectOnce(this::disposeEntry).to(size -> {
+        disposerForExit.add(observeExitExecutedSize().to(size -> {
             setRealizedProfit(exitPrice.diff(directional, entryPrice).multiply(size));
         }));
 
-        observeExitExecutedSize().take(size -> size.is(entryExecutedSize)).first().to(() -> {
-            disposeExit();
-        });
+        disposerForExit.add(observeEntryExecutedSize().first().to(this::exit));
+        disposerForExit.add(observeExitExecutedSize().effectOnce(this::disposeEntry)
+                .take(size -> size.is(entryExecutedSize))
+                .first()
+                .to(this::disposeExit));
     }
 
     /**
@@ -184,7 +185,7 @@ public abstract class Scenario extends EntryStatus implements Directional {
         if (size == null || size.isLessThan(market.service.setting.targetCurrencyMinimumBidSize)) {
             throw new Error("Entry size is less than minimum bid size.");
         }
-        market.request(this.directional = directional, size, declaration).to(this::processAddEntryOrder);
+        market.request(this.directional = directional, size, declaration).to(this::processEntryOrder);
     }
 
     /**
@@ -192,7 +193,7 @@ public abstract class Scenario extends EntryStatus implements Directional {
      * 
      * @param order
      */
-    private void processAddEntryOrder(Order order) {
+    private void processEntryOrder(Order order) {
         entries.add(order);
         setEntrySize(entrySize.plus(order.size));
 
@@ -205,8 +206,10 @@ public abstract class Scenario extends EntryStatus implements Directional {
      * Calculate average price and total executed size.
      * 
      * @param orders
+     * @param priceSetter
+     * @param executedSizeSetter
      */
-    private void updateOrderRelatedStatus(List<Order> orders, Consumer<Num> priceSetter, Consumer<Num> sizeSetter) {
+    private void updateOrderRelatedStatus(List<Order> orders, Consumer<Num> priceSetter, Consumer<Num> executedSizeSetter) {
         Num totalSize = Num.ZERO;
         Num totalPrice = Num.ZERO;
 
@@ -216,8 +219,7 @@ public abstract class Scenario extends EntryStatus implements Directional {
         }
 
         priceSetter.accept(totalPrice.divide(totalSize));
-        sizeSetter.accept(totalSize);
-
+        executedSizeSetter.accept(totalSize);
     }
 
     /**
@@ -275,7 +277,7 @@ public abstract class Scenario extends EntryStatus implements Directional {
     protected final void exitAt(Variable<Num> price) {
         if (entryPrice.isLessThan(directional, price)) {
             disposerForExit.add(observeEntryExecutedSizeDiff().debounce(1, SECONDS, market.service.scheduler()).to(size -> {
-                market.request(directional.inverse(), entryExecutedSize.minus(exitSize), s -> s.make(price)).to(this::processAddExitOrder);
+                market.request(directional.inverse(), entryExecutedSize.minus(exitSize), s -> s.make(price)).to(this::processExitOrder);
             }));
         } else {
             disposerForExit.add(market.tickers.latest.observe().take(e -> e.price.isLessThanOrEqual(directional, price)).first().to(e -> {
@@ -286,7 +288,7 @@ public abstract class Scenario extends EntryStatus implements Directional {
                 }
 
                 market.request(directional.inverse(), entryExecutedSize.minus(exitExecutedSize), Orderable::take)
-                        .to(this::processAddExitOrder);
+                        .to(this::processExitOrder);
             }));
         }
     }
@@ -322,11 +324,11 @@ public abstract class Scenario extends EntryStatus implements Directional {
             disposerForExit
                     .add(market.tickers.latest.observe().take(e -> e.price.isGreaterThanOrEqual(directional, price)).first().to(e -> {
                         market.request(directional.inverse(), entryExecutedSize.minus(exitExecutedSize), strategy)
-                                .to(this::processAddExitOrder);
+                                .to(this::processExitOrder);
                     }));
         } else {
             disposerForExit.add(market.tickers.latest.observe().take(e -> e.price.isLessThanOrEqual(directional, price)).first().to(e -> {
-                market.request(directional.inverse(), entryExecutedSize.minus(exitExecutedSize), strategy).to(this::processAddExitOrder);
+                market.request(directional.inverse(), entryExecutedSize.minus(exitExecutedSize), strategy).to(this::processExitOrder);
             }));
         }
     }
@@ -340,7 +342,7 @@ public abstract class Scenario extends EntryStatus implements Directional {
      */
     protected final void exitWhen(Signal<?> timing, Consumer<Orderable> strategy) {
         disposerForExit.add(timing.first().to(() -> {
-            market.request(directional.inverse(), entryExecutedSize.minus(exitSize), strategy).to(this::processAddExitOrder);
+            market.request(directional.inverse(), entryExecutedSize.minus(exitExecutedSize), strategy).to(this::processExitOrder);
         }));
     }
 
@@ -349,9 +351,10 @@ public abstract class Scenario extends EntryStatus implements Directional {
      * 
      * @param order
      */
-    private void processAddExitOrder(Order order) {
+    private void processExitOrder(Order order) {
         exits.add(order);
         setExitSize(exitSize.plus(order.size));
+        Num exitSize2 = exitSize;
 
         order.observeExecutedSize().to(v -> {
             updateOrderRelatedStatus(exits, this::setExitPrice, this::setExitExecutedSize);

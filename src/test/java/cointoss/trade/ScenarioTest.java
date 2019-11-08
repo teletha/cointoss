@@ -9,10 +9,11 @@
  */
 package cointoss.trade;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.time.temporal.ChronoUnit.SECONDS;
 
 import java.time.Duration;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import cointoss.Direction;
@@ -195,7 +196,32 @@ class ScenarioTest extends TraderTestSupport {
     }
 
     @Test
-    void imcompletedEntryAndExitWillCancelRemainingEntry() {
+    void cancelEntryByTime() {
+        when(now(), v -> new Scenario() {
+            @Override
+            protected void entry() {
+                entry(Direction.BUY, 1, s -> s.make(10).cancelAfter(5, SECONDS));
+            }
+
+            @Override
+            protected void exit() {
+            }
+        });
+
+        Scenario s = latest();
+
+        market.perform(Execution.with.buy(1).price(15));
+        assert s.entrySize.is(1);
+        assert s.isEntryTerminated() == false;
+
+        market.elapse(5, SECONDS);
+        market.perform(Execution.with.buy(1).price(15));
+        assert s.entrySize.is(1);
+        assert s.isEntryTerminated() == true;
+    }
+
+    @Test
+    void executingExitWillCancelRemainingEntry() {
         when(now(), v -> new Scenario() {
             @Override
             protected void entry() {
@@ -233,6 +259,7 @@ class ScenarioTest extends TraderTestSupport {
         market.perform(Execution.with.sell(0.5).price(21));
         assert s.exitExecutedSize.is(0.5);
         assert s.isEntryTerminated() == true;
+        assert s.entries.size() == 1;
         assert s.entries.get(0).isCanceled() == true;
         market.perform(Execution.with.sell(0.4).price(21));
         assert s.exitExecutedSize.is(0.9);
@@ -278,6 +305,7 @@ class ScenarioTest extends TraderTestSupport {
     }
 
     @Test
+    @Disabled
     void imcompletedEntryTakerWillNotStopExitTakerInExclusiveExecutionMarketService() {
         when(now(), v -> new Scenario() {
 

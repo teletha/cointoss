@@ -100,6 +100,9 @@ public class BackTest implements BackTestModel {
     /** The final property updater. */
     private static final MethodHandle initialTargetCurrencyUpdater = updater("initialTargetCurrency");
 
+    /** The final property updater. */
+    private static final MethodHandle detailUpdater = updater("detail");
+
     /** The exposed property. */
     public final MarketService service;
 
@@ -118,6 +121,9 @@ public class BackTest implements BackTestModel {
     /** The exposed property. */
     public final Num initialTargetCurrency;
 
+    /** The exposed property. */
+    public final boolean detail;
+
     /**
      * HIDE CONSTRUCTOR
      */
@@ -128,6 +134,7 @@ public class BackTest implements BackTestModel {
         this.traders = null;
         this.initialBaseCurrency = BackTestModel.super.initialBaseCurrency();
         this.initialTargetCurrency = BackTestModel.super.initialTargetCurrency();
+        this.detail = BackTestModel.super.detail();
     }
 
     /**
@@ -347,6 +354,39 @@ public class BackTest implements BackTestModel {
     }
 
     /**
+     * Set the detail option.
+     *  
+     *  @return
+     */
+    @Override
+    public final boolean detail() {
+        return this.detail;
+    }
+
+    /**
+     * Provide classic getter API.
+     *
+     * @return A value of detail property.
+     */
+    @SuppressWarnings("unused")
+    private final boolean getDetail() {
+        return this.detail;
+    }
+
+    /**
+     * Provide classic setter API.
+     *
+     * @paran value A new value of detail property to assign.
+     */
+    private final void setDetail(boolean value) {
+        try {
+            detailUpdater.invoke(this, value);
+        } catch (Throwable e) {
+            throw quiet(e);
+        }
+    }
+
+    /**
      * Show all property values.
      *
      * @return All property values.
@@ -359,7 +399,8 @@ public class BackTest implements BackTestModel {
         builder.append("end=").append(end).append(", ");
         builder.append("traders=").append(traders).append(", ");
         builder.append("initialBaseCurrency=").append(initialBaseCurrency).append(", ");
-        builder.append("initialTargetCurrency=").append(initialTargetCurrency).append("]");
+        builder.append("initialTargetCurrency=").append(initialTargetCurrency).append(", ");
+        builder.append("detail=").append(detail).append("]");
         return builder.toString();
     }
 
@@ -370,7 +411,7 @@ public class BackTest implements BackTestModel {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(service, start, end, traders, initialBaseCurrency, initialTargetCurrency);
+        return Objects.hash(service, start, end, traders, initialBaseCurrency, initialTargetCurrency, detail);
     }
 
     /**
@@ -391,6 +432,7 @@ public class BackTest implements BackTestModel {
         if (!Objects.equals(traders, other.traders)) return false;
         if (!Objects.equals(initialBaseCurrency, other.initialBaseCurrency)) return false;
         if (!Objects.equals(initialTargetCurrency, other.initialTargetCurrency)) return false;
+        if (detail != other.detail) return false;
         return true;
     }
 
@@ -569,6 +611,17 @@ public class BackTest implements BackTestModel {
                 throw quiet(e);
             }
         }
+
+        /**
+         * Assign detail property.
+         * 
+         * @param value A new value to assign.
+         * @return The next assignable model.
+         */
+        default Next detail(boolean value) {
+            ((BackTest) this).setDetail(value);
+            return (Next) this;
+        }
     }
 
     /**
@@ -593,5 +646,6 @@ public class BackTest implements BackTestModel {
         static final String Traders = "traders";
         static final String InitialBaseCurrency = "initialBaseCurrency";
         static final String InitialTargetCurrency = "initialTargetCurrency";
+        static final String Detail = "detail";
     }
 }

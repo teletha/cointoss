@@ -343,7 +343,7 @@ public class VerifiableMarketService extends MarketService {
      * @param e
      * @return
      */
-    void emulate(Execution e, Consumer<Execution> executor) {
+    final void emulate(Execution e, Consumer<Execution> executor) {
         now = e.date;
         nowMills = e.mills;
 

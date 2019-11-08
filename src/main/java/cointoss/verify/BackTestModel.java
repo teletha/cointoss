@@ -124,6 +124,16 @@ interface BackTestModel {
     }
 
     /**
+     * Set the detail option.
+     * 
+     * @return
+     */
+    @Icy.Property
+    default boolean detail() {
+        return false;
+    }
+
+    /**
      * Activate test with {@link ConsoleAnalyzer}.
      */
     default void run() {

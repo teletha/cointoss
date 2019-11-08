@@ -9,7 +9,7 @@
  */
 package cointoss.trade;
 
-import static cointoss.util.Num.*;
+import static cointoss.util.Num.HUNDRED;
 
 import java.text.NumberFormat;
 import java.time.Duration;

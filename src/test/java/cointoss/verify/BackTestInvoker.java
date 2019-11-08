@@ -51,7 +51,7 @@ public class BackTestInvoker {
                 @Override
                 protected void exit() {
                     exitAt(entryPrice.plus(this, 2000));
-                    exitAt(entryPrice.minus(this, 1400));
+                    exitAt(entryPrice.minus(this, 1800), s -> s.take());
                 }
             });
         }
