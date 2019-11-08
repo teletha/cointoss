@@ -305,6 +305,45 @@ class ScenarioTest extends TraderTestSupport {
     }
 
     @Test
+    void stopLossTaker() {
+        when(now(), v -> new Scenario() {
+            @Override
+            protected void entry() {
+                entry(Direction.BUY, 1, s -> s.make(10));
+            }
+
+            @Override
+            protected void exit() {
+                exitAt(20);
+                exitAt(5, s -> s.take());
+            }
+        });
+
+        Scenario s = latest();
+        assert s.exits.size() == 0;
+
+        market.perform(Execution.with.buy(1).price(9));
+        market.elapse(1, SECONDS);
+        assert s.exits.size() == 1; // exit is ordered
+        assert s.entryExecutedSize.is(1);
+        assert s.exitExecutedSize.is(0);
+
+        market.perform(Execution.with.buy(0.1).price(5)); // trigger stop
+        market.perform(Execution.with.buy(0.5).price(5));
+        assert s.exits.size() == 2; // stop is ordered
+        assert s.exits.stream().allMatch(Order::isActive);
+        assert s.isExitTerminated() == false;
+        assert s.entryExecutedSize.is(1);
+        assert s.exitExecutedSize.is(0.5);
+
+        market.perform(Execution.with.buy(0.7).price(5));
+        assert s.exits.stream().allMatch(Order::isTerminated); // exit is canceled
+        assert s.isExitTerminated() == true;
+        assert s.entryExecutedSize.is(1);
+        assert s.exitExecutedSize.is(1);
+    }
+
+    @Test
     @Disabled
     void imcompletedEntryTakerWillNotStopExitTakerInExclusiveExecutionMarketService() {
         when(now(), v -> new Scenario() {

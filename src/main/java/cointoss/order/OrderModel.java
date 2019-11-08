@@ -516,7 +516,7 @@ abstract class OrderModel implements Directional, Comparable<OrderModel> {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append(direction().mark());
+        builder.append(type().isMaker() ? direction().mark() : direction().mark().toLowerCase());
         builder.append(executedSize()).append("/").append(size()).append("(").append(canceledSize()).append(")@").append(price());
         builder.append("\t").append(state());
         if (terminationTime() == null) {

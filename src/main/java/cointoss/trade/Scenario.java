@@ -131,7 +131,11 @@ public abstract class Scenario extends EntryStatus implements Directional {
      * @return A result.
      */
     public final boolean isExitTerminated() {
-        return exits.isEmpty() == false && exits.stream().allMatch(Order::isTerminated);
+        if (entryExecutedSize.isZero() && isEntryTerminated()) {
+            return exits.isEmpty() || exits.stream().allMatch(Order::isTerminated);
+        } else {
+            return exits.isEmpty() == false && exits.stream().allMatch(Order::isTerminated);
+        }
     }
 
     /**

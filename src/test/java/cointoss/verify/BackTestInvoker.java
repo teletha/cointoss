@@ -9,6 +9,8 @@
  */
 package cointoss.verify;
 
+import static java.time.temporal.ChronoUnit.MINUTES;
+
 import cointoss.Direction;
 import cointoss.Market;
 import cointoss.market.bitflyer.BitFlyer;
@@ -22,8 +24,8 @@ public class BackTestInvoker {
 
     public static void main(String[] args) throws InterruptedException {
         BackTest.with.service(BitFlyer.FX_BTC_JPY)
-                .start(2019, 8, 13)
-                .end(2019, 8, 13)
+                .start(2019, 11, 8)
+                .end(2019, 11, 8)
                 .traders(Sample::new)
                 .initialBaseCurrency(3000000)
                 .run();
@@ -44,14 +46,15 @@ public class BackTestInvoker {
                     Indicator indicator = new Indicator(market);
 
                     if (indicator.diff.isGreaterThan(8)) {
-                        entry(indicator.direction, 0.1, s -> s.make(market.latestPrice().minus(indicator.direction, 150)));
+                        entry(indicator.direction, 0.1, s -> s.make(market.latestPrice().minus(indicator.direction, 150))
+                                .cancelAfter(5, MINUTES));
                     }
                 }
 
                 @Override
                 protected void exit() {
-                    exitAt(entryPrice.plus(this, 2000));
-                    exitAt(entryPrice.minus(this, 1800), s -> s.take());
+                    exitAt(entryPrice.plus(this, 1000));
+                    exitAt(entryPrice.minus(this, 500), s -> s.take());
                 }
             });
         }

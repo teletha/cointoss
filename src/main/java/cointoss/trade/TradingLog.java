@@ -136,6 +136,12 @@ public class TradingLog {
                 builder.append(entry);
             }
         }
+
+        for (Scenario scenario : entries) {
+            if (scenario.isActive()) {
+                System.out.println(scenario);
+            }
+        }
         builder.append("時間 ").append(holdTime).append("\t実行").append(Chrono.formatAsDuration(duration.toMillis())).append(EOL);
         // builder.append("利益 ").append(profit).append(EOL);
         builder.append("利幅 ").append(profitRange).append(EOL);

@@ -152,6 +152,7 @@ class TraderTest extends TraderTestSupport {
 
         // activate exit entry
         market.perform(Execution.with.buy(1).price(20));
+        awaitOrderBufferingTime();
 
         // execute exit entry
         market.perform(Execution.with.buy(1).price(22));
