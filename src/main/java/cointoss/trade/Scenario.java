@@ -67,7 +67,7 @@ public abstract class Scenario extends EntryStatus implements Directional {
      * 
      */
     public Scenario() {
-        disposerForExit.add(observeEntryExecutedSize().first().to(this::exit));
+        disposerForExit.add(observeEntryExecutedSize().to(this::exit));
 
         // calculate profit
         disposerForExit.add(observeExitExecutedSize().effectOnce(this::disposeEntry).to(size -> {
@@ -340,7 +340,7 @@ public abstract class Scenario extends EntryStatus implements Directional {
      */
     protected final void exitWhen(Signal<?> timing, Consumer<Orderable> strategy) {
         disposerForExit.add(timing.first().to(() -> {
-            market.request(directional.inverse(), entryExecutedSize.minus(exitExecutedSize), strategy).to(this::processAddExitOrder);
+            market.request(directional.inverse(), entryExecutedSize.minus(exitSize), strategy).to(this::processAddExitOrder);
         }));
     }
 

@@ -295,26 +295,34 @@ class ScenarioTest extends TraderTestSupport {
         Scenario s = latest();
 
         market.perform(Execution.with.buy(0.5).price(15));
+        assert s.entries.size() == 1;
         assert s.entrySize.is(1);
         assert s.entryExecutedSize.is(0.5);
+        assert s.exits.size() == 1;
         assert s.exitSize.is(0.5);
         assert s.exitExecutedSize.is(0);
 
         market.perform(Execution.with.buy(0.5).price(15));
+        assert s.entries.size() == 1;
         assert s.entrySize.is(1);
         assert s.entryExecutedSize.is(1);
-        assert s.exitSize.is(0.5);
+        assert s.exits.size() == 2;
+        assert s.exitSize.is(1);
         assert s.exitExecutedSize.is(0);
 
         market.perform(Execution.with.buy(0.5).price(15));
+        assert s.entries.size() == 1;
         assert s.entrySize.is(1);
         assert s.entryExecutedSize.is(1);
+        assert s.exits.size() == 2;
         assert s.exitSize.is(1);
         assert s.exitExecutedSize.is(0.5);
 
         market.perform(Execution.with.buy(0.5).price(15));
+        assert s.entries.size() == 1;
         assert s.entrySize.is(1);
         assert s.entryExecutedSize.is(1);
+        assert s.exits.size() == 2;
         assert s.exitSize.is(1);
         assert s.exitExecutedSize.is(1);
     }

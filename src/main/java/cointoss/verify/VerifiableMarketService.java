@@ -407,13 +407,21 @@ public class VerifiableMarketService extends MarketService {
                     tasks.poll().run();
                 }
 
-                // replace execution info
                 executor.accept(Execution.with.direction(e.direction, executedSize)
                         .price(order.type.isTaker() ? order.marketMinPrice : order.price)
                         .date(e.date)
                         .id(e.id)
                         .consecutive(e.consecutive)
                         .delay(e.delay));
+
+                if (executedSize.isNot(e.size)) {
+                    emulate(Execution.with.direction(e.direction, e.size.minus(executedSize))
+                            .price(e.price)
+                            .date(e.date)
+                            .id(e.id)
+                            .consecutive(e.consecutive)
+                            .delay(e.delay), executor);
+                }
                 return;
             }
         }
