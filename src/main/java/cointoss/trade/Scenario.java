@@ -9,10 +9,11 @@
  */
 package cointoss.trade;
 
-import static java.util.concurrent.TimeUnit.*;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
@@ -22,7 +23,6 @@ import com.google.common.annotations.VisibleForTesting;
 import cointoss.Direction;
 import cointoss.Directional;
 import cointoss.Market;
-import cointoss.execution.Execution;
 import cointoss.order.Order;
 import cointoss.order.OrderState;
 import cointoss.order.OrderStrategy.Makable;
@@ -64,11 +64,14 @@ public abstract class Scenario extends EntryStatus implements Directional {
     /** The exit disposer. */
     private final Disposable disposerForExit = Disposable.empty();
 
+    /** The debugging log. */
+    private LinkedList<String> logs;
+
     /**
      * 
      */
     public Scenario() {
-
+        enableLog();
         // calculate profit
         disposerForExit.add(observeExitExecutedSize().to(size -> {
             setRealizedProfit(exitPrice.diff(directional, entryPrice).multiply(size));
@@ -88,6 +91,7 @@ public abstract class Scenario extends EntryStatus implements Directional {
         // cancel all remaining entry orders
         I.signal(entries).take(Order::isNotTerminated).flatMap(market::cancel).to(I.NoOP);
         disposerForEntry.dispose();
+        log("Dispose entry.");
     }
 
     /**
@@ -97,6 +101,7 @@ public abstract class Scenario extends EntryStatus implements Directional {
         // cancel all remaining exit orders
         I.signal(exits).take(Order::isNotTerminated).flatMap(market::cancel).to(I.NoOP);
         disposerForExit.dispose();
+        log("Dispose exit.");
     }
 
     /**
@@ -201,9 +206,11 @@ public abstract class Scenario extends EntryStatus implements Directional {
     private void processEntryOrder(Order order) {
         entries.add(order);
         setEntrySize(entrySize.plus(order.size));
+        logEntry("Process entry order");
 
         order.observeExecutedSize().to(v -> {
             updateOrderRelatedStatus(entries, this::setEntryPrice, this::setEntryExecutedSize);
+            logEntry("Update entry order");
         });
     }
 
@@ -325,7 +332,17 @@ public abstract class Scenario extends EntryStatus implements Directional {
      * @param price An exit price.
      */
     protected final void exitAt(Num price, Consumer<Orderable> strategy) {
-        if (price.isGreaterThan(directional, entryPrice)) {
+        exitAt(Variable.of(price), strategy);
+    }
+
+    /**
+     * Declare exit order by price. Loss cutting is the only element in the trade that investors can
+     * control.
+     * 
+     * @param price An exit price.
+     */
+    protected final void exitAt(Variable<Num> price, Consumer<Orderable> strategy) {
+        if (entryPrice.isLessThanOrEqual(directional, price)) {
             disposerForExit
                     .add(market.tickers.latest.observe().take(e -> e.price.isGreaterThanOrEqual(directional, price)).first().to(e -> {
                         market.request(directional.inverse(), entryExecutedSize.minus(exitExecutedSize), strategy)
@@ -333,9 +350,6 @@ public abstract class Scenario extends EntryStatus implements Directional {
                     }));
         } else {
             disposerForExit.add(market.tickers.latest.observeNow().take(e -> {
-                if (Scenario.time(e)) System.out
-                        .println("stop loss set " + e + "  " + price + "  " + entryPrice + "  " + exitSize + "  " + entryExecutedSize + "   " + e.price
-                                .isLessThanOrEqual(directional, price));
                 return e.price.isLessThanOrEqual(directional, price);
             }).takeUntil(e -> {
                 return exitSize.plus(e.size).isGreaterThan(entryExecutedSize);
@@ -343,10 +357,6 @@ public abstract class Scenario extends EntryStatus implements Directional {
                 market.request(directional.inverse(), entryExecutedSize.minus(exitExecutedSize), strategy).to(this::processExitOrder);
             }));
         }
-    }
-
-    public static boolean time(Execution e) {
-        return e.id < 100 || (1393271012 <= e.id && e.id <= 1393271026);
     }
 
     /**
@@ -370,10 +380,11 @@ public abstract class Scenario extends EntryStatus implements Directional {
     private void processExitOrder(Order order) {
         exits.add(order);
         setExitSize(exitSize.plus(order.size));
-        Num exitSize2 = exitSize;
+        logExit("Process exit order");
 
         order.observeExecutedSize().to(v -> {
             updateOrderRelatedStatus(exits, this::setExitPrice, this::setExitExecutedSize);
+            logExit("Update exit order");
         });
 
         // order.observeTerminating().to(() -> {
@@ -410,6 +421,7 @@ public abstract class Scenario extends EntryStatus implements Directional {
         StringBuilder builder = new StringBuilder("Scenario ").append(directional).append("\r\n");
         format(builder, "IN", entries, entryPrice, entrySize, entryExecutedSize, calculateCanceledSize(entries));
         format(builder, "OUT", exits, exitPrice, exitSize, exitExecutedSize, calculateCanceledSize(exits));
+        if (logs != null) logs.forEach(log -> builder.append("\t").append(log).append("\r\n"));
         return builder.toString();
     }
 
@@ -430,5 +442,43 @@ public abstract class Scenario extends EntryStatus implements Directional {
         for (Order order : orders) {
             builder.append("\t\t ").append(order).append("\r\n");
         }
+    }
+
+    /**
+     * Enable log for this {@link Scenario}.
+     */
+    private void enableLog() {
+        if (logs == null) {
+            logs = new LinkedList();
+        }
+    }
+
+    /**
+     * Write log message.
+     * 
+     * @param message
+     */
+    private void log(String message) {
+        if (logs != null) {
+            logs.add(message);
+        }
+    }
+
+    /**
+     * Write entry info as log message.
+     * 
+     * @param message
+     */
+    private void logEntry(String message) {
+        log(message + " " + entryExecutedSize + "/" + entrySize + "@" + entryPrice);
+    }
+
+    /**
+     * Write exit info as log message.
+     * 
+     * @param message
+     */
+    private void logExit(String message) {
+        log(message + " " + exitExecutedSize + "/" + exitSize + "@" + exitPrice);
     }
 }

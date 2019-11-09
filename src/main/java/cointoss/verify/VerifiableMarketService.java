@@ -37,7 +37,6 @@ import cointoss.order.OrderBookChange;
 import cointoss.order.OrderState;
 import cointoss.order.OrderType;
 import cointoss.order.QuantityCondition;
-import cointoss.trade.Scenario;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
 import cointoss.util.Retry;
@@ -345,7 +344,6 @@ public class VerifiableMarketService extends MarketService {
      * @return
      */
     final void emulate(Execution e, Consumer<Execution> executor) {
-        if (Scenario.time(e)) System.out.println("emulate " + e);
         now = e.date;
         nowMills = e.mills;
 
@@ -408,8 +406,6 @@ public class VerifiableMarketService extends MarketService {
                 while (!tasks.isEmpty() && tasks.peek().activeTime <= nowMills) {
                     tasks.poll().run();
                 }
-
-                if (Scenario.time(e)) System.out.println("order matching " + e + "  " + order);
 
                 executor.accept(Execution.with.direction(e.direction, executedSize)
                         .price(order.type.isTaker() ? order.marketMinPrice : order.price)
