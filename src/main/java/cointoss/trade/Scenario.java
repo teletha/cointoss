@@ -9,7 +9,7 @@
  */
 package cointoss.trade;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
@@ -22,6 +22,7 @@ import com.google.common.annotations.VisibleForTesting;
 import cointoss.Direction;
 import cointoss.Directional;
 import cointoss.Market;
+import cointoss.execution.Execution;
 import cointoss.order.Order;
 import cointoss.order.OrderState;
 import cointoss.order.OrderStrategy.Makable;
@@ -331,12 +332,21 @@ public abstract class Scenario extends EntryStatus implements Directional {
                                 .to(this::processExitOrder);
                     }));
         } else {
-            disposerForExit.add(market.tickers.latest.observe().take(e -> {
+            disposerForExit.add(market.tickers.latest.observeNow().take(e -> {
+                if (Scenario.time(e)) System.out
+                        .println("stop loss set " + e + "  " + price + "  " + entryPrice + "  " + exitSize + "  " + entryExecutedSize + "   " + e.price
+                                .isLessThanOrEqual(directional, price));
                 return e.price.isLessThanOrEqual(directional, price);
-            }).first().to(e -> {
+            }).takeUntil(e -> {
+                return exitSize.plus(e.size).isGreaterThan(entryExecutedSize);
+            }).to(e -> {
                 market.request(directional.inverse(), entryExecutedSize.minus(exitExecutedSize), strategy).to(this::processExitOrder);
             }));
         }
+    }
+
+    public static boolean time(Execution e) {
+        return e.id < 100 || (1393271012 <= e.id && e.id <= 1393271026);
     }
 
     /**
