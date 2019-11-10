@@ -110,6 +110,7 @@ public abstract class TraderTestSupport extends Trader {
         });
 
         market.perform(e);
+        awaitOrderBufferingTime();
         market.perform(exit);
         market.perform(exit);
     }

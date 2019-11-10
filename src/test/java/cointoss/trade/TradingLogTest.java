@@ -9,12 +9,11 @@
  */
 package cointoss.trade;
 
-import static cointoss.execution.Execution.*;
+import static cointoss.execution.Execution.with;
 
 import org.junit.jupiter.api.Test;
 
 import cointoss.execution.Execution;
-import cointoss.trade.TradingLog;
 
 public class TradingLogTest extends TraderTestSupport {
 

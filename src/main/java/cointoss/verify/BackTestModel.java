@@ -158,7 +158,7 @@ interface BackTestModel {
         List<Trader> traders = I.signal(traders()).map(t -> t.apply(market)).toList();
 
         LocalDateTime start = LocalDateTime.now();
-        market.readLog(log -> log.range(start(), end()).effect(e -> market.perform(e)));
+        market.readLog(log -> log.range(start(), end()).effect(e -> market.perform(e)).effectOnError(Throwable::printStackTrace));
         LocalDateTime end = LocalDateTime.now();
 
         for (Trader trader : traders) {

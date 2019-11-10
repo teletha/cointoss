@@ -9,7 +9,7 @@
  */
 package cointoss.trade;
 
-import static java.util.concurrent.TimeUnit.*;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
@@ -291,22 +291,7 @@ public abstract class Scenario extends EntryStatus implements Directional {
      * @param price An exit price.
      */
     protected final void exitAt(Variable<Num> price) {
-        if (entryPrice.isLessThan(directional, price)) {
-            disposerForExit.add(observeEntryExecutedSizeDiff().debounce(1, SECONDS, market.service.scheduler()).to(size -> {
-                market.request(directional.inverse(), entryExecutedSize.minus(exitSize), s -> s.make(price)).to(this::processExitOrder);
-            }));
-        } else {
-            disposerForExit.add(market.tickers.latest.observe().take(e -> e.price.isLessThanOrEqual(directional, price)).first().to(e -> {
-                Num v = entryExecutedSize.minus(exitExecutedSize);
-
-                if (v.isNegativeOrZero()) {
-                    System.out.println("The exit executed size exceeds the entr executed size.\r\n" + toString());
-                }
-
-                market.request(directional.inverse(), entryExecutedSize.minus(exitExecutedSize), Orderable::take)
-                        .to(this::processExitOrder);
-            }));
-        }
+        exitAt(price, entryPrice.isLessThan(directional, price) ? s -> s.make(price) : s -> s.take());
     }
 
     /**
@@ -346,18 +331,14 @@ public abstract class Scenario extends EntryStatus implements Directional {
      * @param price An exit price.
      */
     protected final void exitAt(Variable<Num> price, Consumer<Orderable> strategy) {
-        if (entryPrice.isLessThanOrEqual(directional, price)) {
-            disposerForExit
-                    .add(market.tickers.latest.observe().take(e -> e.price.isGreaterThanOrEqual(directional, price)).first().to(e -> {
-                        market.request(directional.inverse(), entryExecutedSize.minus(exitExecutedSize), strategy)
-                                .to(this::processExitOrder);
-                    }));
+        if (entryPrice.isLessThan(directional, price)) {
+            disposerForExit.add(observeEntryExecutedSizeDiff().debounce(1, SECONDS, market.service.scheduler()).to(size -> {
+                market.request(directional.inverse(), entryExecutedSize.minus(exitSize), strategy).to(this::processExitOrder);
+            }));
         } else {
-            disposerForExit.add(market.tickers.latest.observeNow().take(e -> {
-                return e.price.isLessThanOrEqual(directional, price);
-            }).takeUntil(e -> {
-                return exitSize.plus(e.size).isGreaterThan(entryExecutedSize);
-            }).to(e -> {
+            disposerForExit.add(market.tickers.latest.observe().take(e -> e.price.isLessThanOrEqual(directional, price)).first().to(e -> {
+                disposeEntry();
+
                 market.request(directional.inverse(), entryExecutedSize.minus(exitExecutedSize), strategy).to(this::processExitOrder);
             }));
         }
