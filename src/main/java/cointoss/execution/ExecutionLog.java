@@ -819,7 +819,7 @@ public class ExecutionLog {
     }
 
     public static void main(String[] args) {
-        restoreNormalLog(BitFlyer.FX_BTC_JPY, Chrono.utc(2019, 11, 9));
+        restoreNormalLog(BitFlyer.FX_BTC_JPY, Chrono.utc(2019, 11, 8));
     }
 
     public static void main2(String[] args) {

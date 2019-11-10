@@ -9,7 +9,7 @@
  */
 package cointoss.verify;
 
-import static java.time.temporal.ChronoUnit.MINUTES;
+import static java.time.temporal.ChronoUnit.*;
 
 import cointoss.Direction;
 import cointoss.Market;
@@ -24,8 +24,8 @@ public class BackTestInvoker {
 
     public static void main(String[] args) throws InterruptedException {
         BackTest.with.service(BitFlyer.FX_BTC_JPY)
-                .start(2019, 11, 9)
-                .end(2019, 11, 9)
+                .start(2019, 11, 8)
+                .end(2019, 11, 8)
                 .traders(Sample::new)
                 .initialBaseCurrency(3000000)
                 .run();

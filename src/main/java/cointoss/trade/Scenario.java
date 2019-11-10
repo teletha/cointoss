@@ -422,7 +422,12 @@ public abstract class Scenario extends EntryStatus implements Directional {
      */
     @Override
     public String toString() {
-        StringBuilder builder = new StringBuilder("Scenario ").append(directional).append("\r\n");
+        StringBuilder builder = new StringBuilder("Scenario ").append(directional)
+                .append(" un/realized")
+                .append(unrealizedProfit(market.latestPrice()))
+                .append("/")
+                .append(realizedProfit)
+                .append("\r\n");
         format(builder, "IN", entries, entryPrice, entrySize, entryExecutedSize, calculateCanceledSize(entries));
         format(builder, "OUT", exits, exitPrice, exitSize, exitExecutedSize, calculateCanceledSize(exits));
         if (logs != null) logs.forEach(log -> builder.append("\t").append(log).append("\r\n"));
