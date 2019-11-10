@@ -56,6 +56,7 @@ import com.univocity.parsers.csv.CsvWriterSettings;
 import cointoss.Direction;
 import cointoss.Market;
 import cointoss.MarketService;
+import cointoss.market.bitflyer.BitFlyer;
 import cointoss.market.bitmex.BitMex;
 import cointoss.util.Chrono;
 import cointoss.util.Network;
@@ -804,10 +805,21 @@ public class ExecutionLog {
         }
     }
 
-    public static void main(String[] args) {
-        Market market = new Market(BitMex.XBT_USD);
-        market.readLog(log -> log.fromYestaday());
+    /**
+     * Restore normal log of the specified market and date.
+     * 
+     * @param service
+     * @param date
+     */
+    public static void restoreNormalLog(MarketService service, ZonedDateTime date) {
+        ExecutionLog log = new ExecutionLog(service);
+        Cache cache = log.cache(date);
+        cache.read().to(cache.queue::add);
+        cache.write();
+    }
 
+    public static void main(String[] args) {
+        restoreNormalLog(BitFlyer.FX_BTC_JPY, Chrono.utc(2019, 11, 9));
     }
 
     public static void main2(String[] args) {
