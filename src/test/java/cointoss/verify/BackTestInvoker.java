@@ -9,7 +9,7 @@
  */
 package cointoss.verify;
 
-import static java.time.temporal.ChronoUnit.*;
+import static java.time.temporal.ChronoUnit.MINUTES;
 
 import cointoss.Direction;
 import cointoss.Market;
@@ -24,8 +24,8 @@ public class BackTestInvoker {
 
     public static void main(String[] args) throws InterruptedException {
         BackTest.with.service(BitFlyer.FX_BTC_JPY)
-                .start(2019, 11, 8)
-                .end(2019, 11, 8)
+                .start(2019, 11, 1)
+                .end(2019, 11, 1)
                 .traders(Sample::new)
                 .initialBaseCurrency(3000000)
                 .run();
@@ -39,22 +39,18 @@ public class BackTestInvoker {
         private Sample(Market market) {
             super(market);
 
-            when(market.tickers.of(TickSpan.Second5).add.skip(12), tick -> new Scenario() {
+            when(market.tickers.of(TickSpan.Minute1).add.skip(4), tick -> new Scenario() {
 
                 @Override
                 protected void entry() {
-                    Indicator indicator = new Indicator(market);
-
-                    if (indicator.diff.isGreaterThan(8)) {
-                        entry(indicator.direction, 0.1, s -> s.make(market.latestPrice().minus(indicator.direction, 150))
-                                .cancelAfter(5, MINUTES));
-                    }
+                    entry(Direction.random(), 0.1, s -> s.make(market.tickers.latestPrice.v.minus(this, 300)).cancelAfter(5, MINUTES));
                 }
 
                 @Override
                 protected void exit() {
-                    exitAt(entryPrice.plus(this, 1000));
-                    exitAt(entryPrice.minus(this, 500), s -> s.take());
+                    exitAt(entryPrice.plus(this, 3900));
+
+                    exitAt(trailing(up -> entryPrice.minus(this, 1300).plus(this, up)));
                 }
             });
         }

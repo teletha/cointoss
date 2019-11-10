@@ -17,6 +17,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import com.google.common.annotations.VisibleForTesting;
 
@@ -357,6 +358,12 @@ public abstract class Scenario extends EntryStatus implements Directional {
         }));
     }
 
+    protected final Variable<Num> trailing(Function<Num, Num> trailer) {
+        Variable variable = Variable.empty();
+        disposerForExit.add(market.tickers.latest.observeNow().map(v -> trailer.apply(entryPrice.minus(this, v.price))).to(variable));
+        return variable;
+    }
+
     /**
      * Process for additional exit order.
      * 
@@ -405,7 +412,7 @@ public abstract class Scenario extends EntryStatus implements Directional {
     public String toString() {
         StringBuilder builder = new StringBuilder("Scenario ").append(directional)
                 .append(" un/realized")
-                .append(unrealizedProfit(market.latestPrice()))
+                .append(unrealizedProfit(market.tickers.latestPrice.v))
                 .append("/")
                 .append(realizedProfit)
                 .append("\r\n");

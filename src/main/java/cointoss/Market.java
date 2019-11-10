@@ -250,24 +250,6 @@ public class Market implements Disposable {
     }
 
     /**
-     * Shorthand accessor to the latest price.
-     * 
-     * @return
-     */
-    public final Num latestPrice() {
-        return tickers.latest.v.price;
-    }
-
-    /**
-     * Shorthand accessor to the latest price.
-     * 
-     * @return
-     */
-    public final Signal<Num> observeLatestPrice() {
-        return timelineNow.map(Execution::price).diff();
-    }
-
-    /**
      * Create new price signal.
      * 
      * @param price

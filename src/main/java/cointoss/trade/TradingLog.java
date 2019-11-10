@@ -9,7 +9,7 @@
  */
 package cointoss.trade;
 
-import static cointoss.util.Num.*;
+import static cointoss.util.Num.HUNDRED;
 
 import java.text.NumberFormat;
 import java.time.Duration;
@@ -89,7 +89,7 @@ public class TradingLog {
             holdTime.add(entry.holdTime().toMillis());
 
             // calculate profit and loss
-            Num pol = entry.profit(market.latestPrice());
+            Num pol = entry.profit(market.tickers.latestPrice.v);
             Num pips = entry.entryExecutedSize.isZero() ? Num.ZERO : pol.divide(entry.entryExecutedSize);
 
             profitAndLoss.add(pol);

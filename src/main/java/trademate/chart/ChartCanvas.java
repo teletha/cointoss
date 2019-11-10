@@ -27,7 +27,6 @@ import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.PathElement;
 
-import cointoss.Market;
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.market.bitflyer.SFD;
 import cointoss.ticker.Tick;
@@ -275,7 +274,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     private void visualizeLatestPrice() {
         chart.market.observeNow() //
                 .skipNull()
-                .switchMap(Market::observeLatestPrice)
+                .switchMap(m -> m.tickers.latestPrice.observeNow())
                 .on(Viewtify.UIThread)
                 .effectOnLifecycle(disposer -> {
                     TickLable latest = latestPrice.createLabel("最新値");
