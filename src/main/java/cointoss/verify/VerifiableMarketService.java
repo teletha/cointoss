@@ -329,11 +329,15 @@ public class VerifiableMarketService extends MarketService {
      * @return
      */
     final void elapse(long time, TimeUnit unit) {
-        now = now.plus(time, unit.toChronoUnit());
-        nowMills = nowMills + unit.toMillis(time);
+        long seconds = unit.toSeconds(time);
 
-        while (!tasks.isEmpty() && tasks.peek().activeTime <= nowMills) {
-            tasks.poll().run();
+        for (long i = 0; i < seconds; i++) {
+            now = now.plusSeconds(1);
+            nowMills += 1000;
+
+            while (!tasks.isEmpty() && tasks.peek().activeTime <= nowMills) {
+                tasks.poll().run();
+            }
         }
     }
 

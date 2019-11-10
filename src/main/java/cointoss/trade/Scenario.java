@@ -9,7 +9,7 @@
  */
 package cointoss.trade;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
@@ -148,8 +148,12 @@ public abstract class Scenario extends EntryStatus implements Directional {
      * Compute position holding time.
      */
     public final Duration holdTime() {
+        if (entryExecutedSize.isZero() && isEntryTerminated()) {
+            return Duration.ZERO;
+        }
+
         ZonedDateTime start = entries.first().map(o -> o.creationTime).or(Chrono.MIN);
-        ZonedDateTime end = exits.last().map(o -> o.terminationTime).or(market.service.now());
+        ZonedDateTime end = exits.isEmpty() ? market.service.now() : exits.last().map(o -> o.terminationTime).or(market.service.now());
 
         return Duration.between(start, end);
     }

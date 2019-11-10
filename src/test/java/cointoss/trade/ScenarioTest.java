@@ -31,6 +31,67 @@ class ScenarioTest extends TraderTestSupport {
     }
 
     @Test
+    void holdTimeWithNoneExecutedActiveEntry() {
+        when(now(), v -> new Scenario() {
+
+            @Override
+            protected void entry() {
+                entry(Direction.BUY, 1, s -> s.make(10));
+            }
+
+            @Override
+            protected void exit() {
+            }
+        });
+
+        market.elapse(14, SECONDS);
+
+        Scenario s = latest();
+        assert s.holdTime().equals(Duration.ofSeconds(14));
+    }
+
+    @Test
+    void holdTimeWithNoneExecutedCanceledEntry() {
+        when(now(), v -> new Scenario() {
+
+            @Override
+            protected void entry() {
+                entry(Direction.BUY, 1, s -> s.make(10).cancelAfter(8, SECONDS));
+            }
+
+            @Override
+            protected void exit() {
+            }
+        });
+
+        market.elapse(18, SECONDS);
+
+        Scenario s = latest();
+        assert s.holdTime().isZero();
+    }
+
+    @Test
+    void holdTimeWithPartialyExecutedCanceledEntry() {
+        when(now(), v -> new Scenario() {
+
+            @Override
+            protected void entry() {
+                entry(Direction.BUY, 1, s -> s.make(10).cancelAfter(8, SECONDS));
+            }
+
+            @Override
+            protected void exit() {
+            }
+        });
+
+        market.perform(Execution.with.buy(0.1).price(9));
+        market.elapse(18, SECONDS);
+
+        Scenario s = latest();
+        assert s.holdTime().equals(Duration.ofSeconds(18));
+    }
+
+    @Test
     void isTerminated() {
         entry(Execution.with.buy(1).price(10));
 
