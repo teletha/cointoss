@@ -40,7 +40,7 @@ import kiss.Variable;
 /**
  * Declarative entry and exit definition.
  */
-public abstract class Scenario extends EntryStatus implements Directional {
+public abstract class Scenario extends ScenarioBase implements Directional {
 
     /** The scenario direction. */
     private Directional directional;
@@ -359,8 +359,16 @@ public abstract class Scenario extends EntryStatus implements Directional {
     }
 
     protected final Variable<Num> trailing(Function<Num, Num> trailer) {
+        Variable<Num> trailedPrice = Variable.of(trailer.apply(entryPrice));
+        disposerForExit.add(market.tickers.latestPrice.observeNow()
+                .map(price -> Num.max(this, trailer.apply(price), trailedPrice.v))
+                .to(trailedPrice));
+        return trailedPrice;
+    }
+
+    protected final Variable<Num> trailing2(Function<Num, Num> trailer) {
         Variable variable = Variable.empty();
-        disposerForExit.add(market.tickers.latest.observeNow().map(v -> trailer.apply(entryPrice.minus(this, v.price))).to(variable));
+        disposerForExit.add(market.tickers.latestPrice.observeNow().map(v -> trailer.apply(entryPrice.minus(this, v))).to(variable));
         return variable;
     }
 

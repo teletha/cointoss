@@ -24,8 +24,8 @@ public class BackTestInvoker {
 
     public static void main(String[] args) throws InterruptedException {
         BackTest.with.service(BitFlyer.FX_BTC_JPY)
-                .start(2019, 11, 1)
-                .end(2019, 11, 1)
+                .start(2019, 11, 9)
+                .end(2019, 11, 9)
                 .traders(Sample::new)
                 .initialBaseCurrency(3000000)
                 .run();
@@ -50,7 +50,8 @@ public class BackTestInvoker {
                 protected void exit() {
                     exitAt(entryPrice.plus(this, 3900));
 
-                    exitAt(trailing(up -> entryPrice.minus(this, 1300).plus(this, up)));
+                    exitAt(trailing2(up -> entryPrice.minus(this, 1300).plus(this, up)));
+                    // exitAt(trailing(price -> price.minus(this, 1500)));
                 }
             });
         }
