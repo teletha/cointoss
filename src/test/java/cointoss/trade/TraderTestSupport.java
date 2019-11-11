@@ -15,7 +15,6 @@ import java.time.temporal.ChronoUnit;
 import org.junit.jupiter.api.BeforeEach;
 
 import cointoss.execution.Execution;
-import cointoss.order.OrderStrategy.Orderable;
 import cointoss.verify.VerifiableMarket;
 import kiss.I;
 import kiss.Signal;
@@ -79,14 +78,15 @@ public abstract class TraderTestSupport extends Trader {
 
             @Override
             protected void entry() {
-                entry(e, e.size, Orderable::take);
+                entry(e, e.size, s -> s.make(e.price));
             }
 
             @Override
             protected void exit() {
             }
         });
-        market.perform(e);
+        market.perform(Execution.with.direction(e.direction, e.size).price(e.price.minus(e, 1)).date(e.date));
+        awaitOrderBufferingTime();
     }
 
     /**

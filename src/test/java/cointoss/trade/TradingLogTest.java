@@ -18,12 +18,23 @@ import cointoss.execution.Execution;
 public class TradingLogTest extends TraderTestSupport {
 
     @Test
-    void entry() {
+    void entryTerminated() {
         entryAndExit(Execution.with.buy(1).price(10), Execution.with.buy(1).price(20));
 
         TradingLog log = log();
         assert log.terminated == 1;
         assert log.active == 0;
+        assert log.cancel == 0;
+        assert log.total == 1;
+    }
+
+    @Test
+    void entryActive() {
+        entry(Execution.with.buy(1).price(10));
+
+        TradingLog log = log();
+        assert log.terminated == 0;
+        assert log.active == 1;
         assert log.cancel == 0;
         assert log.total == 1;
     }

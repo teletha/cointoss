@@ -39,7 +39,7 @@ public class BackTestInvoker {
         private Sample(Market market) {
             super(market);
 
-            when(market.tickers.of(TickSpan.Hour1).add, tick -> new Scenario() {
+            when(market.tickers.of(TickSpan.Minute5).add, tick -> new Scenario() {
 
                 @Override
                 protected void entry() {
@@ -50,7 +50,7 @@ public class BackTestInvoker {
                 protected void exit() {
                     exitAt(entryPrice.plus(this, 3900));
 
-                    // exitAt(trailing2(up -> entryPrice.minus(this, 1300).plus(this, up)));
+                    exitAt(trailing2(up -> entryPrice.minus(this, 1300).plus(this, up)));
                     // exitAt(trailing(price -> price.minus(this, 1500)));
                 }
             });

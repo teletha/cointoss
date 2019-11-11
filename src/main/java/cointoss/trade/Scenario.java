@@ -75,7 +75,6 @@ public abstract class Scenario extends ScenarioBase implements Directional {
         enableLog();
         // calculate profit
         disposerForExit.add(observeExitExecutedSize().to(size -> {
-            System.out.println(size + "  " + exitPrice + "   " + entryPrice + "   " + size);
             setRealizedProfit(exitPrice.diff(directional, entryPrice).multiply(size));
         }));
 
