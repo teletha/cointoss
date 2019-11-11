@@ -9,7 +9,7 @@
  */
 package cointoss.trade;
 
-import static java.time.temporal.ChronoUnit.*;
+import static java.time.temporal.ChronoUnit.SECONDS;
 
 import java.time.Duration;
 
@@ -19,8 +19,64 @@ import org.junit.jupiter.api.Test;
 import cointoss.Direction;
 import cointoss.execution.Execution;
 import cointoss.order.Order;
+import cointoss.util.Num;
 
 class ScenarioTest extends TraderTestSupport {
+
+    @Test
+    void buyProfitCompletedEntryAndCompletedExit() {
+        entryAndExit(Execution.with.buy(1).price(10), Execution.with.sell(1).price(20));
+        Scenario s = latest();
+        assert s.realizedProfit().is(10);
+        assert s.unrealizedProfit(Num.of(25)).is(0);
+        assert s.profit(Num.of(25)).is(10);
+
+    }
+
+    @Test
+    void sellProfitCompletedEntryAndCompletedExit() {
+        entryAndExit(Execution.with.sell(1).price(10), Execution.with.buy(1).price(2));
+        Scenario s = latest();
+        assert s.realizedProfit().is(8);
+        assert s.unrealizedProfit(Num.of(1)).is(0);
+        assert s.profit(Num.of(1)).is(8);
+    }
+
+    @Test
+    void buyProfitCompletedEntryAndPartiallyExecutedExit() {
+        entryAndExit(Execution.with.buy(2).price(10), Execution.with.sell(1).price(20));
+        Scenario s = latest();
+        assert s.realizedProfit().is(10);
+        assert s.unrealizedProfit(Num.of(25)).is(15);
+        assert s.profit(Num.of(30)).is(30);
+    }
+
+    @Test
+    void sellProfitCompletedEntryAndPartiallyExecutedExit() {
+        entryAndExit(Execution.with.sell(2).price(20), Execution.with.buy(1).price(10));
+        Scenario s = latest();
+        assert s.realizedProfit().is(10);
+        assert s.unrealizedProfit(Num.of(5)).is(15);
+        assert s.profit(Num.of(5)).is(25);
+    }
+
+    @Test
+    void buyProfitCompletedEntryAndNoExit() {
+        entry(Execution.with.buy(1).price(10));
+        Scenario s = latest();
+        assert s.realizedProfit().is(0);
+        assert s.unrealizedProfit(Num.of(25)).is(15);
+        assert s.profit(Num.of(25)).is(15);
+    }
+
+    @Test
+    void sellProfitCompletedEntryAndNoExit() {
+        entry(Execution.with.sell(1).price(10));
+        Scenario s = latest();
+        assert s.realizedProfit().is(0);
+        assert s.unrealizedProfit(Num.of(5)).is(5);
+        assert s.profit(Num.of(2)).is(8);
+    }
 
     @Test
     void holdTime() {

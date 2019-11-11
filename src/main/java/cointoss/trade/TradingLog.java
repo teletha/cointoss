@@ -33,10 +33,22 @@ public class TradingLog {
     public final Statistics profitRange;
 
     /** summary */
+    public final Statistics unrealizedProfit;
+
+    /** summary */
+    public final Statistics unrealizedProfitRange;
+
+    /** summary */
     public final Statistics loss;
 
     /** summary */
     public final Statistics lossRange;
+
+    /** summary */
+    public final Statistics unrealizedLoss;
+
+    /** summary */
+    public final Statistics unrealizedLossRange;
 
     /** summary */
     public final Statistics profitAndLoss;
@@ -75,8 +87,12 @@ public class TradingLog {
         Function<Num, String> format = v -> v.scale(market.service.setting.baseCurrencyScaleSize).format(NumberFormat.getNumberInstance());
         this.profit = new Statistics().formatter(format);
         this.profitRange = new Statistics().formatter(format);
+        this.unrealizedProfit = new Statistics().formatter(format);
+        this.unrealizedProfitRange = new Statistics().formatter(format);
         this.loss = new Statistics().formatter(format).negative();
         this.lossRange = new Statistics().formatter(format).negative();
+        this.unrealizedLoss = new Statistics().formatter(format).negative();
+        this.unrealizedLossRange = new Statistics().formatter(format).negative();
         this.profitAndLoss = new Statistics().formatter(format);
         this.entries = entries;
 
@@ -89,16 +105,26 @@ public class TradingLog {
             holdTime.add(entry.holdTime().toMillis());
 
             // calculate profit and loss
-            Num pol = entry.profit(market.tickers.latestPrice.v);
-            Num pips = entry.entryExecutedSize.isZero() ? Num.ZERO : pol.divide(entry.entryExecutedSize);
+            Num realized = entry.realizedProfit;
+            Num unrealized = entry.unrealizedProfit(market.tickers.latestPrice.v);
+            Num pol = realized.plus(unrealized);
+            Num pips = entry.entryExecutedSize.isZero() ? Num.ZERO : realized.divide(entry.entryExecutedSize);
+            Num unrealizedPips = entry.entryExecutedSize.isZero() ? Num.ZERO : unrealized.divide(entry.entryExecutedSize);
 
             profitAndLoss.add(pol);
-            if (pol.isPositiveOrZero()) {
-                profit.add(pol);
+            if (realized.isPositiveOrZero()) {
+                profit.add(realized);
                 profitRange.add(pips);
             } else {
-                loss.add(pol);
+                loss.add(realized);
                 lossRange.add(pips);
+            }
+            if (unrealized.isPositiveOrZero()) {
+                unrealizedProfit.add(unrealized);
+                unrealizedProfitRange.add(unrealizedPips);
+            } else {
+                unrealizedLoss.add(unrealized);
+                unrealizedLossRange.add(unrealizedPips);
             }
             maxTotalProfitAndLoss = Num.max(maxTotalProfitAndLoss, profitAndLoss.total());
             drawDown = Num.max(drawDown, maxTotalProfitAndLoss.minus(profitAndLoss.total()));
@@ -145,8 +171,10 @@ public class TradingLog {
         builder.append("時間 ").append(holdTime).append("\t実行").append(Chrono.formatAsDuration(duration.toMillis())).append(EOL);
         // builder.append("利益 ").append(profit).append(EOL);
         builder.append("利幅 ").append(profitRange).append(EOL);
+        builder.append("含利幅 ").append(unrealizedProfitRange).append(EOL);
         // builder.append("損失 ").append(loss).append(EOL);
         builder.append("損幅 ").append(lossRange).append(EOL);
+        builder.append("含損幅 ").append(unrealizedLossRange).append(EOL);
         builder.append("総合 ")
                 .append(profitAndLoss)
                 .append("\t勝率")

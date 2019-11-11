@@ -100,18 +100,18 @@ public abstract class TraderTestSupport extends Trader {
 
             @Override
             protected void entry() {
-                entry(e, e.size, Orderable::take);
+                entry(e, e.size, s -> s.make(e.price));
             }
 
             @Override
             protected void exit() {
-                exitAt(exit.price, Orderable::take);
+                exitWhen(now(), s -> s.make(exit.price));
             }
         });
 
-        market.perform(e);
+        market.perform(Execution.with.direction(e.direction, e.size).price(e.price.minus(e, 1)).date(e.date));
         awaitOrderBufferingTime();
-        market.perform(exit);
-        market.perform(exit);
+        market.perform(Execution.with.direction(e.inverse(), exit.size).price(exit.price.minus(e.inverse(), 1)).date(exit.date));
+        awaitOrderBufferingTime();
     }
 }
