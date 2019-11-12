@@ -27,6 +27,12 @@ public class TradingLog {
     public final Statistics holdTime = new Statistics().formatter(Chrono::formatAsDuration);
 
     /** summary */
+    public final Statistics holdTimeProfit = new Statistics().formatter(Chrono::formatAsDuration);
+
+    /** summary */
+    public final Statistics holdTimeLoss = new Statistics().formatter(Chrono::formatAsDuration);
+
+    /** summary */
     public final Statistics profit;
 
     /** summary */
@@ -119,7 +125,8 @@ public class TradingLog {
             if (entry.isTerminated()) terminated++;
 
             // calculate order and hold time
-            holdTime.add(entry.holdTime().toMillis());
+            long hold = entry.holdTime().toMillis();
+            holdTime.add(hold);
 
             // calculate profit and loss
             Num realized = entry.realizedProfit;
@@ -133,9 +140,11 @@ public class TradingLog {
             if (pol.isPositive()) {
                 profit.add(pol);
                 profitRange.add(pips);
+                holdTimeProfit.add(hold);
             } else if (pol.isNegative()) {
                 loss.add(pol);
                 lossRange.add(pips);
+                holdTimeLoss.add(hold);
             }
             if (realized.isPositive()) {
                 realizedProfit.add(realized);
