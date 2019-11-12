@@ -24,7 +24,6 @@ public class TradingLogTest extends TraderTestSupport {
         TradingLog log = log();
         assert log.terminated == 1;
         assert log.active == 0;
-        assert log.cancel == 0;
         assert log.total == 1;
     }
 
@@ -35,7 +34,6 @@ public class TradingLogTest extends TraderTestSupport {
         TradingLog log = log();
         assert log.terminated == 0;
         assert log.active == 1;
-        assert log.cancel == 0;
         assert log.total == 1;
     }
 
@@ -113,7 +111,6 @@ public class TradingLogTest extends TraderTestSupport {
         TradingLog log = log();
         assert log.terminated == 0;
         assert log.active == 1;
-        assert log.cancel == 0;
         assert log.total == 1;
     }
 

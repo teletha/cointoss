@@ -33,6 +33,12 @@ public class TradingLog {
     public final Statistics profitRange;
 
     /** summary */
+    public final Statistics realizedProfit;
+
+    /** summary */
+    public final Statistics realizedProfitRange;
+
+    /** summary */
     public final Statistics unrealizedProfit;
 
     /** summary */
@@ -43,6 +49,12 @@ public class TradingLog {
 
     /** summary */
     public final Statistics lossRange;
+
+    /** summary */
+    public final Statistics realizedLoss;
+
+    /** summary */
+    public final Statistics realizedLossRange;
 
     /** summary */
     public final Statistics unrealizedLoss;
@@ -71,9 +83,6 @@ public class TradingLog {
     /** A number of terminated entries. */
     public int terminated = 0;
 
-    /** A number of canceled entries. */
-    public int cancel = 0;
-
     /** The all entries. */
     private final List<Scenario> entries;
 
@@ -87,16 +96,24 @@ public class TradingLog {
         Function<Num, String> format = v -> v.scale(market.service.setting.baseCurrencyScaleSize).format(NumberFormat.getNumberInstance());
         this.profit = new Statistics().formatter(format);
         this.profitRange = new Statistics().formatter(format);
+        this.realizedProfit = new Statistics().formatter(format);
+        this.realizedProfitRange = new Statistics().formatter(format);
         this.unrealizedProfit = new Statistics().formatter(format);
         this.unrealizedProfitRange = new Statistics().formatter(format);
         this.loss = new Statistics().formatter(format).negative();
         this.lossRange = new Statistics().formatter(format).negative();
+        this.realizedLoss = new Statistics().formatter(format).negative();
+        this.realizedLossRange = new Statistics().formatter(format).negative();
         this.unrealizedLoss = new Statistics().formatter(format).negative();
         this.unrealizedLossRange = new Statistics().formatter(format).negative();
         this.profitAndLoss = new Statistics().formatter(format);
         this.entries = entries;
 
         for (Scenario entry : entries) {
+            if (entry.isCanceled()) {
+                continue;
+            }
+
             total++;
             if (entry.isActive()) active++;
             if (entry.isTerminated()) terminated++;
@@ -109,20 +126,28 @@ public class TradingLog {
             Num unrealized = entry.unrealizedProfit(market.tickers.latestPrice.v);
             Num pol = realized.plus(unrealized);
             Num pips = entry.entryExecutedSize.isZero() ? Num.ZERO : realized.divide(entry.entryExecutedSize);
+            Num realizedPips = entry.entryExecutedSize.isZero() ? Num.ZERO : realized.divide(entry.entryExecutedSize);
             Num unrealizedPips = entry.entryExecutedSize.isZero() ? Num.ZERO : unrealized.divide(entry.entryExecutedSize);
 
             profitAndLoss.add(pol);
-            if (realized.isPositiveOrZero()) {
-                profit.add(realized);
+            if (pol.isPositive()) {
+                profit.add(pol);
                 profitRange.add(pips);
-            } else {
-                loss.add(realized);
+            } else if (pol.isNegative()) {
+                loss.add(pol);
                 lossRange.add(pips);
             }
-            if (unrealized.isPositiveOrZero()) {
+            if (realized.isPositive()) {
+                realizedProfit.add(realized);
+                realizedProfitRange.add(realizedPips);
+            } else if (realized.isNegative()) {
+                realizedLoss.add(realized);
+                realizedLossRange.add(realizedPips);
+            }
+            if (unrealized.isPositive()) {
                 unrealizedProfit.add(unrealized);
                 unrealizedProfitRange.add(unrealizedPips);
-            } else {
+            } else if (unrealized.isNegative()) {
                 unrealizedLoss.add(unrealized);
                 unrealizedLossRange.add(unrealizedPips);
             }
@@ -136,7 +161,7 @@ public class TradingLog {
      * Calculate winning rate.
      */
     public Num winningRate() {
-        return profitAndLoss.size() == 0 ? Num.ZERO : Num.of(profit.size()).divide(Num.of(profitAndLoss.size())).multiply(HUNDRED).scale(1);
+        return profitAndLoss.size() == 0 ? Num.ZERO : Num.of(profit.size()).divide(total).multiply(HUNDRED).scale(1);
     }
 
     /**
@@ -191,8 +216,6 @@ public class TradingLog {
                 .append(terminated)
                 .append(" 残")
                 .append(active)
-                .append(" 中止")
-                .append(cancel)
                 .append(EOL);
 
         return builder.toString();
