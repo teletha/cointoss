@@ -9,7 +9,7 @@
  */
 package cointoss.execution;
 
-import static java.nio.charset.StandardCharsets.*;
+import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static java.nio.file.StandardOpenOption.*;
 import static java.util.concurrent.TimeUnit.*;
 
@@ -39,6 +39,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import org.apache.commons.lang3.RandomUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -62,7 +63,6 @@ import cointoss.util.Chrono;
 import cointoss.util.Network;
 import cointoss.util.Num;
 import cointoss.util.Retry;
-import cointoss.util.Span;
 import kiss.I;
 import kiss.Observer;
 import kiss.Signal;
@@ -71,9 +71,7 @@ import psychopath.File;
 import psychopath.Locator;
 
 /**
- * Log Manager.
- * 
- * @version 2018/08/03 8:34:01
+ * {@link Execution} Log Manager.
  */
 public class ExecutionLog {
 
@@ -450,17 +448,6 @@ public class ExecutionLog {
     /**
      * Read log from the specified start to end.
      * 
-     * @param init
-     * @param limit
-     * @return
-     */
-    public final Signal<Execution> range(Span span) {
-        return range(span.start, span.end);
-    }
-
-    /**
-     * Read log from the specified start to end.
-     * 
      * @param start
      * @param end
      * @return
@@ -476,7 +463,9 @@ public class ExecutionLog {
      * @return
      */
     public final Signal<Execution> rangeRandom(int days) {
-        return range(Span.random(cacheFirst, cacheLast.minusDays(1), days));
+        long range = ChronoUnit.DAYS.between(cacheFirst, cacheLast.minusDays(days + 1));
+        long offset = RandomUtils.nextLong(0, range);
+        return range(cacheFirst.plusDays(offset), cacheFirst.plusDays(offset + days));
     }
 
     /**
