@@ -32,7 +32,6 @@ import cointoss.order.OrderStrategy.Takable;
 import cointoss.ticker.TickerManager;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
-import cointoss.util.PentaConsumer;
 import cointoss.util.Retry;
 import kiss.Disposable;
 import kiss.I;
@@ -43,8 +42,6 @@ import kiss.WiseConsumer;
 
 /**
  * Facade for the market related operations.
- * 
- * @version 2018/08/14 1:04:19
  */
 public class Market implements Disposable {
 
@@ -281,7 +278,7 @@ public class Market implements Disposable {
     private class MarketOrderStrategy implements Orderable, Takable, Makable, Cancellable {
 
         /** The action sequence. */
-        private final LinkedList<PentaConsumer<Market, Direction, Num, Order, Observer<? super Order>>> actions = new LinkedList();
+        private final LinkedList<OrderAction> actions = new LinkedList();
 
         /**
          * {@inheritDoc}
@@ -418,13 +415,21 @@ public class Market implements Disposable {
          * @param size
          */
         private void execute(Market market, Direction direction, Num size, Order previous, Observer<? super Order> observer) {
-            PentaConsumer<Market, Direction, Num, Order, Observer<? super Order>> action = actions.pollFirst();
+            OrderAction action = actions.pollFirst();
 
             if (action == null) {
                 observer.complete();
             } else {
-                action.accept(market, direction, size, previous, observer);
+                action.execute(market, direction, size, previous, observer);
             }
         }
+    }
+
+    /**
+     * 
+     */
+    private interface OrderAction {
+
+        void execute(Market market, Direction direction, Num num, Order order, Observer<? super Order> observer);
     }
 }

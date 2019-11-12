@@ -14,18 +14,16 @@ import static java.time.temporal.ChronoUnit.MINUTES;
 import cointoss.Direction;
 import cointoss.Market;
 import cointoss.market.bitflyer.BitFlyer;
-import cointoss.ticker.Tick;
 import cointoss.ticker.TickSpan;
 import cointoss.trade.Scenario;
 import cointoss.trade.Trader;
-import cointoss.util.Num;
 
 public class BackTestInvoker {
 
     public static void main(String[] args) throws InterruptedException {
         BackTest.with.service(BitFlyer.FX_BTC_JPY)
-                .start(2019, 11, 9)
-                .end(2019, 11, 11)
+                .start(2019, 10, 25)
+                .end(2019, 10, 26)
                 .traders(Sample::new)
                 .initialBaseCurrency(3000000)
                 .run();
@@ -53,30 +51,6 @@ public class BackTestInvoker {
                     exitAt(trailing2(up -> entryPrice.minus(this, 1300).plus(this, up)));
                 }
             });
-        }
-    }
-
-    private static class Indicator {
-
-        Num buyVolume = Num.ZERO;
-
-        Num sellVolume = Num.ZERO;
-
-        Direction direction;
-
-        Num diff;
-
-        private Indicator(Market market) {
-            Tick t = market.tickers.of(TickSpan.Second5).last();
-
-            for (int i = 12; 0 < i; i--) {
-                buyVolume = buyVolume.plus(t.buyVolume());
-                sellVolume = sellVolume.plus(t.sellVolume());
-                t = t.previous;
-            }
-            direction = buyVolume.isGreaterThan(sellVolume) ? Direction.BUY : Direction.SELL;
-
-            diff = buyVolume.minus(sellVolume).abs();
         }
     }
 }
