@@ -18,9 +18,6 @@ import kiss.I;
 import kiss.Signal;
 import kiss.Variable;
 
-/**
- * @version 2018/07/06 10:21:22
- */
 public final class TickerManager implements Disposable {
 
     /** The initial execution. */
@@ -98,6 +95,9 @@ public final class TickerManager implements Disposable {
             // initialize tickers once if needed
             initialized = true;
             initial.set(e);
+            // for the first time only, set LTP before updating tickers
+            latest.set(e);
+            latestPrice.set(e.price);
 
             for (Ticker ticker : tickers) {
                 ticker.init(e, this);

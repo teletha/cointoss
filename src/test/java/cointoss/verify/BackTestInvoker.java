@@ -23,6 +23,7 @@ import cointoss.util.Num;
 public class BackTestInvoker {
 
     public static void main(String[] args) throws InterruptedException {
+        Thread.sleep(8000);
         BackTest.with.service(BitFlyer.FX_BTC_JPY)
                 .start(2019, 11, 9)
                 .end(2019, 11, 9)
@@ -48,9 +49,9 @@ public class BackTestInvoker {
 
                 @Override
                 protected void exit() {
-                    exitAt(entryPrice.plus(this, 3900));
+                    exitAt(entryPrice.plus(this, 8935));
 
-                    exitAt(trailing2(up -> entryPrice.minus(this, 1300).plus(this, up)));
+                    // exitAt(trailing2(up -> entryPrice.minus(this, 1300).plus(this, up)));
                     // exitAt(trailing(price -> price.minus(this, 1500)));
                 }
             });
