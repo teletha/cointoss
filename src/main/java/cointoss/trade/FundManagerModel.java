@@ -38,7 +38,7 @@ interface FundManagerModel {
      * @return
      */
     @Icy.Property
-    default double riskAssetsRatio() {
+    default double acceptableRiskAssetsRatio() {
         return 0.01;
     }
 
@@ -48,8 +48,8 @@ interface FundManagerModel {
      * @param ratio
      * @return
      */
-    @Icy.Intercept("riskAssetsRatio")
-    private double validateRiskAssetsRatio(double ratio) {
+    @Icy.Intercept("acceptableRiskAssetsRatio")
+    private double validateAcceptableRiskAssetsRatio(double ratio) {
         if (ratio < 0.001) {
             ratio = 0.001;
         }
@@ -66,7 +66,7 @@ interface FundManagerModel {
      * @return
      */
     default Num riskAssets() {
-        return totalAssets().multiply(riskAssetsRatio());
+        return totalAssets().multiply(acceptableRiskAssetsRatio());
     }
 
     /**
@@ -74,7 +74,7 @@ interface FundManagerModel {
      * 
      * @return
      */
-    @Icy.Property(mutable = true, copiable = true)
+    @Icy.Property
     default Num losscutRange() {
         return Num.of(-2000);
     }

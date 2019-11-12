@@ -57,7 +57,7 @@ public class FundManager implements FundManagerModel {
     private static final MethodHandle totalAssets$912239839= invoker("totalAssets", double.class);
 
     /** The overload or intercept method invoker. */
-    private static final MethodHandle validateRiskAssetsRatio$912239839= invoker("validateRiskAssetsRatio", double.class);
+    private static final MethodHandle validateAcceptableRiskAssetsRatio$912239839= invoker("validateAcceptableRiskAssetsRatio", double.class);
 
     /** The overload or intercept method invoker. */
     private static final MethodHandle validateLosscutRange$1377900837= invoker("validateLosscutRange", Num.class);
@@ -85,7 +85,7 @@ public class FundManager implements FundManagerModel {
     private static final MethodHandle totalAssetsUpdater = updater("totalAssets");
 
     /** The final property updater. */
-    private static final MethodHandle riskAssetsRatioUpdater = updater("riskAssetsRatio");
+    private static final MethodHandle acceptableRiskAssetsRatioUpdater = updater("acceptableRiskAssetsRatio");
 
     /** The final property updater. */
     private static final MethodHandle losscutRangeUpdater = updater("losscutRange");
@@ -103,7 +103,7 @@ public class FundManager implements FundManagerModel {
     public final Num totalAssets;
 
     /** The exposed property. */
-    public final double riskAssetsRatio;
+    public final double acceptableRiskAssetsRatio;
 
     /** The exposed property. */
     public final Num losscutRange;
@@ -122,7 +122,7 @@ public class FundManager implements FundManagerModel {
      */
     protected FundManager() {
         this.totalAssets = null;
-        this.riskAssetsRatio = FundManagerModel.super.riskAssetsRatio();
+        this.acceptableRiskAssetsRatio = FundManagerModel.super.acceptableRiskAssetsRatio();
         this.losscutRange = FundManagerModel.super.losscutRange();
         this.riskRewardRatio = FundManagerModel.super.riskRewardRatio();
         this.historicalVolatility = FundManagerModel.super.historicalVolatility();
@@ -171,28 +171,28 @@ public class FundManager implements FundManagerModel {
      *  @return
      */
     @Override
-    public final double riskAssetsRatio() {
-        return this.riskAssetsRatio;
+    public final double acceptableRiskAssetsRatio() {
+        return this.acceptableRiskAssetsRatio;
     }
 
     /**
      * Provide classic getter API.
      *
-     * @return A value of riskAssetsRatio property.
+     * @return A value of acceptableRiskAssetsRatio property.
      */
     @SuppressWarnings("unused")
-    private final double getRiskAssetsRatio() {
-        return this.riskAssetsRatio;
+    private final double getAcceptableRiskAssetsRatio() {
+        return this.acceptableRiskAssetsRatio;
     }
 
     /**
      * Provide classic setter API.
      *
-     * @paran value A new value of riskAssetsRatio property to assign.
+     * @paran value A new value of acceptableRiskAssetsRatio property to assign.
      */
-    private final void setRiskAssetsRatio(double value) {
+    private final void setAcceptableRiskAssetsRatio(double value) {
         try {
-            riskAssetsRatioUpdater.invoke(this, validateRiskAssetsRatio$912239839.invoke(this, value));
+            acceptableRiskAssetsRatioUpdater.invoke(this, validateAcceptableRiskAssetsRatio$912239839.invoke(this, value));
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -206,28 +206,6 @@ public class FundManager implements FundManagerModel {
     @Override
     public final Num losscutRange() {
         return this.losscutRange;
-    }
-
-    /**
-     * Assign the new value of losscutRange property.
-     *
-     * @paran value The new losscutRange property value to assign.
-     * @return Chainable API.
-     */
-    public final FundManager assignLosscutRange(Num value) {
-        setLosscutRange(value);
-        return this;
-    }
-
-    /**
-     * Assign the new value of losscutRange property.
-     *
-     * @paran value The losscutRange property assigner which accepts the current value and returns new value.
-     * @return Chainable API.
-     */
-    public final FundManager assignLosscutRange(UnaryOperator<Num> value) {
-        setLosscutRange(value.apply(this.losscutRange));
-        return this;
     }
 
     /**
@@ -436,7 +414,7 @@ public class FundManager implements FundManagerModel {
     public String toString() {
         StringBuilder builder = new StringBuilder("FundManager [");
         builder.append("totalAssets=").append(totalAssets).append(", ");
-        builder.append("riskAssetsRatio=").append(riskAssetsRatio).append(", ");
+        builder.append("acceptableRiskAssetsRatio=").append(acceptableRiskAssetsRatio).append(", ");
         builder.append("losscutRange=").append(losscutRange).append(", ");
         builder.append("riskRewardRatio=").append(riskRewardRatio).append(", ");
         builder.append("historicalVolatility=").append(historicalVolatility).append(", ");
@@ -451,7 +429,7 @@ public class FundManager implements FundManagerModel {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(totalAssets, riskAssetsRatio, losscutRange, riskRewardRatio, historicalVolatility, liquidity);
+        return Objects.hash(totalAssets, acceptableRiskAssetsRatio, losscutRange, riskRewardRatio, historicalVolatility, liquidity);
     }
 
     /**
@@ -467,7 +445,7 @@ public class FundManager implements FundManagerModel {
 
         FundManager other = (FundManager) o;
         if (!Objects.equals(totalAssets, other.totalAssets)) return false;
-        if (riskAssetsRatio != other.riskAssetsRatio) return false;
+        if (acceptableRiskAssetsRatio != other.acceptableRiskAssetsRatio) return false;
         if (!Objects.equals(losscutRange, other.losscutRange)) return false;
         if (riskRewardRatio != other.riskRewardRatio) return false;
         if (!Objects.equals(historicalVolatility, other.historicalVolatility)) return false;
@@ -481,24 +459,11 @@ public class FundManager implements FundManagerModel {
      * @param value A new value to assign.
      * @return A created new model instance.
      */
-    public FundManager withLosscutRange(Num value) {
-        if (this.losscutRange == value) {
-            return this;
-        }
-        return with.totalAssets(this.totalAssets).riskAssetsRatio(this.riskAssetsRatio).losscutRange(value).riskRewardRatio(this.riskRewardRatio).historicalVolatility(this.historicalVolatility).liquidity(this.liquidity);
-    }
-
-    /**
-     * Create new {@link FundManager} with the specified property and copy other properties from this model.
-     *
-     * @param value A new value to assign.
-     * @return A created new model instance.
-     */
     public FundManager withRiskRewardRatio(double value) {
         if (this.riskRewardRatio == value) {
             return this;
         }
-        return with.totalAssets(this.totalAssets).riskAssetsRatio(this.riskAssetsRatio).losscutRange(this.losscutRange).riskRewardRatio(value).historicalVolatility(this.historicalVolatility).liquidity(this.liquidity);
+        return with.totalAssets(this.totalAssets).acceptableRiskAssetsRatio(this.acceptableRiskAssetsRatio).losscutRange(this.losscutRange).riskRewardRatio(value).historicalVolatility(this.historicalVolatility).liquidity(this.liquidity);
     }
 
     /** The singleton builder. */
@@ -592,13 +557,13 @@ public class FundManager implements FundManagerModel {
     public static interface ÅssignableÅrbitrary<Next extends FundManager> {
 
         /**
-         * Assign riskAssetsRatio property.
+         * Assign acceptableRiskAssetsRatio property.
          * 
          * @param value A new value to assign.
          * @return The next assignable model.
          */
-        default Next riskAssetsRatio(double value) {
-            ((FundManager) this).setRiskAssetsRatio(value);
+        default Next acceptableRiskAssetsRatio(double value) {
+            ((FundManager) this).setAcceptableRiskAssetsRatio(value);
             return (Next) this;
         }
 
@@ -664,7 +629,7 @@ public class FundManager implements FundManagerModel {
      */
     static final class My {
         static final String TotalAssets = "totalAssets";
-        static final String RiskAssetsRatio = "riskAssetsRatio";
+        static final String AcceptableRiskAssetsRatio = "acceptableRiskAssetsRatio";
         static final String LosscutRange = "losscutRange";
         static final String RiskRewardRatio = "riskRewardRatio";
         static final String HistoricalVolatility = "historicalVolatility";

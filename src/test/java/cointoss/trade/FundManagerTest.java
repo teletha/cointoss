@@ -15,9 +15,9 @@ class FundManagerTest {
 
     @Test
     void riskAssets() {
-        assert FundManager.with.totalAssets(100).riskAssetsRatio(0.01).riskAssets().is(1);
-        assert FundManager.with.totalAssets(100).riskAssetsRatio(0.02).riskAssets().is(2);
-        assert FundManager.with.totalAssets(10000).riskAssetsRatio(0).riskAssets().is(10);
-        assert FundManager.with.totalAssets(10000).riskAssetsRatio(1).riskAssets().is(500);
+        assert FundManager.with.totalAssets(100).acceptableRiskAssetsRatio(0.01).riskAssets().is(1);
+        assert FundManager.with.totalAssets(100).acceptableRiskAssetsRatio(0.02).riskAssets().is(2);
+        assert FundManager.with.totalAssets(10000).acceptableRiskAssetsRatio(0).riskAssets().is(10);
+        assert FundManager.with.totalAssets(10000).acceptableRiskAssetsRatio(1).riskAssets().is(500);
     }
 }

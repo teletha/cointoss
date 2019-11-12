@@ -21,6 +21,8 @@ import cointoss.trade.Trader;
 public class BackTestInvoker {
 
     public static void main(String[] args) throws InterruptedException {
+        Thread.sleep(8000);
+
         BackTest.with.service(BitFlyer.FX_BTC_JPY)
                 .start(2019, 10, 25)
                 .end(2019, 10, 26)
