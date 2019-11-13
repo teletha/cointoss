@@ -9,7 +9,7 @@
  */
 package cointoss.verify;
 
-import static java.time.temporal.ChronoUnit.MINUTES;
+import static java.time.temporal.ChronoUnit.*;
 
 import cointoss.Direction;
 import cointoss.Market;
@@ -17,15 +17,14 @@ import cointoss.market.bitflyer.BitFlyer;
 import cointoss.ticker.TickSpan;
 import cointoss.trade.Scenario;
 import cointoss.trade.Trader;
+import kiss.I;
 
 public class BackTestInvoker {
 
     public static void main(String[] args) throws InterruptedException {
-        Thread.sleep(8000);
-
         BackTest.with.service(BitFlyer.FX_BTC_JPY)
-                .start(2019, 10, 25)
-                .end(2019, 10, 26)
+                .start(2019, 11, 9)
+                .end(2019, 11, 9)
                 .traders(Sample::new)
                 .initialBaseCurrency(3000000)
                 .run();
@@ -43,14 +42,20 @@ public class BackTestInvoker {
 
                 @Override
                 protected void entry() {
-                    entry(Direction.random(), 0.1, s -> s.make(market.tickers.latestPrice.v).cancelAfter(2, MINUTES));
+                    entry(Direction.random(), 0.1, s -> s.make(market.tickers.latestPrice.v).cancelAfter(3, MINUTES));
                 }
 
                 @Override
                 protected void exit() {
-                    exitAt(entryPrice.plus(this, 3900));
-                    // exitAt(trailing(price -> price.minus(this, 13500)));
-                    exitAt(trailing2(up -> entryPrice.minus(this, 1300).plus(this, up)));
+                    exitAt(entryPrice.plus(this, 12200));
+                    exitAt(market.tickers.of(TickSpan.Second5).add.flatMap(tick -> {
+                        if (tick.openPrice.isGreaterThan(this, entryPrice.plus(this, 6500))) {
+                            return I.signal(entryPrice.plus(this, 1400));
+                        } else {
+                            return I.signal();
+                        }
+                    }).first().startWith(entryPrice.minus(this, 2400)).to());
+                    // exitAt(trailing2(up -> entryPrice.minus(this, 1300).plus(this, up)));
                 }
             });
         }

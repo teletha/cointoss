@@ -9,7 +9,7 @@
  */
 package cointoss.trade;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
@@ -379,6 +379,12 @@ public abstract class Scenario extends ScenarioBase implements Directional {
         Variable variable = Variable.of(trailer.apply(entryPrice.minus(this, entryPrice)));
         disposerForExit
                 .add(market.tickers.of(TickSpan.Second5).add.map(v -> trailer.apply(entryPrice.minus(this, v.openPrice))).to(variable));
+        return variable;
+    }
+
+    protected final Variable<Num> trailing3(Function<Num, Num> trailer) {
+        Variable variable = Variable.of(trailer.apply(market.tickers.latestPrice.v));
+        disposerForExit.add(market.tickers.of(TickSpan.Second5).add.map(tick -> trailer.apply(tick.openPrice)).to(variable));
         return variable;
     }
 
