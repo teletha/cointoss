@@ -27,10 +27,10 @@ import kiss.Variable;
 public final class Ticker implements Disposable {
 
     /** Reusable NULL object.. */
-    public static final Ticker EMPTY = new Ticker(TickSpan.Minute1);
+    public static final Ticker EMPTY = new Ticker(Span.Minute1);
 
     /** The span. */
-    public final TickSpan span;
+    public final Span span;
 
     /** The event listeners. */
     final Signaling<Tick> additions = new Signaling();
@@ -61,7 +61,7 @@ public final class Ticker implements Disposable {
      * 
      * @param span An associated span.
      */
-    Ticker(TickSpan span) {
+    Ticker(Span span) {
         this.span = Objects.requireNonNull(span);
         this.uppers = new Ticker[span.uppers.length];
         this.ticks = new SegmentBuffer<Tick>(span.ticksPerDay(), tick -> tick.start.toLocalDate());
@@ -162,6 +162,16 @@ public final class Ticker implements Disposable {
      */
     public final int size() {
         return ticks.size();
+    }
+
+    /**
+     * Retrieve {@link Tick} at the specified index.
+     * 
+     * @param index
+     * @return
+     */
+    public final Tick get(int index) {
+        return ticks.get(index);
     }
 
     /**

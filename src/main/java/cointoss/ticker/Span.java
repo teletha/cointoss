@@ -17,10 +17,8 @@ import java.time.temporal.ChronoField;
 
 /**
  * Defined tick span.
- * 
- * @version 2018/01/29 9:52:28
  */
-public enum TickSpan {
+public enum Span {
 
     /** SPAN */
     Second5(5, SECOND_OF_MINUTE, 1),
@@ -92,7 +90,7 @@ public enum TickSpan {
      * @param amount
      * @param unit
      */
-    private TickSpan(long amount, ChronoField unit, int... uppers) {
+    private Span(long amount, ChronoField unit, int... uppers) {
         this.amount = amount;
         this.unit = unit;
         this.duration = Duration.of(amount, unit.getBaseUnit());

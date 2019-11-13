@@ -21,7 +21,7 @@ import cointoss.MarketService;
 import cointoss.analyze.Analyzer;
 import cointoss.execution.ExecutionLog;
 import cointoss.market.MarketServiceProvider;
-import cointoss.ticker.TickSpan;
+import cointoss.ticker.Span;
 import cointoss.trade.Scenario;
 import cointoss.trade.Trader;
 import cointoss.trade.TradingLog;
@@ -175,7 +175,7 @@ public class BackTestView extends View implements Analyzer {
         Viewtify.inUI(() -> {
             // update chart
             chart.market.set(market);
-            chart.ticker.set(market.tickers.of(TickSpan.Minute5));
+            chart.ticker.set(market.tickers.of(Span.Minute5));
 
             logSelection.values(logs);
 
@@ -191,7 +191,7 @@ public class BackTestView extends View implements Analyzer {
         private Sample(Market market) {
             super(market);
 
-            when(market.tickers.of(TickSpan.Hour4).add.skip(1).take(1), tick -> {
+            when(market.tickers.of(Span.Hour4).add.skip(1).take(1), tick -> {
                 return new Scenario() {
 
                     @Override

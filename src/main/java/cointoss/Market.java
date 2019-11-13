@@ -29,6 +29,7 @@ import cointoss.order.OrderStrategy.Cancellable;
 import cointoss.order.OrderStrategy.Makable;
 import cointoss.order.OrderStrategy.Orderable;
 import cointoss.order.OrderStrategy.Takable;
+import cointoss.ticker.Indicator;
 import cointoss.ticker.TickerManager;
 import cointoss.util.Chrono;
 import cointoss.util.Num;

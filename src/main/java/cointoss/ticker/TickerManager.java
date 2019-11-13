@@ -29,7 +29,7 @@ public final class TickerManager implements Disposable {
     /** The latest price. */
     public final Variable<Num> latestPrice = Variable.of(Num.ZERO);
 
-    public final RealtimeTicker realtime = new RealtimeTicker(TickSpan.Minute1, latest);
+    public final RealtimeTicker realtime = new RealtimeTicker(Span.Minute1, latest);
 
     /** Total of long volume since application startup. */
     Num longVolume = Num.ZERO;
@@ -44,7 +44,7 @@ public final class TickerManager implements Disposable {
     Num shortPriceDecrease = Num.ZERO;
 
     /** The number of tickers. */
-    private final int size = TickSpan.values().length;
+    private final int size = Span.values().length;
 
     /** The managed tickers. */
     private final Ticker[] tickers = new Ticker[size];
@@ -57,7 +57,7 @@ public final class TickerManager implements Disposable {
      */
     public TickerManager() {
         for (int i = size - 1; 0 <= i; i--) {
-            Ticker ticker = tickers[i] = new Ticker(TickSpan.values()[i]);
+            Ticker ticker = tickers[i] = new Ticker(Span.values()[i]);
 
             // cache associated upper tickers
             int index = 0;
@@ -68,11 +68,11 @@ public final class TickerManager implements Disposable {
     }
 
     /**
-     * Retrieve the {@link Ticker} by {@link TickSpan}.
+     * Retrieve the {@link Ticker} by {@link Span}.
      * 
-     * @param span The target {@link TickSpan}.
+     * @param span The target {@link Span}.
      */
-    public Ticker of(TickSpan span) {
+    public Ticker of(Span span) {
         return tickers[span.ordinal()];
     }
 

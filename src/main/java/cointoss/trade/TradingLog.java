@@ -90,7 +90,7 @@ public class TradingLog {
     public int terminated = 0;
 
     /** The all entries. */
-    private final List<Scenario> entries;
+    private final List<Scenario> scenarios;
 
     /** The exected duration. */
     public Duration duration = Duration.ZERO;
@@ -113,7 +113,7 @@ public class TradingLog {
         this.unrealizedLoss = new Statistics().formatter(format).negative();
         this.unrealizedLossRange = new Statistics().formatter(format).negative();
         this.profitAndLoss = new Statistics().formatter(format);
-        this.entries = entries;
+        this.scenarios = entries;
 
         for (Scenario entry : entries) {
             if (entry.isCanceled()) {
@@ -192,16 +192,13 @@ public class TradingLog {
         StringBuilder builder = new StringBuilder();
 
         if (detail) {
-            for (Scenario entry : entries) {
-                builder.append(entry);
+            for (Scenario scenario : scenarios) {
+                if (scenario.isActive()) {
+                    builder.append(scenario);
+                }
             }
         }
 
-        for (Scenario scenario : entries) {
-            if (scenario.isActive()) {
-                System.out.println(scenario);
-            }
-        }
         builder.append("時間 ").append(holdTime).append("\t実行").append(Chrono.formatAsDuration(duration.toMillis())).append(EOL);
         // builder.append("利益 ").append(profit).append(EOL);
         builder.append("利幅 ").append(profitRange).append(EOL);

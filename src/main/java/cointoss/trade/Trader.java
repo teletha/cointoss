@@ -16,10 +16,15 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BooleanSupplier;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 import cointoss.Market;
 import cointoss.execution.Execution;
+import cointoss.ticker.Indicator;
+import cointoss.ticker.Span;
+import cointoss.ticker.Tick;
+import cointoss.util.Num;
 import kiss.Disposable;
 import kiss.Signal;
 import kiss.WiseFunction;
@@ -99,6 +104,18 @@ public abstract class Trader {
      */
     public final TradingLog log() {
         return new TradingLog(market, funds, entries);
+    }
+
+    /**
+     * Build your {@link Indicator}.
+     * 
+     * @param <T>
+     * @param span
+     * @param calculator
+     * @return
+     */
+    protected final Indicator indicator(Span span, Function<Tick, Num> calculator) {
+        return Indicator.calculate(market.tickers.of(span), calculator);
     }
 
     /**

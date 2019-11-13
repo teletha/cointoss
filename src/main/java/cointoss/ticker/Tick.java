@@ -61,7 +61,7 @@ public final class Tick {
      * @param open A open price.
      * @param realtime The realtime execution statistic.
      */
-    Tick(Tick previous, ZonedDateTime start, TickSpan span, Num open, TickerManager realtime) {
+    Tick(Tick previous, ZonedDateTime start, Span span, Num open, TickerManager realtime) {
         this.previous = previous;
         this.start = start;
         this.end = start.plus(span.duration);

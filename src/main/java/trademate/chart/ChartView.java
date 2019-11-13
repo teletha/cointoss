@@ -10,7 +10,7 @@
 package trademate.chart;
 
 import cointoss.Market;
-import cointoss.ticker.TickSpan;
+import cointoss.ticker.Span;
 import cointoss.ticker.Ticker;
 import kiss.I;
 import kiss.Variable;
@@ -34,7 +34,7 @@ public class ChartView extends View {
     public final Variable<Ticker> ticker = Variable.of(Ticker.EMPTY);
 
     /** Chart UI */
-    protected UIComboBox<TickSpan> span;
+    protected UIComboBox<Span> span;
 
     /** Chart UI */
     protected UILabel selectDate;
@@ -91,7 +91,7 @@ public class ChartView extends View {
      */
     @Override
     protected void initialize() {
-        span.values(0, TickSpan.class);
+        span.values(0, Span.class);
 
         span.observeNow() //
                 .skipNull()
