@@ -21,7 +21,7 @@ import javax.annotation.processing.Generated;
  * Generated model for {@link RetryModel}.
  */
 @Generated("Icy Manipulator")
-public class Retry extends RetryModel {
+public abstract class Retry extends RetryModel {
 
     /**
      * Deceive complier that the specified checked exception is unchecked exception.

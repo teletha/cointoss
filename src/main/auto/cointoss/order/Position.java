@@ -19,7 +19,7 @@ import javax.annotation.processing.Generated;
  * Generated model for {@link PositionModel}.
  */
 @Generated("Icy Manipulator")
-public class Position extends PositionModel {
+public abstract class Position extends PositionModel {
 
     /**
      * Deceive complier that the specified checked exception is unchecked exception.

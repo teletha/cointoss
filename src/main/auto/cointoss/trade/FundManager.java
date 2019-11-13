@@ -19,7 +19,7 @@ import javax.annotation.processing.Generated;
  * Generated model for {@link FundManagerModel}.
  */
 @Generated("Icy Manipulator")
-public class FundManager implements FundManagerModel {
+public abstract class FundManager implements FundManagerModel {
 
     /**
      * Deceive complier that the specified checked exception is unchecked exception.

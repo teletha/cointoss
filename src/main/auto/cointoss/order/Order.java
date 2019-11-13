@@ -23,7 +23,7 @@ import kiss.Signal;
  * Generated model for {@link OrderModel}.
  */
 @Generated("Icy Manipulator")
-public class Order extends OrderModel {
+public abstract class Order extends OrderModel {
 
     /**
      * Deceive complier that the specified checked exception is unchecked exception.
