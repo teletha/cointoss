@@ -12,7 +12,6 @@ package trademate.chart;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.function.ToDoubleFunction;
 
 import javafx.collections.ObservableList;
 import javafx.scene.Group;
@@ -29,10 +28,12 @@ import javafx.scene.shape.PathElement;
 
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.market.bitflyer.SFD;
+import cointoss.ticker.Indicator;
 import cointoss.ticker.Tick;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
 import kiss.I;
+import kiss.Variable;
 import stylist.Style;
 import trademate.chart.Axis.TickLable;
 import trademate.setting.Notificator;
@@ -145,10 +146,17 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         this.candleLatest.widthProperty().bind(widthProperty());
         this.candleLatest.heightProperty().bind(heightProperty());
 
-        this.chartBottom.create(tick -> tick.buyVolume().toDouble() * 2, ChartStyles.OrderSupportBuy);
-        this.chartBottom.create(tick -> tick.sellVolume().toDouble() * 2, ChartStyles.OrderSupportSell);
+        this.chartBottom.create(chart.ticker.observe()
+                .switchMap(ticker -> I.signal(Indicator.build(ticker, tick -> tick.buyVolume().multiply(2))))
+                .to(), ChartStyles.OrderSupportBuy);
+        this.chartBottom.create(chart.ticker.observe()
+                .switchMap(ticker -> I.signal(Indicator.build(ticker, tick -> tick.sellVolume().multiply(2))))
+                .to(), ChartStyles.OrderSupportSell);
         // this.chartBottom.create(tick -> tick.volume().toDouble() * 2, ChartStyles.BackGrid);
-        this.chartRelative.create(tick -> chart.market.v.tickers.realtime.estimateUpPotential().toDouble() * 100, ChartStyles.PriceSFD);
+        // WaveTrendOscillator oscillator = new
+        // WaveTrendOscillator(chart.market.v.tickers.of(Span.Minute5));
+        // this.chartRelative.create(tick -> oscillator.wt1.valueAt(tick).toDouble(),
+        // ChartStyles.PriceSFD);
 
         Viewtify.clip(this);
 
@@ -424,11 +432,11 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         /**
          * Create new line chart.
          * 
-         * @param converter
+         * @param indicator
          * @param style
          */
-        private void create(ToDoubleFunction<Tick> converter, Style style) {
-            lines.add(new Line(converter, style));
+        private void create(Variable<Indicator> indicator, Style style) {
+            lines.add(new Line(indicator, style));
         }
 
         /**
@@ -471,7 +479,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
          */
         private void draw() {
             double height = getHeight();
-            double scale = lines.stream().map(Line::scale).min(Comparator.naturalOrder()).get();
+            double scale = lines.stream().map(Line::scale).min(Comparator.naturalOrder()).orElse(1d);
             GraphicsContext gc = candles.getGraphicsContext2D();
             gc.setLineWidth(1);
 
@@ -492,13 +500,14 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
          */
         private void drawLatest(double x, Tick tick) {
             double height = getHeight();
-            double scale = lines.stream().map(Line::scale).min(Comparator.naturalOrder()).get();
+            double scale = lines.stream().map(Line::scale).min(Comparator.naturalOrder()).orElse(1d);
             GraphicsContext gc = candleLatest.getGraphicsContext2D();
             gc.setLineWidth(1);
 
             for (Line line : lines) {
                 gc.setStroke(line.color);
-                gc.strokeLine(valueX[index - 1], line.valueY[index - 1], x, height - bottomUp - line.converter.applyAsDouble(tick) * scale);
+                gc.strokeLine(valueX[index - 1], line.valueY[index - 1], x, height - bottomUp - line.indicator.v.valueAt(tick)
+                        .toDouble() * scale);
             }
         }
 
@@ -510,8 +519,8 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             /** The maximum height. */
             private final double heightMax = 50;
 
-            /** The value converter. */
-            private final ToDoubleFunction<Tick> converter;
+            /** The indicator. */
+            private final Variable<Indicator> indicator;
 
             /** The color of line. */
             private final Color color;
@@ -523,11 +532,11 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             private double valueMax = 0;
 
             /**
-             * @param converter
+             * @param indicator
              * @param style
              */
-            private Line(ToDoubleFunction<Tick> converter, Style style) {
-                this.converter = converter;
+            private Line(Variable<Indicator> indicator, Style style) {
+                this.indicator = indicator;
                 this.color = FXUtils.color(style, "stroke");
             }
 
@@ -538,7 +547,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
              * @param tick
              */
             private void calculate(double x, Tick tick) {
-                double calculated = converter.applyAsDouble(tick);
+                double calculated = indicator.v.valueAt(tick).toDouble();
 
                 if (valueMax < calculated) valueMax = calculated;
                 try {
