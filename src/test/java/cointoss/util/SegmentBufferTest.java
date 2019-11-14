@@ -9,8 +9,8 @@
  */
 package cointoss.util;
 
-import static java.util.stream.Collectors.*;
-import static java.util.stream.IntStream.*;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.IntStream.range;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.LocalDate;
@@ -209,5 +209,11 @@ class SegmentBufferTest {
         assertIterableEquals(range(10000, 80000).boxed().collect(toList()), buffer.each(10000, 80000).toList());
         assertIterableEquals(range(size - 10, size).boxed().collect(toList()), buffer.each(size - 10, size).toList());
         assertIterableEquals(range(size - 10, size).boxed().collect(toList()), buffer.each(size - 10, size + 10).toList());
+    }
+
+    @Test
+    void eachDateSegment() {
+        SegmentBuffer<Integer> buffer = new SegmentBuffer(10);
+        buffer.add(1, 2, 3, 4, 5);
     }
 }

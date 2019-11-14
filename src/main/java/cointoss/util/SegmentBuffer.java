@@ -18,9 +18,6 @@ import java.util.function.Function;
 import kiss.I;
 import kiss.Signal;
 
-/**
- * @version 2018/08/13 17:28:37
- */
 public final class SegmentBuffer<E> {
 
     /** The fixed segment size. */
@@ -39,7 +36,7 @@ public final class SegmentBuffer<E> {
     private int uncompletedSize;
 
     /** The uncompleted date manager. */
-    private Object[] uncompleted;
+    private E[] uncompleted;
 
     /**
      * 
@@ -57,7 +54,7 @@ public final class SegmentBuffer<E> {
         }
         this.segmentSize = segmentSize;
         this.extractor = Objects.requireNonNull(extractor);
-        this.uncompleted = new Object[segmentSize];
+        this.uncompleted = (E[]) new Object[segmentSize];
     }
 
     /**
@@ -96,12 +93,12 @@ public final class SegmentBuffer<E> {
         try {
             uncompleted[uncompletedSize++] = item;
         } catch (ArrayIndexOutOfBoundsException e) {
-            completeds.computeIfAbsent(extractor.apply((E) uncompleted[0]), key -> {
+            completeds.computeIfAbsent(extractor.apply(uncompleted[0]), key -> {
                 Completed segment = new Completed(uncompleted);
                 completedSize += segment.size;
                 return segment;
             });
-            uncompleted = new Object[segmentSize];
+            uncompleted = (E[]) new Object[segmentSize];
             uncompletedSize = 0;
             add(item);
         }
@@ -161,13 +158,13 @@ public final class SegmentBuffer<E> {
         // completed
         for (Completed<E> segment : completeds.values()) {
             if (index < segment.size) {
-                return (E) segment.items[index];
+                return segment.items[index];
             }
             index -= segment.size;
         }
 
         // ucompleted
-        return (E) uncompleted[index];
+        return uncompleted[index];
     }
 
     /**
@@ -181,7 +178,7 @@ public final class SegmentBuffer<E> {
         }
 
         if (uncompletedSize != 0) {
-            return (E) uncompleted[0];
+            return uncompleted[0];
         }
         return null;
     }
@@ -193,7 +190,7 @@ public final class SegmentBuffer<E> {
      */
     public E last() {
         if (uncompletedSize != 0) {
-            return (E) uncompleted[uncompletedSize - 1];
+            return uncompleted[uncompletedSize - 1];
         }
 
         if (completedSize != 0) {
@@ -292,7 +289,39 @@ public final class SegmentBuffer<E> {
         // uncompleted
         if (0 < uncompletedSize) {
             for (int i = start; i < Math.min(end, uncompletedSize); i++) {
-                each.accept((E) uncompleted[i]);
+                each.accept(uncompleted[i]);
+            }
+        }
+    }
+
+    /**
+     * Signal all items at the specified {@link LocalDate}.
+     * 
+     * @param date A target date.
+     * @param each An item processor.
+     */
+    public void each(LocalDate date, Consumer<? super E> each) {
+        // check completed
+        Completed<E> completed = completeds.get(date);
+
+        if (completed != null) {
+            for (E item : completed.items) {
+                each.accept(item);
+            }
+            return;
+        }
+
+        // check uncompleted
+        if (uncompletedSize == 0) {
+            return;
+        }
+
+        // check uncompleted key
+        LocalDate key = extractor.apply(uncompleted[0]);
+
+        if (key.equals(date)) {
+            for (int i = 0; i < uncompletedSize; i++) {
+                each.accept(uncompleted[i]);
             }
         }
     }
@@ -301,7 +330,7 @@ public final class SegmentBuffer<E> {
      * Clear all items.
      */
     public void clear() {
-        uncompleted = new Object[segmentSize];
+        uncompleted = (E[]) new Object[segmentSize];
         completeds.clear();
     }
 
@@ -316,13 +345,13 @@ public final class SegmentBuffer<E> {
         private int size;
 
         /** The actual data manager. */
-        private final Object[] items;
+        private final E[] items;
 
         /**
          * Completed segment.
          */
         private Completed(int segmentSize, Signal<E> items) {
-            this.items = new Object[segmentSize];
+            this.items = (E[]) new Object[segmentSize];
 
             items.to(e -> {
                 this.items[size++] = e;
@@ -332,7 +361,7 @@ public final class SegmentBuffer<E> {
         /**
          * Completed segment.
          */
-        private Completed(Object[] items) {
+        private Completed(E[] items) {
             this.items = items;
             this.size = items.length;
         }
@@ -366,7 +395,7 @@ public final class SegmentBuffer<E> {
             int stop = Math.min(end, size);
 
             for (int i = start; i < stop; i++) {
-                each.accept((E) items[i]);
+                each.accept(items[i]);
             }
         }
     }
