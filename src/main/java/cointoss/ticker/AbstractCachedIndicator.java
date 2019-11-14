@@ -9,20 +9,28 @@
  */
 package cointoss.ticker;
 
-import org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap;
+import org.eclipse.collections.api.map.primitive.MutableIntObjectMap;
+import org.eclipse.collections.impl.factory.primitive.IntObjectMaps;
 
 import cointoss.util.Num;
 
 public abstract class AbstractCachedIndicator extends AbstractIndicator {
 
     /** CACHE */
-    private final IntObjectHashMap<Num> cache = new IntObjectHashMap();
+    private final MutableIntObjectMap<Num> cache = IntObjectMaps.mutable.empty();
 
     /**
-     * @param ticker
+     * @see AbstractIndicator#AbstractIndicator(Ticker)
      */
     protected AbstractCachedIndicator(Ticker ticker) {
         super(ticker);
+    }
+
+    /**
+     * @see AbstractIndicator#AbstractIndicator(Indicator)
+     */
+    protected AbstractCachedIndicator(Indicator indicator) {
+        super(indicator);
     }
 
     /**

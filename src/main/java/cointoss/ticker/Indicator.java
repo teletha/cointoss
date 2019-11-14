@@ -50,7 +50,7 @@ public interface Indicator {
     }
 
     /**
-     * Wrap by exponetial moving average indicator.
+     * Wrap by exponetial moving average.
      * 
      * @param size A tick size.
      * @return A wrapped indicator.
@@ -58,7 +58,7 @@ public interface Indicator {
     default Indicator ema(int size) {
         Objects.checkIndex(size, 100);
 
-        return new AbstractCachedIndicator(ticker()) {
+        return new AbstractCachedIndicator(this) {
 
             /** The multiplier. */
             private final double multiplier = 2.0 / (size + 1);
@@ -66,17 +66,17 @@ public interface Indicator {
             @Override
             protected Num calculate(int index) {
                 if (index == 0) {
-                    return Indicator.this.valueAt(0);
+                    return wrapped.valueAt(0);
                 }
 
-                Num prevValue = valueAt(index - 1);
-                return Indicator.this.valueAt(index).minus(prevValue).multiply(multiplier).plus(prevValue);
+                Num previous = valueAt(index - 1);
+                return wrapped.valueAt(index).minus(previous).multiply(multiplier).plus(previous);
             }
         };
     }
 
     /**
-     * Wrap by simple moving average indicator.
+     * Wrap by simple moving average.
      * 
      * @param size A tick size.
      * @return A wrapped indicator.
@@ -84,13 +84,13 @@ public interface Indicator {
     default Indicator sma(int size) {
         Objects.checkIndex(size, 100);
 
-        return new AbstractCachedIndicator(ticker()) {
+        return new AbstractCachedIndicator(this) {
 
             @Override
             protected Num calculate(int index) {
                 Num sum = Num.ZERO;
                 for (int i = Math.max(0, index - size + 1); i <= index; i++) {
-                    sum = sum.plus(Indicator.this.valueAt(i));
+                    sum = sum.plus(wrapped.valueAt(i));
                 }
                 return sum.divide(Math.min(size, index + 1));
             }
@@ -98,7 +98,7 @@ public interface Indicator {
     }
 
     /**
-     * Wrap by weighted moving average indicator.
+     * Wrap by weighted moving average.
      * 
      * @param size A tick size.
      * @return A wrapped indicator.
@@ -106,25 +106,25 @@ public interface Indicator {
     default Indicator wma(int size) {
         Objects.checkIndex(size, 100);
 
-        return new AbstractCachedIndicator(ticker()) {
+        return new AbstractCachedIndicator(this) {
 
             @Override
             protected Num calculate(int index) {
                 if (index == 0) {
-                    return Indicator.this.valueAt(index);
+                    return wrapped.valueAt(index);
                 }
 
                 Num value = Num.ZERO;
 
                 if (index - size < 0) {
                     for (int i = index + 1; i > 0; i--) {
-                        value = value.plus(Num.of(i).multiply(Indicator.this.valueAt(i - 1)));
+                        value = value.plus(Num.of(i).multiply(wrapped.valueAt(i - 1)));
                     }
                     return value.divide(Num.of(((index + 1) * (index + 2)) / 2));
                 } else {
                     int actualIndex = index;
                     for (int i = size; i > 0; i--) {
-                        value = value.plus(Num.of(i).multiply(Indicator.this.valueAt(actualIndex)));
+                        value = value.plus(Num.of(i).multiply(wrapped.valueAt(actualIndex)));
                         actualIndex--;
                     }
                     return value.divide(Num.of((size * (size + 1)) / 2));
@@ -134,7 +134,7 @@ public interface Indicator {
     }
 
     /**
-     * Build simple calculatable {@link Indicator}.
+     * Build your original {@link Indicator}.
      * 
      * @param <T>
      * @param ticker
