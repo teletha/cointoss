@@ -14,14 +14,42 @@ import java.util.function.Function;
 
 import cointoss.util.Num;
 
-public interface Indicator {
+public abstract class Indicator {
+
+    /** The target {@link Ticker}. */
+    protected final Ticker ticker;
+
+    /** The wrapped {@link Indicator}. (OPTIONAL: may be null) */
+    protected final Indicator wrapped;
+
+    /**
+     * Build with the target {@link Ticker}.
+     * 
+     * @param ticker A target ticker.
+     */
+    protected Indicator(Ticker ticker) {
+        this.ticker = Objects.requireNonNull(ticker);
+        this.wrapped = null;
+    }
+
+    /**
+     * Build with the delegation {@link Indicator}.
+     * 
+     * @param indicator A {@link Indicator} to delegate.
+     */
+    protected Indicator(Indicator indicator) {
+        this.wrapped = Objects.requireNonNull(indicator);
+        this.ticker = Objects.requireNonNull(indicator.ticker());
+    }
 
     /**
      * Return the related {@link Ticker}.
      * 
      * @return
      */
-    Ticker ticker();
+    public final Ticker ticker() {
+        return ticker;
+    }
 
     /**
      * Return the value of this {@link Indicator}.
@@ -29,14 +57,14 @@ public interface Indicator {
      * @param index A index on {@link Ticker}.
      * @return
      */
-    Num valueAt(int index);
+    public abstract Num valueAt(int index);
 
     /**
      * Return the first value of this {@link Indicator}.
      * 
      * @return A first value.
      */
-    default Num first() {
+    public final Num first() {
         return valueAt(0);
     }
 
@@ -45,7 +73,7 @@ public interface Indicator {
      * 
      * @return A latest value.
      */
-    default Num last() {
+    public final Num last() {
         return valueAt(Math.max(0, ticker().size() - 1));
     }
 
@@ -55,7 +83,7 @@ public interface Indicator {
      * @param size A tick size.
      * @return A wrapped indicator.
      */
-    default Indicator ema(int size) {
+    public final Indicator ema(int size) {
         Objects.checkIndex(size, 100);
 
         return new AbstractCachedIndicator(this) {
@@ -81,7 +109,7 @@ public interface Indicator {
      * @param size A tick size.
      * @return A wrapped indicator.
      */
-    default Indicator mma(int size) {
+    public final Indicator mma(int size) {
         Objects.checkIndex(size, 100);
 
         return new AbstractCachedIndicator(this) {
@@ -107,7 +135,7 @@ public interface Indicator {
      * @param size A tick size.
      * @return A wrapped indicator.
      */
-    default Indicator sma(int size) {
+    public final Indicator sma(int size) {
         Objects.checkIndex(size, 100);
 
         return new AbstractCachedIndicator(this) {
@@ -129,7 +157,7 @@ public interface Indicator {
      * @param size A tick size.
      * @return A wrapped indicator.
      */
-    default Indicator wma(int size) {
+    public final Indicator wma(int size) {
         Objects.checkIndex(size, 100);
 
         return new AbstractCachedIndicator(this) {
@@ -167,7 +195,7 @@ public interface Indicator {
      * @param calculator
      * @return
      */
-    static Indicator calculate(Ticker ticker, Function<Tick, Num> calculator) {
+    public static Indicator calculate(Ticker ticker, Function<Tick, Num> calculator) {
         Objects.requireNonNull(calculator);
 
         return new AbstractCachedIndicator(ticker) {
@@ -215,7 +243,7 @@ public interface Indicator {
      * @param ticker
      * @return
      */
-    static Indicator trueRange(Ticker ticker) {
+    public static Indicator trueRange(Ticker ticker) {
         return new AbstractCachedIndicator(ticker) {
 
             @Override
@@ -254,7 +282,7 @@ public interface Indicator {
      * @param size
      * @return
      */
-    static Indicator averageTrueRange(Ticker ticker, int size) {
+    public static Indicator averageTrueRange(Ticker ticker, int size) {
         return trueRange(ticker).mma(size);
     }
 }

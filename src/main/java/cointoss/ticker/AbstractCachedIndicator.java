@@ -14,20 +14,20 @@ import org.eclipse.collections.impl.factory.primitive.IntObjectMaps;
 
 import cointoss.util.Num;
 
-public abstract class AbstractCachedIndicator extends AbstractIndicator {
+public abstract class AbstractCachedIndicator extends Indicator {
 
     /** CACHE */
     private final MutableIntObjectMap<Num> cache = IntObjectMaps.mutable.empty();
 
     /**
-     * @see AbstractIndicator#AbstractIndicator(Ticker)
+     * @see Indicator#Indicator(Ticker)
      */
     protected AbstractCachedIndicator(Ticker ticker) {
         super(ticker);
     }
 
     /**
-     * @see AbstractIndicator#AbstractIndicator(Indicator)
+     * @see Indicator#Indicator(Indicator)
      */
     protected AbstractCachedIndicator(Indicator indicator) {
         super(indicator);
@@ -37,7 +37,7 @@ public abstract class AbstractCachedIndicator extends AbstractIndicator {
      * {@inheritDoc}
      */
     @Override
-    public Num valueAt(int index) {
+    public final Num valueAt(int index) {
         return cache.getIfAbsentPut(index, () -> calculate(index));
     }
 
