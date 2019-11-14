@@ -16,10 +16,9 @@ import cointoss.Market;
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.ticker.Indicator;
 import cointoss.ticker.Span;
-import cointoss.ticker.Tick;
+import cointoss.ticker.oscillators.WaveTrendOscillator;
 import cointoss.trade.Scenario;
 import cointoss.trade.Trader;
-import cointoss.util.Num;
 import kiss.I;
 
 public class BackTestInvoker {
@@ -71,17 +70,7 @@ public class BackTestInvoker {
      */
     private static class LazyBear extends Trader {
 
-        Indicator ap = Indicator.build(market.tickers.of(Span.Minute5), Tick::typicalPrice);
-
-        Indicator esa = ap.ema(10);
-
-        Indicator d = esa.calculate(ap, (a, b) -> a.minus(b).abs()).ema(10);
-
-        Indicator ci = ap.calculate(esa, d, (a, b, c) -> a.minus(b).divide(Num.of(0.015).multiply(c)));
-
-        Indicator wt1 = ci.ema(21);
-
-        Indicator wt2 = wt1.sma(4);
+        WaveTrendOscillator oscillator = new WaveTrendOscillator(market.tickers.of(Span.Minute5));
 
         private LazyBear(Market market) {
             super(market);
@@ -90,7 +79,7 @@ public class BackTestInvoker {
 
                 @Override
                 protected void entry() {
-                    System.out.println(wt1.last());
+                    System.out.println(oscillator.wt1.last());
                     entry(Direction.random(), 0.1, s -> s.make(market.tickers.latestPrice.v).cancelAfter(3, MINUTES));
                 }
 
