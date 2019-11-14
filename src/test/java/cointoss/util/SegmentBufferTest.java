@@ -9,8 +9,8 @@
  */
 package cointoss.util;
 
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.IntStream.range;
+import static java.util.stream.Collectors.*;
+import static java.util.stream.IntStream.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.LocalDate;
@@ -213,7 +213,15 @@ class SegmentBufferTest {
 
     @Test
     void eachDateSegment() {
-        SegmentBuffer<Integer> buffer = new SegmentBuffer(10);
-        buffer.add(1, 2, 3, 4, 5);
+        SegmentBuffer<Double> buffer = new SegmentBuffer<>(2, item -> date.plusDays((long) Math.floor(item)));
+        buffer.add(1d, 1.5, 2d, 2.5, 3d, 3.5, 4d, 4.5, 5d);
+
+        assertIterableEquals(I.list(1d, 1.5d), buffer.each(date.plusDays(1)).toList());
+        assertIterableEquals(I.list(2d, 2.5d), buffer.each(date.plusDays(2)).toList());
+        assertIterableEquals(I.list(3d, 3.5d), buffer.each(date.plusDays(3)).toList());
+        assertIterableEquals(I.list(4d, 4.5d), buffer.each(date.plusDays(4)).toList());
+        assertIterableEquals(I.list(5d), buffer.each(date.plusDays(5)).toList());
+
+        assert buffer.each(date.plusDays(10)).toList().isEmpty();
     }
 }

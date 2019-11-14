@@ -238,6 +238,24 @@ public final class SegmentBuffer<E> {
     }
 
     /**
+     * Signal all items at the specified {@link LocalDate}.
+     * 
+     * @param date A target date.
+     * @return An item stream.
+     */
+    public Signal<E> each(LocalDate date) {
+        return new Signal<E>((observer, disposer) -> {
+            try {
+                each(date, observer);
+                observer.complete();
+            } catch (Throwable e) {
+                observer.error(e);
+            }
+            return disposer;
+        });
+    }
+
+    /**
      * Signal all items.
      * 
      * @param each An item processor.
@@ -335,7 +353,7 @@ public final class SegmentBuffer<E> {
     }
 
     /**
-     * @version 2018/08/13 7:22:22
+     * Completely filled segment.
      */
     private static class Completed<E> {
 
