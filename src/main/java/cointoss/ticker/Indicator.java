@@ -45,6 +45,23 @@ public abstract class Indicator {
     }
 
     /**
+     * Helper method to calculate the length of previous ticks.
+     * 
+     * @param tick A starting {@link Tick}.
+     * @param max A maximum length you want.
+     * @return The actual length of previous ticks.
+     */
+    protected final int calculatePreviousTickLength(Tick tick, int max) {
+        int actualSize = 1;
+
+        while (tick.previous != null && actualSize < max) {
+            tick = tick.previous;
+            actualSize++;
+        }
+        return actualSize;
+    }
+
+    /**
      * Return the related {@link Ticker}.
      * 
      * @return
@@ -56,10 +73,10 @@ public abstract class Indicator {
     /**
      * Return the value of this {@link Indicator}.
      * 
-     * @param index A index on {@link Ticker}.
+     * @param tick A {@link Tick} on {@link Ticker}.
      * @return
      */
-    public abstract Num valueAt(int index);
+    public abstract Num valueAt(Tick tick);
 
     /**
      * Return the first value of this {@link Indicator}.
@@ -67,7 +84,7 @@ public abstract class Indicator {
      * @return A first value.
      */
     public final Num first() {
-        return valueAt(0);
+        return valueAt(ticker.first());
     }
 
     /**
@@ -76,7 +93,7 @@ public abstract class Indicator {
      * @return A latest value.
      */
     public final Num last() {
-        return valueAt(Math.max(0, ticker().size() - 1));
+        return valueAt(ticker.last());
     }
 
     /**
@@ -90,8 +107,8 @@ public abstract class Indicator {
         return new AbstractCachedIndicator(this) {
 
             @Override
-            protected Num calculate(int index) {
-                return calculater.apply(wrapped.valueAt(index), indicator1.valueAt(index));
+            protected Num calculate(Tick tick) {
+                return calculater.apply(wrapped.valueAt(tick), indicator1.valueAt(tick));
             }
         };
     }
@@ -108,8 +125,8 @@ public abstract class Indicator {
         return new AbstractCachedIndicator(this) {
 
             @Override
-            protected Num calculate(int index) {
-                return calculater.apply(wrapped.valueAt(index), indicator1.valueAt(index), indicator2.valueAt(index));
+            protected Num calculate(Tick tick) {
+                return calculater.apply(wrapped.valueAt(tick), indicator1.valueAt(tick), indicator2.valueAt(tick));
             }
         };
     }
@@ -149,13 +166,13 @@ public abstract class Indicator {
             private final double multiplier = 2.0 / (size + 1);
 
             @Override
-            protected Num calculate(int index) {
-                if (index == 0) {
-                    return wrapped.valueAt(0);
+            protected Num calculate(Tick tick) {
+                if (tick.previous == null) {
+                    return wrapped.valueAt(tick);
                 }
 
-                Num previous = valueAt(index - 1);
-                return wrapped.valueAt(index).minus(previous).multiply(multiplier).plus(previous);
+                Num previous = valueAt(tick.previous);
+                return wrapped.valueAt(tick).minus(previous).multiply(multiplier).plus(previous);
             }
         };
     }
@@ -175,13 +192,13 @@ public abstract class Indicator {
             private final double multiplier = 1.0 / size;
 
             @Override
-            protected Num calculate(int index) {
-                if (index == 0) {
-                    return wrapped.valueAt(0);
+            protected Num calculate(Tick tick) {
+                if (tick.previous == null) {
+                    return wrapped.valueAt(tick);
                 }
 
-                Num previous = valueAt(index - 1);
-                return wrapped.valueAt(index).minus(previous).multiply(multiplier).plus(previous);
+                Num previous = valueAt(tick.previous);
+                return wrapped.valueAt(tick).minus(previous).multiply(multiplier).plus(previous);
             }
         };
     }
@@ -198,12 +215,16 @@ public abstract class Indicator {
         return new AbstractCachedIndicator(this) {
 
             @Override
-            protected Num calculate(int index) {
+            protected Num calculate(Tick tick) {
                 Num sum = Num.ZERO;
-                for (int i = Math.max(0, index - size + 1); i <= index; i++) {
-                    sum = sum.plus(wrapped.valueAt(i));
+                Tick current = tick;
+                int remaining = size;
+                while (current != null && 0 < remaining) {
+                    sum = sum.plus(wrapped.valueAt(current));
+                    current = current.previous;
+                    remaining--;
                 }
-                return sum.divide(Math.min(size, index + 1));
+                return sum.divide(size - remaining);
             }
         };
     }
@@ -220,26 +241,18 @@ public abstract class Indicator {
         return new AbstractCachedIndicator(this) {
 
             @Override
-            protected Num calculate(int index) {
-                if (index == 0) {
-                    return wrapped.valueAt(index);
+            protected Num calculate(Tick tick) {
+                if (tick.previous == null) {
+                    return wrapped.valueAt(tick);
                 }
 
                 Num value = Num.ZERO;
-
-                if (index - size < 0) {
-                    for (int i = index + 1; i > 0; i--) {
-                        value = value.plus(Num.of(i).multiply(wrapped.valueAt(i - 1)));
-                    }
-                    return value.divide(Num.of(((index + 1) * (index + 2)) / 2));
-                } else {
-                    int actualIndex = index;
-                    for (int i = size; i > 0; i--) {
-                        value = value.plus(Num.of(i).multiply(wrapped.valueAt(actualIndex)));
-                        actualIndex--;
-                    }
-                    return value.divide(Num.of((size * (size + 1)) / 2));
+                int actualSize = calculatePreviousTickLength(tick, size);
+                for (int i = actualSize; 0 < i; i--) {
+                    value = value.plus(wrapped.valueAt(tick).multiply(i));
+                    tick = tick.previous;
                 }
+                return value.divide(actualSize * (actualSize + 1) / 2);
             }
         };
     }
@@ -258,8 +271,8 @@ public abstract class Indicator {
         return new AbstractCachedIndicator(ticker) {
 
             @Override
-            protected Num calculate(int index) {
-                return calculator.apply(ticker.get(index));
+            protected Num calculate(Tick tick) {
+                return calculator.apply(tick);
             }
         };
     }
@@ -326,17 +339,16 @@ public abstract class Indicator {
         return new AbstractCachedIndicator(ticker) {
 
             @Override
-            protected Num calculate(int index) {
-                Tick current = ticker.get(index);
-                Num highLow = current.highPrice().minus(current.lowPrice()).abs();
+            protected Num calculate(Tick tick) {
+                Num highLow = tick.highPrice().minus(tick.lowPrice()).abs();
 
-                if (index == 0) {
+                if (tick.previous == null) {
                     return highLow;
                 }
 
-                Tick previous = ticker.get(index - 1);
-                Num highClose = index == 0 ? Num.ZERO : current.highPrice().minus(previous.closePrice()).abs();
-                Num closeLow = index == 0 ? Num.ZERO : previous.closePrice().minus(current.lowPrice).abs();
+                Tick previous = tick.previous;
+                Num highClose = tick.highPrice().minus(previous.closePrice()).abs();
+                Num closeLow = previous.closePrice().minus(tick.lowPrice).abs();
 
                 return Num.max(highLow, highClose, closeLow);
             }

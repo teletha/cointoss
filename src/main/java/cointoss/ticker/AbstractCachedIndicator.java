@@ -9,15 +9,15 @@
  */
 package cointoss.ticker;
 
-import org.eclipse.collections.api.map.primitive.MutableIntObjectMap;
-import org.eclipse.collections.impl.factory.primitive.IntObjectMaps;
+import java.time.ZonedDateTime;
+import java.util.concurrent.ConcurrentSkipListMap;
 
 import cointoss.util.Num;
 
 public abstract class AbstractCachedIndicator extends Indicator {
 
     /** CACHE */
-    private final MutableIntObjectMap<Num> cache = IntObjectMaps.mutable.empty();
+    private final ConcurrentSkipListMap<ZonedDateTime, Num> cache = new ConcurrentSkipListMap();
 
     /**
      * @see Indicator#Indicator(Ticker)
@@ -37,15 +37,15 @@ public abstract class AbstractCachedIndicator extends Indicator {
      * {@inheritDoc}
      */
     @Override
-    public final Num valueAt(int index) {
-        return cache.getIfAbsentPut(index, () -> calculate(index));
+    public final Num valueAt(Tick tick) {
+        return cache.computeIfAbsent(tick.start, key -> calculate(tick));
     }
 
     /**
      * Calculate actual value.
      * 
-     * @param index The tick index.
+     * @param tick The target tick.
      * @return A calcualted value.
      */
-    protected abstract Num calculate(int index);
+    protected abstract Num calculate(Tick tick);
 }

@@ -9,9 +9,8 @@
  */
 package cointoss.ticker;
 
-import static cointoss.ticker.TickerTestSupport.*;
+import static cointoss.ticker.TickerTestSupport.ticker;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 class IndicatorTest {
@@ -20,20 +19,11 @@ class IndicatorTest {
     void valueAt() {
         Ticker ticker = ticker(Span.Second5, 1, 2, 3, 4, 5);
         Indicator indicator = Indicator.build(ticker, tick -> tick.openPrice);
-        assert indicator.valueAt(0).is(1);
-        assert indicator.valueAt(1).is(2);
-        assert indicator.valueAt(2).is(3);
-        assert indicator.valueAt(3).is(4);
-        assert indicator.valueAt(4).is(5);
-    }
-
-    @Test
-    void valueAtOutOfRange() {
-        Ticker ticker = ticker(Span.Second5, 1, 2, 3, 4, 5);
-        Indicator indicator = Indicator.build(ticker, tick -> tick.openPrice);
-
-        Assertions.assertThrows(ArrayIndexOutOfBoundsException.class, () -> indicator.valueAt(-1));
-        Assertions.assertThrows(NullPointerException.class, () -> indicator.valueAt(10));
+        assert indicator.valueAt(ticker.get(0)).is(1);
+        assert indicator.valueAt(ticker.get(1)).is(2);
+        assert indicator.valueAt(ticker.get(2)).is(3);
+        assert indicator.valueAt(ticker.get(3)).is(4);
+        assert indicator.valueAt(ticker.get(4)).is(5);
     }
 
     @Test
@@ -54,72 +44,72 @@ class IndicatorTest {
     void sma() {
         Ticker ticker = ticker(Span.Second5, 1, 2, 3, 4, 5);
         Indicator indicator = Indicator.build(ticker, tick -> tick.openPrice).sma(2);
-        assert indicator.valueAt(0).is(1);
-        assert indicator.valueAt(1).is(1.5);
-        assert indicator.valueAt(2).is(2.5);
-        assert indicator.valueAt(3).is(3.5);
-        assert indicator.valueAt(4).is(4.5);
+        assert indicator.valueAt(ticker.get(0)).is(1);
+        assert indicator.valueAt(ticker.get(1)).is(1.5);
+        assert indicator.valueAt(ticker.get(2)).is(2.5);
+        assert indicator.valueAt(ticker.get(3)).is(3.5);
+        assert indicator.valueAt(ticker.get(4)).is(4.5);
 
         indicator = Indicator.build(ticker, tick -> tick.openPrice).sma(4);
-        assert indicator.valueAt(0).is(1);
-        assert indicator.valueAt(1).is(1.5);
-        assert indicator.valueAt(2).is(2);
-        assert indicator.valueAt(3).is(2.5);
-        assert indicator.valueAt(4).is(3.5);
+        assert indicator.valueAt(ticker.get(0)).is(1);
+        assert indicator.valueAt(ticker.get(1)).is(1.5);
+        assert indicator.valueAt(ticker.get(2)).is(2);
+        assert indicator.valueAt(ticker.get(3)).is(2.5);
+        assert indicator.valueAt(ticker.get(4)).is(3.5);
     }
 
     @Test
     void ema() {
         Ticker ticker = ticker(Span.Second5, 1, 2, 3, 4, 5);
         Indicator indicator = Indicator.build(ticker, tick -> tick.openPrice).ema(2);
-        assert indicator.valueAt(0).is(1);
-        assert indicator.valueAt(1).is(1.6666666667);
-        assert indicator.valueAt(2).is(2.5555555556);
-        assert indicator.valueAt(3).is(3.518518519);
-        assert indicator.valueAt(4).is(4.50617284);
+        assert indicator.valueAt(ticker.get(0)).is(1);
+        assert indicator.valueAt(ticker.get(1)).is(1.6666666667);
+        assert indicator.valueAt(ticker.get(2)).is(2.5555555556);
+        assert indicator.valueAt(ticker.get(3)).is(3.518518519);
+        assert indicator.valueAt(ticker.get(4)).is(4.50617284);
 
         indicator = Indicator.build(ticker, tick -> tick.openPrice).ema(4);
-        assert indicator.valueAt(0).is(1);
-        assert indicator.valueAt(1).is(1.4);
-        assert indicator.valueAt(2).is(2.04);
-        assert indicator.valueAt(3).is(2.824);
-        assert indicator.valueAt(4).is(3.6944);
+        assert indicator.valueAt(ticker.get(0)).is(1);
+        assert indicator.valueAt(ticker.get(1)).is(1.4);
+        assert indicator.valueAt(ticker.get(2)).is(2.04);
+        assert indicator.valueAt(ticker.get(3)).is(2.824);
+        assert indicator.valueAt(ticker.get(4)).is(3.6944);
     }
 
     @Test
     void mma() {
         Ticker ticker = ticker(Span.Second5, 1, 2, 3, 4, 5);
         Indicator indicator = Indicator.build(ticker, tick -> tick.openPrice).mma(2);
-        assert indicator.valueAt(0).is(1);
-        assert indicator.valueAt(1).is(1.5);
-        assert indicator.valueAt(2).is(2.25);
-        assert indicator.valueAt(3).is(3.125);
-        assert indicator.valueAt(4).is(4.0625);
+        assert indicator.valueAt(ticker.get(0)).is(1);
+        assert indicator.valueAt(ticker.get(1)).is(1.5);
+        assert indicator.valueAt(ticker.get(2)).is(2.25);
+        assert indicator.valueAt(ticker.get(3)).is(3.125);
+        assert indicator.valueAt(ticker.get(4)).is(4.0625);
 
         indicator = Indicator.build(ticker, tick -> tick.openPrice).mma(4);
-        assert indicator.valueAt(0).is(1);
-        assert indicator.valueAt(1).is(1.25);
-        assert indicator.valueAt(2).is(1.6875);
-        assert indicator.valueAt(3).is(2.265625);
-        assert indicator.valueAt(4).is(2.94921875);
+        assert indicator.valueAt(ticker.get(0)).is(1);
+        assert indicator.valueAt(ticker.get(1)).is(1.25);
+        assert indicator.valueAt(ticker.get(2)).is(1.6875);
+        assert indicator.valueAt(ticker.get(3)).is(2.265625);
+        assert indicator.valueAt(ticker.get(4)).is(2.94921875);
     }
 
     @Test
     void wma() {
         Ticker ticker = ticker(Span.Second5, 1, 2, 3, 4, 5);
         Indicator indicator = Indicator.build(ticker, tick -> tick.openPrice).wma(2);
-        assert indicator.valueAt(0).is(1);
-        assert indicator.valueAt(1).is(1.6666666667);
-        assert indicator.valueAt(2).is(2.6666666667);
-        assert indicator.valueAt(3).is(3.6666666667);
-        assert indicator.valueAt(4).is(4.6666666667);
+        assert indicator.valueAt(ticker.get(0)).is(1);
+        assert indicator.valueAt(ticker.get(1)).is(1.6666666667);
+        assert indicator.valueAt(ticker.get(2)).is(2.6666666667);
+        assert indicator.valueAt(ticker.get(3)).is(3.6666666667);
+        assert indicator.valueAt(ticker.get(4)).is(4.6666666667);
 
         indicator = Indicator.build(ticker, tick -> tick.openPrice).wma(4);
-        assert indicator.valueAt(0).is(1);
-        assert indicator.valueAt(1).is(1.6666666667);
-        assert indicator.valueAt(2).is(2.333333333);
-        assert indicator.valueAt(3).is(3);
-        assert indicator.valueAt(4).is(4);
+        assert indicator.valueAt(ticker.get(0)).is(1);
+        assert indicator.valueAt(ticker.get(1)).is(1.6666666667);
+        assert indicator.valueAt(ticker.get(2)).is(2.333333333);
+        assert indicator.valueAt(ticker.get(3)).is(3);
+        assert indicator.valueAt(ticker.get(4)).is(4);
     }
 
     @Test
@@ -128,11 +118,11 @@ class IndicatorTest {
         Indicator indicator1 = Indicator.build(ticker, tick -> tick.openPrice);
         Indicator indicator2 = Indicator.build(ticker, tick -> tick.closePrice());
         Indicator indicator = indicator1.plus(indicator2);
-        assert indicator.valueAt(0).is(2);
-        assert indicator.valueAt(1).is(4);
-        assert indicator.valueAt(2).is(6);
-        assert indicator.valueAt(3).is(8);
-        assert indicator.valueAt(4).is(10);
+        assert indicator.valueAt(ticker.get(0)).is(2);
+        assert indicator.valueAt(ticker.get(1)).is(4);
+        assert indicator.valueAt(ticker.get(2)).is(6);
+        assert indicator.valueAt(ticker.get(3)).is(8);
+        assert indicator.valueAt(ticker.get(4)).is(10);
     }
 
     @Test
@@ -141,32 +131,32 @@ class IndicatorTest {
         Indicator indicator1 = Indicator.build(ticker, tick -> tick.openPrice);
         Indicator indicator2 = Indicator.build(ticker, tick -> tick.closePrice());
         Indicator indicator = indicator1.minus(indicator2);
-        assert indicator.valueAt(0).is(0);
-        assert indicator.valueAt(1).is(0);
-        assert indicator.valueAt(2).is(0);
-        assert indicator.valueAt(3).is(0);
-        assert indicator.valueAt(4).is(0);
+        assert indicator.valueAt(ticker.get(0)).is(0);
+        assert indicator.valueAt(ticker.get(1)).is(0);
+        assert indicator.valueAt(ticker.get(2)).is(0);
+        assert indicator.valueAt(ticker.get(3)).is(0);
+        assert indicator.valueAt(ticker.get(4)).is(0);
     }
 
     @Test
     void trueRange() {
         Ticker ticker = ticker(Span.Second5, 1, 2, 4, 8, 16);
         Indicator indicator = Indicator.trueRange(ticker);
-        assert indicator.valueAt(0).is(0);
-        assert indicator.valueAt(1).is(1);
-        assert indicator.valueAt(2).is(2);
-        assert indicator.valueAt(3).is(4);
-        assert indicator.valueAt(4).is(8);
+        assert indicator.valueAt(ticker.get(0)).is(0);
+        assert indicator.valueAt(ticker.get(1)).is(1);
+        assert indicator.valueAt(ticker.get(2)).is(2);
+        assert indicator.valueAt(ticker.get(3)).is(4);
+        assert indicator.valueAt(ticker.get(4)).is(8);
     }
 
     @Test
     void averageTrueRange() {
         Ticker ticker = ticker(Span.Second5, 1, 2, 4, 8, 16);
         Indicator indicator = Indicator.averageTrueRange(ticker, 4);
-        assert indicator.valueAt(0).is(0);
-        assert indicator.valueAt(1).is(0.25);
-        assert indicator.valueAt(2).is(0.6875);
-        assert indicator.valueAt(3).is(1.515625);
-        assert indicator.valueAt(4).is(3.13671875);
+        assert indicator.valueAt(ticker.get(0)).is(0);
+        assert indicator.valueAt(ticker.get(1)).is(0.25);
+        assert indicator.valueAt(ticker.get(2)).is(0.6875);
+        assert indicator.valueAt(ticker.get(3)).is(1.515625);
+        assert indicator.valueAt(ticker.get(4)).is(3.13671875);
     }
 }
