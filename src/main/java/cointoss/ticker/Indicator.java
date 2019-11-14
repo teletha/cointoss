@@ -13,6 +13,8 @@ import java.util.Objects;
 import java.util.function.Function;
 
 import cointoss.util.Num;
+import kiss.WiseBiFunction;
+import kiss.WiseTriFunction;
 
 public abstract class Indicator {
 
@@ -75,6 +77,61 @@ public abstract class Indicator {
      */
     public final Num last() {
         return valueAt(Math.max(0, ticker().size() - 1));
+    }
+
+    /**
+     * Wrap by the calculation result between {@link Indicator}s.
+     * 
+     * @param indicator1
+     * @param calculater
+     * @return
+     */
+    public final Indicator calculate(Indicator indicator1, WiseBiFunction<Num, Num, Num> calculater) {
+        return new AbstractCachedIndicator(this) {
+
+            @Override
+            protected Num calculate(int index) {
+                return calculater.apply(wrapped.valueAt(index), indicator1.valueAt(index));
+            }
+        };
+    }
+
+    /**
+     * Wrap by the calculation result between {@link Indicator}s.
+     * 
+     * @param indicator1
+     * @param indicator2
+     * @param calculater
+     * @return
+     */
+    public final Indicator calculate(Indicator indicator1, Indicator indicator2, WiseTriFunction<Num, Num, Num, Num> calculater) {
+        return new AbstractCachedIndicator(this) {
+
+            @Override
+            protected Num calculate(int index) {
+                return calculater.apply(wrapped.valueAt(index), indicator1.valueAt(index), indicator2.valueAt(index));
+            }
+        };
+    }
+
+    /**
+     * Wrap by the calculation result between {@link Indicator}s.
+     * 
+     * @param subtrahend
+     * @return
+     */
+    public final Indicator minus(Indicator subtrahend) {
+        return calculate(subtrahend, Num::minus);
+    }
+
+    /**
+     * Wrap by the calculation result between {@link Indicator}s.
+     * 
+     * @param augend
+     * @return
+     */
+    public final Indicator plus(Indicator augend) {
+        return calculate(augend, Num::plus);
     }
 
     /**
@@ -195,7 +252,7 @@ public abstract class Indicator {
      * @param calculator
      * @return
      */
-    public static Indicator calculate(Ticker ticker, Function<Tick, Num> calculator) {
+    public static Indicator build(Ticker ticker, Function<Tick, Num> calculator) {
         Objects.requireNonNull(calculator);
 
         return new AbstractCachedIndicator(ticker) {
@@ -205,6 +262,28 @@ public abstract class Indicator {
                 return calculator.apply(ticker.get(index));
             }
         };
+    }
+
+    /**
+     * <p>
+     * The average true range (ATR) is a technical analysis indicator that measures market
+     * volatility by decomposing the entire range of an asset price for that period. Specifically,
+     * ATR is a measure of volatility introduced by market technician J. Welles Wilder Jr. in his
+     * book, "New Concepts in Technical Trading Systems."
+     * </p>
+     * <p>
+     * The true range indicator is taken as the greatest of the following: current high less the
+     * current low; the absolute value of the current high less the previous close; and the absolute
+     * value of the current low less the previous close. The average true range is then a moving
+     * average, generally using 14 days, of the true ranges.
+     * </p>
+     * 
+     * @param ticker
+     * @param size
+     * @return
+     */
+    public static Indicator averageTrueRange(Ticker ticker, int size) {
+        return trueRange(ticker).mma(size);
     }
 
     /**
@@ -262,27 +341,5 @@ public abstract class Indicator {
                 return Num.max(highLow, highClose, closeLow);
             }
         };
-    }
-
-    /**
-     * <p>
-     * The average true range (ATR) is a technical analysis indicator that measures market
-     * volatility by decomposing the entire range of an asset price for that period. Specifically,
-     * ATR is a measure of volatility introduced by market technician J. Welles Wilder Jr. in his
-     * book, "New Concepts in Technical Trading Systems."
-     * </p>
-     * <p>
-     * The true range indicator is taken as the greatest of the following: current high less the
-     * current low; the absolute value of the current high less the previous close; and the absolute
-     * value of the current low less the previous close. The average true range is then a moving
-     * average, generally using 14 days, of the true ranges.
-     * </p>
-     * 
-     * @param ticker
-     * @param size
-     * @return
-     */
-    public static Indicator averageTrueRange(Ticker ticker, int size) {
-        return trueRange(ticker).mma(size);
     }
 }

@@ -115,7 +115,7 @@ public abstract class Trader {
      * @return
      */
     protected final Indicator indicator(Span span, Function<Tick, Num> calculator) {
-        return Indicator.calculate(market.tickers.of(span), calculator);
+        return Indicator.build(market.tickers.of(span), calculator);
     }
 
     /**
