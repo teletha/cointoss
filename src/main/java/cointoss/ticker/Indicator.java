@@ -13,6 +13,7 @@ import java.util.Objects;
 import java.util.function.Function;
 
 import cointoss.util.Num;
+import kiss.Signal;
 import kiss.WiseBiFunction;
 import kiss.WiseTriFunction;
 
@@ -255,6 +256,24 @@ public abstract class Indicator {
                 return value.divide(actualSize * (actualSize + 1) / 2);
             }
         };
+    }
+
+    /**
+     * Create {@link Signal} of {@link Indicator} value.
+     * 
+     * @return
+     */
+    public final Signal<Num> observe() {
+        return ticker.add.map(this::valueAt);
+    }
+
+    /**
+     * Create {@link Signal} of {@link Indicator} value.
+     * 
+     * @return
+     */
+    public final Signal<Num> observeNow() {
+        return observe().startWith(last());
     }
 
     /**

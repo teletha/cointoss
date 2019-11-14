@@ -12,6 +12,7 @@ package trademate.chart;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Function;
 
 import javafx.collections.ObservableList;
 import javafx.scene.Group;
@@ -30,6 +31,8 @@ import cointoss.market.bitflyer.BitFlyer;
 import cointoss.market.bitflyer.SFD;
 import cointoss.ticker.Indicator;
 import cointoss.ticker.Tick;
+import cointoss.ticker.Ticker;
+import cointoss.ticker.oscillators.WaveTrendOscillator;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
 import kiss.I;
@@ -146,17 +149,13 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         this.candleLatest.widthProperty().bind(widthProperty());
         this.candleLatest.heightProperty().bind(heightProperty());
 
-        this.chartBottom.create(chart.ticker.observe()
-                .switchMap(ticker -> I.signal(Indicator.build(ticker, tick -> tick.buyVolume().multiply(2))))
-                .to(), ChartStyles.OrderSupportBuy);
-        this.chartBottom.create(chart.ticker.observe()
-                .switchMap(ticker -> I.signal(Indicator.build(ticker, tick -> tick.sellVolume().multiply(2))))
-                .to(), ChartStyles.OrderSupportSell);
+        this.chartBottom.create(ticker -> Indicator.build(ticker, tick -> tick.buyVolume().multiply(2)), ChartStyles.OrderSupportBuy);
+        this.chartBottom.create(ticker -> Indicator.build(ticker, tick -> tick.sellVolume().multiply(2)), ChartStyles.OrderSupportSell);
         // this.chartBottom.create(tick -> tick.volume().toDouble() * 2, ChartStyles.BackGrid);
-        // WaveTrendOscillator oscillator = new
-        // WaveTrendOscillator(chart.market.v.tickers.of(Span.Minute5));
-        // this.chartRelative.create(tick -> oscillator.wt1.valueAt(tick).toDouble(),
-        // ChartStyles.PriceSFD);
+
+        Variable<WaveTrendOscillator> oscillator = chart.ticker.observe().switchMap(t -> I.signal(new WaveTrendOscillator(t))).to();
+        this.chartRelative.create(ticker -> oscillator.v.wt1, ChartStyles.OrderSupportBuy);
+        this.chartRelative.create(ticker -> oscillator.v.wt2, ChartStyles.OrderSupportSell);
 
         Viewtify.clip(this);
 
@@ -435,7 +434,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
          * @param indicator
          * @param style
          */
-        private void create(Variable<Indicator> indicator, Style style) {
+        private void create(Function<Ticker, Indicator> indicator, Style style) {
             lines.add(new Line(indicator, style));
         }
 
@@ -535,8 +534,8 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
              * @param indicator
              * @param style
              */
-            private Line(Variable<Indicator> indicator, Style style) {
-                this.indicator = indicator;
+            private Line(Function<Ticker, Indicator> indicator, Style style) {
+                this.indicator = chart.ticker.observe().switchMap(ticker -> I.signal(indicator.apply(ticker))).to();
                 this.color = FXUtils.color(style, "stroke");
             }
 

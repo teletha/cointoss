@@ -27,7 +27,12 @@ public class WaveTrendOscillator {
         Indicator ap = Indicator.build(ticker, Tick::typicalPrice);
         Indicator esa = ap.ema(10);
         Indicator d = esa.calculate(ap, (a, b) -> a.minus(b).abs()).ema(10);
-        Indicator ci = ap.calculate(esa, d, (a, b, c) -> a.minus(b).divide(Num.of(0.015).multiply(c)));
+        Indicator ci = ap.calculate(esa, d, (a, b, c) -> {
+            if (c.isZero()) {
+                return a.minus(b);
+            }
+            return a.minus(b).divide(Num.of(0.015).multiply(c));
+        });
         wt1 = ci.ema(21);
         wt2 = wt1.sma(4);
     }

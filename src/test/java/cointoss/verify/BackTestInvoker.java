@@ -9,7 +9,7 @@
  */
 package cointoss.verify;
 
-import static java.time.temporal.ChronoUnit.*;
+import static java.time.temporal.ChronoUnit.MINUTES;
 
 import cointoss.Direction;
 import cointoss.Market;
@@ -25,9 +25,9 @@ public class BackTestInvoker {
 
     public static void main(String[] args) throws InterruptedException {
         BackTest.with.service(BitFlyer.FX_BTC_JPY)
-                .start(2019, 11, 9)
+                .start(2019, 11, 5)
                 .end(2019, 11, 9)
-                .traders(Sample::new, Sample::new, LazyBear::new)
+                .traders(Sample::new, LazyBear::new)
                 .initialBaseCurrency(3000000)
                 .run();
     }
@@ -75,25 +75,43 @@ public class BackTestInvoker {
         private LazyBear(Market market) {
             super(market);
 
-            when(market.tickers.of(Span.Minute5).add.skip(12), tick -> new Scenario() {
+            when(oscillator.wt1.observe().take(v -> v.isLessThan(-40)), value -> new Scenario() {
 
                 @Override
                 protected void entry() {
-                    System.out.println(oscillator.wt1.last());
-                    entry(Direction.random(), 0.1, s -> s.make(market.tickers.latestPrice.v).cancelAfter(3, MINUTES));
+                    entry(Direction.BUY, 0.3, s -> s.make(market.tickers.latestPrice.v).cancelAfter(3, MINUTES));
                 }
 
                 @Override
                 protected void exit() {
-                    exitAt(entryPrice.plus(this, 6400));
-                    exitAt(market.tickers.of(Span.Second5).add.flatMap(tick -> {
-                        if (tick.openPrice.isGreaterThan(this, entryPrice.plus(this, 2800))) {
-                            return I.signal(entryPrice.plus(this, 500));
-                        } else {
-                            return I.signal();
-                        }
-                    }).first().startWith(entryPrice.minus(this, 3000)).to());
-                    // exitAt(trailing2(up -> entryPrice.minus(this, 1300).plus(this, up)));
+                    exitWhen(oscillator.wt1.observe().take(v -> v.isGreaterThan(30)), s -> s.take());
+                    // exitAt(market.tickers.of(Span.Second5).add.flatMap(tick -> {
+                    // if (tick.openPrice.isGreaterThan(this, entryPrice.plus(this, 4000))) {
+                    // return I.signal(entryPrice.plus(this, 100));
+                    // } else {
+                    // return I.signal();
+                    // }
+                    // }).first().startWith(entryPrice.minus(this, 2000)).to());
+                }
+            });
+
+            when(oscillator.wt1.observe().take(v -> v.isGreaterThan(40)), value -> new Scenario() {
+
+                @Override
+                protected void entry() {
+                    entry(Direction.SELL, 0.3, s -> s.make(market.tickers.latestPrice.v).cancelAfter(3, MINUTES));
+                }
+
+                @Override
+                protected void exit() {
+                    exitWhen(oscillator.wt1.observe().take(v -> v.isLessThan(-30)), s -> s.take());
+                    // exitAt(market.tickers.of(Span.Second5).add.flatMap(tick -> {
+                    // if (tick.openPrice.isGreaterThan(this, entryPrice.plus(this, 4000))) {
+                    // return I.signal(entryPrice.plus(this, 100));
+                    // } else {
+                    // return I.signal();
+                    // }
+                    // }).first().startWith(entryPrice.minus(this, 2000)).to());
                 }
             });
         }
