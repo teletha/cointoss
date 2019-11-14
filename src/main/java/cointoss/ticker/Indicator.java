@@ -178,4 +178,83 @@ public interface Indicator {
             }
         };
     }
+
+    /**
+     * <p>
+     * Welles Wilder described these calculations to determine the trading range for a stock or
+     * commodity. True Range is defined as the largest of the following:
+     * </p>
+     * <ul>
+     * <li>The distance from today's high to today's low.</li>
+     * <li>The distance from yesterday's close to today's high.</li>
+     * <li>The distance from yesterday's close to today's low.</li>
+     * </ul>
+     * <p>
+     * Wilder included price comparisons among subsequent bars in order to account for gaps in his
+     * range calculation.
+     * <p>
+     * <p>
+     * The raw True Range is then smoothed (a 14-period smoothing is common) to give an Average True
+     * Range (ATR). The True Range can be smoothed using a variety of moving average types,
+     * including Simple, Exponential, Welles Wilder, etc.
+     * </p>
+     * <p>
+     * ATR measures a security's volatility. It does not indicate price direction or duration,
+     * rather the degree of price movement. Average True Range can be interpreted using the same
+     * techniques that are used with the other volatility indicators.
+     * </p>
+     * <p>
+     * Wilder states that high values of ATR often occur at market bottoms following a sell-off. Low
+     * ATR values are often found during extended sideways or consolidation periods.
+     * </p>
+     * <p>
+     * Several other indicators are built off True Range, including DI+/DI-, ADX, and ADXR. RTL
+     * Tokens . . . TR ( more )
+     * </p>
+     * 
+     * @param ticker
+     * @return
+     */
+    static Indicator trueRange(Ticker ticker) {
+        return new AbstractCachedIndicator(ticker) {
+
+            @Override
+            protected Num calculate(int index) {
+                Tick current = ticker.get(index);
+                Num highLow = current.highPrice().minus(current.lowPrice()).abs();
+
+                if (index == 0) {
+                    return highLow;
+                }
+
+                Tick previous = ticker.get(index - 1);
+                Num highClose = index == 0 ? Num.ZERO : current.highPrice().minus(previous.closePrice()).abs();
+                Num closeLow = index == 0 ? Num.ZERO : previous.closePrice().minus(current.lowPrice).abs();
+
+                return Num.max(highLow, highClose, closeLow);
+            }
+        };
+    }
+
+    /**
+     * <p>
+     * The average true range (ATR) is a technical analysis indicator that measures market
+     * volatility by decomposing the entire range of an asset price for that period. Specifically,
+     * ATR is a measure of volatility introduced by market technician J. Welles Wilder Jr. in his
+     * book, "New Concepts in Technical Trading Systems."
+     * </p>
+     * <p>
+     * The true range indicator is taken as the greatest of the following: current high less the
+     * current low; the absolute value of the current high less the previous close; and the absolute
+     * value of the current low less the previous close. The average true range is then a moving
+     * average, generally using 14 days, of the true ranges.
+     * </p>
+     * 
+     * @param ticker
+     * @param size
+     * @return
+     */
+    static Indicator averageTrueRange(Ticker ticker, int size) {
+        return trueRange(ticker).mma(size);
+    }
 }

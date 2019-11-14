@@ -121,4 +121,26 @@ class IndicatorTest {
         assert indicator.valueAt(3).is(3);
         assert indicator.valueAt(4).is(4);
     }
+
+    @Test
+    void trueRange() {
+        Ticker ticker = ticker(Span.Second5, 1, 2, 4, 8, 16);
+        Indicator indicator = Indicator.trueRange(ticker);
+        assert indicator.valueAt(0).is(0);
+        assert indicator.valueAt(1).is(1);
+        assert indicator.valueAt(2).is(2);
+        assert indicator.valueAt(3).is(4);
+        assert indicator.valueAt(4).is(8);
+    }
+
+    @Test
+    void averageTrueRange() {
+        Ticker ticker = ticker(Span.Second5, 1, 2, 4, 8, 16);
+        Indicator indicator = Indicator.averageTrueRange(ticker, 4);
+        assert indicator.valueAt(0).is(0);
+        assert indicator.valueAt(1).is(0.25);
+        assert indicator.valueAt(2).is(0.6875);
+        assert indicator.valueAt(3).is(1.515625);
+        assert indicator.valueAt(4).is(3.13671875);
+    }
 }
