@@ -76,6 +76,32 @@ public interface Indicator {
     }
 
     /**
+     * Wrap by modified moving average.
+     * 
+     * @param size A tick size.
+     * @return A wrapped indicator.
+     */
+    default Indicator mma(int size) {
+        Objects.checkIndex(size, 100);
+
+        return new AbstractCachedIndicator(this) {
+
+            /** The multiplier. */
+            private final double multiplier = 1.0 / size;
+
+            @Override
+            protected Num calculate(int index) {
+                if (index == 0) {
+                    return wrapped.valueAt(0);
+                }
+
+                Num previous = valueAt(index - 1);
+                return wrapped.valueAt(index).minus(previous).multiply(multiplier).plus(previous);
+            }
+        };
+    }
+
+    /**
      * Wrap by simple moving average.
      * 
      * @param size A tick size.
