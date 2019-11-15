@@ -9,7 +9,7 @@
  */
 package cointoss.trade;
 
-import static cointoss.util.Num.HUNDRED;
+import static cointoss.util.Num.*;
 
 import java.text.NumberFormat;
 import java.time.Duration;
@@ -191,11 +191,9 @@ public class TradingLog {
 
         StringBuilder builder = new StringBuilder();
 
-        if (detail) {
-            for (Scenario scenario : scenarios) {
-                if (scenario.isActive()) {
-                    builder.append(scenario);
-                }
+        for (Scenario scenario : scenarios) {
+            if (scenario.isEnableLog() && scenario.isActive()) {
+                builder.append(scenario);
             }
         }
 

@@ -14,6 +14,14 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
 
+import cointoss.market.bitflyer.BitFlyer;
+import cointoss.market.bitflyer.SFD;
+import cointoss.ticker.Indicator;
+import cointoss.ticker.Tick;
+import cointoss.ticker.Ticker;
+import cointoss.ticker.oscillators.WaveTrendOscillator;
+import cointoss.util.Chrono;
+import cointoss.util.Num;
 import javafx.collections.ObservableList;
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -26,15 +34,6 @@ import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.PathElement;
-
-import cointoss.market.bitflyer.BitFlyer;
-import cointoss.market.bitflyer.SFD;
-import cointoss.ticker.Indicator;
-import cointoss.ticker.Tick;
-import cointoss.ticker.Ticker;
-import cointoss.ticker.oscillators.WaveTrendOscillator;
-import cointoss.util.Chrono;
-import cointoss.util.Num;
 import kiss.I;
 import kiss.Variable;
 import stylist.Style;
@@ -205,8 +204,11 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             mouseTrackVertical.layoutLine.requestLayout();
             mouseTrackHorizontal.layoutLine.requestLayout();
 
-            // upper info
-            chart.ticker.v.findByEpochSecond((long) x).to(tick -> {
+            // Move the start position forward for visual consistency
+            long sec = (long) x + chart.ticker.v.span.duration.toSeconds() / 2;
+
+            // Upper Info
+            chart.ticker.v.findByEpochSecond(sec).to(tick -> {
                 chart.selectDate.text(Chrono.system(tick.start).format(Chrono.DateTime));
                 chart.selectHigh.text("H " + tick.highPrice().scale(0));
                 chart.selectLow.text("L " + tick.lowPrice().scale(0));

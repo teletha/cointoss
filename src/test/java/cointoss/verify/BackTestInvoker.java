@@ -9,7 +9,7 @@
  */
 package cointoss.verify;
 
-import static java.time.temporal.ChronoUnit.MINUTES;
+import static java.time.temporal.ChronoUnit.*;
 
 import cointoss.Direction;
 import cointoss.Market;
@@ -27,7 +27,7 @@ public class BackTestInvoker {
         BackTest.with.service(BitFlyer.FX_BTC_JPY)
                 .start(2019, 11, 5)
                 .end(2019, 11, 9)
-                .traders(Sample::new, LazyBear::new)
+                .traders(LazyBear::new)
                 .initialBaseCurrency(3000000)
                 .run();
     }
@@ -70,21 +70,26 @@ public class BackTestInvoker {
      */
     private static class LazyBear extends Trader {
 
-        WaveTrendOscillator oscillator = new WaveTrendOscillator(market.tickers.of(Span.Minute5));
+        WaveTrendOscillator oscillator = new WaveTrendOscillator(market.tickers.of(Span.Hour1));
 
         private LazyBear(Market market) {
             super(market);
 
-            when(oscillator.wt1.observe().take(v -> v.isLessThan(-40)), value -> new Scenario() {
+            when(oscillator.wt1.observe().take(v -> v.isLessThan(-50)), value -> new Scenario() {
+
+                {
+                    enableLog();
+                }
 
                 @Override
                 protected void entry() {
                     entry(Direction.BUY, 0.3, s -> s.make(market.tickers.latestPrice.v).cancelAfter(3, MINUTES));
+                    logEntry("oscillator " + value);
                 }
 
                 @Override
                 protected void exit() {
-                    exitWhen(oscillator.wt1.observe().take(v -> v.isGreaterThan(30)), s -> s.take());
+                    exitWhen(oscillator.wt1.observe().take(v -> v.isGreaterThan(value.negate())), s -> s.take());
                     // exitAt(market.tickers.of(Span.Second5).add.flatMap(tick -> {
                     // if (tick.openPrice.isGreaterThan(this, entryPrice.plus(this, 4000))) {
                     // return I.signal(entryPrice.plus(this, 100));
@@ -95,7 +100,11 @@ public class BackTestInvoker {
                 }
             });
 
-            when(oscillator.wt1.observe().take(v -> v.isGreaterThan(40)), value -> new Scenario() {
+            when(oscillator.wt1.observe().take(v -> v.isGreaterThan(50)), value -> new Scenario() {
+
+                {
+                    enableLog();
+                }
 
                 @Override
                 protected void entry() {
@@ -104,7 +113,7 @@ public class BackTestInvoker {
 
                 @Override
                 protected void exit() {
-                    exitWhen(oscillator.wt1.observe().take(v -> v.isLessThan(-30)), s -> s.take());
+                    exitWhen(oscillator.wt1.observe().take(v -> v.isLessThan(value.negate())), s -> s.take());
                     // exitAt(market.tickers.of(Span.Second5).add.flatMap(tick -> {
                     // if (tick.openPrice.isGreaterThan(this, entryPrice.plus(this, 4000))) {
                     // return I.signal(entryPrice.plus(this, 100));

@@ -9,7 +9,7 @@
  */
 package cointoss.trade;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
@@ -368,16 +368,14 @@ public abstract class Scenario extends ScenarioBase implements Directional {
 
     protected final Variable<Num> trailing(Function<Num, Num> trailer) {
         Variable<Num> trailedPrice = Variable.of(trailer.apply(entryPrice));
-        disposerForExit
-                .add(market.tickers.of(Span.Second5).add.map(tick -> Num.max(this, trailer.apply(tick.openPrice), trailedPrice.v))
-                        .to(trailedPrice));
+        disposerForExit.add(market.tickers.of(Span.Second5).add.map(tick -> Num.max(this, trailer.apply(tick.openPrice), trailedPrice.v))
+                .to(trailedPrice));
         return trailedPrice;
     }
 
     protected final Variable<Num> trailing2(Function<Num, Num> trailer) {
         Variable variable = Variable.of(trailer.apply(entryPrice.minus(this, entryPrice)));
-        disposerForExit
-                .add(market.tickers.of(Span.Second5).add.map(v -> trailer.apply(entryPrice.minus(this, v.openPrice))).to(variable));
+        disposerForExit.add(market.tickers.of(Span.Second5).add.map(v -> trailer.apply(entryPrice.minus(this, v.openPrice))).to(variable));
         return variable;
     }
 
@@ -458,10 +456,19 @@ public abstract class Scenario extends ScenarioBase implements Directional {
     /**
      * Enable log for this {@link Scenario}.
      */
-    private void enableLog() {
+    protected final void enableLog() {
         if (logs == null) {
             logs = new LinkedList();
         }
+    }
+
+    /**
+     * Check log availability.
+     * 
+     * @return
+     */
+    protected final boolean isEnableLog() {
+        return logs != null;
     }
 
     /**
@@ -469,7 +476,7 @@ public abstract class Scenario extends ScenarioBase implements Directional {
      * 
      * @param message
      */
-    private void log(String message) {
+    protected final void log(String message) {
         if (logs != null) {
             logs.add(message);
         }
@@ -480,7 +487,7 @@ public abstract class Scenario extends ScenarioBase implements Directional {
      * 
      * @param message
      */
-    private void logEntry(String message) {
+    protected final void logEntry(String message) {
         log(message + " " + entryExecutedSize + "/" + entrySize + "@" + entryPrice);
     }
 
@@ -489,7 +496,7 @@ public abstract class Scenario extends ScenarioBase implements Directional {
      * 
      * @param message
      */
-    private void logExit(String message) {
+    protected final void logExit(String message) {
         log(message + " " + exitExecutedSize + "/" + exitSize + "@" + exitPrice);
     }
 }
