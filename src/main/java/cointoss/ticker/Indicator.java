@@ -118,13 +118,48 @@ public abstract class Indicator<T> {
     }
 
     /**
+     * Wrap by combined {@link Indicator}.
+     * 
+     * @param <With>
+     * @param indicator1
+     * @return
+     */
+    public final <With> Indicator<Ⅱ<T, With>> combine(Indicator<With> indicator1) {
+        return map(indicator1, (a, b) -> I.pair(a, b));
+    }
+
+    /**
+     * Wrap by combined {@link Indicator}.
+     * 
+     * @param <With1>
+     * @param <With2>
+     * @param indicator1
+     * @param indicator2
+     * @return
+     */
+    public final <With1, With2> Indicator<Ⅲ<T, With1, With2>> combine(Indicator<With1> indicator1, Indicator<With2> indicator2) {
+        return map(indicator1, indicator2, (a, b, c) -> I.pair(a, b, c));
+    }
+
+    /**
+     * Wrap by the mapped result.
+     * 
+     * @param <Out>
+     * @param mapper
+     * @return
+     */
+    public final <Out> Indicator<Out> map(Function<T, Out> mapper) {
+        return (Indicator<Out>) memoize((tick, self) -> (T) mapper.apply(valueAt(tick)));
+    }
+
+    /**
      * Wrap by the calculation result between {@link Indicator}s.
      * 
      * @param indicator1
      * @param calculater
      * @return
      */
-    public final <With, Out> Indicator<Out> calculate(Indicator<With> indicator1, WiseBiFunction<T, With, Out> calculater) {
+    public final <With, Out> Indicator<Out> map(Indicator<With> indicator1, WiseBiFunction<T, With, Out> calculater) {
         return new Indicator<Out>(this) {
 
             @Override
@@ -142,7 +177,7 @@ public abstract class Indicator<T> {
      * @param calculater
      * @return
      */
-    public final <With1, With2, Out> Indicator<Out> calculate(Indicator<With1> indicator1, Indicator<With2> indicator2, WiseTriFunction<T, With1, With2, Out> calculater) {
+    public final <With1, With2, Out> Indicator<Out> map(Indicator<With1> indicator1, Indicator<With2> indicator2, WiseTriFunction<T, With1, With2, Out> calculater) {
         return new Indicator<>(this) {
 
             @Override
@@ -150,30 +185,6 @@ public abstract class Indicator<T> {
                 return calculater.apply((T) wrapped.valueAt(tick), indicator1.valueAt(tick), indicator2.valueAt(tick));
             }
         };
-    }
-
-    /**
-     * Wrap by combined {@link Indicator}.
-     * 
-     * @param <With>
-     * @param indicator1
-     * @return
-     */
-    public final <With> Indicator<Ⅱ<T, With>> combine(Indicator<With> indicator1) {
-        return calculate(indicator1, (a, b) -> I.pair(a, b));
-    }
-
-    /**
-     * Wrap by combined {@link Indicator}.
-     * 
-     * @param <With1>
-     * @param <With2>
-     * @param indicator1
-     * @param indicator2
-     * @return
-     */
-    public final <With1, With2> Indicator<Ⅲ<T, With1, With2>> combine(Indicator<With1> indicator1, Indicator<With2> indicator2) {
-        return calculate(indicator1, indicator2, (a, b, c) -> I.pair(a, b, c));
     }
 
     /**

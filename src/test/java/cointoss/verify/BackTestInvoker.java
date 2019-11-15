@@ -76,7 +76,7 @@ public class BackTestInvoker {
         private LazyBear(Market market) {
             super(market);
 
-            when(oscillator.wt1.observe().take(v -> v.isLessThan(-50)), value -> new Scenario() {
+            when(oscillator.observe().take(v -> v.ⅰ.isLessThan(-50)), value -> new Scenario() {
 
                 {
                     enableLog();
@@ -90,7 +90,7 @@ public class BackTestInvoker {
 
                 @Override
                 protected void exit() {
-                    exitWhen(oscillator.wt1.observe().take(v -> v.isGreaterThan(value.negate())), s -> s.take());
+                    exitWhen(oscillator.observe().take(v -> v.ⅰ.isGreaterThan(value.ⅰ.negate())), s -> s.take());
                     // exitAt(market.tickers.of(Span.Second5).add.flatMap(tick -> {
                     // if (tick.openPrice.isGreaterThan(this, entryPrice.plus(this, 4000))) {
                     // return I.signal(entryPrice.plus(this, 100));
@@ -101,7 +101,7 @@ public class BackTestInvoker {
                 }
             });
 
-            when(oscillator.wt1.observe().take(v -> v.isGreaterThan(50)), value -> new Scenario() {
+            when(oscillator.observe().take(v -> v.ⅰ.isGreaterThan(50)), value -> new Scenario() {
 
                 {
                     enableLog();
@@ -114,7 +114,7 @@ public class BackTestInvoker {
 
                 @Override
                 protected void exit() {
-                    exitWhen(oscillator.wt1.observe().take(v -> v.isLessThan(value.negate())), s -> s.take());
+                    exitWhen(oscillator.observe().take(v -> v.ⅰ.isLessThan(value.ⅰ.negate())), s -> s.take());
                     // exitAt(market.tickers.of(Span.Second5).add.flatMap(tick -> {
                     // if (tick.openPrice.isGreaterThan(this, entryPrice.plus(this, 4000))) {
                     // return I.signal(entryPrice.plus(this, 100));

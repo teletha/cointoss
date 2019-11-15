@@ -39,6 +39,7 @@ import cointoss.util.Chrono;
 import cointoss.util.Num;
 import kiss.I;
 import kiss.Variable;
+import kiss.Ⅱ;
 import stylist.Style;
 import trademate.chart.Axis.TickLable;
 import trademate.setting.Notificator;
@@ -159,8 +160,8 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         // this.chartBottom.create(tick -> tick.volume().toDouble() * 2, ChartStyles.BackGrid);
 
         Variable<WaveTrendOscillator> oscillator = chart.ticker.observe().switchMap(t -> I.signal(new WaveTrendOscillator(t))).to();
-        this.chartRelative.create(ticker -> oscillator.v.wt1, ChartStyles.OrderSupportBuy);
-        this.chartRelative.create(ticker -> oscillator.v.wt2, ChartStyles.OrderSupportSell);
+        this.chartRelative.create(ticker -> oscillator.v.map(Ⅱ::ⅰ), ChartStyles.OrderSupportBuy);
+        this.chartRelative.create(ticker -> oscillator.v.map(Ⅱ::ⅱ), ChartStyles.OrderSupportSell);
 
         Viewtify.clip(this);
 
