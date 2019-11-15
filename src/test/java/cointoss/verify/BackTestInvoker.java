@@ -9,7 +9,7 @@
  */
 package cointoss.verify;
 
-import static java.time.temporal.ChronoUnit.*;
+import static java.time.temporal.ChronoUnit.MINUTES;
 
 import cointoss.Direction;
 import cointoss.Market;
@@ -19,6 +19,7 @@ import cointoss.ticker.Span;
 import cointoss.ticker.oscillators.WaveTrendOscillator;
 import cointoss.trade.Scenario;
 import cointoss.trade.Trader;
+import cointoss.util.Num;
 import kiss.I;
 
 public class BackTestInvoker {
@@ -37,7 +38,7 @@ public class BackTestInvoker {
      */
     private static class Sample extends Trader {
 
-        Indicator losscutRange = Indicator.averageTrueRange(market.tickers.of(Span.Minute30), 6);
+        Indicator<Num> losscutRange = Indicator.averageTrueRange(market.tickers.of(Span.Minute30), 6);
 
         private Sample(Market market) {
             super(market);

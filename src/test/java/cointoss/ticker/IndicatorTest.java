@@ -13,12 +13,14 @@ import static cointoss.ticker.TickerTestSupport.ticker;
 
 import org.junit.jupiter.api.Test;
 
+import cointoss.util.Num;
+
 class IndicatorTest {
 
     @Test
     void valueAt() {
         Ticker ticker = ticker(Span.Second5, 1, 2, 3, 4, 5);
-        Indicator indicator = Indicator.build(ticker, tick -> tick.openPrice);
+        Indicator<Num> indicator = Indicator.build(ticker, tick -> tick.openPrice);
         assert indicator.valueAt(ticker.get(0)).is(1);
         assert indicator.valueAt(ticker.get(1)).is(2);
         assert indicator.valueAt(ticker.get(2)).is(3);
@@ -29,21 +31,21 @@ class IndicatorTest {
     @Test
     void first() {
         Ticker ticker = ticker(Span.Second5, 1, 2, 3, 4, 5);
-        Indicator indicator = Indicator.build(ticker, tick -> tick.openPrice);
+        Indicator<Num> indicator = Indicator.build(ticker, tick -> tick.openPrice);
         assert indicator.first().is(1);
     }
 
     @Test
     void last() {
         Ticker ticker = ticker(Span.Second5, 1, 2, 3, 4, 5);
-        Indicator indicator = Indicator.build(ticker, tick -> tick.openPrice);
+        Indicator<Num> indicator = Indicator.build(ticker, tick -> tick.openPrice);
         assert indicator.last().is(5);
     }
 
     @Test
     void sma() {
         Ticker ticker = ticker(Span.Second5, 1, 2, 3, 4, 5);
-        Indicator indicator = Indicator.build(ticker, tick -> tick.openPrice).sma(2);
+        Indicator<Num> indicator = Indicator.build(ticker, tick -> tick.openPrice).sma(2);
         assert indicator.valueAt(ticker.get(0)).is(1);
         assert indicator.valueAt(ticker.get(1)).is(1.5);
         assert indicator.valueAt(ticker.get(2)).is(2.5);
@@ -61,7 +63,7 @@ class IndicatorTest {
     @Test
     void ema() {
         Ticker ticker = ticker(Span.Second5, 1, 2, 3, 4, 5);
-        Indicator indicator = Indicator.build(ticker, tick -> tick.openPrice).ema(2);
+        Indicator<Num> indicator = Indicator.build(ticker, tick -> tick.openPrice).ema(2);
         assert indicator.valueAt(ticker.get(0)).is(1);
         assert indicator.valueAt(ticker.get(1)).is(1.6666666667);
         assert indicator.valueAt(ticker.get(2)).is(2.5555555556);
@@ -79,7 +81,7 @@ class IndicatorTest {
     @Test
     void mma() {
         Ticker ticker = ticker(Span.Second5, 1, 2, 3, 4, 5);
-        Indicator indicator = Indicator.build(ticker, tick -> tick.openPrice).mma(2);
+        Indicator<Num> indicator = Indicator.build(ticker, tick -> tick.openPrice).mma(2);
         assert indicator.valueAt(ticker.get(0)).is(1);
         assert indicator.valueAt(ticker.get(1)).is(1.5);
         assert indicator.valueAt(ticker.get(2)).is(2.25);
@@ -97,7 +99,7 @@ class IndicatorTest {
     @Test
     void wma() {
         Ticker ticker = ticker(Span.Second5, 1, 2, 3, 4, 5);
-        Indicator indicator = Indicator.build(ticker, tick -> tick.openPrice).wma(2);
+        Indicator<Num> indicator = Indicator.build(ticker, tick -> tick.openPrice).wma(2);
         assert indicator.valueAt(ticker.get(0)).is(1);
         assert indicator.valueAt(ticker.get(1)).is(1.6666666667);
         assert indicator.valueAt(ticker.get(2)).is(2.6666666667);
@@ -113,35 +115,9 @@ class IndicatorTest {
     }
 
     @Test
-    void plus() {
-        Ticker ticker = ticker(Span.Second5, 1, 2, 3, 4, 5);
-        Indicator indicator1 = Indicator.build(ticker, tick -> tick.openPrice);
-        Indicator indicator2 = Indicator.build(ticker, tick -> tick.closePrice());
-        Indicator indicator = indicator1.plus(indicator2);
-        assert indicator.valueAt(ticker.get(0)).is(2);
-        assert indicator.valueAt(ticker.get(1)).is(4);
-        assert indicator.valueAt(ticker.get(2)).is(6);
-        assert indicator.valueAt(ticker.get(3)).is(8);
-        assert indicator.valueAt(ticker.get(4)).is(10);
-    }
-
-    @Test
-    void minus() {
-        Ticker ticker = ticker(Span.Second5, 1, 2, 3, 4, 5);
-        Indicator indicator1 = Indicator.build(ticker, tick -> tick.openPrice);
-        Indicator indicator2 = Indicator.build(ticker, tick -> tick.closePrice());
-        Indicator indicator = indicator1.minus(indicator2);
-        assert indicator.valueAt(ticker.get(0)).is(0);
-        assert indicator.valueAt(ticker.get(1)).is(0);
-        assert indicator.valueAt(ticker.get(2)).is(0);
-        assert indicator.valueAt(ticker.get(3)).is(0);
-        assert indicator.valueAt(ticker.get(4)).is(0);
-    }
-
-    @Test
     void trueRange() {
         Ticker ticker = ticker(Span.Second5, 1, 2, 4, 8, 16);
-        Indicator indicator = Indicator.trueRange(ticker);
+        Indicator<Num> indicator = Indicator.trueRange(ticker);
         assert indicator.valueAt(ticker.get(0)).is(0);
         assert indicator.valueAt(ticker.get(1)).is(1);
         assert indicator.valueAt(ticker.get(2)).is(2);
@@ -152,7 +128,7 @@ class IndicatorTest {
     @Test
     void averageTrueRange() {
         Ticker ticker = ticker(Span.Second5, 1, 2, 4, 8, 16);
-        Indicator indicator = Indicator.averageTrueRange(ticker, 4);
+        Indicator<Num> indicator = Indicator.averageTrueRange(ticker, 4);
         assert indicator.valueAt(ticker.get(0)).is(0);
         assert indicator.valueAt(ticker.get(1)).is(0.25);
         assert indicator.valueAt(ticker.get(2)).is(0.6875);

@@ -442,7 +442,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
          * @param indicator
          * @param style
          */
-        private void create(Function<Ticker, Indicator> indicator, Style style) {
+        private void create(Function<Ticker, Indicator<Num>> indicator, Style style) {
             lines.add(new Line(indicator, style));
         }
 
@@ -527,7 +527,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             private final double heightMax = 50;
 
             /** The indicator. */
-            private final Variable<Indicator> indicator;
+            private final Variable<Indicator<Num>> indicator;
 
             /** The color of line. */
             private final Color color;
@@ -542,7 +542,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
              * @param indicator
              * @param style
              */
-            private Line(Function<Ticker, Indicator> indicator, Style style) {
+            private Line(Function<Ticker, Indicator<Num>> indicator, Style style) {
                 this.indicator = chart.ticker.observe().switchMap(ticker -> I.signal(indicator.apply(ticker))).to();
                 this.color = FXUtils.color(style, "stroke");
             }

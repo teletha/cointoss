@@ -22,18 +22,18 @@ public class WaveTrendOscillator extends IndicatorSet {
 
     public final Variable<Integer> lazyLength = Variable.of(21);
 
-    public final Indicator wt1;
+    public final Indicator<Num> wt1;
 
-    public final Indicator wt2;
+    public final Indicator<Num> wt2;
 
     /**
      * @param ticker
      */
     public WaveTrendOscillator(Ticker ticker) {
-        Indicator ap = Indicator.build(ticker, Tick::typicalPrice);
-        Indicator esa = ap.ema(emaLength.v);
-        Indicator d = esa.calculate(ap, (a, b) -> a.minus(b).abs()).ema(emaLength.v);
-        Indicator ci = ap.calculate(esa, d, (a, b, c) -> {
+        Indicator<Num> ap = Indicator.build(ticker, Tick::typicalPrice);
+        Indicator<Num> esa = ap.ema(emaLength.v);
+        Indicator<Num> d = esa.calculate(ap, (a, b) -> a.minus(b).abs()).ema(emaLength.v);
+        Indicator<Num> ci = ap.calculate(esa, d, (a, b, c) -> {
             if (c.isZero()) {
                 return a.minus(b);
             }

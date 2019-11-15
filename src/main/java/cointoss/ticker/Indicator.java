@@ -16,12 +16,15 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import cointoss.util.Num;
+import kiss.I;
 import kiss.Signal;
 import kiss.Variable;
 import kiss.WiseBiFunction;
 import kiss.WiseTriFunction;
+import kiss.Ⅱ;
+import kiss.Ⅲ;
 
-public abstract class Indicator {
+public abstract class Indicator<T> {
 
     /** The human-readable name. */
     public final Variable<String> name = Variable.of(getClass().getSimpleName());
@@ -94,14 +97,14 @@ public abstract class Indicator {
      * @param tick A {@link Tick} on {@link Ticker}.
      * @return
      */
-    public abstract Num valueAt(Tick tick);
+    public abstract T valueAt(Tick tick);
 
     /**
      * Return the first value of this {@link Indicator}.
      * 
      * @return A first value.
      */
-    public final Num first() {
+    public final T first() {
         return valueAt(ticker.first());
     }
 
@@ -110,7 +113,7 @@ public abstract class Indicator {
      * 
      * @return A latest value.
      */
-    public final Num last() {
+    public final T last() {
         return valueAt(ticker.last());
     }
 
@@ -121,12 +124,12 @@ public abstract class Indicator {
      * @param calculater
      * @return
      */
-    public final Indicator calculate(Indicator indicator1, WiseBiFunction<Num, Num, Num> calculater) {
-        return new Indicator(this) {
+    public final <In, Out> Indicator<Out> calculate(Indicator<In> indicator1, WiseBiFunction<T, In, Out> calculater) {
+        return new Indicator<Out>(this) {
 
             @Override
-            public Num valueAt(Tick tick) {
-                return calculater.apply(wrapped.valueAt(tick), indicator1.valueAt(tick));
+            public Out valueAt(Tick tick) {
+                return calculater.apply((T) wrapped.valueAt(tick), indicator1.valueAt(tick));
             }
         };
     }
@@ -139,34 +142,38 @@ public abstract class Indicator {
      * @param calculater
      * @return
      */
-    public final Indicator calculate(Indicator indicator1, Indicator indicator2, WiseTriFunction<Num, Num, Num, Num> calculater) {
-        return new Indicator(this) {
+    public final <In1, In2, Out> Indicator<Out> calculate(Indicator<In1> indicator1, Indicator<In2> indicator2, WiseTriFunction<T, In1, In2, Out> calculater) {
+        return new Indicator<>(this) {
 
             @Override
-            public Num valueAt(Tick tick) {
-                return calculater.apply(wrapped.valueAt(tick), indicator1.valueAt(tick), indicator2.valueAt(tick));
+            public Out valueAt(Tick tick) {
+                return calculater.apply((T) wrapped.valueAt(tick), indicator1.valueAt(tick), indicator2.valueAt(tick));
             }
         };
     }
 
     /**
-     * Wrap by the calculation result between {@link Indicator}s.
+     * Wrap by combined {@link Indicator}.
      * 
-     * @param subtrahend
+     * @param <With>
+     * @param indicator1
      * @return
      */
-    public final Indicator minus(Indicator subtrahend) {
-        return calculate(subtrahend, Num::minus);
+    public final <With> Indicator<Ⅱ<T, With>> combine(Indicator<With> indicator1) {
+        return calculate(indicator1, (a, b) -> I.pair(a, b));
     }
 
     /**
-     * Wrap by the calculation result between {@link Indicator}s.
+     * Wrap by combined {@link Indicator}.
      * 
-     * @param augend
+     * @param <With1>
+     * @param <With2>
+     * @param indicator1
+     * @param indicator2
      * @return
      */
-    public final Indicator plus(Indicator augend) {
-        return calculate(augend, Num::plus);
+    public final <With1, With2> Indicator<Ⅲ<T, With1, With2>> combine(Indicator<With1> indicator1, Indicator<With2> indicator2) {
+        return calculate(indicator1, indicator2, (a, b, c) -> I.pair(a, b, c));
     }
 
     /**
@@ -175,18 +182,18 @@ public abstract class Indicator {
      * @param size A tick size.
      * @return A wrapped indicator.
      */
-    public final Indicator ema(int size) {
+    public final Indicator<Num> ema(int size) {
         Objects.checkIndex(size, 100);
 
         double multiplier = 2.0 / (size + 1);
 
-        return memoize((tick, self) -> {
+        return (Indicator<Num>) memoize((tick, self) -> {
             if (tick.previous == null) {
                 return valueAt(tick);
             }
 
-            Num previous = self.apply(tick.previous);
-            return valueAt(tick).minus(previous).multiply(multiplier).plus(previous);
+            Num previous = (Num) self.apply(tick.previous);
+            return (T) ((Num) valueAt(tick)).minus(previous).multiply(multiplier).plus(previous);
         });
     }
 
@@ -196,18 +203,18 @@ public abstract class Indicator {
      * @param size A tick size.
      * @return A wrapped indicator.
      */
-    public final Indicator mma(int size) {
+    public final Indicator<Num> mma(int size) {
         Objects.checkIndex(size, 100);
 
         double multiplier = 1.0 / size;
 
-        return memoize((tick, self) -> {
+        return (Indicator<Num>) memoize((tick, self) -> {
             if (tick.previous == null) {
                 return valueAt(tick);
             }
 
-            Num previous = self.apply(tick.previous);
-            return valueAt(tick).minus(previous).multiply(multiplier).plus(previous);
+            Num previous = (Num) self.apply(tick.previous);
+            return (T) ((Num) valueAt(tick)).minus(previous).multiply(multiplier).plus(previous);
         });
     }
 
@@ -217,10 +224,10 @@ public abstract class Indicator {
      * @param size A tick size.
      * @return A wrapped indicator.
      */
-    public final Indicator sma(int size) {
+    public final Indicator<Num> sma(int size) {
         Objects.checkIndex(size, 100);
 
-        return new Indicator(this) {
+        return new Indicator<Num>(this) {
 
             @Override
             public Num valueAt(Tick tick) {
@@ -228,13 +235,13 @@ public abstract class Indicator {
                 Tick current = tick;
                 int remaining = size;
                 while (current != null && 0 < remaining) {
-                    sum = sum.plus(wrapped.valueAt(current));
+                    sum = sum.plus((Num) wrapped.valueAt(current));
                     current = current.previous;
                     remaining--;
                 }
                 return sum.divide(size - remaining);
             }
-        };
+        }.memoize();
     }
 
     /**
@@ -243,26 +250,26 @@ public abstract class Indicator {
      * @param size A tick size.
      * @return A wrapped indicator.
      */
-    public final Indicator wma(int size) {
+    public final Indicator<Num> wma(int size) {
         Objects.checkIndex(size, 100);
 
-        return new Indicator(this) {
+        return new Indicator<Num>(this) {
 
             @Override
             public Num valueAt(Tick tick) {
                 if (tick.previous == null) {
-                    return wrapped.valueAt(tick);
+                    return (Num) wrapped.valueAt(tick);
                 }
 
                 Num value = Num.ZERO;
                 int actualSize = calculatePreviousTickLength(tick, size);
                 for (int i = actualSize; 0 < i; i--) {
-                    value = value.plus(wrapped.valueAt(tick).multiply(i));
+                    value = value.plus(((Num) wrapped.valueAt(tick)).multiply(i));
                     tick = tick.previous;
                 }
                 return value.divide(actualSize * (actualSize + 1) / 2);
             }
-        };
+        }.memoize();
     }
 
     /**
@@ -270,7 +277,7 @@ public abstract class Indicator {
      * 
      * @return
      */
-    public final Indicator memoize() {
+    public final Indicator<T> memoize() {
         return memoize((tick, self) -> valueAt(tick));
     }
 
@@ -279,14 +286,14 @@ public abstract class Indicator {
      * 
      * @return
      */
-    public final Indicator memoize(BiFunction<Tick, Function<Tick, Num>, Num> calculator) {
-        return new Indicator(this) {
+    public final Indicator<T> memoize(BiFunction<Tick, Function<Tick, T>, T> calculator) {
+        return new Indicator<>(this) {
 
             /** CACHE */
-            private final ConcurrentSkipListMap<ZonedDateTime, Num> cache = new ConcurrentSkipListMap();
+            private final ConcurrentSkipListMap<ZonedDateTime, T> cache = new ConcurrentSkipListMap();
 
             @Override
-            public Num valueAt(Tick tick) {
+            public T valueAt(Tick tick) {
                 return cache.computeIfAbsent(tick.start, key -> calculator.apply(tick, this::valueAt));
             }
         };
@@ -297,7 +304,7 @@ public abstract class Indicator {
      * 
      * @return
      */
-    public final Signal<Num> observe() {
+    public final Signal<T> observe() {
         return ticker.add.map(this::valueAt);
     }
 
@@ -306,7 +313,7 @@ public abstract class Indicator {
      * 
      * @return
      */
-    public final Signal<Num> observeNow() {
+    public final Signal<T> observeNow() {
         return observe().startWith(last());
     }
 
@@ -318,13 +325,13 @@ public abstract class Indicator {
      * @param calculator
      * @return
      */
-    public static Indicator build(Ticker ticker, Function<Tick, Num> calculator) {
+    public static <T> Indicator<T> build(Ticker ticker, Function<Tick, T> calculator) {
         Objects.requireNonNull(calculator);
 
-        return new Indicator(ticker) {
+        return new Indicator<>(ticker) {
 
             @Override
-            public Num valueAt(Tick tick) {
+            public T valueAt(Tick tick) {
                 return calculator.apply(tick);
             }
         };
@@ -348,7 +355,7 @@ public abstract class Indicator {
      * @param size
      * @return
      */
-    public static Indicator averageTrueRange(Ticker ticker, int size) {
+    public static Indicator<Num> averageTrueRange(Ticker ticker, int size) {
         return trueRange(ticker).mma(size);
     }
 
