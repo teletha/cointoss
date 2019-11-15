@@ -9,19 +9,12 @@
  */
 package trademate.chart;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
 
-import cointoss.market.bitflyer.BitFlyer;
-import cointoss.market.bitflyer.SFD;
-import cointoss.ticker.Indicator;
-import cointoss.ticker.Tick;
-import cointoss.ticker.Ticker;
-import cointoss.ticker.oscillators.WaveTrendOscillator;
-import cointoss.util.Chrono;
-import cointoss.util.Num;
 import javafx.collections.ObservableList;
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -34,6 +27,16 @@ import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.PathElement;
+
+import cointoss.market.bitflyer.BitFlyer;
+import cointoss.market.bitflyer.SFD;
+import cointoss.ticker.Indicator;
+import cointoss.ticker.IndicatorSet;
+import cointoss.ticker.Tick;
+import cointoss.ticker.Ticker;
+import cointoss.ticker.oscillators.WaveTrendOscillator;
+import cointoss.util.Chrono;
+import cointoss.util.Num;
 import kiss.I;
 import kiss.Variable;
 import stylist.Style;
@@ -122,6 +125,9 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
     /** The settings. */
     private final ChartDisplaySetting setting = I.make(ChartDisplaySetting.class);
+
+    /** The indicator manager. */
+    private final List<IndicatorSet> indicators = new ArrayList();
 
     /**
      * Chart canvas.

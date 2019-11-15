@@ -9,15 +9,22 @@
  */
 package cointoss.ticker;
 
+import java.time.ZonedDateTime;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import cointoss.util.Num;
 import kiss.Signal;
+import kiss.Variable;
 import kiss.WiseBiFunction;
 import kiss.WiseTriFunction;
 
 public abstract class Indicator {
+
+    /** The human-readable name. */
+    public final Variable<String> name = Variable.of(getClass().getSimpleName());
 
     /** The target {@link Ticker}. */
     protected final Ticker ticker;
@@ -63,6 +70,16 @@ public abstract class Indicator {
     }
 
     /**
+     * Set the name property of this {@link Indicator}.
+     * 
+     * @param name The name value to set.
+     */
+    public final Indicator name(String name) {
+        this.name.set(name);
+        return this;
+    }
+
+    /**
      * Return the related {@link Ticker}.
      * 
      * @return
@@ -105,10 +122,10 @@ public abstract class Indicator {
      * @return
      */
     public final Indicator calculate(Indicator indicator1, WiseBiFunction<Num, Num, Num> calculater) {
-        return new AbstractCachedIndicator(this) {
+        return new Indicator(this) {
 
             @Override
-            protected Num calculate(Tick tick) {
+            public Num valueAt(Tick tick) {
                 return calculater.apply(wrapped.valueAt(tick), indicator1.valueAt(tick));
             }
         };
@@ -123,10 +140,10 @@ public abstract class Indicator {
      * @return
      */
     public final Indicator calculate(Indicator indicator1, Indicator indicator2, WiseTriFunction<Num, Num, Num, Num> calculater) {
-        return new AbstractCachedIndicator(this) {
+        return new Indicator(this) {
 
             @Override
-            protected Num calculate(Tick tick) {
+            public Num valueAt(Tick tick) {
                 return calculater.apply(wrapped.valueAt(tick), indicator1.valueAt(tick), indicator2.valueAt(tick));
             }
         };
@@ -161,21 +178,16 @@ public abstract class Indicator {
     public final Indicator ema(int size) {
         Objects.checkIndex(size, 100);
 
-        return new AbstractCachedIndicator(this) {
+        double multiplier = 2.0 / (size + 1);
 
-            /** The multiplier. */
-            private final double multiplier = 2.0 / (size + 1);
-
-            @Override
-            protected Num calculate(Tick tick) {
-                if (tick.previous == null) {
-                    return wrapped.valueAt(tick);
-                }
-
-                Num previous = valueAt(tick.previous);
-                return wrapped.valueAt(tick).minus(previous).multiply(multiplier).plus(previous);
+        return memoize((tick, self) -> {
+            if (tick.previous == null) {
+                return valueAt(tick);
             }
-        };
+
+            Num previous = self.apply(tick.previous);
+            return valueAt(tick).minus(previous).multiply(multiplier).plus(previous);
+        });
     }
 
     /**
@@ -187,21 +199,16 @@ public abstract class Indicator {
     public final Indicator mma(int size) {
         Objects.checkIndex(size, 100);
 
-        return new AbstractCachedIndicator(this) {
+        double multiplier = 1.0 / size;
 
-            /** The multiplier. */
-            private final double multiplier = 1.0 / size;
-
-            @Override
-            protected Num calculate(Tick tick) {
-                if (tick.previous == null) {
-                    return wrapped.valueAt(tick);
-                }
-
-                Num previous = valueAt(tick.previous);
-                return wrapped.valueAt(tick).minus(previous).multiply(multiplier).plus(previous);
+        return memoize((tick, self) -> {
+            if (tick.previous == null) {
+                return valueAt(tick);
             }
-        };
+
+            Num previous = self.apply(tick.previous);
+            return valueAt(tick).minus(previous).multiply(multiplier).plus(previous);
+        });
     }
 
     /**
@@ -213,10 +220,10 @@ public abstract class Indicator {
     public final Indicator sma(int size) {
         Objects.checkIndex(size, 100);
 
-        return new AbstractCachedIndicator(this) {
+        return new Indicator(this) {
 
             @Override
-            protected Num calculate(Tick tick) {
+            public Num valueAt(Tick tick) {
                 Num sum = Num.ZERO;
                 Tick current = tick;
                 int remaining = size;
@@ -239,10 +246,10 @@ public abstract class Indicator {
     public final Indicator wma(int size) {
         Objects.checkIndex(size, 100);
 
-        return new AbstractCachedIndicator(this) {
+        return new Indicator(this) {
 
             @Override
-            protected Num calculate(Tick tick) {
+            public Num valueAt(Tick tick) {
                 if (tick.previous == null) {
                     return wrapped.valueAt(tick);
                 }
@@ -254,6 +261,33 @@ public abstract class Indicator {
                     tick = tick.previous;
                 }
                 return value.divide(actualSize * (actualSize + 1) / 2);
+            }
+        };
+    }
+
+    /**
+     * Wrap by memoized {@link Indicator}.
+     * 
+     * @return
+     */
+    public final Indicator memoize() {
+        return memoize((tick, self) -> valueAt(tick));
+    }
+
+    /**
+     * Wrap by memoized {@link Indicator} with the recursive caller.
+     * 
+     * @return
+     */
+    public final Indicator memoize(BiFunction<Tick, Function<Tick, Num>, Num> calculator) {
+        return new Indicator(this) {
+
+            /** CACHE */
+            private final ConcurrentSkipListMap<ZonedDateTime, Num> cache = new ConcurrentSkipListMap();
+
+            @Override
+            public Num valueAt(Tick tick) {
+                return cache.computeIfAbsent(tick.start, key -> calculator.apply(tick, this::valueAt));
             }
         };
     }
@@ -287,10 +321,10 @@ public abstract class Indicator {
     public static Indicator build(Ticker ticker, Function<Tick, Num> calculator) {
         Objects.requireNonNull(calculator);
 
-        return new AbstractCachedIndicator(ticker) {
+        return new Indicator(ticker) {
 
             @Override
-            protected Num calculate(Tick tick) {
+            public Num valueAt(Tick tick) {
                 return calculator.apply(tick);
             }
         };
@@ -355,10 +389,10 @@ public abstract class Indicator {
      * @return
      */
     public static Indicator trueRange(Ticker ticker) {
-        return new AbstractCachedIndicator(ticker) {
+        return new Indicator(ticker) {
 
             @Override
-            protected Num calculate(Tick tick) {
+            public Num valueAt(Tick tick) {
                 Num highLow = tick.highPrice().minus(tick.lowPrice()).abs();
 
                 if (tick.previous == null) {
