@@ -77,7 +77,7 @@ public abstract class Indicator<T> {
      * 
      * @param name The name value to set.
      */
-    public final Indicator name(String name) {
+    public final Indicator<T> name(String name) {
         this.name.set(name);
         return this;
     }
@@ -124,7 +124,7 @@ public abstract class Indicator<T> {
      * @param calculater
      * @return
      */
-    public final <In, Out> Indicator<Out> calculate(Indicator<In> indicator1, WiseBiFunction<T, In, Out> calculater) {
+    public final <With, Out> Indicator<Out> calculate(Indicator<With> indicator1, WiseBiFunction<T, With, Out> calculater) {
         return new Indicator<Out>(this) {
 
             @Override
@@ -142,7 +142,7 @@ public abstract class Indicator<T> {
      * @param calculater
      * @return
      */
-    public final <In1, In2, Out> Indicator<Out> calculate(Indicator<In1> indicator1, Indicator<In2> indicator2, WiseTriFunction<T, In1, In2, Out> calculater) {
+    public final <With1, With2, Out> Indicator<Out> calculate(Indicator<With1> indicator1, Indicator<With2> indicator2, WiseTriFunction<T, With1, With2, Out> calculater) {
         return new Indicator<>(this) {
 
             @Override
@@ -395,8 +395,8 @@ public abstract class Indicator<T> {
      * @param ticker
      * @return
      */
-    public static Indicator trueRange(Ticker ticker) {
-        return new Indicator(ticker) {
+    public static Indicator<Num> trueRange(Ticker ticker) {
+        return new Indicator<>(ticker) {
 
             @Override
             public Num valueAt(Tick tick) {
