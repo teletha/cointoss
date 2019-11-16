@@ -22,8 +22,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
-import javafx.scene.control.TextInputDialog;
-
 import org.apache.commons.codec.digest.HmacAlgorithms;
 import org.apache.commons.codec.digest.HmacUtils;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -44,6 +42,7 @@ import cointoss.order.OrderUnit;
 import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
+import javafx.scene.control.TextInputDialog;
 import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
@@ -142,10 +141,10 @@ class BitFlyerService extends MarketService {
             ChildOrderRequest request = new ChildOrderRequest();
             request.child_order_type = order.type == OrderType.Maker ? "LIMIT" : "MARKET";
             request.minute_to_expire = 60 * 24;
-            request.price = order.price.toInt();
+            request.price = order.price.intValue();
             request.product_code = marketName;
             request.side = order.direction().name();
-            request.size = order.size.toDouble();
+            request.size = order.size.doubleValue();
             request.time_in_force = order.quantityCondition.abbreviation;
 
             call = call("POST", "/v1/me/sendchildorder", request, "child_order_acceptance_id", String.class);
@@ -155,10 +154,10 @@ class BitFlyerService extends MarketService {
             request.ord_type = order.type == OrderType.Maker ? "LIMIT" : "MARKET";
             request.minute_to_expire = 60 * 24;
             request.order_ref_id = id;
-            request.price = order.price.toInt();
+            request.price = order.price.intValue();
             request.product_code = marketName;
             request.side = order.direction().name();
-            request.size = order.size.toDouble();
+            request.size = order.size.doubleValue();
             request.time_in_force = order.quantityCondition.abbreviation;
 
             call = call("POST", "https://lightning.bitflyer.jp/api/trade/sendorder", request, "", WebResponse.class)

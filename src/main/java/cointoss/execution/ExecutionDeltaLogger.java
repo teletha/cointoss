@@ -226,7 +226,7 @@ public class ExecutionDeltaLogger extends ExecutionLogger {
      * @return
      */
     protected static String encodeIntegralDelta(Num current, Num previous, int defaultValue) {
-        int diff = current.toInt() - previous.toInt();
+        int diff = current.intValue() - previous.intValue();
 
         if (diff == defaultValue) {
             return "";
@@ -264,7 +264,7 @@ public class ExecutionDeltaLogger extends ExecutionLogger {
         } else {
             int scale = current.scale();
             Num integer = current.scaleByPowerOfTen(scale);
-            return encodeInt(scale + half) + encodeLong(integer.toLong());
+            return encodeInt(scale + half) + encodeLong(integer.longValue());
         }
     }
 

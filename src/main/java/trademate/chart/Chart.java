@@ -9,11 +9,10 @@
  */
 package trademate.chart;
 
+import cointoss.util.Num;
 import javafx.geometry.Insets;
 import javafx.geometry.Side;
 import javafx.scene.layout.Region;
-
-import cointoss.util.Num;
 import kiss.Variable;
 import viewtify.ui.helper.LayoutAssistant;
 
@@ -125,7 +124,7 @@ public class Chart extends Region {
         });
 
         Num margin = max.v.minus(min).multiply(Num.of(0.5));
-        axisY.logicalMaxValue.set(max.v.plus(margin).toLong());
-        axisY.logicalMinValue.set(min.v.minus(margin).toLong());
+        axisY.logicalMaxValue.set(max.v.plus(margin).longValue());
+        axisY.logicalMinValue.set(min.v.minus(margin).longValue());
     }
 }

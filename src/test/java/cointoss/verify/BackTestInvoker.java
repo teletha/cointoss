@@ -9,18 +9,19 @@
  */
 package cointoss.verify;
 
-import static java.time.temporal.ChronoUnit.MINUTES;
+import static java.time.temporal.ChronoUnit.*;
 
 import cointoss.Direction;
 import cointoss.Market;
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.ticker.Indicator;
+import cointoss.ticker.Indicators;
 import cointoss.ticker.Span;
-import cointoss.ticker.oscillators.WaveTrendOscillator;
 import cointoss.trade.Scenario;
 import cointoss.trade.Trader;
 import cointoss.util.Num;
 import kiss.I;
+import kiss.Ⅱ;
 
 public class BackTestInvoker {
 
@@ -71,7 +72,7 @@ public class BackTestInvoker {
      */
     private static class LazyBear extends Trader {
 
-        WaveTrendOscillator oscillator = new WaveTrendOscillator(market.tickers.of(Span.Hour1));
+        Indicator<Ⅱ<Num, Num>> oscillator = Indicators.waveTrend(market.tickers.of(Span.Second15), 21, 4);
 
         private LazyBear(Market market) {
             super(market);

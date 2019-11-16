@@ -15,6 +15,14 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
 
+import cointoss.market.bitflyer.BitFlyer;
+import cointoss.market.bitflyer.SFD;
+import cointoss.ticker.Indicator;
+import cointoss.ticker.Indicators;
+import cointoss.ticker.Tick;
+import cointoss.ticker.Ticker;
+import cointoss.util.Chrono;
+import cointoss.util.Num;
 import javafx.collections.ObservableList;
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -27,16 +35,6 @@ import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.PathElement;
-
-import cointoss.market.bitflyer.BitFlyer;
-import cointoss.market.bitflyer.SFD;
-import cointoss.ticker.Indicator;
-import cointoss.ticker.IndicatorSet;
-import cointoss.ticker.Tick;
-import cointoss.ticker.Ticker;
-import cointoss.ticker.oscillators.WaveTrendOscillator;
-import cointoss.util.Chrono;
-import cointoss.util.Num;
 import kiss.I;
 import kiss.Variable;
 import kiss.Ⅱ;
@@ -128,7 +126,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     private final ChartDisplaySetting setting = I.make(ChartDisplaySetting.class);
 
     /** The indicator manager. */
-    private final List<IndicatorSet> indicators = new ArrayList();
+    private final List<Indicator> indicators = new ArrayList();
 
     /**
      * Chart canvas.
@@ -157,9 +155,9 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
         this.chartBottom.create(ticker -> Indicator.build(ticker, tick -> tick.buyVolume().multiply(2)), ChartStyles.OrderSupportBuy);
         this.chartBottom.create(ticker -> Indicator.build(ticker, tick -> tick.sellVolume().multiply(2)), ChartStyles.OrderSupportSell);
-        // this.chartBottom.create(tick -> tick.volume().toDouble() * 2, ChartStyles.BackGrid);
+        // this.chartBottom.create(tick -> tick.volume().doubleValue() * 2, ChartStyles.BackGrid);
 
-        Variable<WaveTrendOscillator> oscillator = chart.ticker.observe().switchMap(t -> I.signal(new WaveTrendOscillator(t))).to();
+        Variable<Indicator<Ⅱ<Num, Num>>> oscillator = chart.ticker.observe().switchMap(t -> I.signal(Indicators.waveTrend(t))).to();
         this.chartRelative.create(ticker -> oscillator.v.map(Ⅱ::ⅰ), ChartStyles.OrderSupportBuy);
         this.chartRelative.create(ticker -> oscillator.v.map(Ⅱ::ⅱ), ChartStyles.OrderSupportSell);
 
@@ -297,7 +295,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
                     disposer.add(() -> latestPrice.remove(latest));
 
-                    return price -> latest.value.set(price.toDouble());
+                    return price -> latest.value.set(price.doubleValue());
                 })
                 .switchOn(setting.showLatestPrice.observeNow())
                 .to(latestPrice.layoutLine::requestLayout);
@@ -312,7 +310,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 for (SFD sfd : SFD.values()) {
                     TickLable label = sfdPrice.createLabel("乖離" + sfd.percentage + "%");
                     market.service.add(sfd.boundary().on(Viewtify.UIThread).to(price -> {
-                        label.value.set(price.toDouble());
+                        label.value.set(price.doubleValue());
                         sfdPrice.layoutLine.requestLayout();
                     }));
                 }
@@ -365,10 +363,10 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             }
             chart.ticker.v.each(visibleStartIndex, visibleSize, tick -> {
                 double x = axisX.getPositionForValue(tick.start.toEpochSecond());
-                double open = axisY.getPositionForValue(tick.openPrice.toDouble());
-                double close = axisY.getPositionForValue(tick.closePrice().toDouble());
-                double high = axisY.getPositionForValue(tick.highPrice().toDouble());
-                double low = axisY.getPositionForValue(tick.lowPrice().toDouble());
+                double open = axisY.getPositionForValue(tick.openPrice.doubleValue());
+                double close = axisY.getPositionForValue(tick.closePrice().doubleValue());
+                double high = axisY.getPositionForValue(tick.highPrice().doubleValue());
+                double low = axisY.getPositionForValue(tick.lowPrice().doubleValue());
 
                 gc.setStroke(open < close ? Sell : Buy);
                 gc.setLineWidth(1);
@@ -396,10 +394,10 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             Tick tick = chart.ticker.v.last();
 
             double x = axisX.getPositionForValue(tick.start.toEpochSecond());
-            double open = axisY.getPositionForValue(tick.openPrice.toDouble());
-            double close = axisY.getPositionForValue(tick.closePrice().toDouble());
-            double high = axisY.getPositionForValue(tick.highPrice().toDouble());
-            double low = axisY.getPositionForValue(tick.lowPrice().toDouble());
+            double open = axisY.getPositionForValue(tick.openPrice.doubleValue());
+            double close = axisY.getPositionForValue(tick.closePrice().doubleValue());
+            double high = axisY.getPositionForValue(tick.highPrice().doubleValue());
+            double low = axisY.getPositionForValue(tick.lowPrice().doubleValue());
 
             gc.setStroke(open < close ? Sell : Buy);
             gc.setLineWidth(1);
@@ -515,7 +513,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             for (Line line : lines) {
                 gc.setStroke(line.color);
                 gc.strokeLine(valueX[index - 1], line.valueY[index - 1], x, height - bottomUp - line.indicator.v.valueAt(tick)
-                        .toDouble() * scale);
+                        .doubleValue() * scale);
             }
         }
 
@@ -555,7 +553,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
              * @param tick
              */
             private void calculate(double x, Tick tick) {
-                double calculated = indicator.v.valueAt(tick).toDouble();
+                double calculated = indicator.v.valueAt(tick).doubleValue();
 
                 if (valueMax < calculated) valueMax = calculated;
                 try {
@@ -658,7 +656,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
          */
         private TickLable createLabel(Num price, String description) {
             TickLable label = axis.createLabel(description, styles);
-            if (price != null) label.value.set(price.toDouble());
+            if (price != null) label.value.set(price.doubleValue());
             labels.add(label);
 
             layoutLine.requestLayout();

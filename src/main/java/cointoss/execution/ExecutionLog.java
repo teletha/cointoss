@@ -9,7 +9,7 @@
  */
 package cointoss.execution;
 
-import static java.nio.charset.StandardCharsets.ISO_8859_1;
+import static java.nio.charset.StandardCharsets.*;
 import static java.nio.file.StandardOpenOption.*;
 import static java.util.concurrent.TimeUnit.*;
 
@@ -291,7 +291,7 @@ public class ExecutionLog {
             Num coefficient = Num.ONE;
 
             while (disposer.isNotDisposed()) {
-                ArrayDeque<Execution> rests = service.executions(startId, startId + coefficient.multiply(size).toLong())
+                ArrayDeque<Execution> rests = service.executions(startId, startId + coefficient.multiply(size).longValue())
                         .retry()
                         .toCollection(new ArrayDeque(size));
 
@@ -331,7 +331,7 @@ public class ExecutionLog {
                         // Although there is no data in the current search range,
                         // since it has not yet reached the latest execution,
                         // shift the range backward and search again.
-                        startId += coefficient.multiply(size).toInt() - 1;
+                        startId += coefficient.multiply(size).intValue() - 1;
                         coefficient = coefficient.plus("0.1");
                         continue;
                     } else {
@@ -858,7 +858,7 @@ public class ExecutionLog {
         Num coefficient = Num.ONE;
 
         while (true) {
-            ArrayDeque<Execution> executions = service.executions(startId, startId + coefficient.multiply(size).toLong())
+            ArrayDeque<Execution> executions = service.executions(startId, startId + coefficient.multiply(size).longValue())
                     .effectOnError(Throwable::printStackTrace)
                     .retry()
                     .toCollection(new ArrayDeque(size));

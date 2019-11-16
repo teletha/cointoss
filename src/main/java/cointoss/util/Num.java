@@ -32,7 +32,7 @@ import kiss.Variable;
 /**
  * @version 2018/07/14 13:48:54
  */
-public class Num implements Comparable<Num> {
+public class Num extends Number implements Comparable<Num> {
 
     // initialize
     static {
@@ -519,7 +519,7 @@ public class Num implements Comparable<Num> {
      * @see BigDecimal#pow(int, java.math.MathContext)
      */
     public final Num pow(double n) {
-        return of(Math.pow(toDouble(), n));
+        return of(Math.pow(doubleValue(), n));
     }
 
     /**
@@ -565,33 +565,35 @@ public class Num implements Comparable<Num> {
     }
 
     /**
-     * Converts this {@code Num} to a {@code double}.
-     * 
-     * @return this {@code Num} converted to a {@code double}
-     * @see BigDecimal#doubleValue()
+     * {@inheritDoc}
      */
-    public final double toDouble() {
-        return delegate.doubleValue();
-    }
-
-    /**
-     * Converts this {@code Num} to a {@code int}.
-     * 
-     * @return this {@code Num} converted to a {@code int}
-     * @see BigDecimal#intValueExact();
-     */
-    public final int toInt() {
+    @Override
+    public final int intValue() {
         return delegate.intValue();
     }
 
     /**
-     * Converts this {@code Num} to a {@code long}.
-     * 
-     * @return this {@code Num} converted to a {@code long}
-     * @see BigDecimal#intValueExact();
+     * {@inheritDoc}
      */
-    public final long toLong() {
+    @Override
+    public final long longValue() {
         return delegate.longValue();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public final float floatValue() {
+        return delegate.floatValue();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public final double doubleValue() {
+        return delegate.doubleValue();
     }
 
     /**

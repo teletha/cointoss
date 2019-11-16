@@ -231,7 +231,7 @@ public class Chrono {
      * @return
      */
     public static String formatAsDuration(Num mills) {
-        return formatAsDuration(mills.toLong());
+        return formatAsDuration(mills.longValue());
     }
 
     /**

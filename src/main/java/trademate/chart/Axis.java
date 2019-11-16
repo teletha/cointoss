@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.DoubleFunction;
 
+import cointoss.util.Num;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -33,8 +34,6 @@ import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.PathElement;
 import javafx.util.Duration;
-
-import cointoss.util.Num;
 import kiss.Disposable;
 import stylist.Style;
 import viewtify.Viewtify;
@@ -144,7 +143,7 @@ public class Axis extends Region {
             Num current = Num.of(scroll.getVisibleAmount());
             Num next = Num.within(Num.ONE.divide(ZoomSize), current.plus(change), Num.ONE);
 
-            scroll.setVisibleAmount(next.toDouble());
+            scroll.setVisibleAmount(next.doubleValue());
         });
     }
 

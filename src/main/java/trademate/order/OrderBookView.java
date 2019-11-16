@@ -11,15 +11,14 @@ package trademate.order;
 
 import static trademate.TradeMateStyle.*;
 
+import cointoss.order.OrderBookManager;
+import cointoss.order.OrderUnit;
+import cointoss.util.Num;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ListCell;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-
-import cointoss.order.OrderBookManager;
-import cointoss.order.OrderUnit;
-import cointoss.util.Num;
 import stylist.Style;
 import stylist.StyleDSL;
 import trademate.TradingView;
@@ -152,7 +151,7 @@ public class OrderBookView extends View {
                     Num normalize = e.size.scale(scaleSize);
                     setText(e.price() + " " + normalize);
 
-                    double width = Math.min(200, normalize.toDouble());
+                    double width = Math.min(200, normalize.doubleValue());
                     back.setWidth(width);
                     back.setTranslateX(width - 66);
                     setTranslateX(-width);
