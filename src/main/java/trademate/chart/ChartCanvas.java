@@ -9,7 +9,6 @@
  */
 package trademate.chart;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -125,8 +124,8 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     /** The settings. */
     private final ChartDisplaySetting setting = I.make(ChartDisplaySetting.class);
 
-    /** The indicator manager. */
-    private final List<Indicator> indicators = new ArrayList();
+    /** The script manager. */
+    private final PlotScriptRegistry scripts = I.make(PlotScriptRegistry.class);
 
     /**
      * Chart canvas.
@@ -412,6 +411,55 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     }
 
     /**
+     * 
+     */
+    private class PlotScriptChart extends Group {
+
+        /** The bottom base position. */
+        private final double bottomUp;
+
+        /** The related script. */
+        private final PlotScript script;
+
+        /** The current x-position. */
+        private int index = 0;
+
+        /** The x-point of values. */
+        private double[] valueX = new double[0];
+
+        /**
+         * @param bottomUp
+         * @param script
+         */
+        private PlotScriptChart(double bottomUp, PlotScript script) {
+            this.bottomUp = bottomUp;
+            this.script = script;
+        }
+
+        /**
+         * Initialize.
+         * 
+         * @param size
+         */
+        private void initialize(int size) {
+            index = 0;
+
+            for (Line line : lines) {
+                line.valueMax = 0;
+            }
+
+            // ensure size
+            if (valueX.length < size) {
+                valueX = new double[size];
+
+                for (Line line : lines) {
+                    line.valueY = new double[size];
+                }
+            }
+        }
+    }
+
+    /**
      * @version 2018/07/13 23:46:59
      */
     private class LineChart extends Group {
@@ -452,6 +500,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
          */
         private void initialize(int size) {
             index = 0;
+            System.out.println("initialize");
 
             for (Line line : lines) {
                 line.valueMax = 0;

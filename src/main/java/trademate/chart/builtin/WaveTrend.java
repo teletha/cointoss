@@ -16,14 +16,13 @@ import cointoss.ticker.Ticker;
 import cointoss.util.Num;
 import kiss.Variable;
 import kiss.Ⅱ;
-import trademate.TradeMateStyle;
 import trademate.chart.PlotScript;
 
 public class WaveTrend extends PlotScript {
 
-    public final Variable<Integer> channelLength = Variable.of(21);
+    public final Variable<Integer> channelLength = Variable.of(10);
 
-    public final Variable<Integer> averageLength = Variable.of(4);
+    public final Variable<Integer> averageLength = Variable.of(21);
 
     public final Variable<Num> overBoughtLevel1 = Variable.of(Num.of(60));
 
@@ -37,16 +36,16 @@ public class WaveTrend extends PlotScript {
      * {@inheritDoc}
      */
     @Override
-    protected void plot(Market market, Ticker ticker) {
+    protected void declare(Market market, Ticker ticker) {
         Indicator<Ⅱ<Num, Num>> indicator = Indicators.waveTrend(ticker, channelLength.v, averageLength.v);
 
         plot(0);
-        plot(overBoughtLevel1, TradeMateStyle.Short);
-        plot(overBoughtLevel2, TradeMateStyle.Short);
-        plot(overSoldLevel1, TradeMateStyle.Long);
-        plot(overSoldLevel2, TradeMateStyle.Long);
-
-        plot(indicator.map(Ⅱ::ⅰ), TradeMateStyle.Long);
-        plot(indicator.map(Ⅱ::ⅱ), TradeMateStyle.Short);
+        // plot(overBoughtLevel1, TradeMateStyle.Short);
+        // plot(overBoughtLevel2, TradeMateStyle.Short);
+        // plot(overSoldLevel1, TradeMateStyle.Long);
+        // plot(overSoldLevel2, TradeMateStyle.Long);
+        //
+        // plot(indicator.map(Ⅱ::ⅰ), TradeMateStyle.Long);
+        // plot(indicator.map(Ⅱ::ⅱ), TradeMateStyle.Short);
     }
 }

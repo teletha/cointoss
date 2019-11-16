@@ -18,7 +18,7 @@ import kiss.Ⅱ;
 public class Indicators {
 
     public final static Indicator<Ⅱ<Num, Num>> waveTrend(Ticker ticker) {
-        return waveTrend(ticker, 21, 4);
+        return waveTrend(ticker, 10, 21);
     }
 
     public final static Indicator<Ⅱ<Num, Num>> waveTrend(Ticker ticker, int channelLength, int averageLength) {
