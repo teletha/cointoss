@@ -11,7 +11,6 @@ package cointoss.ticker;
 
 import java.time.ZonedDateTime;
 import java.util.Objects;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Consumer;
 
 import cointoss.execution.Execution;
@@ -21,9 +20,6 @@ import kiss.Signal;
 import kiss.Signaling;
 import kiss.Variable;
 
-/**
- * @version 2018/07/05 10:16:49
- */
 public final class Ticker implements Disposable {
 
     /** Reusable NULL object.. */
@@ -52,9 +48,6 @@ public final class Ticker implements Disposable {
 
     /** The latest tick. */
     Tick current;
-
-    /** The lock system. */
-    private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
     /**
      * Create {@link Ticker}.
@@ -90,29 +83,24 @@ public final class Ticker implements Disposable {
     final boolean createTick(Execution execution, TickerManager realtime) {
         // Make sure whether the execution does not exceed the end time of current tick.
         if (!execution.isBefore(current.end)) {
-            lock.writeLock().lock();
 
-            try {
-                // If the end time of current tick does not reach the start time of tick which
-                // execution actually belongs to, it is assumed that there was a blank time
-                // (i.e. server error, maintenance). So we complement them in advance.
-                ZonedDateTime start = span.calculateStartTime(execution.date);
+            // If the end time of current tick does not reach the start time of tick which
+            // execution actually belongs to, it is assumed that there was a blank time
+            // (i.e. server error, maintenance). So we complement them in advance.
+            ZonedDateTime start = span.calculateStartTime(execution.date);
 
-                while (current.end.isBefore(start)) {
-                    current.freeze();
-                    current = new Tick(ticks.last(), current.end, span, current.closePrice(), realtime);
-                    ticks.add(current);
-                    additions.accept(current);
-                }
-
-                // create the latest tick for execution
+            while (current.end.isBefore(start)) {
                 current.freeze();
-                current = new Tick(ticks.last(), current.end, span, execution.price, realtime);
+                current = new Tick(ticks.last(), current.end, span, current.closePrice(), realtime);
                 ticks.add(current);
                 additions.accept(current);
-            } finally {
-                lock.writeLock().unlock();
             }
+
+            // create the latest tick for execution
+            current.freeze();
+            current = new Tick(ticks.last(), current.end, span, execution.price, realtime);
+            ticks.add(current);
+            additions.accept(current);
             return true;
         } else {
             return false; // end it immediately
@@ -189,12 +177,7 @@ public final class Ticker implements Disposable {
      * @param consumer
      */
     public final void each(int start, int size, Consumer<Tick> consumer) {
-        lock.readLock().lock();
-        try {
-            ticks.each(start, start + Math.min(start + size, ticks.size()), consumer);
-        } finally {
-            lock.readLock().unlock();
-        }
+        ticks.each(start, start + Math.min(start + size, ticks.size()), consumer);
     }
 
     /**
@@ -204,17 +187,11 @@ public final class Ticker implements Disposable {
      * @return
      */
     public final Variable<Tick> findByEpochSecond(long epochSeconds) {
-        lock.readLock().lock();
-
-        try {
-            if (ticks.isEmpty()) {
-                return Variable.empty();
-            }
-            int index = (int) ((epochSeconds - first().start.toEpochSecond()) / span.duration.getSeconds());
-            return index < size() ? Variable.of(ticks.get(index)) : Variable.empty();
-        } finally {
-            lock.readLock().unlock();
+        if (ticks.isEmpty()) {
+            return Variable.empty();
         }
+        int index = (int) ((epochSeconds - first().start.toEpochSecond()) / span.duration.getSeconds());
+        return index < size() ? Variable.of(ticks.get(index)) : Variable.empty();
     }
 
     /**

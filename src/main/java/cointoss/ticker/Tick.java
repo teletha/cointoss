@@ -20,6 +20,9 @@ public final class Tick {
     /** Begin time of the tick */
     public final ZonedDateTime start;
 
+    /** Begin time of the tick */
+    public final long startSeconds;
+
     /** End time of the tick */
     public final ZonedDateTime end;
 
@@ -64,6 +67,7 @@ public final class Tick {
     Tick(Tick previous, ZonedDateTime start, Span span, Num open, TickerManager realtime) {
         this.previous = previous;
         this.start = start;
+        this.startSeconds = start.toEpochSecond();
         this.end = start.plus(span.duration);
         this.openPrice = this.highPrice = this.lowPrice = open;
 

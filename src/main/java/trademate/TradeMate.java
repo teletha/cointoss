@@ -28,9 +28,6 @@ import viewtify.ui.UI;
 import viewtify.ui.UITabPane;
 import viewtify.ui.View;
 
-/**
- * @version 2018/09/16 8:43:30
- */
 @Manageable(lifestyle = Singleton.class)
 public class TradeMate extends View {
 

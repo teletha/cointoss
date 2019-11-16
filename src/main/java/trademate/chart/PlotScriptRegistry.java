@@ -16,7 +16,8 @@ import cointoss.Market;
 import kiss.Manageable;
 import kiss.Singleton;
 import kiss.Storable;
-import trademate.chart.builtin.WaveTrend;
+import trademate.chart.builtin.VolumeIndicator;
+import trademate.chart.builtin.WaveTrendIndicator;
 
 @Manageable(lifestyle = Singleton.class)
 public class PlotScriptRegistry implements Storable {
@@ -56,6 +57,6 @@ public class PlotScriptRegistry implements Storable {
      * @return
      */
     public List<PlotScript> findScriptsOn(Market market) {
-        return List.of(new WaveTrend());
+        return List.of(new WaveTrendIndicator(), new VolumeIndicator());
     }
 }

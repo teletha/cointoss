@@ -13,22 +13,40 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import javafx.scene.paint.Color;
+
 import cointoss.Market;
 import cointoss.ticker.Indicator;
 import cointoss.ticker.Ticker;
 import kiss.Variable;
 import stylist.Style;
+import viewtify.util.FXUtils;
 
 public abstract class PlotScript {
+
+    /** The plotter. */
+    protected final Plotter bottom = new Plotter(0);
+
+    /** The plotter. */
+    protected final Plotter up = new Plotter(1);
+
+    /** The plotter. */
+    protected final Plotter down = new Plotter(2);
+
+    /** The plotter. */
+    protected final Plotter top = new Plotter(3);
+
+    /** The plotter. */
+    protected final Plotter overlay = new Plotter(4);
+
+    /** The all plotters. */
+    final Plotter[] plotters = {bottom, up, down, top, overlay};
 
     /** The current market. */
     private Market market;
 
     /** The current ticker. */
     private Ticker ticker;
-
-    /** The associated {@link Indicator}s. */
-    private List<Plotting> indicators = new ArrayList();
 
     /**
      * Execute plot declaration.
@@ -39,7 +57,9 @@ public abstract class PlotScript {
     final void plot(Market market, Ticker ticker) {
         this.market = Objects.requireNonNull(market);
         this.ticker = Objects.requireNonNull(ticker);
-        this.indicators.clear();
+        for (Plotter plotter : plotters) {
+            plotter.indicators.clear();
+        }
 
         declare(market, ticker);
     }
@@ -53,75 +73,97 @@ public abstract class PlotScript {
     protected abstract void declare(Market market, Ticker ticker);
 
     /**
-     * Plot the specified {@link Indicator}.
      * 
-     * @param indicator A indicator to plot.
      */
-    protected final void plot(Indicator<? extends Number> indicator) {
-        plot(indicator, null);
-    }
+    protected class Plotter {
 
-    /**
-     * Plot the specified {@link Indicator}.
-     * 
-     * @param indicator A indicator to plot.
-     */
-    protected final void plot(Indicator<? extends Number> indicator, Style style) {
-        indicators.add(new Plotting(indicator, style));
-    }
+        /** The associated {@link Indicator}s. */
+        final List<IndicatorInfo> indicators = new ArrayList();
 
-    /**
-     * Plot the specified value.
-     * 
-     * @param value A value to plot.
-     */
-    protected final void plot(Number value) {
-        plot(value, null);
-    }
+        /** The plot area. */
+        final int area;
 
-    /**
-     * Plot the specified value.
-     * 
-     * @param value A value to plot.
-     */
-    protected final void plot(Number value, Style style) {
-        plot(Variable.of(value), style);
-    }
+        /**
+         * @param area
+         */
+        private Plotter(int area) {
+            this.area = area;
+        }
 
-    /**
-     * Plot the specified value.
-     * 
-     * @param value A value to plot.
-     */
-    protected final void plot(Variable<? extends Number> value) {
-        plot(value, null);
-    }
+        /**
+         * Plot the specified {@link Indicator}.
+         * 
+         * @param indicator A indicator to plot.
+         */
+        public final void plot(Indicator<? extends Number> indicator) {
+            plot(indicator, null);
+        }
 
-    /**
-     * Plot the specified value.
-     * 
-     * @param value A value to plot.
-     */
-    protected final void plot(Variable<? extends Number> value, Style style) {
-        plot(Indicator.build(ticker, tick -> value.v));
+        /**
+         * Plot the specified {@link Indicator}.
+         * 
+         * @param indicator A indicator to plot.
+         */
+        public final void plot(Indicator<? extends Number> indicator, Style style) {
+            if (style == null) {
+                style = ChartStyles.MouseTrack;
+            }
+            indicators.add(new IndicatorInfo(indicator, style));
+        }
+
+        /**
+         * Plot the specified value.
+         * 
+         * @param value A value to plot.
+         */
+        public final void plot(Number value) {
+            plot(value, null);
+        }
+
+        /**
+         * Plot the specified value.
+         * 
+         * @param value A value to plot.
+         */
+        public final void plot(Number value, Style style) {
+            plot(Variable.of(value), style);
+        }
+
+        /**
+         * Plot the specified value.
+         * 
+         * @param value A value to plot.
+         */
+        public final void plot(Variable<? extends Number> value) {
+            plot(value, null);
+        }
+
+        /**
+         * Plot the specified value.
+         * 
+         * @param value A value to plot.
+         */
+        public final void plot(Variable<? extends Number> value, Style style) {
+            plot(Indicator.build(ticker, tick -> value.v));
+        }
     }
 
     /**
      * Plotting indicator info holder.
      */
-    static class Plotting {
+    static class IndicatorInfo {
 
         final Indicator<? extends Number> indicator;
 
-        final Style style;
+        final Color color;
 
         /**
          * @param indicator
          * @param style
          */
-        private Plotting(Indicator<? extends Number> indicator, Style style) {
+        private IndicatorInfo(Indicator<? extends Number> indicator, Style style) {
             this.indicator = indicator;
-            this.style = style;
+            this.color = FXUtils.color(style, "stroke");
         }
     }
 }

@@ -9,11 +9,12 @@
  */
 package cointoss.ticker;
 
-import java.time.ZonedDateTime;
 import java.util.Objects;
-import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+
+import org.eclipse.collections.api.map.primitive.MutableLongObjectMap;
+import org.eclipse.collections.impl.factory.primitive.LongObjectMaps;
 
 import cointoss.util.Num;
 import kiss.I;
@@ -149,7 +150,7 @@ public abstract class Indicator<T> {
      * @return
      */
     public final <Out> Indicator<Out> map(Function<T, Out> mapper) {
-        return (Indicator<Out>) memoize((tick, self) -> (T) mapper.apply(valueAt(tick)));
+        return (Indicator<Out>) memoize(1, (tick, self) -> (T) mapper.apply(valueAt(tick)));
     }
 
     /**
@@ -198,7 +199,7 @@ public abstract class Indicator<T> {
 
         double multiplier = 2.0 / (size + 1);
 
-        return (Indicator<Num>) memoize((tick, self) -> {
+        return (Indicator<Num>) memoize((size + 1) * 4, (tick, self) -> {
             if (tick.previous == null) {
                 return valueAt(tick);
             }
@@ -219,7 +220,7 @@ public abstract class Indicator<T> {
 
         double multiplier = 1.0 / size;
 
-        return (Indicator<Num>) memoize((tick, self) -> {
+        return (Indicator<Num>) memoize((size + 1) * 4, (tick, self) -> {
             if (tick.previous == null) {
                 return valueAt(tick);
             }
@@ -289,7 +290,7 @@ public abstract class Indicator<T> {
      * @return
      */
     public final Indicator<T> memoize() {
-        return memoize((tick, self) -> valueAt(tick));
+        return memoize(1, (tick, self) -> valueAt(tick));
     }
 
     /**
@@ -297,15 +298,25 @@ public abstract class Indicator<T> {
      * 
      * @return
      */
-    public final Indicator<T> memoize(BiFunction<Tick, Function<Tick, T>, T> calculator) {
-        return new Indicator<>(this) {
+    public final Indicator<T> memoize(int limit, BiFunction<Tick, Function<Tick, T>, T> calculator) {
+        return new Indicator<T>(this) {
 
             /** CACHE */
-            private final ConcurrentSkipListMap<ZonedDateTime, T> cache = new ConcurrentSkipListMap();
+            private final MutableLongObjectMap<T> cache = LongObjectMaps.mutable.empty();
+
+            /** Call limit to avoid stack over flow. */
+            private int count = limit;
 
             @Override
             public T valueAt(Tick tick) {
-                return cache.computeIfAbsent(tick.start, key -> calculator.apply(tick, this::valueAt));
+                if (count == 0) return (T) wrapped.valueAt(tick);
+
+                return cache.getIfAbsentPut(tick.startSeconds, () -> calculator.apply(tick, t -> {
+                    count--;
+                    T v = this.valueAt(t);
+                    count++;
+                    return v;
+                }));
             }
         };
     }
