@@ -22,9 +22,6 @@ import viewtify.ui.UIComboBox;
 import viewtify.ui.UILabel;
 import viewtify.ui.View;
 
-/**
- * @version 2018/08/30 9:37:10
- */
 public class ChartView extends View {
 
     /** The associated market. */

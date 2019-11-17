@@ -101,13 +101,20 @@ public abstract class Indicator<T> {
      * Return the value of this {@link Indicator}.
      * 
      * @param tick A {@link Tick} on {@link Ticker}.
-     * @return
+     * @return A time-based value.
      */
     public final T valueAt(Tick tick) {
         Tick rounded = ticker.findByEpochSecond(tick.startSeconds).v;
         return valueAtRounded(rounded == null ? ticker.first() : rounded);
     }
 
+    /**
+     * Return the value of this {@link Indicator}. It is ensure that the {@link Tick} parameter is
+     * rounded for {@link Ticker}.
+     * 
+     * @param tick A {@link Tick} on {@link Ticker}.
+     * @return A time-based value.
+     */
     protected abstract T valueAtRounded(Tick tick);
 
     /**
