@@ -9,7 +9,7 @@
  */
 package cointoss.trade;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
@@ -345,13 +345,11 @@ public abstract class Scenario extends ScenarioBase implements Directional {
                 market.request(directional.inverse(), entryExecutedSize.minus(exitSize), strategy).to(this::processExitOrder);
             }));
         } else {
-            disposerForExit
-                    .add(market.tickers.of(Span.Second5).add.take(e -> e.openPrice.isLessThanOrEqual(directional, price)).first().to(e -> {
-                        disposeEntry();
+            disposerForExit.add(market.tickers.latestPrice.observe().take(p -> p.isLessThanOrEqual(directional, price)).first().to(e -> {
+                disposeEntry();
 
-                        market.request(directional.inverse(), entryExecutedSize.minus(exitExecutedSize), strategy)
-                                .to(this::processExitOrder);
-                    }));
+                market.request(directional.inverse(), entryExecutedSize.minus(exitExecutedSize), strategy).to(this::processExitOrder);
+            }));
         }
     }
 
