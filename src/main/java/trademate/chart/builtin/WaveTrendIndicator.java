@@ -25,13 +25,13 @@ public class WaveTrendIndicator extends PlotScript {
 
     public final Variable<Integer> averageLength = Variable.of(21);
 
-    public final Variable<Num> overBoughtLevel1 = Variable.of(Num.of(60));
+    public final Variable<Integer> overBoughtLevel1 = Variable.of(60);
 
-    public final Variable<Num> overBoughtLevel2 = Variable.of(Num.of(53));
+    public final Variable<Integer> overBoughtLevel2 = Variable.of(53);
 
-    public final Variable<Num> overSoldLevel1 = Variable.of(Num.of(-60));
+    public final Variable<Integer> overSoldLevel1 = Variable.of(-60);
 
-    public final Variable<Num> overSoldLevel2 = Variable.of(Num.of(-53));
+    public final Variable<Integer> overSoldLevel2 = Variable.of(-53);
 
     /**
      * {@inheritDoc}
