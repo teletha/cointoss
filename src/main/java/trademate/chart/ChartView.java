@@ -69,8 +69,9 @@ public class ChartView extends View {
     protected UI declareUI() {
         return new UI() {
             {
-                $(vbox, () -> {
-                    $(hbox, () -> {
+                $(sbox, () -> {
+                    $(chart);
+                    $(hbox, S.InfoBox, () -> {
                         $(span);
                         $(selectDate, S.Data);
                         $(selectHigh, S.Data);
@@ -80,7 +81,6 @@ public class ChartView extends View {
                         $(selectShortVolume, S.Data);
                         $(latest, S.Data);
                     });
-                    $(chart);
                 });
             }
         };
@@ -102,16 +102,18 @@ public class ChartView extends View {
         latest.model(setting.showLatestPrice);
     }
 
-    /**
-     * @version 2018/09/08 20:10:52
-     */
     private interface S extends StyleDSL {
 
-        static Style Data = () -> {
+        Style Data = () -> {
             font.size(11, px);
             text.verticalAlign.middle();
             display.height(25, px).minWidth(50, px);
             padding.left(7, px);
+        };
+
+        Style InfoBox = () -> {
+            display.maxHeight(50, px);
+            position.top(0, px);
         };
     }
 }
