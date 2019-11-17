@@ -15,6 +15,15 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
+import org.eclipse.collections.api.list.primitive.MutableDoubleList;
+import org.eclipse.collections.impl.factory.primitive.DoubleLists;
+
+import cointoss.market.bitflyer.BitFlyer;
+import cointoss.market.bitflyer.SFD;
+import cointoss.ticker.Indicator;
+import cointoss.ticker.Tick;
+import cointoss.util.Chrono;
+import cointoss.util.Num;
 import javafx.collections.ObservableList;
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -27,16 +36,6 @@ import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.PathElement;
-
-import org.eclipse.collections.api.list.primitive.MutableDoubleList;
-import org.eclipse.collections.impl.factory.primitive.DoubleLists;
-
-import cointoss.market.bitflyer.BitFlyer;
-import cointoss.market.bitflyer.SFD;
-import cointoss.ticker.Indicator;
-import cointoss.ticker.Tick;
-import cointoss.util.Chrono;
-import cointoss.util.Num;
 import kiss.I;
 import stylist.Style;
 import trademate.chart.Axis.TickLable;
@@ -425,10 +424,11 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         /** The bottom base position. */
         private final double bottomUp;
 
+        /** All y-values are scalable or not. */
+        private final boolean scalable;
+
         /** The poly line. */
         private final List<Line> lines = new CopyOnWriteArrayList();
-
-        /** The current x-position. */
 
         /** The x-point of values. */
         private MutableDoubleList valueX;
@@ -440,12 +440,19 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             this.plotter = plotter;
 
             switch (plotter.area) {
-            case 1: // up
+            case Up:
                 this.bottomUp = 100;
+                this.scalable = true;
                 break;
 
-            default: // bottom
+            case Overlay:
+                this.bottomUp = 100;
+                this.scalable = false;
+                break;
+
+            default:
                 this.bottomUp = 0;
+                this.scalable = true;
                 break;
             }
         }
@@ -457,7 +464,9 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
          */
         private void initialize(int size) {
             lines.clear();
-            lines.addAll(plotter.indicators.stream().map(Line::new).collect(Collectors.toList()));
+            lines.addAll(plotter.indicators.stream()
+                    .map(info -> new Line(info, plotter.area == PlotArea.Overlay))
+                    .collect(Collectors.toList()));
 
             // ensure size
             valueX = DoubleLists.mutable.empty();
@@ -484,13 +493,15 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
          */
         private void draw() {
             double height = getHeight();
-            double scale = lines.stream().map(Line::scale).min(Comparator.naturalOrder()).orElse(1d);
+            double scale = scalable ? lines.stream().map(Line::scale).min(Comparator.naturalOrder()).orElse(1d) : 1;
             GraphicsContext gc = candles.getGraphicsContext2D();
             gc.setLineWidth(1);
 
             for (Line line : lines) {
-                for (int i = 0; i < line.valueY.size(); i++) {
-                    line.valueY.set(i, height - bottomUp - line.valueY.get(i) * scale);
+                if (scalable) {
+                    for (int i = 0; i < line.valueY.size(); i++) {
+                        line.valueY.set(i, height - bottomUp - line.valueY.get(i) * scale);
+                    }
                 }
                 gc.setStroke(line.color);
                 gc.strokePolyline(valueX.toArray(), line.valueY.toArray(), valueX.size());
@@ -505,14 +516,20 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
          */
         private void drawLatest(double x, Tick tick) {
             double height = getHeight();
-            double scale = lines.stream().map(Line::scale).min(Comparator.naturalOrder()).orElse(1d);
+            double scale = scalable ? lines.stream().map(Line::scale).min(Comparator.naturalOrder()).orElse(1d) : 1;
             GraphicsContext gc = candleLatest.getGraphicsContext2D();
             gc.setLineWidth(1);
 
             for (Line line : lines) {
                 gc.setStroke(line.color);
-                gc.strokeLine(valueX.getLast(), line.valueY
-                        .getLast(), x, height - bottomUp - line.indicator.valueAt(tick).doubleValue() * scale);
+                if (scalable) {
+                    gc.strokeLine(valueX.getLast(), line.valueY
+                            .getLast(), x, height - bottomUp - line.indicator.valueAt(tick).doubleValue() * scale);
+                } else {
+                    gc.strokeLine(valueX.getLast(), line.valueY.getLast(), x, axisY
+                            .getPositionForValue(line.indicator.valueAt(tick).doubleValue()));
+                }
+
             }
         }
 
@@ -530,6 +547,9 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             /** The chart color. */
             private final Color color;
 
+            /** The line position. */
+            private final boolean overlay;
+
             /** The y-point of values. */
             private MutableDoubleList valueY = DoubleLists.mutable.empty();
 
@@ -539,9 +559,10 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             /**
              * @param info
              */
-            private Line(IndicatorInfo info) {
+            private Line(IndicatorInfo info, boolean overlay) {
                 this.indicator = info.indicator;
                 this.color = info.color;
+                this.overlay = overlay;
             }
 
             /**
@@ -553,7 +574,9 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             private void calculate(double x, Tick tick) {
                 double calculated = indicator.valueAt(tick).doubleValue();
 
-                if (valueMax < calculated) {
+                if (overlay) {
+                    calculated = axisY.getPositionForValue(calculated);
+                } else if (valueMax < calculated) {
                     valueMax = calculated;
                 }
                 valueY.add(calculated);

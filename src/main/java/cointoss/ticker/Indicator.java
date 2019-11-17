@@ -33,6 +33,9 @@ public abstract class Indicator<T> {
     /** The target {@link Ticker}. */
     protected final Ticker ticker;
 
+    /** seconds */
+    protected final long spanSeconds;
+
     /** The wrapped {@link Indicator}. (OPTIONAL: may be null) */
     protected final Indicator wrapped;
 
@@ -44,6 +47,7 @@ public abstract class Indicator<T> {
     protected Indicator(Ticker ticker) {
         this.ticker = Objects.requireNonNull(ticker);
         this.wrapped = null;
+        this.spanSeconds = ticker.span.duration.toSeconds();
     }
 
     /**
@@ -54,6 +58,7 @@ public abstract class Indicator<T> {
     protected Indicator(Indicator indicator) {
         this.wrapped = Objects.requireNonNull(indicator);
         this.ticker = Objects.requireNonNull(indicator.ticker());
+        this.spanSeconds = ticker.span.duration.toSeconds();
     }
 
     /**
@@ -98,7 +103,12 @@ public abstract class Indicator<T> {
      * @param tick A {@link Tick} on {@link Ticker}.
      * @return
      */
-    public abstract T valueAt(Tick tick);
+    public final T valueAt(Tick tick) {
+        Tick rounded = ticker.findByEpochSecond(tick.startSeconds).v;
+        return valueAtRounded(rounded == null ? ticker.first() : rounded);
+    }
+
+    protected abstract T valueAtRounded(Tick tick);
 
     /**
      * Return the first value of this {@link Indicator}.
@@ -164,8 +174,8 @@ public abstract class Indicator<T> {
         return new Indicator<Out>(this) {
 
             @Override
-            public Out valueAt(Tick tick) {
-                return calculater.apply((T) wrapped.valueAt(tick), indicator1.valueAt(tick));
+            protected Out valueAtRounded(Tick tick) {
+                return calculater.apply((T) wrapped.valueAtRounded(tick), indicator1.valueAt(tick));
             }
         };
     }
@@ -182,8 +192,8 @@ public abstract class Indicator<T> {
         return new Indicator<>(this) {
 
             @Override
-            public Out valueAt(Tick tick) {
-                return calculater.apply((T) wrapped.valueAt(tick), indicator1.valueAt(tick), indicator2.valueAt(tick));
+            protected Out valueAtRounded(Tick tick) {
+                return calculater.apply((T) wrapped.valueAtRounded(tick), indicator1.valueAt(tick), indicator2.valueAt(tick));
             }
         };
     }
@@ -237,12 +247,12 @@ public abstract class Indicator<T> {
      * @return A wrapped indicator.
      */
     public final Indicator<Num> sma(int size) {
-        Objects.checkIndex(size, 100);
+        Objects.checkIndex(size, 256);
 
         return new Indicator<Num>(this) {
 
             @Override
-            public Num valueAt(Tick tick) {
+            protected Num valueAtRounded(Tick tick) {
                 Num sum = Num.ZERO;
                 Tick current = tick;
                 int remaining = size;
@@ -268,7 +278,7 @@ public abstract class Indicator<T> {
         return new Indicator<Num>(this) {
 
             @Override
-            public Num valueAt(Tick tick) {
+            protected Num valueAtRounded(Tick tick) {
                 if (tick.previous == null) {
                     return (Num) wrapped.valueAt(tick);
                 }
@@ -308,7 +318,7 @@ public abstract class Indicator<T> {
             private int count = limit;
 
             @Override
-            public T valueAt(Tick tick) {
+            protected T valueAtRounded(Tick tick) {
                 if (count == 0) return (T) wrapped.valueAt(tick);
 
                 return cache.getIfAbsentPut(tick.startSeconds, () -> calculator.apply(tick, t -> {
@@ -353,7 +363,7 @@ public abstract class Indicator<T> {
         return new Indicator<>(ticker) {
 
             @Override
-            public T valueAt(Tick tick) {
+            protected T valueAtRounded(Tick tick) {
                 return calculator.apply(tick);
             }
         };
@@ -421,7 +431,7 @@ public abstract class Indicator<T> {
         return new Indicator<>(ticker) {
 
             @Override
-            public Num valueAt(Tick tick) {
+            protected Num valueAtRounded(Tick tick) {
                 Num highLow = tick.highPrice().minus(tick.lowPrice()).abs();
 
                 if (tick.previous == null) {

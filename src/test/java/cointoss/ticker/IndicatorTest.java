@@ -9,13 +9,11 @@
  */
 package cointoss.ticker;
 
-import static cointoss.ticker.TickerTestSupport.ticker;
-
 import org.junit.jupiter.api.Test;
 
 import cointoss.util.Num;
 
-class IndicatorTest {
+class IndicatorTest extends TickerTestSupport {
 
     @Test
     void valueAt() {
@@ -26,6 +24,21 @@ class IndicatorTest {
         assert indicator.valueAt(ticker.get(2)).is(3);
         assert indicator.valueAt(ticker.get(3)).is(4);
         assert indicator.valueAt(ticker.get(4)).is(5);
+    }
+
+    @Test
+    void valueAtLowerTick() {
+        Ticker ticker = ticker(Span.Second15, 1, 2, 3, 4, 5);
+        Ticker lower = manager.of(Span.Second5);
+        Indicator<Num> indicator = Indicator.build(ticker, tick -> tick.openPrice);
+        assert indicator.valueAt(lower.get(0)).is(1);
+        assert indicator.valueAt(lower.get(1)).is(1);
+        assert indicator.valueAt(lower.get(2)).is(1);
+        assert indicator.valueAt(lower.get(3)).is(2);
+        assert indicator.valueAt(lower.get(4)).is(2);
+        assert indicator.valueAt(lower.get(5)).is(2);
+        assert indicator.valueAt(lower.get(6)).is(3);
+        assert indicator.valueAt(lower.get(12)).is(5);
     }
 
     @Test

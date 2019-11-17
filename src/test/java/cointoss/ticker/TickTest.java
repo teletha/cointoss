@@ -11,17 +11,17 @@ package cointoss.ticker;
 
 import org.junit.jupiter.api.Test;
 
-class TickTest {
+class TickTest extends TickerTestSupport {
 
     @Test
     void typicalPrice() {
-        Tick tick = TickerTestSupport.tick(Span.Second5, 10, 15, 4, 8);
+        Tick tick = tick(Span.Second5, 10, 15, 4, 8);
         assert tick.typicalPrice().is(9);
     }
 
     @Test
     void medianPrice() {
-        Tick tick = TickerTestSupport.tick(Span.Second5, 10, 15, 4, 8);
+        Tick tick = tick(Span.Second5, 10, 15, 4, 8);
         assert tick.medianPrice().is(9.5);
     }
 }

@@ -191,7 +191,7 @@ public final class Ticker implements Disposable {
             return Variable.empty();
         }
         int index = (int) ((epochSeconds - first().start.toEpochSecond()) / span.duration.getSeconds());
-        return index < size() ? Variable.of(ticks.get(index)) : Variable.empty();
+        return 0 <= index && index < size() ? Variable.of(ticks.get(index)) : Variable.empty();
     }
 
     /**

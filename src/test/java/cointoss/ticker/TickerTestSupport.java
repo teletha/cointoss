@@ -16,6 +16,8 @@ import cointoss.util.Chrono;
 
 public class TickerTestSupport {
 
+    protected final TickerManager manager = new TickerManager();
+
     /**
      * Build {@link Ticker} simply with your values.
      * 
@@ -23,9 +25,7 @@ public class TickerTestSupport {
      * @param values
      * @return
      */
-    public static Ticker ticker(Span span, int... values) {
-        TickerManager manager = new TickerManager();
-
+    public Ticker ticker(Span span, int... values) {
         ZonedDateTime time = Chrono.MIN;
 
         for (int value : values) {
@@ -45,14 +45,13 @@ public class TickerTestSupport {
      * @param close
      * @return
      */
-    public static Tick tick(Span span, int open, int high, int low, int close) {
+    public Tick tick(Span span, int open, int high, int low, int close) {
         if (high < open || high < low || high < close) {
             throw new IllegalArgumentException("High price is not highest. [open:" + open + " high:" + high + " low:" + low + " close:" + close + "]");
         }
 
         ZonedDateTime time = Chrono.MIN;
 
-        TickerManager manager = new TickerManager();
         manager.update(Execution.with.buy(1).price(open).date(time));
         manager.update(Execution.with.buy(1).price(high).date(time));
         manager.update(Execution.with.buy(1).price(low).date(time));

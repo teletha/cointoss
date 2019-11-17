@@ -13,11 +13,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import javafx.scene.paint.Color;
-
 import cointoss.Market;
 import cointoss.ticker.Indicator;
 import cointoss.ticker.Ticker;
+import javafx.scene.paint.Color;
 import kiss.Variable;
 import stylist.Style;
 import viewtify.util.FXUtils;
@@ -25,19 +24,19 @@ import viewtify.util.FXUtils;
 public abstract class PlotScript {
 
     /** The plotter. */
-    protected final Plotter bottom = new Plotter(0);
+    protected final Plotter bottom = new Plotter(PlotArea.Bottom);
 
     /** The plotter. */
-    protected final Plotter up = new Plotter(1);
+    protected final Plotter up = new Plotter(PlotArea.Up);
 
     /** The plotter. */
-    protected final Plotter down = new Plotter(2);
+    protected final Plotter down = new Plotter(PlotArea.Down);
 
     /** The plotter. */
-    protected final Plotter top = new Plotter(3);
+    protected final Plotter top = new Plotter(PlotArea.Top);
 
     /** The plotter. */
-    protected final Plotter overlay = new Plotter(4);
+    protected final Plotter overlay = new Plotter(PlotArea.Overlay);
 
     /** The all plotters. */
     final Plotter[] plotters = {bottom, up, down, top, overlay};
@@ -81,12 +80,12 @@ public abstract class PlotScript {
         final List<IndicatorInfo> indicators = new ArrayList();
 
         /** The plot area. */
-        final int area;
+        final PlotArea area;
 
         /**
          * @param area
          */
-        private Plotter(int area) {
+        private Plotter(PlotArea area) {
             this.area = area;
         }
 
