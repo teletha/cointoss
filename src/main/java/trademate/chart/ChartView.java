@@ -67,9 +67,7 @@ public class ChartView extends View {
         return new UI() {
             {
                 $(sbox, () -> {
-                    $(chart);
                     $(hbox, S.InfoBox, () -> {
-                        $(span);
                         $(selectDate, S.Data);
                         $(selectHigh, S.Data);
                         $(selectLow, S.Data);
@@ -77,6 +75,10 @@ public class ChartView extends View {
                         $(selectLongVolume, S.Data);
                         $(selectShortVolume, S.Data);
                         $(latest, S.Data);
+                    });
+                    $(chart);
+                    $(hbox, S.ConfigBox, () -> {
+                        $(span);
                     });
                 });
             }
@@ -110,7 +112,12 @@ public class ChartView extends View {
 
         Style InfoBox = () -> {
             display.maxHeight(50, px);
-            position.top(0, px);
+            position.top(0, px).left(0, px);
+        };
+
+        Style ConfigBox = () -> {
+            display.maxWidth(100, px).maxHeight(10, px);
+            position.top(0, px).right(56, px);
         };
     }
 }

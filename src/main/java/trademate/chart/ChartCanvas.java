@@ -15,15 +15,6 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
-import org.eclipse.collections.api.list.primitive.MutableDoubleList;
-import org.eclipse.collections.impl.factory.primitive.DoubleLists;
-
-import cointoss.market.bitflyer.BitFlyer;
-import cointoss.market.bitflyer.SFD;
-import cointoss.ticker.Indicator;
-import cointoss.ticker.Tick;
-import cointoss.util.Chrono;
-import cointoss.util.Num;
 import javafx.collections.ObservableList;
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -36,11 +27,21 @@ import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.PathElement;
+
+import org.eclipse.collections.api.list.primitive.MutableDoubleList;
+import org.eclipse.collections.impl.factory.primitive.DoubleLists;
+
+import cointoss.market.bitflyer.BitFlyer;
+import cointoss.market.bitflyer.SFD;
+import cointoss.ticker.Indicator;
+import cointoss.ticker.Tick;
+import cointoss.util.Chrono;
+import cointoss.util.Num;
 import kiss.I;
 import stylist.Style;
 import trademate.chart.Axis.TickLable;
 import trademate.chart.PlotScript.IndicatorInfo;
-import trademate.chart.PlotScript.Plotter;
+import trademate.chart.PlotScript.PlotDSL;
 import trademate.setting.Notificator;
 import viewtify.Viewtify;
 import viewtify.ui.helper.LayoutAssistant;
@@ -110,6 +111,9 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     /** Chart UI */
     private final Canvas candleLatest = new Canvas();
 
+    /** Chart UI */
+    private final Canvas candleInfo = new Canvas();
+
     /** Flag whether candle chart shoud layout on the next rendering phase or not. */
     public final LayoutAssistant layoutCandle = new LayoutAssistant(this);
 
@@ -146,6 +150,8 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         this.candles.heightProperty().bind(heightProperty());
         this.candleLatest.widthProperty().bind(widthProperty());
         this.candleLatest.heightProperty().bind(heightProperty());
+        this.candleInfo.widthProperty().bind(widthProperty());
+        this.candleInfo.heightProperty().bind(heightProperty());
 
         chart.ticker.observe().to(ticker -> {
             for (PlotScriptChart plot : plots) {
@@ -156,7 +162,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             for (PlotScript script : scripts.findScriptsOn(chart.market.v)) {
                 script.plot(chart.market.v, ticker);
 
-                for (Plotter plotter : script.plotters) {
+                for (PlotDSL plotter : script.plotters) {
                     PlotScriptChart c = new PlotScriptChart(plotter);
                     plots.add(c);
                     getChildren().add(c);
@@ -175,8 +181,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 .layoutBy(axisY.scroll.valueProperty(), axisY.scroll.visibleAmountProperty())
                 .layoutBy(chart.ticker.observe().switchMap(ticker -> ticker.update.startWithNull()));
 
-        // drag move
-
         visualizeNotifyPrice();
         visualizeOrderPrice();
         visualizeLatestPrice();
@@ -184,7 +188,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         visualizeSFDPrice();
 
         getChildren()
-                .addAll(backGridVertical, backGridHorizontal, notifyPrice, orderBuyPrice, orderSellPrice, latestPrice, sfdPrice, candles, candleLatest, mouseTrackHorizontal, mouseTrackVertical);
+                .addAll(backGridVertical, backGridHorizontal, notifyPrice, orderBuyPrice, orderSellPrice, latestPrice, sfdPrice, candles, candleLatest, candleInfo, mouseTrackHorizontal, mouseTrackVertical);
     }
 
     /**
@@ -222,6 +226,22 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 chart.selectVolume.text("V " + tick.volume().scale(3));
                 chart.selectLongVolume.text("B " + tick.buyVolume().scale(3));
                 chart.selectShortVolume.text("S " + tick.sellVolume().scale(3));
+
+                GraphicsContext gc = candleInfo.getGraphicsContext2D();
+                gc.clearRect(0, 0, candleInfo.getWidth(), candleInfo.getHeight());
+                int textY = 15;
+                for (PlotScriptChart chart : plots) {
+                    if (chart.lines.isEmpty() == false) {
+                        int textX = 0;
+                        for (IndicatorInfo info : chart.plotter.indicators) {
+                            System.out.println(info.indicator.name);
+                            gc.setFill(info.color);
+                            gc.fillText(info.indicator.valueAt(tick).toString(), textX, textY, 43);
+                            textX += 50;
+                        }
+                        textY += 15;
+                    }
+                }
             });
         });
 
@@ -419,7 +439,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     private class PlotScriptChart extends Group {
 
         /** The associated script. */
-        private final Plotter plotter;
+        private final PlotDSL plotter;
 
         /** The bottom base position. */
         private final double bottomUp;
@@ -436,7 +456,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         /**
          * 
          */
-        private PlotScriptChart(Plotter plotter) {
+        private PlotScriptChart(PlotDSL plotter) {
             this.plotter = plotter;
 
             switch (plotter.area) {

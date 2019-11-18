@@ -13,10 +13,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import javafx.scene.paint.Color;
+
 import cointoss.Market;
 import cointoss.ticker.Indicator;
 import cointoss.ticker.Ticker;
-import javafx.scene.paint.Color;
+import cointoss.util.Num;
 import kiss.Variable;
 import stylist.Style;
 import viewtify.util.FXUtils;
@@ -24,22 +26,22 @@ import viewtify.util.FXUtils;
 public abstract class PlotScript {
 
     /** The plotter. */
-    protected final Plotter bottom = new Plotter(PlotArea.Bottom);
+    protected final PlotDSL bottom = new PlotDSL(PlotArea.Bottom);
 
     /** The plotter. */
-    protected final Plotter up = new Plotter(PlotArea.Up);
+    protected final PlotDSL up = new PlotDSL(PlotArea.Up);
 
     /** The plotter. */
-    protected final Plotter down = new Plotter(PlotArea.Down);
+    protected final PlotDSL down = new PlotDSL(PlotArea.Down);
 
     /** The plotter. */
-    protected final Plotter top = new Plotter(PlotArea.Top);
+    protected final PlotDSL top = new PlotDSL(PlotArea.Top);
 
     /** The plotter. */
-    protected final Plotter overlay = new Plotter(PlotArea.Overlay);
+    protected final PlotDSL overlay = new PlotDSL(PlotArea.Overlay);
 
     /** The all plotters. */
-    final Plotter[] plotters = {bottom, up, down, top, overlay};
+    final PlotDSL[] plotters = {bottom, up, down, top, overlay};
 
     /** The current market. */
     private Market market;
@@ -56,7 +58,7 @@ public abstract class PlotScript {
     final void plot(Market market, Ticker ticker) {
         this.market = Objects.requireNonNull(market);
         this.ticker = Objects.requireNonNull(ticker);
-        for (Plotter plotter : plotters) {
+        for (PlotDSL plotter : plotters) {
             plotter.indicators.clear();
         }
 
@@ -72,9 +74,9 @@ public abstract class PlotScript {
     protected abstract void declare(Market market, Ticker ticker);
 
     /**
-     * 
+     * Chart plotting DSL.
      */
-    protected class Plotter {
+    protected class PlotDSL {
 
         /** The associated {@link Indicator}s. */
         final List<IndicatorInfo> indicators = new ArrayList();
@@ -85,7 +87,7 @@ public abstract class PlotScript {
         /**
          * @param area
          */
-        private Plotter(PlotArea area) {
+        private PlotDSL(PlotArea area) {
             this.area = area;
         }
 
@@ -125,7 +127,7 @@ public abstract class PlotScript {
          * @param value A value to plot.
          */
         public final void plot(Number value, Style style) {
-            plot(Variable.of(value), style);
+            plot(Num.of(value.toString()), style);
         }
 
         /**
@@ -143,7 +145,16 @@ public abstract class PlotScript {
          * @param value A value to plot.
          */
         public final void plot(Variable<? extends Number> value, Style style) {
-            plot(Indicator.build(ticker, tick -> value.v));
+            plot(value.v, style);
+        }
+
+        /**
+         * Plot the specified value.
+         * 
+         * @param value A value to plot.
+         */
+        private final void plot(Num value, Style style) {
+            plot(Indicator.build(ticker, value), style);
         }
     }
 

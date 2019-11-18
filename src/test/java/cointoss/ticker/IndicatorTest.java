@@ -148,4 +148,14 @@ class IndicatorTest extends TickerTestSupport {
         assert indicator.valueAt(ticker.get(3)).is(1.515625);
         assert indicator.valueAt(ticker.get(4)).is(3.13671875);
     }
+
+    @Test
+    void constant() {
+        Ticker ticker = ticker(Span.Second5, 1, 2, 4, 8, 16);
+        Indicator<Integer> calculatable = Indicator.build(ticker, tick -> 10);
+        assert calculatable.isConstant() == false;
+
+        Indicator<Integer> constant = Indicator.build(ticker, 10);
+        assert constant.isConstant() == true;
+    }
 }

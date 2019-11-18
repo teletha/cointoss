@@ -9,11 +9,12 @@
  */
 package trademate.chart.builtin;
 
+import static trademate.chart.ChartStyles.*;
+
 import cointoss.Market;
 import cointoss.ticker.Indicator;
 import cointoss.ticker.Tick;
 import cointoss.ticker.Ticker;
-import trademate.chart.ChartStyles;
 import trademate.chart.PlotScript;
 
 public class VolumeIndicator extends PlotScript {
@@ -23,7 +24,7 @@ public class VolumeIndicator extends PlotScript {
      */
     @Override
     protected void declare(Market market, Ticker ticker) {
-        bottom.plot(Indicator.build(ticker, Tick::buyVolume), ChartStyles.OrderSupportBuy);
-        bottom.plot(Indicator.build(ticker, Tick::sellVolume), ChartStyles.OrderSupportSell);
+        bottom.plot(Indicator.build(ticker, Tick::buyVolume), OrderSupportBuy);
+        bottom.plot(Indicator.build(ticker, Tick::sellVolume), OrderSupportSell);
     }
 }
