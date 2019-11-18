@@ -13,18 +13,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import javafx.scene.paint.Color;
-
-import org.eclipse.collections.api.list.primitive.MutableDoubleList;
-import org.eclipse.collections.impl.factory.primitive.DoubleLists;
-
 import cointoss.Market;
 import cointoss.ticker.Indicator;
 import cointoss.ticker.Ticker;
 import cointoss.util.Num;
 import kiss.Variable;
 import stylist.Style;
-import viewtify.util.FXUtils;
+import trademate.chart.ChartCanvas.PlotStyle;
 
 public abstract class PlotScript {
 
@@ -167,38 +162,6 @@ public abstract class PlotScript {
          */
         private final void plot(Num value, Style style) {
             plot(Indicator.build(ticker, value), style);
-        }
-    }
-
-    /**
-     * 
-     */
-    static class PlotStyle {
-
-        /** The indicator. */
-        final Indicator<? extends Number> indicator;
-
-        /** The indicator color. */
-        final Color color;
-
-        /** The indicator line width. */
-        final double width;
-
-        /** The indicator line style. */
-        final double[] dashArray;
-
-        /** The y-axis values. */
-        final MutableDoubleList valueY = DoubleLists.mutable.empty();
-
-        /**
-         * @param indicator
-         * @param style
-         */
-        private PlotStyle(Indicator<? extends Number> indicator, Style style) {
-            this.indicator = indicator;
-            this.color = FXUtils.color(style, "stroke");
-            this.width = FXUtils.length(style, "stroke-width");
-            this.dashArray = FXUtils.lengths(style, "stroke-dasharray");
         }
     }
 }

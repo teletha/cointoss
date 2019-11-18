@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import javafx.collections.ObservableList;
-import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -31,6 +30,7 @@ import org.eclipse.collections.impl.factory.primitive.DoubleLists;
 
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.market.bitflyer.SFD;
+import cointoss.ticker.Indicator;
 import cointoss.ticker.Tick;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
@@ -38,13 +38,13 @@ import kiss.I;
 import stylist.Style;
 import trademate.chart.Axis.TickLable;
 import trademate.chart.PlotScript.PlotDSL;
-import trademate.chart.PlotScript.PlotStyle;
 import trademate.setting.Notificator;
 import viewtify.Viewtify;
 import viewtify.ui.helper.LayoutAssistant;
 import viewtify.ui.helper.StyleHelper;
 import viewtify.ui.helper.User;
 import viewtify.ui.helper.UserActionHelper;
+import viewtify.util.FXUtils;
 
 /**
  * @version 2018/07/13 23:47:28
@@ -151,9 +151,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         this.candleInfo.heightProperty().bind(heightProperty());
 
         chart.ticker.observe().to(ticker -> {
-            for (PlotScriptChart plot : plots) {
-                getChildren().remove(plot);
-            }
             plots.clear();
 
             for (PlotScript script : scripts.findScriptsOn(chart.market.v)) {
@@ -162,7 +159,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 for (PlotDSL plotter : script.plotters) {
                     PlotScriptChart c = new PlotScriptChart(plotter);
                     plots.add(c);
-                    getChildren().add(c);
                 }
             }
         });
@@ -434,10 +430,44 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     /**
      * 
      */
-    private class PlotScriptChart extends Group {
+    static class PlotStyle {
+
+        /** The indicator. */
+        final Indicator<? extends Number> indicator;
+
+        /** The indicator color. */
+        final Color color;
+
+        /** The indicator line width. */
+        final double width;
+
+        /** The indicator line style. */
+        final double[] dashArray;
+
+        /** The y-axis values. */
+        final MutableDoubleList valueY = DoubleLists.mutable.empty();
+
+        /**
+         * @param indicator
+         * @param style
+         */
+        PlotStyle(Indicator<? extends Number> indicator, Style style) {
+            this.indicator = indicator;
+            this.color = FXUtils.color(style, "stroke");
+            this.width = FXUtils.length(style, "stroke-width");
+            this.dashArray = FXUtils.lengths(style, "stroke-dasharray");
+        }
+    }
+
+    /**
+     * 
+     */
+    private class PlotScriptChart {
 
         /** The associated script. */
         private final PlotDSL plotter;
+
+        private final Canvas canvas = new Canvas();
 
         /** The bottom base position. */
         private final double bottomUp;
@@ -467,6 +497,9 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 this.bottomUp = 0;
                 break;
             }
+
+            this.canvas.widthProperty().bind(widthProperty());
+            this.canvas.heightProperty().bind(heightProperty());
         }
 
         /**
@@ -491,13 +524,18 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
          * @param tick
          */
         private void calculate(double x, Tick tick) {
+            double height = getHeight();
+
             for (PlotStyle style : plotter.styles) {
                 double calculated = style.indicator.valueAt(tick).doubleValue();
 
                 if (plotter.area == PlotArea.Overlay) {
                     calculated = axisY.getPositionForValue(calculated);
-                } else if (valueYMax < calculated) {
-                    valueYMax = calculated;
+                } else {
+                    // calculated = height - bottomUp - calculated;
+                    if (valueYMax < calculated) {
+                        valueYMax = calculated;
+                    }
                 }
                 style.valueY.add(calculated);
             }
@@ -508,7 +546,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
          * Finish drawing chart line.
          */
         private void draw() {
-            double height = getHeight();
+            double height = candles.getHeight();
             double scale = scale();
             GraphicsContext gc = candles.getGraphicsContext2D();
             gc.setLineWidth(1);
