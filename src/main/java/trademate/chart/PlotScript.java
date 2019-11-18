@@ -99,20 +99,20 @@ public abstract class PlotScript {
         }
 
         /**
-         * Plot the specified {@link Indicator}.
+         * Plot the specified {@link Indicator} as line chart.
          * 
          * @param indicator A indicator to plot.
          */
-        public final void plot(Indicator<Num> indicator) {
-            plot(indicator, null);
+        public final void line(Indicator<Num> indicator) {
+            line(indicator, null);
         }
 
         /**
-         * Plot the specified {@link Indicator}.
+         * Plot the specified {@link Indicator} as line chart.
          * 
          * @param indicator A indicator to plot.
          */
-        public final void plot(Indicator<Num> indicator, Style style) {
+        public final void line(Indicator<Num> indicator, Style style) {
             if (style == null) {
                 style = ChartStyles.MouseTrack;
             }
@@ -120,48 +120,48 @@ public abstract class PlotScript {
         }
 
         /**
-         * Plot the specified value.
+         * Plot the specified value as line chart.
          * 
          * @param value A value to plot.
          */
-        public final void plot(Number value) {
-            plot(value, null);
+        public final void line(Number value) {
+            line(value, null);
         }
 
         /**
-         * Plot the specified value.
+         * Plot the specified value as line chart.
          * 
          * @param value A value to plot.
          */
-        public final void plot(Number value, Style style) {
-            plot(Num.of(value.toString()), style);
+        public final void line(Number value, Style style) {
+            line(Num.of(value.toString()), style);
         }
 
         /**
-         * Plot the specified value.
+         * Plot the specified value as line chart.
          * 
          * @param value A value to plot.
          */
-        public final void plot(Variable<? extends Number> value) {
-            plot(value, null);
+        public final void line(Variable<? extends Number> value) {
+            line(value, null);
         }
 
         /**
-         * Plot the specified value.
+         * Plot the specified value as line chart.
          * 
          * @param value A value to plot.
          */
-        public final void plot(Variable<? extends Number> value, Style style) {
-            plot(value.v, style);
+        public final void line(Variable<? extends Number> value, Style style) {
+            line(value.v, style);
         }
 
         /**
-         * Plot the specified value.
+         * Plot the specified value as line chart.
          * 
          * @param value A value to plot.
          */
-        private final void plot(Num value, Style style) {
-            plot(Indicator.build(ticker, value), style);
+        private final void line(Num value, Style style) {
+            line(Indicator.build(ticker, value), style);
         }
     }
 }
