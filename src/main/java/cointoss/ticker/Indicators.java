@@ -31,8 +31,8 @@ public class Indicators {
             }
             return a.minus(b).divide(Num.of(0.015).multiply(c));
         });
-        Indicator<Num> wt1 = ci.ema(averageLength);
-        Indicator<Num> wt2 = wt1.sma(4);
+        Indicator<Num> wt1 = ci.ema(averageLength).scale(2);
+        Indicator<Num> wt2 = wt1.sma(4).scale(2);
         return wt1.combine(wt2);
     }
 }

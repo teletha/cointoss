@@ -44,7 +44,7 @@ public class SMAIndicator extends PlotScript implements StyleDSL {
     };
 
     public Style SMA4H = () -> {
-        stroke.color(Color.rgb(57, 130, 195, alpha)).dashArray(1, 4);
+        stroke.color(Color.rgb(57, 130, 195, alpha));
     };
 
     /**

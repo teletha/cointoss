@@ -33,7 +33,9 @@ public class VolumeIndicator extends PlotScript implements StyleDSL {
      */
     @Override
     protected void declare(Market market, Ticker ticker) {
-        bottom.plot(Indicator.build(ticker, Tick::buyVolume), Long);
-        bottom.plot(Indicator.build(ticker, Tick::sellVolume), Short);
+        int volumeScale = market.service.setting.targetCurrencyMinimumBidSize.scale();
+
+        bottom.plot(Indicator.build(ticker, Tick::buyVolume).scale(volumeScale), Long);
+        bottom.plot(Indicator.build(ticker, Tick::sellVolume).scale(volumeScale), Short);
     }
 }
