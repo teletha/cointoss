@@ -15,11 +15,13 @@ import java.util.Objects;
 
 import cointoss.Market;
 import cointoss.ticker.Indicator;
+import cointoss.ticker.Tick;
 import cointoss.ticker.Ticker;
 import cointoss.util.Num;
 import kiss.Variable;
 import stylist.Style;
-import trademate.chart.ChartCanvas.PlotStyle;
+import trademate.chart.ChartCanvas.CandleStyle;
+import trademate.chart.ChartCanvas.LineStyle;
 
 public abstract class PlotScript {
 
@@ -66,7 +68,7 @@ public abstract class PlotScript {
         this.targetScale = market.service.setting.targetCurrencyScaleSize;
 
         for (PlotDSL plotter : plotters) {
-            plotter.styles.clear();
+            plotter.lines.clear();
         }
 
         declare(market, ticker);
@@ -86,7 +88,10 @@ public abstract class PlotScript {
     protected class PlotDSL {
 
         /** The associated {@link Indicator}s. */
-        final List<PlotStyle> styles = new ArrayList();
+        final List<LineStyle> lines = new ArrayList();
+
+        /** The associated {@link Indicator}s. */
+        final List<CandleStyle> candles = new ArrayList();
 
         /** The plot area. */
         final PlotArea area;
@@ -116,7 +121,7 @@ public abstract class PlotScript {
             if (style == null) {
                 style = ChartStyles.MouseTrack;
             }
-            styles.add(new PlotStyle(indicator, style));
+            lines.add(new LineStyle(indicator, style));
         }
 
         /**
@@ -162,6 +167,28 @@ public abstract class PlotScript {
          */
         private final void line(Num value, Style style) {
             line(Indicator.build(ticker, value), style);
+        }
+
+        /**
+         * Plot the specified value as candle chart.
+         * 
+         * @param indicator
+         */
+        public final void candle(Indicator<Tick> indicator) {
+            candle(indicator, null);
+        }
+
+        /**
+         * Plot the specified value as candle chart.
+         * 
+         * @param indicator An {@link Indicator} to plot.
+         * @param style
+         */
+        public final void candle(Indicator<Tick> indicator, Style style) {
+            if (style == null) {
+                style = ChartStyles.MouseTrack;
+            }
+            candles.add(new CandleStyle(indicator, style));
         }
     }
 }

@@ -9,6 +9,8 @@
  */
 package trademate.chart.builtin;
 
+import java.util.function.Function;
+
 import cointoss.Market;
 import cointoss.ticker.Indicator;
 import cointoss.ticker.Tick;
@@ -33,6 +35,9 @@ public class VolumeIndicator extends PlotScript implements StyleDSL {
      */
     @Override
     protected void declare(Market market, Ticker ticker) {
+        overlay.candle(Indicator.build(ticker, Function.identity()));
+
+        // volume
         int volumeScale = market.service.setting.targetCurrencyMinimumBidSize.scale();
 
         bottom.line(Indicator.build(ticker, Tick::buyVolume).scale(volumeScale), Long);

@@ -157,7 +157,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 script.plot(chart.market.v, ticker);
 
                 for (PlotDSL plotter : script.plotters) {
-                    if (!plotter.styles.isEmpty()) {
+                    if (!plotter.lines.isEmpty()) {
                         plots.add(new PlotScriptChart(plotter));
                     }
                 }
@@ -226,7 +226,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 int textY = 15;
                 for (PlotScriptChart chart : plots) {
                     int textX = 0;
-                    for (PlotStyle style : chart.plotter.styles) {
+                    for (LineStyle style : chart.plotter.lines) {
                         if (!style.indicator.isConstant()) {
                             gc.setFill(style.color);
                             gc.fillText(style.indicator.valueAt(tick).toString(), textX, textY, 43);
@@ -429,7 +429,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     /**
      * 
      */
-    static class PlotStyle {
+    static class LineStyle {
 
         /** The indicator. */
         final Indicator<? extends Number> indicator;
@@ -450,11 +450,27 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
          * @param indicator
          * @param style
          */
-        PlotStyle(Indicator<? extends Number> indicator, Style style) {
+        LineStyle(Indicator<? extends Number> indicator, Style style) {
             this.indicator = indicator;
             this.color = FXUtils.color(style, "stroke");
             this.width = FXUtils.length(style, "stroke-width");
             this.dashArray = FXUtils.lengths(style, "stroke-dasharray");
+        }
+    }
+
+    /**
+     * 
+     */
+    static class CandleStyle {
+
+        /** The indicator. */
+        final Indicator<Tick> indicator;
+
+        /**
+         * @param indicator
+         */
+        CandleStyle(Indicator<Tick> indicator, Style style) {
+            this.indicator = indicator;
         }
     }
 
@@ -511,7 +527,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
             // ensure size
             valueX.clear();
-            for (PlotStyle style : plotter.styles) {
+            for (LineStyle style : plotter.lines) {
                 style.valueY.clear();
             }
         }
@@ -523,7 +539,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
          * @param tick
          */
         private void calculate(double x, Tick tick) {
-            for (PlotStyle style : plotter.styles) {
+            for (LineStyle style : plotter.lines) {
                 double calculated = style.indicator.valueAt(tick).doubleValue();
 
                 if (plotter.area == PlotArea.Overlay) {
@@ -546,7 +562,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             double scale = scale();
             GraphicsContext gc = candles.getGraphicsContext2D();
 
-            for (PlotStyle style : plotter.styles) {
+            for (LineStyle style : plotter.lines) {
                 if (scale != 1) {
                     for (int i = 0; i < style.valueY.size(); i++) {
                         style.valueY.set(i, height - bottomUp - style.valueY.get(i) * scale);
@@ -570,7 +586,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             double scale = scale();
             GraphicsContext gc = candleLatest.getGraphicsContext2D();
 
-            for (PlotStyle style : plotter.styles) {
+            for (LineStyle style : plotter.lines) {
                 gc.setLineWidth(style.width);
                 gc.setStroke(style.color);
                 gc.setLineDashes(style.dashArray);
