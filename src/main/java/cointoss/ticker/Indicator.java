@@ -218,14 +218,22 @@ public abstract class Indicator<T> {
     }
 
     /**
+     * Wrap by scaled value.
+     * 
+     * @param scale Scale size.
+     * @return A wrapped indicator.
+     */
+    public final Indicator<Num> scale(int scale) {
+        return ((Indicator<Num>) this).map(tick -> tick.scale(scale));
+    }
+
+    /**
      * Wrap by exponetial moving average.
      * 
      * @param size A tick size.
      * @return A wrapped indicator.
      */
     public final Indicator<Num> ema(int size) {
-        Objects.checkIndex(size, 100);
-
         double multiplier = 2.0 / (size + 1);
 
         return (Indicator<Num>) memoize((size + 1) * 4, (tick, self) -> {
@@ -245,8 +253,6 @@ public abstract class Indicator<T> {
      * @return A wrapped indicator.
      */
     public final Indicator<Num> mma(int size) {
-        Objects.checkIndex(size, 100);
-
         double multiplier = 1.0 / size;
 
         return (Indicator<Num>) memoize((size + 1) * 4, (tick, self) -> {
@@ -266,8 +272,6 @@ public abstract class Indicator<T> {
      * @return A wrapped indicator.
      */
     public final Indicator<Num> sma(int size) {
-        Objects.checkIndex(size, 256);
-
         return new Indicator<Num>(this) {
 
             @Override
@@ -292,8 +296,6 @@ public abstract class Indicator<T> {
      * @return A wrapped indicator.
      */
     public final Indicator<Num> wma(int size) {
-        Objects.checkIndex(size, 100);
-
         return new Indicator<Num>(this) {
 
             @Override

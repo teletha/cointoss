@@ -9,6 +9,8 @@
  */
 package trademate.chart.builtin;
 
+import static trademate.chart.ChartStyles.*;
+
 import cointoss.Market;
 import cointoss.ticker.Indicator;
 import cointoss.ticker.Indicators;
@@ -16,7 +18,6 @@ import cointoss.ticker.Ticker;
 import cointoss.util.Num;
 import kiss.Variable;
 import kiss.Ⅱ;
-import trademate.chart.ChartStyles;
 import trademate.chart.PlotScript;
 
 public class WaveTrendIndicator extends PlotScript {
@@ -41,12 +42,12 @@ public class WaveTrendIndicator extends PlotScript {
         Indicator<Ⅱ<Num, Num>> indicator = Indicators.waveTrend(ticker, channelLength.v, averageLength.v);
 
         up.plot(0);
-        up.plot(overBoughtLevel1, ChartStyles.OrderSupportSell);
-        up.plot(overBoughtLevel2, ChartStyles.OrderSupportSell);
-        up.plot(overSoldLevel1, ChartStyles.OrderSupportBuy);
-        up.plot(overSoldLevel2, ChartStyles.OrderSupportBuy);
+        up.plot(overBoughtLevel1, OrderSupportSell);
+        up.plot(overBoughtLevel2, OrderSupportSell);
+        up.plot(overSoldLevel1, OrderSupportBuy);
+        up.plot(overSoldLevel2, OrderSupportBuy);
 
-        up.plot(indicator.map(Ⅱ::ⅰ), ChartStyles.OrderSupportBuy);
-        up.plot(indicator.map(Ⅱ::ⅱ), ChartStyles.OrderSupportSell);
+        up.plot(indicator.map(Ⅱ::ⅰ), OrderSupportBuy);
+        up.plot(indicator.map(Ⅱ::ⅱ), OrderSupportSell);
     }
 }

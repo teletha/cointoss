@@ -234,7 +234,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                     if (chart.lines.isEmpty() == false) {
                         int textX = 0;
                         for (IndicatorInfo info : chart.plotter.indicators) {
-                            System.out.println(info.indicator.name);
                             gc.setFill(info.color);
                             gc.fillText(info.indicator.valueAt(tick).toString(), textX, textY, 43);
                             textX += 50;

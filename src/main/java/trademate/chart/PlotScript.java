@@ -40,6 +40,12 @@ public abstract class PlotScript {
     /** The plotter. */
     protected final PlotDSL overlay = new PlotDSL(PlotArea.Overlay);
 
+    /** The base currency scale. */
+    protected int baseScale;
+
+    /** The base currency scale. */
+    protected int targetScale;
+
     /** The all plotters. */
     final PlotDSL[] plotters = {bottom, up, down, top, overlay};
 
@@ -58,6 +64,9 @@ public abstract class PlotScript {
     final void plot(Market market, Ticker ticker) {
         this.market = Objects.requireNonNull(market);
         this.ticker = Objects.requireNonNull(ticker);
+        this.baseScale = market.service.setting.baseCurrencyScaleSize;
+        this.targetScale = market.service.setting.targetCurrencyScaleSize;
+
         for (PlotDSL plotter : plotters) {
             plotter.indicators.clear();
         }
@@ -96,7 +105,7 @@ public abstract class PlotScript {
          * 
          * @param indicator A indicator to plot.
          */
-        public final void plot(Indicator<? extends Number> indicator) {
+        public final void plot(Indicator<Num> indicator) {
             plot(indicator, null);
         }
 
@@ -105,7 +114,7 @@ public abstract class PlotScript {
          * 
          * @param indicator A indicator to plot.
          */
-        public final void plot(Indicator<? extends Number> indicator, Style style) {
+        public final void plot(Indicator<Num> indicator, Style style) {
             if (style == null) {
                 style = ChartStyles.MouseTrack;
             }
@@ -171,7 +180,7 @@ public abstract class PlotScript {
          * @param indicator
          * @param style
          */
-        private IndicatorInfo(Indicator<? extends Number> indicator, Style style) {
+        private IndicatorInfo(Indicator<Num> indicator, Style style) {
             this.indicator = indicator;
             this.color = FXUtils.color(style, "stroke");
         }
