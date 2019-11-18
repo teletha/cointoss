@@ -15,6 +15,9 @@ import java.util.Objects;
 
 import javafx.scene.paint.Color;
 
+import org.eclipse.collections.api.list.primitive.MutableDoubleList;
+import org.eclipse.collections.impl.factory.primitive.DoubleLists;
+
 import cointoss.Market;
 import cointoss.ticker.Indicator;
 import cointoss.ticker.Ticker;
@@ -183,6 +186,9 @@ public abstract class PlotScript {
 
         /** The indicator line style. */
         final double[] dashArray;
+
+        /** The y-axis values. */
+        final MutableDoubleList valueY = DoubleLists.mutable.empty();
 
         /**
          * @param indicator

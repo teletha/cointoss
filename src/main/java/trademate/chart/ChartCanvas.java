@@ -10,10 +10,8 @@
 package trademate.chart;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.stream.Collectors;
 
 import javafx.collections.ObservableList;
 import javafx.scene.Group;
@@ -230,7 +228,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 gc.clearRect(0, 0, candleInfo.getWidth(), candleInfo.getHeight());
                 int textY = 15;
                 for (PlotScriptChart chart : plots) {
-                    if (chart.lines.isEmpty() == false) {
+                    if (chart.plotter.styles.isEmpty() == false) {
                         int textX = 0;
                         for (PlotStyle style : chart.plotter.styles) {
                             gc.setFill(style.color);
@@ -238,6 +236,8 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                             textX += 50;
                         }
                         textY += 15;
+                    } else {
+                        System.out.println(chart + "  " + chart.plotter.area);
                     }
                 }
             });
@@ -436,6 +436,9 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
      */
     private class PlotScriptChart extends Group {
 
+        /** The maximum height. */
+        private final double heightMax = 50;
+
         /** The associated script. */
         private final PlotDSL plotter;
 
@@ -445,11 +448,11 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         /** All y-values are scalable or not. */
         private final boolean scalable;
 
-        /** The poly line. */
-        private final List<Line> lines = new CopyOnWriteArrayList();
-
         /** The x-point of values. */
-        private MutableDoubleList valueX;
+        private final MutableDoubleList valueX = DoubleLists.mutable.empty();
+
+        /** The max y-value. */
+        private double valueYMax = 0;
 
         /**
          * 
@@ -481,13 +484,12 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
          * @param size
          */
         private void initialize(int size) {
-            lines.clear();
-            lines.addAll(plotter.styles.stream().map(Line::new).collect(Collectors.toList()));
+            valueYMax = 0;
 
             // ensure size
-            valueX = DoubleLists.mutable.empty();
-            for (Line line : lines) {
-                line.valueY = DoubleLists.mutable.empty();
+            valueX.clear();
+            for (PlotStyle style : plotter.styles) {
+                style.valueY.clear();
             }
         }
 
@@ -498,8 +500,15 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
          * @param tick
          */
         private void calculate(double x, Tick tick) {
-            for (Line line : lines) {
-                line.calculate(x, tick);
+            for (PlotStyle style : plotter.styles) {
+                double calculated = style.indicator.valueAt(tick).doubleValue();
+
+                if (plotter.area == PlotArea.Overlay) {
+                    calculated = axisY.getPositionForValue(calculated);
+                } else if (valueYMax < calculated) {
+                    valueYMax = calculated;
+                }
+                style.valueY.add(calculated);
             }
             valueX.add(x);
         }
@@ -509,20 +518,20 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
          */
         private void draw() {
             double height = getHeight();
-            double scale = scalable ? lines.stream().map(Line::scale).min(Comparator.naturalOrder()).orElse(1d) : 1;
+            double scale = scale();
             GraphicsContext gc = candles.getGraphicsContext2D();
             gc.setLineWidth(1);
 
-            for (Line line : lines) {
+            for (PlotStyle style : plotter.styles) {
                 if (scalable) {
-                    for (int i = 0; i < line.valueY.size(); i++) {
-                        line.valueY.set(i, height - bottomUp - line.valueY.get(i) * scale);
+                    for (int i = 0; i < style.valueY.size(); i++) {
+                        style.valueY.set(i, height - bottomUp - style.valueY.get(i) * scale);
                     }
                 }
-                gc.setLineWidth(line.style.width);
-                gc.setStroke(line.style.color);
-                gc.setLineDashes(line.style.dashArray);
-                gc.strokePolyline(valueX.toArray(), line.valueY.toArray(), valueX.size());
+                gc.setLineWidth(style.width);
+                gc.setStroke(style.color);
+                gc.setLineDashes(style.dashArray);
+                gc.strokePolyline(valueX.toArray(), style.valueY.toArray(), valueX.size());
             }
         }
 
@@ -534,77 +543,35 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
          */
         private void drawLatest(double x, Tick tick) {
             double height = getHeight();
-            double scale = scalable ? lines.stream().map(Line::scale).min(Comparator.naturalOrder()).orElse(1d) : 1;
+            double scale = scale();
             GraphicsContext gc = candleLatest.getGraphicsContext2D();
             gc.setLineWidth(1);
 
-            for (Line line : lines) {
-                gc.setLineWidth(line.style.width);
-                gc.setStroke(line.style.color);
-                gc.setLineDashes(line.style.dashArray);
+            for (PlotStyle style : plotter.styles) {
+                gc.setLineWidth(style.width);
+                gc.setStroke(style.color);
+                gc.setLineDashes(style.dashArray);
 
                 if (scalable) {
-                    gc.strokeLine(valueX.getLast(), line.valueY
-                            .getLast(), x, height - bottomUp - line.style.indicator.valueAt(tick).doubleValue() * scale);
+                    gc.strokeLine(valueX.getLast(), style.valueY
+                            .getLast(), x, height - bottomUp - style.indicator.valueAt(tick).doubleValue() * scale);
                 } else {
-                    gc.strokeLine(valueX.getLast(), line.valueY.getLast(), x, axisY
-                            .getPositionForValue(line.style.indicator.valueAt(tick).doubleValue()));
+                    gc.strokeLine(valueX.getLast(), style.valueY.getLast(), x, axisY
+                            .getPositionForValue(style.indicator.valueAt(tick).doubleValue()));
                 }
             }
         }
 
         /**
+         * Calculate scale.
          * 
+         * @return
          */
-        private class Line {
-
-            /** The maximum height. */
-            private final double heightMax = 50;
-
-            /** The target plotting indicator related info. */
-            private final PlotStyle style;
-
-            /** The line position. */
-            private final boolean overlay;
-
-            /** The y-point of values. */
-            private MutableDoubleList valueY = DoubleLists.mutable.empty();
-
-            /** The max value. */
-            private double valueMax = 0;
-
-            /**
-             * @param style
-             */
-            private Line(PlotStyle style) {
-                this.style = style;
-                this.overlay = plotter.area == PlotArea.Overlay;
-            }
-
-            /**
-             * Calculate value.
-             * 
-             * @param x
-             * @param tick
-             */
-            private void calculate(double x, Tick tick) {
-                double calculated = style.indicator.valueAt(tick).doubleValue();
-
-                if (overlay) {
-                    calculated = axisY.getPositionForValue(calculated);
-                } else if (valueMax < calculated) {
-                    valueMax = calculated;
-                }
-                valueY.add(calculated);
-            }
-
-            /**
-             * Calculate scale.
-             * 
-             * @return
-             */
-            private double scale() {
-                return heightMax < valueMax ? heightMax / valueMax : 1;
+        private double scale() {
+            if (scalable) {
+                return heightMax < valueYMax ? heightMax / valueYMax : 1;
+            } else {
+                return 1;
             }
         }
     }
