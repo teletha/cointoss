@@ -220,21 +220,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 chart.selectVolume.text("V " + tick.volume().scale(3));
                 chart.selectLongVolume.text("B " + tick.buyVolume().scale(3));
                 chart.selectShortVolume.text("S " + tick.sellVolume().scale(3));
-
-                GraphicsContext gc = candleInfo.getGraphicsContext2D();
-                gc.clearRect(0, 0, candleInfo.getWidth(), candleInfo.getHeight());
-                int textY = 15;
-                for (PlotScriptChart chart : plots) {
-                    int textX = 0;
-                    for (LineStyle style : chart.plotter.lines) {
-                        if (!style.indicator.isConstant()) {
-                            gc.setFill(style.color);
-                            gc.fillText(style.indicator.valueAt(tick).toString(), textX, textY, 43);
-                            textX += 50;
-                        }
-                    }
-                    textY += 15;
-                }
             });
         });
 

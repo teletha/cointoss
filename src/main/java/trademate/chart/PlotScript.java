@@ -90,9 +90,6 @@ public abstract class PlotScript {
         /** The associated {@link Indicator}s. */
         final List<LineStyle> lines = new ArrayList();
 
-        /** The associated {@link Indicator}s. */
-        final List<CandleStyle> candles = new ArrayList();
-
         /** The plot area. */
         final PlotArea area;
 
@@ -167,28 +164,6 @@ public abstract class PlotScript {
          */
         private final void line(Num value, Style style) {
             line(Indicator.build(ticker, value), style);
-        }
-
-        /**
-         * Plot the specified value as candle chart.
-         * 
-         * @param indicator
-         */
-        public final void candle(Indicator<Tick> indicator) {
-            candle(indicator, null);
-        }
-
-        /**
-         * Plot the specified value as candle chart.
-         * 
-         * @param indicator An {@link Indicator} to plot.
-         * @param style
-         */
-        public final void candle(Indicator<Tick> indicator, Style style) {
-            if (style == null) {
-                style = ChartStyles.MouseTrack;
-            }
-            candles.add(new CandleStyle(indicator, style));
         }
     }
 }
