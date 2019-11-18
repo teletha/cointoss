@@ -24,6 +24,8 @@ import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.PathElement;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 
 import org.eclipse.collections.api.list.primitive.MutableDoubleList;
 import org.eclipse.collections.impl.factory.primitive.DoubleLists;
@@ -152,6 +154,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
         chart.ticker.observe().to(ticker -> {
             plots.clear();
+            chart.infomations.getChildren().clear();
 
             for (PlotScript script : scripts.findScriptsOn(chart.market.v)) {
                 script.plot(chart.market.v, ticker);
@@ -220,6 +223,14 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 chart.selectVolume.text("V " + tick.volume().scale(3));
                 chart.selectLongVolume.text("B " + tick.buyVolume().scale(3));
                 chart.selectShortVolume.text("S " + tick.sellVolume().scale(3));
+
+                for (PlotScriptChart p : plots) {
+                    for (LineChart line : p.plotter.lines) {
+                        if (line.infoText != null) {
+                            line.infoText.setText("  " + line.indicator.valueAt(tick));
+                        }
+                    }
+                }
             });
         });
 
@@ -414,60 +425,13 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     /**
      * 
      */
-    static class LineStyle {
-
-        /** The indicator. */
-        final Indicator<? extends Number> indicator;
-
-        /** The indicator color. */
-        final Color color;
-
-        /** The indicator line width. */
-        final double width;
-
-        /** The indicator line style. */
-        final double[] dashArray;
-
-        /** The y-axis values. */
-        final MutableDoubleList valueY = DoubleLists.mutable.empty();
-
-        /**
-         * @param indicator
-         * @param style
-         */
-        LineStyle(Indicator<? extends Number> indicator, Style style) {
-            this.indicator = indicator;
-            this.color = FXUtils.color(style, "stroke");
-            this.width = FXUtils.length(style, "stroke-width");
-            this.dashArray = FXUtils.lengths(style, "stroke-dasharray");
-        }
-    }
-
-    /**
-     * 
-     */
-    static class CandleStyle {
-
-        /** The indicator. */
-        final Indicator<Tick> indicator;
-
-        /**
-         * @param indicator
-         */
-        CandleStyle(Indicator<Tick> indicator, Style style) {
-            this.indicator = indicator;
-        }
-    }
-
-    /**
-     * 
-     */
     private class PlotScriptChart {
 
         /** The associated script. */
         private final PlotDSL plotter;
 
-        private final Canvas canvas = new Canvas();
+        /** The infomation area. */
+        private final TextFlow infomation = new TextFlow();
 
         /** The bottom base position. */
         private final double bottomUp;
@@ -498,8 +462,12 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 break;
             }
 
-            this.canvas.widthProperty().bind(widthProperty());
-            this.canvas.heightProperty().bind(heightProperty());
+            chart.infomations.getChildren().add(infomation);
+            for (LineChart line : plotter.lines) {
+                if (line.infoText != null) {
+                    infomation.getChildren().add(line.infoText);
+                }
+            }
         }
 
         /**
@@ -512,7 +480,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
             // ensure size
             valueX.clear();
-            for (LineStyle style : plotter.lines) {
+            for (LineChart style : plotter.lines) {
                 style.valueY.clear();
             }
         }
@@ -524,7 +492,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
          * @param tick
          */
         private void calculate(double x, Tick tick) {
-            for (LineStyle style : plotter.lines) {
+            for (LineChart style : plotter.lines) {
                 double calculated = style.indicator.valueAt(tick).doubleValue();
 
                 if (plotter.area == PlotArea.Overlay) {
@@ -547,7 +515,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             double scale = scale();
             GraphicsContext gc = candles.getGraphicsContext2D();
 
-            for (LineStyle style : plotter.lines) {
+            for (LineChart style : plotter.lines) {
                 if (scale != 1) {
                     for (int i = 0; i < style.valueY.size(); i++) {
                         style.valueY.set(i, height - bottomUp - style.valueY.get(i) * scale);
@@ -571,7 +539,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             double scale = scale();
             GraphicsContext gc = candleLatest.getGraphicsContext2D();
 
-            for (LineStyle style : plotter.lines) {
+            for (LineChart style : plotter.lines) {
                 gc.setLineWidth(style.width);
                 gc.setStroke(style.color);
                 gc.setLineDashes(style.dashArray);
@@ -597,6 +565,64 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             } else {
                 return 1;
             }
+        }
+    }
+
+    /**
+     * 
+     */
+    static class LineChart {
+
+        /** The indicator. */
+        final Indicator<? extends Number> indicator;
+
+        /** The indicator color. */
+        final Color color;
+
+        /** The indicator line width. */
+        final double width;
+
+        /** The indicator line style. */
+        final double[] dashArray;
+
+        /** The y-axis values. */
+        final MutableDoubleList valueY = DoubleLists.mutable.empty();
+
+        /** The infomation area. */
+        private final Text infoText;
+
+        /**
+         * @param indicator
+         * @param style
+         */
+        LineChart(Indicator<? extends Number> indicator, Style style) {
+            this.indicator = indicator;
+            this.color = FXUtils.color(style, "stroke");
+            this.width = FXUtils.length(style, "stroke-width");
+            this.dashArray = FXUtils.lengths(style, "stroke-dasharray");
+
+            if (indicator.isConstant()) {
+                this.infoText = null;
+            } else {
+                this.infoText = new Text();
+                this.infoText.setFill(color);
+            }
+        }
+    }
+
+    /**
+     * 
+     */
+    static class CandleChart {
+
+        /** The indicator. */
+        final Indicator<Tick> indicator;
+
+        /**
+         * @param indicator
+         */
+        CandleChart(Indicator<Tick> indicator, Style style) {
+            this.indicator = indicator;
         }
     }
 

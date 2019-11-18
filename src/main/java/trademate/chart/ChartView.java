@@ -9,6 +9,8 @@
  */
 package trademate.chart;
 
+import javafx.scene.layout.VBox;
+
 import cointoss.Market;
 import cointoss.ticker.Span;
 import cointoss.ticker.Ticker;
@@ -51,6 +53,9 @@ public class ChartView extends View {
     /** Chart UI */
     protected UILabel selectShortVolume;
 
+    /** Chart UI */
+    protected final VBox infomations = new VBox();
+
     /** The candle chart. */
     private final Chart chart = new Chart(this);
 
@@ -76,6 +81,7 @@ public class ChartView extends View {
                         $(selectShortVolume, S.Data);
                         $(latest, S.Data);
                     });
+                    $(infomations);
                     $(chart);
                     $(hbox, S.ConfigBox, () -> {
                         $(span);

@@ -20,8 +20,8 @@ import cointoss.ticker.Ticker;
 import cointoss.util.Num;
 import kiss.Variable;
 import stylist.Style;
-import trademate.chart.ChartCanvas.CandleStyle;
-import trademate.chart.ChartCanvas.LineStyle;
+import trademate.chart.ChartCanvas.CandleChart;
+import trademate.chart.ChartCanvas.LineChart;
 
 public abstract class PlotScript {
 
@@ -88,7 +88,7 @@ public abstract class PlotScript {
     protected class PlotDSL {
 
         /** The associated {@link Indicator}s. */
-        final List<LineStyle> lines = new ArrayList();
+        final List<LineChart> lines = new ArrayList();
 
         /** The plot area. */
         final PlotArea area;
@@ -118,7 +118,7 @@ public abstract class PlotScript {
             if (style == null) {
                 style = ChartStyles.MouseTrack;
             }
-            lines.add(new LineStyle(indicator, style));
+            lines.add(new LineChart(indicator, style));
         }
 
         /**
