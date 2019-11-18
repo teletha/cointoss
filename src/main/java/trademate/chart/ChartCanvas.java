@@ -436,17 +436,11 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
      */
     private class PlotScriptChart extends Group {
 
-        /** The maximum height. */
-        private final double heightMax = 50;
-
         /** The associated script. */
         private final PlotDSL plotter;
 
         /** The bottom base position. */
         private final double bottomUp;
-
-        /** All y-values are scalable or not. */
-        private final boolean scalable;
 
         /** The x-point of values. */
         private final MutableDoubleList valueX = DoubleLists.mutable.empty();
@@ -463,17 +457,14 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             switch (plotter.area) {
             case Up:
                 this.bottomUp = 100;
-                this.scalable = true;
                 break;
 
             case Overlay:
-                this.bottomUp = 100;
-                this.scalable = false;
+                this.bottomUp = 0;
                 break;
 
             default:
                 this.bottomUp = 0;
-                this.scalable = true;
                 break;
             }
         }
@@ -523,7 +514,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             gc.setLineWidth(1);
 
             for (PlotStyle style : plotter.styles) {
-                if (scalable) {
+                if (scale != 1) {
                     for (int i = 0; i < style.valueY.size(); i++) {
                         style.valueY.set(i, height - bottomUp - style.valueY.get(i) * scale);
                     }
@@ -552,7 +543,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 gc.setStroke(style.color);
                 gc.setLineDashes(style.dashArray);
 
-                if (scalable) {
+                if (scale != 1) {
                     gc.strokeLine(valueX.getLast(), style.valueY
                             .getLast(), x, height - bottomUp - style.indicator.valueAt(tick).doubleValue() * scale);
                 } else {
@@ -568,8 +559,8 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
          * @return
          */
         private double scale() {
-            if (scalable) {
-                return heightMax < valueYMax ? heightMax / valueYMax : 1;
+            if (plotter.area != PlotArea.Overlay) {
+                return 50 < valueYMax ? 50 / valueYMax : 1;
             } else {
                 return 1;
             }
