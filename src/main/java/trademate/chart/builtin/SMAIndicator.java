@@ -43,8 +43,8 @@ public class SMAIndicator extends PlotScript implements StyleDSL {
         stroke.color(Color.rgb(17, 132, 66, alpha));
     };
 
-    public Style Minute240SMA = () -> {
-        stroke.color(Color.rgb(57, 130, 195, alpha));
+    public Style SMA4H = () -> {
+        stroke.color(Color.rgb(57, 130, 195, alpha)).dashArray(1, 4);
     };
 
     /**
@@ -55,7 +55,7 @@ public class SMAIndicator extends PlotScript implements StyleDSL {
         overlay.plot(Indicator.build(ticker, Tick::closePrice).sma(shortDays).scale(baseScale), shortSMA);
         overlay.plot(Indicator.build(market.tickers.of(Span.Minute30), Tick::closePrice).sma(shortDays).scale(baseScale), SMA30M);
         overlay.plot(Indicator.build(market.tickers.of(Span.Hour1), Tick::closePrice).sma(shortDays).scale(baseScale), SMA1H);
-        overlay.plot(Indicator.build(market.tickers.of(Span.Hour4), Tick::closePrice).sma(shortDays).scale(baseScale), Minute240SMA);
+        overlay.plot(Indicator.build(market.tickers.of(Span.Hour4), Tick::closePrice).sma(shortDays).scale(baseScale), SMA4H);
         overlay.plot(Indicator.build(ticker, Tick::closePrice).sma(longDays).scale(baseScale), longSMA);
     }
 }

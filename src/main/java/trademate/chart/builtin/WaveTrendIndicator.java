@@ -9,45 +9,53 @@
  */
 package trademate.chart.builtin;
 
-import static trademate.chart.ChartStyles.*;
-
 import cointoss.Market;
 import cointoss.ticker.Indicator;
 import cointoss.ticker.Indicators;
 import cointoss.ticker.Ticker;
 import cointoss.util.Num;
-import kiss.Variable;
 import kiss.Ⅱ;
+import stylist.Style;
+import stylist.StyleDSL;
+import trademate.TradeMateStyle;
 import trademate.chart.PlotScript;
 
-public class WaveTrendIndicator extends PlotScript {
+public class WaveTrendIndicator extends PlotScript implements StyleDSL {
 
-    public final Variable<Integer> channelLength = Variable.of(10);
+    public int channelLength = 10;
 
-    public final Variable<Integer> averageLength = Variable.of(21);
+    public int averageLength = 21;
 
-    public final Variable<Integer> overBoughtLevel1 = Variable.of(60);
+    public int overBoughtLevel1 = 60;
 
-    public final Variable<Integer> overBoughtLevel2 = Variable.of(53);
+    public int overBoughtLevel2 = 53;
 
-    public final Variable<Integer> overSoldLevel1 = Variable.of(-60);
+    public int overSoldLevel1 = -60;
 
-    public final Variable<Integer> overSoldLevel2 = Variable.of(-53);
+    public int overSoldLevel2 = -53;
+
+    public Style Main = () -> {
+        stroke.color(TradeMateStyle.BUY).width(0.3, px);
+    };
+
+    public Style Lazy = () -> {
+        stroke.color(TradeMateStyle.SELL).width(0.3, px);
+    };
 
     /**
      * {@inheritDoc}
      */
     @Override
     protected void declare(Market market, Ticker ticker) {
-        Indicator<Ⅱ<Num, Num>> indicator = Indicators.waveTrend(ticker, channelLength.v, averageLength.v);
+        Indicator<Ⅱ<Num, Num>> indicator = Indicators.waveTrend(ticker, channelLength, averageLength);
 
         up.plot(0);
-        up.plot(overBoughtLevel1, OrderSupportSell);
-        up.plot(overBoughtLevel2, OrderSupportSell);
-        up.plot(overSoldLevel1, OrderSupportBuy);
-        up.plot(overSoldLevel2, OrderSupportBuy);
+        up.plot(overBoughtLevel1, Lazy);
+        up.plot(overBoughtLevel2, Lazy);
+        up.plot(overSoldLevel1, Main);
+        up.plot(overSoldLevel2, Main);
 
-        up.plot(indicator.map(Ⅱ::ⅰ), OrderSupportBuy);
-        up.plot(indicator.map(Ⅱ::ⅱ), OrderSupportSell);
+        up.plot(indicator.map(Ⅱ::ⅰ), Main);
+        up.plot(indicator.map(Ⅱ::ⅱ), Lazy);
     }
 }

@@ -9,22 +9,31 @@
  */
 package trademate.chart.builtin;
 
-import static trademate.chart.ChartStyles.*;
-
 import cointoss.Market;
 import cointoss.ticker.Indicator;
 import cointoss.ticker.Tick;
 import cointoss.ticker.Ticker;
+import stylist.Style;
+import stylist.StyleDSL;
+import trademate.chart.ChartStyles;
 import trademate.chart.PlotScript;
 
-public class VolumeIndicator extends PlotScript {
+public class VolumeIndicator extends PlotScript implements StyleDSL {
+
+    public Style Long = () -> {
+        stroke.color(ChartStyles.buy);
+    };
+
+    public Style Short = () -> {
+        stroke.color(ChartStyles.sell);
+    };
 
     /**
      * {@inheritDoc}
      */
     @Override
     protected void declare(Market market, Ticker ticker) {
-        bottom.plot(Indicator.build(ticker, Tick::buyVolume), OrderSupportBuy);
-        bottom.plot(Indicator.build(ticker, Tick::sellVolume), OrderSupportSell);
+        bottom.plot(Indicator.build(ticker, Tick::buyVolume), Long);
+        bottom.plot(Indicator.build(ticker, Tick::sellVolume), Short);
     }
 }

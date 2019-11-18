@@ -33,15 +33,14 @@ import org.eclipse.collections.impl.factory.primitive.DoubleLists;
 
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.market.bitflyer.SFD;
-import cointoss.ticker.Indicator;
 import cointoss.ticker.Tick;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
 import kiss.I;
 import stylist.Style;
 import trademate.chart.Axis.TickLable;
-import trademate.chart.PlotScript.IndicatorInfo;
 import trademate.chart.PlotScript.PlotDSL;
+import trademate.chart.PlotScript.PlotStyle;
 import trademate.setting.Notificator;
 import viewtify.Viewtify;
 import viewtify.ui.helper.LayoutAssistant;
@@ -233,9 +232,9 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 for (PlotScriptChart chart : plots) {
                     if (chart.lines.isEmpty() == false) {
                         int textX = 0;
-                        for (IndicatorInfo info : chart.plotter.indicators) {
-                            gc.setFill(info.color);
-                            gc.fillText(info.indicator.valueAt(tick).toString(), textX, textY, 43);
+                        for (PlotStyle style : chart.plotter.styles) {
+                            gc.setFill(style.color);
+                            gc.fillText(style.indicator.valueAt(tick).toString(), textX, textY, 43);
                             textX += 50;
                         }
                         textY += 15;
@@ -483,9 +482,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
          */
         private void initialize(int size) {
             lines.clear();
-            lines.addAll(plotter.indicators.stream()
-                    .map(info -> new Line(info, plotter.area == PlotArea.Overlay))
-                    .collect(Collectors.toList()));
+            lines.addAll(plotter.styles.stream().map(Line::new).collect(Collectors.toList()));
 
             // ensure size
             valueX = DoubleLists.mutable.empty();
@@ -522,7 +519,9 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                         line.valueY.set(i, height - bottomUp - line.valueY.get(i) * scale);
                     }
                 }
-                gc.setStroke(line.color);
+                gc.setLineWidth(line.style.width);
+                gc.setStroke(line.style.color);
+                gc.setLineDashes(line.style.dashArray);
                 gc.strokePolyline(valueX.toArray(), line.valueY.toArray(), valueX.size());
             }
         }
@@ -540,15 +539,17 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             gc.setLineWidth(1);
 
             for (Line line : lines) {
-                gc.setStroke(line.color);
+                gc.setLineWidth(line.style.width);
+                gc.setStroke(line.style.color);
+                gc.setLineDashes(line.style.dashArray);
+
                 if (scalable) {
                     gc.strokeLine(valueX.getLast(), line.valueY
-                            .getLast(), x, height - bottomUp - line.indicator.valueAt(tick).doubleValue() * scale);
+                            .getLast(), x, height - bottomUp - line.style.indicator.valueAt(tick).doubleValue() * scale);
                 } else {
                     gc.strokeLine(valueX.getLast(), line.valueY.getLast(), x, axisY
-                            .getPositionForValue(line.indicator.valueAt(tick).doubleValue()));
+                            .getPositionForValue(line.style.indicator.valueAt(tick).doubleValue()));
                 }
-
             }
         }
 
@@ -561,10 +562,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             private final double heightMax = 50;
 
             /** The target plotting indicator related info. */
-            private final Indicator<? extends Number> indicator;
-
-            /** The chart color. */
-            private final Color color;
+            private final PlotStyle style;
 
             /** The line position. */
             private final boolean overlay;
@@ -576,12 +574,11 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             private double valueMax = 0;
 
             /**
-             * @param info
+             * @param style
              */
-            private Line(IndicatorInfo info, boolean overlay) {
-                this.indicator = info.indicator;
-                this.color = info.color;
-                this.overlay = overlay;
+            private Line(PlotStyle style) {
+                this.style = style;
+                this.overlay = plotter.area == PlotArea.Overlay;
             }
 
             /**
@@ -591,7 +588,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
              * @param tick
              */
             private void calculate(double x, Tick tick) {
-                double calculated = indicator.valueAt(tick).doubleValue();
+                double calculated = style.indicator.valueAt(tick).doubleValue();
 
                 if (overlay) {
                     calculated = axisY.getPositionForValue(calculated);

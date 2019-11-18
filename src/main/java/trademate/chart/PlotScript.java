@@ -68,7 +68,7 @@ public abstract class PlotScript {
         this.targetScale = market.service.setting.targetCurrencyScaleSize;
 
         for (PlotDSL plotter : plotters) {
-            plotter.indicators.clear();
+            plotter.styles.clear();
         }
 
         declare(market, ticker);
@@ -88,7 +88,7 @@ public abstract class PlotScript {
     protected class PlotDSL {
 
         /** The associated {@link Indicator}s. */
-        final List<IndicatorInfo> indicators = new ArrayList();
+        final List<PlotStyle> styles = new ArrayList();
 
         /** The plot area. */
         final PlotArea area;
@@ -118,7 +118,7 @@ public abstract class PlotScript {
             if (style == null) {
                 style = ChartStyles.MouseTrack;
             }
-            indicators.add(new IndicatorInfo(indicator, style));
+            styles.add(new PlotStyle(indicator, style));
         }
 
         /**
@@ -168,21 +168,31 @@ public abstract class PlotScript {
     }
 
     /**
-     * Plotting indicator info holder.
+     * 
      */
-    static class IndicatorInfo {
+    static class PlotStyle {
 
+        /** The indicator. */
         final Indicator<? extends Number> indicator;
 
+        /** The indicator color. */
         final Color color;
+
+        /** The indicator line width. */
+        final double width;
+
+        /** The indicator line style. */
+        final double[] dashArray;
 
         /**
          * @param indicator
          * @param style
          */
-        private IndicatorInfo(Indicator<Num> indicator, Style style) {
+        private PlotStyle(Indicator<? extends Number> indicator, Style style) {
             this.indicator = indicator;
             this.color = FXUtils.color(style, "stroke");
+            this.width = FXUtils.length(style, "stroke-width");
+            this.dashArray = FXUtils.lengths(style, "stroke-dasharray");
         }
     }
 }
