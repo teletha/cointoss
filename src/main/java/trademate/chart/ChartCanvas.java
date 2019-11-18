@@ -157,8 +157,9 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 script.plot(chart.market.v, ticker);
 
                 for (PlotDSL plotter : script.plotters) {
-                    PlotScriptChart c = new PlotScriptChart(plotter);
-                    plots.add(c);
+                    if (!plotter.styles.isEmpty()) {
+                        plots.add(new PlotScriptChart(plotter));
+                    }
                 }
             }
         });
@@ -224,17 +225,15 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 gc.clearRect(0, 0, candleInfo.getWidth(), candleInfo.getHeight());
                 int textY = 15;
                 for (PlotScriptChart chart : plots) {
-                    if (chart.plotter.styles.isEmpty() == false) {
-                        int textX = 0;
-                        for (PlotStyle style : chart.plotter.styles) {
+                    int textX = 0;
+                    for (PlotStyle style : chart.plotter.styles) {
+                        if (!style.indicator.isConstant()) {
                             gc.setFill(style.color);
                             gc.fillText(style.indicator.valueAt(tick).toString(), textX, textY, 43);
                             textX += 50;
                         }
-                        textY += 15;
-                    } else {
-                        System.out.println(chart + "  " + chart.plotter.area);
                     }
+                    textY += 15;
                 }
             });
         });
@@ -524,15 +523,12 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
          * @param tick
          */
         private void calculate(double x, Tick tick) {
-            double height = getHeight();
-
             for (PlotStyle style : plotter.styles) {
                 double calculated = style.indicator.valueAt(tick).doubleValue();
 
                 if (plotter.area == PlotArea.Overlay) {
                     calculated = axisY.getPositionForValue(calculated);
                 } else {
-                    // calculated = height - bottomUp - calculated;
                     if (valueYMax < calculated) {
                         valueYMax = calculated;
                     }
@@ -546,10 +542,9 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
          * Finish drawing chart line.
          */
         private void draw() {
-            double height = candles.getHeight();
+            double height = getHeight();
             double scale = scale();
             GraphicsContext gc = candles.getGraphicsContext2D();
-            gc.setLineWidth(1);
 
             for (PlotStyle style : plotter.styles) {
                 if (scale != 1) {
@@ -574,7 +569,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             double height = getHeight();
             double scale = scale();
             GraphicsContext gc = candleLatest.getGraphicsContext2D();
-            gc.setLineWidth(1);
 
             for (PlotStyle style : plotter.styles) {
                 gc.setLineWidth(style.width);
