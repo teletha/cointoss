@@ -22,9 +22,9 @@ import trademate.chart.PlotScript;
 
 public class SMAIndicator extends PlotScript implements StyleDSL {
 
-    public Variable<Integer> shortDays = Variable.of(21);
+    public final Variable<Integer> shortDays = Variable.of(21);
 
-    public int longDays = 75;
+    public final Variable<Integer> longDays = Variable.of(75);
 
     private double alpha = 0.5;
 
