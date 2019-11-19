@@ -37,15 +37,19 @@ class PlotScriptRegistryTest {
     }
 
     @Test
-    void store() {
+    void autoStore() throws InterruptedException {
         PlotScriptRegistry registry = new TestablePlotScriptRegistry();
         Volume volume = registry.register(BitFlyer.BTC_JPY, Volume.class);
-        volume.buy.set(10);
+        volume.buy.set(12);
 
         PlotScriptRegistry other = new TestablePlotScriptRegistry();
-        other.restore();
         Volume otherVolume = other.register(BitFlyer.BTC_JPY, Volume.class);
-        assert otherVolume.buy.is(10);
+        assert otherVolume.buy.is(12);
+        otherVolume.buy.set(15);
+
+        PlotScriptRegistry another = new TestablePlotScriptRegistry();
+        Volume anotherVolume = another.register(BitFlyer.BTC_JPY, Volume.class);
+        assert anotherVolume.buy.is(15);
     }
 
     /**
@@ -70,12 +74,12 @@ class PlotScriptRegistryTest {
      */
     private static class TestablePlotScriptRegistry extends PlotScriptRegistry {
 
-        // /**
-        // * {@inheritDoc}
-        // */
-        // @Override
-        // public String locate() {
-        // return room.locateAbsent("pref.json").toAbsolutePath().toString();
-        // }
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String locate() {
+            return room.locate("pref.json").toAbsolutePath().toString();
+        }
     }
 }

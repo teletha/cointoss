@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import cointoss.Market;
 import cointoss.MarketService;
@@ -31,13 +30,35 @@ import trademate.chart.builtin.WaveTrendIndicator;
 class PlotScriptRegistry implements Storable {
 
     /** The managed scripts. */
-    public Map<String, List<PlotScriptPreference>> preferences = new HashMap();
+    private Map<String, List<PlotScript>> managedScripts = new HashMap();
 
     /**
      * 
      */
     protected PlotScriptRegistry() {
         restore();
+
+        I.signal(managedScripts.values()).flatIterable(v -> v).to(this::autoSave);
+    }
+
+    /**
+     * Get the managedScripts property of this {@link PlotScriptRegistry}.
+     * 
+     * @return The managedScripts property.
+     */
+    @SuppressWarnings("unused")
+    private Map<String, List<PlotScript>> getScripts() {
+        return managedScripts;
+    }
+
+    /**
+     * Set the managedScripts property of this {@link PlotScriptRegistry}.
+     * 
+     * @param managedScripts The managedScripts value to set.
+     */
+    @SuppressWarnings("unused")
+    private void setScripts(Map<String, List<PlotScript>> managedScripts) {
+        this.managedScripts = managedScripts;
     }
 
     /**
@@ -47,57 +68,41 @@ class PlotScriptRegistry implements Storable {
      * @return
      */
     List<PlotScript> collectScriptOn(MarketService service) {
-        List<PlotScriptPreference> list = preferences.get(service.marketName);
-
-        if (list == null) {
-            return List.of();
-        }
-        return list.stream().map(this::decode).collect(Collectors.toList());
+        return managedScripts.computeIfAbsent(service.marketName, k -> new ArrayList());
     }
 
     /**
      * Register {@link PlotScript} on the specified {@link MarketService}.
      * 
-     * @param <P>
+     * @param <S>
      * @param market
-     * @param scriptClass
+     * @param type A script type.
      * @return
      */
-    <P extends PlotScript> P register(MarketService market, Class<P> scriptClass) {
-        List<PlotScriptPreference> list = preferences.get(market.marketName);
-
-        if (list == null) {
-            list = new ArrayList();
-            preferences.put(market.marketName, list);
-        }
-
-        for (PlotScriptPreference p : list) {
-            if (p.clazz == scriptClass) {
-                return (P) decode(p);
+    <S extends PlotScript> S register(MarketService market, Class<S> type) {
+        List<PlotScript> scripts = managedScripts.computeIfAbsent(market.marketName, k -> new ArrayList());
+        for (PlotScript script : scripts) {
+            if (script.getClass() == type) {
+                return (S) script;
             }
         }
 
-        PlotScriptPreference p = new PlotScriptPreference();
-        p.clazz = scriptClass;
-        list.add(p);
-
-        return (P) decode(p);
+        S script = I.make(type);
+        scripts.add(script);
+        autoSave(script);
+        return script;
     }
 
-    private PlotScript decode(PlotScriptPreference pref) {
-        if (pref.cache != null) {
-            return pref.cache;
-        }
-        PlotScript script = I.make(pref.clazz);
+    /**
+     * Observe properties to save automatically.
+     * 
+     * @param script
+     */
+    private void autoSave(PlotScript script) {
         Model<PlotScript> model = Model.of(script);
         for (Property p : model.properties()) {
-            model.set(script, p, I.transform(preferences.get(p.name), p.model.type));
-            model.observe(script, p).to(v -> {
-                pref.preferences.put(p.name, I.transform(v, String.class));
-                store();
-            });
+            model.observe(script, p).to(v -> store());
         }
-        return pref.cache = script;
     }
 
     void unregister(MarketService market, PlotScript script) {
