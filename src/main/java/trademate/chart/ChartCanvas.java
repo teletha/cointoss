@@ -363,7 +363,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             long span = chart.ticker.v.span.duration.getSeconds();
             int visibleSize = (int) ((end - start) / span) + 1;
             int visibleStartIndex = (int) ((start - chart.ticker.v.first().start.toEpochSecond()) / span);
-            // if (visibleStartIndex + visibleSize + 1 == chart.ticker.v.size()) visibleSize--;
+            if (visibleStartIndex + visibleSize == chart.ticker.v.size()) visibleSize--;
 
             // Redraw all candles.
             GraphicsContext gc = candles.getGraphicsContext2D();
