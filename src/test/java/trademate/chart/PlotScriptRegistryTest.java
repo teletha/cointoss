@@ -9,6 +9,8 @@
  */
 package trademate.chart;
 
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
@@ -24,7 +26,19 @@ class PlotScriptRegistryTest {
     static CleanRoom room = new CleanRoom();
 
     @Test
-    void register() {
+    void collectAllScriptsOnMarket() {
+        PlotScriptRegistry registry = new TestablePlotScriptRegistry();
+        Volume volume = registry.register(BitFlyer.BTC_JPY, Volume.class);
+        SMA sma = registry.register(BitFlyer.BTC_JPY, SMA.class);
+
+        List<PlotScript> scripts = registry.collectScriptOn(BitFlyer.BTC_JPY);
+        assert scripts.size() == 2;
+        assert scripts.get(0) == volume;
+        assert scripts.get(1) == sma;
+    }
+
+    @Test
+    void plotScriptIsSingletonPerMarket() {
         PlotScriptRegistry registry = new TestablePlotScriptRegistry();
         Volume volume = registry.register(BitFlyer.BTC_JPY, Volume.class);
         assert volume != null;
@@ -37,7 +51,7 @@ class PlotScriptRegistryTest {
     }
 
     @Test
-    void autoStore() throws InterruptedException {
+    void storePropertyAutomatically() {
         PlotScriptRegistry registry = new TestablePlotScriptRegistry();
         Volume volume = registry.register(BitFlyer.BTC_JPY, Volume.class);
         volume.buy.set(12);
@@ -45,11 +59,13 @@ class PlotScriptRegistryTest {
         PlotScriptRegistry other = new TestablePlotScriptRegistry();
         Volume otherVolume = other.register(BitFlyer.BTC_JPY, Volume.class);
         assert otherVolume.buy.is(12);
-        otherVolume.buy.set(15);
+        assert otherVolume.sell.is(0);
+        otherVolume.sell.set(15);
 
         PlotScriptRegistry another = new TestablePlotScriptRegistry();
         Volume anotherVolume = another.register(BitFlyer.BTC_JPY, Volume.class);
-        assert anotherVolume.buy.is(15);
+        assert anotherVolume.buy.is(12);
+        assert anotherVolume.sell.is(15);
     }
 
     /**
@@ -60,6 +76,21 @@ class PlotScriptRegistryTest {
         public Variable<Integer> buy = Variable.of(0);
 
         public Variable<Integer> sell = Variable.of(0);
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected void declare(Market market, Ticker ticker) {
+        }
+    }
+
+    /**
+     * 
+     */
+    private static class SMA extends PlotScript {
+
+        public Variable<Integer> length = Variable.of(21);
 
         /**
          * {@inheritDoc}
