@@ -177,7 +177,7 @@ public final class Ticker implements Disposable {
      * @param consumer
      */
     public final void each(int start, int size, Consumer<Tick> consumer) {
-        ticks.each(start, start + Math.min(start + size, ticks.size()), consumer);
+        ticks.each(start, Math.min(start + size, ticks.size()), consumer);
     }
 
     /**

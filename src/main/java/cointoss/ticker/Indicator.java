@@ -381,6 +381,7 @@ public abstract class Indicator<T> {
             @Override
             protected T valueAtRounded(Tick tick) {
                 if (count == 0) return (T) wrapped.valueAt(tick);
+                if (tick.closePrice == null /* The latest tick MUST NOT cache. */) return calculator.apply(tick, this::valueAt);
 
                 return cache.getIfAbsentPut(tick.startSeconds, () -> calculator.apply(tick, t -> {
                     count--;

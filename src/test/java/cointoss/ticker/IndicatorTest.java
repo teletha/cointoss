@@ -11,6 +11,7 @@ package cointoss.ticker;
 
 import org.junit.jupiter.api.Test;
 
+import cointoss.execution.Execution;
 import cointoss.util.Num;
 
 class IndicatorTest extends TickerTestSupport {
@@ -157,5 +158,27 @@ class IndicatorTest extends TickerTestSupport {
 
         Indicator<Integer> constant = Indicator.build(ticker, 10);
         assert constant.isConstant() == true;
+    }
+
+    @Test
+    void dontCacheLatest() {
+        Ticker ticker = ticker(Span.Second5, 1, 2, 3);
+        Tick tick2 = ticker.get(2);
+
+        Indicator<Num> indicator = Indicator.build(ticker, tick -> tick.closePrice()).memoize();
+        assert indicator.valueAt(tick2).is(3);
+
+        // update latest price
+        manager.update(Execution.with.buy(1).price(10));
+        assert indicator.valueAt(tick2).is(10);
+
+        // update latest price
+        manager.update(Execution.with.buy(1).price(15));
+        assert indicator.valueAt(tick2).is(15);
+
+        // step into next tick
+        manager.update(Execution.with.buy(1).price(20).date(tick2.end));
+        assert indicator.valueAt(tick2).is(15);
+        assert indicator.valueAt(ticker.get(3)).is(20);
     }
 }
