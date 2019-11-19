@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import javafx.scene.text.TextFlow;
+
 import cointoss.Market;
 import cointoss.ticker.Indicator;
 import cointoss.ticker.Ticker;
@@ -91,11 +93,47 @@ public abstract class PlotScript {
         /** The plot area. */
         final PlotArea area;
 
+        /** The infomation area. */
+        final TextFlow infomation = new TextFlow();
+
+        /** The bottom base position. */
+        final double bottomUp;
+
+        /** The max y-value. */
+        double valueYMax = 0;
+
         /**
          * @param area
          */
         private PlotDSL(PlotArea area) {
             this.area = area;
+
+            switch (area) {
+            case Up:
+                this.bottomUp = 100;
+                break;
+
+            case Overlay:
+                this.bottomUp = 0;
+                break;
+
+            default:
+                this.bottomUp = 0;
+                break;
+            }
+        }
+
+        /**
+         * Calculate scale.
+         * 
+         * @return
+         */
+        double scale() {
+            if (area != PlotArea.Overlay) {
+                return 50 < valueYMax ? 50 / valueYMax : 1;
+            } else {
+                return 1;
+            }
         }
 
         /**

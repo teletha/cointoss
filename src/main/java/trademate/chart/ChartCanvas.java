@@ -25,7 +25,6 @@ import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.PathElement;
 import javafx.scene.text.Text;
-import javafx.scene.text.TextFlow;
 
 import org.eclipse.collections.api.list.primitive.MutableDoubleList;
 import org.eclipse.collections.impl.factory.primitive.DoubleLists;
@@ -102,7 +101,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     private final LineMark sfdPrice;
 
     /** The user plot chart. */
-    private final List<PlotScriptChart> plots = new ArrayList();
+    private final List<PlotDSL> plots = new ArrayList();
 
     /** Chart UI */
     private final Canvas candles = new Canvas();
@@ -161,7 +160,13 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
                 for (PlotDSL plotter : script.plotters) {
                     if (!plotter.lines.isEmpty()) {
-                        plots.add(new PlotScriptChart(plotter));
+                        chart.infomations.getChildren().add(plotter.infomation);
+                        for (LineChart line : plotter.lines) {
+                            if (line.infoText != null) {
+                                plotter.infomation.getChildren().add(line.infoText);
+                            }
+                        }
+                        plots.add(plotter);
                     }
                 }
             }
@@ -224,8 +229,8 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 chart.selectLongVolume.text("B " + tick.buyVolume().scale(3));
                 chart.selectShortVolume.text("S " + tick.sellVolume().scale(3));
 
-                for (PlotScriptChart p : plots) {
-                    for (LineChart line : p.plotter.lines) {
+                for (PlotDSL p : plots) {
+                    for (LineChart line : p.lines) {
                         if (line.infoText != null) {
                             line.infoText.setText("  " + line.indicator.valueAt(tick));
                         }
@@ -370,8 +375,13 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             gc.clearRect(0, 0, candles.getWidth(), candles.getHeight());
 
             // draw chart in visible range
-            for (PlotScriptChart chart : plots) {
-                chart.initialize(visibleSize);
+            for (PlotDSL chart : plots) {
+                chart.valueYMax = 0;
+
+                // ensure size
+                for (LineChart style : chart.lines) {
+                    style.valueY.clear();
+                }
             }
             MutableDoubleList valueX = DoubleLists.mutable.empty();
 
@@ -388,15 +398,40 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 gc.setLineWidth(BarWidth);
                 gc.strokeLine(x, open, x, close);
 
-                for (PlotScriptChart chart : plots) {
-                    chart.calculate(tick);
+                for (PlotDSL chart : plots) {
+                    for (LineChart style : chart.lines) {
+                        double calculated = style.indicator.valueAt(tick).doubleValue();
+
+                        if (chart.area == PlotArea.Overlay) {
+                            calculated = axisY.getPositionForValue(calculated);
+                        } else {
+                            if (chart.valueYMax < calculated) {
+                                chart.valueYMax = calculated;
+                            }
+                        }
+                        style.valueY.add(calculated);
+                    }
                 }
                 valueX.add(x);
             });
 
             double[] arrayX = valueX.toArray();
-            for (PlotScriptChart chart : plots) {
-                chart.draw(arrayX);
+            for (PlotDSL chart : plots) {
+                double height = getHeight();
+                double scale = chart.scale();
+                GraphicsContext g = candles.getGraphicsContext2D();
+
+                for (LineChart style : chart.lines) {
+                    if (scale != 1) {
+                        for (int i = 0; i < style.valueY.size(); i++) {
+                            style.valueY.set(i, height - chart.bottomUp - style.valueY.get(i) * scale);
+                        }
+                    }
+                    g.setLineWidth(style.width);
+                    g.setStroke(style.color);
+                    g.setLineDashes(style.dashArray);
+                    g.strokePolyline(arrayX, style.valueY.toArray(), arrayX.length);
+                }
             }
         });
 
@@ -424,149 +459,26 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
             double lastX = axisX.getPositionForValue(tick.previous.start.toEpochSecond());
 
-            for (PlotScriptChart chart : plots) {
-                chart.drawLatest(lastX, x, tick);
+            for (PlotDSL chart : plots) {
+                double height = getHeight();
+                double scale = chart.scale();
+                GraphicsContext g = candleLatest.getGraphicsContext2D();
+
+                for (LineChart style : chart.lines) {
+                    g.setLineWidth(style.width);
+                    g.setStroke(style.color);
+                    g.setLineDashes(style.dashArray);
+
+                    if (scale != 1) {
+                        g.strokeLine(lastX, style.valueY
+                                .getLast(), x, height - chart.bottomUp - style.indicator.valueAt(tick).doubleValue() * scale);
+                    } else {
+                        g.strokeLine(lastX, style.valueY.getLast(), x, axisY
+                                .getPositionForValue(style.indicator.valueAt(tick).doubleValue()));
+                    }
+                }
             }
         });
-    }
-
-    /**
-     * 
-     */
-    private class PlotScriptChart {
-
-        /** The associated script. */
-        private final PlotDSL plotter;
-
-        /** The infomation area. */
-        private final TextFlow infomation = new TextFlow();
-
-        /** The bottom base position. */
-        private final double bottomUp;
-
-        /** The max y-value. */
-        private double valueYMax = 0;
-
-        /**
-         * 
-         */
-        private PlotScriptChart(PlotDSL plotter) {
-            this.plotter = plotter;
-
-            switch (plotter.area) {
-            case Up:
-                this.bottomUp = 100;
-                break;
-
-            case Overlay:
-                this.bottomUp = 0;
-                break;
-
-            default:
-                this.bottomUp = 0;
-                break;
-            }
-
-            chart.infomations.getChildren().add(infomation);
-            for (LineChart line : plotter.lines) {
-                if (line.infoText != null) {
-                    infomation.getChildren().add(line.infoText);
-                }
-            }
-        }
-
-        /**
-         * Initialize.
-         * 
-         * @param size
-         */
-        private void initialize(int size) {
-            valueYMax = 0;
-
-            // ensure size
-            for (LineChart style : plotter.lines) {
-                style.valueY.clear();
-            }
-        }
-
-        /**
-         * Pre-calculate each values.
-         * 
-         * @param tick
-         */
-        private void calculate(Tick tick) {
-            for (LineChart style : plotter.lines) {
-                double calculated = style.indicator.valueAt(tick).doubleValue();
-
-                if (plotter.area == PlotArea.Overlay) {
-                    calculated = axisY.getPositionForValue(calculated);
-                } else {
-                    if (valueYMax < calculated) {
-                        valueYMax = calculated;
-                    }
-                }
-                style.valueY.add(calculated);
-            }
-        }
-
-        /**
-         * Finish drawing chart line.
-         */
-        private void draw(double[] valueX) {
-            double height = getHeight();
-            double scale = scale();
-            GraphicsContext gc = candles.getGraphicsContext2D();
-
-            for (LineChart style : plotter.lines) {
-                if (scale != 1) {
-                    for (int i = 0; i < style.valueY.size(); i++) {
-                        style.valueY.set(i, height - bottomUp - style.valueY.get(i) * scale);
-                    }
-                }
-                gc.setLineWidth(style.width);
-                gc.setStroke(style.color);
-                gc.setLineDashes(style.dashArray);
-                gc.strokePolyline(valueX, style.valueY.toArray(), valueX.length);
-            }
-        }
-
-        /**
-         * Drawing latest chart line.
-         * 
-         * @param x
-         * @param tick
-         */
-        private void drawLatest(double lastX, double x, Tick tick) {
-            double height = getHeight();
-            double scale = scale();
-            GraphicsContext gc = candleLatest.getGraphicsContext2D();
-
-            for (LineChart style : plotter.lines) {
-                gc.setLineWidth(style.width);
-                gc.setStroke(style.color);
-                gc.setLineDashes(style.dashArray);
-
-                if (scale != 1) {
-                    gc.strokeLine(lastX, style.valueY
-                            .getLast(), x, height - bottomUp - style.indicator.valueAt(tick).doubleValue() * scale);
-                } else {
-                    gc.strokeLine(lastX, style.valueY.getLast(), x, axisY.getPositionForValue(style.indicator.valueAt(tick).doubleValue()));
-                }
-            }
-        }
-
-        /**
-         * Calculate scale.
-         * 
-         * @return
-         */
-        private double scale() {
-            if (plotter.area != PlotArea.Overlay) {
-                return 50 < valueYMax ? 50 / valueYMax : 1;
-            } else {
-                return 1;
-            }
-        }
     }
 
     /**
