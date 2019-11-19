@@ -13,15 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.eclipse.collections.api.list.primitive.MutableDoubleList;
-import org.eclipse.collections.impl.factory.primitive.DoubleLists;
-
-import cointoss.market.bitflyer.BitFlyer;
-import cointoss.market.bitflyer.SFD;
-import cointoss.ticker.Indicator;
-import cointoss.ticker.Tick;
-import cointoss.util.Chrono;
-import cointoss.util.Num;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
@@ -35,6 +26,16 @@ import javafx.scene.shape.Path;
 import javafx.scene.shape.PathElement;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
+
+import org.eclipse.collections.api.list.primitive.MutableDoubleList;
+import org.eclipse.collections.impl.factory.primitive.DoubleLists;
+
+import cointoss.market.bitflyer.BitFlyer;
+import cointoss.market.bitflyer.SFD;
+import cointoss.ticker.Indicator;
+import cointoss.ticker.Tick;
+import cointoss.util.Chrono;
+import cointoss.util.Num;
 import kiss.I;
 import stylist.Style;
 import trademate.chart.Axis.TickLable;
@@ -121,8 +122,8 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     /** The settings. */
     private final ChartDisplaySetting setting = I.make(ChartDisplaySetting.class);
 
-    /** The script manager. */
-    private final PlotScriptRegistry scripts = I.make(PlotScriptRegistry.class);
+    /** The script registry. */
+    private final PlotScriptRegistry scriptRegistry = I.make(PlotScriptRegistry.class);
 
     /**
      * Chart canvas.
@@ -155,7 +156,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             plots.clear();
             chart.infomations.getChildren().clear();
 
-            for (PlotScript script : scripts.findScriptsOn(chart.market.v.service)) {
+            for (PlotScript script : scriptRegistry.findScriptsOn(chart.market.v.service)) {
                 script.plot(chart.market.v, ticker);
 
                 for (PlotDSL plotter : script.plotters) {
@@ -371,6 +372,8 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             for (PlotScriptChart chart : plots) {
                 chart.initialize(visibleSize);
             }
+            MutableDoubleList valueX = DoubleLists.mutable.empty();
+
             chart.ticker.v.each(visibleStartIndex, visibleSize, tick -> {
                 double x = axisX.getPositionForValue(tick.start.toEpochSecond());
                 double open = axisY.getPositionForValue(tick.openPrice.doubleValue());
@@ -385,11 +388,14 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 gc.strokeLine(x, open, x, close);
 
                 for (PlotScriptChart chart : plots) {
-                    chart.calculate(x, tick);
+                    chart.calculate(tick);
                 }
+                valueX.add(x);
             });
+
+            double[] arrayX = valueX.toArray();
             for (PlotScriptChart chart : plots) {
-                chart.draw();
+                chart.draw(arrayX);
             }
         });
 
@@ -415,8 +421,10 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             gc.setLineWidth(BarWidth);
             gc.strokeLine(x, open, x, close);
 
+            double lastX = axisX.getPositionForValue(tick.previous.start.toEpochSecond());
+
             for (PlotScriptChart chart : plots) {
-                chart.drawLatest(x, tick);
+                chart.drawLatest(lastX, x, tick);
             }
         });
     }
@@ -434,9 +442,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
         /** The bottom base position. */
         private final double bottomUp;
-
-        /** The x-point of values. */
-        private final MutableDoubleList valueX = DoubleLists.mutable.empty();
 
         /** The max y-value. */
         private double valueYMax = 0;
@@ -478,7 +483,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             valueYMax = 0;
 
             // ensure size
-            valueX.clear();
             for (LineChart style : plotter.lines) {
                 style.valueY.clear();
             }
@@ -487,10 +491,9 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         /**
          * Pre-calculate each values.
          * 
-         * @param x
          * @param tick
          */
-        private void calculate(double x, Tick tick) {
+        private void calculate(Tick tick) {
             for (LineChart style : plotter.lines) {
                 double calculated = style.indicator.valueAt(tick).doubleValue();
 
@@ -503,13 +506,12 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 }
                 style.valueY.add(calculated);
             }
-            valueX.add(x);
         }
 
         /**
          * Finish drawing chart line.
          */
-        private void draw() {
+        private void draw(double[] valueX) {
             double height = getHeight();
             double scale = scale();
             GraphicsContext gc = candles.getGraphicsContext2D();
@@ -523,7 +525,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 gc.setLineWidth(style.width);
                 gc.setStroke(style.color);
                 gc.setLineDashes(style.dashArray);
-                gc.strokePolyline(valueX.toArray(), style.valueY.toArray(), valueX.size());
+                gc.strokePolyline(valueX, style.valueY.toArray(), valueX.length);
             }
         }
 
@@ -533,7 +535,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
          * @param x
          * @param tick
          */
-        private void drawLatest(double x, Tick tick) {
+        private void drawLatest(double lastX, double x, Tick tick) {
             double height = getHeight();
             double scale = scale();
             GraphicsContext gc = candleLatest.getGraphicsContext2D();
@@ -544,11 +546,10 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 gc.setLineDashes(style.dashArray);
 
                 if (scale != 1) {
-                    gc.strokeLine(valueX.getLast(), style.valueY
+                    gc.strokeLine(lastX, style.valueY
                             .getLast(), x, height - bottomUp - style.indicator.valueAt(tick).doubleValue() * scale);
                 } else {
-                    gc.strokeLine(valueX.getLast(), style.valueY.getLast(), x, axisY
-                            .getPositionForValue(style.indicator.valueAt(tick).doubleValue()));
+                    gc.strokeLine(lastX, style.valueY.getLast(), x, axisY.getPositionForValue(style.indicator.valueAt(tick).doubleValue()));
                 }
             }
         }
