@@ -9,7 +9,6 @@
  */
 package trademate.chart;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -68,7 +67,7 @@ class PlotScriptRegistry implements Storable {
      * @return
      */
     List<PlotScript> collectScriptOn(MarketService service) {
-        return managedScripts.computeIfAbsent(service.marketName, k -> new ArrayList());
+        return managedScripts.computeIfAbsent(service.marketName, this::defaults);
     }
 
     /**
@@ -80,7 +79,7 @@ class PlotScriptRegistry implements Storable {
      * @return
      */
     <S extends PlotScript> S register(MarketService market, Class<S> type) {
-        List<PlotScript> scripts = managedScripts.computeIfAbsent(market.marketName, k -> new ArrayList());
+        List<PlotScript> scripts = managedScripts.computeIfAbsent(market.marketName, this::defaults);
         for (PlotScript script : scripts) {
             if (script.getClass() == type) {
                 return (S) script;
@@ -89,8 +88,7 @@ class PlotScriptRegistry implements Storable {
 
         S script = I.make(type);
         scripts.add(script);
-        autoSave(script);
-        return script;
+        return autoSave(script);
     }
 
     /**
@@ -98,11 +96,12 @@ class PlotScriptRegistry implements Storable {
      * 
      * @param script
      */
-    private void autoSave(PlotScript script) {
+    private <S extends PlotScript> S autoSave(S script) {
         Model<PlotScript> model = Model.of(script);
         for (Property p : model.properties()) {
             model.observe(script, p).to(v -> store());
         }
+        return script;
     }
 
     /**
@@ -117,6 +116,15 @@ class PlotScriptRegistry implements Storable {
         if (scripts != null) {
             scripts.remove(script);
         }
+    }
+
+    /**
+     * Define default built-in indicators.
+     * 
+     * @return
+     */
+    protected List<PlotScript> defaults(String market) {
+        return I.list(autoSave(new SMAIndicator()), autoSave(new VolumeIndicator()), autoSave(new WaveTrendIndicator()));
     }
 
     /**

@@ -9,6 +9,7 @@
  */
 package trademate.chart;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -117,6 +118,14 @@ class PlotScriptRegistryTest {
      * 
      */
     private static class TestablePlotScriptRegistry extends PlotScriptRegistry {
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected List<PlotScript> defaults(String market) {
+            return new ArrayList();
+        }
 
         /**
          * {@inheritDoc}
