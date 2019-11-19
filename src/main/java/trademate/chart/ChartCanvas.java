@@ -9,7 +9,6 @@
  */
 package trademate.chart;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -38,7 +37,6 @@ import cointoss.util.Num;
 import kiss.I;
 import stylist.Style;
 import trademate.chart.Axis.TickLable;
-import trademate.chart.PlotScript.PlotDSL;
 import trademate.setting.Notificator;
 import viewtify.Viewtify;
 import viewtify.ui.helper.LayoutAssistant;
@@ -100,9 +98,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     /** Chart UI */
     private final LineMark sfdPrice;
 
-    /** The user plot chart. */
-    private final List<PlotDSL> plots = new ArrayList();
-
     /** Chart UI */
     private final Canvas candles = new Canvas();
 
@@ -113,10 +108,10 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     private final Canvas candleInfo = new Canvas();
 
     /** Flag whether candle chart shoud layout on the next rendering phase or not. */
-    public final LayoutAssistant layoutCandle = new LayoutAssistant(this);
+    private final LayoutAssistant layoutCandle = new LayoutAssistant(this);
 
     /** Flag whether candle chart shoud layout on the next rendering phase or not. */
-    public final LayoutAssistant layoutCandleLatest = new LayoutAssistant(this);
+    private final LayoutAssistant layoutCandleLatest = new LayoutAssistant(this);
 
     /** The settings. */
     private final ChartDisplaySetting setting = I.make(ChartDisplaySetting.class);
@@ -152,23 +147,10 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         this.candleInfo.heightProperty().bind(heightProperty());
 
         chart.ticker.observe().to(ticker -> {
-            plots.clear();
             chart.infomations.getChildren().clear();
 
             for (PlotScript script : scriptRegistry.findScriptsOn(chart.market.v.service)) {
-                script.plot(chart.market.v, ticker);
-
-                for (PlotDSL plotter : script.plotters) {
-                    if (!plotter.lines.isEmpty()) {
-                        chart.infomations.getChildren().add(plotter.infomation);
-                        for (LineChart line : plotter.lines) {
-                            if (line.infoText != null) {
-                                plotter.infomation.getChildren().add(line.infoText);
-                            }
-                        }
-                        plots.add(plotter);
-                    }
-                }
+                script.plot(chart.market.v, ticker, chart);
             }
         });
 
@@ -229,13 +211,13 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 chart.selectLongVolume.text("B " + tick.buyVolume().scale(3));
                 chart.selectShortVolume.text("S " + tick.sellVolume().scale(3));
 
-                for (PlotDSL p : plots) {
+                scriptRegistry.findScriptsOn(chart.market).forEach(p -> {
                     for (LineChart line : p.lines) {
                         if (line.infoText != null) {
                             line.infoText.setText("  " + line.indicator.valueAt(tick));
                         }
                     }
-                }
+                });
             });
         });
 
@@ -375,14 +357,14 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             gc.clearRect(0, 0, candles.getWidth(), candles.getHeight());
 
             // draw chart in visible range
-            for (PlotDSL chart : plots) {
+            scriptRegistry.findScriptsOn(chart.market).forEach(chart -> {
                 chart.valueYMax = 0;
 
                 // ensure size
                 for (LineChart style : chart.lines) {
                     style.valueY.clear();
                 }
-            }
+            });
             MutableDoubleList valueX = DoubleLists.mutable.empty();
 
             chart.ticker.v.each(visibleStartIndex, visibleSize, tick -> {
@@ -398,7 +380,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 gc.setLineWidth(BarWidth);
                 gc.strokeLine(x, open, x, close);
 
-                for (PlotDSL chart : plots) {
+                scriptRegistry.findScriptsOn(chart.market).forEach(chart -> {
                     for (LineChart style : chart.lines) {
                         double calculated = style.indicator.valueAt(tick).doubleValue();
 
@@ -411,12 +393,12 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                         }
                         style.valueY.add(calculated);
                     }
-                }
+                });
                 valueX.add(x);
             });
 
             double[] arrayX = valueX.toArray();
-            for (PlotDSL chart : plots) {
+            scriptRegistry.findScriptsOn(chart.market).forEach(chart -> {
                 double height = getHeight();
                 double scale = chart.scale();
                 GraphicsContext g = candles.getGraphicsContext2D();
@@ -432,7 +414,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                     g.setLineDashes(style.dashArray);
                     g.strokePolyline(arrayX, style.valueY.toArray(), arrayX.length);
                 }
-            }
+            });
         });
 
         layoutCandleLatest.layout(() -> {
@@ -459,7 +441,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
             double lastX = axisX.getPositionForValue(tick.previous.start.toEpochSecond());
 
-            for (PlotDSL chart : plots) {
+            scriptRegistry.findScriptsOn(chart.market).forEach(chart -> {
                 double height = getHeight();
                 double scale = chart.scale();
                 GraphicsContext g = candleLatest.getGraphicsContext2D();
@@ -477,7 +459,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                                 .getPositionForValue(style.indicator.valueAt(tick).doubleValue()));
                     }
                 }
-            }
+            });
         });
     }
 
@@ -502,7 +484,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         final MutableDoubleList valueY = DoubleLists.mutable.empty();
 
         /** The infomation area. */
-        private final Text infoText;
+        final Text infoText;
 
         /**
          * @param indicator

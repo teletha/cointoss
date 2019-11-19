@@ -61,7 +61,7 @@ public abstract class PlotScript {
      * @param market
      * @param ticker
      */
-    final void plot(Market market, Ticker ticker) {
+    final void plot(Market market, Ticker ticker, ChartView chart) {
         this.market = Objects.requireNonNull(market);
         this.ticker = Objects.requireNonNull(ticker);
         this.baseScale = market.service.setting.baseCurrencyScaleSize;
@@ -72,6 +72,17 @@ public abstract class PlotScript {
         }
 
         declare(market, ticker);
+
+        for (PlotDSL plotter : plotters) {
+            if (!plotter.lines.isEmpty()) {
+                chart.infomations.getChildren().add(plotter.infomation);
+                for (LineChart line : plotter.lines) {
+                    if (line.infoText != null) {
+                        plotter.infomation.getChildren().add(line.infoText);
+                    }
+                }
+            }
+        }
     }
 
     /**

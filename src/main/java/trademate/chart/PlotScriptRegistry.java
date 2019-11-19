@@ -9,9 +9,11 @@
  */
 package trademate.chart;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import cointoss.Market;
 import cointoss.MarketService;
@@ -22,6 +24,7 @@ import kiss.Storable;
 import kiss.Variable;
 import kiss.model.Model;
 import kiss.model.Property;
+import trademate.chart.PlotScript.PlotDSL;
 import trademate.chart.builtin.SMAIndicator;
 import trademate.chart.builtin.VolumeIndicator;
 import trademate.chart.builtin.WaveTrendIndicator;
@@ -67,8 +70,8 @@ class PlotScriptRegistry implements Storable {
      * @param market
      * @return
      */
-    List<PlotScript> findScriptsOn(Variable<Market> market) {
-        return findScriptsOn(market.v.service);
+    Stream<PlotDSL> findScriptsOn(Variable<Market> market) {
+        return findScriptsOn(market.v.service).stream().flatMap(v -> Arrays.stream(v.plotters));
     }
 
     /**
