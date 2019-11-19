@@ -15,12 +15,10 @@ import java.util.Objects;
 
 import cointoss.Market;
 import cointoss.ticker.Indicator;
-import cointoss.ticker.Tick;
 import cointoss.ticker.Ticker;
 import cointoss.util.Num;
 import kiss.Variable;
 import stylist.Style;
-import trademate.chart.ChartCanvas.CandleChart;
 import trademate.chart.ChartCanvas.LineChart;
 
 public abstract class PlotScript {

@@ -247,6 +247,16 @@ public abstract class Indicator<T> {
     }
 
     /**
+     * Wrap by exponetial moving average.
+     * 
+     * @param size A tick size.
+     * @return A wrapped indicator.
+     */
+    public final Indicator<Num> ema(Variable<? extends Number> size) {
+        return ema(size.v.intValue());
+    }
+
+    /**
      * Wrap by modified moving average.
      * 
      * @param size A tick size.
@@ -263,6 +273,16 @@ public abstract class Indicator<T> {
             Num previous = (Num) self.apply(tick.previous);
             return (T) ((Num) valueAt(tick)).minus(previous).multiply(multiplier).plus(previous);
         });
+    }
+
+    /**
+     * Wrap by modified moving average.
+     * 
+     * @param size A tick size.
+     * @return A wrapped indicator.
+     */
+    public final Indicator<Num> mma(Variable<? extends Number> size) {
+        return mma(size.v.intValue());
     }
 
     /**
@@ -290,6 +310,16 @@ public abstract class Indicator<T> {
     }
 
     /**
+     * Wrap by simple moving average.
+     * 
+     * @param size A tick size.
+     * @return A wrapped indicator.
+     */
+    public final Indicator<Num> sma(Variable<? extends Number> size) {
+        return sma(size.v.intValue());
+    }
+
+    /**
      * Wrap by weighted moving average.
      * 
      * @param size A tick size.
@@ -313,6 +343,16 @@ public abstract class Indicator<T> {
                 return value.divide(actualSize * (actualSize + 1) / 2);
             }
         }.memoize();
+    }
+
+    /**
+     * Wrap by weighted moving average.
+     * 
+     * @param size A tick size.
+     * @return A wrapped indicator.
+     */
+    public final Indicator<Num> wma(Variable<? extends Number> size) {
+        return wma(size.v.intValue());
     }
 
     /**

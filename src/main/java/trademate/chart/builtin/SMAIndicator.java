@@ -14,6 +14,7 @@ import cointoss.ticker.Indicator;
 import cointoss.ticker.Span;
 import cointoss.ticker.Tick;
 import cointoss.ticker.Ticker;
+import kiss.Variable;
 import stylist.Style;
 import stylist.StyleDSL;
 import stylist.value.Color;
@@ -21,7 +22,7 @@ import trademate.chart.PlotScript;
 
 public class SMAIndicator extends PlotScript implements StyleDSL {
 
-    public int shortDays = 21;
+    public Variable<Integer> shortDays = Variable.of(21);
 
     public int longDays = 75;
 
