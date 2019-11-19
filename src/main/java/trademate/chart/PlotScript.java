@@ -12,8 +12,6 @@ package trademate.chart;
 import java.util.ArrayList;
 import java.util.List;
 
-import javafx.scene.text.Text;
-
 import cointoss.Market;
 import cointoss.ticker.Indicator;
 import cointoss.ticker.Ticker;
@@ -41,9 +39,6 @@ public abstract class PlotScript {
     /** The plotter. */
     protected final PlotDSL overlay = new PlotDSL(PlotArea.Overlay);
 
-    /** The all plotters. */
-    private final PlotDSL[] plotters = {bottom, up, down, top, overlay};
-
     /** The current ticker. */
     private Ticker ticker;
 
@@ -55,6 +50,8 @@ public abstract class PlotScript {
      */
     final Signal<PlotDSL> plot(Market market, Ticker ticker, ChartView chart) {
         this.ticker = ticker;
+
+        PlotDSL[] plotters = {bottom, up, down, top, overlay};
 
         for (PlotDSL plotter : plotters) {
             plotter.lines.clear();
@@ -83,9 +80,6 @@ public abstract class PlotScript {
 
         /** The plot area. */
         final PlotArea area;
-
-        /** The value display. */
-        final List<Text> texts = new ArrayList();
 
         /** The max y-value. */
         double valueYMax = 0;

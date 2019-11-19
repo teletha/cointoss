@@ -333,7 +333,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             int visibleStartIndex = (int) ((start - chart.ticker.v.first().start.toEpochSecond()) / span);
             if (visibleStartIndex + visibleSize == chart.ticker.v.size()) visibleSize--;
 
-            // Redraw all candles.
+            // redraw all candles.
             GraphicsContext gc = candles.getGraphicsContext2D();
             gc.clearRect(0, 0, candles.getWidth(), candles.getHeight());
 
@@ -489,19 +489,19 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     static class LineChart {
 
         /** The indicator. */
-        final Indicator<? extends Number> indicator;
+        private final Indicator<? extends Number> indicator;
 
         /** The indicator color. */
-        final Color color;
+        private final Color color;
 
         /** The indicator line width. */
-        final double width;
+        private final double width;
 
         /** The indicator line style. */
-        final double[] dashArray;
+        private final double[] dashArray;
 
         /** The y-axis values. */
-        final MutableDoubleList valueY = DoubleLists.mutable.empty();
+        private final MutableDoubleList valueY = DoubleLists.mutable.empty();
 
         /**
          * @param indicator
@@ -523,7 +523,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     static class CandleChart {
 
         /** The indicator. */
-        final Indicator<Tick> indicator;
+        private final Indicator<Tick> indicator;
 
         /**
          * @param indicator
@@ -534,15 +534,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     }
 
     /**
-     * @version 2018/01/12 21:54:07
-     */
-    @SuppressWarnings("unused")
-    private class TopMark extends Path {
-
-    }
-
-    /**
-     * @version 2018/01/09 0:19:26
+     * 
      */
     private class LineMark extends Path {
 
