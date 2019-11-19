@@ -10,21 +10,28 @@
 package trademate.chart;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import cointoss.Market;
+import cointoss.MarketService;
+import kiss.I;
 import kiss.Manageable;
 import kiss.Singleton;
 import kiss.Storable;
+import kiss.model.Model;
+import kiss.model.Property;
 import trademate.chart.builtin.SMAIndicator;
 import trademate.chart.builtin.VolumeIndicator;
 import trademate.chart.builtin.WaveTrendIndicator;
 
 @Manageable(lifestyle = Singleton.class)
-public class PlotScriptRegistry implements Storable {
+class PlotScriptRegistry implements Storable {
 
     /** The managed scripts. */
-    private List<PlotScript> scripts = new ArrayList();
+    public Map<String, List<PlotScriptPreference>> preferences = new HashMap();
 
     /**
      * 
@@ -34,21 +41,67 @@ public class PlotScriptRegistry implements Storable {
     }
 
     /**
-     * Get the scripts property of this {@link PlotScriptRegistry}.
+     * Retrieve all script on the specified {@link MarketService}.
      * 
-     * @return The scripts property.
+     * @param market
+     * @return
      */
-    List<PlotScript> getScripts() {
-        return scripts;
+    List<PlotScript> collectScriptOn(MarketService service) {
+        List<PlotScriptPreference> list = preferences.get(service.marketName);
+
+        if (list == null) {
+            return List.of();
+        }
+        return list.stream().map(this::decode).collect(Collectors.toList());
     }
 
     /**
-     * Set the scripts property of this {@link PlotScriptRegistry}.
+     * Register {@link PlotScript} on the specified {@link MarketService}.
      * 
-     * @param scripts The scripts value to set.
+     * @param <P>
+     * @param market
+     * @param scriptClass
+     * @return
      */
-    void setScripts(List<PlotScript> scripts) {
-        this.scripts = scripts;
+    <P extends PlotScript> P register(MarketService market, Class<P> scriptClass) {
+        List<PlotScriptPreference> list = preferences.get(market.marketName);
+
+        if (list == null) {
+            list = new ArrayList();
+            preferences.put(market.marketName, list);
+        }
+
+        for (PlotScriptPreference p : list) {
+            if (p.clazz == scriptClass) {
+                return (P) decode(p);
+            }
+        }
+
+        PlotScriptPreference p = new PlotScriptPreference();
+        p.clazz = scriptClass;
+        list.add(p);
+
+        return (P) decode(p);
+    }
+
+    private PlotScript decode(PlotScriptPreference pref) {
+        if (pref.cache != null) {
+            return pref.cache;
+        }
+        PlotScript script = I.make(pref.clazz);
+        Model<PlotScript> model = Model.of(script);
+        for (Property p : model.properties()) {
+            model.set(script, p, I.transform(preferences.get(p.name), p.model.type));
+            model.observe(script, p).to(v -> {
+                pref.preferences.put(p.name, I.transform(v, String.class));
+                store();
+            });
+        }
+        return pref.cache = script;
+    }
+
+    void unregister(MarketService market, PlotScript script) {
+
     }
 
     /**
