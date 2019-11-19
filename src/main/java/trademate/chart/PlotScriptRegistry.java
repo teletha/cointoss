@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import cointoss.Market;
 import cointoss.MarketService;
 import kiss.I;
 import kiss.Manageable;
@@ -66,7 +65,7 @@ class PlotScriptRegistry implements Storable {
      * @param market
      * @return
      */
-    List<PlotScript> collectScriptOn(MarketService service) {
+    List<PlotScript> findScriptsOn(MarketService service) {
         return managedScripts.computeIfAbsent(service.marketName, this::defaults);
     }
 
@@ -125,15 +124,5 @@ class PlotScriptRegistry implements Storable {
      */
     protected List<PlotScript> defaults(String market) {
         return I.list(autoSave(new SMAIndicator()), autoSave(new VolumeIndicator()), autoSave(new WaveTrendIndicator()));
-    }
-
-    /**
-     * Retrieve all script on the specified {@link Market}.
-     * 
-     * @param market
-     * @return
-     */
-    public List<PlotScript> findScriptsOn(Market market) {
-        return List.of(new WaveTrendIndicator(), new VolumeIndicator(), new SMAIndicator());
     }
 }

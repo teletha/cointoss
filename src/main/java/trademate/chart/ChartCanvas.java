@@ -13,6 +13,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import org.eclipse.collections.api.list.primitive.MutableDoubleList;
+import org.eclipse.collections.impl.factory.primitive.DoubleLists;
+
+import cointoss.market.bitflyer.BitFlyer;
+import cointoss.market.bitflyer.SFD;
+import cointoss.ticker.Indicator;
+import cointoss.ticker.Tick;
+import cointoss.util.Chrono;
+import cointoss.util.Num;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
@@ -26,16 +35,6 @@ import javafx.scene.shape.Path;
 import javafx.scene.shape.PathElement;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
-
-import org.eclipse.collections.api.list.primitive.MutableDoubleList;
-import org.eclipse.collections.impl.factory.primitive.DoubleLists;
-
-import cointoss.market.bitflyer.BitFlyer;
-import cointoss.market.bitflyer.SFD;
-import cointoss.ticker.Indicator;
-import cointoss.ticker.Tick;
-import cointoss.util.Chrono;
-import cointoss.util.Num;
 import kiss.I;
 import stylist.Style;
 import trademate.chart.Axis.TickLable;
@@ -156,7 +155,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             plots.clear();
             chart.infomations.getChildren().clear();
 
-            for (PlotScript script : scripts.findScriptsOn(chart.market.v)) {
+            for (PlotScript script : scripts.findScriptsOn(chart.market.v.service)) {
                 script.plot(chart.market.v, ticker);
 
                 for (PlotDSL plotter : script.plotters) {
@@ -596,9 +595,11 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
          * @param style
          */
         LineChart(Indicator<? extends Number> indicator, Style style) {
+            double width = FXUtils.length(style, "stroke-width");
+
             this.indicator = indicator;
             this.color = FXUtils.color(style, "stroke");
-            this.width = FXUtils.length(style, "stroke-width");
+            this.width = width == 0 ? 1 : width;
             this.dashArray = FXUtils.lengths(style, "stroke-dasharray");
 
             if (indicator.isConstant()) {

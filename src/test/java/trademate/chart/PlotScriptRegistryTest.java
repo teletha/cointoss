@@ -27,12 +27,12 @@ class PlotScriptRegistryTest {
     static CleanRoom room = new CleanRoom();
 
     @Test
-    void collectAllScriptsOnMarket() {
+    void findAllScriptsOnMarket() {
         PlotScriptRegistry registry = new TestablePlotScriptRegistry();
         Volume volume = registry.register(BitFlyer.BTC_JPY, Volume.class);
         SMA sma = registry.register(BitFlyer.BTC_JPY, SMA.class);
 
-        List<PlotScript> scripts = registry.collectScriptOn(BitFlyer.BTC_JPY);
+        List<PlotScript> scripts = registry.findScriptsOn(BitFlyer.BTC_JPY);
         assert scripts.size() == 2;
         assert scripts.get(0) == volume;
         assert scripts.get(1) == sma;
@@ -44,11 +44,11 @@ class PlotScriptRegistryTest {
         Volume volume = registry.register(BitFlyer.BTC_JPY, Volume.class);
         SMA sma = registry.register(BitFlyer.BTC_JPY, SMA.class);
 
-        assert registry.collectScriptOn(BitFlyer.BTC_JPY).size() == 2;
+        assert registry.findScriptsOn(BitFlyer.BTC_JPY).size() == 2;
         registry.unregister(BitFlyer.BTC_JPY, volume);
-        assert registry.collectScriptOn(BitFlyer.BTC_JPY).size() == 1;
+        assert registry.findScriptsOn(BitFlyer.BTC_JPY).size() == 1;
         registry.unregister(BitFlyer.BTC_JPY, sma);
-        assert registry.collectScriptOn(BitFlyer.BTC_JPY).size() == 0;
+        assert registry.findScriptsOn(BitFlyer.BTC_JPY).size() == 0;
     }
 
     @Test
