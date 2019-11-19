@@ -75,8 +75,8 @@ class PlotScriptRegistry implements Storable {
      * Register {@link PlotScript} on the specified {@link MarketService}.
      * 
      * @param <S>
-     * @param market
-     * @param type A script type.
+     * @param market A target market.
+     * @param script A target script to add.
      * @return
      */
     <S extends PlotScript> S register(MarketService market, Class<S> type) {
@@ -105,8 +105,18 @@ class PlotScriptRegistry implements Storable {
         }
     }
 
+    /**
+     * Unregister {@link PlotScript} on the specified {@link MarketService}.
+     * 
+     * @param market A target market.
+     * @param script A target script to remove.
+     */
     void unregister(MarketService market, PlotScript script) {
+        List<PlotScript> scripts = managedScripts.get(market.marketName);
 
+        if (scripts != null) {
+            scripts.remove(script);
+        }
     }
 
     /**

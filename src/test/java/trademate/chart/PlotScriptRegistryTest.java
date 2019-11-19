@@ -38,6 +38,19 @@ class PlotScriptRegistryTest {
     }
 
     @Test
+    void unregisterScript() {
+        PlotScriptRegistry registry = new TestablePlotScriptRegistry();
+        Volume volume = registry.register(BitFlyer.BTC_JPY, Volume.class);
+        SMA sma = registry.register(BitFlyer.BTC_JPY, SMA.class);
+
+        assert registry.collectScriptOn(BitFlyer.BTC_JPY).size() == 2;
+        registry.unregister(BitFlyer.BTC_JPY, volume);
+        assert registry.collectScriptOn(BitFlyer.BTC_JPY).size() == 1;
+        registry.unregister(BitFlyer.BTC_JPY, sma);
+        assert registry.collectScriptOn(BitFlyer.BTC_JPY).size() == 0;
+    }
+
+    @Test
     void plotScriptIsSingletonPerMarket() {
         PlotScriptRegistry registry = new TestablePlotScriptRegistry();
         Volume volume = registry.register(BitFlyer.BTC_JPY, Volume.class);
