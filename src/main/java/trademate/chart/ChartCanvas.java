@@ -37,6 +37,7 @@ import cointoss.util.Num;
 import kiss.I;
 import stylist.Style;
 import trademate.chart.Axis.TickLable;
+import trademate.chart.PlotScript.PlotDSL;
 import trademate.setting.Notificator;
 import viewtify.Viewtify;
 import viewtify.ui.helper.LayoutAssistant;
@@ -116,8 +117,8 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     /** The settings. */
     private final ChartDisplaySetting setting = I.make(ChartDisplaySetting.class);
 
-    /** The script registry. */
-    private final PlotScriptRegistry scriptRegistry = I.make(PlotScriptRegistry.class);
+    /** The associated plot scripts. */
+    private List<PlotDSL> plotters = List.of();
 
     /**
      * Chart canvas.
@@ -146,13 +147,12 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         this.candleInfo.widthProperty().bind(widthProperty());
         this.candleInfo.heightProperty().bind(heightProperty());
 
-        chart.ticker.observe().to(ticker -> {
-            chart.infomations.getChildren().clear();
-
-            for (PlotScript script : scriptRegistry.findScriptsOn(chart.market.v.service)) {
-                script.plot(chart.market.v, ticker, chart);
-            }
-        });
+        chart.market.observe()
+                .combineLatest(chart.ticker.observe())
+                .map(v -> I.signal(I.make(PlotScriptRegistry.class).findScriptsOn(v.ⅰ.service))
+                        .flatMap(script -> script.plot(chart.market.v, chart.ticker.v, chart))
+                        .toList())
+                .to(list -> plotters = list);
 
         Viewtify.clip(this);
 
@@ -211,13 +211,13 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 chart.selectLongVolume.text("B " + tick.buyVolume().scale(3));
                 chart.selectShortVolume.text("S " + tick.sellVolume().scale(3));
 
-                scriptRegistry.findScriptsOn(chart.market).forEach(p -> {
-                    for (LineChart line : p.lines) {
+                for (PlotDSL plotter : plotters) {
+                    for (LineChart line : plotter.lines) {
                         if (line.infoText != null) {
                             line.infoText.setText("  " + line.indicator.valueAt(tick));
                         }
                     }
-                });
+                }
             });
         });
 
@@ -357,14 +357,14 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             gc.clearRect(0, 0, candles.getWidth(), candles.getHeight());
 
             // draw chart in visible range
-            scriptRegistry.findScriptsOn(chart.market).forEach(chart -> {
-                chart.valueYMax = 0;
+            for (PlotDSL plotter : plotters) {
+                plotter.valueYMax = 0;
 
                 // ensure size
-                for (LineChart style : chart.lines) {
-                    style.valueY.clear();
+                for (LineChart chart : plotter.lines) {
+                    chart.valueY.clear();
                 }
-            });
+            }
             MutableDoubleList valueX = DoubleLists.mutable.empty();
 
             chart.ticker.v.each(visibleStartIndex, visibleSize, tick -> {
@@ -380,41 +380,41 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 gc.setLineWidth(BarWidth);
                 gc.strokeLine(x, open, x, close);
 
-                scriptRegistry.findScriptsOn(chart.market).forEach(chart -> {
-                    for (LineChart style : chart.lines) {
-                        double calculated = style.indicator.valueAt(tick).doubleValue();
+                for (PlotDSL plotter : plotters) {
+                    for (LineChart chart : plotter.lines) {
+                        double calculated = chart.indicator.valueAt(tick).doubleValue();
 
-                        if (chart.area == PlotArea.Overlay) {
+                        if (plotter.area == PlotArea.Overlay) {
                             calculated = axisY.getPositionForValue(calculated);
                         } else {
-                            if (chart.valueYMax < calculated) {
-                                chart.valueYMax = calculated;
+                            if (plotter.valueYMax < calculated) {
+                                plotter.valueYMax = calculated;
                             }
                         }
-                        style.valueY.add(calculated);
+                        chart.valueY.add(calculated);
                     }
-                });
+                }
                 valueX.add(x);
             });
 
             double[] arrayX = valueX.toArray();
-            scriptRegistry.findScriptsOn(chart.market).forEach(chart -> {
+            for (PlotDSL plotter : plotters) {
                 double height = getHeight();
-                double scale = chart.scale();
+                double scale = plotter.scale();
                 GraphicsContext g = candles.getGraphicsContext2D();
 
-                for (LineChart style : chart.lines) {
+                for (LineChart chart : plotter.lines) {
                     if (scale != 1) {
-                        for (int i = 0; i < style.valueY.size(); i++) {
-                            style.valueY.set(i, height - chart.bottomUp - style.valueY.get(i) * scale);
+                        for (int i = 0; i < chart.valueY.size(); i++) {
+                            chart.valueY.set(i, height - plotter.bottomUp - chart.valueY.get(i) * scale);
                         }
                     }
-                    g.setLineWidth(style.width);
-                    g.setStroke(style.color);
-                    g.setLineDashes(style.dashArray);
-                    g.strokePolyline(arrayX, style.valueY.toArray(), arrayX.length);
+                    g.setLineWidth(chart.width);
+                    g.setStroke(chart.color);
+                    g.setLineDashes(chart.dashArray);
+                    g.strokePolyline(arrayX, chart.valueY.toArray(), arrayX.length);
                 }
-            });
+            }
         });
 
         layoutCandleLatest.layout(() -> {
@@ -441,25 +441,25 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
             double lastX = axisX.getPositionForValue(tick.previous.start.toEpochSecond());
 
-            scriptRegistry.findScriptsOn(chart.market).forEach(chart -> {
+            for (PlotDSL plotter : plotters) {
                 double height = getHeight();
-                double scale = chart.scale();
+                double scale = plotter.scale();
                 GraphicsContext g = candleLatest.getGraphicsContext2D();
 
-                for (LineChart style : chart.lines) {
-                    g.setLineWidth(style.width);
-                    g.setStroke(style.color);
-                    g.setLineDashes(style.dashArray);
+                for (LineChart chart : plotter.lines) {
+                    g.setLineWidth(chart.width);
+                    g.setStroke(chart.color);
+                    g.setLineDashes(chart.dashArray);
 
                     if (scale != 1) {
-                        g.strokeLine(lastX, style.valueY
-                                .getLast(), x, height - chart.bottomUp - style.indicator.valueAt(tick).doubleValue() * scale);
+                        g.strokeLine(lastX, chart.valueY
+                                .getLast(), x, height - plotter.bottomUp - chart.indicator.valueAt(tick).doubleValue() * scale);
                     } else {
-                        g.strokeLine(lastX, style.valueY.getLast(), x, axisY
-                                .getPositionForValue(style.indicator.valueAt(tick).doubleValue()));
+                        g.strokeLine(lastX, chart.valueY.getLast(), x, axisY
+                                .getPositionForValue(chart.indicator.valueAt(tick).doubleValue()));
                     }
                 }
-            });
+            }
         });
     }
 

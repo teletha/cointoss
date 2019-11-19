@@ -19,6 +19,8 @@ import cointoss.Market;
 import cointoss.ticker.Indicator;
 import cointoss.ticker.Ticker;
 import cointoss.util.Num;
+import kiss.I;
+import kiss.Signal;
 import kiss.Variable;
 import stylist.Style;
 import trademate.chart.ChartCanvas.LineChart;
@@ -61,7 +63,7 @@ public abstract class PlotScript {
      * @param market
      * @param ticker
      */
-    final void plot(Market market, Ticker ticker, ChartView chart) {
+    final Signal<PlotDSL> plot(Market market, Ticker ticker, ChartView chart) {
         this.market = Objects.requireNonNull(market);
         this.ticker = Objects.requireNonNull(ticker);
         this.baseScale = market.service.setting.baseCurrencyScaleSize;
@@ -73,16 +75,18 @@ public abstract class PlotScript {
 
         declare(market, ticker);
 
-        for (PlotDSL plotter : plotters) {
-            if (!plotter.lines.isEmpty()) {
-                chart.infomations.getChildren().add(plotter.infomation);
-                for (LineChart line : plotter.lines) {
-                    if (line.infoText != null) {
-                        plotter.infomation.getChildren().add(line.infoText);
-                    }
-                }
-            }
-        }
+        // for (PlotDSL plotter : plotters) {
+        // if (!plotter.lines.isEmpty()) {
+        // chart.infomations.getChildren().add(plotter.infomation);
+        // for (LineChart line : plotter.lines) {
+        // if (line.infoText != null) {
+        // plotter.infomation.getChildren().add(line.infoText);
+        // }
+        // }
+        // }
+        // }
+
+        return I.signal(plotters).skip(plotter -> plotter.lines.isEmpty());
     }
 
     /**
