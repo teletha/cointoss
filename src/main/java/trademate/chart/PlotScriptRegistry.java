@@ -13,13 +13,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import cointoss.Market;
 import cointoss.MarketService;
 import kiss.I;
 import kiss.Manageable;
 import kiss.Singleton;
 import kiss.Storable;
-import kiss.Variable;
 import kiss.model.Model;
 import kiss.model.Property;
 import trademate.chart.builtin.SMAIndicator;
@@ -59,16 +57,6 @@ class PlotScriptRegistry implements Storable {
     @SuppressWarnings("unused")
     private void setScripts(Map<String, List<PlotScript>> managedScripts) {
         this.managedScripts = managedScripts;
-    }
-
-    /**
-     * Retrieve all script on the specified {@link MarketService}.
-     * 
-     * @param market
-     * @return
-     */
-    List<PlotScript> findScriptsOn(Variable<Market> market) {
-        return findScriptsOn(market.v.service);
     }
 
     /**

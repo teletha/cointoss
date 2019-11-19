@@ -10,5 +10,19 @@
 package trademate.chart;
 
 enum PlotArea {
-    Top, Down, Up, Bottom, Overlay;
+    Top(true, 0), Down(true, 100), Up(false, 100), Bottom(false, 0), Overlay(true, 0);
+
+    /** The positioning. */
+    final boolean direction;
+
+    /** The offset. */
+    final int offset;
+
+    /**
+     * Initializer.
+     */
+    private PlotArea(boolean direction, int offset) {
+        this.direction = direction;
+        this.offset = offset;
+    }
 }

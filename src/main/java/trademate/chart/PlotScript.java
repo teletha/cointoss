@@ -11,9 +11,8 @@ package trademate.chart;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
-import javafx.scene.text.TextFlow;
+import javafx.scene.text.Text;
 
 import cointoss.Market;
 import cointoss.ticker.Indicator;
@@ -42,17 +41,8 @@ public abstract class PlotScript {
     /** The plotter. */
     protected final PlotDSL overlay = new PlotDSL(PlotArea.Overlay);
 
-    /** The base currency scale. */
-    protected int baseScale;
-
-    /** The base currency scale. */
-    protected int targetScale;
-
     /** The all plotters. */
-    final PlotDSL[] plotters = {bottom, up, down, top, overlay};
-
-    /** The current market. */
-    private Market market;
+    private final PlotDSL[] plotters = {bottom, up, down, top, overlay};
 
     /** The current ticker. */
     private Ticker ticker;
@@ -64,27 +54,13 @@ public abstract class PlotScript {
      * @param ticker
      */
     final Signal<PlotDSL> plot(Market market, Ticker ticker, ChartView chart) {
-        this.market = Objects.requireNonNull(market);
-        this.ticker = Objects.requireNonNull(ticker);
-        this.baseScale = market.service.setting.baseCurrencyScaleSize;
-        this.targetScale = market.service.setting.targetCurrencyScaleSize;
+        this.ticker = ticker;
 
         for (PlotDSL plotter : plotters) {
             plotter.lines.clear();
         }
 
         declare(market, ticker);
-
-        // for (PlotDSL plotter : plotters) {
-        // if (!plotter.lines.isEmpty()) {
-        // chart.infomations.getChildren().add(plotter.infomation);
-        // for (LineChart line : plotter.lines) {
-        // if (line.infoText != null) {
-        // plotter.infomation.getChildren().add(line.infoText);
-        // }
-        // }
-        // }
-        // }
 
         return I.signal(plotters).skip(plotter -> plotter.lines.isEmpty());
     }
@@ -108,11 +84,8 @@ public abstract class PlotScript {
         /** The plot area. */
         final PlotArea area;
 
-        /** The infomation area. */
-        final TextFlow infomation = new TextFlow();
-
-        /** The bottom base position. */
-        final double bottomUp;
+        /** The value display. */
+        final List<Text> texts = new ArrayList();
 
         /** The max y-value. */
         double valueYMax = 0;
@@ -122,20 +95,6 @@ public abstract class PlotScript {
          */
         private PlotDSL(PlotArea area) {
             this.area = area;
-
-            switch (area) {
-            case Up:
-                this.bottomUp = 100;
-                break;
-
-            case Overlay:
-                this.bottomUp = 0;
-                break;
-
-            default:
-                this.bottomUp = 0;
-                break;
-            }
         }
 
         /**

@@ -23,7 +23,6 @@ import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.PathElement;
-import javafx.scene.text.Text;
 
 import org.eclipse.collections.api.list.primitive.MutableDoubleList;
 import org.eclipse.collections.impl.factory.primitive.DoubleLists;
@@ -106,7 +105,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     private final Canvas candleLatest = new Canvas();
 
     /** Chart UI */
-    private final Canvas candleInfo = new Canvas();
+    private final Canvas chartInfo = new Canvas();
 
     /** Flag whether candle chart shoud layout on the next rendering phase or not. */
     private final LayoutAssistant layoutCandle = new LayoutAssistant(this);
@@ -118,7 +117,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     private final ChartDisplaySetting setting = I.make(ChartDisplaySetting.class);
 
     /** The associated plot scripts. */
-    private List<PlotDSL> plotters = List.of();
+    private PlotDSL[] plotters = new PlotDSL[0];
 
     /**
      * Chart canvas.
@@ -144,15 +143,16 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         this.candles.heightProperty().bind(heightProperty());
         this.candleLatest.widthProperty().bind(widthProperty());
         this.candleLatest.heightProperty().bind(heightProperty());
-        this.candleInfo.widthProperty().bind(widthProperty());
-        this.candleInfo.heightProperty().bind(heightProperty());
+        this.chartInfo.widthProperty().bind(widthProperty());
+        this.chartInfo.heightProperty().bind(heightProperty());
 
         chart.market.observe()
                 .combineLatest(chart.ticker.observe())
                 .map(v -> I.signal(I.make(PlotScriptRegistry.class).findScriptsOn(v.ⅰ.service))
                         .flatMap(script -> script.plot(chart.market.v, chart.ticker.v, chart))
-                        .toList())
-                .to(list -> plotters = list);
+                        .toList()
+                        .toArray(PlotDSL[]::new))
+                .to(v -> plotters = v);
 
         Viewtify.clip(this);
 
@@ -172,7 +172,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         visualizeSFDPrice();
 
         getChildren()
-                .addAll(backGridVertical, backGridHorizontal, notifyPrice, orderBuyPrice, orderSellPrice, latestPrice, sfdPrice, candles, candleLatest, candleInfo, mouseTrackHorizontal, mouseTrackVertical);
+                .addAll(backGridVertical, backGridHorizontal, notifyPrice, orderBuyPrice, orderSellPrice, latestPrice, sfdPrice, candles, candleLatest, chartInfo, mouseTrackHorizontal, mouseTrackVertical);
     }
 
     /**
@@ -199,26 +199,11 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             mouseTrackVertical.layoutLine.requestLayout();
             mouseTrackHorizontal.layoutLine.requestLayout();
 
-            // Move the start position forward for visual consistency
+            // move the start position forward for visual consistency
             long sec = (long) x + chart.ticker.v.span.duration.toSeconds() / 2;
 
-            // Upper Info
-            chart.ticker.v.findByEpochSecond(sec).to(tick -> {
-                chart.selectDate.text(Chrono.system(tick.start).format(Chrono.DateTime));
-                chart.selectHigh.text("H " + tick.highPrice().scale(0));
-                chart.selectLow.text("L " + tick.lowPrice().scale(0));
-                chart.selectVolume.text("V " + tick.volume().scale(3));
-                chart.selectLongVolume.text("B " + tick.buyVolume().scale(3));
-                chart.selectShortVolume.text("S " + tick.sellVolume().scale(3));
-
-                for (PlotDSL plotter : plotters) {
-                    for (LineChart line : plotter.lines) {
-                        if (line.infoText != null) {
-                            line.infoText.setText("  " + line.indicator.valueAt(tick));
-                        }
-                    }
-                }
-            });
+            // update upper info
+            chart.ticker.v.findByEpochSecond(sec).to(this::drawChartInfo);
         });
 
         // remove on exit
@@ -229,13 +214,9 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             mouseTrackVertical.layoutLine.requestLayout();
             mouseTrackHorizontal.layoutLine.requestLayout();
 
-            // upper info
-            chart.selectDate.text("");
-            chart.selectHigh.text("");
-            chart.selectLow.text("");
-            chart.selectVolume.text("");
-            chart.selectLongVolume.text("");
-            chart.selectShortVolume.text("");
+            // clear upper info
+            GraphicsContext gc = chartInfo.getGraphicsContext2D();
+            gc.clearRect(0, 0, chartInfo.getWidth(), chartInfo.getHeight());
         });
     }
 
@@ -406,7 +387,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 for (LineChart chart : plotter.lines) {
                     if (scale != 1) {
                         for (int i = 0; i < chart.valueY.size(); i++) {
-                            chart.valueY.set(i, height - plotter.bottomUp - chart.valueY.get(i) * scale);
+                            chart.valueY.set(i, height - plotter.area.offset - chart.valueY.get(i) * scale);
                         }
                     }
                     g.setLineWidth(chart.width);
@@ -453,7 +434,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
                     if (scale != 1) {
                         g.strokeLine(lastX, chart.valueY
-                                .getLast(), x, height - plotter.bottomUp - chart.indicator.valueAt(tick).doubleValue() * scale);
+                                .getLast(), x, height - plotter.area.offset - chart.indicator.valueAt(tick).doubleValue() * scale);
                     } else {
                         g.strokeLine(lastX, chart.valueY.getLast(), x, axisY
                                 .getPositionForValue(chart.indicator.valueAt(tick).doubleValue()));
@@ -461,6 +442,45 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 }
             }
         });
+    }
+
+    /**
+     * Draw chart info.
+     */
+    private void drawChartInfo(Tick tick) {
+        GraphicsContext gc = chartInfo.getGraphicsContext2D();
+        gc.clearRect(0, 0, chartInfo.getWidth(), chartInfo.getHeight());
+
+        int base = chart.market.v.service.setting.baseCurrencyScaleSize;
+        String date = Chrono.system(tick.start).format(Chrono.DateTime);
+        String open = "O" + tick.openPrice.scale(base);
+        String high = "H" + tick.highPrice().scale(base);
+        String low = "L" + tick.lowPrice().scale(base);
+        String close = "C" + tick.closePrice().scale(base);
+
+        int gap = 5;
+        int width = 43;
+        int largeWidth = width * 2 + gap;
+        int y = 18;
+        int offsetX = 10;
+        gc.setFill(Color.WHITE);
+        gc.fillText(date, offsetX, y, largeWidth);
+        gc.fillText(open, offsetX + largeWidth + gap, y, width);
+        gc.fillText(high, offsetX + largeWidth + width + gap * 2, y, width);
+        gc.fillText(low, offsetX + largeWidth + width * 2 + gap * 3, y, width);
+        gc.fillText(close, offsetX + largeWidth + width * 3 + gap * 4, y, width);
+
+        for (PlotDSL plotter : plotters) {
+            y += 15;
+            int x = offsetX;
+            for (LineChart chart : plotter.lines) {
+                if (!chart.indicator.isConstant()) {
+                    gc.setFill(chart.color);
+                    gc.fillText(chart.indicator.valueAt(tick).toString(), x, y, width);
+                    x += width + gap;
+                }
+            }
+        }
     }
 
     /**
@@ -483,9 +503,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         /** The y-axis values. */
         final MutableDoubleList valueY = DoubleLists.mutable.empty();
 
-        /** The infomation area. */
-        final Text infoText;
-
         /**
          * @param indicator
          * @param style
@@ -497,13 +514,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             this.color = FXUtils.color(style, "stroke");
             this.width = width == 0 ? 1 : width;
             this.dashArray = FXUtils.lengths(style, "stroke-dasharray");
-
-            if (indicator.isConstant()) {
-                this.infoText = null;
-            } else {
-                this.infoText = new Text();
-                this.infoText.setFill(color);
-            }
         }
     }
 
