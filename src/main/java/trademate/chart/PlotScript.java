@@ -108,7 +108,7 @@ public abstract class PlotScript {
             double max = Math.max(horizonMaxY, lineMaxY);
 
             if (area != PlotArea.Overlay) {
-                return 50 < max ? 50 / max : 1;
+                return 35 < max ? 35 / max : 1;
             } else {
                 return 1;
             }
