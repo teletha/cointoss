@@ -56,6 +56,7 @@ public abstract class PlotScript {
 
         for (PlotDSL plotter : plotters) {
             plotter.lines.clear();
+            plotter.horizons.clear();
         }
 
         declare(market, ticker);
