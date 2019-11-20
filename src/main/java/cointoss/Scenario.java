@@ -13,12 +13,8 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map.Entry;
-import java.util.NavigableMap;
-import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -52,6 +48,9 @@ public abstract class Scenario extends ScenarioBase implements Directional {
     /** The fund management for this scenario. */
     protected FundManager funds;
 
+    /** The parent {@link Trader}. */
+    Trader trader;
+
     /** The list entry orders. */
     @VisibleForTesting
     final LinkedQueue<Order> entries = new LinkedQueue<>();
@@ -68,9 +67,6 @@ public abstract class Scenario extends ScenarioBase implements Directional {
 
     /** The debugging log. */
     private LinkedList<String> logs;
-
-    /** The state snapshot. */
-    private NavigableMap<ZonedDateTime, Snapshot> snapshots = new TreeMap();
 
     /**
      * 
@@ -176,9 +172,7 @@ public abstract class Scenario extends ScenarioBase implements Directional {
      */
     @Override
     public final Profitable snapshotAt(ZonedDateTime time) {
-        Entry<ZonedDateTime, Snapshot> entry = snapshots.floorEntry(time);
-
-        return entry == null ? Snapshot.ZERO : entry.getValue();
+        throw new Error();
     }
 
     /**
@@ -238,7 +232,8 @@ public abstract class Scenario extends ScenarioBase implements Directional {
         order.observeExecutedSize().to(v -> {
             updateOrderRelatedStatus(entries, this::setEntryPrice, this::setEntryExecutedSize);
             logEntry("Update entry order");
-            snapshot(market.service.now());
+
+            trader.snapshot(Num.ZERO, isBuy() ? v : v.negate(), order.price);
         });
     }
 
@@ -413,7 +408,9 @@ public abstract class Scenario extends ScenarioBase implements Directional {
         order.observeExecutedSize().to(v -> {
             updateOrderRelatedStatus(exits, this::setExitPrice, this::setExitExecutedSize);
             logExit("Update exit order");
-            snapshot(market.service.now());
+
+            Num increasedRealizedProfit = exitPrice.diff(this, entryPrice).multiply(v);
+            trader.snapshot(increasedRealizedProfit, isBuy() ? v.negate() : v, null);
         });
     }
 
@@ -514,64 +511,5 @@ public abstract class Scenario extends ScenarioBase implements Directional {
      */
     protected final void logExit(String message) {
         log(message + " " + exitExecutedSize + "/" + exitSize + "@" + exitPrice);
-    }
-
-    /**
-     * Create state snapshot.
-     * 
-     * @return
-     */
-    private void snapshot(ZonedDateTime date) {
-        snapshots.put(date.plus(59, ChronoUnit.SECONDS)
-                .truncatedTo(ChronoUnit.MINUTES), new Snapshot(direction(), realizedProfit, entryPrice, entryExecutedSize
-                        .minus(exitExecutedSize)));
-    }
-
-    /**
-     * 
-     */
-    private static class Snapshot implements Profitable {
-
-        private static final Snapshot ZERO = new Snapshot(Direction.BUY, Num.ZERO, Num.ZERO, Num.ZERO);
-
-        /** The direction. */
-        private final Direction direction;
-
-        /** The realized profit. */
-        private final Num realizedProfit;
-
-        /** The entry price. */
-        private final Num entryPrice;
-
-        /** The entry size which is . */
-        private final Num entryExecutedUnexitedSize;
-
-        /**
-         * @param realizedProfit
-         * @param entryPrice
-         * @param entryExecutedUnexitedSize
-         */
-        private Snapshot(Direction direction, Num realizedProfit, Num entryPrice, Num entryExecutedUnexitedSize) {
-            this.direction = direction;
-            this.realizedProfit = realizedProfit;
-            this.entryPrice = entryPrice;
-            this.entryExecutedUnexitedSize = entryExecutedUnexitedSize;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public Num realizedProfit() {
-            return realizedProfit;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public Num unrealizedProfit(Num price) {
-            return price.diff(direction, entryPrice).multiply(entryExecutedUnexitedSize);
-        }
     }
 }

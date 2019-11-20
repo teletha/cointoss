@@ -9,9 +9,14 @@
  */
 package cointoss;
 
+import static java.time.temporal.ChronoUnit.*;
+
 import java.time.ZonedDateTime;
 import java.time.temporal.TemporalUnit;
+import java.util.Map;
+import java.util.NavigableMap;
 import java.util.Objects;
+import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BooleanSupplier;
@@ -24,6 +29,7 @@ import cointoss.execution.Execution;
 import cointoss.ticker.Indicator;
 import cointoss.ticker.Span;
 import cointoss.ticker.Tick;
+import cointoss.util.Chrono;
 import cointoss.util.Num;
 import kiss.Disposable;
 import kiss.Signal;
@@ -46,6 +52,9 @@ public abstract class Trader implements Profitable {
 
     /** The disposer manager. */
     private final Disposable disposer = Disposable.empty();
+
+    /** The state snapshot. */
+    private NavigableMap<ZonedDateTime, Snapshot> snapshots = new TreeMap<>(Map.of(Chrono.MIN, Snapshot.ZERO));
 
     /**
      * Declare your strategy.
@@ -86,6 +95,7 @@ public abstract class Trader implements Profitable {
             Scenario scenario = builder.apply(value);
 
             if (scenario != null) {
+                scenario.trader = this;
                 scenario.market = market;
                 scenario.funds = funds;
                 scenario.entry();
@@ -124,26 +134,7 @@ public abstract class Trader implements Profitable {
      */
     @Override
     public Profitable snapshotAt(ZonedDateTime time) {
-        return new Profitable() {
-
-            @Override
-            public Num unrealizedProfit(Num currentPrice) {
-                Num value = Num.ZERO;
-                for (Scenario scenario : scenarios) {
-                    value = value.plus(scenario.snapshotAt(time).unrealizedProfit(currentPrice));
-                }
-                return value;
-            }
-
-            @Override
-            public Num realizedProfit() {
-                Num value = Num.ZERO;
-                for (Scenario scenario : scenarios) {
-                    value = value.plus(scenario.snapshotAt(time).realizedProfit());
-                }
-                return value;
-            }
-        };
+        return snapshots.floorEntry(time).getValue();
     }
 
     /**
@@ -211,5 +202,74 @@ public abstract class Trader implements Profitable {
             }
             return false;
         };
+    }
+
+    /**
+     * Create state snapshot.
+     * 
+     * @return
+     */
+    void snapshot(Num increasedRealizedProfit, Num increasedRemainingSize, Num increasedPrice) {
+        Snapshot previous = snapshots.lastEntry().getValue();
+
+        ZonedDateTime now = market.service.now().plus(59, SECONDS).truncatedTo(MINUTES);
+        Num realizedProfit = previous.realizedProfit.plus(increasedRealizedProfit);
+        Num remainingSize = previous.remainingSize.plus(increasedRemainingSize);
+        Num entryPrice = remainingSize.isZero() ? Num.ZERO
+                : increasedPrice != null
+                        ? previous.remainingSize.multiply(previous.entryPrice)
+                                .plus(increasedRemainingSize.multiply(increasedPrice))
+                                .divide(remainingSize)
+                        : previous.entryPrice;
+
+        snapshots.put(now, new Snapshot(null, realizedProfit, entryPrice, remainingSize));
+    }
+
+    /**
+     * 
+     */
+    private static class Snapshot implements Profitable {
+
+        private static final Snapshot ZERO = new Snapshot(Direction.BUY, Num.ZERO, Num.ZERO, Num.ZERO);
+
+        /** The direction. */
+        private final Direction direction;
+
+        /** The realized profit. */
+        private final Num realizedProfit;
+
+        /** The entry price. */
+        private final Num entryPrice;
+
+        /** The entry size which is . */
+        private final Num remainingSize;
+
+        /**
+         * @param realizedProfit
+         * @param entryPrice
+         * @param entryExecutedUnexitedSize
+         */
+        private Snapshot(Direction direction, Num realizedProfit, Num entryPrice, Num remainingSize) {
+            this.direction = direction;
+            this.realizedProfit = realizedProfit;
+            this.entryPrice = entryPrice;
+            this.remainingSize = remainingSize;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Num realizedProfit() {
+            return realizedProfit;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Num unrealizedProfit(Num price) {
+            return price.diff(remainingSize.isPositive() ? Direction.BUY : Direction.SELL, entryPrice).multiply(remainingSize);
+        }
     }
 }
