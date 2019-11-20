@@ -7,7 +7,7 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss.trade;
+package cointoss;
 
 import static java.util.concurrent.TimeUnit.*;
 
@@ -21,9 +21,6 @@ import java.util.function.Function;
 
 import com.google.common.annotations.VisibleForTesting;
 
-import cointoss.Direction;
-import cointoss.Directional;
-import cointoss.Market;
 import cointoss.order.Order;
 import cointoss.order.OrderStrategy.Makable;
 import cointoss.order.OrderStrategy.Orderable;

@@ -7,12 +7,13 @@
  *
  *          https://opensource.org/licenses/MIT
  */
-package cointoss.trade;
+package cointoss;
 
 import static cointoss.execution.Execution.with;
 
 import org.junit.jupiter.api.Test;
 
+import cointoss.TradingLog;
 import cointoss.execution.Execution;
 
 public class TradingLogTest extends TraderTestSupport {

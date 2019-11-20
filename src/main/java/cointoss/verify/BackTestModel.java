@@ -19,10 +19,10 @@ import java.util.function.Function;
 
 import cointoss.Market;
 import cointoss.MarketService;
+import cointoss.Trader;
+import cointoss.TradingLog;
 import cointoss.analyze.Analyzer;
 import cointoss.analyze.ConsoleAnalyzer;
-import cointoss.trade.Trader;
-import cointoss.trade.TradingLog;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
 import icy.manipulator.Icy;

@@ -7,7 +7,7 @@
  *
  *          https://opensource.org/licenses/MIT
  */
-package cointoss.trade;
+package cointoss;
 
 import static cointoss.util.Num.*;
 
@@ -16,7 +16,6 @@ import java.time.Duration;
 import java.util.List;
 import java.util.function.Function;
 
-import cointoss.Market;
 import cointoss.analyze.Statistics;
 import cointoss.util.Chrono;
 import cointoss.util.Num;

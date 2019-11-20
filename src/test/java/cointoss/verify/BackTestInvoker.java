@@ -13,12 +13,12 @@ import static java.time.temporal.ChronoUnit.*;
 
 import cointoss.Direction;
 import cointoss.Market;
+import cointoss.Scenario;
+import cointoss.Trader;
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.ticker.Indicator;
 import cointoss.ticker.Indicators;
 import cointoss.ticker.Span;
-import cointoss.trade.Scenario;
-import cointoss.trade.Trader;
 import cointoss.util.Num;
 import kiss.I;
 import kiss.Ⅱ;

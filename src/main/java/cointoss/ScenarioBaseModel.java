@@ -7,12 +7,10 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss.trade;
+package cointoss;
 
 import org.apache.logging.log4j.util.PerformanceSensitive;
 
-import cointoss.Direction;
-import cointoss.Directional;
 import cointoss.util.Num;
 import cointoss.util.ObservableNumProperty;
 import icy.manipulator.Icy;

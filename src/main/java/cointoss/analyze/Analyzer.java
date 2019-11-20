@@ -12,7 +12,7 @@ package cointoss.analyze;
 import java.util.List;
 
 import cointoss.Market;
-import cointoss.trade.TradingLog;
+import cointoss.TradingLog;
 
 public interface Analyzer {
 

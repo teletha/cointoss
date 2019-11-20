@@ -2,7 +2,7 @@ package cointoss.verify;
 
 import cointoss.Market;
 import cointoss.MarketService;
-import cointoss.trade.Trader;
+import cointoss.Trader;
 import cointoss.util.Num;
 import cointoss.verify.BackTest;
 import cointoss.verify.BackTestModel;

@@ -7,7 +7,7 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss.trade;
+package cointoss;
 
 import static java.time.temporal.ChronoUnit.SECONDS;
 
@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import cointoss.Direction;
+import cointoss.Scenario;
 import cointoss.execution.Execution;
 import cointoss.order.Order;
 import cointoss.util.Num;

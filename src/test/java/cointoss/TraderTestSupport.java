@@ -7,13 +7,15 @@
  *
  *          https://opensource.org/licenses/MIT
  */
-package cointoss.trade;
+package cointoss;
 
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 
 import org.junit.jupiter.api.BeforeEach;
 
+import cointoss.Scenario;
+import cointoss.Trader;
 import cointoss.execution.Execution;
 import cointoss.verify.VerifiableMarket;
 import kiss.I;

@@ -7,7 +7,7 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss.trade;
+package cointoss;
 
 import cointoss.util.Num;
 import icy.manipulator.Icy;
