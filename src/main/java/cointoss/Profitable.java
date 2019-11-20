@@ -9,6 +9,8 @@
  */
 package cointoss;
 
+import java.time.ZonedDateTime;
+
 import org.apache.logging.log4j.util.PerformanceSensitive;
 
 import cointoss.util.Num;
@@ -40,4 +42,14 @@ public interface Profitable {
      */
     @PerformanceSensitive
     Num unrealizedProfit(Num currentPrice);
+
+    /**
+     * Calcualte the sanpshot when market is the specified datetime and price.
+     * 
+     * @param time The specified date and time.
+     * @return A snapshot of this {@link Scenario}.
+     */
+    default Profitable snapshotAt(ZonedDateTime time) {
+        return this;
+    }
 }

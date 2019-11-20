@@ -12,6 +12,7 @@ package trademate.chart.builtin;
 import static cointoss.ticker.Span.Minute1;
 
 import cointoss.Market;
+import cointoss.Profitable;
 import cointoss.Trader;
 import cointoss.ticker.Indicator;
 import cointoss.ticker.Ticker;
@@ -45,11 +46,11 @@ public class TraderVisualizer extends PlotScript implements StyleDSL {
         Indicator<TraderState> indicator = Indicator.build(market.tickers.of(Minute1), tick -> {
             Num realized = Num.ZERO;
             Num unrealized = Num.ZERO;
-            Num price = market.tickers.latestPrice.v;
 
             for (Trader trader : market.traders) {
-                realized = realized.plus(trader.realizedProfit());
-                unrealized = unrealized.plus(trader.unrealizedProfit(price));
+                Profitable snapshot = trader.snapshotAt(tick.start);
+                realized = realized.plus(snapshot.realizedProfit());
+                unrealized = unrealized.plus(snapshot.unrealizedProfit(tick.openPrice));
             }
             return new TraderState(realized.scale(scale), unrealized.scale(scale));
         }).memoize();

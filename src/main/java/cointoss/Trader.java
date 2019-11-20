@@ -120,6 +120,33 @@ public abstract class Trader implements Profitable {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Profitable snapshotAt(ZonedDateTime time) {
+        return new Profitable() {
+
+            @Override
+            public Num unrealizedProfit(Num currentPrice) {
+                Num value = Num.ZERO;
+                for (Scenario scenario : scenarios) {
+                    value = value.plus(scenario.snapshotAt(time).unrealizedProfit(currentPrice));
+                }
+                return value;
+            }
+
+            @Override
+            public Num realizedProfit() {
+                Num value = Num.ZERO;
+                for (Scenario scenario : scenarios) {
+                    value = value.plus(scenario.snapshotAt(time).realizedProfit());
+                }
+                return value;
+            }
+        };
+    }
+
+    /**
      * Create the snapshot of trading log.
      * 
      * @return

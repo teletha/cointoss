@@ -13,7 +13,6 @@ import static java.time.temporal.ChronoUnit.*;
 
 import org.junit.jupiter.api.Test;
 
-import cointoss.Scenario.Snapshot;
 import cointoss.execution.Execution;
 import cointoss.util.Num;
 
@@ -121,7 +120,7 @@ class ScenarioProfitTest extends TraderTestSupport {
 
         Scenario s = latest();
         // past
-        Snapshot snapshot = s.snapshotAt(base.plus(1, MINUTES));
+        Profitable snapshot = s.snapshotAt(base.plus(1, MINUTES));
         assert snapshot.realizedProfit().is(0);
         assert snapshot.unrealizedProfit(Num.of(12)).is(2);
 
@@ -152,7 +151,7 @@ class ScenarioProfitTest extends TraderTestSupport {
 
         Scenario s = latest();
         // past
-        Snapshot snapshot = s.snapshotAt(base.plus(1, MINUTES));
+        Profitable snapshot = s.snapshotAt(base.plus(1, MINUTES));
         assert snapshot.realizedProfit().is(0);
         assert snapshot.unrealizedProfit(Num.of(12)).is(4);
 
@@ -183,7 +182,7 @@ class ScenarioProfitTest extends TraderTestSupport {
 
         Scenario s = latest();
         // past
-        Snapshot snapshot = s.snapshotAt(base.plus(1, MINUTES));
+        Profitable snapshot = s.snapshotAt(base.plus(1, MINUTES));
         assert snapshot.realizedProfit().is(0);
         assert snapshot.unrealizedProfit(Num.of(12)).is(4);
 
@@ -214,7 +213,7 @@ class ScenarioProfitTest extends TraderTestSupport {
 
         Scenario s = latest();
         // past
-        Snapshot snapshot = s.snapshotAt(base.plus(1, MINUTES));
+        Profitable snapshot = s.snapshotAt(base.plus(1, MINUTES));
         assert snapshot.realizedProfit().is(0);
         assert snapshot.unrealizedProfit(Num.of(12)).is(2);
 
@@ -245,7 +244,7 @@ class ScenarioProfitTest extends TraderTestSupport {
 
         Scenario s = latest();
         // past
-        Snapshot snapshot = s.snapshotAt(base.plus(1, MINUTES));
+        Profitable snapshot = s.snapshotAt(base.plus(1, MINUTES));
         assert snapshot.realizedProfit().is(0);
         assert snapshot.unrealizedProfit(Num.of(12)).is(2);
 
@@ -276,7 +275,7 @@ class ScenarioProfitTest extends TraderTestSupport {
 
         Scenario s = latest();
         // past
-        Snapshot snapshot = s.snapshotAt(base.plus(1, MINUTES));
+        Profitable snapshot = s.snapshotAt(base.plus(1, MINUTES));
         assert snapshot.realizedProfit().is(0);
         assert snapshot.unrealizedProfit(Num.of(12)).is(4);
 
@@ -307,7 +306,7 @@ class ScenarioProfitTest extends TraderTestSupport {
 
         Scenario s = latest();
         // past
-        Snapshot snapshot = s.snapshotAt(base.plus(1, MINUTES));
+        Profitable snapshot = s.snapshotAt(base.plus(1, MINUTES));
         assert snapshot.realizedProfit().is(0);
         assert snapshot.unrealizedProfit(Num.of(12)).is(2);
 
@@ -338,7 +337,7 @@ class ScenarioProfitTest extends TraderTestSupport {
 
         Scenario s = latest();
         // past
-        Snapshot snapshot = s.snapshotAt(base.plus(1, MINUTES));
+        Profitable snapshot = s.snapshotAt(base.plus(1, MINUTES));
         assert snapshot.realizedProfit().is(0);
         assert snapshot.unrealizedProfit(Num.of(12)).is(2);
 
@@ -382,7 +381,7 @@ class ScenarioProfitTest extends TraderTestSupport {
 
         Scenario s = latest();
         // past
-        Snapshot snapshot = s.snapshotAt(base.plus(30, SECONDS));
+        Profitable snapshot = s.snapshotAt(base.plus(30, SECONDS));
         assert snapshot.realizedProfit().is(0);
         assert snapshot.unrealizedProfit(Num.of(6)).is(0);
 

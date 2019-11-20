@@ -172,12 +172,10 @@ public abstract class Scenario extends ScenarioBase implements Directional {
     }
 
     /**
-     * Calcualte the sanpshot when market is the specified datetime and price.
-     * 
-     * @param time The specified date and time.
-     * @return A snapshot of this {@link Scenario}.
+     * {@inheritDoc}
      */
-    public final Snapshot snapshotAt(ZonedDateTime time) {
+    @Override
+    public final Profitable snapshotAt(ZonedDateTime time) {
         Entry<ZonedDateTime, Snapshot> entry = snapshots.floorEntry(time);
 
         return entry == null ? Snapshot.ZERO : entry.getValue();
@@ -532,7 +530,7 @@ public abstract class Scenario extends ScenarioBase implements Directional {
     /**
      * 
      */
-    public static class Snapshot implements Profitable {
+    private static class Snapshot implements Profitable {
 
         private static final Snapshot ZERO = new Snapshot(Direction.BUY, Num.ZERO, Num.ZERO, Num.ZERO);
 
