@@ -79,6 +79,9 @@ public abstract class PlotScript {
         /** The associated {@link Indicator}s. */
         final List<LineChart> lines = new ArrayList();
 
+        /** The max y-value on line chart. */
+        double lineMaxY = 0;
+
         /** The associated {@link Indicator}s. */
         final List<Horizon> horizons = new ArrayList();
 
@@ -87,9 +90,6 @@ public abstract class PlotScript {
 
         /** The plot area. */
         final PlotArea area;
-
-        /** The max y-value. */
-        double valueYMax = 0;
 
         /**
          * @param area
@@ -104,7 +104,7 @@ public abstract class PlotScript {
          * @return
          */
         double scale() {
-            double max = Math.max(horizonMaxY, valueYMax);
+            double max = Math.max(horizonMaxY, lineMaxY);
 
             if (area != PlotArea.Overlay) {
                 return 50 < max ? 50 / max : 1;

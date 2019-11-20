@@ -338,7 +338,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
             // draw chart in visible range
             for (PlotDSL plotter : plotters) {
-                plotter.valueYMax = 0;
+                plotter.lineMaxY = 0;
 
                 // ensure size
                 for (LineChart chart : plotter.lines) {
@@ -367,8 +367,8 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                         if (plotter.area == PlotArea.Overlay) {
                             calculated = axisY.getPositionForValue(calculated);
                         } else {
-                            if (plotter.valueYMax < calculated) {
-                                plotter.valueYMax = calculated;
+                            if (plotter.lineMaxY < calculated) {
+                                plotter.lineMaxY = calculated;
                             }
                         }
                         chart.valueY.add(calculated);
@@ -384,6 +384,16 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             for (PlotDSL plotter : plotters) {
                 double scale = plotter.scale();
 
+                // draw horizontal line
+                for (Horizon horizon : plotter.horizons) {
+                    double y = scale != 1 ? height - plotter.area.offset - horizon.value * scale : horizon.value;
+
+                    gc.setLineWidth(horizon.width);
+                    gc.setStroke(horizon.color);
+                    gc.setLineDashes(horizon.dashArray);
+                    gc.strokeLine(0, y, width, y);
+                }
+
                 // draw line chart
                 for (LineChart chart : plotter.lines) {
                     if (scale != 1) {
@@ -395,16 +405,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                     gc.setStroke(chart.color);
                     gc.setLineDashes(chart.dashArray);
                     gc.strokePolyline(arrayX, chart.valueY.toArray(), arrayX.length);
-                }
-
-                // draw horizontal line
-                for (Horizon horizon : plotter.horizons) {
-                    double y = scale != 1 ? height - plotter.area.offset - horizon.value * scale : horizon.value;
-
-                    gc.setLineWidth(horizon.width);
-                    gc.setStroke(horizon.color);
-                    gc.setLineDashes(horizon.dashArray);
-                    gc.strokeLine(0, y, width, y);
                 }
             }
         });
@@ -437,18 +437,17 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 for (PlotDSL plotter : plotters) {
                     double height = getHeight();
                     double scale = plotter.scale();
-                    GraphicsContext g = candleLatest.getGraphicsContext2D();
 
                     for (LineChart chart : plotter.lines) {
-                        g.setLineWidth(chart.width);
-                        g.setStroke(chart.color);
-                        g.setLineDashes(chart.dashArray);
+                        gc.setLineWidth(chart.width);
+                        gc.setStroke(chart.color);
+                        gc.setLineDashes(chart.dashArray);
 
                         if (scale != 1) {
-                            g.strokeLine(lastX, chart.valueY
+                            gc.strokeLine(lastX, chart.valueY
                                     .getLast(), x, height - plotter.area.offset - chart.indicator.valueAt(tick).doubleValue() * scale);
                         } else {
-                            g.strokeLine(lastX, chart.valueY.getLast(), x, axisY
+                            gc.strokeLine(lastX, chart.valueY.getLast(), x, axisY
                                     .getPositionForValue(chart.indicator.valueAt(tick).doubleValue()));
                         }
                     }
@@ -487,11 +486,9 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             y += 15;
             int x = offsetX;
             for (LineChart chart : plotter.lines) {
-                if (!chart.indicator.isConstant()) {
-                    gc.setFill(chart.color);
-                    gc.fillText(chart.indicator.valueAt(tick).toString(), x, y, width);
-                    x += width + gap;
-                }
+                gc.setFill(chart.color);
+                gc.fillText(chart.indicator.valueAt(tick).toString(), x, y, width);
+                x += width + gap;
             }
         }
     }
