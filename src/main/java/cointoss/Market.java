@@ -17,6 +17,9 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import org.eclipse.collections.api.factory.Lists;
+import org.eclipse.collections.api.list.MutableList;
+
 import cointoss.execution.Execution;
 import cointoss.execution.ExecutionLog;
 import cointoss.market.MarketServiceProvider;
@@ -29,7 +32,6 @@ import cointoss.order.OrderStrategy.Cancellable;
 import cointoss.order.OrderStrategy.Makable;
 import cointoss.order.OrderStrategy.Orderable;
 import cointoss.order.OrderStrategy.Takable;
-import cointoss.ticker.Indicator;
 import cointoss.ticker.TickerManager;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
@@ -83,6 +85,12 @@ public class Market implements Disposable {
         }
         return previous;
     }).skip(e -> e == null || e == Market.BASE);
+
+    /** The managed {@link Trader}. */
+    final MutableList<Trader> managedTraders = Lists.mutable.empty();
+
+    /** The managed {@link Trader}. */
+    public final MutableList<Trader> traders = managedTraders.asUnmodifiable();
 
     /**
      * Build {@link Market} with the specified {@link MarketServiceProvider}.

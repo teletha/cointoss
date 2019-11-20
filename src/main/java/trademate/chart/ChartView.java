@@ -30,6 +30,15 @@ public class ChartView extends View {
     /** Chart UI */
     protected UIComboBox<Span> span;
 
+    /** The chart configuration. */
+    public final Variable<Boolean> showLatestPrice = Variable.of(true);
+
+    /** The chart configuration. */
+    public final Variable<Boolean> showOrderSupport = Variable.of(true);
+
+    /** The chart configuration. */
+    public final Variable<Boolean> showPositionSupport = Variable.of(true);
+
     /** The candle chart. */
     private final Chart chart = new Chart(this);
 
@@ -56,7 +65,6 @@ public class ChartView extends View {
     @Override
     protected void initialize() {
         span.values(0, Span.class);
-
         span.observeNow() //
                 .skipNull()
                 .combineLatest(market.observeNow().skipNull())
@@ -64,8 +72,10 @@ public class ChartView extends View {
                 .to(ticker::set);
     }
 
+    /**
+     * 
+     */
     private interface S extends StyleDSL {
-
         Style ConfigBox = () -> {
             display.maxWidth(100, px).maxHeight(10, px);
             position.top(0, px).right(56, px);

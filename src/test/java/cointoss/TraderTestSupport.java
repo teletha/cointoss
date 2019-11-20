@@ -14,8 +14,6 @@ import java.time.temporal.ChronoUnit;
 
 import org.junit.jupiter.api.BeforeEach;
 
-import cointoss.Scenario;
-import cointoss.Trader;
 import cointoss.execution.Execution;
 import cointoss.verify.VerifiableMarket;
 import kiss.I;
@@ -37,7 +35,7 @@ public abstract class TraderTestSupport extends Trader {
     @BeforeEach
     void initialize() {
         market.service.clear();
-        entries.clear();
+        scenarios.clear();
     }
 
     /**
@@ -46,7 +44,7 @@ public abstract class TraderTestSupport extends Trader {
      * @return
      */
     protected final Scenario latest() {
-        return entries.peekLast();
+        return scenarios.getLast();
     }
 
     /**

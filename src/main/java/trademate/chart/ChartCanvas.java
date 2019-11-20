@@ -12,15 +12,6 @@ package trademate.chart;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.eclipse.collections.api.list.primitive.MutableDoubleList;
-import org.eclipse.collections.impl.list.mutable.primitive.DoubleArrayList;
-
-import cointoss.market.bitflyer.BitFlyer;
-import cointoss.market.bitflyer.SFD;
-import cointoss.ticker.Indicator;
-import cointoss.ticker.Tick;
-import cointoss.util.Chrono;
-import cointoss.util.Num;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
@@ -32,6 +23,16 @@ import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.PathElement;
+
+import org.eclipse.collections.api.list.primitive.MutableDoubleList;
+import org.eclipse.collections.impl.list.mutable.primitive.DoubleArrayList;
+
+import cointoss.market.bitflyer.BitFlyer;
+import cointoss.market.bitflyer.SFD;
+import cointoss.ticker.Indicator;
+import cointoss.ticker.Tick;
+import cointoss.util.Chrono;
+import cointoss.util.Num;
 import kiss.I;
 import stylist.Style;
 import trademate.chart.Axis.TickLable;
@@ -111,9 +112,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
     /** Flag whether candle chart shoud layout on the next rendering phase or not. */
     private final LayoutAssistant layoutCandleLatest = new LayoutAssistant(this);
-
-    /** The settings. */
-    private final ChartDisplaySetting setting = I.make(ChartDisplaySetting.class);
 
     /** The associated plot scripts. */
     private PlotDSL[] plotters = new PlotDSL[0];
@@ -249,15 +247,19 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
      * Visualize order price in chart.
      */
     private void visualizeOrderPrice() {
-        chart.market.observe().switchMap(m -> m.orders.manages()).on(Viewtify.UIThread).to(o -> {
-            LineMark mark = o.isBuy() ? orderBuyPrice : orderSellPrice;
-            TickLable label = mark.createLabel(o.price);
+        chart.market.observe()
+                .switchMap(m -> m.orders.manages())
+                .switchOn(chart.showOrderSupport.observeNow())
+                .on(Viewtify.UIThread)
+                .to(o -> {
+                    LineMark mark = o.isBuy() ? orderBuyPrice : orderSellPrice;
+                    TickLable label = mark.createLabel(o.price);
 
-            o.observeTerminating().on(Viewtify.UIThread).to(e -> {
-                System.out.println("remove order line " + e);
-                mark.remove(label);
-            });
-        });
+                    o.observeTerminating().on(Viewtify.UIThread).to(e -> {
+                        System.out.println("remove order line " + e);
+                        mark.remove(label);
+                    });
+                });
     }
 
     /**
@@ -275,7 +277,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
                     return price -> latest.value.set(price.doubleValue());
                 })
-                .switchOn(setting.showLatestPrice.observeNow())
+                .switchOn(chart.showLatestPrice.observeNow())
                 .to(latestPrice.layoutLine::requestLayout);
     }
 

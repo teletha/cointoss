@@ -11,13 +11,14 @@ package cointoss;
 
 import java.time.ZonedDateTime;
 import java.time.temporal.TemporalUnit;
-import java.util.LinkedList;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BooleanSupplier;
 import java.util.function.Function;
 import java.util.function.Predicate;
+
+import org.eclipse.collections.impl.list.mutable.FastList;
 
 import cointoss.execution.Execution;
 import cointoss.ticker.Indicator;
@@ -38,7 +39,7 @@ public abstract class Trader {
     protected final FundManager funds;
 
     /** All managed entries. */
-    final LinkedList<Scenario> entries = new LinkedList<>();
+    final FastList<Scenario> scenarios = new FastList();
 
     /** The alive state. */
     private final AtomicBoolean enable = new AtomicBoolean(true);
@@ -53,6 +54,7 @@ public abstract class Trader {
      */
     public Trader(Market market) {
         this.market = Objects.requireNonNull(market);
+        this.market.managedTraders.add(this);
         this.funds = FundManager.with.totalAssets(market.service.baseCurrency().first().to().v);
     }
 
@@ -89,11 +91,24 @@ public abstract class Trader {
                 scenario.entry();
 
                 if (scenario.entries.isEmpty() == false) {
-                    entries.add(scenario);
+                    scenarios.add(scenario);
                 }
             }
         }));
         return this;
+    }
+
+    /**
+     * Calculate the current profit and loss.
+     * 
+     * @return
+     */
+    public final Num profit() {
+        Num profit = Num.ZERO;
+        for (Scenario scenario : scenarios) {
+            profit = profit.plus(scenario.profit(market.tickers.latestPrice.v));
+        }
+        return profit;
     }
 
     /**
@@ -102,7 +117,7 @@ public abstract class Trader {
      * @return
      */
     public final TradingLog log() {
-        return new TradingLog(market, funds, entries);
+        return new TradingLog(market, funds, scenarios);
     }
 
     /**

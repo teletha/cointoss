@@ -17,6 +17,15 @@ import cointoss.TradingLog;
 public interface Analyzer {
 
     /**
+     * Set up phase.
+     * 
+     * @param market
+     */
+    default void initialize(Market market) {
+        // do nothing
+    }
+
+    /**
      * Analyze the given {@link TradingLog}s.
      * 
      * @param market A target market.

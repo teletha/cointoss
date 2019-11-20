@@ -13,18 +13,15 @@ import static transcript.Transcript.en;
 
 import java.time.Period;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
-import cointoss.Direction;
 import cointoss.Market;
 import cointoss.MarketService;
-import cointoss.Scenario;
-import cointoss.Trader;
 import cointoss.TradingLog;
 import cointoss.analyze.Analyzer;
 import cointoss.execution.ExecutionLog;
 import cointoss.market.MarketServiceProvider;
 import cointoss.ticker.Span;
+import cointoss.trading.LazyBear;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
 import cointoss.verify.BackTest;
@@ -155,12 +152,25 @@ public class BackTestView extends View implements Analyzer {
             BackTest.with.service(marketSelection.value())
                     .start(startDate.zoned())
                     .end(endDate.zoned())
-                    .traders(Sample::new)
+                    .traders(LazyBear::new)
                     .initialBaseCurrency(3000000)
                     .run(this);
         }, e -> {
             e.printStackTrace();
         });
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void initialize(Market market) {
+        chart.showOrderSupport.set(false);
+        chart.showPositionSupport.set(false);
+        chart.showLatestPrice.set(false);
+
+        chart.market.set(market);
+        chart.ticker.set(market.tickers.of(Span.Minute30));
     }
 
     /**
@@ -173,43 +183,9 @@ public class BackTestView extends View implements Analyzer {
         }
 
         Viewtify.inUI(() -> {
-            // update chart
-            chart.market.set(market);
-            chart.ticker.set(market.tickers.of(Span.Minute5));
-
             logSelection.values(logs);
 
             market.dispose();
         });
-    }
-
-    /**
-     * 
-     */
-    private static class Sample extends Trader {
-
-        private Sample(Market market) {
-            super(market);
-
-            when(market.tickers.of(Span.Hour4).add.skip(1).take(1), tick -> {
-                return new Scenario() {
-
-                    @Override
-                    protected void entry() {
-                        entry(Direction.random(), 3, s -> s.make(market.tickers.latest.v.price));
-                    }
-
-                    /**
-                     * {@inheritDoc}
-                     */
-                    @Override
-                    protected void exit() {
-                        exitAt(entryPrice.plus(this, 5000));
-                        exitAt(entryPrice.minus(this, 5000));
-                        exitAfter(15, TimeUnit.MINUTES);
-                    }
-                };
-            });
-        }
     }
 }

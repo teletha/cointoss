@@ -13,7 +13,6 @@ import static cointoss.execution.Execution.with;
 
 import org.junit.jupiter.api.Test;
 
-import cointoss.TradingLog;
 import cointoss.execution.Execution;
 
 public class TradingLogTest extends TraderTestSupport {
@@ -39,7 +38,7 @@ public class TradingLogTest extends TraderTestSupport {
     }
 
     @Test
-    void profit() {
+    void profitStatistics() {
         entryAndExit(Execution.with.buy(1).price(10), Execution.with.buy(1).price(20)); // profit
         entryAndExit(Execution.with.buy(1).price(30), Execution.with.buy(1).price(50)); // profit
         entryAndExit(Execution.with.buy(1).price(30), Execution.with.buy(1).price(10)); // loss
@@ -53,7 +52,7 @@ public class TradingLogTest extends TraderTestSupport {
     }
 
     @Test
-    void loss() {
+    void lossStatistics() {
         entryAndExit(Execution.with.buy(1).price(10), Execution.with.buy(1).price(20)); // profit
         entryAndExit(Execution.with.buy(1).price(30), Execution.with.buy(1).price(20)); // loss
         entryAndExit(Execution.with.buy(1).price(30), Execution.with.buy(1).price(10)); // loss

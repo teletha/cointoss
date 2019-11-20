@@ -154,11 +154,13 @@ interface BackTestModel {
         market.service.baseCurrency = initialBaseCurrency();
         market.service.targetCurrency = initialTargetCurrency();
 
+        analyzer.initialize(market);
+
         List<TradingLog> logs = new ArrayList();
         List<Trader> traders = I.signal(traders()).map(t -> t.apply(market)).toList();
 
         LocalDateTime start = LocalDateTime.now();
-        market.readLog(log -> log.range(start(), end()).effect(e -> market.perform(e)).effectOnError(Throwable::printStackTrace));
+        market.readLog(log -> log.range(start(), end()).effect(market::perform).effectOnError(Throwable::printStackTrace));
         LocalDateTime end = LocalDateTime.now();
 
         for (Trader trader : traders) {
