@@ -9,9 +9,9 @@
  */
 package cointoss.execution;
 
-import static java.nio.charset.StandardCharsets.*;
+import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static java.nio.file.StandardOpenOption.*;
-import static java.util.concurrent.TimeUnit.*;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -25,7 +25,6 @@ import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAccessor;
 import java.util.ArrayDeque;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.Delayed;
@@ -46,9 +45,6 @@ import org.apache.logging.log4j.Logger;
 import com.github.luben.zstd.ZstdInputStream;
 import com.github.luben.zstd.ZstdOutputStream;
 import com.google.common.base.Stopwatch;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
 import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
 import com.univocity.parsers.csv.CsvWriter;
@@ -154,21 +150,6 @@ public class ExecutionLog {
 
     /** The root directory of logs. */
     private final Directory root;
-
-    /** In-memory cache. */
-    private final LoadingCache<ZonedDateTime, List<Execution>> memory = CacheBuilder.newBuilder()
-            .maximumSize(3)
-            .expireAfterAccess(15, MINUTES)
-            .build(new CacheLoader<>() {
-
-                /**
-                 * {@inheritDoc}
-                 */
-                @Override
-                public List<Execution> load(ZonedDateTime key) throws Exception {
-                    return new Cache(key).read().toList();
-                }
-            });
 
     /** The first day. */
     private ZonedDateTime cacheFirst;
@@ -395,13 +376,9 @@ public class ExecutionLog {
     public final Signal<Execution> at(ZonedDateTime date) {
         Stopwatch stopwatch = Stopwatch.createUnstarted();
 
-        try {
-            return I.signal(memory.get(date)).effectOnObserve(() -> stopwatch.reset().start()).effectOnTerminate(() -> {
-                log.info("Process executions [{}] {}", date, stopwatch.stop().elapsed());
-            });
-        } catch (ExecutionException e) {
-            throw I.quiet(e);
-        }
+        return new Cache(date).read().effectOnObserve(() -> stopwatch.reset().start()).effectOnTerminate(() -> {
+            log.info("Process executions [{}] {}", date, stopwatch.stop().elapsed());
+        });
     }
 
     /**
