@@ -177,7 +177,7 @@ public abstract class Scenario extends ScenarioBase implements Directional {
      * @param time The specified date and time.
      * @return A snapshot of this {@link Scenario}.
      */
-    public final Snapshot profitWhen(ZonedDateTime time) {
+    public final Snapshot snapshotAt(ZonedDateTime time) {
         Entry<ZonedDateTime, Snapshot> entry = snapshots.floorEntry(time);
 
         return entry == null ? Snapshot.ZERO : entry.getValue();
