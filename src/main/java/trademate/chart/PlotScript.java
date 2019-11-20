@@ -20,6 +20,7 @@ import kiss.I;
 import kiss.Signal;
 import kiss.Variable;
 import stylist.Style;
+import trademate.chart.ChartCanvas.Horizon;
 import trademate.chart.ChartCanvas.LineChart;
 
 public abstract class PlotScript {
@@ -78,6 +79,12 @@ public abstract class PlotScript {
         /** The associated {@link Indicator}s. */
         final List<LineChart> lines = new ArrayList();
 
+        /** The associated {@link Indicator}s. */
+        final List<Horizon> horizons = new ArrayList();
+
+        /** The max y-value on horizontal line. */
+        private double horizonMaxY = 0;
+
         /** The plot area. */
         final PlotArea area;
 
@@ -97,8 +104,10 @@ public abstract class PlotScript {
          * @return
          */
         double scale() {
+            double max = Math.max(horizonMaxY, valueYMax);
+
             if (area != PlotArea.Overlay) {
-                return 50 < valueYMax ? 50 / valueYMax : 1;
+                return 50 < max ? 50 / max : 1;
             } else {
                 return 1;
             }
@@ -167,7 +176,16 @@ public abstract class PlotScript {
          * @param value A value to plot.
          */
         private final void line(Num value, Style style) {
-            line(Indicator.build(ticker, value), style);
+            if (style == null) {
+                style = ChartStyles.MouseTrack;
+            }
+
+            double v = value.doubleValue();
+            if (horizonMaxY < v) {
+                horizonMaxY = v;
+            }
+
+            horizons.add(new Horizon(v, style));
         }
     }
 }

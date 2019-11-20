@@ -12,6 +12,15 @@ package trademate.chart;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import org.eclipse.collections.api.list.primitive.MutableDoubleList;
+import org.eclipse.collections.impl.factory.primitive.DoubleLists;
+
+import cointoss.market.bitflyer.BitFlyer;
+import cointoss.market.bitflyer.SFD;
+import cointoss.ticker.Indicator;
+import cointoss.ticker.Tick;
+import cointoss.util.Chrono;
+import cointoss.util.Num;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
@@ -23,16 +32,6 @@ import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.PathElement;
-
-import org.eclipse.collections.api.list.primitive.MutableDoubleList;
-import org.eclipse.collections.impl.factory.primitive.DoubleLists;
-
-import cointoss.market.bitflyer.BitFlyer;
-import cointoss.market.bitflyer.SFD;
-import cointoss.ticker.Indicator;
-import cointoss.ticker.Tick;
-import cointoss.util.Chrono;
-import cointoss.util.Num;
 import kiss.I;
 import stylist.Style;
 import trademate.chart.Axis.TickLable;
@@ -379,21 +378,33 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             });
 
             double[] arrayX = valueX.toArray();
-            for (PlotDSL plotter : plotters) {
-                double height = getHeight();
-                double scale = plotter.scale();
-                GraphicsContext g = candles.getGraphicsContext2D();
+            double width = candles.getWidth();
+            double height = candles.getHeight();
 
+            for (PlotDSL plotter : plotters) {
+                double scale = plotter.scale();
+
+                // draw line chart
                 for (LineChart chart : plotter.lines) {
                     if (scale != 1) {
                         for (int i = 0; i < chart.valueY.size(); i++) {
                             chart.valueY.set(i, height - plotter.area.offset - chart.valueY.get(i) * scale);
                         }
                     }
-                    g.setLineWidth(chart.width);
-                    g.setStroke(chart.color);
-                    g.setLineDashes(chart.dashArray);
-                    g.strokePolyline(arrayX, chart.valueY.toArray(), arrayX.length);
+                    gc.setLineWidth(chart.width);
+                    gc.setStroke(chart.color);
+                    gc.setLineDashes(chart.dashArray);
+                    gc.strokePolyline(arrayX, chart.valueY.toArray(), arrayX.length);
+                }
+
+                // draw horizontal line
+                for (Horizon horizon : plotter.horizons) {
+                    double y = scale != 1 ? height - plotter.area.offset - horizon.value * scale : horizon.value;
+
+                    gc.setLineWidth(horizon.width);
+                    gc.setStroke(horizon.color);
+                    gc.setLineDashes(horizon.dashArray);
+                    gc.strokeLine(0, y, width, y);
                 }
             }
         });
@@ -420,24 +431,26 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             gc.setLineWidth(BarWidth);
             gc.strokeLine(x, open, x, close);
 
-            double lastX = axisX.getPositionForValue(tick.previous.start.toEpochSecond());
+            if (tick.previous != null) {
+                double lastX = axisX.getPositionForValue(tick.previous.start.toEpochSecond());
 
-            for (PlotDSL plotter : plotters) {
-                double height = getHeight();
-                double scale = plotter.scale();
-                GraphicsContext g = candleLatest.getGraphicsContext2D();
+                for (PlotDSL plotter : plotters) {
+                    double height = getHeight();
+                    double scale = plotter.scale();
+                    GraphicsContext g = candleLatest.getGraphicsContext2D();
 
-                for (LineChart chart : plotter.lines) {
-                    g.setLineWidth(chart.width);
-                    g.setStroke(chart.color);
-                    g.setLineDashes(chart.dashArray);
+                    for (LineChart chart : plotter.lines) {
+                        g.setLineWidth(chart.width);
+                        g.setStroke(chart.color);
+                        g.setLineDashes(chart.dashArray);
 
-                    if (scale != 1) {
-                        g.strokeLine(lastX, chart.valueY
-                                .getLast(), x, height - plotter.area.offset - chart.indicator.valueAt(tick).doubleValue() * scale);
-                    } else {
-                        g.strokeLine(lastX, chart.valueY.getLast(), x, axisY
-                                .getPositionForValue(chart.indicator.valueAt(tick).doubleValue()));
+                        if (scale != 1) {
+                            g.strokeLine(lastX, chart.valueY
+                                    .getLast(), x, height - plotter.area.offset - chart.indicator.valueAt(tick).doubleValue() * scale);
+                        } else {
+                            g.strokeLine(lastX, chart.valueY.getLast(), x, axisY
+                                    .getPositionForValue(chart.indicator.valueAt(tick).doubleValue()));
+                        }
                     }
                 }
             }
@@ -486,6 +499,35 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     /**
      * 
      */
+    static class Horizon {
+
+        /** The constant value. */
+        private final double value;
+
+        /** The indicator color. */
+        private final Color color;
+
+        /** The indicator line width. */
+        private final double width;
+
+        /** The indicator line style. */
+        private final double[] dashArray;
+
+        /**
+         * @param indicator
+         * @param style
+         */
+        Horizon(double value, Style style) {
+            this.value = value;
+            this.color = FXUtils.color(style, "stroke");
+            this.width = FXUtils.length(style, "stroke-width", 1);
+            this.dashArray = FXUtils.lengths(style, "stroke-dasharray");
+        }
+    }
+
+    /**
+     * 
+     */
     static class LineChart {
 
         /** The indicator. */
@@ -508,11 +550,9 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
          * @param style
          */
         LineChart(Indicator<? extends Number> indicator, Style style) {
-            double width = FXUtils.length(style, "stroke-width");
-
             this.indicator = indicator;
             this.color = FXUtils.color(style, "stroke");
-            this.width = width == 0 ? 1 : width;
+            this.width = FXUtils.length(style, "stroke-width", 1);
             this.dashArray = FXUtils.lengths(style, "stroke-dasharray");
         }
     }
