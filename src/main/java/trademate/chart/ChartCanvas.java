@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.eclipse.collections.api.list.primitive.MutableDoubleList;
-import org.eclipse.collections.impl.factory.primitive.DoubleLists;
+import org.eclipse.collections.impl.list.mutable.primitive.DoubleArrayList;
 
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.market.bitflyer.SFD;
@@ -345,7 +345,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                     chart.valueY.clear();
                 }
             }
-            MutableDoubleList valueX = DoubleLists.mutable.empty();
+            MutableDoubleList valueX = new NoCopyDoubleList();
 
             chart.ticker.v.each(visibleStartIndex, visibleSize, tick -> {
                 double x = axisX.getPositionForValue(tick.start.toEpochSecond());
@@ -404,7 +404,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                     gc.setLineWidth(chart.width);
                     gc.setStroke(chart.color);
                     gc.setLineDashes(chart.dashArray);
-                    gc.strokePolyline(arrayX, chart.valueY.toArray(), arrayX.length);
+                    gc.strokePolyline(arrayX, chart.valueY.toArray(), valueX.size());
                 }
             }
         });
@@ -540,7 +540,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         private final double[] dashArray;
 
         /** The y-axis values. */
-        private final MutableDoubleList valueY = DoubleLists.mutable.empty();
+        private final MutableDoubleList valueY = new NoCopyDoubleList();
 
         /**
          * @param indicator
@@ -718,6 +718,20 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                     }
                 }
             });
+        }
+    }
+
+    /**
+     * 
+     */
+    private static class NoCopyDoubleList extends DoubleArrayList {
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public double[] toArray() {
+            return items;
         }
     }
 }
