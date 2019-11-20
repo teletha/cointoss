@@ -30,7 +30,7 @@ import kiss.Signal;
 import kiss.WiseFunction;
 import kiss.WiseSupplier;
 
-public abstract class Trader {
+public abstract class Trader implements Profitable {
 
     /** The market. */
     protected final Market market;
@@ -99,16 +99,24 @@ public abstract class Trader {
     }
 
     /**
-     * Calculate the current profit and loss.
+     * A realized profit or loss of this entry.
      * 
-     * @return
+     * @return A realized profit or loss of this entry.
      */
-    public final Num profit() {
-        Num profit = Num.ZERO;
-        for (Scenario scenario : scenarios) {
-            profit = profit.plus(scenario.profit(market.tickers.latestPrice.v));
-        }
-        return profit;
+    @Override
+    public final Num realizedProfit() {
+        return scenarios.stream().map(Scenario::realizedProfit).reduce(Num.ZERO, Num::plus);
+    }
+
+    /**
+     * Calculate unrealized profit or loss on the current price.
+     * 
+     * @param currentPrice A current price.
+     * @return An unrealized profit or loss of this entry.
+     */
+    @Override
+    public final Num unrealizedProfit(Num currentPrice) {
+        return scenarios.stream().map(s -> s.unrealizedProfit(currentPrice)).reduce(Num.ZERO, Num::plus);
     }
 
     /**

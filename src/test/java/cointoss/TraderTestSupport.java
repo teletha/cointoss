@@ -73,7 +73,23 @@ public abstract class TraderTestSupport extends Trader {
         return market.service.now().plusSeconds(delay);
     }
 
+    /**
+     * Shorthand method to entry.
+     * 
+     * @param eentry
+     * @param exit
+     */
     protected final void entry(Execution e) {
+        entryPartial(e, e.size.doubleValue());
+    }
+
+    /**
+     * Shorthand method to entry.
+     * 
+     * @param eentry
+     * @param exit
+     */
+    protected final void entryPartial(Execution e, double partialEntrySize) {
         when(now(), v -> new Scenario() {
 
             @Override
@@ -85,7 +101,7 @@ public abstract class TraderTestSupport extends Trader {
             protected void exit() {
             }
         });
-        market.perform(Execution.with.direction(e.direction, e.size).price(e.price.minus(e, 1)).date(e.date));
+        market.perform(Execution.with.direction(e.direction, partialEntrySize).price(e.price.minus(e, 1)).date(e.date));
         awaitOrderBufferingTime();
     }
 
@@ -96,6 +112,36 @@ public abstract class TraderTestSupport extends Trader {
      * @param exit
      */
     protected final void entryAndExit(Execution e, Execution exit) {
+        entryPartialAndExit(e, e.size.doubleValue(), exit);
+    }
+
+    /**
+     * Shorthand method to entry and exit.
+     * 
+     * @param eentry
+     * @param exit
+     */
+    protected final void entryAndExitPartial(Execution e, Execution exit, double partialExitSize) {
+        entryPartialAndExitPartial(e, e.size.doubleValue(), exit, partialExitSize);
+    }
+
+    /**
+     * Shorthand method to entry and exit.
+     * 
+     * @param eentry
+     * @param exit
+     */
+    protected final void entryPartialAndExit(Execution e, double partialEntrySize, Execution exit) {
+        entryPartialAndExitPartial(e, partialEntrySize, exit, exit.size.doubleValue());
+    }
+
+    /**
+     * Shorthand method to entry and exit.
+     * 
+     * @param eentry
+     * @param exit
+     */
+    protected final void entryPartialAndExitPartial(Execution e, double partialEntrySize, Execution exit, double partialExitSize) {
         when(now(), v -> new Scenario() {
 
             @Override
@@ -109,9 +155,9 @@ public abstract class TraderTestSupport extends Trader {
             }
         });
 
-        market.perform(Execution.with.direction(e.direction, e.size).price(e.price.minus(e, 1)).date(e.date));
+        market.perform(Execution.with.direction(e.direction, partialEntrySize).price(e.price.minus(e, 1)).date(e.date));
         awaitOrderBufferingTime();
-        market.perform(Execution.with.direction(e.inverse(), exit.size).price(exit.price.minus(e.inverse(), 1)).date(exit.date));
+        market.perform(Execution.with.direction(e.inverse(), partialExitSize).price(exit.price.minus(e.inverse(), 1)).date(exit.date));
         awaitOrderBufferingTime();
     }
 }
