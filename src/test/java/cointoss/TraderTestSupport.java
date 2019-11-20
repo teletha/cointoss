@@ -23,6 +23,8 @@ public abstract class TraderTestSupport extends Trader {
 
     protected VerifiableMarket market;
 
+    protected ZonedDateTime base;
+
     /**
      * @param provider
      */
@@ -36,6 +38,8 @@ public abstract class TraderTestSupport extends Trader {
     void initialize() {
         market.service.clear();
         scenarios.clear();
+
+        base = market.service.now();
     }
 
     /**
@@ -71,6 +75,17 @@ public abstract class TraderTestSupport extends Trader {
      */
     protected final ZonedDateTime second(long delay) {
         return market.service.now().plusSeconds(delay);
+    }
+
+    /**
+     * Build date time.
+     * 
+     * @param time
+     * @param unit
+     * @return
+     */
+    protected final ZonedDateTime after(long time, ChronoUnit unit) {
+        return market.service.now().plus(time, unit);
     }
 
     /**

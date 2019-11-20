@@ -16,7 +16,7 @@ import cointoss.util.ObservableNumProperty;
 import icy.manipulator.Icy;
 
 @Icy(setterModifier = "final")
-abstract class ScenarioBaseModel implements Directional {
+abstract class ScenarioBaseModel implements Directional, Profitable {
 
     /**
      * {@inheritDoc}
@@ -105,32 +105,27 @@ abstract class ScenarioBaseModel implements Directional {
     }
 
     /**
-     * Calculate total profit or loss on the current price.
-     * 
-     * @param currentPrice A current price.
-     * @return A total profit or loss of this entry.
+     * {@inheritDoc}
      */
+    @Override
     @PerformanceSensitive
     public final Num profit(Num currentPrice) {
         return realizedProfit().plus(unrealizedProfit(currentPrice));
     }
 
     /**
-     * A realized profit or loss of this entry.
-     * 
-     * @return A realized profit or loss of this entry.
+     * {@inheritDoc}
      */
+    @Override
     @Icy.Property(custom = ObservableNumProperty.class)
     public Num realizedProfit() {
         return Num.ZERO;
     }
 
     /**
-     * Calculate unrealized profit or loss on the current price.
-     * 
-     * @param currentPrice A current price.
-     * @return An unrealized profit or loss of this entry.
+     * {@inheritDoc}
      */
+    @Override
     @PerformanceSensitive
     public final Num unrealizedProfit(Num currentPrice) {
         return currentPrice.diff(direction(), entryPrice()).multiply(entryExecutedSize().minus(exitExecutedSize()));
