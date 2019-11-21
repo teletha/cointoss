@@ -23,6 +23,9 @@ import cointoss.Trader;
 import cointoss.TradingLog;
 import cointoss.analyze.Analyzer;
 import cointoss.analyze.ConsoleAnalyzer;
+import cointoss.execution.Execution;
+import cointoss.ticker.Span;
+import cointoss.ticker.Tick;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
 import icy.manipulator.Icy;
@@ -160,7 +163,12 @@ interface BackTestModel {
         List<Trader> traders = I.signal(traders()).map(t -> t.apply(market)).toList();
 
         LocalDateTime start = LocalDateTime.now();
-        market.readLog(log -> log.range(start(), end()).effect(market::perform).effectOnError(Throwable::printStackTrace));
+        market.readLog(log -> log.range(start(), end()).effect(market::perform).effectOnComplete(() -> {
+            // Since a display that matches the actual final result can be expected, a dummy tick is
+            // added at the end.
+            Tick last = market.tickers.of(Span.Second5).last();
+            market.perform(Execution.with.buy(market.service.setting.targetCurrencyMinimumBidSize).price(last.closePrice()).date(last.end));
+        }).effectOnError(Throwable::printStackTrace));
         LocalDateTime end = LocalDateTime.now();
 
         for (Trader trader : traders) {

@@ -10,8 +10,8 @@
 package trademate.chart;
 
 enum PlotArea {
-    Top(true, 0, 35, 10), High(true, 70, 35, 10), Low(false, 70, 35, 10), LowNarrow(false, 70, 20, 5), Bottom(false, 0, 35,
-            10), Main(true, 0, -1, -1);
+    Top(true, 0, 35, 10), High(true, 70, 35, 15), Low(false, 70, 35, 10), LowNarrow(false, 70, 25, 9), Bottom(false, 0, 35, 10), Main(true,
+            0, -1, -1);
 
     /** The positioning. */
     final boolean direction;

@@ -457,10 +457,8 @@ public class VerifiableMarketService extends MarketService {
         if (order.type == OrderType.Taker) {
             return true;
         }
-
         if (order.isBuy()) {
             Num price = order.price;
-
             return price.isGreaterThan(e.price) || price.is(setting.baseCurrencyMinimumBidPrice());
         } else {
             return order.price.isLessThan(e.price);

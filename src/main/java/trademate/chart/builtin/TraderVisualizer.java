@@ -37,7 +37,7 @@ public class TraderVisualizer extends PlotScript implements StyleDSL {
     };
 
     public Style size = () -> {
-        stroke.color(Color.rgb(220, 220, 200));
+        stroke.color(Color.rgb(220, 220, 200)).width(0.3, px);
     };
 
     /**
