@@ -93,6 +93,24 @@ public abstract class Trader extends TraderBase {
     }
 
     /**
+     * Check whether this {@link Trader} is active or not.
+     * 
+     * @return it returns true if this {@link Trader} is active.
+     */
+    protected final boolean isEnable() {
+        return disable.isEmpty();
+    }
+
+    /**
+     * Check whether this {@link Trader} is disactive or not.
+     * 
+     * @return it returns true if this {@link Trader} is disactive.
+     */
+    protected final boolean isDisable() {
+        return !disable.isEmpty();
+    }
+
+    /**
      * Disable this {@link Trader} while the specified duration.
      * 
      * @param duration

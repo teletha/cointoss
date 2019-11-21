@@ -504,4 +504,19 @@ class TraderTest extends TraderTestSupport {
         s = latest();
         assert s != null;
     }
+
+    @Test
+    void isEnableAndIsDisable() {
+        Variable<Boolean> disable = Variable.of(false);
+        disableWhile(disable.observe());
+
+        // enable
+        assert isEnable() == true;
+        assert isDisable() == false;
+
+        // disable
+        disable.set(true);
+        assert isEnable() == false;
+        assert isDisable() == true;
+    }
 }
