@@ -31,6 +31,12 @@ public class TradingLog {
     /** summary */
     public final Statistics holdTimeLoss = new Statistics().formatter(Chrono::formatAsDuration);
 
+    /** summary. */
+    public final Num holdMaxSize;
+
+    /** summary. */
+    public final Num holdCurrentSize;
+
     /** summary */
     public final Statistics profit;
 
@@ -97,7 +103,7 @@ public class TradingLog {
     /**
      * Analyze trading.
      */
-    public TradingLog(Market market, FundManager funds, List<Scenario> entries) {
+    public TradingLog(Market market, FundManager funds, List<Scenario> entries, Trader trader) {
         Function<Num, String> format = v -> v.scale(market.service.setting.baseCurrencyScaleSize).format(NumberFormat.getNumberInstance());
         this.profit = new Statistics().formatter(format);
         this.profitRange = new Statistics().formatter(format);
@@ -113,6 +119,8 @@ public class TradingLog {
         this.unrealizedLossRange = new Statistics().formatter(format).negative();
         this.profitAndLoss = new Statistics().formatter(format);
         this.scenarios = entries;
+        this.holdMaxSize = trader.maxHoldSize();
+        this.holdCurrentSize = trader.currentHoldSize();
 
         for (Scenario entry : entries) {
             if (entry.isCanceled()) {
@@ -196,11 +204,11 @@ public class TradingLog {
             }
         }
 
-        builder.append("時間 ").append(holdTime).append("\t実行").append(Chrono.formatAsDuration(duration.toMillis())).append(EOL);
-        // builder.append("利益 ").append(profit).append(EOL);
+        builder.append("実行時間 ").append(Chrono.formatAsDuration(duration.toMillis())).append(EOL);
+        builder.append("枚数 現在").append(holdCurrentSize).append(" 最大").append(holdMaxSize).append(EOL);
+        builder.append("時間 ").append(holdTime).append(EOL);
         builder.append("利幅 ").append(profitRange).append(EOL);
         builder.append("含利幅 ").append(unrealizedProfitRange).append(EOL);
-        // builder.append("損失 ").append(loss).append(EOL);
         builder.append("損幅 ").append(lossRange).append(EOL);
         builder.append("含損幅 ").append(unrealizedLossRange).append(EOL);
         builder.append("総合 ")

@@ -63,6 +63,12 @@ public abstract class Trader {
     @VisibleForTesting
     final NavigableMap<ZonedDateTime, Snapshot> snapshots = new TreeMap<>(Map.of(Chrono.MIN, EMPTY_SNAPSHOT));
 
+    /** The actual maximum holding size. (historical data) */
+    private Num maxHoldSize = Num.ZERO;
+
+    /** The current holding size. */
+    private Num currentHoldSize = Num.ZERO;
+
     /**
      * Declare your strategy.
      * 
@@ -126,12 +132,30 @@ public abstract class Trader {
     }
 
     /**
+     * Return the maximum hold size of target currency.
+     * 
+     * @return A maximum hold size.
+     */
+    public final Num maxHoldSize() {
+        return maxHoldSize;
+    }
+
+    /**
+     * Return the current hold size of target currency.
+     * 
+     * @return A current hold size.
+     */
+    public final Num currentHoldSize() {
+        return currentHoldSize;
+    }
+
+    /**
      * Create the snapshot of trading log.
      * 
      * @return
      */
     public final TradingLog log() {
-        return new TradingLog(market, funds, scenarios);
+        return new TradingLog(market, funds, scenarios, this);
     }
 
     /**
@@ -210,6 +234,12 @@ public abstract class Trader {
                         : letest.remainingSize.multiply(letest.entryPrice).plus(deltaRemainingSize.multiply(price)).divide(newSize);
 
         snapshots.put(now, new Snapshot(newRealized, newPrice, newSize));
+
+        // update holding size
+        currentHoldSize = newSize;
+        if (newSize.abs().isGreaterThan(maxHoldSize)) {
+            maxHoldSize = newSize;
+        }
     }
 
     /**
