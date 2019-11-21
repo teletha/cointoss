@@ -9,9 +9,9 @@
  */
 package cointoss.execution;
 
-import static java.nio.charset.StandardCharsets.ISO_8859_1;
+import static java.nio.charset.StandardCharsets.*;
 import static java.nio.file.StandardOpenOption.*;
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -785,7 +785,7 @@ public class ExecutionLog {
     }
 
     public static void main(String[] args) {
-        restoreNormalLog(BitFlyer.FX_BTC_JPY, Chrono.utc(2019, 11, 8));
+        restoreNormalLog(BitFlyer.FX_BTC_JPY, Chrono.utc(2019, 10, 30));
     }
 
     public static void main2(String[] args) {

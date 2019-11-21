@@ -9,7 +9,7 @@
  */
 package cointoss.verify;
 
-import static java.time.temporal.ChronoUnit.MINUTES;
+import static java.time.temporal.ChronoUnit.*;
 
 import cointoss.Direction;
 import cointoss.Market;
@@ -28,8 +28,8 @@ public class BackTestInvoker {
         int day = 17;
 
         BackTest.with.service(BitFlyer.FX_BTC_JPY)
-                .start(2019, 11, 8)
-                .end(2019, 11, 8)
+                .start(2019, 10, 30)
+                .end(2019, 10, 30)
                 .traders(LazyBear::new)
                 .initialBaseCurrency(3000000)
                 .run();

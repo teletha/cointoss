@@ -133,10 +133,12 @@ public abstract class Trader implements Profitable {
     }
 
     /**
-     * {@inheritDoc}
+     * Calcualte the sanpshot when market is the specified datetime and price.
+     * 
+     * @param time The specified date and time.
+     * @return A snapshot of this {@link Scenario}.
      */
-    @Override
-    public Profitable snapshotAt(ZonedDateTime time) {
+    public final Profitable snapshotAt(ZonedDateTime time) {
         return snapshots.floorEntry(time).getValue();
     }
 
@@ -208,35 +210,31 @@ public abstract class Trader implements Profitable {
     }
 
     /**
-     * Create state snapshot.
+     * Update snapshot.
      * 
-     * @return
+     * @param deltaRealizedProfit
+     * @param deltaRemainingSize
+     * @param price
      */
-    void snapshot(Num increasedRealizedProfit, Num increasedRemainingSize, Num increasedPrice) {
-        Snapshot previous = snapshots.lastEntry().getValue();
+    void updateSnapshot(Num deltaRealizedProfit, Num deltaRemainingSize, Num price) {
+        Snapshot letest = snapshots.lastEntry().getValue();
 
         ZonedDateTime now = market.service.now().plus(59, SECONDS).truncatedTo(MINUTES);
-        Num realizedProfit = previous.realizedProfit.plus(increasedRealizedProfit);
-        Num remainingSize = previous.remainingSize.plus(increasedRemainingSize);
-        Num entryPrice = remainingSize.isZero() ? Num.ZERO
-                : increasedPrice != null
-                        ? previous.remainingSize.multiply(previous.entryPrice)
-                                .plus(increasedRemainingSize.multiply(increasedPrice))
-                                .divide(remainingSize)
-                        : previous.entryPrice;
+        Num newRealized = letest.realizedProfit.plus(deltaRealizedProfit);
+        Num newSize = letest.remainingSize.plus(deltaRemainingSize);
+        Num newPrice = newSize.isZero() ? Num.ZERO
+                : price == null ? letest.entryPrice
+                        : letest.remainingSize.multiply(letest.entryPrice).plus(deltaRemainingSize.multiply(price)).divide(newSize);
 
-        snapshots.put(now, new Snapshot(null, realizedProfit, entryPrice, remainingSize));
+        snapshots.put(now, new Snapshot(newRealized, newPrice, newSize));
     }
 
-    static final Snapshot EMPTY_SNAPSHOT = new Snapshot(Direction.BUY, Num.ZERO, Num.ZERO, Num.ZERO);
+    static final Snapshot EMPTY_SNAPSHOT = new Snapshot(Num.ZERO, Num.ZERO, Num.ZERO);
 
     /**
-     * 
+     * The snapshot of {@link Trader}'s state.
      */
     private static class Snapshot implements Profitable {
-
-        /** The direction. */
-        private final Direction direction;
 
         /** The realized profit. */
         private final Num realizedProfit;
@@ -248,12 +246,13 @@ public abstract class Trader implements Profitable {
         private final Num remainingSize;
 
         /**
+         * Store the current state.
+         * 
          * @param realizedProfit
          * @param entryPrice
          * @param entryExecutedUnexitedSize
          */
-        private Snapshot(Direction direction, Num realizedProfit, Num entryPrice, Num remainingSize) {
-            this.direction = direction;
+        private Snapshot(Num realizedProfit, Num entryPrice, Num remainingSize) {
             this.realizedProfit = realizedProfit;
             this.entryPrice = entryPrice;
             this.remainingSize = remainingSize;

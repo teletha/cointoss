@@ -187,6 +187,5 @@ public abstract class TraderTestSupport extends Trader {
         awaitOrderBufferingTime();
         market.perform(Execution.with.direction(e.inverse(), partialExitSize).price(exit.price.minus(e.inverse(), 1)).date(exit.date));
         awaitOrderBufferingTime();
-        System.out.println(latest());
     }
 }

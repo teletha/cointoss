@@ -222,12 +222,12 @@ public abstract class Scenario extends ScenarioBase implements Directional {
         logEntry("Process entry order");
 
         order.observeExecutedSize().to(v -> {
-            Num increaseSize = v.minus(entryExecutedSize);
+            Num deltaSize = v.minus(entryExecutedSize);
 
             updateOrderRelatedStatus(entries, this::setEntryPrice, this::setEntryExecutedSize);
-            logEntry("Update entry order");
+            trader.updateSnapshot(Num.ZERO, isBuy() ? deltaSize : deltaSize.negate(), order.price);
 
-            trader.snapshot(Num.ZERO, isBuy() ? increaseSize : increaseSize.negate(), order.price);
+            logEntry("Update entry order");
         });
     }
 
@@ -400,13 +400,13 @@ public abstract class Scenario extends ScenarioBase implements Directional {
         logExit("Process exit order");
 
         order.observeExecutedSize().to(v -> {
-            Num increaseSize = v.minus(exitExecutedSize);
+            Num previous = realizedProfit;
+            Num deltaSize = v.minus(exitExecutedSize);
 
             updateOrderRelatedStatus(exits, this::setExitPrice, this::setExitExecutedSize);
-            logExit("Update exit order");
+            trader.updateSnapshot(realizedProfit.minus(previous), isBuy() ? deltaSize.negate() : deltaSize, null);
 
-            Num increasedRealizedProfit = exitPrice.diff(this, entryPrice).multiply(v);
-            trader.snapshot(increasedRealizedProfit, isBuy() ? increaseSize.negate() : increaseSize, null);
+            logExit("Update exit order");
         });
     }
 
