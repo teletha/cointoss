@@ -29,6 +29,9 @@ public abstract class PlotScript {
     protected final PlotDSL bottom = new PlotDSL(PlotArea.Bottom);
 
     /** The plotter. */
+    protected final PlotDSL bottomN = new PlotDSL(PlotArea.BottomNarrow);
+
+    /** The plotter. */
     protected final PlotDSL low = new PlotDSL(PlotArea.Low);
 
     /** The plotter. */
@@ -38,7 +41,13 @@ public abstract class PlotScript {
     protected final PlotDSL high = new PlotDSL(PlotArea.High);
 
     /** The plotter. */
+    protected final PlotDSL highN = new PlotDSL(PlotArea.HighNarrow);
+
+    /** The plotter. */
     protected final PlotDSL top = new PlotDSL(PlotArea.Top);
+
+    /** The plotter. */
+    protected final PlotDSL topN = new PlotDSL(PlotArea.TopNarrow);
 
     /** The plotter. */
     protected final PlotDSL main = new PlotDSL(PlotArea.Main);
