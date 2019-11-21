@@ -408,25 +408,25 @@ class TraderTest extends TraderTestSupport {
     }
 
     @Test
-    void holdSize() {
+    void holdSizeAndHoldMaxSize() {
         entry(Execution.with.buy(1).price(10));
-        assert currentHoldSize().is(1);
-        assert maxHoldSize().is(1);
+        assert holdSize().is(1);
+        assert holdMaxSize.is(1);
 
         entry(Execution.with.buy(2).price(10));
-        assert currentHoldSize().is(3);
-        assert maxHoldSize().is(3);
+        assert holdSize().is(3);
+        assert holdMaxSize.is(3);
 
         entry(Execution.with.sell(1).price(20));
-        assert currentHoldSize().is(2);
-        assert maxHoldSize().is(3);
+        assert holdSize().is(2);
+        assert holdMaxSize.is(3);
 
         entry(Execution.with.sell(3).price(20));
-        assert currentHoldSize().is(-1);
-        assert maxHoldSize().is(3);
+        assert holdSize().is(-1);
+        assert holdMaxSize.is(3);
 
         entry(Execution.with.sell(3).price(20));
-        assert currentHoldSize().is(-4);
-        assert maxHoldSize().is(4);
+        assert holdSize().is(-4);
+        assert holdMaxSize.is(4);
     }
 }

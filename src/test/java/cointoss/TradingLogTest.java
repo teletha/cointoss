@@ -9,8 +9,6 @@
  */
 package cointoss;
 
-import static cointoss.execution.Execution.with;
-
 import org.junit.jupiter.api.Test;
 
 import cointoss.execution.Execution;
@@ -223,9 +221,9 @@ public class TradingLogTest extends TraderTestSupport {
 
     @Test
     void drawDown1() {
-        entryAndExit(with.buy(1).price(10), with.buy(1).price(15)); // win 5
-        entryAndExit(with.buy(1).price(10), with.buy(1).price(15)); // win 5
-        entryAndExit(with.sell(1).price(25), with.buy(1).price(30)); // lose -5
+        entryAndExit(Execution.with.buy(1).price(10), Execution.with.buy(1).price(15)); // win 5
+        entryAndExit(Execution.with.buy(1).price(10), Execution.with.buy(1).price(15)); // win 5
+        entryAndExit(Execution.with.sell(1).price(25), Execution.with.buy(1).price(30)); // lose -5
 
         TradingLog log = log();
         assert log.drawDownRatio.is("0.045");
@@ -233,13 +231,13 @@ public class TradingLogTest extends TraderTestSupport {
 
     @Test
     void drawDown2() {
-        entryAndExit(with.buy(1).price(10), with.buy(1).price(30)); // win 20
-        entryAndExit(with.buy(1).price(30), with.buy(1).price(25)); // lose -5
-        entryAndExit(with.buy(1).price(10), with.buy(1).price(40)); // win 30
-        entryAndExit(with.buy(1).price(50), with.buy(1).price(25)); // lose -25
-        entryAndExit(with.buy(1).price(30), with.buy(1).price(25)); // lose -5
-        entryAndExit(with.buy(1).price(35), with.buy(1).price(25)); // lose -10
-        entryAndExit(with.buy(1).price(10), with.buy(1).price(40)); // win 30
+        entryAndExit(Execution.with.buy(1).price(10), Execution.with.buy(1).price(30)); // win 20
+        entryAndExit(Execution.with.buy(1).price(30), Execution.with.buy(1).price(25)); // lose -5
+        entryAndExit(Execution.with.buy(1).price(10), Execution.with.buy(1).price(40)); // win 30
+        entryAndExit(Execution.with.buy(1).price(50), Execution.with.buy(1).price(25)); // lose -25
+        entryAndExit(Execution.with.buy(1).price(30), Execution.with.buy(1).price(25)); // lose -5
+        entryAndExit(Execution.with.buy(1).price(35), Execution.with.buy(1).price(25)); // lose -10
+        entryAndExit(Execution.with.buy(1).price(10), Execution.with.buy(1).price(40)); // win 30
 
         TradingLog log = log();
         assert log.drawDownRatio.is("0.276");
@@ -247,10 +245,10 @@ public class TradingLogTest extends TraderTestSupport {
 
     @Test
     void drawDown3() {
-        entryAndExit(with.buy(1).price(10), with.buy(1).price(15)); // lose 5
-        entryAndExit(with.sell(1).price(10), with.buy(1).price(35)); // lose -25
-        entryAndExit(with.sell(1).price(10), with.buy(1).price(15)); // lose -5
-        entryAndExit(with.sell(1).price(10), with.buy(1).price(20)); // lose -10
+        entryAndExit(Execution.with.buy(1).price(10), Execution.with.buy(1).price(15)); // lose 5
+        entryAndExit(Execution.with.sell(1).price(10), Execution.with.buy(1).price(35)); // lose -25
+        entryAndExit(Execution.with.sell(1).price(10), Execution.with.buy(1).price(15)); // lose -5
+        entryAndExit(Execution.with.sell(1).price(10), Execution.with.buy(1).price(20)); // lose -10
 
         TradingLog log = log();
         assert log.drawDownRatio.is("0.381");
@@ -258,9 +256,9 @@ public class TradingLogTest extends TraderTestSupport {
 
     @Test
     void drawDownWinAll() {
-        entryAndExit(with.buy(1).price(10), with.buy(1).price(30)); // win 20
-        entryAndExit(with.buy(1).price(10), with.buy(1).price(40)); // win 30
-        entryAndExit(with.buy(1).price(10), with.buy(1).price(30)); // win 30
+        entryAndExit(Execution.with.buy(1).price(10), Execution.with.buy(1).price(30)); // win 20
+        entryAndExit(Execution.with.buy(1).price(10), Execution.with.buy(1).price(40)); // win 30
+        entryAndExit(Execution.with.buy(1).price(10), Execution.with.buy(1).price(30)); // win 30
 
         TradingLog log = log();
         assert log.drawDownRatio.is(0);
@@ -268,10 +266,10 @@ public class TradingLogTest extends TraderTestSupport {
 
     @Test
     void drawDownLoseAll() {
-        entryAndExit(with.sell(1).price(10), with.buy(1).price(15)); // lose -5
-        entryAndExit(with.sell(1).price(10), with.buy(1).price(35)); // lose -25
-        entryAndExit(with.sell(1).price(10), with.buy(1).price(15)); // lose -5
-        entryAndExit(with.sell(1).price(10), with.buy(1).price(20)); // lose -10
+        entryAndExit(Execution.with.sell(1).price(10), Execution.with.buy(1).price(15)); // lose -5
+        entryAndExit(Execution.with.sell(1).price(10), Execution.with.buy(1).price(35)); // lose -25
+        entryAndExit(Execution.with.sell(1).price(10), Execution.with.buy(1).price(15)); // lose -5
+        entryAndExit(Execution.with.sell(1).price(10), Execution.with.buy(1).price(20)); // lose -10
 
         TradingLog log = log();
         assert log.drawDownRatio.is("0.45");

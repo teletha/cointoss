@@ -9,7 +9,7 @@
  */
 package cointoss;
 
-import static cointoss.util.Num.*;
+import static cointoss.util.Num.HUNDRED;
 
 import java.text.NumberFormat;
 import java.time.Duration;
@@ -119,8 +119,8 @@ public class TradingLog {
         this.unrealizedLossRange = new Statistics().formatter(format).negative();
         this.profitAndLoss = new Statistics().formatter(format);
         this.scenarios = entries;
-        this.holdMaxSize = trader.maxHoldSize();
-        this.holdCurrentSize = trader.currentHoldSize();
+        this.holdMaxSize = trader.holdMaxSize;
+        this.holdCurrentSize = trader.holdSize;
 
         for (Scenario entry : entries) {
             if (entry.isCanceled()) {

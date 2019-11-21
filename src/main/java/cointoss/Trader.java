@@ -13,7 +13,6 @@ import static java.time.temporal.ChronoUnit.*;
 
 import java.time.ZonedDateTime;
 import java.time.temporal.TemporalUnit;
-import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Objects;
 import java.util.TreeMap;
@@ -38,7 +37,7 @@ import kiss.Signal;
 import kiss.WiseFunction;
 import kiss.WiseSupplier;
 
-public abstract class Trader {
+public abstract class Trader extends TraderBase {
 
     /** The identity element of {@link Snapshot}. */
     private static final Snapshot EMPTY_SNAPSHOT = new Snapshot(Num.ZERO, Num.ZERO, Num.ZERO);
@@ -59,13 +58,10 @@ public abstract class Trader {
     private final Disposable disposer = Disposable.empty();
 
     /** The state snapshot. */
-    private NavigableMap<ZonedDateTime, Snapshot> snapshots;
+    private final NavigableMap<ZonedDateTime, Snapshot> snapshots = new TreeMap();
 
     /** The actual maximum holding size. (historical data) */
     private Num maxHoldSize;
-
-    /** The current holding size. */
-    private Num currentHoldSize;
 
     /**
      * Declare your strategy.
@@ -87,8 +83,9 @@ public abstract class Trader {
     void initialize() {
         scenarios.clear();
         maxHoldSize = Num.ZERO;
-        currentHoldSize = Num.ZERO;
-        snapshots = new TreeMap<>(Map.of(Chrono.MIN, EMPTY_SNAPSHOT));
+        setHoldSize(Num.ZERO);
+        snapshots.clear();
+        snapshots.put(Chrono.MIN, EMPTY_SNAPSHOT);
     }
 
     /**
@@ -148,25 +145,6 @@ public abstract class Trader {
      */
     public final Profitable snapshotAt(ZonedDateTime time) {
         return snapshots.floorEntry(time).getValue();
-    }
-
-    /**
-     * Return the maximum hold size of target currency.
-     * 
-     * @return A maximum hold size.
-     */
-    public final Num maxHoldSize() {
-        return maxHoldSize;
-    }
-
-    /**
-     * Return the current hold size of target currency. Positive number means long position,
-     * negative number means short position. Zero means no position.
-     * 
-     * @return A current hold size.
-     */
-    public final Num currentHoldSize() {
-        return currentHoldSize;
     }
 
     /**
@@ -256,7 +234,7 @@ public abstract class Trader {
         snapshots.put(now, new Snapshot(newRealized, newPrice, newSize));
 
         // update holding size
-        currentHoldSize = newSize;
+        setHoldSize(newSize);
         if (newSize.abs().isGreaterThan(maxHoldSize)) {
             maxHoldSize = newSize.abs();
         }
