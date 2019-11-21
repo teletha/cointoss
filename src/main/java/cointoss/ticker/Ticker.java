@@ -88,17 +88,17 @@ public final class Ticker implements Disposable {
             // execution actually belongs to, it is assumed that there was a blank time
             // (i.e. server error, maintenance). So we complement them in advance.
             ZonedDateTime start = span.calculateStartTime(execution.date);
+            Tick prev = ticks.last();
 
             while (current.end.isBefore(start)) {
                 current.freeze();
-                current = new Tick(ticks.last(), current.end, span, current.closePrice(), realtime);
+                current = new Tick(prev, current.end, span, current.closePrice(), realtime);
                 ticks.add(current);
-                additions.accept(current);
             }
 
             // create the latest tick for execution
             current.freeze();
-            current = new Tick(ticks.last(), current.end, span, execution.price, realtime);
+            current = new Tick(prev, current.end, span, execution.price, realtime);
             ticks.add(current);
             additions.accept(current);
             return true;
