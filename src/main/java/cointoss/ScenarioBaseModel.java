@@ -47,11 +47,10 @@ abstract class ScenarioBaseModel implements Directional, Profitable {
     }
 
     /**
-     * A remaining size of entry orders.
-     * 
-     * @return A remaining size of entry orders.
+     * {@inheritDoc}
      */
-    public Num entryRemainingSize() {
+    @Override
+    public final Num entryRemainingSize() {
         return entrySize().minus(entryExecutedSize());
     }
 

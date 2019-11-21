@@ -120,26 +120,31 @@ class ScenarioProfitTest extends TraderTestSupport {
         Profitable snapshot = snapshotAt(minute(1));
         assert snapshot.realizedProfit().is(0);
         assert snapshot.unrealizedProfit(Num.of(12)).is(2);
+        assert snapshot.entryRemainingSize().is(1);
 
         // past
         snapshot = snapshotAt(minute(2));
         assert snapshot.realizedProfit().is(0);
         assert snapshot.unrealizedProfit(Num.of(6)).is(-4);
+        assert snapshot.entryRemainingSize().is(1);
 
         // past
         snapshot = snapshotAt(minute(4));
         assert snapshot.realizedProfit().is(0);
         assert snapshot.unrealizedProfit(Num.of(15)).is(5);
+        assert snapshot.entryRemainingSize().is(1);
 
         // future
         snapshot = snapshotAt(minute(6));
         assert snapshot.realizedProfit().is(10);
         assert snapshot.unrealizedProfit(Num.of(25)).is(0);
+        assert snapshot.entryRemainingSize().is(0);
 
         // future
         snapshot = snapshotAt(minute(10));
         assert snapshot.realizedProfit().is(10);
         assert snapshot.unrealizedProfit(Num.of(5)).is(0);
+        assert snapshot.entryRemainingSize().is(0);
     }
 
     @Test

@@ -9,7 +9,7 @@
  */
 package trademate.chart.builtin;
 
-import static cointoss.ticker.Span.Minute1;
+import static cointoss.ticker.Span.*;
 
 import cointoss.Market;
 import cointoss.Profitable;
@@ -36,28 +36,36 @@ public class TraderVisualizer extends PlotScript implements StyleDSL {
         stroke.color(Color.rgb(201, 216, 150)).dashArray(1, 6);
     };
 
+    public Style size = () -> {
+        stroke.color(Color.rgb(220, 220, 200));
+    };
+
     /**
      * {@inheritDoc}
      */
     @Override
     protected void declare(Market market, Ticker ticker) {
         int scale = market.service.setting.baseCurrencyScaleSize;
+        int targetScale = market.service.setting.targetCurrencyScaleSize;
 
         Indicator<TraderState> indicator = Indicator.build(market.tickers.of(Minute1), tick -> {
             Num realized = Num.ZERO;
             Num unrealized = Num.ZERO;
+            Num size = Num.ZERO;
 
             for (Trader trader : market.traders) {
                 Profitable snapshot = trader.snapshotAt(tick.start);
                 realized = realized.plus(snapshot.realizedProfit());
                 unrealized = unrealized.plus(snapshot.unrealizedProfit(tick.openPrice));
+                size = size.plus(snapshot.entryRemainingSize());
             }
-            return new TraderState(realized.scale(scale), unrealized.scale(scale));
+            return new TraderState(realized.scale(scale), unrealized.scale(scale), size.scale(targetScale));
         }).memoize();
 
         up.line(indicator.map(s -> s.realized), realized);
         up.line(indicator.map(s -> s.unrealized), unrealized);
         up.line(indicator.map(s -> s.profit), profit);
+        up.line(indicator.map(s -> s.size), size);
     }
 
     /**
@@ -74,14 +82,18 @@ public class TraderVisualizer extends PlotScript implements StyleDSL {
         /** The total profit. */
         public final Num profit;
 
+        /** The total size. */
+        public final Num size;
+
         /**
          * @param realizedProfit
          * @param unrealizedProfit
          */
-        private TraderState(Num realizedProfit, Num unrealizedProfit) {
+        private TraderState(Num realizedProfit, Num unrealizedProfit, Num size) {
             this.realized = realizedProfit;
             this.unrealized = unrealizedProfit;
             this.profit = realizedProfit.plus(unrealizedProfit);
+            this.size = size;
         }
     }
 }

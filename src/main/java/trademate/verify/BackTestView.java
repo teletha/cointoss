@@ -9,7 +9,7 @@
  */
 package trademate.verify;
 
-import static transcript.Transcript.en;
+import static transcript.Transcript.*;
 
 import java.time.Period;
 import java.util.List;
@@ -179,7 +179,7 @@ public class BackTestView extends View implements Analyzer {
     @Override
     public void analyze(Market market, List<TradingLog> logs) {
         for (TradingLog log : logs) {
-            System.out.println(log.showByText(true));
+            System.out.println(log);
         }
 
         Viewtify.inUI(() -> {

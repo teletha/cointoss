@@ -38,7 +38,11 @@ import kiss.Signal;
 import kiss.WiseFunction;
 import kiss.WiseSupplier;
 
-public abstract class Trader implements Profitable {
+public abstract class Trader {
+
+    /** The identity element of {@link Snapshot}. */
+    @VisibleForTesting
+    static final Snapshot EMPTY_SNAPSHOT = new Snapshot(Num.ZERO, Num.ZERO, Num.ZERO);
 
     /** The market. */
     protected final Market market;
@@ -109,27 +113,6 @@ public abstract class Trader implements Profitable {
             }
         }));
         return this;
-    }
-
-    /**
-     * A realized profit or loss of this entry.
-     * 
-     * @return A realized profit or loss of this entry.
-     */
-    @Override
-    public final Num realizedProfit() {
-        return scenarios.stream().map(Scenario::realizedProfit).reduce(Num.ZERO, Num::plus);
-    }
-
-    /**
-     * Calculate unrealized profit or loss on the current price.
-     * 
-     * @param currentPrice A current price.
-     * @return An unrealized profit or loss of this entry.
-     */
-    @Override
-    public final Num unrealizedProfit(Num currentPrice) {
-        return scenarios.stream().map(s -> s.unrealizedProfit(currentPrice)).reduce(Num.ZERO, Num::plus);
     }
 
     /**
@@ -216,7 +199,7 @@ public abstract class Trader implements Profitable {
      * @param deltaRemainingSize
      * @param price
      */
-    void updateSnapshot(Num deltaRealizedProfit, Num deltaRemainingSize, Num price) {
+    final void updateSnapshot(Num deltaRealizedProfit, Num deltaRemainingSize, Num price) {
         Snapshot letest = snapshots.lastEntry().getValue();
 
         ZonedDateTime now = market.service.now().plus(59, SECONDS).truncatedTo(MINUTES);
@@ -228,8 +211,6 @@ public abstract class Trader implements Profitable {
 
         snapshots.put(now, new Snapshot(newRealized, newPrice, newSize));
     }
-
-    static final Snapshot EMPTY_SNAPSHOT = new Snapshot(Num.ZERO, Num.ZERO, Num.ZERO);
 
     /**
      * The snapshot of {@link Trader}'s state.
@@ -272,6 +253,14 @@ public abstract class Trader implements Profitable {
         @Override
         public Num unrealizedProfit(Num price) {
             return price.diff(remainingSize.isPositive() ? Direction.BUY : Direction.SELL, entryPrice).multiply(remainingSize);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Num entryRemainingSize() {
+            return remainingSize;
         }
     }
 }

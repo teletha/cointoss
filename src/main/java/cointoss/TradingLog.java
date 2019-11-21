@@ -191,7 +191,7 @@ public class TradingLog {
         StringBuilder builder = new StringBuilder();
 
         for (Scenario scenario : scenarios) {
-            if ((scenario.isEnableLog() && scenario.isActive()) || detail) {
+            if ((scenario.isActive()) || detail) {
                 builder.append(scenario);
             }
         }

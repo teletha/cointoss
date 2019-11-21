@@ -81,7 +81,7 @@ interface BackTestModel {
      * @return
      */
     @Icy.Property
-    List<Function<Market, Trader>> traders();
+    List<Function<Market, cointoss.Trader>> traders();
 
     /**
      * Set the initial assets.
