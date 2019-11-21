@@ -369,8 +369,9 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                         if (plotter.area == PlotArea.Main) {
                             calculated = axisY.getPositionForValue(calculated);
                         } else {
-                            if (plotter.lineMaxY < calculated) {
-                                plotter.lineMaxY = calculated;
+                            double max = 0 <= calculated ? calculated : -calculated;
+                            if (plotter.lineMaxY < max) {
+                                plotter.lineMaxY = max;
                             }
                         }
                         chart.valueY.add(calculated);
