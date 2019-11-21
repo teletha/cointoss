@@ -14,6 +14,7 @@ import static java.time.temporal.ChronoUnit.SECONDS;
 import org.junit.jupiter.api.Test;
 
 import cointoss.execution.Execution;
+import kiss.I;
 import kiss.Variable;
 
 class TraderTest extends TraderTestSupport {
@@ -428,5 +429,42 @@ class TraderTest extends TraderTestSupport {
         entry(Execution.with.sell(3).price(20));
         assert holdSize().is(-4);
         assert holdMaxSize.is(4);
+    }
+
+    @Test
+    void disableAlways() {
+        disableWhile(I.signal(true));
+
+        // don't executed because disabled
+        entry(Execution.with.buy(1).price(10));
+
+        Scenario s = latest();
+        assert s == null;
+    }
+
+    @Test
+    void enableWhile() {
+        Variable<Boolean> disable = Variable.of(false);
+        disableWhile(disable.observe());
+
+        // enable
+        entryAndExit(Execution.with.buy(1).price(10), Execution.with.sell(1).price(20));
+        Scenario s = latest();
+        assert s.entrySize.is(1);
+        assert s.exitSize.is(1);
+
+        // disable
+        disable.set(true);
+        entryAndExit(Execution.with.buy(1).price(20), Execution.with.sell(1).price(30));
+        Scenario previous = latest();
+        assert previous == s;
+
+        // enable
+        disable.set(false);
+        entryAndExit(Execution.with.buy(2).price(30), Execution.with.sell(2).price(40));
+        s = latest();
+        assert previous != s;
+        assert s.entrySize.is(2);
+        assert s.exitSize.is(2);
     }
 }

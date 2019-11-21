@@ -31,6 +31,8 @@ public class LazyBear extends Trader {
     public LazyBear(Market market) {
         super(market);
 
+        disableWhile(observeHoldSize().map(v -> v.abs().isGreaterThan(4)));
+
         double size = 0.1;
 
         when(oscillator.observe().take(v -> v.ⅰ.isLessThan(-50)), value -> new Scenario() {

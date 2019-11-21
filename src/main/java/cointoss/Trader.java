@@ -15,21 +15,19 @@ import java.time.ZonedDateTime;
 import java.time.temporal.TemporalUnit;
 import java.util.NavigableMap;
 import java.util.Objects;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BooleanSupplier;
-import java.util.function.Function;
 import java.util.function.Predicate;
 
+import org.eclipse.collections.api.factory.Sets;
 import org.eclipse.collections.impl.list.mutable.FastList;
 
 import com.google.common.annotations.VisibleForTesting;
 
 import cointoss.execution.Execution;
-import cointoss.ticker.Indicator;
-import cointoss.ticker.Span;
-import cointoss.ticker.Tick;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
 import kiss.Disposable;
@@ -51,17 +49,14 @@ public abstract class Trader extends TraderBase {
     /** All managed entries. */
     private final FastList<Scenario> scenarios = new FastList();
 
-    /** The alive state. */
-    private final AtomicBoolean enable = new AtomicBoolean(true);
-
     /** The disposer manager. */
     private final Disposable disposer = Disposable.empty();
 
     /** The state snapshot. */
     private final NavigableMap<ZonedDateTime, Snapshot> snapshots = new TreeMap();
 
-    /** The actual maximum holding size. (historical data) */
-    private Num maxHoldSize;
+    /** The trader's alive state. */
+    private Set<Signal> disable = Sets.mutable.empty();
 
     /**
      * Declare your strategy.
@@ -82,10 +77,11 @@ public abstract class Trader extends TraderBase {
     @VisibleForTesting
     void initialize() {
         scenarios.clear();
-        maxHoldSize = Num.ZERO;
         setHoldSize(Num.ZERO);
+        setHoldMaxSize(Num.ZERO);
         snapshots.clear();
         snapshots.put(Chrono.MIN, EMPTY_SNAPSHOT);
+        disable.clear();
     }
 
     /**
@@ -94,6 +90,21 @@ public abstract class Trader extends TraderBase {
     @VisibleForTesting
     Scenario latest() {
         return scenarios.getLast();
+    }
+
+    /**
+     * Disable this {@link Trader} while the specified duration.
+     * 
+     * @param duration
+     */
+    protected final void disableWhile(Signal<Boolean> duration) {
+        disposer.add(duration.to(condition -> {
+            if (condition) {
+                disable.add(duration);
+            } else {
+                disable.remove(duration);
+            }
+        }).add(() -> disable.remove(duration)));
     }
 
     /**
@@ -120,7 +131,7 @@ public abstract class Trader extends TraderBase {
         Objects.requireNonNull(timing);
         Objects.requireNonNull(builder);
 
-        disposer.add(timing.takeWhile(v -> enable.get()).to(value -> {
+        disposer.add(timing.take(disable::isEmpty).to(value -> {
             Scenario scenario = builder.apply(value);
 
             if (scenario != null) {
@@ -154,18 +165,6 @@ public abstract class Trader extends TraderBase {
      */
     public final TradingLog log() {
         return new TradingLog(market, funds, scenarios, this);
-    }
-
-    /**
-     * Build your {@link Indicator}.
-     * 
-     * @param <T>
-     * @param span
-     * @param calculator
-     * @return
-     */
-    protected final Indicator indicator(Span span, Function<Tick, Num> calculator) {
-        return Indicator.build(market.tickers.of(span), calculator);
     }
 
     /**
@@ -235,8 +234,8 @@ public abstract class Trader extends TraderBase {
 
         // update holding size
         setHoldSize(newSize);
-        if (newSize.abs().isGreaterThan(maxHoldSize)) {
-            maxHoldSize = newSize.abs();
+        if (newSize.abs().isGreaterThan(holdMaxSize)) {
+            setHoldMaxSize(newSize.abs());
         }
     }
 
