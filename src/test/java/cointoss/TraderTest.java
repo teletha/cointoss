@@ -518,5 +518,28 @@ class TraderTest extends TraderTestSupport {
         disable.set(true);
         assert isEnable() == false;
         assert isDisable() == true;
+        entry(Execution.with.buy(1).price(10));
+        Scenario s = latest();
+        assert s == null;
+    }
+
+    @Test
+    void enableAndDisable() {
+        // enable
+        assert isEnable() == true;
+        assert isDisable() == false;
+
+        // disable
+        disable();
+        assert isEnable() == false;
+        assert isDisable() == true;
+        entry(Execution.with.buy(1).price(10));
+        Scenario s = latest();
+        assert s == null;
+
+        // enable
+        enable();
+        assert isEnable() == true;
+        assert isDisable() == false;
     }
 }

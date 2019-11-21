@@ -31,6 +31,7 @@ import cointoss.execution.Execution;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
 import kiss.Disposable;
+import kiss.I;
 import kiss.Signal;
 import kiss.WiseFunction;
 import kiss.WiseSupplier;
@@ -90,6 +91,20 @@ public abstract class Trader extends TraderBase {
     @VisibleForTesting
     Scenario latest() {
         return scenarios.getLast();
+    }
+
+    /**
+     * Make this {@link Trader} enable forcibly.
+     */
+    protected final void enable() {
+        disable.clear();
+    }
+
+    /**
+     * Make this {@link Trader} disable forcibly.
+     */
+    protected final void disable() {
+        disable.add(I.signal());
     }
 
     /**
