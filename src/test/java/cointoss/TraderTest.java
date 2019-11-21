@@ -13,8 +13,6 @@ import static java.time.temporal.ChronoUnit.SECONDS;
 
 import org.junit.jupiter.api.Test;
 
-import cointoss.Direction;
-import cointoss.Scenario;
 import cointoss.execution.Execution;
 import kiss.Variable;
 
@@ -407,5 +405,28 @@ class TraderTest extends TraderTestSupport {
         market.perform(Execution.with.buy(1).price(9), 3);
         market.perform(Execution.with.buy(1).price(9), 3);
         assert state.isPresent();
+    }
+
+    @Test
+    void holdSize() {
+        entry(Execution.with.buy(1).price(10));
+        assert currentHoldSize().is(1);
+        assert maxHoldSize().is(1);
+
+        entry(Execution.with.buy(2).price(10));
+        assert currentHoldSize().is(3);
+        assert maxHoldSize().is(3);
+
+        entry(Execution.with.sell(1).price(20));
+        assert currentHoldSize().is(2);
+        assert maxHoldSize().is(3);
+
+        entry(Execution.with.sell(3).price(20));
+        assert currentHoldSize().is(-1);
+        assert maxHoldSize().is(3);
+
+        entry(Execution.with.sell(3).price(20));
+        assert currentHoldSize().is(-4);
+        assert maxHoldSize().is(4);
     }
 }

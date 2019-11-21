@@ -41,8 +41,7 @@ import kiss.WiseSupplier;
 public abstract class Trader {
 
     /** The identity element of {@link Snapshot}. */
-    @VisibleForTesting
-    static final Snapshot EMPTY_SNAPSHOT = new Snapshot(Num.ZERO, Num.ZERO, Num.ZERO);
+    private static final Snapshot EMPTY_SNAPSHOT = new Snapshot(Num.ZERO, Num.ZERO, Num.ZERO);
 
     /** The market. */
     protected final Market market;
@@ -51,7 +50,7 @@ public abstract class Trader {
     protected final FundManager funds;
 
     /** All managed entries. */
-    final FastList<Scenario> scenarios = new FastList();
+    private final FastList<Scenario> scenarios = new FastList();
 
     /** The alive state. */
     private final AtomicBoolean enable = new AtomicBoolean(true);
@@ -60,14 +59,13 @@ public abstract class Trader {
     private final Disposable disposer = Disposable.empty();
 
     /** The state snapshot. */
-    @VisibleForTesting
-    final NavigableMap<ZonedDateTime, Snapshot> snapshots = new TreeMap<>(Map.of(Chrono.MIN, EMPTY_SNAPSHOT));
+    private NavigableMap<ZonedDateTime, Snapshot> snapshots;
 
     /** The actual maximum holding size. (historical data) */
-    private Num maxHoldSize = Num.ZERO;
+    private Num maxHoldSize;
 
     /** The current holding size. */
-    private Num currentHoldSize = Num.ZERO;
+    private Num currentHoldSize;
 
     /**
      * Declare your strategy.
@@ -78,6 +76,27 @@ public abstract class Trader {
         this.market = Objects.requireNonNull(market);
         this.market.managedTraders.add(this);
         this.funds = FundManager.with.totalAssets(market.service.baseCurrency().first().to().v);
+
+        initialize();
+    }
+
+    /**
+     * Initialize status
+     */
+    @VisibleForTesting
+    void initialize() {
+        scenarios.clear();
+        maxHoldSize = Num.ZERO;
+        currentHoldSize = Num.ZERO;
+        snapshots = new TreeMap<>(Map.of(Chrono.MIN, EMPTY_SNAPSHOT));
+    }
+
+    /**
+     * Retrieve the latest {@link Scenario}.
+     */
+    @VisibleForTesting
+    Scenario latest() {
+        return scenarios.getLast();
     }
 
     /**
@@ -238,7 +257,7 @@ public abstract class Trader {
         // update holding size
         currentHoldSize = newSize;
         if (newSize.abs().isGreaterThan(maxHoldSize)) {
-            maxHoldSize = newSize;
+            maxHoldSize = newSize.abs();
         }
     }
 
