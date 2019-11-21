@@ -15,6 +15,7 @@ import java.time.temporal.ChronoUnit;
 import org.junit.jupiter.api.BeforeEach;
 
 import cointoss.execution.Execution;
+import cointoss.util.Chrono;
 import cointoss.verify.VerifiableMarket;
 import kiss.I;
 import kiss.Signal;
@@ -23,7 +24,7 @@ public abstract class TraderTestSupport extends Trader {
 
     protected VerifiableMarket market;
 
-    protected ZonedDateTime base;
+    private ZonedDateTime base;
 
     /**
      * @param provider
@@ -38,6 +39,8 @@ public abstract class TraderTestSupport extends Trader {
     void initialize() {
         market.service.clear();
         scenarios.clear();
+        snapshots.clear();
+        snapshots.put(Chrono.MIN, Trader.EMPTY_SNAPSHOT);
 
         base = market.service.now();
     }
@@ -74,7 +77,17 @@ public abstract class TraderTestSupport extends Trader {
      * @return
      */
     protected final ZonedDateTime second(long delay) {
-        return market.service.now().plusSeconds(delay);
+        return base.plusSeconds(delay);
+    }
+
+    /**
+     * Config delay.
+     * 
+     * @param delay
+     * @return
+     */
+    protected final ZonedDateTime minute(long delay) {
+        return base.plusMinutes(delay);
     }
 
     /**
@@ -85,7 +98,7 @@ public abstract class TraderTestSupport extends Trader {
      * @return
      */
     protected final ZonedDateTime after(long time, ChronoUnit unit) {
-        return market.service.now().plus(time, unit);
+        return base.plus(time, unit);
     }
 
     /**
@@ -174,5 +187,6 @@ public abstract class TraderTestSupport extends Trader {
         awaitOrderBufferingTime();
         market.perform(Execution.with.direction(e.inverse(), partialExitSize).price(exit.price.minus(e.inverse(), 1)).date(exit.date));
         awaitOrderBufferingTime();
+        System.out.println(latest());
     }
 }

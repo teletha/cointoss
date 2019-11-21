@@ -9,7 +9,7 @@
  */
 package cointoss;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
@@ -168,14 +168,6 @@ public abstract class Scenario extends ScenarioBase implements Directional {
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public final Profitable snapshotAt(ZonedDateTime time) {
-        throw new Error();
-    }
-
-    /**
      * Declare entry order.
      */
     protected abstract void entry();
@@ -230,10 +222,12 @@ public abstract class Scenario extends ScenarioBase implements Directional {
         logEntry("Process entry order");
 
         order.observeExecutedSize().to(v -> {
+            Num increaseSize = v.minus(entryExecutedSize);
+
             updateOrderRelatedStatus(entries, this::setEntryPrice, this::setEntryExecutedSize);
             logEntry("Update entry order");
 
-            trader.snapshot(Num.ZERO, isBuy() ? v : v.negate(), order.price);
+            trader.snapshot(Num.ZERO, isBuy() ? increaseSize : increaseSize.negate(), order.price);
         });
     }
 
@@ -406,11 +400,13 @@ public abstract class Scenario extends ScenarioBase implements Directional {
         logExit("Process exit order");
 
         order.observeExecutedSize().to(v -> {
+            Num increaseSize = v.minus(exitExecutedSize);
+
             updateOrderRelatedStatus(exits, this::setExitPrice, this::setExitExecutedSize);
             logExit("Update exit order");
 
             Num increasedRealizedProfit = exitPrice.diff(this, entryPrice).multiply(v);
-            trader.snapshot(increasedRealizedProfit, isBuy() ? v.negate() : v, null);
+            trader.snapshot(increasedRealizedProfit, isBuy() ? increaseSize.negate() : increaseSize, null);
         });
     }
 

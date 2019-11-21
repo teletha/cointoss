@@ -25,6 +25,8 @@ import java.util.function.Predicate;
 
 import org.eclipse.collections.impl.list.mutable.FastList;
 
+import com.google.common.annotations.VisibleForTesting;
+
 import cointoss.execution.Execution;
 import cointoss.ticker.Indicator;
 import cointoss.ticker.Span;
@@ -54,7 +56,8 @@ public abstract class Trader implements Profitable {
     private final Disposable disposer = Disposable.empty();
 
     /** The state snapshot. */
-    private NavigableMap<ZonedDateTime, Snapshot> snapshots = new TreeMap<>(Map.of(Chrono.MIN, Snapshot.ZERO));
+    @VisibleForTesting
+    final NavigableMap<ZonedDateTime, Snapshot> snapshots = new TreeMap<>(Map.of(Chrono.MIN, EMPTY_SNAPSHOT));
 
     /**
      * Declare your strategy.
@@ -225,12 +228,12 @@ public abstract class Trader implements Profitable {
         snapshots.put(now, new Snapshot(null, realizedProfit, entryPrice, remainingSize));
     }
 
+    static final Snapshot EMPTY_SNAPSHOT = new Snapshot(Direction.BUY, Num.ZERO, Num.ZERO, Num.ZERO);
+
     /**
      * 
      */
     private static class Snapshot implements Profitable {
-
-        private static final Snapshot ZERO = new Snapshot(Direction.BUY, Num.ZERO, Num.ZERO, Num.ZERO);
 
         /** The direction. */
         private final Direction direction;
