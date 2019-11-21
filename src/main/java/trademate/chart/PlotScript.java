@@ -26,31 +26,31 @@ import trademate.chart.ChartCanvas.LineChart;
 public abstract class PlotScript {
 
     /** The plotter. */
-    protected final PlotDSL bottom = new PlotDSL(PlotArea.Bottom);
+    protected final PlotDSL bottom = new PlotDSL(PlotArea.Bottom, this);
 
     /** The plotter. */
-    protected final PlotDSL bottomN = new PlotDSL(PlotArea.BottomNarrow);
+    protected final PlotDSL bottomN = new PlotDSL(PlotArea.BottomNarrow, this);
 
     /** The plotter. */
-    protected final PlotDSL low = new PlotDSL(PlotArea.Low);
+    protected final PlotDSL low = new PlotDSL(PlotArea.Low, this);
 
     /** The plotter. */
-    protected final PlotDSL lowN = new PlotDSL(PlotArea.LowNarrow);
+    protected final PlotDSL lowN = new PlotDSL(PlotArea.LowNarrow, this);
 
     /** The plotter. */
-    protected final PlotDSL high = new PlotDSL(PlotArea.High);
+    protected final PlotDSL high = new PlotDSL(PlotArea.High, this);
 
     /** The plotter. */
-    protected final PlotDSL highN = new PlotDSL(PlotArea.HighNarrow);
+    protected final PlotDSL highN = new PlotDSL(PlotArea.HighNarrow, this);
 
     /** The plotter. */
-    protected final PlotDSL top = new PlotDSL(PlotArea.Top);
+    protected final PlotDSL top = new PlotDSL(PlotArea.Top, this);
 
     /** The plotter. */
-    protected final PlotDSL topN = new PlotDSL(PlotArea.TopNarrow);
+    protected final PlotDSL topN = new PlotDSL(PlotArea.TopNarrow, this);
 
     /** The plotter. */
-    protected final PlotDSL main = new PlotDSL(PlotArea.Main);
+    protected final PlotDSL main = new PlotDSL(PlotArea.Main, this);
 
     /**
      * Execute plot declaration.
@@ -82,7 +82,7 @@ public abstract class PlotScript {
     /**
      * Chart plotting DSL.
      */
-    protected class PlotDSL {
+    protected static class PlotDSL {
 
         /** The associated {@link Indicator}s. */
         final List<LineChart> lines = new ArrayList();
@@ -99,11 +99,15 @@ public abstract class PlotScript {
         /** The plot area. */
         final PlotArea area;
 
+        /** The origin script. */
+        final PlotScript origin;
+
         /**
          * @param area
          */
-        private PlotDSL(PlotArea area) {
+        private PlotDSL(PlotArea area, PlotScript origin) {
             this.area = area;
+            this.origin = origin;
         }
 
         /**

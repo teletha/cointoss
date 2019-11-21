@@ -483,9 +483,15 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         gc.fillText(low, offsetX + largeWidth + width * 2 + gap * 3, y, width);
         gc.fillText(close, offsetX + largeWidth + width * 3 + gap * 4, y, width);
 
+        // indicator values drawn from the same plot script are displayed on the same line
+        int x = 0;
+        Object origin = null;
         for (PlotDSL plotter : plotters) {
-            y += 15;
-            int x = offsetX;
+            if (origin != plotter.origin) {
+                y += 15;
+                x = offsetX;
+                origin = plotter.origin;
+            }
             for (LineChart chart : plotter.lines) {
                 gc.setFill(chart.color);
                 gc.fillText(chart.indicator.valueAt(tick).toString(), x, y, width);
