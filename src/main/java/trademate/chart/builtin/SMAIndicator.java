@@ -55,10 +55,10 @@ public class SMAIndicator extends PlotScript implements StyleDSL {
     protected void declare(Market market, Ticker ticker) {
         int base = market.service.setting.baseCurrencyScaleSize;
 
-        overlay.line(Indicator.build(ticker, Tick::closePrice).sma(shortDays).scale(base), shortSMA);
-        overlay.line(Indicator.build(market.tickers.of(Span.Minute30), Tick::closePrice).sma(shortDays).scale(base), SMA30M);
-        overlay.line(Indicator.build(market.tickers.of(Span.Hour1), Tick::closePrice).sma(shortDays).scale(base), SMA1H);
-        overlay.line(Indicator.build(market.tickers.of(Span.Hour4), Tick::closePrice).sma(shortDays).scale(base), SMA4H);
-        overlay.line(Indicator.build(ticker, Tick::closePrice).sma(longDays).scale(base), longSMA);
+        main.line(Indicator.build(ticker, Tick::closePrice).sma(shortDays).scale(base), shortSMA);
+        main.line(Indicator.build(market.tickers.of(Span.Minute30), Tick::closePrice).sma(shortDays).scale(base), SMA30M);
+        main.line(Indicator.build(market.tickers.of(Span.Hour1), Tick::closePrice).sma(shortDays).scale(base), SMA1H);
+        main.line(Indicator.build(market.tickers.of(Span.Hour4), Tick::closePrice).sma(shortDays).scale(base), SMA4H);
+        main.line(Indicator.build(ticker, Tick::closePrice).sma(longDays).scale(base), longSMA);
     }
 }

@@ -50,13 +50,13 @@ public class WaveTrendIndicator extends PlotScript implements StyleDSL {
     protected void declare(Market market, Ticker ticker) {
         Indicator<Ⅱ<Num, Num>> indicator = Indicators.waveTrend(ticker, channelLength.v, averageLength.v);
 
-        up.line(0);
-        up.line(overBoughtLevel1, Lazy);
-        up.line(overBoughtLevel2, Lazy);
-        up.line(overSoldLevel1, Main);
-        up.line(overSoldLevel2, Main);
+        low.line(0);
+        low.line(overBoughtLevel1, Lazy);
+        low.line(overBoughtLevel2, Lazy);
+        low.line(overSoldLevel1, Main);
+        low.line(overSoldLevel2, Main);
 
-        up.line(indicator.map(Ⅱ::ⅰ), Main);
-        up.line(indicator.map(Ⅱ::ⅱ), Lazy);
+        low.line(indicator.map(Ⅱ::ⅰ), Main);
+        low.line(indicator.map(Ⅱ::ⅱ), Lazy);
     }
 }

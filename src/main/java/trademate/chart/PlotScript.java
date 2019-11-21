@@ -29,19 +29,19 @@ public abstract class PlotScript {
     protected final PlotDSL bottom = new PlotDSL(PlotArea.Bottom);
 
     /** The plotter. */
-    protected final PlotDSL up = new PlotDSL(PlotArea.Up);
+    protected final PlotDSL low = new PlotDSL(PlotArea.Low);
 
     /** The plotter. */
-    protected final PlotDSL down = new PlotDSL(PlotArea.Down);
+    protected final PlotDSL lowN = new PlotDSL(PlotArea.LowNarrow);
+
+    /** The plotter. */
+    protected final PlotDSL high = new PlotDSL(PlotArea.High);
 
     /** The plotter. */
     protected final PlotDSL top = new PlotDSL(PlotArea.Top);
 
     /** The plotter. */
-    protected final PlotDSL overlay = new PlotDSL(PlotArea.Overlay);
-
-    /** The current ticker. */
-    private Ticker ticker;
+    protected final PlotDSL main = new PlotDSL(PlotArea.Main);
 
     /**
      * Execute plot declaration.
@@ -50,9 +50,7 @@ public abstract class PlotScript {
      * @param ticker
      */
     final Signal<PlotDSL> plot(Market market, Ticker ticker, ChartView chart) {
-        this.ticker = ticker;
-
-        PlotDSL[] plotters = {bottom, up, down, top, overlay};
+        PlotDSL[] plotters = {bottom, low, lowN, high, top, main};
 
         for (PlotDSL plotter : plotters) {
             plotter.lines.clear();
@@ -107,8 +105,12 @@ public abstract class PlotScript {
         double scale() {
             double max = Math.max(horizonMaxY, lineMaxY);
 
-            if (area != PlotArea.Overlay) {
-                return 35 < max ? 35 / max : 1;
+            if (area != PlotArea.Main) {
+                if (max < area.minHeight || area.maxHeight < max) {
+                    return area.maxHeight / max;
+                } else {
+                    return 1;
+                }
             } else {
                 return 1;
             }

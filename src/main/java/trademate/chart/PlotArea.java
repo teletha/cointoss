@@ -10,7 +10,8 @@
 package trademate.chart;
 
 enum PlotArea {
-    Top(true, 0), Down(true, 70), Up(false, 70), Bottom(false, 0), Overlay(true, 0);
+    Top(true, 0, 35, 10), High(true, 70, 35, 10), Low(false, 70, 35, 10), LowNarrow(false, 70, 20, 5), Bottom(false, 0, 35,
+            10), Main(true, 0, -1, -1);
 
     /** The positioning. */
     final boolean direction;
@@ -18,11 +19,19 @@ enum PlotArea {
     /** The offset. */
     final int offset;
 
+    /** The area height. */
+    final int maxHeight;
+
+    /** The area height. */
+    final int minHeight;
+
     /**
      * Initializer.
      */
-    private PlotArea(boolean direction, int offset) {
+    private PlotArea(boolean direction, int offset, int maxHeight, int minHeight) {
         this.direction = direction;
         this.offset = offset;
+        this.maxHeight = maxHeight;
+        this.minHeight = minHeight;
     }
 }

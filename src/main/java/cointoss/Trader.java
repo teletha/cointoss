@@ -160,7 +160,8 @@ public abstract class Trader {
     }
 
     /**
-     * Return the current hold size of target currency.
+     * Return the current hold size of target currency. Positive number means long position,
+     * negative number means short position. Zero means no position.
      * 
      * @return A current hold size.
      */

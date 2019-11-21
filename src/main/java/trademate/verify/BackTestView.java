@@ -9,7 +9,7 @@
  */
 package trademate.verify;
 
-import static transcript.Transcript.*;
+import static transcript.Transcript.en;
 
 import java.time.Period;
 import java.util.List;
@@ -20,7 +20,6 @@ import cointoss.TradingLog;
 import cointoss.analyze.Analyzer;
 import cointoss.execution.ExecutionLog;
 import cointoss.market.MarketServiceProvider;
-import cointoss.ticker.Span;
 import cointoss.trading.LazyBear;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
@@ -170,7 +169,6 @@ public class BackTestView extends View implements Analyzer {
         chart.showLatestPrice.set(false);
 
         chart.market.set(market);
-        chart.ticker.set(market.tickers.of(Span.Minute30));
     }
 
     /**

@@ -9,7 +9,7 @@
  */
 package cointoss.trading;
 
-import static java.time.temporal.ChronoUnit.*;
+import static java.time.temporal.ChronoUnit.MINUTES;
 
 import cointoss.Direction;
 import cointoss.Market;

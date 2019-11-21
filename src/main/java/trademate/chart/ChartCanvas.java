@@ -12,15 +12,6 @@ package trademate.chart;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.eclipse.collections.api.list.primitive.MutableDoubleList;
-import org.eclipse.collections.impl.list.mutable.primitive.DoubleArrayList;
-
-import cointoss.market.bitflyer.BitFlyer;
-import cointoss.market.bitflyer.SFD;
-import cointoss.ticker.Indicator;
-import cointoss.ticker.Tick;
-import cointoss.util.Chrono;
-import cointoss.util.Num;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
@@ -32,6 +23,16 @@ import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.PathElement;
+
+import org.eclipse.collections.api.list.primitive.MutableDoubleList;
+import org.eclipse.collections.impl.list.mutable.primitive.DoubleArrayList;
+
+import cointoss.market.bitflyer.BitFlyer;
+import cointoss.market.bitflyer.SFD;
+import cointoss.ticker.Indicator;
+import cointoss.ticker.Tick;
+import cointoss.util.Chrono;
+import cointoss.util.Num;
 import kiss.I;
 import stylist.Style;
 import trademate.chart.Axis.TickLable;
@@ -365,7 +366,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                     for (LineChart chart : plotter.lines) {
                         double calculated = chart.indicator.valueAt(tick).doubleValue();
 
-                        if (plotter.area == PlotArea.Overlay) {
+                        if (plotter.area == PlotArea.Main) {
                             calculated = axisY.getPositionForValue(calculated);
                         } else {
                             if (plotter.lineMaxY < calculated) {
@@ -387,7 +388,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
                 // draw horizontal line
                 for (Horizon horizon : plotter.horizons) {
-                    double y = scale != 1 ? height - plotter.area.offset - horizon.value * scale : horizon.value;
+                    double y = plotter.area != PlotArea.Main ? height - plotter.area.offset - horizon.value * scale : horizon.value;
 
                     gc.setLineWidth(horizon.width);
                     gc.setStroke(horizon.color);
@@ -397,11 +398,12 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
                 // draw line chart
                 for (LineChart chart : plotter.lines) {
-                    if (scale != 1) {
+                    if (plotter.area != PlotArea.Main) {
                         for (int i = 0; i < chart.valueY.size(); i++) {
                             chart.valueY.set(i, height - plotter.area.offset - chart.valueY.get(i) * scale);
                         }
                     }
+
                     gc.setLineWidth(chart.width);
                     gc.setStroke(chart.color);
                     gc.setLineDashes(chart.dashArray);
@@ -440,16 +442,13 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                     double scale = plotter.scale();
 
                     for (LineChart chart : plotter.lines) {
-                        gc.setLineWidth(chart.width);
-                        gc.setStroke(chart.color);
-                        gc.setLineDashes(chart.dashArray);
-
-                        if (scale != 1) {
-                            gc.strokeLine(lastX, chart.valueY
-                                    .getLast(), x, height - plotter.area.offset - chart.indicator.valueAt(tick).doubleValue() * scale);
-                        } else {
-                            gc.strokeLine(lastX, chart.valueY.getLast(), x, axisY
-                                    .getPositionForValue(chart.indicator.valueAt(tick).doubleValue()));
+                        if (!chart.valueY.isEmpty()) {
+                            gc.setLineWidth(chart.width);
+                            gc.setStroke(chart.color);
+                            gc.setLineDashes(chart.dashArray);
+                            gc.strokeLine(lastX, chart.valueY.getLast(), x, plotter.area == PlotArea.Main
+                                    ? axisY.getPositionForValue(chart.indicator.valueAt(tick).doubleValue())
+                                    : height - plotter.area.offset - chart.indicator.valueAt(tick).doubleValue() * scale);
                         }
                     }
                 }
