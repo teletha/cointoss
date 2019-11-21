@@ -36,4 +36,14 @@ interface TraderBaseModel {
     default Num holdMaxSize() {
         return Num.ZERO;
     }
+
+    /**
+     * Calculate the current profit and loss.
+     * 
+     * @return A current profit and loss.
+     */
+    @Icy.Property(setterModifier = "final", custom = ObservableNumProperty.class)
+    default Num profit() {
+        return Num.ZERO;
+    }
 }

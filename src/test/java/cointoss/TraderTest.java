@@ -443,7 +443,7 @@ class TraderTest extends TraderTestSupport {
     }
 
     @Test
-    void enableWhile() {
+    void disableWhile() {
         Variable<Boolean> disable = Variable.of(false);
         disableWhile(disable.observe());
 
@@ -466,5 +466,42 @@ class TraderTest extends TraderTestSupport {
         assert previous != s;
         assert s.entrySize.is(2);
         assert s.exitSize.is(2);
+    }
+
+    @Test
+    void disableWhileMultiple() {
+        Variable<Boolean> disable1 = Variable.of(false);
+        disableWhile(disable1.observe());
+
+        Variable<Boolean> disable2 = Variable.of(false);
+        disableWhile(disable2.observe());
+
+        // disable one and other
+        disable1.set(true);
+        disable2.set(true);
+        entry(Execution.with.buy(1).price(10));
+        Scenario s = latest();
+        assert s == null;
+
+        // disable one and enabe other
+        disable1.set(true);
+        disable2.set(false);
+        entry(Execution.with.buy(1).price(10));
+        s = latest();
+        assert s == null;
+
+        // enable one and disable other
+        disable1.set(false);
+        disable2.set(true);
+        entry(Execution.with.buy(1).price(10));
+        s = latest();
+        assert s == null;
+
+        // enable one and other
+        disable1.set(false);
+        disable2.set(false);
+        entry(Execution.with.buy(1).price(10));
+        s = latest();
+        assert s != null;
     }
 }

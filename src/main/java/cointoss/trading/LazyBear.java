@@ -26,12 +26,12 @@ import kiss.Ⅱ;
  */
 public class LazyBear extends Trader {
 
-    Indicator<Ⅱ<Num, Num>> oscillator = Indicators.waveTrend(market.tickers.of(Span.Second5));
+    Indicator<Ⅱ<Num, Num>> oscillator = Indicators.waveTrend(market.tickers.of(Span.Second15));
 
     public LazyBear(Market market) {
         super(market);
 
-        disableWhile(observeHoldSize().map(v -> v.abs().isGreaterThan(4)));
+        disableWhile(observeProfit().map(p -> p.isLessThan(-10000)));
 
         double size = 0.1;
 

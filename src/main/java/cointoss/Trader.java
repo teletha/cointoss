@@ -237,6 +237,10 @@ public abstract class Trader extends TraderBase {
         if (newSize.abs().isGreaterThan(holdMaxSize)) {
             setHoldMaxSize(newSize.abs());
         }
+
+        // update profit
+        Direction direction = newSize.isPositive() ? Direction.BUY : Direction.SELL;
+        setProfit(newRealized.plus(market.tickers.latestPrice.v.diff(direction, newSize.abs()).multiply(newSize)));
     }
 
     /**
