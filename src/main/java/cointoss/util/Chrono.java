@@ -19,13 +19,13 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoField;
 import java.time.temporal.Temporal;
 
-/**
- * @version 2018/08/03 8:39:27
- */
 public class Chrono {
 
     /** The UTC zone id. */
     public static final ZoneId UTC = ZoneId.of("UTC");
+
+    /** The system zone id. */
+    public static final ZoneId SYSTEM = ZoneId.systemDefault();
 
     /** The minimum UTC time. */
     public static final ZonedDateTime MIN = ZonedDateTime.of(1970, 1, 1, 0, 0, 0, 0, UTC);
@@ -212,6 +212,16 @@ public class Chrono {
      */
     public static long epochMills(Temporal date) {
         return date.getLong(ChronoField.INSTANT_SECONDS) * 1000 + date.getLong(ChronoField.MILLI_OF_SECOND);
+    }
+
+    /**
+     * Format the date-time to human-readable expression.
+     * 
+     * @param date A target date-time to format.
+     * @return A formatted literal.
+     */
+    public static String format(ZonedDateTime date) {
+        return DateTimeWithT.format(date.withZoneSameInstant(SYSTEM));
     }
 
     /**

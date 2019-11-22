@@ -31,5 +31,5 @@ public interface Analyzer {
      * @param market A target market.
      * @param logs A list of logs to visialize.
      */
-    void analyze(Market market, List<TradingLog> logs);
+    void analyze(Market market, List<TradingLog> logs, boolean detail);
 }

@@ -176,6 +176,6 @@ interface BackTestModel {
             log.duration = Duration.between(start, end);
             logs.add(log);
         }
-        analyzer.analyze(market, logs);
+        analyzer.analyze(market, logs, detail());
     }
 }

@@ -26,10 +26,11 @@ public class BackTestInvoker {
 
     public static void main(String[] args) throws InterruptedException {
         BackTest.with.service(BitFlyer.FX_BTC_JPY)
-                .start(2019, 10, 30)
-                .end(2019, 10, 30)
+                .start(2019, 11, 4)
+                .end(2019, 11, 4)
                 .traders(LazyBear::new)
                 .initialBaseCurrency(3000000)
+                .detail(true)
                 .run();
     }
 

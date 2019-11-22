@@ -175,7 +175,7 @@ public class BackTestView extends View implements Analyzer {
      * {@inheritDoc}
      */
     @Override
-    public void analyze(Market market, List<TradingLog> logs) {
+    public void analyze(Market market, List<TradingLog> logs, boolean detail) {
         for (TradingLog log : logs) {
             System.out.println(log);
         }
