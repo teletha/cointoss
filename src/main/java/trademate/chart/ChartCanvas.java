@@ -160,7 +160,8 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         layoutCandleLatest.layoutBy(widthProperty(), heightProperty())
                 .layoutBy(axisX.scroll.valueProperty(), axisX.scroll.visibleAmountProperty())
                 .layoutBy(axisY.scroll.valueProperty(), axisY.scroll.visibleAmountProperty())
-                .layoutBy(chart.ticker.observe().switchMap(ticker -> ticker.update.startWithNull()));
+                .layoutBy(chart.ticker.observe().switchMap(ticker -> ticker.update.startWithNull()))
+                .layoutWhile(chart.showRealtimeUpdate.observeNow());
 
         visualizeNotifyPrice();
         visualizeOrderPrice();
@@ -269,6 +270,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         chart.market.observeNow() //
                 .skipNull()
                 .switchMap(m -> m.tickers.latestPrice.observeNow())
+                .switchOn(chart.showLatestPrice.observeNow())
                 .on(Viewtify.UIThread)
                 .effectOnLifecycle(disposer -> {
                     TickLable latest = latestPrice.createLabel("最新値");
@@ -277,7 +279,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
                     return price -> latest.value.set(price.doubleValue());
                 })
-                .switchOn(chart.showLatestPrice.observeNow())
                 .to(latestPrice.layoutLine::requestLayout);
     }
 

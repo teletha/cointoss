@@ -167,6 +167,7 @@ public class BackTestView extends View implements Analyzer {
         chart.showOrderSupport.set(false);
         chart.showPositionSupport.set(false);
         chart.showLatestPrice.set(false);
+        chart.showRealtimeUpdate.set(false);
 
         chart.market.set(market);
     }

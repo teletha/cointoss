@@ -39,6 +39,9 @@ public class ChartView extends View {
     /** The chart configuration. */
     public final Variable<Boolean> showPositionSupport = Variable.of(true);
 
+    /** The chart configuration. */
+    public final Variable<Boolean> showRealtimeUpdate = Variable.of(true);
+
     /** The candle chart. */
     private final Chart chart = new Chart(this);
 
