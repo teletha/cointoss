@@ -15,12 +15,15 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.collections.api.list.primitive.MutableLongList;
+import org.eclipse.collections.impl.factory.primitive.LongLists;
 import org.junit.jupiter.api.Test;
 
 import antibug.Chronus;
 import kiss.I;
 import kiss.Observer;
 import kiss.WiseFunction;
+import kiss.WiseRunnable;
 
 class RetryPolicyTest {
 
@@ -35,101 +38,83 @@ class RetryPolicyTest {
         RetryPolicy policy = RetryPolicy.with.limit(3);
         Result result = new Result();
 
-        I.signal(1, 2, 3, 4, 5).map(alwaysFail).retryWhen(policy).to(result);
+        I.signal(1, 2, 3, 4, 5).map(alwaysFail).retryWhen(policy).to((Observer) result);
         assert policy.count == 3;
         assert result.hasOnlyError("Failed Number 1");
     }
 
     @Test
     void delayFixedDuration() {
-        RetryPolicy policy = RetryPolicy.with.limit(3).delay(100, MILLISECONDS).scheduler(chronus);
         Result result = new Result();
+        RetryPolicy policy = RetryPolicy.with.limit(3).delay(100, MILLISECONDS).scheduler(chronus);
+        policy.onRetry = result;
 
-        I.signal(1, 2, 3, 4, 5).map(alwaysFail).retryWhen(policy).to(result);
-        assert policy.count == 1;
-        assert result.hasNoError();
-        chronus.await(120, MILLISECONDS);
-        assert policy.count == 2;
-        assert result.hasNoError();
-        chronus.await(120, MILLISECONDS);
-        assert policy.count == 3;
-        assert result.hasNoError();
+        I.signal(1, 2, 3, 4, 5).map(alwaysFail).retryWhen(policy).to((Observer) result);
         chronus.await();
+        assert policy.count == 3;
         assert result.hasOnlyError("Failed Number 1");
+        assert result.checkMinimumRequiredInterval(100, 100);
     }
 
     @Test
     void delayLinearDuration() {
-        RetryPolicy policy = RetryPolicy.with.limit(3).delayLinear(Duration.ofMillis(30)).scheduler(chronus);
         Result result = new Result();
+        RetryPolicy policy = RetryPolicy.with.limit(5).delayLinear(Duration.ofMillis(30)).scheduler(chronus);
+        policy.onRetry = result;
 
-        I.signal(1, 2, 3, 4, 5).map(alwaysFail).retryWhen(policy).to(result);
-        assert policy.count == 1;
-        chronus.await(35, MILLISECONDS); // wait 35ms then second try
-        assert policy.count == 2;
-        chronus.await(40, MILLISECONDS); // 40ms is not enough
-        assert policy.count == 2;
-        chronus.await(30, MILLISECONDS); // wait 70ms then third try
-        assert policy.count == 3;
-        chronus.await(80, MILLISECONDS); // 80ms is not enough
-        assert policy.count == 3;
-        chronus.await(20, MILLISECONDS); // wait 100ms then fail
+        I.signal(1, 2, 3, 4, 5).map(alwaysFail).retryWhen(policy).to((Observer) result);
+        chronus.await();
+        assert policy.count == 5;
         assert result.hasOnlyError("Failed Number 1");
+        assert result.checkMinimumRequiredInterval(30, 60, 90, 120);
     }
 
     @Test
     void delayMinimumDuration() {
-        RetryPolicy policy = RetryPolicy.with.limit(3)
-                .delayLinear(Duration.ofMillis(30))
-                .delayMinimum(Duration.ofMillis(60))
-                .scheduler(chronus);
         Result result = new Result();
+        RetryPolicy policy = RetryPolicy.with.limit(5)
+                .delayLinear(Duration.ofMillis(20))
+                .delayMinimum(Duration.ofMillis(50))
+                .scheduler(chronus);
+        policy.onRetry = result;
 
-        I.signal(1, 2, 3, 4, 5).map(alwaysFail).retryWhen(policy).to(result);
-        assert policy.count == 1;
-        chronus.await(35, MILLISECONDS); // 35ms is not enough
-        assert policy.count == 1;
-        chronus.await(35, MILLISECONDS); // wait 70ms then second try
-        assert policy.count == 2;
-        chronus.await(50, MILLISECONDS); // 50ms is not enough
-        assert policy.count == 2;
-        chronus.await(20, MILLISECONDS); // wait 70ms then third try
-        assert policy.count == 3;
-        assert result.hasNoError();
+        I.signal(1, 2, 3, 4, 5).map(alwaysFail).retryWhen(policy).to((Observer) result);
         chronus.await();
+        assert policy.count == 5;
         assert result.hasOnlyError("Failed Number 1");
+        assert result.checkMinimumRequiredInterval(50, 50, 60, 80);
     }
 
     @Test
     void delayMaximumDuration() {
-        RetryPolicy policy = RetryPolicy.with.limit(4)
-                .delayLinear(Duration.ofMillis(30))
+        Result result = new Result();
+        RetryPolicy policy = RetryPolicy.with.limit(5)
+                .delayLinear(Duration.ofMillis(20))
                 .delayMaximum(Duration.ofMillis(50))
                 .scheduler(chronus);
-        Result result = new Result();
+        policy.onRetry = result;
 
-        I.signal(1, 2, 3, 4, 5).map(alwaysFail).retryWhen(policy).to(result);
-        assert policy.count == 1;
-        chronus.await(35, MILLISECONDS); // wait 35ms then second try
-        assert policy.count == 2;
-        chronus.await(80, MILLISECONDS); // wait then third try
-        assert policy.count == 3;
-        chronus.await(80, MILLISECONDS); // wait then forth try
-        assert policy.count == 4;
+        I.signal(1, 2, 3, 4, 5).map(alwaysFail).retryWhen(policy).to((Observer) result);
         chronus.await();
+        assert policy.count == 5;
         assert result.hasOnlyError("Failed Number 1");
+        assert result.checkMinimumRequiredInterval(20, 40, 50, 50);
     }
 
     /**
      * 
      */
-    private static class Result implements Observer<String> {
+    private static class Result implements Observer<String>, WiseRunnable {
 
         private List<String> values = new ArrayList();
 
         private List<Throwable> errors = new ArrayList();
 
         private boolean complete;
+
+        private long startTime = System.nanoTime();
+
+        private MutableLongList retryTiming = LongLists.mutable.empty();
 
         /**
          * {@inheritDoc}
@@ -175,6 +160,30 @@ class RetryPolicyTest {
          */
         private boolean hasNoError() {
             assert errors.isEmpty();
+            return true;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void RUN() throws Throwable {
+            retryTiming.add((System.nanoTime() - startTime) / 1000000);
+        }
+
+        /**
+         * Check executed timing by intervals.
+         * 
+         * @param intervals
+         * @return
+         */
+        private boolean checkMinimumRequiredInterval(int... intervals) {
+            assert intervals.length + 1 == retryTiming.size();
+
+            for (int i = 0; i < retryTiming.size() - 1; i++) {
+                assert intervals[i] <= retryTiming.get(i + 1) - retryTiming
+                        .get(i) : "Interval: " + intervals[i] + " Timings: " + retryTiming;
+            }
             return true;
         }
     }

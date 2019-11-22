@@ -23,12 +23,16 @@ import icy.manipulator.Icy;
 import kiss.I;
 import kiss.Signal;
 import kiss.WiseFunction;
+import kiss.WiseRunnable;
 
 @Icy
 abstract class RetryPolicyModel implements WiseFunction<Signal<Throwable>, Signal<?>> {
 
     @VisibleForTesting
     long count;
+
+    @VisibleForTesting
+    WiseRunnable onRetry;
 
     /**
      * Set maximum number of trials.
@@ -156,6 +160,6 @@ abstract class RetryPolicyModel implements WiseFunction<Signal<Throwable>, Signa
             } else {
                 return I.signal(e);
             }
-        }).take(limit()).delay(() -> Chrono.between(delayMinimum(), delay().apply(count++), delayMaximum()), scheduler());
+        }).take(limit()).delay(() -> Chrono.between(delayMinimum(), delay().apply(count++), delayMaximum()), scheduler()).effect(onRetry);
     }
 }
