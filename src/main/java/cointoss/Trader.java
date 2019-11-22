@@ -94,6 +94,14 @@ public abstract class Trader extends TraderBase {
     }
 
     /**
+     * Retrieve the latest {@link Snapshot}.
+     */
+    @VisibleForTesting
+    Profitable snapshotLatest() {
+        return snapshots.lastEntry().getValue();
+    }
+
+    /**
      * Make this {@link Trader} enable forcibly.
      */
     protected final void enable() {
@@ -262,7 +270,6 @@ public abstract class Trader extends TraderBase {
         Num newPrice = newSize.isZero() ? Num.ZERO
                 : price == null ? letest.entryPrice
                         : letest.remainingSize.multiply(letest.entryPrice).plus(deltaRemainingSize.multiply(price)).divide(newSize);
-
         snapshots.put(now, new Snapshot(newRealized, newPrice, newSize));
 
         // update holding size
@@ -273,7 +280,7 @@ public abstract class Trader extends TraderBase {
 
         // update profit
         Direction direction = newSize.isPositive() ? Direction.BUY : Direction.SELL;
-        setProfit(newRealized.plus(market.tickers.latestPrice.v.diff(direction, newSize.abs()).multiply(newSize)));
+        setProfit(newRealized.plus(market.tickers.latestPrice.v.diff(direction, newPrice).multiply(newSize.abs())));
     }
 
     /**
@@ -316,7 +323,8 @@ public abstract class Trader extends TraderBase {
          */
         @Override
         public Num unrealizedProfit(Num price) {
-            return price.diff(remainingSize.isPositive() ? Direction.BUY : Direction.SELL, entryPrice).multiply(remainingSize);
+            Direction direction = remainingSize.isPositive() ? Direction.BUY : Direction.SELL;
+            return price.diff(direction, entryPrice).multiply(remainingSize.abs());
         }
 
         /**
@@ -325,6 +333,14 @@ public abstract class Trader extends TraderBase {
         @Override
         public Num entryRemainingSize() {
             return remainingSize;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String toString() {
+            return "Snapshot [realizedProfit=" + realizedProfit + ", entryPrice=" + entryPrice + ", remainingSize=" + remainingSize + "]";
         }
     }
 }

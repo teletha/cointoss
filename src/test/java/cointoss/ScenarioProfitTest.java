@@ -113,6 +113,102 @@ class ScenarioProfitTest extends TraderTestSupport {
     }
 
     @Test
+    void sellCompleteEntryAndCompleteExit() {
+        entryAndExit(Execution.with.sell(1).price(10), Execution.with.buy(1).price(20));
+
+        Scenario s = latest();
+        assert s.realizedProfit.is(-10);
+        assert s.unrealizedProfit(Num.of(25)).is(0);
+        assert s.profit(Num.of(25)).is(-10);
+        assert s.entryRemainingSize().is(0);
+        assert s.exitRemainingSize().is(0);
+    }
+
+    @Test
+    void sellCompleteEntryAndIncompleteExit() {
+        entryAndExit(Execution.with.sell(2).price(10), Execution.with.buy(1).price(20));
+
+        Scenario s = latest();
+        assert s.realizedProfit.is(-10);
+        assert s.unrealizedProfit(Num.of(25)).is(-15);
+        assert s.profit(Num.of(25)).is(-25);
+        assert s.entryRemainingSize().is(0);
+        assert s.exitRemainingSize().is(1);
+    }
+
+    @Test
+    void sellCompleteEntryAndPartialExit() {
+        entryAndExitPartial(Execution.with.sell(2).price(10), Execution.with.buy(2).price(20), 1);
+
+        Scenario s = latest();
+        assert s.realizedProfit.is(-10);
+        assert s.unrealizedProfit(Num.of(25)).is(-15);
+        assert s.profit(Num.of(25)).is(-25);
+        assert s.entryRemainingSize().is(0);
+        assert s.exitRemainingSize().is(1);
+    }
+
+    @Test
+    void sellCompleteEntryAndNoExit() {
+        entry(Execution.with.sell(1).price(10));
+
+        Scenario s = latest();
+        assert s.realizedProfit.is(0);
+        assert s.unrealizedProfit(Num.of(25)).is(-15);
+        assert s.profit(Num.of(25)).is(-15);
+        assert s.entryRemainingSize().is(0);
+        assert s.exitRemainingSize().is(0);
+    }
+
+    @Test
+    void sellPartialEntryAndCompleteExit() {
+        entryPartialAndExit(Execution.with.sell(2).price(20), 1, Execution.with.buy(1).price(10));
+
+        Scenario s = latest();
+        assert s.realizedProfit.is(10);
+        assert s.unrealizedProfit(Num.of(5)).is(0);
+        assert s.profit(Num.of(5)).is(10);
+        assert s.entryRemainingSize().is(1);
+        assert s.exitRemainingSize().is(0);
+    }
+
+    @Test
+    void sellPartialEntryAndIncompleteExit() {
+        entryPartialAndExit(Execution.with.sell(3).price(20), 2, Execution.with.buy(1).price(10));
+
+        Scenario s = latest();
+        assert s.realizedProfit.is(10);
+        assert s.unrealizedProfit(Num.of(5)).is(15);
+        assert s.profit(Num.of(5)).is(25);
+        assert s.entryRemainingSize().is(1);
+        assert s.exitRemainingSize().is(1);
+    }
+
+    @Test
+    void sellPartialEntryAndPartialExit() {
+        entryPartialAndExitPartial(Execution.with.sell(2).price(20), 1, Execution.with.buy(2).price(10), 1);
+
+        Scenario s = latest();
+        assert s.realizedProfit.is(10);
+        assert s.unrealizedProfit(Num.of(5)).is(0);
+        assert s.profit(Num.of(5)).is(10);
+        assert s.entryRemainingSize().is(1);
+        assert s.exitRemainingSize().is(0);
+    }
+
+    @Test
+    void sellPartialEntryAndNoExit() {
+        entryPartial(Execution.with.sell(2).price(10), 1);
+
+        Scenario s = latest();
+        assert s.realizedProfit.is(0);
+        assert s.unrealizedProfit(Num.of(5)).is(5);
+        assert s.profit(Num.of(25)).is(-15);
+        assert s.entryRemainingSize().is(1);
+        assert s.exitRemainingSize().is(0);
+    }
+
+    @Test
     void snapshotCompleteEntryAndCompleteExit() {
         entryAndExit(Execution.with.buy(1).price(10), Execution.with.sell(1).price(20).date(minute(5)));
 
@@ -355,6 +451,146 @@ class ScenarioProfitTest extends TraderTestSupport {
         snapshot = snapshotAt(minute(10));
         assert snapshot.realizedProfit().is(0);
         assert snapshot.unrealizedProfit(Num.of(5)).is(-5);
+    }
+
+    @Test
+    void snapshotSellCompleteEntryAndCompleteExit() {
+        entryAndExit(Execution.with.sell(1).price(10), Execution.with.sell(1).price(20).date(minute(5)));
+
+        // past
+        Profitable snapshot = snapshotAt(minute(1));
+        assert snapshot.realizedProfit().is(0);
+        assert snapshot.unrealizedProfit(Num.of(12)).is(-2);
+        assert snapshot.entryRemainingSize().is(-1);
+
+        // past
+        snapshot = snapshotAt(minute(2));
+        assert snapshot.realizedProfit().is(0);
+        assert snapshot.unrealizedProfit(Num.of(6)).is(4);
+        assert snapshot.entryRemainingSize().is(-1);
+
+        // past
+        snapshot = snapshotAt(minute(4));
+        assert snapshot.realizedProfit().is(0);
+        assert snapshot.unrealizedProfit(Num.of(15)).is(-5);
+        assert snapshot.entryRemainingSize().is(-1);
+
+        // future
+        snapshot = snapshotAt(minute(6));
+        assert snapshot.realizedProfit().is(-10);
+        assert snapshot.unrealizedProfit(Num.of(25)).is(0);
+        assert snapshot.entryRemainingSize().is(0);
+
+        // future
+        snapshot = snapshotAt(minute(10));
+        assert snapshot.realizedProfit().is(-10);
+        assert snapshot.unrealizedProfit(Num.of(5)).is(0);
+        assert snapshot.entryRemainingSize().is(0);
+    }
+
+    @Test
+    void snapshotSellCompleteEntryAndIncompleteExit() {
+        entryAndExit(Execution.with.sell(2).price(10), Execution.with.buy(1).price(20).date(minute(5)));
+
+        // past
+        Profitable snapshot = snapshotAt(minute(1));
+        assert snapshot.realizedProfit().is(0);
+        assert snapshot.unrealizedProfit(Num.of(12)).is(-4);
+        assert snapshot.entryRemainingSize().is(-2);
+
+        // past
+        snapshot = snapshotAt(minute(2));
+        assert snapshot.realizedProfit().is(0);
+        assert snapshot.unrealizedProfit(Num.of(6)).is(8);
+        assert snapshot.entryRemainingSize().is(-2);
+
+        // past
+        snapshot = snapshotAt(minute(4));
+        assert snapshot.realizedProfit().is(0);
+        assert snapshot.unrealizedProfit(Num.of(15)).is(-10);
+        assert snapshot.entryRemainingSize().is(-2);
+
+        // future
+        snapshot = snapshotAt(minute(6));
+        assert snapshot.realizedProfit().is(-10);
+        assert snapshot.unrealizedProfit(Num.of(25)).is(-15);
+        assert snapshot.entryRemainingSize().is(-1);
+
+        // future
+        snapshot = snapshotAt(minute(10));
+        assert snapshot.realizedProfit().is(-10);
+        assert snapshot.unrealizedProfit(Num.of(5)).is(5);
+        assert snapshot.entryRemainingSize().is(-1);
+    }
+
+    @Test
+    void snapshotSellCompleteEntryAndPartialExit() {
+        entryAndExitPartial(Execution.with.sell(2).price(10), Execution.with.buy(2).price(20).date(minute(5)), 1);
+
+        // past
+        Profitable snapshot = snapshotAt(minute(1));
+        assert snapshot.realizedProfit().is(0);
+        assert snapshot.unrealizedProfit(Num.of(12)).is(-4);
+        assert snapshot.entryRemainingSize().is(-2);
+
+        // past
+        snapshot = snapshotAt(minute(2));
+        assert snapshot.realizedProfit().is(0);
+        assert snapshot.unrealizedProfit(Num.of(6)).is(8);
+        assert snapshot.entryRemainingSize().is(-2);
+
+        // past
+        snapshot = snapshotAt(minute(4));
+        assert snapshot.realizedProfit().is(0);
+        assert snapshot.unrealizedProfit(Num.of(15)).is(-10);
+        assert snapshot.entryRemainingSize().is(-2);
+
+        // future
+        snapshot = snapshotAt(minute(6));
+        assert snapshot.realizedProfit().is(-10);
+        assert snapshot.unrealizedProfit(Num.of(25)).is(-15);
+        assert snapshot.entryRemainingSize().is(-1);
+
+        // future
+        snapshot = snapshotAt(minute(10));
+        assert snapshot.realizedProfit().is(-10);
+        assert snapshot.unrealizedProfit(Num.of(5)).is(5);
+        assert snapshot.entryRemainingSize().is(-1);
+    }
+
+    @Test
+    void snapshotSellCompleteEntryAndNoExit() {
+        entry(Execution.with.sell(1).price(10));
+
+        // past
+        Profitable snapshot = snapshotAt(minute(1));
+        assert snapshot.realizedProfit().is(0);
+        assert snapshot.unrealizedProfit(Num.of(12)).is(-2);
+        assert snapshot.entryRemainingSize().is(-1);
+
+        // past
+        snapshot = snapshotAt(minute(2));
+        assert snapshot.realizedProfit().is(0);
+        assert snapshot.unrealizedProfit(Num.of(6)).is(4);
+        assert snapshot.entryRemainingSize().is(-1);
+
+        // past
+        snapshot = snapshotAt(minute(4));
+        assert snapshot.realizedProfit().is(0);
+        assert snapshot.unrealizedProfit(Num.of(15)).is(-5);
+        assert snapshot.entryRemainingSize().is(-1);
+
+        // future
+        snapshot = snapshotAt(minute(6));
+        assert snapshot.realizedProfit().is(0);
+        assert snapshot.unrealizedProfit(Num.of(25)).is(-15);
+        assert snapshot.entryRemainingSize().is(-1);
+
+        // future
+        snapshot = snapshotAt(minute(10));
+        assert snapshot.realizedProfit().is(0);
+        assert snapshot.unrealizedProfit(Num.of(5)).is(5);
+        assert snapshot.entryRemainingSize().is(-1);
     }
 
     @Test
