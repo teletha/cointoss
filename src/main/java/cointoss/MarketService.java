@@ -9,6 +9,7 @@
  */
 package cointoss;
 
+import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -27,6 +28,7 @@ import cointoss.order.OrderState;
 import cointoss.util.Chrono;
 import cointoss.util.Network;
 import cointoss.util.Num;
+import cointoss.util.RetryPolicy;
 import kiss.Decoder;
 import kiss.Disposable;
 import kiss.Encoder;
@@ -263,6 +265,15 @@ public abstract class MarketService implements Disposable {
      */
     public ScheduledExecutorService scheduler() {
         return scheduler;
+    }
+
+    /**
+     * Create new {@link RetryPolicy}.
+     * 
+     * @return
+     */
+    public RetryPolicy retryPolicy() {
+        return RetryPolicy.with.limit(500).delayLinear(Duration.ofSeconds(2)).delayMaximum(Duration.ofMinutes(2));
     }
 
     /**

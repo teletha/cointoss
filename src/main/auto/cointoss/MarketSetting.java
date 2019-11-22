@@ -4,7 +4,6 @@ import cointoss.MarketSetting;
 import cointoss.MarketSettingModel;
 import cointoss.execution.ExecutionLogger;
 import cointoss.util.Num;
-import cointoss.util.RetryPolicy;
 import java.lang.Class;
 import java.lang.Override;
 import java.lang.StringBuilder;
@@ -99,9 +98,6 @@ public abstract class MarketSetting implements MarketSettingModel {
     /** The final property updater. */
     private static final MethodHandle executionWithSequentialIdUpdater = updater("executionWithSequentialId");
 
-    /** The final property updater. */
-    private static final MethodHandle retryPolicyUpdater = updater("retryPolicy");
-
     /** The exposed property. */
     public final Num baseCurrencyMinimumBidPrice;
 
@@ -129,9 +125,6 @@ public abstract class MarketSetting implements MarketSettingModel {
     /** The exposed property. */
     public final boolean executionWithSequentialId;
 
-    /** The exposed property. */
-    public final RetryPolicy retryPolicy;
-
     /**
      * HIDE CONSTRUCTOR
      */
@@ -145,7 +138,6 @@ public abstract class MarketSetting implements MarketSettingModel {
         this.acquirableExecutionSize = MarketSettingModel.super.acquirableExecutionSize();
         this.executionLogger = MarketSettingModel.super.executionLogger();
         this.executionWithSequentialId = MarketSettingModel.super.executionWithSequentialId();
-        this.retryPolicy = MarketSettingModel.super.retryPolicy();
     }
 
     /** Get the minimum bid price of the base currency. */
@@ -437,42 +429,6 @@ public abstract class MarketSetting implements MarketSettingModel {
     }
 
     /**
-     * Configure {@link cointoss.util.RetryPolicy}.
-     *  
-     *  @return
-     */
-    @Override
-    public final RetryPolicy retryPolicy() {
-        return this.retryPolicy;
-    }
-
-    /**
-     * Provide classic getter API.
-     *
-     * @return A value of retryPolicy property.
-     */
-    @SuppressWarnings("unused")
-    private final RetryPolicy getRetryPolicy() {
-        return this.retryPolicy;
-    }
-
-    /**
-     * Provide classic setter API.
-     *
-     * @paran value A new value of retryPolicy property to assign.
-     */
-    private final void setRetryPolicy(RetryPolicy value) {
-        if (value == null) {
-            value = MarketSettingModel.super.retryPolicy();
-        }
-        try {
-            retryPolicyUpdater.invoke(this, value);
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
-    }
-
-    /**
      * Show all property values.
      *
      * @return All property values.
@@ -488,8 +444,7 @@ public abstract class MarketSetting implements MarketSettingModel {
         builder.append("targetCurrencyScaleSize=").append(targetCurrencyScaleSize).append(", ");
         builder.append("acquirableExecutionSize=").append(acquirableExecutionSize).append(", ");
         builder.append("executionLogger=").append(executionLogger).append(", ");
-        builder.append("executionWithSequentialId=").append(executionWithSequentialId).append(", ");
-        builder.append("retryPolicy=").append(retryPolicy).append("]");
+        builder.append("executionWithSequentialId=").append(executionWithSequentialId).append("]");
         return builder.toString();
     }
 
@@ -500,7 +455,7 @@ public abstract class MarketSetting implements MarketSettingModel {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(baseCurrencyMinimumBidPrice, targetCurrencyMinimumBidSize, orderBookGroupRanges, targetCurrencyBidSizes, baseCurrencyScaleSize, targetCurrencyScaleSize, acquirableExecutionSize, executionLogger, executionWithSequentialId, retryPolicy);
+        return Objects.hash(baseCurrencyMinimumBidPrice, targetCurrencyMinimumBidSize, orderBookGroupRanges, targetCurrencyBidSizes, baseCurrencyScaleSize, targetCurrencyScaleSize, acquirableExecutionSize, executionLogger, executionWithSequentialId);
     }
 
     /**
@@ -524,21 +479,7 @@ public abstract class MarketSetting implements MarketSettingModel {
         if (acquirableExecutionSize != other.acquirableExecutionSize) return false;
         if (!Objects.equals(executionLogger, other.executionLogger)) return false;
         if (executionWithSequentialId != other.executionWithSequentialId) return false;
-        if (!Objects.equals(retryPolicy, other.retryPolicy)) return false;
         return true;
-    }
-
-    /**
-     * Create new {@link MarketSetting} with the specified property and copy other properties from this model.
-     *
-     * @param value A new value to assign.
-     * @return A created new model instance.
-     */
-    public MarketSetting withRetryPolicy(RetryPolicy value) {
-        if (this.retryPolicy == value) {
-            return this;
-        }
-        return with.baseCurrencyMinimumBidPrice(this.baseCurrencyMinimumBidPrice).targetCurrencyMinimumBidSize(this.targetCurrencyMinimumBidSize).orderBookGroupRanges(this.orderBookGroupRanges).targetCurrencyBidSizes(this.targetCurrencyBidSizes).baseCurrencyScaleSize(this.baseCurrencyScaleSize).targetCurrencyScaleSize(this.targetCurrencyScaleSize).acquirableExecutionSize(this.acquirableExecutionSize).executionLogger(this.executionLogger).executionWithSequentialId(this.executionWithSequentialId).retryPolicy(value);
     }
 
     /** The singleton builder. */
@@ -691,17 +632,6 @@ public abstract class MarketSetting implements MarketSettingModel {
             ((MarketSetting) this).setExecutionWithSequentialId(value);
             return (Next) this;
         }
-
-        /**
-         * Assign retryPolicy property.
-         * 
-         * @param value A new value to assign.
-         * @return The next assignable model.
-         */
-        default Next retryPolicy(RetryPolicy value) {
-            ((MarketSetting) this).setRetryPolicy(value);
-            return (Next) this;
-        }
     }
 
     /**
@@ -729,6 +659,5 @@ public abstract class MarketSetting implements MarketSettingModel {
         static final String AcquirableExecutionSize = "acquirableExecutionSize";
         static final String ExecutionLogger = "executionLogger";
         static final String ExecutionWithSequentialId = "executionWithSequentialId";
-        static final String RetryPolicy = "retryPolicy";
     }
 }

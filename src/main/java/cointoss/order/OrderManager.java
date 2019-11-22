@@ -144,7 +144,7 @@ public final class OrderManager {
             Complementer complementer = new Complementer(order);
 
             return service.request(order)
-                    .retryWhen(service.setting.retryPolicy())
+                    .retryWhen(service.retryPolicy())
                     .effectOnObserve(complementer::start)
                     .effect(complementer::complement)
                     .effectOnTerminate(complementer::stop)
@@ -190,7 +190,7 @@ public final class OrderManager {
             OrderState previous = order.state;
             order.setState(REQUESTING);
 
-            return service.cancel(order).retryWhen(service.setting.retryPolicy()).effectOnError(e -> {
+            return service.cancel(order).retryWhen(service.retryPolicy()).effectOnError(e -> {
                 order.setState(previous);
             });
         } else {

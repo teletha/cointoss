@@ -9,7 +9,6 @@
  */
 package cointoss;
 
-import java.time.Duration;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -106,15 +105,5 @@ interface MarketSettingModel {
     @Icy.Property
     default boolean executionWithSequentialId() {
         return true;
-    }
-
-    /**
-     * Configure {@link cointoss.util.RetryPolicy}.
-     * 
-     * @return
-     */
-    @Icy.Property(copiable = true)
-    default cointoss.util.RetryPolicy retryPolicy() {
-        return cointoss.util.RetryPolicy.with.limit(5).delayLinear(Duration.ofMillis(1000)).delayMaximum(Duration.ofMinutes(3));
     }
 }

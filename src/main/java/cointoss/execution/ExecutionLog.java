@@ -9,14 +9,13 @@
  */
 package cointoss.execution;
 
-import static java.nio.charset.StandardCharsets.*;
+import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static java.nio.file.StandardOpenOption.*;
-import static java.util.concurrent.TimeUnit.*;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
-import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
@@ -167,7 +166,7 @@ public class ExecutionLog {
     private final ExecutionLogger logger;
 
     /** The retry policy. */
-    private final RetryPolicy policy = RetryPolicy.with.limit(100).delayLinear(Duration.ofSeconds(1)).delayMaximum(Duration.ofMinutes(2));
+    private final RetryPolicy policy;
 
     /**
      * Create log manager.
@@ -188,6 +187,7 @@ public class ExecutionLog {
         this.service = Objects.requireNonNull(service);
         this.root = Objects.requireNonNull(root);
         this.logger = I.make(service.setting.executionLogger());
+        this.policy = service.retryPolicy();
 
         try {
             ZonedDateTime start = null;

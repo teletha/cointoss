@@ -86,16 +86,14 @@ public class VerifiableMarketService extends MarketService {
     public VerifiableMarketService() {
         super("TestableExchange", "TestableMarket", MarketSetting.with.baseCurrencyMinimumBidPrice(Num.ONE)
                 .targetCurrencyMinimumBidSize(Num.ONE)
-                .orderBookGroupRanges(Num.ONE)
-                .retryPolicy(RetryPolicy.with.unlimit().delayMaximum(Duration.ZERO)));
+                .orderBookGroupRanges(Num.ONE));
     }
 
     /**
      * 
      */
     public VerifiableMarketService(MarketService delegation) {
-        super(delegation.exchangeName, delegation.marketName, delegation.setting
-                .withRetryPolicy(RetryPolicy.with.unlimit().delayMaximum(Duration.ZERO)));
+        super(delegation.exchangeName, delegation.marketName, delegation.setting);
     }
 
     /**
@@ -319,6 +317,14 @@ public class VerifiableMarketService extends MarketService {
     @Override
     public ScheduledExecutorService scheduler() {
         return scheduler;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public RetryPolicy retryPolicy() {
+        return RetryPolicy.with.unlimit().delayMaximum(Duration.ZERO);
     }
 
     /**
