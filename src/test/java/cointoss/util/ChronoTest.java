@@ -14,9 +14,6 @@ import java.time.ZonedDateTime;
 
 import org.junit.jupiter.api.Test;
 
-/**
- * @version 2018/07/16 11:45:36
- */
 class ChronoTest {
 
     @Test
@@ -65,6 +62,11 @@ class ChronoTest {
     void epochMills() {
         assert Chrono.epochMills(ZonedDateTime.of(1970, 1, 1, 0, 0, 1, 0, Chrono.UTC)) == 1000L;
         assert Chrono.epochMills(ZonedDateTime.of(2018, 4, 4, 10, 11, 14, 0, Chrono.UTC)) == 1522836674000L;
+    }
+
+    @Test
+    void format() {
+        assert Chrono.format(ZonedDateTime.of(1970, 1, 1, 0, 0, 1, 0, Chrono.UTC)).equals("1970-01-01T09:00:01");
     }
 
     @Test
