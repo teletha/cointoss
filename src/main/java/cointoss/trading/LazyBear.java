@@ -9,7 +9,7 @@
  */
 package cointoss.trading;
 
-import static java.time.temporal.ChronoUnit.*;
+import static java.time.temporal.ChronoUnit.MINUTES;
 
 import cointoss.Direction;
 import cointoss.Market;
@@ -31,7 +31,7 @@ public class LazyBear extends Trader {
     public LazyBear(Market market) {
         super(market);
 
-        disableWhile(observeProfit().map(p -> p.isLessThan(-10000)));
+        // disableWhile(observeProfit().map(p -> p.isLessThan(-10000)));
 
         double size = 0.1;
 

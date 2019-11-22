@@ -14,6 +14,8 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 
 import antibug.CleanRoom;
 import cointoss.Market;
@@ -21,6 +23,7 @@ import cointoss.market.bitflyer.BitFlyer;
 import cointoss.ticker.Ticker;
 import kiss.Variable;
 
+@Execution(ExecutionMode.SAME_THREAD)
 class PlotScriptRegistryTest {
 
     @RegisterExtension
