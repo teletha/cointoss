@@ -48,6 +48,20 @@ class ChronoTest {
     }
 
     @Test
+    void betweenDurationMills() {
+        Duration min = Duration.ofMillis(300);
+        Duration max = Duration.ofMillis(500);
+
+        Duration before = Duration.ofMillis(100);
+        Duration in = Duration.ofMillis(400);
+        Duration after = Duration.ofMillis(600);
+
+        assert Chrono.between(min, in, max) == in;
+        assert Chrono.between(min, before, max) == min;
+        assert Chrono.between(min, after, max) == max;
+    }
+
+    @Test
     void epochMills() {
         assert Chrono.epochMills(ZonedDateTime.of(1970, 1, 1, 0, 0, 1, 0, Chrono.UTC)) == 1000L;
         assert Chrono.epochMills(ZonedDateTime.of(2018, 4, 4, 10, 11, 14, 0, Chrono.UTC)) == 1522836674000L;

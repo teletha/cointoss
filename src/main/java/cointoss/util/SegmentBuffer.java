@@ -173,7 +173,7 @@ public final class SegmentBuffer<E> {
      * @return
      */
     public E first() {
-        if (completedSize != 0) {
+        if (!completeds.isEmpty()) {
             return completeds.firstEntry().getValue().first();
         }
 
@@ -193,7 +193,7 @@ public final class SegmentBuffer<E> {
             return uncompleted[uncompletedSize - 1];
         }
 
-        if (completedSize != 0) {
+        if (!completeds.isEmpty()) {
             return completeds.lastEntry().getValue().last();
         }
         return null;

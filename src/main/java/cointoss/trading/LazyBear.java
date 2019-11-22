@@ -9,7 +9,7 @@
  */
 package cointoss.trading;
 
-import static java.time.temporal.ChronoUnit.MINUTES;
+import static java.time.temporal.ChronoUnit.*;
 
 import cointoss.Direction;
 import cointoss.Market;
@@ -19,7 +19,6 @@ import cointoss.ticker.Indicator;
 import cointoss.ticker.Indicators;
 import cointoss.ticker.Span;
 import cointoss.util.Num;
-import kiss.I;
 import kiss.Ⅱ;
 
 /**
@@ -46,14 +45,13 @@ public class LazyBear extends Trader {
             @Override
             protected void exit() {
                 exitWhen(oscillator.observe().take(v -> v.ⅰ.isGreaterThan(value.ⅰ.negate().divide(2))), s -> s.take());
-                exitAt(entryPrice.minus(this, 4900));
-                exitAt(market.tickers.of(Span.Second5).add.flatMap(tick -> {
-                    if (tick.openPrice.isGreaterThan(this, entryPrice.plus(this, 4000))) {
-                        return I.signal(entryPrice.plus(this, 100));
-                    } else {
-                        return I.signal();
-                    }
-                }).first().startWith(entryPrice.minus(this, 2000)).to());
+                // exitAt(market.tickers.of(Span.Second5).add.flatMap(tick -> {
+                // if (tick.openPrice.isGreaterThan(this, entryPrice.plus(this, 4000))) {
+                // return I.signal(entryPrice.plus(this, 100));
+                // } else {
+                // return I.signal();
+                // }
+                // }).first().startWith(entryPrice.minus(this, 2000)).to());
             }
         });
 
@@ -67,14 +65,13 @@ public class LazyBear extends Trader {
             @Override
             protected void exit() {
                 exitWhen(oscillator.observe().take(v -> v.ⅰ.isLessThan(value.ⅰ.negate().divide(2))), s -> s.take());
-                exitAt(entryPrice.minus(this, 4900));
-                exitAt(market.tickers.of(Span.Second5).add.flatMap(tick -> {
-                    if (tick.openPrice.isGreaterThan(this, entryPrice.plus(this, 4000))) {
-                        return I.signal(entryPrice.plus(this, 100));
-                    } else {
-                        return I.signal();
-                    }
-                }).first().startWith(entryPrice.minus(this, 2000)).to());
+                // exitAt(market.tickers.of(Span.Second5).add.flatMap(tick -> {
+                // if (tick.openPrice.isGreaterThan(this, entryPrice.plus(this, 4000))) {
+                // return I.signal(entryPrice.plus(this, 100));
+                // } else {
+                // return I.signal();
+                // }
+                // }).first().startWith(entryPrice.minus(this, 2000)).to());
             }
         });
     }

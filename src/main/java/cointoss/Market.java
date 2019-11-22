@@ -35,7 +35,7 @@ import cointoss.order.OrderStrategy.Takable;
 import cointoss.ticker.TickerManager;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
-import cointoss.util.Retry;
+import cointoss.util.RetryPolicy;
 import kiss.Disposable;
 import kiss.I;
 import kiss.Observer;
@@ -112,7 +112,7 @@ public class Market implements Disposable {
      * Start reading {@link OrderBook}.
      */
     protected void readOrderBook() {
-        Retry policy = service.setting.retryPolicy();
+        RetryPolicy policy = service.setting.retryPolicy();
 
         // orderbook management
         service.add(service.orderBook().retryWhen(policy).to(board -> {

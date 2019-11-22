@@ -9,9 +9,9 @@
  */
 package cointoss.execution;
 
-import static java.nio.charset.StandardCharsets.ISO_8859_1;
+import static java.nio.charset.StandardCharsets.*;
 import static java.nio.file.StandardOpenOption.*;
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -58,7 +58,7 @@ import cointoss.market.bitmex.BitMex;
 import cointoss.util.Chrono;
 import cointoss.util.Network;
 import cointoss.util.Num;
-import cointoss.util.Retry;
+import cointoss.util.RetryPolicy;
 import kiss.I;
 import kiss.Observer;
 import kiss.Signal;
@@ -167,7 +167,7 @@ public class ExecutionLog {
     private final ExecutionLogger logger;
 
     /** The retry policy. */
-    private final Retry policy = Retry.with.limit(100).delayLinear(Duration.ofSeconds(1)).delayMaximum(Duration.ofMinutes(2));
+    private final RetryPolicy policy = RetryPolicy.with.limit(100).delayLinear(Duration.ofSeconds(1)).delayMaximum(Duration.ofMinutes(2));
 
     /**
      * Create log manager.

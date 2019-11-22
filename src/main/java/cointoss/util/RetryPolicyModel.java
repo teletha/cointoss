@@ -9,7 +9,7 @@
  */
 package cointoss.util;
 
-import static java.time.temporal.ChronoUnit.MINUTES;
+import static java.time.temporal.ChronoUnit.*;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
@@ -25,68 +25,117 @@ import kiss.Signal;
 import kiss.WiseFunction;
 
 @Icy
-abstract class RetryModel implements WiseFunction<Signal<Throwable>, Signal<?>> {
+abstract class RetryPolicyModel implements WiseFunction<Signal<Throwable>, Signal<?>> {
 
     @VisibleForTesting
     long count;
 
+    /**
+     * Set maximum number of trials.
+     * 
+     * @return
+     */
     @Icy.Property
     abstract long limit();
 
+    /**
+     * Set limit number to {@link Long#MAX_VALUE}.
+     * 
+     * @return
+     */
     @Icy.Overload("limit")
     private long unlimit() {
         return Long.MAX_VALUE;
     }
 
+    /**
+     * Set the delay time between trials.
+     * 
+     * @return
+     */
     @Icy.Property
     LongFunction<Duration> delay() {
         return i -> delayMinimum();
     }
 
+    /**
+     * Set the delay time between trials.
+     * 
+     * @param delay
+     * @return
+     */
     @Icy.Overload("delay")
     private LongFunction<Duration> delay(Duration delay) {
         return i -> delay;
     }
 
+    /**
+     * Set the delay time between trials.
+     * 
+     * @param delay
+     * @return
+     */
     @Icy.Overload("delay")
     private LongFunction<Duration> delay(long time, ChronoUnit unit) {
         return delay(Duration.of(time, unit));
     }
 
+    /**
+     * Set the delay time between trials.
+     * 
+     * @param delay
+     * @return
+     */
     @Icy.Overload("delay")
     private LongFunction<Duration> delay(long time, TimeUnit unit) {
         return delay(time, unit.toChronoUnit());
     }
 
+    /**
+     * Set the linear delay time between trials.
+     * 
+     * @param baseDelay
+     * @return
+     */
     @Icy.Overload("delay")
-    private LongFunction<Duration> delayLinear(Duration delay) {
-        return i -> delay.multipliedBy(i);
+    private LongFunction<Duration> delayLinear(Duration baseDelay) {
+        return i -> baseDelay.multipliedBy(i + 1);
     }
 
-    @Icy.Overload("delay")
-    private LongFunction<Duration> delayExponential(Duration delay) {
-        return i -> delay.multipliedBy((long) Math.pow(i, 2));
-    }
-
+    /**
+     * Set the minimum time to delay. The default is 0 seconds.
+     * 
+     * @return
+     */
     @Icy.Property
     Duration delayMinimum() {
         return Duration.ZERO;
     }
 
+    /**
+     * Set the maximum time to delay. The default is 10 minutes.
+     * 
+     * @return
+     */
     @Icy.Property
     Duration delayMaximum() {
-        return Duration.of(30, MINUTES);
+        return Duration.of(10, MINUTES);
     }
 
+    /**
+     * Set the scheduler to manage the delay.
+     * 
+     * @return
+     */
     @Icy.Property
     ScheduledExecutorService scheduler() {
         return null;
     }
 
     /**
-     * Reset count.
+     * Set the current number of trials to 0.
      */
-    public void reset() {
+    public final void reset() {
         count = 0;
     }
 

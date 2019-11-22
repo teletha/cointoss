@@ -195,10 +195,10 @@ public class Chrono {
      * @return
      */
     public static Duration between(Duration min, Duration target, Duration max) {
-        if (min.compareTo(target) == 1) {
+        if (min.compareTo(target) > 0) {
             return min;
         }
-        if (target.compareTo(max) == -1) {
+        if (target.compareTo(max) < 0) {
             return target;
         }
         return max;

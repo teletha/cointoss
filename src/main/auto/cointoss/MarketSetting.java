@@ -4,7 +4,7 @@ import cointoss.MarketSetting;
 import cointoss.MarketSettingModel;
 import cointoss.execution.ExecutionLogger;
 import cointoss.util.Num;
-import cointoss.util.Retry;
+import cointoss.util.RetryPolicy;
 import java.lang.Class;
 import java.lang.Override;
 import java.lang.StringBuilder;
@@ -130,7 +130,7 @@ public abstract class MarketSetting implements MarketSettingModel {
     public final boolean executionWithSequentialId;
 
     /** The exposed property. */
-    public final Retry retryPolicy;
+    public final RetryPolicy retryPolicy;
 
     /**
      * HIDE CONSTRUCTOR
@@ -437,12 +437,12 @@ public abstract class MarketSetting implements MarketSettingModel {
     }
 
     /**
-     * Configure {@link RetryPolicy}.
+     * Configure {@link cointoss.util.RetryPolicy}.
      *  
      *  @return
      */
     @Override
-    public final Retry retryPolicy() {
+    public final RetryPolicy retryPolicy() {
         return this.retryPolicy;
     }
 
@@ -452,7 +452,7 @@ public abstract class MarketSetting implements MarketSettingModel {
      * @return A value of retryPolicy property.
      */
     @SuppressWarnings("unused")
-    private final Retry getRetryPolicy() {
+    private final RetryPolicy getRetryPolicy() {
         return this.retryPolicy;
     }
 
@@ -461,7 +461,7 @@ public abstract class MarketSetting implements MarketSettingModel {
      *
      * @paran value A new value of retryPolicy property to assign.
      */
-    private final void setRetryPolicy(Retry value) {
+    private final void setRetryPolicy(RetryPolicy value) {
         if (value == null) {
             value = MarketSettingModel.super.retryPolicy();
         }
@@ -534,7 +534,7 @@ public abstract class MarketSetting implements MarketSettingModel {
      * @param value A new value to assign.
      * @return A created new model instance.
      */
-    public MarketSetting withRetryPolicy(Retry value) {
+    public MarketSetting withRetryPolicy(RetryPolicy value) {
         if (this.retryPolicy == value) {
             return this;
         }
@@ -698,7 +698,7 @@ public abstract class MarketSetting implements MarketSettingModel {
          * @param value A new value to assign.
          * @return The next assignable model.
          */
-        default Next retryPolicy(Retry value) {
+        default Next retryPolicy(RetryPolicy value) {
             ((MarketSetting) this).setRetryPolicy(value);
             return (Next) this;
         }

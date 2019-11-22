@@ -17,7 +17,6 @@ import cointoss.execution.ExecutionDeltaLogger;
 import cointoss.execution.ExecutionLog;
 import cointoss.execution.ExecutionLogger;
 import cointoss.util.Num;
-import cointoss.util.Retry;
 import icy.manipulator.Icy;
 import kiss.I;
 
@@ -110,12 +109,12 @@ interface MarketSettingModel {
     }
 
     /**
-     * Configure {@link RetryPolicy}.
+     * Configure {@link cointoss.util.RetryPolicy}.
      * 
      * @return
      */
     @Icy.Property(copiable = true)
-    default cointoss.util.Retry retryPolicy() {
-        return Retry.with.limit(5).delayLinear(Duration.ofMillis(1000)).delayMaximum(Duration.ofMinutes(3));
+    default cointoss.util.RetryPolicy retryPolicy() {
+        return cointoss.util.RetryPolicy.with.limit(5).delayLinear(Duration.ofMillis(1000)).delayMaximum(Duration.ofMinutes(3));
     }
 }

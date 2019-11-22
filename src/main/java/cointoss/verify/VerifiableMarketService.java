@@ -39,7 +39,7 @@ import cointoss.order.OrderType;
 import cointoss.order.QuantityCondition;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
-import cointoss.util.Retry;
+import cointoss.util.RetryPolicy;
 import kiss.I;
 import kiss.Signal;
 import kiss.Signaling;
@@ -87,7 +87,7 @@ public class VerifiableMarketService extends MarketService {
         super("TestableExchange", "TestableMarket", MarketSetting.with.baseCurrencyMinimumBidPrice(Num.ONE)
                 .targetCurrencyMinimumBidSize(Num.ONE)
                 .orderBookGroupRanges(Num.ONE)
-                .retryPolicy(Retry.with.unlimit().delayMaximum(Duration.ZERO)));
+                .retryPolicy(RetryPolicy.with.unlimit().delayMaximum(Duration.ZERO)));
     }
 
     /**
@@ -95,7 +95,7 @@ public class VerifiableMarketService extends MarketService {
      */
     public VerifiableMarketService(MarketService delegation) {
         super(delegation.exchangeName, delegation.marketName, delegation.setting
-                .withRetryPolicy(Retry.with.unlimit().delayMaximum(Duration.ZERO)));
+                .withRetryPolicy(RetryPolicy.with.unlimit().delayMaximum(Duration.ZERO)));
     }
 
     /**
