@@ -19,14 +19,17 @@ Realized Profit
 Run
 実行
 
-Size(Max)
-サイズ(最大)
+Size
+枚数
 
 Start
 開始
 
 The end date must be after the start date.
 終了日は開始日より後でなければなりません。
+
+Total
+総計
 
 Unrealized Loss
 含損幅
@@ -36,6 +39,9 @@ Unrealized Profit
 
 Win Rate
 勝率
+
+current
+現在
 
 max
 最大

@@ -67,7 +67,7 @@ public class BackTestView extends View implements Analyzer {
     private UITableColumn<TradingLog, String> name;
 
     /** The trading statistics. */
-    private UITableColumn<TradingLog, String> size;
+    private UITableColumn<TradingLog, TradingLog> size;
 
     /** The trading statistics. */
     private UITableColumn<TradingLog, Statistics> realizedProfit;
@@ -81,8 +81,11 @@ public class BackTestView extends View implements Analyzer {
     /** The trading statistics. */
     private UITableColumn<TradingLog, Statistics> unrealizedLoss;
 
-    /** UI */
-    private UITableColumn<TradingLog, Num> profitAndLoss;
+    /** The trading statistics. */
+    private UITableColumn<TradingLog, Statistics> profit;
+
+    /** The trading statistics. */
+    private UITableColumn<TradingLog, Num> total;
 
     /** UI */
     private UITableColumn<TradingLog, Num> winRatio;
@@ -103,9 +106,9 @@ public class BackTestView extends View implements Analyzer {
                         $(marketSelection);
                         $(hbox, FormRow, () -> {
                             label(en("Start"), style.formLabel);
-                            $(startDate, style.FormInput);
+                            $(startDate, style.formInput);
                             label(en("End"), style.formLabel);
-                            $(endDate, style.FormInput);
+                            $(endDate, style.formInput);
                         });
                         $(runner);
                     });
@@ -120,7 +123,8 @@ public class BackTestView extends View implements Analyzer {
                         $(realizedLoss);
                         $(unrealizedLoss);
 
-                        $(profitAndLoss);
+                        $(profit);
+                        $(total);
                         $(winRatio);
                         $(riskRewardRatio);
                     });
@@ -142,7 +146,7 @@ public class BackTestView extends View implements Analyzer {
             padding.top(3, px);
         };
 
-        Style FormInput = () -> {
+        Style formInput = () -> {
             display.minWidth(110, px);
             margin.right(20, px);
         };
@@ -193,16 +197,37 @@ public class BackTestView extends View implements Analyzer {
      */
     private void configureTradingLogView() {
         name.header(en("Name")).model(log -> log.trader.name());
-        size.header(en("Size(Max)")).model(log -> log.holdCurrentSize + "/" + log.holdMaxSize);
+        size.header(en("Size")).model(log -> log).render(this::renderPositionSize);
         realizedProfit.header(en("Realized Profit")).model(log -> log.profitRange).render(this::render);
         unrealizedProfit.header(en("Unrealized Profit")).model(log -> log.unrealizedProfitRange).render(this::render);
         realizedLoss.header(en("Realized Loss")).model(log -> log.lossRange).render(this::render);
         unrealizedLoss.header(en("Unrealized Loss")).model(log -> log.unrealizedLossRange).render(this::render);
-
-        profitAndLoss.header(en("Profit")).model(log -> log.profitAndLoss.total());
+        profit.header(en("Profit")).model(log -> log.profitAndLoss).render(this::render);
+        total.header(en("Total")).model(log -> log.profitAndLoss.total().scale(marketSelection.value().setting.baseCurrencyScaleSize));
         winRatio.header(en("Win Rate")).model(log -> log.winningRate());
     }
 
+    /**
+     * Render position size.
+     * 
+     * @param cell
+     * @param statistics
+     */
+    private void renderPositionSize(UITableCell cell, TradingLog log) {
+        int target = marketSelection.value().setting.targetCurrencyScaleSize;
+
+        UILabel mean = make(UILabel.class).tooltip(en("current")).text(log.holdCurrentSize.scale(target)).style(style.mean);
+        UILabel max = make(UILabel.class).tooltip(en("max")).text(log.holdMaxSize.scale(target)).style(style.max);
+
+        cell.text(mean, max);
+    }
+
+    /**
+     * Render {@link Statistics}.
+     * 
+     * @param cell
+     * @param statistics
+     */
     private void render(UITableCell cell, Statistics statistics) {
         int base = marketSelection.value().setting.baseCurrencyScaleSize;
 
