@@ -1,15 +1,24 @@
-End Date
-終了日
+End
+終了
+
+Name
+名称
 
 No logs were found for the specified date.
 指定された日付のログが見つかりませんでした。
 
+Profit
+損益
+
 Run
 実行
 
-Start Date
-開始日
+Start
+開始
 
 The end date must be after the start date.
 終了日は開始日より後でなければなりません。
+
+Win Rate
+ウィン・レート
 

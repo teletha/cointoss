@@ -73,6 +73,15 @@ public abstract class Trader extends TraderBase {
     }
 
     /**
+     * The human-readable identical name.
+     * 
+     * @return An identical trader name.
+     */
+    public String name() {
+        return getClass().getSimpleName();
+    }
+
+    /**
      * Initialize status
      */
     @VisibleForTesting

@@ -22,6 +22,9 @@ import cointoss.util.Num;
 
 public class TradingLog {
 
+    /** The associated trader. */
+    public final Trader trader;
+
     /** summary */
     public final Statistics holdTime = new Statistics().formatter(Chrono::formatAsDuration);
 
@@ -104,6 +107,7 @@ public class TradingLog {
      * Analyze trading.
      */
     public TradingLog(Market market, FundManager funds, List<Scenario> entries, Trader trader) {
+        this.trader = trader;
         Function<Num, String> format = v -> v.scale(market.service.setting.baseCurrencyScaleSize).format(NumberFormat.getNumberInstance());
         this.profit = new Statistics().formatter(format);
         this.profitRange = new Statistics().formatter(format);

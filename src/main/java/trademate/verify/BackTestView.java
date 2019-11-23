@@ -75,7 +75,7 @@ public class BackTestView extends View implements Analyzer {
     /**
      * UI definition.
      */
-    private class UIDefinition extends UI implements SettingStyles, Styles {
+    class view extends UI implements SettingStyles {
 
         {
             $(vbox, () -> {
@@ -84,19 +84,17 @@ public class BackTestView extends View implements Analyzer {
                     $(vbox, () -> {
                         $(marketSelection);
                         $(hbox, FormRow, () -> {
-                            label(en("Start Date"), FormLabel);
-                            $(startDate, FormInput);
-                        });
-                        $(hbox, FormRow, () -> {
-                            label(en("End Date"), FormLabel);
-                            $(endDate, FormInput);
+                            label(en("Start"), style.formLabel);
+                            $(startDate, style.FormInput);
+                            label(en("End"), style.formLabel);
+                            $(endDate, style.FormInput);
                         });
                         $(runner);
                     });
                 });
 
                 $(hbox, () -> {
-                    $(results, Results, () -> {
+                    $(results, style.testResult, () -> {
                         $(name);
                         $(profitAndLoss);
                         $(winRatio);
@@ -108,24 +106,22 @@ public class BackTestView extends View implements Analyzer {
     }
 
     /**
-     * 
+     * Style definition
      */
-    private interface Styles extends StyleDSL {
-        Style Results = () -> {
+    interface style extends StyleDSL {
+        Style testResult = () -> {
             display.width(300, px).maxHeight(150, px).minHeight(150, px);
         };
 
-        Style Chart = () -> {
-            display.width(300, px).height(150, px);
+        Style formLabel = () -> {
+            display.minWidth(40, px);
+            padding.top(3, px);
         };
-    }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected UI declareUI() {
-        return new UIDefinition();
+        Style FormInput = () -> {
+            display.minWidth(110, px);
+            margin.right(20, px);
+        };
     }
 
     /**
@@ -157,6 +153,17 @@ public class BackTestView extends View implements Analyzer {
         }, e -> {
             e.printStackTrace();
         });
+
+        configureTradingLogView();
+    }
+
+    /**
+     * Setting for trading log.
+     */
+    private void configureTradingLogView() {
+        name.header(en("Name")).model(log -> log.trader.name());
+        profitAndLoss.header(en("Profit")).model(log -> log.profitAndLoss.total());
+        winRatio.header(en("Win Rate")).model(log -> log.winningRate());
     }
 
     /**
@@ -179,6 +186,7 @@ public class BackTestView extends View implements Analyzer {
     public void analyze(Market market, List<TradingLog> logs, boolean detail) {
         for (TradingLog log : logs) {
             System.out.println(log);
+            results.values.add(log);
         }
 
         Viewtify.inUI(() -> {
