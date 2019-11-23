@@ -10,8 +10,17 @@ No logs were found for the specified date.
 Profit
 損益
 
+Realized Loss
+損幅
+
+Realized Profit
+利幅
+
 Run
 実行
+
+Size(Max)
+サイズ(最大)
 
 Start
 開始
@@ -19,6 +28,18 @@ Start
 The end date must be after the start date.
 終了日は開始日より後でなければなりません。
 
+Unrealized Loss
+含損幅
+
+Unrealized Profit
+含利幅
+
 Win Rate
-ウィン・レート
+勝率
+
+max
+最大
+
+mean
+平均
 

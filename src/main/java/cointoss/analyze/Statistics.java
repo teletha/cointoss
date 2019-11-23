@@ -93,8 +93,8 @@ public class Statistics {
      */
     public Statistics add(Num value) {
         size++;
-        min = min.isZero() ? value : Num.min(min, value);
-        max = max.isZero() ? value : Num.max(max, value);
+        min = min.isZero() ? value : negative ? Num.max(min, value) : Num.min(min, value);
+        max = max.isZero() ? value : negative ? Num.min(max, value) : Num.max(max, value);
         total = total.plus(value);
 
         Num delta = value.minus(mean);
@@ -200,9 +200,9 @@ public class Statistics {
     @Override
     public String toString() {
         return new StringBuilder().append("最小")
-                .append(padding(formatter.apply(negative ? max : min)))
+                .append(padding(formatter.apply(min)))
                 .append("\t最大")
-                .append(padding(formatter.apply(negative ? min : max)))
+                .append(padding(formatter.apply(max)))
                 .append("\t平均")
                 .append(padding(formatter.apply(mean)))
                 .append("\t合計")

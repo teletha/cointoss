@@ -18,6 +18,7 @@ import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.TradingLog;
 import cointoss.analyze.Analyzer;
+import cointoss.analyze.Statistics;
 import cointoss.execution.ExecutionLog;
 import cointoss.market.MarketServiceProvider;
 import cointoss.trading.LazyBear;
@@ -34,7 +35,9 @@ import viewtify.ui.UI;
 import viewtify.ui.UIButton;
 import viewtify.ui.UIComboBox;
 import viewtify.ui.UIDatePicker;
+import viewtify.ui.UILabel;
 import viewtify.ui.UITableColumn;
+import viewtify.ui.UITableColumn.UITableCell;
 import viewtify.ui.UITableView;
 import viewtify.ui.View;
 import viewtify.ui.helper.User;
@@ -62,6 +65,21 @@ public class BackTestView extends View implements Analyzer {
 
     /** UI */
     private UITableColumn<TradingLog, String> name;
+
+    /** The trading statistics. */
+    private UITableColumn<TradingLog, String> size;
+
+    /** The trading statistics. */
+    private UITableColumn<TradingLog, Statistics> realizedProfit;
+
+    /** The trading statistics. */
+    private UITableColumn<TradingLog, Statistics> unrealizedProfit;
+
+    /** The trading statistics. */
+    private UITableColumn<TradingLog, Statistics> realizedLoss;
+
+    /** The trading statistics. */
+    private UITableColumn<TradingLog, Statistics> unrealizedLoss;
 
     /** UI */
     private UITableColumn<TradingLog, Num> profitAndLoss;
@@ -96,6 +114,12 @@ public class BackTestView extends View implements Analyzer {
                 $(hbox, () -> {
                     $(results, style.testResult, () -> {
                         $(name);
+                        $(size);
+                        $(realizedProfit);
+                        $(unrealizedProfit);
+                        $(realizedLoss);
+                        $(unrealizedLoss);
+
                         $(profitAndLoss);
                         $(winRatio);
                         $(riskRewardRatio);
@@ -110,7 +134,7 @@ public class BackTestView extends View implements Analyzer {
      */
     interface style extends StyleDSL {
         Style testResult = () -> {
-            display.width(300, px).maxHeight(150, px).minHeight(150, px);
+            display.width(800, px).maxHeight(150, px).minHeight(150, px);
         };
 
         Style formLabel = () -> {
@@ -121,6 +145,15 @@ public class BackTestView extends View implements Analyzer {
         Style FormInput = () -> {
             display.minWidth(110, px);
             margin.right(20, px);
+        };
+
+        Style max = () -> {
+            font.color(255, 230, 230);
+        };
+
+        Style mean = () -> {
+            margin.right(5, px);
+            font.color(205, 230, 250);
         };
     }
 
@@ -150,8 +183,6 @@ public class BackTestView extends View implements Analyzer {
                     .traders(LazyBear::new)
                     .initialBaseCurrency(3000000)
                     .run(this);
-        }, e -> {
-            e.printStackTrace();
         });
 
         configureTradingLogView();
@@ -162,8 +193,23 @@ public class BackTestView extends View implements Analyzer {
      */
     private void configureTradingLogView() {
         name.header(en("Name")).model(log -> log.trader.name());
+        size.header(en("Size(Max)")).model(log -> log.holdCurrentSize + "/" + log.holdMaxSize);
+        realizedProfit.header(en("Realized Profit")).model(log -> log.profitRange).render(this::render);
+        unrealizedProfit.header(en("Unrealized Profit")).model(log -> log.unrealizedProfitRange).render(this::render);
+        realizedLoss.header(en("Realized Loss")).model(log -> log.lossRange).render(this::render);
+        unrealizedLoss.header(en("Unrealized Loss")).model(log -> log.unrealizedLossRange).render(this::render);
+
         profitAndLoss.header(en("Profit")).model(log -> log.profitAndLoss.total());
         winRatio.header(en("Win Rate")).model(log -> log.winningRate());
+    }
+
+    private void render(UITableCell cell, Statistics statistics) {
+        int base = marketSelection.value().setting.baseCurrencyScaleSize;
+
+        UILabel mean = make(UILabel.class).tooltip(en("mean")).text(statistics.mean().scale(base)).style(style.mean);
+        UILabel max = make(UILabel.class).tooltip(en("max")).text(statistics.max().scale(base)).style(style.max);
+
+        cell.text(mean, max);
     }
 
     /**
