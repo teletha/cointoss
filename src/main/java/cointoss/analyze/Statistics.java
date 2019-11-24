@@ -130,6 +130,15 @@ public class Statistics {
     }
 
     /**
+     * Calculate maximum value.
+     * 
+     * @return A formatted maximum value.
+     */
+    public String formattedMax() {
+        return formatter.apply(max);
+    }
+
+    /**
      * Calculate minimum value.
      * 
      * @return A minimum value.
@@ -139,12 +148,30 @@ public class Statistics {
     }
 
     /**
+     * Calculate minimum value.
+     * 
+     * @return A formatted minimum value.
+     */
+    public String formattedMin() {
+        return formatter.apply(min);
+    }
+
+    /**
      * Calculate mean value.
      * 
      * @return A mean value.
      */
     public Num mean() {
         return mean;
+    }
+
+    /**
+     * Calculate mean value.
+     * 
+     * @return A formatted mean value.
+     */
+    public String formattedMean() {
+        return formatter.apply(mean);
     }
 
     /**
@@ -183,6 +210,15 @@ public class Statistics {
      */
     public Num total() {
         return total;
+    }
+
+    /**
+     * Calculate total value.
+     * 
+     * @return A formatted total value.
+     */
+    public String formattedTotal() {
+        return formatter.apply(total);
     }
 
     /**

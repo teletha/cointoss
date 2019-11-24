@@ -1,8 +1,5 @@
-Count
-カウント
-
-Draw Down
-DD
+Drawdown
+ドローダウン
 
 End
 終了
@@ -10,8 +7,17 @@ End
 Hold Size
 保持枚数
 
-Loss Hold Time
-損失保持時間
+Loss Span
+損失時間
+
+Max
+最大
+
+Mean
+平均
+
+Min
+最小
 
 Name
 名称
@@ -19,14 +25,17 @@ Name
 No logs were found for the specified date.
 指定された日付のログが見つかりませんでした。
 
+Period
+期間
+
 Profit
-損益
+利益
 
 Profit Factor
 利益係数
 
-Profit Hold Time
-利益保持時間
+Profit Span
+利益時間
 
 Realized Loss
 損幅
@@ -53,7 +62,13 @@ The end date must be after the start date.
 終了日は開始日より後でなければなりません。
 
 Total
-総計
+総数
+
+Total Profit
+総合利益
+
+Trade Count
+取引数
 
 Unrealized Loss
 含損幅
@@ -63,16 +78,4 @@ Unrealized Profit
 
 Win Rate
 勝率
-
-current
-現在
-
-max
-最大
-
-mean
-平均
-
-min
-最小
 

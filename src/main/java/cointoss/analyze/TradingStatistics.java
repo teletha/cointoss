@@ -13,8 +13,10 @@ import static cointoss.util.Num.*;
 
 import java.text.NumberFormat;
 import java.time.Duration;
-import java.util.List;
+import java.time.ZonedDateTime;
 import java.util.function.Function;
+
+import org.eclipse.collections.impl.list.mutable.FastList;
 
 import cointoss.FundManager;
 import cointoss.Market;
@@ -28,14 +30,34 @@ public class TradingStatistics {
     /** The associated trader. */
     public final String name;
 
+    /** The start date-time. */
+    public final ZonedDateTime startDate;
+
+    /** The end date-time. */
+    public final ZonedDateTime endDate;
+
     /** summary */
     public final Statistics holdTime = new Statistics().formatter(Chrono::formatAsDuration);
 
     /** summary */
-    public final Statistics holdTimeProfit = new Statistics().formatter(Chrono::formatAsDuration);
+    public final Statistics holdTimeOnProfitTrade = new Statistics().formatter(Chrono::formatAsDuration);
 
     /** summary */
-    public final Statistics holdTimeLoss = new Statistics().formatter(Chrono::formatAsDuration);
+    public final Statistics holdTimeOnLossTrade = new Statistics().formatter(Chrono::formatAsDuration);
+
+    /** The base currency scale. */
+    private int baseCurrencyScale;
+
+    /** The base currency format. */
+    private final Function<Num, String> baseCurrencyFormatter = num -> num.scale(baseCurrencyScale)
+            .format(NumberFormat.getNumberInstance());
+
+    /** The target currency scale. */
+    private int targetCurrencyScale;
+
+    /** The target currency format. */
+    private final Function<Num, String> targetCurrencyFormatter = num -> num.scale(targetCurrencyScale)
+            .format(NumberFormat.getNumberInstance());
 
     /** summary. */
     public final Num holdMaxSize;
@@ -44,43 +66,43 @@ public class TradingStatistics {
     public final Num holdCurrentSize;
 
     /** summary */
-    public final Statistics profit;
+    public final Statistics profit = new Statistics().formatter(baseCurrencyFormatter);
 
     /** summary */
-    public final Statistics profitRange;
+    public final Statistics profitRange = new Statistics().formatter(baseCurrencyFormatter);
 
     /** summary */
-    public final Statistics realizedProfit;
+    public final Statistics realizedProfit = new Statistics().formatter(baseCurrencyFormatter);
 
     /** summary */
-    public final Statistics realizedProfitRange;
+    public final Statistics realizedProfitRange = new Statistics().formatter(baseCurrencyFormatter);
 
     /** summary */
-    public final Statistics unrealizedProfit;
+    public final Statistics unrealizedProfit = new Statistics().formatter(baseCurrencyFormatter);
 
     /** summary */
-    public final Statistics unrealizedProfitRange;
+    public final Statistics unrealizedProfitRange = new Statistics().formatter(baseCurrencyFormatter);
 
     /** summary */
-    public final Statistics loss;
+    public final Statistics loss = new Statistics().formatter(baseCurrencyFormatter).negative();
 
     /** summary */
-    public final Statistics lossRange;
+    public final Statistics lossRange = new Statistics().formatter(baseCurrencyFormatter).negative();
 
     /** summary */
-    public final Statistics realizedLoss;
+    public final Statistics realizedLoss = new Statistics().formatter(baseCurrencyFormatter).negative();
 
     /** summary */
-    public final Statistics realizedLossRange;
+    public final Statistics realizedLossRange = new Statistics().formatter(baseCurrencyFormatter).negative();
 
     /** summary */
-    public final Statistics unrealizedLoss;
+    public final Statistics unrealizedLoss = new Statistics().formatter(baseCurrencyFormatter).negative();
 
     /** summary */
-    public final Statistics unrealizedLossRange;
+    public final Statistics unrealizedLossRange = new Statistics().formatter(baseCurrencyFormatter).negative();
 
     /** summary */
-    public final Statistics profitAndLoss;
+    public final Statistics profitAndLoss = new Statistics().formatter(baseCurrencyFormatter);
 
     /** The max draw down. */
     public Num drawDown = Num.ZERO;
@@ -106,22 +128,12 @@ public class TradingStatistics {
     /**
      * Analyze trading.
      */
-    public TradingStatistics(Market market, FundManager funds, List<Scenario> entries, Trader trader) {
+    public TradingStatistics(Market market, FundManager funds, FastList<Scenario> entries, Trader trader) {
         this.name = trader.name();
-        Function<Num, String> format = v -> v.scale(market.service.setting.baseCurrencyScaleSize).format(NumberFormat.getNumberInstance());
-        this.profit = new Statistics().formatter(format);
-        this.profitRange = new Statistics().formatter(format);
-        this.realizedProfit = new Statistics().formatter(format);
-        this.realizedProfitRange = new Statistics().formatter(format);
-        this.unrealizedProfit = new Statistics().formatter(format);
-        this.unrealizedProfitRange = new Statistics().formatter(format);
-        this.loss = new Statistics().formatter(format).negative();
-        this.lossRange = new Statistics().formatter(format).negative();
-        this.realizedLoss = new Statistics().formatter(format).negative();
-        this.realizedLossRange = new Statistics().formatter(format).negative();
-        this.unrealizedLoss = new Statistics().formatter(format).negative();
-        this.unrealizedLossRange = new Statistics().formatter(format).negative();
-        this.profitAndLoss = new Statistics().formatter(format);
+        this.startDate = entries.getFirstOptional().map(Scenario::holdStartTime).orElseGet(market.service::now);
+        this.endDate = entries.getLastOptional().map(Scenario::holdEndTime).orElseGet(market.service::now);
+        this.baseCurrencyScale = market.service.setting.baseCurrencyScaleSize;
+        this.targetCurrencyScale = market.service.setting.targetCurrencyScaleSize;
         this.holdMaxSize = trader.holdMaxSize;
         this.holdCurrentSize = trader.holdSize;
 
@@ -150,11 +162,11 @@ public class TradingStatistics {
             if (pol.isPositive()) {
                 profit.add(pol);
                 profitRange.add(pips);
-                holdTimeProfit.add(hold);
+                holdTimeOnProfitTrade.add(hold);
             } else if (pol.isNegative()) {
                 loss.add(pol);
                 lossRange.add(pips);
-                holdTimeLoss.add(hold);
+                holdTimeOnLossTrade.add(hold);
             }
             if (realized.isPositive()) {
                 realizedProfit.add(realized);

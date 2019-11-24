@@ -225,6 +225,16 @@ public class Chrono {
     }
 
     /**
+     * Format the date to human-readable expression.
+     * 
+     * @param date A target date to format.
+     * @return A formatted literal.
+     */
+    public static String formatAsDate(ZonedDateTime date) {
+        return Date.format(date.withZoneSameInstant(SYSTEM));
+    }
+
+    /**
      * Format the duration (mills) to human-readable expression.
      * 
      * @param mills

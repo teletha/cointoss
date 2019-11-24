@@ -19,6 +19,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import org.eclipse.collections.impl.list.mutable.FastList;
+
 import com.google.common.annotations.VisibleForTesting;
 
 import cointoss.order.Order;
@@ -27,7 +29,6 @@ import cointoss.order.OrderStrategy.Orderable;
 import cointoss.order.OrderStrategy.Takable;
 import cointoss.ticker.Span;
 import cointoss.util.Chrono;
-import cointoss.util.LinkedQueue;
 import cointoss.util.Num;
 import kiss.Disposable;
 import kiss.I;
@@ -53,11 +54,11 @@ public abstract class Scenario extends ScenarioBase implements Directional {
 
     /** The list entry orders. */
     @VisibleForTesting
-    final LinkedQueue<Order> entries = new LinkedQueue<>();
+    final FastList<Order> entries = new FastList<>();
 
     /** The list exit orders. */
     @VisibleForTesting
-    final LinkedQueue<Order> exits = new LinkedQueue<>();
+    final FastList<Order> exits = new FastList<>();
 
     /** The entry disposer. */
     private final Disposable disposerForEntry = Disposable.empty();
@@ -160,11 +161,25 @@ public abstract class Scenario extends ScenarioBase implements Directional {
         if (entryExecutedSize.isZero() && isEntryTerminated()) {
             return Duration.ZERO;
         }
+        return Duration.between(holdStartTime(), holdEndTime());
+    }
 
-        ZonedDateTime start = entries.first().map(o -> o.creationTime).or(Chrono.MIN);
-        ZonedDateTime end = exits.isEmpty() ? market.service.now() : exits.last().map(o -> o.terminationTime).or(market.service.now());
+    /**
+     * Compute the time when this {@link Scenario} has first position.
+     * 
+     * @return
+     */
+    public final ZonedDateTime holdStartTime() {
+        return entries.getFirstOptional().map(o -> o.creationTime).orElseGet(() -> Chrono.MIN);
+    }
 
-        return Duration.between(start, end);
+    /**
+     * Compute the time when this {@link Scenario} ends last position.
+     * 
+     * @return
+     */
+    public final ZonedDateTime holdEndTime() {
+        return exits.getLastOptional().map(o -> o.terminationTime).orElseGet(market.service::now);
     }
 
     /**
