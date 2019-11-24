@@ -70,6 +70,12 @@ class ChronoTest {
     }
 
     @Test
+    void formatAsDate() {
+        assert Chrono.formatAsDate(ZonedDateTime.of(1970, 1, 1, 0, 0, 1, 0, Chrono.UTC)).equals("1970-01-01");
+        assert Chrono.formatAsDate(ZonedDateTime.of(1970, 1, 1, 23, 0, 1, 0, Chrono.UTC)).equals("1970-01-02");
+    }
+
+    @Test
     void formatAsDuration() {
         assert Chrono.formatAsDuration(1 * 1000).equals("1");
         assert Chrono.formatAsDuration(10 * 1000).equals("10");
