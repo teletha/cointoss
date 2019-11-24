@@ -22,9 +22,6 @@ import viewtify.ui.UIPane;
 import viewtify.ui.View;
 import viewtify.ui.helper.User;
 
-/**
- * @version 2018/08/29 3:51:53
- */
 @Manageable(lifestyle = Singleton.class)
 public class SettingView extends View {
 
@@ -41,61 +38,33 @@ public class SettingView extends View {
     private UIPane setting;
 
     /**
-     * {@inheritDoc}
+     * UI definition.
      */
-    @Override
-    protected UI declareUI() {
-        return new UI() {
-            {
-                $(hbox, () -> {
-                    $(vbox, $.CategoryPane, () -> {
-                        $(general, $.CategoryLabel);
-                        $(appearance, $.CategoryLabel);
-                        $(chart, $.CategoryLabel);
-                        $(notification, $.CategoryLabel);
-                        $(bitflyer, $.CategoryLabel);
-                    });
-                    $(setting);
+    class view extends UI {
+        {
+            $(hbox, () -> {
+                $(vbox, style.categoryPane, () -> {
+                    $(general, style.categoryLabel);
+                    $(appearance, style.categoryLabel);
+                    $(chart, style.categoryLabel);
+                    $(notification, style.categoryLabel);
+                    $(bitflyer, style.categoryLabel);
                 });
-            }
-        };
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void initialize() {
-        select(notification, NotificationSetting.class);
-
-        general.text($.General).when(User.MouseClick, () -> select(general, GeneralSetting.class));
-        appearance.text($.Appearance).when(User.MouseClick, () -> select(appearance, AppearanceSetting.class));
-        chart.text($.Chart).when(User.MouseClick, () -> select(appearance, ChartSetting.class));
-        notification.text($.Notification).when(User.MouseClick, () -> select(notification, NotificationSetting.class));
-        bitflyer.text($.Bitflyer).when(User.MouseClick, () -> select(bitflyer, BitFlyerSetting.class));
-    }
-
-    private void select(UILabel selected, Class<? extends View> view) {
-        for (UILabel label : List.of(general, appearance, notification, bitflyer)) {
-            if (label == selected) {
-                label.style($.Selected);
-            } else {
-                label.unstyle($.Selected);
-            }
+                $(setting);
+            });
         }
-        setting.set(view);
     }
 
     /**
-     * Resource definition.
+     * Style definition.
      */
-    private interface $ extends StyleDSL {
+    interface style extends StyleDSL {
 
-        Style CategoryPane = () -> {
+        Style categoryPane = () -> {
             padding.top(40, px);
         };
 
-        Style CategoryLabel = () -> {
+        Style categoryLabel = () -> {
             display.width(200, px).height(20, px);
             padding.vertical(10, px).left(40, px);
             cursor.pointer();
@@ -110,14 +79,39 @@ public class SettingView extends View {
             background.color("derive(-fx-base, 6%)");
         };
 
-        Transcript General = Transcript.en("General");
+        Transcript general = Transcript.en("General");
 
-        Transcript Appearance = Transcript.en("Appearance");
+        Transcript appearance = Transcript.en("Appearance");
 
-        Transcript Chart = Transcript.en("Chart");
+        Transcript chart = Transcript.en("Chart");
 
-        Transcript Notification = Transcript.en("Notification");
+        Transcript notification = Transcript.en("Notification");
 
-        Transcript Bitflyer = Transcript.en("Bitflyer");
+        Transcript bitflyer = Transcript.en("Bitflyer");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void initialize() {
+        select(notification, NotificationSetting.class);
+
+        general.text(style.general).when(User.MouseClick, () -> select(general, GeneralSetting.class));
+        appearance.text(style.appearance).when(User.MouseClick, () -> select(appearance, AppearanceSetting.class));
+        chart.text(style.chart).when(User.MouseClick, () -> select(appearance, ChartSetting.class));
+        notification.text(style.notification).when(User.MouseClick, () -> select(notification, NotificationSetting.class));
+        bitflyer.text(style.bitflyer).when(User.MouseClick, () -> select(bitflyer, BitFlyerSetting.class));
+    }
+
+    private void select(UILabel selected, Class<? extends View> view) {
+        for (UILabel label : List.of(general, appearance, notification, bitflyer)) {
+            if (label == selected) {
+                label.style(style.Selected);
+            } else {
+                label.unstyle(style.Selected);
+            }
+        }
+        setting.set(view);
     }
 }

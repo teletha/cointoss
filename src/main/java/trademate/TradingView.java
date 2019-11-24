@@ -52,27 +52,24 @@ public class TradingView extends View {
     }
 
     /**
-     * {@inheritDoc}
+     * UI definition.
      */
-    @Override
-    protected UI declareUI() {
-        return new UI() {
-            {
-                $(vbox, () -> {
-                    $(hbox, style.fill, () -> {
-                        $(chart, style.chart);
-                        $(builder);
-                        $(books);
-                        $(executionView);
-                    });
-                    $(hbox, () -> {
-                        $(orders);
-                        $(positions);
-                        $(console);
-                    });
+    class view extends UI {
+        {
+            $(vbox, () -> {
+                $(hbox, style.fill, () -> {
+                    $(chart);
+                    $(builder);
+                    $(books);
+                    $(executionView);
                 });
-            }
-        };
+                $(hbox, () -> {
+                    $(orders);
+                    $(positions);
+                    $(console);
+                });
+            });
+        }
     }
 
     /**
@@ -81,12 +78,6 @@ public class TradingView extends View {
     interface style extends StyleDSL {
         Style fill = () -> {
             display.height.fill().width.fill();
-            margin.right(5, px);
-        };
-
-        Style chart = () -> {
-            // display.height.fill().width.fill();
-            // margin.right(5, px);
         };
     }
 

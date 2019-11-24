@@ -46,33 +46,17 @@ public class ChartView extends View {
     private final Chart chart = new Chart(this);
 
     /**
-     * {@inheritDoc}
+     * UI definition.
      */
-    @Override
-    protected UI declareUI() {
-        return new UI() {
-            {
-                $(sbox, style.chart, () -> {
-                    $(chart);
-                    $(hbox, style.configBox, () -> {
-                        $(span);
-                    });
+    class view extends UI {
+        {
+            $(sbox, style.chart, () -> {
+                $(chart);
+                $(hbox, style.configBox, () -> {
+                    $(span);
                 });
-            }
-        };
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void initialize() {
-        span.values(0, Span.class);
-        span.observeNow() //
-                .skipNull()
-                .combineLatest(market.observeNow().skipNull())
-                .map(e -> e.ⅱ.tickers.of(e.ⅰ))
-                .to(ticker::set);
+            });
+        }
     }
 
     /**
@@ -87,5 +71,18 @@ public class ChartView extends View {
             display.maxWidth(100, px).maxHeight(10, px);
             position.top(0, px).right(56, px);
         };
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void initialize() {
+        span.values(0, Span.class);
+        span.observeNow() //
+                .skipNull()
+                .combineLatest(market.observeNow().skipNull())
+                .map(e -> e.ⅱ.tickers.of(e.ⅰ))
+                .to(ticker::set);
     }
 }

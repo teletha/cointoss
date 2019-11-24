@@ -27,9 +27,6 @@ import viewtify.ui.UISpinner;
 import viewtify.ui.UserInterface;
 import viewtify.ui.View;
 
-/**
- * @version 2018/08/30 12:53:20
- */
 public class ExecutionView extends View {
 
     /** The execution list. */
@@ -44,21 +41,29 @@ public class ExecutionView extends View {
     /** Parent View */
     private TradingView view;
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected UI declareUI() {
-        return new UI() {
-            {
-                $(vbox, S.Root, () -> {
-                    $(executionList);
-                    $(hbox, () -> {
-                        $(takerSize, S.TakerSize);
-                    });
-                    $(executionCumulativeList);
+    class view extends UI {
+        {
+            $(vbox, style.root, () -> {
+                $(executionList);
+                $(hbox, () -> {
+                    $(takerSize, style.takerSize);
                 });
-            }
+                $(executionCumulativeList);
+            });
+        }
+    }
+
+    interface style extends StyleDSL {
+        Style root = () -> {
+            display.minWidth(210, px).maxWidth(210, px);
+
+            $.descendant(() -> {
+                text.unselectable();
+            });
+        };
+
+        Style takerSize = () -> {
+            display.width(70, px);
         };
     }
 
@@ -131,23 +136,5 @@ public class ExecutionView extends View {
                 ui.styleOnly(Side.of(e.direction));
             }
         }
-    }
-
-    /**
-     * @version 2018/09/07 10:49:03
-     */
-    private interface S extends StyleDSL {
-
-        Style Root = () -> {
-            display.minWidth(210, px).maxWidth(210, px);
-
-            $.descendant(() -> {
-                text.unselectable();
-            });
-        };
-
-        Style TakerSize = () -> {
-            display.width(70, px);
-        };
     }
 }

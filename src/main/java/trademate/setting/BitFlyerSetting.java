@@ -10,7 +10,7 @@
 package trademate.setting;
 
 import static trademate.setting.SettingStyles.*;
-import static transcript.Transcript.*;
+import static transcript.Transcript.en;
 
 import cointoss.market.bitflyer.BitFlyerAccount;
 import kiss.I;
@@ -45,66 +45,60 @@ public class BitFlyerSetting extends View {
 
     private UICheckBox loginBackground;
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected UI declareUI() {
-        return new UI() {
-            Transcript PublicAPIDescription = Transcript
-                    .en("Please get API key and API secret to use the public API provided by [BitFlyer](https://lightning.bitflyer.jp/developer).");
+    class view extends UI {
+        Transcript PublicAPIDescription = Transcript
+                .en("Please get API key and API secret to use the public API provided by [BitFlyer](https://lightning.bitflyer.jp/developer).");
 
-            Transcript PrivateAPITitle = Transcript.en("Usage of Private API");
+        Transcript PrivateAPITitle = Transcript.en("Usage of Private API");
 
-            Transcript PrivateAPIDescription = Transcript
-                    .en("We will try to speed up trading by using private API.\nTradeMate acquires the account specific infomation(e.g. session id) by logging in automatically.");
+        Transcript PrivateAPIDescription = Transcript
+                .en("We will try to speed up trading by using private API.\nTradeMate acquires the account specific infomation(e.g. session id) by logging in automatically.");
 
-            Transcript PrivateAPIWarning = Transcript.en("WARNING : This setting will allow all operations on your account.");
+        Transcript PrivateAPIWarning = Transcript.en("WARNING : This setting will allow all operations on your account.");
 
-            Transcript LoginExplicitly = Transcript.en("Login explicitly");
+        Transcript LoginExplicitly = Transcript.en("Login explicitly");
 
-            {
-                $(vbox, Root, () -> {
-                    $(vbox, Block, () -> {
-                        label("BitFlyer", Heading);
-                        label(PublicAPIDescription, Description);
-                        $(hbox, FormRow, () -> {
-                            label("API Key", FormLabel);
-                            $(apiKey, FormInput);
-                        });
-                        $(hbox, FormRow, () -> {
-                            label("API Secret", FormLabel);
-                            $(apiSecret, FormInput);
-                        });
-
-                        label(PrivateAPITitle, Heading);
-                        label(PrivateAPIDescription, Description);
-                        label(PrivateAPIWarning, Description, Warning);
-                        $(hbox, FormRow, () -> {
-                            label("Login ID", FormLabel);
-                            $(loginId, FormInput);
-                        });
-                        $(hbox, FormRow, () -> {
-                            label(en("Password"), FormLabel);
-                            $(loginPassword, FormInput);
-                        });
-                        $(hbox, FormRow, () -> {
-                            label(en("Account ID"), FormLabel);
-                            $(accountId, FormInput);
-                        });
-                        $(hbox, FormRow, () -> {
-                            label(en("Account Token"), FormLabel);
-                            $(accountToken, FormInput);
-                        });
-                        $(hbox, FormRow, () -> {
-                            label(LoginExplicitly, FormLabel);
-                            $(loginBackground, FormInput);
-                        });
-
+        {
+            $(vbox, Root, () -> {
+                $(vbox, Block, () -> {
+                    label("BitFlyer", Heading);
+                    label(PublicAPIDescription, Description);
+                    $(hbox, FormRow, () -> {
+                        label("API Key", FormLabel);
+                        $(apiKey, FormInput);
                     });
+                    $(hbox, FormRow, () -> {
+                        label("API Secret", FormLabel);
+                        $(apiSecret, FormInput);
+                    });
+
+                    label(PrivateAPITitle, Heading);
+                    label(PrivateAPIDescription, Description);
+                    label(PrivateAPIWarning, Description, Warning);
+                    $(hbox, FormRow, () -> {
+                        label("Login ID", FormLabel);
+                        $(loginId, FormInput);
+                    });
+                    $(hbox, FormRow, () -> {
+                        label(en("Password"), FormLabel);
+                        $(loginPassword, FormInput);
+                    });
+                    $(hbox, FormRow, () -> {
+                        label(en("Account ID"), FormLabel);
+                        $(accountId, FormInput);
+                    });
+                    $(hbox, FormRow, () -> {
+                        label(en("Account Token"), FormLabel);
+                        $(accountToken, FormInput);
+                    });
+                    $(hbox, FormRow, () -> {
+                        label(LoginExplicitly, FormLabel);
+                        $(loginBackground, FormInput);
+                    });
+
                 });
-            }
-        };
+            });
+        }
     }
 
     /**

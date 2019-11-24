@@ -11,7 +11,7 @@ package trademate.setting;
 
 import static trademate.CommonText.*;
 import static trademate.setting.SettingStyles.*;
-import static transcript.Transcript.*;
+import static transcript.Transcript.en;
 
 import kiss.I;
 import kiss.Manageable;
@@ -30,28 +30,22 @@ public class AppearanceSetting extends View {
 
     private UIColorPicker sell;
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected UI declareUI() {
-        return new UI() {
-            {
-                $(vbox, Root, () -> {
-                    $(vbox, Block, () -> {
-                        label(en("Colors"), Heading);
-                        $(hbox, FormRow, () -> {
-                            label(Buy, FormLabel);
-                            $(buy, FormInput);
-                        });
-                        $(hbox, FormRow, () -> {
-                            label(Sell, FormLabel);
-                            $(sell, FormInput);
-                        });
+    class view extends UI {
+        {
+            $(vbox, Root, () -> {
+                $(vbox, Block, () -> {
+                    label(en("Colors"), Heading);
+                    $(hbox, FormRow, () -> {
+                        label(Buy, FormLabel);
+                        $(buy, FormInput);
+                    });
+                    $(hbox, FormRow, () -> {
+                        label(Sell, FormLabel);
+                        $(sell, FormInput);
                     });
                 });
-            }
-        };
+            });
+        }
     }
 
     /**

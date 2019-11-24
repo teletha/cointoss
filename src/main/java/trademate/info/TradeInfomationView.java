@@ -9,10 +9,9 @@
  */
 package trademate.info;
 
-import static transcript.Transcript.*;
+import static transcript.Transcript.en;
 
 import cointoss.order.OrderBook;
-import cointoss.order.OrderManager;
 import cointoss.order.Position;
 import cointoss.util.Num;
 import stylist.Style;
@@ -23,9 +22,6 @@ import viewtify.ui.UIButton;
 import viewtify.ui.UILabel;
 import viewtify.ui.View;
 
-/**
- * @version 2018/09/08 18:33:32
- */
 public class TradeInfomationView extends View {
 
     /** UI */
@@ -46,30 +42,58 @@ public class TradeInfomationView extends View {
     /** Parent View */
     private TradingView view;
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected UI declareUI() {
-        return new UI() {
-            {
-                $(vbox, S.Root, () -> {
-                    $(hbox, S.Row, () -> {
-                        label(en("Amount"), S.Label);
-                        $(positionSize, S.Normal);
-                    });
-                    $(hbox, S.Row, () -> {
-                        label(en("Price"), S.Label);
-                        $(positionPrice, S.Normal);
-                    });
-                    $(hbox, S.Row, () -> {
-                        label(en("Profit"), S.Label);
-                        $(positionProfit, S.Normal);
-                    });
-                    $(add);
-                    $(remove);
+    class view extends UI {
+        {
+            $(vbox, style.root, () -> {
+                $(hbox, style.row, () -> {
+                    label(en("Amount"), style.label);
+                    $(positionSize, style.normal);
                 });
-            }
+                $(hbox, style.row, () -> {
+                    label(en("Price"), style.label);
+                    $(positionPrice, style.normal);
+                });
+                $(hbox, style.row, () -> {
+                    label(en("Profit"), style.label);
+                    $(positionProfit, style.normal);
+                });
+                $(add);
+                $(remove);
+            });
+        }
+    }
+
+    /**
+     * @version 2018/09/07 14:14:11
+     */
+    @SuppressWarnings("unused")
+    private interface style extends StyleDSL {
+
+        Style root = () -> {
+            display.width(525, px);
+            text.unselectable();
+        };
+
+        Style row = () -> {
+            padding.top(8, px);
+            text.verticalAlign.middle();
+        };
+
+        Style label = () -> {
+            display.width(60, px);
+            display.height(27, px);
+        };
+
+        Style wide = () -> {
+            display.width(120, px);
+        };
+
+        Style normal = () -> {
+            display.width(100, px);
+        };
+
+        Style narrow = () -> {
+            display.width(70, px);
         };
     }
 
@@ -78,7 +102,6 @@ public class TradeInfomationView extends View {
      */
     @Override
     protected void initialize() {
-        OrderManager manager = view.market().orders;
     }
 
     /**
@@ -90,39 +113,5 @@ public class TradeInfomationView extends View {
     private void retreat(Position position) {
         OrderBook book = view.market().orderBook.bookFor(position.inverse());
         Num price = book.computeBestPrice(Num.ZERO, Num.TWO);
-    }
-
-    /**
-     * @version 2018/09/07 14:14:11
-     */
-    @SuppressWarnings("unused")
-    private interface S extends StyleDSL {
-
-        Style Root = () -> {
-            display.width(525, px);
-            text.unselectable();
-        };
-
-        Style Row = () -> {
-            padding.top(8, px);
-            text.verticalAlign.middle();
-        };
-
-        Style Label = () -> {
-            display.width(60, px);
-            display.height(27, px);
-        };
-
-        Style Wide = () -> {
-            display.width(120, px);
-        };
-
-        Style Normal = () -> {
-            display.width(100, px);
-        };
-
-        Style Narrow = () -> {
-            display.width(70, px);
-        };
     }
 }

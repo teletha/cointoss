@@ -56,56 +56,50 @@ public class NotificationSetting extends View {
     /** The access token tester. */
     private UIButton lineTest;
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected UI declareUI() {
-        return new UI() {
-            {
-                $(vbox, Root, () -> {
-                    // Notification Types
-                    $(vbox, Block, () -> {
-                        label(en("Notification Type"), Heading);
-                        $(hbox, FormRow, () -> {
-                            label("", FormLabel);
-                            label(en("Desktop"), FormCheck, FormHeaderLabel);
-                            label(en("LINE"), FormCheck, FormHeaderLabel);
-                            label(en("Sound"), FormCheck2, FormHeaderLabel);
-                        });
-                        $(longTrend);
-                        $(shortTrend);
-                        $(execution);
-                        $(orderFailed);
-                        $(priceSignal);
+    class view extends UI {
+        {
+            $(vbox, Root, () -> {
+                // Notification Types
+                $(vbox, Block, () -> {
+                    label(en("Notification Type"), Heading);
+                    $(hbox, FormRow, () -> {
+                        label("", FormLabel);
+                        label(en("Desktop"), FormCheck, FormHeaderLabel);
+                        label(en("LINE"), FormCheck, FormHeaderLabel);
+                        label(en("Sound"), FormCheck2, FormHeaderLabel);
                     });
+                    $(longTrend);
+                    $(shortTrend);
+                    $(execution);
+                    $(orderFailed);
+                    $(priceSignal);
+                });
 
-                    // Desktop
-                    $(vbox, Block, () -> {
-                        label(en("Desktop Notification"), Heading);
-                        $(hbox, FormRow, () -> {
-                            label(en("Display Time"), FormLabel);
-                            $(desktopDuration, FormInput);
-                        });
-                        $(hbox, FormRow, () -> {
-                            label(en("Display Position"), FormLabel);
-                            $(desktopPosition, FormInput);
-                        });
+                // Desktop
+                $(vbox, Block, () -> {
+                    label(en("Desktop Notification"), Heading);
+                    $(hbox, FormRow, () -> {
+                        label(en("Display Time"), FormLabel);
+                        $(desktopDuration, FormInput);
                     });
-
-                    // LINE
-                    $(vbox, Block, () -> {
-                        label(en("LINE Notification"), Heading);
-                        label(en("You can notify LINE by specifying the access token acquired from [LINE Notify](https://notify-bot.line.me/)."), Description);
-                        $(hbox, FormRow, () -> {
-                            label(en("Access Token"), FormLabel);
-                            $(lineAccessToken, FormInput);
-                            $(lineTest, FormInput);
-                        });
+                    $(hbox, FormRow, () -> {
+                        label(en("Display Position"), FormLabel);
+                        $(desktopPosition, FormInput);
                     });
                 });
-            }
-        };
+
+                // LINE
+                $(vbox, Block, () -> {
+                    label(en("LINE Notification"), Heading);
+                    label(en("You can notify LINE by specifying the access token acquired from [LINE Notify](https://notify-bot.line.me/)."), Description);
+                    $(hbox, FormRow, () -> {
+                        label(en("Access Token"), FormLabel);
+                        $(lineAccessToken, FormInput);
+                        $(lineTest, FormInput);
+                    });
+                });
+            });
+        }
     }
 
     /**

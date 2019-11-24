@@ -33,16 +33,10 @@ public class TradeMate extends View {
 
     private UITabPane main;
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected UI declareUI() {
-        return new UI() {
-            {
-                $(main);
-            }
-        };
+    class view extends UI {
+        {
+            $(main);
+        }
     }
 
     /**

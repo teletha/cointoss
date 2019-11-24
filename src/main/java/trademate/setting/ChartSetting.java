@@ -9,7 +9,7 @@
  */
 package trademate.setting;
 
-import static trademate.setting.SettingStyles.*;
+import static trademate.setting.SettingStyles.Root;
 
 import kiss.Manageable;
 import kiss.Singleton;
@@ -22,18 +22,12 @@ import viewtify.ui.View;
 @Manageable(lifestyle = Singleton.class)
 public class ChartSetting extends View {
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected UI declareUI() {
-        return new UI() {
-            {
-                $(vbox, Root, () -> {
+    class view extends UI {
+        {
+            $(vbox, Root, () -> {
 
-                });
-            }
-        };
+            });
+        }
     }
 
     /**

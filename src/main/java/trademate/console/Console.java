@@ -25,9 +25,6 @@ import viewtify.ui.UI;
 import viewtify.ui.UIListView;
 import viewtify.ui.View;
 
-/**
- * @version 2017/11/19 6:48:15
- */
 public class Console extends View {
 
     /** The maximum line size. */
@@ -42,15 +39,15 @@ public class Console extends View {
 
     final ObservableList<String> messages = FXCollections.observableList(new LinkedList());
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected UI declareUI() {
-        return new UI() {
-            {
-                $(console, S.ConsoleView);
-            }
+    class view extends UI {
+        {
+            $(console, style.consoleView);
+        }
+    }
+
+    interface style extends StyleDSL {
+
+        Style consoleView = () -> {
         };
     }
 
@@ -89,14 +86,5 @@ public class Console extends View {
      */
     public void info(String message, Object... params) {
         logger.info(message, params);
-    }
-
-    /**
-     * @version 2018/08/30 12:50:36
-     */
-    private static class S implements StyleDSL {
-
-        static Style ConsoleView = () -> {
-        };
     }
 }
