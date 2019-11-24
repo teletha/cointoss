@@ -58,8 +58,8 @@ public class TradingLogTest extends TraderTestSupport {
 
         TradingStatistics log = statistics();
         assert log.loss.size() == 2;
-        assert log.loss.max().is(-10);
-        assert log.loss.min().is(-20);
+        assert log.loss.max().is(-20);
+        assert log.loss.min().is(-10);
         assert log.loss.total().is(-30);
         assert log.loss.mean().is(-15);
     }
