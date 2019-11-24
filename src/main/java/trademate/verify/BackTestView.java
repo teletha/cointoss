@@ -9,7 +9,7 @@
  */
 package trademate.verify;
 
-import static transcript.Transcript.en;
+import static transcript.Transcript.*;
 
 import java.time.Period;
 import java.util.List;
@@ -67,7 +67,13 @@ public class BackTestView extends View implements Analyzer {
     private UITableColumn<TradingLog, String> name;
 
     /** The trading statistics. */
-    private UITableColumn<TradingLog, TradingLog> size;
+    private UITableColumn<TradingLog, TradingLog> holdSize;
+
+    /** The trading statistics. */
+    private UITableColumn<TradingLog, Statistics> holdTimeForProfit;
+
+    /** The trading statistics. */
+    private UITableColumn<TradingLog, Statistics> holdTimeForLoss;
 
     /** The trading statistics. */
     private UITableColumn<TradingLog, Statistics> realizedProfit;
@@ -87,11 +93,17 @@ public class BackTestView extends View implements Analyzer {
     /** The trading statistics. */
     private UITableColumn<TradingLog, Num> total;
 
-    /** UI */
+    /** The trading statistics. */
     private UITableColumn<TradingLog, Num> winRatio;
 
-    /** UI */
-    private UITableColumn<TradingLog, Num> riskRewardRatio;
+    /** The trading statistics. */
+    private UITableColumn<TradingLog, Num> profitFactor;
+
+    /** The trading statistics. */
+    private UITableColumn<TradingLog, Num> drawDown;
+
+    /** The trading statistics. */
+    private UITableColumn<TradingLog, TradingLog> scenarioCount;
 
     /**
      * UI definition.
@@ -117,7 +129,9 @@ public class BackTestView extends View implements Analyzer {
                 $(hbox, () -> {
                     $(results, style.testResult, () -> {
                         $(name);
-                        $(size);
+                        $(holdSize);
+                        $(holdTimeForProfit);
+                        $(holdTimeForLoss);
                         $(realizedProfit);
                         $(unrealizedProfit);
                         $(realizedLoss);
@@ -126,7 +140,9 @@ public class BackTestView extends View implements Analyzer {
                         $(profit);
                         $(total);
                         $(winRatio);
-                        $(riskRewardRatio);
+                        $(profitFactor);
+                        $(drawDown);
+                        $(scenarioCount);
                     });
                 });
             });
@@ -138,7 +154,7 @@ public class BackTestView extends View implements Analyzer {
      */
     interface style extends StyleDSL {
         Style testResult = () -> {
-            display.width(800, px).maxHeight(150, px).minHeight(150, px);
+            display.maxHeight(250, px).minHeight(250, px);
         };
 
         Style formLabel = () -> {
@@ -156,7 +172,6 @@ public class BackTestView extends View implements Analyzer {
         };
 
         Style mean = () -> {
-            margin.right(5, px);
             font.color(205, 230, 250);
         };
     }
@@ -197,7 +212,9 @@ public class BackTestView extends View implements Analyzer {
      */
     private void configureTradingLogView() {
         name.header(en("Name")).model(log -> log.trader.name());
-        size.header(en("Size")).model(log -> log).render(this::renderPositionSize);
+        holdSize.header(en("Hold Size")).model(log -> log).render(this::renderPositionSize);
+        holdTimeForProfit.header(en("Profit Hold Time")).model(log -> log.holdTimeProfit).render(this::render);
+        holdTimeForLoss.header(en("Loss Hold Time")).model(log -> log.holdTimeLoss).render(this::render);
         realizedProfit.header(en("Realized Profit")).model(log -> log.profitRange).render(this::render);
         unrealizedProfit.header(en("Unrealized Profit")).model(log -> log.unrealizedProfitRange).render(this::render);
         realizedLoss.header(en("Realized Loss")).model(log -> log.lossRange).render(this::render);
@@ -205,13 +222,29 @@ public class BackTestView extends View implements Analyzer {
         profit.header(en("Profit")).model(log -> log.profitAndLoss).render(this::render);
         total.header(en("Total")).model(log -> log.profitAndLoss.total().scale(marketSelection.value().setting.baseCurrencyScaleSize));
         winRatio.header(en("Win Rate")).model(log -> log.winningRate());
+        profitFactor.header(en("Profit Factor")).model(TradingLog::profitFactor);
+        drawDown.header(en("Draw Down")).model(log -> log.drawDownRatio);
+        scenarioCount.header(en("Count")).model(log -> log).render(this::renderScenarioCount);
+    }
+
+    /**
+     * Render scenario count.
+     * 
+     * @param cell
+     * @param log
+     */
+    private void renderScenarioCount(UITableCell cell, TradingLog log) {
+        UILabel remaining = make(UILabel.class).tooltip(en("Remaining")).text(log.active).style(style.mean);
+        UILabel total = make(UILabel.class).tooltip(en("Total")).text(log.total).style(style.max);
+
+        cell.textVertical(remaining, total);
     }
 
     /**
      * Render position size.
      * 
      * @param cell
-     * @param statistics
+     * @param log
      */
     private void renderPositionSize(UITableCell cell, TradingLog log) {
         int target = marketSelection.value().setting.targetCurrencyScaleSize;
@@ -219,7 +252,7 @@ public class BackTestView extends View implements Analyzer {
         UILabel mean = make(UILabel.class).tooltip(en("current")).text(log.holdCurrentSize.scale(target)).style(style.mean);
         UILabel max = make(UILabel.class).tooltip(en("max")).text(log.holdMaxSize.scale(target)).style(style.max);
 
-        cell.text(mean, max);
+        cell.textVertical(mean, max);
     }
 
     /**
@@ -233,8 +266,9 @@ public class BackTestView extends View implements Analyzer {
 
         UILabel mean = make(UILabel.class).tooltip(en("mean")).text(statistics.mean().scale(base)).style(style.mean);
         UILabel max = make(UILabel.class).tooltip(en("max")).text(statistics.max().scale(base)).style(style.max);
+        UILabel min = make(UILabel.class).tooltip(en("min")).text(statistics.min().scale(base)).style(style.max);
 
-        cell.text(mean, max);
+        cell.textVertical(mean, max, min);
     }
 
     /**

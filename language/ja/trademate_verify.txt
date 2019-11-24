@@ -1,5 +1,17 @@
+Count
+カウント
+
+Draw Down
+DD
+
 End
 終了
+
+Hold Size
+保持枚数
+
+Loss Hold Time
+損失保持時間
 
 Name
 名称
@@ -10,11 +22,20 @@ No logs were found for the specified date.
 Profit
 損益
 
+Profit Factor
+利益係数
+
+Profit Hold Time
+利益保持時間
+
 Realized Loss
 損幅
 
 Realized Profit
 利幅
+
+Remaining
+残存
 
 Run
 実行
@@ -24,6 +45,9 @@ Size
 
 Start
 開始
+
+Terminated
+終了済
 
 The end date must be after the start date.
 終了日は開始日より後でなければなりません。
@@ -48,4 +72,7 @@ max
 
 mean
 平均
+
+min
+最小
 
