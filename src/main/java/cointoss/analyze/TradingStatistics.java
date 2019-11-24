@@ -26,7 +26,7 @@ import cointoss.util.Num;
 public class TradingStatistics {
 
     /** The associated trader. */
-    public final Trader trader;
+    public final String name;
 
     /** summary */
     public final Statistics holdTime = new Statistics().formatter(Chrono::formatAsDuration);
@@ -100,9 +100,6 @@ public class TradingStatistics {
     /** A number of terminated entries. */
     public int terminated = 0;
 
-    /** The all entries. */
-    private final List<Scenario> scenarios;
-
     /** The exected duration. */
     public Duration duration = Duration.ZERO;
 
@@ -110,7 +107,7 @@ public class TradingStatistics {
      * Analyze trading.
      */
     public TradingStatistics(Market market, FundManager funds, List<Scenario> entries, Trader trader) {
-        this.trader = trader;
+        this.name = trader.name();
         Function<Num, String> format = v -> v.scale(market.service.setting.baseCurrencyScaleSize).format(NumberFormat.getNumberInstance());
         this.profit = new Statistics().formatter(format);
         this.profitRange = new Statistics().formatter(format);
@@ -125,7 +122,6 @@ public class TradingStatistics {
         this.unrealizedLoss = new Statistics().formatter(format).negative();
         this.unrealizedLossRange = new Statistics().formatter(format).negative();
         this.profitAndLoss = new Statistics().formatter(format);
-        this.scenarios = entries;
         this.holdMaxSize = trader.holdMaxSize;
         this.holdCurrentSize = trader.holdSize;
 
@@ -204,12 +200,6 @@ public class TradingStatistics {
         String EOL = "\r\n";
 
         StringBuilder builder = new StringBuilder();
-
-        for (Scenario scenario : scenarios) {
-            if ((scenario.isActive()) || detail) {
-                builder.append(scenario);
-            }
-        }
 
         builder.append("実行時間 ").append(Chrono.formatAsDuration(duration.toMillis())).append(EOL);
         builder.append("枚数 現在").append(holdCurrentSize).append(" 最大").append(holdMaxSize).append(EOL);

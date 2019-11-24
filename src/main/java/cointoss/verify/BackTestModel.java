@@ -172,7 +172,7 @@ interface BackTestModel {
         LocalDateTime end = LocalDateTime.now();
 
         for (Trader trader : traders) {
-            TradingStatistics log = trader.log();
+            TradingStatistics log = trader.statistics();
             log.duration = Duration.between(start, end);
             logs.add(log);
         }

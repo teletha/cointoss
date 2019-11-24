@@ -211,7 +211,7 @@ public class BackTestView extends View implements Analyzer {
      * Setting for trading log.
      */
     private void configureTradingLogView() {
-        name.header(en("Name")).model(log -> log.trader.name());
+        name.header(en("Name")).model(log -> log.name);
         holdSize.header(en("Hold Size")).model(log -> log).render(this::renderPositionSize);
         holdTimeForProfit.header(en("Profit Hold Time")).model(log -> log.holdTimeProfit).render(this::render);
         holdTimeForLoss.header(en("Loss Hold Time")).model(log -> log.holdTimeLoss).render(this::render);

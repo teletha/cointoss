@@ -210,11 +210,11 @@ public abstract class Trader extends TraderBase {
     }
 
     /**
-     * Create the snapshot of trading log.
+     * Create the current trading statistics.
      * 
-     * @return
+     * @return A current statistics.
      */
-    public final TradingStatistics log() {
+    public final TradingStatistics statistics() {
         return new TradingStatistics(market, funds, scenarios, this);
     }
 
