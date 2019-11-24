@@ -119,8 +119,8 @@ public class BackTestView extends View implements Analyzer {
 
             $(vbox, () -> {
                 $(hbox, style.fill, () -> {
-                    $(chart, style.chart);
-                    $(vbox, () -> {
+                    $(chart);
+                    $(vbox, style.config, () -> {
                         $(marketSelection);
                         $(hbox, FormRow, () -> {
                             label(en("Start"), style.formLabel);
@@ -161,11 +161,10 @@ public class BackTestView extends View implements Analyzer {
     interface style extends StyleDSL {
         Style fill = () -> {
             display.height.fill().width.fill();
-            margin.right(5, px);
         };
 
-        Style chart = () -> {
-            display.minWidth(100, percent);
+        Style config = () -> {
+            display.minWidth(400, px).maxWidth(400, px);
         };
 
         Style testResult = () -> {

@@ -59,8 +59,8 @@ public class TradingView extends View {
         return new UI() {
             {
                 $(vbox, () -> {
-                    $(hbox, () -> {
-                        $(chart, style.fill);
+                    $(hbox, style.fill, () -> {
+                        $(chart, style.chart);
                         $(builder);
                         $(books);
                         $(executionView);
@@ -82,6 +82,11 @@ public class TradingView extends View {
         Style fill = () -> {
             display.height.fill().width.fill();
             margin.right(5, px);
+        };
+
+        Style chart = () -> {
+            // display.height.fill().width.fill();
+            // margin.right(5, px);
         };
     }
 

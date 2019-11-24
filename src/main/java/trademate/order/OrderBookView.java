@@ -11,14 +11,15 @@ package trademate.order;
 
 import static trademate.TradeMateStyle.*;
 
-import cointoss.order.OrderBookManager;
-import cointoss.order.OrderUnit;
-import cointoss.util.Num;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ListCell;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+
+import cointoss.order.OrderBookManager;
+import cointoss.order.OrderUnit;
+import cointoss.util.Num;
 import stylist.Style;
 import stylist.StyleDSL;
 import trademate.TradingView;
@@ -29,9 +30,6 @@ import viewtify.ui.UIListView;
 import viewtify.ui.UISpinner;
 import viewtify.ui.View;
 
-/**
- * @version 2018/09/07 12:39:29
- */
 public class OrderBookView extends View {
 
     /** UI for long maker. */
@@ -59,23 +57,60 @@ public class OrderBookView extends View {
     private OrderBookManager book;
 
     /**
-     * {@inheritDoc}
+     * UI definition.
      */
-    @Override
-    protected UI declareUI() {
-        return new UI() {
-            {
-                $(vbox, S.Root, () -> {
-                    $(shortList, S.Book, Short);
-                    $(hbox, () -> {
-                        $(priceRange, S.PriceRange);
-                        $(priceLatest, S.PriceLatest);
-                        $(priceSpread, S.PriceSpread);
-                        $(hideSize, S.HideSize);
-                    });
-                    $(longList, S.Book, Long);
+    class view extends UI {
+        {
+            $(vbox, style.root, () -> {
+                $(shortList, style.book, Short);
+                $(hbox, () -> {
+                    $(priceRange, style.priceRange);
+                    $(priceLatest, style.priceLatest);
+                    $(priceSpread, style.priceSpread);
+                    $(hideSize, style.hideSize);
                 });
-            }
+                $(longList, style.book, Long);
+            });
+        }
+    }
+
+    /**
+     * 
+     */
+    interface style extends StyleDSL {
+
+        Style root = () -> {
+            display.minWidth(220, px).maxWidth(220, px);
+        };
+
+        Style book = () -> {
+            text.unselectable();
+
+            $.descendant(() -> {
+                font.color("inherit");
+                text.indent(66, px);
+            });
+
+            $.select(".scroll-bar:horizontal").descendant(() -> {
+                padding.size(0, px);
+            });
+        };
+
+        Style priceRange = () -> {
+            display.width(72, px);
+        };
+
+        Style priceLatest = () -> {
+            display.width(60, px).height(25, px);
+            text.indent(12, px);
+        };
+
+        Style priceSpread = () -> {
+            display.width(50, px).height(25, px);
+        };
+
+        Style hideSize = () -> {
+            display.width(60, px);
         };
     }
 
@@ -162,45 +197,5 @@ public class OrderBookView extends View {
                 }
             });
         }
-    }
-
-    /**
-     * @version 2018/09/07 10:49:03
-     */
-    private interface S extends StyleDSL {
-
-        Style Root = () -> {
-            display.minWidth(220, px);
-        };
-
-        Style Book = () -> {
-            text.unselectable();
-
-            $.descendant(() -> {
-                font.color("inherit");
-                text.indent(66, px);
-            });
-
-            $.select(".scroll-bar:horizontal").descendant(() -> {
-                padding.size(0, px);
-            });
-        };
-
-        Style PriceRange = () -> {
-            display.width(72, px);
-        };
-
-        Style PriceLatest = () -> {
-            display.width(60, px).height(25, px);
-            text.indent(12, px);
-        };
-
-        Style PriceSpread = () -> {
-            display.width(50, px).height(25, px);
-        };
-
-        Style HideSize = () -> {
-            display.width(60, px);
-        };
     }
 }

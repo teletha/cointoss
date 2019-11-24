@@ -52,9 +52,9 @@ public class ChartView extends View {
     protected UI declareUI() {
         return new UI() {
             {
-                $(sbox, () -> {
+                $(sbox, style.chart, () -> {
                     $(chart);
-                    $(hbox, S.ConfigBox, () -> {
+                    $(hbox, style.configBox, () -> {
                         $(span);
                     });
                 });
@@ -76,10 +76,14 @@ public class ChartView extends View {
     }
 
     /**
-     * 
+     * Style definition.
      */
-    private interface S extends StyleDSL {
-        Style ConfigBox = () -> {
+    interface style extends StyleDSL {
+        Style chart = () -> {
+            display.width.fill();
+        };
+
+        Style configBox = () -> {
             display.maxWidth(100, px).maxHeight(10, px);
             position.top(0, px).right(56, px);
         };
