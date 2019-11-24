@@ -11,6 +11,7 @@ package cointoss;
 
 import org.junit.jupiter.api.Test;
 
+import cointoss.analyze.TradingStatistics;
 import cointoss.execution.Execution;
 
 public class TradingLogTest extends TraderTestSupport {
@@ -19,7 +20,7 @@ public class TradingLogTest extends TraderTestSupport {
     void entryTerminated() {
         entryAndExit(Execution.with.buy(1).price(10), Execution.with.buy(1).price(20));
 
-        TradingLog log = log();
+        TradingStatistics log = log();
         assert log.terminated == 1;
         assert log.active == 0;
         assert log.total == 1;
@@ -29,7 +30,7 @@ public class TradingLogTest extends TraderTestSupport {
     void entryActive() {
         entry(Execution.with.buy(1).price(10));
 
-        TradingLog log = log();
+        TradingStatistics log = log();
         assert log.terminated == 0;
         assert log.active == 1;
         assert log.total == 1;
@@ -41,7 +42,7 @@ public class TradingLogTest extends TraderTestSupport {
         entryAndExit(Execution.with.buy(1).price(30), Execution.with.buy(1).price(50)); // profit
         entryAndExit(Execution.with.buy(1).price(30), Execution.with.buy(1).price(10)); // loss
 
-        TradingLog log = log();
+        TradingStatistics log = log();
         assert log.profit.size() == 2;
         assert log.profit.max().is(20);
         assert log.profit.min().is(10);
@@ -55,7 +56,7 @@ public class TradingLogTest extends TraderTestSupport {
         entryAndExit(Execution.with.buy(1).price(30), Execution.with.buy(1).price(20)); // loss
         entryAndExit(Execution.with.buy(1).price(30), Execution.with.buy(1).price(10)); // loss
 
-        TradingLog log = log();
+        TradingStatistics log = log();
         assert log.loss.size() == 2;
         assert log.loss.max().is(-10);
         assert log.loss.min().is(-20);
@@ -70,7 +71,7 @@ public class TradingLogTest extends TraderTestSupport {
         entryAndExit(Execution.with.buy(1).price(30), Execution.with.buy(1).price(20)); // loss
         entryAndExit(Execution.with.buy(1).price(30), Execution.with.buy(1).price(10)); // loss
 
-        TradingLog log = log();
+        TradingStatistics log = log();
         assert log.profitAndLoss.size() == 4;
         assert log.profitAndLoss.max().is(20);
         assert log.profitAndLoss.min().is(-20);
@@ -82,7 +83,7 @@ public class TradingLogTest extends TraderTestSupport {
     void completeProfit() {
         entryAndExit(Execution.with.buy(1).price(10), Execution.with.buy(1).price(15));
 
-        TradingLog log = log();
+        TradingStatistics log = log();
         assert log.terminated == 1;
         assert log.profit.max().is(5);
         assert log.profit.min().is(5);
@@ -94,7 +95,7 @@ public class TradingLogTest extends TraderTestSupport {
     void completeLoss() {
         entryAndExit(Execution.with.sell(1).price(10), Execution.with.buy(1).price(15));
 
-        TradingLog log = log();
+        TradingStatistics log = log();
         assert log.terminated == 1;
         assert log.loss.max().is(-5);
         assert log.loss.min().is(-5);
@@ -106,7 +107,7 @@ public class TradingLogTest extends TraderTestSupport {
     void activeEntry() {
         entry(Execution.with.buy(1).price(10));
 
-        TradingLog log = log();
+        TradingStatistics log = log();
         assert log.terminated == 0;
         assert log.active == 1;
         assert log.total == 1;
@@ -122,7 +123,7 @@ public class TradingLogTest extends TraderTestSupport {
         entryAndExit(Execution.with.sell(1).price(10), Execution.with.buy(1).price(15));
         entryAndExit(Execution.with.sell(1).price(10), Execution.with.buy(1).price(15));
 
-        TradingLog log = log();
+        TradingStatistics log = log();
         assert log.winningRate().is(50);
     }
 
@@ -135,7 +136,7 @@ public class TradingLogTest extends TraderTestSupport {
         // lose
         entryAndExit(Execution.with.sell(1).price(10), Execution.with.buy(1).price(15));
 
-        TradingLog log = log();
+        TradingStatistics log = log();
         assert log.winningRate().is(66.7);
     }
 
@@ -145,7 +146,7 @@ public class TradingLogTest extends TraderTestSupport {
         entryAndExit(Execution.with.sell(1).price(10), Execution.with.buy(1).price(15));
         entryAndExit(Execution.with.sell(1).price(10), Execution.with.buy(1).price(15));
 
-        TradingLog log = log();
+        TradingStatistics log = log();
         assert log.winningRate().is(0);
     }
 
@@ -155,7 +156,7 @@ public class TradingLogTest extends TraderTestSupport {
         entryAndExit(Execution.with.buy(1).price(10), Execution.with.buy(1).price(15));
         entryAndExit(Execution.with.buy(1).price(10), Execution.with.buy(1).price(15));
 
-        TradingLog log = log();
+        TradingStatistics log = log();
         assert log.winningRate().is(100);
     }
 
@@ -169,7 +170,7 @@ public class TradingLogTest extends TraderTestSupport {
         entryAndExit(Execution.with.sell(1).price(10), Execution.with.buy(1).price(15));
         entryAndExit(Execution.with.sell(1).price(10), Execution.with.buy(1).price(15));
 
-        TradingLog log = log();
+        TradingStatistics log = log();
         assert log.profitFactor().is(1);
     }
 
@@ -182,7 +183,7 @@ public class TradingLogTest extends TraderTestSupport {
         // lose
         entryAndExit(Execution.with.sell(1).price(10), Execution.with.buy(1).price(15));
 
-        TradingLog log = log();
+        TradingStatistics log = log();
         assert log.profitFactor().is("2");
     }
 
@@ -195,7 +196,7 @@ public class TradingLogTest extends TraderTestSupport {
         entryAndExit(Execution.with.sell(1).price(10), Execution.with.buy(1).price(15));
         entryAndExit(Execution.with.sell(1).price(10), Execution.with.buy(1).price(15));
 
-        TradingLog log = log();
+        TradingStatistics log = log();
         assert log.profitFactor().is("0.5");
     }
 
@@ -205,7 +206,7 @@ public class TradingLogTest extends TraderTestSupport {
         entryAndExit(Execution.with.buy(1).price(10), Execution.with.buy(1).price(15));
         entryAndExit(Execution.with.buy(1).price(10), Execution.with.buy(1).price(15));
 
-        TradingLog log = log();
+        TradingStatistics log = log();
         assert log.profitFactor().is("10");
     }
 
@@ -215,7 +216,7 @@ public class TradingLogTest extends TraderTestSupport {
         entryAndExit(Execution.with.sell(1).price(10), Execution.with.buy(1).price(15));
         entryAndExit(Execution.with.sell(1).price(10), Execution.with.buy(1).price(15));
 
-        TradingLog log = log();
+        TradingStatistics log = log();
         assert log.profitFactor().is("0");
     }
 
@@ -225,7 +226,7 @@ public class TradingLogTest extends TraderTestSupport {
         entryAndExit(Execution.with.buy(1).price(10), Execution.with.buy(1).price(15)); // win 5
         entryAndExit(Execution.with.sell(1).price(25), Execution.with.buy(1).price(30)); // lose -5
 
-        TradingLog log = log();
+        TradingStatistics log = log();
         assert log.drawDownRatio.is("0.045");
     }
 
@@ -239,7 +240,7 @@ public class TradingLogTest extends TraderTestSupport {
         entryAndExit(Execution.with.buy(1).price(35), Execution.with.buy(1).price(25)); // lose -10
         entryAndExit(Execution.with.buy(1).price(10), Execution.with.buy(1).price(40)); // win 30
 
-        TradingLog log = log();
+        TradingStatistics log = log();
         assert log.drawDownRatio.is("0.276");
     }
 
@@ -250,7 +251,7 @@ public class TradingLogTest extends TraderTestSupport {
         entryAndExit(Execution.with.sell(1).price(10), Execution.with.buy(1).price(15)); // lose -5
         entryAndExit(Execution.with.sell(1).price(10), Execution.with.buy(1).price(20)); // lose -10
 
-        TradingLog log = log();
+        TradingStatistics log = log();
         assert log.drawDownRatio.is("0.381");
     }
 
@@ -260,7 +261,7 @@ public class TradingLogTest extends TraderTestSupport {
         entryAndExit(Execution.with.buy(1).price(10), Execution.with.buy(1).price(40)); // win 30
         entryAndExit(Execution.with.buy(1).price(10), Execution.with.buy(1).price(30)); // win 30
 
-        TradingLog log = log();
+        TradingStatistics log = log();
         assert log.drawDownRatio.is(0);
     }
 
@@ -271,7 +272,7 @@ public class TradingLogTest extends TraderTestSupport {
         entryAndExit(Execution.with.sell(1).price(10), Execution.with.buy(1).price(15)); // lose -5
         entryAndExit(Execution.with.sell(1).price(10), Execution.with.buy(1).price(20)); // lose -10
 
-        TradingLog log = log();
+        TradingStatistics log = log();
         assert log.drawDownRatio.is("0.45");
     }
 }

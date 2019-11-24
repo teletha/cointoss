@@ -27,6 +27,7 @@ import org.eclipse.collections.impl.list.mutable.FastList;
 
 import com.google.common.annotations.VisibleForTesting;
 
+import cointoss.analyze.TradingStatistics;
 import cointoss.execution.Execution;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
@@ -213,8 +214,8 @@ public abstract class Trader extends TraderBase {
      * 
      * @return
      */
-    public final TradingLog log() {
-        return new TradingLog(market, funds, scenarios, this);
+    public final TradingStatistics log() {
+        return new TradingStatistics(market, funds, scenarios, this);
     }
 
     /**

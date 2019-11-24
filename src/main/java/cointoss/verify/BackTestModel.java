@@ -20,9 +20,9 @@ import java.util.function.Function;
 import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.Trader;
-import cointoss.TradingLog;
 import cointoss.analyze.Analyzer;
 import cointoss.analyze.ConsoleAnalyzer;
+import cointoss.analyze.TradingStatistics;
 import cointoss.execution.Execution;
 import cointoss.ticker.Span;
 import cointoss.ticker.Tick;
@@ -159,7 +159,7 @@ interface BackTestModel {
 
         analyzer.initialize(market);
 
-        List<TradingLog> logs = new ArrayList();
+        List<TradingStatistics> logs = new ArrayList();
         List<Trader> traders = I.signal(traders()).map(t -> t.apply(market)).toList();
 
         LocalDateTime start = LocalDateTime.now();
@@ -172,7 +172,7 @@ interface BackTestModel {
         LocalDateTime end = LocalDateTime.now();
 
         for (Trader trader : traders) {
-            TradingLog log = trader.log();
+            TradingStatistics log = trader.log();
             log.duration = Duration.between(start, end);
             logs.add(log);
         }

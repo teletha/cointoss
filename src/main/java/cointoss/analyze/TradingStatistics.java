@@ -7,20 +7,23 @@
  *
  *          https://opensource.org/licenses/MIT
  */
-package cointoss;
+package cointoss.analyze;
 
-import static cointoss.util.Num.HUNDRED;
+import static cointoss.util.Num.*;
 
 import java.text.NumberFormat;
 import java.time.Duration;
 import java.util.List;
 import java.util.function.Function;
 
-import cointoss.analyze.Statistics;
+import cointoss.FundManager;
+import cointoss.Market;
+import cointoss.Scenario;
+import cointoss.Trader;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
 
-public class TradingLog {
+public class TradingStatistics {
 
     /** The associated trader. */
     public final Trader trader;
@@ -106,7 +109,7 @@ public class TradingLog {
     /**
      * Analyze trading.
      */
-    public TradingLog(Market market, FundManager funds, List<Scenario> entries, Trader trader) {
+    public TradingStatistics(Market market, FundManager funds, List<Scenario> entries, Trader trader) {
         this.trader = trader;
         Function<Num, String> format = v -> v.scale(market.service.setting.baseCurrencyScaleSize).format(NumberFormat.getNumberInstance());
         this.profit = new Statistics().formatter(format);

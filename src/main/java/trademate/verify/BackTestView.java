@@ -16,9 +16,9 @@ import java.util.List;
 
 import cointoss.Market;
 import cointoss.MarketService;
-import cointoss.TradingLog;
 import cointoss.analyze.Analyzer;
 import cointoss.analyze.Statistics;
+import cointoss.analyze.TradingStatistics;
 import cointoss.execution.ExecutionLog;
 import cointoss.market.MarketServiceProvider;
 import cointoss.trading.LazyBear;
@@ -58,52 +58,52 @@ public class BackTestView extends View implements Analyzer {
 
     private ChartView chart;
 
-    private UIComboBox<TradingLog> logSelection;
+    private UIComboBox<TradingStatistics> logSelection;
 
     /** UI */
     private UITableView results;
 
     /** UI */
-    private UITableColumn<TradingLog, String> name;
+    private UITableColumn<TradingStatistics, String> name;
 
     /** The trading statistics. */
-    private UITableColumn<TradingLog, TradingLog> holdSize;
+    private UITableColumn<TradingStatistics, TradingStatistics> holdSize;
 
     /** The trading statistics. */
-    private UITableColumn<TradingLog, Statistics> holdTimeForProfit;
+    private UITableColumn<TradingStatistics, Statistics> holdTimeForProfit;
 
     /** The trading statistics. */
-    private UITableColumn<TradingLog, Statistics> holdTimeForLoss;
+    private UITableColumn<TradingStatistics, Statistics> holdTimeForLoss;
 
     /** The trading statistics. */
-    private UITableColumn<TradingLog, Statistics> realizedProfit;
+    private UITableColumn<TradingStatistics, Statistics> realizedProfit;
 
     /** The trading statistics. */
-    private UITableColumn<TradingLog, Statistics> unrealizedProfit;
+    private UITableColumn<TradingStatistics, Statistics> unrealizedProfit;
 
     /** The trading statistics. */
-    private UITableColumn<TradingLog, Statistics> realizedLoss;
+    private UITableColumn<TradingStatistics, Statistics> realizedLoss;
 
     /** The trading statistics. */
-    private UITableColumn<TradingLog, Statistics> unrealizedLoss;
+    private UITableColumn<TradingStatistics, Statistics> unrealizedLoss;
 
     /** The trading statistics. */
-    private UITableColumn<TradingLog, Statistics> profit;
+    private UITableColumn<TradingStatistics, Statistics> profit;
 
     /** The trading statistics. */
-    private UITableColumn<TradingLog, Num> total;
+    private UITableColumn<TradingStatistics, Num> total;
 
     /** The trading statistics. */
-    private UITableColumn<TradingLog, Num> winRatio;
+    private UITableColumn<TradingStatistics, Num> winRatio;
 
     /** The trading statistics. */
-    private UITableColumn<TradingLog, Num> profitFactor;
+    private UITableColumn<TradingStatistics, Num> profitFactor;
 
     /** The trading statistics. */
-    private UITableColumn<TradingLog, Num> drawDown;
+    private UITableColumn<TradingStatistics, Num> drawDown;
 
     /** The trading statistics. */
-    private UITableColumn<TradingLog, TradingLog> scenarioCount;
+    private UITableColumn<TradingStatistics, TradingStatistics> scenarioCount;
 
     /**
      * UI definition.
@@ -222,7 +222,7 @@ public class BackTestView extends View implements Analyzer {
         profit.header(en("Profit")).model(log -> log.profitAndLoss).render(this::render);
         total.header(en("Total")).model(log -> log.profitAndLoss.total().scale(marketSelection.value().setting.baseCurrencyScaleSize));
         winRatio.header(en("Win Rate")).model(log -> log.winningRate());
-        profitFactor.header(en("Profit Factor")).model(TradingLog::profitFactor);
+        profitFactor.header(en("Profit Factor")).model(TradingStatistics::profitFactor);
         drawDown.header(en("Draw Down")).model(log -> log.drawDownRatio);
         scenarioCount.header(en("Count")).model(log -> log).render(this::renderScenarioCount);
     }
@@ -233,11 +233,11 @@ public class BackTestView extends View implements Analyzer {
      * @param cell
      * @param log
      */
-    private void renderScenarioCount(UITableCell cell, TradingLog log) {
+    private void renderScenarioCount(UITableCell cell, TradingStatistics log) {
         UILabel remaining = make(UILabel.class).tooltip(en("Remaining")).text(log.active).style(style.mean);
         UILabel total = make(UILabel.class).tooltip(en("Total")).text(log.total).style(style.max);
 
-        cell.textVertical(remaining, total);
+        cell.textV(remaining, total);
     }
 
     /**
@@ -246,13 +246,13 @@ public class BackTestView extends View implements Analyzer {
      * @param cell
      * @param log
      */
-    private void renderPositionSize(UITableCell cell, TradingLog log) {
+    private void renderPositionSize(UITableCell cell, TradingStatistics log) {
         int target = marketSelection.value().setting.targetCurrencyScaleSize;
 
         UILabel mean = make(UILabel.class).tooltip(en("current")).text(log.holdCurrentSize.scale(target)).style(style.mean);
         UILabel max = make(UILabel.class).tooltip(en("max")).text(log.holdMaxSize.scale(target)).style(style.max);
 
-        cell.textVertical(mean, max);
+        cell.textV(mean, max);
     }
 
     /**
@@ -268,7 +268,7 @@ public class BackTestView extends View implements Analyzer {
         UILabel max = make(UILabel.class).tooltip(en("max")).text(statistics.max().scale(base)).style(style.max);
         UILabel min = make(UILabel.class).tooltip(en("min")).text(statistics.min().scale(base)).style(style.max);
 
-        cell.textVertical(mean, max, min);
+        cell.textV(mean, max, min);
     }
 
     /**
@@ -288,8 +288,8 @@ public class BackTestView extends View implements Analyzer {
      * {@inheritDoc}
      */
     @Override
-    public void analyze(Market market, List<TradingLog> logs, boolean detail) {
-        for (TradingLog log : logs) {
+    public void analyze(Market market, List<TradingStatistics> logs, boolean detail) {
+        for (TradingStatistics log : logs) {
             System.out.println(log);
             results.values.add(log);
         }
