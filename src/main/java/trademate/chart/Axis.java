@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.DoubleFunction;
 
-import cointoss.util.Num;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -34,6 +33,8 @@ import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.PathElement;
 import javafx.util.Duration;
+
+import cointoss.util.Num;
 import kiss.Disposable;
 import stylist.Style;
 import viewtify.Viewtify;
@@ -229,6 +230,22 @@ public class Axis extends Region {
         double min = logicalMinValue.get();
         double amount = scroll.getVisibleAmount();
         return Math.min(computeVisibleMinValue() + (max - min) * amount, max);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected double computePrefWidth(double height) {
+        return 60;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected double computePrefHeight(double width) {
+        return 50;
     }
 
     /**
