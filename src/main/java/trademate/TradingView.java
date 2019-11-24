@@ -11,6 +11,8 @@ package trademate;
 
 import cointoss.Market;
 import cointoss.MarketService;
+import stylist.Style;
+import stylist.StyleDSL;
 import trademate.chart.ChartView;
 import trademate.console.Console;
 import trademate.info.TradeInfomationView;
@@ -58,7 +60,7 @@ public class TradingView extends View {
             {
                 $(vbox, () -> {
                     $(hbox, () -> {
-                        $(chart);
+                        $(chart, style.fill);
                         $(builder);
                         $(books);
                         $(executionView);
@@ -70,6 +72,16 @@ public class TradingView extends View {
                     });
                 });
             }
+        };
+    }
+
+    /**
+     * Style definition.
+     */
+    interface style extends StyleDSL {
+        Style fill = () -> {
+            display.height.fill().width.fill();
+            margin.right(5, px);
         };
     }
 

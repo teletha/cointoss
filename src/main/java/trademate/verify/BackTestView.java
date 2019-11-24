@@ -9,10 +9,12 @@
  */
 package trademate.verify;
 
-import static transcript.Transcript.*;
+import static transcript.Transcript.en;
 
 import java.time.Period;
 import java.util.List;
+
+import javafx.scene.layout.VBox;
 
 import cointoss.Market;
 import cointoss.MarketService;
@@ -114,9 +116,10 @@ public class BackTestView extends View implements Analyzer {
     class view extends UI implements SettingStyles {
 
         {
+
             $(vbox, () -> {
-                $(hbox, () -> {
-                    $(chart);
+                $(hbox, style.fill, () -> {
+                    $(chart, style.chart);
                     $(vbox, () -> {
                         $(marketSelection);
                         $(hbox, FormRow, () -> {
@@ -156,6 +159,15 @@ public class BackTestView extends View implements Analyzer {
      * Style definition
      */
     interface style extends StyleDSL {
+        Style fill = () -> {
+            display.height.fill().width.fill();
+            margin.right(5, px);
+        };
+
+        Style chart = () -> {
+            display.minWidth(100, percent);
+        };
+
         Style testResult = () -> {
             display.maxHeight(250, px).minHeight(250, px);
         };
@@ -184,6 +196,9 @@ public class BackTestView extends View implements Analyzer {
      */
     @Override
     protected void initialize() {
+        VBox ui = (VBox) ui();
+        System.out.println(ui.getHeight());
+
         marketSelection.values(0, MarketServiceProvider.availableMarketServices());
         startDate.initial(Chrono.utcNow().minusDays(10)).uneditable().requireWhen(marketSelection).require(() -> {
             ExecutionLog log = marketSelection.value().log;
