@@ -29,7 +29,7 @@ import viewtify.ui.UITabPane;
 import viewtify.ui.View;
 
 @Manageable(lifestyle = Singleton.class)
-public class TradeMate extends View {
+public class TradeBot extends View {
 
     private UITabPane main;
 
@@ -61,9 +61,9 @@ public class TradeMate extends View {
         // activate application
         Viewtify.application()
                 .use(Theme.Dark)
-                .icon("icon/app.png")
+                .icon("icon/bot.png")
                 .language(Lang.of(I.env("language", Locale.getDefault().getLanguage())))
                 .onTerminating(Network::terminate)
-                .activate(TradeMate.class);
+                .activate(TradeBot.class);
     }
 }
