@@ -293,8 +293,6 @@ public class BackTestView extends View implements Analyzer {
      * @param statistics
      */
     private void render(UITableCell cell, Statistics statistics) {
-        int base = marketSelection.value().setting.baseCurrencyScaleSize;
-
         UILabel mean = make(UILabel.class).tooltip(en("Mean")).text(statistics.formattedMean()).style(style.mean);
         UILabel max = make(UILabel.class).tooltip(en("Max")).text(statistics.formattedMax()).style(style.max);
         UILabel min = make(UILabel.class).tooltip(en("Min")).text(statistics.formattedMin()).style(style.max);
