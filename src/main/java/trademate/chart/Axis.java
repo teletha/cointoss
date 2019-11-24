@@ -461,6 +461,9 @@ public class Axis extends Region {
         /** The associated value. */
         public final DoubleProperty value = new SimpleDoubleProperty();
 
+        /** The label formatter. */
+        private DoubleFunction<String> formatter;
+
         /**
          * 
          */
@@ -473,7 +476,8 @@ public class Axis extends Region {
          */
         private TickLable(String description, Style... classNames) {
             tickLabels.getChildren().add(this);
-            textProperty().bind(Viewtify.calculate(value, () -> tickLabelFormatter.get().apply(value.get())));
+            textProperty().bind(Viewtify.calculate(value, () -> formatter != null ? formatter.apply(value.get())
+                    : tickLabelFormatter.get().apply(value.get())));
             value.addListener(layoutAxis);
 
             if (description != null && !description.isEmpty()) {
@@ -484,6 +488,17 @@ public class Axis extends Region {
             }
 
             StyleHelper.of(this).style(ChartStyles.Label).style(classNames);
+        }
+
+        /**
+         * Set label formatter.
+         * 
+         * @param formatter
+         * @return
+         */
+        public TickLable formatter(DoubleFunction<String> formatter) {
+            this.formatter = formatter;
+            return this;
         }
 
         /**

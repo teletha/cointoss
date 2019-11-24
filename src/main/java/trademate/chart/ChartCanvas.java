@@ -12,6 +12,15 @@ package trademate.chart;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import org.eclipse.collections.api.list.primitive.MutableDoubleList;
+import org.eclipse.collections.impl.list.mutable.primitive.DoubleArrayList;
+
+import cointoss.market.bitflyer.BitFlyer;
+import cointoss.market.bitflyer.SFD;
+import cointoss.ticker.Indicator;
+import cointoss.ticker.Tick;
+import cointoss.util.Chrono;
+import cointoss.util.Num;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
@@ -23,16 +32,6 @@ import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.PathElement;
-
-import org.eclipse.collections.api.list.primitive.MutableDoubleList;
-import org.eclipse.collections.impl.list.mutable.primitive.DoubleArrayList;
-
-import cointoss.market.bitflyer.BitFlyer;
-import cointoss.market.bitflyer.SFD;
-import cointoss.ticker.Indicator;
-import cointoss.ticker.Tick;
-import cointoss.util.Chrono;
-import cointoss.util.Num;
 import kiss.I;
 import stylist.Style;
 import trademate.chart.Axis.TickLable;
@@ -185,7 +184,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
      * Visualize mouse tracker in chart.
      */
     private void visualizeMouseTrack() {
-        TickLable labelX = mouseTrackVertical.createLabel();
+        TickLable labelX = mouseTrackVertical.createLabel().formatter(v -> Chrono.systemBySeconds(v).format(Chrono.DateTimeWithoutSec));
         TickLable labelY = mouseTrackHorizontal.createLabel();
 
         // track on move

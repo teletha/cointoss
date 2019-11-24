@@ -224,7 +224,7 @@ public abstract class MarketService implements Disposable {
     }
 
     /**
-     * Calculate human-readable price for display.
+     * Calculate human-readable data-time for display.
      * 
      * @param seconds A target time. (second)
      * @return
