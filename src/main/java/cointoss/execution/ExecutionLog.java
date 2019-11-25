@@ -9,13 +9,15 @@
  */
 package cointoss.execution;
 
-import static java.nio.charset.StandardCharsets.ISO_8859_1;
+import static java.nio.charset.StandardCharsets.*;
 import static java.nio.file.StandardOpenOption.*;
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
+import java.nio.channels.OverlappingFileLockException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
@@ -540,7 +542,7 @@ public class ExecutionLog {
          */
         private Cache enableAutoSave() {
             if (task == NOOP) {
-                task = scheduler.scheduleWithFixedDelay(this::write, 20, 90, TimeUnit.SECONDS);
+                task = scheduler.scheduleWithFixedDelay(this::write, 20, 60, TimeUnit.SECONDS);
             }
             return this;
         }
@@ -633,8 +635,7 @@ public class ExecutionLog {
                 return;
             }
 
-            root.tryLock(lock -> { // don't release this lock until JVM is end
-                System.out.println("GET lock and start write log from " + storedId);
+            root.lock().recover(OverlappingFileLockException.class, (FileLock) null).to(o -> {
                 readStoredId();
 
                 // switch buffer
@@ -653,14 +654,14 @@ public class ExecutionLog {
                 // write normal log
                 try (FileChannel channel = FileChannel.open(normal.create().asJavaPath(), CREATE, APPEND)) {
                     channel.write(ByteBuffer.wrap(text.toString().getBytes(ISO_8859_1)));
+                    writeStoredId(remaining.getLast().id);
 
                     log.info("Write log until " + remaining.peekLast().date + " at " + service + ".");
-                } finally {
-                    writeStoredId(remaining.getLast().id);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    throw I.quiet(e);
                 }
-                System.out.println("GET lock and write log until " + storedId);
-            }, () -> {
-                // read latest cache id
+            }, npe -> {
                 readStoredId();
 
                 // remove older execution from memory cache
@@ -672,7 +673,6 @@ public class ExecutionLog {
                         iterator.remove();
                     }
                 }
-                System.out.println("Cant get lock, remove memory cache until " + storedId);
             });
         }
 
@@ -681,7 +681,7 @@ public class ExecutionLog {
          */
         private void readStoredId() {
             try {
-                storedId = Long.parseLong(store.text());
+                storedId = Long.parseLong(store.text().trim());
             } catch (NumberFormatException e) {
                 // do nothing
             }
