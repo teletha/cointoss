@@ -296,10 +296,10 @@ public abstract class Trader extends TraderBase {
         snapshots.put(now, snapshot);
 
         // update holding size
-        Num newHoldSize = snapshot.entryRemainingSize().abs();
+        Num newHoldSize = snapshot.entryRemainingSize();
         setHoldSize(newHoldSize);
-        if (newHoldSize.isGreaterThan(holdMaxSize)) {
-            setHoldMaxSize(newHoldSize);
+        if (newHoldSize.abs().isGreaterThan(holdMaxSize)) {
+            setHoldMaxSize(newHoldSize.abs());
         }
 
         // update profit
