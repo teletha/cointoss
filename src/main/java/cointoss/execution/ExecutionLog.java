@@ -9,9 +9,9 @@
  */
 package cointoss.execution;
 
-import static java.nio.charset.StandardCharsets.ISO_8859_1;
+import static java.nio.charset.StandardCharsets.*;
 import static java.nio.file.StandardOpenOption.*;
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -151,11 +151,8 @@ public class ExecutionLog {
     /** The root directory of logs. */
     private final Directory root;
 
-    /** The write lock file. */
-    private final File writeLock;
-
-    /** The write id file. */
-    private final File writeId;
+    /** The latest id store in local file. */
+    private final File store;
 
     /** The first day. */
     private ZonedDateTime cacheFirst;
@@ -169,8 +166,8 @@ public class ExecutionLog {
     /** The latest cached id. */
     private long cacheId;
 
-    /** The latest file cached id. */
-    private long fileCacheId;
+    /** The latest stored id in local cache file. */
+    private long storedId;
 
     /** The log parser. */
     private final ExecutionLogger logger;
@@ -196,8 +193,7 @@ public class ExecutionLog {
     ExecutionLog(MarketService service, Directory root) {
         this.service = Objects.requireNonNull(service);
         this.root = Objects.requireNonNull(root);
-        this.writeLock = root.file("writeLock.txt");
-        this.writeId = root.file("writeId.txt");
+        this.store = root.file("lastID.log");
         this.logger = I.make(service.setting.executionLogger());
         this.policy = service.retryPolicy();
 
@@ -263,7 +259,7 @@ public class ExecutionLog {
                 .flatMap(day -> new Cache(day).read())
                 .effect(e -> cacheId = e.id)
                 .take(e -> e.isAfter(start))
-                .effectOnComplete(() -> fileCacheId = cacheId)
+                .effectOnComplete(() -> storedId = cacheId)
                 .concat(network().effect(this::cache));
     }
 
@@ -632,43 +628,13 @@ public class ExecutionLog {
         /**
          * Write all queued executions to log file.
          */
-        private void write2() {
-            if (queue.isEmpty()) {
-                return;
-            }
-
-            // switch buffer
-            LinkedList<Execution> remaining = queue;
-            queue = new LinkedList();
-
-            // build text
-            StringBuilder text = new StringBuilder();
-
-            for (Execution e : remaining) {
-                text.append(e).append("\r\n");
-            }
-
-            // write normal log
-            try (FileChannel channel = FileChannel.open(normal.create().asJavaPath(), CREATE, APPEND)) {
-                channel.write(ByteBuffer.wrap(text.toString().getBytes(ISO_8859_1)));
-
-                log.info("Write log until " + remaining.peekLast().date + " at " + service + ".");
-            } catch (IOException e) {
-                throw I.quiet(e);
-            }
-        }
-
-        /**
-         * Write all queued executions to log file.
-         */
         private void write() {
             if (queue.isEmpty()) {
                 return;
             }
 
-            writeLock.tryLock(() -> {
-                // read latest cache id
-                long fileCacheId = readFileCacheId();
+            root.tryLock(() -> {
+                readStoredId();
 
                 // switch buffer
                 LinkedList<Execution> remaining = queue;
@@ -678,7 +644,7 @@ public class ExecutionLog {
                 StringBuilder text = new StringBuilder();
 
                 for (Execution e : remaining) {
-                    if (fileCacheId < e.id) {
+                    if (storedId < e.id) {
                         text.append(e).append("\r\n");
                     }
                 }
@@ -689,36 +655,40 @@ public class ExecutionLog {
 
                     log.info("Write log until " + remaining.peekLast().date + " at " + service + ".");
                 } finally {
-                    // update latest cache id
-                    writeId.text(Long.toString(remaining.getLast().id));
-                    System.out.println("update cache id to " + remaining.getLast().id);
+                    writeStoredId(remaining.getLast().id);
                 }
             }, () -> {
                 // read latest cache id
-                long fileCacheId = readFileCacheId();
+                readStoredId();
 
                 // remove older execution from memory cache
                 Iterator<Execution> iterator = queue.iterator();
                 while (iterator.hasNext()) {
                     Execution e = iterator.next();
 
-                    if (e.id <= fileCacheId) {
+                    if (e.id <= storedId) {
                         iterator.remove();
-                        System.out.println("remove from memory-cache " + e.id);
                     }
                 }
             });
         }
 
-        private long readFileCacheId() {
+        /**
+         * Read the latest stored id.
+         */
+        private void readStoredId() {
             try {
-                return fileCacheId = Long.parseLong(writeId.text());
+                storedId = Long.parseLong(store.text());
             } catch (NumberFormatException e) {
-                return fileCacheId;
-            } catch (Throwable e) {
-                e.printStackTrace();
-                throw I.quiet(e);
+                // do nothing
             }
+        }
+
+        /**
+         * Write the latest stored id.
+         */
+        private void writeStoredId(long id) {
+            store.text(Long.toString(id));
         }
 
         /**
