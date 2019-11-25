@@ -9,9 +9,9 @@
  */
 package cointoss.execution;
 
-import static java.nio.charset.StandardCharsets.*;
+import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static java.nio.file.StandardOpenOption.*;
-import static java.util.concurrent.TimeUnit.*;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -633,7 +633,8 @@ public class ExecutionLog {
                 return;
             }
 
-            root.tryLock(() -> {
+            root.tryLock(lock -> { // don't release this lock until JVM is end
+                System.out.println("GET lock and start write log from " + storedId);
                 readStoredId();
 
                 // switch buffer
@@ -657,6 +658,7 @@ public class ExecutionLog {
                 } finally {
                     writeStoredId(remaining.getLast().id);
                 }
+                System.out.println("GET lock and write log until " + storedId);
             }, () -> {
                 // read latest cache id
                 readStoredId();
@@ -670,6 +672,7 @@ public class ExecutionLog {
                         iterator.remove();
                     }
                 }
+                System.out.println("Cant get lock, remove memory cache until " + storedId);
             });
         }
 
@@ -688,7 +691,7 @@ public class ExecutionLog {
          * Write the latest stored id.
          */
         private void writeStoredId(long id) {
-            store.text(Long.toString(id));
+            store.text(Long.toString(storedId = id));
         }
 
         /**
