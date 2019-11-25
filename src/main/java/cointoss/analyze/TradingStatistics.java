@@ -9,7 +9,7 @@
  */
 package cointoss.analyze;
 
-import static cointoss.util.Num.*;
+import static cointoss.util.Num.HUNDRED;
 
 import java.text.NumberFormat;
 import java.time.Duration;
@@ -125,6 +125,8 @@ public class TradingStatistics {
     /** The exected duration. */
     public Duration duration = Duration.ZERO;
 
+    FastList<Scenario> entries;
+
     /**
      * Analyze trading.
      */
@@ -136,6 +138,7 @@ public class TradingStatistics {
         this.targetCurrencyScale = market.service.setting.targetCurrencyScaleSize;
         this.holdMaxSize = trader.holdMaxSize;
         this.holdCurrentSize = trader.holdSize;
+        this.entries = entries;
 
         for (Scenario entry : entries) {
             if (entry.isCanceled()) {
@@ -212,6 +215,12 @@ public class TradingStatistics {
         String EOL = "\r\n";
 
         StringBuilder builder = new StringBuilder();
+
+        if (detail) {
+            for (Scenario scenario : entries) {
+                System.out.println(scenario);
+            }
+        }
 
         builder.append("実行時間 ").append(Chrono.formatAsDuration(duration.toMillis())).append(EOL);
         builder.append("枚数 現在").append(holdCurrentSize).append(" 最大").append(holdMaxSize).append(EOL);

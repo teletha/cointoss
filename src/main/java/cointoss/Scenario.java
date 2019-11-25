@@ -9,7 +9,7 @@
  */
 package cointoss;
 
-import static java.util.concurrent.TimeUnit.*;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
@@ -240,7 +240,7 @@ public abstract class Scenario extends ScenarioBase implements Directional {
             Num deltaSize = v.minus(entryExecutedSize);
 
             updateOrderRelatedStatus(entries, this::setEntryPrice, this::setEntryExecutedSize);
-            trader.updateSnapshot(Num.ZERO, isBuy() ? deltaSize : deltaSize.negate(), order.price);
+            trader.updateSnapshot(direction(), Num.ZERO, deltaSize, order.price);
 
             logEntry("Update entry order");
         });
@@ -419,7 +419,7 @@ public abstract class Scenario extends ScenarioBase implements Directional {
             Num deltaSize = v.minus(exitExecutedSize);
 
             updateOrderRelatedStatus(exits, this::setExitPrice, this::setExitExecutedSize);
-            trader.updateSnapshot(realizedProfit.minus(previous), isBuy() ? deltaSize.negate() : deltaSize, null);
+            trader.updateSnapshot(direction(), realizedProfit.minus(previous), deltaSize.negate(), null);
 
             logExit("Update exit order");
         });

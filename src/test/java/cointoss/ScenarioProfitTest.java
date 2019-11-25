@@ -747,4 +747,66 @@ class ScenarioProfitTest extends TraderTestSupport {
         assert snapshot.realizedProfit().is(0);
         assert snapshot.unrealizedProfit(Num.of(12)).is(3);
     }
+
+    @Test
+    void snapshotShortLongLong() {
+        entryAndExitPartial(Execution.with.sell(2).price(20), Execution.with.buy(2).price(10).date(minute(5)), 1);
+        entry(Execution.with.buy(1).price(15).date(minute(7)));
+        entry(Execution.with.buy(1).price(17).date(minute(9)));
+
+        // past
+        Profitable snapshot = snapshotAt(minute(1));
+        assert snapshot.realizedProfit().is(0);
+        assert snapshot.unrealizedProfit(Num.of(12)).is(16);
+        assert snapshot.entryRemainingSize().is(-2);
+
+        // exit first scenario partially
+        snapshot = snapshotAt(minute(6));
+        assert snapshot.realizedProfit().is(10);
+        assert snapshot.unrealizedProfit(Num.of(18)).is(2);
+        assert snapshot.entryRemainingSize().is(-1);
+
+        // entry second scenario
+        snapshot = snapshotAt(minute(8));
+        assert snapshot.realizedProfit().is(10);
+        assert snapshot.unrealizedProfit(Num.of(18)).is(5);
+        assert snapshot.entryRemainingSize().is(0);
+
+        // entry third scenario
+        snapshot = snapshotAt(minute(10));
+        assert snapshot.realizedProfit().is(10);
+        assert snapshot.unrealizedProfit(Num.of(19)).is(7);
+        assert snapshot.entryRemainingSize().is(1);
+    }
+
+    @Test
+    void snapshotLongShortShort() {
+        entryAndExitPartial(Execution.with.buy(2).price(10), Execution.with.sell(2).price(20).date(minute(5)), 1);
+        entry(Execution.with.sell(1).price(17).date(minute(7)));
+        entry(Execution.with.sell(1).price(15).date(minute(9)));
+
+        // past
+        Profitable snapshot = snapshotAt(minute(1));
+        assert snapshot.realizedProfit().is(0);
+        assert snapshot.unrealizedProfit(Num.of(12)).is(4);
+        assert snapshot.entryRemainingSize().is(2);
+
+        // exit first scenario partially
+        snapshot = snapshotAt(minute(6));
+        assert snapshot.realizedProfit().is(10);
+        assert snapshot.unrealizedProfit(Num.of(18)).is(8);
+        assert snapshot.entryRemainingSize().is(1);
+
+        // entry second scenario
+        snapshot = snapshotAt(minute(8));
+        assert snapshot.realizedProfit().is(10);
+        assert snapshot.unrealizedProfit(Num.of(19)).is(7);
+        assert snapshot.entryRemainingSize().is(0);
+
+        // entry third scenario
+        snapshot = snapshotAt(minute(10));
+        assert snapshot.realizedProfit().is(10);
+        assert snapshot.unrealizedProfit(Num.of(18)).is(4);
+        assert snapshot.entryRemainingSize().is(-1);
+    }
 }

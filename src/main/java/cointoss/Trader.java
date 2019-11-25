@@ -40,7 +40,7 @@ import kiss.WiseSupplier;
 public abstract class Trader extends TraderBase {
 
     /** The identity element of {@link Snapshot}. */
-    private static final Snapshot EMPTY_SNAPSHOT = new Snapshot(Num.ZERO, Num.ZERO, Num.ZERO);
+    private static final Snapshot EMPTY_SNAPSHOT = new Snapshot(Num.ZERO, Num.ZERO, Num.ZERO, Num.ZERO, Num.ZERO);
 
     /** The market. */
     protected final Market market;
@@ -271,26 +271,39 @@ public abstract class Trader extends TraderBase {
      * @param deltaRemainingSize
      * @param price
      */
-    final void updateSnapshot(Num deltaRealizedProfit, Num deltaRemainingSize, Num price) {
-        Snapshot letest = snapshots.lastEntry().getValue();
+    final void updateSnapshot(Direction direction, Num deltaRealizedProfit, Num deltaRemainingSize, Num price) {
+        Snapshot latest = snapshots.lastEntry().getValue();
 
         ZonedDateTime now = market.service.now().plus(59, SECONDS).truncatedTo(MINUTES);
-        Num newRealized = letest.realizedProfit.plus(deltaRealizedProfit);
-        Num newSize = letest.remainingSize.plus(deltaRemainingSize);
-        Num newPrice = newSize.isZero() ? Num.ZERO
-                : price == null ? letest.entryPrice
-                        : letest.remainingSize.multiply(letest.entryPrice).plus(deltaRemainingSize.multiply(price)).divide(newSize);
-        snapshots.put(now, new Snapshot(newRealized, newPrice, newSize));
+        Num newRealized = latest.realizedProfit.plus(deltaRealizedProfit);
+        Snapshot snapshot;
+
+        if (direction == Direction.BUY) {
+            Num newLongSize = latest.longSize.plus(deltaRemainingSize);
+            Num newLongPrice = newLongSize.isZero() ? Num.ZERO
+                    : price == null ? latest.longPrice
+                            : latest.longSize.multiply(latest.longPrice).plus(deltaRemainingSize.multiply(price)).divide(newLongSize);
+
+            snapshot = new Snapshot(newRealized, newLongPrice, newLongSize, latest.shortPrice, latest.shortSize);
+        } else {
+            Num newShortSize = latest.shortSize.plus(deltaRemainingSize);
+            Num newShortPrice = newShortSize.isZero() ? Num.ZERO
+                    : price == null ? latest.shortPrice
+                            : latest.shortSize.multiply(latest.shortPrice).plus(deltaRemainingSize.multiply(price)).divide(newShortSize);
+
+            snapshot = new Snapshot(newRealized, latest.longPrice, latest.longSize, newShortPrice, newShortSize);
+        }
+        snapshots.put(now, snapshot);
 
         // update holding size
-        setHoldSize(newSize);
-        if (newSize.abs().isGreaterThan(holdMaxSize)) {
-            setHoldMaxSize(newSize.abs());
+        Num newHoldSize = snapshot.entryRemainingSize().abs();
+        setHoldSize(newHoldSize);
+        if (newHoldSize.isGreaterThan(holdMaxSize)) {
+            setHoldMaxSize(newHoldSize);
         }
 
         // update profit
-        Direction direction = newSize.isPositive() ? Direction.BUY : Direction.SELL;
-        setProfit(newRealized.plus(market.tickers.latestPrice.v.diff(direction, newPrice).multiply(newSize.abs())));
+        setProfit(snapshot.profit(market.tickers.latestPrice.v));
     }
 
     /**
@@ -301,23 +314,33 @@ public abstract class Trader extends TraderBase {
         /** The realized profit. */
         private final Num realizedProfit;
 
-        /** The entry price. */
-        private final Num entryPrice;
+        /** The average long price. */
+        private final Num longPrice;
 
-        /** The entry size which is . */
-        private final Num remainingSize;
+        /** The average short price. */
+        private final Num shortPrice;
+
+        /** The long size. */
+        private final Num longSize;
+
+        /** The short size. */
+        private final Num shortSize;
 
         /**
          * Store the current state.
          * 
          * @param realizedProfit
-         * @param entryPrice
-         * @param entryExecutedUnexitedSize
+         * @param longPrice
+         * @param longSize
+         * @param shortPrice
+         * @param shortSize
          */
-        private Snapshot(Num realizedProfit, Num entryPrice, Num remainingSize) {
+        private Snapshot(Num realizedProfit, Num longPrice, Num longSize, Num shortPrice, Num shortSize) {
             this.realizedProfit = realizedProfit;
-            this.entryPrice = entryPrice;
-            this.remainingSize = remainingSize;
+            this.longPrice = longPrice;
+            this.longSize = longSize;
+            this.shortPrice = shortPrice;
+            this.shortSize = shortSize;
         }
 
         /**
@@ -333,8 +356,9 @@ public abstract class Trader extends TraderBase {
          */
         @Override
         public Num unrealizedProfit(Num price) {
-            Direction direction = remainingSize.isPositive() ? Direction.BUY : Direction.SELL;
-            return price.diff(direction, entryPrice).multiply(remainingSize.abs());
+            Num longProfit = price.diff(Direction.BUY, longPrice).multiply(longSize);
+            Num shortProfit = price.diff(Direction.SELL, shortPrice).multiply(shortSize);
+            return longProfit.plus(shortProfit);
         }
 
         /**
@@ -342,7 +366,7 @@ public abstract class Trader extends TraderBase {
          */
         @Override
         public Num entryRemainingSize() {
-            return remainingSize;
+            return longSize.minus(shortSize);
         }
 
         /**
@@ -350,7 +374,7 @@ public abstract class Trader extends TraderBase {
          */
         @Override
         public String toString() {
-            return "Snapshot [realizedProfit=" + realizedProfit + ", entryPrice=" + entryPrice + ", remainingSize=" + remainingSize + "]";
+            return "Snapshot [realizedProfit=" + realizedProfit + ", longPrice=" + longPrice + ", shortPrice=" + shortPrice + ", longSize=" + longSize + ", shortSize=" + shortSize + "]";
         }
     }
 }
