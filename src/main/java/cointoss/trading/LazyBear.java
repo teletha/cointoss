@@ -26,7 +26,7 @@ import kiss.Ⅱ;
  */
 public class LazyBear extends Trader {
 
-    Indicator<Ⅱ<Num, Num>> oscillator = Indicators.waveTrend(market.tickers.of(Span.Second15));
+    Indicator<Ⅱ<Num, Num>> oscillator = Indicators.waveTrend(market.tickers.of(Span.Second5));
 
     public LazyBear(Market market) {
         super(market);
@@ -35,7 +35,7 @@ public class LazyBear extends Trader {
 
         double size = 0.1;
 
-        when(oscillator.observe().take(v -> v.ⅰ.isLessThan(-75)), value -> new Scenario() {
+        when(oscillator.observe().take(v -> v.ⅰ.isLessThan(-50)), value -> new Scenario() {
 
             @Override
             protected void entry() {
@@ -55,7 +55,7 @@ public class LazyBear extends Trader {
             }
         });
 
-        when(oscillator.observe().take(v -> v.ⅰ.isGreaterThan(75)), value -> new Scenario() {
+        when(oscillator.observe().take(v -> v.ⅰ.isGreaterThan(50)), value -> new Scenario() {
 
             @Override
             protected void entry() {

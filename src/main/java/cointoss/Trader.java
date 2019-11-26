@@ -205,7 +205,7 @@ public abstract class Trader extends TraderBase {
      * @param time The specified date and time.
      * @return A snapshot of this {@link Scenario}.
      */
-    public final Profitable snapshotAt(ZonedDateTime time) {
+    public final Snapshot snapshotAt(ZonedDateTime time) {
         return snapshots.floorEntry(time).getValue();
     }
 
@@ -309,7 +309,7 @@ public abstract class Trader extends TraderBase {
     /**
      * The snapshot of {@link Trader}'s state.
      */
-    private static class Snapshot implements Profitable {
+    public static class Snapshot implements Profitable {
 
         /** The realized profit. */
         private final Num realizedProfit;
@@ -321,10 +321,10 @@ public abstract class Trader extends TraderBase {
         private final Num shortPrice;
 
         /** The long size. */
-        private final Num longSize;
+        public final Num longSize;
 
         /** The short size. */
-        private final Num shortSize;
+        public final Num shortSize;
 
         /**
          * Store the current state.
