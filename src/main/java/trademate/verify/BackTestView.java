@@ -9,10 +9,12 @@
  */
 package trademate.verify;
 
-import static transcript.Transcript.*;
+import static transcript.Transcript.en;
 
 import java.time.Period;
 import java.util.List;
+
+import javafx.scene.layout.VBox;
 
 import cointoss.Market;
 import cointoss.MarketService;
@@ -21,11 +23,11 @@ import cointoss.analyze.Statistics;
 import cointoss.analyze.TradingStatistics;
 import cointoss.execution.ExecutionLog;
 import cointoss.market.MarketServiceProvider;
+import cointoss.trading.LazyBear;
 import cointoss.trading.VolumeCross;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
 import cointoss.verify.BackTest;
-import javafx.scene.layout.VBox;
 import stylist.Style;
 import stylist.StyleDSL;
 import trademate.chart.ChartView;
@@ -215,7 +217,7 @@ public class BackTestView extends View implements Analyzer {
             BackTest.with.service(marketSelection.value())
                     .start(startDate.zoned())
                     .end(endDate.zoned())
-                    .traders(VolumeCross::new)
+                    .traders(VolumeCross::new, LazyBear::new)
                     .initialBaseCurrency(3000000)
                     .run(this);
         });

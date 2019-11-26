@@ -40,8 +40,8 @@ public class VolumeIndicator extends PlotScript implements StyleDSL {
         bottom.line(Indicator.build(ticker, Tick::buyVolume).scale(volumeScale).ema(21), Long);
         bottom.line(Indicator.build(ticker, Tick::sellVolume).scale(volumeScale).ema(21), Short);
 
-        Indicator<Num> buyPriceIncrease = Indicator.build(ticker, Tick::buyPriceIncrease).ema(21).scale(volumeScale);
-        Indicator<Num> sellPriceDecrease = Indicator.build(ticker, Tick::sellPriceDecrease).ema(21).scale(volumeScale);
-        bottomN.line(buyPriceIncrease.map(sellPriceDecrease, (b, s) -> b.divide(s).scale(3)), Short);
+        Indicator<Num> buyPriceIncrease = Indicator.build(ticker, Tick::buyPriceIncrease).sma(14).scale(volumeScale);
+        Indicator<Num> sellPriceDecrease = Indicator.build(ticker, Tick::sellPriceDecrease).sma(14).scale(volumeScale);
+        bottomN.line(buyPriceIncrease.map(sellPriceDecrease, (b, s) -> b.minus(s)), Short);
     }
 }

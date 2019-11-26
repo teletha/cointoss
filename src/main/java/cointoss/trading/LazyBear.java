@@ -9,7 +9,7 @@
  */
 package cointoss.trading;
 
-import static java.time.temporal.ChronoUnit.*;
+import static java.time.temporal.ChronoUnit.MINUTES;
 
 import cointoss.Direction;
 import cointoss.Market;
@@ -26,7 +26,7 @@ import kiss.Ⅱ;
  */
 public class LazyBear extends Trader {
 
-    Indicator<Ⅱ<Num, Num>> oscillator = Indicators.waveTrend(market.tickers.of(Span.Second5));
+    Indicator<Ⅱ<Num, Num>> oscillator = Indicators.waveTrend(market.tickers.of(Span.Second15));
 
     public LazyBear(Market market) {
         super(market);
