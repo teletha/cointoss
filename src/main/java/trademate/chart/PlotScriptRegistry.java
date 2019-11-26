@@ -20,6 +20,7 @@ import kiss.Singleton;
 import kiss.Storable;
 import kiss.model.Model;
 import kiss.model.Property;
+import trademate.chart.builtin.ATRIndicator;
 import trademate.chart.builtin.SMAIndicator;
 import trademate.chart.builtin.TraderVisualizer;
 import trademate.chart.builtin.VolumeIndicator;
@@ -124,6 +125,6 @@ class PlotScriptRegistry implements Storable {
      * @return
      */
     protected List<PlotScript> defaults(String market) {
-        return I.list(autoSave(new SMAIndicator()), autoSave(new VolumeIndicator()), autoSave(new WaveTrendIndicator()), new TraderVisualizer());
+        return I.list(autoSave(new SMAIndicator()), autoSave(new VolumeIndicator()), autoSave(new WaveTrendIndicator()), new TraderVisualizer(), new ATRIndicator());
     }
 }
