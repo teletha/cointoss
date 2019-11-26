@@ -9,7 +9,7 @@
  */
 package cointoss.trading;
 
-import static java.time.temporal.ChronoUnit.*;
+import static java.time.temporal.ChronoUnit.MINUTES;
 
 import cointoss.Direction;
 import cointoss.Market;
@@ -29,6 +29,10 @@ public class VolumeCross extends Trader {
 
     Indicator<Num> sell = Indicator.build(market.tickers.of(Span.Second15), Tick::sellVolume).ema(21);
 
+    Indicator<Num> buyPriceIncrease = Indicator.build(market.tickers.of(Span.Second15), Tick::buyPriceIncrease);
+
+    Indicator<Num> sellPriceDecrease = Indicator.build(market.tickers.of(Span.Second15), Tick::sellPriceDecrease);
+
     Indicator<Num> diff = buy.map(sell, (b, s) -> b.minus(s));
 
     public VolumeCross(Market market) {
@@ -47,7 +51,6 @@ public class VolumeCross extends Trader {
             @Override
             protected void exit() {
                 exitWhen(diff.observe().take(v -> v.isLessThan(-2)), o -> o.take());
-                exitAt(entryPrice.plus(10000), o -> o.make(entryPrice.plus(10000)));
             }
         });
 
@@ -60,7 +63,6 @@ public class VolumeCross extends Trader {
             @Override
             protected void exit() {
                 exitWhen(diff.observe().take(v -> v.isGreaterThan(2)), o -> o.take());
-                exitAt(entryPrice.minus(10000), o -> o.make(entryPrice.minus(10000)));
             }
         });
     }

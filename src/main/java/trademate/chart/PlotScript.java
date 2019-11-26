@@ -59,7 +59,7 @@ public abstract class PlotScript {
      * @param ticker
      */
     final Signal<PlotDSL> plot(Market market, Ticker ticker, ChartView chart) {
-        PlotDSL[] plotters = {bottom, low, lowN, high, top, main};
+        PlotDSL[] plotters = {bottom, bottomN, low, lowN, high, highN, top, topN, main};
 
         for (PlotDSL plotter : plotters) {
             plotter.lines.clear();
