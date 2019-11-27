@@ -145,7 +145,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         chart.market.observe()
                 .combineLatest(chart.ticker.observe())
                 .map(v -> I.signal(I.make(PlotScriptRegistry.class).findScriptsOn(v.ⅰ.service))
-                        .flatMap(script -> script.plot(chart.market.v, chart.ticker.v, chart))
+                        .flatMap(script -> script.plot(chart.market.v, chart.ticker.v))
                         .toList()
                         .toArray(PlotDSL[]::new))
                 .to(v -> plotters = v);
