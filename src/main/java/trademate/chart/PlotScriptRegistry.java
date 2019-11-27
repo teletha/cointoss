@@ -68,7 +68,7 @@ class PlotScriptRegistry implements Storable {
      * @return
      */
     List<PlotScript> findScriptsOn(MarketService market) {
-        return managedScripts.computeIfAbsent(market.marketName, this::defaults);
+        return managedScripts.computeIfAbsent(market.marketIdentity(), this::defaults);
     }
 
     /**
@@ -80,7 +80,7 @@ class PlotScriptRegistry implements Storable {
      * @return
      */
     <S extends PlotScript> S register(MarketService market, Class<S> type) {
-        List<PlotScript> scripts = managedScripts.computeIfAbsent(market.marketName, this::defaults);
+        List<PlotScript> scripts = managedScripts.computeIfAbsent(market.marketIdentity(), this::defaults);
         for (PlotScript script : scripts) {
             if (script.getClass() == type) {
                 return (S) script;
@@ -112,7 +112,7 @@ class PlotScriptRegistry implements Storable {
      * @param script A target script to remove.
      */
     void unregister(MarketService market, PlotScript script) {
-        List<PlotScript> scripts = managedScripts.get(market.marketName);
+        List<PlotScript> scripts = managedScripts.get(market.marketIdentity());
 
         if (scripts != null) {
             scripts.remove(script);

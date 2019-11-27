@@ -14,8 +14,6 @@ import static transcript.Transcript.en;
 import java.time.Period;
 import java.util.List;
 
-import javafx.scene.layout.VBox;
-
 import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.analyze.Analyzer;
@@ -196,9 +194,6 @@ public class BackTestView extends View implements Analyzer {
      */
     @Override
     protected void initialize() {
-        VBox ui = (VBox) ui();
-        System.out.println(ui.getHeight());
-
         marketSelection.values(0, MarketServiceProvider.availableMarketServices());
         startDate.initial(Chrono.utcNow().minusDays(10)).uneditable().requireWhen(marketSelection).require(() -> {
             ExecutionLog log = marketSelection.value().log;
