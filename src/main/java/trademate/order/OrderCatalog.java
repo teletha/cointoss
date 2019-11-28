@@ -89,12 +89,10 @@ public class OrderCatalog extends View {
             $.menu(Cancel).disableWhen(ordersArePassive).whenUserClick(e -> act(this::cancel));
         });
 
-        date.header(Date)
-                .modelByVar(Order.class, o -> o.observeCreationTimeNow().to())
-                .render((ui, item) -> ui.text(formatter.format(item)));
-        side.header(SiDe).model(Order.class, Order::direction).render((ui, side) -> ui.text(side).styleOnly(TradeMateStyle.Side.of(side)));
-        amount.header(Amount).modelByVar(Order.class, o -> o.observeRemainingSizeNow().to());
-        price.header(Price).model(Order.class, o -> o.price);
+        date.text(Date).modelByVar(Order.class, o -> o.observeCreationTimeNow().to()).render((ui, item) -> ui.text(formatter.format(item)));
+        side.text(SiDe).model(Order.class, Order::direction).render((ui, side) -> ui.text(side).styleOnly(TradeMateStyle.Side.of(side)));
+        amount.text(Amount).modelByVar(Order.class, o -> o.observeRemainingSizeNow().to());
+        price.text(Price).model(Order.class, o -> o.price);
 
         // initialize orders on server
         I.signal(view.market().orders.items).take(Order::isBuy).sort(Comparator.reverseOrder()).to(this::createOrderItem);
@@ -111,8 +109,8 @@ public class OrderCatalog extends View {
      */
     private void createOrderItem(Order order) {
         if (order != null) {
-            table.values.add(order);
-            order.observeTerminating().on(Viewtify.UIThread).to(() -> table.values.remove(order));
+            table.addItemAtLast(order);
+            order.observeTerminating().on(Viewtify.UIThread).to(() -> table.removeItem(order));
         }
     }
 
@@ -151,7 +149,7 @@ public class OrderCatalog extends View {
          * 
          */
         private CatalogRow() {
-            ui.styleOnly(Viewtify.signalNow(itemProperty()).as(Order.class).switchMap(o -> o.observeStateNow()).map(S.State::of));
+            ui.styleOnly(Viewtify.observeNow(itemProperty()).as(Order.class).switchMap(o -> o.observeStateNow()).map(S.State::of));
         }
     }
 

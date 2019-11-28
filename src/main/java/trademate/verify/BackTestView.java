@@ -224,21 +224,21 @@ public class BackTestView extends View implements Analyzer {
      * Setting for trading log.
      */
     private void configureTradingLogView() {
-        name.header(en("Name")).model(log -> log.name);
-        period.header(en("Period")).model(log -> log).render(this::renderPeriod);
-        holdSize.header(en("Hold Size")).model(log -> log).render(this::renderPositionSize);
-        holdTimeForProfit.header(en("Profit Span")).model(log -> log.holdTimeOnProfitTrade).render(this::render);
-        holdTimeForLoss.header(en("Loss Span")).model(log -> log.holdTimeOnLossTrade).render(this::render);
-        realizedProfit.header(en("Realized Profit")).model(log -> log.profitRange).render(this::render);
-        unrealizedProfit.header(en("Unrealized Profit")).model(log -> log.unrealizedProfitRange).render(this::render);
-        realizedLoss.header(en("Realized Loss")).model(log -> log.lossRange).render(this::render);
-        unrealizedLoss.header(en("Unrealized Loss")).model(log -> log.unrealizedLossRange).render(this::render);
-        profit.header(en("Profit")).model(log -> log.profitAndLoss).render(this::render);
-        total.header(en("Total Profit")).model(log -> log.profitAndLoss.formattedTotal());
-        winRatio.header(en("Win Rate")).model(log -> log.winningRate());
-        profitFactor.header(en("Profit Factor")).model(TradingStatistics::profitFactor);
-        drawDown.header(en("Drawdown")).model(log -> log.drawDownRatio);
-        scenarioCount.header(en("Trade Count")).model(log -> log).render(this::renderScenarioCount);
+        name.text(en("Name")).model(log -> log.name);
+        period.text(en("Period")).model(log -> log).render(this::renderPeriod);
+        holdSize.text(en("Hold Size")).model(log -> log).render(this::renderPositionSize);
+        holdTimeForProfit.text(en("Profit Span")).model(log -> log.holdTimeOnProfitTrade).render(this::render);
+        holdTimeForLoss.text(en("Loss Span")).model(log -> log.holdTimeOnLossTrade).render(this::render);
+        realizedProfit.text(en("Realized Profit")).model(log -> log.profitRange).render(this::render);
+        unrealizedProfit.text(en("Unrealized Profit")).model(log -> log.unrealizedProfitRange).render(this::render);
+        realizedLoss.text(en("Realized Loss")).model(log -> log.lossRange).render(this::render);
+        unrealizedLoss.text(en("Unrealized Loss")).model(log -> log.unrealizedLossRange).render(this::render);
+        profit.text(en("Profit")).model(log -> log.profitAndLoss).render(this::render);
+        total.text(en("Total Profit")).model(log -> log.profitAndLoss.formattedTotal());
+        winRatio.text(en("Win Rate")).model(log -> log.winningRate());
+        profitFactor.text(en("Profit Factor")).model(TradingStatistics::profitFactor);
+        drawDown.text(en("Drawdown")).model(log -> log.drawDownRatio);
+        scenarioCount.text(en("Trade Count")).model(log -> log).render(this::renderScenarioCount);
     }
 
     /**
@@ -316,7 +316,7 @@ public class BackTestView extends View implements Analyzer {
     public void analyze(Market market, List<TradingStatistics> logs, boolean detail) {
         for (TradingStatistics log : logs) {
             System.out.println(log);
-            results.values.add(log);
+            results.addItemAtLast(log);
         }
 
         Viewtify.inUI(() -> {
