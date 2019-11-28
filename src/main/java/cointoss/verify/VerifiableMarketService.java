@@ -93,7 +93,7 @@ public class VerifiableMarketService extends MarketService {
      * 
      */
     public VerifiableMarketService(MarketService delegation) {
-        super("Verifiable " + delegation.exchangeName, delegation.marketName, delegation.setting);
+        super(delegation.exchangeName, delegation.marketName, delegation.setting);
     }
 
     /**
