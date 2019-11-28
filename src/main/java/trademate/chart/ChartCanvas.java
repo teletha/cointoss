@@ -12,15 +12,6 @@ package trademate.chart;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.eclipse.collections.api.list.primitive.MutableDoubleList;
-import org.eclipse.collections.impl.list.mutable.primitive.DoubleArrayList;
-
-import cointoss.market.bitflyer.BitFlyer;
-import cointoss.market.bitflyer.SFD;
-import cointoss.ticker.Indicator;
-import cointoss.ticker.Tick;
-import cointoss.util.Chrono;
-import cointoss.util.Num;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
@@ -32,6 +23,16 @@ import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.PathElement;
+
+import org.eclipse.collections.api.list.primitive.MutableDoubleList;
+import org.eclipse.collections.impl.list.mutable.primitive.DoubleArrayList;
+
+import cointoss.market.bitflyer.BitFlyer;
+import cointoss.market.bitflyer.SFD;
+import cointoss.ticker.Indicator;
+import cointoss.ticker.Tick;
+import cointoss.util.Chrono;
+import cointoss.util.Num;
 import kiss.I;
 import stylist.Style;
 import trademate.chart.Axis.TickLable;
@@ -144,11 +145,15 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
         chart.market.observe()
                 .combineLatest(chart.ticker.observe())
-                .map(v -> I.signal(I.make(PlotScriptRegistry.class).findScriptsOn(v.ⅰ.service))
-                        .flatMap(script -> script.plot(chart.market.v, chart.ticker.v))
-                        .toList()
-                        .toArray(PlotDSL[]::new))
-                .to(v -> plotters = v);
+                .map(v -> I.make(PlotScriptRegistry.class).findScriptsOn(v.ⅰ.service))
+                .combineLatest(Viewtify.observeNow(chart.scripts))
+                .to(v -> {
+                    this.plotters = I.signal(v.ⅰ)
+                            .merge(I.signal(v.ⅱ))
+                            .flatMap(script -> script.plot(chart.market.v, chart.ticker.v))
+                            .toList()
+                            .toArray(PlotDSL[]::new);
+                });
 
         Viewtify.clip(this);
 
