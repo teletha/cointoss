@@ -9,6 +9,9 @@
  */
 package trademate.chart;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+
 import cointoss.Market;
 import cointoss.ticker.Span;
 import cointoss.ticker.Ticker;
@@ -41,6 +44,9 @@ public class ChartView extends View {
 
     /** The chart configuration. */
     public final Variable<Boolean> showRealtimeUpdate = Variable.of(true);
+
+    /** The additional scripts. */
+    public final ObservableList<PlotScript> scripts = FXCollections.observableArrayList();
 
     /** The candle chart. */
     private final Chart chart = new Chart(this);

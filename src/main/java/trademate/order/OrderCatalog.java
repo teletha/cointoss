@@ -31,7 +31,7 @@ import stylist.ValueStyle;
 import trademate.TradeMateStyle;
 import trademate.TradingView;
 import viewtify.Viewtify;
-import viewtify.bind.Calculation;
+import viewtify.bind.Calculated;
 import viewtify.ui.UI;
 import viewtify.ui.UITableColumn;
 import viewtify.ui.UITableView;
@@ -84,7 +84,7 @@ public class OrderCatalog extends View {
     @Override
     protected void initialize() {
         table.selectMultipleRows().render(table -> new CatalogRow()).context($ -> {
-            Calculation<Boolean> ordersArePassive = table.selection().flatVariable(o -> Variable.of(o.state)).isNot(ACTIVE);
+            Calculated<Boolean> ordersArePassive = table.selection().flatVariable(o -> Variable.of(o.state)).isNot(ACTIVE);
 
             $.menu(Cancel).disableWhen(ordersArePassive).whenUserClick(e -> act(this::cancel));
         });
