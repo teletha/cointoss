@@ -9,8 +9,21 @@
  */
 package trademate.chart;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+
+import javafx.collections.ObservableList;
+import javafx.scene.Node;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.input.ContextMenuEvent;
+import javafx.scene.layout.Region;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.LineTo;
+import javafx.scene.shape.MoveTo;
+import javafx.scene.shape.Path;
+import javafx.scene.shape.PathElement;
 
 import org.eclipse.collections.api.list.primitive.MutableDoubleList;
 import org.eclipse.collections.impl.list.mutable.primitive.DoubleArrayList;
@@ -27,17 +40,6 @@ import cointoss.ticker.Tick;
 import cointoss.ticker.Ticker;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
-import javafx.collections.ObservableList;
-import javafx.scene.Node;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.input.ContextMenuEvent;
-import javafx.scene.layout.Region;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.LineTo;
-import javafx.scene.shape.MoveTo;
-import javafx.scene.shape.Path;
-import javafx.scene.shape.PathElement;
 import kiss.I;
 import kiss.Ⅲ;
 import stylist.Style;
@@ -121,7 +123,8 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
     /** The cache by span. */
     private LoadingCache<Ⅲ<Market, Ticker, ObservableList<PlotScript>>, PlotDSL[]> plottersCache = CacheBuilder.newBuilder()
-            .maximumSize(6)
+            .maximumSize(7)
+            .expireAfterAccess(Duration.ofHours(1))
             .build(new CacheLoader<>() {
 
                 @Override
@@ -131,7 +134,9 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
                     List<PlotDSL> combined = I.signal(registered, additional)
                             .flatIterable(list -> list)
-                            .flatMap(script -> script.plot(v.ⅰ, v.ⅱ))
+                            .effect(script -> script.declare(v.ⅰ, v.ⅱ))
+                            .flatArray(s -> new PlotDSL[] {s.bottom, s.bottomN, s.low, s.lowN, s.high, s.highN, s.top, s.topN, s.main})
+                            .skip(plotter -> plotter.lines.isEmpty() && plotter.horizons.isEmpty())
                             .toList();
 
                     return combined.toArray(new PlotDSL[combined.size()]);

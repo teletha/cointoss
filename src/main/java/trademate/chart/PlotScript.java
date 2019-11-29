@@ -16,8 +16,6 @@ import cointoss.Market;
 import cointoss.ticker.Indicator;
 import cointoss.ticker.Ticker;
 import cointoss.util.Num;
-import kiss.I;
-import kiss.Signal;
 import kiss.Variable;
 import stylist.Style;
 import trademate.chart.ChartCanvas.Horizon;
@@ -51,18 +49,6 @@ public abstract class PlotScript {
 
     /** The plotter. */
     protected final PlotDSL main = new PlotDSL(PlotArea.Main, this);
-
-    /**
-     * Execute plot declaration.
-     * 
-     * @param market
-     * @param ticker
-     */
-    final Signal<PlotDSL> plot(Market market, Ticker ticker) {
-        declare(market, ticker);
-
-        return I.signal(bottom, bottomN, low, lowN, high, highN, top, topN, main).skip(plotter -> plotter.lines.isEmpty());
-    }
 
     /**
      * Declare your chart.
