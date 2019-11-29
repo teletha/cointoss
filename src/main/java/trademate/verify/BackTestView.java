@@ -36,6 +36,7 @@ import stylist.Style;
 import stylist.StyleDSL;
 import trademate.chart.ChartView;
 import trademate.chart.PlotScript;
+import trademate.chart.builtin.TraderVisualizer;
 import trademate.setting.SettingStyles;
 import transcript.Transcript;
 import viewtify.Viewtify;
@@ -315,7 +316,7 @@ public class BackTestView extends View implements Analyzer {
 
         chart.market.set(market);
         chart.scripts.clear();
-        chart.scripts.addAll(I.signal(traders).flatMap(this::createTraderPlotScript).toList());
+        chart.scripts.addAll(I.signal(traders).flatMap(this::createTraderPlotScript).startWith(TraderVisualizer::new).toList());
     }
 
     private Signal<Supplier<PlotScript>> createTraderPlotScript(Trader trader) {
