@@ -319,6 +319,12 @@ public class BackTestView extends View implements Analyzer {
         chart.scripts.addAll(I.signal(traders).flatMap(this::createTraderPlotScript).startWith(TraderVisualizer::new).toList());
     }
 
+    /**
+     * Create {@link PlotScript} from member class within {@link Trader}.
+     * 
+     * @param trader
+     * @return
+     */
     private Signal<Supplier<PlotScript>> createTraderPlotScript(Trader trader) {
         return I.signal(trader)
                 .flatArray(t -> t.getClass().getDeclaredClasses())
