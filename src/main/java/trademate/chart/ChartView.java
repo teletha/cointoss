@@ -9,6 +9,8 @@
  */
 package trademate.chart;
 
+import java.util.function.Supplier;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -46,7 +48,7 @@ public class ChartView extends View {
     public final Variable<Boolean> showRealtimeUpdate = Variable.of(true);
 
     /** The additional scripts. */
-    public final ObservableList<PlotScript> scripts = FXCollections.observableArrayList();
+    public final ObservableList<Supplier<PlotScript>> scripts = FXCollections.observableArrayList();
 
     /** The candle chart. */
     private final Chart chart = new Chart(this);

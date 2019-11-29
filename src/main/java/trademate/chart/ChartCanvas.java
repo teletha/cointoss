@@ -12,6 +12,7 @@ package trademate.chart;
 import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Supplier;
 
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
@@ -122,15 +123,15 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     private final LayoutAssistant layoutCandleLatest = new LayoutAssistant(this);
 
     /** The cache by span. */
-    private LoadingCache<Ⅲ<Market, Ticker, ObservableList<PlotScript>>, PlotDSL[]> plottersCache = CacheBuilder.newBuilder()
+    private LoadingCache<Ⅲ<Market, Ticker, ObservableList<Supplier<PlotScript>>>, PlotDSL[]> plottersCache = CacheBuilder.newBuilder()
             .maximumSize(7)
             .expireAfterAccess(Duration.ofHours(1))
             .build(new CacheLoader<>() {
 
                 @Override
-                public PlotDSL[] load(Ⅲ<Market, Ticker, ObservableList<PlotScript>> v) throws Exception {
+                public PlotDSL[] load(Ⅲ<Market, Ticker, ObservableList<Supplier<PlotScript>>> v) throws Exception {
                     List<PlotScript> registered = I.make(PlotScriptRegistry.class).findPlottersBy(v.ⅰ, v.ⅱ);
-                    List<PlotScript> additional = v.ⅲ;
+                    List<PlotScript> additional = I.signal(v.ⅲ).map(Supplier::get).toList();
 
                     List<PlotDSL> combined = I.signal(registered, additional)
                             .flatIterable(list -> list)
