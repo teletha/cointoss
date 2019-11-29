@@ -25,26 +25,23 @@ import cointoss.ticker.Span;
 import cointoss.ticker.Tick;
 import cointoss.util.Num;
 import kiss.Signal;
+import trademate.chart.Plot;
+import trademate.chart.PlotArea;
 
 /**
  * 
  */
 public class VolumeCross extends Trader {
 
-    Indicator<Num> buy = Indicator.build(market.tickers.of(Span.Minute10), Tick::buyVolume).ema(21);
-
-    Indicator<Num> sell = Indicator.build(market.tickers.of(Span.Minute10), Tick::sellVolume).ema(21);
-
-    Indicator<Num> diff = buy.map(sell, (b, s) -> b.minus(s));
-
-    Indicator<Num> buyPriceIncrease = Indicator.build(market.tickers.of(Span.Minute5), Tick::buyPriceIncrease).sma(21);
-
-    Indicator<Num> sellPriceDecrease = Indicator.build(market.tickers.of(Span.Minute5), Tick::sellPriceDecrease).sma(21);
-
-    Indicator<Num> priceDiff = buyPriceIncrease.map(sellPriceDecrease, (b, s) -> b.minus(s));
+    @Plot(area = PlotArea.BottomNarrow)
+    Indicator<Num> priceDiff;
 
     public VolumeCross(Market market) {
         super(market);
+
+        Indicator<Num> buyPriceIncrease = Indicator.build(market.tickers.of(Span.Minute5), Tick::buyPriceIncrease).sma(21);
+        Indicator<Num> sellPriceDecrease = Indicator.build(market.tickers.of(Span.Minute5), Tick::sellPriceDecrease).sma(21);
+        priceDiff = buyPriceIncrease.map(sellPriceDecrease, (b, s) -> b.minus(s)).scale(market.service.setting.targetCurrencyScaleSize);
 
         // disableWhile(observeProfit().map(p -> p.isLessThan(-10000)));
 

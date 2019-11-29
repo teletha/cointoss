@@ -20,7 +20,7 @@ public interface Analyzer {
      * Set up phase.
      * 
      * @param market
-     * @param traders TODO
+     * @param traders
      */
     default void initialize(Market market, List<Trader> traders) {
         // do nothing

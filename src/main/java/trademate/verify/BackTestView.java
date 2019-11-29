@@ -13,6 +13,7 @@ import static transcript.Transcript.en;
 
 import java.time.Period;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import cointoss.Market;
 import cointoss.MarketService;
@@ -30,6 +31,7 @@ import cointoss.verify.BackTest;
 import stylist.Style;
 import stylist.StyleDSL;
 import trademate.chart.ChartView;
+import trademate.chart.builtin.TraderPlot;
 import trademate.setting.SettingStyles;
 import transcript.Transcript;
 import viewtify.Viewtify;
@@ -308,6 +310,8 @@ public class BackTestView extends View implements Analyzer {
         chart.showRealtimeUpdate.set(false);
 
         chart.market.set(market);
+        chart.scripts.clear();
+        chart.scripts.addAll(traders.stream().map(t -> new TraderPlot(t)).collect(Collectors.toList()));
     }
 
     /**
