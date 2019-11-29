@@ -143,7 +143,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         this.chartInfo.heightProperty().bind(heightProperty());
 
         chart.market.observe().combineLatest(chart.ticker.observe(), Viewtify.observeNow(chart.scripts)).to(v -> {
-            List<PlotScript> registered = I.make(PlotScriptRegistry.class).findScriptsOn(v.ⅰ.service);
+            List<PlotScript> registered = I.make(PlotScriptRegistry.class).findPlottersBy(v.ⅰ, v.ⅱ);
             List<PlotScript> additional = v.ⅲ;
 
             List<PlotDSL> combined = I.signal(registered, additional)

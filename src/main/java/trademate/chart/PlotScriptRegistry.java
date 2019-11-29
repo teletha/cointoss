@@ -9,20 +9,23 @@
  */
 package trademate.chart;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+
+import cointoss.Market;
 import cointoss.MarketService;
+import cointoss.ticker.Span;
+import cointoss.ticker.Ticker;
 import kiss.I;
 import kiss.Manageable;
 import kiss.Singleton;
 import kiss.Storable;
-import kiss.model.Model;
-import kiss.model.Property;
-import trademate.chart.builtin.ATRIndicator;
 import trademate.chart.builtin.SMAIndicator;
-import trademate.chart.builtin.TraderVisualizer;
 import trademate.chart.builtin.VolumeIndicator;
 import trademate.chart.builtin.WaveTrendIndicator;
 
@@ -30,15 +33,16 @@ import trademate.chart.builtin.WaveTrendIndicator;
 class PlotScriptRegistry implements Storable {
 
     /** The managed scripts. */
-    private Map<String, List<PlotScript>> managedScripts = new HashMap();
+    private Map<String, List<Class<? extends PlotScript>>> managedScripts = new HashMap();
+
+    /** The cache by span. */
+    private Cache<Span, PlotScript> cacheBySpan = CacheBuilder.newBuilder().maximumSize(6).build();
 
     /**
      * 
      */
     protected PlotScriptRegistry() {
         restore();
-
-        I.signal(managedScripts.values()).flatIterable(v -> v).to(this::autoSave);
     }
 
     /**
@@ -47,7 +51,7 @@ class PlotScriptRegistry implements Storable {
      * @return The managedScripts property.
      */
     @SuppressWarnings("unused")
-    private Map<String, List<PlotScript>> getScripts() {
+    private Map<String, List<Class<? extends PlotScript>>> getManagedScripts() {
         return managedScripts;
     }
 
@@ -57,52 +61,69 @@ class PlotScriptRegistry implements Storable {
      * @param managedScripts The managedScripts value to set.
      */
     @SuppressWarnings("unused")
-    private void setScripts(Map<String, List<PlotScript>> managedScripts) {
+    private void setManagedScripts(Map<String, List<Class<? extends PlotScript>>> managedScripts) {
         this.managedScripts = managedScripts;
     }
 
     /**
-     * Retrieve all script on the specified {@link MarketService}.
+     * Find all plotting scripts on the specified {@link Market} and {@link Ticker}.
      * 
-     * @param market
-     * @return
+     * @param market A target {@link Market}.
+     * @param ticker A target {@link Ticker}.
+     * @return A list of {@link PlotScript}.
      */
-    List<PlotScript> findScriptsOn(MarketService market) {
-        return managedScripts.computeIfAbsent(market.marketIdentity(), this::defaults);
+    final List<PlotScript> findPlottersBy(Market market, Ticker ticker) {
+        return findPlottersBy(market.service, ticker.span);
+    }
+
+    /**
+     * Find all plotting scripts on the specified {@link MarketService} and {@link Span}.
+     * 
+     * @param service A target {@link MarketService}.
+     * @param span A target {@link Span}.
+     * @return A list of {@link PlotScript}.
+     */
+    final List<PlotScript> findPlottersBy(MarketService service, Span span) {
+        List<Class<? extends PlotScript>> classes = managedScripts.get(service.marketIdentity());
+
+        if (classes == null) {
+            classes = defaults();
+        }
+
+        List<PlotScript> scripts = new ArrayList();
+        for (Class<? extends PlotScript> clazz : classes) {
+            scripts.add(I.make(clazz));
+        }
+        return scripts;
     }
 
     /**
      * Register {@link PlotScript} on the specified {@link MarketService}.
      * 
-     * @param <S>
      * @param market A target market.
      * @param script A target script to add.
      * @return
      */
-    <S extends PlotScript> S register(MarketService market, Class<S> type) {
-        List<PlotScript> scripts = managedScripts.computeIfAbsent(market.marketIdentity(), this::defaults);
-        for (PlotScript script : scripts) {
-            if (script.getClass() == type) {
-                return (S) script;
-            }
-        }
-
-        S script = I.make(type);
-        scripts.add(script);
-        return autoSave(script);
+    final void register(Market market, Class<? extends PlotScript> type) {
+        register(market.service, type);
     }
 
     /**
-     * Observe properties to save automatically.
+     * Register {@link PlotScript} on the specified {@link MarketService}.
      * 
-     * @param script
+     * @param service A target market.
+     * @param script A target script to add.
+     * @return
      */
-    private <S extends PlotScript> S autoSave(S script) {
-        Model<PlotScript> model = Model.of(script);
-        for (Property p : model.properties()) {
-            model.observe(script, p).to(v -> store());
+    final void register(MarketService service, Class<? extends PlotScript> type) {
+        List<Class<? extends PlotScript>> classes = managedScripts.computeIfAbsent(service.marketIdentity(), key -> new ArrayList());
+
+        for (Class<? extends PlotScript> clazz : classes) {
+            if (clazz == type) {
+                return;
+            }
         }
-        return script;
+        classes.add(type);
     }
 
     /**
@@ -111,11 +132,41 @@ class PlotScriptRegistry implements Storable {
      * @param market A target market.
      * @param script A target script to remove.
      */
-    void unregister(MarketService market, PlotScript script) {
-        List<PlotScript> scripts = managedScripts.get(market.marketIdentity());
+    final void unregister(Market market, PlotScript script) {
+        unregister(market, script.getClass());
+    }
 
-        if (scripts != null) {
-            scripts.remove(script);
+    /**
+     * Unregister {@link PlotScript} on the specified {@link MarketService}.
+     * 
+     * @param market A target market.
+     * @param script A target script to remove.
+     */
+    final void unregister(MarketService market, PlotScript script) {
+        unregister(market, script.getClass());
+    }
+
+    /**
+     * Unregister {@link PlotScript} on the specified {@link MarketService}.
+     * 
+     * @param market A target market.
+     * @param script A target script to remove.
+     */
+    final void unregister(Market market, Class<? extends PlotScript> script) {
+        unregister(market.service, script);
+    }
+
+    /**
+     * Unregister {@link PlotScript} on the specified {@link MarketService}.
+     * 
+     * @param market A target market.
+     * @param script A target script to remove.
+     */
+    final void unregister(MarketService market, Class<? extends PlotScript> script) {
+        List<Class<? extends PlotScript>> classes = managedScripts.get(market.marketIdentity());
+
+        if (classes != null) {
+            classes.remove(script);
         }
     }
 
@@ -124,7 +175,7 @@ class PlotScriptRegistry implements Storable {
      * 
      * @return
      */
-    protected List<PlotScript> defaults(String market) {
-        return I.list(autoSave(new SMAIndicator()), autoSave(new VolumeIndicator()), autoSave(new WaveTrendIndicator()), new TraderVisualizer(), new ATRIndicator());
+    protected List<Class<? extends PlotScript>> defaults() {
+        return List.of(SMAIndicator.class, VolumeIndicator.class, WaveTrendIndicator.class);
     }
 }

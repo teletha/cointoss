@@ -9,7 +9,6 @@
  */
 package trademate.chart;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -20,6 +19,7 @@ import org.junit.jupiter.api.parallel.ExecutionMode;
 import antibug.CleanRoom;
 import cointoss.Market;
 import cointoss.market.bitflyer.BitFlyer;
+import cointoss.ticker.Span;
 import cointoss.ticker.Ticker;
 import kiss.Variable;
 
@@ -30,59 +30,29 @@ class PlotScriptRegistryTest {
     static CleanRoom room = new CleanRoom();
 
     @Test
-    void findAllScriptsOnMarket() {
+    void register() {
         PlotScriptRegistry registry = new TestablePlotScriptRegistry();
-        Volume volume = registry.register(BitFlyer.BTC_JPY, Volume.class);
-        SMA sma = registry.register(BitFlyer.BTC_JPY, SMA.class);
+        registry.register(BitFlyer.BTC_JPY, Volume.class);
+        registry.register(BitFlyer.BTC_JPY, SMA.class);
 
-        List<PlotScript> scripts = registry.findScriptsOn(BitFlyer.BTC_JPY);
-        assert scripts.size() == 2;
-        assert scripts.get(0) == volume;
-        assert scripts.get(1) == sma;
+        List<PlotScript> plotters = registry.findPlottersBy(BitFlyer.BTC_JPY, Span.Hour1);
+        assert plotters.size() == 2;
+        assert plotters.get(0) instanceof Volume;
+        assert plotters.get(1) instanceof SMA;
+
     }
 
     @Test
-    void unregisterScript() {
+    void unregister() {
         PlotScriptRegistry registry = new TestablePlotScriptRegistry();
-        Volume volume = registry.register(BitFlyer.BTC_JPY, Volume.class);
-        SMA sma = registry.register(BitFlyer.BTC_JPY, SMA.class);
+        registry.register(BitFlyer.BTC_JPY, Volume.class);
+        registry.register(BitFlyer.BTC_JPY, SMA.class);
 
-        assert registry.findScriptsOn(BitFlyer.BTC_JPY).size() == 2;
-        registry.unregister(BitFlyer.BTC_JPY, volume);
-        assert registry.findScriptsOn(BitFlyer.BTC_JPY).size() == 1;
-        registry.unregister(BitFlyer.BTC_JPY, sma);
-        assert registry.findScriptsOn(BitFlyer.BTC_JPY).size() == 0;
-    }
-
-    @Test
-    void plotScriptIsSingletonPerMarket() {
-        PlotScriptRegistry registry = new TestablePlotScriptRegistry();
-        Volume volume = registry.register(BitFlyer.BTC_JPY, Volume.class);
-        assert volume != null;
-
-        // same instance on same market
-        assert volume == registry.register(BitFlyer.BTC_JPY, Volume.class);
-
-        // diff instance on diff market
-        assert volume != registry.register(BitFlyer.ETH_BTC, Volume.class);
-    }
-
-    @Test
-    void storePropertyAutomatically() {
-        PlotScriptRegistry registry = new TestablePlotScriptRegistry();
-        Volume volume = registry.register(BitFlyer.BTC_JPY, Volume.class);
-        volume.buy.set(12);
-
-        PlotScriptRegistry other = new TestablePlotScriptRegistry();
-        Volume otherVolume = other.register(BitFlyer.BTC_JPY, Volume.class);
-        assert otherVolume.buy.is(12);
-        assert otherVolume.sell.is(0);
-        otherVolume.sell.set(15);
-
-        PlotScriptRegistry another = new TestablePlotScriptRegistry();
-        Volume anotherVolume = another.register(BitFlyer.BTC_JPY, Volume.class);
-        assert anotherVolume.buy.is(12);
-        assert anotherVolume.sell.is(15);
+        assert registry.findPlottersBy(BitFlyer.BTC_JPY, Span.Hour1).size() == 2;
+        registry.unregister(BitFlyer.BTC_JPY, Volume.class);
+        assert registry.findPlottersBy(BitFlyer.BTC_JPY, Span.Hour1).size() == 1;
+        registry.unregister(BitFlyer.BTC_JPY, SMA.class);
+        assert registry.findPlottersBy(BitFlyer.BTC_JPY, Span.Hour1).size() == 0;
     }
 
     /**
@@ -121,14 +91,6 @@ class PlotScriptRegistryTest {
      * 
      */
     private static class TestablePlotScriptRegistry extends PlotScriptRegistry {
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        protected List<PlotScript> defaults(String market) {
-            return new ArrayList();
-        }
 
         /**
          * {@inheritDoc}
