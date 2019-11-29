@@ -9,7 +9,7 @@
  */
 package trademate.chart;
 
-public enum PlotArea {
+enum PlotArea {
     Top(true, 0, 35, 15), TopNarrow(true, 0, 25, 10), High(true, 70, 35, 15), HighNarrow(true, 70, 25, 10), Low(false, 70, 35,
             10), LowNarrow(false, 70, 25, 10), Bottom(false, 0, 35, 15), BottomNarrow(false, 0, 25, 10), Main(true, 0, -1, -1);
 

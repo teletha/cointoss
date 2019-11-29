@@ -23,17 +23,18 @@ import cointoss.Trader;
 import cointoss.ticker.Indicator;
 import cointoss.ticker.Span;
 import cointoss.ticker.Tick;
+import cointoss.ticker.Ticker;
 import cointoss.util.Num;
 import kiss.Signal;
-import trademate.chart.Plot;
-import trademate.chart.PlotArea;
+import stylist.Style;
+import stylist.StyleDSL;
+import trademate.chart.PlotScript;
 
 /**
  * 
  */
 public class VolumeCross extends Trader {
 
-    @Plot(area = PlotArea.BottomNarrow)
     Indicator<Num> priceDiff;
 
     public VolumeCross(Market market) {
@@ -74,5 +75,20 @@ public class VolumeCross extends Trader {
 
     private <In> Function<Signal<In>, Signal<List<In>>> near(int size, Predicate<In> condition) {
         return signal -> signal.buffer(size, 1).take(buff -> buff.stream().allMatch(condition));
+    }
+
+    /**
+     * 
+     */
+    class Plot extends PlotScript implements StyleDSL {
+
+        Style diff = () -> {
+            stroke.color("#eee");
+        };
+
+        @Override
+        protected void declare(Market market, Ticker ticker) {
+            bottomN.line(priceDiff, diff);
+        }
     }
 }

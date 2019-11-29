@@ -13,7 +13,6 @@ import cointoss.Market;
 import cointoss.ticker.Indicator;
 import cointoss.ticker.Tick;
 import cointoss.ticker.Ticker;
-import cointoss.util.Num;
 import stylist.Style;
 import stylist.StyleDSL;
 import trademate.chart.ChartStyles;
@@ -39,9 +38,5 @@ public class VolumeIndicator extends PlotScript implements StyleDSL {
 
         bottom.line(Indicator.build(ticker, Tick::buyVolume).ema(21).scale(volumeScale), Long);
         bottom.line(Indicator.build(ticker, Tick::sellVolume).ema(21).scale(volumeScale), Short);
-
-        Indicator<Num> buyPriceIncrease = Indicator.build(ticker, Tick::buyPriceIncrease).sma(14).scale(volumeScale);
-        Indicator<Num> sellPriceDecrease = Indicator.build(ticker, Tick::sellPriceDecrease).sma(14).scale(volumeScale);
-        bottomN.line(buyPriceIncrease.map(sellPriceDecrease, (b, s) -> b.minus(s)), Short);
     }
 }

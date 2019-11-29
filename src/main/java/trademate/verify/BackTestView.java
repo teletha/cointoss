@@ -29,11 +29,13 @@ import cointoss.util.Chrono;
 import cointoss.util.Num;
 import cointoss.verify.BackTest;
 import kiss.I;
+import kiss.Signal;
+import kiss.WiseSupplier;
+import kiss.model.Model;
 import stylist.Style;
 import stylist.StyleDSL;
 import trademate.chart.ChartView;
 import trademate.chart.PlotScript;
-import trademate.chart.builtin.TraderPlot;
 import trademate.setting.SettingStyles;
 import transcript.Transcript;
 import viewtify.Viewtify;
@@ -313,7 +315,16 @@ public class BackTestView extends View implements Analyzer {
 
         chart.market.set(market);
         chart.scripts.clear();
-        chart.scripts.addAll(I.signal(traders).map(trader -> (Supplier<PlotScript>) () -> new TraderPlot(trader)).toList());
+        chart.scripts.addAll(I.signal(traders).flatMap(this::createTraderPlotScript).toList());
+    }
+
+    private Signal<Supplier<PlotScript>> createTraderPlotScript(Trader trader) {
+        return I.signal(trader)
+                .flatArray(t -> t.getClass().getDeclaredClasses())
+                .take(clazz -> PlotScript.class.isAssignableFrom(clazz))
+                .map(clazz -> Model.collectConstructors(clazz)[0])
+                .effect(c -> c.setAccessible(true))
+                .map(c -> (WiseSupplier<PlotScript>) () -> (PlotScript) c.newInstance(trader));
     }
 
     /**
