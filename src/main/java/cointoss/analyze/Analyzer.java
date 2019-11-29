@@ -12,6 +12,7 @@ package cointoss.analyze;
 import java.util.List;
 
 import cointoss.Market;
+import cointoss.Trader;
 
 public interface Analyzer {
 
@@ -19,8 +20,9 @@ public interface Analyzer {
      * Set up phase.
      * 
      * @param market
+     * @param traders TODO
      */
-    default void initialize(Market market) {
+    default void initialize(Market market, List<Trader> traders) {
         // do nothing
     }
 

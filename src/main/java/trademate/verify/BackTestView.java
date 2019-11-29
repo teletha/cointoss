@@ -16,6 +16,7 @@ import java.util.List;
 
 import cointoss.Market;
 import cointoss.MarketService;
+import cointoss.Trader;
 import cointoss.analyze.Analyzer;
 import cointoss.analyze.Statistics;
 import cointoss.analyze.TradingStatistics;
@@ -300,7 +301,7 @@ public class BackTestView extends View implements Analyzer {
      * {@inheritDoc}
      */
     @Override
-    public void initialize(Market market) {
+    public void initialize(Market market, List<Trader> traders) {
         chart.showOrderSupport.set(false);
         chart.showPositionSupport.set(false);
         chart.showLatestPrice.set(false);
