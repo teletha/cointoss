@@ -11,14 +11,9 @@ package trademate.chart;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
 
 import cointoss.Market;
 import cointoss.ticker.Indicator;
-import cointoss.ticker.Span;
 import cointoss.ticker.Ticker;
 import cointoss.util.Num;
 import kiss.I;
@@ -31,33 +26,31 @@ import trademate.chart.ChartCanvas.LineChart;
 public abstract class PlotScript {
 
     /** The plotter. */
-    protected PlotDSL bottom = new PlotDSL(PlotArea.Bottom, this);
+    protected final PlotDSL bottom = new PlotDSL(PlotArea.Bottom, this);
 
     /** The plotter. */
-    protected PlotDSL bottomN = new PlotDSL(PlotArea.BottomNarrow, this);
+    protected final PlotDSL bottomN = new PlotDSL(PlotArea.BottomNarrow, this);
 
     /** The plotter. */
-    protected PlotDSL low = new PlotDSL(PlotArea.Low, this);
+    protected final PlotDSL low = new PlotDSL(PlotArea.Low, this);
 
     /** The plotter. */
-    protected PlotDSL lowN = new PlotDSL(PlotArea.LowNarrow, this);
+    protected final PlotDSL lowN = new PlotDSL(PlotArea.LowNarrow, this);
 
     /** The plotter. */
-    protected PlotDSL high = new PlotDSL(PlotArea.High, this);
+    protected final PlotDSL high = new PlotDSL(PlotArea.High, this);
 
     /** The plotter. */
-    protected PlotDSL highN = new PlotDSL(PlotArea.HighNarrow, this);
+    protected final PlotDSL highN = new PlotDSL(PlotArea.HighNarrow, this);
 
     /** The plotter. */
-    protected PlotDSL top = new PlotDSL(PlotArea.Top, this);
+    protected final PlotDSL top = new PlotDSL(PlotArea.Top, this);
 
     /** The plotter. */
-    protected PlotDSL topN = new PlotDSL(PlotArea.TopNarrow, this);
+    protected final PlotDSL topN = new PlotDSL(PlotArea.TopNarrow, this);
 
     /** The plotter. */
-    protected PlotDSL main = new PlotDSL(PlotArea.Main, this);
-
-    private Cache<Span, PlotDSL[]> caches = CacheBuilder.newBuilder().maximumSize(6).build();
+    protected final PlotDSL main = new PlotDSL(PlotArea.Main, this);
 
     /**
      * Execute plot declaration.
@@ -66,27 +59,9 @@ public abstract class PlotScript {
      * @param ticker
      */
     final Signal<PlotDSL> plot(Market market, Ticker ticker) {
-        try {
-            PlotDSL[] plotters = caches.get(ticker.span, () -> {
-                bottom = new PlotDSL(PlotArea.Bottom, PlotScript.this);
-                bottomN = new PlotDSL(PlotArea.BottomNarrow, PlotScript.this);
-                low = new PlotDSL(PlotArea.Low, PlotScript.this);
-                lowN = new PlotDSL(PlotArea.LowNarrow, PlotScript.this);
-                high = new PlotDSL(PlotArea.High, PlotScript.this);
-                highN = new PlotDSL(PlotArea.HighNarrow, PlotScript.this);
-                top = new PlotDSL(PlotArea.Top, PlotScript.this);
-                topN = new PlotDSL(PlotArea.TopNarrow, PlotScript.this);
-                main = new PlotDSL(PlotArea.Main, PlotScript.this);
+        declare(market, ticker);
 
-                declare(market, ticker);
-
-                return new PlotDSL[] {bottom, bottomN, low, lowN, high, highN, top, topN, main};
-            });
-
-            return I.signal(plotters).skip(plotter -> plotter.lines.isEmpty());
-        } catch (ExecutionException e) {
-            throw I.quiet(e);
-        }
+        return I.signal(bottom, bottomN, low, lowN, high, highN, top, topN, main).skip(plotter -> plotter.lines.isEmpty());
     }
 
     /**

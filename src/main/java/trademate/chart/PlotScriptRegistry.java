@@ -14,9 +14,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-
 import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.ticker.Span;
@@ -34,9 +31,6 @@ class PlotScriptRegistry implements Storable {
 
     /** The managed scripts. */
     private Map<String, List<Class<? extends PlotScript>>> managedScripts = new HashMap();
-
-    /** The cache by span. */
-    private Cache<Span, PlotScript> cacheBySpan = CacheBuilder.newBuilder().maximumSize(6).build();
 
     /**
      * 

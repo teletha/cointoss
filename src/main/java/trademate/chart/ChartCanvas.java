@@ -15,10 +15,16 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import org.eclipse.collections.api.list.primitive.MutableDoubleList;
 import org.eclipse.collections.impl.list.mutable.primitive.DoubleArrayList;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+
+import cointoss.Market;
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.market.bitflyer.SFD;
 import cointoss.ticker.Indicator;
 import cointoss.ticker.Tick;
+import cointoss.ticker.Ticker;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
 import javafx.collections.ObservableList;
@@ -33,6 +39,7 @@ import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.PathElement;
 import kiss.I;
+import kiss.Ⅲ;
 import stylist.Style;
 import trademate.chart.Axis.TickLable;
 import trademate.chart.PlotScript.PlotDSL;
@@ -112,6 +119,25 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     /** Flag whether candle chart shoud layout on the next rendering phase or not. */
     private final LayoutAssistant layoutCandleLatest = new LayoutAssistant(this);
 
+    /** The cache by span. */
+    private LoadingCache<Ⅲ<Market, Ticker, ObservableList<PlotScript>>, PlotDSL[]> plottersCache = CacheBuilder.newBuilder()
+            .maximumSize(6)
+            .build(new CacheLoader<>() {
+
+                @Override
+                public PlotDSL[] load(Ⅲ<Market, Ticker, ObservableList<PlotScript>> v) throws Exception {
+                    List<PlotScript> registered = I.make(PlotScriptRegistry.class).findPlottersBy(v.ⅰ, v.ⅱ);
+                    List<PlotScript> additional = v.ⅲ;
+
+                    List<PlotDSL> combined = I.signal(registered, additional)
+                            .flatIterable(list -> list)
+                            .flatMap(script -> script.plot(v.ⅰ, v.ⅱ))
+                            .toList();
+
+                    return combined.toArray(new PlotDSL[combined.size()]);
+                }
+            });
+
     /** The associated plot scripts. */
     private PlotDSL[] plotters = new PlotDSL[0];
 
@@ -143,15 +169,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         this.chartInfo.heightProperty().bind(heightProperty());
 
         chart.market.observe().combineLatest(chart.ticker.observe(), Viewtify.observeNow(chart.scripts)).to(v -> {
-            List<PlotScript> registered = I.make(PlotScriptRegistry.class).findPlottersBy(v.ⅰ, v.ⅱ);
-            List<PlotScript> additional = v.ⅲ;
-
-            List<PlotDSL> combined = I.signal(registered, additional)
-                    .flatIterable(list -> list)
-                    .flatMap(script -> script.plot(v.ⅰ, v.ⅱ))
-                    .toList();
-
-            plotters = combined.toArray(new PlotDSL[combined.size()]);
+            plotters = plottersCache.getUnchecked(v);
         });
 
         Viewtify.clip(this);
