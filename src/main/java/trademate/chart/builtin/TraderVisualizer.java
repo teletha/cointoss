@@ -79,6 +79,14 @@ public class TraderVisualizer extends PlotScript implements StyleDSL {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        return "Trading";
+    }
+
+    /**
      * 
      */
     public static class TraderState {

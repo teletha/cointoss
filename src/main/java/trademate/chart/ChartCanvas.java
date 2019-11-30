@@ -25,6 +25,7 @@ import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.PathElement;
+import javafx.scene.text.Font;
 
 import org.eclipse.collections.api.list.primitive.MutableDoubleList;
 import org.eclipse.collections.impl.list.mutable.primitive.DoubleArrayList;
@@ -54,10 +55,13 @@ import viewtify.ui.helper.User;
 import viewtify.ui.helper.UserActionHelper;
 import viewtify.util.FXUtils;
 
-/**
- * @version 2018/07/13 23:47:28
- */
 public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas> {
+
+    /** Infomation Font */
+    private static final Font InfoFont = Font.font(Font.getDefault().getName(), 10.5);
+
+    /** Infomation Color */
+    private static final Color InfoColor = Color.rgb(247, 239, 227);
 
     /** @FIXME Read from css file. */
     private static final Color Buy = Color.rgb(32, 151, 77);
@@ -491,6 +495,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     private void drawChartInfo(Tick tick) {
         GraphicsContext gc = chartInfo.getGraphicsContext2D();
         gc.clearRect(0, 0, chartInfo.getWidth(), chartInfo.getHeight());
+        gc.setFont(InfoFont);
 
         int base = chart.market.v.service.setting.baseCurrencyScaleSize;
         String date = Chrono.system(tick.start).format(Chrono.DateTime);
@@ -499,12 +504,13 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         String low = "L" + tick.lowPrice().scale(base);
         String close = "C" + tick.closePrice().scale(base);
 
-        int gap = 4;
-        int width = 52;
+        int gap = 3;
+        int gapY = 16;
+        int width = 60;
         int largeWidth = width * 2 + gap;
-        int y = 18;
+        int y = gapY;
         int offsetX = 10;
-        gc.setFill(Color.WHITE);
+        gc.setFill(InfoColor);
         gc.fillText(date, offsetX, y, largeWidth);
         gc.fillText(open, offsetX + largeWidth + gap, y, width);
         gc.fillText(high, offsetX + largeWidth + width + gap * 2, y, width);
@@ -516,9 +522,12 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         Object origin = null;
         for (PlotDSL plotter : plotters) {
             if (origin != plotter.origin) {
-                y += 15;
+                y += gapY;
                 x = offsetX;
                 origin = plotter.origin;
+                gc.setFill(InfoColor);
+                gc.fillText(plotter.origin.toString(), x, y, width);
+                x += width + gap;
             }
             for (LineChart chart : plotter.lines) {
                 gc.setFill(chart.color);

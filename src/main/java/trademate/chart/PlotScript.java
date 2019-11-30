@@ -59,6 +59,18 @@ public abstract class PlotScript {
     protected abstract void declare(Market market, Ticker ticker);
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        Class clazz = getClass();
+        if (clazz.isMemberClass()) {
+            clazz = clazz.getEnclosingClass();
+        }
+        return clazz.getSimpleName().replace("Indicator", "");
+    }
+
+    /**
      * Chart plotting DSL.
      */
     protected static class PlotDSL {
