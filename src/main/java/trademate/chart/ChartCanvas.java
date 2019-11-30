@@ -499,8 +499,8 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         String low = "L" + tick.lowPrice().scale(base);
         String close = "C" + tick.closePrice().scale(base);
 
-        int gap = 5;
-        int width = 43;
+        int gap = 4;
+        int width = 52;
         int largeWidth = width * 2 + gap;
         int y = 18;
         int offsetX = 10;
@@ -522,7 +522,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             }
             for (LineChart chart : plotter.lines) {
                 gc.setFill(chart.color);
-                gc.fillText(chart.indicator.valueAt(tick).toString(), x, y, width);
+                gc.fillText(chart.info.valueAt(tick), x, y, width);
                 x += width + gap;
             }
         }
@@ -565,6 +565,9 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         /** The indicator. */
         private final Indicator<? extends Number> indicator;
 
+        /** The infomation writer. */
+        private final Indicator<String> info;
+
         /** The indicator color. */
         private final Color color;
 
@@ -580,12 +583,14 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         /**
          * @param indicator
          * @param style
+         * @param info
          */
-        LineChart(Indicator<? extends Number> indicator, Style style) {
+        LineChart(Indicator<? extends Number> indicator, Style style, Indicator<String> info) {
             this.indicator = indicator;
             this.color = FXUtils.color(style, "stroke");
             this.width = FXUtils.length(style, "stroke-width", 1);
             this.dashArray = FXUtils.lengths(style, "stroke-dasharray");
+            this.info = info == null ? indicator.map(v -> v.toString()) : info;
         }
     }
 

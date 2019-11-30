@@ -123,10 +123,19 @@ public abstract class PlotScript {
          * @param indicator A indicator to plot.
          */
         public final void line(Indicator<Num> indicator, Style style) {
+            line(indicator, style, null);
+        }
+
+        /**
+         * Plot the specified {@link Indicator} as line chart.
+         * 
+         * @param indicator A indicator to plot.
+         */
+        public final void line(Indicator<Num> indicator, Style style, Indicator<String> info) {
             if (style == null) {
                 style = ChartStyles.MouseTrack;
             }
-            lines.add(new LineChart(indicator, style));
+            lines.add(new LineChart(indicator, style, info));
         }
 
         /**

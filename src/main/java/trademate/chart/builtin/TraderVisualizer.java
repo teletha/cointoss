@@ -9,7 +9,7 @@
  */
 package trademate.chart.builtin;
 
-import static cointoss.ticker.Span.*;
+import static cointoss.ticker.Span.Minute1;
 
 import cointoss.Market;
 import cointoss.Trader;
@@ -73,21 +73,15 @@ public class TraderVisualizer extends PlotScript implements StyleDSL {
                     .scale(targetScale));
         }).memoize();
 
-        low.line(indicator.map(s -> s.realized), realized);
         low.line(indicator.map(s -> s.unrealized), unrealized);
         low.line(indicator.map(s -> s.profit), profit);
-        lowN.line(indicator.map(s -> s.size), size);
-        lowN.line(indicator.map(s -> s.longs), longSize);
-        lowN.line(indicator.map(s -> s.shorts), shortSize);
+        lowN.line(indicator.map(s -> s.size), size, indicator.map(s -> s.sizeInfo()));
     }
 
     /**
      * 
      */
     public static class TraderState {
-
-        /** The realized profit. */
-        public final Num realized;
 
         /** The unrealized profit. */
         public final Num unrealized;
@@ -109,12 +103,15 @@ public class TraderVisualizer extends PlotScript implements StyleDSL {
          * @param unrealizedProfit
          */
         private TraderState(Num realizedProfit, Num unrealizedProfit, Num longs, Num shorts) {
-            this.realized = realizedProfit;
             this.unrealized = unrealizedProfit;
             this.profit = realizedProfit.plus(unrealizedProfit);
             this.longs = longs;
             this.shorts = shorts;
             this.size = longs.minus(shorts);
+        }
+
+        private String sizeInfo() {
+            return size + "(" + longs + " " + shorts + ")";
         }
     }
 }
