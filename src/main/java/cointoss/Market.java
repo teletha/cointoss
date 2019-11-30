@@ -11,6 +11,7 @@ package cointoss;
 
 import java.time.temporal.ChronoUnit;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
@@ -87,7 +88,7 @@ public class Market implements Disposable {
     }).skip(e -> e == null || e == Market.BASE);
 
     /** The managed {@link Trader}. */
-    final MutableList<Trader> managedTraders = Lists.mutable.empty();
+    private final MutableList<Trader> managedTraders = Lists.mutable.empty();
 
     /** The managed {@link Trader}. */
     public final MutableList<Trader> traders = managedTraders.asUnmodifiable();
@@ -106,6 +107,17 @@ public class Market implements Disposable {
         timeline.to(tickers::update);
 
         readOrderBook();
+    }
+
+    public void register(Trader... traders) {
+        register(List.of(traders));
+    }
+
+    public void register(List<Trader> traders) {
+        for (Trader trader : traders) {
+            trader.initialize(this);
+            this.managedTraders.add(trader);
+        }
     }
 
     /**

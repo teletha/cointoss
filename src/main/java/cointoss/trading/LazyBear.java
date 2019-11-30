@@ -12,6 +12,7 @@ package cointoss.trading;
 import static java.time.temporal.ChronoUnit.MINUTES;
 
 import cointoss.Direction;
+import cointoss.FundManager;
 import cointoss.Market;
 import cointoss.Scenario;
 import cointoss.Trader;
@@ -26,10 +27,12 @@ import kiss.Ⅱ;
  */
 public class LazyBear extends Trader {
 
-    Indicator<Ⅱ<Num, Num>> oscillator = Indicators.waveTrend(market.tickers.of(Span.Second15));
-
-    public LazyBear(Market market) {
-        super(market);
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void declare(Market market, FundManager fund) {
+        Indicator<Ⅱ<Num, Num>> oscillator = Indicators.waveTrend(market.tickers.of(Span.Second15));
 
         // disableWhile(observeProfit().map(p -> p.isLessThan(-10000)));
 

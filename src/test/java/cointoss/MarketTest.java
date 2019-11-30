@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test;
 import cointoss.order.Order;
 import cointoss.verify.VerifiableMarket;
 
-public class MarketTest {
+class MarketTest {
 
     private VerifiableMarket market = new VerifiableMarket();
 
@@ -25,5 +25,22 @@ public class MarketTest {
         List<Order> orders = market.stop().toList();
 
         assert orders.isEmpty();
+    }
+
+    @Test
+    void registerCallDeclare() {
+        CallDeclare trader = new CallDeclare();
+        market.register(trader);
+        assert trader.declaredMarket == market;
+    }
+
+    private static class CallDeclare extends Trader {
+
+        private Market declaredMarket;
+
+        @Override
+        protected void declare(Market market, FundManager fund) {
+            this.declaredMarket = market;
+        }
     }
 }

@@ -15,9 +15,7 @@ import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
 
-import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.Trader;
 import cointoss.analyze.Analyzer;
@@ -29,7 +27,6 @@ import cointoss.ticker.Tick;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
 import icy.manipulator.Icy;
-import kiss.I;
 
 @Icy
 interface BackTestModel {
@@ -84,7 +81,7 @@ interface BackTestModel {
      * @return
      */
     @Icy.Property
-    List<Function<Market, cointoss.Trader>> traders();
+    List<Trader> traders();
 
     /**
      * Set the initial assets.
@@ -158,9 +155,9 @@ interface BackTestModel {
         market.service.targetCurrency = initialTargetCurrency();
 
         List<TradingStatistics> logs = new ArrayList();
-        List<Trader> traders = I.signal(traders()).map(t -> t.apply(market)).toList();
 
-        analyzer.initialize(market, traders);
+        market.register(traders());
+        analyzer.initialize(market, traders());
 
         LocalDateTime start = LocalDateTime.now();
         market.readLog(log -> log.range(start(), end()).effect(market::perform).effectOnComplete(() -> {
@@ -171,7 +168,7 @@ interface BackTestModel {
         }).effectOnError(Throwable::printStackTrace));
         LocalDateTime end = LocalDateTime.now();
 
-        for (Trader trader : traders) {
+        for (Trader trader : traders()) {
             TradingStatistics log = trader.statistics();
             log.duration = Duration.between(start, end);
             logs.add(log);

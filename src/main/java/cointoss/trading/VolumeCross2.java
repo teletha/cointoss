@@ -34,24 +34,29 @@ import trademate.chart.PlotScript;
 /**
  * 
  */
-public class VolumeCross extends Trader {
+public class VolumeCross2 extends Trader {
 
-    public int smaLength = 21;
+    Market market;
 
-    Indicator<Num> priceDiff;
+    FundManager fund;
+
+    int smaLength = 21;
+
+    double size = 0.3;
+
+    Indicator<Num> buyPriceIncrease = Indicator.build(market.tickers.of(Span.Minute5), Tick::buyPriceIncrease).sma(smaLength);
+
+    Indicator<Num> sellPriceDecrease = Indicator.build(market.tickers.of(Span.Minute5), Tick::sellPriceDecrease).sma(smaLength);
+
+    Indicator<Num> priceDiff = buyPriceIncrease.map(sellPriceDecrease, (b, s) -> b.minus(s))
+            .scale(market.service.setting.targetCurrencyScaleSize);
 
     /**
      * {@inheritDoc}
      */
     @Override
     protected void declare(Market market, FundManager fund) {
-        Indicator<Num> buyPriceIncrease = Indicator.build(market.tickers.of(Span.Minute5), Tick::buyPriceIncrease).sma(smaLength);
-        Indicator<Num> sellPriceDecrease = Indicator.build(market.tickers.of(Span.Minute5), Tick::sellPriceDecrease).sma(smaLength);
-        priceDiff = buyPriceIncrease.map(sellPriceDecrease, (b, s) -> b.minus(s)).scale(market.service.setting.targetCurrencyScaleSize);
-
         // disableWhile(observeProfit().map(p -> p.isLessThan(-10000)));
-
-        double size = 0.3;
 
         when(priceDiff.observe().plug(near(5, o -> o.isGreaterThan(0))), v -> new Scenario() {
             @Override

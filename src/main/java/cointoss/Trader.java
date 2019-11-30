@@ -43,10 +43,10 @@ public abstract class Trader extends TraderBase {
     private static final Snapshot EMPTY_SNAPSHOT = new Snapshot(Num.ZERO, Num.ZERO, Num.ZERO, Num.ZERO, Num.ZERO);
 
     /** The market. */
-    protected final Market market;
+    private Market market;
 
     /** The fund management. */
-    protected final FundManager funds;
+    private FundManager funds;
 
     /** All managed entries. */
     private final FastList<Scenario> scenarios = new FastList();
@@ -61,17 +61,31 @@ public abstract class Trader extends TraderBase {
     private Set<Signal> disable = Sets.mutable.empty();
 
     /**
+     * Initialize this {@link Trader}.
+     */
+    final synchronized void initialize(Market market) {
+        scenarios.clear();
+        setHoldSize(Num.ZERO);
+        setHoldMaxSize(Num.ZERO);
+        snapshots.clear();
+        snapshots.put(Chrono.MIN, EMPTY_SNAPSHOT);
+        disable.clear();
+
+        if (this.market == null) {
+            this.market = Objects.requireNonNull(market);
+            this.funds = FundManager.with.totalAssets(market.service.baseCurrency().first().to().v);
+
+            declare(market, funds);
+        }
+    }
+
+    /**
      * Declare your strategy.
      * 
      * @param market A target market to deal.
+     * @param fund A fund manager.
      */
-    public Trader(Market market) {
-        this.market = Objects.requireNonNull(market);
-        this.market.managedTraders.add(this);
-        this.funds = FundManager.with.totalAssets(market.service.baseCurrency().first().to().v);
-
-        initialize();
-    }
+    protected abstract void declare(Market market, FundManager fund);
 
     /**
      * The human-readable identical name.
@@ -80,19 +94,6 @@ public abstract class Trader extends TraderBase {
      */
     public String name() {
         return getClass().getSimpleName();
-    }
-
-    /**
-     * Initialize status
-     */
-    @VisibleForTesting
-    void initialize() {
-        scenarios.clear();
-        setHoldSize(Num.ZERO);
-        setHoldMaxSize(Num.ZERO);
-        snapshots.clear();
-        snapshots.put(Chrono.MIN, EMPTY_SNAPSHOT);
-        disable.clear();
     }
 
     /**

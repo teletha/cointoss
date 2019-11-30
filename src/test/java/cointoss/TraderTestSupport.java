@@ -21,7 +21,7 @@ import kiss.Signal;
 
 public abstract class TraderTestSupport extends Trader {
 
-    protected VerifiableMarket market;
+    protected VerifiableMarket market = new VerifiableMarket();
 
     private ZonedDateTime base;
 
@@ -29,17 +29,23 @@ public abstract class TraderTestSupport extends Trader {
      * @param provider
      */
     public TraderTestSupport() {
-        super(new VerifiableMarket());
 
-        this.market = (VerifiableMarket) super.market;
+        market.register(this);
     }
 
     @BeforeEach
     void setup() {
-        initialize();
+        initialize(market);
         market.service.clear();
 
         base = market.service.now();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void declare(Market market, FundManager fund) {
     }
 
     /**

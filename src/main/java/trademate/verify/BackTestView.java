@@ -220,7 +220,7 @@ public class BackTestView extends View implements Analyzer {
             BackTest.with.service(marketSelection.value())
                     .start(startDate.zoned())
                     .end(endDate.zoned())
-                    .traders(VolumeCross::new, LazyBear::new)
+                    .traders(new VolumeCross(), new LazyBear())
                     .initialBaseCurrency(3000000)
                     .run(this);
         });

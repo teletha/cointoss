@@ -18,7 +18,7 @@ public class BackTestInvoker {
         BackTest.with.service(BitFlyer.FX_BTC_JPY)
                 .start(2019, 10, 25)
                 .end(2019, 10, 25)
-                .traders(LazyBear::new)
+                .traders(new LazyBear())
                 .initialBaseCurrency(3000000)
                 .detail(true)
                 .run();

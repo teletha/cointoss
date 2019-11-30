@@ -542,4 +542,9 @@ class TraderTest extends TraderTestSupport {
         assert isEnable() == true;
         assert isDisable() == false;
     }
+
+    @Test
+    void callingDeclareOnlyOnce() {
+
+    }
 }

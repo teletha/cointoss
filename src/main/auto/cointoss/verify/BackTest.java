@@ -1,6 +1,5 @@
 package cointoss.verify;
 
-import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.Trader;
 import cointoss.util.Num;
@@ -16,7 +15,6 @@ import java.lang.reflect.Method;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Function;
 import javax.annotation.processing.Generated;
 
 /**
@@ -113,7 +111,7 @@ public abstract class BackTest implements BackTestModel {
     public final ZonedDateTime end;
 
     /** The exposed property. */
-    public final List<Function<Market, Trader>> traders;
+    public final List<Trader> traders;
 
     /** The exposed property. */
     public final Num initialBaseCurrency;
@@ -251,7 +249,7 @@ public abstract class BackTest implements BackTestModel {
      *  @return
      */
     @Override
-    public final List<Function<Market, Trader>> traders() {
+    public final List<Trader> traders() {
         return this.traders;
     }
 
@@ -261,7 +259,7 @@ public abstract class BackTest implements BackTestModel {
      * @return A value of traders property.
      */
     @SuppressWarnings("unused")
-    private final List<Function<Market, Trader>> getTraders() {
+    private final List<Trader> getTraders() {
         return this.traders;
     }
 
@@ -270,7 +268,7 @@ public abstract class BackTest implements BackTestModel {
      *
      * @paran value A new value of traders property to assign.
      */
-    private final void setTraders(List<Function<Market, Trader>> value) {
+    private final void setTraders(List<Trader> value) {
         if (value == null) {
             throw new IllegalArgumentException("The traders property requires non-null value.");
         }
@@ -544,7 +542,7 @@ public abstract class BackTest implements BackTestModel {
          * @param value A new value to assign.
          * @return The next assignable model.
          */
-        default Next traders(List<Function<Market, Trader>> value) {
+        default Next traders(List<Trader> value) {
             ((BackTest) this).setTraders(value);
             return (Next) this;
         }
@@ -554,7 +552,7 @@ public abstract class BackTest implements BackTestModel {
          * 
          * @return The next assignable model.
          */
-        default Next traders(Function<Market, Trader>... values) {
+        default Next traders(Trader... values) {
             return traders(List.of(values));
         }
     }
