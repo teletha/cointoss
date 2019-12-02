@@ -61,7 +61,7 @@ public class Console extends View {
         logger = LogManager.getLogger(name);
         ConsoleAppender.consoles.put(name, this);
 
-        console.values(messages);
+        console.items(messages);
     }
 
     /**

@@ -127,14 +127,15 @@ public class OrderBookView extends View {
 
         hideSize.values(0, Num.range(0, 99));
 
-        longList.cell(e -> new CellView(Color.rgb(251, 189, 42, 0.2))).take(hideSize, (unit, size) -> unit.size.isGreaterThanOrEqual(size));
-        shortList.cell(e -> new CellView(Color.rgb(247, 105, 77, 0.2)))
+        longList.renderListCell(e -> new CellView(Color.rgb(251, 189, 42, 0.2)))
+                .take(hideSize, (unit, size) -> unit.size.isGreaterThanOrEqual(size));
+        shortList.renderListCell(e -> new CellView(Color.rgb(247, 105, 77, 0.2)))
                 .take(hideSize, (unit, size) -> unit.size.isGreaterThanOrEqual(size))
                 .scrollToBottom();
 
         priceRange.values(0, view.market().service.setting.orderBookGroupRangesWithBase()).observeNow(range -> {
-            longList.values((ObservableList) book.longs.selectBy(range));
-            shortList.values((ObservableList) book.shorts.selectBy(range));
+            longList.items((ObservableList) book.longs.selectBy(range));
+            shortList.items((ObservableList) book.shorts.selectBy(range));
         });
 
         view.market().tickers.latest.observe().on(Viewtify.UIThread).to(e -> priceLatest.text(e.price));

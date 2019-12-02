@@ -74,16 +74,16 @@ public class ExecutionView extends View {
     protected void initialize() {
         // configure UI
         takerSize.values(IntStream.range(1, 51).boxed()).initial(10);
-        executionList.cell(v -> new Cell(false));
-        executionCumulativeList.cell(v -> new Cell(true)).take(takerSize, (e, size) -> e.accumulative.isGreaterThanOrEqual(size));
+        executionList.renderListCell(v -> new Cell(false));
+        executionCumulativeList.renderListCell(v -> new Cell(true)).take(takerSize, (e, size) -> e.accumulative.isGreaterThanOrEqual(size));
 
         // load execution log
         Viewtify.inWorker(() -> {
             return view.market().timeline.on(Viewtify.UIThread).to(e -> {
-                executionList.add(0, e);
+                executionList.addItemAtFirst(e);
 
                 if (100 < executionList.size()) {
-                    executionList.removeLast();
+                    executionList.removeItemAtLast();
                 }
             });
         });
@@ -92,10 +92,10 @@ public class ExecutionView extends View {
         Viewtify.inWorker(() -> {
             return view.market().timelineByTaker.on(Viewtify.UIThread).to(e -> {
                 if (e.accumulative.isGreaterThanOrEqual(Num.ONE)) {
-                    executionCumulativeList.add(0, e);
+                    executionCumulativeList.addItemAtFirst(e);
 
                     if (2000 < executionCumulativeList.size()) {
-                        executionCumulativeList.removeLast();
+                        executionCumulativeList.removeItemAtLast();
                     }
                 }
             });

@@ -86,7 +86,7 @@ public class OrderCatalog extends View {
         table.selectMultipleRows().render(table -> new CatalogRow()).context($ -> {
             Calculated<Boolean> ordersArePassive = table.selection().flatVariable(o -> Variable.of(o.state)).isNot(ACTIVE);
 
-            $.menu(Cancel).disableWhen(ordersArePassive).whenUserClick(e -> act(this::cancel));
+            $.menu().text(Cancel).disableWhen(ordersArePassive).whenUserClick(e -> act(this::cancel));
         });
 
         date.text(Date).modelByVar(Order.class, o -> o.observeCreationTimeNow().to()).render((ui, item) -> ui.text(formatter.format(item)));
