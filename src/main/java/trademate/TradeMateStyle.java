@@ -15,9 +15,6 @@ import stylist.StyleDSL;
 import stylist.ValueStyle;
 import stylist.value.Color;
 
-/**
- * @version 2018/09/07 10:57:21
- */
 public interface TradeMateStyle extends StyleDSL {
 
     Color BUY = Color.rgb(251, 189, 42);

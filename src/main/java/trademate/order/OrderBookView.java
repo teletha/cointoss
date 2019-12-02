@@ -11,17 +11,22 @@ package trademate.order;
 
 import static trademate.TradeMateStyle.*;
 
+import java.util.function.Function;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.control.ListCell;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontSmoothingType;
 
 import cointoss.order.OrderBookManager;
 import cointoss.order.OrderUnit;
 import cointoss.util.Num;
 import stylist.Style;
 import stylist.StyleDSL;
+import trademate.TradeMateStyle;
 import trademate.TradingView;
 import viewtify.Viewtify;
 import viewtify.ui.UI;
@@ -29,6 +34,7 @@ import viewtify.ui.UILabel;
 import viewtify.ui.UIListView;
 import viewtify.ui.UISpinner;
 import viewtify.ui.View;
+import viewtify.util.FXUtils;
 
 public class OrderBookView extends View {
 
@@ -127,9 +133,10 @@ public class OrderBookView extends View {
 
         hideSize.values(0, Num.range(0, 99));
 
-        longList.renderListCell(e -> new CellView(Color.rgb(251, 189, 42, 0.2)))
+        int scale = view.market().service.setting.targetCurrencyScaleSize;
+        longList.renderNode(displayOrderUnit(TradeMateStyle.BUY, scale))
                 .take(hideSize, (unit, size) -> unit.size.isGreaterThanOrEqual(size));
-        shortList.renderListCell(e -> new CellView(Color.rgb(247, 105, 77, 0.2)))
+        shortList.renderNode(displayOrderUnit(TradeMateStyle.SELL, scale))
                 .take(hideSize, (unit, size) -> unit.size.isGreaterThanOrEqual(size))
                 .scrollToBottom();
 
@@ -143,60 +150,35 @@ public class OrderBookView extends View {
     }
 
     /**
-     * @version 2018/04/11 12:12:09
+     * Rendering {@link OrderUnit}.
+     * 
+     * @param color
+     * @param scale
+     * @return
      */
-    private class CellView extends ListCell<OrderUnit> {
+    private Function<OrderUnit, Canvas> displayOrderUnit(stylist.value.Color color, int scale) {
+        double width = longList.ui.widthProperty().doubleValue();
+        double height = 17;
+        double fontSize = 12;
+        Color foreground = FXUtils.color(color);
+        Color background = foreground.deriveColor(0, 1, 1, 0.2);
+        Font font = Font.font(fontSize);
 
-        private final Rectangle back = new Rectangle(0, 16);
+        return e -> {
+            Num size = e.size.scale(scale);
+            double range = Math.min(width, size.doubleValue());
 
-        private final int scaleSize;
+            Canvas canvas = new Canvas(width, height);
+            GraphicsContext c = canvas.getGraphicsContext2D();
+            c.setFill(background);
+            c.fillRect(0, 0, range, height);
 
-        /**
-         * @param side
-         */
-        private CellView(Color color) {
-            setOnMouseClicked(e -> {
-                if (getListView() == longList.ui) {
-                    Num min = getItem().price;
-                    Num max = min.plus(priceRange.value());
-                    Num best = book.longs.computeBestPrice(max, Num.of(3), Num.ONE);
-                    view.builder.orderPrice.value(best.toString());
-                } else {
-                    Num min = getItem().price;
-                    Num best = book.shorts.computeBestPrice(min, Num.of(3), Num.ONE);
-                    view.builder.orderPrice.value(best.toString());
-                }
-            });
+            c.setFont(font);
+            c.setFill(foreground);
+            c.setFontSmoothingType(FontSmoothingType.LCD);
+            c.fillText(e.price + " " + size, 72, height - 3, width - 72 - 10);
 
-            back.setFill(color);
-            setGraphic(back);
-            scaleSize = view.market().service.setting.targetCurrencyScaleSize();
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        protected void updateItem(OrderUnit e, boolean empty) {
-            Viewtify.inUI(() -> {
-                super.updateItem(e, empty);
-
-                if (empty || e == null) {
-                    setText(null);
-                } else {
-                    Num normalize = e.size.scale(scaleSize);
-                    setText(e.price() + " " + normalize);
-
-                    double width = Math.min(200, normalize.doubleValue());
-                    back.setWidth(width);
-                    back.setTranslateX(width - 66);
-                    setTranslateX(-width);
-
-                    // using inline style makes memory leak
-                    // setStyle("-fx-background-insets: 0 " +
-                    // base.minus(normalize.multiply(Num.TWO)) + "px 0 0;");
-                }
-            });
-        }
+            return canvas;
+        };
     }
 }
