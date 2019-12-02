@@ -232,20 +232,20 @@ public class BackTestView extends View implements Analyzer {
      */
     private void configureTradingLogView() {
         name.text(en("Name")).model(log -> log.name);
-        period.text(en("Period")).model(log -> log).renderByUI(this::renderPeriod);
-        holdSize.text(en("Hold Size")).model(log -> log).renderByUI(this::renderPositionSize);
-        holdTimeForProfit.text(en("Profit Span")).model(log -> log.holdTimeOnProfitTrade).renderByUI(this::render);
-        holdTimeForLoss.text(en("Loss Span")).model(log -> log.holdTimeOnLossTrade).renderByUI(this::render);
-        realizedProfit.text(en("Realized Profit")).model(log -> log.profitRange).renderByUI(this::render);
-        unrealizedProfit.text(en("Unrealized Profit")).model(log -> log.unrealizedProfitRange).renderByUI(this::render);
-        realizedLoss.text(en("Realized Loss")).model(log -> log.lossRange).renderByUI(this::render);
-        unrealizedLoss.text(en("Unrealized Loss")).model(log -> log.unrealizedLossRange).renderByUI(this::render);
-        profit.text(en("Profit")).model(log -> log.profitAndLoss).renderByUI(this::render);
+        period.text(en("Period")).model(log -> log).render(this::renderPeriod);
+        holdSize.text(en("Hold Size")).model(log -> log).render(this::renderPositionSize);
+        holdTimeForProfit.text(en("Profit Span")).model(log -> log.holdTimeOnProfitTrade).render(this::render);
+        holdTimeForLoss.text(en("Loss Span")).model(log -> log.holdTimeOnLossTrade).render(this::render);
+        realizedProfit.text(en("Realized Profit")).model(log -> log.profitRange).render(this::render);
+        unrealizedProfit.text(en("Unrealized Profit")).model(log -> log.unrealizedProfitRange).render(this::render);
+        realizedLoss.text(en("Realized Loss")).model(log -> log.lossRange).render(this::render);
+        unrealizedLoss.text(en("Unrealized Loss")).model(log -> log.unrealizedLossRange).render(this::render);
+        profit.text(en("Profit")).model(log -> log.profitAndLoss).render(this::render);
         total.text(en("Total Profit")).model(log -> log.profitAndLoss.formattedTotal());
         winRatio.text(en("Win Rate")).model(log -> log.winningRate());
         profitFactor.text(en("Profit Factor")).model(TradingStatistics::profitFactor);
         drawDown.text(en("Drawdown")).model(log -> log.drawDownRatio);
-        scenarioCount.text(en("Trade Count")).model(log -> log).renderByUI(this::renderScenarioCount);
+        scenarioCount.text(en("Trade Count")).model(log -> log).render(this::renderScenarioCount);
     }
 
     /**
@@ -254,14 +254,11 @@ public class BackTestView extends View implements Analyzer {
      * @param cell
      * @param log
      */
-    private UILabel renderPeriod(TradingStatistics log) {
-        UILabel label = make(UILabel.class);
+    private void renderPeriod(UILabel label, TradingStatistics log) {
         UILabel remaining = make(UILabel.class).tooltip(en("Start")).text(Chrono.formatAsDate(log.startDate)).style(style.mean);
         UILabel total = make(UILabel.class).tooltip(en("End")).text(Chrono.formatAsDate(log.endDate)).style(style.mean);
 
         label.textV(remaining, total);
-
-        return label;
     }
 
     /**
@@ -270,14 +267,11 @@ public class BackTestView extends View implements Analyzer {
      * @param cell
      * @param log
      */
-    private UILabel renderScenarioCount(TradingStatistics log) {
-        UILabel label = make(UILabel.class);
+    private void renderScenarioCount(UILabel label, TradingStatistics log) {
         UILabel remaining = make(UILabel.class).tooltip(en("Remaining")).text(log.active).style(style.mean);
         UILabel total = make(UILabel.class).tooltip(en("Total")).text(log.total).style(style.max);
 
         label.textV(remaining, total);
-
-        return label;
     }
 
     /**
@@ -286,16 +280,13 @@ public class BackTestView extends View implements Analyzer {
      * @param cell
      * @param log
      */
-    private UILabel renderPositionSize(TradingStatistics log) {
+    private void renderPositionSize(UILabel label, TradingStatistics log) {
         int target = marketSelection.value().setting.targetCurrencyScaleSize;
 
-        UILabel label = make(UILabel.class);
         UILabel mean = make(UILabel.class).tooltip(en("Remaining")).text(log.holdCurrentSize.scale(target)).style(style.mean);
         UILabel max = make(UILabel.class).tooltip(en("Max")).text(log.holdMaxSize.scale(target)).style(style.max);
 
         label.textV(mean, max);
-
-        return label;
     }
 
     /**
@@ -304,15 +295,12 @@ public class BackTestView extends View implements Analyzer {
      * @param cell
      * @param statistics
      */
-    private UILabel render(Statistics statistics) {
-        UILabel label = make(UILabel.class);
+    private void render(UILabel label, Statistics statistics) {
         UILabel mean = make(UILabel.class).tooltip(en("Mean")).text(statistics.formattedMean()).style(style.mean);
         UILabel max = make(UILabel.class).tooltip(en("Max")).text(statistics.formattedMax()).style(style.max);
         UILabel min = make(UILabel.class).tooltip(en("Min")).text(statistics.formattedMin()).style(style.max);
 
         label.textV(mean, max, min);
-
-        return label;
     }
 
     /**

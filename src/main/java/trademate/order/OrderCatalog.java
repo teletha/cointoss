@@ -33,11 +33,10 @@ import trademate.TradingView;
 import viewtify.Viewtify;
 import viewtify.bind.Calculated;
 import viewtify.ui.UI;
-import viewtify.ui.UILabel;
 import viewtify.ui.UITableColumn;
 import viewtify.ui.UITableView;
-import viewtify.ui.UserInterface;
 import viewtify.ui.View;
+import viewtify.ui.helper.StyleHelper;
 
 public class OrderCatalog extends View {
 
@@ -92,10 +91,10 @@ public class OrderCatalog extends View {
 
         date.text(Date)
                 .modelByVar(Order.class, o -> o.observeCreationTimeNow().to())
-                .renderByUI(item -> make(UILabel.class).text(formatter.format(item)));
+                .render((label, item) -> label.text(formatter.format(item)));
         side.text(SiDe)
                 .model(Order.class, Order::direction)
-                .renderByUI(side -> make(UILabel.class).text(side).styleOnly(TradeMateStyle.Side.of(side)));
+                .render((label, side) -> label.text(side).styleOnly(TradeMateStyle.Side.of(side)));
         amount.text(Amount).modelByVar(Order.class, o -> o.observeRemainingSizeNow().to());
         price.text(Price).model(Order.class, o -> o.price);
 
@@ -143,18 +142,23 @@ public class OrderCatalog extends View {
     }
 
     /**
-     * @version 2018/12/08 14:55:02
+     * 
      */
-    private class CatalogRow extends TableRow<Order> {
-
-        /** The enhanced ui. */
-        private final UserInterface ui = Viewtify.wrap(this, OrderCatalog.this);
+    private class CatalogRow extends TableRow<Order> implements StyleHelper<CatalogRow, CatalogRow> {
 
         /**
          * 
          */
         private CatalogRow() {
-            ui.styleOnly(Viewtify.observeNow(itemProperty()).as(Order.class).switchMap(o -> o.observeStateNow()).map(S.State::of));
+            styleOnly(Viewtify.observeNow(itemProperty()).as(Order.class).switchMap(o -> o.observeStateNow()).map(S.State::of));
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public CatalogRow ui() {
+            return this;
         }
     }
 
