@@ -11,9 +11,8 @@ package trademate;
 
 import static trademate.TradeMateStyle.Side;
 
+import java.util.function.Function;
 import java.util.stream.IntStream;
-
-import javafx.scene.control.ListCell;
 
 import cointoss.execution.Execution;
 import cointoss.util.Chrono;
@@ -22,9 +21,9 @@ import stylist.Style;
 import stylist.StyleDSL;
 import viewtify.Viewtify;
 import viewtify.ui.UI;
+import viewtify.ui.UILabel;
 import viewtify.ui.UIListView;
 import viewtify.ui.UISpinner;
-import viewtify.ui.UserInterface;
 import viewtify.ui.View;
 
 public class ExecutionView extends View {
@@ -72,10 +71,13 @@ public class ExecutionView extends View {
      */
     @Override
     protected void initialize() {
+        int targetScale = view.market().service.setting.targetCurrencyScaleSize;
+
         // configure UI
         takerSize.values(IntStream.range(1, 51).boxed()).initial(10);
-        executionList.renderListCell(v -> new Cell(false));
-        executionCumulativeList.renderListCell(v -> new Cell(true)).take(takerSize, (e, size) -> e.accumulative.isGreaterThanOrEqual(size));
+        executionList.renderUI(execution(targetScale, false));
+        executionCumulativeList.renderUI(execution(targetScale, true))
+                .take(takerSize, (e, size) -> e.accumulative.isGreaterThanOrEqual(size));
 
         // load execution log
         Viewtify.inWorker(() -> {
@@ -103,38 +105,18 @@ public class ExecutionView extends View {
     }
 
     /**
-     * @version 2017/11/13 21:35:32
+     * Rendering execution.
+     * 
+     * @param scale
+     * @param accumulative
+     * @return
      */
-    private class Cell extends ListCell<Execution> {
+    private Function<Execution, UILabel> execution(int scale, boolean accumulative) {
+        return e -> {
+            String text = Chrono.system(e.date).format(Chrono.Time) + "  " + e.price + " " + (accumulative ? e.accumulative : e.size)
+                    .scale(scale) + "  " + e.delay;
 
-        /** The format. */
-        private final boolean comulative;
-
-        /** The enhanced ui. */
-        private final UserInterface ui = Viewtify.wrap(this, ExecutionView.this);
-
-        /**
-         * @param comulative
-         */
-        private Cell(boolean comulative) {
-            this.comulative = comulative;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        protected void updateItem(Execution e, boolean empty) {
-            super.updateItem(e, empty);
-
-            if (empty) {
-                setText(null);
-                setGraphic(null);
-            } else {
-                setText(Chrono.system(e.date).format(Chrono.Time) + "  " + e.price + "円  " + (comulative ? e.accumulative : e.size)
-                        .scale(6) + "  " + e.delay);
-                ui.styleOnly(Side.of(e.direction));
-            }
-        }
+            return make(UILabel.class).text(text).styleOnly(Side.of(e.direction));
+        };
     }
 }
