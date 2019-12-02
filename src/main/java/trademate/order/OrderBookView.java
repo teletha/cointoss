@@ -9,8 +9,6 @@
  */
 package trademate.order;
 
-import static trademate.TradeMateStyle.*;
-
 import java.util.function.Function;
 
 import javafx.collections.FXCollections;
@@ -68,14 +66,14 @@ public class OrderBookView extends View {
     class view extends UI {
         {
             $(vbox, style.root, () -> {
-                $(shortList, style.book, Short);
+                $(shortList, style.book);
                 $(hbox, () -> {
                     $(priceRange, style.priceRange);
                     $(priceLatest, style.priceLatest);
                     $(priceSpread, style.priceSpread);
                     $(hideSize, style.hideSize);
                 });
-                $(longList, style.book, Long);
+                $(longList, style.book);
             });
         }
     }
@@ -91,11 +89,6 @@ public class OrderBookView extends View {
 
         Style book = () -> {
             text.unselectable();
-
-            $.descendant(() -> {
-                font.color("inherit");
-                text.indent(66, px);
-            });
 
             $.select(".scroll-bar:horizontal").descendant(() -> {
                 padding.size(0, px);
