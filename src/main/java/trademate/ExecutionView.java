@@ -75,8 +75,8 @@ public class ExecutionView extends View {
 
         // configure UI
         takerSize.values(IntStream.range(1, 51).boxed()).initial(10);
-        executionList.renderUI(execution(targetScale, false));
-        executionCumulativeList.renderUI(execution(targetScale, true))
+        executionList.renderByUI(execution(targetScale, false));
+        executionCumulativeList.renderByUI(execution(targetScale, true))
                 .take(takerSize, (e, size) -> e.accumulative.isGreaterThanOrEqual(size));
 
         // load execution log
