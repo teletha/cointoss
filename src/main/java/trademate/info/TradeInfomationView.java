@@ -111,7 +111,7 @@ public class TradeInfomationView extends View {
      */
     @SuppressWarnings("unused")
     private void retreat(Position position) {
-        OrderBook book = view.market().orderBook.bookFor(position.inverse());
+        OrderBook book = view.market.orderBook.bookFor(position.inverse());
         Num price = book.computeBestPrice(Num.ZERO, Num.TWO);
     }
 }

@@ -71,7 +71,7 @@ public class ExecutionView extends View {
      */
     @Override
     protected void initialize() {
-        int targetScale = view.market().service.setting.targetCurrencyScaleSize;
+        int targetScale = view.market.service.setting.targetCurrencyScaleSize;
 
         // configure UI
         takerSize.values(IntStream.range(1, 51).boxed()).initial(10);
@@ -81,7 +81,7 @@ public class ExecutionView extends View {
 
         // load execution log
         Viewtify.inWorker(() -> {
-            return view.market().timeline.on(Viewtify.UIThread).to(e -> {
+            return view.market.timeline.skipWhile(view.initializing).on(Viewtify.UIThread).to(e -> {
                 executionList.addItemAtFirst(e);
 
                 if (100 < executionList.size()) {
@@ -92,11 +92,11 @@ public class ExecutionView extends View {
 
         // load big taker log
         Viewtify.inWorker(() -> {
-            return view.market().timelineByTaker.on(Viewtify.UIThread).to(e -> {
+            return view.market.timelineByTaker.skipWhile(view.initializing).on(Viewtify.UIThread).to(e -> {
                 if (e.accumulative.isGreaterThanOrEqual(Num.ONE)) {
                     executionCumulativeList.addItemAtFirst(e);
 
-                    if (2000 < executionCumulativeList.size()) {
+                    if (1000 < executionCumulativeList.size()) {
                         executionCumulativeList.removeItemAtLast();
                     }
                 }

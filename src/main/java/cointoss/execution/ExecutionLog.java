@@ -9,9 +9,9 @@
  */
 package cointoss.execution;
 
-import static java.nio.charset.StandardCharsets.*;
+import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static java.nio.file.StandardOpenOption.*;
-import static java.util.concurrent.TimeUnit.*;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -589,14 +589,13 @@ public class ExecutionLog {
                     return download();
                 } else {
                     // read normal
-                    Signal<Execution> signal = I.signal(parser.iterate(normal.newInputStream(), ISO_8859_1))
+                    return I.signal(parser.iterate(normal.newInputStream(), ISO_8859_1))
                             .map(this::parse)
                             .effectOnComplete(parser::stopParsing)
                             .effectOnObserve(stopwatch::start)
                             .effectOnComplete(() -> {
                                 log.info("Read log [{}] {}", date, stopwatch.stop().elapsed());
                             });
-                    return signal;
                 }
             } catch (IOException e) {
                 throw I.quiet(e);

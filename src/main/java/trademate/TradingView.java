@@ -9,8 +9,12 @@
  */
 package trademate;
 
+import java.time.temporal.ChronoUnit;
+import java.util.function.Predicate;
+
 import cointoss.Market;
 import cointoss.MarketService;
+import cointoss.util.Chrono;
 import stylist.Style;
 import stylist.StyleDSL;
 import trademate.chart.ChartView;
@@ -25,7 +29,11 @@ import viewtify.ui.View;
 
 public class TradingView extends View {
 
+    /** The associated market service. */
     public final MarketService service;
+
+    /** The associated market. */
+    public final Market market;
 
     public ExecutionView executionView;
 
@@ -41,14 +49,28 @@ public class TradingView extends View {
 
     public ChartView chart;
 
-    /** Market cache. */
-    private Market market;
+    /**
+     * Each View will process a large amount of logs at initialization, but using this flag can
+     * greatly reduce the UI processing.
+     */
+    private boolean whileInit;
+
+    /**
+     * Each View will process a large amount of logs at initialization, but using this flag can
+     * greatly reduce the UI processing.
+     * 
+     * @return
+     */
+    public final Predicate<Object> initializing = e -> whileInit;
 
     /**
      * @param service
      */
     public TradingView(MarketService service) {
         this.service = service;
+        this.market = new Market(service);
+
+        Viewtify.Terminator.add(market);
     }
 
     /**
@@ -86,7 +108,22 @@ public class TradingView extends View {
      */
     @Override
     protected void initialize() {
-        chart.market.set(market());
+        Viewtify.inWorker(() -> {
+            chart.showOrderSupport.set(false);
+            chart.showPositionSupport.set(false);
+            chart.showLatestPrice.set(false);
+            chart.showRealtimeUpdate.set(false);
+            chart.market.set(market);
+
+            whileInit = true;
+            market.readLog(log -> log.from(Chrono.utcNow().truncatedTo(ChronoUnit.DAYS)));
+            whileInit = false;
+
+            chart.showOrderSupport.set(true);
+            chart.showPositionSupport.set(true);
+            chart.showLatestPrice.set(true);
+            chart.showRealtimeUpdate.set(true);
+        });
     }
 
     /**
@@ -95,17 +132,5 @@ public class TradingView extends View {
     @Override
     protected String name() {
         return TradingView.class.getSimpleName() + View.IDSeparator + service.marketIdentity();
-    }
-
-    /**
-     * Retrieve the associated market.
-     * 
-     * @return
-     */
-    public final synchronized Market market() {
-        if (market == null) {
-            Viewtify.Terminator.add(market = new Market(service).readLog(log -> log.fromYestaday().share()));
-        }
-        return market;
     }
 }

@@ -216,12 +216,12 @@ public class OrderBuilder extends View {
         orderLimitLong.text(Buy).when(User.MouseClick).throttle(1000, MILLISECONDS).mapTo(Direction.BUY).to(this::requestOrder);
         orderLimitShort.text(Sell).when(User.MouseClick).throttle(1000, MILLISECONDS).mapTo(Direction.SELL).to(this::requestOrder);
 
-        orderCancel.text(en("Cancel")).when(User.MouseClick).to(() -> view.market().orders.cancelNowAll());
-        orderStop.text(en("Stop")).when(User.MouseClick).to(() -> view.market().stop().to(I.NoOP));
-        orderReverse.text(en("Reverse")).when(User.MouseClick).to(() -> view.market().reverse().to(I.NoOP));
+        orderCancel.text(en("Cancel")).when(User.MouseClick).to(() -> view.market.orders.cancelNowAll());
+        orderStop.text(en("Stop")).when(User.MouseClick).to(() -> view.market.stop().to(I.NoOP));
+        orderReverse.text(en("Reverse")).when(User.MouseClick).to(() -> view.market.reverse().to(I.NoOP));
 
-        if (view.market().service == BitFlyer.FX_BTC_JPY) {
-            view.market().service.add(SFD.latestBTC.on(Viewtify.UIThread).to(price -> {
+        if (view.market.service == BitFlyer.FX_BTC_JPY) {
+            view.market.service.add(SFD.latestBTC.on(Viewtify.UIThread).to(price -> {
                 sfdPrice500.text("5.00% " + price.multiply(1.05).scale(0));
                 sfdPrice499.text("4.99% " + price.multiply(1.0499).scale(1));
                 sfdPrice498.text("4.98% " + price.multiply(1.0498).scale(2));
@@ -276,12 +276,12 @@ public class OrderBuilder extends View {
             for (int i = 0; i < divideSize; i++) {
                 Num optimizedSize = increaseInterval == 0 ? Num.ZERO
                         : Num.of(i).divide(increaseInterval).scale(0, RoundingMode.FLOOR).multiply(initSize.divide(2));
-                Num optimizedPrice = view.market().orderBook.computeBestPrice(side, price, optimizeThreshold.value(), Num.of(2));
+                Num optimizedPrice = view.market.orderBook.computeBestPrice(side, price, optimizeThreshold.value(), Num.of(2));
 
                 Order order = Order.with.direction(side, size.plus(optimizedSize)).price(optimizedPrice).state(OrderState.REQUESTING);
                 price = optimizedPrice.plus(priceInterval);
 
-                view.market().request(order).to(I.NoOP);
+                view.market.request(order).to(I.NoOP);
             }
         });
     }

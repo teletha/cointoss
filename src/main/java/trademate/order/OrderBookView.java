@@ -118,7 +118,7 @@ public class OrderBookView extends View {
      */
     @Override
     protected void initialize() {
-        book = view.market().orderBook;
+        book = view.market.orderBook;
         book.longs.setContainer(FXCollections::observableList);
         book.shorts.setContainer(FXCollections::observableList);
         book.longs.setOperator(Viewtify.UIThread);
@@ -126,20 +126,20 @@ public class OrderBookView extends View {
 
         hideSize.values(0, Num.range(0, 99));
 
-        int scale = view.market().service.setting.targetCurrencyScaleSize;
+        int scale = view.market.service.setting.targetCurrencyScaleSize;
         longList.renderByNode(displayOrderUnit(TradeMateStyle.BUY, scale))
                 .take(hideSize, (unit, size) -> unit.size.isGreaterThanOrEqual(size));
         shortList.renderByNode(displayOrderUnit(TradeMateStyle.SELL, scale))
                 .take(hideSize, (unit, size) -> unit.size.isGreaterThanOrEqual(size))
                 .scrollToBottom();
 
-        priceRange.values(0, view.market().service.setting.orderBookGroupRangesWithBase()).observeNow(range -> {
+        priceRange.values(0, view.market.service.setting.orderBookGroupRangesWithBase()).observeNow(range -> {
             longList.items((ObservableList) book.longs.selectBy(range));
             shortList.items((ObservableList) book.shorts.selectBy(range));
         });
 
-        view.market().tickers.latest.observe().on(Viewtify.UIThread).to(e -> priceLatest.text(e.price));
-        view.market().orderBook.spread.observe().on(Viewtify.UIThread).to(price -> priceSpread.text(price));
+        view.market.tickers.latest.observe().skipWhile(view.initializing).on(Viewtify.UIThread).to(e -> priceLatest.text(e.price));
+        view.market.orderBook.spread.observe().skipWhile(view.initializing).on(Viewtify.UIThread).to(price -> priceSpread.text(price));
     }
 
     /**

@@ -99,11 +99,11 @@ public class OrderCatalog extends View {
         price.text(Price).model(Order.class, o -> o.price);
 
         // initialize orders on server
-        I.signal(view.market().orders.items).take(Order::isBuy).sort(Comparator.reverseOrder()).to(this::createOrderItem);
-        I.signal(view.market().orders.items).take(Order::isSell).sort(Comparator.naturalOrder()).to(this::createOrderItem);
+        I.signal(view.market.orders.items).take(Order::isBuy).sort(Comparator.reverseOrder()).to(this::createOrderItem);
+        I.signal(view.market.orders.items).take(Order::isSell).sort(Comparator.naturalOrder()).to(this::createOrderItem);
 
         // observe orders on clinet
-        view.market().orders.add.to(this::createOrderItem);
+        view.market.orders.add.to(this::createOrderItem);
     }
 
     /**
@@ -136,7 +136,7 @@ public class OrderCatalog extends View {
      */
     private void cancel(Order order) {
         Viewtify.inWorker(() -> {
-            view.market().cancel(order).to(o -> {
+            view.market.cancel(order).to(o -> {
             });
         });
     }
