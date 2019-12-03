@@ -24,6 +24,8 @@ import cointoss.analyze.TradingStatistics;
 import cointoss.execution.ExecutionLog;
 import cointoss.execution.ExecutionLog.LogType;
 import cointoss.market.MarketServiceProvider;
+import cointoss.trading.LazyBear;
+import cointoss.trading.VolumeCross;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
 import cointoss.verify.BackTest;
@@ -41,6 +43,7 @@ import transcript.Transcript;
 import viewtify.Viewtify;
 import viewtify.ui.UI;
 import viewtify.ui.UIButton;
+import viewtify.ui.UICheckBox;
 import viewtify.ui.UIComboBox;
 import viewtify.ui.UIDatePicker;
 import viewtify.ui.UILabel;
@@ -55,13 +58,20 @@ public class BackTestView extends View implements Analyzer {
 
     private static final Transcript EndDateMustBeAfterStartDate = Transcript.en("The end date must be after the start date.");
 
+    /** Runner UI */
     private UIComboBox<MarketService> marketSelection;
 
+    /** Runner UI */
     private UIDatePicker startDate;
 
+    /** Runner UI */
     private UIDatePicker endDate;
 
+    /** Runner UI */
     private UIButton runner;
+
+    /** Runner UI */
+    private UICheckBox fastLog;
 
     private ChartView chart;
 
@@ -126,14 +136,20 @@ public class BackTestView extends View implements Analyzer {
                 $(hbox, style.fill, () -> {
                     $(chart);
                     $(vbox, style.config, () -> {
-                        $(marketSelection);
-                        $(hbox, FormRow, () -> {
+                        $(hbox, style.formRow, () -> {
+                            label(en("Market"), style.formLabel);
+                            $(marketSelection);
+                        });
+                        $(hbox, style.formRow, () -> {
                             label(en("Start"), style.formLabel);
                             $(startDate, style.formInput);
                             label(en("End"), style.formLabel);
                             $(endDate, style.formInput);
                         });
-                        $(runner);
+                        $(hbox, style.formRow, () -> {
+                            $(runner);
+                            $(fastLog, style.formCheck);
+                        });
                     });
                 });
 
@@ -176,6 +192,12 @@ public class BackTestView extends View implements Analyzer {
             display.maxHeight(250, px).minHeight(250, px);
         };
 
+        Style formRow = () -> {
+            display.minHeight(30, px);
+            padding.vertical(3, px);
+            text.verticalAlign.middle();
+        };
+
         Style formLabel = () -> {
             display.minWidth(40, px);
             padding.top(3, px);
@@ -184,6 +206,11 @@ public class BackTestView extends View implements Analyzer {
         Style formInput = () -> {
             display.minWidth(110, px);
             margin.right(20, px);
+        };
+
+        Style formCheck = () -> {
+            display.minWidth(60, px);
+            padding.left(10, px);
         };
 
         Style max = () -> {
@@ -201,6 +228,9 @@ public class BackTestView extends View implements Analyzer {
     @Override
     protected void initialize() {
         marketSelection.values(0, MarketServiceProvider.availableMarketServices());
+        fastLog.text(en("Use Fast Log"))
+                .initial(false)
+                .tooltip(en("Run backtests very fast using compressed execution history.\r\nHowever, the execution result may be inaccurate."));
         startDate.initial(Chrono.utcNow().minusDays(10)).uneditable().requireWhen(marketSelection).require(() -> {
             ExecutionLog log = marketSelection.value().log;
 
@@ -218,9 +248,9 @@ public class BackTestView extends View implements Analyzer {
             BackTest.with.service(marketSelection.value())
                     .start(startDate.zoned())
                     .end(endDate.zoned())
-                    .traders()
+                    .traders(new LazyBear(), new VolumeCross())
                     .initialBaseCurrency(3000000)
-                    .type(LogType.Fast)
+                    .type(fastLog.value() ? LogType.Fast : LogType.Normal)
                     .run(this);
         });
 

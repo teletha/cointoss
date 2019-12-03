@@ -778,6 +778,16 @@ public class ExecutionLog {
                         long id = tick.openId;
                         Num buy = tick.buyVolume().divide(2);
                         Num sell = tick.sellVolume().divide(2);
+
+                        if (buy.isZero()) {
+                            if (sell.isZero()) return;
+                            buy = tick.sellVolume().divide(4);
+                            sell = tick.sellVolume().divide(4);
+                        } else if (sell.isZero()) {
+                            buy = tick.buyVolume().divide(4);
+                            sell = tick.buyVolume().divide(4);
+                        }
+
                         Direction[] sides = tick.isBull() ? new Direction[] {SELL, BUY, SELL, BUY} : new Direction[] {BUY, SELL, BUY, SELL};
                         Num[] sizes = tick.isBull() ? new Num[] {sell, buy, sell, buy} : new Num[] {buy, sell, buy, sell};
                         Num[] prices = tick.isBull() ? new Num[] {tick.openPrice, tick.lowPrice(), tick.highPrice(), tick.closePrice()}
@@ -790,6 +800,10 @@ public class ExecutionLog {
                                     .date(tick.start.plusSeconds(i))
                                     .consecutive(Execution.ConsecutiveDifference)
                                     .delay(Execution.DelayInestimable);
+
+                            if (e.price.isZero()) {
+                                System.out.println(e);
+                            }
                             writer.writeRow(logger.encode(prev[0], e));
                             prev[0] = e;
                         }
@@ -927,11 +941,11 @@ public class ExecutionLog {
     public static void createFastLog(MarketService service, ZonedDateTime date) {
         ExecutionLog log = new ExecutionLog(service);
         Cache cache = log.cache(date);
-        cache.writeFast();
+        cache.writeNormal();
     }
 
-    public static void main1(String[] args) {
-        createFastLog(BitFlyer.FX_BTC_JPY, Chrono.utc(2019, 11, 8));
+    public static void main(String[] args) {
+        createFastLog(BitFlyer.FX_BTC_JPY, Chrono.utc(2019, 11, 14));
     }
 
     public static void main2(String[] args) {

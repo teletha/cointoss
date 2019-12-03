@@ -10,6 +10,9 @@ Hold Size
 Loss Span
 損失時間
 
+Market
+市場
+
 Max
 最大
 
@@ -49,6 +52,9 @@ Remaining
 Run
 実行
 
+Run backtests very fast using compressed execution history.﹍␣However, the execution result may be inaccurate.
+圧縮された約定履歴を使用することで高速にバックテストを実行します。﹍␣ただし、実行結果が不正確になることがあります。
+
 Size
 枚数
 
@@ -75,6 +81,9 @@ Unrealized Loss
 
 Unrealized Profit
 含利幅
+
+Use Fast Log
+高速ログを使用
 
 Win Rate
 勝率
