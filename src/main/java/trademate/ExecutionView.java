@@ -54,7 +54,7 @@ public class ExecutionView extends View {
 
     interface style extends StyleDSL {
         Style root = () -> {
-            display.minWidth(210, px).maxWidth(210, px);
+            display.minWidth(170, px).maxWidth(170, px);
 
             $.descendant(() -> {
                 text.unselectable();

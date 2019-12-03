@@ -293,7 +293,7 @@ public class OrderBuilder extends View {
 
         Style Root = () -> {
             padding.horizontal(10, px);
-            display.minWidth(280, px);
+            display.minWidth(250, px);
         };
 
         Style Row = () -> {

@@ -801,9 +801,6 @@ public class ExecutionLog {
                                     .consecutive(Execution.ConsecutiveDifference)
                                     .delay(Execution.DelayInestimable);
 
-                            if (e.price.isZero()) {
-                                System.out.println(e);
-                            }
                             writer.writeRow(logger.encode(prev[0], e));
                             prev[0] = e;
                         }
@@ -938,14 +935,14 @@ public class ExecutionLog {
      * @param service
      * @param date
      */
-    public static void createFastLog(MarketService service, ZonedDateTime date) {
+    public static void restoreNormal(MarketService service, ZonedDateTime date) {
         ExecutionLog log = new ExecutionLog(service);
         Cache cache = log.cache(date);
         cache.writeNormal();
     }
 
-    public static void main(String[] args) {
-        createFastLog(BitFlyer.FX_BTC_JPY, Chrono.utc(2019, 11, 14));
+    public static void main1(String[] args) {
+        restoreNormal(BitFlyer.FX_BTC_JPY, Chrono.utc(2019, 11, 14));
     }
 
     public static void main2(String[] args) {
