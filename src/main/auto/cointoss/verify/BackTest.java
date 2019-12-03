@@ -101,6 +101,9 @@ public abstract class BackTest implements BackTestModel {
     /** The final property updater. */
     private static final MethodHandle detailUpdater = updater("detail");
 
+    /** The final property updater. */
+    private static final MethodHandle fastLogUpdater = updater("fastLog");
+
     /** The exposed property. */
     public final MarketService service;
 
@@ -122,6 +125,9 @@ public abstract class BackTest implements BackTestModel {
     /** The exposed property. */
     public final boolean detail;
 
+    /** The exposed property. */
+    public final boolean fastLog;
+
     /**
      * HIDE CONSTRUCTOR
      */
@@ -133,6 +139,7 @@ public abstract class BackTest implements BackTestModel {
         this.initialBaseCurrency = BackTestModel.super.initialBaseCurrency();
         this.initialTargetCurrency = BackTestModel.super.initialTargetCurrency();
         this.detail = BackTestModel.super.detail();
+        this.fastLog = BackTestModel.super.fastLog();
     }
 
     /**
@@ -385,6 +392,39 @@ public abstract class BackTest implements BackTestModel {
     }
 
     /**
+     * Use fast log.
+     *  
+     *  @return
+     */
+    @Override
+    public final boolean fastLog() {
+        return this.fastLog;
+    }
+
+    /**
+     * Provide classic getter API.
+     *
+     * @return A value of fastLog property.
+     */
+    @SuppressWarnings("unused")
+    private final boolean getFastLog() {
+        return this.fastLog;
+    }
+
+    /**
+     * Provide classic setter API.
+     *
+     * @paran value A new value of fastLog property to assign.
+     */
+    private final void setFastLog(boolean value) {
+        try {
+            fastLogUpdater.invoke(this, value);
+        } catch (Throwable e) {
+            throw quiet(e);
+        }
+    }
+
+    /**
      * Show all property values.
      *
      * @return All property values.
@@ -398,7 +438,8 @@ public abstract class BackTest implements BackTestModel {
         builder.append("traders=").append(traders).append(", ");
         builder.append("initialBaseCurrency=").append(initialBaseCurrency).append(", ");
         builder.append("initialTargetCurrency=").append(initialTargetCurrency).append(", ");
-        builder.append("detail=").append(detail).append("]");
+        builder.append("detail=").append(detail).append(", ");
+        builder.append("fastLog=").append(fastLog).append("]");
         return builder.toString();
     }
 
@@ -409,7 +450,7 @@ public abstract class BackTest implements BackTestModel {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(service, start, end, traders, initialBaseCurrency, initialTargetCurrency, detail);
+        return Objects.hash(service, start, end, traders, initialBaseCurrency, initialTargetCurrency, detail, fastLog);
     }
 
     /**
@@ -431,6 +472,7 @@ public abstract class BackTest implements BackTestModel {
         if (!Objects.equals(initialBaseCurrency, other.initialBaseCurrency)) return false;
         if (!Objects.equals(initialTargetCurrency, other.initialTargetCurrency)) return false;
         if (detail != other.detail) return false;
+        if (fastLog != other.fastLog) return false;
         return true;
     }
 
@@ -620,6 +662,17 @@ public abstract class BackTest implements BackTestModel {
             ((BackTest) this).setDetail(value);
             return (Next) this;
         }
+
+        /**
+         * Assign fastLog property.
+         * 
+         * @param value A new value to assign.
+         * @return The next assignable model.
+         */
+        default Next fastLog(boolean value) {
+            ((BackTest) this).setFastLog(value);
+            return (Next) this;
+        }
     }
 
     /**
@@ -645,5 +698,6 @@ public abstract class BackTest implements BackTestModel {
         static final String InitialBaseCurrency = "initialBaseCurrency";
         static final String InitialTargetCurrency = "initialTargetCurrency";
         static final String Detail = "detail";
+        static final String FastLog = "fastLog";
     }
 }

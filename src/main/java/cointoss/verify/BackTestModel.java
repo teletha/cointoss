@@ -134,6 +134,16 @@ interface BackTestModel {
     }
 
     /**
+     * Use fast log.
+     * 
+     * @return
+     */
+    @Icy.Property
+    default boolean fastLog() {
+        return false;
+    }
+
+    /**
      * Activate test with {@link ConsoleAnalyzer}.
      */
     default void run() {

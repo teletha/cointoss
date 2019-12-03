@@ -26,6 +26,9 @@ public final class Tick {
     /** End time of the tick */
     public final ZonedDateTime end;
 
+    /** Open id of the period. */
+    public final long openId;
+
     /** Open price of the period */
     public final Num openPrice;
 
@@ -61,14 +64,16 @@ public final class Tick {
      * 
      * @param start A start time of period.
      * @param span A tick span.
+     * @param id A open id.
      * @param open A open price.
      * @param realtime The realtime execution statistic.
      */
-    Tick(Tick previous, ZonedDateTime start, Span span, Num open, TickerManager realtime) {
+    Tick(Tick previous, ZonedDateTime start, Span span, long id, Num open, TickerManager realtime) {
         this.previous = previous;
         this.start = start;
         this.startSeconds = start.toEpochSecond();
         this.end = start.plus(span.duration);
+        this.openId = id;
         this.openPrice = this.highPrice = this.lowPrice = open;
 
         this.realtime = realtime;

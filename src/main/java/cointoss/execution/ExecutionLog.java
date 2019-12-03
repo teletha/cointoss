@@ -9,11 +9,13 @@
  */
 package cointoss.execution;
 
+import static cointoss.Direction.*;
 import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static java.nio.file.StandardOpenOption.*;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
@@ -57,6 +59,9 @@ import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.market.bitmex.BitMex;
+import cointoss.ticker.Span;
+import cointoss.ticker.Ticker;
+import cointoss.ticker.TickerManager;
 import cointoss.util.Chrono;
 import cointoss.util.Network;
 import cointoss.util.Num;
@@ -349,7 +354,7 @@ public class ExecutionLog {
 
             if (!cache.date.isEqual(e.date.toLocalDate())) {
                 cache.disableAutoSave();
-                cache.compact();
+                cache.writeCompact();
                 cache = new Cache(e.date).enableAutoSave();
             }
             cache.queue.add(e);
@@ -498,6 +503,16 @@ public class ExecutionLog {
     }
 
     /**
+     * Locate fast execution log.
+     * 
+     * @param date A date time.
+     * @return A file location.
+     */
+    final File locateFastLog(TemporalAccessor date) {
+        return root.file("execution" + Chrono.DateCompact.format(date) + ".flog");
+    }
+
+    /**
      * @version 2018/05/27 10:31:20
      */
     class Cache {
@@ -510,6 +525,9 @@ public class ExecutionLog {
 
         /** The compact log file. */
         private final File compact;
+
+        /** The fast log file. */
+        private final File fast;
 
         /** The log writing task. */
         private ScheduledFuture task = NOOP;
@@ -524,6 +542,7 @@ public class ExecutionLog {
             this.date = date.toLocalDate();
             this.normal = locateLog(date);
             this.compact = locateCompactLog(date);
+            this.fast = locateFastLog(date);
         }
 
         /**
@@ -696,7 +715,7 @@ public class ExecutionLog {
         /**
          * Convert normal log to compact log asynchronously.
          */
-        private void compact() {
+        private void writeCompact() {
             if (compact.isAbsent() && (!queue.isEmpty() || normal.isPresent())) {
                 I.schedule(5, SECONDS, () -> {
                     compact(read()).effectOnComplete(() -> normal.delete()).to(I.NoOP);
@@ -711,11 +730,7 @@ public class ExecutionLog {
             try {
                 compact.parent().create();
 
-                CsvWriterSettings setting = new CsvWriterSettings();
-                setting.getFormat().setDelimiter(' ');
-                setting.getFormat().setComment('無');
-                CsvWriter writer = new CsvWriter(new ZstdOutputStream(compact.newOutputStream(), 1), ISO_8859_1, setting);
-
+                CsvWriter writer = buildCsvWriter(new ZstdOutputStream(compact.newOutputStream(), 1));
                 return executions.maps(Market.BASE, (prev, e) -> {
                     writer.writeRow(logger.encode(prev, e));
                     return e;
@@ -723,6 +738,67 @@ public class ExecutionLog {
             } catch (IOException e) {
                 throw I.quiet(e);
             }
+        }
+
+        /**
+         * Convert compact log to fast log synchronously.
+         */
+        private void writeFast() {
+            if (fast.isAbsent() && compact.isPresent()) {
+                try {
+                    TickerManager manager = new TickerManager();
+                    read().to(manager::update);
+                    Ticker ticker = manager.of(Span.Second5);
+
+                    CsvWriter writer = buildCsvWriter(new ZstdOutputStream(fast.newOutputStream(), 1));
+                    ticker.each(tick -> {
+                        long id = tick.openId;
+                        Num buy = tick.buyVolume().divide(2);
+                        Num sell = tick.sellVolume().divide(2);
+                        Direction[] sides = tick.isBull() ? new Direction[] {SELL, BUY, SELL, BUY} : new Direction[] {BUY, SELL, BUY, SELL};
+                        Num[] sizes = tick.isBull() ? new Num[] {sell, buy, sell, buy} : new Num[] {buy, sell, buy, sell};
+                        Num[] prices = tick.isBull() ? new Num[] {tick.openPrice, tick.lowPrice(), tick.highPrice(), tick.closePrice()}
+                                : new Num[] {tick.openPrice, tick.highPrice(), tick.lowPrice(), tick.closePrice()};
+
+                        for (int i = 0; i < prices.length; i++) {
+                            writer.writeRow(Execution.with.direction(sides[i], sizes[i])
+                                    .price(prices[i])
+                                    .id(id + i)
+                                    .date(tick.start.plusSeconds(i))
+                                    .consecutive(Execution.ConsecutiveDifference)
+                                    .delay(Execution.DelayInestimable)
+                                    .toString());
+                        }
+                    });
+                    writer.close();
+                } catch (Exception e) {
+                    throw I.quiet(e);
+                }
+            }
+        }
+
+        /**
+         * Convert compact log to normal log.
+         */
+        private void writeNormal() {
+            if (normal.isAbsent() && compact.isPresent()) {
+                CsvWriter writer = buildCsvWriter(normal.newOutputStream());
+                read().to(e -> writer.writeRow(e.toString()));
+                writer.close();
+            }
+        }
+
+        /**
+         * Create new CSV writer.
+         * 
+         * @param out
+         * @return
+         */
+        private CsvWriter buildCsvWriter(OutputStream out) {
+            CsvWriterSettings setting = new CsvWriterSettings();
+            setting.getFormat().setDelimiter(' ');
+            setting.getFormat().setComment('無');
+            return new CsvWriter(out, ISO_8859_1, setting);
         }
     }
 
@@ -824,18 +900,17 @@ public class ExecutionLog {
      * @param service
      * @param date
      */
-    public static void restoreNormalLog(MarketService service, ZonedDateTime date) {
+    public static void createCandleLog(MarketService service, ZonedDateTime date) {
         ExecutionLog log = new ExecutionLog(service);
         Cache cache = log.cache(date);
-        cache.read().to(cache.queue::add);
-        cache.write();
-    }
-
-    public static void main2(String[] args) {
-        restoreNormalLog(BitFlyer.FX_BTC_JPY, Chrono.utc(2019, 10, 30));
+        cache.writeFast();
     }
 
     public static void main(String[] args) {
+        createCandleLog(BitFlyer.FX_BTC_JPY, Chrono.utc(2019, 11, 8));
+    }
+
+    public static void main2(String[] args) {
         ExecutionLog log = new ExecutionLog(BitMex.XBT_USD);
         log.fetch(115364009, Chrono.utc(2019, 10, 13), Chrono.utc(2019, 11, 24));
 
