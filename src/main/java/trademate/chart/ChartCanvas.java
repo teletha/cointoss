@@ -387,11 +387,11 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
      * Visualize SFD price in chart.
      */
     private void visualizeSFDPrice() {
-        chart.market.observe().to(market -> {
+        chart.market.observe().on(Viewtify.UIThread).to(market -> {
             if (market.service == BitFlyer.FX_BTC_JPY) {
                 for (SFD sfd : SFD.values()) {
+                    TickLable label = sfdPrice.createLabel("乖離" + sfd.percentage + "%");
                     market.service.add(sfd.boundary().on(Viewtify.UIThread).to(price -> {
-                        TickLable label = sfdPrice.createLabel("乖離" + sfd.percentage + "%");
                         label.value.set(price.doubleValue());
                         sfdPrice.layoutLine.requestLayout();
                     }));

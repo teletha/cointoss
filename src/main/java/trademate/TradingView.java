@@ -13,6 +13,7 @@ import java.util.function.Predicate;
 
 import cointoss.Market;
 import cointoss.MarketService;
+import cointoss.execution.ExecutionLog.LogType;
 import stylist.Style;
 import stylist.StyleDSL;
 import trademate.chart.ChartView;
@@ -111,7 +112,7 @@ public class TradingView extends View {
             chart.market.set(market);
 
             whileInit = true;
-            market.readLog(log -> log.fromYestaday());
+            market.readLog(log -> log.fromLast(3, LogType.Fast));
             whileInit = false;
 
             chart.restoreRealtimeUpdate();

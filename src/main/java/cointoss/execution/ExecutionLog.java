@@ -390,11 +390,7 @@ public class ExecutionLog {
      * @return
      */
     public final Signal<Execution> at(ZonedDateTime date, LogType... type) {
-        Stopwatch stopwatch = Stopwatch.createUnstarted();
-
-        return new Cache(date).read(type).effectOnObserve(() -> stopwatch.reset().start()).effectOnTerminate(() -> {
-            log.info("Process executions [{}] {}", date, stopwatch.stop().elapsed());
-        });
+        return new Cache(date).read(type);
     }
 
     /**
