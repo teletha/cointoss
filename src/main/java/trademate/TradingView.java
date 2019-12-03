@@ -107,14 +107,14 @@ public class TradingView extends View {
     @Override
     protected void initialize() {
         Viewtify.inWorker(() -> {
-            chart.stopRealtimeUpdate();
+            chart.reduceRealtimeUpdate();
             chart.market.set(market);
 
             whileInit = true;
             market.readLog(log -> log.fromYestaday());
             whileInit = false;
 
-            chart.startRealtimeUpdate();
+            chart.restoreRealtimeUpdate();
         });
     }
 

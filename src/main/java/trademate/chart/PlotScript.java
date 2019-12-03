@@ -18,6 +18,7 @@ import cointoss.ticker.Ticker;
 import cointoss.util.Num;
 import kiss.Variable;
 import stylist.Style;
+import trademate.chart.ChartCanvas.CandleMark;
 import trademate.chart.ChartCanvas.Horizon;
 import trademate.chart.ChartCanvas.LineChart;
 
@@ -83,6 +84,9 @@ public abstract class PlotScript {
 
         /** The associated {@link Indicator}s. */
         final List<Horizon> horizons = new ArrayList();
+
+        /** The associated {@link Indicator}s. */
+        final List<CandleMark> candles = new ArrayList();
 
         /** The max y-value on horizontal line. */
         private double horizonMaxY = 0;
@@ -202,6 +206,27 @@ public abstract class PlotScript {
             }
 
             horizons.add(new Horizon(v, style));
+        }
+
+        /**
+         * Plot the specified {@link Indicator} as mark.
+         * 
+         * @param indicator A indicator to plot.
+         */
+        public final void mark(Indicator<Boolean> indicator) {
+            mark(indicator, null);
+        }
+
+        /**
+         * Plot the specified {@link Indicator} as mark.
+         * 
+         * @param indicator A indicator to plot.
+         */
+        public final void mark(Indicator<Boolean> indicator, Style style) {
+            if (style == null) {
+                style = ChartStyles.MouseTrack;
+            }
+            candles.add(new CandleMark(indicator, style));
         }
     }
 }

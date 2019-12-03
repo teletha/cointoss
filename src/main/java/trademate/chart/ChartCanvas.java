@@ -146,7 +146,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                             .flatIterable(list -> list)
                             .effect(script -> script.declare(v.ⅰ, v.ⅱ))
                             .flatArray(s -> new PlotDSL[] {s.bottom, s.bottomN, s.low, s.lowN, s.high, s.highN, s.top, s.topN, s.main})
-                            .skip(plotter -> plotter.lines.isEmpty() && plotter.horizons.isEmpty())
+                            .skip(plotter -> plotter.lines.isEmpty() && plotter.horizons.isEmpty() && plotter.candles.isEmpty())
                             .toList();
 
                     return combined.toArray(new PlotDSL[combined.size()]);
@@ -482,6 +482,14 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                         }
                         chart.valueY.add(calculated);
                     }
+
+                    // draw candle mark
+                    for (CandleMark mark : plotter.candles) {
+                        if (mark.indicator.valueAt(tick)) {
+                            gc.setFill(mark.color);
+                            gc.fillOval(x - (BarWidth / 2), high - BarWidth - 2, BarWidth, BarWidth);
+                        }
+                    }
                 }
                 valueX.add(x);
             });
@@ -681,6 +689,27 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             this.width = FXUtils.length(style, "stroke-width", 1);
             this.dashArray = FXUtils.lengths(style, "stroke-dasharray");
             this.info = info == null ? indicator.map(v -> v.toString()) : info;
+        }
+    }
+
+    /**
+     * 
+     */
+    static class CandleMark {
+
+        /** The indicator. */
+        private final Indicator<Boolean> indicator;
+
+        /** The indicator color. */
+        private final Color color;
+
+        /**
+         * @param indicator
+         * @param style
+         */
+        CandleMark(Indicator<Boolean> indicator, Style style) {
+            this.indicator = indicator;
+            this.color = FXUtils.color(style, "fill");
         }
     }
 

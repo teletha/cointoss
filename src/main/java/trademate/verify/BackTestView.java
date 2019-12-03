@@ -23,8 +23,6 @@ import cointoss.analyze.Statistics;
 import cointoss.analyze.TradingStatistics;
 import cointoss.execution.ExecutionLog;
 import cointoss.market.MarketServiceProvider;
-import cointoss.trading.LazyBear;
-import cointoss.trading.VolumeCross;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
 import cointoss.verify.BackTest;
@@ -219,7 +217,7 @@ public class BackTestView extends View implements Analyzer {
             BackTest.with.service(marketSelection.value())
                     .start(startDate.zoned())
                     .end(endDate.zoned())
-                    .traders(new VolumeCross(), new LazyBear())
+                    .traders()
                     .initialBaseCurrency(3000000)
                     .run(this);
         });
@@ -308,7 +306,7 @@ public class BackTestView extends View implements Analyzer {
      */
     @Override
     public void initialize(Market market, List<Trader> traders) {
-        chart.stopRealtimeUpdate();
+        chart.reduceRealtimeUpdate();
         chart.market.set(market);
         chart.scripts.clear();
         chart.scripts.addAll(I.signal(traders).flatMap(this::createTraderPlotScript).startWith(TraderVisualizer::new).toList());

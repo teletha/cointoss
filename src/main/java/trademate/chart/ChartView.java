@@ -95,16 +95,16 @@ public class ChartView extends View {
     }
 
     /**
-     * Start realtime UI updating.
+     * Restore realtime UI updating.
      */
-    public void startRealtimeUpdate() {
+    public void restoreRealtimeUpdate() {
         realtimeUpdate(true);
     }
 
     /**
-     * Stop realtime UI updating.
+     * Reduce realtime UI updating.
      */
-    public void stopRealtimeUpdate() {
+    public void reduceRealtimeUpdate() {
         realtimeUpdate(false);
     }
 

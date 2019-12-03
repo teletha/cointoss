@@ -9,8 +9,7 @@
  */
 package cointoss.trading;
 
-import static java.time.temporal.ChronoUnit.MINUTES;
-
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.function.Function;
 
@@ -29,6 +28,7 @@ import cointoss.util.Num;
 import kiss.Signal;
 import stylist.Style;
 import stylist.StyleDSL;
+import trademate.TradeMateStyle;
 import trademate.chart.PlotScript;
 
 /**
@@ -36,44 +36,50 @@ import trademate.chart.PlotScript;
  */
 public class VolumeCross extends Trader {
 
-    public int smaLength = 21;
+    public int smaLength = 3;
 
-    Indicator<Num> priceDiff;
+    Indicator<Num> volumeDiff;
+
+    Indicator<Boolean> upPrediction;
+
+    Indicator<Boolean> downPrediction;
 
     /**
      * {@inheritDoc}
      */
     @Override
     protected void declare(Market market, FundManager fund) {
-        Indicator<Num> buyPriceIncrease = Indicator.build(market.tickers.of(Span.Minute5), Tick::buyPriceIncrease).sma(smaLength);
-        Indicator<Num> sellPriceDecrease = Indicator.build(market.tickers.of(Span.Minute5), Tick::sellPriceDecrease).sma(smaLength);
-        priceDiff = buyPriceIncrease.map(sellPriceDecrease, (b, s) -> b.minus(s)).scale(market.service.setting.targetCurrencyScaleSize);
+        Indicator<Num> buyVolume = Indicator.build(market.tickers.of(Span.Minute5), Tick::buyVolume);
+        Indicator<Num> sellVolume = Indicator.build(market.tickers.of(Span.Minute5), Tick::sellVolume);
+        volumeDiff = buyVolume.map(sellVolume, (b, s) -> b.minus(s)).scale(market.service.setting.targetCurrencyScaleSize).sma(7);
+        upPrediction = Indicator.build(market.tickers.of(Span.Minute5), Tick::isBear).map(volumeDiff, (t, d) -> t && d.isPositive());
+        downPrediction = Indicator.build(market.tickers.of(Span.Minute5), Tick::isBull).map(volumeDiff, (t, d) -> t && d.isNegative());
 
         // disableWhile(observeProfit().map(p -> p.isLessThan(-10000)));
 
         double size = 0.3;
 
-        when(priceDiff.observe().plug(near(5, o -> o.isGreaterThan(0))), v -> new Scenario() {
+        when(volumeDiff.observe().plug(near(5, o -> o.isGreaterThan(0))), v -> new Scenario() {
             @Override
             protected void entry() {
-                entry(Direction.BUY, size, o -> o.make(market.tickers.latestPrice.v.minus(300)).cancelAfter(3, MINUTES));
+                entry(Direction.BUY, size, o -> o.make(market.tickers.latestPrice.v.minus(300)).cancelAfter(3, ChronoUnit.MINUTES));
             }
 
             @Override
             protected void exit() {
-                exitWhen(priceDiff.observe().plug(near(2, o -> o.isLessThan(0))), o -> o.take());
+                exitWhen(volumeDiff.observe().plug(near(2, o -> o.isLessThan(0))), o -> o.take());
             }
         });
 
-        when(priceDiff.observe().plug(near(5, o -> o.isLessThan(0))), v -> new Scenario() {
+        when(volumeDiff.observe().plug(near(5, o -> o.isLessThan(0))), v -> new Scenario() {
             @Override
             protected void entry() {
-                entry(Direction.SELL, size, o -> o.make(market.tickers.latestPrice.v.plus(300)).cancelAfter(3, MINUTES));
+                entry(Direction.SELL, size, o -> o.make(market.tickers.latestPrice.v.plus(300)).cancelAfter(3, ChronoUnit.MINUTES));
             }
 
             @Override
             protected void exit() {
-                exitWhen(priceDiff.observe().plug(near(2, o -> o.isGreaterThan(0))), o -> o.take());
+                exitWhen(volumeDiff.observe().plug(near(2, o -> o.isGreaterThan(0))), o -> o.take());
             }
         });
     }
@@ -91,9 +97,19 @@ public class VolumeCross extends Trader {
             stroke.color("#eee");
         };
 
+        Style upMark = () -> {
+            fill.color(TradeMateStyle.BUY);
+        };
+
+        Style downMark = () -> {
+            fill.color(TradeMateStyle.SELL);
+        };
+
         @Override
         protected void declare(Market market, Ticker ticker) {
-            lowN.line(priceDiff, diff);
+            lowN.line(volumeDiff, diff);
+            main.mark(upPrediction, upMark);
+            main.mark(downPrediction, downMark);
         }
     }
 }
