@@ -308,11 +308,7 @@ public class BackTestView extends View implements Analyzer {
      */
     @Override
     public void initialize(Market market, List<Trader> traders) {
-        chart.showOrderSupport.set(false);
-        chart.showPositionSupport.set(false);
-        chart.showLatestPrice.set(false);
-        chart.showRealtimeUpdate.set(false);
-
+        chart.stopRealtimeUpdate();
         chart.market.set(market);
         chart.scripts.clear();
         chart.scripts.addAll(I.signal(traders).flatMap(this::createTraderPlotScript).startWith(TraderVisualizer::new).toList());

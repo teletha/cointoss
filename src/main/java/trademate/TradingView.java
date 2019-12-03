@@ -9,12 +9,10 @@
  */
 package trademate;
 
-import java.time.temporal.ChronoUnit;
 import java.util.function.Predicate;
 
 import cointoss.Market;
 import cointoss.MarketService;
-import cointoss.util.Chrono;
 import stylist.Style;
 import stylist.StyleDSL;
 import trademate.chart.ChartView;
@@ -109,20 +107,14 @@ public class TradingView extends View {
     @Override
     protected void initialize() {
         Viewtify.inWorker(() -> {
-            chart.showOrderSupport.set(false);
-            chart.showPositionSupport.set(false);
-            chart.showLatestPrice.set(false);
-            chart.showRealtimeUpdate.set(false);
+            chart.stopRealtimeUpdate();
             chart.market.set(market);
 
             whileInit = true;
-            market.readLog(log -> log.from(Chrono.utcNow().truncatedTo(ChronoUnit.DAYS)));
+            market.readLog(log -> log.fromYestaday());
             whileInit = false;
 
-            chart.showOrderSupport.set(true);
-            chart.showPositionSupport.set(true);
-            chart.showLatestPrice.set(true);
-            chart.showRealtimeUpdate.set(true);
+            chart.startRealtimeUpdate();
         });
     }
 

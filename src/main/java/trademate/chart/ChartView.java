@@ -93,4 +93,30 @@ public class ChartView extends View {
                 .map(e -> e.ⅱ.tickers.of(e.ⅰ))
                 .to(ticker::set);
     }
+
+    /**
+     * Start realtime UI updating.
+     */
+    public void startRealtimeUpdate() {
+        realtimeUpdate(true);
+    }
+
+    /**
+     * Stop realtime UI updating.
+     */
+    public void stopRealtimeUpdate() {
+        realtimeUpdate(false);
+    }
+
+    /**
+     * Change realtime UI updating strategy.
+     * 
+     * @param state
+     */
+    private void realtimeUpdate(boolean state) {
+        showOrderSupport.set(state);
+        showPositionSupport.set(state);
+        showLatestPrice.set(state);
+        showRealtimeUpdate.set(state);
+    }
 }
