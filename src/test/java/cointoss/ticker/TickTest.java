@@ -24,4 +24,22 @@ class TickTest extends TickerTestSupport {
         Tick tick = tick(Span.Second5, 10, 15, 4, 8);
         assert tick.medianPrice().is(9.5);
     }
+
+    @Test
+    void isBear() {
+        Tick tick = tick(Span.Second5, 10, 15, 4, 8);
+        assert tick.isBear() == true;
+
+        tick = tick(Span.Second5, 10, 15, 4, 12);
+        assert tick.isBear() == false;
+    }
+
+    @Test
+    void isBull() {
+        Tick tick = tick(Span.Second5, 10, 15, 4, 8);
+        assert tick.isBull() == false;
+
+        tick = tick(Span.Second5, 10, 15, 4, 12);
+        assert tick.isBull() == true;
+    }
 }

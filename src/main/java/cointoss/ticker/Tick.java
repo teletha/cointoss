@@ -238,6 +238,24 @@ public final class Tick {
     }
 
     /**
+     * Check the tick state.
+     * 
+     * @return
+     */
+    public boolean isBull() {
+        return openPrice.isLessThan(closePrice());
+    }
+
+    /**
+     * Check the tick state.
+     * 
+     * @return
+     */
+    public boolean isBear() {
+        return openPrice.isGreaterThan(closePrice());
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
