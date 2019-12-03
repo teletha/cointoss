@@ -39,14 +39,8 @@ public class VolumeIndicator extends PlotScript implements StyleDSL {
 
         Indicator<Num> buyVolume = Indicator.build(ticker, Tick::buyVolume);
         Indicator<Num> sellVolume = Indicator.build(ticker, Tick::sellVolume);
-        Indicator<Num> volumeDiff = buyVolume.map(sellVolume, (b, s) -> b.minus(s)).scale(market.service.setting.targetCurrencyScaleSize);
-        Indicator<Boolean> down = Indicator.build(ticker, Tick::isBear).map(volumeDiff, (t, d) -> d.isNegative());
-        Indicator<Boolean> up = Indicator.build(ticker, Tick::isBull).map(volumeDiff, (t, d) -> d.isPositive());
 
         bottom.line(buyVolume.ema(7).scale(volumeScale), Long);
         bottom.line(sellVolume.ema(7).scale(volumeScale), Short);
-
-        main.mark(up, Long);
-        main.mark(down, Short);
     }
 }

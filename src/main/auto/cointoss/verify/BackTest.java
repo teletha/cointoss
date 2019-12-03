@@ -2,6 +2,7 @@ package cointoss.verify;
 
 import cointoss.MarketService;
 import cointoss.Trader;
+import cointoss.execution.ExecutionLog.LogType;
 import cointoss.util.Num;
 import cointoss.verify.BackTest;
 import cointoss.verify.BackTestModel;
@@ -102,7 +103,7 @@ public abstract class BackTest implements BackTestModel {
     private static final MethodHandle detailUpdater = updater("detail");
 
     /** The final property updater. */
-    private static final MethodHandle fastLogUpdater = updater("fastLog");
+    private static final MethodHandle typeUpdater = updater("type");
 
     /** The exposed property. */
     public final MarketService service;
@@ -126,7 +127,7 @@ public abstract class BackTest implements BackTestModel {
     public final boolean detail;
 
     /** The exposed property. */
-    public final boolean fastLog;
+    public final LogType type;
 
     /**
      * HIDE CONSTRUCTOR
@@ -139,7 +140,7 @@ public abstract class BackTest implements BackTestModel {
         this.initialBaseCurrency = BackTestModel.super.initialBaseCurrency();
         this.initialTargetCurrency = BackTestModel.super.initialTargetCurrency();
         this.detail = BackTestModel.super.detail();
-        this.fastLog = BackTestModel.super.fastLog();
+        this.type = BackTestModel.super.type();
     }
 
     /**
@@ -397,28 +398,31 @@ public abstract class BackTest implements BackTestModel {
      *  @return
      */
     @Override
-    public final boolean fastLog() {
-        return this.fastLog;
+    public final LogType type() {
+        return this.type;
     }
 
     /**
      * Provide classic getter API.
      *
-     * @return A value of fastLog property.
+     * @return A value of type property.
      */
     @SuppressWarnings("unused")
-    private final boolean getFastLog() {
-        return this.fastLog;
+    private final LogType getType() {
+        return this.type;
     }
 
     /**
      * Provide classic setter API.
      *
-     * @paran value A new value of fastLog property to assign.
+     * @paran value A new value of type property to assign.
      */
-    private final void setFastLog(boolean value) {
+    private final void setType(LogType value) {
+        if (value == null) {
+            value = BackTestModel.super.type();
+        }
         try {
-            fastLogUpdater.invoke(this, value);
+            typeUpdater.invoke(this, value);
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -439,7 +443,7 @@ public abstract class BackTest implements BackTestModel {
         builder.append("initialBaseCurrency=").append(initialBaseCurrency).append(", ");
         builder.append("initialTargetCurrency=").append(initialTargetCurrency).append(", ");
         builder.append("detail=").append(detail).append(", ");
-        builder.append("fastLog=").append(fastLog).append("]");
+        builder.append("type=").append(type).append("]");
         return builder.toString();
     }
 
@@ -450,7 +454,7 @@ public abstract class BackTest implements BackTestModel {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(service, start, end, traders, initialBaseCurrency, initialTargetCurrency, detail, fastLog);
+        return Objects.hash(service, start, end, traders, initialBaseCurrency, initialTargetCurrency, detail, type);
     }
 
     /**
@@ -472,7 +476,7 @@ public abstract class BackTest implements BackTestModel {
         if (!Objects.equals(initialBaseCurrency, other.initialBaseCurrency)) return false;
         if (!Objects.equals(initialTargetCurrency, other.initialTargetCurrency)) return false;
         if (detail != other.detail) return false;
-        if (fastLog != other.fastLog) return false;
+        if (!Objects.equals(type, other.type)) return false;
         return true;
     }
 
@@ -664,14 +668,32 @@ public abstract class BackTest implements BackTestModel {
         }
 
         /**
-         * Assign fastLog property.
+         * Assign type property.
          * 
          * @param value A new value to assign.
          * @return The next assignable model.
          */
-        default Next fastLog(boolean value) {
-            ((BackTest) this).setFastLog(value);
+        default Next type(LogType value) {
+            ((BackTest) this).setType(value);
             return (Next) this;
+        }
+
+        /**
+         * Assign type property.
+         * 
+         * @return The next assignable model.
+         */
+        default Next fast() {
+            return type(LogType.Fast);
+        }
+
+        /**
+         * Assign type property.
+         * 
+         * @return The next assignable model.
+         */
+        default Next normal() {
+            return type(LogType.Normal);
         }
     }
 
@@ -698,6 +720,6 @@ public abstract class BackTest implements BackTestModel {
         static final String InitialBaseCurrency = "initialBaseCurrency";
         static final String InitialTargetCurrency = "initialTargetCurrency";
         static final String Detail = "detail";
-        static final String FastLog = "fastLog";
+        static final String Type = "type";
     }
 }

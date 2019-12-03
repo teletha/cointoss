@@ -22,6 +22,7 @@ import cointoss.analyze.Analyzer;
 import cointoss.analyze.ConsoleAnalyzer;
 import cointoss.analyze.TradingStatistics;
 import cointoss.execution.Execution;
+import cointoss.execution.ExecutionLog.LogType;
 import cointoss.ticker.Span;
 import cointoss.ticker.Tick;
 import cointoss.util.Chrono;
@@ -139,8 +140,8 @@ interface BackTestModel {
      * @return
      */
     @Icy.Property
-    default boolean fastLog() {
-        return false;
+    default LogType type() {
+        return LogType.Normal;
     }
 
     /**
@@ -170,7 +171,7 @@ interface BackTestModel {
         analyzer.initialize(market, traders());
 
         LocalDateTime start = LocalDateTime.now();
-        market.readLog(log -> log.range(start(), end()).effect(market::perform).effectOnComplete(() -> {
+        market.readLog(log -> log.range(start(), end(), type()).effect(market::perform).effectOnComplete(() -> {
             // Since a display that matches the actual final result can be expected, a dummy tick is
             // added at the end.
             Tick last = market.tickers.of(Span.Second5).last();

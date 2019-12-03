@@ -22,6 +22,7 @@ import cointoss.analyze.Analyzer;
 import cointoss.analyze.Statistics;
 import cointoss.analyze.TradingStatistics;
 import cointoss.execution.ExecutionLog;
+import cointoss.execution.ExecutionLog.LogType;
 import cointoss.market.MarketServiceProvider;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
@@ -219,6 +220,7 @@ public class BackTestView extends View implements Analyzer {
                     .end(endDate.zoned())
                     .traders()
                     .initialBaseCurrency(3000000)
+                    .type(LogType.Fast)
                     .run(this);
         });
 

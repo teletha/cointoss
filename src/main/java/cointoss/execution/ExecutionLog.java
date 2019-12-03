@@ -257,13 +257,13 @@ public class ExecutionLog {
      * @param start The start date.
      * @return
      */
-    public final synchronized Signal<Execution> from(ZonedDateTime start) {
+    public final synchronized Signal<Execution> from(ZonedDateTime start, LogType... type) {
         ZonedDateTime startDay = Chrono.between(cacheFirst, start, cacheLast).truncatedTo(ChronoUnit.DAYS);
 
         return I.signal(startDay)
                 .recurse(day -> day.plusDays(1))
                 .takeWhile(day -> day.isBefore(cacheLast) || day.isEqual(cacheLast))
-                .flatMap(day -> new Cache(day).read())
+                .flatMap(day -> new Cache(day).read(type))
                 .effect(e -> cacheId = e.id)
                 .take(e -> e.isAfter(start))
                 .effectOnComplete(() -> storedId = cacheId)
@@ -369,8 +369,8 @@ public class ExecutionLog {
      * @param day
      * @return
      */
-    public final Signal<Execution> at(int year, int month, int day) {
-        return at(LocalDate.of(year, month, day));
+    public final Signal<Execution> at(int year, int month, int day, LogType... type) {
+        return at(LocalDate.of(year, month, day), type);
     }
 
     /**
@@ -379,8 +379,8 @@ public class ExecutionLog {
      * @param date
      * @return
      */
-    public final Signal<Execution> at(LocalDate date) {
-        return at(date.atTime(0, 0).atZone(Chrono.UTC));
+    public final Signal<Execution> at(LocalDate date, LogType... type) {
+        return at(date.atTime(0, 0).atZone(Chrono.UTC), type);
     }
 
     /**
@@ -389,10 +389,10 @@ public class ExecutionLog {
      * @param date
      * @return
      */
-    public final Signal<Execution> at(ZonedDateTime date) {
+    public final Signal<Execution> at(ZonedDateTime date, LogType... type) {
         Stopwatch stopwatch = Stopwatch.createUnstarted();
 
-        return new Cache(date).read().effectOnObserve(() -> stopwatch.reset().start()).effectOnTerminate(() -> {
+        return new Cache(date).read(type).effectOnObserve(() -> stopwatch.reset().start()).effectOnTerminate(() -> {
             log.info("Process executions [{}] {}", date, stopwatch.stop().elapsed());
         });
     }
@@ -403,8 +403,8 @@ public class ExecutionLog {
      * @param init
      * @return
      */
-    public final Signal<Execution> fromToday() {
-        return fromLast(0);
+    public final Signal<Execution> fromToday(LogType... type) {
+        return fromLast(0, type);
     }
 
     /**
@@ -413,8 +413,8 @@ public class ExecutionLog {
      * @param init
      * @return
      */
-    public final Signal<Execution> fromYestaday() {
-        return fromLast(1);
+    public final Signal<Execution> fromYestaday(LogType... type) {
+        return fromLast(1, type);
     }
 
     /**
@@ -423,8 +423,8 @@ public class ExecutionLog {
      * @param init
      * @return
      */
-    public final Signal<Execution> fromLast(int days) {
-        return from(Chrono.utcNow().minusDays(days));
+    public final Signal<Execution> fromLast(int days, LogType... type) {
+        return from(Chrono.utcNow().minusDays(days), type);
     }
 
     /**
@@ -434,8 +434,8 @@ public class ExecutionLog {
      * @param limit
      * @return
      */
-    public final Signal<Execution> rangeAll() {
-        return range(cacheFirst, cacheLast);
+    public final Signal<Execution> rangeAll(LogType... type) {
+        return range(cacheFirst, cacheLast, type);
     }
 
     /**
@@ -445,8 +445,8 @@ public class ExecutionLog {
      * @param end
      * @return
      */
-    public final Signal<Execution> range(ZonedDateTime start, ZonedDateTime end) {
-        return I.signal(start).recurse(day -> day.plusDays(1)).takeUntil(day -> day.isEqual(end)).flatMap(day -> at(day));
+    public final Signal<Execution> range(ZonedDateTime start, ZonedDateTime end, LogType... type) {
+        return I.signal(start).recurse(day -> day.plusDays(1)).takeUntil(day -> day.isEqual(end)).flatMap(day -> at(day, type));
     }
 
     /**
@@ -455,10 +455,10 @@ public class ExecutionLog {
      * @param days
      * @return
      */
-    public final Signal<Execution> rangeRandom(int days) {
+    public final Signal<Execution> rangeRandom(int days, LogType... type) {
         long range = ChronoUnit.DAYS.between(cacheFirst, cacheLast.minusDays(days + 1));
         long offset = RandomUtils.nextLong(0, range);
-        return range(cacheFirst.plusDays(offset), cacheFirst.plusDays(offset + days));
+        return range(cacheFirst.plusDays(offset), cacheFirst.plusDays(offset + days), type);
     }
 
     /**
@@ -510,6 +510,13 @@ public class ExecutionLog {
      */
     final File locateFastLog(TemporalAccessor date) {
         return root.file("execution" + Chrono.DateCompact.format(date) + ".flog");
+    }
+
+    /**
+     * 
+     */
+    public enum LogType {
+        Normal, Fast;
     }
 
     /**
@@ -583,9 +590,11 @@ public class ExecutionLog {
         /**
          * Read cached date.
          * 
+         * @param types
          * @return
          */
-        private Signal<Execution> read() {
+        private Signal<Execution> read(LogType... types) {
+            LogType type = types == null || types.length == 0 ? LogType.Normal : types[0];
             Stopwatch stopwatch = Stopwatch.createUnstarted();
 
             try {
@@ -595,14 +604,26 @@ public class ExecutionLog {
 
                 CsvParser parser = new CsvParser(setting);
                 if (compact.isPresent()) {
-                    // read compact
-                    return I.signal(parser.iterate(new ZstdInputStream(compact.newInputStream()), ISO_8859_1))
-                            .scanWith(Market.BASE, logger::decode)
-                            .effectOnComplete(parser::stopParsing)
-                            .effectOnObserve(stopwatch::start)
-                            .effectOnComplete(() -> {
-                                log.info("Read compact log [{}] {}", date, stopwatch.stop().elapsed());
-                            });
+                    if (type == LogType.Fast) {
+                        // read fast
+                        writeFast();
+                        return I.signal(parser.iterate(new ZstdInputStream(fast.newInputStream()), ISO_8859_1))
+                                .scanWith(Market.BASE, logger::decode)
+                                .effectOnComplete(parser::stopParsing)
+                                .effectOnObserve(stopwatch::start)
+                                .effectOnComplete(() -> {
+                                    log.info("Read fast log [{}] {}", date, stopwatch.stop().elapsed());
+                                });
+                    } else {
+                        // read compact
+                        return I.signal(parser.iterate(new ZstdInputStream(compact.newInputStream()), ISO_8859_1))
+                                .scanWith(Market.BASE, logger::decode)
+                                .effectOnComplete(parser::stopParsing)
+                                .effectOnObserve(stopwatch::start)
+                                .effectOnComplete(() -> {
+                                    log.info("Read compact log [{}] {}", date, stopwatch.stop().elapsed());
+                                });
+                    }
                 } else if (normal.isAbsent()) {
                     // no data
                     return download();
@@ -750,6 +771,8 @@ public class ExecutionLog {
                     read().to(manager::update);
                     Ticker ticker = manager.of(Span.Second5);
 
+                    Execution[] prev = {Market.BASE};
+
                     CsvWriter writer = buildCsvWriter(new ZstdOutputStream(fast.newOutputStream(), 1));
                     ticker.each(tick -> {
                         long id = tick.openId;
@@ -761,13 +784,14 @@ public class ExecutionLog {
                                 : new Num[] {tick.openPrice, tick.highPrice(), tick.lowPrice(), tick.closePrice()};
 
                         for (int i = 0; i < prices.length; i++) {
-                            writer.writeRow(Execution.with.direction(sides[i], sizes[i])
+                            Execution e = Execution.with.direction(sides[i], sizes[i])
                                     .price(prices[i])
                                     .id(id + i)
                                     .date(tick.start.plusSeconds(i))
                                     .consecutive(Execution.ConsecutiveDifference)
-                                    .delay(Execution.DelayInestimable)
-                                    .toString());
+                                    .delay(Execution.DelayInestimable);
+                            writer.writeRow(logger.encode(prev[0], e));
+                            prev[0] = e;
                         }
                     });
                     writer.close();
@@ -900,14 +924,14 @@ public class ExecutionLog {
      * @param service
      * @param date
      */
-    public static void createCandleLog(MarketService service, ZonedDateTime date) {
+    public static void createFastLog(MarketService service, ZonedDateTime date) {
         ExecutionLog log = new ExecutionLog(service);
         Cache cache = log.cache(date);
         cache.writeFast();
     }
 
-    public static void main(String[] args) {
-        createCandleLog(BitFlyer.FX_BTC_JPY, Chrono.utc(2019, 11, 8));
+    public static void main1(String[] args) {
+        createFastLog(BitFlyer.FX_BTC_JPY, Chrono.utc(2019, 11, 8));
     }
 
     public static void main2(String[] args) {

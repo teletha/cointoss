@@ -9,6 +9,7 @@
  */
 package cointoss.verify;
 
+import cointoss.execution.ExecutionLog.LogType;
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.trading.LazyBear;
 
@@ -16,12 +17,11 @@ public class BackTestInvoker {
 
     public static void main(String[] args) throws InterruptedException {
         BackTest.with.service(BitFlyer.FX_BTC_JPY)
-                .start(2019, 11, 8)
-                .end(2019, 11, 8)
+                .start(2019, 11, 9)
+                .end(2019, 11, 9)
                 .traders(new LazyBear())
                 .initialBaseCurrency(3000000)
-                .detail(true)
-                .fastLog(true)
+                .type(LogType.Fast)
                 .run();
     }
 }
