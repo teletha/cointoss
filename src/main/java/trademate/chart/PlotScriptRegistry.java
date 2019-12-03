@@ -22,21 +22,25 @@ import kiss.I;
 import kiss.Manageable;
 import kiss.Singleton;
 import kiss.Storable;
+import kiss.Variable;
 import trademate.chart.builtin.SMAIndicator;
 import trademate.chart.builtin.VolumeIndicator;
 import trademate.chart.builtin.WaveTrendIndicator;
 
 @Manageable(lifestyle = Singleton.class)
-class PlotScriptRegistry implements Storable {
+class PlotScriptRegistry implements Storable<PlotScriptRegistry> {
 
     /** The managed scripts. */
     private Map<String, List<Class<? extends PlotScript>>> managedScripts = new HashMap();
+
+    /** The state holder for each script. (Global) */
+    private Map<Class<? extends PlotScript>, GlobalSetting> global = new HashMap();
 
     /**
      * 
      */
     protected PlotScriptRegistry() {
-        restore();
+        restore().auto();
     }
 
     /**
@@ -57,6 +61,26 @@ class PlotScriptRegistry implements Storable {
     @SuppressWarnings("unused")
     private void setManagedScripts(Map<String, List<Class<? extends PlotScript>>> managedScripts) {
         this.managedScripts = managedScripts;
+    }
+
+    /**
+     * Get the global property of this {@link PlotScriptRegistry}.
+     * 
+     * @return The global property.
+     */
+    @SuppressWarnings("unused")
+    private Map<Class<? extends PlotScript>, GlobalSetting> getGlobal() {
+        return global;
+    }
+
+    /**
+     * Set the global property of this {@link PlotScriptRegistry}.
+     * 
+     * @param global The global value to set.
+     */
+    @SuppressWarnings("unused")
+    private void setGlobal(Map<Class<? extends PlotScript>, GlobalSetting> global) {
+        this.global = global;
     }
 
     /**
@@ -171,5 +195,47 @@ class PlotScriptRegistry implements Storable {
      */
     protected List<Class<? extends PlotScript>> defaults() {
         return List.of(SMAIndicator.class, VolumeIndicator.class, WaveTrendIndicator.class);
+    }
+
+    /**
+     * Get {@link GlobalSetting} for each {@link PlotScript}.
+     * 
+     * @param script A target script.
+     * @return A global setting.
+     */
+    final GlobalSetting globalSetting(PlotScript script) {
+        return globalSetting(script.getClass());
+    }
+
+    /**
+     * Get {@link GlobalSetting} for each {@link PlotScript}.
+     * 
+     * @param script A target script.
+     * @return A global setting.
+     */
+    final GlobalSetting globalSetting(Class<? extends PlotScript> script) {
+        GlobalSetting setting = global.get(script);
+
+        if (setting == null) {
+            global.put(script, setting = new GlobalSetting());
+            store().auto();
+        }
+        return setting;
+    }
+
+    /**
+     * Global script setting.
+     */
+    public static class GlobalSetting {
+
+        /** The visibility. */
+        public final Variable<Boolean> visible = Variable.of(true);
+
+        /**
+         * Toggle visibility.
+         */
+        public void toggleVisible() {
+            visible.set(!visible.v);
+        }
     }
 }

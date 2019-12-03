@@ -19,6 +19,7 @@ import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.ContextMenuEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.LineTo;
@@ -43,6 +44,7 @@ import cointoss.ticker.Ticker;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
 import kiss.I;
+import kiss.Variable;
 import kiss.Ⅲ;
 import stylist.Style;
 import trademate.chart.Axis.TickLable;
@@ -126,6 +128,9 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     /** Flag whether candle chart shoud layout on the next rendering phase or not. */
     private final LayoutAssistant layoutCandleLatest = new LayoutAssistant(this);
 
+    /** The script registry. */
+    private final PlotScriptRegistry registry = I.make(PlotScriptRegistry.class);
+
     /** The cache by span. */
     private LoadingCache<Ⅲ<Market, Ticker, ObservableList<Supplier<PlotScript>>>, PlotDSL[]> plottersCache = CacheBuilder.newBuilder()
             .maximumSize(7)
@@ -134,7 +139,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
                 @Override
                 public PlotDSL[] load(Ⅲ<Market, Ticker, ObservableList<Supplier<PlotScript>>> v) throws Exception {
-                    List<PlotScript> registered = I.make(PlotScriptRegistry.class).findPlottersBy(v.ⅰ, v.ⅱ);
+                    List<PlotScript> registered = registry.findPlottersBy(v.ⅰ, v.ⅱ);
                     List<PlotScript> additional = I.signal(v.ⅲ).map(Supplier::get).toList();
 
                     List<PlotDSL> combined = I.signal(registered, additional)
@@ -150,6 +155,18 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
     /** The associated plot scripts. */
     private PlotDSL[] plotters = new PlotDSL[0];
+
+    /** The number of plot scripts. */
+    private List<PlotScript> scripts;
+
+    /** The size of chart infomation area. */
+    private final int chartInfoWidth = 60;
+
+    /** The size of chart infomation area. */
+    private final int chartInfoHeight = 16;
+
+    /** The size of chart infomation area. */
+    private final int chartInfoLeftPadding = 10;
 
     /**
      * Chart canvas.
@@ -180,6 +197,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
         chart.market.observe().combineLatest(chart.ticker.observe(), Viewtify.observeNow(chart.scripts)).to(v -> {
             plotters = plottersCache.getUnchecked(v);
+            scripts = I.signal(plotters).map(p -> p.origin).distinct().toList();
         });
 
         Viewtify.clip(this);
@@ -194,6 +212,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 .layoutBy(chart.ticker.observe().switchMap(ticker -> ticker.update.startWithNull()))
                 .layoutWhile(chart.showRealtimeUpdate.observeNow());
 
+        configIndicator();
         visualizeNotifyPrice();
         visualizeOrderPrice();
         visualizeLatestPrice();
@@ -210,6 +229,42 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     @Override
     public Node ui() {
         return this;
+    }
+
+    /**
+     * Configure indicator setting.
+     */
+    private void configIndicator() {
+        when(User.MouseClick).to(e -> {
+            findScriptByPosition(e).to(script -> {
+                registry.globalSetting(script).toggleVisible();
+
+                // redraw
+                layoutCandle.requestLayout();
+                layoutCandleLatest.requestLayout();
+                findTickByPostion(e).to(this::drawChartInfo);
+            });
+        });
+    }
+
+    /**
+     * Find the {@link PlotScript} by the mouse position.
+     * 
+     * @param e
+     * @return
+     */
+    private Variable<PlotScript> findScriptByPosition(MouseEvent e) {
+        double x = e.getX();
+        double y = e.getY();
+
+        if (scripts != null && x < chartInfoLeftPadding + chartInfoWidth && y < (scripts.size() + 1) * chartInfoHeight) {
+            int index = (int) (y / chartInfoHeight) - 1;
+
+            if (0 <= index) {
+                return Variable.of(scripts.get(index));
+            }
+        }
+        return Variable.empty();
     }
 
     /**
@@ -247,6 +302,21 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             GraphicsContext gc = chartInfo.getGraphicsContext2D();
             gc.clearRect(0, 0, chartInfo.getWidth(), chartInfo.getHeight());
         });
+    }
+
+    /**
+     * Find the {@link Tick} by the mouse position.
+     * 
+     * @param e
+     * @return
+     */
+    private Variable<Tick> findTickByPostion(MouseEvent e) {
+        double x = axisX.getValueForPosition(e.getX());
+
+        // move the start position forward for visual consistency
+        long sec = (long) x + chart.ticker.v.span.duration.toSeconds() / 2;
+
+        return chart.ticker.v.findByEpochSecond(sec);
     }
 
     /**
@@ -395,6 +465,10 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 gc.strokeLine(x, open, x, close);
 
                 for (PlotDSL plotter : plotters) {
+                    if (registry.globalSetting(plotter.origin).visible.is(false)) {
+                        continue;
+                    }
+
                     for (LineChart chart : plotter.lines) {
                         double calculated = chart.indicator.valueAt(tick).doubleValue();
 
@@ -417,6 +491,10 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             double height = candles.getHeight();
 
             for (PlotDSL plotter : plotters) {
+                if (registry.globalSetting(plotter.origin).visible.is(false)) {
+                    continue;
+                }
+
                 double scale = plotter.scale();
 
                 // draw horizontal line
@@ -471,6 +549,10 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 double lastX = axisX.getPositionForValue(tick.previous.start.toEpochSecond());
 
                 for (PlotDSL plotter : plotters) {
+                    if (registry.globalSetting(plotter.origin).visible.is(false)) {
+                        continue;
+                    }
+
                     double height = getHeight();
                     double scale = plotter.scale();
 
@@ -505,34 +587,33 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         String close = "C" + tick.closePrice().scale(base);
 
         int gap = 3;
-        int gapY = 16;
-        int width = 60;
-        int largeWidth = width * 2 + gap;
-        int y = gapY;
-        int offsetX = 10;
+        int largeWidth = chartInfoWidth * 2 + gap;
+        int y = chartInfoHeight;
         gc.setFill(InfoColor);
-        gc.fillText(date, offsetX, y, largeWidth);
-        gc.fillText(open, offsetX + largeWidth + gap, y, width);
-        gc.fillText(high, offsetX + largeWidth + width + gap * 2, y, width);
-        gc.fillText(low, offsetX + largeWidth + width * 2 + gap * 3, y, width);
-        gc.fillText(close, offsetX + largeWidth + width * 3 + gap * 4, y, width);
+        gc.fillText(date, chartInfoLeftPadding, y, largeWidth);
+        gc.fillText(open, chartInfoLeftPadding + largeWidth + gap, y, chartInfoWidth);
+        gc.fillText(high, chartInfoLeftPadding + largeWidth + chartInfoWidth + gap * 2, y, chartInfoWidth);
+        gc.fillText(low, chartInfoLeftPadding + largeWidth + chartInfoWidth * 2 + gap * 3, y, chartInfoWidth);
+        gc.fillText(close, chartInfoLeftPadding + largeWidth + chartInfoWidth * 3 + gap * 4, y, chartInfoWidth);
 
         // indicator values drawn from the same plot script are displayed on the same line
         int x = 0;
         Object origin = null;
         for (PlotDSL plotter : plotters) {
+            boolean visible = registry.globalSetting(plotter.origin).visible.v;
+
             if (origin != plotter.origin) {
-                y += gapY;
-                x = offsetX;
+                y += chartInfoHeight;
+                x = chartInfoLeftPadding;
                 origin = plotter.origin;
-                gc.setFill(InfoColor);
-                gc.fillText(plotter.origin.toString(), x, y, width);
-                x += width + gap;
+                gc.setFill(visible ? InfoColor : InfoColor.deriveColor(0, 1, 1, 0.4));
+                gc.fillText(plotter.origin.toString(), x, y, chartInfoWidth);
+                x += chartInfoWidth + gap;
             }
             for (LineChart chart : plotter.lines) {
-                gc.setFill(chart.color);
-                gc.fillText(chart.info.valueAt(tick), x, y, width);
-                x += width + gap;
+                gc.setFill(visible ? chart.color : chart.color.deriveColor(0, 1, 1, 0.4));
+                gc.fillText(chart.info.valueAt(tick), x, y, chartInfoWidth);
+                x += chartInfoWidth + gap;
             }
         }
     }

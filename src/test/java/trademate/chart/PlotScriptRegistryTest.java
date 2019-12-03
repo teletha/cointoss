@@ -10,6 +10,7 @@
 package trademate.chart;
 
 import java.util.List;
+import java.util.function.Function;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -21,7 +22,9 @@ import cointoss.Market;
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.ticker.Span;
 import cointoss.ticker.Ticker;
+import kiss.Disposable;
 import kiss.Variable;
+import trademate.chart.PlotScriptRegistry.GlobalSetting;
 
 @Execution(ExecutionMode.SAME_THREAD)
 class PlotScriptRegistryTest {
@@ -53,6 +56,27 @@ class PlotScriptRegistryTest {
         assert registry.findPlottersBy(BitFlyer.BTC_JPY, Span.Hour1).size() == 1;
         registry.unregister(BitFlyer.BTC_JPY, SMA.class);
         assert registry.findPlottersBy(BitFlyer.BTC_JPY, Span.Hour1).size() == 0;
+    }
+
+    @Test
+    void visibility() {
+        PlotScriptRegistry registry = new TestablePlotScriptRegistry();
+        GlobalSetting setting = registry.globalSetting(Volume.class);
+        assert setting.visible.is(true);
+
+        setting.visible.set(false);
+        assert setting.visible.is(false);
+
+        setting.visible.set(true);
+        assert setting.visible.is(true);
+
+        setting.toggleVisible();
+        assert setting.visible.is(false);
+
+        // save automatically
+        PlotScriptRegistry otherRegistry = new TestablePlotScriptRegistry();
+        GlobalSetting otherSetting = otherRegistry.globalSetting(Volume.class);
+        assert otherSetting.visible.is(false);
     }
 
     /**
@@ -91,6 +115,14 @@ class PlotScriptRegistryTest {
      * 
      */
     private static class TestablePlotScriptRegistry extends PlotScriptRegistry {
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Disposable auto() {
+            return auto(Function.identity());
+        }
 
         /**
          * {@inheritDoc}
