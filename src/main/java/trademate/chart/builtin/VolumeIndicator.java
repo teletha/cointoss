@@ -14,6 +14,7 @@ import cointoss.ticker.Indicator;
 import cointoss.ticker.Tick;
 import cointoss.ticker.Ticker;
 import cointoss.util.Num;
+import kiss.Variable;
 import stylist.Style;
 import stylist.StyleDSL;
 import trademate.chart.ChartStyles;
@@ -29,6 +30,16 @@ public class VolumeIndicator extends PlotScript implements StyleDSL {
         stroke.color(ChartStyles.sell);
     };
 
+    public final Variable<Integer> emaLength = Variable.of(1);
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String name() {
+        return super.name() + "(" + emaLength + ")";
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -40,7 +51,7 @@ public class VolumeIndicator extends PlotScript implements StyleDSL {
         Indicator<Num> buyVolume = Indicator.build(ticker, Tick::buyVolume);
         Indicator<Num> sellVolume = Indicator.build(ticker, Tick::sellVolume);
 
-        bottom.line(buyVolume.ema(7).scale(volumeScale), Long);
-        bottom.line(sellVolume.ema(7).scale(volumeScale), Short);
+        bottom.line(buyVolume.ema(emaLength).scale(volumeScale), Long);
+        bottom.line(sellVolume.ema(emaLength).scale(volumeScale), Short);
     }
 }

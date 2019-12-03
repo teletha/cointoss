@@ -164,7 +164,7 @@ public final class SegmentBuffer<E> {
         }
 
         // ucompleted
-        return uncompleted[index];
+        return index < size() ? uncompleted[index] : null;
     }
 
     /**

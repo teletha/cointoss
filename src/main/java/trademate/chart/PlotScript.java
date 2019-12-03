@@ -60,15 +60,24 @@ public abstract class PlotScript {
     protected abstract void declare(Market market, Ticker ticker);
 
     /**
-     * {@inheritDoc}
+     * Return the indicator name.
+     * 
+     * @return
      */
-    @Override
-    public String toString() {
+    public String name() {
         Class clazz = getClass();
         if (clazz.isMemberClass()) {
             clazz = clazz.getEnclosingClass();
         }
         return clazz.getSimpleName().replace("Indicator", "");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        return name();
     }
 
     /**

@@ -112,7 +112,7 @@ public class TradingView extends View {
             chart.market.set(market);
 
             whileInit = true;
-            market.readLog(log -> log.fromLast(3, LogType.Fast));
+            market.readLog(log -> log.fromLast(4, LogType.Fast));
             whileInit = false;
 
             chart.restoreRealtimeUpdate();
