@@ -22,6 +22,7 @@ import javafx.scene.text.FontSmoothingType;
 import cointoss.order.OrderBookManager;
 import cointoss.order.OrderUnit;
 import cointoss.util.Num;
+import kiss.WiseRunnable;
 import stylist.Style;
 import stylist.StyleDSL;
 import trademate.TradeMateStyle;
@@ -32,6 +33,7 @@ import viewtify.ui.UILabel;
 import viewtify.ui.UIListView;
 import viewtify.ui.UISpinner;
 import viewtify.ui.View;
+import viewtify.ui.helper.User;
 import viewtify.util.FXUtils;
 
 public class OrderBookView extends View {
@@ -125,9 +127,11 @@ public class OrderBookView extends View {
 
         int scale = view.market.service.setting.targetCurrencyScaleSize;
         longList.renderByNode(displayOrderUnit(TradeMateStyle.BUY, scale))
-                .take(hideSize, (unit, size) -> unit.size.isGreaterThanOrEqual(size));
+                .take(hideSize, (unit, size) -> unit.size.isGreaterThanOrEqual(size))
+                .when(User.LeftClick, calculatePrice(longList));
         shortList.renderByNode(displayOrderUnit(TradeMateStyle.SELL, scale))
                 .take(hideSize, (unit, size) -> unit.size.isGreaterThanOrEqual(size))
+                .when(User.LeftClick, calculatePrice(shortList))
                 .scrollToBottom();
 
         priceRange.values(0, view.market.service.setting.orderBookGroupRangesWithBase()).observeNow(range -> {
@@ -136,6 +140,31 @@ public class OrderBookView extends View {
         });
 
         view.market.orderBook.spread.observe().skipWhile(view.initializing).on(Viewtify.UIThread).to(price -> priceSpread.text(price));
+    }
+
+    /**
+     * Calculate the best price.
+     * 
+     * @param list
+     * @return
+     */
+    private WiseRunnable calculatePrice(UIListView<OrderUnit> list) {
+        return () -> {
+            if (list == longList) {
+                list.selectedItem().to(unit -> {
+                    Num min = unit.price;
+                    Num max = min.plus(priceRange.value());
+                    Num best = book.longs.computeBestPrice(max, Num.of(3), Num.ONE);
+                    view.builder.orderPrice.value(best.toString());
+                });
+            } else {
+                list.selectedItem().to(unit -> {
+                    Num min = unit.price;
+                    Num best = book.shorts.computeBestPrice(min, Num.of(3), Num.ONE);
+                    view.builder.orderPrice.value(best.toString());
+                });
+            }
+        };
     }
 
     /**
