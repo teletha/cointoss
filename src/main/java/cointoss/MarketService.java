@@ -299,7 +299,7 @@ public abstract class MarketService implements Disposable {
      */
     @Override
     public String toString() {
-        return marketIdentity();
+        return marketReadableName();
     }
 
     /**

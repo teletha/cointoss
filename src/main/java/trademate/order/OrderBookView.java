@@ -123,7 +123,7 @@ public class OrderBookView extends View {
         book.longs.setOperator(Viewtify.UIThread);
         book.shorts.setOperator(Viewtify.UIThread);
 
-        hideSize.values(0, Num.range(0, 99));
+        hideSize.items(Num.range(0, 99)).initial(0);
 
         int scale = view.market.service.setting.targetCurrencyScaleSize;
         longList.renderByNode(displayOrderUnit(TradeMateStyle.BUY, scale))
@@ -134,7 +134,7 @@ public class OrderBookView extends View {
                 .when(User.LeftClick, calculatePrice(shortList))
                 .scrollToBottom();
 
-        priceRange.values(0, view.market.service.setting.orderBookGroupRangesWithBase()).observeNow(range -> {
+        priceRange.items(view.market.service.setting.orderBookGroupRangesWithBase()).initial(0).observeNow(range -> {
             longList.items((ObservableList) book.longs.selectBy(range));
             shortList.items((ObservableList) book.shorts.selectBy(range));
         });
@@ -155,13 +155,13 @@ public class OrderBookView extends View {
                     Num min = unit.price;
                     Num max = min.plus(priceRange.value());
                     Num best = book.longs.computeBestPrice(max, Num.of(3), Num.ONE);
-                    view.builder.orderPrice.value(best.toString());
+                    view.builder.orderPrice.model(best.toString());
                 });
             } else {
                 list.selectedItem().to(unit -> {
                     Num min = unit.price;
                     Num best = book.shorts.computeBestPrice(min, Num.of(3), Num.ONE);
-                    view.builder.orderPrice.value(best.toString());
+                    view.builder.orderPrice.model(best.toString());
                 });
             }
         };

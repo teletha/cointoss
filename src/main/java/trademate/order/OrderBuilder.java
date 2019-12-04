@@ -195,20 +195,22 @@ public class OrderBuilder extends View {
     @Override
     protected void initialize() {
         orderSize.initial("0").when(User.Scroll, changeBy(orderSizeAmount.ui)).require(positiveNumber);
-        orderSizeAmount.values(0, view.service.setting.targetCurrencyBidSizes());
+        orderSizeAmount.items(view.service.setting.targetCurrencyBidSizes()).initial(0);
 
         orderPrice.initial("0").when(User.Scroll, changeBy(orderPriceAmount.ui)).require(positiveNumber);
-        orderPriceAmount.values(0, Num.ONE, Num.HUNDRED, Num.THOUSAND, Num.of(10000));
+        orderPriceAmount.items(Num.ONE, Num.HUNDRED, Num.THOUSAND, Num.of(10000)).initial(0);
 
-        orderDivideSize.values(0, IntStream.range(1, 31).boxed());
-        orderDivideIntervalAmount.values(0, IntStream.range(0, 20).boxed()).disableWhen(orderDivideSize.ui.valueProperty().isEqualTo(1));
-        optimizeThreshold.values(0, Num.range(0, 20));
+        orderDivideSize.items(IntStream.range(1, 31).boxed()).initial(0);
+        orderDivideIntervalAmount.items(IntStream.range(0, 20).boxed())
+                .disableWhen(orderDivideSize.ui.valueProperty().isEqualTo(1))
+                .initial(0);
+        optimizeThreshold.items(Num.range(0, 20)).initial(0);
         orderPriceInterval.initial("0")
                 .when(User.Scroll, changeBy(orderPriceIntervalAmount.ui))
                 .require(positiveNumber)
                 .parent()
                 .disableWhen(orderDivideSize.ui.valueProperty().isEqualTo(1));
-        orderPriceIntervalAmount.values(0, Num.TEN, Num.HUNDRED, Num.THOUSAND);
+        orderPriceIntervalAmount.items(Num.TEN, Num.HUNDRED, Num.THOUSAND).initial(0);
 
         // validate order condition
         orderLimitLong.parent().disableWhen(orderSize.isInvalid(), orderPrice.isInvalid());
@@ -247,10 +249,10 @@ public class OrderBuilder extends View {
 
             if (deltaY > 0) {
                 // increment
-                ui.value(current.plus(spinner.getValue()).toString());
+                ui.model(current.plus(spinner.getValue()).toString());
             } else if (deltaY < 0) {
                 // decrement
-                ui.value(Num.max(Num.ZERO, current.minus(spinner.getValue())).toString());
+                ui.model(Num.max(Num.ZERO, current.minus(spinner.getValue())).toString());
             }
         };
     }

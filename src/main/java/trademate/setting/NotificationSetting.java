@@ -108,10 +108,10 @@ public class NotificationSetting extends View {
     @Override
     protected void initialize() {
         // For Desktop
-        desktopDuration.values(I.signal(2).recurse(v -> v + 2).take(30).map(Duration::ofSeconds))
+        desktopDuration.items(I.signal(2).recurse(v -> v + 2).take(30).map(Duration::ofSeconds))
                 .model(notificator.desktopDuration)
                 .text(duration -> duration.getSeconds() + en("seconds").get());
-        desktopPosition.values(DesktopPosition.class).model(notificator.desktopPosition);
+        desktopPosition.items(DesktopPosition.class).model(notificator.desktopPosition);
 
         // For LINE
         lineAccessToken.model(notificator.lineAccessToken);
@@ -155,7 +155,7 @@ public class NotificationSetting extends View {
         protected void initialize() {
             desktop.model(notify.desktop);
             line.model(notify.line).disableWhen(notificator.lineAccessToken.iŝ(String::isEmpty));
-            sound.values(Sound.values()).model(notify.sound).when(User.Action, e -> {
+            sound.items(Sound.values()).model(notify.sound).when(User.Action, e -> {
                 sound.value().play();
             });
         }

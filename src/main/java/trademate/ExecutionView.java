@@ -74,7 +74,7 @@ public class ExecutionView extends View {
         int targetScale = view.market.service.setting.targetCurrencyScaleSize;
 
         // configure UI
-        takerSize.values(IntStream.range(1, 51).boxed()).initial(10);
+        takerSize.items(IntStream.range(1, 51).boxed()).initial(10);
         executionList.renderByUI(execution(targetScale, false));
         executionCumulativeList.renderByUI(execution(targetScale, true))
                 .take(takerSize, (e, size) -> e.accumulative.isGreaterThanOrEqual(size));
