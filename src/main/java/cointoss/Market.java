@@ -124,7 +124,7 @@ public class Market implements Disposable {
      * Start reading {@link OrderBook}.
      */
     protected void readOrderBook() {
-        RetryPolicy policy = service.retryPolicy();
+        RetryPolicy policy = service.retryPolicy(500);
 
         // orderbook management
         service.add(service.orderBook().retryWhen(policy).to(board -> {

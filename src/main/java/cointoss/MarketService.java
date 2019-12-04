@@ -279,10 +279,11 @@ public abstract class MarketService implements Disposable {
     /**
      * Create new {@link RetryPolicy}.
      * 
+     * @param max The maximum number to retry.
      * @return
      */
-    public RetryPolicy retryPolicy() {
-        return RetryPolicy.with.limit(500).delayLinear(Duration.ofSeconds(2)).delayMaximum(Duration.ofMinutes(2));
+    public RetryPolicy retryPolicy(int max) {
+        return RetryPolicy.with.limit(max).delayLinear(Duration.ofSeconds(2)).delayMaximum(Duration.ofMinutes(2)).scheduler(scheduler());
     }
 
     /**

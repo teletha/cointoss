@@ -202,7 +202,7 @@ public class ExecutionLog {
         this.root = Objects.requireNonNull(root);
         this.store = root.file("lastID.log");
         this.logger = I.make(service.setting.executionLogger());
-        this.policy = service.retryPolicy();
+        this.policy = service.retryPolicy(500);
 
         try {
             ZonedDateTime start = null;

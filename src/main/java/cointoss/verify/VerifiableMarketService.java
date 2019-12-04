@@ -323,7 +323,7 @@ public class VerifiableMarketService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public RetryPolicy retryPolicy() {
+    public RetryPolicy retryPolicy(int max) {
         return RetryPolicy.with.unlimit().delayMaximum(Duration.ZERO);
     }
 
