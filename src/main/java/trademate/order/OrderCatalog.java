@@ -17,6 +17,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.function.Consumer;
 
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableRow;
 
 import cointoss.Direction;
@@ -24,7 +25,6 @@ import cointoss.order.Order;
 import cointoss.order.OrderState;
 import cointoss.util.Num;
 import kiss.I;
-import kiss.Variable;
 import stylist.Style;
 import stylist.StyleDSL;
 import stylist.ValueStyle;
@@ -37,6 +37,7 @@ import viewtify.ui.UITableColumn;
 import viewtify.ui.UITableView;
 import viewtify.ui.View;
 import viewtify.ui.helper.StyleHelper;
+import viewtify.ui.helper.User;
 
 public class OrderCatalog extends View {
 
@@ -83,10 +84,12 @@ public class OrderCatalog extends View {
      */
     @Override
     protected void initialize() {
-        table.selectMultipleRows().render(table -> new CatalogRow()).context($ -> {
-            Calculated<Boolean> ordersArePassive = table.selection().flatVariable(o -> Variable.of(o.state)).isNot(ACTIVE);
+        table.mode(SelectionMode.MULTIPLE).render(table -> new CatalogRow()).context($ -> {
+            Calculated<Boolean> ordersArePassive = Viewtify.calculate(table.selectedItems())
+                    .flatVariable(o -> o.observeStateNow().to())
+                    .isNot(ACTIVE);
 
-            $.menu().text(Cancel).disableWhen(ordersArePassive).whenUserClick(e -> act(this::cancel));
+            $.menu().text(Cancel).disableWhen(ordersArePassive).when(User.Action, e -> act(this::cancel));
         });
 
         date.text(Date)
@@ -124,7 +127,7 @@ public class OrderCatalog extends View {
      * @param order
      */
     private void act(Consumer<Order> forOrder) {
-        for (Order order : table.selection()) {
+        for (Order order : table.selectedItems()) {
             forOrder.accept(order);
         }
     }

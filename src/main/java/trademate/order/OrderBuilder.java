@@ -293,7 +293,7 @@ public class OrderBuilder extends View {
 
         Style Root = () -> {
             padding.horizontal(10, px);
-            display.minWidth(250, px);
+            display.minWidth(270, px);
         };
 
         Style Row = () -> {
@@ -318,7 +318,7 @@ public class OrderBuilder extends View {
         };
 
         Style FormMin = () -> {
-            display.maxWidth(70, px).height(27, px);
+            display.maxWidth(72, px).height(27, px);
             margin.left(15, px);
         };
 

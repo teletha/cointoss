@@ -15,7 +15,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Supplier;
 
 import javafx.collections.ObservableList;
-import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.ContextMenuEvent;
@@ -227,7 +226,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
      * {@inheritDoc}
      */
     @Override
-    public Node ui() {
+    public Object ui() {
         return this;
     }
 
