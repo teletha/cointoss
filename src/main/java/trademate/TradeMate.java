@@ -11,6 +11,8 @@ package trademate;
 
 import java.util.Locale;
 
+import javafx.scene.control.TabPane.TabClosingPolicy;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -44,10 +46,12 @@ public class TradeMate extends View {
      */
     @Override
     protected void initialize() {
-        main.load("Setting", SettingView.class)
+        main.policy(TabClosingPolicy.UNAVAILABLE)
+                .load("Setting", SettingView.class)
                 .load("Back Test", BackTestView.class)
-                .load("BitFlyer FX", tab -> new TradingView(BitFlyer.FX_BTC_JPY))
+                .load(BitFlyer.FX_BTC_JPY.marketReadableName(), tab -> new TradingView(tab, BitFlyer.FX_BTC_JPY))
                 .initial(0);
+
     }
 
     /**

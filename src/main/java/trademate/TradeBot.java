@@ -14,41 +14,13 @@ import java.util.Locale;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import cointoss.market.bitflyer.BitFlyer;
 import cointoss.util.Network;
 import kiss.I;
-import kiss.Manageable;
-import kiss.Singleton;
-import trademate.setting.SettingView;
-import trademate.verify.BackTestView;
 import transcript.Lang;
 import viewtify.Theme;
 import viewtify.Viewtify;
-import viewtify.ui.UI;
-import viewtify.ui.UITabPane;
-import viewtify.ui.View;
 
-@Manageable(lifestyle = Singleton.class)
-public class TradeBot extends View {
-
-    private UITabPane main;
-
-    class view extends UI {
-        {
-            $(main);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void initialize() {
-        main.load("Setting", SettingView.class)
-                .load("Back Test", BackTestView.class)
-                .load("BitFlyer FX", tab -> new TradingView(BitFlyer.FX_BTC_JPY))
-                .initial(0);
-    }
+public class TradeBot extends TradeMate {
 
     /**
      * Entry point.

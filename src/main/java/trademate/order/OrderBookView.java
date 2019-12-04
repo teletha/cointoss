@@ -46,9 +46,6 @@ public class OrderBookView extends View {
     private UISpinner<Num> priceRange;
 
     /** UI for interval configuration. */
-    private UILabel priceLatest;
-
-    /** UI for interval configuration. */
     private UILabel priceSpread;
 
     /** UI for interval configuration. */
@@ -69,7 +66,6 @@ public class OrderBookView extends View {
                 $(shortList, style.book);
                 $(hbox, () -> {
                     $(priceRange, style.priceRange);
-                    $(priceLatest, style.priceLatest);
                     $(priceSpread, style.priceSpread);
                     $(hideSize, style.hideSize);
                 });
@@ -84,7 +80,7 @@ public class OrderBookView extends View {
     interface style extends StyleDSL {
 
         Style root = () -> {
-            display.minWidth(212, px).maxWidth(212, px);
+            display.minWidth(158, px).maxWidth(158, px);
         };
 
         Style book = () -> {
@@ -96,20 +92,21 @@ public class OrderBookView extends View {
         };
 
         Style priceRange = () -> {
-            display.width(72, px);
+            display.width(76, px);
         };
 
-        Style priceLatest = () -> {
-            display.width(64, px).height(25, px);
-            text.indent(4, px);
-        };
+        // Style priceLatest = () -> {
+        // display.width(64, px).height(25, px);
+        // text.indent(4, px);
+        // };
 
         Style priceSpread = () -> {
-            display.width(46, px).height(25, px);
+            display.width(50, px).height(25, px);
+            text.indent(5, px);
         };
 
         Style hideSize = () -> {
-            display.width(60, px);
+            display.width(62, px);
         };
     }
 
@@ -138,7 +135,6 @@ public class OrderBookView extends View {
             shortList.items((ObservableList) book.shorts.selectBy(range));
         });
 
-        view.market.tickers.latest.observe().skipWhile(view.initializing).on(Viewtify.UIThread).to(e -> priceLatest.text(e.price));
         view.market.orderBook.spread.observe().skipWhile(view.initializing).on(Viewtify.UIThread).to(price -> priceSpread.text(price));
     }
 
@@ -169,7 +165,7 @@ public class OrderBookView extends View {
             c.setFont(font);
             c.setFill(foreground);
             c.setFontSmoothingType(FontSmoothingType.LCD);
-            c.fillText(e.price + " " + size, 60, height - 3, width - 60 - 10);
+            c.fillText(e.price + " " + size, 35, height - 3, width - 35);
 
             return canvas;
         };

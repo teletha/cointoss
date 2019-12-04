@@ -90,6 +90,15 @@ public abstract class MarketService implements Disposable {
     }
 
     /**
+     * Returns the human-readable name of market.
+     * 
+     * @return A human-readable name.
+     */
+    public String marketReadableName() {
+        return marketIdentity().replaceAll("_", " ");
+    }
+
+    /**
      * Estimate the curernt order delay (second).
      * 
      * @return

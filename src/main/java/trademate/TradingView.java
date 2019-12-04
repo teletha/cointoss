@@ -24,15 +24,26 @@ import trademate.order.OrderBuilder;
 import trademate.order.OrderCatalog;
 import viewtify.Viewtify;
 import viewtify.ui.UI;
+import viewtify.ui.UILabel;
+import viewtify.ui.UITab;
 import viewtify.ui.View;
 
 public class TradingView extends View {
+
+    /** The market tab. */
+    private final UITab tab;
 
     /** The associated market service. */
     public final MarketService service;
 
     /** The associated market. */
     public final Market market;
+
+    /** The market title. */
+    private UILabel title;
+
+    /** The market latest price. */
+    private UILabel price;
 
     public ExecutionView executionView;
 
@@ -63,9 +74,11 @@ public class TradingView extends View {
     public final Predicate<Object> initializing = e -> whileInit;
 
     /**
+     * @param tab
      * @param service
      */
-    public TradingView(MarketService service) {
+    public TradingView(UITab tab, MarketService service) {
+        this.tab = tab;
         this.service = service;
         this.market = new Market(service);
 
@@ -100,6 +113,14 @@ public class TradingView extends View {
         Style fill = () -> {
             display.height.fill().width.fill();
         };
+
+        Style tabTitle = () -> {
+            font.size(11, px);
+        };
+
+        Style tabPrice = () -> {
+            font.size(11, px);
+        };
     }
 
     /**
@@ -116,6 +137,13 @@ public class TradingView extends View {
             whileInit = false;
 
             chart.restoreRealtimeUpdate();
+        });
+
+        title.text(service.marketReadableName()).style(style.tabTitle);
+        price.style(style.tabPrice);
+
+        market.tickers.latestPrice.observe().skipWhile(initializing).on(Viewtify.UIThread).to(latest -> {
+            tab.textV(title, price.text(latest));
         });
     }
 
