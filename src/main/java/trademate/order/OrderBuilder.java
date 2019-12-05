@@ -194,23 +194,21 @@ public class OrderBuilder extends View {
      */
     @Override
     protected void initialize() {
-        orderSize.initial("0").when(User.Scroll, changeBy(orderSizeAmount.ui)).require(positiveNumber);
-        orderSizeAmount.items(view.service.setting.targetCurrencyBidSizes()).initial(0);
+        orderSize.initialize("0").when(User.Scroll, changeBy(orderSizeAmount.ui)).require(positiveNumber);
+        orderSizeAmount.initialize(view.service.setting.targetCurrencyBidSizes());
 
-        orderPrice.initial("0").when(User.Scroll, changeBy(orderPriceAmount.ui)).require(positiveNumber);
-        orderPriceAmount.items(Num.ONE, Num.HUNDRED, Num.THOUSAND, Num.of(10000)).initial(0);
+        orderPrice.initialize("0").when(User.Scroll, changeBy(orderPriceAmount.ui)).require(positiveNumber);
+        orderPriceAmount.initialize(Num.ONE, Num.HUNDRED, Num.THOUSAND, Num.of(10000));
 
-        orderDivideSize.items(IntStream.range(1, 31).boxed()).initial(0);
-        orderDivideIntervalAmount.items(IntStream.range(0, 20).boxed())
-                .disableWhen(orderDivideSize.ui.valueProperty().isEqualTo(1))
-                .initial(0);
-        optimizeThreshold.items(Num.range(0, 20)).initial(0);
-        orderPriceInterval.initial("0")
+        orderDivideSize.initialize(IntStream.range(1, 31).boxed());
+        orderDivideIntervalAmount.initialize(IntStream.range(0, 20).boxed()).disableWhen(orderDivideSize.ui.valueProperty().isEqualTo(1));
+        optimizeThreshold.initialize(Num.range(0, 20));
+        orderPriceInterval.initialize("0")
                 .when(User.Scroll, changeBy(orderPriceIntervalAmount.ui))
                 .require(positiveNumber)
                 .parent()
                 .disableWhen(orderDivideSize.ui.valueProperty().isEqualTo(1));
-        orderPriceIntervalAmount.items(Num.TEN, Num.HUNDRED, Num.THOUSAND).initial(0);
+        orderPriceIntervalAmount.initialize(Num.TEN, Num.HUNDRED, Num.THOUSAND);
 
         // validate order condition
         orderLimitLong.parent().disableWhen(orderSize.isInvalid(), orderPrice.isInvalid());
@@ -249,10 +247,10 @@ public class OrderBuilder extends View {
 
             if (deltaY > 0) {
                 // increment
-                ui.model(current.plus(spinner.getValue()).toString());
+                ui.value(current.plus(spinner.getValue()).toString());
             } else if (deltaY < 0) {
                 // decrement
-                ui.model(Num.max(Num.ZERO, current.minus(spinner.getValue())).toString());
+                ui.value(Num.max(Num.ZERO, current.minus(spinner.getValue())).toString());
             }
         };
     }

@@ -109,12 +109,12 @@ public class NotificationSetting extends View {
     protected void initialize() {
         // For Desktop
         desktopDuration.items(I.signal(2).recurse(v -> v + 2).take(30).map(Duration::ofSeconds))
-                .model(notificator.desktopDuration)
+                .sync(notificator.desktopDuration)
                 .text(duration -> duration.getSeconds() + en("seconds").get());
-        desktopPosition.items(DesktopPosition.class).model(notificator.desktopPosition);
+        desktopPosition.items(DesktopPosition.values()).sync(notificator.desktopPosition);
 
         // For LINE
-        lineAccessToken.model(notificator.lineAccessToken);
+        lineAccessToken.sync(notificator.lineAccessToken);
         lineTest.text(en("Send test message")).when(User.Action, () -> {
             I.make(Network.class).line("TEST").to(e -> {
                 lineAccessToken.decorateBy(Icon.Success);
@@ -153,9 +153,9 @@ public class NotificationSetting extends View {
          */
         @Override
         protected void initialize() {
-            desktop.model(notify.desktop);
-            line.model(notify.line).disableWhen(notificator.lineAccessToken.iŝ(String::isEmpty));
-            sound.items(Sound.values()).model(notify.sound).when(User.Action, e -> {
+            desktop.sync(notify.desktop);
+            line.sync(notify.line).disableWhen(notificator.lineAccessToken.iŝ(String::isEmpty));
+            sound.items(Sound.values()).sync(notify.sound).when(User.Action, e -> {
                 sound.value().play();
             });
         }

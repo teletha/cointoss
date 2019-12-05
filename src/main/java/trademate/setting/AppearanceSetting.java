@@ -53,7 +53,7 @@ public class AppearanceSetting extends View {
      */
     @Override
     protected void initialize() {
-        buy.model(theme.Long);
-        sell.model(theme.Short);
+        buy.sync(theme.Long);
+        sell.sync(theme.Short);
     }
 }

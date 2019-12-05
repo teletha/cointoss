@@ -106,12 +106,12 @@ public class BitFlyerSetting extends View {
      */
     @Override
     protected void initialize() {
-        apiKey.model(account.apiKey);
-        apiSecret.model(account.apiSecret);
-        loginId.model(account.loginId);
-        loginPassword.model(account.loginPassword);
-        accountId.model(account.accountId);
-        accountToken.model(account.accountToken);
+        apiKey.sync(account.apiKey);
+        apiSecret.sync(account.apiSecret);
+        loginId.sync(account.loginId);
+        loginPassword.sync(account.loginPassword);
+        accountId.sync(account.accountId);
+        accountToken.sync(account.accountToken);
 
         loginBackground.when(User.Action).to(() -> {
             if (Lang.current() == Lang.EN) {

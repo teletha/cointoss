@@ -86,7 +86,7 @@ public class ChartView extends View {
      */
     @Override
     protected void initialize() {
-        span.items(Span.class).initial(Span.Minute1);
+        span.initialize(Span.values()).value(Span.Minute1);
         span.observeNow() //
                 .skipNull()
                 .combineLatest(market.observeNow().skipNull())
