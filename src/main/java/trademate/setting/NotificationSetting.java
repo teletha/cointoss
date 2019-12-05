@@ -110,7 +110,7 @@ public class NotificationSetting extends View {
         // For Desktop
         desktopDuration.items(I.signal(2).recurse(v -> v + 2).take(30).map(Duration::ofSeconds))
                 .sync(notificator.desktopDuration)
-                .text(duration -> duration.getSeconds() + en("seconds").get());
+                .format(duration -> duration.getSeconds() + en("seconds").get());
         desktopPosition.items(DesktopPosition.values()).sync(notificator.desktopPosition);
 
         // For LINE
