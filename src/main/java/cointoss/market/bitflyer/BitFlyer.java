@@ -23,7 +23,7 @@ public final class BitFlyer extends MarketServiceProvider {
     /** Reusable market configuration. */
     private static MarketSetting FiatBaseSetting = MarketSetting.with.baseCurrencyMinimumBidPrice(Num.of(1))
             .targetCurrencyMinimumBidSize(Num.of("0.01"))
-            .orderBookGroupRanges(Num.of(50, 100, 250, 500, 1000, 2500, 5000))
+            .orderBookGroupRanges(Num.of(10, 50, 100, 250, 500, 1000, 2500, 5000, 10000, 20000))
             .targetCurrencyScaleSize(3)
             .acquirableExecutionSize(499)
             .executionLogger(BitFlyerLogger.class);

@@ -10,6 +10,7 @@
 package cointoss.order;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Objects;
@@ -48,9 +49,9 @@ public class OrderBook {
     OrderBook(MarketSetting setting, Direction side) {
         this.side = Objects.requireNonNull(side);
 
-        this.base = new GapList();
+        this.base = Collections.synchronizedList(new GapList());
         for (Num range : setting.orderBookGroupRanges()) {
-            groups.add(new Grouped(side, range, new GapList(), setting));
+            groups.add(new Grouped(side, range, Collections.synchronizedList(new GapList()), setting));
         }
     }
 
@@ -274,29 +275,26 @@ public class OrderBook {
      * @param add
      */
     private void head(OrderUnit add) {
-        ListIterator<OrderUnit> iterator = base.listIterator();
-
-        while (iterator.hasNext()) {
-            OrderUnit unit = iterator.next();
+        for (int i = 0; i < base.size(); i++) {
+            OrderUnit unit = base.get(i);
 
             if (unit == null) {
                 if (add.size.isNotZero()) {
-                    iterator.set(add);
+                    base.set(i, add);
                     update(add.price, add.size);
                 }
                 return;
             } else if (unit.price.is(add.price)) {
                 if (add.size.isZero()) {
-                    iterator.remove();
+                    base.remove(i);
                 } else {
-                    iterator.set(add);
+                    base.set(i, add);
                 }
                 update(add.price, add.size.minus(unit.size));
                 return;
             } else if (unit.price.isLessThan(add.price)) {
                 if (add.size.isNotZero()) {
-                    if (iterator.hasPrevious()) iterator.previous();
-                    iterator.add(add);
+                    base.add(i, add);
                     update(add.price, add.size);
                 }
                 return;
@@ -315,29 +313,27 @@ public class OrderBook {
      * @param add
      */
     private void tail(OrderUnit add) {
-        ListIterator<OrderUnit> iterator = base.listIterator(base.size());
 
-        while (iterator.hasPrevious()) {
-            OrderUnit unit = iterator.previous();
+        for (int i = base.size() - 1; 0 <= i; i--) {
+            OrderUnit unit = base.get(i);
 
             if (unit == null) {
                 if (add.size.isNotZero()) {
-                    iterator.set(add);
+                    base.set(i, add);
                     update(add.price, add.size);
                 }
                 return;
             } else if (unit.price.is(add.price)) {
                 if (add.size.isZero()) {
-                    iterator.remove();
+                    base.remove(i);
                 } else {
-                    iterator.set(add);
+                    base.set(i, add);
                 }
                 update(add.price, add.size.minus(unit.size));
                 return;
             } else if (unit.price.isGreaterThan(add.price)) {
                 if (add.size.isNotZero()) {
-                    iterator.next();
-                    iterator.add(add);
+                    base.add(i + 1, add);
                     update(add.price, add.size);
                 }
                 return;
@@ -422,26 +418,24 @@ public class OrderBook {
          * @param add
          */
         private void head(Num price, Num size) {
-            ListIterator<OrderUnit> iterator = list.listIterator();
 
-            while (iterator.hasNext()) {
-                OrderUnit unit = iterator.next();
+            for (int i = 0; i < list.size(); i++) {
+                OrderUnit unit = list.get(i);
 
                 if (unit == null) {
-                    iterator.set(new OrderUnit(price, size));
+                    list.set(i, new OrderUnit(price, size));
                     return;
                 } else if (unit.price.is(price)) {
                     Num remaining = unit.size.plus(size);
 
                     if (remaining.scaleDown(this.size).isNegativeOrZero()) {
-                        iterator.remove();
+                        list.remove(i);
                     } else {
-                        iterator.set(unit.size(remaining));
+                        list.set(i, unit.size(remaining));
                     }
                     return;
                 } else if (unit.price.isLessThan(price)) {
-                    if (iterator.hasPrevious()) iterator.previous();
-                    iterator.add(new OrderUnit(price, size));
+                    list.add(i, new OrderUnit(price, size));
                     return;
                 }
             }
@@ -454,26 +448,23 @@ public class OrderBook {
          * @param add
          */
         private void tail(Num price, Num size) {
-            ListIterator<OrderUnit> iterator = list.listIterator(list.size());
-
-            while (iterator.hasPrevious()) {
-                OrderUnit unit = iterator.previous();
+            for (int i = list.size() - 1; 0 <= i; i--) {
+                OrderUnit unit = list.get(i);
 
                 if (unit == null) {
-                    iterator.set(new OrderUnit(price, size));
+                    list.set(i, new OrderUnit(price, size));
                     return;
                 } else if (unit.price.is(price)) {
                     Num remaining = unit.size.plus(size);
 
                     if (remaining.scaleDown(this.size).isNegativeOrZero()) {
-                        iterator.remove();
+                        list.remove(i);
                     } else {
-                        iterator.set(unit.size(remaining));
+                        list.set(i, unit.size(remaining));
                     }
                     return;
                 } else if (unit.price.isGreaterThan(price)) {
-                    iterator.next();
-                    iterator.add(new OrderUnit(price, size));
+                    list.add(i + 1, new OrderUnit(price, size));
                     return;
                 }
             }
