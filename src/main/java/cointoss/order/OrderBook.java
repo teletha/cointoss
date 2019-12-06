@@ -315,7 +315,6 @@ public class OrderBook {
      * @param add
      */
     private void tail(OrderUnit add) {
-
         for (int i = base.size() - 1; 0 <= i; i--) {
             OrderUnit unit = base.get(i);
 

@@ -125,7 +125,8 @@ public class OrderBookView extends View {
         hideSize.initialize(Num.range(0, 99));
 
         int scale = view.market.service.setting.targetCurrencyScaleSize;
-        longList.renderByNode(displayOrderUnit(TradeMateStyle.BUY, scale))
+        longList.reverse()
+                .renderByNode(displayOrderUnit(TradeMateStyle.BUY, scale))
                 .take(hideSize, (unit, size) -> unit.size.isGreaterThanOrEqual(size))
                 .when(User.LeftClick, calculatePrice(longList));
         shortList.renderByNode(displayOrderUnit(TradeMateStyle.SELL, scale))
