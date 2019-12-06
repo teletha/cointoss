@@ -51,7 +51,7 @@ public class OrderBook {
     OrderBook(MarketSetting setting, Direction side) {
         this.side = Objects.requireNonNull(side);
 
-        this.base = new GapList();
+        this.base = new SafeGapList();
         for (Num range : setting.orderBookGroupRanges()) {
             groups.add(new Grouped(side, range, setting));
         }
@@ -288,7 +288,7 @@ public class OrderBook {
                 return;
             } else if (unit.price.is(add.price)) {
                 if (add.size.isZero()) {
-                    base.remove(unit);
+                    base.removeIf(unit::equals);
                 } else {
                     base.set(i, add);
                 }
@@ -327,7 +327,7 @@ public class OrderBook {
                 return;
             } else if (unit.price.is(add.price)) {
                 if (add.size.isZero()) {
-                    base.remove(unit);
+                    base.removeIf(unit::equals);
                 } else {
                     base.set(i, add);
                 }
@@ -382,7 +382,7 @@ public class OrderBook {
         private final Num range;
 
         /** The base list. */
-        private List<OrderUnit> list = new GapList();
+        private List<OrderUnit> list = new SafeGapList();
 
         /** The cache */
         private final int size;
@@ -490,6 +490,30 @@ public class OrderBook {
             if (unit.price.isLessThan(price)) {
                 list.remove(list.size() - 1);
             }
+        }
+    }
+
+    /**
+     * Index-safe implementation. Because JavaFX's FilteredList is broken.
+     */
+    @SuppressWarnings("serial")
+    private static class SafeGapList<E> extends GapList<E> {
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public E get(int index) {
+            int size = size();
+
+            if (size <= index) {
+                index = size - 1;
+            }
+
+            if (index < 0) {
+                index = 0;
+            }
+            return super.doGet(index);
         }
     }
 }
