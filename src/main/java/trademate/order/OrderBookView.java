@@ -11,6 +11,9 @@ package trademate.order;
 
 import java.util.function.Function;
 
+import cointoss.order.OrderBookManager;
+import cointoss.order.OrderUnit;
+import cointoss.util.Num;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.canvas.Canvas;
@@ -18,10 +21,6 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontSmoothingType;
-
-import cointoss.order.OrderBookManager;
-import cointoss.order.OrderUnit;
-import cointoss.util.Num;
 import kiss.WiseRunnable;
 import stylist.Style;
 import stylist.StyleDSL;
@@ -118,8 +117,8 @@ public class OrderBookView extends View {
     @Override
     protected void initialize() {
         book = view.market.orderBook;
-        book.longs.setContainer(FXCollections::observableList);
-        book.shorts.setContainer(FXCollections::observableList);
+        book.longs.composeBy(FXCollections::observableList);
+        book.shorts.composeBy(FXCollections::observableList);
         book.longs.setOperator(Viewtify.UIThread);
         book.shorts.setOperator(Viewtify.UIThread);
 

@@ -10,7 +10,6 @@
 package cointoss.order;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Objects;
@@ -18,6 +17,8 @@ import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
 
 import org.magicwerk.brownies.collections.GapList;
+
+import com.google.common.annotations.VisibleForTesting;
 
 import cointoss.Direction;
 import cointoss.MarketSetting;
@@ -33,6 +34,7 @@ public class OrderBook {
     private final Direction side;
 
     /** The base list. */
+    @VisibleForTesting
     List<OrderUnit> base;
 
     /** The grouped list. */
@@ -49,9 +51,9 @@ public class OrderBook {
     OrderBook(MarketSetting setting, Direction side) {
         this.side = Objects.requireNonNull(side);
 
-        this.base = Collections.synchronizedList(new GapList());
+        this.base = new GapList();
         for (Num range : setting.orderBookGroupRanges()) {
-            groups.add(new Grouped(side, range, Collections.synchronizedList(new GapList()), setting));
+            groups.add(new Grouped(side, range, setting));
         }
     }
 
@@ -70,14 +72,14 @@ public class OrderBook {
      * Replace the order book management container with your container.
      * 
      * @param <L>
-     * @param builder
+     * @param composer
      * @return
      */
-    public final void setContainer(UnaryOperator<List<OrderUnit>> builder) {
-        base = builder.apply(base);
+    public final void composeBy(UnaryOperator<List<OrderUnit>> composer) {
+        base = composer.apply(base);
 
         for (Grouped grouped : groups) {
-            grouped.list = builder.apply(grouped.list);
+            grouped.list = composer.apply(grouped.list);
         }
     }
 
@@ -286,7 +288,7 @@ public class OrderBook {
                 return;
             } else if (unit.price.is(add.price)) {
                 if (add.size.isZero()) {
-                    base.remove(i);
+                    base.remove(unit);
                 } else {
                     base.set(i, add);
                 }
@@ -325,7 +327,7 @@ public class OrderBook {
                 return;
             } else if (unit.price.is(add.price)) {
                 if (add.size.isZero()) {
-                    base.remove(i);
+                    base.remove(unit);
                 } else {
                     base.set(i, add);
                 }
@@ -380,7 +382,7 @@ public class OrderBook {
         private final Num range;
 
         /** The base list. */
-        private List<OrderUnit> list;
+        private List<OrderUnit> list = new GapList();
 
         /** The cache */
         private final int size;
@@ -389,10 +391,9 @@ public class OrderBook {
          * @param side
          * @param scaleSize
          */
-        private Grouped(Direction side, Num range, List<OrderUnit> list, MarketSetting setting) {
+        private Grouped(Direction side, Num range, MarketSetting setting) {
             this.side = side;
             this.range = range;
-            this.list = list;
             this.size = setting.targetCurrencyScaleSize();
         }
 
@@ -429,7 +430,7 @@ public class OrderBook {
                     Num remaining = unit.size.plus(size);
 
                     if (remaining.scaleDown(this.size).isNegativeOrZero()) {
-                        list.remove(i);
+                        list.remove(unit);
                     } else {
                         list.set(i, unit.size(remaining));
                     }
@@ -458,7 +459,7 @@ public class OrderBook {
                     Num remaining = unit.size.plus(size);
 
                     if (remaining.scaleDown(this.size).isNegativeOrZero()) {
-                        list.remove(i);
+                        list.remove(unit);
                     } else {
                         list.set(i, unit.size(remaining));
                     }
