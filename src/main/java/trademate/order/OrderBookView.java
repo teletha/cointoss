@@ -11,9 +11,6 @@ package trademate.order;
 
 import java.util.function.Function;
 
-import cointoss.order.OrderBookManager;
-import cointoss.order.OrderUnit;
-import cointoss.util.Num;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.canvas.Canvas;
@@ -21,6 +18,10 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontSmoothingType;
+
+import cointoss.order.OrderBookManager;
+import cointoss.order.OrderUnit;
+import cointoss.util.Num;
 import kiss.WiseRunnable;
 import stylist.Style;
 import stylist.StyleDSL;
@@ -90,16 +91,15 @@ public class OrderBookView extends View {
             $.select(".scroll-bar:horizontal").descendant(() -> {
                 padding.size(0, px);
             });
+
+            $.select(".cell", () -> {
+                padding.size(0, px);
+            });
         };
 
         Style priceRange = () -> {
-            display.width(76, px);
+            display.width(84, px);
         };
-
-        // Style priceLatest = () -> {
-        // display.width(64, px).height(25, px);
-        // text.indent(4, px);
-        // };
 
         Style priceSpread = () -> {
             display.width(50, px).height(25, px);
@@ -175,7 +175,7 @@ public class OrderBookView extends View {
      */
     private Function<OrderUnit, Canvas> displayOrderUnit(stylist.value.Color color, int scale) {
         double width = longList.ui.widthProperty().doubleValue();
-        double height = 17;
+        double height = 22;
         double fontSize = 12;
         Color foreground = FXUtils.color(color);
         Color background = foreground.deriveColor(0, 1, 1, 0.2);
@@ -193,7 +193,7 @@ public class OrderBookView extends View {
             c.setFont(font);
             c.setFill(foreground);
             c.setFontSmoothingType(FontSmoothingType.LCD);
-            c.fillText(e.price + " " + size, 35, height - 3, width - 35);
+            c.fillText(e.price + " " + size, 33, height - 7, width - 20);
 
             return canvas;
         };
