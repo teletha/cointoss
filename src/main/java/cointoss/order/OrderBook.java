@@ -288,7 +288,7 @@ public class OrderBook {
                 return;
             } else if (unit.price.is(add.price)) {
                 if (add.size.isZero()) {
-                    base.removeIf(unit::equals);
+                    base.remove(i);
                 } else {
                     base.set(i, add);
                 }
@@ -327,7 +327,7 @@ public class OrderBook {
                 return;
             } else if (unit.price.is(add.price)) {
                 if (add.size.isZero()) {
-                    base.removeIf(unit::equals);
+                    base.remove(i);
                 } else {
                     base.set(i, add);
                 }
@@ -430,7 +430,7 @@ public class OrderBook {
                     Num remaining = unit.size.plus(size);
 
                     if (remaining.scaleDown(this.size).isNegativeOrZero()) {
-                        list.remove(unit);
+                        list.remove(i);
                     } else {
                         list.set(i, unit.size(remaining));
                     }
@@ -459,7 +459,7 @@ public class OrderBook {
                     Num remaining = unit.size.plus(size);
 
                     if (remaining.scaleDown(this.size).isNegativeOrZero()) {
-                        list.remove(unit);
+                        list.remove(i);
                     } else {
                         list.set(i, unit.size(remaining));
                     }
