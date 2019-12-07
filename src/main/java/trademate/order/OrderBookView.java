@@ -116,10 +116,10 @@ public class OrderBookView extends View {
     @Override
     protected void initialize() {
         book = view.market.orderBook;
-        book.longs.composeBy(FXCollections::observableList);
-        book.shorts.composeBy(FXCollections::observableList);
-        book.longs.setOperator(Viewtify.UIThread);
-        book.shorts.setOperator(Viewtify.UIThread);
+        book.longs.replaceBy(FXCollections::observableList);
+        book.shorts.replaceBy(FXCollections::observableList);
+        book.longs.operateOn(Viewtify.UIThread);
+        book.shorts.operateOn(Viewtify.UIThread);
 
         hideSize.initialize(Num.range(0, 99));
 

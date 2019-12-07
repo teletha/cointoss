@@ -9,7 +9,6 @@
  */
 package cointoss.order;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Objects;
@@ -33,15 +32,21 @@ public class OrderBook {
     /** The search direction. */
     private final Direction side;
 
+    /** The scale for target currency. */
+    private final int scale;
+
+    /** The board list replacer. (OPTIONAL) */
+    private UnaryOperator<List<OrderBoard>> replacer;
+
+    /** The book operation thread. (OPTIONAL) */
+    private Consumer<Runnable> operator = Runnable::run;
+
     /** The base list. */
     @VisibleForTesting
     List<OrderBoard> base;
 
-    /** The grouped list. */
-    private final List<Grouped> groups = new ArrayList();
-
-    /** The book operator thread. */
-    private Consumer<Runnable> operator = Runnable::run;
+    /** The grouped order book. */
+    private GroupedOrderBook group;
 
     /**
      * @param side
@@ -50,19 +55,16 @@ public class OrderBook {
      */
     OrderBook(MarketSetting setting, Direction side) {
         this.side = Objects.requireNonNull(side);
-
+        this.scale = setting.targetCurrencyScaleSize;
         this.base = new SafeGapList();
-        for (Num range : setting.orderBookGroupRanges()) {
-            groups.add(new Grouped(side, range, setting));
-        }
     }
 
     /**
-     * Set book operator thread.
+     * Set book operation thread.
      * 
      * @param operator
      */
-    public final void setOperator(Consumer<Runnable> operator) {
+    public final void operateOn(Consumer<Runnable> operator) {
         if (operator != null) {
             this.operator = operator;
         }
@@ -71,41 +73,15 @@ public class OrderBook {
     /**
      * Replace the order book management container with your container.
      * 
-     * @param <L>
-     * @param composer
+     * @param replacer A list replacer.
      * @return
      */
-    public final void composeBy(UnaryOperator<List<OrderBoard>> composer) {
-        base = composer.apply(base);
+    public final void replaceBy(UnaryOperator<List<OrderBoard>> replacer) {
+        if (replacer != null) {
+            this.replacer = replacer;
 
-        for (Grouped grouped : groups) {
-            grouped.list = composer.apply(grouped.list);
-        }
-    }
-
-    /**
-     * Retrieve minimum unit.
-     * 
-     * @return
-     */
-    public OrderBoard min() {
-        if (base.isEmpty()) {
-            return null;
-        } else {
-            return base.get(base.size() - 1);
-        }
-    }
-
-    /**
-     * Retrieve maximum unit.
-     * 
-     * @return
-     */
-    public OrderBoard max() {
-        if (base.isEmpty()) {
-            return null;
-        } else {
-            return base.get(0);
+            base = replacer.apply(base);
+            if (group != null) group.boards = replacer.apply(group.boards);
         }
     }
 
@@ -116,12 +92,13 @@ public class OrderBook {
      * @return
      */
     public List<OrderBoard> selectBy(Num range) {
-        for (Grouped grouped : groups) {
-            if (grouped.range.is(range)) {
-                return grouped.list;
-            }
+        if (range.is(1)) {
+            return base;
         }
-        return base;
+
+        group = new GroupedOrderBook(range);
+
+        return group.boards;
     }
 
     /**
@@ -197,9 +174,9 @@ public class OrderBook {
                     if (unit != null && unit.price.isGreaterThan(hint)) {
                         iterator.remove();
 
-                        for (Grouped grouped : groups) {
-                            grouped.update(unit.price, unit.size.negate());
-                            grouped.fixHead(hint);
+                        if (group != null) {
+                            group.update(unit.price, unit.size.negate());
+                            group.fixHead(hint);
                         }
                     } else {
                         break;
@@ -214,9 +191,9 @@ public class OrderBook {
                     if (unit != null && unit.price.isLessThan(hint)) {
                         iterator.remove();
 
-                        for (Grouped grouped : groups) {
-                            grouped.update(unit.price, unit.size.negate());
-                            grouped.fixTail(hint);
+                        if (group != null) {
+                            group.update(unit.price, unit.size.negate());
+                            group.fixTail(hint);
                         }
                     } else {
                         break;
@@ -353,8 +330,8 @@ public class OrderBook {
      * @param size
      */
     private void update(Num price, Num size) {
-        for (Grouped grouped : groups) {
-            grouped.update(price, size);
+        if (group != null) {
+            group.update(price, size);
         }
     }
 
@@ -370,30 +347,31 @@ public class OrderBook {
     }
 
     /**
-     * @version 2018/12/03 20:26:46
+     * 
      */
-    private class Grouped {
-
-        /** The search direction. */
-        private final Direction side;
+    private class GroupedOrderBook {
 
         /** The price range. */
         private final Num range;
 
-        /** The base list. */
-        private List<OrderBoard> list = new SafeGapList();
-
-        /** The cache */
-        private final int size;
+        /** The board container. */
+        private List<OrderBoard> boards = new SafeGapList();
 
         /**
-         * @param side
-         * @param scaleSize
+         * Build {@link GroupedOrderBook}.
+         * 
+         * @param range A price range to group.
          */
-        private Grouped(Direction side, Num range, MarketSetting setting) {
-            this.side = side;
-            this.range = range;
-            this.size = setting.targetCurrencyScaleSize();
+        private GroupedOrderBook(Num range) {
+            this.range = Objects.requireNonNull(range);
+
+            // grouping the current boards
+            for (OrderBoard board : base) {
+                update(board.price, board.size);
+            }
+
+            // replace container if needed
+            if (replacer != null) boards = replacer.apply(boards);
         }
 
         /**
@@ -419,27 +397,27 @@ public class OrderBook {
          */
         private void head(Num price, Num size) {
 
-            for (int i = 0; i < list.size(); i++) {
-                OrderBoard unit = list.get(i);
+            for (int i = 0; i < boards.size(); i++) {
+                OrderBoard unit = boards.get(i);
 
                 if (unit == null) {
-                    list.set(i, new OrderBoard(price, size));
+                    boards.set(i, new OrderBoard(price, size));
                     return;
                 } else if (unit.price.is(price)) {
                     Num remaining = unit.size.plus(size);
 
-                    if (remaining.scaleDown(this.size).isNegativeOrZero()) {
-                        list.remove(i);
+                    if (remaining.scaleDown(scale).isNegativeOrZero()) {
+                        boards.remove(i);
                     } else {
-                        list.set(i, new OrderBoard(unit.price, remaining));
+                        boards.set(i, new OrderBoard(unit.price, remaining));
                     }
                     return;
                 } else if (unit.price.isLessThan(price)) {
-                    list.add(i, new OrderBoard(price, size));
+                    boards.add(i, new OrderBoard(price, size));
                     return;
                 }
             }
-            list.add(new OrderBoard(price, size));
+            boards.add(new OrderBoard(price, size));
         }
 
         /**
@@ -448,46 +426,46 @@ public class OrderBook {
          * @param add
          */
         private void tail(Num price, Num size) {
-            for (int i = list.size() - 1; 0 <= i; i--) {
-                OrderBoard unit = list.get(i);
+            for (int i = boards.size() - 1; 0 <= i; i--) {
+                OrderBoard unit = boards.get(i);
 
                 if (unit == null) {
-                    list.set(i, new OrderBoard(price, size));
+                    boards.set(i, new OrderBoard(price, size));
                     return;
                 } else if (unit.price.is(price)) {
                     Num remaining = unit.size.plus(size);
 
-                    if (remaining.scaleDown(this.size).isNegativeOrZero()) {
-                        list.remove(i);
+                    if (remaining.scaleDown(scale).isNegativeOrZero()) {
+                        boards.remove(i);
                     } else {
-                        list.set(i, new OrderBoard(unit.price, remaining));
+                        boards.set(i, new OrderBoard(unit.price, remaining));
                     }
                     return;
                 } else if (unit.price.isGreaterThan(price)) {
-                    list.add(i + 1, new OrderBoard(price, size));
+                    boards.add(i + 1, new OrderBoard(price, size));
                     return;
                 }
             }
-            list.add(0, new OrderBoard(price, size));
+            boards.add(0, new OrderBoard(price, size));
         }
 
         private void fixHead(Num price) {
             price = calculateGroupedPrice(price, range);
 
-            OrderBoard unit = list.get(0);
+            OrderBoard unit = boards.get(0);
 
             if (unit.price.isGreaterThan(price)) {
-                list.remove(0);
+                boards.remove(0);
             }
         }
 
         private void fixTail(Num price) {
             price = calculateGroupedPrice(price, range);
 
-            OrderBoard unit = list.get(list.size() - 1);
+            OrderBoard unit = boards.get(boards.size() - 1);
 
             if (unit.price.isLessThan(price)) {
-                list.remove(list.size() - 1);
+                boards.remove(boards.size() - 1);
             }
         }
     }
