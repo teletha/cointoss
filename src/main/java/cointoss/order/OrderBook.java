@@ -10,8 +10,8 @@
 package cointoss.order;
 
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
 
@@ -40,15 +40,16 @@ public class OrderBook {
     private Consumer<Runnable> operator = Runnable::run;
 
     /** The base list. */
-    private final List<OrderBoard> base = new SafeGapList();
+    private final ConcurrentSkipListMap<Num, OrderBoard> base = new ConcurrentSkipListMap();
 
     /** The grouped order book. */
     private GroupedOrderBook group;
 
     /**
-     * @param side
-     * @param base
-     * @param ranges
+     * Build {@link OrderBook}.
+     * 
+     * @param setting A market setting.
+     * @param side Order direction.
      */
     OrderBook(MarketSetting setting, Direction side) {
         this.side = Objects.requireNonNull(side);
@@ -126,24 +127,22 @@ public class OrderBook {
     public final Num computeBestPrice(Num start, Num threshold, Num diff) {
         Num total = Num.ZERO;
         if (side == Direction.BUY) {
-            for (OrderBoard unit : base) {
-                if (unit.price.isLessThanOrEqual(start)) {
-                    total = total.plus(unit.size);
+            for (OrderBoard board : base.descendingMap().values()) {
+                if (board.price.isLessThanOrEqual(start)) {
+                    total = total.plus(board.size);
 
                     if (total.isGreaterThanOrEqual(threshold)) {
-                        return unit.price.plus(diff);
+                        return board.price.plus(diff);
                     }
                 }
             }
         } else {
-            for (int i = base.size() - 1; 0 <= i; i--) {
-                OrderBoard unit = base.get(i);
-
-                if (unit.price.isGreaterThanOrEqual(start)) {
-                    total = total.plus(unit.size);
+            for (OrderBoard board : base.values()) {
+                if (board.price.isGreaterThanOrEqual(start)) {
+                    total = total.plus(board.size);
 
                     if (total.isGreaterThanOrEqual(threshold)) {
-                        return unit.price.minus(diff);
+                        return board.price.minus(diff);
                     }
                 }
             }
@@ -159,34 +158,26 @@ public class OrderBook {
     public void fix(Num hint) {
         operator.accept(() -> {
             if (side == Direction.BUY) {
-                ListIterator<OrderBoard> iterator = base.listIterator();
+                Num price = base.lastKey();
 
-                while (iterator.hasNext()) {
-                    OrderBoard unit = iterator.next();
+                while (price != null && price.isGreaterThan(hint)) {
+                    OrderBoard removed = base.remove(price);
 
-                    if (unit != null && unit.price.isGreaterThan(hint)) {
-                        iterator.remove();
+                    group.update(price, removed.size.negate());
+                    group.fixHead(hint);
 
-                        group.update(unit.price, unit.size.negate());
-                        group.fixHead(hint);
-                    } else {
-                        break;
-                    }
+                    price = base.lastKey();
                 }
             } else {
-                ListIterator<OrderBoard> iterator = base.listIterator(base.size());
+                Num price = base.firstKey();
 
-                while (iterator.hasPrevious()) {
-                    OrderBoard unit = iterator.previous();
+                while (price != null && price.isLessThan(hint)) {
+                    OrderBoard removed = base.remove(price);
 
-                    if (unit != null && unit.price.isLessThan(hint)) {
-                        iterator.remove();
+                    group.update(price, removed.size.negate());
+                    group.fixTail(hint);
 
-                        group.update(unit.price, unit.size.negate());
-                        group.fixTail(hint);
-                    } else {
-                        break;
-                    }
+                    price = base.firstKey();
                 }
             }
         });
@@ -205,7 +196,7 @@ public class OrderBook {
                 }
 
                 if (base.isEmpty() == false) {
-                    best.set(base.get(0));
+                    best.set(base.lastEntry().getValue());
                 }
             } else {
                 for (OrderBoard unit : units) {
@@ -213,7 +204,7 @@ public class OrderBook {
                 }
 
                 if (base.isEmpty() == false) {
-                    best.set(base.get(base.size() - 1));
+                    best.set(base.firstEntry().getValue());
                 }
             }
         });
@@ -243,35 +234,22 @@ public class OrderBook {
      * @param add
      */
     private void head(OrderBoard add) {
-        for (int i = 0; i < base.size(); i++) {
-            OrderBoard unit = base.get(i);
+        if (add.size.isZero()) {
+            // remove
+            OrderBoard removed = base.remove(add.price);
 
-            if (unit == null) {
-                if (add.size.isNotZero()) {
-                    base.set(i, add);
-                    group.update(add.price, add.size);
-                }
-                return;
-            } else if (unit.price.is(add.price)) {
-                if (add.size.isZero()) {
-                    base.remove(i);
-                } else {
-                    base.set(i, add);
-                }
-                group.update(add.price, add.size.minus(unit.size));
-                return;
-            } else if (unit.price.isLessThan(add.price)) {
-                if (add.size.isNotZero()) {
-                    base.add(i, add);
-                    group.update(add.price, add.size);
-                }
-                return;
+            if (removed != null) {
+                group.update(removed.price, removed.size.negate());
             }
-        }
+        } else {
+            // add
+            OrderBoard previous = base.put(add.price, add);
 
-        if (add.size.isNotZero()) {
-            base.add(add);
-            group.update(add.price, add.size);
+            if (previous == null) {
+                group.update(add.price, add.size);
+            } else {
+                group.update(add.price, add.size.minus(previous.size));
+            }
         }
     }
 
@@ -281,35 +259,22 @@ public class OrderBook {
      * @param add
      */
     private void tail(OrderBoard add) {
-        for (int i = base.size() - 1; 0 <= i; i--) {
-            OrderBoard unit = base.get(i);
+        if (add.size.isZero()) {
+            // remove
+            OrderBoard removed = base.remove(add.price);
 
-            if (unit == null) {
-                if (add.size.isNotZero()) {
-                    base.set(i, add);
-                    group.update(add.price, add.size);
-                }
-                return;
-            } else if (unit.price.is(add.price)) {
-                if (add.size.isZero()) {
-                    base.remove(i);
-                } else {
-                    base.set(i, add);
-                }
-                group.update(add.price, add.size.minus(unit.size));
-                return;
-            } else if (unit.price.isGreaterThan(add.price)) {
-                if (add.size.isNotZero()) {
-                    base.add(i + 1, add);
-                    group.update(add.price, add.size);
-                }
-                return;
+            if (removed != null) {
+                group.update(removed.price, removed.size.negate());
             }
-        }
+        } else {
+            // add
+            OrderBoard previous = base.put(add.price, add);
 
-        if (add.size.isNotZero()) {
-            base.add(0, add);
-            group.update(add.price, add.size);
+            if (previous == null) {
+                group.update(add.price, add.size);
+            } else {
+                group.update(add.price, add.size.minus(previous.size));
+            }
         }
     }
 
@@ -344,7 +309,7 @@ public class OrderBook {
             this.range = Objects.requireNonNull(range);
 
             // grouping the current boards
-            for (OrderBoard board : base) {
+            for (OrderBoard board : base.values()) {
                 update(board.price, board.size);
             }
 

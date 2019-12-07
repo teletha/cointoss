@@ -34,41 +34,29 @@ class OrderBookListTest {
         // add
         book.update(unit(1000, 1));
         assert list.get(0).price.is(1000);
-        // assert list.x1.get(0).total.is(1);
 
         book.update(unit(1002, 1));
         assert list.get(0).price.is(1002);
-        // assert list.x1.get(0).total.is(1);
         assert list.get(1).price.is(1000);
-        // assert list.x1.get(1).total.is(2);
 
         book.update(unit(1001, 1));
         assert list.get(0).price.is(1002);
-        // assert list.x1.get(0).total.is(1);
         assert list.get(1).price.is(1001);
         assert list.get(1).size.is(1);
-        // assert list.x1.get(1).total.is(2);
         assert list.get(2).price.is(1000);
-        // assert list.x1.get(2).total.is(3);
 
         // replace
         book.update(unit(1001, 2));
         assert list.get(0).price.is(1002);
-        // assert list.x1.get(0).total.is(1);
         assert list.get(1).price.is(1001);
         assert list.get(1).size.is(2);
-        // assert list.x1.get(1).total.is(3);
         assert list.get(2).price.is(1000);
-        // assert list.x1.get(2).total.is(4);
 
         // remove
         book.update(unit(1000, 0));
         assert list.size() == 2;
         assert list.get(0).price.is(1002);
-        // assert list.x1.get(0).total.is(1);
         assert list.get(1).price.is(1001);
-        // assert list.x1.get(1).total.is(3);
-
     }
 
     @Test
@@ -78,40 +66,29 @@ class OrderBookListTest {
 
         book.update(unit(1000, 1));
         assert list.get(0).price.is(1000);
-        // assert list.x1.get(0).total.is(1);
 
         book.update(unit(1002, 1));
         assert list.get(0).price.is(1002);
-        // assert list.x1.get(0).total.is(2);
         assert list.get(1).price.is(1000);
-        // assert list.x1.get(1).total.is(1);
 
         book.update(unit(1001, 1));
         assert list.get(0).price.is(1002);
-        // assert list.x1.get(0).total.is(3);
         assert list.get(1).price.is(1001);
         assert list.get(1).size.is(1);
-        // assert list.x1.get(1).total.is(2);
         assert list.get(2).price.is(1000);
-        // assert list.x1.get(2).total.is(1);
 
         // replace
         book.update(unit(1001, 2));
         assert list.get(0).price.is(1002);
-        // assert list.x1.get(0).total.is(4);
         assert list.get(1).price.is(1001);
         assert list.get(1).size.is(2);
-        // assert list.x1.get(1).total.is(3);
         assert list.get(2).price.is(1000);
-        // assert list.x1.get(2).total.is(1);
 
         // remove
         book.update(unit(1000, 0));
         assert list.size() == 2;
         assert list.get(0).price.is(1002);
-        // assert list.x1.get(0).total.is(3);
         assert list.get(1).price.is(1001);
-        // assert list.x1.get(1).total.is(2);
     }
 
     @Test
