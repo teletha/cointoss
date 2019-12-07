@@ -17,8 +17,6 @@ import java.util.function.UnaryOperator;
 
 import org.magicwerk.brownies.collections.GapList;
 
-import com.google.common.annotations.VisibleForTesting;
-
 import cointoss.Direction;
 import cointoss.MarketSetting;
 import cointoss.util.Num;
@@ -42,8 +40,7 @@ public class OrderBook {
     private Consumer<Runnable> operator = Runnable::run;
 
     /** The base list. */
-    @VisibleForTesting
-    List<OrderBoard> base;
+    private final List<OrderBoard> base = new SafeGapList();
 
     /** The grouped order book. */
     private GroupedOrderBook group;
@@ -56,7 +53,6 @@ public class OrderBook {
     OrderBook(MarketSetting setting, Direction side) {
         this.side = Objects.requireNonNull(side);
         this.scale = setting.targetCurrencyScaleSize;
-        this.base = new SafeGapList();
         this.group = new GroupedOrderBook(setting.baseCurrencyMinimumBidPrice);
     }
 
@@ -81,7 +77,6 @@ public class OrderBook {
         if (replacer != null) {
             this.replacer = replacer;
 
-            base = replacer.apply(base);
             group.boards = replacer.apply(group.boards);
         }
     }
