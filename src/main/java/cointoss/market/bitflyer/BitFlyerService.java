@@ -38,7 +38,7 @@ import cointoss.order.Order;
 import cointoss.order.OrderBookChange;
 import cointoss.order.OrderState;
 import cointoss.order.OrderType;
-import cointoss.order.OrderBoard;
+import cointoss.order.OrderUnit;
 import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
@@ -590,14 +590,14 @@ class BitFlyerService extends MarketService {
 
                     for (int i = 0; i < asks.size(); i++) {
                         JsonObject ask = asks.get(i).getAsJsonObject();
-                        change.asks.add(new OrderBoard(Num.of(ask.get("price").getAsString()), Num.of(ask.get("size").getAsString())));
+                        change.asks.add(new OrderUnit(Num.of(ask.get("price").getAsString()), Num.of(ask.get("size").getAsString())));
                     }
 
                     JsonArray bids = e.get("bids").getAsJsonArray();
 
                     for (int i = 0; i < bids.size(); i++) {
                         JsonObject bid = bids.get(i).getAsJsonObject();
-                        change.bids.add(new OrderBoard(Num.of(bid.get("price").getAsString()), Num.of(bid.get("size").getAsString())));
+                        change.bids.add(new OrderUnit(Num.of(bid.get("price").getAsString()), Num.of(bid.get("size").getAsString())));
                     }
                     return change;
                 });

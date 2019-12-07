@@ -18,10 +18,10 @@ import java.util.List;
 public class OrderBookChange {
 
     /** The list of long orders. */
-    public List<OrderBoard> bids = new ArrayList();
+    public List<OrderUnit> bids = new ArrayList();
 
     /** The list of short orders. */
-    public List<OrderBoard> asks = new ArrayList();
+    public List<OrderUnit> asks = new ArrayList();
 
     /**
      * {@inheritDoc}
