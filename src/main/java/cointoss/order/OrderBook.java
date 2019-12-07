@@ -54,7 +54,7 @@ public class OrderBook {
      */
     OrderBook(MarketSetting setting, Direction side) {
         this.side = Objects.requireNonNull(side);
-        this.base = new ConcurrentSkipListMap(side.isBuy() ? Comparator.naturalOrder() : Comparator.reverseOrder());
+        this.base = new ConcurrentSkipListMap(side.isBuy() ? Comparator.reverseOrder() : Comparator.naturalOrder());
         this.scale = setting.targetCurrencyScaleSize;
         this.group = new GroupedOrderBook(setting.baseCurrencyMinimumBidPrice);
     }
@@ -128,7 +128,7 @@ public class OrderBook {
      */
     public final Num computeBestPrice(Num start, Num threshold, Num diff) {
         Num total = Num.ZERO;
-        for (OrderBoard board : base.descendingMap().values()) {
+        for (OrderBoard board : base.values()) {
             if (board.price.isLessThanOrEqual(side, start)) {
                 total = total.plus(board.size);
 
@@ -147,7 +147,7 @@ public class OrderBook {
      */
     public void fix(Num hint) {
         operator.accept(() -> {
-            Num price = base.lastKey();
+            Num price = base.firstKey();
 
             while (price != null && price.isGreaterThan(side, hint)) {
                 OrderBoard removed = base.remove(price);
@@ -155,7 +155,7 @@ public class OrderBook {
                 group.update(price, removed.size.negate());
                 group.fix(hint);
 
-                price = base.lastKey();
+                price = base.firstKey();
             }
         });
     }
@@ -188,7 +188,7 @@ public class OrderBook {
             }
 
             if (base.isEmpty() == false) {
-                best.set(base.lastEntry().getValue());
+                best.set(base.firstEntry().getValue());
             }
         });
     }
