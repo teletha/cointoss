@@ -143,7 +143,7 @@ public class TradingView extends View {
         price.style(style.tabPrice);
 
         market.tickers.latestPrice.observe().skipWhile(initializing).on(Viewtify.UIThread).to(latest -> {
-            tab.textV(title, price.text(latest));
+            tab.textV(title, price.text(latest + " (" + market.tickers.latest.v.delay + ")"));
         });
     }
 

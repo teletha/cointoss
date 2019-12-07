@@ -29,6 +29,9 @@ public final class Tick {
     /** Open id of the period. */
     public final long openId;
 
+    /** Sampled network delay. */
+    public final int delay;
+
     /** Open price of the period */
     public final Num openPrice;
 
@@ -68,12 +71,13 @@ public final class Tick {
      * @param open A open price.
      * @param realtime The realtime execution statistic.
      */
-    Tick(Tick previous, ZonedDateTime start, Span span, long id, Num open, TickerManager realtime) {
+    Tick(Tick previous, ZonedDateTime start, Span span, long id, int delay, Num open, TickerManager realtime) {
         this.previous = previous;
         this.start = start;
         this.startSeconds = start.toEpochSecond();
         this.end = start.plus(span.duration);
         this.openId = id;
+        this.delay = delay;
         this.openPrice = this.highPrice = this.lowPrice = open;
 
         this.realtime = realtime;
