@@ -11,6 +11,9 @@ package trademate.order;
 
 import java.util.function.Function;
 
+import cointoss.order.OrderBookManager;
+import cointoss.order.OrderUnit;
+import cointoss.util.Num;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.canvas.Canvas;
@@ -18,10 +21,6 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontSmoothingType;
-
-import cointoss.order.OrderBookManager;
-import cointoss.order.OrderUnit;
-import cointoss.util.Num;
 import kiss.WiseRunnable;
 import stylist.Style;
 import stylist.StyleDSL;
@@ -125,8 +124,7 @@ public class OrderBookView extends View {
         hideSize.initialize(Num.range(0, 99));
 
         int scale = view.market.service.setting.targetCurrencyScaleSize;
-        longList.reverse()
-                .renderByNode(displayOrderUnit(TradeMateStyle.BUY, scale))
+        longList.renderByNode(displayOrderUnit(TradeMateStyle.BUY, scale))
                 .take(hideSize, (unit, size) -> unit.size.isGreaterThanOrEqual(size))
                 .when(User.LeftClick, calculatePrice(longList));
         shortList.renderByNode(displayOrderUnit(TradeMateStyle.SELL, scale))
