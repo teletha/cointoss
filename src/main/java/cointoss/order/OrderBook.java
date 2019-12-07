@@ -254,7 +254,7 @@ public class OrderBook {
             if (unit == null) {
                 if (add.size.isNotZero()) {
                     base.set(i, add);
-                    update(add.price, add.size);
+                    group.update(add.price, add.size);
                 }
                 return;
             } else if (unit.price.is(add.price)) {
@@ -263,12 +263,12 @@ public class OrderBook {
                 } else {
                     base.set(i, add);
                 }
-                update(add.price, add.size.minus(unit.size));
+                group.update(add.price, add.size.minus(unit.size));
                 return;
             } else if (unit.price.isLessThan(add.price)) {
                 if (add.size.isNotZero()) {
                     base.add(i, add);
-                    update(add.price, add.size);
+                    group.update(add.price, add.size);
                 }
                 return;
             }
@@ -276,7 +276,7 @@ public class OrderBook {
 
         if (add.size.isNotZero()) {
             base.add(add);
-            update(add.price, add.size);
+            group.update(add.price, add.size);
         }
     }
 
@@ -292,7 +292,7 @@ public class OrderBook {
             if (unit == null) {
                 if (add.size.isNotZero()) {
                     base.set(i, add);
-                    update(add.price, add.size);
+                    group.update(add.price, add.size);
                 }
                 return;
             } else if (unit.price.is(add.price)) {
@@ -301,12 +301,12 @@ public class OrderBook {
                 } else {
                     base.set(i, add);
                 }
-                update(add.price, add.size.minus(unit.size));
+                group.update(add.price, add.size.minus(unit.size));
                 return;
             } else if (unit.price.isGreaterThan(add.price)) {
                 if (add.size.isNotZero()) {
                     base.add(i + 1, add);
-                    update(add.price, add.size);
+                    group.update(add.price, add.size);
                 }
                 return;
             }
@@ -314,17 +314,8 @@ public class OrderBook {
 
         if (add.size.isNotZero()) {
             base.add(0, add);
-            update(add.price, add.size);
+            group.update(add.price, add.size);
         }
-    }
-
-    /**
-     * Update group list.
-     * 
-     * @param size
-     */
-    private void update(Num price, Num size) {
-        group.update(price, size);
     }
 
     /**
