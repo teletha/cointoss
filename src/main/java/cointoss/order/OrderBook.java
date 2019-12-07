@@ -86,18 +86,15 @@ public class OrderBook {
     }
 
     /**
-     * Select list by ratio.
+     * Get the grouped view of this {@link OrderBook}.
      * 
-     * @param ratio
-     * @return
+     * @param range The price range.
+     * @return A grouped view.
      */
-    public List<OrderBoard> selectBy(Num range) {
-        if (range.is(1)) {
-            return base;
+    public final List<OrderBoard> groupBy(Num range) {
+        if (group == null || group.range.isNot(range)) {
+            group = new GroupedOrderBook(range);
         }
-
-        group = new GroupedOrderBook(range);
-
         return group.boards;
     }
 
@@ -396,7 +393,6 @@ public class OrderBook {
          * @param add
          */
         private void head(Num price, Num size) {
-
             for (int i = 0; i < boards.size(); i++) {
                 OrderBoard unit = boards.get(i);
 

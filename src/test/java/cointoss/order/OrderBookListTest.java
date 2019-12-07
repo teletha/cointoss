@@ -168,48 +168,48 @@ class OrderBookListTest {
     void buyGroup() {
         OrderBook list = new OrderBook(setting, Direction.BUY);
         list.update(unit(1000, 1));
-        assertList(list.selectBy(Num.TEN), 0, 1000, 1, 1);
+        assertList(list.groupBy(Num.TEN), 0, 1000, 1, 1);
 
         // add
         list.update(unit(1009, 1));
-        assertList(list.selectBy(Num.TEN), 0, 1000, 2, 2);
+        assertList(list.groupBy(Num.TEN), 0, 1000, 2, 2);
 
         // minus
         list.update(unit(1000, 0));
-        assertList(list.selectBy(Num.TEN), 0, 1000, 1, 1);
+        assertList(list.groupBy(Num.TEN), 0, 1000, 1, 1);
 
         // next group
         list.update(unit(1010, 1));
-        assertList(list.selectBy(Num.TEN), 0, 1010, 1, 1);
-        assertList(list.selectBy(Num.TEN), 1, 1000, 1, 2);
+        assertList(list.groupBy(Num.TEN), 0, 1010, 1, 1);
+        assertList(list.groupBy(Num.TEN), 1, 1000, 1, 2);
 
         // remove
         list.update(unit(1009, 0));
-        assertList(list.selectBy(Num.TEN), 0, 1010, 1, 1);
+        assertList(list.groupBy(Num.TEN), 0, 1010, 1, 1);
     }
 
     @Test
     void sellGroup() {
         OrderBook list = new OrderBook(setting, Direction.SELL);
         list.update(unit(1000, 1));
-        assertList(list.selectBy(Num.TEN), 0, 1000, 1, 1);
+        assertList(list.groupBy(Num.TEN), 0, 1000, 1, 1);
 
         // add
         list.update(unit(1009, 1));
-        assertList(list.selectBy(Num.TEN), 0, 1000, 2, 2);
+        assertList(list.groupBy(Num.TEN), 0, 1000, 2, 2);
 
         // minus
         list.update(unit(1000, 0));
-        assertList(list.selectBy(Num.TEN), 0, 1000, 1, 1);
+        assertList(list.groupBy(Num.TEN), 0, 1000, 1, 1);
 
         // next group
         list.update(unit(1010, 1));
-        assertList(list.selectBy(Num.TEN), 0, 1010, 1, 2);
-        assertList(list.selectBy(Num.TEN), 1, 1000, 1, 1);
+        assertList(list.groupBy(Num.TEN), 0, 1010, 1, 2);
+        assertList(list.groupBy(Num.TEN), 1, 1000, 1, 1);
 
         // remove
         list.update(unit(1009, 0));
-        assertList(list.selectBy(Num.TEN), 0, 1010, 1, 1);
+        assertList(list.groupBy(Num.TEN), 0, 1010, 1, 1);
     }
 
     @Test
@@ -227,27 +227,27 @@ class OrderBookListTest {
         list.update(unit(1024, 1));
         list.update(unit(1001, 1));
         list.update(unit(1000, 1));
-        assert list.selectBy(Num.TEN).size() == 6;
+        assert list.groupBy(Num.TEN).size() == 6;
 
         // fix error
         list.fix(Num.of(1051));
-        assert list.selectBy(Num.TEN).size() == 5;
+        assert list.groupBy(Num.TEN).size() == 5;
 
         // fix error : remaining
         list.fix(Num.of(1050));
-        assert list.selectBy(Num.TEN).size() == 5;
+        assert list.groupBy(Num.TEN).size() == 5;
 
         // fix error : multiple
         list.fix(Num.of(1038));
-        assert list.selectBy(Num.TEN).size() == 3;
+        assert list.groupBy(Num.TEN).size() == 3;
 
         // fix error : overlap
         list.fix(Num.of(1030));
-        assert list.selectBy(Num.TEN).size() == 2;
+        assert list.groupBy(Num.TEN).size() == 2;
 
         // fix error : not exist
         list.fix(Num.of(1010));
-        assert list.selectBy(Num.TEN).size() == 1;
+        assert list.groupBy(Num.TEN).size() == 1;
     }
 
     @Test
@@ -265,27 +265,27 @@ class OrderBookListTest {
         list.update(unit(1010, 1));
         list.update(unit(1001, 1));
         list.update(unit(1000, 1));
-        assert list.selectBy(Num.TEN).size() == 6;
+        assert list.groupBy(Num.TEN).size() == 6;
 
         // fix error
         list.fix(Num.of(1010));
-        assert list.selectBy(Num.TEN).size() == 5;
+        assert list.groupBy(Num.TEN).size() == 5;
 
         // fix error : remaining
         list.fix(Num.of(1011));
-        assert list.selectBy(Num.TEN).size() == 5;
+        assert list.groupBy(Num.TEN).size() == 5;
 
         // fix error : multiple
         list.fix(Num.of(1031));
-        assert list.selectBy(Num.TEN).size() == 3;
+        assert list.groupBy(Num.TEN).size() == 3;
 
         // fix error : overlap
         list.fix(Num.of(1038));
-        assert list.selectBy(Num.TEN).size() == 2;
+        assert list.groupBy(Num.TEN).size() == 2;
 
         // fix error : not exist
         list.fix(Num.of(1050));
-        assert list.selectBy(Num.TEN).size() == 1;
+        assert list.groupBy(Num.TEN).size() == 1;
     }
 
     @Test

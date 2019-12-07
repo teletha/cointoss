@@ -133,8 +133,8 @@ public class OrderBookView extends View {
                 .scrollToBottom();
 
         priceRange.initialize(view.market.service.setting.orderBookGroupRangesWithBase()).observeNow(range -> {
-            longList.items((ObservableList) book.longs.selectBy(range));
-            shortList.items((ObservableList) book.shorts.selectBy(range));
+            longList.items((ObservableList) book.longs.groupBy(range));
+            shortList.items((ObservableList) book.shorts.groupBy(range));
         });
 
         view.market.orderBook.spread.observe().skipWhile(view.initializing).on(Viewtify.UIThread).to(price -> priceSpread.text(price));
