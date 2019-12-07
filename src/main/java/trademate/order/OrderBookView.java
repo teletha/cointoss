@@ -12,7 +12,7 @@ package trademate.order;
 import java.util.function.Function;
 
 import cointoss.order.OrderBookManager;
-import cointoss.order.OrderUnit;
+import cointoss.order.OrderBoard;
 import cointoss.util.Num;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -38,10 +38,10 @@ import viewtify.util.FXUtils;
 public class OrderBookView extends View {
 
     /** UI for long maker. */
-    private UIListView<OrderUnit> longList;
+    private UIListView<OrderBoard> longList;
 
     /** UI for maker. */
-    private UIListView<OrderUnit> shortList;
+    private UIListView<OrderBoard> shortList;
 
     /** UI for interval configuration. */
     private UISpinner<Num> priceRange;
@@ -118,8 +118,8 @@ public class OrderBookView extends View {
         book = view.market.orderBook;
         book.longs.composeBy(FXCollections::observableList);
         book.shorts.composeBy(FXCollections::observableList);
-        book.longs.setOperator(Viewtify.UIThread);
-        book.shorts.setOperator(Viewtify.UIThread);
+        book.longs.processOn(Viewtify.UIThread);
+        book.shorts.processOn(Viewtify.UIThread);
 
         hideSize.initialize(Num.range(0, 99));
 
@@ -146,7 +146,7 @@ public class OrderBookView extends View {
      * @param list
      * @return
      */
-    private WiseRunnable calculatePrice(UIListView<OrderUnit> list) {
+    private WiseRunnable calculatePrice(UIListView<OrderBoard> list) {
         return () -> {
             if (list == longList) {
                 list.selectedItem().to(unit -> {
@@ -166,13 +166,13 @@ public class OrderBookView extends View {
     }
 
     /**
-     * Rendering {@link OrderUnit}.
+     * Rendering {@link OrderBoard}.
      * 
      * @param color
      * @param scale
      * @return
      */
-    private Function<OrderUnit, Canvas> displayOrderUnit(stylist.value.Color color, int scale) {
+    private Function<OrderBoard, Canvas> displayOrderUnit(stylist.value.Color color, int scale) {
         double width = longList.ui.widthProperty().doubleValue();
         double height = 22;
         double fontSize = 12;

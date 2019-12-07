@@ -352,8 +352,8 @@ class OrderBookListTest {
      * @param size
      * @param price
      */
-    private void assertList(List<OrderUnit> list, int index, int price, int size, int total) {
-        OrderUnit unit = list.get(index);
+    private void assertList(List<OrderBoard> list, int index, int price, int size, int total) {
+        OrderBoard unit = list.get(index);
         assert unit.size.is(size);
         assert unit.price.is(price);
         // assert unit.total.is(total);
@@ -366,8 +366,8 @@ class OrderBookListTest {
      * @param size
      * @return
      */
-    private List<OrderUnit> unit(int price, int size) {
-        return Collections.singletonList(new OrderUnit(Num.of(price), Num.of(size)));
+    private List<OrderBoard> unit(int price, int size) {
+        return Collections.singletonList(new OrderBoard(Num.of(price), Num.of(size)));
     }
 
     @Test
