@@ -57,6 +57,7 @@ public class OrderBook {
         this.side = Objects.requireNonNull(side);
         this.scale = setting.targetCurrencyScaleSize;
         this.base = new SafeGapList();
+        this.group = new GroupedOrderBook(setting.baseCurrencyMinimumBidPrice);
     }
 
     /**
@@ -81,7 +82,7 @@ public class OrderBook {
             this.replacer = replacer;
 
             base = replacer.apply(base);
-            if (group != null) group.boards = replacer.apply(group.boards);
+            group.boards = replacer.apply(group.boards);
         }
     }
 
@@ -92,7 +93,7 @@ public class OrderBook {
      * @return A grouped view.
      */
     public final List<OrderBoard> groupBy(Num range) {
-        if (group == null || group.range.isNot(range)) {
+        if (group.range.isNot(range)) {
             group = new GroupedOrderBook(range);
         }
         return group.boards;
@@ -171,10 +172,8 @@ public class OrderBook {
                     if (unit != null && unit.price.isGreaterThan(hint)) {
                         iterator.remove();
 
-                        if (group != null) {
-                            group.update(unit.price, unit.size.negate());
-                            group.fixHead(hint);
-                        }
+                        group.update(unit.price, unit.size.negate());
+                        group.fixHead(hint);
                     } else {
                         break;
                     }
@@ -188,10 +187,8 @@ public class OrderBook {
                     if (unit != null && unit.price.isLessThan(hint)) {
                         iterator.remove();
 
-                        if (group != null) {
-                            group.update(unit.price, unit.size.negate());
-                            group.fixTail(hint);
-                        }
+                        group.update(unit.price, unit.size.negate());
+                        group.fixTail(hint);
                     } else {
                         break;
                     }
@@ -327,9 +324,7 @@ public class OrderBook {
      * @param size
      */
     private void update(Num price, Num size) {
-        if (group != null) {
-            group.update(price, size);
-        }
+        group.update(price, size);
     }
 
     /**
