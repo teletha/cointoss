@@ -14,10 +14,10 @@ import cointoss.util.Num;
 public class OrderBoard implements Comparable<OrderBoard> {
 
     /** The board price. */
-    public final Num price;
+    public Num price;
 
     /** The board size. */
-    public final Num size;
+    public Num size;
 
     /**
      * Simple Builder.
