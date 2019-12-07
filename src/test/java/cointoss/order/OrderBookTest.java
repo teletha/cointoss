@@ -20,7 +20,7 @@ import cointoss.Direction;
 import cointoss.MarketSetting;
 import cointoss.util.Num;
 
-class OrderBookListTest {
+class OrderBookTest {
 
     private MarketSetting setting = MarketSetting.with.baseCurrencyMinimumBidPrice(ONE)
             .targetCurrencyMinimumBidSize(ONE)
