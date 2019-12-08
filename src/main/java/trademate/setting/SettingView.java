@@ -9,13 +9,14 @@
  */
 package trademate.setting;
 
+import static transcript.Transcript.en;
+
 import java.util.List;
 
 import kiss.Managed;
 import kiss.Singleton;
 import stylist.Style;
 import stylist.StyleDSL;
-import transcript.Transcript;
 import viewtify.ui.UI;
 import viewtify.ui.UILabel;
 import viewtify.ui.UIPane;
@@ -79,15 +80,6 @@ public class SettingView extends View {
             background.color("derive(-fx-base, 6%)");
         };
 
-        Transcript general = Transcript.en("General");
-
-        Transcript appearance = Transcript.en("Appearance");
-
-        Transcript chart = Transcript.en("Chart");
-
-        Transcript notification = Transcript.en("Notification");
-
-        Transcript bitflyer = Transcript.en("Bitflyer");
     }
 
     /**
@@ -95,13 +87,13 @@ public class SettingView extends View {
      */
     @Override
     protected void initialize() {
-        select(notification, NotificationSetting.class);
+        select(notification, NotificatorSetting.class);
 
-        general.text(style.general).when(User.MouseClick, () -> select(general, GeneralSetting.class));
-        appearance.text(style.appearance).when(User.MouseClick, () -> select(appearance, AppearanceSetting.class));
-        chart.text(style.chart).when(User.MouseClick, () -> select(appearance, ChartSetting.class));
-        notification.text(style.notification).when(User.MouseClick, () -> select(notification, NotificationSetting.class));
-        bitflyer.text(style.bitflyer).when(User.MouseClick, () -> select(bitflyer, BitFlyerSetting.class));
+        general.text(en("General")).when(User.MouseClick, () -> select(general, GeneralSetting.class));
+        appearance.text(en("Appearance")).when(User.MouseClick, () -> select(appearance, AppearanceSetting.class));
+        chart.text(en("Chart")).when(User.MouseClick, () -> select(appearance, ChartSetting.class));
+        notification.text(en("Notification")).when(User.MouseClick, () -> select(notification, NotificatorSetting.class));
+        bitflyer.text(en("Bitflyer")).when(User.MouseClick, () -> select(bitflyer, BitFlyerSetting.class));
     }
 
     private void select(UILabel selected, Class<? extends View> view) {

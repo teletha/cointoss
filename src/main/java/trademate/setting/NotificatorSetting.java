@@ -31,7 +31,7 @@ import viewtify.ui.helper.User;
 import viewtify.util.Icon;
 
 @Managed(value = Singleton.class)
-public class NotificationSetting extends View {
+class NotificatorSetting extends View {
 
     /** The notificator. */
     private final Notificator notificator = I.make(Notificator.class);
