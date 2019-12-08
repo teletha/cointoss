@@ -10,7 +10,7 @@
 package trademate.setting;
 
 import static trademate.setting.SettingStyles.*;
-import static transcript.Transcript.en;
+import static transcript.Transcript.*;
 
 import java.time.Duration;
 
@@ -111,7 +111,9 @@ public class NotificationSetting extends View {
         desktopDuration.items(I.signal(2).recurse(v -> v + 2).take(30).map(Duration::ofSeconds))
                 .sync(notificator.desktopDuration)
                 .format(duration -> duration.getSeconds() + en("seconds").get());
-        desktopPosition.items(DesktopPosition.values()).sync(notificator.desktopPosition);
+        desktopPosition.items(DesktopPosition.values()).sync(notificator.desktopPosition).when(User.Action, e -> {
+            notificator.longTrend.message("okok");
+        });
 
         // For LINE
         lineAccessToken.sync(notificator.lineAccessToken);
@@ -153,9 +155,9 @@ public class NotificationSetting extends View {
          */
         @Override
         protected void initialize() {
-            desktop.sync(notify.desktop);
-            line.sync(notify.line).disableWhen(notificator.lineAccessToken.iŝ(String::isEmpty));
-            sound.items(Sound.values()).sync(notify.sound).when(User.Action, e -> {
+            desktop.sync(notify.onDesktop);
+            line.sync(notify.onLine).disableWhen(notificator.lineAccessToken.iŝ(String::isEmpty));
+            sound.items(Sound.values()).sync(notify.onSound).when(User.Action, e -> {
                 sound.value().play();
             });
         }
@@ -168,7 +170,7 @@ public class NotificationSetting extends View {
             return new UI() {
                 {
                     $(hbox, FormRow, () -> {
-                        label(notify, FormLabel);
+                        label(notify.name, FormLabel);
                         $(hbox, FormCheck, () -> {
                             $(desktop);
                         });

@@ -9,45 +9,32 @@
  */
 package trademate.setting;
 
-import javafx.geometry.Pos;
-import javafx.util.Duration;
+import static transcript.Transcript.*;
 
 import org.controlsfx.control.Notifications;
 
-import com.google.common.base.Supplier;
-
 import cointoss.util.Network;
+import javafx.geometry.Pos;
+import javafx.util.Duration;
 import kiss.I;
+import kiss.Manageable;
+import kiss.Singleton;
 import kiss.Storable;
 import kiss.Variable;
-import trademate.TradeMate;
 import transcript.Transcript;
-import viewtify.Viewtify;
 
-/**
- * @version 2018/09/16 8:44:00
- */
+@Manageable(lifestyle = Singleton.class)
 public class Notificator implements Storable<Notificator> {
 
-    private static final Transcript LongTrend = Transcript.en("Long Trend");
+    public final Notify longTrend = new Notify(en("Long Trend"));
 
-    private static final Transcript ShortTrend = Transcript.en("Short Trend");
+    public final Notify shortTrend = new Notify(en("Short Trend"));
 
-    private static final Transcript Execution = Transcript.en("Execution");
+    public final Notify execution = new Notify(en("Execution"));
 
-    private static final Transcript OrderFailed = Transcript.en("Order Failed");
+    public final Notify orderFailed = new Notify(en("Order Failed"));
 
-    private static final Transcript PriceSignal = Transcript.en("Price Signal");
-
-    public final Notify longTrend = new Notify(LongTrend);
-
-    public final Notify shortTrend = new Notify(ShortTrend);
-
-    public final Notify execution = new Notify(Execution);
-
-    public final Notify orderFailed = new Notify(OrderFailed);
-
-    public final Notify priceSignal = new Notify(PriceSignal);
+    public final Notify priceSignal = new Notify(en("Price Signal"));
 
     /** The desktop position. */
     public final Variable<DesktopPosition> desktopPosition = Variable.of(DesktopPosition.BottomRight);
@@ -66,80 +53,91 @@ public class Notificator implements Storable<Notificator> {
     }
 
     /**
-     * @version 2018/08/30 10:30:06
+     * 
      */
-    public class Notify implements Supplier<String> {
+    public class Notify {
 
         /** Showing desktop notification. */
-        public final Variable<Boolean> desktop = Variable.of(false);
+        public final Variable<Boolean> onDesktop = Variable.of(false);
 
         /** Showing line notification. */
-        public final Variable<Boolean> line = Variable.of(false);
+        public final Variable<Boolean> onLine = Variable.of(false);
 
-        /** Showing notification pane. */
-        public final Variable<Sound> sound = Variable.of(Sound.なし);
+        /** Notifiy by sound. */
+        public final Variable<Sound> onSound = Variable.of(Sound.なし);
 
-        /** The type name. */
-        private final CharSequence name;
+        /** The name. */
+        final Transcript name;
 
         /**
          * 
          */
-        public Notify(CharSequence name) {
+        Notify(Transcript name) {
             this.name = name;
         }
 
         /**
-         * Notify something.
+         * Notify.
          * 
          * @param message
          */
-        public void notify(CharSequence message) {
-            // by sound
-            if (sound.isPresent() && sound.isNot(Sound.なし)) {
-                sound.v.play();
-            }
+        public final void notify(String message) {
+            message(message);
+            sound();
+        }
 
-            // to desktop
-            if (desktop.is(true)) {
-                Viewtify.inUI(() -> {
-                    Notifications.create()
-                            .darkStyle()
-                            .hideCloseButton()
-                            .position(desktopPosition.v.position)
-                            .hideAfter(Duration.seconds(desktopDuration.v.getSeconds()))
-                            .text(message.toString())
-                            .owner(I.make(TradeMate.class).screen())
-                            .show();
-                });
-            }
+        /**
+         * Notify by simple message.
+         * 
+         * @param message
+         */
+        public final void message(String message) {
+            if (message != null) {
+                message = message.strip();
 
-            // to LINE
-            if (line.is(true)) {
-                I.make(Network.class).line(message).to(I.NoOP);
+                if (message.length() != 0) {
+                    // to desktop
+                    if (onDesktop.is(true)) {
+                        Notifications.create()
+                                .darkStyle()
+                                .hideCloseButton()
+                                .position(desktopPosition.v.position)
+                                .hideAfter(Duration.seconds(desktopDuration.v.getSeconds()))
+                                .text(message)
+                                .show();
+                    }
+
+                    // to LINE
+                    if (onLine.is(true)) {
+                        I.make(Network.class).line(message).to(I.NoOP);
+                    }
+                }
             }
         }
 
         /**
-         * {@inheritDoc}
+         * Notify by sound.
          */
-        @Override
-        public String get() {
-            return name.toString();
+        public final void sound() {
+            onSound.to(v -> {
+                if (v != Sound.なし) {
+                    v.play();
+                }
+            });
         }
     }
 
     /**
      * 
      */
-    public static enum DesktopPosition {
-        TopLeft(Pos.TOP_LEFT, Transcript.en("TopLeft")),
+    static enum DesktopPosition {
+        TopLeft(Pos.TOP_LEFT, en("TopLeft")),
 
-        TopRight(Pos.TOP_RIGHT, Transcript.en("TopRight")),
+        TopRight(Pos.TOP_RIGHT, en("TopRight")),
 
-        BottomLeft(Pos.BOTTOM_LEFT, Transcript.en("BottomLeft")),
+        BottomLeft(Pos.BOTTOM_LEFT, en("BottomLeft")),
 
-        BottomRight(Pos.BOTTOM_RIGHT, Transcript.en("BottomRight"));
+        BottomRight(Pos.BOTTOM_RIGHT, en("BottomRight"));
 
         /** The actual position. */
         private final Pos position;

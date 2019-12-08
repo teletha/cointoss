@@ -14,19 +14,6 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Supplier;
 
-import javafx.collections.ObservableList;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.input.ContextMenuEvent;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Region;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.LineTo;
-import javafx.scene.shape.MoveTo;
-import javafx.scene.shape.Path;
-import javafx.scene.shape.PathElement;
-import javafx.scene.text.Font;
-
 import org.eclipse.collections.api.list.primitive.MutableDoubleList;
 import org.eclipse.collections.impl.list.mutable.primitive.DoubleArrayList;
 
@@ -42,13 +29,24 @@ import cointoss.ticker.Tick;
 import cointoss.ticker.Ticker;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
+import javafx.collections.ObservableList;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.input.ContextMenuEvent;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Region;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.LineTo;
+import javafx.scene.shape.MoveTo;
+import javafx.scene.shape.Path;
+import javafx.scene.shape.PathElement;
+import javafx.scene.text.Font;
 import kiss.I;
 import kiss.Variable;
 import kiss.Ⅲ;
 import stylist.Style;
 import trademate.chart.Axis.TickLable;
 import trademate.chart.PlotScript.PlotDSL;
-import trademate.setting.Notificator;
 import viewtify.Viewtify;
 import viewtify.ui.helper.LayoutAssistant;
 import viewtify.ui.helper.StyleHelper;
@@ -81,9 +79,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
     /** The vertical axis. (shortcut) */
     private final Axis axisY;
-
-    /** The notificator. */
-    private final Notificator notificator = I.make(Notificator.class);
 
     /** Chart UI */
     private final LineMark backGridVertical;
