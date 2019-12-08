@@ -11,12 +11,12 @@ package trademate.setting;
 
 import static trademate.setting.SettingStyles.Root;
 
-import kiss.Manageable;
+import kiss.Managed;
 import kiss.Singleton;
 import viewtify.ui.UI;
 import viewtify.ui.View;
 
-@Manageable(lifestyle = Singleton.class)
+@Managed(value = Singleton.class)
 public class GeneralSetting extends View {
 
     class view extends UI {

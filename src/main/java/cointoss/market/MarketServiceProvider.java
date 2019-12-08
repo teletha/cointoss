@@ -16,12 +16,12 @@ import cointoss.Market;
 import cointoss.MarketService;
 import kiss.Extensible;
 import kiss.I;
-import kiss.Manageable;
+import kiss.Managed;
 import kiss.Signal;
 import kiss.Singleton;
 import kiss.Variable;
 
-@Manageable(lifestyle = Singleton.class)
+@Managed(value = Singleton.class)
 public abstract class MarketServiceProvider implements Extensible {
 
     /** The collection of markets. */

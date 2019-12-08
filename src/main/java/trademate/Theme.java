@@ -9,13 +9,13 @@
  */
 package trademate;
 
-import kiss.Manageable;
+import kiss.Managed;
 import kiss.Singleton;
 import kiss.Storable;
 import kiss.Variable;
 import stylist.value.Color;
 
-@Manageable(lifestyle = Singleton.class)
+@Managed(value = Singleton.class)
 public class Theme implements Storable<Theme> {
 
     /* Long position color. */

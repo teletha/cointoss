@@ -17,13 +17,13 @@ import cointoss.util.Network;
 import javafx.geometry.Pos;
 import javafx.util.Duration;
 import kiss.I;
-import kiss.Manageable;
+import kiss.Managed;
 import kiss.Singleton;
 import kiss.Storable;
 import kiss.Variable;
 import transcript.Transcript;
 
-@Manageable(lifestyle = Singleton.class)
+@Managed(value = Singleton.class)
 public class Notificator implements Storable<Notificator> {
 
     public final Notify longTrend = new Notify(en("Long Trend"));

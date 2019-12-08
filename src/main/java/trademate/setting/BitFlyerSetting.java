@@ -14,7 +14,7 @@ import static transcript.Transcript.en;
 
 import cointoss.market.bitflyer.BitFlyerAccount;
 import kiss.I;
-import kiss.Manageable;
+import kiss.Managed;
 import kiss.Singleton;
 import transcript.Lang;
 import transcript.Transcript;
@@ -25,7 +25,7 @@ import viewtify.ui.UIText;
 import viewtify.ui.View;
 import viewtify.ui.helper.User;
 
-@Manageable(lifestyle = Singleton.class)
+@Managed(value = Singleton.class)
 public class BitFlyerSetting extends View {
 
     /** The account info. */

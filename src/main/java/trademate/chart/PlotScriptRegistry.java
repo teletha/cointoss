@@ -19,7 +19,7 @@ import cointoss.MarketService;
 import cointoss.ticker.Span;
 import cointoss.ticker.Ticker;
 import kiss.I;
-import kiss.Manageable;
+import kiss.Managed;
 import kiss.Singleton;
 import kiss.Storable;
 import kiss.Variable;
@@ -27,7 +27,7 @@ import trademate.chart.builtin.SMAIndicator;
 import trademate.chart.builtin.VolumeIndicator;
 import trademate.chart.builtin.WaveTrendIndicator;
 
-@Manageable(lifestyle = Singleton.class)
+@Managed(value = Singleton.class)
 class PlotScriptRegistry implements Storable<PlotScriptRegistry> {
 
     /** The managed scripts. */

@@ -9,14 +9,14 @@
  */
 package cointoss.market;
 
-import kiss.Manageable;
+import kiss.Managed;
 import kiss.Singleton;
 import kiss.Storable;
 
 /**
  * @version 2018/09/06 21:46:36
  */
-@Manageable(lifestyle = Singleton.class)
+@Managed(value = Singleton.class)
 public abstract class MarketAccount<Self extends MarketAccount> implements Storable<Self> {
 
     /**

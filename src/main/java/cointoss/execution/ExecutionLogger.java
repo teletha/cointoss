@@ -14,13 +14,13 @@ import java.util.Arrays;
 
 import cointoss.Direction;
 import cointoss.util.Num;
-import kiss.Manageable;
+import kiss.Managed;
 import kiss.Singleton;
 
 /**
  * {@link Execution} log writer.
  */
-@Manageable(lifestyle = Singleton.class)
+@Managed(value = Singleton.class)
 public class ExecutionLogger {
 
     /** CONSTANTS */

@@ -19,7 +19,7 @@ import org.apache.logging.log4j.Logger;
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.util.Network;
 import kiss.I;
-import kiss.Manageable;
+import kiss.Managed;
 import kiss.Singleton;
 import trademate.setting.SettingView;
 import trademate.verify.BackTestView;
@@ -30,7 +30,7 @@ import viewtify.ui.UI;
 import viewtify.ui.UITabPane;
 import viewtify.ui.View;
 
-@Manageable(lifestyle = Singleton.class)
+@Managed(value = Singleton.class)
 public class TradeMate extends View {
 
     private UITabPane main;

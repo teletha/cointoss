@@ -14,14 +14,14 @@ import static trademate.setting.SettingStyles.*;
 import static transcript.Transcript.en;
 
 import kiss.I;
-import kiss.Manageable;
+import kiss.Managed;
 import kiss.Singleton;
 import trademate.Theme;
 import viewtify.ui.UI;
 import viewtify.ui.UIColorPicker;
 import viewtify.ui.View;
 
-@Manageable(lifestyle = Singleton.class)
+@Managed(value = Singleton.class)
 public class AppearanceSetting extends View {
 
     private Theme theme = I.make(Theme.class);

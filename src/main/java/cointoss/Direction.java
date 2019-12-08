@@ -15,7 +15,7 @@ import org.apache.commons.lang3.RandomUtils;
 
 import kiss.Decoder;
 import kiss.Encoder;
-import kiss.Manageable;
+import kiss.Managed;
 import kiss.Singleton;
 
 /**
@@ -125,7 +125,7 @@ public enum Direction implements Directional {
     /**
      * 
      */
-    @Manageable(lifestyle = Singleton.class)
+    @Managed(value = Singleton.class)
     private static class Codec implements Encoder<Direction>, Decoder<Direction> {
 
         /**

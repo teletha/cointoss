@@ -22,7 +22,7 @@ import cointoss.util.Num;
 import icy.manipulator.Icy;
 import kiss.Decoder;
 import kiss.Encoder;
-import kiss.Manageable;
+import kiss.Managed;
 import kiss.Singleton;
 
 @Icy(grouping = 2)
@@ -329,7 +329,7 @@ abstract class ExecutionModel implements Directional {
     /**
      * 
      */
-    @Manageable(lifestyle = Singleton.class)
+    @Managed(value = Singleton.class)
     private static class Codec implements Decoder<ZonedDateTime>, Encoder<ZonedDateTime> {
 
         /**

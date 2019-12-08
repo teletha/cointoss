@@ -24,7 +24,7 @@ import cointoss.Market;
 import kiss.Decoder;
 import kiss.Encoder;
 import kiss.I;
-import kiss.Manageable;
+import kiss.Managed;
 import kiss.Signal;
 import kiss.Singleton;
 import kiss.Variable;
@@ -1496,7 +1496,7 @@ public class Num extends Number implements Comparable<Num> {
     /**
      * 
      */
-    @Manageable(lifestyle = Singleton.class)
+    @Managed(value = Singleton.class)
     private static class Codec implements Encoder<Num>, Decoder<Num> {
 
         /**

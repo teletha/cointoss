@@ -11,7 +11,7 @@ package trademate.setting;
 
 import java.util.List;
 
-import kiss.Manageable;
+import kiss.Managed;
 import kiss.Singleton;
 import stylist.Style;
 import stylist.StyleDSL;
@@ -22,7 +22,7 @@ import viewtify.ui.UIPane;
 import viewtify.ui.View;
 import viewtify.ui.helper.User;
 
-@Manageable(lifestyle = Singleton.class)
+@Managed(value = Singleton.class)
 public class SettingView extends View {
 
     private UILabel general;
