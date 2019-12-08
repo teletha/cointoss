@@ -9,13 +9,16 @@
  */
 package trademate.setting;
 
-import static transcript.Transcript.*;
+import static transcript.Transcript.en;
+
+import java.util.List;
+
+import javafx.geometry.Pos;
+import javafx.util.Duration;
 
 import org.controlsfx.control.Notifications;
 
 import cointoss.util.Network;
-import javafx.geometry.Pos;
-import javafx.util.Duration;
 import kiss.I;
 import kiss.Managed;
 import kiss.Singleton;
@@ -23,27 +26,32 @@ import kiss.Storable;
 import kiss.Variable;
 import transcript.Transcript;
 
-@Managed(value = Singleton.class)
+@Managed(Singleton.class)
 public class Notificator implements Storable<Notificator> {
 
+    /** The defined type. */
     public final Notify longTrend = new Notify(en("Long Trend"));
 
+    /** The defined type. */
     public final Notify shortTrend = new Notify(en("Short Trend"));
 
+    /** The defined type. */
     public final Notify execution = new Notify(en("Execution"));
 
+    /** The defined type. */
     public final Notify orderFailed = new Notify(en("Order Failed"));
 
+    /** The defined type. */
     public final Notify priceSignal = new Notify(en("Price Signal"));
 
     /** The desktop position. */
-    public final Variable<DesktopPosition> desktopPosition = Variable.of(DesktopPosition.BottomRight);
+    final @Managed Variable<DesktopPosition> desktopPosition = Variable.of(DesktopPosition.BottomRight);
 
     /** The duration of desktop display. */
-    public final Variable<java.time.Duration> desktopDuration = Variable.of(java.time.Duration.ofSeconds(1));
+    final @Managed Variable<java.time.Duration> desktopDuration = Variable.of(java.time.Duration.ofSeconds(1));
 
     /** The access token for LINE. */
-    public final Variable<String> lineAccessToken = Variable.empty();
+    final @Managed Variable<String> lineAccessToken = Variable.empty();
 
     /**
      * 
@@ -53,18 +61,27 @@ public class Notificator implements Storable<Notificator> {
     }
 
     /**
+     * Retrieve all notify types.
+     * 
+     * @return
+     */
+    List<Notify> types() {
+        return I.signal(Notificator.class.getFields()).map(f -> f.get(this)).as(Notify.class).toList();
+    }
+
+    /**
      * 
      */
     public class Notify {
 
         /** Showing desktop notification. */
-        public final Variable<Boolean> onDesktop = Variable.of(false);
+        final @Managed Variable<Boolean> onDesktop = Variable.of(false);
 
         /** Showing line notification. */
-        public final Variable<Boolean> onLine = Variable.of(false);
+        final @Managed Variable<Boolean> onLine = Variable.of(false);
 
         /** Notifiy by sound. */
-        public final Variable<Sound> onSound = Variable.of(Sound.なし);
+        final @Managed Variable<Sound> onSound = Variable.of(Sound.なし);
 
         /** The name. */
         final Transcript name;
@@ -109,7 +126,7 @@ public class Notificator implements Storable<Notificator> {
 
                     // to LINE
                     if (onLine.is(true)) {
-                        I.make(Network.class).line(message).to(I.NoOP);
+                        I.make(Network.class).line(message, lineAccessToken.v).to(I.NoOP);
                     }
                 }
             }

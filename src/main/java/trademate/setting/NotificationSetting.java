@@ -10,7 +10,7 @@
 package trademate.setting;
 
 import static trademate.setting.SettingStyles.*;
-import static transcript.Transcript.*;
+import static transcript.Transcript.en;
 
 import java.time.Duration;
 
@@ -36,26 +36,21 @@ public class NotificationSetting extends View {
     /** The notificator. */
     private final Notificator notificator = I.make(Notificator.class);
 
-    private NotifySetting longTrend = new NotifySetting(notificator.longTrend);
-
-    private NotifySetting shortTrend = new NotifySetting(notificator.shortTrend);
-
-    private NotifySetting execution = new NotifySetting(notificator.execution);
-
-    private NotifySetting orderFailed = new NotifySetting(notificator.orderFailed);
-
-    private NotifySetting priceSignal = new NotifySetting(notificator.priceSignal);
-
+    /** The desktop configuration UI. */
     private UISpinner<Duration> desktopDuration;
 
+    /** The desktop configuration UI. */
     private UIComboBox<DesktopPosition> desktopPosition;
 
-    /** The access token for LINE. */
+    /** The LINE configuration UI. */
     private UIPassword lineAccessToken;
 
-    /** The access token tester. */
+    /** The LINE configuration UI. */
     private UIButton lineTest;
 
+    /**
+     * UI definition.
+     */
     class view extends UI {
         {
             $(vbox, Root, () -> {
@@ -68,11 +63,10 @@ public class NotificationSetting extends View {
                         label(en("LINE"), FormCheck, FormHeaderLabel);
                         label(en("Sound"), FormCheck2, FormHeaderLabel);
                     });
-                    $(longTrend);
-                    $(shortTrend);
-                    $(execution);
-                    $(orderFailed);
-                    $(priceSignal);
+
+                    for (Notify type : notificator.types()) {
+                        $(new Setting(type));
+                    }
                 });
 
                 // Desktop
@@ -108,17 +102,15 @@ public class NotificationSetting extends View {
     @Override
     protected void initialize() {
         // For Desktop
+        desktopPosition.items(DesktopPosition.values()).sync(notificator.desktopPosition);
         desktopDuration.items(I.signal(2).recurse(v -> v + 2).take(30).map(Duration::ofSeconds))
                 .sync(notificator.desktopDuration)
                 .format(duration -> duration.getSeconds() + en("seconds").get());
-        desktopPosition.items(DesktopPosition.values()).sync(notificator.desktopPosition).when(User.Action, e -> {
-            notificator.longTrend.message("okok");
-        });
 
         // For LINE
         lineAccessToken.sync(notificator.lineAccessToken);
         lineTest.text(en("Send test message")).when(User.Action, () -> {
-            I.make(Network.class).line("TEST").to(e -> {
+            I.make(Network.class).line("TEST", notificator.lineAccessToken.v).to(e -> {
                 lineAccessToken.decorateBy(Icon.Success);
             }, e -> {
                 lineAccessToken.invalid(en("The specified token [{0}] is incorrect. Specify the correct token and then test again.")
@@ -128,10 +120,11 @@ public class NotificationSetting extends View {
     }
 
     /**
-     * @version 2018/08/30 9:54:57
+     * 
      */
-    private class NotifySetting extends View {
+    class Setting extends View {
 
+        /** The notify type. */
         private final Notify notify;
 
         /** Enable desktop notification. */
@@ -146,7 +139,7 @@ public class NotificationSetting extends View {
         /**
          * @param notify
          */
-        private NotifySetting(Notify notify) {
+        private Setting(Notify notify) {
             this.notify = notify;
         }
 
@@ -157,32 +150,24 @@ public class NotificationSetting extends View {
         protected void initialize() {
             desktop.sync(notify.onDesktop);
             line.sync(notify.onLine).disableWhen(notificator.lineAccessToken.iŝ(String::isEmpty));
-            sound.items(Sound.values()).sync(notify.onSound).when(User.Action, e -> {
-                sound.value().play();
-            });
+            sound.items(Sound.values()).sync(notify.onSound).when(User.Action, () -> sound.value().play());
         }
 
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        protected UI declareUI() {
-            return new UI() {
-                {
-                    $(hbox, FormRow, () -> {
-                        label(notify.name, FormLabel);
-                        $(hbox, FormCheck, () -> {
-                            $(desktop);
-                        });
-                        $(hbox, FormCheck, () -> {
-                            $(line);
-                        });
-                        $(hbox, FormCheck2, () -> {
-                            $(sound);
-                        });
+        class view extends UI {
+            {
+                $(hbox, FormRow, () -> {
+                    label(notify.name, FormLabel);
+                    $(hbox, FormCheck, () -> {
+                        $(desktop);
                     });
-                }
-            };
+                    $(hbox, FormCheck, () -> {
+                        $(line);
+                    });
+                    $(hbox, FormCheck2, () -> {
+                        $(sound);
+                    });
+                });
+            }
         }
     }
 }

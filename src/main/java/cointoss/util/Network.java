@@ -39,7 +39,6 @@ import okhttp3.ResponseBody;
 import okhttp3.WebSocket;
 import okhttp3.WebSocketListener;
 import okio.Buffer;
-import trademate.setting.Notificator;
 
 public class Network {
 
@@ -383,13 +382,12 @@ public class Network {
      * Call LINE notify API.
      * 
      * @param message A message to send
+     * @param token Notify API token.
      */
-    public Signal<?> line(CharSequence message) {
-        Notificator notificator = I.make(Notificator.class);
-
-        if (notificator.lineAccessToken.isPresent()) {
+    public Signal<?> line(CharSequence message, String token) {
+        if (token != null) {
             Request request = new Request.Builder().url("https://notify-api.line.me/api/notify")
-                    .addHeader("Authorization", "Bearer " + notificator.lineAccessToken)
+                    .addHeader("Authorization", "Bearer " + token)
                     .post(RequestBody.create(MediaType.parse("application/x-www-form-urlencoded; charset=utf-8"), "message=\r\n" + message))
                     .build();
 
