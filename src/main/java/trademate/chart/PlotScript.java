@@ -18,11 +18,12 @@ import cointoss.ticker.Ticker;
 import cointoss.util.Num;
 import kiss.Variable;
 import stylist.Style;
+import stylist.StyleDSL;
 import trademate.chart.ChartCanvas.CandleMark;
 import trademate.chart.ChartCanvas.Horizon;
 import trademate.chart.ChartCanvas.LineChart;
 
-public abstract class PlotScript {
+public abstract class PlotScript implements StyleDSL {
 
     /** The plotter. */
     protected final PlotDSL bottom = new PlotDSL(PlotArea.Bottom, this);
@@ -66,7 +67,7 @@ public abstract class PlotScript {
      */
     public String name() {
         Class clazz = getClass();
-        if (clazz.isMemberClass()) {
+        if (clazz.isMemberClass() || clazz.isAnonymousClass() || clazz.isLocalClass()) {
             clazz = clazz.getEnclosingClass();
         }
         return clazz.getSimpleName().replace("Indicator", "");

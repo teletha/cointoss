@@ -27,7 +27,6 @@ import cointoss.ticker.Ticker;
 import cointoss.util.Num;
 import kiss.Signal;
 import stylist.Style;
-import stylist.StyleDSL;
 import trademate.TradeMateStyle;
 import trademate.chart.PlotScript;
 
@@ -38,12 +37,6 @@ public class VolumeCross extends Trader {
 
     public int smaLength = 3;
 
-    Indicator<Num> volumeDiff;
-
-    Indicator<Boolean> upPrediction;
-
-    Indicator<Boolean> downPrediction;
-
     /**
      * {@inheritDoc}
      */
@@ -51,9 +44,13 @@ public class VolumeCross extends Trader {
     protected void declare(Market market, FundManager fund) {
         Indicator<Num> buyVolume = Indicator.build(market.tickers.of(Span.Minute5), Tick::buyVolume);
         Indicator<Num> sellVolume = Indicator.build(market.tickers.of(Span.Minute5), Tick::sellVolume);
-        volumeDiff = buyVolume.map(sellVolume, (b, s) -> b.minus(s)).scale(market.service.setting.targetCurrencyScaleSize).sma(7);
-        upPrediction = Indicator.build(market.tickers.of(Span.Minute5), Tick::isBear).map(volumeDiff, (t, d) -> t && d.isPositive());
-        downPrediction = Indicator.build(market.tickers.of(Span.Minute5), Tick::isBull).map(volumeDiff, (t, d) -> t && d.isNegative());
+        Indicator<Num> volumeDiff = buyVolume.map(sellVolume, (b, s) -> b.minus(s))
+                .scale(market.service.setting.targetCurrencyScaleSize)
+                .sma(7);
+        Indicator<Boolean> upPrediction = Indicator.build(market.tickers.of(Span.Minute5), Tick::isBear)
+                .map(volumeDiff, (t, d) -> t && d.isPositive());
+        Indicator<Boolean> downPrediction = Indicator.build(market.tickers.of(Span.Minute5), Tick::isBull)
+                .map(volumeDiff, (t, d) -> t && d.isNegative());
 
         // disableWhile(observeProfit().map(p -> p.isLessThan(-10000)));
 
@@ -82,34 +79,30 @@ public class VolumeCross extends Trader {
                 exitWhen(volumeDiff.observe().plug(near(2, o -> o.isGreaterThan(0))), o -> o.take());
             }
         });
+
+        option(new PlotScript() {
+            Style diff = () -> {
+                stroke.color("#eee");
+            };
+
+            Style upMark = () -> {
+                fill.color(TradeMateStyle.BUY);
+            };
+
+            Style downMark = () -> {
+                fill.color(TradeMateStyle.SELL);
+            };
+
+            @Override
+            protected void declare(Market market, Ticker ticker) {
+                lowN.line(volumeDiff, diff);
+                main.mark(upPrediction, upMark);
+                main.mark(downPrediction, downMark);
+            }
+        });
     }
 
     private <In> Function<Signal<In>, Signal<List<In>>> near(int size, Predicate<In> condition) {
         return signal -> signal.buffer(size, 1).take(buff -> buff.stream().allMatch(condition));
-    }
-
-    /**
-     * 
-     */
-    class Plot extends PlotScript implements StyleDSL {
-
-        Style diff = () -> {
-            stroke.color("#eee");
-        };
-
-        Style upMark = () -> {
-            fill.color(TradeMateStyle.BUY);
-        };
-
-        Style downMark = () -> {
-            fill.color(TradeMateStyle.SELL);
-        };
-
-        @Override
-        protected void declare(Market market, Ticker ticker) {
-            lowN.line(volumeDiff, diff);
-            main.mark(upPrediction, upMark);
-            main.mark(downPrediction, downMark);
-        }
     }
 }

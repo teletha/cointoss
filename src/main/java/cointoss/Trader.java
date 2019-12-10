@@ -13,6 +13,8 @@ import static java.time.temporal.ChronoUnit.*;
 
 import java.time.ZonedDateTime;
 import java.time.temporal.TemporalUnit;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.NavigableMap;
 import java.util.Objects;
 import java.util.Set;
@@ -32,15 +34,19 @@ import cointoss.execution.Execution;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
 import kiss.Disposable;
+import kiss.Extensible;
 import kiss.I;
 import kiss.Signal;
 import kiss.WiseFunction;
 import kiss.WiseSupplier;
 
-public abstract class Trader extends TraderBase {
+public abstract class Trader extends TraderBase implements Extensible {
 
     /** The identity element of {@link Snapshot}. */
     private static final Snapshot EMPTY_SNAPSHOT = new Snapshot(Num.ZERO, Num.ZERO, Num.ZERO, Num.ZERO, Num.ZERO);
+
+    /** The registered options. */
+    private final List options = new ArrayList();
 
     /** The market. */
     private Market market;
@@ -69,7 +75,6 @@ public abstract class Trader extends TraderBase {
         setHoldMaxSize(Num.ZERO);
         snapshots.clear();
         snapshots.put(Chrono.MIN, EMPTY_SNAPSHOT);
-        disable.clear();
 
         if (this.market == null) {
             this.market = Objects.requireNonNull(market);
@@ -157,6 +162,19 @@ public abstract class Trader extends TraderBase {
                 disable.remove(duration);
             }
         }).add(() -> disable.remove(duration)));
+    }
+
+    /**
+     * Set the disable property of this {@link Trader}.
+     * 
+     * @param disable The disable value to set.
+     */
+    private void setEnable(boolean enable) {
+        if (enable) {
+            enable();
+        } else {
+            disable();
+        }
     }
 
     /**
@@ -305,6 +323,36 @@ public abstract class Trader extends TraderBase {
 
         // update profit
         setProfit(snapshot.profit(market.tickers.latestPrice.v));
+    }
+
+    /**
+     * Register optional helper for this {@link Trader}.
+     * 
+     * @param option
+     */
+    protected final void option(Object option) {
+        if (option != null) {
+            this.options.add(option);
+        }
+    }
+
+    /**
+     * Find all registered options by the specified type.
+     * 
+     * @param <T>
+     * @param type
+     * @return
+     */
+    public final <T> List<T> findOptionBy(Class<T> type) {
+        return I.signal(options).as(type).toList();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        return name();
     }
 
     /**

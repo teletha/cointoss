@@ -14,7 +14,7 @@ import cointoss.util.ObservableNumProperty;
 import icy.manipulator.Icy;
 
 @Icy
-interface TraderBaseModel {
+abstract class TraderBaseModel {
 
     /**
      * Return the current hold size of target currency. Positive number means long position,
@@ -23,7 +23,7 @@ interface TraderBaseModel {
      * @return A current hold size.
      */
     @Icy.Property(setterModifier = "final", custom = ObservableNumProperty.class)
-    default Num holdSize() {
+    public Num holdSize() {
         return Num.ZERO;
     }
 
@@ -33,7 +33,7 @@ interface TraderBaseModel {
      * @return A maximum hold size.
      */
     @Icy.Property(setterModifier = "final", custom = ObservableNumProperty.class)
-    default Num holdMaxSize() {
+    public Num holdMaxSize() {
         return Num.ZERO;
     }
 
@@ -43,7 +43,23 @@ interface TraderBaseModel {
      * @return A current profit and loss.
      */
     @Icy.Property(setterModifier = "final", custom = ObservableNumProperty.class)
-    default Num profit() {
+    public Num profit() {
         return Num.ZERO;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object obj) {
+        return super.equals(obj);
     }
 }

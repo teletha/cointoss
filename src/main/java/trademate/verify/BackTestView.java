@@ -13,7 +13,13 @@ import static transcript.Transcript.en;
 
 import java.time.Period;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Supplier;
+
+import javafx.beans.value.ObservableValue;
+
+import org.controlsfx.control.PropertySheet;
+import org.controlsfx.control.PropertySheet.Item;
 
 import cointoss.Market;
 import cointoss.MarketService;
@@ -24,15 +30,12 @@ import cointoss.analyze.TradingStatistics;
 import cointoss.execution.ExecutionLog;
 import cointoss.execution.ExecutionLog.LogType;
 import cointoss.market.MarketServiceProvider;
-import cointoss.trading.LazyBear;
-import cointoss.trading.VolumeCross;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
 import cointoss.verify.BackTest;
 import kiss.I;
-import kiss.Signal;
-import kiss.WiseSupplier;
 import kiss.model.Model;
+import kiss.model.Property;
 import stylist.Style;
 import stylist.StyleDSL;
 import trademate.chart.ChartView;
@@ -47,6 +50,7 @@ import viewtify.ui.UICheckBox;
 import viewtify.ui.UIComboBox;
 import viewtify.ui.UIDatePicker;
 import viewtify.ui.UILabel;
+import viewtify.ui.UIPane;
 import viewtify.ui.UITableColumn;
 import viewtify.ui.UITableView;
 import viewtify.ui.View;
@@ -72,6 +76,12 @@ public class BackTestView extends View implements Analyzer {
 
     /** Runner UI */
     private UICheckBox fastLog;
+
+    /** Runner UI */
+    private UIComboBox<Trader> traderSelection;
+
+    /** Runner UI */
+    private UIPane traderPane;
 
     private ChartView chart;
 
@@ -131,7 +141,6 @@ public class BackTestView extends View implements Analyzer {
     class view extends UI implements SettingStyles {
 
         {
-
             $(vbox, () -> {
                 $(hbox, style.fill, () -> {
                     $(chart);
@@ -150,6 +159,8 @@ public class BackTestView extends View implements Analyzer {
                             $(runner);
                             $(fastLog, style.formCheck);
                         });
+                        $(traderSelection, style.traderSelect);
+                        $(traderPane);
                     });
                 });
 
@@ -213,6 +224,10 @@ public class BackTestView extends View implements Analyzer {
             padding.left(10, px);
         };
 
+        Style traderSelect = () -> {
+            margin.top(12, px).bottom(8, px);
+        };
+
         Style max = () -> {
             font.color(255, 230, 230);
         };
@@ -248,13 +263,159 @@ public class BackTestView extends View implements Analyzer {
             BackTest.with.service(marketSelection.value())
                     .start(startDate.zoned())
                     .end(endDate.zoned())
-                    .traders(new LazyBear(), new VolumeCross())
+                    .traders(I.signal(traderSelection.items()).map(this::clone).toList())
                     .initialBaseCurrency(3000000)
                     .type(fastLog.value() ? LogType.Fast : LogType.Normal)
                     .run(this);
         });
 
+        configureTradersView();
         configureTradingLogView();
+    }
+
+    private void configureTradersView() {
+        traderSelection.items(I.find(Trader.class)).when(User.Action, () -> {
+            traderPane.set(new TraderView(traderSelection.value()));
+        });
+    }
+
+    /**
+     * Compute all editable properties of the specified model.
+     * 
+     * @param model
+     * @return
+     */
+    private List<Property> editableProperties(Model<Trader> model) {
+        return I.signal(model.properties())
+                .skip(p -> p.name.equals("holdSize") || p.name.equals("holdMaxSize") || p.name.equals("profit"))
+                .toList();
+    }
+
+    /**
+     * Clone the specified {@link Trader} with copying all editable properties.
+     * 
+     * @param base A base {@link Trader}.
+     * @return A cloned {@link Trader}.
+     */
+    private Trader clone(Trader base) {
+        Model<Trader> model = Model.of(base);
+        Trader clone = I.make(model.type);
+        for (Property p : editableProperties(model)) {
+            model.set(clone, p, model.get(base, p));
+        }
+        return clone;
+    }
+
+    /**
+     * Sub Trader view.
+     */
+    class TraderView extends View {
+
+        private final Trader trader;
+
+        private final Model<Trader> model;
+
+        private PropertySheet sheet = new PropertySheet();
+
+        private TraderView(Trader trader) {
+            this.trader = trader;
+            this.model = Model.of(trader);
+        }
+
+        /**
+         * UI definition.
+         */
+        class view extends UI {
+            {
+                $(vbox, () -> {
+                    $(sheet);
+                });
+            }
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected void initialize() {
+            for (Property p : editableProperties(model)) {
+                sheet.getItems().add(new PropertyItem(p));
+            }
+        }
+
+        /**
+         * 
+         */
+        private class PropertyItem implements PropertySheet.Item {
+
+            /** The target property. */
+            private final Property property;
+
+            /**
+             * Create {@link Item} for {@link Property}.
+             * 
+             * @param property
+             */
+            private PropertyItem(Property property) {
+                this.property = property;
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public Class<?> getType() {
+                return property.model.type;
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public String getCategory() {
+                return property.name;
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public String getName() {
+                return property.name;
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public String getDescription() {
+                return property.name;
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public Object getValue() {
+                return model.get(trader, property);
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public void setValue(Object value) {
+                model.set(trader, property, value);
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public Optional<ObservableValue<? extends Object>> getObservableValue() {
+                return Optional.empty();
+            }
+        }
     }
 
     /**
@@ -341,22 +502,11 @@ public class BackTestView extends View implements Analyzer {
         chart.reduceRealtimeUpdate();
         chart.market.set(market);
         chart.scripts.clear();
-        chart.scripts.addAll(I.signal(traders).flatMap(this::createTraderPlotScript).startWith(TraderVisualizer::new).toList());
-    }
-
-    /**
-     * Create {@link PlotScript} from member class within {@link Trader}.
-     * 
-     * @param trader
-     * @return
-     */
-    private Signal<Supplier<PlotScript>> createTraderPlotScript(Trader trader) {
-        return I.signal(trader)
-                .flatArray(t -> t.getClass().getDeclaredClasses())
-                .take(clazz -> PlotScript.class.isAssignableFrom(clazz))
-                .map(clazz -> Model.collectConstructors(clazz)[0])
-                .effect(c -> c.setAccessible(true))
-                .map(c -> (WiseSupplier<PlotScript>) () -> (PlotScript) c.newInstance(trader));
+        chart.scripts.addAll(I.signal(traders)
+                .flatIterable(t -> t.findOptionBy(PlotScript.class))
+                .map(e -> (Supplier<PlotScript>) () -> e)
+                .startWith(TraderVisualizer::new)
+                .toList());
     }
 
     /**
