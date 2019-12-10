@@ -1,6 +1,9 @@
 Access Token
 アクセストークン
 
+Access Token Test
+アクセス・トークン・テスト
+
 Account ID
 アカウントID
 
@@ -84,6 +87,9 @@ Sound
 
 The specified token [{0}] is incorrect. Specify the correct token and then test again.
 指定されたトークン[{0}]は正しくありません。 正しいトークンを指定して,もう一度テストしてください。
+
+The specified token is valid.
+指定されたトークンは有効です。
 
 TopLeft
 左上

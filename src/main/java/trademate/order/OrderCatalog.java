@@ -153,7 +153,7 @@ public class OrderCatalog extends View {
          * 
          */
         private CatalogRow() {
-            styleOnly(Viewtify.observeNow(itemProperty()).as(Order.class).switchMap(o -> o.observeStateNow()).map(S.State::of));
+            styleOnly(Viewtify.observing(itemProperty()).as(Order.class).switchMap(o -> o.observeStateNow()).map(S.State::of));
         }
 
         /**

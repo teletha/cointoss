@@ -1,0 +1,3 @@
+The specified price ({0}) has been reached.
+指定された価格 ({0}) に達しました。
+

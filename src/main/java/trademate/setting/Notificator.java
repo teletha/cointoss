@@ -25,6 +25,7 @@ import kiss.Singleton;
 import kiss.Storable;
 import kiss.Variable;
 import transcript.Transcript;
+import viewtify.Viewtify;
 
 @Managed(Singleton.class)
 public class Notificator implements Storable<Notificator> {
@@ -94,12 +95,13 @@ public class Notificator implements Storable<Notificator> {
         }
 
         /**
-         * Notify.
+         * Notify by simple message and sound.
          * 
-         * @param message
+         * @param title A message title.
+         * @param message A message.
          */
-        public final void notify(String message) {
-            message(message);
+        public final void notify(CharSequence title, CharSequence message) {
+            message(title, message);
             sound();
         }
 
@@ -108,25 +110,28 @@ public class Notificator implements Storable<Notificator> {
          * 
          * @param message
          */
-        public final void message(String message) {
-            if (message != null) {
-                message = message.strip();
+        public final void message(CharSequence title, CharSequence message) {
+            if (title != null && message != null) {
+                String stripedTitle = title.toString().strip();
+                String stripedMessage = message.toString().strip();
 
-                if (message.length() != 0) {
+                if (stripedMessage.length() != 0) {
                     // to desktop
                     if (onDesktop.is(true)) {
-                        Notifications.create()
-                                .darkStyle()
-                                .hideCloseButton()
-                                .position(desktopPosition.v.position)
-                                .hideAfter(Duration.seconds(desktopDuration.v.getSeconds()))
-                                .text(message)
-                                .show();
+                        Viewtify.inUI(() -> {
+                            Notifications.create()
+                                    .darkStyle()
+                                    .position(desktopPosition.v.position)
+                                    .hideAfter(Duration.seconds(desktopDuration.v.getSeconds()))
+                                    .title(stripedTitle)
+                                    .text(stripedMessage)
+                                    .show();
+                        });
                     }
 
                     // to LINE
                     if (onLine.is(true)) {
-                        I.make(Network.class).line(message, lineAccessToken.v).to(I.NoOP);
+                        I.make(Network.class).line(stripedTitle, stripedMessage, lineAccessToken.v).to(I.NoOP);
                     }
                 }
             }

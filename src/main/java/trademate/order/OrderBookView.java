@@ -11,9 +11,6 @@ package trademate.order;
 
 import java.util.function.Function;
 
-import cointoss.order.OrderBookManager;
-import cointoss.order.OrderBoard;
-import cointoss.util.Num;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.canvas.Canvas;
@@ -21,6 +18,10 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontSmoothingType;
+
+import cointoss.order.OrderBoard;
+import cointoss.order.OrderBookManager;
+import cointoss.util.Num;
 import kiss.WiseRunnable;
 import stylist.Style;
 import stylist.StyleDSL;
@@ -106,7 +107,7 @@ public class OrderBookView extends View {
         };
 
         Style hideSize = () -> {
-            display.width(62, px);
+            display.width(66, px);
         };
     }
 
@@ -132,7 +133,7 @@ public class OrderBookView extends View {
                 .when(User.LeftClick, calculatePrice(shortList))
                 .scrollToBottom();
 
-        priceRange.initialize(view.market.service.setting.orderBookGroupRangesWithBase()).observeNow(range -> {
+        priceRange.initialize(view.market.service.setting.orderBookGroupRangesWithBase()).observing(range -> {
             longList.items((ObservableList) book.longs.groupBy(range));
             shortList.items((ObservableList) book.shorts.groupBy(range));
         });

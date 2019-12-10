@@ -87,9 +87,9 @@ public class ChartView extends View {
     @Override
     protected void initialize() {
         span.initialize(Span.values());
-        span.observeNow() //
+        span.observing() //
                 .skipNull()
-                .combineLatest(market.observeNow().skipNull())
+                .combineLatest(market.observing().skipNull())
                 .map(e -> e.ⅱ.tickers.of(e.ⅰ))
                 .to(ticker::set);
     }

@@ -9,7 +9,6 @@
  */
 package trademate.order;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static trademate.CommonText.*;
 import static transcript.Transcript.en;
 
@@ -17,7 +16,6 @@ import java.math.RoundingMode;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
 
-import javafx.scene.control.Spinner;
 import javafx.scene.input.ScrollEvent;
 
 import cointoss.Direction;
@@ -60,7 +58,6 @@ public class OrderBuilder extends View {
     private UISpinner<Num> orderSizeAmount;
 
     /** UI */
-
     UIText orderPrice;
 
     /** UI */
@@ -194,27 +191,34 @@ public class OrderBuilder extends View {
      */
     @Override
     protected void initialize() {
-        orderSize.initialize("0").when(User.Scroll, changeBy(orderSizeAmount.ui)).require(positiveNumber);
+        orderSize.initialize("0").when(User.Scroll, changeBy(orderSizeAmount)).require(positiveNumber);
         orderSizeAmount.initialize(view.service.setting.targetCurrencyBidSizes());
 
-        orderPrice.initialize("0").when(User.Scroll, changeBy(orderPriceAmount.ui)).require(positiveNumber);
+        orderPrice.initialize("0").when(User.Scroll, changeBy(orderPriceAmount)).require(positiveNumber);
         orderPriceAmount.initialize(Num.ONE, Num.HUNDRED, Num.THOUSAND, Num.of(10000));
 
-        orderDivideSize.initialize(IntStream.range(1, 31).boxed());
-        orderDivideIntervalAmount.initialize(IntStream.range(0, 20).boxed()).disableWhen(orderDivideSize.ui.valueProperty().isEqualTo(1));
+        orderDivideSize.initialize(IntStream.rangeClosed(1, 12));
+        orderDivideIntervalAmount.initialize(IntStream.rangeClosed(0, 6)).disableWhen(orderDivideSize.observing().is(1));
+
         optimizeThreshold.initialize(Num.range(0, 20));
         orderPriceInterval.initialize("0")
-                .when(User.Scroll, changeBy(orderPriceIntervalAmount.ui))
+                .when(User.Scroll, changeBy(orderPriceIntervalAmount))
                 .require(positiveNumber)
                 .parent()
-                .disableWhen(orderDivideSize.ui.valueProperty().isEqualTo(1));
+                .disableWhen(orderDivideSize.observing().is(1));
         orderPriceIntervalAmount.initialize(Num.TEN, Num.HUNDRED, Num.THOUSAND);
 
         // validate order condition
         orderLimitLong.parent().disableWhen(orderSize.isInvalid(), orderPrice.isInvalid());
 
-        orderLimitLong.text(Buy).when(User.MouseClick).throttle(1000, MILLISECONDS).mapTo(Direction.BUY).to(this::requestOrder);
-        orderLimitShort.text(Sell).when(User.MouseClick).throttle(1000, MILLISECONDS).mapTo(Direction.SELL).to(this::requestOrder);
+        orderLimitLong.text(Buy).when(User.LeftClick, (e, ui) -> {
+            requestOrder(Direction.BUY);
+            ui.disableBriefly();
+        });
+        orderLimitShort.text(Buy).when(User.LeftClick, (e, ui) -> {
+            requestOrder(Direction.SELL);
+            ui.disableBriefly();
+        });
 
         orderCancel.text(en("Cancel")).when(User.MouseClick).to(() -> view.market.orders.cancelNowAll());
         orderStop.text(en("Stop")).when(User.MouseClick).to(() -> view.market.stop().to(I.NoOP));
@@ -240,17 +244,17 @@ public class OrderBuilder extends View {
      * @param amount
      * @return
      */
-    private WiseBiConsumer<ScrollEvent, UIText> changeBy(Spinner<Num> spinner) {
+    private WiseBiConsumer<ScrollEvent, UIText> changeBy(UISpinner<Num> spinner) {
         return (e, ui) -> {
             Num current = Num.of(ui.value());
             double deltaY = e.getDeltaY();
 
             if (deltaY > 0) {
                 // increment
-                ui.value(current.plus(spinner.getValue()).toString());
+                ui.value(current.plus(spinner.value()).toString());
             } else if (deltaY < 0) {
                 // decrement
-                ui.value(Num.max(Num.ZERO, current.minus(spinner.getValue())).toString());
+                ui.value(Num.max(Num.ZERO, current.minus(spinner.value())).toString());
             }
         };
     }

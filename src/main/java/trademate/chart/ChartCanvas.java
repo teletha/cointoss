@@ -9,10 +9,24 @@
  */
 package trademate.chart;
 
+import static transcript.Transcript.en;
+
 import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Supplier;
+
+import javafx.collections.ObservableList;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Region;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.LineTo;
+import javafx.scene.shape.MoveTo;
+import javafx.scene.shape.Path;
+import javafx.scene.shape.PathElement;
+import javafx.scene.text.Font;
 
 import org.eclipse.collections.api.list.primitive.MutableDoubleList;
 import org.eclipse.collections.impl.list.mutable.primitive.DoubleArrayList;
@@ -22,6 +36,7 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 
 import cointoss.Market;
+import cointoss.MarketService;
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.market.bitflyer.SFD;
 import cointoss.ticker.Indicator;
@@ -29,24 +44,13 @@ import cointoss.ticker.Tick;
 import cointoss.ticker.Ticker;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
-import javafx.collections.ObservableList;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.input.ContextMenuEvent;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Region;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.LineTo;
-import javafx.scene.shape.MoveTo;
-import javafx.scene.shape.Path;
-import javafx.scene.shape.PathElement;
-import javafx.scene.text.Font;
 import kiss.I;
 import kiss.Variable;
 import kiss.Ⅲ;
 import stylist.Style;
 import trademate.chart.Axis.TickLable;
 import trademate.chart.PlotScript.PlotDSL;
+import trademate.setting.Notificator;
 import viewtify.Viewtify;
 import viewtify.ui.helper.LayoutAssistant;
 import viewtify.ui.helper.StyleHelper;
@@ -189,7 +193,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         this.chartInfo.widthProperty().bind(widthProperty());
         this.chartInfo.heightProperty().bind(heightProperty());
 
-        chart.market.observe().combineLatest(chart.ticker.observe(), Viewtify.observeNow(chart.scripts)).to(v -> {
+        chart.market.observe().combineLatest(chart.ticker.observe(), Viewtify.observing(chart.scripts)).to(v -> {
             plotters = plottersCache.getUnchecked(v);
             scripts = I.signal(plotters).map(p -> p.origin).distinct().toList();
         });
@@ -204,7 +208,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 .layoutBy(axisX.scroll.valueProperty(), axisX.scroll.visibleAmountProperty())
                 .layoutBy(axisY.scroll.valueProperty(), axisY.scroll.visibleAmountProperty())
                 .layoutBy(chart.ticker.observe().switchMap(ticker -> ticker.update.startWithNull()))
-                .layoutWhile(chart.showRealtimeUpdate.observeNow());
+                .layoutWhile(chart.showRealtimeUpdate.observing());
 
         configIndicator();
         visualizeNotifyPrice();
@@ -317,7 +321,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
      * Visualize notifiable price in chart.
      */
     private void visualizeNotifyPrice() {
-        addEventHandler(ContextMenuEvent.CONTEXT_MENU_REQUESTED, e -> {
+        when(User.RightClick, e -> {
             double clickedPosition = e.getY();
 
             // check price range to add or remove
@@ -335,6 +339,13 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
             label.add(chart.market.v.signalByPrice(price).on(Viewtify.UIThread).to(exe -> {
                 notifyPrice.remove(label);
+
+                MarketService service = chart.market.v.service;
+                Num p = exe.price.scale(service.setting.targetCurrencyScaleSize);
+                String title = "🔊  " + service.marketReadableName() + " " + p;
+                CharSequence message = en("The specified price ({0}) has been reached.").with(p);
+
+                I.make(Notificator.class).priceSignal.notify(title, message);
             }));
         });
     }
@@ -345,7 +356,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     private void visualizeOrderPrice() {
         chart.market.observe()
                 .switchMap(m -> m.orders.manages())
-                .switchOn(chart.showOrderSupport.observeNow())
+                .switchOn(chart.showOrderSupport.observing())
                 .on(Viewtify.UIThread)
                 .to(o -> {
                     LineMark mark = o.isBuy() ? orderBuyPrice : orderSellPrice;
@@ -362,10 +373,10 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
      * Visualize latest price in chart.
      */
     private void visualizeLatestPrice() {
-        chart.market.observeNow() //
+        chart.market.observing() //
                 .skipNull()
-                .switchMap(m -> m.tickers.latestPrice.observeNow())
-                .switchOn(chart.showLatestPrice.observeNow())
+                .switchMap(m -> m.tickers.latestPrice.observing())
+                .switchOn(chart.showLatestPrice.observing())
                 .on(Viewtify.UIThread)
                 .effectOnLifecycle(disposer -> {
                     TickLable latest = latestPrice.createLabel("最新値");

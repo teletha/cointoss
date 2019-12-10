@@ -384,11 +384,12 @@ public class Network {
      * @param message A message to send
      * @param token Notify API token.
      */
-    public Signal<?> line(CharSequence message, String token) {
+    public Signal<?> line(CharSequence title, CharSequence message, String token) {
         if (token != null) {
             Request request = new Request.Builder().url("https://notify-api.line.me/api/notify")
                     .addHeader("Authorization", "Bearer " + token)
-                    .post(RequestBody.create(MediaType.parse("application/x-www-form-urlencoded; charset=utf-8"), "message=\r\n" + message))
+                    .post(RequestBody.create(MediaType
+                            .parse("application/x-www-form-urlencoded; charset=utf-8"), "message=" + title + "\r\n" + message))
                     .build();
 
             return rest(request, "", null);

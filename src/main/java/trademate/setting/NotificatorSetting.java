@@ -30,7 +30,7 @@ import viewtify.ui.View;
 import viewtify.ui.helper.User;
 import viewtify.util.Icon;
 
-@Managed(value = Singleton.class)
+@Managed(Singleton.class)
 class NotificatorSetting extends View {
 
     /** The notificator. */
@@ -110,12 +110,14 @@ class NotificatorSetting extends View {
         // For LINE
         lineAccessToken.sync(notificator.lineAccessToken);
         lineTest.text(en("Send test message")).when(User.Action, () -> {
-            I.make(Network.class).line("TEST", notificator.lineAccessToken.v).to(e -> {
-                lineAccessToken.decorateBy(Icon.Success);
-            }, e -> {
-                lineAccessToken.invalid(en("The specified token [{0}] is incorrect. Specify the correct token and then test again.")
-                        .with(lineAccessToken.value()));
-            });
+            I.make(Network.class)
+                    .line(en("LINE Access Token Test"), en("The specified token is valid."), notificator.lineAccessToken.v)
+                    .to(e -> {
+                        lineAccessToken.decorateBy(Icon.Success);
+                    }, e -> {
+                        lineAccessToken.invalid(en("The specified token [{0}] is incorrect. Specify the correct token and then test again.")
+                                .with(lineAccessToken.value()));
+                    });
         });
     }
 
@@ -149,7 +151,7 @@ class NotificatorSetting extends View {
         @Override
         protected void initialize() {
             desktop.sync(notify.onDesktop);
-            line.sync(notify.onLine).disableWhen(notificator.lineAccessToken.iŝ(String::isEmpty));
+            line.sync(notify.onLine).disableWhen(notificator.lineAccessToken.observing().is(String::isEmpty));
             sound.items(Sound.values()).sync(notify.onSound).when(User.Action, () -> sound.value().play());
         }
 
