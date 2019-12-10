@@ -49,6 +49,9 @@ General
 LINE
 LINE
 
+LINE Access Token Test
+LINE アクセス・トークン・テスト
+
 LINE Notification
 LINEへの通知
 

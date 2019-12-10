@@ -197,16 +197,18 @@ public class OrderBuilder extends View {
         orderPrice.initialize("0").when(User.Scroll, changeBy(orderPriceAmount)).require(positiveNumber);
         orderPriceAmount.initialize(Num.ONE, Num.HUNDRED, Num.THOUSAND, Num.of(10000));
 
-        orderDivideSize.initialize(IntStream.rangeClosed(1, 12));
-        orderDivideIntervalAmount.initialize(IntStream.rangeClosed(0, 6)).disableWhen(orderDivideSize.observing().is(1));
+        orderDivideIntervalAmount.initialize(IntStream.rangeClosed(0, 6));
+        orderDivideSize.initialize(IntStream.rangeClosed(1, 12)).observing(v -> {
+            boolean disable = v == 1;
+            orderDivideIntervalAmount.disable(disable);
+            orderPriceInterval.disable(disable);
+            orderPriceIntervalAmount.disable(disable);
+        });
+
+        orderPriceIntervalAmount.initialize(Num.TEN, Num.HUNDRED, Num.THOUSAND);
+        orderPriceInterval.initialize("0").when(User.Scroll, changeBy(orderPriceIntervalAmount)).require(positiveNumber);
 
         optimizeThreshold.initialize(Num.range(0, 20));
-        orderPriceInterval.initialize("0")
-                .when(User.Scroll, changeBy(orderPriceIntervalAmount))
-                .require(positiveNumber)
-                .parent()
-                .disableWhen(orderDivideSize.observing().is(1));
-        orderPriceIntervalAmount.initialize(Num.TEN, Num.HUNDRED, Num.THOUSAND);
 
         // validate order condition
         orderLimitLong.parent().disableWhen(orderSize.isInvalid(), orderPrice.isInvalid());
