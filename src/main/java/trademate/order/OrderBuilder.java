@@ -13,7 +13,6 @@ import static trademate.CommonText.*;
 import static transcript.Transcript.en;
 
 import java.math.RoundingMode;
-import java.util.function.Predicate;
 import java.util.stream.IntStream;
 
 import javafx.scene.input.ScrollEvent;
@@ -26,6 +25,7 @@ import cointoss.order.OrderState;
 import cointoss.util.Num;
 import kiss.I;
 import kiss.WiseBiConsumer;
+import kiss.WiseConsumer;
 import stylist.Style;
 import stylist.StyleDSL;
 import trademate.TradeMateStyle;
@@ -38,16 +38,13 @@ import viewtify.ui.UISpinner;
 import viewtify.ui.UIText;
 import viewtify.ui.View;
 import viewtify.ui.helper.User;
+import viewtify.ui.helper.ValueHelper;
 
 public class OrderBuilder extends View {
 
-    private Predicate<UIText> positiveNumber = ui -> {
-        try {
-            return Num.of(ui.value()).isPositive();
-        } catch (
-
-        NumberFormatException e) {
-            return false;
+    private WiseConsumer<ValueHelper> positiveNumber = ui -> {
+        if (Num.of(String.valueOf(ui.value())).isPositive() == false) {
+            throw new NumberFormatException(ui.value() + " is not positive number.");
         }
     };
 
