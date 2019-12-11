@@ -88,6 +88,11 @@ public final class Tick {
         this.sellPriceDecrease = realtime.shortPriceDecrease;
     }
 
+    /**
+     * Get the previous {@link Tick}.
+     * 
+     * @return
+     */
     public Tick previous() {
         return previous.get();
     }
