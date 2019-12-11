@@ -10,11 +10,12 @@
 package cointoss.ticker;
 
 import java.util.Objects;
+import java.util.concurrent.ExecutionException;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import org.eclipse.collections.api.map.primitive.MutableLongObjectMap;
-import org.eclipse.collections.impl.factory.primitive.LongObjectMaps;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 
 import cointoss.util.Num;
 import kiss.I;
@@ -74,8 +75,8 @@ public abstract class Indicator<T> {
     protected final int calculatePreviousTickLength(Tick tick, int max) {
         int actualSize = 1;
 
-        while (tick.previous != null && actualSize < max) {
-            tick = tick.previous;
+        while (tick.previous() != null && actualSize < max) {
+            tick = tick.previous();
             actualSize++;
         }
         return actualSize;
@@ -237,11 +238,11 @@ public abstract class Indicator<T> {
         double multiplier = 2.0 / (size + 1);
 
         return (Indicator<Num>) memoize((size + 1) * 4, (tick, self) -> {
-            if (tick.previous == null) {
+            if (tick.previous() == null) {
                 return valueAt(tick);
             }
 
-            Num previous = (Num) self.apply(tick.previous);
+            Num previous = (Num) self.apply(tick.previous());
             return (T) ((Num) valueAt(tick)).minus(previous).multiply(multiplier).plus(previous);
         });
     }
@@ -266,11 +267,11 @@ public abstract class Indicator<T> {
         double multiplier = 1.0 / size;
 
         return (Indicator<Num>) memoize((size + 1) * 4, (tick, self) -> {
-            if (tick.previous == null) {
+            if (tick.previous() == null) {
                 return valueAt(tick);
             }
 
-            Num previous = (Num) self.apply(tick.previous);
+            Num previous = (Num) self.apply(tick.previous());
             return (T) ((Num) valueAt(tick)).minus(previous).multiply(multiplier).plus(previous);
         });
     }
@@ -301,7 +302,7 @@ public abstract class Indicator<T> {
                 int remaining = size;
                 while (current != null && 0 < remaining) {
                     sum = sum.plus((Num) wrapped.valueAt(current));
-                    current = current.previous;
+                    current = current.previous();
                     remaining--;
                 }
                 return sum.divide(size - remaining);
@@ -330,7 +331,7 @@ public abstract class Indicator<T> {
 
             @Override
             protected Num valueAtRounded(Tick tick) {
-                if (tick.previous == null) {
+                if (tick.previous() == null) {
                     return (Num) wrapped.valueAt(tick);
                 }
 
@@ -338,7 +339,7 @@ public abstract class Indicator<T> {
                 int actualSize = calculatePreviousTickLength(tick, size);
                 for (int i = actualSize; 0 < i; i--) {
                     value = value.plus(((Num) wrapped.valueAt(tick)).multiply(i));
-                    tick = tick.previous;
+                    tick = tick.previous();
                 }
                 return value.divide(actualSize * (actualSize + 1) / 2);
             }
@@ -373,7 +374,7 @@ public abstract class Indicator<T> {
         return new Indicator<T>(this) {
 
             /** CACHE */
-            private final MutableLongObjectMap<T> cache = LongObjectMaps.mutable.empty();
+            private final Cache<Tick, T> cache = CacheBuilder.newBuilder().maximumSize(8192).weakKeys().weakValues().build();
 
             /** Call limit to avoid stack over flow. */
             private int count = limit;
@@ -383,14 +384,19 @@ public abstract class Indicator<T> {
                 if (count == 0) return (T) wrapped.valueAt(tick);
                 if (tick.closePrice == null /* The latest tick MUST NOT cache. */) return calculator.apply(tick, this::valueAt);
 
-                return cache.getIfAbsentPut(tick.startSeconds, () -> calculator.apply(tick, t -> {
-                    count--;
-                    T v = this.valueAt(t);
-                    count++;
-                    return v;
-                }));
+                try {
+                    return cache.get(tick, () -> calculator.apply(tick, t -> {
+                        count--;
+                        T v = this.valueAt(t);
+                        count++;
+                        return v;
+                    }));
+                } catch (ExecutionException e) {
+                    throw I.quiet(e);
+                }
             }
         };
+
     }
 
     /**
@@ -518,11 +524,11 @@ public abstract class Indicator<T> {
             protected Num valueAtRounded(Tick tick) {
                 Num highLow = tick.highPrice().minus(tick.lowPrice()).abs();
 
-                if (tick.previous == null) {
+                if (tick.previous() == null) {
                     return highLow;
                 }
 
-                Tick previous = tick.previous;
+                Tick previous = tick.previous();
                 Num highClose = tick.highPrice().minus(previous.closePrice()).abs();
                 Num closeLow = previous.closePrice().minus(tick.lowPrice).abs();
 

@@ -109,6 +109,14 @@ public final class Ticker implements Disposable {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void vandalize() {
+        ticks.clear();
+    }
+
+    /**
      * Calculate start time.
      * 
      * @return
@@ -201,13 +209,5 @@ public final class Ticker implements Disposable {
     @Override
     public String toString() {
         return Ticker.class.getSimpleName() + "[" + span + "] " + ticks;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void vandalize() {
-        ticks.clear();
     }
 }

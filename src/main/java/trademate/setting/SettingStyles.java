@@ -63,7 +63,7 @@ public interface SettingStyles extends StyleDSL {
     };
 
     Style FormInputMin = () -> {
-        display.minWidth(60, px);
+        display.minWidth(60, px).width(60, px);
     };
 
     Style FormCheck = () -> {

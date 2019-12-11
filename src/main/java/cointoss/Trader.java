@@ -40,7 +40,7 @@ import kiss.Signal;
 import kiss.WiseFunction;
 import kiss.WiseSupplier;
 
-public abstract class Trader extends TraderBase implements Extensible {
+public abstract class Trader extends TraderBase implements Extensible, Disposable {
 
     /** The identity element of {@link Snapshot}. */
     private static final Snapshot EMPTY_SNAPSHOT = new Snapshot(Num.ZERO, Num.ZERO, Num.ZERO, Num.ZERO, Num.ZERO);
@@ -56,9 +56,6 @@ public abstract class Trader extends TraderBase implements Extensible {
 
     /** All managed entries. */
     private final FastList<Scenario> scenarios = new FastList();
-
-    /** The disposer manager. */
-    private final Disposable disposer = Disposable.empty();
 
     /** The state snapshot. */
     private final NavigableMap<ZonedDateTime, Snapshot> snapshots = new TreeMap();
@@ -99,6 +96,16 @@ public abstract class Trader extends TraderBase implements Extensible {
      */
     public String name() {
         return getClass().getSimpleName();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void vandalize() {
+        scenarios.clear();
+        snapshots.clear();
+        options.clear();
     }
 
     /**
@@ -155,7 +162,7 @@ public abstract class Trader extends TraderBase implements Extensible {
      * @param duration
      */
     protected final void disableWhile(Signal<Boolean> duration) {
-        disposer.add(duration.to(condition -> {
+        add(duration.to(condition -> {
             if (condition) {
                 disable.add(duration);
             } else {
@@ -201,7 +208,7 @@ public abstract class Trader extends TraderBase implements Extensible {
         Objects.requireNonNull(timing);
         Objects.requireNonNull(builder);
 
-        disposer.add(timing.take(disable::isEmpty).to(value -> {
+        add(timing.take(disable::isEmpty).to(value -> {
             Scenario scenario = builder.apply(value);
 
             if (scenario != null) {

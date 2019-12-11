@@ -11,19 +11,23 @@ package trademate.verify;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+import javafx.scene.layout.HBox;
 
 import kiss.model.Property;
 import trademate.setting.SettingStyles;
+import viewtify.Viewtify;
 import viewtify.ui.UI;
 import viewtify.ui.UICheckBox;
 import viewtify.ui.UIComboBox;
 import viewtify.ui.UILabel;
-import viewtify.ui.UIPane;
-import viewtify.ui.UIRange;
+import viewtify.ui.UISpinner;
 import viewtify.ui.UIText;
-import viewtify.ui.UserInterface;
+import viewtify.ui.UITextValue;
 import viewtify.ui.View;
-import viewtify.util.Range;
+import viewtify.ui.helper.User;
 
 class PropertyEditor extends View {
 
@@ -38,9 +42,6 @@ class PropertyEditor extends View {
 
     /** The title area. */
     private UILabel title;
-
-    /** The input area. */
-    private UIPane input;
 
     /**
      * 
@@ -58,9 +59,94 @@ class PropertyEditor extends View {
         {
             $(hbox, FormRow, () -> {
                 $(title, FormLabel);
-                $(input, FormInput);
+
+                Class type = property.model.type;
+
+                if (type == boolean.class || type == Boolean.class) {
+                    $(createCheckBox((boolean) initialValue));
+                } else if (type.isEnum()) {
+                    $(createComboBox(initialValue));
+                } else if (isIntegral(property.model.type)) {
+                    $(createIntegralRange((int) initialValue));
+                } else {
+                    $(make(UIText.class), FormInput);
+                }
             });
         }
+    }
+
+    /**
+     * Build UI for boolean.
+     * 
+     * @param initial The initial value.
+     * @return A create UI.
+     */
+    private UICheckBox createCheckBox(boolean initial) {
+        UICheckBox created = make(UICheckBox.class);
+        created.value(initial);
+
+        created.when(User.Action, () -> {
+            builder.propertyValues.put(property, List.of(created.value()));
+        });
+
+        return created;
+    }
+
+    /**
+     * Build UI for enum.
+     * 
+     * @param initial The initial value.
+     * @return A create UI.
+     */
+    private <E> UIComboBox<E> createComboBox(E initial) {
+        UIComboBox<E> created = make(UIComboBox.class);
+        created.items((E[]) initial.getClass().getEnumConstants());
+        created.value(initial);
+
+        created.when(User.Action, () -> {
+            builder.propertyValues.put(property, List.of(created.value()));
+        });
+
+        return created;
+    }
+
+    /**
+     * Build UI for integer.
+     * 
+     * @param initial The initial value.
+     * @return A create UI.
+     */
+    private HBox createIntegralRange(int initial) {
+        UISpinner<Integer> step = make(UISpinner.class);
+        step.items(IntStream.rangeClosed(1, 100)).style(SettingStyles.FormInputMin);
+
+        UITextValue<Integer> start = make(UITextValue.class);
+        start.value(initial).style(SettingStyles.FormInputMin).when(User.Scroll, e -> {
+            if (e.getDeltaY() > 0) {
+                start.value(v -> v + step.value());
+            } else {
+                start.value(v -> v - step.value());
+            }
+        });
+
+        UITextValue<Integer> end = make(UITextValue.class);
+        end.value(initial).style(SettingStyles.FormInputMin).when(User.Scroll, e -> {
+            if (e.getDeltaY() > 0) {
+                end.value(v -> v + step.value());
+            } else {
+                end.value(v -> v - step.value());
+            }
+        });
+
+        Viewtify.observe(start.valueProperty())
+                .merge(Viewtify.observe(end.valueProperty()), Viewtify.observe(step.valueProperty()))
+                .to(() -> {
+                    builder.propertyValues.put(property, IntStream.iterate(start.value(), v -> v <= end.value(), v -> v + step.value())
+                            .boxed()
+                            .collect(Collectors.<Object> toList()));
+                });
+
+        return new HBox(start.ui, end.ui, step.ui);
     }
 
     /**
@@ -69,26 +155,6 @@ class PropertyEditor extends View {
     @Override
     protected void initialize() {
         title.text(property.name);
-        input.set(makeInputUI(property.model.type));
-    }
-
-    /**
-     * Create input area.
-     * 
-     * @param type
-     * @return
-     */
-    private UserInterface makeInputUI(Class type) {
-        if (type == boolean.class || type == Boolean.class) {
-            return make(UICheckBox.class).value((boolean) initialValue);
-        } else if (isIntegral(type)) {
-            return ((UIRange<Integer>) make(UIRange.class))
-                    .value(new Range<>((Integer) initialValue, (Integer) initialValue, v -> v + 1, v -> v - 1));
-        } else if (type.isEnum()) {
-            return ((UIComboBox<Object>) make(UIComboBox.class)).items(type.getEnumConstants()).value(initialValue);
-        } else {
-            return make(UIText.class);
-        }
     }
 
     /**

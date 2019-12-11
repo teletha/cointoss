@@ -11,9 +11,13 @@ package cointoss.analyze;
 
 import static cointoss.util.Num.HUNDRED;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.text.NumberFormat;
 import java.time.Duration;
 import java.time.ZonedDateTime;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Function;
 
 import org.eclipse.collections.impl.list.mutable.FastList;
@@ -24,11 +28,16 @@ import cointoss.Scenario;
 import cointoss.Trader;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
+import kiss.I;
+import kiss.WiseConsumer;
 
 public class TradingStatistics {
 
     /** The associated trader. */
     public final String name;
+
+    /** The trader's properties. */
+    public final Map<String, Object> properties = new HashMap();
 
     /** The start date-time. */
     public final ZonedDateTime startDate;
@@ -125,8 +134,6 @@ public class TradingStatistics {
     /** The exected duration. */
     public Duration duration = Duration.ZERO;
 
-    FastList<Scenario> entries;
-
     /**
      * Analyze trading.
      */
@@ -138,7 +145,14 @@ public class TradingStatistics {
         this.targetCurrencyScale = market.service.setting.targetCurrencyScaleSize;
         this.holdMaxSize = trader.holdMaxSize;
         this.holdCurrentSize = trader.holdSize;
-        this.entries = entries;
+
+        // extract trader's properties
+        I.signal(trader)
+                .flatArray(t -> t.getClass().getDeclaredFields())
+                .take(f -> Modifier.isPublic(f.getModifiers()))
+                .to((WiseConsumer<Field>) f -> {
+                    properties.put(f.getName(), f.get(trader));
+                });
 
         for (Scenario entry : entries) {
             if (entry.isCanceled()) {
@@ -211,16 +225,10 @@ public class TradingStatistics {
      * @param detail
      * @return
      */
-    public final String showByText(boolean detail) {
+    public final String showByText() {
         String EOL = "\r\n";
 
         StringBuilder builder = new StringBuilder();
-
-        if (detail) {
-            for (Scenario scenario : entries) {
-                System.out.println(scenario);
-            }
-        }
 
         builder.append("実行時間 ").append(Chrono.formatAsDuration(duration.toMillis())).append(EOL);
         builder.append("枚数 現在").append(holdCurrentSize).append(" 最大").append(holdMaxSize).append(EOL);
@@ -255,6 +263,6 @@ public class TradingStatistics {
      */
     @Override
     public String toString() {
-        return showByText(false);
+        return showByText();
     }
 }

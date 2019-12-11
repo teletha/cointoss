@@ -145,6 +145,10 @@ public class Market implements Disposable {
     @Override
     public void vandalize() {
         service.dispose();
+        tickers.dispose();
+        for (Trader trader : managedTraders) {
+            trader.dispose();
+        }
     }
 
     /**

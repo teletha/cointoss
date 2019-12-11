@@ -21,7 +21,7 @@ public class ConsoleAnalyzer implements Analyzer {
     @Override
     public void analyze(Market market, List<TradingStatistics> logs, boolean detail) {
         for (TradingStatistics log : logs) {
-            System.out.println(log.showByText(detail));
+            System.out.println(log.showByText());
         }
     }
 }

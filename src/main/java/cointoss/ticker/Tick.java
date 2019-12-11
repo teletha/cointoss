@@ -9,6 +9,7 @@
  */
 package cointoss.ticker;
 
+import java.lang.ref.WeakReference;
 import java.time.ZonedDateTime;
 
 import cointoss.util.Num;
@@ -36,7 +37,7 @@ public final class Tick {
     public final Num openPrice;
 
     /** The previous tick. */
-    public final Tick previous;
+    private final WeakReference<Tick> previous;
 
     /** Close price of the period. */
     Num closePrice;
@@ -72,7 +73,7 @@ public final class Tick {
      * @param realtime The realtime execution statistic.
      */
     Tick(Tick previous, ZonedDateTime start, Span span, long id, int delay, Num open, TickerManager realtime) {
-        this.previous = previous;
+        this.previous = new WeakReference(previous);
         this.start = start;
         this.startSeconds = start.toEpochSecond();
         this.end = start.plus(span.duration);
@@ -85,6 +86,10 @@ public final class Tick {
         this.buyPriceIncrease = realtime.longPriceIncrease;
         this.sellVolume = realtime.shortVolume;
         this.sellPriceDecrease = realtime.shortPriceDecrease;
+    }
+
+    public Tick previous() {
+        return previous.get();
     }
 
     /**
@@ -243,7 +248,7 @@ public final class Tick {
      * @param size A number of ticks.
      */
     public Signal<Tick> previous(int size) {
-        return I.signal(this).recurse(self -> self.previous).take(size);
+        return I.signal(this).recurse(self -> self.previous()).take(size);
     }
 
     /**
@@ -287,5 +292,26 @@ public final class Tick {
                 .append(sellVolume());
 
         return builder.toString();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return start.hashCode();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Tick == false) {
+            return false;
+        }
+
+        Tick other = (Tick) obj;
+        return start.equals(other.start);
     }
 }

@@ -9,12 +9,13 @@
  */
 package trademate.verify;
 
-import static transcript.Transcript.*;
+import static transcript.Transcript.en;
 
 import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import cointoss.Market;
 import cointoss.MarketService;
@@ -23,9 +24,12 @@ import cointoss.analyze.Analyzer;
 import cointoss.analyze.Statistics;
 import cointoss.analyze.TradingStatistics;
 import cointoss.execution.ExecutionLog;
+import cointoss.execution.ExecutionLog.LogType;
 import cointoss.market.MarketServiceProvider;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
+import cointoss.verify.BackTest;
+import kiss.Disposable;
 import kiss.I;
 import kiss.Variable;
 import kiss.model.Model;
@@ -84,7 +88,7 @@ public class BackTestView extends View implements Analyzer {
     private UITableView results;
 
     /** UI */
-    private UITableColumn<TradingStatistics, String> name;
+    private UITableColumn<TradingStatistics, TradingStatistics> name;
 
     /** The trading statistics. */
     private UITableColumn<TradingStatistics, TradingStatistics> period;
@@ -130,6 +134,9 @@ public class BackTestView extends View implements Analyzer {
 
     /** The trader builder manager. */
     private final List<ParameterizedTraderBuilder> builders = new ArrayList();
+
+    /** The last disposer. */
+    private Disposable lastDisposer = Disposable.empty();
 
     /**
      * UI definition.
@@ -255,13 +262,20 @@ public class BackTestView extends View implements Analyzer {
         });
 
         runner.text(en("Run")).disableWhen(startDate.isInvalid()).when(User.MouseClick).on(Viewtify.WorkerThread).to(e -> {
-            // BackTest.with.service(marketSelection.value())
-            // .start(startDate.zoned())
-            // .end(endDate.zoned())
-            // .traders(I.signal(traderSelection.items()).map(this::clone).toList())
-            // .initialBaseCurrency(3000000)
-            // .type(fastLog.value() ? LogType.Fast : LogType.Normal)
-            // .run(this);
+            lastDisposer.dispose();
+
+            List<Trader> traders = new ArrayList();
+
+            for (ParameterizedTraderBuilder builder : builders) {
+                traders.addAll(builder.build());
+            }
+            BackTest.with.service(marketSelection.value())
+                    .start(startDate.zoned())
+                    .end(endDate.zoned())
+                    .traders(traders)
+                    .initialBaseCurrency(3000000)
+                    .type(fastLog.value() ? LogType.Fast : LogType.Normal)
+                    .run(this);
         });
 
         configureTradersView();
@@ -295,25 +309,10 @@ public class BackTestView extends View implements Analyzer {
     }
 
     /**
-     * Clone the specified {@link Trader} with copying all editable properties.
-     * 
-     * @param base A base {@link Trader}.
-     * @return A cloned {@link Trader}.
-     */
-    private Trader clone(Trader base) {
-        Model<Trader> model = Model.of(base);
-        Trader clone = I.make(model.type);
-        for (Property p : editableProperties(model)) {
-            model.set(clone, p, model.get(base, p));
-        }
-        return clone;
-    }
-
-    /**
      * Setting for trading log.
      */
     private void configureTradingLogView() {
-        name.text(en("Name")).model(log -> log.name);
+        name.text(en("Name")).model(log -> log).render(this::renderName);
         period.text(en("Period")).model(log -> log).render(this::renderPeriod);
         holdSize.text(en("Hold Size")).model(log -> log).render(this::renderPositionSize);
         holdTimeForProfit.text(en("Profit Span")).model(log -> log.holdTimeOnProfitTrade).render(this::render);
@@ -328,6 +327,20 @@ public class BackTestView extends View implements Analyzer {
         profitFactor.text(en("Profit Factor")).model(TradingStatistics::profitFactor);
         drawDown.text(en("Drawdown")).model(log -> log.drawDownRatio);
         scenarioCount.text(en("Trade Count")).model(log -> log).render(this::renderScenarioCount);
+    }
+
+    /**
+     * Render scenario count.
+     * 
+     * @param cell
+     * @param log
+     */
+    private void renderName(UILabel label, TradingStatistics log) {
+        label.text(log.name)
+                .tooltip(log.properties.entrySet()
+                        .stream()
+                        .map(e -> e.getKey() + " : " + e.getValue())
+                        .collect(Collectors.joining("\r\n")));
     }
 
     /**
@@ -412,8 +425,8 @@ public class BackTestView extends View implements Analyzer {
 
         Viewtify.inUI(() -> {
             logSelection.items(logs);
-
-            market.dispose();
         });
+
+        lastDisposer = market::dispose;
     }
 }
