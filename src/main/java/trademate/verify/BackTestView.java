@@ -9,17 +9,12 @@
  */
 package trademate.verify;
 
-import static transcript.Transcript.en;
+import static transcript.Transcript.*;
 
 import java.time.Period;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Supplier;
-
-import javafx.beans.value.ObservableValue;
-
-import org.controlsfx.control.PropertySheet;
-import org.controlsfx.control.PropertySheet.Item;
 
 import cointoss.Market;
 import cointoss.MarketService;
@@ -28,12 +23,11 @@ import cointoss.analyze.Analyzer;
 import cointoss.analyze.Statistics;
 import cointoss.analyze.TradingStatistics;
 import cointoss.execution.ExecutionLog;
-import cointoss.execution.ExecutionLog.LogType;
 import cointoss.market.MarketServiceProvider;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
-import cointoss.verify.BackTest;
 import kiss.I;
+import kiss.Variable;
 import kiss.model.Model;
 import kiss.model.Property;
 import stylist.Style;
@@ -50,7 +44,6 @@ import viewtify.ui.UICheckBox;
 import viewtify.ui.UIComboBox;
 import viewtify.ui.UIDatePicker;
 import viewtify.ui.UILabel;
-import viewtify.ui.UIPane;
 import viewtify.ui.UITableColumn;
 import viewtify.ui.UITableView;
 import viewtify.ui.View;
@@ -78,10 +71,10 @@ public class BackTestView extends View implements Analyzer {
     private UICheckBox fastLog;
 
     /** Runner UI */
-    private UIComboBox<Trader> traderSelection;
+    private UIComboBox<ParameterizedTraderBuilder> traderSelection;
 
     /** Runner UI */
-    private UIPane traderPane;
+    private Variable<TraderEditor> traderEditor = Variable.empty();
 
     private ChartView chart;
 
@@ -135,11 +128,13 @@ public class BackTestView extends View implements Analyzer {
     /** The trading statistics. */
     private UITableColumn<TradingStatistics, TradingStatistics> scenarioCount;
 
+    /** The trader builder manager. */
+    private final List<ParameterizedTraderBuilder> builders = new ArrayList();
+
     /**
      * UI definition.
      */
     class view extends UI implements SettingStyles {
-
         {
             $(vbox, () -> {
                 $(hbox, style.fill, () -> {
@@ -160,7 +155,7 @@ public class BackTestView extends View implements Analyzer {
                             $(fastLog, style.formCheck);
                         });
                         $(traderSelection, style.traderSelect);
-                        $(traderPane);
+                        $(traderEditor);
                     });
                 });
 
@@ -260,13 +255,13 @@ public class BackTestView extends View implements Analyzer {
         });
 
         runner.text(en("Run")).disableWhen(startDate.isInvalid()).when(User.MouseClick).on(Viewtify.WorkerThread).to(e -> {
-            BackTest.with.service(marketSelection.value())
-                    .start(startDate.zoned())
-                    .end(endDate.zoned())
-                    .traders(I.signal(traderSelection.items()).map(this::clone).toList())
-                    .initialBaseCurrency(3000000)
-                    .type(fastLog.value() ? LogType.Fast : LogType.Normal)
-                    .run(this);
+            // BackTest.with.service(marketSelection.value())
+            // .start(startDate.zoned())
+            // .end(endDate.zoned())
+            // .traders(I.signal(traderSelection.items()).map(this::clone).toList())
+            // .initialBaseCurrency(3000000)
+            // .type(fastLog.value() ? LogType.Fast : LogType.Normal)
+            // .run(this);
         });
 
         configureTradersView();
@@ -274,8 +269,16 @@ public class BackTestView extends View implements Analyzer {
     }
 
     private void configureTradersView() {
-        traderSelection.items(I.find(Trader.class)).when(User.Action, () -> {
-            traderPane.set(new TraderView(traderSelection.value()));
+        List<Trader> traders = I.find(Trader.class);
+
+        for (Trader trader : traders) {
+            ParameterizedTraderBuilder builder = new ParameterizedTraderBuilder(trader);
+            builders.add(builder);
+            traderSelection.addItemAtLast(builder);
+        }
+
+        traderSelection.when(User.Action, () -> {
+            traderEditor.set(new TraderEditor(traderSelection.value()));
         });
     }
 
@@ -285,7 +288,7 @@ public class BackTestView extends View implements Analyzer {
      * @param model
      * @return
      */
-    private List<Property> editableProperties(Model<Trader> model) {
+    static List<Property> editableProperties(Model<Trader> model) {
         return I.signal(model.properties())
                 .skip(p -> p.name.equals("holdSize") || p.name.equals("holdMaxSize") || p.name.equals("profit"))
                 .toList();
@@ -304,118 +307,6 @@ public class BackTestView extends View implements Analyzer {
             model.set(clone, p, model.get(base, p));
         }
         return clone;
-    }
-
-    /**
-     * Sub Trader view.
-     */
-    class TraderView extends View {
-
-        private final Trader trader;
-
-        private final Model<Trader> model;
-
-        private PropertySheet sheet = new PropertySheet();
-
-        private TraderView(Trader trader) {
-            this.trader = trader;
-            this.model = Model.of(trader);
-        }
-
-        /**
-         * UI definition.
-         */
-        class view extends UI {
-            {
-                $(vbox, () -> {
-                    $(sheet);
-                });
-            }
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        protected void initialize() {
-            for (Property p : editableProperties(model)) {
-                sheet.getItems().add(new PropertyItem(p));
-            }
-        }
-
-        /**
-         * 
-         */
-        private class PropertyItem implements PropertySheet.Item {
-
-            /** The target property. */
-            private final Property property;
-
-            /**
-             * Create {@link Item} for {@link Property}.
-             * 
-             * @param property
-             */
-            private PropertyItem(Property property) {
-                this.property = property;
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            public Class<?> getType() {
-                return property.model.type;
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            public String getCategory() {
-                return property.name;
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            public String getName() {
-                return property.name;
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            public String getDescription() {
-                return property.name;
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            public Object getValue() {
-                return model.get(trader, property);
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            public void setValue(Object value) {
-                model.set(trader, property, value);
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            public Optional<ObservableValue<? extends Object>> getObservableValue() {
-                return Optional.empty();
-            }
-        }
     }
 
     /**
