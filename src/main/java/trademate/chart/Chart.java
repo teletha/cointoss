@@ -15,6 +15,9 @@ import javafx.geometry.Insets;
 import javafx.geometry.Side;
 import javafx.scene.layout.Region;
 
+import cointoss.ticker.Span;
+import cointoss.ticker.Tick;
+import cointoss.ticker.Ticker;
 import cointoss.util.Num;
 import kiss.Variable;
 import viewtify.ui.helper.LayoutAssistant;
@@ -55,7 +58,7 @@ public class Chart extends Region {
         layoutChart.layoutBy(widthProperty(), heightProperty())
                 .layoutBy(axisX.scroll.valueProperty(), axisX.scroll.visibleAmountProperty())
                 .layoutBy(axisY.scroll.valueProperty(), axisY.scroll.visibleAmountProperty())
-                .layoutBy(chart.ticker.observe().switchMap(ticker -> ticker.add.startWithNull()).throttle(50, TimeUnit.MILLISECONDS));
+                .layoutBy(chart.ticker.observe().switchMap(ticker -> ticker.add.startWithNull()).throttle(170, TimeUnit.MILLISECONDS));
 
         // configure axis label
         chart.market.observe().to(m -> {
@@ -116,15 +119,33 @@ public class Chart extends Region {
 
         long start = (long) axisX.computeVisibleMinValue();
         long end = (long) axisX.computeVisibleMaxValue();
+        long duration = end - start;
 
-        chart.ticker.v.eachAt(start, end, tick -> {
-            long time = tick.start.toEpochSecond();
+        Span span;
+        if (1 < duration / 86400 /* 60x60x24 */) {
+            span = Span.Day1;
+        } else if (1 < duration / 21600 /* 60x60x6 */) {
+            span = Span.Hour6;
+        } else if (1 < duration / 3600 /* 60x60 */) {
+            span = Span.Hour1;
+        } else if (1 < duration / 300 /* 60x5 */) {
+            span = Span.Minute5;
+        } else {
+            span = Span.Second5;
+        }
 
-            if (start <= time && time <= end) {
-                max.set(Num.max(max.v, tick.highPrice()));
-                min.set(Num.min(min.v, tick.lowPrice()));
+        if (chart.market.isPresent()) {
+            Ticker ticker = chart.market.v.tickers.of(span);
+            Variable<Tick> startTick = ticker.findByEpochSecond(start);
+            Variable<Tick> endTick = ticker.findByEpochSecond(end);
+
+            if (startTick.isPresent() && endTick.isPresent()) {
+                ticker.eachAt(start, end, tick -> {
+                    max.set(Num.max(max.v, tick.highPrice()));
+                    min.set(Num.min(min.v, tick.lowPrice()));
+                });
             }
-        });
+        }
 
         Num margin = max.v.minus(min).multiply(Num.of(0.5));
         axisY.logicalMaxValue.set(max.v.plus(margin).longValue());
