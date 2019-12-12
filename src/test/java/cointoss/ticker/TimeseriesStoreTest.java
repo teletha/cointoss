@@ -17,9 +17,6 @@ import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import cointoss.ticker.TimeSpan;
-import cointoss.ticker.TimeseriesStore;
-
 class TimeseriesStoreTest {
 
     @Test
@@ -145,7 +142,7 @@ class TimeseriesStoreTest {
     }
 
     @Test
-    void eachAt() {
+    void eachByTime() {
         TimeseriesStore<Integer> store = new TimeseriesStore<>(TimeSpan.Second5, Integer::longValue);
         store.store(5, 10, 15, 20, 25, 30, 35, 40);
 

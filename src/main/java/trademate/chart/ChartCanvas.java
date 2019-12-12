@@ -440,12 +440,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 return;
             }
 
-            // estimate visible range
-            long start = (long) axisX.computeVisibleMinValue();
-            long end = Math.min((long) axisX.computeVisibleMaxValue(), chart.ticker.v.ticks.last().start.toEpochSecond());
-            long span = chart.ticker.v.span.seconds;
-            int visibleSize = (int) ((end - start) / span) + 1;
-
             // redraw all candles.
             GraphicsContext gc = candles.getGraphicsContext2D();
             gc.clearRect(0, 0, candles.getWidth(), candles.getHeight());
@@ -459,13 +453,15 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                     chart.valueY.clear();
                 }
             }
+
             MutableDoubleList valueX = new NoCopyDoubleList();
 
-            Tick tick = chart.ticker.v.ticks.getByTime(start);
-            int counter = 0;
+            // estimate visible range
+            long start = (long) axisX.computeVisibleMinValue();
+            long end = (long) axisX.computeVisibleMaxValue();
 
-            while (tick != null && counter++ < visibleSize) {
-                double x = axisX.getPositionForValue(tick.start.toEpochSecond());
+            chart.ticker.v.ticks.eachByTime(start, end, tick -> {
+                double x = axisX.getPositionForValue(tick.startSeconds);
                 double open = axisY.getPositionForValue(tick.openPrice.doubleValue());
                 double close = axisY.getPositionForValue(tick.closePrice().doubleValue());
                 double high = axisY.getPositionForValue(tick.highPrice().doubleValue());
@@ -505,8 +501,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                     }
                 }
                 valueX.add(x);
-                tick = tick.next();
-            }
+            });
 
             double[] arrayX = valueX.toArray();
             double width = candles.getWidth();

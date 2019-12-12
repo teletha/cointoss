@@ -39,9 +39,6 @@ public final class Tick {
     /** The previous tick. */
     private WeakReference<Tick> previous;
 
-    /** The next tick. */
-    private WeakReference<Tick> next;
-
     /** Close price of the period. */
     Num closePrice;
 
@@ -77,8 +74,6 @@ public final class Tick {
      */
     Tick(Tick previous, ZonedDateTime start, TimeSpan span, long id, int delay, Num open, TickerManager realtime) {
         this.previous = new WeakReference(previous);
-        if (previous != null) previous.next = new WeakReference(this);
-
         this.start = start;
         this.startSeconds = start.toEpochSecond();
         this.end = start.plus(span.duration);
@@ -100,15 +95,6 @@ public final class Tick {
      */
     public Tick previous() {
         return previous.get();
-    }
-
-    /**
-     * Get the previous {@link Tick}.
-     * 
-     * @return
-     */
-    public Tick next() {
-        return next == null ? null : next.get();
     }
 
     /**

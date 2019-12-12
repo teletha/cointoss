@@ -150,7 +150,7 @@ public final class TimeseriesStore<E> {
             return null;
         }
 
-        return entry.getValue().fisrt();
+        return entry.getValue().first();
     }
 
     /**
@@ -225,33 +225,29 @@ public final class TimeseriesStore<E> {
 
         long[] startIndex = index(start);
         long[] endIndex = index(end);
-
         ConcurrentNavigableMap<Long, Segment> sub = indexed.subMap(startIndex[0], true, endIndex[0], true);
         Iterator<Segment> iterator = sub.values().iterator();
         boolean first = true;
 
-        if (iterator.hasNext()) {
-            // first
-            while (iterator.hasNext()) {
-                Segment next = iterator.next();
+        while (iterator.hasNext()) {
+            Segment next = iterator.next();
 
-                if (iterator.hasNext()) {
-                    if (first) {
-                        // first
-                        first = false;
-                        next.eachAt((int) startIndex[1], each);
-                    } else {
-                        // middle
-                        next.eachAt(0, each);
-                    }
+            if (iterator.hasNext()) {
+                if (first) {
+                    // first
+                    first = false;
+                    next.eachAt((int) startIndex[1], each);
                 } else {
-                    if (first) {
-                        first = false;
-                        next.eachAt((int) startIndex[1], (int) endIndex[1], each);
-                    } else {
-                        // last
-                        next.eachAt(0, (int) endIndex[1], each);
-                    }
+                    // middle
+                    next.eachAt(0, each);
+                }
+            } else {
+                if (first) {
+                    first = false;
+                    next.eachAt((int) startIndex[1], (int) endIndex[1], each);
+                } else {
+                    // last
+                    next.eachAt(0, (int) endIndex[1], each);
                 }
             }
         }
@@ -301,7 +297,7 @@ public final class TimeseriesStore<E> {
          * 
          * @return A first item or null.
          */
-        abstract E fisrt();
+        abstract E first();
 
         /**
          * Retrieve last item in this container.
@@ -311,13 +307,13 @@ public final class TimeseriesStore<E> {
         abstract E last();
 
         final void each(int start, Consumer<? super E> consumer) {
-            each(start, size(), consumer);
+            each(start, span.ticksPerDay(), consumer);
         }
 
         abstract void each(int start, int end, Consumer<? super E> consumer);
 
         final void eachAt(int start, Consumer<? super E> consumer) {
-            eachAt(start, size(), consumer);
+            eachAt(start, span.ticksPerDay(), consumer);
         }
 
         abstract void eachAt(int start, int end, Consumer<? super E> consumer);
@@ -380,7 +376,7 @@ public final class TimeseriesStore<E> {
          * {@inheritDoc}
          */
         @Override
-        E fisrt() {
+        E first() {
             return items[min];
         }
 
