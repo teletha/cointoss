@@ -7,7 +7,7 @@
  *
  *          https://opensource.org/licenses/MIT
  */
-package cointoss.util;
+package cointoss.ticker;
 
 import java.time.LocalDate;
 import java.util.Objects;

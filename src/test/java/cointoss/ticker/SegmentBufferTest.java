@@ -7,7 +7,7 @@
  *
  *          https://opensource.org/licenses/MIT
  */
-package cointoss.util;
+package cointoss.ticker;
 
 import static java.util.stream.Collectors.*;
 import static java.util.stream.IntStream.*;
@@ -17,6 +17,7 @@ import java.time.LocalDate;
 
 import org.junit.jupiter.api.Test;
 
+import cointoss.ticker.SegmentBuffer;
 import kiss.I;
 
 /**
