@@ -436,10 +436,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
      */
     private void drawCandle() {
         layoutCandle.layout(() -> {
-            if (chart.ticker.v.ticks.isEmpty()) {
-                return;
-            }
-
             // redraw all candles.
             GraphicsContext gc = candles.getGraphicsContext2D();
             gc.clearRect(0, 0, candles.getWidth(), candles.getHeight());
