@@ -10,6 +10,7 @@
 package cointoss.ticker;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.function.Consumer;
@@ -147,8 +148,9 @@ final class SegmentBuffer<E> {
     }
 
     public E get(Span span, long epochSeconds) {
-        long[] c = span.calculateStartTimeAndRemainder(epochSeconds);
+        long[] c = span.calculateStartDayTimeAndIndex(epochSeconds);
         LocalDate date = Chrono.systemBySeconds(c[0]).toLocalDate();
+        System.out.println(Arrays.toString(c) + "   " + date + "  " + span + "  " + span.seconds);
 
         if (date.equals(uncompleteTime)) {
             if (c[1] < uncompletedSize) {

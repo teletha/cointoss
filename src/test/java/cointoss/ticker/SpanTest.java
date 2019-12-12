@@ -70,19 +70,14 @@ class SpanTest {
 
     @Test
     void calculateStartTimeAndRemainderEpochSeconds() {
-        Assertions.assertArrayEquals(new long[] {0, 10}, Span.Minute1.calculateStartTimeAndRemainder(10));
-        Assertions.assertArrayEquals(new long[] {0, 59}, Span.Minute1.calculateStartTimeAndRemainder(59));
-        Assertions.assertArrayEquals(new long[] {60, 0}, Span.Minute1.calculateStartTimeAndRemainder(60));
-        Assertions.assertArrayEquals(new long[] {60, 1}, Span.Minute1.calculateStartTimeAndRemainder(61));
-        Assertions.assertArrayEquals(new long[] {60, 59}, Span.Minute1.calculateStartTimeAndRemainder(119));
-        Assertions.assertArrayEquals(new long[] {120, 0}, Span.Minute1.calculateStartTimeAndRemainder(120));
-
-        Assertions.assertArrayEquals(new long[] {10, 0}, Span.Second5.calculateStartTimeAndRemainder(10));
-        Assertions.assertArrayEquals(new long[] {55, 4}, Span.Second5.calculateStartTimeAndRemainder(59));
-        Assertions.assertArrayEquals(new long[] {60, 0}, Span.Second5.calculateStartTimeAndRemainder(60));
-        Assertions.assertArrayEquals(new long[] {60, 1}, Span.Second5.calculateStartTimeAndRemainder(61));
-        Assertions.assertArrayEquals(new long[] {115, 4}, Span.Second5.calculateStartTimeAndRemainder(119));
-        Assertions.assertArrayEquals(new long[] {120, 0}, Span.Second5.calculateStartTimeAndRemainder(120));
+        // 2019-12-12 02:16:30
+        Assertions.assertArrayEquals(new long[] {1576108800, 136}, Span.Minute1.calculateStartDayTimeAndIndex(1576116990));
+        // 2019-12-13 00:00:00
+        Assertions.assertArrayEquals(new long[] {1576195200, 0}, Span.Minute1.calculateStartDayTimeAndIndex(1576195200));
+        // 2019-12-13 00:00:59
+        Assertions.assertArrayEquals(new long[] {1576195200, 0}, Span.Minute1.calculateStartDayTimeAndIndex(1576195259));
+        // 2019-12-13 00:01:00
+        Assertions.assertArrayEquals(new long[] {1576195200, 1}, Span.Minute1.calculateStartDayTimeAndIndex(1576195260));
     }
 
     @Test

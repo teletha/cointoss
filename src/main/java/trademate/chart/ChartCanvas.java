@@ -437,8 +437,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             long endEpochSec = Math.min((long) axisX.computeVisibleMaxValue(), chart.ticker.v.last().start.toEpochSecond());
             long span = chart.ticker.v.span.seconds;
             int visibleSize = (int) ((endEpochSec - startEpochSec) / span) + 1;
-            int visibleStartIndex = (int) ((startEpochSec - chart.ticker.v.first().start.toEpochSecond()) / span);
-            if (visibleStartIndex + visibleSize == chart.ticker.v.size()) visibleSize--;
 
             // redraw all candles.
             GraphicsContext gc = candles.getGraphicsContext2D();
@@ -455,10 +453,10 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             }
             MutableDoubleList valueX = new NoCopyDoubleList();
 
-            Variable<Tick> aa = chart.ticker.v.findTickByEpochSecond(startEpochSec);
-            System.out.println(aa);
+            Tick tick = chart.ticker.v.findTickByEpochSecond(startEpochSec);
+            int counter = 0;
 
-            chart.ticker.v.each(visibleStartIndex, visibleSize, tick -> {
+            while (tick != null && counter++ < visibleSize) {
                 double x = axisX.getPositionForValue(tick.start.toEpochSecond());
                 double open = axisY.getPositionForValue(tick.openPrice.doubleValue());
                 double close = axisY.getPositionForValue(tick.closePrice().doubleValue());
@@ -499,7 +497,8 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                     }
                 }
                 valueX.add(x);
-            });
+                tick = tick.next();
+            }
 
             double[] arrayX = valueX.toArray();
             double width = candles.getWidth();

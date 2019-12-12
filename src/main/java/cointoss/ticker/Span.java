@@ -133,9 +133,9 @@ public enum Span {
      * @return {@link Span}'s start epoch seconds to which the specified epoch seconds belong and
      *         the remainded seconds.
      */
-    public long[] calculateStartTimeAndRemainder(long epochSeconds) {
-        long remainder = epochSeconds % seconds;
-        return new long[] {epochSeconds - remainder, remainder};
+    public long[] calculateStartDayTimeAndIndex(long epochSeconds) {
+        long remainder = epochSeconds % 86400; // 60 * 60 * 24 //
+        return new long[] {epochSeconds - remainder, remainder / seconds};
     }
 
     /**
