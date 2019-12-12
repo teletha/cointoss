@@ -45,8 +45,8 @@ public class VolumeCross extends Trader {
         Indicator<Num> buyVolume = Indicator.build(market.tickers.of(TimeSpan.Minute5), Tick::buyVolume);
         Indicator<Num> sellVolume = Indicator.build(market.tickers.of(TimeSpan.Minute5), Tick::sellVolume);
         Indicator<Num> volumeDiff = buyVolume.map(sellVolume, (b, s) -> b.minus(s))
-                .scale(market.service.setting.targetCurrencyScaleSize)
-                .sma(7);
+                .sma(7)
+                .scale(market.service.setting.targetCurrencyScaleSize);
         Indicator<Boolean> upPrediction = Indicator.build(market.tickers.of(TimeSpan.Minute5), Tick::isBear)
                 .map(volumeDiff, (t, d) -> t && d.isPositive());
         Indicator<Boolean> downPrediction = Indicator.build(market.tickers.of(TimeSpan.Minute5), Tick::isBull)

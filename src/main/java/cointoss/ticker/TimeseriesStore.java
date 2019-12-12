@@ -192,7 +192,7 @@ public final class TimeseriesStore<E> {
      */
     public void each(long start, long end, Consumer<? super E> each) {
         if (end < start) {
-            throw new IndexOutOfBoundsException("Start[" + start + "] must be less than end[" + end + "].");
+            return;
         }
 
         long[] startIndex = index(start);

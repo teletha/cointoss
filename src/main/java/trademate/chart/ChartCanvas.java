@@ -454,7 +454,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
             // estimate visible range
             long start = (long) axisX.computeVisibleMinValue();
-            long end = (long) axisX.computeVisibleMaxValue();
+            long end = (long) axisX.computeVisibleMaxValue() - chart.ticker.v.span.duration.getSeconds();
 
             chart.ticker.v.ticks.each(start, end, tick -> {
                 double x = axisX.getPositionForValue(tick.startSeconds);
