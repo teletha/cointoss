@@ -22,9 +22,6 @@ import cointoss.util.Num;
 import kiss.Variable;
 import viewtify.ui.helper.LayoutAssistant;
 
-/**
- * @version 2018/06/26 18:55:05
- */
 public class Chart extends Region {
 
     /** The time unit interval. */
@@ -58,7 +55,7 @@ public class Chart extends Region {
         layoutChart.layoutBy(widthProperty(), heightProperty())
                 .layoutBy(axisX.scroll.valueProperty(), axisX.scroll.visibleAmountProperty())
                 .layoutBy(axisY.scroll.valueProperty(), axisY.scroll.visibleAmountProperty())
-                .layoutBy(chart.ticker.observe().switchMap(ticker -> ticker.add.startWithNull()).throttle(170, TimeUnit.MILLISECONDS));
+                .layoutBy(chart.ticker.observe().switchMap(ticker -> ticker.add.startWithNull()).throttle(120, TimeUnit.MILLISECONDS));
 
         // configure axis label
         chart.market.observe().to(m -> {

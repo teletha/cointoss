@@ -7,7 +7,7 @@
  *
  *          https://opensource.org/licenses/MIT
  */
-package cointoss.ticker;
+package cointoss.util;
 
 import java.util.Iterator;
 import java.util.Map.Entry;
@@ -17,7 +17,9 @@ import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.function.Consumer;
 import java.util.function.ToLongFunction;
 
-final class SegmentBuffer<E> {
+import cointoss.ticker.Span;
+
+public final class SegmentBuffer<E> {
 
     /** The span. */
     private final Span span;

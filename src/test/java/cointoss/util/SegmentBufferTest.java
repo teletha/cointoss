@@ -7,7 +7,7 @@
  *
  *          https://opensource.org/licenses/MIT
  */
-package cointoss.ticker;
+package cointoss.util;
 
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 
@@ -15,6 +15,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
+
+import cointoss.ticker.Span;
+import cointoss.util.SegmentBuffer;
 
 class SegmentBufferTest {
 
