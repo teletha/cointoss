@@ -35,33 +35,33 @@ class SegmentBufferTest {
     void add() {
         SegmentBuffer<Integer> buffer = new SegmentBuffer<>(Span.Second5, Integer::longValue);
         buffer.add(0);
-        assert buffer.getByEpoch(0) == 0;
-        assert buffer.getByEpoch(5) == null;
-        assert buffer.getByEpoch(10) == null;
+        assert buffer.at(0) == 0;
+        assert buffer.at(5) == null;
+        assert buffer.at(10) == null;
 
         // update
         buffer.add(2);
-        assert buffer.getByEpoch(0) == 2;
-        assert buffer.getByEpoch(5) == null;
-        assert buffer.getByEpoch(10) == null;
+        assert buffer.at(0) == 2;
+        assert buffer.at(5) == null;
+        assert buffer.at(10) == null;
 
         // add next stamp
         buffer.add(5);
-        assert buffer.getByEpoch(0) == 2;
-        assert buffer.getByEpoch(5) == 5;
-        assert buffer.getByEpoch(10) == null;
+        assert buffer.at(0) == 2;
+        assert buffer.at(5) == 5;
+        assert buffer.at(10) == null;
 
         // add next stamp
         buffer.add(10);
-        assert buffer.getByEpoch(0) == 2;
-        assert buffer.getByEpoch(5) == 5;
-        assert buffer.getByEpoch(10) == 10;
+        assert buffer.at(0) == 2;
+        assert buffer.at(5) == 5;
+        assert buffer.at(10) == 10;
 
         // update
         buffer.add(13);
-        assert buffer.getByEpoch(0) == 2;
-        assert buffer.getByEpoch(5) == 5;
-        assert buffer.getByEpoch(10) == 13;
+        assert buffer.at(0) == 2;
+        assert buffer.at(5) == 5;
+        assert buffer.at(10) == 13;
     }
 
     @Test

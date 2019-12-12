@@ -122,10 +122,10 @@ final class SegmentBuffer<E> {
     /**
      * Get the item for the specified timestamp (epoch seconds).
      * 
-     * @param timestamp
+     * @param timestamp A time stamp.
      * @return
      */
-    public E getByEpoch(long timestamp) {
+    public E at(long timestamp) {
         long[] index = index(timestamp);
 
         Segment segment = indexed.get(index[0]);

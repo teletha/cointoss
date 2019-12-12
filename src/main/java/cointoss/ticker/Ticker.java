@@ -186,7 +186,7 @@ public final class Ticker implements Disposable {
      * @return
      */
     public final Variable<Tick> findByEpochSecond(long epochSeconds) {
-        return Variable.of(ticks.getByEpoch(epochSeconds));
+        return Variable.of(ticks.at(epochSeconds));
     }
 
     /**
