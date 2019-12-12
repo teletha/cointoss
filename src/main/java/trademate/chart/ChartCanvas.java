@@ -9,12 +9,24 @@
  */
 package trademate.chart;
 
-import static transcript.Transcript.*;
+import static transcript.Transcript.en;
 
 import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Supplier;
+
+import javafx.collections.ObservableList;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Region;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.LineTo;
+import javafx.scene.shape.MoveTo;
+import javafx.scene.shape.Path;
+import javafx.scene.shape.PathElement;
+import javafx.scene.text.Font;
 
 import org.eclipse.collections.api.list.primitive.MutableDoubleList;
 import org.eclipse.collections.impl.list.mutable.primitive.DoubleArrayList;
@@ -32,17 +44,6 @@ import cointoss.ticker.Tick;
 import cointoss.ticker.Ticker;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
-import javafx.collections.ObservableList;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Region;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.LineTo;
-import javafx.scene.shape.MoveTo;
-import javafx.scene.shape.Path;
-import javafx.scene.shape.PathElement;
-import javafx.scene.text.Font;
 import kiss.I;
 import kiss.Variable;
 import kiss.Ⅲ;
@@ -455,6 +456,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
             Tick tick = chart.ticker.v.findTickByEpochSecond(startEpochSec);
             int counter = 0;
+            if (tick != null) System.out.println(startEpochSec + "    " + tick.start.toEpochSecond());
 
             while (tick != null && counter++ < visibleSize) {
                 double x = axisX.getPositionForValue(tick.start.toEpochSecond());

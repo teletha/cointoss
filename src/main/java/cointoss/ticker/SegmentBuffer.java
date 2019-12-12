@@ -164,6 +164,7 @@ final class SegmentBuffer<E> {
             if (completed == null) {
                 return null;
             } else {
+                System.out.println(completed.size + "   " + Arrays.toString(completed.items));
                 return completed.items[(int) c[1]];
             }
         }
