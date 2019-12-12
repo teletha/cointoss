@@ -455,6 +455,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             MutableDoubleList valueX = new NoCopyDoubleList();
 
             Tick tick = chart.ticker.v.findByEpochSecond(startEpochSec).v;
+            System.out.println(tick);
             int counter = 0;
 
             while (tick != null && counter++ < visibleSize) {

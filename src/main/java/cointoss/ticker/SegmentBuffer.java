@@ -9,44 +9,43 @@
  */
 package cointoss.ticker;
 
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.function.Consumer;
 import java.util.function.ToLongFunction;
-
-import kiss.Signal;
 
 final class SegmentBuffer<E> {
 
     /** The span. */
     private final Span span;
 
-    /** The fixed segment size. */
-    private final int segmentSize;
-
     /** The key extractor. */
     private final ToLongFunction<E> timestampExtractor;
 
-    /** The completed size. */
-    private int completedSize;
-
     /** The completed data manager. */
-    private final ConcurrentSkipListMap<Long, Completed<E>> completeds = new ConcurrentSkipListMap();
+    private final ConcurrentSkipListMap<Long, Segment> indexed = new ConcurrentSkipListMap();
 
-    /** The uncompleted size. */
-    private int uncompletedSize;
-
-    /** The uncompleted date manager. */
-    private E[] uncompleted;
+    /** A number of items. */
+    private int size;
 
     /**
      * 
      */
     public SegmentBuffer(Span span, ToLongFunction<E> timestampExtractor) {
         this.span = Objects.requireNonNull(span);
-        this.segmentSize = span.ticksPerDay();
         this.timestampExtractor = Objects.requireNonNull(timestampExtractor);
-        this.uncompleted = (E[]) new Object[segmentSize];
+    }
+
+    /**
+     * Convert timestamp (epoch seconds) to timeindex (start epoch time of day).
+     * 
+     * @param timestamp
+     * @return
+     */
+    long[] index(long timestamp) {
+        long remainder = timestamp % 86400; // 60 * 60 * 24 //
+        return new long[] {timestamp - remainder, remainder / span.seconds};
     }
 
     /**
@@ -55,7 +54,7 @@ final class SegmentBuffer<E> {
      * @return A positive size or zero.
      */
     public int size() {
-        return completedSize + uncompletedSize;
+        return size;
     }
 
     /**
@@ -64,7 +63,7 @@ final class SegmentBuffer<E> {
      * @return
      */
     public boolean isEmpty() {
-        return (completedSize + uncompletedSize) == 0;
+        return indexed.isEmpty();
     }
 
     /**
@@ -73,7 +72,7 @@ final class SegmentBuffer<E> {
      * @return
      */
     public boolean isNotEmpty() {
-        return (completedSize + uncompletedSize) != 0;
+        return !indexed.isEmpty();
     }
 
     /**
@@ -82,18 +81,15 @@ final class SegmentBuffer<E> {
      * @param positions An items to add.
      */
     public void add(E item) {
-        try {
-            uncompleted[uncompletedSize++] = item;
-        } catch (ArrayIndexOutOfBoundsException e) {
-            completeds.computeIfAbsent(timestampExtractor.applyAsLong(uncompleted[0]), key -> {
-                Completed segment = new Completed(uncompleted);
-                completedSize += segment.size;
-                return segment;
-            });
-            uncompleted = (E[]) new Object[segmentSize];
-            uncompletedSize = 0;
-            add(item);
+        long[] index = index(timestampExtractor.applyAsLong(item));
+
+        Segment segment = indexed.get(index[0]);
+
+        if (segment == null) {
+            segment = new OnHeap();
+            indexed.put(index[0], segment);
         }
+        size += segment.set((int) index[1], item);
     }
 
     /**
@@ -114,19 +110,30 @@ final class SegmentBuffer<E> {
      * @return
      */
     public E get(int index) {
-        // completed
-        for (Completed<E> segment : completeds.values()) {
-            if (index < segment.size) {
-                return segment.items[index];
+        for (Segment segment : indexed.values()) {
+            if (index < segment.size()) {
+                return segment.get(index);
             }
-            index -= segment.size;
+            index -= segment.size();
         }
+        return null;
+    }
 
-        // ucompleted
-        if (segmentSize <= index) {
-            index = segmentSize - 1;
+    /**
+     * Get the item for the specified timestamp (epoch seconds).
+     * 
+     * @param timestamp
+     * @return
+     */
+    public E getByEpoch(long timestamp) {
+        long[] index = index(timestamp);
+
+        Segment segment = indexed.get(index[0]);
+
+        if (segment == null) {
+            return null;
         }
-        return uncompleted[index];
+        return segment.get((int) index[1]);
     }
 
     /**
@@ -135,14 +142,13 @@ final class SegmentBuffer<E> {
      * @return
      */
     public E first() {
-        if (!completeds.isEmpty()) {
-            return completeds.firstEntry().getValue().first();
+        Entry<Long, Segment> entry = indexed.firstEntry();
+
+        if (entry == null) {
+            return null;
         }
 
-        if (uncompletedSize != 0) {
-            return uncompleted[0];
-        }
-        return null;
+        return entry.getValue().fisrt();
     }
 
     /**
@@ -151,14 +157,13 @@ final class SegmentBuffer<E> {
      * @return
      */
     public E last() {
-        if (uncompletedSize != 0) {
-            return uncompleted[uncompletedSize - 1];
+        Entry<Long, Segment> entry = indexed.lastEntry();
+
+        if (entry == null) {
+            return null;
         }
 
-        if (!completeds.isEmpty()) {
-            return completeds.lastEntry().getValue().last();
-        }
-        return null;
+        return entry.getValue().last();
     }
 
     /**
@@ -183,8 +188,8 @@ final class SegmentBuffer<E> {
         }
 
         // completed
-        for (Completed segment : completeds.values()) {
-            int size = segment.size;
+        for (Segment segment : indexed.values()) {
+            int size = segment.size();
             if (start < size) {
                 if (end <= size) {
                     segment.each(start, end, each);
@@ -199,85 +204,137 @@ final class SegmentBuffer<E> {
                 end -= size;
             }
         }
-
-        // uncompleted
-        if (0 < uncompletedSize) {
-            for (int i = start; i < Math.min(end, uncompletedSize); i++) {
-                each.accept(uncompleted[i]);
-            }
-        }
     }
 
     /**
      * Clear all items.
      */
     public void clear() {
-        uncompleted = (E[]) new Object[segmentSize];
-        completeds.clear();
+        for (Segment segment : indexed.values()) {
+            segment.clear();
+        }
+        indexed.clear();
     }
 
     /**
-     * Completely filled segment.
+     * Item container.
      */
-    private static class Completed<E> {
+    private abstract class Segment {
+
+        abstract int size();
 
         /**
-         * Return the item size.
-         */
-        private int size;
-
-        /** The actual data manager. */
-        private final E[] items;
-
-        /**
-         * Completed segment.
-         */
-        private Completed(int segmentSize, Signal<E> items) {
-            this.items = (E[]) new Object[segmentSize];
-
-            items.to(e -> {
-                this.items[size++] = e;
-            });
-        }
-
-        /**
-         * Completed segment.
-         */
-        private Completed(E[] items) {
-            this.items = items;
-            this.size = items.length;
-        }
-
-        /**
-         * Get the first item.
+         * Retrieve item by index.
          * 
-         * @return
+         * @param index An item index.
+         * @return An item or null.
          */
-        private E first() {
-            return size == 0 ? null : (E) items[0];
+        abstract E get(int index);
+
+        /**
+         * Set item by index.
+         * 
+         * @param index An item index.
+         * @param item An item to set.
+         * @return Adding new item returns 1, updating item returns 0.
+         */
+        abstract int set(int index, E item);
+
+        abstract void clear();
+
+        /**
+         * Retrieve first item in this container.
+         * 
+         * @return A first item or null.
+         */
+        abstract E fisrt();
+
+        /**
+         * Retrieve last item in this container.
+         * 
+         * @return A last item or null.
+         */
+        abstract E last();
+
+        abstract void each(int start, int end, Consumer<? super E> consumer);
+    }
+
+    /**
+     * On heap container.
+     */
+    private class OnHeap extends Segment {
+
+        /** The managed items. */
+        private E[] items = (E[]) new Object[span.ticksPerDay()];
+
+        /** The first item index. */
+        private int min = Integer.MAX_VALUE;
+
+        /** THe last item index. */
+        private int max = Integer.MIN_VALUE;
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        int size() {
+            return max < 0 ? 0 : max - min + 1;
         }
 
         /**
-         * Get the first item.
-         * 
-         * @return
+         * {@inheritDoc}
          */
-        private E last() {
-            return size == 0 ? null : (E) items[size - 1];
+        @Override
+        E get(int index) {
+            return items[index];
         }
 
         /**
-         * Signal all items from start to end.
-         * 
-         * @param start A start index (included).
-         * @param end A end index (excluded).
-         * @param each An item processor.
+         * {@inheritDoc}
          */
-        private void each(int start, int end, Consumer<? super E> each) {
-            int stop = Math.min(end, size);
+        @Override
+        int set(int index, E item) {
+            boolean added = items[index] == null;
+            items[index] = item;
 
-            for (int i = start; i < stop; i++) {
-                each.accept(items[i]);
+            // FAILSAFE : update min and max index after inserting item
+            min = Math.min(min, index);
+            max = Math.max(max, index);
+
+            return added ? 1 : 0;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        void clear() {
+            items = null;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        E fisrt() {
+            return items[min];
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        E last() {
+            return items[max];
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        void each(int start, int end, Consumer<? super E> consumer) {
+            for (int i = min + start; i < min + end; i++) {
+                consumer.accept(items[i]);
             }
         }
     }

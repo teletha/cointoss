@@ -11,29 +11,127 @@ package cointoss.ticker;
 
 import org.junit.jupiter.api.Test;
 
-import cointoss.util.Chrono;
-
 class SegmentBufferTest {
 
-    int size = 10000;
+    @Test
+    void isEmpty() {
+        SegmentBuffer<Integer> buffer = new SegmentBuffer<>(Span.Minute1, Integer::longValue);
+        assert buffer.isEmpty();
 
-    long now = Chrono.utcNow().toEpochSecond();
+        buffer.add(1);
+        assert buffer.isEmpty() == false;
+    }
+
+    @Test
+    void isNotEmpty() {
+        SegmentBuffer<Integer> buffer = new SegmentBuffer<>(Span.Minute1, Integer::longValue);
+        assert buffer.isNotEmpty() == false;
+
+        buffer.add(1);
+        assert buffer.isNotEmpty();
+    }
+
+    @Test
+    void add() {
+        SegmentBuffer<Integer> buffer = new SegmentBuffer<>(Span.Second5, Integer::longValue);
+        buffer.add(0);
+        assert buffer.getByEpoch(0) == 0;
+        assert buffer.getByEpoch(5) == null;
+        assert buffer.getByEpoch(10) == null;
+
+        // update
+        buffer.add(2);
+        assert buffer.getByEpoch(0) == 2;
+        assert buffer.getByEpoch(5) == null;
+        assert buffer.getByEpoch(10) == null;
+
+        // add next stamp
+        buffer.add(5);
+        assert buffer.getByEpoch(0) == 2;
+        assert buffer.getByEpoch(5) == 5;
+        assert buffer.getByEpoch(10) == null;
+
+        // add next stamp
+        buffer.add(10);
+        assert buffer.getByEpoch(0) == 2;
+        assert buffer.getByEpoch(5) == 5;
+        assert buffer.getByEpoch(10) == 10;
+
+        // update
+        buffer.add(13);
+        assert buffer.getByEpoch(0) == 2;
+        assert buffer.getByEpoch(5) == 5;
+        assert buffer.getByEpoch(10) == 13;
+    }
+
+    @Test
+    void get() {
+        SegmentBuffer<Integer> buffer = new SegmentBuffer<>(Span.Second5, Integer::longValue);
+        buffer.add(0);
+        assert buffer.get(0) == 0;
+        assert buffer.get(5) == null;
+        assert buffer.get(10) == null;
+    }
 
     @Test
     void first() {
-        SegmentBuffer<Long> buffer = new SegmentBuffer<>(Span.Minute1, Long::longValue);
-        for (int i = 0; i < size; i++) {
-            buffer.add(now + i);
-            assert buffer.first() == now;
-        }
+        SegmentBuffer<Integer> buffer = new SegmentBuffer<>(Span.Second5, Integer::longValue);
+        buffer.add(25);
+        assert buffer.first() == 25;
+
+        buffer.add(30);
+        assert buffer.first() == 25;
+
+        buffer.add(15);
+        assert buffer.first() == 15;
+
+        buffer.add(17);
+        assert buffer.first() == 17;
+
+        buffer.add(13);
+        assert buffer.first() == 13;
+
+        buffer.add(10);
+        assert buffer.first() == 10;
     }
 
     @Test
     void last() {
-        SegmentBuffer<Long> buffer = new SegmentBuffer<>(Span.Minute1, Long::longValue);
-        for (int i = 0; i < size; i++) {
-            buffer.add(now + i);
-            assert buffer.last() == now + i;
-        }
+        SegmentBuffer<Integer> buffer = new SegmentBuffer<>(Span.Second5, Integer::longValue);
+        buffer.add(5);
+        assert buffer.last() == 5;
+
+        buffer.add(10);
+        assert buffer.last() == 10;
+
+        buffer.add(12);
+        assert buffer.last() == 12;
+
+        buffer.add(20);
+        assert buffer.last() == 20;
+
+        buffer.add(16);
+        assert buffer.last() == 20;
+
+        buffer.add(30);
+        assert buffer.last() == 30;
+    }
+
+    @Test
+    void size() {
+        SegmentBuffer<Integer> buffer = new SegmentBuffer<>(Span.Second5, Integer::longValue);
+        assert buffer.size() == 0;
+
+        buffer.add(5);
+        assert buffer.size() == 1;
+
+        buffer.add(10);
+        assert buffer.size() == 2;
+
+        // update will not modify size
+        buffer.add(5);
+        buffer.add(6);
+        buffer.add(7);
+        assert buffer.size() == 2;
     }
 }
