@@ -83,6 +83,9 @@ public enum Span {
     /** The unit. */
     private final ChronoField unit;
 
+    /** The number of seconds. */
+    private final long seconds;
+
     /** The indexes of associated upper tickers. */
     final int[] uppers;
 
@@ -94,6 +97,7 @@ public enum Span {
         this.amount = amount;
         this.unit = unit;
         this.duration = Duration.of(amount, unit.getBaseUnit());
+        this.seconds = duration.getSeconds();
         this.uppers = new int[uppers.length];
 
         for (int i = 0; i < uppers.length; i++) {
@@ -109,6 +113,29 @@ public enum Span {
     public ZonedDateTime calculateStartTime(ZonedDateTime time) {
         long value = time.getLong(unit);
         return time.truncatedTo(unit.getBaseUnit()).with(unit, value - (value % amount));
+    }
+
+    /**
+     * Calculates the time to which the specified epoch second belongs in this Span.
+     * 
+     * @param epochSeconds Epoch seconds to be calculated.
+     * @return {@link Span}'s start epoch seconds to which the specified epoch seconds belong.
+     */
+    public long calculateStartTime(long epochSeconds) {
+        long remainder = epochSeconds % seconds;
+        return epochSeconds - remainder;
+    }
+
+    /**
+     * Calculates the time to which the specified epoch second belongs in this Span.
+     * 
+     * @param epochSeconds Epoch seconds to be calculated.
+     * @return {@link Span}'s start epoch seconds to which the specified epoch seconds belong and
+     *         the remainded seconds.
+     */
+    public long[] calculateStartTimeAndRemainder(long epochSeconds) {
+        long remainder = epochSeconds % seconds;
+        return new long[] {epochSeconds - remainder, remainder};
     }
 
     /**

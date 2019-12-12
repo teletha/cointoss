@@ -18,7 +18,7 @@ import java.util.function.Function;
 import kiss.I;
 import kiss.Signal;
 
-public final class SegmentBuffer<E> {
+final class SegmentBuffer<E> {
 
     /** The fixed segment size. */
     private final int segmentSize;

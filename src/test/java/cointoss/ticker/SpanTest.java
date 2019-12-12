@@ -11,14 +11,12 @@ package cointoss.ticker;
 
 import java.time.ZonedDateTime;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import cointoss.util.Chrono;
 
-/**
- * @version 2018/08/13 16:12:44
- */
-class TickSpanTest {
+class SpanTest {
 
     @Test
     void calculateStartTime() {
@@ -51,6 +49,40 @@ class TickSpanTest {
         assert time.getSecond() == 0;
         assert time.getNano() == 0;
         assert time.getMinute() == 3;
+    }
+
+    @Test
+    void calculateStartTimeEpochSeconds() {
+        assert Span.Minute1.calculateStartTime(10) == 0;
+        assert Span.Minute1.calculateStartTime(59) == 0;
+        assert Span.Minute1.calculateStartTime(60) == 60;
+        assert Span.Minute1.calculateStartTime(61) == 60;
+        assert Span.Minute1.calculateStartTime(119) == 60;
+        assert Span.Minute1.calculateStartTime(120) == 120;
+
+        assert Span.Second5.calculateStartTime(10) == 10;
+        assert Span.Second5.calculateStartTime(59) == 55;
+        assert Span.Second5.calculateStartTime(60) == 60;
+        assert Span.Second5.calculateStartTime(61) == 60;
+        assert Span.Second5.calculateStartTime(119) == 115;
+        assert Span.Second5.calculateStartTime(120) == 120;
+    }
+
+    @Test
+    void calculateStartTimeAndRemainderEpochSeconds() {
+        Assertions.assertArrayEquals(new long[] {0, 10}, Span.Minute1.calculateStartTimeAndRemainder(10));
+        Assertions.assertArrayEquals(new long[] {0, 59}, Span.Minute1.calculateStartTimeAndRemainder(59));
+        Assertions.assertArrayEquals(new long[] {60, 0}, Span.Minute1.calculateStartTimeAndRemainder(60));
+        Assertions.assertArrayEquals(new long[] {60, 1}, Span.Minute1.calculateStartTimeAndRemainder(61));
+        Assertions.assertArrayEquals(new long[] {60, 59}, Span.Minute1.calculateStartTimeAndRemainder(119));
+        Assertions.assertArrayEquals(new long[] {120, 0}, Span.Minute1.calculateStartTimeAndRemainder(120));
+
+        Assertions.assertArrayEquals(new long[] {10, 0}, Span.Second5.calculateStartTimeAndRemainder(10));
+        Assertions.assertArrayEquals(new long[] {55, 4}, Span.Second5.calculateStartTimeAndRemainder(59));
+        Assertions.assertArrayEquals(new long[] {60, 0}, Span.Second5.calculateStartTimeAndRemainder(60));
+        Assertions.assertArrayEquals(new long[] {60, 1}, Span.Second5.calculateStartTimeAndRemainder(61));
+        Assertions.assertArrayEquals(new long[] {115, 4}, Span.Second5.calculateStartTimeAndRemainder(119));
+        Assertions.assertArrayEquals(new long[] {120, 0}, Span.Second5.calculateStartTimeAndRemainder(120));
     }
 
     @Test
