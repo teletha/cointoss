@@ -10,13 +10,11 @@
 package cointoss.ticker;
 
 import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import cointoss.util.Chrono;
 import kiss.I;
 import kiss.Signal;
 
@@ -34,9 +32,6 @@ final class SegmentBuffer<E> {
     /** The completed data manager. */
     private final ConcurrentSkipListMap<LocalDate, Completed<E>> completeds = new ConcurrentSkipListMap();
 
-    /** The uncompleted segment id. */
-    private LocalDate uncompleteTime;
-
     /** The uncompleted size. */
     private int uncompletedSize;
 
@@ -46,7 +41,14 @@ final class SegmentBuffer<E> {
     /**
      * 
      */
-    SegmentBuffer(int segmentSize, Function<E, LocalDate> extractor) {
+    public SegmentBuffer(int segmentSize) {
+        this(segmentSize, e -> LocalDate.now());
+    }
+
+    /**
+     * 
+     */
+    public SegmentBuffer(int segmentSize, Function<E, LocalDate> extractor) {
         if (segmentSize < 0) {
             throw new IllegalArgumentException("Segment size [" + segmentSize + "] must be positive.");
         }
@@ -98,7 +100,6 @@ final class SegmentBuffer<E> {
             });
             uncompleted = (E[]) new Object[segmentSize];
             uncompletedSize = 0;
-            uncompleteTime = extractor.apply(item);
             add(item);
         }
     }
@@ -145,29 +146,6 @@ final class SegmentBuffer<E> {
             completedSize += segment.size;
             return segment;
         });
-    }
-
-    public E get(Span span, long epochSeconds) {
-        long[] c = span.calculateStartDayTimeAndIndex(epochSeconds);
-        LocalDate date = Chrono.systemBySeconds(c[0]).toLocalDate();
-        System.out.println(Arrays.toString(c) + "   " + date + "  " + span + "  " + span.seconds);
-
-        if (date.equals(uncompleteTime)) {
-            if (c[1] < uncompletedSize) {
-                return uncompleted[(int) c[1]];
-            } else {
-                return uncompleted[uncompletedSize - 1];
-            }
-        } else {
-            Completed<E> completed = completeds.get(date);
-
-            if (completed == null) {
-                return null;
-            } else {
-                System.out.println(completed.size + "   " + Arrays.toString(completed.items));
-                return completed.items[(int) c[1]];
-            }
-        }
     }
 
     /**

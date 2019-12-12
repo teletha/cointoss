@@ -9,10 +9,13 @@
  */
 package trademate.chart;
 
-import cointoss.util.Num;
+import java.util.concurrent.TimeUnit;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Side;
 import javafx.scene.layout.Region;
+
+import cointoss.util.Num;
 import kiss.Variable;
 import viewtify.ui.helper.LayoutAssistant;
 
@@ -52,7 +55,7 @@ public class Chart extends Region {
         layoutChart.layoutBy(widthProperty(), heightProperty())
                 .layoutBy(axisX.scroll.valueProperty(), axisX.scroll.visibleAmountProperty())
                 .layoutBy(axisY.scroll.valueProperty(), axisY.scroll.visibleAmountProperty())
-                .layoutBy(chart.ticker.observe().switchMap(ticker -> ticker.add.startWithNull()));
+                .layoutBy(chart.ticker.observe().switchMap(ticker -> ticker.add.startWithNull()).throttle(50, TimeUnit.MILLISECONDS));
 
         // configure axis label
         chart.market.observe().to(m -> {
