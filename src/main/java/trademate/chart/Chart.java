@@ -101,9 +101,9 @@ public class Chart extends Region {
      * Set x-axis range.
      */
     private void setAxisXRange() {
-        if (chart.ticker.v.size() != 0) {
-            axisX.logicalMinValue.set(chart.ticker.v.first().start.toEpochSecond());
-            axisX.logicalMaxValue.set(chart.ticker.v.last().start.toEpochSecond() + 3 * 60);
+        if (chart.ticker.v.ticks.isNotEmpty()) {
+            axisX.logicalMinValue.set(chart.ticker.v.ticks.first().start.toEpochSecond());
+            axisX.logicalMaxValue.set(chart.ticker.v.ticks.last().start.toEpochSecond() + 3 * 60);
         }
     }
 
@@ -133,11 +133,11 @@ public class Chart extends Region {
 
         if (chart.market.isPresent()) {
             Ticker ticker = chart.market.v.tickers.of(span);
-            Variable<Tick> startTick = ticker.findByEpochSecond(start);
-            Variable<Tick> endTick = ticker.findByEpochSecond(end);
+            Tick startTick = ticker.ticks.getByTime(start);
+            Tick endTick = ticker.ticks.getByTime(end);
 
-            if (startTick.isPresent() && endTick.isPresent()) {
-                ticker.eachAt(start, end, tick -> {
+            if (startTick != null && endTick != null) {
+                ticker.ticks.eachAt(start, end, tick -> {
                     max.set(Num.max(max.v, tick.highPrice()));
                     min.set(Num.min(min.v, tick.lowPrice()));
                 });

@@ -240,7 +240,10 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 // redraw
                 layoutCandle.requestLayout();
                 layoutCandleLatest.requestLayout();
-                findTickByPostion(e).to(this::drawChartInfo);
+                Tick tick = findTickByPostion(e);
+                if (tick != null) {
+                    drawChartInfo(tick);
+                }
             });
         });
     }
@@ -285,7 +288,11 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             long sec = (long) x + chart.ticker.v.span.duration.toSeconds() / 2;
 
             // update upper info
-            chart.ticker.v.findByEpochSecond(sec).to(this::drawChartInfo);
+            Tick tick = chart.ticker.v.ticks.getByTime(sec);
+
+            if (tick != null) {
+                drawChartInfo(tick);
+            }
         });
 
         // remove on exit
@@ -308,13 +315,13 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
      * @param e
      * @return
      */
-    private Variable<Tick> findTickByPostion(MouseEvent e) {
+    private Tick findTickByPostion(MouseEvent e) {
         double x = axisX.getValueForPosition(e.getX());
 
         // move the start position forward for visual consistency
         long sec = (long) x + chart.ticker.v.span.duration.toSeconds() / 2;
 
-        return chart.ticker.v.findByEpochSecond(sec);
+        return chart.ticker.v.ticks.getByTime(sec);
     }
 
     /**
@@ -429,13 +436,13 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
      */
     private void drawCandle() {
         layoutCandle.layout(() -> {
-            if (chart.ticker.v.size() == 0) {
+            if (chart.ticker.v.ticks.isEmpty()) {
                 return;
             }
 
             // estimate visible range
             long startEpochSec = (long) axisX.computeVisibleMinValue();
-            long endEpochSec = Math.min((long) axisX.computeVisibleMaxValue(), chart.ticker.v.last().start.toEpochSecond());
+            long endEpochSec = Math.min((long) axisX.computeVisibleMaxValue(), chart.ticker.v.ticks.last().start.toEpochSecond());
             long span = chart.ticker.v.span.seconds;
             int visibleSize = (int) ((endEpochSec - startEpochSec) / span) + 1;
 
@@ -454,7 +461,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             }
             MutableDoubleList valueX = new NoCopyDoubleList();
 
-            Tick tick = chart.ticker.v.findByEpochSecond(startEpochSec).v;
+            Tick tick = chart.ticker.v.ticks.getByTime(startEpochSec);
             int counter = 0;
 
             while (tick != null && counter++ < visibleSize) {
@@ -539,14 +546,14 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         });
 
         layoutCandleLatest.layout(() -> {
-            if (chart.ticker.v.size() == 0) {
+            if (chart.ticker.v.ticks.isEmpty()) {
                 return;
             }
 
             GraphicsContext gc = candleLatest.getGraphicsContext2D();
             gc.clearRect(0, 0, candleLatest.getWidth(), candleLatest.getHeight());
 
-            Tick tick = chart.ticker.v.last();
+            Tick tick = chart.ticker.v.ticks.last();
 
             double x = axisX.getPositionForValue(tick.start.toEpochSecond());
             double open = axisY.getPositionForValue(tick.openPrice.doubleValue());

@@ -19,7 +19,7 @@ import java.util.function.ToLongFunction;
 
 import cointoss.ticker.Span;
 
-public final class SegmentBuffer<E> {
+public final class TimeseriseStore<E> {
 
     /** The span. */
     private final Span span;
@@ -36,7 +36,7 @@ public final class SegmentBuffer<E> {
     /**
      * 
      */
-    public SegmentBuffer(Span span, ToLongFunction<E> timestampExtractor) {
+    public TimeseriseStore(Span span, ToLongFunction<E> timestampExtractor) {
         this.span = Objects.requireNonNull(span);
         this.timestampExtractor = Objects.requireNonNull(timestampExtractor);
     }
@@ -53,7 +53,7 @@ public final class SegmentBuffer<E> {
     }
 
     /**
-     * Return the size of this {@link SegmentBuffer}.
+     * Return the size of this {@link TimeseriseStore}.
      * 
      * @return A positive size or zero.
      */
@@ -62,7 +62,7 @@ public final class SegmentBuffer<E> {
     }
 
     /**
-     * Check whether this {@link SegmentBuffer} is empty or not.
+     * Check whether this {@link TimeseriseStore} is empty or not.
      * 
      * @return
      */
@@ -71,7 +71,7 @@ public final class SegmentBuffer<E> {
     }
 
     /**
-     * Check whether this {@link SegmentBuffer} is empty or not.
+     * Check whether this {@link TimeseriseStore} is empty or not.
      * 
      * @return
      */
@@ -80,11 +80,11 @@ public final class SegmentBuffer<E> {
     }
 
     /**
-     * Add realtime item.
+     * Stores the specified time series item.
      * 
-     * @param positions An items to add.
+     * @param item Time series items to store.
      */
-    public void add(E item) {
+    public void store(E item) {
         long[] index = index(timestampExtractor.applyAsLong(item));
 
         Segment segment = indexed.get(index[0]);
@@ -97,13 +97,13 @@ public final class SegmentBuffer<E> {
     }
 
     /**
-     * Add all realtime items.
+     * Stores the specified time series items.
      * 
-     * @param items An items to add.
+     * @param items Time series items to store.
      */
-    public void add(E... items) {
+    public void store(E... items) {
         for (E item : items) {
-            add(item);
+            store(item);
         }
     }
 
@@ -113,7 +113,7 @@ public final class SegmentBuffer<E> {
      * @param index
      * @return
      */
-    public E get(int index) {
+    public E getByIndex(int index) {
         for (Segment segment : indexed.values()) {
             if (index < segment.size()) {
                 return segment.get(index);
@@ -129,7 +129,7 @@ public final class SegmentBuffer<E> {
      * @param timestamp A time stamp.
      * @return
      */
-    public E at(long timestamp) {
+    public E getByTime(long timestamp) {
         long[] index = index(timestamp);
 
         Segment segment = indexed.get(index[0]);
@@ -141,9 +141,9 @@ public final class SegmentBuffer<E> {
     }
 
     /**
-     * Get the first item.
+     * Get the first stored time series item.
      * 
-     * @return
+     * @return The first stored time series item.
      */
     public E first() {
         Entry<Long, Segment> entry = indexed.firstEntry();
@@ -156,9 +156,9 @@ public final class SegmentBuffer<E> {
     }
 
     /**
-     * Get the last item.
+     * Get the last stored time series item.
      * 
-     * @return
+     * @return The last stored time series item.
      */
     public E last() {
         Entry<Long, Segment> entry = indexed.lastEntry();
@@ -171,7 +171,7 @@ public final class SegmentBuffer<E> {
     }
 
     /**
-     * Signal all items.
+     * Get all stored time series items in ascending order.
      * 
      * @param each An item processor.
      */
@@ -180,10 +180,11 @@ public final class SegmentBuffer<E> {
     }
 
     /**
-     * Signal all items from start to end.
+     * Acquires the time series items stored from the specified start time to end time in ascending
+     * order.
      * 
-     * @param start A start index (included).
-     * @param end A end index (excluded).
+     * @param start A start time (included).
+     * @param end A end time (included).
      * @param each An item processor.
      */
     public void each(int start, int end, Consumer<? super E> each) {
@@ -210,10 +211,11 @@ public final class SegmentBuffer<E> {
     }
 
     /**
-     * Signal all items from start to end.
+     * Acquires the time series items stored from the specified start time to end time in ascending
+     * order.
      * 
-     * @param start A start timestamp (included).
-     * @param end A end timestamp (included).
+     * @param start A start time (included).
+     * @param end A end time (included).
      * @param each An item processor.
      */
     public void eachAt(long start, long end, Consumer<? super E> each) {

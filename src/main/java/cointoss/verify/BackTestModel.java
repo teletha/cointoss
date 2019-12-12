@@ -174,7 +174,7 @@ interface BackTestModel {
         market.readLog(log -> log.range(start(), end(), type()).effect(market::perform).effectOnComplete(() -> {
             // Since a display that matches the actual final result can be expected, a dummy tick is
             // added at the end.
-            Tick last = market.tickers.of(Span.Second5).last();
+            Tick last = market.tickers.of(Span.Second5).ticks.last();
             market.perform(Execution.with.buy(market.service.setting.targetCurrencyMinimumBidSize).price(last.closePrice()).date(last.end));
         }).effectOnError(Throwable::printStackTrace));
         LocalDateTime end = LocalDateTime.now();

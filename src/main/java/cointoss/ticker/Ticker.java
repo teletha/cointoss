@@ -11,14 +11,12 @@ package cointoss.ticker;
 
 import java.time.ZonedDateTime;
 import java.util.Objects;
-import java.util.function.Consumer;
 
 import cointoss.execution.Execution;
-import cointoss.util.SegmentBuffer;
+import cointoss.util.TimeseriseStore;
 import kiss.Disposable;
 import kiss.Signal;
 import kiss.Signaling;
-import kiss.Variable;
 
 public final class Ticker implements Disposable {
 
@@ -40,8 +38,8 @@ public final class Ticker implements Disposable {
     /** The event about update tick. */
     public final Signal<Tick> update = updaters.expose;
 
-    /** The tick manager. */
-    final SegmentBuffer<Tick> ticks;
+    /** The tick store. */
+    public final TimeseriseStore<Tick> ticks;
 
     /** The cache of upper tickers. */
     final Ticker[] uppers;
@@ -57,7 +55,7 @@ public final class Ticker implements Disposable {
     Ticker(Span span) {
         this.span = Objects.requireNonNull(span);
         this.uppers = new Ticker[span.uppers.length];
-        this.ticks = new SegmentBuffer<Tick>(span, tick -> tick.startSeconds);
+        this.ticks = new TimeseriseStore<Tick>(span, tick -> tick.startSeconds);
     }
 
     /**
@@ -70,7 +68,7 @@ public final class Ticker implements Disposable {
         current = new Tick(ticks.last(), span
                 .calculateStartTime(execution.date), span, execution.id, execution.delay, execution.price, realtime);
 
-        ticks.add(current);
+        ticks.store(current);
         additions.accept(current);
     }
 
@@ -94,13 +92,13 @@ public final class Ticker implements Disposable {
             while (current.end.isBefore(start)) {
                 current.freeze();
                 current = new Tick(prev, current.end, span, execution.id, execution.delay, current.closePrice(), realtime);
-                ticks.add(current);
+                ticks.store(current);
             }
 
             // create the latest tick for execution
             current.freeze();
             current = new Tick(prev, current.end, span, execution.id, execution.delay, execution.price, realtime);
-            ticks.add(current);
+            ticks.store(current);
             additions.accept(current);
             return true;
         } else {
@@ -114,74 +112,6 @@ public final class Ticker implements Disposable {
     @Override
     public void vandalize() {
         ticks.clear();
-    }
-
-    /**
-     * Calculate start time.
-     * 
-     * @return
-     */
-    public final ZonedDateTime startTime() {
-        return ticks.isEmpty() ? ZonedDateTime.now() : ticks.first().start;
-    }
-
-    /**
-     * Calculate end time.
-     * 
-     * @return
-     */
-    public final ZonedDateTime endTime() {
-        return ticks.isEmpty() ? ZonedDateTime.now() : ticks.last().end;
-    }
-
-    /**
-     * Get first tick.
-     * 
-     * @return
-     */
-    public final Tick first() {
-        return ticks.first();
-    }
-
-    /**
-     * Get last tick.
-     * 
-     * @return
-     */
-    public final Tick last() {
-        return ticks.last();
-    }
-
-    /**
-     * Calculate the {@link Tick} size.
-     * 
-     * @return
-     */
-    public final int size() {
-        return ticks.size();
-    }
-
-    /**
-     * List up all ticks.
-     * 
-     * @param consumer
-     */
-    public final void each(Consumer<Tick> consumer) {
-        ticks.each(consumer);
-    }
-
-    public final void eachAt(long start, long end, Consumer<Tick> consumer) {
-        ticks.eachAt(start, end, consumer);
-    }
-
-    /**
-     * Find by epoch second.
-     * 
-     * @param epochSeconds
-     * @return
-     */
-    public final Variable<Tick> findByEpochSecond(long epochSeconds) {
-        return Variable.of(ticks.at(epochSeconds));
     }
 
     /**

@@ -117,8 +117,8 @@ public abstract class Indicator<T> {
      * @return A time-based value.
      */
     public final T valueAt(Tick tick) {
-        Tick rounded = ticker.findByEpochSecond(tick.startSeconds).v;
-        return valueAtRounded(rounded == null ? ticker.first() : rounded);
+        Tick rounded = ticker.ticks.getByTime(tick.startSeconds);
+        return valueAtRounded(rounded == null ? ticker.ticks.first() : rounded);
     }
 
     /**
@@ -136,7 +136,7 @@ public abstract class Indicator<T> {
      * @return A first value.
      */
     public final T first() {
-        return valueAt(ticker.first());
+        return valueAt(ticker.ticks.first());
     }
 
     /**
@@ -145,7 +145,7 @@ public abstract class Indicator<T> {
      * @return A latest value.
      */
     public final T last() {
-        return valueAt(ticker.last());
+        return valueAt(ticker.ticks.last());
     }
 
     /**

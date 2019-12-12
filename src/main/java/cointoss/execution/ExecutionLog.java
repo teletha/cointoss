@@ -770,7 +770,7 @@ public class ExecutionLog {
                     Execution[] prev = {Market.BASE};
 
                     CsvWriter writer = buildCsvWriter(new ZstdOutputStream(fast.newOutputStream(), 1));
-                    ticker.each(tick -> {
+                    ticker.ticks.each(tick -> {
                         long id = tick.openId;
                         Num buy = tick.buyVolume().divide(2);
                         Num sell = tick.sellVolume().divide(2);
