@@ -11,9 +11,9 @@ package trademate.chart.builtin;
 
 import cointoss.Market;
 import cointoss.ticker.Indicator;
-import cointoss.ticker.Span;
 import cointoss.ticker.Tick;
 import cointoss.ticker.Ticker;
+import cointoss.ticker.TimeSpan;
 import kiss.Variable;
 import stylist.Style;
 import stylist.StyleDSL;
@@ -56,9 +56,9 @@ public class SMAIndicator extends PlotScript implements StyleDSL {
         int base = market.service.setting.baseCurrencyScaleSize;
 
         main.line(Indicator.build(ticker, Tick::closePrice).sma(shortDays).scale(base), shortSMA);
-        main.line(Indicator.build(market.tickers.of(Span.Minute30), Tick::closePrice).sma(shortDays).scale(base), SMA30M);
-        main.line(Indicator.build(market.tickers.of(Span.Hour1), Tick::closePrice).sma(shortDays).scale(base), SMA1H);
-        main.line(Indicator.build(market.tickers.of(Span.Hour4), Tick::closePrice).sma(shortDays).scale(base), SMA4H);
+        main.line(Indicator.build(market.tickers.of(TimeSpan.Minute30), Tick::closePrice).sma(shortDays).scale(base), SMA30M);
+        main.line(Indicator.build(market.tickers.of(TimeSpan.Hour1), Tick::closePrice).sma(shortDays).scale(base), SMA1H);
+        main.line(Indicator.build(market.tickers.of(TimeSpan.Hour4), Tick::closePrice).sma(shortDays).scale(base), SMA4H);
         main.line(Indicator.build(ticker, Tick::closePrice).sma(longDays).scale(base), longSMA);
     }
 }

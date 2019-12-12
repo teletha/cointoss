@@ -25,7 +25,7 @@ public class TickerTestSupport {
      * @param values
      * @return
      */
-    public Ticker ticker(Span span, int... values) {
+    public Ticker ticker(TimeSpan span, int... values) {
         ZonedDateTime time = Chrono.MIN;
 
         for (int value : values) {
@@ -45,7 +45,7 @@ public class TickerTestSupport {
      * @param close
      * @return
      */
-    public Tick tick(Span span, int open, int high, int low, int close) {
+    public Tick tick(TimeSpan span, int open, int high, int low, int close) {
         if (high < open || high < low || high < close) {
             throw new IllegalArgumentException("High price is not highest. [open:" + open + " high:" + high + " low:" + low + " close:" + close + "]");
         }

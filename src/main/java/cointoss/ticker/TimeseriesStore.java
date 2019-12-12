@@ -7,7 +7,7 @@
  *
  *          https://opensource.org/licenses/MIT
  */
-package cointoss.util;
+package cointoss.ticker;
 
 import java.util.Iterator;
 import java.util.Map.Entry;
@@ -17,12 +17,10 @@ import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.function.Consumer;
 import java.util.function.ToLongFunction;
 
-import cointoss.ticker.Span;
-
-public final class TimeseriseStore<E> {
+public final class TimeseriesStore<E> {
 
     /** The span. */
-    private final Span span;
+    private final TimeSpan span;
 
     /** The key extractor. */
     private final ToLongFunction<E> timestampExtractor;
@@ -36,7 +34,7 @@ public final class TimeseriseStore<E> {
     /**
      * 
      */
-    public TimeseriseStore(Span span, ToLongFunction<E> timestampExtractor) {
+    public TimeseriesStore(TimeSpan span, ToLongFunction<E> timestampExtractor) {
         this.span = Objects.requireNonNull(span);
         this.timestampExtractor = Objects.requireNonNull(timestampExtractor);
     }
@@ -53,7 +51,7 @@ public final class TimeseriseStore<E> {
     }
 
     /**
-     * Return the size of this {@link TimeseriseStore}.
+     * Return the size of this {@link TimeseriesStore}.
      * 
      * @return A positive size or zero.
      */
@@ -62,18 +60,18 @@ public final class TimeseriseStore<E> {
     }
 
     /**
-     * Check whether this {@link TimeseriseStore} is empty or not.
+     * Check whether this {@link TimeseriesStore} is empty or not.
      * 
-     * @return
+     * @return Result.
      */
     public boolean isEmpty() {
         return indexed.isEmpty();
     }
 
     /**
-     * Check whether this {@link TimeseriseStore} is empty or not.
+     * Check whether this {@link TimeseriesStore} is empty or not.
      * 
-     * @return
+     * @return Result.
      */
     public boolean isNotEmpty() {
         return !indexed.isEmpty();
@@ -176,18 +174,20 @@ public final class TimeseriseStore<E> {
      * @param each An item processor.
      */
     public void each(Consumer<? super E> each) {
-        each(0, size(), each);
+        for (Segment segment : indexed.values()) {
+            segment.each(0, each);
+        }
     }
 
     /**
-     * Acquires the time series items stored from the specified start time to end time in ascending
-     * order.
+     * Acquires the time series items stored from the specified start index (inclusive) to end index
+     * (exclusive) in ascending order.
      * 
-     * @param start A start time (included).
-     * @param end A end time (included).
+     * @param start A start index (included).
+     * @param end A end index (exclusive).
      * @param each An item processor.
      */
-    public void each(int start, int end, Consumer<? super E> each) {
+    public void eachByIndex(int start, int end, Consumer<? super E> each) {
         if (end < start) {
             throw new IndexOutOfBoundsException("Start[" + start + "] must be less than end[" + end + "].");
         }
@@ -218,7 +218,7 @@ public final class TimeseriseStore<E> {
      * @param end A end time (included).
      * @param each An item processor.
      */
-    public void eachAt(long start, long end, Consumer<? super E> each) {
+    public void eachByTime(long start, long end, Consumer<? super E> each) {
         if (end < start) {
             throw new IndexOutOfBoundsException("Start[" + start + "] must be less than end[" + end + "].");
         }
@@ -291,6 +291,9 @@ public final class TimeseriseStore<E> {
          */
         abstract int set(int index, E item);
 
+        /**
+         * Clear data.
+         */
         abstract void clear();
 
         /**

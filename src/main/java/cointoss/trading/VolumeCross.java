@@ -21,9 +21,9 @@ import cointoss.Market;
 import cointoss.Scenario;
 import cointoss.Trader;
 import cointoss.ticker.Indicator;
-import cointoss.ticker.Span;
 import cointoss.ticker.Tick;
 import cointoss.ticker.Ticker;
+import cointoss.ticker.TimeSpan;
 import cointoss.util.Num;
 import kiss.Signal;
 import stylist.Style;
@@ -42,14 +42,14 @@ public class VolumeCross extends Trader {
      */
     @Override
     protected void declare(Market market, FundManager fund) {
-        Indicator<Num> buyVolume = Indicator.build(market.tickers.of(Span.Minute5), Tick::buyVolume);
-        Indicator<Num> sellVolume = Indicator.build(market.tickers.of(Span.Minute5), Tick::sellVolume);
+        Indicator<Num> buyVolume = Indicator.build(market.tickers.of(TimeSpan.Minute5), Tick::buyVolume);
+        Indicator<Num> sellVolume = Indicator.build(market.tickers.of(TimeSpan.Minute5), Tick::sellVolume);
         Indicator<Num> volumeDiff = buyVolume.map(sellVolume, (b, s) -> b.minus(s))
                 .scale(market.service.setting.targetCurrencyScaleSize)
                 .sma(7);
-        Indicator<Boolean> upPrediction = Indicator.build(market.tickers.of(Span.Minute5), Tick::isBear)
+        Indicator<Boolean> upPrediction = Indicator.build(market.tickers.of(TimeSpan.Minute5), Tick::isBear)
                 .map(volumeDiff, (t, d) -> t && d.isPositive());
-        Indicator<Boolean> downPrediction = Indicator.build(market.tickers.of(Span.Minute5), Tick::isBull)
+        Indicator<Boolean> downPrediction = Indicator.build(market.tickers.of(TimeSpan.Minute5), Tick::isBull)
                 .map(volumeDiff, (t, d) -> t && d.isNegative());
 
         // disableWhile(observeProfit().map(p -> p.isLessThan(-10000)));

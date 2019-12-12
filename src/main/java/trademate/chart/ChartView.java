@@ -15,8 +15,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import cointoss.Market;
-import cointoss.ticker.Span;
 import cointoss.ticker.Ticker;
+import cointoss.ticker.TimeSpan;
 import kiss.Variable;
 import stylist.Style;
 import stylist.StyleDSL;
@@ -33,7 +33,7 @@ public class ChartView extends View {
     public final Variable<Ticker> ticker = Variable.of(Ticker.EMPTY);
 
     /** Chart UI */
-    protected UIComboBox<Span> span;
+    protected UIComboBox<TimeSpan> span;
 
     /** The chart configuration. */
     public final Variable<Boolean> showLatestPrice = Variable.of(true);
@@ -86,7 +86,7 @@ public class ChartView extends View {
      */
     @Override
     protected void initialize() {
-        span.initialize(Span.values());
+        span.initialize(TimeSpan.values());
         span.observing() //
                 .skipNull()
                 .combineLatest(market.observing().skipNull())

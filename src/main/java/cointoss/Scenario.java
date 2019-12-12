@@ -27,7 +27,7 @@ import cointoss.order.Order;
 import cointoss.order.OrderStrategy.Makable;
 import cointoss.order.OrderStrategy.Orderable;
 import cointoss.order.OrderStrategy.Takable;
-import cointoss.ticker.Span;
+import cointoss.ticker.TimeSpan;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
 import kiss.Disposable;
@@ -387,20 +387,20 @@ public abstract class Scenario extends ScenarioBase implements Directional {
 
     protected final Variable<Num> trailing(Function<Num, Num> trailer) {
         Variable<Num> trailedPrice = Variable.of(trailer.apply(entryPrice));
-        disposerForExit.add(market.tickers.of(Span.Second5).add.map(tick -> Num.max(this, trailer.apply(tick.openPrice), trailedPrice.v))
+        disposerForExit.add(market.tickers.of(TimeSpan.Second5).add.map(tick -> Num.max(this, trailer.apply(tick.openPrice), trailedPrice.v))
                 .to(trailedPrice));
         return trailedPrice;
     }
 
     protected final Variable<Num> trailing2(Function<Num, Num> trailer) {
         Variable variable = Variable.of(trailer.apply(entryPrice.minus(this, entryPrice)));
-        disposerForExit.add(market.tickers.of(Span.Second5).add.map(v -> trailer.apply(entryPrice.minus(this, v.openPrice))).to(variable));
+        disposerForExit.add(market.tickers.of(TimeSpan.Second5).add.map(v -> trailer.apply(entryPrice.minus(this, v.openPrice))).to(variable));
         return variable;
     }
 
     protected final Variable<Num> trailing3(Function<Num, Num> trailer) {
         Variable variable = Variable.of(trailer.apply(market.tickers.latestPrice.v));
-        disposerForExit.add(market.tickers.of(Span.Second5).add.map(tick -> trailer.apply(tick.openPrice)).to(variable));
+        disposerForExit.add(market.tickers.of(TimeSpan.Second5).add.map(tick -> trailer.apply(tick.openPrice)).to(variable));
         return variable;
     }
 

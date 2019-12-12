@@ -15,9 +15,9 @@ import javafx.geometry.Insets;
 import javafx.geometry.Side;
 import javafx.scene.layout.Region;
 
-import cointoss.ticker.Span;
 import cointoss.ticker.Tick;
 import cointoss.ticker.Ticker;
+import cointoss.ticker.TimeSpan;
 import cointoss.util.Num;
 import kiss.Variable;
 import viewtify.ui.helper.LayoutAssistant;
@@ -118,17 +118,17 @@ public class Chart extends Region {
         long end = (long) axisX.computeVisibleMaxValue();
         long duration = end - start;
 
-        Span span;
+        TimeSpan span;
         if (1 < duration / 86400 /* 60x60x24 */) {
-            span = Span.Day1;
+            span = TimeSpan.Day1;
         } else if (1 < duration / 21600 /* 60x60x6 */) {
-            span = Span.Hour6;
+            span = TimeSpan.Hour6;
         } else if (1 < duration / 3600 /* 60x60 */) {
-            span = Span.Hour1;
+            span = TimeSpan.Hour1;
         } else if (1 < duration / 300 /* 60x5 */) {
-            span = Span.Minute5;
+            span = TimeSpan.Minute5;
         } else {
-            span = Span.Second5;
+            span = TimeSpan.Second5;
         }
 
         if (chart.market.isPresent()) {
@@ -137,7 +137,7 @@ public class Chart extends Region {
             Tick endTick = ticker.ticks.getByTime(end);
 
             if (startTick != null && endTick != null) {
-                ticker.ticks.eachAt(start, end, tick -> {
+                ticker.ticks.eachByTime(start, end, tick -> {
                     max.set(Num.max(max.v, tick.highPrice()));
                     min.set(Num.min(min.v, tick.lowPrice()));
                 });

@@ -16,8 +16,8 @@ import java.util.Map;
 
 import cointoss.Market;
 import cointoss.MarketService;
-import cointoss.ticker.Span;
 import cointoss.ticker.Ticker;
+import cointoss.ticker.TimeSpan;
 import kiss.I;
 import kiss.Managed;
 import kiss.Singleton;
@@ -95,13 +95,13 @@ class PlotScriptRegistry implements Storable<PlotScriptRegistry> {
     }
 
     /**
-     * Find all plotting scripts on the specified {@link MarketService} and {@link Span}.
+     * Find all plotting scripts on the specified {@link MarketService} and {@link TimeSpan}.
      * 
      * @param service A target {@link MarketService}.
-     * @param span A target {@link Span}.
+     * @param span A target {@link TimeSpan}.
      * @return A list of {@link PlotScript}.
      */
-    final List<PlotScript> findPlottersBy(MarketService service, Span span) {
+    final List<PlotScript> findPlottersBy(MarketService service, TimeSpan span) {
         List<Class<? extends PlotScript>> classes = managedScripts.get(service.marketIdentity());
 
         if (classes == null) {

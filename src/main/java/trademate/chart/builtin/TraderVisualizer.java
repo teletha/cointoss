@@ -9,7 +9,7 @@
  */
 package trademate.chart.builtin;
 
-import static cointoss.ticker.Span.Minute1;
+import static cointoss.ticker.TimeSpan.Minute1;
 
 import cointoss.Market;
 import cointoss.Trader;

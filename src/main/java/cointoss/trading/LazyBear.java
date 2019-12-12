@@ -18,13 +18,13 @@ import cointoss.Scenario;
 import cointoss.Trader;
 import cointoss.ticker.Indicator;
 import cointoss.ticker.Indicators;
-import cointoss.ticker.Span;
+import cointoss.ticker.TimeSpan;
 import cointoss.util.Num;
 import kiss.Ⅱ;
 
 public class LazyBear extends Trader {
 
-    public Span tickerSpan = Span.Second15;
+    public TimeSpan tickerSpan = TimeSpan.Second15;
 
     public int entryThreshold = 50;
 

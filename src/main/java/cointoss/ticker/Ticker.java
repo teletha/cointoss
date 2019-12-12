@@ -13,18 +13,17 @@ import java.time.ZonedDateTime;
 import java.util.Objects;
 
 import cointoss.execution.Execution;
-import cointoss.util.TimeseriseStore;
 import kiss.Disposable;
 import kiss.Signal;
 import kiss.Signaling;
 
 public final class Ticker implements Disposable {
 
-    /** Reusable NULL object.. */
-    public static final Ticker EMPTY = new Ticker(Span.Minute1);
+    /** Reusable NULL object. */
+    public static final Ticker EMPTY = new Ticker(TimeSpan.Minute1);
 
     /** The span. */
-    public final Span span;
+    public final TimeSpan span;
 
     /** The event listeners. */
     final Signaling<Tick> additions = new Signaling();
@@ -39,7 +38,7 @@ public final class Ticker implements Disposable {
     public final Signal<Tick> update = updaters.expose;
 
     /** The tick store. */
-    public final TimeseriseStore<Tick> ticks;
+    public final TimeseriesStore<Tick> ticks;
 
     /** The cache of upper tickers. */
     final Ticker[] uppers;
@@ -52,10 +51,10 @@ public final class Ticker implements Disposable {
      * 
      * @param span An associated span.
      */
-    Ticker(Span span) {
+    Ticker(TimeSpan span) {
         this.span = Objects.requireNonNull(span);
         this.uppers = new Ticker[span.uppers.length];
-        this.ticks = new TimeseriseStore<Tick>(span, tick -> tick.startSeconds);
+        this.ticks = new TimeseriesStore<Tick>(span, tick -> tick.startSeconds);
     }
 
     /**

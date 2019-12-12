@@ -441,10 +441,10 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             }
 
             // estimate visible range
-            long startEpochSec = (long) axisX.computeVisibleMinValue();
-            long endEpochSec = Math.min((long) axisX.computeVisibleMaxValue(), chart.ticker.v.ticks.last().start.toEpochSecond());
+            long start = (long) axisX.computeVisibleMinValue();
+            long end = Math.min((long) axisX.computeVisibleMaxValue(), chart.ticker.v.ticks.last().start.toEpochSecond());
             long span = chart.ticker.v.span.seconds;
-            int visibleSize = (int) ((endEpochSec - startEpochSec) / span) + 1;
+            int visibleSize = (int) ((end - start) / span) + 1;
 
             // redraw all candles.
             GraphicsContext gc = candles.getGraphicsContext2D();
@@ -461,7 +461,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             }
             MutableDoubleList valueX = new NoCopyDoubleList();
 
-            Tick tick = chart.ticker.v.ticks.getByTime(startEpochSec);
+            Tick tick = chart.ticker.v.ticks.getByTime(start);
             int counter = 0;
 
             while (tick != null && counter++ < visibleSize) {

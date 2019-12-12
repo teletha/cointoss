@@ -20,8 +20,8 @@ import org.junit.jupiter.api.parallel.ExecutionMode;
 import antibug.CleanRoom;
 import cointoss.Market;
 import cointoss.market.bitflyer.BitFlyer;
-import cointoss.ticker.Span;
 import cointoss.ticker.Ticker;
+import cointoss.ticker.TimeSpan;
 import kiss.Disposable;
 import kiss.Variable;
 import trademate.chart.PlotScriptRegistry.GlobalSetting;
@@ -38,7 +38,7 @@ class PlotScriptRegistryTest {
         registry.register(BitFlyer.BTC_JPY, Volume.class);
         registry.register(BitFlyer.BTC_JPY, SMA.class);
 
-        List<PlotScript> plotters = registry.findPlottersBy(BitFlyer.BTC_JPY, Span.Hour1);
+        List<PlotScript> plotters = registry.findPlottersBy(BitFlyer.BTC_JPY, TimeSpan.Hour1);
         assert plotters.size() == 2;
         assert plotters.get(0) instanceof Volume;
         assert plotters.get(1) instanceof SMA;
@@ -51,11 +51,11 @@ class PlotScriptRegistryTest {
         registry.register(BitFlyer.BTC_JPY, Volume.class);
         registry.register(BitFlyer.BTC_JPY, SMA.class);
 
-        assert registry.findPlottersBy(BitFlyer.BTC_JPY, Span.Hour1).size() == 2;
+        assert registry.findPlottersBy(BitFlyer.BTC_JPY, TimeSpan.Hour1).size() == 2;
         registry.unregister(BitFlyer.BTC_JPY, Volume.class);
-        assert registry.findPlottersBy(BitFlyer.BTC_JPY, Span.Hour1).size() == 1;
+        assert registry.findPlottersBy(BitFlyer.BTC_JPY, TimeSpan.Hour1).size() == 1;
         registry.unregister(BitFlyer.BTC_JPY, SMA.class);
-        assert registry.findPlottersBy(BitFlyer.BTC_JPY, Span.Hour1).size() == 0;
+        assert registry.findPlottersBy(BitFlyer.BTC_JPY, TimeSpan.Hour1).size() == 0;
     }
 
     @Test

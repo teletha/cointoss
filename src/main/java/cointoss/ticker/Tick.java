@@ -75,7 +75,7 @@ public final class Tick {
      * @param open A open price.
      * @param realtime The realtime execution statistic.
      */
-    Tick(Tick previous, ZonedDateTime start, Span span, long id, int delay, Num open, TickerManager realtime) {
+    Tick(Tick previous, ZonedDateTime start, TimeSpan span, long id, int delay, Num open, TickerManager realtime) {
         this.previous = new WeakReference(previous);
         if (previous != null) previous.next = new WeakReference(this);
 

@@ -18,7 +18,7 @@ import java.time.temporal.ChronoField;
 /**
  * Defined tick span.
  */
-public enum Span {
+public enum TimeSpan {
 
     /** SPAN */
     Second5(5, SECOND_OF_MINUTE, 1),
@@ -77,23 +77,23 @@ public enum Span {
     /** The duration. */
     public final Duration duration;
 
-    /** The unit based amount. */
-    private final long amount;
-
-    /** The unit. */
-    private final ChronoField unit;
-
     /** The number of seconds. */
     public final long seconds;
 
     /** The indexes of associated upper tickers. */
     final int[] uppers;
 
+    /** The unit based amount. */
+    private final long amount;
+
+    /** The unit. */
+    private final ChronoField unit;
+
     /**
      * @param amount
      * @param unit
      */
-    private Span(long amount, ChronoField unit, int... uppers) {
+    private TimeSpan(long amount, ChronoField unit, int... uppers) {
         this.amount = amount;
         this.unit = unit;
         this.duration = Duration.of(amount, unit.getBaseUnit());
@@ -110,32 +110,9 @@ public enum Span {
      * 
      * @param e
      */
-    public ZonedDateTime calculateStartTime(ZonedDateTime time) {
+    ZonedDateTime calculateStartTime(ZonedDateTime time) {
         long value = time.getLong(unit);
         return time.truncatedTo(unit.getBaseUnit()).with(unit, value - (value % amount));
-    }
-
-    /**
-     * Calculates the time to which the specified epoch second belongs in this Span.
-     * 
-     * @param epochSeconds Epoch seconds to be calculated.
-     * @return {@link Span}'s start epoch seconds to which the specified epoch seconds belong.
-     */
-    public long calculateStartTime(long epochSeconds) {
-        long remainder = epochSeconds % seconds;
-        return epochSeconds - remainder;
-    }
-
-    /**
-     * Calculates the time to which the specified epoch second belongs in this Span.
-     * 
-     * @param epochSeconds Epoch seconds to be calculated.
-     * @return {@link Span}'s start epoch seconds to which the specified epoch seconds belong and
-     *         the remainded seconds.
-     */
-    public long[] calculateStartDayTimeAndIndex(long epochSeconds) {
-        long remainder = epochSeconds % 86400; // 60 * 60 * 24 //
-        return new long[] {epochSeconds - remainder, remainder / seconds};
     }
 
     /**
@@ -143,7 +120,7 @@ public enum Span {
      * 
      * @return A calculation result.
      */
-    public int ticksPerDay() {
+    int ticksPerDay() {
         if (duration.toDaysPart() == 0) {
             return (int) Duration.ofDays(1).dividedBy(duration);
         } else {

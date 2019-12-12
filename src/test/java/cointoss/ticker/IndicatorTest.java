@@ -18,7 +18,7 @@ class IndicatorTest extends TickerTestSupport {
 
     @Test
     void valueAt() {
-        Ticker ticker = ticker(Span.Second5, 1, 2, 3, 4, 5);
+        Ticker ticker = ticker(TimeSpan.Second5, 1, 2, 3, 4, 5);
         Indicator<Num> indicator = Indicator.build(ticker, tick -> tick.openPrice);
         assert indicator.valueAt(ticker.ticks.getByIndex(0)).is(1);
         assert indicator.valueAt(ticker.ticks.getByIndex(1)).is(2);
@@ -29,8 +29,8 @@ class IndicatorTest extends TickerTestSupport {
 
     @Test
     void valueAtLowerTick() {
-        Ticker ticker = ticker(Span.Second15, 1, 2, 3, 4, 5);
-        Ticker lower = manager.of(Span.Second5);
+        Ticker ticker = ticker(TimeSpan.Second15, 1, 2, 3, 4, 5);
+        Ticker lower = manager.of(TimeSpan.Second5);
         Indicator<Num> indicator = Indicator.build(ticker, tick -> tick.openPrice);
         assert indicator.valueAt(lower.ticks.getByIndex(0)).is(1);
         assert indicator.valueAt(lower.ticks.getByIndex(1)).is(1);
@@ -44,21 +44,21 @@ class IndicatorTest extends TickerTestSupport {
 
     @Test
     void first() {
-        Ticker ticker = ticker(Span.Second5, 1, 2, 3, 4, 5);
+        Ticker ticker = ticker(TimeSpan.Second5, 1, 2, 3, 4, 5);
         Indicator<Num> indicator = Indicator.build(ticker, tick -> tick.openPrice);
         assert indicator.first().is(1);
     }
 
     @Test
     void last() {
-        Ticker ticker = ticker(Span.Second5, 1, 2, 3, 4, 5);
+        Ticker ticker = ticker(TimeSpan.Second5, 1, 2, 3, 4, 5);
         Indicator<Num> indicator = Indicator.build(ticker, tick -> tick.openPrice);
         assert indicator.last().is(5);
     }
 
     @Test
     void sma() {
-        Ticker ticker = ticker(Span.Second5, 1, 2, 3, 4, 5);
+        Ticker ticker = ticker(TimeSpan.Second5, 1, 2, 3, 4, 5);
         Indicator<Num> indicator = Indicator.build(ticker, tick -> tick.openPrice).sma(2);
         assert indicator.valueAt(ticker.ticks.getByIndex(0)).is(1);
         assert indicator.valueAt(ticker.ticks.getByIndex(1)).is(1.5);
@@ -76,7 +76,7 @@ class IndicatorTest extends TickerTestSupport {
 
     @Test
     void ema() {
-        Ticker ticker = ticker(Span.Second5, 1, 2, 3, 4, 5);
+        Ticker ticker = ticker(TimeSpan.Second5, 1, 2, 3, 4, 5);
         Indicator<Num> indicator = Indicator.build(ticker, tick -> tick.openPrice).ema(2);
         assert indicator.valueAt(ticker.ticks.getByIndex(0)).is(1);
         assert indicator.valueAt(ticker.ticks.getByIndex(1)).is(1.6666666667);
@@ -94,7 +94,7 @@ class IndicatorTest extends TickerTestSupport {
 
     @Test
     void mma() {
-        Ticker ticker = ticker(Span.Second5, 1, 2, 3, 4, 5);
+        Ticker ticker = ticker(TimeSpan.Second5, 1, 2, 3, 4, 5);
         Indicator<Num> indicator = Indicator.build(ticker, tick -> tick.openPrice).mma(2);
         assert indicator.valueAt(ticker.ticks.getByIndex(0)).is(1);
         assert indicator.valueAt(ticker.ticks.getByIndex(1)).is(1.5);
@@ -112,7 +112,7 @@ class IndicatorTest extends TickerTestSupport {
 
     @Test
     void wma() {
-        Ticker ticker = ticker(Span.Second5, 1, 2, 3, 4, 5);
+        Ticker ticker = ticker(TimeSpan.Second5, 1, 2, 3, 4, 5);
         Indicator<Num> indicator = Indicator.build(ticker, tick -> tick.openPrice).wma(2);
         assert indicator.valueAt(ticker.ticks.getByIndex(0)).is(1);
         assert indicator.valueAt(ticker.ticks.getByIndex(1)).is(1.6666666667);
@@ -130,7 +130,7 @@ class IndicatorTest extends TickerTestSupport {
 
     @Test
     void trueRange() {
-        Ticker ticker = ticker(Span.Second5, 1, 2, 4, 8, 16);
+        Ticker ticker = ticker(TimeSpan.Second5, 1, 2, 4, 8, 16);
         Indicator<Num> indicator = Indicator.trueRange(ticker);
         assert indicator.valueAt(ticker.ticks.getByIndex(0)).is(0);
         assert indicator.valueAt(ticker.ticks.getByIndex(1)).is(1);
@@ -141,7 +141,7 @@ class IndicatorTest extends TickerTestSupport {
 
     @Test
     void averageTrueRange() {
-        Ticker ticker = ticker(Span.Second5, 1, 2, 4, 8, 16);
+        Ticker ticker = ticker(TimeSpan.Second5, 1, 2, 4, 8, 16);
         Indicator<Num> indicator = Indicator.averageTrueRange(ticker, 4);
         assert indicator.valueAt(ticker.ticks.getByIndex(0)).is(0);
         assert indicator.valueAt(ticker.ticks.getByIndex(1)).is(0.25);
@@ -152,7 +152,7 @@ class IndicatorTest extends TickerTestSupport {
 
     @Test
     void constant() {
-        Ticker ticker = ticker(Span.Second5, 1, 2, 4, 8, 16);
+        Ticker ticker = ticker(TimeSpan.Second5, 1, 2, 4, 8, 16);
         Indicator<Integer> calculatable = Indicator.build(ticker, tick -> 10);
         assert calculatable.isConstant() == false;
 
@@ -162,7 +162,7 @@ class IndicatorTest extends TickerTestSupport {
 
     @Test
     void dontCacheLatest() {
-        Ticker ticker = ticker(Span.Second5, 1, 2, 3);
+        Ticker ticker = ticker(TimeSpan.Second5, 1, 2, 3);
         Tick tick2 = ticker.ticks.getByIndex(2);
 
         Indicator<Num> indicator = Indicator.build(ticker, tick -> tick.closePrice()).memoize();

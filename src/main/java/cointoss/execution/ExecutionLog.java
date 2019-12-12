@@ -59,9 +59,9 @@ import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.market.bitmex.BitMex;
-import cointoss.ticker.Span;
 import cointoss.ticker.Ticker;
 import cointoss.ticker.TickerManager;
+import cointoss.ticker.TimeSpan;
 import cointoss.util.Chrono;
 import cointoss.util.Network;
 import cointoss.util.Num;
@@ -765,7 +765,7 @@ public class ExecutionLog {
                 try {
                     TickerManager manager = new TickerManager();
                     read().to(manager::update);
-                    Ticker ticker = manager.of(Span.Second5);
+                    Ticker ticker = manager.of(TimeSpan.Second5);
 
                     Execution[] prev = {Market.BASE};
 
