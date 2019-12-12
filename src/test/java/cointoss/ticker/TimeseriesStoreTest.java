@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 class TimeseriesStoreTest {
+    int days = 60 * 60 * 24;
 
     @Test
     void isEmpty() {
@@ -80,6 +81,43 @@ class TimeseriesStoreTest {
     }
 
     @Test
+    void getByIndexOverTime() {
+        TimeseriesStore<Integer> store = new TimeseriesStore<>(TimeSpan.Day1, Integer::longValue);
+        store.store(0, days, 2 * days, 3 * days, 4 * days);
+        assert store.getByIndex(0) == 0;
+        assert store.getByIndex(1) == days;
+        assert store.getByIndex(2) == 2 * days;
+        assert store.getByIndex(3) == 3 * days;
+        assert store.getByIndex(4) == 4 * days;
+        assert store.getByIndex(5) == null;
+    }
+
+    @Test
+    void getByTime() {
+        TimeseriesStore<Integer> store = new TimeseriesStore<>(TimeSpan.Second5, Integer::longValue);
+        store.store(0, 5, 10);
+        assert store.getByTime(0) == 0;
+        assert store.getByTime(3) == 0;
+        assert store.getByTime(5) == 5;
+        assert store.getByTime(7) == 5;
+        assert store.getByTime(10) == 10;
+        assert store.getByTime(14) == 10;
+    }
+
+    @Test
+    void getByTimeOverTime() {
+        TimeseriesStore<Integer> store = new TimeseriesStore<>(TimeSpan.Day1, Integer::longValue);
+        store.store(0, days, 2 * days, 3 * days, 4 * days);
+        assert store.getByTime(0) == 0;
+        assert store.getByTime(days - 1) == 0;
+        assert store.getByTime(days) == days;
+        assert store.getByTime(days + 1) == days;
+        assert store.getByTime(2 * days - 1) == days;
+        assert store.getByTime(2 * days) == 2 * days;
+        assert store.getByTime(2 * days + 1) == 2 * days;
+    }
+
+    @Test
     void first() {
         TimeseriesStore<Integer> store = new TimeseriesStore<>(TimeSpan.Second5, Integer::longValue);
         store.store(25);
@@ -99,6 +137,13 @@ class TimeseriesStoreTest {
 
         store.store(10);
         assert store.first() == 10;
+    }
+
+    @Test
+    void firstOverDays() {
+        TimeseriesStore<Integer> store = new TimeseriesStore<>(TimeSpan.Day1, Integer::longValue);
+        store.store(0, days, 2 * days, 3 * days, 4 * days);
+        assert store.first() == 0;
     }
 
     @Test
@@ -124,6 +169,13 @@ class TimeseriesStoreTest {
     }
 
     @Test
+    void lastOverDays() {
+        TimeseriesStore<Integer> store = new TimeseriesStore<>(TimeSpan.Day1, Integer::longValue);
+        store.store(0, days, 2 * days, 3 * days, 4 * days);
+        assert store.last() == 4 * days;
+    }
+
+    @Test
     void size() {
         TimeseriesStore<Integer> store = new TimeseriesStore<>(TimeSpan.Second5, Integer::longValue);
         assert store.size() == 0;
@@ -142,29 +194,91 @@ class TimeseriesStoreTest {
     }
 
     @Test
+    void sizeOverDays() {
+        TimeseriesStore<Integer> store = new TimeseriesStore<>(TimeSpan.Day1, Integer::longValue);
+        store.store(0, days, 2 * days, 3 * days, 4 * days);
+        assert store.size() == 5;
+    }
+
+    @Test
+    void eachAll() {
+        // padding right
+        TimeseriesStore<Integer> store = new TimeseriesStore<>(TimeSpan.Second5, Integer::longValue);
+        store.store(0, 5, 10, 15, 20, 25, 30);
+
+        List<Integer> list = new ArrayList();
+        store.each(list::add);
+        assertIterableEquals(List.of(0, 5, 10, 15, 20, 25, 30), list);
+
+        // padding both sides
+        store = new TimeseriesStore<>(TimeSpan.Second5, Integer::longValue);
+        store.store(15, 20, 25, 30);
+
+        list = new ArrayList();
+        store.each(list::add);
+        assertIterableEquals(List.of(15, 20, 25, 30), list);
+
+        // padding left side
+        store = new TimeseriesStore<>(TimeSpan.Hour4, Integer::longValue);
+        store.store(3600 * 12, 3600 * 16, 3600 * 20);
+
+        list = new ArrayList();
+        store.each(list::add);
+        assertIterableEquals(List.of(3600 * 12, 3600 * 16, 3600 * 20), list);
+    }
+
+    @Test
+    void eachAllOverDays() {
+        TimeseriesStore<Integer> store = new TimeseriesStore<>(TimeSpan.Day1, Integer::longValue);
+        store.store(0, days, 2 * days, 3 * days, 4 * days);
+
+        List<Integer> list = new ArrayList();
+        store.each(list::add);
+        assertIterableEquals(List.of(0, days, 2 * days, 3 * days, 4 * days), list);
+    }
+
+    @Test
     void eachByTime() {
         TimeseriesStore<Integer> store = new TimeseriesStore<>(TimeSpan.Second5, Integer::longValue);
         store.store(5, 10, 15, 20, 25, 30, 35, 40);
 
         List<Integer> list = new ArrayList();
-        store.eachByTime(10, 35, list::add);
+        store.each(10, 35, list::add);
         assertIterableEquals(List.of(10, 15, 20, 25, 30, 35), list);
 
         list = new ArrayList();
-        store.eachByTime(10, 34, list::add);
+        store.each(10, 34, list::add);
         assertIterableEquals(List.of(10, 15, 20, 25, 30), list);
 
         list = new ArrayList();
-        store.eachByTime(10, 36, list::add);
+        store.each(10, 36, list::add);
         assertIterableEquals(List.of(10, 15, 20, 25, 30, 35), list);
 
         list = new ArrayList();
-        store.eachByTime(0, 15, list::add);
+        store.each(0, 15, list::add);
         assertIterableEquals(List.of(5, 10, 15), list);
 
         list = new ArrayList();
-        store.eachByTime(100, 150, list::add);
+        store.each(100, 150, list::add);
         assertIterableEquals(List.of(), list);
+    }
+
+    @Test
+    void eachByTimeOverDays() {
+        TimeseriesStore<Integer> store = new TimeseriesStore<>(TimeSpan.Day1, Integer::longValue);
+        store.store(0, days, 2 * days, 3 * days, 4 * days);
+
+        List<Integer> list = new ArrayList();
+        store.each(0, 2 * days, list::add);
+        assertIterableEquals(List.of(0, days, 2 * days), list);
+
+        list = new ArrayList();
+        store.each(days, 3 * days, list::add);
+        assertIterableEquals(List.of(days, 2 * days, 3 * days), list);
+
+        list = new ArrayList();
+        store.each(3 * days, 4 * days, list::add);
+        assertIterableEquals(List.of(3 * days, 4 * days), list);
     }
 
     @Test

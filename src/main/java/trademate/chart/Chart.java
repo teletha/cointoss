@@ -137,7 +137,7 @@ public class Chart extends Region {
             Tick endTick = ticker.ticks.getByTime(end);
 
             if (startTick != null && endTick != null) {
-                ticker.ticks.eachByTime(start, end, tick -> {
+                ticker.ticks.each(start, end, tick -> {
                     max.set(Num.max(max.v, tick.highPrice()));
                     min.set(Num.min(min.v, tick.lowPrice()));
                 });

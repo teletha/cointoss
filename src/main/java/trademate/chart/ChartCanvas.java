@@ -456,7 +456,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             long start = (long) axisX.computeVisibleMinValue();
             long end = (long) axisX.computeVisibleMaxValue();
 
-            chart.ticker.v.ticks.eachByTime(start, end, tick -> {
+            chart.ticker.v.ticks.each(start, end, tick -> {
                 double x = axisX.getPositionForValue(tick.startSeconds);
                 double open = axisY.getPositionForValue(tick.openPrice.doubleValue());
                 double close = axisY.getPositionForValue(tick.closePrice().doubleValue());

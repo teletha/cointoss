@@ -9,7 +9,6 @@
  */
 package cointoss.ticker;
 
-import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentNavigableMap;
@@ -21,6 +20,9 @@ public final class TimeseriesStore<E> {
 
     /** The span. */
     private final TimeSpan span;
+
+    /** The item length. */
+    private final int length;
 
     /** The key extractor. */
     private final ToLongFunction<E> timestampExtractor;
@@ -36,6 +38,7 @@ public final class TimeseriesStore<E> {
      */
     public TimeseriesStore(TimeSpan span, ToLongFunction<E> timestampExtractor) {
         this.span = Objects.requireNonNull(span);
+        this.length = span.ticksPerDay();
         this.timestampExtractor = Objects.requireNonNull(timestampExtractor);
     }
 
@@ -175,50 +178,19 @@ public final class TimeseriesStore<E> {
      */
     public void each(Consumer<? super E> each) {
         for (Segment segment : indexed.values()) {
-            segment.each(0, each);
+            segment.each(0, length, each);
         }
     }
 
     /**
-     * Acquires the time series items stored from the specified start index (inclusive) to end index
-     * (exclusive) in ascending order.
-     * 
-     * @param start A start index (included).
-     * @param end A end index (exclusive).
-     * @param each An item processor.
-     */
-    public void eachByIndex(int start, int end, Consumer<? super E> each) {
-        if (end < start) {
-            throw new IndexOutOfBoundsException("Start[" + start + "] must be less than end[" + end + "].");
-        }
-
-        for (Segment segment : indexed.values()) {
-            int size = segment.size();
-            if (start < size) {
-                if (end <= size) {
-                    segment.each(start, end, each);
-                    return;
-                } else {
-                    segment.each(start, size, each);
-                    start = 0;
-                    end -= size;
-                }
-            } else {
-                start -= size;
-                end -= size;
-            }
-        }
-    }
-
-    /**
-     * Acquires the time series items stored from the specified start time to end time in ascending
+     * Get the time series items stored from the specified start time to end time in ascending
      * order.
      * 
      * @param start A start time (included).
      * @param end A end time (included).
      * @param each An item processor.
      */
-    public void eachByTime(long start, long end, Consumer<? super E> each) {
+    public void each(long start, long end, Consumer<? super E> each) {
         if (end < start) {
             throw new IndexOutOfBoundsException("Start[" + start + "] must be less than end[" + end + "].");
         }
@@ -226,30 +198,19 @@ public final class TimeseriesStore<E> {
         long[] startIndex = index(start);
         long[] endIndex = index(end);
         ConcurrentNavigableMap<Long, Segment> sub = indexed.subMap(startIndex[0], true, endIndex[0], true);
-        Iterator<Segment> iterator = sub.values().iterator();
-        boolean first = true;
 
-        while (iterator.hasNext()) {
-            Segment next = iterator.next();
+        for (Entry<Long, Segment> entry : sub.entrySet()) {
+            long time = entry.getKey();
+            int startItemIndex = 0;
+            int endItemIndex = length;
 
-            if (iterator.hasNext()) {
-                if (first) {
-                    // first
-                    first = false;
-                    next.eachAt((int) startIndex[1], each);
-                } else {
-                    // middle
-                    next.eachAt(0, each);
-                }
-            } else {
-                if (first) {
-                    first = false;
-                    next.eachAt((int) startIndex[1], (int) endIndex[1], each);
-                } else {
-                    // last
-                    next.eachAt(0, (int) endIndex[1], each);
-                }
+            if (time == startIndex[0]) {
+                startItemIndex = (int) startIndex[1];
             }
+            if (time == endIndex[0]) {
+                endItemIndex = (int) endIndex[1];
+            }
+            entry.getValue().each(startItemIndex, endItemIndex, each);
         }
     }
 
@@ -267,7 +228,11 @@ public final class TimeseriesStore<E> {
      * Item container.
      */
     private abstract class Segment {
-
+        /**
+         * Return the size of this {@link Segment}.
+         * 
+         * @return A positive size or zero.
+         */
         abstract int size();
 
         /**
@@ -306,33 +271,15 @@ public final class TimeseriesStore<E> {
          */
         abstract E last();
 
-        final void each(int start, Consumer<? super E> consumer) {
-            each(start, span.ticksPerDay(), consumer);
-        }
-
         /**
-         * Acquires the time series items stored from the specified start index (inclusive) to end
-         * index (exclusive) in ascending order.
+         * Get the time series items stored from the specified start index (inclusive) to end index
+         * (exclusive) in ascending order.
          * 
          * @param start A start index (included).
          * @param end A end index (exclusive).
          * @param each An item processor.
          */
-        abstract void each(int start, int end, Consumer<? super E> consumer);
-
-        final void eachAt(int start, Consumer<? super E> consumer) {
-            eachAt(start, span.ticksPerDay(), consumer);
-        }
-
-        /**
-         * Acquires the time series items stored from the specified start index (inclusive) to end
-         * index (exclusive) in ascending order.
-         * 
-         * @param start A start index (included).
-         * @param end A end index (exclusive).
-         * @param each An item processor.
-         */
-        abstract void eachAt(int start, int end, Consumer<? super E> consumer);
+        abstract void each(int start, int end, Consumer<? super E> each);
     }
 
     /**
@@ -341,7 +288,7 @@ public final class TimeseriesStore<E> {
     private class OnHeap extends Segment {
 
         /** The managed items. */
-        private E[] items = (E[]) new Object[span.ticksPerDay()];
+        private E[] items = (E[]) new Object[length];
 
         /** The first item index. */
         private int min = Integer.MAX_VALUE;
@@ -409,16 +356,6 @@ public final class TimeseriesStore<E> {
          */
         @Override
         void each(int start, int end, Consumer<? super E> consumer) {
-            for (int i = min + start; i < min + end; i++) {
-                consumer.accept(items[i]);
-            }
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        void eachAt(int start, int end, Consumer<? super E> consumer) {
             start = Math.max(min, start);
             end = Math.min(max, end);
 
