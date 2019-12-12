@@ -56,7 +56,7 @@ public final class Ticker implements Disposable {
     Ticker(Span span) {
         this.span = Objects.requireNonNull(span);
         this.uppers = new Ticker[span.uppers.length];
-        this.ticks = new SegmentBuffer<Tick>(span.ticksPerDay(), tick -> tick.start.toLocalDate());
+        this.ticks = new SegmentBuffer<Tick>(span, tick -> tick.startSeconds);
     }
 
     /**
@@ -176,16 +176,7 @@ public final class Ticker implements Disposable {
      * @param consumer
      */
     public final void each(Consumer<Tick> consumer) {
-        each(0, size(), consumer);
-    }
-
-    /**
-     * List up all ticks.
-     * 
-     * @param consumer
-     */
-    public final void each(int start, int size, Consumer<Tick> consumer) {
-        ticks.each(start, Math.min(start + size, ticks.size()), consumer);
+        ticks.each(consumer);
     }
 
     /**

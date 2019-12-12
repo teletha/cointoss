@@ -9,28 +9,29 @@
  */
 package cointoss.ticker;
 
-import java.time.LocalDate;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.function.Consumer;
-import java.util.function.Function;
+import java.util.function.ToLongFunction;
 
-import kiss.I;
 import kiss.Signal;
 
 final class SegmentBuffer<E> {
+
+    /** The span. */
+    private final Span span;
 
     /** The fixed segment size. */
     private final int segmentSize;
 
     /** The key extractor. */
-    private final Function<E, LocalDate> extractor;
+    private final ToLongFunction<E> timestampExtractor;
 
     /** The completed size. */
     private int completedSize;
 
     /** The completed data manager. */
-    private final ConcurrentSkipListMap<LocalDate, Completed<E>> completeds = new ConcurrentSkipListMap();
+    private final ConcurrentSkipListMap<Long, Completed<E>> completeds = new ConcurrentSkipListMap();
 
     /** The uncompleted size. */
     private int uncompletedSize;
@@ -41,19 +42,10 @@ final class SegmentBuffer<E> {
     /**
      * 
      */
-    public SegmentBuffer(int segmentSize) {
-        this(segmentSize, e -> LocalDate.now());
-    }
-
-    /**
-     * 
-     */
-    public SegmentBuffer(int segmentSize, Function<E, LocalDate> extractor) {
-        if (segmentSize < 0) {
-            throw new IllegalArgumentException("Segment size [" + segmentSize + "] must be positive.");
-        }
-        this.segmentSize = segmentSize;
-        this.extractor = Objects.requireNonNull(extractor);
+    public SegmentBuffer(Span span, ToLongFunction<E> timestampExtractor) {
+        this.span = Objects.requireNonNull(span);
+        this.segmentSize = span.ticksPerDay();
+        this.timestampExtractor = Objects.requireNonNull(timestampExtractor);
         this.uncompleted = (E[]) new Object[segmentSize];
     }
 
@@ -93,7 +85,7 @@ final class SegmentBuffer<E> {
         try {
             uncompleted[uncompletedSize++] = item;
         } catch (ArrayIndexOutOfBoundsException e) {
-            completeds.computeIfAbsent(extractor.apply(uncompleted[0]), key -> {
+            completeds.computeIfAbsent(timestampExtractor.applyAsLong(uncompleted[0]), key -> {
                 Completed segment = new Completed(uncompleted);
                 completedSize += segment.size;
                 return segment;
@@ -113,39 +105,6 @@ final class SegmentBuffer<E> {
         for (E item : items) {
             add(item);
         }
-    }
-
-    /**
-     * Add all realtime items.
-     * 
-     * @param items An items to add.
-     */
-    public void add(Signal<E> items) {
-        items.to((Consumer<E>) this::add);
-    }
-
-    /**
-     * Add all completed items of the specified date.
-     * 
-     * @param date
-     * @param items An items to add.
-     */
-    public void addCompleted(LocalDate date, E... items) {
-        addCompleted(date, I.signal(items));
-    }
-
-    /**
-     * Add all completed items of the specified date.
-     * 
-     * @param date
-     * @param items An items to add.
-     */
-    public void addCompleted(LocalDate date, Signal<E> items) {
-        completeds.computeIfAbsent(date, key -> {
-            Completed segment = new Completed(segmentSize, items);
-            completedSize += segment.size;
-            return segment;
-        });
     }
 
     /**
@@ -205,76 +164,10 @@ final class SegmentBuffer<E> {
     /**
      * Signal all items.
      * 
-     * @return An item stream.
-     */
-    public Signal<E> each() {
-        return each(0, size());
-    }
-
-    /**
-     * Signal all items from start to last.
-     * 
-     * @param start A start index (included).
-     * @return An item stream.
-     */
-    public Signal<E> each(int start) {
-        return each(start, size());
-    }
-
-    /**
-     * Signal all items from start to end.
-     * 
-     * @param start A start index (included).
-     * @param end A end index (excluded).
-     * @return An item stream.
-     */
-    public Signal<E> each(int start, int end) {
-        return new Signal<>((observer, disposer) -> {
-            try {
-                each(start, end, observer);
-                observer.complete();
-            } catch (Throwable e) {
-                observer.error(e);
-            }
-            return disposer;
-        });
-    }
-
-    /**
-     * Signal all items at the specified {@link LocalDate}.
-     * 
-     * @param date A target date.
-     * @return An item stream.
-     */
-    public Signal<E> each(LocalDate date) {
-        return new Signal<E>((observer, disposer) -> {
-            try {
-                each(date, observer);
-                observer.complete();
-            } catch (Throwable e) {
-                observer.error(e);
-            }
-            return disposer;
-        });
-    }
-
-    /**
-     * Signal all items.
-     * 
      * @param each An item processor.
      */
     public void each(Consumer<? super E> each) {
         each(0, size(), each);
-    }
-
-    /**
-     * Signal all items from start to last.
-     * 
-     * @param start A start index (included).
-     * @param each An item processor.
-     */
-    public void each(int start, Consumer<? super E> each) {
-        each(start, size(), each);
     }
 
     /**
@@ -310,38 +203,6 @@ final class SegmentBuffer<E> {
         // uncompleted
         if (0 < uncompletedSize) {
             for (int i = start; i < Math.min(end, uncompletedSize); i++) {
-                each.accept(uncompleted[i]);
-            }
-        }
-    }
-
-    /**
-     * Signal all items at the specified {@link LocalDate}.
-     * 
-     * @param date A target date.
-     * @param each An item processor.
-     */
-    public void each(LocalDate date, Consumer<? super E> each) {
-        // check completed
-        Completed<E> completed = completeds.get(date);
-
-        if (completed != null) {
-            for (E item : completed.items) {
-                each.accept(item);
-            }
-            return;
-        }
-
-        // check uncompleted
-        if (uncompletedSize == 0) {
-            return;
-        }
-
-        // check uncompleted key
-        LocalDate key = extractor.apply(uncompleted[0]);
-
-        if (key.equals(date)) {
-            for (int i = 0; i < uncompletedSize; i++) {
                 each.accept(uncompleted[i]);
             }
         }
