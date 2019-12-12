@@ -9,6 +9,11 @@
  */
 package cointoss.ticker;
 
+import static org.junit.jupiter.api.Assertions.assertIterableEquals;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
 
 class SegmentBufferTest {
@@ -133,5 +138,31 @@ class SegmentBufferTest {
         buffer.add(6);
         buffer.add(7);
         assert buffer.size() == 2;
+    }
+
+    @Test
+    void eachAt() {
+        SegmentBuffer<Integer> buffer = new SegmentBuffer<>(Span.Second5, Integer::longValue);
+        buffer.add(5, 10, 15, 20, 25, 30, 35, 40);
+
+        List<Integer> list = new ArrayList();
+        buffer.eachAt(10, 35, list::add);
+        assertIterableEquals(List.of(10, 15, 20, 25, 30, 35), list);
+
+        list = new ArrayList();
+        buffer.eachAt(10, 34, list::add);
+        assertIterableEquals(List.of(10, 15, 20, 25, 30), list);
+
+        list = new ArrayList();
+        buffer.eachAt(10, 36, list::add);
+        assertIterableEquals(List.of(10, 15, 20, 25, 30, 35), list);
+
+        list = new ArrayList();
+        buffer.eachAt(0, 15, list::add);
+        assertIterableEquals(List.of(5, 10, 15), list);
+
+        list = new ArrayList();
+        buffer.eachAt(100, 150, list::add);
+        assertIterableEquals(List.of(), list);
     }
 }

@@ -179,6 +179,10 @@ public final class Ticker implements Disposable {
         ticks.each(consumer);
     }
 
+    public final void eachAt(long start, long end, Consumer<Tick> consumer) {
+        ticks.eachAt(start, end, consumer);
+    }
+
     /**
      * Find by epoch second.
      * 

@@ -9,8 +9,10 @@
  */
 package cointoss.ticker;
 
+import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentNavigableMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.function.Consumer;
 import java.util.function.ToLongFunction;
@@ -187,7 +189,6 @@ final class SegmentBuffer<E> {
             throw new IndexOutOfBoundsException("Start[" + start + "] must be less than end[" + end + "].");
         }
 
-        // completed
         for (Segment segment : indexed.values()) {
             int size = segment.size();
             if (start < size) {
@@ -202,6 +203,52 @@ final class SegmentBuffer<E> {
             } else {
                 start -= size;
                 end -= size;
+            }
+        }
+    }
+
+    /**
+     * Signal all items from start to end.
+     * 
+     * @param start A start timestamp (included).
+     * @param end A end timestamp (included).
+     * @param each An item processor.
+     */
+    public void eachAt(long start, long end, Consumer<? super E> each) {
+        if (end < start) {
+            throw new IndexOutOfBoundsException("Start[" + start + "] must be less than end[" + end + "].");
+        }
+
+        long[] startIndex = index(start);
+        long[] endIndex = index(end);
+
+        ConcurrentNavigableMap<Long, Segment> sub = indexed.subMap(startIndex[0], true, endIndex[0], true);
+        Iterator<Segment> iterator = sub.values().iterator();
+        boolean first = true;
+
+        if (iterator.hasNext()) {
+            // first
+            while (iterator.hasNext()) {
+                Segment next = iterator.next();
+
+                if (iterator.hasNext()) {
+                    if (first) {
+                        // first
+                        first = false;
+                        next.eachAt((int) startIndex[1], each);
+                    } else {
+                        // middle
+                        next.eachAt(0, each);
+                    }
+                } else {
+                    if (first) {
+                        first = false;
+                        next.eachAt((int) startIndex[1], (int) endIndex[1], each);
+                    } else {
+                        // last
+                        next.eachAt(0, (int) endIndex[1], each);
+                    }
+                }
             }
         }
     }
@@ -256,7 +303,17 @@ final class SegmentBuffer<E> {
          */
         abstract E last();
 
+        final void each(int start, Consumer<? super E> consumer) {
+            each(start, size(), consumer);
+        }
+
         abstract void each(int start, int end, Consumer<? super E> consumer);
+
+        final void eachAt(int start, Consumer<? super E> consumer) {
+            eachAt(start, size(), consumer);
+        }
+
+        abstract void eachAt(int start, int end, Consumer<? super E> consumer);
     }
 
     /**
@@ -334,6 +391,19 @@ final class SegmentBuffer<E> {
         @Override
         void each(int start, int end, Consumer<? super E> consumer) {
             for (int i = min + start; i < min + end; i++) {
+                consumer.accept(items[i]);
+            }
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        void eachAt(int start, int end, Consumer<? super E> consumer) {
+            start = Math.max(min, start);
+            end = Math.min(max, end);
+
+            for (int i = start; i <= end; i++) {
                 consumer.accept(items[i]);
             }
         }

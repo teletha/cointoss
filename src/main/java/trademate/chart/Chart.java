@@ -114,15 +114,15 @@ public class Chart extends Region {
         Variable<Num> max = Variable.of(Num.MIN);
         Variable<Num> min = Variable.of(Num.MAX);
 
-        double start = axisX.computeVisibleMinValue();
-        double end = axisX.computeVisibleMaxValue();
+        long start = (long) axisX.computeVisibleMinValue();
+        long end = (long) axisX.computeVisibleMaxValue();
 
-        chart.ticker.v.each(data -> {
-            long time = data.start.toEpochSecond();
+        chart.ticker.v.eachAt(start, end, tick -> {
+            long time = tick.start.toEpochSecond();
 
             if (start <= time && time <= end) {
-                max.set(Num.max(max.v, data.highPrice()));
-                min.set(Num.min(min.v, data.lowPrice()));
+                max.set(Num.max(max.v, tick.highPrice()));
+                min.set(Num.min(min.v, tick.lowPrice()));
             }
         });
 
