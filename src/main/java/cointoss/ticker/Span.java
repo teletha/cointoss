@@ -84,7 +84,7 @@ public enum Span {
     private final ChronoField unit;
 
     /** The number of seconds. */
-    private final long seconds;
+    public final long seconds;
 
     /** The indexes of associated upper tickers. */
     final int[] uppers;

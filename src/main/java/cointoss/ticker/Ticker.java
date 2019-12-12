@@ -202,6 +202,10 @@ public final class Ticker implements Disposable {
         return 0 <= index && index < size() ? Variable.of(ticks.get(index)) : Variable.empty();
     }
 
+    public final Variable<Tick> findTickByEpochSecond(long epockSeconds) {
+        return Variable.of(ticks.get(span, epockSeconds));
+    }
+
     /**
      * {@inheritDoc}
      */

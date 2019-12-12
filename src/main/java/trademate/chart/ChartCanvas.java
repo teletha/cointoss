@@ -9,24 +9,12 @@
  */
 package trademate.chart;
 
-import static transcript.Transcript.en;
+import static transcript.Transcript.*;
 
 import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Supplier;
-
-import javafx.collections.ObservableList;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Region;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.LineTo;
-import javafx.scene.shape.MoveTo;
-import javafx.scene.shape.Path;
-import javafx.scene.shape.PathElement;
-import javafx.scene.text.Font;
 
 import org.eclipse.collections.api.list.primitive.MutableDoubleList;
 import org.eclipse.collections.impl.list.mutable.primitive.DoubleArrayList;
@@ -44,6 +32,17 @@ import cointoss.ticker.Tick;
 import cointoss.ticker.Ticker;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
+import javafx.collections.ObservableList;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Region;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.LineTo;
+import javafx.scene.shape.MoveTo;
+import javafx.scene.shape.Path;
+import javafx.scene.shape.PathElement;
+import javafx.scene.text.Font;
 import kiss.I;
 import kiss.Variable;
 import kiss.Ⅲ;
@@ -434,11 +433,11 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             }
 
             // estimate visible range
-            long start = (long) axisX.computeVisibleMinValue();
-            long end = Math.min((long) axisX.computeVisibleMaxValue(), chart.ticker.v.last().start.toEpochSecond());
-            long span = chart.ticker.v.span.duration.getSeconds();
-            int visibleSize = (int) ((end - start) / span) + 1;
-            int visibleStartIndex = (int) ((start - chart.ticker.v.first().start.toEpochSecond()) / span);
+            long startEpochSec = (long) axisX.computeVisibleMinValue();
+            long endEpochSec = Math.min((long) axisX.computeVisibleMaxValue(), chart.ticker.v.last().start.toEpochSecond());
+            long span = chart.ticker.v.span.seconds;
+            int visibleSize = (int) ((endEpochSec - startEpochSec) / span) + 1;
+            int visibleStartIndex = (int) ((startEpochSec - chart.ticker.v.first().start.toEpochSecond()) / span);
             if (visibleStartIndex + visibleSize == chart.ticker.v.size()) visibleSize--;
 
             // redraw all candles.
@@ -455,6 +454,9 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 }
             }
             MutableDoubleList valueX = new NoCopyDoubleList();
+
+            Variable<Tick> aa = chart.ticker.v.findTickByEpochSecond(startEpochSec);
+            System.out.println(aa);
 
             chart.ticker.v.each(visibleStartIndex, visibleSize, tick -> {
                 double x = axisX.getPositionForValue(tick.start.toEpochSecond());
