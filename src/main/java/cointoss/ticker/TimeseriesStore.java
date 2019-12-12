@@ -310,12 +310,28 @@ public final class TimeseriesStore<E> {
             each(start, span.ticksPerDay(), consumer);
         }
 
+        /**
+         * Acquires the time series items stored from the specified start index (inclusive) to end
+         * index (exclusive) in ascending order.
+         * 
+         * @param start A start index (included).
+         * @param end A end index (exclusive).
+         * @param each An item processor.
+         */
         abstract void each(int start, int end, Consumer<? super E> consumer);
 
         final void eachAt(int start, Consumer<? super E> consumer) {
             eachAt(start, span.ticksPerDay(), consumer);
         }
 
+        /**
+         * Acquires the time series items stored from the specified start index (inclusive) to end
+         * index (exclusive) in ascending order.
+         * 
+         * @param start A start index (included).
+         * @param end A end index (exclusive).
+         * @param each An item processor.
+         */
         abstract void eachAt(int start, int end, Consumer<? super E> consumer);
     }
 
