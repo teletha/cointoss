@@ -263,7 +263,7 @@ public class ExecutionDeltaLogger extends ExecutionLogger {
             return "";
         } else {
             int scale = current.scale();
-            Num integer = current.scaleByPowerOfTen(scale);
+            Num integer = current.decuple(scale);
             return encodeInt(scale + half) + encodeLong(integer.longValue());
         }
     }
@@ -280,7 +280,7 @@ public class ExecutionDeltaLogger extends ExecutionLogger {
             return previous;
         } else {
             int scale = decodeInt(current.substring(0, 1)) - half;
-            return Num.of(decodeLong(current.substring(1))).scaleByPowerOfTen(-scale);
+            return Num.of(decodeLong(current.substring(1))).decuple(-scale);
         }
     }
 

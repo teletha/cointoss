@@ -29,9 +29,7 @@ import kiss.Signal;
 import kiss.Singleton;
 import kiss.Variable;
 
-/**
- * @version 2018/07/14 13:48:54
- */
+@SuppressWarnings("serial")
 public class Num extends Number implements Comparable<Num> {
 
     // initialize
@@ -493,31 +491,50 @@ public class Num extends Number implements Comparable<Num> {
     }
 
     /**
-     * @param scale
+     * Returns a {@link Num} whose numerical value is equal to ({@code this} * 10<sup>n</sup>). The
+     * scale of the result is {@code (this.scale() - n)}.
+     *
+     * @param n the exponent power of ten to scale by
+     * @return a {@link Num} whose numerical value is equal to ({@code this} * 10<sup>n</sup>)
+     * @throws ArithmeticException if the scale would be outside the range of a 32-bit integer.
      */
-    public Num scaleByPowerOfTen(int scale) {
-        return new Num(delegate.scaleByPowerOfTen(scale));
+    public Num decuple(int n) {
+        return new Num(delegate.scaleByPowerOfTen(n));
     }
 
     /**
-     * Returns a {@code Decimal} whose value is <tt>(this<sup>n</sup>)</tt>.
-     * 
-     * @param n power to raise this {@code Decimal} to.
-     * @return <tt>this<sup>n</sup></tt>
-     * @see BigDecimal#pow(int, java.math.MathContext)
+     * Returns a {@code Num} whose value is <code>(this<sup>n</sup>)</code>. The current
+     * implementation uses the core algorithm defined in ANSI standard X3.274-1996 with rounding
+     * according to the context settings. In general, the returned numerical value is within two
+     * ulps of the exact numerical value for the chosen precision. Note that future releases may use
+     * a different algorithm with a decreased allowable error bound and increased allowable exponent
+     * range.
+     *
+     * @param n power to raise this {@code Num} to.
+     * @param mc the context to use.
+     * @return <code>this<sup>n</sup></code> using the ANSI standard X3.274-1996 algorithm
+     * @throws ArithmeticException if the result is inexact but the rounding mode is
+     *             {@code UNNECESSARY}, or {@code n} is out of range.
      */
-    public final Num pow(int n) {
+    public Num pow(int n) {
         return new Num(delegate.pow(n, CONTEXT));
     }
 
     /**
-     * Returns a {@code Decimal} whose value is <tt>(this<sup>n</sup>)</tt>.
-     * 
-     * @param n power to raise this {@code Decimal} to.
-     * @return <tt>this<sup>n</sup></tt>
-     * @see BigDecimal#pow(int, java.math.MathContext)
+     * Returns a {@code Num} whose value is <code>(this<sup>n</sup>)</code>. The current
+     * implementation uses the core algorithm defined in ANSI standard X3.274-1996 with rounding
+     * according to the context settings. In general, the returned numerical value is within two
+     * ulps of the exact numerical value for the chosen precision. Note that future releases may use
+     * a different algorithm with a decreased allowable error bound and increased allowable exponent
+     * range.
+     *
+     * @param n power to raise this {@code Num} to.
+     * @param mc the context to use.
+     * @return <code>this<sup>n</sup></code> using the ANSI standard X3.274-1996 algorithm
+     * @throws ArithmeticException if the result is inexact but the rounding mode is
+     *             {@code UNNECESSARY}, or {@code n} is out of range.
      */
-    public final Num pow(double n) {
+    public Num pow(double n) {
         return of(Math.pow(doubleValue(), n));
     }
 
@@ -529,27 +546,38 @@ public class Num extends Number implements Comparable<Num> {
      * @return the natural logarithm (base e) of {@code this}
      * @see StrictMath#log(double)
      */
-    public final Num log() {
+    public Num log() {
         return of(StrictMath.log(delegate.doubleValue()));
     }
 
     /**
-     * Returns the correctly rounded positive square root of the <code>double</code> value of this
-     * {@code Decimal}. /!\ Warning! Uses the {@code StrictMath#sqrt(double)} method under the hood.
-     * 
-     * @return the positive square root of {@code this}
-     * @see StrictMath#sqrt(double)
+     * Returns an approximation to the square root of {@code this} with rounding according to the
+     * context settings.
+     * <p>
+     * The preferred scale of the returned result is equal to {@code this.scale()/2}. The value of
+     * the returned result is always within one ulp of the exact decimal value for the precision in
+     * question. If the rounding mode is {@link RoundingMode#HALF_UP HALF_UP},
+     * {@link RoundingMode#HALF_DOWN HALF_DOWN}, or {@link RoundingMode#HALF_EVEN HALF_EVEN}, the
+     * result is within one half an ulp of the exact decimal value.
+     *
+     * @return the square root of {@code this}.
+     * @throws ArithmeticException if {@code this} is less than zero.
+     * @throws ArithmeticException if an exact result is requested ({@code mc.getPrecision()==0})
+     *             and there is no finite decimal expansion of the exact result
+     * @throws ArithmeticException if {@code (mc.getRoundingMode()==RoundingMode.UNNECESSARY}) and
+     *             the exact result cannot fit in {@code mc.getPrecision()} digits.
      */
-    public final Num sqrt() {
+    public Num sqrt() {
         return of(delegate.sqrt(CONTEXT));
     }
 
     /**
-     * Returns a {@code Decimal} whose value is the absolute value of this {@code Decimal}.
-     * 
+     * Returns a {@code Num} whose value is the absolute value of this {@code Num}, and whose scale
+     * is {@code this.scale()}.
+     *
      * @return {@code abs(this)}
      */
-    public final Num abs() {
+    public Num abs() {
         return new Num(delegate.abs());
     }
 
@@ -564,10 +592,19 @@ public class Num extends Number implements Comparable<Num> {
     }
 
     /**
+     * @param other
+     * @return
+     */
+    @Override
+    public int compareTo(Num other) {
+        return delegate.compareTo(other.delegate);
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
-    public final int intValue() {
+    public int intValue() {
         return delegate.intValue();
     }
 
@@ -575,7 +612,7 @@ public class Num extends Number implements Comparable<Num> {
      * {@inheritDoc}
      */
     @Override
-    public final long longValue() {
+    public long longValue() {
         return delegate.longValue();
     }
 
@@ -583,7 +620,7 @@ public class Num extends Number implements Comparable<Num> {
      * {@inheritDoc}
      */
     @Override
-    public final float floatValue() {
+    public float floatValue() {
         return delegate.floatValue();
     }
 
@@ -591,17 +628,18 @@ public class Num extends Number implements Comparable<Num> {
      * {@inheritDoc}
      */
     @Override
-    public final double doubleValue() {
+    public double doubleValue() {
         return delegate.doubleValue();
     }
 
     /**
-     * @param other
-     * @return
+     * Format this number.
+     * 
+     * @param format Your number format.
+     * @return A formatted value.
      */
-    @Override
-    public int compareTo(Num other) {
-        return delegate.compareTo(other.delegate);
+    public String format(NumberFormat format) {
+        return format.format(delegate);
     }
 
     /**
@@ -793,28 +831,6 @@ public class Num extends Number implements Comparable<Num> {
      */
     public final boolean isPositiveOrZero() {
         return compareTo(ZERO) >= 0;
-    }
-
-    /**
-     * Checks value range.
-     * 
-     * @param position
-     * @param errorRange
-     * @return
-     */
-    public final boolean isNear(Num price, double errorRange) {
-        return isNear(price, of(errorRange));
-    }
-
-    /**
-     * Checks value range.
-     * 
-     * @param position
-     * @param errorRange
-     * @return
-     */
-    public final boolean isNear(Num price, Num errorRange) {
-        return minus(price).abs().isLessThanOrEqual(errorRange.abs());
     }
 
     /**
@@ -1252,22 +1268,6 @@ public class Num extends Number implements Comparable<Num> {
      */
     public final boolean isLessThanOrEqual(Directional direction, Variable<Num> other) {
         return direction.isBuy() ? isLessThanOrEqual(other) : isGreaterThanOrEqual(other);
-    }
-
-    public final String format(int scale) {
-        Num num = scale(scale);
-
-        return isPositiveOrZero() ? "+" + num : num.toString();
-    }
-
-    /**
-     * Format this number.
-     * 
-     * @param format Your number format.
-     * @return A formatted value.
-     */
-    public String format(NumberFormat format) {
-        return format.format(delegate);
     }
 
     /**
