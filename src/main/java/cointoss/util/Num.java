@@ -156,7 +156,7 @@ public class Num extends Number implements Comparable<Num> {
      * @return {@code this + augend}, rounded as necessary
      * @see BigDecimal#add(java.math.BigDecimal, java.math.MathContext)
      */
-    public final Num plus(Num augend) {
+    public Num plus(Num augend) {
         return new Num(delegate.add(augend.delegate, CONTEXT));
     }
 
@@ -228,7 +228,7 @@ public class Num extends Number implements Comparable<Num> {
      * @return {@code this - subtrahend}, rounded as necessary
      * @see BigDecimal#subtract(java.math.BigDecimal, java.math.MathContext)
      */
-    public final Num minus(Num subtrahend) {
+    public Num minus(Num subtrahend) {
         return new Num(delegate.subtract(subtrahend.delegate, CONTEXT));
     }
 
@@ -300,7 +300,7 @@ public class Num extends Number implements Comparable<Num> {
      * @return {@code this * multiplicand}, rounded as necessary
      * @see BigDecimal#multiply(java.math.BigDecimal, java.math.MathContext)
      */
-    public final Num multiply(Num multiplicand) {
+    public Num multiply(Num multiplicand) {
         return new Num(delegate.multiply(multiplicand.delegate, CONTEXT));
     }
 
@@ -372,7 +372,7 @@ public class Num extends Number implements Comparable<Num> {
      * @return {@code this / divisor}, rounded as necessary
      * @see BigDecimal#divide(java.math.BigDecimal, java.math.MathContext)
      */
-    public final Num divide(Num divisor) {
+    public Num divide(Num divisor) {
         return new Num(delegate.divide(divisor.delegate, CONTEXT));
     }
 
@@ -444,7 +444,7 @@ public class Num extends Number implements Comparable<Num> {
      * @return {@code this % divisor}, rounded as necessary.
      * @see BigDecimal#remainder(java.math.BigDecimal, java.math.MathContext)
      */
-    public final Num remainder(Num divisor) {
+    public Num remainder(Num divisor) {
         return new Num(delegate.remainder(divisor.delegate, CONTEXT));
     }
 
@@ -456,41 +456,40 @@ public class Num extends Number implements Comparable<Num> {
     }
 
     /**
-     * Change fractional portion.
-     * 
-     * @return
+     * Returns a {@code Num} whose scale is the specified value, and whose unscaled value is
+     * determined by multiplying or dividing this {@code Num}'s unscaled value by the appropriate
+     * power of ten to maintain its overall value. If the scale is reduced by the operation, the
+     * unscaled value must be divided (rather than multiplied), and the value may be changed; in
+     * this case, the specified rounding mode is applied to the division.
+     *
+     * @param size scale of the {@code Num} value to be returned.
+     * @return a {@code Num} whose scale is the specified value, and whose unscaled value is
+     *         determined by multiplying or dividing this {@code Num}'s unscaled value by the
+     *         appropriate power of ten to maintain its overall value.
+     * @throws ArithmeticException if {@code roundingMode==UNNECESSARY} and the specified scaling
+     *             operation would require rounding.
      */
     public final Num scale(int size) {
-        return scale(size, RoundingMode.HALF_UP);
+        return scale(size, CONTEXT.getRoundingMode());
     }
 
     /**
-     * Change fractional portion.
-     * 
-     * @return
+     * Returns a {@code Num} whose scale is the specified value, and whose unscaled value is
+     * determined by multiplying or dividing this {@code Num}'s unscaled value by the appropriate
+     * power of ten to maintain its overall value. If the scale is reduced by the operation, the
+     * unscaled value must be divided (rather than multiplied), and the value may be changed; in
+     * this case, the specified rounding mode is applied to the division.
+     *
+     * @param size scale of the {@code Num} value to be returned.
+     * @param mode The rounding mode to apply.
+     * @return a {@code Num} whose scale is the specified value, and whose unscaled value is
+     *         determined by multiplying or dividing this {@code Num}'s unscaled value by the
+     *         appropriate power of ten to maintain its overall value.
+     * @throws ArithmeticException if {@code roundingMode==UNNECESSARY} and the specified scaling
+     *             operation would require rounding.
      */
-    public final Num scale(int size, RoundingMode mode) {
+    public Num scale(int size, RoundingMode mode) {
         return new Num(delegate.setScale(size, mode));
-    }
-
-    /**
-     * Ceil up the specified digit.
-     * 
-     * @param size
-     * @return
-     */
-    public final Num scaleDown(int size) {
-        return scale(size, RoundingMode.DOWN);
-    }
-
-    /**
-     * Ceil up the specified digit.
-     * 
-     * @param size
-     * @return
-     */
-    public final Num scaleUp(int size) {
-        return scale(size, RoundingMode.UP);
     }
 
     /**

@@ -11,6 +11,8 @@ package cointoss.util;
 
 import static cointoss.util.Num.*;
 
+import java.math.RoundingMode;
+
 import org.junit.jupiter.api.Test;
 
 import cointoss.Direction;
@@ -134,14 +136,14 @@ class NumTest {
 
     @Test
     void scaleDown() {
-        assert Num.of(1).scaleDown(0).is(1);
-        assert Num.of(12).scaleDown(0).is(12);
-        assert Num.of(123).scaleDown(0).is(123);
+        assert Num.of(1).scale(0, RoundingMode.DOWN).is(1);
+        assert Num.of(12).scale(0, RoundingMode.DOWN).is(12);
+        assert Num.of(123).scale(0, RoundingMode.DOWN).is(123);
 
-        assert Num.of(1).scaleDown(1).is(1);
-        assert Num.of(12).scaleDown(-1).is(10);
-        assert Num.of(123).scaleDown(-1).is(120);
-        assert Num.of(0.05).scaleDown(1).is(0);
+        assert Num.of(1).scale(1, RoundingMode.DOWN).is(1);
+        assert Num.of(12).scale(-1, RoundingMode.DOWN).is(10);
+        assert Num.of(123).scale(-1, RoundingMode.DOWN).is(120);
+        assert Num.of(0.05).scale(1, RoundingMode.DOWN).is(0);
     }
 
     @Test

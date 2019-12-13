@@ -9,6 +9,8 @@
  */
 package cointoss.market.bitflyer;
 
+import java.math.RoundingMode;
+
 import cointoss.execution.Execution;
 import cointoss.util.Num;
 import kiss.Signal;
@@ -78,9 +80,9 @@ public enum SFD {
      */
     final Num calculate(Num price) {
         if (diff.isGreaterThan(Num.ONE)) {
-            return price.multiply(diff).scaleUp(0);
+            return price.multiply(diff).scale(0, RoundingMode.UP);
         } else {
-            return price.multiply(diff).scaleDown(0);
+            return price.multiply(diff).scale(0, RoundingMode.DOWN);
         }
     }
 }

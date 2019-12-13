@@ -9,6 +9,7 @@
  */
 package cointoss.order;
 
+import java.math.RoundingMode;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -263,7 +264,7 @@ public class OrderBook {
                 } else if (unit.price.is(price)) {
                     Num remaining = unit.size.plus(size);
 
-                    if (remaining.scaleDown(scale).isNegativeOrZero()) {
+                    if (remaining.scale(scale, RoundingMode.DOWN).isNegativeOrZero()) {
                         boards.remove(i);
                     } else {
                         boards.set(i, new OrderBoard(unit.price, remaining));
@@ -292,7 +293,7 @@ public class OrderBook {
                 } else if (unit.price.is(price)) {
                     Num remaining = unit.size.plus(size);
 
-                    if (remaining.scaleDown(scale).isNegativeOrZero()) {
+                    if (remaining.scale(scale, RoundingMode.DOWN).isNegativeOrZero()) {
                         boards.remove(i);
                     } else {
                         boards.set(i, new OrderBoard(unit.price, remaining));
