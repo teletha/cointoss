@@ -14,6 +14,9 @@ import java.util.concurrent.ExecutionException;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
+import org.decimal4j.api.DecimalArithmetic;
+import org.decimal4j.scale.Scales;
+
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 
@@ -235,7 +238,8 @@ public abstract class Indicator<T> {
      * @return A wrapped indicator.
      */
     public final Indicator<Num> ema(int size) {
-        double multiplier = 2.0 / (size + 1);
+        DecimalArithmetic arith = Scales.getScaleMetrics(4).getDefaultArithmetic();
+        long multiplier = arith.fromDouble(2.0 / (size + 1));
 
         return (Indicator<Num>) memoize((size + 1) * 4, (tick, self) -> {
             if (tick.previous() == null) {
@@ -243,7 +247,14 @@ public abstract class Indicator<T> {
             }
 
             Num previous = (Num) self.apply(tick.previous());
-            return (T) ((Num) valueAt(tick)).minus(previous).multiply(multiplier).plus(previous);
+            long prevValue = arith.fromBigDecimal(previous.delegate);
+            Num now = (Num) valueAt(tick);
+            long value = arith.fromBigDecimal(now.delegate);
+            value = arith.subtract(value, prevValue);
+            value = arith.multiply(value, multiplier);
+            value = arith.add(value, prevValue);
+
+            return (T) Num.of(arith.toBigDecimal(value));
         });
     }
 
@@ -293,19 +304,24 @@ public abstract class Indicator<T> {
      * @return A wrapped indicator.
      */
     public final Indicator<Num> sma(int size) {
+        DecimalArithmetic arith = Scales.getScaleMetrics(5).getDefaultArithmetic();
+
         return new Indicator<Num>(this) {
 
             @Override
             protected Num valueAtRounded(Tick tick) {
-                Num sum = Num.ZERO;
+                long value = arith.fromLong(0);
                 Tick current = tick;
                 int remaining = size;
                 while (current != null && 0 < remaining) {
-                    sum = sum.plus((Num) wrapped.valueAt(current));
+                    Num num = (Num) wrapped.valueAt(current);
+                    value = arith.add(value, arith.fromBigDecimal(num.delegate));
                     current = current.previous();
                     remaining--;
                 }
-                return sum.divide(size - remaining);
+                value = arith.divide(value, arith.fromLong(size - remaining));
+
+                return Num.of(arith.toBigDecimal(value));
             }
         }.memoize();
     }

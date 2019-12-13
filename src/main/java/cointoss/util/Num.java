@@ -70,7 +70,7 @@ public class Num extends Number implements Comparable<Num> {
     public static final Num MIN = of(Long.MIN_VALUE);
 
     /** The actual value. */
-    private final BigDecimal delegate;
+    public final BigDecimal delegate;
 
     /**
      * Constructor. Only used for NaN instance.
@@ -1394,6 +1394,10 @@ public class Num extends Number implements Comparable<Num> {
             decimals[i] = of(values[i]);
         }
         return decimals;
+    }
+
+    public static Num of(BigDecimal value) {
+        return new Num(value);
     }
 
     /**
