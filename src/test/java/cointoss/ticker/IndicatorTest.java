@@ -151,16 +151,6 @@ class IndicatorTest extends TickerTestSupport {
     }
 
     @Test
-    void constant() {
-        Ticker ticker = ticker(TimeSpan.Second5, 1, 2, 4, 8, 16);
-        Indicator<Integer> calculatable = Indicator.build(ticker, tick -> 10);
-        assert calculatable.isConstant() == false;
-
-        Indicator<Integer> constant = Indicator.build(ticker, 10);
-        assert constant.isConstant() == true;
-    }
-
-    @Test
     void dontCacheLatest() {
         Ticker ticker = ticker(TimeSpan.Second5, 1, 2, 3);
         Tick tick2 = ticker.ticks.getByIndex(2);

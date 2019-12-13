@@ -43,9 +43,6 @@ public abstract class Indicator<T> {
     /** The wrapped {@link Indicator}. (OPTIONAL: may be null) */
     protected final Indicator wrapped;
 
-    /** The indicator property. */
-    private boolean constant = false;
-
     /**
      * Build with the target {@link Ticker}.
      * 
@@ -93,15 +90,6 @@ public abstract class Indicator<T> {
     public final Indicator<T> name(String name) {
         this.name.set(name);
         return this;
-    }
-
-    /**
-     * If this {@link Indicator} returns the constant value, this method will return true.
-     * 
-     * @return
-     */
-    public final boolean isConstant() {
-        return constant;
     }
 
     /**
@@ -431,28 +419,6 @@ public abstract class Indicator<T> {
      */
     public final Signal<T> observeNow() {
         return observe().startWith(last());
-    }
-
-    /**
-     * Build constant {@link Indicator}.
-     * 
-     * @param <T>
-     * @param ticker
-     * @param value The constant value.
-     * @return
-     */
-    public static <T> Indicator<T> build(Ticker ticker, T value) {
-        Objects.requireNonNull(value);
-
-        Indicator<T> indicator = new Indicator<>(ticker) {
-
-            @Override
-            protected T valueAtRounded(Tick tick) {
-                return value;
-            }
-        };
-        indicator.constant = true;
-        return indicator;
     }
 
     /**
