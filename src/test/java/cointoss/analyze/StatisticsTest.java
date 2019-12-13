@@ -11,7 +11,6 @@ package cointoss.analyze;
 
 import org.junit.jupiter.api.Test;
 
-import cointoss.analyze.Statistics;
 import cointoss.util.Num;
 
 class StatisticsTest {
@@ -117,7 +116,7 @@ class StatisticsTest {
         assert statistics.skewness().is(0);
 
         statistics.add(Num.of(10));
-        assert statistics.skewness().is(0.707106782);
+        assert statistics.skewness().is(0.707106781186553);
     }
 
     @Test

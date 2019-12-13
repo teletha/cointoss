@@ -115,15 +115,15 @@ class IndicatorTest extends TickerTestSupport {
         Ticker ticker = ticker(TimeSpan.Second5, 1, 2, 3, 4, 5);
         Indicator<Num> indicator = Indicator.build(ticker, tick -> tick.openPrice).wma(2);
         assert indicator.valueAt(ticker.ticks.getByIndex(0)).is(1);
-        assert indicator.valueAt(ticker.ticks.getByIndex(1)).is(1.6666666667);
-        assert indicator.valueAt(ticker.ticks.getByIndex(2)).is(2.6666666667);
-        assert indicator.valueAt(ticker.ticks.getByIndex(3)).is(3.6666666667);
-        assert indicator.valueAt(ticker.ticks.getByIndex(4)).is(4.6666666667);
+        assert indicator.valueAt(ticker.ticks.getByIndex(1)).is(1.666666666666667);
+        assert indicator.valueAt(ticker.ticks.getByIndex(2)).is(2.666666666666667);
+        assert indicator.valueAt(ticker.ticks.getByIndex(3)).is(3.666666666666667);
+        assert indicator.valueAt(ticker.ticks.getByIndex(4)).is(4.666666666666667);
 
         indicator = Indicator.build(ticker, tick -> tick.openPrice).wma(4);
         assert indicator.valueAt(ticker.ticks.getByIndex(0)).is(1);
-        assert indicator.valueAt(ticker.ticks.getByIndex(1)).is(1.6666666667);
-        assert indicator.valueAt(ticker.ticks.getByIndex(2)).is(2.333333333);
+        assert indicator.valueAt(ticker.ticks.getByIndex(1)).is(1.666666666666667);
+        assert indicator.valueAt(ticker.ticks.getByIndex(2)).is(2.33333333333333);
         assert indicator.valueAt(ticker.ticks.getByIndex(3)).is(3);
         assert indicator.valueAt(ticker.ticks.getByIndex(4)).is(4);
     }

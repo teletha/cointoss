@@ -40,7 +40,7 @@ public class Num extends Number implements Comparable<Num> {
     }
 
     /** The base context. */
-    private static final MathContext CONTEXT = new MathContext(10, RoundingMode.HALF_UP);
+    private static final MathContext CONTEXT = new MathContext(15, RoundingMode.HALF_UP);
 
     /** reuse */
     public static final Num ZERO = of(0);
@@ -542,7 +542,7 @@ public class Num extends Number implements Comparable<Num> {
      * @see StrictMath#sqrt(double)
      */
     public final Num sqrt() {
-        return of(StrictMath.sqrt(delegate.doubleValue()));
+        return of(delegate.sqrt(CONTEXT));
     }
 
     /**

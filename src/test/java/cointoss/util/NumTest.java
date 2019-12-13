@@ -15,10 +15,12 @@ import org.junit.jupiter.api.Test;
 
 import cointoss.Direction;
 
-/**
- * @version 2018/04/02 16:46:50
- */
 class NumTest {
+
+    @Test
+    void big() {
+        assert Num.of("12345678901234567890").toString().equals("12345678901234600000");
+    }
 
     @Test
     void max() {
@@ -102,6 +104,17 @@ class NumTest {
         assert ONE.abs().is(1);
         assert Num.of(-1).abs().is(1);
         assert Num.of(-0.5).abs().is(0.5);
+    }
+
+    @Test
+    void scaleSize() {
+        assert Num.of(1).scale(1).scale() == 0;
+        assert Num.of(13).scale(2).scale() == 0;
+        assert Num.of(123).scale(3).scale() == 0;
+
+        assert Num.of(1.10).scale(3).scale() == 1;
+        assert Num.of(10.220).scale(3).scale() == 2;
+        assert Num.of(123.456).scale(3).scale() == 3;
     }
 
     @Test
