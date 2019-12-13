@@ -43,6 +43,9 @@ public abstract class Indicator<T> {
     /** The wrapped {@link Indicator}. (OPTIONAL: may be null) */
     protected final Indicator wrapped;
 
+    /** The configured scale. (OPTIONAL may be 0) */
+    protected final int scale;
+
     /**
      * Build with the target {@link Ticker}.
      * 
@@ -51,6 +54,7 @@ public abstract class Indicator<T> {
     protected Indicator(Ticker ticker) {
         this.ticker = Objects.requireNonNull(ticker);
         this.wrapped = null;
+        this.scale = 0;
         this.spanSeconds = ticker.span.duration.toSeconds();
     }
 
@@ -59,8 +63,9 @@ public abstract class Indicator<T> {
      * 
      * @param indicator A {@link Indicator} to delegate.
      */
-    protected Indicator(Indicator indicator) {
+    protected Indicator(Indicator indicator, int scale) {
         this.wrapped = Objects.requireNonNull(indicator);
+        this.scale = scale;
         this.ticker = Objects.requireNonNull(indicator.ticker());
         this.spanSeconds = ticker.span.duration.toSeconds();
     }
@@ -182,7 +187,7 @@ public abstract class Indicator<T> {
      * @return
      */
     public final <With, Out> Indicator<Out> map(Indicator<With> indicator1, WiseBiFunction<T, With, Out> calculater) {
-        return new Indicator<Out>(this) {
+        return new Indicator<Out>(this, scale) {
 
             @Override
             protected Out valueAtRounded(Tick tick) {
@@ -200,7 +205,7 @@ public abstract class Indicator<T> {
      * @return
      */
     public final <With1, With2, Out> Indicator<Out> map(Indicator<With1> indicator1, Indicator<With2> indicator2, WiseTriFunction<T, With1, With2, Out> calculater) {
-        return new Indicator<>(this) {
+        return new Indicator<>(this, scale) {
 
             @Override
             protected Out valueAtRounded(Tick tick) {
@@ -216,7 +221,13 @@ public abstract class Indicator<T> {
      * @return A wrapped indicator.
      */
     public final Indicator<Num> scale(int scale) {
-        return ((Indicator<Num>) this).map(tick -> tick.scale(scale));
+        return new Indicator<Num>(this, scale) {
+
+            @Override
+            protected Num valueAtRounded(Tick tick) {
+                return ((Num) wrapped.valueAt(tick)).scale(scale);
+            }
+        };
     }
 
     /**
@@ -294,7 +305,7 @@ public abstract class Indicator<T> {
     public final Indicator<Num> sma(int size) {
         DecimalArithmetic arith = Scales.getScaleMetrics(5).getDefaultArithmetic();
 
-        return new Indicator<Num>(this) {
+        return new Indicator<Num>(this, scale) {
 
             @Override
             protected Num valueAtRounded(Tick tick) {
@@ -331,7 +342,7 @@ public abstract class Indicator<T> {
      * @return A wrapped indicator.
      */
     public final Indicator<Num> wma(int size) {
-        return new Indicator<Num>(this) {
+        return new Indicator<Num>(this, scale) {
 
             @Override
             protected Num valueAtRounded(Tick tick) {
@@ -375,7 +386,7 @@ public abstract class Indicator<T> {
      * @return
      */
     public final Indicator<T> memoize(int limit, BiFunction<Tick, Function<Tick, T>, T> calculator) {
-        return new Indicator<T>(this) {
+        return new Indicator<T>(this, scale) {
 
             /** CACHE */
             private final Cache<Tick, T> cache = CacheBuilder.newBuilder().maximumSize(8192).weakKeys().weakValues().build();

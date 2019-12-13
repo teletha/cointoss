@@ -36,6 +36,23 @@ public class TickerTestSupport {
     }
 
     /**
+     * Build {@link Ticker} simply with your values.
+     * 
+     * @param span
+     * @param values
+     * @return
+     */
+    public Ticker ticker(TimeSpan span, double... values) {
+        ZonedDateTime time = Chrono.MIN;
+
+        for (double value : values) {
+            manager.update(Execution.with.buy(value).price(value).date(time));
+            time = time.plus(span.duration);
+        }
+        return manager.of(span);
+    }
+
+    /**
      * Build {@link Tick} simply with tou values.
      * 
      * @param span
