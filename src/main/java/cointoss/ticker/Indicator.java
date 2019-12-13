@@ -14,9 +14,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import org.decimal4j.api.DecimalArithmetic;
-import org.decimal4j.scale.Scales;
-
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 
@@ -43,9 +40,6 @@ public abstract class Indicator<T> {
     /** The wrapped {@link Indicator}. (OPTIONAL: may be null) */
     protected final Indicator wrapped;
 
-    /** The configured scale. (OPTIONAL may be 0) */
-    protected final int scale;
-
     /**
      * Build with the target {@link Ticker}.
      * 
@@ -54,7 +48,6 @@ public abstract class Indicator<T> {
     protected Indicator(Ticker ticker) {
         this.ticker = Objects.requireNonNull(ticker);
         this.wrapped = null;
-        this.scale = 0;
         this.spanSeconds = ticker.span.duration.toSeconds();
     }
 
@@ -63,9 +56,8 @@ public abstract class Indicator<T> {
      * 
      * @param indicator A {@link Indicator} to delegate.
      */
-    protected Indicator(Indicator indicator, int scale) {
+    protected Indicator(Indicator indicator) {
         this.wrapped = Objects.requireNonNull(indicator);
-        this.scale = scale;
         this.ticker = Objects.requireNonNull(indicator.ticker());
         this.spanSeconds = ticker.span.duration.toSeconds();
     }
@@ -187,7 +179,7 @@ public abstract class Indicator<T> {
      * @return
      */
     public final <With, Out> Indicator<Out> map(Indicator<With> indicator1, WiseBiFunction<T, With, Out> calculater) {
-        return new Indicator<Out>(this, scale) {
+        return new Indicator<Out>(this) {
 
             @Override
             protected Out valueAtRounded(Tick tick) {
@@ -205,7 +197,7 @@ public abstract class Indicator<T> {
      * @return
      */
     public final <With1, With2, Out> Indicator<Out> map(Indicator<With1> indicator1, Indicator<With2> indicator2, WiseTriFunction<T, With1, With2, Out> calculater) {
-        return new Indicator<>(this, scale) {
+        return new Indicator<>(this) {
 
             @Override
             protected Out valueAtRounded(Tick tick) {
@@ -221,7 +213,7 @@ public abstract class Indicator<T> {
      * @return A wrapped indicator.
      */
     public final Indicator<Num> scale(int scale) {
-        return new Indicator<Num>(this, scale) {
+        return new Indicator<Num>(this) {
 
             @Override
             protected Num valueAtRounded(Tick tick) {
@@ -237,23 +229,17 @@ public abstract class Indicator<T> {
      * @return A wrapped indicator.
      */
     public final Indicator<Num> ema(int size) {
-        DecimalArithmetic arith = Scales.getScaleMetrics(4).getDefaultArithmetic();
-        long multiplier = arith.fromDouble(2.0 / (size + 1));
+        double multiplier = 2.0 / (size + 1);
 
         return (Indicator<Num>) memoize((size + 1) * 4, (tick, self) -> {
             if (tick.previous() == null) {
                 return valueAt(tick);
             }
 
-            Num previous = (Num) self.apply(tick.previous());
-            long prevValue = arith.fromBigDecimal(previous.delegate);
+            double previous = ((Num) self.apply(tick.previous())).doubleValue();
             Num now = (Num) valueAt(tick);
-            long value = arith.fromBigDecimal(now.delegate);
-            value = arith.subtract(value, prevValue);
-            value = arith.multiply(value, multiplier);
-            value = arith.add(value, prevValue);
 
-            return (T) Num.of(arith.toBigDecimal(value));
+            return (T) Num.of(((now.doubleValue() - previous) * multiplier) + previous);
         });
     }
 
@@ -303,24 +289,20 @@ public abstract class Indicator<T> {
      * @return A wrapped indicator.
      */
     public final Indicator<Num> sma(int size) {
-        DecimalArithmetic arith = Scales.getScaleMetrics(5).getDefaultArithmetic();
-
-        return new Indicator<Num>(this, scale) {
+        return new Indicator<Num>(this) {
 
             @Override
             protected Num valueAtRounded(Tick tick) {
-                long value = arith.fromLong(0);
+                double value = 0;
                 Tick current = tick;
                 int remaining = size;
                 while (current != null && 0 < remaining) {
                     Num num = (Num) wrapped.valueAt(current);
-                    value = arith.add(value, arith.fromBigDecimal(num.delegate));
+                    value += num.doubleValue();
                     current = current.previous();
                     remaining--;
                 }
-                value = arith.divide(value, arith.fromLong(size - remaining));
-
-                return Num.of(arith.toBigDecimal(value));
+                return Num.of(value / (size - remaining));
             }
         }.memoize();
     }
@@ -342,7 +324,7 @@ public abstract class Indicator<T> {
      * @return A wrapped indicator.
      */
     public final Indicator<Num> wma(int size) {
-        return new Indicator<Num>(this, scale) {
+        return new Indicator<Num>(this) {
 
             @Override
             protected Num valueAtRounded(Tick tick) {
@@ -386,7 +368,7 @@ public abstract class Indicator<T> {
      * @return
      */
     public final Indicator<T> memoize(int limit, BiFunction<Tick, Function<Tick, T>, T> calculator) {
-        return new Indicator<T>(this, scale) {
+        return new Indicator<T>(this) {
 
             /** CACHE */
             private final Cache<Tick, T> cache = CacheBuilder.newBuilder().maximumSize(8192).weakKeys().weakValues().build();

@@ -90,10 +90,10 @@ class IndicatorTest extends TickerTestSupport {
         Ticker ticker = ticker(TimeSpan.Second5, 1, 2, 3, 4, 5);
         Indicator<Num> indicator = Indicator.build(ticker, tick -> tick.openPrice).ema(2);
         assert indicator.valueAt(ticker.ticks.getByIndex(0)).is(1);
-        assert indicator.valueAt(ticker.ticks.getByIndex(1)).is(1.6666666667);
-        assert indicator.valueAt(ticker.ticks.getByIndex(2)).is(2.5555555556);
-        assert indicator.valueAt(ticker.ticks.getByIndex(3)).is(3.518518519);
-        assert indicator.valueAt(ticker.ticks.getByIndex(4)).is(4.50617284);
+        assert indicator.valueAt(ticker.ticks.getByIndex(1)).is(1.66666666666667);
+        assert indicator.valueAt(ticker.ticks.getByIndex(2)).is(2.55555555555556);
+        assert indicator.valueAt(ticker.ticks.getByIndex(3)).is(3.51851851851852);
+        assert indicator.valueAt(ticker.ticks.getByIndex(4)).is(4.50617283950617);
 
         indicator = Indicator.build(ticker, tick -> tick.openPrice).ema(4);
         assert indicator.valueAt(ticker.ticks.getByIndex(0)).is(1);

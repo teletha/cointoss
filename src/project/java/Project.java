@@ -35,6 +35,9 @@ public class Project extends bee.api.Project {
         require("org.ta4j", "ta4j-examples");
         require("com.github.ben-manes.caffeine", "caffeine");
         require("com.ibm.icu", "icu4j");
+        require("com.github.peteroupc", "numbers");
+        require("org.apfloat", "apfloat");
+        require("ch.obermuhlner", "big-math");
 
         versionControlSystem("https://github.com/teletha/cointoss");
     }

@@ -121,14 +121,12 @@ class NumTest {
 
     @Test
     void scale() {
-        assert Num.of(1).scale(0).is(1);
-        assert Num.of(1).scale(1).is(1);
+        assert Num.of("10.1").scale(1).is("10.1");
         assert Num.of(1).scale(2).is(1);
 
-        assert Num.of(1.234).scale(0).is(1);
-        assert Num.of(1.234).scale(1).is(1.2);
-        assert Num.of(1.234).scale(2).is(1.23);
-        assert Num.of(0.05).scale(1).is(0.1);
+        assert Num.of("1.234").scale(1).is("1.2");
+        assert Num.of("1.234").scale(2).is("1.23");
+        assert Num.of("0.05").scale(1).is("0.1");
 
         assert Num.of(21.234).scale(-1).is(20);
         assert Num.of(321.234).scale(-2).is(300);
