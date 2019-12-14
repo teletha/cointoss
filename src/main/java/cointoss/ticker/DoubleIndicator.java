@@ -30,9 +30,6 @@ import kiss.Ⅲ;
 
 public abstract class DoubleIndicator extends AbstractIndicator<Double> {
 
-    /** The mapper from timestamp to tick. */
-    protected final Function<Tick, Tick> normalizer;
-
     /** The wrapped {@link DoubleIndicator}. (OPTIONAL: may be null) */
     protected final DoubleIndicator wrapped;
 
@@ -41,17 +38,8 @@ public abstract class DoubleIndicator extends AbstractIndicator<Double> {
      * 
      * @param ticker A target ticker.
      */
-    protected DoubleIndicator() {
-        this(Function.identity());
-    }
-
-    /**
-     * Build with the target {@link Ticker}.
-     * 
-     * @param ticker A target ticker.
-     */
     protected DoubleIndicator(Function<Tick, Tick> normalizer) {
-        this.normalizer = normalizer;
+        super(normalizer);
         this.wrapped = null;
     }
 
@@ -61,25 +49,8 @@ public abstract class DoubleIndicator extends AbstractIndicator<Double> {
      * @param indicator A {@link DoubleIndicator} to delegate.
      */
     protected DoubleIndicator(DoubleIndicator indicator) {
+        super(indicator.normalizer);
         this.wrapped = Objects.requireNonNull(indicator);
-        this.normalizer = Objects.requireNonNull(indicator.normalizer);
-    }
-
-    /**
-     * Helper method to calculate the length of previous ticks.
-     * 
-     * @param tick A starting {@link Tick}.
-     * @param max A maximum length you want.
-     * @return The actual length of previous ticks.
-     */
-    protected final int calculatePreviousTickLength(Tick tick, int max) {
-        int actualSize = 1;
-
-        while (tick.previous() != null && actualSize < max) {
-            tick = tick.previous();
-            actualSize++;
-        }
-        return actualSize;
     }
 
     /**
@@ -133,7 +104,7 @@ public abstract class DoubleIndicator extends AbstractIndicator<Double> {
      * @return
      */
     public final <Out> Indicator<Out> map(DoubleFunction<Out> mapper) {
-        return new Indicator<>() {
+        return new Indicator<>(normalizer) {
             @Override
             protected Out valueAtRounded(Tick tick) {
                 return mapper.apply(DoubleIndicator.this.valueAt(tick));
@@ -149,7 +120,7 @@ public abstract class DoubleIndicator extends AbstractIndicator<Double> {
      * @return
      */
     public final <With, Out> Indicator<Out> map(Indicator<With> indicator1, WiseBiFunction<Double, With, Out> calculater) {
-        return new Indicator<Out>() {
+        return new Indicator<Out>(normalizer) {
             @Override
             protected Out valueAtRounded(Tick tick) {
                 return calculater.apply(DoubleIndicator.this.valueAt(tick), indicator1.valueAt(tick));
@@ -166,7 +137,7 @@ public abstract class DoubleIndicator extends AbstractIndicator<Double> {
      * @return
      */
     public final <With1, With2, Out> Indicator<Out> map(Indicator<With1> indicator1, Indicator<With2> indicator2, WiseTriFunction<Double, With1, With2, Out> calculater) {
-        return new Indicator<Out>() {
+        return new Indicator<Out>(normalizer) {
 
             @Override
             protected Out valueAtRounded(Tick tick) {

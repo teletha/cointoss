@@ -28,9 +28,6 @@ import kiss.Ⅲ;
 
 public abstract class Indicator<T> extends AbstractIndicator<T> {
 
-    /** The mapper from timestamp to tick. */
-    protected final Function<Tick, Tick> normalizer;
-
     /** The wrapped {@link Indicator}. (OPTIONAL: may be null) */
     protected final Indicator wrapped;
 
@@ -39,17 +36,8 @@ public abstract class Indicator<T> extends AbstractIndicator<T> {
      * 
      * @param ticker A target ticker.
      */
-    protected Indicator() {
-        this(Function.identity());
-    }
-
-    /**
-     * Build with the target {@link Ticker}.
-     * 
-     * @param ticker A target ticker.
-     */
     protected Indicator(Function<Tick, Tick> normalizer) {
-        this.normalizer = normalizer;
+        super(normalizer);
         this.wrapped = null;
     }
 
@@ -59,25 +47,8 @@ public abstract class Indicator<T> extends AbstractIndicator<T> {
      * @param indicator A {@link Indicator} to delegate.
      */
     protected Indicator(Indicator indicator) {
+        super(indicator.normalizer);
         this.wrapped = Objects.requireNonNull(indicator);
-        this.normalizer = Objects.requireNonNull(indicator.normalizer);
-    }
-
-    /**
-     * Helper method to calculate the length of previous ticks.
-     * 
-     * @param tick A starting {@link Tick}.
-     * @param max A maximum length you want.
-     * @return The actual length of previous ticks.
-     */
-    protected final int calculatePreviousTickLength(Tick tick, int max) {
-        int actualSize = 1;
-
-        while (tick.previous() != null && actualSize < max) {
-            tick = tick.previous();
-            actualSize++;
-        }
-        return actualSize;
     }
 
     /**
@@ -183,27 +154,6 @@ public abstract class Indicator<T> extends AbstractIndicator<T> {
                 return ((Num) wrapped.valueAt(tick)).scale(scale);
             }
         };
-    }
-
-    /**
-     * Wrap by exponetial moving average.
-     * 
-     * @param size A tick size.
-     * @return A wrapped indicator.
-     */
-    public final Indicator<Double> emaDouble(int size) {
-        double multiplier = 2.0 / (size + 1);
-
-        return (Indicator<Double>) memoize((size + 1) * 4, (tick, self) -> {
-            if (tick.previous() == null) {
-                return valueAt(tick);
-            }
-
-            double previous = ((Double) self.apply(tick.previous()));
-            double now = (Double) valueAt(tick);
-
-            return (T) Double.valueOf(((now - previous) * multiplier) + previous);
-        });
     }
 
     /**
