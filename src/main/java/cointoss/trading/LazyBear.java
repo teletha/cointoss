@@ -9,7 +9,7 @@
  */
 package cointoss.trading;
 
-import static java.time.temporal.ChronoUnit.MINUTES;
+import java.time.temporal.ChronoUnit;
 
 import cointoss.Direction;
 import cointoss.FundManager;
@@ -18,6 +18,7 @@ import cointoss.Scenario;
 import cointoss.Trader;
 import cointoss.ticker.Indicator;
 import cointoss.ticker.Indicators;
+import cointoss.ticker.Ticker;
 import cointoss.ticker.TimeSpan;
 import cointoss.util.Num;
 import kiss.Ⅱ;
@@ -35,22 +36,23 @@ public class LazyBear extends Trader {
      */
     @Override
     protected void declare(Market market, FundManager fund) {
-        Indicator<Ⅱ<Num, Num>> oscillator = Indicators.waveTrend(market.tickers.of(tickerSpan));
+        Ticker ticker = market.tickers.of(tickerSpan);
+        Indicator<Ⅱ<Num, Num>> oscillator = Indicators.waveTrend(ticker);
 
         // disableWhile(observeProfit().map(p -> p.isLessThan(-10000)));
 
         double size = 0.1;
 
-        when(oscillator.observe().take(v -> v.ⅰ.isLessThan(-entryThreshold)), value -> new Scenario() {
+        when(oscillator.observeWhen(ticker.add).take(v -> v.ⅰ.isLessThan(-entryThreshold)), value -> new Scenario() {
 
             @Override
             protected void entry() {
-                entry(Direction.BUY, size, s -> s.make(market.tickers.latestPrice.v.minus(this, 300)).cancelAfter(3, MINUTES));
+                entry(Direction.BUY, size, s -> s.make(market.tickers.latestPrice.v.minus(this, 300)).cancelAfter(3, ChronoUnit.MINUTES));
             }
 
             @Override
             protected void exit() {
-                exitWhen(oscillator.observe().take(v -> v.ⅰ.isGreaterThan(exitThreshold)), s -> s.take());
+                exitWhen(oscillator.observeWhen(ticker.add).take(v -> v.ⅰ.isGreaterThan(exitThreshold)), s -> s.take());
                 // exitAt(market.tickers.of(Span.Second5).add.flatMap(tick -> {
                 // if (tick.openPrice.isGreaterThan(this, entryPrice.plus(this, 3000))) {
                 // return I.signal(entryPrice.plus(this, 100));
@@ -61,16 +63,16 @@ public class LazyBear extends Trader {
             }
         });
 
-        when(oscillator.observe().take(v -> v.ⅰ.isGreaterThan(entryThreshold)), value -> new Scenario() {
+        when(oscillator.observeWhen(ticker.add).take(v -> v.ⅰ.isGreaterThan(entryThreshold)), value -> new Scenario() {
 
             @Override
             protected void entry() {
-                entry(Direction.SELL, size, s -> s.make(market.tickers.latestPrice.v.minus(this, 300)).cancelAfter(3, MINUTES));
+                entry(Direction.SELL, size, s -> s.make(market.tickers.latestPrice.v.minus(this, 300)).cancelAfter(3, ChronoUnit.MINUTES));
             }
 
             @Override
             protected void exit() {
-                exitWhen(oscillator.observe().take(v -> v.ⅰ.isLessThan(-exitThreshold)), s -> s.take());
+                exitWhen(oscillator.observeWhen(ticker.add).take(v -> v.ⅰ.isLessThan(-exitThreshold)), s -> s.take());
                 // exitAt(market.tickers.of(Span.Second5).add.flatMap(tick -> {
                 // if (tick.openPrice.isGreaterThan(this, entryPrice.plus(this, 3000))) {
                 // return I.signal(entryPrice.plus(this, 100));

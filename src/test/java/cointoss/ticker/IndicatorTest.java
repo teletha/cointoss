@@ -43,20 +43,6 @@ class IndicatorTest extends TickerTestSupport {
     }
 
     @Test
-    void first() {
-        Ticker ticker = ticker(TimeSpan.Second5, 1, 2, 3, 4, 5);
-        Indicator<Num> indicator = Indicator.build(ticker, tick -> tick.openPrice);
-        assert indicator.first().is(1);
-    }
-
-    @Test
-    void last() {
-        Ticker ticker = ticker(TimeSpan.Second5, 1, 2, 3, 4, 5);
-        Indicator<Num> indicator = Indicator.build(ticker, tick -> tick.openPrice);
-        assert indicator.last().is(5);
-    }
-
-    @Test
     void scale() {
         Ticker ticker = ticker(TimeSpan.Second5, 1.23, 2.34, 3.45, 4.56, 5.67);
         Indicator<Num> indicator = Indicator.build(ticker, tick -> tick.openPrice).scale(1);

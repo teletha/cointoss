@@ -42,21 +42,21 @@ public class VolumeCross extends Trader {
      */
     @Override
     protected void declare(Market market, FundManager fund) {
-        Indicator<Num> buyVolume = Indicator.build(market.tickers.of(TimeSpan.Minute5), Tick::buyVolume);
-        Indicator<Num> sellVolume = Indicator.build(market.tickers.of(TimeSpan.Minute5), Tick::sellVolume);
+        Ticker ticker = market.tickers.of(TimeSpan.Minute5);
+
+        Indicator<Num> buyVolume = Indicator.build(ticker, Tick::buyVolume);
+        Indicator<Num> sellVolume = Indicator.build(ticker, Tick::sellVolume);
         Indicator<Num> volumeDiff = buyVolume.map(sellVolume, (b, s) -> b.minus(s))
                 .sma(7)
                 .scale(market.service.setting.targetCurrencyScaleSize);
-        Indicator<Boolean> upPrediction = Indicator.build(market.tickers.of(TimeSpan.Minute5), Tick::isBear)
-                .map(volumeDiff, (t, d) -> t && d.isPositive());
-        Indicator<Boolean> downPrediction = Indicator.build(market.tickers.of(TimeSpan.Minute5), Tick::isBull)
-                .map(volumeDiff, (t, d) -> t && d.isNegative());
+        Indicator<Boolean> upPrediction = Indicator.build(ticker, Tick::isBear).map(volumeDiff, (t, d) -> t && d.isPositive());
+        Indicator<Boolean> downPrediction = Indicator.build(ticker, Tick::isBull).map(volumeDiff, (t, d) -> t && d.isNegative());
 
         // disableWhile(observeProfit().map(p -> p.isLessThan(-10000)));
 
         double size = 0.3;
 
-        when(volumeDiff.observe().plug(near(5, o -> o.isGreaterThan(0))), v -> new Scenario() {
+        when(volumeDiff.observeWhen(ticker.add).plug(near(5, o -> o.isGreaterThan(0))), v -> new Scenario() {
             @Override
             protected void entry() {
                 entry(Direction.BUY, size, o -> o.make(market.tickers.latestPrice.v.minus(300)).cancelAfter(3, ChronoUnit.MINUTES));
@@ -64,11 +64,11 @@ public class VolumeCross extends Trader {
 
             @Override
             protected void exit() {
-                exitWhen(volumeDiff.observe().plug(near(2, o -> o.isLessThan(0))), o -> o.take());
+                exitWhen(volumeDiff.observeWhen(ticker.add).plug(near(2, o -> o.isLessThan(0))), o -> o.take());
             }
         });
 
-        when(volumeDiff.observe().plug(near(5, o -> o.isLessThan(0))), v -> new Scenario() {
+        when(volumeDiff.observeWhen(ticker.add).plug(near(5, o -> o.isLessThan(0))), v -> new Scenario() {
             @Override
             protected void entry() {
                 entry(Direction.SELL, size, o -> o.make(market.tickers.latestPrice.v.plus(300)).cancelAfter(3, ChronoUnit.MINUTES));
@@ -76,7 +76,7 @@ public class VolumeCross extends Trader {
 
             @Override
             protected void exit() {
-                exitWhen(volumeDiff.observe().plug(near(2, o -> o.isGreaterThan(0))), o -> o.take());
+                exitWhen(volumeDiff.observeWhen(ticker.add).plug(near(2, o -> o.isGreaterThan(0))), o -> o.take());
             }
         });
 

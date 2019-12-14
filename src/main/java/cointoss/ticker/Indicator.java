@@ -31,9 +31,6 @@ public abstract class Indicator<T> {
     /** The human-readable name. */
     public final Variable<String> name = Variable.of(getClass().getSimpleName());
 
-    /** The target {@link Ticker}. */
-    protected final Ticker ticker;
-
     /** The wrapped {@link Indicator}. (OPTIONAL: may be null) */
     protected final Indicator wrapped;
 
@@ -42,8 +39,7 @@ public abstract class Indicator<T> {
      * 
      * @param ticker A target ticker.
      */
-    protected Indicator(Ticker ticker) {
-        this.ticker = Objects.requireNonNull(ticker);
+    protected Indicator() {
         this.wrapped = null;
     }
 
@@ -54,7 +50,6 @@ public abstract class Indicator<T> {
      */
     protected Indicator(Indicator indicator) {
         this.wrapped = Objects.requireNonNull(indicator);
-        this.ticker = Objects.requireNonNull(indicator.ticker());
     }
 
     /**
@@ -85,51 +80,12 @@ public abstract class Indicator<T> {
     }
 
     /**
-     * Return the related {@link Ticker}.
-     * 
-     * @return
-     */
-    public final Ticker ticker() {
-        return ticker;
-    }
-
-    /**
      * Return the value of this {@link Indicator}.
      * 
      * @param tick A {@link Tick} on {@link Ticker}.
      * @return A time-based value.
      */
-    public final T valueAt(Tick tick) {
-        Tick rounded = ticker.ticks.getByTime(tick.startSeconds);
-        return valueAtRounded(rounded == null ? ticker.ticks.first() : rounded);
-    }
-
-    /**
-     * Return the value of this {@link Indicator}. It is ensure that the {@link Tick} parameter is
-     * rounded for {@link Ticker}.
-     * 
-     * @param tick A {@link Tick} on {@link Ticker}.
-     * @return A time-based value.
-     */
-    protected abstract T valueAtRounded(Tick tick);
-
-    /**
-     * Return the first value of this {@link Indicator}.
-     * 
-     * @return A first value.
-     */
-    public final T first() {
-        return valueAt(ticker.ticks.first());
-    }
-
-    /**
-     * Return the latest value of this {@link Indicator}.
-     * 
-     * @return A latest value.
-     */
-    public final T last() {
-        return valueAt(ticker.ticks.last());
-    }
+    public abstract T valueAt(Tick tick);
 
     /**
      * Wrap by combined {@link Indicator}.
@@ -177,8 +133,8 @@ public abstract class Indicator<T> {
         return new Indicator<Out>(this) {
 
             @Override
-            protected Out valueAtRounded(Tick tick) {
-                return calculater.apply((T) wrapped.valueAtRounded(tick), indicator1.valueAt(tick));
+            public Out valueAt(Tick tick) {
+                return calculater.apply((T) wrapped.valueAt(tick), indicator1.valueAt(tick));
             }
         };
     }
@@ -195,8 +151,8 @@ public abstract class Indicator<T> {
         return new Indicator<>(this) {
 
             @Override
-            protected Out valueAtRounded(Tick tick) {
-                return calculater.apply((T) wrapped.valueAtRounded(tick), indicator1.valueAt(tick), indicator2.valueAt(tick));
+            public Out valueAt(Tick tick) {
+                return calculater.apply((T) wrapped.valueAt(tick), indicator1.valueAt(tick), indicator2.valueAt(tick));
             }
         };
     }
@@ -211,7 +167,7 @@ public abstract class Indicator<T> {
         return new Indicator<Num>(this) {
 
             @Override
-            protected Num valueAtRounded(Tick tick) {
+            public Num valueAt(Tick tick) {
                 return ((Num) wrapped.valueAt(tick)).scale(scale);
             }
         };
@@ -287,7 +243,7 @@ public abstract class Indicator<T> {
         return new Indicator<Num>(this) {
 
             @Override
-            protected Num valueAtRounded(Tick tick) {
+            public Num valueAt(Tick tick) {
                 double value = 0;
                 Tick current = tick;
                 int remaining = size;
@@ -322,7 +278,7 @@ public abstract class Indicator<T> {
         return new Indicator<Num>(this) {
 
             @Override
-            protected Num valueAtRounded(Tick tick) {
+            public Num valueAt(Tick tick) {
                 if (tick.previous() == null) {
                     return (Num) wrapped.valueAt(tick);
                 }
@@ -372,14 +328,14 @@ public abstract class Indicator<T> {
             private int count = limit;
 
             @Override
-            protected T valueAtRounded(Tick tick) {
+            public T valueAt(Tick tick) {
                 if (count == 0) return (T) wrapped.valueAt(tick);
-                if (tick.closePrice == null /* The latest tick MUST NOT cache. */) return calculator.apply(tick, this::valueAt);
+                if (tick.closePrice == null /* The latest tick MUST NOT cache. */) return calculator.apply(tick, Indicator.this::valueAt);
 
                 try {
                     return cache.get(tick, () -> calculator.apply(tick, t -> {
                         count--;
-                        T v = this.valueAt(t);
+                        T v = Indicator.this.valueAt(t);
                         count++;
                         return v;
                     }));
@@ -388,25 +344,10 @@ public abstract class Indicator<T> {
                 }
             }
         };
-
     }
 
-    /**
-     * Create {@link Signal} of {@link Indicator} value.
-     * 
-     * @return
-     */
-    public final Signal<T> observe() {
-        return ticker.add.map(this::valueAt);
-    }
-
-    /**
-     * Create {@link Signal} of {@link Indicator} value.
-     * 
-     * @return
-     */
-    public final Signal<T> observeNow() {
-        return observe().startWith(last());
+    public Signal<T> observeWhen(Signal<Tick> timing) {
+        return timing.map(this::valueAt);
     }
 
     /**
@@ -420,11 +361,12 @@ public abstract class Indicator<T> {
     public static <T> Indicator<T> build(Ticker ticker, Function<Tick, T> calculator) {
         Objects.requireNonNull(calculator);
 
-        return new Indicator<>(ticker) {
+        return new Indicator<>() {
 
             @Override
-            protected T valueAtRounded(Tick tick) {
-                return calculator.apply(tick);
+            public T valueAt(Tick tick) {
+                Tick found = ticker.ticks.getByTime(tick.startSeconds);
+                return calculator.apply(found == null ? ticker.ticks.first() : found);
             }
         };
     }
@@ -488,10 +430,10 @@ public abstract class Indicator<T> {
      * @return
      */
     public static Indicator<Num> trueRange(Ticker ticker) {
-        return new Indicator<>(ticker) {
+        return new Indicator<>() {
 
             @Override
-            protected Num valueAtRounded(Tick tick) {
+            public Num valueAt(Tick tick) {
                 Num highLow = tick.highPrice().minus(tick.lowPrice()).abs();
 
                 if (tick.previous() == null) {
