@@ -31,8 +31,8 @@ public abstract class Indicator<T> {
     /** The human-readable name. */
     public final Variable<String> name = Variable.of(getClass().getSimpleName());
 
-    /** The target {@link Ticker}. */
-    protected final Ticker ticker;
+    /** The mapper from timestamp to tick. */
+    protected final Function<Tick, Tick> normalizer;
 
     /** The wrapped {@link Indicator}. (OPTIONAL: may be null) */
     protected final Indicator wrapped;
@@ -42,8 +42,17 @@ public abstract class Indicator<T> {
      * 
      * @param ticker A target ticker.
      */
-    protected Indicator(Ticker ticker) {
-        this.ticker = Objects.requireNonNull(ticker);
+    protected Indicator() {
+        this(Function.identity());
+    }
+
+    /**
+     * Build with the target {@link Ticker}.
+     * 
+     * @param ticker A target ticker.
+     */
+    protected Indicator(Function<Tick, Tick> normalizer) {
+        this.normalizer = normalizer;
         this.wrapped = null;
     }
 
@@ -54,7 +63,7 @@ public abstract class Indicator<T> {
      */
     protected Indicator(Indicator indicator) {
         this.wrapped = Objects.requireNonNull(indicator);
-        this.ticker = Objects.requireNonNull(indicator.ticker);
+        this.normalizer = Objects.requireNonNull(indicator.normalizer);
     }
 
     /**
@@ -91,8 +100,8 @@ public abstract class Indicator<T> {
      * @return A time-based value.
      */
     public final T valueAt(Tick timestamp) {
-        Tick rounded = ticker.ticks.getByTime(timestamp.startSeconds);
-        return valueAtRounded(rounded == null ? ticker.ticks.first() : rounded);
+        Tick normalized = normalizer.apply(timestamp);
+        return valueAtRounded(normalized == null ? timestamp : normalized);
     }
 
     /**
@@ -384,12 +393,16 @@ public abstract class Indicator<T> {
     public static <T> Indicator<T> build(Ticker ticker, Function<Tick, T> calculator) {
         Objects.requireNonNull(calculator);
 
-        return new Indicator<>(ticker) {
+        Function<Tick, Tick> normalizer = tick -> {
+            Tick rounded = ticker.ticks.getByTime(tick.startSeconds);
+            return rounded == null ? ticker.ticks.first() : rounded;
+        };
+
+        return new Indicator<>(normalizer) {
 
             @Override
             protected T valueAtRounded(Tick tick) {
-                Tick rounded = ticker.ticks.getByTime(tick.startSeconds);
-                return calculator.apply(rounded == null ? ticker.ticks.first() : rounded);
+                return calculator.apply(tick);
             }
         };
     }
@@ -453,22 +466,18 @@ public abstract class Indicator<T> {
      * @return
      */
     public static Indicator<Num> trueRange(Ticker ticker) {
-        return new Indicator<>(ticker) {
+        return build(ticker, tick -> {
+            Num highLow = tick.highPrice().minus(tick.lowPrice()).abs();
 
-            @Override
-            protected Num valueAtRounded(Tick tick) {
-                Num highLow = tick.highPrice().minus(tick.lowPrice()).abs();
-
-                if (tick.previous() == null) {
-                    return highLow;
-                }
-
-                Tick previous = tick.previous();
-                Num highClose = tick.highPrice().minus(previous.closePrice()).abs();
-                Num closeLow = previous.closePrice().minus(tick.lowPrice).abs();
-
-                return Num.max(highLow, highClose, closeLow);
+            if (tick.previous() == null) {
+                return highLow;
             }
-        };
+
+            Tick previous = tick.previous();
+            Num highClose = tick.highPrice().minus(previous.closePrice()).abs();
+            Num closeLow = previous.closePrice().minus(tick.lowPrice).abs();
+
+            return Num.max(highLow, highClose, closeLow);
+        });
     }
 }
