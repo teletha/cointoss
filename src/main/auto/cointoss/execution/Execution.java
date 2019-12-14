@@ -13,10 +13,10 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.time.ZonedDateTime;
 import java.util.Objects;
-import java.util.function.Consumer;
+import java.util.function.DoubleConsumer;
+import java.util.function.DoubleUnaryOperator;
 import java.util.function.LongConsumer;
 import java.util.function.LongUnaryOperator;
-import java.util.function.UnaryOperator;
 import javax.annotation.processing.Generated;
 
 /**
@@ -67,7 +67,7 @@ public abstract class Execution extends ExecutionModel {
     private static final MethodHandle size$912239839= invoker("size", double.class);
 
     /** The overload or intercept method invoker. */
-    private static final MethodHandle assignWithAccumulative$1683249437= invoker("assignWithAccumulative", Num.class, Consumer.class);
+    private static final MethodHandle assignWithAccumulative$197025490= invoker("assignWithAccumulative", Num.class, DoubleConsumer.class);
 
     /** The overload or intercept method invoker. */
     private static final MethodHandle price$101354429= invoker("price", int.class);
@@ -149,7 +149,7 @@ public abstract class Execution extends ExecutionModel {
     public final Num price;
 
     /** The exposed property. */
-    public final Num accumulative;
+    public final double accumulative;
 
     /** The exposed property. */
     public final ZonedDateTime date;
@@ -252,7 +252,7 @@ public abstract class Execution extends ExecutionModel {
             throw new IllegalArgumentException("The size property requires non-null value.");
         }
         try {
-            sizeUpdater.invoke(this, assignWithAccumulative$1683249437.invoke(this, value, (Consumer<Num>) ((Åssignable) this)::accumulative));
+            sizeUpdater.invoke(this, assignWithAccumulative$197025490.invoke(this, value, (DoubleConsumer) ((Åssignable) this)::accumulative));
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -355,7 +355,7 @@ public abstract class Execution extends ExecutionModel {
      *  @return
      */
     @Override
-    public final Num accumulative() {
+    public final double accumulative() {
         return this.accumulative;
     }
 
@@ -365,7 +365,7 @@ public abstract class Execution extends ExecutionModel {
      * @paran value The new accumulative property value to assign.
      * @return Chainable API.
      */
-    public final Execution assignAccumulative(Num value) {
+    public final Execution assignAccumulative(double value) {
         setAccumulative(value);
         return this;
     }
@@ -376,8 +376,8 @@ public abstract class Execution extends ExecutionModel {
      * @paran value The accumulative property assigner which accepts the current value and returns new value.
      * @return Chainable API.
      */
-    public final Execution assignAccumulative(UnaryOperator<Num> value) {
-        setAccumulative(value.apply(this.accumulative));
+    public final Execution assignAccumulative(DoubleUnaryOperator value) {
+        setAccumulative(value.applyAsDouble(this.accumulative));
         return this;
     }
 
@@ -387,7 +387,7 @@ public abstract class Execution extends ExecutionModel {
      * @return A value of accumulative property.
      */
     @SuppressWarnings("unused")
-    private final Num getAccumulative() {
+    private final double getAccumulative() {
         return this.accumulative;
     }
 
@@ -396,10 +396,7 @@ public abstract class Execution extends ExecutionModel {
      *
      * @paran value A new value of accumulative property to assign.
      */
-    private final void setAccumulative(Num value) {
-        if (value == null) {
-            value = super.accumulative();
-        }
+    private final void setAccumulative(double value) {
         try {
             accumulativeUpdater.invoke(this, value);
         } catch (Throwable e) {
@@ -640,7 +637,7 @@ public abstract class Execution extends ExecutionModel {
         if (!Objects.equals(size, other.size)) return false;
         if (id != other.id) return false;
         if (!Objects.equals(price, other.price)) return false;
-        if (!Objects.equals(accumulative, other.accumulative)) return false;
+        if (accumulative != other.accumulative) return false;
         if (!Objects.equals(date, other.date)) return false;
         if (mills != other.mills) return false;
         if (consecutive != other.consecutive) return false;
@@ -1036,7 +1033,7 @@ public abstract class Execution extends ExecutionModel {
          * @param value A new value to assign.
          * @return The next assignable model.
          */
-        default Next accumulative(Num value) {
+        default Next accumulative(double value) {
             ((Execution) this).setAccumulative(value);
             return (Next) this;
         }

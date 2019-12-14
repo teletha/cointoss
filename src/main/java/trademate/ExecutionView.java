@@ -9,14 +9,13 @@
  */
 package trademate;
 
-import static trademate.TradeMateStyle.Side;
+import static trademate.TradeMateStyle.*;
 
 import java.util.function.Function;
 import java.util.stream.IntStream;
 
 import cointoss.execution.Execution;
 import cointoss.util.Chrono;
-import cointoss.util.Num;
 import stylist.Style;
 import stylist.StyleDSL;
 import viewtify.Viewtify;
@@ -76,8 +75,7 @@ public class ExecutionView extends View {
         // configure UI
         takerSize.initialize(IntStream.range(1, 51).boxed());
         executionList.renderByUI(execution(targetScale, false));
-        executionCumulativeList.renderByUI(execution(targetScale, true))
-                .take(takerSize, (e, size) -> e.accumulative.isGreaterThanOrEqual(size));
+        executionCumulativeList.renderByUI(execution(targetScale, true)).take(takerSize, (e, size) -> size <= e.accumulative);
 
         // load execution log
         Viewtify.inWorker(() -> {
@@ -93,7 +91,7 @@ public class ExecutionView extends View {
         // load big taker log
         Viewtify.inWorker(() -> {
             return view.market.timelineByTaker.skipWhile(view.initializing).on(Viewtify.UIThread).to(e -> {
-                if (e.accumulative.isGreaterThanOrEqual(Num.ONE)) {
+                if (1 <= e.accumulative) {
                     executionCumulativeList.addItemAtFirst(e);
 
                     if (1000 < executionCumulativeList.size()) {
@@ -113,10 +111,15 @@ public class ExecutionView extends View {
      */
     private Function<Execution, UILabel> execution(int scale, boolean accumulative) {
         return e -> {
-            String text = Chrono.system(e.date).format(Chrono.Time) + "  " + e.price + " " + (accumulative ? e.accumulative : e.size)
-                    .scale(scale) + "  " + e.delay;
+            String text = Chrono.system(e.date).format(Chrono.Time) + "  " + e.price + " " + (accumulative ? scale(e.accumulative, scale)
+                    : e.size.scale(scale)) + "  " + e.delay;
 
             return make(UILabel.class).text(text).styleOnly(Side.of(e.direction));
         };
+    }
+
+    private double scale(double value, int scale) {
+        double scaler = Math.pow(10, scale);
+        return Math.round(value * scaler) / scaler;
     }
 }

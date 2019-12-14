@@ -11,11 +11,11 @@ package cointoss.verify;
 
 import static cointoss.order.OrderState.*;
 
-import java.util.concurrent.atomic.AtomicReference;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+
+import com.google.common.util.concurrent.AtomicDouble;
 
 import cointoss.execution.Execution;
 import cointoss.order.Order;
@@ -457,7 +457,7 @@ class VerifiableMarketTest {
 
     @Test
     void observeSequencialExecutionsBySellSize() {
-        AtomicReference<Num> size = new AtomicReference<>();
+        AtomicDouble size = new AtomicDouble();
 
         market.timelineByTaker.to(e -> {
             size.set(e.accumulative);
@@ -465,12 +465,12 @@ class VerifiableMarketTest {
 
         market.performSequencially(4, Execution.with.sell(5).price(10));
         market.perform(Execution.with.sell(5).price(10));
-        assert size.get().is(20);
+        assert size.get() == 20d;
     }
 
     @Test
     void observeSequencialExecutionsByBuySize() {
-        AtomicReference<Num> size = new AtomicReference<>();
+        AtomicDouble size = new AtomicDouble();
 
         market.timelineByTaker.to(e -> {
             size.set(e.accumulative);
@@ -478,6 +478,6 @@ class VerifiableMarketTest {
 
         market.performSequencially(4, Execution.with.buy(5).price(10));
         market.perform(Execution.with.buy(5).price(10));
-        assert size.get().is(20);
+        assert size.get() == 20d;
     }
 }

@@ -100,8 +100,7 @@ public abstract class Indicator<T> {
      * @return A time-based value.
      */
     public final T valueAt(Tick timestamp) {
-        Tick normalized = normalizer.apply(timestamp);
-        return valueAtRounded(normalized == null ? timestamp : normalized);
+        return valueAtRounded(normalizer.apply(timestamp));
     }
 
     /**

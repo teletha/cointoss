@@ -12,7 +12,7 @@ package cointoss.execution;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.function.Consumer;
+import java.util.function.DoubleConsumer;
 import java.util.function.LongConsumer;
 
 import cointoss.Direction;
@@ -111,8 +111,8 @@ abstract class ExecutionModel implements Directional {
     }
 
     @Icy.Intercept("size")
-    private Num assignWithAccumulative(Num size, Consumer<Num> accumulative) {
-        accumulative.accept(size);
+    private Num assignWithAccumulative(Num size, DoubleConsumer accumulative) {
+        accumulative.accept(size.doubleValue());
         return size;
     }
 
@@ -186,8 +186,8 @@ abstract class ExecutionModel implements Directional {
      * @return
      */
     @Icy.Property(mutable = true)
-    public Num accumulative() {
-        return Num.ZERO;
+    public double accumulative() {
+        return 0;
     }
 
     /**
