@@ -54,7 +54,7 @@ public abstract class Indicator<T> {
      */
     protected Indicator(Indicator indicator) {
         this.wrapped = Objects.requireNonNull(indicator);
-        this.ticker = Objects.requireNonNull(indicator.ticker());
+        this.ticker = Objects.requireNonNull(indicator.ticker);
     }
 
     /**
@@ -82,15 +82,6 @@ public abstract class Indicator<T> {
     public final Indicator<T> name(String name) {
         this.name.set(name);
         return this;
-    }
-
-    /**
-     * Return the related {@link Ticker}.
-     * 
-     * @return
-     */
-    public final Ticker ticker() {
-        return ticker;
     }
 
     /**
