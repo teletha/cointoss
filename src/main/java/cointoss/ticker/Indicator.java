@@ -99,8 +99,8 @@ public abstract class Indicator<T> {
      * @param tick A {@link Tick} on {@link Ticker}.
      * @return A time-based value.
      */
-    public final T valueAt(Tick tick) {
-        Tick rounded = ticker.ticks.getByTime(tick.startSeconds);
+    public final T valueAt(Tick timestamp) {
+        Tick rounded = ticker.ticks.getByTime(timestamp.startSeconds);
         return valueAtRounded(rounded == null ? ticker.ticks.first() : rounded);
     }
 
@@ -373,13 +373,13 @@ public abstract class Indicator<T> {
 
             @Override
             protected T valueAtRounded(Tick tick) {
-                if (count == 0) return (T) wrapped.valueAt(tick);
-                if (tick.closePrice == null /* The latest tick MUST NOT cache. */) return calculator.apply(tick, this::valueAt);
+                if (count == 0) return (T) wrapped.valueAtRounded(tick);
+                if (tick.closePrice == null /* The latest tick MUST NOT cache. */) return calculator.apply(tick, this::valueAtRounded);
 
                 try {
                     return cache.get(tick, () -> calculator.apply(tick, t -> {
                         count--;
-                        T v = this.valueAt(t);
+                        T v = this.valueAtRounded(t);
                         count++;
                         return v;
                     }));
@@ -415,7 +415,8 @@ public abstract class Indicator<T> {
 
             @Override
             protected T valueAtRounded(Tick tick) {
-                return calculator.apply(tick);
+                Tick rounded = ticker.ticks.getByTime(tick.startSeconds);
+                return calculator.apply(rounded == null ? ticker.ticks.first() : rounded);
             }
         };
     }

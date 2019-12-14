@@ -9,6 +9,8 @@
  */
 package cointoss.ticker;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.junit.jupiter.api.Test;
 
 import cointoss.execution.Execution;
@@ -54,6 +56,39 @@ class IndicatorTest extends TickerTestSupport {
         Ticker ticker = ticker(TimeSpan.Second5, 1, 2, 3, 4, 5);
         Indicator<Num> indicator = Indicator.build(ticker, tick -> tick.openPrice);
         assert indicator.last().is(5);
+    }
+
+    @Test
+    void memo() {
+        AtomicInteger count = new AtomicInteger();
+
+        Ticker ticker = ticker(TimeSpan.Second5, 1, 2, 3, 4, 5);
+        Indicator<Num> indicator = Indicator.build(ticker, tick -> {
+            count.incrementAndGet();
+            return tick.openPrice;
+        });
+
+        Indicator<Num> memo = indicator.memoize();
+        memo.valueAt(ticker.ticks.getByIndex(0));
+        assert count.get() == 1;
+        memo.valueAt(ticker.ticks.getByIndex(0));
+        assert count.get() == 1;
+
+        memo.valueAt(ticker.ticks.getByIndex(1));
+        assert count.get() == 2;
+        memo.valueAt(ticker.ticks.getByIndex(2));
+        assert count.get() == 3;
+
+        memo.valueAt(ticker.ticks.getByIndex(1));
+        assert count.get() == 3;
+        memo.valueAt(ticker.ticks.getByIndex(2));
+        assert count.get() == 3;
+
+        // from not memo
+        indicator.valueAt(ticker.ticks.getByIndex(2));
+        assert count.get() == 4;
+        indicator.valueAt(ticker.ticks.getByIndex(2));
+        assert count.get() == 5;
     }
 
     @Test
