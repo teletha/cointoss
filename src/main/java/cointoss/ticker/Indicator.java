@@ -57,6 +57,7 @@ public abstract class Indicator<T> extends AbstractIndicator<T> {
      * @param tick A {@link Tick} on {@link Ticker}.
      * @return A time-based value.
      */
+    @Override
     public final T valueAt(Tick timestamp) {
         return valueAtRounded(normalizer.apply(timestamp));
     }

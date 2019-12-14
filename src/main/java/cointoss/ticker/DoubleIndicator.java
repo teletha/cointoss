@@ -59,7 +59,8 @@ public abstract class DoubleIndicator extends AbstractIndicator<Double> {
      * @param tick A {@link Tick} on {@link Ticker}.
      * @return A time-based value.
      */
-    public final double valueAt(Tick timestamp) {
+    @Override
+    public final Double valueAt(Tick timestamp) {
         return valueAtRounded(normalizer.apply(timestamp));
     }
 

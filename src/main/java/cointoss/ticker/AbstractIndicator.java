@@ -55,4 +55,12 @@ public abstract class AbstractIndicator<T> {
         }
         return actualSize;
     }
+
+    /**
+     * Return the value of this {@link Indicator}.
+     * 
+     * @param tick A {@link Tick} on {@link Ticker}.
+     * @return A time-based value.
+     */
+    public abstract T valueAt(Tick timestamp);
 }
