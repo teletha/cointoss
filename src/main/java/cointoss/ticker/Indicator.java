@@ -114,24 +114,6 @@ public abstract class Indicator<T> {
     protected abstract T valueAtRounded(Tick tick);
 
     /**
-     * Return the first value of this {@link Indicator}.
-     * 
-     * @return A first value.
-     */
-    public final T first() {
-        return valueAt(ticker.ticks.first());
-    }
-
-    /**
-     * Return the latest value of this {@link Indicator}.
-     * 
-     * @return A latest value.
-     */
-    public final T last() {
-        return valueAt(ticker.ticks.last());
-    }
-
-    /**
      * Wrap by combined {@link Indicator}.
      * 
      * @param <With>
@@ -374,12 +356,12 @@ public abstract class Indicator<T> {
             @Override
             protected T valueAtRounded(Tick tick) {
                 if (count == 0) return (T) wrapped.valueAtRounded(tick);
-                if (tick.closePrice == null /* The latest tick MUST NOT cache. */) return calculator.apply(tick, this::valueAtRounded);
+                if (tick.closePrice == null /* The latest tick MUST NOT cache. */) return calculator.apply(tick, this::valueAt);
 
                 try {
                     return cache.get(tick, () -> calculator.apply(tick, t -> {
                         count--;
-                        T v = this.valueAtRounded(t);
+                        T v = this.valueAt(t);
                         count++;
                         return v;
                     }));

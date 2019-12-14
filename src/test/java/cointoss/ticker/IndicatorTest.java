@@ -45,20 +45,6 @@ class IndicatorTest extends TickerTestSupport {
     }
 
     @Test
-    void first() {
-        Ticker ticker = ticker(TimeSpan.Second5, 1, 2, 3, 4, 5);
-        Indicator<Num> indicator = Indicator.build(ticker, tick -> tick.openPrice);
-        assert indicator.first().is(1);
-    }
-
-    @Test
-    void last() {
-        Ticker ticker = ticker(TimeSpan.Second5, 1, 2, 3, 4, 5);
-        Indicator<Num> indicator = Indicator.build(ticker, tick -> tick.openPrice);
-        assert indicator.last().is(5);
-    }
-
-    @Test
     void memo() {
         AtomicInteger count = new AtomicInteger();
 
