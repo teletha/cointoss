@@ -34,9 +34,6 @@ public abstract class Indicator<T> {
     /** The target {@link Ticker}. */
     protected final Ticker ticker;
 
-    /** The span length. */
-    protected final long spanSeconds;
-
     /** The wrapped {@link Indicator}. (OPTIONAL: may be null) */
     protected final Indicator wrapped;
 
@@ -48,7 +45,6 @@ public abstract class Indicator<T> {
     protected Indicator(Ticker ticker) {
         this.ticker = Objects.requireNonNull(ticker);
         this.wrapped = null;
-        this.spanSeconds = ticker.span.duration.toSeconds();
     }
 
     /**
@@ -59,7 +55,6 @@ public abstract class Indicator<T> {
     protected Indicator(Indicator indicator) {
         this.wrapped = Objects.requireNonNull(indicator);
         this.ticker = Objects.requireNonNull(indicator.ticker());
-        this.spanSeconds = ticker.span.duration.toSeconds();
     }
 
     /**
