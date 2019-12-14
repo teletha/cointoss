@@ -43,7 +43,6 @@ public class VolumeCross extends Trader {
     @Override
     protected void declare(Market market, FundManager fund) {
         Ticker ticker = market.tickers.of(TimeSpan.Minute5);
-
         Indicator<Num> buyVolume = Indicator.build(ticker, Tick::buyVolume);
         Indicator<Num> sellVolume = Indicator.build(ticker, Tick::sellVolume);
         Indicator<Num> volumeDiff = buyVolume.map(sellVolume, (b, s) -> b.minus(s))
