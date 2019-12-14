@@ -9,6 +9,10 @@
  */
 package cointoss.ticker;
 
+import kiss.Variable;
+
 public abstract class AbstractIndicator<T> {
 
+    /** The human-readable name. */
+    public final Variable<String> name = Variable.of(getClass().getSimpleName());
 }

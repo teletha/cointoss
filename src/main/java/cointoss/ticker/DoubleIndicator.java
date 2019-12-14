@@ -30,9 +30,6 @@ import kiss.Ⅲ;
 
 public abstract class DoubleIndicator extends AbstractIndicator<Double> {
 
-    /** The human-readable name. */
-    public final Variable<String> name = Variable.of(getClass().getSimpleName());
-
     /** The mapper from timestamp to tick. */
     protected final Function<Tick, Tick> normalizer;
 
@@ -83,16 +80,6 @@ public abstract class DoubleIndicator extends AbstractIndicator<Double> {
             actualSize++;
         }
         return actualSize;
-    }
-
-    /**
-     * Set the name property of this {@link DoubleIndicator}.
-     * 
-     * @param name The name value to set.
-     */
-    public final DoubleIndicator name(String name) {
-        this.name.set(name);
-        return this;
     }
 
     /**

@@ -28,9 +28,6 @@ import kiss.Ⅲ;
 
 public abstract class Indicator<T> extends AbstractIndicator<T> {
 
-    /** The human-readable name. */
-    public final Variable<String> name = Variable.of(getClass().getSimpleName());
-
     /** The mapper from timestamp to tick. */
     protected final Function<Tick, Tick> normalizer;
 
@@ -81,16 +78,6 @@ public abstract class Indicator<T> extends AbstractIndicator<T> {
             actualSize++;
         }
         return actualSize;
-    }
-
-    /**
-     * Set the name property of this {@link Indicator}.
-     * 
-     * @param name The name value to set.
-     */
-    public final Indicator<T> name(String name) {
-        this.name.set(name);
-        return this;
     }
 
     /**
