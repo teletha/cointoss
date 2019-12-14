@@ -15,6 +15,7 @@ import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Supplier;
+import java.util.function.ToDoubleFunction;
 
 import javafx.collections.ObservableList;
 import javafx.scene.canvas.Canvas;
@@ -39,6 +40,7 @@ import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.market.bitflyer.SFD;
+import cointoss.ticker.DoubleIndicator;
 import cointoss.ticker.Indicator;
 import cointoss.ticker.Tick;
 import cointoss.ticker.Ticker;
@@ -475,7 +477,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                     }
 
                     for (LineChart chart : plotter.lines) {
-                        double calculated = chart.indicator.valueAt(tick).doubleValue();
+                        double calculated = chart.indicator.applyAsDouble(tick);
 
                         if (plotter.area == PlotArea.Main) {
                             calculated = axisY.getPositionForValue(calculated);
@@ -575,8 +577,8 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                             gc.setStroke(chart.color);
                             gc.setLineDashes(chart.dashArray);
                             gc.strokeLine(lastX, chart.valueY.getLast(), x, plotter.area == PlotArea.Main
-                                    ? axisY.getPositionForValue(chart.indicator.valueAt(tick).doubleValue())
-                                    : height - plotter.area.offset - chart.indicator.valueAt(tick).doubleValue() * scale);
+                                    ? axisY.getPositionForValue(chart.indicator.applyAsDouble(tick))
+                                    : height - plotter.area.offset - chart.indicator.applyAsDouble(tick) * scale);
                         }
                     }
                 }
@@ -666,7 +668,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     static class LineChart {
 
         /** The indicator. */
-        private final Indicator<? extends Number> indicator;
+        private final ToDoubleFunction<Tick> indicator;
 
         /** The infomation writer. */
         private final Indicator<String> info;
@@ -689,11 +691,24 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
          * @param info
          */
         LineChart(Indicator<? extends Number> indicator, Style style, Indicator<String> info) {
-            this.indicator = indicator;
+            this.indicator = tick -> indicator.valueAt(tick).doubleValue();
             this.color = FXUtils.color(style, "stroke");
             this.width = FXUtils.length(style, "stroke-width", 1);
             this.dashArray = FXUtils.lengths(style, "stroke-dasharray");
             this.info = info == null ? indicator.map(v -> v.toString()) : info;
+        }
+
+        /**
+         * @param indicator
+         * @param style
+         * @param info
+         */
+        LineChart(DoubleIndicator indicator, Style style, Indicator<String> info) {
+            this.indicator = indicator::valueAt;
+            this.color = FXUtils.color(style, "stroke");
+            this.width = FXUtils.length(style, "stroke-width", 1);
+            this.dashArray = FXUtils.lengths(style, "stroke-dasharray");
+            this.info = info == null ? indicator.map(String::valueOf) : info;
         }
     }
 

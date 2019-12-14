@@ -26,7 +26,7 @@ import kiss.WiseTriFunction;
 import kiss.Ⅱ;
 import kiss.Ⅲ;
 
-public abstract class Indicator<T> {
+public abstract class Indicator<T> extends AbstractIndicator<T> {
 
     /** The human-readable name. */
     public final Variable<String> name = Variable.of(getClass().getSimpleName());

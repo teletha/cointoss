@@ -10,7 +10,7 @@
 package trademate.chart.builtin;
 
 import cointoss.Market;
-import cointoss.ticker.Indicator;
+import cointoss.ticker.DoubleIndicator;
 import cointoss.ticker.Tick;
 import cointoss.ticker.Ticker;
 import kiss.Variable;
@@ -47,10 +47,10 @@ public class VolumeIndicator extends PlotScript implements StyleDSL {
         // volume
         int volumeScale = market.service.setting.targetCurrencyMinimumBidSize.scale();
 
-        Indicator<Double> buyVolume = Indicator.build(ticker, Tick::buyVolume);
-        Indicator<Double> sellVolume = Indicator.build(ticker, Tick::sellVolume);
+        DoubleIndicator buyVolume = DoubleIndicator.build(ticker, Tick::buyVolume);
+        DoubleIndicator sellVolume = DoubleIndicator.build(ticker, Tick::sellVolume);
 
-        bottom.line(buyVolume.emaDouble(emaLength.v), Long);
-        bottom.line(sellVolume.emaDouble(emaLength.v), Short);
+        bottom.line(buyVolume.ema(emaLength.v).scale(volumeScale), Long);
+        bottom.line(sellVolume.ema(emaLength.v).scale(volumeScale), Short);
     }
 }
