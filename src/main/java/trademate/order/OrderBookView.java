@@ -9,7 +9,7 @@
  */
 package trademate.order;
 
-import java.util.function.Function;
+import java.util.function.BiFunction;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -125,10 +125,10 @@ public class OrderBookView extends View {
         hideSize.initialize(Num.range(0, 99));
 
         int scale = view.market.service.setting.targetCurrencyScaleSize;
-        longList.renderByNode(displayOrderUnit(TradeMateStyle.BUY, scale))
+        longList.renderByNode(Canvas::new, displayOrderUnit(TradeMateStyle.BUY, scale))
                 .take(hideSize, (unit, size) -> unit.size.isGreaterThanOrEqual(size))
                 .when(User.LeftClick, calculatePrice(longList));
-        shortList.renderByNode(displayOrderUnit(TradeMateStyle.SELL, scale))
+        shortList.renderByNode(Canvas::new, displayOrderUnit(TradeMateStyle.SELL, scale))
                 .take(hideSize, (unit, size) -> unit.size.isGreaterThanOrEqual(size))
                 .when(User.LeftClick, calculatePrice(shortList))
                 .scrollToBottom();
@@ -173,7 +173,7 @@ public class OrderBookView extends View {
      * @param scale
      * @return
      */
-    private Function<OrderBoard, Canvas> displayOrderUnit(stylist.value.Color color, int scale) {
+    private BiFunction<Canvas, OrderBoard, Canvas> displayOrderUnit(stylist.value.Color color, int scale) {
         double width = longList.ui.widthProperty().doubleValue();
         double height = 22;
         double fontSize = 12;
@@ -181,12 +181,15 @@ public class OrderBookView extends View {
         Color background = foreground.deriveColor(0, 1, 1, 0.2);
         Font font = Font.font(fontSize);
 
-        return e -> {
+        return (canvas, e) -> {
+            canvas.setWidth(width);
+            canvas.setHeight(height);
+
             Num size = e.size.scale(scale);
             double range = Math.min(width, size.doubleValue());
 
-            Canvas canvas = new Canvas(width, height);
             GraphicsContext c = canvas.getGraphicsContext2D();
+            c.clearRect(0, 0, width, height);
             c.setFill(background);
             c.fillRect(0, 0, range, height);
 

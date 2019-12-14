@@ -9,9 +9,7 @@
  */
 package trademate;
 
-import static trademate.TradeMateStyle.*;
-
-import java.util.function.Function;
+import java.util.function.BiFunction;
 import java.util.stream.IntStream;
 
 import cointoss.execution.Execution;
@@ -74,8 +72,9 @@ public class ExecutionView extends View {
 
         // configure UI
         takerSize.initialize(IntStream.range(1, 51).boxed());
-        executionList.renderByUI(execution(targetScale, false));
-        executionCumulativeList.renderByUI(execution(targetScale, true)).take(takerSize, (e, size) -> size <= e.accumulative);
+        executionList.renderByUI(() -> make(UILabel.class), execution(targetScale, false));
+        executionCumulativeList.renderByUI(() -> make(UILabel.class), execution(targetScale, true))
+                .take(takerSize, (e, size) -> size <= e.accumulative);
 
         // load execution log
         Viewtify.inWorker(() -> {
@@ -109,12 +108,12 @@ public class ExecutionView extends View {
      * @param accumulative
      * @return
      */
-    private Function<Execution, UILabel> execution(int scale, boolean accumulative) {
-        return e -> {
+    private BiFunction<UILabel, Execution, UILabel> execution(int scale, boolean accumulative) {
+        return (ui, e) -> {
             String text = Chrono.system(e.date).format(Chrono.Time) + "  " + e.price + " " + (accumulative ? scale(e.accumulative, scale)
                     : e.size.scale(scale)) + "  " + e.delay;
 
-            return make(UILabel.class).text(text).styleOnly(Side.of(e.direction));
+            return ui.text(text).styleOnly(TradeMateStyle.Side.of(e.direction));
         };
     }
 
