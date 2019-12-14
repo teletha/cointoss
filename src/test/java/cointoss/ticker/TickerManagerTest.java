@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Test;
 
 import com.google.common.base.Predicate;
 
+import antibug.powerassert.PowerAssertOff;
 import cointoss.execution.Execution;
 import cointoss.util.Chrono;
 
@@ -163,13 +164,14 @@ class TickerManagerTest {
     }
 
     @Test
+    @PowerAssertOff
     void updateLongVolume() {
         // update
         manager.update(Execution.with.buy(1).price(300).date(Base));
 
         // validate
         manager.tickers().to(ticker -> {
-            assert ticker.ticks.first().buyVolume().is(1);
+            assert ticker.ticks.first().buyVolume() == 1d;
         });
 
         // update
@@ -178,12 +180,12 @@ class TickerManagerTest {
 
         // validate
         manager.tickers().take(between(Minute3, Day7)).to(ticker -> {
-            assert ticker.ticks.first().buyVolume().is(3);
-            assert ticker.ticks.last().buyVolume().is(3);
+            assert ticker.ticks.first().buyVolume() == 3d;
+            assert ticker.ticks.last().buyVolume() == 3d;
         });
         manager.tickers().take(between(Second5, Minute1)).to(ticker -> {
-            assert ticker.ticks.first().buyVolume().is(1);
-            assert ticker.ticks.last().buyVolume().is(1);
+            assert ticker.ticks.first().buyVolume() == 1d;
+            assert ticker.ticks.last().buyVolume() == 1d;
         });
 
         // update
@@ -191,10 +193,10 @@ class TickerManagerTest {
 
         // validate
         Ticker ticker = manager.of(Minute1);
-        assert ticker.ticks.getByIndex(0).buyVolume().is(1);
-        assert ticker.ticks.getByIndex(1).buyVolume().is(1);
-        assert ticker.ticks.getByIndex(2).buyVolume().is(1);
-        assert ticker.ticks.getByIndex(3).buyVolume().is(3);
+        assert ticker.ticks.getByIndex(0).buyVolume() == 1d;
+        assert ticker.ticks.getByIndex(1).buyVolume() == 1d;
+        assert ticker.ticks.getByIndex(2).buyVolume() == 1d;
+        assert ticker.ticks.getByIndex(3).buyVolume() == 3d;
     }
 
     @Test
@@ -204,7 +206,7 @@ class TickerManagerTest {
 
         // validate
         manager.tickers().to(ticker -> {
-            assert ticker.ticks.first().sellVolume().is(1);
+            assert ticker.ticks.first().sellVolume() == 1d;
         });
 
         // update
@@ -213,12 +215,12 @@ class TickerManagerTest {
 
         // validate
         manager.tickers().take(between(Minute3, Day7)).to(ticker -> {
-            assert ticker.ticks.first().sellVolume().is(3);
-            assert ticker.ticks.last().sellVolume().is(3);
+            assert ticker.ticks.first().sellVolume() == 3d;
+            assert ticker.ticks.last().sellVolume() == 3d;
         });
         manager.tickers().take(between(Second5, Minute1)).to(ticker -> {
-            assert ticker.ticks.first().sellVolume().is(1);
-            assert ticker.ticks.last().sellVolume().is(1);
+            assert ticker.ticks.first().sellVolume() == 1d;
+            assert ticker.ticks.last().sellVolume() == 1d;
         });
     }
 

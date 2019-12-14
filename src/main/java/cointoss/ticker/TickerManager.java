@@ -32,16 +32,16 @@ public final class TickerManager implements Disposable {
     public final RealtimeTicker realtime = new RealtimeTicker(TimeSpan.Minute1, latest);
 
     /** Total of long volume since application startup. */
-    Num longVolume = Num.ZERO;
+    double longVolume = 0;
 
     /** Total of long price increase since application startup. */
-    Num longPriceIncrease = Num.ZERO;
+    double longPriceIncrease = 0;
 
     /** Total of short volume since application startup. */
-    Num shortVolume = Num.ZERO;
+    double shortVolume = 0;
 
     /** Total of short price decrease since application startup. */
-    Num shortPriceDecrease = Num.ZERO;
+    double shortPriceDecrease = 0;
 
     /** The number of tickers. */
     private final int size = TimeSpan.values().length;
@@ -109,11 +109,11 @@ public final class TickerManager implements Disposable {
 
         // update totality of related values
         if (e.direction == Direction.BUY) {
-            longVolume = longVolume.plus(e.size);
-            longPriceIncrease = longPriceIncrease.plus(e.price.minus(latest.v.price));
+            longVolume += e.size.doubleValue();
+            longPriceIncrease += e.price.doubleValue() - latest.v.price.doubleValue();
         } else {
-            shortVolume = shortVolume.plus(e.size);
-            shortPriceDecrease = shortPriceDecrease.plus(latest.v.price.minus(e.price));
+            shortVolume += e.size.doubleValue();
+            shortPriceDecrease += latest.v.price.doubleValue() - e.price.doubleValue();
         }
 
         // update the latest execution at last

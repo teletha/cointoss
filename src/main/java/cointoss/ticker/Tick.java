@@ -52,16 +52,16 @@ public final class Tick {
     TickerManager realtime;
 
     /** Snapshot of long volume at tick initialization. */
-    Num buyVolume;
+    double buyVolume;
 
     /** Snapshot of long price increase at tick initialization. */
-    Num buyPriceIncrease;
+    double buyPriceIncrease;
 
     /** Snapshot of short volume at tick initialization. */
-    Num sellVolume;
+    double sellVolume;
 
     /** Snapshot of short price decrease at tick initialization. */
-    Num sellPriceDecrease;
+    double sellPriceDecrease;
 
     /**
      * New {@link Tick}.
@@ -176,8 +176,8 @@ public final class Tick {
      * 
      * @return The tick related value.
      */
-    public Num volume() {
-        return buyVolume().plus(sellVolume());
+    public double volume() {
+        return buyVolume() + sellVolume();
     }
 
     /**
@@ -185,8 +185,8 @@ public final class Tick {
      * 
      * @return The tick related value.
      */
-    public Num buyVolume() {
-        return realtime == null ? buyVolume : realtime.longVolume.minus(buyVolume);
+    public double buyVolume() {
+        return realtime == null ? buyVolume : realtime.longVolume - buyVolume;
     }
 
     /**
@@ -194,8 +194,8 @@ public final class Tick {
      * 
      * @return The tick related value.
      */
-    public Num buyPriceIncrease() {
-        return realtime == null ? buyPriceIncrease : realtime.longPriceIncrease.minus(buyPriceIncrease);
+    public double buyPriceIncrease() {
+        return realtime == null ? buyPriceIncrease : realtime.longPriceIncrease - buyPriceIncrease;
     }
 
     /**
@@ -203,8 +203,8 @@ public final class Tick {
      * 
      * @return The tick related value.
      */
-    public Num sellVolume() {
-        return realtime == null ? sellVolume : realtime.shortVolume.minus(sellVolume);
+    public double sellVolume() {
+        return realtime == null ? sellVolume : realtime.shortVolume - sellVolume;
     }
 
     /**
@@ -212,25 +212,25 @@ public final class Tick {
      * 
      * @return The tick related value.
      */
-    public Num sellPriceDecrease() {
-        return realtime == null ? sellPriceDecrease : realtime.shortPriceDecrease.minus(sellPriceDecrease);
+    public double sellPriceDecrease() {
+        return realtime == null ? sellPriceDecrease : realtime.shortPriceDecrease - sellPriceDecrease;
     }
 
     /**
      * @return
      */
-    public Num priceVolatility() {
-        Num upPotencial = buyVolume().isZero() ? Num.ZERO : buyPriceIncrease().divide(buyVolume());
-        Num downPotencial = sellVolume().isZero() ? Num.ZERO : sellPriceDecrease().divide(sellVolume());
-        return upPotencial.divide(downPotencial).scale(2);
+    public double priceVolatility() {
+        double upPotencial = buyVolume() == 0d ? 0 : buyPriceIncrease() / buyVolume();
+        double downPotencial = sellVolume() == 0d ? 0 : sellPriceDecrease() / sellVolume();
+        return upPotencial / downPotencial;
     }
 
-    public Num upRatio() {
-        return buyVolume().isZero() ? Num.ZERO : buyPriceIncrease().multiply(buyVolume());
+    public double upRatio() {
+        return buyVolume() == 0d ? 0 : buyPriceIncrease() * buyVolume();
     }
 
-    public Num downRatio() {
-        return sellVolume().isZero() ? Num.ZERO : sellPriceDecrease().multiply(sellVolume());
+    public double downRatio() {
+        return sellVolume() == 0d ? 0 : sellPriceDecrease() * sellVolume();
     }
 
     /**

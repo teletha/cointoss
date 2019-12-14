@@ -139,7 +139,7 @@ public abstract class PlotScript implements StyleDSL {
          * 
          * @param indicator A indicator to plot.
          */
-        public final void line(Indicator<Num> indicator) {
+        public final void line(Indicator<? extends Number> indicator) {
             line(indicator, null);
         }
 
@@ -148,7 +148,7 @@ public abstract class PlotScript implements StyleDSL {
          * 
          * @param indicator A indicator to plot.
          */
-        public final void line(Indicator<Num> indicator, Style style) {
+        public final void line(Indicator<? extends Number> indicator, Style style) {
             line(indicator, style, null);
         }
 
@@ -157,7 +157,7 @@ public abstract class PlotScript implements StyleDSL {
          * 
          * @param indicator A indicator to plot.
          */
-        public final void line(Indicator<Num> indicator, Style style, Indicator<String> info) {
+        public final void line(Indicator<? extends Number> indicator, Style style, Indicator<String> info) {
             if (style == null) {
                 style = ChartStyles.MouseTrack;
             }

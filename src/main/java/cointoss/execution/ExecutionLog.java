@@ -10,9 +10,9 @@
 package cointoss.execution;
 
 import static cointoss.Direction.*;
-import static java.nio.charset.StandardCharsets.ISO_8859_1;
+import static java.nio.charset.StandardCharsets.*;
 import static java.nio.file.StandardOpenOption.*;
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -772,20 +772,20 @@ public class ExecutionLog {
                     CsvWriter writer = buildCsvWriter(new ZstdOutputStream(fast.newOutputStream(), 1));
                     ticker.ticks.each(tick -> {
                         long id = tick.openId;
-                        Num buy = tick.buyVolume().divide(2);
-                        Num sell = tick.sellVolume().divide(2);
+                        double buy = tick.buyVolume() / 2;
+                        double sell = tick.sellVolume() / 2;
 
-                        if (buy.isZero()) {
-                            if (sell.isZero()) return;
-                            buy = tick.sellVolume().divide(4);
-                            sell = tick.sellVolume().divide(4);
-                        } else if (sell.isZero()) {
-                            buy = tick.buyVolume().divide(4);
-                            sell = tick.buyVolume().divide(4);
+                        if (buy == 0d) {
+                            if (sell == 0d) return;
+                            buy = tick.sellVolume() / 4;
+                            sell = tick.sellVolume() / 4;
+                        } else if (sell == 0d) {
+                            buy = tick.buyVolume() / 4;
+                            sell = tick.buyVolume() / 4;
                         }
 
                         Direction[] sides = tick.isBull() ? new Direction[] {SELL, BUY, SELL, BUY} : new Direction[] {BUY, SELL, BUY, SELL};
-                        Num[] sizes = tick.isBull() ? new Num[] {sell, buy, sell, buy} : new Num[] {buy, sell, buy, sell};
+                        double[] sizes = tick.isBull() ? new double[] {sell, buy, sell, buy} : new double[] {buy, sell, buy, sell};
                         Num[] prices = tick.isBull() ? new Num[] {tick.openPrice, tick.lowPrice(), tick.highPrice(), tick.closePrice()}
                                 : new Num[] {tick.openPrice, tick.highPrice(), tick.lowPrice(), tick.closePrice()};
 

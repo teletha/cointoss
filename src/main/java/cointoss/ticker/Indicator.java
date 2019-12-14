@@ -204,6 +204,27 @@ public abstract class Indicator<T> {
      * @param size A tick size.
      * @return A wrapped indicator.
      */
+    public final Indicator<Double> emaDouble(int size) {
+        double multiplier = 2.0 / (size + 1);
+
+        return (Indicator<Double>) memoize((size + 1) * 4, (tick, self) -> {
+            if (tick.previous() == null) {
+                return valueAt(tick);
+            }
+
+            double previous = ((Double) self.apply(tick.previous()));
+            double now = (Double) valueAt(tick);
+
+            return (T) Double.valueOf(((now - previous) * multiplier) + previous);
+        });
+    }
+
+    /**
+     * Wrap by exponetial moving average.
+     * 
+     * @param size A tick size.
+     * @return A wrapped indicator.
+     */
     public final Indicator<Num> ema(int size) {
         double multiplier = 2.0 / (size + 1);
 

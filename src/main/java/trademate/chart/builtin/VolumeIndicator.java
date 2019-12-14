@@ -13,7 +13,6 @@ import cointoss.Market;
 import cointoss.ticker.Indicator;
 import cointoss.ticker.Tick;
 import cointoss.ticker.Ticker;
-import cointoss.util.Num;
 import kiss.Variable;
 import stylist.Style;
 import stylist.StyleDSL;
@@ -48,10 +47,10 @@ public class VolumeIndicator extends PlotScript implements StyleDSL {
         // volume
         int volumeScale = market.service.setting.targetCurrencyMinimumBidSize.scale();
 
-        Indicator<Num> buyVolume = Indicator.build(ticker, Tick::buyVolume);
-        Indicator<Num> sellVolume = Indicator.build(ticker, Tick::sellVolume);
+        Indicator<Double> buyVolume = Indicator.build(ticker, Tick::buyVolume);
+        Indicator<Double> sellVolume = Indicator.build(ticker, Tick::sellVolume);
 
-        bottom.line(buyVolume.ema(emaLength).scale(volumeScale), Long);
-        bottom.line(sellVolume.ema(emaLength).scale(volumeScale), Short);
+        bottom.line(buyVolume.emaDouble(emaLength.v), Long);
+        bottom.line(sellVolume.emaDouble(emaLength.v), Short);
     }
 }

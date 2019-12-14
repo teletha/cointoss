@@ -43,9 +43,9 @@ public class VolumeCross extends Trader {
     @Override
     protected void declare(Market market, FundManager fund) {
         Ticker ticker = market.tickers.of(TimeSpan.Minute5);
-        Indicator<Num> buyVolume = Indicator.build(ticker, Tick::buyVolume);
-        Indicator<Num> sellVolume = Indicator.build(ticker, Tick::sellVolume);
-        Indicator<Num> volumeDiff = buyVolume.map(sellVolume, (b, s) -> b.minus(s))
+        Indicator<Double> buyVolume = Indicator.build(ticker, Tick::buyVolume);
+        Indicator<Double> sellVolume = Indicator.build(ticker, Tick::sellVolume);
+        Indicator<Num> volumeDiff = buyVolume.map(sellVolume, (b, s) -> Num.of(b - s))
                 .sma(7)
                 .scale(market.service.setting.targetCurrencyScaleSize);
         Indicator<Boolean> upPrediction = Indicator.build(ticker, Tick::isBear).map(volumeDiff, (t, d) -> t && d.isPositive());
