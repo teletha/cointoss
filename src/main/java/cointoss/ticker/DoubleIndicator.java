@@ -71,11 +71,9 @@ public abstract class DoubleIndicator extends IndicatableNumberBase<Double, Doub
     protected abstract double valueAtRounded(Tick tick);
 
     /**
-     * Wrap by scaled value.
-     * 
-     * @param scale Scale size.
-     * @return A wrapped indicator.
+     * {@inheritDoc}
      */
+    @Override
     public final DoubleIndicator scale(int scale) {
         return new DoubleIndicator(this) {
 

@@ -100,4 +100,12 @@ public abstract class IndicatableNumberBase<N extends Number, Self extends Indic
     public final Self wma(Variable<? extends Number> size) {
         return wma(size.v.intValue());
     }
+
+    /**
+     * Gets an indicator that returns a number rounded to the specified number of decimal places.
+     * 
+     * @param size Scale A number of decimal places.
+     * @return Rounded indicator.
+     */
+    public abstract Self scale(int size);
 }

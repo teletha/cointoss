@@ -22,9 +22,6 @@ import kiss.I;
 
 public abstract class Indicator<T> extends Indicatable<T, Indicator<T>> {
 
-    /** The wrapped {@link Indicator}. (OPTIONAL: may be null) */
-    protected final Indicator wrapped;
-
     /**
      * Build with the target {@link Ticker}.
      * 
@@ -32,7 +29,6 @@ public abstract class Indicator<T> extends Indicatable<T, Indicator<T>> {
      */
     protected Indicator(Function<Tick, Tick> normalizer) {
         super(normalizer);
-        this.wrapped = null;
     }
 
     /**
@@ -42,7 +38,6 @@ public abstract class Indicator<T> extends Indicatable<T, Indicator<T>> {
      */
     protected Indicator(Indicator indicator) {
         super(indicator.normalizer);
-        this.wrapped = Objects.requireNonNull(indicator);
     }
 
     /**
@@ -66,22 +61,6 @@ public abstract class Indicator<T> extends Indicatable<T, Indicator<T>> {
     protected abstract T valueAtRounded(Tick tick);
 
     /**
-     * Wrap by scaled value.
-     * 
-     * @param scale Scale size.
-     * @return A wrapped indicator.
-     */
-    public final Indicator<Num> scale(int scale) {
-        return new Indicator<Num>(this) {
-
-            @Override
-            protected Num valueAtRounded(Tick tick) {
-                return ((Num) wrapped.valueAt(tick)).scale(scale);
-            }
-        };
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
@@ -96,7 +75,7 @@ public abstract class Indicator<T> extends Indicatable<T, Indicator<T>> {
 
             @Override
             protected T valueAtRounded(Tick tick) {
-                if (count == 0) return (T) wrapped.valueAtRounded(tick);
+                if (count == 0) return Indicator.this.valueAtRounded(tick);
                 if (tick.closePrice == null /* The latest tick MUST NOT cache. */) return calculator.apply(tick, this::valueAt);
 
                 try {
@@ -111,7 +90,6 @@ public abstract class Indicator<T> extends Indicatable<T, Indicator<T>> {
                 }
             }
         };
-
     }
 
     /**

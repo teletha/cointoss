@@ -66,11 +66,9 @@ public abstract class NumIndicator extends IndicatableNumberBase<Num, NumIndicat
     protected abstract Num valueAtRounded(Tick tick);
 
     /**
-     * Wrap by scaled value.
-     * 
-     * @param scale Scale size.
-     * @return A wrapped indicator.
+     * {@inheritDoc}
      */
+    @Override
     public final NumIndicator scale(int scale) {
         return new NumIndicator(this) {
 

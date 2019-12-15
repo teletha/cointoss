@@ -155,17 +155,6 @@ class IndicatorTest extends TickerTestSupport {
     }
 
     @Test
-    void scale() {
-        Ticker ticker = ticker(TimeSpan.Second5, 1.23, 2.34, 3.45, 4.56, 5.67);
-        Indicator<Num> indicator = Indicator.build(ticker, tick -> tick.openPrice).scale(1);
-        assert indicator.valueAt(ticker.ticks.getByIndex(0)).is(1.2);
-        assert indicator.valueAt(ticker.ticks.getByIndex(1)).is(2.3);
-        assert indicator.valueAt(ticker.ticks.getByIndex(2)).is(3.5);
-        assert indicator.valueAt(ticker.ticks.getByIndex(3)).is(4.6);
-        assert indicator.valueAt(ticker.ticks.getByIndex(4)).is(5.7);
-    }
-
-    @Test
     void trueRange() {
         Ticker ticker = ticker(TimeSpan.Second5, 1, 2, 4, 8, 16);
         NumIndicator indicator = Indicator.trueRange(ticker);
