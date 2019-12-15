@@ -22,6 +22,7 @@ import javafx.scene.text.FontSmoothingType;
 import cointoss.order.OrderBoard;
 import cointoss.order.OrderBookManager;
 import cointoss.util.Num;
+import cointoss.util.Primitives;
 import kiss.WiseRunnable;
 import stylist.Style;
 import stylist.StyleDSL;
@@ -126,10 +127,10 @@ public class OrderBookView extends View {
 
         int scale = view.market.service.setting.targetCurrencyScaleSize;
         longList.renderByNode(Canvas::new, displayOrderUnit(TradeMateStyle.BUY, scale))
-                .take(hideSize, (unit, size) -> unit.size.isGreaterThanOrEqual(size))
+                .take(hideSize, (unit, size) -> unit.size >= size.doubleValue())
                 .when(User.LeftClick, calculatePrice(longList));
         shortList.renderByNode(Canvas::new, displayOrderUnit(TradeMateStyle.SELL, scale))
-                .take(hideSize, (unit, size) -> unit.size.isGreaterThanOrEqual(size))
+                .take(hideSize, (unit, size) -> unit.size >= size.doubleValue())
                 .when(User.LeftClick, calculatePrice(shortList))
                 .scrollToBottom();
 
@@ -185,8 +186,8 @@ public class OrderBookView extends View {
             canvas.setWidth(width);
             canvas.setHeight(height);
 
-            Num size = e.size.scale(scale);
-            double range = Math.min(width, size.doubleValue());
+            double size = Primitives.roundDecimal(e.size, scale);
+            double range = Math.min(width, size);
 
             GraphicsContext c = canvas.getGraphicsContext2D();
             c.clearRect(0, 0, width, height);

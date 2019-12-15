@@ -42,14 +42,14 @@ class OrderBookTest {
         book.update(unit(1001, 1));
         assert list.get(0).price.is(1002);
         assert list.get(1).price.is(1001);
-        assert list.get(1).size.is(1);
+        assert list.get(1).size == 1d;
         assert list.get(2).price.is(1000);
 
         // replace
         book.update(unit(1001, 2));
         assert list.get(0).price.is(1002);
         assert list.get(1).price.is(1001);
-        assert list.get(1).size.is(2);
+        assert list.get(1).size == 2d;
         assert list.get(2).price.is(1000);
 
         // remove
@@ -74,14 +74,14 @@ class OrderBookTest {
         book.update(unit(1001, 1));
         assert list.get(0).price.is(1002);
         assert list.get(1).price.is(1001);
-        assert list.get(1).size.is(1);
+        assert list.get(1).size == 1d;
         assert list.get(2).price.is(1000);
 
         // replace
         book.update(unit(1001, 2));
         assert list.get(0).price.is(1002);
         assert list.get(1).price.is(1001);
-        assert list.get(1).size.is(2);
+        assert list.get(1).size == 2d;
         assert list.get(2).price.is(1000);
 
         // remove
@@ -341,7 +341,7 @@ class OrderBookTest {
      */
     private void assertList(List<OrderBoard> list, int index, int price, int size, int total) {
         OrderBoard unit = list.get(index);
-        assert unit.size.is(size);
+        assert unit.size == size;
         assert unit.price.is(price);
         // assert unit.total.is(total);
     }
@@ -354,7 +354,7 @@ class OrderBookTest {
      * @return
      */
     private List<OrderBoard> unit(int price, int size) {
-        return Collections.singletonList(new OrderBoard(Num.of(price), Num.of(size)));
+        return Collections.singletonList(new OrderBoard(Num.of(price), size));
     }
 
     @Test

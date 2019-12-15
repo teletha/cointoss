@@ -12,9 +12,6 @@ package cointoss.order;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @version 2018/04/15 20:10:04
- */
 public class OrderBookChange {
 
     /** The list of long orders. */

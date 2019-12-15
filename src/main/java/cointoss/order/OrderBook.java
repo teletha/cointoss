@@ -22,6 +22,7 @@ import org.magicwerk.brownies.collections.GapList;
 import cointoss.Direction;
 import cointoss.MarketSetting;
 import cointoss.util.Num;
+import cointoss.util.Primitives;
 import kiss.Variable;
 
 public class OrderBook {
@@ -153,7 +154,7 @@ public class OrderBook {
             while (price != null && price.isGreaterThan(side, hint)) {
                 OrderBoard removed = base.remove(price);
 
-                group.update(price, removed.size.negate());
+                group.update(price, removed.size * -1);
                 group.fix(hint);
 
                 price = base.firstKey();
@@ -169,12 +170,12 @@ public class OrderBook {
     public void update(List<OrderBoard> units) {
         operator.accept(() -> {
             for (OrderBoard board : units) {
-                if (board.size.isZero()) {
+                if (Num.of(board.size).isZero()) {
                     // remove
                     OrderBoard removed = base.remove(board.price);
 
                     if (removed != null) {
-                        group.update(removed.price, removed.size.negate());
+                        group.update(removed.price, removed.size * -1);
                     }
                 } else {
                     // add
@@ -183,7 +184,7 @@ public class OrderBook {
                     if (previous == null) {
                         group.update(board.price, board.size);
                     } else {
-                        group.update(board.price, board.size.minus(previous.size));
+                        group.update(board.price, board.size - previous.size);
                     }
                 }
             }
@@ -239,7 +240,7 @@ public class OrderBook {
          * @param price
          * @param size
          */
-        private void update(Num price, Num size) {
+        private void update(Num price, double size) {
             price = calculateGroupedPrice(price, range);
 
             if (side == Direction.BUY) {
@@ -254,7 +255,7 @@ public class OrderBook {
          * 
          * @param add
          */
-        private void head(Num price, Num size) {
+        private void head(Num price, double size) {
             for (int i = 0; i < boards.size(); i++) {
                 OrderBoard unit = boards.get(i);
 
@@ -262,9 +263,9 @@ public class OrderBook {
                     boards.set(i, new OrderBoard(price, size));
                     return;
                 } else if (unit.price.is(price)) {
-                    Num remaining = unit.size.plus(size);
+                    double remaining = unit.size + size;
 
-                    if (remaining.scale(scale, RoundingMode.DOWN).isNegativeOrZero()) {
+                    if (Primitives.roundDecimal(remaining, scale, RoundingMode.DOWN) <= 0) {
                         boards.remove(i);
                     } else {
                         boards.set(i, new OrderBoard(unit.price, remaining));
@@ -283,7 +284,7 @@ public class OrderBook {
          * 
          * @param add
          */
-        private void tail(Num price, Num size) {
+        private void tail(Num price, double size) {
             for (int i = boards.size() - 1; 0 <= i; i--) {
                 OrderBoard unit = boards.get(i);
 
@@ -291,9 +292,9 @@ public class OrderBook {
                     boards.set(i, new OrderBoard(price, size));
                     return;
                 } else if (unit.price.is(price)) {
-                    Num remaining = unit.size.plus(size);
+                    double remaining = unit.size + size;
 
-                    if (remaining.scale(scale, RoundingMode.DOWN).isNegativeOrZero()) {
+                    if (Primitives.roundDecimal(remaining, scale, RoundingMode.DOWN) <= 0) {
                         boards.remove(i);
                     } else {
                         boards.set(i, new OrderBoard(unit.price, remaining));

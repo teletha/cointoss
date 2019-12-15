@@ -17,7 +17,13 @@ public class OrderBoard implements Comparable<OrderBoard> {
     public Num price;
 
     /** The board size. */
-    public Num size;
+    public double size;
+
+    /**
+     * For I#make.
+     */
+    OrderBoard() {
+    }
 
     /**
      * Simple Builder.
@@ -25,7 +31,7 @@ public class OrderBoard implements Comparable<OrderBoard> {
      * @param price A price.
      * @param size A total size.
      */
-    public OrderBoard(Num price, Num size) {
+    public OrderBoard(Num price, double size) {
         this.price = price;
         this.size = size;
     }

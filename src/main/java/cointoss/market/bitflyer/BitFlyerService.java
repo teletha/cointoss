@@ -22,6 +22,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
+import javafx.scene.control.TextInputDialog;
+
 import org.apache.commons.codec.digest.HmacAlgorithms;
 import org.apache.commons.codec.digest.HmacUtils;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -35,14 +37,13 @@ import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.execution.Execution;
 import cointoss.order.Order;
+import cointoss.order.OrderBoard;
 import cointoss.order.OrderBookChange;
 import cointoss.order.OrderState;
 import cointoss.order.OrderType;
-import cointoss.order.OrderBoard;
 import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
-import javafx.scene.control.TextInputDialog;
 import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
@@ -590,14 +591,14 @@ class BitFlyerService extends MarketService {
 
                     for (int i = 0; i < asks.size(); i++) {
                         JsonObject ask = asks.get(i).getAsJsonObject();
-                        change.asks.add(new OrderBoard(Num.of(ask.get("price").getAsString()), Num.of(ask.get("size").getAsString())));
+                        change.asks.add(new OrderBoard(Num.of(ask.get("price").getAsString()), ask.get("size").getAsDouble()));
                     }
 
                     JsonArray bids = e.get("bids").getAsJsonArray();
 
                     for (int i = 0; i < bids.size(); i++) {
                         JsonObject bid = bids.get(i).getAsJsonObject();
-                        change.bids.add(new OrderBoard(Num.of(bid.get("price").getAsString()), Num.of(bid.get("size").getAsString())));
+                        change.bids.add(new OrderBoard(Num.of(bid.get("price").getAsString()), bid.get("size").getAsDouble()));
                     }
                     return change;
                 });
