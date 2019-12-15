@@ -58,9 +58,9 @@ class DoubleIndicatorTest extends TickerTestSupport {
     @Test
     void mapWith() {
         Ticker ticker = ticker(TimeSpan.Second5, 1, 2, 3, 4, 5);
-        Indicator<Num> open = Indicator.build(ticker, tick -> tick.openPrice);
-        Indicator<Num> low = Indicator.build(ticker, tick -> tick.lowPrice);
-        Indicatable<Num> indicator = open.map(low, Num::plus);
+        DoubleIndicator open = DoubleIndicator.build(ticker, tick -> tick.openPrice.doubleValue());
+        DoubleIndicator low = DoubleIndicator.build(ticker, tick -> tick.lowPrice.doubleValue());
+        Indicatable<Num> indicator = open.map(low, (o, l) -> Num.of(o).plus(l));
         assert indicator.valueAt(ticker.ticks.getByIndex(0)).is(2);
         assert indicator.valueAt(ticker.ticks.getByIndex(1)).is(4);
         assert indicator.valueAt(ticker.ticks.getByIndex(2)).is(6);
@@ -69,14 +69,41 @@ class DoubleIndicatorTest extends TickerTestSupport {
     }
 
     @Test
+    void mapWith2() {
+        Ticker ticker = ticker(TimeSpan.Second5, 1, 2, 3, 4, 5);
+        DoubleIndicator open = DoubleIndicator.build(ticker, tick -> tick.openPrice.doubleValue());
+        DoubleIndicator low = DoubleIndicator.build(ticker, tick -> tick.lowPrice.doubleValue());
+        DoubleIndicator high = DoubleIndicator.build(ticker, tick -> tick.highPrice.doubleValue());
+        Indicatable<Num> indicator = open.map(low, high, (o, l, h) -> Num.of(o).plus(l).plus(h));
+        assert indicator.valueAt(ticker.ticks.getByIndex(0)).is(3);
+        assert indicator.valueAt(ticker.ticks.getByIndex(1)).is(6);
+        assert indicator.valueAt(ticker.ticks.getByIndex(2)).is(9);
+        assert indicator.valueAt(ticker.ticks.getByIndex(3)).is(12);
+        assert indicator.valueAt(ticker.ticks.getByIndex(4)).is(15);
+    }
+
+    @Test
     void mapToDouble() {
         Ticker ticker = ticker(TimeSpan.Second5, 1, 2, 3, 4, 5);
-        DoubleIndicator indicator = DoubleIndicator.build(ticker, tick -> tick.openPrice.doubleValue()).mapToDouble(v -> v + 1);
+        DoubleIndicator indicator = DoubleIndicator.build(ticker, tick -> tick.openPrice.doubleValue()).dmap(v -> v + 1);
         assert indicator.valueAt(ticker.ticks.getByIndex(0)) == 2d;
         assert indicator.valueAt(ticker.ticks.getByIndex(1)) == 3d;
         assert indicator.valueAt(ticker.ticks.getByIndex(2)) == 4d;
         assert indicator.valueAt(ticker.ticks.getByIndex(3)) == 5d;
         assert indicator.valueAt(ticker.ticks.getByIndex(4)) == 6d;
+    }
+
+    @Test
+    void mapToDoubleWith() {
+        Ticker ticker = ticker(TimeSpan.Second5, 1, 2, 3, 4, 5);
+        DoubleIndicator open = DoubleIndicator.build(ticker, tick -> tick.openPrice.doubleValue());
+        DoubleIndicator low = DoubleIndicator.build(ticker, tick -> tick.lowPrice.doubleValue());
+        DoubleIndicator indicator = open.dmap(low, (o, l) -> o + l);
+        assert indicator.valueAt(ticker.ticks.getByIndex(0)) == 2d;
+        assert indicator.valueAt(ticker.ticks.getByIndex(1)) == 4d;
+        assert indicator.valueAt(ticker.ticks.getByIndex(2)) == 6d;
+        assert indicator.valueAt(ticker.ticks.getByIndex(3)) == 8d;
+        assert indicator.valueAt(ticker.ticks.getByIndex(4)) == 10d;
     }
 
     @Test

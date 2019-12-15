@@ -12,6 +12,7 @@ package cointoss.ticker;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.function.BiFunction;
+import java.util.function.DoubleBinaryOperator;
 import java.util.function.Function;
 import java.util.function.ToDoubleFunction;
 
@@ -21,7 +22,6 @@ import com.google.common.cache.CacheBuilder;
 import cointoss.util.Primitives;
 import kiss.I;
 import kiss.Variable;
-import kiss.WiseTriFunction;
 import kiss.Ⅱ;
 import kiss.Ⅲ;
 
@@ -96,24 +96,6 @@ public abstract class DoubleIndicator extends Indicatable<Double> {
      */
     public final <With1, With2> Indicator<Ⅲ<Double, With1, With2>> combine(Indicator<With1> indicator1, Indicator<With2> indicator2) {
         return map(indicator1, indicator2, (a, b, c) -> I.pair(a, b, c));
-    }
-
-    /**
-     * Wrap by the calculation result between {@link DoubleIndicator}s.
-     * 
-     * @param indicator1
-     * @param indicator2
-     * @param calculater
-     * @return
-     */
-    public final <With1, With2, Out> Indicator<Out> map(Indicator<With1> indicator1, Indicator<With2> indicator2, WiseTriFunction<Double, With1, With2, Out> calculater) {
-        return new Indicator<Out>(normalizer) {
-
-            @Override
-            protected Out valueAtRounded(Tick tick) {
-                return calculater.apply(DoubleIndicator.this.doubleAt(tick), indicator1.valueAt(tick), indicator2.valueAt(tick));
-            }
-        };
     }
 
     /**

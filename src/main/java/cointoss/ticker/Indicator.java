@@ -94,24 +94,6 @@ public abstract class Indicator<T> extends Indicatable<T> {
     }
 
     /**
-     * Wrap by the calculation result between {@link Indicator}s.
-     * 
-     * @param indicator1
-     * @param indicator2
-     * @param calculater
-     * @return
-     */
-    public final <With1, With2, Out> Indicator<Out> map(Indicator<With1> indicator1, Indicator<With2> indicator2, WiseTriFunction<T, With1, With2, Out> calculater) {
-        return new Indicator<>(this) {
-
-            @Override
-            protected Out valueAtRounded(Tick tick) {
-                return calculater.apply((T) wrapped.valueAtRounded(tick), indicator1.valueAt(tick), indicator2.valueAt(tick));
-            }
-        };
-    }
-
-    /**
      * Wrap by scaled value.
      * 
      * @param scale Scale size.

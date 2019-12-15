@@ -69,14 +69,41 @@ class IndicatorTest extends TickerTestSupport {
     }
 
     @Test
+    void mapWith2() {
+        Ticker ticker = ticker(TimeSpan.Second5, 1, 2, 3, 4, 5);
+        Indicator<Num> open = Indicator.build(ticker, tick -> tick.openPrice);
+        Indicator<Num> low = Indicator.build(ticker, tick -> tick.lowPrice);
+        Indicator<Num> high = Indicator.build(ticker, tick -> tick.highPrice);
+        Indicatable<Num> indicator = open.map(low, high, (o, l, h) -> o.plus(l).plus(h));
+        assert indicator.valueAt(ticker.ticks.getByIndex(0)).is(3);
+        assert indicator.valueAt(ticker.ticks.getByIndex(1)).is(6);
+        assert indicator.valueAt(ticker.ticks.getByIndex(2)).is(9);
+        assert indicator.valueAt(ticker.ticks.getByIndex(3)).is(12);
+        assert indicator.valueAt(ticker.ticks.getByIndex(4)).is(15);
+    }
+
+    @Test
     void mapToDouble() {
         Ticker ticker = ticker(TimeSpan.Second5, 1, 2, 3, 4, 5);
-        DoubleIndicator indicator = Indicator.build(ticker, tick -> tick).mapToDouble(t -> t.openPrice.doubleValue());
+        DoubleIndicator indicator = Indicator.build(ticker, tick -> tick).dmap(t -> t.openPrice.doubleValue());
         assert indicator.valueAt(ticker.ticks.getByIndex(0)) == 1d;
         assert indicator.valueAt(ticker.ticks.getByIndex(1)) == 2d;
         assert indicator.valueAt(ticker.ticks.getByIndex(2)) == 3d;
         assert indicator.valueAt(ticker.ticks.getByIndex(3)) == 4d;
         assert indicator.valueAt(ticker.ticks.getByIndex(4)) == 5d;
+    }
+
+    @Test
+    void mapToDoubleWith() {
+        Ticker ticker = ticker(TimeSpan.Second5, 1, 2, 3, 4, 5);
+        Indicator<Num> open = Indicator.build(ticker, tick -> tick.openPrice);
+        Indicator<Num> low = Indicator.build(ticker, tick -> tick.lowPrice);
+        DoubleIndicator indicator = open.dmap(low, (o, l) -> o.plus(l).doubleValue());
+        assert indicator.valueAt(ticker.ticks.getByIndex(0)) == 2d;
+        assert indicator.valueAt(ticker.ticks.getByIndex(1)) == 4d;
+        assert indicator.valueAt(ticker.ticks.getByIndex(2)) == 6d;
+        assert indicator.valueAt(ticker.ticks.getByIndex(3)) == 8d;
+        assert indicator.valueAt(ticker.ticks.getByIndex(4)) == 10d;
     }
 
     @Test
