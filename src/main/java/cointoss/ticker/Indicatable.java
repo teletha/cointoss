@@ -9,10 +9,14 @@
  */
 package cointoss.ticker;
 
+import java.util.concurrent.ExecutionException;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.ToDoubleBiFunction;
 import java.util.function.ToDoubleFunction;
+
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 
 import cointoss.util.Num;
 import kiss.I;
@@ -65,6 +69,14 @@ public abstract class Indicatable<T, Self extends Indicatable<T, Self>> {
         }
         return actualSize;
     }
+
+    /**
+     * Creates a new {@link Indicatable} of the same type as itself.
+     * 
+     * @param delegator Actual process with recursive call helper.
+     * @return New created {@link Indicatable}.
+     */
+    protected abstract Self build(BiFunction<Tick, Self, T> delegator);
 
     /**
      * Return the value of this {@link Indicator}.
@@ -288,7 +300,26 @@ public abstract class Indicatable<T, Self extends Indicatable<T, Self>> {
      * @param calculator A memoize function with recursive call helper.
      * @return Memoized {@link Indicatable}.
      */
-    public abstract Self memoize(int limit, BiFunction<Tick, Function<Tick, T>, T> calculator);
+    public final Self memoize(int limit, BiFunction<Tick, Function<Tick, T>, T> calculator) {
+        Cache<Tick, T> cache = CacheBuilder.newBuilder().maximumSize(8192).weakKeys().weakValues().build();
+        int[] count = {limit};
+
+        return build((tick, created) -> {
+            if (count[0] == 0) return valueAt(tick);
+            if (tick.closePrice == null /* The latest tick MUST NOT cache. */) return calculator.apply(tick, created::valueAt);
+
+            try {
+                return cache.get(tick, () -> calculator.apply(tick, t -> {
+                    count[0] = count[0] - 1;
+                    T v = created.valueAt(t);
+                    count[0] = count[0] + 1;
+                    return v;
+                }));
+            } catch (ExecutionException e) {
+                throw I.quiet(e);
+            }
+        });
+    }
 
     /**
      * Acquires the stream in which the indicator value flows at the specified timing.

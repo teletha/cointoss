@@ -10,15 +10,10 @@
 package cointoss.ticker;
 
 import java.util.Objects;
-import java.util.concurrent.ExecutionException;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-
 import cointoss.util.Num;
-import kiss.I;
 
 public abstract class Indicator<T> extends Indicatable<T, Indicator<T>> {
 
@@ -29,15 +24,6 @@ public abstract class Indicator<T> extends Indicatable<T, Indicator<T>> {
      */
     protected Indicator(Function<Tick, Tick> normalizer) {
         super(normalizer);
-    }
-
-    /**
-     * Build with the delegation {@link Indicator}.
-     * 
-     * @param indicator A {@link Indicator} to delegate.
-     */
-    protected Indicator(Indicator indicator) {
-        super(indicator.normalizer);
     }
 
     /**
@@ -64,30 +50,12 @@ public abstract class Indicator<T> extends Indicatable<T, Indicator<T>> {
      * {@inheritDoc}
      */
     @Override
-    public final Indicator<T> memoize(int limit, BiFunction<Tick, Function<Tick, T>, T> calculator) {
-        return new Indicator<T>(this) {
-
-            /** CACHE */
-            private final Cache<Tick, T> cache = CacheBuilder.newBuilder().maximumSize(8192).weakKeys().weakValues().build();
-
-            /** Call limit to avoid stack over flow. */
-            private int count = limit;
+    protected Indicator<T> build(BiFunction<Tick, Indicator<T>, T> delegator) {
+        return new Indicator<>(normalizer) {
 
             @Override
             protected T valueAtRounded(Tick tick) {
-                if (count == 0) return Indicator.this.valueAtRounded(tick);
-                if (tick.closePrice == null /* The latest tick MUST NOT cache. */) return calculator.apply(tick, this::valueAt);
-
-                try {
-                    return cache.get(tick, () -> calculator.apply(tick, t -> {
-                        count--;
-                        T v = this.valueAt(t);
-                        count++;
-                        return v;
-                    }));
-                } catch (ExecutionException e) {
-                    throw I.quiet(e);
-                }
+                return delegator.apply(tick, this);
             }
         };
     }

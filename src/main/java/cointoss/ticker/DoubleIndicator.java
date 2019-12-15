@@ -74,6 +74,20 @@ public abstract class DoubleIndicator extends IndicatableNumberBase<Double, Doub
      * {@inheritDoc}
      */
     @Override
+    protected DoubleIndicator build(BiFunction<Tick, DoubleIndicator, Double> delegator) {
+        return new DoubleIndicator(normalizer) {
+
+            @Override
+            protected double valueAtRounded(Tick tick) {
+                return delegator.apply(tick, this);
+            }
+        };
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public final DoubleIndicator scale(int scale) {
         return new DoubleIndicator(this) {
 
@@ -166,39 +180,6 @@ public abstract class DoubleIndicator extends IndicatableNumberBase<Double, Doub
                 return value / (actualSize * (actualSize + 1) / 2);
             }
         }.memoize();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public final DoubleIndicator memoize(int limit, BiFunction<Tick, Function<Tick, Double>, Double> calculator) {
-        return new DoubleIndicator(this) {
-
-            /** CACHE */
-            private final Cache<Tick, Double> cache = CacheBuilder.newBuilder().maximumSize(8192).weakKeys().weakValues().build();
-
-            /** Call limit to avoid stack over flow. */
-            private int count = limit;
-
-            @Override
-            protected double valueAtRounded(Tick tick) {
-                if (count == 0) return wrapped.valueAtRounded(tick);
-                if (tick.closePrice == null /* The latest tick MUST NOT cache. */) return calculator.apply(tick, this::valueAt);
-
-                try {
-                    return cache.get(tick, () -> calculator.apply(tick, t -> {
-                        count--;
-                        double v = this.doubleAt(t);
-                        count++;
-                        return v;
-                    }));
-                } catch (ExecutionException e) {
-                    throw I.quiet(e);
-                }
-            }
-        };
-
     }
 
     /**

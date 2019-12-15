@@ -10,15 +10,10 @@
 package cointoss.ticker;
 
 import java.util.Objects;
-import java.util.concurrent.ExecutionException;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-
 import cointoss.util.Num;
-import kiss.I;
 
 public abstract class NumIndicator extends IndicatableNumberBase<Num, NumIndicator> {
 
@@ -64,6 +59,20 @@ public abstract class NumIndicator extends IndicatableNumberBase<Num, NumIndicat
      * @return A time-based value.
      */
     protected abstract Num valueAtRounded(Tick tick);
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected NumIndicator build(BiFunction<Tick, NumIndicator, Num> delegator) {
+        return new NumIndicator(normalizer) {
+
+            @Override
+            protected Num valueAtRounded(Tick tick) {
+                return delegator.apply(tick, this);
+            }
+        };
+    }
 
     /**
      * {@inheritDoc}
@@ -161,39 +170,6 @@ public abstract class NumIndicator extends IndicatableNumberBase<Num, NumIndicat
                 return Num.of(value / (actualSize * (actualSize + 1) / 2));
             }
         }.memoize();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public final NumIndicator memoize(int limit, BiFunction<Tick, Function<Tick, Num>, Num> calculator) {
-        return new NumIndicator(this) {
-
-            /** CACHE */
-            private final Cache<Tick, Num> cache = CacheBuilder.newBuilder().maximumSize(8192).weakKeys().weakValues().build();
-
-            /** Call limit to avoid stack over flow. */
-            private int count = limit;
-
-            @Override
-            protected Num valueAtRounded(Tick tick) {
-                if (count == 0) return wrapped.valueAtRounded(tick);
-                if (tick.closePrice == null /* The latest tick MUST NOT cache. */) return calculator.apply(tick, this::valueAt);
-
-                try {
-                    return cache.get(tick, () -> calculator.apply(tick, t -> {
-                        count--;
-                        Num v = this.valueAt(t);
-                        count++;
-                        return v;
-                    }));
-                } catch (ExecutionException e) {
-                    throw I.quiet(e);
-                }
-            }
-        };
-
     }
 
     /**
