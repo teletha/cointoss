@@ -26,7 +26,7 @@ import kiss.WiseTriFunction;
 import kiss.Ⅱ;
 import kiss.Ⅲ;
 
-public abstract class Indicator<T> extends AbstractIndicator<T> {
+public abstract class Indicator<T> extends Indicatable<T> {
 
     /** The wrapped {@link Indicator}. (OPTIONAL: may be null) */
     protected final Indicator wrapped;

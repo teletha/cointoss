@@ -13,7 +13,7 @@ import java.util.function.Function;
 
 import kiss.Variable;
 
-public abstract class AbstractIndicator<T> {
+public abstract class Indicatable<T> {
 
     /** The human-readable name. */
     public final Variable<String> name = Variable.of(getClass().getSimpleName());
@@ -26,7 +26,7 @@ public abstract class AbstractIndicator<T> {
      * 
      * @param ticker A target ticker.
      */
-    protected AbstractIndicator() {
+    protected Indicatable() {
         this(null);
     }
 
@@ -35,7 +35,7 @@ public abstract class AbstractIndicator<T> {
      * 
      * @param ticker A target ticker.
      */
-    protected AbstractIndicator(Function<Tick, Tick> normalizer) {
+    protected Indicatable(Function<Tick, Tick> normalizer) {
         this.normalizer = normalizer == null ? Function.identity() : normalizer;
     }
 

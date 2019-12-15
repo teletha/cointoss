@@ -28,7 +28,7 @@ import kiss.WiseTriFunction;
 import kiss.Ⅱ;
 import kiss.Ⅲ;
 
-public abstract class DoubleIndicator extends AbstractIndicator<Double> {
+public abstract class DoubleIndicator extends Indicatable<Double> {
 
     /** The wrapped {@link DoubleIndicator}. (OPTIONAL: may be null) */
     protected final DoubleIndicator wrapped;
@@ -61,6 +61,10 @@ public abstract class DoubleIndicator extends AbstractIndicator<Double> {
      */
     @Override
     public final Double valueAt(Tick timestamp) {
+        return valueAtRounded(normalizer.apply(timestamp));
+    }
+
+    protected final double doubleAt(Tick timestamp) {
         return valueAtRounded(normalizer.apply(timestamp));
     }
 
@@ -108,7 +112,7 @@ public abstract class DoubleIndicator extends AbstractIndicator<Double> {
         return new Indicator<>(normalizer) {
             @Override
             protected Out valueAtRounded(Tick tick) {
-                return mapper.apply(DoubleIndicator.this.valueAt(tick));
+                return mapper.apply(DoubleIndicator.this.doubleAt(tick));
             }
         };
     }
@@ -124,7 +128,7 @@ public abstract class DoubleIndicator extends AbstractIndicator<Double> {
         return new Indicator<Out>(normalizer) {
             @Override
             protected Out valueAtRounded(Tick tick) {
-                return calculater.apply(DoubleIndicator.this.valueAt(tick), indicator1.valueAt(tick));
+                return calculater.apply(DoubleIndicator.this.doubleAt(tick), indicator1.valueAt(tick));
             }
         };
     }
@@ -142,7 +146,7 @@ public abstract class DoubleIndicator extends AbstractIndicator<Double> {
 
             @Override
             protected Out valueAtRounded(Tick tick) {
-                return calculater.apply(DoubleIndicator.this.valueAt(tick), indicator1.valueAt(tick), indicator2.valueAt(tick));
+                return calculater.apply(DoubleIndicator.this.doubleAt(tick), indicator1.valueAt(tick), indicator2.valueAt(tick));
             }
         };
     }
@@ -158,7 +162,7 @@ public abstract class DoubleIndicator extends AbstractIndicator<Double> {
 
             @Override
             protected double valueAtRounded(Tick tick) {
-                return Primitives.roundDecimal(wrapped.valueAt(tick), scale);
+                return Primitives.roundDecimal(wrapped.doubleAt(tick), scale);
             }
         };
     }
@@ -240,7 +244,7 @@ public abstract class DoubleIndicator extends AbstractIndicator<Double> {
                 Tick current = tick;
                 int remaining = size;
                 while (current != null && 0 < remaining) {
-                    value += wrapped.valueAt(current);
+                    value += wrapped.doubleAt(current);
                     current = current.previous();
                     remaining--;
                 }
@@ -271,13 +275,13 @@ public abstract class DoubleIndicator extends AbstractIndicator<Double> {
             @Override
             protected double valueAtRounded(Tick tick) {
                 if (tick.previous() == null) {
-                    return wrapped.valueAt(tick);
+                    return wrapped.doubleAt(tick);
                 }
 
                 double value = 0;
                 int actualSize = calculatePreviousTickLength(tick, size);
                 for (int i = actualSize; 0 < i; i--) {
-                    value += wrapped.valueAt(tick) * i;
+                    value += wrapped.doubleAt(tick) * i;
                     tick = tick.previous();
                 }
                 return value / (actualSize * (actualSize + 1) / 2);
@@ -326,7 +330,7 @@ public abstract class DoubleIndicator extends AbstractIndicator<Double> {
                 try {
                     return cache.get(tick, () -> calculator.apply(tick, t -> {
                         count--;
-                        double v = this.valueAt(t);
+                        double v = this.doubleAt(t);
                         count++;
                         return v;
                     }));
