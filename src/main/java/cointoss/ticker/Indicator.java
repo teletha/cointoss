@@ -21,7 +21,7 @@ import cointoss.util.Num;
 import kiss.I;
 import kiss.Variable;
 
-public abstract class Indicator<T> extends Indicatable<T> {
+public abstract class Indicator<T> extends Indicatable<T, Indicator<T>> {
 
     /** The wrapped {@link Indicator}. (OPTIONAL: may be null) */
     protected final Indicator wrapped;
@@ -104,16 +104,6 @@ public abstract class Indicator<T> extends Indicatable<T> {
     }
 
     /**
-     * Wrap by exponetial moving average.
-     * 
-     * @param size A tick size.
-     * @return A wrapped indicator.
-     */
-    public final Indicator<Num> ema(Variable<? extends Number> size) {
-        return ema(size.v.intValue());
-    }
-
-    /**
      * Wrap by modified moving average.
      * 
      * @param size A tick size.
@@ -130,16 +120,6 @@ public abstract class Indicator<T> extends Indicatable<T> {
             Num previous = (Num) self.apply(tick.previous());
             return (T) ((Num) valueAt(tick)).minus(previous).multiply(multiplier).plus(previous);
         });
-    }
-
-    /**
-     * Wrap by modified moving average.
-     * 
-     * @param size A tick size.
-     * @return A wrapped indicator.
-     */
-    public final Indicator<Num> mma(Variable<? extends Number> size) {
-        return mma(size.v.intValue());
     }
 
     /**
@@ -165,16 +145,6 @@ public abstract class Indicator<T> extends Indicatable<T> {
                 return Num.of(value / (size - remaining));
             }
         }.memoize();
-    }
-
-    /**
-     * Wrap by simple moving average.
-     * 
-     * @param size A tick size.
-     * @return A wrapped indicator.
-     */
-    public final Indicator<Num> sma(Variable<? extends Number> size) {
-        return sma(size.v.intValue());
     }
 
     /**
@@ -204,29 +174,9 @@ public abstract class Indicator<T> extends Indicatable<T> {
     }
 
     /**
-     * Wrap by weighted moving average.
-     * 
-     * @param size A tick size.
-     * @return A wrapped indicator.
+     * {@inheritDoc}
      */
-    public final Indicator<Num> wma(Variable<? extends Number> size) {
-        return wma(size.v.intValue());
-    }
-
-    /**
-     * Wrap by memoized {@link Indicator}.
-     * 
-     * @return
-     */
-    public final Indicator<T> memoize() {
-        return memoize(1, (tick, self) -> valueAt(tick));
-    }
-
-    /**
-     * Wrap by memoized {@link Indicator} with the recursive caller.
-     * 
-     * @return
-     */
+    @Override
     public final Indicator<T> memoize(int limit, BiFunction<Tick, Function<Tick, T>, T> calculator) {
         return new Indicator<T>(this) {
 

@@ -20,7 +20,7 @@ import com.google.common.cache.CacheBuilder;
 import cointoss.util.Num;
 import kiss.I;
 
-public abstract class NumIndicator extends NumberIndicatable<Num, NumIndicator> {
+public abstract class NumIndicator extends IndicatableNumberBase<Num, NumIndicator> {
 
     /** The wrapped {@link NumIndicator}. (OPTIONAL: may be null) */
     protected final NumIndicator wrapped;
@@ -82,10 +82,7 @@ public abstract class NumIndicator extends NumberIndicatable<Num, NumIndicator> 
     }
 
     /**
-     * Wrap by exponetial moving average.
-     * 
-     * @param size A tick size.
-     * @return A wrapped indicator.
+     * {@inheritDoc}
      */
     @Override
     public final NumIndicator ema(int size) {
@@ -104,10 +101,7 @@ public abstract class NumIndicator extends NumberIndicatable<Num, NumIndicator> 
     }
 
     /**
-     * Wrap by modified moving average.
-     * 
-     * @param size A tick size.
-     * @return A wrapped indicator.
+     * {@inheritDoc}
      */
     @Override
     public final NumIndicator mma(int size) {
@@ -126,10 +120,7 @@ public abstract class NumIndicator extends NumberIndicatable<Num, NumIndicator> 
     }
 
     /**
-     * Wrap by simple moving average.
-     * 
-     * @param size A tick size.
-     * @return A wrapped indicator.
+     * {@inheritDoc}
      */
     @Override
     public final NumIndicator sma(int size) {
@@ -151,10 +142,7 @@ public abstract class NumIndicator extends NumberIndicatable<Num, NumIndicator> 
     }
 
     /**
-     * Wrap by weighted moving average.
-     * 
-     * @param size A tick size.
-     * @return A wrapped indicator.
+     * {@inheritDoc}
      */
     @Override
     public final NumIndicator wma(int size) {
@@ -178,19 +166,9 @@ public abstract class NumIndicator extends NumberIndicatable<Num, NumIndicator> 
     }
 
     /**
-     * Wrap by memoized {@link NumIndicator}.
-     * 
-     * @return
+     * {@inheritDoc}
      */
-    public final NumIndicator memoize() {
-        return memoize(1, (tick, self) -> valueAt(tick));
-    }
-
-    /**
-     * Wrap by memoized {@link NumIndicator} with the recursive caller.
-     * 
-     * @return
-     */
+    @Override
     public final NumIndicator memoize(int limit, BiFunction<Tick, Function<Tick, Num>, Num> calculator) {
         return new NumIndicator(this) {
 

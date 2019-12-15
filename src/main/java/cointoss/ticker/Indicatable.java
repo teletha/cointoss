@@ -9,6 +9,7 @@
  */
 package cointoss.ticker;
 
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.ToDoubleBiFunction;
 import java.util.function.ToDoubleFunction;
@@ -21,7 +22,7 @@ import kiss.WiseTriFunction;
 import kiss.Ⅱ;
 import kiss.Ⅲ;
 
-public abstract class Indicatable<T> {
+public abstract class Indicatable<T, Self extends Indicatable<T, Self>> {
 
     /** The human-readable name. */
     public final Variable<String> name = Variable.of(getClass().getSimpleName());
@@ -79,7 +80,7 @@ public abstract class Indicatable<T> {
      * @param combinator First Combinator.
      * @return Combined indicator.
      */
-    public final <With> Indicator<Ⅱ<T, With>> combine(Indicatable<With> combinator) {
+    public final <With> Indicator<Ⅱ<T, With>> combine(Indicatable<With, ?> combinator) {
         return map(combinator, (a, b) -> I.pair(a, b));
     }
 
@@ -91,7 +92,7 @@ public abstract class Indicatable<T> {
      * @param combinator2 Second Combinator.
      * @return Combined indicator.
      */
-    public final <With1, With2> Indicator<Ⅲ<T, With1, With2>> combine(Indicatable<With1> combinator1, Indicatable<With2> combinator2) {
+    public final <With1, With2> Indicator<Ⅲ<T, With1, With2>> combine(Indicatable<With1, ?> combinator1, Indicatable<With2, ?> combinator2) {
         return map(combinator1, combinator2, (a, b, c) -> I.pair(a, b, c));
     }
 
@@ -124,7 +125,7 @@ public abstract class Indicatable<T> {
      * @param mapper A mapping function.
      * @return Mapped indicator.
      */
-    public final <With, Out> Indicator<Out> map(Indicatable<With> combinator, WiseBiFunction<T, With, Out> mapper) {
+    public final <With, Out> Indicator<Out> map(Indicatable<With, ?> combinator, WiseBiFunction<T, With, Out> mapper) {
         return new Indicator<Out>(normalizer) {
             @Override // override to avoid unnecessary calculations
             public Out valueAt(Tick timestamp) {
@@ -147,7 +148,7 @@ public abstract class Indicatable<T> {
      * @param mapper A mapping function.
      * @return Mapped indicator.
      */
-    public final <With1, With2, Out> Indicator<Out> map(Indicatable<With1> combinator1, Indicatable<With2> combinator2, WiseTriFunction<T, With1, With2, Out> mapper) {
+    public final <With1, With2, Out> Indicator<Out> map(Indicatable<With1, ?> combinator1, Indicatable<With2, ?> combinator2, WiseTriFunction<T, With1, With2, Out> mapper) {
         return new Indicator<Out>(normalizer) {
             @Override // override to avoid unnecessary calculations
             public Out valueAt(Tick timestamp) {
@@ -190,7 +191,7 @@ public abstract class Indicatable<T> {
      * @param mapper A mapping function.
      * @return Mapped indicator.
      */
-    public final <With> DoubleIndicator dmap(Indicatable<With> combinator, ToDoubleBiFunction<T, With> mapper) {
+    public final <With> DoubleIndicator dmap(Indicatable<With, ?> combinator, ToDoubleBiFunction<T, With> mapper) {
         return new DoubleIndicator(normalizer) {
             @Override // override to avoid unnecessary calculations
             public Double valueAt(Tick timestamp) {
@@ -203,6 +204,25 @@ public abstract class Indicatable<T> {
             }
         };
     }
+
+    /**
+     * Get the indicator that the calculation result for each tick is memoized.
+     * 
+     * @return Memoized {@link Indicatable}.
+     */
+    public final Self memoize() {
+        return memoize(1, (tick, self) -> valueAt(tick));
+    }
+
+    /**
+     * Get the indicator that the calculation result for each tick is memoized. It also has a helper
+     * function that allows recursive calls.
+     * 
+     * @param limit A maximum depth of recursive calls.
+     * @param calculator A memoize function with recursive call helper.
+     * @return Memoized {@link Indicatable}.
+     */
+    public abstract Self memoize(int limit, BiFunction<Tick, Function<Tick, T>, T> calculator);
 
     /**
      * Acquires the stream in which the indicator value flows at the specified timing.

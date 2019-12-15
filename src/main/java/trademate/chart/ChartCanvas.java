@@ -9,25 +9,13 @@
  */
 package trademate.chart;
 
-import static transcript.Transcript.en;
+import static transcript.Transcript.*;
 
 import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Supplier;
 import java.util.function.ToDoubleFunction;
-
-import javafx.collections.ObservableList;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Region;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.LineTo;
-import javafx.scene.shape.MoveTo;
-import javafx.scene.shape.Path;
-import javafx.scene.shape.PathElement;
-import javafx.scene.text.Font;
 
 import org.eclipse.collections.api.list.primitive.MutableDoubleList;
 import org.eclipse.collections.impl.list.mutable.primitive.DoubleArrayList;
@@ -40,12 +28,23 @@ import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.market.bitflyer.SFD;
-import cointoss.ticker.DoubleIndicator;
+import cointoss.ticker.Indicatable;
 import cointoss.ticker.Indicator;
 import cointoss.ticker.Tick;
 import cointoss.ticker.Ticker;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
+import javafx.collections.ObservableList;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Region;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.LineTo;
+import javafx.scene.shape.MoveTo;
+import javafx.scene.shape.Path;
+import javafx.scene.shape.PathElement;
+import javafx.scene.text.Font;
 import kiss.I;
 import kiss.Variable;
 import kiss.Ⅲ;
@@ -690,25 +689,12 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
          * @param style
          * @param info
          */
-        LineChart(Indicator<? extends Number> indicator, Style style, Indicator<String> info) {
+        LineChart(Indicatable<? extends Number, ?> indicator, Style style, Indicator<String> info) {
             this.indicator = tick -> indicator.valueAt(tick).doubleValue();
             this.color = FXUtils.color(style, "stroke");
             this.width = FXUtils.length(style, "stroke-width", 1);
             this.dashArray = FXUtils.lengths(style, "stroke-dasharray");
             this.info = info == null ? indicator.map(v -> v.toString()) : info;
-        }
-
-        /**
-         * @param indicator
-         * @param style
-         * @param info
-         */
-        LineChart(DoubleIndicator indicator, Style style, Indicator<String> info) {
-            this.indicator = indicator::valueAt;
-            this.color = FXUtils.color(style, "stroke");
-            this.width = FXUtils.length(style, "stroke-width", 1);
-            this.dashArray = FXUtils.lengths(style, "stroke-dasharray");
-            this.info = info == null ? indicator.map(String::valueOf) : info;
         }
     }
 

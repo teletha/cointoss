@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cointoss.Market;
-import cointoss.ticker.DoubleIndicator;
+import cointoss.ticker.Indicatable;
 import cointoss.ticker.Indicator;
 import cointoss.ticker.Ticker;
 import cointoss.util.Num;
@@ -140,7 +140,7 @@ public abstract class PlotScript implements StyleDSL {
          * 
          * @param indicator A indicator to plot.
          */
-        public final void line(Indicator<? extends Number> indicator) {
+        public final void line(Indicatable<? extends Number, ?> indicator) {
             line(indicator, null);
         }
 
@@ -149,7 +149,7 @@ public abstract class PlotScript implements StyleDSL {
          * 
          * @param indicator A indicator to plot.
          */
-        public final void line(Indicator<? extends Number> indicator, Style style) {
+        public final void line(Indicatable<? extends Number, ?> indicator, Style style) {
             line(indicator, style, null);
         }
 
@@ -158,37 +158,7 @@ public abstract class PlotScript implements StyleDSL {
          * 
          * @param indicator A indicator to plot.
          */
-        public final void line(Indicator<? extends Number> indicator, Style style, Indicator<String> info) {
-            if (style == null) {
-                style = ChartStyles.MouseTrack;
-            }
-            lines.add(new LineChart(indicator, style, info));
-        }
-
-        /**
-         * Plot the specified {@link Indicator} as line chart.
-         * 
-         * @param indicator A indicator to plot.
-         */
-        public final void line(DoubleIndicator indicator) {
-            line(indicator, null);
-        }
-
-        /**
-         * Plot the specified {@link Indicator} as line chart.
-         * 
-         * @param indicator A indicator to plot.
-         */
-        public final void line(DoubleIndicator indicator, Style style) {
-            line(indicator, style, null);
-        }
-
-        /**
-         * Plot the specified {@link Indicator} as line chart.
-         * 
-         * @param indicator A indicator to plot.
-         */
-        public final void line(DoubleIndicator indicator, Style style, Indicator<String> info) {
+        public final void line(Indicatable<? extends Number, ?> indicator, Style style, Indicator<String> info) {
             if (style == null) {
                 style = ChartStyles.MouseTrack;
             }

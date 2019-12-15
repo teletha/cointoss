@@ -21,7 +21,7 @@ import com.google.common.cache.CacheBuilder;
 import cointoss.util.Primitives;
 import kiss.I;
 
-public abstract class DoubleIndicator extends NumberIndicatable<Double, DoubleIndicator> {
+public abstract class DoubleIndicator extends IndicatableNumberBase<Double, DoubleIndicator> {
 
     /** The wrapped {@link DoubleIndicator}. (OPTIONAL: may be null) */
     protected final DoubleIndicator wrapped;
@@ -87,10 +87,7 @@ public abstract class DoubleIndicator extends NumberIndicatable<Double, DoubleIn
     }
 
     /**
-     * Wrap by exponetial moving average.
-     * 
-     * @param size A tick size.
-     * @return A wrapped indicator.
+     * {@inheritDoc}
      */
     @Override
     public final DoubleIndicator ema(int size) {
@@ -109,10 +106,7 @@ public abstract class DoubleIndicator extends NumberIndicatable<Double, DoubleIn
     }
 
     /**
-     * Wrap by modified moving average.
-     * 
-     * @param size A tick size.
-     * @return A wrapped indicator.
+     * {@inheritDoc}
      */
     @Override
     public final DoubleIndicator mma(int size) {
@@ -131,10 +125,7 @@ public abstract class DoubleIndicator extends NumberIndicatable<Double, DoubleIn
     }
 
     /**
-     * Wrap by simple moving average.
-     * 
-     * @param size A tick size.
-     * @return A wrapped indicator.
+     * {@inheritDoc}
      */
     @Override
     public final DoubleIndicator sma(int size) {
@@ -156,10 +147,7 @@ public abstract class DoubleIndicator extends NumberIndicatable<Double, DoubleIn
     }
 
     /**
-     * Wrap by weighted moving average.
-     * 
-     * @param size A tick size.
-     * @return A wrapped indicator.
+     * {@inheritDoc}
      */
     @Override
     public final DoubleIndicator wma(int size) {
@@ -183,19 +171,9 @@ public abstract class DoubleIndicator extends NumberIndicatable<Double, DoubleIn
     }
 
     /**
-     * Wrap by memoized {@link DoubleIndicator}.
-     * 
-     * @return
+     * {@inheritDoc}
      */
-    public final DoubleIndicator memoize() {
-        return memoize(1, (tick, self) -> valueAt(tick));
-    }
-
-    /**
-     * Wrap by memoized {@link DoubleIndicator} with the recursive caller.
-     * 
-     * @return
-     */
+    @Override
     public final DoubleIndicator memoize(int limit, BiFunction<Tick, Function<Tick, Double>, Double> calculator) {
         return new DoubleIndicator(this) {
 

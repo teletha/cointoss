@@ -51,7 +51,7 @@ class IndicatorTest extends TickerTestSupport {
         Ticker ticker = ticker(TimeSpan.Second5, 1, 2, 3, 4, 5);
         Indicator<Integer> open = Indicator.build(ticker, tick -> tick.openPrice.intValue());
         Indicator<Integer> low = Indicator.build(ticker, tick -> tick.lowPrice.intValue());
-        Indicatable<Ⅱ<Integer, Integer>> indicator = open.combine(low);
+        Indicator<Ⅱ<Integer, Integer>> indicator = open.combine(low);
         assert indicator.valueAt(ticker.ticks.getByIndex(0)).equals(I.pair(1, 1));
         assert indicator.valueAt(ticker.ticks.getByIndex(1)).equals(I.pair(2, 2));
         assert indicator.valueAt(ticker.ticks.getByIndex(2)).equals(I.pair(3, 3));
@@ -75,7 +75,7 @@ class IndicatorTest extends TickerTestSupport {
         Ticker ticker = ticker(TimeSpan.Second5, 1, 2, 3, 4, 5);
         Indicator<Num> open = Indicator.build(ticker, tick -> tick.openPrice);
         Indicator<Num> low = Indicator.build(ticker, tick -> tick.lowPrice);
-        Indicatable<Num> indicator = open.map(low, Num::plus);
+        Indicator<Num> indicator = open.map(low, Num::plus);
         assert indicator.valueAt(ticker.ticks.getByIndex(0)).is(2);
         assert indicator.valueAt(ticker.ticks.getByIndex(1)).is(4);
         assert indicator.valueAt(ticker.ticks.getByIndex(2)).is(6);
@@ -89,7 +89,7 @@ class IndicatorTest extends TickerTestSupport {
         Indicator<Num> open = Indicator.build(ticker, tick -> tick.openPrice);
         Indicator<Num> low = Indicator.build(ticker, tick -> tick.lowPrice);
         Indicator<Num> high = Indicator.build(ticker, tick -> tick.highPrice);
-        Indicatable<Num> indicator = open.map(low, high, (o, l, h) -> o.plus(l).plus(h));
+        Indicator<Num> indicator = open.map(low, high, (o, l, h) -> o.plus(l).plus(h));
         assert indicator.valueAt(ticker.ticks.getByIndex(0)).is(3);
         assert indicator.valueAt(ticker.ticks.getByIndex(1)).is(6);
         assert indicator.valueAt(ticker.ticks.getByIndex(2)).is(9);

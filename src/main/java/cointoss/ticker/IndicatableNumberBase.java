@@ -13,19 +13,19 @@ import java.util.function.Function;
 
 import kiss.Variable;
 
-public abstract class NumberIndicatable<N extends Number, Self extends NumberIndicatable<N, Self>> extends Indicatable<N> {
+public abstract class IndicatableNumberBase<N extends Number, Self extends IndicatableNumberBase<N, Self>> extends Indicatable<N, Self> {
 
     /**
      * 
      */
-    protected NumberIndicatable() {
+    protected IndicatableNumberBase() {
         super();
     }
 
     /**
      * @param normalizer
      */
-    protected NumberIndicatable(Function<Tick, Tick> normalizer) {
+    protected IndicatableNumberBase(Function<Tick, Tick> normalizer) {
         super(normalizer);
     }
 

@@ -51,7 +51,7 @@ class DoubleIndicatorTest extends TickerTestSupport {
         Ticker ticker = ticker(TimeSpan.Second5, 1, 2, 3, 4, 5);
         DoubleIndicator open = DoubleIndicator.build(ticker, tick -> tick.openPrice.doubleValue());
         DoubleIndicator low = DoubleIndicator.build(ticker, tick -> tick.lowPrice.doubleValue());
-        Indicatable<Ⅱ<Double, Double>> indicator = open.combine(low);
+        Indicator<Ⅱ<Double, Double>> indicator = open.combine(low);
         assert indicator.valueAt(ticker.ticks.getByIndex(0)).equals(I.pair(1d, 1d));
         assert indicator.valueAt(ticker.ticks.getByIndex(1)).equals(I.pair(2d, 2d));
         assert indicator.valueAt(ticker.ticks.getByIndex(2)).equals(I.pair(3d, 3d));
@@ -75,7 +75,7 @@ class DoubleIndicatorTest extends TickerTestSupport {
         Ticker ticker = ticker(TimeSpan.Second5, 1, 2, 3, 4, 5);
         DoubleIndicator open = DoubleIndicator.build(ticker, tick -> tick.openPrice.doubleValue());
         DoubleIndicator low = DoubleIndicator.build(ticker, tick -> tick.lowPrice.doubleValue());
-        Indicatable<Num> indicator = open.map(low, (o, l) -> Num.of(o).plus(l));
+        Indicator<Num> indicator = open.map(low, (o, l) -> Num.of(o).plus(l));
         assert indicator.valueAt(ticker.ticks.getByIndex(0)).is(2);
         assert indicator.valueAt(ticker.ticks.getByIndex(1)).is(4);
         assert indicator.valueAt(ticker.ticks.getByIndex(2)).is(6);
@@ -89,7 +89,7 @@ class DoubleIndicatorTest extends TickerTestSupport {
         DoubleIndicator open = DoubleIndicator.build(ticker, tick -> tick.openPrice.doubleValue());
         DoubleIndicator low = DoubleIndicator.build(ticker, tick -> tick.lowPrice.doubleValue());
         DoubleIndicator high = DoubleIndicator.build(ticker, tick -> tick.highPrice.doubleValue());
-        Indicatable<Num> indicator = open.map(low, high, (o, l, h) -> Num.of(o).plus(l).plus(h));
+        Indicator<Num> indicator = open.map(low, high, (o, l, h) -> Num.of(o).plus(l).plus(h));
         assert indicator.valueAt(ticker.ticks.getByIndex(0)).is(3);
         assert indicator.valueAt(ticker.ticks.getByIndex(1)).is(6);
         assert indicator.valueAt(ticker.ticks.getByIndex(2)).is(9);
