@@ -102,8 +102,8 @@ public class Chart extends Region {
      */
     private void setAxisXRange() {
         if (chart.ticker.v.ticks.isNotEmpty()) {
-            axisX.logicalMinValue.set(chart.ticker.v.ticks.first().start.toEpochSecond());
-            axisX.logicalMaxValue.set(chart.ticker.v.ticks.last().start.toEpochSecond() + 3 * 60);
+            axisX.logicalMinValue.set(chart.ticker.v.ticks.first().startSeconds);
+            axisX.logicalMaxValue.set(chart.ticker.v.ticks.last().startSeconds + 3 * 60);
         }
     }
 

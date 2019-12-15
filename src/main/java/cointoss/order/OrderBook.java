@@ -170,7 +170,7 @@ public class OrderBook {
     public void update(List<OrderBoard> units) {
         operator.accept(() -> {
             for (OrderBoard board : units) {
-                if (Num.of(board.size).isZero()) {
+                if (board.size == 0d) {
                     // remove
                     OrderBoard removed = base.remove(board.price);
 

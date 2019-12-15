@@ -289,8 +289,28 @@ abstract class ExecutionModel implements Directional {
      * @param time
      * @return A result.
      */
+    public final boolean isBeforeSeconds(long second) {
+        return mills() < second * 1000;
+    }
+
+    /**
+     * Helper method to compare date and time.
+     * 
+     * @param time
+     * @return A result.
+     */
     public final boolean isAfter(ZonedDateTime time) {
         return date().isAfter(time);
+    }
+
+    /**
+     * Helper method to compare date and time.
+     * 
+     * @param time
+     * @return A result.
+     */
+    public final boolean isAfterSeconds(long second) {
+        return second * 1000 < mills();
     }
 
     /**

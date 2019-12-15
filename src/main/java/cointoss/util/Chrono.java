@@ -57,27 +57,27 @@ public class Chrono {
      * @return
      */
     public static ZonedDateTime utcNow() {
-        return utc(System.currentTimeMillis());
+        return utcByMills(System.currentTimeMillis());
     }
 
     /**
-     * UTC {@link ZonedDateTime} from epoc mills.
+     * UTC {@link ZonedDateTime} from epoch mills.
      * 
      * @param mills
      * @return
      */
-    public static ZonedDateTime utc(long mills) {
+    public static ZonedDateTime utcByMills(long mills) {
         return Instant.ofEpochMilli(mills).atZone(UTC);
     }
 
     /**
-     * UTC {@link ZonedDateTime} from epoc mills.
+     * UTC {@link ZonedDateTime} from epoch seconds.
      * 
      * @param mills
      * @return
      */
-    public static ZonedDateTime utc(double mills) {
-        return utc((long) mills);
+    public static ZonedDateTime utcBySeconds(long seconds) {
+        return utcByMills(seconds * 1000);
     }
 
     /**
@@ -123,27 +123,17 @@ public class Chrono {
     }
 
     /**
-     * System default {@link ZonedDateTime} from epoc mills.
+     * System default {@link ZonedDateTime} from epoch mills.
      * 
      * @param mills
      * @return
      */
     public static ZonedDateTime systemByMills(long mills) {
-        return utc(mills).withZoneSameInstant(ZoneId.systemDefault());
+        return utcByMills(mills).withZoneSameInstant(ZoneId.systemDefault());
     }
 
     /**
-     * System default {@link ZonedDateTime} from epoc mills.
-     * 
-     * @param mills
-     * @return
-     */
-    public static ZonedDateTime systemByMills(double mills) {
-        return systemByMills((long) mills);
-    }
-
-    /**
-     * System default {@link ZonedDateTime} from epoc seconds.
+     * System default {@link ZonedDateTime} from epoch seconds.
      * 
      * @param seconds
      * @return
@@ -153,17 +143,7 @@ public class Chrono {
     }
 
     /**
-     * System default {@link ZonedDateTime} from epoc seconds.
-     * 
-     * @param seconds
-     * @return
-     */
-    public static ZonedDateTime systemBySeconds(double seconds) {
-        return systemBySeconds((long) seconds);
-    }
-
-    /**
-     * System default {@link ZonedDateTime} from epoc mills.
+     * System default {@link ZonedDateTime} from epoch mills.
      * 
      * @param mills
      * @return

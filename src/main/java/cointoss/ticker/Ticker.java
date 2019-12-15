@@ -64,8 +64,8 @@ public final class Ticker implements Disposable {
      * @param realtime The realtime execution statistic.
      */
     final void init(Execution execution, TickerManager realtime) {
-        current = new Tick(ticks.last(), span
-                .calculateStartTime(execution.date), span, execution.id, execution.delay, execution.price, realtime);
+        current = new Tick(ticks.last(), span.calculateStartTime(execution.date)
+                .toEpochSecond(), span, execution.id, execution.delay, execution.price, realtime);
 
         ticks.store(current);
         additions.accept(current);
@@ -80,7 +80,7 @@ public final class Ticker implements Disposable {
      */
     final boolean createTick(Execution execution, TickerManager realtime) {
         // Make sure whether the execution does not exceed the end time of current tick.
-        if (!execution.isBefore(current.end)) {
+        if (!execution.isBeforeSeconds(current.endSeconds)) {
 
             // If the end time of current tick does not reach the start time of tick which
             // execution actually belongs to, it is assumed that there was a blank time
@@ -88,15 +88,15 @@ public final class Ticker implements Disposable {
             ZonedDateTime start = span.calculateStartTime(execution.date);
             Tick prev = ticks.last();
 
-            while (current.end.isBefore(start)) {
+            while (current.endSeconds < start.toEpochSecond()) {
                 current.freeze();
-                current = new Tick(prev, current.end, span, execution.id, execution.delay, current.closePrice(), realtime);
+                current = new Tick(prev, current.endSeconds, span, execution.id, execution.delay, current.closePrice(), realtime);
                 ticks.store(current);
             }
 
             // create the latest tick for execution
             current.freeze();
-            current = new Tick(prev, current.end, span, execution.id, execution.delay, execution.price, realtime);
+            current = new Tick(prev, current.endSeconds, span, execution.id, execution.delay, execution.price, realtime);
             ticks.store(current);
             additions.accept(current);
             return true;

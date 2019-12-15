@@ -12,20 +12,18 @@ package cointoss.ticker;
 import java.lang.ref.WeakReference;
 import java.time.ZonedDateTime;
 
+import cointoss.util.Chrono;
 import cointoss.util.Num;
 import kiss.I;
 import kiss.Signal;
 
 public final class Tick {
 
-    /** Begin time of the tick */
-    public final ZonedDateTime start;
-
-    /** Begin time of the tick */
+    /** Begin time of the tick (epoch second). */
     public final long startSeconds;
 
-    /** End time of the tick */
-    public final ZonedDateTime end;
+    /** End time of the tick (epoch second). */
+    public final long endSeconds;
 
     /** Open id of the period. */
     public final long openId;
@@ -72,11 +70,10 @@ public final class Tick {
      * @param open A open price.
      * @param realtime The realtime execution statistic.
      */
-    Tick(Tick previous, ZonedDateTime start, TimeSpan span, long id, int delay, Num open, TickerManager realtime) {
+    Tick(Tick previous, long startEpochSeconds, TimeSpan span, long id, int delay, Num open, TickerManager realtime) {
         this.previous = new WeakReference(previous);
-        this.start = start;
-        this.startSeconds = start.toEpochSecond();
-        this.end = start.plus(span.duration);
+        this.startSeconds = startEpochSeconds;
+        this.endSeconds = startEpochSeconds + span.seconds;
         this.openId = id;
         this.delay = delay;
         this.openPrice = this.highPrice = this.lowPrice = open;
@@ -103,7 +100,7 @@ public final class Tick {
      * @return The start time.
      */
     public ZonedDateTime start() {
-        return start;
+        return Chrono.utcByMills(startSeconds * 1000);
     }
 
     /**
@@ -112,7 +109,7 @@ public final class Tick {
      * @return The end time.
      */
     public ZonedDateTime end() {
-        return end;
+        return Chrono.utcByMills(endSeconds * 1000);
     }
 
     /**
@@ -280,11 +277,7 @@ public final class Tick {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder("TICK ");
-        builder.append(start)
-                .append(" ")
-                .append(end)
-                .append(" ")
-                .append(openPrice)
+        builder.append(openPrice)
                 .append(" ")
                 .append(closePrice())
                 .append(" ")
@@ -304,7 +297,7 @@ public final class Tick {
      */
     @Override
     public int hashCode() {
-        return start.hashCode();
+        return Long.hashCode(startSeconds);
     }
 
     /**
@@ -317,6 +310,6 @@ public final class Tick {
         }
 
         Tick other = (Tick) obj;
-        return start.equals(other.start);
+        return startSeconds == other.startSeconds;
     }
 }

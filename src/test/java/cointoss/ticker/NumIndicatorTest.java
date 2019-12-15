@@ -254,7 +254,7 @@ class NumIndicatorTest extends TickerTestSupport {
         assert indicator.valueAt(tick2).is(15);
 
         // step into next tick
-        manager.update(Execution.with.buy(1).price(20).date(tick2.end));
+        manager.update(Execution.with.buy(1).price(20).date(tick2.end()));
         assert indicator.valueAt(tick2).is(15);
         assert indicator.valueAt(ticker.ticks.getByIndex(3)).is(20);
     }

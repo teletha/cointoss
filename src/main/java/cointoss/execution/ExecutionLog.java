@@ -10,9 +10,9 @@
 package cointoss.execution;
 
 import static cointoss.Direction.*;
-import static java.nio.charset.StandardCharsets.*;
+import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static java.nio.file.StandardOpenOption.*;
-import static java.util.concurrent.TimeUnit.*;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -793,7 +793,7 @@ public class ExecutionLog {
                             Execution e = Execution.with.direction(sides[i], sizes[i])
                                     .price(prices[i])
                                     .id(id + i)
-                                    .date(tick.start.plusSeconds(i))
+                                    .date(tick.start().plusSeconds(i))
                                     .consecutive(Execution.ConsecutiveDifference)
                                     .delay(Execution.DelayInestimable);
 

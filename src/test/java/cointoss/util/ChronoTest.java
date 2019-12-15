@@ -86,4 +86,28 @@ class ChronoTest {
         assert Chrono.formatAsDuration(24 * 60 * 60 * 1000).equals("1:00:00:00");
         assert Chrono.formatAsDuration(11 * 24 * 60 * 60 * 1000).equals("11:00:00:00");
     }
+
+    @Test
+    void utcByMills() {
+        assert Chrono.utcByMills(1000).format(Chrono.DateTime).equals("1970-01-01 00:00:01");
+        assert Chrono.utcByMills(1576418285029L).format(Chrono.DateTime).equals("2019-12-15 13:58:05");
+    }
+
+    @Test
+    void utcBySeconds() {
+        assert Chrono.utcBySeconds(1).format(Chrono.DateTime).equals("1970-01-01 00:00:01");
+        assert Chrono.utcBySeconds(1557030696L).format(Chrono.DateTime).equals("2019-05-05 04:31:36");
+    }
+
+    @Test
+    void systemByMills() {
+        assert Chrono.systemByMills(1000).withZoneSameInstant(Chrono.UTC).format(Chrono.DateTime).equals("1970-01-01 00:00:01");
+        assert Chrono.systemByMills(1576418285029L).withZoneSameInstant(Chrono.UTC).format(Chrono.DateTime).equals("2019-12-15 13:58:05");
+    }
+
+    @Test
+    void systemBySeconds() {
+        assert Chrono.systemBySeconds(1).withZoneSameInstant(Chrono.UTC).format(Chrono.DateTime).equals("1970-01-01 00:00:01");
+        assert Chrono.systemBySeconds(1557030696L).withZoneSameInstant(Chrono.UTC).format(Chrono.DateTime).equals("2019-05-05 04:31:36");
+    }
 }
