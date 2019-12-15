@@ -14,6 +14,7 @@ import java.util.function.Function;
 import java.util.function.ToDoubleBiFunction;
 import java.util.function.ToDoubleFunction;
 
+import cointoss.util.Num;
 import kiss.I;
 import kiss.Signal;
 import kiss.Variable;
@@ -201,6 +202,71 @@ public abstract class Indicatable<T, Self extends Indicatable<T, Self>> {
             @Override
             protected double valueAtRounded(Tick tick) {
                 return mapper.applyAsDouble(Indicatable.this.valueAt(tick), combinator.valueAt(tick));
+            }
+        };
+    }
+
+    /**
+     * Gets the indicator whose value is changed by the mapping function.
+     * 
+     * @param <Out> A result type.
+     * @param mapper A mapping function.
+     * @return Mapped indicator.
+     */
+    public final NumIndicator nmap(Function<T, Num> mapper) {
+        return new NumIndicator(normalizer) {
+            @Override // override to avoid unnecessary calculations
+            public Num valueAt(Tick timestamp) {
+                return mapper.apply(Indicatable.this.valueAt(timestamp));
+            }
+
+            @Override
+            protected Num valueAtRounded(Tick tick) {
+                return mapper.apply(Indicatable.this.valueAt(tick));
+            }
+        };
+    }
+
+    /**
+     * Gets the indicator whose value is changed by the mapping function.
+     * 
+     * @param <Out> A result type.
+     * @param combinator First Combinator.
+     * @param mapper A mapping function.
+     * @return Mapped indicator.
+     */
+    public final <With> NumIndicator nmap(Indicatable<With, ?> combinator, WiseBiFunction<T, With, Num> mapper) {
+        return new NumIndicator(normalizer) {
+            @Override // override to avoid unnecessary calculations
+            public Num valueAt(Tick timestamp) {
+                return mapper.apply(Indicatable.this.valueAt(timestamp), combinator.valueAt(timestamp));
+            }
+
+            @Override
+            protected Num valueAtRounded(Tick tick) {
+                return mapper.apply(Indicatable.this.valueAt(tick), combinator.valueAt(tick));
+            }
+        };
+    }
+
+    /**
+     * Gets the indicator whose value is changed by the mapping function.
+     * 
+     * @param combinator1 First Combinator.
+     * @param combinator2 Second Combinator.
+     * @param mapper A mapping function.
+     * @return Mapped indicator.
+     */
+    public final <With1, With2> NumIndicator nmap(Indicatable<With1, ?> combinator1, Indicatable<With2, ?> combinator2, WiseTriFunction<T, With1, With2, Num> mapper) {
+        return new NumIndicator(normalizer) {
+            @Override // override to avoid unnecessary calculations
+            public Num valueAt(Tick timestamp) {
+                return mapper.apply(Indicatable.this.valueAt(timestamp), combinator1.valueAt(timestamp), combinator2.valueAt(timestamp));
+            }
+
+            @Override
+            protected Num valueAtRounded(Tick tick) {
+                return mapper.apply(Indicatable.this.valueAt(tick), combinator1.valueAt(tick), combinator2.valueAt(tick));
             }
         };
     }

@@ -21,6 +21,7 @@ import cointoss.Market;
 import cointoss.Scenario;
 import cointoss.Trader;
 import cointoss.ticker.Indicator;
+import cointoss.ticker.NumIndicator;
 import cointoss.ticker.Tick;
 import cointoss.ticker.Ticker;
 import cointoss.ticker.TimeSpan;
@@ -45,7 +46,7 @@ public class VolumeCross extends Trader {
         Ticker ticker = market.tickers.of(TimeSpan.Minute5);
         Indicator<Double> buyVolume = Indicator.build(ticker, Tick::buyVolume);
         Indicator<Double> sellVolume = Indicator.build(ticker, Tick::sellVolume);
-        Indicator<Num> volumeDiff = buyVolume.map(sellVolume, (b, s) -> Num.of(b - s))
+        NumIndicator volumeDiff = buyVolume.nmap(sellVolume, (b, s) -> Num.of(b - s))
                 .sma(7)
                 .scale(market.service.setting.targetCurrencyScaleSize);
         Indicator<Boolean> upPrediction = Indicator.build(ticker, Tick::isBear).map(volumeDiff, (t, d) -> t && d.isPositive());

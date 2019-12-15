@@ -22,17 +22,17 @@ public class Indicators {
     }
 
     public final static Indicator<Ⅱ<Num, Num>> waveTrend(Ticker ticker, int channelLength, int averageLength) {
-        Indicator<Num> ap = Indicator.build(ticker, Tick::typicalPrice);
-        Indicator<Num> esa = ap.ema(channelLength);
-        Indicator<Num> d = esa.map(ap, (a, b) -> a.minus(b).abs()).ema(channelLength);
-        Indicator<Num> ci = ap.map(esa, d, (a, b, c) -> {
+        NumIndicator ap = NumIndicator.build(ticker, Tick::typicalPrice);
+        NumIndicator esa = ap.ema(channelLength);
+        NumIndicator d = esa.nmap(ap, (a, b) -> a.minus(b).abs()).ema(channelLength);
+        NumIndicator ci = ap.nmap(esa, d, (a, b, c) -> {
             if (c.isZero()) {
                 return a.minus(b);
             }
             return a.minus(b).divide(Num.of(0.015).multiply(c));
         });
-        Indicator<Num> wt1 = ci.ema(averageLength).scale(2);
-        Indicator<Num> wt2 = wt1.sma(4).scale(2);
+        NumIndicator wt1 = ci.ema(averageLength).scale(2);
+        NumIndicator wt2 = wt1.sma(4).scale(2);
         return wt1.combine(wt2);
     }
 }

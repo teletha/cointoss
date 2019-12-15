@@ -19,7 +19,6 @@ import com.google.common.cache.CacheBuilder;
 
 import cointoss.util.Num;
 import kiss.I;
-import kiss.Variable;
 
 public abstract class Indicator<T> extends Indicatable<T, Indicator<T>> {
 
@@ -80,97 +79,6 @@ public abstract class Indicator<T> extends Indicatable<T, Indicator<T>> {
                 return ((Num) wrapped.valueAt(tick)).scale(scale);
             }
         };
-    }
-
-    /**
-     * Wrap by exponetial moving average.
-     * 
-     * @param size A tick size.
-     * @return A wrapped indicator.
-     */
-    public final Indicator<Num> ema(int size) {
-        double multiplier = 2.0 / (size + 1);
-
-        return (Indicator<Num>) memoize((size + 1) * 4, (tick, self) -> {
-            if (tick.previous() == null) {
-                return valueAt(tick);
-            }
-
-            double previous = ((Num) self.apply(tick.previous())).doubleValue();
-            Num now = (Num) valueAt(tick);
-
-            return (T) Num.of(((now.doubleValue() - previous) * multiplier) + previous);
-        });
-    }
-
-    /**
-     * Wrap by modified moving average.
-     * 
-     * @param size A tick size.
-     * @return A wrapped indicator.
-     */
-    public final Indicator<Num> mma(int size) {
-        double multiplier = 1.0 / size;
-
-        return (Indicator<Num>) memoize((size + 1) * 4, (tick, self) -> {
-            if (tick.previous() == null) {
-                return valueAt(tick);
-            }
-
-            Num previous = (Num) self.apply(tick.previous());
-            return (T) ((Num) valueAt(tick)).minus(previous).multiply(multiplier).plus(previous);
-        });
-    }
-
-    /**
-     * Wrap by simple moving average.
-     * 
-     * @param size A tick size.
-     * @return A wrapped indicator.
-     */
-    public final Indicator<Num> sma(int size) {
-        return new Indicator<Num>(this) {
-
-            @Override
-            protected Num valueAtRounded(Tick tick) {
-                double value = 0;
-                Tick current = tick;
-                int remaining = size;
-                while (current != null && 0 < remaining) {
-                    Num num = (Num) wrapped.valueAt(current);
-                    value += num.doubleValue();
-                    current = current.previous();
-                    remaining--;
-                }
-                return Num.of(value / (size - remaining));
-            }
-        }.memoize();
-    }
-
-    /**
-     * Wrap by weighted moving average.
-     * 
-     * @param size A tick size.
-     * @return A wrapped indicator.
-     */
-    public final Indicator<Num> wma(int size) {
-        return new Indicator<Num>(this) {
-
-            @Override
-            protected Num valueAtRounded(Tick tick) {
-                if (tick.previous() == null) {
-                    return (Num) wrapped.valueAt(tick);
-                }
-
-                Num value = Num.ZERO;
-                int actualSize = calculatePreviousTickLength(tick, size);
-                for (int i = actualSize; 0 < i; i--) {
-                    value = value.plus(((Num) wrapped.valueAt(tick)).multiply(i));
-                    tick = tick.previous();
-                }
-                return value.divide(actualSize * (actualSize + 1) / 2);
-            }
-        }.memoize();
     }
 
     /**
@@ -249,7 +157,7 @@ public abstract class Indicator<T> extends Indicatable<T, Indicator<T>> {
      * @param size
      * @return
      */
-    public static Indicator<Num> averageTrueRange(Ticker ticker, int size) {
+    public static NumIndicator averageTrueRange(Ticker ticker, int size) {
         return trueRange(ticker).mma(size);
     }
 
@@ -289,8 +197,8 @@ public abstract class Indicator<T> extends Indicatable<T, Indicator<T>> {
      * @param ticker
      * @return
      */
-    public static Indicator<Num> trueRange(Ticker ticker) {
-        return build(ticker, tick -> {
+    public static NumIndicator trueRange(Ticker ticker) {
+        return NumIndicator.build(ticker, tick -> {
             Num highLow = tick.highPrice().minus(tick.lowPrice()).abs();
 
             if (tick.previous() == null) {
