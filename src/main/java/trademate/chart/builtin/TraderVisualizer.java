@@ -63,7 +63,7 @@ public class TraderVisualizer extends PlotScript implements StyleDSL {
             Num shortSize = Num.ZERO;
 
             for (Trader trader : market.traders) {
-                Snapshot snapshot = trader.snapshotAt(tick.start());
+                Snapshot snapshot = trader.snapshotAt(tick.startSeconds);
                 realized = realized.plus(snapshot.realizedProfit());
                 unrealized = unrealized.plus(snapshot.unrealizedProfit(tick.openPrice));
                 longSize = longSize.plus(snapshot.longSize);

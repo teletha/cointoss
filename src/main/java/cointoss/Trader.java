@@ -31,7 +31,6 @@ import com.google.common.annotations.VisibleForTesting;
 
 import cointoss.analyze.TradingStatistics;
 import cointoss.execution.Execution;
-import cointoss.util.Chrono;
 import cointoss.util.Num;
 import kiss.Disposable;
 import kiss.Extensible;
@@ -58,7 +57,7 @@ public abstract class Trader extends TraderBase implements Extensible, Disposabl
     private final FastList<Scenario> scenarios = new FastList();
 
     /** The state snapshot. */
-    private final NavigableMap<ZonedDateTime, Snapshot> snapshots = new TreeMap();
+    private final NavigableMap<Long, Snapshot> snapshots = new TreeMap();
 
     /** The trader's alive state. */
     private Set<Signal> disable = Sets.mutable.empty();
@@ -71,7 +70,7 @@ public abstract class Trader extends TraderBase implements Extensible, Disposabl
         setHoldSize(Num.ZERO);
         setHoldMaxSize(Num.ZERO);
         snapshots.clear();
-        snapshots.put(Chrono.MIN, EMPTY_SNAPSHOT);
+        snapshots.put(0L, EMPTY_SNAPSHOT);
 
         if (this.market == null) {
             this.market = Objects.requireNonNull(market);
@@ -231,7 +230,7 @@ public abstract class Trader extends TraderBase implements Extensible, Disposabl
      * @param time The specified date and time.
      * @return A snapshot of this {@link Scenario}.
      */
-    public final Snapshot snapshotAt(ZonedDateTime time) {
+    public final Snapshot snapshotAt(long time) {
         return snapshots.floorEntry(time).getValue();
     }
 
@@ -300,7 +299,7 @@ public abstract class Trader extends TraderBase implements Extensible, Disposabl
     final void updateSnapshot(Direction direction, Num deltaRealizedProfit, Num deltaRemainingSize, Num price) {
         Snapshot latest = snapshots.lastEntry().getValue();
 
-        ZonedDateTime now = market.service.now().plus(59, SECONDS).truncatedTo(MINUTES);
+        long now = market.service.now().plus(59, SECONDS).truncatedTo(MINUTES).toEpochSecond();
         Num newRealized = latest.realizedProfit.plus(deltaRealizedProfit);
         Snapshot snapshot;
 
