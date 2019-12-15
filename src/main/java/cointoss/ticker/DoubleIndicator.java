@@ -20,9 +20,8 @@ import com.google.common.cache.CacheBuilder;
 
 import cointoss.util.Primitives;
 import kiss.I;
-import kiss.Variable;
 
-public abstract class DoubleIndicator extends Indicatable<Double> {
+public abstract class DoubleIndicator extends NumberIndicatable<Double, DoubleIndicator> {
 
     /** The wrapped {@link DoubleIndicator}. (OPTIONAL: may be null) */
     protected final DoubleIndicator wrapped;
@@ -93,6 +92,7 @@ public abstract class DoubleIndicator extends Indicatable<Double> {
      * @param size A tick size.
      * @return A wrapped indicator.
      */
+    @Override
     public final DoubleIndicator ema(int size) {
         double multiplier = 2.0 / (size + 1);
 
@@ -109,21 +109,12 @@ public abstract class DoubleIndicator extends Indicatable<Double> {
     }
 
     /**
-     * Wrap by exponetial moving average.
-     * 
-     * @param size A tick size.
-     * @return A wrapped indicator.
-     */
-    public final DoubleIndicator ema(Variable<? extends Number> size) {
-        return ema(size.v.intValue());
-    }
-
-    /**
      * Wrap by modified moving average.
      * 
      * @param size A tick size.
      * @return A wrapped indicator.
      */
+    @Override
     public final DoubleIndicator mma(int size) {
         double multiplier = 1.0 / size;
 
@@ -140,21 +131,12 @@ public abstract class DoubleIndicator extends Indicatable<Double> {
     }
 
     /**
-     * Wrap by modified moving average.
-     * 
-     * @param size A tick size.
-     * @return A wrapped indicator.
-     */
-    public final DoubleIndicator mma(Variable<? extends Number> size) {
-        return mma(size.v.intValue());
-    }
-
-    /**
      * Wrap by simple moving average.
      * 
      * @param size A tick size.
      * @return A wrapped indicator.
      */
+    @Override
     public final DoubleIndicator sma(int size) {
         return new DoubleIndicator(this) {
 
@@ -174,21 +156,12 @@ public abstract class DoubleIndicator extends Indicatable<Double> {
     }
 
     /**
-     * Wrap by simple moving average.
-     * 
-     * @param size A tick size.
-     * @return A wrapped indicator.
-     */
-    public final DoubleIndicator sma(Variable<? extends Number> size) {
-        return sma(size.v.intValue());
-    }
-
-    /**
      * Wrap by weighted moving average.
      * 
      * @param size A tick size.
      * @return A wrapped indicator.
      */
+    @Override
     public final DoubleIndicator wma(int size) {
         return new DoubleIndicator(this) {
 
@@ -207,16 +180,6 @@ public abstract class DoubleIndicator extends Indicatable<Double> {
                 return value / (actualSize * (actualSize + 1) / 2);
             }
         }.memoize();
-    }
-
-    /**
-     * Wrap by weighted moving average.
-     * 
-     * @param size A tick size.
-     * @return A wrapped indicator.
-     */
-    public final DoubleIndicator wma(Variable<? extends Number> size) {
-        return wma(size.v.intValue());
     }
 
     /**

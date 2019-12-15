@@ -19,9 +19,8 @@ import com.google.common.cache.CacheBuilder;
 
 import cointoss.util.Num;
 import kiss.I;
-import kiss.Variable;
 
-public abstract class NumIndicator extends Indicatable<Num> {
+public abstract class NumIndicator extends NumberIndicatable<Num, NumIndicator> {
 
     /** The wrapped {@link NumIndicator}. (OPTIONAL: may be null) */
     protected final NumIndicator wrapped;
@@ -88,6 +87,7 @@ public abstract class NumIndicator extends Indicatable<Num> {
      * @param size A tick size.
      * @return A wrapped indicator.
      */
+    @Override
     public final NumIndicator ema(int size) {
         double multiplier = 2.0 / (size + 1);
 
@@ -104,21 +104,12 @@ public abstract class NumIndicator extends Indicatable<Num> {
     }
 
     /**
-     * Wrap by exponetial moving average.
-     * 
-     * @param size A tick size.
-     * @return A wrapped indicator.
-     */
-    public final NumIndicator ema(Variable<? extends Number> size) {
-        return ema(size.v.intValue());
-    }
-
-    /**
      * Wrap by modified moving average.
      * 
      * @param size A tick size.
      * @return A wrapped indicator.
      */
+    @Override
     public final NumIndicator mma(int size) {
         double multiplier = 1.0 / size;
 
@@ -135,21 +126,12 @@ public abstract class NumIndicator extends Indicatable<Num> {
     }
 
     /**
-     * Wrap by modified moving average.
-     * 
-     * @param size A tick size.
-     * @return A wrapped indicator.
-     */
-    public final NumIndicator mma(Variable<? extends Number> size) {
-        return mma(size.v.intValue());
-    }
-
-    /**
      * Wrap by simple moving average.
      * 
      * @param size A tick size.
      * @return A wrapped indicator.
      */
+    @Override
     public final NumIndicator sma(int size) {
         return new NumIndicator(this) {
 
@@ -169,21 +151,12 @@ public abstract class NumIndicator extends Indicatable<Num> {
     }
 
     /**
-     * Wrap by simple moving average.
-     * 
-     * @param size A tick size.
-     * @return A wrapped indicator.
-     */
-    public final NumIndicator sma(Variable<? extends Number> size) {
-        return sma(size.v.intValue());
-    }
-
-    /**
      * Wrap by weighted moving average.
      * 
      * @param size A tick size.
      * @return A wrapped indicator.
      */
+    @Override
     public final NumIndicator wma(int size) {
         return new NumIndicator(this) {
 
@@ -202,16 +175,6 @@ public abstract class NumIndicator extends Indicatable<Num> {
                 return Num.of(value / (actualSize * (actualSize + 1) / 2));
             }
         }.memoize();
-    }
-
-    /**
-     * Wrap by weighted moving average.
-     * 
-     * @param size A tick size.
-     * @return A wrapped indicator.
-     */
-    public final NumIndicator wma(Variable<? extends Number> size) {
-        return wma(size.v.intValue());
     }
 
     /**
