@@ -11,6 +11,7 @@ package trademate.chart.builtin;
 
 import cointoss.Market;
 import cointoss.ticker.Indicator;
+import cointoss.ticker.NumIndicator;
 import cointoss.ticker.Ticker;
 import cointoss.util.Num;
 import stylist.Style;
@@ -33,10 +34,10 @@ public class ATRIndicator extends PlotScript implements StyleDSL {
      */
     @Override
     protected void declare(Market market, Ticker ticker) {
-        Indicator<Num> atr = Indicator.averageTrueRange(ticker, 21).map(n -> n.scale(market.service.setting.baseCurrencyScaleSize));
+        Indicator<Num> atr = NumIndicator.averageTrueRange(ticker, 21).map(n -> n.scale(market.service.setting.baseCurrencyScaleSize));
         main.line(atr);
 
-        Indicator<Num> tr = Indicator.trueRange(ticker).map(n -> n.scale(market.service.setting.baseCurrencyScaleSize));
+        Indicator<Num> tr = NumIndicator.trueRange(ticker).map(n -> n.scale(market.service.setting.baseCurrencyScaleSize));
         main.line(tr, Main);
 
         Indicator<Num> percentage = atr.map(tr, (avg, now) -> now.divide(avg).scale(3));

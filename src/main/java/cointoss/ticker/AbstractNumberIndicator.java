@@ -13,7 +13,8 @@ import java.util.function.Function;
 
 import kiss.Variable;
 
-public abstract class AbstractNumberIndicator<N extends Number, Self extends AbstractNumberIndicator<N, Self>> extends AbstractIndicator<N, Self> {
+public abstract class AbstractNumberIndicator<N extends Number, Self extends AbstractNumberIndicator<N, Self>>
+        extends AbstractIndicator<N, Self> {
 
     /**
      * 

@@ -258,4 +258,26 @@ class NumIndicatorTest extends TickerTestSupport {
         assert indicator.valueAt(tick2).is(15);
         assert indicator.valueAt(ticker.ticks.getByIndex(3)).is(20);
     }
+
+    @Test
+    void trueRange() {
+        Ticker ticker = ticker(TimeSpan.Second5, 1, 2, 4, 8, 16);
+        NumIndicator indicator = NumIndicator.trueRange(ticker);
+        assert indicator.valueAt(ticker.ticks.getByIndex(0)).is(0);
+        assert indicator.valueAt(ticker.ticks.getByIndex(1)).is(1);
+        assert indicator.valueAt(ticker.ticks.getByIndex(2)).is(2);
+        assert indicator.valueAt(ticker.ticks.getByIndex(3)).is(4);
+        assert indicator.valueAt(ticker.ticks.getByIndex(4)).is(8);
+    }
+
+    @Test
+    void averageTrueRange() {
+        Ticker ticker = ticker(TimeSpan.Second5, 1, 2, 4, 8, 16);
+        NumIndicator indicator = NumIndicator.averageTrueRange(ticker, 4);
+        assert indicator.valueAt(ticker.ticks.getByIndex(0)).is(0);
+        assert indicator.valueAt(ticker.ticks.getByIndex(1)).is(0.25);
+        assert indicator.valueAt(ticker.ticks.getByIndex(2)).is(0.6875);
+        assert indicator.valueAt(ticker.ticks.getByIndex(3)).is(1.515625);
+        assert indicator.valueAt(ticker.ticks.getByIndex(4)).is(3.13671875);
+    }
 }

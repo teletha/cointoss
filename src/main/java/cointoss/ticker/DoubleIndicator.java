@@ -28,16 +28,19 @@ public abstract class DoubleIndicator extends AbstractNumberIndicator<Double, Do
     }
 
     /**
-     * Return the value of this {@link DoubleIndicator}.
-     * 
-     * @param tick A {@link Tick} on {@link Ticker}.
-     * @return A time-based value.
+     * {@inheritDoc}
      */
     @Override
     public Double valueAt(Tick timestamp) {
         return valueAtRounded(normalizer.apply(timestamp));
     }
 
+    /**
+     * Specialized method.
+     * 
+     * @param timestamp
+     * @return
+     */
     protected final double doubleAt(Tick timestamp) {
         return valueAtRounded(normalizer.apply(timestamp));
     }
@@ -69,12 +72,12 @@ public abstract class DoubleIndicator extends AbstractNumberIndicator<Double, Do
      * {@inheritDoc}
      */
     @Override
-    public final DoubleIndicator scale(int scale) {
+    public final DoubleIndicator scale(int size) {
         return new DoubleIndicator(normalizer) {
 
             @Override
             protected double valueAtRounded(Tick tick) {
-                return Primitives.roundDecimal(DoubleIndicator.this.doubleAt(tick), scale);
+                return Primitives.roundDecimal(DoubleIndicator.this.doubleAt(tick), size);
             }
         };
     }

@@ -155,28 +155,6 @@ class IndicatorTest extends TickerTestSupport {
     }
 
     @Test
-    void trueRange() {
-        Ticker ticker = ticker(TimeSpan.Second5, 1, 2, 4, 8, 16);
-        NumIndicator indicator = Indicator.trueRange(ticker);
-        assert indicator.valueAt(ticker.ticks.getByIndex(0)).is(0);
-        assert indicator.valueAt(ticker.ticks.getByIndex(1)).is(1);
-        assert indicator.valueAt(ticker.ticks.getByIndex(2)).is(2);
-        assert indicator.valueAt(ticker.ticks.getByIndex(3)).is(4);
-        assert indicator.valueAt(ticker.ticks.getByIndex(4)).is(8);
-    }
-
-    @Test
-    void averageTrueRange() {
-        Ticker ticker = ticker(TimeSpan.Second5, 1, 2, 4, 8, 16);
-        NumIndicator indicator = Indicator.averageTrueRange(ticker, 4);
-        assert indicator.valueAt(ticker.ticks.getByIndex(0)).is(0);
-        assert indicator.valueAt(ticker.ticks.getByIndex(1)).is(0.25);
-        assert indicator.valueAt(ticker.ticks.getByIndex(2)).is(0.6875);
-        assert indicator.valueAt(ticker.ticks.getByIndex(3)).is(1.515625);
-        assert indicator.valueAt(ticker.ticks.getByIndex(4)).is(3.13671875);
-    }
-
-    @Test
     void dontCacheLatest() {
         Ticker ticker = ticker(TimeSpan.Second5, 1, 2, 3);
         Tick tick2 = ticker.ticks.getByIndex(2);
