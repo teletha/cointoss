@@ -9,6 +9,7 @@
  */
 package cointoss.ticker;
 
+import cointoss.util.Num;
 import kiss.Ⅱ;
 
 /**
@@ -16,22 +17,22 @@ import kiss.Ⅱ;
  */
 public class Indicators {
 
-    public final static Indicator<Ⅱ<Double, Double>> waveTrend(Ticker ticker) {
+    public final static Indicator<Ⅱ<Num, Num>> waveTrend(Ticker ticker) {
         return waveTrend(ticker, 10, 21);
     }
 
-    public final static Indicator<Ⅱ<Double, Double>> waveTrend(Ticker ticker, int channelLength, int averageLength) {
-        DoubleIndicator ap = DoubleIndicator.build(ticker, tick -> tick.typicalPrice().doubleValue());
-        DoubleIndicator esa = ap.ema(channelLength);
-        DoubleIndicator d = esa.dmap(ap, (a, b) -> Math.abs(a - b)).ema(channelLength);
-        DoubleIndicator ci = ap.dmap(esa, d, (a, b, c) -> {
-            if (c == 0d) {
-                return a - b;
+    public final static Indicator<Ⅱ<Num, Num>> waveTrend(Ticker ticker, int channelLength, int averageLength) {
+        NumIndicator ap = NumIndicator.build(ticker, Tick::typicalPrice);
+        NumIndicator esa = ap.ema(channelLength);
+        NumIndicator d = esa.nmap(ap, (a, b) -> a.minus(b).abs()).ema(channelLength);
+        NumIndicator ci = ap.nmap(esa, d, (a, b, c) -> {
+            if (c.isZero()) {
+                return a.minus(b);
             }
-            return (a - b) / 0.015 * c;
+            return a.minus(b).divide(Num.of(0.015).multiply(c));
         });
-        DoubleIndicator wt1 = ci.ema(averageLength).scale(2);
-        DoubleIndicator wt2 = wt1.sma(4).scale(2);
+        NumIndicator wt1 = ci.ema(averageLength).scale(2);
+        NumIndicator wt2 = wt1.sma(4).scale(2);
         return wt1.combine(wt2);
     }
 }
