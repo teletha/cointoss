@@ -9,11 +9,11 @@
  */
 package trademate;
 
-import java.util.function.BiFunction;
 import java.util.stream.IntStream;
 
 import cointoss.execution.Execution;
 import cointoss.util.Chrono;
+import cointoss.util.Primitives;
 import stylist.Style;
 import stylist.StyleDSL;
 import viewtify.Viewtify;
@@ -35,7 +35,7 @@ public class ExecutionView extends View {
     private UISpinner<Integer> takerSize;
 
     /** Parent View */
-    private TradingView view;
+    private TradingView tradingView;
 
     class view extends UI {
         {
@@ -68,17 +68,16 @@ public class ExecutionView extends View {
      */
     @Override
     protected void initialize() {
-        int targetScale = view.market.service.setting.targetCurrencyScaleSize;
+        int scale = tradingView.market.service.setting.targetCurrencyScaleSize;
 
         // configure UI
         takerSize.initialize(IntStream.range(1, 51).boxed());
-        executionList.renderByUI(() -> make(UILabel.class), execution(targetScale, false));
-        executionCumulativeList.renderByUI(() -> make(UILabel.class), execution(targetScale, true))
-                .take(takerSize, (e, size) -> size <= e.accumulative);
+        executionList.render((label, e) -> update(label, e, false, scale));
+        executionCumulativeList.render((label, e) -> update(label, e, true, scale)).take(takerSize, (e, size) -> size <= e.accumulative);
 
         // load execution log
         Viewtify.inWorker(() -> {
-            return view.market.timeline.skipWhile(view.initializing).on(Viewtify.UIThread).to(e -> {
+            return tradingView.market.timeline.skipWhile(tradingView.initializing).on(Viewtify.UIThread).to(e -> {
                 executionList.addItemAtFirst(e);
 
                 if (100 < executionList.size()) {
@@ -89,7 +88,7 @@ public class ExecutionView extends View {
 
         // load big taker log
         Viewtify.inWorker(() -> {
-            return view.market.timelineByTaker.skipWhile(view.initializing).on(Viewtify.UIThread).to(e -> {
+            return tradingView.market.timelineByTaker.skipWhile(tradingView.initializing).on(Viewtify.UIThread).to(e -> {
                 if (1 <= e.accumulative) {
                     executionCumulativeList.addItemAtFirst(e);
 
@@ -101,24 +100,11 @@ public class ExecutionView extends View {
         });
     }
 
-    /**
-     * Rendering execution.
-     * 
-     * @param scale
-     * @param accumulative
-     * @return
-     */
-    private BiFunction<UILabel, Execution, UILabel> execution(int scale, boolean accumulative) {
-        return (ui, e) -> {
-            String text = Chrono.system(e.date).format(Chrono.Time) + "  " + e.price + " " + (accumulative ? scale(e.accumulative, scale)
-                    : e.size.scale(scale)) + "  " + e.delay;
+    private void update(UILabel label, Execution e, boolean accum, int scale) {
+        String text = Chrono.system(e.date).format(Chrono.Time) + "  " + e.price + " " + (accum
+                ? Primitives.roundDecimal(e.accumulative, scale)
+                : e.size.scale(scale)) + "  " + e.delay;
 
-            return ui.text(text).styleOnly(TradeMateStyle.Side.of(e.direction));
-        };
-    }
-
-    private double scale(double value, int scale) {
-        double scaler = Math.pow(10, scale);
-        return Math.round(value * scaler) / scaler;
+        label.text(text).styleOnly(TradeMateStyle.Side.of(e.direction));
     }
 }
