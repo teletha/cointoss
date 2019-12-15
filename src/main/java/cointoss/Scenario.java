@@ -38,7 +38,7 @@ import kiss.Variable;
 /**
  * Declarative entry and exit definition.
  */
-public abstract class Scenario extends ScenarioBase implements Directional {
+public abstract class Scenario extends ScenarioBase implements Directional, Disposable {
 
     /** The scenario direction. */
     private Directional directional;
@@ -387,14 +387,16 @@ public abstract class Scenario extends ScenarioBase implements Directional {
 
     protected final Variable<Num> trailing(Function<Num, Num> trailer) {
         Variable<Num> trailedPrice = Variable.of(trailer.apply(entryPrice));
-        disposerForExit.add(market.tickers.of(TimeSpan.Second5).add.map(tick -> Num.max(this, trailer.apply(tick.openPrice), trailedPrice.v))
-                .to(trailedPrice));
+        disposerForExit
+                .add(market.tickers.of(TimeSpan.Second5).add.map(tick -> Num.max(this, trailer.apply(tick.openPrice), trailedPrice.v))
+                        .to(trailedPrice));
         return trailedPrice;
     }
 
     protected final Variable<Num> trailing2(Function<Num, Num> trailer) {
         Variable variable = Variable.of(trailer.apply(entryPrice.minus(this, entryPrice)));
-        disposerForExit.add(market.tickers.of(TimeSpan.Second5).add.map(v -> trailer.apply(entryPrice.minus(this, v.openPrice))).to(variable));
+        disposerForExit
+                .add(market.tickers.of(TimeSpan.Second5).add.map(v -> trailer.apply(entryPrice.minus(this, v.openPrice))).to(variable));
         return variable;
     }
 
@@ -439,6 +441,25 @@ public abstract class Scenario extends ScenarioBase implements Directional {
     @Override
     public final Direction direction() {
         return directional.direction();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void vandalize() {
+        directional = null;
+        market = null;
+        funds = null;
+        trader = null;
+        entries.clear();
+        exits.clear();
+        disposerForEntry.dispose();
+        disposerForExit.dispose();
+        if (logs != null) {
+            logs.clear();
+            logs = null;
+        }
     }
 
     /**

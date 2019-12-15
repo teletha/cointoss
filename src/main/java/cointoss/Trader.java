@@ -102,6 +102,7 @@ public abstract class Trader extends TraderBase implements Extensible, Disposabl
      */
     @Override
     public void vandalize() {
+        scenarios.forEach(Scenario::dispose);
         scenarios.clear();
         snapshots.clear();
         options.clear();

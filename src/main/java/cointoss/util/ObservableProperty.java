@@ -20,14 +20,16 @@ import kiss.Signaling;
  */
 public abstract class ObservableProperty<T> implements Supplier<T>, Consumer<T> {
 
-    private final Signaling<T> signal = new Signaling();
+    private Signaling<T> signal;
 
     /**
      * {@inheritDoc}
      */
     @Override
     public void accept(T value) {
-        signal.accept(value);
+        if (signal != null) {
+            signal.accept(value);
+        }
     }
 
     /**
@@ -35,7 +37,10 @@ public abstract class ObservableProperty<T> implements Supplier<T>, Consumer<T> 
      * 
      * @return
      */
-    public Signal<T> observe$() {
+    public synchronized Signal<T> observe$() {
+        if (signal == null) {
+            signal = new Signaling();
+        }
         return signal.expose;
     }
 
