@@ -28,7 +28,7 @@ import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.market.bitflyer.SFD;
-import cointoss.ticker.Indicatable;
+import cointoss.ticker.AbstractIndicator;
 import cointoss.ticker.Indicator;
 import cointoss.ticker.Tick;
 import cointoss.ticker.Ticker;
@@ -689,7 +689,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
          * @param style
          * @param info
          */
-        LineChart(Indicatable<? extends Number, ?> indicator, Style style, Indicator<String> info) {
+        LineChart(AbstractIndicator<? extends Number, ?> indicator, Style style, Indicator<String> info) {
             this.indicator = tick -> indicator.valueAt(tick).doubleValue();
             this.color = FXUtils.color(style, "stroke");
             this.width = FXUtils.length(style, "stroke-width", 1);

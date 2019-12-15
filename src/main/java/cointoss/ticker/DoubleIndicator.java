@@ -16,7 +16,7 @@ import java.util.function.ToDoubleFunction;
 
 import cointoss.util.Primitives;
 
-public abstract class DoubleIndicator extends IndicatableNumberBase<Double, DoubleIndicator> {
+public abstract class DoubleIndicator extends AbstractNumberIndicator<Double, DoubleIndicator> {
 
     /**
      * Build with the target {@link Ticker}.

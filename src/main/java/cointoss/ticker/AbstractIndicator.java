@@ -27,7 +27,7 @@ import kiss.WiseTriFunction;
 import kiss.Ⅱ;
 import kiss.Ⅲ;
 
-public abstract class Indicatable<T, Self extends Indicatable<T, Self>> {
+public abstract class AbstractIndicator<T, Self extends AbstractIndicator<T, Self>> {
 
     /** The human-readable name. */
     public final Variable<String> name = Variable.of(getClass().getSimpleName());
@@ -40,7 +40,7 @@ public abstract class Indicatable<T, Self extends Indicatable<T, Self>> {
      * 
      * @param ticker A target ticker.
      */
-    protected Indicatable() {
+    protected AbstractIndicator() {
         this(null);
     }
 
@@ -49,7 +49,7 @@ public abstract class Indicatable<T, Self extends Indicatable<T, Self>> {
      * 
      * @param ticker A target ticker.
      */
-    protected Indicatable(Function<Tick, Tick> normalizer) {
+    protected AbstractIndicator(Function<Tick, Tick> normalizer) {
         this.normalizer = normalizer == null ? Function.identity() : normalizer;
     }
 
@@ -71,10 +71,10 @@ public abstract class Indicatable<T, Self extends Indicatable<T, Self>> {
     }
 
     /**
-     * Creates a new {@link Indicatable} of the same type as itself.
+     * Creates a new {@link AbstractIndicator} of the same type as itself.
      * 
      * @param delegator Actual process with recursive call helper.
-     * @return New created {@link Indicatable}.
+     * @return New created {@link AbstractIndicator}.
      */
     protected abstract Self build(BiFunction<Tick, Self, T> delegator);
 
@@ -93,7 +93,7 @@ public abstract class Indicatable<T, Self extends Indicatable<T, Self>> {
      * @param combinator First Combinator.
      * @return Combined indicator.
      */
-    public final <With> Indicator<Ⅱ<T, With>> combine(Indicatable<With, ?> combinator) {
+    public final <With> Indicator<Ⅱ<T, With>> combine(AbstractIndicator<With, ?> combinator) {
         return map(combinator, (a, b) -> I.pair(a, b));
     }
 
@@ -105,7 +105,7 @@ public abstract class Indicatable<T, Self extends Indicatable<T, Self>> {
      * @param combinator2 Second Combinator.
      * @return Combined indicator.
      */
-    public final <With1, With2> Indicator<Ⅲ<T, With1, With2>> combine(Indicatable<With1, ?> combinator1, Indicatable<With2, ?> combinator2) {
+    public final <With1, With2> Indicator<Ⅲ<T, With1, With2>> combine(AbstractIndicator<With1, ?> combinator1, AbstractIndicator<With2, ?> combinator2) {
         return map(combinator1, combinator2, (a, b, c) -> I.pair(a, b, c));
     }
 
@@ -120,12 +120,12 @@ public abstract class Indicatable<T, Self extends Indicatable<T, Self>> {
         return new Indicator<>(normalizer) {
             @Override // override to avoid unnecessary calculations
             public Out valueAt(Tick timestamp) {
-                return mapper.apply(Indicatable.this.valueAt(timestamp));
+                return mapper.apply(AbstractIndicator.this.valueAt(timestamp));
             }
 
             @Override
             protected Out valueAtRounded(Tick tick) {
-                return mapper.apply(Indicatable.this.valueAt(tick));
+                return mapper.apply(AbstractIndicator.this.valueAt(tick));
             }
         };
     }
@@ -138,16 +138,16 @@ public abstract class Indicatable<T, Self extends Indicatable<T, Self>> {
      * @param mapper A mapping function.
      * @return Mapped indicator.
      */
-    public final <With, Out> Indicator<Out> map(Indicatable<With, ?> combinator, WiseBiFunction<T, With, Out> mapper) {
+    public final <With, Out> Indicator<Out> map(AbstractIndicator<With, ?> combinator, WiseBiFunction<T, With, Out> mapper) {
         return new Indicator<Out>(normalizer) {
             @Override // override to avoid unnecessary calculations
             public Out valueAt(Tick timestamp) {
-                return mapper.apply(Indicatable.this.valueAt(timestamp), combinator.valueAt(timestamp));
+                return mapper.apply(AbstractIndicator.this.valueAt(timestamp), combinator.valueAt(timestamp));
             }
 
             @Override
             protected Out valueAtRounded(Tick tick) {
-                return mapper.apply(Indicatable.this.valueAt(tick), combinator.valueAt(tick));
+                return mapper.apply(AbstractIndicator.this.valueAt(tick), combinator.valueAt(tick));
             }
         };
     }
@@ -161,16 +161,16 @@ public abstract class Indicatable<T, Self extends Indicatable<T, Self>> {
      * @param mapper A mapping function.
      * @return Mapped indicator.
      */
-    public final <With1, With2, Out> Indicator<Out> map(Indicatable<With1, ?> combinator1, Indicatable<With2, ?> combinator2, WiseTriFunction<T, With1, With2, Out> mapper) {
+    public final <With1, With2, Out> Indicator<Out> map(AbstractIndicator<With1, ?> combinator1, AbstractIndicator<With2, ?> combinator2, WiseTriFunction<T, With1, With2, Out> mapper) {
         return new Indicator<Out>(normalizer) {
             @Override // override to avoid unnecessary calculations
             public Out valueAt(Tick timestamp) {
-                return mapper.apply(Indicatable.this.valueAt(timestamp), combinator1.valueAt(timestamp), combinator2.valueAt(timestamp));
+                return mapper.apply(AbstractIndicator.this.valueAt(timestamp), combinator1.valueAt(timestamp), combinator2.valueAt(timestamp));
             }
 
             @Override
             protected Out valueAtRounded(Tick tick) {
-                return mapper.apply(Indicatable.this.valueAt(tick), combinator1.valueAt(tick), combinator2.valueAt(tick));
+                return mapper.apply(AbstractIndicator.this.valueAt(tick), combinator1.valueAt(tick), combinator2.valueAt(tick));
             }
         };
     }
@@ -186,12 +186,12 @@ public abstract class Indicatable<T, Self extends Indicatable<T, Self>> {
         return new DoubleIndicator(normalizer) {
             @Override // override to avoid unnecessary calculations
             public Double valueAt(Tick timestamp) {
-                return mapper.applyAsDouble(Indicatable.this.valueAt(timestamp));
+                return mapper.applyAsDouble(AbstractIndicator.this.valueAt(timestamp));
             }
 
             @Override
             protected double valueAtRounded(Tick tick) {
-                return mapper.applyAsDouble(Indicatable.this.valueAt(tick));
+                return mapper.applyAsDouble(AbstractIndicator.this.valueAt(tick));
             }
         };
     }
@@ -204,16 +204,16 @@ public abstract class Indicatable<T, Self extends Indicatable<T, Self>> {
      * @param mapper A mapping function.
      * @return Mapped indicator.
      */
-    public final <With> DoubleIndicator dmap(Indicatable<With, ?> combinator, ToDoubleBiFunction<T, With> mapper) {
+    public final <With> DoubleIndicator dmap(AbstractIndicator<With, ?> combinator, ToDoubleBiFunction<T, With> mapper) {
         return new DoubleIndicator(normalizer) {
             @Override // override to avoid unnecessary calculations
             public Double valueAt(Tick timestamp) {
-                return mapper.applyAsDouble(Indicatable.this.valueAt(timestamp), combinator.valueAt(timestamp));
+                return mapper.applyAsDouble(AbstractIndicator.this.valueAt(timestamp), combinator.valueAt(timestamp));
             }
 
             @Override
             protected double valueAtRounded(Tick tick) {
-                return mapper.applyAsDouble(Indicatable.this.valueAt(tick), combinator.valueAt(tick));
+                return mapper.applyAsDouble(AbstractIndicator.this.valueAt(tick), combinator.valueAt(tick));
             }
         };
     }
@@ -229,12 +229,12 @@ public abstract class Indicatable<T, Self extends Indicatable<T, Self>> {
         return new NumIndicator(normalizer) {
             @Override // override to avoid unnecessary calculations
             public Num valueAt(Tick timestamp) {
-                return mapper.apply(Indicatable.this.valueAt(timestamp));
+                return mapper.apply(AbstractIndicator.this.valueAt(timestamp));
             }
 
             @Override
             protected Num valueAtRounded(Tick tick) {
-                return mapper.apply(Indicatable.this.valueAt(tick));
+                return mapper.apply(AbstractIndicator.this.valueAt(tick));
             }
         };
     }
@@ -247,16 +247,16 @@ public abstract class Indicatable<T, Self extends Indicatable<T, Self>> {
      * @param mapper A mapping function.
      * @return Mapped indicator.
      */
-    public final <With> NumIndicator nmap(Indicatable<With, ?> combinator, WiseBiFunction<T, With, Num> mapper) {
+    public final <With> NumIndicator nmap(AbstractIndicator<With, ?> combinator, WiseBiFunction<T, With, Num> mapper) {
         return new NumIndicator(normalizer) {
             @Override // override to avoid unnecessary calculations
             public Num valueAt(Tick timestamp) {
-                return mapper.apply(Indicatable.this.valueAt(timestamp), combinator.valueAt(timestamp));
+                return mapper.apply(AbstractIndicator.this.valueAt(timestamp), combinator.valueAt(timestamp));
             }
 
             @Override
             protected Num valueAtRounded(Tick tick) {
-                return mapper.apply(Indicatable.this.valueAt(tick), combinator.valueAt(tick));
+                return mapper.apply(AbstractIndicator.this.valueAt(tick), combinator.valueAt(tick));
             }
         };
     }
@@ -269,16 +269,16 @@ public abstract class Indicatable<T, Self extends Indicatable<T, Self>> {
      * @param mapper A mapping function.
      * @return Mapped indicator.
      */
-    public final <With1, With2> NumIndicator nmap(Indicatable<With1, ?> combinator1, Indicatable<With2, ?> combinator2, WiseTriFunction<T, With1, With2, Num> mapper) {
+    public final <With1, With2> NumIndicator nmap(AbstractIndicator<With1, ?> combinator1, AbstractIndicator<With2, ?> combinator2, WiseTriFunction<T, With1, With2, Num> mapper) {
         return new NumIndicator(normalizer) {
             @Override // override to avoid unnecessary calculations
             public Num valueAt(Tick timestamp) {
-                return mapper.apply(Indicatable.this.valueAt(timestamp), combinator1.valueAt(timestamp), combinator2.valueAt(timestamp));
+                return mapper.apply(AbstractIndicator.this.valueAt(timestamp), combinator1.valueAt(timestamp), combinator2.valueAt(timestamp));
             }
 
             @Override
             protected Num valueAtRounded(Tick tick) {
-                return mapper.apply(Indicatable.this.valueAt(tick), combinator1.valueAt(tick), combinator2.valueAt(tick));
+                return mapper.apply(AbstractIndicator.this.valueAt(tick), combinator1.valueAt(tick), combinator2.valueAt(tick));
             }
         };
     }
@@ -286,7 +286,7 @@ public abstract class Indicatable<T, Self extends Indicatable<T, Self>> {
     /**
      * Get the indicator that the calculation result for each tick is memoized.
      * 
-     * @return Memoized {@link Indicatable}.
+     * @return Memoized {@link AbstractIndicator}.
      */
     public final Self memoize() {
         return memoize(1, (tick, self) -> valueAt(tick));
@@ -298,7 +298,7 @@ public abstract class Indicatable<T, Self extends Indicatable<T, Self>> {
      * 
      * @param limit A maximum depth of recursive calls.
      * @param calculator A memoize function with recursive call helper.
-     * @return Memoized {@link Indicatable}.
+     * @return Memoized {@link AbstractIndicator}.
      */
     public final Self memoize(int limit, BiFunction<Tick, Function<Tick, T>, T> calculator) {
         Cache<Tick, T> cache = CacheBuilder.newBuilder().maximumSize(8192).weakKeys().weakValues().build();

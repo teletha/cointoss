@@ -15,7 +15,7 @@ import java.util.function.Function;
 
 import cointoss.util.Num;
 
-public abstract class NumIndicator extends IndicatableNumberBase<Num, NumIndicator> {
+public abstract class NumIndicator extends AbstractNumberIndicator<Num, NumIndicator> {
 
     /**
      * Build with the target {@link Ticker}.
