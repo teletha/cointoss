@@ -19,7 +19,6 @@ import com.google.common.cache.CacheBuilder;
 
 import cointoss.util.Num;
 import kiss.I;
-import kiss.Signal;
 import kiss.Variable;
 import kiss.WiseBiFunction;
 import kiss.WiseTriFunction;
@@ -93,17 +92,6 @@ public abstract class Indicator<T> extends Indicatable<T> {
      */
     public final <With1, With2> Indicator<Ⅲ<T, With1, With2>> combine(Indicator<With1> indicator1, Indicator<With2> indicator2) {
         return map(indicator1, indicator2, (a, b, c) -> I.pair(a, b, c));
-    }
-
-    /**
-     * Wrap by the mapped result.
-     * 
-     * @param <Out>
-     * @param mapper
-     * @return
-     */
-    public final <Out> Indicator<Out> map(Function<T, Out> mapper) {
-        return (Indicator<Out>) memoize(1, (tick, self) -> (T) mapper.apply(valueAt(tick)));
     }
 
     /**
@@ -329,15 +317,6 @@ public abstract class Indicator<T> extends Indicatable<T> {
             }
         };
 
-    }
-
-    /**
-     * Create {@link Signal} of {@link Indicator} value.
-     * 
-     * @return
-     */
-    public final Signal<T> observeWhen(Signal<Tick> timing) {
-        return timing.map(this::valueAt);
     }
 
     /**

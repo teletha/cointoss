@@ -11,6 +11,7 @@ package cointoss.ticker;
 
 import java.util.function.Function;
 
+import kiss.Signal;
 import kiss.Variable;
 
 public abstract class Indicatable<T> {
@@ -63,4 +64,30 @@ public abstract class Indicatable<T> {
      * @return A time-based value.
      */
     public abstract T valueAt(Tick timestamp);
+
+    /**
+     * Wrap by the mapped result.
+     * 
+     * @param <Out>
+     * @param mapper
+     * @return
+     */
+    public final <Out> Indicator<Out> map(Function<T, Out> mapper) {
+        return new Indicator<>(normalizer) {
+            @Override
+            protected Out valueAtRounded(Tick tick) {
+                return mapper.apply(Indicatable.this.valueAt(tick));
+            }
+        };
+    }
+
+    /**
+     * Acquires the stream in which the indicator value flows at the specified timing.
+     * 
+     * @return
+     */
+    public final Signal<T> observeWhen(Signal<Tick> timing) {
+        return timing.map(this::valueAt);
+    }
+
 }

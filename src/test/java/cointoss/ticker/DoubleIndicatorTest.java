@@ -14,6 +14,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
 
 import cointoss.execution.Execution;
+import cointoss.util.Num;
 
 class DoubleIndicatorTest extends TickerTestSupport {
 
@@ -41,6 +42,17 @@ class DoubleIndicatorTest extends TickerTestSupport {
         assert indicator.valueAt(lower.ticks.getByIndex(5)) == 2d;
         assert indicator.valueAt(lower.ticks.getByIndex(6)) == 3d;
         assert indicator.valueAt(lower.ticks.getByIndex(12)) == 5d;
+    }
+
+    @Test
+    void map() {
+        Ticker ticker = ticker(TimeSpan.Second5, 1, 2, 3, 4, 5);
+        Indicator<Num> indicator = DoubleIndicator.build(ticker, tick -> tick.openPrice.doubleValue()).map(Num::of);
+        assert indicator.valueAt(ticker.ticks.getByIndex(0)).is(1);
+        assert indicator.valueAt(ticker.ticks.getByIndex(1)).is(2);
+        assert indicator.valueAt(ticker.ticks.getByIndex(2)).is(3);
+        assert indicator.valueAt(ticker.ticks.getByIndex(3)).is(4);
+        assert indicator.valueAt(ticker.ticks.getByIndex(4)).is(5);
     }
 
     @Test

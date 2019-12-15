@@ -45,6 +45,17 @@ class IndicatorTest extends TickerTestSupport {
     }
 
     @Test
+    void map() {
+        Ticker ticker = ticker(TimeSpan.Second5, 1, 2, 3, 4, 5);
+        Indicator<Num> indicator = Indicator.build(ticker, tick -> tick).map(Tick::openPrice);
+        assert indicator.valueAt(ticker.ticks.getByIndex(0)).is(1);
+        assert indicator.valueAt(ticker.ticks.getByIndex(1)).is(2);
+        assert indicator.valueAt(ticker.ticks.getByIndex(2)).is(3);
+        assert indicator.valueAt(ticker.ticks.getByIndex(3)).is(4);
+        assert indicator.valueAt(ticker.ticks.getByIndex(4)).is(5);
+    }
+
+    @Test
     void memo() {
         AtomicInteger count = new AtomicInteger();
 
