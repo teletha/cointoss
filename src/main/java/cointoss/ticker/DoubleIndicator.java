@@ -58,7 +58,7 @@ public abstract class DoubleIndicator extends Indicatable<Double> {
      * @return A time-based value.
      */
     @Override
-    public final Double valueAt(Tick timestamp) {
+    public Double valueAt(Tick timestamp) {
         return valueAtRounded(normalizer.apply(timestamp));
     }
 

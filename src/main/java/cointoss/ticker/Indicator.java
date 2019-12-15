@@ -57,7 +57,7 @@ public abstract class Indicator<T> extends Indicatable<T> {
      * @return A time-based value.
      */
     @Override
-    public final T valueAt(Tick timestamp) {
+    public T valueAt(Tick timestamp) {
         return valueAtRounded(normalizer.apply(timestamp));
     }
 

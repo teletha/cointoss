@@ -47,12 +47,23 @@ class DoubleIndicatorTest extends TickerTestSupport {
     @Test
     void map() {
         Ticker ticker = ticker(TimeSpan.Second5, 1, 2, 3, 4, 5);
-        Indicator<Num> indicator = DoubleIndicator.build(ticker, tick -> tick.openPrice.doubleValue()).map(Num::of);
+        Indicator<Num> indicator = DoubleIndicator.build(ticker, tick -> tick.openPrice.doubleValue()).map(v -> Num.of(v));
         assert indicator.valueAt(ticker.ticks.getByIndex(0)).is(1);
         assert indicator.valueAt(ticker.ticks.getByIndex(1)).is(2);
         assert indicator.valueAt(ticker.ticks.getByIndex(2)).is(3);
         assert indicator.valueAt(ticker.ticks.getByIndex(3)).is(4);
         assert indicator.valueAt(ticker.ticks.getByIndex(4)).is(5);
+    }
+
+    @Test
+    void mapToDouble() {
+        Ticker ticker = ticker(TimeSpan.Second5, 1, 2, 3, 4, 5);
+        DoubleIndicator indicator = DoubleIndicator.build(ticker, tick -> tick.openPrice.doubleValue()).mapTo(v -> v + 1);
+        assert indicator.valueAt(ticker.ticks.getByIndex(0)) == 2d;
+        assert indicator.valueAt(ticker.ticks.getByIndex(1)) == 3d;
+        assert indicator.valueAt(ticker.ticks.getByIndex(2)) == 4d;
+        assert indicator.valueAt(ticker.ticks.getByIndex(3)) == 5d;
+        assert indicator.valueAt(ticker.ticks.getByIndex(4)) == 6d;
     }
 
     @Test

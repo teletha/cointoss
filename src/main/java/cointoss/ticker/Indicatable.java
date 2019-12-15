@@ -10,6 +10,7 @@
 package cointoss.ticker;
 
 import java.util.function.Function;
+import java.util.function.ToDoubleFunction;
 
 import kiss.Signal;
 import kiss.Variable;
@@ -66,17 +67,43 @@ public abstract class Indicatable<T> {
     public abstract T valueAt(Tick timestamp);
 
     /**
-     * Wrap by the mapped result.
+     * Gets the indicator whose value is changed by the mapping function.
      * 
-     * @param <Out>
-     * @param mapper
-     * @return
+     * @param <Out> A result type.
+     * @param mapper A mapping function.
+     * @return Mapped indicator.
      */
     public final <Out> Indicator<Out> map(Function<T, Out> mapper) {
         return new Indicator<>(normalizer) {
+            @Override // override to avoid unnecessary calculations
+            public Out valueAt(Tick timestamp) {
+                return mapper.apply(Indicatable.this.valueAt(timestamp));
+            }
+
             @Override
             protected Out valueAtRounded(Tick tick) {
                 return mapper.apply(Indicatable.this.valueAt(tick));
+            }
+        };
+    }
+
+    /**
+     * Gets the indicator whose value is changed by the mapping function.
+     * 
+     * @param <Out> A result type.
+     * @param mapper A mapping function.
+     * @return Mapped indicator.
+     */
+    public final DoubleIndicator mapTo(ToDoubleFunction<T> mapper) {
+        return new DoubleIndicator(normalizer) {
+            @Override // override to avoid unnecessary calculations
+            public Double valueAt(Tick timestamp) {
+                return mapper.applyAsDouble(Indicatable.this.valueAt(timestamp));
+            }
+
+            @Override
+            protected double valueAtRounded(Tick tick) {
+                return mapper.applyAsDouble(Indicatable.this.valueAt(tick));
             }
         };
     }

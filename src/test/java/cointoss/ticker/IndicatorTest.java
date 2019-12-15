@@ -56,6 +56,17 @@ class IndicatorTest extends TickerTestSupport {
     }
 
     @Test
+    void mapToDouble() {
+        Ticker ticker = ticker(TimeSpan.Second5, 1, 2, 3, 4, 5);
+        DoubleIndicator indicator = Indicator.build(ticker, tick -> tick).mapTo(t -> t.openPrice.doubleValue());
+        assert indicator.valueAt(ticker.ticks.getByIndex(0)) == 1d;
+        assert indicator.valueAt(ticker.ticks.getByIndex(1)) == 2d;
+        assert indicator.valueAt(ticker.ticks.getByIndex(2)) == 3d;
+        assert indicator.valueAt(ticker.ticks.getByIndex(3)) == 4d;
+        assert indicator.valueAt(ticker.ticks.getByIndex(4)) == 5d;
+    }
+
+    @Test
     void memo() {
         AtomicInteger count = new AtomicInteger();
 
