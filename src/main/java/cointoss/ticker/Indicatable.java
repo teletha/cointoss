@@ -13,13 +13,13 @@ import java.util.function.Function;
 import java.util.function.ToDoubleBiFunction;
 import java.util.function.ToDoubleFunction;
 
-import org.eclipse.collections.api.block.function.primitive.ObjectDoubleToDoubleFunction;
-import org.eclipse.collections.api.block.function.primitive.ObjectDoubleToObjectFunction;
-
+import kiss.I;
 import kiss.Signal;
 import kiss.Variable;
 import kiss.WiseBiFunction;
 import kiss.WiseTriFunction;
+import kiss.Ⅱ;
+import kiss.Ⅲ;
 
 public abstract class Indicatable<T> {
 
@@ -73,6 +73,29 @@ public abstract class Indicatable<T> {
     public abstract T valueAt(Tick timestamp);
 
     /**
+     * Gets the indicator whose value is paired with the combinator.
+     * 
+     * @param <With> First combination type.
+     * @param combinator First Combinator.
+     * @return Combined indicator.
+     */
+    public final <With> Indicator<Ⅱ<T, With>> combine(Indicatable<With> combinator) {
+        return map(combinator, (a, b) -> I.pair(a, b));
+    }
+
+    /**
+     * Gets the indicator whose value is paired with the combinator.
+     * 
+     * @param <With> First combination type.
+     * @param combinator1 First Combinator.
+     * @param combinator2 Second Combinator.
+     * @return Combined indicator.
+     */
+    public final <With1, With2> Indicator<Ⅲ<T, With1, With2>> combine(Indicatable<With1> combinator1, Indicatable<With2> combinator2) {
+        return map(combinator1, combinator2, (a, b, c) -> I.pair(a, b, c));
+    }
+
+    /**
      * Gets the indicator whose value is changed by the mapping function.
      * 
      * @param <Out> A result type.
@@ -101,7 +124,7 @@ public abstract class Indicatable<T> {
      * @param mapper A mapping function.
      * @return Mapped indicator.
      */
-    public final <With, Out> Indicator<Out> map(Indicator<With> combinator, WiseBiFunction<T, With, Out> mapper) {
+    public final <With, Out> Indicator<Out> map(Indicatable<With> combinator, WiseBiFunction<T, With, Out> mapper) {
         return new Indicator<Out>(normalizer) {
             @Override // override to avoid unnecessary calculations
             public Out valueAt(Tick timestamp) {
@@ -111,28 +134,6 @@ public abstract class Indicatable<T> {
             @Override
             protected Out valueAtRounded(Tick tick) {
                 return mapper.apply(Indicatable.this.valueAt(tick), combinator.valueAt(tick));
-            }
-        };
-    }
-
-    /**
-     * Gets the indicator whose value is changed by the mapping function.
-     * 
-     * @param <Out> A result type.
-     * @param combinator First Combinator.
-     * @param mapper A mapping function.
-     * @return Mapped indicator.
-     */
-    public final <Out> Indicator<Out> map(DoubleIndicator combinator, ObjectDoubleToObjectFunction<T, Out> mapper) {
-        return new Indicator<Out>(normalizer) {
-            @Override // override to avoid unnecessary calculations
-            public Out valueAt(Tick timestamp) {
-                return mapper.valueOf(Indicatable.this.valueAt(timestamp), combinator.doubleAt(timestamp));
-            }
-
-            @Override
-            protected Out valueAtRounded(Tick tick) {
-                return mapper.valueOf(Indicatable.this.valueAt(tick), combinator.doubleAt(tick));
             }
         };
     }
@@ -189,7 +190,7 @@ public abstract class Indicatable<T> {
      * @param mapper A mapping function.
      * @return Mapped indicator.
      */
-    public final <With> DoubleIndicator dmap(Indicator<With> combinator, ToDoubleBiFunction<T, With> mapper) {
+    public final <With> DoubleIndicator dmap(Indicatable<With> combinator, ToDoubleBiFunction<T, With> mapper) {
         return new DoubleIndicator(normalizer) {
             @Override // override to avoid unnecessary calculations
             public Double valueAt(Tick timestamp) {
@@ -199,28 +200,6 @@ public abstract class Indicatable<T> {
             @Override
             protected double valueAtRounded(Tick tick) {
                 return mapper.applyAsDouble(Indicatable.this.valueAt(tick), combinator.valueAt(tick));
-            }
-        };
-    }
-
-    /**
-     * Gets the indicator whose value is changed by the mapping function.
-     * 
-     * @param <Out> A result type.
-     * @param combinator First Combinator.
-     * @param mapper A mapping function.
-     * @return Mapped indicator.
-     */
-    public final <With> DoubleIndicator dmap(DoubleIndicator combinator, ObjectDoubleToDoubleFunction<T> mapper) {
-        return new DoubleIndicator(normalizer) {
-            @Override // override to avoid unnecessary calculations
-            public Double valueAt(Tick timestamp) {
-                return mapper.valueOf(Indicatable.this.valueAt(timestamp), combinator.doubleAt(timestamp));
-            }
-
-            @Override
-            protected double valueAtRounded(Tick tick) {
-                return mapper.valueOf(Indicatable.this.valueAt(tick), combinator.doubleAt(tick));
             }
         };
     }

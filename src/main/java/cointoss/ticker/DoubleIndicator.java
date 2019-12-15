@@ -12,7 +12,6 @@ package cointoss.ticker;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.function.BiFunction;
-import java.util.function.DoubleBinaryOperator;
 import java.util.function.Function;
 import java.util.function.ToDoubleFunction;
 
@@ -22,8 +21,6 @@ import com.google.common.cache.CacheBuilder;
 import cointoss.util.Primitives;
 import kiss.I;
 import kiss.Variable;
-import kiss.Ⅱ;
-import kiss.Ⅲ;
 
 public abstract class DoubleIndicator extends Indicatable<Double> {
 
@@ -73,30 +70,6 @@ public abstract class DoubleIndicator extends Indicatable<Double> {
      * @return A time-based value.
      */
     protected abstract double valueAtRounded(Tick tick);
-
-    /**
-     * Wrap by combined {@link DoubleIndicator}.
-     * 
-     * @param <With>
-     * @param indicator1
-     * @return
-     */
-    public final <With> Indicator<Ⅱ<Double, With>> combine(Indicator<With> indicator1) {
-        return map(indicator1, (a, b) -> I.pair(a, b));
-    }
-
-    /**
-     * Wrap by combined {@link DoubleIndicator}.
-     * 
-     * @param <With1>
-     * @param <With2>
-     * @param indicator1
-     * @param indicator2
-     * @return
-     */
-    public final <With1, With2> Indicator<Ⅲ<Double, With1, With2>> combine(Indicator<With1> indicator1, Indicator<With2> indicator2) {
-        return map(indicator1, indicator2, (a, b, c) -> I.pair(a, b, c));
-    }
 
     /**
      * Wrap by scaled value.

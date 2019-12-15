@@ -20,9 +20,6 @@ import com.google.common.cache.CacheBuilder;
 import cointoss.util.Num;
 import kiss.I;
 import kiss.Variable;
-import kiss.WiseTriFunction;
-import kiss.Ⅱ;
-import kiss.Ⅲ;
 
 public abstract class Indicator<T> extends Indicatable<T> {
 
@@ -68,30 +65,6 @@ public abstract class Indicator<T> extends Indicatable<T> {
      * @return A time-based value.
      */
     protected abstract T valueAtRounded(Tick tick);
-
-    /**
-     * Wrap by combined {@link Indicator}.
-     * 
-     * @param <With>
-     * @param indicator1
-     * @return
-     */
-    public final <With> Indicator<Ⅱ<T, With>> combine(Indicator<With> indicator1) {
-        return map(indicator1, (a, b) -> I.pair(a, b));
-    }
-
-    /**
-     * Wrap by combined {@link Indicator}.
-     * 
-     * @param <With1>
-     * @param <With2>
-     * @param indicator1
-     * @param indicator2
-     * @return
-     */
-    public final <With1, With2> Indicator<Ⅲ<T, With1, With2>> combine(Indicator<With1> indicator1, Indicator<With2> indicator2) {
-        return map(indicator1, indicator2, (a, b, c) -> I.pair(a, b, c));
-    }
 
     /**
      * Wrap by scaled value.

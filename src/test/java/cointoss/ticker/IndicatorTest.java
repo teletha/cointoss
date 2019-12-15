@@ -15,6 +15,8 @@ import org.junit.jupiter.api.Test;
 
 import cointoss.execution.Execution;
 import cointoss.util.Num;
+import kiss.I;
+import kiss.Ⅱ;
 
 class IndicatorTest extends TickerTestSupport {
 
@@ -42,6 +44,19 @@ class IndicatorTest extends TickerTestSupport {
         assert indicator.valueAt(lower.ticks.getByIndex(5)).is(2);
         assert indicator.valueAt(lower.ticks.getByIndex(6)).is(3);
         assert indicator.valueAt(lower.ticks.getByIndex(12)).is(5);
+    }
+
+    @Test
+    void combine() {
+        Ticker ticker = ticker(TimeSpan.Second5, 1, 2, 3, 4, 5);
+        Indicator<Integer> open = Indicator.build(ticker, tick -> tick.openPrice.intValue());
+        Indicator<Integer> low = Indicator.build(ticker, tick -> tick.lowPrice.intValue());
+        Indicatable<Ⅱ<Integer, Integer>> indicator = open.combine(low);
+        assert indicator.valueAt(ticker.ticks.getByIndex(0)).equals(I.pair(1, 1));
+        assert indicator.valueAt(ticker.ticks.getByIndex(1)).equals(I.pair(2, 2));
+        assert indicator.valueAt(ticker.ticks.getByIndex(2)).equals(I.pair(3, 3));
+        assert indicator.valueAt(ticker.ticks.getByIndex(3)).equals(I.pair(4, 4));
+        assert indicator.valueAt(ticker.ticks.getByIndex(4)).equals(I.pair(5, 5));
     }
 
     @Test
