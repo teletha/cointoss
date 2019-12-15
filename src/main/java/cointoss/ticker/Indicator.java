@@ -20,7 +20,6 @@ import com.google.common.cache.CacheBuilder;
 import cointoss.util.Num;
 import kiss.I;
 import kiss.Variable;
-import kiss.WiseBiFunction;
 import kiss.WiseTriFunction;
 import kiss.Ⅱ;
 import kiss.Ⅲ;
@@ -92,23 +91,6 @@ public abstract class Indicator<T> extends Indicatable<T> {
      */
     public final <With1, With2> Indicator<Ⅲ<T, With1, With2>> combine(Indicator<With1> indicator1, Indicator<With2> indicator2) {
         return map(indicator1, indicator2, (a, b, c) -> I.pair(a, b, c));
-    }
-
-    /**
-     * Wrap by the calculation result between {@link Indicator}s.
-     * 
-     * @param indicator1
-     * @param calculater
-     * @return
-     */
-    public final <With, Out> Indicator<Out> map(Indicator<With> indicator1, WiseBiFunction<T, With, Out> calculater) {
-        return new Indicator<Out>(this) {
-
-            @Override
-            protected Out valueAtRounded(Tick tick) {
-                return calculater.apply((T) wrapped.valueAtRounded(tick), indicator1.valueAt(tick));
-            }
-        };
     }
 
     /**

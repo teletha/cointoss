@@ -56,9 +56,22 @@ class IndicatorTest extends TickerTestSupport {
     }
 
     @Test
+    void mapWith() {
+        Ticker ticker = ticker(TimeSpan.Second5, 1, 2, 3, 4, 5);
+        Indicator<Num> open = Indicator.build(ticker, tick -> tick.openPrice);
+        Indicator<Num> low = Indicator.build(ticker, tick -> tick.lowPrice);
+        Indicatable<Num> indicator = open.map(low, Num::plus);
+        assert indicator.valueAt(ticker.ticks.getByIndex(0)).is(2);
+        assert indicator.valueAt(ticker.ticks.getByIndex(1)).is(4);
+        assert indicator.valueAt(ticker.ticks.getByIndex(2)).is(6);
+        assert indicator.valueAt(ticker.ticks.getByIndex(3)).is(8);
+        assert indicator.valueAt(ticker.ticks.getByIndex(4)).is(10);
+    }
+
+    @Test
     void mapToDouble() {
         Ticker ticker = ticker(TimeSpan.Second5, 1, 2, 3, 4, 5);
-        DoubleIndicator indicator = Indicator.build(ticker, tick -> tick).mapTo(t -> t.openPrice.doubleValue());
+        DoubleIndicator indicator = Indicator.build(ticker, tick -> tick).mapToDouble(t -> t.openPrice.doubleValue());
         assert indicator.valueAt(ticker.ticks.getByIndex(0)) == 1d;
         assert indicator.valueAt(ticker.ticks.getByIndex(1)) == 2d;
         assert indicator.valueAt(ticker.ticks.getByIndex(2)) == 3d;

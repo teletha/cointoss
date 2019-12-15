@@ -10,10 +10,12 @@
 package cointoss.ticker;
 
 import java.util.function.Function;
+import java.util.function.ToDoubleBiFunction;
 import java.util.function.ToDoubleFunction;
 
 import kiss.Signal;
 import kiss.Variable;
+import kiss.WiseBiFunction;
 
 public abstract class Indicatable<T> {
 
@@ -94,16 +96,58 @@ public abstract class Indicatable<T> {
      * @param mapper A mapping function.
      * @return Mapped indicator.
      */
-    public final DoubleIndicator mapTo(ToDoubleFunction<T> mapper) {
+    public final <With, Out> Indicator<Out> map(Indicatable<With> indicator1, WiseBiFunction<T, With, Out> mapper) {
+        return new Indicator<Out>(normalizer) {
+            @Override // override to avoid unnecessary calculations
+            public Out valueAt(Tick timestamp) {
+                return mapper.apply(Indicatable.this.valueAt(timestamp), indicator1.valueAt(timestamp));
+            }
+
+            @Override
+            protected Out valueAtRounded(Tick tick) {
+                return mapper.apply(Indicatable.this.valueAt(tick), indicator1.valueAt(tick));
+            }
+        };
+    }
+
+    /**
+     * Gets the indicator whose value is changed by the mapping function.
+     * 
+     * @param <Out> A result type.
+     * @param mapper A mapping function.
+     * @return Mapped indicator.
+     */
+    public final DoubleIndicator mapToDouble(ToDoubleFunction<T> mapper) {
         return new DoubleIndicator(normalizer) {
             @Override // override to avoid unnecessary calculations
             public Double valueAt(Tick timestamp) {
                 return mapper.applyAsDouble(Indicatable.this.valueAt(timestamp));
             }
-
+    
             @Override
             protected double valueAtRounded(Tick tick) {
                 return mapper.applyAsDouble(Indicatable.this.valueAt(tick));
+            }
+        };
+    }
+
+    /**
+     * Gets the indicator whose value is changed by the mapping function.
+     * 
+     * @param <Out> A result type.
+     * @param mapper A mapping function.
+     * @return Mapped indicator.
+     */
+    public final <With> DoubleIndicator mapToDouble(Indicatable<With> indicator1, ToDoubleBiFunction<T, With> mapper) {
+        return new DoubleIndicator(normalizer) {
+            @Override // override to avoid unnecessary calculations
+            public Double valueAt(Tick timestamp) {
+                return mapper.applyAsDouble(Indicatable.this.valueAt(timestamp), indicator1.valueAt(timestamp));
+            }
+
+            @Override
+            protected double valueAtRounded(Tick tick) {
+                return mapper.applyAsDouble(Indicatable.this.valueAt(tick), indicator1.valueAt(tick));
             }
         };
     }
