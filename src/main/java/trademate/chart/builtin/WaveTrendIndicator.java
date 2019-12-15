@@ -13,7 +13,6 @@ import cointoss.Market;
 import cointoss.ticker.Indicator;
 import cointoss.ticker.Indicators;
 import cointoss.ticker.Ticker;
-import cointoss.util.Num;
 import kiss.Variable;
 import kiss.Ⅱ;
 import stylist.Style;
@@ -48,7 +47,7 @@ public class WaveTrendIndicator extends PlotScript implements StyleDSL {
      */
     @Override
     protected void declare(Market market, Ticker ticker) {
-        Indicator<Ⅱ<Num, Num>> indicator = Indicators.waveTrend(ticker, channelLength.v, averageLength.v);
+        Indicator<Ⅱ<Double, Double>> indicator = Indicators.waveTrend(ticker, channelLength.v, averageLength.v);
 
         low.line(0);
         low.line(overBoughtLevel1, Lazy);

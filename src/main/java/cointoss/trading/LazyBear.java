@@ -20,7 +20,6 @@ import cointoss.ticker.Indicator;
 import cointoss.ticker.Indicators;
 import cointoss.ticker.Ticker;
 import cointoss.ticker.TimeSpan;
-import cointoss.util.Num;
 import kiss.Ⅱ;
 
 public class LazyBear extends Trader {
@@ -37,13 +36,13 @@ public class LazyBear extends Trader {
     @Override
     protected void declare(Market market, FundManager fund) {
         Ticker ticker = market.tickers.of(tickerSpan);
-        Indicator<Ⅱ<Num, Num>> oscillator = Indicators.waveTrend(ticker);
+        Indicator<Ⅱ<Double, Double>> oscillator = Indicators.waveTrend(ticker);
 
         // disableWhile(observeProfit().map(p -> p.isLessThan(-10000)));
 
         double size = 0.1;
 
-        when(oscillator.observeWhen(ticker.add).take(v -> v.ⅰ.isLessThan(-entryThreshold)), value -> new Scenario() {
+        when(oscillator.observeWhen(ticker.add).take(v -> v.ⅰ < -entryThreshold), value -> new Scenario() {
 
             @Override
             protected void entry() {
@@ -52,7 +51,7 @@ public class LazyBear extends Trader {
 
             @Override
             protected void exit() {
-                exitWhen(oscillator.observeWhen(ticker.add).take(v -> v.ⅰ.isGreaterThan(exitThreshold)), s -> s.take());
+                exitWhen(oscillator.observeWhen(ticker.add).take(v -> v.ⅰ > exitThreshold), s -> s.take());
                 // exitAt(market.tickers.of(Span.Second5).add.flatMap(tick -> {
                 // if (tick.openPrice.isGreaterThan(this, entryPrice.plus(this, 3000))) {
                 // return I.signal(entryPrice.plus(this, 100));
@@ -63,7 +62,7 @@ public class LazyBear extends Trader {
             }
         });
 
-        when(oscillator.observeWhen(ticker.add).take(v -> v.ⅰ.isGreaterThan(entryThreshold)), value -> new Scenario() {
+        when(oscillator.observeWhen(ticker.add).take(v -> v.ⅰ > entryThreshold), value -> new Scenario() {
 
             @Override
             protected void entry() {
@@ -72,7 +71,7 @@ public class LazyBear extends Trader {
 
             @Override
             protected void exit() {
-                exitWhen(oscillator.observeWhen(ticker.add).take(v -> v.ⅰ.isLessThan(-exitThreshold)), s -> s.take());
+                exitWhen(oscillator.observeWhen(ticker.add).take(v -> v.ⅰ < -exitThreshold), s -> s.take());
                 // exitAt(market.tickers.of(Span.Second5).add.flatMap(tick -> {
                 // if (tick.openPrice.isGreaterThan(this, entryPrice.plus(this, 3000))) {
                 // return I.signal(entryPrice.plus(this, 100));

@@ -19,6 +19,7 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 
 import cointoss.util.Num;
+import cointoss.util.ToDoubleTriFunction;
 import kiss.I;
 import kiss.Signal;
 import kiss.Variable;
@@ -165,7 +166,8 @@ public abstract class AbstractIndicator<T, Self extends AbstractIndicator<T, Sel
         return new Indicator<Out>(normalizer) {
             @Override // override to avoid unnecessary calculations
             public Out valueAt(Tick timestamp) {
-                return mapper.apply(AbstractIndicator.this.valueAt(timestamp), combinator1.valueAt(timestamp), combinator2.valueAt(timestamp));
+                return mapper
+                        .apply(AbstractIndicator.this.valueAt(timestamp), combinator1.valueAt(timestamp), combinator2.valueAt(timestamp));
             }
 
             @Override
@@ -199,7 +201,6 @@ public abstract class AbstractIndicator<T, Self extends AbstractIndicator<T, Sel
     /**
      * Gets the indicator whose value is changed by the mapping function.
      * 
-     * @param <Out> A result type.
      * @param combinator First Combinator.
      * @param mapper A mapping function.
      * @return Mapped indicator.
@@ -214,6 +215,29 @@ public abstract class AbstractIndicator<T, Self extends AbstractIndicator<T, Sel
             @Override
             protected double valueAtRounded(Tick tick) {
                 return mapper.applyAsDouble(AbstractIndicator.this.valueAt(tick), combinator.valueAt(tick));
+            }
+        };
+    }
+
+    /**
+     * Gets the indicator whose value is changed by the mapping function.
+     * 
+     * @param combinator1 First Combinator.
+     * @param combinator2 Second Combinator.
+     * @param mapper A mapping function.
+     * @return Mapped indicator.
+     */
+    public final <With1, With2> DoubleIndicator dmap(AbstractIndicator<With1, ?> combinator1, AbstractIndicator<With2, ?> combinator2, ToDoubleTriFunction<T, With1, With2> mapper) {
+        return new DoubleIndicator(normalizer) {
+            @Override // override to avoid unnecessary calculations
+            public Double valueAt(Tick timestamp) {
+                return mapper.applyAsDouble(AbstractIndicator.this.valueAt(timestamp), combinator1.valueAt(timestamp), combinator2
+                        .valueAt(timestamp));
+            }
+
+            @Override
+            protected double valueAtRounded(Tick tick) {
+                return mapper.applyAsDouble(AbstractIndicator.this.valueAt(tick), combinator1.valueAt(tick), combinator2.valueAt(tick));
             }
         };
     }
@@ -273,7 +297,8 @@ public abstract class AbstractIndicator<T, Self extends AbstractIndicator<T, Sel
         return new NumIndicator(normalizer) {
             @Override // override to avoid unnecessary calculations
             public Num valueAt(Tick timestamp) {
-                return mapper.apply(AbstractIndicator.this.valueAt(timestamp), combinator1.valueAt(timestamp), combinator2.valueAt(timestamp));
+                return mapper
+                        .apply(AbstractIndicator.this.valueAt(timestamp), combinator1.valueAt(timestamp), combinator2.valueAt(timestamp));
             }
 
             @Override
