@@ -17,9 +17,6 @@ import cointoss.util.Num;
 
 public abstract class NumIndicator extends IndicatableNumberBase<Num, NumIndicator> {
 
-    /** The wrapped {@link NumIndicator}. (OPTIONAL: may be null) */
-    protected final NumIndicator wrapped;
-
     /**
      * Build with the target {@link Ticker}.
      * 
@@ -27,17 +24,6 @@ public abstract class NumIndicator extends IndicatableNumberBase<Num, NumIndicat
      */
     protected NumIndicator(Function<Tick, Tick> normalizer) {
         super(normalizer);
-        this.wrapped = null;
-    }
-
-    /**
-     * Build with the delegation {@link NumIndicator}.
-     * 
-     * @param indicator A {@link NumIndicator} to delegate.
-     */
-    protected NumIndicator(NumIndicator indicator) {
-        super(indicator.normalizer);
-        this.wrapped = Objects.requireNonNull(indicator);
     }
 
     /**
@@ -79,11 +65,11 @@ public abstract class NumIndicator extends IndicatableNumberBase<Num, NumIndicat
      */
     @Override
     public final NumIndicator scale(int scale) {
-        return new NumIndicator(this) {
+        return new NumIndicator(normalizer) {
 
             @Override
             protected Num valueAtRounded(Tick tick) {
-                return wrapped.valueAt(tick).scale(scale);
+                return NumIndicator.this.valueAt(tick).scale(scale);
             }
         };
     }
@@ -131,7 +117,7 @@ public abstract class NumIndicator extends IndicatableNumberBase<Num, NumIndicat
      */
     @Override
     public final NumIndicator sma(int size) {
-        return new NumIndicator(this) {
+        return new NumIndicator(normalizer) {
 
             @Override
             protected Num valueAtRounded(Tick tick) {
@@ -139,7 +125,7 @@ public abstract class NumIndicator extends IndicatableNumberBase<Num, NumIndicat
                 Tick current = tick;
                 int remaining = size;
                 while (current != null && 0 < remaining) {
-                    value += wrapped.valueAt(current).doubleValue();
+                    value += NumIndicator.this.valueAt(current).doubleValue();
                     current = current.previous();
                     remaining--;
                 }
@@ -153,18 +139,18 @@ public abstract class NumIndicator extends IndicatableNumberBase<Num, NumIndicat
      */
     @Override
     public final NumIndicator wma(int size) {
-        return new NumIndicator(this) {
+        return new NumIndicator(normalizer) {
 
             @Override
             protected Num valueAtRounded(Tick tick) {
                 if (tick.previous() == null) {
-                    return wrapped.valueAt(tick);
+                    return NumIndicator.this.valueAt(tick);
                 }
 
                 double value = 0;
                 int actualSize = calculatePreviousTickLength(tick, size);
                 for (int i = actualSize; 0 < i; i--) {
-                    value += wrapped.valueAt(tick).doubleValue() * i;
+                    value += NumIndicator.this.valueAt(tick).doubleValue() * i;
                     tick = tick.previous();
                 }
                 return Num.of(value / (actualSize * (actualSize + 1) / 2));

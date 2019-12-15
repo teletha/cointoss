@@ -10,21 +10,13 @@
 package cointoss.ticker;
 
 import java.util.Objects;
-import java.util.concurrent.ExecutionException;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.ToDoubleFunction;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-
 import cointoss.util.Primitives;
-import kiss.I;
 
 public abstract class DoubleIndicator extends IndicatableNumberBase<Double, DoubleIndicator> {
-
-    /** The wrapped {@link DoubleIndicator}. (OPTIONAL: may be null) */
-    protected final DoubleIndicator wrapped;
 
     /**
      * Build with the target {@link Ticker}.
@@ -33,17 +25,6 @@ public abstract class DoubleIndicator extends IndicatableNumberBase<Double, Doub
      */
     protected DoubleIndicator(Function<Tick, Tick> normalizer) {
         super(normalizer);
-        this.wrapped = null;
-    }
-
-    /**
-     * Build with the delegation {@link DoubleIndicator}.
-     * 
-     * @param indicator A {@link DoubleIndicator} to delegate.
-     */
-    protected DoubleIndicator(DoubleIndicator indicator) {
-        super(indicator.normalizer);
-        this.wrapped = Objects.requireNonNull(indicator);
     }
 
     /**
@@ -89,11 +70,11 @@ public abstract class DoubleIndicator extends IndicatableNumberBase<Double, Doub
      */
     @Override
     public final DoubleIndicator scale(int scale) {
-        return new DoubleIndicator(this) {
+        return new DoubleIndicator(normalizer) {
 
             @Override
             protected double valueAtRounded(Tick tick) {
-                return Primitives.roundDecimal(wrapped.doubleAt(tick), scale);
+                return Primitives.roundDecimal(DoubleIndicator.this.doubleAt(tick), scale);
             }
         };
     }
@@ -141,7 +122,7 @@ public abstract class DoubleIndicator extends IndicatableNumberBase<Double, Doub
      */
     @Override
     public final DoubleIndicator sma(int size) {
-        return new DoubleIndicator(this) {
+        return new DoubleIndicator(normalizer) {
 
             @Override
             protected double valueAtRounded(Tick tick) {
@@ -149,7 +130,7 @@ public abstract class DoubleIndicator extends IndicatableNumberBase<Double, Doub
                 Tick current = tick;
                 int remaining = size;
                 while (current != null && 0 < remaining) {
-                    value += wrapped.doubleAt(current);
+                    value += DoubleIndicator.this.doubleAt(current);
                     current = current.previous();
                     remaining--;
                 }
@@ -163,18 +144,18 @@ public abstract class DoubleIndicator extends IndicatableNumberBase<Double, Doub
      */
     @Override
     public final DoubleIndicator wma(int size) {
-        return new DoubleIndicator(this) {
+        return new DoubleIndicator(normalizer) {
 
             @Override
             protected double valueAtRounded(Tick tick) {
                 if (tick.previous() == null) {
-                    return wrapped.doubleAt(tick);
+                    return DoubleIndicator.this.doubleAt(tick);
                 }
 
                 double value = 0;
                 int actualSize = calculatePreviousTickLength(tick, size);
                 for (int i = actualSize; 0 < i; i--) {
-                    value += wrapped.doubleAt(tick) * i;
+                    value += DoubleIndicator.this.doubleAt(tick) * i;
                     tick = tick.previous();
                 }
                 return value / (actualSize * (actualSize + 1) / 2);
