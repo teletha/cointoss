@@ -78,7 +78,7 @@ public enum TimeSpan {
     public final Duration duration;
 
     /** The number of seconds. */
-    final long seconds;
+    public final long seconds;
 
     /** The indexes of associated upper tickers. */
     final int[] uppers;
