@@ -162,7 +162,7 @@ public abstract class PlotScript implements StyleDSL {
             if (style == null) {
                 style = ChartStyles.MouseTrack;
             }
-            lines.add(new LineChart(indicator, style, info));
+            lines.add(new LineChart(indicator.memoize(), style, info));
         }
 
         /**

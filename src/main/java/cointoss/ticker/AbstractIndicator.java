@@ -36,6 +36,9 @@ public abstract class AbstractIndicator<T, Self extends AbstractIndicator<T, Sel
     /** The mapper from timestamp to tick. */
     protected final Function<Tick, Tick> normalizer;
 
+    /** The state of memoization. */
+    boolean memoized = false;
+
     /**
      * Build with the target {@link Ticker}.
      * 
@@ -326,10 +329,14 @@ public abstract class AbstractIndicator<T, Self extends AbstractIndicator<T, Sel
      * @return Memoized {@link AbstractIndicator}.
      */
     public final Self memoize(int limit, BiFunction<Tick, Function<Tick, T>, T> calculator) {
+        if (memoized) {
+            return (Self) this;
+        }
+
         Cache<Tick, T> cache = CacheBuilder.newBuilder().maximumSize(8192).weakKeys().weakValues().build();
         int[] count = {limit};
 
-        return build((tick, created) -> {
+        Self memo = build((tick, created) -> {
             if (count[0] == 0) return valueAt(tick);
             if (tick.closePrice == null /* The latest tick MUST NOT cache. */) return calculator.apply(tick, created::valueAt);
 
@@ -344,6 +351,9 @@ public abstract class AbstractIndicator<T, Self extends AbstractIndicator<T, Sel
                 throw I.quiet(e);
             }
         });
+
+        memo.memoized = true;
+        return memo;
     }
 
     /**

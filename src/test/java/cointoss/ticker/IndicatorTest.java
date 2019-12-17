@@ -155,6 +155,15 @@ class IndicatorTest extends TickerTestSupport {
     }
 
     @Test
+    void avoidMultiMemo() {
+        Ticker ticker = ticker(TimeSpan.Second5, 1, 2, 3, 4, 5);
+        Indicator<Num> indicator = Indicator.build(ticker, tick -> tick.openPrice);
+        Indicator<Num> memoized = indicator.memoize();
+        assert memoized != indicator;
+        assert memoized == memoized.memoize();
+    }
+
+    @Test
     void dontCacheLatest() {
         Ticker ticker = ticker(TimeSpan.Second5, 1, 2, 3);
         Tick tick2 = ticker.ticks.getByIndex(2);
