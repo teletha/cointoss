@@ -418,7 +418,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
      */
     private void drawCandle() {
         layoutCandle.layout(() -> {
-            System.out.println("redraw");
             // redraw all candles.
             GraphicsContext gc = candles.getGraphicsContext2D();
             gc.clearRect(0, 0, candles.getWidth(), candles.getHeight());
@@ -439,7 +438,10 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
             // Estimate capacity, but a little larger as insurance (+2) to avoid re-copying the
             // array of capacity increase.
-            MutableDoubleList valueX = new NoCopyDoubleList((int) ((end - start) / chart.ticker.v.span.seconds) + 2);
+            double tickSize = ((end - start) / chart.ticker.v.span.seconds) + 2;
+            boolean needDrawingOpenAndClose = tickSize < candles.getWidth();
+
+            MutableDoubleList valueX = new NoCopyDoubleList((int) tickSize);
 
             chart.ticker.v.ticks.each(start, end, tick -> {
                 double x = axisX.getPositionForValue(tick.startSeconds);
@@ -451,8 +453,10 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 gc.setStroke(open < close ? Sell : Buy);
                 gc.setLineWidth(1);
                 gc.strokeLine(x, high, x, low);
-                gc.setLineWidth(BarWidth);
-                gc.strokeLine(x, open, x, close);
+                if (needDrawingOpenAndClose) {
+                    gc.setLineWidth(BarWidth);
+                    gc.strokeLine(x, open, x, close);
+                }
 
                 for (PlotDSL plotter : plotters) {
                     if (registry.globalSetting(plotter.origin).visible.is(false)) {
