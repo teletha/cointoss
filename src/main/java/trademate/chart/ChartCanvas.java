@@ -9,24 +9,14 @@
  */
 package trademate.chart;
 
-import static transcript.Transcript.*;
+import static transcript.Transcript.en;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Supplier;
 import java.util.function.ToDoubleFunction;
 
-import org.eclipse.collections.api.list.primitive.MutableDoubleList;
-import org.eclipse.collections.impl.list.mutable.primitive.DoubleArrayList;
-
-import cointoss.MarketService;
-import cointoss.market.bitflyer.BitFlyer;
-import cointoss.market.bitflyer.SFD;
-import cointoss.ticker.AbstractIndicator;
-import cointoss.ticker.Indicator;
-import cointoss.ticker.Tick;
-import cointoss.util.Chrono;
-import cointoss.util.Num;
 import javafx.collections.ObservableList;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -38,8 +28,27 @@ import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.PathElement;
 import javafx.scene.text.Font;
+
+import org.eclipse.collections.api.list.primitive.MutableDoubleList;
+import org.eclipse.collections.impl.list.mutable.primitive.DoubleArrayList;
+
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+
+import cointoss.Market;
+import cointoss.MarketService;
+import cointoss.market.bitflyer.BitFlyer;
+import cointoss.market.bitflyer.SFD;
+import cointoss.ticker.AbstractIndicator;
+import cointoss.ticker.Indicator;
+import cointoss.ticker.Tick;
+import cointoss.ticker.Ticker;
+import cointoss.util.Chrono;
+import cointoss.util.Num;
 import kiss.I;
 import kiss.Variable;
+import kiss.Ⅲ;
 import stylist.Style;
 import trademate.chart.Axis.TickLable;
 import trademate.chart.PlotScript.PlotDSL;
@@ -128,6 +137,28 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     /** The number of plot scripts. */
     private List<PlotScript> scripts;
 
+    /** The cache by span. */
+    private LoadingCache<Ⅲ<Market, Ticker, ObservableList<Supplier<PlotScript>>>, PlotDSL[]> plottersCache = CacheBuilder.newBuilder()
+            .maximumSize(7)
+            .expireAfterAccess(Duration.ofHours(1))
+            .build(new CacheLoader<>() {
+
+                @Override
+                public PlotDSL[] load(Ⅲ<Market, Ticker, ObservableList<Supplier<PlotScript>>> v) throws Exception {
+                    List<PlotScript> registered = registry.findPlottersBy(v.ⅰ, v.ⅱ);
+                    List<PlotScript> additional = I.signal(v.ⅲ).map(Supplier::get).toList();
+
+                    List<PlotDSL> combined = I.signal(registered, additional)
+                            .flatIterable(list -> list)
+                            .effect(script -> script.declare(v.ⅰ, v.ⅱ))
+                            .flatArray(s -> new PlotDSL[] {s.bottom, s.bottomN, s.low, s.lowN, s.high, s.highN, s.top, s.topN, s.main})
+                            .skip(plotter -> plotter.lines.isEmpty() && plotter.horizons.isEmpty() && plotter.candles.isEmpty())
+                            .toList();
+
+                    return combined.toArray(new PlotDSL[combined.size()]);
+                }
+            });
+
     /** The size of chart infomation area. */
     private final int chartInfoWidth = 60;
 
@@ -165,17 +196,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         this.chartInfo.heightProperty().bind(heightProperty());
 
         chart.market.observe().combineLatest(chart.ticker.observe(), Viewtify.observing(chart.scripts)).to(v -> {
-            List<PlotScript> registered = registry.findPlottersBy(v.ⅰ, v.ⅱ);
-            List<PlotScript> additional = I.signal(v.ⅲ).map(Supplier::get).toList();
-
-            List<PlotDSL> combined = I.signal(registered, additional)
-                    .flatIterable(list -> list)
-                    .effect(script -> script.declare(v.ⅰ, v.ⅱ))
-                    .flatArray(s -> new PlotDSL[] {s.bottom, s.bottomN, s.low, s.lowN, s.high, s.highN, s.top, s.topN, s.main})
-                    .skip(plotter -> plotter.lines.isEmpty() && plotter.horizons.isEmpty() && plotter.candles.isEmpty())
-                    .toList();
-
-            plotters = combined.toArray(new PlotDSL[combined.size()]);
+            plotters = plottersCache.getUnchecked(v);
             scripts = I.signal(plotters).map(p -> p.origin).distinct().toList();
         });
 
@@ -418,110 +439,124 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
      */
     private void drawCandle() {
         layoutCandle.layout(() -> {
-            // redraw all candles.
-            GraphicsContext gc = candles.getGraphicsContext2D();
-            gc.clearRect(0, 0, candles.getWidth(), candles.getHeight());
+            while (true) {
+                // estimate visible range
+                long start = (long) axisX.computeVisibleMinValue();
+                long end = (long) axisX.computeVisibleMaxValue() - chart.ticker.v.span.duration.getSeconds();
 
-            // draw chart in visible range
-            for (PlotDSL plotter : plotters) {
-                plotter.lineMaxY = 0;
+                // Estimate capacity, but a little larger as insurance (+2) to avoid re-copying the
+                // array of capacity increase.
+                double tickSize = ((end - start) / chart.ticker.v.span.seconds) + 2;
+                double canvasWidth = candles.getWidth();
+                double tickRatio = canvasWidth / tickSize;
 
-                // ensure size
-                for (LineChart chart : plotter.lines) {
-                    chart.valueY.clear();
+                if (tickRatio < 0.13) {
+                    System.out.println(tickRatio);
+                    axisX.zoom(-1);
+                    continue;
+                } else if (6 < tickRatio && axisX.scroll.getVisibleAmount() < 1) {
+                    axisX.zoom(1);
+                    continue;
                 }
-            }
+                boolean needDrawingOpenAndClose = 1 < tickRatio;
 
-            // estimate visible range
-            long start = (long) axisX.computeVisibleMinValue();
-            long end = (long) axisX.computeVisibleMaxValue() - chart.ticker.v.span.duration.getSeconds();
+                // redraw all candles.
+                GraphicsContext gc = candles.getGraphicsContext2D();
+                gc.clearRect(0, 0, candles.getWidth(), candles.getHeight());
 
-            // Estimate capacity, but a little larger as insurance (+2) to avoid re-copying the
-            // array of capacity increase.
-            double tickSize = ((end - start) / chart.ticker.v.span.seconds) + 2;
-            boolean needDrawingOpenAndClose = tickSize < candles.getWidth();
+                // draw chart in visible range
+                for (PlotDSL plotter : plotters) {
+                    plotter.lineMaxY = 0;
 
-            MutableDoubleList valueX = new NoCopyDoubleList((int) tickSize);
-
-            chart.ticker.v.ticks.each(start, end, tick -> {
-                double x = axisX.getPositionForValue(tick.startSeconds);
-                double open = axisY.getPositionForValue(tick.openPrice.doubleValue());
-                double close = axisY.getPositionForValue(tick.closePrice().doubleValue());
-                double high = axisY.getPositionForValue(tick.highPrice().doubleValue());
-                double low = axisY.getPositionForValue(tick.lowPrice().doubleValue());
-
-                gc.setStroke(open < close ? Sell : Buy);
-                gc.setLineWidth(1);
-                gc.strokeLine(x, high, x, low);
-                if (needDrawingOpenAndClose) {
-                    gc.setLineWidth(BarWidth);
-                    gc.strokeLine(x, open, x, close);
+                    // ensure size
+                    for (LineChart chart : plotter.lines) {
+                        chart.valueY.clear();
+                    }
                 }
+
+                MutableDoubleList valueX = new NoCopyDoubleList((int) tickSize);
+
+                chart.ticker.v.ticks.each(start, end, tick -> {
+                    double x = axisX.getPositionForValue(tick.startSeconds);
+                    double open = axisY.getPositionForValue(tick.openPrice.doubleValue());
+                    double close = axisY.getPositionForValue(tick.closePrice().doubleValue());
+                    double high = axisY.getPositionForValue(tick.highPrice().doubleValue());
+                    double low = axisY.getPositionForValue(tick.lowPrice().doubleValue());
+
+                    gc.setStroke(open < close ? Sell : Buy);
+                    gc.setLineWidth(1);
+                    gc.strokeLine(x, high, x, low);
+                    if (needDrawingOpenAndClose) {
+                        gc.setLineWidth(BarWidth);
+                        gc.strokeLine(x, open, x, close);
+                    }
+
+                    for (PlotDSL plotter : plotters) {
+                        if (registry.globalSetting(plotter.origin).visible.is(false)) {
+                            continue;
+                        }
+
+                        for (LineChart chart : plotter.lines) {
+                            double calculated = chart.indicator.applyAsDouble(tick);
+
+                            if (plotter.area == PlotArea.Main) {
+                                calculated = axisY.getPositionForValue(calculated);
+                            } else {
+                                double max = 0 <= calculated ? calculated : -calculated;
+                                if (plotter.lineMaxY < max) {
+                                    plotter.lineMaxY = max;
+                                }
+                            }
+                            chart.valueY.add(calculated);
+                        }
+
+                        // draw candle mark
+                        for (CandleMark mark : plotter.candles) {
+                            if (mark.indicator.valueAt(tick)) {
+                                gc.setFill(mark.color);
+                                gc.fillOval(x - (BarWidth / 2), high - BarWidth - 2, BarWidth, BarWidth);
+                            }
+                        }
+                    }
+                    valueX.add(x);
+                });
+
+                double[] arrayX = valueX.toArray();
+                double width = candles.getWidth();
+                double height = candles.getHeight();
 
                 for (PlotDSL plotter : plotters) {
                     if (registry.globalSetting(plotter.origin).visible.is(false)) {
                         continue;
                     }
 
-                    for (LineChart chart : plotter.lines) {
-                        double calculated = chart.indicator.applyAsDouble(tick);
+                    double scale = plotter.scale();
 
-                        if (plotter.area == PlotArea.Main) {
-                            calculated = axisY.getPositionForValue(calculated);
-                        } else {
-                            double max = 0 <= calculated ? calculated : -calculated;
-                            if (plotter.lineMaxY < max) {
-                                plotter.lineMaxY = max;
+                    // draw horizontal line
+                    for (Horizon horizon : plotter.horizons) {
+                        double y = plotter.area != PlotArea.Main ? height - plotter.area.offset - horizon.value * scale : horizon.value;
+
+                        gc.setLineWidth(horizon.width);
+                        gc.setStroke(horizon.color);
+                        gc.setLineDashes(horizon.dashArray);
+                        gc.strokeLine(0, y, width, y);
+                    }
+
+                    // draw line chart
+                    for (LineChart chart : plotter.lines) {
+                        if (plotter.area != PlotArea.Main) {
+                            for (int i = 0; i < chart.valueY.size(); i++) {
+                                chart.valueY.set(i, height - plotter.area.offset - chart.valueY.get(i) * scale);
                             }
                         }
-                        chart.valueY.add(calculated);
-                    }
 
-                    // draw candle mark
-                    for (CandleMark mark : plotter.candles) {
-                        if (mark.indicator.valueAt(tick)) {
-                            gc.setFill(mark.color);
-                            gc.fillOval(x - (BarWidth / 2), high - BarWidth - 2, BarWidth, BarWidth);
-                        }
+                        gc.setLineWidth(chart.width);
+                        gc.setStroke(chart.color);
+                        gc.setLineDashes(chart.dashArray);
+                        gc.strokePolyline(arrayX, chart.valueY.toArray(), valueX.size());
                     }
                 }
-                valueX.add(x);
-            });
-
-            double[] arrayX = valueX.toArray();
-            double width = candles.getWidth();
-            double height = candles.getHeight();
-
-            for (PlotDSL plotter : plotters) {
-                if (registry.globalSetting(plotter.origin).visible.is(false)) {
-                    continue;
-                }
-
-                double scale = plotter.scale();
-
-                // draw horizontal line
-                for (Horizon horizon : plotter.horizons) {
-                    double y = plotter.area != PlotArea.Main ? height - plotter.area.offset - horizon.value * scale : horizon.value;
-
-                    gc.setLineWidth(horizon.width);
-                    gc.setStroke(horizon.color);
-                    gc.setLineDashes(horizon.dashArray);
-                    gc.strokeLine(0, y, width, y);
-                }
-
-                // draw line chart
-                for (LineChart chart : plotter.lines) {
-                    if (plotter.area != PlotArea.Main) {
-                        for (int i = 0; i < chart.valueY.size(); i++) {
-                            chart.valueY.set(i, height - plotter.area.offset - chart.valueY.get(i) * scale);
-                        }
-                    }
-
-                    gc.setLineWidth(chart.width);
-                    gc.setStroke(chart.color);
-                    gc.setLineDashes(chart.dashArray);
-                    gc.strokePolyline(arrayX, chart.valueY.toArray(), valueX.size());
-                }
+                break;
             }
         });
 

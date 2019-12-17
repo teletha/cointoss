@@ -41,13 +41,10 @@ import viewtify.Viewtify;
 import viewtify.ui.helper.LayoutAssistant;
 import viewtify.ui.helper.StyleHelper;
 
-/**
- * @version 2018/06/26 10:59:28
- */
 public class Axis extends Region {
 
     /** The default zoom size. */
-    private static final int ZoomSize = 100;
+    private static final int ZoomSize = 200;
 
     /**
      * We use these for auto ranging to pick a user friendly tick unit. We handle tick units in the
@@ -140,12 +137,21 @@ public class Axis extends Region {
 
         // zoom function
         addEventHandler(ScrollEvent.SCROLL, e -> {
-            Num change = Num.of(e.getDeltaY() / e.getMultiplierY() / ZoomSize);
-            Num current = Num.of(scroll.getVisibleAmount());
-            Num next = Num.within(Num.ONE.divide(ZoomSize), current.plus(change), Num.ONE);
-
-            scroll.setVisibleAmount(next.doubleValue());
+            zoom(e.getDeltaY() / e.getMultiplierY());
         });
+    }
+
+    /**
+     * Increment or decrement zooming.
+     * 
+     * @param amout
+     */
+    public void zoom(double amout) {
+        Num change = Num.of(amout / ZoomSize);
+        Num current = Num.of(scroll.getVisibleAmount());
+        Num next = Num.within(Num.ONE.divide(ZoomSize), current.plus(change), Num.ONE);
+
+        scroll.setVisibleAmount(next.doubleValue());
     }
 
     /**
