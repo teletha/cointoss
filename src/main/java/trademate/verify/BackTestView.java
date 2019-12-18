@@ -244,6 +244,7 @@ public class BackTestView extends View implements Analyzer {
      */
     @Override
     protected void initialize() {
+        chart.chart.axisX.paddingRight.set(0);
         marketSelection.initialize(MarketServiceProvider.availableMarketServices());
         fastLog.initialize(false)
                 .text(en("Use Fast Log"))

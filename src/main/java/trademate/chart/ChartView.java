@@ -51,7 +51,7 @@ public class ChartView extends View {
     public final ObservableList<Supplier<PlotScript>> scripts = FXCollections.observableArrayList();
 
     /** The candle chart. */
-    private final Chart chart = new Chart(this);
+    public final Chart chart = new Chart(this);
 
     /**
      * UI definition.

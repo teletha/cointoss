@@ -24,9 +24,6 @@ import viewtify.ui.helper.LayoutAssistant;
 
 public class Chart extends Region {
 
-    /** The canvas right padding. */
-    public static final int PaddingRight = 30;
-
     /** The time unit interval. */
     private static long M = 60;
 
@@ -107,7 +104,7 @@ public class Chart extends Region {
     private void setAxisXRange() {
         if (chart.ticker.v.ticks.isNotEmpty()) {
             axisX.logicalMinValue.set(chart.ticker.v.ticks.first().startSeconds);
-            axisX.logicalMaxValue.set(chart.ticker.v.ticks.last().startSeconds + 1d);
+            axisX.logicalMaxValue.set(chart.ticker.v.ticks.last().startSeconds);
             axisX.visibleMinRange.set(200d * chart.ticker.v.span.seconds);
             axisX.visibleMaxRange.set(3000d * chart.ticker.v.span.seconds);
             axisX.zoom();

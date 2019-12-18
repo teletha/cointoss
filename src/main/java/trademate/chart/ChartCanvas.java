@@ -200,8 +200,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             scripts = I.signal(plotters).map(p -> p.origin).distinct().toList();
         });
 
-        Viewtify.clip(this);
-
         layoutCandle.layoutBy(widthProperty(), heightProperty())
                 .layoutBy(axisX.scroll.valueProperty(), axisX.scroll.visibleAmountProperty())
                 .layoutBy(axisY.scroll.valueProperty(), axisY.scroll.visibleAmountProperty())

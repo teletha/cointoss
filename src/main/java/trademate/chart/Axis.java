@@ -43,7 +43,7 @@ import viewtify.ui.helper.StyleHelper;
 public class Axis extends Region {
 
     /** The default zoom size. */
-    private static final int ZoomSize = 100;
+    private static final int ZoomSize = 200;
 
     /**
      * We use these for auto ranging to pick a user friendly tick unit. We handle tick units in the
@@ -81,6 +81,9 @@ public class Axis extends Region {
 
     /** The visible minimum range. */
     public final DoubleProperty visibleMinRange = new SimpleDoubleProperty(this, "visibleMinRange", 0);
+
+    /** The right padding. */
+    public final DoubleProperty paddingRight = new SimpleDoubleProperty(this, "paddingRight", 0.1);
 
     /** The tick unit. */
     public final ObjectProperty<double[]> units = new SimpleObjectProperty(DefaultTickUnit);
@@ -341,7 +344,11 @@ public class Axis extends Region {
      * @return
      */
     private double computeAxisLength() {
-        return isHorizontal() ? getWidth() : getHeight();
+        if (isVertical()) {
+            return getHeight();
+        } else {
+            return getWidth();
+        }
     }
 
     /**
