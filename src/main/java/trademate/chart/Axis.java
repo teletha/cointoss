@@ -77,7 +77,7 @@ public class Axis extends Region {
     public final DoubleProperty logicalMinValue = new SimpleDoubleProperty(this, "logicalMinValue", 0);
 
     /** The visible maximum range. */
-    public final DoubleProperty visibleMaxRange = new SimpleDoubleProperty(this, "visibleMaxRange", 10000);
+    public final DoubleProperty visibleMaxRange = new SimpleDoubleProperty(this, "visibleMaxRange", Double.MAX_VALUE);
 
     /** The visible minimum range. */
     public final DoubleProperty visibleMinRange = new SimpleDoubleProperty(this, "visibleMinRange", 0);
