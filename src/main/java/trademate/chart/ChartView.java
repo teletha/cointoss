@@ -11,11 +11,12 @@ package trademate.chart;
 
 import java.util.function.Supplier;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+
 import cointoss.Market;
 import cointoss.ticker.Ticker;
 import cointoss.ticker.TimeSpan;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import kiss.Variable;
 import stylist.Style;
 import stylist.StyleDSL;
@@ -50,7 +51,7 @@ public class ChartView extends View {
     public final ObservableList<Supplier<PlotScript>> scripts = FXCollections.observableArrayList();
 
     /** The candle chart. */
-    public final Chart chart = new Chart(this);
+    private final Chart chart = new Chart(this);
 
     /**
      * UI definition.

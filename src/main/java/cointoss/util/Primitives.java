@@ -38,4 +38,20 @@ public class Primitives {
         double s = Math.pow(10, scale);
         return DoubleMath.roundToInt(value * s, mode) / s;
     }
+
+    /**
+     * @param min
+     * @param value
+     * @param max
+     */
+    public static double within(double min, double value, double max) {
+        if (value < min) {
+            value = min;
+        }
+
+        if (max < value) {
+            value = max;
+        }
+        return value;
+    }
 }

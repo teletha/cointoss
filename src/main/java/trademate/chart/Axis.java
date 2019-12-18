@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.DoubleFunction;
 
-import cointoss.util.Num;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -34,6 +33,7 @@ import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.PathElement;
 import javafx.util.Duration;
+
 import kiss.Disposable;
 import stylist.Style;
 import viewtify.Viewtify;
@@ -75,6 +75,12 @@ public class Axis extends Region {
 
     /** The logical minimum value. */
     public final DoubleProperty logicalMinValue = new SimpleDoubleProperty(this, "logicalMinValue", 0);
+
+    /** The visible maximum range. */
+    public final DoubleProperty visibleMaxRange = new SimpleDoubleProperty(this, "visibleMaxRange", 10000);
+
+    /** The visible minimum range. */
+    public final DoubleProperty visibleMinRange = new SimpleDoubleProperty(this, "visibleMinRange", 0);
 
     /** The tick unit. */
     public final ObjectProperty<double[]> units = new SimpleObjectProperty(DefaultTickUnit);
@@ -137,25 +143,45 @@ public class Axis extends Region {
 
         // zoom function
         addEventHandler(ScrollEvent.SCROLL, e -> {
-            zoom(e.getDeltaY() / e.getMultiplierY());
+            zoom(scroll.getVisibleAmount() + e.getDeltaY() / e.getMultiplierY() / ZoomSize);
         });
+    }
+
+    /**
+     * Fit zooming.
+     */
+    public void zoom() {
+        double currentAmount = scroll.getVisibleAmount();
+        double range = computeVisibleMaxValue() - computeVisibleMinValue();
+
+        if (visibleMaxRange.get() <= range) {
+            zoom(currentAmount * (visibleMaxRange.get() / range));
+        } else if (range <= visibleMinRange.get()) {
+            zoom(currentAmount * (visibleMinRange.get() / range));
+        }
     }
 
     /**
      * Increment or decrement zooming.
      * 
-     * @param amout
+     * @param newAmount
      */
-    public void zoom(double amout) {
-        Num change = Num.of(amout / ZoomSize);
-        Num current = Num.of(scroll.getVisibleAmount());
-        Num next = Num.within(Num.ONE.divide(ZoomSize), current.plus(change), Num.ONE);
+    public void zoom(double newAmount) {
+        double currentAmount = scroll.getVisibleAmount();
+        double range = computeVisibleMaxValue() - computeVisibleMinValue();
 
-        scroll.setVisibleAmount(next.doubleValue());
-    }
+        if (currentAmount < newAmount) {
+            if (visibleMaxRange.get() <= range) {
+                return;
+            }
+        }
 
-    public void zoomR(double ratio) {
-        scroll.setVisibleAmount(ratio);
+        if (currentAmount > newAmount) {
+            if (range <= visibleMinRange.get()) {
+                return;
+            }
+        }
+        scroll.setVisibleAmount(newAmount);
     }
 
     /**
@@ -296,9 +322,6 @@ public class Axis extends Region {
             double value = (low - min) / (logicalDiff - visualDiff);
             scroll.setValue(isHorizontal() ? value : 1 - value);
             scroll.setVisibleAmount(visualDiff / logicalDiff);
-
-            System.out
-                    .println(low + "   " + up + "   " + visualDiff + "   " + uiRatio + "  " + max + "  " + min + "  " + logicalDiff + "  " + value + "   " + (visualDiff / logicalDiff));
         }
 
         // search nearest unit index

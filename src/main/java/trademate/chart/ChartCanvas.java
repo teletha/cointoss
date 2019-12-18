@@ -9,13 +9,25 @@
  */
 package trademate.chart;
 
-import static transcript.Transcript.*;
+import static transcript.Transcript.en;
 
 import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Supplier;
 import java.util.function.ToDoubleFunction;
+
+import javafx.collections.ObservableList;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Region;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.LineTo;
+import javafx.scene.shape.MoveTo;
+import javafx.scene.shape.Path;
+import javafx.scene.shape.PathElement;
+import javafx.scene.text.Font;
 
 import org.eclipse.collections.api.list.primitive.MutableDoubleList;
 import org.eclipse.collections.impl.list.mutable.primitive.DoubleArrayList;
@@ -34,17 +46,6 @@ import cointoss.ticker.Tick;
 import cointoss.ticker.Ticker;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
-import javafx.collections.ObservableList;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Region;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.LineTo;
-import javafx.scene.shape.MoveTo;
-import javafx.scene.shape.Path;
-import javafx.scene.shape.PathElement;
-import javafx.scene.text.Font;
 import kiss.I;
 import kiss.Variable;
 import kiss.Ⅲ;
@@ -444,33 +445,8 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
             // Estimate capacity, but a little larger as insurance (+2) to avoid re-copying the
             // array of capacity increase.
-            double tickSize = ((end - start) / chart.ticker.v.span.seconds);
-            double canvasWidth = candles.getWidth();
-            double tickRatio = canvasWidth / tickSize;
-            double currentVisibleAmount = axisX.scroll.getVisibleAmount();
-
-            if (5000 < tickSize && 0.01 < currentVisibleAmount) {
-                axisX.scroll.setVisibleAmount(currentVisibleAmount * (5000 / tickSize));
-                chart.chart.requestLayout();
-                return;
-            }
-
-            if (tickSize < 200 && currentVisibleAmount < 1) {
-                axisX.scroll.setVisibleAmount(currentVisibleAmount * (200 / tickSize));
-                chart.chart.requestLayout();
-                return;
-            }
-
-            System.out.println(tickSize);
-
-            // if (tickRatio < 0.3 && 0.01 < currentVisibleAmount) {
-            // axisX.zoom(-1);
-            // continue;
-            // } else if (5 < tickRatio && currentVisibleAmount < 1) {
-            // axisX.zoom(1);
-            // continue;
-            // }
-            boolean needDrawingOpenAndClose = 1 < tickRatio;
+            double tickSize = ((end - start) / chart.ticker.v.span.seconds) + 2;
+            boolean needDrawingOpenAndClose = tickSize * 0.3 < candles.getWidth();
 
             // redraw all candles.
             GraphicsContext gc = candles.getGraphicsContext2D();
