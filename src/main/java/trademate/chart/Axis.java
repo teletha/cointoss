@@ -43,7 +43,7 @@ import viewtify.ui.helper.StyleHelper;
 public class Axis extends Region {
 
     /** The default zoom size. */
-    private static final int ZoomSize = 200;
+    private static final int ZoomSize = 100;
 
     /**
      * We use these for auto ranging to pick a user friendly tick unit. We handle tick units in the
@@ -131,6 +131,7 @@ public class Axis extends Region {
         scroll.setMin(0);
         scroll.setMax(1);
         scroll.setVisibleAmount(1);
+        scroll.setUnitIncrement(1d / ZoomSize);
 
         getChildren().addAll(lines, tickLabels, scroll);
 
@@ -286,15 +287,18 @@ public class Axis extends Region {
         // layout scroll bar
         double max = logicalMaxValue.get();
         double min = logicalMinValue.get();
+        double logicalDiff = max - min;
 
         if (low == min && up == max) {
-            scroll.setValue(0);
+            scroll.setValue(1);
             scroll.setVisibleAmount(1);
         } else {
-            double logicalDiff = max - min;
             double value = (low - min) / (logicalDiff - visualDiff);
             scroll.setValue(isHorizontal() ? value : 1 - value);
             scroll.setVisibleAmount(visualDiff / logicalDiff);
+
+            System.out
+                    .println(low + "   " + up + "   " + visualDiff + "   " + uiRatio + "  " + max + "  " + min + "  " + logicalDiff + "  " + value + "   " + (visualDiff / logicalDiff));
         }
 
         // search nearest unit index

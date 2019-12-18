@@ -11,14 +11,13 @@ package trademate.chart;
 
 import java.util.concurrent.TimeUnit;
 
-import javafx.geometry.Insets;
-import javafx.geometry.Side;
-import javafx.scene.layout.Region;
-
 import cointoss.ticker.Tick;
 import cointoss.ticker.Ticker;
 import cointoss.ticker.TimeSpan;
 import cointoss.util.Num;
+import javafx.geometry.Insets;
+import javafx.geometry.Side;
+import javafx.scene.layout.Region;
 import kiss.Variable;
 import viewtify.ui.helper.LayoutAssistant;
 
@@ -103,7 +102,7 @@ public class Chart extends Region {
     private void setAxisXRange() {
         if (chart.ticker.v.ticks.isNotEmpty()) {
             axisX.logicalMinValue.set(chart.ticker.v.ticks.first().startSeconds);
-            axisX.logicalMaxValue.set(chart.ticker.v.ticks.last().startSeconds + 3 * 60);
+            axisX.logicalMaxValue.set(chart.ticker.v.ticks.last().startSeconds + 1);
         }
     }
 
