@@ -24,6 +24,9 @@ import viewtify.ui.helper.LayoutAssistant;
 
 public class Chart extends Region {
 
+    /** The canvas right padding. */
+    public static final int PaddingRight = 30;
+
     /** The time unit interval. */
     private static long M = 60;
 

@@ -269,22 +269,6 @@ public class Axis extends Region {
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected double computePrefWidth(double height) {
-        return 60;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected double computePrefHeight(double width) {
-        return 50;
-    }
-
-    /**
      * Compute visible max value.
      * 
      * @return
@@ -365,10 +349,10 @@ public class Axis extends Region {
      */
     @Override
     protected final void layoutChildren() {
-        double width = getWidth();
-        double height = getHeight();
-
         layoutAxis.layout(() -> {
+            double width = getWidth();
+            double height = getHeight();
+
             computeAxisProperties(width, height);
             layoutLines(width, height);
             layoutLabels(width, height);
