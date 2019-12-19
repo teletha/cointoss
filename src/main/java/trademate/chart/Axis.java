@@ -33,8 +33,8 @@ import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.PathElement;
 import javafx.util.Duration;
-
 import kiss.Disposable;
+import kiss.I;
 import stylist.Style;
 import viewtify.Viewtify;
 import viewtify.ui.helper.LayoutAssistant;
@@ -170,21 +170,26 @@ public class Axis extends Region {
      * @param newAmount
      */
     public void zoom(double newAmount) {
-        double currentAmount = scroll.getVisibleAmount();
-        double range = computeVisibleMaxValue() - computeVisibleMinValue();
+        try {
+            double currentAmount = scroll.getVisibleAmount();
+            double range = computeVisibleMaxValue() - computeVisibleMinValue();
 
-        if (currentAmount < newAmount) {
-            if (visibleMaxRange.get() <= range) {
-                return;
+            if (currentAmount < newAmount) {
+                if (visibleMaxRange.get() <= range) {
+                    return;
+                }
             }
-        }
 
-        if (currentAmount > newAmount) {
-            if (range <= visibleMinRange.get()) {
-                return;
+            if (currentAmount > newAmount) {
+                if (range <= visibleMinRange.get()) {
+                    return;
+                }
             }
+            scroll.setVisibleAmount(newAmount);
+        } catch (Throwable e) {
+            e.printStackTrace();
+            throw I.quiet(e);
         }
-        scroll.setVisibleAmount(newAmount);
     }
 
     /**
