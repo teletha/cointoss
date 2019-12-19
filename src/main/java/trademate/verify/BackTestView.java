@@ -138,6 +138,9 @@ public class BackTestView extends View implements Analyzer {
     /** The last disposer. */
     private Disposable lastDisposer = Disposable.empty();
 
+    /** The verification state. */
+    private Variable<Boolean> verifying = Variable.of(false);
+
     /**
      * UI definition.
      */
@@ -262,22 +265,26 @@ public class BackTestView extends View implements Analyzer {
             assert startDate.isBeforeOrSame(endDate.value()) : EndDateMustBeAfterStartDate;
         });
 
-        runner.text(en("Run")).disableWhen(startDate.isInvalid()).when(User.MouseClick).on(Viewtify.WorkerThread).to(e -> {
-            lastDisposer.dispose();
+        runner.text(en("Run"))
+                .disableWhen(startDate.isInvalid(), verifying.observing())
+                .when(User.MouseClick)
+                .on(Viewtify.WorkerThread)
+                .to(e -> {
+                    lastDisposer.dispose();
 
-            List<Trader> traders = new ArrayList();
+                    List<Trader> traders = new ArrayList();
 
-            for (ParameterizedTraderBuilder builder : builders) {
-                traders.addAll(builder.build());
-            }
-            BackTest.with.service(marketSelection.value())
-                    .start(startDate.zoned())
-                    .end(endDate.zoned())
-                    .traders(traders)
-                    .initialBaseCurrency(3000000)
-                    .type(fastLog.value() ? LogType.Fast : LogType.Normal)
-                    .run(this);
-        });
+                    for (ParameterizedTraderBuilder builder : builders) {
+                        traders.addAll(builder.build());
+                    }
+                    BackTest.with.service(marketSelection.value())
+                            .start(startDate.zoned())
+                            .end(endDate.zoned())
+                            .traders(traders)
+                            .initialBaseCurrency(3000000)
+                            .type(fastLog.value() ? LogType.Fast : LogType.Normal)
+                            .run(this);
+                });
 
         configureTradersView();
         configureTradingLogView();
@@ -404,6 +411,8 @@ public class BackTestView extends View implements Analyzer {
      */
     @Override
     public void initialize(Market market, List<Trader> traders) {
+        verifying.set(true);
+
         chart.reduceRealtimeUpdate();
         chart.market.set(market);
         chart.scripts.clear();
@@ -428,6 +437,7 @@ public class BackTestView extends View implements Analyzer {
             logSelection.items(logs);
         });
 
+        verifying.set(false);
         lastDisposer = market::dispose;
     }
 }
