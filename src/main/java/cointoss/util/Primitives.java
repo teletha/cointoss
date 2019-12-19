@@ -10,10 +10,19 @@
 package cointoss.util;
 
 import java.math.RoundingMode;
+import java.text.DecimalFormat;
 
 import com.google.common.math.DoubleMath;
 
 public class Primitives {
+
+    /** Fix decimal point(2). */
+    public static final DecimalFormat DecimalScale2 = new DecimalFormat("#.#");
+
+    static {
+        DecimalScale2.setMinimumFractionDigits(2);
+        DecimalScale2.setMaximumFractionDigits(2);
+    }
 
     /**
      * Round to the specified decimal place.

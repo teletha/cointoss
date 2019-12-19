@@ -13,7 +13,9 @@ import java.math.RoundingMode;
 
 import cointoss.execution.Execution;
 import cointoss.util.Num;
+import kiss.I;
 import kiss.Signal;
+import kiss.Ⅲ;
 
 /**
  * @version 2018/07/31 9:47:26
@@ -84,5 +86,25 @@ public enum SFD {
         } else {
             return price.multiply(diff).scale(0, RoundingMode.DOWN);
         }
+    }
+
+    /**
+     * Calculate the current difference percentage.
+     * 
+     * @return
+     */
+    public static Signal<Ⅲ<Num, Num, Num>> now() {
+        return BitFlyer.FX_BTC_JPY.executionsRealtimely().combineLatest(BitFlyer.BTC_JPY.executionsRealtimely()).map(e -> {
+            Num fx = e.ⅰ.price;
+            Num btc = e.ⅱ.price;
+            Num diff;
+
+            if (btc.isLessThanOrEqual(fx)) {
+                diff = fx.divide(btc).minus(Num.ONE).multiply(Num.HUNDRED);
+            } else {
+                diff = btc.divide(fx).minus(Num.ONE).multiply(Num.HUNDRED).negate();
+            }
+            return I.pair(fx, btc, diff);
+        });
     }
 }

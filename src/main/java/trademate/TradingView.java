@@ -14,6 +14,9 @@ import java.util.function.Predicate;
 import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.execution.ExecutionLog.LogType;
+import cointoss.market.bitflyer.BitFlyer;
+import cointoss.market.bitflyer.SFD;
+import cointoss.util.Primitives;
 import stylist.Style;
 import stylist.StyleDSL;
 import trademate.chart.ChartView;
@@ -142,9 +145,15 @@ public class TradingView extends View {
         title.text(service.marketReadableName()).style(style.tabTitle);
         price.style(style.tabPrice);
 
-        market.tickers.latestPrice.observe().skipWhile(initializing).on(Viewtify.UIThread).to(latest -> {
-            tab.textV(title, price.text(latest + " (" + market.tickers.latest.v.delay + ")"));
-        });
+        additionalInfo();
+    }
+
+    private void additionalInfo() {
+        if (service == BitFlyer.FX_BTC_JPY) {
+            SFD.now().skipWhile(initializing).on(Viewtify.UIThread).to(e -> {
+                tab.textV(title, price.text(e.ⅰ + " (" + e.ⅲ.format(Primitives.DecimalScale2) + "%)"));
+            });
+        }
     }
 
     /**
