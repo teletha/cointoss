@@ -9,10 +9,9 @@
  */
 package trademate.verify;
 
-import static transcript.Transcript.*;
+import static transcript.Transcript.en;
 
 import java.time.Period;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -32,14 +31,13 @@ import cointoss.verify.BackTest;
 import kiss.Disposable;
 import kiss.I;
 import kiss.Variable;
-import kiss.model.Model;
-import kiss.model.Property;
 import stylist.Style;
 import stylist.StyleDSL;
 import trademate.chart.ChartView;
 import trademate.chart.PlotScript;
 import trademate.chart.builtin.TraderVisualizer;
 import trademate.setting.SettingStyles;
+import trademate.widget.ParameterizePropertySheet;
 import transcript.Transcript;
 import viewtify.Viewtify;
 import viewtify.ui.UI;
@@ -73,12 +71,6 @@ public class BackTestView extends View implements Analyzer {
 
     /** Runner UI */
     private UICheckBox fastLog;
-
-    /** Runner UI */
-    private UIComboBox<ParameterizedTraderBuilder> traderSelection;
-
-    /** Runner UI */
-    private Variable<TraderEditor> traderEditor = Variable.empty();
 
     private ChartView chart;
 
@@ -132,14 +124,19 @@ public class BackTestView extends View implements Analyzer {
     /** The trading statistics. */
     private UITableColumn<TradingStatistics, TradingStatistics> scenarioCount;
 
-    /** The trader builder manager. */
-    private final List<ParameterizedTraderBuilder> builders = new ArrayList();
-
     /** The last disposer. */
     private Disposable lastDisposer = Disposable.empty();
 
     /** The verification state. */
     private Variable<Boolean> verifying = Variable.of(false);
+
+    /** The trader builder. */
+    private final List<ParameterizePropertySheet<Trader>> builders = I.find(Trader.class).stream().map(trader -> {
+        ParameterizePropertySheet<Trader> editor = new ParameterizePropertySheet();
+        editor.base.set(trader);
+        editor.rejectableProperty.set(p -> p.name.equals("profit") || p.name.equals("holdMaxSize") || p.name.equals("holdSize"));
+        return editor;
+    }).collect(Collectors.toList());
 
     /**
      * UI definition.
@@ -164,8 +161,10 @@ public class BackTestView extends View implements Analyzer {
                             $(runner);
                             $(fastLog, style.formCheck);
                         });
-                        $(traderSelection, style.traderSelect);
-                        $(traderEditor);
+
+                        for (ParameterizePropertySheet<Trader> editor : builders) {
+                            titled(editor.base.get().name(), editor);
+                        }
                     });
                 });
 
@@ -272,48 +271,16 @@ public class BackTestView extends View implements Analyzer {
                 .to(e -> {
                     lastDisposer.dispose();
 
-                    List<Trader> traders = new ArrayList();
-
-                    for (ParameterizedTraderBuilder builder : builders) {
-                        traders.addAll(builder.build());
-                    }
                     BackTest.with.service(marketSelection.value())
                             .start(startDate.zoned())
                             .end(endDate.zoned())
-                            .traders(traders)
+                            .traders(I.signal(builders).flatIterable(b -> b.build()).take(Trader::isEnable).toList())
                             .initialBaseCurrency(3000000)
                             .type(fastLog.value() ? LogType.Fast : LogType.Normal)
                             .run(this);
                 });
 
-        configureTradersView();
         configureTradingLogView();
-    }
-
-    private void configureTradersView() {
-        List<Trader> traders = I.find(Trader.class);
-
-        for (Trader trader : traders) {
-            ParameterizedTraderBuilder builder = new ParameterizedTraderBuilder(trader);
-            builders.add(builder);
-            traderSelection.addItemAtLast(builder);
-        }
-
-        traderSelection.when(User.Action, () -> {
-            traderEditor.set(new TraderEditor(traderSelection.value()));
-        });
-    }
-
-    /**
-     * Compute all editable properties of the specified model.
-     * 
-     * @param model
-     * @return
-     */
-    static List<Property> editableProperties(Model<Trader> model) {
-        return I.signal(model.properties())
-                .skip(p -> p.name.equals("holdSize") || p.name.equals("holdMaxSize") || p.name.equals("profit"))
-                .toList();
     }
 
     /**

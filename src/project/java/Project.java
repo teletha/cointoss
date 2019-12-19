@@ -27,17 +27,12 @@ public class Project extends bee.api.Project {
         require("org.magicwerk", "brownies-collections");
         require("com.univocity", "univocity-parsers");
         require("com.github.luben", "zstd-jni");
-        require("org.decimal4j", "decimal4j");
+        // require("org.decimal4j", "decimal4j");
         require("com.squareup.okhttp3", "okhttp", "3.14.1");
         require("com.github.signalr4j", "signalr4j", "2.0.4");
         require("org.eclipse.collections", "eclipse-collections");
         require("org.ta4j", "ta4j-core");
-        require("org.ta4j", "ta4j-examples");
-        require("com.github.ben-manes.caffeine", "caffeine");
-        require("com.ibm.icu", "icu4j");
-        require("com.github.peteroupc", "numbers");
-        require("org.apfloat", "apfloat");
-        require("ch.obermuhlner", "big-math");
+        // require("org.ta4j", "ta4j-examples");
 
         versionControlSystem("https://github.com/teletha/cointoss");
     }

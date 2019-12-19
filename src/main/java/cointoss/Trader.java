@@ -143,7 +143,7 @@ public abstract class Trader extends TraderBase implements Extensible, Disposabl
      * 
      * @return it returns true if this {@link Trader} is active.
      */
-    protected final boolean isEnable() {
+    public final boolean isEnable() {
         return disable.isEmpty();
     }
 
@@ -152,7 +152,7 @@ public abstract class Trader extends TraderBase implements Extensible, Disposabl
      * 
      * @return it returns true if this {@link Trader} is disactive.
      */
-    protected final boolean isDisable() {
+    public final boolean isDisable() {
         return !disable.isEmpty();
     }
 
