@@ -10,12 +10,10 @@
 package trademate.order;
 
 import static trademate.CommonText.*;
-import static transcript.Transcript.en;
+import static transcript.Transcript.*;
 
 import java.math.RoundingMode;
 import java.util.stream.IntStream;
-
-import javafx.scene.input.ScrollEvent;
 
 import cointoss.Direction;
 import cointoss.market.bitflyer.BitFlyer;
@@ -23,6 +21,7 @@ import cointoss.market.bitflyer.SFD;
 import cointoss.order.Order;
 import cointoss.order.OrderState;
 import cointoss.util.Num;
+import javafx.scene.input.ScrollEvent;
 import kiss.I;
 import kiss.WiseBiConsumer;
 import kiss.WiseConsumer;
@@ -214,7 +213,7 @@ public class OrderBuilder extends View {
             requestOrder(Direction.BUY);
             ui.disableBriefly();
         });
-        orderLimitShort.text(Buy).when(User.LeftClick, (e, ui) -> {
+        orderLimitShort.text(Sell).when(User.LeftClick, (e, ui) -> {
             requestOrder(Direction.SELL);
             ui.disableBriefly();
         });
