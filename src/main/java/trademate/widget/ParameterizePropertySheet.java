@@ -36,6 +36,7 @@ import kiss.model.Model;
 import kiss.model.Property;
 import trademate.setting.SettingStyles;
 import viewtify.Viewtify;
+import viewtify.ui.Action;
 import viewtify.ui.UI;
 import viewtify.ui.UICheckBox;
 import viewtify.ui.UIComboBox;
@@ -130,14 +131,14 @@ public class ParameterizePropertySheet<M> extends View {
      */
     class PropertyEditorView extends View {
 
+        /** The title area. */
+        private UILabel title;
+
         /** The target property. */
         private final Property property;
 
         /** The initial value of the property. */
         private final Object initialValue;
-
-        /** The title area. */
-        private UILabel title;
 
         /**
          * 
@@ -177,14 +178,8 @@ public class ParameterizePropertySheet<M> extends View {
          * @return A create UI.
          */
         private UICheckBox createCheckBox(boolean initial) {
-            UICheckBox created = make(UICheckBox.class);
-            created.value(initial);
-
-            created.when(User.Action, () -> {
-                propertyValues.put(property, List.of(created.value()));
-            });
-
-            return created;
+            return make(UICheckBox.class).value(initial)
+                    .when(User.Action, (e, check) -> propertyValues.put(property, List.of(check.value())));
         }
 
         /**
@@ -195,14 +190,10 @@ public class ParameterizePropertySheet<M> extends View {
          */
         private <E> UIComboBox<E> createComboBox(E initial) {
             UIComboBox<E> created = make(UIComboBox.class);
-            created.items((E[]) initial.getClass().getEnumConstants());
-            created.value(initial);
 
-            created.when(User.Action, () -> {
-                propertyValues.put(property, List.of(created.value()));
-            });
-
-            return created;
+            return created.items((E[]) initial.getClass().getEnumConstants())
+                    .value(initial)
+                    .when(User.Action, () -> propertyValues.put(property, List.of(created.value())));
         }
 
         /**
@@ -216,22 +207,10 @@ public class ParameterizePropertySheet<M> extends View {
             step.items(IntStream.rangeClosed(1, 100)).style(SettingStyles.FormInputMin);
 
             UITextValue<Integer> start = make(UITextValue.class);
-            start.value(initial).style(SettingStyles.FormInputMin).when(User.Scroll, e -> {
-                if (e.getDeltaY() > 0) {
-                    start.value(v -> v + step.value());
-                } else {
-                    start.value(v -> v - step.value());
-                }
-            });
+            start.value(initial).style(SettingStyles.FormInputMin).when(User.Scroll, Action.traverseInt(step::value));
 
             UITextValue<Integer> end = make(UITextValue.class);
-            end.value(initial).style(SettingStyles.FormInputMin).when(User.Scroll, e -> {
-                if (e.getDeltaY() > 0) {
-                    end.value(v -> v + step.value());
-                } else {
-                    end.value(v -> v - step.value());
-                }
-            });
+            end.value(initial).style(SettingStyles.FormInputMin).when(User.Scroll, Action.traverseInt(step::value));
 
             Viewtify.observe(start.valueProperty())
                     .merge(Viewtify.observe(end.valueProperty()), Viewtify.observe(step.valueProperty()))
