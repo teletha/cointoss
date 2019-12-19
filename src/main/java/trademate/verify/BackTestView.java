@@ -9,7 +9,7 @@
  */
 package trademate.verify;
 
-import static transcript.Transcript.en;
+import static transcript.Transcript.*;
 
 import java.time.Period;
 import java.util.ArrayList;
@@ -421,7 +421,7 @@ public class BackTestView extends View implements Analyzer {
     public void analyze(Market market, List<TradingStatistics> logs, boolean detail) {
         for (TradingStatistics log : logs) {
             System.out.println(log);
-            results.addItemAtLast(log);
+            results.addItemAtFirst(log);
         }
 
         Viewtify.inUI(() -> {
