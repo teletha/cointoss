@@ -28,11 +28,14 @@ import trademate.chart.ChartCanvas.LineChart;
 
 public abstract class PlotScript implements StyleDSL {
 
+    /** The declared plotters. */
+    final Map<PlotArea, Plotter> plotters = new HashMap();
+
     /** The curretn plotting area. */
     private PlotArea area = PlotArea.Main;
 
-    /** The declared plotters. */
-    final Map<PlotArea, PlotDSL> plotters = new HashMap();
+    /** The flag. */
+    private boolean initialized = false;
 
     /**
      * Specify the contextual plot area.
@@ -74,7 +77,7 @@ public abstract class PlotScript implements StyleDSL {
         if (style == null) {
             style = ChartStyles.MouseTrack;
         }
-        PlotDSL plotter = plotters.computeIfAbsent(area, k -> new PlotDSL(k, this));
+        Plotter plotter = plotters.computeIfAbsent(area, k -> new Plotter(k, this));
         plotter.lines.add(new LineChart(indicator.memoize(), style, info));
     }
 
@@ -124,7 +127,7 @@ public abstract class PlotScript implements StyleDSL {
             style = ChartStyles.MouseTrack;
         }
 
-        PlotDSL plotter = plotters.computeIfAbsent(area, k -> new PlotDSL(k, this));
+        Plotter plotter = plotters.computeIfAbsent(area, k -> new Plotter(k, this));
 
         double v = value.doubleValue();
         if (plotter.horizonMaxY < v) {
@@ -153,8 +156,21 @@ public abstract class PlotScript implements StyleDSL {
             style = ChartStyles.MouseTrack;
         }
 
-        PlotDSL plotter = plotters.computeIfAbsent(area, k -> new PlotDSL(k, this));
+        Plotter plotter = plotters.computeIfAbsent(area, k -> new Plotter(k, this));
         plotter.candles.add(new CandleMark(indicator, style));
+    }
+
+    /**
+     * Initialize this script.
+     * 
+     * @param market
+     * @param ticker
+     */
+    final synchronized void initialize(Market market, Ticker ticker) {
+        if (initialized == false) {
+            initialized = true;
+            declare(market, ticker);
+        }
     }
 
     /**
@@ -166,11 +182,11 @@ public abstract class PlotScript implements StyleDSL {
     protected abstract void declare(Market market, Ticker ticker);
 
     /**
-     * Return the indicator name.
+     * Return the script name.
      * 
      * @return
      */
-    public String name() {
+    protected String name() {
         Class clazz = getClass();
         if (clazz.isMemberClass() || clazz.isAnonymousClass() || clazz.isLocalClass()) {
             clazz = clazz.getEnclosingClass();
@@ -187,9 +203,9 @@ public abstract class PlotScript implements StyleDSL {
     }
 
     /**
-     * Chart plotting DSL.
+     * Chart plotting data holder.
      */
-    protected static class PlotDSL {
+    static class Plotter {
 
         /** The associated {@link Indicator}s. */
         final List<LineChart> lines = new ArrayList();
@@ -215,7 +231,7 @@ public abstract class PlotScript implements StyleDSL {
         /**
          * @param area
          */
-        private PlotDSL(PlotArea area, PlotScript origin) {
+        private Plotter(PlotArea area, PlotScript origin) {
             this.area = area;
             this.origin = origin;
         }

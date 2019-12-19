@@ -51,7 +51,7 @@ import kiss.Variable;
 import kiss.Ⅲ;
 import stylist.Style;
 import trademate.chart.Axis.TickLable;
-import trademate.chart.PlotScript.PlotDSL;
+import trademate.chart.PlotScript.Plotter;
 import trademate.setting.Notificator;
 import viewtify.Viewtify;
 import viewtify.ui.helper.LayoutAssistant;
@@ -132,30 +132,30 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     private final PlotScriptRegistry registry = I.make(PlotScriptRegistry.class);
 
     /** The associated plot scripts. */
-    private PlotDSL[] plotters = new PlotDSL[0];
+    private Plotter[] plotters = new Plotter[0];
 
     /** The number of plot scripts. */
     private List<PlotScript> scripts;
 
     /** The cache by span. */
-    private LoadingCache<Ⅲ<Market, Ticker, ObservableList<Supplier<PlotScript>>>, PlotDSL[]> plottersCache = CacheBuilder.newBuilder()
+    private LoadingCache<Ⅲ<Market, Ticker, ObservableList<Supplier<PlotScript>>>, Plotter[]> plottersCache = CacheBuilder.newBuilder()
             .maximumSize(7)
             .expireAfterAccess(Duration.ofHours(1))
             .build(new CacheLoader<>() {
 
                 @Override
-                public PlotDSL[] load(Ⅲ<Market, Ticker, ObservableList<Supplier<PlotScript>>> v) throws Exception {
+                public Plotter[] load(Ⅲ<Market, Ticker, ObservableList<Supplier<PlotScript>>> v) throws Exception {
                     List<PlotScript> registered = registry.findPlottersBy(v.ⅰ, v.ⅱ);
                     List<PlotScript> additional = I.signal(v.ⅲ).map(Supplier::get).toList();
 
-                    List<PlotDSL> combined = I.signal(registered, additional)
+                    List<Plotter> combined = I.signal(registered, additional)
                             .flatIterable(list -> list)
-                            .effect(script -> script.declare(v.ⅰ, v.ⅱ))
+                            .effect(script -> script.initialize(v.ⅰ, v.ⅱ))
                             .flatIterable(script -> script.plotters.values())
                             .skip(plotter -> plotter.lines.isEmpty() && plotter.horizons.isEmpty() && plotter.candles.isEmpty())
                             .toList();
 
-                    return combined.toArray(new PlotDSL[combined.size()]);
+                    return combined.toArray(new Plotter[combined.size()]);
                 }
             });
 
@@ -451,7 +451,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             gc.clearRect(0, 0, candles.getWidth(), candles.getHeight());
 
             // draw chart in visible range
-            for (PlotDSL plotter : plotters) {
+            for (Plotter plotter : plotters) {
                 plotter.lineMaxY = 0;
 
                 // ensure size
@@ -477,7 +477,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                     gc.strokeLine(x, open, x, close);
                 }
 
-                for (PlotDSL plotter : plotters) {
+                for (Plotter plotter : plotters) {
                     if (registry.globalSetting(plotter.origin).visible.is(false)) {
                         continue;
                     }
@@ -511,7 +511,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             double width = candles.getWidth();
             double height = candles.getHeight();
 
-            for (PlotDSL plotter : plotters) {
+            for (Plotter plotter : plotters) {
                 if (registry.globalSetting(plotter.origin).visible.is(false)) {
                     continue;
                 }
@@ -569,7 +569,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             if (tick.previous() != null) {
                 double lastX = axisX.getPositionForValue(tick.previous().startSeconds);
 
-                for (PlotDSL plotter : plotters) {
+                for (Plotter plotter : plotters) {
                     if (registry.globalSetting(plotter.origin).visible.is(false)) {
                         continue;
                     }
@@ -620,7 +620,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         // indicator values drawn from the same plot script are displayed on the same line
         int x = 0;
         Object origin = null;
-        for (PlotDSL plotter : plotters) {
+        for (Plotter plotter : plotters) {
             boolean visible = registry.globalSetting(plotter.origin).visible.v;
 
             if (origin != plotter.origin) {
