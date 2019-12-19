@@ -9,7 +9,7 @@
  */
 package trademate.chart.builtin;
 
-import static cointoss.ticker.TimeSpan.Minute1;
+import static cointoss.ticker.TimeSpan.*;
 
 import cointoss.Market;
 import cointoss.Trader;
@@ -20,6 +20,7 @@ import cointoss.util.Num;
 import stylist.Style;
 import stylist.StyleDSL;
 import stylist.value.Color;
+import trademate.chart.PlotArea;
 import trademate.chart.PlotScript;
 
 public class TraderVisualizer extends PlotScript implements StyleDSL {
@@ -73,9 +74,14 @@ public class TraderVisualizer extends PlotScript implements StyleDSL {
                     .scale(targetScale));
         }).memoize();
 
-        low.line(indicator.map(s -> s.unrealized), unrealized);
-        low.line(indicator.map(s -> s.profit), profit);
-        lowN.line(indicator.map(s -> s.size), size, indicator.map(s -> s.sizeInfo()));
+        in(PlotArea.Low, () -> {
+            line(indicator.map(s -> s.unrealized), unrealized);
+            line(indicator.map(s -> s.profit), profit);
+        });
+
+        in(PlotArea.LowNarrow, () -> {
+            line(indicator.map(s -> s.size), size, indicator.map(s -> s.sizeInfo()));
+        });
     }
 
     /**

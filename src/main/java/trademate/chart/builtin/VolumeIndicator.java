@@ -17,6 +17,7 @@ import kiss.Variable;
 import stylist.Style;
 import stylist.StyleDSL;
 import trademate.chart.ChartStyles;
+import trademate.chart.PlotArea;
 import trademate.chart.PlotScript;
 
 public class VolumeIndicator extends PlotScript implements StyleDSL {
@@ -50,7 +51,9 @@ public class VolumeIndicator extends PlotScript implements StyleDSL {
         DoubleIndicator buyVolume = DoubleIndicator.build(ticker, Tick::buyVolume);
         DoubleIndicator sellVolume = DoubleIndicator.build(ticker, Tick::sellVolume);
 
-        bottom.line(buyVolume.ema(emaLength.v).scale(volumeScale), Long);
-        bottom.line(sellVolume.ema(emaLength.v).scale(volumeScale), Short);
+        in(PlotArea.Bottom, () -> {
+            line(buyVolume.ema(emaLength.v).scale(volumeScale), Long);
+            line(sellVolume.ema(emaLength.v).scale(volumeScale), Short);
+        });
     }
 }

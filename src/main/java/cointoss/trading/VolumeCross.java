@@ -29,6 +29,7 @@ import cointoss.util.Num;
 import kiss.Signal;
 import stylist.Style;
 import trademate.TradeMateStyle;
+import trademate.chart.PlotArea;
 import trademate.chart.PlotScript;
 
 /**
@@ -95,9 +96,12 @@ public class VolumeCross extends Trader {
 
             @Override
             protected void declare(Market market, Ticker ticker) {
-                lowN.line(volumeDiff, diff);
-                main.mark(upPrediction, upMark);
-                main.mark(downPrediction, downMark);
+                mark(upPrediction, upMark);
+                mark(downPrediction, downMark);
+
+                in(PlotArea.LowNarrow, () -> {
+                    line(volumeDiff, diff);
+                });
             }
         });
     }

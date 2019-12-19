@@ -151,7 +151,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                     List<PlotDSL> combined = I.signal(registered, additional)
                             .flatIterable(list -> list)
                             .effect(script -> script.declare(v.ⅰ, v.ⅱ))
-                            .flatArray(s -> new PlotDSL[] {s.bottom, s.bottomN, s.low, s.lowN, s.high, s.highN, s.top, s.topN, s.main})
+                            .flatIterable(script -> script.plotters.values())
                             .skip(plotter -> plotter.lines.isEmpty() && plotter.horizons.isEmpty() && plotter.candles.isEmpty())
                             .toList();
 

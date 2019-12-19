@@ -35,12 +35,12 @@ public class ATRIndicator extends PlotScript implements StyleDSL {
     @Override
     protected void declare(Market market, Ticker ticker) {
         Indicator<Num> atr = NumIndicator.averageTrueRange(ticker, 21).map(n -> n.scale(market.service.setting.baseCurrencyScaleSize));
-        main.line(atr);
+        line(atr);
 
         Indicator<Num> tr = NumIndicator.trueRange(ticker).map(n -> n.scale(market.service.setting.baseCurrencyScaleSize));
-        main.line(tr, Main);
+        line(tr, Main);
 
         Indicator<Num> percentage = atr.map(tr, (avg, now) -> now.divide(avg).scale(3));
-        main.line(percentage, Per);
+        line(percentage, Per);
     }
 }

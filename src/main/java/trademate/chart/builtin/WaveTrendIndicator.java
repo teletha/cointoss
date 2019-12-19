@@ -19,6 +19,7 @@ import kiss.Ⅱ;
 import stylist.Style;
 import stylist.StyleDSL;
 import trademate.TradeMateStyle;
+import trademate.chart.PlotArea;
 import trademate.chart.PlotScript;
 
 public class WaveTrendIndicator extends PlotScript implements StyleDSL {
@@ -50,13 +51,15 @@ public class WaveTrendIndicator extends PlotScript implements StyleDSL {
     protected void declare(Market market, Ticker ticker) {
         Indicator<Ⅱ<Num, Num>> indicator = Indicators.waveTrend(ticker, channelLength.v, averageLength.v);
 
-        low.line(0);
-        low.line(overBoughtLevel1, Lazy);
-        low.line(overBoughtLevel2, Lazy);
-        low.line(overSoldLevel1, Main);
-        low.line(overSoldLevel2, Main);
+        in(PlotArea.Low, () -> {
+            line(0);
+            line(overBoughtLevel1, Lazy);
+            line(overBoughtLevel2, Lazy);
+            line(overSoldLevel1, Main);
+            line(overSoldLevel2, Main);
 
-        low.line(indicator.map(Ⅱ::ⅰ), Main);
-        low.line(indicator.map(Ⅱ::ⅱ), Lazy);
+            line(indicator.map(Ⅱ::ⅰ), Main);
+            line(indicator.map(Ⅱ::ⅱ), Lazy);
+        });
     }
 }

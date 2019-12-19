@@ -10,7 +10,9 @@
 package trademate.chart;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import cointoss.Market;
 import cointoss.ticker.AbstractIndicator;
@@ -26,32 +28,134 @@ import trademate.chart.ChartCanvas.LineChart;
 
 public abstract class PlotScript implements StyleDSL {
 
-    /** The plotter. */
-    protected final PlotDSL bottom = new PlotDSL(PlotArea.Bottom, this);
+    /** The curretn plotting area. */
+    private PlotArea area = PlotArea.Main;
 
-    /** The plotter. */
-    protected final PlotDSL bottomN = new PlotDSL(PlotArea.BottomNarrow, this);
+    /** The declared plotters. */
+    final Map<PlotArea, PlotDSL> plotters = new HashMap();
 
-    /** The plotter. */
-    protected final PlotDSL low = new PlotDSL(PlotArea.Low, this);
+    /**
+     * Specify the contextual plot area.
+     * 
+     * @param area
+     * @param declare
+     */
+    protected final void in(PlotArea area, Runnable declare) {
+        PlotArea prev = this.area;
+        this.area = area;
+        declare.run();
+        this.area = prev;
+    }
 
-    /** The plotter. */
-    protected final PlotDSL lowN = new PlotDSL(PlotArea.LowNarrow, this);
+    /**
+     * Plot the specified {@link Indicator} as line chart.
+     * 
+     * @param indicator A indicator to plot.
+     */
+    protected final void line(AbstractIndicator<? extends Number, ?> indicator) {
+        line(indicator, null);
+    }
 
-    /** The plotter. */
-    protected final PlotDSL high = new PlotDSL(PlotArea.High, this);
+    /**
+     * Plot the specified {@link Indicator} as line chart.
+     * 
+     * @param indicator A indicator to plot.
+     */
+    protected final void line(AbstractIndicator<? extends Number, ?> indicator, Style style) {
+        line(indicator, style, null);
+    }
 
-    /** The plotter. */
-    protected final PlotDSL highN = new PlotDSL(PlotArea.HighNarrow, this);
+    /**
+     * Plot the specified {@link Indicator} as line chart.
+     * 
+     * @param indicator A indicator to plot.
+     */
+    protected final void line(AbstractIndicator<? extends Number, ?> indicator, Style style, Indicator<String> info) {
+        if (style == null) {
+            style = ChartStyles.MouseTrack;
+        }
+        PlotDSL plotter = plotters.computeIfAbsent(area, k -> new PlotDSL(k, this));
+        plotter.lines.add(new LineChart(indicator.memoize(), style, info));
+    }
 
-    /** The plotter. */
-    protected final PlotDSL top = new PlotDSL(PlotArea.Top, this);
+    /**
+     * Plot the specified value as line chart.
+     * 
+     * @param value A value to plot.
+     */
+    protected final void line(Number value) {
+        line(value, null);
+    }
 
-    /** The plotter. */
-    protected final PlotDSL topN = new PlotDSL(PlotArea.TopNarrow, this);
+    /**
+     * Plot the specified value as line chart.
+     * 
+     * @param value A value to plot.
+     */
+    protected final void line(Number value, Style style) {
+        line(Num.of(value.toString()), style);
+    }
 
-    /** The plotter. */
-    protected final PlotDSL main = new PlotDSL(PlotArea.Main, this);
+    /**
+     * Plot the specified value as line chart.
+     * 
+     * @param value A value to plot.
+     */
+    protected final void line(Variable<? extends Number> value) {
+        line(value, null);
+    }
+
+    /**
+     * Plot the specified value as line chart.
+     * 
+     * @param value A value to plot.
+     */
+    protected final void line(Variable<? extends Number> value, Style style) {
+        line(value.v, style);
+    }
+
+    /**
+     * Plot the specified value as line chart.
+     * 
+     * @param value A value to plot.
+     */
+    private final void line(Num value, Style style) {
+        if (style == null) {
+            style = ChartStyles.MouseTrack;
+        }
+
+        PlotDSL plotter = plotters.computeIfAbsent(area, k -> new PlotDSL(k, this));
+
+        double v = value.doubleValue();
+        if (plotter.horizonMaxY < v) {
+            plotter.horizonMaxY = v;
+        }
+
+        plotter.horizons.add(new Horizon(v, style));
+    }
+
+    /**
+     * Plot the specified {@link Indicator} as mark.
+     * 
+     * @param indicator A indicator to plot.
+     */
+    protected final void mark(Indicator<Boolean> indicator) {
+        mark(indicator, null);
+    }
+
+    /**
+     * Plot the specified {@link Indicator} as mark.
+     * 
+     * @param indicator A indicator to plot.
+     */
+    protected final void mark(Indicator<Boolean> indicator, Style style) {
+        if (style == null) {
+            style = ChartStyles.MouseTrack;
+        }
+
+        PlotDSL plotter = plotters.computeIfAbsent(area, k -> new PlotDSL(k, this));
+        plotter.candles.add(new CandleMark(indicator, style));
+    }
 
     /**
      * Declare your chart.
@@ -133,111 +237,6 @@ public abstract class PlotScript implements StyleDSL {
             } else {
                 return 1;
             }
-        }
-
-        /**
-         * Plot the specified {@link Indicator} as line chart.
-         * 
-         * @param indicator A indicator to plot.
-         */
-        public final void line(AbstractIndicator<? extends Number, ?> indicator) {
-            line(indicator, null);
-        }
-
-        /**
-         * Plot the specified {@link Indicator} as line chart.
-         * 
-         * @param indicator A indicator to plot.
-         */
-        public final void line(AbstractIndicator<? extends Number, ?> indicator, Style style) {
-            line(indicator, style, null);
-        }
-
-        /**
-         * Plot the specified {@link Indicator} as line chart.
-         * 
-         * @param indicator A indicator to plot.
-         */
-        public final void line(AbstractIndicator<? extends Number, ?> indicator, Style style, Indicator<String> info) {
-            if (style == null) {
-                style = ChartStyles.MouseTrack;
-            }
-            lines.add(new LineChart(indicator.memoize(), style, info));
-        }
-
-        /**
-         * Plot the specified value as line chart.
-         * 
-         * @param value A value to plot.
-         */
-        public final void line(Number value) {
-            line(value, null);
-        }
-
-        /**
-         * Plot the specified value as line chart.
-         * 
-         * @param value A value to plot.
-         */
-        public final void line(Number value, Style style) {
-            line(Num.of(value.toString()), style);
-        }
-
-        /**
-         * Plot the specified value as line chart.
-         * 
-         * @param value A value to plot.
-         */
-        public final void line(Variable<? extends Number> value) {
-            line(value, null);
-        }
-
-        /**
-         * Plot the specified value as line chart.
-         * 
-         * @param value A value to plot.
-         */
-        public final void line(Variable<? extends Number> value, Style style) {
-            line(value.v, style);
-        }
-
-        /**
-         * Plot the specified value as line chart.
-         * 
-         * @param value A value to plot.
-         */
-        private final void line(Num value, Style style) {
-            if (style == null) {
-                style = ChartStyles.MouseTrack;
-            }
-
-            double v = value.doubleValue();
-            if (horizonMaxY < v) {
-                horizonMaxY = v;
-            }
-
-            horizons.add(new Horizon(v, style));
-        }
-
-        /**
-         * Plot the specified {@link Indicator} as mark.
-         * 
-         * @param indicator A indicator to plot.
-         */
-        public final void mark(Indicator<Boolean> indicator) {
-            mark(indicator, null);
-        }
-
-        /**
-         * Plot the specified {@link Indicator} as mark.
-         * 
-         * @param indicator A indicator to plot.
-         */
-        public final void mark(Indicator<Boolean> indicator, Style style) {
-            if (style == null) {
-                style = ChartStyles.MouseTrack;
-            }
-            candles.add(new CandleMark(indicator, style));
         }
     }
 }
