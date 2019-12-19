@@ -37,7 +37,7 @@ import trademate.chart.ChartView;
 import trademate.chart.PlotScript;
 import trademate.chart.builtin.TraderVisualizer;
 import trademate.setting.SettingStyles;
-import trademate.widget.ParameterizePropertySheet;
+import trademate.widget.ParameterizablePropertySheet;
 import transcript.Transcript;
 import viewtify.Viewtify;
 import viewtify.ui.UI;
@@ -131,8 +131,8 @@ public class BackTestView extends View implements Analyzer {
     private Variable<Boolean> verifying = Variable.of(false);
 
     /** The trader builder. */
-    private final List<ParameterizePropertySheet<Trader>> builders = I.find(Trader.class).stream().map(trader -> {
-        ParameterizePropertySheet<Trader> editor = new ParameterizePropertySheet();
+    private final List<ParameterizablePropertySheet<Trader>> builders = I.find(Trader.class).stream().map(trader -> {
+        ParameterizablePropertySheet<Trader> editor = new ParameterizablePropertySheet();
         editor.base.set(trader);
         editor.rejectableProperty.set(p -> p.name.equals("profit") || p.name.equals("holdMaxSize") || p.name.equals("holdSize"));
         return editor;
@@ -162,7 +162,7 @@ public class BackTestView extends View implements Analyzer {
                             $(fastLog, style.formCheck);
                         });
 
-                        for (ParameterizePropertySheet<Trader> editor : builders) {
+                        for (ParameterizablePropertySheet<Trader> editor : builders) {
                             titled(editor.base.get().name(), editor);
                         }
                     });

@@ -36,7 +36,6 @@ import kiss.model.Model;
 import kiss.model.Property;
 import trademate.setting.SettingStyles;
 import viewtify.Viewtify;
-import viewtify.ui.Action;
 import viewtify.ui.UI;
 import viewtify.ui.UICheckBox;
 import viewtify.ui.UIComboBox;
@@ -45,9 +44,10 @@ import viewtify.ui.UISpinner;
 import viewtify.ui.UIText;
 import viewtify.ui.UITextValue;
 import viewtify.ui.View;
+import viewtify.ui.helper.Actions;
 import viewtify.ui.helper.User;
 
-public class ParameterizePropertySheet<M> extends View {
+public class ParameterizablePropertySheet<M> extends View {
 
     /** The base instance. */
     public final ObjectProperty<M> base = new SimpleObjectProperty();
@@ -72,13 +72,13 @@ public class ParameterizePropertySheet<M> extends View {
     /**
      * 
      */
-    public ParameterizePropertySheet() {
+    public ParameterizablePropertySheet() {
     }
 
     /**
      * @param base
      */
-    public ParameterizePropertySheet(M base) {
+    public ParameterizablePropertySheet(M base) {
         this.base.set(base);
     }
 
@@ -207,10 +207,10 @@ public class ParameterizePropertySheet<M> extends View {
             step.items(IntStream.rangeClosed(1, 100)).style(SettingStyles.FormInputMin);
 
             UITextValue<Integer> start = make(UITextValue.class);
-            start.value(initial).style(SettingStyles.FormInputMin).when(User.Scroll, Action.traverseInt(step::value));
+            start.value(initial).style(SettingStyles.FormInputMin).when(User.Scroll, Actions.traverseInt(step::value));
 
             UITextValue<Integer> end = make(UITextValue.class);
-            end.value(initial).style(SettingStyles.FormInputMin).when(User.Scroll, Action.traverseInt(step::value));
+            end.value(initial).style(SettingStyles.FormInputMin).when(User.Scroll, Actions.traverseInt(step::value));
 
             Viewtify.observe(start.valueProperty())
                     .merge(Viewtify.observe(end.valueProperty()), Viewtify.observe(step.valueProperty()))
