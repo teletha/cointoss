@@ -33,6 +33,7 @@ public class Project extends bee.api.Project {
         require("org.eclipse.collections", "eclipse-collections");
         require("org.ta4j", "ta4j-core");
         // require("org.ta4j", "ta4j-examples");
+        requireLombok();
 
         versionControlSystem("https://github.com/teletha/cointoss");
     }

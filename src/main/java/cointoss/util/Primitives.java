@@ -53,7 +53,7 @@ public class Primitives {
      * @param value
      * @param max
      */
-    public static double within(double min, double value, double max) {
+    public static double between(double min, double value, double max) {
         if (value < min) {
             value = min;
         }
@@ -62,5 +62,21 @@ public class Primitives {
             value = max;
         }
         return value;
+    }
+
+    /**
+     * @param min
+     * @param value
+     * @param max
+     */
+    public static boolean within(double min, double value, double max) {
+        if (value < min) {
+            return false;
+        }
+
+        if (max < value) {
+            return false;
+        }
+        return true;
     }
 }

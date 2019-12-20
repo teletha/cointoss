@@ -10,10 +10,12 @@
 package trademate.order;
 
 import static trademate.CommonText.*;
-import static transcript.Transcript.*;
+import static transcript.Transcript.en;
 
 import java.math.RoundingMode;
 import java.util.stream.IntStream;
+
+import javafx.scene.input.ScrollEvent;
 
 import cointoss.Direction;
 import cointoss.market.bitflyer.BitFlyer;
@@ -21,7 +23,6 @@ import cointoss.market.bitflyer.SFD;
 import cointoss.order.Order;
 import cointoss.order.OrderState;
 import cointoss.util.Num;
-import javafx.scene.input.ScrollEvent;
 import kiss.I;
 import kiss.WiseBiConsumer;
 import kiss.WiseConsumer;

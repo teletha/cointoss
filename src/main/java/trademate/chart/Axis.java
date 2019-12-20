@@ -33,6 +33,8 @@ import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.PathElement;
 import javafx.util.Duration;
+
+import cointoss.util.Primitives;
 import kiss.Disposable;
 import stylist.Style;
 import viewtify.Viewtify;
@@ -125,7 +127,6 @@ public class Axis extends Region {
         }
 
         Viewtify.clip(tickPath, this);
-        Viewtify.clip(tickLabels, this);
 
         // ====================================================
         // Initialize UI widget
@@ -432,21 +433,31 @@ public class Axis extends Region {
             Bounds bounds = label.getBoundsInParent();
 
             if (isHorizontal()) {
-                double cx = (bounds.getMinX() + bounds.getMaxX()) * 0.5;
-                label.setLayoutX(label.position() - cx);
-                if (side == Side.BOTTOM) {
-                    label.setLayoutY(tickLabelDistance);
+                if (Primitives.within(0d, position, width)) {
+                    double cx = (bounds.getMinX() + bounds.getMaxX()) * 0.5;
+                    label.setLayoutX(position - cx);
+                    if (side == Side.BOTTOM) {
+                        label.setLayoutY(tickLabelDistance);
+                    } else {
+                        label.setLayoutY(-tickLabelDistance);
+                    }
+                    label.setVisible(true);
                 } else {
-                    label.setLayoutY(-tickLabelDistance);
+                    label.setVisible(false);
                 }
             } else {
-                double cy = (bounds.getMinY() + bounds.getMaxY()) * 0.5;
-                label.setLayoutY(position - cy);
+                if (Primitives.within(0d, position, height)) {
+                    double cy = (bounds.getMinY() + bounds.getMaxY()) * 0.5;
+                    label.setLayoutY(position - cy);
 
-                if (side == Side.LEFT) {
-                    label.setLayoutX(-tickLabelDistance);
+                    if (side == Side.LEFT) {
+                        label.setLayoutX(-tickLabelDistance);
+                    } else {
+                        label.setLayoutX(tickLabelDistance);
+                    }
+                    label.setVisible(true);
                 } else {
-                    label.setLayoutX(tickLabelDistance);
+                    label.setVisible(false);
                 }
             }
         }

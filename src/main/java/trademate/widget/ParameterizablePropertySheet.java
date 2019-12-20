@@ -18,7 +18,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import javafx.beans.property.ObjectProperty;
@@ -64,7 +63,7 @@ public class ParameterizablePropertySheet<M> extends View {
     public final ObjectProperty<Predicate<Property>> rejectableProperty = new SimpleObjectProperty(I.reject());
 
     /** The value holder. */
-    private final Map<Property, List<Object>> propertyValues = new HashMap();
+    private final Map<Property, List<Object>> properties = new HashMap();
 
     /** Property editing UIs */
     private final ObservableList<PropertyEditorView> editors = FXCollections.observableArrayList();
@@ -109,7 +108,7 @@ public class ParameterizablePropertySheet<M> extends View {
     public List<M> build() {
         List<Set<Ⅱ<Property, Object>>> combinations = new ArrayList();
 
-        for (Entry<Property, List<Object>> entry : propertyValues.entrySet()) {
+        for (Entry<Property, List<Object>> entry : properties.entrySet()) {
             combinations.add(I.signal(entry.getValue()).map(v -> I.pair(entry.getKey(), v)).toCollection(new LinkedHashSet<>()));
         }
 
@@ -179,7 +178,7 @@ public class ParameterizablePropertySheet<M> extends View {
          */
         private UICheckBox createCheckBox(boolean initial) {
             return make(UICheckBox.class).value(initial)
-                    .when(User.Action, (e, check) -> propertyValues.put(property, List.of(check.value())));
+                    .when(User.Action, (e, check) -> properties.put(property, List.of(check.value())));
         }
 
         /**
@@ -193,7 +192,7 @@ public class ParameterizablePropertySheet<M> extends View {
 
             return created.items((E[]) initial.getClass().getEnumConstants())
                     .value(initial)
-                    .when(User.Action, () -> propertyValues.put(property, List.of(created.value())));
+                    .when(User.Action, () -> properties.put(property, List.of(created.value())));
         }
 
         /**
@@ -212,13 +211,13 @@ public class ParameterizablePropertySheet<M> extends View {
             UITextValue<Integer> end = make(UITextValue.class);
             end.value(initial).style(SettingStyles.FormInputMin).when(User.Scroll, Actions.traverseInt(step::value));
 
-            Viewtify.observe(start.valueProperty())
-                    .merge(Viewtify.observe(end.valueProperty()), Viewtify.observe(step.valueProperty()))
-                    .to(() -> {
-                        propertyValues.put(property, IntStream.iterate(start.value(), v -> v <= end.value(), v -> v + step.value())
-                                .boxed()
-                                .collect(Collectors.<Object> toList()));
-                    });
+            start.observe().merge(end.observe(), step.observe()).to(() -> {
+                List values = new ArrayList();
+                for (int i = start.value(); i < end.value(); i += step.value()) {
+                    values.add(i);
+                }
+                properties.put(property, values);
+            });
 
             return new HBox(start.ui, end.ui, step.ui);
         }
