@@ -94,17 +94,19 @@ public enum SFD {
      * @return
      */
     public static Signal<Ⅲ<Num, Num, Num>> now() {
-        return BitFlyer.FX_BTC_JPY.executionsRealtimely().combineLatest(BitFlyer.BTC_JPY.executionsRealtimely()).map(e -> {
-            Num fx = e.ⅰ.price;
-            Num btc = e.ⅱ.price;
-            Num diff;
+        return BitFlyer.FX_BTC_JPY.executionsRealtimely()
+                .combineLatest(BitFlyer.BTC_JPY.executionsRealtimely().startWith(BitFlyer.BTC_JPY.executionLatest()))
+                .map(e -> {
+                    Num fx = e.ⅰ.price;
+                    Num btc = e.ⅱ.price;
+                    Num diff;
 
-            if (btc.isLessThanOrEqual(fx)) {
-                diff = fx.divide(btc).minus(Num.ONE).multiply(Num.HUNDRED);
-            } else {
-                diff = btc.divide(fx).minus(Num.ONE).multiply(Num.HUNDRED).negate();
-            }
-            return I.pair(fx, btc, diff);
-        });
+                    if (btc.isLessThanOrEqual(fx)) {
+                        diff = fx.divide(btc).minus(Num.ONE).multiply(Num.HUNDRED);
+                    } else {
+                        diff = btc.divide(fx).minus(Num.ONE).multiply(Num.HUNDRED).negate();
+                    }
+                    return I.pair(fx, btc, diff);
+                });
     }
 }
