@@ -37,7 +37,7 @@ import trademate.setting.SettingStyles;
 import viewtify.Viewtify;
 import viewtify.ui.UI;
 import viewtify.ui.UICheckBox;
-import viewtify.ui.UIComboBox;
+import viewtify.ui.UIComboCheckBox;
 import viewtify.ui.UILabel;
 import viewtify.ui.UISpinner;
 import viewtify.ui.UIText;
@@ -177,8 +177,7 @@ public class ParameterizablePropertySheet<M> extends View {
          * @return A create UI.
          */
         private UICheckBox createCheckBox(boolean initial) {
-            return make(UICheckBox.class).value(initial)
-                    .when(User.Action, (e, check) -> properties.put(property, List.of(check.value())));
+            return make(UICheckBox.class).value(initial).when(User.Action, (e, check) -> properties.put(property, List.of(check.value())));
         }
 
         /**
@@ -187,12 +186,12 @@ public class ParameterizablePropertySheet<M> extends View {
          * @param initial The initial value.
          * @return A create UI.
          */
-        private <E> UIComboBox<E> createComboBox(E initial) {
-            UIComboBox<E> created = make(UIComboBox.class);
+        private <E> UIComboCheckBox<E> createComboBox(E initial) {
+            UIComboCheckBox<E> created = make(UIComboCheckBox.class);
 
-            return created.items((E[]) initial.getClass().getEnumConstants())
-                    .value(initial)
-                    .when(User.Action, () -> properties.put(property, List.of(created.value())));
+            return created.items((E[]) initial.getClass().getEnumConstants()).when(User.Action, () -> {
+                properties.put(property, (List<Object>) created.selectedItems());
+            });
         }
 
         /**
@@ -206,10 +205,18 @@ public class ParameterizablePropertySheet<M> extends View {
             step.items(IntStream.rangeClosed(1, 100)).style(SettingStyles.FormInputMin);
 
             UITextValue<Integer> start = make(UITextValue.class);
-            start.value(initial).style(SettingStyles.FormInputMin).when(User.Scroll, Actions.traverseInt(step::value));
-
             UITextValue<Integer> end = make(UITextValue.class);
-            end.value(initial).style(SettingStyles.FormInputMin).when(User.Scroll, Actions.traverseInt(step::value));
+
+            start.value(initial)
+                    .style(SettingStyles.FormInputMin)
+                    .when(User.Scroll, Actions.traverseInt(step::value))
+                    .requireWhen(end)
+                    .require(ui -> ui.value() <= end.value());
+            end.value(initial)
+                    .style(SettingStyles.FormInputMin)
+                    .when(User.Scroll, Actions.traverseInt(step::value))
+                    .require(ui -> start.value() <= ui.value())
+                    .requireWhen(start);
 
             start.observe().merge(end.observe(), step.observe()).to(() -> {
                 List values = new ArrayList();
