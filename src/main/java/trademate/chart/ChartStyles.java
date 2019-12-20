@@ -22,6 +22,14 @@ public interface ChartStyles extends StyleDSL {
 
     Color sell = $.rgb(247, 105, 77);
 
+    Style HorizontalAxis = () -> {
+        display.height(45, px).minHeight(45, px);
+    };
+
+    Style VerticalAxis = () -> {
+        display.width(55, px).minWidth(55, px);
+    };
+
     Style Label = () -> {
         font.size(11, px);
         background.color("-fx-background");

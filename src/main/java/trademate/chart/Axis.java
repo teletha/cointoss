@@ -56,7 +56,7 @@ public class Axis extends Region {
     /** The visual placement position. */
     public final Side side;
 
-    public final ObjectProperty<DoubleFunction<String>> tickLabelFormatter = new SimpleObjectProperty<>(this, "tickLabelFormatter", String::valueOf);
+    public final ObjectProperty<DoubleFunction<String>> tickLabelFormatter = new SimpleObjectProperty<>(this, "tickLabelFormatter", Primitives.DecimalScale2::format);
 
     /** The preferred visible number of ticks. */
     public final int tickNumber = 10;
@@ -115,17 +115,12 @@ public class Axis extends Region {
             forGrid.add(new TickLable(ChartStyles.BackGrid));
         }
 
-        if (side.isHorizontal()) {
-            setMinHeight(80);
-        } else {
-
-        }
-
         // ====================================================
         // Initialize UI widget
         // ====================================================
         StyleHelper.of(tickPath).style(ChartStyles.BackGrid);
         StyleHelper.of(baseLine).style(ChartStyles.BackGrid);
+        StyleHelper.of(this).style(side.isHorizontal() ? ChartStyles.HorizontalAxis : ChartStyles.VerticalAxis);
 
         scroll.setOrientation(isHorizontal() ? Orientation.HORIZONTAL : Orientation.VERTICAL);
         scroll.setMin(0);
@@ -440,7 +435,7 @@ public class Axis extends Region {
     }
 
     /**
-     * @version 2018/07/31 6:58:28
+     * 
      */
     public class TickLable extends Label implements Disposable {
 
@@ -448,7 +443,7 @@ public class Axis extends Region {
         public final DoubleProperty value = new SimpleDoubleProperty();
 
         /** The label formatter. */
-        private DoubleFunction<String> formatter;
+        private DoubleFunction<String> formatter = null;
 
         /**
          * 

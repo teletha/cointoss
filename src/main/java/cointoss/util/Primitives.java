@@ -19,9 +19,19 @@ public class Primitives {
     /** Fix decimal point(2). */
     public static final DecimalFormat DecimalScale2 = new DecimalFormat("#.#");
 
+    /** Fix decimal point(4). */
+    public static final DecimalFormat DecimalScale4 = new DecimalFormat("#.#");
+
+    /** Fix decimal point(6). */
+    public static final DecimalFormat DecimalScale6 = new DecimalFormat("#.#");
+
     static {
         DecimalScale2.setMinimumFractionDigits(2);
         DecimalScale2.setMaximumFractionDigits(2);
+        DecimalScale4.setMinimumFractionDigits(4);
+        DecimalScale4.setMaximumFractionDigits(4);
+        DecimalScale6.setMinimumFractionDigits(6);
+        DecimalScale6.setMaximumFractionDigits(6);
     }
 
     /**
