@@ -30,11 +30,11 @@ public class Chart extends Region {
     private static long D = M * 60 * 24;
 
     /** The x-axis UI. */
-    public final Axis axisX = new Axis(5, 4, Side.BOTTOM)
+    public final Axis axisX = new Axis(4, Side.BOTTOM)
             .units(M, 5 * M, 10 * M, 30 * M, 60 * M, 2 * 60 * M, 4 * 60 * M, 6 * 60 * M, 12 * 60 * M, D, 2 * D, 3 * D, 7 * D, 15 * D, 30 * D);
 
     /** The y-axis UI. */
-    public final Axis axisY = new Axis(5, 4, Side.RIGHT).visibleScroll(false);
+    public final Axis axisY = new Axis(4, Side.RIGHT).visibleScroll(false);
 
     /** The chart view. */
     private final ChartView chart;

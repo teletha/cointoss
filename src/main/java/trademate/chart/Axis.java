@@ -17,7 +17,6 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.collections.ObservableList;
 import javafx.geometry.Bounds;
 import javafx.geometry.Orientation;
 import javafx.geometry.Side;
@@ -28,10 +27,7 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.Region;
 import javafx.scene.shape.Line;
-import javafx.scene.shape.LineTo;
-import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
-import javafx.scene.shape.PathElement;
 import javafx.util.Duration;
 
 import cointoss.util.Primitives;
@@ -65,9 +61,6 @@ public class Axis extends Region {
     /** The preferred visible number of ticks. */
     public final int tickNumber = 10;
 
-    /** The visual length of tick. */
-    public final int tickLength;
-
     /** The visual distance between tick and label. */
     public final int tickLabelDistance;
 
@@ -94,9 +87,6 @@ public class Axis extends Region {
     public final ScrollBar scroll = new ScrollBar();
 
     /** UI widget. */
-    private final Group lines = new Group();
-
-    /** UI widget. */
     private final Path tickPath = new Path();
 
     /** UI widget. */
@@ -117,8 +107,7 @@ public class Axis extends Region {
     /**
      * 
      */
-    public Axis(int tickLength, int tickLabelDistance, Side side) {
-        this.tickLength = tickLength;
+    public Axis(int tickLabelDistance, Side side) {
         this.tickLabelDistance = tickLabelDistance;
         this.side = side;
 
@@ -126,15 +115,11 @@ public class Axis extends Region {
             forGrid.add(new TickLable(ChartStyles.BackGrid));
         }
 
-        Viewtify.clip(tickPath, this);
-
         // ====================================================
         // Initialize UI widget
         // ====================================================
         StyleHelper.of(tickPath).style(ChartStyles.BackGrid);
         StyleHelper.of(baseLine).style(ChartStyles.BackGrid);
-
-        lines.getChildren().addAll(tickPath, baseLine);
 
         scroll.setOrientation(isHorizontal() ? Orientation.HORIZONTAL : Orientation.VERTICAL);
         scroll.setMin(0);
@@ -142,7 +127,7 @@ public class Axis extends Region {
         scroll.setVisibleAmount(1);
         scroll.setUnitIncrement(1d / ZoomSize);
 
-        getChildren().addAll(lines, tickLabels, scroll);
+        getChildren().addAll(tickLabels, scroll);
 
         // zoom function
         addEventHandler(ScrollEvent.SCROLL, e -> {
@@ -361,60 +346,9 @@ public class Axis extends Region {
             double height = getHeight();
 
             computeAxisProperties(width, height);
-            layoutLines(width, height);
             layoutLabels(width, height);
             layoutGroups(width, height);
         });
-    }
-
-    /**
-     * Layout lines.
-     * 
-     * @param width
-     * @param height
-     */
-    private void layoutLines(double width, double height) {
-        boolean horizontal = isHorizontal();
-        double axisLength = computeAxisLength();
-        baseLine.setEndX(horizontal ? axisLength : 0);
-        baseLine.setEndY(horizontal ? 0 : axisLength);
-
-        final int k = horizontal ? side != Side.TOP ? 1 : -1 : side != Side.RIGHT ? -1 : 1;
-
-        final ObservableList<PathElement> elements = tickPath.getElements();
-        if (elements.size() > tickSize() * 2) {
-            elements.remove(tickSize() * 2, elements.size());
-        }
-
-        final int eles = elements.size();
-        final int ls = tickSize();
-        for (int i = 0; i < ls; i++) {
-            final double d = labelAt(i).position();
-            MoveTo mt;
-            LineTo lt;
-            if (i * 2 < eles) {
-                mt = (MoveTo) elements.get(i * 2);
-                lt = (LineTo) elements.get(i * 2 + 1);
-            } else {
-                mt = new MoveTo();
-                lt = new LineTo();
-                elements.addAll(mt, lt);
-            }
-            double x1, x2, y1, y2;
-            if (horizontal) {
-                x1 = x2 = d;
-                y1 = 0;
-                y2 = tickLength * k;
-            } else {
-                x1 = 0;
-                x2 = tickLength * k;
-                y1 = y2 = d;
-            }
-            mt.setX(x1);
-            mt.setY(y1);
-            lt.setX(x2);
-            lt.setY(y2);
-        }
     }
 
     /**
@@ -479,21 +413,13 @@ public class Axis extends Region {
                 scroll.resizeRelocate(0, 0, width, distanceFromTop);
             }
 
-            // lines
-            lines.setLayoutX(0);
-            lines.setLayoutY(Math.floor(distanceFromTop));
-
             // labels
             tickLabels.setLayoutX(0);
-            tickLabels.setLayoutY(Math.floor(distanceFromTop + lines.prefHeight(-1) + tickLabelDistance));
+            tickLabels.setLayoutY(Math.floor(distanceFromTop + tickLabelDistance));
 
         } else {
-            // lines
-            lines.setLayoutX(0);
-            lines.setLayoutY(0);
-
             // labels
-            tickLabels.setLayoutX(Math.floor(tickLabelDistance + lines.prefWidth(-1)));
+            tickLabels.setLayoutX(Math.floor(tickLabelDistance));
             tickLabels.setLayoutY(0);
         }
     }
