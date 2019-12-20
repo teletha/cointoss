@@ -9,7 +9,7 @@
  */
 package trademate.chart;
 
-import static transcript.Transcript.*;
+import static transcript.Transcript.en;
 
 import java.time.Duration;
 import java.util.List;
@@ -17,6 +17,18 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 import java.util.function.ToDoubleFunction;
+
+import javafx.collections.ObservableList;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Region;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.LineTo;
+import javafx.scene.shape.MoveTo;
+import javafx.scene.shape.Path;
+import javafx.scene.shape.PathElement;
+import javafx.scene.text.Font;
 
 import org.eclipse.collections.api.list.primitive.MutableDoubleList;
 import org.eclipse.collections.impl.list.mutable.primitive.DoubleArrayList;
@@ -35,17 +47,7 @@ import cointoss.ticker.Tick;
 import cointoss.ticker.Ticker;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
-import javafx.collections.ObservableList;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Region;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.LineTo;
-import javafx.scene.shape.MoveTo;
-import javafx.scene.shape.Path;
-import javafx.scene.shape.PathElement;
-import javafx.scene.text.Font;
+import cointoss.util.Primitives;
 import kiss.I;
 import kiss.Variable;
 import kiss.Ⅲ;
@@ -775,7 +777,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             this.labels = labels;
             this.axis = axis;
 
-            Viewtify.clip(this);
             StyleHelper.of(this).style(styles);
         }
 
@@ -878,15 +879,29 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                     double value = labels.get(i).position();
 
                     if (axis.isHorizontal()) {
-                        move.setX(value);
-                        move.setY(0);
-                        line.setX(value);
-                        line.setY(getHeight());
+                        if (Primitives.within(0, value, ChartCanvas.this.getWidth())) {
+                            move.setX(value);
+                            move.setY(0);
+                            line.setX(value);
+                            line.setY(getHeight());
+                        } else {
+                            move.setX(0);
+                            move.setY(0);
+                            line.setX(0);
+                            line.setY(0);
+                        }
                     } else {
-                        move.setX(0);
-                        move.setY(value);
-                        line.setX(getWidth());
-                        line.setY(value);
+                        if (Primitives.within(0, value, ChartCanvas.this.getHeight())) {
+                            move.setX(0);
+                            move.setY(value);
+                            line.setX(getWidth());
+                            line.setY(value);
+                        } else {
+                            move.setX(0);
+                            move.setY(0);
+                            line.setX(0);
+                            line.setY(0);
+                        }
                     }
                 }
             });

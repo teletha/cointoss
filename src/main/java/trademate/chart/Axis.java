@@ -115,6 +115,12 @@ public class Axis extends Region {
             forGrid.add(new TickLable(ChartStyles.BackGrid));
         }
 
+        if (side.isHorizontal()) {
+            setMinHeight(80);
+        } else {
+
+        }
+
         // ====================================================
         // Initialize UI widget
         // ====================================================
