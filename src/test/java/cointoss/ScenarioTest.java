@@ -9,7 +9,7 @@
  */
 package cointoss;
 
-import static java.time.temporal.ChronoUnit.SECONDS;
+import static java.time.temporal.ChronoUnit.*;
 
 import java.time.Duration;
 
@@ -23,7 +23,7 @@ class ScenarioTest extends TraderTestSupport {
 
     @Test
     void holdTime() {
-        entryAndExit(Execution.with.buy(1).price(10).date(second(0)), Execution.with.buy(1).price(20).date(second(10)));
+        entryAndExit(Execution.with.buy(1).price(10).date(afterSecond(0)), Execution.with.buy(1).price(20).date(afterSecond(10)));
 
         Scenario s = latest();
         assert s.holdTime().equals(Duration.ofSeconds(10));

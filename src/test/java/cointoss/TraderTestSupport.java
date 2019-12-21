@@ -74,46 +74,6 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
     }
 
     /**
-     * Config delay.
-     * 
-     * @param delay
-     * @return
-     */
-    protected final ZonedDateTime second(long delay) {
-        return base.plusSeconds(delay);
-    }
-
-    /**
-     * Config delay.
-     * 
-     * @param delay
-     * @return
-     */
-    protected final long secondAsSecond(long delay) {
-        return base.plusSeconds(delay).toEpochSecond();
-    }
-
-    /**
-     * Config delay.
-     * 
-     * @param delay
-     * @return
-     */
-    protected final ZonedDateTime minute(long delay) {
-        return base.plusMinutes(delay);
-    }
-
-    /**
-     * Config delay.
-     * 
-     * @param delay
-     * @return
-     */
-    protected final long minuteAsSeconds(long delay) {
-        return base.plusMinutes(delay).toEpochSecond();
-    }
-
-    /**
      * Shorthand method to entry.
      * 
      * @param eentry

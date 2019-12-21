@@ -85,4 +85,94 @@ public interface TimebaseSupport {
     default ZonedDateTime afterHour(int time) {
         return after(time, ChronoUnit.HOURS);
     }
+
+    /**
+     * Gets the time when the specified time has elapsed from the reference current time.
+     * 
+     * @param time
+     * @return
+     */
+    default ZonedDateTime afterDay(int time) {
+        return after(time, ChronoUnit.DAYS);
+    }
+
+    /**
+     * Gets the time when the specified time has elapsed from the reference current time.
+     * 
+     * @param time
+     * @return
+     */
+    default ZonedDateTime afterWeek(int time) {
+        return after(time, ChronoUnit.WEEKS);
+    }
+
+    /**
+     * Gets the time when the specified time has elapsed from the reference current time.
+     * 
+     * @param time
+     * @return
+     */
+    default ZonedDateTime afterMonth(int time) {
+        return after(time, ChronoUnit.MONTHS);
+    }
+
+    /**
+     * Gets the epoch seconds when the specified time has elapsed from the reference current time.
+     * 
+     * @param time
+     * @return
+     */
+    default long epochAfterSecond(int time) {
+        return afterSecond(time).toEpochSecond();
+    }
+
+    /**
+     * Gets the epoch seconds when the specified time has elapsed from the reference current time.
+     * 
+     * @param time
+     * @return
+     */
+    default long epochAfterMinute(int time) {
+        return afterMinute(time).toEpochSecond();
+    }
+
+    /**
+     * Gets the epoch seconds when the specified time has elapsed from the reference current time.
+     * 
+     * @param time
+     * @return
+     */
+    default long epochAfterHour(int time) {
+        return afterHour(time).toEpochSecond();
+    }
+
+    /**
+     * Gets the epoch seconds when the specified time has elapsed from the reference current time.
+     * 
+     * @param time
+     * @return
+     */
+    default long epochAfterDay(int time) {
+        return afterDay(time).toEpochSecond();
+    }
+
+    /**
+     * Gets the epoch seconds when the specified time has elapsed from the reference current time.
+     * 
+     * @param time
+     * @return
+     */
+    default long epochAfterWeek(int time) {
+        return afterWeek(time).toEpochSecond();
+    }
+
+    /**
+     * Gets the epoch seconds when the specified time has elapsed from the reference current time.
+     * 
+     * @param time
+     * @return
+     */
+    default long epochAfterMonth(int time) {
+        return afterMonth(time).toEpochSecond();
+    }
 }
