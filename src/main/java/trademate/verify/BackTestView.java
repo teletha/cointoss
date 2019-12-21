@@ -9,7 +9,7 @@
  */
 package trademate.verify;
 
-import static transcript.Transcript.en;
+import static transcript.Transcript.*;
 
 import java.time.Period;
 import java.util.List;
@@ -95,16 +95,10 @@ public class BackTestView extends View implements Analyzer {
     private UITableColumn<TradingStatistics, Statistics> holdTimeForLoss;
 
     /** The trading statistics. */
-    private UITableColumn<TradingStatistics, Statistics> realizedProfit;
+    private UITableColumn<TradingStatistics, TradingStatistics> realizedProfit;
 
     /** The trading statistics. */
-    private UITableColumn<TradingStatistics, Statistics> unrealizedProfit;
-
-    /** The trading statistics. */
-    private UITableColumn<TradingStatistics, Statistics> realizedLoss;
-
-    /** The trading statistics. */
-    private UITableColumn<TradingStatistics, Statistics> unrealizedLoss;
+    private UITableColumn<TradingStatistics, TradingStatistics> realizedLoss;
 
     /** The trading statistics. */
     private UITableColumn<TradingStatistics, Statistics> profit;
@@ -176,9 +170,7 @@ public class BackTestView extends View implements Analyzer {
                         $(holdTimeForProfit);
                         $(holdTimeForLoss);
                         $(realizedProfit);
-                        $(unrealizedProfit);
                         $(realizedLoss);
-                        $(unrealizedLoss);
                         $(profit);
                         $(total);
                         $(winRatio);
@@ -292,10 +284,10 @@ public class BackTestView extends View implements Analyzer {
         holdSize.text(en("Hold Size")).model(log -> log).render(this::renderPositionSize);
         holdTimeForProfit.text(en("Profit Span")).model(log -> log.holdTimeOnProfitTrade).render(this::render);
         holdTimeForLoss.text(en("Loss Span")).model(log -> log.holdTimeOnLossTrade).render(this::render);
-        realizedProfit.text(en("Realized Profit")).model(log -> log.profitRange).render(this::render);
-        unrealizedProfit.text(en("Unrealized Profit")).model(log -> log.unrealizedProfitRange).render(this::render);
-        realizedLoss.text(en("Realized Loss")).model(log -> log.lossRange).render(this::render);
-        unrealizedLoss.text(en("Unrealized Loss")).model(log -> log.unrealizedLossRange).render(this::render);
+        realizedProfit.text(en("Realized Profit"))
+                .model(log -> log)
+                .render((ui, log) -> render(ui, log.profitRange, log.unrealizedProfitRange));
+        realizedLoss.text(en("Realized Loss")).model(log -> log).render((ui, log) -> render(ui, log.lossRange, log.unrealizedLossRange));
         profit.text(en("Profit")).model(log -> log.profitAndLoss).render(this::render);
         total.text(en("Total Profit")).model(log -> log.profitAndLoss.formattedTotal());
         winRatio.text(en("Win Rate")).model(log -> log.winningRate());
@@ -369,6 +361,22 @@ public class BackTestView extends View implements Analyzer {
         UILabel mean = make(UILabel.class).tooltip(en("Mean")).text(statistics.formattedMean()).style(style.mean);
         UILabel max = make(UILabel.class).tooltip(en("Max")).text(statistics.formattedMax()).style(style.max);
         UILabel min = make(UILabel.class).tooltip(en("Min")).text(statistics.formattedMin()).style(style.max);
+
+        label.textV(mean, max, min);
+    }
+
+    /**
+     * Render {@link Statistics}.
+     * 
+     * @param cell
+     * @param main
+     */
+    private void render(UILabel label, Statistics main, Statistics sub) {
+        UILabel mean = make(UILabel.class).tooltip(en("Mean"))
+                .text(main.formattedMean() + " (" + sub.formattedMean() + ")")
+                .style(style.mean);
+        UILabel max = make(UILabel.class).tooltip(en("Max")).text(main.formattedMax() + " (" + sub.formattedMax() + ")").style(style.max);
+        UILabel min = make(UILabel.class).tooltip(en("Min")).text(main.formattedMin() + " (" + sub.formattedMin() + ")").style(style.max);
 
         label.textV(mean, max, min);
     }

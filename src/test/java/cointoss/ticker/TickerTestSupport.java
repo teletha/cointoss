@@ -32,7 +32,7 @@ public class TickerTestSupport {
             manager.update(Execution.with.buy(value).price(value).date(time));
             time = time.plus(span.duration);
         }
-        return manager.of(span);
+        return manager.on(span);
     }
 
     /**
@@ -49,7 +49,7 @@ public class TickerTestSupport {
             manager.update(Execution.with.buy(value).price(value).date(time));
             time = time.plus(span.duration);
         }
-        return manager.of(span);
+        return manager.on(span);
     }
 
     /**
@@ -74,6 +74,6 @@ public class TickerTestSupport {
         manager.update(Execution.with.buy(1).price(low).date(time));
         manager.update(Execution.with.buy(1).price(close).date(time));
 
-        return manager.of(span).current;
+        return manager.on(span).current;
     }
 }

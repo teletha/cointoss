@@ -20,15 +20,14 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
 
+import com.google.common.collect.Sets;
+
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.layout.HBox;
-
-import com.google.common.collect.Sets;
-
 import kiss.I;
 import kiss.Ⅱ;
 import kiss.model.Model;
@@ -189,7 +188,7 @@ public class ParameterizablePropertySheet<M> extends View {
         private <E> UIComboCheckBox<E> createComboBox(E initial) {
             UIComboCheckBox<E> created = make(UIComboCheckBox.class);
 
-            return created.items((E[]) initial.getClass().getEnumConstants()).when(User.Action, () -> {
+            return created.items((E[]) initial.getClass().getEnumConstants()).select(initial).when(User.Action, () -> {
                 properties.put(property, (List<Object>) created.selectedItems());
             });
         }

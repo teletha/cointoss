@@ -56,7 +56,7 @@ public class Chart extends Region {
                 .layoutBy(axisX.scroll.valueProperty(), axisX.scroll.visibleAmountProperty())
                 .layoutBy(axisY.scroll.valueProperty(), axisY.scroll.visibleAmountProperty())
                 .layoutBy(chart.ticker.observe())
-                .layoutBy(chart.ticker.observe().switchMap(ticker -> ticker.add.startWithNull()).throttle(120, TimeUnit.MILLISECONDS));
+                .layoutBy(chart.ticker.observe().switchMap(ticker -> ticker.open.startWithNull()).throttle(120, TimeUnit.MILLISECONDS));
 
         // configure axis label
         chart.market.observe().to(m -> {
@@ -136,7 +136,7 @@ public class Chart extends Region {
         }
 
         if (chart.market.isPresent()) {
-            Ticker ticker = chart.market.v.tickers.of(span);
+            Ticker ticker = chart.market.v.tickers.on(span);
             Tick startTick = ticker.ticks.getByTime(start);
             Tick endTick = ticker.ticks.getByTime(end);
 

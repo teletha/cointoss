@@ -57,7 +57,7 @@ public class TraderVisualizer extends PlotScript implements StyleDSL {
         int scale = market.service.setting.baseCurrencyScaleSize;
         int targetScale = market.service.setting.targetCurrencyScaleSize;
 
-        Indicator<TraderState> indicator = Indicator.build(market.tickers.of(Minute1), tick -> {
+        Indicator<TraderState> indicator = Indicator.build(market.tickers.on(Minute1), tick -> {
             Num realized = Num.ZERO;
             Num unrealized = Num.ZERO;
             Num longSize = Num.ZERO;

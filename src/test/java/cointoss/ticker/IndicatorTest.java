@@ -34,7 +34,7 @@ class IndicatorTest extends TickerTestSupport {
     @Test
     void valueAtLowerTick() {
         Ticker ticker = ticker(TimeSpan.Second15, 1, 2, 3, 4, 5);
-        Ticker lower = manager.of(TimeSpan.Second5);
+        Ticker lower = manager.on(TimeSpan.Second5);
         Indicator<Num> indicator = Indicator.build(ticker, tick -> tick.openPrice);
         assert indicator.valueAt(lower.ticks.getByIndex(0)).is(1);
         assert indicator.valueAt(lower.ticks.getByIndex(1)).is(1);

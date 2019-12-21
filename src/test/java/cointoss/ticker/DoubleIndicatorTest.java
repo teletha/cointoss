@@ -34,7 +34,7 @@ class DoubleIndicatorTest extends TickerTestSupport {
     @Test
     void valueAtLowerTick() {
         Ticker ticker = ticker(TimeSpan.Second15, 1, 2, 3, 4, 5);
-        Ticker lower = manager.of(TimeSpan.Second5);
+        Ticker lower = manager.on(TimeSpan.Second5);
         DoubleIndicator indicator = DoubleIndicator.build(ticker, tick -> tick.openPrice.doubleValue());
         assert indicator.valueAt(lower.ticks.getByIndex(0)) == 1d;
         assert indicator.valueAt(lower.ticks.getByIndex(1)) == 1d;

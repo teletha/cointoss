@@ -205,7 +205,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         layoutCandle.layoutBy(widthProperty(), heightProperty())
                 .layoutBy(axisX.scroll.valueProperty(), axisX.scroll.visibleAmountProperty())
                 .layoutBy(axisY.scroll.valueProperty(), axisY.scroll.visibleAmountProperty())
-                .layoutBy(chart.ticker.observe().switchMap(ticker -> ticker.add.startWithNull().throttle(50, TimeUnit.MILLISECONDS)));
+                .layoutBy(chart.ticker.observe().switchMap(ticker -> ticker.open.startWithNull().throttle(50, TimeUnit.MILLISECONDS)));
         layoutCandleLatest.layoutBy(widthProperty(), heightProperty())
                 .layoutBy(axisX.scroll.valueProperty(), axisX.scroll.visibleAmountProperty())
                 .layoutBy(axisY.scroll.valueProperty(), axisY.scroll.visibleAmountProperty())

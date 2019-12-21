@@ -765,7 +765,7 @@ public class ExecutionLog {
                 try {
                     TickerManager manager = new TickerManager();
                     read().to(manager::update);
-                    Ticker ticker = manager.of(TimeSpan.Second5);
+                    Ticker ticker = manager.on(TimeSpan.Second5);
 
                     Execution[] prev = {Market.BASE};
 

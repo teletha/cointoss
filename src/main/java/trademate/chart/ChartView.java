@@ -90,7 +90,7 @@ public class ChartView extends View {
         span.observing() //
                 .skipNull()
                 .combineLatest(market.observing().skipNull())
-                .map(e -> e.ⅱ.tickers.of(e.ⅰ))
+                .map(e -> e.ⅱ.tickers.on(e.ⅰ))
                 .to(ticker::set);
     }
 

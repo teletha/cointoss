@@ -72,7 +72,7 @@ public final class TickerManager implements Disposable {
      * 
      * @param span The target {@link TimeSpan}.
      */
-    public Ticker of(TimeSpan span) {
+    public Ticker on(TimeSpan span) {
         return tickers[span.ordinal()];
     }
 

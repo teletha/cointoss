@@ -26,10 +26,10 @@ public final class Ticker implements Disposable {
     public final TimeSpan span;
 
     /** The event listeners. */
-    final Signaling<Tick> additions = new Signaling();
+    final Signaling<Tick> opening = new Signaling();
 
-    /** The event about adding new tick. */
-    public final Signal<Tick> add = additions.expose;
+    /** The event about opening new tick. */
+    public final Signal<Tick> open = opening.expose;
 
     /** The event listeners. */
     final Signaling<Tick> updaters = new Signaling();
@@ -68,7 +68,7 @@ public final class Ticker implements Disposable {
                 .toEpochSecond(), span, execution.id, execution.delay, execution.price, realtime);
 
         ticks.store(current);
-        additions.accept(current);
+        opening.accept(current);
     }
 
     /**
@@ -98,7 +98,7 @@ public final class Ticker implements Disposable {
             current.freeze();
             current = new Tick(prev, current.endSeconds, span, execution.id, execution.delay, execution.price, realtime);
             ticks.store(current);
-            additions.accept(current);
+            opening.accept(current);
             return true;
         } else {
             return false; // end it immediately

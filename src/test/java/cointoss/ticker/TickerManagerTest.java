@@ -33,7 +33,7 @@ class TickerManagerTest {
 
     @Test
     void tickerBy() {
-        Ticker ticker = manager.of(Minute1);
+        Ticker ticker = manager.on(Minute1);
         assert ticker != null;
     }
 
@@ -63,16 +63,16 @@ class TickerManagerTest {
 
         // update and validate
         manager.update(Execution.with.buy(1).price(300).date(Base.plusMinutes(3)));
-        assert manager.of(Minute3).ticks.last().highPrice.is(300);
-        assert manager.of(Minute5).ticks.last().highPrice.is(300);
+        assert manager.on(Minute3).ticks.last().highPrice.is(300);
+        assert manager.on(Minute5).ticks.last().highPrice.is(300);
         // update and validate
         manager.update(Execution.with.buy(1).price(400).date(Base.plusMinutes(4)));
-        assert manager.of(Minute3).ticks.last().highPrice.is(400);
-        assert manager.of(Minute5).ticks.last().highPrice.is(400);
+        assert manager.on(Minute3).ticks.last().highPrice.is(400);
+        assert manager.on(Minute5).ticks.last().highPrice.is(400);
         // update and validate
         manager.update(Execution.with.buy(1).price(500).date(Base.plusMinutes(5)));
-        assert manager.of(Minute3).ticks.last().highPrice.is(500);
-        assert manager.of(Minute5).ticks.last().highPrice.is(500);
+        assert manager.on(Minute3).ticks.last().highPrice.is(500);
+        assert manager.on(Minute5).ticks.last().highPrice.is(500);
     }
 
     @Test
@@ -101,16 +101,16 @@ class TickerManagerTest {
 
         // update and validate
         manager.update(Execution.with.buy(1).price(30).date(Base.plusMinutes(3)));
-        assert manager.of(Minute3).ticks.last().lowPrice.is(30);
-        assert manager.of(Minute5).ticks.last().lowPrice.is(30);
+        assert manager.on(Minute3).ticks.last().lowPrice.is(30);
+        assert manager.on(Minute5).ticks.last().lowPrice.is(30);
         // update and validate
         manager.update(Execution.with.buy(1).price(20).date(Base.plusMinutes(4)));
-        assert manager.of(Minute3).ticks.last().lowPrice.is(20);
-        assert manager.of(Minute5).ticks.last().lowPrice.is(20);
+        assert manager.on(Minute3).ticks.last().lowPrice.is(20);
+        assert manager.on(Minute5).ticks.last().lowPrice.is(20);
         // update and validate
         manager.update(Execution.with.buy(1).price(10).date(Base.plusMinutes(5)));
-        assert manager.of(Minute3).ticks.last().lowPrice.is(10);
-        assert manager.of(Minute5).ticks.last().lowPrice.is(10);
+        assert manager.on(Minute3).ticks.last().lowPrice.is(10);
+        assert manager.on(Minute5).ticks.last().lowPrice.is(10);
     }
 
     @Test
@@ -192,7 +192,7 @@ class TickerManagerTest {
         manager.update(Execution.with.buy(3).price(300).date(Base.plusMinutes(3)));
 
         // validate
-        Ticker ticker = manager.of(Minute1);
+        Ticker ticker = manager.on(Minute1);
         assert ticker.ticks.getByIndex(0).buyVolume() == 1d;
         assert ticker.ticks.getByIndex(1).buyVolume() == 1d;
         assert ticker.ticks.getByIndex(2).buyVolume() == 1d;
@@ -236,7 +236,7 @@ class TickerManagerTest {
         manager.update(Execution.with.buy(1).price(10));
         manager.update(Execution.with.buy(1).price(30).date(Base.plusMinutes(5)));
 
-        Ticker ticker = manager.of(Minute1);
+        Ticker ticker = manager.on(Minute1);
         Tick tick = ticker.ticks.getByIndex(0);
         assert tick.openPrice().is(10);
         assert tick.closePrice().is(10);
@@ -275,8 +275,8 @@ class TickerManagerTest {
     }
 
     @Test
-    void signalAdd() {
-        manager.tickers().flatMap(t -> t.add).to();
+    void signalOpen() {
+        manager.tickers().flatMap(t -> t.open).to();
 
         manager.update(Execution.with.buy(1).price(10));
         manager.tickers().to(ticker -> {
@@ -284,45 +284,45 @@ class TickerManagerTest {
         });
 
         manager.update(Execution.with.buy(1).price(20).date(Base.plusSeconds(5)));
-        assert manager.of(Second5).ticks.size() == 2;
+        assert manager.on(Second5).ticks.size() == 2;
         manager.tickers().take(between(Second15, Day7)).to(ticker -> {
             assert ticker.ticks.size() == 1;
         });
 
         manager.update(Execution.with.buy(1).price(30).date(Base.plusMinutes(1)));
-        assert manager.of(Second5).ticks.size() == 13;
-        assert manager.of(Second15).ticks.size() == 5;
-        assert manager.of(Second30).ticks.size() == 3;
-        assert manager.of(Minute1).ticks.size() == 2;
+        assert manager.on(Second5).ticks.size() == 13;
+        assert manager.on(Second15).ticks.size() == 5;
+        assert manager.on(Second30).ticks.size() == 3;
+        assert manager.on(Minute1).ticks.size() == 2;
         manager.tickers().take(between(Minute3, Day7)).to(ticker -> {
             assert ticker.ticks.size() == 1;
         });
 
         manager.update(Execution.with.buy(1).price(40).date(Base.plusMinutes(3)));
-        assert manager.of(Minute1).ticks.size() == 4;
-        assert manager.of(Minute3).ticks.size() == 2;
+        assert manager.on(Minute1).ticks.size() == 4;
+        assert manager.on(Minute3).ticks.size() == 2;
         manager.tickers().take(between(Minute5, Day7)).to(ticker -> {
             assert ticker.ticks.size() == 1;
         });
 
         manager.update(Execution.with.buy(1).price(50).date(Base.plusMinutes(5)));
-        assert manager.of(Minute1).ticks.size() == 6;
-        assert manager.of(Minute3).ticks.size() == 2;
-        assert manager.of(Minute5).ticks.size() == 2;
+        assert manager.on(Minute1).ticks.size() == 6;
+        assert manager.on(Minute3).ticks.size() == 2;
+        assert manager.on(Minute5).ticks.size() == 2;
         manager.tickers().take(between(Minute10, Day7)).to(ticker -> {
             assert ticker.ticks.size() == 1;
         });
     }
 
     @Test
-    void signalAddWithGap() {
-        manager.tickers().flatMap(t -> t.add).to();
+    void signalOpenWithGap() {
+        manager.tickers().flatMap(t -> t.open).to();
 
         manager.update(Execution.with.buy(1).price(10));
         manager.update(Execution.with.buy(1).price(30).date(Base.plusMinutes(5)));
-        assert manager.of(Minute1).ticks.size() == 6;
-        assert manager.of(Minute3).ticks.size() == 2;
-        assert manager.of(Minute5).ticks.size() == 2;
+        assert manager.on(Minute1).ticks.size() == 6;
+        assert manager.on(Minute3).ticks.size() == 2;
+        assert manager.on(Minute5).ticks.size() == 2;
         manager.tickers().take(between(Minute10, Day7)).to(ticker -> {
             assert ticker.ticks.size() == 1;
         });
