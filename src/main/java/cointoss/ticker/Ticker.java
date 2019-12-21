@@ -32,6 +32,12 @@ public final class Ticker implements Disposable {
     public final Signal<Tick> open = opening.expose;
 
     /** The event listeners. */
+    final Signaling<Tick> closing = new Signaling();
+
+    /** The event about opening new tick. */
+    public final Signal<Tick> close = closing.expose;
+
+    /** The event listeners. */
     final Signaling<Tick> updaters = new Signaling();
 
     /** The event about update tick. */
@@ -96,6 +102,7 @@ public final class Ticker implements Disposable {
 
             // create the latest tick for execution
             current.freeze();
+            closing.accept(current);
             current = new Tick(prev, current.endSeconds, span, execution.id, execution.delay, execution.price, realtime);
             ticks.store(current);
             opening.accept(current);

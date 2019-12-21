@@ -13,8 +13,9 @@ import java.time.ZonedDateTime;
 
 import cointoss.execution.Execution;
 import cointoss.util.Chrono;
+import cointoss.util.TimebaseSupport;
 
-public class TickerTestSupport {
+public class TickerTestSupport implements TimebaseSupport {
 
     protected final TickerManager manager = new TickerManager();
 

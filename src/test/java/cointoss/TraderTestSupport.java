@@ -15,11 +15,12 @@ import java.time.temporal.ChronoUnit;
 import org.junit.jupiter.api.BeforeEach;
 
 import cointoss.execution.Execution;
+import cointoss.util.TimebaseSupport;
 import cointoss.verify.VerifiableMarket;
 import kiss.I;
 import kiss.Signal;
 
-public abstract class TraderTestSupport extends Trader {
+public abstract class TraderTestSupport extends Trader implements TimebaseSupport {
 
     protected VerifiableMarket market = new VerifiableMarket();
 
@@ -39,6 +40,14 @@ public abstract class TraderTestSupport extends Trader {
         market.service.clear();
 
         base = market.service.now();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ZonedDateTime baseTime() {
+        return base;
     }
 
     /**
@@ -102,17 +111,6 @@ public abstract class TraderTestSupport extends Trader {
      */
     protected final long minuteAsSeconds(long delay) {
         return base.plusMinutes(delay).toEpochSecond();
-    }
-
-    /**
-     * Build date time.
-     * 
-     * @param time
-     * @param unit
-     * @return
-     */
-    protected final ZonedDateTime after(long time, ChronoUnit unit) {
-        return base.plus(time, unit);
     }
 
     /**
