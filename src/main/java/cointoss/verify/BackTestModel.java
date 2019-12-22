@@ -20,7 +20,7 @@ import cointoss.MarketService;
 import cointoss.Trader;
 import cointoss.analyze.Analyzer;
 import cointoss.analyze.ConsoleAnalyzer;
-import cointoss.analyze.TradingStatistics;
+import cointoss.analyze.TradingStats;
 import cointoss.execution.Execution;
 import cointoss.execution.ExecutionLog.LogType;
 import cointoss.ticker.Tick;
@@ -165,7 +165,7 @@ interface BackTestModel {
         market.service.baseCurrency = initialBaseCurrency();
         market.service.targetCurrency = initialTargetCurrency();
 
-        List<TradingStatistics> logs = new ArrayList();
+        List<TradingStats> logs = new ArrayList();
 
         market.register(traders());
         analyzer.initialize(market, traders());
@@ -182,7 +182,7 @@ interface BackTestModel {
         LocalDateTime end = LocalDateTime.now();
 
         for (Trader trader : traders()) {
-            TradingStatistics log = trader.statistics();
+            TradingStats log = trader.statistics();
             log.duration = Duration.between(start, end);
             logs.add(log);
         }

@@ -29,7 +29,7 @@ import org.eclipse.collections.impl.list.mutable.FastList;
 
 import com.google.common.annotations.VisibleForTesting;
 
-import cointoss.analyze.TradingStatistics;
+import cointoss.analyze.TradingStats;
 import cointoss.execution.Execution;
 import cointoss.util.Num;
 import kiss.Disposable;
@@ -240,8 +240,8 @@ public abstract class Trader extends TraderBase implements Extensible, Disposabl
      * 
      * @return A current statistics.
      */
-    public final TradingStatistics statistics() {
-        return new TradingStatistics(market, funds, scenarios, this);
+    public final TradingStats statistics() {
+        return new TradingStats(market, funds, scenarios, this);
     }
 
     /**

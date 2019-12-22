@@ -17,7 +17,7 @@ import cointoss.util.Num;
  * This class provides a means of updating summary statistics as each new data point is added. The
  * data points are not stored, and values are updated with online algorithm.
  */
-public class Statistics {
+public class Stats {
 
     /** MAX value. */
     private Num min = Num.ZERO;
@@ -53,7 +53,7 @@ public class Statistics {
      * @param factor
      * @return Chainable API.
      */
-    public Statistics decay(Num factor) {
+    public Stats decay(Num factor) {
         if (Num.within(Num.ZERO, factor, Num.ONE)) {
             this.decayFactor = factor;
         }
@@ -66,7 +66,7 @@ public class Statistics {
      * @param formatter A value formatter.
      * @return Chainable API.
      */
-    public Statistics formatter(Function<Num, String> formatter) {
+    public Stats formatter(Function<Num, String> formatter) {
         if (formatter != null) {
             this.formatter = formatter;
         }
@@ -74,11 +74,11 @@ public class Statistics {
     }
 
     /**
-     * Set this {@link Statistics} deal with negative values.
+     * Set this {@link Stats} deal with negative values.
      * 
      * @return Chainable API.
      */
-    public Statistics negative() {
+    public Stats negative() {
         this.negative = true;
         return this;
     }
@@ -89,7 +89,7 @@ public class Statistics {
      * @param value A value to add.
      * @return Chainable API.
      */
-    public Statistics add(long value) {
+    public Stats add(long value) {
         return add(Num.of(value));
     }
 
@@ -99,7 +99,7 @@ public class Statistics {
      * @param value A value to add.
      * @return Chainable API.
      */
-    public Statistics add(double value) {
+    public Stats add(double value) {
         return add(Num.of(value));
     }
 
@@ -109,7 +109,7 @@ public class Statistics {
      * @param value A value to add.
      * @return Chainable API.
      */
-    public Statistics add(Num value) {
+    public Stats add(Num value) {
         if (decayFactor.isNot(Num.ONE)) {
             decayedSize = decayFactor.multiply(decayedSize);
             total = decayFactor.multiply(total);

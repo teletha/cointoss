@@ -31,7 +31,7 @@ import cointoss.util.Num;
 import kiss.I;
 import kiss.WiseConsumer;
 
-public class TradingStatistics {
+public class TradingStats {
 
     /** The associated trader. */
     public final String name;
@@ -46,13 +46,13 @@ public class TradingStatistics {
     public final ZonedDateTime endDate;
 
     /** summary */
-    public final Statistics holdTime = new Statistics().formatter(Chrono::formatAsDuration);
+    public final Stats holdTime = new Stats().formatter(Chrono::formatAsDuration);
 
     /** summary */
-    public final Statistics holdTimeOnProfitTrade = new Statistics().formatter(Chrono::formatAsDuration);
+    public final Stats holdTimeOnProfitTrade = new Stats().formatter(Chrono::formatAsDuration);
 
     /** summary */
-    public final Statistics holdTimeOnLossTrade = new Statistics().formatter(Chrono::formatAsDuration);
+    public final Stats holdTimeOnLossTrade = new Stats().formatter(Chrono::formatAsDuration);
 
     /** The base currency scale. */
     private int baseCurrencyScale;
@@ -75,43 +75,43 @@ public class TradingStatistics {
     public final Num holdCurrentSize;
 
     /** summary */
-    public final Statistics profit = new Statistics().formatter(baseCurrencyFormatter);
+    public final Stats profit = new Stats().formatter(baseCurrencyFormatter);
 
     /** summary */
-    public final Statistics profitRange = new Statistics().formatter(baseCurrencyFormatter);
+    public final Stats profitRange = new Stats().formatter(baseCurrencyFormatter);
 
     /** summary */
-    public final Statistics realizedProfit = new Statistics().formatter(baseCurrencyFormatter);
+    public final Stats realizedProfit = new Stats().formatter(baseCurrencyFormatter);
 
     /** summary */
-    public final Statistics realizedProfitRange = new Statistics().formatter(baseCurrencyFormatter);
+    public final Stats realizedProfitRange = new Stats().formatter(baseCurrencyFormatter);
 
     /** summary */
-    public final Statistics unrealizedProfit = new Statistics().formatter(baseCurrencyFormatter);
+    public final Stats unrealizedProfit = new Stats().formatter(baseCurrencyFormatter);
 
     /** summary */
-    public final Statistics unrealizedProfitRange = new Statistics().formatter(baseCurrencyFormatter);
+    public final Stats unrealizedProfitRange = new Stats().formatter(baseCurrencyFormatter);
 
     /** summary */
-    public final Statistics loss = new Statistics().formatter(baseCurrencyFormatter).negative();
+    public final Stats loss = new Stats().formatter(baseCurrencyFormatter).negative();
 
     /** summary */
-    public final Statistics lossRange = new Statistics().formatter(baseCurrencyFormatter).negative();
+    public final Stats lossRange = new Stats().formatter(baseCurrencyFormatter).negative();
 
     /** summary */
-    public final Statistics realizedLoss = new Statistics().formatter(baseCurrencyFormatter).negative();
+    public final Stats realizedLoss = new Stats().formatter(baseCurrencyFormatter).negative();
 
     /** summary */
-    public final Statistics realizedLossRange = new Statistics().formatter(baseCurrencyFormatter).negative();
+    public final Stats realizedLossRange = new Stats().formatter(baseCurrencyFormatter).negative();
 
     /** summary */
-    public final Statistics unrealizedLoss = new Statistics().formatter(baseCurrencyFormatter).negative();
+    public final Stats unrealizedLoss = new Stats().formatter(baseCurrencyFormatter).negative();
 
     /** summary */
-    public final Statistics unrealizedLossRange = new Statistics().formatter(baseCurrencyFormatter).negative();
+    public final Stats unrealizedLossRange = new Stats().formatter(baseCurrencyFormatter).negative();
 
     /** summary */
-    public final Statistics profitAndLoss = new Statistics().formatter(baseCurrencyFormatter);
+    public final Stats profitAndLoss = new Stats().formatter(baseCurrencyFormatter);
 
     /** The max draw down. */
     public Num drawDown = Num.ZERO;
@@ -137,7 +137,7 @@ public class TradingStatistics {
     /**
      * Analyze trading.
      */
-    public TradingStatistics(Market market, FundManager funds, FastList<Scenario> entries, Trader trader) {
+    public TradingStats(Market market, FundManager funds, FastList<Scenario> entries, Trader trader) {
         this.name = trader.name();
         this.startDate = entries.getFirstOptional().map(Scenario::holdStartTime).orElseGet(market.service::now);
         this.endDate = entries.getLastOptional().map(Scenario::holdEndTime).orElseGet(market.service::now);

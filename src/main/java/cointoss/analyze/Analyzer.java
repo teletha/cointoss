@@ -27,10 +27,10 @@ public interface Analyzer {
     }
 
     /**
-     * Analyze the given {@link TradingStatistics}s.
+     * Analyze the given {@link TradingStats}s.
      * 
      * @param market A target market.
      * @param logs A list of logs to visialize.
      */
-    void analyze(Market market, List<TradingStatistics> logs, boolean detail);
+    void analyze(Market market, List<TradingStats> logs, boolean detail);
 }
