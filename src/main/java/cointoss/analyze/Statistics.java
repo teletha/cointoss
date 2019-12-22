@@ -31,6 +31,9 @@ public class Statistics {
     /** Number of values. */
     private int size = 0;
 
+    /** Number of values. */
+    private Num decayedSize = Num.ZERO;
+
     /** Mean value. */
     private Num mean = Num.ZERO;
 
@@ -48,11 +51,11 @@ public class Statistics {
      * Set the decay factor.
      * 
      * @param factor
-     * @return
+     * @return Chainable API.
      */
     public Statistics decay(Num factor) {
-        if (Num.between(Num.ZERO, factor, Num.ONE)) {
-
+        if (Num.within(Num.ZERO, factor, Num.ONE)) {
+            this.decayFactor = factor;
         }
         return this;
     }
@@ -107,20 +110,31 @@ public class Statistics {
      * @return Chainable API.
      */
     public Statistics add(Num value) {
+        if (decayFactor.isNot(Num.ONE)) {
+            decayedSize = decayFactor.multiply(decayedSize);
+            total = decayFactor.multiply(total);
+            mean = decayFactor.multiply(mean);
+            m2 = decayFactor.multiply(m2);
+            m3 = decayFactor.multiply(m3);
+            m4 = decayFactor.multiply(m4);
+        }
+
         size++;
+        decayedSize = decayedSize.plus(Num.ONE);
         min = min.isZero() ? value : negative ? Num.max(min, value) : Num.min(min, value);
         max = max.isZero() ? value : negative ? Num.min(max, value) : Num.max(max, value);
         total = total.plus(value);
 
         Num delta = value.minus(mean);
-        Num deltaN = delta.divide(size);
+        Num deltaN = delta.divide(decayedSize);
         Num deltaN2 = deltaN.pow(2);
-        Num term = delta.multiply(deltaN).multiply(size - 1);
+        Num term = delta.multiply(deltaN).multiply(decayedSize.minus(Num.ONE));
 
         mean = mean.plus(deltaN);
-        m4 = m4.plus(term.multiply(deltaN2).multiply(size * size - 3 * size + 3).plus(deltaN2.multiply(m2).multiply(6)))
-                .minus(deltaN.multiply(m3).multiply(4));
-        m3 = m3.plus(term.multiply(deltaN).multiply(size - 2).minus(deltaN.multiply(m2).multiply(3)));
+        m4 = m4.plus(term.multiply(deltaN2)
+                .multiply(decayedSize.multiply(decayedSize).minus(Num.THREE.multiply(decayedSize)).plus(Num.THREE))
+                .plus(deltaN2.multiply(m2).multiply(6))).minus(deltaN.multiply(m3).multiply(4));
+        m3 = m3.plus(term.multiply(deltaN).multiply(decayedSize.minus(Num.TWO)).minus(deltaN.multiply(m2).multiply(3)));
         m2 = m2.plus(delta.multiply(value.minus(mean)));
 
         return this;
@@ -132,7 +146,7 @@ public class Statistics {
      * @return A kurtosis value.
      */
     public Num kurtosis() {
-        return m2.isZero() ? Num.ZERO : m4.multiply(size).divide(m2.pow(2)).minus(3);
+        return m2.isZero() ? Num.ZERO : m4.multiply(decayedSize).divide(m2.pow(2)).minus(3);
     }
 
     /**
@@ -195,7 +209,7 @@ public class Statistics {
      * @return A sckewness value.
      */
     public Num skewness() {
-        Num divide = m3.multiply(Math.sqrt(size));
+        Num divide = m3.multiply(decayedSize.sqrt());
 
         return divide.isZero() ? Num.ZERO : divide.divide(m2.pow(1.5));
     }
@@ -207,6 +221,15 @@ public class Statistics {
      */
     public int size() {
         return size;
+    }
+
+    /**
+     * The approximate value of items.
+     * 
+     * @return
+     */
+    public int decayedSize() {
+        return decayedSize.intValue();
     }
 
     /**
@@ -242,7 +265,7 @@ public class Statistics {
      * @return A variance value.
      */
     public Num variance() {
-        return m2.divide(size + 1e-15);
+        return m2.divide(decayedSize);
     }
 
     /**
