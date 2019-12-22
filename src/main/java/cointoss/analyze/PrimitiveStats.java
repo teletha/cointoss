@@ -9,43 +9,43 @@
  */
 package cointoss.analyze;
 
-import java.util.function.Function;
+import java.util.function.DoubleFunction;
 
-import cointoss.util.Num;
+import cointoss.util.Primitives;
 
 /**
  * This class provides a means of updating summary statistics as each new data point is added. The
  * data points are not stored, and values are updated with online algorithm.
  */
-public class Stats {
+public class PrimitiveStats {
 
     /** MAX value. */
-    private Num min = Num.ZERO;
+    private double min = 0;
 
     /** MIN value. */
-    private Num max = Num.ZERO;
+    private double max = 0;
 
     /** Total value. */
-    private Num total = Num.ZERO;
+    private double total = 0;
 
     /** Number of values. */
     private int size = 0;
 
     /** Number of values. */
-    private Num decayedSize = Num.ZERO;
+    private double decayedSize = 0;
 
     /** Mean value. */
-    private Num mean = Num.ZERO;
+    private double mean = 0;
 
     /** Temporary values to calculate variance. */
-    private Num m2 = Num.ZERO, m3 = Num.ZERO, m4 = Num.ZERO;
+    private double m2 = 0, m3 = 0, m4 = 0;
 
     /** The value formatter. */
-    private Function<Num, String> formatter = num -> num.toString();
+    private DoubleFunction<String> formatter = Primitives.DecimalScale2::format;
 
     private boolean negative = false;
 
-    private Num decayFactor = Num.ONE;
+    private double decayFactor = 1;
 
     /**
      * Set the decay factor.
@@ -53,8 +53,8 @@ public class Stats {
      * @param factor
      * @return Chainable API.
      */
-    public Stats decay(Num factor) {
-        if (Num.within(Num.ZERO, factor, Num.ONE)) {
+    public PrimitiveStats decay(double factor) {
+        if (Primitives.within(0, factor, 1)) {
             this.decayFactor = factor;
         }
         return this;
@@ -66,7 +66,7 @@ public class Stats {
      * @param formatter A value formatter.
      * @return Chainable API.
      */
-    public Stats formatter(Function<Num, String> formatter) {
+    public PrimitiveStats formatter(DoubleFunction<String> formatter) {
         if (formatter != null) {
             this.formatter = formatter;
         }
@@ -74,11 +74,11 @@ public class Stats {
     }
 
     /**
-     * Set this {@link Stats} deal with negative values.
+     * Set this {@link PrimitiveStats} deal with negative values.
      * 
      * @return Chainable API.
      */
-    public Stats negative() {
+    public PrimitiveStats negative() {
         this.negative = true;
         return this;
     }
@@ -89,8 +89,8 @@ public class Stats {
      * @param value A value to add.
      * @return Chainable API.
      */
-    public Stats add(long value) {
-        return add(Num.of(value));
+    public PrimitiveStats add(long value) {
+        return add((double) value);
     }
 
     /**
@@ -99,43 +99,31 @@ public class Stats {
      * @param value A value to add.
      * @return Chainable API.
      */
-    public Stats add(double value) {
-        return add(Num.of(value));
-    }
-
-    /**
-     * Add new value to summarize.
-     * 
-     * @param value A value to add.
-     * @return Chainable API.
-     */
-    public Stats add(Num value) {
-        if (decayFactor.isNot(Num.ONE)) {
-            decayedSize = decayFactor.multiply(decayedSize);
-            total = decayFactor.multiply(total);
-            mean = decayFactor.multiply(mean);
-            m2 = decayFactor.multiply(m2);
-            m3 = decayFactor.multiply(m3);
-            m4 = decayFactor.multiply(m4);
+    public PrimitiveStats add(double value) {
+        if (decayFactor != 1d) {
+            decayedSize = decayFactor * decayedSize;
+            total = decayFactor * total;
+            mean = decayFactor * mean;
+            m2 = decayFactor * m2;
+            m3 = decayFactor * m3;
+            m4 = decayFactor * m4;
         }
 
         size++;
-        decayedSize = decayedSize.plus(Num.ONE);
-        min = min.isZero() ? value : negative ? Num.max(min, value) : Num.min(min, value);
-        max = max.isZero() ? value : negative ? Num.min(max, value) : Num.max(max, value);
-        total = total.plus(value);
+        decayedSize = decayedSize + 1d;
+        min = min == 0d ? value : negative ? Math.max(min, value) : Math.min(min, value);
+        max = max == 0d ? value : negative ? Math.min(max, value) : Math.max(max, value);
+        total = total + value;
 
-        Num delta = value.minus(mean);
-        Num deltaN = delta.divide(decayedSize);
-        Num deltaN2 = deltaN.pow(2);
-        Num term = delta.multiply(deltaN).multiply(decayedSize.minus(Num.ONE));
+        double delta = value - mean;
+        double deltaN = delta / decayedSize;
+        double deltaN2 = Math.pow(deltaN, 2);
+        double term = delta * deltaN * (decayedSize - 1);
 
-        mean = mean.plus(deltaN);
-        m4 = m4.plus(term.multiply(deltaN2)
-                .multiply(decayedSize.multiply(decayedSize).minus(Num.THREE.multiply(decayedSize)).plus(Num.THREE))
-                .plus(deltaN2.multiply(m2).multiply(6))).minus(deltaN.multiply(m3).multiply(4));
-        m3 = m3.plus(term.multiply(deltaN).multiply(decayedSize.minus(Num.TWO)).minus(deltaN.multiply(m2).multiply(3)));
-        m2 = m2.plus(delta.multiply(value.minus(mean)));
+        mean = mean + deltaN;
+        m4 = m4 + (term * deltaN2 * (decayedSize * decayedSize - (3 * decayedSize) + 3) + (deltaN2 * m2 * 6)) - (deltaN * m3 * 4);
+        m3 = m3 + (term * deltaN * (decayedSize - 2)) - (deltaN * m2 * 3);
+        m2 = m2 + (delta * (value - mean));
 
         return this;
     }
@@ -145,8 +133,9 @@ public class Stats {
      * 
      * @return A kurtosis value.
      */
-    public Num kurtosis() {
-        return m2.isZero() ? Num.ZERO : m4.multiply(decayedSize).divide(m2.pow(2)).minus(3);
+    public double kurtosis() {
+
+        return m2 == 0d ? 0d : (m4 * decayedSize / Math.pow(m2, 2)) - 3;
     }
 
     /**
@@ -154,7 +143,7 @@ public class Stats {
      * 
      * @return A maximum value.
      */
-    public Num max() {
+    public double max() {
         return max;
     }
 
@@ -172,7 +161,7 @@ public class Stats {
      * 
      * @return A minimum value.
      */
-    public Num min() {
+    public double min() {
         return min;
     }
 
@@ -190,7 +179,7 @@ public class Stats {
      * 
      * @return A mean value.
      */
-    public Num mean() {
+    public double mean() {
         return mean;
     }
 
@@ -208,10 +197,10 @@ public class Stats {
      * 
      * @return A sckewness value.
      */
-    public Num skewness() {
-        Num divide = m3.multiply(decayedSize.sqrt());
+    public double skewness() {
+        double divide = m3 * Math.sqrt(decayedSize);
 
-        return divide.isZero() ? Num.ZERO : divide.divide(m2.pow(1.5));
+        return divide == 0d ? 0 : divide / Math.pow(m2, 1.5);
     }
 
     /**
@@ -229,7 +218,7 @@ public class Stats {
      * @return
      */
     public int decayedSize() {
-        return decayedSize.intValue();
+        return (int) decayedSize;
     }
 
     /**
@@ -237,8 +226,8 @@ public class Stats {
      * 
      * @return A standard deviation value.
      */
-    public Num standardDeviation() {
-        return variance().sqrt();
+    public double standardDeviation() {
+        return Math.sqrt(variance());
     }
 
     /**
@@ -246,7 +235,7 @@ public class Stats {
      * 
      * @return A total value.
      */
-    public Num total() {
+    public double total() {
         return total;
     }
 
@@ -264,8 +253,8 @@ public class Stats {
      * 
      * @return A variance value.
      */
-    public Num variance() {
-        return m2.divide(decayedSize);
+    public double variance() {
+        return m2 / decayedSize;
     }
 
     /**

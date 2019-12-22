@@ -20,7 +20,7 @@ import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.Trader;
 import cointoss.analyze.Analyzer;
-import cointoss.analyze.Stats;
+import cointoss.analyze.NumStats;
 import cointoss.analyze.TradingStats;
 import cointoss.execution.ExecutionLog;
 import cointoss.execution.ExecutionLog.LogType;
@@ -89,10 +89,10 @@ public class BackTestView extends View implements Analyzer {
     private UITableColumn<TradingStats, TradingStats> holdSize;
 
     /** The trading statistics. */
-    private UITableColumn<TradingStats, Stats> holdTimeForProfit;
+    private UITableColumn<TradingStats, NumStats> holdTimeForProfit;
 
     /** The trading statistics. */
-    private UITableColumn<TradingStats, Stats> holdTimeForLoss;
+    private UITableColumn<TradingStats, NumStats> holdTimeForLoss;
 
     /** The trading statistics. */
     private UITableColumn<TradingStats, TradingStats> realizedProfit;
@@ -101,7 +101,7 @@ public class BackTestView extends View implements Analyzer {
     private UITableColumn<TradingStats, TradingStats> realizedLoss;
 
     /** The trading statistics. */
-    private UITableColumn<TradingStats, Stats> profit;
+    private UITableColumn<TradingStats, NumStats> profit;
 
     /** The trading statistics. */
     private UITableColumn<TradingStats, String> total;
@@ -352,12 +352,12 @@ public class BackTestView extends View implements Analyzer {
     }
 
     /**
-     * Render {@link Stats}.
+     * Render {@link NumStats}.
      * 
      * @param cell
      * @param statistics
      */
-    private void render(UILabel label, Stats statistics) {
+    private void render(UILabel label, NumStats statistics) {
         UILabel mean = make(UILabel.class).tooltip(en("Mean")).text(statistics.formattedMean()).style(style.mean);
         UILabel max = make(UILabel.class).tooltip(en("Max")).text(statistics.formattedMax()).style(style.max);
         UILabel min = make(UILabel.class).tooltip(en("Min")).text(statistics.formattedMin()).style(style.max);
@@ -366,12 +366,12 @@ public class BackTestView extends View implements Analyzer {
     }
 
     /**
-     * Render {@link Stats}.
+     * Render {@link NumStats}.
      * 
      * @param cell
      * @param main
      */
-    private void render(UILabel label, Stats main, Stats sub) {
+    private void render(UILabel label, NumStats main, NumStats sub) {
         UILabel mean = make(UILabel.class).tooltip(en("Mean"))
                 .text(main.formattedMean() + " (" + sub.formattedMean() + ")")
                 .style(style.mean);

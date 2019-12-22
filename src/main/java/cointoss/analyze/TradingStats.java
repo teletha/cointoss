@@ -46,13 +46,13 @@ public class TradingStats {
     public final ZonedDateTime endDate;
 
     /** summary */
-    public final Stats holdTime = new Stats().formatter(Chrono::formatAsDuration);
+    public final NumStats holdTime = new NumStats().formatter(Chrono::formatAsDuration);
 
     /** summary */
-    public final Stats holdTimeOnProfitTrade = new Stats().formatter(Chrono::formatAsDuration);
+    public final NumStats holdTimeOnProfitTrade = new NumStats().formatter(Chrono::formatAsDuration);
 
     /** summary */
-    public final Stats holdTimeOnLossTrade = new Stats().formatter(Chrono::formatAsDuration);
+    public final NumStats holdTimeOnLossTrade = new NumStats().formatter(Chrono::formatAsDuration);
 
     /** The base currency scale. */
     private int baseCurrencyScale;
@@ -75,43 +75,43 @@ public class TradingStats {
     public final Num holdCurrentSize;
 
     /** summary */
-    public final Stats profit = new Stats().formatter(baseCurrencyFormatter);
+    public final NumStats profit = new NumStats().formatter(baseCurrencyFormatter);
 
     /** summary */
-    public final Stats profitRange = new Stats().formatter(baseCurrencyFormatter);
+    public final NumStats profitRange = new NumStats().formatter(baseCurrencyFormatter);
 
     /** summary */
-    public final Stats realizedProfit = new Stats().formatter(baseCurrencyFormatter);
+    public final NumStats realizedProfit = new NumStats().formatter(baseCurrencyFormatter);
 
     /** summary */
-    public final Stats realizedProfitRange = new Stats().formatter(baseCurrencyFormatter);
+    public final NumStats realizedProfitRange = new NumStats().formatter(baseCurrencyFormatter);
 
     /** summary */
-    public final Stats unrealizedProfit = new Stats().formatter(baseCurrencyFormatter);
+    public final NumStats unrealizedProfit = new NumStats().formatter(baseCurrencyFormatter);
 
     /** summary */
-    public final Stats unrealizedProfitRange = new Stats().formatter(baseCurrencyFormatter);
+    public final NumStats unrealizedProfitRange = new NumStats().formatter(baseCurrencyFormatter);
 
     /** summary */
-    public final Stats loss = new Stats().formatter(baseCurrencyFormatter).negative();
+    public final NumStats loss = new NumStats().formatter(baseCurrencyFormatter).negative();
 
     /** summary */
-    public final Stats lossRange = new Stats().formatter(baseCurrencyFormatter).negative();
+    public final NumStats lossRange = new NumStats().formatter(baseCurrencyFormatter).negative();
 
     /** summary */
-    public final Stats realizedLoss = new Stats().formatter(baseCurrencyFormatter).negative();
+    public final NumStats realizedLoss = new NumStats().formatter(baseCurrencyFormatter).negative();
 
     /** summary */
-    public final Stats realizedLossRange = new Stats().formatter(baseCurrencyFormatter).negative();
+    public final NumStats realizedLossRange = new NumStats().formatter(baseCurrencyFormatter).negative();
 
     /** summary */
-    public final Stats unrealizedLoss = new Stats().formatter(baseCurrencyFormatter).negative();
+    public final NumStats unrealizedLoss = new NumStats().formatter(baseCurrencyFormatter).negative();
 
     /** summary */
-    public final Stats unrealizedLossRange = new Stats().formatter(baseCurrencyFormatter).negative();
+    public final NumStats unrealizedLossRange = new NumStats().formatter(baseCurrencyFormatter).negative();
 
     /** summary */
-    public final Stats profitAndLoss = new Stats().formatter(baseCurrencyFormatter);
+    public final NumStats profitAndLoss = new NumStats().formatter(baseCurrencyFormatter);
 
     /** The max draw down. */
     public Num drawDown = Num.ZERO;

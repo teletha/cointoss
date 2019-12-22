@@ -13,11 +13,11 @@ import org.junit.jupiter.api.Test;
 
 import cointoss.util.Num;
 
-class StatsTest {
+class NumStatsTest {
 
     @Test
     void mean() {
-        Stats statistics = new Stats();
+        NumStats statistics = new NumStats();
         statistics.add(Num.of(10));
         assert statistics.mean().is(10);
 
@@ -30,7 +30,7 @@ class StatsTest {
 
     @Test
     void total() {
-        Stats statistics = new Stats();
+        NumStats statistics = new NumStats();
         statistics.add(Num.of(10));
         assert statistics.total().is(10);
 
@@ -43,7 +43,7 @@ class StatsTest {
 
     @Test
     void size() {
-        Stats statistics = new Stats();
+        NumStats statistics = new NumStats();
         statistics.add(Num.of(10));
         assert statistics.size() == 1;
 
@@ -56,7 +56,7 @@ class StatsTest {
 
     @Test
     void min() {
-        Stats statistics = new Stats();
+        NumStats statistics = new NumStats();
         statistics.add(Num.of(10));
         assert statistics.min().is(10);
 
@@ -69,7 +69,7 @@ class StatsTest {
 
     @Test
     void max() {
-        Stats statistics = new Stats();
+        NumStats statistics = new NumStats();
         statistics.add(Num.of(10));
         assert statistics.max().is(10);
 
@@ -82,7 +82,7 @@ class StatsTest {
 
     @Test
     void variance() {
-        Stats statistics = new Stats();
+        NumStats statistics = new NumStats();
         statistics.add(Num.of(10));
         assert statistics.variance().is(0);
 
@@ -95,7 +95,7 @@ class StatsTest {
 
     @Test
     void standardDeviation() {
-        Stats statistics = new Stats();
+        NumStats statistics = new NumStats();
         statistics.add(Num.of(10));
         assert statistics.standardDeviation().is(0);
 
@@ -108,7 +108,7 @@ class StatsTest {
 
     @Test
     void skewness() {
-        Stats statistics = new Stats();
+        NumStats statistics = new NumStats();
         statistics.add(Num.of(10));
         assert statistics.skewness().is(0);
 
@@ -121,7 +121,7 @@ class StatsTest {
 
     @Test
     void kurtosis() {
-        Stats statistics = new Stats();
+        NumStats statistics = new NumStats();
         statistics.add(Num.of(10));
         assert statistics.kurtosis().is(0);
 
