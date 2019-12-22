@@ -11,11 +11,11 @@ package cointoss.analyze;
 
 import org.junit.jupiter.api.Test;
 
-class StatsTest {
+class PrimitiveStatsTest {
 
     @Test
     void mean() {
-        Stats statistics = new Stats();
+        PrimitiveStats statistics = new PrimitiveStats();
         statistics.add(10d);
         assert statistics.mean() == 10d;
 
@@ -28,7 +28,7 @@ class StatsTest {
 
     @Test
     void total() {
-        Stats statistics = new Stats();
+        PrimitiveStats statistics = new PrimitiveStats();
         statistics.add(10d);
         assert statistics.total() == 10d;
 
@@ -41,7 +41,7 @@ class StatsTest {
 
     @Test
     void size() {
-        Stats statistics = new Stats();
+        PrimitiveStats statistics = new PrimitiveStats();
         statistics.add(10d);
         assert statistics.size() == 1;
 
@@ -54,7 +54,7 @@ class StatsTest {
 
     @Test
     void min() {
-        Stats statistics = new Stats();
+        PrimitiveStats statistics = new PrimitiveStats();
         statistics.add(10d);
         assert statistics.min() == 10d;
 
@@ -67,7 +67,7 @@ class StatsTest {
 
     @Test
     void max() {
-        Stats statistics = new Stats();
+        PrimitiveStats statistics = new PrimitiveStats();
         statistics.add(10d);
         assert statistics.max() == 10d;
 
@@ -80,7 +80,7 @@ class StatsTest {
 
     @Test
     void variance() {
-        Stats statistics = new Stats();
+        PrimitiveStats statistics = new PrimitiveStats();
         statistics.add(10d);
         assert statistics.variance() == 0d;
 
@@ -93,7 +93,7 @@ class StatsTest {
 
     @Test
     void standardDeviation() {
-        Stats statistics = new Stats();
+        PrimitiveStats statistics = new PrimitiveStats();
         statistics.add(10d);
         assert statistics.standardDeviation() == 0d;
 
@@ -106,7 +106,7 @@ class StatsTest {
 
     @Test
     void skewness() {
-        Stats statistics = new Stats();
+        PrimitiveStats statistics = new PrimitiveStats();
         statistics.add(10d);
         assert statistics.skewness() == 0d;
 
@@ -119,7 +119,7 @@ class StatsTest {
 
     @Test
     void kurtosis() {
-        Stats statistics = new Stats();
+        PrimitiveStats statistics = new PrimitiveStats();
         statistics.add(10d);
         assert statistics.kurtosis() == 0d;
 
