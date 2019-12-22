@@ -9,6 +9,7 @@
  */
 package trademate.widget;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -162,6 +163,8 @@ public class ParameterizablePropertySheet<M> extends View {
                         $(createComboBox(initialValue));
                     } else if (isIntegral(property.model.type)) {
                         $(createIntegralRange((int) initialValue));
+                    } else if (isDecimal(property.model.type)) {
+                        $(createDecimalRange((double) initialValue));
                     } else {
                         $(make(UIText.class), FormInput);
                     }
@@ -229,6 +232,41 @@ public class ParameterizablePropertySheet<M> extends View {
         }
 
         /**
+         * Build UI for decimal.
+         * 
+         * @param initial The initial value.
+         * @return A create UI.
+         */
+        private HBox createDecimalRange(double initial) {
+            UISpinner<Double> step = make(UISpinner.class);
+            step.items(0.1, 0.01, 0.001).style(SettingStyles.FormInputMin);
+
+            UITextValue<Double> start = make(UITextValue.class);
+            UITextValue<Double> end = make(UITextValue.class);
+
+            start.value(initial)
+                    .style(SettingStyles.FormInputMin)
+                    .when(User.Scroll, Actions.traverseDouble(step::value))
+                    .requireWhen(end)
+                    .require(ui -> ui.value() <= end.value());
+            end.value(initial)
+                    .style(SettingStyles.FormInputMin)
+                    .when(User.Scroll, Actions.traverseDouble(step::value))
+                    .require(ui -> start.value() <= ui.value())
+                    .requireWhen(start);
+
+            start.observe().merge(end.observe(), step.observe()).to(() -> {
+                List values = new ArrayList();
+                for (double i = start.value(); i < end.value(); i += step.value()) {
+                    values.add(i);
+                }
+                properties.put(property, values);
+            });
+
+            return new HBox(start.ui, end.ui, step.ui);
+        }
+
+        /**
          * {@inheritDoc}
          */
         @Override
@@ -244,6 +282,16 @@ public class ParameterizablePropertySheet<M> extends View {
          */
         private boolean isIntegral(Class type) {
             return type == int.class || type == Integer.class || type == long.class || type == Long.class || type == BigInteger.class;
+        }
+
+        /**
+         * Test whether property type is integral number.
+         * 
+         * @param type
+         * @return
+         */
+        private boolean isDecimal(Class type) {
+            return type == float.class || type == Float.class || type == double.class || type == Double.class || type == BigDecimal.class;
         }
     }
 

@@ -9,7 +9,7 @@
  */
 package cointoss.analyze;
 
-import static cointoss.util.Num.HUNDRED;
+import static cointoss.util.Num.*;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
