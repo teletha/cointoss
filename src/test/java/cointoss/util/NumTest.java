@@ -53,10 +53,17 @@ class NumTest {
     }
 
     @Test
+    void between() {
+        assert Num.between(ONE, TWO, TEN).is(TWO);
+        assert Num.between(ONE, THOUSAND, TEN).is(TEN);
+        assert Num.between(ONE, ZERO, TEN).is(ONE);
+    }
+
+    @Test
     void within() {
-        assert Num.within(ONE, TWO, TEN).is(TWO);
-        assert Num.within(ONE, THOUSAND, TEN).is(TEN);
-        assert Num.within(ONE, ZERO, TEN).is(ONE);
+        assert Num.within(ONE, TWO, TEN) == true;
+        assert Num.within(ONE, THOUSAND, TEN) == false;
+        assert Num.within(ONE, ZERO, TEN) == false;
     }
 
     @Test

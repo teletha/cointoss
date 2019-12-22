@@ -42,6 +42,21 @@ public class Statistics {
 
     private boolean negative = false;
 
+    private Num decayFactor = Num.ONE;
+
+    /**
+     * Set the decay factor.
+     * 
+     * @param factor
+     * @return
+     */
+    public Statistics decay(Num factor) {
+        if (Num.between(Num.ZERO, factor, Num.ONE)) {
+
+        }
+        return this;
+    }
+
     /**
      * Set value formatter.
      * 

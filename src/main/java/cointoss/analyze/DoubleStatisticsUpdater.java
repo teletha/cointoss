@@ -32,7 +32,7 @@ public class DoubleStatisticsUpdater {
      */
     public void add(double x) {
         count++;
-        double delta = x - mean;
+        final double delta = x - mean;
         mean = mean + delta / count;
         s += delta * (x - mean);
     }
@@ -47,10 +47,10 @@ public class DoubleStatisticsUpdater {
         if (count == 0) {
             throw new IllegalStateException("sample is empty");
         }
-        double deltaOld = x - mean;
-        double countMinus1 = count - 1;
+        final double deltaOld = x - mean;
+        final double countMinus1 = count - 1;
         mean = count / countMinus1 * mean - x / countMinus1;
-        double deltaNew = x - mean;
+        final double deltaNew = x - mean;
         s -= deltaOld * deltaNew;
         count--;
     }
@@ -67,12 +67,12 @@ public class DoubleStatisticsUpdater {
         if (count == 0) {
             throw new IllegalStateException("sample is empty");
         }
-        double deltaYX = y - x;
-        double deltaX = x - mean;
-        double deltaY = y - mean;
+        final double deltaYX = y - x;
+        final double deltaX = x - mean;
+        final double deltaY = y - mean;
         mean = mean + deltaYX / count;
-        double deltaYp = y - mean;
-        long countMinus1 = count - 1;
+        final double deltaYp = y - mean;
+        final long countMinus1 = count - 1;
         s = s - count * (deltaX * deltaX - deltaY * deltaYp) / countMinus1 - (deltaYX * deltaYp) / countMinus1;
     }
 
@@ -175,17 +175,17 @@ public class DoubleStatisticsUpdater {
      *
      * @param with the sampler with which this sampler is combined
      */
-    public void combine(DoubleStatisticsUpdater with) {
+    public void combine(final DoubleStatisticsUpdater with) {
         // e.g. see https://en.wikipedia.org/wiki/Standard_deviation#Combining_standard_deviations
-        long n1 = this.count;
-        long n2 = with.count;
-        double m1 = this.mean;
-        double m2 = with.mean;
-        double s1 = this.s;
-        double s2 = with.s;
-        long n = n1 + n2;
-        double m = (n1 * m1 + n2 * m2) / n;
-        double s = s1 + s2 + n1 * m1 * m1 + n2 * m2 * m2 - n * m * m;
+        final long n1 = this.count;
+        final long n2 = with.count;
+        final double m1 = this.mean;
+        final double m2 = with.mean;
+        final double s1 = this.s;
+        final double s2 = with.s;
+        final long n = n1 + n2;
+        final double m = (n1 * m1 + n2 * m2) / n;
+        final double s = s1 + s2 + n1 * m1 * m1 + n2 * m2 * m2 - n * m * m;
         this.count = n;
         this.mean = m;
         this.s = s;

@@ -1472,7 +1472,26 @@ public class Num extends Number implements Comparable<Num> {
      * @param max A maximum value.
      * @return A target value in range.
      */
-    public static Num within(Num min, Num value, Num max) {
+    public static boolean within(Num min, Num value, Num max) {
+        if (min.isGreaterThan(value)) {
+            return false;
+        }
+
+        if (value.isGreaterThan(max)) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Check the value range.
+     * 
+     * @param min A minimum value.
+     * @param value A target value to check.
+     * @param max A maximum value.
+     * @return A target value in range.
+     */
+    public static Num between(Num min, Num value, Num max) {
         return min(max, max(min, value));
     }
 
