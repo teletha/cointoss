@@ -17,7 +17,7 @@ import cointoss.util.Primitives;
  * This class provides a means of updating summary statistics as each new data point is added. The
  * data points are not stored, and values are updated with online algorithm.
  */
-public class PrimitiveStats {
+public class Stats {
 
     /** MAX value. */
     private double min = 0;
@@ -53,7 +53,7 @@ public class PrimitiveStats {
      * @param factor
      * @return Chainable API.
      */
-    public PrimitiveStats decay(double factor) {
+    public Stats decay(double factor) {
         if (Primitives.within(0, factor, 1)) {
             this.decayFactor = factor;
         }
@@ -66,7 +66,7 @@ public class PrimitiveStats {
      * @param formatter A value formatter.
      * @return Chainable API.
      */
-    public PrimitiveStats formatter(DoubleFunction<String> formatter) {
+    public Stats formatter(DoubleFunction<String> formatter) {
         if (formatter != null) {
             this.formatter = formatter;
         }
@@ -74,11 +74,11 @@ public class PrimitiveStats {
     }
 
     /**
-     * Set this {@link PrimitiveStats} deal with negative values.
+     * Set this {@link Stats} deal with negative values.
      * 
      * @return Chainable API.
      */
-    public PrimitiveStats negative() {
+    public Stats negative() {
         this.negative = true;
         return this;
     }
@@ -89,7 +89,7 @@ public class PrimitiveStats {
      * @param value A value to add.
      * @return Chainable API.
      */
-    public PrimitiveStats add(long value) {
+    public Stats add(long value) {
         return add((double) value);
     }
 
@@ -99,7 +99,7 @@ public class PrimitiveStats {
      * @param value A value to add.
      * @return Chainable API.
      */
-    public PrimitiveStats add(double value) {
+    public Stats add(double value) {
         if (decayFactor != 1d) {
             decayedSize = decayFactor * decayedSize;
             total = decayFactor * total;
