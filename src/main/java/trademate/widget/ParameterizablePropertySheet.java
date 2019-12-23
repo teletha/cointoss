@@ -21,6 +21,7 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
 
+import javafx.beans.InvalidationListener;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -191,10 +192,11 @@ public class ParameterizablePropertySheet<M> extends View {
          */
         private <E> UIComboCheckBox<E> createComboBox(E initial) {
             UIComboCheckBox<E> created = make(UIComboCheckBox.class);
-
-            return created.items((E[]) initial.getClass().getEnumConstants()).select(initial).when(User.Action, () -> {
+            created.selectedItems().addListener((InvalidationListener) e -> {
                 properties.put(property, (List<Object>) created.selectedItems());
             });
+
+            return created.items((E[]) initial.getClass().getEnumConstants()).select(initial).title(property.model.type.getSimpleName());
         }
 
         /**
@@ -223,7 +225,7 @@ public class ParameterizablePropertySheet<M> extends View {
 
             start.observe().merge(end.observe(), step.observe()).to(() -> {
                 List values = new ArrayList();
-                for (int i = start.value(); i < end.value(); i += step.value()) {
+                for (int i = start.value(); i <= end.value(); i += step.value()) {
                     values.add(i);
                 }
                 properties.put(property, values);
@@ -258,7 +260,7 @@ public class ParameterizablePropertySheet<M> extends View {
 
             start.observe().merge(end.observe(), step.observe()).to(() -> {
                 List values = new ArrayList();
-                for (double i = start.value(); i < end.value(); i += step.value()) {
+                for (double i = start.value(); i <= end.value(); i += step.value()) {
                     values.add(i);
                 }
                 properties.put(property, values);

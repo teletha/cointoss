@@ -9,7 +9,7 @@
  */
 package trademate.verify;
 
-import static transcript.Transcript.*;
+import static transcript.Transcript.en;
 
 import java.time.Period;
 import java.util.List;
@@ -166,17 +166,17 @@ public class BackTestView extends View implements Analyzer {
                     $(results, style.testResult, () -> {
                         $(name);
                         $(period);
-                        $(holdSize);
-                        $(holdTimeForProfit);
-                        $(holdTimeForLoss);
-                        $(realizedProfit);
-                        $(realizedLoss);
+                        $(holdSize, style.shortColumn);
+                        $(scenarioCount, style.shortColumn);
+                        $(holdTimeForProfit, style.shortColumn);
+                        $(holdTimeForLoss, style.shortColumn);
+                        $(realizedProfit, style.priceColumn);
+                        $(realizedLoss, style.priceColumn);
                         $(profit);
                         $(total);
                         $(winRatio);
                         $(profitFactor);
                         $(drawDown);
-                        $(scenarioCount);
                     });
                 });
             });
@@ -196,7 +196,7 @@ public class BackTestView extends View implements Analyzer {
         };
 
         Style testResult = () -> {
-            display.maxHeight(250, px).minHeight(250, px);
+            display.minHeight(330, px);
         };
 
         Style formRow = () -> {
@@ -230,6 +230,14 @@ public class BackTestView extends View implements Analyzer {
 
         Style mean = () -> {
             font.color(205, 230, 250);
+        };
+
+        Style priceColumn = () -> {
+            display.width(105, px).minWidth(105, px);
+        };
+
+        Style shortColumn = () -> {
+            display.width(60, px).minWidth(60, px);
         };
     }
 
