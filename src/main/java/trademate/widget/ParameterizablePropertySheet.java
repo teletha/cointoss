@@ -21,14 +21,15 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
 
-import com.google.common.collect.Sets;
-
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.layout.HBox;
+
+import com.google.common.collect.Sets;
+
 import kiss.I;
 import kiss.Ⅱ;
 import kiss.model.Model;
@@ -239,7 +240,7 @@ public class ParameterizablePropertySheet<M> extends View {
          */
         private HBox createDecimalRange(double initial) {
             UISpinner<Double> step = make(UISpinner.class);
-            step.items(0.1, 0.01, 0.001).style(SettingStyles.FormInputMin);
+            step.items(0.001, 0.01, 0.1, 1d).style(SettingStyles.FormInputMin);
 
             UITextValue<Double> start = make(UITextValue.class);
             UITextValue<Double> end = make(UITextValue.class);

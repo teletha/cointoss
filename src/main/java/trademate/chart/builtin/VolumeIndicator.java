@@ -30,7 +30,7 @@ public class VolumeIndicator extends PlotScript implements StyleDSL {
         stroke.color(ChartStyles.sell);
     };
 
-    public final Variable<Integer> emaLength = Variable.of(1);
+    public final Variable<Integer> emaLength = Variable.of(10);
 
     /**
      * {@inheritDoc}
@@ -52,8 +52,8 @@ public class VolumeIndicator extends PlotScript implements StyleDSL {
         DoubleIndicator sellVolume = DoubleIndicator.build(ticker, Tick::sellVolume);
 
         in(PlotArea.Bottom, () -> {
-            line(buyVolume.ema(emaLength.v).scale(volumeScale), Long);
-            line(sellVolume.ema(emaLength.v).scale(volumeScale), Short);
+            line(buyVolume.scale(volumeScale), Long);
+            line(sellVolume.scale(volumeScale), Short);
         });
     }
 }

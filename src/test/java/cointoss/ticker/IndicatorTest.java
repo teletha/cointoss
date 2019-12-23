@@ -49,14 +49,14 @@ class IndicatorTest extends TickerTestSupport {
     @Test
     void combine() {
         Ticker ticker = ticker(TimeSpan.Second5, 1, 2, 3, 4, 5);
-        Indicator<Integer> open = Indicator.build(ticker, tick -> tick.openPrice.intValue());
+        Indicator<Double> volume = Indicator.build(ticker, tick -> tick.buyVolume());
         Indicator<Integer> low = Indicator.build(ticker, tick -> tick.lowPrice.intValue());
-        Indicator<Ⅱ<Integer, Integer>> indicator = open.combine(low);
-        assert indicator.valueAt(ticker.ticks.getByIndex(0)).equals(I.pair(1, 1));
-        assert indicator.valueAt(ticker.ticks.getByIndex(1)).equals(I.pair(2, 2));
-        assert indicator.valueAt(ticker.ticks.getByIndex(2)).equals(I.pair(3, 3));
-        assert indicator.valueAt(ticker.ticks.getByIndex(3)).equals(I.pair(4, 4));
-        assert indicator.valueAt(ticker.ticks.getByIndex(4)).equals(I.pair(5, 5));
+        Indicator<Ⅱ<Double, Integer>> indicator = volume.combine(low);
+        assert indicator.valueAt(ticker.ticks.getByIndex(0)).equals(I.pair(1d, 1));
+        assert indicator.valueAt(ticker.ticks.getByIndex(1)).equals(I.pair(2d, 2));
+        assert indicator.valueAt(ticker.ticks.getByIndex(2)).equals(I.pair(3d, 3));
+        assert indicator.valueAt(ticker.ticks.getByIndex(3)).equals(I.pair(4d, 4));
+        assert indicator.valueAt(ticker.ticks.getByIndex(4)).equals(I.pair(5d, 5));
     }
 
     @Test

@@ -39,12 +39,14 @@ public class VolumeCross extends Trader {
 
     public int smaLength = 3;
 
+    public TimeSpan span = TimeSpan.Minute5;
+
     /**
      * {@inheritDoc}
      */
     @Override
     protected void declare(Market market, FundManager fund) {
-        Ticker ticker = market.tickers.on(TimeSpan.Minute5);
+        Ticker ticker = market.tickers.on(span);
         Indicator<Double> buyVolume = Indicator.build(ticker, Tick::buyVolume);
         Indicator<Double> sellVolume = Indicator.build(ticker, Tick::sellVolume);
         NumIndicator volumeDiff = buyVolume.nmap(sellVolume, (b, s) -> Num.of(b - s))
@@ -57,7 +59,7 @@ public class VolumeCross extends Trader {
 
         double size = 0.3;
 
-        when(volumeDiff.observeWhen(ticker.open).plug(near(5, o -> o.isGreaterThan(0))), v -> new Scenario() {
+        when(volumeDiff.observeWhen(ticker.close).plug(near(5, o -> o.isGreaterThan(0))), v -> new Scenario() {
             @Override
             protected void entry() {
                 entry(Direction.BUY, size, o -> o.make(market.tickers.latestPrice.v.minus(300)).cancelAfter(3, ChronoUnit.MINUTES));
@@ -65,11 +67,11 @@ public class VolumeCross extends Trader {
 
             @Override
             protected void exit() {
-                exitWhen(volumeDiff.observeWhen(ticker.open).plug(near(2, o -> o.isLessThan(0))), o -> o.take());
+                exitWhen(volumeDiff.observeWhen(ticker.close).plug(near(2, o -> o.isLessThan(0))), o -> o.take());
             }
         });
 
-        when(volumeDiff.observeWhen(ticker.open).plug(near(5, o -> o.isLessThan(0))), v -> new Scenario() {
+        when(volumeDiff.observeWhen(ticker.close).plug(near(5, o -> o.isLessThan(0))), v -> new Scenario() {
             @Override
             protected void entry() {
                 entry(Direction.SELL, size, o -> o.make(market.tickers.latestPrice.v.plus(300)).cancelAfter(3, ChronoUnit.MINUTES));
@@ -77,7 +79,7 @@ public class VolumeCross extends Trader {
 
             @Override
             protected void exit() {
-                exitWhen(volumeDiff.observeWhen(ticker.open).plug(near(2, o -> o.isGreaterThan(0))), o -> o.take());
+                exitWhen(volumeDiff.observeWhen(ticker.close).plug(near(2, o -> o.isGreaterThan(0))), o -> o.take());
             }
         });
 
