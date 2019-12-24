@@ -13,14 +13,13 @@ import stylist.Style;
 import stylist.StyleDSL;
 import stylist.value.Color;
 
-/**
- * @version 2018/09/03 1:21:23
- */
 public interface ChartStyles extends StyleDSL {
 
     Color buy = $.rgb(32, 151, 77);
 
     Color sell = $.rgb(247, 105, 77);
+
+    Color same = $.rgb(190, 190, 190);
 
     Style HorizontalAxis = () -> {
         display.height(45, px).minHeight(45, px);

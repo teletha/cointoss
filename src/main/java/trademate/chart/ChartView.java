@@ -15,6 +15,8 @@ import java.util.function.Supplier;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import org.controlsfx.glyphfont.FontAwesome;
+
 import cointoss.Market;
 import cointoss.ticker.Ticker;
 import cointoss.ticker.TimeSpan;
@@ -22,6 +24,7 @@ import kiss.Variable;
 import stylist.Style;
 import stylist.StyleDSL;
 import viewtify.ui.UI;
+import viewtify.ui.UIButton;
 import viewtify.ui.UIComboBox;
 import viewtify.ui.View;
 
@@ -30,11 +33,17 @@ public class ChartView extends View {
     /** The associated market. */
     public final Variable<Market> market = Variable.empty();
 
-    /** The list of plottable cnadle date. */
+    /** The list of plottable candle date. */
     public final Variable<Ticker> ticker = Variable.of(Ticker.EMPTY);
+
+    /** The candle type. */
+    public final Variable<CandleType> candleType = Variable.of(CandleType.Price);
 
     /** Chart UI */
     protected UIComboBox<TimeSpan> span;
+
+    /** Chart UI */
+    protected UIButton config;
 
     /** The chart configuration. */
     public final Variable<Boolean> showLatestPrice = Variable.of(true);
@@ -63,6 +72,7 @@ public class ChartView extends View {
                 $(chart);
                 $(hbox, style.configBox, () -> {
                     $(span);
+                    $(config);
                 });
             });
         }
@@ -77,7 +87,7 @@ public class ChartView extends View {
         };
 
         Style configBox = () -> {
-            display.maxWidth(100, px).maxHeight(10, px);
+            display.maxWidth(130, px).maxHeight(26, px);
             position.top(0, px).right(56, px);
         };
     }
@@ -93,6 +103,8 @@ public class ChartView extends View {
                 .combineLatest(market.observing().skipNull())
                 .map(e -> e.ⅱ.tickers.on(e.ⅰ))
                 .to(ticker::set);
+
+        config.text(FontAwesome.Glyph.GEAR).popover(new Config());
     }
 
     /**
@@ -119,5 +131,29 @@ public class ChartView extends View {
         showPositionSupport.set(state);
         showLatestPrice.set(state);
         showRealtimeUpdate.set(state);
+    }
+
+    /**
+     * 
+     */
+    class Config extends View {
+
+        private UIComboBox<CandleType> candle;
+
+        class view extends UI {
+            {
+                $(vbox, () -> {
+                    form("Candle Type", candle);
+                });
+            }
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected void initialize() {
+            candle.initialize(CandleType.values()).observe(candleType::set);
+        }
     }
 }

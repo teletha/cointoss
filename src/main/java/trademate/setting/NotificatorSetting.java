@@ -20,6 +20,7 @@ import kiss.Managed;
 import kiss.Singleton;
 import trademate.setting.Notificator.DesktopPosition;
 import trademate.setting.Notificator.Notify;
+import viewtify.style.FormStyles;
 import viewtify.ui.UI;
 import viewtify.ui.UIButton;
 import viewtify.ui.UICheckBox;
@@ -51,7 +52,7 @@ class NotificatorSetting extends View {
     /**
      * UI definition.
      */
-    class view extends UI {
+    class view extends UI implements FormStyles {
         {
             $(vbox, Root, () -> {
                 // Notification Types
@@ -72,25 +73,15 @@ class NotificatorSetting extends View {
                 // Desktop
                 $(vbox, Block, () -> {
                     label(en("Desktop Notification"), Heading);
-                    $(hbox, FormRow, () -> {
-                        label(en("Display Time"), FormLabel);
-                        $(desktopDuration, FormInput);
-                    });
-                    $(hbox, FormRow, () -> {
-                        label(en("Display Position"), FormLabel);
-                        $(desktopPosition, FormInput);
-                    });
+                    form(en("Display Time"), desktopDuration);
+                    form(en("Display Position"), desktopPosition);
                 });
 
                 // LINE
                 $(vbox, Block, () -> {
                     label(en("LINE Notification"), Heading);
                     label(en("You can notify LINE by specifying the access token acquired from [LINE Notify](https://notify-bot.line.me/)."), Description);
-                    $(hbox, FormRow, () -> {
-                        label(en("Access Token"), FormLabel);
-                        $(lineAccessToken, FormInput);
-                        $(lineTest, FormInput);
-                    });
+                    form(en("Access Token"), lineAccessToken, lineTest);
                 });
             });
         }
@@ -157,15 +148,15 @@ class NotificatorSetting extends View {
 
         class view extends UI {
             {
-                $(hbox, FormRow, () -> {
-                    label(notify.name, FormLabel);
-                    $(hbox, FormCheck, () -> {
+                $(hbox, FormStyles.FormRow, () -> {
+                    label(notify.name, FormStyles.FormLabel);
+                    $(hbox, FormStyles.FormCheck, () -> {
                         $(desktop);
                     });
-                    $(hbox, FormCheck, () -> {
+                    $(hbox, FormStyles.FormCheck, () -> {
                         $(line);
                     });
-                    $(hbox, FormCheck2, () -> {
+                    $(hbox, FormStyles.FormCheck2, () -> {
                         $(sound);
                     });
                 });

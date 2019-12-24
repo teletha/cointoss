@@ -63,39 +63,17 @@ public class BitFlyerSetting extends View {
                 $(vbox, Block, () -> {
                     label("BitFlyer", Heading);
                     label(PublicAPIDescription, Description);
-                    $(hbox, FormRow, () -> {
-                        label("API Key", FormLabel);
-                        $(apiKey, FormInput);
-                    });
-                    $(hbox, FormRow, () -> {
-                        label("API Secret", FormLabel);
-                        $(apiSecret, FormInput);
-                    });
+                    form("API Key", apiKey);
+                    form("API Secret", apiSecret);
 
                     label(PrivateAPITitle, Heading);
                     label(PrivateAPIDescription, Description);
                     label(PrivateAPIWarning, Description, Warning);
-                    $(hbox, FormRow, () -> {
-                        label("Login ID", FormLabel);
-                        $(loginId, FormInput);
-                    });
-                    $(hbox, FormRow, () -> {
-                        label(en("Password"), FormLabel);
-                        $(loginPassword, FormInput);
-                    });
-                    $(hbox, FormRow, () -> {
-                        label(en("Account ID"), FormLabel);
-                        $(accountId, FormInput);
-                    });
-                    $(hbox, FormRow, () -> {
-                        label(en("Account Token"), FormLabel);
-                        $(accountToken, FormInput);
-                    });
-                    $(hbox, FormRow, () -> {
-                        label(LoginExplicitly, FormLabel);
-                        $(loginBackground, FormInput);
-                    });
-
+                    form("Login ID", loginId);
+                    form(en("Password"), loginPassword);
+                    form(en("Account ID"), accountId);
+                    form(en("Account Token"), accountToken);
+                    form(LoginExplicitly, loginBackground);
                 });
             });
         }

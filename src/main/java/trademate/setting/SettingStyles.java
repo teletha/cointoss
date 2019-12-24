@@ -41,42 +41,4 @@ public interface SettingStyles extends StyleDSL {
     Style Warning = () -> {
         font.color($.rgb(220, 100, 100));
     };
-
-    Style FormRow = () -> {
-        display.minHeight(30, px);
-        padding.vertical(3, px);
-        text.verticalAlign.middle();
-    };
-
-    Style FormLabel = () -> {
-        display.minWidth(120, px);
-        padding.top(4, px);
-    };
-
-    Style FormHeaderLabel = () -> {
-        text.align.center();
-    };
-
-    Style FormInput = () -> {
-        display.minWidth(170, px);
-        margin.right(10, px);
-    };
-
-    Style FormInputMin = () -> {
-        display.minWidth(60, px).width(60, px);
-    };
-
-    Style FormInputMiddle = () -> {
-        display.minWidth(80, px).width(80, px);
-    };
-
-    Style FormCheck = () -> {
-        display.minWidth(60, px);
-        text.align.center().verticalAlign.middle();
-    };
-
-    Style FormCheck2 = () -> {
-        display.minWidth(160, px);
-        text.align.center().verticalAlign.middle();
-    };
 }

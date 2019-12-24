@@ -35,14 +35,8 @@ public class AppearanceSetting extends View {
             $(vbox, Root, () -> {
                 $(vbox, Block, () -> {
                     label(en("Colors"), Heading);
-                    $(hbox, FormRow, () -> {
-                        label(Buy, FormLabel);
-                        $(buy, FormInput);
-                    });
-                    $(hbox, FormRow, () -> {
-                        label(Sell, FormLabel);
-                        $(sell, FormInput);
-                    });
+                    form(Buy, buy);
+                    form(Sell, sell);
                 });
             });
         }

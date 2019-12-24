@@ -34,8 +34,8 @@ import kiss.I;
 import kiss.Ⅱ;
 import kiss.model.Model;
 import kiss.model.Property;
-import trademate.setting.SettingStyles;
 import viewtify.Viewtify;
+import viewtify.style.FormStyles;
 import viewtify.ui.UI;
 import viewtify.ui.UICheckBox;
 import viewtify.ui.UIComboCheckBox;
@@ -151,7 +151,7 @@ public class ParameterizablePropertySheet<M> extends View {
         /**
          * UI definition.
          */
-        class view extends UI implements SettingStyles {
+        class view extends UI implements FormStyles {
             {
                 $(hbox, FormRow, () -> {
                     $(title, FormLabel);
@@ -207,21 +207,16 @@ public class ParameterizablePropertySheet<M> extends View {
         private HBox createIntegralRange(int initial) {
             UISpinner<Integer> step = make(UISpinner.class);
             step.items(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 30, 40, 50, 100, 200, 300, 400, 500, 1000, 2000, 3000, 4000, 5000, 10000)
-                    .style(SettingStyles.FormInputMiddle);
+                    .style(FormStyles.FormInputMiddle);
 
             UITextValue<Integer> start = make(UITextValue.class);
             UITextValue<Integer> end = make(UITextValue.class);
 
-            start.value(initial)
-                    .style(SettingStyles.FormInputMin)
-                    .when(User.Scroll, Actions.traverseInt(step::value))
-                    .observe((prev, now) -> {
-                        end.value(v -> v + (now - prev));
-                    })
-                    .requireWhen(end)
-                    .require(ui -> ui.value() <= end.value());
+            start.value(initial).style(FormStyles.FormInputMin).when(User.Scroll, Actions.traverseInt(step::value)).observe((prev, now) -> {
+                end.value(v -> v + (now - prev));
+            }).requireWhen(end).require(ui -> ui.value() <= end.value());
             end.value(initial)
-                    .style(SettingStyles.FormInputMin)
+                    .style(FormStyles.FormInputMin)
                     .when(User.Scroll, Actions.traverseInt(step::value))
                     .require(ui -> start.value() <= ui.value())
                     .requireWhen(start);
@@ -246,13 +241,13 @@ public class ParameterizablePropertySheet<M> extends View {
         private HBox createDecimalRange(double initial) {
             UISpinner<Double> step = make(UISpinner.class);
             step.items(0.001, 0.002, 0.003, 0.004, 0.005, 0.01, 0.02, 0.03, 0.04, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 1.0, 2.0, 3.0, 4.0, 5.0)
-                    .style(SettingStyles.FormInputMiddle);
+                    .style(FormStyles.FormInputMiddle);
 
             UITextValue<Double> start = make(UITextValue.class);
             UITextValue<Double> end = make(UITextValue.class);
 
             start.value(initial)
-                    .style(SettingStyles.FormInputMin)
+                    .style(FormStyles.FormInputMin)
                     .when(User.Scroll, Actions.traverseDouble(step::value))
                     .observe((prev, now) -> {
                         end.value(v -> BigDecimal.valueOf(v).add(BigDecimal.valueOf(now).subtract(BigDecimal.valueOf(prev))).doubleValue());
@@ -260,7 +255,7 @@ public class ParameterizablePropertySheet<M> extends View {
                     .requireWhen(end)
                     .require(ui -> ui.value() <= end.value());
             end.value(initial)
-                    .style(SettingStyles.FormInputMin)
+                    .style(FormStyles.FormInputMin)
                     .when(User.Scroll, Actions.traverseDouble(step::value))
                     .require(ui -> start.value() <= ui.value())
                     .requireWhen(start);
