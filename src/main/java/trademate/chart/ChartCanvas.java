@@ -15,6 +15,7 @@ import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.function.ToDoubleFunction;
 
@@ -75,6 +76,9 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
     /** @FIXME Read from css file. */
     private static final Color Sell = Color.rgb(247, 105, 77);
+
+    /** @FIXME Read from css file. */
+    private static final Color Same = Color.rgb(180, 180, 180);
 
     /** The candle width. */
     private static final int BarWidth = 3;
@@ -169,6 +173,16 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
     /** The size of chart infomation area. */
     private final int chartInfoLeftPadding = 10;
+
+    private Function<Tick, Color> candleColorCordinator = tick -> {
+        if (tick.openPrice.isLessThan(tick.closePrice())) {
+            return Buy;
+        } else if (tick.openPrice.isGreaterThan(tick.closePrice())) {
+            return Sell;
+        } else {
+            return Same;
+        }
+    };
 
     /**
      * Chart canvas.
@@ -471,7 +485,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 double high = axisY.getPositionForValue(tick.highPrice().doubleValue());
                 double low = axisY.getPositionForValue(tick.lowPrice().doubleValue());
 
-                gc.setStroke(open < close ? Sell : Buy);
+                gc.setStroke(candleColorCordinator.apply(tick));
                 gc.setLineWidth(1);
                 gc.strokeLine(x, high, x, low);
                 if (needDrawingOpenAndClose) {
@@ -562,7 +576,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             double high = axisY.getPositionForValue(tick.highPrice().doubleValue());
             double low = axisY.getPositionForValue(tick.lowPrice().doubleValue());
 
-            gc.setStroke(open < close ? Sell : Buy);
+            gc.setStroke(candleColorCordinator.apply(tick));
             gc.setLineWidth(1);
             gc.strokeLine(x, high, x, low);
             gc.setLineWidth(BarWidth);
