@@ -9,6 +9,7 @@
  */
 package trademate.chart;
 
+import java.util.Comparator;
 import java.util.function.Supplier;
 
 import javafx.collections.FXCollections;
@@ -86,7 +87,7 @@ public class ChartView extends View {
      */
     @Override
     protected void initialize() {
-        span.initialize(TimeSpan.values());
+        span.initialize(TimeSpan.values()).sort(Comparator.reverseOrder());
         span.observing() //
                 .skipNull()
                 .combineLatest(market.observing().skipNull())

@@ -140,6 +140,16 @@ abstract class RetryPolicyModel implements WiseFunction<Signal<Throwable>, Signa
     }
 
     /**
+     * Set the scheduler to manage the delay.
+     * 
+     * @return
+     */
+    @Icy.Property
+    boolean autoReset() {
+        return true;
+    }
+
+    /**
      * Set the current number of trials to 0.
      */
     public final void reset() {
@@ -164,10 +174,12 @@ abstract class RetryPolicyModel implements WiseFunction<Signal<Throwable>, Signa
                 return I.signal(e);
             }
         }).take(limit()).delay(i -> {
-            if (autoReset != null) {
-                autoReset.cancel(true);
+            if (autoReset()) {
+                if (autoReset != null) {
+                    autoReset.cancel(true);
+                }
+                autoReset = I.schedule(delayMaximum().toMillis() * 2, TimeUnit.MILLISECONDS, scheduler(), this::reset);
             }
-            autoReset = I.schedule(delayMaximum().toMillis() * 2, TimeUnit.MILLISECONDS, scheduler(), this::reset);
 
             return Chrono.between(delayMinimum(), delay().apply(count++), delayMaximum());
         }, scheduler()).effect(onRetry);
