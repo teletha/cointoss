@@ -19,7 +19,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.Predicate;
-import java.util.stream.IntStream;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.ObjectProperty;
@@ -207,7 +206,8 @@ public class ParameterizablePropertySheet<M> extends View {
          */
         private HBox createIntegralRange(int initial) {
             UISpinner<Integer> step = make(UISpinner.class);
-            step.items(IntStream.rangeClosed(1, 100)).style(SettingStyles.FormInputMin);
+            step.items(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 30, 40, 50, 100, 200, 300, 400, 500, 1000, 2000, 3000, 4000, 5000, 10000)
+                    .style(SettingStyles.FormInputMiddle);
 
             UITextValue<Integer> start = make(UITextValue.class);
             UITextValue<Integer> end = make(UITextValue.class);
@@ -215,6 +215,9 @@ public class ParameterizablePropertySheet<M> extends View {
             start.value(initial)
                     .style(SettingStyles.FormInputMin)
                     .when(User.Scroll, Actions.traverseInt(step::value))
+                    .observe((prev, now) -> {
+                        end.value(v -> v + (now - prev));
+                    })
                     .requireWhen(end)
                     .require(ui -> ui.value() <= end.value());
             end.value(initial)
@@ -242,7 +245,8 @@ public class ParameterizablePropertySheet<M> extends View {
          */
         private HBox createDecimalRange(double initial) {
             UISpinner<Double> step = make(UISpinner.class);
-            step.items(0.001, 0.01, 0.1, 1d).style(SettingStyles.FormInputMin);
+            step.items(0.001, 0.002, 0.003, 0.004, 0.005, 0.01, 0.02, 0.03, 0.04, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 1.0, 2.0, 3.0, 4.0, 5.0)
+                    .style(SettingStyles.FormInputMiddle);
 
             UITextValue<Double> start = make(UITextValue.class);
             UITextValue<Double> end = make(UITextValue.class);
@@ -250,6 +254,9 @@ public class ParameterizablePropertySheet<M> extends View {
             start.value(initial)
                     .style(SettingStyles.FormInputMin)
                     .when(User.Scroll, Actions.traverseDouble(step::value))
+                    .observe((prev, now) -> {
+                        end.value(v -> BigDecimal.valueOf(v).add(BigDecimal.valueOf(now).subtract(BigDecimal.valueOf(prev))).doubleValue());
+                    })
                     .requireWhen(end)
                     .require(ui -> ui.value() <= end.value());
             end.value(initial)

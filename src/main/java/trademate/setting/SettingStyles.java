@@ -66,6 +66,10 @@ public interface SettingStyles extends StyleDSL {
         display.minWidth(60, px).width(60, px);
     };
 
+    Style FormInputMiddle = () -> {
+        display.minWidth(80, px).width(80, px);
+    };
+
     Style FormCheck = () -> {
         display.minWidth(60, px);
         text.align.center().verticalAlign.middle();

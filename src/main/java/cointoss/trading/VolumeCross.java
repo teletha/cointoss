@@ -41,6 +41,10 @@ public class VolumeCross extends Trader {
 
     public TimeSpan span = TimeSpan.Minute5;
 
+    public int profitRange = 5000;
+
+    public int losscutRange = 5000;
+
     /**
      * {@inheritDoc}
      */
@@ -52,6 +56,7 @@ public class VolumeCross extends Trader {
         NumIndicator volumeDiff = buyVolume.nmap(sellVolume, (b, s) -> Num.of(b - s))
                 .sma(7)
                 .scale(market.service.setting.targetCurrencyScaleSize);
+
         Indicator<Boolean> upPrediction = Indicator.build(ticker, Tick::isBear).map(volumeDiff, (t, d) -> t && d.isPositive());
         Indicator<Boolean> downPrediction = Indicator.build(ticker, Tick::isBull).map(volumeDiff, (t, d) -> t && d.isNegative());
 
@@ -67,6 +72,8 @@ public class VolumeCross extends Trader {
 
             @Override
             protected void exit() {
+                exitAt(entryPrice.plus(direction(), profitRange));
+                exitAt(entryPrice.minus(direction(), losscutRange));
                 exitWhen(volumeDiff.observeWhen(ticker.close).plug(near(2, o -> o.isLessThan(0))), o -> o.take());
             }
         });
@@ -79,6 +86,8 @@ public class VolumeCross extends Trader {
 
             @Override
             protected void exit() {
+                exitAt(entryPrice.plus(direction(), profitRange));
+                exitAt(entryPrice.minus(direction(), losscutRange));
                 exitWhen(volumeDiff.observeWhen(ticker.close).plug(near(2, o -> o.isGreaterThan(0))), o -> o.take());
             }
         });

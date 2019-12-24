@@ -13,6 +13,7 @@ import static java.time.temporal.ChronoUnit.MINUTES;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
+import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.LongFunction;
@@ -30,6 +31,8 @@ abstract class RetryPolicyModel implements WiseFunction<Signal<Throwable>, Signa
 
     @VisibleForTesting
     long count;
+
+    Future<?> autoReset;
 
     @VisibleForTesting
     WiseRunnable onRetry;
@@ -160,6 +163,13 @@ abstract class RetryPolicyModel implements WiseFunction<Signal<Throwable>, Signa
             } else {
                 return I.signal(e);
             }
-        }).take(limit()).delay(i -> Chrono.between(delayMinimum(), delay().apply(count++), delayMaximum()), scheduler()).effect(onRetry);
+        }).take(limit()).delay(i -> {
+            if (autoReset != null) {
+                autoReset.cancel(true);
+            }
+            autoReset = I.schedule(delayMaximum().toMillis() * 2, TimeUnit.MILLISECONDS, scheduler(), this::reset);
+
+            return Chrono.between(delayMinimum(), delay().apply(count++), delayMaximum());
+        }, scheduler()).effect(onRetry);
     }
 }

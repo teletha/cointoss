@@ -130,7 +130,6 @@ public class Market implements Disposable {
         service.add(service.orderBook().retryWhen(policy).to(board -> {
             orderBook.shorts.update(board.asks);
             orderBook.longs.update(board.bids);
-            policy.reset();
         }));
         service.add(timeline.throttle(2, TimeUnit.SECONDS).to(e -> {
             // fix error board

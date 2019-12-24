@@ -65,7 +65,6 @@ import cointoss.ticker.TimeSpan;
 import cointoss.util.Chrono;
 import cointoss.util.Network;
 import cointoss.util.Num;
-import cointoss.util.RetryPolicy;
 import kiss.I;
 import kiss.Observer;
 import kiss.Signal;
@@ -179,9 +178,6 @@ public class ExecutionLog {
     /** The log parser. */
     private final ExecutionLogger logger;
 
-    /** The retry policy. */
-    private final RetryPolicy policy;
-
     /**
      * Create log manager.
      * 
@@ -202,7 +198,6 @@ public class ExecutionLog {
         this.root = Objects.requireNonNull(root);
         this.store = root.file("lastID.log");
         this.logger = I.make(service.setting.executionLogger());
-        this.policy = service.retryPolicy(500);
 
         try {
             ZonedDateTime start = null;
@@ -340,7 +335,7 @@ public class ExecutionLog {
                 }
             }
             return disposer;
-        }).retryWhen(policy);
+        }).retryWhen(service.retryPolicy(500));
     }
 
     /**
@@ -921,7 +916,6 @@ public class ExecutionLog {
                 log.info("Realtime buffer write from {} to {}.  size {}", buffer.peek().date, buffer.peekLast().date, buffer.size());
             }
             destination = observer;
-            policy.reset();
         }
     }
 

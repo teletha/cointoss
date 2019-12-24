@@ -237,7 +237,7 @@ public class BackTestView extends View implements Analyzer {
         };
 
         Style shortColumn = () -> {
-            display.width(60, px).minWidth(60, px);
+            display.width(65, px).minWidth(65, px);
         };
     }
 

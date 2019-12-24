@@ -107,6 +107,7 @@ public enum SFD {
                         diff = btc.divide(fx).minus(Num.ONE).multiply(Num.HUNDRED).negate();
                     }
                     return I.pair(fx, btc, diff);
-                });
+                })
+                .retryWhen(BitFlyer.FX_BTC_JPY.retryPolicy(200));
     }
 }

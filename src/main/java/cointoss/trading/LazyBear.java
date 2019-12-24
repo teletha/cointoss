@@ -33,13 +33,15 @@ public class LazyBear extends Trader {
 
     public TimeSpan tickerSpan = TimeSpan.Second15;
 
-    public int entryThreshold = 50;
+    public int entryThreshold = 35;
 
-    public int exitThreshold = 5;
+    public int exitThreshold = 15;
 
-    public int decay = 10;
+    public double decay = 0.95;
 
     public double diff = 0.1;
+
+    public int losscutRange = 3000;
 
     /**
      * {@inheritDoc}
@@ -48,8 +50,8 @@ public class LazyBear extends Trader {
     protected void declare(Market market, FundManager fund) {
         Variable<Boolean> mustBuy = Variable.of(false);
         Variable<Boolean> mustSell = Variable.of(false);
-        PrimitiveStats buys = new PrimitiveStats().decay(0.95);
-        PrimitiveStats sells = new PrimitiveStats().decay(0.95);
+        PrimitiveStats buys = new PrimitiveStats().decay(decay);
+        PrimitiveStats sells = new PrimitiveStats().decay(decay);
 
         market.tickers.on(TimeSpan.Second5).close.to(tick -> {
             buys.add(tick.buyVolume());
@@ -76,6 +78,7 @@ public class LazyBear extends Trader {
 
             @Override
             protected void exit() {
+                exitAt(entryPrice.minus(direction(), losscutRange));
                 exitWhen(oscillator.observeWhen(ticker.open).take(v -> v.ⅰ.isGreaterThan(exitThreshold)), s -> s.take());
                 // exitAt(market.tickers.of(Span.Second5).add.flatMap(tick -> {
                 // if (tick.openPrice.isGreaterThan(this, entryPrice.plus(this,
@@ -100,6 +103,7 @@ public class LazyBear extends Trader {
 
                     @Override
                     protected void exit() {
+                        exitAt(entryPrice.minus(direction(), losscutRange));
                         exitWhen(oscillator.observeWhen(ticker.open).take(v -> v.ⅰ.isLessThan(-exitThreshold)), s -> s.take());
                         // exitAt(market.tickers.of(Span.Second5).add.flatMap(tick -> {
                         // if (tick.openPrice.isGreaterThan(this, entryPrice.plus(this,
