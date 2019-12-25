@@ -9,8 +9,6 @@
  */
 package trademate.setting;
 
-import static transcript.Transcript.en;
-
 import kiss.I;
 import kiss.Managed;
 import kiss.Singleton;

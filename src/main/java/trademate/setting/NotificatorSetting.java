@@ -15,14 +15,19 @@ import cointoss.util.Network;
 import kiss.I;
 import kiss.Managed;
 import kiss.Singleton;
+import stylist.Style;
+import stylist.StyleDSL;
 import trademate.setting.Notificator.DesktopPosition;
 import trademate.setting.Notificator.Notify;
+import transcript.Transcript;
 import viewtify.style.FormStyles;
 import viewtify.ui.UIButton;
 import viewtify.ui.UICheckBox;
 import viewtify.ui.UIComboBox;
 import viewtify.ui.UIPassword;
 import viewtify.ui.UISpinner;
+import viewtify.ui.UITableColumn;
+import viewtify.ui.UITableView;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
 import viewtify.ui.helper.User;
@@ -33,6 +38,17 @@ class NotificatorSetting extends View {
 
     /** The notificator. */
     private final Notificator notificator = I.make(Notificator.class);
+
+    /** The notificator configuration UI. */
+    private UITableView<Notify> notifications;
+
+    private UITableColumn<Notify, Transcript> name;
+
+    private UITableColumn<Notify, Notify> desktop;
+
+    private UITableColumn<Notify, Notify> line;
+
+    private UITableColumn<Notify, Notify> sound;
 
     /** The desktop configuration UI. */
     private UISpinner<Duration> desktopDuration;
@@ -46,6 +62,12 @@ class NotificatorSetting extends View {
     /** The LINE configuration UI. */
     private UIButton lineTest;
 
+    interface style extends StyleDSL {
+        Style Table = () -> {
+            display.height(190, px);
+        };
+    }
+
     /**
      * UI definition.
      */
@@ -55,16 +77,12 @@ class NotificatorSetting extends View {
                 // Notification Types
                 $(vbox, Block, () -> {
                     label(en("Notification Type"), Heading);
-                    $(hbox, FormRow, () -> {
-                        label("", FormLabel);
-                        label(en("Desktop"), FormCheck, FormHeaderLabel);
-                        label(en("LINE"), FormCheck, FormHeaderLabel);
-                        label(en("Sound"), FormCheck2, FormHeaderLabel);
+                    $(notifications, style.Table, () -> {
+                        $(name, FormLabel);
+                        $(desktop);
+                        $(line);
+                        $(sound, FormInput);
                     });
-
-                    for (Notify type : notificator.types()) {
-                        $(new Setting(type));
-                    }
                 });
 
                 // Desktop
@@ -89,6 +107,17 @@ class NotificatorSetting extends View {
      */
     @Override
     protected void initialize() {
+        // For Notifications
+        notifications.items(notificator.types()).operatable(false);
+        name.model(n -> n.name);
+        desktop.text(en("Desktop")).renderAsCheckBox(n -> n.onDesktop, UICheckBox::sync);
+        line.text(en("LINE")).renderAsCheckBox(n -> n.onLine, (ui, value) -> {
+            ui.sync(value).disableWhen(notificator.lineAccessToken.observing().is(String::isEmpty));
+        });
+        sound.text(en("Sound")).renderAsComboBox(n -> n.onSound, (ui, value) -> {
+            ui.items(Sound.values()).sync(value).when(User.Action, () -> ui.value().play());
+        });
+
         // For Desktop
         desktopPosition.items(DesktopPosition.values()).sync(notificator.desktopPosition);
         desktopDuration.items(I.signal(2).recurse(v -> v + 2).take(30).map(Duration::ofSeconds))
@@ -107,57 +136,5 @@ class NotificatorSetting extends View {
                                 .with(lineAccessToken.value()));
                     });
         });
-    }
-
-    /**
-     * 
-     */
-    class Setting extends View {
-
-        /** The notify type. */
-        private final Notify notify;
-
-        /** Enable desktop notification. */
-        private UICheckBox desktop;
-
-        /** Enable LINE notification. */
-        private UICheckBox line;
-
-        /** Enable sound notification. */
-        private UIComboBox<Sound> sound;
-
-        /**
-         * @param notify
-         */
-        private Setting(Notify notify) {
-            this.notify = notify;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        protected void initialize() {
-            desktop.sync(notify.onDesktop);
-            line.sync(notify.onLine).disableWhen(notificator.lineAccessToken.observing().is(String::isEmpty));
-            sound.items(Sound.values()).sync(notify.onSound).when(User.Action, () -> sound.value().play());
-        }
-
-        class view extends ViewDSL {
-            {
-                $(hbox, FormStyles.FormRow, () -> {
-                    label(notify.name, FormStyles.FormLabel);
-                    $(hbox, FormStyles.FormCheck, () -> {
-                        $(desktop);
-                    });
-                    $(hbox, FormStyles.FormCheck, () -> {
-                        $(line);
-                    });
-                    $(hbox, FormStyles.FormCheck2, () -> {
-                        $(sound);
-                    });
-                });
-            }
-        }
     }
 }
