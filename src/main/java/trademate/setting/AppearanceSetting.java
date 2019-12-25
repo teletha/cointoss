@@ -34,9 +34,9 @@ public class AppearanceSetting extends View {
 
     class view extends ViewDSL {
         {
-            $(vbox, style.root, () -> {
-                $(vbox, style.block, () -> {
-                    label(en("Colors"), style.heading);
+            $(vbox, style.Root, () -> {
+                $(vbox, style.Block, () -> {
+                    label(en("Colors"), style.Heading);
                     form(CommonText.Buy, buy);
                     form(CommonText.Sell, sell);
                 });

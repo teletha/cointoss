@@ -12,22 +12,23 @@ package trademate.setting;
 import static stylist.StyleDSL.*;
 
 import stylist.Style;
+import stylist.StyleDeclarable;
 import stylist.value.Numeric;
 
-public interface SettingStyles {
+public interface SettingStyles extends StyleDeclarable {
 
     Numeric blockSpace = new Numeric(35, px);
 
-    Style root = () -> {
+    Style Root = () -> {
         padding.vertical(20, px).horizontal(30, px);
     };
 
-    Style block = () -> {
+    Style Block = () -> {
         padding.bottom(blockSpace);
         border.bottom.width(2, px).color($.rgb(40, 40, 40));
     };
 
-    Style heading = () -> {
+    Style Heading = () -> {
         padding.top(blockSpace).bottom(5, px);
         font.size(16, px);
     };

@@ -22,7 +22,7 @@ public class ChartSetting extends View {
 
     class view extends ViewDSL {
         {
-            $(vbox, style.root, () -> {
+            $(vbox, style.Root, () -> {
             });
         }
     }

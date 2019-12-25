@@ -9,8 +9,6 @@
  */
 package trademate.setting;
 
-import static transcript.Transcript.en;
-
 import java.time.Duration;
 
 import cointoss.util.Network;
@@ -48,23 +46,20 @@ class NotificatorSetting extends View {
     /** The LINE configuration UI. */
     private UIButton lineTest;
 
-    interface style extends FormStyles, SettingStyles {
-    }
-
     /**
      * UI definition.
      */
-    class view extends ViewDSL {
+    class view extends ViewDSL implements FormStyles, SettingStyles {
         {
-            $(vbox, style.root, () -> {
+            $(vbox, Root, () -> {
                 // Notification Types
-                $(vbox, style.block, () -> {
-                    label(en("Notification Type"), style.heading);
-                    $(hbox, style.FormRow, () -> {
-                        label("", style.FormLabel);
-                        label(en("Desktop"), style.FormCheck, style.FormHeaderLabel);
-                        label(en("LINE"), style.FormCheck, style.FormHeaderLabel);
-                        label(en("Sound"), style.FormCheck2, style.FormHeaderLabel);
+                $(vbox, Block, () -> {
+                    label(en("Notification Type"), Heading);
+                    $(hbox, FormRow, () -> {
+                        label("", FormLabel);
+                        label(en("Desktop"), FormCheck, FormHeaderLabel);
+                        label(en("LINE"), FormCheck, FormHeaderLabel);
+                        label(en("Sound"), FormCheck2, FormHeaderLabel);
                     });
 
                     for (Notify type : notificator.types()) {
@@ -73,16 +68,16 @@ class NotificatorSetting extends View {
                 });
 
                 // Desktop
-                $(vbox, style.block, () -> {
-                    label(en("Desktop Notification"), style.heading);
+                $(vbox, Block, () -> {
+                    label(en("Desktop Notification"), Heading);
                     form(en("Display Time"), desktopDuration);
                     form(en("Display Position"), desktopPosition);
                 });
 
                 // LINE
-                $(vbox, style.block, () -> {
-                    label(en("LINE Notification"), style.heading);
-                    label(en("You can notify LINE by specifying the access token acquired from [LINE Notify](https://notify-bot.line.me/)."), style.Description);
+                $(vbox, Block, () -> {
+                    label(en("LINE Notification"), Heading);
+                    label(en("You can notify LINE by specifying the access token acquired from [LINE Notify](https://notify-bot.line.me/)."), Description);
                     form(en("Access Token"), lineAccessToken, lineTest);
                 });
             });
