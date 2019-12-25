@@ -32,7 +32,7 @@ import trademate.TradeMateStyle;
 import trademate.TradingView;
 import viewtify.Viewtify;
 import viewtify.bind.Calculated;
-import viewtify.ui.UI;
+import viewtify.ui.ViewDSL;
 import viewtify.ui.UITableColumn;
 import viewtify.ui.UITableView;
 import viewtify.ui.View;
@@ -66,8 +66,8 @@ public class OrderCatalog extends View {
      * {@inheritDoc}
      */
     @Override
-    protected UI declareUI() {
-        return new UI() {
+    protected ViewDSL declareUI() {
+        return new ViewDSL() {
             {
                 $(table, S.Root, () -> {
                     $(date, S.Wide);

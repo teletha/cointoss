@@ -9,8 +9,7 @@
  */
 package trademate.setting;
 
-import static trademate.setting.SettingStyles.*;
-import static transcript.Transcript.en;
+import static transcript.Transcript.*;
 
 import cointoss.market.bitflyer.BitFlyerAccount;
 import kiss.I;
@@ -18,11 +17,11 @@ import kiss.Managed;
 import kiss.Singleton;
 import transcript.Lang;
 import transcript.Transcript;
-import viewtify.ui.UI;
 import viewtify.ui.UICheckBox;
 import viewtify.ui.UIPassword;
 import viewtify.ui.UIText;
 import viewtify.ui.View;
+import viewtify.ui.ViewDSL;
 import viewtify.ui.helper.User;
 
 @Managed(value = Singleton.class)
@@ -45,7 +44,10 @@ public class BitFlyerSetting extends View {
 
     private UICheckBox loginBackground;
 
-    class view extends UI {
+    interface style extends SettingStyles {
+    }
+
+    class view extends ViewDSL {
         Transcript PublicAPIDescription = Transcript
                 .en("Please get API key and API secret to use the public API provided by [BitFlyer](https://lightning.bitflyer.jp/developer).");
 
@@ -59,16 +61,16 @@ public class BitFlyerSetting extends View {
         Transcript LoginExplicitly = Transcript.en("Login explicitly");
 
         {
-            $(vbox, Root, () -> {
-                $(vbox, Block, () -> {
-                    label("BitFlyer", Heading);
-                    label(PublicAPIDescription, Description);
+            $(vbox, style.Root, () -> {
+                $(vbox, style.Block, () -> {
+                    label("BitFlyer", style.Heading);
+                    label(PublicAPIDescription, style.Description);
                     form("API Key", apiKey);
                     form("API Secret", apiSecret);
 
-                    label(PrivateAPITitle, Heading);
-                    label(PrivateAPIDescription, Description);
-                    label(PrivateAPIWarning, Description, Warning);
+                    label(PrivateAPITitle, style.Heading);
+                    label(PrivateAPIDescription, style.Description);
+                    label(PrivateAPIWarning, style.Description, style.Warning);
                     form("Login ID", loginId);
                     form(en("Password"), loginPassword);
                     form(en("Account ID"), accountId);

@@ -9,14 +9,12 @@
  */
 package trademate.setting;
 
+import static stylist.StyleDSL.*;
+
 import stylist.Style;
-import stylist.StyleDSL;
 import stylist.value.Numeric;
 
-/**
- * @version 2018/09/06 23:46:11
- */
-public interface SettingStyles extends StyleDSL {
+public interface SettingStyles {
 
     Numeric blockSpace = new Numeric(35, px);
 

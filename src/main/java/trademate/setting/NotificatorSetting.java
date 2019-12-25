@@ -9,8 +9,7 @@
  */
 package trademate.setting;
 
-import static trademate.setting.SettingStyles.*;
-import static transcript.Transcript.en;
+import static transcript.Transcript.*;
 
 import java.time.Duration;
 
@@ -21,13 +20,13 @@ import kiss.Singleton;
 import trademate.setting.Notificator.DesktopPosition;
 import trademate.setting.Notificator.Notify;
 import viewtify.style.FormStyles;
-import viewtify.ui.UI;
 import viewtify.ui.UIButton;
 import viewtify.ui.UICheckBox;
 import viewtify.ui.UIComboBox;
 import viewtify.ui.UIPassword;
 import viewtify.ui.UISpinner;
 import viewtify.ui.View;
+import viewtify.ui.ViewDSL;
 import viewtify.ui.helper.User;
 import viewtify.util.Icon;
 
@@ -52,7 +51,7 @@ class NotificatorSetting extends View {
     /**
      * UI definition.
      */
-    class view extends UI implements FormStyles {
+    class view extends ViewDSL implements FormStyles, SettingStyles {
         {
             $(vbox, Root, () -> {
                 // Notification Types
@@ -146,7 +145,7 @@ class NotificatorSetting extends View {
             sound.items(Sound.values()).sync(notify.onSound).when(User.Action, () -> sound.value().play());
         }
 
-        class view extends UI {
+        class view extends ViewDSL {
             {
                 $(hbox, FormStyles.FormRow, () -> {
                     label(notify.name, FormStyles.FormLabel);

@@ -26,7 +26,7 @@ import trademate.verify.BackTestView;
 import transcript.Lang;
 import viewtify.Theme;
 import viewtify.Viewtify;
-import viewtify.ui.UI;
+import viewtify.ui.ViewDSL;
 import viewtify.ui.UITabPane;
 import viewtify.ui.View;
 
@@ -35,7 +35,7 @@ public class TradeMate extends View {
 
     private UITabPane main;
 
-    class view extends UI {
+    class view extends ViewDSL {
         {
             $(main);
         }

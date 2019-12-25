@@ -31,7 +31,7 @@ import stylist.StyleDSL;
 import trademate.TradeMateStyle;
 import trademate.TradingView;
 import viewtify.Viewtify;
-import viewtify.ui.UI;
+import viewtify.ui.ViewDSL;
 import viewtify.ui.UIButton;
 import viewtify.ui.UILabel;
 import viewtify.ui.UISpinner;
@@ -118,8 +118,8 @@ public class OrderBuilder extends View {
      * {@inheritDoc}
      */
     @Override
-    protected UI declareUI() {
-        return new UI() {
+    protected ViewDSL declareUI() {
+        return new ViewDSL() {
             {
                 $(vbox, S.Root, () -> {
                     $(hbox, S.Row, () -> {

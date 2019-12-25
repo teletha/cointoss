@@ -36,7 +36,7 @@ import kiss.model.Model;
 import kiss.model.Property;
 import viewtify.Viewtify;
 import viewtify.style.FormStyles;
-import viewtify.ui.UI;
+import viewtify.ui.ViewDSL;
 import viewtify.ui.UICheckBox;
 import viewtify.ui.UIComboCheckBox;
 import viewtify.ui.UILabel;
@@ -85,7 +85,7 @@ public class ParameterizablePropertySheet<M> extends View {
     /**
      * UI definition.
      */
-    class view extends UI {
+    class view extends ViewDSL {
         {
             $(vbox, editors);
         }
@@ -151,7 +151,7 @@ public class ParameterizablePropertySheet<M> extends View {
         /**
          * UI definition.
          */
-        class view extends UI implements FormStyles {
+        class view extends ViewDSL implements FormStyles {
             {
                 $(hbox, FormRow, () -> {
                     $(title, FormLabel);

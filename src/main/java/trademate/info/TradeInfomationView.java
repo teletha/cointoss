@@ -17,7 +17,7 @@ import cointoss.util.Num;
 import stylist.Style;
 import stylist.StyleDSL;
 import trademate.TradingView;
-import viewtify.ui.UI;
+import viewtify.ui.ViewDSL;
 import viewtify.ui.UIButton;
 import viewtify.ui.UILabel;
 import viewtify.ui.View;
@@ -42,7 +42,7 @@ public class TradeInfomationView extends View {
     /** Parent View */
     private TradingView view;
 
-    class view extends UI {
+    class view extends ViewDSL {
         {
             $(vbox, style.root, () -> {
                 $(hbox, style.row, () -> {

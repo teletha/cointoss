@@ -40,7 +40,7 @@ import trademate.setting.SettingStyles;
 import trademate.widget.ParameterizablePropertySheet;
 import transcript.Transcript;
 import viewtify.Viewtify;
-import viewtify.ui.UI;
+import viewtify.ui.ViewDSL;
 import viewtify.ui.UIButton;
 import viewtify.ui.UICheckBox;
 import viewtify.ui.UIComboBox;
@@ -135,7 +135,7 @@ public class BackTestView extends View implements Analyzer {
     /**
      * UI definition.
      */
-    class view extends UI implements SettingStyles {
+    class view extends ViewDSL implements SettingStyles {
         {
             $(vbox, () -> {
                 $(hbox, style.fill, () -> {

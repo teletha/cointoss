@@ -17,7 +17,7 @@ import cointoss.util.Primitives;
 import stylist.Style;
 import stylist.StyleDSL;
 import viewtify.Viewtify;
-import viewtify.ui.UI;
+import viewtify.ui.ViewDSL;
 import viewtify.ui.UILabel;
 import viewtify.ui.UIListView;
 import viewtify.ui.UISpinner;
@@ -37,7 +37,7 @@ public class ExecutionView extends View {
     /** Parent View */
     private TradingView tradingView;
 
-    class view extends UI {
+    class view extends ViewDSL {
         {
             $(vbox, style.root, () -> {
                 $(executionList);

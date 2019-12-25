@@ -26,7 +26,7 @@ import trademate.order.OrderBookView;
 import trademate.order.OrderBuilder;
 import trademate.order.OrderCatalog;
 import viewtify.Viewtify;
-import viewtify.ui.UI;
+import viewtify.ui.ViewDSL;
 import viewtify.ui.UILabel;
 import viewtify.ui.UITab;
 import viewtify.ui.View;
@@ -91,7 +91,7 @@ public class TradingView extends View {
     /**
      * UI definition.
      */
-    class view extends UI {
+    class view extends ViewDSL {
         {
             $(vbox, () -> {
                 $(hbox, style.fill, () -> {

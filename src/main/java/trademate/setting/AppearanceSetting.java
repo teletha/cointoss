@@ -9,17 +9,16 @@
  */
 package trademate.setting;
 
-import static trademate.CommonText.*;
-import static trademate.setting.SettingStyles.*;
-import static transcript.Transcript.en;
+import static transcript.Transcript.*;
 
 import kiss.I;
 import kiss.Managed;
 import kiss.Singleton;
+import trademate.CommonText;
 import trademate.Theme;
-import viewtify.ui.UI;
 import viewtify.ui.UIColorPicker;
 import viewtify.ui.View;
+import viewtify.ui.ViewDSL;
 
 @Managed(value = Singleton.class)
 public class AppearanceSetting extends View {
@@ -30,13 +29,13 @@ public class AppearanceSetting extends View {
 
     private UIColorPicker sell;
 
-    class view extends UI {
+    class view extends ViewDSL implements SettingStyles {
         {
             $(vbox, Root, () -> {
                 $(vbox, Block, () -> {
                     label(en("Colors"), Heading);
-                    form(Buy, buy);
-                    form(Sell, sell);
+                    form(CommonText.Buy, buy);
+                    form(CommonText.Sell, sell);
                 });
             });
         }

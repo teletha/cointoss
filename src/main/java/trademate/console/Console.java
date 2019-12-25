@@ -21,7 +21,7 @@ import stylist.Style;
 import stylist.StyleDSL;
 import trademate.TradingView;
 import viewtify.Viewtify;
-import viewtify.ui.UI;
+import viewtify.ui.ViewDSL;
 import viewtify.ui.UIListView;
 import viewtify.ui.View;
 
@@ -39,7 +39,7 @@ public class Console extends View {
 
     final ObservableList<String> messages = FXCollections.observableList(new LinkedList());
 
-    class view extends UI {
+    class view extends ViewDSL {
         {
             $(console, style.consoleView);
         }

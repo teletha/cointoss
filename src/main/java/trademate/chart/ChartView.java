@@ -23,7 +23,7 @@ import cointoss.ticker.TimeSpan;
 import kiss.Variable;
 import stylist.Style;
 import stylist.StyleDSL;
-import viewtify.ui.UI;
+import viewtify.ui.ViewDSL;
 import viewtify.ui.UIButton;
 import viewtify.ui.UIComboBox;
 import viewtify.ui.View;
@@ -66,7 +66,7 @@ public class ChartView extends View {
     /**
      * UI definition.
      */
-    class view extends UI {
+    class view extends ViewDSL {
         {
             $(sbox, style.chart, () -> {
                 $(chart);
@@ -140,7 +140,7 @@ public class ChartView extends View {
 
         private UIComboBox<CandleType> candle;
 
-        class view extends UI {
+        class view extends ViewDSL {
             {
                 $(vbox, () -> {
                     form("Candle Type", candle);

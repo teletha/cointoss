@@ -29,7 +29,7 @@ import stylist.StyleDSL;
 import trademate.TradeMateStyle;
 import trademate.TradingView;
 import viewtify.Viewtify;
-import viewtify.ui.UI;
+import viewtify.ui.ViewDSL;
 import viewtify.ui.UILabel;
 import viewtify.ui.UIListView;
 import viewtify.ui.UISpinner;
@@ -63,7 +63,7 @@ public class OrderBookView extends View {
     /**
      * UI definition.
      */
-    class view extends UI {
+    class view extends ViewDSL {
         {
             $(vbox, style.root, () -> {
                 $(shortList, style.book);

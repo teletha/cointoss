@@ -17,7 +17,7 @@ import kiss.Managed;
 import kiss.Singleton;
 import stylist.Style;
 import stylist.StyleDSL;
-import viewtify.ui.UI;
+import viewtify.ui.ViewDSL;
 import viewtify.ui.UILabel;
 import viewtify.ui.UIPane;
 import viewtify.ui.View;
@@ -41,7 +41,7 @@ public class SettingView extends View {
     /**
      * UI definition.
      */
-    class view extends UI {
+    class view extends ViewDSL implements SettingStyles {
         {
             $(hbox, () -> {
                 $(vbox, style.categoryPane, () -> {

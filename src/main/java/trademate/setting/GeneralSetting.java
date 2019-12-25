@@ -9,17 +9,15 @@
  */
 package trademate.setting;
 
-import static trademate.setting.SettingStyles.Root;
-
 import kiss.Managed;
 import kiss.Singleton;
-import viewtify.ui.UI;
 import viewtify.ui.View;
+import viewtify.ui.ViewDSL;
 
 @Managed(value = Singleton.class)
 public class GeneralSetting extends View {
 
-    class view extends UI {
+    class view extends ViewDSL implements SettingStyles {
         {
             $(vbox, Root, () -> {
 
