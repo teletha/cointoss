@@ -104,7 +104,7 @@ public class ChartView extends View {
                 .map(e -> e.ⅱ.tickers.on(e.ⅰ))
                 .to(ticker::set);
 
-        config.text(FontAwesome.Glyph.GEAR).popover(new Config());
+        config.text(FontAwesome.Glyph.GEAR).popup(new Config());
     }
 
     /**
