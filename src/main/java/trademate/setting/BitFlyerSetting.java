@@ -61,14 +61,14 @@ public class BitFlyerSetting extends View {
         Transcript LoginExplicitly = Transcript.en("Login explicitly");
 
         {
-            $(vbox, style.Root, () -> {
-                $(vbox, style.Block, () -> {
-                    label("BitFlyer", style.Heading);
+            $(vbox, style.root, () -> {
+                $(vbox, style.block, () -> {
+                    label("BitFlyer", style.heading);
                     label(PublicAPIDescription, style.Description);
                     form("API Key", apiKey);
                     form("API Secret", apiSecret);
 
-                    label(PrivateAPITitle, style.Heading);
+                    label(PrivateAPITitle, style.heading);
                     label(PrivateAPIDescription, style.Description);
                     label(PrivateAPIWarning, style.Description, style.Warning);
                     form("Login ID", loginId);

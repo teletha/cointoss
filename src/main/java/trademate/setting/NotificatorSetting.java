@@ -9,7 +9,7 @@
  */
 package trademate.setting;
 
-import static transcript.Transcript.*;
+import static transcript.Transcript.en;
 
 import java.time.Duration;
 
@@ -48,20 +48,23 @@ class NotificatorSetting extends View {
     /** The LINE configuration UI. */
     private UIButton lineTest;
 
+    interface style extends FormStyles, SettingStyles {
+    }
+
     /**
      * UI definition.
      */
-    class view extends ViewDSL implements FormStyles, SettingStyles {
+    class view extends ViewDSL {
         {
-            $(vbox, Root, () -> {
+            $(vbox, style.root, () -> {
                 // Notification Types
-                $(vbox, Block, () -> {
-                    label(en("Notification Type"), Heading);
-                    $(hbox, FormRow, () -> {
-                        label("", FormLabel);
-                        label(en("Desktop"), FormCheck, FormHeaderLabel);
-                        label(en("LINE"), FormCheck, FormHeaderLabel);
-                        label(en("Sound"), FormCheck2, FormHeaderLabel);
+                $(vbox, style.block, () -> {
+                    label(en("Notification Type"), style.heading);
+                    $(hbox, style.FormRow, () -> {
+                        label("", style.FormLabel);
+                        label(en("Desktop"), style.FormCheck, style.FormHeaderLabel);
+                        label(en("LINE"), style.FormCheck, style.FormHeaderLabel);
+                        label(en("Sound"), style.FormCheck2, style.FormHeaderLabel);
                     });
 
                     for (Notify type : notificator.types()) {
@@ -70,16 +73,16 @@ class NotificatorSetting extends View {
                 });
 
                 // Desktop
-                $(vbox, Block, () -> {
-                    label(en("Desktop Notification"), Heading);
+                $(vbox, style.block, () -> {
+                    label(en("Desktop Notification"), style.heading);
                     form(en("Display Time"), desktopDuration);
                     form(en("Display Position"), desktopPosition);
                 });
 
                 // LINE
-                $(vbox, Block, () -> {
-                    label(en("LINE Notification"), Heading);
-                    label(en("You can notify LINE by specifying the access token acquired from [LINE Notify](https://notify-bot.line.me/)."), Description);
+                $(vbox, style.block, () -> {
+                    label(en("LINE Notification"), style.heading);
+                    label(en("You can notify LINE by specifying the access token acquired from [LINE Notify](https://notify-bot.line.me/)."), style.Description);
                     form(en("Access Token"), lineAccessToken, lineTest);
                 });
             });

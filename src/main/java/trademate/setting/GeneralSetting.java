@@ -17,9 +17,12 @@ import viewtify.ui.ViewDSL;
 @Managed(value = Singleton.class)
 public class GeneralSetting extends View {
 
+    interface style extends SettingStyles {
+    }
+
     class view extends ViewDSL implements SettingStyles {
         {
-            $(vbox, Root, () -> {
+            $(vbox, style.root, () -> {
 
             });
         }

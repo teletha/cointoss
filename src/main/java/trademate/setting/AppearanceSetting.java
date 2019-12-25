@@ -9,7 +9,7 @@
  */
 package trademate.setting;
 
-import static transcript.Transcript.*;
+import static transcript.Transcript.en;
 
 import kiss.I;
 import kiss.Managed;
@@ -29,11 +29,14 @@ public class AppearanceSetting extends View {
 
     private UIColorPicker sell;
 
-    class view extends ViewDSL implements SettingStyles {
+    interface style extends SettingStyles {
+    }
+
+    class view extends ViewDSL {
         {
-            $(vbox, Root, () -> {
-                $(vbox, Block, () -> {
-                    label(en("Colors"), Heading);
+            $(vbox, style.root, () -> {
+                $(vbox, style.block, () -> {
+                    label(en("Colors"), style.heading);
                     form(CommonText.Buy, buy);
                     form(CommonText.Sell, sell);
                 });

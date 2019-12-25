@@ -18,16 +18,16 @@ public interface SettingStyles {
 
     Numeric blockSpace = new Numeric(35, px);
 
-    Style Root = () -> {
+    Style root = () -> {
         padding.vertical(20, px).horizontal(30, px);
     };
 
-    Style Block = () -> {
+    Style block = () -> {
         padding.bottom(blockSpace);
         border.bottom.width(2, px).color($.rgb(40, 40, 40));
     };
 
-    Style Heading = () -> {
+    Style heading = () -> {
         padding.top(blockSpace).bottom(5, px);
         font.size(16, px);
     };
