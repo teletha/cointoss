@@ -73,6 +73,23 @@ public enum CandleType {
                 return CandleType.Sell;
             }
         }
+    }),
+
+    /** Coordinate by volume. */
+    PriceVolumeWeight(tick -> {
+        Num open = tick.openPrice;
+        Num close = tick.closePrice();
+        double buy = tick.buyVolume();
+        double sell = tick.sellVolume();
+        double weight = Math.pow(buy / sell, 4);
+
+        if (open.isLessThan(close)) {
+            return CandleType.Buy.deriveColor(0, weight, 1, 1);
+        } else if (open.isGreaterThan(close)) {
+            return CandleType.Sell.deriveColor(0, weight, 1, 1);
+        } else {
+            return CandleType.Same;
+        }
     });
 
     /** The candle color. */
