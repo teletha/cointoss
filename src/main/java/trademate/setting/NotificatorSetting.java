@@ -108,7 +108,7 @@ class NotificatorSetting extends View {
     @Override
     protected void initialize() {
         // For Notifications
-        notifications.items(notificator.types()).operatable(false);
+        notifications.items(notificator.types()).operatable(false).simplify();
         name.model(n -> n.name);
         desktop.text(en("Desktop")).renderAsCheckBox(n -> n.onDesktop, UICheckBox::sync);
         line.text(en("LINE")).renderAsCheckBox(n -> n.onLine, (ui, value) -> {

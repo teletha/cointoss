@@ -26,7 +26,6 @@ import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.layout.HBox;
 
 import com.google.common.collect.Sets;
 
@@ -36,14 +35,14 @@ import kiss.model.Model;
 import kiss.model.Property;
 import viewtify.Viewtify;
 import viewtify.style.FormStyles;
-import viewtify.ui.ViewDSL;
 import viewtify.ui.UICheckBox;
 import viewtify.ui.UIComboCheckBox;
-import viewtify.ui.UILabel;
 import viewtify.ui.UISpinner;
 import viewtify.ui.UIText;
 import viewtify.ui.UITextValue;
+import viewtify.ui.UserInterface;
 import viewtify.ui.View;
+import viewtify.ui.ViewDSL;
 import viewtify.ui.helper.Actions;
 import viewtify.ui.helper.User;
 
@@ -131,9 +130,6 @@ public class ParameterizablePropertySheet<M> extends View {
      */
     class PropertyEditorView extends View {
 
-        /** The title area. */
-        private UILabel title;
-
         /** The target property. */
         private final Property property;
 
@@ -151,25 +147,25 @@ public class ParameterizablePropertySheet<M> extends View {
         /**
          * UI definition.
          */
-        class view extends ViewDSL implements FormStyles {
+        class view extends ViewDSL {
             {
-                $(hbox, FormRow, () -> {
-                    $(title, FormLabel);
+                form(property.name, FormStyles.FormInputMin, createUI(property));
+            }
+        }
 
-                    Class type = property.model.type;
+        private UserInterface[] createUI(Property property) {
+            Class type = property.model.type;
 
-                    if (type == boolean.class || type == Boolean.class) {
-                        $(createCheckBox((boolean) initialValue));
-                    } else if (type.isEnum()) {
-                        $(createComboBox(initialValue));
-                    } else if (isIntegral(property.model.type)) {
-                        $(createIntegralRange((int) initialValue));
-                    } else if (isDecimal(property.model.type)) {
-                        $(createDecimalRange((double) initialValue));
-                    } else {
-                        $(make(UIText.class), FormInput);
-                    }
-                });
+            if (type == boolean.class || type == Boolean.class) {
+                return new UserInterface[] {createCheckBox((boolean) initialValue)};
+            } else if (type.isEnum()) {
+                return new UserInterface[] {createComboBox(initialValue)};
+            } else if (isIntegral(property.model.type)) {
+                return createIntegralRange((int) initialValue);
+            } else if (isDecimal(property.model.type)) {
+                return createDecimalRange((double) initialValue);
+            } else {
+                return new UserInterface[] {make(UIText.class)};
             }
         }
 
@@ -204,19 +200,17 @@ public class ParameterizablePropertySheet<M> extends View {
          * @param initial The initial value.
          * @return A create UI.
          */
-        private HBox createIntegralRange(int initial) {
+        private UserInterface[] createIntegralRange(int initial) {
             UISpinner<Integer> step = make(UISpinner.class);
-            step.items(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 30, 40, 50, 100, 200, 300, 400, 500, 1000, 2000, 3000, 4000, 5000, 10000)
-                    .style(FormStyles.FormInputMiddle);
+            step.items(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 30, 40, 50, 100, 200, 300, 400, 500, 1000, 2000, 3000, 4000, 5000, 10000);
 
             UITextValue<Integer> start = make(UITextValue.class);
             UITextValue<Integer> end = make(UITextValue.class);
 
-            start.value(initial).style(FormStyles.FormInputMin).when(User.Scroll, Actions.traverseInt(step::value)).observe((prev, now) -> {
+            start.value(initial).when(User.Scroll, Actions.traverseInt(step::value)).observe((prev, now) -> {
                 end.value(v -> v + (now - prev));
             }).requireWhen(end).require(ui -> ui.value() <= end.value());
             end.value(initial)
-                    .style(FormStyles.FormInputMin)
                     .when(User.Scroll, Actions.traverseInt(step::value))
                     .require(ui -> start.value() <= ui.value())
                     .requireWhen(start);
@@ -229,7 +223,7 @@ public class ParameterizablePropertySheet<M> extends View {
                 properties.put(property, values);
             });
 
-            return new HBox(start.ui, end.ui, step.ui);
+            return new UserInterface[] {start, end, step};
         }
 
         /**
@@ -238,24 +232,17 @@ public class ParameterizablePropertySheet<M> extends View {
          * @param initial The initial value.
          * @return A create UI.
          */
-        private HBox createDecimalRange(double initial) {
+        private UserInterface[] createDecimalRange(double initial) {
             UISpinner<Double> step = make(UISpinner.class);
-            step.items(0.001, 0.002, 0.003, 0.004, 0.005, 0.01, 0.02, 0.03, 0.04, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 1.0, 2.0, 3.0, 4.0, 5.0)
-                    .style(FormStyles.FormInputMiddle);
+            step.items(0.001, 0.002, 0.003, 0.004, 0.005, 0.01, 0.02, 0.03, 0.04, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 1.0, 2.0, 3.0, 4.0, 5.0);
 
             UITextValue<Double> start = make(UITextValue.class);
             UITextValue<Double> end = make(UITextValue.class);
 
-            start.value(initial)
-                    .style(FormStyles.FormInputMin)
-                    .when(User.Scroll, Actions.traverseDouble(step::value))
-                    .observe((prev, now) -> {
-                        end.value(v -> BigDecimal.valueOf(v).add(BigDecimal.valueOf(now).subtract(BigDecimal.valueOf(prev))).doubleValue());
-                    })
-                    .requireWhen(end)
-                    .require(ui -> ui.value() <= end.value());
+            start.value(initial).when(User.Scroll, Actions.traverseDouble(step::value)).observe((prev, now) -> {
+                end.value(v -> BigDecimal.valueOf(v).add(BigDecimal.valueOf(now).subtract(BigDecimal.valueOf(prev))).doubleValue());
+            }).requireWhen(end).require(ui -> ui.value() <= end.value());
             end.value(initial)
-                    .style(FormStyles.FormInputMin)
                     .when(User.Scroll, Actions.traverseDouble(step::value))
                     .require(ui -> start.value() <= ui.value())
                     .requireWhen(start);
@@ -268,7 +255,7 @@ public class ParameterizablePropertySheet<M> extends View {
                 properties.put(property, values);
             });
 
-            return new HBox(start.ui, end.ui, step.ui);
+            return new UserInterface[] {start, end, step};
         }
 
         /**
@@ -276,7 +263,6 @@ public class ParameterizablePropertySheet<M> extends View {
          */
         @Override
         protected void initialize() {
-            title.text(property.name);
         }
 
         /**
