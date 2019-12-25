@@ -63,7 +63,7 @@ class NotificatorSetting extends View {
     private UIButton lineTest;
 
     interface style extends StyleDSL {
-        Style Table = () -> {
+        Style Types = () -> {
             display.height(190, px);
         };
     }
@@ -77,7 +77,7 @@ class NotificatorSetting extends View {
                 // Notification Types
                 $(vbox, Block, () -> {
                     label(en("Notification Type"), Heading);
-                    $(notifications, style.Table, () -> {
+                    $(notifications, style.Types, () -> {
                         $(name, FormLabel);
                         $(desktop);
                         $(line);

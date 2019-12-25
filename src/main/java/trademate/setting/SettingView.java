@@ -13,10 +13,10 @@ import java.util.List;
 
 import kiss.Managed;
 import kiss.Singleton;
+import kiss.Variable;
 import stylist.Style;
 import stylist.StyleDSL;
 import viewtify.ui.UILabel;
-import viewtify.ui.UIPane;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
 import viewtify.ui.helper.User;
@@ -34,7 +34,7 @@ public class SettingView extends View {
 
     private UILabel bitflyer;
 
-    private UIPane setting;
+    private final Variable<View> main = Variable.empty();
 
     /**
      * UI definition.
@@ -49,7 +49,7 @@ public class SettingView extends View {
                     $(notification, style.categoryLabel);
                     $(bitflyer, style.categoryLabel);
                 });
-                $(setting);
+                $(main);
             });
         }
     }
@@ -102,6 +102,6 @@ public class SettingView extends View {
                 label.unstyle(style.Selected);
             }
         }
-        setting.set(view);
+        main.set(View.build(view));
     }
 }
