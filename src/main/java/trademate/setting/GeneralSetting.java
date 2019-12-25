@@ -22,7 +22,7 @@ public class GeneralSetting extends View {
 
     class view extends ViewDSL implements SettingStyles {
         {
-            $(vbox, style.Root, () -> {
+            $(vbox, () -> {
 
             });
         }

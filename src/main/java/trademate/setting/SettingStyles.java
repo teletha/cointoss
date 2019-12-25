@@ -19,10 +19,6 @@ public interface SettingStyles extends StyleDeclarations {
 
     Numeric blockSpace = new Numeric(35, px);
 
-    Style Root = () -> {
-        padding.vertical(20, px).horizontal(30, px);
-    };
-
     Style Block = () -> {
         padding.bottom(blockSpace);
         border.bottom.width(2, px).color($.rgb(40, 40, 40));

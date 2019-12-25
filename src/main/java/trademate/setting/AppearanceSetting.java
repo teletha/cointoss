@@ -32,7 +32,7 @@ public class AppearanceSetting extends View {
 
     class view extends ViewDSL {
         {
-            $(vbox, style.Root, () -> {
+            $(vbox, () -> {
                 $(vbox, style.Block, () -> {
                     label(en("Colors"), style.Heading);
                     form(CommonText.Buy, buy);

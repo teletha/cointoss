@@ -9,18 +9,16 @@
  */
 package trademate.setting;
 
-import static transcript.Transcript.en;
-
 import java.util.List;
 
 import kiss.Managed;
 import kiss.Singleton;
 import stylist.Style;
 import stylist.StyleDSL;
-import viewtify.ui.ViewDSL;
 import viewtify.ui.UILabel;
 import viewtify.ui.UIPane;
 import viewtify.ui.View;
+import viewtify.ui.ViewDSL;
 import viewtify.ui.helper.User;
 
 @Managed(value = Singleton.class)
@@ -62,7 +60,7 @@ public class SettingView extends View {
     interface style extends StyleDSL {
 
         Style categoryPane = () -> {
-            padding.top(40, px);
+            padding.top(40, px).right(20, px);
         };
 
         Style categoryLabel = () -> {

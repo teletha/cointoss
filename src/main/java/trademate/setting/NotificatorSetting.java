@@ -73,7 +73,7 @@ class NotificatorSetting extends View {
      */
     class view extends ViewDSL implements FormStyles, SettingStyles {
         {
-            $(vbox, Root, () -> {
+            $(vbox, () -> {
                 // Notification Types
                 $(vbox, Block, () -> {
                     label(en("Notification Type"), Heading);

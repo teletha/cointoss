@@ -45,7 +45,7 @@ public class BitFlyerSetting extends View {
     class view extends ViewDSL implements FormStyles, SettingStyles {
 
         {
-            $(vbox, Root, () -> {
+            $(vbox, () -> {
                 $(vbox, Block, () -> {
                     label("BitFlyer", Heading);
                     label(en("Please get API key and API secret to use the public API provided by [BitFlyer](https://lightning.bitflyer.jp/developer)."), Description);
