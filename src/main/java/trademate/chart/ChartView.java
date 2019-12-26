@@ -12,21 +12,20 @@ package trademate.chart;
 import java.util.Comparator;
 import java.util.function.Supplier;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-
 import org.controlsfx.glyphfont.FontAwesome;
 
 import cointoss.Market;
 import cointoss.ticker.Ticker;
 import cointoss.ticker.TimeSpan;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import kiss.Variable;
 import stylist.Style;
 import stylist.StyleDSL;
-import viewtify.ui.ViewDSL;
 import viewtify.ui.UIButton;
 import viewtify.ui.UIComboBox;
 import viewtify.ui.View;
+import viewtify.ui.ViewDSL;
 
 public class ChartView extends View {
 
