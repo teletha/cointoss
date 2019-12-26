@@ -9,8 +9,6 @@
  */
 package trademate.verify;
 
-import static transcript.Transcript.en;
-
 import java.time.Period;
 import java.util.List;
 import java.util.function.Supplier;
@@ -40,7 +38,6 @@ import trademate.setting.SettingStyles;
 import trademate.widget.ParameterizablePropertySheet;
 import transcript.Transcript;
 import viewtify.Viewtify;
-import viewtify.ui.ViewDSL;
 import viewtify.ui.UIButton;
 import viewtify.ui.UICheckBox;
 import viewtify.ui.UIComboBox;
@@ -49,6 +46,7 @@ import viewtify.ui.UILabel;
 import viewtify.ui.UITableColumn;
 import viewtify.ui.UITableView;
 import viewtify.ui.View;
+import viewtify.ui.ViewDSL;
 import viewtify.ui.helper.User;
 
 public class BackTestView extends View implements Analyzer {
@@ -157,7 +155,8 @@ public class BackTestView extends View implements Analyzer {
                         });
 
                         for (ParameterizablePropertySheet<Trader> editor : builders) {
-                            titled(editor.base.get().name(), editor);
+                            label(editor.base.get().name());
+                            $(editor);
                         }
                     });
                 });

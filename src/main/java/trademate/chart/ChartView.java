@@ -68,7 +68,7 @@ public class ChartView extends View {
     class view extends ViewDSL {
         {
             $(sbox, style.chart, () -> {
-                $(chart);
+                $(ui(chart));
                 $(hbox, style.configBox, () -> {
                     $(span);
                     $(config);
