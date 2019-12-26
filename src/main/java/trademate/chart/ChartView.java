@@ -38,11 +38,14 @@ public class ChartView extends View {
     /** The candle type. */
     public final Variable<CandleType> candleType = Variable.of(CandleType.Price);
 
-    /** Chart UI */
-    protected UIComboBox<TimeSpan> span;
+    /** Configuration UI */
+    private UIButton config;
 
-    /** Chart UI */
-    protected UIButton config;
+    /** Configuration UI */
+    private UIComboBox<TimeSpan> span;
+
+    /** Configuration UI */
+    private UIComboBox<CandleType> candle;
 
     /** The chart configuration. */
     public final Variable<Boolean> showLatestPrice = Variable.of(true);
@@ -103,7 +106,14 @@ public class ChartView extends View {
                 .map(e -> e.ⅱ.tickers.on(e.ⅰ))
                 .to(ticker::set);
 
-        config.text(FontAwesome.Glyph.GEAR).popup(new Config());
+        config.text(FontAwesome.Glyph.GEAR).popup(new ViewDSL() {
+            {
+                $(vbox, () -> {
+                    form("Candle Type", candle);
+                });
+            }
+        });
+        candle.initialize(CandleType.values()).observing(candleType::set);
     }
 
     /**
@@ -133,26 +143,10 @@ public class ChartView extends View {
     }
 
     /**
-     * 
+     * User preference for chart.
      */
-    class Config extends View {
-
-        private UIComboBox<CandleType> candle;
-
-        class view extends ViewDSL {
-            {
-                $(vbox, () -> {
-                    form("Candle Type", candle);
-                });
-            }
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        protected void initialize() {
-            candle.initialize(CandleType.values()).observe(candleType::set);
-        }
+    public static class Preference {
+        /** Color coordinator of candle. */
+        public final Variable<CandleType> candleType = Variable.of(CandleType.Price);
     }
 }
