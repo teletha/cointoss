@@ -23,6 +23,7 @@ import kiss.Variable;
 import stylist.Style;
 import stylist.StyleDSL;
 import viewtify.ui.UIButton;
+import viewtify.ui.UICheckBox;
 import viewtify.ui.UIComboBox;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
@@ -47,8 +48,11 @@ public class ChartView extends View {
     /** Configuration UI */
     private UIComboBox<CandleType> candle;
 
-    /** The chart configuration. */
-    public final Variable<Boolean> showLatestPrice = Variable.of(true);
+    /** Configuration UI */
+    public UICheckBox showLatestPrice;
+
+    /** Chart UI */
+    public Chart chart;
 
     /** The chart configuration. */
     public final Variable<Boolean> showOrderSupport = Variable.of(true);
@@ -61,9 +65,6 @@ public class ChartView extends View {
 
     /** The additional scripts. */
     public final ObservableList<Supplier<PlotScript>> scripts = FXCollections.observableArrayList();
-
-    /** The candle chart. */
-    public final Chart chart = new Chart(this);
 
     /**
      * UI definition.
@@ -110,10 +111,12 @@ public class ChartView extends View {
             {
                 $(vbox, () -> {
                     form("Candle Type", candle);
+                    form("Latest Price", showLatestPrice);
                 });
             }
         });
         candle.initialize(CandleType.values()).observing(candleType::set);
+        showLatestPrice.initialize(true);
     }
 
     /**
@@ -138,7 +141,7 @@ public class ChartView extends View {
     private void realtimeUpdate(boolean state) {
         showOrderSupport.set(state);
         showPositionSupport.set(state);
-        showLatestPrice.set(state);
+        showLatestPrice.value(state);
         showRealtimeUpdate.set(state);
     }
 }

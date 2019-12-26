@@ -381,15 +381,20 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         chart.market.observing() //
                 .skipNull()
                 .switchMap(m -> m.tickers.latestPrice.observing())
-                .switchOn(chart.showLatestPrice.observing())
                 .on(Viewtify.UIThread)
                 .effectOnLifecycle(disposer -> {
+                    System.out.println("start latest");
                     TickLable latest = latestPrice.createLabel("最新値");
 
-                    disposer.add(() -> latestPrice.remove(latest));
+                    disposer.add(() -> {
+                        System.out.println("dispose latest price");
+                        latestPrice.remove(latest);
+                    });
 
                     return price -> latest.value.set(price.doubleValue());
                 })
+                .subscribeOn(Viewtify.UIThread)
+                .switchOn(chart.showLatestPrice.observing())
                 .to(latestPrice.layoutLine::requestLayout);
     }
 
