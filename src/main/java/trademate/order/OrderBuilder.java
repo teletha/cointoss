@@ -10,12 +10,9 @@
 package trademate.order;
 
 import static trademate.CommonText.*;
-import static transcript.Transcript.en;
 
 import java.math.RoundingMode;
 import java.util.stream.IntStream;
-
-import javafx.scene.input.ScrollEvent;
 
 import cointoss.Direction;
 import cointoss.market.bitflyer.BitFlyer;
@@ -23,6 +20,7 @@ import cointoss.market.bitflyer.SFD;
 import cointoss.order.Order;
 import cointoss.order.OrderState;
 import cointoss.util.Num;
+import javafx.scene.input.ScrollEvent;
 import kiss.I;
 import kiss.WiseBiConsumer;
 import kiss.WiseConsumer;
@@ -31,12 +29,12 @@ import stylist.StyleDSL;
 import trademate.TradeMateStyle;
 import trademate.TradingView;
 import viewtify.Viewtify;
-import viewtify.ui.ViewDSL;
 import viewtify.ui.UIButton;
 import viewtify.ui.UILabel;
 import viewtify.ui.UISpinner;
 import viewtify.ui.UIText;
 import viewtify.ui.View;
+import viewtify.ui.ViewDSL;
 import viewtify.ui.helper.User;
 import viewtify.ui.helper.ValueHelper;
 
@@ -224,14 +222,14 @@ public class OrderBuilder extends View {
         orderReverse.text(en("Reverse")).when(User.MouseClick).to(() -> view.market.reverse().to(I.NoOP));
 
         if (view.market.service == BitFlyer.FX_BTC_JPY) {
-            view.market.service.add(SFD.latestBTC.on(Viewtify.UIThread).to(price -> {
-                sfdPrice500.text("5.00% " + price.multiply(1.05).scale(0));
-                sfdPrice499.text("4.99% " + price.multiply(1.0499).scale(1));
-                sfdPrice498.text("4.98% " + price.multiply(1.0498).scale(2));
-                sfdPrice497.text("4.97% " + price.multiply(1.0497).scale(3));
-                sfdPrice495.text("4.95% " + price.multiply(1.0495).scale(4));
-                sfdPrice494.text("4.94% " + price.multiply(1.0494).scale(5));
-                sfdPrice490.text("4.90% " + price.multiply(1.0490).scale(6));
+            view.market.service.add(SFD.now().on(Viewtify.UIThread).to(price -> {
+                sfdPrice500.text("5.00% " + price.ⅱ.multiply(1.05).scale(0));
+                sfdPrice499.text("4.99% " + price.ⅱ.multiply(1.0499).scale(1));
+                sfdPrice498.text("4.98% " + price.ⅱ.multiply(1.0498).scale(2));
+                sfdPrice497.text("4.97% " + price.ⅱ.multiply(1.0497).scale(3));
+                sfdPrice495.text("4.95% " + price.ⅱ.multiply(1.0495).scale(4));
+                sfdPrice494.text("4.94% " + price.ⅱ.multiply(1.0494).scale(5));
+                sfdPrice490.text("4.90% " + price.ⅱ.multiply(1.0490).scale(6));
             }));
         }
     }

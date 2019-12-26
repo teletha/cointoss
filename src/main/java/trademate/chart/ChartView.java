@@ -141,12 +141,4 @@ public class ChartView extends View {
         showLatestPrice.set(state);
         showRealtimeUpdate.set(state);
     }
-
-    /**
-     * User preference for chart.
-     */
-    public static class Preference {
-        /** Color coordinator of candle. */
-        public final Variable<CandleType> candleType = Variable.of(CandleType.Price);
-    }
 }

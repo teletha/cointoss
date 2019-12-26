@@ -11,7 +11,6 @@ package cointoss.market.bitflyer;
 
 import java.math.RoundingMode;
 
-import cointoss.execution.Execution;
 import cointoss.util.Num;
 import kiss.I;
 import kiss.Signal;
@@ -46,8 +45,8 @@ public enum SFD {
     /** The diff constants. */
     Minus20("0.80");
 
-    /** The latest price of BTC. */
-    public static final Signal<Num> latestBTC = BitFlyer.BTC_JPY.executionsRealtimely().map(Execution::price).diff().share();
+    /** The latest SFD stream. */
+    private static Signal<Ⅲ<Num, Num, Num>> latest;
 
     /** The human-readable percentage. */
     public final Num percentage;
@@ -71,7 +70,7 @@ public enum SFD {
      * @return
      */
     public Signal<Num> boundary() {
-        return latestBTC.map(this::calculate);
+        return now().map(v -> calculate(v.ⅱ));
     }
 
     /**
@@ -93,21 +92,25 @@ public enum SFD {
      * 
      * @return
      */
-    public static Signal<Ⅲ<Num, Num, Num>> now() {
-        return BitFlyer.FX_BTC_JPY.executionsRealtimely()
-                .combineLatest(BitFlyer.BTC_JPY.executionsRealtimely().startWith(BitFlyer.BTC_JPY.executionLatest()))
-                .map(e -> {
-                    Num fx = e.ⅰ.price;
-                    Num btc = e.ⅱ.price;
-                    Num diff;
+    public static synchronized Signal<Ⅲ<Num, Num, Num>> now() {
+        if (latest == null) {
+            latest = BitFlyer.FX_BTC_JPY.executionsRealtimely()
+                    .combineLatest(BitFlyer.BTC_JPY.executionsRealtimely().startWith(BitFlyer.BTC_JPY.executionLatest()))
+                    .map(e -> {
+                        Num fx = e.ⅰ.price;
+                        Num btc = e.ⅱ.price;
+                        Num diff;
 
-                    if (btc.isLessThanOrEqual(fx)) {
-                        diff = fx.divide(btc).minus(Num.ONE).multiply(Num.HUNDRED);
-                    } else {
-                        diff = btc.divide(fx).minus(Num.ONE).multiply(Num.HUNDRED).negate();
-                    }
-                    return I.pair(fx, btc, diff);
-                })
-                .retryWhen(BitFlyer.FX_BTC_JPY.retryPolicy(200));
+                        if (btc.isLessThanOrEqual(fx)) {
+                            diff = fx.divide(btc).minus(Num.ONE).multiply(Num.HUNDRED);
+                        } else {
+                            diff = btc.divide(fx).minus(Num.ONE).multiply(Num.HUNDRED).negate();
+                        }
+                        return I.pair(fx, btc, diff);
+                    })
+                    .retryWhen(BitFlyer.FX_BTC_JPY.retryPolicy(200))
+                    .share();
+        }
+        return latest;
     }
 }
