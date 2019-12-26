@@ -86,7 +86,9 @@ public class ParameterizablePropertySheet<M> extends View {
      */
     class view extends ViewDSL {
         {
-            $(vbox, editors);
+            $(vbox, () -> {
+                $(editors);
+            });
         }
     }
 
