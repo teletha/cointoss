@@ -20,15 +20,14 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.Predicate;
 
+import com.google.common.collect.Sets;
+
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-
-import com.google.common.collect.Sets;
-
 import kiss.I;
 import kiss.Ⅱ;
 import kiss.model.Model;
@@ -86,9 +85,7 @@ public class ParameterizablePropertySheet<M> extends View {
      */
     class view extends ViewDSL {
         {
-            $(vbox, () -> {
-                $(editors);
-            });
+            $(vbox, editors);
         }
     }
 
@@ -167,7 +164,7 @@ public class ParameterizablePropertySheet<M> extends View {
             } else if (isDecimal(property.model.type)) {
                 return createDecimalRange((double) initialValue);
             } else {
-                return new UserInterface[] {make(UIText.class)};
+                return new UserInterface[] {new UIText(this)};
             }
         }
 
@@ -178,7 +175,7 @@ public class ParameterizablePropertySheet<M> extends View {
          * @return A create UI.
          */
         private UICheckBox createCheckBox(boolean initial) {
-            return make(UICheckBox.class).value(initial).when(User.Action, (e, check) -> properties.put(property, List.of(check.value())));
+            return new UICheckBox(this).value(initial).when(User.Action, (e, check) -> properties.put(property, List.of(check.value())));
         }
 
         /**
@@ -188,7 +185,7 @@ public class ParameterizablePropertySheet<M> extends View {
          * @return A create UI.
          */
         private <E> UIComboCheckBox<E> createComboBox(E initial) {
-            UIComboCheckBox<E> created = make(UIComboCheckBox.class);
+            UIComboCheckBox<E> created = new UIComboCheckBox(this);
             created.selectedItems().addListener((InvalidationListener) e -> {
                 properties.put(property, (List<Object>) created.selectedItems());
             });
@@ -203,11 +200,11 @@ public class ParameterizablePropertySheet<M> extends View {
          * @return A create UI.
          */
         private UserInterface[] createIntegralRange(int initial) {
-            UISpinner<Integer> step = make(UISpinner.class);
+            UISpinner<Integer> step = new UISpinner(this);
             step.items(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 30, 40, 50, 100, 200, 300, 400, 500, 1000, 2000, 3000, 4000, 5000, 10000);
 
-            UITextValue<Integer> start = make(UITextValue.class);
-            UITextValue<Integer> end = make(UITextValue.class);
+            UITextValue<Integer> start = new UITextValue(this);
+            UITextValue<Integer> end = new UITextValue(this);
 
             start.value(initial).when(User.Scroll, Actions.traverseInt(step::value)).observe((prev, now) -> {
                 end.value(v -> v + (now - prev));
@@ -235,11 +232,11 @@ public class ParameterizablePropertySheet<M> extends View {
          * @return A create UI.
          */
         private UserInterface[] createDecimalRange(double initial) {
-            UISpinner<Double> step = make(UISpinner.class);
+            UISpinner<Double> step = new UISpinner(this);
             step.items(0.001, 0.002, 0.003, 0.004, 0.005, 0.01, 0.02, 0.03, 0.04, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 1.0, 2.0, 3.0, 4.0, 5.0);
 
-            UITextValue<Double> start = make(UITextValue.class);
-            UITextValue<Double> end = make(UITextValue.class);
+            UITextValue<Double> start = new UITextValue(this);
+            UITextValue<Double> end = new UITextValue(this);
 
             start.value(initial).when(User.Scroll, Actions.traverseDouble(step::value)).observe((prev, now) -> {
                 end.value(v -> BigDecimal.valueOf(v).add(BigDecimal.valueOf(now).subtract(BigDecimal.valueOf(prev))).doubleValue());

@@ -324,8 +324,8 @@ public class BackTestView extends View implements Analyzer {
      * @param log
      */
     private void renderPeriod(UILabel label, TradingStats log) {
-        UILabel remaining = make(UILabel.class).tooltip(en("Start")).text(Chrono.formatAsDate(log.startDate)).style(style.mean);
-        UILabel total = make(UILabel.class).tooltip(en("End")).text(Chrono.formatAsDate(log.endDate)).style(style.mean);
+        UILabel remaining = new UILabel(this).tooltip(en("Start")).text(Chrono.formatAsDate(log.startDate)).style(style.mean);
+        UILabel total = new UILabel(this).tooltip(en("End")).text(Chrono.formatAsDate(log.endDate)).style(style.mean);
 
         label.textV(remaining, total);
     }
@@ -337,8 +337,8 @@ public class BackTestView extends View implements Analyzer {
      * @param log
      */
     private void renderScenarioCount(UILabel label, TradingStats log) {
-        UILabel remaining = make(UILabel.class).tooltip(en("Remaining")).text(log.active).style(style.mean);
-        UILabel total = make(UILabel.class).tooltip(en("Total")).text(log.total).style(style.max);
+        UILabel remaining = new UILabel(this).tooltip(en("Remaining")).text(log.active).style(style.mean);
+        UILabel total = new UILabel(this).tooltip(en("Total")).text(log.total).style(style.max);
 
         label.textV(remaining, total);
     }
@@ -352,8 +352,8 @@ public class BackTestView extends View implements Analyzer {
     private void renderPositionSize(UILabel label, TradingStats log) {
         int target = marketSelection.value().setting.targetCurrencyScaleSize;
 
-        UILabel mean = make(UILabel.class).tooltip(en("Remaining")).text(log.holdCurrentSize.scale(target)).style(style.mean);
-        UILabel max = make(UILabel.class).tooltip(en("Max")).text(log.holdMaxSize.scale(target)).style(style.max);
+        UILabel mean = new UILabel(this).tooltip(en("Remaining")).text(log.holdCurrentSize.scale(target)).style(style.mean);
+        UILabel max = new UILabel(this).tooltip(en("Max")).text(log.holdMaxSize.scale(target)).style(style.max);
 
         label.textV(mean, max);
     }
@@ -365,9 +365,9 @@ public class BackTestView extends View implements Analyzer {
      * @param statistics
      */
     private void render(UILabel label, NumStats statistics) {
-        UILabel mean = make(UILabel.class).tooltip(en("Mean")).text(statistics.formattedMean()).style(style.mean);
-        UILabel max = make(UILabel.class).tooltip(en("Max")).text(statistics.formattedMax()).style(style.max);
-        UILabel min = make(UILabel.class).tooltip(en("Min")).text(statistics.formattedMin()).style(style.max);
+        UILabel mean = new UILabel(this).tooltip(en("Mean")).text(statistics.formattedMean()).style(style.mean);
+        UILabel max = new UILabel(this).tooltip(en("Max")).text(statistics.formattedMax()).style(style.max);
+        UILabel min = new UILabel(this).tooltip(en("Min")).text(statistics.formattedMin()).style(style.max);
 
         label.textV(mean, max, min);
     }
@@ -379,11 +379,11 @@ public class BackTestView extends View implements Analyzer {
      * @param main
      */
     private void render(UILabel label, NumStats main, NumStats sub) {
-        UILabel mean = make(UILabel.class).tooltip(en("Mean"))
+        UILabel mean = new UILabel(this).tooltip(en("Mean"))
                 .text(main.formattedMean() + " (" + sub.formattedMean() + ")")
                 .style(style.mean);
-        UILabel max = make(UILabel.class).tooltip(en("Max")).text(main.formattedMax() + " (" + sub.formattedMax() + ")").style(style.max);
-        UILabel min = make(UILabel.class).tooltip(en("Min")).text(main.formattedMin() + " (" + sub.formattedMin() + ")").style(style.max);
+        UILabel max = new UILabel(this).tooltip(en("Max")).text(main.formattedMax() + " (" + sub.formattedMax() + ")").style(style.max);
+        UILabel min = new UILabel(this).tooltip(en("Min")).text(main.formattedMin() + " (" + sub.formattedMin() + ")").style(style.max);
 
         label.textV(mean, max, min);
     }

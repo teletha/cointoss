@@ -11,6 +11,7 @@ package trademate.setting;
 
 import java.util.List;
 
+import kiss.I;
 import kiss.Managed;
 import kiss.Singleton;
 import kiss.Variable;
@@ -102,6 +103,6 @@ public class SettingView extends View {
                 label.unstyle(style.Selected);
             }
         }
-        main.set(View.build(view));
+        main.set(I.make(view));
     }
 }
