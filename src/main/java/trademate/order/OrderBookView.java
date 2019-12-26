@@ -29,11 +29,11 @@ import stylist.StyleDSL;
 import trademate.TradeMateStyle;
 import trademate.TradingView;
 import viewtify.Viewtify;
-import viewtify.ui.ViewDSL;
 import viewtify.ui.UILabel;
 import viewtify.ui.UIListView;
 import viewtify.ui.UISpinner;
 import viewtify.ui.View;
+import viewtify.ui.ViewDSL;
 import viewtify.ui.helper.User;
 import viewtify.util.FXUtils;
 
@@ -139,7 +139,10 @@ public class OrderBookView extends View {
             shortList.items((ObservableList) book.shorts.groupBy(range));
         });
 
-        view.market.orderBook.spread.observe().skipWhile(view.initializing).on(Viewtify.UIThread).to(price -> priceSpread.text(price));
+        view.market.orderBook.spread.observe()
+                .take(view.chart.showRealtimeUpdate)
+                .on(Viewtify.UIThread)
+                .to(price -> priceSpread.text(price));
     }
 
     /**

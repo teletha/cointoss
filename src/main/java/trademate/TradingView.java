@@ -9,8 +9,6 @@
  */
 package trademate;
 
-import java.util.function.Predicate;
-
 import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.execution.ExecutionLog.LogType;
@@ -26,10 +24,10 @@ import trademate.order.OrderBookView;
 import trademate.order.OrderBuilder;
 import trademate.order.OrderCatalog;
 import viewtify.Viewtify;
-import viewtify.ui.ViewDSL;
 import viewtify.ui.UILabel;
 import viewtify.ui.UITab;
 import viewtify.ui.View;
+import viewtify.ui.ViewDSL;
 
 public class TradingView extends View {
 
@@ -61,20 +59,6 @@ public class TradingView extends View {
     public TradeInfomationView positions;
 
     public ChartView chart;
-
-    /**
-     * Each View will process a large amount of logs at initialization, but using this flag can
-     * greatly reduce the UI processing.
-     */
-    private boolean whileInit;
-
-    /**
-     * Each View will process a large amount of logs at initialization, but using this flag can
-     * greatly reduce the UI processing.
-     * 
-     * @return
-     */
-    public final Predicate<Object> initializing = e -> whileInit;
 
     /**
      * @param tab
@@ -135,9 +119,7 @@ public class TradingView extends View {
             chart.reduceRealtimeUpdate();
             chart.market.set(market);
 
-            whileInit = true;
             market.readLog(log -> log.fromLast(6, LogType.Fast));
-            whileInit = false;
 
             chart.restoreRealtimeUpdate();
         });
@@ -150,7 +132,7 @@ public class TradingView extends View {
 
     private void additionalInfo() {
         if (service == BitFlyer.FX_BTC_JPY) {
-            SFD.now().skipWhile(initializing).on(Viewtify.UIThread).to(e -> {
+            SFD.now().take(chart.showRealtimeUpdate.observing()).on(Viewtify.UIThread).to(e -> {
                 tab.textV(title, price.text(e.ⅰ + " (" + e.ⅲ.format(Primitives.DecimalScale2) + "%)"));
             });
         }

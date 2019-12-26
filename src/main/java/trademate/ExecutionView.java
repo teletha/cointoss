@@ -17,11 +17,11 @@ import cointoss.util.Primitives;
 import stylist.Style;
 import stylist.StyleDSL;
 import viewtify.Viewtify;
-import viewtify.ui.ViewDSL;
 import viewtify.ui.UILabel;
 import viewtify.ui.UIListView;
 import viewtify.ui.UISpinner;
 import viewtify.ui.View;
+import viewtify.ui.ViewDSL;
 
 public class ExecutionView extends View {
 
@@ -77,7 +77,7 @@ public class ExecutionView extends View {
 
         // load execution log
         Viewtify.inWorker(() -> {
-            return tradingView.market.timeline.skipWhile(tradingView.initializing).on(Viewtify.UIThread).to(e -> {
+            return tradingView.market.timeline.take(tradingView.chart.showRealtimeUpdate.observing()).on(Viewtify.UIThread).to(e -> {
                 executionList.addItemAtFirst(e);
 
                 if (100 < executionList.size()) {
@@ -88,7 +88,7 @@ public class ExecutionView extends View {
 
         // load big taker log
         Viewtify.inWorker(() -> {
-            return tradingView.market.timelineByTaker.skipWhile(tradingView.initializing).on(Viewtify.UIThread).to(e -> {
+            return tradingView.market.timelineByTaker.take(tradingView.chart.showRealtimeUpdate.observing()).on(Viewtify.UIThread).to(e -> {
                 if (1 <= e.accumulative) {
                     executionCumulativeList.addItemAtFirst(e);
 
