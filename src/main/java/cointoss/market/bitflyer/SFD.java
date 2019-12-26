@@ -95,7 +95,8 @@ public enum SFD {
     public static synchronized Signal<Ⅲ<Num, Num, Num>> now() {
         if (latest == null) {
             latest = BitFlyer.FX_BTC_JPY.executionsRealtimely()
-                    .combineLatest(BitFlyer.BTC_JPY.executionsRealtimely().startWith(BitFlyer.BTC_JPY.executionLatest()))
+                    .diff()
+                    .combineLatest(BitFlyer.BTC_JPY.executionsRealtimely().startWith(BitFlyer.BTC_JPY.executionLatest().diff()))
                     .map(e -> {
                         Num fx = e.ⅰ.price;
                         Num btc = e.ⅱ.price;
