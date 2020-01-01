@@ -12,10 +12,10 @@ package trademate.setting;
 import static stylist.StyleDSL.*;
 
 import stylist.Style;
-import stylist.StyleDeclarations;
+import stylist.StyleDeclarable;
 import stylist.value.Numeric;
 
-public interface SettingStyles extends StyleDeclarations {
+public interface SettingStyles extends StyleDeclarable {
 
     Numeric blockSpace = new Numeric(35, px);
 
