@@ -127,14 +127,14 @@ public abstract class Trader extends TraderBase implements Extensible, Disposabl
     /**
      * Make this {@link Trader} enable forcibly.
      */
-    protected final void enable() {
+    public final void enable() {
         disable.clear();
     }
 
     /**
      * Make this {@link Trader} disable forcibly.
      */
-    protected final void disable() {
+    public final void disable() {
         disable.add(I.signal());
     }
 

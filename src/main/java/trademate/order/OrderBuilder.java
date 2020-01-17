@@ -14,13 +14,15 @@ import static trademate.CommonText.*;
 import java.math.RoundingMode;
 import java.util.stream.IntStream;
 
+import javafx.scene.input.ScrollEvent;
+
 import cointoss.Direction;
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.market.bitflyer.SFD;
 import cointoss.order.Order;
 import cointoss.order.OrderState;
+import cointoss.trading.LazyBear;
 import cointoss.util.Num;
-import javafx.scene.input.ScrollEvent;
 import kiss.I;
 import kiss.WiseBiConsumer;
 import kiss.WiseConsumer;
@@ -30,6 +32,7 @@ import trademate.TradeMateStyle;
 import trademate.TradingView;
 import viewtify.Viewtify;
 import viewtify.ui.UIButton;
+import viewtify.ui.UICheckBox;
 import viewtify.ui.UILabel;
 import viewtify.ui.UISpinner;
 import viewtify.ui.UIText;
@@ -97,20 +100,7 @@ public class OrderBuilder extends View {
     /** UI */
     private UILabel sfdPrice499;
 
-    /** UI */
-    private UILabel sfdPrice498;
-
-    /** UI */
-    private UILabel sfdPrice497;
-
-    /** UI */
-    private UILabel sfdPrice495;
-
-    /** UI */
-    private UILabel sfdPrice494;
-
-    /** UI */
-    private UILabel sfdPrice490;
+    private UICheckBox bot;
 
     /**
      * {@inheritDoc}
@@ -160,21 +150,9 @@ public class OrderBuilder extends View {
                     $(hbox, S.Row, () -> {
                         $(sfdPrice499, S.SFD);
                     });
-                    $(hbox, S.Row, () -> {
-                        $(sfdPrice498, S.SFD);
-                    });
-                    $(hbox, S.Row, () -> {
-                        $(sfdPrice497, S.SFD);
-                    });
 
                     $(hbox, S.Row, () -> {
-                        $(sfdPrice495, S.SFD);
-                    });
-                    $(hbox, S.Row, () -> {
-                        $(sfdPrice494, S.SFD);
-                    });
-                    $(hbox, S.Row, () -> {
-                        $(sfdPrice490, S.SFD);
+                        $(bot);
                     });
                 });
             }
@@ -225,13 +203,12 @@ public class OrderBuilder extends View {
             view.market.service.add(SFD.now().on(Viewtify.UIThread).to(price -> {
                 sfdPrice500.text("5.00% " + price.ⅱ.multiply(1.05).scale(0));
                 sfdPrice499.text("4.99% " + price.ⅱ.multiply(1.0499).scale(1));
-                sfdPrice498.text("4.98% " + price.ⅱ.multiply(1.0498).scale(2));
-                sfdPrice497.text("4.97% " + price.ⅱ.multiply(1.0497).scale(3));
-                sfdPrice495.text("4.95% " + price.ⅱ.multiply(1.0495).scale(4));
-                sfdPrice494.text("4.94% " + price.ⅱ.multiply(1.0494).scale(5));
-                sfdPrice490.text("4.90% " + price.ⅱ.multiply(1.0490).scale(6));
             }));
         }
+
+        bot.text("Active Bot").observe().take(1).to(v -> {
+            view.market.register(new LazyBear());
+        });
     }
 
     /**

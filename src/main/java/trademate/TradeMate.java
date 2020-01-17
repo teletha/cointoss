@@ -11,12 +11,13 @@ package trademate;
 
 import java.util.Locale;
 
+import javafx.scene.control.TabPane.TabClosingPolicy;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.util.Network;
-import javafx.scene.control.TabPane.TabClosingPolicy;
 import kiss.I;
 import kiss.Managed;
 import kiss.Singleton;
@@ -35,10 +36,16 @@ public class TradeMate extends View {
     /** Tab Area */
     UITabPane main;
 
-    class view extends ViewDSL {
-        {
-            $(main);
-        }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected ViewDSL declareUI() {
+        return new ViewDSL() {
+            {
+                $(main);
+            }
+        };
     }
 
     /**
