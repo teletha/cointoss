@@ -14,9 +14,6 @@ import static transcript.Transcript.en;
 import java.util.List;
 
 import javafx.geometry.Pos;
-import javafx.util.Duration;
-
-import org.controlsfx.control.Notifications;
 
 import cointoss.util.Network;
 import kiss.I;
@@ -114,19 +111,10 @@ public class Notificator implements Storable<Notificator> {
             if (title != null && message != null) {
                 String stripedTitle = title.toString().strip();
                 String stripedMessage = message.toString().strip();
-
                 if (stripedMessage.length() != 0) {
                     // to desktop
                     if (onDesktop.is(true)) {
-                        Viewtify.inUI(() -> {
-                            Notifications.create()
-                                    .darkStyle()
-                                    .position(desktopPosition.v.position)
-                                    .hideAfter(Duration.seconds(desktopDuration.v.getSeconds()))
-                                    .title(stripedTitle)
-                                    .text(stripedMessage)
-                                    .show();
-                        });
+                        Viewtify.notify(stripedTitle, stripedMessage);
                     }
 
                     // to LINE
