@@ -72,7 +72,6 @@ public class TradeMate extends View {
         // activate application
         Viewtify.application()
                 .use(Theme.Dark)
-                .useSystemTray()
                 .icon("icon/app.png")
                 .language(Lang.of(I.env("language", Locale.getDefault().getLanguage())))
                 .onTerminating(Network::terminate)
