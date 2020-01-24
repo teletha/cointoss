@@ -935,9 +935,9 @@ public class ExecutionLog {
         restoreNormal(BitFlyer.FX_BTC_JPY, Chrono.utc(2020, 1, 19));
     }
 
-    public static void main2(String[] args) {
+    public static void main(String[] args) {
         ExecutionLog log = new ExecutionLog(BitMex.XBT_USD);
-        log.fetch(115364009, Chrono.utc(2019, 10, 13), Chrono.utc(2019, 11, 24));
+        log.fetch(115364009, Chrono.utc(2019, 11, 21), Chrono.utc(2020, 1, 24));
 
         Network.terminate();
     }
