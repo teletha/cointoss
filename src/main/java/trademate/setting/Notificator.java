@@ -49,7 +49,7 @@ public class Notificator implements Storable<Notificator> {
     final @Managed Variable<java.time.Duration> desktopDuration = Variable.of(java.time.Duration.ofSeconds(1));
 
     /** The access token for LINE. */
-    final @Managed Variable<String> lineAccessToken = Variable.empty();
+    final @Managed Variable<String> lineAccessToken = Variable.of("");
 
     /**
      * 

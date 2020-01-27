@@ -44,6 +44,6 @@ public class BitFlyerAccount extends MarketAccount<BitFlyerAccount> {
      */
     @Override
     protected boolean validate() {
-        return apiKey.isNot(String::isEmpty) && apiSecret.isNot(String::isEmpty);
+        return apiKey.isPresent() && apiKey.isNot(String::isEmpty) && apiSecret.isPresent() && apiSecret.isNot(String::isEmpty);
     }
 }
