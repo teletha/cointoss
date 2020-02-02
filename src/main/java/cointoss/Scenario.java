@@ -19,6 +19,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import org.apache.logging.log4j.Logger;
 import org.eclipse.collections.impl.list.mutable.FastList;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -29,6 +30,7 @@ import cointoss.order.OrderStrategy.Orderable;
 import cointoss.order.OrderStrategy.Takable;
 import cointoss.ticker.TimeSpan;
 import cointoss.util.Chrono;
+import cointoss.util.DynamicFileLog;
 import cointoss.util.Num;
 import kiss.Disposable;
 import kiss.I;
@@ -39,6 +41,9 @@ import kiss.Variable;
  * Declarative entry and exit definition.
  */
 public abstract class Scenario extends ScenarioBase implements Directional, Disposable {
+
+    /** The trading log. */
+    private final Logger log = DynamicFileLog.getLogger("scenario");
 
     /** The scenario direction. */
     private Directional directional;
@@ -73,6 +78,8 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
      * 
      */
     public Scenario() {
+        enableLog();
+
         // calculate profit
         disposerForExit.add(observeExitExecutedSize().to(size -> {
             setRealizedProfit(exitPrice.diff(directional, entryPrice).multiply(size));
@@ -522,6 +529,8 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
      * @param message
      */
     protected final void log(String message) {
+        log.debug(message);
+
         if (logs != null) {
             logs.add(message);
         }
