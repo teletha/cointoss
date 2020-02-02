@@ -11,6 +11,7 @@ package cointoss;
 
 import static java.time.temporal.ChronoUnit.*;
 
+import java.lang.StackWalker.Option;
 import java.time.ZonedDateTime;
 import java.time.temporal.TemporalUnit;
 import java.util.ArrayList;
@@ -24,6 +25,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BooleanSupplier;
 import java.util.function.Predicate;
 
+import org.apache.logging.log4j.Logger;
 import org.eclipse.collections.api.factory.Sets;
 import org.eclipse.collections.impl.list.mutable.FastList;
 
@@ -31,6 +33,7 @@ import com.google.common.annotations.VisibleForTesting;
 
 import cointoss.analyze.TradingStats;
 import cointoss.execution.Execution;
+import cointoss.util.DynamicFileLog;
 import cointoss.util.Num;
 import kiss.Disposable;
 import kiss.Extensible;
@@ -43,6 +46,9 @@ public abstract class Trader extends TraderBase implements Extensible, Disposabl
 
     /** The identity element of {@link Snapshot}. */
     private static final Snapshot EMPTY_SNAPSHOT = new Snapshot(Num.ZERO, Num.ZERO, Num.ZERO, Num.ZERO, Num.ZERO);
+
+    /** The logger for this {@link Trader}. */
+    Logger log;
 
     /** The registered options. */
     private final List options = new ArrayList();
@@ -66,6 +72,10 @@ public abstract class Trader extends TraderBase implements Extensible, Disposabl
      * Initialize this {@link Trader}.
      */
     final synchronized void initialize(Market market) {
+        boolean backtest = StackWalker.getInstance(Option.RETAIN_CLASS_REFERENCE)
+                .walk(stream -> stream.filter(frame -> frame.getClassName().contains("BackTestModel")).findFirst().isPresent());
+        log = DynamicFileLog.getLogger(name(), backtest);
+
         scenarios.clear();
         setHoldSize(Num.ZERO);
         setHoldMaxSize(Num.ZERO);
