@@ -252,7 +252,7 @@ public abstract class Execution extends ExecutionModel {
             throw new IllegalArgumentException("The size property requires non-null value.");
         }
         try {
-            sizeUpdater.invoke(this, assignWithAccumulative$197025490.invoke(this, value, (DoubleConsumer) ((Åssignable) this)::accumulative));
+            sizeUpdater.invoke(this, assignWithAccumulative$197025490.invoke(this, value, (DoubleConsumer) this::setAccumulative));
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -434,7 +434,7 @@ public abstract class Execution extends ExecutionModel {
             value = super.date();
         }
         try {
-            dateUpdater.invoke(this, assignWithMills$1104079711.invoke(this, value, (LongConsumer) ((Åssignable) this)::mills));
+            dateUpdater.invoke(this, assignWithMills$1104079711.invoke(this, value, (LongConsumer) this::setMills));
         } catch (Throwable e) {
             throw quiet(e);
         }

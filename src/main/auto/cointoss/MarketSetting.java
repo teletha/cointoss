@@ -198,7 +198,7 @@ public abstract class MarketSetting implements MarketSettingModel {
             throw new IllegalArgumentException("The targetCurrencyMinimumBidSize property requires non-null value.");
         }
         try {
-            targetCurrencyMinimumBidSizeUpdater.invoke(this, deriveByMinBid$473121199.invoke(this, value, (Consumer<List<Num>>) ((Åssignable) this)::targetCurrencyBidSizes));
+            targetCurrencyMinimumBidSizeUpdater.invoke(this, deriveByMinBid$473121199.invoke(this, value, (Consumer<List<Num>>) this::setTargetCurrencyBidSizes));
         } catch (Throwable e) {
             throw quiet(e);
         }
