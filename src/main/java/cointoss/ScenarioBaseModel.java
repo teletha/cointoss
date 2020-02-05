@@ -9,6 +9,8 @@
  */
 package cointoss;
 
+import java.util.function.Consumer;
+
 import org.apache.logging.log4j.util.PerformanceSensitive;
 
 import cointoss.util.Num;
@@ -54,6 +56,23 @@ abstract class ScenarioBaseModel implements Directional, Profitable {
         return entrySize().minus(entryExecutedSize());
     }
 
+    @Icy.Property(custom = ObservableNumProperty.class)
+    public Num entryRemainingSize2() {
+        return Num.ZERO;
+    }
+
+    @Icy.Intercept("entrySize")
+    private Num calculateEntryRemaining(Num entrySize, Consumer<Num> entryRemainingSize2) {
+        entryRemainingSize2.accept(entrySize.minus(entryExecutedSize()));
+        return entrySize;
+    }
+
+    @Icy.Intercept("entryExecutedSize")
+    private Num calculateEntryRemaining2(Num entryExecutedSize, Consumer<Num> entryRemainingSize2) {
+        entryRemainingSize2.accept(entrySize().minus(entryExecutedSize));
+        return entryExecutedSize;
+    }
+
     /**
      * An average price of executed entry orders.
      * 
@@ -89,7 +108,7 @@ abstract class ScenarioBaseModel implements Directional, Profitable {
      * 
      * @return A remaining size of exit orders.
      */
-    public Num exitRemainingSize() {
+    public final Num exitRemainingSize() {
         return exitSize().minus(exitExecutedSize());
     }
 

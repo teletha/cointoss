@@ -25,11 +25,11 @@ import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.logging.log4j.core.config.LoggerConfig;
 import org.apache.logging.log4j.core.layout.PatternLayout;
 
-public class DynamicFileLog {
+public class Loggings {
 
     private static final BackTestPolicy BackTestPolicy = new BackTestPolicy();
 
-    public static Logger getLogger(String name, boolean backtest) {
+    public static Logger getTradingLogger(String name, boolean backtest) {
         LoggerContext context = (LoggerContext) LogManager.getContext(false);
         Configuration config = context.getConfiguration();
         Layout layout = PatternLayout.newBuilder().withPattern("%m%n").withConfiguration(config).build();
@@ -56,7 +56,7 @@ public class DynamicFileLog {
         return context.getLogger(name);
     }
 
-    public static void requestLogReset() {
+    public static void requestTradingLoggerReset() {
         BackTestPolicy.needReset = true;
     }
 

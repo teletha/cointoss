@@ -33,7 +33,7 @@ import com.google.common.annotations.VisibleForTesting;
 
 import cointoss.analyze.TradingStats;
 import cointoss.execution.Execution;
-import cointoss.util.DynamicFileLog;
+import cointoss.util.Loggings;
 import cointoss.util.Num;
 import kiss.Disposable;
 import kiss.Extensible;
@@ -74,7 +74,7 @@ public abstract class Trader extends TraderBase implements Extensible, Disposabl
     final synchronized void initialize(Market market) {
         boolean backtest = StackWalker.getInstance(Option.RETAIN_CLASS_REFERENCE)
                 .walk(stream -> stream.filter(frame -> frame.getClassName().contains("BackTestModel")).findFirst().isPresent());
-        log = DynamicFileLog.getLogger(name(), backtest);
+        log = Loggings.getTradingLogger(name(), backtest);
 
         scenarios.clear();
         setHoldSize(Num.ZERO);

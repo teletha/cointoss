@@ -23,7 +23,7 @@ import cointoss.analyze.ConsoleAnalyzer;
 import cointoss.analyze.TradingStats;
 import cointoss.execution.ExecutionLog.LogType;
 import cointoss.util.Chrono;
-import cointoss.util.DynamicFileLog;
+import cointoss.util.Loggings;
 import cointoss.util.Num;
 import icy.manipulator.Icy;
 
@@ -159,7 +159,7 @@ interface BackTestModel {
             analyzer = new ConsoleAnalyzer();
         }
 
-        DynamicFileLog.requestLogReset();
+        Loggings.requestTradingLoggerReset();
 
         VerifiableMarket market = new VerifiableMarket(service());
         market.service.baseCurrency = initialBaseCurrency();

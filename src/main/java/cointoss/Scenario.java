@@ -9,7 +9,7 @@
  */
 package cointoss;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
