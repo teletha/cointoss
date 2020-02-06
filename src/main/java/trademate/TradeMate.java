@@ -57,6 +57,7 @@ public class TradeMate extends View {
                 .load("Setting", SettingView.class)
                 .load("Back Test", BackTestView.class)
                 .load(BitFlyer.FX_BTC_JPY.marketReadableName(), tab -> new TradingView(tab, BitFlyer.FX_BTC_JPY))
+                .load(BitFlyer.BTC_JPY.marketReadableName(), tab -> new TradingView(tab, BitFlyer.BTC_JPY))
                 .initial(0);
 
     }

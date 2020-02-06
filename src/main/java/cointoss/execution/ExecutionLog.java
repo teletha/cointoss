@@ -291,10 +291,10 @@ public class ExecutionLog {
 
                 if (retrieved != 0) {
                     // REST API returns some executions
-                    if (size < retrieved) {
+                    if (size <= retrieved && coefficient.isGreaterThan(1)) {
                         // Since there are too many data acquired,
                         // narrow the data range and get it again.
-                        coefficient = Num.max(Num.ONE, coefficient.minus(1));
+                        coefficient = Num.max(Num.ONE, coefficient.minus(5));
                         continue;
                     } else {
                         log.info("REST write from {}.  size {} ({})", rests.getFirst().date, rests.size(), coefficient);
@@ -313,7 +313,11 @@ public class ExecutionLog {
 
                         // The number of acquired data is too small,
                         // expand the data range slightly from next time.
-                        if (retrieved < size * 0.1) {
+                        if (retrieved < size * 0.3) {
+                            coefficient = coefficient.plus("0.5");
+                        } else if (retrieved < size * 0.5) {
+                            coefficient = coefficient.plus("0.3");
+                        } else if (retrieved < size * 0.7) {
                             coefficient = coefficient.plus("0.1");
                         }
                     }
@@ -931,11 +935,11 @@ public class ExecutionLog {
         cache.writeNormal();
     }
 
-    public static void main1(String[] args) {
-        restoreNormal(BitFlyer.FX_BTC_JPY, Chrono.utc(2020, 1, 19));
+    public static void main(String[] args) {
+        restoreNormal(BitFlyer.BTC_JPY, Chrono.utc(2020, 1, 19));
     }
 
-    public static void main(String[] args) {
+    public static void main1(String[] args) {
         ExecutionLog log = new ExecutionLog(BitMex.XBT_USD);
         log.fetch(115364009, Chrono.utc(2019, 11, 21), Chrono.utc(2020, 1, 24));
 
