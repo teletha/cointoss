@@ -272,6 +272,7 @@ public class ExecutionLog {
      */
     private Signal<Execution> network() {
         return new Signal<Execution>((observer, disposer) -> {
+            long latestId = service.executionLatest().to().v.id;
             BufferFromRestToRealtime buffer = new BufferFromRestToRealtime(service.setting.executionWithSequentialId, observer::error);
 
             // read from realtime API
@@ -284,7 +285,10 @@ public class ExecutionLog {
 
             while (disposer.isNotDisposed()) {
                 ArrayDeque<Execution> rests = service.executions(startId, startId + coefficient.multiply(size).longValue())
-                        .retry()
+                        .effectOnError(e -> {
+                            e.printStackTrace();
+                        })
+                        .retryWhen(service.retryPolicy(1000))
                         .toCollection(new ArrayDeque(size));
 
                 int retrieved = rests.size();
@@ -313,7 +317,9 @@ public class ExecutionLog {
 
                         // The number of acquired data is too small,
                         // expand the data range slightly from next time.
-                        if (retrieved < size * 0.3) {
+                        if (retrieved < size * 0.1) {
+                            coefficient = coefficient.plus("3");
+                        } else if (retrieved < size * 0.3) {
                             coefficient = coefficient.plus("0.5");
                         } else if (retrieved < size * 0.5) {
                             coefficient = coefficient.plus("0.3");
@@ -329,6 +335,7 @@ public class ExecutionLog {
                         // shift the range backward and search again.
                         startId += coefficient.multiply(size).intValue() - 1;
                         coefficient = coefficient.plus("0.1");
+                        System.out.println("empty " + service.marketReadableName());
                         continue;
                     } else {
                         // REST API has caught up with the real-time API,

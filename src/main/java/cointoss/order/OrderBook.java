@@ -149,15 +149,17 @@ public class OrderBook {
      */
     public void fix(Num hint) {
         operator.accept(() -> {
-            Num price = base.firstKey();
+            if (!base.isEmpty()) {
+                Num price = base.firstKey();
 
-            while (price != null && price.isGreaterThan(side, hint)) {
-                OrderBoard removed = base.remove(price);
+                while (price != null && price.isGreaterThan(side, hint)) {
+                    OrderBoard removed = base.remove(price);
 
-                group.update(price, removed.size * -1);
-                group.fix(hint);
+                    group.update(price, removed.size * -1);
+                    group.fix(hint);
 
-                price = base.firstKey();
+                    price = base.firstKey();
+                }
             }
         });
     }
