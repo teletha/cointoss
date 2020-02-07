@@ -292,6 +292,7 @@ public abstract class MarketService implements Disposable {
     @Override
     public final void vandalize() {
         disposer.dispose();
+        scheduler.shutdown();
     }
 
     /**

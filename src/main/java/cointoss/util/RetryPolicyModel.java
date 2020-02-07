@@ -11,8 +11,10 @@ package cointoss.util;
 
 import static java.time.temporal.ChronoUnit.MINUTES;
 
+import java.io.InterruptedIOException;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -150,6 +152,16 @@ abstract class RetryPolicyModel implements WiseFunction<Signal<Throwable>, Signa
     }
 
     /**
+     * Ignore the specified error types.
+     * 
+     * @return
+     */
+    @Icy.Property
+    List<Class<? extends Throwable>> ignore() {
+        return List.of();
+    }
+
+    /**
      * Set the current number of trials to 0.
      */
     public final void reset() {
@@ -168,11 +180,17 @@ abstract class RetryPolicyModel implements WiseFunction<Signal<Throwable>, Signa
         }
 
         return error.flatMap(e -> {
-            if (e instanceof AssertionError) {
+            if (e instanceof AssertionError || e instanceof InterruptedException || e instanceof InterruptedIOException) {
                 return I.signalError(e);
-            } else {
-                return I.signal(e);
             }
+
+            for (Class<? extends Throwable> type : ignore()) {
+                if (type.isInstance(e)) {
+                    return I.signalError(e);
+                }
+            }
+
+            return I.signal(e);
         }).take(limit()).delay(i -> {
             if (autoReset()) {
                 if (autoReset != null) {
