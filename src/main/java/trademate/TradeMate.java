@@ -9,6 +9,7 @@
  */
 package trademate;
 
+import java.util.List;
 import java.util.Locale;
 
 import javafx.scene.control.TabPane.TabClosingPolicy;
@@ -16,6 +17,7 @@ import javafx.scene.control.TabPane.TabClosingPolicy;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import cointoss.MarketService;
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.util.Network;
 import kiss.I;
@@ -53,15 +55,22 @@ public class TradeMate extends View {
      */
     @Override
     protected void initialize() {
-        main.policy(TabClosingPolicy.UNAVAILABLE)
-                .load("Setting", SettingView.class)
-                .load("Back Test", BackTestView.class)
-                .load(BitFlyer.FX_BTC_JPY.marketReadableName(), tab -> new TradingView(tab, BitFlyer.FX_BTC_JPY))
-                .load(BitFlyer.BTC_JPY.marketReadableName(), tab -> new TradingView(tab, BitFlyer.BTC_JPY))
-                .load(BitFlyer.ETH_JPY.marketReadableName(), tab -> new TradingView(tab, BitFlyer.ETH_JPY))
-                .load(BitFlyer.BCH_BTC.marketReadableName(), tab -> new TradingView(tab, BitFlyer.BCH_BTC))
-                .initial(0);
+        main.policy(TabClosingPolicy.UNAVAILABLE).load("Setting", SettingView.class).load("Back Test", BackTestView.class);
 
+        List<MarketService> services = List.of(BitFlyer.FX_BTC_JPY, BitFlyer.BTC_JPY, BitFlyer.ETH_JPY, BitFlyer.BCH_BTC);
+        for (MarketService service : services) {
+            loadTabFor(service);
+        }
+        main.initial(0);
+    }
+
+    /**
+     * Build tab with {@link MarketService}.
+     * 
+     * @param service
+     */
+    private void loadTabFor(MarketService service) {
+        main.load(service.marketReadableName(), tab -> new TradingView(tab, service));
     }
 
     /**
