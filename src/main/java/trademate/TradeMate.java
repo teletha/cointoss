@@ -28,6 +28,7 @@ import trademate.verify.BackTestView;
 import transcript.Lang;
 import viewtify.Theme;
 import viewtify.Viewtify;
+import viewtify.ui.UITab;
 import viewtify.ui.UITabPane;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
@@ -88,5 +89,19 @@ public class TradeMate extends View {
                 .language(Lang.of(I.env("language", Locale.getDefault().getLanguage())))
                 .onTerminating(Network::terminate)
                 .activate(TradeMate.class);
+    }
+
+    /**
+     * {@link TradeMate} will automatically initialize in the background if any tab has not been
+     * activated yet.
+     */
+    public final void requestLazyInitialization() {
+        for (UITab tab : main.items()) {
+            if (!tab.isLoaded()) {
+                System.out.println("Try to load " + tab.text());
+                Viewtify.inUI(() -> tab.load());
+                return;
+            }
+        }
     }
 }

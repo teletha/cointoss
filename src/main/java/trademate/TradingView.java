@@ -122,6 +122,7 @@ public class TradingView extends View {
             market.readLog(log -> log.fromLast(6, LogType.Fast));
 
             chart.restoreRealtimeUpdate();
+            findAncestorView(TradeMate.class).to(TradeMate::requestLazyInitialization);
         });
 
         title.text(service.marketReadableName()).style(style.tabTitle);
