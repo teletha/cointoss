@@ -609,7 +609,7 @@ public class ExecutionLog {
                                 .effectOnComplete(parser::stopParsing)
                                 .effectOnObserve(stopwatch::start)
                                 .effectOnComplete(() -> {
-                                    log.info("Read fast log [{}] {}", date, stopwatch.stop().elapsed());
+                                    log.info("Read fast log {} [{}] {}", service.marketIdentity(), date, stopwatch.stop().elapsed());
                                 });
                     } else {
                         // read compact
@@ -618,7 +618,7 @@ public class ExecutionLog {
                                 .effectOnComplete(parser::stopParsing)
                                 .effectOnObserve(stopwatch::start)
                                 .effectOnComplete(() -> {
-                                    log.info("Read compact log [{}] {}", date, stopwatch.stop().elapsed());
+                                    log.info("Read compact log {} [{}] {}", service.marketIdentity(), date, stopwatch.stop().elapsed());
                                 });
                     }
                 } else if (normal.isAbsent()) {
@@ -631,7 +631,7 @@ public class ExecutionLog {
                             .effectOnComplete(parser::stopParsing)
                             .effectOnObserve(stopwatch::start)
                             .effectOnComplete(() -> {
-                                log.info("Read log [{}] {}", date, stopwatch.stop().elapsed());
+                                log.info("Read normal log {} [{}] {}", service.marketIdentity(), date, stopwatch.stop().elapsed());
                             });
                 }
             } catch (IOException e) {

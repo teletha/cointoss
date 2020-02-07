@@ -98,7 +98,6 @@ public class TradeMate extends View {
     public final void requestLazyInitialization() {
         for (UITab tab : main.items()) {
             if (!tab.isLoaded()) {
-                System.out.println("Try to load " + tab.text());
                 Viewtify.inUI(() -> tab.load());
                 return;
             }
