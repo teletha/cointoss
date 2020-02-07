@@ -10,9 +10,9 @@
 package cointoss.execution;
 
 import static cointoss.Direction.*;
-import static java.nio.charset.StandardCharsets.ISO_8859_1;
+import static java.nio.charset.StandardCharsets.*;
 import static java.nio.file.StandardOpenOption.*;
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -272,7 +272,6 @@ public class ExecutionLog {
      */
     private Signal<Execution> network() {
         return new Signal<Execution>((observer, disposer) -> {
-            long latestId = service.executionLatest().to().v.id;
             BufferFromRestToRealtime buffer = new BufferFromRestToRealtime(service.setting.executionWithSequentialId, observer::error);
 
             // read from realtime API
@@ -281,14 +280,12 @@ public class ExecutionLog {
             // read from REST API
             int size = service.setting.acquirableExecutionSize();
             long startId = cacheId != 0 ? cacheId : service.estimateInitialExecutionId();
+            long latestId = -1;
             Num coefficient = Num.ONE;
 
             while (disposer.isNotDisposed()) {
                 ArrayDeque<Execution> rests = service.executions(startId, startId + coefficient.multiply(size).longValue())
-                        .effectOnError(e -> {
-                            e.printStackTrace();
-                        })
-                        .retryWhen(service.retryPolicy(1000))
+                        .retryWhen(service.retryPolicy(500))
                         .toCollection(new ArrayDeque(size));
 
                 int retrieved = rests.size();
@@ -329,20 +326,19 @@ public class ExecutionLog {
                     }
                 } else {
                     // REST API returns empty execution
-                    if (buffer.realtime.isEmpty() || startId < buffer.realtime.peek().id) {
+                    if (startId < buffer.realtimeFirstId()) {
                         // Although there is no data in the current search range,
                         // since it has not yet reached the latest execution,
                         // shift the range backward and search again.
                         startId += coefficient.multiply(size).intValue() - 1;
                         coefficient = coefficient.plus("0.1");
-                        System.out.println("empty " + service.marketReadableName());
                         continue;
-                    } else {
-                        // REST API has caught up with the real-time API,
-                        // we must switch to realtime API.
-                        buffer.switchToRealtime(startId, observer);
-                        break;
                     }
+
+                    // REST API has caught up with the real-time API,
+                    // we must switch to realtime API.
+                    buffer.switchToRealtime(startId, observer);
+                    break;
                 }
             }
             return disposer;
@@ -862,6 +858,9 @@ public class ExecutionLog {
         /** The execution event receiver. */
         private Observer<? super Execution> destination = realtime::add;
 
+        /** The no-realtime latest execution id. */
+        private long latestId = -1;
+
         /**
          * Build {@link BufferFromRestToRealtime}.
          * 
@@ -927,6 +926,21 @@ public class ExecutionLog {
                 log.info("Realtime buffer write from {} to {}.  size {}", buffer.peek().date, buffer.peekLast().date, buffer.size());
             }
             destination = observer;
+        }
+
+        /**
+         * Compute the first execution id in realtime buffer.
+         * 
+         * @return
+         */
+        private long realtimeFirstId() {
+            if (!realtime.isEmpty()) {
+                return realtime.peek().id;
+            } else if (0 < latestId) {
+                return latestId;
+            } else {
+                return latestId = service.executionLatest().to().v.id;
+            }
         }
     }
 
