@@ -29,9 +29,9 @@ public final class BitFlyer extends MarketServiceProvider {
             .executionLogger(BitFlyerLogger.class);
 
     /** Reusable market configuration. */
-    private static MarketSetting BTCBaseSetting = MarketSetting.with.baseCurrencyMinimumBidPrice(Num.of("0.01"))
-            .targetCurrencyMinimumBidSize(Num.of("0.01"))
-            .orderBookGroupRanges(Num.of(0.01, 0.02, 0.05, 0.1))
+    private static MarketSetting BTCBaseSetting = MarketSetting.with.baseCurrencyMinimumBidPrice(Num.of("0.00001"))
+            .targetCurrencyMinimumBidSize(Num.of("0.00001"))
+            .orderBookGroupRanges(Num.of(0.00001, 0.0001, 0.005, 0.01, 0.1, 1))
             .targetCurrencyScaleSize(6)
             .acquirableExecutionSize(499)
             .executionLogger(BitFlyerLogger.class);
