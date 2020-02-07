@@ -135,6 +135,14 @@ public class TradingView extends View {
             SFD.now().take(chart.showRealtimeUpdate.observing()).on(Viewtify.UIThread).to(e -> {
                 tab.textV(title, price.text(e.ⅰ + " (" + e.ⅲ.format(Primitives.DecimalScale2) + "%)"));
             });
+        } else {
+            service.executionsRealtimely()
+                    .take(chart.showRealtimeUpdate.observe())
+                    .startWith(service.executionLatest())
+                    .on(Viewtify.UIThread)
+                    .to(e -> {
+                        tab.textV(title, price.text(e.price));
+                    });
         }
     }
 

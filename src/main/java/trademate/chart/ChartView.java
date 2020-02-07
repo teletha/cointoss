@@ -12,19 +12,23 @@ package trademate.chart;
 import java.util.Comparator;
 import java.util.function.Supplier;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+
 import org.controlsfx.glyphfont.FontAwesome;
 
 import cointoss.Market;
 import cointoss.ticker.Ticker;
 import cointoss.ticker.TimeSpan;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import cointoss.util.Chrono;
 import kiss.Variable;
 import stylist.Style;
 import stylist.StyleDSL;
+import viewtify.Viewtify;
 import viewtify.ui.UIButton;
 import viewtify.ui.UICheckBox;
 import viewtify.ui.UIComboBox;
+import viewtify.ui.UILabel;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
 
@@ -44,6 +48,9 @@ public class ChartView extends View {
 
     /** Configuration UI */
     private UIComboBox<TimeSpan> span;
+
+    /** Chart UI */
+    private UILabel clock;
 
     /** Configuration UI */
     private UIComboBox<CandleType> candle;
@@ -73,10 +80,14 @@ public class ChartView extends View {
         {
             $(sbox, style.chart, () -> {
                 $(ui(chart));
-                $(hbox, style.configBox, () -> {
-                    $(span);
-                    $(config);
+                $(vbox, style.configBox, () -> {
+                    $(hbox, () -> {
+                        $(span);
+                        $(config);
+                    });
+                    $(clock, style.timer);
                 });
+
             });
         }
     }
@@ -92,6 +103,11 @@ public class ChartView extends View {
         Style configBox = () -> {
             display.maxWidth(130, px).maxHeight(26, px);
             position.top(0, px).right(56, px);
+        };
+
+        Style timer = () -> {
+            font.size(11, px);
+            padding.top(3, px).left(7, px);
         };
     }
 
@@ -117,6 +133,12 @@ public class ChartView extends View {
         });
         candle.initialize(CandleType.values()).observing(candleType::set);
         showLatestPrice.initialize(true);
+
+        Chrono.seconds().on(Viewtify.UIThread).to(now -> {
+            String time = Chrono.Time.format(now) + "  (" + Chrono
+                    .formatAsDuration(now, ticker.map(t -> t.span.calculateNextStartTime(now)).or(now)) + ")";
+            clock.text(time);
+        });
     }
 
     /**

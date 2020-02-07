@@ -13,7 +13,6 @@ import java.time.ZonedDateTime;
 
 import org.junit.jupiter.api.Test;
 
-import cointoss.ticker.TimeSpan;
 import cointoss.util.Chrono;
 
 class TimeSpanTest {
@@ -46,6 +45,14 @@ class TimeSpanTest {
         assert time.getMinute() == 3;
 
         time = TimeSpan.Minute3.calculateStartTime(Chrono.utcNow().withMinute(5));
+        assert time.getSecond() == 0;
+        assert time.getNano() == 0;
+        assert time.getMinute() == 3;
+    }
+
+    @Test
+    void calculateNextStartTime() {
+        ZonedDateTime time = TimeSpan.Minute3.calculateNextStartTime(Chrono.utcNow().withMinute(0));
         assert time.getSecond() == 0;
         assert time.getNano() == 0;
         assert time.getMinute() == 3;

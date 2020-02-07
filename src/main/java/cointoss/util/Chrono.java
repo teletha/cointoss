@@ -9,6 +9,7 @@
  */
 package cointoss.util;
 
+import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -17,7 +18,13 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoField;
+import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
+import kiss.Signal;
 
 public class Chrono {
 
@@ -215,6 +222,16 @@ public class Chrono {
     }
 
     /**
+     * Format the date to human-readable expression.
+     * 
+     * @param date A target date to format.
+     * @return A formatted literal.
+     */
+    public static String formatAsTime(ZonedDateTime date) {
+        return Time.format(date.withZoneSameInstant(SYSTEM));
+    }
+
+    /**
      * Format the duration (mills) to human-readable expression.
      * 
      * @param mills
@@ -286,5 +303,33 @@ public class Chrono {
             }
         }
         return hasNext ? expression.concat(":") : expression;
+    }
+
+    /** The base clock. */
+    private static final Clock CLOCK = Clock.systemDefaultZone();
+
+    /** The clock scheduler. */
+    private static final ScheduledExecutorService TIMER = Executors.newSingleThreadScheduledExecutor(task -> {
+        Thread thread = new Thread(task);
+        thread.setDaemon(true);
+        thread.setName("CLOCK");
+
+        return thread;
+    });
+
+    /** The shared clock. */
+    private static Signal<ZonedDateTime> shared = new Signal<ZonedDateTime>((observer, disposer) -> {
+        return disposer.add(TIMER.scheduleAtFixedRate(() -> {
+            observer.accept(ZonedDateTime.ofInstant(CLOCK.instant(), CLOCK.getZone()).truncatedTo(ChronoUnit.SECONDS));
+        }, 0, 1, TimeUnit.SECONDS));
+    }).share();
+
+    /**
+     * Gets a stream that returns the current time every second.
+     * 
+     * @return
+     */
+    public static Signal<ZonedDateTime> seconds() {
+        return shared;
     }
 }

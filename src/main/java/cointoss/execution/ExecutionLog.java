@@ -280,7 +280,6 @@ public class ExecutionLog {
             // read from REST API
             int size = service.setting.acquirableExecutionSize();
             long startId = cacheId != 0 ? cacheId : service.estimateInitialExecutionId();
-            long latestId = -1;
             Num coefficient = Num.ONE;
 
             while (disposer.isNotDisposed()) {

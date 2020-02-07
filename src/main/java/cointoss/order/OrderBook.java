@@ -158,7 +158,11 @@ public class OrderBook {
                     group.update(price, removed.size * -1);
                     group.fix(hint);
 
-                    price = base.firstKey();
+                    if (base.isEmpty()) {
+                        break;
+                    } else {
+                        price = base.firstKey();
+                    }
                 }
             }
         });
@@ -319,10 +323,12 @@ public class OrderBook {
             int index = side == Direction.BUY ? 0 : boards.size() - 1;
             price = calculateGroupedPrice(price, range);
 
-            OrderBoard unit = boards.get(index);
+            if (!boards.isEmpty()) {
+                OrderBoard unit = boards.get(index);
 
-            if (unit.price.isGreaterThan(side, price)) {
-                boards.remove(index);
+                if (unit.price.isGreaterThan(side, price)) {
+                    boards.remove(index);
+                }
             }
         }
     }

@@ -106,13 +106,22 @@ public enum TimeSpan {
     }
 
     /**
-     * Calculate start time.
+     * Calculate the start time.
      * 
      * @param e
      */
-    ZonedDateTime calculateStartTime(ZonedDateTime time) {
+    public ZonedDateTime calculateStartTime(ZonedDateTime time) {
         long value = time.getLong(unit);
         return time.truncatedTo(unit.getBaseUnit()).with(unit, value - (value % amount));
+    }
+
+    /**
+     * Calculate the next start time.
+     * 
+     * @param e
+     */
+    public ZonedDateTime calculateNextStartTime(ZonedDateTime time) {
+        return calculateStartTime(time).plus(duration);
     }
 
     /**
