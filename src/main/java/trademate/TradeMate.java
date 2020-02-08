@@ -19,6 +19,7 @@ import org.apache.logging.log4j.Logger;
 
 import cointoss.MarketService;
 import cointoss.market.bitflyer.BitFlyer;
+import cointoss.util.Chrono;
 import cointoss.util.Network;
 import kiss.I;
 import kiss.Managed;
@@ -63,6 +64,10 @@ public class TradeMate extends View {
             loadTabFor(service);
         }
         main.initial(0);
+
+        Chrono.seconds().on(Viewtify.UIThread).to(time -> {
+            stage().to(stage -> stage.setTitle(Chrono.DateDayTime.format(time)));
+        });
     }
 
     /**

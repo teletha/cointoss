@@ -58,6 +58,9 @@ public class ChartView extends View {
     /** Configuration UI */
     public UICheckBox showLatestPrice;
 
+    /** Configuration UI */
+    public UICheckBox showLatestTime;
+
     /** Chart UI */
     public Chart chart;
 
@@ -80,14 +83,11 @@ public class ChartView extends View {
         {
             $(sbox, style.chart, () -> {
                 $(ui(chart));
-                $(vbox, style.configBox, () -> {
-                    $(hbox, () -> {
-                        $(span);
-                        $(config);
-                    });
-                    $(clock, style.timer);
+                $(hbox, style.configBox, () -> {
+                    $(span);
+                    $(config);
                 });
-
+                $(clock, style.timer);
             });
         }
     }
@@ -97,7 +97,7 @@ public class ChartView extends View {
      */
     interface style extends StyleDSL {
         Style chart = () -> {
-            display.width.fill();
+            display.width.fill().height.fill();
         };
 
         Style configBox = () -> {
@@ -106,8 +106,9 @@ public class ChartView extends View {
         };
 
         Style timer = () -> {
-            font.size(11, px);
-            padding.top(3, px).left(7, px);
+            font.size(11, px).color("-fx-mid-text-color");
+            background.color("-fx-background");
+            position.top(5, px).right(0, px);
         };
     }
 
@@ -128,14 +129,16 @@ public class ChartView extends View {
                 $(vbox, () -> {
                     form("Candle Type", candle);
                     form("Latest Price", showLatestPrice);
+                    form("Latest Time", showLatestTime);
                 });
             }
         });
         candle.initialize(CandleType.values()).observing(candleType::set);
         showLatestPrice.initialize(true);
+        showLatestTime.initialize(true);
 
         Chrono.seconds().on(Viewtify.UIThread).to(now -> {
-            String time = Chrono.Time.format(now) + "  (" + Chrono
+            String time = Chrono.Time.format(now) + " (" + Chrono
                     .formatAsDuration(now, ticker.map(t -> t.span.calculateNextStartTime(now)).or(now)) + ")";
             clock.text(time);
         });
@@ -164,6 +167,7 @@ public class ChartView extends View {
         showOrderSupport.set(state);
         showPositionSupport.set(state);
         showLatestPrice.value(state);
+        showLatestTime.value(state);
         showRealtimeUpdate.set(state);
     }
 }

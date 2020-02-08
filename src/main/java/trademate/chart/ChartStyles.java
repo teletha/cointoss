@@ -22,7 +22,7 @@ public interface ChartStyles extends StyleDSL {
     Color same = $.rgb(190, 190, 190);
 
     Style HorizontalAxis = () -> {
-        display.height(45, px).minHeight(45, px);
+        display.height(35, px).minHeight(35, px);
     };
 
     Style VerticalAxis = () -> {
