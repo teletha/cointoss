@@ -217,7 +217,7 @@ public class VerifiableMarketService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Execution> executionsRealtimely() {
+    protected Signal<Execution> connectExecutionRealtimely() {
         // If this exception will be thrown, it is bug of this program. So we must rethrow the
         // wrapped error in here.
         throw new Error();
@@ -300,6 +300,14 @@ public class VerifiableMarketService extends MarketService {
      */
     @Override
     public Signal<OrderBookChange> orderBook() {
+        return Signal.never();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Signal<OrderBookChange> connectOrderBookRealtimely() {
         return Signal.never();
     }
 

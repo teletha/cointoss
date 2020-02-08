@@ -288,63 +288,58 @@ class BitFlyerService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public synchronized Signal<Execution> executionsRealtimely() {
-        if (executions != null) {
-            return executions;
-        } else {
-            String[] previous = new String[] {"", ""};
+    protected Signal<Execution> connectExecutionRealtimely() {
+        String[] previous = new String[] {"", ""};
 
-            return executions = network.jsonRPC("wss://ws.lightstream.bitflyer.com/json-rpc", "lightning_executions_" + marketName)
-                    .effectOnObserve(disposer::add)
-                    .flatIterable(JsonElement::getAsJsonArray)
-                    .map(JsonElement::getAsJsonObject)
-                    .map(e -> {
-                        long id = e.get("id").getAsLong();
+        return executions = network.jsonRPC("wss://ws.lightstream.bitflyer.com/json-rpc", "lightning_executions_" + marketName)
+                .effectOnObserve(disposer::add)
+                .flatIterable(JsonElement::getAsJsonArray)
+                .map(JsonElement::getAsJsonObject)
+                .map(e -> {
+                    long id = e.get("id").getAsLong();
 
-                        if (id == 0 && latestId == 0) {
-                            return null; // skip
-                        }
+                    if (id == 0 && latestId == 0) {
+                        return null; // skip
+                    }
 
-                        id = latestId = id != 0 ? id : ++latestId;
-                        Direction direction = Direction.parse(e.get("side").getAsString());
-                        Num size = Num.of(e.get("size").getAsString());
-                        Num price = Num.of(e.get("price").getAsString());
-                        ZonedDateTime date = parse(e.get("exec_date").getAsString()).atZone(Chrono.UTC);
-                        String buyer = e.get("buy_child_order_acceptance_id").getAsString();
-                        String seller = e.get("sell_child_order_acceptance_id").getAsString();
-                        String taker = direction.isBuy() ? buyer : seller;
-                        int consecutiveType = estimateConsecutiveType(previous[0], previous[1], buyer, seller);
-                        int delay = estimateDelay(taker, date);
+                    id = latestId = id != 0 ? id : ++latestId;
+                    Direction direction = Direction.parse(e.get("side").getAsString());
+                    Num size = Num.of(e.get("size").getAsString());
+                    Num price = Num.of(e.get("price").getAsString());
+                    ZonedDateTime date = parse(e.get("exec_date").getAsString()).atZone(Chrono.UTC);
+                    String buyer = e.get("buy_child_order_acceptance_id").getAsString();
+                    String seller = e.get("sell_child_order_acceptance_id").getAsString();
+                    String taker = direction.isBuy() ? buyer : seller;
+                    int consecutiveType = estimateConsecutiveType(previous[0], previous[1], buyer, seller);
+                    int delay = estimateDelay(taker, date);
 
-                        Execution exe = Execution.with.direction(direction, size)
-                                .id(id)
-                                .price(price)
-                                .date(date)
-                                .consecutive(consecutiveType)
-                                .delay(delay)
-                                .buyer(buyer)
-                                .seller(seller);
+                    Execution exe = Execution.with.direction(direction, size)
+                            .id(id)
+                            .price(price)
+                            .date(date)
+                            .consecutive(consecutiveType)
+                            .delay(delay)
+                            .buyer(buyer)
+                            .seller(seller);
 
-                        Order o = orders.get(buyer);
+                    Order o = orders.get(buyer);
+
+                    if (o != null) {
+                        updateOrder(o, exe);
+                    } else {
+                        o = orders.get(seller);
 
                         if (o != null) {
                             updateOrder(o, exe);
-                        } else {
-                            o = orders.get(seller);
-
-                            if (o != null) {
-                                updateOrder(o, exe);
-                            }
                         }
+                    }
 
-                        previous[0] = buyer;
-                        previous[1] = seller;
+                    previous[0] = buyer;
+                    previous[1] = seller;
 
-                        return exe;
-                    })
-                    .skipNull()
-                    .share();
-        }
+                    return exe;
+                })
+                .skipNull();
     }
 
     /**
@@ -566,7 +561,7 @@ class BitFlyerService extends MarketService {
      */
     @Override
     public Signal<OrderBookChange> orderBook() {
-        return snapshotOrderBook().concat(realtimeOrderBook());
+        return snapshotOrderBook().concat(orderBookRealtimely());
     }
 
     /**
@@ -579,11 +574,10 @@ class BitFlyerService extends MarketService {
     }
 
     /**
-     * Realtime order book info.
-     * 
-     * @return
+     * {@inheritDoc}
      */
-    private Signal<OrderBookChange> realtimeOrderBook() {
+    @Override
+    protected Signal<OrderBookChange> connectOrderBookRealtimely() {
         return network.jsonRPC("wss://ws.lightstream.bitflyer.com/json-rpc", "lightning_board_" + marketName)
                 .map(JsonElement::getAsJsonObject)
                 .map(e -> {

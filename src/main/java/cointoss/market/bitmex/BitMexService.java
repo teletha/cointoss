@@ -92,7 +92,7 @@ class BitMexService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<Execution> executionsRealtimely() {
+    protected Signal<Execution> connectExecutionRealtimely() {
         WebSocketCommand command = new WebSocketCommand();
         command.op = "subscribe";
         command.args.add("trade:" + marketName);
@@ -149,6 +149,14 @@ class BitMexService extends MarketService {
      */
     @Override
     public Signal<OrderBookChange> orderBook() {
+        return I.signal();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Signal<OrderBookChange> connectOrderBookRealtimely() {
         return I.signal();
     }
 

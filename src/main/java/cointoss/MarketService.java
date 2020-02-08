@@ -66,6 +66,12 @@ public abstract class MarketService implements Disposable {
         return thread;
     });
 
+    /** The shared real-time execution log. */
+    private Signal<Execution> executions;
+
+    /** The shared real-time order book. */
+    private Signal<OrderBookChange> orderBooks;
+
     /** The realtime user order state. */
     private Variable<Order> orderStream;
 
@@ -130,11 +136,23 @@ public abstract class MarketService implements Disposable {
     public abstract Signal<Execution> executions(long start, long end);
 
     /**
-     * Acquire the execution log in realtime. This is infinitely.
+     * Acquire execution log in realtime. This is infinitely.
      * 
-     * @return A event stream of execution log.
+     * @return A shared realtime execution logs.
      */
-    public abstract Signal<Execution> executionsRealtimely();
+    public final synchronized Signal<Execution> executionsRealtimely() {
+        if (executions == null) {
+            executions = connectExecutionRealtimely().effectOnObserve(disposer::add).share();
+        }
+        return executions;
+    }
+
+    /**
+     * Connect to the realtime execution log stream.
+     * 
+     * @return A realtime execution logs.
+     */
+    protected abstract Signal<Execution> connectExecutionRealtimely();
 
     /**
      * Acquier the latest execution log.
@@ -221,6 +239,25 @@ public abstract class MarketService implements Disposable {
      * @return
      */
     public abstract Signal<OrderBookChange> orderBook();
+
+    /**
+     * Acquire order book in realtime. This is infinitely.
+     * 
+     * @return A shared realtime order books.
+     */
+    public final synchronized Signal<OrderBookChange> orderBookRealtimely() {
+        if (orderBooks == null) {
+            orderBooks = connectOrderBookRealtimely().effectOnObserve(disposer::add).share();
+        }
+        return orderBooks;
+    }
+
+    /**
+     * Connect to the realtime order book stream.
+     * 
+     * @return A realtime order books.
+     */
+    protected abstract Signal<OrderBookChange> connectOrderBookRealtimely();
 
     /**
      * Calculate human-readable price for display.
