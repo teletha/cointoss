@@ -227,20 +227,6 @@ public class Network {
                  * {@inheritDoc}
                  */
                 @Override
-                public void onClosing(WebSocket socket, int code, String reason) {
-                }
-
-                /**
-                 * {@inheritDoc}
-                 */
-                @Override
-                public void onClosed(WebSocket socket, int code, String reason) {
-                }
-
-                /**
-                 * {@inheritDoc}
-                 */
-                @Override
                 public void onFailure(WebSocket socket, Throwable error, Response response) {
                     observer.error(error);
                 }
@@ -289,20 +275,6 @@ public class Network {
                     if (params != null) {
                         observer.accept(params.get("message"));
                     }
-                }
-
-                /**
-                 * {@inheritDoc}
-                 */
-                @Override
-                public void onClosing(WebSocket socket, int code, String reason) {
-                }
-
-                /**
-                 * {@inheritDoc}
-                 */
-                @Override
-                public void onClosed(WebSocket socket, int code, String reason) {
                 }
 
                 /**

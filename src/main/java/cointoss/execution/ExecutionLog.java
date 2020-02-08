@@ -10,9 +10,9 @@
 package cointoss.execution;
 
 import static cointoss.Direction.*;
-import static java.nio.charset.StandardCharsets.*;
+import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static java.nio.file.StandardOpenOption.*;
-import static java.util.concurrent.TimeUnit.*;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -143,7 +143,7 @@ public class ExecutionLog {
     /** The log writer. */
     private static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(2, run -> {
         Thread thread = new Thread(run);
-        thread.setName("Market Log Writer");
+        thread.setName("ExecutionLog Writer");
         thread.setDaemon(true);
         return thread;
     });

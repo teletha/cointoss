@@ -11,7 +11,6 @@ package cointoss.util;
 
 import static java.time.temporal.ChronoUnit.MINUTES;
 
-import java.io.InterruptedIOException;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -180,7 +179,7 @@ abstract class RetryPolicyModel implements WiseFunction<Signal<Throwable>, Signa
         }
 
         return error.flatMap(e -> {
-            if (e instanceof AssertionError || e instanceof InterruptedException || e instanceof InterruptedIOException) {
+            if (e instanceof AssertionError) {
                 return I.signalError(e);
             }
 
