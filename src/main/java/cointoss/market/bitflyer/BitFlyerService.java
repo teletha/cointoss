@@ -92,9 +92,6 @@ class BitFlyerService extends MarketService {
     /** The internal order manager. */
     private final Map<String, Order> orders = new ConcurrentHashMap();
 
-    /** The shared event stream of real-time execution log. */
-    private Signal<Execution> executions;
-
     /** Flag for test. */
     private final boolean forTest;
 
@@ -291,7 +288,7 @@ class BitFlyerService extends MarketService {
     protected Signal<Execution> connectExecutionRealtimely() {
         String[] previous = new String[] {"", ""};
 
-        return executions = network.jsonRPC("wss://ws.lightstream.bitflyer.com/json-rpc", "lightning_executions_" + marketName)
+        return network.jsonRPC("wss://ws.lightstream.bitflyer.com/json-rpc", "lightning_executions_" + marketName)
                 .effectOnObserve(disposer::add)
                 .flatIterable(JsonElement::getAsJsonArray)
                 .map(JsonElement::getAsJsonObject)
@@ -632,14 +629,14 @@ class BitFlyerService extends MarketService {
                     .addHeader("ACCESS-TIMESTAMP", timestamp)
                     .addHeader("ACCESS-SIGN", sign)
                     .addHeader("Content-Type", "application/json")
-                    .post(RequestBody.create(mime, body))
+                    .post(RequestBody.create(body, mime))
                     .build();
         } else {
             request = new Request.Builder().url(path)
                     .addHeader("Content-Type", "application/json")
                     .addHeader("Cookie", sessionKey + "=" + maintainer.session)
                     .addHeader("X-Requested-With", "XMLHttpRequest")
-                    .post(RequestBody.create(mime, body))
+                    .post(RequestBody.create(body, mime))
                     .build();
         }
         return network.rest(request, selector, type, Limit);
@@ -668,14 +665,14 @@ class BitFlyerService extends MarketService {
                     .addHeader("ACCESS-TIMESTAMP", timestamp)
                     .addHeader("ACCESS-SIGN", sign)
                     .addHeader("Content-Type", "application/json")
-                    .post(RequestBody.create(mime, body))
+                    .post(RequestBody.create(body, mime))
                     .build();
         } else {
             request = new Request.Builder().url(path)
                     .addHeader("Content-Type", "application/json")
                     .addHeader("Cookie", sessionKey + "=" + maintainer.session)
                     .addHeader("X-Requested-With", "XMLHttpRequest")
-                    .post(RequestBody.create(mime, body))
+                    .post(RequestBody.create(body, mime))
                     .build();
         }
         return network.rest(request, Limit);
