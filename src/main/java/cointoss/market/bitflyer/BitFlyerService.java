@@ -289,7 +289,6 @@ class BitFlyerService extends MarketService {
         String[] previous = new String[] {"", ""};
 
         return network.jsonRPC("wss://ws.lightstream.bitflyer.com/json-rpc", "lightning_executions_" + marketName)
-                .effectOnObserve(disposer::add)
                 .flatIterable(JsonElement::getAsJsonArray)
                 .map(JsonElement::getAsJsonObject)
                 .map(e -> {
