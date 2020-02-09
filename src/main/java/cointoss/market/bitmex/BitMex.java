@@ -23,7 +23,7 @@ public final class BitMex extends MarketServiceProvider {
             .targetCurrencyMinimumBidSize(Num.of("0.01"))
             .orderBookGroupRanges(Num.of(50, 100, 250, 500, 1000, 2500, 5000))
             .targetCurrencyScaleSize(3)
-            .acquirableExecutionSize(500)
+            .acquirableExecutionSize(1000)
             .executionWithSequentialId(false);
 
     /** Market */

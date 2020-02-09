@@ -22,6 +22,7 @@ import java.nio.channels.FileLock;
 import java.nio.channels.OverlappingFileLockException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -57,7 +58,6 @@ import com.univocity.parsers.csv.CsvWriterSettings;
 import cointoss.Direction;
 import cointoss.Market;
 import cointoss.MarketService;
-import cointoss.market.bitflyer.BitFlyer;
 import cointoss.market.bitmex.BitMex;
 import cointoss.ticker.Ticker;
 import cointoss.ticker.TickerManager;
@@ -956,7 +956,9 @@ public class ExecutionLog {
     }
 
     public static void main(String[] args) {
-        restoreNormal(BitFlyer.BTC_JPY, Chrono.utc(2020, 1, 19));
+        restoreNormal(BitMex.XBT_USD, ZonedDateTime.of(2019, 11, 22, 0, 0, 0, 0, ZoneId.systemDefault()));
+        // new ExecutionLog(BitMex.XBT_USD).fromYestaday().to(e -> {
+        // });
     }
 
     public static void main1(String[] args) {

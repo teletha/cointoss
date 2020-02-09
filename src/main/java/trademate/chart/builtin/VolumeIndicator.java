@@ -13,7 +13,6 @@ import cointoss.Market;
 import cointoss.ticker.DoubleIndicator;
 import cointoss.ticker.Tick;
 import cointoss.ticker.Ticker;
-import kiss.Variable;
 import stylist.Style;
 import stylist.StyleDSL;
 import trademate.chart.ChartStyles;
@@ -30,14 +29,12 @@ public class VolumeIndicator extends PlotScript implements StyleDSL {
         stroke.color(ChartStyles.sell);
     };
 
-    public final Variable<Integer> emaLength = Variable.of(10);
-
     /**
      * {@inheritDoc}
      */
     @Override
     public String name() {
-        return super.name() + "(" + emaLength + ")";
+        return "Volume";
     }
 
     /**
