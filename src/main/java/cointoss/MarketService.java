@@ -266,7 +266,7 @@ public abstract class MarketService implements Disposable {
      * @return
      */
     public String calculateReadablePrice(double price) {
-        return Num.of(price).scale(0).toString();
+        return Num.of(price).scale(setting.baseCurrencyScaleSize).toString();
     }
 
     /**
