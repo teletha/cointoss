@@ -11,6 +11,7 @@ package cointoss.market.bitflyer;
 
 import java.math.RoundingMode;
 
+import cointoss.execution.Execution;
 import cointoss.util.Num;
 import kiss.I;
 import kiss.Signal;
@@ -46,7 +47,7 @@ public enum SFD {
     Minus20("0.80");
 
     /** The latest SFD stream. */
-    private static Signal<Ⅲ<Num, Num, Num>> latest;
+    private static Signal<Ⅲ<Execution, Num, Num>> latest;
 
     /** The human-readable percentage. */
     public final Num percentage;
@@ -92,7 +93,7 @@ public enum SFD {
      * 
      * @return
      */
-    public static synchronized Signal<Ⅲ<Num, Num, Num>> now() {
+    public static synchronized Signal<Ⅲ<Execution, Num, Num>> now() {
         if (latest == null) {
             latest = BitFlyer.FX_BTC_JPY.executionsRealtimely()
                     .diff()
@@ -107,7 +108,7 @@ public enum SFD {
                         } else {
                             diff = btc.divide(fx).minus(Num.ONE).multiply(Num.HUNDRED).negate();
                         }
-                        return I.pair(fx, btc, diff);
+                        return I.pair(e.ⅰ, btc, diff);
                     })
                     .retryWhen(BitFlyer.FX_BTC_JPY.retryPolicy(200))
                     .share();

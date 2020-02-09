@@ -134,7 +134,7 @@ public class TradingView extends View {
     private void additionalInfo() {
         if (service == BitFlyer.FX_BTC_JPY) {
             SFD.now().take(chart.showRealtimeUpdate.observing()).on(Viewtify.UIThread).to(e -> {
-                tab.textV(title, price.text(e.ⅰ + " (" + e.ⅲ.format(Primitives.DecimalScale2) + "%)"));
+                tab.textV(title, price.text(e.ⅰ.price + " (" + e.ⅲ.format(Primitives.DecimalScale2) + "%) " + e.ⅰ.delay));
             });
         } else {
             service.executionsRealtimely()

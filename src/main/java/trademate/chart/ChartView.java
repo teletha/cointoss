@@ -98,7 +98,7 @@ public class ChartView extends View {
 
         Style span = () -> {
             font.size(11, px);
-            display.minWidth(112, px);
+            display.minWidth(118, px);
 
             $.select(">.list-cell", () -> {
                 text.align.center();
@@ -111,10 +111,9 @@ public class ChartView extends View {
      */
     @Override
     protected void initialize() {
-        span.initialize(TimeSpan.values()).sort(Comparator.reverseOrder()).render(v -> v.combineLatest(Chrono.seconds()).map(x -> {
+        span.initialize(TimeSpan.values()).sort(Comparator.reverseOrder()).textWhen(v -> v.combineLatest(Chrono.seconds()).map(x -> {
             return Chrono.formatAsDuration(x.ⅱ, x.ⅰ.calculateNextStartTime(x.ⅱ)) + " / " + x.ⅰ;
         }));
-
         span.observing() //
                 .skipNull()
                 .combineLatest(market.observing().skipNull())
