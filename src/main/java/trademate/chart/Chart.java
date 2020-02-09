@@ -149,7 +149,7 @@ public class Chart extends Region {
         }
 
         Num margin = max.v.minus(min).multiply(Num.of(0.5));
-        axisY.logicalMaxValue.set(max.v.plus(margin).longValue());
-        axisY.logicalMinValue.set(min.v.minus(margin).longValue());
+        axisY.logicalMaxValue.set(max.v.plus(margin).doubleValue());
+        axisY.logicalMinValue.set(min.v.minus(margin).doubleValue());
     }
 }
