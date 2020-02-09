@@ -14,7 +14,8 @@ import static java.time.temporal.ChronoField.*;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoField;
-import java.util.Locale;
+
+import transcript.Transcript;
 
 /**
  * Defined tick span.
@@ -103,7 +104,7 @@ public enum TimeSpan {
         this.duration = Duration.of(amount, unit.getBaseUnit());
         this.seconds = duration.getSeconds();
         this.uppers = new int[uppers.length];
-        this.shortName = amount + unit.getDisplayName(Locale.getDefault());
+        this.shortName = amount + unit();
 
         for (int i = 0; i < uppers.length; i++) {
             this.uppers[i] = uppers[i] + ordinal();
@@ -130,12 +131,38 @@ public enum TimeSpan {
     }
 
     /**
-     * Get the short name.
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        return shortName;
+    }
+
+    /**
+     * Compute unit expresison for each locales.
      * 
+     * @param field
      * @return
      */
-    public String shortName() {
-        return shortName;
+    private String unit() {
+        switch (unit) {
+        case EPOCH_DAY:
+            return Transcript.en("days").toString();
+
+        case HOUR_OF_DAY:
+            return Transcript.en("hours").toString();
+
+        case MINUTE_OF_HOUR:
+            return Transcript.en("mins").toString();
+
+        case SECOND_OF_MINUTE:
+            return Transcript.en("secs").toString();
+
+        default:
+            // If this exception will be thrown, it is bug of this program. So we must rethrow the
+            // wrapped error in here.
+            throw new Error();
+        }
     }
 
     /**

@@ -98,7 +98,7 @@ public class ChartView extends View {
 
         Style span = () -> {
             font.size(11, px);
-            display.minWidth(110, px);
+            display.minWidth(120, px);
         };
     }
 
@@ -108,9 +108,9 @@ public class ChartView extends View {
     @Override
     protected void initialize() {
         span.initialize(TimeSpan.values()).sort(Comparator.reverseOrder()).render(v -> v.combineLatest(Chrono.seconds()).map(x -> {
-            String remaining = Chrono.formatAsDuration(x.ⅱ, x.ⅰ.calculateNextStartTime(x.ⅱ));
-            return remaining + " / " + x.ⅰ.shortName();
+            return Chrono.formatAsDuration(x.ⅱ, x.ⅰ.calculateNextStartTime(x.ⅱ)) + " / " + x.ⅰ;
         }));
+
         span.observing() //
                 .skipNull()
                 .combineLatest(market.observing().skipNull())
