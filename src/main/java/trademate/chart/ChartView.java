@@ -24,6 +24,7 @@ import cointoss.util.Chrono;
 import kiss.Variable;
 import stylist.Style;
 import stylist.StyleDSL;
+import trademate.verify.BackTestView;
 import viewtify.ui.UIButton;
 import viewtify.ui.UICheckBox;
 import viewtify.ui.UIComboBox;
@@ -111,14 +112,18 @@ public class ChartView extends View {
      */
     @Override
     protected void initialize() {
-        span.initialize(TimeSpan.values()).sort(Comparator.reverseOrder()).textWhen(v -> v.combineLatest(Chrono.seconds()).map(x -> {
-            return Chrono.formatAsDuration(x.ⅱ, x.ⅰ.calculateNextStartTime(x.ⅱ)) + " / " + x.ⅰ;
-        }));
+        span.initialize(TimeSpan.values()).sort(Comparator.reverseOrder());
         span.observing() //
                 .skipNull()
                 .combineLatest(market.observing().skipNull())
                 .map(e -> e.ⅱ.tickers.on(e.ⅰ))
                 .to(ticker::set);
+
+        if (findAncestorView(BackTestView.class).isAbsent()) {
+            span.textWhen(v -> v.combineLatest(Chrono.seconds()).map(x -> {
+                return Chrono.formatAsDuration(x.ⅱ, x.ⅰ.calculateNextStartTime(x.ⅱ)) + " / " + x.ⅰ;
+            }));
+        }
 
         config.text(FontAwesome.Glyph.GEAR).popup(new ViewDSL() {
             {
