@@ -98,7 +98,11 @@ public class ChartView extends View {
 
         Style span = () -> {
             font.size(11, px);
-            display.minWidth(120, px);
+            display.minWidth(112, px);
+
+            $.select(">.list-cell", () -> {
+                text.align.center();
+            });
         };
     }
 
