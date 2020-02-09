@@ -65,8 +65,8 @@ public class TradeMate extends View {
         }
         main.initial(0);
 
-        Chrono.seconds().on(Viewtify.UIThread).to(time -> {
-            stage().to(stage -> stage.setTitle(Chrono.DateDayTime.format(time)));
+        Chrono.seconds().map(Chrono.DateDayTime::format).on(Viewtify.UIThread).to(time -> {
+            stage().v.setTitle(time);
         });
     }
 

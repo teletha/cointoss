@@ -24,11 +24,9 @@ import cointoss.util.Chrono;
 import kiss.Variable;
 import stylist.Style;
 import stylist.StyleDSL;
-import viewtify.Viewtify;
 import viewtify.ui.UIButton;
 import viewtify.ui.UICheckBox;
 import viewtify.ui.UIComboBox;
-import viewtify.ui.UILabel;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
 
@@ -49,17 +47,11 @@ public class ChartView extends View {
     /** Configuration UI */
     private UIComboBox<TimeSpan> span;
 
-    /** Chart UI */
-    private UILabel clock;
-
     /** Configuration UI */
     private UIComboBox<CandleType> candle;
 
     /** Configuration UI */
     public UICheckBox showLatestPrice;
-
-    /** Configuration UI */
-    public UICheckBox showLatestTime;
 
     /** Chart UI */
     public Chart chart;
@@ -84,10 +76,9 @@ public class ChartView extends View {
             $(sbox, style.chart, () -> {
                 $(ui(chart));
                 $(hbox, style.configBox, () -> {
-                    $(span);
+                    $(span, style.span);
                     $(config);
                 });
-                $(clock, style.timer);
             });
         }
     }
@@ -105,10 +96,9 @@ public class ChartView extends View {
             position.top(0, px).right(56, px);
         };
 
-        Style timer = () -> {
-            font.size(11, px).color("-fx-mid-text-color");
-            background.color("-fx-background");
-            position.top(5, px).right(0, px);
+        Style span = () -> {
+            font.size(11, px);
+            display.minWidth(110, px);
         };
     }
 
@@ -117,7 +107,10 @@ public class ChartView extends View {
      */
     @Override
     protected void initialize() {
-        span.initialize(TimeSpan.values()).sort(Comparator.reverseOrder());
+        span.initialize(TimeSpan.values()).sort(Comparator.reverseOrder()).render(v -> v.combineLatest(Chrono.seconds()).map(x -> {
+            String remaining = Chrono.formatAsDuration(x.ⅱ, x.ⅰ.calculateNextStartTime(x.ⅱ));
+            return remaining + " / " + x.ⅰ.shortName();
+        }));
         span.observing() //
                 .skipNull()
                 .combineLatest(market.observing().skipNull())
@@ -129,19 +122,11 @@ public class ChartView extends View {
                 $(vbox, () -> {
                     form("Candle Type", candle);
                     form("Latest Price", showLatestPrice);
-                    form("Latest Time", showLatestTime);
                 });
             }
         });
         candle.initialize(CandleType.values()).observing(candleType::set);
         showLatestPrice.initialize(true);
-        showLatestTime.initialize(true);
-
-        Chrono.seconds().on(Viewtify.UIThread).to(now -> {
-            String time = Chrono.Time.format(now) + " (" + Chrono
-                    .formatAsDuration(now, ticker.map(t -> t.span.calculateNextStartTime(now)).or(now)) + ")";
-            clock.text(time);
-        });
     }
 
     /**
@@ -167,7 +152,6 @@ public class ChartView extends View {
         showOrderSupport.set(state);
         showPositionSupport.set(state);
         showLatestPrice.value(state);
-        showLatestTime.value(state);
         showRealtimeUpdate.set(state);
     }
 }

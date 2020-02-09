@@ -14,6 +14,7 @@ import static java.time.temporal.ChronoField.*;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoField;
+import java.util.Locale;
 
 /**
  * Defined tick span.
@@ -89,6 +90,9 @@ public enum TimeSpan {
     /** The unit. */
     private final ChronoField unit;
 
+    /** The short name. */
+    private final String shortName;
+
     /**
      * @param amount
      * @param unit
@@ -99,6 +103,7 @@ public enum TimeSpan {
         this.duration = Duration.of(amount, unit.getBaseUnit());
         this.seconds = duration.getSeconds();
         this.uppers = new int[uppers.length];
+        this.shortName = amount + unit.getDisplayName(Locale.getDefault());
 
         for (int i = 0; i < uppers.length; i++) {
             this.uppers[i] = uppers[i] + ordinal();
@@ -122,6 +127,15 @@ public enum TimeSpan {
      */
     public ZonedDateTime calculateNextStartTime(ZonedDateTime time) {
         return calculateStartTime(time).plus(duration);
+    }
+
+    /**
+     * Get the short name.
+     * 
+     * @return
+     */
+    public String shortName() {
+        return shortName;
     }
 
     /**

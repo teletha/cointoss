@@ -629,14 +629,14 @@ class BitFlyerService extends MarketService {
                     .addHeader("ACCESS-TIMESTAMP", timestamp)
                     .addHeader("ACCESS-SIGN", sign)
                     .addHeader("Content-Type", "application/json")
-                    .post(RequestBody.create(body, mime))
+                    .post(RequestBody.create(mime, body))
                     .build();
         } else {
             request = new Request.Builder().url(path)
                     .addHeader("Content-Type", "application/json")
                     .addHeader("Cookie", sessionKey + "=" + maintainer.session)
                     .addHeader("X-Requested-With", "XMLHttpRequest")
-                    .post(RequestBody.create(body, mime))
+                    .post(RequestBody.create(mime, body))
                     .build();
         }
         return network.rest(request, selector, type, Limit);
@@ -665,14 +665,14 @@ class BitFlyerService extends MarketService {
                     .addHeader("ACCESS-TIMESTAMP", timestamp)
                     .addHeader("ACCESS-SIGN", sign)
                     .addHeader("Content-Type", "application/json")
-                    .post(RequestBody.create(body, mime))
+                    .post(RequestBody.create(mime, body))
                     .build();
         } else {
             request = new Request.Builder().url(path)
                     .addHeader("Content-Type", "application/json")
                     .addHeader("Cookie", sessionKey + "=" + maintainer.session)
                     .addHeader("X-Requested-With", "XMLHttpRequest")
-                    .post(RequestBody.create(body, mime))
+                    .post(RequestBody.create(mime, body))
                     .build();
         }
         return network.rest(request, Limit);

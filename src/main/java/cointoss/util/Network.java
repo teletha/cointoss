@@ -282,6 +282,7 @@ public class Network {
                  */
                 @Override
                 public void onFailure(WebSocket socket, Throwable error, Response response) {
+                    System.out.println(error);
                     observer.error(error);
                 }
             });
