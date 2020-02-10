@@ -9,7 +9,7 @@
  */
 package cointoss.util;
 
-import static java.time.temporal.ChronoUnit.*;
+import static java.time.temporal.ChronoUnit.MINUTES;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
@@ -199,8 +199,11 @@ abstract class RetryPolicyModel implements WiseFunction<Signal<Throwable>, Signa
             }
 
             Duration d = Chrono.between(delayMinimum(), delay().apply(count++), delayMaximum());
-            System.out.println(e.getClass().getSimpleName() + " (" + (count - 1) + "times), retry after " + d);
+
             return d;
-        }, scheduler()).effect(onRetry);
+        }, scheduler()).effect(onRetry).effect(e -> {
+            Duration d = Chrono.between(delayMinimum(), delay().apply(count - 1), delayMaximum());
+            System.out.println(e.getClass().getSimpleName() + " (" + (count - 1) + "times), retry after " + d + "   " + this);
+        });
     }
 }
