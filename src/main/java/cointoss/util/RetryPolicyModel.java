@@ -9,7 +9,7 @@
  */
 package cointoss.util;
 
-import static java.time.temporal.ChronoUnit.MINUTES;
+import static java.time.temporal.ChronoUnit.*;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
@@ -190,7 +190,7 @@ abstract class RetryPolicyModel implements WiseFunction<Signal<Throwable>, Signa
             }
 
             return I.signal(e);
-        }).take(limit()).delay(i -> {
+        }).take(limit()).delay(e -> {
             if (autoReset()) {
                 if (autoReset != null) {
                     autoReset.cancel(true);
@@ -198,7 +198,9 @@ abstract class RetryPolicyModel implements WiseFunction<Signal<Throwable>, Signa
                 autoReset = I.schedule(delayMaximum().toMillis() * 2, TimeUnit.MILLISECONDS, scheduler(), this::reset);
             }
 
-            return Chrono.between(delayMinimum(), delay().apply(count++), delayMaximum());
+            Duration d = Chrono.between(delayMinimum(), delay().apply(count++), delayMaximum());
+            System.out.println(e.getClass().getSimpleName() + " (" + (count - 1) + "times), retry after " + d);
+            return d;
         }, scheduler()).effect(onRetry);
     }
 }

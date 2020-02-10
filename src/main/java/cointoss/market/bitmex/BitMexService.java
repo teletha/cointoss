@@ -198,6 +198,8 @@ class BitMexService extends MarketService {
         Num size = Num.of(e.get("homeNotional").getAsString());
         Num price = Num.of(e.get("price").getAsString());
         ZonedDateTime date = ZonedDateTime.parse(e.get("timestamp").getAsString(), RealTimeFormat);
+        long id = date.toInstant().toEpochMilli();
+        String tradeId = e.get("trdMatchID").getAsString();
 
         int consecutive = Execution.ConsecutiveDifference;
 
@@ -207,12 +209,7 @@ class BitMexService extends MarketService {
         consectives[0] = direction;
         consectives[1] = date;
 
-        return Execution.with.direction(direction, size)
-                .id(start + increment.getAndIncrement())
-                .price(price)
-                .date(date)
-                .consecutive(consecutive)
-                .buyer(e.get("trdMatchID").getAsString());
+        return Execution.with.direction(direction, size).id(id).price(price).date(date).consecutive(consecutive).buyer(tradeId);
     }
 
     /**

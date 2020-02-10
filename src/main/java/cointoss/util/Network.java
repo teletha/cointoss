@@ -9,7 +9,7 @@
  */
 package cointoss.util;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -65,9 +65,10 @@ public class Network {
                     .connectTimeout(TIMEOUT, SECONDS)
                     .readTimeout(TIMEOUT, SECONDS)
                     .writeTimeout(TIMEOUT, SECONDS)
-                    .retryOnConnectionFailure(true)
+                    .callTimeout(TIMEOUT, SECONDS)
                     .proxy(proxy)
                     .build();
+
         }
         return client;
     }
@@ -281,8 +282,23 @@ public class Network {
                  * {@inheritDoc}
                  */
                 @Override
+                public void onClosing(WebSocket webSocket, int code, String reason) {
+                    System.out.println(code + "   " + reason);
+                }
+
+                /**
+                 * {@inheritDoc}
+                 */
+                @Override
+                public void onClosed(WebSocket webSocket, int code, String reason) {
+                    System.out.println(code + "   " + reason);
+                }
+
+                /**
+                 * {@inheritDoc}
+                 */
+                @Override
                 public void onFailure(WebSocket socket, Throwable error, Response response) {
-                    error.printStackTrace();
                     observer.error(error);
                 }
             });
