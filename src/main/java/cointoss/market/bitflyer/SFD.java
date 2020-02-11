@@ -110,7 +110,7 @@ public enum SFD {
                         }
                         return I.pair(e.ⅰ, btc, diff);
                     })
-                    .retryWhen(BitFlyer.FX_BTC_JPY.retryPolicy(200))
+                    .retryWhen(BitFlyer.FX_BTC_JPY.retryPolicy(200, "SFD"))
                     .share();
         }
         return latest;

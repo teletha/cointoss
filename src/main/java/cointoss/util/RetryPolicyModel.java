@@ -9,7 +9,7 @@
  */
 package cointoss.util;
 
-import static java.time.temporal.ChronoUnit.MINUTES;
+import static java.time.temporal.ChronoUnit.*;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
@@ -160,11 +160,24 @@ abstract class RetryPolicyModel implements WiseFunction<Signal<Throwable>, Signa
         return List.of();
     }
 
+    @Icy.Property
+    String name() {
+        return "";
+    }
+
     /**
      * Set the current number of trials to 0.
      */
     public final void reset() {
         count = 0;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        return "RetryPolicy[" + name() + "]";
     }
 
     /**
@@ -203,7 +216,7 @@ abstract class RetryPolicyModel implements WiseFunction<Signal<Throwable>, Signa
             return d;
         }, scheduler()).effect(onRetry).effect(e -> {
             Duration d = Chrono.between(delayMinimum(), delay().apply(count - 1), delayMaximum());
-            System.out.println(e.getClass().getSimpleName() + " (" + (count - 1) + "times), retry after " + d + "   " + this);
+            System.out.println(this + " (" + (count) + "times), retry " + d + "   " + e);
         });
     }
 }

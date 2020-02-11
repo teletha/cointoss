@@ -10,9 +10,9 @@
 package cointoss.execution;
 
 import static cointoss.Direction.*;
-import static java.nio.charset.StandardCharsets.ISO_8859_1;
+import static java.nio.charset.StandardCharsets.*;
 import static java.nio.file.StandardOpenOption.*;
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -275,7 +275,10 @@ public class ExecutionLog {
             BufferFromRestToRealtime buffer = new BufferFromRestToRealtime(service.setting.executionWithSequentialId, observer::error);
 
             // read from realtime API
-            disposer.add(service.executionsRealtimely().to(buffer));
+            disposer.add(service.executionsRealtimely().to(buffer, e -> {
+                System.out.println("Error in realtime " + e);
+                observer.error(e);
+            }));
 
             // read from REST API
             int size = service.setting.acquirableExecutionSize();
@@ -284,7 +287,7 @@ public class ExecutionLog {
 
             while (disposer.isNotDisposed()) {
                 ArrayDeque<Execution> rests = service.executions(startId, startId + coefficient.multiply(size).longValue())
-                        .retryWhen(service.retryPolicy(500))
+                        // .retryWhen(service.retryPolicy(500, "REST executions"))
                         .toCollection(new ArrayDeque(size));
 
                 int retrieved = rests.size();
@@ -341,7 +344,7 @@ public class ExecutionLog {
                 }
             }
             return disposer;
-        }).retryWhen(service.retryPolicy(500));
+        }).retryWhen(service.retryPolicy(500, "ExecutionLog"));
     }
 
     /**
