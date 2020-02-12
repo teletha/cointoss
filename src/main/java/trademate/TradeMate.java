@@ -85,7 +85,7 @@ public class TradeMate extends View {
     public static void main(String[] args) {
         // initialize logger for non-main thread
         Logger log = LogManager.getLogger();
-        // Thread.setDefaultUncaughtExceptionHandler((t, e) -> log.error(e.getMessage(), e));
+        Thread.setDefaultUncaughtExceptionHandler((t, e) -> log.error(e.getMessage(), e));
 
         // activate application
         Viewtify.application()

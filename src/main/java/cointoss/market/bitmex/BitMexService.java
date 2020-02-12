@@ -14,7 +14,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -28,6 +28,7 @@ import cointoss.order.Order;
 import cointoss.order.OrderBookChange;
 import cointoss.order.OrderState;
 import cointoss.util.APILimiter;
+import cointoss.util.Chrono;
 import cointoss.util.Num;
 import kiss.I;
 import kiss.Signal;
@@ -73,19 +74,36 @@ class BitMexService extends MarketService {
         return null;
     }
 
+    private static final long padding = 100000;
+
     /**
      * {@inheritDoc}
      */
     @Override
     public Signal<Execution> executions(long start, long end) {
-        AtomicInteger increment = new AtomicInteger();
+        start++;
+        long startingPoint = start % padding;
+        AtomicLong increment = new AtomicLong(startingPoint - 1);
         Object[] consectives = new Object[2];
+        ZonedDateTime[] previousDate = new ZonedDateTime[] {encodeId(start)};
 
-        return call("GET", "trade?symbol=" + marketName + "&count=" + (end - start) + "&start=" + start)
+        return call("GET", "trade?symbol=" + marketName + "&count=1000" + "&startTime=" + formatEncodedId(start) + "&start=" + startingPoint)
                 .flatIterable(JsonElement::getAsJsonArray)
                 .map(json -> {
-                    return convert(json, start, increment, consectives);
+                    return convert(json, increment, consectives, previousDate);
                 });
+    }
+
+    private ZonedDateTime encodeId(long id) {
+        return Chrono.utcByMills(id / padding);
+    }
+
+    private String formatEncodedId(long id) {
+        return RealTimeFormat.format(encodeId(id));
+    }
+
+    private long decodeId(ZonedDateTime time) {
+        return time.toInstant().toEpochMilli() * padding;
     }
 
     /**
@@ -97,9 +115,9 @@ class BitMexService extends MarketService {
         command.op = "subscribe";
         command.args.add("trade:" + marketName);
 
-        long start = 0;
-        AtomicInteger increment = new AtomicInteger();
+        AtomicLong increment = new AtomicLong();
         Object[] consecutives = new Object[2];
+        ZonedDateTime[] previousDate = new ZonedDateTime[1];
 
         return network.websocket("wss://www.bitmex.com/realtime", command).flatMap(json -> {
             JsonArray array = json.getAsJsonObject().getAsJsonArray("data");
@@ -107,7 +125,7 @@ class BitMexService extends MarketService {
             if (array == null) {
                 return I.signal();
             } else {
-                return I.signal(array).map(e -> convert(e, start, increment, consecutives));
+                return I.signal(array).map(e -> convert(e, increment, consecutives, previousDate));
             }
         });
     }
@@ -125,7 +143,7 @@ class BitMexService extends MarketService {
      */
     @Override
     public long estimateInitialExecutionId() {
-        return 0;
+        return decodeId(Chrono.utc(2020, 1, 1));
     }
 
     /**
@@ -191,14 +209,22 @@ class BitMexService extends MarketService {
      * @param previous
      * @return
      */
-    private Execution convert(JsonElement json, long start, AtomicInteger increment, Object[] consectives) {
+    private Execution convert(JsonElement json, AtomicLong increment, Object[] consectives, ZonedDateTime[] previousDate) {
         JsonObject e = json.getAsJsonObject();
 
         Direction direction = Direction.parse(e.get("side").getAsString());
         Num size = Num.of(e.get("homeNotional").getAsString());
         Num price = Num.of(e.get("price").getAsString());
-        ZonedDateTime date = ZonedDateTime.parse(e.get("timestamp").getAsString(), RealTimeFormat);
-        long id = date.toInstant().toEpochMilli();
+        long id;
+        ZonedDateTime date = ZonedDateTime.parse(e.get("timestamp").getAsString(), RealTimeFormat).withZoneSameLocal(Chrono.UTC);
+        if (date.equals(previousDate[0])) {
+            id = decodeId(date) + increment.incrementAndGet();
+        } else {
+            id = decodeId(date);
+            increment.set(0);
+        }
+        previousDate[0] = date;
+
         String tradeId = e.get("trdMatchID").getAsString();
 
         int consecutive = Execution.ConsecutiveDifference;

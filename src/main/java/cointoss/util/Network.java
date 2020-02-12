@@ -45,7 +45,7 @@ public class Network {
     private static final org.apache.logging.log4j.Logger log = LogManager.getLogger(Network.class);
 
     /** The timeout duration. */
-    private static final Duration TIMEOUT = Duration.ofSeconds(5);
+    private static final Duration TIMEOUT = Duration.ofSeconds(20);
 
     /** The proxy server. */
     private static Proxy proxy;
@@ -145,7 +145,7 @@ public class Network {
                     observer.error(new Error("[" + request.url() + "] HTTP Status " + code + " " + value));
                 }
             } catch (Throwable e) {
-                observer.error(new Error("[" + request.url() + "] throws some error.", e));
+                observer.error(new Error("[" + request.url() + "] throws error : " + e.getMessage(), e));
             }
             return disposer;
         });

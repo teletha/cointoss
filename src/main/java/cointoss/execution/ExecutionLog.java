@@ -22,7 +22,6 @@ import java.nio.channels.FileLock;
 import java.nio.channels.OverlappingFileLockException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -558,6 +557,7 @@ public class ExecutionLog {
             this.normal = locateLog(date);
             this.compact = locateCompactLog(date);
             this.fast = locateFastLog(date);
+            enableAutoSave();
         }
 
         /**
@@ -966,10 +966,11 @@ public class ExecutionLog {
         cache.writeNormal();
     }
 
-    public static void main3(String[] args) {
-        restoreNormal(BitMex.XBT_USD, ZonedDateTime.of(2019, 11, 22, 0, 0, 0, 0, ZoneId.systemDefault()));
-        // new ExecutionLog(BitMex.XBT_USD).fromYestaday().to(e -> {
-        // });
+    public static void main(String[] args) {
+        // restoreNormal(BitMex.XBT_USD, ZonedDateTime.of(2019, 11, 22, 0, 0, 0, 0,
+        // ZoneId.systemDefault()));
+        new ExecutionLog(BitMex.XBT_USD).fromYestaday().to(e -> {
+        });
     }
 
     public static void main1(String[] args) {
