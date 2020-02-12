@@ -9,12 +9,15 @@
  */
 package trademate;
 
+import java.util.function.Consumer;
+
 import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.execution.ExecutionLog.LogType;
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.market.bitflyer.SFD;
 import cointoss.util.Primitives;
+import kiss.Disposable;
 import stylist.Style;
 import stylist.StyleDSL;
 import trademate.chart.ChartView;
@@ -132,19 +135,27 @@ public class TradingView extends View {
     }
 
     private void additionalInfo() {
+        Disposable diposer;
+        Consumer<Throwable> error = e -> {
+        };
+
         if (service == BitFlyer.FX_BTC_JPY) {
-            SFD.now().take(chart.showRealtimeUpdate.observing()).on(Viewtify.UIThread).to(e -> {
-                tab.textV(title, price.text(e.ⅰ.price + " (" + e.ⅲ.format(Primitives.DecimalScale2) + "%) " + e.ⅰ.delay));
-            });
+            diposer = SFD.now() //
+                    .take(chart.showRealtimeUpdate.observing())
+                    .on(Viewtify.UIThread)
+                    .to(e -> {
+                        tab.textV(title, price.text(e.ⅰ.price + " (" + e.ⅲ.format(Primitives.DecimalScale2) + "%) " + e.ⅰ.delay));
+                    }, error);
         } else {
-            service.executionsRealtimely()
+            diposer = service.executionsRealtimely()
                     .take(chart.showRealtimeUpdate.observe())
                     .startWith(service.executionLatest())
                     .on(Viewtify.UIThread)
                     .to(e -> {
                         tab.textV(title, price.text(e.price));
-                    });
+                    }, error);
         }
+        service.add(diposer);
     }
 
     /**

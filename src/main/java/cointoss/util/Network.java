@@ -65,6 +65,7 @@ public class Network {
                     .readTimeout(TIMEOUT)
                     .writeTimeout(TIMEOUT)
                     .callTimeout(TIMEOUT)
+                    .retryOnConnectionFailure(true)
                     .proxy(proxy)
                     .build();
 

@@ -308,7 +308,7 @@ public class ExecutionLog {
                         coefficient = Num.max(Num.ONE, coefficient.minus(5));
                         continue;
                     } else {
-                        log.info("REST write from {}.  size {} ({})", rests.getFirst().date, rests.size(), coefficient);
+                        log.info("REST write on " + service + " from {}.  size {} ({})", rests.getFirst().date, rests.size(), coefficient);
 
                         for (Execution execution : rests) {
                             if (!buffer.canSwitch(execution)) {

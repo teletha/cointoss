@@ -76,28 +76,27 @@ public class ExecutionView extends View {
         executionCumulativeList.render((label, e) -> update(label, e, true, scale)).take(takerSize, (e, size) -> size <= e.accumulative);
 
         // load execution log
-        Viewtify.inWorker(() -> {
-            return tradingView.market.timeline.take(tradingView.chart.showRealtimeUpdate.observing()).on(Viewtify.UIThread).to(e -> {
-                executionList.addItemAtFirst(e);
+        tradingView.service
+                .add(tradingView.market.timeline.take(tradingView.chart.showRealtimeUpdate.observing()).on(Viewtify.UIThread).to(e -> {
+                    executionList.addItemAtFirst(e);
 
-                if (100 < executionList.size()) {
-                    executionList.removeItemAtLast();
-                }
-            });
-        });
+                    if (100 < executionList.size()) {
+                        executionList.removeItemAtLast();
+                    }
+                }));
 
         // load big taker log
-        Viewtify.inWorker(() -> {
-            return tradingView.market.timelineByTaker.take(tradingView.chart.showRealtimeUpdate.observing()).on(Viewtify.UIThread).to(e -> {
-                if (1 <= e.accumulative) {
-                    executionCumulativeList.addItemAtFirst(e);
+        tradingView.service.add(tradingView.market.timelineByTaker.take(tradingView.chart.showRealtimeUpdate.observing())
+                .on(Viewtify.UIThread)
+                .to(e -> {
+                    if (1 <= e.accumulative) {
+                        executionCumulativeList.addItemAtFirst(e);
 
-                    if (1000 < executionCumulativeList.size()) {
-                        executionCumulativeList.removeItemAtLast();
+                        if (1000 < executionCumulativeList.size()) {
+                            executionCumulativeList.removeItemAtLast();
+                        }
                     }
-                }
-            });
-        });
+                }));
     }
 
     private void update(UILabel label, Execution e, boolean accum, int scale) {
