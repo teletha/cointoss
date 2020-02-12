@@ -9,11 +9,10 @@
  */
 package cointoss.util;
 
-import static java.util.concurrent.TimeUnit.*;
-
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,7 +45,7 @@ public class Network {
     private static final org.apache.logging.log4j.Logger log = LogManager.getLogger(Network.class);
 
     /** The timeout duration. */
-    private static final long TIMEOUT = 5;
+    private static final Duration TIMEOUT = Duration.ofSeconds(5);
 
     /** The proxy server. */
     private static Proxy proxy;
@@ -62,10 +61,10 @@ public class Network {
     private static synchronized OkHttpClient client() {
         if (client == null) {
             client = new OkHttpClient.Builder() //
-                    .connectTimeout(TIMEOUT, SECONDS)
-                    .readTimeout(TIMEOUT, SECONDS)
-                    .writeTimeout(TIMEOUT, SECONDS)
-                    .callTimeout(TIMEOUT, SECONDS)
+                    .connectTimeout(TIMEOUT)
+                    .readTimeout(TIMEOUT)
+                    .writeTimeout(TIMEOUT)
+                    .callTimeout(TIMEOUT)
                     .proxy(proxy)
                     .build();
 
@@ -282,16 +281,8 @@ public class Network {
                  * {@inheritDoc}
                  */
                 @Override
-                public void onClosing(WebSocket webSocket, int code, String reason) {
-                    System.out.println(code + "   " + reason);
-                }
-
-                /**
-                 * {@inheritDoc}
-                 */
-                @Override
                 public void onClosed(WebSocket webSocket, int code, String reason) {
-                    System.out.println(code + "   " + reason);
+                    System.out.println("Closed " + code + "   " + reason);
                 }
 
                 /**

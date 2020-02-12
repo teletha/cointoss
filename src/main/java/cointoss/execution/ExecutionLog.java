@@ -10,9 +10,9 @@
 package cointoss.execution;
 
 import static cointoss.Direction.*;
-import static java.nio.charset.StandardCharsets.*;
+import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static java.nio.file.StandardOpenOption.*;
-import static java.util.concurrent.TimeUnit.*;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -274,11 +274,13 @@ public class ExecutionLog {
         return new Signal<Execution>((observer, disposer) -> {
             BufferFromRestToRealtime buffer = new BufferFromRestToRealtime(service.setting.executionWithSequentialId, observer::error);
 
-            // read from realtime API
-            disposer.add(service.executionsRealtimely().to(buffer, e -> {
-                System.out.println("Error in realtime " + e);
-                observer.error(e);
-            }));
+            // If you connect to the real-time API first, two errors may occur at the same time for
+            // the real-time API and the REST API (because the real-time API is asynchronous). In
+            // that case, there is a possibility that the retry operation may be hindered.
+            // Therefore, the real-time API will connect after the connection of the REST API
+            // is confirmed.
+            // disposer.add(service.executionsRealtimely().to(buffer, observer::error));
+            boolean activeRealtime = false;
 
             // read from REST API
             int size = service.setting.acquirableExecutionSize();
@@ -286,9 +288,15 @@ public class ExecutionLog {
             Num coefficient = Num.ONE;
 
             while (disposer.isNotDisposed()) {
-                ArrayDeque<Execution> rests = service.executions(startId, startId + coefficient.multiply(size).longValue())
-                        // .retryWhen(service.retryPolicy(500, "REST executions"))
-                        .toCollection(new ArrayDeque(size));
+                ArrayDeque<Execution> rests = new ArrayDeque(size);
+                service.executions(startId, startId + coefficient.multiply(size).longValue()).to(rests::add, observer::error);
+
+                // Since the synchronous REST API did not return an error, it can be determined that
+                // the server is operating normally, so the real-time API is also connected.
+                if (activeRealtime == false) {
+                    activeRealtime = true;
+                    disposer.add(service.executionsRealtimely().to(buffer, observer::error));
+                }
 
                 int retrieved = rests.size();
 
@@ -958,7 +966,7 @@ public class ExecutionLog {
         cache.writeNormal();
     }
 
-    public static void main(String[] args) {
+    public static void main3(String[] args) {
         restoreNormal(BitMex.XBT_USD, ZonedDateTime.of(2019, 11, 22, 0, 0, 0, 0, ZoneId.systemDefault()));
         // new ExecutionLog(BitMex.XBT_USD).fromYestaday().to(e -> {
         // });

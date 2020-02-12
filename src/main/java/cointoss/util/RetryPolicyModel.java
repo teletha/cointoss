@@ -9,7 +9,7 @@
  */
 package cointoss.util;
 
-import static java.time.temporal.ChronoUnit.*;
+import static java.time.temporal.ChronoUnit.MINUTES;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
@@ -18,6 +18,9 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.LongFunction;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.google.common.annotations.VisibleForTesting;
 
@@ -30,8 +33,13 @@ import kiss.WiseRunnable;
 @Icy
 abstract class RetryPolicyModel implements WiseFunction<Signal<Throwable>, Signal<?>> {
 
+    private static final Logger logger = LogManager.getLogger();
+
     @VisibleForTesting
     long count;
+
+    @VisibleForTesting
+    boolean parking;
 
     Future<?> autoReset;
 
@@ -160,8 +168,13 @@ abstract class RetryPolicyModel implements WiseFunction<Signal<Throwable>, Signa
         return List.of();
     }
 
+    /**
+     * Show debuggable message with the specified name.
+     * 
+     * @return
+     */
     @Icy.Property
-    String name() {
+    String debug() {
         return "";
     }
 
@@ -177,7 +190,7 @@ abstract class RetryPolicyModel implements WiseFunction<Signal<Throwable>, Signa
      */
     @Override
     public String toString() {
-        return "RetryPolicy[" + name() + "]";
+        return "RetryPolicy[" + debug() + " @" + count + "]";
     }
 
     /**
@@ -202,7 +215,12 @@ abstract class RetryPolicyModel implements WiseFunction<Signal<Throwable>, Signa
                 }
             }
 
-            return I.signal(e);
+            if (parking) {
+                return I.signal();
+            } else {
+                parking = true;
+                return I.signal(e);
+            }
         }).take(limit()).delay(e -> {
             if (autoReset()) {
                 if (autoReset != null) {
@@ -211,12 +229,14 @@ abstract class RetryPolicyModel implements WiseFunction<Signal<Throwable>, Signa
                 autoReset = I.schedule(delayMaximum().toMillis() * 2, TimeUnit.MILLISECONDS, scheduler(), this::reset);
             }
 
-            Duration d = Chrono.between(delayMinimum(), delay().apply(count++), delayMaximum());
+            Duration duration = Chrono.between(delayMinimum(), delay().apply(count++), delayMaximum());
 
-            return d;
-        }, scheduler()).effect(onRetry).effect(e -> {
-            Duration d = Chrono.between(delayMinimum(), delay().apply(count - 1), delayMaximum());
-            System.out.println(this + " (" + (count) + "times), retry " + d + "   " + e);
-        });
+            String debug = debug();
+            if (debug != null && debug.length() != 0) {
+                logger.info(this + " will retry after " + Chrono.formatAsDuration(duration) + "\t: " + e);
+            }
+
+            return duration;
+        }, scheduler()).effect(() -> parking = false).effect(onRetry);
     }
 }

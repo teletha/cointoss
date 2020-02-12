@@ -319,8 +319,8 @@ public abstract class MarketService implements Disposable {
      * @param max The maximum number to retry.
      * @return
      */
-    public RetryPolicy retryPolicy(int max) {
-        return retryPolicy(max, marketReadableName());
+    public final RetryPolicy retryPolicy(int max) {
+        return retryPolicy(max, null);
     }
 
     /**
@@ -334,7 +334,7 @@ public abstract class MarketService implements Disposable {
                 .delayLinear(Duration.ofSeconds(2))
                 .delayMaximum(Duration.ofMinutes(2))
                 .scheduler(scheduler())
-                .name(name);
+                .debug(name == null || name.length() == 0 ? null : marketIdentity() + " : " + name);
     }
 
     /**

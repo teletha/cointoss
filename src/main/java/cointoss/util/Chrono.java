@@ -241,7 +241,17 @@ public class Chrono {
      * @return
      */
     public static String formatAsDuration(ZonedDateTime start, ZonedDateTime end) {
-        return formatAsDuration(Duration.between(start, end).toMillis());
+        return formatAsDuration(Duration.between(start, end));
+    }
+
+    /**
+     * Format the duration to human-readable expression.
+     * 
+     * @param mills
+     * @return
+     */
+    public static String formatAsDuration(Duration duration) {
+        return formatAsDuration(duration.toMillis());
     }
 
     /**
