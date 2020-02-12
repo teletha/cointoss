@@ -557,7 +557,6 @@ public class ExecutionLog {
             this.normal = locateLog(date);
             this.compact = locateCompactLog(date);
             this.fast = locateFastLog(date);
-            enableAutoSave();
         }
 
         /**
