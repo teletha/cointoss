@@ -84,13 +84,12 @@ class BitMexService extends MarketService {
         start++;
         long startingPoint = start % padding;
         AtomicLong increment = new AtomicLong(startingPoint - 1);
-        Object[] consectives = new Object[2];
-        ZonedDateTime[] previousDate = new ZonedDateTime[] {encodeId(start)};
+        Object[] previous = new Object[] {null, encodeId(start)};
 
         return call("GET", "trade?symbol=" + marketName + "&count=1000" + "&startTime=" + formatEncodedId(start) + "&start=" + startingPoint)
                 .flatIterable(JsonElement::getAsJsonArray)
                 .map(json -> {
-                    return convert(json, increment, consectives, previousDate);
+                    return convert(json, increment, previous);
                 });
     }
 
@@ -116,8 +115,7 @@ class BitMexService extends MarketService {
         command.args.add("trade:" + marketName);
 
         AtomicLong increment = new AtomicLong();
-        Object[] consecutives = new Object[2];
-        ZonedDateTime[] previousDate = new ZonedDateTime[1];
+        Object[] previous = new Object[2];
 
         return network.websocket("wss://www.bitmex.com/realtime", command).flatMap(json -> {
             JsonArray array = json.getAsJsonObject().getAsJsonArray("data");
@@ -125,7 +123,7 @@ class BitMexService extends MarketService {
             if (array == null) {
                 return I.signal();
             } else {
-                return I.signal(array).map(e -> convert(e, increment, consecutives, previousDate));
+                return I.signal(array).map(e -> convert(e, increment, previous));
             }
         });
     }
@@ -135,7 +133,8 @@ class BitMexService extends MarketService {
      */
     @Override
     public Signal<Execution> executionLatest() {
-        return null;
+        return call("GET", "/trade?symbol=" + marketName + "&count=1&reverse=true").flatIterable(JsonElement::getAsJsonArray)
+                .map(json -> convert(json, new AtomicLong(), new Object[2]));
     }
 
     /**
@@ -209,31 +208,35 @@ class BitMexService extends MarketService {
      * @param previous
      * @return
      */
-    private Execution convert(JsonElement json, AtomicLong increment, Object[] consectives, ZonedDateTime[] previousDate) {
+    private Execution convert(JsonElement json, AtomicLong increment, Object[] previous) {
         JsonObject e = json.getAsJsonObject();
 
         Direction direction = Direction.parse(e.get("side").getAsString());
         Num size = Num.of(e.get("homeNotional").getAsString());
         Num price = Num.of(e.get("price").getAsString());
-        long id;
         ZonedDateTime date = ZonedDateTime.parse(e.get("timestamp").getAsString(), RealTimeFormat).withZoneSameLocal(Chrono.UTC);
-        if (date.equals(previousDate[0])) {
+        String tradeId = e.get("trdMatchID").getAsString();
+        long id;
+        int consecutive;
+
+        if (date.equals(previous[1])) {
             id = decodeId(date) + increment.incrementAndGet();
+
+            if (direction != previous[0]) {
+                consecutive = Execution.ConsecutiveDifference;
+            } else if (direction == Direction.BUY) {
+                consecutive = Execution.ConsecutiveSameBuyer;
+            } else {
+                consecutive = Execution.ConsecutiveSameSeller;
+            }
         } else {
             id = decodeId(date);
             increment.set(0);
+            consecutive = Execution.ConsecutiveDifference;
         }
-        previousDate[0] = date;
 
-        String tradeId = e.get("trdMatchID").getAsString();
-
-        int consecutive = Execution.ConsecutiveDifference;
-
-        if (consectives[0] == direction && consectives[1].equals(date)) {
-            consecutive = direction == Direction.BUY ? Execution.ConsecutiveSameBuyer : Execution.ConsecutiveSameSeller;
-        }
-        consectives[0] = direction;
-        consectives[1] = date;
+        previous[0] = direction;
+        previous[1] = date;
 
         return Execution.with.direction(direction, size).id(id).price(price).date(date).consecutive(consecutive).buyer(tradeId);
     }

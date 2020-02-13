@@ -38,9 +38,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.logging.log4j.LogManager;
@@ -855,12 +853,6 @@ public class ExecutionLog {
         /** The upper error handler. */
         private final Consumer<? super Throwable> error;
 
-        /** The locally managed sequential id. */
-        private final AtomicLong id = new AtomicLong();
-
-        /** The id rewriter. (default is not rewritable) */
-        private Function<Execution, Execution> rewriter = Function.identity();
-
         /** The actual realtime execution buffer. */
         private ConcurrentLinkedDeque<Execution> realtime = new ConcurrentLinkedDeque();
 
@@ -885,7 +877,7 @@ public class ExecutionLog {
          */
         @Override
         public void accept(Execution e) {
-            destination.accept(rewriter.apply(e));
+            destination.accept(e);
         }
 
         /**
@@ -921,16 +913,11 @@ public class ExecutionLog {
         private void switchToRealtime(long currentId, Observer<? super Execution> observer) {
             log.info(service.marketIdentity() + " switch to Realtime API.");
 
-            if (!sequntial) {
-                id.set(currentId);
-                rewriter = e -> e.assignId(id.getAndIncrement());
-            }
-
             while (!realtime.isEmpty()) {
                 ConcurrentLinkedDeque<Execution> buffer = realtime;
                 realtime = new ConcurrentLinkedDeque();
                 for (Execution e : buffer) {
-                    observer.accept(rewriter.apply(e));
+                    observer.accept(e);
                 }
                 log.info("Realtime buffer write from {} to {}.  size {}", buffer.peek().date, buffer.peekLast().date, buffer.size());
             }
