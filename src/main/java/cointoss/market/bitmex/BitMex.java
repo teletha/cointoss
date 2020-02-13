@@ -21,7 +21,7 @@ public final class BitMex extends MarketServiceProvider {
     /** Reusable market configuration. */
     private static MarketSetting FiatBaseSetting = MarketSetting.with.baseCurrencyMinimumBidPrice(Num.of("0.5"))
             .targetCurrencyMinimumBidSize(Num.of("0.00001"))
-            .orderBookGroupRanges(Num.of(50, 100, 250, 500, 1000, 2500, 5000))
+            .orderBookGroupRanges(Num.of(5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000))
             .baseCurrencyScaleSize(1)
             .targetCurrencyScaleSize(5)
             .acquirableExecutionSize(1000);

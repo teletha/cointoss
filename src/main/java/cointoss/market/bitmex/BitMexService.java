@@ -25,6 +25,7 @@ import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.execution.Execution;
 import cointoss.order.Order;
+import cointoss.order.OrderBoard;
 import cointoss.order.OrderBookChange;
 import cointoss.order.OrderState;
 import cointoss.util.APILimiter;
@@ -166,7 +167,24 @@ class BitMexService extends MarketService {
      */
     @Override
     public Signal<OrderBookChange> orderBook() {
-        return I.signal();
+        return call("GET", "orderBook/L2?depth=400&symbol=" + marketName).map(this::convertOrderBook);
+    }
+
+    private OrderBookChange convertOrderBook(JsonElement e) {
+        OrderBookChange change = new OrderBookChange();
+        for (JsonElement element : e.getAsJsonArray()) {
+            JsonObject o = element.getAsJsonObject();
+            Num price = Num.of(o.get("price").getAsString());
+            Num size = Num.of(o.get("size").getAsString());
+            size = size.divide(price);
+
+            if (o.get("side").getAsString().equals("Buy")) {
+                change.bids.add(new OrderBoard(price, size.doubleValue()));
+            } else {
+                change.asks.add(new OrderBoard(price, size.doubleValue()));
+            }
+        }
+        return change;
     }
 
     /**
@@ -271,5 +289,11 @@ class BitMexService extends MarketService {
         public String op;
 
         public List<String> args = new ArrayList();
+    }
+
+    public static void main(String[] args) {
+        BitMex.XBT_USD.orderBook().to(c -> {
+            System.out.println(c);
+        });
     }
 }

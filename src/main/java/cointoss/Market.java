@@ -93,6 +93,9 @@ public class Market implements Disposable {
     /** The managed {@link Trader}. */
     public final MutableList<Trader> traders = managedTraders.asUnmodifiable();
 
+    /** Flag */
+    private boolean readingLog = false;
+
     /**
      * Build {@link Market} with the specified {@link MarketServiceProvider}.
      * 
@@ -131,7 +134,7 @@ public class Market implements Disposable {
             orderBook.shorts.update(board.asks);
             orderBook.longs.update(board.bids);
         }));
-        service.add(timeline.throttle(2, TimeUnit.SECONDS).to(e -> {
+        service.add(timeline.skipWhile(e -> readingLog).throttle(2, TimeUnit.SECONDS).to(e -> {
             // fix error board
             orderBook.shorts.fix(e.price);
             orderBook.longs.fix(e.price);
@@ -291,7 +294,9 @@ public class Market implements Disposable {
      * @return
      */
     public final Market readLog(Function<ExecutionLog, Signal<Execution>> log) {
+        readingLog = true;
         service.add(log.apply(service.log).to(timelineObservers));
+        readingLog = false;
 
         return this;
     }
