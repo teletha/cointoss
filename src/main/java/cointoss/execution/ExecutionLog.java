@@ -269,7 +269,7 @@ public class ExecutionLog {
      */
     private Signal<Execution> network() {
         return new Signal<Execution>((observer, disposer) -> {
-            BufferFromRestToRealtime buffer = new BufferFromRestToRealtime(service.setting.executionWithSequentialId, observer::error);
+            BufferFromRestToRealtime buffer = new BufferFromRestToRealtime(observer::error);
 
             // If you connect to the real-time API first, two errors may occur at the same time for
             // the real-time API and the REST API (because the real-time API is asynchronous). In
@@ -847,9 +847,6 @@ public class ExecutionLog {
      */
     private class BufferFromRestToRealtime implements Observer<Execution> {
 
-        /** The flag whether execution record holds the sequential id or not. */
-        private final boolean sequntial;
-
         /** The upper error handler. */
         private final Consumer<? super Throwable> error;
 
@@ -867,8 +864,7 @@ public class ExecutionLog {
          * 
          * @param sequntial
          */
-        private BufferFromRestToRealtime(boolean sequntial, Consumer<? super Throwable> error) {
-            this.sequntial = sequntial;
+        private BufferFromRestToRealtime(Consumer<? super Throwable> error) {
             this.error = error;
         }
 
@@ -901,7 +897,7 @@ public class ExecutionLog {
             if (first == null) {
                 return false;
             }
-            return sequntial ? e.id == first.id : e.buyer.equals(first.buyer);
+            return service.checkEquality(e, first);
         }
 
         /**

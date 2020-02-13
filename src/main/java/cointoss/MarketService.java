@@ -162,6 +162,17 @@ public abstract class MarketService implements Disposable {
     public abstract Signal<Execution> executionLatest();
 
     /**
+     * Checks whether the specified {@link Execution}s are the same.
+     * 
+     * @param one Non-null target.
+     * @param other Non-null target.
+     * @return Result.
+     */
+    public boolean checkEquality(Execution one, Execution other) {
+        return one.id == other.id;
+    }
+
+    /**
      * Estimate the inital execution id of the {@link Market}.
      * 
      * @return

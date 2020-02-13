@@ -96,14 +96,4 @@ interface MarketSettingModel {
     default Class<? extends ExecutionLogger> executionLogger() {
         return ExecutionDeltaLogger.class;
     }
-
-    /**
-     * Configure {@link ExecutionLog} parser.
-     * 
-     * @return
-     */
-    @Icy.Property
-    default boolean executionWithSequentialId() {
-        return true;
-    }
 }

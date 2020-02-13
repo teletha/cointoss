@@ -202,6 +202,14 @@ class BitMexService extends MarketService {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean checkEquality(Execution one, Execution other) {
+        return one.buyer.equals(other.buyer);
+    }
+
+    /**
      * Convert to {@link Execution}.
      * 
      * @param json

@@ -95,9 +95,6 @@ public abstract class MarketSetting implements MarketSettingModel {
     /** The final property updater. */
     private static final MethodHandle executionLoggerUpdater = updater("executionLogger");
 
-    /** The final property updater. */
-    private static final MethodHandle executionWithSequentialIdUpdater = updater("executionWithSequentialId");
-
     /** The exposed property. */
     public final Num baseCurrencyMinimumBidPrice;
 
@@ -122,9 +119,6 @@ public abstract class MarketSetting implements MarketSettingModel {
     /** The exposed property. */
     public final Class<? extends ExecutionLogger> executionLogger;
 
-    /** The exposed property. */
-    public final boolean executionWithSequentialId;
-
     /**
      * HIDE CONSTRUCTOR
      */
@@ -137,7 +131,6 @@ public abstract class MarketSetting implements MarketSettingModel {
         this.targetCurrencyScaleSize = MarketSettingModel.super.targetCurrencyScaleSize();
         this.acquirableExecutionSize = MarketSettingModel.super.acquirableExecutionSize();
         this.executionLogger = MarketSettingModel.super.executionLogger();
-        this.executionWithSequentialId = MarketSettingModel.super.executionWithSequentialId();
     }
 
     /** Get the minimum bid price of the base currency. */
@@ -396,39 +389,6 @@ public abstract class MarketSetting implements MarketSettingModel {
     }
 
     /**
-     * Configure {@link ExecutionLog} parser.
-     *  
-     *  @return
-     */
-    @Override
-    public final boolean executionWithSequentialId() {
-        return this.executionWithSequentialId;
-    }
-
-    /**
-     * Provide classic getter API.
-     *
-     * @return A value of executionWithSequentialId property.
-     */
-    @SuppressWarnings("unused")
-    private final boolean getExecutionWithSequentialId() {
-        return this.executionWithSequentialId;
-    }
-
-    /**
-     * Provide classic setter API.
-     *
-     * @paran value A new value of executionWithSequentialId property to assign.
-     */
-    private final void setExecutionWithSequentialId(boolean value) {
-        try {
-            executionWithSequentialIdUpdater.invoke(this, value);
-        } catch (Throwable e) {
-            throw quiet(e);
-        }
-    }
-
-    /**
      * Show all property values.
      *
      * @return All property values.
@@ -443,8 +403,7 @@ public abstract class MarketSetting implements MarketSettingModel {
         builder.append("baseCurrencyScaleSize=").append(baseCurrencyScaleSize).append(", ");
         builder.append("targetCurrencyScaleSize=").append(targetCurrencyScaleSize).append(", ");
         builder.append("acquirableExecutionSize=").append(acquirableExecutionSize).append(", ");
-        builder.append("executionLogger=").append(executionLogger).append(", ");
-        builder.append("executionWithSequentialId=").append(executionWithSequentialId).append("]");
+        builder.append("executionLogger=").append(executionLogger).append("]");
         return builder.toString();
     }
 
@@ -455,7 +414,7 @@ public abstract class MarketSetting implements MarketSettingModel {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(baseCurrencyMinimumBidPrice, targetCurrencyMinimumBidSize, orderBookGroupRanges, targetCurrencyBidSizes, baseCurrencyScaleSize, targetCurrencyScaleSize, acquirableExecutionSize, executionLogger, executionWithSequentialId);
+        return Objects.hash(baseCurrencyMinimumBidPrice, targetCurrencyMinimumBidSize, orderBookGroupRanges, targetCurrencyBidSizes, baseCurrencyScaleSize, targetCurrencyScaleSize, acquirableExecutionSize, executionLogger);
     }
 
     /**
@@ -478,7 +437,6 @@ public abstract class MarketSetting implements MarketSettingModel {
         if (targetCurrencyScaleSize != other.targetCurrencyScaleSize) return false;
         if (acquirableExecutionSize != other.acquirableExecutionSize) return false;
         if (!Objects.equals(executionLogger, other.executionLogger)) return false;
-        if (executionWithSequentialId != other.executionWithSequentialId) return false;
         return true;
     }
 
@@ -621,17 +579,6 @@ public abstract class MarketSetting implements MarketSettingModel {
             ((MarketSetting) this).setExecutionLogger(value);
             return (Next) this;
         }
-
-        /**
-         * Assign executionWithSequentialId property.
-         * 
-         * @param value A new value to assign.
-         * @return The next assignable model.
-         */
-        default Next executionWithSequentialId(boolean value) {
-            ((MarketSetting) this).setExecutionWithSequentialId(value);
-            return (Next) this;
-        }
     }
 
     /**
@@ -658,6 +605,5 @@ public abstract class MarketSetting implements MarketSettingModel {
         static final String TargetCurrencyScaleSize = "targetCurrencyScaleSize";
         static final String AcquirableExecutionSize = "acquirableExecutionSize";
         static final String ExecutionLogger = "executionLogger";
-        static final String ExecutionWithSequentialId = "executionWithSequentialId";
     }
 }
