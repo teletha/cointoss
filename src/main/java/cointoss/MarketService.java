@@ -100,8 +100,8 @@ public abstract class MarketService implements Disposable {
      * 
      * @return A human-readable name.
      */
-    public String marketReadableName() {
-        return marketIdentity().replaceAll("_", " ");
+    public final String marketReadableName() {
+        return marketIdentity().replaceAll("_", "");
     }
 
     /**

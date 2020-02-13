@@ -951,7 +951,7 @@ public class ExecutionLog {
     public static void main(String[] args) {
         // restoreNormal(BitMex.XBT_USD, ZonedDateTime.of(2019, 11, 22, 0, 0, 0, 0,
         // ZoneId.systemDefault()));
-        new ExecutionLog(BitMex.XBT_USD).fromYestaday().to(e -> {
+        new ExecutionLog(BitMex.ETH_USD).fromYestaday().to(e -> {
         });
     }
 

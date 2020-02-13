@@ -142,7 +142,7 @@ class BitMexService extends MarketService {
      */
     @Override
     public long estimateInitialExecutionId() {
-        return decodeId(Chrono.utc(2020, 1, 1));
+        return decodeId(Chrono.utc(2020, 1, 1).minusMinutes(3));
     }
 
     /**

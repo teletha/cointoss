@@ -19,6 +19,7 @@ import org.apache.logging.log4j.Logger;
 
 import cointoss.MarketService;
 import cointoss.market.bitflyer.BitFlyer;
+import cointoss.market.bitmex.BitMex;
 import cointoss.util.Chrono;
 import cointoss.util.Network;
 import kiss.I;
@@ -59,7 +60,7 @@ public class TradeMate extends View {
     protected void initialize() {
         main.policy(TabClosingPolicy.UNAVAILABLE).load("Setting", SettingView.class).load("Back Test", BackTestView.class);
 
-        List<MarketService> services = List.of(BitFlyer.FX_BTC_JPY, BitFlyer.BTC_JPY, BitFlyer.ETH_JPY, BitFlyer.BCH_BTC);
+        List<MarketService> services = List.of(BitFlyer.FX_BTC_JPY, BitFlyer.BTC_JPY, BitFlyer.ETH_JPY, BitFlyer.BCH_BTC, BitMex.XBT_USD);
         for (MarketService service : services) {
             loadTabFor(service);
         }
