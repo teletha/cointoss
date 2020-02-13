@@ -247,7 +247,10 @@ public class BackTestView extends View implements Analyzer {
     @Override
     protected void initialize() {
         chart.chart.axisX.paddingRight.set(0);
-        marketSelection.initialize(MarketServiceProvider.availableMarketServices());
+        marketSelection.initialize(MarketServiceProvider.availableMarketServices())
+                .render(MarketService::marketReadableName)
+                .renderSelected(MarketService::marketReadableName);
+
         fastLog.initialize(false)
                 .text(en("Use Fast Log"))
                 .tooltip(en("Run backtests very fast using compressed execution history.\r\nHowever, the execution result may be inaccurate."));

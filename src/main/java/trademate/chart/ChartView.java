@@ -120,7 +120,7 @@ public class ChartView extends View {
                 .to(ticker::set);
 
         if (findAncestorView(BackTestView.class).isAbsent()) {
-            span.textWhen(v -> v.combineLatest(Chrono.seconds()).map(x -> {
+            span.renderSelectedWhen(v -> v.combineLatest(Chrono.seconds()).map(x -> {
                 return Chrono.formatAsDuration(x.ⅱ, x.ⅰ.calculateNextStartTime(x.ⅱ)) + " / " + x.ⅰ;
             }));
         }
