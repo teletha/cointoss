@@ -130,7 +130,7 @@ public class Market implements Disposable {
         RetryPolicy policy = service.retryPolicy(500, "OrderBook");
 
         // orderbook management
-        service.add(service.orderBook().retryWhen(policy).to(board -> {
+        service.add(service.orderBookRealtimely().retryWhen(policy).to(board -> {
             orderBook.shorts.update(board.asks);
             orderBook.longs.update(board.bids);
         }));

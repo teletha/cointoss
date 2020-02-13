@@ -258,7 +258,7 @@ public abstract class MarketService implements Disposable {
      */
     public final synchronized Signal<OrderBookChange> orderBookRealtimely() {
         if (orderBooks == null) {
-            orderBooks = connectOrderBookRealtimely().effectOnObserve(disposer::add).share();
+            orderBooks = orderBook().concat(connectOrderBookRealtimely()).effectOnObserve(disposer::add).share();
         }
         return orderBooks;
     }

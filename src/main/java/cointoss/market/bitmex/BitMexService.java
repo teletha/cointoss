@@ -43,12 +43,21 @@ class BitMexService extends MarketService {
     /** The bitflyer API limit. */
     private static final APILimiter Limit = APILimiter.with.limit(60).refresh(Duration.ofMinutes(1));
 
+    /** The market id. */
+    private final int id;
+
+    /** The instrument tick size. */
+    private final Num instrumentTickSize;
+
     /**
      * @param marketName
      * @param setting
      */
-    BitMexService(String marketName, MarketSetting setting) {
+    BitMexService(int id, String marketName, MarketSetting setting) {
         super("BitMEX", marketName, setting);
+
+        this.id = id;
+        this.instrumentTickSize = marketName.equals("XBTUSD") ? Num.of("0.01") : setting.baseCurrencyMinimumBidPrice;
     }
 
     /**
@@ -192,7 +201,41 @@ class BitMexService extends MarketService {
      */
     @Override
     protected Signal<OrderBookChange> connectOrderBookRealtimely() {
-        return I.signal();
+        WebSocketCommand command = new WebSocketCommand();
+        command.op = "subscribe";
+        command.args.add("orderBookL2_25:" + marketName);
+
+        return network.websocket("wss://www.bitmex.com/realtime", command).flatMap(json -> {
+            JsonObject root = json.getAsJsonObject();
+            JsonElement table = root.get("table");
+
+            if (table == null) {
+                return I.signal();
+            }
+
+            String type = table.getAsString();
+
+            if ("orderBookL2_25".equals(type)) {
+                OrderBookChange change = new OrderBookChange();
+                for (JsonElement e : root.get("data").getAsJsonArray()) {
+                    JsonObject o = e.getAsJsonObject();
+                    long id = o.get("id").getAsLong();
+                    Num price = instrumentTickSize.multiply((100000000L * this.id) - id);
+                    String side = o.get("side").getAsString();
+                    JsonElement sizeElement = o.get("size");
+                    double size = sizeElement == null ? 0 : sizeElement.getAsDouble() / price.doubleValue();
+
+                    if (side.equals("Buy")) {
+                        change.bids.add(new OrderBoard(price, size));
+                    } else {
+                        change.asks.add(new OrderBoard(price, size));
+                    }
+                }
+                return I.signal(change);
+            } else {
+                return I.signal();
+            }
+        });
     }
 
     /**
@@ -292,8 +335,7 @@ class BitMexService extends MarketService {
     }
 
     public static void main(String[] args) {
-        BitMex.XBT_USD.orderBook().to(c -> {
-            System.out.println(c);
+        BitMex.XBT_USD.orderBookRealtimely().to(c -> {
         });
     }
 }

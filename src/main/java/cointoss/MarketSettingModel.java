@@ -28,11 +28,21 @@ interface MarketSettingModel {
     @Icy.Property
     Num baseCurrencyMinimumBidPrice();
 
+    @Icy.Overload("baseCurrencyMinimumBidPrice")
+    private Num baseCurrencyMinimumBidPrice(String price) {
+        return Num.of(price);
+    }
+
     /**
      * Get the minimum bid size of the target currency.
      */
     @Icy.Property
     Num targetCurrencyMinimumBidSize();
+
+    @Icy.Overload("targetCurrencyMinimumBidSize")
+    private Num targetCurrencyMinimumBidSize(String price) {
+        return Num.of(price);
+    }
 
     @Icy.Intercept("targetCurrencyMinimumBidSize")
     private Num deriveByMinBid(Num minBid, Consumer<List<Num>> targetCurrencyBidSizes) {

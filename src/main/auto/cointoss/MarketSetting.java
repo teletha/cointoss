@@ -6,6 +6,7 @@ import cointoss.execution.ExecutionLogger;
 import cointoss.util.Num;
 import java.lang.Class;
 import java.lang.Override;
+import java.lang.String;
 import java.lang.StringBuilder;
 import java.lang.Throwable;
 import java.lang.invoke.MethodHandle;
@@ -51,6 +52,12 @@ public abstract class MarketSetting implements MarketSettingModel {
             throw quiet(e);
         }
     }
+
+    /** The overload or intercept method invoker. */
+    private static final MethodHandle baseCurrencyMinimumBidPrice$927011984= invoker("baseCurrencyMinimumBidPrice", String.class);
+
+    /** The overload or intercept method invoker. */
+    private static final MethodHandle targetCurrencyMinimumBidSize$927011984= invoker("targetCurrencyMinimumBidSize", String.class);
 
     /** The overload or intercept method invoker. */
     private static final MethodHandle deriveByMinBid$473121199= invoker("deriveByMinBid", Num.class, Consumer.class);
@@ -458,6 +465,17 @@ public abstract class MarketSetting implements MarketSettingModel {
             o.baseCurrencyMinimumBidPrice(baseCurrencyMinimumBidPrice);
             return o;
         }
+
+        /**
+         * Create new {@link MarketSetting} with the specified baseCurrencyMinimumBidPrice property.
+         * 
+         * @return The next assignable model.
+         */
+        public ÅssignableTargetCurrencyMinimumBidSize<ÅssignableOrderBookGroupRanges<Self>> baseCurrencyMinimumBidPrice(String price) {
+            Åssignable o = new Åssignable();
+            o.baseCurrencyMinimumBidPrice(price);
+            return o;
+        }
     }
 
     /**
@@ -475,6 +493,19 @@ public abstract class MarketSetting implements MarketSettingModel {
             ((MarketSetting) this).setBaseCurrencyMinimumBidPrice(value);
             return (Next) this;
         }
+
+        /**
+         * Assign baseCurrencyMinimumBidPrice property.
+         * 
+         * @return The next assignable model.
+         */
+        default Next baseCurrencyMinimumBidPrice(String price) {
+            try {
+                return baseCurrencyMinimumBidPrice((Num) baseCurrencyMinimumBidPrice$927011984.invoke(this, price));
+            } catch (Throwable e) {
+                throw quiet(e);
+            }
+        }
     }
 
     /**
@@ -491,6 +522,19 @@ public abstract class MarketSetting implements MarketSettingModel {
         default Next targetCurrencyMinimumBidSize(Num value) {
             ((MarketSetting) this).setTargetCurrencyMinimumBidSize(value);
             return (Next) this;
+        }
+
+        /**
+         * Assign targetCurrencyMinimumBidSize property.
+         * 
+         * @return The next assignable model.
+         */
+        default Next targetCurrencyMinimumBidSize(String price) {
+            try {
+                return targetCurrencyMinimumBidSize((Num) targetCurrencyMinimumBidSize$927011984.invoke(this, price));
+            } catch (Throwable e) {
+                throw quiet(e);
+            }
         }
     }
 

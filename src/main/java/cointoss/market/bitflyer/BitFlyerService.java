@@ -557,15 +557,6 @@ class BitFlyerService extends MarketService {
      */
     @Override
     public Signal<OrderBookChange> orderBook() {
-        return snapshotOrderBook().concat(orderBookRealtimely());
-    }
-
-    /**
-     * Snapshot order book info.
-     * 
-     * @return
-     */
-    private Signal<OrderBookChange> snapshotOrderBook() {
         return call("PUBLIC", "/v1/board?product_code=" + marketName, "", "", OrderBookChange.class);
     }
 
