@@ -445,4 +445,36 @@ class ScenarioTest extends TraderTestSupport {
         assert s.exitSize.is(1);
         assert s.exitExecutedSize.is(1);
     }
+
+    @Test
+    void testName() {
+        when(now(), v -> new Scenario() {
+            @Override
+            protected void entry() {
+                entry(Direction.BUY, 1, s -> s.make(10));
+            }
+
+            @Override
+            protected void exit() {
+                exitAt(20);
+                exitWhen(market.timeline.take(e -> e.price.isGreaterThan(20)), o -> o.take());
+            }
+        });
+
+        Scenario s = latest();
+        assert s.exits.size() == 0;
+
+        market.perform(Execution.with.buy(1).price(9));
+        market.elapse(1, SECONDS);
+        assert s.exits.size() == 2; // exit is ordered
+        assert s.entryExecutedSize.is(1);
+        assert s.exitExecutedSize.is(0);
+        assert s.exitSize.is(2);
+
+        market.perform(Execution.with.buy(2).price(21)); // trigger stop
+        assert s.exits.size() == 2; // stop is ordered
+        assert s.entryExecutedSize.is(1);
+        assert s.exitExecutedSize.is(1);
+        assert s.exitSize.is(1);
+    }
 }

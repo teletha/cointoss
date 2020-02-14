@@ -363,13 +363,18 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
     protected final void exitAt(Variable<Num> price, Consumer<Orderable> strategy) {
         if (entryPrice.isLessThan(directional, price)) {
             disposerForExit.add(observeEntryExecutedSizeDiff().debounce(1, SECONDS, market.service.scheduler()).to(size -> {
-                market.request(directional.inverse(), entryExecutedSize.minus(exitSize), strategy).to(this::processExitOrder);
+                market.request(directional.inverse(), entryExecutedSize.minus(exitSize), strategy).to(o -> {
+                    processExitOrder(o, "exitAt");
+                });
             }));
         } else {
             disposerForExit.add(market.tickers.latestPrice.observe().take(p -> p.isLessThanOrEqual(directional, price)).first().to(e -> {
                 disposeEntry();
 
-                market.request(directional.inverse(), entryExecutedSize.minus(exitExecutedSize), strategy).to(this::processExitOrder);
+                System.out.println(this);
+                market.request(directional.inverse(), entryExecutedSize.minus(exitExecutedSize), strategy).to(o -> {
+                    processExitOrder(o, "exitAtStopLoss");
+                });
             }));
         }
     }
@@ -383,7 +388,9 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
      */
     protected final void exitWhen(Signal<?> timing, Consumer<Orderable> strategy) {
         disposerForExit.add(timing.first().to(() -> {
-            market.request(directional.inverse(), entryExecutedSize.minus(exitExecutedSize), strategy).to(this::processExitOrder);
+            market.request(directional.inverse(), entryExecutedSize.minus(exitExecutedSize), strategy).to(e -> {
+                processExitOrder(e, "exitWhen");
+            });
         }));
     }
 
@@ -413,10 +420,10 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
      * 
      * @param order
      */
-    private void processExitOrder(Order order) {
+    private void processExitOrder(Order order, String type) {
         exits.add(order);
         setExitSize(exitSize.plus(order.size));
-        logExit("Process exit order");
+        logExit("Process exit order [" + type + "]" + market.service.now());
 
         order.observeExecutedSize().to(v -> {
             Num previous = realizedProfit;
@@ -425,7 +432,7 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
             updateOrderRelatedStatus(exits, this::setExitPrice, this::setExitExecutedSize);
             trader.updateSnapshot(direction(), realizedProfit.minus(previous), deltaSize.negate(), null);
 
-            logExit("Update exit order[" + deltaSize + "   " + v + "]");
+            logExit("Update exit order[" + deltaSize + "   " + v + "]" + market.service.now());
         });
     }
 
