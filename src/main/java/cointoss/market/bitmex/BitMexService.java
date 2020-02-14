@@ -120,22 +120,10 @@ class BitMexService extends MarketService {
      */
     @Override
     protected Signal<Execution> connectExecutionRealtimely() {
-        WebSocketCommand command = new WebSocketCommand();
-        command.op = "subscribe";
-        command.args.add("trade:" + marketName);
-
         AtomicLong increment = new AtomicLong();
         Object[] previous = new Object[2];
 
-        return network.websocket("wss://www.bitmex.com/realtime", command).flatMap(json -> {
-            JsonArray array = json.getAsJsonObject().getAsJsonArray("data");
-
-            if (array == null) {
-                return I.signal();
-            } else {
-                return I.signal(array).map(e -> convert(e, increment, previous));
-            }
-        });
+        return connectSharedWebSocket(Topic.trade).flatIterable(e -> e).map(e -> convert(e, increment, previous));
     }
 
     /**
@@ -201,40 +189,22 @@ class BitMexService extends MarketService {
      */
     @Override
     protected Signal<OrderBookChange> connectOrderBookRealtimely() {
-        WebSocketCommand command = new WebSocketCommand();
-        command.op = "subscribe";
-        command.args.add("orderBookL2_25:" + marketName);
+        return connectSharedWebSocket(Topic.orderBookL2_25).map(x -> {
+            OrderBookChange change = new OrderBookChange();
+            for (JsonElement e : x) {
+                JsonObject o = e.getAsJsonObject();
+                long id = o.get("id").getAsLong();
+                Num price = instrumentTickSize.multiply((100000000L * this.id) - id);
+                JsonElement sizeElement = o.get("size");
+                double size = sizeElement == null ? 0 : sizeElement.getAsDouble() / price.doubleValue();
 
-        return network.websocket("wss://www.bitmex.com/realtime", command).flatMap(json -> {
-            JsonObject root = json.getAsJsonObject();
-            JsonElement table = root.get("table");
-
-            if (table == null) {
-                return I.signal();
-            }
-
-            String type = table.getAsString();
-
-            if ("orderBookL2_25".equals(type)) {
-                OrderBookChange change = new OrderBookChange();
-                for (JsonElement e : root.get("data").getAsJsonArray()) {
-                    JsonObject o = e.getAsJsonObject();
-                    long id = o.get("id").getAsLong();
-                    Num price = instrumentTickSize.multiply((100000000L * this.id) - id);
-                    String side = o.get("side").getAsString();
-                    JsonElement sizeElement = o.get("size");
-                    double size = sizeElement == null ? 0 : sizeElement.getAsDouble() / price.doubleValue();
-
-                    if (side.equals("Buy")) {
-                        change.bids.add(new OrderBoard(price, size));
-                    } else {
-                        change.asks.add(new OrderBoard(price, size));
-                    }
+                if (o.get("side").getAsString().charAt(0) == 'B') {
+                    change.bids.add(new OrderBoard(price, size));
+                } else {
+                    change.asks.add(new OrderBoard(price, size));
                 }
-                return I.signal(change);
-            } else {
-                return I.signal();
             }
+            return change;
         });
     }
 
@@ -323,6 +293,43 @@ class BitMexService extends MarketService {
         return network.rest(request, Limit);
     }
 
+    /** The shared websocket. */
+    private Signal<JsonElement> websocket;
+
+    /**
+     * Build shared websocket connection for this market.
+     * 
+     * @return
+     */
+    private synchronized Signal<JsonArray> connectSharedWebSocket(Topic topic) {
+        if (websocket == null) {
+            WebSocketCommand command = new WebSocketCommand();
+            command.op = "subscribe";
+            for (Topic type : Topic.values()) {
+                command.args.add(type + ":" + marketName);
+            }
+
+            websocket = network.websocket("wss://www.bitmex.com/realtime", command);
+        }
+
+        return websocket.share().flatMap(e -> {
+            JsonObject root = e.getAsJsonObject();
+            JsonElement tableProperty = root.get("table");
+            if (tableProperty == null || !tableProperty.getAsString().equals(topic.name())) {
+                return I.signal();
+            } else {
+                return I.signal(root.get("data")).map(JsonElement::getAsJsonArray);
+            }
+        });
+    }
+
+    /**
+     * Subscription topics for websocket.
+     */
+    private enum Topic {
+        trade, orderBookL2_25;
+    }
+
     /**
      * 
      */
@@ -335,7 +342,9 @@ class BitMexService extends MarketService {
     }
 
     public static void main(String[] args) {
-        BitMex.XBT_USD.orderBookRealtimely().to(c -> {
+        BitMexService s = (BitMexService) BitMex.XBT_USD;
+        s.connectSharedWebSocket(Topic.orderBookL2_25).to(e -> {
+            System.out.println(e);
         });
     }
 }
