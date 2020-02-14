@@ -167,8 +167,16 @@ class BitMexService extends MarketService {
      * {@inheritDoc}
      */
     @Override
+    protected Signal<Order> connectOrdersRealtimely() {
+        return I.signal();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Signal<OrderBookPageChanges> orderBook() {
-        return call("GET", "orderBook/L2?depth=400&symbol=" + marketName).map(JsonElement::getAsJsonArray).map(this::convertOrderBook);
+        return call("GET", "orderBook/L2?depth=400&symbol=" + marketName).map(e -> convertOrderBook(e.getAsJsonArray()));
     }
 
     /**
@@ -201,14 +209,6 @@ class BitMexService extends MarketService {
             }
         }
         return change;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected Signal<Order> connectOrdersRealtimely() {
-        return I.signal();
     }
 
     /**
