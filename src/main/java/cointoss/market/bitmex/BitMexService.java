@@ -37,6 +37,9 @@ import okhttp3.Request;
 
 class BitMexService extends MarketService {
 
+    /** The right padding for id. */
+    private static final long PaddingForID = 100000;
+
     /** The realtime data format */
     private static final DateTimeFormatter RealTimeFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX");
 
@@ -48,6 +51,9 @@ class BitMexService extends MarketService {
 
     /** The instrument tick size. */
     private final Num instrumentTickSize;
+
+    /** The shared websocket connection. */
+    private Signal<JsonElement> websocket;
 
     /**
      * @param marketName
@@ -84,15 +90,13 @@ class BitMexService extends MarketService {
         return null;
     }
 
-    private static final long padding = 100000;
-
     /**
      * {@inheritDoc}
      */
     @Override
     public Signal<Execution> executions(long start, long end) {
         start++;
-        long startingPoint = start % padding;
+        long startingPoint = start % PaddingForID;
         AtomicLong increment = new AtomicLong(startingPoint - 1);
         Object[] previous = new Object[] {null, encodeId(start)};
 
@@ -104,7 +108,7 @@ class BitMexService extends MarketService {
     }
 
     private ZonedDateTime encodeId(long id) {
-        return Chrono.utcByMills(id / padding);
+        return Chrono.utcByMills(id / PaddingForID);
     }
 
     private String formatEncodedId(long id) {
@@ -112,7 +116,7 @@ class BitMexService extends MarketService {
     }
 
     private long decodeId(ZonedDateTime time) {
-        return time.toInstant().toEpochMilli() * padding;
+        return time.toInstant().toEpochMilli() * PaddingForID;
     }
 
     /**
@@ -164,24 +168,7 @@ class BitMexService extends MarketService {
      */
     @Override
     public Signal<OrderBookChange> orderBook() {
-        return call("GET", "orderBook/L2?depth=400&symbol=" + marketName).map(this::convertOrderBook);
-    }
-
-    private OrderBookChange convertOrderBook(JsonElement e) {
-        OrderBookChange change = new OrderBookChange();
-        for (JsonElement element : e.getAsJsonArray()) {
-            JsonObject o = element.getAsJsonObject();
-            Num price = Num.of(o.get("price").getAsString());
-            Num size = Num.of(o.get("size").getAsString());
-            size = size.divide(price);
-
-            if (o.get("side").getAsString().equals("Buy")) {
-                change.bids.add(new OrderBoard(price, size.doubleValue()));
-            } else {
-                change.asks.add(new OrderBoard(price, size.doubleValue()));
-            }
-        }
-        return change;
+        return call("GET", "orderBook/L2?depth=400&symbol=" + marketName).map(JsonElement::getAsJsonArray).map(this::convertOrderBook);
     }
 
     /**
@@ -189,23 +176,31 @@ class BitMexService extends MarketService {
      */
     @Override
     protected Signal<OrderBookChange> connectOrderBookRealtimely() {
-        return connectSharedWebSocket(Topic.orderBookL2_25).map(x -> {
-            OrderBookChange change = new OrderBookChange();
-            for (JsonElement e : x) {
-                JsonObject o = e.getAsJsonObject();
-                long id = o.get("id").getAsLong();
-                Num price = instrumentTickSize.multiply((100000000L * this.id) - id);
-                JsonElement sizeElement = o.get("size");
-                double size = sizeElement == null ? 0 : sizeElement.getAsDouble() / price.doubleValue();
+        return connectSharedWebSocket(Topic.orderBookL2_25).map(this::convertOrderBook);
+    }
 
-                if (o.get("side").getAsString().charAt(0) == 'B') {
-                    change.bids.add(new OrderBoard(price, size));
-                } else {
-                    change.asks.add(new OrderBoard(price, size));
-                }
+    /**
+     * Convert json to {@link OrderBookChange}.
+     * 
+     * @param array
+     * @return
+     */
+    private OrderBookChange convertOrderBook(JsonArray array) {
+        OrderBookChange change = new OrderBookChange();
+        for (JsonElement e : array) {
+            JsonObject o = e.getAsJsonObject();
+            long id = o.get("id").getAsLong();
+            Num price = instrumentTickSize.multiply((100000000L * this.id) - id);
+            JsonElement sizeElement = o.get("size");
+            double size = sizeElement == null ? 0 : sizeElement.getAsDouble() / price.doubleValue();
+
+            if (o.get("side").getAsString().charAt(0) == 'B') {
+                change.bids.add(new OrderBoard(price, size));
+            } else {
+                change.asks.add(new OrderBoard(price, size));
             }
-            return change;
-        });
+        }
+        return change;
     }
 
     /**
@@ -292,9 +287,6 @@ class BitMexService extends MarketService {
 
         return network.rest(request, Limit);
     }
-
-    /** The shared websocket. */
-    private Signal<JsonElement> websocket;
 
     /**
      * Build shared websocket connection for this market.
