@@ -11,10 +11,14 @@ package cointoss;
 
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.function.Consumer;
 
 import org.junit.jupiter.api.BeforeEach;
 
 import cointoss.execution.Execution;
+import cointoss.order.Order;
+import cointoss.order.OrderStrategy.Orderable;
+import cointoss.util.Num;
 import cointoss.util.TimebaseSupport;
 import cointoss.verify.VerifiableMarket;
 import kiss.I;
@@ -158,6 +162,68 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
         market.perform(Execution.with.direction(e.direction, partialEntrySize).price(e.price.minus(e, 1)).date(e.date));
         awaitOrderBufferingTime();
         market.perform(Execution.with.direction(e.inverse(), partialExitSize).price(exit.price.minus(e.inverse(), 1)).date(exit.date));
+        awaitOrderBufferingTime();
+    }
+
+    // ========================================
+    // Execution Helper
+    // ========================================
+    protected final Scenario entry(int size, Consumer<Orderable> strategy) {
+        when(now(), v -> new Scenario() {
+            @Override
+            protected void entry() {
+                entry(Direction.BUY, size, strategy);
+            }
+
+            @Override
+            protected void exit() {
+            }
+        });
+        return latest();
+    }
+
+    protected final Scenario exit(Consumer<Orderable> strategy) {
+        Scenario s = latest();
+        s.exitWhen(now(), strategy);
+        return latest();
+    }
+
+    /**
+     * Execution for entry.
+     * 
+     * @param size
+     * @param price
+     */
+    protected final void executeEntry(int size, int price) {
+        Scenario s = latest();
+        market.perform(Execution.with.direction(s.direction().inverse(), size)
+                .price(Num.of(price).minus(s.direction(), 1))
+                .date(market.service.now()));
+        awaitOrderBufferingTime();
+    }
+
+    /**
+     * Execution for exit.
+     * 
+     * @param size
+     * @param price
+     */
+    protected final void executeExit(int size, int price) {
+        Scenario s = latest();
+        market.perform(Execution.with.direction(s.direction(), size)
+                .price(Num.of(price).minus(s.direction().inverse(), 1))
+                .date(market.service.now()));
+        awaitOrderBufferingTime();
+    }
+
+    /**
+     * Cancel entry.
+     */
+    protected final void cancelEntry() {
+        Scenario s = latest();
+        for (Order entry : s.entries) {
+            market.cancel(entry);
+        }
         awaitOrderBufferingTime();
     }
 }

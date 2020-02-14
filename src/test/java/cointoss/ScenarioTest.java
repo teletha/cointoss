@@ -9,7 +9,7 @@
  */
 package cointoss;
 
-import static java.time.temporal.ChronoUnit.*;
+import static java.time.temporal.ChronoUnit.SECONDS;
 
 import java.time.Duration;
 
@@ -167,13 +167,13 @@ class ScenarioTest extends TraderTestSupport {
         assert s.entries.size() == 1;
         assert s.entrySize.is(1);
         assert s.entryExecutedSize.is(0);
-        assert s.entryRemainingSize2.is(1);
+        assert s.entryRemainingSize().is(1);
 
         // first execution
         market.perform(Execution.with.buy(0.3).price(9));
         assert s.entrySize.is(1);
         assert s.entryExecutedSize.is(0.3);
-        assert s.entryRemainingSize2.is(0.7);
+        assert s.entryRemainingSize().is(0.7);
 
         // second execution
         market.perform(Execution.with.buy(0.3).price(9));
@@ -389,7 +389,6 @@ class ScenarioTest extends TraderTestSupport {
         market.perform(Execution.with.buy(2.2).price(1850));
         market.perform(Execution.with.buy(4.6823314).price(1146));
         market.perform(Execution.with.buy(1.4).price(1146));
-        System.out.println(s);
         assert s.exits.size() == 1;
         assert s.entryExecutedSize.is(1);
         assert s.exitExecutedSize.is(1);
@@ -451,29 +450,31 @@ class ScenarioTest extends TraderTestSupport {
         when(now(), v -> new Scenario() {
             @Override
             protected void entry() {
-                entry(Direction.BUY, 1, s -> s.make(10));
+                entry(Direction.BUY, 2, s -> s.make(10));
             }
 
             @Override
             protected void exit() {
-                exitAt(20);
-                exitWhen(market.timeline.take(e -> e.price.isGreaterThan(20)), o -> o.take());
+                exitAt(15);
+                exitAt(5);
             }
         });
 
         Scenario s = latest();
         assert s.exits.size() == 0;
 
-        market.perform(Execution.with.buy(1).price(9));
-        market.elapse(1, SECONDS);
-        assert s.exits.size() == 2; // exit is ordered
-        assert s.entryExecutedSize.is(1);
+        market.perform(Execution.with.buy(2).price(9));
+        awaitOrderBufferingTime();
+        assert s.exits.size() == 1; // exit is ordered
+        assert s.entryExecutedSize.is(2);
         assert s.exitExecutedSize.is(0);
         assert s.exitSize.is(2);
 
-        market.perform(Execution.with.buy(2).price(21)); // trigger stop
+        market.perform(Execution.with.buy(1).price(16)); // trigger stop
+        market.perform(Execution.with.buy(3).price(4)); // trigger stop loss
+        awaitOrderBufferingTime();
         assert s.exits.size() == 2; // stop is ordered
-        assert s.entryExecutedSize.is(1);
+        assert s.entryExecutedSize.is(2);
         assert s.exitExecutedSize.is(1);
         assert s.exitSize.is(1);
     }
