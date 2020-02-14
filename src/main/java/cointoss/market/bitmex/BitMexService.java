@@ -135,7 +135,7 @@ class BitMexService extends MarketService {
      */
     @Override
     public Signal<Execution> executionLatest() {
-        return call("GET", "/trade?symbol=" + marketName + "&count=1&reverse=true").flatIterable(JsonElement::getAsJsonArray)
+        return call("GET", "trade?symbol=" + marketName + "&count=1&reverse=true").flatIterable(JsonElement::getAsJsonArray)
                 .map(json -> convert(json, new AtomicLong(), new Object[2]));
     }
 
@@ -176,7 +176,7 @@ class BitMexService extends MarketService {
      */
     @Override
     public Signal<OrderBookPageChanges> orderBook() {
-        return call("GET", "orderBook/L2?depth=400&symbol=" + marketName).map(e -> convertOrderBook(e.getAsJsonArray()));
+        return call("GET", "orderBook/L2?depth=1200&symbol=" + marketName).map(e -> convertOrderBook(e.getAsJsonArray()));
     }
 
     /**
@@ -285,7 +285,7 @@ class BitMexService extends MarketService {
     private Signal<JsonElement> call(String method, String path) {
         Request request = new Request.Builder().url("https://www.bitmex.com/api/v1/" + path).build();
 
-        return network.rest(request, Limit);
+        return network.rest(request, Limit).retryWhen(retryPolicy(10, "BitMEX RESTCall"));
     }
 
     /**
