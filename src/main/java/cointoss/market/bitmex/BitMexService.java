@@ -47,7 +47,7 @@ class BitMexService extends MarketService {
     private static final APILimiter Limit = APILimiter.with.limit(60).refresh(Duration.ofMinutes(1));
 
     /** The market id. */
-    private final int id;
+    private final int marketId;
 
     /** The instrument tick size. */
     private final Num instrumentTickSize;
@@ -62,7 +62,7 @@ class BitMexService extends MarketService {
     BitMexService(int id, String marketName, MarketSetting setting) {
         super("BitMEX", marketName, setting);
 
-        this.id = id;
+        this.marketId = id;
         this.instrumentTickSize = marketName.equals("XBTUSD") ? Num.of("0.01") : setting.baseCurrencyMinimumBidPrice;
     }
 
@@ -190,7 +190,7 @@ class BitMexService extends MarketService {
         for (JsonElement e : array) {
             JsonObject o = e.getAsJsonObject();
             long id = o.get("id").getAsLong();
-            Num price = instrumentTickSize.multiply((100000000L * this.id) - id);
+            Num price = instrumentTickSize.multiply((100000000L * marketId) - id);
             JsonElement sizeElement = o.get("size");
             double size = sizeElement == null ? 0 : sizeElement.getAsDouble() / price.doubleValue();
 
