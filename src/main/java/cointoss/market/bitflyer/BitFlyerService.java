@@ -37,8 +37,8 @@ import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.execution.Execution;
 import cointoss.order.Order;
-import cointoss.order.OrderBoard;
-import cointoss.order.OrderBookChange;
+import cointoss.order.OrderBookPage;
+import cointoss.order.OrderBookPageChanges;
 import cointoss.order.OrderState;
 import cointoss.order.OrderType;
 import cointoss.util.APILimiter;
@@ -556,31 +556,31 @@ class BitFlyerService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<OrderBookChange> orderBook() {
-        return call("PUBLIC", "/v1/board?product_code=" + marketName, "", "", OrderBookChange.class);
+    public Signal<OrderBookPageChanges> orderBook() {
+        return call("PUBLIC", "/v1/board?product_code=" + marketName, "", "", OrderBookPageChanges.class);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected Signal<OrderBookChange> connectOrderBookRealtimely() {
+    protected Signal<OrderBookPageChanges> connectOrderBookRealtimely() {
         return network.jsonRPC("wss://ws.lightstream.bitflyer.com/json-rpc", "lightning_board_" + marketName)
                 .map(JsonElement::getAsJsonObject)
                 .map(e -> {
-                    OrderBookChange change = new OrderBookChange();
+                    OrderBookPageChanges change = new OrderBookPageChanges();
                     JsonArray asks = e.get("asks").getAsJsonArray();
 
                     for (int i = 0; i < asks.size(); i++) {
                         JsonObject ask = asks.get(i).getAsJsonObject();
-                        change.asks.add(new OrderBoard(Num.of(ask.get("price").getAsString()), ask.get("size").getAsDouble()));
+                        change.asks.add(new OrderBookPage(Num.of(ask.get("price").getAsString()), ask.get("size").getAsDouble()));
                     }
 
                     JsonArray bids = e.get("bids").getAsJsonArray();
 
                     for (int i = 0; i < bids.size(); i++) {
                         JsonObject bid = bids.get(i).getAsJsonObject();
-                        change.bids.add(new OrderBoard(Num.of(bid.get("price").getAsString()), bid.get("size").getAsDouble()));
+                        change.bids.add(new OrderBookPage(Num.of(bid.get("price").getAsString()), bid.get("size").getAsDouble()));
                     }
                     return change;
                 });

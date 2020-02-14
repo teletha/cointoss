@@ -25,8 +25,8 @@ import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.execution.Execution;
 import cointoss.order.Order;
-import cointoss.order.OrderBoard;
-import cointoss.order.OrderBookChange;
+import cointoss.order.OrderBookPage;
+import cointoss.order.OrderBookPageChanges;
 import cointoss.order.OrderState;
 import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
@@ -167,7 +167,7 @@ class BitMexService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<OrderBookChange> orderBook() {
+    public Signal<OrderBookPageChanges> orderBook() {
         return call("GET", "orderBook/L2?depth=400&symbol=" + marketName).map(JsonElement::getAsJsonArray).map(this::convertOrderBook);
     }
 
@@ -175,18 +175,18 @@ class BitMexService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    protected Signal<OrderBookChange> connectOrderBookRealtimely() {
+    protected Signal<OrderBookPageChanges> connectOrderBookRealtimely() {
         return connectSharedWebSocket(Topic.orderBookL2_25).map(this::convertOrderBook);
     }
 
     /**
-     * Convert json to {@link OrderBookChange}.
+     * Convert json to {@link OrderBookPageChanges}.
      * 
      * @param array
      * @return
      */
-    private OrderBookChange convertOrderBook(JsonArray array) {
-        OrderBookChange change = new OrderBookChange();
+    private OrderBookPageChanges convertOrderBook(JsonArray array) {
+        OrderBookPageChanges change = new OrderBookPageChanges();
         for (JsonElement e : array) {
             JsonObject o = e.getAsJsonObject();
             long id = o.get("id").getAsLong();
@@ -195,9 +195,9 @@ class BitMexService extends MarketService {
             double size = sizeElement == null ? 0 : sizeElement.getAsDouble() / price.doubleValue();
 
             if (o.get("side").getAsString().charAt(0) == 'B') {
-                change.bids.add(new OrderBoard(price, size));
+                change.bids.add(new OrderBookPage(price, size));
             } else {
-                change.asks.add(new OrderBoard(price, size));
+                change.asks.add(new OrderBookPage(price, size));
             }
         }
         return change;

@@ -33,7 +33,7 @@ import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.execution.Execution;
 import cointoss.order.Order;
-import cointoss.order.OrderBookChange;
+import cointoss.order.OrderBookPageChanges;
 import cointoss.order.OrderState;
 import cointoss.order.OrderType;
 import cointoss.order.QuantityCondition;
@@ -299,7 +299,7 @@ public class VerifiableMarketService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    public Signal<OrderBookChange> orderBook() {
+    public Signal<OrderBookPageChanges> orderBook() {
         return Signal.never();
     }
 
@@ -307,7 +307,7 @@ public class VerifiableMarketService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    protected Signal<OrderBookChange> connectOrderBookRealtimely() {
+    protected Signal<OrderBookPageChanges> connectOrderBookRealtimely() {
         return Signal.never();
     }
 

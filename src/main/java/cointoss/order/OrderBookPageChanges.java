@@ -12,13 +12,13 @@ package cointoss.order;
 import java.util.ArrayList;
 import java.util.List;
 
-public class OrderBookChange {
+public class OrderBookPageChanges {
 
     /** The list of long orders. */
-    public List<OrderBoard> bids = new ArrayList();
+    public List<OrderBookPage> bids = new ArrayList();
 
     /** The list of short orders. */
-    public List<OrderBoard> asks = new ArrayList();
+    public List<OrderBookPage> asks = new ArrayList();
 
     /**
      * {@inheritDoc}

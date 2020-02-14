@@ -19,7 +19,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontSmoothingType;
 
-import cointoss.order.OrderBoard;
+import cointoss.order.OrderBookPage;
 import cointoss.order.OrderBookManager;
 import cointoss.util.Num;
 import cointoss.util.Primitives;
@@ -40,10 +40,10 @@ import viewtify.util.FXUtils;
 public class OrderBookView extends View {
 
     /** UI for long maker. */
-    private UIListView<OrderBoard> longList;
+    private UIListView<OrderBookPage> longList;
 
     /** UI for maker. */
-    private UIListView<OrderBoard> shortList;
+    private UIListView<OrderBookPage> shortList;
 
     /** UI for interval configuration. */
     private UISpinner<Num> priceRange;
@@ -151,7 +151,7 @@ public class OrderBookView extends View {
      * @param list
      * @return
      */
-    private WiseRunnable calculatePrice(UIListView<OrderBoard> list) {
+    private WiseRunnable calculatePrice(UIListView<OrderBookPage> list) {
         return () -> {
             if (list == longList) {
                 list.selectedItem().to(unit -> {
@@ -171,13 +171,13 @@ public class OrderBookView extends View {
     }
 
     /**
-     * Rendering {@link OrderBoard}.
+     * Rendering {@link OrderBookPage}.
      * 
      * @param color
      * @param scale
      * @return
      */
-    private BiFunction<Canvas, OrderBoard, Canvas> displayOrderUnit(stylist.value.Color color, int scale) {
+    private BiFunction<Canvas, OrderBookPage, Canvas> displayOrderUnit(stylist.value.Color color, int scale) {
         double width = longList.ui.widthProperty().doubleValue();
         double height = 22;
         double fontSize = 12;

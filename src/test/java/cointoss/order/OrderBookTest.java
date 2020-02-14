@@ -29,7 +29,7 @@ class OrderBookTest {
     @Test
     void buy() {
         OrderBook book = new OrderBook(setting, Direction.BUY);
-        List<OrderBoard> list = book.groupBy(Num.ONE);
+        List<OrderBookPage> list = book.groupBy(Num.ONE);
 
         // add
         book.update(unit(1000, 1));
@@ -62,7 +62,7 @@ class OrderBookTest {
     @Test
     void sell() {
         OrderBook book = new OrderBook(setting, Direction.SELL);
-        List<OrderBoard> list = book.groupBy(Num.ONE);
+        List<OrderBookPage> list = book.groupBy(Num.ONE);
 
         book.update(unit(1000, 1));
         assert list.get(0).price.is(1000);
@@ -94,7 +94,7 @@ class OrderBookTest {
     @Test
     void buyFix() {
         OrderBook book = new OrderBook(setting, Direction.BUY);
-        List<OrderBoard> list = book.groupBy(Num.ONE);
+        List<OrderBookPage> list = book.groupBy(Num.ONE);
 
         book.update(unit(1007, 1));
         book.update(unit(1006, 1));
@@ -127,7 +127,7 @@ class OrderBookTest {
     @Test
     void sellFix() {
         OrderBook book = new OrderBook(setting, Direction.SELL);
-        List<OrderBoard> list = book.groupBy(Num.ONE);
+        List<OrderBookPage> list = book.groupBy(Num.ONE);
 
         book.update(unit(1007, 1));
         book.update(unit(1004, 1));
@@ -339,8 +339,8 @@ class OrderBookTest {
      * @param size
      * @param price
      */
-    private void assertList(List<OrderBoard> list, int index, int price, int size, int total) {
-        OrderBoard unit = list.get(index);
+    private void assertList(List<OrderBookPage> list, int index, int price, int size, int total) {
+        OrderBookPage unit = list.get(index);
         assert unit.size == size;
         assert unit.price.is(price);
         // assert unit.total.is(total);
@@ -353,8 +353,8 @@ class OrderBookTest {
      * @param size
      * @return
      */
-    private List<OrderBoard> unit(int price, int size) {
-        return Collections.singletonList(new OrderBoard(Num.of(price), size));
+    private List<OrderBookPage> unit(int price, int size) {
+        return Collections.singletonList(new OrderBookPage(Num.of(price), size));
     }
 
     @Test

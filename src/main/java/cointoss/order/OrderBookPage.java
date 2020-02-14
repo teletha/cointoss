@@ -11,7 +11,7 @@ package cointoss.order;
 
 import cointoss.util.Num;
 
-public class OrderBoard implements Comparable<OrderBoard> {
+public class OrderBookPage implements Comparable<OrderBookPage> {
 
     /** The board price. */
     public Num price;
@@ -22,7 +22,7 @@ public class OrderBoard implements Comparable<OrderBoard> {
     /**
      * For I#make.
      */
-    OrderBoard() {
+    OrderBookPage() {
     }
 
     /**
@@ -31,7 +31,7 @@ public class OrderBoard implements Comparable<OrderBoard> {
      * @param price A price.
      * @param size A total size.
      */
-    public OrderBoard(Num price, double size) {
+    public OrderBookPage(Num price, double size) {
         this.price = price;
         this.size = size;
     }
@@ -40,7 +40,7 @@ public class OrderBoard implements Comparable<OrderBoard> {
      * {@inheritDoc}
      */
     @Override
-    public int compareTo(OrderBoard o) {
+    public int compareTo(OrderBookPage o) {
         return price.compareTo(o.price);
     }
 }

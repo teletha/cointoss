@@ -23,7 +23,7 @@ import cointoss.execution.Execution;
 import cointoss.execution.ExecutionLog;
 import cointoss.market.MarketServiceProvider;
 import cointoss.order.Order;
-import cointoss.order.OrderBookChange;
+import cointoss.order.OrderBookPageChanges;
 import cointoss.order.OrderState;
 import cointoss.util.Chrono;
 import cointoss.util.Network;
@@ -70,7 +70,7 @@ public abstract class MarketService implements Disposable {
     private Signal<Execution> executions;
 
     /** The shared real-time order book. */
-    private Signal<OrderBookChange> orderBooks;
+    private Signal<OrderBookPageChanges> orderBooks;
 
     /** The realtime user order state. */
     private Variable<Order> orderStream;
@@ -249,14 +249,14 @@ public abstract class MarketService implements Disposable {
      * 
      * @return
      */
-    public abstract Signal<OrderBookChange> orderBook();
+    public abstract Signal<OrderBookPageChanges> orderBook();
 
     /**
      * Acquire order book in realtime. This is infinitely.
      * 
      * @return A shared realtime order books.
      */
-    public final synchronized Signal<OrderBookChange> orderBookRealtimely() {
+    public final synchronized Signal<OrderBookPageChanges> orderBookRealtimely() {
         if (orderBooks == null) {
             orderBooks = orderBook().concat(connectOrderBookRealtimely()).effectOnObserve(disposer::add).share();
         }
@@ -268,7 +268,7 @@ public abstract class MarketService implements Disposable {
      * 
      * @return A realtime order books.
      */
-    protected abstract Signal<OrderBookChange> connectOrderBookRealtimely();
+    protected abstract Signal<OrderBookPageChanges> connectOrderBookRealtimely();
 
     /**
      * Calculate human-readable price for display.
