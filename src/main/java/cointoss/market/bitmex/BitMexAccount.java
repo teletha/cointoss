@@ -32,6 +32,6 @@ public class BitMexAccount extends MarketAccount<BitMexAccount> {
      */
     @Override
     protected boolean validate() {
-        return apiKey.isPresent() && apiSecret.isPresent();
+        return true;
     }
 }

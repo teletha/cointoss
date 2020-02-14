@@ -369,7 +369,6 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
             disposerForExit.add(market.tickers.latestPrice.observe().take(p -> p.isLessThanOrEqual(directional, price)).first().to(e -> {
                 disposeEntry();
 
-                System.out.println(entryExecutedSize + "   " + exitExecutedSize + "\r\n" + this);
                 market.request(directional.inverse(), entryExecutedSize.minus(exitExecutedSize), strategy).to(this::processExitOrder);
             }));
         }

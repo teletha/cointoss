@@ -31,7 +31,6 @@ import kiss.I;
 import kiss.Variable;
 import stylist.Style;
 import stylist.StyleDSL;
-import trademate.TradeMate;
 import trademate.chart.ChartView;
 import trademate.chart.PlotScript;
 import trademate.chart.builtin.TraderVisualizer;
@@ -284,7 +283,7 @@ public class BackTestView extends View implements Analyzer {
                 });
 
         configureTradingLogView();
-        findAncestorView(TradeMate.class).to(TradeMate::requestLazyInitialization);
+        // findAncestorView(TradeMate.class).to(TradeMate::requestLazyInitialization);
     }
 
     /**

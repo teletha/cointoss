@@ -9,10 +9,9 @@
  */
 package cointoss.execution;
 
-import static cointoss.Direction.*;
-import static java.nio.charset.StandardCharsets.ISO_8859_1;
+import static java.nio.charset.StandardCharsets.*;
 import static java.nio.file.StandardOpenOption.*;
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -55,6 +54,7 @@ import com.univocity.parsers.csv.CsvWriterSettings;
 import cointoss.Direction;
 import cointoss.Market;
 import cointoss.MarketService;
+import cointoss.market.MarketServiceProvider;
 import cointoss.market.bitmex.BitMex;
 import cointoss.ticker.Ticker;
 import cointoss.ticker.TickerManager;
@@ -241,6 +241,13 @@ public class ExecutionLog {
      */
     public final ZonedDateTime lastCacheDate() {
         return cacheLast;
+    }
+
+    /**
+     * Clear all fast log.
+     */
+    public final void clearFastCache() {
+        root.delete("*.flog");
     }
 
     /**
@@ -772,6 +779,7 @@ public class ExecutionLog {
         private void writeFast() {
             if (fast.isAbsent() && compact.isPresent()) {
                 try {
+                    int scale = service.setting.targetCurrencyScaleSize;
                     TickerManager manager = new TickerManager();
                     read().to(manager::update);
                     Ticker ticker = manager.on(TimeSpan.Second5);
@@ -781,20 +789,23 @@ public class ExecutionLog {
                     CsvWriter writer = buildCsvWriter(new ZstdOutputStream(fast.newOutputStream(), 1));
                     ticker.ticks.each(tick -> {
                         long id = tick.openId;
-                        double buy = tick.buyVolume() / 2;
-                        double sell = tick.sellVolume() / 2;
+                        Num buy = Num.of(tick.buyVolume()).scale(scale).divide(2);
+                        Num sell = Num.of(tick.sellVolume()).scale(scale).divide(2);
+                        Direction buySide = Direction.BUY;
+                        Direction sellSide = Direction.SELL;
 
-                        if (buy == 0d) {
-                            if (sell == 0d) return;
-                            buy = tick.sellVolume() / 4;
-                            sell = tick.sellVolume() / 4;
-                        } else if (sell == 0d) {
-                            buy = tick.buyVolume() / 4;
-                            sell = tick.buyVolume() / 4;
+                        if (buy.isZero()) {
+                            if (sell.isZero()) return;
+                            buy = sell = sell.divide(2);
+                            buySide = sellSide;
+                        } else if (sell.isZero()) {
+                            buy = sell = buy.divide(2);
+                            sellSide = buySide;
                         }
 
-                        Direction[] sides = tick.isBull() ? new Direction[] {SELL, BUY, SELL, BUY} : new Direction[] {BUY, SELL, BUY, SELL};
-                        double[] sizes = tick.isBull() ? new double[] {sell, buy, sell, buy} : new double[] {buy, sell, buy, sell};
+                        Direction[] sides = tick.isBull() ? new Direction[] {sellSide, buySide, sellSide, buySide}
+                                : new Direction[] {buySide, sellSide, buySide, sellSide};
+                        Num[] sizes = tick.isBull() ? new Num[] {sell, buy, sell, buy} : new Num[] {buy, sell, buy, sell};
                         Num[] prices = tick.isBull() ? new Num[] {tick.openPrice, tick.lowPrice(), tick.highPrice(), tick.closePrice()}
                                 : new Num[] {tick.openPrice, tick.highPrice(), tick.lowPrice(), tick.closePrice()};
 
@@ -948,11 +959,20 @@ public class ExecutionLog {
         cache.writeNormal();
     }
 
-    public static void main(String[] args) {
-        // restoreNormal(BitMex.XBT_USD, ZonedDateTime.of(2019, 11, 22, 0, 0, 0, 0,
-        // ZoneId.systemDefault()));
-        new ExecutionLog(BitMex.ETH_USD).fromYestaday().to(e -> {
+    /**
+     * Helper method to clear all fast log.
+     */
+    public static void clearFastLog() {
+        I.load(Market.class);
+
+        MarketServiceProvider.availableMarketServices().to(service -> {
+            ExecutionLog log = new ExecutionLog(service);
+            log.clearFastCache();
         });
+    }
+
+    public static void main3(String[] args) {
+        clearFastLog();
     }
 
     public static void main1(String[] args) {
