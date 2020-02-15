@@ -7,7 +7,7 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss.trade;
+package cointoss.trade.extension;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -20,6 +20,6 @@ import org.junit.jupiter.params.provider.ArgumentsSource;
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @ParameterizedTest
-@ArgumentsSource(TradeSide.Provider.class)
+@ArgumentsSource(Provider.class)
 public @interface TradeTest {
 }

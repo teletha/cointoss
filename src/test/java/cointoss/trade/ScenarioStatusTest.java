@@ -9,24 +9,24 @@
  */
 package cointoss.trade;
 
-import static java.time.temporal.ChronoUnit.*;
-
-import org.junit.jupiter.api.Test;
+import static java.time.temporal.ChronoUnit.MINUTES;
 
 import cointoss.Scenario;
 import cointoss.TraderTestSupport;
+import cointoss.trade.extension.SideType;
+import cointoss.trade.extension.TradeTest;
 
 class ScenarioStatusTest extends TraderTestSupport {
 
-    @Test
-    void isActive() {
+    @TradeTest
+    void isActive(SideType type) {
         // canceled
-        Scenario s = entry(5, o -> o.make(10).cancelAfter(10, MINUTES));
+        Scenario s = entry(type, 5, o -> o.make(10).cancelAfter(10, MINUTES));
         market.elapse(10, MINUTES);
         assert s.isActive() == false;
 
         // create entry
-        s = entry(5, o -> o.make(10));
+        s = entry(type, 5, o -> o.make(10));
         assert s.isActive() == true;
 
         // executed entry partially
@@ -50,15 +50,15 @@ class ScenarioStatusTest extends TraderTestSupport {
         assert s.isActive() == false;
     }
 
-    @Test
-    void isCanceled() {
+    @TradeTest
+    void isCanceled(SideType type) {
         // canceled
-        Scenario s = entry(5, o -> o.make(10).cancelAfter(10, MINUTES));
+        Scenario s = entry(type, 5, o -> o.make(10).cancelAfter(10, MINUTES));
         market.elapse(10, MINUTES);
         assert s.isCanceled() == true;
 
         // create entry
-        s = entry(5, o -> o.make(10));
+        s = entry(type, 5, o -> o.make(10));
         assert s.isCanceled() == false;
 
         // executed entry partially
@@ -82,15 +82,15 @@ class ScenarioStatusTest extends TraderTestSupport {
         assert s.isCanceled() == false;
     }
 
-    @Test
-    void isCompleted() {
+    @TradeTest
+    void isCompleted(SideType type) {
         // canceled
-        Scenario s = entry(5, o -> o.make(10).cancelAfter(10, MINUTES));
+        Scenario s = entry(type, 5, o -> o.make(10).cancelAfter(10, MINUTES));
         market.elapse(10, MINUTES);
         assert s.isTerminated() == true;
 
         // create entry
-        s = entry(1, o -> o.make(10));
+        s = entry(type, 1, o -> o.make(10));
         assert s.isTerminated() == false;
 
         // executed entry partially

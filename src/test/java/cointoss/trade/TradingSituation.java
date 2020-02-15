@@ -30,4 +30,6 @@ abstract class TradingSituation implements BeforeEachCallback {
     abstract void entryOnly();
 
     abstract void entryExecutedPartially();
+
+    abstract void exitCompleted();
 }

@@ -7,18 +7,15 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss.trade;
+package cointoss.trade.extension;
 
-import java.util.stream.Stream;
-
-import org.junit.jupiter.api.extension.ExtensionContext;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.ArgumentsProvider;
+import java.util.List;
 
 import cointoss.Direction;
 import cointoss.Directional;
+import kiss.I;
 
-class TradeSide implements Directional {
+public class SideType implements Directional {
 
     public final Direction side;
 
@@ -27,7 +24,7 @@ class TradeSide implements Directional {
     /**
      * @param side
      */
-    private TradeSide(Direction side) {
+    private SideType(Direction side) {
         this.side = side;
         this.sign = side.isBuy() ? 1 : -1;
     }
@@ -40,14 +37,20 @@ class TradeSide implements Directional {
         return side;
     }
 
-    static class Provider implements ArgumentsProvider {
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        return "[side:" + side + "]";
+    }
 
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public Stream<? extends Arguments> provideArguments(ExtensionContext context) throws Exception {
-            return Stream.of(Direction.values()).map(TradeSide::new).map(Arguments::arguments);
-        }
+    /**
+     * Collect all values.
+     * 
+     * @return
+     */
+    static List<SideType> values() {
+        return I.signal(Direction.values()).map(SideType::new).toList();
     }
 }

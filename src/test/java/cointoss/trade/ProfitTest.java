@@ -11,57 +11,81 @@ package cointoss.trade;
 
 import cointoss.Scenario;
 import cointoss.TraderTestSupport;
+import cointoss.trade.extension.PriceType;
+import cointoss.trade.extension.SideType;
+import cointoss.trade.extension.TradeTest;
 import cointoss.util.Num;
 
 class ProfitTest extends TraderTestSupport {
 
     @TradeTest
-    void realizedProfit(TradeSide side) {
-        Scenario s = entry(side, 2, o -> o.make(10));
+    void realizedProfit(SideType side, PriceType price) {
+        Scenario s = entry(side, 2, o -> o.make(price.entry));
         assert s.realizedProfit.is(0);
 
-        executeEntry(1, 10);
+        executeEntryHalf();
         assert s.realizedProfit.is(0);
 
-        executeEntry(1, 10);
+        executeEntryAll();
         assert s.realizedProfit.is(0);
 
-        exit(o -> o.make(20));
+        exit(o -> o.make(price.exit));
         assert s.realizedProfit.is(0);
 
-        executeExit(1, 20);
-        assert s.realizedProfit.is(1 * 10 * side.sign);
+        executeExitHalf();
+        assert s.realizedProfit.is(1 * price.diff * side.sign);
 
-        executeExit(1, 20);
-        assert s.realizedProfit.is(2 * 10 * side.sign);
+        executeExitAll();
+        assert s.realizedProfit.is(2 * price.diff * side.sign);
     }
 
     @TradeTest
-    void unrealizedProfit(TradeSide side) {
+    void realizedLoss(SideType side) {
         Scenario s = entry(side, 2, o -> o.make(10));
+        assert s.realizedProfit.is(0);
+
+        executeEntryHalf();
+        assert s.realizedProfit.is(0);
+
+        executeEntryAll();
+        assert s.realizedProfit.is(0);
+
+        exit(o -> o.make(5));
+        assert s.realizedProfit.is(0);
+
+        executeExitHalf();
+        assert s.realizedProfit.is(-1 * 5 * side.sign);
+
+        executeExitAll();
+        assert s.realizedProfit.is(-2 * 5 * side.sign);
+    }
+
+    @TradeTest
+    void unrealizedProfit(SideType type) {
+        Scenario s = entry(type, 2, o -> o.make(10));
         assert s.unrealizedProfit(Num.of(15)).is(0);
         assert s.unrealizedProfit(Num.of(10)).is(0);
         assert s.unrealizedProfit(Num.of(5)).is(0);
 
         executeEntry(1, 10);
-        assert s.unrealizedProfit(Num.of(15)).is(1 * 5 * side.sign);
-        assert s.unrealizedProfit(Num.of(10)).is(1 * 0 * side.sign);
-        assert s.unrealizedProfit(Num.of(5)).is(1 * -5 * side.sign);
+        assert s.unrealizedProfit(Num.of(15)).is(1 * 5 * type.sign);
+        assert s.unrealizedProfit(Num.of(10)).is(1 * 0 * type.sign);
+        assert s.unrealizedProfit(Num.of(5)).is(1 * -5 * type.sign);
 
         executeEntry(1, 10);
-        assert s.unrealizedProfit(Num.of(15)).is(2 * 5 * side.sign);
-        assert s.unrealizedProfit(Num.of(10)).is(2 * 0 * side.sign);
-        assert s.unrealizedProfit(Num.of(5)).is(2 * -5 * side.sign);
+        assert s.unrealizedProfit(Num.of(15)).is(2 * 5 * type.sign);
+        assert s.unrealizedProfit(Num.of(10)).is(2 * 0 * type.sign);
+        assert s.unrealizedProfit(Num.of(5)).is(2 * -5 * type.sign);
 
         exit(o -> o.make(20));
-        assert s.unrealizedProfit(Num.of(15)).is(2 * 5 * side.sign);
-        assert s.unrealizedProfit(Num.of(10)).is(2 * 0 * side.sign);
-        assert s.unrealizedProfit(Num.of(5)).is(2 * -5 * side.sign);
+        assert s.unrealizedProfit(Num.of(15)).is(2 * 5 * type.sign);
+        assert s.unrealizedProfit(Num.of(10)).is(2 * 0 * type.sign);
+        assert s.unrealizedProfit(Num.of(5)).is(2 * -5 * type.sign);
 
         executeExit(1, 20);
-        assert s.unrealizedProfit(Num.of(15)).is(1 * 5 * side.sign);
-        assert s.unrealizedProfit(Num.of(10)).is(1 * 0 * side.sign);
-        assert s.unrealizedProfit(Num.of(5)).is(1 * -5 * side.sign);
+        assert s.unrealizedProfit(Num.of(15)).is(1 * 5 * type.sign);
+        assert s.unrealizedProfit(Num.of(10)).is(1 * 0 * type.sign);
+        assert s.unrealizedProfit(Num.of(5)).is(1 * -5 * type.sign);
 
         executeExit(1, 20);
         assert s.unrealizedProfit(Num.of(15)).is(0);
