@@ -9,7 +9,7 @@
  */
 package cointoss.trade;
 
-import static java.time.temporal.ChronoUnit.MINUTES;
+import static java.time.temporal.ChronoUnit.*;
 
 import org.junit.jupiter.api.Test;
 
@@ -30,11 +30,11 @@ class ScenarioStatusTest extends TraderTestSupport {
         assert s.isActive() == true;
 
         // executed entry partially
-        executeEntry(2, 10);
+        executeEntryHalf();
         assert s.isActive() == true;
 
         // complete entry
-        executeEntry(3, 10);
+        executeEntryAll();
         assert s.isActive() == true;
 
         // create exit

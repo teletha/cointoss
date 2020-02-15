@@ -169,10 +169,14 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
     // Execution Helper
     // ========================================
     protected final Scenario entry(int size, Consumer<Orderable> strategy) {
+        return entry(Direction.BUY, size, strategy);
+    }
+
+    protected final Scenario entry(Directional side, int size, Consumer<Orderable> strategy) {
         when(now(), v -> new Scenario() {
             @Override
             protected void entry() {
-                entry(Direction.BUY, size, strategy);
+                entry(side, size, strategy);
             }
 
             @Override
@@ -189,30 +193,68 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
     }
 
     /**
-     * Execution for entry.
-     * 
-     * @param size
-     * @param price
+     * Execute entry order completelly.
+     */
+    protected final void executeEntryAll() {
+        Order o = latest().entries.get(0);
+        executeEntry(o.size, o.price);
+    }
+
+    /**
+     * Execute entry order partially.
+     */
+    protected final void executeEntryHalf() {
+        Order o = latest().entries.get(0);
+        executeEntry(o.size.divide(2), o.price);
+    }
+
+    /**
+     * Execute entry order partially.
      */
     protected final void executeEntry(int size, int price) {
+        executeEntry(Num.of(size), Num.of(price));
+    }
+
+    /**
+     * Execute entry order partially.
+     */
+    private void executeEntry(Num size, Num price) {
         Scenario s = latest();
-        market.perform(Execution.with.direction(s.direction().inverse(), size)
-                .price(Num.of(price).minus(s.direction(), 1))
-                .date(market.service.now()));
+
+        market.perform(Execution.with.direction(s.inverse(), size).price(price.minus(s, 1)).date(market.service.now()));
         awaitOrderBufferingTime();
     }
 
     /**
-     * Execution for exit.
-     * 
-     * @param size
-     * @param price
+     * Execute exit order completelly.
+     */
+    protected final void executeExitAll() {
+        Order o = latest().exits.get(0);
+        executeExit(o.size, o.price);
+    }
+
+    /**
+     * Execute exit order partially.
+     */
+    protected final void executeExitHalf() {
+        Order o = latest().exits.get(0);
+        executeExit(o.size.divide(2), o.price);
+    }
+
+    /**
+     * Execute exit order partially.
      */
     protected final void executeExit(int size, int price) {
+        executeExit(Num.of(size), Num.of(price));
+    }
+
+    /**
+     * Execute exit order partially.
+     */
+    private void executeExit(Num size, Num price) {
         Scenario s = latest();
-        market.perform(Execution.with.direction(s.direction(), size)
-                .price(Num.of(price).minus(s.direction().inverse(), 1))
-                .date(market.service.now()));
+
+        market.perform(Execution.with.direction(s.direction(), size).price(price.minus(s.inverse(), 1)).date(market.service.now()));
         awaitOrderBufferingTime();
     }
 
