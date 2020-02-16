@@ -229,13 +229,6 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
     }
 
     /**
-     * Cancel all entry.
-     */
-    private void cancelEntry() {
-
-    }
-
-    /**
      * Process for additional entry order.
      * 
      * @param order
@@ -432,7 +425,7 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
         setExitSize(exitSize.plus(order.size));
         logExit("Process exit order [" + type + "]" + market.service.now());
 
-        order.observeExecutedSize().effectOnce(this::cancelEntry).to(v -> {
+        order.observeExecutedSize().to(v -> {
             Num previous = realizedProfit;
             Num deltaSize = v.minus(exitExecutedSize);
 
