@@ -22,16 +22,7 @@ class ScenarioSizeTest extends TraderTestSupport {
         Scenario s = build(scene, size);
 
         switch (scene) {
-        case Entry:
-        case EntryCancelled:
-        case EntryCompletely:
-        case EntryPartially:
-        case EntryPartiallyCancelled:
-        case Exit:
-        case ExitCancelled:
-        case ExitCompletely:
-        case ExitPartially:
-        case ExitPartiallyCancelled:
+        default:
             assert s.entrySize.is(size);
         }
     }
@@ -51,13 +42,30 @@ class ScenarioSizeTest extends TraderTestSupport {
             assert s.entryRemainingSize().is(size.half);
             break;
 
-        case EntryCompletely:
-        case Exit:
-        case ExitCancelled:
-        case ExitCompletely:
-        case ExitPartially:
-        case ExitPartiallyCancelled:
+        default:
             assert s.entryRemainingSize().is(0);
+            break;
+        }
+    }
+
+    @TradeTest
+    void entryExecutedSize(ScenePart scene, SizePart size) {
+        Scenario s = build(scene, size);
+
+        switch (scene) {
+        case Entry:
+        case EntryCancelled:
+            assert s.entryExecutedSize().is(0);
+            break;
+
+        case EntryPartially:
+        case EntryPartiallyCancelled:
+        case EntryPartiallyAndExitCompletely:
+            assert s.entryExecutedSize().is(size.half);
+            break;
+
+        default:
+            assert s.entryExecutedSize().is(size);
             break;
         }
     }

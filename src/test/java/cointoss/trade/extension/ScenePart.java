@@ -15,5 +15,8 @@ public enum ScenePart {
     Entry, EntryPartially, EntryCompletely, EntryCancelled, EntryPartiallyCancelled,
 
     // exit type
-    Exit, ExitPartially, ExitCompletely, ExitCancelled, ExitPartiallyCancelled;
+    Exit, ExitPartially, ExitCompletely, ExitCancelled, ExitPartiallyCancelled,
+
+    // entry partially cancelled and exit
+    EntryPartiallyAndExitCompletely;
 }

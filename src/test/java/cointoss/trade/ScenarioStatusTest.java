@@ -9,96 +9,98 @@
  */
 package cointoss.trade;
 
-import static java.time.temporal.ChronoUnit.MINUTES;
-
 import cointoss.Scenario;
 import cointoss.TraderTestSupport;
-import cointoss.trade.extension.SidePart;
+import cointoss.trade.extension.ScenePart;
 import cointoss.trade.extension.TradeTest;
 
 class ScenarioStatusTest extends TraderTestSupport {
 
     @TradeTest
-    void isActive(SidePart side) {
-        // canceled
-        Scenario s = entry(side, 5, o -> o.make(10).cancelAfter(10, MINUTES));
-        market.elapse(10, MINUTES);
-        assert s.isActive() == false;
+    void isActive(ScenePart scene) {
+        Scenario s = build(scene);
 
-        // create entry
-        s = entry(side, 5, o -> o.make(10));
-        assert s.isActive() == true;
+        switch (scene) {
+        case EntryCancelled:
+        case EntryPartiallyAndExitCompletely:
+        case ExitCompletely:
+            assert s.isActive() == false;
+            break;
 
-        // executed entry partially
-        executeEntryHalf();
-        assert s.isActive() == true;
-
-        // complete entry
-        executeEntryAll();
-        assert s.isActive() == true;
-
-        // create exit
-        exit(o -> o.make(20));
-        assert s.isActive();
-
-        // executed exit partially
-        executeExit(2, 20);
-        assert s.isActive();
-
-        // complete exit
-        executeExit(3, 20);
-        assert s.isActive() == false;
+        default:
+            assert s.isActive() == true;
+            break;
+        }
     }
 
     @TradeTest
-    void isCanceled(SidePart side) {
-        // canceled
-        Scenario s = entry(side, 5, o -> o.make(10).cancelAfter(10, MINUTES));
-        market.elapse(10, MINUTES);
-        assert s.isCanceled() == true;
+    void isCanceled(ScenePart scene) {
+        Scenario s = build(scene);
 
-        // create entry
-        s = entry(side, 5, o -> o.make(10));
-        assert s.isCanceled() == false;
+        switch (scene) {
+        case EntryCancelled:
+            assert s.isCanceled() == true;
+            break;
 
-        // executed entry partially
-        executeEntry(2, 10);
-        assert s.isCanceled() == false;
-
-        // complete entry
-        executeEntry(3, 10);
-        assert s.isCanceled() == false;
-
-        // create exit
-        exit(o -> o.make(20));
-        assert s.isCanceled() == false;
-
-        // executed exit partially
-        executeExit(2, 20);
-        assert s.isCanceled() == false;
-
-        // complete exit
-        executeExit(3, 20);
-        assert s.isCanceled() == false;
+        default:
+            assert s.isCanceled() == false;
+            break;
+        }
     }
 
     @TradeTest
-    void isCompleted(SidePart side) {
-        // canceled
-        Scenario s = entry(side, 5, o -> o.make(10).cancelAfter(10, MINUTES));
-        market.elapse(10, MINUTES);
-        assert s.isTerminated() == true;
+    void isTerminated(ScenePart scene) {
+        Scenario s = build(scene);
 
-        // create entry
-        s = entry(side, 1, o -> o.make(10));
-        assert s.isTerminated() == false;
+        switch (scene) {
+        case EntryCancelled:
+        case EntryPartiallyAndExitCompletely:
+        case ExitCompletely:
+            assert s.isTerminated() == true;
+            break;
 
-        // executed entry partially
-        executeEntry(1, 10);
-        assert s.isTerminated() == false;
+        default:
+            assert s.isTerminated() == false;
+            break;
+        }
+    }
 
-        // complete entry
-        executeEntry(4, 10);
-        assert s.isTerminated() == false;
+    @TradeTest
+    void isEntryTerminated(ScenePart scene) {
+        Scenario s = build(scene);
+
+        switch (scene) {
+        case EntryCancelled:
+        case EntryCompletely:
+        case EntryPartiallyAndExitCompletely:
+        case Exit:
+        case ExitCancelled:
+        case ExitPartially:
+        case ExitPartiallyCancelled:
+        case ExitCompletely:
+            assert s.isEntryTerminated() == true;
+            break;
+
+        default:
+            assert s.isEntryTerminated() == false;
+            break;
+        }
+    }
+
+    @TradeTest
+    void isExitTerminated(ScenePart scene) {
+        Scenario s = build(scene);
+
+        switch (scene) {
+        case EntryCancelled:
+        case EntryPartiallyAndExitCompletely:
+        case ExitCompletely:
+            assert s.isExitTerminated() == true;
+            break;
+
+        default:
+            assert s.isExitTerminated() == false;
+            break;
+        }
     }
 }

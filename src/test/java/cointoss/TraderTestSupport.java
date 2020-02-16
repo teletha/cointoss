@@ -9,6 +9,8 @@
  */
 package cointoss;
 
+import static java.time.temporal.ChronoUnit.*;
+
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.function.Consumer;
@@ -308,6 +310,10 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
         awaitOrderBufferingTime();
     }
 
+    protected final Scenario build(ScenePart scene) {
+        return build(scene, null, null, null);
+    }
+
     protected final Scenario build(ScenePart scene, SidePart side) {
         return build(scene, side, null, null);
     }
@@ -344,8 +350,8 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
             break;
 
         case EntryCancelled:
-            s = entry(side, size, o -> o.make(p.entry));
-            cancelEntry();
+            s = entry(side, size, o -> o.make(p.entry).cancelAfter(1, MINUTES));
+            market.elapse(1, MINUTES);
             break;
 
         case EntryPartiallyCancelled:
@@ -387,6 +393,13 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
             exit(o -> o.make(p.exit));
             executeExitHalf();
             cancelExit();
+            break;
+
+        case EntryPartiallyAndExitCompletely:
+            s = entry(side, size, o -> o.make(p.entry));
+            executeEntryHalf();
+            exit(o -> o.make(p.exit));
+            executeExitAll();
             break;
         }
         return s;
