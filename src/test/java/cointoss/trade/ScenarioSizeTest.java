@@ -28,27 +28,6 @@ class ScenarioSizeTest extends TraderTestSupport {
     }
 
     @TradeTest
-    void entryRemainingSize(ScenePart scene, SizePart size) {
-        Scenario s = build(scene, size);
-
-        switch (scene) {
-        case Entry:
-        case EntryCancelled:
-            assert s.entryRemainingSize().is(size);
-            break;
-
-        case EntryPartially:
-        case EntryPartiallyCancelled:
-            assert s.entryRemainingSize().is(size.half);
-            break;
-
-        default:
-            assert s.entryRemainingSize().is(0);
-            break;
-        }
-    }
-
-    @TradeTest
     void entryExecutedSize(ScenePart scene, SizePart size) {
         Scenario s = build(scene, size);
 

@@ -47,14 +47,6 @@ abstract class ScenarioBaseModel implements Directional, Profitable {
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public final Num entryRemainingSize() {
-        return entrySize().minus(entryExecutedSize());
-    }
-
-    /**
      * An average price of executed entry orders.
      * 
      * @return An average price of executed entry orders.
@@ -82,15 +74,6 @@ abstract class ScenarioBaseModel implements Directional, Profitable {
     @Icy.Property(custom = ObservableNumProperty.class)
     public Num exitExecutedSize() {
         return Num.ZERO;
-    }
-
-    /**
-     * A remaining size of exit orders.
-     * 
-     * @return A remaining size of exit orders.
-     */
-    public final Num exitRemainingSize() {
-        return exitSize().minus(exitExecutedSize());
     }
 
     /**

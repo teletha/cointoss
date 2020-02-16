@@ -332,7 +332,7 @@ public abstract class Trader extends TraderBase implements Extensible, Disposabl
         snapshots.put(now, snapshot);
 
         // update holding size
-        Num newHoldSize = snapshot.entryRemainingSize();
+        Num newHoldSize = snapshot.longSize.minus(snapshot.shortSize);
         setHoldSize(newHoldSize);
         if (newHoldSize.abs().isGreaterThan(holdMaxSize)) {
             setHoldMaxSize(newHoldSize.abs());
@@ -425,14 +425,6 @@ public abstract class Trader extends TraderBase implements Extensible, Disposabl
             Num longProfit = price.diff(Direction.BUY, longPrice).multiply(longSize);
             Num shortProfit = price.diff(Direction.SELL, shortPrice).multiply(shortSize);
             return longProfit.plus(shortProfit);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public Num entryRemainingSize() {
-            return longSize.minus(shortSize);
         }
 
         /**

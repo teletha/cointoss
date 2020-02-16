@@ -167,13 +167,11 @@ class ScenarioTest extends TraderTestSupport {
         assert s.entries.size() == 1;
         assert s.entrySize.is(1);
         assert s.entryExecutedSize.is(0);
-        assert s.entryRemainingSize().is(1);
 
         // first execution
         market.perform(Execution.with.buy(0.3).price(9));
         assert s.entrySize.is(1);
         assert s.entryExecutedSize.is(0.3);
-        assert s.entryRemainingSize().is(0.7);
 
         // second execution
         market.perform(Execution.with.buy(0.3).price(9));

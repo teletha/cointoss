@@ -40,11 +40,4 @@ public interface Profitable {
      */
     @PerformanceSensitive
     Num unrealizedProfit(Num currentPrice);
-
-    /**
-     * A remaining size of entry orders.
-     * 
-     * @return A remaining size of entry orders.
-     */
-    Num entryRemainingSize();
 }
