@@ -19,14 +19,14 @@ import cointoss.trade.extension.TradeTest;
 class ScenarioStatusTest extends TraderTestSupport {
 
     @TradeTest
-    void isActive(SidePart type) {
+    void isActive(SidePart side) {
         // canceled
-        Scenario s = entry(type, 5, o -> o.make(10).cancelAfter(10, MINUTES));
+        Scenario s = entry(side, 5, o -> o.make(10).cancelAfter(10, MINUTES));
         market.elapse(10, MINUTES);
         assert s.isActive() == false;
 
         // create entry
-        s = entry(type, 5, o -> o.make(10));
+        s = entry(side, 5, o -> o.make(10));
         assert s.isActive() == true;
 
         // executed entry partially
@@ -51,14 +51,14 @@ class ScenarioStatusTest extends TraderTestSupport {
     }
 
     @TradeTest
-    void isCanceled(SidePart type) {
+    void isCanceled(SidePart side) {
         // canceled
-        Scenario s = entry(type, 5, o -> o.make(10).cancelAfter(10, MINUTES));
+        Scenario s = entry(side, 5, o -> o.make(10).cancelAfter(10, MINUTES));
         market.elapse(10, MINUTES);
         assert s.isCanceled() == true;
 
         // create entry
-        s = entry(type, 5, o -> o.make(10));
+        s = entry(side, 5, o -> o.make(10));
         assert s.isCanceled() == false;
 
         // executed entry partially
@@ -83,14 +83,14 @@ class ScenarioStatusTest extends TraderTestSupport {
     }
 
     @TradeTest
-    void isCompleted(SidePart type) {
+    void isCompleted(SidePart side) {
         // canceled
-        Scenario s = entry(type, 5, o -> o.make(10).cancelAfter(10, MINUTES));
+        Scenario s = entry(side, 5, o -> o.make(10).cancelAfter(10, MINUTES));
         market.elapse(10, MINUTES);
         assert s.isTerminated() == true;
 
         // create entry
-        s = entry(type, 1, o -> o.make(10));
+        s = entry(side, 1, o -> o.make(10));
         assert s.isTerminated() == false;
 
         // executed entry partially

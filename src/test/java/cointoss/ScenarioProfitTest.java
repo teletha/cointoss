@@ -12,18 +12,21 @@ package cointoss;
 import org.junit.jupiter.api.Test;
 
 import cointoss.execution.Execution;
+import cointoss.trade.extension.PricePart;
+import cointoss.trade.extension.SidePart;
+import cointoss.trade.extension.TradeTest;
 import cointoss.util.Num;
 
 class ScenarioProfitTest extends TraderTestSupport {
 
-    @Test
-    void completeEntryAndCompleteExit() {
-        entryAndExit(Execution.with.buy(1).price(10), Execution.with.sell(1).price(20));
+    @TradeTest
+    void completeEntryAndCompleteExit(SidePart side, PricePart price) {
+        entryAndExit(Execution.with.direction(side, 1).price(price.entry), Execution.with.direction(side.inverse(), 1).price(price.exit));
 
         Scenario s = latest();
-        assert s.realizedProfit.is(10);
-        assert s.unrealizedProfit(Num.of(25)).is(0);
-        assert s.profit(Num.of(25)).is(10);
+        assert s.realizedProfit.is(price.diff * side.sign);
+        assert s.unrealizedProfit(price.profitN).is(0);
+        assert s.profit(price.profitN).is(price.diff * side.sign);
         assert s.entryRemainingSize().is(0);
         assert s.exitRemainingSize().is(0);
     }

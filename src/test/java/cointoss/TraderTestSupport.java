@@ -165,17 +165,37 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
         awaitOrderBufferingTime();
     }
 
-    // ========================================
-    // Execution Helper
-    // ========================================
+    /**
+     * Create entry order.
+     * 
+     * @param size A order size.
+     * @param strategy The order strategy.
+     * @return A created {@link Scenario}.
+     */
     protected final Scenario entry(int size, Consumer<Orderable> strategy) {
         return entry(Direction.BUY, size, strategy);
     }
 
+    /**
+     * Create entry order.
+     * 
+     * @param side A order side.
+     * @param size A order size.
+     * @param strategy The order strategy.
+     * @return A created {@link Scenario}.
+     */
     protected final Scenario entry(Directional side, int size, Consumer<Orderable> strategy) {
         return entry(side, Num.of(size), strategy);
     }
 
+    /**
+     * Create entry order.
+     * 
+     * @param side A order side.
+     * @param size A order size.
+     * @param strategy The order strategy.
+     * @return A created {@link Scenario}.
+     */
     protected final Scenario entry(Directional side, Num size, Consumer<Orderable> strategy) {
         when(now(), v -> new Scenario() {
             @Override

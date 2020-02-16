@@ -1,6 +1,7 @@
 package cointoss.execution;
 
 import cointoss.Direction;
+import cointoss.Directional;
 import cointoss.execution.Execution;
 import cointoss.execution.ExecutionModel;
 import cointoss.util.Num;
@@ -53,6 +54,9 @@ public abstract class Execution extends ExecutionModel {
             throw quiet(e);
         }
     }
+
+    /** The overload or intercept method invoker. */
+    private static final MethodHandle direction$268375447= invoker("direction", Directional.class);
 
     /** The overload or intercept method invoker. */
     private static final MethodHandle size$101354429= invoker("size", int.class);
@@ -834,6 +838,66 @@ public abstract class Execution extends ExecutionModel {
             o.size(size);
             return (Self)o;
         }
+
+        /**
+         * Create new {@link Execution} with the specified direction property.
+         * 
+         * @return The next assignable model.
+         */
+        public Self direction(Directional direction, Num size) {
+            Åssignable o = new Åssignable();
+            o.direction(direction);
+            o.size(size);
+            return (Self)o;
+        }
+
+        /**
+         * Create new {@link Execution} with the specified direction property.
+         * 
+         * @return The next assignable model.
+         */
+        public Self direction(Directional direction, int size) {
+            Åssignable o = new Åssignable();
+            o.direction(direction);
+            o.size(size);
+            return (Self)o;
+        }
+
+        /**
+         * Create new {@link Execution} with the specified direction property.
+         * 
+         * @return The next assignable model.
+         */
+        public Self direction(Directional direction, float size) {
+            Åssignable o = new Åssignable();
+            o.direction(direction);
+            o.size(size);
+            return (Self)o;
+        }
+
+        /**
+         * Create new {@link Execution} with the specified direction property.
+         * 
+         * @return The next assignable model.
+         */
+        public Self direction(Directional direction, long size) {
+            Åssignable o = new Åssignable();
+            o.direction(direction);
+            o.size(size);
+            return (Self)o;
+        }
+
+        /**
+         * Create new {@link Execution} with the specified direction property.
+         * 
+         * @return The next assignable model.
+         */
+        public Self direction(Directional direction, double size) {
+            Åssignable o = new Åssignable();
+            o.direction(direction);
+            o.size(size);
+            return (Self)o;
+        }
     }
 
     /**
@@ -868,6 +932,19 @@ public abstract class Execution extends ExecutionModel {
          */
         default Next sell() {
             return direction(Direction.SELL);
+        }
+
+        /**
+         * Assign direction property.
+         * 
+         * @return The next assignable model.
+         */
+        default Next direction(Directional direction) {
+            try {
+                return direction((Direction) direction$268375447.invoke(this, direction));
+            } catch (Throwable e) {
+                throw quiet(e);
+            }
         }
     }
 

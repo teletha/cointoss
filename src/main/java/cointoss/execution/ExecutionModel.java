@@ -58,6 +58,11 @@ abstract class ExecutionModel implements Directional {
     @Icy.Property
     public abstract Direction direction();
 
+    @Icy.Overload("direction")
+    private Direction direction(Directional direction) {
+        return direction.direction();
+    }
+
     /**
      * Size.
      * 
