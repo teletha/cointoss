@@ -47,7 +47,7 @@ public class PricePart {
      * @param entry
      * @param exit
      */
-    private PricePart(double entry, double exit) {
+    public PricePart(double entry, double exit) {
         this.entry = entry;
         this.entryN = Num.of(entry);
         this.exit = exit;

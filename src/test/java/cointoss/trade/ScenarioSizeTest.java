@@ -9,71 +9,56 @@
  */
 package cointoss.trade;
 
-import cointoss.Direction;
 import cointoss.Scenario;
 import cointoss.TraderTestSupport;
+import cointoss.trade.extension.ScenePart;
 import cointoss.trade.extension.SizePart;
 import cointoss.trade.extension.TradeTest;
 
 class ScenarioSizeTest extends TraderTestSupport {
 
     @TradeTest
-    void entrySize(SizePart size) {
-        Scenario s = entry(Direction.BUY, size, o -> o.make(10));
-        assert s.entrySize.is(size);
+    void entrySize(ScenePart scene, SizePart size) {
+        Scenario s = build(scene, size);
 
-        executeEntryHalf();
-        assert s.entrySize.is(size);
-
-        executeEntryAll();
-        assert s.entrySize.is(size);
-
-        exit(o -> o.make(20));
-        assert s.entrySize.is(size);
-
-        executeExitHalf();
-        assert s.entrySize.is(size);
-
-        executeExitAll();
-        assert s.entrySize.is(size);
-
-        s = entry(Direction.BUY, size, o -> o.make(10));
-        cancelEntry();
-        assert s.entrySize.is(size);
-
-        s = entry(Direction.BUY, size, o -> o.make(10));
-        executeEntryHalf();
-        cancelEntry();
-        assert s.entrySize.is(size);
+        switch (scene) {
+        case Entry:
+        case EntryCancelled:
+        case EntryCompletely:
+        case EntryPartially:
+        case EntryPartiallyCancelled:
+        case Exit:
+        case ExitCancelled:
+        case ExitCompletely:
+        case ExitPartially:
+        case ExitPartiallyCancelled:
+            assert s.entrySize.is(size);
+        }
     }
 
     @TradeTest
-    void entryRemainingSize(SizePart size) {
-        Scenario s = entry(Direction.BUY, size, o -> o.make(10));
-        assert s.entryRemainingSize().is(size);
+    void entryRemainingSize(ScenePart scene, SizePart size) {
+        Scenario s = build(scene, size);
 
-        executeEntryHalf();
-        assert s.entryRemainingSize().is(size.half);
+        switch (scene) {
+        case Entry:
+        case EntryCancelled:
+            assert s.entryRemainingSize().is(size);
+            break;
 
-        executeEntryAll();
-        assert s.entryRemainingSize().is(0);
+        case EntryPartially:
+        case EntryPartiallyCancelled:
+            assert s.entryRemainingSize().is(size.half);
+            break;
 
-        exit(o -> o.make(20));
-        assert s.entryRemainingSize().is(0);
-
-        executeExitHalf();
-        assert s.entryRemainingSize().is(0);
-
-        executeExitAll();
-        assert s.entryRemainingSize().is(0);
-
-        s = entry(Direction.BUY, size, o -> o.make(10));
-        cancelEntry();
-        assert s.entryRemainingSize().is(0);
-
-        s = entry(Direction.BUY, size, o -> o.make(10));
-        executeEntryHalf();
-        cancelEntry();
-        assert s.entryRemainingSize().is(0);
+        case EntryCompletely:
+        case Exit:
+        case ExitCancelled:
+        case ExitCompletely:
+        case ExitPartially:
+        case ExitPartiallyCancelled:
+            assert s.entryRemainingSize().is(0);
+            break;
+        }
     }
 }

@@ -18,6 +18,10 @@ import org.junit.jupiter.api.BeforeEach;
 import cointoss.execution.Execution;
 import cointoss.order.Order;
 import cointoss.order.OrderStrategy.Orderable;
+import cointoss.trade.extension.PricePart;
+import cointoss.trade.extension.ScenePart;
+import cointoss.trade.extension.SidePart;
+import cointoss.trade.extension.SizePart;
 import cointoss.util.Num;
 import cointoss.util.TimebaseSupport;
 import cointoss.verify.VerifiableMarket;
@@ -291,5 +295,100 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
             market.cancel(entry);
         }
         awaitOrderBufferingTime();
+    }
+
+    /**
+     * Cancel entry.
+     */
+    protected final void cancelExit() {
+        Scenario s = latest();
+        for (Order e : s.exits) {
+            market.cancel(e);
+        }
+        awaitOrderBufferingTime();
+    }
+
+    protected final Scenario build(ScenePart scene, SidePart side) {
+        return build(scene, side, null, null);
+    }
+
+    protected final Scenario build(ScenePart scene, SizePart size) {
+        return build(scene, null, size, null);
+    }
+
+    protected final Scenario build(ScenePart scene, SidePart side, SizePart size, PricePart price) {
+        if (side == null) {
+            side = new SidePart(Direction.BUY);
+        }
+
+        if (size == null) {
+            size = new SizePart(2);
+        }
+
+        Scenario s = null;
+        PricePart p = price != null ? price : new PricePart(10, 20);
+
+        switch (scene) {
+        case Entry:
+            s = entry(side, size, o -> o.make(p.entry));
+            break;
+
+        case EntryPartially:
+            s = entry(side, size, o -> o.make(p.entry));
+            executeEntryHalf();
+            break;
+
+        case EntryCompletely:
+            s = entry(side, size, o -> o.make(p.entry));
+            executeEntryAll();
+            break;
+
+        case EntryCancelled:
+            s = entry(side, size, o -> o.make(p.entry));
+            cancelEntry();
+            break;
+
+        case EntryPartiallyCancelled:
+            s = entry(side, size, o -> o.make(p.entry));
+            executeEntryHalf();
+            cancelEntry();
+            break;
+
+        case Exit:
+            s = entry(side, size, o -> o.make(p.entry));
+            executeEntryAll();
+            exit(o -> o.make(p.exit));
+            break;
+
+        case ExitPartially:
+            s = entry(side, size, o -> o.make(p.entry));
+            executeEntryAll();
+            exit(o -> o.make(p.exit));
+            executeExitHalf();
+            break;
+
+        case ExitCompletely:
+            s = entry(side, size, o -> o.make(p.entry));
+            executeEntryAll();
+            exit(o -> o.make(p.exit));
+            executeExitAll();
+            break;
+
+        case ExitCancelled:
+            s = entry(side, size, o -> o.make(p.entry));
+            executeEntryAll();
+            exit(o -> o.make(p.exit));
+            cancelExit();
+            break;
+
+        case ExitPartiallyCancelled:
+            s = entry(side, size, o -> o.make(p.entry));
+            executeEntryAll();
+            exit(o -> o.make(p.exit));
+            executeExitHalf();
+            cancelExit();
+            break;
+        }
+        return s;
     }
 }

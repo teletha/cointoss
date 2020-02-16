@@ -25,7 +25,7 @@ public class SidePart implements Directional {
     /**
      * @param side
      */
-    private SidePart(Direction side) {
+    public SidePart(Direction side) {
         this.side = side;
         this.sign = side.isBuy() ? 1 : -1;
     }

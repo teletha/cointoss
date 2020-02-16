@@ -23,7 +23,7 @@ public class SizePart extends Num {
 
     public final Num halfN;
 
-    private SizePart(double size) {
+    public SizePart(double size) {
         super(BigDecimal.valueOf(size));
 
         this.num = size;
