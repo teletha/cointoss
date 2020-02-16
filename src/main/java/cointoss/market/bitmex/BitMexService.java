@@ -44,7 +44,7 @@ class BitMexService extends MarketService {
     private static final DateTimeFormatter RealTimeFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX");
 
     /** The bitflyer API limit. */
-    private static final APILimiter Limit = APILimiter.with.limit(60).refresh(Duration.ofMinutes(1));
+    private static final APILimiter Limit = APILimiter.with.limit(30).refresh(Duration.ofMinutes(1));
 
     /** The market id. */
     private final int marketId;
@@ -331,12 +331,5 @@ class BitMexService extends MarketService {
         public String op;
 
         public List<String> args = new ArrayList();
-    }
-
-    public static void main(String[] args) {
-        BitMexService s = (BitMexService) BitMex.XBT_USD;
-        s.connectSharedWebSocket(Topic.orderBookL2_25).to(e -> {
-            System.out.println(e);
-        });
     }
 }

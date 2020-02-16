@@ -11,8 +11,6 @@ package cointoss;
 
 import static java.time.temporal.ChronoUnit.SECONDS;
 
-import java.time.Duration;
-
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -20,75 +18,6 @@ import cointoss.execution.Execution;
 import cointoss.order.Order;
 
 class ScenarioTest extends TraderTestSupport {
-
-    @Test
-    void holdTime() {
-        entryAndExit(Execution.with.buy(1).price(10).date(afterSecond(0)), Execution.with.buy(1).price(20).date(afterSecond(10)));
-
-        Scenario s = latest();
-        assert s.holdTime().equals(Duration.ofSeconds(10));
-    }
-
-    @Test
-    void holdTimeWithNoneExecutedActiveEntry() {
-        when(now(), v -> new Scenario() {
-
-            @Override
-            protected void entry() {
-                entry(Direction.BUY, 1, s -> s.make(10));
-            }
-
-            @Override
-            protected void exit() {
-            }
-        });
-
-        market.elapse(14, SECONDS);
-
-        Scenario s = latest();
-        assert s.holdTime().equals(Duration.ofSeconds(14));
-    }
-
-    @Test
-    void holdTimeWithNoneExecutedCanceledEntry() {
-        when(now(), v -> new Scenario() {
-
-            @Override
-            protected void entry() {
-                entry(Direction.BUY, 1, s -> s.make(10).cancelAfter(8, SECONDS));
-            }
-
-            @Override
-            protected void exit() {
-            }
-        });
-
-        market.elapse(18, SECONDS);
-
-        Scenario s = latest();
-        assert s.holdTime().isZero();
-    }
-
-    @Test
-    void holdTimeWithPartialyExecutedCanceledEntry() {
-        when(now(), v -> new Scenario() {
-
-            @Override
-            protected void entry() {
-                entry(Direction.BUY, 1, s -> s.make(10).cancelAfter(8, SECONDS));
-            }
-
-            @Override
-            protected void exit() {
-            }
-        });
-
-        market.perform(Execution.with.buy(0.1).price(9));
-        market.elapse(18, SECONDS);
-
-        Scenario s = latest();
-        assert s.holdTime().equals(Duration.ofSeconds(18));
-    }
 
     @Test
     void entryWithMultipleExecutionsAndSingleExit() {
