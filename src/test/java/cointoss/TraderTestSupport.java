@@ -173,6 +173,10 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
     }
 
     protected final Scenario entry(Directional side, int size, Consumer<Orderable> strategy) {
+        return entry(side, Num.of(size), strategy);
+    }
+
+    protected final Scenario entry(Directional side, Num size, Consumer<Orderable> strategy) {
         when(now(), v -> new Scenario() {
             @Override
             protected void entry() {

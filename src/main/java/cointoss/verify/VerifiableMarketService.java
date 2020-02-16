@@ -84,8 +84,8 @@ public class VerifiableMarketService extends MarketService {
      * 
      */
     public VerifiableMarketService() {
-        super("TestableExchange", "TestableMarket", MarketSetting.with.baseCurrencyMinimumBidPrice(Num.ONE)
-                .targetCurrencyMinimumBidSize(Num.ONE)
+        super("TestableExchange", "TestableMarket", MarketSetting.with.baseCurrencyMinimumBidPrice(Num.of("0.01"))
+                .targetCurrencyMinimumBidSize(Num.of("0.01"))
                 .orderBookGroupRanges(Num.ONE));
     }
 

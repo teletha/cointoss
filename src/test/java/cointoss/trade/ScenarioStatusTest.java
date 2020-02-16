@@ -13,13 +13,13 @@ import static java.time.temporal.ChronoUnit.MINUTES;
 
 import cointoss.Scenario;
 import cointoss.TraderTestSupport;
-import cointoss.trade.extension.SideType;
+import cointoss.trade.extension.SidePart;
 import cointoss.trade.extension.TradeTest;
 
 class ScenarioStatusTest extends TraderTestSupport {
 
     @TradeTest
-    void isActive(SideType type) {
+    void isActive(SidePart type) {
         // canceled
         Scenario s = entry(type, 5, o -> o.make(10).cancelAfter(10, MINUTES));
         market.elapse(10, MINUTES);
@@ -51,7 +51,7 @@ class ScenarioStatusTest extends TraderTestSupport {
     }
 
     @TradeTest
-    void isCanceled(SideType type) {
+    void isCanceled(SidePart type) {
         // canceled
         Scenario s = entry(type, 5, o -> o.make(10).cancelAfter(10, MINUTES));
         market.elapse(10, MINUTES);
@@ -83,7 +83,7 @@ class ScenarioStatusTest extends TraderTestSupport {
     }
 
     @TradeTest
-    void isCompleted(SideType type) {
+    void isCompleted(SidePart type) {
         // canceled
         Scenario s = entry(type, 5, o -> o.make(10).cancelAfter(10, MINUTES));
         market.elapse(10, MINUTES);

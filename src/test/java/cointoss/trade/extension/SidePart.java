@@ -9,22 +9,23 @@
  */
 package cointoss.trade.extension;
 
-import java.util.List;
+import java.util.Set;
 
 import cointoss.Direction;
 import cointoss.Directional;
-import kiss.I;
 
-public class SideType implements Directional {
+public class SidePart implements Directional {
 
+    /** The actual side. */
     public final Direction side;
 
+    /** The calculation sign. */
     public final int sign;
 
     /**
      * @param side
      */
-    private SideType(Direction side) {
+    private SidePart(Direction side) {
         this.side = side;
         this.sign = side.isBuy() ? 1 : -1;
     }
@@ -42,7 +43,7 @@ public class SideType implements Directional {
      */
     @Override
     public String toString() {
-        return "[side:" + side + "]";
+        return "[" + side + "]";
     }
 
     /**
@@ -50,7 +51,7 @@ public class SideType implements Directional {
      * 
      * @return
      */
-    static List<SideType> values() {
-        return I.signal(Direction.values()).map(SideType::new).toList();
+    static Set<SidePart> values() {
+        return Set.of(new SidePart(Direction.BUY), new SidePart(Direction.SELL));
     }
 }

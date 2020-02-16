@@ -20,6 +20,6 @@ import org.junit.jupiter.params.provider.ArgumentsSource;
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @ParameterizedTest
-@ArgumentsSource(Provider.class)
+@ArgumentsSource(TradePartProvider.class)
 public @interface TradeTest {
 }
