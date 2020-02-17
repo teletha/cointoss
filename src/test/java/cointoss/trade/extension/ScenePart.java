@@ -38,9 +38,6 @@ public enum ScenePart implements TradePart {
     /** Complete entry and exit is executed partially. */
     ExitPartially,
 
-    /** Complete entry and half exit is executed completely. */
-    ExitHalf,
-
     /** Complete entry and exit. */
     ExitCompletely,
 
