@@ -26,6 +26,7 @@ class ScenaroHoldTimeTest extends TraderTestSupport {
         switch (scene) {
         case EntrySeparately:
         case ExitSeparately:
+        case ExitLater:
             assert s.holdTime().equals(Duration.ofSeconds(60));
             break;
 
@@ -48,6 +49,7 @@ class ScenaroHoldTimeTest extends TraderTestSupport {
 
         // already completed so no change
         case ExitSeparately:
+        case ExitLater:
             assert s.holdTime().equals(Duration.ofSeconds(60));
             break;
 

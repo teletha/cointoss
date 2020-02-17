@@ -32,14 +32,29 @@ public enum ScenePart implements TradePart {
     /** Entry is executed partially and the remaining is canceled. */
     EntryPartiallyCanceled,
 
-    // exit type
-    Exit, ExitPartially, ExitCompletely, ExitCanceled, ExitPartiallyCancelled,
+    /** Complete entry and exit is just requested. */
+    Exit,
+
+    /** Complete entry and exit is executed partially. */
+    ExitPartially,
+
+    /** Complete entry and exit. */
+    ExitCompletely,
 
     /** Complete entry and complete exit by multiple executions. */
     ExitMultiple,
 
     /** Complete entry and complete exit by multiple executions over long time. */
     ExitSeparately,
+
+    /** Complete entry and complete exit later. */
+    ExitLater,
+
+    /** Complete entry and exit is canceled. */
+    ExitCanceled,
+
+    /** Complete entry and exit is executed partially and the remaining is canceled. */
+    ExitPartiallyCancelled,
 
     // entry partially cancelled and exit
     EntryPartiallyAndExitCompletely;
