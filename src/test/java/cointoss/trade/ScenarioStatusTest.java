@@ -24,7 +24,8 @@ class ScenarioStatusTest extends TraderTestSupport {
         case EntryCanceled:
         case EntryPartiallyAndExitCompletely:
         case ExitCompletely:
-        case ExitLater:
+        case ExitMultiple:
+        case ExitSeparately:
             assert s.isActive() == false;
             break;
 
@@ -57,7 +58,8 @@ class ScenarioStatusTest extends TraderTestSupport {
         case EntryCanceled:
         case EntryPartiallyAndExitCompletely:
         case ExitCompletely:
-        case ExitLater:
+        case ExitMultiple:
+        case ExitSeparately:
             assert s.isTerminated() == true;
             break;
 
@@ -82,7 +84,8 @@ class ScenarioStatusTest extends TraderTestSupport {
         case ExitPartially:
         case ExitPartiallyCancelled:
         case ExitCompletely:
-        case ExitLater:
+        case ExitMultiple:
+        case ExitSeparately:
             assert s.isEntryTerminated() == true;
             break;
 
@@ -100,7 +103,8 @@ class ScenarioStatusTest extends TraderTestSupport {
         case EntryCanceled:
         case EntryPartiallyAndExitCompletely:
         case ExitCompletely:
-        case ExitLater:
+        case ExitMultiple:
+        case ExitSeparately:
             assert s.isExitTerminated() == true;
             break;
 

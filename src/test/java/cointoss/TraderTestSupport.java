@@ -9,7 +9,7 @@
  */
 package cointoss;
 
-import static java.time.temporal.ChronoUnit.*;
+import static java.time.temporal.ChronoUnit.MINUTES;
 
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
@@ -404,19 +404,28 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
             executeExitAll();
             break;
 
+        case ExitMultiple:
+            s = entry(side, size, o -> o.make(price.entry));
+            executeEntryAll();
+            exit(o -> o.make(price.exit));
+            executeExitHalf();
+            executeExitHalf();
+            break;
+
+        case ExitSeparately:
+            s = entry(side, size, o -> o.make(price.entry));
+            executeEntryAll();
+            exit(o -> o.make(price.exit));
+            executeExitHalf();
+            market.elapse(1, ChronoUnit.MINUTES);
+            executeExitHalf();
+            break;
+
         case ExitCanceled:
             s = entry(side, size, o -> o.make(price.entry));
             executeEntryAll();
             exit(o -> o.make(price.exit));
             cancelExit();
-            break;
-
-        case ExitLater:
-            s = entry(side, size, o -> o.make(price.entry));
-            executeEntryAll();
-            exit(o -> o.make(price.exit));
-            market.elapse(60, ChronoUnit.SECONDS);
-            executeExitAll();
             break;
 
         case ExitPartiallyCancelled:
