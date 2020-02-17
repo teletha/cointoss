@@ -288,26 +288,6 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
     }
 
     /**
-     * Cancel entry.
-     */
-    protected final void cancelEntry() {
-        Scenario s = latest();
-        for (Order entry : s.entries) {
-            market.cancel(entry);
-        }
-    }
-
-    /**
-     * Cancel entry.
-     */
-    protected final void cancelExit() {
-        Scenario s = latest();
-        for (Order e : s.exits) {
-            market.cancel(e);
-        }
-    }
-
-    /**
      * Build the specified trade scene.
      * 
      * @param parts The trade scene.
@@ -369,7 +349,7 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
         case EntrySeparately:
             s = entry(side, size, o -> o.make(price.entry));
             executeEntryHalf();
-            market.elapse(1, ChronoUnit.MINUTES);
+            market.elapse(1, MINUTES);
             executeEntryHalf();
             break;
 
@@ -379,9 +359,9 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
             break;
 
         case EntryPartiallyCanceled:
-            s = entry(side, size, o -> o.make(price.entry));
+            s = entry(side, size, o -> o.make(price.entry).cancelAfter(1, MINUTES));
             executeEntryHalf();
-            cancelEntry();
+            market.elapse(1, MINUTES);
             break;
 
         case Exit:
@@ -417,14 +397,14 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
             executeEntryAll();
             exit(o -> o.make(price.exit));
             executeExitHalf();
-            market.elapse(1, ChronoUnit.MINUTES);
+            market.elapse(1, MINUTES);
             executeExitHalf();
             break;
 
         case ExitLater:
             s = entry(side, size, o -> o.make(price.entry));
             executeEntryAll();
-            market.elapse(1, ChronoUnit.MINUTES);
+            market.elapse(1, MINUTES);
             exit(o -> o.make(price.exit));
             executeExitAll();
             break;
@@ -432,31 +412,31 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
         case ExitCanceled:
             s = entry(side, size, o -> o.make(price.entry));
             executeEntryAll();
-            exit(o -> o.make(price.exit).cancelAfter(1, ChronoUnit.MINUTES));
-            market.elapse(1, ChronoUnit.MINUTES);
+            exit(o -> o.make(price.exit).cancelAfter(1, MINUTES));
+            market.elapse(1, MINUTES);
             break;
 
         case ExitCanceledThenOtherExit:
             s = entry(side, size, o -> o.make(price.entry));
             executeEntryAll();
-            exit(o -> o.make(price.exit).cancelAfter(1, ChronoUnit.MINUTES).make(price.exit));
-            market.elapse(1, ChronoUnit.MINUTES);
+            exit(o -> o.make(price.exit).cancelAfter(1, MINUTES).make(price.exit));
+            market.elapse(1, MINUTES);
             break;
 
         case ExitCanceledThenOtherExitCompletely:
             s = entry(side, size, o -> o.make(price.entry));
             executeEntryAll();
-            exit(o -> o.make(price.exit).cancelAfter(1, ChronoUnit.MINUTES).make(price.exit));
-            market.elapse(1, ChronoUnit.MINUTES);
+            exit(o -> o.make(price.exit).cancelAfter(1, MINUTES).make(price.exit));
+            market.elapse(1, MINUTES);
             executeExitAll();
             break;
 
         case ExitPartiallyCancelled:
-            s = entry(side, size, o -> o.make(price.entry));
+            s = entry(side, size, o -> o.make(price.entry).cancelAfter(1, MINUTES));
             executeEntryAll();
             exit(o -> o.make(price.exit));
             executeExitHalf();
-            cancelExit();
+            market.elapse(1, MINUTES);
             break;
 
         case EntryPartiallyAndExitCompletely:

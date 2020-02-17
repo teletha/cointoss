@@ -84,6 +84,7 @@ class ScenarioStatusTest extends TraderTestSupport {
         case EntryCompletely:
         case EntryMultiple:
         case EntrySeparately:
+        case EntryPartiallyCanceled:
         case EntryPartiallyAndExitCompletely:
         case Exit:
         case ExitCanceled:
