@@ -7,177 +7,18 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss;
+package cointoss.trade;
 
 import org.junit.jupiter.api.Test;
 
+import cointoss.Direction;
+import cointoss.Profitable;
+import cointoss.Scenario;
+import cointoss.TraderTestSupport;
 import cointoss.execution.Execution;
-import cointoss.trade.extension.PricePart;
-import cointoss.trade.extension.SidePart;
-import cointoss.trade.extension.TradeTest;
 import cointoss.util.Num;
 
-class ScenarioProfitTest extends TraderTestSupport {
-
-    @TradeTest
-    void completeEntryAndCompleteExit(SidePart side, PricePart price) {
-        entryAndExit(Execution.with.direction(side, 1).price(price.entry), Execution.with.direction(side.inverse(), 1).price(price.exit));
-
-        Scenario s = latest();
-        assert s.realizedProfit.is(price.diff * side.sign);
-        assert s.unrealizedProfit(price.profitN).is(0);
-        assert s.profit(price.profitN).is(price.diff * side.sign);
-    }
-
-    @Test
-    void completeEntryAndIncompleteExit() {
-        entryAndExit(Execution.with.buy(2).price(10), Execution.with.sell(1).price(20));
-
-        Scenario s = latest();
-        assert s.realizedProfit.is(10);
-        assert s.unrealizedProfit(Num.of(25)).is(15);
-        assert s.profit(Num.of(25)).is(25);
-    }
-
-    @Test
-    void completeEntryAndPartialExit() {
-        entryAndExitPartial(Execution.with.buy(2).price(10), Execution.with.sell(2).price(20), 1);
-
-        Scenario s = latest();
-        assert s.realizedProfit.is(10);
-        assert s.unrealizedProfit(Num.of(25)).is(15);
-        assert s.profit(Num.of(25)).is(25);
-    }
-
-    @Test
-    void completeEntryAndNoExit() {
-        entry(Execution.with.buy(1).price(10));
-
-        Scenario s = latest();
-        assert s.realizedProfit.is(0);
-        assert s.unrealizedProfit(Num.of(25)).is(15);
-        assert s.profit(Num.of(25)).is(15);
-    }
-
-    @Test
-    void partialEntryAndCompleteExit() {
-        entryPartialAndExit(Execution.with.buy(2).price(10), 1, Execution.with.sell(1).price(20));
-
-        Scenario s = latest();
-        assert s.realizedProfit.is(10);
-        assert s.unrealizedProfit(Num.of(25)).is(0);
-        assert s.profit(Num.of(25)).is(10);
-    }
-
-    @Test
-    void partialEntryAndIncompleteExit() {
-        entryPartialAndExit(Execution.with.buy(3).price(10), 2, Execution.with.sell(1).price(20));
-
-        Scenario s = latest();
-        assert s.realizedProfit.is(10);
-        assert s.unrealizedProfit(Num.of(25)).is(15);
-        assert s.profit(Num.of(25)).is(25);
-    }
-
-    @Test
-    void partialEntryAndPartialExit() {
-        entryPartialAndExitPartial(Execution.with.buy(2).price(10), 1, Execution.with.sell(2).price(20), 1);
-
-        Scenario s = latest();
-        assert s.realizedProfit.is(10);
-        assert s.unrealizedProfit(Num.of(25)).is(0);
-        assert s.profit(Num.of(25)).is(10);
-    }
-
-    @Test
-    void partialEntryAndNoExit() {
-        entryPartial(Execution.with.buy(2).price(10), 1);
-
-        Scenario s = latest();
-        assert s.realizedProfit.is(0);
-        assert s.unrealizedProfit(Num.of(25)).is(15);
-        assert s.profit(Num.of(25)).is(15);
-    }
-
-    @Test
-    void sellCompleteEntryAndCompleteExit() {
-        entryAndExit(Execution.with.sell(1).price(10), Execution.with.buy(1).price(20));
-
-        Scenario s = latest();
-        assert s.realizedProfit.is(-10);
-        assert s.unrealizedProfit(Num.of(25)).is(0);
-        assert s.profit(Num.of(25)).is(-10);
-    }
-
-    @Test
-    void sellCompleteEntryAndIncompleteExit() {
-        entryAndExit(Execution.with.sell(2).price(10), Execution.with.buy(1).price(20));
-
-        Scenario s = latest();
-        assert s.realizedProfit.is(-10);
-        assert s.unrealizedProfit(Num.of(25)).is(-15);
-        assert s.profit(Num.of(25)).is(-25);
-    }
-
-    @Test
-    void sellCompleteEntryAndPartialExit() {
-        entryAndExitPartial(Execution.with.sell(2).price(10), Execution.with.buy(2).price(20), 1);
-
-        Scenario s = latest();
-        assert s.realizedProfit.is(-10);
-        assert s.unrealizedProfit(Num.of(25)).is(-15);
-        assert s.profit(Num.of(25)).is(-25);
-    }
-
-    @Test
-    void sellCompleteEntryAndNoExit() {
-        entry(Execution.with.sell(1).price(10));
-
-        Scenario s = latest();
-        assert s.realizedProfit.is(0);
-        assert s.unrealizedProfit(Num.of(25)).is(-15);
-        assert s.profit(Num.of(25)).is(-15);
-    }
-
-    @Test
-    void sellPartialEntryAndCompleteExit() {
-        entryPartialAndExit(Execution.with.sell(2).price(20), 1, Execution.with.buy(1).price(10));
-
-        Scenario s = latest();
-        assert s.realizedProfit.is(10);
-        assert s.unrealizedProfit(Num.of(5)).is(0);
-        assert s.profit(Num.of(5)).is(10);
-    }
-
-    @Test
-    void sellPartialEntryAndIncompleteExit() {
-        entryPartialAndExit(Execution.with.sell(3).price(20), 2, Execution.with.buy(1).price(10));
-
-        Scenario s = latest();
-        assert s.realizedProfit.is(10);
-        assert s.unrealizedProfit(Num.of(5)).is(15);
-        assert s.profit(Num.of(5)).is(25);
-    }
-
-    @Test
-    void sellPartialEntryAndPartialExit() {
-        entryPartialAndExitPartial(Execution.with.sell(2).price(20), 1, Execution.with.buy(2).price(10), 1);
-
-        Scenario s = latest();
-        assert s.realizedProfit.is(10);
-        assert s.unrealizedProfit(Num.of(5)).is(0);
-        assert s.profit(Num.of(5)).is(10);
-    }
-
-    @Test
-    void sellPartialEntryAndNoExit() {
-        entryPartial(Execution.with.sell(2).price(10), 1);
-
-        Scenario s = latest();
-        assert s.realizedProfit.is(0);
-        assert s.unrealizedProfit(Num.of(5)).is(5);
-        assert s.profit(Num.of(25)).is(-15);
-    }
+class ScenarioSnapshotTest extends TraderTestSupport {
 
     @Test
     void snapshotCompleteEntryAndCompleteExit() {
