@@ -10,6 +10,7 @@
  */
 package cointoss.verify;
 
+import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.concurrent.TimeUnit;
@@ -135,6 +136,17 @@ public class VerifiableMarket extends Market {
      */
     public final VerifiableMarket elapse(long time, ChronoUnit unit) {
         service.elapse(time, TimeUnit.of(unit));
+        return this;
+    }
+
+    /**
+     * Elapse market time.
+     * 
+     * @param time
+     * @return
+     */
+    public final VerifiableMarket elapse(Duration time) {
+        service.elapse(time.toMillis(), TimeUnit.MILLISECONDS);
         return this;
     }
 }

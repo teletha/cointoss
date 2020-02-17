@@ -9,89 +9,56 @@
  */
 package cointoss.trade;
 
-import static java.time.temporal.ChronoUnit.SECONDS;
-
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 
-import org.junit.jupiter.api.Test;
-
-import cointoss.Direction;
 import cointoss.Scenario;
 import cointoss.TraderTestSupport;
-import cointoss.execution.Execution;
+import cointoss.trade.extension.ScenePart;
+import cointoss.trade.extension.TradeTest;
 
 class ScenaroHoldTimeTest extends TraderTestSupport {
 
-    @Test
-    void holdTime() {
-        Scenario s = entry(1, o -> o.make(10));
-        executeEntryAll();
-        market.elapse(10, ChronoUnit.SECONDS);
-        exit(o -> o.make(20));
-        executeExitAll();
+    @TradeTest
+    void holdTime(ScenePart scene) {
+        Scenario s = scenario(scene);
 
-        assert s.holdTime().equals(Duration.ofSeconds(10));
-    }
+        switch (scene) {
+        case EntrySeparately:
+        case ExitLater:
+            assert s.holdTime().equals(Duration.ofSeconds(60));
+            break;
 
-    @Test
-    void holdTimeWithNoneExecutedActiveEntry() {
-        when(now(), v -> new Scenario() {
+        default:
+            assert s.holdTime().equals(Duration.ofSeconds(0));
+            break;
+        }
 
-            @Override
-            protected void entry() {
-                entry(Direction.BUY, 1, s -> s.make(10));
-            }
+        // Time flows...
+        market.elapse(100, ChronoUnit.SECONDS);
 
-            @Override
-            protected void exit() {
-            }
-        });
+        switch (scene) {
+        // already completed so no change
+        case EntryCanceled:
+        case ExitCompletely:
+        case EntryPartiallyAndExitCompletely:
+            assert s.holdTime().equals(Duration.ofSeconds(0));
+            break;
 
-        market.elapse(14, SECONDS);
+        // already completed so no change
+        case ExitLater:
+            assert s.holdTime().equals(Duration.ofSeconds(60));
+            break;
 
-        Scenario s = latest();
-        assert s.holdTime().equals(Duration.ofSeconds(14));
-    }
+        // added the elapsed time
+        case EntrySeparately:
+            assert s.holdTime().equals(Duration.ofSeconds(160));
+            break;
 
-    @Test
-    void holdTimeWithNoneExecutedCanceledEntry() {
-        when(now(), v -> new Scenario() {
-
-            @Override
-            protected void entry() {
-                entry(Direction.BUY, 1, s -> s.make(10).cancelAfter(8, SECONDS));
-            }
-
-            @Override
-            protected void exit() {
-            }
-        });
-
-        market.elapse(18, SECONDS);
-
-        Scenario s = latest();
-        assert s.holdTime().isZero();
-    }
-
-    @Test
-    void holdTimeWithPartialyExecutedCanceledEntry() {
-        when(now(), v -> new Scenario() {
-
-            @Override
-            protected void entry() {
-                entry(Direction.BUY, 1, s -> s.make(10).cancelAfter(8, SECONDS));
-            }
-
-            @Override
-            protected void exit() {
-            }
-        });
-
-        market.perform(Execution.with.buy(0.1).price(9));
-        market.elapse(18, SECONDS);
-
-        Scenario s = latest();
-        assert s.holdTime().equals(Duration.ofSeconds(18));
+        // added the elapsed time
+        default:
+            assert s.holdTime().equals(Duration.ofSeconds(100));
+            break;
+        }
     }
 }

@@ -18,12 +18,13 @@ class ScenarioStatusTest extends TraderTestSupport {
 
     @TradeTest
     void isActive(ScenePart scene) {
-        Scenario s = build(scene);
+        Scenario s = scenario(scene);
 
         switch (scene) {
-        case EntryCancelled:
+        case EntryCanceled:
         case EntryPartiallyAndExitCompletely:
         case ExitCompletely:
+        case ExitLater:
             assert s.isActive() == false;
             break;
 
@@ -35,10 +36,10 @@ class ScenarioStatusTest extends TraderTestSupport {
 
     @TradeTest
     void isCanceled(ScenePart scene) {
-        Scenario s = build(scene);
+        Scenario s = scenario(scene);
 
         switch (scene) {
-        case EntryCancelled:
+        case EntryCanceled:
             assert s.isCanceled() == true;
             break;
 
@@ -50,12 +51,13 @@ class ScenarioStatusTest extends TraderTestSupport {
 
     @TradeTest
     void isTerminated(ScenePart scene) {
-        Scenario s = build(scene);
+        Scenario s = scenario(scene);
 
         switch (scene) {
-        case EntryCancelled:
+        case EntryCanceled:
         case EntryPartiallyAndExitCompletely:
         case ExitCompletely:
+        case ExitLater:
             assert s.isTerminated() == true;
             break;
 
@@ -67,17 +69,20 @@ class ScenarioStatusTest extends TraderTestSupport {
 
     @TradeTest
     void isEntryTerminated(ScenePart scene) {
-        Scenario s = build(scene);
+        Scenario s = scenario(scene);
 
         switch (scene) {
-        case EntryCancelled:
+        case EntryCanceled:
         case EntryCompletely:
+        case EntryMultiple:
+        case EntrySeparately:
         case EntryPartiallyAndExitCompletely:
         case Exit:
-        case ExitCancelled:
+        case ExitCanceled:
         case ExitPartially:
         case ExitPartiallyCancelled:
         case ExitCompletely:
+        case ExitLater:
             assert s.isEntryTerminated() == true;
             break;
 
@@ -89,12 +94,13 @@ class ScenarioStatusTest extends TraderTestSupport {
 
     @TradeTest
     void isExitTerminated(ScenePart scene) {
-        Scenario s = build(scene);
+        Scenario s = scenario(scene);
 
         switch (scene) {
-        case EntryCancelled:
+        case EntryCanceled:
         case EntryPartiallyAndExitCompletely:
         case ExitCompletely:
+        case ExitLater:
             assert s.isExitTerminated() == true;
             break;
 

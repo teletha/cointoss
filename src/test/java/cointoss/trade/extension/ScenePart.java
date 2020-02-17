@@ -9,13 +9,34 @@
  */
 package cointoss.trade.extension;
 
-public enum ScenePart {
+public enum ScenePart implements TradePart {
 
-    // entry type
-    Entry, EntryPartially, EntryCompletely, EntryCancelled, EntryPartiallyCancelled,
+    /** Entry is just requested. */
+    Entry,
+
+    /** Entry is executed partially. */
+    EntryPartially,
+
+    /** Complete entry. */
+    EntryCompletely,
+
+    /** Complete entry by multiple executions. */
+    EntryMultiple,
+
+    /** Complete entry by multiple executions over long time. */
+    EntrySeparately,
+
+    /** Entry was requested and canceled. */
+    EntryCanceled,
+
+    /** Entry is executed partially and the remaining is canceled. */
+    EntryPartiallyCanceled,
 
     // exit type
-    Exit, ExitPartially, ExitCompletely, ExitCancelled, ExitPartiallyCancelled,
+    Exit, ExitPartially, ExitCompletely, ExitCanceled, ExitPartiallyCancelled,
+
+    /** Complete entry and complete exit later. */
+    ExitLater,
 
     // entry partially cancelled and exit
     EntryPartiallyAndExitCompletely;

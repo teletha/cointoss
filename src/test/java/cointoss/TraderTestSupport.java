@@ -24,6 +24,7 @@ import cointoss.trade.extension.PricePart;
 import cointoss.trade.extension.ScenePart;
 import cointoss.trade.extension.SidePart;
 import cointoss.trade.extension.SizePart;
+import cointoss.trade.extension.TradePart;
 import cointoss.util.Num;
 import cointoss.util.TimebaseSupport;
 import cointoss.verify.VerifiableMarket;
@@ -252,7 +253,6 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
         Scenario s = latest();
 
         market.perform(Execution.with.direction(s.inverse(), size).price(price.minus(s, 1)).date(market.service.now()));
-        awaitOrderBufferingTime();
     }
 
     /**
@@ -285,7 +285,6 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
         Scenario s = latest();
 
         market.perform(Execution.with.direction(s.direction(), size).price(price.minus(s.inverse(), 1)).date(market.service.now()));
-        awaitOrderBufferingTime();
     }
 
     /**
@@ -296,7 +295,6 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
         for (Order entry : s.entries) {
             market.cancel(entry);
         }
-        awaitOrderBufferingTime();
     }
 
     /**
@@ -307,98 +305,132 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
         for (Order e : s.exits) {
             market.cancel(e);
         }
-        awaitOrderBufferingTime();
     }
 
-    protected final Scenario build(ScenePart scene) {
-        return build(scene, null, null, null);
-    }
+    /**
+     * Build the specified trade scene.
+     * 
+     * @param parts The trade scene.
+     * @return A new created {@link Scenario}.
+     */
+    protected final Scenario scenario(TradePart... parts) {
+        ScenePart scene = ScenePart.ExitCompletely;
+        SidePart side = new SidePart(Direction.BUY);
+        SizePart size = new SizePart(2);
+        PricePart price = new PricePart(10, 20);
 
-    protected final Scenario build(ScenePart scene, SidePart side) {
-        return build(scene, side, null, null);
-    }
-
-    protected final Scenario build(ScenePart scene, SizePart size) {
-        return build(scene, null, size, null);
-    }
-
-    protected final Scenario build(ScenePart scene, SidePart side, SizePart size, PricePart price) {
-        if (side == null) {
-            side = new SidePart(Direction.BUY);
+        for (TradePart part : parts) {
+            if (part instanceof ScenePart) {
+                scene = (ScenePart) part;
+            } else if (part instanceof SidePart) {
+                side = (SidePart) part;
+            } else if (part instanceof SizePart) {
+                size = (SizePart) part;
+            } else if (part instanceof PricePart) {
+                price = (PricePart) part;
+            }
         }
+        return scenario(scene, side, size, price);
+    }
 
-        if (size == null) {
-            size = new SizePart(2);
-        }
-
+    /**
+     * Build the specified trade scene.
+     * 
+     * @param scene A target trade scene.
+     * @param side An entry side.
+     * @param size An entry size.
+     * @param price An entry and exit price
+     * @return A new created {@link Scenario}.
+     */
+    private final Scenario scenario(ScenePart scene, SidePart side, SizePart size, PricePart price) {
         Scenario s = null;
-        PricePart p = price != null ? price : new PricePart(10, 20);
 
         switch (scene) {
         case Entry:
-            s = entry(side, size, o -> o.make(p.entry));
+            s = entry(side, size, o -> o.make(price.entry));
             break;
 
         case EntryPartially:
-            s = entry(side, size, o -> o.make(p.entry));
+            s = entry(side, size, o -> o.make(price.entry));
             executeEntryHalf();
             break;
 
         case EntryCompletely:
-            s = entry(side, size, o -> o.make(p.entry));
+            s = entry(side, size, o -> o.make(price.entry));
             executeEntryAll();
             break;
 
-        case EntryCancelled:
-            s = entry(side, size, o -> o.make(p.entry).cancelAfter(1, MINUTES));
+        case EntryMultiple:
+            s = entry(side, size, o -> o.make(price.entry));
+            executeEntryHalf();
+            executeEntryHalf();
+            break;
+
+        case EntrySeparately:
+            s = entry(side, size, o -> o.make(price.entry));
+            executeEntryHalf();
+            market.elapse(1, ChronoUnit.MINUTES);
+            executeEntryHalf();
+            break;
+
+        case EntryCanceled:
+            s = entry(side, size, o -> o.make(price.entry).cancelAfter(1, MINUTES));
             market.elapse(1, MINUTES);
             break;
 
-        case EntryPartiallyCancelled:
-            s = entry(side, size, o -> o.make(p.entry));
+        case EntryPartiallyCanceled:
+            s = entry(side, size, o -> o.make(price.entry));
             executeEntryHalf();
             cancelEntry();
             break;
 
         case Exit:
-            s = entry(side, size, o -> o.make(p.entry));
+            s = entry(side, size, o -> o.make(price.entry));
             executeEntryAll();
-            exit(o -> o.make(p.exit));
+            exit(o -> o.make(price.exit));
             break;
 
         case ExitPartially:
-            s = entry(side, size, o -> o.make(p.entry));
+            s = entry(side, size, o -> o.make(price.entry));
             executeEntryAll();
-            exit(o -> o.make(p.exit));
+            exit(o -> o.make(price.exit));
             executeExitHalf();
             break;
 
         case ExitCompletely:
-            s = entry(side, size, o -> o.make(p.entry));
+            s = entry(side, size, o -> o.make(price.entry));
             executeEntryAll();
-            exit(o -> o.make(p.exit));
+            exit(o -> o.make(price.exit));
             executeExitAll();
             break;
 
-        case ExitCancelled:
-            s = entry(side, size, o -> o.make(p.entry));
+        case ExitCanceled:
+            s = entry(side, size, o -> o.make(price.entry));
             executeEntryAll();
-            exit(o -> o.make(p.exit));
+            exit(o -> o.make(price.exit));
             cancelExit();
             break;
 
-        case ExitPartiallyCancelled:
-            s = entry(side, size, o -> o.make(p.entry));
+        case ExitLater:
+            s = entry(side, size, o -> o.make(price.entry));
             executeEntryAll();
-            exit(o -> o.make(p.exit));
+            exit(o -> o.make(price.exit));
+            market.elapse(60, ChronoUnit.SECONDS);
+            executeExitAll();
+            break;
+
+        case ExitPartiallyCancelled:
+            s = entry(side, size, o -> o.make(price.entry));
+            executeEntryAll();
+            exit(o -> o.make(price.exit));
             executeExitHalf();
             cancelExit();
             break;
 
         case EntryPartiallyAndExitCompletely:
-            s = entry(side, size, o -> o.make(p.entry));
+            s = entry(side, size, o -> o.make(price.entry));
             executeEntryHalf();
-            exit(o -> o.make(p.exit));
+            exit(o -> o.make(price.exit));
             executeExitAll();
             break;
         }

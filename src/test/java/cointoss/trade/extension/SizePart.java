@@ -15,7 +15,7 @@ import java.util.Set;
 import cointoss.util.Num;
 
 @SuppressWarnings("serial")
-public class SizePart extends Num {
+public class SizePart extends Num implements TradePart {
 
     public final double num;
 

@@ -13,7 +13,7 @@ import java.util.Set;
 
 import cointoss.util.Num;
 
-public class PricePart {
+public class PricePart implements TradePart {
 
     public final double entry;
 

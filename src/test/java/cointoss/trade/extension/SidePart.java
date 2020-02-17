@@ -14,7 +14,7 @@ import java.util.Set;
 import cointoss.Direction;
 import cointoss.Directional;
 
-public class SidePart implements Directional {
+public class SidePart implements Directional, TradePart {
 
     /** The actual side. */
     public final Direction side;
