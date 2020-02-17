@@ -53,6 +53,12 @@ public enum ScenePart implements TradePart {
     /** Complete entry and exit is canceled. */
     ExitCanceled,
 
+    /** Complete entry and first exit was canceled then second exit is requested. */
+    ExitCanceledThenOtherExit,
+
+    /** Complete entry and first exit was canceled then second exit is completed. */
+    ExitCanceledThenOtherExitCompletely,
+
     /** Complete entry and exit is executed partially and the remaining is canceled. */
     ExitPartiallyCancelled,
 

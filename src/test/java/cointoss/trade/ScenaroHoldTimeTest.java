@@ -10,6 +10,7 @@
 package cointoss.trade;
 
 import java.time.Duration;
+import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 
 import cointoss.Scenario;
@@ -27,6 +28,9 @@ class ScenaroHoldTimeTest extends TraderTestSupport {
         case EntrySeparately:
         case ExitSeparately:
         case ExitLater:
+        case ExitCanceled:
+        case ExitCanceledThenOtherExit:
+        case ExitCanceledThenOtherExitCompletely:
             assert s.holdTime().equals(Duration.ofSeconds(60));
             break;
 
@@ -50,17 +54,53 @@ class ScenaroHoldTimeTest extends TraderTestSupport {
         // already completed so no change
         case ExitSeparately:
         case ExitLater:
+        case ExitCanceled:
+        case ExitCanceledThenOtherExitCompletely:
             assert s.holdTime().equals(Duration.ofSeconds(60));
             break;
 
         // added the elapsed time
         case EntrySeparately:
+        case ExitCanceledThenOtherExit:
             assert s.holdTime().equals(Duration.ofSeconds(160));
             break;
 
         // added the elapsed time
         default:
             assert s.holdTime().equals(Duration.ofSeconds(100));
+            break;
+        }
+    }
+
+    @TradeTest
+    void holdStartTime(ScenePart scene) {
+        ZonedDateTime starting = market.service.now();
+        Scenario s = scenario(scene);
+        assert s.holdStartTime().isEqual(starting);
+
+        // Time flows...
+        market.elapse(100, ChronoUnit.SECONDS);
+        assert s.holdStartTime().isEqual(starting);
+    }
+
+    @TradeTest
+    void holdEndTime(ScenePart scene) {
+        ZonedDateTime starting = market.service.now();
+        Scenario s = scenario(scene);
+
+        switch (scene) {
+        case EntryCanceled:
+        case EntrySeparately:
+        case ExitCanceled:
+        case ExitCanceledThenOtherExit:
+        case ExitCanceledThenOtherExitCompletely:
+        case ExitSeparately:
+        case ExitLater:
+            assert s.holdEndTime().isEqual(starting.plusSeconds(60));
+            break;
+
+        default:
+            assert s.holdEndTime().isEqual(starting);
             break;
         }
     }

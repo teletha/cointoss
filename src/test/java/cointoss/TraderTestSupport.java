@@ -432,8 +432,23 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
         case ExitCanceled:
             s = entry(side, size, o -> o.make(price.entry));
             executeEntryAll();
-            exit(o -> o.make(price.exit));
-            cancelExit();
+            exit(o -> o.make(price.exit).cancelAfter(1, ChronoUnit.MINUTES));
+            market.elapse(1, ChronoUnit.MINUTES);
+            break;
+
+        case ExitCanceledThenOtherExit:
+            s = entry(side, size, o -> o.make(price.entry));
+            executeEntryAll();
+            exit(o -> o.make(price.exit).cancelAfter(1, ChronoUnit.MINUTES).make(price.exit));
+            market.elapse(1, ChronoUnit.MINUTES);
+            break;
+
+        case ExitCanceledThenOtherExitCompletely:
+            s = entry(side, size, o -> o.make(price.entry));
+            executeEntryAll();
+            exit(o -> o.make(price.exit).cancelAfter(1, ChronoUnit.MINUTES).make(price.exit));
+            market.elapse(1, ChronoUnit.MINUTES);
+            executeExitAll();
             break;
 
         case ExitPartiallyCancelled:

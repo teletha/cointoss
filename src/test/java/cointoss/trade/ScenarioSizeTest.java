@@ -55,6 +55,11 @@ class ScenarioSizeTest extends TraderTestSupport {
         Scenario s = scenario(scene, size);
 
         switch (scene) {
+        case ExitCanceledThenOtherExit:
+        case ExitCanceledThenOtherExitCompletely:
+            assert s.exitSize.is(size.num * 2);
+            break;
+
         case Exit:
         case ExitCanceled:
         case ExitCompletely:
@@ -85,6 +90,7 @@ class ScenarioSizeTest extends TraderTestSupport {
         case ExitMultiple:
         case ExitSeparately:
         case ExitLater:
+        case ExitCanceledThenOtherExitCompletely:
             assert s.exitExecutedSize.is(size);
             break;
 
