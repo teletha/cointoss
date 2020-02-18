@@ -16,10 +16,11 @@ import org.junit.jupiter.api.Test;
 
 import cointoss.execution.Execution;
 import cointoss.order.Order;
+import cointoss.trade.extension.TradeTest;
 
 class ScenarioTest extends TraderTestSupport {
 
-    @Test
+    @TradeTest
     void entryWithMultipleExecutionsAndSingleExit() {
         when(now(), v -> new Scenario() {
             @Override
