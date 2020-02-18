@@ -10,7 +10,6 @@
 package cointoss.trade.extension;
 
 import java.time.Duration;
-import java.util.Set;
 
 import cointoss.util.Chrono;
 
@@ -18,7 +17,7 @@ public class EntryExitGapPart implements TradePart {
 
     public final Duration sec;
 
-    public EntryExitGapPart(long seconds) {
+    public EntryExitGapPart(int seconds) {
         this.sec = Duration.ofSeconds(seconds);
     }
 
@@ -28,9 +27,5 @@ public class EntryExitGapPart implements TradePart {
     @Override
     public String toString() {
         return Chrono.formatAsDuration(sec);
-    }
-
-    static Set<EntryExitGapPart> values() {
-        return Set.of(new EntryExitGapPart(0));
     }
 }

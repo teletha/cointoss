@@ -17,9 +17,34 @@ import java.lang.annotation.Target;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ArgumentsSource;
 
+import cointoss.Direction;
+
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @ParameterizedTest
 @ArgumentsSource(TradePartProvider.class)
 public @interface TradeTest {
+
+    /**
+     * Configure {@link SidePart}.
+     * 
+     * @return
+     */
+    Direction[] side() default {Direction.BUY, Direction.SELL};
+
+    /**
+     * Configure {@link SidePart}.
+     * 
+     * @return
+     */
+    double[] size() default {2, 0.2};
+
+    double[] price() default {10, 20, 20, 10, 0.1, 0.2, 0.2, 0.1};
+
+    /**
+     * Configure {@link EntryExitGapPart}.
+     * 
+     * @return
+     */
+    int[] gap() default {0};
 }

@@ -9,8 +9,6 @@
  */
 package cointoss.trade.extension;
 
-import java.util.Set;
-
 import cointoss.util.Num;
 
 public class PricePart implements TradePart {
@@ -71,14 +69,5 @@ public class PricePart implements TradePart {
     @Override
     public String toString() {
         return "[entry=" + entry + ", exit=" + exit + "]";
-    }
-
-    /**
-     * Collect all values.
-     * 
-     * @return
-     */
-    static Set<PricePart> values() {
-        return Set.of(new PricePart(10, 20), new PricePart(20, 10), new PricePart(0.1, 0.2), new PricePart(0.2, 0.1));
     }
 }

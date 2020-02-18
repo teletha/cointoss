@@ -10,7 +10,6 @@
 package cointoss.trade.extension;
 
 import java.math.BigDecimal;
-import java.util.Set;
 
 import cointoss.util.Num;
 
@@ -37,14 +36,5 @@ public class SizePart extends Num implements TradePart {
     @Override
     public String toString() {
         return "[" + num + "]";
-    }
-
-    /**
-     * Collect all values.
-     * 
-     * @return
-     */
-    static Set<SizePart> values() {
-        return Set.of(new SizePart(2), new SizePart(0.2));
     }
 }

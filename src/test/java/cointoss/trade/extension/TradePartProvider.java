@@ -10,8 +10,12 @@
 package cointoss.trade.extension;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.DoubleStream;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -27,18 +31,25 @@ class TradePartProvider implements ArgumentsProvider {
      */
     @Override
     public Stream<? extends Arguments> provideArguments(ExtensionContext context) throws Exception {
+        TradeTest annotation = context.getRequiredTestMethod().getAnnotation(TradeTest.class);
+
         List<Set<?>> parameters = new ArrayList();
         for (Class<?> parameterType : context.getRequiredTestMethod().getParameterTypes()) {
             if (parameterType == SidePart.class) {
-                parameters.add(SidePart.values());
+                parameters.add(Stream.of(annotation.side()).map(SidePart::new).collect(Collectors.toSet()));
             } else if (parameterType == PricePart.class) {
-                parameters.add(PricePart.values());
+                Set<PricePart> set = new HashSet();
+                double[] prices = annotation.price();
+                for (int i = 0; i < prices.length; i += 2) {
+                    set.add(new PricePart(prices[i], prices[i + 1]));
+                }
+                parameters.add(set);
             } else if (parameterType == SizePart.class) {
-                parameters.add(SizePart.values());
+                parameters.add(DoubleStream.of(annotation.size()).mapToObj(SizePart::new).collect(Collectors.toSet()));
             } else if (parameterType == ScenePart.class) {
                 parameters.add(Set.of(ScenePart.values()));
             } else if (parameterType == EntryExitGapPart.class) {
-                parameters.add(EntryExitGapPart.values());
+                parameters.add(IntStream.of(annotation.gap()).mapToObj(EntryExitGapPart::new).collect(Collectors.toSet()));
             }
         }
         return Sets.cartesianProduct(parameters).stream().map(List::toArray).map(Arguments::arguments);

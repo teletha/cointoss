@@ -9,8 +9,6 @@
  */
 package cointoss.trade.extension;
 
-import java.util.Set;
-
 import cointoss.Direction;
 import cointoss.Directional;
 
@@ -44,14 +42,5 @@ public class SidePart implements Directional, TradePart {
     @Override
     public String toString() {
         return "[" + side + "]";
-    }
-
-    /**
-     * Collect all values.
-     * 
-     * @return
-     */
-    static Set<SidePart> values() {
-        return Set.of(new SidePart(Direction.BUY), new SidePart(Direction.SELL));
     }
 }
