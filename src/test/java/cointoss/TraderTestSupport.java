@@ -20,6 +20,7 @@ import org.junit.jupiter.api.BeforeEach;
 import cointoss.execution.Execution;
 import cointoss.order.Order;
 import cointoss.order.OrderStrategy.Orderable;
+import cointoss.trade.extension.EntryExitGapPart;
 import cointoss.trade.extension.PricePart;
 import cointoss.trade.extension.ScenePart;
 import cointoss.trade.extension.SidePart;
@@ -298,6 +299,7 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
         SidePart side = new SidePart(Direction.BUY);
         SizePart size = new SizePart(2);
         PricePart price = new PricePart(10, 20);
+        EntryExitGapPart gap = new EntryExitGapPart(0);
 
         for (TradePart part : parts) {
             if (part instanceof ScenePart) {
@@ -308,9 +310,11 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
                 size = (SizePart) part;
             } else if (part instanceof PricePart) {
                 price = (PricePart) part;
+            } else if (part instanceof EntryExitGapPart) {
+                gap = (EntryExitGapPart) part;
             }
         }
-        return scenario(scene, side, size, price);
+        return scenario(scene, side, size, price, gap);
     }
 
     /**
@@ -322,7 +326,7 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
      * @param price An entry and exit price
      * @return A new created {@link Scenario}.
      */
-    private final Scenario scenario(ScenePart scene, SidePart side, SizePart size, PricePart price) {
+    private final Scenario scenario(ScenePart scene, SidePart side, SizePart size, PricePart price, EntryExitGapPart gap) {
         Scenario s = null;
 
         switch (scene) {
@@ -367,12 +371,14 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
         case Exit:
             s = entry(side, size, o -> o.make(price.entry));
             executeEntryAll();
+            market.elapse(gap.sec);
             exit(o -> o.make(price.exit));
             break;
 
         case ExitPartially:
             s = entry(side, size, o -> o.make(price.entry));
             executeEntryAll();
+            market.elapse(gap.sec);
             exit(o -> o.make(price.exit));
             executeExitHalf();
             break;
@@ -380,6 +386,7 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
         case ExitCompletely:
             s = entry(side, size, o -> o.make(price.entry));
             executeEntryAll();
+            market.elapse(gap.sec);
             exit(o -> o.make(price.exit));
             executeExitAll();
             break;
@@ -387,6 +394,7 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
         case ExitMultiple:
             s = entry(side, size, o -> o.make(price.entry));
             executeEntryAll();
+            market.elapse(gap.sec);
             exit(o -> o.make(price.exit));
             executeExitHalf();
             executeExitHalf();
@@ -395,23 +403,17 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
         case ExitSeparately:
             s = entry(side, size, o -> o.make(price.entry));
             executeEntryAll();
+            market.elapse(gap.sec);
             exit(o -> o.make(price.exit));
             executeExitHalf();
             market.elapse(1, MINUTES);
             executeExitHalf();
-            break;
-
-        case ExitLater:
-            s = entry(side, size, o -> o.make(price.entry));
-            executeEntryAll();
-            market.elapse(1, MINUTES);
-            exit(o -> o.make(price.exit));
-            executeExitAll();
             break;
 
         case ExitCanceled:
             s = entry(side, size, o -> o.make(price.entry));
             executeEntryAll();
+            market.elapse(gap.sec);
             exit(o -> o.make(price.exit).cancelAfter(1, MINUTES));
             market.elapse(1, MINUTES);
             break;
@@ -419,6 +421,7 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
         case ExitCanceledThenOtherExit:
             s = entry(side, size, o -> o.make(price.entry));
             executeEntryAll();
+            market.elapse(gap.sec);
             exit(o -> o.make(price.exit).cancelAfter(1, MINUTES).make(price.exit));
             market.elapse(1, MINUTES);
             break;
@@ -426,6 +429,7 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
         case ExitCanceledThenOtherExitCompletely:
             s = entry(side, size, o -> o.make(price.entry));
             executeEntryAll();
+            market.elapse(gap.sec);
             exit(o -> o.make(price.exit).cancelAfter(1, MINUTES).make(price.exit));
             market.elapse(1, MINUTES);
             executeExitAll();
@@ -434,6 +438,7 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
         case ExitPartiallyCancelled:
             s = entry(side, size, o -> o.make(price.entry).cancelAfter(1, MINUTES));
             executeEntryAll();
+            market.elapse(gap.sec);
             exit(o -> o.make(price.exit));
             executeExitHalf();
             market.elapse(1, MINUTES);
@@ -442,6 +447,7 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
         case EntryPartiallyAndExitCompletely:
             s = entry(side, size, o -> o.make(price.entry));
             executeEntryHalf();
+            market.elapse(gap.sec);
             exit(o -> o.make(price.exit));
             executeExitAll();
             break;

@@ -28,7 +28,6 @@ class ScenaroHoldTimeTest extends TraderTestSupport {
         case EntryPartiallyCanceled:
         case EntrySeparately:
         case ExitSeparately:
-        case ExitLater:
         case ExitCanceled:
         case ExitCanceledThenOtherExit:
         case ExitCanceledThenOtherExitCompletely:
@@ -55,7 +54,6 @@ class ScenaroHoldTimeTest extends TraderTestSupport {
 
         // already completed so no change
         case ExitSeparately:
-        case ExitLater:
         case ExitCanceled:
         case ExitCanceledThenOtherExitCompletely:
             assert s.holdTime().equals(Duration.ofSeconds(60));
@@ -100,7 +98,6 @@ class ScenaroHoldTimeTest extends TraderTestSupport {
         case ExitCanceledThenOtherExit:
         case ExitCanceledThenOtherExitCompletely:
         case ExitSeparately:
-        case ExitLater:
         case ExitPartiallyCancelled:
             assert s.holdEndTime().isEqual(starting.plusSeconds(60));
             break;

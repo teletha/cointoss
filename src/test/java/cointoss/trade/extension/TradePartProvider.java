@@ -37,6 +37,8 @@ class TradePartProvider implements ArgumentsProvider {
                 parameters.add(SizePart.values());
             } else if (parameterType == ScenePart.class) {
                 parameters.add(Set.of(ScenePart.values()));
+            } else if (parameterType == EntryExitGapPart.class) {
+                parameters.add(EntryExitGapPart.values());
             }
         }
         return Sets.cartesianProduct(parameters).stream().map(List::toArray).map(Arguments::arguments);

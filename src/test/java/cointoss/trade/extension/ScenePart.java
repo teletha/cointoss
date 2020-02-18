@@ -47,9 +47,6 @@ public enum ScenePart implements TradePart {
     /** Complete entry and complete exit by multiple executions over long time. */
     ExitSeparately,
 
-    /** Complete entry and complete exit later. */
-    ExitLater,
-
     /** Complete entry and exit is canceled. */
     ExitCanceled,
 
