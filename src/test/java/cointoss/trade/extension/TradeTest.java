@@ -33,12 +33,17 @@ public @interface TradeTest {
     Direction[] side() default {Direction.BUY, Direction.SELL};
 
     /**
-     * Configure {@link SidePart}.
+     * Configure {@link SizePart}.
      * 
      * @return
      */
     double[] size() default {2, 0.2};
 
+    /**
+     * Configure {@link PricePart}.
+     * 
+     * @return
+     */
     double[] price() default {10, 20, 20, 10, 0.1, 0.2, 0.2, 0.1};
 
     /**
