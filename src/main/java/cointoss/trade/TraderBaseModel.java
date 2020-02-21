@@ -7,7 +7,7 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss;
+package cointoss.trade;
 
 import cointoss.util.Num;
 import cointoss.util.ObservableNumProperty;

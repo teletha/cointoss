@@ -12,9 +12,6 @@ package cointoss.trade;
 import org.junit.jupiter.api.Test;
 
 import cointoss.Direction;
-import cointoss.Profitable;
-import cointoss.Scenario;
-import cointoss.TraderTestSupport;
 import cointoss.execution.Execution;
 import cointoss.trade.extension.PricePart;
 import cointoss.trade.extension.SidePart;

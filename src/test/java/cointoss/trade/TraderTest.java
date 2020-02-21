@@ -7,13 +7,15 @@
  *
  *          https://opensource.org/licenses/MIT
  */
-package cointoss;
+package cointoss.trade;
 
 import static java.time.temporal.ChronoUnit.SECONDS;
 
 import org.junit.jupiter.api.Test;
 
+import cointoss.Direction;
 import cointoss.execution.Execution;
+import cointoss.trade.Scenario;
 import kiss.I;
 import kiss.Variable;
 

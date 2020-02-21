@@ -7,7 +7,7 @@
  *
  *          https://opensource.org/licenses/MIT
  */
-package cointoss;
+package cointoss.trade;
 
 import static java.time.temporal.ChronoUnit.MINUTES;
 
@@ -17,6 +17,9 @@ import java.util.function.Consumer;
 
 import org.junit.jupiter.api.BeforeEach;
 
+import cointoss.Direction;
+import cointoss.Directional;
+import cointoss.Market;
 import cointoss.execution.Execution;
 import cointoss.order.Order;
 import cointoss.order.OrderStrategy.Orderable;

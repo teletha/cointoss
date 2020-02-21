@@ -7,7 +7,7 @@
  *
  *          https://opensource.org/licenses/MIT
  */
-package cointoss;
+package cointoss.trade;
 
 import static java.time.temporal.ChronoUnit.*;
 
@@ -31,6 +31,8 @@ import org.eclipse.collections.impl.list.mutable.FastList;
 
 import com.google.common.annotations.VisibleForTesting;
 
+import cointoss.Direction;
+import cointoss.Market;
 import cointoss.analyze.TradingStats;
 import cointoss.execution.Execution;
 import cointoss.util.Loggings;
@@ -71,7 +73,7 @@ public abstract class Trader extends TraderBase implements Extensible, Disposabl
     /**
      * Initialize this {@link Trader}.
      */
-    final synchronized void initialize(Market market) {
+    public final synchronized void initialize(Market market) {
         boolean backtest = StackWalker.getInstance(Option.RETAIN_CLASS_REFERENCE)
                 .walk(stream -> stream.filter(frame -> frame.getClassName().contains("BackTestModel")).findFirst().isPresent());
         log = Loggings.getTradingLogger(name(), backtest);

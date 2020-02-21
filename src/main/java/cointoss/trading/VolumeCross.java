@@ -16,15 +16,15 @@ import java.util.function.Function;
 import com.google.common.base.Predicate;
 
 import cointoss.Direction;
-import cointoss.FundManager;
 import cointoss.Market;
-import cointoss.Scenario;
-import cointoss.Trader;
 import cointoss.ticker.Indicator;
 import cointoss.ticker.NumIndicator;
 import cointoss.ticker.Tick;
 import cointoss.ticker.Ticker;
 import cointoss.ticker.TimeSpan;
+import cointoss.trade.FundManager;
+import cointoss.trade.Scenario;
+import cointoss.trade.Trader;
 import cointoss.util.Num;
 import kiss.Signal;
 import stylist.Style;

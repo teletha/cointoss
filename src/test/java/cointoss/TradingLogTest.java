@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 
 import cointoss.analyze.TradingStats;
 import cointoss.execution.Execution;
+import cointoss.trade.TraderTestSupport;
 
 public class TradingLogTest extends TraderTestSupport {
 

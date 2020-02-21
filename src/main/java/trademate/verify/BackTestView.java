@@ -16,13 +16,13 @@ import java.util.stream.Collectors;
 
 import cointoss.Market;
 import cointoss.MarketService;
-import cointoss.Trader;
 import cointoss.analyze.Analyzer;
 import cointoss.analyze.NumStats;
 import cointoss.analyze.TradingStats;
 import cointoss.execution.ExecutionLog;
 import cointoss.execution.ExecutionLog.LogType;
 import cointoss.market.MarketServiceProvider;
+import cointoss.trade.Trader;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
 import cointoss.verify.BackTest;

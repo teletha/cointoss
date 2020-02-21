@@ -9,8 +9,6 @@
  */
 package cointoss.trade;
 
-import cointoss.Scenario;
-import cointoss.TraderTestSupport;
 import cointoss.trade.extension.PricePart;
 import cointoss.trade.extension.SidePart;
 import cointoss.trade.extension.SizePart;

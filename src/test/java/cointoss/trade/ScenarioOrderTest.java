@@ -7,9 +7,10 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package cointoss;
+package cointoss.trade;
 
 import antibug.powerassert.PowerAssertOff;
+import cointoss.trade.Scenario;
 import cointoss.trade.extension.ScenePart;
 import cointoss.trade.extension.TradeTest;
 

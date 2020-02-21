@@ -12,15 +12,15 @@ package cointoss.trading;
 import java.time.temporal.ChronoUnit;
 
 import cointoss.Direction;
-import cointoss.FundManager;
 import cointoss.Market;
-import cointoss.Scenario;
-import cointoss.Trader;
 import cointoss.analyze.PrimitiveStats;
 import cointoss.ticker.Indicator;
 import cointoss.ticker.Indicators;
 import cointoss.ticker.Ticker;
 import cointoss.ticker.TimeSpan;
+import cointoss.trade.FundManager;
+import cointoss.trade.Scenario;
+import cointoss.trade.Trader;
 import cointoss.util.Num;
 import kiss.Variable;
 import kiss.Ⅱ;

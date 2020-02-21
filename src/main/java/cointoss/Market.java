@@ -34,6 +34,7 @@ import cointoss.order.OrderStrategy.Makable;
 import cointoss.order.OrderStrategy.Orderable;
 import cointoss.order.OrderStrategy.Takable;
 import cointoss.ticker.TickerManager;
+import cointoss.trade.Trader;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
 import cointoss.util.RetryPolicy;

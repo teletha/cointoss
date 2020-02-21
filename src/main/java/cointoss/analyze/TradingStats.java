@@ -9,7 +9,7 @@
  */
 package cointoss.analyze;
 
-import static cointoss.util.Num.*;
+import static cointoss.util.Num.HUNDRED;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -22,10 +22,10 @@ import java.util.function.Function;
 
 import org.eclipse.collections.impl.list.mutable.FastList;
 
-import cointoss.FundManager;
 import cointoss.Market;
-import cointoss.Scenario;
-import cointoss.Trader;
+import cointoss.trade.FundManager;
+import cointoss.trade.Scenario;
+import cointoss.trade.Trader;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
 import kiss.I;

@@ -1,8 +1,8 @@
 package cointoss.verify;
 
 import cointoss.MarketService;
-import cointoss.Trader;
 import cointoss.execution.ExecutionLog.LogType;
+import cointoss.trade.Trader;
 import cointoss.util.Num;
 import cointoss.verify.BackTest;
 import cointoss.verify.BackTestModel;
@@ -683,8 +683,8 @@ public abstract class BackTest implements BackTestModel {
          * 
          * @return The next assignable model.
          */
-        default Next normal() {
-            return type(LogType.Normal);
+        default Next fast() {
+            return type(LogType.Fast);
         }
 
         /**
@@ -692,8 +692,8 @@ public abstract class BackTest implements BackTestModel {
          * 
          * @return The next assignable model.
          */
-        default Next fast() {
-            return type(LogType.Fast);
+        default Next normal() {
+            return type(LogType.Normal);
         }
     }
 

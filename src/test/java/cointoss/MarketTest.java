@@ -14,6 +14,8 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import cointoss.order.Order;
+import cointoss.trade.FundManager;
+import cointoss.trade.Trader;
 import cointoss.verify.VerifiableMarket;
 
 class MarketTest {

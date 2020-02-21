@@ -12,10 +12,10 @@ package trademate.chart.builtin;
 import static cointoss.ticker.TimeSpan.*;
 
 import cointoss.Market;
-import cointoss.Trader;
-import cointoss.Trader.Snapshot;
 import cointoss.ticker.Indicator;
 import cointoss.ticker.Ticker;
+import cointoss.trade.Trader;
+import cointoss.trade.Trader.Snapshot;
 import cointoss.util.Num;
 import stylist.Style;
 import stylist.StyleDSL;

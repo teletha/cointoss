@@ -17,11 +17,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cointoss.MarketService;
-import cointoss.Trader;
 import cointoss.analyze.Analyzer;
 import cointoss.analyze.ConsoleAnalyzer;
 import cointoss.analyze.TradingStats;
 import cointoss.execution.ExecutionLog.LogType;
+import cointoss.trade.Trader;
 import cointoss.util.Chrono;
 import cointoss.util.Loggings;
 import cointoss.util.Num;
