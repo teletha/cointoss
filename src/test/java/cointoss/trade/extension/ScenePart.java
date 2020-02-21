@@ -12,53 +12,60 @@ package cointoss.trade.extension;
 public enum ScenePart implements TradePart {
 
     /** Entry is just requested. */
-    Entry,
+    Entry(false),
 
     /** Entry is executed partially. */
-    EntryPartially,
+    EntryPartially(false),
 
     /** Complete entry. */
-    EntryCompletely,
+    EntryCompletely(false),
 
     /** Complete entry by multiple executions. */
-    EntryMultiple,
+    EntryMultiple(false),
 
     /** Complete entry by multiple executions over long time. */
-    EntrySeparately,
+    EntrySeparately(false),
 
     /** Entry was requested and canceled. */
-    EntryCanceled,
+    EntryCanceled(false),
 
     /** Entry is executed partially and the remaining is canceled. */
-    EntryPartiallyCanceled,
+    EntryPartiallyCanceled(false),
 
     /** Complete entry and exit is just requested. */
-    Exit,
+    Exit(true),
 
     /** Complete entry and exit is executed partially. */
-    ExitPartially,
+    ExitPartially(true),
 
     /** Complete entry and exit. */
-    ExitCompletely,
+    ExitCompletely(true),
 
     /** Complete entry and complete exit by multiple executions. */
-    ExitMultiple,
+    ExitMultiple(true),
 
     /** Complete entry and complete exit by multiple executions over long time. */
-    ExitSeparately,
+    ExitSeparately(true),
 
     /** Complete entry and exit is canceled. */
-    ExitCanceled,
+    ExitCanceled(true),
 
     /** Complete entry and first exit was canceled then second exit is requested. */
-    ExitCanceledThenOtherExit,
+    ExitCanceledThenOtherExit(true),
 
     /** Complete entry and first exit was canceled then second exit is completed. */
-    ExitCanceledThenOtherExitCompletely,
+    ExitCanceledThenOtherExitCompletely(true),
 
     /** Complete entry and exit is executed partially and the remaining is canceled. */
-    ExitPartiallyCancelled,
+    ExitPartiallyCancelled(true),
 
     // entry partially cancelled and exit
-    EntryPartiallyAndExitCompletely;
+    EntryPartiallyAndExitCompletely(true);
+
+    /** The scene status. */
+    public final boolean hasExit;
+
+    private ScenePart(boolean hasExit) {
+        this.hasExit = hasExit;
+    }
 }

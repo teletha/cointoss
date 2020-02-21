@@ -50,6 +50,8 @@ class TradePartProvider implements ArgumentsProvider {
                 parameters.add(Set.of(ScenePart.values()));
             } else if (parameterType == EntryExitGapPart.class) {
                 parameters.add(IntStream.of(annotation.gap()).mapToObj(EntryExitGapPart::new).collect(Collectors.toSet()));
+            } else if (parameterType == StrategyPart.class) {
+                parameters.add(Set.of(StrategyPart.values()));
             }
         }
         return Sets.cartesianProduct(parameters).stream().map(List::toArray).map(Arguments::arguments);

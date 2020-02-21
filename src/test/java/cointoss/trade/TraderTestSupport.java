@@ -28,6 +28,7 @@ import cointoss.trade.extension.PricePart;
 import cointoss.trade.extension.ScenePart;
 import cointoss.trade.extension.SidePart;
 import cointoss.trade.extension.SizePart;
+import cointoss.trade.extension.StrategyPart;
 import cointoss.trade.extension.TradePart;
 import cointoss.util.Num;
 import cointoss.util.TimebaseSupport;
@@ -303,6 +304,7 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
         SizePart size = new SizePart(2);
         PricePart price = new PricePart(10, 20);
         EntryExitGapPart gap = new EntryExitGapPart(0);
+        StrategyPart strategy = StrategyPart.Make;
 
         for (TradePart part : parts) {
             if (part instanceof ScenePart) {
@@ -315,9 +317,11 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
                 price = (PricePart) part;
             } else if (part instanceof EntryExitGapPart) {
                 gap = (EntryExitGapPart) part;
+            } else if (part instanceof StrategyPart) {
+                strategy = (StrategyPart) part;
             }
         }
-        return scenario(scene, side, size, price, gap);
+        return scenario(scene, side, size, price, gap, strategy);
     }
 
     /**
@@ -329,7 +333,7 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
      * @param price An entry and exit price
      * @return A new created {@link Scenario}.
      */
-    private final Scenario scenario(ScenePart scene, SidePart side, SizePart size, PricePart price, EntryExitGapPart gap) {
+    private final Scenario scenario(ScenePart scene, SidePart side, SizePart size, PricePart price, EntryExitGapPart gap, StrategyPart strategy) {
         Scenario s = null;
 
         switch (scene) {

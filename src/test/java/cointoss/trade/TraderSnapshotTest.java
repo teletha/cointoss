@@ -14,7 +14,9 @@ import org.junit.jupiter.api.Test;
 import cointoss.Direction;
 import cointoss.execution.Execution;
 import cointoss.trade.extension.PricePart;
+import cointoss.trade.extension.ScenePart;
 import cointoss.trade.extension.SidePart;
+import cointoss.trade.extension.SizePart;
 import cointoss.trade.extension.TradeTest;
 import cointoss.util.Num;
 
@@ -139,6 +141,34 @@ class TraderSnapshotTest extends TraderTestSupport {
         snapshot = snapshotAt(epochAfterMinute(10));
         assert snapshot.realizedProfit().is(10 * side.sign);
         assert snapshot.unrealizedProfit(Num.of(5)).is(0);
+    }
+
+    @TradeTest
+    void realizedProfit(ScenePart scene, SidePart side, SizePart size, PricePart price) {
+        Scenario s = scenario(scene, side, size, price);
+        Snapshot snapshot = snapshotAt(epochAfterMinute(1));
+
+        switch (scene) {
+        case ExitCompletely:
+        case ExitMultiple:
+        case ExitSeparately:
+        case ExitCanceledThenOtherExitCompletely:
+            assert snapshot.realizedProfit().is(price.diff * size.num * side.sign);
+            break;
+
+        case ExitPartially:
+        case ExitPartiallyCancelled:
+            assert snapshot.realizedProfit().is(price.diff * size.half * side.sign);
+            break;
+
+        case EntryPartiallyAndExitCompletely:
+            assert snapshot.realizedProfit().is(price.diff * size.half * side.sign);
+            break;
+
+        default:
+            assert snapshot.realizedProfit().is(0);
+            break;
+        }
     }
 
     @TradeTest

@@ -9,12 +9,9 @@
  */
 package cointoss.trade;
 
-import antibug.powerassert.PowerAssertOff;
-import cointoss.trade.Scenario;
 import cointoss.trade.extension.ScenePart;
 import cointoss.trade.extension.TradeTest;
 
-@PowerAssertOff
 class ScenarioOrderTest extends TraderTestSupport {
 
     @TradeTest
@@ -33,17 +30,24 @@ class ScenarioOrderTest extends TraderTestSupport {
         Scenario s = scenario(scene);
 
         switch (scene) {
-        case Entry:
-        case EntryCanceled:
-            assert s.exits.size() == 0;
+        case Exit:
+        case ExitCanceled:
+        case ExitCompletely:
+        case ExitMultiple:
+        case ExitSeparately:
+        case ExitPartially:
+        case ExitPartiallyCancelled:
+        case EntryPartiallyAndExitCompletely:
+            assert s.exits.size() == 1;
             break;
 
-        case EntrySeparately:
+        case ExitCanceledThenOtherExit:
+        case ExitCanceledThenOtherExitCompletely:
             assert s.exits.size() == 2;
             break;
 
         default:
-            assert s.exits.size() == 1;
+            assert s.exits.size() == 0;
             break;
         }
     }
