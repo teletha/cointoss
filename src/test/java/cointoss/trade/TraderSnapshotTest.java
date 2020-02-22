@@ -158,9 +158,6 @@ class TraderSnapshotTest extends TraderTestSupport {
 
         case ExitPartially:
         case ExitPartiallyCancelled:
-            assert snapshot.realizedProfit().is(price.diff * size.half * side.sign);
-            break;
-
         case EntryPartiallyAndExitCompletely:
             assert snapshot.realizedProfit().is(price.diff * size.half * side.sign);
             break;

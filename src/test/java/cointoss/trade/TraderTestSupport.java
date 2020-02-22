@@ -30,6 +30,7 @@ import cointoss.trade.extension.SidePart;
 import cointoss.trade.extension.SizePart;
 import cointoss.trade.extension.StrategyPart;
 import cointoss.trade.extension.TradePart;
+import cointoss.util.Chrono;
 import cointoss.util.Num;
 import cointoss.util.TimebaseSupport;
 import cointoss.verify.VerifiableMarket;
@@ -343,25 +344,25 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
 
         case EntryPartially:
             s = entry(side, size, o -> o.make(price.entry));
-            executeEntryHalf();
+            execute(true, side, size.halfN, price.entryN, 0);
             break;
 
         case EntryCompletely:
             s = entry(side, size, o -> o.make(price.entry));
-            executeEntryAll();
+            execute(true, side, size, price.entryN, 0);
             break;
 
         case EntryMultiple:
             s = entry(side, size, o -> o.make(price.entry));
-            executeEntryHalf();
-            executeEntryHalf();
+            execute(true, side, size.halfN, price.entryN, 0);
+            execute(true, side, size.halfN, price.entryN, 0);
             break;
 
         case EntrySeparately:
             s = entry(side, size, o -> o.make(price.entry));
-            executeEntryHalf();
+            execute(true, side, size.halfN, price.entryN, 0);
             market.elapse(1, MINUTES);
-            executeEntryHalf();
+            execute(true, side, size.halfN, price.entryN, 0);
             break;
 
         case EntryCanceled:
@@ -371,55 +372,55 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
 
         case EntryPartiallyCanceled:
             s = entry(side, size, o -> o.make(price.entry).cancelAfter(1, MINUTES));
-            executeEntryHalf();
+            execute(true, side, size.halfN, price.entryN, 0);
             market.elapse(1, MINUTES);
             break;
 
         case Exit:
             s = entry(side, size, o -> o.make(price.entry));
-            executeEntryAll();
+            execute(true, side, size, price.entryN, 0);
             market.elapse(gap.sec);
             exit(o -> o.make(price.exit));
             break;
 
         case ExitPartially:
             s = entry(side, size, o -> o.make(price.entry));
-            executeEntryAll();
+            execute(true, side, size, price.entryN, 0);
             market.elapse(gap.sec);
             exit(o -> o.make(price.exit));
-            executeExitHalf();
+            execute(true, side.inverse(), size.halfN, price.exitN, 0);
             break;
 
         case ExitCompletely:
             s = entry(side, size, o -> o.make(price.entry));
-            executeEntryAll();
+            execute(true, side, size, price.entryN, 0);
             market.elapse(gap.sec);
             exit(o -> o.make(price.exit));
-            executeExitAll();
+            execute(true, side.inverse(), size, price.exitN, 0);
             break;
 
         case ExitMultiple:
             s = entry(side, size, o -> o.make(price.entry));
-            executeEntryAll();
+            execute(true, side, size, price.entryN, 0);
             market.elapse(gap.sec);
             exit(o -> o.make(price.exit));
-            executeExitHalf();
-            executeExitHalf();
+            execute(true, side.inverse(), size.halfN, price.exitN, 0);
+            execute(true, side.inverse(), size.halfN, price.exitN, 0);
             break;
 
         case ExitSeparately:
             s = entry(side, size, o -> o.make(price.entry));
-            executeEntryAll();
+            execute(true, side, size, price.entryN, 0);
             market.elapse(gap.sec);
             exit(o -> o.make(price.exit));
-            executeExitHalf();
+            execute(true, side.inverse(), size.halfN, price.exitN, 0);
             market.elapse(1, MINUTES);
-            executeExitHalf();
+            execute(true, side.inverse(), size.halfN, price.exitN, 0);
             break;
 
         case ExitCanceled:
             s = entry(side, size, o -> o.make(price.entry));
-            executeEntryAll();
+            execute(true, side, size, price.entryN, 0);
             market.elapse(gap.sec);
             exit(o -> o.make(price.exit).cancelAfter(1, MINUTES));
             market.elapse(1, MINUTES);
@@ -427,7 +428,7 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
 
         case ExitCanceledThenOtherExit:
             s = entry(side, size, o -> o.make(price.entry));
-            executeEntryAll();
+            execute(true, side, size, price.entryN, 0);
             market.elapse(gap.sec);
             exit(o -> o.make(price.exit).cancelAfter(1, MINUTES).make(price.exit));
             market.elapse(1, MINUTES);
@@ -435,30 +436,55 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
 
         case ExitCanceledThenOtherExitCompletely:
             s = entry(side, size, o -> o.make(price.entry));
-            executeEntryAll();
+            execute(true, side, size, price.entryN, 0);
             market.elapse(gap.sec);
             exit(o -> o.make(price.exit).cancelAfter(1, MINUTES).make(price.exit));
             market.elapse(1, MINUTES);
-            executeExitAll();
+            execute(true, side.inverse(), size, price.exitN, 0);
             break;
 
         case ExitPartiallyCancelled:
             s = entry(side, size, o -> o.make(price.entry).cancelAfter(1, MINUTES));
-            executeEntryAll();
+            execute(true, side, size, price.entryN, 0);
             market.elapse(gap.sec);
             exit(o -> o.make(price.exit));
-            executeExitHalf();
+            execute(true, side.inverse(), size.halfN, price.exitN, 0);
             market.elapse(1, MINUTES);
             break;
 
         case EntryPartiallyAndExitCompletely:
             s = entry(side, size, o -> o.make(price.entry));
-            executeEntryHalf();
+            execute(true, side, size.halfN, price.entryN, 0);
             market.elapse(gap.sec);
             exit(o -> o.make(price.exit));
-            executeExitAll();
+            execute(true, side.inverse(), size, price.exitN, 0);
             break;
         }
         return s;
+    }
+
+    /**
+     * Perform exection.
+     * 
+     * @param make
+     * @param side
+     * @param size
+     * @param price
+     * @param sec
+     */
+    private void execute(boolean make, Directional side, Num size, Num price, long sec) {
+        ZonedDateTime time = Chrono.MIN.plusSeconds(sec);
+
+        if (make) {
+            Num p = price.divide(2);
+            if (side.isBuy()) {
+                p = price.minus(p);
+            } else {
+                p = price.plus(p);
+            }
+            market.perform(Execution.with.direction(side, size).price(p).date(time));
+        } else {
+            market.perform(Execution.with.direction(side, size).price(price).date(time));
+        }
     }
 }

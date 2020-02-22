@@ -25,6 +25,8 @@ import cointoss.Direction;
 @ArgumentsSource(TradePartProvider.class)
 public @interface TradeTest {
 
+    ScenePart[] scene() default {};
+
     /**
      * Configure {@link SidePart}.
      * 
@@ -37,14 +39,14 @@ public @interface TradeTest {
      * 
      * @return
      */
-    double[] size() default {2, 0.2};
+    double[] size() default {0.5};
 
     /**
      * Configure {@link PricePart}.
      * 
      * @return
      */
-    double[] price() default {10, 20, 20, 10, 0.1, 0.2, 0.2, 0.1};
+    double[] price() default {0.01, 0.02, 0.2, 0.1};
 
     /**
      * Configure {@link EntryExitGapPart}.
