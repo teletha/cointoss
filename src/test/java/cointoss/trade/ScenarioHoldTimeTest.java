@@ -16,7 +16,7 @@ import java.time.temporal.ChronoUnit;
 import cointoss.trade.extension.ScenePart;
 import cointoss.trade.extension.TradeTest;
 
-class ScenaroHoldTimeTest extends TraderTestSupport {
+class ScenarioHoldTimeTest extends TraderTestSupport {
 
     @TradeTest
     void holdTime(ScenePart scene) {

@@ -39,14 +39,14 @@ public @interface TradeTest {
      * 
      * @return
      */
-    double[] size() default {0.5};
+    double[] size() default {5, 0.0004};
 
     /**
      * Configure {@link PricePart}.
      * 
      * @return
      */
-    double[] price() default {0.01, 0.02, 0.2, 0.1};
+    double[] price() default {0.01, 0.02, 2, 1};
 
     /**
      * Configure {@link HoldTimePart}.
