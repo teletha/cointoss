@@ -9,7 +9,7 @@
  */
 package cointoss.trade;
 
-import static java.time.temporal.ChronoUnit.SECONDS;
+import static java.time.temporal.ChronoUnit.*;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -17,7 +17,6 @@ import org.junit.jupiter.api.Test;
 import cointoss.Direction;
 import cointoss.execution.Execution;
 import cointoss.order.Order;
-import cointoss.trade.Scenario;
 import cointoss.trade.extension.TradeTest;
 
 class ScenarioTest extends TraderTestSupport {
@@ -306,7 +305,10 @@ class ScenarioTest extends TraderTestSupport {
         assert s.exitExecutedSize.is(0);
         assert s.exitSize.is(2);
 
-        market.perform(Execution.with.buy(1).price(16)); // trigger stop
+        market.perform(Execution.with.buy(1).price(16)); // execute stop profit
+        assert s.exitExecutedSize.is(1);
+        assert s.exitSize.is(1);
+
         market.perform(Execution.with.buy(3).price(4)); // trigger stop loss
         awaitOrderBufferingTime();
         assert s.exits.size() == 2; // stop is ordered
