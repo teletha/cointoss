@@ -25,9 +25,7 @@ class ScenaroHoldTimeTest extends TraderTestSupport {
         switch (scene) {
         case EntrySeparately:
         case ExitSeparately:
-        case ExitCanceledThenOtherExit:
-        case ExitCanceledThenOtherExitCompletely:
-            assert s.holdTime().equals(Duration.ofSeconds(60));
+            assert s.holdTime().equals(Duration.ofSeconds(30));
             break;
 
         default:
@@ -41,23 +39,22 @@ class ScenaroHoldTimeTest extends TraderTestSupport {
         switch (scene) {
         // already completed so no change
         case EntryCanceled:
+        case EntryPartiallyCanceledAndExitCompletely:
         case ExitCanceled:
         case ExitCompletely:
         case ExitMultiple:
-        case EntryPartiallyCanceledAndExitCompletely:
+        case ExitCanceledThenOtherExitCompletely:
             assert s.holdTime().equals(Duration.ofSeconds(0));
             break;
 
         // already completed so no change
         case ExitSeparately:
-        case ExitCanceledThenOtherExitCompletely:
-            assert s.holdTime().equals(Duration.ofSeconds(60));
+            assert s.holdTime().equals(Duration.ofSeconds(30));
             break;
 
         // added the elapsed time
         case EntrySeparately:
-        case ExitCanceledThenOtherExit:
-            assert s.holdTime().equals(Duration.ofSeconds(160));
+            assert s.holdTime().equals(Duration.ofSeconds(130));
             break;
 
         // added the elapsed time
@@ -85,10 +82,8 @@ class ScenaroHoldTimeTest extends TraderTestSupport {
 
         switch (scene) {
         case EntrySeparately:
-        case ExitCanceledThenOtherExit:
-        case ExitCanceledThenOtherExitCompletely:
         case ExitSeparately:
-            assert s.holdEndTime().isEqual(starting.plusSeconds(60));
+            assert s.holdEndTime().isEqual(starting.plusSeconds(30));
             break;
 
         default:

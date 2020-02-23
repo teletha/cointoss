@@ -52,8 +52,8 @@ class TradePartProvider implements ArgumentsProvider {
                     scenes = ScenePart.values();
                 }
                 parameters.add(Set.of(scenes));
-            } else if (parameterType == EntryExitGapPart.class) {
-                parameters.add(IntStream.of(annotation.gap()).mapToObj(EntryExitGapPart::new).collect(Collectors.toSet()));
+            } else if (parameterType == HoldTimePart.class) {
+                parameters.add(IntStream.of(annotation.gap()).mapToObj(HoldTimePart::new).collect(Collectors.toSet()));
             } else if (parameterType == StrategyPart.class) {
                 parameters.add(Set.of(StrategyPart.values()));
             }

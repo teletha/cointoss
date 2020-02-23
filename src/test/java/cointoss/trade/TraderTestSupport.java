@@ -23,7 +23,7 @@ import cointoss.Market;
 import cointoss.execution.Execution;
 import cointoss.order.Order;
 import cointoss.order.OrderStrategy.Orderable;
-import cointoss.trade.extension.EntryExitGapPart;
+import cointoss.trade.extension.HoldTimePart;
 import cointoss.trade.extension.PricePart;
 import cointoss.trade.extension.ScenePart;
 import cointoss.trade.extension.SidePart;
@@ -304,7 +304,7 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
         SidePart side = new SidePart(Direction.BUY);
         SizePart size = new SizePart(2);
         PricePart price = new PricePart(10, 20);
-        EntryExitGapPart gap = new EntryExitGapPart(0);
+        HoldTimePart gap = new HoldTimePart(0);
         StrategyPart strategy = StrategyPart.Make;
 
         for (TradePart part : parts) {
@@ -316,8 +316,8 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
                 size = (SizePart) part;
             } else if (part instanceof PricePart) {
                 price = (PricePart) part;
-            } else if (part instanceof EntryExitGapPart) {
-                gap = (EntryExitGapPart) part;
+            } else if (part instanceof HoldTimePart) {
+                gap = (HoldTimePart) part;
             } else if (part instanceof StrategyPart) {
                 strategy = (StrategyPart) part;
             }
@@ -334,7 +334,7 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
      * @param price An entry and exit price
      * @return A new created {@link Scenario}.
      */
-    private final Scenario scenario(ScenePart scene, SidePart side, SizePart size, PricePart price, EntryExitGapPart gap, StrategyPart strategy) {
+    private final Scenario scenario(ScenePart scene, SidePart side, SizePart size, PricePart price, HoldTimePart gap, StrategyPart strategy) {
         Scenario s = null;
 
         switch (scene) {
@@ -361,7 +361,7 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
         case EntrySeparately:
             s = entry(side, size, o -> o.make(price.entry));
             execute(true, side, size.halfN, price.entryN, 0);
-            market.elapse(1, MINUTES);
+            market.elapse(30, SECONDS);
             execute(true, side, size.halfN, price.entryN, 0);
             break;
 
@@ -414,7 +414,7 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
             market.elapse(gap.sec);
             exit(o -> o.make(price.exit));
             execute(true, side.inverse(), size.halfN, price.exitN, 0);
-            market.elapse(1, MINUTES);
+            market.elapse(30, SECONDS);
             execute(true, side.inverse(), size.halfN, price.exitN, 0);
             break;
 
@@ -430,16 +430,14 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
             s = entry(side, size, o -> o.make(price.entry));
             execute(true, side, size, price.entryN, 0);
             market.elapse(gap.sec);
-            exit(o -> o.make(price.exit).cancelAfter(1, MINUTES).make(price.exit));
-            market.elapse(1, MINUTES);
+            exit(o -> o.make(price.exit).cancelAfter(0, MINUTES).make(price.exit));
             break;
 
         case ExitCanceledThenOtherExitCompletely:
             s = entry(side, size, o -> o.make(price.entry));
             execute(true, side, size, price.entryN, 0);
             market.elapse(gap.sec);
-            exit(o -> o.make(price.exit).cancelAfter(1, MINUTES).make(price.exit));
-            market.elapse(1, MINUTES);
+            exit(o -> o.make(price.exit).cancelAfter(0, MINUTES).make(price.exit));
             execute(true, side.inverse(), size, price.exitN, 0);
             break;
 
@@ -464,24 +462,6 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
     }
 
     /**
-     * Cancel all entry orders.
-     */
-    private void cancelEntry() {
-        for (Order order : latest().entries) {
-            market.cancel(order).to(I.NoOP);
-        }
-    }
-
-    /**
-     * Cancel all entry orders.
-     */
-    private void cancelExit() {
-        for (Order order : latest().exits) {
-            market.cancel(order).to(I.NoOP);
-        }
-    }
-
-    /**
      * Perform exection.
      * 
      * @param make
@@ -503,6 +483,24 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
             market.perform(Execution.with.direction(side, size).price(p).date(time));
         } else {
             market.perform(Execution.with.direction(side, size).price(price).date(time));
+        }
+    }
+
+    /**
+     * Cancel all entry orders.
+     */
+    private void cancelEntry() {
+        for (Order order : latest().entries) {
+            market.cancel(order).to(I.NoOP);
+        }
+    }
+
+    /**
+     * Cancel all entry orders.
+     */
+    private void cancelExit() {
+        for (Order order : latest().exits) {
+            market.cancel(order).to(I.NoOP);
         }
     }
 }

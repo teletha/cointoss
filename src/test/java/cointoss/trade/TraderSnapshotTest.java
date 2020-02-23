@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 
 import cointoss.Direction;
 import cointoss.execution.Execution;
+import cointoss.trade.extension.HoldTimePart;
 import cointoss.trade.extension.PricePart;
 import cointoss.trade.extension.ScenePart;
 import cointoss.trade.extension.SidePart;
@@ -23,269 +24,94 @@ import cointoss.util.Num;
 class TraderSnapshotTest extends TraderTestSupport {
 
     @TradeTest
-    void snapshotCompleteEntryAndCompleteExit(SidePart side, PricePart price) {
-        entryAndExit(Execution.with.direction(side, 1)
-                .price(price.entry), Execution.with.direction(side.inverse(), 1).price(price.exit).date(afterMinute(5)));
-
-        // past
-        for (int i = 1; i < 4; i++) {
-            Profitable snapshot = snapshotAt(epochAfterMinute(i));
-            assert snapshot.realizedProfit().is(0);
-            assert snapshot.unrealizedProfit(price.middleN).is(1 * price.diffHalf * side.sign);
-        }
-
-        // future
-        for (int i = 5; i < 10; i++) {
-            Profitable snapshot = snapshotAt(epochAfterMinute(i));
-            assert snapshot.realizedProfit().is(1 * price.diff * side.sign);
-            assert snapshot.unrealizedProfit(price.profitN).is(0);
-        }
-    }
-
-    @TradeTest
-    void snapshotCompleteEntryAndIncompleteExit(SidePart side, PricePart price) {
-        entryAndExit(Execution.with.direction(side, 2)
-                .price(price.entry), Execution.with.direction(side.inverse(), 1).price(price.exit).date(afterMinute(5)));
-
-        // past
-        for (int i = 1; i < 4; i++) {
-            Profitable snapshot = snapshotAt(epochAfterMinute(i));
-            assert snapshot.realizedProfit().is(0);
-            assert snapshot.unrealizedProfit(price.middleN).is(2 * price.diffHalf * side.sign);
-        }
-
-        // future
-        for (int i = 5; i < 10; i++) {
-            Profitable snapshot = snapshotAt(epochAfterMinute(i));
-            assert snapshot.realizedProfit().is(1 * price.diff * side.sign);
-            assert snapshot.unrealizedProfit(price.middleN).is(1 * price.diffHalf * side.sign);
-        }
-    }
-
-    @TradeTest
-    void snapshotCompleteEntryAndPartialExit(SidePart side, PricePart price) {
-        entryAndExitPartial(Execution.with.direction(side, 2)
-                .price(price.entry), Execution.with.direction(side.inverse(), 2).price(price.exit).date(afterMinute(5)), 1);
-
-        // past
-        for (int i = 1; i < 4; i++) {
-            Profitable snapshot = snapshotAt(epochAfterMinute(i));
-            assert snapshot.realizedProfit().is(0);
-            assert snapshot.unrealizedProfit(price.middleN).is(2 * price.diffHalf * side.sign);
-        }
-
-        // future
-        for (int i = 5; i < 10; i++) {
-            Profitable snapshot = snapshotAt(epochAfterMinute(i));
-            assert snapshot.realizedProfit().is(1 * price.diff * side.sign);
-            assert snapshot.unrealizedProfit(price.middleN).is(1 * price.diffHalf * side.sign);
-        }
-    }
-
-    @TradeTest
-    void snapshotCompleteEntryAndNoExit(SidePart side) {
-        entry(Execution.with.direction(side, 1).price(10));
-
-        // past
-        Profitable snapshot = snapshotAt(epochAfterMinute(1));
-        assert snapshot.realizedProfit().is(0);
-        assert snapshot.unrealizedProfit(Num.of(12)).is(2 * side.sign);
-
-        // past
-        snapshot = snapshotAt(epochAfterMinute(2));
-        assert snapshot.realizedProfit().is(0);
-        assert snapshot.unrealizedProfit(Num.of(6)).is(-4 * side.sign);
-
-        // past
-        snapshot = snapshotAt(epochAfterMinute(4));
-        assert snapshot.realizedProfit().is(0);
-        assert snapshot.unrealizedProfit(Num.of(15)).is(5 * side.sign);
-
-        // future
-        snapshot = snapshotAt(epochAfterMinute(6));
-        assert snapshot.realizedProfit().is(0);
-        assert snapshot.unrealizedProfit(Num.of(25)).is(15 * side.sign);
-
-        // future
-        snapshot = snapshotAt(epochAfterMinute(10));
-        assert snapshot.realizedProfit().is(0);
-        assert snapshot.unrealizedProfit(Num.of(5)).is(-5 * side.sign);
-    }
-
-    @TradeTest
-    void snapshotPartialEntryAndCompleteExit(SidePart side) {
-        entryPartialAndExit(Execution.with.direction(side, 2)
-                .price(10), 1, Execution.with.direction(side.inverse(), 1).price(20).date(afterMinute(5)));
-
-        // past
-        Profitable snapshot = snapshotAt(epochAfterMinute(1));
-        assert snapshot.realizedProfit().is(0);
-        assert snapshot.unrealizedProfit(Num.of(12)).is(2 * side.sign);
-
-        // past
-        snapshot = snapshotAt(epochAfterMinute(2));
-        assert snapshot.realizedProfit().is(0);
-        assert snapshot.unrealizedProfit(Num.of(6)).is(-4 * side.sign);
-
-        // past
-        snapshot = snapshotAt(epochAfterMinute(4));
-        assert snapshot.realizedProfit().is(0);
-        assert snapshot.unrealizedProfit(Num.of(15)).is(5 * side.sign);
-
-        // future
-        snapshot = snapshotAt(epochAfterMinute(6));
-        assert snapshot.realizedProfit().is(10 * side.sign);
-        assert snapshot.unrealizedProfit(Num.of(25)).is(0);
-
-        // future
-        snapshot = snapshotAt(epochAfterMinute(10));
-        assert snapshot.realizedProfit().is(10 * side.sign);
-        assert snapshot.unrealizedProfit(Num.of(5)).is(0);
-    }
-
-    @TradeTest
     void realizedProfit(ScenePart scene, SidePart side, SizePart size, PricePart price) {
-        scenario(scene, side, size, price);
-        Snapshot snapshot = snapshotAt(epochAfterMinute(1));
+        scenario(scene, side, size, price, new HoldTimePart(5 * 60));
+        for (int i = 0; i <= 4; i++) {
+            Snapshot notExitedYet = snapshotAt(epochAfterMinute(i));
+            assert notExitedYet.realizedProfit().is(0);
+        }
 
-        switch (scene) {
-        case ExitCompletely:
-        case ExitMultiple:
-        case ExitSeparately:
-        case ExitCanceledThenOtherExitCompletely:
-            assert snapshot.realizedProfit().is(price.diff * size.num * side.sign);
-            break;
+        for (int i = 6; i <= 10; i++) {
+            Snapshot alreadyExited = snapshotAt(epochAfterMinute(i));
+            switch (scene) {
+            case ExitCompletely:
+            case ExitMultiple:
+            case ExitSeparately:
+            case ExitCanceledThenOtherExitCompletely:
+                assert alreadyExited.realizedProfit().is(price.diff * size.num * side.sign);
+                break;
 
-        case ExitPartially:
-        case ExitPartiallyCancelled:
-        case EntryPartiallyCanceledAndExitCompletely:
-            assert snapshot.realizedProfit().is(price.diff * size.half * side.sign);
-            break;
+            case ExitPartially:
+            case ExitPartiallyCancelled:
+            case EntryPartiallyCanceledAndExitCompletely:
+                assert alreadyExited.realizedProfit().is(price.diff * size.half * side.sign);
+                break;
 
-        default:
-            assert snapshot.realizedProfit().is(0);
-            break;
+            default:
+                assert alreadyExited.realizedProfit().is(0);
+                break;
+            }
         }
     }
 
     @TradeTest
     void unrealizedProfit(ScenePart scene, SidePart side, SizePart size, PricePart price) {
-        scenario(scene, side, size, price);
-        Snapshot snapshot = snapshotAt(epochAfterMinute(1));
+        scenario(scene, side, size, price, new HoldTimePart(5 * 60));
+        for (int i = 1; i <= 4; i++) {
+            Snapshot notExitedYet = snapshotAt(epochAfterMinute(i));
+            switch (scene) {
+            case Entry:
+            case EntryCanceled:
+                assert notExitedYet.unrealizedProfit(price.profitN).is(0);
+                assert notExitedYet.unrealizedProfit(price.profitN.multiply(100)).is(0);
+                break;
 
-        switch (scene) {
-        case Entry:
-        case EntryCanceled:
-        case EntryPartiallyCanceledAndExitCompletely:
-        case ExitCompletely:
-        case ExitMultiple:
-        case ExitSeparately:
-        case ExitCanceledThenOtherExitCompletely:
-            assert snapshot.unrealizedProfit(price.profitN).is(0);
-            break;
+            case EntryPartially:
+            case EntryPartiallyCanceled:
+            case EntryPartiallyCanceledAndExitCompletely:
+                assert notExitedYet.unrealizedProfit(price.exitN).is(price.diff * size.half * side.sign);
+                assert notExitedYet.unrealizedProfit(price.entryN.plus(price.diffHalfN)).is(price.diffHalf * size.half * side.sign);
+                assert notExitedYet.unrealizedProfit(price.entryN.minus(price.diffHalfN)).is(-price.diffHalf * size.half * side.sign);
+                break;
 
-        case EntryPartially:
-        case EntryPartiallyCanceled:
-        case ExitPartially:
-        case ExitPartiallyCancelled:
-            assert snapshot.unrealizedProfit(price.exitN).is(price.diff * size.half * side.sign);
-            break;
-
-        default:
-            assert snapshot.unrealizedProfit(price.exitN).is(price.diff * size.num * side.sign);
-            break;
+            default:
+                assert notExitedYet.unrealizedProfit(price.exitN).is(price.diff * size.num * side.sign);
+                assert notExitedYet.unrealizedProfit(price.entryN.plus(price.diffHalfN)).is(price.diffHalf * size.num * side.sign);
+                assert notExitedYet.unrealizedProfit(price.entryN.minus(price.diffHalfN)).is(-price.diffHalf * size.num * side.sign);
+                break;
+            }
         }
-    }
 
-    @TradeTest
-    void snapshotPartialEntryAndIncompleteExit(SidePart side) {
-        entryPartialAndExit(Execution.with.direction(side, 3)
-                .price(10), 2, Execution.with.direction(side.inverse(), 1).price(20).date(afterMinute(5)));
+        for (int i = 6; i <= 10; i++) {
+            Snapshot alreadyExited = snapshotAt(epochAfterMinute(i));
+            switch (scene) {
+            case Entry:
+            case EntryCanceled:
+            case EntryPartiallyCanceledAndExitCompletely:
+            case ExitCompletely:
+            case ExitMultiple:
+            case ExitSeparately:
+            case ExitCanceledThenOtherExitCompletely:
+                assert alreadyExited.unrealizedProfit(price.profitN).is(0);
+                assert alreadyExited.unrealizedProfit(price.profitN.multiply(100)).is(0);
+                break;
 
-        // past
-        Profitable snapshot = snapshotAt(epochAfterMinute(1));
-        assert snapshot.realizedProfit().is(0);
-        assert snapshot.unrealizedProfit(Num.of(12)).is(4 * side.sign);
+            case EntryPartially:
+            case EntryPartiallyCanceled:
+            case ExitPartially:
+            case ExitPartiallyCancelled:
+                assert alreadyExited.unrealizedProfit(price.exitN).is(price.diff * size.half * side.sign);
+                assert alreadyExited.unrealizedProfit(price.entryN.plus(price.diffHalfN)).is(price.diffHalf * size.half * side.sign);
+                assert alreadyExited.unrealizedProfit(price.entryN.minus(price.diffHalfN)).is(-price.diffHalf * size.half * side.sign);
+                break;
 
-        // past
-        snapshot = snapshotAt(epochAfterMinute(2));
-        assert snapshot.realizedProfit().is(0);
-        assert snapshot.unrealizedProfit(Num.of(6)).is(-8 * side.sign);
-
-        // past
-        snapshot = snapshotAt(epochAfterMinute(4));
-        assert snapshot.realizedProfit().is(0);
-        assert snapshot.unrealizedProfit(Num.of(15)).is(10 * side.sign);
-
-        // future
-        snapshot = snapshotAt(epochAfterMinute(6));
-        assert snapshot.realizedProfit().is(10 * side.sign);
-        assert snapshot.unrealizedProfit(Num.of(25)).is(15 * side.sign);
-
-        // future
-        snapshot = snapshotAt(epochAfterMinute(10));
-        assert snapshot.realizedProfit().is(10 * side.sign);
-        assert snapshot.unrealizedProfit(Num.of(5)).is(-5 * side.sign);
-    }
-
-    @Test
-    void snapshotPartialEntryAndPartialExit() {
-        entryPartialAndExitPartial(Execution.with.buy(2).price(10), 1, Execution.with.sell(2).price(20).date(afterMinute(5)), 1);
-
-        // past
-        Profitable snapshot = snapshotAt(epochAfterMinute(1));
-        assert snapshot.realizedProfit().is(0);
-        assert snapshot.unrealizedProfit(Num.of(12)).is(2);
-
-        // past
-        snapshot = snapshotAt(epochAfterMinute(2));
-        assert snapshot.realizedProfit().is(0);
-        assert snapshot.unrealizedProfit(Num.of(6)).is(-4);
-
-        // past
-        snapshot = snapshotAt(epochAfterMinute(4));
-        assert snapshot.realizedProfit().is(0);
-        assert snapshot.unrealizedProfit(Num.of(15)).is(5);
-
-        // future
-        snapshot = snapshotAt(epochAfterMinute(6));
-        assert snapshot.realizedProfit().is(10);
-        assert snapshot.unrealizedProfit(Num.of(25)).is(0);
-
-        // future
-        snapshot = snapshotAt(epochAfterMinute(10));
-        assert snapshot.realizedProfit().is(10);
-        assert snapshot.unrealizedProfit(Num.of(5)).is(0);
-    }
-
-    @Test
-    void snapshotPartialEntryAndNoExit() {
-        entryPartial(Execution.with.buy(2).price(10), 1);
-
-        // past
-        Profitable snapshot = snapshotAt(epochAfterMinute(1));
-        assert snapshot.realizedProfit().is(0);
-        assert snapshot.unrealizedProfit(Num.of(12)).is(2);
-
-        // past
-        snapshot = snapshotAt(epochAfterMinute(2));
-        assert snapshot.realizedProfit().is(0);
-        assert snapshot.unrealizedProfit(Num.of(6)).is(-4);
-
-        // past
-        snapshot = snapshotAt(epochAfterMinute(4));
-        assert snapshot.realizedProfit().is(0);
-        assert snapshot.unrealizedProfit(Num.of(15)).is(5);
-
-        // future
-        snapshot = snapshotAt(epochAfterMinute(6));
-        assert snapshot.realizedProfit().is(0);
-        assert snapshot.unrealizedProfit(Num.of(25)).is(15);
-
-        // future
-        snapshot = snapshotAt(epochAfterMinute(10));
-        assert snapshot.realizedProfit().is(0);
-        assert snapshot.unrealizedProfit(Num.of(5)).is(-5);
+            default:
+                assert alreadyExited.unrealizedProfit(price.exitN).is(price.diff * size.num * side.sign);
+                assert alreadyExited.unrealizedProfit(price.entryN.plus(price.diffHalfN)).is(price.diffHalf * size.num * side.sign);
+                assert alreadyExited.unrealizedProfit(price.entryN.minus(price.diffHalfN)).is(-price.diffHalf * size.num * side.sign);
+                break;
+            }
+        }
     }
 
     @Test

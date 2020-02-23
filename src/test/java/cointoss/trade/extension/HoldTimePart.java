@@ -13,11 +13,11 @@ import java.time.Duration;
 
 import cointoss.util.Chrono;
 
-public class EntryExitGapPart implements TradePart {
+public class HoldTimePart implements TradePart {
 
     public final Duration sec;
 
-    public EntryExitGapPart(int seconds) {
+    public HoldTimePart(int seconds) {
         this.sec = Duration.ofSeconds(seconds);
     }
 

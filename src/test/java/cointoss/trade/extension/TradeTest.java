@@ -49,7 +49,7 @@ public @interface TradeTest {
     double[] price() default {0.01, 0.02, 0.2, 0.1};
 
     /**
-     * Configure {@link EntryExitGapPart}.
+     * Configure {@link HoldTimePart}.
      * 
      * @return
      */
