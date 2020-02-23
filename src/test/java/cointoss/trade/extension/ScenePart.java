@@ -60,7 +60,7 @@ public enum ScenePart implements TradePart {
     ExitPartiallyCancelled(true),
 
     // entry partially cancelled and exit
-    EntryPartiallyAndExitCompletely(true);
+    EntryPartiallyCanceledAndExitCompletely(true);
 
     /** The scene status. */
     public final boolean hasExit;

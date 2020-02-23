@@ -145,7 +145,7 @@ class TraderSnapshotTest extends TraderTestSupport {
 
     @TradeTest
     void realizedProfit(ScenePart scene, SidePart side, SizePart size, PricePart price) {
-        Scenario s = scenario(scene, side, size, price);
+        scenario(scene, side, size, price);
         Snapshot snapshot = snapshotAt(epochAfterMinute(1));
 
         switch (scene) {
@@ -158,12 +158,41 @@ class TraderSnapshotTest extends TraderTestSupport {
 
         case ExitPartially:
         case ExitPartiallyCancelled:
-        case EntryPartiallyAndExitCompletely:
+        case EntryPartiallyCanceledAndExitCompletely:
             assert snapshot.realizedProfit().is(price.diff * size.half * side.sign);
             break;
 
         default:
             assert snapshot.realizedProfit().is(0);
+            break;
+        }
+    }
+
+    @TradeTest
+    void unrealizedProfit(ScenePart scene, SidePart side, SizePart size, PricePart price) {
+        scenario(scene, side, size, price);
+        Snapshot snapshot = snapshotAt(epochAfterMinute(1));
+
+        switch (scene) {
+        case Entry:
+        case EntryCanceled:
+        case EntryPartiallyCanceledAndExitCompletely:
+        case ExitCompletely:
+        case ExitMultiple:
+        case ExitSeparately:
+        case ExitCanceledThenOtherExitCompletely:
+            assert snapshot.unrealizedProfit(price.profitN).is(0);
+            break;
+
+        case EntryPartially:
+        case EntryPartiallyCanceled:
+        case ExitPartially:
+        case ExitPartiallyCancelled:
+            assert snapshot.unrealizedProfit(price.exitN).is(price.diff * size.half * side.sign);
+            break;
+
+        default:
+            assert snapshot.unrealizedProfit(price.exitN).is(price.diff * size.num * side.sign);
             break;
         }
     }

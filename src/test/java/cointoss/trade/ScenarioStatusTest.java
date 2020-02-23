@@ -20,7 +20,7 @@ class ScenarioStatusTest extends TraderTestSupport {
 
         switch (scene) {
         case EntryCanceled:
-        case EntryPartiallyAndExitCompletely:
+        case EntryPartiallyCanceledAndExitCompletely:
         case ExitCompletely:
         case ExitMultiple:
         case ExitSeparately:
@@ -56,7 +56,7 @@ class ScenarioStatusTest extends TraderTestSupport {
 
         switch (scene) {
         case EntryCanceled:
-        case EntryPartiallyAndExitCompletely:
+        case EntryPartiallyCanceledAndExitCompletely:
         case ExitCompletely:
         case ExitMultiple:
         case ExitSeparately:
@@ -81,7 +81,7 @@ class ScenarioStatusTest extends TraderTestSupport {
         case EntryMultiple:
         case EntrySeparately:
         case EntryPartiallyCanceled:
-        case EntryPartiallyAndExitCompletely:
+        case EntryPartiallyCanceledAndExitCompletely:
         case Exit:
         case ExitCanceled:
         case ExitCanceledThenOtherExit:
@@ -106,7 +106,7 @@ class ScenarioStatusTest extends TraderTestSupport {
 
         switch (scene) {
         case EntryCanceled:
-        case EntryPartiallyAndExitCompletely:
+        case EntryPartiallyCanceledAndExitCompletely:
         case ExitCompletely:
         case ExitMultiple:
         case ExitSeparately:

@@ -9,7 +9,7 @@
  */
 package cointoss.trade;
 
-import static java.time.temporal.ChronoUnit.MINUTES;
+import static java.time.temporal.ChronoUnit.*;
 
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
@@ -366,14 +366,14 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
             break;
 
         case EntryCanceled:
-            s = entry(side, size, o -> o.make(price.entry).cancelAfter(1, MINUTES));
-            market.elapse(1, MINUTES);
+            s = entry(side, size, o -> o.make(price.entry));
+            cancelEntry();
             break;
 
         case EntryPartiallyCanceled:
-            s = entry(side, size, o -> o.make(price.entry).cancelAfter(1, MINUTES));
+            s = entry(side, size, o -> o.make(price.entry));
             execute(true, side, size.halfN, price.entryN, 0);
-            market.elapse(1, MINUTES);
+            cancelEntry();
             break;
 
         case Exit:
@@ -422,8 +422,8 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
             s = entry(side, size, o -> o.make(price.entry));
             execute(true, side, size, price.entryN, 0);
             market.elapse(gap.sec);
-            exit(o -> o.make(price.exit).cancelAfter(1, MINUTES));
-            market.elapse(1, MINUTES);
+            exit(o -> o.make(price.exit));
+            cancelExit();
             break;
 
         case ExitCanceledThenOtherExit:
@@ -444,23 +444,41 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
             break;
 
         case ExitPartiallyCancelled:
-            s = entry(side, size, o -> o.make(price.entry).cancelAfter(1, MINUTES));
+            s = entry(side, size, o -> o.make(price.entry));
             execute(true, side, size, price.entryN, 0);
             market.elapse(gap.sec);
             exit(o -> o.make(price.exit));
             execute(true, side.inverse(), size.halfN, price.exitN, 0);
-            market.elapse(1, MINUTES);
             break;
 
-        case EntryPartiallyAndExitCompletely:
+        case EntryPartiallyCanceledAndExitCompletely:
             s = entry(side, size, o -> o.make(price.entry));
             execute(true, side, size.halfN, price.entryN, 0);
+            cancelEntry();
             market.elapse(gap.sec);
             exit(o -> o.make(price.exit));
             execute(true, side.inverse(), size, price.exitN, 0);
             break;
         }
         return s;
+    }
+
+    /**
+     * Cancel all entry orders.
+     */
+    private void cancelEntry() {
+        for (Order order : latest().entries) {
+            market.cancel(order).to(I.NoOP);
+        }
+    }
+
+    /**
+     * Cancel all entry orders.
+     */
+    private void cancelExit() {
+        for (Order order : latest().exits) {
+            market.cancel(order).to(I.NoOP);
+        }
     }
 
     /**

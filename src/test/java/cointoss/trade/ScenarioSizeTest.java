@@ -38,7 +38,7 @@ class ScenarioSizeTest extends TraderTestSupport {
 
         case EntryPartially:
         case EntryPartiallyCanceled:
-        case EntryPartiallyAndExitCompletely:
+        case EntryPartiallyCanceledAndExitCompletely:
             assert s.entryExecutedSize().is(size.half);
             break;
 
@@ -68,7 +68,7 @@ class ScenarioSizeTest extends TraderTestSupport {
             assert s.exitSize.is(size);
             break;
 
-        case EntryPartiallyAndExitCompletely:
+        case EntryPartiallyCanceledAndExitCompletely:
             assert s.exitSize.is(size.half);
             break;
 
@@ -92,7 +92,7 @@ class ScenarioSizeTest extends TraderTestSupport {
 
         case ExitPartially:
         case ExitPartiallyCancelled:
-        case EntryPartiallyAndExitCompletely:
+        case EntryPartiallyCanceledAndExitCompletely:
             assert s.exitExecutedSize.is(size.half);
             break;
 

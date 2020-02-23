@@ -37,7 +37,7 @@ class ScenarioOrderTest extends TraderTestSupport {
         case ExitSeparately:
         case ExitPartially:
         case ExitPartiallyCancelled:
-        case EntryPartiallyAndExitCompletely:
+        case EntryPartiallyCanceledAndExitCompletely:
             assert s.exits.size() == 1;
             break;
 
