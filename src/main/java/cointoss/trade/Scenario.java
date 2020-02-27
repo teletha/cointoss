@@ -364,22 +364,26 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
      * @param price An exit price.
      */
     protected final void exitAt(Variable<Num> price, Consumer<Orderable> strategy) {
+        Disposable disposer;
         if (entryPrice.isLessThan(directional, price)) {
-            disposerForExit.add(observeEntryExecutedSizeDiff().debounce(1, SECONDS, market.service.scheduler()).to(size -> {
+            // profit
+            disposer = observeEntryExecutedSizeDiff().debounce(1, SECONDS, market.service.scheduler()).to(size -> {
                 market.request(directional.inverse(), entryExecutedSize.minus(exitSize), strategy).to(o -> {
                     processExitOrder(o, "exitAt");
                 });
-            }));
+            });
         } else {
-            disposerForExit.add(market.tickers.latestPrice.observe().take(p -> p.isLessThanOrEqual(directional, price)).first().to(e -> {
+            // losscut
+            disposer = market.tickers.latestPrice.observe().take(p -> p.isLessThanOrEqual(directional, price)).first().to(e -> {
                 disposeEntry();
 
                 System.out.println(this);
                 market.request(directional.inverse(), entryExecutedSize.minus(exitExecutedSize), strategy).to(o -> {
                     processExitOrder(o, "exitAtStopLoss");
                 });
-            }));
+            });
         }
+        disposerForExit.add(disposer);
     }
 
     /**

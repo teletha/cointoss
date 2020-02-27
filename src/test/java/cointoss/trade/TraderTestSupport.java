@@ -39,7 +39,7 @@ import kiss.Signal;
 
 public abstract class TraderTestSupport extends Trader implements TimebaseSupport {
 
-    protected VerifiableMarket market = new VerifiableMarket();
+    protected VerifiableMarket market;
 
     private ZonedDateTime base;
 
@@ -47,16 +47,19 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
      * @param provider
      */
     public TraderTestSupport() {
-
-        market.register(this);
     }
 
     @BeforeEach
     void setup() {
+        market = new VerifiableMarket();
+        market.register(this);
+
         initialize(market);
         market.service.clear();
 
         base = market.service.now();
+
+        System.out.println("setup");
     }
 
     /**
