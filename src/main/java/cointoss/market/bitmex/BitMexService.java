@@ -312,6 +312,8 @@ class BitMexService extends MarketService {
             } else {
                 return I.signal(root.get("data")).map(JsonElement::getAsJsonArray);
             }
+        }).effectOnError(e -> {
+            e.printStackTrace();
         });
     }
 

@@ -222,7 +222,7 @@ public class Network {
                  */
                 @Override
                 public void onMessage(WebSocket socket, String text) {
-                    observer.accept(parser.parse(text).getAsJsonObject());
+                    observer.accept(parser.parse(text));
                 }
 
                 /**
