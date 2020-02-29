@@ -19,7 +19,16 @@ import kiss.I;
 public final class Binance extends MarketServiceProvider {
 
     /** Market */
-    public static final MarketService BTC_USDT = new BinanceService("BTCUSDT", MarketSetting.with.baseCurrencyMinimumBidPrice("0.01")
+    public static final MarketService BTC_USDT = new BinanceService("BTCUSDT", false, MarketSetting.with.baseCurrencyMinimumBidPrice("0.01")
+            .targetCurrencyMinimumBidSize("0.000001")
+            .orderBookGroupRanges(Num.of(1, 5, 10, 25))
+            .baseCurrencyScaleSize(1)
+            .targetCurrencyScaleSize(5)
+            .acquirableExecutionSize(1000));
+
+    /** Market */
+    public static final MarketService FUTURE_BTC_USDT = new BinanceService("BTCUSDT", true, MarketSetting.with
+            .baseCurrencyMinimumBidPrice("0.01")
             .targetCurrencyMinimumBidSize("0.000001")
             .orderBookGroupRanges(Num.of(1, 5, 10, 25))
             .baseCurrencyScaleSize(1)

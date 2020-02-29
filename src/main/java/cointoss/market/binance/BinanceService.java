@@ -38,6 +38,9 @@ class BinanceService extends MarketService {
     /** The bitflyer API limit. */
     private static final APILimiter Limit = APILimiter.with.limit(600).refresh(Duration.ofMinutes(1));
 
+    /** The market type. */
+    private final boolean isFutures;
+
     /** The shared websocket connection. */
     private Signal<JsonElement> websocket;
 
@@ -45,8 +48,10 @@ class BinanceService extends MarketService {
      * @param marketName
      * @param setting
      */
-    BinanceService(String marketName, MarketSetting setting) {
-        super("Binance", marketName, setting);
+    BinanceService(String marketName, boolean isFutures, MarketSetting setting) {
+        super(isFutures ? "BinanceF" : "Binance", marketName, setting);
+
+        this.isFutures = isFutures;
     }
 
     /**
@@ -82,8 +87,7 @@ class BinanceService extends MarketService {
      */
     @Override
     public Signal<Execution> executions(long start, long end) {
-        return call("GET", "aggTrades?symbol=" + marketName + "&limit=" + (end - start) + "&fromId=" + start)
-                .flatIterable(JsonElement::getAsJsonArray)
+        return call("GET", "aggTrades?symbol=" + marketName + "&limit=1000&fromId=" + start).flatIterable(JsonElement::getAsJsonArray)
                 .map(e -> convert(e.getAsJsonObject()));
     }
 
@@ -109,7 +113,7 @@ class BinanceService extends MarketService {
      */
     @Override
     public long estimateInitialExecutionId() {
-        return 224601247;
+        return 0;
     }
 
     /**
@@ -141,7 +145,7 @@ class BinanceService extends MarketService {
      */
     @Override
     public Signal<OrderBookPageChanges> orderBook() {
-        return call("GET", "/depth?symbol=" + marketName + "&limit=5000").map(this::convertOrderBook);
+        return call("GET", "depth?symbol=" + marketName + "&limit=1000").map(e -> convertOrderBook(e, "bids", "asks"));
     }
 
     /**
@@ -149,7 +153,10 @@ class BinanceService extends MarketService {
      */
     @Override
     protected Signal<OrderBookPageChanges> connectOrderBookRealtimely() {
-        return connectSharedWebSocket(Topic.depth20$100ms).map(this::convertOrderBook);
+        String bidName = isFutures ? "b" : "bids";
+        String askName = isFutures ? "a" : "asks";
+
+        return connectSharedWebSocket(Topic.depth20$100ms).map(e -> convertOrderBook(e, bidName, askName));
     }
 
     /**
@@ -158,12 +165,12 @@ class BinanceService extends MarketService {
      * @param array
      * @return
      */
-    private OrderBookPageChanges convertOrderBook(JsonElement root) {
+    private OrderBookPageChanges convertOrderBook(JsonElement root, String bidName, String askName) {
         OrderBookPageChanges change = new OrderBookPageChanges();
 
         JsonObject o = root.getAsJsonObject();
-        JsonArray bids = o.get("bids").getAsJsonArray();
-        JsonArray asks = o.get("asks").getAsJsonArray();
+        JsonArray bids = o.get(bidName).getAsJsonArray();
+        JsonArray asks = o.get(askName).getAsJsonArray();
 
         for (JsonElement e : bids) {
             JsonArray bid = e.getAsJsonArray();
@@ -267,7 +274,8 @@ class BinanceService extends MarketService {
      * @return
      */
     private Signal<JsonElement> call(String method, String path) {
-        Request request = new Request.Builder().url("https://api.binance.com/api/v3/" + path).build();
+        String uri = isFutures ? "https://fapi.binance.com/fapi/v1/" : "https://api.binance.com/api/v3/";
+        Request request = new Request.Builder().url(uri + path).build();
 
         return network.rest(request, Limit).retryWhen(retryPolicy(10, "Binance RESTCall"));
     }
@@ -278,6 +286,7 @@ class BinanceService extends MarketService {
      * @return
      */
     private synchronized Signal<JsonObject> connectSharedWebSocket(Topic topic) {
+        String uri = isFutures ? "wss://fstream.binance.com/stream" : "wss://stream.binance.com:9443/stream";
         String name = marketName.toLowerCase() + "@" + topic;
 
         if (websocket == null) {
@@ -286,7 +295,7 @@ class BinanceService extends MarketService {
             for (Topic type : Topic.values()) {
                 command.params.add(marketName.toLowerCase() + "@" + type);
             }
-            websocket = network.websocket("wss://stream.binance.com:9443/stream", command);
+            websocket = network.websocket(uri, command);
         }
 
         return websocket.share().flatMap(e -> {
