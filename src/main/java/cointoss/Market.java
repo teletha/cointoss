@@ -135,7 +135,7 @@ public class Market implements Disposable {
             orderBook.shorts.update(board.asks);
             orderBook.longs.update(board.bids);
         }));
-        service.add(timeline.skipWhile(e -> readingLog).throttle(2, TimeUnit.SECONDS).to(e -> {
+        service.add(timeline.skipWhile(e -> readingLog).throttle(1, TimeUnit.SECONDS).to(e -> {
             // fix error board
             orderBook.shorts.fix(e.price);
             orderBook.longs.fix(e.price);

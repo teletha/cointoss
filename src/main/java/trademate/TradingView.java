@@ -150,6 +150,7 @@ public class TradingView extends View {
             diposer = service.executionsRealtimely()
                     .take(chart.showRealtimeUpdate.observe())
                     .startWith(service.executionLatest())
+                    .retryWhen(service.retryPolicy(100, "Title"))
                     .on(Viewtify.UIThread)
                     .to(e -> {
                         tab.textV(title, price.text(e.price));

@@ -14,6 +14,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
@@ -21,8 +22,8 @@ import cointoss.Direction;
 import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.execution.Execution;
-import cointoss.execution.ExecutionLog;
 import cointoss.order.Order;
+import cointoss.order.OrderBookPage;
 import cointoss.order.OrderBookPageChanges;
 import cointoss.order.OrderState;
 import cointoss.util.APILimiter;
@@ -81,7 +82,7 @@ class BinanceService extends MarketService {
      */
     @Override
     public Signal<Execution> executions(long start, long end) {
-        return call("GET", "aggTrades?symbol=" + marketName.toUpperCase() + "&limit=" + (end - start) + "&fromId=" + start)
+        return call("GET", "aggTrades?symbol=" + marketName + "&limit=" + (end - start) + "&fromId=" + start)
                 .flatIterable(JsonElement::getAsJsonArray)
                 .map(e -> convert(e.getAsJsonObject()));
     }
@@ -99,7 +100,7 @@ class BinanceService extends MarketService {
      */
     @Override
     public Signal<Execution> executionLatest() {
-        return call("GET", "aggTrades?symbol=" + marketName.toUpperCase() + "&limit=1").flatIterable(JsonElement::getAsJsonArray)
+        return call("GET", "aggTrades?symbol=" + marketName + "&limit=1").flatIterable(JsonElement::getAsJsonArray)
                 .map(e -> convert(e.getAsJsonObject()));
     }
 
@@ -140,7 +141,7 @@ class BinanceService extends MarketService {
      */
     @Override
     public Signal<OrderBookPageChanges> orderBook() {
-        return I.signal();
+        return call("GET", "/depth?symbol=" + marketName + "&limit=5000").map(this::convertOrderBook);
     }
 
     /**
@@ -148,7 +149,38 @@ class BinanceService extends MarketService {
      */
     @Override
     protected Signal<OrderBookPageChanges> connectOrderBookRealtimely() {
-        return I.signal();
+        return connectSharedWebSocket(Topic.depth20$100ms).map(this::convertOrderBook);
+    }
+
+    /**
+     * Convert json to {@link OrderBookPageChanges}.
+     * 
+     * @param array
+     * @return
+     */
+    private OrderBookPageChanges convertOrderBook(JsonElement root) {
+        OrderBookPageChanges change = new OrderBookPageChanges();
+
+        JsonObject o = root.getAsJsonObject();
+        JsonArray bids = o.get("bids").getAsJsonArray();
+        JsonArray asks = o.get("asks").getAsJsonArray();
+
+        for (JsonElement e : bids) {
+            JsonArray bid = e.getAsJsonArray();
+            Num price = Num.of(bid.get(0).getAsBigDecimal());
+            double size = bid.get(1).getAsDouble();
+
+            change.bids.add(new OrderBookPage(price, size));
+        }
+
+        for (JsonElement e : asks) {
+            JsonArray ask = e.getAsJsonArray();
+            Num price = Num.of(ask.get(0).getAsBigDecimal());
+            double size = ask.get(1).getAsDouble();
+
+            change.asks.add(new OrderBookPage(price, size));
+        }
+        return change;
     }
 
     /**
@@ -237,7 +269,7 @@ class BinanceService extends MarketService {
     private Signal<JsonElement> call(String method, String path) {
         Request request = new Request.Builder().url("https://api.binance.com/api/v3/" + path).build();
 
-        return network.rest(request, Limit).retryWhen(retryPolicy(10, "BitMEX RESTCall"));
+        return network.rest(request, Limit).retryWhen(retryPolicy(10, "Binance RESTCall"));
     }
 
     /**
@@ -246,13 +278,13 @@ class BinanceService extends MarketService {
      * @return
      */
     private synchronized Signal<JsonObject> connectSharedWebSocket(Topic topic) {
-        String name = marketName + "@" + topic;
+        String name = marketName.toLowerCase() + "@" + topic;
 
         if (websocket == null) {
             WebSocketCommand command = new WebSocketCommand();
             command.method = "SUBSCRIBE";
             for (Topic type : Topic.values()) {
-                command.params.add(marketName + "@" + type);
+                command.params.add(marketName.toLowerCase() + "@" + type);
             }
             websocket = network.websocket("wss://stream.binance.com:9443/stream", command);
         }
@@ -272,7 +304,12 @@ class BinanceService extends MarketService {
      * Subscription topics for websocket.
      */
     private enum Topic {
-        aggTrade;
+        aggTrade, depth20$100ms;
+
+        @Override
+        public String toString() {
+            return name().replace('$', '@');
+        }
     }
 
     /**
@@ -286,17 +323,5 @@ class BinanceService extends MarketService {
         public List<String> params = new ArrayList();
 
         public int id;
-    }
-
-    public static void main1(String[] args) {
-        Binance.BTC_USDT.executionsRealtimely().to(e -> {
-        }, e -> {
-            e.printStackTrace();
-        });
-    }
-
-    public static void main(String[] args) {
-        new ExecutionLog(Binance.BTC_USDT).fromYestaday().to(e -> {
-        });
     }
 }
