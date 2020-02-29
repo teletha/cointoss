@@ -88,8 +88,7 @@ class BitfinexService extends MarketService {
      */
     @Override
     public Signal<Execution> executions(long start, long end) {
-        start++;
-        long startTime = start / PaddingForID;
+        long startTime = (start / PaddingForID) + 1;
         long startingPoint = start % PaddingForID;
         AtomicLong increment = new AtomicLong(startingPoint - 1);
         Object[] previous = new Object[] {null, encodeId(start)};

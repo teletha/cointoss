@@ -46,9 +46,6 @@ public final class BitFlyer extends MarketServiceProvider {
     public static final MarketService ETH_JPY = new BitFlyerService("ETH_JPY", FiatBaseSetting);
 
     /** Market */
-    public static final MarketService ETH_BTC = new BitFlyerService("ETH_BTC", BTCBaseSetting);
-
-    /** Market */
     public static final MarketService BCH_BTC = new BitFlyerService("BCH_BTC", BTCBaseSetting);
 
     /**

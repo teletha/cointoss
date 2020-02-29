@@ -60,7 +60,9 @@ public abstract class MarketServiceProvider implements Extensible {
      * @return
      */
     public static final Signal<MarketServiceProvider> availableProviders() {
-        return I.signal(I.find(MarketServiceProvider.class)).take(market -> market.account().validate());
+        return I.signal(I.find(MarketServiceProvider.class)).take(market -> {
+            return market.account().validate();
+        });
     }
 
     /**

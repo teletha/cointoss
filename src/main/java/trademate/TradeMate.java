@@ -18,6 +18,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import cointoss.MarketService;
+import cointoss.market.MarketServiceProvider;
 import cointoss.market.binance.Binance;
 import cointoss.market.bitfinex.Bitfinex;
 import cointoss.market.bitflyer.BitFlyer;
@@ -67,6 +68,7 @@ public class TradeMate extends View {
         for (MarketService service : services) {
             loadTabFor(service);
         }
+
         main.initial(0);
 
         Chrono.seconds().map(Chrono.DateDayTime::format).on(Viewtify.UIThread).to(time -> {

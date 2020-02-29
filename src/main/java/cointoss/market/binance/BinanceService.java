@@ -87,7 +87,7 @@ class BinanceService extends MarketService {
      */
     @Override
     public Signal<Execution> executions(long start, long end) {
-        return call("GET", "aggTrades?symbol=" + marketName + "&limit=1000&fromId=" + start).flatIterable(JsonElement::getAsJsonArray)
+        return call("GET", "aggTrades?symbol=" + marketName + "&limit=1000&fromId=" + (start + 1)).flatIterable(JsonElement::getAsJsonArray)
                 .map(e -> convert(e.getAsJsonObject()));
     }
 
