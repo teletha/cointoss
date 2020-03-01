@@ -12,6 +12,7 @@ package cointoss.market.bitfinex;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Function;
 
 import org.eclipse.collections.api.map.primitive.MutableIntObjectMap;
 import org.eclipse.collections.impl.factory.primitive.IntObjectMaps;
@@ -42,7 +43,7 @@ class BitfinexService extends MarketService {
     private static final long PaddingForID = 10000;
 
     /** The bitflyer API limit. */
-    private static final APILimiter LimitForTradeHistory = APILimiter.with.limit(50).refresh(Duration.ofMinutes(1));
+    private static final APILimiter LimitForTradeHistory = APILimiter.with.limit(30).refresh(Duration.ofMinutes(1));
 
     /** The shared websocket connection. */
     private Signal<JsonElement> websocket;
@@ -357,7 +358,25 @@ class BitfinexService extends MarketService {
      * Subscription topics for websocket.
      */
     private enum Topic {
-        trades;
+        trades(array -> {
+            JsonElement type = array.get(1);
+
+            // ignore snapshot and update
+            if (!type.isJsonArray() && type.getAsString().endsWith("e")) {
+                return I.signal(array.get(2)).as(JsonArray.class);
+            } else {
+                return I.signal();
+            }
+        });
+
+        private final Function<JsonArray, Signal<JsonArray>> extractor;
+
+        /**
+         * @param extractor
+         */
+        private Topic(Function<JsonArray, Signal<JsonArray>> extractor) {
+            this.extractor = extractor;
+        }
     }
 
     /**

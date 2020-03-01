@@ -232,41 +232,6 @@ class BinanceService extends MarketService {
     }
 
     /**
-     * Estimate consecutive type.
-     * 
-     * @param previous
-     */
-    private int estimateConsecutiveType(String prevBuyer, String prevSeller, String buyer, String seller) {
-        if (buyer.equals(prevBuyer)) {
-            if (seller.equals(prevSeller)) {
-                return Execution.ConsecutiveSameBoth;
-            } else {
-                return Execution.ConsecutiveSameBuyer;
-            }
-        } else if (seller.equals(prevSeller)) {
-            return Execution.ConsecutiveSameSeller;
-        } else {
-            return Execution.ConsecutiveDifference;
-        }
-    }
-
-    /**
-     * Analyze Taker's order ID and obtain approximate order time (Since there is a bot which
-     * specifies non-standard id format, ignore it in that case).
-     */
-    private int estimateDelay(long eventTime, long tradeTime) {
-        int delay = (int) (eventTime - tradeTime) / 1000;
-
-        if (delay < 0) {
-            return Execution.DelayInestimable;
-        } else if (180 < delay) {
-            return Execution.DelayHuge;
-        } else {
-            return delay;
-        }
-    }
-
-    /**
      * Call rest API.
      * 
      * @param method

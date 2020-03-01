@@ -20,6 +20,7 @@ import cointoss.Direction;
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.market.bitflyer.SFD;
 import cointoss.order.Order;
+import cointoss.order.OrderManager;
 import cointoss.order.OrderState;
 import cointoss.trading.LazyBear;
 import cointoss.util.Num;
@@ -95,6 +96,9 @@ public class OrderBuilder extends View {
     private TradingView view;
 
     /** UI */
+    private UILabel positionSize;
+
+    /** UI */
     private UILabel sfdPrice500;
 
     /** UI */
@@ -152,6 +156,10 @@ public class OrderBuilder extends View {
                     });
 
                     $(hbox, S.Row, () -> {
+                        label(en("Position"), S.Label);
+                        $(positionSize);
+                    });
+                    $(hbox, S.Row, () -> {
                         $(bot);
                     });
                 });
@@ -164,6 +172,8 @@ public class OrderBuilder extends View {
      */
     @Override
     protected void initialize() {
+        OrderManager orders = view.market.orders;
+
         orderSize.initialize("0").when(User.Scroll, changeBy(orderSizeAmount)).require(positiveNumber);
         orderSizeAmount.initialize(view.service.setting.targetCurrencyBidSizes());
 
@@ -195,7 +205,7 @@ public class OrderBuilder extends View {
             ui.disableBriefly();
         });
 
-        orderCancel.text(en("Cancel")).when(User.MouseClick).to(() -> view.market.orders.cancelNowAll());
+        orderCancel.text(en("Cancel")).when(User.MouseClick).to(() -> orders.cancelNowAll());
         orderStop.text(en("Stop")).when(User.MouseClick).to(() -> view.market.stop().to(I.NoOP));
         orderReverse.text(en("Reverse")).when(User.MouseClick).to(() -> view.market.reverse().to(I.NoOP));
 
@@ -205,6 +215,10 @@ public class OrderBuilder extends View {
                 sfdPrice499.text("4.99% " + price.ⅱ.multiply(1.0499).scale(1));
             }));
         }
+
+        view.market.orders.position.observing().on(Viewtify.UIThread).to(position -> {
+            positionSize.text(position).styleOnly(position.isPositiveOrZero() ? TradeMateStyle.Long : TradeMateStyle.Short);
+        });
 
         bot.text("Active Bot").observe().take(1).to(v -> {
             view.market.register(new LazyBear());
