@@ -24,12 +24,9 @@ import cointoss.market.bitflyer.BitFlyer;
 import cointoss.market.bitmex.BitMex;
 import cointoss.util.Chrono;
 import cointoss.util.Network;
-import cointoss.util.Num;
 import kiss.I;
 import kiss.Managed;
 import kiss.Singleton;
-import stylist.Style;
-import stylist.StyleDSL;
 import trademate.setting.SettingView;
 import trademate.verify.BackTestView;
 import transcript.Lang;
@@ -37,8 +34,6 @@ import viewtify.Theme;
 import viewtify.Viewtify;
 import viewtify.ui.UITab;
 import viewtify.ui.UITabPane;
-import viewtify.ui.UITableColumn;
-import viewtify.ui.UITableView;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
 
@@ -48,12 +43,6 @@ public class TradeMate extends View {
     /** Tab Area */
     UITabPane main;
 
-    private UITableView<MarketService> markets;
-
-    private UITableColumn<MarketService, String> name;
-
-    private UITableColumn<MarketService, Num> price;
-
     /**
      * {@inheritDoc}
      */
@@ -61,24 +50,8 @@ public class TradeMate extends View {
     protected ViewDSL declareUI() {
         return new ViewDSL() {
             {
-                $(hbox, () -> {
-                    $(markets, styles.markets, () -> {
-                        $(name, styles.name);
-                        $(price);
-                    });
-                    $(main);
-                });
+                $(main);
             }
-        };
-    }
-
-    private interface styles extends StyleDSL {
-        Style markets = () -> {
-            display.minWidth(200, px);
-        };
-
-        Style name = () -> {
-            display.width(120, px);
         };
     }
 
@@ -87,10 +60,6 @@ public class TradeMate extends View {
      */
     @Override
     protected void initialize() {
-        name.text(en("Market")).model(MarketService::marketReadableName);
-        // price.text(en("Current")).modelBySignal(s ->
-        // s.executionsRealtimely().map(Execution::price).on(Viewtify.UIThread));
-
         main.policy(TabClosingPolicy.UNAVAILABLE).load("Setting", SettingView.class).load("Back Test", BackTestView.class);
 
         List<MarketService> services = List
@@ -100,10 +69,6 @@ public class TradeMate extends View {
         }
 
         main.initial(0);
-
-        for (MarketService service : services) {
-            markets.addItemAtLast(service);
-        }
 
         Chrono.seconds().map(Chrono.DateDayTime::format).on(Viewtify.UIThread).to(time -> {
             stage().v.setTitle(time);
