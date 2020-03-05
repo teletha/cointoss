@@ -266,7 +266,7 @@ public abstract class Order extends OrderModel {
             throw new IllegalArgumentException("The size property requires non-null value.");
         }
         try {
-            sizeUpdater.invoke(this, validateSize$1683249437.invoke(this, value, (Consumer<Num>) ((Åssignable) this)::remainingSize));
+            sizeUpdater.invoke(this, validateSize$1683249437.invoke(this, value, (Consumer<Num>) this::setRemainingSize));
         } catch (Throwable e) {
             throw quiet(e);
         }
@@ -302,7 +302,7 @@ public abstract class Order extends OrderModel {
             value = super.price();
         }
         try {
-            priceUpdater.invoke(this, price$1654949385.invoke(this, value, (Consumer<OrderType>) ((Åssignable) this)::type));
+            priceUpdater.invoke(this, price$1654949385.invoke(this, value, (Consumer<OrderType>) this::setType));
         } catch (Throwable e) {
             throw quiet(e);
         }

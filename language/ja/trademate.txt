@@ -7,11 +7,17 @@ Buy
 Cancel
 キャンセル
 
+Current
+カレント
+
 Date
 日付
 
 End Date
 終了日
+
+Market
+市場
 
 Price
 値段
