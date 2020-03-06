@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Locale;
 
 import javafx.scene.control.TabPane.TabClosingPolicy;
+import javafx.scene.control.TabPane.TabDragPolicy;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -60,7 +61,10 @@ public class TradeMate extends View {
      */
     @Override
     protected void initialize() {
-        main.policy(TabClosingPolicy.UNAVAILABLE).load("Setting", SettingView.class).load("Back Test", BackTestView.class);
+        main.policy(TabClosingPolicy.UNAVAILABLE)
+                .policy(TabDragPolicy.REORDER)
+                .load("Setting", SettingView.class)
+                .load("Back Test", BackTestView.class);
 
         List<MarketService> services = List
                 .of(BitFlyer.FX_BTC_JPY, BitFlyer.BTC_JPY, BitFlyer.ETH_JPY, BitFlyer.BCH_BTC, BitMex.XBT_USD, BitMex.ETH_USD, Binance.BTC_USDT, Binance.FUTURE_BTC_USDT, Bitfinex.BTC_USDT);
