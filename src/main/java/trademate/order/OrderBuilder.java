@@ -9,7 +9,7 @@
  */
 package trademate.order;
 
-import static cointoss.order.OrderState.*;
+import static cointoss.order.OrderState.ACTIVE;
 import static trademate.CommonText.*;
 
 import java.math.RoundingMode;
@@ -185,7 +185,7 @@ public class OrderBuilder extends View {
                         $(bot);
                     });
 
-                    $(table, S.Root, () -> {
+                    $(table, S.Catalog, () -> {
                         $(side, S.Narrow);
                         $(price, S.Wide);
                         $(amount, S.Narrow);
@@ -389,8 +389,8 @@ public class OrderBuilder extends View {
     private interface S extends StyleDSL {
 
         Style Root = () -> {
-            padding.horizontal(10, px);
-            display.minWidth(270, px);
+            padding.left(5, px);
+            display.minWidth(270, px).height.fill();
         };
 
         Style Row = () -> {
@@ -434,6 +434,10 @@ public class OrderBuilder extends View {
             default:
                 break;
             }
+        };
+
+        Style Catalog = () -> {
+            display.height.fill();
         };
 
         Style Wide = () -> {

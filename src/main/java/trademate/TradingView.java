@@ -76,11 +76,11 @@ public class TradingView extends View {
                     $(chart);
                 });
 
-                $(vbox, () -> {
-                    $(hbox, () -> {
-                        $(builder);
+                $(vbox, style.fill, () -> {
+                    $(hbox, style.fill, () -> {
                         $(books);
                         $(executionView);
+                        $(builder);
                     });
                 });
             });
@@ -101,6 +101,10 @@ public class TradingView extends View {
 
         Style chartArea = () -> {
             display.height.fill().width.fill();
+        };
+
+        Style fill = () -> {
+            display.height.fill();
         };
     }
 

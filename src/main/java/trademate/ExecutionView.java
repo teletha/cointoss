@@ -40,11 +40,11 @@ public class ExecutionView extends View {
     class view extends ViewDSL {
         {
             $(vbox, style.root, () -> {
-                $(executionList);
+                $(executionList, style.fill);
                 $(hbox, () -> {
                     $(takerSize, style.takerSize);
                 });
-                $(executionCumulativeList);
+                $(executionCumulativeList, style.fill);
             });
         }
     }
@@ -60,6 +60,10 @@ public class ExecutionView extends View {
 
         Style takerSize = () -> {
             display.width(70, px);
+        };
+
+        Style fill = () -> {
+            display.height.fill();
         };
     }
 

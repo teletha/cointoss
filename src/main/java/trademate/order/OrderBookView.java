@@ -19,8 +19,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontSmoothingType;
 
-import cointoss.order.OrderBookPage;
 import cointoss.order.OrderBookManager;
+import cointoss.order.OrderBookPage;
 import cointoss.util.Num;
 import cointoss.util.Primitives;
 import kiss.WiseRunnable;
@@ -83,10 +83,11 @@ public class OrderBookView extends View {
     interface style extends StyleDSL {
 
         Style root = () -> {
-            display.minWidth(158, px).maxWidth(158, px);
+            display.minWidth(158, px).maxWidth(158, px).height.fill();
         };
 
         Style book = () -> {
+            display.height.fill();
             text.unselectable();
 
             $.select(".scroll-bar:horizontal").descendant(() -> {
