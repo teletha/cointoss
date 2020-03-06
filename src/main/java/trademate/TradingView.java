@@ -21,11 +21,8 @@ import kiss.Disposable;
 import stylist.Style;
 import stylist.StyleDSL;
 import trademate.chart.ChartView;
-import trademate.console.Console;
-import trademate.info.TradeInfomationView;
 import trademate.order.OrderBookView;
 import trademate.order.OrderBuilder;
-import trademate.order.OrderCatalog;
 import viewtify.Viewtify;
 import viewtify.ui.UILabel;
 import viewtify.ui.UITab;
@@ -51,15 +48,9 @@ public class TradingView extends View {
 
     public ExecutionView executionView;
 
-    public Console console;
-
     public OrderBookView books;
 
     public OrderBuilder builder;
-
-    public OrderCatalog orders;
-
-    public TradeInfomationView positions;
 
     public ChartView chart;
 
@@ -80,17 +71,17 @@ public class TradingView extends View {
      */
     class view extends ViewDSL {
         {
-            $(vbox, () -> {
-                $(hbox, style.fill, () -> {
+            $(hbox, () -> {
+                $(vbox, style.chartArea, () -> {
                     $(chart);
-                    $(builder);
-                    $(books);
-                    $(executionView);
                 });
-                $(hbox, () -> {
-                    $(orders);
-                    $(positions);
-                    $(console);
+
+                $(vbox, () -> {
+                    $(hbox, () -> {
+                        $(builder);
+                        $(books);
+                        $(executionView);
+                    });
                 });
             });
         }
@@ -100,16 +91,16 @@ public class TradingView extends View {
      * Style definition.
      */
     interface style extends StyleDSL {
-        Style fill = () -> {
-            display.height.fill().width.fill();
-        };
-
         Style tabTitle = () -> {
             font.size(11, px);
         };
 
         Style tabPrice = () -> {
             font.size(11, px);
+        };
+
+        Style chartArea = () -> {
+            display.height.fill().width.fill();
         };
     }
 
@@ -125,6 +116,7 @@ public class TradingView extends View {
             market.readLog(log -> log.fromLast(6, LogType.Fast));
 
             chart.restoreRealtimeUpdate();
+
             findAncestorView(TradeMate.class).to(TradeMate::requestLazyInitialization);
         });
 

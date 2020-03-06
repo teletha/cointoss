@@ -9,11 +9,16 @@
  */
 package trademate.order;
 
+import static cointoss.order.OrderState.*;
 import static trademate.CommonText.*;
 
 import java.math.RoundingMode;
+import java.util.Comparator;
+import java.util.function.Consumer;
 import java.util.stream.IntStream;
 
+import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TableRow;
 import javafx.scene.input.ScrollEvent;
 
 import cointoss.Direction;
@@ -29,16 +34,21 @@ import kiss.WiseBiConsumer;
 import kiss.WiseConsumer;
 import stylist.Style;
 import stylist.StyleDSL;
+import stylist.ValueStyle;
 import trademate.TradeMateStyle;
 import trademate.TradingView;
 import viewtify.Viewtify;
+import viewtify.bind.Calculated;
 import viewtify.ui.UIButton;
 import viewtify.ui.UICheckBox;
 import viewtify.ui.UILabel;
 import viewtify.ui.UISpinner;
+import viewtify.ui.UITableColumn;
+import viewtify.ui.UITableView;
 import viewtify.ui.UIText;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
+import viewtify.ui.helper.StyleHelper;
 import viewtify.ui.helper.User;
 import viewtify.ui.helper.ValueHelper;
 
@@ -106,6 +116,18 @@ public class OrderBuilder extends View {
 
     private UICheckBox bot;
 
+    /** UI */
+    private UITableView<Order> table;
+
+    /** UI */
+    private UITableColumn<Order, Direction> side;
+
+    /** UI */
+    private UITableColumn<Order, Num> amount;
+
+    /** UI */
+    private UITableColumn<Order, Num> price;
+
     /**
      * {@inheritDoc}
      */
@@ -161,6 +183,12 @@ public class OrderBuilder extends View {
                     });
                     $(hbox, S.Row, () -> {
                         $(bot);
+                    });
+
+                    $(table, S.Root, () -> {
+                        $(side, S.Narrow);
+                        $(price, S.Wide);
+                        $(amount, S.Narrow);
                     });
                 });
             }
@@ -223,6 +251,27 @@ public class OrderBuilder extends View {
         bot.text("Active Bot").observe().take(1).to(v -> {
             view.market.register(new LazyBear());
         });
+
+        table.mode(SelectionMode.MULTIPLE).render(table -> new CatalogRow()).context($ -> {
+            Calculated<Boolean> ordersArePassive = Viewtify.calculate(table.selectedItems())
+                    .flatVariable(o -> o.observeStateNow().to())
+                    .isNot(ACTIVE);
+
+            $.menu().text(Cancel).disableWhen(ordersArePassive).when(User.Action, e -> act(this::cancel));
+        });
+
+        side.text(SiDe)
+                .model(Order.class, Order::direction)
+                .render((label, side) -> label.text(side).styleOnly(TradeMateStyle.Side.of(side)));
+        amount.text(Amount).modelByVar(Order.class, o -> o.observeRemainingSizeNow().to());
+        price.text(Price).model(Order.class, o -> o.price);
+
+        // initialize orders on server
+        I.signal(view.market.orders.items).take(Order::isBuy).sort(Comparator.reverseOrder()).to(this::createOrderItem);
+        I.signal(view.market.orders.items).take(Order::isSell).sort(Comparator.naturalOrder()).to(this::createOrderItem);
+
+        // observe orders on clinet
+        view.market.orders.add.to(this::createOrderItem);
     }
 
     /**
@@ -279,6 +328,62 @@ public class OrderBuilder extends View {
     }
 
     /**
+     * Create tree item for {@link OrderSet}.
+     * 
+     * @param set
+     */
+    private void createOrderItem(Order order) {
+        if (order != null) {
+            table.addItemAtLast(order);
+            order.observeTerminating().on(Viewtify.UIThread).to(() -> table.removeItem(order));
+        }
+    }
+
+    /**
+     * Cancel {@link OrderSet} or {@link Order}.
+     * 
+     * @param order
+     */
+    private void act(Consumer<Order> forOrder) {
+        for (Order order : table.selectedItems()) {
+            forOrder.accept(order);
+        }
+    }
+
+    /**
+     * Cancel {@link Order}.
+     * 
+     * @param order
+     */
+    private void cancel(Order order) {
+        Viewtify.inWorker(() -> {
+            view.market.cancel(order).to(o -> {
+            });
+        });
+    }
+
+    /**
+     * 
+     */
+    private class CatalogRow extends TableRow<Order> implements StyleHelper<CatalogRow, CatalogRow> {
+
+        /**
+         * 
+         */
+        private CatalogRow() {
+            styleOnly(Viewtify.observing(itemProperty()).as(Order.class).switchMap(o -> o.observeStateNow()).map(S.State::of));
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public CatalogRow ui() {
+            return this;
+        }
+    }
+
+    /**
      * @version 2018/09/09 9:14:18
      */
     private interface S extends StyleDSL {
@@ -316,6 +421,27 @@ public class OrderBuilder extends View {
 
         Style FormButton = () -> {
             display.width(62, px).height(31, px);
+        };
+
+        ValueStyle<OrderState> State = state -> {
+            switch (state) {
+            case REQUESTING:
+                $.descendant(() -> {
+                    font.color($.rgb(80, 80, 80));
+                });
+                break;
+
+            default:
+                break;
+            }
+        };
+
+        Style Wide = () -> {
+            display.width(120, px);
+        };
+
+        Style Narrow = () -> {
+            display.width(65, px);
         };
     }
 }

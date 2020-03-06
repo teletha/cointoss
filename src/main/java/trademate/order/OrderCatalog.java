@@ -9,11 +9,9 @@
  */
 package trademate.order;
 
-import static cointoss.order.OrderState.ACTIVE;
+import static cointoss.order.OrderState.*;
 import static trademate.CommonText.*;
 
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.function.Consumer;
 
@@ -32,23 +30,17 @@ import trademate.TradeMateStyle;
 import trademate.TradingView;
 import viewtify.Viewtify;
 import viewtify.bind.Calculated;
-import viewtify.ui.ViewDSL;
 import viewtify.ui.UITableColumn;
 import viewtify.ui.UITableView;
 import viewtify.ui.View;
+import viewtify.ui.ViewDSL;
 import viewtify.ui.helper.StyleHelper;
 import viewtify.ui.helper.User;
 
 public class OrderCatalog extends View {
 
-    /** The date formatter. */
-    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd HH:mm:ss");
-
     /** UI */
     private UITableView<Order> table;
-
-    /** UI */
-    private UITableColumn<Order, ZonedDateTime> date;
 
     /** UI */
     private UITableColumn<Order, Direction> side;
@@ -70,7 +62,6 @@ public class OrderCatalog extends View {
         return new ViewDSL() {
             {
                 $(table, S.Root, () -> {
-                    $(date, S.Wide);
                     $(side, S.Narrow);
                     $(price, S.Wide);
                     $(amount, S.Narrow);
@@ -92,9 +83,6 @@ public class OrderCatalog extends View {
             $.menu().text(Cancel).disableWhen(ordersArePassive).when(User.Action, e -> act(this::cancel));
         });
 
-        date.text(Date)
-                .modelByVar(Order.class, o -> o.observeCreationTimeNow().to())
-                .render((label, item) -> label.text(formatter.format(item)));
         side.text(SiDe)
                 .model(Order.class, Order::direction)
                 .render((label, side) -> label.text(side).styleOnly(TradeMateStyle.Side.of(side)));
