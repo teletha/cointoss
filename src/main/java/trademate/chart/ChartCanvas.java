@@ -9,7 +9,7 @@
  */
 package trademate.chart;
 
-import static transcript.Transcript.en;
+import static transcript.Transcript.*;
 
 import java.time.Duration;
 import java.util.List;
@@ -64,6 +64,12 @@ import viewtify.util.FXUtils;
 
 public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas> {
 
+    /** Name Font */
+    private static final Font NameFont = Font.font(Font.getDefault().getName(), 26);
+
+    /** Name Color */
+    private static final Color NameColor = Color.rgb(50, 50, 50);
+
     /** Infomation Font */
     private static final Font InfoFont = Font.font(Font.getDefault().getName(), 10.5);
 
@@ -114,6 +120,9 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
     /** Chart UI */
     private final Canvas candleLatest = new Canvas();
+
+    /** Chart UI */
+    private final Canvas name = new Canvas();
 
     /** Chart UI */
     private final Canvas chartInfo = new Canvas();
@@ -190,6 +199,8 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         this.candleLatest.heightProperty().bind(heightProperty());
         this.chartInfo.widthProperty().bind(widthProperty());
         this.chartInfo.heightProperty().bind(heightProperty());
+        this.name.widthProperty().bind(widthProperty());
+        this.name.heightProperty().bind(heightProperty());
 
         chart.market.observe().combineLatest(chart.ticker.observe(), Viewtify.observing(chart.scripts)).to(v -> {
             plotters = plottersCache.getUnchecked(v);
@@ -216,7 +227,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         visualizeSFDPrice();
 
         getChildren()
-                .addAll(backGridVertical, backGridHorizontal, notifyPrice, orderBuyPrice, orderSellPrice, latestPrice, sfdPrice, candles, candleLatest, chartInfo, mouseTrackHorizontal, mouseTrackVertical);
+                .addAll(name, backGridVertical, backGridHorizontal, notifyPrice, orderBuyPrice, orderSellPrice, latestPrice, sfdPrice, candles, candleLatest, chartInfo, mouseTrackHorizontal, mouseTrackVertical);
     }
 
     /**
@@ -431,6 +442,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         orderSellPrice.draw();
 
         drawCandle();
+        drawMarketName();
     }
 
     /**
@@ -638,6 +650,18 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 x += chartInfoWidth + gap;
             }
         }
+    }
+
+    /**
+     * Draw market name in background.
+     */
+    private void drawMarketName() {
+        chart.market.to(m -> {
+            GraphicsContext gc = name.getGraphicsContext2D();
+            gc.setFont(NameFont);
+            gc.setFill(NameColor);
+            gc.fillText(m.service.marketReadableName(), 5, NameFont.getSize() * 1.4);
+        });
     }
 
     /**
