@@ -12,8 +12,15 @@ package trademate;
 import java.util.List;
 import java.util.Locale;
 
+import javafx.collections.ObservableList;
+import javafx.scene.Node;
+import javafx.scene.Scene;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 import javafx.scene.control.TabPane.TabClosingPolicy;
 import javafx.scene.control.TabPane.TabDragPolicy;
+import javafx.scene.layout.Pane;
+import javafx.stage.Stage;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -33,13 +40,18 @@ import trademate.verify.BackTestView;
 import transcript.Lang;
 import viewtify.Theme;
 import viewtify.Viewtify;
+import viewtify.ui.UISplitPane;
 import viewtify.ui.UITab;
 import viewtify.ui.UITabPane;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
+import viewtify.ui.helper.User;
 
 @Managed(value = Singleton.class)
 public class TradeMate extends View {
+
+    /** The main split. */
+    UISplitPane split;
 
     /** Tab Area */
     UITabPane main;
@@ -51,7 +63,9 @@ public class TradeMate extends View {
     protected ViewDSL declareUI() {
         return new ViewDSL() {
             {
-                $(main);
+                $(split, () -> {
+                    $(main);
+                });
             }
         };
     }
@@ -85,7 +99,114 @@ public class TradeMate extends View {
      * @param service
      */
     private void loadTabFor(MarketService service) {
-        main.load(service.marketReadableName(), tab -> new TradingView(tab, service));
+        main.load(service.marketReadableName(), tab -> {
+            tab.context(c -> {
+                c.menu().text(en("Arrange in tiles")).when(User.Action, () -> tile(tab));
+                c.menu().text(en("Detach as window")).when(User.Action, () -> detach(tab));
+            });
+
+            return new TradingView(tab, service);
+        });
+    }
+
+    /**
+     * {@link TradeMate} will automatically initialize in the background if any tab has not been
+     * activated yet.
+     */
+    public final void requestLazyInitialization() {
+        for (UITab tab : main.items()) {
+            if (!tab.isLoaded()) {
+                Viewtify.inUI(() -> tab.load());
+                return;
+            }
+        }
+    }
+
+    /**
+     * Detach the specified tab.
+     * 
+     * @param tab
+     */
+    private void detach(UITab tab) {
+        int originalIndex = main.ui.getTabs().indexOf(tab);
+
+        Pane content = (Pane) tab.getContent();
+        tab.setContent(null);
+
+        Scene scene = new Scene(content, content.getPrefWidth(), content.getPrefHeight());
+        scene.getStylesheets().addAll(main.ui.getScene().getStylesheets());
+
+        Stage stage = new Stage();
+        stage.setScene(scene);
+        stage.getIcons().addAll(((Stage) main.ui.getScene().getWindow()).getIcons());
+        stage.setTitle(tab.getText());
+        stage.setOnShown(e -> main.ui.getTabs().remove(tab));
+        stage.setOnCloseRequest(e -> {
+            stage.close();
+            tab.setContent(content);
+            main.ui.getTabs().add(originalIndex, tab);
+        });
+        stage.show();
+    }
+
+    /**
+     * Tile the specified tab.
+     * 
+     * @param tab
+     */
+    private void tile(UITab tab) {
+        int originalIndex = main.ui.getTabs().indexOf(tab);
+
+        main.ui.getTabs().remove(tab);
+        Node content = tab.getContent();
+
+        split.ui.getItems().add(content);
+        allocateEvenWidth();
+    }
+
+    /**
+     * Move tab.
+     * 
+     * @param tab
+     * @param from
+     * @param to
+     */
+    private void move(Tab tab, TabPane from, TabPane to) {
+        ObservableList<Tab> froms = from.getTabs();
+
+        if (froms.remove(tab)) {
+            to.getTabs().add(tab);
+
+            if (froms.isEmpty()) {
+                remove(from);
+            }
+        }
+    }
+
+    /**
+     * Remove {@link TabPane}.
+     * 
+     * @param pane
+     */
+    private void remove(TabPane pane) {
+        if (pane != null && split.ui.getItems().remove(pane)) {
+            allocateEvenWidth();
+        }
+    }
+
+    /**
+     * Compute all positions for equal spacing.
+     * 
+     * @return
+     */
+    private void allocateEvenWidth() {
+        int itemSize = split.ui.getItems().size();
+        double equalSpacing = 1d / itemSize;
+        double[] positions = new double[itemSize - 1];
+        for (int i = 0; i < positions.length; i++) {
+            positions[i] = equalSpacing * (i + 1);
+        }
+        split.ui.setDividerPositions(positions);
     }
 
     /**
@@ -103,18 +224,5 @@ public class TradeMate extends View {
                 .language(Lang.of(I.env("language", Locale.getDefault().getLanguage())))
                 .onTerminating(Network::terminate)
                 .activate(TradeMate.class);
-    }
-
-    /**
-     * {@link TradeMate} will automatically initialize in the background if any tab has not been
-     * activated yet.
-     */
-    public final void requestLazyInitialization() {
-        for (UITab tab : main.items()) {
-            if (!tab.isLoaded()) {
-                Viewtify.inUI(() -> tab.load());
-                return;
-            }
-        }
     }
 }

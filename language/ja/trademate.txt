@@ -1,6 +1,9 @@
 Amount
 数量
 
+Arrange in tiles
+並べて表示
+
 Buy
 買い
 
@@ -12,6 +15,9 @@ Current
 
 Date
 日付
+
+Detach as window
+ウインドウとして分離
 
 End Date
 終了日
@@ -33,4 +39,3 @@ Side
 
 Start Date
 開始日
-
