@@ -9,7 +9,7 @@
  */
 package trademate.order;
 
-import static cointoss.order.OrderState.ACTIVE;
+import static cointoss.order.OrderState.*;
 import static trademate.CommonText.*;
 
 import java.math.RoundingMode;
@@ -17,6 +17,7 @@ import java.util.Comparator;
 import java.util.function.Consumer;
 import java.util.stream.IntStream;
 
+import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableRow;
 import javafx.scene.input.ScrollEvent;
@@ -42,6 +43,7 @@ import viewtify.bind.Calculated;
 import viewtify.ui.UIButton;
 import viewtify.ui.UICheckBox;
 import viewtify.ui.UILabel;
+import viewtify.ui.UIScrollPane;
 import viewtify.ui.UISpinner;
 import viewtify.ui.UITableColumn;
 import viewtify.ui.UITableView;
@@ -128,6 +130,8 @@ public class OrderBuilder extends View {
     /** UI */
     private UITableColumn<Order, Num> price;
 
+    private UIScrollPane scroll;
+
     /**
      * {@inheritDoc}
      */
@@ -135,60 +139,62 @@ public class OrderBuilder extends View {
     protected ViewDSL declareUI() {
         return new ViewDSL() {
             {
-                $(vbox, S.Root, () -> {
-                    $(hbox, S.Row, () -> {
-                        label(Amount, S.Label);
-                        $(orderSize, S.Form);
-                        $(orderSizeAmount, S.FormMin);
-                    });
-                    $(hbox, S.Row, () -> {
-                        label(Price, S.Label);
-                        $(orderPrice, S.Form);
-                        $(orderPriceAmount, S.FormMin);
-                    });
-                    $(hbox, S.Row, () -> {
-                        label(en("Variances"), S.Label);
-                        $(orderDivideSize, S.Form);
-                        $(orderDivideIntervalAmount, S.FormMin);
-                    });
-                    $(hbox, S.Row, () -> {
-                        label(en("Price Interval"), S.Label);
-                        $(orderPriceInterval, S.Form);
-                        $(orderPriceIntervalAmount, S.FormMin);
-                    });
-                    $(hbox, S.Row, () -> {
-                        label(en("Threshold"), S.Label);
-                        $(optimizeThreshold, S.Form);
-                    });
-                    $(hbox, S.Row, () -> {
-                        $(orderLimitShort, S.FormButton, TradeMateStyle.Short);
-                        $(orderLimitLong, S.FormButton, TradeMateStyle.Long);
-                    });
-                    $(hbox, S.Row, () -> {
-                        $(orderCancel, S.FormButton);
-                        $(orderStop, S.FormButton);
-                        $(orderReverse, S.FormButton);
-                    });
+                $(scroll, () -> {
+                    $(vbox, S.Root, () -> {
+                        $(hbox, S.Row, () -> {
+                            label(Amount, S.Label);
+                            $(orderSize, S.Form);
+                            $(orderSizeAmount, S.FormMin);
+                        });
+                        $(hbox, S.Row, () -> {
+                            label(Price, S.Label);
+                            $(orderPrice, S.Form);
+                            $(orderPriceAmount, S.FormMin);
+                        });
+                        $(hbox, S.Row, () -> {
+                            label(en("Variances"), S.Label);
+                            $(orderDivideSize, S.Form);
+                            $(orderDivideIntervalAmount, S.FormMin);
+                        });
+                        $(hbox, S.Row, () -> {
+                            label(en("Price Interval"), S.Label);
+                            $(orderPriceInterval, S.Form);
+                            $(orderPriceIntervalAmount, S.FormMin);
+                        });
+                        $(hbox, S.Row, () -> {
+                            label(en("Threshold"), S.Label);
+                            $(optimizeThreshold, S.Form);
+                        });
+                        $(hbox, S.Row, () -> {
+                            $(orderLimitShort, S.FormButton, TradeMateStyle.Short);
+                            $(orderLimitLong, S.FormButton, TradeMateStyle.Long);
+                        });
+                        $(hbox, S.Row, () -> {
+                            $(orderCancel, S.FormButton);
+                            $(orderStop, S.FormButton);
+                            $(orderReverse, S.FormButton);
+                        });
 
-                    $(hbox, S.Row, () -> {
-                        $(sfdPrice500, S.SFD);
-                    });
-                    $(hbox, S.Row, () -> {
-                        $(sfdPrice499, S.SFD);
-                    });
+                        $(hbox, S.Row, () -> {
+                            $(sfdPrice500, S.SFD);
+                        });
+                        $(hbox, S.Row, () -> {
+                            $(sfdPrice499, S.SFD);
+                        });
 
-                    $(hbox, S.Row, () -> {
-                        label(en("Position"), S.Label);
-                        $(positionSize);
-                    });
-                    $(hbox, S.Row, () -> {
-                        $(bot);
-                    });
+                        $(hbox, S.Row, () -> {
+                            label(en("Position"), S.Label);
+                            $(positionSize);
+                        });
+                        $(hbox, S.Row, () -> {
+                            $(bot);
+                        });
 
-                    $(table, S.Catalog, () -> {
-                        $(side, S.Narrow);
-                        $(price, S.Wide);
-                        $(amount, S.Narrow);
+                        $(table, S.Catalog, () -> {
+                            $(side, S.Narrow);
+                            $(price, S.Wide);
+                            $(amount, S.Narrow);
+                        });
                     });
                 });
             }
@@ -200,6 +206,8 @@ public class OrderBuilder extends View {
      */
     @Override
     protected void initialize() {
+        scroll.policy(ScrollBarPolicy.NEVER, ScrollBarPolicy.AS_NEEDED);
+
         OrderManager orders = view.market.orders;
 
         orderSize.initialize("0").when(User.Scroll, changeBy(orderSizeAmount)).require(positiveNumber);
@@ -391,6 +399,7 @@ public class OrderBuilder extends View {
         Style Root = () -> {
             padding.left(5, px);
             display.minWidth(270, px).height.fill();
+            overflow.y.auto();
         };
 
         Style Row = () -> {

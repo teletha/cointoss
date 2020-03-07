@@ -1,3 +1,6 @@
 Detach
 分離
 
+Tile
+タイル
+
