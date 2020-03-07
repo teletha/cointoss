@@ -301,6 +301,7 @@ public class OrderBuilder extends View {
                 // decrement
                 ui.value(Num.max(Num.ZERO, current.minus(spinner.value())).toString());
             }
+            e.consume();
         };
     }
 

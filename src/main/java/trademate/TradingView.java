@@ -24,6 +24,7 @@ import trademate.chart.ChartView;
 import trademate.order.OrderBookView;
 import trademate.order.OrderBuilder;
 import viewtify.Viewtify;
+import viewtify.ui.UIHBox;
 import viewtify.ui.UILabel;
 import viewtify.ui.UITab;
 import viewtify.ui.View;
@@ -54,6 +55,8 @@ public class TradingView extends View {
 
     public ChartView chart;
 
+    private UIHBox box;
+
     /**
      * @param tab
      * @param service
@@ -71,7 +74,7 @@ public class TradingView extends View {
      */
     class view extends ViewDSL {
         {
-            $(hbox, () -> {
+            $(box, () -> {
                 $(vbox, style.chartArea, () -> {
                     $(chart);
                 });

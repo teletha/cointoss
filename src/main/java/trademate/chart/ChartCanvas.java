@@ -9,7 +9,7 @@
  */
 package trademate.chart;
 
-import static transcript.Transcript.*;
+import static transcript.Transcript.en;
 
 import java.time.Duration;
 import java.util.List;
@@ -65,7 +65,7 @@ import viewtify.util.FXUtils;
 public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas> {
 
     /** Name Font */
-    private static final Font NameFont = Font.font(Font.getDefault().getName(), 26);
+    private static final Font NameFont = Font.font(Font.getDefault().getName(), 24);
 
     /** Name Color */
     private static final Color NameColor = Color.rgb(50, 50, 50);
@@ -202,6 +202,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         this.name.widthProperty().bind(widthProperty());
         this.name.heightProperty().bind(heightProperty());
 
+        chart.market.observe().to(this::drawMarketName);
         chart.market.observe().combineLatest(chart.ticker.observe(), Viewtify.observing(chart.scripts)).to(v -> {
             plotters = plottersCache.getUnchecked(v);
             scripts = I.signal(plotters).map(p -> p.origin).distinct().toList();
@@ -442,7 +443,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         orderSellPrice.draw();
 
         drawCandle();
-        drawMarketName();
     }
 
     /**
@@ -655,13 +655,12 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     /**
      * Draw market name in background.
      */
-    private void drawMarketName() {
-        chart.market.to(m -> {
-            GraphicsContext gc = name.getGraphicsContext2D();
-            gc.setFont(NameFont);
-            gc.setFill(NameColor);
-            gc.fillText(m.service.marketReadableName(), 5, NameFont.getSize() * 1.4);
-        });
+    private void drawMarketName(Market m) {
+        GraphicsContext gc = name.getGraphicsContext2D();
+        gc.clearRect(0, 0, name.getWidth(), name.getHeight());
+        gc.setFont(NameFont);
+        gc.setFill(NameColor);
+        gc.fillText(m.service.marketReadableName(), 4, NameFont.getSize() * 1.2);
     }
 
     /**
