@@ -24,7 +24,6 @@ import trademate.chart.ChartView;
 import trademate.order.OrderBookView;
 import trademate.order.OrderBuilder;
 import viewtify.Viewtify;
-import viewtify.ui.UIHBox;
 import viewtify.ui.UILabel;
 import viewtify.ui.UITab;
 import viewtify.ui.View;
@@ -47,15 +46,13 @@ public class TradingView extends View {
     /** The market latest price. */
     private UILabel price;
 
-    public ExecutionView executionView;
+    public ChartView chart;
 
     public OrderBookView books;
 
+    public ExecutionView executions;
+
     public OrderBuilder builder;
-
-    public ChartView chart;
-
-    private UIHBox box;
 
     /**
      * @param tab
@@ -67,6 +64,11 @@ public class TradingView extends View {
         this.market = new Market(service);
 
         Viewtify.Terminator.add(market);
+
+        tab.context(c -> {
+            c.checkMenu().text("Orderbook");
+            c.checkMenu().text("Execution");
+        });
     }
 
     /**
@@ -74,18 +76,14 @@ public class TradingView extends View {
      */
     class view extends ViewDSL {
         {
-            $(box, () -> {
+            $(hbox, () -> {
                 $(vbox, style.chartArea, () -> {
                     $(chart);
                 });
 
-                $(vbox, style.fill, () -> {
-                    $(hbox, style.fill, () -> {
-                        $(books);
-                        $(executionView);
-                        $(builder);
-                    });
-                });
+                $(books);
+                $(executions);
+                $(builder);
             });
         }
     }

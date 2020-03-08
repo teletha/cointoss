@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Locale;
 
 import javafx.collections.ObservableList;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -86,7 +85,10 @@ public class TradeMate extends View {
             loadTabFor(service);
         }
 
-        main.initial(0);
+        main.initial(0).context(c -> {
+            c.menu().text(en("Arrange in tiles")).when(User.Action, () -> tile(main.selectedItem().v));
+            c.menu().text(en("Detach as window")).when(User.Action, () -> detach(main.selectedItem().v));
+        });
 
         Chrono.seconds().map(Chrono.DateDayTime::format).on(Viewtify.UIThread).to(time -> {
             stage().v.setTitle(time);
@@ -100,10 +102,10 @@ public class TradeMate extends View {
      */
     private void loadTabFor(MarketService service) {
         main.load(service.marketReadableName(), tab -> {
-            tab.context(c -> {
-                c.menu().text(en("Arrange in tiles")).when(User.Action, () -> tile(tab));
-                c.menu().text(en("Detach as window")).when(User.Action, () -> detach(tab));
-            });
+            // tab.context(c -> {
+            // c.menu().text(en("Arrange in tiles")).when(User.Action, () -> tile(tab));
+            // c.menu().text(en("Detach as window")).when(User.Action, () -> detach(tab));
+            // });
 
             return new TradingView(tab, service);
         });
@@ -155,12 +157,10 @@ public class TradeMate extends View {
      * @param tab
      */
     private void tile(UITab tab) {
-        int originalIndex = main.ui.getTabs().indexOf(tab);
+        UITabPane to = new UITabPane(this);
 
-        main.ui.getTabs().remove(tab);
-        Node content = tab.getContent();
-
-        split.ui.getItems().add(content);
+        split.ui.getItems().add(to.ui());
+        move(tab, main.ui, to.ui());
         allocateEvenWidth();
     }
 
@@ -224,5 +224,18 @@ public class TradeMate extends View {
                 .language(Lang.of(I.env("language", Locale.getDefault().getLanguage())))
                 .onTerminating(Network::terminate)
                 .activate(TradeMate.class);
+    }
+
+    /**
+     * 
+     */
+    private static class TradeTabePane extends TabPane {
+
+        /**
+         * 
+         */
+        private TradeTabePane() {
+
+        }
     }
 }
