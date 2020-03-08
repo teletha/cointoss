@@ -13,7 +13,9 @@ import java.util.List;
 import java.util.Locale;
 
 import javafx.collections.ObservableList;
+import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TabPane.TabClosingPolicy;
@@ -85,11 +87,6 @@ public class TradeMate extends View {
             loadTabFor(service);
         }
 
-        main.initial(0).context(c -> {
-            c.menu().text(en("Arrange in tiles")).when(User.Action, () -> tile(main.selectedItem().v));
-            c.menu().text(en("Detach as window")).when(User.Action, () -> detach(main.selectedItem().v));
-        });
-
         Chrono.seconds().map(Chrono.DateDayTime::format).on(Viewtify.UIThread).to(time -> {
             stage().v.setTitle(time);
         });
@@ -101,11 +98,11 @@ public class TradeMate extends View {
      * @param service
      */
     private void loadTabFor(MarketService service) {
-        main.load(service.marketReadableName(), tab -> {
-            // tab.context(c -> {
-            // c.menu().text(en("Arrange in tiles")).when(User.Action, () -> tile(tab));
-            // c.menu().text(en("Detach as window")).when(User.Action, () -> detach(tab));
-            // });
+        main.initial(0).load(service.marketReadableName(), tab -> {
+            tab.context(c -> {
+                c.menu().text(en("Arrange in tiles")).when(User.Action, () -> tileInPane(tab));
+                c.menu().text(en("Detach as window")).when(User.Action, () -> detachAsWindow(tab));
+            });
 
             return new TradingView(tab, service);
         });
@@ -129,8 +126,9 @@ public class TradeMate extends View {
      * 
      * @param tab
      */
-    private void detach(UITab tab) {
-        int originalIndex = main.ui.getTabs().indexOf(tab);
+    private void detachAsWindow(UITab tab) {
+        TabPane pane = tab.getTabPane();
+        int originalIndex = pane.getTabs().indexOf(tab);
 
         Pane content = (Pane) tab.getContent();
         tab.setContent(null);
@@ -156,12 +154,13 @@ public class TradeMate extends View {
      * 
      * @param tab
      */
-    private void tile(UITab tab) {
-        UITabPane to = new UITabPane(this);
+    private void tileInPane(UITab tab) {
+        Node content = tab.getContent();
+        tab.setContent(null);
 
-        split.ui.getItems().add(to.ui());
-        move(tab, main.ui, to.ui());
-        allocateEvenWidth();
+        split.ui.getItems().add(content);
+
+        reallocate(split.ui);
     }
 
     /**
@@ -177,21 +176,65 @@ public class TradeMate extends View {
         if (froms.remove(tab)) {
             to.getTabs().add(tab);
 
+            if (from == main.ui) {
+                tab.setOnCloseRequest(e -> move(tab, tab.getTabPane(), main.ui));
+            } else if (to == main.ui) {
+                tab.setOnCloseRequest(null);
+            }
+
             if (froms.isEmpty()) {
-                remove(from);
+                // remove tab from parent split pane
+                SplitPane parentSplit = findParentSplit(from);
+                parentSplit.getItems().remove(from);
+                reallocate(parentSplit);
             }
         }
     }
 
     /**
-     * Remove {@link TabPane}.
+     * Add the specified tab to the target {@link TabPane}.
      * 
-     * @param pane
+     * @param tab
+     * @param to
      */
-    private void remove(TabPane pane) {
-        if (pane != null && split.ui.getItems().remove(pane)) {
-            allocateEvenWidth();
+    private void add(Tab tab, TabPane to) {
+        TabPane from = tab.getTabPane();
+
+        if (from == to) {
+            return;
         }
+
+        remove(tab);
+        to.getTabs().add(tab);
+    }
+
+    /**
+     * Remove the specified tab from the current {@link TabPane}.
+     * 
+     * @param tab
+     */
+    private void remove(Tab tab) {
+        TabPane pane = tab.getTabPane();
+        ObservableList<Tab> tabs = pane.getTabs();
+        if (tabs.remove(tab) && tabs.isEmpty()) {
+            // remove tab from parent split pane
+            SplitPane split = findParentSplit(pane);
+            split.getItems().remove(pane);
+            reallocate(split);
+        }
+    }
+
+    /**
+     * Find the nearest ancestor {@link SplitPane}.
+     * 
+     * @param node
+     * @return
+     */
+    private SplitPane findParentSplit(Node node) {
+        while (node instanceof SplitPane == false) {
+            node = node.getParent();
+        }
+        return (SplitPane) node;
     }
 
     /**
@@ -207,6 +250,21 @@ public class TradeMate extends View {
             positions[i] = equalSpacing * (i + 1);
         }
         split.ui.setDividerPositions(positions);
+    }
+
+    /**
+     * Compute all positions for equal spacing.
+     * 
+     * @return
+     */
+    private void reallocate(SplitPane split) {
+        int itemSize = split.getItems().size();
+        double equalSpacing = 1d / itemSize;
+        double[] positions = new double[itemSize - 1];
+        for (int i = 0; i < positions.length; i++) {
+            positions[i] = equalSpacing * (i + 1);
+        }
+        split.setDividerPositions(positions);
     }
 
     /**

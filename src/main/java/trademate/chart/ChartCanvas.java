@@ -340,7 +340,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
      */
     private void visualizeNotifyPrice() {
         when(User.ContextMenu, e -> {
-            System.out.println(e);
             e.consume();
 
             double clickedPosition = e.getY();
