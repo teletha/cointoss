@@ -162,4 +162,29 @@ public class ChartView extends View {
         showLatestPrice.value(state);
         showRealtimeUpdate.set(state);
     }
+
+    /**
+     * 
+     */
+    private static class ChartConfig extends View {
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected ViewDSL declareUI() {
+            return new ViewDSL() {
+                {
+
+                }
+            };
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected void initialize() {
+        }
+    }
 }
