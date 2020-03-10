@@ -34,7 +34,7 @@ import viewtify.ui.ViewDSL;
 public class TradingView extends View {
 
     /** The market tab. */
-    private final UITab tab;
+    public final UITab tab;
 
     /** The associated market service. */
     public final MarketService service;

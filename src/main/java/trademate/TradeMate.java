@@ -9,15 +9,15 @@
  */
 package trademate;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.SingleSelectionModel;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
 import javafx.scene.control.TabPane.TabClosingPolicy;
 import javafx.scene.control.TabPane.TabDragPolicy;
 import javafx.scene.layout.Pane;
@@ -36,6 +36,7 @@ import cointoss.util.Network;
 import kiss.I;
 import kiss.Managed;
 import kiss.Singleton;
+import kiss.Storable;
 import trademate.setting.SettingView;
 import trademate.verify.BackTestView;
 import transcript.Lang;
@@ -46,10 +47,13 @@ import viewtify.ui.UITab;
 import viewtify.ui.UITabPane;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
+import viewtify.ui.helper.Actions;
 import viewtify.ui.helper.User;
 
 @Managed(value = Singleton.class)
 public class TradeMate extends View {
+
+    private final LayoutManager layout = I.make(LayoutManager.class);
 
     /** The main split. */
     UISplitPane split;
@@ -90,10 +94,6 @@ public class TradeMate extends View {
         Chrono.seconds().map(Chrono.DateDayTime::format).on(Viewtify.UIThread).to(time -> {
             stage().v.setTitle(time);
         });
-
-        split.context(c -> {
-            c.menu().text("OK");
-        });
     }
 
     /**
@@ -105,10 +105,13 @@ public class TradeMate extends View {
         main.initial(0).load(service.marketReadableName(), tab -> {
             tab.context(c -> {
                 c.menu().text(en("Arrange in tiles")).when(User.Action, () -> tileInPane(tab));
-                c.menu().text(en("Detach as window")).when(User.Action, () -> detachAsWindow(tab));
+                c.menu().text(en("Detach as window")).when(User.Action, () -> detachAsWindow(tab, service));
             });
-
             return new TradingView(tab, service);
+        }, tab -> {
+            if (layout.isWindow(service)) {
+                detachAsWindow(tab, service);
+            }
         });
     }
 
@@ -130,11 +133,11 @@ public class TradeMate extends View {
      * 
      * @param tab
      */
-    private void detachAsWindow(UITab tab) {
+    private void detachAsWindow(UITab tab, MarketService service) {
         // remove content
-        Pane content = (Pane) tab.getContent();
-        tab.setContent(null);
-        tab.setDisable(true);
+        Pane content = unmerge(tab);
+
+        layout.addWindow(service);
 
         Scene scene = new Scene(content, content.getPrefWidth(), content.getPrefHeight());
         scene.getStylesheets().addAll(main.ui.getScene().getStylesheets());
@@ -145,8 +148,8 @@ public class TradeMate extends View {
         stage.setTitle(tab.getText());
         stage.setOnCloseRequest(e -> {
             stage.close();
-            tab.setContent(content);
-            tab.setDisable(false);
+            merge(content);
+            layout.removeWindow(service);
         });
         stage.show();
     }
@@ -157,51 +160,46 @@ public class TradeMate extends View {
      * @param tab
      */
     private void tileInPane(UITab tab) {
-        // remove contents
-        Node content = tab.getContent();
-        tab.setContent(null);
-
-        // disable tab
-        tab.setDisable(true);
+        Node contents = unmerge(tab);
 
         // move to tile area
-        split.ui.getItems().add(content);
+        split.ui.getItems().add(contents);
 
         // relayout
         reallocate(split.ui);
     }
 
     /**
-     * Add the specified tab to the target {@link TabPane}.
+     * Merge tab from the detached contents.
      * 
-     * @param tab
-     * @param to
+     * @param pane
      */
-    private void add(Tab tab, TabPane to) {
-        TabPane from = tab.getTabPane();
-
-        if (from == to) {
-            return;
-        }
-
-        remove(tab);
-        to.getTabs().add(tab);
+    private void merge(Pane pane) {
+        Tab tab = (Tab) pane.getProperties().remove("trademate-tab");
+        tab.setContent(pane);
+        tab.setDisable(false);
     }
 
     /**
-     * Remove the specified tab from the current {@link TabPane}.
+     * Unmerge contents from tab.
      * 
      * @param tab
      */
-    private void remove(Tab tab) {
-        TabPane pane = tab.getTabPane();
-        ObservableList<Tab> tabs = pane.getTabs();
-        if (tabs.remove(tab) && tabs.isEmpty()) {
-            // remove tab from parent split pane
-            SplitPane split = findParentSplit(pane);
-            split.getItems().remove(pane);
-            reallocate(split);
+    private Pane unmerge(Tab tab) {
+        // remove contents from tab and disable tab
+        Pane contents = (Pane) tab.getContent();
+        tab.setContent(null);
+        tab.setDisable(true);
+
+        // store associated tab
+        contents.getProperties().put("trademate-tab", tab);
+
+        // select the nearest enable tab
+        SingleSelectionModel<Tab> model = tab.getTabPane().getSelectionModel();
+        if (!Actions.selectPrev(model)) {
+            Actions.selectNext(model);
         }
+        return contents;
     }
 
     /**
@@ -264,7 +262,57 @@ public class TradeMate extends View {
                 .activate(TradeMate.class);
     }
 
-    private enum PositionKind {
-        Normal, Tile, Detach;
+    /**
+     * 
+     */
+    @Managed(Singleton.class)
+    private static class LayoutManager implements Storable<LayoutManager> {
+
+        /** The windowed services. */
+        public List<String> windows = new ArrayList();
+
+        /**
+         * Hide
+         */
+        private LayoutManager() {
+            restore();
+        }
+
+        /**
+         * Add windowed service.
+         * 
+         * @param service
+         */
+        private void addWindow(MarketService service) {
+            windows.add(service.marketIdentity());
+            store();
+        }
+
+        /**
+         * Remove windowed service.
+         * 
+         * @param service
+         */
+        private void removeWindow(MarketService service) {
+            windows.remove(service.marketIdentity());
+            store();
+        }
+
+        /**
+         * Check whether the specified service is windowed or not.
+         * 
+         * @param service
+         * @return
+         */
+        private boolean isWindow(MarketService service) {
+            return windows.contains(service.marketIdentity());
+        }
+    }
+
+    /**
+     * 
+     */
+    private enum LayoutKind {
+        Normal, Tile, Window;
     }
 }
