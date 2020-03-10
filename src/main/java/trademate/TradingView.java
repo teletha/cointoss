@@ -25,7 +25,6 @@ import trademate.order.OrderBookView;
 import trademate.order.OrderBuilder;
 import viewtify.Viewtify;
 import viewtify.ui.UICheckBox;
-import viewtify.ui.UIContextMenu;
 import viewtify.ui.UIHBox;
 import viewtify.ui.UILabel;
 import viewtify.ui.UITab;
@@ -59,11 +58,11 @@ public class TradingView extends View {
 
     public OrderBuilder builder;
 
-    public UICheckBox showOrderBook;
+    private UICheckBox showOrderBook;
 
-    public UICheckBox showExecution;
+    private UICheckBox showExecution;
 
-    public UICheckBox showOrderBuilder;
+    private UICheckBox showOrderBuilder;
 
     /**
      * @param tab
@@ -75,11 +74,6 @@ public class TradingView extends View {
         this.market = new Market(service);
 
         Viewtify.Terminator.add(market);
-
-        tab.context(c -> {
-            c.checkMenu().text("Orderbook");
-            c.checkMenu().text("Execution");
-        });
     }
 
     /**
@@ -142,15 +136,22 @@ public class TradingView extends View {
 
         additionalInfo();
 
-        // context menu
-        UIContextMenu.declareOn(box, c -> {
-            c.menu(showOrderBook);
-            c.menu(showExecution);
-            c.menu(showOrderBuilder);
+        configContextMenuOnTab();
+    }
+
+    /**
+     * Configuration for tab's context menu.
+     */
+    private void configContextMenuOnTab() {
+        tab.context(c -> {
+            c.menu(showOrderBook, false);
+            c.menu(showExecution, false);
+            c.menu(showOrderBuilder, false);
         });
-        showOrderBook.text("OrderBook").initialize(true);
-        showExecution.text("Execution").initialize(true);
-        showOrderBuilder.text("Order").initialize(true);
+
+        showOrderBook.text(en("Orderbook")).initialize(true).observing(books::visible);
+        showExecution.text(en("Trade History")).initialize(true).observing(executions::visible);
+        showOrderBuilder.text(en("Order")).initialize(true).observing(builder::visible);
     }
 
     private void additionalInfo() {

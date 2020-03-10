@@ -17,13 +17,22 @@ Date
 日付
 
 Detach as window
-ウインドウとして分離
+外部ウインドウへ分離
 
 End Date
 終了日
 
+Trade History
+約定履歴
+
 Market
 市場
+
+Order
+発注
+
+Orderbook
+注文板
 
 Price
 値段
@@ -37,5 +46,3 @@ Sell
 Side
 サイド
 
-Start Date
-開始日
