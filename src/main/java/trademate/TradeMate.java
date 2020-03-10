@@ -90,6 +90,10 @@ public class TradeMate extends View {
         Chrono.seconds().map(Chrono.DateDayTime::format).on(Viewtify.UIThread).to(time -> {
             stage().v.setTitle(time);
         });
+
+        split.context(c -> {
+            c.menu().text("OK");
+        });
     }
 
     /**
@@ -127,11 +131,10 @@ public class TradeMate extends View {
      * @param tab
      */
     private void detachAsWindow(UITab tab) {
-        TabPane pane = tab.getTabPane();
-        int originalIndex = pane.getTabs().indexOf(tab);
-
+        // remove content
         Pane content = (Pane) tab.getContent();
         tab.setContent(null);
+        tab.setDisable(true);
 
         Scene scene = new Scene(content, content.getPrefWidth(), content.getPrefHeight());
         scene.getStylesheets().addAll(main.ui.getScene().getStylesheets());
@@ -140,11 +143,10 @@ public class TradeMate extends View {
         stage.setScene(scene);
         stage.getIcons().addAll(((Stage) main.ui.getScene().getWindow()).getIcons());
         stage.setTitle(tab.getText());
-        stage.setOnShown(e -> main.ui.getTabs().remove(tab));
         stage.setOnCloseRequest(e -> {
             stage.close();
             tab.setContent(content);
-            main.ui.getTabs().add(originalIndex, tab);
+            tab.setDisable(false);
         });
         stage.show();
     }
@@ -155,40 +157,18 @@ public class TradeMate extends View {
      * @param tab
      */
     private void tileInPane(UITab tab) {
+        // remove contents
         Node content = tab.getContent();
         tab.setContent(null);
 
+        // disable tab
+        tab.setDisable(true);
+
+        // move to tile area
         split.ui.getItems().add(content);
 
+        // relayout
         reallocate(split.ui);
-    }
-
-    /**
-     * Move tab.
-     * 
-     * @param tab
-     * @param from
-     * @param to
-     */
-    private void move(Tab tab, TabPane from, TabPane to) {
-        ObservableList<Tab> froms = from.getTabs();
-
-        if (froms.remove(tab)) {
-            to.getTabs().add(tab);
-
-            if (from == main.ui) {
-                tab.setOnCloseRequest(e -> move(tab, tab.getTabPane(), main.ui));
-            } else if (to == main.ui) {
-                tab.setOnCloseRequest(null);
-            }
-
-            if (froms.isEmpty()) {
-                // remove tab from parent split pane
-                SplitPane parentSplit = findParentSplit(from);
-                parentSplit.getItems().remove(from);
-                reallocate(parentSplit);
-            }
-        }
     }
 
     /**
@@ -284,16 +264,7 @@ public class TradeMate extends View {
                 .activate(TradeMate.class);
     }
 
-    /**
-     * 
-     */
-    private static class TradeTabePane extends TabPane {
-
-        /**
-         * 
-         */
-        private TradeTabePane() {
-
-        }
+    private enum PositionKind {
+        Normal, Tile, Detach;
     }
 }
