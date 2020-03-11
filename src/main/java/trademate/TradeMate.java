@@ -87,31 +87,20 @@ public class TradeMate extends View {
 
         List<MarketService> services = List
                 .of(BitFlyer.FX_BTC_JPY, BitFlyer.BTC_JPY, BitFlyer.ETH_JPY, BitFlyer.BCH_BTC, BitMex.XBT_USD, BitMex.ETH_USD, Binance.BTC_USDT, Binance.FUTURE_BTC_USDT, Bitfinex.BTC_USDT);
+
         for (MarketService service : services) {
-            loadTabFor(service);
+            main.load(service.marketReadableName(), tab -> {
+                tab.context(c -> {
+                    c.menu().text(en("Arrange in tiles")).when(User.Action, () -> tileInPane(tab));
+                    c.menu().text(en("Detach as window")).when(User.Action, () -> detachAsWindow(tab, service));
+                });
+                return new TradingView(tab, service);
+            });
         }
+        main.initial(0);
 
         Chrono.seconds().map(Chrono.DateDayTime::format).on(Viewtify.UIThread).to(time -> {
             stage().v.setTitle(time);
-        });
-    }
-
-    /**
-     * Build tab with {@link MarketService}.
-     * 
-     * @param service
-     */
-    private void loadTabFor(MarketService service) {
-        main.initial(0).load(service.marketReadableName(), tab -> {
-            tab.context(c -> {
-                c.menu().text(en("Arrange in tiles")).when(User.Action, () -> tileInPane(tab));
-                c.menu().text(en("Detach as window")).when(User.Action, () -> detachAsWindow(tab, service));
-            });
-            return new TradingView(tab, service);
-        }, tab -> {
-            if (layout.isWindow(service)) {
-                detachAsWindow(tab, service);
-            }
         });
     }
 
