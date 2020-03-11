@@ -88,14 +88,17 @@ public class TradeMate extends View {
         List<MarketService> services = List
                 .of(BitFlyer.FX_BTC_JPY, BitFlyer.BTC_JPY, BitFlyer.ETH_JPY, BitFlyer.BCH_BTC, BitMex.XBT_USD, BitMex.ETH_USD, Binance.BTC_USDT, Binance.FUTURE_BTC_USDT, Bitfinex.BTC_USDT);
 
+        // ========================================================
+        // Create Tab for each Markets
+        // ========================================================
         for (MarketService service : services) {
             main.tab(ui -> ui.text(service.marketReadableName()).contents(tab -> new TradingView(tab, service)));
         }
         main.initial(0);
 
-        // ===============================================================
+        // ========================================================
         // Context Menu for Docking Layout
-        // ===============================================================
+        // ========================================================
         for (UITab tab : main.items()) {
             tab.context(c -> {
                 c.menu().text(en("Arrange in tiles")).when(User.Action, () -> tileInPane(tab));
@@ -103,9 +106,9 @@ public class TradeMate extends View {
             });
         }
 
-        // ===============================================================
+        // ========================================================
         // Clock in Title bar
-        // ===============================================================
+        // ========================================================
         Chrono.seconds().map(Chrono.DateDayTime::format).on(Viewtify.UIThread).to(time -> {
             stage().v.setTitle(time);
         });
