@@ -82,23 +82,30 @@ public class TradeMate extends View {
     protected void initialize() {
         main.policy(TabClosingPolicy.UNAVAILABLE)
                 .policy(TabDragPolicy.REORDER)
-                .load("Setting", SettingView.class)
-                .load("Back Test", BackTestView.class);
+                .tab(ui -> ui.text("Setting").contents(SettingView.class))
+                .tab(ui -> ui.text("Back Test").contents(BackTestView.class));
 
         List<MarketService> services = List
                 .of(BitFlyer.FX_BTC_JPY, BitFlyer.BTC_JPY, BitFlyer.ETH_JPY, BitFlyer.BCH_BTC, BitMex.XBT_USD, BitMex.ETH_USD, Binance.BTC_USDT, Binance.FUTURE_BTC_USDT, Bitfinex.BTC_USDT);
 
         for (MarketService service : services) {
-            main.load(service.marketReadableName(), tab -> {
-                tab.context(c -> {
-                    c.menu().text(en("Arrange in tiles")).when(User.Action, () -> tileInPane(tab));
-                    c.menu().text(en("Detach as window")).when(User.Action, () -> detachAsWindow(tab, service));
-                });
-                return new TradingView(tab, service);
-            });
+            main.tab(ui -> ui.text(service.marketReadableName()).contents(tab -> new TradingView(tab, service)));
         }
         main.initial(0);
 
+        // ===============================================================
+        // Context Menu for Docking Layout
+        // ===============================================================
+        for (UITab tab : main.items()) {
+            tab.context(c -> {
+                c.menu().text(en("Arrange in tiles")).when(User.Action, () -> tileInPane(tab));
+                c.menu().text(en("Detach as window")).when(User.Action, () -> detachAsWindow(tab));
+            });
+        }
+
+        // ===============================================================
+        // Clock in Title bar
+        // ===============================================================
         Chrono.seconds().map(Chrono.DateDayTime::format).on(Viewtify.UIThread).to(time -> {
             stage().v.setTitle(time);
         });
@@ -122,11 +129,9 @@ public class TradeMate extends View {
      * 
      * @param tab
      */
-    private void detachAsWindow(UITab tab, MarketService service) {
+    private void detachAsWindow(UITab tab) {
         // remove content
         Pane content = unmerge(tab);
-
-        layout.addWindow(service);
 
         Scene scene = new Scene(content, content.getPrefWidth(), content.getPrefHeight());
         scene.getStylesheets().addAll(main.ui.getScene().getStylesheets());
@@ -138,7 +143,6 @@ public class TradeMate extends View {
         stage.setOnCloseRequest(e -> {
             stage.close();
             merge(content);
-            layout.removeWindow(service);
         });
         stage.show();
     }
