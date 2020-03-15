@@ -9,7 +9,7 @@
  */
 package trademate.order;
 
-import static cointoss.order.OrderState.*;
+import static cointoss.order.OrderState.ACTIVE;
 import static trademate.CommonText.*;
 
 import java.math.RoundingMode;
@@ -178,9 +178,6 @@ public class OrderBuilder extends View {
                         $(hbox, S.Row, () -> {
                             $(sfdPrice500, S.SFD);
                         });
-                        $(hbox, S.Row, () -> {
-                            $(sfdPrice499, S.SFD);
-                        });
 
                         $(hbox, S.Row, () -> {
                             label(en("Position"), S.Label);
@@ -227,7 +224,7 @@ public class OrderBuilder extends View {
         orderPriceIntervalAmount.initialize(Num.TEN, Num.HUNDRED, Num.THOUSAND);
         orderPriceInterval.initialize("0").when(User.Scroll, changeBy(orderPriceIntervalAmount)).require(positiveNumber);
 
-        optimizeThreshold.initialize(Num.range(0, 20));
+        optimizeThreshold.initialize(Num.range(0, 200));
 
         // validate order condition
         orderLimitLong.parent().disableWhen(orderSize.isInvalid(), orderPrice.isInvalid());
@@ -247,8 +244,7 @@ public class OrderBuilder extends View {
 
         if (view.market.service == BitFlyer.FX_BTC_JPY) {
             view.market.service.add(SFD.now().on(Viewtify.UIThread).to(price -> {
-                sfdPrice500.text("5.00% " + price.ⅱ.multiply(1.05).scale(0));
-                sfdPrice499.text("4.99% " + price.ⅱ.multiply(1.0499).scale(1));
+                sfdPrice500.text("-5.00% " + price.ⅱ.multiply(0.95).scale(0));
             }));
         }
 
