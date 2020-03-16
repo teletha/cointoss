@@ -184,7 +184,7 @@ class BitMexService extends MarketService {
      */
     @Override
     protected Signal<OrderBookPageChanges> connectOrderBookRealtimely() {
-        return connectSharedWebSocket(Topic.orderBookL2_25).map(this::convertOrderBook);
+        return connectSharedWebSocket(Topic.orderBookL2).map(this::convertOrderBook);
     }
 
     /**
@@ -321,7 +321,7 @@ class BitMexService extends MarketService {
      * Subscription topics for websocket.
      */
     private enum Topic {
-        trade, orderBookL2_25;
+        trade, orderBookL2, orderBookL2_25;
     }
 
     /**
