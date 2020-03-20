@@ -100,7 +100,7 @@ public class TradeMate extends View {
         // Context Menu for Docking Layout
         // ========================================================
         for (UITab tab : main.items()) {
-            tab.context(c -> {
+            tab.context("Tiling", c -> {
                 c.menu().text(en("Arrange in tiles")).when(User.Action, () -> tileInPane(tab));
                 c.menu().text(en("Detach as window")).when(User.Action, () -> detachAsWindow(tab));
             });
