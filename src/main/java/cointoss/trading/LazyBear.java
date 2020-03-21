@@ -14,16 +14,14 @@ import java.time.temporal.ChronoUnit;
 import cointoss.Direction;
 import cointoss.Market;
 import cointoss.analyze.PrimitiveStats;
-import cointoss.ticker.Indicator;
 import cointoss.ticker.Indicators;
+import cointoss.ticker.NumIndicator;
 import cointoss.ticker.Ticker;
 import cointoss.ticker.TimeSpan;
 import cointoss.trade.FundManager;
 import cointoss.trade.Scenario;
 import cointoss.trade.Trader;
-import cointoss.util.Num;
 import kiss.Variable;
-import kiss.Ⅱ;
 import stylist.Style;
 import trademate.chart.ChartStyles;
 import trademate.chart.PlotArea;
@@ -65,11 +63,11 @@ public class LazyBear extends Trader {
         });
 
         Ticker ticker = market.tickers.on(tickerSpan);
-        Indicator<Ⅱ<Num, Num>> oscillator = Indicators.waveTrend(ticker);
+        NumIndicator oscillator = Indicators.waveTrend(ticker);
 
         double size = 0.1;
 
-        when(oscillator.observeWhen(ticker.open).take(v -> v.ⅰ.isLessThan(-entryThreshold)).skip(v -> mustSell.v), value -> new Scenario() {
+        when(oscillator.observeWhen(ticker.open).take(v -> v.isLessThan(-entryThreshold)).skip(v -> mustSell.v), value -> new Scenario() {
 
             @Override
             protected void entry() {
@@ -79,7 +77,7 @@ public class LazyBear extends Trader {
             @Override
             protected void exit() {
                 exitAt(entryPrice.minus(direction(), losscutRange));
-                exitWhen(oscillator.observeWhen(ticker.open).take(v -> v.ⅰ.isGreaterThan(exitThreshold)), s -> s.take());
+                exitWhen(oscillator.observeWhen(ticker.open).take(v -> v.isGreaterThan(exitThreshold)), s -> s.take());
                 // exitAt(market.tickers.of(Span.Second5).add.flatMap(tick -> {
                 // if (tick.openPrice.isGreaterThan(this, entryPrice.plus(this,
                 // 3000))) {
@@ -91,30 +89,27 @@ public class LazyBear extends Trader {
             }
         });
 
-        when(oscillator.observeWhen(ticker.open)
-                .take(v -> v.ⅰ.isGreaterThan(entryThreshold))
-                .skip(v -> mustBuy.v), value -> new Scenario() {
+        when(oscillator.observeWhen(ticker.open).take(v -> v.isGreaterThan(entryThreshold)).skip(v -> mustBuy.v), value -> new Scenario() {
 
-                    @Override
-                    protected void entry() {
-                        entry(Direction.SELL, size, s -> s.make(market.tickers.latestPrice.v.minus(this, 300))
-                                .cancelAfter(3, ChronoUnit.MINUTES));
-                    }
+            @Override
+            protected void entry() {
+                entry(Direction.SELL, size, s -> s.make(market.tickers.latestPrice.v.minus(this, 300)).cancelAfter(3, ChronoUnit.MINUTES));
+            }
 
-                    @Override
-                    protected void exit() {
-                        exitAt(entryPrice.minus(direction(), losscutRange));
-                        exitWhen(oscillator.observeWhen(ticker.open).take(v -> v.ⅰ.isLessThan(-exitThreshold)), s -> s.take());
-                        // exitAt(market.tickers.of(Span.Second5).add.flatMap(tick -> {
-                        // if (tick.openPrice.isGreaterThan(this, entryPrice.plus(this,
-                        // 3000))) {
-                        // return I.signal(entryPrice.plus(this, 100));
-                        // } else {
-                        // return I.signal();
-                        // }
-                        // }).first().startWith(entryPrice.minus(this, 7000)).to());
-                    }
-                });
+            @Override
+            protected void exit() {
+                exitAt(entryPrice.minus(direction(), losscutRange));
+                exitWhen(oscillator.observeWhen(ticker.open).take(v -> v.isLessThan(-exitThreshold)), s -> s.take());
+                // exitAt(market.tickers.of(Span.Second5).add.flatMap(tick -> {
+                // if (tick.openPrice.isGreaterThan(this, entryPrice.plus(this,
+                // 3000))) {
+                // return I.signal(entryPrice.plus(this, 100));
+                // } else {
+                // return I.signal();
+                // }
+                // }).first().startWith(entryPrice.minus(this, 7000)).to());
+            }
+        });
 
         option(new PlotScript() {
 

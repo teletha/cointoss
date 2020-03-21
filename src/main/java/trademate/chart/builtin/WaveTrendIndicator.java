@@ -10,12 +10,10 @@
 package trademate.chart.builtin;
 
 import cointoss.Market;
-import cointoss.ticker.Indicator;
 import cointoss.ticker.Indicators;
+import cointoss.ticker.NumIndicator;
 import cointoss.ticker.Ticker;
-import cointoss.util.Num;
 import kiss.Variable;
-import kiss.Ⅱ;
 import stylist.Style;
 import stylist.StyleDSL;
 import trademate.TradeMateStyle;
@@ -30,18 +28,10 @@ public class WaveTrendIndicator extends PlotScript implements StyleDSL {
 
     public final Variable<Integer> overBoughtLevel1 = Variable.of(60);
 
-    public final Variable<Integer> overBoughtLevel2 = Variable.of(53);
-
     public final Variable<Integer> overSoldLevel1 = Variable.of(-60);
-
-    public final Variable<Integer> overSoldLevel2 = Variable.of(-53);
 
     public Style Main = () -> {
         stroke.color(TradeMateStyle.BUY).width(0.3, px);
-    };
-
-    public Style Lazy = () -> {
-        stroke.color(TradeMateStyle.SELL).width(0.3, px);
     };
 
     /**
@@ -49,17 +39,14 @@ public class WaveTrendIndicator extends PlotScript implements StyleDSL {
      */
     @Override
     protected void declare(Market market, Ticker ticker) {
-        Indicator<Ⅱ<Num, Num>> indicator = Indicators.waveTrend(ticker, channelLength.v, averageLength.v);
+        NumIndicator indicator = Indicators.waveTrend(ticker, channelLength.v, averageLength.v);
 
         in(PlotArea.Low, () -> {
             line(0);
-            line(overBoughtLevel1, Lazy);
-            line(overBoughtLevel2, Lazy);
+            line(overBoughtLevel1, Main);
             line(overSoldLevel1, Main);
-            line(overSoldLevel2, Main);
 
-            line(indicator.map(Ⅱ::ⅰ), Main);
-            line(indicator.map(Ⅱ::ⅱ), Lazy);
+            line(indicator, Main);
         });
     }
 }
