@@ -9,7 +9,6 @@
  */
 package cointoss.order;
 
-import java.math.RoundingMode;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -22,7 +21,6 @@ import org.magicwerk.brownies.collections.GapList;
 import cointoss.Direction;
 import cointoss.MarketSetting;
 import cointoss.util.Num;
-import cointoss.util.Primitives;
 import kiss.Variable;
 
 public class OrderBook {
@@ -271,7 +269,7 @@ public class OrderBook {
                 } else if (unit.price.is(price)) {
                     double remaining = unit.size + size;
 
-                    if (Primitives.roundDecimal(remaining, scale, RoundingMode.DOWN) <= 0) {
+                    if (Double.compare(remaining, 0) <= 0) {
                         boards.remove(i);
                     } else {
                         boards.set(i, new OrderBookPage(unit.price, remaining));
@@ -300,7 +298,7 @@ public class OrderBook {
                 } else if (unit.price.is(price)) {
                     double remaining = unit.size + size;
 
-                    if (Primitives.roundDecimal(remaining, scale, RoundingMode.DOWN) <= 0) {
+                    if (Double.compare(remaining, 0) <= 0) {
                         boards.remove(i);
                     } else {
                         boards.set(i, new OrderBookPage(unit.price, remaining));

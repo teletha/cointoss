@@ -9,19 +9,9 @@
  */
 package trademate;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
-
-import javafx.scene.Node;
-import javafx.scene.Scene;
-import javafx.scene.control.SingleSelectionModel;
-import javafx.scene.control.SplitPane;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane.TabClosingPolicy;
-import javafx.scene.control.TabPane.TabDragPolicy;
-import javafx.scene.layout.Pane;
-import javafx.stage.Stage;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -36,7 +26,6 @@ import cointoss.util.Network;
 import kiss.I;
 import kiss.Managed;
 import kiss.Singleton;
-import kiss.Storable;
 import trademate.setting.SettingView;
 import trademate.verify.BackTestView;
 import transcript.Lang;
@@ -44,22 +33,19 @@ import viewtify.Theme;
 import viewtify.Viewtify;
 import viewtify.ui.UISplitPane;
 import viewtify.ui.UITab;
-import viewtify.ui.UITabPane;
+import viewtify.ui.UITab.State;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
-import viewtify.ui.helper.Actions;
-import viewtify.ui.helper.User;
+import viewtify.ui.dock.DockSystem;
 
 @Managed(value = Singleton.class)
 public class TradeMate extends View {
 
-    private final LayoutManager layout = I.make(LayoutManager.class);
+    /** The tab loading strategy. */
+    private final TabLoader loader = new TabLoader();
 
     /** The main split. */
     UISplitPane split;
-
-    /** Tab Area */
-    UITabPane main;
 
     /**
      * {@inheritDoc}
@@ -68,9 +54,7 @@ public class TradeMate extends View {
     protected ViewDSL declareUI() {
         return new ViewDSL() {
             {
-                $(split, () -> {
-                    $(main);
-                });
+                $(DockSystem.UI);
             }
         };
     }
@@ -80,10 +64,13 @@ public class TradeMate extends View {
      */
     @Override
     protected void initialize() {
-        main.policy(TabClosingPolicy.UNAVAILABLE)
-                .policy(TabDragPolicy.REORDER)
-                .tab(ui -> ui.text("Setting").contents(SettingView.class))
-                .tab(ui -> ui.text("Back Test").contents(BackTestView.class));
+        DockSystem.register("Setting").contents(SettingView.class);
+        DockSystem.register("BackTest").contents(BackTestView.class);
+
+        // main.policy(TabClosingPolicy.UNAVAILABLE)
+        // .policy(TabDragPolicy.REORDER)
+        // .tab(ui -> ui.text("Setting").contents(SettingView.class))
+        // .tab(ui -> ui.text("Back Test").contents(BackTestView.class));
 
         List<MarketService> services = List
                 .of(BitFlyer.FX_BTC_JPY, BitFlyer.BTC_JPY, BitFlyer.ETH_JPY, BitFlyer.BCH_BTC, BitMex.XBT_USD, BitMex.ETH_USD, Binance.BTC_USDT, Binance.FUTURE_BTC_USDT, Bitfinex.BTC_USDT);
@@ -92,19 +79,25 @@ public class TradeMate extends View {
         // Create Tab for each Markets
         // ========================================================
         for (MarketService service : services) {
-            main.tab(ui -> ui.text(service.marketReadableName()).contents(tab -> new TradingView(tab, service)));
+            UITab ui = DockSystem.register(service.marketIdentity())
+                    .text(service.marketReadableName())
+                    .contents(tab -> new TradingView(tab, service));
+
+            loader.add(ui);
+            // main.tab(ui -> ui.text(service.marketReadableName()).contents(tab -> new
+            // TradingView(tab, service)));
         }
-        main.initial(0);
+        // main.initial(0);
 
         // ========================================================
         // Context Menu for Docking Layout
         // ========================================================
-        for (UITab tab : main.items()) {
-            tab.context("Tiling", c -> {
-                c.menu().text(en("Arrange in tiles")).when(User.Action, () -> tileInPane(tab));
-                c.menu().text(en("Detach as window")).when(User.Action, () -> detachAsWindow(tab));
-            });
-        }
+        // for (UITab tab : main.items()) {
+        // tab.context("Tiling", c -> {
+        // c.menu().text(en("Arrange in tiles")).when(User.Action, () -> tileInPane(tab));
+        // c.menu().text(en("Detach as window")).when(User.Action, () -> detachAsWindow(tab));
+        // });
+        // }
 
         // ========================================================
         // Clock in Title bar
@@ -119,126 +112,46 @@ public class TradeMate extends View {
      * activated yet.
      */
     public final void requestLazyInitialization() {
-        for (UITab tab : main.items()) {
-            if (!tab.isLoaded()) {
-                Viewtify.inUI(() -> tab.load());
-                return;
+        // for (UITab tab : main.items()) {
+        // if (!tab.isLoaded()) {
+        // Viewtify.inUI(() -> tab.load());
+        // return;
+        // }
+        // }
+    }
+
+    private static class TabLoader implements Runnable {
+
+        /** The queue for loading tabs. */
+        private final LinkedList<UITab> tabs = new LinkedList();
+
+        private void add(UITab tab) {
+            tabs.add(tab);
+
+            if (tabs.size() == 1) {
+                Viewtify.inUI(this);
             }
         }
-    }
 
-    /**
-     * Detach the specified tab.
-     * 
-     * @param tab
-     */
-    private void detachAsWindow(UITab tab) {
-        // remove content
-        Pane content = unmerge(tab);
-
-        Scene scene = new Scene(content, content.getPrefWidth(), content.getPrefHeight());
-        scene.getStylesheets().addAll(main.ui.getScene().getStylesheets());
-
-        Stage stage = new Stage();
-        stage.setScene(scene);
-        stage.getIcons().addAll(((Stage) main.ui.getScene().getWindow()).getIcons());
-        stage.setTitle(tab.getText());
-        stage.setOnCloseRequest(e -> {
-            stage.close();
-            merge(content);
-        });
-        stage.show();
-    }
-
-    /**
-     * Tile the specified tab.
-     * 
-     * @param tab
-     */
-    private void tileInPane(UITab tab) {
-        Node contents = unmerge(tab);
-
-        // move to tile area
-        split.ui.getItems().add(contents);
-
-        // relayout
-        reallocate(split.ui);
-    }
-
-    /**
-     * Merge tab from the detached contents.
-     * 
-     * @param pane
-     */
-    private void merge(Pane pane) {
-        Tab tab = (Tab) pane.getProperties().remove("trademate-tab");
-        tab.setContent(pane);
-        tab.setDisable(false);
-    }
-
-    /**
-     * Unmerge contents from tab.
-     * 
-     * @param tab
-     */
-    private Pane unmerge(Tab tab) {
-        // remove contents from tab and disable tab
-        Pane contents = (Pane) tab.getContent();
-        tab.setContent(null);
-        tab.setDisable(true);
-
-        // store associated tab
-        contents.getProperties().put("trademate-tab", tab);
-
-        // select the nearest enable tab
-        SingleSelectionModel<Tab> model = tab.getTabPane().getSelectionModel();
-        if (!Actions.selectPrev(model)) {
-            Actions.selectNext(model);
+        private UITab retrieveNextTab() {
+            return tabs.pollFirst();
         }
-        return contents;
-    }
 
-    /**
-     * Find the nearest ancestor {@link SplitPane}.
-     * 
-     * @param node
-     * @return
-     */
-    private SplitPane findParentSplit(Node node) {
-        while (node instanceof SplitPane == false) {
-            node = node.getParent();
-        }
-        return (SplitPane) node;
-    }
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void run() {
+            UITab tab = retrieveNextTab();
 
-    /**
-     * Compute all positions for equal spacing.
-     * 
-     * @return
-     */
-    private void allocateEvenWidth() {
-        int itemSize = split.ui.getItems().size();
-        double equalSpacing = 1d / itemSize;
-        double[] positions = new double[itemSize - 1];
-        for (int i = 0; i < positions.length; i++) {
-            positions[i] = equalSpacing * (i + 1);
+            if (tab != null) {
+                Viewtify.observe(tab.loadingProperty)
+                        .effectOnObserve(tab::load)
+                        .take(s -> s == State.Loaded)
+                        .first()
+                        .to(() -> Viewtify.inUI(this));
+            }
         }
-        split.ui.setDividerPositions(positions);
-    }
-
-    /**
-     * Compute all positions for equal spacing.
-     * 
-     * @return
-     */
-    private void reallocate(SplitPane split) {
-        int itemSize = split.getItems().size();
-        double equalSpacing = 1d / itemSize;
-        double[] positions = new double[itemSize - 1];
-        for (int i = 0; i < positions.length; i++) {
-            positions[i] = equalSpacing * (i + 1);
-        }
-        split.setDividerPositions(positions);
     }
 
     /**
@@ -256,59 +169,5 @@ public class TradeMate extends View {
                 .language(Lang.of(I.env("language", Locale.getDefault().getLanguage())))
                 .onTerminating(Network::terminate)
                 .activate(TradeMate.class);
-    }
-
-    /**
-     * 
-     */
-    @Managed(Singleton.class)
-    private static class LayoutManager implements Storable<LayoutManager> {
-
-        /** The windowed services. */
-        public List<String> windows = new ArrayList();
-
-        /**
-         * Hide
-         */
-        private LayoutManager() {
-            restore();
-        }
-
-        /**
-         * Add windowed service.
-         * 
-         * @param service
-         */
-        private void addWindow(MarketService service) {
-            windows.add(service.marketIdentity());
-            store();
-        }
-
-        /**
-         * Remove windowed service.
-         * 
-         * @param service
-         */
-        private void removeWindow(MarketService service) {
-            windows.remove(service.marketIdentity());
-            store();
-        }
-
-        /**
-         * Check whether the specified service is windowed or not.
-         * 
-         * @param service
-         * @return
-         */
-        private boolean isWindow(MarketService service) {
-            return windows.contains(service.marketIdentity());
-        }
-    }
-
-    /**
-     * 
-     */
-    private enum LayoutKind {
-        Normal, Tile, Window;
     }
 }

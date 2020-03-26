@@ -59,6 +59,25 @@ public class Primitives {
     }
 
     /**
+     * Check equality for primitive doubles.
+     * 
+     * @param value1
+     * @param value2
+     * @param delta
+     * @return
+     */
+    public static boolean equals(double value1, double value2, double delta) {
+        assertValidDelta(delta);
+        return Double.doubleToLongBits(value1) == Double.doubleToLongBits(value2) || Math.abs(value1 - value2) <= delta;
+    }
+
+    private static void assertValidDelta(double delta) {
+        if (Double.isNaN(delta) || delta < 0.0) {
+            throw new IllegalArgumentException("Invalid delta " + delta);
+        }
+    }
+
+    /**
      * @param min
      * @param value
      * @param max
