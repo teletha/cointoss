@@ -202,7 +202,10 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         this.name.widthProperty().bind(widthProperty());
         this.name.heightProperty().bind(heightProperty());
 
-        chart.market.observe().to(this::drawMarketName);
+        chart.market.observe()
+                .combineLatest(Viewtify.observe(widthProperty()), Viewtify.observe(heightProperty()))
+                .map(Ⅲ<Market, Number, Number>::ⅰ)
+                .to(this::drawMarketName);
         chart.market.observe().combineLatest(chart.ticker.observe(), Viewtify.observing(chart.scripts)).to(v -> {
             plotters = plottersCache.getUnchecked(v);
             scripts = I.signal(plotters).map(p -> p.origin).distinct().toList();
