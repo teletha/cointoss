@@ -33,7 +33,6 @@ import viewtify.Theme;
 import viewtify.Viewtify;
 import viewtify.ui.UISplitPane;
 import viewtify.ui.UITab;
-import viewtify.ui.UITab.State;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
 import viewtify.ui.dock.DockSystem;
@@ -80,6 +79,7 @@ public class TradeMate extends View {
         // ========================================================
         for (MarketService service : services) {
             UITab ui = DockSystem.register(service.marketIdentity())
+                    .closable(false)
                     .text(service.marketReadableName())
                     .contents(tab -> new TradingView(tab, service));
 
@@ -112,46 +112,42 @@ public class TradeMate extends View {
      * activated yet.
      */
     public final void requestLazyInitialization() {
-        // for (UITab tab : main.items()) {
-        // if (!tab.isLoaded()) {
-        // Viewtify.inUI(() -> tab.load());
-        // return;
-        // }
-        // }
+        loader.tryLoad();
     }
 
-    private static class TabLoader implements Runnable {
+    private static class TabLoader {
 
         /** The queue for loading tabs. */
-        private final LinkedList<UITab> tabs = new LinkedList();
+        private final LinkedList<UITab> queue = new LinkedList();
 
-        private void add(UITab tab) {
-            tabs.add(tab);
-
-            if (tabs.size() == 1) {
-                Viewtify.inUI(this);
-            }
-        }
-
-        private UITab retrieveNextTab() {
-            return tabs.pollFirst();
-        }
+        /** The current processing tab. */
+        private UITab current;
 
         /**
-         * {@inheritDoc}
+         * Add tab to loading queue.
+         * 
+         * @param tab
          */
-        @Override
-        public void run() {
-            UITab tab = retrieveNextTab();
+        private void add(UITab tab) {
+            queue.add(tab);
+        }
 
-            if (tab != null) {
-                Viewtify.observe(tab.loadingProperty)
-                        .effectOnObserve(tab::load)
-                        .take(s -> s == State.Loaded)
-                        .first()
-                        .to(() -> Viewtify.inUI(this));
+        private synchronized void tryLoad() {
+            if (current == null || current.isLoaded()) {
+                current = queue.pollFirst();
+
+                if (current != null) {
+                    if (current.isLoaded()) {
+                        tryLoad();
+                    } else {
+                        Viewtify.inUI(() -> {
+                            current.load();
+                        });
+                    }
+                }
             }
         }
+
     }
 
     /**

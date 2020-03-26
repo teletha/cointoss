@@ -18,6 +18,7 @@ import cointoss.market.bitflyer.BitFlyer;
 import cointoss.market.bitflyer.SFD;
 import cointoss.util.Primitives;
 import kiss.Disposable;
+import kiss.I;
 import stylist.Style;
 import stylist.StyleDSL;
 import trademate.chart.ChartView;
@@ -128,7 +129,7 @@ public class TradingView extends View {
 
             chart.restoreRealtimeUpdate();
 
-            findAncestorView(TradeMate.class).to(TradeMate::requestLazyInitialization);
+            I.make(TradeMate.class).requestLazyInitialization();
         });
 
         title.text(service.marketReadableName()).style(style.tabTitle);

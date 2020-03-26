@@ -284,7 +284,7 @@ public class BackTestView extends View implements Analyzer {
                 });
 
         configureTradingLogView();
-        findAncestorView(TradeMate.class).to(TradeMate::requestLazyInitialization);
+        I.make(TradeMate.class).requestLazyInitialization();
     }
 
     /**

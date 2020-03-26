@@ -55,7 +55,7 @@ public class Primitives {
      */
     public static double roundDecimal(double value, int scale, RoundingMode mode) {
         double s = Math.pow(10, scale);
-        return DoubleMath.roundToInt(value * s, mode) / s;
+        return DoubleMath.roundToLong(value * s, mode) / s;
     }
 
     /**
