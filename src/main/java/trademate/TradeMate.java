@@ -66,11 +66,6 @@ public class TradeMate extends View {
         DockSystem.register("Setting").contents(SettingView.class);
         DockSystem.register("BackTest").contents(BackTestView.class);
 
-        // main.policy(TabClosingPolicy.UNAVAILABLE)
-        // .policy(TabDragPolicy.REORDER)
-        // .tab(ui -> ui.text("Setting").contents(SettingView.class))
-        // .tab(ui -> ui.text("Back Test").contents(BackTestView.class));
-
         List<MarketService> services = List
                 .of(BitFlyer.FX_BTC_JPY, BitFlyer.BTC_JPY, BitFlyer.ETH_JPY, BitFlyer.BCH_BTC, BitMex.XBT_USD, BitMex.ETH_USD, Binance.BTC_USDT, Binance.FUTURE_BTC_USDT, Bitfinex.BTC_USDT);
 
@@ -78,26 +73,13 @@ public class TradeMate extends View {
         // Create Tab for each Markets
         // ========================================================
         for (MarketService service : services) {
-            UITab ui = DockSystem.register(service.marketIdentity())
+            UITab tab = DockSystem.register(service.marketIdentity())
                     .closable(false)
                     .text(service.marketReadableName())
-                    .contents(tab -> new TradingView(tab, service));
+                    .contents(ui -> new TradingView(ui, service));
 
-            loader.add(ui);
-            // main.tab(ui -> ui.text(service.marketReadableName()).contents(tab -> new
-            // TradingView(tab, service)));
+            loader.add(tab);
         }
-        // main.initial(0);
-
-        // ========================================================
-        // Context Menu for Docking Layout
-        // ========================================================
-        // for (UITab tab : main.items()) {
-        // tab.context("Tiling", c -> {
-        // c.menu().text(en("Arrange in tiles")).when(User.Action, () -> tileInPane(tab));
-        // c.menu().text(en("Detach as window")).when(User.Action, () -> detachAsWindow(tab));
-        // });
-        // }
 
         // ========================================================
         // Clock in Title bar
