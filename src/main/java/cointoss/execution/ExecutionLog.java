@@ -55,6 +55,7 @@ import cointoss.Direction;
 import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.market.MarketServiceProvider;
+import cointoss.market.bitflyer.BitFlyer;
 import cointoss.market.bitmex.BitMex;
 import cointoss.ticker.Ticker;
 import cointoss.ticker.TickerManager;
@@ -975,11 +976,13 @@ public class ExecutionLog {
         clearFastLog();
     }
 
-    public static void main1(String[] args) {
-        ExecutionLog log = new ExecutionLog(BitMex.XBT_USD);
-        log.fetch(115364009, Chrono.utc(2019, 11, 21), Chrono.utc(2020, 1, 24));
+    public static void main(String[] args) throws InterruptedException {
+        ExecutionLog log = new ExecutionLog(BitFlyer.FX_BTC_JPY);
+        Cache cache2 = log.cache(Chrono.utc(2020, 3, 17));
+        cache2.writeCompact();
+        cache2.writeFast();
 
-        Network.terminate();
+        Thread.sleep(30000);
     }
 
     public static void main7(String[] args) {
