@@ -28,7 +28,6 @@ public class StopTest extends TraderTestSupport {
 
             @Override
             protected void exit() {
-                exitAt(15);
                 exitAt(5);
             }
         });
@@ -38,20 +37,16 @@ public class StopTest extends TraderTestSupport {
 
         market.perform(Execution.with.buy(2).price(9));
         awaitOrderBufferingTime();
-        assert s.exits.size() == 1; // exit is ordered
+
+        // trigger stop loss
+        market.perform(Execution.with.buy(3).price(4));
+        awaitOrderBufferingTime();
+        assert s.exits.size() == 1; // stop is ordered
         assert s.entryExecutedSize.is(2);
         assert s.exitExecutedSize.is(0);
-        assert s.exitSize.is(2);
-
-        market.perform(Execution.with.buy(1).price(16)); // execute stop profit
-        assert s.exitExecutedSize.is(1);
-        assert s.exitSize.is(2);
-
-        market.perform(Execution.with.buy(3).price(4)); // trigger stop loss
-        awaitOrderBufferingTime();
-        assert s.exits.size() == 2; // stop is ordered
-        assert s.entryExecutedSize.is(2);
-        assert s.exitExecutedSize.is(1);
         assert s.exitSize.is(2) : s;
+
+        // trigger stop loss
+        market.perform(Execution.with.buy(3).price(4));
     }
 }

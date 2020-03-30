@@ -58,8 +58,6 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
         market.service.clear();
 
         base = market.service.now();
-
-        System.out.println("setup");
     }
 
     /**
