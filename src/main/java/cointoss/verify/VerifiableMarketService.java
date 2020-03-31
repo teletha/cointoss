@@ -65,6 +65,9 @@ public class VerifiableMarketService extends MarketService {
     /** The initial target currency. */
     public Num targetCurrency = Num.ZERO;
 
+    /** The latest price. */
+    private Num latestPrice;
+
     /** The latest execution time. */
     private ZonedDateTime now = Chrono.MIN;
 
@@ -104,6 +107,7 @@ public class VerifiableMarketService extends MarketService {
         orderActive.clear();
         now = Chrono.MIN;
         nowMills = 0;
+        latestPrice = null;
         tasks.clear();
     }
 
@@ -400,7 +404,8 @@ public class VerifiableMarketService extends MarketService {
             if (validateTradableByPrice(order, e)) {
                 Num executedSize = Num.min(e.size, order.remainingSize);
                 if (order.type.isTaker() && executedSize.isNot(0)) {
-                    order.marketMinPrice = order.isBuy() ? Num.max(order.marketMinPrice, e.price) : Num.min(order.marketMinPrice, e.price);
+                    order.marketMinPrice = order.isBuy() ? Num.max(order.marketMinPrice, e.price, latestPrice)
+                            : Num.min(order.marketMinPrice, e.price, latestPrice);
                     order.price = order.price.multiply(order.executedSize)
                             .plus(order.marketMinPrice.multiply(executedSize))
                             .divide(executedSize.plus(order.executedSize));
@@ -443,6 +448,8 @@ public class VerifiableMarketService extends MarketService {
                 return;
             }
         }
+
+        latestPrice = e.price;
 
         while (!tasks.isEmpty() && tasks.peek().activeTime <= nowMills) {
             tasks.poll().run();

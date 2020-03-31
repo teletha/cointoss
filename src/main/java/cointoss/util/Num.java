@@ -1419,8 +1419,10 @@ public class Num extends Number implements Comparable<Num> {
         Num max = decimals[0];
 
         for (int i = 1; i < decimals.length; i++) {
-            if (max == null || max.isLessThan(direction, decimals[i])) {
-                max = decimals[i];
+            if (decimals[i] != null) {
+                if (max == null || max.isLessThan(direction, decimals[i])) {
+                    max = decimals[i];
+                }
             }
         }
         return max;
@@ -1457,8 +1459,10 @@ public class Num extends Number implements Comparable<Num> {
         Num min = decimals[0];
 
         for (int i = 1; i < decimals.length; i++) {
-            if (min == null || min.isGreaterThan(direction, decimals[i])) {
-                min = decimals[i];
+            if (decimals[i] != null) {
+                if (min == null || min.isGreaterThan(direction, decimals[i])) {
+                    min = decimals[i];
+                }
             }
         }
         return min;

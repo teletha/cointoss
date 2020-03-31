@@ -32,6 +32,11 @@ class NumTest {
     }
 
     @Test
+    void maxNull() {
+        assert Num.max((Num) null, TWO, null).is(2);
+    }
+
+    @Test
     void maxOnSell() {
         assert Num.max(Direction.SELL, ONE).is(1);
         assert Num.max(Direction.SELL, ONE, TWO, TEN).is(1);
@@ -43,6 +48,11 @@ class NumTest {
         assert Num.min(ONE).is(1);
         assert Num.min(ONE, TWO, TEN).is(1);
         assert Num.min(ONE, TWO, of(-10)).is(-10);
+    }
+
+    @Test
+    void minNull() {
+        assert Num.min((Num) null, TWO, null).is(2);
     }
 
     @Test

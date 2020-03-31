@@ -9,7 +9,7 @@
  */
 package cointoss.trade;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
@@ -377,7 +377,6 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
             disposer = market.tickers.latestPrice.observe().take(p -> p.isLessThanOrEqual(directional, price)).first().to(e -> {
                 disposeEntry();
 
-                System.out.println(this);
                 market.request(directional.inverse(), entryExecutedSize.minus(exitExecutedSize), strategy).to(o -> {
                     processExitOrder(o, "exitAtStopLoss");
                 });

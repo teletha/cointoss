@@ -64,7 +64,7 @@ class TakerTest extends TraderTestSupport {
     }
 
     @TradeTest
-    void dividedTakerWillUseTheWorstPossibleExecutionPrice1(SidePart side) {
+    void dividedTakerWillUseTheWorstExecutionPrice1(SidePart side) {
         when(now(), () -> new Scenario() {
 
             @Override
@@ -92,7 +92,7 @@ class TakerTest extends TraderTestSupport {
     }
 
     @TradeTest
-    void dividedTakerWillUseTheWorstPossibleExecutionPrice2(SidePart side) {
+    void dividedTakerWillUseTheWorstExecutionPrice2(SidePart side) {
         when(now(), () -> new Scenario() {
 
             @Override
@@ -120,7 +120,7 @@ class TakerTest extends TraderTestSupport {
     }
 
     @TradeTest
-    void dividedTakerWillUseTheWorstPossibleExecutionPrice3(SidePart side) {
+    void dividedTakerWillUseTheWorstExecutionPrice3(SidePart side) {
         when(now(), () -> new Scenario() {
 
             @Override
@@ -144,6 +144,60 @@ class TakerTest extends TraderTestSupport {
             assert s.entryPrice.is(10);
         } else {
             assert s.entryPrice.is(7);
+        }
+    }
+
+    @TradeTest
+    void takerWillUseTheWorstLatestPrice1(SidePart side) {
+        // set latest price
+        market.perform(Execution.with.direction(side, 1).price(5));
+
+        when(now(), () -> new Scenario() {
+            @Override
+            protected void entry() {
+                entry(side, 1, o -> o.take());
+            }
+
+            @Override
+            protected void exit() {
+            }
+        });
+
+        // trigger taker
+        market.perform(Execution.with.direction(side, 1).price(10));
+
+        Scenario s = latest();
+        if (side.isBuy()) {
+            assert s.entryPrice.is(10);
+        } else {
+            assert s.entryPrice.is(5);
+        }
+    }
+
+    @TradeTest
+    void takerWillUseTheWorstLatestPrice2(SidePart side) {
+        // set latest price
+        market.perform(Execution.with.direction(side, 1).price(10));
+
+        when(now(), () -> new Scenario() {
+            @Override
+            protected void entry() {
+                entry(side, 1, o -> o.take());
+            }
+
+            @Override
+            protected void exit() {
+            }
+        });
+
+        // trigger taker
+        market.perform(Execution.with.direction(side, 1).price(5));
+
+        Scenario s = latest();
+        if (side.isBuy()) {
+            assert s.entryPrice.is(10);
+        } else {
+            assert s.entryPrice.is(5);
         }
     }
 }

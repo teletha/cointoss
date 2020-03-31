@@ -130,40 +130,6 @@ class TraderTest extends TraderTestSupport {
     }
 
     @Test
-    void exitTake() {
-        when(now(), v -> new Scenario() {
-
-            @Override
-            protected void entry() {
-                entry(Direction.BUY, 1, s -> s.make(10));
-            }
-
-            @Override
-            protected void exit() {
-                exitAt(20, s -> s.take());
-            }
-        });
-
-        Scenario scenario = latest();
-
-        // execute entry
-        market.perform(Execution.with.buy(1).price(9));
-        assert scenario.entrySize.is(1);
-        assert scenario.entryExecutedSize.is(1);
-        assert scenario.entryPrice.is(10);
-
-        // activate exit entry
-        market.perform(Execution.with.buy(1).price(20));
-        awaitOrderBufferingTime();
-
-        // execute exit entry
-        market.perform(Execution.with.buy(1).price(22));
-        assert scenario.exitSize.is(1);
-        assert scenario.exitExecutedSize.is(1);
-        assert scenario.exitPrice.is(22);
-    }
-
-    @Test
     void exitWillStopAllEntries() {
         when(now(), v -> new Scenario() {
 
