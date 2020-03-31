@@ -84,12 +84,10 @@ public abstract class Trader extends TraderBase implements Extensible, Disposabl
         snapshots.clear();
         snapshots.put(0L, EMPTY_SNAPSHOT);
 
-        if (this.market == null) {
-            this.market = Objects.requireNonNull(market);
-            this.funds = FundManager.with.totalAssets(market.service.baseCurrency().first().to().v);
+        this.market = Objects.requireNonNull(market);
+        this.funds = FundManager.with.totalAssets(market.service.baseCurrency().first().to().v);
 
-            declare(market, funds);
-        }
+        declare(market, funds);
     }
 
     /**
