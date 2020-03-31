@@ -64,29 +64,26 @@ class TakerTest extends TraderTestSupport {
     }
 
     @TradeTest
-    void divided(SidePart side) {
+    void dividedTakerWillUseTheWorstPossibleExecutionPrice1(SidePart side) {
         when(now(), () -> new Scenario() {
-    
+
             @Override
             protected void entry() {
                 entry(side, 1, o -> o.take());
             }
-    
+
             @Override
             protected void exit() {
             }
         });
-    
+
         // trigger taker
         market.perform(Execution.with.direction(side, 0.25).price(10));
         market.perform(Execution.with.direction(side, 0.25).price(6));
         market.perform(Execution.with.direction(side, 0.25).price(14));
         market.perform(Execution.with.direction(side, 0.25).price(8));
-    
+
         Scenario s = latest();
-        assert s.direction() == side.direction();
-        assert s.entrySize.is(1);
-        assert s.entryExecutedSize.is(1);
         if (side.isBuy()) {
             assert s.entryPrice.is(12);
         } else {
@@ -95,7 +92,7 @@ class TakerTest extends TraderTestSupport {
     }
 
     @TradeTest
-    void dividedUpperPrice(SidePart side) {
+    void dividedTakerWillUseTheWorstPossibleExecutionPrice2(SidePart side) {
         when(now(), () -> new Scenario() {
 
             @Override
@@ -115,9 +112,6 @@ class TakerTest extends TraderTestSupport {
         market.perform(Execution.with.direction(side, 0.25).price(16));
 
         Scenario s = latest();
-        assert s.direction() == side.direction();
-        assert s.entrySize.is(1);
-        assert s.entryExecutedSize.is(1);
         if (side.isBuy()) {
             assert s.entryPrice.is(13);
         } else {
@@ -126,7 +120,7 @@ class TakerTest extends TraderTestSupport {
     }
 
     @TradeTest
-    void dividedLowerPrice(SidePart side) {
+    void dividedTakerWillUseTheWorstPossibleExecutionPrice3(SidePart side) {
         when(now(), () -> new Scenario() {
 
             @Override
@@ -146,9 +140,6 @@ class TakerTest extends TraderTestSupport {
         market.perform(Execution.with.direction(side, 0.25).price(4));
 
         Scenario s = latest();
-        assert s.direction() == side.direction();
-        assert s.entrySize.is(1);
-        assert s.entryExecutedSize.is(1);
         if (side.isBuy()) {
             assert s.entryPrice.is(10);
         } else {
