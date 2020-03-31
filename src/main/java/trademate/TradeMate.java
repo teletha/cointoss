@@ -29,9 +29,11 @@ import kiss.Singleton;
 import trademate.setting.SettingView;
 import trademate.verify.BackTestView;
 import transcript.Lang;
+import viewtify.Key;
+import viewtify.ShortcutManager;
 import viewtify.Theme;
 import viewtify.Viewtify;
-import viewtify.ui.UISplitPane;
+import viewtify.ViewtifyCommand;
 import viewtify.ui.UITab;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
@@ -42,9 +44,6 @@ public class TradeMate extends View {
 
     /** The tab loading strategy. */
     private final TabLoader loader = new TabLoader();
-
-    /** The main split. */
-    UISplitPane split;
 
     /**
      * {@inheritDoc}
@@ -87,6 +86,12 @@ public class TradeMate extends View {
         Chrono.seconds().map(Chrono.DateDayTime::format).on(Viewtify.UIThread).to(time -> {
             stage().v.setTitle(time);
         });
+
+        // ========================================================
+        // Global Shortcut
+        // ========================================================
+        ShortcutManager shortcut = I.make(ShortcutManager.class);
+        shortcut.register(Key.F11, ViewtifyCommand.ShowGlobalSearchBox);
     }
 
     /**
