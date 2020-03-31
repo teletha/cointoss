@@ -64,6 +64,37 @@ class TakerTest extends TraderTestSupport {
     }
 
     @TradeTest
+    void divided(SidePart side) {
+        when(now(), () -> new Scenario() {
+    
+            @Override
+            protected void entry() {
+                entry(side, 1, o -> o.take());
+            }
+    
+            @Override
+            protected void exit() {
+            }
+        });
+    
+        // trigger taker
+        market.perform(Execution.with.direction(side, 0.25).price(10));
+        market.perform(Execution.with.direction(side, 0.25).price(6));
+        market.perform(Execution.with.direction(side, 0.25).price(14));
+        market.perform(Execution.with.direction(side, 0.25).price(8));
+    
+        Scenario s = latest();
+        assert s.direction() == side.direction();
+        assert s.entrySize.is(1);
+        assert s.entryExecutedSize.is(1);
+        if (side.isBuy()) {
+            assert s.entryPrice.is(12);
+        } else {
+            assert s.entryPrice.is(7);
+        }
+    }
+
+    @TradeTest
     void dividedUpperPrice(SidePart side) {
         when(now(), () -> new Scenario() {
 
@@ -78,44 +109,17 @@ class TakerTest extends TraderTestSupport {
         });
 
         // trigger taker
-        market.perform(Execution.with.direction(side, 0.5).price(10));
-        market.perform(Execution.with.direction(side, 0.5).price(14));
+        market.perform(Execution.with.direction(side, 0.25).price(10));
+        market.perform(Execution.with.direction(side, 0.25).price(12));
+        market.perform(Execution.with.direction(side, 0.25).price(14));
+        market.perform(Execution.with.direction(side, 0.25).price(16));
 
         Scenario s = latest();
         assert s.direction() == side.direction();
         assert s.entrySize.is(1);
         assert s.entryExecutedSize.is(1);
         if (side.isBuy()) {
-            assert s.entryPrice.is(12);
-        } else {
-            assert s.entryPrice.is(10);
-        }
-    }
-
-    @TradeTest
-    void dividedUpperPriceWithDiffSide(SidePart side) {
-        when(now(), () -> new Scenario() {
-
-            @Override
-            protected void entry() {
-                entry(side, 1, o -> o.take());
-            }
-
-            @Override
-            protected void exit() {
-            }
-        });
-
-        // trigger taker
-        market.perform(Execution.with.direction(side.inverse(), 0.5).price(10));
-        market.perform(Execution.with.direction(side.inverse(), 0.5).price(14));
-
-        Scenario s = latest();
-        assert s.direction() == side.direction();
-        assert s.entrySize.is(1);
-        assert s.entryExecutedSize.is(1);
-        if (side.isBuy()) {
-            assert s.entryPrice.is(12);
+            assert s.entryPrice.is(13);
         } else {
             assert s.entryPrice.is(10);
         }
@@ -136,9 +140,10 @@ class TakerTest extends TraderTestSupport {
         });
 
         // trigger taker
-        market.perform(Execution.with.direction(side, 0.5).price(10));
+        market.perform(Execution.with.direction(side, 0.25).price(10));
+        market.perform(Execution.with.direction(side, 0.25).price(8));
         market.perform(Execution.with.direction(side, 0.25).price(6));
-        market.perform(Execution.with.direction(side, 0.25).price(14));
+        market.perform(Execution.with.direction(side, 0.25).price(4));
 
         Scenario s = latest();
         assert s.direction() == side.direction();
@@ -147,36 +152,7 @@ class TakerTest extends TraderTestSupport {
         if (side.isBuy()) {
             assert s.entryPrice.is(10);
         } else {
-            assert s.entryPrice.is(8);
-        }
-    }
-
-    @TradeTest
-    void dividedLowerPriceWithDiffSide(SidePart side) {
-        when(now(), () -> new Scenario() {
-
-            @Override
-            protected void entry() {
-                entry(side, 1, o -> o.take());
-            }
-
-            @Override
-            protected void exit() {
-            }
-        });
-
-        // trigger taker
-        market.perform(Execution.with.direction(side.inverse(), 0.5).price(10));
-        market.perform(Execution.with.direction(side.inverse(), 0.5).price(6));
-
-        Scenario s = latest();
-        assert s.direction() == side.direction();
-        assert s.entrySize.is(1);
-        assert s.entryExecutedSize.is(1);
-        if (side.isBuy()) {
-            assert s.entryPrice.is(10);
-        } else {
-            assert s.entryPrice.is(8);
+            assert s.entryPrice.is(7);
         }
     }
 }
