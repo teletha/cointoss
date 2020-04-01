@@ -121,6 +121,8 @@ public class TradingView extends View {
      */
     @Override
     protected void initialize() {
+        configContextMenuOnTab();
+
         Viewtify.inWorker(() -> {
             chart.reduceRealtimeUpdate();
             chart.market.set(market);
@@ -136,8 +138,6 @@ public class TradingView extends View {
         price.style(style.tabPrice);
 
         additionalInfo();
-
-        configContextMenuOnTab();
     }
 
     /**

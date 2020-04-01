@@ -30,10 +30,8 @@ import trademate.setting.SettingView;
 import trademate.verify.BackTestView;
 import transcript.Lang;
 import viewtify.Key;
-import viewtify.ShortcutManager;
 import viewtify.Theme;
 import viewtify.Viewtify;
-import viewtify.ViewtifyCommand;
 import viewtify.ui.UITab;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
@@ -90,8 +88,10 @@ public class TradeMate extends View {
         // ========================================================
         // Global Shortcut
         // ========================================================
-        ShortcutManager shortcut = I.make(ShortcutManager.class);
-        shortcut.register(Key.F11, ViewtifyCommand.ShowGlobalSearchBox);
+
+        TradeMateCommand.OpenBacktest.defaultKey(Key.F11).contribute(() -> {
+            System.out.println("Open Back Test");
+        });
     }
 
     /**
