@@ -26,7 +26,6 @@ import cointoss.util.Network;
 import kiss.I;
 import kiss.Managed;
 import kiss.Singleton;
-import trademate.setting.SettingView;
 import trademate.verify.BackTestView;
 import transcript.Lang;
 import viewtify.Key;
@@ -60,8 +59,8 @@ public class TradeMate extends View {
      */
     @Override
     protected void initialize() {
-        DockSystem.register("Setting").contents(SettingView.class);
-        DockSystem.register("BackTest").contents(BackTestView.class);
+        // DockSystem.register("Setting").contents(SettingView.class);
+        // DockSystem.register("BackTest").contents(BackTestView.class);
 
         List<MarketService> services = List
                 .of(BitFlyer.FX_BTC_JPY, BitFlyer.BTC_JPY, BitFlyer.ETH_JPY, BitFlyer.BCH_BTC, BitMex.XBT_USD, BitMex.ETH_USD, Binance.BTC_USDT, Binance.FUTURE_BTC_USDT, Bitfinex.BTC_USDT);
@@ -88,9 +87,8 @@ public class TradeMate extends View {
         // ========================================================
         // Global Shortcut
         // ========================================================
-
-        TradeMateCommand.OpenBacktest.defaultKey(Key.F11).contribute(() -> {
-            System.out.println("Open Back Test");
+        TradeMateCommand.OpenBacktest.shortcut(Key.F11).contribute(() -> {
+            Viewtify.openNewWindow(new BackTestView(), null);
         });
     }
 
