@@ -16,6 +16,7 @@ import java.util.Locale;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.market.binance.Binance;
 import cointoss.market.bitfinex.Bitfinex;
@@ -83,10 +84,6 @@ public class TradeMate extends View {
         Chrono.seconds().map(Chrono.DateDayTime::format).on(Viewtify.UIThread).to(time -> {
             stage().v.setTitle(time);
         });
-
-        // ========================================================
-        // Global Shortcut
-        // ========================================================
     }
 
     /**
@@ -136,6 +133,8 @@ public class TradeMate extends View {
      * Entry point.
      */
     public static void main(String[] args) {
+        I.load(Market.class);
+
         // initialize logger for non-main thread
         Logger log = LogManager.getLogger();
         Thread.setDefaultUncaughtExceptionHandler((t, e) -> log.error(e.getMessage(), e));
