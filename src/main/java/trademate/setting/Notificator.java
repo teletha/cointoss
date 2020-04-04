@@ -14,6 +14,10 @@ import static transcript.Transcript.en;
 import java.util.List;
 
 import javafx.geometry.Pos;
+import javafx.stage.Screen;
+import javafx.util.Duration;
+
+import org.controlsfx.control.Notifications;
 
 import cointoss.util.Network;
 import kiss.I;
@@ -22,7 +26,6 @@ import kiss.Singleton;
 import kiss.Storable;
 import kiss.Variable;
 import transcript.Transcript;
-import viewtify.Viewtify;
 
 @Managed(Singleton.class)
 public class Notificator implements Storable<Notificator> {
@@ -114,7 +117,18 @@ public class Notificator implements Storable<Notificator> {
                 if (stripedMessage.length() != 0) {
                     // to desktop
                     if (onDesktop.is(true)) {
-                        Viewtify.notify(stripedTitle, stripedMessage);
+                        Notifications.create()
+                                .darkStyle()
+                                .title(stripedTitle)
+                                .text(stripedMessage)
+                                .position(desktopPosition.v.position)
+                                .hideAfter(Duration.seconds(desktopDuration.v.getSeconds()))
+                                .hideCloseButton()
+                                .owner(Screen.getPrimary())
+                                .onAction(e -> {
+                                    // hide on click
+                                })
+                                .show();
                     }
 
                     // to LINE
