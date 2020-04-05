@@ -9,7 +9,7 @@
  */
 package cointoss.trade;
 
-import static java.util.concurrent.TimeUnit.*;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
@@ -247,7 +247,7 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
             updateOrderRelatedStatus(entries, this::setEntryPrice, this::setEntryExecutedSize);
             trader.updateSnapshot(direction(), Num.ZERO, deltaSize, order.price);
 
-            logEntry("Update entry order");
+            logEntry("Update entry order ");
         });
     }
 
@@ -429,7 +429,7 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
     private void processExitOrder(Order order, String type) {
         exits.add(order);
         setExitSize(exitSize.plus(order.size));
-        logExit("Process exit order [" + type + "]" + market.service.now());
+        logExit("Process exit order [" + type + "]");
 
         order.observeExecutedSize().to(v -> {
             Num previous = realizedProfit;
@@ -438,7 +438,7 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
             updateOrderRelatedStatus(exits, this::setExitPrice, this::setExitExecutedSize);
             trader.updateSnapshot(direction(), realizedProfit.minus(previous), deltaSize.negate(), null);
 
-            logExit("Update exit order[" + deltaSize + "   " + v + "]" + market.service.now());
+            logExit("Update exit order[" + type + "] ");
         });
     }
 
@@ -550,7 +550,7 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
      * @param message
      */
     protected final void logEntry(String message) {
-        log(message + " " + entryExecutedSize + "/" + entrySize + "@" + entryPrice);
+        log(Chrono.system(market.service.now()) + "\t" + message + " " + entryExecutedSize + "/" + entrySize + "@" + entryPrice);
     }
 
     /**
@@ -559,6 +559,6 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
      * @param message
      */
     protected final void logExit(String message) {
-        log(message + " " + exitExecutedSize + "/" + exitSize + "@" + exitPrice);
+        log(Chrono.system(market.service.now()) + "\t" + message + " " + exitExecutedSize + "/" + exitSize + "@" + exitPrice);
     }
 }

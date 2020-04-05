@@ -9,9 +9,9 @@
  */
 package cointoss.execution;
 
-import static java.nio.charset.StandardCharsets.*;
+import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static java.nio.file.StandardOpenOption.*;
-import static java.util.concurrent.TimeUnit.*;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -977,10 +977,9 @@ public class ExecutionLog {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        ExecutionLog log = new ExecutionLog(BitFlyer.FX_BTC_JPY);
-        Cache cache2 = log.cache(Chrono.utc(2020, 3, 17));
-        cache2.writeCompact();
-        cache2.writeFast();
+        ExecutionLog log = new ExecutionLog(BitFlyer.BTC_JPY);
+        Cache cache2 = log.cache(Chrono.utc(2020, 2, 9));
+        cache2.writeNormal();
 
         Thread.sleep(30000);
     }

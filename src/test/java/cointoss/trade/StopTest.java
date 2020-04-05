@@ -87,4 +87,5 @@ public class StopTest extends TraderTestSupport {
         assert s.exitSize.is(2);
         assert s.exitPrice.is(4);
     }
+
 }

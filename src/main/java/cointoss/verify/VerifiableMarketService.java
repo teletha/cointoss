@@ -11,13 +11,13 @@ package cointoss.verify;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.Delayed;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -54,7 +54,7 @@ public class VerifiableMarketService extends MarketService {
     private int id = 0;
 
     /** The order manager. */
-    private final Collection<BackendOrder> orderActive = new ConcurrentLinkedDeque<>();
+    private final List<BackendOrder> orderActive = new ArrayList<>();
 
     /** The order manager. */
     private final Signaling<Order> orderUpdateRealtimely = new Signaling();
@@ -153,7 +153,17 @@ public class VerifiableMarketService extends MarketService {
             child.createTimeMills = nowMills + latency.lag();
             child.remainingSize = order.size;
 
-            orderActive.add(child);
+            // taker has high priority
+            if (order.type.isMaker()) {
+                orderActive.add(child); // last
+            } else {
+                int i = indexFirstMaker();
+                if (i == -1) {
+                    orderActive.add(child); // last
+                } else {
+                    orderActive.add(i, child); // before maker
+                }
+            }
 
             if (!executionsBeforeOrderResponse.isEmpty()) {
                 for (Execution execution : executionsBeforeOrderResponse) {
@@ -164,6 +174,16 @@ public class VerifiableMarketService extends MarketService {
 
             return child.id;
         });
+    }
+
+    private int indexFirstMaker() {
+        for (int i = 0; i < orderActive.size(); i++) {
+            BackendOrder b = orderActive.get(i);
+            if (b.type.isMaker()) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     /** The prepared execution store. */

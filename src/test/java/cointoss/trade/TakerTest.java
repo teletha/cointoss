@@ -9,6 +9,9 @@
  */
 package cointoss.trade;
 
+import org.junit.jupiter.api.Test;
+
+import cointoss.Direction;
 import cointoss.execution.Execution;
 import cointoss.trade.extension.SidePart;
 import cointoss.trade.extension.TradeTest;
@@ -199,5 +202,37 @@ class TakerTest extends TraderTestSupport {
         } else {
             assert s.entryPrice.is(5);
         }
+    }
+
+    @Test
+    void takerHasHighPriority() {
+        when(now(), () -> new Scenario() {
+            @Override
+            protected void entry() {
+                entry(Direction.BUY, 1, o -> o.make(10));
+            }
+
+            @Override
+            protected void exit() {
+                exitAt(15);
+                exitAt(5, o -> o.take());
+            }
+        });
+
+        // entry
+        market.perform(Execution.with.buy(1).price(5));
+        awaitOrderBufferingTime();
+
+        // trigger taker exit
+        market.perform(Execution.with.buy(1).price(5));
+        awaitOrderBufferingTime();
+
+        Scenario s = latest();
+        assert s.exitExecutedSize.is(0);
+
+        // taker has high priority
+        market.perform(Execution.with.buy(1).price(16));
+        assert s.exitExecutedSize.is(1);
+        assert s.exitPrice.is(5);
     }
 }
