@@ -333,7 +333,7 @@ public abstract class AbstractIndicator<T, Self extends AbstractIndicator<T, Sel
             return (Self) this;
         }
 
-        Cache<Tick, T> cache = CacheBuilder.newBuilder().maximumSize(8192).weakKeys().weakValues().build();
+        Cache<Tick, T> cache = CacheBuilder.newBuilder().maximumSize(8192 * 4).weakKeys().weakValues().build();
         int[] count = {limit};
 
         Self memo = build((tick, created) -> {
@@ -365,4 +365,21 @@ public abstract class AbstractIndicator<T, Self extends AbstractIndicator<T, Sel
         return timing.map(this::valueAt);
     }
 
+    /**
+     * Acquires the stream in which the indicator value flows at the specified timing.
+     * 
+     * @return
+     */
+    public final Signal<T> updateBy(Ticker ticker) {
+        return updateBy(ticker.open);
+    }
+
+    /**
+     * Acquires the stream in which the indicator value flows at the specified timing.
+     * 
+     * @return
+     */
+    public final Signal<T> updateBy(Signal<Tick> ticker) {
+        return ticker.map(this::valueAt);
+    }
 }

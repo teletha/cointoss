@@ -13,7 +13,6 @@ import java.time.temporal.ChronoUnit;
 
 import cointoss.Direction;
 import cointoss.Market;
-import cointoss.analyze.PrimitiveStats;
 import cointoss.ticker.Indicators;
 import cointoss.ticker.NumIndicator;
 import cointoss.ticker.Ticker;
@@ -21,7 +20,6 @@ import cointoss.ticker.TimeSpan;
 import cointoss.trade.FundManager;
 import cointoss.trade.Scenario;
 import cointoss.trade.Trader;
-import kiss.Variable;
 import stylist.Style;
 import trademate.chart.ChartStyles;
 import trademate.chart.PlotArea;
@@ -46,29 +44,12 @@ public class LazyBear extends Trader {
      */
     @Override
     protected void declare(Market market, FundManager fund) {
-        Variable<Boolean> mustBuy = Variable.of(false);
-        Variable<Boolean> mustSell = Variable.of(false);
-        PrimitiveStats buys = new PrimitiveStats().decay(decay);
-        PrimitiveStats sells = new PrimitiveStats().decay(decay);
-
-        market.tickers.on(TimeSpan.Second5).close.to(tick -> {
-            buys.add(tick.buyVolume());
-            sells.add(tick.sellVolume());
-            double bm = buys.mean();
-            double sm = sells.mean();
-            double ratio = bm / sm;
-
-            mustBuy.set(1d + diff < ratio);
-            mustSell.set(1d - diff < ratio);
-        });
-
         Ticker ticker = market.tickers.on(tickerSpan);
         NumIndicator oscillator = Indicators.waveTrend(ticker);
 
         double size = 0.1;
 
-        when(oscillator.observeWhen(ticker.open).take(v -> v.isLessThan(-entryThreshold)).skip(v -> mustSell.v), value -> new Scenario() {
-
+        when(oscillator.observeWhen(ticker.open).take(v -> v.isLessThan(-entryThreshold)), value -> new Scenario() {
             @Override
             protected void entry() {
                 entry(Direction.BUY, size, s -> s.make(market.tickers.latestPrice.v.minus(this, 300)).cancelAfter(3, ChronoUnit.MINUTES));
@@ -89,8 +70,7 @@ public class LazyBear extends Trader {
             }
         });
 
-        when(oscillator.observeWhen(ticker.open).take(v -> v.isGreaterThan(entryThreshold)).skip(v -> mustBuy.v), value -> new Scenario() {
-
+        when(oscillator.observeWhen(ticker.open).take(v -> v.isGreaterThan(entryThreshold)), value -> new Scenario() {
             @Override
             protected void entry() {
                 entry(Direction.SELL, size, s -> s.make(market.tickers.latestPrice.v.minus(this, 300)).cancelAfter(3, ChronoUnit.MINUTES));
