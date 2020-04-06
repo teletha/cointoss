@@ -13,6 +13,7 @@ import java.util.function.Function;
 
 import cointoss.Direction;
 import cointoss.Market;
+import cointoss.market.bitflyer.BitFlyer;
 import cointoss.order.OrderStrategy.Orderable;
 import cointoss.ticker.Indicators;
 import cointoss.ticker.NumIndicator;
@@ -22,6 +23,7 @@ import cointoss.trade.FundManager;
 import cointoss.trade.Scenario;
 import cointoss.trade.Trader;
 import cointoss.util.Num;
+import cointoss.verify.BackTest;
 import kiss.Signal;
 
 /**
@@ -43,7 +45,7 @@ public class WaveTrend extends Trader {
         Ticker ticker = market.tickers.on(span);
         NumIndicator indicator = Indicators.waveTrend(ticker);
 
-        when(indicator.updateBy(ticker).plug(below(entryThreshold)), v -> new Scenario() {
+        when(indicator.updateBy(ticker).plug(breakdown(entryThreshold)), v -> new Scenario() {
             @Override
             protected void entry() {
                 entry(Direction.SELL, 0.1, Orderable::take);
@@ -51,17 +53,21 @@ public class WaveTrend extends Trader {
 
             @Override
             protected void exit() {
-                exitWhen(indicator.updateBy(ticker).plug(above(entryThreshold)), Orderable::take);
-                exitWhen(indicator.updateBy(ticker).plug(below(exitThreshold)), Orderable::take);
+                exitWhen(indicator.updateBy(ticker).plug(breakup(entryThreshold)), Orderable::take);
+                exitWhen(indicator.updateBy(ticker).plug(breakdown(exitThreshold)), Orderable::take);
             }
         });
     }
 
-    protected final Function<Signal<Num>, Signal<Num>> above(double threshold) {
-        return s -> s.take(Num.ZERO, (prev, next) -> prev.isLessThan(threshold) && next.isGreaterThanOrEqual(threshold));
+    protected final Function<Signal<Num>, Signal<Num>> breakup(double threshold) {
+        return s -> s.take(Num.ZERO, (previous, current) -> previous.isLessThan(threshold) && current.isGreaterThanOrEqual(threshold));
     }
 
-    protected final Function<Signal<Num>, Signal<Num>> below(double threshold) {
-        return s -> s.take(Num.ZERO, (prev, next) -> prev.isGreaterThan(threshold) && next.isLessThanOrEqual(threshold));
+    protected final Function<Signal<Num>, Signal<Num>> breakdown(double threshold) {
+        return s -> s.take(Num.ZERO, (previous, current) -> previous.isGreaterThan(threshold) && current.isLessThanOrEqual(threshold));
+    }
+
+    public static void main(String[] args) {
+        BackTest.with.service(BitFlyer.FX_BTC_JPY).start(2020, 4, 2).end(2020, 4, 2).traders(new WaveTrend()).fast().detail(true).run();
     }
 }

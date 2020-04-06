@@ -9,7 +9,7 @@
  */
 package cointoss.trade;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
@@ -239,7 +239,7 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
     private void processEntryOrder(Order order) {
         entries.add(order);
         setEntrySize(entrySize.plus(order.size));
-        logEntry("Process entry order");
+        logEntry("Launch entry");
 
         order.observeExecutedSize().to(v -> {
             Num deltaSize = v.minus(entryExecutedSize);
@@ -247,7 +247,7 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
             updateOrderRelatedStatus(entries, this::setEntryPrice, this::setEntryExecutedSize);
             trader.updateSnapshot(direction(), Num.ZERO, deltaSize, order.price);
 
-            logEntry("Update entry order ");
+            logEntry("Update entry ");
         });
     }
 
@@ -429,7 +429,7 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
     private void processExitOrder(Order order, String type) {
         exits.add(order);
         setExitSize(exitSize.plus(order.size));
-        logExit("Process exit order [" + type + "]");
+        logExit("Launch " + type);
 
         order.observeExecutedSize().to(v -> {
             Num previous = realizedProfit;
@@ -438,7 +438,7 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
             updateOrderRelatedStatus(exits, this::setExitPrice, this::setExitExecutedSize);
             trader.updateSnapshot(direction(), realizedProfit.minus(previous), deltaSize.negate(), null);
 
-            logExit("Update exit order[" + type + "] ");
+            logExit("Update " + type);
         });
     }
 
@@ -550,7 +550,8 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
      * @param message
      */
     protected final void logEntry(String message) {
-        log(Chrono.system(market.service.now()) + "\t" + message + " " + entryExecutedSize + "/" + entrySize + "@" + entryPrice);
+        String date = Chrono.format(Chrono.system(market.service.now()));
+        log(date + "\t" + message + "\t" + entryExecutedSize + "/" + entrySize + "@" + entryPrice);
     }
 
     /**
@@ -559,6 +560,7 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
      * @param message
      */
     protected final void logExit(String message) {
-        log(Chrono.system(market.service.now()) + "\t" + message + " " + exitExecutedSize + "/" + exitSize + "@" + exitPrice);
+        String date = Chrono.format(Chrono.system(market.service.now()));
+        log(date + "\t" + message + "\t" + exitExecutedSize + "/" + exitSize + "@" + exitPrice);
     }
 }

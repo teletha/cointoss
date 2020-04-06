@@ -333,7 +333,7 @@ public abstract class AbstractIndicator<T, Self extends AbstractIndicator<T, Sel
             return (Self) this;
         }
 
-        Cache<Tick, T> cache = CacheBuilder.newBuilder().maximumSize(8192 * 4).weakKeys().weakValues().build();
+        Cache<Tick, T> cache = CacheBuilder.newBuilder().maximumSize(64).weakKeys().weakValues().build();
         int[] count = {limit};
 
         Self memo = build((tick, created) -> {
