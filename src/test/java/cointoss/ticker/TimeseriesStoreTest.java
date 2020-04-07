@@ -93,25 +93,6 @@ class TimeseriesStoreTest {
     }
 
     @Test
-    void getByLastIndex() {
-        TimeseriesStore<Integer> store = new TimeseriesStore<>(TimeSpan.Second5, Integer::longValue);
-        store.store(0);
-        assert store.getByLastIndex(0) == 0;
-        assert store.getByLastIndex(5) == null;
-        assert store.getByLastIndex(10) == null;
-
-        store.store(5);
-        assert store.getByLastIndex(0) == 5;
-        assert store.getByLastIndex(1) == 0;
-        assert store.getByLastIndex(2) == null;
-
-        store.store(9);
-        assert store.getByLastIndex(0) == 9;
-        assert store.getByLastIndex(1) == 5;
-        assert store.getByLastIndex(2) == 0;
-    }
-
-    @Test
     void getByTime() {
         TimeseriesStore<Integer> store = new TimeseriesStore<>(TimeSpan.Second5, Integer::longValue);
         store.store(0, 5, 10);

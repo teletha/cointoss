@@ -14,6 +14,17 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 public abstract class Indicator<T> extends AbstractIndicator<T, Indicator<T>> {
+    /**
+     * Build with the target {@link Ticker}.
+     * 
+     * @param ticker A target ticker.
+     */
+    protected Indicator(Ticker ticker) {
+        this(tick -> {
+            Tick rounded = ticker.ticks.getByTime(tick.startSeconds);
+            return rounded == null ? ticker.ticks.first() : rounded;
+        });
+    }
 
     /**
      * Build with the target {@link Ticker}.

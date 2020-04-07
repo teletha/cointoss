@@ -134,9 +134,9 @@ public final class TimeseriesStore<E> {
         for (Segment segment : indexed.descendingMap().values()) {
             int size = segment.size();
             if (index < size) {
-                return segment.get(size - index);
+                return segment.get(size - index - 1);
             }
-            index -= segment.size();
+            index -= size;
         }
         return null;
     }

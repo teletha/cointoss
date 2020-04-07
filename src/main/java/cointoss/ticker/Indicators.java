@@ -9,6 +9,8 @@
  */
 package cointoss.ticker;
 
+import java.util.function.Function;
+
 import cointoss.util.Num;
 
 /**
@@ -46,6 +48,9 @@ public final class Indicators {
 
         private final int length;
 
+        /** The current key. */
+        private Tick latest;
+
         /**
          * @param ticker
          */
@@ -54,6 +59,11 @@ public final class Indicators {
 
             this.ticker = ticker;
             this.length = length;
+
+            ticker.open.to(() -> {
+                System.out.println("reset");
+                latest = null; // reset
+            });
         }
 
         /**
@@ -61,13 +71,20 @@ public final class Indicators {
          */
         @Override
         protected Num valueAtRounded(Tick tick) {
-            Tick target = ticker.ticks.getByLastIndex(length);
-
-            if (target.startSeconds <= tick.startSeconds) {
-                return null;
-            }
+            Function<Tick, Num> equation = computeEquation();
 
             return tick.lowPrice;
+        }
+
+        /** CACHE */
+        private Function<Tick, Num> equation;
+
+        private synchronized Function<Tick, Num> computeEquation() {
+            if (equation == null) {
+                equation = e -> Num.ZERO;
+                System.out.println("Compute");
+            }
+            return equation;
         }
     }
 }

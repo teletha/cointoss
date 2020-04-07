@@ -67,6 +67,9 @@ public class Num extends Number implements Comparable<Num> {
     /** reuse */
     public static final Num MIN = of(Long.MIN_VALUE);
 
+    /** reuse */
+    public static final Num NaN = new NaN();
+
     /** The actual value. */
     private final BigDecimal delegate;
 
@@ -1539,6 +1542,27 @@ public class Num extends Number implements Comparable<Num> {
         @Override
         public String encode(Num value) {
             return value.toString();
+        }
+    }
+
+    /**
+     */
+    private static class NaN extends Num {
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public double doubleValue() {
+            return Double.NaN;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String toString() {
+            return "NaN";
         }
     }
 }
