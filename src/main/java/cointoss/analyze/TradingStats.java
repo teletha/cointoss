@@ -11,6 +11,7 @@ package cointoss.analyze;
 
 import static cointoss.util.Num.*;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.text.NumberFormat;
@@ -205,7 +206,8 @@ public class TradingStats {
             }
             maxTotalProfitAndLoss = Num.max(maxTotalProfitAndLoss, profitAndLoss.total());
             drawDown = Num.max(drawDown, maxTotalProfitAndLoss.minus(profitAndLoss.total()));
-            drawDownRatio = Num.max(drawDownRatio, drawDown.divide(funds.totalAssets.plus(maxTotalProfitAndLoss)).scale(3));
+            drawDownRatio = Num
+                    .max(drawDownRatio, drawDown.divide(Num.max(Num.ONE, funds.totalAssets.plus(maxTotalProfitAndLoss))).scale(3));
         }
     }
 
@@ -230,40 +232,52 @@ public class TradingStats {
      * @return
      */
     public final String showByText() {
-        String EOL = "\r\n";
-
         StringBuilder builder = new StringBuilder();
-
-        for (Scenario entry : entries) {
-            builder.append(entry).append(EOL);
-        }
-
-        builder.append("実行時間 ").append(Chrono.formatAsDuration(duration.toMillis())).append(EOL);
-        builder.append("枚数 現在").append(holdCurrentSize).append(" 最大").append(holdMaxSize).append(EOL);
-        builder.append("時間 ").append(holdTime).append(EOL);
-        builder.append("利幅 ").append(profitRange).append(EOL);
-        builder.append("含利幅 ").append(unrealizedProfitRange).append(EOL);
-        builder.append("損幅 ").append(lossRange).append(EOL);
-        builder.append("含損幅 ").append(unrealizedLossRange).append(EOL);
-        builder.append("総合 ")
-                .append(profitAndLoss)
-                .append("\t勝率")
-                .append(winningRate())
-                .append("% ")
-                .append(" PF")
-                .append(profitFactor())
-                .append(" DD")
-                .append(drawDownRatio.multiply(100))
-                .append("% ")
-                .append("総")
-                .append(total)
-                .append(" 済")
-                .append(terminated)
-                .append(" 残")
-                .append(active)
-                .append(EOL);
-
+        showByText(builder);
         return builder.toString();
+    }
+
+    /**
+     * Output result by text format.
+     * 
+     * @param detail
+     * @return
+     */
+    public final void showByText(Appendable builder) {
+        try {
+            String EOL = "\r\n";
+
+            for (Scenario entry : entries) {
+                builder.append(entry.toString()).append(EOL);
+            }
+
+            builder.append("実行時間 ").append(Chrono.formatAsDuration(duration.toMillis())).append(EOL);
+            builder.append("枚数 現在").append(holdCurrentSize.toString()).append(" 最大").append(holdMaxSize.toString()).append(EOL);
+            builder.append("時間 ").append(holdTime.toString()).append(EOL);
+            builder.append("利幅 ").append(profitRange.toString()).append(EOL);
+            builder.append("含利幅 ").append(unrealizedProfitRange.toString()).append(EOL);
+            builder.append("損幅 ").append(lossRange.toString()).append(EOL);
+            builder.append("含損幅 ").append(unrealizedLossRange.toString()).append(EOL);
+            builder.append("総合 ")
+                    .append(profitAndLoss.toString())
+                    .append("\t勝率")
+                    .append(winningRate().toString())
+                    .append("% ")
+                    .append(" PF")
+                    .append(profitFactor().toString())
+                    .append(" DD")
+                    .append(drawDownRatio.multiply(100).toString())
+                    .append("% ")
+                    .append("総")
+                    .append(String.valueOf(total))
+                    .append(" 済")
+                    .append(String.valueOf(terminated))
+                    .append(" 残")
+                    .append(String.valueOf(active))
+                    .append(EOL);
+        } catch (IOException e) {
+            throw I.quiet(e);
+        }
     }
 
     /**

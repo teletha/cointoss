@@ -44,7 +44,7 @@ import kiss.Signal;
 import kiss.WiseFunction;
 import kiss.WiseSupplier;
 
-public abstract class Trader extends TraderBase implements Extensible, Disposable {
+public abstract class Trader extends TraderBase implements TradingFilters, Extensible, Disposable {
 
     /** The identity element of {@link Snapshot}. */
     private static final Snapshot EMPTY_SNAPSHOT = new Snapshot(Num.ZERO, Num.ZERO, Num.ZERO, Num.ZERO, Num.ZERO);

@@ -91,6 +91,24 @@ public abstract class AbstractIndicator<T, Self extends AbstractIndicator<T, Sel
     public abstract T valueAt(Tick timestamp);
 
     /**
+     * Acquires the stream in which the indicator value flows at the specified timing.
+     * 
+     * @return
+     */
+    public final Signal<T> valueAt(Ticker ticker) {
+        return valueAt(ticker.open);
+    }
+
+    /**
+     * Acquires the stream in which the indicator value flows at the specified timing.
+     * 
+     * @return
+     */
+    public final Signal<T> valueAt(Signal<Tick> ticker) {
+        return ticker.map(this::valueAt);
+    }
+
+    /**
      * Gets the indicator whose value is paired with the combinator.
      * 
      * @param <With> First combination type.
@@ -363,23 +381,5 @@ public abstract class AbstractIndicator<T, Self extends AbstractIndicator<T, Sel
      */
     public final Signal<T> observeWhen(Signal<Tick> timing) {
         return timing.map(this::valueAt);
-    }
-
-    /**
-     * Acquires the stream in which the indicator value flows at the specified timing.
-     * 
-     * @return
-     */
-    public final Signal<T> updateBy(Ticker ticker) {
-        return updateBy(ticker.open);
-    }
-
-    /**
-     * Acquires the stream in which the indicator value flows at the specified timing.
-     * 
-     * @return
-     */
-    public final Signal<T> updateBy(Signal<Tick> ticker) {
-        return ticker.map(this::valueAt);
     }
 }
