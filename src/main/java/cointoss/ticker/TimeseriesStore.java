@@ -125,6 +125,23 @@ public final class TimeseriesStore<E> {
     }
 
     /**
+     * Get an item at the specified index from last.
+     * 
+     * @param index
+     * @return
+     */
+    public E getByLastIndex(int index) {
+        for (Segment segment : indexed.descendingMap().values()) {
+            int size = segment.size();
+            if (index < size) {
+                return segment.get(size - index);
+            }
+            index -= segment.size();
+        }
+        return null;
+    }
+
+    /**
      * Get the item for the specified timestamp (epoch seconds).
      * 
      * @param timestamp A time stamp.

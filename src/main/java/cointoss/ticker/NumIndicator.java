@@ -22,6 +22,18 @@ public abstract class NumIndicator extends AbstractNumberIndicator<Num, NumIndic
      * 
      * @param ticker A target ticker.
      */
+    protected NumIndicator(Ticker ticker) {
+        this(tick -> {
+            Tick rounded = ticker.ticks.getByTime(tick.startSeconds);
+            return rounded == null ? ticker.ticks.first() : rounded;
+        });
+    }
+
+    /**
+     * Build with the target {@link Ticker}.
+     * 
+     * @param ticker A target ticker.
+     */
     protected NumIndicator(Function<Tick, Tick> normalizer) {
         super(normalizer);
     }
@@ -238,14 +250,10 @@ public abstract class NumIndicator extends AbstractNumberIndicator<Num, NumIndic
      * @return
      */
     public static NumIndicator build(Ticker ticker, Function<Tick, Num> calculator) {
+        Objects.requireNonNull(ticker);
         Objects.requireNonNull(calculator);
 
-        Function<Tick, Tick> normalizer = tick -> {
-            Tick rounded = ticker.ticks.getByTime(tick.startSeconds);
-            return rounded == null ? ticker.ticks.first() : rounded;
-        };
-
-        return new NumIndicator(normalizer) {
+        return new NumIndicator(ticker) {
 
             @Override
             protected Num valueAtRounded(Tick tick) {

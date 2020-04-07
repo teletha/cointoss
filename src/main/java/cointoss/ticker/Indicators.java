@@ -14,13 +14,17 @@ import cointoss.util.Num;
 /**
  * Built-in {@link Indicator} collection.
  */
-public class Indicators {
+public final class Indicators {
 
-    public final static NumIndicator waveTrend(Ticker ticker) {
+    public static NumIndicator trendLine(Ticker ticker, int length) {
+        return new TrendLine(ticker, length);
+    }
+
+    public static NumIndicator waveTrend(Ticker ticker) {
         return waveTrend(ticker, 10, 21);
     }
 
-    public final static NumIndicator waveTrend(Ticker ticker, int channelLength, int averageLength) {
+    public static NumIndicator waveTrend(Ticker ticker, int channelLength, int averageLength) {
         NumIndicator ap = NumIndicator.build(ticker, Tick::typicalPrice);
         NumIndicator esa = ap.ema(channelLength);
         NumIndicator d = esa.nmap(ap, (a, b) -> a.minus(b).abs()).ema(channelLength);
@@ -31,5 +35,39 @@ public class Indicators {
             return a.minus(b).divide(Num.of(0.015).multiply(c));
         });
         return ci.ema(averageLength).scale(2);
+    }
+
+    /**
+     * 
+     */
+    private static class TrendLine extends NumIndicator {
+
+        private final Ticker ticker;
+
+        private final int length;
+
+        /**
+         * @param ticker
+         */
+        private TrendLine(Ticker ticker, int length) {
+            super(ticker);
+
+            this.ticker = ticker;
+            this.length = length;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected Num valueAtRounded(Tick tick) {
+            Tick target = ticker.ticks.getByLastIndex(length);
+
+            if (target.startSeconds <= tick.startSeconds) {
+                return null;
+            }
+
+            return tick.lowPrice;
+        }
     }
 }
