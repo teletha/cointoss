@@ -66,6 +66,9 @@ public class ChartView extends View {
     /** The chart configuration. */
     public final Variable<Boolean> showRealtimeUpdate = Variable.of(true);
 
+    /** The chart configuration. */
+    public final Variable<Boolean> showIndicator = Variable.of(true);
+
     /** The additional scripts. */
     public final ObservableList<Supplier<PlotScript>> scripts = FXCollections.observableArrayList();
 
@@ -161,6 +164,7 @@ public class ChartView extends View {
         showPositionSupport.set(state);
         showLatestPrice.value(state);
         showRealtimeUpdate.set(state);
+        showIndicator.set(state);
     }
 
     /**

@@ -20,12 +20,10 @@ import trademate.chart.PlotScript;
 
 public class TrendLineIndicator extends PlotScript implements StyleDSL {
 
-    public final Variable<Integer> tickLength = Variable.of(50);
-
-    private double alpha = 0.5;
+    public final Variable<Integer> tickLength = Variable.of(21);
 
     public Style SupportLine = () -> {
-        stroke.color(Color.rgb(53, 53, 223, alpha));
+        stroke.color(Color.rgb(253, 253, 223, 0.8));
     };
 
     /**
@@ -33,6 +31,8 @@ public class TrendLineIndicator extends PlotScript implements StyleDSL {
      */
     @Override
     protected void declare(Market market, Ticker ticker) {
-        line(Indicators.trendLine(ticker, tickLength.v), SupportLine);
+        line(Indicators.lowTrendLine(ticker, tickLength.v), SupportLine);
+
+        line(Indicators.trend(ticker, tickLength.v), SupportLine);
     }
 }

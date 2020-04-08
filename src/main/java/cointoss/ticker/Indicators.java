@@ -9,7 +9,7 @@
  */
 package cointoss.ticker;
 
-import java.util.function.Function;
+import org.apache.commons.math3.stat.regression.SimpleRegression;
 
 import cointoss.util.Num;
 
@@ -18,8 +18,12 @@ import cointoss.util.Num;
  */
 public final class Indicators {
 
-    public static NumIndicator trendLine(Ticker ticker, int length) {
-        return new TrendLine(ticker, length);
+    public static NumIndicator trend(Ticker ticker, int length) {
+        return new Trend(ticker, length);
+    }
+
+    public static NumIndicator lowTrendLine(Ticker ticker, int length) {
+        return new LowTrendLine(ticker, length);
     }
 
     public static NumIndicator waveTrend(Ticker ticker) {
@@ -42,28 +46,40 @@ public final class Indicators {
     /**
      * 
      */
-    private static class TrendLine extends NumIndicator {
+    private static class LowTrendLine extends NumIndicator {
 
         private final Ticker ticker;
 
         private final int length;
 
-        /** The current key. */
-        private Tick latest;
+        private final SimpleRegression regression = new SimpleRegression(true);
+
+        private long minTime = 0;
+
+        private double minValue = Double.MAX_VALUE;
 
         /**
          * @param ticker
          */
-        private TrendLine(Ticker ticker, int length) {
+        private LowTrendLine(Ticker ticker, int length) {
             super(ticker);
 
             this.ticker = ticker;
             this.length = length;
 
-            ticker.open.to(() -> {
-                System.out.println("reset");
-                latest = null; // reset
-            });
+            ticker.ticks.each(this::add);
+            ticker.close.to(this::add);
+        }
+
+        private void add(Tick tick) {
+            double low = tick.closePrice().doubleValue();
+
+            regression.addData(tick.startSeconds, low);
+
+            if (low < minValue) {
+                minValue = low;
+                minTime = tick.startSeconds;
+            }
         }
 
         /**
@@ -71,20 +87,83 @@ public final class Indicators {
          */
         @Override
         protected Num valueAtRounded(Tick tick) {
-            Function<Tick, Num> equation = computeEquation();
+            return Num.of(regression.predict(tick.startSeconds));
+        }
+    }
 
-            return tick.lowPrice;
+    /**
+     * 
+     */
+    private static class HighTrendLine extends NumIndicator {
+
+        private final Ticker ticker;
+
+        private final int length;
+
+        private final SimpleRegression regression = new SimpleRegression(true);
+
+        private long maxTime = 0;
+
+        private double maxValue = Double.MIN_VALUE;
+
+        /**
+         * @param ticker
+         */
+        private HighTrendLine(Ticker ticker, int length) {
+            super(ticker);
+
+            this.ticker = ticker;
+            this.length = length;
+
+            ticker.ticks.each(this::add);
+            ticker.close.to(this::add);
         }
 
-        /** CACHE */
-        private Function<Tick, Num> equation;
+        private void add(Tick tick) {
+            double high = tick.highPrice.doubleValue();
 
-        private synchronized Function<Tick, Num> computeEquation() {
-            if (equation == null) {
-                equation = e -> Num.ZERO;
-                System.out.println("Compute");
+            regression.addData(tick.startSeconds, high);
+
+            if (maxValue < high) {
+                maxValue = high;
+                maxTime = tick.startSeconds;
             }
-            return equation;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected Num valueAtRounded(Tick tick) {
+            return Num.of(regression.predict(tick.startSeconds) + (maxValue - regression.predict(maxTime)));
+        }
+    }
+
+    /**
+     * 
+     */
+    private static class Trend extends NumIndicator {
+
+        private final Ticker ticker;
+
+        private final int length;
+
+        /**
+         * @param ticker
+         */
+        private Trend(Ticker ticker, int length) {
+            super(ticker);
+
+            this.ticker = ticker;
+            this.length = length;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected Num valueAtRounded(Tick tick) {
+            return Num.ZERO;
         }
     }
 }

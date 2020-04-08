@@ -14,10 +14,12 @@ import java.time.ZonedDateTime;
 
 import cointoss.util.Chrono;
 import cointoss.util.Num;
-import kiss.I;
 import kiss.Signal;
 
 public final class Tick {
+
+    /** The empty dummy. */
+    static final Tick EMPTY = new Tick();
 
     /** Begin time of the tick (epoch second). */
     public final long startSeconds;
@@ -60,6 +62,17 @@ public final class Tick {
 
     /** Snapshot of short price decrease at tick initialization. */
     double sellPriceDecrease;
+
+    /**
+     * Empty Dummt Tick.
+     */
+    private Tick() {
+        this.startSeconds = 0;
+        this.endSeconds = 0;
+        this.delay = 0;
+        this.openId = 0;
+        this.openPrice = closePrice = highPrice = lowPrice = Num.ZERO;
+    }
 
     /**
      * New {@link Tick}.
@@ -250,7 +263,17 @@ public final class Tick {
      * @param size A number of ticks.
      */
     public Signal<Tick> previous(int size) {
-        return I.signal(this).recurse(self -> self.previous()).take(size);
+        return new Signal<>((observer, disposer) -> {
+            int count = 0;
+            Tick now = this;
+            while (count < size && now != null && disposer.isNotDisposed()) {
+                observer.accept(now);
+
+                now = now.previous();
+                count++;
+            }
+            return disposer;
+        });
     }
 
     /**

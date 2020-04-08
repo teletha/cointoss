@@ -1355,6 +1355,9 @@ public class Num extends Number implements Comparable<Num> {
      * @return
      */
     public static Num of(double value) {
+        if (Double.isNaN(value)) {
+            return NaN;
+        }
         return new Num(new BigDecimal(value, CONTEXT));
     }
 
