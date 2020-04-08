@@ -127,10 +127,10 @@ public class OrderBookView extends View {
         hideSize.initialize(Num.range(0, 99));
 
         int scale = view.market.service.setting.targetCurrencyScaleSize;
-        longList.renderByNode(Canvas::new, displayOrderUnit(TradeMateStyle.BUY, scale))
+        longList.renderByNode(Canvas::new, displayOrderUnit(TradeMateStyle.BUY, scale, false))
                 .take(hideSize, (unit, size) -> unit.size >= size.doubleValue())
                 .when(User.LeftClick, calculatePrice(longList));
-        shortList.renderByNode(Canvas::new, displayOrderUnit(TradeMateStyle.SELL, scale))
+        shortList.renderByNode(Canvas::new, displayOrderUnit(TradeMateStyle.SELL, scale, true))
                 .take(hideSize, (unit, size) -> unit.size >= size.doubleValue())
                 .when(User.LeftClick, calculatePrice(shortList))
                 .scrollToBottom();
@@ -178,13 +178,14 @@ public class OrderBookView extends View {
      * @param scale
      * @return
      */
-    private BiFunction<Canvas, OrderBookPage, Canvas> displayOrderUnit(stylist.value.Color color, int scale) {
+    private BiFunction<Canvas, OrderBookPage, Canvas> displayOrderUnit(stylist.value.Color color, int scale, boolean isShort) {
         double width = longList.ui.widthProperty().doubleValue();
         double height = 22;
         double fontSize = 12;
         Color foreground = FXUtils.color(color);
         Color background = foreground.deriveColor(0, 1, 1, 0.2);
         Font font = Font.font(fontSize);
+        Num minSize = view.market.service.setting.targetCurrencyMinimumBidSize();
 
         return (canvas, e) -> {
             canvas.setWidth(width);
@@ -192,6 +193,8 @@ public class OrderBookView extends View {
 
             double size = Primitives.roundDecimal(e.size, scale);
             double range = Math.min(width, size);
+            Num pr = priceRange.value();
+            Num price = isShort && pr.isNot(minSize) ? e.price.plus(pr) : e.price;
 
             GraphicsContext c = canvas.getGraphicsContext2D();
             c.clearRect(0, 0, width, height);
@@ -201,7 +204,7 @@ public class OrderBookView extends View {
             c.setFont(font);
             c.setFill(foreground);
             c.setFontSmoothingType(FontSmoothingType.LCD);
-            c.fillText(e.price + " " + size, 33, height - 7, width - 20);
+            c.fillText(price + " " + size, 33, height - 7, width - 20);
 
             return canvas;
         };
