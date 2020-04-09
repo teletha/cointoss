@@ -35,4 +35,12 @@ public interface CommonText {
     Transcript Date = Transcript.en("Date");
 
     Transcript Cancel = Transcript.en("Cancel");
+
+    Transcript OpenPrice = Transcript.en("Open");
+
+    Transcript ClosePrice = Transcript.en("Close");
+
+    Transcript HighPrice = Transcript.en("High");
+
+    Transcript LowPrice = Transcript.en("Low");
 }

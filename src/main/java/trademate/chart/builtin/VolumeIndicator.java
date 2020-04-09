@@ -15,6 +15,7 @@ import cointoss.ticker.Tick;
 import cointoss.ticker.Ticker;
 import stylist.Style;
 import stylist.StyleDSL;
+import trademate.CommonText;
 import trademate.chart.ChartStyles;
 import trademate.chart.PlotArea;
 import trademate.chart.PlotScript;
@@ -49,8 +50,8 @@ public class VolumeIndicator extends PlotScript implements StyleDSL {
         DoubleIndicator sellVolume = DoubleIndicator.build(ticker, Tick::sellVolume);
 
         in(PlotArea.Bottom, () -> {
-            line(buyVolume.scale(volumeScale).name("Long"), Long);
-            line(sellVolume.scale(volumeScale).name("Short"), Short);
+            line(buyVolume.scale(volumeScale).name(CommonText.Buy), Long);
+            line(sellVolume.scale(volumeScale).name(CommonText.Sell), Short);
         });
     }
 }

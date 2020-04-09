@@ -10,6 +10,9 @@ Buy
 Cancel
 キャンセル
 
+Close
+終値
+
 Current
 カレント
 
@@ -22,11 +25,17 @@ Detach as window
 End Date
 終了日
 
-Trade History
-約定履歴
+High
+高値
+
+Low
+安値
 
 Market
 市場
+
+Open
+始値
 
 Order
 発注
@@ -45,4 +54,7 @@ Sell
 
 Side
 サイド
+
+Trade History
+約定履歴
 

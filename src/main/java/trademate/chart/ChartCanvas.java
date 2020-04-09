@@ -52,6 +52,7 @@ import kiss.Signal;
 import kiss.Variable;
 import kiss.Ⅲ;
 import stylist.Style;
+import trademate.CommonText;
 import trademate.chart.Axis.TickLable;
 import trademate.chart.PlotScript.Plotter;
 import trademate.setting.Notificator;
@@ -165,7 +166,10 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             });
 
     /** The size of chart infomation area. */
-    private final int chartInfoWidth = 70;
+    private final int chartInfoTitle = 105;
+
+    /** The size of chart infomation area. */
+    private final int chartInfoWidth = 75;
 
     /** The size of chart infomation area. */
     private final int chartInfoHeight = 16;
@@ -255,7 +259,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         double x = e.getX();
         double y = e.getY();
 
-        if (scripts != null && x < chartInfoLeftPadding + chartInfoWidth && y < (scripts.size() + 1) * chartInfoHeight) {
+        if (scripts != null && x < chartInfoLeftPadding + chartInfoTitle && y < (scripts.size() + 1) * chartInfoHeight) {
             int index = (int) (y / chartInfoHeight) - 1;
 
             if (0 <= index) {
@@ -275,11 +279,11 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         double x = e.getX();
         double y = e.getY();
 
-        if (scripts != null && chartInfoLeftPadding + chartInfoWidth < x && y < (scripts.size() + 1) * chartInfoHeight) {
+        if (scripts != null && chartInfoLeftPadding + chartInfoTitle < x && y < (scripts.size() + 1) * chartInfoHeight) {
             int indexY = (int) (y / chartInfoHeight) - 1;
 
             if (0 <= indexY) {
-                int indexX = (int) ((x - chartInfoLeftPadding - chartInfoWidth) / (chartInfoWidth + chartInfoHorizontalGap));
+                int indexX = (int) ((x - chartInfoLeftPadding - chartInfoTitle) / (chartInfoWidth + chartInfoHorizontalGap));
                 return I.signal(scripts.get(indexY))
                         .flatIterable(s -> s.plotters.values())
                         .flatIterable(p -> p.lines)
@@ -334,7 +338,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
      * Configure indicator setting.
      */
     private void configIndicator() {
-        when(User.MouseClick).to(e -> {
+        when(User.LeftClick).to(e -> {
             findScriptByInfoText(e).to(script -> {
                 registry.globalSetting(script).toggleVisible();
 
@@ -689,19 +693,18 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
         int base = chart.market.v.service.setting.baseCurrencyScaleSize;
         String date = Chrono.systemByMills(tick.startSeconds * 1000).format(Chrono.DateTime);
-        String open = "O" + tick.openPrice.scale(base);
-        String high = "H" + tick.highPrice().scale(base);
-        String low = "L" + tick.lowPrice().scale(base);
-        String close = "C" + tick.closePrice().scale(base);
+        String open = CommonText.OpenPrice + " " + tick.openPrice.scale(base);
+        String high = CommonText.HighPrice + " " + tick.highPrice().scale(base);
+        String low = CommonText.LowPrice + " " + tick.lowPrice().scale(base);
+        String close = CommonText.ClosePrice + " " + tick.closePrice().scale(base);
 
-        int largeWidth = chartInfoWidth * 2 + chartInfoHorizontalGap;
         int y = chartInfoHeight;
         gc.setFill(InfoColor);
-        gc.fillText(date, chartInfoLeftPadding, y, largeWidth);
-        gc.fillText(open, chartInfoLeftPadding + largeWidth + chartInfoHorizontalGap, y, chartInfoWidth);
-        gc.fillText(high, chartInfoLeftPadding + largeWidth + chartInfoWidth + chartInfoHorizontalGap * 2, y, chartInfoWidth);
-        gc.fillText(low, chartInfoLeftPadding + largeWidth + chartInfoWidth * 2 + chartInfoHorizontalGap * 3, y, chartInfoWidth);
-        gc.fillText(close, chartInfoLeftPadding + largeWidth + chartInfoWidth * 3 + chartInfoHorizontalGap * 4, y, chartInfoWidth);
+        gc.fillText(date, chartInfoLeftPadding, y, chartInfoTitle);
+        gc.fillText(open, chartInfoLeftPadding + chartInfoTitle + chartInfoHorizontalGap, y, chartInfoWidth);
+        gc.fillText(high, chartInfoLeftPadding + chartInfoTitle + chartInfoWidth + chartInfoHorizontalGap * 2, y, chartInfoWidth);
+        gc.fillText(low, chartInfoLeftPadding + chartInfoTitle + chartInfoWidth * 2 + chartInfoHorizontalGap * 3, y, chartInfoWidth);
+        gc.fillText(close, chartInfoLeftPadding + chartInfoTitle + chartInfoWidth * 3 + chartInfoHorizontalGap * 4, y, chartInfoWidth);
 
         // indicator values drawn from the same plot script are displayed on the same line
         int x = 0;
@@ -715,7 +718,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 origin = plotter.origin;
                 gc.setFill(visible ? InfoColor : InfoColor.deriveColor(0, 1, 1, 0.4));
                 gc.fillText(plotter.origin.toString(), x, y, chartInfoWidth);
-                x += chartInfoWidth + chartInfoHorizontalGap;
+                x += chartInfoTitle + chartInfoHorizontalGap;
             }
             for (LineChart chart : plotter.lines) {
                 String name = chart.indicator.name.v;
