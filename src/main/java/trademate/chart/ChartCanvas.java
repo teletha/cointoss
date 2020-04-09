@@ -246,29 +246,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     }
 
     /**
-     * Configure indicator setting.
-     */
-    private void configIndicator() {
-        when(User.MouseClick).to(e -> {
-            findScriptByInfoText(e).to(script -> {
-                registry.globalSetting(script).toggleVisible();
-
-                // redraw
-                layoutCandle.requestLayout();
-                layoutCandleLatest.requestLayout();
-                Tick tick = findTickByPostion(e);
-                if (tick != null) {
-                    drawChartInfo(tick);
-                }
-            });
-
-            findLineChartByInfoText(e).to(chart -> {
-                System.out.println(chart.indicator.name);
-            });
-        });
-    }
-
-    /**
      * Find the {@link PlotScript} by info text position.
      * 
      * @param e
@@ -339,6 +316,52 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     }
 
     /**
+     * Find the {@link Tick} by the mouse position.
+     * 
+     * @param e
+     * @return
+     */
+    private Tick findTickByPostion(MouseEvent e) {
+        double x = axisX.getValueForPosition(e.getX());
+
+        // move the start position forward for visual consistency
+        long sec = (long) x + chart.ticker.v.span.duration.toSeconds() / 2;
+
+        return chart.ticker.v.ticks.getByTime(sec);
+    }
+
+    /**
+     * Configure indicator setting.
+     */
+    private void configIndicator() {
+        when(User.MouseClick).to(e -> {
+            findScriptByInfoText(e).to(script -> {
+                registry.globalSetting(script).toggleVisible();
+
+                // redraw
+                layoutCandle.requestLayout();
+                layoutCandleLatest.requestLayout();
+                Tick tick = findTickByPostion(e);
+                if (tick != null) {
+                    drawChartInfo(tick);
+                }
+            });
+
+            findLineChartByInfoText(e).to(chart -> {
+                chart.toggleVisible();
+
+                // redraw
+                layoutCandle.requestLayout();
+                layoutCandleLatest.requestLayout();
+                Tick tick = findTickByPostion(e);
+                if (tick != null) {
+                    drawChartInfo(tick);
+                }
+            });
+        });
+    }
+
+    /**
      * Visualize mouse tracker in chart.
      */
     private void visualizeMouseTrack() {
@@ -378,21 +401,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             GraphicsContext gc = chartInfo.getGraphicsContext2D();
             gc.clearRect(0, 0, chartInfo.getWidth(), chartInfo.getHeight());
         });
-    }
-
-    /**
-     * Find the {@link Tick} by the mouse position.
-     * 
-     * @param e
-     * @return
-     */
-    private Tick findTickByPostion(MouseEvent e) {
-        double x = axisX.getValueForPosition(e.getX());
-
-        // move the start position forward for visual consistency
-        long sec = (long) x + chart.ticker.v.span.duration.toSeconds() / 2;
-
-        return chart.ticker.v.ticks.getByTime(sec);
     }
 
     /**
@@ -605,6 +613,10 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
                 // draw line chart
                 for (LineChart chart : plotter.lines) {
+                    if (chart.visible == false) {
+                        continue;
+                    }
+
                     if (plotter.area != PlotArea.Main) {
                         for (int i = 0; i < chart.valueY.size(); i++) {
                             chart.valueY.set(i, height - plotter.area.offset - chart.valueY.get(i) * scale);
@@ -653,7 +665,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                     double scale = plotter.scale();
 
                     for (LineChart chart : plotter.lines) {
-                        if (!chart.valueY.isEmpty()) {
+                        if (!chart.valueY.isEmpty() && chart.visible) {
                             gc.setLineWidth(chart.width);
                             gc.setStroke(chart.color);
                             gc.setLineDashes(chart.dashArray);
@@ -709,7 +721,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 String name = chart.indicator.name.v;
                 if (!name.isEmpty()) name = name.concat(" ");
 
-                gc.setFill(visible ? chart.color : chart.color.deriveColor(0, 1, 1, 0.4));
+                gc.setFill(visible && chart.visible ? chart.color : chart.color.deriveColor(0, 1, 1, 0.4));
                 gc.fillText(name + chart.info.valueAt(tick), x, y, chartInfoWidth);
                 x += chartInfoWidth + chartInfoHorizontalGap;
             }
@@ -779,6 +791,9 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         /** The y-axis values. */
         private final MutableDoubleList valueY = new NoCopyDoubleList(64);
 
+        /** The visibility state. */
+        private boolean visible = true;
+
         /**
          * @param indicator
          * @param style
@@ -790,6 +805,13 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             this.width = FXUtils.length(style, "stroke-width", 1);
             this.dashArray = FXUtils.lengths(style, "stroke-dasharray");
             this.info = info == null ? indicator.map(v -> v.toString()) : info;
+        }
+
+        /**
+         * Toggle visibility.
+         */
+        private void toggleVisible() {
+            visible = !visible;
         }
     }
 
