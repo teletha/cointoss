@@ -15,6 +15,7 @@ import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import javafx.collections.ObservableList;
@@ -48,6 +49,7 @@ import cointoss.util.Chrono;
 import cointoss.util.Num;
 import cointoss.util.Primitives;
 import kiss.I;
+import kiss.Signal;
 import kiss.Variable;
 import kiss.Ⅲ;
 import stylist.Style;
@@ -132,9 +134,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     /** Flag whether candle chart shoud layout on the next rendering phase or not. */
     private final LayoutAssistant layoutCandleLatest = new LayoutAssistant(this);
 
-    /** Flag whether indicator shoud layout on the next rendering phase or not. */
-    private final LayoutAssistant layoutLowIndicator = new LayoutAssistant(this);
-
     /** The script registry. */
     private final PlotScriptRegistry registry = I.make(PlotScriptRegistry.class);
 
@@ -167,7 +166,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             });
 
     /** The size of chart infomation area. */
-    private final int chartInfoWidth = 60;
+    private final int chartInfoWidth = 70;
 
     /** The size of chart infomation area. */
     private final int chartInfoHeight = 16;
@@ -224,12 +223,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 .layoutBy(chart.candleType.observe())
                 .layoutBy(chart.ticker.observe().switchMap(ticker -> ticker.update.startWithNull().throttle(50, TimeUnit.MILLISECONDS)))
                 .layoutWhile(chart.showRealtimeUpdate.observing());
-        layoutLowIndicator.layoutBy(widthProperty(), heightProperty())
-                .layoutBy(axisX.scroll.valueProperty(), axisX.scroll.visibleAmountProperty())
-                .layoutBy(axisY.scroll.valueProperty(), axisY.scroll.visibleAmountProperty())
-                .layoutBy(chart.candleType.observe())
-                .layoutBy(chart.ticker.observe().switchMap(ticker -> ticker.update.startWithNull().throttle(50, TimeUnit.MILLISECONDS)))
-                .layoutWhile(chart.showRealtimeUpdate.observing());
 
         configIndicator();
         visualizeNotifyPrice();
@@ -237,7 +230,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         visualizeLatestPrice();
         visualizeMouseTrack();
         visualizeSFDPrice();
-        visualizeIndicatorInfo();
 
         getChildren()
                 .addAll(name, backGridVertical, backGridHorizontal, notifyPrice, orderBuyPrice, orderSellPrice, latestPrice, sfdPrice, candles, candleLatest, chartInfo, mouseTrackHorizontal, mouseTrackVertical);
@@ -262,7 +254,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 // redraw
                 layoutCandle.requestLayout();
                 layoutCandleLatest.requestLayout();
-                layoutLowIndicator.requestLayout();
                 Tick tick = findTickByPostion(e);
                 if (tick != null) {
                     drawChartInfo(tick);
@@ -289,6 +280,32 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             }
         }
         return Variable.empty();
+    }
+
+    /**
+     * Helper to select all line charts by point.
+     * 
+     * @return
+     */
+    private Function<MouseEvent, Signal<LineChart>> findLineChartByPosition() {
+        return e -> {
+            double x = axisX.getValueForPosition(e.getX());
+            double y = e.getY();
+            double min = y - 4;
+            double max = y + 4;
+
+            // move the start position forward for visual consistency
+            long sec = (long) x + chart.ticker.v.span.duration.toSeconds() / 2;
+
+            // estimate visible range
+            long start = (long) axisX.computeVisibleMinValue();
+            int index = (int) ((sec - start) / chart.ticker.v.span.seconds);
+
+            return I.signal(plotters).flatIterable(p -> p.lines).take(chart -> {
+                double value = chart.valueY.get(index);
+                return min <= value && value <= max;
+            });
+        };
     }
 
     /**
@@ -442,47 +459,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     }
 
     /**
-     * Visualize indicator's infomation in chart.
-     */
-    private void visualizeIndicatorInfo() {
-        // track on move
-        when(User.MouseMove, User.MouseDrag).to(e -> {
-            double x = axisX.getValueForPosition(e.getX());
-            double y = e.getY();
-            double min = y - 4;
-            double max = y + 4;
-
-            // move the start position forward for visual consistency
-            long sec = (long) x + chart.ticker.v.span.duration.toSeconds() / 2;
-
-            // estimate visible range
-            long start = (long) axisX.computeVisibleMinValue();
-            int index = (int) ((sec - start) / chart.ticker.v.span.seconds);
-            boolean needLayout = false;
-
-            for (Plotter plotter : plotters) {
-                for (LineChart chart : plotter.lines) {
-                    double value = chart.valueY.get(index);
-
-                    if (min <= value && value <= max) {
-                        if (chart.widthAmplifier == 1) {
-                            chart.widthAmplifier = 2;
-                            needLayout = true;
-                        }
-                    } else {
-                        if (chart.widthAmplifier == 2) {
-                            chart.widthAmplifier = 1;
-                            needLayout = true;
-                        }
-                    }
-                }
-            }
-
-            if (needLayout) layoutCandle.requestLayout();
-        });
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
@@ -605,7 +581,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                         }
                     }
 
-                    gc.setLineWidth(chart.width * chart.widthAmplifier);
+                    gc.setLineWidth(chart.width);
                     gc.setStroke(chart.color);
                     gc.setLineDashes(chart.dashArray);
                     gc.strokePolyline(arrayX, chart.valueY.toArray(), valueX.size());
@@ -701,8 +677,11 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 x += chartInfoWidth + gap;
             }
             for (LineChart chart : plotter.lines) {
+                String name = chart.indicator.name.v;
+                if (!name.isEmpty()) name = name.concat(" ");
+
                 gc.setFill(visible ? chart.color : chart.color.deriveColor(0, 1, 1, 0.4));
-                gc.fillText(chart.info.valueAt(tick), x, y, chartInfoWidth);
+                gc.fillText(name + chart.info.valueAt(tick), x, y, chartInfoWidth);
                 x += chartInfoWidth + gap;
             }
         }
@@ -764,9 +743,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
         /** The indicator line width. */
         private final double width;
-
-        /** The indicator state. */
-        private int widthAmplifier = 1;
 
         /** The indicator line style. */
         private final double[] dashArray;

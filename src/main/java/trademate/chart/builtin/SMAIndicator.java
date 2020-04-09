@@ -9,11 +9,12 @@
  */
 package trademate.chart.builtin;
 
+import static cointoss.ticker.TimeSpan.*;
+
 import cointoss.Market;
 import cointoss.ticker.NumIndicator;
 import cointoss.ticker.Tick;
 import cointoss.ticker.Ticker;
-import cointoss.ticker.TimeSpan;
 import kiss.Variable;
 import stylist.Style;
 import stylist.StyleDSL;
@@ -55,10 +56,14 @@ public class SMAIndicator extends PlotScript implements StyleDSL {
     protected void declare(Market market, Ticker ticker) {
         int base = market.service.setting.baseCurrencyScaleSize;
 
-        line(NumIndicator.build(ticker, Tick::closePrice).sma(shortDays).scale(base), shortSMA);
-        line(NumIndicator.build(market.tickers.on(TimeSpan.Minute30), Tick::closePrice).sma(shortDays).scale(base), SMA30M);
-        line(NumIndicator.build(market.tickers.on(TimeSpan.Hour1), Tick::closePrice).sma(shortDays).scale(base), SMA1H);
-        line(NumIndicator.build(market.tickers.on(TimeSpan.Hour4), Tick::closePrice).sma(shortDays).scale(base), SMA4H);
-        line(NumIndicator.build(ticker, Tick::closePrice).sma(longDays).scale(base), longSMA);
+        line(ticker, shortDays, base, shortSMA);
+        line(market.tickers.on(Minute30), shortDays, base, SMA30M);
+        line(market.tickers.on(Hour1), shortDays, base, SMA1H);
+        line(market.tickers.on(Hour4), shortDays, base, SMA4H);
+        line(ticker, longDays, base, longSMA);
+    }
+
+    private void line(Ticker ticker, Variable<Integer> days, int base, Style style) {
+        line(NumIndicator.build(ticker, Tick::closePrice).sma(longDays).scale(base).name(ticker.span.toString() + days), style);
     }
 }

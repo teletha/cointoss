@@ -83,6 +83,17 @@ public abstract class AbstractIndicator<T, Self extends AbstractIndicator<T, Sel
     protected abstract Self build(BiFunction<Tick, Self, T> delegator);
 
     /**
+     * Set this indicator's name.
+     * 
+     * @param name A indicator name to set.
+     * @return Chainable API.
+     */
+    public Self name(Object name) {
+        this.name.set(String.valueOf(name));
+        return (Self) this;
+    }
+
+    /**
      * Return the value of this {@link Indicator}.
      * 
      * @param tick A {@link Tick} on {@link Ticker}.

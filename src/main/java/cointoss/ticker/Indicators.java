@@ -41,7 +41,7 @@ public final class Indicators {
             return a.minus(b).divide(Num.of(0.015).multiply(c));
         });
         NumIndicator indi = ci.ema(averageLength).scale(2);
-        indi.name.set("WaveTrend " + ticker.span.name());
+        indi.name.set(ticker.span.toString());
         return indi;
     }
 

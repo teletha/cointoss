@@ -49,8 +49,8 @@ public class VolumeIndicator extends PlotScript implements StyleDSL {
         DoubleIndicator sellVolume = DoubleIndicator.build(ticker, Tick::sellVolume);
 
         in(PlotArea.Bottom, () -> {
-            line(buyVolume.scale(volumeScale), Long);
-            line(sellVolume.scale(volumeScale), Short);
+            line(buyVolume.scale(volumeScale).name("Long"), Long);
+            line(sellVolume.scale(volumeScale).name("Short"), Short);
         });
     }
 }
