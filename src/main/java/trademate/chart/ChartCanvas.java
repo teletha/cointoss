@@ -287,7 +287,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
      * 
      * @return
      */
-    private Function<MouseEvent, Signal<LineChart>> findLineChartByPosition() {
+    private Function<MouseEvent, Signal<LineChart>> findLineChartByChartPosition() {
         return e -> {
             double x = axisX.getValueForPosition(e.getX());
             double y = e.getY();

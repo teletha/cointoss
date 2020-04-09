@@ -10,7 +10,6 @@
 package trademate.chart.builtin;
 
 import cointoss.Market;
-import cointoss.ticker.Indicators;
 import cointoss.ticker.Ticker;
 import kiss.Variable;
 import stylist.Style;
@@ -31,8 +30,5 @@ public class TrendLineIndicator extends PlotScript implements StyleDSL {
      */
     @Override
     protected void declare(Market market, Ticker ticker) {
-        line(Indicators.lowTrendLine(ticker, tickLength.v), SupportLine);
-
-        line(Indicators.trend(ticker, tickLength.v), SupportLine);
     }
 }
