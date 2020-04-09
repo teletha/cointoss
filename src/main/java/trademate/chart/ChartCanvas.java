@@ -15,7 +15,6 @@ import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 import javafx.collections.ObservableList;
@@ -174,6 +173,9 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     /** The size of chart infomation area. */
     private final int chartInfoLeftPadding = 10;
 
+    /** The size of chart infomation area. */
+    private final int chartInfoHorizontalGap = 3;
+
     /**
      * Chart canvas.
      * 
@@ -248,7 +250,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
      */
     private void configIndicator() {
         when(User.MouseClick).to(e -> {
-            findScriptByPosition(e).to(script -> {
+            findScriptByInfoText(e).to(script -> {
                 registry.globalSetting(script).toggleVisible();
 
                 // redraw
@@ -259,16 +261,20 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                     drawChartInfo(tick);
                 }
             });
+
+            findLineChartByInfoText(e).to(chart -> {
+                System.out.println(chart.indicator.name);
+            });
         });
     }
 
     /**
-     * Find the {@link PlotScript} by the mouse position.
+     * Find the {@link PlotScript} by info text position.
      * 
      * @param e
      * @return
      */
-    private Variable<PlotScript> findScriptByPosition(MouseEvent e) {
+    private Variable<PlotScript> findScriptByInfoText(MouseEvent e) {
         double x = e.getX();
         double y = e.getY();
 
@@ -283,29 +289,53 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     }
 
     /**
-     * Helper to select all line charts by point.
+     * Find the {@link LineChart} by info text position.
+     * 
+     * @param e
+     * @return
+     */
+    private Variable<LineChart> findLineChartByInfoText(MouseEvent e) {
+        double x = e.getX();
+        double y = e.getY();
+
+        if (scripts != null && chartInfoLeftPadding + chartInfoWidth < x && y < (scripts.size() + 1) * chartInfoHeight) {
+            int indexY = (int) (y / chartInfoHeight) - 1;
+
+            if (0 <= indexY) {
+                int indexX = (int) ((x - chartInfoLeftPadding - chartInfoWidth) / (chartInfoWidth + chartInfoHorizontalGap));
+                return I.signal(scripts.get(indexY))
+                        .flatIterable(s -> s.plotters.values())
+                        .flatIterable(p -> p.lines)
+                        .takeAt(i -> i == indexX)
+                        .first()
+                        .to();
+            }
+        }
+        return Variable.empty();
+    }
+
+    /**
+     * Find the {@link LineChart} by chart position.
      * 
      * @return
      */
-    private Function<MouseEvent, Signal<LineChart>> findLineChartByChartPosition() {
-        return e -> {
-            double x = axisX.getValueForPosition(e.getX());
-            double y = e.getY();
-            double min = y - 4;
-            double max = y + 4;
+    private Signal<LineChart> findLineChartByChart(MouseEvent e) {
+        double x = axisX.getValueForPosition(e.getX());
+        double y = e.getY();
+        double min = y - 4;
+        double max = y + 4;
 
-            // move the start position forward for visual consistency
-            long sec = (long) x + chart.ticker.v.span.duration.toSeconds() / 2;
+        // move the start position forward for visual consistency
+        long sec = (long) x + chart.ticker.v.span.duration.toSeconds() / 2;
 
-            // estimate visible range
-            long start = (long) axisX.computeVisibleMinValue();
-            int index = (int) ((sec - start) / chart.ticker.v.span.seconds);
+        // estimate visible range
+        long start = (long) axisX.computeVisibleMinValue();
+        int index = (int) ((sec - start) / chart.ticker.v.span.seconds);
 
-            return I.signal(plotters).flatIterable(p -> p.lines).take(chart -> {
-                double value = chart.valueY.get(index);
-                return min <= value && value <= max;
-            });
-        };
+        return I.signal(plotters).flatIterable(p -> p.lines).take(chart -> {
+            double value = chart.valueY.get(index);
+            return min <= value && value <= max;
+        });
     }
 
     /**
@@ -652,15 +682,14 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         String low = "L" + tick.lowPrice().scale(base);
         String close = "C" + tick.closePrice().scale(base);
 
-        int gap = 3;
-        int largeWidth = chartInfoWidth * 2 + gap;
+        int largeWidth = chartInfoWidth * 2 + chartInfoHorizontalGap;
         int y = chartInfoHeight;
         gc.setFill(InfoColor);
         gc.fillText(date, chartInfoLeftPadding, y, largeWidth);
-        gc.fillText(open, chartInfoLeftPadding + largeWidth + gap, y, chartInfoWidth);
-        gc.fillText(high, chartInfoLeftPadding + largeWidth + chartInfoWidth + gap * 2, y, chartInfoWidth);
-        gc.fillText(low, chartInfoLeftPadding + largeWidth + chartInfoWidth * 2 + gap * 3, y, chartInfoWidth);
-        gc.fillText(close, chartInfoLeftPadding + largeWidth + chartInfoWidth * 3 + gap * 4, y, chartInfoWidth);
+        gc.fillText(open, chartInfoLeftPadding + largeWidth + chartInfoHorizontalGap, y, chartInfoWidth);
+        gc.fillText(high, chartInfoLeftPadding + largeWidth + chartInfoWidth + chartInfoHorizontalGap * 2, y, chartInfoWidth);
+        gc.fillText(low, chartInfoLeftPadding + largeWidth + chartInfoWidth * 2 + chartInfoHorizontalGap * 3, y, chartInfoWidth);
+        gc.fillText(close, chartInfoLeftPadding + largeWidth + chartInfoWidth * 3 + chartInfoHorizontalGap * 4, y, chartInfoWidth);
 
         // indicator values drawn from the same plot script are displayed on the same line
         int x = 0;
@@ -674,7 +703,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 origin = plotter.origin;
                 gc.setFill(visible ? InfoColor : InfoColor.deriveColor(0, 1, 1, 0.4));
                 gc.fillText(plotter.origin.toString(), x, y, chartInfoWidth);
-                x += chartInfoWidth + gap;
+                x += chartInfoWidth + chartInfoHorizontalGap;
             }
             for (LineChart chart : plotter.lines) {
                 String name = chart.indicator.name.v;
@@ -682,7 +711,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
                 gc.setFill(visible ? chart.color : chart.color.deriveColor(0, 1, 1, 0.4));
                 gc.fillText(name + chart.info.valueAt(tick), x, y, chartInfoWidth);
-                x += chartInfoWidth + gap;
+                x += chartInfoWidth + chartInfoHorizontalGap;
             }
         }
     }
