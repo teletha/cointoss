@@ -40,7 +40,9 @@ public final class Indicators {
             }
             return a.minus(b).divide(Num.of(0.015).multiply(c));
         });
-        return ci.ema(averageLength).scale(2);
+        NumIndicator indi = ci.ema(averageLength).scale(2);
+        indi.name.set("WaveTrend " + ticker.span.name());
+        return indi;
     }
 
     /**

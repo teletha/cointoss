@@ -9,14 +9,13 @@
  */
 package trademate.chart;
 
-import static transcript.Transcript.en;
+import static transcript.Transcript.*;
 
 import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
-import java.util.function.ToDoubleFunction;
 
 import javafx.collections.ObservableList;
 import javafx.scene.canvas.Canvas;
@@ -229,6 +228,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         visualizeLatestPrice();
         visualizeMouseTrack();
         visualizeSFDPrice();
+        visualizeIndicatorInfo();
 
         getChildren()
                 .addAll(name, backGridVertical, backGridHorizontal, notifyPrice, orderBuyPrice, orderSellPrice, latestPrice, sfdPrice, candles, candleLatest, chartInfo, mouseTrackHorizontal, mouseTrackVertical);
@@ -432,6 +432,36 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     }
 
     /**
+     * Visualize indicator's infomation in chart.
+     */
+    private void visualizeIndicatorInfo() {
+        // track on move
+        when(User.MouseClick).to(e -> {
+            double x = axisX.getValueForPosition(e.getX());
+            double y = e.getY();
+            double min = y - 3;
+            double max = y + 3;
+
+            // move the start position forward for visual consistency
+            long sec = (long) x + chart.ticker.v.span.duration.toSeconds() / 2;
+
+            // estimate visible range
+            long start = (long) axisX.computeVisibleMinValue();
+            int index = (int) ((sec - start) / chart.ticker.v.span.seconds);
+
+            for (Plotter plotter : plotters) {
+                for (LineChart chart : plotter.lines) {
+                    double value = chart.valueY.get(index);
+
+                    if (min <= value && value <= max) {
+                        System.out.println(chart.indicator.name + "  " + chart.indicator);
+                    }
+                }
+            }
+        });
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -501,7 +531,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                     }
 
                     for (LineChart chart : plotter.lines) {
-                        double calculated = chart.indicator.applyAsDouble(tick);
+                        double calculated = chart.indicator.valueAt(tick).doubleValue();
 
                         if (plotter.area == PlotArea.Main) {
                             calculated = axisY.getPositionForValue(calculated);
@@ -601,8 +631,8 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                             gc.setStroke(chart.color);
                             gc.setLineDashes(chart.dashArray);
                             gc.strokeLine(lastX, chart.valueY.getLast(), x, plotter.area == PlotArea.Main
-                                    ? axisY.getPositionForValue(chart.indicator.applyAsDouble(tick))
-                                    : height - plotter.area.offset - chart.indicator.applyAsDouble(tick) * scale);
+                                    ? axisY.getPositionForValue(chart.indicator.valueAt(tick).doubleValue())
+                                    : height - plotter.area.offset - chart.indicator.valueAt(tick).doubleValue() * scale);
                         }
                     }
                 }
@@ -702,8 +732,8 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
      */
     static class LineChart {
 
-        /** The indicator. */
-        private final ToDoubleFunction<Tick> indicator;
+        /** THe actual indicator. */
+        private final AbstractIndicator<? extends Number, ?> indicator;
 
         /** The infomation writer. */
         private final Indicator<String> info;
@@ -726,7 +756,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
          * @param info
          */
         LineChart(AbstractIndicator<? extends Number, ?> indicator, Style style, Indicator<String> info) {
-            this.indicator = tick -> indicator.valueAt(tick).doubleValue();
+            this.indicator = indicator;
             this.color = FXUtils.color(style, "stroke");
             this.width = FXUtils.length(style, "stroke-width", 1);
             this.dashArray = FXUtils.lengths(style, "stroke-dasharray");

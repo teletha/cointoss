@@ -78,7 +78,7 @@ public abstract class PlotScript implements StyleDSL {
             style = ChartStyles.MouseTrack;
         }
         Plotter plotter = plotters.computeIfAbsent(area, k -> new Plotter(k, this));
-        plotter.lines.add(new LineChart(indicator.memoize(), style, info));
+        plotter.lines.add(new LineChart(indicator, style, info));
     }
 
     /**
