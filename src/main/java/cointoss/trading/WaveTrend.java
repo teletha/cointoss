@@ -27,11 +27,11 @@ import cointoss.verify.BackTest;
  */
 public class WaveTrend extends Trader {
 
-    public TimeSpan span = TimeSpan.Second15;
+    public TimeSpan span = TimeSpan.Minute1;
 
-    public int entryThreshold = 80;
+    public int entryThreshold = 64;
 
-    public int exitThreshold = -30;
+    public int exitThreshold = -50;
 
     public int stop = 3;
 
@@ -42,10 +42,11 @@ public class WaveTrend extends Trader {
      */
     @Override
     protected void declare(Market market, FundManager fund) {
+
         Ticker ticker = market.tickers.on(span);
         NumIndicator indicator = Indicators.waveTrend(ticker);
 
-        when(indicator.valueAt(ticker.update).plug(breakdown(entryThreshold)), v -> new Scenario() {
+        when(indicator.valueAt(ticker.update).plug(breakdown(entryThreshold, stop)), v -> new Scenario() {
             @Override
             protected void entry() {
                 entry(Direction.SELL, size, Orderable::take);
@@ -73,6 +74,6 @@ public class WaveTrend extends Trader {
     }
 
     public static void main(String[] args) {
-        BackTest.with.service(BitFlyer.FX_BTC_JPY).start(2020, 3, 16).end(2020, 3, 16).traders(new WaveTrend()).fast().detail(true).run();
+        BackTest.with.service(BitFlyer.FX_BTC_JPY).start(2020, 3, 16).end(2020, 3, 16).traders(new WaveTrend()).normal().detail(true).run();
     }
 }

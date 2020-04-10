@@ -27,7 +27,7 @@ public class VolumeIndicator extends PlotScript implements StyleDSL {
     };
 
     public Style Short = () -> {
-        stroke.color(ChartStyles.sell.opacify(-0.52));
+        stroke.color(ChartStyles.sell.opacify(-0.49));
     };
 
     /**

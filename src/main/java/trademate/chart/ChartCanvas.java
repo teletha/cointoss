@@ -411,7 +411,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
      * Visualize notifiable price in chart.
      */
     private void visualizeNotifyPrice() {
-        when(User.ContextMenu, e -> {
+        when(User.RightClick, e -> {
             e.consume();
 
             double clickedPosition = e.getY();
