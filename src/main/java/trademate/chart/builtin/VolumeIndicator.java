@@ -27,16 +27,8 @@ public class VolumeIndicator extends PlotScript implements StyleDSL {
     };
 
     public Style Short = () -> {
-        stroke.color(ChartStyles.sell);
+        stroke.color(ChartStyles.sell.opacify(-0.52));
     };
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String name() {
-        return "Volume";
-    }
 
     /**
      * {@inheritDoc}
