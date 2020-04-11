@@ -384,13 +384,4 @@ public abstract class AbstractIndicator<T, Self extends AbstractIndicator<T, Sel
         memo.memoized = true;
         return memo;
     }
-
-    /**
-     * Acquires the stream in which the indicator value flows at the specified timing.
-     * 
-     * @return
-     */
-    public final Signal<T> observeWhen(Signal<Tick> timing) {
-        return timing.map(this::valueAt);
-    }
 }

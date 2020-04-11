@@ -414,32 +414,78 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         when(User.RightClick, e -> {
             e.consume();
 
-            double clickedPosition = e.getY();
-
-            // check price range to add or remove
-            for (TickLable mark : notifyPrice.labels) {
-                double markedPosition = axisY.getPositionForValue(mark.value.get());
-
-                if (Math.abs(markedPosition - clickedPosition) < 5) {
-                    notifyPrice.remove(mark);
-                    return;
-                }
+            if (e.isControlDown()) {
+                notifyByIndicator(e);
+            } else {
+                notifyByPrice(e);
             }
-
-            Num price = Num.of(Math.floor(axisY.getValueForPosition(clickedPosition)));
-            TickLable label = notifyPrice.createLabel(price);
-
-            label.add(chart.market.v.signalByPrice(price).on(Viewtify.UIThread).to(exe -> {
-                notifyPrice.remove(label);
-
-                MarketService service = chart.market.v.service;
-                Num p = exe.price.scale(service.setting.targetCurrencyScaleSize);
-                String title = "🔊  " + service.marketReadableName() + " " + p;
-                CharSequence message = en("The specified price ({0}) has been reached.").with(p);
-                System.out.println("remove line");
-                I.make(Notificator.class).priceSignal.notify(title, message);
-            }));
         });
+    }
+
+    /**
+     * Notify by price.
+     * 
+     * @param e
+     */
+    private void notifyByPrice(MouseEvent e) {
+        double clickedPosition = e.getY();
+
+        // check price range to add or remove
+        for (TickLable mark : notifyPrice.labels) {
+            double markedPosition = axisY.getPositionForValue(mark.value.get());
+
+            if (Math.abs(markedPosition - clickedPosition) < 5) {
+                notifyPrice.remove(mark);
+                return;
+            }
+        }
+
+        Num price = Num.of(Math.floor(axisY.getValueForPosition(clickedPosition)));
+        TickLable label = notifyPrice.createLabel(price);
+
+        label.add(chart.market.v.signalByPrice(price).on(Viewtify.UIThread).to(exe -> {
+            notifyPrice.remove(label);
+
+            MarketService service = chart.market.v.service;
+            Num p = exe.price.scale(service.setting.targetCurrencyScaleSize);
+            String title = "🔊  " + service.marketReadableName() + " " + p;
+            CharSequence message = en("The specified price ({0}) has been reached.").with(p);
+            System.out.println("remove line");
+            I.make(Notificator.class).priceSignal.notify(title, message);
+        }));
+    }
+
+    /**
+     * Notify by price.
+     * 
+     * @param e
+     */
+    private void notifyByIndicator(MouseEvent e) {
+        double clickedPosition = e.getY();
+
+        // check price range to add or remove
+        for (TickLable mark : notifyPrice.labels) {
+            double markedPosition = axisY.getPositionForValue(mark.value.get());
+
+            if (Math.abs(markedPosition - clickedPosition) < 5) {
+                notifyPrice.remove(mark);
+                return;
+            }
+        }
+
+        Num price = Num.of(Math.floor(axisY.getValueForPosition(clickedPosition)));
+        TickLable label = notifyPrice.createLabel(price);
+
+        label.add(chart.market.v.signalByPrice(price).on(Viewtify.UIThread).to(exe -> {
+            notifyPrice.remove(label);
+
+            MarketService service = chart.market.v.service;
+            Num p = exe.price.scale(service.setting.targetCurrencyScaleSize);
+            String title = "🔊  " + service.marketReadableName() + " " + p;
+            CharSequence message = en("The specified price ({0}) has been reached.").with(p);
+            System.out.println("remove line");
+            I.make(Notificator.class).priceSignal.notify(title, message);
+        }));
     }
 
     /**

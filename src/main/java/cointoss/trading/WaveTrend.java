@@ -46,7 +46,7 @@ public class WaveTrend extends Trader {
         Ticker ticker = market.tickers.on(span);
         NumIndicator indicator = Indicators.waveTrend(ticker);
 
-        when(indicator.valueAt(ticker.update).plug(breakdown(entryThreshold, stop)), v -> new Scenario() {
+        when(indicator.valueAt(ticker.open).plug(breakdown(entryThreshold, stop)), v -> new Scenario() {
             @Override
             protected void entry() {
                 entry(Direction.SELL, size, Orderable::take);
@@ -59,7 +59,7 @@ public class WaveTrend extends Trader {
             }
         });
 
-        when(indicator.valueAt(ticker.update).plug(breakup(-entryThreshold)), v -> new Scenario() {
+        when(indicator.valueAt(ticker.open).plug(breakup(-entryThreshold)), v -> new Scenario() {
             @Override
             protected void entry() {
                 entry(Direction.BUY, size, Orderable::take);

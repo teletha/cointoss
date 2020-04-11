@@ -48,6 +48,10 @@ public class WaveTrendIndicator extends PlotScript implements StyleDSL {
         stroke.color(Color.rgb(57, 130, 195, 0.5));
     };
 
+    public Style H1 = () -> {
+        stroke.color(Color.rgb(157, 130, 195, 0.5));
+    };
+
     /**
      * {@inheritDoc}
      */
@@ -64,6 +68,7 @@ public class WaveTrendIndicator extends PlotScript implements StyleDSL {
             line(Indicators.waveTrend(market.tickers.on(TimeSpan.Minute1), channelLength.v, averageLength.v), M1);
             line(Indicators.waveTrend(market.tickers.on(TimeSpan.Minute10), channelLength.v, averageLength.v), M10);
             line(Indicators.waveTrend(market.tickers.on(TimeSpan.Minute30), channelLength.v, averageLength.v), M30);
+            line(Indicators.waveTrend(market.tickers.on(TimeSpan.Hour1), channelLength.v, averageLength.v), H1);
         });
     }
 }
