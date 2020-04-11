@@ -9,7 +9,7 @@
  */
 package cointoss.trade;
 
-import static java.util.concurrent.TimeUnit.*;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
@@ -403,8 +403,9 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
         Disposable disposer;
         if (entryPrice.isLessThan(directional, price)) {
             // profit
-            disposer = observeEntryExecutedSizeDiff().debounce(1, SECONDS, market.service.scheduler()).to(size -> {
-                market.request(directional.inverse(), entryExecutedSize.minus(exitSize), strategy).to(o -> {
+            observeEntryExecutedSize().buffer();
+            disposer = observeEntryExecutedSizeDiff().debounceAll(1, SECONDS, market.service.scheduler()).map(Num::sum).to(size -> {
+                market.request(directional.inverse(), size, strategy).to(o -> {
                     processExitOrder(o, "exitAt");
                 });
             });

@@ -9,7 +9,7 @@
  */
 package cointoss.trade;
 
-import static java.time.temporal.ChronoUnit.*;
+import static java.time.temporal.ChronoUnit.SECONDS;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;

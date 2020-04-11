@@ -13,6 +13,7 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
 import java.text.NumberFormat;
+import java.util.List;
 import java.util.Objects;
 import java.util.stream.IntStream;
 
@@ -1523,6 +1524,30 @@ public class Num extends Number implements Comparable<Num> {
      */
     public static Num random(double minInclusive, double maxExclusive) {
         return of(RandomUtils.nextDouble(minInclusive, maxExclusive));
+    }
+
+    /**
+     * Calculate the sum of all numbers.
+     * 
+     * @param nums
+     * @return
+     */
+    public static Num sum(Num... nums) {
+        return sum(List.of(nums));
+    }
+
+    /**
+     * Calculate the sum of all numbers.
+     * 
+     * @param nums
+     * @return
+     */
+    public static Num sum(Iterable<Num> nums) {
+        Num sum = Num.ZERO;
+        for (Num num : nums) {
+            sum = sum.plus(num);
+        }
+        return sum;
     }
 
     /**
