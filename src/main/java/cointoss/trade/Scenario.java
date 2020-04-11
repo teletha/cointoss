@@ -200,6 +200,18 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
      * @param size A entry size.
      * @return A ordering method.
      */
+    protected final void entry(Directional directional, long size) {
+        entry(directional, size, Orderable::take);
+    }
+
+    /**
+     * We will order with the specified quantity. Use the return the {@link Takable} &
+     * {@link Makable} value to define the details of the ordering method.
+     * 
+     * @param <S> Ordering interface
+     * @param size A entry size.
+     * @return A ordering method.
+     */
     protected final void entry(Directional directional, long size, Consumer<Orderable> declaration) {
         entry(directional, Num.of(size), declaration);
     }
@@ -212,8 +224,32 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
      * @param size A entry size.
      * @return A ordering method.
      */
+    protected final void entry(Directional directional, double size) {
+        entry(directional, size, Orderable::take);
+    }
+
+    /**
+     * We will order with the specified quantity. Use the return the {@link Takable} &
+     * {@link Makable} value to define the details of the ordering method.
+     * 
+     * @param <S> Ordering interface
+     * @param size A entry size.
+     * @return A ordering method.
+     */
     protected final void entry(Directional directional, double size, Consumer<Orderable> declaration) {
         entry(directional, Num.of(size), declaration);
+    }
+
+    /**
+     * We will order with the specified quantity. Use the return the {@link Takable} &
+     * {@link Makable} value to define the details of the ordering method.
+     * 
+     * @param <S> Ordering interface
+     * @param size A entry size.
+     * @return A ordering method.
+     */
+    protected final void entry(Directional directional, Num size) {
+        entry(directional, size, Orderable::take);
     }
 
     /**
@@ -383,6 +419,17 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
             });
         }
         disposerForExit.add(disposer);
+    }
+
+    /**
+     * Declare exit order
+     * 
+     * @param <S>
+     * @param timing
+     * @param strategy
+     */
+    protected final void exitWhen(Signal<?> timing) {
+        exitWhen(timing, Orderable::take);
     }
 
     /**

@@ -347,6 +347,14 @@ public class VerifiableMarketService extends MarketService {
      * {@inheritDoc}
      */
     @Override
+    public long nano() {
+        return nowMills * 1000000;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public ScheduledExecutorService scheduler() {
         return scheduler;
     }

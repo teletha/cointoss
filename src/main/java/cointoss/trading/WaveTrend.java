@@ -12,7 +12,6 @@ package cointoss.trading;
 import cointoss.Direction;
 import cointoss.Market;
 import cointoss.market.bitflyer.BitFlyer;
-import cointoss.order.OrderStrategy.Orderable;
 import cointoss.ticker.Indicators;
 import cointoss.ticker.NumIndicator;
 import cointoss.ticker.Ticker;
@@ -37,6 +36,8 @@ public class WaveTrend extends Trader {
 
     public double size = 0.1;
 
+    public int losscut = 5000;
+
     /**
      * {@inheritDoc}
      */
@@ -46,29 +47,33 @@ public class WaveTrend extends Trader {
         Ticker ticker = market.tickers.on(span);
         NumIndicator indicator = Indicators.waveTrend(ticker);
 
-        when(indicator.valueAt(ticker.open).plug(breakdown(entryThreshold, stop)), v -> new Scenario() {
+        when(indicator.valueAt(ticker.open).plug(breakdown(entryThreshold)), v -> new Scenario() {
             @Override
             protected void entry() {
-                entry(Direction.SELL, size, Orderable::take);
+                entry(Direction.SELL, size);
             }
 
             @Override
             protected void exit() {
-                exitWhen(indicator.valueAt(ticker.open).plug(breakup(entryThreshold + stop)), Orderable::take);
-                exitWhen(indicator.valueAt(ticker.open).plug(breakdown(exitThreshold)), Orderable::take);
+                exitAt(entryPrice.plus(losscut));
+                exitAt(entryPrice.minus(losscut * 4));
+                exitWhen(indicator.valueAt(ticker.open).plug(breakup(entryThreshold + stop)));
+                exitWhen(indicator.valueAt(ticker.open).plug(breakdown(exitThreshold)));
             }
         });
 
         when(indicator.valueAt(ticker.open).plug(breakup(-entryThreshold)), v -> new Scenario() {
             @Override
             protected void entry() {
-                entry(Direction.BUY, size, Orderable::take);
+                entry(Direction.BUY, size);
             }
 
             @Override
             protected void exit() {
-                exitWhen(indicator.valueAt(ticker.open).plug(breakdown(-entryThreshold - stop)), Orderable::take);
-                exitWhen(indicator.valueAt(ticker.open).plug(breakup(-exitThreshold)), Orderable::take);
+                exitAt(entryPrice.minus(losscut));
+                exitAt(entryPrice.plus(losscut * 4));
+                exitWhen(indicator.valueAt(ticker.open).plug(breakdown(-entryThreshold - stop)));
+                exitWhen(indicator.valueAt(ticker.open).plug(breakup(-exitThreshold)));
             }
         });
     }

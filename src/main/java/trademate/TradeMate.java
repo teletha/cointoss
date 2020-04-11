@@ -60,8 +60,8 @@ public class TradeMate extends View {
      */
     @Override
     protected void initialize() {
-        DockSystem.register("Setting").contents(SettingView.class);
-        DockSystem.register("BackTest").contents(BackTestView.class);
+        DockSystem.register("Setting").contents(SettingView.class).closable(false);
+        DockSystem.register("BackTest").contents(BackTestView.class).closable(false);
 
         List<MarketService> services = List
                 .of(BitFlyer.FX_BTC_JPY, BitFlyer.BTC_JPY, BitFlyer.ETH_JPY, BitFlyer.BCH_BTC, BitMex.XBT_USD, BitMex.ETH_USD, Binance.BTC_USDT, Binance.FUTURE_BTC_USDT, Bitfinex.BTC_USDT);

@@ -316,6 +316,15 @@ public abstract class MarketService implements Disposable {
     }
 
     /**
+     * Get the current nano-time.
+     * 
+     * @return The current time.
+     */
+    public long nano() {
+        return System.nanoTime();
+    }
+
+    /**
      * Get the market scheduler.
      * 
      * @return A scheduler.

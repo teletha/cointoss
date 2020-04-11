@@ -73,8 +73,6 @@ public class BackTestView extends View implements Analyzer {
 
     private ChartView chart;
 
-    private UIComboBox<TradingStats> logSelection;
-
     /** UI */
     private UITableView results;
 
@@ -419,10 +417,6 @@ public class BackTestView extends View implements Analyzer {
             System.out.println(log);
             results.addItemAtFirst(log);
         }
-
-        Viewtify.inUI(() -> {
-            logSelection.items(logs);
-        });
 
         verifying.set(false);
         lastDisposer = market::dispose;

@@ -75,12 +75,12 @@ public class TraderVisualizer extends PlotScript implements StyleDSL {
         }).memoize();
 
         in(PlotArea.Low, () -> {
-            line(indicator.map(s -> s.unrealized), unrealized);
-            line(indicator.map(s -> s.profit), profit);
+            line(indicator.map(s -> s.unrealized).name("含み"), unrealized);
+            line(indicator.map(s -> s.profit).name("損益"), profit);
         });
 
         in(PlotArea.LowNarrow, () -> {
-            line(indicator.map(s -> s.size), size, indicator.map(s -> s.sizeInfo()));
+            line(indicator.map(s -> s.size).name("枚数"), size, indicator.map(s -> s.sizeInfo()));
         });
     }
 
