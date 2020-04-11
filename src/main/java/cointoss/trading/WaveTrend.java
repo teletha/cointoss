@@ -19,6 +19,7 @@ import cointoss.ticker.TimeSpan;
 import cointoss.trade.FundManager;
 import cointoss.trade.Scenario;
 import cointoss.trade.Trader;
+import cointoss.util.Num;
 import cointoss.verify.BackTest;
 
 /**
@@ -55,7 +56,7 @@ public class WaveTrend extends Trader {
 
             @Override
             protected void exit() {
-                exitAt(entryPrice.plus(losscut));
+                exitAt(trailing(n -> Num.min(entryPrice.plus(500), n.minus(losscut))));
                 exitAt(entryPrice.minus(losscut * 4));
                 exitWhen(indicator.valueAt(ticker.open).plug(breakup(entryThreshold + stop)));
                 exitWhen(indicator.valueAt(ticker.open).plug(breakdown(exitThreshold)));
@@ -70,7 +71,7 @@ public class WaveTrend extends Trader {
 
             @Override
             protected void exit() {
-                exitAt(entryPrice.minus(losscut));
+                exitAt(trailing(n -> Num.max(entryPrice.minus(500), n.plus(losscut))));
                 exitAt(entryPrice.plus(losscut * 4));
                 exitWhen(indicator.valueAt(ticker.open).plug(breakdown(-entryThreshold - stop)));
                 exitWhen(indicator.valueAt(ticker.open).plug(breakup(-exitThreshold)));
