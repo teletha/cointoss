@@ -59,7 +59,7 @@ import cointoss.market.bitflyer.BitFlyer;
 import cointoss.market.bitmex.BitMex;
 import cointoss.ticker.Ticker;
 import cointoss.ticker.TickerManager;
-import cointoss.ticker.TimeSpan;
+import cointoss.ticker.Span;
 import cointoss.util.Chrono;
 import cointoss.util.Network;
 import cointoss.util.Num;
@@ -783,7 +783,7 @@ public class ExecutionLog {
                     int scale = service.setting.targetCurrencyScaleSize;
                     TickerManager manager = new TickerManager();
                     read().to(manager::update);
-                    Ticker ticker = manager.on(TimeSpan.Second5);
+                    Ticker ticker = manager.on(Span.Second5);
 
                     Execution[] prev = {Market.BASE};
 

@@ -20,7 +20,7 @@ import transcript.Transcript;
 /**
  * Defined tick span.
  */
-public enum TimeSpan {
+public enum Span {
 
     /** SPAN */
     Second5(5, SECOND_OF_MINUTE, 1),
@@ -98,7 +98,7 @@ public enum TimeSpan {
      * @param amount
      * @param unit
      */
-    private TimeSpan(long amount, ChronoField unit, int... uppers) {
+    private Span(long amount, ChronoField unit, int... uppers) {
         this.amount = amount;
         this.unit = unit;
         this.duration = Duration.of(amount, unit.getBaseUnit());

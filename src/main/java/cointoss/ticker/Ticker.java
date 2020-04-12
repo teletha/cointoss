@@ -20,10 +20,10 @@ import kiss.Signaling;
 public final class Ticker implements Disposable {
 
     /** Reusable NULL object. */
-    public static final Ticker EMPTY = new Ticker(TimeSpan.Minute1);
+    public static final Ticker EMPTY = new Ticker(Span.Minute1);
 
     /** The span. */
-    public final TimeSpan span;
+    public final Span span;
 
     /** The event listeners. */
     final Signaling<Tick> opening = new Signaling();
@@ -57,7 +57,7 @@ public final class Ticker implements Disposable {
      * 
      * @param span An associated span.
      */
-    Ticker(TimeSpan span) {
+    Ticker(Span span) {
         this.span = Objects.requireNonNull(span);
         this.uppers = new Ticker[span.uppers.length];
         this.ticks = new TimeseriesStore<Tick>(span, tick -> tick.startSeconds);

@@ -26,7 +26,7 @@ public class TickerTestSupport implements TimebaseSupport {
      * @param values
      * @return
      */
-    public Ticker ticker(TimeSpan span, int... values) {
+    public Ticker ticker(Span span, int... values) {
         ZonedDateTime time = Chrono.MIN;
 
         for (int value : values) {
@@ -43,7 +43,7 @@ public class TickerTestSupport implements TimebaseSupport {
      * @param values
      * @return
      */
-    public Ticker ticker(TimeSpan span, double... values) {
+    public Ticker ticker(Span span, double... values) {
         ZonedDateTime time = Chrono.MIN;
 
         for (double value : values) {
@@ -63,7 +63,7 @@ public class TickerTestSupport implements TimebaseSupport {
      * @param close
      * @return
      */
-    public Tick tick(TimeSpan span, int open, int high, int low, int close) {
+    public Tick tick(Span span, int open, int high, int low, int close) {
         if (high < open || high < low || high < close) {
             throw new IllegalArgumentException("High price is not highest. [open:" + open + " high:" + high + " low:" + low + " close:" + close + "]");
         }

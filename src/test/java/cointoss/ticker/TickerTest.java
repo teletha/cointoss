@@ -19,7 +19,7 @@ class TickerTest extends TickerTestSupport {
 
     @Test
     void open() {
-        Ticker ticker = manager.on(TimeSpan.Second5);
+        Ticker ticker = manager.on(Span.Second5);
         List<Tick> open = ticker.open.toList();
         assert open.size() == 0;
 
@@ -35,7 +35,7 @@ class TickerTest extends TickerTestSupport {
 
     @Test
     void openSkipEmptyTick() {
-        Ticker ticker = manager.on(TimeSpan.Second5);
+        Ticker ticker = manager.on(Span.Second5);
         List<Tick> open = ticker.open.toList();
         assert open.size() == 0;
 
@@ -47,7 +47,7 @@ class TickerTest extends TickerTestSupport {
 
     @Test
     void close() {
-        Ticker ticker = manager.on(TimeSpan.Second5);
+        Ticker ticker = manager.on(Span.Second5);
         List<Tick> close = ticker.close.toList();
         assert close.size() == 0;
 
@@ -63,7 +63,7 @@ class TickerTest extends TickerTestSupport {
 
     @Test
     void closeSkipEmptyTick() {
-        Ticker ticker = manager.on(TimeSpan.Second5);
+        Ticker ticker = manager.on(Span.Second5);
         List<Tick> close = ticker.close.toList();
         assert close.size() == 0;
 

@@ -13,15 +13,15 @@ import java.time.Duration;
 
 import org.junit.jupiter.api.Test;
 
-import cointoss.ticker.TimeSpan;
+import cointoss.ticker.Span;
 
 class SpanTest {
 
     @Test
     void duration() {
-        assert TimeSpan.Minute1.duration.equals(Duration.ofMinutes(1));
-        assert TimeSpan.Second5.duration.equals(Duration.ofSeconds(5));
-        assert TimeSpan.Hour1.duration.equals(Duration.ofHours(1));
-        assert TimeSpan.Day2.duration.equals(Duration.ofDays(2));
+        assert Span.Minute1.duration.equals(Duration.ofMinutes(1));
+        assert Span.Second5.duration.equals(Duration.ofSeconds(5));
+        assert Span.Hour1.duration.equals(Duration.ofHours(1));
+        assert Span.Day2.duration.equals(Duration.ofDays(2));
     }
 }

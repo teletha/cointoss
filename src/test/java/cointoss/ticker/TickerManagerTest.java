@@ -9,7 +9,7 @@
  */
 package cointoss.ticker;
 
-import static cointoss.ticker.TimeSpan.*;
+import static cointoss.ticker.Span.*;
 
 import java.time.ZonedDateTime;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -224,7 +224,7 @@ class TickerManagerTest {
         });
     }
 
-    private Predicate<Ticker> between(TimeSpan start, TimeSpan end) {
+    private Predicate<Ticker> between(Span start, Span end) {
         return e -> {
             int ordinal = e.span.ordinal();
             return start.ordinal() <= ordinal && ordinal <= end.ordinal();
@@ -333,7 +333,7 @@ class TickerManagerTest {
         AtomicInteger counter = new AtomicInteger();
         manager.tickers().flatMap(t -> t.update).to(counter::incrementAndGet);
 
-        int size = TimeSpan.values().length;
+        int size = Span.values().length;
 
         manager.update(Execution.with.buy(1).price(10));
         assert counter.get() == size;

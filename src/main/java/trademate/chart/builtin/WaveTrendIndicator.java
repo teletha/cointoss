@@ -13,7 +13,7 @@ import cointoss.Market;
 import cointoss.ticker.Indicators;
 import cointoss.ticker.NumIndicator;
 import cointoss.ticker.Ticker;
-import cointoss.ticker.TimeSpan;
+import cointoss.ticker.Span;
 import kiss.Variable;
 import stylist.Style;
 import stylist.StyleDSL;
@@ -65,10 +65,10 @@ public class WaveTrendIndicator extends PlotScript implements StyleDSL {
             line(overSoldLevel1, Main);
 
             line(indicator, Main);
-            line(Indicators.waveTrend(market.tickers.on(TimeSpan.Minute1), channelLength.v, averageLength.v), M1);
-            line(Indicators.waveTrend(market.tickers.on(TimeSpan.Minute10), channelLength.v, averageLength.v), M10);
-            line(Indicators.waveTrend(market.tickers.on(TimeSpan.Minute30), channelLength.v, averageLength.v), M30);
-            line(Indicators.waveTrend(market.tickers.on(TimeSpan.Hour1), channelLength.v, averageLength.v), H1);
+            line(Indicators.waveTrend(market.tickers.on(Span.Minute1), channelLength.v, averageLength.v), M1);
+            line(Indicators.waveTrend(market.tickers.on(Span.Minute10), channelLength.v, averageLength.v), M10);
+            line(Indicators.waveTrend(market.tickers.on(Span.Minute30), channelLength.v, averageLength.v), M30);
+            line(Indicators.waveTrend(market.tickers.on(Span.Hour1), channelLength.v, averageLength.v), H1);
         });
     }
 }

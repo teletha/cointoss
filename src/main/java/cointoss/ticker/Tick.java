@@ -83,7 +83,7 @@ public final class Tick {
      * @param open A open price.
      * @param realtime The realtime execution statistic.
      */
-    Tick(Tick previous, long startEpochSeconds, TimeSpan span, long id, int delay, Num open, TickerManager realtime) {
+    Tick(Tick previous, long startEpochSeconds, Span span, long id, int delay, Num open, TickerManager realtime) {
         this.previous = new WeakReference(previous);
         this.startSeconds = startEpochSeconds;
         this.endSeconds = startEpochSeconds + span.seconds;
@@ -299,8 +299,10 @@ public final class Tick {
      */
     @Override
     public String toString() {
-        StringBuilder builder = new StringBuilder("TICK ");
-        builder.append(openPrice)
+        StringBuilder builder = new StringBuilder("TICK ").append(" ")
+                .append(Chrono.format(start()))
+                .append(" ")
+                .append(openPrice)
                 .append(" ")
                 .append(closePrice())
                 .append(" ")

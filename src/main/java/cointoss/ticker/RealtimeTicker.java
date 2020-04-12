@@ -43,14 +43,14 @@ public class RealtimeTicker implements Disposable {
     private final GapList<Execution> buffer = GapList.create();
 
     /** The tick span. */
-    private final TimeSpan span;
+    private final Span span;
 
     private final Variable<Execution> latest;
 
     /**
      * 
      */
-    public RealtimeTicker(TimeSpan span, Variable<Execution> latest) {
+    public RealtimeTicker(Span span, Variable<Execution> latest) {
         this.span = span;
         this.latest = latest;
         buffer.addLast(Market.BASE);

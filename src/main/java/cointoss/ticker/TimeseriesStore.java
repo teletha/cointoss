@@ -19,7 +19,7 @@ import java.util.function.ToLongFunction;
 public final class TimeseriesStore<E> {
 
     /** The span. */
-    private final TimeSpan span;
+    private final Span span;
 
     /** The item length. */
     private final int length;
@@ -36,7 +36,7 @@ public final class TimeseriesStore<E> {
     /**
      * 
      */
-    public TimeseriesStore(TimeSpan span, ToLongFunction<E> timestampExtractor) {
+    public TimeseriesStore(Span span, ToLongFunction<E> timestampExtractor) {
         this.span = Objects.requireNonNull(span);
         this.length = span.ticksPerDay();
         this.timestampExtractor = Objects.requireNonNull(timestampExtractor);

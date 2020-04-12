@@ -17,7 +17,7 @@ import javafx.scene.layout.Region;
 
 import cointoss.ticker.Tick;
 import cointoss.ticker.Ticker;
-import cointoss.ticker.TimeSpan;
+import cointoss.ticker.Span;
 import cointoss.util.Num;
 import kiss.Variable;
 import viewtify.ui.helper.LayoutAssistant;
@@ -122,17 +122,17 @@ public class Chart extends Region {
         long end = (long) axisX.computeVisibleMaxValue();
         long duration = end - start;
 
-        TimeSpan span;
+        Span span;
         if (1 < duration / 86400 /* 60x60x24 */) {
-            span = TimeSpan.Day1;
+            span = Span.Day1;
         } else if (1 < duration / 21600 /* 60x60x6 */) {
-            span = TimeSpan.Hour6;
+            span = Span.Hour6;
         } else if (1 < duration / 3600 /* 60x60 */) {
-            span = TimeSpan.Hour1;
+            span = Span.Hour1;
         } else if (1 < duration / 300 /* 60x5 */) {
-            span = TimeSpan.Minute5;
+            span = Span.Minute5;
         } else {
-            span = TimeSpan.Second5;
+            span = Span.Second5;
         }
 
         if (chart.market.isPresent()) {

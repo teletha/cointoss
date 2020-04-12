@@ -19,7 +19,7 @@ import org.controlsfx.glyphfont.FontAwesome;
 
 import cointoss.Market;
 import cointoss.ticker.Ticker;
-import cointoss.ticker.TimeSpan;
+import cointoss.ticker.Span;
 import cointoss.util.Chrono;
 import kiss.Variable;
 import stylist.Style;
@@ -46,7 +46,7 @@ public class ChartView extends View {
     private UIButton config;
 
     /** Configuration UI */
-    private UIComboBox<TimeSpan> span;
+    private UIComboBox<Span> span;
 
     /** Configuration UI */
     private UIComboBox<CandleType> candle;
@@ -115,7 +115,7 @@ public class ChartView extends View {
      */
     @Override
     protected void initialize() {
-        span.initialize(TimeSpan.values()).sort(Comparator.reverseOrder());
+        span.initialize(Span.values()).sort(Comparator.reverseOrder());
         span.observing() //
                 .skipNull()
                 .combineLatest(market.observing().skipNull())

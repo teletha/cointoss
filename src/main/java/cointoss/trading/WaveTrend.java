@@ -17,12 +17,12 @@ import cointoss.Market;
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.ticker.Indicators;
 import cointoss.ticker.NumIndicator;
+import cointoss.ticker.Span;
 import cointoss.ticker.Ticker;
-import cointoss.ticker.TimeSpan;
 import cointoss.trade.FundManager;
 import cointoss.trade.Scenario;
 import cointoss.trade.Trader;
-import cointoss.util.Num;
+import cointoss.trade.Trailing;
 import cointoss.verify.BackTest;
 
 /**
@@ -30,7 +30,7 @@ import cointoss.verify.BackTest;
  */
 public class WaveTrend extends Trader {
 
-    public TimeSpan span = TimeSpan.Minute1;
+    public Span span = Span.Minute1;
 
     public int entryThreshold = 64;
 
@@ -59,10 +59,10 @@ public class WaveTrend extends Trader {
 
             @Override
             protected void exit() {
-                exitAt(trailing(n -> Num.min(entryPrice.minus(500), n.plus(losscut))));
+                exitAt(Trailing.with.losscut(losscut).profit(1000));
                 exitAt(entryPrice.minus(losscut * 4));
-                // exitWhen(indicator.valueAt(ticker.open).plug(breakup(entryThreshold + stop)));
-                // exitWhen(indicator.valueAt(ticker.open).plug(breakdown(exitThreshold)));
+                exitWhen(indicator.valueAt(ticker.open).plug(breakup(entryThreshold + stop)));
+                exitWhen(indicator.valueAt(ticker.open).plug(breakdown(exitThreshold)));
             }
         });
 
@@ -74,10 +74,10 @@ public class WaveTrend extends Trader {
 
             @Override
             protected void exit() {
-                exitAt(trailing(n -> Num.max(entryPrice.plus(500), n.minus(losscut))));
+                exitAt(Trailing.with.losscut(losscut).profit(1000));
                 exitAt(entryPrice.plus(losscut * 4));
-                // exitWhen(indicator.valueAt(ticker.open).plug(breakdown(-entryThreshold - stop)));
-                // exitWhen(indicator.valueAt(ticker.open).plug(breakup(-exitThreshold)));
+                exitWhen(indicator.valueAt(ticker.open).plug(breakdown(-entryThreshold - stop)));
+                exitWhen(indicator.valueAt(ticker.open).plug(breakup(-exitThreshold)));
             }
         });
     }

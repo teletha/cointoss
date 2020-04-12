@@ -17,7 +17,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 import org.eclipse.collections.impl.list.mutable.FastList;
 
@@ -30,7 +29,6 @@ import cointoss.order.Order;
 import cointoss.order.OrderStrategy.Makable;
 import cointoss.order.OrderStrategy.Orderable;
 import cointoss.order.OrderStrategy.Takable;
-import cointoss.ticker.TimeSpan;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
 import kiss.Disposable;
@@ -369,6 +367,16 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
      * 
      * @param price An exit price.
      */
+    protected final void exitAt(Trailing price) {
+        exitAt(price, Orderable::take);
+    }
+
+    /**
+     * Declare exit order by price. Loss cutting is the only element in the trade that investors can
+     * control.
+     * 
+     * @param price An exit price.
+     */
     protected final void exitAt(long price, Consumer<Orderable> strategy) {
         exitAt(Num.of(price), strategy);
     }
@@ -423,6 +431,24 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
     }
 
     /**
+     * Declare exit order by price. Loss cutting is the only element in the trade that investors can
+     * control.
+     * 
+     * @param price An exit price.
+     */
+    protected final void exitAt(Trailing price, Consumer<Orderable> strategy) {
+        Num max = entryPrice.plus(this, price.profit);
+        Variable<Num> trailedPrice = Variable.of(entryPrice.minus(this, price.losscut));
+
+        price.update.apply(market).to(current -> {
+            Num trailing = Num.max(this, trailedPrice.v, current.minus(this, price.losscut));
+            trailedPrice.set(Num.min(this, trailing, max));
+        });
+
+        exitAt(trailedPrice, strategy);
+    }
+
+    /**
      * Declare exit order
      * 
      * @param <S>
@@ -446,27 +472,6 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
                 processExitOrder(e, "exitWhen");
             });
         }));
-    }
-
-    protected final Variable<Num> trailing(Function<Num, Num> trailer) {
-        Variable<Num> trailedPrice = Variable.of(trailer.apply(entryPrice));
-        disposerForExit
-                .add(market.tickers.on(TimeSpan.Second5).open.map(tick -> Num.max(this, trailer.apply(tick.openPrice), trailedPrice.v))
-                        .to(trailedPrice));
-        return trailedPrice;
-    }
-
-    protected final Variable<Num> trailing2(Function<Num, Num> trailer) {
-        Variable variable = Variable.of(trailer.apply(entryPrice.minus(this, entryPrice)));
-        disposerForExit
-                .add(market.tickers.on(TimeSpan.Second5).open.map(v -> trailer.apply(entryPrice.minus(this, v.openPrice))).to(variable));
-        return variable;
-    }
-
-    protected final Variable<Num> trailing3(Function<Num, Num> trailer) {
-        Variable variable = Variable.of(trailer.apply(market.tickers.latestPrice.v));
-        disposerForExit.add(market.tickers.on(TimeSpan.Second5).open.map(tick -> trailer.apply(tick.openPrice)).to(variable));
-        return variable;
     }
 
     /**
