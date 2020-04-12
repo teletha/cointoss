@@ -28,19 +28,23 @@ import cointoss.verify.BackTest;
 /**
  * 
  */
-public class WaveTrend extends Trader {
+public class LongWaveTrend extends Trader {
 
-    public Span span = Span.Minute1;
+    public Span span = Span.Hour1;
 
-    public int entryThreshold = 64;
+    public int entryThreshold = 50;
 
     public int exitThreshold = -50;
 
     public int stop = 3;
 
-    public double size = 0.1;
+    public double size = 10;
 
-    public int losscut = 5000;
+    public int trailLosscut = 9000;
+
+    public int trailProfitcut = 5000;
+
+    public int profitcut = 50000;
 
     /**
      * {@inheritDoc}
@@ -59,8 +63,8 @@ public class WaveTrend extends Trader {
 
             @Override
             protected void exit() {
-                exitAt(Trailing.with.losscut(losscut).profit(1000));
-                exitAt(entryPrice.minus(losscut * 4));
+                exitAt(Trailing.with.losscut(trailLosscut).profit(trailProfitcut));
+                exitAt(entryPrice.minus(profitcut));
                 exitWhen(indicator.valueAt(ticker.open).plug(breakup(entryThreshold + stop)));
                 exitWhen(indicator.valueAt(ticker.open).plug(breakdown(exitThreshold)));
             }
@@ -74,8 +78,8 @@ public class WaveTrend extends Trader {
 
             @Override
             protected void exit() {
-                exitAt(Trailing.with.losscut(losscut).profit(1000));
-                exitAt(entryPrice.plus(losscut * 4));
+                exitAt(Trailing.with.losscut(trailLosscut).profit(trailProfitcut));
+                exitAt(entryPrice.plus(profitcut));
                 exitWhen(indicator.valueAt(ticker.open).plug(breakdown(-entryThreshold - stop)));
                 exitWhen(indicator.valueAt(ticker.open).plug(breakup(-exitThreshold)));
             }
@@ -86,6 +90,6 @@ public class WaveTrend extends Trader {
         Logger log = LogManager.getLogger();
         Thread.setDefaultUncaughtExceptionHandler((t, e) -> log.error(e.getMessage(), e));
 
-        BackTest.with.service(BitFlyer.FX_BTC_JPY).start(2020, 3, 2).end(2020, 3, 2).traders(new WaveTrend()).fast().detail(true).run();
+        BackTest.with.service(BitFlyer.FX_BTC_JPY).start(2020, 3, 2).end(2020, 3, 2).traders(new LongWaveTrend()).fast().detail(true).run();
     }
 }
