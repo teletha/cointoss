@@ -9,10 +9,12 @@
  */
 package cointoss.order;
 
+import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.function.Consumer;
 
 import cointoss.Direction;
+import cointoss.ticker.Span;
 import cointoss.util.Num;
 import kiss.Signal;
 import kiss.Variable;
@@ -156,6 +158,26 @@ public interface OrderStrategy {
          * @return
          */
         Orderable cancelAfter(long time, ChronoUnit unit);
+
+        /**
+         * Cancel the order if it remains after the specified time has passed.
+         * 
+         * @param duration A time until canceling.
+         * @return
+         */
+        default Orderable cancelAfter(Duration duration) {
+            return cancelAfter(duration.toSeconds(), ChronoUnit.SECONDS);
+        }
+
+        /**
+         * Cancel the order if it remains after the specified time has passed.
+         * 
+         * @param span A time until canceling.
+         * @return
+         */
+        default Orderable cancelAfter(Span span) {
+            return cancelAfter(span.duration);
+        }
 
         /**
          * Cancel the order if it remains after the specified time has passed.
