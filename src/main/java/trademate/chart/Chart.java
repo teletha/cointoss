@@ -15,9 +15,9 @@ import javafx.geometry.Insets;
 import javafx.geometry.Side;
 import javafx.scene.layout.Region;
 
+import cointoss.ticker.Span;
 import cointoss.ticker.Tick;
 import cointoss.ticker.Ticker;
-import cointoss.ticker.Span;
 import cointoss.util.Num;
 import kiss.Variable;
 import viewtify.ui.helper.LayoutAssistant;
