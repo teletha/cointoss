@@ -36,7 +36,6 @@ import trademate.chart.ChartView;
 import trademate.chart.PlotScript;
 import trademate.chart.builtin.TraderVisualizer;
 import trademate.setting.SettingStyles;
-import trademate.widget.ParameterizablePropertySheet;
 import transcript.Transcript;
 import viewtify.Viewtify;
 import viewtify.ui.UIButton;
@@ -44,6 +43,7 @@ import viewtify.ui.UICheckBox;
 import viewtify.ui.UIComboBox;
 import viewtify.ui.UIDatePicker;
 import viewtify.ui.UILabel;
+import viewtify.ui.UIPane;
 import viewtify.ui.UITableColumn;
 import viewtify.ui.UITableView;
 import viewtify.ui.View;
@@ -122,12 +122,19 @@ public class BackTestView extends View implements Analyzer {
     private Variable<Boolean> verifying = Variable.of(false);
 
     /** The trader builder. */
-    private final List<ParameterizablePropertySheet<Trader>> builders = I.find(Trader.class).stream().map(trader -> {
-        ParameterizablePropertySheet<Trader> editor = new ParameterizablePropertySheet();
-        editor.base.set(trader);
+    private final List<BotEditor> builders = I.find(Trader.class).stream().map(trader -> {
+        trader.disable(); // default
+
+        BotEditor editor = new BotEditor(trader);
         editor.rejectableProperty.set(p -> p.name.equals("profit") || p.name.equals("holdMaxSize") || p.name.equals("holdSize"));
         return editor;
     }).collect(Collectors.toList());
+
+    /** Runner UI */
+    private UIComboBox<BotEditor> botSelector;
+
+    /** Runner UI */
+    private UIPane botEditor;
 
     /**
      * UI definition.
@@ -153,10 +160,8 @@ public class BackTestView extends View implements Analyzer {
                             $(fastLog, style.formCheck);
                         });
 
-                        for (ParameterizablePropertySheet<Trader> editor : builders) {
-                            label(editor.base.get().name());
-                            $(editor);
-                        }
+                        $(botSelector, style.bot);
+                        $(botEditor);
                     });
                 });
 
@@ -185,6 +190,10 @@ public class BackTestView extends View implements Analyzer {
      * Style definition
      */
     interface style extends StyleDSL {
+        Style bot = () -> {
+            margin.top(10, px);
+        };
+
         Style fill = () -> {
             display.height.fill().width.fill();
         };
@@ -280,6 +289,12 @@ public class BackTestView extends View implements Analyzer {
                             .type(fastLog.value() ? LogType.Fast : LogType.Normal)
                             .run(this);
                 });
+
+        botSelector.items(builders)
+                .selectFirst()
+                .render(b -> b.trader.name())
+                .renderSelected(b -> b.trader.name())
+                .whenSelected(botEditor::content);
 
         configureTradingLogView();
         I.make(TradeMate.class).requestLazyInitialization();

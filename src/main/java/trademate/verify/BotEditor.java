@@ -7,7 +7,7 @@
  *
  *          http://opensource.org/licenses/mit-license.php
  */
-package trademate.widget;
+package trademate.verify;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -20,19 +20,21 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.Predicate;
 
-import com.google.common.collect.Sets;
-
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+
+import org.apache.commons.lang3.StringUtils;
+
+import com.google.common.collect.Sets;
+
+import cointoss.trade.Trader;
 import kiss.I;
 import kiss.Ⅱ;
 import kiss.model.Model;
 import kiss.model.Property;
-import viewtify.Viewtify;
 import viewtify.style.FormStyles;
 import viewtify.ui.UICheckBox;
 import viewtify.ui.UIComboCheckBox;
@@ -45,15 +47,13 @@ import viewtify.ui.ViewDSL;
 import viewtify.ui.helper.Actions;
 import viewtify.ui.helper.User;
 
-public class ParameterizablePropertySheet<M> extends View {
+public class BotEditor extends View {
 
     /** The base instance. */
-    public final ObjectProperty<M> base = new SimpleObjectProperty();
+    public final Trader trader;
 
-    /** The base model. */
-    public final ReadOnlyObjectProperty<Model<M>> model = Viewtify.observe(base)
-            .map(o -> Model.of(o))
-            .to(SimpleObjectProperty.class, ObjectProperty::set);
+    /** The trader model. */
+    private final Model<Trader> model;
 
     /** The property filter. */
     public final ObjectProperty<Predicate<Property>> acceptableProperty = new SimpleObjectProperty(I.accept());
@@ -65,19 +65,14 @@ public class ParameterizablePropertySheet<M> extends View {
     private final Map<Property, List<Object>> properties = new HashMap();
 
     /** Property editing UIs */
-    private final ObservableList<PropertyEditorView> editors = FXCollections.observableArrayList();
+    private final ObservableList<PropertyEditor> editors = FXCollections.observableArrayList();
 
     /**
-     * 
+     * @param trader
      */
-    public ParameterizablePropertySheet() {
-    }
-
-    /**
-     * @param base
-     */
-    public ParameterizablePropertySheet(M base) {
-        this.base.set(base);
+    public BotEditor(Trader trader) {
+        this.trader = trader;
+        this.model = Model.of(trader);
     }
 
     /**
@@ -94,32 +89,44 @@ public class ParameterizablePropertySheet<M> extends View {
      */
     @Override
     protected void initialize() {
-        Viewtify.observing(model)
+        I.signal(model)
                 .effect(editors::clear)
-                .flatIterable(Model<M>::properties)
+                .flatIterable(Model::properties)
                 .take(acceptableProperty.get())
                 .skip(rejectableProperty.get())
                 .to(property -> {
-                    editors.add(new PropertyEditorView(property, model.get().get(base.get(), property)));
+                    BotEditor.PropertyEditor form = new PropertyEditor(property, model.get(trader, property));
+
+                    if (property.name.equals("enable")) {
+                        editors.add(0, form);
+                    } else {
+                        editors.add(form);
+                    }
                 });
     }
 
-    public List<M> build() {
+    /**
+     * Create all combination of parameterized traders.
+     * 
+     * @return
+     */
+    public List<Trader> build() {
         List<Set<Ⅱ<Property, Object>>> combinations = new ArrayList();
 
         for (Entry<Property, List<Object>> entry : properties.entrySet()) {
             combinations.add(I.signal(entry.getValue()).map(v -> I.pair(entry.getKey(), v)).toCollection(new LinkedHashSet<>()));
         }
 
-        List<M> instances = new ArrayList();
+        List<Trader> instances = new ArrayList();
 
         for (List<Ⅱ<Property, Object>> combined : Sets.cartesianProduct(combinations)) {
-            M instance = I.make(model.get().type);
+            Trader trader = I.make(model.type);
+            trader.disable();
 
             for (Ⅱ<Property, Object> value : combined) {
-                model.get().set(instance, value.ⅰ, value.ⅱ);
+                model.set(trader, value.ⅰ, value.ⅱ);
             }
-            instances.add(instance);
+            instances.add(trader);
         }
         return instances;
     }
@@ -127,7 +134,7 @@ public class ParameterizablePropertySheet<M> extends View {
     /**
      * 
      */
-    class PropertyEditorView extends View {
+    class PropertyEditor extends View {
 
         /** The target property. */
         private final Property property;
@@ -138,7 +145,7 @@ public class ParameterizablePropertySheet<M> extends View {
         /**
          * 
          */
-        PropertyEditorView(Property property, Object initialValue) {
+        PropertyEditor(Property property, Object initialValue) {
             this.property = property;
             this.initialValue = initialValue;
         }
@@ -148,7 +155,7 @@ public class ParameterizablePropertySheet<M> extends View {
          */
         class view extends ViewDSL {
             {
-                form(property.name, FormStyles.FormInputMin, createUI(property));
+                form(StringUtils.capitalize(property.name), FormStyles.FormInputMin, createUI(property));
             }
         }
 
@@ -175,7 +182,11 @@ public class ParameterizablePropertySheet<M> extends View {
          * @return A create UI.
          */
         private UICheckBox createCheckBox(boolean initial) {
-            return new UICheckBox(this).value(initial).when(User.Action, (e, check) -> properties.put(property, List.of(check.value())));
+            UICheckBox box = new UICheckBox(this).value(initial);
+
+            box.observing().to(v -> properties.put(property, List.of(v)));
+
+            return box;
         }
 
         /**

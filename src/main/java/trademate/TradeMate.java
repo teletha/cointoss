@@ -126,7 +126,6 @@ public class TradeMate extends View {
                 }
             }
         }
-
     }
 
     /**
