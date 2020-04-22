@@ -434,6 +434,7 @@ public class BackTestView extends View implements Analyzer {
         }
 
         verifying.set(false);
+        chart.chart.layoutForcely();
         lastDisposer = market::dispose;
     }
 }

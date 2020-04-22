@@ -24,6 +24,9 @@ import viewtify.ui.helper.LayoutAssistant;
 
 public class Chart extends Region {
 
+    /** The chart refresh time. */
+    static final int RefreshTime = 250;
+
     /** The time unit interval. */
     private static long M = 60;
 
@@ -56,7 +59,9 @@ public class Chart extends Region {
                 .layoutBy(axisX.scroll.valueProperty(), axisX.scroll.visibleAmountProperty())
                 .layoutBy(axisY.scroll.valueProperty(), axisY.scroll.visibleAmountProperty())
                 .layoutBy(chart.ticker.observe())
-                .layoutBy(chart.ticker.observe().switchMap(ticker -> ticker.open.startWithNull()).throttle(120, TimeUnit.MILLISECONDS));
+                .layoutBy(chart.ticker.observe()
+                        .switchMap(ticker -> ticker.open.startWithNull())
+                        .throttle(RefreshTime, TimeUnit.MILLISECONDS));
 
         // configure axis label
         chart.market.observe().to(m -> {
@@ -65,6 +70,14 @@ public class Chart extends Region {
         });
 
         getChildren().addAll(canvas, axisX, axisY);
+    }
+
+    /**
+     * Layout chart immediately.
+     */
+    public final void layoutForcely() {
+        layoutChart.layoutForcely();
+        canvas.layoutCandle.layoutForcely();
     }
 
     /**

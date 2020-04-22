@@ -9,7 +9,7 @@
  */
 package trademate.chart;
 
-import static transcript.Transcript.*;
+import static transcript.Transcript.en;
 
 import java.time.Duration;
 import java.util.List;
@@ -129,7 +129,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     private final Canvas chartInfo = new Canvas();
 
     /** Flag whether candle chart shoud layout on the next rendering phase or not. */
-    private final LayoutAssistant layoutCandle = new LayoutAssistant(this);
+    final LayoutAssistant layoutCandle = new LayoutAssistant(this);
 
     /** Flag whether candle chart shoud layout on the next rendering phase or not. */
     private final LayoutAssistant layoutCandleLatest = new LayoutAssistant(this);
@@ -222,12 +222,14 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 .layoutBy(axisX.scroll.valueProperty(), axisX.scroll.visibleAmountProperty())
                 .layoutBy(axisY.scroll.valueProperty(), axisY.scroll.visibleAmountProperty())
                 .layoutBy(chart.candleType.observe())
-                .layoutBy(chart.ticker.observe().switchMap(ticker -> ticker.open.startWithNull().throttle(50, TimeUnit.MILLISECONDS)));
+                .layoutBy(chart.ticker.observe()
+                        .switchMap(ticker -> ticker.open.startWithNull().throttle(Chart.RefreshTime, TimeUnit.MILLISECONDS)));
         layoutCandleLatest.layoutBy(widthProperty(), heightProperty())
                 .layoutBy(axisX.scroll.valueProperty(), axisX.scroll.visibleAmountProperty())
                 .layoutBy(axisY.scroll.valueProperty(), axisY.scroll.visibleAmountProperty())
                 .layoutBy(chart.candleType.observe())
-                .layoutBy(chart.ticker.observe().switchMap(ticker -> ticker.update.startWithNull().throttle(50, TimeUnit.MILLISECONDS)))
+                .layoutBy(chart.ticker.observe()
+                        .switchMap(ticker -> ticker.update.startWithNull().throttle(Chart.RefreshTime, TimeUnit.MILLISECONDS)))
                 .layoutWhile(chart.showRealtimeUpdate.observing());
 
         configIndicator();

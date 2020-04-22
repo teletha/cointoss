@@ -18,8 +18,8 @@ import javafx.collections.ObservableList;
 import org.controlsfx.glyphfont.FontAwesome;
 
 import cointoss.Market;
-import cointoss.ticker.Ticker;
 import cointoss.ticker.Span;
+import cointoss.ticker.Ticker;
 import cointoss.util.Chrono;
 import kiss.Variable;
 import stylist.Style;
