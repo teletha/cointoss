@@ -31,10 +31,10 @@ public final class Indicators {
     }
 
     public static NumIndicator waveTrend(Ticker ticker, int channelLength, int averageLength) {
-        NumIndicator ap = NumIndicator.build(ticker, Tick::typicalPrice);
-        NumIndicator esa = ap.ema(channelLength);
-        NumIndicator d = esa.nmap(ap, (a, b) -> a.minus(b).abs()).ema(channelLength);
-        NumIndicator ci = ap.nmap(esa, d, (a, b, c) -> {
+        NumIndicator price = NumIndicator.build(ticker, Tick::typicalPrice);
+        NumIndicator priceEMA = price.ema(channelLength);
+        NumIndicator emaOnDiffPriceAndPriceEMA = priceEMA.nmap(price, (pEMA, p) -> pEMA.minus(p).abs()).ema(channelLength);
+        NumIndicator ci = price.nmap(priceEMA, emaOnDiffPriceAndPriceEMA, (a, b, c) -> {
             if (c.isZero()) {
                 return a.minus(b);
             }
