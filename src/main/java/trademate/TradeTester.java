@@ -12,7 +12,6 @@ package trademate;
 import java.util.Locale;
 
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import cointoss.Market;
 import cointoss.util.Network;
@@ -56,14 +55,11 @@ public class TradeTester extends View {
     public static void main(String[] args) {
         I.load(Market.class);
 
-        // initialize logger for non-main thread
-        Logger log = LogManager.getLogger();
-        Thread.setDefaultUncaughtExceptionHandler((t, e) -> log.error(e.getMessage(), e));
-
         // activate application
         Viewtify.application()
+                .logging(LogManager.getLogger()::error)
                 .use(Theme.Dark)
-                .icon("icon/bot.png")
+                .icon("icon/tester.png")
                 .language(Lang.of(I.env("language", Locale.getDefault().getLanguage())))
                 .onTerminating(Network::terminate)
                 .activate(TradeTester.class);
