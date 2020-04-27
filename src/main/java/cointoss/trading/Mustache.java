@@ -9,18 +9,13 @@
  */
 package cointoss.trading;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import cointoss.Direction;
 import cointoss.Market;
-import cointoss.market.bitflyer.BitFlyer;
 import cointoss.ticker.Span;
 import cointoss.trade.FundManager;
 import cointoss.trade.Scenario;
 import cointoss.trade.Trader;
 import cointoss.trade.Trailing;
-import cointoss.verify.BackTest;
 
 /**
  * 
@@ -34,6 +29,8 @@ public class Mustache extends Trader {
     public int trailLosscut = 5000;
 
     public int trailProfitcut = 0;
+
+    public double profitRatio = 0.5f;
 
     /**
      * {@inheritDoc}
@@ -49,7 +46,7 @@ public class Mustache extends Trader {
             @Override
             protected void exit() {
                 exitAt(Trailing.with.losscut(trailLosscut).profit(trailProfitcut));
-                exitAt(v.openPrice);
+                exitAt(v.openPrice.plus(range * profitRatio));
             }
         });
 
@@ -62,15 +59,8 @@ public class Mustache extends Trader {
             @Override
             protected void exit() {
                 exitAt(Trailing.with.losscut(trailLosscut).profit(trailProfitcut));
-                exitAt(v.openPrice);
+                exitAt(v.openPrice.minus(range * profitRatio));
             }
         });
-    }
-
-    public static void main(String[] args) {
-        Logger log = LogManager.getLogger();
-        Thread.setDefaultUncaughtExceptionHandler((t, e) -> log.error(e.getMessage(), e));
-
-        BackTest.with.service(BitFlyer.FX_BTC_JPY).start(2020, 3, 2).end(2020, 3, 2).traders(new Mustache()).fast().detail(true).run();
     }
 }

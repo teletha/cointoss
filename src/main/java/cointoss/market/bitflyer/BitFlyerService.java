@@ -51,6 +51,7 @@ import kiss.Signaling;
 import marionette.browser.Browser;
 import okhttp3.MediaType;
 import okhttp3.Request;
+import okhttp3.Request.Builder;
 import okhttp3.RequestBody;
 import viewtify.Viewtify;
 
@@ -107,6 +108,9 @@ class BitFlyerService extends MarketService {
     /** The session key. */
     private final String sessionKey = "api_session_v2";
 
+    /** The session maintainer. */
+    private final SessionMaintainer sessionMaintainer = new SessionMaintainer();
+
     /** The latest realtime execution id. */
     private long latestId;
 
@@ -124,7 +128,7 @@ class BitFlyerService extends MarketService {
         super("BitFlyer", type, setting);
 
         this.forTest = forTest;
-        this.intervalOrderCheck = I.signal(0, 1, TimeUnit.SECONDS).map(v -> orders().toList()).share();
+        this.intervalOrderCheck = I.signal(0, 1, TimeUnit.SECONDS, scheduler()).map(v -> orders().toList()).share();
     }
 
     /**
@@ -135,7 +139,7 @@ class BitFlyerService extends MarketService {
         Signal<String> call;
         String id = "JRF" + Chrono.utcNow().format(format) + RandomStringUtils.randomNumeric(6);
 
-        if (forTest || maintainer.session() == null) {
+        if (forTest || sessionMaintainer.session() == null) {
             ChildOrderRequest request = new ChildOrderRequest();
             request.child_order_type = order.type == OrderType.Maker ? "LIMIT" : "MARKET";
             request.minute_to_expire = 60 * 24;
@@ -248,7 +252,7 @@ class BitFlyerService extends MarketService {
         cancel.order_id = order.relation(Internals.class).id;
         cancel.child_order_acceptance_id = order.id;
 
-        Signal<?> call = forTest || maintainer.session() == null || cancel.order_id == null
+        Signal<?> call = forTest || sessionMaintainer.session() == null || cancel.order_id == null
                 ? call("POST", "/v1/me/cancelchildorder", cancel, null, null)
                 : call("POST", "https://lightning.bitflyer.jp/api/trade/cancelorder", cancel, null, WebResponse.class);
 
@@ -622,12 +626,12 @@ class BitFlyerService extends MarketService {
                     .post(RequestBody.create(mime, body))
                     .build();
         } else {
-            request = new Request.Builder().url(path)
+            Builder builder = new Request.Builder().url(path)
                     .addHeader("Content-Type", "application/json")
-                    .addHeader("Cookie", sessionKey + "=" + maintainer.session)
-                    .addHeader("X-Requested-With", "XMLHttpRequest")
-                    .post(RequestBody.create(mime, body))
-                    .build();
+                    .addHeader("Cookie", sessionKey + "=" + sessionMaintainer.session)
+                    .addHeader("X-Requested-With", "XMLHttpRequest");
+            if (body != null && body.length() != 0) builder = builder.post(RequestBody.create(mime, body));
+            request = builder.build();
         }
         return network.rest(request, selector, type, Limit);
     }
@@ -658,27 +662,27 @@ class BitFlyerService extends MarketService {
                     .post(RequestBody.create(mime, body))
                     .build();
         } else {
-            request = new Request.Builder().url(path)
+            Builder builder = new Request.Builder().url(path)
                     .addHeader("Content-Type", "application/json")
-                    .addHeader("Cookie", sessionKey + "=" + maintainer.session)
-                    .addHeader("X-Requested-With", "XMLHttpRequest")
-                    .post(RequestBody.create(mime, body))
-                    .build();
+                    .addHeader("Cookie", sessionKey + "=" + sessionMaintainer.session)
+                    .addHeader("X-Requested-With", "XMLHttpRequest");
+            if (body != null && body.length() != 0) builder = builder.post(RequestBody.create(mime, body));
+            request = builder.build();
         }
         return network.rest(request, Limit);
     }
 
-    protected SessionMaintainer maintainer = new SessionMaintainer();
-
     /**
      * @version 2018/02/15 9:27:14
      */
-    private class SessionMaintainer implements Disposable {
+    private class SessionMaintainer {
 
         /** The session id. */
         private String session;
 
         private boolean started = false;
+
+        private Disposable ping;
 
         /**
          * Retrieve the session id.
@@ -719,21 +723,29 @@ class BitFlyerService extends MarketService {
                             session = browser.cookie(sessionKey);
                             browser.reload();
                             browser.dispose();
+                            maintain();
                         });
                     });
                 } else {
                     session = browser.cookie(sessionKey);
                     browser.reload();
                     browser.dispose();
+                    maintain();
                 }
             }
         }
 
         /**
-         * {@inheritDoc}
+         * Maintain the session.
          */
-        @Override
-        public void vandalize() {
+        private synchronized void maintain() {
+            if (ping == null) {
+                I.signal(10, 10, TimeUnit.MINUTES);
+                disposer.add(scheduler().scheduleAtFixedRate(() -> {
+                    call("", "https://lightning.bitflyer.com/api/trade/getMyBoardOrders", "{\"product_code\":\"" + marketName + "\",\"account_id\":\"" + account.accountId + "\",\"lang\":\"ja\"}")
+                            .to(I.NoOP);
+                }, 1, 1, TimeUnit.MINUTES));
+            }
         }
     }
 
@@ -903,6 +915,23 @@ class BitFlyerService extends MarketService {
         @Override
         public String toString() {
             return "WebResponse [status=" + status + ", error_message=" + error_message + ", data=" + data + "]";
+        }
+    }
+
+    /**
+     * 
+     */
+    private static class CircuitBreakerInfo {
+        public Num upper_limit;
+
+        public Num lower_limit;
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String toString() {
+            return "CircuitBreakerInfo [upper_limit=" + upper_limit + ", lower_limit=" + lower_limit + "]";
         }
     }
 
