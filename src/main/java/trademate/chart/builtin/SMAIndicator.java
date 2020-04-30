@@ -79,6 +79,14 @@ public class SMAIndicator extends PlotScript implements StyleDSL {
     }
 
     private void line(Ticker ticker, Variable<Integer> days, int base, Style style) {
-        line(NumIndicator.build(ticker, Tick::closePrice).sma(days).scale(base).name(ticker.span.toString() + days), style);
+        line(NumIndicator.build(ticker, Tick::closePrice).sma(days).scale(base).name(ticker.span.toString()), style);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected String name() {
+        return "SMA(" + shortDays + " " + longDays + ")";
     }
 }

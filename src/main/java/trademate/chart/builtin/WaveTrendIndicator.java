@@ -36,10 +36,6 @@ public class WaveTrendIndicator extends PlotScript implements StyleDSL {
         stroke.color(TradeMateStyle.BUY).width(0.3, px);
     };
 
-    public Style M1 = () -> {
-        stroke.color(Color.rgb(107, 191, 71, 0.5));
-    };
-
     public Style M10 = () -> {
         stroke.color(Color.rgb(17, 132, 66, 0.5));
     };
@@ -65,7 +61,6 @@ public class WaveTrendIndicator extends PlotScript implements StyleDSL {
             line(overSoldLevel1, Main);
 
             line(indicator, Main);
-            line(Indicators.waveTrend(market.tickers.on(Span.Minute1), channelLength.v, averageLength.v), M1);
             line(Indicators.waveTrend(market.tickers.on(Span.Minute10), channelLength.v, averageLength.v), M10);
             line(Indicators.waveTrend(market.tickers.on(Span.Minute30), channelLength.v, averageLength.v), M30);
             line(Indicators.waveTrend(market.tickers.on(Span.Hour1), channelLength.v, averageLength.v), H1);
