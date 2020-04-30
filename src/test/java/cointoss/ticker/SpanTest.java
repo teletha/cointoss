@@ -1,67 +1,74 @@
 /*
- * Copyright (C) 2019 CoinToss Development Team
+ * Copyright (C) 2019 Nameless Production Committee
  *
  * Licensed under the MIT License (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *          https://opensource.org/licenses/MIT
+ *          http://opensource.org/licenses/mit-license.php
  */
 package cointoss.ticker;
 
+import java.time.Duration;
 import java.time.ZonedDateTime;
 
 import org.junit.jupiter.api.Test;
 
 import cointoss.util.Chrono;
 
-class TimeSpanTest {
+class SpanTest {
+
+    @Test
+    void duration() {
+        assert Span.Minute1.duration.equals(Duration.ofMinutes(1));
+        assert Span.Second5.duration.equals(Duration.ofSeconds(5));
+        assert Span.Hour1.duration.equals(Duration.ofHours(1));
+    }
 
     @Test
     void calculateStartTime() {
-        ZonedDateTime time = Span.Minute3.calculateStartTime(Chrono.utcNow().withMinute(0));
+        ZonedDateTime time = Span.Minute5.calculateStartTime(Chrono.utcNow().withMinute(0));
         assert time.getSecond() == 0;
         assert time.getNano() == 0;
         assert time.getMinute() == 0;
 
-        time = Span.Minute3.calculateStartTime(Chrono.utcNow().withMinute(1));
+        time = Span.Minute5.calculateStartTime(Chrono.utcNow().withMinute(1));
         assert time.getSecond() == 0;
         assert time.getNano() == 0;
         assert time.getMinute() == 0;
 
-        time = Span.Minute3.calculateStartTime(Chrono.utcNow().withMinute(2));
+        time = Span.Minute5.calculateStartTime(Chrono.utcNow().withMinute(2));
         assert time.getSecond() == 0;
         assert time.getNano() == 0;
         assert time.getMinute() == 0;
 
-        time = Span.Minute3.calculateStartTime(Chrono.utcNow().withMinute(3));
+        time = Span.Minute5.calculateStartTime(Chrono.utcNow().withMinute(3));
         assert time.getSecond() == 0;
         assert time.getNano() == 0;
-        assert time.getMinute() == 3;
+        assert time.getMinute() == 0;
 
-        time = Span.Minute3.calculateStartTime(Chrono.utcNow().withMinute(4));
+        time = Span.Minute5.calculateStartTime(Chrono.utcNow().withMinute(5));
         assert time.getSecond() == 0;
         assert time.getNano() == 0;
-        assert time.getMinute() == 3;
+        assert time.getMinute() == 5;
 
-        time = Span.Minute3.calculateStartTime(Chrono.utcNow().withMinute(5));
+        time = Span.Minute5.calculateStartTime(Chrono.utcNow().withMinute(6));
         assert time.getSecond() == 0;
         assert time.getNano() == 0;
-        assert time.getMinute() == 3;
+        assert time.getMinute() == 5;
     }
 
     @Test
     void calculateNextStartTime() {
-        ZonedDateTime time = Span.Minute3.calculateNextStartTime(Chrono.utcNow().withMinute(0));
+        ZonedDateTime time = Span.Minute5.calculateNextStartTime(Chrono.utcNow().withMinute(0));
         assert time.getSecond() == 0;
         assert time.getNano() == 0;
-        assert time.getMinute() == 3;
+        assert time.getMinute() == 5;
     }
 
     @Test
     void ticksPerDay() {
         assert Span.Day1.ticksPerDay() == 1;
-        assert Span.Day2.ticksPerDay() == 1;
         assert Span.Day3.ticksPerDay() == 1;
         assert Span.Day7.ticksPerDay() == 1;
         assert Span.Hour12.ticksPerDay() == 2;

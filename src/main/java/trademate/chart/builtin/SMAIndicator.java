@@ -27,7 +27,7 @@ public class SMAIndicator extends PlotScript implements StyleDSL {
 
     public final Variable<Integer> longDays = Variable.of(75);
 
-    private double alpha = 0.5;
+    private double alpha = 0.7;
 
     public Style shortSMA = () -> {
         stroke.color(Color.rgb(181, 212, 53, alpha));
@@ -35,6 +35,14 @@ public class SMAIndicator extends PlotScript implements StyleDSL {
 
     public Style longSMA = () -> {
         stroke.color(Color.rgb(54, 78, 161, alpha));
+    };
+
+    public Style SMA5M = () -> {
+        stroke.color(Color.rgb(207, 89, 71, alpha));
+    };
+
+    public Style SMA15M = () -> {
+        stroke.color(Color.rgb(101, 89, 71, alpha));
     };
 
     public Style SMA30M = () -> {
@@ -45,8 +53,12 @@ public class SMAIndicator extends PlotScript implements StyleDSL {
         stroke.color(Color.rgb(17, 132, 66, alpha));
     };
 
+    public Style SMA2H = () -> {
+        stroke.color(Color.rgb(17, 132, 206, alpha));
+    };
+
     public Style SMA4H = () -> {
-        stroke.color(Color.rgb(57, 130, 195, alpha));
+        stroke.color(Color.rgb(57, 80, 195, alpha));
     };
 
     /**
@@ -57,13 +69,16 @@ public class SMAIndicator extends PlotScript implements StyleDSL {
         int base = market.service.setting.baseCurrencyScaleSize;
 
         line(ticker, shortDays, base, shortSMA);
+        line(market.tickers.on(Minute5), shortDays, base, SMA5M);
+        line(market.tickers.on(Minute15), shortDays, base, SMA15M);
         line(market.tickers.on(Minute30), shortDays, base, SMA30M);
         line(market.tickers.on(Hour1), shortDays, base, SMA1H);
+        line(market.tickers.on(Hour2), shortDays, base, SMA2H);
         line(market.tickers.on(Hour4), shortDays, base, SMA4H);
         line(ticker, longDays, base, longSMA);
     }
 
     private void line(Ticker ticker, Variable<Integer> days, int base, Style style) {
-        line(NumIndicator.build(ticker, Tick::closePrice).sma(longDays).scale(base).name(ticker.span.toString() + days), style);
+        line(NumIndicator.build(ticker, Tick::closePrice).sma(days).scale(base).name(ticker.span.toString() + days), style);
     }
 }

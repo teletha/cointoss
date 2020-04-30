@@ -32,10 +32,7 @@ public enum Span {
     Second30(30, SECOND_OF_MINUTE, 1),
 
     /** SPAN */
-    Minute1(1, MINUTE_OF_HOUR, 1, 2),
-
-    /** SPAN */
-    Minute3(3, MINUTE_OF_HOUR),
+    Minute1(1, MINUTE_OF_HOUR, 1),
 
     /** SPAN */
     Minute5(5, MINUTE_OF_HOUR, 1, 2),
@@ -65,10 +62,7 @@ public enum Span {
     Hour12(12, HOUR_OF_DAY, 1),
 
     /** SPAN */
-    Day1(1, EPOCH_DAY, 1, 2, 3),
-
-    /** SPAN */
-    Day2(2, EPOCH_DAY),
+    Day1(1, EPOCH_DAY, 1, 2),
 
     /** SPAN */
     Day3(3, EPOCH_DAY),
