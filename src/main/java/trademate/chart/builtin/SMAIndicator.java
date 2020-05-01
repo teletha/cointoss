@@ -61,6 +61,10 @@ public class SMAIndicator extends PlotScript implements StyleDSL {
         stroke.color(Color.rgb(57, 80, 195, alpha));
     };
 
+    public Style SMA6H = () -> {
+        stroke.color(Color.rgb(57, 80, 105, alpha));
+    };
+
     /**
      * {@inheritDoc}
      */
@@ -75,6 +79,7 @@ public class SMAIndicator extends PlotScript implements StyleDSL {
         line(market.tickers.on(Hour1), shortDays, base, SMA1H);
         line(market.tickers.on(Hour2), shortDays, base, SMA2H);
         line(market.tickers.on(Hour4), shortDays, base, SMA4H);
+        line(market.tickers.on(Hour6), shortDays, base, SMA6H);
         line(ticker, longDays, base, longSMA);
     }
 
