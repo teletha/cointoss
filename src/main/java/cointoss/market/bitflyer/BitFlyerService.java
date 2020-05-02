@@ -48,7 +48,7 @@ import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
 import kiss.Signaling;
-import marionette.browser.Browser;
+import necromancy.Necromancy;
 import okhttp3.MediaType;
 import okhttp3.Request;
 import okhttp3.Request.Builder;
@@ -703,9 +703,7 @@ class BitFlyerService extends MarketService {
             if (started == false) {
                 started = true;
 
-                Browser browser = Browser.build(pref -> {
-                    pref.profile(".log/bitflyer/chrome");
-                });
+                Necromancy browser = Necromancy.with.profile(".log/bitflyer/chrome");
 
                 browser.load("https://lightning.bitflyer.jp") //
                         .input("#LoginId", account.loginId)
