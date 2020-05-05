@@ -7,24 +7,16 @@
  *
  *          https://opensource.org/licenses/MIT
  */
-package cointoss.market.bybit;
+package cointoss.market.ftx;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.zip.GZIPInputStream;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.univocity.parsers.csv.CsvParser;
-import com.univocity.parsers.csv.CsvParserSettings;
 
 import cointoss.Direction;
 import cointoss.MarketService;
@@ -41,13 +33,13 @@ import kiss.I;
 import kiss.Signal;
 import okhttp3.Request;
 
-class BybitService extends MarketService {
+class FTXService extends MarketService {
 
     /** The right padding for id. */
     private static final long PaddingForID = 100000;
 
     /** The realtime data format */
-    private static final DateTimeFormatter RealTimeFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX");
+    private static final DateTimeFormatter TimeFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSSX");
 
     /** The bitflyer API limit. */
     private static final APILimiter Limit = APILimiter.with.limit(30).refresh(Duration.ofMinutes(1));
@@ -62,7 +54,7 @@ class BybitService extends MarketService {
      * @param marketName
      * @param setting
      */
-    BybitService(String marketName, MarketSetting setting) {
+    FTXService(String marketName, MarketSetting setting) {
         super("BitMEX", marketName, setting);
 
         this.instrumentTickSize = marketName.equals("XBTUSD") ? Num.of("0.01") : setting.baseCurrencyMinimumBidPrice;
@@ -109,18 +101,6 @@ class BybitService extends MarketService {
                 });
     }
 
-    private ZonedDateTime encodeId(long id) {
-        return Chrono.utcByMills(id / PaddingForID);
-    }
-
-    private String formatEncodedId(long id) {
-        return RealTimeFormat.format(encodeId(id));
-    }
-
-    private long decodeId(ZonedDateTime time) {
-        return time.toInstant().toEpochMilli() * PaddingForID;
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -129,7 +109,10 @@ class BybitService extends MarketService {
         AtomicLong increment = new AtomicLong();
         Object[] previous = new Object[2];
 
-        return connectSharedWebSocket(Topic.trade).flatIterable(e -> e).map(e -> convert(e, increment, previous));
+        return connectWebSocket(Topic.trades).map(json -> {
+            System.out.println(json);
+            return null;
+        });
     }
 
     /**
@@ -137,7 +120,7 @@ class BybitService extends MarketService {
      */
     @Override
     public Signal<Execution> executionLatest() {
-        return call("GET", "trade?symbol=" + marketName + "&count=1&reverse=true").flatIterable(JsonElement::getAsJsonArray)
+        return call("GET", "markets/" + marketName + "/trades?limit=1").flatIterable(e -> e.getAsJsonObject().getAsJsonArray("result"))
                 .map(json -> convert(json, new AtomicLong(), new Object[2]));
     }
 
@@ -251,31 +234,10 @@ class BybitService extends MarketService {
         Direction direction = Direction.parse(e.get("side").getAsString());
         Num size = Num.of(e.get("size").getAsString());
         Num price = Num.of(e.get("price").getAsString());
-        ZonedDateTime date = ZonedDateTime.parse(e.get("timestamp").getAsString(), RealTimeFormat).withZoneSameLocal(Chrono.UTC);
-        String tradeId = e.get("trade_id").getAsString();
-        long id;
-        int consecutive;
+        ZonedDateTime date = ZonedDateTime.parse(e.get("time").getAsString(), TimeFormat).withZoneSameLocal(Chrono.UTC);
+        long id = e.get("id").getAsLong();
 
-        if (date.equals(previous[1])) {
-            id = decodeId(date) + increment.incrementAndGet();
-
-            if (direction != previous[0]) {
-                consecutive = Execution.ConsecutiveDifference;
-            } else if (direction == Direction.BUY) {
-                consecutive = Execution.ConsecutiveSameBuyer;
-            } else {
-                consecutive = Execution.ConsecutiveSameSeller;
-            }
-        } else {
-            id = decodeId(date);
-            increment.set(0);
-            consecutive = Execution.ConsecutiveDifference;
-        }
-
-        previous[0] = direction;
-        previous[1] = date;
-
-        return Execution.with.direction(direction, size).id(id).price(price).date(date).consecutive(consecutive).buyer(tradeId);
+        return Execution.with.direction(direction, size).id(id).price(price).date(date).consecutive(Execution.ConsecutiveDifference);
     }
 
     /**
@@ -286,9 +248,9 @@ class BybitService extends MarketService {
      * @return
      */
     private Signal<JsonElement> call(String method, String path) {
-        Request request = new Request.Builder().url("https://www.bitmex.com/api/v1/" + path).build();
+        Request request = new Request.Builder().url("https://ftx.com/api/" + path).build();
 
-        return network.rest(request, Limit).retryWhen(retryPolicy(10, "BitMEX RESTCall"));
+        return network.rest(request, Limit).retryWhen(retryPolicy(10, "FTX RESTCall"));
     }
 
     /**
@@ -296,27 +258,19 @@ class BybitService extends MarketService {
      * 
      * @return
      */
-    private synchronized Signal<JsonArray> connectSharedWebSocket(Topic topic) {
-        if (websocket == null) {
-            WebSocketCommand command = new WebSocketCommand();
-            command.op = "subscribe";
-            for (Topic type : Topic.values()) {
-                command.args.add(type + "." + marketName);
-            }
+    private synchronized Signal<JsonElement> connectWebSocket(Topic topic) {
+        WebSocketCommand command = new WebSocketCommand();
+        command.op = "subscribe";
+        command.channel = topic.name();
+        command.market = marketName;
 
-            websocket = network.websocket("wss://stream.bybit.com/realtime", command);
-        }
-
-        return websocket.share().flatMap(e -> {
+        return network.websocket("wss://ftx.com/ws/", command).flatMap(e -> {
             JsonObject root = e.getAsJsonObject();
-            JsonElement tableProperty = root.get("topic");
-            if (tableProperty == null || !tableProperty.getAsString().startsWith(topic.name())) {
-                return I.signal();
+            if (root.get("type").getAsString().equals("update")) {
+                return I.signal(root.getAsJsonArray("data"));
             } else {
-                return I.signal(root.get("data")).map(JsonElement::getAsJsonArray);
+                return I.signal();
             }
-        }).effectOnError(e -> {
-            e.printStackTrace();
         });
     }
 
@@ -324,7 +278,7 @@ class BybitService extends MarketService {
      * Subscription topics for websocket.
      */
     private enum Topic {
-        trade, orderBookL2_25;
+        trades;
     }
 
     /**
@@ -335,44 +289,9 @@ class BybitService extends MarketService {
 
         public String op;
 
-        public List<String> args = new ArrayList();
-    }
+        public String channel;
 
-    private void downloadArchivedData(ZonedDateTime date) {
-        try {
-            String uri = "https://public.bybit.com/trading/" + marketName + "/" + marketName + Chrono.formatAsDate(date) + ".csv.gz";
-
-            CsvParserSettings setting = new CsvParserSettings();
-            setting.setHeaderExtractionEnabled(true);
-            setting.getFormat().setLineSeparator("\n");
-
-            Object[] previous = new Object[2];
-
-            I.signal(new CsvParser(setting).iterate(new GZIPInputStream(new URL(uri).openStream()))).reverse().to(e -> {
-                Direction side = Direction.parse(e[2]);
-                Num size = Num.of(e[9]);
-                Num price = Num.of(e[4]);
-
-                String secPart = e[0].substring(0, 10);
-                String millPart = switch (e[0].length()) {
-                case 10 -> "000";
-                case 12 -> e[0].substring(11, 12).concat("00");
-                case 13 -> e[0].substring(11, 13).concat("0");
-                default -> e[0].substring(11, 14);
-                };
-                ZonedDateTime time = Chrono.utcByMills(Long.parseLong(secPart.concat(millPart)));
-
-                Execution execution = Execution.with.direction(side, size)
-                        .price(price)
-                        .date(time)
-                        .consecutive(estimateConsecutive(side, time, previous));
-                System.out.println(execution);
-            });
-        } catch (MalformedURLException e) {
-            throw I.quiet(e);
-        } catch (IOException e) {
-            throw I.quiet(e);
-        }
+        public String market;
     }
 
     private int estimateConsecutive(Direction direction, ZonedDateTime date, Object[] previous) {
@@ -396,7 +315,9 @@ class BybitService extends MarketService {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        ((BybitService) Bybit.BTC_USD).downloadArchivedData(Chrono.utc(2019, 10, 1));
+        FTX.BTC_USD.executionLatest().to(e -> {
+            System.out.println(e);
+        });
     }
 
 }

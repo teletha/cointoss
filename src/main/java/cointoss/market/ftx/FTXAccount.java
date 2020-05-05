@@ -7,12 +7,12 @@
  *
  *          https://opensource.org/licenses/MIT
  */
-package cointoss.market.bybit;
+package cointoss.market.ftx;
 
 import cointoss.market.MarketAccount;
 import kiss.Variable;
 
-public class BybitAccount extends MarketAccount<BybitAccount> {
+public class FTXAccount extends MarketAccount<FTXAccount> {
 
     /** The API key. */
     public final Variable<String> apiKey = Variable.empty();
@@ -23,7 +23,7 @@ public class BybitAccount extends MarketAccount<BybitAccount> {
     /**
      * Hide constructor.
      */
-    private BybitAccount() {
+    private FTXAccount() {
         restore().auto();
     }
 

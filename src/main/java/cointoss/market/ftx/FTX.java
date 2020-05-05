@@ -7,7 +7,7 @@
  *
  *          https://opensource.org/licenses/MIT
  */
-package cointoss.market.bybit;
+package cointoss.market.ftx;
 
 import cointoss.MarketService;
 import cointoss.MarketSetting;
@@ -16,10 +16,10 @@ import cointoss.market.MarketServiceProvider;
 import cointoss.util.Num;
 import kiss.I;
 
-public final class Bybit extends MarketServiceProvider {
+public final class FTX extends MarketServiceProvider {
 
     /** Market */
-    public static final MarketService BTC_USD = new BybitService("BTCUSD", MarketSetting.with.baseCurrencyMinimumBidPrice("0.5")
+    public static final MarketService BTC_USD = new FTXService("BTC-PERP", MarketSetting.with.baseCurrencyMinimumBidPrice("0.5")
             .targetCurrencyMinimumBidSize("0.00001")
             .orderBookGroupRanges(Num.of(1, 5, 10, 25, 50, 100))
             .baseCurrencyScaleSize(1)
@@ -31,6 +31,6 @@ public final class Bybit extends MarketServiceProvider {
      */
     @Override
     public MarketAccount account() {
-        return I.make(BybitAccount.class);
+        return I.make(FTXAccount.class);
     }
 }
