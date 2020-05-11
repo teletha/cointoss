@@ -65,7 +65,7 @@ public class Network {
                     .readTimeout(TIMEOUT)
                     .writeTimeout(TIMEOUT)
                     .callTimeout(TIMEOUT)
-                    .pingInterval(Duration.ofMinutes(5))
+                    .pingInterval(Duration.ofMinutes(3))
                     .proxy(proxy)
                     .build();
 
