@@ -238,9 +238,9 @@ public class OrderBuilder extends View {
             ui.disableBriefly();
         });
 
-        orderCancel.text(en("Cancel")).when(User.MouseClick).to(() -> orders.cancelNowAll());
-        orderStop.text(en("Stop")).when(User.MouseClick).to(() -> view.market.stop().to(I.NoOP));
-        orderReverse.text(en("Reverse")).when(User.MouseClick).to(() -> view.market.reverse().to(I.NoOP));
+        orderCancel.text(en("Cancel")).when(User.MouseClick).on(Viewtify.WorkerThread).to(() -> orders.cancelNowAll());
+        orderStop.text(en("Stop")).when(User.MouseClick).on(Viewtify.WorkerThread).to(() -> view.market.stop().to(I.NoOP));
+        orderReverse.text(en("Reverse")).when(User.MouseClick).on(Viewtify.WorkerThread).to(() -> view.market.reverse().to(I.NoOP));
 
         if (view.market.service == BitFlyer.FX_BTC_JPY) {
             view.market.service.add(SFD.now().on(Viewtify.UIThread).to(price -> {
