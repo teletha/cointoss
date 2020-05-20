@@ -14,7 +14,6 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.concurrent.atomic.AtomicLong;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
@@ -23,7 +22,6 @@ import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.execution.Execution;
 import cointoss.order.Order;
-import cointoss.order.OrderBookPage;
 import cointoss.order.OrderBookPageChanges;
 import cointoss.order.OrderState;
 import cointoss.util.APILimiter;
@@ -89,16 +87,9 @@ class FTXService extends MarketService {
      */
     @Override
     public Signal<Execution> executions(long start, long end) {
-        start++;
-        long startingPoint = start % PaddingForID;
-        AtomicLong increment = new AtomicLong(startingPoint - 1);
-        Object[] previous = new Object[] {null, encodeId(start)};
-
-        return call("GET", "trade?symbol=" + marketName + "&count=1000" + "&startTime=" + formatEncodedId(start) + "&start=" + startingPoint)
-                .flatIterable(JsonElement::getAsJsonArray)
-                .map(json -> {
-                    return convert(json, increment, previous);
-                });
+        // If this exception will be thrown, it is bug of this program. So we must rethrow the
+        // wrapped error in here.
+        throw new Error();
     }
 
     /**
@@ -129,7 +120,9 @@ class FTXService extends MarketService {
      */
     @Override
     public long estimateInitialExecutionId() {
-        return decodeId(Chrono.utc(2020, 1, 1).minusMinutes(3));
+        // If this exception will be thrown, it is bug of this program. So we must rethrow the
+        // wrapped error in here.
+        throw new Error();
     }
 
     /**
@@ -161,7 +154,9 @@ class FTXService extends MarketService {
      */
     @Override
     public Signal<OrderBookPageChanges> orderBook() {
-        return call("GET", "orderBook/L2?depth=1200&symbol=" + marketName).map(e -> convertOrderBook(e.getAsJsonArray()));
+        // If this exception will be thrown, it is bug of this program. So we must rethrow the
+        // wrapped error in here.
+        throw new Error();
     }
 
     /**
@@ -169,31 +164,9 @@ class FTXService extends MarketService {
      */
     @Override
     protected Signal<OrderBookPageChanges> connectOrderBookRealtimely() {
-        return connectSharedWebSocket(Topic.orderBookL2).map(this::convertOrderBook);
-    }
-
-    /**
-     * Convert json to {@link OrderBookPageChanges}.
-     * 
-     * @param array
-     * @return
-     */
-    private OrderBookPageChanges convertOrderBook(JsonArray array) {
-        OrderBookPageChanges change = new OrderBookPageChanges();
-        for (JsonElement e : array) {
-            JsonObject o = e.getAsJsonObject();
-            long id = o.get("id").getAsLong();
-            Num price = instrumentTickSize.multiply((100000000L * marketId) - id);
-            JsonElement sizeElement = o.get("size");
-            double size = sizeElement == null ? 0 : sizeElement.getAsDouble() / price.doubleValue();
-
-            if (o.get("side").getAsString().charAt(0) == 'B') {
-                change.bids.add(new OrderBookPage(price, size));
-            } else {
-                change.asks.add(new OrderBookPage(price, size));
-            }
-        }
-        return change;
+        // If this exception will be thrown, it is bug of this program. So we must rethrow the
+        // wrapped error in here.
+        throw new Error();
     }
 
     /**
