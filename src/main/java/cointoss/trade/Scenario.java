@@ -29,6 +29,7 @@ import cointoss.order.Order;
 import cointoss.order.OrderStrategy.Makable;
 import cointoss.order.OrderStrategy.Orderable;
 import cointoss.order.OrderStrategy.Takable;
+import cointoss.ticker.Span;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
 import kiss.Disposable;
@@ -309,6 +310,17 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
      * Declare exit order. Loss cutting is the only element in the trade that investors can control.
      */
     protected abstract void exit();
+
+    /**
+     * Declare exit order by price. Loss cutting is the only element in the trade that investors can
+     * control.
+     * 
+     * @param time
+     * @param unit
+     */
+    protected final void exitAfter(Span span) {
+        exitAfter(span.seconds, TimeUnit.SECONDS);
+    }
 
     /**
      * Declare exit order by price. Loss cutting is the only element in the trade that investors can
