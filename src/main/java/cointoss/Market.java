@@ -33,9 +33,9 @@ import cointoss.order.OrderStrategy.Cancellable;
 import cointoss.order.OrderStrategy.Makable;
 import cointoss.order.OrderStrategy.Orderable;
 import cointoss.order.OrderStrategy.Takable;
+import cointoss.ticker.Span;
 import cointoss.ticker.Tick;
 import cointoss.ticker.TickerManager;
-import cointoss.ticker.Span;
 import cointoss.trade.Trader;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
@@ -82,7 +82,7 @@ public class Market implements Disposable {
     public final Signal<Execution> timelineByTaker = timeline.map(e -> {
         Execution previous = switcher.getAndSet(e);
 
-        if (e.consecutive == Execution.ConsecutiveSameBuyer || e.consecutive == Execution.ConsecutiveSameSeller) {
+        if (previous.direction == e.direction && (e.consecutive == Execution.ConsecutiveSameBuyer || e.consecutive == Execution.ConsecutiveSameSeller)) {
             // same taker
             e.assignAccumulative(v -> previous.accumulative + v);
             return null;
