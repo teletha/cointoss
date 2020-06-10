@@ -11,6 +11,8 @@ package trademate.chart;
 
 import java.util.concurrent.TimeUnit;
 
+import javafx.beans.property.LongProperty;
+import javafx.beans.property.SimpleLongProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Side;
 import javafx.scene.layout.Region;
@@ -31,6 +33,12 @@ public class Chart extends Region {
     private static long M = 60;
 
     private static long D = M * 60 * 24;
+
+    /** The minimum number of ticks. */
+    public final LongProperty minimumTickNumber = new SimpleLongProperty(200);
+
+    /** The maximum number of ticks. */
+    public final LongProperty maximumTickNumber = new SimpleLongProperty(2000);
 
     /** The x-axis UI. */
     public final Axis axisX = new Axis(1, Side.BOTTOM)
@@ -116,10 +124,11 @@ public class Chart extends Region {
      */
     private void setAxisXRange() {
         if (chart.ticker.v.ticks.isNotEmpty()) {
+            long seconds = chart.ticker.v.span.seconds;
             axisX.logicalMinValue.set(chart.ticker.v.ticks.first().startSeconds);
             axisX.logicalMaxValue.set(chart.ticker.v.ticks.last().startSeconds + 1d);
-            axisX.visibleMinRange.set(200d * chart.ticker.v.span.seconds);
-            axisX.visibleMaxRange.set(3000d * chart.ticker.v.span.seconds);
+            axisX.visibleMinRange.set(minimumTickNumber.doubleValue() * seconds);
+            axisX.visibleMaxRange.set(maximumTickNumber.doubleValue() * seconds);
             axisX.zoom();
         }
     }
@@ -153,12 +162,18 @@ public class Chart extends Region {
             Tick startTick = ticker.ticks.getByTime(start);
             Tick endTick = ticker.ticks.getByTime(end);
 
-            if (startTick != null && endTick != null) {
-                ticker.ticks.each(start, end, tick -> {
-                    max.set(Num.max(max.v, tick.highPrice()));
-                    min.set(Num.min(min.v, tick.lowPrice()));
-                });
+            if (endTick == null) {
+                endTick = ticker.ticks.last();
             }
+
+            if (startTick == null) {
+                startTick = endTick;
+            }
+
+            ticker.ticks.each(start, end, tick -> {
+                max.set(Num.max(max.v, tick.highPrice()));
+                min.set(Num.min(min.v, tick.lowPrice()));
+            });
         }
 
         Num margin = max.v.minus(min).multiply(Num.of(0.5));

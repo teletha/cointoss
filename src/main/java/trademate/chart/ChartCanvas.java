@@ -599,8 +599,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
             chart.ticker.v.ticks.each(start, end, tick -> {
                 double x = axisX.getPositionForValue(tick.startSeconds);
-                double open = axisY.getPositionForValue(tick.openPrice.doubleValue());
-                double close = axisY.getPositionForValue(tick.closePrice().doubleValue());
                 double high = axisY.getPositionForValue(tick.highPrice().doubleValue());
                 double low = axisY.getPositionForValue(tick.lowPrice().doubleValue());
 
@@ -608,6 +606,8 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 gc.setLineWidth(1);
                 gc.strokeLine(x, high, x, low);
                 if (needDrawingOpenAndClose) {
+                    double open = axisY.getPositionForValue(tick.openPrice.doubleValue());
+                    double close = axisY.getPositionForValue(tick.closePrice().doubleValue());
                     gc.setLineWidth(BarWidth);
                     gc.strokeLine(x, open, x, close);
                 }

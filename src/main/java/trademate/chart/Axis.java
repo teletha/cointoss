@@ -229,7 +229,7 @@ public class Axis extends Region {
      */
     public double getPositionForValue(double value) {
         double position = uiRatio * (value - computeVisibleMinValue());
-        return (isHorizontal() ? position : getHeight() - position) - paddingForward.get();
+        return (isHorizontal() ? position : getHeight() - position) - computePadding();
     }
 
     /**
@@ -239,12 +239,21 @@ public class Axis extends Region {
      * @return
      */
     public final double getValueForPosition(double position) {
-        position += paddingForward.get();
+        position += computePadding();
 
         if (isVertical()) {
             position = getHeight() - position;
         }
         return position / uiRatio + computeVisibleMinValue();
+    }
+
+    /**
+     * Compute the forward padding if needed.
+     * 
+     * @return
+     */
+    private double computePadding() {
+        return 0;
     }
 
     /**
