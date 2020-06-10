@@ -115,8 +115,6 @@ public class ChartView extends View {
      */
     @Override
     protected void initialize() {
-        chart.axisX.paddingForward.set(40);
-
         span.initialize(Span.values()).sort(Comparator.reverseOrder());
         span.observing() //
                 .skipNull()

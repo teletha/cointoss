@@ -574,7 +574,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         layoutCandle.layout(() -> {
             // estimate visible range
             long start = (long) axisX.computeVisibleMinValue();
-            long end = (long) axisX.computeVisibleMaxValue() - chart.ticker.v.span.seconds;
+            long end = chart.ticker.map(v -> v.ticks.last()).map(t -> t.startSeconds).or(0L) - chart.ticker.v.span.seconds;
 
             // Estimate capacity, but a little larger as insurance (+2) to avoid re-copying the
             // array of capacity increase.
