@@ -40,9 +40,6 @@ public class Chart extends Region {
     /** The maximum number of ticks. */
     public final LongProperty maximumTickNumber = new SimpleLongProperty(2000);
 
-    /** The padding number of ticks. */
-    public final LongProperty paddingTickNumber = new SimpleLongProperty(30);
-
     /** The x-axis UI. */
     public final Axis axisX = new Axis(1, Side.BOTTOM)
             .units(M, 5 * M, 10 * M, 30 * M, 60 * M, 2 * 60 * M, 4 * 60 * M, 6 * 60 * M, 12 * 60 * M, D, 2 * D, 3 * D, 7 * D, 15 * D, 30 * D);
@@ -129,7 +126,7 @@ public class Chart extends Region {
         if (chart.ticker.v.ticks.isNotEmpty()) {
             long seconds = chart.ticker.v.span.seconds;
             axisX.logicalMinValue.set(chart.ticker.v.ticks.first().startSeconds);
-            axisX.logicalMaxValue.set(chart.ticker.v.ticks.last().startSeconds + paddingTickNumber.doubleValue() * seconds);
+            axisX.logicalMaxValue.set(chart.ticker.v.ticks.last().startSeconds);
             axisX.visibleMinRange.set(minimumTickNumber.doubleValue() * seconds);
             axisX.visibleMaxRange.set(maximumTickNumber.doubleValue() * seconds);
             axisX.zoom();

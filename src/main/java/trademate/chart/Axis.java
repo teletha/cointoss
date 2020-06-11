@@ -76,6 +76,9 @@ public class Axis extends Region {
     /** The visible minimum range. */
     public final DoubleProperty visibleMinRange = new SimpleDoubleProperty(this, "visibleMinRange", 0);
 
+    /** The visible padding size. */
+    public final DoubleProperty padding = new SimpleDoubleProperty(this, "padding", 50);
+
     /** The tick unit. */
     public final ObjectProperty<double[]> units = new SimpleObjectProperty(DefaultTickUnit);
 
@@ -226,7 +229,7 @@ public class Axis extends Region {
      */
     public double getPositionForValue(double value) {
         double position = uiRatio * (value - computeVisibleMinValue());
-        return isHorizontal() ? position : getHeight() - position;
+        return (isHorizontal() ? position : getHeight() - position) - padding.get();
     }
 
     /**
@@ -236,6 +239,8 @@ public class Axis extends Region {
      * @return
      */
     public final double getValueForPosition(double position) {
+        position += padding.get();
+
         if (isVertical()) {
             position = getHeight() - position;
         }
