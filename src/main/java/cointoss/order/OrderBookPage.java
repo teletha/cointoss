@@ -43,4 +43,12 @@ public class OrderBookPage implements Comparable<OrderBookPage> {
     public int compareTo(OrderBookPage o) {
         return price.compareTo(o.price);
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        return "OrderBookPage [price=" + price + ", size=" + size + "]";
+    }
 }

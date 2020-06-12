@@ -25,7 +25,6 @@ import cointoss.Direction;
 import cointoss.MarketService;
 import cointoss.MarketSetting;
 import cointoss.execution.Execution;
-import cointoss.execution.ExecutionLog;
 import cointoss.order.Order;
 import cointoss.order.OrderBookPage;
 import cointoss.order.OrderBookPageChanges;
@@ -42,8 +41,11 @@ class BitfinexService extends MarketService {
     /** The right padding for id. */
     private static final long PaddingForID = 10000;
 
-    /** The bitflyer API limit. */
+    /** The API limit. */
     private static final APILimiter LimitForTradeHistory = APILimiter.with.limit(30).refresh(Duration.ofMinutes(1));
+
+    /** The API limit. */
+    private static final APILimiter LimitForBook = APILimiter.with.limit(30).refresh(Duration.ofMinutes(1));
 
     /** The shared websocket connection. */
     private Signal<JsonElement> websocket;
@@ -94,7 +96,8 @@ class BitfinexService extends MarketService {
         AtomicLong increment = new AtomicLong(startingPoint - 1);
         Object[] previous = new Object[] {null, encodeId(start)};
 
-        return call("GET", "hist?sort=1&limit=10000&start=" + startTime, LimitForTradeHistory).flatIterable(JsonElement::getAsJsonArray)
+        return call("GET", "trades/t" + marketName + "/hist?sort=1&limit=10000&start=" + startTime, LimitForTradeHistory)
+                .flatIterable(JsonElement::getAsJsonArray)
                 .map(e -> convert(e.getAsJsonArray(), increment, previous));
     }
 
@@ -114,7 +117,7 @@ class BitfinexService extends MarketService {
      */
     @Override
     public Signal<Execution> executionLatest() {
-        return call("GET", "hist?limit=1", LimitForTradeHistory).flatIterable(JsonElement::getAsJsonArray)
+        return call("GET", "trades/t" + marketName + "/hist?limit=1", LimitForTradeHistory).flatIterable(JsonElement::getAsJsonArray)
                 .map(e -> convert(e, new AtomicLong(), new Object[2]));
     }
 
@@ -155,7 +158,7 @@ class BitfinexService extends MarketService {
      */
     @Override
     public Signal<OrderBookPageChanges> orderBook() {
-        return I.signal();
+        return call("GET", "book/t" + marketName + "/P1?len=100", LimitForBook).map(this::convertOrderBook);
     }
 
     /**
@@ -172,27 +175,19 @@ class BitfinexService extends MarketService {
      * @param array
      * @return
      */
-    private OrderBookPageChanges convertOrderBook(JsonElement root, String bidName, String askName) {
+    private OrderBookPageChanges convertOrderBook(JsonElement root) {
         OrderBookPageChanges change = new OrderBookPageChanges();
 
-        JsonObject o = root.getAsJsonObject();
-        JsonArray bids = o.get(bidName).getAsJsonArray();
-        JsonArray asks = o.get(askName).getAsJsonArray();
+        for (JsonElement e : root.getAsJsonArray()) {
+            JsonArray item = e.getAsJsonArray();
+            Num price = Num.of(item.get(0).getAsBigDecimal());
+            double size = item.get(2).getAsDouble();
 
-        for (JsonElement e : bids) {
-            JsonArray bid = e.getAsJsonArray();
-            Num price = Num.of(bid.get(0).getAsBigDecimal());
-            double size = bid.get(1).getAsDouble();
-
-            change.bids.add(new OrderBookPage(price, size));
-        }
-
-        for (JsonElement e : asks) {
-            JsonArray ask = e.getAsJsonArray();
-            Num price = Num.of(ask.get(0).getAsBigDecimal());
-            double size = ask.get(1).getAsDouble();
-
-            change.asks.add(new OrderBookPage(price, size));
+            if (0 < size) {
+                change.bids.add(new OrderBookPage(price, size));
+            } else {
+                change.asks.add(new OrderBookPage(price, -size));
+            }
         }
         return change;
     }
@@ -304,7 +299,7 @@ class BitfinexService extends MarketService {
      * @return
      */
     private Signal<JsonElement> call(String method, String path, APILimiter limiter) {
-        Request request = new Request.Builder().url("https://api-pub.bitfinex.com/v2/trades/t" + marketName + "/" + path).build();
+        Request request = new Request.Builder().url("https://api-pub.bitfinex.com/v2/" + path).build();
 
         return network.rest(request, limiter).retryWhen(retryPolicy(10, "Bitfinex RESTCall"));
     }
@@ -394,10 +389,13 @@ class BitfinexService extends MarketService {
 
     public static void main(String[] args) {
 
-        // Bitfinex.BTC_USDT.executionsRealtimely().to(e -> {
-        // System.out.println(e);
-        // });
-        new ExecutionLog(Bitfinex.BTC_USDT).fromYestaday().to(e -> {
+        Bitfinex.BTC_USDT.orderBook().to(e -> {
+            e.bids.forEach(page -> {
+                System.out.println(page);
+            });
+            e.asks.forEach(page -> {
+                System.out.println(page);
+            });
         });
     }
 }
