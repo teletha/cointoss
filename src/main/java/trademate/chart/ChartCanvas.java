@@ -9,7 +9,7 @@
  */
 package trademate.chart;
 
-import static transcript.Transcript.en;
+import static transcript.Transcript.*;
 
 import java.time.Duration;
 import java.util.List;
@@ -40,6 +40,7 @@ import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.market.bitflyer.SFD;
+import cointoss.order.OrderBookPage;
 import cointoss.ticker.AbstractIndicator;
 import cointoss.ticker.Indicator;
 import cointoss.ticker.Tick;
@@ -123,6 +124,9 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     private final Canvas candleLatest = new Canvas();
 
     /** Chart UI */
+    private final Canvas orderbook = new Canvas();
+
+    /** Chart UI */
     private final Canvas name = new Canvas();
 
     /** Chart UI */
@@ -133,6 +137,9 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
     /** Flag whether candle chart shoud layout on the next rendering phase or not. */
     private final LayoutAssistant layoutCandleLatest = new LayoutAssistant(this);
+
+    /** Flag whether orderbook shoud layout on the next rendering phase or not. */
+    private final LayoutAssistant layoutOrderbook = new LayoutAssistant(this);
 
     /** The script registry. */
     private final PlotScriptRegistry registry = I.make(PlotScriptRegistry.class);
@@ -204,6 +211,8 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         this.candles.heightProperty().bind(heightProperty());
         this.candleLatest.widthProperty().bind(widthProperty());
         this.candleLatest.heightProperty().bind(heightProperty());
+        this.orderbook.widthProperty().bind(widthProperty());
+        this.orderbook.heightProperty().bind(heightProperty());
         this.chartInfo.widthProperty().bind(widthProperty());
         this.chartInfo.heightProperty().bind(heightProperty());
         this.name.widthProperty().bind(widthProperty());
@@ -231,6 +240,12 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 .layoutBy(chart.ticker.observe()
                         .switchMap(ticker -> ticker.update.startWithNull().throttle(Chart.RefreshTime, TimeUnit.MILLISECONDS)))
                 .layoutWhile(chart.showRealtimeUpdate.observing());
+        layoutOrderbook.layoutBy(widthProperty(), heightProperty())
+                .layoutBy(axisX.scroll.valueProperty(), axisX.scroll.visibleAmountProperty())
+                .layoutBy(axisY.scroll.valueProperty(), axisY.scroll.visibleAmountProperty())
+                .layoutBy(chart.ticker.observe())
+                .layoutBy(chart.market.observe().map(m -> m.orderBook).flatMap(b -> b.longs.update))
+                .layoutWhile(chart.showRealtimeUpdate.observing());
 
         configIndicator();
         visualizeNotifyPrice();
@@ -240,7 +255,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         visualizeSFDPrice();
 
         getChildren()
-                .addAll(name, backGridVertical, backGridHorizontal, notifyPrice, orderBuyPrice, orderSellPrice, latestPrice, sfdPrice, candles, candleLatest, chartInfo, mouseTrackHorizontal, mouseTrackVertical);
+                .addAll(name, backGridVertical, backGridHorizontal, notifyPrice, orderBuyPrice, orderSellPrice, latestPrice, sfdPrice, orderbook, candles, candleLatest, chartInfo, mouseTrackHorizontal, mouseTrackVertical);
     }
 
     /**
@@ -565,6 +580,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         orderSellPrice.draw();
 
         drawCandle();
+        drawOrderbook();
     }
 
     /**
@@ -789,6 +805,30 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         gc.setFont(NameFont);
         gc.setFill(NameColor);
         gc.fillText(m.service.marketReadableName(), 4, NameFont.getSize() * 1.2);
+    }
+
+    /**
+     * Draw orderbook on chart.
+     */
+    private void drawOrderbook() {
+        layoutOrderbook.layout(() -> {
+            GraphicsContext gc = orderbook.getGraphicsContext2D();
+            gc.clearRect(0, 0, orderbook.getWidth(), orderbook.getHeight());
+
+            chart.market.to(m -> {
+                double start = orderbook.getWidth();
+
+                // buyer
+                gc.setLineWidth(1);
+                gc.setStroke(Color.AQUA);
+
+                List<OrderBookPage> pages = m.orderBook.longs.currentGroup();
+                for (OrderBookPage page : pages) {
+                    double position = axisY.getPositionForValue(page.price.doubleValue());
+                    gc.strokeLine(start, position, start - page.size, position);
+                }
+            });
+        });
     }
 
     /**

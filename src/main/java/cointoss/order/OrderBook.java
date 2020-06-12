@@ -23,6 +23,8 @@ import cointoss.Direction;
 import cointoss.MarketSetting;
 import cointoss.util.Num;
 import cointoss.util.Primitives;
+import kiss.Signal;
+import kiss.Signaling;
 import kiss.Variable;
 
 public class OrderBook {
@@ -47,6 +49,10 @@ public class OrderBook {
 
     /** The grouped order book. */
     private GroupedOrderBook group;
+
+    private final Signaling<Object> updating = new Signaling();
+
+    public final Signal<Object> update = updating.expose;
 
     /**
      * Build {@link OrderBook}.
@@ -96,6 +102,15 @@ public class OrderBook {
         if (group.range.isNot(range)) {
             group = new GroupedOrderBook(range);
         }
+        return group.boards;
+    }
+
+    /**
+     * Get the current selected grouped view of this {@link OrderBook}.
+     * 
+     * @return A grouped view.
+     */
+    public final List<OrderBookPage> currentGroup() {
         return group.boards;
     }
 
@@ -198,6 +213,7 @@ public class OrderBook {
             if (base.isEmpty() == false) {
                 best.set(base.firstEntry().getValue());
             }
+            updating.accept(this);
         });
     }
 
