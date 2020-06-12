@@ -17,6 +17,8 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.geometry.Bounds;
 import javafx.geometry.Orientation;
 import javafx.geometry.Side;
@@ -32,6 +34,7 @@ import javafx.util.Duration;
 
 import cointoss.util.Primitives;
 import kiss.Disposable;
+import kiss.Variable;
 import stylist.Style;
 import viewtify.Viewtify;
 import viewtify.ui.helper.LayoutAssistant;
@@ -56,7 +59,8 @@ public class Axis extends Region {
     /** The visual placement position. */
     public final Side side;
 
-    public final ObjectProperty<DoubleFunction<String>> tickLabelFormatter = new SimpleObjectProperty<>(this, "tickLabelFormatter", Primitives.DecimalScale2::format);
+    /** The default label formatter. */
+    public final Variable<DoubleFunction<String>> tickLabelFormatter = Variable.of(Primitives.DecimalScale2::format);
 
     /** The preferred visible number of ticks. */
     public final int tickNumber = 10;
@@ -444,8 +448,11 @@ public class Axis extends Region {
         /** The associated value. */
         public final DoubleProperty value = new SimpleDoubleProperty();
 
+        /** The sub infomation. */
+        public final StringProperty info = new SimpleStringProperty();
+
         /** The label formatter. */
-        private DoubleFunction<String> formatter = null;
+        private final Variable<DoubleFunction<String>> formatter = Variable.empty();
 
         /**
          * 
@@ -459,8 +466,8 @@ public class Axis extends Region {
          */
         private TickLable(String description, Style... classNames) {
             tickLabels.getChildren().add(this);
-            textProperty().bind(Viewtify.calculate(value, () -> formatter != null ? formatter.apply(value.get())
-                    : tickLabelFormatter.get().apply(value.get())));
+            Viewtify.observe(value).map(v -> formatter.or(tickLabelFormatter).apply(v)).map(v -> v);
+            textProperty().bind(Viewtify.calculate(value, () -> formatter.or(tickLabelFormatter).apply(value.get())));
             value.addListener(layoutAxis);
 
             if (description != null && !description.isEmpty()) {
@@ -479,8 +486,8 @@ public class Axis extends Region {
          * @param formatter
          * @return
          */
-        public TickLable formatter(DoubleFunction<String> formatter) {
-            this.formatter = formatter;
+        public final TickLable formatter(DoubleFunction<String> formatter) {
+            this.formatter.set(formatter);
             return this;
         }
 
