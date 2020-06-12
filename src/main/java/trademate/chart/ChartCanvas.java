@@ -12,9 +12,12 @@ package trademate.chart;
 import static transcript.Transcript.*;
 
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
+import java.util.function.DoublePredicate;
 import java.util.function.Supplier;
 
 import javafx.collections.ObservableList;
@@ -54,6 +57,7 @@ import kiss.Variable;
 import kiss.Ⅲ;
 import stylist.Style;
 import trademate.CommonText;
+import trademate.TradeMateStyle;
 import trademate.chart.Axis.TickLable;
 import trademate.chart.PlotScript.Plotter;
 import trademate.setting.Notificator;
@@ -243,7 +247,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         layoutOrderbook.layoutBy(widthProperty(), heightProperty())
                 .layoutBy(axisX.scroll.valueProperty(), axisX.scroll.visibleAmountProperty())
                 .layoutBy(axisY.scroll.valueProperty(), axisY.scroll.visibleAmountProperty())
-                .layoutBy(chart.ticker.observe())
+                .layoutBy(chart.ticker.observe(), chart.showOrderbook.observe())
                 .layoutBy(chart.market.observe().map(m -> m.orderBook).flatMap(b -> b.longs.update))
                 .layoutWhile(chart.showRealtimeUpdate.observing());
 
@@ -808,27 +812,57 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     }
 
     /**
-     * Draw orderbook on chart.
+     * Draw orderbooks on chart.
      */
     private void drawOrderbook() {
         layoutOrderbook.layout(() -> {
             GraphicsContext gc = orderbook.getGraphicsContext2D();
             gc.clearRect(0, 0, orderbook.getWidth(), orderbook.getHeight());
 
-            chart.market.to(m -> {
-                double start = orderbook.getWidth();
+            if (chart.showOrderbook.value()) {
+                chart.market.to(m -> {
+                    double max = axisY.computeVisibleMaxValue();
+                    double min = axisY.computeVisibleMinValue();
 
-                // buyer
-                gc.setLineWidth(1);
-                gc.setStroke(Color.AQUA);
-
-                List<OrderBookPage> pages = m.orderBook.longs.currentGroup();
-                for (OrderBookPage page : pages) {
-                    double position = axisY.getPositionForValue(page.price.doubleValue());
-                    gc.strokeLine(start, position, start - page.size, position);
-                }
-            });
+                    drawOrderbook(m.orderBook.longs.ascendingPages(), price -> min < price, TradeMateStyle.BUY);
+                    drawOrderbook(m.orderBook.shorts.descendingPages(), price -> price < max, TradeMateStyle.SELL);
+                });
+            }
         });
+    }
+
+    /**
+     * Draw orderbooks on chart' side.
+     * 
+     * @param pages The page info.
+     * @param threshold A range to draw.
+     * @param color Visible color.
+     */
+    private void drawOrderbook(Iterator<OrderBookPage> pages, DoublePredicate threshold, stylist.value.Color color) {
+        double max = 40;
+        ArrayList<OrderBookPage> range = new ArrayList();
+
+        while (pages.hasNext()) {
+            OrderBookPage page = pages.next();
+
+            if (!threshold.test(page.price.doubleValue())) {
+                break;
+            }
+            max = Math.max(max, page.size);
+            range.add(page);
+        }
+
+        double ratio = 40 / max;
+        double start = orderbook.getWidth();
+
+        GraphicsContext gc = orderbook.getGraphicsContext2D();
+        gc.setLineWidth(1);
+        gc.setStroke(FXUtils.color(color.opacify(-0.2)));
+
+        for (OrderBookPage page : range) {
+            double position = axisY.getPositionForValue(page.price.doubleValue());
+            gc.strokeLine(start, position, start - page.size * ratio, position);
+        }
     }
 
     /**

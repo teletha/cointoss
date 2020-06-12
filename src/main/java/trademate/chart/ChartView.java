@@ -54,6 +54,9 @@ public class ChartView extends View {
     /** Configuration UI */
     public UICheckBox showLatestPrice;
 
+    /** Configuration UI */
+    public UICheckBox showOrderbook;
+
     /** Chart UI */
     public Chart chart;
 
@@ -133,11 +136,13 @@ public class ChartView extends View {
                 $(vbox, () -> {
                     form("Candle Type", candle);
                     form("Latest Price", showLatestPrice);
+                    form("Orderbook", showOrderbook);
                 });
             }
         });
         candle.initialize(CandleType.values()).observing(candleType::set);
         showLatestPrice.initialize(true);
+        showOrderbook.initialize(true);
     }
 
     /**
@@ -162,9 +167,10 @@ public class ChartView extends View {
     private void realtimeUpdate(boolean state) {
         showOrderSupport.set(state);
         showPositionSupport.set(state);
-        showLatestPrice.value(state);
         showRealtimeUpdate.set(state);
         showIndicator.set(state);
+        showLatestPrice.value(state);
+        showOrderbook.value(state);
     }
 
     /**
