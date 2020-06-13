@@ -17,8 +17,6 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import javafx.geometry.Bounds;
 import javafx.geometry.Orientation;
 import javafx.geometry.Side;
@@ -448,11 +446,11 @@ public class Axis extends Region {
         /** The associated value. */
         public final DoubleProperty value = new SimpleDoubleProperty();
 
-        /** The sub infomation. */
-        public final StringProperty info = new SimpleStringProperty();
-
         /** The label formatter. */
         private final Variable<DoubleFunction<String>> formatter = Variable.empty();
+
+        /** The sub infomation. */
+        private String info = "";
 
         /**
          * 
@@ -466,8 +464,7 @@ public class Axis extends Region {
          */
         private TickLable(String description, Style... classNames) {
             tickLabels.getChildren().add(this);
-            Viewtify.observe(value).map(v -> formatter.or(tickLabelFormatter).apply(v)).map(v -> v);
-            textProperty().bind(Viewtify.calculate(value, () -> formatter.or(tickLabelFormatter).apply(value.get())));
+            Viewtify.observe(value).map(v -> formatter.or(tickLabelFormatter).apply(v).concat(info)).to(this::setText);
             value.addListener(layoutAxis);
 
             if (description != null && !description.isEmpty()) {
@@ -484,10 +481,25 @@ public class Axis extends Region {
          * Set label formatter.
          * 
          * @param formatter
-         * @return
+         * @return Chainable API.
          */
         public final TickLable formatter(DoubleFunction<String> formatter) {
             this.formatter.set(formatter);
+            return this;
+        }
+
+        /**
+         * Set sub infomation.
+         * 
+         * @param text A infomation text.
+         * @return Chainable API.
+         */
+        public final TickLable info(String text) {
+            if (text == null || text.isBlank()) {
+                info = "";
+            } else {
+                info = "\r\n" + text;
+            }
             return this;
         }
 

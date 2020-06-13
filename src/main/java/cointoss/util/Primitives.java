@@ -59,6 +59,28 @@ public class Primitives {
     }
 
     /**
+     * Round to the specified decimal place.
+     * 
+     * @param value
+     * @param scale
+     * @return
+     */
+    public static String roundString(double value, int scale) {
+        return String.valueOf(roundDecimal(value, scale));
+    }
+
+    /**
+     * Round to the specified decimal place.
+     * 
+     * @param value
+     * @param scale
+     * @return
+     */
+    public static String roundString(double value, int scale, RoundingMode mode) {
+        return String.valueOf(roundDecimal(value, scale, mode));
+    }
+
+    /**
      * Check equality for primitive doubles.
      * 
      * @param value1

@@ -11,7 +11,6 @@ package cointoss.order;
 
 import java.math.RoundingMode;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentSkipListMap;
@@ -111,8 +110,8 @@ public class OrderBook {
      * 
      * @return
      */
-    public final Iterator<OrderBookPage> ascendingPages() {
-        return group.original.iterator();
+    public final Iterable<OrderBookPage> ascendingPages() {
+        return group.original::iterator;
     }
 
     /**
@@ -120,8 +119,8 @@ public class OrderBook {
      * 
      * @return
      */
-    public final Iterator<OrderBookPage> descendingPages() {
-        return group.original.descendingIterator();
+    public final Iterable<OrderBookPage> descendingPages() {
+        return group.original::descendingIterator;
     }
 
     /**

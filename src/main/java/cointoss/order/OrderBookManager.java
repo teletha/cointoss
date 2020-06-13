@@ -9,9 +9,9 @@
  */
 package cointoss.order;
 
+import cointoss.Direction;
 import cointoss.Directional;
 import cointoss.MarketService;
-import cointoss.Direction;
 import cointoss.util.Num;
 import kiss.Variable;
 
