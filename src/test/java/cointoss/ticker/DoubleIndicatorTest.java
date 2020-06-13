@@ -33,17 +33,17 @@ class DoubleIndicatorTest extends TickerTestSupport {
 
     @Test
     void valueAtLowerTick() {
-        Ticker ticker = ticker(Span.Second15, 1, 2, 3, 4, 5);
+        Ticker ticker = ticker(Span.Second30, 1, 2, 3, 4, 5);
         Ticker lower = manager.on(Span.Second5);
         DoubleIndicator indicator = DoubleIndicator.build(ticker, tick -> tick.openPrice.doubleValue());
         assert indicator.valueAt(lower.ticks.getByIndex(0)) == 1d;
-        assert indicator.valueAt(lower.ticks.getByIndex(1)) == 1d;
         assert indicator.valueAt(lower.ticks.getByIndex(2)) == 1d;
-        assert indicator.valueAt(lower.ticks.getByIndex(3)) == 2d;
-        assert indicator.valueAt(lower.ticks.getByIndex(4)) == 2d;
-        assert indicator.valueAt(lower.ticks.getByIndex(5)) == 2d;
-        assert indicator.valueAt(lower.ticks.getByIndex(6)) == 3d;
-        assert indicator.valueAt(lower.ticks.getByIndex(12)) == 5d;
+        assert indicator.valueAt(lower.ticks.getByIndex(4)) == 1d;
+        assert indicator.valueAt(lower.ticks.getByIndex(6)) == 2d;
+        assert indicator.valueAt(lower.ticks.getByIndex(8)) == 2d;
+        assert indicator.valueAt(lower.ticks.getByIndex(10)) == 2d;
+        assert indicator.valueAt(lower.ticks.getByIndex(12)) == 3d;
+        assert indicator.valueAt(lower.ticks.getByIndex(24)) == 5d;
     }
 
     @Test

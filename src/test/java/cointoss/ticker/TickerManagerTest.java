@@ -285,13 +285,12 @@ class TickerManagerTest {
 
         manager.update(Execution.with.buy(1).price(20).date(Base.plusSeconds(5)));
         assert manager.on(Second5).ticks.size() == 2;
-        manager.tickers().take(between(Second15, Day7)).to(ticker -> {
+        manager.tickers().take(between(Second30, Day7)).to(ticker -> {
             assert ticker.ticks.size() == 1;
         });
 
         manager.update(Execution.with.buy(1).price(30).date(Base.plusMinutes(1)));
         assert manager.on(Second5).ticks.size() == 13;
-        assert manager.on(Second15).ticks.size() == 5;
         assert manager.on(Second30).ticks.size() == 3;
         assert manager.on(Minute1).ticks.size() == 2;
         manager.tickers().take(between(Minute5, Day7)).to(ticker -> {

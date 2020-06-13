@@ -131,12 +131,18 @@ public class OrderBook {
      * @return
      */
     public final OrderBookPage findLargestOrder(Num lowerPrice, Num upperPrice) {
-        Num lowerRounded = calculateGroupedPrice(lowerPrice, group.range);
-        Num upperRounded = calculateGroupedPrice(upperPrice, group.range);
         OrderBookPage max = new OrderBookPage(lowerPrice, 0);
+
+        if (base.isEmpty()) {
+            return max;
+        }
+
         boolean comparable = false;
 
         if (side.isBuy()) {
+            Num lowerRounded = calculateGroupedPrice(Num.max(base.lastKey(), lowerPrice), group.range);
+            Num upperRounded = calculateGroupedPrice(Num.min(base.firstKey(), upperPrice), group.range);
+
             for (OrderBookPage page : ascendingPages()) {
                 if (comparable == false && page.price.is(upperRounded)) {
                     comparable = true;
@@ -152,6 +158,9 @@ public class OrderBook {
                 }
             }
         } else {
+            Num lowerRounded = calculateGroupedPrice(Num.max(base.firstKey(), lowerPrice), group.range);
+            Num upperRounded = calculateGroupedPrice(Num.min(base.lastKey(), upperPrice), group.range);
+
             for (OrderBookPage page : descendingPages()) {
                 if (comparable == false && page.price.is(lowerRounded)) {
                     comparable = true;

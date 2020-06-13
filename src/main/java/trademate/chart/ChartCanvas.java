@@ -9,7 +9,7 @@
  */
 package trademate.chart;
 
-import static transcript.Transcript.*;
+import static transcript.Transcript.en;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -261,7 +261,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 .layoutBy(axisX.scroll.valueProperty(), axisX.scroll.visibleAmountProperty())
                 .layoutBy(axisY.scroll.valueProperty(), axisY.scroll.visibleAmountProperty())
                 .layoutBy(chart.ticker.observe(), chart.showOrderbook.observe())
-                .layoutBy(chart.market.observe().map(m -> m.orderBook).flatMap(b -> b.longs.update))
+                .layoutBy(chart.market.observe().map(m -> m.orderBook).flatMap(b -> b.longs.update.throttle(1, TimeUnit.SECONDS)))
                 .layoutWhile(chart.showRealtimeUpdate.observing());
 
         configIndicator();

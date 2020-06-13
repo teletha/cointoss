@@ -19,7 +19,7 @@ import cointoss.verify.VerifiableMarketService;
 class OrderBookManagerTest {
 
     @Test
-    void findLargetOrderFromLongOnly() {
+    void findLargestOrderFromLongOnly() {
         OrderBookManager manager = new OrderBookManager(new VerifiableMarketService());
         manager.longs.update(page(10, 5));
         manager.longs.update(page(13, 1));
@@ -31,7 +31,7 @@ class OrderBookManagerTest {
     }
 
     @Test
-    void findLargetOrderFromLongOnlyWithMultipleLargest() {
+    void findLargestOrderFromLongOnlyWithMultipleLargest() {
         OrderBookManager manager = new OrderBookManager(new VerifiableMarketService());
         manager.longs.update(page(10, 2));
         manager.longs.update(page(13, 4));
@@ -43,7 +43,7 @@ class OrderBookManagerTest {
     }
 
     @Test
-    void findLargetOrderFromShortOnly() {
+    void findLargestOrderFromShortOnly() {
         OrderBookManager manager = new OrderBookManager(new VerifiableMarketService());
         manager.shorts.update(page(10, 5));
         manager.shorts.update(page(13, 1));
@@ -55,7 +55,7 @@ class OrderBookManagerTest {
     }
 
     @Test
-    void findLargetOrderFromShortOnlyWithMultipleLargest() {
+    void findLargestOrderFromShortOnlyWithMultipleLargest() {
         OrderBookManager manager = new OrderBookManager(new VerifiableMarketService());
         manager.shorts.update(page(10, 2));
         manager.shorts.update(page(13, 4));
@@ -67,7 +67,7 @@ class OrderBookManagerTest {
     }
 
     @Test
-    void findLargetOrder() {
+    void findLargestOrder() {
         OrderBookManager manager = new OrderBookManager(new VerifiableMarketService());
         manager.shorts.update(page(20, 3));
         manager.shorts.update(page(19, 1));
@@ -84,15 +84,20 @@ class OrderBookManagerTest {
     }
 
     @Test
-    void findLargetOrderWithMultipleLargest() {
+    void findLargestOrderWithMultipleLargest() {
         OrderBookManager manager = new OrderBookManager(new VerifiableMarketService());
-        manager.shorts.update(page(10, 2));
-        manager.shorts.update(page(13, 4));
-        manager.shorts.update(page(15, 2));
-        manager.shorts.update(page(18, 4));
         manager.shorts.update(page(20, 3));
+        manager.shorts.update(page(19, 1));
+        manager.shorts.update(page(18, 2));
+        manager.shorts.update(page(17, 8));
+        manager.shorts.update(page(16, 3));
+        manager.longs.update(page(15, 2));
+        manager.longs.update(page(14, 1));
+        manager.longs.update(page(13, 5));
+        manager.longs.update(page(12, 8));
+        manager.longs.update(page(10, 3));
 
-        assert manager.findLargestOrder(10, 20).is(13, 4);
+        assert manager.findLargestOrder(10, 20).is(12, 8);
     }
 
     /**

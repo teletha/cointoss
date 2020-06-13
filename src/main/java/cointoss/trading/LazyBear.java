@@ -15,8 +15,8 @@ import cointoss.Direction;
 import cointoss.Market;
 import cointoss.ticker.Indicators;
 import cointoss.ticker.NumIndicator;
-import cointoss.ticker.Ticker;
 import cointoss.ticker.Span;
+import cointoss.ticker.Ticker;
 import cointoss.trade.FundManager;
 import cointoss.trade.Scenario;
 import cointoss.trade.Trader;
@@ -27,7 +27,7 @@ import trademate.chart.PlotScript;
 
 public class LazyBear extends Trader {
 
-    public Span tickerSpan = Span.Second15;
+    public Span tickerSpan = Span.Second30;
 
     public int entryThreshold = 35;
 
