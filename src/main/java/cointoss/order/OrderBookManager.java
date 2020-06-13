@@ -70,4 +70,58 @@ public class OrderBookManager {
         }
         return side.isBuy() ? longs.computeBestPrice(price, threshold, diff) : shorts.computeBestPrice(price, threshold, diff);
     }
+
+    /**
+     * Get the total order size on the specified price in the current selected grouped order book.
+     * 
+     * @param price
+     * @return
+     */
+    public double amountOn(double price) {
+        return amountOn(Num.of(price));
+    }
+
+    /**
+     * Get the total order size on the specified price in the current selected grouped order book.
+     * 
+     * @param price
+     * @return
+     */
+    public double amountOn(Num price) {
+        if (price.isGreaterThanOrEqual(shorts.best.v.price)) {
+            return shorts.amountOn(price);
+        }
+
+        if (price.isLessThanOrEqual(longs.best.v.price)) {
+            return longs.amountOn(price);
+        }
+        return 0;
+    }
+
+    /**
+     * It finds the largest order in the currently selected OrderBook within the specified price
+     * range.
+     * 
+     * @param lowerPrice
+     * @param upperPrice
+     * @return
+     */
+    public OrderBookPage findLargestOrder(double lowerPrice, double upperPrice) {
+        return findLargestOrder(Num.of(lowerPrice), Num.of(upperPrice));
+    }
+
+    /**
+     * It finds the largest order in the currently selected OrderBook within the specified price
+     * range.
+     * 
+     * @param lowerPrice
+     * @param upperPrice
+     * @return
+     */
+    public OrderBookPage findLargestOrder(Num lowerPrice, Num upperPrice) {
+        OrderBookPage inLong = longs.findLargestOrder(lowerPrice, upperPrice);
+        OrderBookPage inShort = shorts.findLargestOrder(lowerPrice, upperPrice);
+
+        return inLong.size < inShort.size ? inShort : inLong;
+    }
 }

@@ -9,7 +9,7 @@
  */
 package cointoss.order;
 
-import static cointoss.util.Num.ONE;
+import static cointoss.util.Num.*;
 
 import java.util.Collections;
 import java.util.List;

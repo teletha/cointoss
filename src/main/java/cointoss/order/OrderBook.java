@@ -106,6 +106,71 @@ public class OrderBook {
     }
 
     /**
+     * Search the order size on the specified price.
+     * 
+     * @param price A target price.
+     * @return
+     */
+    public final double amountOn(Num price) {
+        Num rounded = calculateGroupedPrice(price, group.range);
+        for (OrderBookPage page : side.isBuy() ? ascendingPages() : descendingPages()) {
+            System.out.println(page.price + "   " + rounded + "    " + price);
+            if (page.price.is(rounded)) {
+                return page.size;
+            }
+        }
+        return 0;
+    }
+
+    /**
+     * It finds the largest order in the currently selected OrderBook within the specified price
+     * range.
+     * 
+     * @param lowerPrice
+     * @param upperPrice
+     * @return
+     */
+    public final OrderBookPage findLargestOrder(Num lowerPrice, Num upperPrice) {
+        Num lowerRounded = calculateGroupedPrice(lowerPrice, group.range);
+        Num upperRounded = calculateGroupedPrice(upperPrice, group.range);
+        OrderBookPage max = new OrderBookPage(lowerPrice, 0);
+        boolean comparable = false;
+
+        if (side.isBuy()) {
+            for (OrderBookPage page : ascendingPages()) {
+                if (comparable == false && page.price.is(upperRounded)) {
+                    comparable = true;
+                    max = page;
+                } else if (comparable == true) {
+                    if (page.size > max.size) {
+                        max = page;
+                    }
+
+                    if (page.price.is(lowerRounded)) {
+                        break;
+                    }
+                }
+            }
+        } else {
+            for (OrderBookPage page : descendingPages()) {
+                if (comparable == false && page.price.is(lowerRounded)) {
+                    comparable = true;
+                    max = page;
+                } else if (comparable == true) {
+                    if (page.size > max.size) {
+                        max = page;
+                    }
+
+                    if (page.price.is(upperRounded)) {
+                        break;
+                    }
+                }
+            }
+        }
+        return max;
+    }
+
+    /**
      * Iterate all pages of the current selected grouped view by ascending order.
      * 
      * @return

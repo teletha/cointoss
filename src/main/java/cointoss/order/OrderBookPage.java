@@ -45,6 +45,17 @@ public class OrderBookPage implements Comparable<OrderBookPage> {
     }
 
     /**
+     * Test method.
+     * 
+     * @param price
+     * @param size
+     * @return
+     */
+    boolean is(double price, double size) {
+        return this.price.is(price) && size == size;
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override

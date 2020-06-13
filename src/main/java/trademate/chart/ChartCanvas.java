@@ -410,9 +410,9 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         // track on move
         when(User.MouseMove, User.MouseDrag).to(e -> {
             double x = axisX.getValueForPosition(e.getX());
-            double price = axisY.getValueForPosition(e.getY());
+            double y = e.getY();
             labelX.value.set(x);
-            labelY.value.set(price);
+            labelY.value.set(axisY.getValueForPosition(y));
 
             mouseTrackVertical.layoutLine.requestLayout();
             mouseTrackHorizontal.layoutLine.requestLayout();
@@ -426,6 +426,10 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             if (tick != null) {
                 drawChartInfo(tick);
             }
+
+            // search the nearest and largest order size
+            OrderBookPage large = chart.market.v.orderBook
+                    .findLargestOrder(axisY.getValueForPosition(y - 2), axisY.getValueForPosition(y + 2));
         });
 
         // remove on exit
