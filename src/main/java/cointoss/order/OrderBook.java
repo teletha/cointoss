@@ -140,6 +140,10 @@ public class OrderBook {
         boolean comparable = false;
 
         if (side.isBuy()) {
+            if (lowerPrice.isGreaterThan(base.firstKey())) {
+                return max;
+            }
+
             Num lowerRounded = calculateGroupedPrice(Num.max(base.lastKey(), lowerPrice), group.range);
             Num upperRounded = calculateGroupedPrice(Num.min(base.firstKey(), upperPrice), group.range);
 
@@ -158,6 +162,10 @@ public class OrderBook {
                 }
             }
         } else {
+            if (upperPrice.isLessThan(base.firstKey())) {
+                return max;
+            }
+
             Num lowerRounded = calculateGroupedPrice(Num.max(base.firstKey(), lowerPrice), group.range);
             Num upperRounded = calculateGroupedPrice(Num.min(base.lastKey(), upperPrice), group.range);
 

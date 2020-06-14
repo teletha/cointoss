@@ -79,7 +79,7 @@ public class Axis extends Region {
     public final DoubleProperty visibleMinRange = new SimpleDoubleProperty(this, "visibleMinRange", 0);
 
     /** The visible padding size. */
-    public final DoubleProperty padding = new SimpleDoubleProperty(this, "padding", 50);
+    public final DoubleProperty padding = new SimpleDoubleProperty(this, "padding", 60);
 
     /** The tick unit. */
     public final ObjectProperty<double[]> units = new SimpleObjectProperty(DefaultTickUnit);

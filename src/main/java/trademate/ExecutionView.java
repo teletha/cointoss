@@ -84,7 +84,7 @@ public class ExecutionView extends View {
                 .add(tradingView.market.timeline.take(tradingView.chart.showRealtimeUpdate.observing()).on(Viewtify.UIThread).to(e -> {
                     executionList.addItemAtFirst(e);
 
-                    if (100 < executionList.size()) {
+                    if (15 < executionList.size()) {
                         executionList.removeItemAtLast();
                     }
                 }));
