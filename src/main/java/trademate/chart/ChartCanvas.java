@@ -21,7 +21,7 @@ import javafx.collections.ObservableList;
 import javafx.geometry.VPos;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
@@ -68,13 +68,7 @@ import viewtify.ui.helper.User;
 import viewtify.ui.helper.UserActionHelper;
 import viewtify.util.FXUtils;
 
-public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas> {
-
-    /** Name Font */
-    private static final Font NameFont = Font.font(Font.getDefault().getName(), 24);
-
-    /** Name Color */
-    private static final Color NameColor = Color.rgb(50, 50, 50);
+public class ChartCanvas extends StackPane implements UserActionHelper<ChartCanvas> {
 
     /** Infomation Font */
     private static final Font InfoFont = Font.font(Font.getDefault().getName(), 10.5);
@@ -88,8 +82,11 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     /** Chart Color */
     private static final Color SellerColor = FXUtils.color(TradeMateStyle.SELL.opacify(-0.2));
 
-    /** The orderbook bar width. */
-    private static final double OrderbookWidth = 40;
+    /** The width orderbook bar graph. */
+    private static final double OrderbookBarWidth = 40;
+
+    /** The width of orderbook size figure. */
+    private static final double OrderbookDigitWidth = 20;
 
     /** The candle width. */
     private static final int BarWidth = 3;
@@ -131,46 +128,35 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     private final LineMark sfdPrice;
 
     /** Chart UI */
-    private final EnhancedCanvas candles = new EnhancedCanvas();
+    private final EnhancedCanvas candles = new EnhancedCanvas().bindSizeTo(this);
 
     /** Chart UI */
-    private final EnhancedCanvas candleLatest = new EnhancedCanvas();
+    private final EnhancedCanvas candleLatest = new EnhancedCanvas().bindSizeTo(this);
 
     /** Chart UI */
-    private final EnhancedCanvas orderbook = new EnhancedCanvas().context(c -> {
-        c.setLineWidth(1);
-        c.setFont(Font.font(8));
-        c.setFill(Color.rgb(250, 250, 250, 0.9));
-    });
+    private final EnhancedCanvas orderbook = new EnhancedCanvas().bindSizeTo(OrderbookDigitWidth + OrderbookBarWidth, this)
+            .fontSize(8)
+            .fillColor(250, 250, 250, 0.9);
 
     /** Chart UI */
-    private final EnhancedCanvas orderbookForMouse = new EnhancedCanvas().context(c -> {
-        c.setLineWidth(1);
-        c.setFont(Font.font(8));
-        c.setTextBaseline(VPos.CENTER);
-        c.setStroke(Color.WHITE);
-    });
+    private final EnhancedCanvas orderbookForMouse = new EnhancedCanvas().bindSizeTo(OrderbookDigitWidth + OrderbookBarWidth, this)
+            .fontSize(8)
+            .textBaseLine(VPos.CENTER);
 
     /** Chart UI */
-    private final EnhancedCanvas marketInfo = new EnhancedCanvas().context(c -> {
-        c.setFont(NameFont);
-        c.setFill(NameColor);
-    });
+    private final EnhancedCanvas marketName = new EnhancedCanvas().size(230, 30).fontSize(24).fillColor(50, 50, 50);
 
     /** Chart UI */
     private final EnhancedCanvas chartInfo = new EnhancedCanvas();
 
-    /** Flag whether candle chart should layout on the next rendering phase or not. */
+    /** Flag whether candle chart shoud layout on the next rendering phase or not. */
     final LayoutAssistant layoutCandle = new LayoutAssistant(this);
 
-    /** Flag whether candle chart should layout on the next rendering phase or not. */
+    /** Flag whether candle chart shoud layout on the next rendering phase or not. */
     private final LayoutAssistant layoutCandleLatest = new LayoutAssistant(this);
 
-    /** Flag whether orderbook should layout on the next rendering phase or not. */
+    /** Flag whether orderbook shoud layout on the next rendering phase or not. */
     private final LayoutAssistant layoutOrderbook = new LayoutAssistant(this);
-
-    /** Flag whether market info should layout on the next rendering phase or not. */
-    private final LayoutAssistant layoutMarketInfo = new LayoutAssistant(this);
 
     /** The script registry. */
     private final PlotScriptRegistry registry = I.make(PlotScriptRegistry.class);
@@ -219,7 +205,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     private final int chartInfoHorizontalGap = 3;
 
     /** The latest orderbook layer. */
-    private OrderbookLayer orderbookLayer;
+    private OrderbookBar orderbookBar;
 
     /**
      * Chart canvas.
@@ -241,13 +227,9 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         this.orderBuyPrice = new LineMark(axisY, ChartStyles.OrderSupportBuy);
         this.orderSellPrice = new LineMark(axisY, ChartStyles.OrderSupportSell);
         this.sfdPrice = new LineMark(axisY, ChartStyles.PriceSFD);
-        this.candles.fitOn(this);
-        this.candleLatest.fitOn(this);
-        this.orderbook.fitOn(this);
-        this.orderbookForMouse.fitOn(this);
-        this.chartInfo.fitOn(this);
-        this.marketInfo.fitOn(this);
+        this.chartInfo.bindSizeTo(this);
 
+        chart.market.observe().to(m -> marketName.clear().fillText(m.service.marketReadableName(), 4, 28));
         chart.market.observe().combineLatest(chart.ticker.observe(), Viewtify.observing(chart.scripts)).to(v -> {
             plotters = plottersCache.getUnchecked(v);
             scripts = I.signal(plotters).map(p -> p.origin).distinct().toList();
@@ -272,11 +254,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 .layoutBy(chart.ticker.observe(), chart.showOrderbook.observe())
                 .layoutBy(chart.market.observe().map(m -> m.orderBook).flatMap(b -> b.longs.update.throttle(1, TimeUnit.SECONDS)))
                 .layoutWhile(chart.showRealtimeUpdate.observing());
-        layoutMarketInfo.layoutBy(widthProperty(), heightProperty())
-                .layoutBy(axisX.scroll.valueProperty(), axisX.scroll.visibleAmountProperty())
-                .layoutBy(axisY.scroll.valueProperty(), axisY.scroll.visibleAmountProperty())
-                .layoutBy(chart.market.observe().switchVariable(m -> m.tickers.latest).throttle(1, TimeUnit.SECONDS))
-                .layoutWhile(chart.showRealtimeUpdate.observing());;
 
         configIndicator();
         visualizeNotifyPrice();
@@ -286,7 +263,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         visualizeSFDPrice();
 
         getChildren()
-                .addAll(marketInfo, backGridVertical, backGridHorizontal, notifyPrice, orderBuyPrice, orderSellPrice, latestPrice, sfdPrice, orderbook, orderbookForMouse, candles, candleLatest, chartInfo, mouseTrackHorizontal, mouseTrackVertical);
+                .addAll(marketName, backGridVertical, backGridHorizontal, notifyPrice, orderBuyPrice, orderSellPrice, latestPrice, sfdPrice, orderbook, orderbookForMouse, candles, candleLatest, chartInfo, mouseTrackHorizontal, mouseTrackVertical);
     }
 
     /**
@@ -448,9 +425,8 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
             double position = axisY.getPositionForValue(largest.price.doubleValue());
             orderbookForMouse.clear()
-                    .configureStroke(largest.price.isLessThanOrEqual(orderbook.longs.best.v.price) ? BuyerColor : SellerColor)
-                    .strokeText((int) largest.size, orderbookForMouse
-                            .getWidth() - largest.size * orderbookLayer.diminishing - 15, position);
+                    .strokeColor(largest.price.isLessThanOrEqual(orderbook.longs.best.v.price) ? BuyerColor : SellerColor)
+                    .strokeText((int) largest.size, orderbookForMouse.getWidth() - largest.size * orderbookBar.scale - 15, position);
         });
 
         // remove on exit
@@ -622,22 +598,8 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         orderBuyPrice.draw();
         orderSellPrice.draw();
 
-        drawMarketInfo();
         drawCandle();
         drawOrderbook();
-    }
-
-    /**
-     * Draw market related info.
-     */
-    private void drawMarketInfo() {
-        layoutMarketInfo.layout(() -> {
-            marketInfo.clear();
-
-            chart.market.to(m -> {
-                marketInfo.fillText(m.service.marketReadableName(), 4, NameFont.getSize() * 1.2);
-            });
-        });
     }
 
     /**
@@ -858,43 +820,15 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
      */
     private void drawOrderbook() {
         layoutOrderbook.layout(() -> {
-            GraphicsContext gc = orderbook.getGraphicsContext2D();
-            gc.clearRect(0, 0, orderbook.getWidth(), orderbook.getHeight());
+            orderbook.clear();
 
             if (chart.showOrderbook.value()) {
                 chart.market.to(m -> {
-                    orderbookLayer = new OrderbookLayer(m);
-                    orderbookLayer.draw();
+                    orderbookBar = new OrderbookBar(m);
+                    orderbookBar.draw();
                 });
             }
         });
-    }
-
-    /**
-     * Draw orderbooks on chart' side.
-     * 
-     * @param pages The page info.
-     * @param threshold A range to draw.
-     * @param color Visible color.
-     */
-    private void drawOrderbook(List<OrderBookPage> pages, double max, double ratio, Color color, VPos textBaseLine) {
-        double upper = max * 0.6;
-        double start = orderbook.getWidth();
-        double lastPosition = 0;
-
-        GraphicsContext gc = orderbook.getGraphicsContext2D();
-        gc.setStroke(color);
-        gc.setTextBaseline(textBaseLine);
-
-        for (OrderBookPage page : pages) {
-            double position = axisY.getPositionForValue(page.price.doubleValue());
-            double width = start - page.size * ratio;
-            gc.strokeLine(start, position, width, position);
-            if (page.size > upper && Math.abs(lastPosition - position) > 8) {
-                gc.strokeText(String.valueOf((int) page.size), Math.min(width, start - 10), position, OrderbookWidth);
-                lastPosition = position;
-            }
-        }
     }
 
     /**
@@ -1195,29 +1129,29 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     /**
      * 
      */
-    private class OrderbookLayer {
+    private class OrderbookBar {
 
         /** The current diminishing scale. */
-        private final double diminishing;
+        private final double scale;
 
         /** The current orderbook for buyer. */
         private final List<OrderBookPage> buyers = new FastList();
 
         /** The maximum size on buyers. */
-        private double buyerMaxSize = OrderbookWidth;
+        private double buyerMaxSize = OrderbookBarWidth;
 
         /** The current orderbook for seller. */
         private final List<OrderBookPage> sellers = new FastList();
 
         /** The maximum size on sellers. */
-        private double sellerMaxSize = OrderbookWidth;
+        private double sellerMaxSize = OrderbookBarWidth;
 
         /**
          * Calculate info.
          * 
          * @param market
          */
-        private OrderbookLayer(Market market) {
+        private OrderbookBar(Market market) {
             final double visibleMax = axisY.computeVisibleMaxValue();
             final double visibleMin = axisY.computeVisibleMinValue();
 
@@ -1241,7 +1175,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 }
             }
 
-            diminishing = OrderbookWidth / Math.max(buyerMaxSize, sellerMaxSize);
+            scale = OrderbookBarWidth / Math.max(buyerMaxSize, sellerMaxSize);
         }
 
         /**
@@ -1270,10 +1204,10 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
             for (OrderBookPage page : pages) {
                 double position = axisY.getPositionForValue(page.price.doubleValue());
-                double width = start - page.size * diminishing;
+                double width = start - page.size * scale;
                 gc.strokeLine(start, position, width, position);
                 if (page.size > upper && Math.abs(lastPosition - position) > 8) {
-                    gc.strokeText(String.valueOf((int) page.size), width - 15, position, OrderbookWidth);
+                    gc.strokeText(String.valueOf((int) page.size), width - 15, position, OrderbookBarWidth);
                     lastPosition = position;
                 }
             }
