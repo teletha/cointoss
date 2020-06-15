@@ -27,6 +27,7 @@ import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.PathElement;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 
 import org.eclipse.collections.api.list.primitive.MutableDoubleList;
@@ -149,6 +150,12 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     /** Chart UI */
     private final EnhancedCanvas chartInfo = new EnhancedCanvas();
 
+    /** Chart UI */
+    private final EnhancedCanvas info = new EnhancedCanvas().size(100, 100).fontSize(8);
+
+    /** Chart UI */
+    private final Rectangle infoBackground = new Rectangle(100, 100);
+
     /** Flag whether candle chart shoud layout on the next rendering phase or not. */
     final LayoutAssistant layoutCandle = new LayoutAssistant(this);
 
@@ -263,7 +270,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         visualizeSFDPrice();
 
         getChildren()
-                .addAll(marketName, backGridVertical, backGridHorizontal, notifyPrice, orderBuyPrice, orderSellPrice, latestPrice, sfdPrice, orderbook, orderbookDigit, candles, candleLatest, chartInfo, mouseTrackHorizontal, mouseTrackVertical);
+                .addAll(marketName, backGridVertical, backGridHorizontal, notifyPrice, orderBuyPrice, orderSellPrice, latestPrice, sfdPrice, orderbook, orderbookDigit, candles, candleLatest, chartInfo, mouseTrackHorizontal, mouseTrackVertical, infoBackground, info);
     }
 
     /**
@@ -600,6 +607,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
         drawCandle();
         drawOrderbook();
+        drawInfo();
     }
 
     /**
@@ -833,6 +841,20 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 });
             }
         });
+    }
+
+    /**
+     * Draw infomation.
+     */
+    private void drawInfo() {
+        info.setLayoutX(10);
+        info.setLayoutY(getHeight() - 110);
+
+        infoBackground.setLayoutX(10);
+        infoBackground.setLayoutY(getHeight() - 110);
+        infoBackground.setArcHeight(10);
+        infoBackground.setArcWidth(10);
+        infoBackground.setFill(Color.rgb(20, 20, 20, 0.7));
     }
 
     /**
