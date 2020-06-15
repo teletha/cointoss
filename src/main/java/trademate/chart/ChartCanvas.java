@@ -9,7 +9,7 @@
  */
 package trademate.chart;
 
-import static transcript.Transcript.en;
+import static transcript.Transcript.*;
 
 import java.time.Duration;
 import java.util.List;
@@ -137,34 +137,40 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     private final EnhancedCanvas candleLatest = new EnhancedCanvas();
 
     /** Chart UI */
-    private final EnhancedCanvas orderbook = new EnhancedCanvas().context(gc -> {
-        gc.setLineWidth(1);
-        gc.setFont(Font.font(8));
-        gc.setFill(Color.rgb(250, 250, 250, 0.9));
+    private final EnhancedCanvas orderbook = new EnhancedCanvas().context(c -> {
+        c.setLineWidth(1);
+        c.setFont(Font.font(8));
+        c.setFill(Color.rgb(250, 250, 250, 0.9));
     });
 
     /** Chart UI */
-    private final EnhancedCanvas orderbookForMouse = new EnhancedCanvas().context(gc -> {
-        gc.setLineWidth(1);
-        gc.setFont(Font.font(8));
-        gc.setTextBaseline(VPos.CENTER);
-        gc.setStroke(Color.WHITE);
+    private final EnhancedCanvas orderbookForMouse = new EnhancedCanvas().context(c -> {
+        c.setLineWidth(1);
+        c.setFont(Font.font(8));
+        c.setTextBaseline(VPos.CENTER);
+        c.setStroke(Color.WHITE);
     });
 
     /** Chart UI */
-    private final EnhancedCanvas name = new EnhancedCanvas();
+    private final EnhancedCanvas marketInfo = new EnhancedCanvas().context(c -> {
+        c.setFont(NameFont);
+        c.setFill(NameColor);
+    });
 
     /** Chart UI */
     private final EnhancedCanvas chartInfo = new EnhancedCanvas();
 
-    /** Flag whether candle chart shoud layout on the next rendering phase or not. */
+    /** Flag whether candle chart should layout on the next rendering phase or not. */
     final LayoutAssistant layoutCandle = new LayoutAssistant(this);
 
-    /** Flag whether candle chart shoud layout on the next rendering phase or not. */
+    /** Flag whether candle chart should layout on the next rendering phase or not. */
     private final LayoutAssistant layoutCandleLatest = new LayoutAssistant(this);
 
-    /** Flag whether orderbook shoud layout on the next rendering phase or not. */
+    /** Flag whether orderbook should layout on the next rendering phase or not. */
     private final LayoutAssistant layoutOrderbook = new LayoutAssistant(this);
+
+    /** Flag whether market info should layout on the next rendering phase or not. */
+    private final LayoutAssistant layoutMarketInfo = new LayoutAssistant(this);
 
     /** The script registry. */
     private final PlotScriptRegistry registry = I.make(PlotScriptRegistry.class);
@@ -240,12 +246,8 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         this.orderbook.fitOn(this);
         this.orderbookForMouse.fitOn(this);
         this.chartInfo.fitOn(this);
-        this.name.fitOn(this);
+        this.marketInfo.fitOn(this);
 
-        chart.market.observe()
-                .combineLatest(Viewtify.observe(widthProperty()), Viewtify.observe(heightProperty()))
-                .map(Ⅲ<Market, Double, Double>::ⅰ)
-                .to(this::drawMarketName);
         chart.market.observe().combineLatest(chart.ticker.observe(), Viewtify.observing(chart.scripts)).to(v -> {
             plotters = plottersCache.getUnchecked(v);
             scripts = I.signal(plotters).map(p -> p.origin).distinct().toList();
@@ -270,6 +272,11 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 .layoutBy(chart.ticker.observe(), chart.showOrderbook.observe())
                 .layoutBy(chart.market.observe().map(m -> m.orderBook).flatMap(b -> b.longs.update.throttle(1, TimeUnit.SECONDS)))
                 .layoutWhile(chart.showRealtimeUpdate.observing());
+        layoutMarketInfo.layoutBy(widthProperty(), heightProperty())
+                .layoutBy(axisX.scroll.valueProperty(), axisX.scroll.visibleAmountProperty())
+                .layoutBy(axisY.scroll.valueProperty(), axisY.scroll.visibleAmountProperty())
+                .layoutBy(chart.market.observe().switchVariable(m -> m.tickers.latest).throttle(1, TimeUnit.SECONDS))
+                .layoutWhile(chart.showRealtimeUpdate.observing());;
 
         configIndicator();
         visualizeNotifyPrice();
@@ -279,7 +286,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         visualizeSFDPrice();
 
         getChildren()
-                .addAll(name, backGridVertical, backGridHorizontal, notifyPrice, orderBuyPrice, orderSellPrice, latestPrice, sfdPrice, orderbook, orderbookForMouse, candles, candleLatest, chartInfo, mouseTrackHorizontal, mouseTrackVertical);
+                .addAll(marketInfo, backGridVertical, backGridHorizontal, notifyPrice, orderBuyPrice, orderSellPrice, latestPrice, sfdPrice, orderbook, orderbookForMouse, candles, candleLatest, chartInfo, mouseTrackHorizontal, mouseTrackVertical);
     }
 
     /**
@@ -615,8 +622,22 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         orderBuyPrice.draw();
         orderSellPrice.draw();
 
+        drawMarketInfo();
         drawCandle();
         drawOrderbook();
+    }
+
+    /**
+     * Draw market related info.
+     */
+    private void drawMarketInfo() {
+        layoutMarketInfo.layout(() -> {
+            marketInfo.clear();
+
+            chart.market.to(m -> {
+                marketInfo.fillText(m.service.marketReadableName(), 4, NameFont.getSize() * 1.2);
+            });
+        });
     }
 
     /**
@@ -830,17 +851,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 x += chartInfoWidth + chartInfoHorizontalGap;
             }
         }
-    }
-
-    /**
-     * Draw market name in background.
-     */
-    private void drawMarketName(Market m) {
-        GraphicsContext gc = name.getGraphicsContext2D();
-        gc.clearRect(0, 0, name.getWidth(), name.getHeight());
-        gc.setFont(NameFont);
-        gc.setFill(NameColor);
-        gc.fillText(m.service.marketReadableName(), 4, NameFont.getSize() * 1.2);
     }
 
     /**
