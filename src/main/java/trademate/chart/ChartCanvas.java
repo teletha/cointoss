@@ -9,7 +9,7 @@
  */
 package trademate.chart;
 
-import static transcript.Transcript.*;
+import static transcript.Transcript.en;
 
 import java.time.Duration;
 import java.util.List;
@@ -21,7 +21,7 @@ import javafx.collections.ObservableList;
 import javafx.geometry.VPos;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
@@ -68,7 +68,7 @@ import viewtify.ui.helper.User;
 import viewtify.ui.helper.UserActionHelper;
 import viewtify.util.FXUtils;
 
-public class ChartCanvas extends StackPane implements UserActionHelper<ChartCanvas> {
+public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas> {
 
     /** Infomation Font */
     private static final Font InfoFont = Font.font(Font.getDefault().getName(), 10.5);
@@ -136,10 +136,10 @@ public class ChartCanvas extends StackPane implements UserActionHelper<ChartCanv
     /** Chart UI */
     private final EnhancedCanvas orderbook = new EnhancedCanvas().bindSizeTo(OrderbookDigitWidth + OrderbookBarWidth, this)
             .fontSize(8)
-            .fillColor(250, 250, 250, 0.9);
+            .textBaseLine(VPos.CENTER);
 
     /** Chart UI */
-    private final EnhancedCanvas orderbookForMouse = new EnhancedCanvas().bindSizeTo(OrderbookDigitWidth + OrderbookBarWidth, this)
+    private final EnhancedCanvas orderbookDigit = new EnhancedCanvas().bindSizeTo(OrderbookDigitWidth + OrderbookBarWidth, this)
             .fontSize(8)
             .textBaseLine(VPos.CENTER);
 
@@ -263,7 +263,7 @@ public class ChartCanvas extends StackPane implements UserActionHelper<ChartCanv
         visualizeSFDPrice();
 
         getChildren()
-                .addAll(marketName, backGridVertical, backGridHorizontal, notifyPrice, orderBuyPrice, orderSellPrice, latestPrice, sfdPrice, orderbook, orderbookForMouse, candles, candleLatest, chartInfo, mouseTrackHorizontal, mouseTrackVertical);
+                .addAll(marketName, backGridVertical, backGridHorizontal, notifyPrice, orderBuyPrice, orderSellPrice, latestPrice, sfdPrice, orderbook, orderbookDigit, candles, candleLatest, chartInfo, mouseTrackHorizontal, mouseTrackVertical);
     }
 
     /**
@@ -424,9 +424,9 @@ public class ChartCanvas extends StackPane implements UserActionHelper<ChartCanv
             OrderBookPage largest = orderbook.findLargestOrder(axisY.getValueForPosition(y + 2), axisY.getValueForPosition(y - 2));
 
             double position = axisY.getPositionForValue(largest.price.doubleValue());
-            orderbookForMouse.clear()
+            orderbookDigit.clear()
                     .strokeColor(largest.price.isLessThanOrEqual(orderbook.longs.best.v.price) ? BuyerColor : SellerColor)
-                    .strokeText((int) largest.size, orderbookForMouse.getWidth() - largest.size * orderbookBar.scale - 15, position);
+                    .strokeText((int) largest.size, orderbookDigit.getWidth() - largest.size * orderbookBar.scale - 15, position);
         });
 
         // remove on exit
@@ -439,7 +439,7 @@ public class ChartCanvas extends StackPane implements UserActionHelper<ChartCanv
 
             // clear mouse related info
             chartInfo.clear();
-            orderbookForMouse.clear();
+            orderbookDigit.clear();
         });
     }
 
@@ -820,6 +820,10 @@ public class ChartCanvas extends StackPane implements UserActionHelper<ChartCanv
      */
     private void drawOrderbook() {
         layoutOrderbook.layout(() -> {
+            double x = getWidth() - OrderbookBarWidth - OrderbookDigitWidth;
+            orderbook.setLayoutX(x);
+            orderbookDigit.setLayoutX(x);
+
             orderbook.clear();
 
             if (chart.showOrderbook.value()) {
@@ -1182,8 +1186,8 @@ public class ChartCanvas extends StackPane implements UserActionHelper<ChartCanv
          * Draw orderbooks on chart' side.
          */
         private void draw() {
-            draw(buyers, buyerMaxSize, BuyerColor, VPos.TOP);
-            draw(sellers, sellerMaxSize, SellerColor, VPos.BOTTOM);
+            draw(buyers, buyerMaxSize, BuyerColor);
+            draw(sellers, sellerMaxSize, SellerColor);
         }
 
         /**
@@ -1193,14 +1197,13 @@ public class ChartCanvas extends StackPane implements UserActionHelper<ChartCanv
          * @param threshold A range to draw.
          * @param color Visible color.
          */
-        private void draw(List<OrderBookPage> pages, double max, Color color, VPos textBaseLine) {
-            double upper = max * 0.8;
+        private void draw(List<OrderBookPage> pages, double max, Color color) {
+            double upper = max * 0.75;
             double start = orderbook.getWidth();
             double lastPosition = 0;
 
             GraphicsContext gc = orderbook.getGraphicsContext2D();
             gc.setStroke(color);
-            gc.setTextBaseline(VPos.CENTER);
 
             for (OrderBookPage page : pages) {
                 double position = axisY.getPositionForValue(page.price.doubleValue());
