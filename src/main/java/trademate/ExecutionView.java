@@ -9,6 +9,7 @@
  */
 package trademate;
 
+import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
 import cointoss.execution.Execution;
@@ -20,10 +21,14 @@ import viewtify.Viewtify;
 import viewtify.ui.UILabel;
 import viewtify.ui.UIListView;
 import viewtify.ui.UISpinner;
+import viewtify.ui.UIText;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
+import viewtify.util.Icon;
 
 public class ExecutionView extends View {
+
+    private UIText pong;
 
     /** The execution list. */
     private UIListView<Execution> executionList;
@@ -40,6 +45,7 @@ public class ExecutionView extends View {
     class view extends ViewDSL {
         {
             $(vbox, style.root, () -> {
+                form("Pong", pong);
                 $(executionList, style.fill);
                 $(hbox, () -> {
                     $(takerSize, style.takerSize);
@@ -72,6 +78,18 @@ public class ExecutionView extends View {
      */
     @Override
     protected void initialize() {
+        tradingView.market.tickers.latest.observe().throttle(1000, TimeUnit.MILLISECONDS).on(Viewtify.UIThread).to(e -> {
+            long diff = System.currentTimeMillis() - e.mills;
+            if (diff < 0) {
+                pong.decorateBy(Icon.Error, "The time on your computer may not be accurate. Please synchronize the time with public NTP server.");
+            } else if (1250 < diff) {
+                pong.decorateBy(Icon.Error, "You are experiencing significant delays and may be referring to outdated data.\r\nWe recommend that you stop trading.");
+            } else {
+                pong.undecorate();
+            }
+            pong.value(diff + "ms");
+        });
+
         int scale = tradingView.market.service.setting.targetCurrencyScaleSize;
 
         // configure UI
