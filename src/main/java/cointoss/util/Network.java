@@ -18,10 +18,6 @@ import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 
-import com.github.signalr4j.client.LogLevel;
-import com.github.signalr4j.client.Logger;
-import com.github.signalr4j.client.hubs.HubConnection;
-import com.github.signalr4j.client.hubs.HubProxy;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -314,49 +310,6 @@ public class Network {
         public String method;
 
         public Map<String, String> params = new HashMap();
-    }
-
-    /**
-     * Connect by Signalr.
-     * 
-     * @param uri
-     * @param query
-     * @param channel
-     * @return
-     */
-    public Signal<JsonElement> signalr(String uri, String query, String channel, String... events) {
-        return new Signal<>((observer, disposer) -> {
-            // Connect to the server
-            HubConnection connection = new HubConnection(uri, query, true, new NullLogger());
-            connection.error(observer::error);
-            HubProxy proxy = connection.createHubProxy(channel);
-
-            for (String event : events) {
-                proxy.subscribe(event).addReceivedHandler(array -> {
-                    for (JsonElement e : array) {
-                        observer.accept(e);
-                    }
-                });
-            }
-
-            // Start the connection
-            connection.start();
-
-            return disposer.add(connection::disconnect);
-        });
-    }
-
-    /**
-     * @version 2018/04/29 7:56:01
-     */
-    private static class NullLogger implements Logger {
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void log(String message, LogLevel level) {
-        }
     }
 
     /**

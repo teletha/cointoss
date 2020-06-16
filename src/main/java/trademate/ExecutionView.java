@@ -21,14 +21,13 @@ import viewtify.Viewtify;
 import viewtify.ui.UILabel;
 import viewtify.ui.UIListView;
 import viewtify.ui.UISpinner;
-import viewtify.ui.UIText;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
 import viewtify.util.Icon;
 
 public class ExecutionView extends View {
 
-    private UIText pong;
+    private UILabel delay;
 
     /** The execution list. */
     private UIListView<Execution> executionList;
@@ -45,7 +44,7 @@ public class ExecutionView extends View {
     class view extends ViewDSL {
         {
             $(vbox, style.root, () -> {
-                form("Pong", pong);
+                form("Delay", delay);
                 $(executionList, style.fill);
                 $(hbox, () -> {
                     $(takerSize, style.takerSize);
@@ -78,16 +77,19 @@ public class ExecutionView extends View {
      */
     @Override
     protected void initialize() {
-        tradingView.market.tickers.latest.observe().throttle(1000, TimeUnit.MILLISECONDS).on(Viewtify.UIThread).to(e -> {
+        tradingView.market.tickers.latest.observe().throttle(500, TimeUnit.MILLISECONDS).on(Viewtify.UIThread).to(e -> {
             long diff = System.currentTimeMillis() - e.mills;
             if (diff < 0) {
-                pong.decorateBy(Icon.Error, "The time on your computer may not be accurate. Please synchronize the time with public NTP server.");
-            } else if (1250 < diff) {
-                pong.decorateBy(Icon.Error, "You are experiencing significant delays and may be referring to outdated data.\r\nWe recommend that you stop trading.");
+                delay.tooltip("The time on your computer may not be accurate.\r\nPlease synchronize the time with public NTP server.");
+                delay.ui.setGraphic(Icon.Error.image());
+            } else if (1000 < diff) {
+                delay.tooltip("You are experiencing significant delays and may be referring to outdated data.\r\nWe recommend that you stop trading.");
+                delay.ui.setGraphic(Icon.Error.image());
             } else {
-                pong.undecorate();
+                delay.untooltip();
+                delay.ui.setGraphic(null);
             }
-            pong.value(diff + "ms");
+            delay.text(diff + "ms");
         });
 
         int scale = tradingView.market.service.setting.targetCurrencyScaleSize;
