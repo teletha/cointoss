@@ -171,7 +171,7 @@ class TickerManagerTest {
 
         // validate
         manager.tickers().to(ticker -> {
-            assert ticker.ticks.first().buyVolume() == 1d;
+            assert ticker.ticks.first().longVolume() == 1d;
         });
 
         // update
@@ -180,12 +180,12 @@ class TickerManagerTest {
 
         // validate
         manager.tickers().take(between(Minute5, Day7)).to(ticker -> {
-            assert ticker.ticks.first().buyVolume() == 3d;
-            assert ticker.ticks.last().buyVolume() == 3d;
+            assert ticker.ticks.first().longVolume() == 3d;
+            assert ticker.ticks.last().longVolume() == 3d;
         });
         manager.tickers().take(between(Second5, Minute1)).to(ticker -> {
-            assert ticker.ticks.first().buyVolume() == 1d;
-            assert ticker.ticks.last().buyVolume() == 1d;
+            assert ticker.ticks.first().longVolume() == 1d;
+            assert ticker.ticks.last().longVolume() == 1d;
         });
 
         // update
@@ -193,10 +193,10 @@ class TickerManagerTest {
 
         // validate
         Ticker ticker = manager.on(Minute1);
-        assert ticker.ticks.getByIndex(0).buyVolume() == 1d;
-        assert ticker.ticks.getByIndex(1).buyVolume() == 1d;
-        assert ticker.ticks.getByIndex(2).buyVolume() == 1d;
-        assert ticker.ticks.getByIndex(3).buyVolume() == 3d;
+        assert ticker.ticks.getByIndex(0).longVolume() == 1d;
+        assert ticker.ticks.getByIndex(1).longVolume() == 1d;
+        assert ticker.ticks.getByIndex(2).longVolume() == 1d;
+        assert ticker.ticks.getByIndex(3).longVolume() == 3d;
     }
 
     @Test
@@ -206,7 +206,7 @@ class TickerManagerTest {
 
         // validate
         manager.tickers().to(ticker -> {
-            assert ticker.ticks.first().sellVolume() == 1d;
+            assert ticker.ticks.first().shortVolume() == 1d;
         });
 
         // update
@@ -215,12 +215,12 @@ class TickerManagerTest {
 
         // validate
         manager.tickers().take(between(Minute5, Day7)).to(ticker -> {
-            assert ticker.ticks.first().sellVolume() == 3d;
-            assert ticker.ticks.last().sellVolume() == 3d;
+            assert ticker.ticks.first().shortVolume() == 3d;
+            assert ticker.ticks.last().shortVolume() == 3d;
         });
         manager.tickers().take(between(Second5, Minute1)).to(ticker -> {
-            assert ticker.ticks.first().sellVolume() == 1d;
-            assert ticker.ticks.last().sellVolume() == 1d;
+            assert ticker.ticks.first().shortVolume() == 1d;
+            assert ticker.ticks.last().shortVolume() == 1d;
         });
     }
 

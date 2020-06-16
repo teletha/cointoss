@@ -49,7 +49,7 @@ class IndicatorTest extends TickerTestSupport {
     @Test
     void combine() {
         Ticker ticker = ticker(Span.Second5, 1, 2, 3, 4, 5);
-        Indicator<Double> volume = Indicator.build(ticker, tick -> tick.buyVolume());
+        Indicator<Double> volume = Indicator.build(ticker, tick -> tick.longVolume());
         Indicator<Integer> low = Indicator.build(ticker, tick -> tick.lowPrice.intValue());
         Indicator<Ⅱ<Double, Integer>> indicator = volume.combine(low);
         assert indicator.valueAt(ticker.ticks.getByIndex(0)).equals(I.pair(1d, 1));

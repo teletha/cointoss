@@ -35,8 +35,8 @@ public enum CandleType {
 
     /** Coordinate by volume. */
     Volume(tick -> {
-        double buy = tick.buyVolume();
-        double sell = tick.sellVolume();
+        double buy = tick.longVolume();
+        double sell = tick.shortVolume();
 
         if (buy > sell) {
             return CandleType.Buy;
@@ -51,8 +51,8 @@ public enum CandleType {
     PriceVolume(tick -> {
         Num open = tick.openPrice;
         Num close = tick.closePrice();
-        double buy = tick.buyVolume();
-        double sell = tick.sellVolume();
+        double buy = tick.longVolume();
+        double sell = tick.shortVolume();
 
         if (open.isLessThan(close)) {
             if (buy >= sell) {
@@ -79,8 +79,8 @@ public enum CandleType {
     PriceVolumeWeight(tick -> {
         Num open = tick.openPrice;
         Num close = tick.closePrice();
-        double buy = tick.buyVolume();
-        double sell = tick.sellVolume();
+        double buy = tick.longVolume();
+        double sell = tick.shortVolume();
         double weight = Math.pow(buy / sell, 4);
 
         if (open.isLessThan(close)) {

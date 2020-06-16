@@ -38,8 +38,8 @@ public class VolumeIndicator extends PlotScript implements StyleDSL {
         // volume
         int volumeScale = market.service.setting.targetCurrencyMinimumBidSize.scale();
 
-        DoubleIndicator buyVolume = DoubleIndicator.build(ticker, Tick::buyVolume);
-        DoubleIndicator sellVolume = DoubleIndicator.build(ticker, Tick::sellVolume);
+        DoubleIndicator buyVolume = DoubleIndicator.build(ticker, Tick::longVolume);
+        DoubleIndicator sellVolume = DoubleIndicator.build(ticker, Tick::shortVolume);
 
         in(PlotArea.Bottom, () -> {
             line(buyVolume.scale(volumeScale).name(CommonText.Buy), Long);

@@ -29,11 +29,17 @@ public final class TickerManager implements Disposable {
     /** The latest price. */
     public final Variable<Num> latestPrice = Variable.of(Num.ZERO);
 
+    /** Total of long count since application startup. */
+    int longCount = 0;
+
     /** Total of long volume since application startup. */
     double longVolume = 0;
 
     /** Total of long price increase since application startup. */
     double longPriceIncrease = 0;
+
+    /** Total of short count since application startup. */
+    int shortCount = 0;
 
     /** Total of short volume since application startup. */
     double shortVolume = 0;
@@ -105,11 +111,13 @@ public final class TickerManager implements Disposable {
             update(tickers[0], e, e.price, e.price.compareTo(latest.v.price));
         }
 
-        // update totality of related values
+        // update total related values
         if (e.direction == Direction.BUY) {
+            longCount++;
             longVolume += e.size.doubleValue();
             longPriceIncrease += e.price.doubleValue() - latest.v.price.doubleValue();
         } else {
+            shortCount++;
             shortVolume += e.size.doubleValue();
             shortPriceDecrease += latest.v.price.doubleValue() - e.price.doubleValue();
         }

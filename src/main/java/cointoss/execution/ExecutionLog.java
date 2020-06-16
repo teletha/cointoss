@@ -790,8 +790,8 @@ public class ExecutionLog {
                     CsvWriter writer = buildCsvWriter(new ZstdOutputStream(fast.newOutputStream(), 1));
                     ticker.ticks.each(tick -> {
                         long id = tick.openId;
-                        Num buy = Num.of(tick.buyVolume()).scale(scale).divide(2);
-                        Num sell = Num.of(tick.sellVolume()).scale(scale).divide(2);
+                        Num buy = Num.of(tick.longVolume()).scale(scale).divide(2);
+                        Num sell = Num.of(tick.shortVolume()).scale(scale).divide(2);
                         Direction buySide = Direction.BUY;
                         Direction sellSide = Direction.SELL;
 
