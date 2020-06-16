@@ -43,8 +43,9 @@ public class ExecutionView extends View {
 
     private UILabel volumeRatio;
 
-    /** The execution list. */
-    private UIListView<Execution> executionList;
+    private UILabel losscutLong;
+
+    private UILabel losscutShort;
 
     /** The execution list. */
     private UIListView<Execution> executionCumulativeList;
@@ -62,7 +63,8 @@ public class ExecutionView extends View {
                 form(en("Delay"), delay);
                 form(en("Count"), FormInputMin, countLong.style(Long), countShort.style(Short), countRatio);
                 form(en("Volume"), FormInputMin, volumeLong.style(Long), volumeShort.style(Short), volumeRatio);
-                $(executionList, style.fill);
+                form(en("Losscut"), FormInputMin, losscutLong.style(Long), losscutShort.style(Short));
+
                 $(hbox, () -> {
                     $(takerSize, style.takerSize);
                 });
@@ -73,7 +75,7 @@ public class ExecutionView extends View {
 
     interface style extends StyleDSL {
         Style root = () -> {
-            display.minWidth(170, px).maxWidth(170, px).height.fill();
+            display.minWidth(180, px).maxWidth(180, px).height.fill();
 
             $.descendant(() -> {
                 text.unselectable();
@@ -118,29 +120,21 @@ public class ExecutionView extends View {
 
             countLong.text(longCount);
             countShort.text(shortCount);
-            countRatio.text(Primitives.roundString(longCount / (shortCount + 0.000000001), 2));
+            countRatio.text(Primitives.roundString(longCount / (longCount + shortCount + 0.000000001) * 100, 1).concat("%"));
 
             volumeLong.text(Primitives.roundString(longVolume, 1));
             volumeShort.text(Primitives.roundString(shortVolume, 1));
-            volumeRatio.text(Primitives.roundString(longVolume / (shortVolume + 0.0000000001), 2));
+            volumeRatio.text(Primitives.roundString(longVolume / (longVolume + shortVolume + 0.0000000001) * 100, 1).concat("%"));
+
+            losscutLong.text(realtime.longLosscutCount());
+            losscutShort.text(realtime.shortLosscutCount());
         });
 
         int scale = tradingView.market.service.setting.targetCurrencyScaleSize;
 
         // configure UI
         takerSize.initialize(IntStream.range(1, 51).boxed());
-        executionList.render((label, e) -> update(label, e, false, scale));
         executionCumulativeList.render((label, e) -> update(label, e, true, scale)).take(takerSize, (e, size) -> size <= e.accumulative);
-
-        // load execution log
-        tradingView.service
-                .add(tradingView.market.timeline.take(tradingView.chart.showRealtimeUpdate.observing()).on(Viewtify.UIThread).to(e -> {
-                    executionList.addItemAtFirst(e);
-
-                    if (15 < executionList.size()) {
-                        executionList.removeItemAtLast();
-                    }
-                }));
 
         // load big taker log
         tradingView.service.add(tradingView.market.timelineByTaker.take(tradingView.chart.showRealtimeUpdate.observing())

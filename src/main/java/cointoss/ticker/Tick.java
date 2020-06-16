@@ -54,6 +54,9 @@ public final class Tick {
     /** Snapshot of long count at tick initialization. */
     int longCount;
 
+    /** Snapshot of losscut long count at tick initialization. */
+    int longLosscutCount;
+
     /** Snapshot of long volume at tick initialization. */
     double longVolume;
 
@@ -62,6 +65,9 @@ public final class Tick {
 
     /** Snapshot of short count at tick initialization. */
     int shortCount;
+
+    /** Snapshot of losscut short count at tick initialization. */
+    int shortLosscutCount;
 
     /** Snapshot of short volume at tick initialization. */
     double shortVolume;
@@ -101,9 +107,11 @@ public final class Tick {
         this.longCount = realtime.longCount;
         this.longVolume = realtime.longVolume;
         this.longPriceIncrease = realtime.longPriceIncrease;
+        this.longLosscutCount = realtime.longLosscutCount;
         this.shortCount = realtime.shortCount;
         this.shortVolume = realtime.shortVolume;
         this.shortPriceDecrease = realtime.shortPriceDecrease;
+        this.shortLosscutCount = realtime.shortLosscutCount;
     }
 
     /**
@@ -226,6 +234,13 @@ public final class Tick {
     /**
      * Retrieve the tick related value.
      */
+    public int longLosscutCount() {
+        return realtime == null ? longLosscutCount : realtime.longLosscutCount - longLosscutCount;
+    }
+
+    /**
+     * Retrieve the tick related value.
+     */
     public int shortCount() {
         return realtime == null ? shortCount : realtime.shortCount - shortCount;
     }
@@ -246,6 +261,13 @@ public final class Tick {
      */
     public double shortPriceDecrease() {
         return realtime == null ? shortPriceDecrease : realtime.shortPriceDecrease - shortPriceDecrease;
+    }
+
+    /**
+     * Retrieve the tick related value.
+     */
+    public int shortLosscutCount() {
+        return realtime == null ? shortLosscutCount : realtime.shortLosscutCount - shortLosscutCount;
     }
 
     /**
@@ -275,9 +297,11 @@ public final class Tick {
         longCount = longCount();
         longVolume = longVolume();
         longPriceIncrease = longPriceIncrease();
+        longLosscutCount = longLosscutCount();
         shortCount = shortCount();
         shortVolume = shortVolume();
         shortPriceDecrease = shortPriceDecrease();
+        shortLosscutCount = shortLosscutCount();
         realtime = null;
     }
 

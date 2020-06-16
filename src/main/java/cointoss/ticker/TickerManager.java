@@ -32,6 +32,9 @@ public final class TickerManager implements Disposable {
     /** Total of long count since application startup. */
     int longCount = 0;
 
+    /** Total of losscut long count since application startup. */
+    int longLosscutCount = 0;
+
     /** Total of long volume since application startup. */
     double longVolume = 0;
 
@@ -40,6 +43,9 @@ public final class TickerManager implements Disposable {
 
     /** Total of short count since application startup. */
     int shortCount = 0;
+
+    /** Total of losscut short count since application startup. */
+    int shortLosscutCount = 0;
 
     /** Total of short volume since application startup. */
     double shortVolume = 0;
@@ -120,10 +126,12 @@ public final class TickerManager implements Disposable {
             longCount++;
             longVolume += e.size.doubleValue();
             longPriceIncrease += e.price.doubleValue() - latest.v.price.doubleValue();
+            if (e.delay == Execution.DelayHuge) shortLosscutCount++;
         } else {
             shortCount++;
             shortVolume += e.size.doubleValue();
             shortPriceDecrease += latest.v.price.doubleValue() - e.price.doubleValue();
+            if (e.delay == Execution.DelayHuge) longLosscutCount++;
         }
 
         // update the latest execution at last
