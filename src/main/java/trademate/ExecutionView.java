@@ -77,7 +77,7 @@ public class ExecutionView extends View {
      */
     @Override
     protected void initialize() {
-        tradingView.market.tickers.latest.observe().throttle(500, TimeUnit.MILLISECONDS).on(Viewtify.UIThread).to(e -> {
+        tradingView.market.tickers.latest.observe().throttle(1000, TimeUnit.MILLISECONDS).on(Viewtify.UIThread).to(e -> {
             long diff = System.currentTimeMillis() - e.mills;
             if (diff < 0) {
                 delay.tooltip("The time on your computer may not be accurate.\r\nPlease synchronize the time with public NTP server.");

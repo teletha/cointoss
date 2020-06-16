@@ -29,8 +29,6 @@ public final class TickerManager implements Disposable {
     /** The latest price. */
     public final Variable<Num> latestPrice = Variable.of(Num.ZERO);
 
-    public final RealtimeTicker realtime = new RealtimeTicker(Span.Minute1, latest);
-
     /** Total of long volume since application startup. */
     double longVolume = 0;
 
@@ -196,6 +194,5 @@ public final class TickerManager implements Disposable {
         for (Ticker ticker : tickers) {
             ticker.dispose();
         }
-        realtime.dispose();
     }
 }
