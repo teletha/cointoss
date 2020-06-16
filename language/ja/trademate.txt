@@ -13,11 +13,17 @@ Cancel
 Close
 終値
 
+Count
+約定数
+
 Current
 カレント
 
 Date
 日付
+
+Delay
+遅延
 
 Detach as window
 外部ウインドウへ分離
@@ -57,4 +63,7 @@ Side
 
 Trade History
 約定履歴
+
+Volume
+出来高
 

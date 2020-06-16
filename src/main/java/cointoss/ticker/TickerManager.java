@@ -80,6 +80,10 @@ public final class TickerManager implements Disposable {
         return tickers[span.ordinal()];
     }
 
+    public RealtimeTicker realtime(int seconds) {
+        return new RealtimeTicker(this, seconds / 5);
+    }
+
     /**
      * Retrieve all {@link Ticker}s.
      * 

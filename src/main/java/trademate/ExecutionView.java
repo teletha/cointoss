@@ -13,11 +13,13 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
 import cointoss.execution.Execution;
+import cointoss.ticker.RealtimeTicker;
 import cointoss.util.Chrono;
 import cointoss.util.Primitives;
 import stylist.Style;
 import stylist.StyleDSL;
 import viewtify.Viewtify;
+import viewtify.style.FormStyles;
 import viewtify.ui.UILabel;
 import viewtify.ui.UIListView;
 import viewtify.ui.UISpinner;
@@ -28,6 +30,18 @@ import viewtify.util.Icon;
 public class ExecutionView extends View {
 
     private UILabel delay;
+
+    private UILabel countLong;
+
+    private UILabel countShort;
+
+    private UILabel countRatio;
+
+    private UILabel volumeLong;
+
+    private UILabel volumeShort;
+
+    private UILabel volumeRatio;
 
     /** The execution list. */
     private UIListView<Execution> executionList;
@@ -41,10 +55,13 @@ public class ExecutionView extends View {
     /** Parent View */
     private TradingView tradingView;
 
-    class view extends ViewDSL {
+    class view extends ViewDSL implements TradeMateStyle, FormStyles {
+
         {
-            $(vbox, style.root, () -> {
-                form("Delay", delay);
+            $(vbox, style.root, FormLabelMin, () -> {
+                form(en("Delay"), delay);
+                form(en("Count"), FormInputMin, countLong.style(Long), countShort.style(Short), countRatio);
+                form(en("Volume"), FormInputMin, volumeLong.style(Long), volumeShort.style(Short), volumeRatio);
                 $(executionList, style.fill);
                 $(hbox, () -> {
                     $(takerSize, style.takerSize);
@@ -90,6 +107,22 @@ public class ExecutionView extends View {
                 delay.ui.setGraphic(null);
             }
             delay.text(diff + "ms");
+        });
+
+        RealtimeTicker realtime = tradingView.market.tickers.realtime(60);
+        Chrono.seconds().on(Viewtify.UIThread).to(() -> {
+            int longCount = realtime.longCount();
+            int shortCount = realtime.shortCount();
+            double longVolume = realtime.longVolume();
+            double shortVolume = realtime.shortVolume();
+
+            countLong.text(longCount);
+            countShort.text(shortCount);
+            countRatio.text(Primitives.roundString(longCount / (shortCount + 0.000000001), 2));
+
+            volumeLong.text(Primitives.roundString(longVolume, 1));
+            volumeShort.text(Primitives.roundString(shortVolume, 1));
+            volumeRatio.text(Primitives.roundString(longVolume / (shortVolume + 0.0000000001), 2));
         });
 
         int scale = tradingView.market.service.setting.targetCurrencyScaleSize;

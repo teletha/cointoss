@@ -40,6 +40,7 @@ import trademate.TradeMateStyle;
 import trademate.TradingView;
 import viewtify.Viewtify;
 import viewtify.bind.Calculated;
+import viewtify.style.FormStyles;
 import viewtify.ui.UIButton;
 import viewtify.ui.UICheckBox;
 import viewtify.ui.UILabel;
@@ -132,70 +133,27 @@ public class OrderBuilder extends View {
 
     private UIScrollPane scroll;
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected ViewDSL declareUI() {
-        return new ViewDSL() {
-            {
-                $(scroll, () -> {
-                    $(vbox, S.Root, () -> {
-                        $(hbox, S.Row, () -> {
-                            label(Amount, S.Label);
-                            $(orderSize, S.Form);
-                            $(orderSizeAmount, S.FormMin);
-                        });
-                        $(hbox, S.Row, () -> {
-                            label(Price, S.Label);
-                            $(orderPrice, S.Form);
-                            $(orderPriceAmount, S.FormMin);
-                        });
-                        $(hbox, S.Row, () -> {
-                            label(en("Variances"), S.Label);
-                            $(orderDivideSize, S.Form);
-                            $(orderDivideIntervalAmount, S.FormMin);
-                        });
-                        $(hbox, S.Row, () -> {
-                            label(en("Price Interval"), S.Label);
-                            $(orderPriceInterval, S.Form);
-                            $(orderPriceIntervalAmount, S.FormMin);
-                        });
-                        $(hbox, S.Row, () -> {
-                            label(en("Threshold"), S.Label);
-                            $(optimizeThreshold, S.Form);
-                        });
-                        $(hbox, S.Row, () -> {
-                            $(orderLimitShort, S.FormButton, TradeMateStyle.Short);
-                            $(orderLimitLong, S.FormButton, TradeMateStyle.Long);
-                        });
-                        $(hbox, S.Row, () -> {
-                            $(orderCancel, S.FormButton);
-                            $(orderStop, S.FormButton);
-                            $(orderReverse, S.FormButton);
-                        });
+    class View extends ViewDSL implements TradeMateStyle, FormStyles {
+        {
+            $(OrderBuilder.this.scroll, () -> {
+                $(vbox, S.Root, FormLabelMin, () -> {
+                    form(Amount, FormInputMin, orderSize, orderSizeAmount);
+                    form(Price, FormInputMin, orderPrice, orderPriceAmount);
+                    form(en("Variances"), FormInputMin, orderDivideSize, orderDivideIntervalAmount);
+                    form(en("Price Interval"), FormInputMin, orderPriceInterval, orderPriceIntervalAmount);
+                    form(en("Threshold"), FormInputMin, optimizeThreshold);
+                    form(FormButton, orderLimitShort.style(Short), orderLimitLong.style(Long));
+                    form(FormButton, orderCancel, orderStop, orderReverse);
+                    form(en("Position"), FormInputMin, positionSize);
 
-                        $(hbox, S.Row, () -> {
-                            $(sfdPrice500, S.SFD);
-                        });
-
-                        $(hbox, S.Row, () -> {
-                            label(en("Position"), S.Label);
-                            $(positionSize);
-                        });
-                        $(hbox, S.Row, () -> {
-                            $(bot);
-                        });
-
-                        $(table, S.Catalog, () -> {
-                            $(side, S.Narrow);
-                            $(price, S.Wide);
-                            $(amount, S.Narrow);
-                        });
+                    $(table, S.Catalog, () -> {
+                        $(side, S.Narrow);
+                        $(price, S.Wide);
+                        $(amount, S.Narrow);
                     });
                 });
-            }
-        };
+            });
+        }
     }
 
     /**
@@ -395,7 +353,7 @@ public class OrderBuilder extends View {
 
         Style Root = () -> {
             padding.left(5, px);
-            display.minWidth(270, px).height.fill();
+            display.width(250, px).height.fill();
             overflow.y.auto();
         };
 
