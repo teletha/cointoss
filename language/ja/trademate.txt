@@ -64,6 +64,9 @@ Sell
 Side
 サイド
 
+Spread
+スプレッド
+
 Trade History
 約定履歴
 

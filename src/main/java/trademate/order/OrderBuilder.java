@@ -168,7 +168,9 @@ public class OrderBuilder extends View {
         orderSize.initialize("0").when(User.Scroll, changeBy(orderSizeAmount)).require(positiveNumber);
         orderSizeAmount.initialize(view.service.setting.targetCurrencyBidSizes());
 
-        orderPrice.initialize("0").when(User.Scroll, changeBy(orderPriceAmount)).require(positiveNumber);
+        orderPrice.initialize("0").when(User.Scroll, changeBy(orderPriceAmount)).require(positiveNumber).when(User.MiddleClick, () -> {
+            orderPrice.value(view.market.tickers.latest.v.price.toString());
+        });
         orderPriceAmount.initialize(Num.ONE, Num.HUNDRED, Num.THOUSAND, Num.of(10000));
 
         orderDivideIntervalAmount.initialize(IntStream.rangeClosed(0, 6));

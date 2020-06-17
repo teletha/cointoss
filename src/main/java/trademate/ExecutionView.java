@@ -47,6 +47,8 @@ public class ExecutionView extends View {
 
     private UILabel losscutShort;
 
+    private UILabel spread;
+
     /** The execution list. */
     private UIListView<Execution> executionCumulativeList;
 
@@ -54,7 +56,7 @@ public class ExecutionView extends View {
     private UISpinner<Integer> takerSize;
 
     /** Parent View */
-    private TradingView tradingView;
+    private TradingView view;
 
     class view extends ViewDSL implements TradeMateStyle, FormStyles {
 
@@ -64,6 +66,7 @@ public class ExecutionView extends View {
                 form(en("Count"), FormInputMin, countLong.style(Long), countShort.style(Short), countRatio);
                 form(en("Volume"), FormInputMin, volumeLong.style(Long), volumeShort.style(Short), volumeRatio);
                 form(en("Losscut"), FormInputMin, losscutLong.style(Long), losscutShort.style(Short));
+                form(en("Spread"), FormInputMin, spread);
 
                 $(hbox, () -> {
                     $(takerSize, style.takerSize);
@@ -96,23 +99,29 @@ public class ExecutionView extends View {
      */
     @Override
     protected void initialize() {
-        tradingView.market.tickers.latest.observe().throttle(1000, TimeUnit.MILLISECONDS).on(Viewtify.UIThread).to(e -> {
-            long diff = System.currentTimeMillis() - e.mills;
-            if (diff < 0) {
-                delay.tooltip("The time on your computer may not be accurate.\r\nPlease synchronize the time with public NTP server.");
-                delay.ui.setGraphic(Icon.Error.image());
-            } else if (1000 < diff) {
-                delay.tooltip("You are experiencing significant delays and may be referring to outdated data.\r\nWe recommend that you stop trading.");
-                delay.ui.setGraphic(Icon.Error.image());
-            } else {
-                delay.untooltip();
-                delay.ui.setGraphic(null);
-            }
-            delay.text(diff + "ms");
-        });
+        view.market.tickers.latest.observe()
+                .take(view.chart.showRealtimeUpdate)
+                .throttle(1000, TimeUnit.MILLISECONDS)
+                .on(Viewtify.UIThread)
+                .to(e -> {
+                    long diff = System.currentTimeMillis() - e.mills;
+                    if (diff < 0) {
+                        delay.tooltip("The time on your computer may not be accurate.\r\nPlease synchronize the time with public NTP server.");
+                        delay.ui.setGraphic(Icon.Error.image());
+                    } else if (1000 < diff) {
+                        delay.tooltip("You are experiencing significant delays and may be referring to outdated data.\r\nWe recommend that you stop trading.");
+                        delay.ui.setGraphic(Icon.Error.image());
+                    } else {
+                        delay.untooltip();
+                        delay.ui.setGraphic(null);
+                    }
+                    delay.text(diff + "ms");
+                });
 
-        RealtimeTicker realtime = tradingView.market.tickers.realtime(60);
-        Chrono.seconds().on(Viewtify.UIThread).to(() -> {
+        view.market.orderBook.spread.observe().take(view.chart.showRealtimeUpdate).on(Viewtify.UIThread).to(price -> spread.text(price));
+
+        RealtimeTicker realtime = view.market.tickers.realtime(60);
+        Chrono.seconds().take(view.chart.showRealtimeUpdate).on(Viewtify.UIThread).to(() -> {
             int longCount = realtime.longCount();
             int shortCount = realtime.shortCount();
             double longVolume = realtime.longVolume();
@@ -130,24 +139,22 @@ public class ExecutionView extends View {
             losscutShort.text(realtime.shortLosscutCount());
         });
 
-        int scale = tradingView.market.service.setting.targetCurrencyScaleSize;
+        int scale = view.market.service.setting.targetCurrencyScaleSize;
 
         // configure UI
         takerSize.initialize(IntStream.range(1, 51).boxed());
         executionCumulativeList.render((label, e) -> update(label, e, true, scale)).take(takerSize, (e, size) -> size <= e.accumulative);
 
         // load big taker log
-        tradingView.service.add(tradingView.market.timelineByTaker.take(tradingView.chart.showRealtimeUpdate.observing())
-                .on(Viewtify.UIThread)
-                .to(e -> {
-                    if (1 <= e.accumulative) {
-                        executionCumulativeList.addItemAtFirst(e);
+        view.service.add(view.market.timelineByTaker.take(view.chart.showRealtimeUpdate.observing()).on(Viewtify.UIThread).to(e -> {
+            if (1 <= e.accumulative) {
+                executionCumulativeList.addItemAtFirst(e);
 
-                        if (1000 < executionCumulativeList.size()) {
-                            executionCumulativeList.removeItemAtLast();
-                        }
-                    }
-                }));
+                if (1000 < executionCumulativeList.size()) {
+                    executionCumulativeList.removeItemAtLast();
+                }
+            }
+        }));
     }
 
     private void update(UILabel label, Execution e, boolean accum, int scale) {

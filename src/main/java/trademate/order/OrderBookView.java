@@ -12,7 +12,6 @@ package trademate.order;
 import java.util.function.BiFunction;
 
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
@@ -26,7 +25,6 @@ import cointoss.util.Primitives;
 import kiss.WiseRunnable;
 import stylist.Style;
 import stylist.StyleDSL;
-import trademate.TradeMateStyle;
 import trademate.TradingView;
 import viewtify.Viewtify;
 import viewtify.ui.UILabel;
@@ -34,7 +32,6 @@ import viewtify.ui.UIListView;
 import viewtify.ui.UISpinner;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
-import viewtify.ui.helper.User;
 import viewtify.util.FXUtils;
 
 public class OrderBookView extends View {
@@ -127,17 +124,19 @@ public class OrderBookView extends View {
         hideSize.initialize(Num.range(0, 99));
 
         int scale = view.market.service.setting.targetCurrencyScaleSize;
-        longList.renderByNode(Canvas::new, displayOrderUnit(TradeMateStyle.BUY, scale, false))
-                .take(hideSize, (unit, size) -> unit.size >= size.doubleValue())
-                .when(User.LeftClick, calculatePrice(longList));
-        shortList.renderByNode(Canvas::new, displayOrderUnit(TradeMateStyle.SELL, scale, true))
-                .take(hideSize, (unit, size) -> unit.size >= size.doubleValue())
-                .when(User.LeftClick, calculatePrice(shortList))
-                .scrollToBottom();
+        // longList.renderByNode(Canvas::new, displayOrderUnit(TradeMateStyle.BUY, scale, false))
+        // .take(hideSize, (unit, size) -> unit.size >= size.doubleValue())
+        // .when(User.LeftClick, calculatePrice(longList));
+        // shortList.renderByNode(Canvas::new, displayOrderUnit(TradeMateStyle.SELL, scale, true))
+        // .take(hideSize, (unit, size) -> unit.size >= size.doubleValue())
+        // .when(User.LeftClick, calculatePrice(shortList))
+        // .scrollToBottom();
 
         priceRange.initialize(view.market.service.setting.orderBookGroupRangesWithBase()).observing(range -> {
-            longList.items((ObservableList) book.longs.groupBy(range));
-            shortList.items((ObservableList) book.shorts.groupBy(range));
+            book.longs.groupBy(range);
+            book.shorts.groupBy(range);
+            // longList.items((ObservableList) book.longs.groupBy(range));
+            // shortList.items((ObservableList) book.shorts.groupBy(range));
         });
 
         view.market.orderBook.spread.observe()

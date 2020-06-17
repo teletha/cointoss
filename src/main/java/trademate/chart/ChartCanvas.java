@@ -9,7 +9,7 @@
  */
 package trademate.chart;
 
-import static transcript.Transcript.*;
+import static transcript.Transcript.en;
 
 import java.time.Duration;
 import java.util.List;
@@ -18,6 +18,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
 import javafx.collections.ObservableList;
+import javafx.event.EventType;
 import javafx.geometry.VPos;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseEvent;
@@ -448,13 +449,22 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
      */
     private void visualizeNotifyPrice() {
         when(User.RightClick, e -> {
-            e.consume();
+            // e.consume();
 
             if (e.isControlDown()) {
                 notifyByIndicator(e);
             } else {
                 notifyByPrice(e);
             }
+        });
+
+        when(User.MousePress).to(pressed -> {
+            when(User.MouseDrag, User.MouseRelease).merge(when(User.MouseExit)).takeUntil(e -> {
+                EventType type = e.getEventType();
+                return type == MouseEvent.MOUSE_RELEASED || type == MouseEvent.MOUSE_EXITED;
+            }).to(dragOrReleaseOrExit -> {
+                System.out.println(dragOrReleaseOrExit);
+            });
         });
     }
 
