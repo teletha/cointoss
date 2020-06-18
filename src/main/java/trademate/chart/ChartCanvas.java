@@ -9,7 +9,7 @@
  */
 package trademate.chart;
 
-import static transcript.Transcript.*;
+import static transcript.Transcript.en;
 
 import java.time.Duration;
 import java.util.List;
@@ -150,7 +150,10 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     private final EnhancedCanvas marketName = new EnhancedCanvas().size(230, 30).fontSize(24).fillColor(50, 50, 50);
 
     /** Chart UI */
-    private final EnhancedCanvas chartInfo = new EnhancedCanvas();
+    private final EnhancedCanvas chartInfo = new EnhancedCanvas().bindSizeTo(this);
+
+    /** Chart UI */
+    private final EnhancedCanvas supporter = new EnhancedCanvas().bindSizeTo(this);
 
     /** Flag whether candle chart shoud layout on the next rendering phase or not. */
     final LayoutAssistant layoutCandle = new LayoutAssistant(this);
@@ -210,8 +213,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     /** The latest orderbook layer. */
     private OrderbookBar orderbookBar;
 
-    private EntrySupporter entrySupporter = new EntrySupporter();
-
     /**
      * Chart canvas.
      * 
@@ -232,7 +233,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         this.orderBuyPrice = new LineMark(axisY, ChartStyles.OrderSupportBuy);
         this.orderSellPrice = new LineMark(axisY, ChartStyles.OrderSupportSell);
         this.sfdPrice = new LineMark(axisY, ChartStyles.PriceSFD);
-        this.chartInfo.bindSizeTo(this);
 
         chart.market.observe().to(m -> marketName.clear().fillText(m.service.marketReadableName(), 4, 28));
         chart.market.observe().combineLatest(chart.ticker.observe(), Viewtify.observing(chart.scripts)).to(v -> {
@@ -266,10 +266,10 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         visualizeLatestPrice();
         visualizeMouseTrack();
         visualizeSFDPrice();
-        entrySupporter.init();
+        visualizePriceSupporter();
 
         getChildren()
-                .addAll(marketName, backGridVertical, backGridHorizontal, notifyPrice, orderBuyPrice, orderSellPrice, latestPrice, sfdPrice, orderbook, orderbookDigit, candles, candleLatest, chartInfo, mouseTrackHorizontal, mouseTrackVertical);
+                .addAll(marketName, backGridVertical, backGridHorizontal, notifyPrice, orderBuyPrice, orderSellPrice, latestPrice, sfdPrice, orderbook, orderbookDigit, candles, candleLatest, chartInfo, supporter, mouseTrackHorizontal, mouseTrackVertical);
     }
 
     /**
@@ -462,6 +462,57 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 notifyByPrice(e);
             }
         });
+    }
+
+    /**
+     * Visualize entry supporter or notifiable price in chart.
+     */
+    private void visualizePriceSupporter() {
+        Predicate<MouseEvent> RightButton = e -> e.getButton() == MouseButton.SECONDARY;
+
+        when(User.MousePress).take(RightButton).to(pressed -> {
+            long startTime = (long) axisX.getValueForPosition(pressed.getX());
+            double startPrice = axisY.getValueForPosition(pressed.getY());
+
+            Disposable dispose = Disposable.empty();
+            when(User.MouseDrag).take(RightButton).to(dragged -> {
+                long stepTime = (long) axisX.getValueForPosition(dragged.getX());
+                double stepPrice = axisY.getValueForPosition(dragged.getY());
+                drawSupporterArea(pressed, dragged);
+            }, dispose);
+
+            when(User.MouseRelease).take(RightButton).take(1).to(released -> {
+                long endTime = (long) axisX.getValueForPosition(released.getX());
+                double endPrice = axisY.getValueForPosition(released.getY());
+
+                supporter.clear();
+            }, dispose);
+        });
+    }
+
+    private void drawSupporterArea(MouseEvent start, MouseEvent end) {
+        double startX = start.getX();
+        double startY = start.getY();
+        double endX = end.getX();
+        double endY = end.getY();
+
+        if (endX < startX) {
+            startX = endX;
+            endX = start.getX();
+        }
+
+        if (endY < startY) {
+            startY = endY;
+            endY = start.getY();
+        }
+
+        GraphicsContext gc = supporter.getGraphicsContext2D();
+        gc.setFill(Color.WHITE.deriveColor(0, 1, 1, 0.15));
+        gc.setStroke(Color.WHITE.deriveColor(0, 1, 1, 0.7));
+
+        gc.clearRect(0, 0, supporter.getWidth(), supporter.getHeight());
+        gc.fillRect(startX, startY, endX - startX, endY - startY);
+        gc.strokeRect(startX, startY, endX - startX, endY - startY);
     }
 
     /**
@@ -1221,59 +1272,5 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 }
             }
         }
-    }
-
-    /**
-     * 
-     */
-    private class EntrySupporter {
-
-        private final Predicate<MouseEvent> RightButton = e -> {
-            return e.getButton() == MouseButton.SECONDARY;
-        };
-
-        private long startTime = -1;
-
-        private double startPrice = -1;
-
-        private long endTime = -1;
-
-        private double endPrice = -1;
-
-        private long stepTime = -1;
-
-        private double stepPrice = -1;
-
-        private void init() {
-            when(User.MousePress).take(RightButton).to(pressed -> {
-                startTime = (long) axisX.getValueForPosition(pressed.getX());
-                startPrice = axisY.getValueForPosition(pressed.getY());
-
-                System.out.println("Start  " + Chrono.systemByMills(startTime) + "   " + startPrice);
-
-                Disposable dispose = Disposable.empty();
-                when(User.MouseDrag).to(this::step, dispose);
-                when(User.MouseExit, User.MouseRelease).take(1).to(this::end, dispose);
-            });
-        }
-
-        private void start(MouseEvent press) {
-
-        }
-
-        private void end(MouseEvent e) {
-            endTime = (long) axisX.getValueForPosition(e.getX());
-            endPrice = axisY.getValueForPosition(e.getY());
-
-            System.out.println("End  " + Chrono.systemByMills(endTime) + "   " + endPrice);
-        }
-
-        private void step(MouseEvent e) {
-            stepTime = (long) axisX.getValueForPosition(e.getX());
-            stepPrice = axisY.getValueForPosition(e.getY());
-
-            System.out.println("Step  " + Chrono.systemByMills(stepTime) + "   " + stepPrice);
-        }
-
     }
 }
