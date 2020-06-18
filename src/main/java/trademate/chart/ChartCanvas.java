@@ -9,18 +9,19 @@
  */
 package trademate.chart;
 
-import static transcript.Transcript.en;
+import static transcript.Transcript.*;
 
 import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import javafx.collections.ObservableList;
-import javafx.event.EventType;
 import javafx.geometry.VPos;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
@@ -51,6 +52,7 @@ import cointoss.ticker.Ticker;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
 import cointoss.util.Primitives;
+import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
 import kiss.Variable;
@@ -208,6 +210,8 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     /** The latest orderbook layer. */
     private OrderbookBar orderbookBar;
 
+    private EntrySupporter entrySupporter = new EntrySupporter();
+
     /**
      * Chart canvas.
      * 
@@ -262,6 +266,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         visualizeLatestPrice();
         visualizeMouseTrack();
         visualizeSFDPrice();
+        entrySupporter.init();
 
         getChildren()
                 .addAll(marketName, backGridVertical, backGridHorizontal, notifyPrice, orderBuyPrice, orderSellPrice, latestPrice, sfdPrice, orderbook, orderbookDigit, candles, candleLatest, chartInfo, mouseTrackHorizontal, mouseTrackVertical);
@@ -456,15 +461,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             } else {
                 notifyByPrice(e);
             }
-        });
-
-        when(User.MousePress).to(pressed -> {
-            when(User.MouseDrag, User.MouseRelease).merge(when(User.MouseExit)).takeUntil(e -> {
-                EventType type = e.getEventType();
-                return type == MouseEvent.MOUSE_RELEASED || type == MouseEvent.MOUSE_EXITED;
-            }).to(dragOrReleaseOrExit -> {
-                System.out.println(dragOrReleaseOrExit);
-            });
         });
     }
 
@@ -1225,5 +1221,59 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 }
             }
         }
+    }
+
+    /**
+     * 
+     */
+    private class EntrySupporter {
+
+        private final Predicate<MouseEvent> RightButton = e -> {
+            return e.getButton() == MouseButton.SECONDARY;
+        };
+
+        private long startTime = -1;
+
+        private double startPrice = -1;
+
+        private long endTime = -1;
+
+        private double endPrice = -1;
+
+        private long stepTime = -1;
+
+        private double stepPrice = -1;
+
+        private void init() {
+            when(User.MousePress).take(RightButton).to(pressed -> {
+                startTime = (long) axisX.getValueForPosition(pressed.getX());
+                startPrice = axisY.getValueForPosition(pressed.getY());
+
+                System.out.println("Start  " + Chrono.systemByMills(startTime) + "   " + startPrice);
+
+                Disposable dispose = Disposable.empty();
+                when(User.MouseDrag).to(this::step, dispose);
+                when(User.MouseExit, User.MouseRelease).take(1).to(this::end, dispose);
+            });
+        }
+
+        private void start(MouseEvent press) {
+
+        }
+
+        private void end(MouseEvent e) {
+            endTime = (long) axisX.getValueForPosition(e.getX());
+            endPrice = axisY.getValueForPosition(e.getY());
+
+            System.out.println("End  " + Chrono.systemByMills(endTime) + "   " + endPrice);
+        }
+
+        private void step(MouseEvent e) {
+            stepTime = (long) axisX.getValueForPosition(e.getX());
+            stepPrice = axisY.getValueForPosition(e.getY());
+
+            System.out.println("Step  " + Chrono.systemByMills(stepTime) + "   " + stepPrice);
+        }
+
     }
 }
