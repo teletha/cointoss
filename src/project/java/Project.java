@@ -22,6 +22,7 @@ public class Project extends bee.api.Project {
         require("org.apache.commons", "commons-lang3");
         require("org.apache.commons", "commons-math3");
         require("commons-codec", "commons-codec");
+        require("commons-net", "commons-net");
         require("org.apache.logging.log4j", "log4j-core", Log4j);
         require("org.apache.logging.log4j", "log4j-slf4j-impl", Log4j);
         require("org.magicwerk", "brownies-collections");

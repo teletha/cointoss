@@ -9,6 +9,7 @@
  */
 package cointoss.util;
 
+import java.net.InetAddress;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
@@ -23,6 +24,9 @@ import java.time.temporal.Temporal;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import org.apache.commons.net.ntp.NTPUDPClient;
+import org.apache.commons.net.ntp.TimeInfo;
 
 import kiss.Signal;
 
@@ -344,5 +348,40 @@ public class Chrono {
      */
     public static Signal<ZonedDateTime> seconds() {
         return shared;
+    }
+
+    /** Difference between the time of the NTP server and local PC. */
+    private static long latestDelay;
+
+    static {
+        seconds().takeAt(index -> index % 300 == 30).to(Chrono::calculateDelayByNTP);
+    }
+
+    /**
+     * 
+     */
+    private static void calculateDelayByNTP() {
+        NTPUDPClient client = new NTPUDPClient();
+        try {
+            client.open();
+            TimeInfo info = client.getTime(InetAddress.getByName("ntp.nict.jp"));
+            info.computeDetails();
+            latestDelay = info.getOffset();
+            System.out.println(latestDelay);
+        } catch (Throwable e) {
+            // ignore
+        } finally {
+            client.close();
+        }
+    }
+
+    /**
+     * Obtains the exact current time, corrected for the difference between the NTP server and local
+     * PC time.
+     * 
+     * @return
+     */
+    public static long currentTimeMills() {
+        return System.currentTimeMillis() + latestDelay;
     }
 }
