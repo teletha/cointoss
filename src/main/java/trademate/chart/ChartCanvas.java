@@ -73,7 +73,7 @@ import viewtify.util.FXUtils;
 public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas> {
 
     /** Infomation Font */
-    private static final Font InfoFont = Font.font(Font.getDefault().getName(), 10.5);
+    private static final Font InfoFont = Font.font(10.5);
 
     /** Infomation Color */
     private static final Color InfoColor = Color.rgb(247, 239, 227);
@@ -490,17 +490,13 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         double upperPrice = axisY.getValueForPosition(startY);
         double lowerPrice = axisY.getValueForPosition(endY);
 
-        int gapX = -35;
-        int gapY = -12;
-        gc.setStroke(Color.BLACK);
+        int scale = chart.market.v.service.setting.baseCurrencyScaleSize;
+        double textX = endX - 40;
+        double lineY = -12;
+        gc.setStroke(Color.WHITESMOKE);
         gc.setFont(Font.font(10));
-        gc.setLineWidth(2);
-        gc.strokeText("Duration\t" + Chrono.formatAsDuration(Math.abs(endTime - startTime) * 1000), endX + gapX, endY + gapY);
-        gc.strokeText("Spread\t" + Primitives.roundDecimal(Math.abs(upperPrice - lowerPrice), 2), endX + gapX, endY + gapY * 2);
-        gc.setFill(Color.WHITESMOKE);
-        gc.fillText("Duration\t" + Chrono.formatAsDuration(Math.abs(endTime - startTime) * 1000), endX + gapX, endY + gapY);
-        gc.fillText("Spread\t" + Primitives.roundDecimal(Math.abs(upperPrice - lowerPrice), 2), endX + gapX, endY + gapY * 2);
-
+        gc.strokeText(en("Duration") + "\t" + Chrono.formatAsDuration(Math.abs(endTime - startTime) * 1000), textX, endY + lineY);
+        gc.strokeText(en("Spread") + "\t" + Primitives.roundString(Math.abs(upperPrice - lowerPrice), scale), textX, endY + lineY * 2);
     }
 
     /**
