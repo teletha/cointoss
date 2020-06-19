@@ -9,7 +9,7 @@
  */
 package trademate.chart;
 
-import static transcript.Transcript.en;
+import static transcript.Transcript.*;
 
 import java.time.Duration;
 import java.util.List;
@@ -43,7 +43,6 @@ import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.market.bitflyer.SFD;
-import cointoss.order.OrderBookManager;
 import cointoss.order.OrderBookPage;
 import cointoss.ticker.AbstractIndicator;
 import cointoss.ticker.Indicator;
@@ -261,7 +260,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 .layoutWhile(chart.showRealtimeUpdate.observing());
 
         configIndicator();
-        visualizeNotifyPrice();
         visualizeOrderPrice();
         visualizeLatestPrice();
         visualizeMouseTrack();
@@ -425,14 +423,16 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             }
 
             // search the nearest and largest order size
-            OrderBookManager orderbook = chart.market.v.orderBook;
+            chart.market.to(m -> {
+                OrderBookPage largest = m.orderBook.findLargestOrder(axisY.getValueForPosition(y + 2), axisY.getValueForPosition(y - 2));
 
-            OrderBookPage largest = orderbook.findLargestOrder(axisY.getValueForPosition(y + 2), axisY.getValueForPosition(y - 2));
-
-            double position = axisY.getPositionForValue(largest.price.doubleValue());
-            orderbookDigit.clear()
-                    .strokeColor(largest.price.isLessThanOrEqual(orderbook.longs.best.v.price) ? BuyerColor : SellerColor)
-                    .strokeText((int) largest.size, orderbookDigit.getWidth() - largest.size * orderbookBar.scale - 15, position);
+                if (largest != null && orderbookBar != null) {
+                    double position = axisY.getPositionForValue(largest.price.doubleValue());
+                    orderbookDigit.clear()
+                            .strokeColor(largest.price.isLessThanOrEqual(m.orderBook.longs.best.v.price) ? BuyerColor : SellerColor)
+                            .strokeText((int) largest.size, orderbookDigit.getWidth() - largest.size * orderbookBar.scale - 15, position);
+                }
+            });
         });
 
         // remove on exit
@@ -450,42 +450,24 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
     }
 
     /**
-     * Visualize notifiable price in chart.
-     */
-    private void visualizeNotifyPrice() {
-        when(User.RightClick, e -> {
-            // e.consume();
-
-            if (e.isControlDown()) {
-                notifyByIndicator(e);
-            } else {
-                notifyByPrice(e);
-            }
-        });
-    }
-
-    /**
      * Visualize entry supporter or notifiable price in chart.
      */
     private void visualizePriceSupporter() {
         Predicate<MouseEvent> RightButton = e -> e.getButton() == MouseButton.SECONDARY;
 
         when(User.MousePress).take(RightButton).to(pressed -> {
-            long startTime = (long) axisX.getValueForPosition(pressed.getX());
-            double startPrice = axisY.getValueForPosition(pressed.getY());
 
             Disposable dispose = Disposable.empty();
             when(User.MouseDrag).take(RightButton).to(dragged -> {
-                long stepTime = (long) axisX.getValueForPosition(dragged.getX());
-                double stepPrice = axisY.getValueForPosition(dragged.getY());
                 drawSupporterArea(pressed, dragged);
             }, dispose);
 
             when(User.MouseRelease).take(RightButton).take(1).to(released -> {
-                long endTime = (long) axisX.getValueForPosition(released.getX());
-                double endPrice = axisY.getValueForPosition(released.getY());
-
-                supporter.clear();
+                if (pressed.getX() != released.getX() || pressed.getY() != released.getY()) {
+                    supporter.clear();
+                } else {
+                    notifyByPrice(released);
+                }
             }, dispose);
         });
     }
@@ -496,23 +478,25 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         double endX = end.getX();
         double endY = end.getY();
 
-        if (endX < startX) {
-            startX = endX;
-            endX = start.getX();
-        }
-
-        if (endY < startY) {
-            startY = endY;
-            endY = start.getY();
-        }
-
         GraphicsContext gc = supporter.getGraphicsContext2D();
         gc.setFill(Color.WHITE.deriveColor(0, 1, 1, 0.15));
         gc.setStroke(Color.WHITE.deriveColor(0, 1, 1, 0.7));
 
         gc.clearRect(0, 0, supporter.getWidth(), supporter.getHeight());
-        gc.fillRect(startX, startY, endX - startX, endY - startY);
-        gc.strokeRect(startX, startY, endX - startX, endY - startY);
+        gc.strokeLine(startX, startY, endX, endY);
+
+        long startTime = (long) axisX.getValueForPosition(startX);
+        long endTime = (long) axisX.getValueForPosition(endX);
+        double upperPrice = axisY.getValueForPosition(startY);
+        double lowerPrice = axisY.getValueForPosition(endY);
+
+        int gapX = -35;
+        int gapY = -12;
+        gc.setFill(Color.WHITESMOKE);
+        gc.setFont(Font.font(10));
+        gc.fillText("Duration\t" + Chrono.formatAsDuration(Math.abs(endTime - startTime) * 1000), endX + gapX, endY + gapY);
+        gc.fillText("Spread\t" + Primitives.roundDecimal(Math.abs(upperPrice - lowerPrice), 2), endX + gapX, endY + gapY * 2);
+
     }
 
     /**
@@ -554,31 +538,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
      * @param e
      */
     private void notifyByIndicator(MouseEvent e) {
-        double clickedPosition = e.getY();
-
-        // check price range to add or remove
-        for (TickLable mark : notifyPrice.labels) {
-            double markedPosition = axisY.getPositionForValue(mark.value.get());
-
-            if (Math.abs(markedPosition - clickedPosition) < 5) {
-                notifyPrice.remove(mark);
-                return;
-            }
-        }
-
-        Num price = Num.of(Math.floor(axisY.getValueForPosition(clickedPosition)));
-        TickLable label = notifyPrice.createLabel(price);
-
-        label.add(chart.market.v.signalByPrice(price).on(Viewtify.UIThread).to(exe -> {
-            notifyPrice.remove(label);
-
-            MarketService service = chart.market.v.service;
-            Num p = exe.price.scale(service.setting.targetCurrencyScaleSize);
-            String title = "🔊  " + service.marketReadableName() + " " + p;
-            CharSequence message = en("The specified price ({0}) has been reached.").with(p);
-            System.out.println("remove line");
-            I.make(Notificator.class).priceSignal.notify(title, message);
-        }));
     }
 
     /**
