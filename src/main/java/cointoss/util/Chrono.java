@@ -339,7 +339,9 @@ public class Chrono {
         return disposer.add(TIMER.scheduleAtFixedRate(() -> {
             observer.accept(ZonedDateTime.ofInstant(CLOCK.instant(), CLOCK.getZone()).truncatedTo(ChronoUnit.SECONDS));
         }, 0, 1, TimeUnit.SECONDS));
-    }).share();
+    }).share().effectOnError(e -> {
+        e.printStackTrace();
+    });
 
     /**
      * Gets a stream that returns the current time every second.

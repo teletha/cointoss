@@ -37,6 +37,9 @@ High
 Losscut
 ロスカット
 
+Losssize
+ロスサイズ
+
 Low
 安値
 

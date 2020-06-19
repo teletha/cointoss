@@ -43,9 +43,13 @@ public class ExecutionView extends View {
 
     private UILabel volumeRatio;
 
-    private UILabel losscutLong;
+    private UILabel losscutCountLong;
 
-    private UILabel losscutShort;
+    private UILabel losscutCountShort;
+
+    private UILabel losscutVolumeLong;
+
+    private UILabel losscutVolumeShort;
 
     private UILabel spread;
 
@@ -65,7 +69,8 @@ public class ExecutionView extends View {
                 form(en("Delay"), delay);
                 form(en("Count"), FormInputMin, countLong.style(Long), countShort.style(Short), countRatio);
                 form(en("Volume"), FormInputMin, volumeLong.style(Long), volumeShort.style(Short), volumeRatio);
-                form(en("Losscut"), FormInputMin, losscutLong.style(Long), losscutShort.style(Short));
+                form(en("Losscut"), FormInputMin, losscutCountLong.style(Long), losscutCountShort.style(Short));
+                form(en("Losssize"), FormInputMin, losscutVolumeLong.style(Long), losscutVolumeShort.style(Short));
                 form(en("Spread"), FormInputMin, spread);
 
                 $(hbox, () -> {
@@ -135,8 +140,11 @@ public class ExecutionView extends View {
             volumeShort.text(Primitives.roundString(shortVolume, 1));
             volumeRatio.text(Primitives.roundString(longVolume / (longVolume + shortVolume + 0.0000000001) * 100, 1).concat("%"));
 
-            losscutLong.text(realtime.longLosscutCount());
-            losscutShort.text(realtime.shortLosscutCount());
+            losscutCountLong.text(realtime.longLosscutCount());
+            losscutCountShort.text(realtime.shortLosscutCount());
+
+            losscutVolumeLong.text(Primitives.roundString(realtime.longLosscutVolume(), 1));
+            losscutVolumeShort.text(Primitives.roundString(realtime.shortLosscutVolume(), 1));
         });
 
         int scale = view.market.service.setting.targetCurrencyScaleSize;

@@ -9,7 +9,7 @@
  */
 package trademate.chart;
 
-import static transcript.Transcript.*;
+import static transcript.Transcript.en;
 
 import java.time.Duration;
 import java.util.List;
@@ -492,8 +492,12 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
 
         int gapX = -35;
         int gapY = -12;
-        gc.setFill(Color.WHITESMOKE);
+        gc.setStroke(Color.BLACK);
         gc.setFont(Font.font(10));
+        gc.setLineWidth(2);
+        gc.strokeText("Duration\t" + Chrono.formatAsDuration(Math.abs(endTime - startTime) * 1000), endX + gapX, endY + gapY);
+        gc.strokeText("Spread\t" + Primitives.roundDecimal(Math.abs(upperPrice - lowerPrice), 2), endX + gapX, endY + gapY * 2);
+        gc.setFill(Color.WHITESMOKE);
         gc.fillText("Duration\t" + Chrono.formatAsDuration(Math.abs(endTime - startTime) * 1000), endX + gapX, endY + gapY);
         gc.fillText("Spread\t" + Primitives.roundDecimal(Math.abs(upperPrice - lowerPrice), 2), endX + gapX, endY + gapY * 2);
 

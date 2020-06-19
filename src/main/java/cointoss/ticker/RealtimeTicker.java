@@ -19,15 +19,19 @@ public class RealtimeTicker {
 
     private int longCount;
 
+    private int longLosscutCount;
+
     private double longVolume;
 
-    private int longLosscutCount;
+    private double longLosscutVolume;
 
     private int shortCount;
 
+    private int shortLosscutCount;
+
     private double shortVolume;
 
-    private int shortLosscutCount;
+    private double shortLosscutVolume;
 
     /**
      * @param tickerManager
@@ -42,9 +46,11 @@ public class RealtimeTicker {
             longCount += latest.longCount - removed.longCount;
             longVolume += latest.longVolume - removed.longVolume;
             longLosscutCount += latest.longLosscutCount - removed.longLosscutCount;
+            longLosscutVolume += latest.longLosscutVolume - removed.longLosscutVolume;
             shortCount += latest.shortCount - removed.shortCount;
             shortVolume += latest.shortVolume - removed.shortVolume;
             shortLosscutCount += latest.shortLosscutCount - removed.shortLosscutCount;
+            shortLosscutVolume += latest.shortLosscutVolume - removed.shortLosscutVolume;
 
             latest = tick;
         });
@@ -62,6 +68,10 @@ public class RealtimeTicker {
         return longLosscutCount + latest.longLosscutCount();
     }
 
+    public double longLosscutVolume() {
+        return longLosscutVolume + latest.longLosscutVolume();
+    }
+
     public int shortCount() {
         return shortCount + latest.shortCount();
     }
@@ -72,5 +82,9 @@ public class RealtimeTicker {
 
     public int shortLosscutCount() {
         return shortLosscutCount + latest.shortLosscutCount();
+    }
+
+    public double shortLosscutVolume() {
+        return shortLosscutVolume + latest.shortLosscutVolume();
     }
 }
