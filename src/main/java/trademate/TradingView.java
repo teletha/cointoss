@@ -22,7 +22,6 @@ import kiss.I;
 import stylist.Style;
 import stylist.StyleDSL;
 import trademate.chart.ChartView;
-import trademate.order.OrderBookView;
 import trademate.order.OrderBuilder;
 import viewtify.Viewtify;
 import viewtify.ui.UICheckBox;
@@ -53,13 +52,9 @@ public class TradingView extends View {
 
     public ChartView chart;
 
-    public OrderBookView books;
-
     public ExecutionView executions;
 
     public OrderBuilder builder;
-
-    private UICheckBox showOrderBook;
 
     private UICheckBox showExecution;
 
@@ -88,7 +83,6 @@ public class TradingView extends View {
                     $(chart);
                 });
 
-                $(books);
                 $(executions);
                 $(builder);
             });
@@ -145,12 +139,10 @@ public class TradingView extends View {
      */
     private void configContextMenuOnTab() {
         tab.context(c -> {
-            c.menu(showOrderBook, false);
             c.menu(showExecution, false);
             c.menu(showOrderBuilder, false);
         });
 
-        showOrderBook.text(en("Orderbook")).initialize(true).observing(books::visible);
         showExecution.text(en("Trade History")).initialize(true).observing(executions::visible);
         showOrderBuilder.text(en("Order")).initialize(true).observing(builder::visible);
     }

@@ -9,7 +9,7 @@
  */
 package trademate.chart;
 
-import static transcript.Transcript.en;
+import static transcript.Transcript.*;
 
 import java.time.Duration;
 import java.util.List;
@@ -256,7 +256,9 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 .layoutBy(axisX.scroll.valueProperty(), axisX.scroll.visibleAmountProperty())
                 .layoutBy(axisY.scroll.valueProperty(), axisY.scroll.visibleAmountProperty())
                 .layoutBy(chart.ticker.observe(), chart.showOrderbook.observe())
-                .layoutBy(chart.market.observe().map(m -> m.orderBook).flatMap(b -> b.longs.update.throttle(1, TimeUnit.SECONDS)))
+                .layoutBy(chart.market.observe()
+                        .map(m -> m.orderBook)
+                        .flatMap(b -> b.longs.update.merge(b.shorts.update).throttle(1, TimeUnit.SECONDS)))
                 .layoutWhile(chart.showRealtimeUpdate.observing());
 
         configIndicator();
@@ -1217,11 +1219,16 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             double upper = max * 0.75;
             double start = orderbook.getWidth();
             double lastPosition = 0;
+            int hideSize = chart.orderbookHideSize.value();
 
             GraphicsContext gc = orderbook.getGraphicsContext2D();
             gc.setStroke(color);
 
             for (OrderBookPage page : pages) {
+                if (page.size < hideSize) {
+                    continue; // hiding
+                }
+
                 double position = axisY.getPositionForValue(page.price.doubleValue());
                 double width = start - page.size * scale;
                 gc.strokeLine(start, position, width, position);

@@ -11,6 +11,7 @@ package trademate.chart;
 
 import java.util.Comparator;
 import java.util.function.Supplier;
+import java.util.stream.IntStream;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -21,13 +22,17 @@ import cointoss.Market;
 import cointoss.ticker.Span;
 import cointoss.ticker.Ticker;
 import cointoss.util.Chrono;
+import cointoss.util.Num;
 import kiss.Variable;
 import stylist.Style;
 import stylist.StyleDSL;
+import trademate.TradingView;
 import trademate.verify.BackTestView;
+import viewtify.style.FormStyles;
 import viewtify.ui.UIButton;
 import viewtify.ui.UICheckBox;
 import viewtify.ui.UIComboBox;
+import viewtify.ui.UISpinner;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
 
@@ -57,6 +62,12 @@ public class ChartView extends View {
     /** Configuration UI */
     public UICheckBox showOrderbook;
 
+    /** Configuration UI */
+    public UISpinner<Num> orderbookPriceRange;
+
+    /** Configuration UI */
+    public UISpinner<Integer> orderbookHideSize;
+
     /** Chart UI */
     public Chart chart;
 
@@ -74,6 +85,9 @@ public class ChartView extends View {
 
     /** The additional scripts. */
     public final ObservableList<Supplier<PlotScript>> scripts = FXCollections.observableArrayList();
+
+    /** Parent View */
+    private TradingView view;
 
     /**
      * UI definition.
@@ -136,13 +150,25 @@ public class ChartView extends View {
                 $(vbox, () -> {
                     form("Candle Type", candle);
                     form("Latest Price", showLatestPrice);
-                    form("Orderbook", showOrderbook);
+                    form("Orderbook", FormStyles.FormInputMin, showOrderbook, orderbookPriceRange, orderbookHideSize);
                 });
             }
         });
         candle.initialize(CandleType.values()).observing(candleType::set);
         showLatestPrice.initialize(true);
         showOrderbook.initialize(true);
+
+        orderbookHideSize.initialize(IntStream.range(0, 101))
+                .tooltip(en("Display only boards that are larger than the specified size."))
+                .enableWhen(showOrderbook.isSelected());
+        orderbookPriceRange.initialize(view.market.service.setting.orderBookGroupRangesWithBase())
+                .tooltip(en("Display a grouped board with a specified price range."))
+                .enableWhen(showOrderbook.isSelected())
+                .observing(range -> {
+                    var book = view.market.orderBook;
+                    book.longs.groupBy(range);
+                    book.shorts.groupBy(range);
+                });
     }
 
     /**

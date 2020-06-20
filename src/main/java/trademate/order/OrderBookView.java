@@ -11,7 +11,6 @@ package trademate.order;
 
 import java.util.function.BiFunction;
 
-import javafx.collections.FXCollections;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
@@ -26,7 +25,6 @@ import kiss.WiseRunnable;
 import stylist.Style;
 import stylist.StyleDSL;
 import trademate.TradingView;
-import viewtify.Viewtify;
 import viewtify.ui.UILabel;
 import viewtify.ui.UIListView;
 import viewtify.ui.UISpinner;
@@ -116,14 +114,14 @@ public class OrderBookView extends View {
     @Override
     protected void initialize() {
         book = view.market.orderBook;
-        book.longs.replaceBy(FXCollections::observableList);
-        book.shorts.replaceBy(FXCollections::observableList);
-        book.longs.operateOn(Viewtify.UIThread);
-        book.shorts.operateOn(Viewtify.UIThread);
+        // book.longs.replaceBy(FXCollections::observableList);
+        // book.shorts.replaceBy(FXCollections::observableList);
+        // book.longs.operateOn(Viewtify.UIThread);
+        // book.shorts.operateOn(Viewtify.UIThread);
 
-        hideSize.initialize(Num.range(0, 99));
-
-        int scale = view.market.service.setting.targetCurrencyScaleSize;
+        // hideSize.initialize(Num.range(0, 99));
+        //
+        // int scale = view.market.service.setting.targetCurrencyScaleSize;
         // longList.renderByNode(Canvas::new, displayOrderUnit(TradeMateStyle.BUY, scale, false))
         // .take(hideSize, (unit, size) -> unit.size >= size.doubleValue())
         // .when(User.LeftClick, calculatePrice(longList));
@@ -132,17 +130,18 @@ public class OrderBookView extends View {
         // .when(User.LeftClick, calculatePrice(shortList))
         // .scrollToBottom();
 
-        priceRange.initialize(view.market.service.setting.orderBookGroupRangesWithBase()).observing(range -> {
-            book.longs.groupBy(range);
-            book.shorts.groupBy(range);
-            // longList.items((ObservableList) book.longs.groupBy(range));
-            // shortList.items((ObservableList) book.shorts.groupBy(range));
-        });
+        // priceRange.initialize(view.market.service.setting.orderBookGroupRangesWithBase()).observing(range
+        // -> {
+        // book.longs.groupBy(range);
+        // book.shorts.groupBy(range);
+        // // longList.items((ObservableList) book.longs.groupBy(range));
+        // // shortList.items((ObservableList) book.shorts.groupBy(range));
+        // });
 
-        view.market.orderBook.spread.observe()
-                .take(view.chart.showRealtimeUpdate)
-                .on(Viewtify.UIThread)
-                .to(price -> priceSpread.text(price));
+        // view.market.orderBook.spread.observe()
+        // .take(view.chart.showRealtimeUpdate)
+        // .on(Viewtify.UIThread)
+        // .to(price -> priceSpread.text(price));
     }
 
     /**

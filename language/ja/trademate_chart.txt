@@ -1,3 +1,9 @@
+Display only boards that are larger than the specified size.
+指定されたサイズより大きい板だけを表示します。
+
+Display a grouped board with a specified price range.
+指定された値幅でまとめられた板を表示します。
+
 Duration
 期間
 
