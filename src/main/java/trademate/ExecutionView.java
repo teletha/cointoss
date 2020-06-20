@@ -151,24 +151,22 @@ public class ExecutionView extends View {
 
         // configure UI
         takerSize.initialize(IntStream.range(1, 51).boxed());
-        executionCumulativeList.render((label, e) -> update(label, e, true, scale)).take(takerSize, (e, size) -> size <= e.accumulative);
+        executionCumulativeList.render((label, e) -> update(label, e, scale)).take(takerSize, (e, size) -> size <= e.accumulative);
 
         // load big taker log
         view.service.add(view.market.timelineByTaker.take(view.chart.showRealtimeUpdate.observing()).on(Viewtify.UIThread).to(e -> {
             if (1 <= e.accumulative) {
                 executionCumulativeList.addItemAtFirst(e);
 
-                if (1000 < executionCumulativeList.size()) {
+                if (2000 < executionCumulativeList.size()) {
                     executionCumulativeList.removeItemAtLast();
                 }
             }
         }));
     }
 
-    private void update(UILabel label, Execution e, boolean accum, int scale) {
-        String text = Chrono.system(e.date).format(Chrono.Time) + "  " + e.price + " " + (accum
-                ? Primitives.roundDecimal(e.accumulative, scale)
-                : e.size.scale(scale)) + "  " + e.delay;
+    private void update(UILabel label, Execution e, int scale) {
+        String text = Chrono.system(e.date).format(Chrono.Time) + "\t" + e.price + " \t" + Primitives.roundString(e.accumulative, scale);
 
         label.text(text).styleOnly(TradeMateStyle.Side.of(e.direction));
     }

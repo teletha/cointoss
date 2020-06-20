@@ -77,6 +77,8 @@ public class TradeMate extends View {
             loader.add(tab);
         }
 
+        DockSystem.register("Realtime").contents(RealtimeView.class).closable(false);
+
         // ========================================================
         // Clock in Title bar
         // ========================================================

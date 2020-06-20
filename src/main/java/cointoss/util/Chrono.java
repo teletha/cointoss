@@ -356,7 +356,7 @@ public class Chrono {
     private static long latestDelay;
 
     static {
-        seconds().takeAt(index -> index % 300 == 30).to(Chrono::calculateDelayByNTP);
+        seconds().takeAt(index -> index % 300 == 15).to(Chrono::calculateDelayByNTP);
     }
 
     /**
