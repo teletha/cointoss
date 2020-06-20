@@ -126,7 +126,6 @@ public class TradingView extends View {
             chart.restoreRealtimeUpdate();
 
             I.make(TradeMate.class).requestLazyInitialization();
-            I.make(RealtimeView.class).register(market);
         });
 
         title.text(service.marketReadableName()).style(style.tabTitle);

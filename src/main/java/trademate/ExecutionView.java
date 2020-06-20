@@ -158,7 +158,7 @@ public class ExecutionView extends View {
             if (1 <= e.accumulative) {
                 executionCumulativeList.addItemAtFirst(e);
 
-                if (2000 < executionCumulativeList.size()) {
+                if (1000 < executionCumulativeList.size()) {
                     executionCumulativeList.removeItemAtLast();
                 }
             }
@@ -166,7 +166,7 @@ public class ExecutionView extends View {
     }
 
     private void update(UILabel label, Execution e, int scale) {
-        String text = Chrono.system(e.date).format(Chrono.Time) + "\t" + e.price + " \t" + Primitives.roundString(e.accumulative, scale);
+        String text = Chrono.system(e.date).format(Chrono.Time) + "  " + e.price + " \t" + Primitives.roundString(e.accumulative, scale);
 
         label.text(text).styleOnly(TradeMateStyle.Side.of(e.direction));
     }
