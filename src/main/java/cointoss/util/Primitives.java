@@ -139,6 +139,25 @@ public class Primitives {
      * @return
      */
     public static double ratio(double numerator, double denominator) {
-        return denominator == 0d ? 0d : roundDecimal(numerator / denominator * 100, 1);
+        return denominator == 0 ? 0 : roundDecimal(numerator / denominator, 3);
+    }
+
+    /**
+     * Claculate ratio.
+     * 
+     * @param numerator
+     * @param denominator
+     * @return
+     */
+    public static String percent(double numerator, double denominator) {
+        double ratio = denominator == 0 ? 0 : roundDecimal(numerator / denominator * 100, 1);
+        long integer = (long) ratio;
+
+        if (ratio == integer) {
+            return String.valueOf(integer).concat("%");
+        } else {
+            return String.valueOf(ratio).concat("%");
+        }
+
     }
 }
