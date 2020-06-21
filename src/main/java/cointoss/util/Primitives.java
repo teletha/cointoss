@@ -43,7 +43,7 @@ public class Primitives {
      */
     public static double roundDecimal(double value, int scale) {
         double s = Math.pow(10, scale);
-        return Math.round(value * s) / s;
+        return StrictMath.rint(value * s) / s;
     }
 
     /**
@@ -129,5 +129,16 @@ public class Primitives {
             return false;
         }
         return true;
+    }
+
+    /**
+     * Claculate ratio.
+     * 
+     * @param numerator
+     * @param denominator
+     * @return
+     */
+    public static double ratio(double numerator, double denominator) {
+        return denominator == 0d ? 0d : roundDecimal(numerator / denominator * 100, 1);
     }
 }
