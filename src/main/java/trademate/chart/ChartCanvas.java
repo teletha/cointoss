@@ -9,7 +9,7 @@
  */
 package trademate.chart;
 
-import static transcript.Transcript.*;
+import static transcript.Transcript.en;
 
 import java.time.Duration;
 import java.util.List;
@@ -31,9 +31,7 @@ import javafx.scene.shape.Path;
 import javafx.scene.shape.PathElement;
 import javafx.scene.text.Font;
 
-import org.eclipse.collections.api.list.primitive.MutableDoubleList;
 import org.eclipse.collections.impl.list.mutable.FastList;
-import org.eclipse.collections.impl.list.mutable.primitive.DoubleArrayList;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -49,6 +47,7 @@ import cointoss.ticker.Indicator;
 import cointoss.ticker.Tick;
 import cointoss.ticker.Ticker;
 import cointoss.util.Chrono;
+import cointoss.util.DoubleArray;
 import cointoss.util.Num;
 import cointoss.util.Primitives;
 import kiss.Disposable;
@@ -648,7 +647,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                     }
                 }
 
-                MutableDoubleList valueX = new NoCopyDoubleList((int) tickSize);
+                DoubleArray valueX = new DoubleArray((int) tickSize);
 
                 chart.ticker.v.ticks.each(start, end, tick -> {
                     double x = axisX.getPositionForValue(tick.startSeconds);
@@ -695,7 +694,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                     valueX.add(x);
                 });
 
-                double[] arrayX = valueX.toArray();
                 double width = candles.getWidth();
                 double height = candles.getHeight();
 
@@ -731,7 +729,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                         gc.setLineWidth(chart.width);
                         gc.setStroke(chart.color);
                         gc.setLineDashes(chart.dashArray);
-                        gc.strokePolyline(arrayX, chart.valueY.toArray(), valueX.size());
+                        gc.strokePolyline(valueX.asArray(), chart.valueY.asArray(), valueX.size());
                     }
                 }
             });
@@ -775,7 +773,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                             gc.setLineWidth(chart.width);
                             gc.setStroke(chart.color);
                             gc.setLineDashes(chart.dashArray);
-                            gc.strokeLine(lastX, chart.valueY.getLast(), x, plotter.area == PlotArea.Main
+                            gc.strokeLine(lastX, chart.valueY.last(), x, plotter.area == PlotArea.Main
                                     ? axisY.getPositionForValue(chart.indicator.valueAt(tick).doubleValue())
                                     : height - plotter.area.offset - chart.indicator.valueAt(tick).doubleValue() * scale);
                         }
@@ -903,7 +901,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         private final double[] dashArray;
 
         /** The y-axis values. */
-        private final MutableDoubleList valueY = new NoCopyDoubleList(64);
+        private final DoubleArray valueY = new DoubleArray(64);
 
         /** The visibility state. */
         private boolean visible = true;
@@ -1127,24 +1125,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                     }
                 }
             });
-        }
-    }
-
-    /**
-     * 
-     */
-    private static class NoCopyDoubleList extends DoubleArrayList {
-
-        private NoCopyDoubleList(int initialSize) {
-            super(initialSize);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public double[] toArray() {
-            return items;
         }
     }
 
