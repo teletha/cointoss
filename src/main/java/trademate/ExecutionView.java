@@ -134,11 +134,11 @@ public class ExecutionView extends View {
 
             countLong.text(longCount);
             countShort.text(shortCount);
-            countRatio.text(Primitives.roundString(longCount / (longCount + shortCount + 0.000000001) * 100, 1).concat("%"));
+            countRatio.text(Primitives.percent(longCount, longCount + shortCount));
 
             volumeLong.text(Primitives.roundString(longVolume, 1));
             volumeShort.text(Primitives.roundString(shortVolume, 1));
-            volumeRatio.text(Primitives.roundString(longVolume / (longVolume + shortVolume + 0.0000000001) * 100, 1).concat("%"));
+            volumeRatio.text(Primitives.percent(longVolume, longVolume + shortVolume));
 
             losscutCountLong.text(realtime.longLosscutCount());
             losscutCountShort.text(realtime.shortLosscutCount());
