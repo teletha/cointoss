@@ -9,6 +9,7 @@
  */
 package cointoss.market.bitflyer;
 
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -24,10 +25,10 @@ import java.util.concurrent.TimeUnit;
 
 import javafx.scene.control.TextInputDialog;
 
-import org.apache.commons.codec.digest.HmacAlgorithms;
-import org.apache.commons.codec.digest.HmacUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 
+import com.google.common.hash.HashFunction;
+import com.google.common.hash.Hashing;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -98,6 +99,8 @@ class BitFlyerService extends MarketService {
 
     /** The account setting. */
     private final BitFlyerAccount account = I.make(BitFlyerAccount.class);
+
+    private final HashFunction hmac256 = Hashing.hmacSha256(account.apiSecret.v.getBytes());
 
     /** The shared order list. */
     private final Signal<List<Order>> intervalOrderCheck;
@@ -605,7 +608,7 @@ class BitFlyerService extends MarketService {
      */
     protected <M> Signal<M> call(String method, String path, String body, String selector, Class<M> type) {
         String timestamp = String.valueOf(Chrono.utcNow().toEpochSecond());
-        String sign = new HmacUtils(HmacAlgorithms.HMAC_SHA_256, account.apiSecret.v).hmacHex(timestamp + method + path + body);
+        String sign = hmac256.hashString(timestamp + method + path + body, StandardCharsets.UTF_8).toString();
 
         Request request;
 
@@ -641,7 +644,7 @@ class BitFlyerService extends MarketService {
      */
     protected Signal<JsonElement> call(String method, String path, String body) {
         String timestamp = String.valueOf(Chrono.utcNow().toEpochSecond());
-        String sign = new HmacUtils(HmacAlgorithms.HMAC_SHA_256, account.apiSecret.v).hmacHex(timestamp + method + path + body);
+        String sign = hmac256.hashString(timestamp + method + path + body, StandardCharsets.UTF_8).toString();
 
         Request request;
 
