@@ -9,7 +9,7 @@
  */
 package cointoss.trade;
 
-import static java.time.temporal.ChronoUnit.SECONDS;
+import static java.time.temporal.ChronoUnit.*;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -146,7 +146,7 @@ class ScenarioTest extends TraderTestSupport {
         assert s.entrySize.is(1);
         assert s.entryExecutedSize().is(0.9);
         assert s.isEntryTerminated() == false;
-        assert s.entries.get(0).isCanceled() == false;
+        assert s.entries.peekFirst().isCanceled() == false;
         assert s.exits.size() == 3;
         assert s.exitSize.is(0.9);
         assert s.exitExecutedSize.is(0);
@@ -157,7 +157,7 @@ class ScenarioTest extends TraderTestSupport {
         assert s.exitExecutedSize.is(0.5);
         assert s.isEntryTerminated() == true;
         assert s.entries.size() == 1;
-        assert s.entries.get(0).isCanceled() == true;
+        assert s.entries.peekFirst().isCanceled() == true;
         market.perform(Execution.with.sell(0.4).price(21));
         assert s.exitExecutedSize.is(0.9);
     }

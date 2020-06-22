@@ -13,9 +13,9 @@ import static java.util.concurrent.TimeUnit.*;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
@@ -35,7 +35,6 @@ import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
 import kiss.Variable;
-import kiss.WiseList;
 
 /**
  * Declarative entry and exit definition.
@@ -56,11 +55,11 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
 
     /** The list entry orders. */
     @VisibleForTesting
-    final WiseList<Order> entries = I.list(ArrayList.class);
+    final Deque<Order> entries = new ArrayDeque();
 
     /** The list exit orders. */
     @VisibleForTesting
-    final WiseList<Order> exits = I.list(ArrayList.class);
+    final Deque<Order> exits = new ArrayDeque();
 
     /** The entry disposer. */
     private final Disposable disposerForEntry = Disposable.empty();
@@ -174,7 +173,7 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
      * @return
      */
     public final ZonedDateTime holdStartTime() {
-        return entries.first().map(o -> o.creationTime).or(() -> Chrono.MIN);
+        return Variable.of(entries.peekFirst()).map(o -> o.creationTime).or(() -> Chrono.MIN);
     }
 
     /**
@@ -183,7 +182,7 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
      * @return
      */
     public final ZonedDateTime holdEndTime() {
-        return exits.last().map(o -> o.terminationTime).or(market.service::now);
+        return Variable.of(exits.peekLast()).map(o -> o.terminationTime).or(market.service::now);
     }
 
     /**
@@ -293,7 +292,7 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
      * @param priceSetter
      * @param executedSizeSetter
      */
-    private void updateOrderRelatedStatus(List<Order> orders, Consumer<Num> priceSetter, Consumer<Num> executedSizeSetter) {
+    private void updateOrderRelatedStatus(Deque<Order> orders, Consumer<Num> priceSetter, Consumer<Num> executedSizeSetter) {
         Num totalSize = Num.ZERO;
         Num totalPrice = Num.ZERO;
 
@@ -559,11 +558,11 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
         return builder.toString();
     }
 
-    private Num calculateCanceledSize(List<Order> orders) {
+    private Num calculateCanceledSize(Deque<Order> orders) {
         return I.signal(orders).scanWith(Num.ZERO, (v, o) -> v.plus(o.canceledSize())).to().or(Num.ZERO);
     }
 
-    private void format(StringBuilder builder, String type, List<Order> orders, Num price, Num size, Num executedSize, Num canceledSize) {
+    private void format(StringBuilder builder, String type, Deque<Order> orders, Num price, Num size, Num executedSize, Num canceledSize) {
         builder.append("\t")
                 .append(type)
                 .append("\t order ")

@@ -160,7 +160,7 @@ class DoubleIndicatorTest extends TickerTestSupport {
         DoubleIndicator indicator = DoubleIndicator.build(ticker, tick -> tick.openPrice.doubleValue()).scale(1);
         assert indicator.valueAt(ticker.ticks.getByIndex(0)) == 1.2d;
         assert indicator.valueAt(ticker.ticks.getByIndex(1)) == 2.3d;
-        assert indicator.valueAt(ticker.ticks.getByIndex(2)) == 3.5d;
+        assert indicator.valueAt(ticker.ticks.getByIndex(2)) == 3.4d;
         assert indicator.valueAt(ticker.ticks.getByIndex(3)) == 4.6d;
         assert indicator.valueAt(ticker.ticks.getByIndex(4)) == 5.7d;
     }

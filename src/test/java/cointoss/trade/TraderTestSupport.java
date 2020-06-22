@@ -234,7 +234,7 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
      * Execute entry order completelly.
      */
     protected final void executeEntryAll() {
-        Order o = latest().entries.get(0);
+        Order o = latest().entries.peekFirst();
         executeEntry(o.size, o.price);
     }
 
@@ -242,7 +242,7 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
      * Execute entry order partially.
      */
     protected final void executeEntryHalf() {
-        Order o = latest().entries.get(0);
+        Order o = latest().entries.peekFirst();
         executeEntry(o.size.divide(2), o.price);
     }
 
@@ -266,7 +266,7 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
      * Execute exit order completelly.
      */
     protected final void executeExitAll() {
-        Order o = latest().exits.get(0);
+        Order o = latest().exits.peekFirst();
         executeExit(o.size, o.price);
     }
 
@@ -274,7 +274,7 @@ public abstract class TraderTestSupport extends Trader implements TimebaseSuppor
      * Execute exit order partially.
      */
     protected final void executeExitHalf() {
-        Order o = latest().exits.get(0);
+        Order o = latest().exits.peekFirst();
         executeExit(o.size.divide(2), o.price);
     }
 

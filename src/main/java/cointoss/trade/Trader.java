@@ -14,7 +14,9 @@ import static java.time.temporal.ChronoUnit.*;
 import java.lang.StackWalker.Option;
 import java.time.ZonedDateTime;
 import java.time.temporal.TemporalUnit;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.HashSet;
 import java.util.List;
 import java.util.NavigableMap;
@@ -41,7 +43,6 @@ import kiss.Extensible;
 import kiss.I;
 import kiss.Signal;
 import kiss.WiseFunction;
-import kiss.WiseList;
 import kiss.WiseSupplier;
 
 public abstract class Trader extends TraderBase implements TradingFilters, Extensible, Disposable {
@@ -62,7 +63,7 @@ public abstract class Trader extends TraderBase implements TradingFilters, Exten
     private FundManager funds;
 
     /** All managed entries. */
-    private final WiseList<Scenario> scenarios = I.list(ArrayList.class);
+    private final Deque<Scenario> scenarios = new ArrayDeque();
 
     /** The state snapshot. */
     private final NavigableMap<Long, Snapshot> snapshots = new TreeMap();
@@ -123,7 +124,7 @@ public abstract class Trader extends TraderBase implements TradingFilters, Exten
      */
     @VisibleForTesting
     Scenario latest() {
-        return scenarios.last().v;
+        return scenarios.peekLast();
     }
 
     /**

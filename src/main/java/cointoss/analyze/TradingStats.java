@@ -17,6 +17,7 @@ import java.lang.reflect.Modifier;
 import java.text.NumberFormat;
 import java.time.Duration;
 import java.time.ZonedDateTime;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
@@ -28,8 +29,8 @@ import cointoss.trade.Trader;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
 import kiss.I;
+import kiss.Variable;
 import kiss.WiseConsumer;
-import kiss.WiseList;
 
 public class TradingStats {
 
@@ -135,15 +136,15 @@ public class TradingStats {
     public Duration duration = Duration.ZERO;
 
     /** All scenario. */
-    private final WiseList<Scenario> entries;
+    private final Deque<Scenario> entries;
 
     /**
      * Analyze trading.
      */
-    public TradingStats(Market market, FundManager funds, WiseList<Scenario> entries, Trader trader) {
+    public TradingStats(Market market, FundManager funds, Deque<Scenario> entries, Trader trader) {
         this.name = trader.name();
-        this.startDate = entries.first().map(Scenario::holdStartTime).or(market.service::now);
-        this.endDate = entries.last().map(Scenario::holdEndTime).or(market.service::now);
+        this.startDate = Variable.of(entries.peekFirst()).map(Scenario::holdStartTime).or(market.service::now);
+        this.endDate = Variable.of(entries.peekLast()).map(Scenario::holdEndTime).or(market.service::now);
         this.baseCurrencyScale = market.service.setting.baseCurrencyScaleSize;
         this.targetCurrencyScale = market.service.setting.targetCurrencyScaleSize;
         this.holdMaxSize = trader.holdMaxSize;
