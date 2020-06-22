@@ -21,8 +21,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
-import org.eclipse.collections.impl.list.mutable.FastList;
-
 import cointoss.Market;
 import cointoss.trade.FundManager;
 import cointoss.trade.Scenario;
@@ -31,6 +29,7 @@ import cointoss.util.Chrono;
 import cointoss.util.Num;
 import kiss.I;
 import kiss.WiseConsumer;
+import kiss.WiseList;
 
 public class TradingStats {
 
@@ -136,15 +135,15 @@ public class TradingStats {
     public Duration duration = Duration.ZERO;
 
     /** All scenario. */
-    private final FastList<Scenario> entries;
+    private final WiseList<Scenario> entries;
 
     /**
      * Analyze trading.
      */
-    public TradingStats(Market market, FundManager funds, FastList<Scenario> entries, Trader trader) {
+    public TradingStats(Market market, FundManager funds, WiseList<Scenario> entries, Trader trader) {
         this.name = trader.name();
-        this.startDate = entries.getFirstOptional().map(Scenario::holdStartTime).orElseGet(market.service::now);
-        this.endDate = entries.getLastOptional().map(Scenario::holdEndTime).orElseGet(market.service::now);
+        this.startDate = entries.first().map(Scenario::holdStartTime).or(market.service::now);
+        this.endDate = entries.last().map(Scenario::holdEndTime).or(market.service::now);
         this.baseCurrencyScale = market.service.setting.baseCurrencyScaleSize;
         this.targetCurrencyScale = market.service.setting.targetCurrencyScaleSize;
         this.holdMaxSize = trader.holdMaxSize;

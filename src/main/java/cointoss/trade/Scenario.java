@@ -9,16 +9,15 @@
  */
 package cointoss.trade;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
-
-import org.eclipse.collections.impl.list.mutable.FastList;
 
 import com.google.common.annotations.VisibleForTesting;
 
@@ -36,6 +35,7 @@ import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
 import kiss.Variable;
+import kiss.WiseList;
 
 /**
  * Declarative entry and exit definition.
@@ -56,11 +56,11 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
 
     /** The list entry orders. */
     @VisibleForTesting
-    final FastList<Order> entries = new FastList<>();
+    final WiseList<Order> entries = I.list(ArrayList.class);
 
     /** The list exit orders. */
     @VisibleForTesting
-    final FastList<Order> exits = new FastList<>();
+    final WiseList<Order> exits = I.list(ArrayList.class);
 
     /** The entry disposer. */
     private final Disposable disposerForEntry = Disposable.empty();
@@ -174,7 +174,7 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
      * @return
      */
     public final ZonedDateTime holdStartTime() {
-        return entries.getFirstOptional().map(o -> o.creationTime).orElseGet(() -> Chrono.MIN);
+        return entries.first().map(o -> o.creationTime).or(() -> Chrono.MIN);
     }
 
     /**
@@ -183,7 +183,7 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
      * @return
      */
     public final ZonedDateTime holdEndTime() {
-        return exits.getLastOptional().map(o -> o.terminationTime).orElseGet(market.service::now);
+        return exits.last().map(o -> o.terminationTime).or(market.service::now);
     }
 
     /**

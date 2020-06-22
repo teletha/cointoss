@@ -15,6 +15,7 @@ import java.lang.StackWalker.Option;
 import java.time.ZonedDateTime;
 import java.time.temporal.TemporalUnit;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.NavigableMap;
 import java.util.Objects;
@@ -26,8 +27,6 @@ import java.util.function.BooleanSupplier;
 import java.util.function.Predicate;
 
 import org.apache.logging.log4j.Logger;
-import org.eclipse.collections.api.factory.Sets;
-import org.eclipse.collections.impl.list.mutable.FastList;
 
 import com.google.common.annotations.VisibleForTesting;
 
@@ -42,6 +41,7 @@ import kiss.Extensible;
 import kiss.I;
 import kiss.Signal;
 import kiss.WiseFunction;
+import kiss.WiseList;
 import kiss.WiseSupplier;
 
 public abstract class Trader extends TraderBase implements TradingFilters, Extensible, Disposable {
@@ -62,13 +62,13 @@ public abstract class Trader extends TraderBase implements TradingFilters, Exten
     private FundManager funds;
 
     /** All managed entries. */
-    private final FastList<Scenario> scenarios = new FastList();
+    private final WiseList<Scenario> scenarios = I.list(ArrayList.class);
 
     /** The state snapshot. */
     private final NavigableMap<Long, Snapshot> snapshots = new TreeMap();
 
     /** The trader's alive state. */
-    private Set<Signal> disable = Sets.mutable.empty();
+    private Set<Signal> disable = new HashSet();
 
     /**
      * Initialize this {@link Trader}.
@@ -123,7 +123,7 @@ public abstract class Trader extends TraderBase implements TradingFilters, Exten
      */
     @VisibleForTesting
     Scenario latest() {
-        return scenarios.getLast();
+        return scenarios.last().v;
     }
 
     /**

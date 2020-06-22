@@ -31,8 +31,6 @@ public class Project extends bee.api.Project {
         // require("org.decimal4j", "decimal4j");
         require("com.google.code.gson", "gson");
         require("com.squareup.okhttp3", "okhttp", "3.14.1");
-        require("org.eclipse.collections", "eclipse-collections");
-        require("org.ta4j", "ta4j-core");
 
         versionControlSystem("https://github.com/teletha/cointoss");
     }

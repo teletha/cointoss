@@ -11,11 +11,10 @@ package cointoss.market.bitfinex;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
-
-import org.eclipse.collections.api.map.primitive.MutableIntObjectMap;
-import org.eclipse.collections.impl.factory.primitive.IntObjectMaps;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -321,20 +320,18 @@ class BitfinexService extends MarketService {
             websocket = network.websocket(uri, command);
         }
 
-        MutableIntObjectMap<Topic> map = IntObjectMaps.mutable.empty();
+        Map<Number, Topic> map = new HashMap();
 
         return websocket.share().flatMap(e -> {
             if (e.isJsonObject()) {
                 JsonObject o = e.getAsJsonObject();
                 if (o.has("channel")) {
                     String channel = o.get("channel").getAsString();
-                    int channelId = o.get("chanId").getAsInt();
-                    map.put(channelId, Topic.valueOf(channel));
+                    map.put(o.get("chanId").getAsNumber(), Topic.valueOf(channel));
                 }
             } else {
                 JsonArray arrat = e.getAsJsonArray();
-                int id = arrat.get(0).getAsInt();
-                Topic name = map.get(id);
+                Topic name = map.get(arrat.get(0).getAsNumber());
 
                 if (name == topic) {
                     JsonElement type = arrat.get(1);

@@ -10,6 +10,8 @@
 package cointoss;
 
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -17,9 +19,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
-
-import org.eclipse.collections.api.factory.Lists;
-import org.eclipse.collections.api.list.MutableList;
 
 import cointoss.execution.Execution;
 import cointoss.execution.ExecutionLog;
@@ -91,10 +90,10 @@ public class Market implements Disposable {
     }).skip(e -> e == null || e == Market.BASE);
 
     /** The managed {@link Trader}. */
-    private final MutableList<Trader> managedTraders = Lists.mutable.empty();
+    private final List<Trader> managedTraders = new ArrayList();
 
     /** The managed {@link Trader}. */
-    public final MutableList<Trader> traders = managedTraders.asUnmodifiable();
+    public final List<Trader> traders = Collections.unmodifiableList(managedTraders);
 
     /** Flag */
     private boolean readingLog = false;

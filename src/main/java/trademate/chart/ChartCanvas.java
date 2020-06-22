@@ -9,9 +9,10 @@
  */
 package trademate.chart;
 
-import static transcript.Transcript.en;
+import static transcript.Transcript.*;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
@@ -30,8 +31,6 @@ import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.PathElement;
 import javafx.scene.text.Font;
-
-import org.eclipse.collections.impl.list.mutable.FastList;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -1137,13 +1136,13 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         private final double scale;
 
         /** The current orderbook for buyer. */
-        private final List<OrderBookPage> buyers = new FastList();
+        private final List<OrderBookPage> buyers = new ArrayList();
 
         /** The maximum size on buyers. */
         private double buyerMaxSize = OrderbookBarWidth;
 
         /** The current orderbook for seller. */
-        private final List<OrderBookPage> sellers = new FastList();
+        private final List<OrderBookPage> sellers = new ArrayList();
 
         /** The maximum size on sellers. */
         private double sellerMaxSize = OrderbookBarWidth;

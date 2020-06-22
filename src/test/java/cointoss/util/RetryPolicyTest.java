@@ -9,14 +9,12 @@
  */
 package cointoss.util;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.collections.api.list.primitive.MutableLongList;
-import org.eclipse.collections.impl.factory.primitive.LongLists;
 import org.junit.jupiter.api.Test;
 
 import antibug.Chronus;
@@ -115,7 +113,7 @@ class RetryPolicyTest {
 
         private long startTime = System.nanoTime();
 
-        private MutableLongList retryTiming = LongLists.mutable.empty();
+        private List<Long> retryTiming = new ArrayList();
 
         /**
          * {@inheritDoc}
