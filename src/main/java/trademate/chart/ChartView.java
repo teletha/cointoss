@@ -26,7 +26,6 @@ import cointoss.util.Num;
 import kiss.Variable;
 import stylist.Style;
 import stylist.StyleDSL;
-import trademate.TradingView;
 import trademate.verify.BackTestView;
 import viewtify.style.FormStyles;
 import viewtify.ui.UIButton;
@@ -85,9 +84,6 @@ public class ChartView extends View {
 
     /** The additional scripts. */
     public final ObservableList<Supplier<PlotScript>> scripts = FXCollections.observableArrayList();
-
-    /** Parent View */
-    private TradingView view;
 
     /**
      * UI definition.
@@ -158,17 +154,18 @@ public class ChartView extends View {
         showLatestPrice.initialize(true);
         showOrderbook.initialize(true);
 
-        orderbookHideSize.initialize(IntStream.range(0, 101))
-                .tooltip(en("Display only boards that are larger than the specified size."))
-                .enableWhen(showOrderbook.isSelected());
-        orderbookPriceRange.initialize(view.market.service.setting.orderBookGroupRangesWithBase())
-                .tooltip(en("Display a grouped board with a specified price range."))
-                .enableWhen(showOrderbook.isSelected())
-                .observing(range -> {
-                    var book = view.market.orderBook;
-                    book.longs.groupBy(range);
-                    book.shorts.groupBy(range);
-                });
+        market.observe().to(m -> {
+            orderbookHideSize.initialize(IntStream.range(0, 101))
+                    .tooltip(en("Display only boards that are larger than the specified size."))
+                    .enableWhen(showOrderbook.isSelected());
+            orderbookPriceRange.initialize(m.service.setting.orderBookGroupRangesWithBase())
+                    .tooltip(en("Display a grouped board with a specified price range."))
+                    .enableWhen(showOrderbook.isSelected())
+                    .observing(range -> {
+                        m.orderBook.longs.groupBy(range);
+                        m.orderBook.shorts.groupBy(range);
+                    });
+        });
     }
 
     /**
