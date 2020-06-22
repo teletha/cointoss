@@ -15,10 +15,10 @@ import kiss.Variable;
 public class BitFlyerAccount extends MarketAccount<BitFlyerAccount> {
 
     /** The API key. */
-    public final Variable<String> apiKey = Variable.empty();
+    public final Variable<String> apiKey = Variable.of("undefined");
 
     /** The API secret. */
-    public final Variable<String> apiSecret = Variable.empty();
+    public final Variable<String> apiSecret = Variable.of("undefined");
 
     /** The login id. */
     public final Variable<String> loginId = Variable.empty();
