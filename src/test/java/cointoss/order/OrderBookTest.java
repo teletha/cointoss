@@ -9,12 +9,15 @@
  */
 package cointoss.order;
 
-import static cointoss.util.Num.*;
+import static cointoss.util.Num.ONE;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
+
+import com.google.common.collect.Iterables;
 
 import cointoss.Direction;
 import cointoss.MarketSetting;
@@ -26,75 +29,79 @@ class OrderBookTest {
             .targetCurrencyMinimumBidSize(ONE)
             .orderBookGroupRanges(Num.TEN);
 
+    private OrderBookPage at(int index, Collection<OrderBookPage> pages) {
+        return Iterables.get(pages, index);
+    }
+
     @Test
     void buy() {
         OrderBook book = new OrderBook(setting, Direction.BUY);
-        List<OrderBookPage> list = book.groupBy(Num.ONE);
+        Collection<OrderBookPage> list = book.groupBy(Num.ONE);
 
         // add
         book.update(unit(1000, 1));
-        assert list.get(0).price.is(1000);
+        assert at(0, list).price.is(1000);
 
         book.update(unit(1002, 1));
-        assert list.get(0).price.is(1002);
-        assert list.get(1).price.is(1000);
+        assert at(0, list).price.is(1002);
+        assert at(1, list).price.is(1000);
 
         book.update(unit(1001, 1));
-        assert list.get(0).price.is(1002);
-        assert list.get(1).price.is(1001);
-        assert list.get(1).size == 1d;
-        assert list.get(2).price.is(1000);
+        assert at(0, list).price.is(1002);
+        assert at(1, list).price.is(1001);
+        assert at(1, list).size == 1d;
+        assert at(2, list).price.is(1000);
 
         // replace
         book.update(unit(1001, 2));
-        assert list.get(0).price.is(1002);
-        assert list.get(1).price.is(1001);
-        assert list.get(1).size == 2d;
-        assert list.get(2).price.is(1000);
+        assert at(0, list).price.is(1002);
+        assert at(1, list).price.is(1001);
+        assert at(1, list).size == 2d;
+        assert at(2, list).price.is(1000);
 
         // remove
         book.update(unit(1000, 0));
         assert list.size() == 2;
-        assert list.get(0).price.is(1002);
-        assert list.get(1).price.is(1001);
+        assert at(0, list).price.is(1002);
+        assert at(1, list).price.is(1001);
     }
 
     @Test
     void sell() {
         OrderBook book = new OrderBook(setting, Direction.SELL);
-        List<OrderBookPage> list = book.groupBy(Num.ONE);
+        Collection<OrderBookPage> list = book.groupBy(Num.ONE);
 
         book.update(unit(1000, 1));
-        assert list.get(0).price.is(1000);
+        assert at(0, list).price.is(1000);
 
         book.update(unit(1002, 1));
-        assert list.get(0).price.is(1002);
-        assert list.get(1).price.is(1000);
+        assert at(0, list).price.is(1000);
+        assert at(1, list).price.is(1002);
 
         book.update(unit(1001, 1));
-        assert list.get(0).price.is(1002);
-        assert list.get(1).price.is(1001);
-        assert list.get(1).size == 1d;
-        assert list.get(2).price.is(1000);
+        assert at(0, list).price.is(1000);
+        assert at(1, list).price.is(1001);
+        assert at(1, list).size == 1d;
+        assert at(2, list).price.is(1002);
 
         // replace
         book.update(unit(1001, 2));
-        assert list.get(0).price.is(1002);
-        assert list.get(1).price.is(1001);
-        assert list.get(1).size == 2d;
-        assert list.get(2).price.is(1000);
+        assert at(0, list).price.is(1000);
+        assert at(1, list).price.is(1001);
+        assert at(1, list).size == 2d;
+        assert at(2, list).price.is(1002);
 
         // remove
         book.update(unit(1000, 0));
         assert list.size() == 2;
-        assert list.get(0).price.is(1002);
-        assert list.get(1).price.is(1001);
+        assert at(0, list).price.is(1001);
+        assert at(1, list).price.is(1002);
     }
 
     @Test
     void buyFix() {
         OrderBook book = new OrderBook(setting, Direction.BUY);
-        List<OrderBookPage> list = book.groupBy(Num.ONE);
+        Collection<OrderBookPage> list = book.groupBy(Num.ONE);
 
         book.update(unit(1007, 1));
         book.update(unit(1006, 1));
@@ -127,7 +134,7 @@ class OrderBookTest {
     @Test
     void sellFix() {
         OrderBook book = new OrderBook(setting, Direction.SELL);
-        List<OrderBookPage> list = book.groupBy(Num.ONE);
+        Collection<OrderBookPage> list = book.groupBy(Num.ONE);
 
         book.update(unit(1007, 1));
         book.update(unit(1004, 1));
@@ -191,8 +198,8 @@ class OrderBookTest {
 
         // next group
         book.update(unit(1010, 1));
-        assertList(book.groupBy(Num.TEN), 0, 1010, 1, 2);
-        assertList(book.groupBy(Num.TEN), 1, 1000, 1, 1);
+        assertList(book.groupBy(Num.TEN), 1, 1010, 1, 2);
+        assertList(book.groupBy(Num.TEN), 0, 1000, 1, 1);
 
         // remove
         book.update(unit(1009, 0));
@@ -339,11 +346,10 @@ class OrderBookTest {
      * @param size
      * @param price
      */
-    private void assertList(List<OrderBookPage> list, int index, int price, int size, int total) {
-        OrderBookPage unit = list.get(index);
+    private void assertList(Collection<OrderBookPage> list, int index, int price, int size, int total) {
+        OrderBookPage unit = at(index, list);
         assert unit.size == size;
         assert unit.price.is(price);
-        // assert unit.total.is(total);
     }
 
     /**

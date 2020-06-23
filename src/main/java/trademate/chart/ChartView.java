@@ -9,6 +9,7 @@
  */
 package trademate.chart;
 
+import java.text.Normalizer.Form;
 import java.util.Comparator;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
@@ -32,8 +33,10 @@ import viewtify.ui.UIButton;
 import viewtify.ui.UICheckBox;
 import viewtify.ui.UIComboBox;
 import viewtify.ui.UISpinner;
+import viewtify.ui.UIText;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
+import viewtify.ui.helper.ValueCondition;
 
 public class ChartView extends View {
 
@@ -62,7 +65,7 @@ public class ChartView extends View {
     public UICheckBox showOrderbook;
 
     /** Configuration UI */
-    public UISpinner<Num> orderbookPriceRange;
+    public UIText orderbookPriceRange;
 
     /** Configuration UI */
     public UISpinner<Integer> orderbookHideSize;
@@ -154,18 +157,22 @@ public class ChartView extends View {
         showLatestPrice.initialize(true);
         showOrderbook.initialize(true);
 
-        market.observe().to(m -> {
-            orderbookHideSize.initialize(IntStream.range(0, 101))
-                    .tooltip(en("Display only boards that are larger than the specified size."))
-                    .enableWhen(showOrderbook.isSelected());
-            orderbookPriceRange.initialize(m.service.setting.orderBookGroupRangesWithBase())
-                    .tooltip(en("Display a grouped board with a specified price range."))
-                    .enableWhen(showOrderbook.isSelected())
-                    .observing(range -> {
-                        m.orderBook.longs.groupBy(range);
-                        m.orderBook.shorts.groupBy(range);
-                    });
-        });
+        orderbookHideSize.initialize(IntStream.range(0, 101))
+                .tooltip(en("Display only boards that are larger than the specified size."))
+                .enableWhen(showOrderbook.isSelected());
+        orderbookPriceRange.initialize("1")
+                .acceptPositiveNumberInput()
+                .normalizeInput(Form.NFKC)
+                .maximumInput(6)
+                .require(ValueCondition.Positive)
+                .tooltip(en("Display a grouped board with a specified price range."))
+                .enableWhen(showOrderbook.isSelected())
+                .observing(range -> {
+                    if (market.isPresent()) {
+                        market.v.orderBook.longs.groupBy(Num.of(range));
+                        market.v.orderBook.shorts.groupBy(Num.of(range));
+                    }
+                });
     }
 
     /**

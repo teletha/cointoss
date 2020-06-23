@@ -1,0 +1,3 @@
+Please enter a positive number.
+正の数を入力してください。
+

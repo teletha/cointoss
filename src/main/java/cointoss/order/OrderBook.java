@@ -10,14 +10,13 @@
 package cointoss.order;
 
 import java.math.RoundingMode;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
-
-import org.magicwerk.brownies.collections.GapList;
 
 import cointoss.Direction;
 import cointoss.MarketSetting;
@@ -37,9 +36,6 @@ public class OrderBook {
 
     /** The scale for target currency. */
     private final int scale;
-
-    /** The board list replacer. (OPTIONAL) */
-    private UnaryOperator<List<OrderBookPage>> replacer;
 
     /** The book operation thread. (OPTIONAL) */
     private Consumer<Runnable> operator = Runnable::run;
@@ -85,11 +81,11 @@ public class OrderBook {
      * @return
      */
     public final void replaceBy(UnaryOperator<List<OrderBookPage>> replacer) {
-        if (replacer != null) {
-            this.replacer = replacer;
-
-            group.pages = replacer.apply(group.pages);
-        }
+        // if (replacer != null) {
+        // this.replacer = replacer;
+        //
+        // group.pages = replacer.apply(group.pages);
+        // }
     }
 
     /**
@@ -98,28 +94,11 @@ public class OrderBook {
      * @param range The price range.
      * @return A grouped view.
      */
-    public final List<OrderBookPage> groupBy(Num range) {
+    public final Collection<OrderBookPage> groupBy(Num range) {
         if (group.range.isNot(range)) {
             group = new GroupedOrderBook(range);
         }
-        return group.pages;
-    }
-
-    /**
-     * Search the order size on the specified price.
-     * 
-     * @param price A target price.
-     * @return
-     */
-    public final double amountOn(Num price) {
-        Num rounded = calculateGroupedPrice(price, group.range);
-        for (OrderBookPage page : side.isBuy() ? ascendingPages() : descendingPages()) {
-            System.out.println(page.price + "   " + rounded + "    " + price);
-            if (page.price.is(rounded)) {
-                return page.size;
-            }
-        }
-        return 0;
+        return group.pages.values();
     }
 
     /**
@@ -137,50 +116,30 @@ public class OrderBook {
             return max;
         }
 
-        boolean comparable = false;
-
         if (side.isBuy()) {
-            if (lowerPrice.isGreaterThan(base.firstKey())) {
+            if (lowerPrice.isGreaterThan(base.firstKey()) || upperPrice.isLessThan(base.lastKey())) {
                 return max;
             }
 
             Num lowerRounded = calculateGroupedPrice(Num.max(base.lastKey(), lowerPrice), group.range);
             Num upperRounded = calculateGroupedPrice(Num.min(base.firstKey(), upperPrice), group.range);
 
-            for (OrderBookPage page : ascendingPages()) {
-                if (comparable == false && page.price.is(upperRounded)) {
-                    comparable = true;
+            for (OrderBookPage page : group.pages.subMap(upperRounded, true, lowerRounded, true).values()) {
+                if (max.size < page.size) {
                     max = page;
-                } else if (comparable == true) {
-                    if (page.size > max.size) {
-                        max = page;
-                    }
-
-                    if (page.price.is(lowerRounded)) {
-                        break;
-                    }
                 }
             }
         } else {
-            if (upperPrice.isLessThan(base.firstKey())) {
+            if (upperPrice.isLessThan(base.firstKey()) || lowerPrice.isGreaterThan(base.lastKey())) {
                 return max;
             }
 
             Num lowerRounded = calculateGroupedPrice(Num.max(base.firstKey(), lowerPrice), group.range);
             Num upperRounded = calculateGroupedPrice(Num.min(base.lastKey(), upperPrice), group.range);
 
-            for (OrderBookPage page : descendingPages()) {
-                if (comparable == false && page.price.is(lowerRounded)) {
-                    comparable = true;
+            for (OrderBookPage page : group.pages.subMap(lowerRounded, true, upperRounded, true).values()) {
+                if (max.size < page.size) {
                     max = page;
-                } else if (comparable == true) {
-                    if (page.size > max.size) {
-                        max = page;
-                    }
-
-                    if (page.price.is(upperRounded)) {
-                        break;
-                    }
                 }
             }
         }
@@ -193,16 +152,7 @@ public class OrderBook {
      * @return
      */
     public final Iterable<OrderBookPage> ascendingPages() {
-        return group.original::iterator;
-    }
-
-    /**
-     * Iterate all pages of the current selected grouped view by descending order.
-     * 
-     * @return
-     */
-    public final Iterable<OrderBookPage> descendingPages() {
-        return group.original::descendingIterator;
+        return group.pages.values();
     }
 
     /**
@@ -327,11 +277,8 @@ public class OrderBook {
         /** The price range. */
         private final Num range;
 
-        /** The original page list. */
-        private final SafeGapList<OrderBookPage> original = new SafeGapList();
-
-        /** The page list. */
-        private List<OrderBookPage> pages = original;
+        private final ConcurrentSkipListMap<Num, OrderBookPage> pages = new ConcurrentSkipListMap(side.isBuy() ? Comparator.reverseOrder()
+                : Comparator.naturalOrder());
 
         /**
          * Build {@link GroupedOrderBook}.
@@ -345,9 +292,6 @@ public class OrderBook {
             for (OrderBookPage board : base.values()) {
                 update(board.price, board.size);
             }
-
-            // replace container if needed
-            if (replacer != null) pages = replacer.apply(pages);
         }
 
         /**
@@ -359,69 +303,12 @@ public class OrderBook {
         private void update(Num price, double size) {
             price = calculateGroupedPrice(price, range);
 
-            if (side == Direction.BUY) {
-                head(price, size);
-            } else {
-                tail(price, size);
+            OrderBookPage page = pages.computeIfAbsent(price, key -> new OrderBookPage(key, 0));
+            page.size += size;
+
+            if (Primitives.roundDecimal(page.size, scale, RoundingMode.DOWN) <= 0) {
+                pages.remove(price);
             }
-        }
-
-        /**
-         * Update {@link OrderBookPage}.
-         * 
-         * @param add
-         */
-        private void head(Num price, double size) {
-            for (int i = 0; i < pages.size(); i++) {
-                OrderBookPage unit = pages.get(i);
-
-                if (unit == null) {
-                    pages.set(i, new OrderBookPage(price, size));
-                    return;
-                } else if (unit.price.is(price)) {
-                    double remaining = unit.size + size;
-
-                    if (Primitives.roundDecimal(remaining, scale, RoundingMode.DOWN) <= 0) {
-                        pages.remove(i);
-                    } else {
-                        pages.set(i, new OrderBookPage(unit.price, remaining));
-                    }
-                    return;
-                } else if (unit.price.isLessThan(price)) {
-                    pages.add(i, new OrderBookPage(price, size));
-                    return;
-                }
-            }
-            pages.add(new OrderBookPage(price, size));
-        }
-
-        /**
-         * Update {@link OrderBookPage}.
-         * 
-         * @param add
-         */
-        private void tail(Num price, double size) {
-            for (int i = pages.size() - 1; 0 <= i; i--) {
-                OrderBookPage unit = pages.get(i);
-
-                if (unit == null) {
-                    pages.set(i, new OrderBookPage(price, size));
-                    return;
-                } else if (unit.price.is(price)) {
-                    double remaining = unit.size + size;
-
-                    if (Primitives.roundDecimal(remaining, scale, RoundingMode.DOWN) <= 0) {
-                        pages.remove(i);
-                    } else {
-                        pages.set(i, new OrderBookPage(unit.price, remaining));
-                    }
-                    return;
-                } else if (unit.price.isGreaterThan(price)) {
-                    pages.add(i + 1, new OrderBookPage(price, size));
-                    return;
-                }
-            }
-            pages.add(0, new OrderBookPage(price, size));
         }
 
         /**
@@ -429,41 +316,16 @@ public class OrderBook {
          * 
          * @param hint A price hint.
          */
-        private void fix(Num price) {
-            int index = side == Direction.BUY ? 0 : pages.size() - 1;
-            price = calculateGroupedPrice(price, range);
-
+        private void fix(Num hint) {
             if (!pages.isEmpty()) {
-                OrderBookPage unit = pages.get(index);
+                hint = calculateGroupedPrice(hint, range);
 
-                if (unit.price.isGreaterThan(side, price)) {
-                    pages.remove(index);
+                Num price = pages.firstKey();
+                while (price != null && price.isGreaterThan(side, hint)) {
+                    pages.remove(price);
+                    price = pages.firstKey();
                 }
             }
-        }
-    }
-
-    /**
-     * Index-safe implementation. Because JavaFX's FilteredList is broken.
-     */
-    @SuppressWarnings("serial")
-    private static class SafeGapList<E> extends GapList<E> {
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public E get(int index) {
-            int size = size();
-
-            if (size <= index) {
-                index = size - 1;
-            }
-
-            if (index < 0) {
-                index = 0;
-            }
-            return super.doGet(index);
         }
     }
 }

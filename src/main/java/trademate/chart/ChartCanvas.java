@@ -9,7 +9,7 @@
  */
 package trademate.chart;
 
-import static transcript.Transcript.*;
+import static transcript.Transcript.en;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -1167,7 +1167,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             }
 
             // collect seller pages
-            for (OrderBookPage page : market.orderBook.shorts.descendingPages()) {
+            for (OrderBookPage page : market.orderBook.shorts.ascendingPages()) {
                 if (page.price.doubleValue() < visibleMax) {
                     sellerMaxSize = Math.max(sellerMaxSize, page.size);
                     sellers.add(page);

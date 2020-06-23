@@ -13,6 +13,7 @@ import static cointoss.order.OrderState.ACTIVE;
 import static trademate.CommonText.*;
 
 import java.math.RoundingMode;
+import java.text.Normalizer.Form;
 import java.util.Comparator;
 import java.util.function.Consumer;
 import java.util.stream.IntStream;
@@ -165,12 +166,16 @@ public class OrderBuilder extends View {
 
         OrderManager orders = view.market.orders;
 
-        orderSize.initialize("0").when(User.Scroll, changeBy(orderSizeAmount)).require(positiveNumber);
+        orderSize.initialize("0").normalizeInput(Form.NFKC).acceptPositiveNumberInput().when(User.Scroll, changeBy(orderSizeAmount));
         orderSizeAmount.initialize(view.service.setting.targetCurrencyBidSizes());
 
-        orderPrice.initialize("0").when(User.Scroll, changeBy(orderPriceAmount)).require(positiveNumber).when(User.MiddleClick, () -> {
-            orderPrice.value(view.market.tickers.latest.v.price.toString());
-        });
+        orderPrice.initialize("0")
+                .normalizeInput(Form.NFKC)
+                .acceptPositiveNumberInput()
+                .when(User.Scroll, changeBy(orderPriceAmount))
+                .when(User.MiddleClick, () -> {
+                    orderPrice.value(view.market.tickers.latest.v.price.toString());
+                });
         orderPriceAmount.initialize(Num.ONE, Num.HUNDRED, Num.THOUSAND, Num.of(10000));
 
         orderDivideIntervalAmount.initialize(IntStream.rangeClosed(0, 6));
@@ -182,7 +187,11 @@ public class OrderBuilder extends View {
         });
 
         orderPriceIntervalAmount.initialize(Num.TEN, Num.HUNDRED, Num.THOUSAND);
-        orderPriceInterval.initialize("0").when(User.Scroll, changeBy(orderPriceIntervalAmount)).require(positiveNumber);
+        orderPriceInterval.initialize("0")
+                .normalizeInput(Form.NFKC)
+                .acceptPositiveNumberInput()
+                .when(User.Scroll, changeBy(orderPriceAmount))
+                .when(User.Scroll, changeBy(orderPriceIntervalAmount));
 
         optimizeThreshold.initialize(Num.range(0, 200));
 

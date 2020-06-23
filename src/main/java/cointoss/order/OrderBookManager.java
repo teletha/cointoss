@@ -72,33 +72,6 @@ public class OrderBookManager {
     }
 
     /**
-     * Get the total order size on the specified price in the current selected grouped order book.
-     * 
-     * @param price
-     * @return
-     */
-    public double amountOn(double price) {
-        return amountOn(Num.of(price));
-    }
-
-    /**
-     * Get the total order size on the specified price in the current selected grouped order book.
-     * 
-     * @param price
-     * @return
-     */
-    public double amountOn(Num price) {
-        if (price.isGreaterThanOrEqual(shorts.best.v.price)) {
-            return shorts.amountOn(price);
-        }
-
-        if (price.isLessThanOrEqual(longs.best.v.price)) {
-            return longs.amountOn(price);
-        }
-        return 0;
-    }
-
-    /**
      * It finds the largest order in the currently selected OrderBook within the specified price
      * range.
      * 
