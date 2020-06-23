@@ -16,7 +16,6 @@ import kiss.Singleton;
 import transcript.Lang;
 import viewtify.style.FormStyles;
 import viewtify.ui.UICheckBox;
-import viewtify.ui.UIPassword;
 import viewtify.ui.UIText;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
@@ -28,17 +27,17 @@ public class BitFlyerSetting extends View {
     /** The account info. */
     private final BitFlyerAccount account = I.make(BitFlyerAccount.class);
 
-    private UIPassword apiKey;
+    private UIText apiKey;
 
-    private UIPassword apiSecret;
+    private UIText apiSecret;
 
     private UIText loginId;
 
-    private UIPassword loginPassword;
+    private UIText loginPassword;
 
-    private UIPassword accountId;
+    private UIText accountId;
 
-    private UIPassword accountToken;
+    private UIText accountToken;
 
     private UICheckBox loginBackground;
 
@@ -70,12 +69,12 @@ public class BitFlyerSetting extends View {
      */
     @Override
     protected void initialize() {
-        apiKey.sync(account.apiKey);
-        apiSecret.sync(account.apiSecret);
+        apiKey.sync(account.apiKey).masking(true);
+        apiSecret.sync(account.apiSecret).masking(true);
         loginId.sync(account.loginId);
-        loginPassword.sync(account.loginPassword);
-        accountId.sync(account.accountId);
-        accountToken.sync(account.accountToken);
+        loginPassword.sync(account.loginPassword).masking(true);
+        accountId.sync(account.accountId).masking(true);
+        accountToken.sync(account.accountToken).masking(true);
 
         loginBackground.when(User.Action).to(() -> {
             if (Lang.current() == Lang.EN) {

@@ -12,6 +12,8 @@ package trademate;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
+import com.google.common.base.Strings;
+
 import cointoss.execution.Execution;
 import cointoss.ticker.RealtimeTicker;
 import cointoss.util.Chrono;
@@ -166,7 +168,8 @@ public class ExecutionView extends View {
     }
 
     private void update(UILabel label, Execution e, int scale) {
-        String text = Chrono.system(e.date).format(Chrono.Time) + "  " + e.price + " \t" + Primitives.roundString(e.accumulative, scale);
+        String text = Chrono.system(e.date).format(Chrono.Time) + "  " + Strings.padEnd(e.price.toString(), 5, ' ') + " \t" + Primitives
+                .roundString(e.accumulative, scale);
 
         label.text(text).styleOnly(TradeMateStyle.Side.of(e.direction));
     }

@@ -54,6 +54,7 @@ import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
 import viewtify.ui.helper.StyleHelper;
 import viewtify.ui.helper.User;
+import viewtify.ui.helper.ValueCondition;
 import viewtify.ui.helper.ValueHelper;
 
 public class OrderBuilder extends View {
@@ -166,7 +167,11 @@ public class OrderBuilder extends View {
 
         OrderManager orders = view.market.orders;
 
-        orderSize.initialize("0").normalizeInput(Form.NFKC).acceptPositiveNumberInput().when(User.Scroll, changeBy(orderSizeAmount));
+        orderSize.initialize("0")
+                .normalizeInput(Form.NFKC)
+                .acceptPositiveNumberInput()
+                .require(ValueCondition.Positive)
+                .when(User.Scroll, changeBy(orderSizeAmount));
         orderSizeAmount.initialize(view.service.setting.targetCurrencyBidSizes());
 
         orderPrice.initialize("0")

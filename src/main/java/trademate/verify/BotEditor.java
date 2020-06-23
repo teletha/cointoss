@@ -217,12 +217,14 @@ public class BotEditor extends View {
             UITextValue<Integer> start = new UITextValue(this);
             UITextValue<Integer> end = new UITextValue(this);
 
-            start.value(initial).when(User.Scroll, Actions.traverseInt(step::value)).observe((prev, now) -> {
-                end.value(v -> v + (now - prev));
-            }).requireWhen(end).require(ui -> ui.value() <= end.value());
+            start.value(initial)
+                    .when(User.Scroll, Actions.traverseInt(step::value))
+                    .observe((prev, now) -> end.value(v -> v + (now - prev)))
+                    .require(en("The start value must be less than the end value."), ui -> ui.value() <= end.value())
+                    .requireWhen(end);
             end.value(initial)
                     .when(User.Scroll, Actions.traverseInt(step::value))
-                    .require(ui -> start.value() <= ui.value())
+                    .require(en("The end value must be greater than the start value."), ui -> start.value() <= ui.value())
                     .requireWhen(start);
 
             start.observe().merge(end.observe(), step.observe()).to(() -> {
@@ -249,12 +251,16 @@ public class BotEditor extends View {
             UITextValue<Double> start = new UITextValue(this);
             UITextValue<Double> end = new UITextValue(this);
 
-            start.value(initial).when(User.Scroll, Actions.traverseDouble(step::value)).observe((prev, now) -> {
-                end.value(v -> BigDecimal.valueOf(v).add(BigDecimal.valueOf(now).subtract(BigDecimal.valueOf(prev))).doubleValue());
-            }).requireWhen(end).require(ui -> ui.value() <= end.value());
+            start.value(initial)
+                    .when(User.Scroll, Actions.traverseDouble(step::value))
+                    .observe((prev, now) -> end.value(v -> BigDecimal.valueOf(v)
+                            .add(BigDecimal.valueOf(now).subtract(BigDecimal.valueOf(prev)))
+                            .doubleValue()))
+                    .require(en("The start value must be less than the end value."), ui -> ui.value() <= end.value())
+                    .requireWhen(end);
             end.value(initial)
                     .when(User.Scroll, Actions.traverseDouble(step::value))
-                    .require(ui -> start.value() <= ui.value())
+                    .require(en("The end value must be greater than the start value."), ui -> start.value() <= ui.value())
                     .requireWhen(start);
 
             start.observe().merge(end.observe(), step.observe()).to(() -> {

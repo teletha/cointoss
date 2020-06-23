@@ -67,6 +67,15 @@ Terminated
 The end date must be after the start date.
 終了日は開始日より後でなければなりません。
 
+The end value must be greater than the start value.
+終了値は開始値よりも大きくなければなりません。
+
+The start date must be prior to the end date.
+開始日は終了日より前でなければなりません。
+
+The start value must be less than the end value.
+開始値は終了値より小さくなければなりません。
+
 Total
 総数
 

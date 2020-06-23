@@ -24,10 +24,10 @@ import viewtify.style.FormStyles;
 import viewtify.ui.UIButton;
 import viewtify.ui.UICheckBox;
 import viewtify.ui.UIComboBox;
-import viewtify.ui.UIPassword;
 import viewtify.ui.UISpinner;
 import viewtify.ui.UITableColumn;
 import viewtify.ui.UITableView;
+import viewtify.ui.UIText;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
 import viewtify.ui.helper.User;
@@ -57,7 +57,7 @@ class NotificatorSetting extends View {
     private UIComboBox<DesktopPosition> desktopPosition;
 
     /** The LINE configuration UI. */
-    private UIPassword lineAccessToken;
+    private UIText lineAccessToken;
 
     /** The LINE configuration UI. */
     private UIButton lineTest;
@@ -125,7 +125,7 @@ class NotificatorSetting extends View {
                 .format(duration -> duration.getSeconds() + en("seconds").get());
 
         // For LINE
-        lineAccessToken.sync(notificator.lineAccessToken);
+        lineAccessToken.sync(notificator.lineAccessToken).masking(true);
         lineTest.text(en("Send test message")).when(User.Action, () -> {
             I.make(Network.class)
                     .line(en("LINE Access Token Test"), en("The specified token is valid."), notificator.lineAccessToken.v)

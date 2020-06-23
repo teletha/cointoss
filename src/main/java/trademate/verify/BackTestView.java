@@ -260,18 +260,15 @@ public class BackTestView extends View implements Analyzer {
         fastLog.initialize(false)
                 .text(en("Use Fast Log"))
                 .tooltip(en("Run backtests very fast using compressed execution history.\r\nHowever, the execution result may be inaccurate."));
-        startDate.initial(Chrono.utcNow().minusDays(10)).uneditable().requireWhen(marketSelection).require(() -> {
+        startDate.initial(Chrono.utcNow().minusDays(10)).uneditable().requireWhen(marketSelection).require(LogIsNotFound, v -> {
             ExecutionLog log = marketSelection.value().log;
 
-            assert startDate.isBeforeOrSame(log.lastCacheDate()) : LogIsNotFound;
-            assert startDate.isAfterOrSame(log.firstCacheDate()) : LogIsNotFound;
+            return startDate.isBeforeOrSame(log.lastCacheDate()) && startDate.isAfterOrSame(log.firstCacheDate());
         }).observe((o, n) -> {
             endDate.value(v -> v.plus(Period.between(o, n)));
         });
 
-        endDate.initial(Chrono.utcNow()).uneditable().require(() -> {
-            assert startDate.isBeforeOrSame(endDate.value()) : EndDateMustBeAfterStartDate;
-        });
+        endDate.initial(Chrono.utcNow()).uneditable().require(EndDateMustBeAfterStartDate, v -> startDate.isBeforeOrSame(endDate.value()));
 
         runner.text(en("Run"))
                 .disableWhen(startDate.isInvalid(), verifying.observing())
