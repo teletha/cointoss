@@ -95,7 +95,7 @@ public class OrderBook {
      * @return A grouped view.
      */
     public final Collection<OrderBookPage> groupBy(Num range) {
-        if (group.range.isNot(range)) {
+        if (range.isPositive() && group.range.isNot(range)) {
             group = new GroupedOrderBook(range);
         }
         return group.pages.values();

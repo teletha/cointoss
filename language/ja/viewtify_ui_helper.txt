@@ -1,6 +1,9 @@
 Please enter a positive number.
 正の数を入力してください。
 
+Please input a positive number.
+正数を入力してください。
+
 This is invalid value, please correct.
 これは無効な値です。訂正してください。
 

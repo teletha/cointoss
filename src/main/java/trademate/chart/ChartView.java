@@ -33,10 +33,9 @@ import viewtify.ui.UIButton;
 import viewtify.ui.UICheckBox;
 import viewtify.ui.UIComboBox;
 import viewtify.ui.UISpinner;
-import viewtify.ui.UIText;
+import viewtify.ui.UITextValue;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
-import viewtify.ui.helper.Verifier;
 
 public class ChartView extends View {
 
@@ -65,7 +64,7 @@ public class ChartView extends View {
     public UICheckBox showOrderbook;
 
     /** Configuration UI */
-    public UIText orderbookPriceRange;
+    public UITextValue<Num> orderbookPriceRange;
 
     /** Configuration UI */
     public UISpinner<Integer> orderbookHideSize;
@@ -160,17 +159,16 @@ public class ChartView extends View {
         orderbookHideSize.initialize(IntStream.range(0, 101))
                 .tooltip(en("Display only boards that are larger than the specified size."))
                 .enableWhen(showOrderbook.isSelected());
-        orderbookPriceRange.initialize("1")
+        orderbookPriceRange.initialize(Num.ONE)
                 .acceptPositiveNumberInput()
                 .normalizeInput(Form.NFKC)
                 .maximumInput(6)
-                .verifyBy(Verifier.PositiveNumber)
                 .tooltip(en("Display a grouped board with a specified price range."))
                 .enableWhen(showOrderbook.isSelected())
                 .observing(range -> {
                     if (market.isPresent()) {
-                        market.v.orderBook.longs.groupBy(Num.of(range));
-                        market.v.orderBook.shorts.groupBy(Num.of(range));
+                        market.v.orderBook.longs.groupBy(range);
+                        market.v.orderBook.shorts.groupBy(range);
                     }
                 });
     }
