@@ -9,7 +9,7 @@
  */
 package trademate.order;
 
-import static cointoss.order.OrderState.ACTIVE;
+import static cointoss.order.OrderState.*;
 import static trademate.CommonText.*;
 
 import java.math.RoundingMode;
@@ -54,8 +54,8 @@ import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
 import viewtify.ui.helper.StyleHelper;
 import viewtify.ui.helper.User;
-import viewtify.ui.helper.ValueCondition;
 import viewtify.ui.helper.ValueHelper;
+import viewtify.ui.helper.Verifier;
 
 public class OrderBuilder extends View {
 
@@ -170,7 +170,7 @@ public class OrderBuilder extends View {
         orderSize.initialize("0")
                 .normalizeInput(Form.NFKC)
                 .acceptPositiveNumberInput()
-                .verifyBy(ValueCondition.Positive)
+                .verifyBy(Verifier.PositiveNumber)
                 .when(User.Scroll, changeBy(orderSizeAmount));
         orderSizeAmount.initialize(view.service.setting.targetCurrencyBidSizes());
 

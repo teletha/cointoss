@@ -36,7 +36,7 @@ import viewtify.ui.UISpinner;
 import viewtify.ui.UIText;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
-import viewtify.ui.helper.ValueCondition;
+import viewtify.ui.helper.Verifier;
 
 public class ChartView extends View {
 
@@ -164,7 +164,7 @@ public class ChartView extends View {
                 .acceptPositiveNumberInput()
                 .normalizeInput(Form.NFKC)
                 .maximumInput(6)
-                .verifyBy(ValueCondition.Positive)
+                .verifyBy(Verifier.PositiveNumber)
                 .tooltip(en("Display a grouped board with a specified price range."))
                 .enableWhen(showOrderbook.isSelected())
                 .observing(range -> {
