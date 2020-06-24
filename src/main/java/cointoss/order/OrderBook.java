@@ -13,6 +13,7 @@ import java.math.RoundingMode;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.function.Consumer;
@@ -320,10 +321,10 @@ public class OrderBook {
             if (!pages.isEmpty()) {
                 hint = calculateGroupedPrice(hint, range);
 
-                Num price = pages.firstKey();
-                while (price != null && price.isGreaterThan(side, hint)) {
-                    pages.remove(price);
-                    price = pages.firstKey();
+                Entry<Num, OrderBookPage> entry = pages.firstEntry();
+                while (entry != null && entry.getKey().isGreaterThan(side, hint)) {
+                    pages.pollFirstEntry();
+                    entry = pages.firstEntry();
                 }
             }
         }

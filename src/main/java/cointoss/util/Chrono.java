@@ -339,6 +339,8 @@ public class Chrono {
         return disposer.add(TIMER.scheduleAtFixedRate(() -> {
             observer.accept(ZonedDateTime.ofInstant(CLOCK.instant(), CLOCK.getZone()).truncatedTo(ChronoUnit.SECONDS));
         }, 0, 1, TimeUnit.SECONDS));
+    }).effectOnError(e -> {
+        e.printStackTrace();
     }).share().effectOnError(e -> {
         e.printStackTrace();
     });
@@ -356,7 +358,11 @@ public class Chrono {
     private static long latestDelay;
 
     static {
-        seconds().takeAt(index -> index % 300 == 15).to(Chrono::calculateDelayByNTP);
+        seconds().takeAt(index -> index % 300 == 15).to(e -> calculateDelayByNTP(), e -> {
+            e.printStackTrace();
+        }, () -> {
+            System.out.println("Complete NTP");
+        });
     }
 
     /**
@@ -372,6 +378,7 @@ public class Chrono {
             System.out.println(latestDelay);
         } catch (Throwable e) {
             // ignore
+            e.printStackTrace();
         } finally {
             client.close();
         }

@@ -165,12 +165,11 @@ public class ChartView extends View {
                 .maximumInput(6)
                 .tooltip(en("Display a grouped board with a specified price range."))
                 .enableWhen(showOrderbook.isSelected())
-                .observing(range -> {
-                    if (market.isPresent()) {
-                        market.v.orderBook.longs.groupBy(range);
-                        market.v.orderBook.shorts.groupBy(range);
-                    }
+                .observing(e -> e.combineLatest(market.observe()), v -> {
+                    v.ⅱ.orderBook.longs.groupBy(v.ⅰ);
+                    v.ⅱ.orderBook.shorts.groupBy(v.ⅰ);
                 });
+
     }
 
     /**

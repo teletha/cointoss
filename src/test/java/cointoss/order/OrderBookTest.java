@@ -162,48 +162,48 @@ class OrderBookTest {
         OrderBook book = new OrderBook(setting, Direction.BUY);
 
         book.update(unit(1000, 1));
-        assertList(book.groupBy(Num.TEN), 0, 1000, 1, 1);
+        assertList(book.groupBy(Num.TEN), 0, 1000, 1, 1, 1000);
 
         // add
         book.update(unit(1009, 1));
-        assertList(book.groupBy(Num.TEN), 0, 1000, 2, 2);
+        assertList(book.groupBy(Num.TEN), 0, 1000, 2, 2, 1000);
 
         // minus
         book.update(unit(1000, 0));
-        assertList(book.groupBy(Num.TEN), 0, 1000, 1, 1);
+        assertList(book.groupBy(Num.TEN), 0, 1000, 1, 1, 1000);
 
         // next group
         book.update(unit(1010, 1));
-        assertList(book.groupBy(Num.TEN), 0, 1010, 1, 1);
-        assertList(book.groupBy(Num.TEN), 1, 1000, 1, 2);
+        assertList(book.groupBy(Num.TEN), 0, 1010, 1, 1, 1010);
+        assertList(book.groupBy(Num.TEN), 1, 1000, 1, 2, 1000);
 
         // remove
         book.update(unit(1009, 0));
-        assertList(book.groupBy(Num.TEN), 0, 1010, 1, 1);
+        assertList(book.groupBy(Num.TEN), 0, 1010, 1, 1, 1010);
     }
 
     @Test
     void sellGroup() {
         OrderBook book = new OrderBook(setting, Direction.SELL);
         book.update(unit(1000, 1));
-        assertList(book.groupBy(Num.TEN), 0, 1000, 1, 1);
+        assertList(book.groupBy(Num.TEN), 0, 1000, 1, 1, 1010);
 
         // add
         book.update(unit(1009, 1));
-        assertList(book.groupBy(Num.TEN), 0, 1000, 2, 2);
+        assertList(book.groupBy(Num.TEN), 0, 1000, 2, 2, 1010);
 
         // minus
         book.update(unit(1000, 0));
-        assertList(book.groupBy(Num.TEN), 0, 1000, 1, 1);
+        assertList(book.groupBy(Num.TEN), 0, 1000, 1, 1, 1010);
 
         // next group
         book.update(unit(1010, 1));
-        assertList(book.groupBy(Num.TEN), 1, 1010, 1, 2);
-        assertList(book.groupBy(Num.TEN), 0, 1000, 1, 1);
+        assertList(book.groupBy(Num.TEN), 1, 1010, 1, 2, 1020);
+        assertList(book.groupBy(Num.TEN), 0, 1000, 1, 1, 1010);
 
         // remove
         book.update(unit(1009, 0));
-        assertList(book.groupBy(Num.TEN), 0, 1010, 1, 1);
+        assertList(book.groupBy(Num.TEN), 0, 1010, 1, 1, 1020);
     }
 
     @Test
@@ -350,6 +350,21 @@ class OrderBookTest {
         OrderBookPage unit = at(index, list);
         assert unit.size == size;
         assert unit.price.is(price);
+    }
+
+    /**
+     * Helper method to assert.
+     * 
+     * @param list
+     * @param index
+     * @param size
+     * @param price
+     */
+    private void assertList(Collection<OrderBookPage> list, int index, int price, int size, int total, int rangedPrice) {
+        OrderBookPage unit = at(index, list);
+        assert unit.size == size;
+        assert unit.price.is(price);
+        assert unit.rangedPrice().is(rangedPrice);
     }
 
     /**

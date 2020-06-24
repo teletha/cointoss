@@ -14,7 +14,7 @@ import cointoss.util.Num;
 public final class OrderBookPage implements Comparable<OrderBookPage> {
 
     /** The board price. */
-    public final Num price;
+    public Num price;
 
     /** The board size. */
     public double size;
@@ -26,8 +26,7 @@ public final class OrderBookPage implements Comparable<OrderBookPage> {
      * For I#make.
      */
     OrderBookPage() {
-        this.price = Num.ZERO;
-        this.range = Num.ZERO;
+        range = Num.ZERO;
     }
 
     /**
