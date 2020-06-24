@@ -9,7 +9,7 @@
  */
 package trademate.chart;
 
-import static transcript.Transcript.en;
+import static transcript.Transcript.*;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -427,7 +427,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 OrderBookPage largest = m.orderBook.findLargestOrder(axisY.getValueForPosition(y + 2), axisY.getValueForPosition(y - 2));
 
                 if (largest != null && orderbookBar != null) {
-                    double position = axisY.getPositionForValue(largest.price.doubleValue());
+                    double position = axisY.getPositionForValue(largest.rangedPrice().doubleValue());
                     orderbookDigit.clear()
                             .strokeColor(largest.price.isLessThanOrEqual(m.orderBook.longs.best.v.price) ? BuyerColor : SellerColor)
                             .strokeText((int) largest.size, orderbookDigit.getWidth() - largest.size * orderbookBar.scale - 15, position);
@@ -1208,7 +1208,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                     continue; // hiding
                 }
 
-                double position = axisY.getPositionForValue(page.price.doubleValue());
+                double position = axisY.getPositionForValue(page.rangedPrice().doubleValue());
                 double width = start - page.size * scale;
                 gc.strokeLine(start, position, width, position);
                 if (page.size > upper && Math.abs(lastPosition - position) > 8) {

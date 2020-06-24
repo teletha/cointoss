@@ -110,7 +110,7 @@ public class OrderBook {
      * @return
      */
     public final OrderBookPage findLargestOrder(Num lowerPrice, Num upperPrice) {
-        OrderBookPage max = new OrderBookPage(lowerPrice, 0);
+        OrderBookPage max = new OrderBookPage(lowerPrice, 0, group.range);
 
         if (base.isEmpty()) {
             return max;
@@ -303,7 +303,7 @@ public class OrderBook {
         private void update(Num price, double size) {
             price = calculateGroupedPrice(price, range);
 
-            OrderBookPage page = pages.computeIfAbsent(price, key -> new OrderBookPage(key, 0));
+            OrderBookPage page = pages.computeIfAbsent(price, key -> new OrderBookPage(key, 0, side.isBuy() ? Num.ZERO : range));
             page.size += size;
 
             if (Primitives.roundDecimal(page.size, scale, RoundingMode.DOWN) <= 0) {

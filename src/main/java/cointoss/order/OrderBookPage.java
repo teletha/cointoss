@@ -11,18 +11,23 @@ package cointoss.order;
 
 import cointoss.util.Num;
 
-public class OrderBookPage implements Comparable<OrderBookPage> {
+public final class OrderBookPage implements Comparable<OrderBookPage> {
 
     /** The board price. */
-    public Num price;
+    public final Num price;
 
     /** The board size. */
     public double size;
+
+    /** The price range. */
+    private final Num range;
 
     /**
      * For I#make.
      */
     OrderBookPage() {
+        this.price = Num.ZERO;
+        this.range = Num.ZERO;
     }
 
     /**
@@ -32,8 +37,30 @@ public class OrderBookPage implements Comparable<OrderBookPage> {
      * @param size A total size.
      */
     public OrderBookPage(Num price, double size) {
+        this(price, size, Num.ZERO);
+    }
+
+    /**
+     * Simple Builder.
+     * 
+     * @param price A price.
+     * @param size A total size.
+     */
+    OrderBookPage(Num price, double size, Num range) {
         this.price = price;
         this.size = size;
+        this.range = range;
+    }
+
+    /**
+     * Get the terminal price if you are representing a price range. In the buyboard, it represents
+     * the lowest price in the price range, and in the sellboard, it represents the highest price in
+     * the price range.
+     * 
+     * @return
+     */
+    public Num rangedPrice() {
+        return price.plus(range);
     }
 
     /**
@@ -45,11 +72,7 @@ public class OrderBookPage implements Comparable<OrderBookPage> {
     }
 
     /**
-     * Test method.
-     * 
-     * @param price
-     * @param size
-     * @return
+     * Expose to test.
      */
     boolean is(double price, double size) {
         return this.price.is(price) && size == size;
