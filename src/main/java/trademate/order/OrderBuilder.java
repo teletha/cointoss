@@ -170,7 +170,7 @@ public class OrderBuilder extends View {
         orderSize.initialize("0")
                 .normalizeInput(Form.NFKC)
                 .acceptPositiveNumberInput()
-                .require(ValueCondition.Positive)
+                .verifyBy(ValueCondition.Positive)
                 .when(User.Scroll, changeBy(orderSizeAmount));
         orderSizeAmount.initialize(view.service.setting.targetCurrencyBidSizes());
 

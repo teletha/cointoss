@@ -36,7 +36,6 @@ import trademate.chart.ChartView;
 import trademate.chart.PlotScript;
 import trademate.chart.builtin.TraderVisualizer;
 import trademate.setting.SettingStyles;
-import transcript.Transcript;
 import viewtify.Viewtify;
 import viewtify.ui.UIButton;
 import viewtify.ui.UICheckBox;
@@ -51,10 +50,6 @@ import viewtify.ui.ViewDSL;
 import viewtify.ui.helper.User;
 
 public class BackTestView extends View implements Analyzer {
-
-    private static final Transcript LogIsNotFound = Transcript.en("No logs were found for the specified date.");
-
-    private static final Transcript EndDateMustBeAfterStartDate = Transcript.en("The end date must be after the start date.");
 
     /** Runner UI */
     private UIComboBox<MarketService> marketSelection;
@@ -260,18 +255,21 @@ public class BackTestView extends View implements Analyzer {
         fastLog.initialize(false)
                 .text(en("Use Fast Log"))
                 .tooltip(en("Run backtests very fast using compressed execution history.\r\nHowever, the execution result may be inaccurate."));
-        startDate.initial(Chrono.utcNow().minusDays(10)).uneditable().requireWhen(marketSelection).require(LogIsNotFound, v -> {
-            ExecutionLog log = marketSelection.value().log;
+        startDate.initial(Chrono.utcNow().minusDays(10))
+                .uneditable()
+                .observe((o, n) -> endDate.value(v -> v.plus(Period.between(o, n))))
+                .verifyWhen(marketSelection.isChanged())
+                .verify(en("No logs were found for the specified date."), v -> {
+                    ExecutionLog log = marketSelection.value().log;
+                    return startDate.isBeforeOrSame(log.lastCacheDate()) && startDate.isAfterOrSame(log.firstCacheDate());
+                });
 
-            return startDate.isBeforeOrSame(log.lastCacheDate()) && startDate.isAfterOrSame(log.firstCacheDate());
-        }).observe((o, n) -> {
-            endDate.value(v -> v.plus(Period.between(o, n)));
-        });
-
-        endDate.initial(Chrono.utcNow()).uneditable().require(EndDateMustBeAfterStartDate, v -> startDate.isBeforeOrSame(endDate.value()));
+        endDate.initial(Chrono.utcNow())
+                .uneditable()
+                .verify(en("The end date must be after the start date."), v -> startDate.isBeforeOrSame(endDate.value()));
 
         runner.text(en("Run"))
-                .disableWhen(startDate.isInvalid(), verifying.observing())
+                .disableWhen(startDate.isInvalid(), endDate.isInvalid(), verifying.observing())
                 .when(User.MouseClick)
                 .on(Viewtify.WorkerThread)
                 .to(e -> {

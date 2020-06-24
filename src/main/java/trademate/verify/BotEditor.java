@@ -218,14 +218,16 @@ public class BotEditor extends View {
             UITextValue<Integer> end = new UITextValue(this);
 
             start.value(initial)
+                    .acceptIntegralInput()
                     .when(User.Scroll, Actions.traverseInt(step::value))
                     .observe((prev, now) -> end.value(v -> v + (now - prev)))
-                    .require(en("The start value must be less than the end value."), ui -> ui.value() <= end.value())
-                    .requireWhen(end);
+                    .verify(en("The start value must be less than the end value."), ui -> ui.value() <= end.value())
+                    .verifyWhen(end.isChanged());
             end.value(initial)
+                    .acceptIntegralInput()
                     .when(User.Scroll, Actions.traverseInt(step::value))
-                    .require(en("The end value must be greater than the start value."), ui -> start.value() <= ui.value())
-                    .requireWhen(start);
+                    .verify(en("The end value must be greater than the start value."), ui -> start.value() <= ui.value())
+                    .verifyWhen(start.isChanged());
 
             start.observe().merge(end.observe(), step.observe()).to(() -> {
                 List values = new ArrayList();
@@ -252,16 +254,18 @@ public class BotEditor extends View {
             UITextValue<Double> end = new UITextValue(this);
 
             start.value(initial)
+                    .acceptDecimalInput()
                     .when(User.Scroll, Actions.traverseDouble(step::value))
                     .observe((prev, now) -> end.value(v -> BigDecimal.valueOf(v)
                             .add(BigDecimal.valueOf(now).subtract(BigDecimal.valueOf(prev)))
                             .doubleValue()))
-                    .require(en("The start value must be less than the end value."), ui -> ui.value() <= end.value())
-                    .requireWhen(end);
+                    .verify(en("The start value must be less than the end value."), ui -> ui.value() <= end.value())
+                    .verifyWhen(end.isChanged());
             end.value(initial)
+                    .acceptDecimalInput()
                     .when(User.Scroll, Actions.traverseDouble(step::value))
-                    .require(en("The end value must be greater than the start value."), ui -> start.value() <= ui.value())
-                    .requireWhen(start);
+                    .verify(en("The end value must be greater than the start value."), ui -> start.value() <= ui.value())
+                    .verifyWhen(start.isChanged());
 
             start.observe().merge(end.observe(), step.observe()).to(() -> {
                 List values = new ArrayList();

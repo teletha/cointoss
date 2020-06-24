@@ -164,7 +164,7 @@ public class ChartView extends View {
                 .acceptPositiveNumberInput()
                 .normalizeInput(Form.NFKC)
                 .maximumInput(6)
-                .require(ValueCondition.Positive)
+                .verifyBy(ValueCondition.Positive)
                 .tooltip(en("Display a grouped board with a specified price range."))
                 .enableWhen(showOrderbook.isSelected())
                 .observing(range -> {
