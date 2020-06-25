@@ -427,9 +427,10 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
                 OrderBookPage largest = m.orderBook.findLargestOrder(axisY.getValueForPosition(y + 2), axisY.getValueForPosition(y - 2));
 
                 if (largest != null && orderbookBar != null) {
-                    double position = axisY.getPositionForValue(largest.rangedPrice().doubleValue());
+                    Num price = largest.rangedPrice();
+                    double position = axisY.getPositionForValue(price.doubleValue());
                     orderbookDigit.clear()
-                            .strokeColor(largest.price.isLessThanOrEqual(m.orderBook.longs.best.v.price) ? BuyerColor : SellerColor)
+                            .strokeColor(price.isLessThanOrEqual(m.orderBook.longs.best.v.price) ? BuyerColor : SellerColor)
                             .strokeText((int) largest.size, orderbookDigit.getWidth() - largest.size * orderbookBar.scale - 15, position);
                 }
             });
