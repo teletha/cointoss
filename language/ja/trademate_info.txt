@@ -1,9 +1,0 @@
-Amount
-数量
-
-Price
-値段
-
-Profit
-損益
-
