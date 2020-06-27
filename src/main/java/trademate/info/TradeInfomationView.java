@@ -9,18 +9,16 @@
  */
 package trademate.info;
 
-import static transcript.Transcript.en;
-
 import cointoss.order.OrderBook;
 import cointoss.order.Position;
 import cointoss.util.Num;
 import stylist.Style;
 import stylist.StyleDSL;
 import trademate.TradingView;
-import viewtify.ui.ViewDSL;
 import viewtify.ui.UIButton;
 import viewtify.ui.UILabel;
 import viewtify.ui.View;
+import viewtify.ui.ViewDSL;
 
 public class TradeInfomationView extends View {
 

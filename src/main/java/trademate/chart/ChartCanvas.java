@@ -9,8 +9,6 @@
  */
 package trademate.chart;
 
-import static transcript.Transcript.en;
-
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -60,6 +58,7 @@ import trademate.TradeMateStyle;
 import trademate.chart.Axis.TickLable;
 import trademate.chart.PlotScript.Plotter;
 import trademate.setting.Notificator;
+import transcript.Transcript;
 import viewtify.Viewtify;
 import viewtify.ui.canvas.EnhancedCanvas;
 import viewtify.ui.helper.LayoutAssistant;
@@ -496,8 +495,10 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         double lineY = -12;
         gc.setStroke(Color.WHITESMOKE);
         gc.setFont(Font.font(10));
-        gc.strokeText(en("Duration") + "\t" + Chrono.formatAsDuration(Math.abs(endTime - startTime) * 1000), textX, endY + lineY);
-        gc.strokeText(en("Spread") + "\t" + Primitives.roundString(Math.abs(upperPrice - lowerPrice), scale), textX, endY + lineY * 2);
+        gc.strokeText(new Transcript("Duration") + "\t" + Chrono
+                .formatAsDuration(Math.abs(endTime - startTime) * 1000), textX, endY + lineY);
+        gc.strokeText(new Transcript("Spread") + "\t" + Primitives
+                .roundString(Math.abs(upperPrice - lowerPrice), scale), textX, endY + lineY * 2);
     }
 
     /**
@@ -527,7 +528,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             MarketService service = chart.market.v.service;
             Num p = exe.price.scale(service.setting.targetCurrencyScaleSize);
             String title = "🔊  " + service.marketReadableName() + " " + p;
-            CharSequence message = en("The specified price ({0}) has been reached.").with(p);
+            CharSequence message = new Transcript("The specified price ({0}) has been reached.").with(p);
             System.out.println("remove line");
             I.make(Notificator.class).priceSignal.notify(title, message);
         }));

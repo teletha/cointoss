@@ -13,13 +13,11 @@ import cointoss.market.bitflyer.BitFlyerAccount;
 import kiss.I;
 import kiss.Managed;
 import kiss.Singleton;
-import transcript.Lang;
 import viewtify.style.FormStyles;
 import viewtify.ui.UICheckBox;
 import viewtify.ui.UIText;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
-import viewtify.ui.helper.User;
 
 @Managed(value = Singleton.class)
 public class BitFlyerSetting extends View {
@@ -75,13 +73,5 @@ public class BitFlyerSetting extends View {
         loginPassword.sync(account.loginPassword).masking(true);
         accountId.sync(account.accountId).masking(true);
         accountToken.sync(account.accountToken).masking(true);
-
-        loginBackground.when(User.Action).to(() -> {
-            if (Lang.current() == Lang.EN) {
-                Lang.JA.setDefault();
-            } else {
-                Lang.EN.setDefault();
-            }
-        });
     }
 }

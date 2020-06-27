@@ -28,7 +28,6 @@ import kiss.Managed;
 import kiss.Singleton;
 import trademate.setting.SettingView;
 import trademate.verify.BackTestView;
-import transcript.Lang;
 import viewtify.Theme;
 import viewtify.Viewtify;
 import viewtify.ui.UITab;
@@ -138,7 +137,7 @@ public class TradeMate extends View {
                 .logging(LogManager.getLogger()::error)
                 .use(Theme.Dark)
                 .icon("icon/app.png")
-                .language(Lang.of(I.env("language", Locale.getDefault().getLanguage())))
+                .language(I.env("language", Locale.getDefault().getLanguage()))
                 .onTerminating(Network::terminate)
                 .activate(TradeMate.class);
     }

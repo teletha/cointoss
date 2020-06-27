@@ -19,7 +19,6 @@ import kiss.I;
 import kiss.Managed;
 import kiss.Singleton;
 import trademate.verify.BackTestView;
-import transcript.Lang;
 import viewtify.Theme;
 import viewtify.Viewtify;
 import viewtify.ui.View;
@@ -60,7 +59,7 @@ public class TradeTester extends View {
                 .logging(LogManager.getLogger()::error)
                 .use(Theme.Dark)
                 .icon("icon/tester.png")
-                .language(Lang.of(I.env("language", Locale.getDefault().getLanguage())))
+                .language(I.env("language", Locale.getDefault().getLanguage()))
                 .onTerminating(Network::terminate)
                 .activate(TradeTester.class);
     }

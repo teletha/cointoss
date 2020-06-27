@@ -9,8 +9,6 @@
  */
 package trademate.setting;
 
-import static transcript.Transcript.en;
-
 import java.util.List;
 
 import javafx.geometry.Pos;
@@ -31,19 +29,19 @@ import transcript.Transcript;
 public class Notificator implements Storable<Notificator> {
 
     /** The defined type. */
-    public final Notify longTrend = new Notify(en("Long Trend"));
+    public final Notify longTrend = new Notify(new Transcript("Long Trend"));
 
     /** The defined type. */
-    public final Notify shortTrend = new Notify(en("Short Trend"));
+    public final Notify shortTrend = new Notify(new Transcript("Short Trend"));
 
     /** The defined type. */
-    public final Notify execution = new Notify(en("Execution"));
+    public final Notify execution = new Notify(new Transcript("Execution"));
 
     /** The defined type. */
-    public final Notify orderFailed = new Notify(en("Order Failed"));
+    public final Notify orderFailed = new Notify(new Transcript("Order Failed"));
 
     /** The defined type. */
-    public final Notify priceSignal = new Notify(en("Price Signal"));
+    public final Notify priceSignal = new Notify(new Transcript("Price Signal"));
 
     /** The desktop position. */
     final @Managed Variable<DesktopPosition> desktopPosition = Variable.of(DesktopPosition.BottomRight);
@@ -155,13 +153,13 @@ public class Notificator implements Storable<Notificator> {
      * 
      */
     static enum DesktopPosition {
-        TopLeft(Pos.TOP_LEFT, en("TopLeft")),
+        TopLeft(Pos.TOP_LEFT, new Transcript("TopLeft")),
 
-        TopRight(Pos.TOP_RIGHT, en("TopRight")),
+        TopRight(Pos.TOP_RIGHT, new Transcript("TopRight")),
 
-        BottomLeft(Pos.BOTTOM_LEFT, en("BottomLeft")),
+        BottomLeft(Pos.BOTTOM_LEFT, new Transcript("BottomLeft")),
 
-        BottomRight(Pos.BOTTOM_RIGHT, en("BottomRight"));
+        BottomRight(Pos.BOTTOM_RIGHT, new Transcript("BottomRight"));
 
         /** The actual position. */
         private final Pos position;

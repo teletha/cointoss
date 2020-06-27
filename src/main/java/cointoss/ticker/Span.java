@@ -138,16 +138,16 @@ public enum Span {
     private String unit() {
         switch (unit) {
         case EPOCH_DAY:
-            return Transcript.en("days").toString();
+            return new Transcript("days").toString();
 
         case HOUR_OF_DAY:
-            return Transcript.en("hours").toString();
+            return new Transcript("hours").toString();
 
         case MINUTE_OF_HOUR:
-            return Transcript.en("mins").toString();
+            return new Transcript("mins").toString();
 
         case SECOND_OF_MINUTE:
-            return Transcript.en("secs").toString();
+            return new Transcript("secs").toString();
 
         default:
             // If this exception will be thrown, it is bug of this program. So we must rethrow the

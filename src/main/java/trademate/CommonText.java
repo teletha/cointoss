@@ -16,31 +16,31 @@ import transcript.Transcript;
  */
 public interface CommonText {
 
-    Transcript SiDe = Transcript.en("Side");
+    Transcript SiDe = new Transcript("Side");
 
-    Transcript Buy = Transcript.en("Buy");
+    Transcript Buy = new Transcript("Buy");
 
-    Transcript Sell = Transcript.en("Sell");
+    Transcript Sell = new Transcript("Sell");
 
-    Transcript Long = Transcript.en("Long");
+    Transcript Long = new Transcript("Long");
 
-    Transcript Short = Transcript.en("Short");
+    Transcript Short = new Transcript("Short");
 
-    Transcript Price = Transcript.en("Price");
+    Transcript Price = new Transcript("Price");
 
-    Transcript Amount = Transcript.en("Amount");
+    Transcript Amount = new Transcript("Amount");
 
-    Transcript Profit = Transcript.en("Profit");
+    Transcript Profit = new Transcript("Profit");
 
-    Transcript Date = Transcript.en("Date");
+    Transcript Date = new Transcript("Date");
 
-    Transcript Cancel = Transcript.en("Cancel");
+    Transcript Cancel = new Transcript("Cancel");
 
-    Transcript OpenPrice = Transcript.en("Open");
+    Transcript OpenPrice = new Transcript("Open");
 
-    Transcript ClosePrice = Transcript.en("Close");
+    Transcript ClosePrice = new Transcript("Close");
 
-    Transcript HighPrice = Transcript.en("High");
+    Transcript HighPrice = new Transcript("High");
 
-    Transcript LowPrice = Transcript.en("Low");
+    Transcript LowPrice = new Transcript("Low");
 }
