@@ -43,6 +43,7 @@ import cointoss.order.OrderState;
 import cointoss.order.OrderType;
 import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
+import cointoss.util.Network;
 import cointoss.util.Num;
 import kiss.Disposable;
 import kiss.I;
@@ -679,9 +680,10 @@ class BitFlyerService extends MarketService {
      */
     private static class Session {
 
-        /** The session id (may be null). */
+        /** The session ID (may be null). */
         private static String id;
 
+        // Use your browser to log in and obtain a session ID.
         static {
             Viewtify.browser(browser -> {
                 browser.load("https://lightning.bitflyer.jp")
@@ -698,20 +700,29 @@ class BitFlyerService extends MarketService {
                         .to(() -> {
                             browser.cookie(sessionKey).to(c -> id = c.getValue());
                             browser.stage().get().close();
+
+                            maintain();
                         });
             });
         }
-    }
 
-    /**
-     * Maintain the session.
-     */
-    private synchronized void maintain() {
-        I.signal(10, 10, TimeUnit.MINUTES);
-        disposer.add(scheduler().scheduleAtFixedRate(() -> {
-            call("", "https://lightning.bitflyer.com/api/trade/getMyBoardOrders", "{\"product_code\":\"" + marketName + "\",\"account_id\":\"" + account.accountId + "\",\"lang\":\"ja\"}")
-                    .to(I.NoOP);
-        }, 1, 1, TimeUnit.MINUTES));
+        /**
+         * Use the API periodically to maintain the session ID.
+         */
+        private static void maintain() {
+            Chrono.seconds().takeAt(i -> i % 480 == 240).to(() -> {
+                Builder builder = new Request.Builder().url("https://lightning.bitflyer.com/api/trade/getMyBoardOrders")
+                        .addHeader("Content-Type", "application/json")
+                        .addHeader("Cookie", sessionKey + "=" + Session.id)
+                        .addHeader("X-Requested-With", "XMLHttpRequest")
+                        .post(RequestBody
+                                .create(mime, "{\"product_code\":\"FX_BTC_JPY\",\"account_id\":\"" + account.accountId + "\",\"lang\":\"ja\"}"));
+
+                new Network().rest(builder.build()).to(e -> {
+                    System.out.println(e);
+                });
+            });
+        }
     }
 
     /**
