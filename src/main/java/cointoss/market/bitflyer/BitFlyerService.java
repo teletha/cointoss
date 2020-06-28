@@ -718,9 +718,7 @@ class BitFlyerService extends MarketService {
                         .post(RequestBody
                                 .create(mime, "{\"product_code\":\"FX_BTC_JPY\",\"account_id\":\"" + account.accountId + "\",\"lang\":\"ja\"}"));
 
-                new Network().rest(builder.build()).to(e -> {
-                    System.out.println(e);
-                });
+                new Network().rest(builder.build()).to(I.NoOP);
             });
         }
     }
