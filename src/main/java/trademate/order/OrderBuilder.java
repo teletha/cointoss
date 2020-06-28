@@ -9,7 +9,6 @@
  */
 package trademate.order;
 
-import static cointoss.order.OrderState.*;
 import static trademate.CommonText.*;
 
 import java.math.RoundingMode;
@@ -40,7 +39,6 @@ import stylist.ValueStyle;
 import trademate.TradeMateStyle;
 import trademate.TradingView;
 import viewtify.Viewtify;
-import viewtify.bind.Calculated;
 import viewtify.style.FormStyles;
 import viewtify.ui.UIButton;
 import viewtify.ui.UICheckBox;
@@ -231,11 +229,7 @@ public class OrderBuilder extends View {
         });
 
         table.mode(SelectionMode.MULTIPLE).render(table -> new CatalogRow()).context($ -> {
-            Calculated<Boolean> ordersArePassive = Viewtify.calculate(table.selectedItems())
-                    .flatVariable(o -> o.observeStateNow().to())
-                    .isNot(ACTIVE);
-
-            $.menu().text(Cancel).disableWhen(ordersArePassive).when(User.Action, e -> act(this::cancel));
+            $.menu().text(Cancel).when(User.Action, e -> act(this::cancel));
         });
 
         side.text(SiDe)

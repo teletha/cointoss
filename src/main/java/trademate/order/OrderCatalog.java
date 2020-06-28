@@ -9,7 +9,6 @@
  */
 package trademate.order;
 
-import static cointoss.order.OrderState.*;
 import static trademate.CommonText.*;
 
 import java.util.Comparator;
@@ -29,7 +28,6 @@ import stylist.ValueStyle;
 import trademate.TradeMateStyle;
 import trademate.TradingView;
 import viewtify.Viewtify;
-import viewtify.bind.Calculated;
 import viewtify.ui.UITableColumn;
 import viewtify.ui.UITableView;
 import viewtify.ui.View;
@@ -76,11 +74,7 @@ public class OrderCatalog extends View {
     @Override
     protected void initialize() {
         table.mode(SelectionMode.MULTIPLE).render(table -> new CatalogRow()).context($ -> {
-            Calculated<Boolean> ordersArePassive = Viewtify.calculate(table.selectedItems())
-                    .flatVariable(o -> o.observeStateNow().to())
-                    .isNot(ACTIVE);
-
-            $.menu().text(Cancel).disableWhen(ordersArePassive).when(User.Action, e -> act(this::cancel));
+            $.menu().text(Cancel).when(User.Action, e -> act(this::cancel));
         });
 
         side.text(SiDe)
