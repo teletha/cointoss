@@ -1,29 +1,140 @@
-days
-日
+Access Token
+アクセストークン
 
-hours
-時間
+Access Token Test
+アクセス・トークン・テスト
 
-mins
-分
+Account ID
+アカウントID
 
-secs
-秒
+Account Token
+アカウントトークン
 
-This is invalid value, please correct.
-これは無効な値です。訂正してください。
+Amount
+数量
+
+Appearance
+外観
+
+Arrange in tiles
+並べて表示
+
+Bitflyer
+ビットフライヤー
+
+BottomLeft
+左下
+
+BottomRight
+右下
+
+Buy
+買い
+
+Cancel
+キャンセル
+
+Chart
+チャート
+
+Close
+終値
+
+Colors
+色
+
+Count
+約定数
+
+Current
+カレント
+
+Date
+日付
+
+Delay
+遅延
+
+Desktop
+デスクトップ
+
+Desktop Notification
+デスクトップへの通知
+
+Detach as window
+外部ウインドウへ分離
+
+Display Position
+表示位置
+
+Display Time
+表示時間
+
+Display a grouped board with a specified price range.
+指定された値幅でまとめられた板を表示します。
+
+Display only boards that are larger than the specified size.
+指定されたサイズより大きい板だけを表示します。
 
 Drawdown
 ドローダウン
 
+Duration
+期間
+
 End
 終了
+
+End Date
+終了日
+
+Enter the two-step verification code provided by Bitflyer.
+ビット・フライヤーが提供する 2 ステップの検証コードを入力します。
+
+Execution
+約定
+
+Exit
+撤退
+
+General
+一般
+
+High
+高値
 
 Hold Size
 保持枚数
 
+LINE
+LINE
+
+LINE Access Token Test
+LINE アクセス・トークン・テスト
+
+LINE Notification
+LINEへの通知
+
+Limit Entry
+指値
+
+Login explicitly
+明示的にログイン
+
+Long Trend
+買いトレンド
+
 Loss Span
 損失時間
+
+Losscut
+ロスカット
+
+Losssize
+ロスサイズ
+
+Low
+安値
 
 Market
 市場
@@ -43,11 +154,53 @@ Name
 No logs were found for the specified date.
 指定された日付のログが見つかりませんでした。
 
+Notification
+通知
+
+Notification Type
+通知の種類
+
+Open
+始値
+
+Order
+発注
+
+Order Failed
+注文失敗
+
+Orderbook
+注文板
+
+Password
+パスワード
+
 Period
 期間
 
+Please enter a positive number.
+正の数を入力してください。
+
+Please get API key and API secret to use the public API provided by [BitFlyer](https://lightning.bitflyer.jp/developer).
+[BitFlyer](https://lightning.bitflyer.jp/developer)の提供する公開APIを利用するためにAPIキーとAPIシークレットを取得してください。
+
+Please input a positive number.
+正数を入力してください。
+
+Position
+ポジション
+
+Price
+値段
+
+Price Interval
+価格間隔
+
+Price Signal
+指定値へ到達
+
 Profit
-利益
+損益
 
 Profit Factor
 利益係数
@@ -64,17 +217,44 @@ Realized Profit
 Remaining
 残存
 
+Reverse
+ドテン
+
 Run
 実行
 
 Run backtests very fast using compressed execution history.﹍␣However, the execution result may be inaccurate.
 圧縮された約定履歴を使用することで高速にバックテストを実行します。﹍␣ただし、実行結果が不正確になることがあります。
 
+SFD
+SFD
+
+Sell
+売り
+
+Send test message
+テスト・メッセージの送信
+
+Short Trend
+売りトレンド
+
+Side
+サイド
+
 Size
 枚数
 
+Sound
+サウンド
+
+Spread
+値幅
+
 Start
 開始
+
+Stop
+撤退
 
 Terminated
 終了済
@@ -85,11 +265,32 @@ The end date must be after the start date.
 The end value must be greater than the start value.
 終了値は開始値よりも大きくなければなりません。
 
+The specified price ({0}) has been reached.
+指定された価格 ({0}) に達しました。
+
+The specified token [{0}] is incorrect. Specify the correct token and then test again.
+指定されたトークン[{0}]は正しくありません。 正しいトークンを指定して,もう一度テストしてください。
+
+The specified token is valid.
+指定されたトークンは有効です。
+
 The start date must be prior to the end date.
 開始日は終了日より前でなければなりません。
 
 The start value must be less than the end value.
 開始値は終了値より小さくなければなりません。
+
+This is invalid value, please correct.
+これは無効な値です。訂正してください。
+
+Threshold
+閾枚数
+
+TopLeft
+左上
+
+TopRight
+右上
 
 Total
 総数
@@ -100,134 +301,26 @@ Total Profit
 Trade Count
 取引数
 
+Trade History
+約定履歴
+
 Unrealized Loss
 含損幅
 
 Unrealized Profit
 含利幅
 
+Usage of Private API
+非公開APIの利用
+
 Use Fast Log
 高速ログを使用
 
-Win Rate
-勝率
+Variances
+分散数
 
-This is invalid value, please correct.
-これは無効な値です。訂正してください。
-
-Please enter a positive number.
-正の数を入力してください。
-
-Please input a positive number.
-正数を入力してください。
-
-This is invalid value, please correct.
-これは無効な値です。訂正してください。
-
-Access Token
-アクセストークン
-
-Access Token Test
-アクセス・トークン・テスト
-
-Account ID
-アカウントID
-
-Account Token
-アカウントトークン
-
-Appearance
-外観
-
-Bitflyer
-ビットフライヤー
-
-BottomLeft
-左下
-
-BottomRight
-右下
-
-Chart
-チャート
-
-Colors
-色
-
-Desktop
-デスクトップ
-
-Desktop Notification
-デスクトップへの通知
-
-Display Position
-表示位置
-
-Display Time
-表示時間
-
-Execution
-約定
-
-General
-一般
-
-LINE
-LINE
-
-LINE Access Token Test
-LINE アクセス・トークン・テスト
-
-LINE Notification
-LINEへの通知
-
-Login explicitly
-明示的にログイン
-
-Long Trend
-買いトレンド
-
-Notification
-通知
-
-Notification Type
-通知の種類
-
-Order Failed
-注文失敗
-
-Password
-パスワード
-
-Please get API key and API secret to use the public API provided by [BitFlyer](https://lightning.bitflyer.jp/developer).
-[BitFlyer](https://lightning.bitflyer.jp/developer)の提供する公開APIを利用するためにAPIキーとAPIシークレットを取得してください。
-
-Price Signal
-指定値へ到達
-
-Send test message
-テスト・メッセージの送信
-
-Short Trend
-売りトレンド
-
-Sound
-サウンド
-
-The specified token [{0}] is incorrect. Specify the correct token and then test again.
-指定されたトークン[{0}]は正しくありません。 正しいトークンを指定して,もう一度テストしてください。
-
-The specified token is valid.
-指定されたトークンは有効です。
-
-TopLeft
-左上
-
-TopRight
-右上
-
-Usage of Private API
-非公開APIの利用
+Volume
+出来高
 
 WARNING : This setting will allow all operations on your account.
 注意 : この設定を行うとあなたのアカウントに対する全ての操作を許可することになります。
@@ -235,156 +328,24 @@ WARNING : This setting will allow all operations on your account.
 We will try to speed up trading by using private API.␣TradeMate acquires the account specific infomation(e.g. session id) by logging in automatically.
 非公開APIを利用して取引の高速化を図ります。␣ブラウザを使用して自動でログインを行いアカウント固有のIDやセッション情報を取得します。
 
+Win Rate
+勝率
+
 You can notify LINE by specifying the access token acquired from [LINE Notify](https://notify-bot.line.me/).
 [LINE Notify](https://notify-bot.line.me/)から取得したアクセストークンを指定することでLINEに通知することが出来ます。
+
+days
+日
+
+hours
+時間
+
+mins
+分
 
 seconds
 秒
 
-Buy
-買い
-
-Cancel
-キャンセル
-
-Exit
-撤退
-
-Limit Entry
-指値
-
-Order
-命令
-
-Position
-ポジション
-
-Price Interval
-価格間隔
-
-Reverse
-ドテン
-
-SFD
-SFD
-
-Sell
-売り
-
-Stop
-撤退
-
-Threshold
-閾枚数
-
-Variances
-分散数
-
-Amount
-数量
-
-Price
-値段
-
-Profit
-損益
-
-Buy
-バイ ( )
-
-Sell
-セル ( )
-
-Amount
-数量
-
-Arrange in tiles
-並べて表示
-
-Buy
-買い
-
-Cancel
-キャンセル
-
-Close
-終値
-
-Count
-約定数
-
-Current
-カレント
-
-Date
-日付
-
-Delay
-遅延
-
-Detach as window
-外部ウインドウへ分離
-
-End Date
-終了日
-
-High
-高値
-
-Losscut
-ロスカット
-
-Losssize
-ロスサイズ
-
-Low
-安値
-
-Market
-市場
-
-Open
-始値
-
-Order
-発注
-
-Orderbook
-注文板
-
-Price
-値段
-
-Run
-実行
-
-Sell
-売り
-
-Side
-サイド
-
-Spread
-スプレッド
-
-Trade History
-約定履歴
-
-Volume
-出来高
-
-Display only boards that are larger than the specified size.
-指定されたサイズより大きい板だけを表示します。
-
-Display a grouped board with a specified price range.
-指定された値幅でまとめられた板を表示します。
-
-Duration
-期間
-
-Spread
-値幅
-
-The specified price ({0}) has been reached.
-指定された価格 ({0}) に達しました。
+secs
+秒
 

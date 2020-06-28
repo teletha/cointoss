@@ -9,6 +9,8 @@
  */
 package cointoss.market.bitflyer;
 
+import static viewtify.ui.UIWeb.Operation.*;
+
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -22,8 +24,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
-
-import javafx.scene.control.TextInputDialog;
 
 import org.apache.commons.lang3.RandomStringUtils;
 
@@ -48,11 +48,11 @@ import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
 import kiss.Signaling;
-import necromancy.Necromancy;
 import okhttp3.MediaType;
 import okhttp3.Request;
 import okhttp3.Request.Builder;
 import okhttp3.RequestBody;
+import transcript.Transcript;
 import viewtify.Viewtify;
 
 /**
@@ -97,7 +97,7 @@ class BitFlyerService extends MarketService {
     private final boolean forTest;
 
     /** The account setting. */
-    private final BitFlyerAccount account = I.make(BitFlyerAccount.class);
+    private static final BitFlyerAccount account = I.make(BitFlyerAccount.class);
 
     /** The shared order list. */
     private final Signal<List<Order>> intervalOrderCheck;
@@ -106,10 +106,7 @@ class BitFlyerService extends MarketService {
     private final Signaling<Order> orderUpdateRealtimely = new Signaling();
 
     /** The session key. */
-    private final String sessionKey = "api_session_v2";
-
-    /** The session maintainer. */
-    private final SessionMaintainer sessionMaintainer = new SessionMaintainer();
+    private static final String sessionKey = "api_session_v2";
 
     /** The latest realtime execution id. */
     private long latestId;
@@ -139,7 +136,7 @@ class BitFlyerService extends MarketService {
         Signal<String> call;
         String id = "JRF" + Chrono.utcNow().format(format) + RandomStringUtils.randomNumeric(6);
 
-        if (forTest || sessionMaintainer.session() == null) {
+        if (forTest || Session.id == null) {
             ChildOrderRequest request = new ChildOrderRequest();
             request.child_order_type = order.type == OrderType.Maker ? "LIMIT" : "MARKET";
             request.minute_to_expire = 60 * 24;
@@ -252,7 +249,7 @@ class BitFlyerService extends MarketService {
         cancel.order_id = order.relation(Internals.class).id;
         cancel.child_order_acceptance_id = order.id;
 
-        Signal<?> call = forTest || sessionMaintainer.session() == null || cancel.order_id == null
+        Signal<?> call = forTest || Session.id == null || cancel.order_id == null
                 ? call("POST", "/v1/me/cancelchildorder", cancel, null, null)
                 : call("POST", "https://lightning.bitflyer.jp/api/trade/cancelorder", cancel, null, WebResponse.class);
 
@@ -630,7 +627,7 @@ class BitFlyerService extends MarketService {
         } else {
             Builder builder = new Request.Builder().url(path)
                     .addHeader("Content-Type", "application/json")
-                    .addHeader("Cookie", sessionKey + "=" + sessionMaintainer.session)
+                    .addHeader("Cookie", sessionKey + "=" + Session.id)
                     .addHeader("X-Requested-With", "XMLHttpRequest");
             if (body != null && body.length() != 0) builder = builder.post(RequestBody.create(mime, body));
             request = builder.build();
@@ -668,7 +665,7 @@ class BitFlyerService extends MarketService {
         } else {
             Builder builder = new Request.Builder().url(path)
                     .addHeader("Content-Type", "application/json")
-                    .addHeader("Cookie", sessionKey + "=" + sessionMaintainer.session)
+                    .addHeader("Cookie", sessionKey + "=" + Session.id)
                     .addHeader("X-Requested-With", "XMLHttpRequest");
             if (body != null && body.length() != 0) builder = builder.post(RequestBody.create(mime, body));
             request = builder.build();
@@ -677,78 +674,44 @@ class BitFlyerService extends MarketService {
     }
 
     /**
-     * @version 2018/02/15 9:27:14
+     * Singleton session holder. The JVM specification guarantees automatic lazy initialization on
+     * first access.
      */
-    private class SessionMaintainer {
+    private static class Session {
 
-        /** The session id. */
-        private String session;
+        /** The session id (may be null). */
+        private static String id;
 
-        private boolean started = false;
-
-        private Disposable ping;
-
-        /**
-         * Retrieve the session id.
-         * 
-         * @return
-         */
-        private String session() {
-            if (session == null) {
-                I.schedule(this::connect);
-            }
-            return session;
-        }
-
-        /**
-         * Connect to server and get session id.
-         */
-        private synchronized void connect() {
-            if (started == false) {
-                started = true;
-
-                Necromancy browser = Necromancy.with.profile(".log/bitflyer/chrome");
-
-                browser.load("https://lightning.bitflyer.jp") //
-                        .input("#LoginId", account.loginId)
-                        .input("#Password", account.loginPassword)
-                        .click("#login_btn");
-
-                if (browser.uri().equals("https://lightning.bitflyer.jp/Home/TwoFactorAuth")) {
-                    Viewtify.inUI(() -> {
-                        String code = new TextInputDialog().showAndWait()
-                                .orElseThrow(() -> new IllegalArgumentException("二段階認証の確認コードが間違っています"))
-                                .trim();
-
-                        Viewtify.inWorker(() -> {
-                            browser.click("form > label").input("#ConfirmationCode", code).click("form > button");
-                            session = browser.cookie(sessionKey);
-                            browser.reload();
-                            browser.dispose();
-                            maintain();
+        static {
+            Viewtify.browser(browser -> {
+                browser.load("https://lightning.bitflyer.jp")
+                        .$(input("#LoginId", account.loginId.exact()))
+                        .$(input("#Password", account.loginPassword.exact()))
+                        .$(click("#login_btn"))
+                        .$(awaitContentLoading())
+                        .$(detour("https://lightning.bitflyer.jp/Home/TwoFactorAuth", w -> {
+                            return browser.click("form > label")
+                                    .$(inputByHuman("#ConfirmationCode", new Transcript("Enter the two-step verification code provided by Bitflyer.")))
+                                    .$(click("form > button"))
+                                    .$(awaitContentLoading());
+                        }))
+                        .to(() -> {
+                            browser.cookie(sessionKey).to(c -> id = c.getValue());
+                            browser.stage().get().close();
                         });
-                    });
-                } else {
-                    session = browser.cookie(sessionKey);
-                    browser.reload();
-                    browser.dispose();
-                    maintain();
-                }
-            }
+            });
         }
+    }
 
-        /**
-         * Maintain the session.
-         */
-        private synchronized void maintain() {
-            if (ping == null) {
-                I.signal(10, 10, TimeUnit.MINUTES);
-                disposer.add(scheduler().scheduleAtFixedRate(() -> {
-                    call("", "https://lightning.bitflyer.com/api/trade/getMyBoardOrders", "{\"product_code\":\"" + marketName + "\",\"account_id\":\"" + account.accountId + "\",\"lang\":\"ja\"}")
-                            .to(I.NoOP);
-                }, 1, 1, TimeUnit.MINUTES));
-            }
-        }
+    /**
+     * Maintain the session.
+     */
+    private synchronized void maintain() {
+        I.signal(10, 10, TimeUnit.MINUTES);
+        disposer.add(scheduler().scheduleAtFixedRate(() -> {
+            call("", "https://lightning.bitflyer.com/api/trade/getMyBoardOrders", "{\"product_code\":\"" + marketName + "\",\"account_id\":\"" + account.accountId + "\",\"lang\":\"ja\"}")
+                    .to(I.NoOP);
+        }, 1, 1, TimeUnit.MINUTES));
     }
 
     /**
@@ -923,6 +886,7 @@ class BitFlyerService extends MarketService {
     /**
      * 
      */
+    @SuppressWarnings("unused")
     private static class CircuitBreakerInfo {
         public Num upper_limit;
 

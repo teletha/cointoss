@@ -16,7 +16,6 @@ public class Project extends bee.api.Project {
 
         require("com.github.teletha", "sinobu");
         require("com.github.teletha", "viewtify");
-        require("com.github.teletha", "necromancy");
         require("com.github.teletha", "icymanipulator").atAnnotation();
         require("com.github.teletha", "antibug").atTest();
         require("org.apache.commons", "commons-lang3");
@@ -24,11 +23,17 @@ public class Project extends bee.api.Project {
         require("commons-net", "commons-net");
         require("org.apache.logging.log4j", "log4j-core", Log4j);
         require("org.apache.logging.log4j", "log4j-slf4j-impl", Log4j);
-        require("com.univocity", "univocity-parsers");
-        require("com.github.luben", "zstd-jni");
         // require("org.decimal4j", "decimal4j");
+        require("com.google.guava", "guava");
+        unrequire("com.google.code.findbugs", "jsr305");
+        unrequire("com.google.errorprone", "error_prone_annotations");
+        unrequire("com.google.guava", "listenablefuture");
+        unrequire("com.google.j2objc", "j2objc-annotations");
+        unrequire("org.checkerframework", "checker-qual");
         require("com.google.code.gson", "gson");
         require("com.squareup.okhttp3", "okhttp", "3.14.1");
+        require("com.univocity", "univocity-parsers");
+        require("com.github.luben", "zstd-jni");
 
         versionControlSystem("https://github.com/teletha/cointoss");
     }
