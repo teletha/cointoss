@@ -529,7 +529,6 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             Num p = exe.price.scale(service.setting.targetCurrencyScaleSize);
             String title = "🔊  " + service.marketReadableName() + " " + p;
             CharSequence message = new Transcript("The specified price ({0}) has been reached.").with(p);
-            System.out.println("remove line");
             I.make(Notificator.class).priceSignal.notify(title, message);
         }));
     }
