@@ -122,7 +122,7 @@ class NotificatorSetting extends View {
         desktopPosition.items(DesktopPosition.values()).sync(notificator.desktopPosition);
         desktopDuration.items(I.signal(2).recurse(v -> v + 2).take(30).map(Duration::ofSeconds))
                 .sync(notificator.desktopDuration)
-                .format(duration -> duration.getSeconds() + en("seconds").get());
+                .format(duration -> String.valueOf(duration.getSeconds()) + en("seconds"));
 
         // For LINE
         lineAccessToken.sync(notificator.lineAccessToken).masking(true);
@@ -132,8 +132,9 @@ class NotificatorSetting extends View {
                     .to(e -> {
                         lineAccessToken.decorateBy(Icon.Success);
                     }, e -> {
-                        lineAccessToken.invalid(en("The specified token [{0}] is incorrect. Specify the correct token and then test again.")
-                                .with(lineAccessToken.value()));
+                        lineAccessToken
+                                .invalid(new Transcript("The specified token [{0}] is incorrect. Specify the correct token and then test again.", lineAccessToken
+                                        .value()));
                     });
         });
     }
