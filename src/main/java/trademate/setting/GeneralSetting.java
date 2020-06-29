@@ -9,18 +9,25 @@
  */
 package trademate.setting;
 
+import java.util.List;
+
 import kiss.Managed;
 import kiss.Singleton;
+import transcript.Transcript;
+import viewtify.ui.UIComboBox;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
 
 @Managed(value = Singleton.class)
 public class GeneralSetting extends View {
 
+    UIComboBox<String> language;
+
     class view extends ViewDSL implements SettingStyles {
         {
-            $(vbox, () -> {
-
+            $(vbox, Block, () -> {
+                label(en("General"), Heading);
+                form(en("Language"), language);
             });
         }
     }
@@ -30,5 +37,6 @@ public class GeneralSetting extends View {
      */
     @Override
     protected void initialize() {
+        language.initialize(List.of("en", "ja")).observe(Transcript.lang::set);
     }
 }

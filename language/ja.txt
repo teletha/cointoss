@@ -115,11 +115,17 @@ LINE アクセス・トークン・テスト
 LINE Notification
 LINEへの通知
 
+Language
+言語
+
 Limit Entry
 指値
 
 Login explicitly
 明示的にログイン
+
+Long
+ロング
 
 Long Trend
 買いトレンド
@@ -234,6 +240,9 @@ Sell
 
 Send test message
 テスト・メッセージの送信
+
+Short
+ショート
 
 Short Trend
 売りトレンド
