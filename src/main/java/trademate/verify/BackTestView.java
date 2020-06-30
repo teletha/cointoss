@@ -254,7 +254,7 @@ public class BackTestView extends View implements Analyzer {
 
         fastLog.initialize(false)
                 .text(en("Use Fast Log"))
-                .tooltip(en("Run backtests very fast using compressed execution history.\r\nHowever, the execution result may be inaccurate."));
+                .tooltip(en("Run backtests very fast using compressed execution history.\nHowever, the execution result may be inaccurate."));
         startDate.initial(Chrono.utcNow().minusDays(10))
                 .uneditable()
                 .observe((o, n) -> endDate.value(v -> v.plus(Period.between(o, n))))

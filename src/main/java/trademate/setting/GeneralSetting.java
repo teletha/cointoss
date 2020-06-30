@@ -41,6 +41,6 @@ public class GeneralSetting extends View {
         language.initialize(List.of(Locale.ENGLISH, Locale.JAPANESE))
                 .render(lang -> lang.getDisplayLanguage(Locale.getDefault()))
                 .renderSelected(lang -> lang.getDisplayLanguage(Locale.getDefault()))
-                .observe(Transcript.Lang::set);
+                .observe(lang -> Transcript.Lang.set(lang.getLanguage()));
     }
 }
