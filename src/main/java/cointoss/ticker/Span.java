@@ -15,7 +15,7 @@ import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoField;
 
-import transcript.Transcript;
+import kiss.Transcript;
 
 /**
  * Defined tick span.

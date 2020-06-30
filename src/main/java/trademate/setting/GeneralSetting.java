@@ -10,10 +10,11 @@
 package trademate.setting;
 
 import java.util.List;
+import java.util.Locale;
 
 import kiss.Managed;
 import kiss.Singleton;
-import transcript.Transcript;
+import kiss.Transcript;
 import viewtify.ui.UIComboBox;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
@@ -21,7 +22,7 @@ import viewtify.ui.ViewDSL;
 @Managed(value = Singleton.class)
 public class GeneralSetting extends View {
 
-    UIComboBox<String> language;
+    UIComboBox<Locale> language;
 
     class view extends ViewDSL implements SettingStyles {
         {
@@ -37,6 +38,9 @@ public class GeneralSetting extends View {
      */
     @Override
     protected void initialize() {
-        language.initialize(List.of("en", "ja")).observe(Transcript.lang::set);
+        language.initialize(List.of(Locale.ENGLISH, Locale.JAPANESE))
+                .render(lang -> lang.getDisplayLanguage(Locale.getDefault()))
+                .renderSelected(lang -> lang.getDisplayLanguage(Locale.getDefault()))
+                .observe(Transcript.Lang::set);
     }
 }

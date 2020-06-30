@@ -22,8 +22,8 @@ import kiss.I;
 import kiss.Managed;
 import kiss.Singleton;
 import kiss.Storable;
+import kiss.Transcript;
 import kiss.Variable;
-import transcript.Transcript;
 
 @Managed(Singleton.class)
 public class Notificator implements Storable<Notificator> {

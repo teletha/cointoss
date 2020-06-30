@@ -9,7 +9,7 @@
  */
 package trademate;
 
-import transcript.Transcript;
+import kiss.Transcript;
 
 /**
  * 

@@ -49,11 +49,11 @@ import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
 import kiss.Signaling;
+import kiss.Transcript;
 import okhttp3.MediaType;
 import okhttp3.Request;
 import okhttp3.Request.Builder;
 import okhttp3.RequestBody;
-import transcript.Transcript;
 import viewtify.Viewtify;
 
 /**
