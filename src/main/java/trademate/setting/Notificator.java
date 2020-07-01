@@ -10,6 +10,7 @@
 package trademate.setting;
 
 import java.util.List;
+import java.util.Objects;
 
 import javafx.geometry.Pos;
 import javafx.stage.Screen;
@@ -98,7 +99,7 @@ public class Notificator implements Storable<Notificator> {
          * @param title A message title.
          * @param message A message.
          */
-        public final void notify(CharSequence title, CharSequence message) {
+        public final void notify(Object title, Object message) {
             message(title, message);
             sound();
         }
@@ -108,10 +109,10 @@ public class Notificator implements Storable<Notificator> {
          * 
          * @param message
          */
-        public final void message(CharSequence title, CharSequence message) {
+        public final void message(Object title, Object message) {
             if (title != null && message != null) {
-                String stripedTitle = title.toString().strip();
-                String stripedMessage = message.toString().strip();
+                String stripedTitle = Objects.toString(title).strip();
+                String stripedMessage = Objects.toString(message).strip();
                 if (stripedMessage.length() != 0) {
                     // to desktop
                     if (onDesktop.is(true)) {

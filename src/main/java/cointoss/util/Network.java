@@ -318,7 +318,7 @@ public class Network {
      * @param message A message to send
      * @param token Notify API token.
      */
-    public Signal<?> line(CharSequence title, CharSequence message, String token) {
+    public Signal<?> line(Object title, Object message, String token) {
         if (token != null) {
             Request request = new Request.Builder().url("https://notify-api.line.me/api/notify")
                     .addHeader("Authorization", "Bearer " + token)
