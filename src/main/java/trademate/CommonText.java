@@ -9,38 +9,36 @@
  */
 package trademate;
 
-import kiss.Transcript;
+import kiss.I;
+import kiss.Variable;
 
-/**
- * 
- */
 public interface CommonText {
 
-    Transcript SiDe = new Transcript("Side");
+    Variable<String> SiDe = I.translate("Side");
 
-    Transcript Buy = new Transcript("Buy");
+    Variable<String> Buy = I.translate("Buy");
 
-    Transcript Sell = new Transcript("Sell");
+    Variable<String> Sell = I.translate("Sell");
 
-    Transcript Long = new Transcript("Long");
+    Variable<String> Long = I.translate("Long");
 
-    Transcript Short = new Transcript("Short");
+    Variable<String> Short = I.translate("Short");
 
-    Transcript Price = new Transcript("Price");
+    Variable<String> Price = I.translate("Price");
 
-    Transcript Amount = new Transcript("Amount");
+    Variable<String> Amount = I.translate("Amount");
 
-    Transcript Profit = new Transcript("Profit");
+    Variable<String> Profit = I.translate("Profit");
 
-    Transcript Date = new Transcript("Date");
+    Variable<String> Date = I.translate("Date");
 
-    Transcript Cancel = new Transcript("Cancel");
+    Variable<String> Cancel = I.translate("Cancel");
 
-    Transcript OpenPrice = new Transcript("Open");
+    Variable<String> OpenPrice = I.translate("Open");
 
-    Transcript ClosePrice = new Transcript("Close");
+    Variable<String> ClosePrice = I.translate("Close");
 
-    Transcript HighPrice = new Transcript("High");
+    Variable<String> HighPrice = I.translate("High");
 
-    Transcript LowPrice = new Transcript("Low");
+    Variable<String> LowPrice = I.translate("Low");
 }

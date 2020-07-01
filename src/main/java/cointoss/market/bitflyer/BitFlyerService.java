@@ -9,6 +9,7 @@
  */
 package cointoss.market.bitflyer;
 
+import static kiss.I.translate;
 import static viewtify.ui.UIWeb.Operation.*;
 
 import java.nio.charset.StandardCharsets;
@@ -49,7 +50,6 @@ import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
 import kiss.Signaling;
-import kiss.Transcript;
 import okhttp3.MediaType;
 import okhttp3.Request;
 import okhttp3.Request.Builder;
@@ -693,7 +693,7 @@ class BitFlyerService extends MarketService {
                         .$(awaitContentLoading())
                         .$(detour("https://lightning.bitflyer.jp/Home/TwoFactorAuth", w -> {
                             return browser.click("form > label")
-                                    .$(inputByHuman("#ConfirmationCode", new Transcript("Enter the two-step verification code provided by Bitflyer.")))
+                                    .$(inputByHuman("#ConfirmationCode", translate("Enter the two-step verification code provided by Bitflyer.")))
                                     .$(click("form > button"))
                                     .$(awaitContentLoading());
                         }))

@@ -50,7 +50,6 @@ import cointoss.util.Primitives;
 import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
-import kiss.Transcript;
 import kiss.Variable;
 import kiss.Ⅲ;
 import stylist.Style;
@@ -495,9 +494,8 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
         double lineY = -12;
         gc.setStroke(Color.WHITESMOKE);
         gc.setFont(Font.font(10));
-        gc.strokeText(new Transcript("Duration") + "\t" + Chrono
-                .formatAsDuration(Math.abs(endTime - startTime) * 1000), textX, endY + lineY);
-        gc.strokeText(new Transcript("Spread") + "\t" + Primitives
+        gc.strokeText(I.translate("Duration") + "\t" + Chrono.formatAsDuration(Math.abs(endTime - startTime) * 1000), textX, endY + lineY);
+        gc.strokeText(I.translate("Spread") + "\t" + Primitives
                 .roundString(Math.abs(upperPrice - lowerPrice), scale), textX, endY + lineY * 2);
     }
 
@@ -528,8 +526,7 @@ public class ChartCanvas extends Region implements UserActionHelper<ChartCanvas>
             MarketService service = chart.market.v.service;
             Num p = exe.price.scale(service.setting.targetCurrencyScaleSize);
             String title = "🔊  " + service.marketReadableName() + " " + p;
-            Transcript message = new Transcript("The specified price ({0}) has been reached.", p);
-            I.make(Notificator.class).priceSignal.notify(title, message);
+            I.make(Notificator.class).priceSignal.notify(title, I.translate("The specified price ({0}) has been reached.", p));
         }));
     }
 

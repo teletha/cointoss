@@ -23,26 +23,25 @@ import kiss.I;
 import kiss.Managed;
 import kiss.Singleton;
 import kiss.Storable;
-import kiss.Transcript;
 import kiss.Variable;
 
 @Managed(Singleton.class)
 public class Notificator implements Storable<Notificator> {
 
     /** The defined type. */
-    public final Notify longTrend = new Notify(new Transcript("Long Trend"));
+    public final Notify longTrend = new Notify(I.translate("Long Trend"));
 
     /** The defined type. */
-    public final Notify shortTrend = new Notify(new Transcript("Short Trend"));
+    public final Notify shortTrend = new Notify(I.translate("Short Trend"));
 
     /** The defined type. */
-    public final Notify execution = new Notify(new Transcript("Execution"));
+    public final Notify execution = new Notify(I.translate("Execution"));
 
     /** The defined type. */
-    public final Notify orderFailed = new Notify(new Transcript("Order Failed"));
+    public final Notify orderFailed = new Notify(I.translate("Order Failed"));
 
     /** The defined type. */
-    public final Notify priceSignal = new Notify(new Transcript("Price Signal"));
+    public final Notify priceSignal = new Notify(I.translate("Price Signal"));
 
     /** The desktop position. */
     final @Managed Variable<DesktopPosition> desktopPosition = Variable.of(DesktopPosition.BottomRight);
@@ -84,12 +83,12 @@ public class Notificator implements Storable<Notificator> {
         final @Managed Variable<Sound> onSound = Variable.of(Sound.なし);
 
         /** The name. */
-        final Transcript name;
+        final Variable<String> name;
 
         /**
          * 
          */
-        Notify(Transcript name) {
+        Notify(Variable<String> name) {
             this.name = name;
         }
 
@@ -154,24 +153,24 @@ public class Notificator implements Storable<Notificator> {
      * 
      */
     static enum DesktopPosition {
-        TopLeft(Pos.TOP_LEFT, new Transcript("TopLeft")),
+        TopLeft(Pos.TOP_LEFT, I.translate("TopLeft")),
 
-        TopRight(Pos.TOP_RIGHT, new Transcript("TopRight")),
+        TopRight(Pos.TOP_RIGHT, I.translate("TopRight")),
 
-        BottomLeft(Pos.BOTTOM_LEFT, new Transcript("BottomLeft")),
+        BottomLeft(Pos.BOTTOM_LEFT, I.translate("BottomLeft")),
 
-        BottomRight(Pos.BOTTOM_RIGHT, new Transcript("BottomRight"));
+        BottomRight(Pos.BOTTOM_RIGHT, I.translate("BottomRight"));
 
         /** The actual position. */
         private final Pos position;
 
         /** The readable text. */
-        private final Transcript text;
+        private final Variable<String> text;
 
         /**
          * @param position
          */
-        private DesktopPosition(Pos position, Transcript text) {
+        private DesktopPosition(Pos position, Variable<String> text) {
             this.position = position;
             this.text = text;
         }

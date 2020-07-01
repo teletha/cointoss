@@ -15,7 +15,8 @@ import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoField;
 
-import kiss.Transcript;
+import kiss.I;
+import kiss.Variable;
 
 /**
  * Defined tick span.
@@ -83,7 +84,7 @@ public enum Span {
     private final ChronoField unit;
 
     /** The unit name. */
-    private final Transcript unitName;
+    private final Variable<String> unitName;
 
     /**
      * @param amount
@@ -135,19 +136,19 @@ public enum Span {
      * @param field
      * @return
      */
-    private Transcript unit() {
+    private Variable<String> unit() {
         switch (unit) {
         case EPOCH_DAY:
-            return new Transcript("days");
+            return I.translate("days");
 
         case HOUR_OF_DAY:
-            return new Transcript("hours");
+            return I.translate("hours");
 
         case MINUTE_OF_HOUR:
-            return new Transcript("mins");
+            return I.translate("mins");
 
         case SECOND_OF_MINUTE:
-            return new Transcript("secs");
+            return I.translate("secs");
 
         default:
             // If this exception will be thrown, it is bug of this program. So we must rethrow the

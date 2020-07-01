@@ -15,7 +15,7 @@ import cointoss.util.Network;
 import kiss.I;
 import kiss.Managed;
 import kiss.Singleton;
-import kiss.Transcript;
+import kiss.Variable;
 import stylist.Style;
 import stylist.StyleDSL;
 import trademate.setting.Notificator.DesktopPosition;
@@ -42,7 +42,7 @@ class NotificatorSetting extends View {
     /** The notificator configuration UI. */
     private UITableView<Notify> notifications;
 
-    private UITableColumn<Notify, Transcript> name;
+    private UITableColumn<Notify, Variable<String>> name;
 
     private UITableColumn<Notify, Notify> desktop;
 
@@ -133,7 +133,7 @@ class NotificatorSetting extends View {
                         lineAccessToken.decorateBy(Icon.Success);
                     }, e -> {
                         lineAccessToken
-                                .invalid(new Transcript("The specified token [{0}] is incorrect. Specify the correct token and then test again.", lineAccessToken
+                                .invalid(en("The specified token [{0}] is incorrect. Specify the correct token and then test again.", lineAccessToken
                                         .value()));
                     });
         });
