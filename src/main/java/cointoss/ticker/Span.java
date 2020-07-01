@@ -82,8 +82,8 @@ public enum Span {
     /** The unit. */
     private final ChronoField unit;
 
-    /** The short name. */
-    private final String shortName;
+    /** The unit name. */
+    private final Transcript unitName;
 
     /**
      * @param amount
@@ -95,7 +95,7 @@ public enum Span {
         this.duration = Duration.of(amount, unit.getBaseUnit());
         this.seconds = duration.getSeconds();
         this.uppers = new int[uppers.length];
-        this.shortName = amount + unit();
+        this.unitName = unit();
 
         for (int i = 0; i < uppers.length; i++) {
             this.uppers[i] = uppers[i] + ordinal();
@@ -126,7 +126,7 @@ public enum Span {
      */
     @Override
     public String toString() {
-        return shortName;
+        return amount + unitName.v;
     }
 
     /**
@@ -135,19 +135,19 @@ public enum Span {
      * @param field
      * @return
      */
-    private String unit() {
+    private Transcript unit() {
         switch (unit) {
         case EPOCH_DAY:
-            return new Transcript("days").toString();
+            return new Transcript("days");
 
         case HOUR_OF_DAY:
-            return new Transcript("hours").toString();
+            return new Transcript("hours");
 
         case MINUTE_OF_HOUR:
-            return new Transcript("mins").toString();
+            return new Transcript("mins");
 
         case SECOND_OF_MINUTE:
-            return new Transcript("secs").toString();
+            return new Transcript("secs");
 
         default:
             // If this exception will be thrown, it is bug of this program. So we must rethrow the
