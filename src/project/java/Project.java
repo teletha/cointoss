@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 CoinToss Development Team
+ * Copyright (C) 2020 cointoss Development Team
  *
  * Licensed under the MIT License (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@ public class Project extends bee.api.Project {
     String Log4j = "2.11.1";
 
     {
-        product("cointoss", "cointoss", "1.0");
+        product("cointoss", "cointoss", "1.0.1");
 
         require("com.github.teletha", "sinobu");
         require("com.github.teletha", "viewtify");
