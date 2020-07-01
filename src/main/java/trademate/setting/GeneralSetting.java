@@ -12,9 +12,9 @@ package trademate.setting;
 import java.util.List;
 import java.util.Locale;
 
+import kiss.I;
 import kiss.Managed;
 import kiss.Singleton;
-import kiss.Transcript;
 import viewtify.ui.UIComboBox;
 import viewtify.ui.View;
 import viewtify.ui.ViewDSL;
@@ -41,6 +41,6 @@ public class GeneralSetting extends View {
         language.initialize(List.of(Locale.ENGLISH, Locale.JAPANESE))
                 .render(lang -> lang.getDisplayLanguage(Locale.getDefault()))
                 .renderSelected(lang -> lang.getDisplayLanguage(Locale.getDefault()))
-                .observe(lang -> Transcript.Lang.set(lang.getLanguage()));
+                .observe(lang -> I.Lang.set(lang.getLanguage()));
     }
 }
