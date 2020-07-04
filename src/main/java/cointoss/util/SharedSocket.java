@@ -37,7 +37,7 @@ public abstract class SharedSocket {
      * 
      * @param uri
      */
-    protected SharedSocket(String uri, WiseFunction<String, Signal<JSON>> converter) {
+    protected SharedSocket(String uri, WiseFunction<String, JSON> mapper) {
         this.expose = I.http(uri, ws -> {
             synchronized (this) {
                 this.ws = ws;
@@ -46,7 +46,7 @@ public abstract class SharedSocket {
                 }
                 queued = null;
             }
-        }).flatMap(converter).share();
+        }).map(mapper).share();
     }
 
     /**
@@ -85,8 +85,7 @@ public abstract class SharedSocket {
          */
         public JsonRPC(String uri) {
             super(uri, text -> {
-                System.out.println(text);
-                return I.json(text).find("params", JSON.class);
+                return I.json(text).get("params");
             });
         }
 
@@ -99,8 +98,8 @@ public abstract class SharedSocket {
         public Signal<JSON> subscribe(String channel) {
             return invoke(new Command("subscribe", channel)).effectOnDispose(() -> invoke(new Command("unsubscribe", channel)))
                     .map(json -> {
-                        if (json.has("channel", channel)) {
-                            return json.get("message", JSON.class);
+                        if (json != null && json.has("channel", channel)) {
+                            return json.get("message");
                         } else {
                             return null;
                         }
@@ -136,8 +135,10 @@ public abstract class SharedSocket {
 
     public static void main(String[] args) throws InterruptedException {
         JsonRPC ws = new JsonRPC("wss://ws.lightstream.bitflyer.com/json-rpc");
-        Disposable disposable = ws.subscribe("lightning_executions_FX_BTC_JPY").flatMap(json -> json.find("*")).to(v -> {
+        Disposable disposable = ws.subscribe("lightning_executions_FX_BTC_JPY").flatIterable(json -> json.find(JSON.class, "*")).to(v -> {
             System.out.println(v.to(String.class));
+        }, e -> {
+            e.printStackTrace();
         });
 
         Thread.sleep(1000 * 2);

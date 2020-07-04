@@ -176,7 +176,7 @@ public class Network {
                         if (selector == null || selector.length == 0) {
                             observer.accept(json.to(type));
                         } else {
-                            json.find(selector).map(v -> v.to(type)).to(observer);
+                            json.find(type, selector).forEach(observer);
                         }
                     }
                     observer.complete();
