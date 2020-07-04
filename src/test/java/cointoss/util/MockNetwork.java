@@ -36,7 +36,7 @@ public class MockNetwork extends Network {
      * {@inheritDoc}
      */
     @Override
-    public final <M> Signal<M> rest(Request request, String selector, Class<M> type, APILimiter limiter) {
+    public final <M> Signal<M> rest(Request request, APILimiter limiter, Class<M> type, String[] selector) {
         String path = request.url().encodedPath();
         MockResponse mock = responses.get(path);
 

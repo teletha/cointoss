@@ -150,14 +150,14 @@ public class Network {
     /**
      * Call REST API.
      */
-    public final <M> Signal<M> rest(Request request, String selector, Class<M> type) {
-        return rest(request, selector, type, null);
+    public final <M> Signal<M> rest(Request request, Class<M> type, String... selector) {
+        return rest(request, null, type, selector);
     }
 
     /**
      * Call REST API.
      */
-    public <M> Signal<M> rest(Request request, String selector, Class<M> type, APILimiter limiter) {
+    public <M> Signal<M> rest(Request request, APILimiter limiter, Class<M> type, String... selector) {
         return new Signal<>((observer, disposer) -> {
             if (limiter != null) {
                 limiter.acquire();
@@ -173,7 +173,7 @@ public class Network {
                     } else {
                         JSON json = I.json(value);
 
-                        if (selector == null || selector.isEmpty()) {
+                        if (selector == null || selector.length == 0) {
                             observer.accept(json.to(type));
                         } else {
                             json.find(selector).map(v -> v.to(type)).to(observer);
@@ -326,7 +326,7 @@ public class Network {
                             .parse("application/x-www-form-urlencoded; charset=utf-8"), "message=" + title + "\r\n" + message))
                     .build();
 
-            return rest(request, "", null);
+            return rest(request, null, new String[0]);
         } else {
             return I.signal();
         }

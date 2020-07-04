@@ -147,7 +147,7 @@ class BitFlyerService extends MarketService {
             request.size = order.size.doubleValue();
             request.time_in_force = order.quantityCondition.abbreviation;
 
-            call = call("POST", "/v1/me/sendchildorder", request, "child_order_acceptance_id", String.class);
+            call = call("POST", "/v1/me/sendchildorder", request, String.class, new String[] {"child_order_acceptance_id"});
         } else {
             ChildOrderRequestWebAPI request = new ChildOrderRequestWebAPI();
             request.account_id = account.accountId.v;
@@ -160,7 +160,7 @@ class BitFlyerService extends MarketService {
             request.size = order.size.doubleValue();
             request.time_in_force = order.quantityCondition.abbreviation;
 
-            call = call("POST", "https://lightning.bitflyer.jp/api/trade/sendorder", request, "", WebResponse.class)
+            call = call("POST", "https://lightning.bitflyer.jp/api/trade/sendorder", request, WebResponse.class, new String[0])
                     .map(e -> e.data.get("order_ref_id"));
         }
 
@@ -250,9 +250,8 @@ class BitFlyerService extends MarketService {
         cancel.order_id = order.relation(Internals.class).id;
         cancel.child_order_acceptance_id = order.id;
 
-        Signal<?> call = forTest || Session.id == null || cancel.order_id == null
-                ? call("POST", "/v1/me/cancelchildorder", cancel, null, null)
-                : call("POST", "https://lightning.bitflyer.jp/api/trade/cancelorder", cancel, null, WebResponse.class);
+        Signal<?> call = forTest || Session.id == null || cancel.order_id == null ? call("POST", "/v1/me/cancelchildorder", cancel, null)
+                : call("POST", "https://lightning.bitflyer.jp/api/trade/cancelorder", cancel, WebResponse.class);
 
         Signal<Order> isCancelled = intervalOrderCheck.map(orders -> {
             for (Order listed : orders) {
@@ -499,7 +498,7 @@ class BitFlyerService extends MarketService {
      */
     @Override
     public Signal<Order> orders() {
-        return call("GET", "/v1/me/getchildorders?product_code=" + marketName, "", "*", ChildOrderResponse.class)
+        return call("GET", "/v1/me/getchildorders?product_code=" + marketName, "", ChildOrderResponse.class, new String[] {"*"})
                 .map(ChildOrderResponse::toOrder);
     }
 
@@ -508,8 +507,8 @@ class BitFlyerService extends MarketService {
      */
     @Override
     public Signal<Order> orders(OrderState state) {
-        return call("GET", "/v1/me/getchildorders?child_order_state=" + state + "&product_code=" + marketName, "", "*", ChildOrderResponse.class)
-                .map(ChildOrderResponse::toOrder);
+        return call("GET", "/v1/me/getchildorders?child_order_state=" + state + "&product_code=" + marketName, "", ChildOrderResponse.class, new String[] {
+                "*"}).map(ChildOrderResponse::toOrder);
     }
 
     /**
@@ -541,7 +540,7 @@ class BitFlyerService extends MarketService {
      */
     @Override
     public Signal<Num> baseCurrency() {
-        return call("GET", "/v1/me/getbalance", "", "*", CurrencyState.class).take(unit -> unit.currency_code.equals("JPY"))
+        return call("GET", "/v1/me/getbalance", "", CurrencyState.class, new String[] {"*"}).take(unit -> unit.currency_code.equals("JPY"))
                 .map(c -> c.available);
     }
 
@@ -550,7 +549,7 @@ class BitFlyerService extends MarketService {
      */
     @Override
     public Signal<Num> targetCurrency() {
-        return call("GET", "/v1/me/getbalance", "", "*", CurrencyState.class).take(unit -> unit.currency_code.equals("BTC"))
+        return call("GET", "/v1/me/getbalance", "", CurrencyState.class, new String[] {"*"}).take(unit -> unit.currency_code.equals("BTC"))
                 .map(c -> c.available);
     }
 
@@ -559,7 +558,7 @@ class BitFlyerService extends MarketService {
      */
     @Override
     public Signal<OrderBookPageChanges> orderBook() {
-        return call("PUBLIC", "/v1/board?product_code=" + marketName, "", "", OrderBookPageChanges.class);
+        return call("PUBLIC", "/v1/board?product_code=" + marketName, "", OrderBookPageChanges.class, new String[0]);
     }
 
     /**
@@ -591,17 +590,17 @@ class BitFlyerService extends MarketService {
     /**
      * Call private API.
      */
-    private <M> Signal<M> call(String method, String path, Object body, String selector, Class<M> type) {
+    private <M> Signal<M> call(String method, String path, Object body, Class<M> type, String... selector) {
         StringBuilder builder = new StringBuilder();
         I.write(body, builder);
 
-        return call(method, path, builder.toString(), selector, type);
+        return call(method, path, builder.toString(), type, selector);
     }
 
     /**
      * Call private API.
      */
-    protected <M> Signal<M> call(String method, String path, String body, String selector, Class<M> type) {
+    protected <M> Signal<M> call(String method, String path, String body, Class<M> type, String... selector) {
         String timestamp = String.valueOf(Chrono.utcNow().toEpochSecond());
         String sign = Hashing.hmacSha256(account.apiSecret.v.getBytes())
                 .hashString(timestamp + method + path + body, StandardCharsets.UTF_8)
@@ -633,7 +632,7 @@ class BitFlyerService extends MarketService {
             if (body != null && body.length() != 0) builder = builder.post(RequestBody.create(mime, body));
             request = builder.build();
         }
-        return network.rest(request, selector, type, Limit);
+        return network.rest(request, Limit, type, selector);
     }
 
     /**
