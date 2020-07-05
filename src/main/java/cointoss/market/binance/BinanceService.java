@@ -14,10 +14,6 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-
 import cointoss.Direction;
 import cointoss.MarketService;
 import cointoss.MarketSetting;
@@ -30,6 +26,7 @@ import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
 import kiss.I;
+import kiss.JSON;
 import kiss.Signal;
 import okhttp3.Request;
 
@@ -42,7 +39,7 @@ class BinanceService extends MarketService {
     private final boolean isFutures;
 
     /** The shared websocket connection. */
-    private Signal<JsonElement> websocket;
+    private Signal<JSON> websocket;
 
     /**
      * @param marketName
@@ -87,8 +84,8 @@ class BinanceService extends MarketService {
      */
     @Override
     public Signal<Execution> executions(long start, long end) {
-        return call("GET", "aggTrades?symbol=" + marketName + "&limit=1000&fromId=" + (start + 1)).flatIterable(JsonElement::getAsJsonArray)
-                .map(e -> convert(e.getAsJsonObject()));
+        return call("GET", "aggTrades?symbol=" + marketName + "&limit=1000&fromId=" + (start + 1)).flatIterable(e -> e.find("*"))
+                .map(this::convert);
     }
 
     /**
@@ -104,8 +101,7 @@ class BinanceService extends MarketService {
      */
     @Override
     public Signal<Execution> executionLatest() {
-        return call("GET", "aggTrades?symbol=" + marketName + "&limit=1").flatIterable(JsonElement::getAsJsonArray)
-                .map(e -> convert(e.getAsJsonObject()));
+        return call("GET", "aggTrades?symbol=" + marketName + "&limit=1").flatIterable(e -> e.find("*")).map(this::convert);
     }
 
     /**
@@ -165,25 +161,19 @@ class BinanceService extends MarketService {
      * @param array
      * @return
      */
-    private OrderBookPageChanges convertOrderBook(JsonElement root, String bidName, String askName) {
+    private OrderBookPageChanges convertOrderBook(JSON o, String bidName, String askName) {
         OrderBookPageChanges change = new OrderBookPageChanges();
 
-        JsonObject o = root.getAsJsonObject();
-        JsonArray bids = o.get(bidName).getAsJsonArray();
-        JsonArray asks = o.get(askName).getAsJsonArray();
-
-        for (JsonElement e : bids) {
-            JsonArray bid = e.getAsJsonArray();
-            Num price = Num.of(bid.get(0).getAsBigDecimal());
-            double size = bid.get(1).getAsDouble();
+        for (JSON bid : o.find(bidName, "*")) {
+            Num price = bid.getAs(Num.class, "0");
+            double size = bid.getAs(Double.class, "1");
 
             change.bids.add(new OrderBookPage(price, size));
         }
 
-        for (JsonElement e : asks) {
-            JsonArray ask = e.getAsJsonArray();
-            Num price = Num.of(ask.get(0).getAsBigDecimal());
-            double size = ask.get(1).getAsDouble();
+        for (JSON ask : o.find(askName, "*")) {
+            Num price = ask.getAs(Num.class, "0");
+            double size = ask.getAs(Double.class, "1");
 
             change.asks.add(new OrderBookPage(price, size));
         }
@@ -213,13 +203,13 @@ class BinanceService extends MarketService {
      * @param previous
      * @return
      */
-    private Execution convert(JsonObject e) {
-        Direction direction = e.get("m").getAsBoolean() ? Direction.SELL : Direction.BUY;
-        Num size = Num.of(e.get("q").getAsString());
-        Num price = Num.of(e.get("p").getAsString());
-        long tradeTime = e.get("T").getAsLong();
+    private Execution convert(JSON e) {
+        Direction direction = e.getAs(Boolean.class, "m") ? Direction.SELL : Direction.BUY;
+        Num size = e.getAs(Num.class, "q");
+        Num price = e.getAs(Num.class, "p");
+        long tradeTime = e.getAs(Long.class, "T");
         ZonedDateTime date = Chrono.utcByMills(tradeTime);
-        long tradeId = e.get("a").getAsLong();
+        long tradeId = e.getAs(Long.class, "a");
 
         Execution exe = Execution.with.direction(direction, size)
                 .id(tradeId)
@@ -238,11 +228,11 @@ class BinanceService extends MarketService {
      * @param path
      * @return
      */
-    private Signal<JsonElement> call(String method, String path) {
+    private Signal<JSON> call(String method, String path) {
         String uri = isFutures ? "https://fapi.binance.com/fapi/v1/" : "https://api.binance.com/api/v3/";
         Request request = new Request.Builder().url(uri + path).build();
 
-        return network.rest(request, Limit).retryWhen(retryPolicy(10, "Binance RESTCall"));
+        return network.rest2(request, Limit).retryWhen(retryPolicy(10, "Binance RESTCall"));
     }
 
     /**
@@ -250,7 +240,7 @@ class BinanceService extends MarketService {
      * 
      * @return
      */
-    private synchronized Signal<JsonObject> connectSharedWebSocket(Topic topic) {
+    private synchronized Signal<JSON> connectSharedWebSocket(Topic topic) {
         String uri = isFutures ? "wss://fstream.binance.com/stream" : "wss://stream.binance.com:9443/stream";
         String name = marketName.toLowerCase() + "@" + topic;
 
@@ -260,16 +250,14 @@ class BinanceService extends MarketService {
             for (Topic type : Topic.values()) {
                 command.params.add(marketName.toLowerCase() + "@" + type);
             }
-            websocket = network.websocket(uri, command);
+            websocket = network.websocket2(uri, command);
         }
 
-        return websocket.share().flatMap(e -> {
-            JsonObject root = e.getAsJsonObject();
-            JsonElement stream = root.get("stream");
-            if (stream == null || !stream.getAsString().equals(name)) {
-                return I.signal();
+        return websocket.share().flatMap(root -> {
+            if (root.has("stream", name)) {
+                return I.signal(root.get("data"));
             } else {
-                return I.signal(root.get("data")).map(JsonElement::getAsJsonObject);
+                return I.signal();
             }
         });
     }
