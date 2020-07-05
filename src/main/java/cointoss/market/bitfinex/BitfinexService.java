@@ -14,11 +14,6 @@ import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.function.Function;
-
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 
 import cointoss.Direction;
 import cointoss.MarketService;
@@ -31,7 +26,9 @@ import cointoss.order.OrderState;
 import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
+import cointoss.util.SharedSocket;
 import kiss.I;
+import kiss.JSON;
 import kiss.Signal;
 import okhttp3.Request;
 
@@ -47,7 +44,7 @@ class BitfinexService extends MarketService {
     private static final APILimiter LimitForBook = APILimiter.with.limit(30).refresh(Duration.ofMinutes(1));
 
     /** The shared websocket connection. */
-    private Signal<JsonElement> websocket;
+    private Signal<JSON> websocket;
 
     /**
      * @param marketName
@@ -96,8 +93,8 @@ class BitfinexService extends MarketService {
         Object[] previous = new Object[] {null, encodeId(start)};
 
         return call("GET", "trades/t" + marketName + "/hist?sort=1&limit=10000&start=" + startTime, LimitForTradeHistory)
-                .flatIterable(JsonElement::getAsJsonArray)
-                .map(e -> convert(e.getAsJsonArray(), increment, previous));
+                .flatIterable(e -> e.find("*"))
+                .map(e -> convert(e, increment, previous));
     }
 
     /**
@@ -116,7 +113,7 @@ class BitfinexService extends MarketService {
      */
     @Override
     public Signal<Execution> executionLatest() {
-        return call("GET", "trades/t" + marketName + "/hist?limit=1", LimitForTradeHistory).flatIterable(JsonElement::getAsJsonArray)
+        return call("GET", "trades/t" + marketName + "/hist?limit=1", LimitForTradeHistory).flatIterable(e -> e.find("*"))
                 .map(e -> convert(e, new AtomicLong(), new Object[2]));
     }
 
@@ -157,7 +154,21 @@ class BitfinexService extends MarketService {
      */
     @Override
     public Signal<OrderBookPageChanges> orderBook() {
-        return call("GET", "book/t" + marketName + "/P1?len=100", LimitForBook).map(this::convertOrderBook);
+        return call("GET", "book/t" + marketName + "/P1?len=100", LimitForBook).map(json -> {
+            OrderBookPageChanges change = new OrderBookPageChanges();
+
+            for (JSON data : json.find("*")) {
+                Num price = Num.of(data.getAs(String.class, "0"));
+                double size = data.getAs(Double.class, "2");
+
+                if (0 < size) {
+                    change.bids.add(new OrderBookPage(price, size));
+                } else {
+                    change.asks.add(new OrderBookPage(price, -size));
+                }
+            }
+            return change;
+        });
     }
 
     /**
@@ -165,30 +176,21 @@ class BitfinexService extends MarketService {
      */
     @Override
     protected Signal<OrderBookPageChanges> connectOrderBookRealtimely() {
-        return I.signal();
-    }
+        return realtime.subscribe(Topic.book, marketName).map(json -> {
+            OrderBookPageChanges change = new OrderBookPageChanges();
+            JSON data = json.get("1");
 
-    /**
-     * Convert json to {@link OrderBookPageChanges}.
-     * 
-     * @param array
-     * @return
-     */
-    private OrderBookPageChanges convertOrderBook(JsonElement root) {
-        OrderBookPageChanges change = new OrderBookPageChanges();
-
-        for (JsonElement e : root.getAsJsonArray()) {
-            JsonArray item = e.getAsJsonArray();
-            Num price = Num.of(item.get(0).getAsBigDecimal());
-            double size = item.get(2).getAsDouble();
+            Num price = Num.of(data.getAs(String.class, "0"));
+            double size = data.getAs(Double.class, "2");
 
             if (0 < size) {
                 change.bids.add(new OrderBookPage(price, size));
             } else {
                 change.asks.add(new OrderBookPage(price, -size));
             }
-        }
-        return change;
+            return change;
+        });
+
     }
 
     /**
@@ -214,11 +216,10 @@ class BitfinexService extends MarketService {
      * @param previous
      * @return
      */
-    private Execution convert(JsonElement e, AtomicLong increment, Object[] previous) {
-        JsonArray a = e.getAsJsonArray();
-        ZonedDateTime date = Chrono.utcByMills(a.get(1).getAsLong());
-        double size = a.get(2).getAsDouble();
-        Num price = Num.of(a.get(3).getAsBigDecimal());
+    private Execution convert(JSON a, AtomicLong increment, Object[] previous) {
+        ZonedDateTime date = Chrono.utcByMills(a.getAs(Long.class, "1"));
+        double size = a.getAs(Double.class, "2");
+        Num price = Num.of(a.getAs(String.class, "3"));
         Direction direction = 0 < size ? Direction.BUY : Direction.SELL;
         if (direction == Direction.SELL) size *= -1;
 
@@ -297,10 +298,10 @@ class BitfinexService extends MarketService {
      * @param path
      * @return
      */
-    private Signal<JsonElement> call(String method, String path, APILimiter limiter) {
+    private Signal<JSON> call(String method, String path, APILimiter limiter) {
         Request request = new Request.Builder().url("https://api-pub.bitfinex.com/v2/" + path).build();
 
-        return network.rest(request, limiter).retryWhen(retryPolicy(10, "Bitfinex RESTCall"));
+        return network.rest2(request, limiter).retryWhen(retryPolicy(10, "Bitfinex RESTCall"));
     }
 
     /**
@@ -308,7 +309,7 @@ class BitfinexService extends MarketService {
      * 
      * @return
      */
-    private synchronized Signal<JsonArray> connectSharedWebSocket(Topic topic) {
+    private synchronized Signal<JSON> connectSharedWebSocket(Topic topic) {
         String uri = "wss://api-pub.bitfinex.com/ws/2";
 
         if (websocket == null) {
@@ -317,28 +318,22 @@ class BitfinexService extends MarketService {
             command.symbol = "t" + marketName;
             command.channel = topic.toString();
 
-            websocket = network.websocket(uri, command);
+            websocket = network.websocket2(uri, command);
         }
 
         Map<Number, Topic> map = new HashMap();
 
         return websocket.share().flatMap(e -> {
-            if (e.isJsonObject()) {
-                JsonObject o = e.getAsJsonObject();
-                if (o.has("channel")) {
-                    String channel = o.get("channel").getAsString();
-                    map.put(o.get("chanId").getAsNumber(), Topic.valueOf(channel));
-                }
+            String channel = e.getAs(String.class, "channel");
+
+            if (channel != null) {
+                map.put(e.getAs(Integer.class, "chanId"), Topic.valueOf(channel));
             } else {
-                JsonArray arrat = e.getAsJsonArray();
-                Topic name = map.get(arrat.get(0).getAsNumber());
-
+                Topic name = map.get(e.getAs(Integer.class, "0"));
                 if (name == topic) {
-                    JsonElement type = arrat.get(1);
-
                     // ignore snapshot and update
-                    if (!type.isJsonArray() && type.getAsString().endsWith("e")) {
-                        return I.signal(arrat.get(2)).as(JsonArray.class);
+                    if (e.getAs(String.class, "1").endsWith("e")) {
+                        return I.signal(e.get("2"));
                     }
                 }
             }
@@ -346,29 +341,13 @@ class BitfinexService extends MarketService {
         });
     }
 
+    private final Realtime realtime = new Realtime();
+
     /**
      * Subscription topics for websocket.
      */
     private enum Topic {
-        trades(array -> {
-            JsonElement type = array.get(1);
-
-            // ignore snapshot and update
-            if (!type.isJsonArray() && type.getAsString().endsWith("e")) {
-                return I.signal(array.get(2)).as(JsonArray.class);
-            } else {
-                return I.signal();
-            }
-        });
-
-        private final Function<JsonArray, Signal<JsonArray>> extractor;
-
-        /**
-         * @param extractor
-         */
-        private Topic(Function<JsonArray, Signal<JsonArray>> extractor) {
-            this.extractor = extractor;
-        }
+        trades, book;
     }
 
     /**
@@ -384,15 +363,84 @@ class BitfinexService extends MarketService {
         public String symbol;
     }
 
+    /**
+     * 
+     */
+    private static class Realtime extends SharedSocket {
+
+        /**
+         *
+         */
+        private Realtime() {
+            super("wss://api-pub.bitfinex.com/ws/2", I::json);
+        }
+
+        /**
+         * Subscribe channel.
+         * 
+         * @param topic
+         * @return
+         */
+        private Signal<JSON> subscribe(Topic topic, String symbol) {
+            String[] id = {"-1"};
+
+            // retrieve channel id
+            expose.take(json -> json.has("event", "subscribed") && json.has("channel", topic.name()) && json.has("pair", symbol))
+                    .first()
+                    .to(json -> {
+                        id[0] = json.getAs(String.class, "chanId");
+                    });
+
+            return invoke(new Command("subscribe", topic.name(), symbol))
+                    .effectOnDispose(() -> invoke(new Command("unsubscribe", topic.name(), symbol)))
+                    .take(json -> json.has("0", id[0]) && !json.has("1", "hb")) // skip heartbeat
+                    .skip(1); // skip snapshot
+        }
+
+        /**
+         * 
+         */
+        private static class Command {
+
+            public String event;
+
+            public String channel;
+
+            public String symbol;
+
+            /**
+             * @param channel
+             * @param symbol
+             */
+            private Command(String event, String channel, String symbol) {
+                this.event = event;
+                this.channel = channel;
+                this.symbol = symbol;
+            }
+        }
+    }
+
     public static void main(String[] args) {
 
-        Bitfinex.BTC_USDT.orderBook().to(e -> {
+        // Bitfinex.BTC_USDT.executionLatest().to(e -> {
+        // System.out.println(e);
+        // });
+        //
+        // Bitfinex.BTC_USDT.executionsRealtimely().to(e -> {
+        // System.out.println(e);
+        // });
+
+        Bitfinex.BTC_USDT.orderBookRealtimely().to(e -> {
             e.bids.forEach(page -> {
                 System.out.println(page);
             });
             e.asks.forEach(page -> {
                 System.out.println(page);
             });
+        }, e -> {
+            e.printStackTrace();
+        }, () -> {
+            System.out.println("COMPLETE");
         });
     }
 }
