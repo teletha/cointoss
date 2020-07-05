@@ -295,9 +295,9 @@ class BitFlyerService extends MarketService {
                     }
 
                     id = latestId = id != 0 ? id : ++latestId;
-                    Direction direction = e.getAs(Direction.class, "side");
-                    Num size = e.getAs(Num.class, "size");
-                    Num price = e.getAs(Num.class, "price");
+                    Direction direction = Direction.parse(e.getAs(String.class, "side"));
+                    Num size = Num.of(e.getAs(String.class, "size"));
+                    Num price = Num.of(e.getAs(String.class, "price"));
                     ZonedDateTime date = parse(e.getAs(String.class, "exec_date")).atZone(Chrono.UTC);
                     String buyer = e.getAs(String.class, "buy_child_order_acceptance_id");
                     String seller = e.getAs(String.class, "sell_child_order_acceptance_id");
@@ -402,9 +402,9 @@ class BitFlyerService extends MarketService {
      */
     private Execution convert(JSON e, String[] previous) {
         long id = e.getAs(Long.class, "id");
-        Direction direction = e.getAs(Direction.class, "side");
-        Num size = e.getAs(Num.class, "size");
-        Num price = e.getAs(Num.class, "price");
+        Direction direction = Direction.parse(e.getAs(String.class, "side"));
+        Num size = Num.of(e.getAs(String.class, "size"));
+        Num price = Num.of(e.getAs(String.class, "price"));
         ZonedDateTime date = LocalDateTime.parse(e.getAs(String.class, "exec_date")).atZone(Chrono.UTC);
         String buyer = e.getAs(String.class, "buy_child_order_acceptance_id");
         String seller = e.getAs(String.class, "sell_child_order_acceptance_id");

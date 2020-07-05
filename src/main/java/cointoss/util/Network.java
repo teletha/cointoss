@@ -246,6 +246,50 @@ public class Network {
      * Connect by websocket.
      * 
      * @param uri
+     * @param jsonCommnad
+     * @return
+     */
+    public Signal<JSON> websocket2(String uri, Object jsonCommnad) {
+        return new Signal<JSON>((observer, disposer) -> {
+            Request request = new Request.Builder().url(uri).build();
+
+            WebSocket websocket = client().newWebSocket(request, new WebSocketListener() {
+
+                /**
+                 * {@inheritDoc}
+                 */
+                @Override
+                public void onOpen(WebSocket socket, Response response) {
+                    socket.send(I.write(jsonCommnad));
+                }
+
+                /**
+                 * {@inheritDoc}
+                 */
+                @Override
+                public void onMessage(WebSocket socket, String text) {
+                    observer.accept(I.json(text));
+                }
+
+                /**
+                 * {@inheritDoc}
+                 */
+                @Override
+                public void onFailure(WebSocket socket, Throwable error, Response response) {
+                    observer.error(error);
+                }
+            });
+
+            return disposer.add(() -> {
+                websocket.close(1000, null);
+            });
+        });
+    }
+
+    /**
+     * Connect by websocket.
+     * 
+     * @param uri
      * @param channelName
      * @return
      */

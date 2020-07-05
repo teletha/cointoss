@@ -16,10 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-
 import cointoss.Direction;
 import cointoss.MarketService;
 import cointoss.MarketSetting;
@@ -32,6 +28,7 @@ import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
 import kiss.I;
+import kiss.JSON;
 import kiss.Signal;
 import okhttp3.Request;
 
@@ -53,7 +50,7 @@ class BitMexService extends MarketService {
     private final Num instrumentTickSize;
 
     /** The shared websocket connection. */
-    private Signal<JsonElement> websocket;
+    private Signal<JSON> websocket;
 
     /**
      * @param marketName
@@ -101,7 +98,7 @@ class BitMexService extends MarketService {
         Object[] previous = new Object[] {null, encodeId(start)};
 
         return call("GET", "trade?symbol=" + marketName + "&count=1000" + "&startTime=" + formatEncodedId(start) + "&start=" + startingPoint)
-                .flatIterable(JsonElement::getAsJsonArray)
+                .flatIterable(e -> e.find("*"))
                 .map(json -> {
                     return convert(json, increment, previous);
                 });
@@ -135,7 +132,7 @@ class BitMexService extends MarketService {
      */
     @Override
     public Signal<Execution> executionLatest() {
-        return call("GET", "trade?symbol=" + marketName + "&count=1&reverse=true").flatIterable(JsonElement::getAsJsonArray)
+        return call("GET", "trade?symbol=" + marketName + "&count=1&reverse=true").flatIterable(e -> e.find("*"))
                 .map(json -> convert(json, new AtomicLong(), new Object[2]));
     }
 
@@ -176,7 +173,7 @@ class BitMexService extends MarketService {
      */
     @Override
     public Signal<OrderBookPageChanges> orderBook() {
-        return call("GET", "orderBook/L2?depth=1200&symbol=" + marketName).map(e -> convertOrderBook(e.getAsJsonArray()));
+        return call("GET", "orderBook/L2?depth=1200&symbol=" + marketName).map(e -> convertOrderBook(e.find("*")));
     }
 
     /**
@@ -193,16 +190,15 @@ class BitMexService extends MarketService {
      * @param array
      * @return
      */
-    private OrderBookPageChanges convertOrderBook(JsonArray array) {
+    private OrderBookPageChanges convertOrderBook(List<JSON> array) {
         OrderBookPageChanges change = new OrderBookPageChanges();
-        for (JsonElement e : array) {
-            JsonObject o = e.getAsJsonObject();
-            long id = o.get("id").getAsLong();
+        for (JSON o : array) {
+            long id = o.getAs(Long.class, "id");
             Num price = instrumentTickSize.multiply((100000000L * marketId) - id);
-            JsonElement sizeElement = o.get("size");
-            double size = sizeElement == null ? 0 : sizeElement.getAsDouble() / price.doubleValue();
+            JSON sizeElement = o.get("size");
+            double size = sizeElement == null ? 0 : sizeElement.to(Double.class) / price.doubleValue();
 
-            if (o.get("side").getAsString().charAt(0) == 'B') {
+            if (o.getAs(String.class, "side").charAt(0) == 'B') {
                 change.bids.add(new OrderBookPage(price, size));
             } else {
                 change.asks.add(new OrderBookPage(price, size));
@@ -242,14 +238,12 @@ class BitMexService extends MarketService {
      * @param previous
      * @return
      */
-    private Execution convert(JsonElement json, AtomicLong increment, Object[] previous) {
-        JsonObject e = json.getAsJsonObject();
-
-        Direction direction = Direction.parse(e.get("side").getAsString());
-        Num size = Num.of(e.get("homeNotional").getAsString());
-        Num price = Num.of(e.get("price").getAsString());
-        ZonedDateTime date = ZonedDateTime.parse(e.get("timestamp").getAsString(), RealTimeFormat).withZoneSameLocal(Chrono.UTC);
-        String tradeId = e.get("trdMatchID").getAsString();
+    private Execution convert(JSON e, AtomicLong increment, Object[] previous) {
+        Direction direction = Direction.parse(e.getAs(String.class, "side"));
+        Num size = Num.of(e.getAs(String.class, "homeNotional"));
+        Num price = Num.of(e.getAs(String.class, "price"));
+        ZonedDateTime date = ZonedDateTime.parse(e.getAs(String.class, "timestamp"), RealTimeFormat).withZoneSameLocal(Chrono.UTC);
+        String tradeId = e.getAs(String.class, "trdMatchID");
         long id;
         int consecutive;
 
@@ -282,10 +276,10 @@ class BitMexService extends MarketService {
      * @param path
      * @return
      */
-    private Signal<JsonElement> call(String method, String path) {
+    private Signal<JSON> call(String method, String path) {
         Request request = new Request.Builder().url("https://www.bitmex.com/api/v1/" + path).build();
 
-        return network.rest(request, Limit).retryWhen(retryPolicy(10, "BitMEX RESTCall"));
+        return network.rest2(request, Limit).retryWhen(retryPolicy(10, "BitMEX RESTCall"));
     }
 
     /**
@@ -293,7 +287,7 @@ class BitMexService extends MarketService {
      * 
      * @return
      */
-    private synchronized Signal<JsonArray> connectSharedWebSocket(Topic topic) {
+    private synchronized Signal<List<JSON>> connectSharedWebSocket(Topic topic) {
         if (websocket == null) {
             WebSocketCommand command = new WebSocketCommand();
             command.op = "subscribe";
@@ -301,16 +295,14 @@ class BitMexService extends MarketService {
                 command.args.add(type + ":" + marketName);
             }
 
-            websocket = network.websocket("wss://www.bitmex.com/realtime", command);
+            websocket = network.websocket2("wss://www.bitmex.com/realtime", command);
         }
 
-        return websocket.share().flatMap(e -> {
-            JsonObject root = e.getAsJsonObject();
-            JsonElement tableProperty = root.get("table");
-            if (tableProperty == null || !tableProperty.getAsString().equals(topic.name())) {
-                return I.signal();
+        return websocket.share().flatMap(root -> {
+            if (root.has("table", topic.name())) {
+                return I.signal(root.get("data")).map(e -> e.find("*"));
             } else {
-                return I.signal(root.get("data")).map(JsonElement::getAsJsonArray);
+                return I.signal();
             }
         }).effectOnError(e -> {
             e.printStackTrace();
