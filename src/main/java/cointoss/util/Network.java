@@ -9,7 +9,6 @@
  */
 package cointoss.util;
 
-import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.time.Duration;
@@ -33,7 +32,6 @@ import okhttp3.Response;
 import okhttp3.ResponseBody;
 import okhttp3.WebSocket;
 import okhttp3.WebSocketListener;
-import okio.Buffer;
 
 public class Network {
 
@@ -88,29 +86,6 @@ public class Network {
             client.dispatcher().executorService().shutdownNow();
             client.connectionPool().evictAll();
             client = null;
-        }
-    }
-
-    /**
-     * For debug.
-     * 
-     * @param request
-     * @return
-     */
-    @SuppressWarnings("unused")
-    private static String bodyToString(final Request request) {
-        try {
-            RequestBody body = request.body();
-
-            if (body == null) {
-                return "";
-            }
-            final Request copy = request.newBuilder().build();
-            final Buffer buffer = new Buffer();
-            copy.body().writeTo(buffer);
-            return buffer.readUtf8();
-        } catch (final IOException e) {
-            return "did not work";
         }
     }
 
