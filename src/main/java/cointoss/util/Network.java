@@ -18,7 +18,6 @@ import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import kiss.I;
@@ -87,6 +86,39 @@ public class Network {
             client.connectionPool().evictAll();
             client = null;
         }
+    }
+
+    /**
+     * Call REST API.
+     */
+    public final Signal<JSON> rest2(Request request) {
+        return rest2(request, null);
+    }
+
+    /**
+     * Call REST API.
+     */
+    public Signal<JSON> rest2(Request request, APILimiter limiter) {
+        return new Signal<>((observer, disposer) -> {
+            if (limiter != null) {
+                limiter.acquire();
+            }
+
+            try (Response response = client().newCall(request).execute(); ResponseBody body = response.body()) {
+                String value = body.string();
+                int code = response.code();
+
+                if (code == 200) {
+                    observer.accept(I.json(value));
+                    observer.complete();
+                } else {
+                    observer.error(new Error("[" + request.url() + "] HTTP Status " + code + " " + value));
+                }
+            } catch (Throwable e) {
+                observer.error(new Error("[" + request.url() + "] throws error : " + e.getMessage(), e));
+            }
+            return disposer;
+        });
     }
 
     /**
@@ -217,11 +249,9 @@ public class Network {
      * @param channelName
      * @return
      */
-    public Signal<JsonElement> jsonRPC(String uri, String channelName) {
-        return new Signal<JsonElement>((observer, disposer) -> {
-            JsonParser parser = new JsonParser();
+    public Signal<JSON> jsonRPC(String uri, String channelName) {
+        return new Signal<JSON>((observer, disposer) -> {
             Request request = new Request.Builder().url(uri).build();
-
             WebSocket websocket = client().newWebSocket(request, new WebSocketListener() {
 
                 /**
@@ -241,8 +271,7 @@ public class Network {
                  */
                 @Override
                 public void onMessage(WebSocket socket, String text) {
-                    JsonObject e = parser.parse(text).getAsJsonObject();
-                    JsonObject params = e.getAsJsonObject("params");
+                    JSON params = I.json(text).get("params");
 
                     if (params != null) {
                         observer.accept(params.get("message"));

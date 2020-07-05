@@ -11,9 +11,6 @@ package cointoss.market.bitflyer;
 
 import java.util.Objects;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-
 import cointoss.MarketSetting;
 import cointoss.execution.Execution;
 import cointoss.order.Order;
@@ -21,6 +18,7 @@ import cointoss.order.OrderState;
 import cointoss.util.Chrono;
 import cointoss.util.MockNetwork;
 import cointoss.util.Num;
+import kiss.JSON;
 
 /**
  * @version 2018/04/29 21:19:34
@@ -84,17 +82,17 @@ class MockBitFlyerService extends BitFlyerService {
         Objects.requireNonNull(buyerId);
         Objects.requireNonNull(sellerId);
 
-        JsonObject o = new JsonObject();
-        o.addProperty("id", exe.id);
-        o.addProperty("side", exe.direction.name());
-        o.addProperty("price", exe.price.doubleValue());
-        o.addProperty("size", exe.size.doubleValue());
-        o.addProperty("exec_date", BitFlyerService.RealTimeFormat.format(exe.date) + "Z");
-        o.addProperty("buy_child_order_acceptance_id", buyerId);
-        o.addProperty("sell_child_order_acceptance_id", sellerId);
+        JSON o = new JSON();
+        o.set("id", exe.id);
+        o.set("side", exe.direction.name());
+        o.set("price", exe.price.doubleValue());
+        o.set("size", exe.size.doubleValue());
+        o.set("exec_date", BitFlyerService.RealTimeFormat.format(exe.date) + "Z");
+        o.set("buy_child_order_acceptance_id", buyerId);
+        o.set("sell_child_order_acceptance_id", sellerId);
 
-        JsonArray root = new JsonArray();
-        root.add(o);
+        JSON root = new JSON();
+        root.set("0", o);
 
         mockNetwork.connect("wss://ws.lightstream.bitflyer.com/json-rpc").willResponse(root);
     }

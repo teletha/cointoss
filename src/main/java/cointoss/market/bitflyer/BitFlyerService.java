@@ -9,7 +9,7 @@
  */
 package cointoss.market.bitflyer;
 
-import static kiss.I.translate;
+import static kiss.I.*;
 import static viewtify.ui.UIWeb.Operation.*;
 
 import java.nio.charset.StandardCharsets;
@@ -29,9 +29,6 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang3.RandomStringUtils;
 
 import com.google.common.hash.Hashing;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 
 import cointoss.Direction;
 import cointoss.MarketService;
@@ -48,6 +45,7 @@ import cointoss.util.Network;
 import cointoss.util.Num;
 import kiss.Disposable;
 import kiss.I;
+import kiss.JSON;
 import kiss.Signal;
 import kiss.Signaling;
 import okhttp3.MediaType;
@@ -57,11 +55,9 @@ import okhttp3.RequestBody;
 import viewtify.Viewtify;
 
 /**
- * <p>
  * Since the order API and the real-time execution API are completely separate systems, execution
  * data may arrive before the order response, or execution data may arrive after the cancellation
  * response.
- * </p>
  */
 class BitFlyerService extends MarketService {
 
@@ -290,22 +286,21 @@ class BitFlyerService extends MarketService {
         String[] previous = new String[] {"", ""};
 
         return network.jsonRPC("wss://ws.lightstream.bitflyer.com/json-rpc", "lightning_executions_" + marketName)
-                .flatIterable(JsonElement::getAsJsonArray)
-                .map(JsonElement::getAsJsonObject)
+                .flatIterable(e -> e.find("*"))
                 .map(e -> {
-                    long id = e.get("id").getAsLong();
+                    long id = e.getAs(Long.class, "id");
 
                     if (id == 0 && latestId == 0) {
                         return null; // skip
                     }
 
                     id = latestId = id != 0 ? id : ++latestId;
-                    Direction direction = Direction.parse(e.get("side").getAsString());
-                    Num size = Num.of(e.get("size").getAsString());
-                    Num price = Num.of(e.get("price").getAsString());
-                    ZonedDateTime date = parse(e.get("exec_date").getAsString()).atZone(Chrono.UTC);
-                    String buyer = e.get("buy_child_order_acceptance_id").getAsString();
-                    String seller = e.get("sell_child_order_acceptance_id").getAsString();
+                    Direction direction = e.getAs(Direction.class, "side");
+                    Num size = e.getAs(Num.class, "size");
+                    Num price = e.getAs(Num.class, "price");
+                    ZonedDateTime date = parse(e.getAs(String.class, "exec_date")).atZone(Chrono.UTC);
+                    String buyer = e.getAs(String.class, "buy_child_order_acceptance_id");
+                    String seller = e.getAs(String.class, "sell_child_order_acceptance_id");
                     String taker = direction.isBuy() ? buyer : seller;
                     int consecutiveType = estimateConsecutiveType(previous[0], previous[1], buyer, seller);
                     int delay = estimateDelay(taker, date);
@@ -382,7 +377,7 @@ class BitFlyerService extends MarketService {
         String[] previous = new String[] {"", ""};
 
         return call("GET", "/v1/executions?product_code=" + marketName + "&count=" + setting
-                .acquirableExecutionSize() + "&before=" + end + "&after=" + start, "").flatIterable(JsonElement::getAsJsonArray)
+                .acquirableExecutionSize() + "&before=" + end + "&after=" + start, "").flatIterable(e -> e.find("*"))
                         .reverse()
                         .map(e -> convert(e, previous));
     }
@@ -394,7 +389,7 @@ class BitFlyerService extends MarketService {
     public Signal<Execution> executionLatest() {
         String[] previous = new String[] {"", ""};
 
-        return call("GET", "/v1/executions?product_code=" + marketName + "&count=1", "").flatIterable(JsonElement::getAsJsonArray)
+        return call("GET", "/v1/executions?product_code=" + marketName + "&count=1", "").flatIterable(e -> e.find("*"))
                 .map(e -> convert(e, previous));
     }
 
@@ -405,16 +400,14 @@ class BitFlyerService extends MarketService {
      * @param previous
      * @return
      */
-    private Execution convert(JsonElement json, String[] previous) {
-        JsonObject e = json.getAsJsonObject();
-
-        long id = e.get("id").getAsLong();
-        Direction direction = Direction.parse(e.get("side").getAsString());
-        Num size = Num.of(e.get("size").getAsString());
-        Num price = Num.of(e.get("price").getAsString());
-        ZonedDateTime date = LocalDateTime.parse(e.get("exec_date").getAsString()).atZone(Chrono.UTC);
-        String buyer = e.get("buy_child_order_acceptance_id").getAsString();
-        String seller = e.get("sell_child_order_acceptance_id").getAsString();
+    private Execution convert(JSON e, String[] previous) {
+        long id = e.getAs(Long.class, "id");
+        Direction direction = e.getAs(Direction.class, "side");
+        Num size = e.getAs(Num.class, "size");
+        Num price = e.getAs(Num.class, "price");
+        ZonedDateTime date = LocalDateTime.parse(e.getAs(String.class, "exec_date")).atZone(Chrono.UTC);
+        String buyer = e.getAs(String.class, "buy_child_order_acceptance_id");
+        String seller = e.getAs(String.class, "sell_child_order_acceptance_id");
         String taker = direction.isBuy() ? buyer : seller;
         int consecutiveType = estimateConsecutiveType(previous[0], previous[1], buyer, seller);
         int delay = estimateDelay(taker, date);
@@ -566,25 +559,17 @@ class BitFlyerService extends MarketService {
      */
     @Override
     protected Signal<OrderBookPageChanges> connectOrderBookRealtimely() {
-        return network.jsonRPC("wss://ws.lightstream.bitflyer.com/json-rpc", "lightning_board_" + marketName)
-                .map(JsonElement::getAsJsonObject)
-                .map(e -> {
-                    OrderBookPageChanges change = new OrderBookPageChanges();
-                    JsonArray asks = e.get("asks").getAsJsonArray();
+        return network.jsonRPC("wss://ws.lightstream.bitflyer.com/json-rpc", "lightning_board_" + marketName).map(e -> {
+            OrderBookPageChanges change = new OrderBookPageChanges();
+            for (JSON ask : e.find("asks", "*")) {
+                change.asks.add(new OrderBookPage(ask.getAs(Num.class, "price"), ask.getAs(Double.class, "size")));
+            }
 
-                    for (int i = 0; i < asks.size(); i++) {
-                        JsonObject ask = asks.get(i).getAsJsonObject();
-                        change.asks.add(new OrderBookPage(Num.of(ask.get("price").getAsString()), ask.get("size").getAsDouble()));
-                    }
-
-                    JsonArray bids = e.get("bids").getAsJsonArray();
-
-                    for (int i = 0; i < bids.size(); i++) {
-                        JsonObject bid = bids.get(i).getAsJsonObject();
-                        change.bids.add(new OrderBookPage(Num.of(bid.get("price").getAsString()), bid.get("size").getAsDouble()));
-                    }
-                    return change;
-                });
+            for (JSON bid : e.find("bids", "*")) {
+                change.bids.add(new OrderBookPage(bid.getAs(Num.class, "price"), bid.getAs(Double.class, "size")));
+            }
+            return change;
+        });
     }
 
     /**
@@ -638,7 +623,7 @@ class BitFlyerService extends MarketService {
     /**
      * Call private API.
      */
-    protected Signal<JsonElement> call(String method, String path, String body) {
+    protected Signal<JSON> call(String method, String path, String body) {
         String timestamp = String.valueOf(Chrono.utcNow().toEpochSecond());
         String sign = Hashing.hmacSha256(account.apiSecret.v.getBytes())
                 .hashString(timestamp + method + path + body, StandardCharsets.UTF_8)
@@ -670,7 +655,7 @@ class BitFlyerService extends MarketService {
             if (body != null && body.length() != 0) builder = builder.post(RequestBody.create(mime, body));
             request = builder.build();
         }
-        return network.rest(request, Limit);
+        return network.rest2(request, Limit);
     }
 
     /**
@@ -717,7 +702,7 @@ class BitFlyerService extends MarketService {
                         .post(RequestBody
                                 .create(mime, "{\"product_code\":\"FX_BTC_JPY\",\"account_id\":\"" + account.accountId + "\",\"lang\":\"ja\"}"));
 
-                new Network().rest(builder.build()).to(I.NoOP);
+                new Network().rest2(builder.build()).to(I.NoOP);
             });
         }
     }

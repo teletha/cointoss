@@ -15,15 +15,11 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Queue;
 
-import com.google.gson.JsonElement;
-
+import kiss.JSON;
 import kiss.Signal;
 import kiss.Signaling;
 import okhttp3.Request;
 
-/**
- * @version 2018/04/30 10:38:28
- */
 public class MockNetwork extends Network {
 
     /** The mocked response manager. */
@@ -55,7 +51,7 @@ public class MockNetwork extends Network {
      * {@inheritDoc}
      */
     @Override
-    public final Signal<JsonElement> jsonRPC(String uri, String channelName) {
+    public final Signal<JSON> jsonRPC(String uri, String channelName) {
         return websockets.computeIfAbsent(uri, key -> new MockSocket()).signaling.expose;
     }
 
@@ -115,14 +111,14 @@ public class MockNetwork extends Network {
      */
     public static class MockSocket {
 
-        private final Signaling<JsonElement> signaling = new Signaling();
+        private final Signaling<JSON> signaling = new Signaling();
 
         /**
          * Describe the reseponse value.
          * 
          * @param value
          */
-        public void willResponse(JsonElement data) {
+        public void willResponse(JSON data) {
             signaling.accept(data);
         }
     }
