@@ -10,6 +10,7 @@
 package cointoss.util;
 
 import java.net.http.WebSocket;
+import java.time.Duration;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashMap;
@@ -21,10 +22,13 @@ import kiss.JSON;
 import kiss.Signal;
 import kiss.WiseFunction;
 
-public abstract class SharedSocket {
+public abstract class SharedSocket implements Disposable {
 
     /** The communication route. */
     protected final Signal<JSON> expose;
+
+    /** The interval time for ping. */
+    protected Duration pingnIterval = Duration.ofMinutes(3);
 
     /** The cached connection. */
     private WebSocket ws;
@@ -71,6 +75,13 @@ public abstract class SharedSocket {
         if (ws != null) {
             ws.sendClose(WebSocket.NORMAL_CLOSURE, "");
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void vandalize() {
     }
 
     /**

@@ -420,7 +420,7 @@ class BitfinexService extends MarketService {
         }
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
 
         // Bitfinex.BTC_USDT.executionLatest().to(e -> {
         // System.out.println(e);
@@ -442,5 +442,7 @@ class BitfinexService extends MarketService {
         }, () -> {
             System.out.println("COMPLETE");
         });
+
+        Thread.sleep(1000 * 60 * 15);
     }
 }

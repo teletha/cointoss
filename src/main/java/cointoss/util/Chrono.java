@@ -337,13 +337,24 @@ public class Chrono {
     /** The shared clock. */
     private static Signal<ZonedDateTime> shared = new Signal<ZonedDateTime>((observer, disposer) -> {
         return disposer.add(TIMER.scheduleAtFixedRate(() -> {
-            observer.accept(ZonedDateTime.ofInstant(CLOCK.instant(), CLOCK.getZone()).truncatedTo(ChronoUnit.SECONDS));
+            observer.accept(ZonedDateTime.ofInstant(Instant.ofEpochMilli(currentTimeMills()), CLOCK.getZone())
+                    .truncatedTo(ChronoUnit.SECONDS));
         }, 0, 1, TimeUnit.SECONDS));
     }).effectOnError(e -> {
         e.printStackTrace();
     }).share().effectOnError(e -> {
         e.printStackTrace();
-    });
+    }).share();
+
+    /**
+     * Gets a stream that returns the current time every interval.
+     * 
+     * @param interval
+     */
+    public static Signal<ZonedDateTime> interval(Duration interval) {
+        long time = interval.toSeconds();
+        return shared.takeAt(count -> count % time == time - 1);
+    }
 
     /**
      * Gets a stream that returns the current time every second.
