@@ -49,6 +49,7 @@ public abstract class SharedSocket implements Disposable {
                     invoke(command);
                 }
                 queued = null;
+                Thread.currentThread().setName("ws init " + uri);
             }
         }).map(mapper).share();
     }
@@ -140,28 +141,5 @@ public abstract class SharedSocket implements Disposable {
                 this.params.put("channel", channel);
             }
         }
-    }
-
-    public static void main(String[] args) throws InterruptedException {
-        JsonRPC ws = new JsonRPC("wss://ws.lightstream.bitflyer.com/json-rpc");
-        Disposable disposable = ws.subscribe("lightning_executions_FX_BTC_JPY").flatIterable(json -> json.find("*")).to(v -> {
-            System.out.println(v.as(String.class));
-        }, e -> {
-            e.printStackTrace();
-        });
-
-        Thread.sleep(1000 * 2);
-        Disposable disposable2 = ws.subscribe("lightning_board_FX_BTC_JPY").to(v -> {
-            System.out.println(v.as(String.class));
-        });
-
-        Thread.sleep(1000 * 10);
-        disposable.dispose();
-        System.out.println("Dispose1");
-        Thread.sleep(1000 * 10);
-        disposable2.dispose();
-        System.out.println("Dispose2");
-
-        Thread.sleep(1000 * 10);
     }
 }

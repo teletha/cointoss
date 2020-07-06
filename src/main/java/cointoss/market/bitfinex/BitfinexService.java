@@ -11,8 +11,7 @@ package cointoss.market.bitfinex;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 import cointoss.Direction;
@@ -43,8 +42,8 @@ class BitfinexService extends MarketService {
     /** The API limit. */
     private static final APILimiter LimitForBook = APILimiter.with.limit(30).refresh(Duration.ofMinutes(1));
 
-    /** The shared websocket connection. */
-    private Signal<JSON> websocket;
+    /** The realtiem communicator. */
+    private final Realtime realtime = new Realtime();
 
     /**
      * @param marketName
@@ -105,7 +104,7 @@ class BitfinexService extends MarketService {
         AtomicLong increment = new AtomicLong();
         Object[] previous = new Object[2];
 
-        return connectSharedWebSocket(Topic.trades).map(e -> convert(e, increment, previous));
+        return realtime.subscribe(Topic.trades, marketName).take(e -> e.has("1", "tu")).map(e -> convert(e.get("2"), increment, previous));
     }
 
     /**
@@ -216,10 +215,10 @@ class BitfinexService extends MarketService {
      * @param previous
      * @return
      */
-    private Execution convert(JSON a, AtomicLong increment, Object[] previous) {
-        ZonedDateTime date = Chrono.utcByMills(a.get(Long.class, "1"));
-        double size = a.get(Double.class, "2");
-        Num price = a.get(Num.class, "3");
+    private Execution convert(JSON array, AtomicLong increment, Object[] previous) {
+        ZonedDateTime date = Chrono.utcByMills(array.get(Long.class, "1"));
+        double size = array.get(Double.class, "2");
+        Num price = array.get(Num.class, "3");
         Direction direction = 0 < size ? Direction.BUY : Direction.SELL;
         if (direction == Direction.SELL) size *= -1;
 
@@ -257,41 +256,6 @@ class BitfinexService extends MarketService {
     }
 
     /**
-     * Estimate consecutive type.
-     * 
-     * @param previous
-     */
-    private int estimateConsecutiveType(String prevBuyer, String prevSeller, String buyer, String seller) {
-        if (buyer.equals(prevBuyer)) {
-            if (seller.equals(prevSeller)) {
-                return Execution.ConsecutiveSameBoth;
-            } else {
-                return Execution.ConsecutiveSameBuyer;
-            }
-        } else if (seller.equals(prevSeller)) {
-            return Execution.ConsecutiveSameSeller;
-        } else {
-            return Execution.ConsecutiveDifference;
-        }
-    }
-
-    /**
-     * Analyze Taker's order ID and obtain approximate order time (Since there is a bot which
-     * specifies non-standard id format, ignore it in that case).
-     */
-    private int estimateDelay(long eventTime, long tradeTime) {
-        int delay = (int) (eventTime - tradeTime) / 1000;
-
-        if (delay < 0) {
-            return Execution.DelayInestimable;
-        } else if (180 < delay) {
-            return Execution.DelayHuge;
-        } else {
-            return delay;
-        }
-    }
-
-    /**
      * Call rest API.
      * 
      * @param method
@@ -305,62 +269,10 @@ class BitfinexService extends MarketService {
     }
 
     /**
-     * Build shared websocket connection for this market.
-     * 
-     * @return
-     */
-    private synchronized Signal<JSON> connectSharedWebSocket(Topic topic) {
-        String uri = "wss://api-pub.bitfinex.com/ws/2";
-
-        if (websocket == null) {
-            WebSocketCommand command = new WebSocketCommand();
-            command.event = "subscribe";
-            command.symbol = "t" + marketName;
-            command.channel = topic.toString();
-
-            websocket = network.websocket(uri, command);
-        }
-
-        Map<Number, Topic> map = new HashMap();
-
-        return websocket.share().flatMap(e -> {
-            String channel = e.text("channel");
-
-            if (channel != null) {
-                map.put(e.get(Integer.class, "chanId"), Topic.valueOf(channel));
-            } else {
-                Topic name = map.get(e.get(Integer.class, "0"));
-                if (name == topic) {
-                    // ignore snapshot and update
-                    if (e.text("1").endsWith("e")) {
-                        return I.signal(e.get("2"));
-                    }
-                }
-            }
-            return I.signal();
-        });
-    }
-
-    private final Realtime realtime = new Realtime();
-
-    /**
      * Subscription topics for websocket.
      */
     private enum Topic {
         trades, book;
-    }
-
-    /**
-     * 
-     */
-    @SuppressWarnings("unused")
-    private static class WebSocketCommand {
-
-        public String event;
-
-        public String channel;
-
-        public String symbol;
     }
 
     /**
@@ -422,20 +334,20 @@ class BitfinexService extends MarketService {
 
     public static void main(String[] args) throws InterruptedException {
 
-        // Bitfinex.BTC_USDT.executionLatest().to(e -> {
-        // System.out.println(e);
-        // });
-        //
-        // Bitfinex.BTC_USDT.executionsRealtimely().to(e -> {
-        // System.out.println(e);
-        // });
+        Bitfinex.BTC_USDT.executionLatest().to(e -> {
+            System.out.println(e);
+        });
 
-        Bitfinex.BTC_USDT.orderBookRealtimely().to(e -> {
+        Bitfinex.BTC_USDT.executionsRealtimely().to(e -> {
+            System.out.println(e + "  " + Thread.currentThread().getName());
+        });
+
+        Bitfinex.BTC_USDT.orderBookRealtimely().throttle(1, TimeUnit.SECONDS).to(e -> {
             e.bids.forEach(page -> {
-                System.out.println(page);
+                System.out.println(page + "  " + Thread.currentThread().getName());
             });
             e.asks.forEach(page -> {
-                System.out.println(page);
+                System.out.println(page + "  " + Thread.currentThread().getName());
             });
         }, e -> {
             e.printStackTrace();
