@@ -30,7 +30,6 @@ public class Project extends bee.api.Project {
         unrequire("com.google.guava", "listenablefuture");
         unrequire("com.google.j2objc", "j2objc-annotations");
         unrequire("org.checkerframework", "checker-qual");
-        require("com.google.code.gson", "gson");
         require("com.squareup.okhttp3", "okhttp", "3.14.1");
         require("com.univocity", "univocity-parsers");
         require("com.github.luben", "zstd-jni");

@@ -301,7 +301,7 @@ class BitfinexService extends MarketService {
     private Signal<JSON> call(String method, String path, APILimiter limiter) {
         Request request = new Request.Builder().url("https://api-pub.bitfinex.com/v2/" + path).build();
 
-        return network.rest2(request, limiter).retryWhen(retryPolicy(10, "Bitfinex RESTCall"));
+        return network.rest(request, limiter).retryWhen(retryPolicy(10, "Bitfinex RESTCall"));
     }
 
     /**
@@ -318,7 +318,7 @@ class BitfinexService extends MarketService {
             command.symbol = "t" + marketName;
             command.channel = topic.toString();
 
-            websocket = network.websocket2(uri, command);
+            websocket = network.websocket(uri, command);
         }
 
         Map<Number, Topic> map = new HashMap();

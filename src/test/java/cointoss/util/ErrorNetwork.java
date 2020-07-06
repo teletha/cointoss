@@ -9,9 +9,8 @@
  */
 package cointoss.util;
 
-import com.google.gson.JsonElement;
-
 import kiss.I;
+import kiss.JSON;
 import kiss.Signal;
 import okhttp3.Request;
 
@@ -21,7 +20,7 @@ public class ErrorNetwork extends Network {
      * {@inheritDoc}
      */
     @Override
-    public Signal<JsonElement> rest(Request request, APILimiter limiter) {
+    public Signal<JSON> rest(Request request, APILimiter limiter) {
         return I.signalError(new Error());
     }
 }

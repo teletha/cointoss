@@ -14,9 +14,6 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.concurrent.atomic.AtomicLong;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-
 import cointoss.Direction;
 import cointoss.MarketService;
 import cointoss.MarketSetting;
@@ -28,6 +25,7 @@ import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
 import cointoss.util.Num;
 import kiss.I;
+import kiss.JSON;
 import kiss.Signal;
 import okhttp3.Request;
 
@@ -46,7 +44,7 @@ class FTXService extends MarketService {
     private final Num instrumentTickSize;
 
     /** The shared websocket connection. */
-    private Signal<JsonElement> websocket;
+    private Signal<JSON> websocket;
 
     /**
      * @param marketName
@@ -111,7 +109,7 @@ class FTXService extends MarketService {
      */
     @Override
     public Signal<Execution> executionLatest() {
-        return call("GET", "markets/" + marketName + "/trades?limit=1").flatIterable(e -> e.getAsJsonObject().getAsJsonArray("result"))
+        return call("GET", "markets/" + marketName + "/trades?limit=1").flatIterable(e -> e.find("result", "*"))
                 .map(json -> convert(json, new AtomicLong(), new Object[2]));
     }
 
@@ -200,15 +198,12 @@ class FTXService extends MarketService {
      * @param previous
      * @return
      */
-    private Execution convert(JsonElement json, AtomicLong increment, Object[] previous) {
-        JsonObject e = json.getAsJsonObject();
-        System.out.println(e);
-
-        Direction direction = Direction.parse(e.get("side").getAsString());
-        Num size = Num.of(e.get("size").getAsString());
-        Num price = Num.of(e.get("price").getAsString());
-        ZonedDateTime date = ZonedDateTime.parse(e.get("time").getAsString(), TimeFormat).withZoneSameLocal(Chrono.UTC);
-        long id = e.get("id").getAsLong();
+    private Execution convert(JSON e, AtomicLong increment, Object[] previous) {
+        Direction direction = Direction.parse(e.getAs(String.class, "side"));
+        Num size = e.getAs(Num.class, "size");
+        Num price = e.getAs(Num.class, "price");
+        ZonedDateTime date = ZonedDateTime.parse(e.getAs(String.class, "time"), TimeFormat).withZoneSameLocal(Chrono.UTC);
+        long id = e.getAs(Long.class, "id");
 
         return Execution.with.direction(direction, size).id(id).price(price).date(date).consecutive(Execution.ConsecutiveDifference);
     }
@@ -220,7 +215,7 @@ class FTXService extends MarketService {
      * @param path
      * @return
      */
-    private Signal<JsonElement> call(String method, String path) {
+    private Signal<JSON> call(String method, String path) {
         Request request = new Request.Builder().url("https://ftx.com/api/" + path).build();
 
         return network.rest(request, Limit).retryWhen(retryPolicy(10, "FTX RESTCall"));
@@ -231,16 +226,15 @@ class FTXService extends MarketService {
      * 
      * @return
      */
-    private synchronized Signal<JsonElement> connectWebSocket(Topic topic) {
+    private synchronized Signal<JSON> connectWebSocket(Topic topic) {
         WebSocketCommand command = new WebSocketCommand();
         command.op = "subscribe";
         command.channel = topic.name();
         command.market = marketName;
 
-        return network.websocket("wss://ftx.com/ws/", command).flatMap(e -> {
-            JsonObject root = e.getAsJsonObject();
-            if (root.get("type").getAsString().equals("update")) {
-                return I.signal(root.getAsJsonArray("data"));
+        return network.websocket("wss://ftx.com/ws/", command).flatMap(root -> {
+            if (root.has("type", "update")) {
+                return I.signal(root.get("data"));
             } else {
                 return I.signal();
             }

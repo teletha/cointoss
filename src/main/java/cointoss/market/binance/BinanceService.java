@@ -232,7 +232,7 @@ class BinanceService extends MarketService {
         String uri = isFutures ? "https://fapi.binance.com/fapi/v1/" : "https://api.binance.com/api/v3/";
         Request request = new Request.Builder().url(uri + path).build();
 
-        return network.rest2(request, Limit).retryWhen(retryPolicy(10, "Binance RESTCall"));
+        return network.rest(request, Limit).retryWhen(retryPolicy(10, "Binance RESTCall"));
     }
 
     /**
@@ -250,7 +250,7 @@ class BinanceService extends MarketService {
             for (Topic type : Topic.values()) {
                 command.params.add(marketName.toLowerCase() + "@" + type);
             }
-            websocket = network.websocket2(uri, command);
+            websocket = network.websocket(uri, command);
         }
 
         return websocket.share().flatMap(root -> {

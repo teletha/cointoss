@@ -279,7 +279,7 @@ class BitMexService extends MarketService {
     private Signal<JSON> call(String method, String path) {
         Request request = new Request.Builder().url("https://www.bitmex.com/api/v1/" + path).build();
 
-        return network.rest2(request, Limit).retryWhen(retryPolicy(10, "BitMEX RESTCall"));
+        return network.rest(request, Limit).retryWhen(retryPolicy(10, "BitMEX RESTCall"));
     }
 
     /**
@@ -295,7 +295,7 @@ class BitMexService extends MarketService {
                 command.args.add(type + ":" + marketName);
             }
 
-            websocket = network.websocket2("wss://www.bitmex.com/realtime", command);
+            websocket = network.websocket("wss://www.bitmex.com/realtime", command);
         }
 
         return websocket.share().flatMap(root -> {

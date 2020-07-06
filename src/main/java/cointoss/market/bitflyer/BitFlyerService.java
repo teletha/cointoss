@@ -655,7 +655,7 @@ class BitFlyerService extends MarketService {
             if (body != null && body.length() != 0) builder = builder.post(RequestBody.create(mime, body));
             request = builder.build();
         }
-        return network.rest2(request, Limit);
+        return network.rest(request, Limit);
     }
 
     /**
@@ -702,7 +702,7 @@ class BitFlyerService extends MarketService {
                         .post(RequestBody
                                 .create(mime, "{\"product_code\":\"FX_BTC_JPY\",\"account_id\":\"" + account.accountId + "\",\"lang\":\"ja\"}"));
 
-                new Network().rest2(builder.build()).to(I.NoOP);
+                new Network().rest(builder.build()).to(I.NoOP);
             });
         }
     }

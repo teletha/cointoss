@@ -17,9 +17,6 @@ import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
-
 import kiss.I;
 import kiss.JSON;
 import kiss.Signal;
@@ -91,14 +88,14 @@ public class Network {
     /**
      * Call REST API.
      */
-    public final Signal<JSON> rest2(Request request) {
-        return rest2(request, null);
+    public final Signal<JSON> rest(Request request) {
+        return rest(request, null);
     }
 
     /**
      * Call REST API.
      */
-    public Signal<JSON> rest2(Request request, APILimiter limiter) {
+    public Signal<JSON> rest(Request request, APILimiter limiter) {
         return new Signal<>((observer, disposer) -> {
             if (limiter != null) {
                 limiter.acquire();
@@ -110,39 +107,6 @@ public class Network {
 
                 if (code == 200) {
                     observer.accept(I.json(value));
-                    observer.complete();
-                } else {
-                    observer.error(new Error("[" + request.url() + "] HTTP Status " + code + " " + value));
-                }
-            } catch (Throwable e) {
-                observer.error(new Error("[" + request.url() + "] throws error : " + e.getMessage(), e));
-            }
-            return disposer;
-        });
-    }
-
-    /**
-     * Call REST API.
-     */
-    public final Signal<JsonElement> rest(Request request) {
-        return rest(request, null);
-    }
-
-    /**
-     * Call REST API.
-     */
-    public Signal<JsonElement> rest(Request request, APILimiter limiter) {
-        return new Signal<>((observer, disposer) -> {
-            if (limiter != null) {
-                limiter.acquire();
-            }
-
-            try (Response response = client().newCall(request).execute(); ResponseBody body = response.body()) {
-                String value = body.string();
-                int code = response.code();
-
-                if (code == 200) {
-                    observer.accept(new JsonParser().parse(value));
                     observer.complete();
                 } else {
                     observer.error(new Error("[" + request.url() + "] HTTP Status " + code + " " + value));
@@ -204,52 +168,7 @@ public class Network {
      * @param jsonCommnad
      * @return
      */
-    public Signal<JsonElement> websocket(String uri, Object jsonCommnad) {
-        return new Signal<JsonElement>((observer, disposer) -> {
-            JsonParser parser = new JsonParser();
-            Request request = new Request.Builder().url(uri).build();
-
-            WebSocket websocket = client().newWebSocket(request, new WebSocketListener() {
-
-                /**
-                 * {@inheritDoc}
-                 */
-                @Override
-                public void onOpen(WebSocket socket, Response response) {
-                    socket.send(I.write(jsonCommnad));
-                }
-
-                /**
-                 * {@inheritDoc}
-                 */
-                @Override
-                public void onMessage(WebSocket socket, String text) {
-                    observer.accept(parser.parse(text));
-                }
-
-                /**
-                 * {@inheritDoc}
-                 */
-                @Override
-                public void onFailure(WebSocket socket, Throwable error, Response response) {
-                    observer.error(error);
-                }
-            });
-
-            return disposer.add(() -> {
-                websocket.close(1000, null);
-            });
-        });
-    }
-
-    /**
-     * Connect by websocket.
-     * 
-     * @param uri
-     * @param jsonCommnad
-     * @return
-     */
-    public Signal<JSON> websocket2(String uri, Object jsonCommnad) {
+    public Signal<JSON> websocket(String uri, Object jsonCommnad) {
         return new Signal<JSON>((observer, disposer) -> {
             Request request = new Request.Builder().url(uri).build();
 
