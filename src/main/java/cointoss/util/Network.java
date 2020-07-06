@@ -145,9 +145,9 @@ public class Network {
                         JSON json = I.json(value);
 
                         if (selector == null || selector.length == 0) {
-                            observer.accept(json.to(type));
+                            observer.accept(json.as(type));
                         } else {
-                            json.findAs(type, selector).forEach(observer);
+                            json.find(type, selector).forEach(observer);
                         }
                     }
                     observer.complete();

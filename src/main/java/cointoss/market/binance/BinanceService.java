@@ -165,15 +165,15 @@ class BinanceService extends MarketService {
         OrderBookPageChanges change = new OrderBookPageChanges();
 
         for (JSON bid : o.find(bidName, "*")) {
-            Num price = bid.getAs(Num.class, "0");
-            double size = bid.getAs(Double.class, "1");
+            Num price = bid.get(Num.class, "0");
+            double size = bid.get(Double.class, "1");
 
             change.bids.add(new OrderBookPage(price, size));
         }
 
         for (JSON ask : o.find(askName, "*")) {
-            Num price = ask.getAs(Num.class, "0");
-            double size = ask.getAs(Double.class, "1");
+            Num price = ask.get(Num.class, "0");
+            double size = ask.get(Double.class, "1");
 
             change.asks.add(new OrderBookPage(price, size));
         }
@@ -204,12 +204,12 @@ class BinanceService extends MarketService {
      * @return
      */
     private Execution convert(JSON e) {
-        Direction direction = e.getAs(Boolean.class, "m") ? Direction.SELL : Direction.BUY;
-        Num size = e.getAs(Num.class, "q");
-        Num price = e.getAs(Num.class, "p");
-        long tradeTime = e.getAs(Long.class, "T");
+        Direction direction = e.get(Boolean.class, "m") ? Direction.SELL : Direction.BUY;
+        Num size = e.get(Num.class, "q");
+        Num price = e.get(Num.class, "p");
+        long tradeTime = e.get(Long.class, "T");
         ZonedDateTime date = Chrono.utcByMills(tradeTime);
-        long tradeId = e.getAs(Long.class, "a");
+        long tradeId = e.get(Long.class, "a");
 
         Execution exe = Execution.with.direction(direction, size)
                 .id(tradeId)

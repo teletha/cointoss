@@ -158,8 +158,8 @@ class BitfinexService extends MarketService {
             OrderBookPageChanges change = new OrderBookPageChanges();
 
             for (JSON data : json.find("*")) {
-                Num price = Num.of(data.getAs(String.class, "0"));
-                double size = data.getAs(Double.class, "2");
+                Num price = data.get(Num.class, "0");
+                double size = data.get(Double.class, "2");
 
                 if (0 < size) {
                     change.bids.add(new OrderBookPage(price, size));
@@ -180,8 +180,8 @@ class BitfinexService extends MarketService {
             OrderBookPageChanges change = new OrderBookPageChanges();
             JSON data = json.get("1");
 
-            Num price = Num.of(data.getAs(String.class, "0"));
-            double size = data.getAs(Double.class, "2");
+            Num price = data.get(Num.class, "0");
+            double size = data.get(Double.class, "2");
 
             if (0 < size) {
                 change.bids.add(new OrderBookPage(price, size));
@@ -217,9 +217,9 @@ class BitfinexService extends MarketService {
      * @return
      */
     private Execution convert(JSON a, AtomicLong increment, Object[] previous) {
-        ZonedDateTime date = Chrono.utcByMills(a.getAs(Long.class, "1"));
-        double size = a.getAs(Double.class, "2");
-        Num price = Num.of(a.getAs(String.class, "3"));
+        ZonedDateTime date = Chrono.utcByMills(a.get(Long.class, "1"));
+        double size = a.get(Double.class, "2");
+        Num price = a.get(Num.class, "3");
         Direction direction = 0 < size ? Direction.BUY : Direction.SELL;
         if (direction == Direction.SELL) size *= -1;
 
@@ -324,15 +324,15 @@ class BitfinexService extends MarketService {
         Map<Number, Topic> map = new HashMap();
 
         return websocket.share().flatMap(e -> {
-            String channel = e.getAs(String.class, "channel");
+            String channel = e.text("channel");
 
             if (channel != null) {
-                map.put(e.getAs(Integer.class, "chanId"), Topic.valueOf(channel));
+                map.put(e.get(Integer.class, "chanId"), Topic.valueOf(channel));
             } else {
-                Topic name = map.get(e.getAs(Integer.class, "0"));
+                Topic name = map.get(e.get(Integer.class, "0"));
                 if (name == topic) {
                     // ignore snapshot and update
-                    if (e.getAs(String.class, "1").endsWith("e")) {
+                    if (e.text("1").endsWith("e")) {
                         return I.signal(e.get("2"));
                     }
                 }
@@ -388,7 +388,7 @@ class BitfinexService extends MarketService {
             expose.take(json -> json.has("event", "subscribed") && json.has("channel", topic.name()) && json.has("pair", symbol))
                     .first()
                     .to(json -> {
-                        id[0] = json.getAs(String.class, "chanId");
+                        id[0] = json.text("chanId");
                     });
 
             return invoke(new Command("subscribe", topic.name(), symbol))

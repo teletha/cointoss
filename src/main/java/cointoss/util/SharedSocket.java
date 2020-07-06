@@ -134,14 +134,14 @@ public abstract class SharedSocket {
     public static void main(String[] args) throws InterruptedException {
         JsonRPC ws = new JsonRPC("wss://ws.lightstream.bitflyer.com/json-rpc");
         Disposable disposable = ws.subscribe("lightning_executions_FX_BTC_JPY").flatIterable(json -> json.find("*")).to(v -> {
-            System.out.println(v.to(String.class));
+            System.out.println(v.as(String.class));
         }, e -> {
             e.printStackTrace();
         });
 
         Thread.sleep(1000 * 2);
         Disposable disposable2 = ws.subscribe("lightning_board_FX_BTC_JPY").to(v -> {
-            System.out.println(v.to(String.class));
+            System.out.println(v.as(String.class));
         });
 
         Thread.sleep(1000 * 10);

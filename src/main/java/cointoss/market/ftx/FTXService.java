@@ -199,11 +199,11 @@ class FTXService extends MarketService {
      * @return
      */
     private Execution convert(JSON e, AtomicLong increment, Object[] previous) {
-        Direction direction = Direction.parse(e.getAs(String.class, "side"));
-        Num size = e.getAs(Num.class, "size");
-        Num price = e.getAs(Num.class, "price");
-        ZonedDateTime date = ZonedDateTime.parse(e.getAs(String.class, "time"), TimeFormat).withZoneSameLocal(Chrono.UTC);
-        long id = e.getAs(Long.class, "id");
+        Direction direction = Direction.parse(e.get(String.class, "side"));
+        Num size = e.get(Num.class, "size");
+        Num price = e.get(Num.class, "price");
+        ZonedDateTime date = ZonedDateTime.parse(e.get(String.class, "time"), TimeFormat).withZoneSameLocal(Chrono.UTC);
+        long id = e.get(Long.class, "id");
 
         return Execution.with.direction(direction, size).id(id).price(price).date(date).consecutive(Execution.ConsecutiveDifference);
     }

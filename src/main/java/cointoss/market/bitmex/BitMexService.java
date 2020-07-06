@@ -193,12 +193,12 @@ class BitMexService extends MarketService {
     private OrderBookPageChanges convertOrderBook(List<JSON> array) {
         OrderBookPageChanges change = new OrderBookPageChanges();
         for (JSON o : array) {
-            long id = o.getAs(Long.class, "id");
+            long id = o.get(Long.class, "id");
             Num price = instrumentTickSize.multiply((100000000L * marketId) - id);
             JSON sizeElement = o.get("size");
-            double size = sizeElement == null ? 0 : sizeElement.to(Double.class) / price.doubleValue();
+            double size = sizeElement == null ? 0 : sizeElement.as(Double.class) / price.doubleValue();
 
-            if (o.getAs(String.class, "side").charAt(0) == 'B') {
+            if (o.get(String.class, "side").charAt(0) == 'B') {
                 change.bids.add(new OrderBookPage(price, size));
             } else {
                 change.asks.add(new OrderBookPage(price, size));
@@ -239,11 +239,11 @@ class BitMexService extends MarketService {
      * @return
      */
     private Execution convert(JSON e, AtomicLong increment, Object[] previous) {
-        Direction direction = Direction.parse(e.getAs(String.class, "side"));
-        Num size = Num.of(e.getAs(String.class, "homeNotional"));
-        Num price = Num.of(e.getAs(String.class, "price"));
-        ZonedDateTime date = ZonedDateTime.parse(e.getAs(String.class, "timestamp"), RealTimeFormat).withZoneSameLocal(Chrono.UTC);
-        String tradeId = e.getAs(String.class, "trdMatchID");
+        Direction direction = Direction.parse(e.get(String.class, "side"));
+        Num size = Num.of(e.get(String.class, "homeNotional"));
+        Num price = Num.of(e.get(String.class, "price"));
+        ZonedDateTime date = ZonedDateTime.parse(e.get(String.class, "timestamp"), RealTimeFormat).withZoneSameLocal(Chrono.UTC);
+        String tradeId = e.get(String.class, "trdMatchID");
         long id;
         int consecutive;
 
