@@ -15,7 +15,6 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
@@ -64,7 +63,6 @@ public class EfficientWebSocket {
                     ws.sendText(I.write(command), true);
                 }
                 queued = null;
-                Thread.currentThread().setName("EfficientWS writer " + uri);
             }
         }).to(text -> {
             JSON json = I.json(text);
@@ -78,8 +76,10 @@ public class EfficientWebSocket {
                 signaling.accept(json);
             }
         }, e -> {
+            e.printStackTrace();
             signals.values().forEach(signal -> signal.error(e));
         }, () -> {
+            System.out.println("COMP");
             signals.values().forEach(signal -> signal.complete());
         });
     }
@@ -267,22 +267,29 @@ public class EfficientWebSocket {
      */
     static class Command extends IdentifiableTopic {
 
-        public String method = "SUBSCRIBE";
+        public long id = 123;
 
-        public List<String> params = new ArrayList();
+        public String jsonrpc = "2.0";
 
-        public int id = 0;
+        public String method = "subscribe";
 
-        private Command(String channel, String market) {
-            super(market.toLowerCase() + "@" + channel, "SUBSCRIBE", "UNSUBSCRIBE");
-            this.params.add(market.toLowerCase() + "@" + channel);
+        public Map<String, String> params = new HashMap();
+
+        /**
+         * @param id
+         */
+        public Command(String channel, String marketName) {
+            super("[" + channel + marketName + "]");
+            params.put("channel", channel + marketName);
         }
     }
 
     public static void main(String[] args) throws InterruptedException {
-        EfficientWebSocket realtime = new EfficientWebSocket("wss://fstream.binance.com/stream", 25, json -> json.text("stream"));
+        EfficientWebSocket realtime = new EfficientWebSocket("wss://ws.lightstream.bitflyer.com/json-rpc", 25, json -> {
+            return json.find(String.class, "params", "channel").toString();
+        });
 
-        realtime.subscribe(new Command("depth20@100ms", "BTCUSDT")).to(e -> {
+        realtime.subscribe(new Command("lightning_board_", "FX_BTC_JPY")).to(e -> {
             System.out.println("BTC  " + e);
         });
 

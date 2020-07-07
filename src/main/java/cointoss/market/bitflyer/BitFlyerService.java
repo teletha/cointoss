@@ -9,7 +9,7 @@
  */
 package cointoss.market.bitflyer;
 
-import static kiss.I.*;
+import static kiss.I.translate;
 import static viewtify.ui.UIWeb.Operation.*;
 
 import java.nio.charset.StandardCharsets;
@@ -41,6 +41,8 @@ import cointoss.order.OrderState;
 import cointoss.order.OrderType;
 import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
+import cointoss.util.EfficientWebSocket;
+import cointoss.util.EfficientWebSocket.IdentifiableTopic;
 import cointoss.util.Network;
 import cointoss.util.Num;
 import kiss.Disposable;
@@ -71,6 +73,11 @@ class BitFlyerService extends MarketService {
 
     /** The bitflyer API limit. */
     private static final APILimiter Limit = APILimiter.with.limit(500).refresh(Duration.ofMinutes(5));
+
+    /** The realtime communicator. */
+    private static final EfficientWebSocket Realtime = new EfficientWebSocket("wss://ws.lightstream.bitflyer.com/json-rpc", 25, json -> {
+        return json.find(String.class, "params", "channel").toString();
+    });
 
     /** The realtime data format */
     static final DateTimeFormatter RealTimeFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
@@ -285,8 +292,8 @@ class BitFlyerService extends MarketService {
     protected Signal<Execution> connectExecutionRealtimely() {
         String[] previous = new String[] {"", ""};
 
-        return network.jsonRPC("wss://ws.lightstream.bitflyer.com/json-rpc", "lightning_executions_" + marketName)
-                .flatIterable(e -> e.find("*"))
+        return Realtime.subscribe(new Topic("lightning_executions_", marketName))
+                .flatIterable(json -> json.find("params", "message", "*"))
                 .map(e -> {
                     long id = e.get(Long.class, "id");
 
@@ -559,7 +566,9 @@ class BitFlyerService extends MarketService {
      */
     @Override
     protected Signal<OrderBookPageChanges> connectOrderBookRealtimely() {
-        return network.jsonRPC("wss://ws.lightstream.bitflyer.com/json-rpc", "lightning_board_" + marketName).map(e -> {
+        return Realtime.subscribe(new Topic("lightning_board_", marketName)).map(root -> {
+            JSON e = root.get("params").get("message");
+
             OrderBookPageChanges change = new OrderBookPageChanges();
             for (JSON ask : e.find("asks", "*")) {
                 change.asks.add(new OrderBookPage(ask.get(Num.class, "price"), ask.get(Double.class, "size")));
@@ -900,5 +909,27 @@ class BitFlyerService extends MarketService {
     private static class Internals {
 
         private String id;
+    }
+
+    /**
+     * 
+     */
+    public static class Topic extends IdentifiableTopic {
+
+        public long id = 123;
+
+        public String jsonrpc = "2.0";
+
+        public String method = "subscribe";
+
+        public Map<String, String> params = new HashMap();
+
+        /**
+         * @param id
+         */
+        public Topic(String channel, String marketName) {
+            super("[" + channel + marketName + "]");
+            params.put("channel", channel + marketName);
+        }
     }
 }
