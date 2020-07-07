@@ -26,6 +26,8 @@ import cointoss.order.OrderBookPageChanges;
 import cointoss.order.OrderState;
 import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
+import cointoss.util.EfficientWebSocket;
+import cointoss.util.EfficientWebSocket.IdentifiableTopic;
 import cointoss.util.Num;
 import kiss.I;
 import kiss.JSON;
@@ -43,14 +45,15 @@ class BitMexService extends MarketService {
     /** The bitflyer API limit. */
     private static final APILimiter Limit = APILimiter.with.limit(45).refresh(Duration.ofMinutes(1));
 
+    /** The realtime communicator. */
+    private static final EfficientWebSocket RealtimeCommunication = new EfficientWebSocket("wss://www.bitmex.com/realtime", 25, json -> json
+            .text("table") + json.find(String.class, "data", "0", "symbol"));
+
     /** The market id. */
     private final int marketId;
 
     /** The instrument tick size. */
     private final Num instrumentTickSize;
-
-    /** The shared websocket connection. */
-    private Signal<JSON> websocket;
 
     /**
      * @param marketName
@@ -124,7 +127,9 @@ class BitMexService extends MarketService {
         AtomicLong increment = new AtomicLong();
         Object[] previous = new Object[2];
 
-        return connectSharedWebSocket(Topic.trade).flatIterable(e -> e).map(e -> convert(e, increment, previous));
+        return RealtimeCommunication.subscribe(new Topic("trade", marketName))
+                .flatIterable(json -> json.find("data", "*"))
+                .map(json -> convert(json, increment, previous));
     }
 
     /**
@@ -181,24 +186,26 @@ class BitMexService extends MarketService {
      */
     @Override
     protected Signal<OrderBookPageChanges> connectOrderBookRealtimely() {
-        return connectSharedWebSocket(Topic.orderBookL2).map(this::convertOrderBook);
+        return RealtimeCommunication.subscribe(new Topic("orderBookL2", marketName))
+                .map(json -> json.find("data", "*"))
+                .map(this::convertOrderBook);
     }
 
     /**
      * Convert json to {@link OrderBookPageChanges}.
      * 
-     * @param array
+     * @param pages
      * @return
      */
-    private OrderBookPageChanges convertOrderBook(List<JSON> array) {
+    private OrderBookPageChanges convertOrderBook(List<JSON> pages) {
         OrderBookPageChanges change = new OrderBookPageChanges();
-        for (JSON o : array) {
-            long id = o.get(Long.class, "id");
+        for (JSON page : pages) {
+            long id = Long.parseLong(page.text("id"));
             Num price = instrumentTickSize.multiply((100000000L * marketId) - id);
-            JSON sizeElement = o.get("size");
+            JSON sizeElement = page.get("size");
             double size = sizeElement == null ? 0 : sizeElement.as(Double.class) / price.doubleValue();
 
-            if (o.get(String.class, "side").charAt(0) == 'B') {
+            if (page.text("side").charAt(0) == 'B') {
                 change.bids.add(new OrderBookPage(price, size));
             } else {
                 change.asks.add(new OrderBookPage(price, size));
@@ -283,47 +290,18 @@ class BitMexService extends MarketService {
     }
 
     /**
-     * Build shared websocket connection for this market.
-     * 
-     * @return
+     * Subscription topic for websocket communication.
      */
-    private synchronized Signal<List<JSON>> connectSharedWebSocket(Topic topic) {
-        if (websocket == null) {
-            WebSocketCommand command = new WebSocketCommand();
-            command.op = "subscribe";
-            for (Topic type : Topic.values()) {
-                command.args.add(type + ":" + marketName);
-            }
+    static class Topic extends IdentifiableTopic {
 
-            websocket = network.websocket("wss://www.bitmex.com/realtime", command);
-        }
-
-        return websocket.share().flatMap(root -> {
-            if (root.has("table", topic.name())) {
-                return I.signal(root.get("data")).map(e -> e.find("*"));
-            } else {
-                return I.signal();
-            }
-        }).effectOnError(e -> {
-            e.printStackTrace();
-        });
-    }
-
-    /**
-     * Subscription topics for websocket.
-     */
-    private enum Topic {
-        trade, orderBookL2, orderBookL2_25;
-    }
-
-    /**
-     * 
-     */
-    @SuppressWarnings("unused")
-    private static class WebSocketCommand {
-
-        public String op;
+        public String op = "subscribe";
 
         public List<String> args = new ArrayList();
+
+        private Topic(String channel, String market) {
+            super(channel + "[" + market + "]");
+
+            this.args.add(channel + ":" + market);
+        }
     }
 }

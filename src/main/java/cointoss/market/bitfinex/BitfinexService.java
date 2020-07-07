@@ -11,8 +11,8 @@ package cointoss.market.bitfinex;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Function;
 
 import cointoss.Direction;
 import cointoss.MarketService;
@@ -24,8 +24,9 @@ import cointoss.order.OrderBookPageChanges;
 import cointoss.order.OrderState;
 import cointoss.util.APILimiter;
 import cointoss.util.Chrono;
+import cointoss.util.EfficientWebSocket;
+import cointoss.util.EfficientWebSocket.IdentifiableTopic;
 import cointoss.util.Num;
-import cointoss.util.SharedSocket;
 import kiss.I;
 import kiss.JSON;
 import kiss.Signal;
@@ -42,8 +43,21 @@ class BitfinexService extends MarketService {
     /** The API limit. */
     private static final APILimiter LimitForBook = APILimiter.with.limit(30).refresh(Duration.ofMinutes(1));
 
+    /** Extract id from websocket stream. */
+    private static final Function<JSON, String> extractId = json -> {
+        String chanId = json.text("0");
+        if (chanId != null) {
+            return chanId;
+        } else {
+            // for initial subscribed response
+            return json.text("channel") + json.text("pair");
+        }
+    };
+
     /** The realtiem communicator. */
-    private final Realtime realtime = new Realtime();
+    private static final EfficientWebSocket realtime = new EfficientWebSocket("wss://api-pub.bitfinex.com/ws/2", 25, extractId)
+            .updateIdBy(json -> json.text("chanId"))
+            .ignoreIf(json -> json.has("1", "hb")); // ignore heartbeat
 
     /**
      * @param marketName
@@ -104,7 +118,9 @@ class BitfinexService extends MarketService {
         AtomicLong increment = new AtomicLong();
         Object[] previous = new Object[2];
 
-        return realtime.subscribe(Topic.trades, marketName).take(e -> e.has("1", "tu")).map(e -> convert(e.get("2"), increment, previous));
+        return realtime.subscribe(new Topic("trades", marketName))
+                .take(e -> e.has("1", "tu"))
+                .map(e -> convert(e.get("2"), increment, previous));
     }
 
     /**
@@ -175,12 +191,12 @@ class BitfinexService extends MarketService {
      */
     @Override
     protected Signal<OrderBookPageChanges> connectOrderBookRealtimely() {
-        return realtime.subscribe(Topic.book, marketName).map(json -> {
+        return realtime.subscribe(new Topic("book", marketName)).skip(1).map(json -> {
             OrderBookPageChanges change = new OrderBookPageChanges();
             JSON data = json.get("1");
 
             Num price = data.get(Num.class, "0");
-            double size = data.get(Double.class, "2");
+            double size = Double.parseDouble(data.text("2"));
 
             if (0 < size) {
                 change.bids.add(new OrderBookPage(price, size));
@@ -269,92 +285,20 @@ class BitfinexService extends MarketService {
     }
 
     /**
-     * Subscription topics for websocket.
-     */
-    private enum Topic {
-        trades, book;
-    }
-
-    /**
      * 
      */
-    private static class Realtime extends SharedSocket {
+    static class Topic extends IdentifiableTopic {
 
-        /**
-         *
-         */
-        private Realtime() {
-            super("wss://api-pub.bitfinex.com/ws/2", I::json);
+        public String event = "subscribe";
+
+        public String channel;
+
+        public String symbol;
+
+        private Topic(String channel, String symbol) {
+            super(channel + symbol);
+            this.channel = channel;
+            this.symbol = symbol;
         }
-
-        /**
-         * Subscribe channel.
-         * 
-         * @param topic
-         * @return
-         */
-        private Signal<JSON> subscribe(Topic topic, String symbol) {
-            String[] id = {"-1"};
-
-            // retrieve channel id
-            expose.take(json -> json.has("event", "subscribed") && json.has("channel", topic.name()) && json.has("pair", symbol))
-                    .first()
-                    .to(json -> {
-                        id[0] = json.text("chanId");
-                    });
-
-            return invoke(new Command("subscribe", topic.name(), symbol))
-                    .effectOnDispose(() -> invoke(new Command("unsubscribe", topic.name(), symbol)))
-                    .take(json -> json.has("0", id[0]) && !json.has("1", "hb")) // skip heartbeat
-                    .skip(1); // skip snapshot
-        }
-
-        /**
-         * 
-         */
-        private static class Command {
-
-            public String event;
-
-            public String channel;
-
-            public String symbol;
-
-            /**
-             * @param channel
-             * @param symbol
-             */
-            private Command(String event, String channel, String symbol) {
-                this.event = event;
-                this.channel = channel;
-                this.symbol = symbol;
-            }
-        }
-    }
-
-    public static void main(String[] args) throws InterruptedException {
-
-        Bitfinex.BTC_USDT.executionLatest().to(e -> {
-            System.out.println(e);
-        });
-
-        Bitfinex.BTC_USDT.executionsRealtimely().to(e -> {
-            System.out.println(e + "  " + Thread.currentThread().getName());
-        });
-
-        Bitfinex.BTC_USDT.orderBookRealtimely().throttle(1, TimeUnit.SECONDS).to(e -> {
-            e.bids.forEach(page -> {
-                System.out.println(page + "  " + Thread.currentThread().getName());
-            });
-            e.asks.forEach(page -> {
-                System.out.println(page + "  " + Thread.currentThread().getName());
-            });
-        }, e -> {
-            e.printStackTrace();
-        }, () -> {
-            System.out.println("COMPLETE");
-        });
-
-        Thread.sleep(1000 * 60 * 15);
     }
 }
