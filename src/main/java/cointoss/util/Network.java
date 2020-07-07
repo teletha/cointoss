@@ -75,13 +75,4 @@ public class Network {
             return I.signal();
         }
     }
-
-    /**
-     * Create {@link HttpRequest.Builder}.
-     * 
-     * @param uri
-     */
-    public static HttpRequest.Builder request(String... uri) {
-        return HttpRequest.newBuilder(URI.create(String.join("", uri)));
-    }
 }
