@@ -88,9 +88,6 @@ class BitFlyerService extends MarketService {
     /** The realtime data format */
     static final DateTimeFormatter RealTimeFormatUntilHour = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH");
 
-    /** The api url. */
-    static final String API = "https://api.bitflyer.com";
-
     /** The internal order manager. */
     private final Map<String, Order> orders = new ConcurrentHashMap();
 
@@ -147,7 +144,7 @@ class BitFlyerService extends MarketService {
             request.size = order.size.doubleValue();
             request.time_in_force = order.quantityCondition.abbreviation;
 
-            call = rest("POST", API + "/v1/me/sendchildorder", APIType.Private, I.write(request))
+            call = rest("POST", API.Private, "/v1/me/sendchildorder", I.write(request))
                     .flatIterable(json -> json.find(String.class, "child_order_acceptance_id"));
         } else {
             ChildOrderRequestWebAPI request = new ChildOrderRequestWebAPI();
@@ -161,8 +158,7 @@ class BitFlyerService extends MarketService {
             request.size = order.size.doubleValue();
             request.time_in_force = order.quantityCondition.abbreviation;
 
-            call = rest("POST", "https://lightning.bitflyer.jp/api/trade/sendorder", APIType.Internal, I.write(request))
-                    .map(json -> json.get("data").text("order_ref_id"));
+            call = rest("POST", API.Internal, "/trade/sendorder", I.write(request)).map(json -> json.get("data").text("order_ref_id"));
         }
 
         Complementer complementer = new Complementer(order);
@@ -252,8 +248,8 @@ class BitFlyerService extends MarketService {
         cancel.child_order_acceptance_id = order.id;
 
         Signal<?> call = forTest || Session.id == null || cancel.order_id == null
-                ? rest("POST", API + "/v1/me/cancelchildorder", APIType.Private, I.write(cancel))
-                : rest("POST", "https://lightning.bitflyer.jp/api/trade/cancelorder", APIType.Internal, I.write(cancel));
+                ? rest("POST", API.Private, "/v1/me/cancelchildorder", I.write(cancel))
+                : rest("POST", API.Internal, "/trade/cancelorder", I.write(cancel));
 
         Signal<Order> isCancelled = intervalOrderCheck.map(orders -> {
             for (Order listed : orders) {
@@ -382,8 +378,8 @@ class BitFlyerService extends MarketService {
     public Signal<Execution> executions(long start, long end) {
         String[] previous = new String[] {"", ""};
 
-        return rest("GET", API + "/v1/executions?product_code=" + marketName + "&count=" + setting
-                .acquirableExecutionSize() + "&before=" + end + "&after=" + start, APIType.Public) //
+        return rest("GET", API.Public, "/v1/executions?product_code=" + marketName + "&count=" + setting
+                .acquirableExecutionSize() + "&before=" + end + "&after=" + start) //
                         .flatIterable(e -> e.find("*"))
                         .reverse()
                         .map(e -> convert(e, previous));
@@ -396,7 +392,7 @@ class BitFlyerService extends MarketService {
     public Signal<Execution> executionLatest() {
         String[] previous = new String[] {"", ""};
 
-        return rest("GET", API + "/v1/executions?product_code=" + marketName + "&count=1", APIType.Public).flatIterable(e -> e.find("*"))
+        return rest("GET", API.Public, "/v1/executions?product_code=" + marketName + "&count=1").flatIterable(e -> e.find("*"))
                 .map(e -> convert(e, previous));
     }
 
@@ -498,7 +494,7 @@ class BitFlyerService extends MarketService {
      */
     @Override
     public Signal<Order> orders() {
-        return rest("GET", API + "/v1/me/getchildorders?product_code=" + marketName, APIType.Private)
+        return rest("GET", API.Private, "/v1/me/getchildorders?product_code=" + marketName)
                 .flatIterable(json -> json.find(ChildOrderResponse.class, "*"))
                 .map(ChildOrderResponse::toOrder);
     }
@@ -508,7 +504,7 @@ class BitFlyerService extends MarketService {
      */
     @Override
     public Signal<Order> orders(OrderState state) {
-        return rest("GET", API + "/v1/me/getchildorders?child_order_state=" + state + "&product_code=" + marketName, APIType.Private)
+        return rest("GET", API.Private, "/v1/me/getchildorders?child_order_state=" + state + "&product_code=" + marketName)
                 .flatIterable(json -> json.find(ChildOrderResponse.class, "*"))
                 .map(ChildOrderResponse::toOrder);
     }
@@ -542,7 +538,7 @@ class BitFlyerService extends MarketService {
      */
     @Override
     public Signal<Num> baseCurrency() {
-        return rest("GET", API + "/v1/me/getbalance", APIType.Private).flatIterable(json -> json.find(CurrencyState.class, "*"))
+        return rest("GET", API.Private, "/v1/me/getbalance").flatIterable(json -> json.find(CurrencyState.class, "*"))
                 .take(unit -> unit.currency_code.equals("JPY"))
                 .map(unit -> unit.available);
     }
@@ -552,7 +548,7 @@ class BitFlyerService extends MarketService {
      */
     @Override
     public Signal<Num> targetCurrency() {
-        return rest("GET", API + "/v1/me/getbalance", APIType.Private).flatIterable(json -> json.find(CurrencyState.class, "*"))
+        return rest("GET", API.Private, "/v1/me/getbalance").flatIterable(json -> json.find(CurrencyState.class, "*"))
                 .take(unit -> unit.currency_code.equals("BTC"))
                 .map(unit -> unit.available);
     }
@@ -562,7 +558,7 @@ class BitFlyerService extends MarketService {
      */
     @Override
     public Signal<OrderBookPageChanges> orderBook() {
-        return rest("GET", API + "/v1/board?product_code=" + marketName, APIType.Public).map(json -> json.as(OrderBookPageChanges.class));
+        return rest("GET", API.Public, "/v1/board?product_code=" + marketName).map(json -> json.as(OrderBookPageChanges.class));
     }
 
     /**
@@ -589,19 +585,19 @@ class BitFlyerService extends MarketService {
      * Execute REST operation.
      * 
      * @param method
+     * @param api
      * @param uri
-     * @param apiType
      * @param bodyContents
      * @return
      */
-    private Signal<JSON> rest(String method, String uri, APIType apiType, String... bodyContents) {
-        URI u = URI.create(uri);
+    private Signal<JSON> rest(String method, API api, String uri, String... bodyContents) {
+        URI u = URI.create(api + uri);
         String bodyText = String.join("", bodyContents);
 
         HttpRequest.Builder builder = HttpRequest.newBuilder(u);
 
         // authentication if needed
-        switch (apiType) {
+        switch (api) {
         case Public:
             break;
 
@@ -831,29 +827,6 @@ class BitFlyerService extends MarketService {
     }
 
     /**
-     * @version 2018/02/09 11:42:24
-     */
-    private static class WebResponse {
-
-        /** Generic parameter */
-        public int status;
-
-        /** Generic parameter */
-        public String error_message;
-
-        /** Generic parameter */
-        public Map<String, String> data = new HashMap();
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public String toString() {
-            return "WebResponse [status=" + status + ", error_message=" + error_message + ", data=" + data + "]";
-        }
-    }
-
-    /**
      * 
      */
     @SuppressWarnings("unused")
@@ -904,7 +877,24 @@ class BitFlyerService extends MarketService {
     /**
      * API Category
      */
-    private enum APIType {
-        Public, Private, Internal
+    private enum API {
+        Public("https://api.bitflyer.com"), Private("https://api.bitflyer.com"), Internal("https://lightning.bitflyer.jp/api");
+
+        private final String uri;
+
+        /**
+         * @param uri
+         */
+        private API(String uri) {
+            this.uri = uri;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String toString() {
+            return uri;
+        }
     }
 }

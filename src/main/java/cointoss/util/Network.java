@@ -14,16 +14,11 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpRequest.Builder;
 
-import org.apache.logging.log4j.LogManager;
-
 import kiss.I;
 import kiss.JSON;
 import kiss.Signal;
 
 public class Network {
-
-    /** The logging system. */
-    private static final org.apache.logging.log4j.Logger log = LogManager.getLogger(Network.class);
 
     /**
      * Call REST API.
