@@ -9,10 +9,10 @@
  */
 package cointoss.util;
 
+import java.net.http.HttpRequest.Builder;
+
 import kiss.I;
-import kiss.JSON;
 import kiss.Signal;
-import okhttp3.Request;
 
 public class ErrorNetwork extends Network {
 
@@ -20,7 +20,7 @@ public class ErrorNetwork extends Network {
      * {@inheritDoc}
      */
     @Override
-    public Signal<JSON> rest(Request request, APILimiter limiter) {
+    public <M> Signal<M> rest(Builder request, APILimiter limiter, Class<M> type, String... selector) {
         return I.signalError(new Error());
     }
 }

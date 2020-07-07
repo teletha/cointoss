@@ -9,6 +9,9 @@
  */
 package cointoss.market.ftx;
 
+import java.net.URI;
+import java.net.http.HttpRequest;
+import java.net.http.HttpRequest.Builder;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -27,7 +30,6 @@ import cointoss.util.Num;
 import kiss.I;
 import kiss.JSON;
 import kiss.Signal;
-import okhttp3.Request;
 
 class FTXService extends MarketService {
 
@@ -210,9 +212,9 @@ class FTXService extends MarketService {
      * @return
      */
     private Signal<JSON> call(String method, String path) {
-        Request request = new Request.Builder().url("https://ftx.com/api/" + path).build();
+        Builder builder = HttpRequest.newBuilder(URI.create("https://ftx.com/api/" + path));
 
-        return network.rest(request, Limit).retryWhen(retryPolicy(10, "FTX RESTCall"));
+        return network.rest(builder, Limit).retryWhen(retryPolicy(10, "FTX RESTCall"));
     }
 
     public static void main(String[] args) throws InterruptedException {

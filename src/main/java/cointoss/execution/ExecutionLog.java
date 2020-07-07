@@ -56,12 +56,10 @@ import cointoss.Market;
 import cointoss.MarketService;
 import cointoss.market.MarketServiceProvider;
 import cointoss.market.bitflyer.BitFlyer;
-import cointoss.market.bitmex.BitMex;
 import cointoss.ticker.Span;
 import cointoss.ticker.Ticker;
 import cointoss.ticker.TickerManager;
 import cointoss.util.Chrono;
-import cointoss.util.Network;
 import cointoss.util.Num;
 import kiss.I;
 import kiss.Observer;
@@ -982,15 +980,6 @@ public class ExecutionLog {
         cache2.writeNormal();
 
         Thread.sleep(30000);
-    }
-
-    public static void main7(String[] args) {
-        Network.proxy("178.128.231.246", 3128);
-
-        ExecutionLog log = new ExecutionLog(BitMex.XBT_USD);
-        log.fetch(0, Chrono.utc(2018, 1, 1), Chrono.utc(2019, 7, 31));
-
-        Network.terminate();
     }
 
     /**

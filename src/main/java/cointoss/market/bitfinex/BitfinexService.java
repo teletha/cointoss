@@ -9,6 +9,9 @@
  */
 package cointoss.market.bitfinex;
 
+import java.net.URI;
+import java.net.http.HttpRequest;
+import java.net.http.HttpRequest.Builder;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.concurrent.atomic.AtomicLong;
@@ -30,7 +33,6 @@ import cointoss.util.Num;
 import kiss.I;
 import kiss.JSON;
 import kiss.Signal;
-import okhttp3.Request;
 
 class BitfinexService extends MarketService {
 
@@ -279,9 +281,9 @@ class BitfinexService extends MarketService {
      * @return
      */
     private Signal<JSON> call(String method, String path, APILimiter limiter) {
-        Request request = new Request.Builder().url("https://api-pub.bitfinex.com/v2/" + path).build();
+        Builder builder = HttpRequest.newBuilder(URI.create("https://api-pub.bitfinex.com/v2/" + path));
 
-        return network.rest(request, limiter).retryWhen(retryPolicy(10, "Bitfinex RESTCall"));
+        return network.rest(builder, limiter).retryWhen(retryPolicy(10, "Bitfinex RESTCall"));
     }
 
     /**

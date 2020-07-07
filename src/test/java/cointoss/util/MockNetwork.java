@@ -9,6 +9,7 @@
  */
 package cointoss.util;
 
+import java.net.http.HttpRequest.Builder;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -18,7 +19,6 @@ import java.util.Queue;
 import kiss.JSON;
 import kiss.Signal;
 import kiss.Signaling;
-import okhttp3.Request;
 
 public class MockNetwork extends Network {
 
@@ -32,8 +32,8 @@ public class MockNetwork extends Network {
      * {@inheritDoc}
      */
     @Override
-    public final <M> Signal<M> rest(Request request, APILimiter limiter, Class<M> type, String[] selector) {
-        String path = request.url().encodedPath();
+    public <M> Signal<M> rest(Builder request, APILimiter limiter, Class<M> type, String... selector) {
+        String path = request.build().uri().getRawPath();
         MockResponse mock = responses.get(path);
 
         if (mock == null) {

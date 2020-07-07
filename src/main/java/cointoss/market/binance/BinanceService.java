@@ -9,6 +9,9 @@
  */
 package cointoss.market.binance;
 
+import java.net.URI;
+import java.net.http.HttpRequest;
+import java.net.http.HttpRequest.Builder;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -30,7 +33,6 @@ import cointoss.util.Num;
 import kiss.I;
 import kiss.JSON;
 import kiss.Signal;
-import okhttp3.Request;
 
 class BinanceService extends MarketService {
 
@@ -238,9 +240,9 @@ class BinanceService extends MarketService {
      */
     private Signal<JSON> call(String method, String path) {
         String uri = isFutures ? "https://fapi.binance.com/fapi/v1/" : "https://api.binance.com/api/v3/";
-        Request request = new Request.Builder().url(uri + path).build();
+        Builder builder = HttpRequest.newBuilder(URI.create(uri + path));
 
-        return network.rest(request, Limit).retryWhen(retryPolicy(10, "Binance RESTCall"));
+        return network.rest(builder, Limit).retryWhen(retryPolicy(10, "Binance RESTCall"));
     }
 
     /**

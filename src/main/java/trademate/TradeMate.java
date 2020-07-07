@@ -22,7 +22,6 @@ import cointoss.market.bitfinex.Bitfinex;
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.market.bitmex.BitMex;
 import cointoss.util.Chrono;
-import cointoss.util.Network;
 import kiss.I;
 import kiss.Managed;
 import kiss.Singleton;
@@ -138,7 +137,6 @@ public class TradeMate extends View {
                 .use(Theme.Dark)
                 .icon("icon/app.png")
                 .language(I.env("language", Locale.getDefault().getLanguage()))
-                .onTerminating(Network::terminate)
                 .activate(TradeMate.class);
     }
 }

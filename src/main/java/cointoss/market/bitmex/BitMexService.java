@@ -9,6 +9,9 @@
  */
 package cointoss.market.bitmex;
 
+import java.net.URI;
+import java.net.http.HttpRequest;
+import java.net.http.HttpRequest.Builder;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -32,7 +35,6 @@ import cointoss.util.Num;
 import kiss.I;
 import kiss.JSON;
 import kiss.Signal;
-import okhttp3.Request;
 
 class BitMexService extends MarketService {
 
@@ -282,9 +284,9 @@ class BitMexService extends MarketService {
      * @return
      */
     private Signal<JSON> call(String method, String path) {
-        Request request = new Request.Builder().url("https://www.bitmex.com/api/v1/" + path).build();
+        Builder builder = HttpRequest.newBuilder(URI.create("https://www.bitmex.com/api/v1/" + path));
 
-        return network.rest(request, Limit).retryWhen(retryPolicy(10, "BitMEX RESTCall"));
+        return network.rest(builder, Limit).retryWhen(retryPolicy(10, "BitMEX RESTCall"));
     }
 
     /**

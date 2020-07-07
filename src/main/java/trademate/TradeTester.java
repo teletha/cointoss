@@ -14,7 +14,6 @@ import java.util.Locale;
 import org.apache.logging.log4j.LogManager;
 
 import cointoss.Market;
-import cointoss.util.Network;
 import kiss.I;
 import kiss.Managed;
 import kiss.Singleton;
@@ -60,7 +59,6 @@ public class TradeTester extends View {
                 .use(Theme.Dark)
                 .icon("icon/tester.png")
                 .language(I.env("language", Locale.getDefault().getLanguage()))
-                .onTerminating(Network::terminate)
                 .activate(TradeTester.class);
     }
 }
