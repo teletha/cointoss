@@ -15,6 +15,7 @@ import static viewtify.ui.UIWeb.Operation.*;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
+import java.net.http.HttpRequest.Builder;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -53,10 +54,6 @@ import kiss.I;
 import kiss.JSON;
 import kiss.Signal;
 import kiss.Signaling;
-import okhttp3.MediaType;
-import okhttp3.Request;
-import okhttp3.Request.Builder;
-import okhttp3.RequestBody;
 import viewtify.Viewtify;
 
 /**
@@ -65,9 +62,6 @@ import viewtify.Viewtify;
  * response.
  */
 class BitFlyerService extends MarketService {
-
-    /** REUSE */
-    private static final MediaType mime = MediaType.parse("application/json; charset=utf-8");
 
     private static final DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss-");
 
@@ -260,10 +254,6 @@ class BitFlyerService extends MarketService {
         Signal<?> call = forTest || Session.id == null || cancel.order_id == null
                 ? rest("POST", API + "/v1/me/cancelchildorder", APIType.Private, I.write(cancel))
                 : rest("POST", "https://lightning.bitflyer.jp/api/trade/cancelorder", APIType.Internal, I.write(cancel));
-
-        call = call.effect(e -> {
-            System.out.println("Cancel " + e + "   " + I.write(cancel));
-        });
 
         Signal<Order> isCancelled = intervalOrderCheck.map(orders -> {
             for (Order listed : orders) {
@@ -682,14 +672,14 @@ class BitFlyerService extends MarketService {
          */
         private static void maintain() {
             Chrono.seconds().takeAt(i -> i % 480 == 240).to(() -> {
-                Builder builder = new Request.Builder().url("https://lightning.bitflyer.com/api/trade/getMyBoardOrders")
-                        .addHeader("Content-Type", "application/json")
-                        .addHeader("Cookie", sessionKey + "=" + Session.id)
-                        .addHeader("X-Requested-With", "XMLHttpRequest")
-                        .post(RequestBody
-                                .create(mime, "{\"product_code\":\"FX_BTC_JPY\",\"account_id\":\"" + account.accountId + "\",\"lang\":\"ja\"}"));
+                Builder builder = HttpRequest.newBuilder(URI.create("https://lightning.bitflyer.com/api/trade/getMyBoardOrders"))
+                        .header("Content-Type", "application/json")
+                        .header("Cookie", sessionKey + "=" + Session.id)
+                        .header("X-Requested-With", "XMLHttpRequest")
+                        .POST(BodyPublishers
+                                .ofString("{\"product_code\":\"FX_BTC_JPY\",\"account_id\":\"" + account.accountId + "\",\"lang\":\"ja\"}"));
 
-                new Network().rest(builder.build()).to(I.NoOP);
+                new Network().rest(builder, Limit).to(I.NoOP);
             });
         }
     }
@@ -753,7 +743,6 @@ class BitFlyerService extends MarketService {
                     .type(OrderType.Maker)
                     .creationTime(LocalDateTime.parse(child_order_date, Chrono.DateTimeWithT).atZone(Chrono.UTC));
             o.relation(Internals.class).id = child_order_id;
-            System.out.println("Internal ID " + child_order_id + "    at    " + child_order_acceptance_id);
 
             return o;
         }
