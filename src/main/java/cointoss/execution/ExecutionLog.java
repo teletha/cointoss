@@ -57,9 +57,9 @@ import cointoss.MarketService;
 import cointoss.market.MarketServiceProvider;
 import cointoss.market.bitflyer.BitFlyer;
 import cointoss.market.bitmex.BitMex;
+import cointoss.ticker.Span;
 import cointoss.ticker.Ticker;
 import cointoss.ticker.TickerManager;
-import cointoss.ticker.Span;
 import cointoss.util.Chrono;
 import cointoss.util.Network;
 import cointoss.util.Num;
@@ -943,7 +943,7 @@ public class ExecutionLog {
             } else if (0 < latestId) {
                 return latestId;
             } else {
-                return latestId = service.executionLatest().to().v.id;
+                return latestId = service.executionLatest().to().map(v -> v.id).or(0L);
             }
         }
     }

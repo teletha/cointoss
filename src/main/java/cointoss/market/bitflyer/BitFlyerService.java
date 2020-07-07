@@ -386,8 +386,9 @@ class BitFlyerService extends MarketService {
     public Signal<Execution> executions(long start, long end) {
         String[] previous = new String[] {"", ""};
 
-        return call("GET", "/v1/executions?product_code=" + marketName + "&count=" + setting
-                .acquirableExecutionSize() + "&before=" + end + "&after=" + start, "").flatIterable(e -> e.find("*"))
+        return rest("GET", API + "/v1/executions?product_code=" + marketName + "&count=" + setting
+                .acquirableExecutionSize() + "&before=" + end + "&after=" + start, APIType.Public) //
+                        .flatIterable(e -> e.find("*"))
                         .reverse()
                         .map(e -> convert(e, previous));
     }
@@ -399,14 +400,16 @@ class BitFlyerService extends MarketService {
     public Signal<Execution> executionLatest() {
         String[] previous = new String[] {"", ""};
 
-        return call("GET", "/v1/executions?product_code=" + marketName + "&count=1", "").flatIterable(e -> e.find("*"))
+        return rest("GET", API + "/v1/executions?product_code=" + marketName + "&count=1", APIType.Public).flatIterable(e -> e.find("*"))
                 .map(e -> convert(e, previous));
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         BitFlyer.FX_BTC_JPY.executionLatest().to(e -> {
             System.out.println(e);
         });
+
+        Thread.sleep(1000 * 10);
     }
 
     /**
@@ -507,7 +510,7 @@ class BitFlyerService extends MarketService {
      */
     @Override
     public Signal<Order> orders() {
-        return rest("GET", API + "/v1/me/getchildorders?product_code=" + marketName, Authentication.Public)
+        return rest("GET", API + "/v1/me/getchildorders?product_code=" + marketName, APIType.Private)
                 .flatIterable(json -> json.find(ChildOrderResponse.class, "*"))
                 .map(ChildOrderResponse::toOrder);
     }
@@ -517,7 +520,7 @@ class BitFlyerService extends MarketService {
      */
     @Override
     public Signal<Order> orders(OrderState state) {
-        return rest("GET", API + "/v1/me/getchildorders?child_order_state=" + state + "&product_code=" + marketName, Authentication.Public)
+        return rest("GET", API + "/v1/me/getchildorders?child_order_state=" + state + "&product_code=" + marketName, APIType.Private)
                 .flatIterable(json -> json.find(ChildOrderResponse.class, "*"))
                 .map(ChildOrderResponse::toOrder);
     }
@@ -551,7 +554,7 @@ class BitFlyerService extends MarketService {
      */
     @Override
     public Signal<Num> baseCurrency() {
-        return rest("GET", API + "/v1/me/getbalance", Authentication.Public).flatIterable(json -> json.find(CurrencyState.class, "*"))
+        return rest("GET", API + "/v1/me/getbalance", APIType.Private).flatIterable(json -> json.find(CurrencyState.class, "*"))
                 .take(unit -> unit.currency_code.equals("JPY"))
                 .map(unit -> unit.available);
     }
@@ -561,7 +564,7 @@ class BitFlyerService extends MarketService {
      */
     @Override
     public Signal<Num> targetCurrency() {
-        return rest("GET", API + "/v1/me/getbalance", Authentication.Public).flatIterable(json -> json.find(CurrencyState.class, "*"))
+        return rest("GET", API + "/v1/me/getbalance", APIType.Private).flatIterable(json -> json.find(CurrencyState.class, "*"))
                 .take(unit -> unit.currency_code.equals("BTC"))
                 .map(unit -> unit.available);
     }
@@ -571,8 +574,7 @@ class BitFlyerService extends MarketService {
      */
     @Override
     public Signal<OrderBookPageChanges> orderBook() {
-        return rest("GET", API + "/v1/board?product_code=" + marketName, Authentication.None)
-                .map(json -> json.as(OrderBookPageChanges.class));
+        return rest("GET", API + "/v1/board?product_code=" + marketName, APIType.Public).map(json -> json.as(OrderBookPageChanges.class));
     }
 
     /**
@@ -643,15 +645,18 @@ class BitFlyerService extends MarketService {
         return network.rest(request, Limit, type, selector);
     }
 
-    private Signal<JSON> rest(String method, String uri, Authentication authentication, String... bodyContents) {
+    private Signal<JSON> rest(String method, String uri, APIType apiType, String... bodyContents) {
         URI u = URI.create(uri);
         String bodyText = String.join("", bodyContents);
 
         HttpRequest.Builder builder = HttpRequest.newBuilder(u);
 
         // authentication if needed
-        switch (authentication) {
+        switch (apiType) {
         case Public:
+            break;
+
+        case Private:
             String path = u.getPath();
             String query = u.getQuery();
             if (query != null) path = path + "?" + query;
@@ -666,13 +671,10 @@ class BitFlyerService extends MarketService {
                     .header("Content-Type", "application/json");
             break;
 
-        case Private:
+        case Internal:
             builder = builder.header("Content-Type", "application/json; charset=utf-8")
                     .header("Cookie", sessionKey + "=" + Session.id)
                     .header("X-Requested-With", "XMLHttpRequest");
-            break;
-
-        case None:
             break;
         }
 
@@ -682,44 +684,6 @@ class BitFlyerService extends MarketService {
         }
 
         return network.rest(builder, Limit);
-    }
-
-    /**
-     * Call private API.
-     */
-    protected Signal<JSON> call(String method, String path, String body) {
-        String timestamp = String.valueOf(Chrono.utcNow().toEpochSecond());
-        String sign = Hashing.hmacSha256(account.apiSecret.v.getBytes())
-                .hashString(timestamp + method + path + body, StandardCharsets.UTF_8)
-                .toString();
-
-        Request request;
-
-        if (method.equals("PUBLIC")) {
-            request = new Request.Builder().url(API + path).build();
-        } else if (method.equals("GET")) {
-            request = new Request.Builder().url(API + path)
-                    .addHeader("ACCESS-KEY", account.apiKey.v)
-                    .addHeader("ACCESS-TIMESTAMP", timestamp)
-                    .addHeader("ACCESS-SIGN", sign)
-                    .build();
-        } else if (method.equals("POST") && !path.startsWith("http")) {
-            request = new Request.Builder().url(API + path)
-                    .addHeader("ACCESS-KEY", account.apiKey.v)
-                    .addHeader("ACCESS-TIMESTAMP", timestamp)
-                    .addHeader("ACCESS-SIGN", sign)
-                    .addHeader("Content-Type", "application/json")
-                    .post(RequestBody.create(mime, body))
-                    .build();
-        } else {
-            Builder builder = new Request.Builder().url(path)
-                    .addHeader("Content-Type", "application/json")
-                    .addHeader("Cookie", sessionKey + "=" + Session.id)
-                    .addHeader("X-Requested-With", "XMLHttpRequest");
-            if (body != null && body.length() != 0) builder = builder.post(RequestBody.create(mime, body));
-            request = builder.build();
-        }
-        return network.rest(request, Limit);
     }
 
     /**
@@ -989,9 +953,9 @@ class BitFlyerService extends MarketService {
     }
 
     /**
-     * Authentication Type
+     * API Category
      */
-    private enum Authentication {
-        None, Public, Private
+    private enum APIType {
+        Public, Private, Internal
     }
 }
