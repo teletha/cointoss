@@ -153,7 +153,8 @@ class BitFlyerService extends MarketService {
             request.size = order.size.doubleValue();
             request.time_in_force = order.quantityCondition.abbreviation;
 
-            call = call("POST", "/v1/me/sendchildorder", request, String.class, new String[] {"child_order_acceptance_id"});
+            call = rest("POST", API + "/v1/me/sendchildorder", APIType.Private, I.write(request))
+                    .flatIterable(json -> json.find(String.class, "child_order_acceptance_id"));
         } else {
             ChildOrderRequestWebAPI request = new ChildOrderRequestWebAPI();
             request.account_id = account.accountId.v;
@@ -166,8 +167,8 @@ class BitFlyerService extends MarketService {
             request.size = order.size.doubleValue();
             request.time_in_force = order.quantityCondition.abbreviation;
 
-            call = call("POST", "https://lightning.bitflyer.jp/api/trade/sendorder", request, WebResponse.class, new String[0])
-                    .map(e -> e.data.get("order_ref_id"));
+            call = rest("POST", "https://lightning.bitflyer.jp/api/trade/sendorder", APIType.Internal, I.write(request))
+                    .map(json -> json.get("data").text("order_ref_id"));
         }
 
         Complementer complementer = new Complementer(order);
@@ -256,8 +257,13 @@ class BitFlyerService extends MarketService {
         cancel.order_id = order.relation(Internals.class).id;
         cancel.child_order_acceptance_id = order.id;
 
-        Signal<?> call = forTest || Session.id == null || cancel.order_id == null ? call("POST", "/v1/me/cancelchildorder", cancel, null)
-                : call("POST", "https://lightning.bitflyer.jp/api/trade/cancelorder", cancel, WebResponse.class);
+        Signal<?> call = forTest || Session.id == null || cancel.order_id == null
+                ? rest("POST", API + "/v1/me/cancelchildorder", APIType.Private, I.write(cancel))
+                : rest("POST", "https://lightning.bitflyer.jp/api/trade/cancelorder", APIType.Internal, I.write(cancel));
+
+        call = call.effect(e -> {
+            System.out.println("Cancel " + e + "   " + I.write(cancel));
+        });
 
         Signal<Order> isCancelled = intervalOrderCheck.map(orders -> {
             for (Order listed : orders) {
@@ -402,14 +408,6 @@ class BitFlyerService extends MarketService {
 
         return rest("GET", API + "/v1/executions?product_code=" + marketName + "&count=1", APIType.Public).flatIterable(e -> e.find("*"))
                 .map(e -> convert(e, previous));
-    }
-
-    public static void main(String[] args) throws InterruptedException {
-        BitFlyer.FX_BTC_JPY.executionLatest().to(e -> {
-            System.out.println(e);
-        });
-
-        Thread.sleep(1000 * 10);
     }
 
     /**
@@ -598,53 +596,14 @@ class BitFlyerService extends MarketService {
     }
 
     /**
-     * Call private API.
+     * Execute REST operation.
+     * 
+     * @param method
+     * @param uri
+     * @param apiType
+     * @param bodyContents
+     * @return
      */
-    private <M> Signal<M> call(String method, String path, Object body, Class<M> type, String... selector) {
-        StringBuilder builder = new StringBuilder();
-        I.write(body, builder);
-
-        return call(method, path, builder.toString(), type, selector);
-    }
-
-    /**
-     * Call private API.
-     */
-    protected <M> Signal<M> call(String method, String path, String body, Class<M> type, String... selector) {
-        String timestamp = String.valueOf(Chrono.utcNow().toEpochSecond());
-        String sign = Hashing.hmacSha256(account.apiSecret.v.getBytes())
-                .hashString(timestamp + method + path + body, StandardCharsets.UTF_8)
-                .toString();
-
-        Request request;
-
-        if (method.equals("PUBLIC")) {
-            request = new Request.Builder().url(API + path).build();
-        } else if (method.equals("GET")) {
-            request = new Request.Builder().url(API + path)
-                    .addHeader("ACCESS-KEY", account.apiKey.v)
-                    .addHeader("ACCESS-TIMESTAMP", timestamp)
-                    .addHeader("ACCESS-SIGN", sign)
-                    .build();
-        } else if (method.equals("POST") && !path.startsWith("http")) {
-            request = new Request.Builder().url(API + path)
-                    .addHeader("ACCESS-KEY", account.apiKey.v)
-                    .addHeader("ACCESS-TIMESTAMP", timestamp)
-                    .addHeader("ACCESS-SIGN", sign)
-                    .addHeader("Content-Type", "application/json")
-                    .post(RequestBody.create(mime, body))
-                    .build();
-        } else {
-            Builder builder = new Request.Builder().url(path)
-                    .addHeader("Content-Type", "application/json")
-                    .addHeader("Cookie", sessionKey + "=" + Session.id)
-                    .addHeader("X-Requested-With", "XMLHttpRequest");
-            if (body != null && body.length() != 0) builder = builder.post(RequestBody.create(mime, body));
-            request = builder.build();
-        }
-        return network.rest(request, Limit, type, selector);
-    }
-
     private Signal<JSON> rest(String method, String uri, APIType apiType, String... bodyContents) {
         URI u = URI.create(uri);
         String bodyText = String.join("", bodyContents);
@@ -794,6 +753,7 @@ class BitFlyerService extends MarketService {
                     .type(OrderType.Maker)
                     .creationTime(LocalDateTime.parse(child_order_date, Chrono.DateTimeWithT).atZone(Chrono.UTC));
             o.relation(Internals.class).id = child_order_id;
+            System.out.println("Internal ID " + child_order_id + "    at    " + child_order_acceptance_id);
 
             return o;
         }
