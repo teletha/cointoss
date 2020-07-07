@@ -11,6 +11,10 @@ package cointoss.util;
 
 import java.net.InetSocketAddress;
 import java.net.Proxy;
+import java.net.URI;
+import java.net.http.HttpRequest;
+import java.net.http.HttpRequest.BodyPublishers;
+import java.net.http.HttpRequest.Builder;
 import java.time.Duration;
 
 import org.apache.logging.log4j.LogManager;
@@ -18,10 +22,8 @@ import org.apache.logging.log4j.LogManager;
 import kiss.I;
 import kiss.JSON;
 import kiss.Signal;
-import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 
@@ -117,13 +119,6 @@ public class Network {
     /**
      * Call REST API.
      */
-    public final <M> Signal<M> rest(Request request, Class<M> type, String... selector) {
-        return rest(request, null, type, selector);
-    }
-
-    /**
-     * Call REST API.
-     */
     public <M> Signal<M> rest(Request request, APILimiter limiter, Class<M> type, String... selector) {
         return new Signal<>((observer, disposer) -> {
             if (limiter != null) {
@@ -158,6 +153,42 @@ public class Network {
     }
 
     /**
+     * Call REST API.
+     */
+    public final Signal<JSON> rest(HttpRequest.Builder request) {
+        return rest(request, null);
+    }
+
+    /**
+     * Call REST API.
+     */
+    public final Signal<JSON> rest(HttpRequest.Builder request, APILimiter limiter) {
+        return new Signal<>((observer, disposer) -> {
+            if (limiter != null) limiter.acquire();
+
+            return I.http(request, JSON.class).to(observer, disposer);
+        });
+    }
+
+    /**
+     * Call REST API.
+     */
+    public final <M> Signal<M> rest(HttpRequest.Builder request, Class<M> type, String... selector) {
+        return rest(request, null, type, selector);
+    }
+
+    /**
+     * Call REST API.
+     */
+    public <M> Signal<M> rest(HttpRequest.Builder request, APILimiter limiter, Class<M> type, String... selector) {
+        return new Signal<>((observer, disposer) -> {
+            if (limiter != null) limiter.acquire();
+
+            return I.http(request, JSON.class).flatIterable(json -> json.find(type, selector)).to(observer, disposer);
+        });
+    }
+
+    /**
      * Call LINE notify API.
      * 
      * @param message A message to send
@@ -165,15 +196,24 @@ public class Network {
      */
     public Signal<?> line(Object title, Object message, String token) {
         if (token != null) {
-            Request request = new Request.Builder().url("https://notify-api.line.me/api/notify")
-                    .addHeader("Authorization", "Bearer " + token)
-                    .post(RequestBody.create(MediaType
-                            .parse("application/x-www-form-urlencoded; charset=utf-8"), "message=" + title + "\r\n" + message))
-                    .build();
+            Builder request = HttpRequest.newBuilder()
+                    .uri(URI.create("https://notify-api.line.me/api/notify"))
+                    .header("Authorization", "Bearer " + token)
+                    .header("Content-Type", "application/x-www-form-urlencoded; charset=utf-8")
+                    .POST(BodyPublishers.ofString("message=" + title + "\r\n" + message));
 
-            return rest(request, null, new String[0]);
+            return rest(request, JSON.class);
         } else {
             return I.signal();
         }
+    }
+
+    /**
+     * Create {@link HttpRequest.Builder}.
+     * 
+     * @param uri
+     */
+    public static HttpRequest.Builder request(String... uri) {
+        return HttpRequest.newBuilder(URI.create(String.join("", uri)));
     }
 }

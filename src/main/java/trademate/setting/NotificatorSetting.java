@@ -132,6 +132,7 @@ class NotificatorSetting extends View {
                     .to(e -> {
                         lineAccessToken.decorateBy(Icon.Success);
                     }, e -> {
+                        e.printStackTrace();
                         lineAccessToken
                                 .invalid(en("The specified token [{0}] is incorrect. Specify the correct token and then test again.", lineAccessToken
                                         .value()));

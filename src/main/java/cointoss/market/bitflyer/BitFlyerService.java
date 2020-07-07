@@ -12,6 +12,9 @@ package cointoss.market.bitflyer;
 import static kiss.I.translate;
 import static viewtify.ui.UIWeb.Operation.*;
 
+import java.net.URI;
+import java.net.http.HttpRequest;
+import java.net.http.HttpRequest.BodyPublishers;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -92,7 +95,7 @@ class BitFlyerService extends MarketService {
     static final DateTimeFormatter RealTimeFormatUntilHour = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH");
 
     /** The api url. */
-    static final String api = "https://api.bitflyer.com";
+    static final String API = "https://api.bitflyer.com";
 
     /** The internal order manager. */
     private final Map<String, Order> orders = new ConcurrentHashMap();
@@ -498,7 +501,8 @@ class BitFlyerService extends MarketService {
      */
     @Override
     public Signal<Order> orders() {
-        return call("GET", "/v1/me/getchildorders?product_code=" + marketName, "", ChildOrderResponse.class, new String[] {"*"})
+        return rest("GET", API + "/v1/me/getchildorders?product_code=" + marketName, Authentication.Public)
+                .flatIterable(json -> json.find(ChildOrderResponse.class, "*"))
                 .map(ChildOrderResponse::toOrder);
     }
 
@@ -507,8 +511,9 @@ class BitFlyerService extends MarketService {
      */
     @Override
     public Signal<Order> orders(OrderState state) {
-        return call("GET", "/v1/me/getchildorders?child_order_state=" + state + "&product_code=" + marketName, "", ChildOrderResponse.class, new String[] {
-                "*"}).map(ChildOrderResponse::toOrder);
+        return rest("GET", API + "/v1/me/getchildorders?child_order_state=" + state + "&product_code=" + marketName, Authentication.Public)
+                .flatIterable(json -> json.find(ChildOrderResponse.class, "*"))
+                .map(ChildOrderResponse::toOrder);
     }
 
     /**
@@ -540,8 +545,9 @@ class BitFlyerService extends MarketService {
      */
     @Override
     public Signal<Num> baseCurrency() {
-        return call("GET", "/v1/me/getbalance", "", CurrencyState.class, new String[] {"*"}).take(unit -> unit.currency_code.equals("JPY"))
-                .map(c -> c.available);
+        return rest("GET", API + "/v1/me/getbalance", Authentication.Public).flatIterable(json -> json.find(CurrencyState.class, "*"))
+                .take(unit -> unit.currency_code.equals("JPY"))
+                .map(unit -> unit.available);
     }
 
     /**
@@ -549,8 +555,9 @@ class BitFlyerService extends MarketService {
      */
     @Override
     public Signal<Num> targetCurrency() {
-        return call("GET", "/v1/me/getbalance", "", CurrencyState.class, new String[] {"*"}).take(unit -> unit.currency_code.equals("BTC"))
-                .map(c -> c.available);
+        return rest("GET", API + "/v1/me/getbalance", Authentication.Public).flatIterable(json -> json.find(CurrencyState.class, "*"))
+                .take(unit -> unit.currency_code.equals("BTC"))
+                .map(unit -> unit.available);
     }
 
     /**
@@ -558,7 +565,8 @@ class BitFlyerService extends MarketService {
      */
     @Override
     public Signal<OrderBookPageChanges> orderBook() {
-        return call("PUBLIC", "/v1/board?product_code=" + marketName, "", OrderBookPageChanges.class, new String[0]);
+        return rest("GET", API + "/v1/board?product_code=" + marketName, Authentication.None)
+                .map(json -> json.as(OrderBookPageChanges.class));
     }
 
     /**
@@ -603,15 +611,15 @@ class BitFlyerService extends MarketService {
         Request request;
 
         if (method.equals("PUBLIC")) {
-            request = new Request.Builder().url(api + path).build();
+            request = new Request.Builder().url(API + path).build();
         } else if (method.equals("GET")) {
-            request = new Request.Builder().url(api + path)
+            request = new Request.Builder().url(API + path)
                     .addHeader("ACCESS-KEY", account.apiKey.v)
                     .addHeader("ACCESS-TIMESTAMP", timestamp)
                     .addHeader("ACCESS-SIGN", sign)
                     .build();
         } else if (method.equals("POST") && !path.startsWith("http")) {
-            request = new Request.Builder().url(api + path)
+            request = new Request.Builder().url(API + path)
                     .addHeader("ACCESS-KEY", account.apiKey.v)
                     .addHeader("ACCESS-TIMESTAMP", timestamp)
                     .addHeader("ACCESS-SIGN", sign)
@@ -629,6 +637,47 @@ class BitFlyerService extends MarketService {
         return network.rest(request, Limit, type, selector);
     }
 
+    private Signal<JSON> rest(String method, String uri, Authentication authentication, String... bodyContents) {
+        URI u = URI.create(uri);
+        String bodyText = String.join("", bodyContents);
+
+        HttpRequest.Builder builder = HttpRequest.newBuilder(u);
+
+        // authentication if needed
+        switch (authentication) {
+        case Public:
+            String path = u.getPath();
+            String query = u.getQuery();
+            if (query != null) path = path + "?" + query;
+            String timestamp = String.valueOf(Chrono.utcNow().toEpochSecond());
+            String sign = Hashing.hmacSha256(account.apiSecret.v.getBytes())
+                    .hashString(timestamp + method + path + bodyText, StandardCharsets.UTF_8)
+                    .toString();
+
+            builder = builder.header("ACCESS-KEY", account.apiKey.v)
+                    .header("ACCESS-TIMESTAMP", timestamp)
+                    .header("ACCESS-SIGN", sign)
+                    .header("Content-Type", "application/json");
+            break;
+
+        case Private:
+            builder = builder.header("Content-Type", "application/json")
+                    .header("Cookie", sessionKey + "=" + Session.id)
+                    .header("X-Requested-With", "XMLHttpRequest");
+            break;
+
+        case None:
+            break;
+        }
+
+        // post with body contents
+        if (method.equals("POST")) {
+            builder = builder.POST(BodyPublishers.ofString(bodyText));
+        }
+
+        return network.rest(builder, Limit);
+    }
+
     /**
      * Call private API.
      */
@@ -641,15 +690,15 @@ class BitFlyerService extends MarketService {
         Request request;
 
         if (method.equals("PUBLIC")) {
-            request = new Request.Builder().url(api + path).build();
+            request = new Request.Builder().url(API + path).build();
         } else if (method.equals("GET")) {
-            request = new Request.Builder().url(api + path)
+            request = new Request.Builder().url(API + path)
                     .addHeader("ACCESS-KEY", account.apiKey.v)
                     .addHeader("ACCESS-TIMESTAMP", timestamp)
                     .addHeader("ACCESS-SIGN", sign)
                     .build();
         } else if (method.equals("POST") && !path.startsWith("http")) {
-            request = new Request.Builder().url(api + path)
+            request = new Request.Builder().url(API + path)
                     .addHeader("ACCESS-KEY", account.apiKey.v)
                     .addHeader("ACCESS-TIMESTAMP", timestamp)
                     .addHeader("ACCESS-SIGN", sign)
@@ -931,5 +980,12 @@ class BitFlyerService extends MarketService {
             super("[" + channel + marketName + "]");
             params.put("channel", channel + marketName);
         }
+    }
+
+    /**
+     * Authentication Type
+     */
+    private enum Authentication {
+        None, Public, Private
     }
 }
