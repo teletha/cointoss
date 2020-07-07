@@ -15,6 +15,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
@@ -266,41 +267,23 @@ public class EfficientWebSocket {
      */
     static class Command extends IdentifiableTopic {
 
-        public String event = "subscribe";
+        public String method = "SUBSCRIBE";
 
-        public String channel;
+        public List<String> params = new ArrayList();
 
-        public String symbol;
+        public int id = 0;
 
-        /**
-         * @param channel
-         * @param symbol
-         */
-        private Command(String channel, String symbol) {
-            super(channel + symbol);
-            this.channel = channel;
-            this.symbol = symbol;
+        private Command(String channel, String market) {
+            super(market.toLowerCase() + "@" + channel, "SUBSCRIBE", "UNSUBSCRIBE");
+            this.params.add(market.toLowerCase() + "@" + channel);
         }
     }
 
     public static void main(String[] args) throws InterruptedException {
+        EfficientWebSocket realtime = new EfficientWebSocket("wss://fstream.binance.com/stream", 25, json -> json.text("stream"));
 
-        EfficientWebSocket realtime = new EfficientWebSocket("wss://api-pub.bitfinex.com/ws/2", 25, json -> {
-            String chanId = json.text("0");
-            if (chanId != null) {
-                return chanId;
-            } else {
-                // for initial subscribed response
-                return json.text("channel") + json.text("pair");
-            }
-        }).updateIdBy(json -> json.text("chanId"));
-
-        realtime.subscribe(new Command("book", "BTCUSD")).to(e -> {
+        realtime.subscribe(new Command("depth20@100ms", "BTCUSDT")).to(e -> {
             System.out.println("BTC  " + e);
-        });
-
-        realtime.subscribe(new Command("book", "ETHUSD")).to(e -> {
-            System.out.println("ETH " + e);
         });
 
         Thread.sleep(1000 * 40);

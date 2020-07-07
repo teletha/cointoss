@@ -46,7 +46,7 @@ class BitMexService extends MarketService {
     private static final APILimiter Limit = APILimiter.with.limit(45).refresh(Duration.ofMinutes(1));
 
     /** The realtime communicator. */
-    private static final EfficientWebSocket RealtimeCommunication = new EfficientWebSocket("wss://www.bitmex.com/realtime", 25, json -> json
+    private static final EfficientWebSocket Realtime = new EfficientWebSocket("wss://www.bitmex.com/realtime", 25, json -> json
             .text("table") + json.find(String.class, "data", "0", "symbol"));
 
     /** The market id. */
@@ -127,7 +127,7 @@ class BitMexService extends MarketService {
         AtomicLong increment = new AtomicLong();
         Object[] previous = new Object[2];
 
-        return RealtimeCommunication.subscribe(new Topic("trade", marketName))
+        return Realtime.subscribe(new Topic("trade", marketName))
                 .flatIterable(json -> json.find("data", "*"))
                 .map(json -> convert(json, increment, previous));
     }
@@ -186,9 +186,7 @@ class BitMexService extends MarketService {
      */
     @Override
     protected Signal<OrderBookPageChanges> connectOrderBookRealtimely() {
-        return RealtimeCommunication.subscribe(new Topic("orderBookL2", marketName))
-                .map(json -> json.find("data", "*"))
-                .map(this::convertOrderBook);
+        return Realtime.subscribe(new Topic("orderBookL2", marketName)).map(json -> json.find("data", "*")).map(this::convertOrderBook);
     }
 
     /**
@@ -292,7 +290,7 @@ class BitMexService extends MarketService {
     /**
      * Subscription topic for websocket communication.
      */
-    static class Topic extends IdentifiableTopic {
+    public static class Topic extends IdentifiableTopic {
 
         public String op = "subscribe";
 

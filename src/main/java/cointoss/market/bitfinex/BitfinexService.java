@@ -44,7 +44,7 @@ class BitfinexService extends MarketService {
     private static final APILimiter LimitForBook = APILimiter.with.limit(30).refresh(Duration.ofMinutes(1));
 
     /** Extract id from websocket stream. */
-    private static final Function<JSON, String> extractId = json -> {
+    private static final Function<JSON, String> ExtractId = json -> {
         String chanId = json.text("0");
         if (chanId != null) {
             return chanId;
@@ -55,7 +55,7 @@ class BitfinexService extends MarketService {
     };
 
     /** The realtiem communicator. */
-    private static final EfficientWebSocket realtime = new EfficientWebSocket("wss://api-pub.bitfinex.com/ws/2", 25, extractId)
+    private static final EfficientWebSocket Realtime = new EfficientWebSocket("wss://api-pub.bitfinex.com/ws/2", 25, ExtractId)
             .updateIdBy(json -> json.text("chanId"))
             .ignoreIf(json -> json.has("1", "hb")); // ignore heartbeat
 
@@ -118,7 +118,7 @@ class BitfinexService extends MarketService {
         AtomicLong increment = new AtomicLong();
         Object[] previous = new Object[2];
 
-        return realtime.subscribe(new Topic("trades", marketName))
+        return Realtime.subscribe(new Topic("trades", marketName))
                 .take(e -> e.has("1", "tu"))
                 .map(e -> convert(e.get("2"), increment, previous));
     }
@@ -191,7 +191,7 @@ class BitfinexService extends MarketService {
      */
     @Override
     protected Signal<OrderBookPageChanges> connectOrderBookRealtimely() {
-        return realtime.subscribe(new Topic("book", marketName)).skip(1).map(json -> {
+        return Realtime.subscribe(new Topic("book", marketName)).skip(1).map(json -> {
             OrderBookPageChanges change = new OrderBookPageChanges();
             JSON data = json.get("1");
 
@@ -287,7 +287,7 @@ class BitfinexService extends MarketService {
     /**
      * 
      */
-    static class Topic extends IdentifiableTopic {
+    public static class Topic extends IdentifiableTopic {
 
         public String event = "subscribe";
 
