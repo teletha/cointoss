@@ -403,6 +403,12 @@ class BitFlyerService extends MarketService {
                 .map(e -> convert(e, previous));
     }
 
+    public static void main(String[] args) {
+        BitFlyer.FX_BTC_JPY.executionLatest().to(e -> {
+            System.out.println(e);
+        });
+    }
+
     /**
      * Convert to {@link Execution}.
      * 
@@ -661,7 +667,7 @@ class BitFlyerService extends MarketService {
             break;
 
         case Private:
-            builder = builder.header("Content-Type", "application/json")
+            builder = builder.header("Content-Type", "application/json; charset=utf-8")
                     .header("Cookie", sessionKey + "=" + Session.id)
                     .header("X-Requested-With", "XMLHttpRequest");
             break;
