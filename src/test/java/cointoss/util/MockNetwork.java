@@ -48,14 +48,6 @@ public class MockNetwork extends Network {
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public final Signal<JSON> jsonRPC(String uri, String channelName) {
-        return websockets.computeIfAbsent(uri, key -> new MockSocket()).signaling.expose;
-    }
-
-    /**
      * Describe mockable response for the specified request.
      * 
      * @param path A request path to mock.

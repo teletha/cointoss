@@ -12,8 +12,6 @@ package cointoss.util;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.time.Duration;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 
@@ -26,8 +24,6 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
-import okhttp3.WebSocket;
-import okhttp3.WebSocketListener;
 
 public class Network {
 
@@ -159,124 +155,6 @@ public class Network {
             }
             return disposer;
         });
-    }
-
-    /**
-     * Connect by websocket.
-     * 
-     * @param uri
-     * @param jsonCommnad
-     * @return
-     */
-    public Signal<JSON> websocket(String uri, Object jsonCommnad) {
-        return new Signal<JSON>((observer, disposer) -> {
-            Request request = new Request.Builder().url(uri).build();
-
-            WebSocket websocket = client().newWebSocket(request, new WebSocketListener() {
-
-                /**
-                 * {@inheritDoc}
-                 */
-                @Override
-                public void onOpen(WebSocket socket, Response response) {
-                    socket.send(I.write(jsonCommnad));
-                }
-
-                /**
-                 * {@inheritDoc}
-                 */
-                @Override
-                public void onMessage(WebSocket socket, String text) {
-                    observer.accept(I.json(text));
-                }
-
-                /**
-                 * {@inheritDoc}
-                 */
-                @Override
-                public void onFailure(WebSocket socket, Throwable error, Response response) {
-                    observer.error(error);
-                }
-            });
-
-            return disposer.add(() -> {
-                websocket.close(1000, null);
-            });
-        });
-    }
-
-    /**
-     * Connect by websocket.
-     * 
-     * @param uri
-     * @param channelName
-     * @return
-     */
-    public Signal<JSON> jsonRPC(String uri, String channelName) {
-        return new Signal<JSON>((observer, disposer) -> {
-            Request request = new Request.Builder().url(uri).build();
-            WebSocket websocket = client().newWebSocket(request, new WebSocketListener() {
-
-                /**
-                 * {@inheritDoc}
-                 */
-                @Override
-                public void onOpen(WebSocket socket, Response response) {
-                    JsonRPC invoke = new JsonRPC();
-                    invoke.method = "subscribe";
-                    invoke.params.put("channel", channelName);
-
-                    socket.send(I.write(invoke));
-                }
-
-                /**
-                 * {@inheritDoc}
-                 */
-                @Override
-                public void onMessage(WebSocket socket, String text) {
-                    JSON params = I.json(text).get("params");
-
-                    if (params != null) {
-                        observer.accept(params.get("message"));
-                    }
-                }
-
-                /**
-                 * {@inheritDoc}
-                 */
-                @Override
-                public void onClosed(WebSocket webSocket, int code, String reason) {
-                    System.out.println("Closed " + code + "   " + reason);
-                }
-
-                /**
-                 * {@inheritDoc}
-                 */
-                @Override
-                public void onFailure(WebSocket socket, Throwable error, Response response) {
-                    observer.error(error);
-                }
-            });
-
-            return disposer.add(() -> {
-                websocket.close(1000, null);
-            });
-        });
-    }
-
-    /**
-     * JsonRPC model.
-     */
-    @SuppressWarnings("unused")
-    private static class JsonRPC {
-
-        public long id = 123;
-
-        public String jsonrpc = "2.0";
-
-        public String method;
-
-        public Map<String, String> params = new HashMap();
     }
 
     /**

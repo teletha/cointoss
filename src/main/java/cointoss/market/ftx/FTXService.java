@@ -43,9 +43,6 @@ class FTXService extends MarketService {
     /** The instrument tick size. */
     private final Num instrumentTickSize;
 
-    /** The shared websocket connection. */
-    private Signal<JSON> websocket;
-
     /**
      * @param marketName
      * @param setting
@@ -98,10 +95,7 @@ class FTXService extends MarketService {
         AtomicLong increment = new AtomicLong();
         Object[] previous = new Object[2];
 
-        return connectWebSocket(Topic.trades).map(json -> {
-            System.out.println(json);
-            return null;
-        });
+        return I.signal();
     }
 
     /**
@@ -219,66 +213,6 @@ class FTXService extends MarketService {
         Request request = new Request.Builder().url("https://ftx.com/api/" + path).build();
 
         return network.rest(request, Limit).retryWhen(retryPolicy(10, "FTX RESTCall"));
-    }
-
-    /**
-     * Build shared websocket connection for this market.
-     * 
-     * @return
-     */
-    private synchronized Signal<JSON> connectWebSocket(Topic topic) {
-        WebSocketCommand command = new WebSocketCommand();
-        command.op = "subscribe";
-        command.channel = topic.name();
-        command.market = marketName;
-
-        return network.websocket("wss://ftx.com/ws/", command).flatMap(root -> {
-            if (root.has("type", "update")) {
-                return I.signal(root.get("data"));
-            } else {
-                return I.signal();
-            }
-        });
-    }
-
-    /**
-     * Subscription topics for websocket.
-     */
-    private enum Topic {
-        trades;
-    }
-
-    /**
-     * 
-     */
-    @SuppressWarnings("unused")
-    private static class WebSocketCommand {
-
-        public String op;
-
-        public String channel;
-
-        public String market;
-    }
-
-    private int estimateConsecutive(Direction direction, ZonedDateTime date, Object[] previous) {
-        int consectives = 0;
-
-        if (date.equals(previous[1])) {
-            if (direction != previous[0]) {
-                consectives = Execution.ConsecutiveDifference;
-            } else if (direction == Direction.BUY) {
-                consectives = Execution.ConsecutiveSameBuyer;
-            } else {
-                consectives = Execution.ConsecutiveSameSeller;
-            }
-        } else {
-            consectives = Execution.ConsecutiveDifference;
-        }
-        previous[0] = direction;
-        previous[1] = date;
-
-        return consectives;
     }
 
     public static void main(String[] args) throws InterruptedException {
