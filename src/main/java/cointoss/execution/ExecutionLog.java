@@ -941,7 +941,7 @@ public class ExecutionLog {
             } else if (0 < latestId) {
                 return latestId;
             } else {
-                return latestId = service.executionLatest().to().map(v -> v.id).or(0L);
+                return latestId = service.executionLatest().to().v.id;
             }
         }
     }
