@@ -42,11 +42,8 @@ public class EfficientWebSocket {
     /** The cached connection. */
     private WebSocket ws;
 
-    /** The websocket's state. */
-    private State state = State.Disconnected;
-
     /** Temporary buffer for commands called before the connection was established. */
-    private final Deque<IdentifiableTopic> queued = new ArrayDeque();
+    private final Deque<IdentifiableTopic> queue = new ArrayDeque();
 
     /** The signal tee. */
     private final Map<String, Supersonic<JSON>> signals = new HashMap();
@@ -56,6 +53,9 @@ public class EfficientWebSocket {
 
     /** The processing when the ID changes depending on the content of the response. */
     private Function<JSON, String> update;
+
+    /** The management of subscriptions. */
+    private int subscriptions;
 
     /**
      * 
@@ -114,68 +114,63 @@ public class EfficientWebSocket {
             return supersonic;
         });
 
-        return signal.expose.effectOnDispose(() -> ws.sendText(I.write(topic.unsubscribeCommand), true));
+        return signal.expose.effectOnDispose(() -> send(topic.unsubscribe()));
     }
 
     /**
-     * Close this connection.
-     */
-    public final void close() {
-        if (ws != null) {
-            ws.sendClose(WebSocket.NORMAL_CLOSURE, "");
-        }
-    }
-
-    private int size;
-
-    /**
-     * Try to subscribe the specified topic.
+     * Subscribe the specified topic.
      * 
-     * @param topic
+     * @param topic A topic to subscribe.
      */
-    private void trySubscribe(IdentifiableTopic topic) {
-        size++;
-        System.out.println("subscribe " + size);
+    private synchronized void sendSubscribe(IdentifiableTopic topic) {
+        send(topic);
 
-        switch (state) {
-        case Disconnected:
+        if (subscriptions++ == 0) {
+            queue.add(topic);
             connect();
-            queued.add(topic);
-            break;
-
-        case Connecting:
-            queued.add(topic);
-            break;
-
-        case Connected:
-            ws.sendText(I.write(topic), true);
-            break;
-
-        case Disconnecting:
-            // ignore
-            break;
         }
     }
 
     /**
-     * Connect websocket.
+     * Unsubscribe the specified topic.
+     * 
+     * @param topic A topic to unsubscribe.
+     */
+    private synchronized void snedUnsubscribe(IdentifiableTopic topic) {
+        send(topic.unsubscribe());
+
+        if (--subscriptions == 0) {
+            disconnect();
+            queue.clear();
+        }
+    }
+
+    /**
+     * Send message to this websocket.
+     * 
+     * @param topic A topic to subscribe.
+     */
+    private void send(IdentifiableTopic topic) {
+        if (ws != null) {
+            try {
+                ws.sendText(I.write(topic), true);
+            } catch (Throwable e) {
+                // ignore
+            }
+        }
+    }
+
+    /**
+     * Connect to the server by websocket.
      */
     private void connect() {
-        state = State.Connecting;
-
         I.http(uri, ws -> {
-            synchronized (this) {
-                System.out.println("Connect to " + uri);
-                state = State.Connected;
-                this.ws = ws;
-                for (IdentifiableTopic command : queued) {
-                    System.out.println("Command " + command.id);
-                    ws.sendText(I.write(command), true);
-                }
-                queued.clear();
+            this.ws = ws;
+            for (IdentifiableTopic command : queue) {
+                send(command);
             }
+            queue.clear();
         }).to(text -> {
-            // System.out.println(text);
             JSON json = I.json(text);
 
             if (reject != null && reject.test(json)) {
@@ -187,62 +182,31 @@ public class EfficientWebSocket {
                 signaling.accept(json);
             }
         }, e -> {
-            state = State.Disconnected;
             System.out.println("Error in WS " + uri);
             signals.values().forEach(signal -> signal.error(e));
         }, () -> {
-            state = State.Disconnected;
             System.out.println("Complete WS " + uri);
             signals.values().forEach(signal -> signal.complete());
         });
     }
 
     /**
-     * Try to unsubscribe the specified topic.
-     * 
-     * @param topic
+     * Send close message to disconnect this websocket.
      */
-    private void tryUnsubscribe(IdentifiableTopic topic) {
-        size--;
-        System.out.println("unsbscribe " + size);
-
-        switch (state) {
-        case Disconnected:
-            // ignore
-            break;
-
-        case Connecting:
-            queued.remove(topic);
-            break;
-
-        case Connected:
-            ws.sendText(I.write(topic.unsubscribe()), true);
-            break;
-
-        case Disconnecting:
-            // ignore
-            break;
+    private void disconnect() {
+        if (ws != null) {
+            try {
+                ws.sendClose(WebSocket.NORMAL_CLOSURE, "");
+            } catch (Throwable e) {
+                // ignore
+            } finally {
+                ws = null;
+            }
         }
     }
 
     /**
-     * Disconnect websocket.
-     */
-    private void disconnect() {
-        state = State.Disconnecting;
-
-        ws.sendClose(1000, "");
-    }
-
-    /**
-     * State Pattern
-     */
-    private static enum State {
-        Disconnected, Connecting, Connected, Disconnecting;
-    }
-
-    /**
-     * 
+     * Identifiable topic which can represents subscribe and unsubscribe commands.
      */
     public static abstract class IdentifiableTopic implements Cloneable {
 
@@ -323,7 +287,7 @@ public class EfficientWebSocket {
 
         /** The exposed interface. */
         private final Signal<V> expose = new Signal<>((observer, disposer) -> {
-            if (size == 0) trySubscribe(topic);
+            if (size == 0) sendSubscribe(topic);
 
             holder.add(observer);
             update();
@@ -332,25 +296,27 @@ public class EfficientWebSocket {
                 holder.remove(observer);
                 update();
 
-                if (size == 0) tryUnsubscribe(topic);
+                if (size == 0) snedUnsubscribe(topic);
             });
         });
 
         /**
+         * Bind to topic.
+         * 
          * @param topic
          */
         private Supersonic(IdentifiableTopic topic) {
             this.topic = topic;
         }
 
+        /**
+         * Update observers.
+         */
         private void update() {
             observers = holder.toArray(new Observer[holder.size()]);
             size = observers.length;
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public void accept(V value) {
             for (int i = 0; i < size; i++) {
@@ -358,9 +324,6 @@ public class EfficientWebSocket {
             }
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public void complete() {
             for (int i = 0; i < size; i++) {
@@ -368,9 +331,6 @@ public class EfficientWebSocket {
             }
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public void error(Throwable error) {
             for (int i = 0; i < size; i++) {
@@ -402,6 +362,10 @@ public class EfficientWebSocket {
     }
 
     public static void main(String[] args) throws InterruptedException {
+        // Thread.setDefaultUncaughtExceptionHandler((e, x) -> {
+        // x.printStackTrace();
+        // });
+
         Market m = new Market(BitFlyer.FX_BTC_JPY);
         m.readLog(x -> x.fromToday(LogType.Fast).effect(e -> {
         }));
