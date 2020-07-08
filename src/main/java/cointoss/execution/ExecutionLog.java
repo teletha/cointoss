@@ -30,7 +30,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentLinkedDeque;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Delayed;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
@@ -292,15 +291,10 @@ public class ExecutionLog {
             Num coefficient = Num.ONE;
 
             while (disposer.isNotDisposed()) {
-                CountDownLatch latch = new CountDownLatch(1);
                 ArrayDeque<Execution> rests = new ArrayDeque(size);
                 service.executions(startId, startId + coefficient.multiply(size).longValue())
-                        .to(rests::add, observer::error, latch::countDown);
-                try {
-                    latch.await();
-                } catch (InterruptedException e) {
-                    throw I.quiet(e);
-                }
+                        .waitForTerminate()
+                        .to(rests::add, observer::error);
 
                 // Since the synchronous REST API did not return an error, it can be determined that
                 // the server is operating normally, so the real-time API is also connected.
