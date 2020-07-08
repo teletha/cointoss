@@ -9,9 +9,9 @@
  */
 package cointoss.execution;
 
-import static java.nio.charset.StandardCharsets.ISO_8859_1;
+import static java.nio.charset.StandardCharsets.*;
 import static java.nio.file.StandardOpenOption.*;
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -30,6 +30,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Delayed;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
@@ -291,8 +292,15 @@ public class ExecutionLog {
             Num coefficient = Num.ONE;
 
             while (disposer.isNotDisposed()) {
+                CountDownLatch latch = new CountDownLatch(1);
                 ArrayDeque<Execution> rests = new ArrayDeque(size);
-                service.executions(startId, startId + coefficient.multiply(size).longValue()).to(rests::add, observer::error);
+                service.executions(startId, startId + coefficient.multiply(size).longValue())
+                        .to(rests::add, observer::error, latch::countDown);
+                try {
+                    latch.await();
+                } catch (InterruptedException e) {
+                    throw I.quiet(e);
+                }
 
                 // Since the synchronous REST API did not return an error, it can be determined that
                 // the server is operating normally, so the real-time API is also connected.
@@ -941,7 +949,7 @@ public class ExecutionLog {
             } else if (0 < latestId) {
                 return latestId;
             } else {
-                return latestId = service.executionLatest().to().v.id;
+                return latestId = service.executionLatest().to().acquire().id;
             }
         }
     }

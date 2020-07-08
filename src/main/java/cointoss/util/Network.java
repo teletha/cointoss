@@ -34,10 +34,7 @@ public class Network {
         return new Signal<>((observer, disposer) -> {
             if (limiter != null) limiter.acquire();
 
-            observer.accept(I.json(request));
-            observer.complete();
-
-            return disposer;
+            return I.http(request, JSON.class).to(observer, disposer);
         });
     }
 
