@@ -9,9 +9,9 @@
  */
 package cointoss.execution;
 
-import static java.nio.charset.StandardCharsets.*;
+import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static java.nio.file.StandardOpenOption.*;
-import static java.util.concurrent.TimeUnit.*;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -943,7 +943,7 @@ public class ExecutionLog {
             } else if (0 < latestId) {
                 return latestId;
             } else {
-                return latestId = service.executionLatest().to().acquire().id;
+                return latestId = service.executionLatest().map(e -> e.id).waitForTerminate().to().exact();
             }
         }
     }
@@ -976,7 +976,7 @@ public class ExecutionLog {
         clearFastLog();
     }
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main1(String[] args) throws InterruptedException {
         ExecutionLog log = new ExecutionLog(BitFlyer.BTC_JPY);
         Cache cache2 = log.cache(Chrono.utc(2020, 2, 9));
         cache2.writeNormal();
