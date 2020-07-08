@@ -20,6 +20,9 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import cointoss.Market;
+import cointoss.execution.ExecutionLog.LogType;
+import cointoss.market.bitflyer.BitFlyer;
 import kiss.I;
 import kiss.JSON;
 import kiss.Observer;
@@ -27,14 +30,23 @@ import kiss.Signal;
 
 public class EfficientWebSocket {
 
+    /** The connection address. */
+    private final String uri;
+
+    /** The id extractor. */
+    private final Function<JSON, String> extractId;
+
     /** The maximum subscription size. */
     private final int max;
 
     /** The cached connection. */
     private WebSocket ws;
 
+    /** The websocket's state. */
+    private State state = State.Disconnected;
+
     /** Temporary buffer for commands called before the connection was established. */
-    private Deque<IdentifiableTopic> queued = new ArrayDeque();
+    private final Deque<IdentifiableTopic> queued = new ArrayDeque();
 
     /** The signal tee. */
     private final Map<String, Supersonic<JSON>> signals = new HashMap();
@@ -52,36 +64,9 @@ public class EfficientWebSocket {
      * @param extractId
      */
     public EfficientWebSocket(String uri, int max, Function<JSON, String> extractId) {
-        Objects.requireNonNull(uri);
-        Objects.requireNonNull(extractId);
+        this.uri = Objects.requireNonNull(uri);
+        this.extractId = Objects.requireNonNull(extractId);
         this.max = max;
-
-        I.http(uri, ws -> {
-            synchronized (this) {
-                this.ws = ws;
-                for (IdentifiableTopic command : queued) {
-                    ws.sendText(I.write(command), true);
-                }
-                queued = null;
-            }
-        }).to(text -> {
-            JSON json = I.json(text);
-
-            if (reject != null && reject.test(json)) {
-                return;
-            }
-
-            Supersonic<JSON> signaling = signals.get(extractId.apply(json));
-            if (signaling != null) {
-                signaling.accept(json);
-            }
-        }, e -> {
-            e.printStackTrace();
-            signals.values().forEach(signal -> signal.error(e));
-        }, () -> {
-            System.out.println("COMP");
-            signals.values().forEach(signal -> signal.complete());
-        });
     }
 
     /**
@@ -118,7 +103,7 @@ public class EfficientWebSocket {
         Objects.requireNonNull(topic);
 
         Supersonic<JSON> signal = signals.computeIfAbsent(topic.id, id -> {
-            Supersonic<JSON> supersonic = new Supersonic();
+            Supersonic<JSON> supersonic = new Supersonic(topic);
 
             // The subscription ID may be determined by the content of the response.
             if (update != null) {
@@ -126,16 +111,10 @@ public class EfficientWebSocket {
                 supersonic.expose.take(1).to(json -> signals.put(update.apply(json), signals.get(topic.id)));
             }
 
-            if (ws == null) {
-                queued.add(topic);
-            } else {
-                ws.sendText(I.write(topic), true);
-            }
-
             return supersonic;
         });
 
-        return signal.expose.effectOnDispose(() -> subscribe(topic.unsubscribe()));
+        return signal.expose.effectOnDispose(() -> ws.sendText(I.write(topic.unsubscribeCommand), true));
     }
 
     /**
@@ -147,10 +126,125 @@ public class EfficientWebSocket {
         }
     }
 
+    private int size;
+
+    /**
+     * Try to subscribe the specified topic.
+     * 
+     * @param topic
+     */
+    private void trySubscribe(IdentifiableTopic topic) {
+        size++;
+        System.out.println("subscribe " + size);
+
+        switch (state) {
+        case Disconnected:
+            connect();
+            queued.add(topic);
+            break;
+
+        case Connecting:
+            queued.add(topic);
+            break;
+
+        case Connected:
+            ws.sendText(I.write(topic), true);
+            break;
+
+        case Disconnecting:
+            // ignore
+            break;
+        }
+    }
+
+    /**
+     * Connect websocket.
+     */
+    private void connect() {
+        state = State.Connecting;
+
+        I.http(uri, ws -> {
+            synchronized (this) {
+                System.out.println("Connect to " + uri);
+                state = State.Connected;
+                this.ws = ws;
+                for (IdentifiableTopic command : queued) {
+                    System.out.println("Command " + command.id);
+                    ws.sendText(I.write(command), true);
+                }
+                queued.clear();
+            }
+        }).to(text -> {
+            // System.out.println(text);
+            JSON json = I.json(text);
+
+            if (reject != null && reject.test(json)) {
+                return;
+            }
+
+            Supersonic<JSON> signaling = signals.get(extractId.apply(json));
+            if (signaling != null) {
+                signaling.accept(json);
+            }
+        }, e -> {
+            state = State.Disconnected;
+            System.out.println("Error in WS " + uri);
+            signals.values().forEach(signal -> signal.error(e));
+        }, () -> {
+            state = State.Disconnected;
+            System.out.println("Complete WS " + uri);
+            signals.values().forEach(signal -> signal.complete());
+        });
+    }
+
+    /**
+     * Try to unsubscribe the specified topic.
+     * 
+     * @param topic
+     */
+    private void tryUnsubscribe(IdentifiableTopic topic) {
+        size--;
+        System.out.println("unsbscribe " + size);
+
+        switch (state) {
+        case Disconnected:
+            // ignore
+            break;
+
+        case Connecting:
+            queued.remove(topic);
+            break;
+
+        case Connected:
+            ws.sendText(I.write(topic.unsubscribe()), true);
+            break;
+
+        case Disconnecting:
+            // ignore
+            break;
+        }
+    }
+
+    /**
+     * Disconnect websocket.
+     */
+    private void disconnect() {
+        state = State.Disconnecting;
+
+        ws.sendClose(1000, "");
+    }
+
+    /**
+     * State Pattern
+     */
+    private static enum State {
+        Disconnected, Connecting, Connected, Disconnecting;
+    }
+
     /**
      * 
      */
-    public static abstract class IdentifiableTopic {
+    public static abstract class IdentifiableTopic implements Cloneable {
 
         /** The identifier. */
         private final String id;
@@ -187,24 +281,36 @@ public class EfficientWebSocket {
          */
         private IdentifiableTopic unsubscribe() {
             try {
+                IdentifiableTopic cloned = (IdentifiableTopic) clone();
                 for (Field field : getClass().getFields()) {
-                    if (field.getType() == String.class && Objects.equals(field.get(this), subscribeCommand)) {
+                    if (field.getType() == String.class && Objects.equals(field.get(cloned), subscribeCommand)) {
                         field.setAccessible(true);
-                        field.set(this, unsubscribeCommand);
+                        field.set(cloned, unsubscribeCommand);
                         break;
                     }
                 }
+                return cloned;
             } catch (Exception e) {
                 throw I.quiet(e);
             }
-            return this;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String toString() {
+            return I.write(this);
         }
     }
 
     /**
      * Supersonic {@link Signal} support subject.
      */
-    private static class Supersonic<V> implements Observer<V> {
+    private class Supersonic<V> implements Observer<V> {
+
+        /** The associated topic. */
+        private IdentifiableTopic topic;
 
         /** The number of internal listeners. */
         private int size = 0;
@@ -217,14 +323,25 @@ public class EfficientWebSocket {
 
         /** The exposed interface. */
         private final Signal<V> expose = new Signal<>((observer, disposer) -> {
+            if (size == 0) trySubscribe(topic);
+
             holder.add(observer);
             update();
 
             return disposer.add(() -> {
                 holder.remove(observer);
                 update();
+
+                if (size == 0) tryUnsubscribe(topic);
             });
         });
+
+        /**
+         * @param topic
+         */
+        private Supersonic(IdentifiableTopic topic) {
+            this.topic = topic;
+        }
 
         private void update() {
             observers = holder.toArray(new Observer[holder.size()]);
@@ -285,15 +402,11 @@ public class EfficientWebSocket {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        EfficientWebSocket realtime = new EfficientWebSocket("wss://ws.lightstream.bitflyer.com/json-rpc", 25, json -> {
-            return json.find(String.class, "params", "channel").toString();
-        });
+        Market m = new Market(BitFlyer.FX_BTC_JPY);
+        m.readLog(x -> x.fromToday(LogType.Fast).effect(e -> {
+        }));
 
-        realtime.subscribe(new Command("lightning_board_", "FX_BTC_JPY")).to(e -> {
-            System.out.println("BTC  " + e);
-        });
-
-        Thread.sleep(1000 * 40);
+        Thread.sleep(1000 * 60 * 10);
     }
 
 }

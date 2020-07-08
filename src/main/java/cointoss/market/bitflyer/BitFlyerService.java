@@ -9,7 +9,7 @@
  */
 package cointoss.market.bitflyer;
 
-import static kiss.I.*;
+import static kiss.I.translate;
 import static viewtify.ui.UIWeb.Operation.*;
 
 import java.net.URI;
