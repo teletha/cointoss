@@ -22,7 +22,7 @@ import java.util.function.Predicate;
 
 import cointoss.Market;
 import cointoss.execution.ExecutionLog.LogType;
-import cointoss.market.bitflyer.BitFlyer;
+import cointoss.market.bitmex.BitMex;
 import kiss.I;
 import kiss.JSON;
 import kiss.Observer;
@@ -105,12 +105,6 @@ public class EfficientWebSocket {
         Supersonic<JSON> signal = signals.computeIfAbsent(topic.id, id -> {
             Supersonic<JSON> supersonic = new Supersonic(topic);
 
-            // The subscription ID may be determined by the content of the response.
-            if (update != null) {
-                supersonic.size = 1;
-                supersonic.expose.take(1).to(json -> signals.put(update.apply(json), signals.get(topic.id)));
-            }
-
             return supersonic;
         });
 
@@ -123,10 +117,13 @@ public class EfficientWebSocket {
      * @param topic A topic to subscribe.
      */
     private synchronized void sendSubscribe(IdentifiableTopic topic) {
-        send(topic);
+        if (ws == null) {
+            queue.add(topic);
+        } else {
+            send(topic);
+        }
 
         if (subscriptions++ == 0) {
-            queue.add(topic);
             connect();
         }
     }
@@ -153,6 +150,7 @@ public class EfficientWebSocket {
     private void send(IdentifiableTopic topic) {
         if (ws != null) {
             try {
+                System.out.println("Send " + topic.id);
                 ws.sendText(I.write(topic), true);
             } catch (Throwable e) {
                 // ignore
@@ -287,10 +285,13 @@ public class EfficientWebSocket {
 
         /** The exposed interface. */
         private final Signal<V> expose = new Signal<>((observer, disposer) -> {
-            if (size == 0) sendSubscribe(topic);
-
             holder.add(observer);
             update();
+
+            if (size == 1) {
+                registerUpdater();
+                sendSubscribe(topic);
+            }
 
             return disposer.add(() -> {
                 holder.remove(observer);
@@ -315,6 +316,33 @@ public class EfficientWebSocket {
         private void update() {
             observers = holder.toArray(new Observer[holder.size()]);
             size = observers.length;
+        }
+
+        /**
+         * The subscription ID may be determined by the content of the response.
+         */
+        private void registerUpdater() {
+            if (update != null) {
+                class Updater implements Observer<JSON> {
+
+                    @Override
+                    public void accept(JSON json) {
+                        // update id
+                        signals.put(update.apply(json), signals.get(topic.id));
+                        System.out.println("Update ID " + update.apply(json) + "  " + signals.keySet());
+
+                        // remove myself
+                        holder.remove(this);
+                        update();
+                    }
+                }
+
+                // Add updater at head, we will make sure that only this updater is processed for
+                // the next event.
+                holder.add(0, new Updater());
+                update();
+                size = 1;
+            }
         }
 
         @Override
@@ -366,8 +394,9 @@ public class EfficientWebSocket {
         // x.printStackTrace();
         // });
 
-        Market m = new Market(BitFlyer.FX_BTC_JPY);
+        Market m = new Market(BitMex.XBT_USD);
         m.readLog(x -> x.fromToday(LogType.Fast).effect(e -> {
+            System.out.println(e);
         }));
 
         Thread.sleep(1000 * 60 * 10);
