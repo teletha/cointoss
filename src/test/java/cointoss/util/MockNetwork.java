@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Queue;
 
+import kiss.I;
 import kiss.JSON;
 import kiss.Signal;
 import kiss.Signaling;
@@ -27,6 +28,25 @@ public class MockNetwork extends Network {
 
     /** The mocked websocket manager. */
     private final Map<String, MockSocket> websockets = new HashMap();
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Signal<JSON> rest(Builder request, APILimiter limiter) {
+        String path = request.build().uri().getRawPath();
+        MockResponse mock = responses.get(path);
+
+        if (mock == null) {
+            throw new AssertionError("[" + path + "] requires valid response.");
+        } else {
+            return new Signal<>((observer, disposer) -> {
+                observer.accept(mock.responseAsJSON());
+                observer.complete();
+                return disposer;
+            });
+        }
+    }
 
     /**
      * {@inheritDoc}
@@ -95,6 +115,15 @@ public class MockNetwork extends Network {
          */
         private Object response() {
             return response.poll();
+        }
+
+        /**
+         * Return your response.
+         * 
+         * @return
+         */
+        private JSON responseAsJSON() {
+            return I.json(I.write(response.poll()));
         }
     }
 

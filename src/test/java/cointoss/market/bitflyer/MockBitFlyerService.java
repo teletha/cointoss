@@ -9,6 +9,7 @@
  */
 package cointoss.market.bitflyer;
 
+import java.util.ArrayList;
 import java.util.Objects;
 
 import cointoss.MarketSetting;
@@ -67,7 +68,17 @@ class MockBitFlyerService extends BitFlyerService {
         o.outstanding_size = order.size;
         o.executed_size = Num.ZERO;
 
-        mockNetwork.request("/v1/me/getchildorders").willResponse(o);
+        ChildOrderResponseList array = new ChildOrderResponseList();
+        array.add(o);
+
+        mockNetwork.request("/v1/me/getchildorders").willResponse(array);
+    }
+
+    /**
+     * Root element.
+     */
+    @SuppressWarnings("serial")
+    private static class ChildOrderResponseList extends ArrayList<ChildOrderResponse> {
     }
 
     /**
