@@ -169,37 +169,32 @@ public class EfficientWebSocket {
     private void connect() {
         logger.info("Starting websocket [{}].", uri);
 
-        try {
-            I.http(uri, ws -> {
-                logger.info("Connected websocket [{}].", uri);
+        I.http(uri, ws -> {
+            logger.info("Connected websocket [{}].", uri);
 
-                this.ws = ws;
-                for (IdentifiableTopic command : queue) {
-                    send(command);
-                }
-                queue.clear();
-            }).to(text -> {
-                JSON json = I.json(text);
+            this.ws = ws;
+            for (IdentifiableTopic command : queue) {
+                send(command);
+            }
+            queue.clear();
+        }).to(text -> {
+            JSON json = I.json(text);
 
-                if (reject != null && reject.test(json)) {
-                    return;
-                }
+            if (reject != null && reject.test(json)) {
+                return;
+            }
 
-                Supersonic<JSON> signaling = signals.get(extractId.apply(json));
-                if (signaling != null) {
-                    signaling.accept(json);
-                }
-            }, e -> {
-                logger.error("Disconnected websocket [{}].", uri, e);
-                signals.values().forEach(signal -> signal.error(e));
-            }, () -> {
-                logger.info("Finished websocket [{}].", uri);
-                signals.values().forEach(signal -> signal.complete());
-            });
-        } catch (Throwable e) {
-            e.printStackTrace();
-            throw I.quiet(e);
-        }
+            Supersonic<JSON> signaling = signals.get(extractId.apply(json));
+            if (signaling != null) {
+                signaling.accept(json);
+            }
+        }, e -> {
+            logger.error("Disconnected websocket [{}].", uri, e);
+            signals.values().forEach(signal -> signal.error(e));
+        }, () -> {
+            logger.info("Finished websocket [{}].", uri);
+            signals.values().forEach(signal -> signal.complete());
+        });
     }
 
     /**
@@ -371,9 +366,9 @@ public class EfficientWebSocket {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        Thread.setDefaultUncaughtExceptionHandler((e, x) -> {
-            x.printStackTrace();
-        });
+        // Thread.setDefaultUncaughtExceptionHandler((e, x) -> {
+        // x.printStackTrace();
+        // });
 
         Market m = new Market(Bitfinex.BTC_USDT);
         m.readLog(x -> x.fromToday(LogType.Fast).throttle(3, TimeUnit.SECONDS).effect(e -> {
