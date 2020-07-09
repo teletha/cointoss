@@ -271,28 +271,31 @@ public class EfficientWebSocket {
         /** The associated topic. */
         private IdentifiableTopic topic;
 
+        /** State */
+        private boolean updating = false;
+
         /** The number of internal listeners. */
         private int size = 0;
 
         /** The internal listeners. */
-        private Observer[] observers = new Observer[0];
+        private Observer[] deployed = new Observer[0];
 
         /** The array manipulator. */
-        private final ArrayList<Observer> holder = new ArrayList();
+        private final ArrayList<Observer> observers = new ArrayList();
 
         /** The exposed interface. */
         private final Signal<V> expose = new Signal<>((observer, disposer) -> {
-            holder.add(observer);
-            update();
+            observers.add(observer);
+            deploy();
 
             if (size == 1) {
-                registerUpdater();
+                if (extractNewId != null) new Updater();
                 sendSubscribe(topic);
             }
 
             return disposer.add(() -> {
-                holder.remove(observer);
-                update();
+                observers.remove(observer);
+                deploy();
 
                 if (size == 0) snedUnsubscribe(topic);
             });
@@ -308,59 +311,70 @@ public class EfficientWebSocket {
         }
 
         /**
-         * Update observers.
+         * Deploy observers.
          */
-        private void update() {
-            observers = holder.toArray(new Observer[holder.size()]);
-            size = observers.length;
-        }
-
-        /**
-         * The subscription ID may be determined by the content of the response.
-         */
-        private void registerUpdater() {
-            if (extractNewId != null) {
-                class Updater implements Observer<JSON> {
-
-                    @Override
-                    public void accept(JSON json) {
-                        // update id
-                        String newId = extractNewId.apply(json);
-                        signals.put(newId, signals.get(topic.id));
-                        logger.info("Update websocket [{}] subscription id from '{}' to '{}'.", uri, topic.id, newId);
-
-                        // remove myself
-                        holder.remove(this);
-                        update();
-                    }
-                }
-
-                // Add updater at head, we will make sure that only this updater is processed for
-                // the next event.
-                holder.add(0, new Updater());
-                update();
-                size = 1;
+        private void deploy() {
+            if (!updating) {
+                deployed = observers.toArray(new Observer[observers.size()]);
+                size = deployed.length;
             }
         }
 
         @Override
         public void accept(V value) {
             for (int i = 0; i < size; i++) {
-                observers[i].accept(value);
+                deployed[i].accept(value);
             }
         }
 
         @Override
         public void complete() {
             for (int i = 0; i < size; i++) {
-                observers[i].complete();
+                deployed[i].complete();
             }
         }
 
         @Override
         public void error(Throwable error) {
             for (int i = 0; i < size; i++) {
-                observers[i].error(error);
+                deployed[i].error(error);
+            }
+        }
+
+        /**
+         * The subscription ID may be determined by the content of the response.
+         */
+        private class Updater implements Observer<JSON> {
+
+            private Updater() {
+                // store original observers
+                updating = true;
+
+                // register this updater
+                size = 1;
+                deployed = new Observer[] {this};
+            }
+
+            @Override
+            public void accept(JSON json) {
+                // update id
+                String newId = extractNewId.apply(json);
+                signals.put(newId, signals.get(topic.id));
+                logger.info("Update websocket [{}] subscription id from '{}' to '{}'.", uri, topic.id, newId);
+
+                // restore original observers
+                updating = false;
+                deploy();
+            }
+
+            @Override
+            public void error(Throwable e) {
+                observers.forEach(o -> o.error(e));
+            }
+
+            @Override
+            public void complete() {
+                observers.forEach(o -> o.complete());
             }
         }
     }
