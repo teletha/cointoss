@@ -13,8 +13,9 @@ import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -59,12 +60,7 @@ public abstract class MarketService implements Disposable {
     public final MarketSetting setting;
 
     /** The market specific scheduler. */
-    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(8, task -> {
-        Thread thread = new Thread(task);
-        thread.setName(marketIdentity());
-        thread.setDaemon(true);
-        return thread;
-    });
+    private final ScheduledThreadPoolExecutor scheduler;
 
     /** The shared real-time execution log. */
     private Signal<Execution> executions;
@@ -83,6 +79,15 @@ public abstract class MarketService implements Disposable {
         this.exchangeName = Objects.requireNonNull(exchangeName);
         this.marketName = Objects.requireNonNull(marketName);
         this.setting = setting;
+        this.scheduler = new ScheduledThreadPoolExecutor(8, task -> {
+            Thread thread = new Thread(task);
+            thread.setName(marketIdentity() + " Scheduler");
+            thread.setDaemon(true);
+            return thread;
+        });
+        this.scheduler.allowCoreThreadTimeOut(true);
+        this.scheduler.setKeepAliveTime(1, TimeUnit.MINUTES);
+
         this.log = new ExecutionLog(this);
     }
 
