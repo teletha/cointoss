@@ -62,7 +62,7 @@ public class EfficientWebSocket {
     private final Deque<IdentifiableTopic> queue = new ArrayDeque();
 
     /** The signal tee. */
-    private final Map<String, Supersonic<JSON>> signals = new HashMap();
+    private final Map<String, Supersonic> signals = new HashMap();
 
     /** The management of subscriptions. */
     private int subscriptions;
@@ -111,9 +111,7 @@ public class EfficientWebSocket {
     public final synchronized Signal<JSON> subscribe(IdentifiableTopic topic) {
         Objects.requireNonNull(topic);
 
-        Supersonic<JSON> signal = signals.computeIfAbsent(topic.id, id -> new Supersonic(topic));
-
-        return signal.expose;
+        return signals.computeIfAbsent(topic.id, id -> new Supersonic(topic)).expose;
     }
 
     /**
@@ -141,7 +139,7 @@ public class EfficientWebSocket {
     private synchronized void snedUnsubscribe(IdentifiableTopic topic) {
         send(topic.unsubscribe());
 
-        if (--subscriptions == 0) {
+        if (subscriptions == 0 || --subscriptions == 0) {
             disconnect();
             queue.clear();
         }
@@ -184,15 +182,17 @@ public class EfficientWebSocket {
                 return;
             }
 
-            Supersonic<JSON> signaling = signals.get(extractId.apply(json));
+            Supersonic signaling = signals.get(extractId.apply(json));
             if (signaling != null) {
                 signaling.accept(json);
             }
         }, e -> {
-            logger.error("Disconnected websocket [{}].", uri, e);
+            logger.error("Disconnected websocket [{}].", uri, cause(e));
+            disconnect();
             signals.values().forEach(signal -> signal.error(e));
         }, () -> {
             logger.info("Finished websocket [{}].", uri);
+            disconnect();
             signals.values().forEach(signal -> signal.complete());
         });
     }
@@ -210,6 +210,23 @@ public class EfficientWebSocket {
                 ws = null;
             }
         }
+        subscriptions = 0;
+        queue.clear();
+    }
+
+    /**
+     * Get the root cause.
+     * 
+     * @param e
+     * @return
+     */
+    private static Throwable cause(Throwable e) {
+        Throwable cause = e.getCause();
+        while (cause != null) {
+            e = cause;
+            cause = e.getCause();
+        }
+        return e;
     }
 
     /**
@@ -266,7 +283,7 @@ public class EfficientWebSocket {
     /**
      * Supersonic {@link Signal} support subject.
      */
-    private class Supersonic<V> implements Observer<V> {
+    private class Supersonic implements Observer<JSON> {
 
         /** The associated topic. */
         private IdentifiableTopic topic;
@@ -284,7 +301,7 @@ public class EfficientWebSocket {
         private final ArrayList<Observer> observers = new ArrayList();
 
         /** The exposed interface. */
-        private final Signal<V> expose = new Signal<>((observer, disposer) -> {
+        private final Signal<JSON> expose = new Signal<>((observer, disposer) -> {
             observers.add(observer);
             deploy();
 
@@ -321,7 +338,7 @@ public class EfficientWebSocket {
         }
 
         @Override
-        public void accept(V value) {
+        public void accept(JSON value) {
             for (int i = 0; i < size; i++) {
                 deployed[i].accept(value);
             }
@@ -350,7 +367,7 @@ public class EfficientWebSocket {
                 // store original observers
                 updating = true;
 
-                // register this updater
+                // register this updater directly
                 size = 1;
                 deployed = new Observer[] {this};
             }
