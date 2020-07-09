@@ -292,14 +292,14 @@ class BitMexService extends MarketService {
     /**
      * Subscription topic for websocket communication.
      */
-    public static class Topic extends IdentifiableTopic {
+    static class Topic extends IdentifiableTopic<Topic> {
 
         public String op = "subscribe";
 
         public List<String> args = new ArrayList();
 
         private Topic(String channel, String market) {
-            super(channel + "[" + market + "]");
+            super(channel + "[" + market + "]", topic -> topic.op = "unsubscribe");
 
             this.args.add(channel + ":" + market);
         }

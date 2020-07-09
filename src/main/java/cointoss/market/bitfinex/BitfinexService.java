@@ -289,7 +289,7 @@ class BitfinexService extends MarketService {
     /**
      * 
      */
-    public static class Topic extends IdentifiableTopic {
+    static class Topic extends IdentifiableTopic<Topic> {
 
         public String event = "subscribe";
 
@@ -298,7 +298,7 @@ class BitfinexService extends MarketService {
         public String symbol;
 
         private Topic(String channel, String symbol) {
-            super(channel + symbol);
+            super(channel + symbol, topic -> topic.event = "unsubscribe");
             this.channel = channel;
             this.symbol = symbol;
         }

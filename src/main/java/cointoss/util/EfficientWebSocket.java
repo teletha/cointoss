@@ -9,7 +9,6 @@
  */
 package cointoss.util;
 
-import java.lang.reflect.Field;
 import java.net.http.WebSocket;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -17,6 +16,8 @@ import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -58,7 +59,6 @@ public class EfficientWebSocket {
     private int subscriptions;
 
     /**
-     * 
      * @param uri
      * @param max
      * @param extractId
@@ -102,11 +102,7 @@ public class EfficientWebSocket {
     public final synchronized Signal<JSON> subscribe(IdentifiableTopic topic) {
         Objects.requireNonNull(topic);
 
-        Supersonic<JSON> signal = signals.computeIfAbsent(topic.id, id -> {
-            Supersonic<JSON> supersonic = new Supersonic(topic);
-
-            return supersonic;
-        });
+        Supersonic<JSON> signal = signals.computeIfAbsent(topic.id, id -> new Supersonic(topic));
 
         return signal.expose.effectOnDispose(() -> send(topic.unsubscribe()));
     }
@@ -206,34 +202,28 @@ public class EfficientWebSocket {
     /**
      * Identifiable topic which can represents subscribe and unsubscribe commands.
      */
-    public static abstract class IdentifiableTopic implements Cloneable {
+    public static abstract class IdentifiableTopic<T extends IdentifiableTopic> implements Cloneable {
 
         /** The identifier. */
         private final String id;
 
-        /** The subscription command. */
-        private final String subscribeCommand;
-
-        /** The unsubscription command. */
-        private final String unsubscribeCommand;
+        /** The unsubscription command builder. */
+        private final Consumer<T> unsubscribeCommanBuilder;
 
         /**
-         * 
+         * @param id
+         * @param unsubscribeCommanBuilder
          */
-        protected IdentifiableTopic(String id) {
-            this(id, "subscribe", "unsubscribe");
-        }
-
-        /**
-         * 
-         */
-        protected IdentifiableTopic(String id, String subscribeCommand, String unsubscribeCommand) {
+        protected IdentifiableTopic(String id, Consumer<T> unsubscribeCommanBuilder) {
             if (id == null || id.isEmpty()) {
                 throw new IllegalArgumentException("ID must be non-empty value.");
             }
+
+            if (unsubscribeCommanBuilder == null) {
+                throw new IllegalArgumentException("Can't unsubscribe command.");
+            }
             this.id = id;
-            this.subscribeCommand = Objects.requireNonNull(subscribeCommand);
-            this.unsubscribeCommand = Objects.requireNonNull(unsubscribeCommand);
+            this.unsubscribeCommanBuilder = unsubscribeCommanBuilder;
         }
 
         /**
@@ -243,14 +233,8 @@ public class EfficientWebSocket {
          */
         private IdentifiableTopic unsubscribe() {
             try {
-                IdentifiableTopic cloned = (IdentifiableTopic) clone();
-                for (Field field : getClass().getFields()) {
-                    if (field.getType() == String.class && Objects.equals(field.get(cloned), subscribeCommand)) {
-                        field.setAccessible(true);
-                        field.set(cloned, unsubscribeCommand);
-                        break;
-                    }
-                }
+                T cloned = (T) clone();
+                unsubscribeCommanBuilder.accept(cloned);
                 return cloned;
             } catch (Exception e) {
                 throw I.quiet(e);
@@ -367,39 +351,17 @@ public class EfficientWebSocket {
         }
     }
 
-    /**
-     * 
-     */
-    static class Command extends IdentifiableTopic {
-
-        public long id = 123;
-
-        public String jsonrpc = "2.0";
-
-        public String method = "subscribe";
-
-        public Map<String, String> params = new HashMap();
-
-        /**
-         * @param id
-         */
-        public Command(String channel, String marketName) {
-            super("[" + channel + marketName + "]");
-            params.put("channel", channel + marketName);
-        }
-    }
-
     public static void main(String[] args) throws InterruptedException {
         // Thread.setDefaultUncaughtExceptionHandler((e, x) -> {
         // x.printStackTrace();
         // });
 
         Market m = new Market(BitMex.XBT_USD);
-        m.readLog(x -> x.fromToday(LogType.Fast).effect(e -> {
+        m.readLog(x -> x.fromToday(LogType.Fast).throttle(3, TimeUnit.SECONDS).effect(e -> {
             System.out.println(e);
         }));
 
-        Thread.sleep(1000 * 60 * 10);
+        Thread.sleep(1000 * 30);
     }
 
 }

@@ -102,7 +102,7 @@ class BinanceService extends MarketService {
      */
     @Override
     protected Signal<Execution> connectExecutionRealtimely() {
-        return realtime().subscribe(new Command("aggTrade", marketName)).map(json -> convert(json.get("data")));
+        return realtime().subscribe(new Topic("aggTrade", marketName)).map(json -> convert(json.get("data")));
     }
 
     /**
@@ -161,7 +161,7 @@ class BinanceService extends MarketService {
         String bidName = isFutures ? "b" : "bids";
         String askName = isFutures ? "a" : "asks";
 
-        return realtime().subscribe(new Command("depth20@100ms", marketName))
+        return realtime().subscribe(new Topic("depth20@100ms", marketName))
                 .map(json -> convertOrderBook(json.get("data"), bidName, askName));
     }
 
@@ -257,7 +257,7 @@ class BinanceService extends MarketService {
     /**
      * 
      */
-    public static class Command extends IdentifiableTopic {
+    static class Topic extends IdentifiableTopic<Topic> {
 
         public String method = "SUBSCRIBE";
 
@@ -265,8 +265,8 @@ class BinanceService extends MarketService {
 
         public int id = 0;
 
-        private Command(String channel, String market) {
-            super(market.toLowerCase() + "@" + channel, "SUBSCRIBE", "UNSUBSCRIBE");
+        private Topic(String channel, String market) {
+            super(market.toLowerCase() + "@" + channel, topic -> topic.method = "UNSUBSCRIBE");
             this.params.add(market.toLowerCase() + "@" + channel);
         }
     }

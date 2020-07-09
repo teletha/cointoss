@@ -9,7 +9,7 @@
  */
 package cointoss.market.bitflyer;
 
-import static kiss.I.translate;
+import static kiss.I.*;
 import static viewtify.ui.UIWeb.Operation.*;
 
 import java.net.URI;
@@ -855,7 +855,7 @@ class BitFlyerService extends MarketService {
     /**
      * 
      */
-    public static class Topic extends IdentifiableTopic {
+    static class Topic extends IdentifiableTopic<Topic> {
 
         public long id = 123;
 
@@ -869,7 +869,7 @@ class BitFlyerService extends MarketService {
          * @param id
          */
         public Topic(String channel, String marketName) {
-            super("[" + channel + marketName + "]");
+            super("[" + channel + marketName + "]", topic -> topic.method = "unsubscribe");
             params.put("channel", channel + marketName);
         }
     }
