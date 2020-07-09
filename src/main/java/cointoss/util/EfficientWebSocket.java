@@ -21,9 +21,12 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import cointoss.Market;
 import cointoss.execution.ExecutionLog.LogType;
-import cointoss.market.bitmex.BitMex;
+import cointoss.market.bitflyer.BitFlyer;
 import kiss.I;
 import kiss.JSON;
 import kiss.Observer;
@@ -31,14 +34,26 @@ import kiss.Signal;
 
 public class EfficientWebSocket {
 
+    /** Logging utility. */
+    private static final Logger logger = LogManager.getLogger();
+
     /** The connection address. */
     private final String uri;
 
-    /** The id extractor. */
-    private final Function<JSON, String> extractId;
-
     /** The maximum subscription size. */
     private final int max;
+
+    /** The ID extractor. */
+    private final Function<JSON, String> extractId;
+
+    /**
+     * Updated ID extractor to deal with cases where ID is specified in the response of
+     * subscription.
+     */
+    private Function<JSON, String> extractNewId;
+
+    /** The rejectable message pattern. */
+    private Predicate<JSON> reject;
 
     /** The cached connection. */
     private WebSocket ws;
@@ -48,12 +63,6 @@ public class EfficientWebSocket {
 
     /** The signal tee. */
     private final Map<String, Supersonic<JSON>> signals = new HashMap();
-
-    /** The reject filter. */
-    private Predicate<JSON> reject;
-
-    /** The processing when the ID changes depending on the content of the response. */
-    private Function<JSON, String> update;
 
     /** The management of subscriptions. */
     private int subscriptions;
@@ -77,13 +86,13 @@ public class EfficientWebSocket {
      * @return
      */
     public final EfficientWebSocket updateIdBy(Function<JSON, String> extractNewId) {
-        this.update = extractNewId;
+        this.extractNewId = extractNewId;
         return this;
     }
 
     /**
-     * Ignore JSONs that match the specified criteria. This process is very efficient because it is
-     * tried only once for each JSON data on the base signal.
+     * Ignore JSON that match the specified criteria. This process is very efficient because it is
+     * tried only once for each JSON data on the base stream.
      * 
      * @param condition
      * @return
@@ -104,7 +113,7 @@ public class EfficientWebSocket {
 
         Supersonic<JSON> signal = signals.computeIfAbsent(topic.id, id -> new Supersonic(topic));
 
-        return signal.expose.effectOnDispose(() -> send(topic.unsubscribe()));
+        return signal.expose;
     }
 
     /**
@@ -146,10 +155,11 @@ public class EfficientWebSocket {
     private void send(IdentifiableTopic topic) {
         if (ws != null) {
             try {
-                System.out.println("Send " + topic.id);
                 ws.sendText(I.write(topic), true);
+                logger.info("Send websocket command {} to {}.", topic, uri);
             } catch (Throwable e) {
                 // ignore
+                System.out.println(e);
             }
         }
     }
@@ -158,7 +168,11 @@ public class EfficientWebSocket {
      * Connect to the server by websocket.
      */
     private void connect() {
+        logger.info("Starting websocket [{}].", uri);
+
         I.http(uri, ws -> {
+            logger.info("Connected websocket [{}].", uri);
+
             this.ws = ws;
             for (IdentifiableTopic command : queue) {
                 send(command);
@@ -176,10 +190,10 @@ public class EfficientWebSocket {
                 signaling.accept(json);
             }
         }, e -> {
-            System.out.println("Error in WS " + uri);
+            logger.error("Disconnected websocket [{}].", uri, e);
             signals.values().forEach(signal -> signal.error(e));
         }, () -> {
-            System.out.println("Complete WS " + uri);
+            logger.info("Finished websocket [{}].", uri);
             signals.values().forEach(signal -> signal.complete());
         });
     }
@@ -246,7 +260,7 @@ public class EfficientWebSocket {
          */
         @Override
         public String toString() {
-            return I.write(this);
+            return I.write(this).replaceAll("\\s", "");
         }
     }
 
@@ -306,14 +320,14 @@ public class EfficientWebSocket {
          * The subscription ID may be determined by the content of the response.
          */
         private void registerUpdater() {
-            if (update != null) {
+            if (extractNewId != null) {
                 class Updater implements Observer<JSON> {
 
                     @Override
                     public void accept(JSON json) {
                         // update id
-                        signals.put(update.apply(json), signals.get(topic.id));
-                        System.out.println("Update ID " + update.apply(json) + "  " + signals.keySet());
+                        signals.put(extractNewId.apply(json), signals.get(topic.id));
+                        System.out.println("Update ID " + extractNewId.apply(json) + "  " + signals.keySet());
 
                         // remove myself
                         holder.remove(this);
@@ -356,12 +370,12 @@ public class EfficientWebSocket {
         // x.printStackTrace();
         // });
 
-        Market m = new Market(BitMex.XBT_USD);
+        Market m = new Market(BitFlyer.FX_BTC_JPY);
         m.readLog(x -> x.fromToday(LogType.Fast).throttle(3, TimeUnit.SECONDS).effect(e -> {
             System.out.println(e);
         }));
 
-        Thread.sleep(1000 * 30);
+        Thread.sleep(1000 * 120);
     }
 
 }
