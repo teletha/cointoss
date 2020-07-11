@@ -9,7 +9,7 @@
  */
 package cointoss.market.bitflyer;
 
-import static kiss.I.*;
+import static kiss.I.translate;
 import static viewtify.ui.UIWeb.Operation.*;
 
 import java.net.URI;
@@ -72,7 +72,7 @@ class BitFlyerService extends MarketService {
     private static final APILimiter Limit = APILimiter.with.limit(500).refresh(Duration.ofMinutes(5));
 
     /** The realtime communicator. */
-    private static final EfficientWebSocket Realtime = new EfficientWebSocket("wss://ws.lightstream.bitflyer.com/json-rpc", 25, json -> {
+    static final EfficientWebSocket Realtime = new EfficientWebSocket("wss://ws.lightstream.bitflyer.com/json-rpc", json -> {
         return json.find(String.class, "params", "channel").toString();
     });
 

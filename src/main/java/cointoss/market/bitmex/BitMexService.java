@@ -48,7 +48,7 @@ class BitMexService extends MarketService {
     private static final APILimiter Limit = APILimiter.with.limit(45).refresh(Duration.ofMinutes(1));
 
     /** The realtime communicator. */
-    private static final EfficientWebSocket Realtime = new EfficientWebSocket("wss://www.bitmex.com/realtime", 25, json -> json
+    private static final EfficientWebSocket Realtime = new EfficientWebSocket("wss://www.bitmex.com/realtime", json -> json
             .text("table") + json.find(String.class, "data", "0", "symbol"));
 
     /** The market id. */

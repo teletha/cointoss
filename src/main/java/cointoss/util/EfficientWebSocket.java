@@ -41,7 +41,7 @@ public class EfficientWebSocket {
     private final String uri;
 
     /** The maximum subscription size. */
-    private final int max;
+    private int max = 25;
 
     /** The ID extractor. */
     private final Function<JSON, String> extractId;
@@ -72,10 +72,24 @@ public class EfficientWebSocket {
      * @param max
      * @param extractId
      */
-    public EfficientWebSocket(String uri, int max, Function<JSON, String> extractId) {
+    public EfficientWebSocket(String uri, Function<JSON, String> extractId) {
         this.uri = Objects.requireNonNull(uri);
         this.extractId = Objects.requireNonNull(extractId);
-        this.max = max;
+    }
+
+    /**
+     * Sets the maximum number of subscriptions per connection. Default value is 25.
+     * 
+     * @param size The maximum number of subscriptions per connection. A number less than or equal
+     *            to 0 is considered unlimited.
+     * @return Chainable API.
+     */
+    public final EfficientWebSocket subscriptionSize(int size) {
+        if (size <= 0) {
+            size = Integer.MAX_VALUE;
+        }
+        this.max = size;
+        return this;
     }
 
     /**
@@ -83,7 +97,7 @@ public class EfficientWebSocket {
      * new ID from the response.
      * 
      * @param extractNewId
-     * @return
+     * @return Chainable API.
      */
     public final EfficientWebSocket updateIdBy(Function<JSON, String> extractNewId) {
         this.extractNewId = extractNewId;
@@ -95,7 +109,7 @@ public class EfficientWebSocket {
      * tried only once for each JSON data on the base stream.
      * 
      * @param condition
-     * @return
+     * @return Chainable API.
      */
     public final EfficientWebSocket ignoreIf(Predicate<JSON> condition) {
         this.reject = condition;
