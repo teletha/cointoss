@@ -14,7 +14,6 @@ import static java.time.temporal.ChronoUnit.MINUTES;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.LongFunction;
@@ -25,6 +24,7 @@ import org.apache.logging.log4j.Logger;
 import com.google.common.annotations.VisibleForTesting;
 
 import icy.manipulator.Icy;
+import kiss.Disposable;
 import kiss.I;
 import kiss.Signal;
 import kiss.WiseFunction;
@@ -41,7 +41,7 @@ abstract class RetryPolicyModel implements WiseFunction<Signal<Throwable>, Signa
     @VisibleForTesting
     boolean parking;
 
-    Future<?> autoReset;
+    Disposable autoReset;
 
     @VisibleForTesting
     WiseRunnable onRetry;
@@ -224,9 +224,9 @@ abstract class RetryPolicyModel implements WiseFunction<Signal<Throwable>, Signa
         }).take(limit()).delay(e -> {
             if (autoReset()) {
                 if (autoReset != null) {
-                    autoReset.cancel(true);
+                    autoReset.dispose();
                 }
-                autoReset = I.schedule(delayMaximum().toMillis() * 2, TimeUnit.MILLISECONDS, scheduler(), this::reset);
+                autoReset = I.schedule(delayMaximum().toMillis() * 2, TimeUnit.MILLISECONDS, scheduler()).to(this::reset);
             }
 
             Duration duration = Chrono.between(delayMinimum(), delay().apply(count++), delayMaximum());

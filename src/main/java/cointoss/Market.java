@@ -444,7 +444,7 @@ public class Market implements Disposable {
          */
         @Override
         public Orderable cancelAfter(long time, ChronoUnit unit) {
-            return cancelWhen(I.schedule(time, 0, TimeUnit.of(unit), false, service.scheduler()));
+            return cancelWhen(I.schedule(time, TimeUnit.of(unit), service.scheduler()));
         }
 
         /**

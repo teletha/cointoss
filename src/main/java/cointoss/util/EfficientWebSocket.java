@@ -9,6 +9,7 @@
  */
 package cointoss.util;
 
+import java.net.http.HttpClient;
 import java.net.http.WebSocket;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -16,7 +17,6 @@ import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -24,9 +24,6 @@ import java.util.function.Predicate;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import cointoss.Market;
-import cointoss.execution.ExecutionLog.LogType;
-import cointoss.market.bitfinex.Bitfinex;
 import kiss.I;
 import kiss.JSON;
 import kiss.Observer;
@@ -68,7 +65,10 @@ public class EfficientWebSocket {
     private int subscriptions;
 
     /** The flag for loggin in detail. */
-    private boolean detailed;
+    private boolean debug;
+
+    /** The http client. */
+    private HttpClient[] client = new HttpClient[0];
 
     /**
      * @param uri
@@ -124,8 +124,18 @@ public class EfficientWebSocket {
      * 
      * @return Chainable API.
      */
-    public final EfficientWebSocket enableDetailedLog(boolean enable) {
-        this.detailed = enable;
+    public final EfficientWebSocket enableDebug() {
+        this.debug = true;
+        return this;
+    }
+
+    /**
+     * Outputs a detailed log.
+     * 
+     * @return Chainable API.
+     */
+    public final EfficientWebSocket enableDebug(HttpClient client) {
+        this.client = client == null ? new HttpClient[0] : new HttpClient[] {client};
         return this;
     }
 
@@ -202,7 +212,7 @@ public class EfficientWebSocket {
                 send(command);
             }
             queue.clear();
-        }).to(detailed ? I.bundle(logger::debug, this::dispatch) : this::dispatch, e -> {
+        }, client).to(debug ? I.bundle(this::debug, this::dispatch) : this::dispatch, e -> {
             logger.error("Disconnected websocket [{}].", uri, cause(e));
             disconnect();
             signals.values().forEach(signal -> signal.error(e));
@@ -229,6 +239,15 @@ public class EfficientWebSocket {
         if (signaling != null) {
             signaling.accept(json);
         }
+    }
+
+    /**
+     * Output test code.
+     * 
+     * @param text
+     */
+    private void debug(String text) {
+        System.out.println("server.sendJSON(\"" + text.replace('"', '\'') + "\");");
     }
 
     /**
@@ -430,17 +449,17 @@ public class EfficientWebSocket {
         }
     }
 
-    public static void main(String[] args) throws InterruptedException {
-        // Thread.setDefaultUncaughtExceptionHandler((e, x) -> {
-        // x.printStackTrace();
-        // });
-
-        Market m = new Market(Bitfinex.BTC_USDT);
-        m.readLog(x -> x.fromToday(LogType.Fast).throttle(3, TimeUnit.SECONDS).effect(e -> {
-            System.out.println(e);
-        }));
-
-        Thread.sleep(1000 * 220);
-    }
+    // public static void main(String[] args) throws InterruptedException {
+    // // Thread.setDefaultUncaughtExceptionHandler((e, x) -> {
+    // // x.printStackTrace();
+    // // });
+    //
+    // Market m = new Market(Bitfinex.BTC_USDT);
+    // m.readLog(x -> x.fromToday(LogType.Fast).throttle(3, TimeUnit.SECONDS).effect(e -> {
+    // System.out.println(e);
+    // }));
+    //
+    // Thread.sleep(1000 * 220);
+    // }
 
 }

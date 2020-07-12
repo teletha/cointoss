@@ -751,7 +751,7 @@ public class ExecutionLog {
          */
         private void writeCompact() {
             if (compact.isAbsent() && (!queue.isEmpty() || normal.isPresent())) {
-                I.schedule(5, SECONDS, () -> {
+                I.schedule(5, SECONDS).to(() -> {
                     compact(read()).effectOnComplete(() -> normal.delete()).to(I.NoOP);
                 });
             }
