@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="error">
+
+    <!-- Properties -->
+    <Properties>
+        <Property name="pattern">%p \t%m%n</Property>
+    </Properties>
+
+    <!-- Console Appender -->
+    <Appenders>
+        <Console name="SYSTEM" target="SYSTEM_OUT">
+            <PatternLayout pattern="${pattern}" />
+        </Console>
+    </Appenders>
+
+    <Loggers>
+        <Root level="error">
+            <AppenderRef ref="SYSTEM" />
+        </Root>
+    </Loggers>
+</Configuration>
