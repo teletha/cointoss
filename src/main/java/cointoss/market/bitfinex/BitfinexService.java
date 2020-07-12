@@ -59,7 +59,7 @@ class BitfinexService extends MarketService {
     /** The realtiem communicator. */
     private static final EfficientWebSocket Realtime = new EfficientWebSocket("wss://api-pub.bitfinex.com/ws/2", ExtractId)
             .updateIdBy(json -> json.text("chanId"))
-            .ignoreIf(json -> json.has("1", "hb")); // ignore heartbeat
+            .ignoreMessageIf(json -> json.has("1", "hb")); // ignore heartbeat
 
     /**
      * @param marketName

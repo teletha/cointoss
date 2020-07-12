@@ -67,6 +67,9 @@ public class EfficientWebSocket {
     /** The management of subscriptions. */
     private int subscriptions;
 
+    /** The flag for loggin in detail. */
+    private boolean detailed;
+
     /**
      * @param uri
      * @param max
@@ -84,7 +87,7 @@ public class EfficientWebSocket {
      *            to 0 is considered unlimited.
      * @return Chainable API.
      */
-    public final EfficientWebSocket subscriptionSize(int size) {
+    public final EfficientWebSocket maximumSubscriptions(int size) {
         if (size <= 0) {
             size = Integer.MAX_VALUE;
         }
@@ -111,8 +114,18 @@ public class EfficientWebSocket {
      * @param condition
      * @return Chainable API.
      */
-    public final EfficientWebSocket ignoreIf(Predicate<JSON> condition) {
+    public final EfficientWebSocket ignoreMessageIf(Predicate<JSON> condition) {
         this.reject = condition;
+        return this;
+    }
+
+    /**
+     * Outputs a detailed log.
+     * 
+     * @return Chainable API.
+     */
+    public final EfficientWebSocket enableDetailedLog(boolean enable) {
+        this.detailed = enable;
         return this;
     }
 
@@ -189,18 +202,7 @@ public class EfficientWebSocket {
                 send(command);
             }
             queue.clear();
-        }).to(text -> {
-            JSON json = I.json(text);
-
-            if (reject != null && reject.test(json)) {
-                return;
-            }
-
-            Supersonic signaling = signals.get(extractId.apply(json));
-            if (signaling != null) {
-                signaling.accept(json);
-            }
-        }, e -> {
+        }).to(detailed ? I.bundle(logger::debug, this::dispatch) : this::dispatch, e -> {
             logger.error("Disconnected websocket [{}].", uri, cause(e));
             disconnect();
             signals.values().forEach(signal -> signal.error(e));
@@ -209,6 +211,24 @@ public class EfficientWebSocket {
             disconnect();
             signals.values().forEach(signal -> signal.complete());
         });
+    }
+
+    /**
+     * Dispatch websocket message.
+     * 
+     * @param text
+     */
+    private void dispatch(String text) {
+        JSON json = I.json(text);
+
+        if (reject != null && reject.test(json)) {
+            return;
+        }
+
+        Supersonic signaling = signals.get(extractId.apply(json));
+        if (signaling != null) {
+            signaling.accept(json);
+        }
     }
 
     /**

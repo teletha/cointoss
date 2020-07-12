@@ -79,14 +79,14 @@ public abstract class MarketService implements Disposable {
         this.exchangeName = Objects.requireNonNull(exchangeName);
         this.marketName = Objects.requireNonNull(marketName);
         this.setting = setting;
-        this.scheduler = new ScheduledThreadPoolExecutor(8, task -> {
+        this.scheduler = new ScheduledThreadPoolExecutor(2, task -> {
             Thread thread = new Thread(task);
             thread.setName(marketIdentity() + " Scheduler");
             thread.setDaemon(true);
             return thread;
         });
         this.scheduler.allowCoreThreadTimeOut(true);
-        this.scheduler.setKeepAliveTime(1, TimeUnit.MINUTES);
+        this.scheduler.setKeepAliveTime(30, TimeUnit.SECONDS);
 
         this.log = new ExecutionLog(this);
     }
