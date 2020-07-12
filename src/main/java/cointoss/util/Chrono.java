@@ -10,7 +10,6 @@
 package cointoss.util;
 
 import java.net.InetAddress;
-import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -21,13 +20,14 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.net.ntp.NTPUDPClient;
 import org.apache.commons.net.ntp.TimeInfo;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
+import kiss.I;
 import kiss.Signal;
 
 public class Chrono {
@@ -64,6 +64,59 @@ public class Chrono {
 
     /** Reusable format. HH:mm */
     public static final DateTimeFormatter TimeWithoutSec = DateTimeFormatter.ofPattern("HH:mm");
+
+    /** The logging system. */
+    private static final Logger logger = LogManager.getLogger();
+
+    /** Difference between the time of the NTP server and local PC. */
+    private static long latestDelay;
+
+    static {
+        I.schedule(20, 60 * 60, TimeUnit.SECONDS, true).to(Chrono::measureTimeDeviation);
+    }
+
+    /**
+     * Query the NTP server and measure the time deviation.
+     */
+    private static void measureTimeDeviation() {
+        NTPUDPClient client = new NTPUDPClient();
+        try {
+            client.open();
+            TimeInfo info = client.getTime(InetAddress.getByName("ntp.nict.jp"));
+            info.computeDetails();
+            latestDelay = info.getOffset();
+            logger.info("Using NTP server to measure the time deviation : " + latestDelay + "ms");
+        } catch (Throwable e) {
+            // ignore
+            logger.error("A query to NTP server failed. ", e);
+        } finally {
+            client.close();
+        }
+    }
+
+    /** The shared clock. */
+    private static Signal<ZonedDateTime> shared = I.schedule(0, 1, TimeUnit.SECONDS, true)
+            .map(v -> ZonedDateTime.ofInstant(Instant.ofEpochMilli(currentTimeMills()), SYSTEM).truncatedTo(ChronoUnit.SECONDS))
+            .share();
+
+    /**
+     * Gets a stream that returns the current time every second.
+     * 
+     * @return
+     */
+    public static Signal<ZonedDateTime> seconds() {
+        return shared;
+    }
+
+    /**
+     * Obtains the exact current time, corrected for the difference between the NTP server and local
+     * PC time.
+     * 
+     * @return
+     */
+    public static long currentTimeMills() {
+        return System.currentTimeMillis() + latestDelay;
+    }
 
     /**
      * UTC {@link ZonedDateTime} from current time.
@@ -320,88 +373,5 @@ public class Chrono {
             }
         }
         return hasNext ? expression.concat(":") : expression;
-    }
-
-    /** The base clock. */
-    private static final Clock CLOCK = Clock.systemDefaultZone();
-
-    /** The clock scheduler. */
-    private static final ScheduledExecutorService TIMER = Executors.newSingleThreadScheduledExecutor(task -> {
-        Thread thread = new Thread(task);
-        thread.setDaemon(true);
-        thread.setName("CLOCK");
-
-        return thread;
-    });
-
-    /** The shared clock. */
-    private static Signal<ZonedDateTime> shared = new Signal<ZonedDateTime>((observer, disposer) -> {
-        return disposer.add(TIMER.scheduleAtFixedRate(() -> {
-            observer.accept(ZonedDateTime.ofInstant(Instant.ofEpochMilli(currentTimeMills()), CLOCK.getZone())
-                    .truncatedTo(ChronoUnit.SECONDS));
-        }, 0, 1, TimeUnit.SECONDS));
-    }).effectOnError(e -> {
-        e.printStackTrace();
-    }).share().effectOnError(e -> {
-        e.printStackTrace();
-    }).share();
-
-    /**
-     * Gets a stream that returns the current time every interval.
-     * 
-     * @param interval
-     */
-    public static Signal<ZonedDateTime> interval(Duration interval) {
-        long time = interval.toSeconds();
-        return shared.takeAt(count -> count % time == time - 1);
-    }
-
-    /**
-     * Gets a stream that returns the current time every second.
-     * 
-     * @return
-     */
-    public static Signal<ZonedDateTime> seconds() {
-        return shared;
-    }
-
-    /** Difference between the time of the NTP server and local PC. */
-    private static long latestDelay;
-
-    static {
-        seconds().takeAt(index -> index % 300 == 15).to(e -> calculateDelayByNTP(), e -> {
-            e.printStackTrace();
-        }, () -> {
-            System.out.println("Complete NTP");
-        });
-    }
-
-    /**
-     * 
-     */
-    private static void calculateDelayByNTP() {
-        NTPUDPClient client = new NTPUDPClient();
-        try {
-            client.open();
-            TimeInfo info = client.getTime(InetAddress.getByName("ntp.nict.jp"));
-            info.computeDetails();
-            latestDelay = info.getOffset();
-            System.out.println(latestDelay);
-        } catch (Throwable e) {
-            // ignore
-            e.printStackTrace();
-        } finally {
-            client.close();
-        }
-    }
-
-    /**
-     * Obtains the exact current time, corrected for the difference between the NTP server and local
-     * PC time.
-     * 
-     * @return
-     */
-    public static long currentTimeMills() {
-        return System.currentTimeMillis() + latestDelay;
     }
 }

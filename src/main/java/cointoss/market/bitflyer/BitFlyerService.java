@@ -123,7 +123,7 @@ class BitFlyerService extends MarketService {
         super("BitFlyer", type, setting);
 
         this.forTest = forTest;
-        this.intervalOrderCheck = I.signal(0, 1, TimeUnit.SECONDS, scheduler()).map(v -> orders().toList()).share();
+        this.intervalOrderCheck = I.schedule(0, 1, TimeUnit.SECONDS, false, scheduler()).map(v -> orders().toList()).share();
     }
 
     /**
@@ -667,7 +667,7 @@ class BitFlyerService extends MarketService {
          * Use the API periodically to maintain the session ID.
          */
         private static void maintain() {
-            Chrono.seconds().takeAt(i -> i % 480 == 240).to(() -> {
+            I.schedule(15, 15, TimeUnit.MINUTES, true).to(() -> {
                 Builder builder = HttpRequest.newBuilder(URI.create("https://lightning.bitflyer.com/api/trade/getMyBoardOrders"))
                         .header("Content-Type", "application/json")
                         .header("Cookie", sessionKey + "=" + Session.id)

@@ -9,7 +9,7 @@
  */
 package cointoss.trade;
 
-import static java.util.concurrent.TimeUnit.*;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
@@ -329,7 +329,7 @@ public abstract class Scenario extends ScenarioBase implements Directional, Disp
      * @param unit
      */
     protected final void exitAfter(long time, TimeUnit unit) {
-        exitWhen(I.signal(time, 0, unit, market.service.scheduler()).first(), Orderable::take);
+        exitWhen(I.schedule(time, 0, unit, false, market.service.scheduler()).first(), Orderable::take);
     }
 
     /**
