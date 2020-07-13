@@ -40,6 +40,54 @@ public class BitFlyerServiceTest {
     }
 
     @Test
+    void executions() {
+        MockBitFlyerService service = new MockBitFlyerService();
+        service.httpClient.onGet().doReturnJSON("""
+                [
+                    {
+                        "id": 1828074165,
+                        "side": "BUY",
+                        "price": 999231,
+                        "size": 0.01,
+                        "exec_date": "2020-07-13T07:41:43.097",
+                        "buy_child_order_acceptance_id": "JRF20200713-074142-266150",
+                        "sell_child_order_acceptance_id": "JRF20200713-074142-697549"
+                    },
+                    {
+                        "id": 1828074164,
+                        "side": "BUY",
+                        "price": 999224,
+                        "size": 0.1,
+                        "exec_date": "2020-07-13T07:41:43.097",
+                        "buy_child_order_acceptance_id": "JRF20200713-074142-266150",
+                        "sell_child_order_acceptance_id": "JRF20200713-074142-809298"
+                    }
+                ]
+                """);
+
+        List<Execution> list = service.executions(1, 10).toList();
+        Execution e = list.get(0);
+        assert e.id == 1828074164;
+        assert e.direction == Direction.BUY;
+        assert e.price.is(999224);
+        assert e.size.is(0.1);
+        assert e.date.isEqual(ZonedDateTime.of(2020, 7, 13, 7, 41, 43, 97000000, Chrono.UTC));
+        assert e.buyer.equals("JRF20200713-074142-266150");
+        assert e.seller.equals("JRF20200713-074142-809298");
+        assert e.consecutive == Execution.ConsecutiveDifference;
+
+        e = list.get(1);
+        assert e.id == 1828074165;
+        assert e.direction == Direction.BUY;
+        assert e.price.is(999231);
+        assert e.size.is(0.01);
+        assert e.date.isEqual(ZonedDateTime.of(2020, 7, 13, 7, 41, 43, 97000000, Chrono.UTC));
+        assert e.buyer.equals("JRF20200713-074142-266150");
+        assert e.seller.equals("JRF20200713-074142-697549");
+        assert e.consecutive == Execution.ConsecutiveSameBuyer;
+    }
+
+    @Test
     void executionLatest() {
         MockBitFlyerService service = new MockBitFlyerService();
         service.httpClient.onGet().doReturnJSON("""
