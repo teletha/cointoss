@@ -17,13 +17,11 @@ import cointoss.execution.Execution;
 import cointoss.order.Order;
 import cointoss.order.OrderState;
 import cointoss.util.Chrono;
+import cointoss.util.EfficientWebSocket;
 import cointoss.util.MockNetwork;
 import cointoss.util.Num;
 import kiss.JSON;
 
-/**
- * @version 2018/04/29 21:19:34
- */
 class MockBitFlyerService extends BitFlyerService {
 
     /** The mockable network. */
@@ -38,6 +36,14 @@ class MockBitFlyerService extends BitFlyerService {
                 .orderBookGroupRanges(Num.ONE));
 
         network = mockNetwork = new MockNetwork();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected EfficientWebSocket realtimely() {
+        return super.realtimely();
     }
 
     /**
