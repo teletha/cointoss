@@ -73,7 +73,7 @@ class BitfinexService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    protected EfficientWebSocket realtimely() {
+    protected EfficientWebSocket clientRealtimely() {
         return Realtime;
     }
 
@@ -128,7 +128,7 @@ class BitfinexService extends MarketService {
         AtomicLong increment = new AtomicLong();
         Object[] previous = new Object[2];
 
-        return realtimely().subscribe(new Topic("trades", marketName))
+        return clientRealtimely().subscribe(new Topic("trades", marketName))
                 .take(e -> e.has("1", "tu"))
                 .map(e -> convert(e.get("2"), increment, previous));
     }
@@ -201,7 +201,7 @@ class BitfinexService extends MarketService {
      */
     @Override
     protected Signal<OrderBookPageChanges> connectOrderBookRealtimely() {
-        return realtimely().subscribe(new Topic("book", marketName)).skip(1).map(json -> {
+        return clientRealtimely().subscribe(new Topic("book", marketName)).skip(1).map(json -> {
             OrderBookPageChanges change = new OrderBookPageChanges();
             JSON data = json.get("1");
 

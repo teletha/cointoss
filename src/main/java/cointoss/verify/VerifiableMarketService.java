@@ -104,7 +104,7 @@ public class VerifiableMarketService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    protected EfficientWebSocket realtimely() {
+    protected EfficientWebSocket clientRealtimely() {
         // If this exception will be thrown, it is bug of this program. So we must rethrow the
         // wrapped error in here.
         throw new Error();

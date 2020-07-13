@@ -72,7 +72,7 @@ class BitMexService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    protected EfficientWebSocket realtimely() {
+    protected EfficientWebSocket clientRealtimely() {
         return Realtime;
     }
 
@@ -137,7 +137,7 @@ class BitMexService extends MarketService {
         AtomicLong increment = new AtomicLong();
         Object[] previous = new Object[2];
 
-        return realtimely().subscribe(new Topic("trade", marketName))
+        return clientRealtimely().subscribe(new Topic("trade", marketName))
                 .flatIterable(json -> json.find("data", "*"))
                 .map(json -> convert(json, increment, previous));
     }
@@ -196,7 +196,7 @@ class BitMexService extends MarketService {
      */
     @Override
     protected Signal<OrderBookPageChanges> connectOrderBookRealtimely() {
-        return realtimely().subscribe(new Topic("orderBookL2", marketName)).map(json -> json.find("data", "*")).map(this::convertOrderBook);
+        return clientRealtimely().subscribe(new Topic("orderBookL2", marketName)).map(json -> json.find("data", "*")).map(this::convertOrderBook);
     }
 
     /**

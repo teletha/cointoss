@@ -9,6 +9,7 @@
  */
 package cointoss;
 
+import java.net.http.HttpClient;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -111,11 +112,20 @@ public abstract class MarketService implements Disposable {
     }
 
     /**
+     * Return the http communicator.
+     * 
+     * @return
+     */
+    protected HttpClient client() {
+        return null;
+    }
+
+    /**
      * Return the realtime communicator.
      * 
      * @return
      */
-    protected abstract EfficientWebSocket realtimely();
+    protected abstract EfficientWebSocket clientRealtimely();
 
     /**
      * Estimate the curernt order delay (second).

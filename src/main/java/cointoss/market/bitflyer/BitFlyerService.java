@@ -130,7 +130,7 @@ class BitFlyerService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    protected EfficientWebSocket realtimely() {
+    protected EfficientWebSocket clientRealtimely() {
         return Realtime;
     }
 
@@ -295,7 +295,7 @@ class BitFlyerService extends MarketService {
     protected Signal<Execution> connectExecutionRealtimely() {
         String[] previous = new String[] {"", ""};
 
-        return realtimely().subscribe(new Topic("lightning_executions_", marketName))
+        return clientRealtimely().subscribe(new Topic("lightning_executions_", marketName))
                 .flatIterable(json -> json.find("params", "message", "*"))
                 .map(json -> {
                     Execution e = convertExecution(json, previous);
@@ -324,6 +324,10 @@ class BitFlyerService extends MarketService {
      */
     static LocalDateTime parse(String time) {
         int size = time.length();
+
+        if (time.charAt(size - 1) != 'Z') {
+            return LocalDateTime.parse(time);
+        }
 
         // remove tail Z
         time = time.substring(0, size - 1);
@@ -556,7 +560,7 @@ class BitFlyerService extends MarketService {
      */
     @Override
     protected Signal<OrderBookPageChanges> connectOrderBookRealtimely() {
-        return realtimely().subscribe(new Topic("lightning_board_", marketName)).map(root -> {
+        return clientRealtimely().subscribe(new Topic("lightning_board_", marketName)).map(root -> {
             JSON e = root.get("params").get("message");
 
             OrderBookPageChanges change = new OrderBookPageChanges();
@@ -618,7 +622,7 @@ class BitFlyerService extends MarketService {
             builder = builder.POST(BodyPublishers.ofString(bodyText));
         }
 
-        return network.rest(builder, Limit);
+        return network.rest(builder, Limit, client());
     }
 
     /**

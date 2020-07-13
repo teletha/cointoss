@@ -10,6 +10,7 @@
 package cointoss.util;
 
 import java.net.URI;
+import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpRequest.Builder;
@@ -23,36 +24,18 @@ public class Network {
     /**
      * Call REST API.
      */
-    public final Signal<JSON> rest(HttpRequest.Builder request) {
-        return rest(request, null);
+    public final Signal<JSON> rest(HttpRequest.Builder request, HttpClient... client) {
+        return rest(request, null, client);
     }
 
     /**
      * Call REST API.
      */
-    public Signal<JSON> rest(HttpRequest.Builder request, APILimiter limiter) {
+    public Signal<JSON> rest(HttpRequest.Builder request, APILimiter limiter, HttpClient... client) {
         return new Signal<>((observer, disposer) -> {
             if (limiter != null) limiter.acquire();
 
-            return I.http(request, JSON.class).to(observer, disposer);
-        });
-    }
-
-    /**
-     * Call REST API.
-     */
-    public final <M> Signal<M> rest(HttpRequest.Builder request, Class<M> type, String... selector) {
-        return rest(request, null, type, selector);
-    }
-
-    /**
-     * Call REST API.
-     */
-    public <M> Signal<M> rest(HttpRequest.Builder request, APILimiter limiter, Class<M> type, String... selector) {
-        return new Signal<>((observer, disposer) -> {
-            if (limiter != null) limiter.acquire();
-
-            return I.http(request, JSON.class).flatIterable(json -> json.find(type, selector)).to(observer, disposer);
+            return I.http(request, JSON.class, client).to(observer, disposer);
         });
     }
 

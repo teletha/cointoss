@@ -64,7 +64,7 @@ class BinanceService extends MarketService {
      * {@inheritDoc}
      */
     @Override
-    protected EfficientWebSocket realtimely() {
+    protected EfficientWebSocket clientRealtimely() {
         return isFutures ? RealtimeFuture : Realtime;
     }
 
@@ -110,7 +110,7 @@ class BinanceService extends MarketService {
      */
     @Override
     protected Signal<Execution> connectExecutionRealtimely() {
-        return realtimely().subscribe(new Topic("aggTrade", marketName)).map(json -> convert(json.get("data")));
+        return clientRealtimely().subscribe(new Topic("aggTrade", marketName)).map(json -> convert(json.get("data")));
     }
 
     /**
@@ -169,7 +169,7 @@ class BinanceService extends MarketService {
         String bidName = isFutures ? "b" : "bids";
         String askName = isFutures ? "a" : "asks";
 
-        return realtimely().subscribe(new Topic("depth20@100ms", marketName))
+        return clientRealtimely().subscribe(new Topic("depth20@100ms", marketName))
                 .map(json -> convertOrderBook(json.get("data"), bidName, askName));
     }
 
