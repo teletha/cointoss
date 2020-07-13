@@ -31,8 +31,6 @@ import cointoss.util.Chrono;
 
 public class BitFlyerServiceTest {
 
-    MockBitFlyerService service = new MockBitFlyerService();
-
     @Test
     void parse() {
         assert BitFlyerService.parse("2018-04-26T00:32:26.1234567Z").isEqual(LocalDateTime.parse("2018-04-26T00:32:26.123"));
@@ -44,6 +42,8 @@ public class BitFlyerServiceTest {
 
     @Test
     void order() {
+        MockBitFlyerService service = new MockBitFlyerService();
+
         service.ordersWillResponse(Order.with.buy(1).price(10), "FirstOrder");
         List<Order> orders = service.orders().toList();
         assert orders.size() == 1;
@@ -117,6 +117,7 @@ public class BitFlyerServiceTest {
 
     @Test
     void executionRealtimelyWithMultipleChannels() {
+        MockBitFlyerService service = new MockBitFlyerService();
         service.websocketServer
                 .replyWhenJSON("{'id':123,'jsonrpc':'2.0','method':'subscribe','params':{'channel':'lightning_executions_FX_BTC_JPY'}}", server -> {
                     server.sendJSON("{'jsonrpc':'2.0','id':123,'result':true}");

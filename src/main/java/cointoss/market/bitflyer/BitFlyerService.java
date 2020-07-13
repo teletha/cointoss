@@ -77,16 +77,16 @@ class BitFlyerService extends MarketService {
     });
 
     /** The realtime data format */
-    static final DateTimeFormatter RealTimeFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
+    static final DateTimeFormatter RealtimeFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
 
     /** The realtime data format */
-    static final DateTimeFormatter RealTimeFormatUntilSecond = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+    static final DateTimeFormatter RealtimeFormatUntilSecond = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
 
     /** The realtime data format */
-    static final DateTimeFormatter RealTimeFormatUntilMinute = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
+    static final DateTimeFormatter RealtimeFormatUntilMinute = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
 
     /** The realtime data format */
-    static final DateTimeFormatter RealTimeFormatUntilHour = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH");
+    static final DateTimeFormatter RealtimeFormatUntilHour = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH");
 
     /** The internal order manager. */
     private final Map<String, Order> orders = new ConcurrentHashMap();
@@ -131,9 +131,7 @@ class BitFlyerService extends MarketService {
      */
     @Override
     protected EfficientWebSocket realtimely() {
-        return new EfficientWebSocket("wss://ws.lightstream.bitflyer.com/json-rpc", json -> {
-            return json.find(String.class, "params", "channel").toString();
-        });
+        return Realtime;
     }
 
     /**
@@ -299,49 +297,21 @@ class BitFlyerService extends MarketService {
 
         return realtimely().subscribe(new Topic("lightning_executions_", marketName))
                 .flatIterable(json -> json.find("params", "message", "*"))
-                .map(e -> {
-                    long id = e.get(Long.class, "id");
+                .map(json -> {
+                    Execution e = convertExecution(json, previous);
 
-                    if (id == 0 && latestId == 0) {
-                        return null; // skip
-                    }
-
-                    id = latestId = id != 0 ? id : ++latestId;
-                    Direction direction = e.get(Direction.class, "side");
-                    Num size = e.get(Num.class, "size");
-                    Num price = e.get(Num.class, "price");
-                    ZonedDateTime date = parse(e.text("exec_date")).atZone(Chrono.UTC);
-                    String buyer = e.text("buy_child_order_acceptance_id");
-                    String seller = e.text("sell_child_order_acceptance_id");
-                    String taker = direction.isBuy() ? buyer : seller;
-                    int consecutiveType = estimateConsecutiveType(previous[0], previous[1], buyer, seller, direction);
-                    int delay = estimateDelay(taker, date);
-
-                    Execution exe = Execution.with.direction(direction, size)
-                            .id(id)
-                            .price(price)
-                            .date(date)
-                            .consecutive(consecutiveType)
-                            .delay(delay)
-                            .buyer(buyer)
-                            .seller(seller);
-
-                    Order o = orders.get(buyer);
-
+                    // update order
+                    Order o = orders.get(e.buyer);
                     if (o != null) {
-                        updateOrder(o, exe);
+                        updateOrder(o, e);
                     } else {
-                        o = orders.get(seller);
+                        o = orders.get(e.seller);
 
                         if (o != null) {
-                            updateOrder(o, exe);
+                            updateOrder(o, e);
                         }
                     }
-
-                    previous[0] = buyer;
-                    previous[1] = seller;
-
-                    return exe;
+                    return e;
                 })
                 .skipNull();
     }
@@ -360,13 +330,13 @@ class BitFlyerService extends MarketService {
 
         switch (size) {
         case 14:
-            return LocalDateTime.parse(time, RealTimeFormatUntilHour);
+            return LocalDateTime.parse(time, RealtimeFormatUntilHour);
 
         case 17:
-            return LocalDateTime.parse(time, RealTimeFormatUntilMinute);
+            return LocalDateTime.parse(time, RealtimeFormatUntilMinute);
 
         case 20:
-            return LocalDateTime.parse(time, RealTimeFormatUntilSecond);
+            return LocalDateTime.parse(time, RealtimeFormatUntilSecond);
 
         default:
             // padding 0
@@ -377,7 +347,7 @@ class BitFlyerService extends MarketService {
                 }
                 time = time + builder;
             }
-            return LocalDateTime.parse(time.substring(0, 23), RealTimeFormat);
+            return LocalDateTime.parse(time.substring(0, 23), RealtimeFormat);
         }
     }
 
@@ -392,7 +362,7 @@ class BitFlyerService extends MarketService {
                 .acquirableExecutionSize() + "&before=" + end + "&after=" + start) //
                         .flatIterable(e -> e.find("*"))
                         .reverse()
-                        .map(e -> convert(e, previous));
+                        .map(e -> convertExecution(e, previous));
     }
 
     /**
@@ -403,34 +373,44 @@ class BitFlyerService extends MarketService {
         String[] previous = new String[] {"", ""};
 
         return rest("GET", API.Public, "/v1/executions?product_code=" + marketName + "&count=1").flatIterable(e -> e.find("*"))
-                .map(e -> convert(e, previous));
+                .map(e -> convertExecution(e, previous));
     }
 
     /**
      * Convert to {@link Execution}.
      * 
-     * @param json
-     * @param previous
-     * @return
+     * @param json Message represents executed trade.
+     * @param previous Previous execution info.
+     * @return A parsed {@link Execution}.
      */
-    private Execution convert(JSON e, String[] previous) {
-        long id = e.get(Long.class, "id");
-        Direction direction = Direction.parse(e.get(String.class, "side"));
-        Num size = Num.of(e.get(String.class, "size"));
-        Num price = Num.of(e.get(String.class, "price"));
-        ZonedDateTime date = LocalDateTime.parse(e.get(String.class, "exec_date")).atZone(Chrono.UTC);
-        String buyer = e.get(String.class, "buy_child_order_acceptance_id");
-        String seller = e.get(String.class, "sell_child_order_acceptance_id");
+    private Execution convertExecution(JSON json, String[] previous) {
+        long id = Long.parseLong(json.text("id"));
+        if (id == 0 && latestId == 0) {
+            return null; // skip
+        }
+
+        id = latestId = id != 0 ? id : ++latestId;
+        Direction direction = json.get(Direction.class, "side");
+        Num size = json.get(Num.class, "size");
+        Num price = json.get(Num.class, "price");
+        ZonedDateTime date = parse(json.text("exec_date")).atZone(Chrono.UTC);
+        String buyer = json.text("buy_child_order_acceptance_id");
+        String seller = json.text("sell_child_order_acceptance_id");
         String taker = direction.isBuy() ? buyer : seller;
         int consecutiveType = estimateConsecutiveType(previous[0], previous[1], buyer, seller, direction);
         int delay = estimateDelay(taker, date);
 
-        Execution exe = Execution.with.direction(direction, size).id(id).price(price).date(date).consecutive(consecutiveType).delay(delay);
-
         previous[0] = buyer;
         previous[1] = seller;
 
-        return exe;
+        return Execution.with.direction(direction, size)
+                .id(id)
+                .price(price)
+                .date(date)
+                .consecutive(consecutiveType)
+                .delay(delay)
+                .buyer(buyer)
+                .seller(seller);
     }
 
     /**
